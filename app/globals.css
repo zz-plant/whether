@@ -4,11 +4,18 @@
 
 :root {
   color-scheme: dark;
+  --display-offset-x: 0px;
+  --display-offset-y: 0px;
 }
 
 body {
   @apply bg-slate-950 text-slate-100 antialiased;
   font-family: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+.display-drift {
+  transform: translate(var(--display-offset-x), var(--display-offset-y));
+  transition: transform 2.5s ease-in-out;
 }
 
 .mono {
