@@ -4,7 +4,7 @@
  */
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   evaluateDecision,
   type DecisionAction,
@@ -74,20 +74,30 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
   const [category, setCategory] = useState<DecisionCategory>("HIRING");
   const [action, setAction] = useState<DecisionAction>("HIRE");
   const [copied, setCopied] = useState(false);
+  const [copyError, setCopyError] = useState(false);
 
   const output = useMemo(
     () => evaluateDecision(assessment, { lifecycle, category, action }),
     [assessment, lifecycle, category, action]
   );
+  const shareText = useMemo(
+    () => buildShareText(assessment, lifecycle, category, action, output),
+    [assessment, lifecycle, category, action, output]
+  );
+
+  useEffect(() => {
+    setCopyError(false);
+  }, [lifecycle, category, action]);
 
   const handleCopy = async () => {
-    const payload = buildShareText(assessment, lifecycle, category, action, output);
     try {
-      await navigator.clipboard.writeText(payload);
+      await navigator.clipboard.writeText(shareText);
       setCopied(true);
+      setCopyError(false);
       setTimeout(() => setCopied(false), 2000);
     } catch {
       setCopied(false);
+      setCopyError(true);
     }
   };
 
@@ -110,6 +120,22 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
             {copied ? "Copied" : "Copy verdict"}
           </button>
         </div>
+        {copyError ? (
+          <div className="mt-4 rounded-xl border border-amber-400/40 bg-amber-500/10 p-4 text-xs text-amber-100">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-amber-200">
+              Clipboard blocked
+            </p>
+            <p className="mt-2 text-amber-100/90">
+              Select and copy the verdict below to share it manually.
+            </p>
+            <textarea
+              readOnly
+              value={shareText}
+              rows={8}
+              className="mt-3 w-full rounded-lg border border-amber-400/30 bg-slate-950/80 p-3 font-mono text-[11px] text-amber-100"
+            />
+          </div>
+        ) : null}
 
         <div className="mt-6 grid gap-4 lg:grid-cols-3">
           <label className="space-y-2 text-xs uppercase tracking-[0.2em] text-slate-400">

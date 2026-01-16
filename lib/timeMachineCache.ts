@@ -45,6 +45,22 @@ export const getTimeMachineYears = () => {
   return Array.from(years).sort((a, b) => b - a);
 };
 
+export const getTimeMachineMonthsByYear = () => {
+  const monthsByYear: Record<number, number[]> = {};
+  sortedSnapshots.forEach((snapshot) => {
+    if (!monthsByYear[snapshot.year]) {
+      monthsByYear[snapshot.year] = [];
+    }
+    if (!monthsByYear[snapshot.year].includes(snapshot.month)) {
+      monthsByYear[snapshot.year].push(snapshot.month);
+    }
+  });
+  Object.keys(monthsByYear).forEach((year) => {
+    monthsByYear[Number(year)].sort((a, b) => a - b);
+  });
+  return monthsByYear;
+};
+
 export const hasTimeMachineEntry = (year: number, month: number) => {
   return sortedSnapshots.some(
     (snapshot) => snapshot.year === year && snapshot.month === month
