@@ -5,31 +5,31 @@ Each milestone is tied to the core loop: ingest Treasury data → compute regime
 plain‑English operational constraints with traceable sources.
 
 ## Milestone 0 — Repo scaffolding (Week 0)
-- Establish Next.js 14 + TypeScript strict + Tailwind baseline.
-- Add core directories: `app/`, `lib/`, `data/`, `public/`.
-- Add `lib/types.ts` with Regime Engine interfaces.
-- Add `lib/regimeEngine.ts` with explainable scoring and classification.
-- Add `data/snapshot_fallback.json` for offline mode.
+- [x] Establish Next.js 14 + TypeScript strict + Tailwind baseline.
+- [x] Add core directories: `app/`, `lib/`, `data/`, `public/`.
+- [x] Add `lib/types.ts` with Regime Engine interfaces.
+- [x] Add `lib/regimeEngine.ts` with explainable scoring and classification.
+- [x] Add `data/snapshot_fallback.json` for offline mode.
 
 ## Milestone 1 — Live Sensor Array (Week 1)
-- Implement `/api/treasury` route:
-  - Fetch from US Treasury Fiscal Data API.
-  - Normalize to `TreasuryData` shape.
-  - Cache daily (`revalidate: 86400`).
-  - Fallback to snapshot with `isLive: false`.
-  - Always return `source`, `record_date`, `fetched_at`.
-- Build Sensor cards:
-  - Base rate (1M yield) with tooltip explanation.
-  - Curve slope (10Y − 2Y) with tooltip explanation.
-  - Source + timestamp on every card.
+- [x] Implement `/api/treasury` route:
+  - [x] Fetch from US Treasury Fiscal Data API.
+  - [x] Normalize to `TreasuryData` shape.
+  - [x] Cache daily (`revalidate: 86400`).
+  - [x] Fallback to snapshot with `isLive: false`.
+  - [x] Always return `source`, `record_date`, `fetched_at`.
+- [x] Build Sensor cards:
+  - [x] Base rate (1M yield) with tooltip explanation.
+  - [x] Curve slope (10Y − 2Y) with tooltip explanation.
+  - [x] Source + timestamp on every card.
 
 ## Milestone 2 — Regime Hero + Playbook (Week 2)
-- Regime Hero:
-  - Regime badge (Scarcity/Defensive/Volatile/Expansion).
-  - Short description that translates jargon into operational constraints.
-- Playbook lists:
-  - STOP / START / FENCE with reasons.
-  - Keep lists short and action‑oriented.
+- [x] Regime Hero:
+  - [x] Regime badge (Scarcity/Defensive/Volatile/Expansion).
+  - [x] Short description that translates jargon into operational constraints.
+- [x] Playbook lists:
+  - [x] STOP / START / FENCE with reasons.
+  - [x] Keep lists short and action‑oriented.
 
 ## Milestone 3 — Decision Shield (Week 3)
 - Dropdown-driven inputs (Lifecycle, Category, Action).

@@ -59,6 +59,17 @@ Query any date since 2000 via the Treasury API to show the regime on that day.
 - **Live vs snapshot indicators**: clearly label data freshness.
 - **Fail gracefully** if the API is down or blocked.
 
+## Repo layout (current scaffolding)
+- `lib/regimeEngine.ts`: deterministic scoring + regime classification core.
+- `lib/decisionShield.ts`: decision verdicts tied to regimes and sensor states.
+- `lib/treasuryNormalizer.ts`: maps Treasury API payloads into normalized data shapes.
+- `lib/treasuryClient.ts`: Treasury fetcher with snapshot fallback and explicit metadata.
+- `lib/sensors.ts`: builds sensor readings with source + timestamp metadata.
+- `lib/playbook.ts`: selects regime playbook guidance from the insight database.
+- `lib/timeMachine.ts`: builds historical queries and labels.
+- `lib/types.ts`: shared Treasury data + sensor types.
+- `data/snapshot_fallback.json`: offline snapshot with source and timestamps.
+
 ### Scoring (MVP)
 - Tightness score (0–100):
   - Base rate > 5% adds 90
@@ -77,3 +88,8 @@ This repo should make the product’s **purpose and market gap** obvious:
 - The “Whether Report” output should be shareable (copy/screenshot) to influence decisions.
 
 For UI and engineering inspiration, see `LEARNINGS.md`.
+
+## Local development
+1. Install dependencies: `npm install`
+2. Run the dashboard: `npm run dev`
+3. Open `http://localhost:3000` to view the Regime Station UI.
