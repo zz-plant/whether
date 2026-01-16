@@ -23,6 +23,15 @@ It is inspired by high-level themes from:
 - **Polished interaction**: use gentle motion (150–300ms) and subtle depth (soft shadows) to reinforce hierarchy.
 - **Clear CTA hierarchy**: surface a primary CTA above the fold and repeat it after supporting content.
 
+## Weather app inspiration (beloved references)
+
+- **Forecast-at-a-glance**: lead with a single, high-signal summary that answers "what should I do today?" before any charts.
+- **Layered detail**: offer progressive disclosure (hourly → daily → historical) so depth is available without overwhelming.
+- **Signal density**: compact, information-rich panels (feels-like, wind, precip) that earn their real estate.
+- **Contextual alerts**: highlight only meaningful changes (fronts, volatility spikes) with calm, professional emphasis.
+- **Visual rhythm**: align cards, charts, and tables on a strict grid to create predictable scanning patterns.
+- **Trust cues**: show update times and source links inline to reinforce data credibility.
+
 ## Practical checklist
 
 - [ ] Start from design tokens and document them in a shared theme file.
