@@ -5,9 +5,12 @@ import { evaluateRegime } from "../lib/regimeEngine";
 import { getPlaybookGuidance } from "../lib/playbook";
 import {
   DataSourcePanel,
+  LiveTickerPanel,
   PlaybookPanel,
   RegimeAssessmentCard,
+  ScoreReadoutPanel,
   SensorArray,
+  SignalMatrixPanel,
 } from "./components/reportSections";
 
 export default async function HomePage() {
@@ -36,8 +39,16 @@ export default async function HomePage() {
           </p>
         </header>
 
-        <section className="mt-10 grid gap-6 lg:grid-cols-[2fr,1fr]">
+        <section className="mt-10 grid gap-6 lg:grid-cols-[2.2fr,1fr]">
           <RegimeAssessmentCard assessment={assessment} />
+          <div className="grid gap-6">
+            <LiveTickerPanel treasury={treasury} assessment={assessment} />
+            <ScoreReadoutPanel assessment={assessment} />
+          </div>
+        </section>
+
+        <section className="mt-10 grid gap-6 lg:grid-cols-[1.2fr,1fr]">
+          <SignalMatrixPanel assessment={assessment} />
           <DataSourcePanel treasury={treasury} />
         </section>
 
