@@ -49,10 +49,12 @@ Example logic:
 - If **Survival** and **Hire** ⇒ **Danger** (misaligned)
 - If **Growth** and **Hire** ⇒ **Safe** (aligned)
 
-Output includes a **status flag + concrete advice** (e.g., payback window).
+Output includes a **status flag + concrete advice** (e.g., payback window), plus copy-ready
+verdict text for sharing in planning reviews.
 
 ### 4) Time Machine (historical analysis)
-Query any date since 2000 via the Treasury API to show the regime on that day.
+Query any month since 2000 via the Treasury API to show the regime on the latest available
+record on or before that date, clearly labeled as historical.
 
 ## Technical requirements
 - **Snapshot mode**: render instantly from cached data (0ms), then fetch async.
