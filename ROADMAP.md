@@ -61,6 +61,12 @@ plain‑English operational constraints with traceable sources.
 
 ---
 
+### Development stories (planned)
+- As a product leader, I can see a curated Insight Database so I understand how macro regimes translate into concrete product and engineering constraints.
+- As an operator, I can copy Decision Shield guidance tied to current sensors so I can validate hires, rewrites, and launches with traceable reasoning.
+- As a team lead, I can compare fossil-record signals against today’s regime so I can spot legacy architecture and support patterns that no longer fit the climate.
+- As an executive, I can read a one-sentence meta-insight that explains why posture must change with macro physics.
+
 ### Success criteria
 - Every output is traceable to a public source and includes timestamps.
 - Operators can copy/paste a defensible, plain‑English decision rationale.
