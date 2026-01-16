@@ -11,6 +11,21 @@ import {
 } from "./components/reportSections";
 
 export default async function HomePage() {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://whether.report";
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Whether — Regime Station",
+    url: siteUrl,
+    description:
+      "Translate Treasury macro signals into plain-English operational constraints for product and engineering leaders.",
+    inLanguage: "en",
+    publisher: {
+      "@type": "Organization",
+      name: "Whether"
+    }
+  };
+
   const treasury = await fetchTreasuryData({ snapshotFallback: snapshotData });
   const sensors = buildSensorReadings(treasury);
   const assessment = evaluateRegime(treasury);
@@ -19,6 +34,10 @@ export default async function HomePage() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
       <div className="mx-auto max-w-6xl px-6 py-12">
         <header className="flex flex-col gap-4 border-b border-slate-800 pb-8">
           <div className="flex flex-wrap items-center justify-between gap-4">
