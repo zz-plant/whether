@@ -55,6 +55,9 @@ verdict text for sharing in planning reviews.
 ### 4) Time Machine (historical analysis)
 Query any month since 2000 via the Treasury API to show the regime on the latest available
 record on or before that date, clearly labeled as historical.
+The Time Machine now prefers the local cache (`data/time_machine_cache.json`) to avoid
+third‑party lookups in replay mode. Refresh the cache by re-running the Treasury query
+logic in a connected environment and committing the updated file.
 
 ## Technical requirements
 - **Snapshot mode**: render instantly from cached data (0ms), then fetch async.
