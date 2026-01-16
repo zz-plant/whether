@@ -9,6 +9,7 @@ import {
   hasTimeMachineEntry,
   getTimeMachineCoverage,
   getTimeMachineYears,
+  getTimeMachineMonthsByYear,
 } from "../lib/timeMachineCache";
 import { DecisionShieldPanel } from "./components/decisionShieldPanel";
 import { DisplayGuardian } from "./components/displayGuardian";
@@ -57,6 +58,29 @@ const parseHistoricalSelection = (searchParams?: { month?: string; year?: string
   };
 };
 
+const parseRequestedSelection = (searchParams?: { month?: string; year?: string }) => {
+  if (!searchParams?.month || !searchParams?.year) {
+    return null;
+  }
+
+  const month = Number(searchParams.month);
+  const year = Number(searchParams.year);
+
+  if (!Number.isInteger(month) || !Number.isInteger(year)) {
+    return null;
+  }
+
+  if (month < 1 || month > 12) {
+    return null;
+  }
+
+  if (year < 2000) {
+    return null;
+  }
+
+  return { month, year };
+};
+
 const buildYearOptions = (startYear: number, endYear: number) => {
   const years: number[] = [];
   for (let year = endYear; year >= startYear; year -= 1) {
@@ -91,7 +115,12 @@ export default async function HomePage({
   const defaultYear = latestCache?.year ?? now.getUTCFullYear();
   const cacheCoverage = getTimeMachineCoverage();
   const cacheYears = getTimeMachineYears();
+  const cacheMonthsByYear = getTimeMachineMonthsByYear();
   const historicalSelection = parseHistoricalSelection(searchParams);
+  const requestedSelection = parseRequestedSelection(searchParams);
+  const invalidHistoricalSelection = Boolean(requestedSelection && !historicalSelection);
+  const selectedMonth = requestedSelection?.month ?? defaultMonth;
+  const selectedYear = requestedSelection?.year ?? defaultYear;
   const treasury = await fetchTreasuryData({
     snapshotFallback: snapshotData,
     asOf: historicalSelection?.asOf,
@@ -156,12 +185,14 @@ export default async function HomePage({
         <DecisionShieldPanel assessment={assessment} />
 
         <TimeMachinePanel
-          selectedYear={historicalSelection?.year ?? defaultYear}
-          selectedMonth={historicalSelection?.month ?? defaultMonth}
+          selectedYear={selectedYear}
+          selectedMonth={selectedMonth}
           years={cacheYears.length ? cacheYears : buildYearOptions(2000, defaultYear)}
           isHistorical={Boolean(historicalSelection)}
           latestRecordDate={treasury.record_date}
           cacheCoverage={cacheCoverage}
+          monthsByYear={cacheMonthsByYear}
+          invalidSelection={invalidHistoricalSelection}
         />
 
         <footer className="mt-12 border-t border-slate-800 pt-6 text-xs text-slate-500">

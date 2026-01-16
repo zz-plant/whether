@@ -86,6 +86,7 @@ const getRegimeAccent = (regime: RegimeAssessment["regime"]) => {
 export const RegimeAssessmentCard = ({ assessment }: { assessment: RegimeAssessment }) => {
   const regimeLabel = getRegimeLabel(assessment.regime);
   const regimeAccent = getRegimeAccent(assessment.regime);
+  const hasWarnings = assessment.dataWarnings.length > 0;
 
   return (
     <div className="relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
@@ -118,6 +119,22 @@ export const RegimeAssessmentCard = ({ assessment }: { assessment: RegimeAssessm
           </li>
         ))}
       </ul>
+      {hasWarnings ? (
+        <div className="relative mt-6 rounded-xl border border-amber-400/40 bg-amber-500/10 p-4 text-xs text-amber-100">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-amber-200">Data quality flags</p>
+          <ul className="mt-3 space-y-2">
+            {assessment.dataWarnings.map((warning) => (
+              <li key={warning} className="flex gap-2">
+                <span className="text-amber-200/80">•</span>
+                <span>{warning}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-3 text-[11px] text-amber-200/80">
+            Scores may be less reliable when source fields are missing.
+          </p>
+        </div>
+      ) : null}
       <div className="relative mt-6 grid gap-4 rounded-xl border border-slate-800 bg-slate-950/60 p-4 text-xs text-slate-400">
         <p>{assessment.tightnessExplanation}</p>
         <p>{assessment.riskAppetiteExplanation}</p>
@@ -173,7 +190,18 @@ export const LiveTickerPanel = ({
           </span>
         </div>
       </div>
-      <div className="mt-4 text-xs text-slate-500">Source: {treasury.source}</div>
+      <div className="mt-4 text-xs text-slate-500">
+        Source:{" "}
+        <a
+          href={treasury.source}
+          target="_blank"
+          rel="noreferrer"
+          className="text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+          title={treasury.source}
+        >
+          Open source
+        </a>
+      </div>
     </div>
   );
 };
@@ -270,7 +298,14 @@ export const DataSourcePanel = ({ treasury }: { treasury: TreasuryData }) => {
       <p className="mono text-sm text-slate-200">{treasury.record_date}</p>
       <p className="mt-4 text-xs text-slate-400">Fetched at</p>
       <p className="mono text-sm text-slate-200">{formatTimestamp(treasury.fetched_at)}</p>
-      <p className="mt-4 break-all text-xs text-slate-500">{treasury.source}</p>
+      <a
+        href={treasury.source}
+        target="_blank"
+        rel="noreferrer"
+        className="mt-4 break-all text-xs text-slate-400 underline decoration-slate-700 underline-offset-4 hover:text-slate-200"
+      >
+        {treasury.source}
+      </a>
     </div>
   );
 };
@@ -291,6 +326,8 @@ export const TimeMachinePanel = ({
   isHistorical,
   latestRecordDate,
   cacheCoverage,
+  monthsByYear,
+  invalidSelection,
 }: {
   selectedYear: number;
   selectedMonth: number;
@@ -298,7 +335,14 @@ export const TimeMachinePanel = ({
   isHistorical: boolean;
   latestRecordDate: string;
   cacheCoverage: { earliest: string | null; latest: string | null };
+  monthsByYear: Record<number, number[]>;
+  invalidSelection: boolean;
 }) => {
+  const availableMonths = monthsByYear[selectedYear] ?? [];
+  const resolvedSelectedMonth =
+    availableMonths.length > 0 && !availableMonths.includes(selectedMonth)
+      ? availableMonths[0]
+      : selectedMonth;
   const coverageLabel =
     cacheCoverage.earliest && cacheCoverage.latest
       ? `${cacheCoverage.earliest} → ${cacheCoverage.latest}`
@@ -331,14 +375,19 @@ export const TimeMachinePanel = ({
             Month
             <select
               name="month"
-              defaultValue={selectedMonth}
+              defaultValue={resolvedSelectedMonth}
               className="w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-sm text-slate-100"
             >
-              {monthOptions.map((option) => (
-                <option key={option.value} value={option.value}>
+              {monthOptions.map((option) => {
+                const isUnavailable =
+                  availableMonths.length > 0 && !availableMonths.includes(option.value);
+                return (
+                  <option key={option.value} value={option.value} disabled={isUnavailable}>
                   {option.label}
+                  {isUnavailable ? " (not available)" : ""}
                 </option>
-              ))}
+                );
+              })}
             </select>
           </label>
           <label className="space-y-2 text-xs uppercase tracking-[0.2em] text-slate-400">
@@ -362,6 +411,11 @@ export const TimeMachinePanel = ({
             Load snapshot
           </button>
         </form>
+        {invalidSelection ? (
+          <p className="mt-4 text-xs text-amber-200">
+            That month is not available in the cache. Showing the latest data instead.
+          </p>
+        ) : null}
         <p className="mt-4 text-xs text-slate-500">
           Latest available record: <span className="mono text-slate-300">{latestRecordDate}</span>
         </p>
