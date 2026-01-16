@@ -32,19 +32,19 @@ plain‑English operational constraints with traceable sources.
   - [x] Keep lists short and action‑oriented.
 
 ## Milestone 3 — Decision Shield (Week 3)
-- Dropdown-driven inputs (Lifecycle, Category, Action).
-- Verdict card (Safe / Risky / Dangerous) with:
-  - 2–4 bullets tied to sensor states.
-  - Guardrail constraint.
-  - Reversal trigger.
-- Copy-to-clipboard output for easy sharing.
+- [x] Dropdown-driven inputs (Lifecycle, Category, Action).
+- [x] Verdict card (Safe / Risky / Dangerous) with:
+  - [x] 2–4 bullets tied to sensor states.
+  - [x] Guardrail constraint.
+  - [x] Reversal trigger.
+- [x] Copy-to-clipboard output for easy sharing.
 
 ## Milestone 4 — Time Machine (Week 4)
-- Historical mode:
-  - Month/Year picker.
-  - Server fetch with `record_date:lte:YYYY-MM-DD`.
-  - Banner that clearly marks historical context.
-- Handle missing data and “latest available” lookup.
+- [x] Historical mode:
+  - [x] Month/Year picker.
+  - [x] Server fetch with `record_date:lte:YYYY-MM-DD`.
+  - [x] Banner that clearly marks historical context.
+- [x] Handle missing data and “latest available” lookup.
 
 ## Milestone 5 — UX Polish + Verification (Week 5)
 - Cockpit-style layout with high-density panels.

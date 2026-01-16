@@ -1,0 +1,191 @@
+/**
+ * Decision Shield panel for validating operator actions against the current regime.
+ * Keeps verdict output shareable and grounded in sensor-driven signals.
+ */
+"use client";
+
+import { useMemo, useState } from "react";
+import {
+  evaluateDecision,
+  type DecisionAction,
+  type DecisionCategory,
+  type DecisionOutput,
+  type LifecycleStage,
+} from "../../lib/decisionShield";
+import type { RegimeAssessment } from "../../lib/regimeEngine";
+
+const lifecycleOptions: { value: LifecycleStage; label: string }[] = [
+  { value: "DISCOVERY", label: "Discovery" },
+  { value: "GROWTH", label: "Growth" },
+  { value: "SCALE", label: "Scale" },
+  { value: "MATURE", label: "Mature" },
+];
+
+const categoryOptions: { value: DecisionCategory; label: string }[] = [
+  { value: "HIRING", label: "Hiring" },
+  { value: "ROADMAP", label: "Roadmap" },
+  { value: "PRICING", label: "Pricing" },
+  { value: "INFRASTRUCTURE", label: "Infrastructure" },
+];
+
+const actionOptions: { value: DecisionAction; label: string }[] = [
+  { value: "HIRE", label: "Hire" },
+  { value: "REWRITE", label: "Rewrite" },
+  { value: "LAUNCH", label: "Launch" },
+  { value: "DISCOUNT", label: "Discount" },
+  { value: "EXPAND", label: "Expand" },
+];
+
+const verdictStyles: Record<DecisionOutput["verdict"], string> = {
+  SAFE: "border-emerald-400/40 bg-emerald-500/10 text-emerald-200",
+  RISKY: "border-amber-400/40 bg-amber-500/10 text-amber-200",
+  DANGEROUS: "border-rose-400/40 bg-rose-500/10 text-rose-200",
+};
+
+const buildShareText = (
+  assessment: RegimeAssessment,
+  lifecycle: LifecycleStage,
+  category: DecisionCategory,
+  action: DecisionAction,
+  output: DecisionOutput
+) => {
+  const lines = [
+    "Decision Shield — Whether Report",
+    `Regime: ${assessment.regime}`,
+    `Lifecycle: ${lifecycle}`,
+    `Category: ${category}`,
+    `Action: ${action}`,
+    `Verdict: ${output.verdict}`,
+    "",
+    `Summary: ${output.summary}`,
+    "",
+    "Signals:",
+    ...output.bullets.map((bullet) => `- ${bullet}`),
+    "",
+    `Guardrail: ${output.guardrail}`,
+    `Reversal trigger: ${output.reversalTrigger}`,
+  ];
+
+  return lines.join("\n");
+};
+
+export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessment }) => {
+  const [lifecycle, setLifecycle] = useState<LifecycleStage>("GROWTH");
+  const [category, setCategory] = useState<DecisionCategory>("HIRING");
+  const [action, setAction] = useState<DecisionAction>("HIRE");
+  const [copied, setCopied] = useState(false);
+
+  const output = useMemo(
+    () => evaluateDecision(assessment, { lifecycle, category, action }),
+    [assessment, lifecycle, category, action]
+  );
+
+  const handleCopy = async () => {
+    const payload = buildShareText(assessment, lifecycle, category, action, output);
+    try {
+      await navigator.clipboard.writeText(payload);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
+  };
+
+  return (
+    <section className="mt-10">
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="text-sm uppercase tracking-[0.2em] text-slate-400">Decision Shield</p>
+            <h3 className="text-xl font-semibold text-slate-100">Validate an action</h3>
+            <p className="mt-2 text-sm text-slate-300">
+              Pressure-test the next move against current regime physics, then share the verdict.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="rounded-full border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 hover:border-slate-500"
+          >
+            {copied ? "Copied" : "Copy verdict"}
+          </button>
+        </div>
+
+        <div className="mt-6 grid gap-4 lg:grid-cols-3">
+          <label className="space-y-2 text-xs uppercase tracking-[0.2em] text-slate-400">
+            Lifecycle
+            <select
+              value={lifecycle}
+              onChange={(event) => setLifecycle(event.target.value as LifecycleStage)}
+              className="w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-sm text-slate-100"
+            >
+              {lifecycleOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="space-y-2 text-xs uppercase tracking-[0.2em] text-slate-400">
+            Category
+            <select
+              value={category}
+              onChange={(event) => setCategory(event.target.value as DecisionCategory)}
+              className="w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-sm text-slate-100"
+            >
+              {categoryOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="space-y-2 text-xs uppercase tracking-[0.2em] text-slate-400">
+            Action
+            <select
+              value={action}
+              onChange={(event) => setAction(event.target.value as DecisionAction)}
+              className="w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-sm text-slate-100"
+            >
+              {actionOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        <div className="mt-6 grid gap-4 lg:grid-cols-[1.4fr,1fr]">
+          <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Verdict</p>
+            <div
+              className={`mt-3 inline-flex items-center rounded-full border px-3 py-1 text-xs uppercase tracking-[0.2em] ${verdictStyles[output.verdict]}`}
+            >
+              {output.verdict}
+            </div>
+            <p className="mt-3 text-sm text-slate-200">{output.summary}</p>
+            <ul className="mt-4 space-y-2 text-sm text-slate-300">
+              {output.bullets.map((bullet) => (
+                <li key={bullet} className="flex gap-2">
+                  <span className="text-slate-500">•</span>
+                  <span>{bullet}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="grid gap-4">
+            <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Guardrail</p>
+              <p className="mt-3 text-sm text-slate-300">{output.guardrail}</p>
+            </div>
+            <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Reversal trigger</p>
+              <p className="mt-3 text-sm text-slate-300">{output.reversalTrigger}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};

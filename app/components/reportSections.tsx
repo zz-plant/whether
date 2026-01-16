@@ -18,6 +18,21 @@ const formatNumber = (value: number | null, unit: string) => {
   return `${value.toFixed(2)}${unit}`;
 };
 
+const monthOptions = [
+  { value: 1, label: "January" },
+  { value: 2, label: "February" },
+  { value: 3, label: "March" },
+  { value: 4, label: "April" },
+  { value: 5, label: "May" },
+  { value: 6, label: "June" },
+  { value: 7, label: "July" },
+  { value: 8, label: "August" },
+  { value: 9, label: "September" },
+  { value: 10, label: "October" },
+  { value: 11, label: "November" },
+  { value: 12, label: "December" },
+];
+
 const getRegimeLabel = (regime: RegimeAssessment["regime"]) => {
   switch (regime) {
     case "SCARCITY":
@@ -114,19 +129,22 @@ export const RegimeAssessmentCard = ({ assessment }: { assessment: RegimeAssessm
 export const LiveTickerPanel = ({
   treasury,
   assessment,
+  modeLabel,
 }: {
   treasury: TreasuryData;
   assessment: RegimeAssessment;
+  modeLabel?: string;
 }) => {
   const curveSlope = assessment.scores.curveSlope;
   const curveLabel = curveSlope === null ? "—" : curveSlope < 0 ? "Inverted" : "Normal";
+  const statusLabel = modeLabel ?? (treasury.isLive ? "Live" : "Offline");
 
   return (
     <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
       <div className="flex items-center justify-between">
         <h3 className="text-sm uppercase tracking-[0.2em] text-slate-400">Live Ticker</h3>
         <span className="rounded-full border border-slate-700 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-400">
-          {treasury.isLive ? "Live" : "Offline"}
+          {statusLabel}
         </span>
       </div>
       <div className="mt-4 grid gap-3 text-sm text-slate-300">
@@ -254,6 +272,94 @@ export const DataSourcePanel = ({ treasury }: { treasury: TreasuryData }) => {
       <p className="mono text-sm text-slate-200">{formatTimestamp(treasury.fetched_at)}</p>
       <p className="mt-4 break-all text-xs text-slate-500">{treasury.source}</p>
     </div>
+  );
+};
+
+export const HistoricalBanner = ({ banner }: { banner: string }) => {
+  return (
+    <div className="mt-6 rounded-2xl border border-slate-700 bg-slate-900/60 px-4 py-3 text-sm text-slate-200">
+      <span className="text-xs uppercase tracking-[0.2em] text-slate-400">Time Machine</span>
+      <p className="mt-1">{banner}</p>
+    </div>
+  );
+};
+
+export const TimeMachinePanel = ({
+  selectedYear,
+  selectedMonth,
+  years,
+  isHistorical,
+  latestRecordDate,
+}: {
+  selectedYear: number;
+  selectedMonth: number;
+  years: number[];
+  isHistorical: boolean;
+  latestRecordDate: string;
+}) => {
+  return (
+    <section className="mt-10">
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="text-sm uppercase tracking-[0.2em] text-slate-400">Time Machine</p>
+            <h3 className="text-xl font-semibold text-slate-100">Replay a prior regime</h3>
+            <p className="mt-2 text-sm text-slate-300">
+              Pull the latest available Treasury record on or before a chosen month to see the
+              historical regime.
+            </p>
+          </div>
+          {isHistorical ? (
+            <a
+              href="/"
+              className="rounded-full border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 hover:border-slate-500"
+            >
+              Exit historical view
+            </a>
+          ) : null}
+        </div>
+
+        <form method="GET" className="mt-6 grid gap-4 md:grid-cols-[1fr,1fr,auto]">
+          <label className="space-y-2 text-xs uppercase tracking-[0.2em] text-slate-400">
+            Month
+            <select
+              name="month"
+              defaultValue={selectedMonth}
+              className="w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-sm text-slate-100"
+            >
+              {monthOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="space-y-2 text-xs uppercase tracking-[0.2em] text-slate-400">
+            Year
+            <select
+              name="year"
+              defaultValue={selectedYear}
+              className="w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-sm text-slate-100"
+            >
+              {years.map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button
+            type="submit"
+            className="rounded-xl border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 hover:border-slate-500"
+          >
+            Load snapshot
+          </button>
+        </form>
+        <p className="mt-4 text-xs text-slate-500">
+          Latest available record: <span className="mono text-slate-300">{latestRecordDate}</span>
+        </p>
+      </div>
+    </section>
   );
 };
 
