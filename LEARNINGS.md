@@ -1,32 +1,76 @@
-# Learnings and principles
+# Learnings & Principles
 
-This document summarizes product, engineering, and UI/UX principles to guide future work in this repo.
-It is inspired by high-level themes from:
-- oven-sh (Bun)
-- nextlevelbuilder/ui-ux-pro-max-skill
+A concise reference for **Regime Station** product intent and execution standards.
+Use this as the default checklist when making product, engineering, or UI/UX decisions.
 
-## Product + engineering themes (oven-sh/Bun)
+---
 
-- **Single-tool focus**: consolidate the most common workflows (run, test, install) into one fast, dependable CLI to reduce cognitive load.
-- **Speed and resource efficiency**: optimize for fast startup, low memory use, and minimal runtime friction.
-- **Drop-in compatibility**: prioritize compatibility with existing ecosystems so adoption requires little to no rewrites.
-- **Pragmatic defaults**: ship with sensible defaults and examples so new users can succeed quickly.
+## North Star: What we ship and why
 
-## UI/UX themes (UI UX Pro Max)
+**Regime Station turns public macro signals into plain‑English execution constraints for product and engineering leaders.**
+Every change should help users answer:
 
-- **Design system first**: define tokens (color, typography, spacing, radius, elevation) and reuse them across components.
-- **Pattern-driven layouts**: choose a primary layout pattern (e.g., hero-centric with social proof) and use it consistently.
-- **Accessible by default**:
-  - Maintain WCAG AA contrast.
-  - Keep focus states visible.
-  - Respect `prefers-reduced-motion`.
-- **Polished interaction**: use gentle motion (150–300ms) and subtle depth (soft shadows) to reinforce hierarchy.
-- **Clear CTA hierarchy**: surface a primary CTA above the fold and repeat it after supporting content.
+1. **What is the macro regime?**
+2. **What does it mean operationally?**
+3. **What should we do next (or avoid)?**
 
-## Practical checklist
+---
 
-- [ ] Start from design tokens and document them in a shared theme file.
-- [ ] Use consistent spacing scale (e.g., 4/8/12/16/24/32).
-- [ ] Ensure clickable elements have `cursor: pointer` and visible hover states.
-- [ ] Validate contrast ratios for text and UI affordances.
-- [ ] Provide a short “getting started” path with minimal steps.
+## Product & Engineering Principles
+
+| Principle | What it means in practice | Why it matters |
+| --- | --- | --- |
+| **Clarity over cleverness** | Prefer explicit names, readable logic, and straightforward docs. | Leaders need fast comprehension, not hidden magic. |
+| **Traceable data** | Every output must point to a verifiable public source (US Treasury). | Trust and auditability are non‑negotiable. |
+| **Plain English first** | Translate jargon into operational consequences. | Users act on guidance, not on signal jargon. |
+| **Single‑tool focus** | Consolidate the most common workflows into one dependable interface. | Reduces cognitive load and adoption friction. |
+| **Speed & efficiency** | Optimize for fast startup, low memory use, minimal runtime friction. | High‑signal tools should feel immediate and reliable. |
+| **Pragmatic defaults** | Ship sensible defaults and working examples. | Shortens time‑to‑value for new users. |
+
+---
+
+## UI/UX Standards (Serious, high‑density dashboards)
+
+### Design system first
+- Define tokens for **color, typography, spacing, radius, elevation**.
+- Reuse tokens consistently across components.
+
+### Layout & hierarchy
+- Pick a **primary layout pattern** and stick to it.
+- Maintain **clear CTA hierarchy** (one primary action above the fold, reinforced later).
+
+### Accessibility by default
+- Maintain **WCAG AA** contrast.
+- Keep **focus states visible**.
+- Respect **`prefers-reduced-motion`**.
+
+### Interaction polish (subtle, professional)
+- Use gentle motion (**150–300ms**) and soft shadows for hierarchy.
+- Avoid playful or whimsical UI patterns.
+
+---
+
+## Decision Checklist (use before shipping)
+
+### Product
+- [ ] Does this change make the regime or its implications **clearer**?
+- [ ] Is every output **traceable to US Treasury data**?
+- [ ] Are we translating jargon into **operational consequences**?
+
+### Engineering
+- [ ] Is the logic **explicit and readable**?
+- [ ] Are defaults sensible and documented?
+- [ ] Does this preserve **fast startup and low runtime friction**?
+
+### UI/UX
+- [ ] Are design tokens defined and consistently applied?
+- [ ] Is the layout pattern consistent with existing screens?
+- [ ] Are contrast and focus states compliant?
+- [ ] Are interactions subtle and professional?
+
+---
+
+## Sources of inspiration (high‑level themes)
+
+- **oven‑sh / Bun**: single‑tool focus, speed, drop‑in compatibility, pragmatic defaults.
+- **UI‑UX Pro Max**: design system consistency, accessible defaults, clear CTA hierarchy.
