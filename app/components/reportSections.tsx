@@ -290,13 +290,20 @@ export const TimeMachinePanel = ({
   years,
   isHistorical,
   latestRecordDate,
+  cacheCoverage,
 }: {
   selectedYear: number;
   selectedMonth: number;
   years: number[];
   isHistorical: boolean;
   latestRecordDate: string;
+  cacheCoverage: { earliest: string | null; latest: string | null };
 }) => {
+  const coverageLabel =
+    cacheCoverage.earliest && cacheCoverage.latest
+      ? `${cacheCoverage.earliest} → ${cacheCoverage.latest}`
+      : "No cache loaded";
+
   return (
     <section className="mt-10">
       <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
@@ -357,6 +364,9 @@ export const TimeMachinePanel = ({
         </form>
         <p className="mt-4 text-xs text-slate-500">
           Latest available record: <span className="mono text-slate-300">{latestRecordDate}</span>
+        </p>
+        <p className="mt-2 text-xs text-slate-500">
+          Cache coverage: <span className="mono text-slate-300">{coverageLabel}</span>
         </p>
       </div>
     </section>

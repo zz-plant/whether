@@ -3,6 +3,7 @@
  * Keeps network access isolated behind a small interface for future Cloudflare migration.
  */
 import type { TreasuryData } from "./types";
+import { findTimeMachineSnapshot } from "./timeMachineCache";
 import { buildHistoricalQuery } from "./timeMachine";
 import { normalizeTreasuryResponse } from "./treasuryNormalizer";
 
@@ -32,6 +33,23 @@ const buildTreasuryUrl = (endpoint: string, asOf?: string) => {
 export const fetchTreasuryData = async (
   options: TreasuryFetchOptions = {}
 ): Promise<TreasuryData> => {
+  if (options.asOf) {
+    const cachedSnapshot = findTimeMachineSnapshot(options.asOf);
+    if (cachedSnapshot) {
+      return cachedSnapshot;
+    }
+
+    if (options.snapshotFallback) {
+      return {
+        ...options.snapshotFallback,
+        fetched_at: new Date().toISOString(),
+        isLive: false,
+      };
+    }
+
+    throw new Error("Time Machine cache miss for historical selection.");
+  }
+
   const fetcher = options.fetcher ?? fetch;
   const endpoint = options.endpoint ?? TREASURY_ENDPOINT;
   const fetched_at = new Date().toISOString();

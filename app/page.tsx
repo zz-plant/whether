@@ -4,6 +4,12 @@ import { buildSensorReadings } from "../lib/sensors";
 import { evaluateRegime } from "../lib/regimeEngine";
 import { getPlaybookGuidance } from "../lib/playbook";
 import { formatHistoricalBanner, resolveHistoricalDate } from "../lib/timeMachine";
+import {
+  getLatestTimeMachineSnapshot,
+  hasTimeMachineEntry,
+  getTimeMachineCoverage,
+  getTimeMachineYears,
+} from "../lib/timeMachineCache";
 import { DecisionShieldPanel } from "./components/decisionShieldPanel";
 import {
   DataSourcePanel,
@@ -34,6 +40,10 @@ const parseHistoricalSelection = (searchParams?: { month?: string; year?: string
   }
 
   if (year < 2000) {
+    return null;
+  }
+
+  if (!hasTimeMachineEntry(year, month)) {
     return null;
   }
 
@@ -75,8 +85,11 @@ export default async function HomePage({
   };
 
   const now = new Date();
-  const defaultMonth = now.getUTCMonth() + 1;
-  const defaultYear = now.getUTCFullYear();
+  const latestCache = getLatestTimeMachineSnapshot();
+  const defaultMonth = latestCache?.month ?? now.getUTCMonth() + 1;
+  const defaultYear = latestCache?.year ?? now.getUTCFullYear();
+  const cacheCoverage = getTimeMachineCoverage();
+  const cacheYears = getTimeMachineYears();
   const historicalSelection = parseHistoricalSelection(searchParams);
   const treasury = await fetchTreasuryData({
     snapshotFallback: snapshotData,
@@ -143,9 +156,10 @@ export default async function HomePage({
         <TimeMachinePanel
           selectedYear={historicalSelection?.year ?? defaultYear}
           selectedMonth={historicalSelection?.month ?? defaultMonth}
-          years={buildYearOptions(2000, defaultYear)}
+          years={cacheYears.length ? cacheYears : buildYearOptions(2000, defaultYear)}
           isHistorical={Boolean(historicalSelection)}
           latestRecordDate={treasury.record_date}
+          cacheCoverage={cacheCoverage}
         />
 
         <footer className="mt-12 border-t border-slate-800 pt-6 text-xs text-slate-500">
