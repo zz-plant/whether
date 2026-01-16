@@ -2,7 +2,7 @@
  * Treasury normalization helpers for mapping API payloads into Regime Station data shapes.
  * Keeps source metadata and freshness explicit for traceable outputs.
  */
-import type { NormalizedTreasuryRow, TreasuryData, TreasuryYields } from "./types";
+import type { TreasuryData, TreasuryYields } from "./types";
 
 const parseNumber = (value: unknown): number | null => {
   if (value == null) {
@@ -35,18 +35,11 @@ export const normalizeTreasuryRow = (
 export const normalizeTreasuryResponse = (
   payload: { data?: Record<string, unknown>[] },
   metadata: { fetched_at: string; source: string; isLive: boolean }
-): NormalizedTreasuryRow | null => {
+): TreasuryData | null => {
   const firstRow = payload.data?.[0];
   if (!firstRow) {
     return null;
   }
 
-  const normalized = normalizeTreasuryRow(firstRow, metadata);
-
-  return {
-    record_date: normalized.record_date,
-    fetched_at: normalized.fetched_at,
-    source: normalized.source,
-    yields: normalized.yields,
-  };
+  return normalizeTreasuryRow(firstRow, metadata);
 };

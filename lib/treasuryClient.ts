@@ -38,13 +38,7 @@ export const fetchTreasuryData = async (
       throw new Error("Treasury API returned no data.");
     }
 
-    return {
-      source: normalized.source,
-      record_date: normalized.record_date,
-      fetched_at: normalized.fetched_at,
-      isLive: true,
-      yields: normalized.yields,
-    };
+    return normalized;
   } catch (error) {
     if (options.snapshotFallback) {
       return {

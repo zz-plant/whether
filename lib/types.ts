@@ -31,10 +31,3 @@ export interface SensorReading {
   fetched_at: string;
   isLive: boolean;
 }
-
-export interface NormalizedTreasuryRow {
-  record_date: string;
-  fetched_at: string;
-  source: string;
-  yields: TreasuryYields;
-}

@@ -3,6 +3,12 @@
  * Produces shareable, plain-English guidance tied to sensor conditions.
  */
 import type { RegimeAssessment, RegimeKey } from "./regimeEngine";
+import {
+  BASE_RATE_TIGHTNESS_THRESHOLD,
+  REGIME_REVERSAL_DAYS,
+  RISK_APPETITE_REGIME_THRESHOLD,
+  TIGHTNESS_REGIME_THRESHOLD,
+} from "./regimeEngine";
 
 export type LifecycleStage = "DISCOVERY" | "GROWTH" | "SCALE" | "MATURE";
 export type DecisionCategory = "HIRING" | "ROADMAP" | "PRICING" | "INFRASTRUCTURE";
@@ -69,13 +75,17 @@ const buildSensorBullets = (assessment: RegimeAssessment): string[] => {
   const bullets: string[] = [];
   const { baseRate, curveSlope, tightness, riskAppetite } = assessment.scores;
 
-  if (baseRate > 5) {
-    bullets.push("Base rates are above 5%, making capital meaningfully expensive.");
+  if (baseRate > BASE_RATE_TIGHTNESS_THRESHOLD) {
+    bullets.push(
+      `Base rates are above ${BASE_RATE_TIGHTNESS_THRESHOLD}%, making capital meaningfully expensive.`
+    );
   } else {
-    bullets.push("Base rates are below 5%, keeping capital costs moderate.");
+    bullets.push(`Base rates are below ${BASE_RATE_TIGHTNESS_THRESHOLD}%, keeping capital costs moderate.`);
   }
 
-  if (curveSlope < 0) {
+  if (curveSlope === null) {
+    bullets.push("The yield curve slope is unavailable, so inversion risk is unconfirmed.");
+  } else if (curveSlope < 0) {
     bullets.push("The yield curve is inverted, signaling cautious market behavior.");
   } else {
     bullets.push("The yield curve is positive, signaling healthier risk appetite.");
@@ -89,7 +99,7 @@ const buildSensorBullets = (assessment: RegimeAssessment): string[] => {
 };
 
 const buildReversalTrigger = (assessment: RegimeAssessment) => {
-  return `Revisit when tightness drops below 70 and risk appetite rises above 50 for 30 consecutive days (current: ${assessment.scores.tightness}/${assessment.scores.riskAppetite}).`;
+  return `Revisit when tightness drops below ${TIGHTNESS_REGIME_THRESHOLD} and risk appetite rises above ${RISK_APPETITE_REGIME_THRESHOLD} for ${REGIME_REVERSAL_DAYS} consecutive days (current: ${assessment.scores.tightness}/${assessment.scores.riskAppetite}).`;
 };
 
 export const evaluateDecision = (

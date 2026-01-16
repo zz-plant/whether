@@ -11,7 +11,7 @@ export interface RegimeScores {
   riskAppetite: number;
   baseRateUsed: "1M" | "3M" | "MISSING";
   baseRate: number;
-  curveSlope: number;
+  curveSlope: number | null;
 }
 
 export interface RegimeAssessment {
@@ -23,6 +23,16 @@ export interface RegimeAssessment {
   riskAppetiteExplanation: string;
   dataWarnings: string[];
 }
+
+export const BASE_RATE_TIGHTNESS_THRESHOLD = 5;
+export const TIGHTNESS_BASE_RATE_POINTS = 90;
+export const TIGHTNESS_INVERSION_POINTS = 25;
+export const TIGHTNESS_CAP = 100;
+export const RISK_APPETITE_MIN_SLOPE = -1.0;
+export const RISK_APPETITE_MAX_SLOPE = 1.5;
+export const TIGHTNESS_REGIME_THRESHOLD = 70;
+export const RISK_APPETITE_REGIME_THRESHOLD = 50;
+export const REGIME_REVERSAL_DAYS = 30;
 
 const REGIME_PROFILES: Record<RegimeKey, { description: string; constraints: string[] }> = {
   SCARCITY: {
@@ -60,10 +70,12 @@ const REGIME_PROFILES: Record<RegimeKey, { description: string; constraints: str
 };
 
 const TIGHTNESS_EXPLANATION =
-  "Tightness score: base rate > 5% adds 90 points. Inverted curve adds 25 points. Score is capped at 100.";
+  `Tightness score: base rate > ${BASE_RATE_TIGHTNESS_THRESHOLD}% adds ${TIGHTNESS_BASE_RATE_POINTS} points. ` +
+  `Inverted curve adds ${TIGHTNESS_INVERSION_POINTS} points. Score is capped at ${TIGHTNESS_CAP}.`;
 
 const RISK_APPETITE_EXPLANATION =
-  "Risk appetite score maps the 10Y-2Y slope from -1.0% (very cautious) to +1.5% (confident), scaled to 0-100.";
+  `Risk appetite score maps the 10Y-2Y slope from ${RISK_APPETITE_MIN_SLOPE}% (very cautious) ` +
+  `to ${RISK_APPETITE_MAX_SLOPE}% (confident), scaled to 0-100.`;
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
@@ -77,41 +89,45 @@ export const getBaseRate = (yields: TreasuryYields) => {
   return { value: 0, used: "MISSING" as const };
 };
 
-export const computeCurveSlope = (yields: TreasuryYields) => {
-  const tenYear = typeof yields.tenYear === "number" ? yields.tenYear : 0;
-  const twoYear = typeof yields.twoYear === "number" ? yields.twoYear : 0;
+export const computeCurveSlope = (yields: TreasuryYields): number | null => {
+  const tenYear = yields.tenYear;
+  const twoYear = yields.twoYear;
+
+  if (typeof tenYear !== "number" || typeof twoYear !== "number") {
+    return null;
+  }
+
   return tenYear - twoYear;
 };
 
 export const computeTightnessScore = (baseRate: number, curveSlope: number) => {
   let score = 0;
 
-  if (baseRate > 5) {
-    score += 90;
+  if (baseRate > BASE_RATE_TIGHTNESS_THRESHOLD) {
+    score += TIGHTNESS_BASE_RATE_POINTS;
   }
 
   if (curveSlope < 0) {
-    score += 25;
+    score += TIGHTNESS_INVERSION_POINTS;
   }
 
-  return clamp(score, 0, 100);
+  return clamp(score, 0, TIGHTNESS_CAP);
 };
 
 export const computeRiskAppetiteScore = (curveSlope: number) => {
-  const minSlope = -1.0;
-  const maxSlope = 1.5;
-  const normalized = (curveSlope - minSlope) / (maxSlope - minSlope);
+  const normalized =
+    (curveSlope - RISK_APPETITE_MIN_SLOPE) / (RISK_APPETITE_MAX_SLOPE - RISK_APPETITE_MIN_SLOPE);
   return clamp(Math.round(normalized * 100), 0, 100);
 };
 
 export const classifyRegime = (tightness: number, riskAppetite: number): RegimeKey => {
-  if (tightness > 70 && riskAppetite < 50) {
+  if (tightness > TIGHTNESS_REGIME_THRESHOLD && riskAppetite < RISK_APPETITE_REGIME_THRESHOLD) {
     return "SCARCITY";
   }
-  if (tightness > 70 && riskAppetite > 50) {
+  if (tightness > TIGHTNESS_REGIME_THRESHOLD && riskAppetite > RISK_APPETITE_REGIME_THRESHOLD) {
     return "DEFENSIVE";
   }
-  if (tightness < 70 && riskAppetite < 50) {
+  if (tightness < TIGHTNESS_REGIME_THRESHOLD && riskAppetite < RISK_APPETITE_REGIME_THRESHOLD) {
     return "VOLATILE";
   }
   return "EXPANSION";
@@ -121,16 +137,17 @@ export const evaluateRegime = (treasury: TreasuryData): RegimeAssessment => {
   const dataWarnings: string[] = [];
   const baseRate = getBaseRate(treasury.yields);
   const curveSlope = computeCurveSlope(treasury.yields);
+  const curveSlopeForScore = curveSlope ?? 0;
 
   if (baseRate.used === "MISSING") {
     dataWarnings.push("Base rate missing; defaulted to 0% for scoring.");
   }
-  if (treasury.yields.tenYear == null || treasury.yields.twoYear == null) {
+  if (curveSlope === null) {
     dataWarnings.push("Curve slope missing; defaulted to 0% for scoring.");
   }
 
-  const tightness = computeTightnessScore(baseRate.value, curveSlope);
-  const riskAppetite = computeRiskAppetiteScore(curveSlope);
+  const tightness = computeTightnessScore(baseRate.value, curveSlopeForScore);
+  const riskAppetite = computeRiskAppetiteScore(curveSlopeForScore);
   const regime = classifyRegime(tightness, riskAppetite);
   const profile = REGIME_PROFILES[regime];
 

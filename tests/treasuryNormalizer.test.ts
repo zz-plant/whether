@@ -27,5 +27,6 @@ describe("treasury normalizer", () => {
     assert.ok(normalized);
     assert.equal(normalized?.record_date, "2024-10-01");
     assert.equal(normalized?.yields.oneMonth, 5.12);
+    assert.equal(normalized?.isLive, true);
   });
 });
