@@ -1,0 +1,10 @@
+import { NextResponse } from "next/server";
+import { fetchTreasuryData } from "../../../lib/treasuryClient";
+import { snapshotData } from "../../../lib/snapshot";
+
+export const revalidate = 86400;
+
+export async function GET() {
+  const data = await fetchTreasuryData({ snapshotFallback: snapshotData });
+  return NextResponse.json(data);
+}
