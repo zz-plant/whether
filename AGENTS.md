@@ -2,9 +2,22 @@
 
 This repository is intentionally minimal right now. Use this guide to keep contributions consistent.
 
+## Setup commands
+- Install dependencies: `npm install`
+- Start dev server: `npm run dev`
+- Build for production: `npm run build`
+- Run lint checks: `npm run lint`
+- Run tests: `npm test`
+
 ## Purpose
 Whether (Regime Station) turns public macro signals into operational guidance for product and engineering leaders.
 Keep the product intent front-and-center: **translate macro data into plain‑English execution constraints**.
+
+## Project layout
+- `app/`: Next.js App Router UI and routes.
+- `lib/`: Core logic, data clients, and shared utilities.
+- `data/`: Local data snapshots or fixtures (keep sources explicit).
+- `tests/`: Automated test coverage for regime logic and decision rules.
 
 ## Working agreements
 - **Clarity over cleverness**: prioritize readability and explicit naming over terse abstractions.
@@ -22,6 +35,11 @@ Keep the product intent front-and-center: **translate macro data into plain‑En
 - Update `README.md` when product requirements change.
 - Keep `LEARNINGS.md` as a concise design/engineering principles reference.
 - Every new module should include a short header comment describing its role in the Regime Station flow.
+
+## Data and sourcing requirements
+- Surface data freshness (timestamp) and source metadata for every fetched series.
+- Prefer explicit source URLs in code comments or metadata objects.
+- Avoid silent fallbacks; propagate errors with enough context to debug missing data.
 
 ## Testing and verification
 - Add unit tests for regime classification, scoring, and decision rules.
