@@ -11,6 +11,7 @@ import {
   getTimeMachineYears,
 } from "../lib/timeMachineCache";
 import { DecisionShieldPanel } from "./components/decisionShieldPanel";
+import { DisplayGuardian } from "./components/displayGuardian";
 import {
   DataSourcePanel,
   HistoricalBanner,
@@ -111,7 +112,8 @@ export default async function HomePage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <div className="mx-auto max-w-6xl px-6 py-12">
+      <DisplayGuardian />
+      <div className="mx-auto max-w-6xl px-6 py-12 display-drift">
         <header className="flex flex-col gap-4 border-b border-slate-800 pb-8">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
