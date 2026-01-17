@@ -298,102 +298,105 @@ export const DecisionShieldPanel = ({
           </div>
         ) : null}
 
-        <div className="mt-6 grid gap-4 lg:grid-cols-3">
-          <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 lg:col-span-3">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
-              Input → Verdict → Why → Guardrails
-            </p>
-          </div>
-          <div className="space-y-2">
-            <label
-              htmlFor="decision-lifecycle"
-              className="text-xs uppercase tracking-[0.2em] text-slate-400"
-            >
-              Lifecycle
-            </label>
-            <select
-              id="decision-lifecycle"
-              value={lifecycle}
-              onChange={(event) => setLifecycle(event.target.value as LifecycleStage)}
-              className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100 transition-colors hover:border-slate-700"
-            >
-              {lifecycleOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="space-y-2">
-            <label
-              htmlFor="decision-category"
-              className="text-xs uppercase tracking-[0.2em] text-slate-400"
-            >
-              Category
-            </label>
-            <select
-              id="decision-category"
-              value={category}
-              onChange={(event) => setCategory(event.target.value as DecisionCategory)}
-              className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100 transition-colors hover:border-slate-700"
-            >
-              {categoryOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="space-y-2">
-            <label
-              htmlFor="decision-action"
-              className="text-xs uppercase tracking-[0.2em] text-slate-400"
-            >
-              Action
-            </label>
-            <select
-              id="decision-action"
-              value={action}
-              onChange={(event) => setAction(event.target.value as DecisionAction)}
-              className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100 transition-colors hover:border-slate-700"
-            >
-              {actionOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div className="mt-6 grid gap-4 lg:grid-cols-[1.2fr,1fr]">
+        <div className="mt-6 space-y-4">
           <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Verdict</p>
-            <div
-              className={`mt-3 inline-flex items-center rounded-full border px-3 py-1 text-xs uppercase tracking-[0.2em] ${verdictStyles[output.verdict]}`}
-            >
-              {output.verdict}
-            </div>
-            <p className="mt-3 type-data text-slate-200 break-words">{output.summary}</p>
-            <p className="mt-4 text-xs uppercase tracking-[0.2em] text-slate-400">
-              Why this verdict
+            <p className="type-label text-slate-400">
+              Inputs → Verdict → Why → Guardrail → Reversal trigger
             </p>
-            <ul className="mt-3 space-y-2 text-sm text-slate-300">
-              {output.bullets.slice(0, 4).map((bullet) => (
-                <li key={bullet} className="flex gap-2">
-                  <span className="text-slate-500">•</span>
-                  <span className="break-words">{bullet}</span>
-                </li>
-              ))}
-            </ul>
           </div>
-          <div className="grid gap-4">
+          <div className="grid gap-4 lg:grid-cols-3">
+            <div className="space-y-2">
+              <label
+                htmlFor="decision-lifecycle"
+                className="type-label text-slate-400"
+              >
+                Lifecycle
+              </label>
+              <select
+                id="decision-lifecycle"
+                value={lifecycle}
+                onChange={(event) => setLifecycle(event.target.value as LifecycleStage)}
+                className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100 transition-colors hover:border-slate-700"
+              >
+                {lifecycleOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <label
+                htmlFor="decision-category"
+                className="type-label text-slate-400"
+              >
+                Category
+              </label>
+              <select
+                id="decision-category"
+                value={category}
+                onChange={(event) => setCategory(event.target.value as DecisionCategory)}
+                className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100 transition-colors hover:border-slate-700"
+              >
+                {categoryOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <label
+                htmlFor="decision-action"
+                className="type-label text-slate-400"
+              >
+                Action
+              </label>
+              <select
+                id="decision-action"
+                value={action}
+                onChange={(event) => setAction(event.target.value as DecisionAction)}
+                className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100 transition-colors hover:border-slate-700"
+              >
+                {actionOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="grid gap-4 lg:grid-cols-[1.2fr,1fr]">
             <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Guardrail</p>
+              <p className="type-label text-slate-400">Verdict</p>
+              <div
+                className={`mt-3 inline-flex items-center rounded-full border px-3 py-1 text-xs uppercase tracking-[0.2em] ${verdictStyles[output.verdict]}`}
+              >
+                {output.verdict}
+              </div>
+              <p className="mt-3 type-data text-slate-200 break-words">{output.summary}</p>
+              <p className="mt-3 text-xs text-slate-500">Copy-ready, shareable verdict.</p>
+            </div>
+            <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+              <p className="type-label text-slate-400">Why (signals)</p>
+              <ul className="mt-3 space-y-2 text-sm text-slate-300">
+                {output.bullets.slice(0, 4).map((bullet) => (
+                  <li key={bullet} className="flex gap-2">
+                    <span className="text-slate-500">•</span>
+                    <span className="break-words">{bullet}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          <div className="grid gap-4 lg:grid-cols-2">
+            <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+              <p className="type-label text-slate-400">Guardrail</p>
               <p className="mt-3 type-data text-slate-300 break-words">{output.guardrail}</p>
             </div>
             <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Reversal trigger</p>
+              <p className="type-label text-slate-400">Reversal trigger</p>
               <p className="mt-3 type-data text-slate-300 break-words">
                 {output.reversalTrigger}
               </p>

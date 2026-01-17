@@ -13,5 +13,5 @@ export const resolveHistoricalDate = (year: number, month: number) => {
 
 export const formatHistoricalBanner = (year: number, month: number) => {
   const paddedMonth = String(month).padStart(2, "0");
-  return `Historical View: ${year}-${paddedMonth}`;
+  return `Historical mode active · ${year}-${paddedMonth}`;
 };
