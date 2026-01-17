@@ -5,6 +5,7 @@
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import type { PlaybookEntry } from "../../lib/playbook";
 import type { SensorReading, TreasuryData } from "../../lib/types";
+import { operatorRequests } from "../../lib/operatorRequests";
 
 const numberFormatter = new Intl.NumberFormat("en-US", {
   minimumFractionDigits: 2,
@@ -238,6 +239,41 @@ export const LiveTickerPanel = ({
     </section>
   );
 };
+
+export const OperatorRequestsPanel = () => (
+  <section
+    id="operator-requests"
+    aria-labelledby="operator-requests-title"
+    className="mt-10 rounded-2xl border border-slate-800 bg-slate-900/40 p-6"
+  >
+    <div className="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Post-MVP demand</p>
+        <h3 id="operator-requests-title" className="text-2xl font-semibold text-slate-100">
+          Operator request backlog
+        </h3>
+      </div>
+      <span className="rounded-full border border-slate-700 px-3 py-1 text-[10px] uppercase tracking-[0.25em] text-slate-300">
+        Future scope
+      </span>
+    </div>
+    <p className="mt-3 max-w-3xl text-sm text-slate-300">
+      These are the most common expansion requests expected after launch. Each item should preserve
+      traceable data sources and plain-English operational guidance.
+    </p>
+    <div className="mt-6 grid gap-4 md:grid-cols-2">
+      {operatorRequests.map((request) => (
+        <div
+          key={request.title}
+          className="rounded-2xl border border-slate-800/80 bg-slate-950/60 px-4 py-4 shadow-[0_0_0_1px_rgba(15,23,42,0.4)]"
+        >
+          <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{request.title}</p>
+          <p className="mt-2 text-sm text-slate-200">{request.description}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+);
 
 export const ScoreReadoutPanel = ({ assessment }: { assessment: RegimeAssessment }) => {
   return (

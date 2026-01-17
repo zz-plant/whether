@@ -59,6 +59,18 @@ plain‑English operational constraints with traceable sources.
   - Decision Shield verdicts.
 - Add data parsing tests for Treasury response normalization.
 
+## Milestone 7 — Operator Demand Expansion (Week 7)
+- Broaden macro inputs beyond the yield curve (inflation, unemployment, credit spreads) with explicit source links.
+- Add adjustable regime thresholds with audit trails for custom tuning.
+- Expand Decision Shield to cover additional decision types (M&A, infra spend, geographic expansion).
+- Add export/share flows (PDF, slide-ready summary, scheduled email or Slack brief).
+- Build an Insight Database with citations to evidence and historical precedents.
+- Add time-series comparisons (“then vs now”) with regime change diffs.
+- Add alerts/notifications on regime changes.
+- Support saved Decision Shield scenarios and team presets.
+- Surface deep data provenance per sensor (direct source URLs, formulas, timestamps).
+- Introduce an API/export endpoint for embedding regimes in internal dashboards.
+
 ---
 
 ### Development stories (planned)
@@ -66,6 +78,8 @@ plain‑English operational constraints with traceable sources.
 - As an operator, I can copy Decision Shield guidance tied to current sensors so I can validate hires, rewrites, and launches with traceable reasoning.
 - As a team lead, I can compare fossil-record signals against today’s regime so I can spot legacy architecture and support patterns that no longer fit the climate.
 - As an executive, I can read a one-sentence meta-insight that explains why posture must change with macro physics.
+- As a strategy lead, I can subscribe to regime-change alerts and distribute summaries automatically.
+- As a finance partner, I can export a slide-ready snapshot of the current regime with citations for planning reviews.
 
 ### Success criteria
 - Every output is traceable to a public source and includes timestamps.

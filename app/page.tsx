@@ -26,6 +26,7 @@ import {
   ScoreReadoutPanel,
   SensorArray,
   SignalMatrixPanel,
+  OperatorRequestsPanel,
   TimeMachinePanel,
 } from "./components/reportSections";
 
@@ -220,11 +221,12 @@ export default async function HomePage({
                 { href: "#executive-snapshot", label: "Executive snapshot" },
                 { href: "#regime-assessment", label: "Regime assessment" },
                 { href: "#signal-matrix", label: "Signal matrix" },
+                { href: "#data-source", label: "Data source" },
                 { href: "#sensor-array", label: "Sensor array" },
                 { href: "#playbook", label: "Playbook" },
                 { href: "#decision-shield", label: "Decision shield" },
                 { href: "#time-machine", label: "Time machine" },
-                { href: "#data-source", label: "Data source" },
+                { href: "#operator-requests", label: "Operator requests" },
               ].map((item) => (
                 <li key={item.href}>
                   <a
@@ -276,6 +278,8 @@ export default async function HomePage({
           monthsByYear={cacheMonthsByYear}
           invalidSelection={invalidHistoricalSelection}
         />
+
+        <OperatorRequestsPanel />
 
         <footer className="mt-12 border-t border-slate-800/70 pt-6 text-xs uppercase tracking-[0.3em] text-slate-500">
           Not Financial Advice.
