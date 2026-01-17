@@ -115,11 +115,14 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
           <button
             type="button"
             onClick={handleCopy}
-            className="rounded-full border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 hover:border-slate-500"
+            className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-slate-500 hover:text-slate-100"
           >
             {copied ? "Copied" : "Copy verdict"}
           </button>
         </div>
+        <p className="sr-only" role="status" aria-live="polite">
+          {copied ? "Verdict copied to clipboard." : copyError ? "Clipboard blocked." : ""}
+        </p>
         {copyError ? (
           <div className="mt-4 rounded-xl border border-amber-400/40 bg-amber-500/10 p-4 text-xs text-amber-100">
             <p className="text-[10px] uppercase tracking-[0.2em] text-amber-200">
@@ -143,7 +146,7 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
             <select
               value={lifecycle}
               onChange={(event) => setLifecycle(event.target.value as LifecycleStage)}
-              className="w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-sm text-slate-100"
+              className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100 transition-colors hover:border-slate-700"
             >
               {lifecycleOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -157,7 +160,7 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
             <select
               value={category}
               onChange={(event) => setCategory(event.target.value as DecisionCategory)}
-              className="w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-sm text-slate-100"
+              className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100 transition-colors hover:border-slate-700"
             >
               {categoryOptions.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -171,7 +174,7 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
             <select
               value={action}
               onChange={(event) => setAction(event.target.value as DecisionAction)}
-              className="w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-sm text-slate-100"
+              className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100 transition-colors hover:border-slate-700"
             >
               {actionOptions.map((option) => (
                 <option key={option.value} value={option.value}>
