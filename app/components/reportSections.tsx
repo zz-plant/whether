@@ -1088,31 +1088,35 @@ export const PlaybookPanel = ({
         </div>
         {playbook ? (
           <div className="mt-6 rounded-xl border border-slate-800 bg-slate-950/60 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Leadership signals</p>
-            <div className="mt-4 grid gap-4 md:grid-cols-2">
-              <div>
-                <p className="text-[10px] uppercase tracking-[0.2em] text-emerald-200">
-                  More often
-                </p>
-                <ul className="mt-3 space-y-2 text-sm text-slate-300">
-                  {playbook.leadershipPhrases.more.map((item) => (
-                    <li key={item} className="break-words">
-                      • {item}
-                    </li>
-                  ))}
-                </ul>
+            <details open>
+              <summary className="min-h-[44px] cursor-pointer text-xs uppercase tracking-[0.2em] text-slate-400 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300">
+                Leadership signals (phrases to use or avoid)
+              </summary>
+              <div className="mt-4 grid gap-4 md:grid-cols-2">
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-emerald-200">
+                    More often
+                  </p>
+                  <ul className="mt-3 space-y-2 text-sm text-slate-300">
+                    {playbook.leadershipPhrases.more.map((item) => (
+                      <li key={item} className="break-words">
+                        • {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-rose-200">Less often</p>
+                  <ul className="mt-3 space-y-2 text-sm text-slate-300">
+                    {playbook.leadershipPhrases.less.map((item) => (
+                      <li key={item} className="break-words">
+                        • {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-              <div>
-                <p className="text-[10px] uppercase tracking-[0.2em] text-rose-200">Less often</p>
-                <ul className="mt-3 space-y-2 text-sm text-slate-300">
-                  {playbook.leadershipPhrases.less.map((item) => (
-                    <li key={item} className="break-words">
-                      • {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+            </details>
           </div>
         ) : null}
       </div>
