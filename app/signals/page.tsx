@@ -62,6 +62,18 @@ export default async function SignalsPage({
     treasury,
     treasuryProvenance,
   } = await loadReportData(searchParams);
+  const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
+  const trustStatusLabel = historicalSelection
+    ? "Historical snapshot"
+    : isFallback
+      ? "Fallback mode"
+      : "Verified live feed";
+  const trustStatusDetail = historicalSelection
+    ? "Viewing archived Treasury data for the selected month."
+    : isFallback
+      ? treasury.fallback_reason ?? "Using cached Treasury snapshot due to upstream outage."
+      : "Treasury API responding normally; live signals verified.";
+  const trustStatusTone = historicalSelection ? "historical" : isFallback ? "warning" : "stable";
 
   return (
     <ReportShell
@@ -69,6 +81,9 @@ export default async function SignalsPage({
       recordDateLabel={recordDateLabel}
       fetchedAtLabel={fetchedAtLabel}
       treasurySource={treasury.source}
+      trustStatusLabel={trustStatusLabel}
+      trustStatusDetail={trustStatusDetail}
+      trustStatusTone={trustStatusTone}
       pageTitle="Signals & thresholds"
       pageSummary="Deep-dive into the live signal layer, the macro data sources, and how thresholds are shaping the regime classification."
       pageLinks={pageLinks}

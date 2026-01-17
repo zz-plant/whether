@@ -59,6 +59,37 @@ const buildSlideBullets = (assessment: RegimeAssessment, macros: MacroSeriesRead
   ].join("\n");
 };
 
+const getRegimeLabel = (regime: RegimeAssessment["regime"]) => {
+  switch (regime) {
+    case "SCARCITY":
+      return "Survival Mode";
+    case "DEFENSIVE":
+      return "Safety Mode";
+    case "VOLATILE":
+      return "Stability Mode";
+    case "EXPANSION":
+      return "Growth Mode";
+    default:
+      return regime;
+  }
+};
+
+const buildConstraintHeadlines = (assessment: RegimeAssessment, treasury: TreasuryData) => {
+  const regimeLabel = getRegimeLabel(assessment.regime);
+  const headline = `${regimeLabel}: capital tightness ${assessment.scores.tightness}/100 with bravery ${assessment.scores.riskAppetite}/100.`;
+  const constraints = assessment.constraints.map((item) => `• ${item}`);
+
+  return [
+    `Whether Report Headlines — ${treasury.record_date}`,
+    headline,
+    "",
+    "Execution constraints:",
+    ...constraints,
+    "",
+    `Source: ${treasury.source}`,
+  ].join("\n");
+};
+
 export const ExportBriefPanel = ({
   assessment,
   treasury,
@@ -84,6 +115,10 @@ export const ExportBriefPanel = ({
   const slideBullets = useMemo(
     () => buildSlideBullets(assessment, macroSeries),
     [assessment, macroSeries]
+  );
+  const constraintHeadlines = useMemo(
+    () => buildConstraintHeadlines(assessment, treasury),
+    [assessment, treasury]
   );
   const mailSubject = encodeURIComponent(`Whether Report — ${treasury.record_date}`);
   const mailBody = encodeURIComponent(briefing);
@@ -178,6 +213,39 @@ export const ExportBriefPanel = ({
             >
               {isCopying && copyTarget === "Slides" ? "Copying" : "Copy slide bullets"}
             </button>
+          </div>
+        </div>
+        <div className="mt-4 grid gap-4 lg:grid-cols-[1.4fr,1fr]">
+          <div className="weather-surface p-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+              Constraint headlines
+            </p>
+            <p className="mt-3 text-sm text-slate-300">
+              Plain-English summary lines that can drop into status updates or exec briefings.
+            </p>
+            <button
+              type="button"
+              onClick={() => handleCopy(constraintHeadlines, "Headlines")}
+              disabled={isCopying}
+              aria-busy={isCopying}
+              className="weather-button mt-4 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
+            >
+              {isCopying && copyTarget === "Headlines" ? "Copying" : "Copy constraint headlines"}
+            </button>
+          </div>
+          <div className="weather-surface p-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+              Headline preview
+            </p>
+            <p className="mt-3 text-sm text-slate-300">
+              Keep the text intact when sharing to preserve sourcing.
+            </p>
+            <textarea
+              readOnly
+              value={constraintHeadlines}
+              rows={6}
+              className="mt-3 w-full rounded-lg border border-slate-800 bg-slate-950/80 p-3 font-mono text-base text-slate-200"
+            />
           </div>
         </div>
         <div className="mt-4 min-h-[260px]">
