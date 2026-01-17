@@ -7,7 +7,6 @@ import { getPlaybookGuidance } from "../lib/playbook";
 import {
   getLatestTimeMachineSnapshot,
   getTimeMachineCoverage,
-  getTimeMachineYears,
   getTimeMachineMonthsByYear,
 } from "../lib/timeMachineCache";
 import {
@@ -52,14 +51,6 @@ const formatDateValue = (value: string) => {
 const formatTimestampValue = (value: string) => {
   const date = new Date(value);
   return Number.isNaN(date.valueOf()) ? value : timestampFormatter.format(date);
-};
-
-const buildYearOptions = (startYear: number, endYear: number) => {
-  const years: number[] = [];
-  for (let year = endYear; year >= startYear; year -= 1) {
-    years.push(year);
-  }
-  return years;
 };
 
 export const generateMetadata = ({
@@ -149,7 +140,6 @@ export default async function HomePage({
   const defaultMonth = latestCache?.month ?? now.getUTCMonth() + 1;
   const defaultYear = latestCache?.year ?? now.getUTCFullYear();
   const cacheCoverage = getTimeMachineCoverage();
-  const cacheYears = getTimeMachineYears();
   const cacheMonthsByYear = getTimeMachineMonthsByYear();
   const invalidHistoricalSelection = Boolean(requestedSelection && !historicalSelection);
   const selectedMonth = requestedSelection?.month ?? defaultMonth;
@@ -341,7 +331,6 @@ export default async function HomePage({
         <TimeMachinePanel
           selectedYear={selectedYear}
           selectedMonth={selectedMonth}
-          years={cacheYears.length ? cacheYears : buildYearOptions(2000, defaultYear)}
           isHistorical={Boolean(historicalSelection)}
           latestRecordDate={treasury.record_date}
           cacheCoverage={cacheCoverage}
