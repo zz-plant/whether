@@ -5,7 +5,7 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useMemo, useRef, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
 import type { RegimeKey } from "../../lib/regimeEngine";
@@ -81,8 +81,6 @@ export const TimeMachinePanel = ({
   historicalSummary,
   comparison,
 }: TimeMachinePanelProps) => {
-  const [month, setMonth] = useState(selectedMonth);
-  const [year, setYear] = useState(selectedYear);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const errorId = "time-machine-error";
@@ -92,13 +90,21 @@ export const TimeMachinePanel = ({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  useEffect(() => {
-    setMonth(selectedMonth);
-  }, [selectedMonth]);
+  const parseQueryNumber = (value: string | null, fallback: number) => {
+    if (!value) {
+      return fallback;
+    }
+    const parsed = Number(value);
+    return Number.isNaN(parsed) ? fallback : parsed;
+  };
 
-  useEffect(() => {
-    setYear(selectedYear);
-  }, [selectedYear]);
+  const draftMonthParam = searchParams.get("draftMonth");
+  const draftYearParam = searchParams.get("draftYear");
+  const queryMonthParam = draftMonthParam ?? searchParams.get("month");
+  const queryYearParam = draftYearParam ?? searchParams.get("year");
+  const month = parseQueryNumber(queryMonthParam, selectedMonth);
+  const year = parseQueryNumber(queryYearParam, selectedYear);
+  const isDraft = Boolean(draftMonthParam || draftYearParam);
 
   const availableMonths = useMemo(() => monthsByYear[year] ?? [], [monthsByYear, year]);
   const isUnavailableSelection =
@@ -135,6 +141,8 @@ export const TimeMachinePanel = ({
     setErrorMessage(null);
     startTransition(() => {
       const nextParams = new URLSearchParams(searchParams.toString());
+      nextParams.delete("draftMonth");
+      nextParams.delete("draftYear");
       nextParams.set("month", String(month));
       nextParams.set("year", String(year));
       router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
@@ -154,8 +162,11 @@ export const TimeMachinePanel = ({
   };
 
   const handleMonthChange = (value: number) => {
-    setMonth(value);
     setErrorMessage(null);
+    const nextParams = new URLSearchParams(searchParams.toString());
+    nextParams.set("draftMonth", String(value));
+    nextParams.set("draftYear", String(year));
+    router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
   };
 
   const handleYearChange = (value: number) => {
@@ -164,9 +175,11 @@ export const TimeMachinePanel = ({
       nextAvailableMonths.length > 0 && !nextAvailableMonths.includes(month)
         ? nextAvailableMonths[0]
         : month;
-    setYear(value);
-    setMonth(nextMonth);
     setErrorMessage(null);
+    const nextParams = new URLSearchParams(searchParams.toString());
+    nextParams.set("draftMonth", String(nextMonth));
+    nextParams.set("draftYear", String(value));
+    router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
   };
 
   return (
@@ -351,19 +364,28 @@ export const TimeMachinePanel = ({
             {isPending ? "Loading" : "Load snapshot"}
           </button>
         </form>
-        {errorMessage ? (
-          <p
-            id={errorId}
-            className="mt-4 text-xs text-amber-200"
-            role="status"
-            aria-live="polite"
-          >
-            {errorMessage}
-          </p>
-        ) : null}
-        {invalidSelection ? (
-          <p className="mt-4 text-xs text-amber-200" role="status" aria-live="polite">
-            That month is not available in the cache. Showing the latest data instead.
+        <div className="mt-4 min-h-[20px]">
+          {errorMessage ? (
+            <p
+              id={errorId}
+              className="text-xs text-amber-200"
+              role="status"
+              aria-live="polite"
+            >
+              {errorMessage}
+            </p>
+          ) : null}
+        </div>
+        <div className="mt-4 min-h-[20px]">
+          {invalidSelection ? (
+            <p className="text-xs text-amber-200" role="status" aria-live="polite">
+              That month is not available in the cache. Showing the latest data instead.
+            </p>
+          ) : null}
+        </div>
+        {isDraft ? (
+          <p className="mt-2 text-xs text-slate-500">
+            Draft selection is staged in the URL. Load snapshot to apply.
           </p>
         ) : null}
         <p className="mt-4 text-xs text-slate-500">
