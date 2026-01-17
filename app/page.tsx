@@ -176,6 +176,23 @@ export default async function HomePage({
     : treasury.isLive
       ? "Live"
       : "Offline / Simulated";
+  const primaryJumpLinks = [
+    { href: "#executive-snapshot", label: "Executive snapshot" },
+    { href: "#regime-assessment", label: "Regime assessment" },
+    { href: "#signal-matrix", label: "Signal matrix" },
+    { href: "#playbook", label: "Playbook" },
+    { href: "#export-briefs", label: "Export briefs" },
+  ];
+  const secondaryJumpLinks = [
+    { href: "#first-time-guide", label: "First-time guide" },
+    { href: "#sensor-array", label: "Sensor array" },
+    { href: "#macro-signals", label: "Macro signals" },
+    { href: "#thresholds", label: "Thresholds" },
+    { href: "#decision-shield", label: "Decision shield" },
+    { href: "#time-machine", label: "Time machine" },
+    { href: "#cxo-functions", label: "CXO outputs" },
+    { href: "#operator-requests", label: "Operator requests" },
+  ];
   const historicalComparison =
     historicalSelection && liveAssessment
       ? {
@@ -255,21 +272,7 @@ export default async function HomePage({
           <nav aria-label="Report sections" className="space-y-3">
             <p className="text-[10px] uppercase tracking-[0.3em] text-slate-500">Jump to</p>
             <ul className="flex flex-wrap gap-3">
-              {[
-                { href: "#first-time-guide", label: "First-time guide" },
-                { href: "#executive-snapshot", label: "Executive snapshot" },
-                { href: "#regime-assessment", label: "Regime assessment" },
-                { href: "#signal-matrix", label: "Signal matrix" },
-                { href: "#sensor-array", label: "Sensor array" },
-                { href: "#macro-signals", label: "Macro signals" },
-                { href: "#thresholds", label: "Thresholds" },
-                { href: "#playbook", label: "Playbook" },
-                { href: "#decision-shield", label: "Decision shield" },
-                { href: "#export-briefs", label: "Export briefs" },
-                { href: "#time-machine", label: "Time machine" },
-                { href: "#cxo-functions", label: "CXO outputs" },
-                { href: "#operator-requests", label: "Operator requests" },
-              ].map((item) => (
+              {primaryJumpLinks.map((item) => (
                 <li key={item.href}>
                   <a
                     href={item.href}
@@ -280,6 +283,26 @@ export default async function HomePage({
                 </li>
               ))}
             </ul>
+            <details className="rounded-2xl border border-slate-800/60 bg-slate-950/40 px-4 py-3">
+              <summary className="flex min-h-[44px] cursor-pointer items-center justify-between text-[11px] uppercase tracking-[0.25em] text-slate-300 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+                All sections
+                <span className="text-[10px] text-slate-500">
+                  {secondaryJumpLinks.length} more
+                </span>
+              </summary>
+              <ul className="mt-3 flex flex-wrap gap-3">
+                {secondaryJumpLinks.map((item) => (
+                  <li key={item.href}>
+                    <a
+                      href={item.href}
+                      className="inline-flex min-h-[44px] items-center rounded-full border border-slate-800/70 bg-slate-950/60 px-4 py-2 text-[11px] uppercase tracking-[0.25em] text-slate-300 transition-colors hover:border-slate-500 hover:text-slate-100"
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </details>
           </nav>
           {historicalSelection ? <HistoricalBanner banner={historicalSelection.banner} /> : null}
         </header>
