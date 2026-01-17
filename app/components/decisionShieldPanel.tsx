@@ -76,6 +76,7 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
   const [copied, setCopied] = useState(false);
   const [isCopying, setIsCopying] = useState(false);
   const [copyError, setCopyError] = useState(false);
+  const storageKey = "whether.decisionShield";
 
   const output = useMemo(
     () => evaluateDecision(assessment, { lifecycle, category, action }),
@@ -85,6 +86,42 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
     () => buildShareText(assessment, lifecycle, category, action, output),
     [assessment, lifecycle, category, action, output]
   );
+
+  useEffect(() => {
+    const stored = window.localStorage.getItem(storageKey);
+    if (!stored) {
+      return;
+    }
+    try {
+      const parsed = JSON.parse(stored) as {
+        lifecycle?: LifecycleStage;
+        category?: DecisionCategory;
+        action?: DecisionAction;
+      };
+      if (parsed.lifecycle) {
+        setLifecycle(parsed.lifecycle);
+      }
+      if (parsed.category) {
+        setCategory(parsed.category);
+      }
+      if (parsed.action) {
+        setAction(parsed.action);
+      }
+    } catch (error) {
+      console.warn("Unable to restore Decision Shield state.", error);
+    }
+  }, [storageKey]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(
+        storageKey,
+        JSON.stringify({ lifecycle, category, action })
+      );
+    } catch (error) {
+      console.warn("Unable to persist Decision Shield state.", error);
+    }
+  }, [action, category, lifecycle, storageKey]);
 
   useEffect(() => {
     setCopyError(false);
@@ -109,12 +146,14 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
   };
 
   return (
-    <section className="mt-10">
+    <section id="decision-shield" aria-labelledby="decision-shield-title" className="mt-10">
       <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="min-w-0">
             <p className="text-sm uppercase tracking-[0.2em] text-slate-400">Decision Shield</p>
-            <h3 className="text-xl font-semibold text-slate-100">Validate an action</h3>
+            <h3 id="decision-shield-title" className="text-xl font-semibold text-slate-100">
+              Validate an action
+            </h3>
             <p className="mt-2 text-sm text-slate-300">
               Pressure-test the next move against current regime physics, then share the verdict.
             </p>

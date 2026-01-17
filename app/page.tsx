@@ -195,12 +195,36 @@ export default async function HomePage({
                 href={treasury.source}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-2 block text-xs text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+                className="touch-target mt-2 block text-xs text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
               >
                 US Treasury Fiscal Data API
               </a>
             </div>
           </div>
+          <nav aria-label="Report sections" className="mt-4">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">Jump to</p>
+            <ul className="mt-3 flex flex-wrap gap-2">
+              {[
+                { href: "#executive-snapshot", label: "Executive snapshot" },
+                { href: "#regime-assessment", label: "Regime assessment" },
+                { href: "#signal-matrix", label: "Signal matrix" },
+                { href: "#sensor-array", label: "Sensor array" },
+                { href: "#playbook", label: "Playbook" },
+                { href: "#decision-shield", label: "Decision shield" },
+                { href: "#time-machine", label: "Time machine" },
+                { href: "#data-source", label: "Data source" },
+              ].map((item) => (
+                <li key={item.href}>
+                  <a
+                    href={item.href}
+                    className="inline-flex min-h-[44px] items-center rounded-full border border-slate-800 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-300 transition-colors hover:border-slate-600 hover:text-slate-100"
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
           {historicalSelection ? <HistoricalBanner banner={historicalSelection.banner} /> : null}
         </header>
 
