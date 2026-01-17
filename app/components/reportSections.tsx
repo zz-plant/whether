@@ -230,6 +230,13 @@ export const RegimeAssessmentCard = ({
             <span>Capital tightness</span>
             <span className="text-slate-200 tabular-nums">{assessment.scores.tightness}/100</span>
           </div>
+          <meter
+            className="sr-only"
+            min={0}
+            max={100}
+            value={tightnessScore}
+            aria-label="Capital tightness score"
+          />
           <svg
             viewBox="0 0 100 8"
             className="h-2 w-full"
@@ -258,6 +265,13 @@ export const RegimeAssessmentCard = ({
             <span>Market bravery</span>
             <span className="text-slate-200 tabular-nums">{assessment.scores.riskAppetite}/100</span>
           </div>
+          <meter
+            className="sr-only"
+            min={0}
+            max={100}
+            value={riskScore}
+            aria-label="Market bravery score"
+          />
           <svg
             viewBox="0 0 100 8"
             className="h-2 w-full"
