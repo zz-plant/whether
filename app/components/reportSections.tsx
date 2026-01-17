@@ -13,6 +13,7 @@ import type {
 import { cxoFunctionOutputs } from "../../lib/cxoFunctionOutputs";
 import { operatorRequests } from "../../lib/operatorRequests";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
+import { insightDatabase } from "../../data/recommendations";
 
 const numberFormatter = new Intl.NumberFormat("en-US", {
   minimumFractionDigits: 2,
@@ -999,6 +1000,102 @@ export const ExecutiveSnapshotPanel = ({
   );
 };
 
+type RegimeAlert = {
+  changed: boolean;
+  currentRegime: RegimeAssessment["regime"];
+  previousRegime: RegimeAssessment["regime"];
+  currentRecordDate: string;
+  previousRecordDate: string;
+  reasons: string[];
+  summary: string;
+};
+
+export const RegimeChangeAlertPanel = ({
+  alert,
+  provenance,
+}: {
+  alert: RegimeAlert | null;
+  provenance: DataProvenance;
+}) => {
+  const statusLabel = alert?.changed ? "Changed" : "Stable";
+  const statusTone = alert?.changed
+    ? "border-rose-500/40 bg-rose-500/10 text-rose-100"
+    : "border-emerald-500/40 bg-emerald-500/10 text-emerald-100";
+
+  return (
+    <section id="regime-alerts" aria-labelledby="regime-alerts-title" className="mt-10">
+      <div className="weather-panel p-6">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="type-label text-slate-400">Regime change alerts</p>
+            <h3 id="regime-alerts-title" className="type-section text-slate-100">
+              Alert preview and reason codes
+            </h3>
+            <p className="mt-2 type-data text-slate-300">
+              Monitor regime transitions with a clear before/after snapshot and the signal shifts
+              that triggered the change.
+            </p>
+          </div>
+          <div className="flex flex-col items-end gap-3">
+            <span
+              className={`weather-pill inline-flex min-h-[44px] items-center px-3 py-1 text-[10px] uppercase tracking-[0.2em] ${statusTone}`}
+            >
+              {statusLabel}
+            </span>
+            <DataProvenanceStrip provenance={provenance} />
+          </div>
+        </div>
+        {alert ? (
+          <div className="mt-6 grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">
+            <div className="weather-surface p-4">
+              <p className="type-label text-slate-400">Latest alert</p>
+              <p className="mt-3 text-sm text-slate-100">{alert.summary}</p>
+              <p className="mt-2 text-xs text-slate-500">
+                Previous record:{" "}
+                <time dateTime={alert.previousRecordDate}>
+                  {formatDate(alert.previousRecordDate)}
+                </time>{" "}
+                → Current record:{" "}
+                <time dateTime={alert.currentRecordDate}>
+                  {formatDate(alert.currentRecordDate)}
+                </time>
+              </p>
+              <ul className="mt-4 space-y-2 text-sm text-slate-300">
+                {alert.reasons.map((reason) => (
+                  <li key={reason} className="flex gap-2">
+                    <span className="text-slate-500">•</span>
+                    <span className="break-words">{reason}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="weather-surface p-4">
+              <p className="type-label text-slate-400">Actions</p>
+              <p className="mt-3 text-sm text-slate-300">
+                Use the Time Machine to replay the prior month and share the shift in your planning
+                review.
+              </p>
+              <a
+                href="/signals#time-machine"
+                className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-xl border border-sky-500/40 bg-slate-950/70 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+              >
+                Open Time Machine
+              </a>
+            </div>
+          </div>
+        ) : (
+          <div className="mt-6 weather-surface p-4">
+            <p className="text-sm text-slate-300">
+              Alert history is unavailable for this view. Exit the Time Machine or refresh the
+              latest report to see the most recent regime transition.
+            </p>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+};
+
 export const SensorArray = ({
   sensors,
   provenance,
@@ -1331,6 +1428,88 @@ export const PlaybookPanel = ({
             </details>
           </div>
         ) : null}
+      </div>
+    </section>
+  );
+};
+
+export const InsightDatabasePanel = ({
+  regime,
+  provenance,
+}: {
+  regime: RegimeAssessment["regime"];
+  provenance: DataProvenance;
+}) => {
+  const evidence = insightDatabase.regimeEvidence.regimes.find((entry) => entry.key === regime);
+  const fossilRecord = insightDatabase.fossilRecord;
+
+  return (
+    <section id="insight-database" aria-labelledby="insight-database-title" className="mt-10">
+      <div className="weather-panel p-6">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="type-label text-slate-400">Insight database</p>
+            <h3 id="insight-database-title" className="type-section text-slate-100">
+              Evidence-backed regime rationale
+            </h3>
+            <p className="mt-2 type-data text-slate-300">
+              Attach cited macro evidence and historical patterns to explain the current posture.
+            </p>
+          </div>
+          <DataProvenanceStrip provenance={provenance} />
+        </div>
+        <div className="mt-6 grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">
+          <div className="weather-surface p-4">
+            <p className="type-label text-slate-400">Regime evidence</p>
+            <p className="mt-3 text-sm text-slate-200">
+              {evidence?.summary ?? "No evidence summary available for this regime."}
+            </p>
+            <ul className="mt-4 space-y-3 text-sm text-slate-300">
+              {(evidence?.citations ?? []).map((citation) => (
+                <li key={citation.url} className="flex flex-col gap-1">
+                  <span className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                    {citation.source}
+                  </span>
+                  <a
+                    href={citation.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="touch-target text-slate-200 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+                  >
+                    {citation.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="weather-surface p-4">
+            <p className="type-label text-slate-400">{fossilRecord.title}</p>
+            <p className="mt-2 text-xs text-slate-500">{fossilRecord.subtitle}</p>
+            <p className="mt-3 text-sm text-slate-300">{fossilRecord.description}</p>
+          </div>
+        </div>
+        <div className="mt-6 overflow-x-auto">
+          <table className="min-w-full text-left text-sm text-slate-300">
+            <thead className="text-xs uppercase tracking-[0.2em] text-slate-400">
+              <tr>
+                <th className="px-3 py-2">{fossilRecord.columns.domain}</th>
+                <th className="px-3 py-2">{fossilRecord.columns.lowRateArtifact}</th>
+                <th className="px-3 py-2">{fossilRecord.columns.highRateArtifact}</th>
+                <th className="px-3 py-2">{fossilRecord.columns.insight}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {fossilRecord.rows.map((row) => (
+                <tr key={row.domain} className="border-t border-slate-800/60">
+                  <td className="px-3 py-3 text-slate-200">{row.domain}</td>
+                  <td className="px-3 py-3">{row.lowRateArtifact}</td>
+                  <td className="px-3 py-3">{row.highRateArtifact}</td>
+                  <td className="px-3 py-3">{row.insight}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
   );
