@@ -134,6 +134,10 @@ export default async function HomePage({
     : treasury.isLive
       ? "Live"
       : "Offline / Simulated";
+  const fetchedTimestamp = new Date(treasury.fetched_at);
+  const fetchedLabel = Number.isNaN(fetchedTimestamp.valueOf())
+    ? treasury.fetched_at
+    : fetchedTimestamp.toUTCString();
 
   return (
     <main id="main-content" tabIndex={-1} className="min-h-screen bg-slate-950 text-slate-100">
@@ -157,6 +161,27 @@ export default async function HomePage({
             Translate Treasury signals into operational constraints. Every output is sourced and time-stamped
             for traceability.
           </p>
+          <div className="mt-6 grid gap-3 md:grid-cols-3">
+            <div className="rounded-xl border border-slate-800 bg-slate-900/60 px-4 py-3">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">Record date</p>
+              <p className="mono mt-2 text-sm text-slate-100">{treasury.record_date}</p>
+            </div>
+            <div className="rounded-xl border border-slate-800 bg-slate-900/60 px-4 py-3">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">Fetched at</p>
+              <p className="mono mt-2 text-sm text-slate-100">{fetchedLabel}</p>
+            </div>
+            <div className="rounded-xl border border-slate-800 bg-slate-900/60 px-4 py-3">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">Source</p>
+              <a
+                href={treasury.source}
+                target="_blank"
+                rel="noreferrer"
+                className="touch-target mt-2 break-all text-xs text-slate-200 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+              >
+                {treasury.source}
+              </a>
+            </div>
+          </div>
           {historicalSelection ? <HistoricalBanner banner={historicalSelection.banner} /> : null}
         </header>
 

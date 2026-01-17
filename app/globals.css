@@ -67,8 +67,25 @@ a:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 input:focus-visible {
-  outline: 2px solid rgba(56, 189, 248, 0.8);
+  outline: 2px solid rgba(56, 189, 248, 0.95);
   outline-offset: 3px;
+  box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.9);
+}
+
+.touch-target {
+  position: relative;
+  display: inline-flex;
+  min-height: 44px;
+  min-width: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 0.1rem 0.6rem;
+}
+
+.touch-target::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
 }
 
 @media (prefers-reduced-motion: reduce) {

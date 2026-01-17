@@ -5,6 +5,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   evaluateDecision,
   type DecisionAction,
@@ -70,11 +71,22 @@ const buildShareText = (
 };
 
 export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessment }) => {
-  const [lifecycle, setLifecycle] = useState<LifecycleStage>("GROWTH");
-  const [category, setCategory] = useState<DecisionCategory>("HIRING");
-  const [action, setAction] = useState<DecisionAction>("HIRE");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const urlLifecycle = searchParams.get("lifecycle");
+  const urlCategory = searchParams.get("category");
+  const urlAction = searchParams.get("action");
+  const initialLifecycle =
+    lifecycleOptions.find((option) => option.value === urlLifecycle)?.value ?? "GROWTH";
+  const initialCategory =
+    categoryOptions.find((option) => option.value === urlCategory)?.value ?? "HIRING";
+  const initialAction = actionOptions.find((option) => option.value === urlAction)?.value ?? "HIRE";
+  const [lifecycle, setLifecycle] = useState<LifecycleStage>(initialLifecycle);
+  const [category, setCategory] = useState<DecisionCategory>(initialCategory);
+  const [action, setAction] = useState<DecisionAction>(initialAction);
   const [copied, setCopied] = useState(false);
   const [copyError, setCopyError] = useState(false);
+  const [isCopying, setIsCopying] = useState(false);
 
   const output = useMemo(
     () => evaluateDecision(assessment, { lifecycle, category, action }),
@@ -89,7 +101,65 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
     setCopyError(false);
   }, [lifecycle, category, action]);
 
+  const updateQueryParam = (
+    nextLifecycle: LifecycleStage,
+    nextCategory: DecisionCategory,
+    nextAction: DecisionAction
+  ) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("lifecycle", nextLifecycle);
+    params.set("category", nextCategory);
+    params.set("action", nextAction);
+    router.push(`?${params.toString()}`);
+  };
+
+  useEffect(() => {
+    const stored = sessionStorage.getItem("decision-shield-state");
+    if (!stored) {
+      return;
+    }
+    try {
+      const parsed = JSON.parse(stored) as {
+        lifecycle?: LifecycleStage;
+        category?: DecisionCategory;
+        action?: DecisionAction;
+      };
+      let nextLifecycle = lifecycle;
+      let nextCategory = category;
+      let nextAction = action;
+      if (parsed.lifecycle && !urlLifecycle) {
+        nextLifecycle = parsed.lifecycle;
+        setLifecycle(parsed.lifecycle);
+      }
+      if (parsed.category && !urlCategory) {
+        nextCategory = parsed.category;
+        setCategory(parsed.category);
+      }
+      if (parsed.action && !urlAction) {
+        nextAction = parsed.action;
+        setAction(parsed.action);
+      }
+      if (!urlLifecycle || !urlCategory || !urlAction) {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set("lifecycle", nextLifecycle);
+        params.set("category", nextCategory);
+        params.set("action", nextAction);
+        router.replace(`?${params.toString()}`);
+      }
+    } catch {
+      sessionStorage.removeItem("decision-shield-state");
+    }
+  }, [category, lifecycle, action, router, searchParams, urlAction, urlCategory, urlLifecycle]);
+
+  useEffect(() => {
+    sessionStorage.setItem(
+      "decision-shield-state",
+      JSON.stringify({ lifecycle, category, action })
+    );
+  }, [action, category, lifecycle]);
+
   const handleCopy = async () => {
+    setIsCopying(true);
     try {
       await navigator.clipboard.writeText(shareText);
       setCopied(true);
@@ -98,6 +168,8 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
     } catch {
       setCopied(false);
       setCopyError(true);
+    } finally {
+      setIsCopying(false);
     }
   };
 
@@ -115,13 +187,33 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
           <button
             type="button"
             onClick={handleCopy}
-            className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-slate-500 hover:text-slate-100"
+            disabled={isCopying}
+            aria-busy={isCopying}
+            className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-slate-500 hover:text-slate-100 disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {copied ? "Copied" : "Copy verdict"}
+            {isCopying ? (
+              <>
+                <span
+                  aria-hidden="true"
+                  className="h-3 w-3 animate-spin rounded-full border-2 border-slate-200 border-t-transparent"
+                />
+                Copying
+              </>
+            ) : copied ? (
+              "Copied"
+            ) : (
+              "Copy verdict"
+            )}
           </button>
         </div>
         <p className="sr-only" role="status" aria-live="polite">
-          {copied ? "Verdict copied to clipboard." : copyError ? "Clipboard blocked." : ""}
+          {isCopying
+            ? "Copying verdict."
+            : copied
+              ? "Verdict copied to clipboard."
+              : copyError
+                ? "Clipboard blocked."
+                : ""}
         </p>
         {copyError ? (
           <div className="mt-4 rounded-xl border border-amber-400/40 bg-amber-500/10 p-4 text-xs text-amber-100">
@@ -135,7 +227,7 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
               readOnly
               value={shareText}
               rows={8}
-              className="mt-3 w-full rounded-lg border border-amber-400/30 bg-slate-950/80 p-3 font-mono text-[11px] text-amber-100"
+              className="mt-3 w-full origin-top-left rounded-lg border border-amber-400/30 bg-slate-950/80 p-3 font-mono text-base text-amber-100 [transform:scale(0.9)]"
             />
           </div>
         ) : null}
@@ -145,7 +237,11 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
             Lifecycle
             <select
               value={lifecycle}
-              onChange={(event) => setLifecycle(event.target.value as LifecycleStage)}
+              onChange={(event) => {
+                const nextLifecycle = event.target.value as LifecycleStage;
+                setLifecycle(nextLifecycle);
+                updateQueryParam(nextLifecycle, category, action);
+              }}
               className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100 transition-colors hover:border-slate-700"
             >
               {lifecycleOptions.map((option) => (
@@ -159,7 +255,11 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
             Category
             <select
               value={category}
-              onChange={(event) => setCategory(event.target.value as DecisionCategory)}
+              onChange={(event) => {
+                const nextCategory = event.target.value as DecisionCategory;
+                setCategory(nextCategory);
+                updateQueryParam(lifecycle, nextCategory, action);
+              }}
               className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100 transition-colors hover:border-slate-700"
             >
               {categoryOptions.map((option) => (
@@ -173,7 +273,11 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
             Action
             <select
               value={action}
-              onChange={(event) => setAction(event.target.value as DecisionAction)}
+              onChange={(event) => {
+                const nextAction = event.target.value as DecisionAction;
+                setAction(nextAction);
+                updateQueryParam(lifecycle, category, nextAction);
+              }}
               className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100 transition-colors hover:border-slate-700"
             >
               {actionOptions.map((option) => (

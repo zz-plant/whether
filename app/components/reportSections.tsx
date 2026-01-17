@@ -190,13 +190,13 @@ export const LiveTickerPanel = ({
           </span>
         </div>
       </div>
-      <div className="mt-4 text-xs text-slate-500">
-        Source:{" "}
+      <div className="mt-4 flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-xs text-slate-500">
+        <span>Source link</span>
         <a
           href={treasury.source}
           target="_blank"
           rel="noreferrer"
-          className="text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+          className="touch-target text-slate-200 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
           title={treasury.source}
         >
           Open source
@@ -302,7 +302,7 @@ export const DataSourcePanel = ({ treasury }: { treasury: TreasuryData }) => {
         href={treasury.source}
         target="_blank"
         rel="noreferrer"
-        className="mt-4 break-all text-xs text-slate-400 underline decoration-slate-700 underline-offset-4 hover:text-slate-200"
+        className="touch-target mt-4 break-all text-xs text-slate-200 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
       >
         {treasury.source}
       </a>
@@ -363,7 +363,7 @@ export const TimeMachinePanel = ({
           {isHistorical ? (
             <a
               href="/"
-              className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-slate-500 hover:text-slate-100"
+              className="touch-target inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-slate-500 hover:text-slate-100"
             >
               Exit historical view
             </a>
@@ -406,7 +406,7 @@ export const TimeMachinePanel = ({
           </label>
           <button
             type="submit"
-            className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-slate-500 hover:text-slate-100"
+            className="touch-target inline-flex min-h-[44px] items-center justify-center rounded-xl border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-slate-500 hover:text-slate-100"
           >
             Load snapshot
           </button>
