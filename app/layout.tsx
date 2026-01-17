@@ -1,5 +1,5 @@
 import "./globals.css";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://whether.report";
 const siteName = "Whether — Regime Station";
@@ -52,6 +52,10 @@ export const metadata: Metadata = {
       "max-video-preview": -1
     }
   }
+};
+
+export const viewport: Viewport = {
+  themeColor: "#020617",
 };
 
 export default function RootLayout({

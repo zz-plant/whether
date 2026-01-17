@@ -25,6 +25,26 @@ import {
   TimeMachinePanel,
 } from "./components/reportSections";
 
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+  dateStyle: "medium",
+  timeZone: "UTC",
+});
+const timestampFormatter = new Intl.DateTimeFormat("en-US", {
+  dateStyle: "medium",
+  timeStyle: "short",
+  timeZone: "UTC",
+});
+
+const formatDateValue = (value: string) => {
+  const date = new Date(value);
+  return Number.isNaN(date.valueOf()) ? value : dateFormatter.format(date);
+};
+
+const formatTimestampValue = (value: string) => {
+  const date = new Date(value);
+  return Number.isNaN(date.valueOf()) ? value : timestampFormatter.format(date);
+};
+
 const parseHistoricalSelection = (searchParams?: { month?: string; year?: string }) => {
   if (!searchParams?.month || !searchParams?.year) {
     return null;
@@ -125,6 +145,8 @@ export default async function HomePage({
     snapshotFallback: snapshotData,
     asOf: historicalSelection?.asOf,
   });
+  const recordDateLabel = formatDateValue(treasury.record_date);
+  const fetchedAtLabel = formatTimestampValue(treasury.fetched_at);
   const sensors = buildSensorReadings(treasury);
   const assessment = evaluateRegime(treasury);
   const { playbook, startItems, stopItems } = getPlaybookGuidance(assessment.regime);
@@ -145,7 +167,7 @@ export default async function HomePage({
       <div className="mx-auto max-w-6xl px-6 py-12 display-drift">
         <header className="flex flex-col gap-4 border-b border-slate-800 pb-8">
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
+            <div className="min-w-0">
               <p className="text-sm uppercase tracking-[0.2em] text-slate-400">Regime Station</p>
               <h1 className="text-3xl font-semibold">Whether Report</h1>
             </div>
@@ -157,6 +179,27 @@ export default async function HomePage({
             Translate Treasury signals into operational constraints. Every output is sourced and time-stamped
             for traceability.
           </p>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/50 px-4 py-3">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-slate-400">Record date</p>
+              <p className="mono mt-2 text-sm text-slate-100">{recordDateLabel}</p>
+            </div>
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/50 px-4 py-3">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-slate-400">Fetched at</p>
+              <p className="mono mt-2 text-sm text-slate-100">{fetchedAtLabel}</p>
+            </div>
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/50 px-4 py-3">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-slate-400">Source</p>
+              <a
+                href={treasury.source}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-2 block text-xs text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+              >
+                US Treasury Fiscal Data API
+              </a>
+            </div>
+          </div>
           {historicalSelection ? <HistoricalBanner banner={historicalSelection.banner} /> : null}
         </header>
 
