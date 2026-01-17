@@ -15,6 +15,7 @@ import { DecisionShieldPanel } from "./components/decisionShieldPanel";
 import { DisplayGuardian } from "./components/displayGuardian";
 import {
   DataSourcePanel,
+  ExecutiveSnapshotPanel,
   HistoricalBanner,
   LiveTickerPanel,
   PlaybookPanel,
@@ -202,6 +203,8 @@ export default async function HomePage({
           </div>
           {historicalSelection ? <HistoricalBanner banner={historicalSelection.banner} /> : null}
         </header>
+
+        <ExecutiveSnapshotPanel treasury={treasury} assessment={assessment} modeLabel={statusLabel} />
 
         <section className="mt-10 grid gap-6 lg:grid-cols-[2.2fr,1fr]">
           <RegimeAssessmentCard assessment={assessment} />

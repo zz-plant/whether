@@ -217,7 +217,7 @@ export const LiveTickerPanel = ({
           href={treasury.source}
           target="_blank"
           rel="noreferrer"
-          className="text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+          className="touch-target text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
           title={treasury.source}
         >
           Open source
@@ -323,7 +323,7 @@ export const DataSourcePanel = ({ treasury }: { treasury: TreasuryData }) => {
         href={treasury.source}
         target="_blank"
         rel="noreferrer"
-        className="mt-4 break-all text-xs text-slate-400 underline decoration-slate-700 underline-offset-4 hover:text-slate-200"
+        className="touch-target mt-4 break-all text-xs text-slate-400 underline decoration-slate-700 underline-offset-4 hover:text-slate-200"
       >
         {treasury.source}
       </a>
@@ -337,6 +337,58 @@ export const HistoricalBanner = ({ banner }: { banner: string }) => {
       <span className="text-xs uppercase tracking-[0.2em] text-slate-400">Time Machine</span>
       <p className="mt-1">{banner}</p>
     </div>
+  );
+};
+
+export const ExecutiveSnapshotPanel = ({
+  treasury,
+  assessment,
+  modeLabel,
+}: {
+  treasury: TreasuryData;
+  assessment: RegimeAssessment;
+  modeLabel: string;
+}) => {
+  const curveSlope = assessment.scores.curveSlope;
+  const curveLabel = curveSlope === null ? "—" : curveSlope < 0 ? "Inverted" : "Normal";
+
+  return (
+    <section className="mt-8">
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-sm uppercase tracking-[0.2em] text-slate-400">Executive snapshot</p>
+            <h3 className="text-xl font-semibold text-slate-100">Operational pulse</h3>
+          </div>
+          <span className="rounded-full border border-slate-700 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-300">
+            {modeLabel}
+          </span>
+        </div>
+        <div className="mt-5 grid gap-4 md:grid-cols-3">
+          <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Data freshness</p>
+            <p className="mono mt-2 text-sm text-slate-100">{treasury.record_date}</p>
+            <p className="mt-2 text-xs text-slate-500">Fetched {formatTimestamp(treasury.fetched_at)}</p>
+          </div>
+          <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Rate baseline</p>
+            <p className="mono mt-2 text-sm text-slate-100">
+              {formatNumber(assessment.scores.baseRate, "%")}
+            </p>
+            <p className="mt-2 text-xs text-slate-500">
+              Using {assessment.scores.baseRateUsed} for policy anchor
+            </p>
+          </div>
+          <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Curve signal</p>
+            <p className="mono mt-2 text-sm text-slate-100">
+              {curveSlope === null ? "—" : `${curveSlope.toFixed(2)}%`}
+            </p>
+            <p className="mt-2 text-xs text-slate-500">Slope is {curveLabel}</p>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 };
 
