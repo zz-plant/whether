@@ -345,31 +345,35 @@ export const ThresholdsPanel = ({
             </div>
           </div>
           <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Audit trail</p>
-            {auditLog.length ? (
-              <ul className="mt-3 space-y-3 text-xs text-slate-400">
-                {auditLog.map((entry) => (
-                  <li key={`${entry.timestamp}-${entry.source}`}>
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">
-                      {entry.source === "reset" ? "Reset" : "Override"} ·{" "}
-                      {new Date(entry.timestamp).toLocaleString("en-US", {
-                        timeStyle: "short",
-                        dateStyle: "medium",
-                      })}
-                    </p>
-                    <p className="mt-1 text-slate-300">
-                      {entry.previous.baseRateTightness}% → {entry.next.baseRateTightness}% ·{" "}
-                      {entry.previous.tightnessRegime}/{entry.previous.riskAppetiteRegime} →{" "}
-                      {entry.next.tightnessRegime}/{entry.next.riskAppetiteRegime}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="mt-3 text-xs text-slate-500">
-                No overrides logged yet. Defaults are active.
-              </p>
-            )}
+            <details open>
+              <summary className="min-h-[44px] cursor-pointer text-xs uppercase tracking-[0.2em] text-slate-400 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300">
+                Audit trail (recent overrides)
+              </summary>
+              {auditLog.length ? (
+                <ul className="mt-3 space-y-3 text-xs text-slate-400">
+                  {auditLog.map((entry) => (
+                    <li key={`${entry.timestamp}-${entry.source}`}>
+                      <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">
+                        {entry.source === "reset" ? "Reset" : "Override"} ·{" "}
+                        {new Date(entry.timestamp).toLocaleString("en-US", {
+                          timeStyle: "short",
+                          dateStyle: "medium",
+                        })}
+                      </p>
+                      <p className="mt-1 text-slate-300">
+                        {entry.previous.baseRateTightness}% → {entry.next.baseRateTightness}% ·{" "}
+                        {entry.previous.tightnessRegime}/{entry.previous.riskAppetiteRegime} →{" "}
+                        {entry.next.tightnessRegime}/{entry.next.riskAppetiteRegime}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-3 text-xs text-slate-500">
+                  No overrides logged yet. Defaults are active.
+                </p>
+              )}
+            </details>
           </div>
         </div>
       </div>
