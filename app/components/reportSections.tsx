@@ -168,6 +168,91 @@ export const RegimeAssessmentCard = ({
   );
 };
 
+export const FirstTimeGuidePanel = ({
+  statusLabel,
+  recordDateLabel,
+  fetchedAtLabel,
+}: {
+  statusLabel: string;
+  recordDateLabel: string;
+  fetchedAtLabel: string;
+}) => (
+  <section id="first-time-guide" aria-labelledby="first-time-guide-title" className="mt-10">
+    <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="type-label text-slate-400">First-time operator guide</p>
+          <h2 id="first-time-guide-title" className="type-section text-slate-100">
+            Orient to the live regime briefing in three moves
+          </h2>
+          <p className="mt-2 type-data text-slate-300">
+            This report is built to turn Treasury signals into immediate execution constraints. Start
+            here to ground decisions before you dive into the data.
+          </p>
+        </div>
+        <div className="rounded-xl border border-slate-800/70 bg-slate-950/60 px-4 py-3 text-xs uppercase tracking-[0.2em] text-slate-300">
+          <p className="text-[10px] text-slate-500">Current snapshot</p>
+          <p className="mt-2 text-[11px] text-slate-200">Status: {statusLabel}</p>
+          <p className="mt-1 text-[11px] text-slate-400">Record: {recordDateLabel}</p>
+          <p className="mt-1 text-[11px] text-slate-500">Fetched: {fetchedAtLabel}</p>
+        </div>
+      </div>
+
+      <div className="mt-6 grid gap-4 lg:grid-cols-3">
+        {[
+          {
+            title: "1. Scan the executive snapshot",
+            detail:
+              "Confirm the operating regime and the top constraints before you open deeper diagnostics.",
+          },
+          {
+            title: "2. Validate the regime drivers",
+            detail:
+              "Use the signal matrix and sensor array to see which Treasury levers are tightening or loosening.",
+          },
+          {
+            title: "3. Translate into execution moves",
+            detail:
+              "Use the playbook and export briefs to brief leadership with plain-English action constraints.",
+          },
+        ].map((step) => (
+          <div
+            key={step.title}
+            className="rounded-xl border border-slate-800/70 bg-slate-950/60 p-4 text-sm text-slate-300"
+          >
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-200">
+              {step.title}
+            </p>
+            <p className="mt-2 text-sm text-slate-400">{step.detail}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-6 flex flex-wrap gap-3">
+        {[
+          { href: "#executive-snapshot", label: "Executive snapshot" },
+          { href: "#regime-assessment", label: "Regime assessment" },
+          { href: "#playbook", label: "Playbook" },
+          { href: "#export-briefs", label: "Export briefs" },
+          { href: "#time-machine", label: "Time machine" },
+        ].map((link) => (
+          <a
+            key={link.href}
+            href={link.href}
+            className="inline-flex min-h-[44px] items-center rounded-full border border-slate-800/70 bg-slate-950/60 px-4 py-2 text-[11px] uppercase tracking-[0.25em] text-slate-300 transition-colors hover:border-slate-500 hover:text-slate-100"
+          >
+            {link.label}
+          </a>
+        ))}
+      </div>
+      <p className="mt-4 text-xs text-slate-500">
+        Share the URL when you lock thresholds or time machine selections so every stakeholder sees
+        the same regime assumptions.
+      </p>
+    </div>
+  </section>
+);
+
 export const LiveTickerPanel = ({
   treasury,
   assessment,
