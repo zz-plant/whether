@@ -71,6 +71,25 @@ export const getLatestTimeMachineSnapshot = () => {
   return sortedSnapshots.at(-1) ?? null;
 };
 
+export const getPreviousTimeMachineSnapshot = (asOf: string): TreasuryData | null => {
+  const target = new Date(asOf);
+  if (Number.isNaN(target.valueOf())) {
+    return null;
+  }
+
+  const candidate = [...sortedSnapshots].reverse().find((snapshot) => {
+    const recordDate = new Date(snapshot.record_date);
+    return recordDate < target;
+  });
+
+  if (!candidate) {
+    return null;
+  }
+
+  const { year: _year, month: _month, ...data } = candidate;
+  return data;
+};
+
 export const findTimeMachineSnapshot = (asOf: string): TreasuryData | null => {
   const target = new Date(asOf);
   if (Number.isNaN(target.valueOf())) {

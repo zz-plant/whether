@@ -6,6 +6,7 @@ import {
   BeginnerGlossaryPanel,
   ExecutiveSnapshotPanel,
   RegimeAssessmentCard,
+  RegimeChangeAlertPanel,
   SignalMatrixPanel,
   HistoricalBanner,
 } from "./components/reportSections";
@@ -91,6 +92,7 @@ export default async function HomePage({
     { href: "#first-time-guide", label: "First-time guide" },
     { href: "#beginner-glossary", label: "Glossary" },
     { href: "#executive-snapshot", label: "Executive snapshot" },
+    { href: "#regime-alerts", label: "Regime alerts" },
     { href: "#regime-assessment", label: "Regime assessment" },
     { href: "#signal-matrix", label: "Signal matrix" },
   ];
@@ -113,6 +115,7 @@ export default async function HomePage({
     fetchedAtLabel,
     historicalSelection,
     recordDateLabel,
+    regimeAlert,
     statusLabel,
     treasury,
     treasuryProvenance,
@@ -162,6 +165,8 @@ export default async function HomePage({
         assessment={assessment}
         provenance={treasuryProvenance}
       />
+
+      <RegimeChangeAlertPanel alert={regimeAlert} provenance={treasuryProvenance} />
 
       <section className="mt-10">
         <RegimeAssessmentCard assessment={assessment} provenance={treasuryProvenance} />

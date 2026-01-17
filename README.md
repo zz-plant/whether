@@ -51,7 +51,8 @@ Example logic:
 - If **Growth** and **Hire** ⇒ **Safe** (aligned)
 
 Output includes a **status flag + concrete advice** (e.g., payback window), plus copy-ready
-verdict text for sharing in planning reviews.
+verdict text for sharing in planning reviews. Operators can also save common scenarios as presets
+to speed up recurring decisions.
 
 ### 4) Time Machine (historical analysis)
 Query any month since 2000 via the Treasury API to show the regime on the latest available
@@ -60,12 +61,20 @@ The Time Machine now prefers the local cache (`data/time_machine_cache.json`) to
 third‑party lookups in replay mode. Refresh the cache by re-running the Treasury query
 logic in a connected environment and committing the updated file.
 
+### 4b) Regime change alerts (signal shifts)
+Surface regime transitions with a reason-code summary so leaders can spot when posture needs to
+change, and replay the prior month using the Time Machine for context.
+
 ### 5) Report lanes (multi-page workflow)
 The report now ships as three focused lanes so leaders can consume the right depth without
 scrolling a single mega-page:
 - **Overview**: executive snapshot and regime posture.
 - **Signals & thresholds**: sensor detail, macro signals, and historical time machine context.
 - **Operations playbook**: action guidance, decision shields, and export briefs.
+
+### 6) Insight Database (evidence pack)
+Attach citations and historical precedent to playbook guidance, including a “Fossil Record” view
+of how organization and product artifacts map to capital regimes.
 
 ## Technical requirements
 - **Snapshot mode**: render instantly from cached data (0ms), then fetch async.

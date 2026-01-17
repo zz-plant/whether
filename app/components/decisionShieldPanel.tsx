@@ -103,11 +103,26 @@ export const DecisionShieldPanel = ({
   const [copied, setCopied] = useState(false);
   const [isCopying, setIsCopying] = useState(false);
   const [copyError, setCopyError] = useState(false);
+  const [presets, setPresets] = useState<
+    Array<{
+      id: string;
+      name: string;
+      lifecycle: LifecycleStage;
+      category: DecisionCategory;
+      action: DecisionAction;
+      createdAt: string;
+    }>
+  >([]);
+  const [presetName, setPresetName] = useState("");
+  const [presetError, setPresetError] = useState<string | null>(null);
+  const [presetStatus, setPresetStatus] = useState<string | null>(null);
   const storageKey = "whether.decisionShield";
+  const presetStorageKey = "whether.decisionShieldPresets";
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const restoredFromStorage = useRef(false);
+  const presetInputRef = useRef<HTMLInputElement | null>(null);
 
   const urlLifecycle = useMemo(
     () => parseParam(searchParams.get("lifecycle"), lifecycleOptions),
@@ -195,6 +210,21 @@ export const DecisionShieldPanel = ({
 
   useEffect(() => {
     try {
+      const stored = window.localStorage.getItem(presetStorageKey);
+      if (!stored) {
+        return;
+      }
+      const parsed = JSON.parse(stored) as typeof presets;
+      if (Array.isArray(parsed)) {
+        setPresets(parsed);
+      }
+    } catch {
+      // Intentionally ignore storage restore errors to keep console clean.
+    }
+  }, [presetStorageKey]);
+
+  useEffect(() => {
+    try {
       window.localStorage.setItem(
         storageKey,
         JSON.stringify({ lifecycle, category, action })
@@ -203,6 +233,14 @@ export const DecisionShieldPanel = ({
       // Intentionally ignore storage persistence errors to keep console clean.
     }
   }, [action, category, lifecycle, storageKey]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(presetStorageKey, JSON.stringify(presets));
+    } catch {
+      // Intentionally ignore storage persistence errors to keep console clean.
+    }
+  }, [presetStorageKey, presets]);
 
   useEffect(() => {
     const currentLifecycle = searchParams.get("lifecycle");
@@ -225,6 +263,65 @@ export const DecisionShieldPanel = ({
   useEffect(() => {
     setCopyError(false);
   }, [lifecycle, category, action]);
+
+  useEffect(() => {
+    if (!presetStatus) {
+      return;
+    }
+    const timeout = window.setTimeout(() => setPresetStatus(null), 2000);
+    return () => window.clearTimeout(timeout);
+  }, [presetStatus]);
+
+  const resolvePresetId = () => {
+    if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+      return crypto.randomUUID();
+    }
+    return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  };
+
+  const handlePresetSave = () => {
+    if (!presetName.trim()) {
+      setPresetError("Name your preset so it can be reused.");
+      presetInputRef.current?.focus();
+      return;
+    }
+    const nextPreset = {
+      id: resolvePresetId(),
+      name: presetName.trim(),
+      lifecycle,
+      category,
+      action,
+      createdAt: new Date().toISOString(),
+    };
+    setPresets((prev) => [nextPreset, ...prev].slice(0, 8));
+    setPresetName("");
+    setPresetError(null);
+    setPresetStatus("Preset saved.");
+  };
+
+  const handlePresetApply = (presetId: string) => {
+    const preset = presets.find((item) => item.id === presetId);
+    if (!preset) {
+      return;
+    }
+    setLifecycle(preset.lifecycle);
+    setCategory(preset.category);
+    setAction(preset.action);
+    setPresetStatus("Preset applied.");
+  };
+
+  const handlePresetDelete = (presetId: string) => {
+    setPresets((prev) => prev.filter((item) => item.id !== presetId));
+    setPresetStatus("Preset removed.");
+  };
+
+  const handlePresetBlur = () => {
+    if (!presetName.trim()) {
+      setPresetError("Name your preset so it can be reused.");
+    } else {
+      setPresetError(null);
+    }
+  };
 
   const handleCopy = async () => {
     if (isCopying) {
@@ -366,6 +463,86 @@ export const DecisionShieldPanel = ({
                   </option>
                 ))}
               </select>
+            </div>
+          </div>
+
+          <div className="weather-surface p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="type-label text-slate-400">Saved scenarios</p>
+                <p className="mt-2 text-sm text-slate-300">
+                  Store common Decision Shield inputs as presets for faster reviews.
+                </p>
+              </div>
+              <p className="text-xs text-slate-500">Max 8 presets</p>
+            </div>
+            <div className="mt-4 flex flex-wrap items-start gap-3">
+              <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.2em] text-slate-400">
+                Preset name
+                <input
+                  ref={presetInputRef}
+                  type="text"
+                  value={presetName}
+                  onChange={(event) => setPresetName(event.target.value)}
+                  onBlur={handlePresetBlur}
+                  aria-invalid={Boolean(presetError)}
+                  aria-describedby={presetError ? "preset-error" : undefined}
+                  className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70"
+                />
+              </label>
+              <button
+                type="button"
+                onClick={handlePresetSave}
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
+              >
+                Save preset
+              </button>
+            </div>
+            <div className="mt-2 min-h-[20px]">
+              {presetError ? (
+                <p id="preset-error" className="text-xs text-amber-200">
+                  {presetError}
+                </p>
+              ) : null}
+            </div>
+            <p className="sr-only" role="status" aria-live="polite">
+              {presetStatus ?? ""}
+            </p>
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
+              {presets.length === 0 ? (
+                <p className="text-sm text-slate-500">
+                  No presets yet. Save one to reuse this scenario in future reviews.
+                </p>
+              ) : (
+                presets.map((preset) => (
+                  <div key={preset.id} className="rounded-lg border border-slate-800/60 p-3">
+                    <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                      {preset.name}
+                    </p>
+                    <p className="mt-2 text-sm text-slate-200">
+                      {formatOptionLabel(preset.lifecycle, lifecycleOptions)} ·{" "}
+                      {formatOptionLabel(preset.category, categoryOptions)} ·{" "}
+                      {formatDecisionAction(preset.action)}
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handlePresetApply(preset.id)}
+                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100"
+                      >
+                        Apply
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handlePresetDelete(preset.id)}
+                        className="weather-pill inline-flex min-h-[44px] items-center justify-center border border-rose-400/40 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-rose-200 transition-colors hover:border-rose-300/70 hover:text-rose-100"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 

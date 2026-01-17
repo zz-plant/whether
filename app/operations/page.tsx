@@ -6,6 +6,7 @@ import { ExportBriefPanel } from "../components/exportBriefPanel";
 import {
   CxoFunctionPanel,
   HistoricalBanner,
+  InsightDatabasePanel,
   OperatorRequestsPanel,
   PlaybookPanel,
 } from "../components/reportSections";
@@ -40,6 +41,7 @@ export default async function OperationsPage({
   ];
   const sectionLinks = [
     { href: "#playbook", label: "Playbook" },
+    { href: "#insight-database", label: "Insight database" },
     { href: "#decision-shield", label: "Decision shield" },
     { href: "#export-briefs", label: "Export briefs" },
     { href: "#cxo-functions", label: "CXO outputs" },
@@ -99,6 +101,8 @@ export default async function OperationsPage({
         fenceItems={fenceItems}
         provenance={treasuryProvenance}
       />
+
+      <InsightDatabasePanel regime={assessment.regime} provenance={treasuryProvenance} />
 
       <DecisionShieldPanel assessment={assessment} provenance={treasuryProvenance} />
 

@@ -11,6 +11,7 @@ import {
   getLatestTimeMachineSnapshot,
   getTimeMachineCoverage,
   getTimeMachineMonthsByYear,
+  getPreviousTimeMachineSnapshot,
 } from "./timeMachineCache";
 import {
   parseTimeMachineRequest,
@@ -37,6 +38,50 @@ const formatDateValue = (value: string) => {
 const formatTimestampValue = (value: string) => {
   const date = new Date(value);
   return Number.isNaN(date.valueOf()) ? value : timestampFormatter.format(date);
+};
+
+const formatScore = (value: number) => value.toFixed(0);
+
+const buildRegimeAlert = (
+  current: ReturnType<typeof evaluateRegime>,
+  previous: ReturnType<typeof evaluateRegime>,
+  currentRecordDate: string,
+  previousRecordDate: string
+) => {
+  const tightnessThreshold = current.thresholds.tightnessRegime;
+  const riskThreshold = current.thresholds.riskAppetiteRegime;
+  const wasTight = previous.scores.tightness > tightnessThreshold;
+  const isTight = current.scores.tightness > tightnessThreshold;
+  const wasBrave = previous.scores.riskAppetite > riskThreshold;
+  const isBrave = current.scores.riskAppetite > riskThreshold;
+  const reasons: string[] = [];
+
+  if (wasTight !== isTight) {
+    reasons.push(
+      `Tightness moved ${isTight ? "above" : "below"} ${formatScore(tightnessThreshold)}.`
+    );
+  }
+  if (wasBrave !== isBrave) {
+    reasons.push(
+      `Risk appetite moved ${isBrave ? "above" : "below"} ${formatScore(riskThreshold)}.`
+    );
+  }
+  if (reasons.length === 0) {
+    reasons.push(
+      `Regime shifted as tightness (${formatScore(previous.scores.tightness)} → ${formatScore(current.scores.tightness)}) ` +
+        `and risk appetite (${formatScore(previous.scores.riskAppetite)} → ${formatScore(current.scores.riskAppetite)}) moved across boundaries.`
+    );
+  }
+
+  return {
+    changed: current.regime !== previous.regime,
+    currentRegime: current.regime,
+    previousRegime: previous.regime,
+    currentRecordDate,
+    previousRecordDate,
+    reasons,
+    summary: `From ${previous.regime} to ${current.regime}.`,
+  };
 };
 
 export type ReportSearchParams = {
@@ -74,6 +119,12 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
   const liveAssessment = historicalSelection ? evaluateRegime(liveTreasury, thresholds) : null;
   const { playbook, startItems, stopItems } = getPlaybookGuidance(assessment.regime);
   const fenceItems = assessment.constraints;
+  const previousSnapshot = historicalSelection
+    ? null
+    : getPreviousTimeMachineSnapshot(treasury.record_date);
+  const previousAssessment = previousSnapshot
+    ? evaluateRegime(previousSnapshot, thresholds)
+    : null;
   const treasuryProvenance = {
     sourceLabel: "US Treasury Fiscal Data API",
     sourceUrl: treasury.source,
@@ -117,6 +168,15 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
           },
         }
       : null;
+  const regimeAlert =
+    previousAssessment && previousSnapshot
+      ? buildRegimeAlert(
+          assessment,
+          previousAssessment,
+          treasury.record_date,
+          previousSnapshot.record_date
+        )
+      : null;
 
   return {
     assessment,
@@ -135,6 +195,7 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
     playbook,
     recordDateLabel,
     requestedSelection,
+    regimeAlert,
     selectedMonth,
     selectedYear,
     sensors,

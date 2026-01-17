@@ -37,7 +37,7 @@ export const operatorRequests: Array<{
     title: "Insight Database",
     description:
       "Attach citations and historical precedent to the playbook guidance for defensibility.",
-    status: "BACKLOG",
+    status: "DELIVERED",
   },
   {
     title: "Historical comparisons",
@@ -47,12 +47,12 @@ export const operatorRequests: Array<{
   {
     title: "Regime change alerts",
     description: "Notify teams with reason codes when the regime flips.",
-    status: "BACKLOG",
+    status: "DELIVERED",
   },
   {
     title: "Saved scenarios",
     description: "Persist Decision Shield inputs as team presets and templates.",
-    status: "BACKLOG",
+    status: "DELIVERED",
   },
   {
     title: "Deep provenance",

@@ -190,6 +190,80 @@ export const insightDatabase = {
       },
     ],
   },
+  regimeEvidence: {
+    title: "Regime Evidence",
+    subtitle: "Signal-backed rationale with traceable sources",
+    regimes: [
+      {
+        key: "SCARCITY",
+        summary:
+          "High base rates plus an inverted curve compress access to capital and raise hurdle rates.",
+        citations: [
+          {
+            title: "Daily Treasury Yield Curve Rates",
+            source: "US Treasury Fiscal Data",
+            url: "https://fiscaldata.treasury.gov/api-documentation/",
+          },
+          {
+            title: "10-Year vs. 2-Year Treasury Spread",
+            source: "FRED",
+            url: "https://fred.stlouisfed.org/series/T10Y2Y",
+          },
+        ],
+      },
+      {
+        key: "DEFENSIVE",
+        summary:
+          "Rates remain elevated, but the curve stabilizes—capital exists, yet demands efficiency.",
+        citations: [
+          {
+            title: "Daily Treasury Yield Curve Rates",
+            source: "US Treasury Fiscal Data",
+            url: "https://fiscaldata.treasury.gov/api-documentation/",
+          },
+          {
+            title: "Treasury Yield Curve Methodology",
+            source: "US Treasury",
+            url: "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView",
+          },
+        ],
+      },
+      {
+        key: "VOLATILE",
+        summary:
+          "Rates ease, but the curve stays flat or inverted, signaling risk-off behavior despite liquidity.",
+        citations: [
+          {
+            title: "10-Year vs. 2-Year Treasury Spread",
+            source: "FRED",
+            url: "https://fred.stlouisfed.org/series/T10Y2Y",
+          },
+          {
+            title: "Daily Treasury Yield Curve Rates",
+            source: "US Treasury Fiscal Data",
+            url: "https://fiscaldata.treasury.gov/api-documentation/",
+          },
+        ],
+      },
+      {
+        key: "EXPANSION",
+        summary:
+          "Lower base rates with a positive curve signal risk-on funding conditions and faster cycles.",
+        citations: [
+          {
+            title: "Daily Treasury Yield Curve Rates",
+            source: "US Treasury Fiscal Data",
+            url: "https://fiscaldata.treasury.gov/api-documentation/",
+          },
+          {
+            title: "10-Year vs. 2-Year Treasury Spread",
+            source: "FRED",
+            url: "https://fred.stlouisfed.org/series/T10Y2Y",
+          },
+        ],
+      },
+    ],
+  },
   decisionShield: {
     title: "Decision Shield",
     subtitle: "Operational constraints by weather",
