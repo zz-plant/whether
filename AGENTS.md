@@ -3,11 +3,11 @@
 This repository is intentionally minimal right now. Use this guide to keep contributions consistent.
 
 ## Setup commands
-- Install dependencies: `npm install`
-- Start dev server: `npm run dev`
-- Build for production: `npm run build`
-- Run lint checks: `npm run lint`
-- Run tests: `npm test`
+- Install dependencies: `bun install`
+- Start dev server: `bun run dev`
+- Build for production: `bun run build`
+- Run lint checks: `bun run lint`
+- Run tests: `bun test`
 
 ## Purpose
 Whether (Regime Station) turns public macro signals into operational guidance for product and engineering leaders.
