@@ -87,6 +87,12 @@ export const ThresholdsPanel = ({
   const riskRef = useRef<HTMLInputElement | null>(null);
   const storageKey = "whether.thresholdDraft";
   const auditKey = "whether.thresholdAudit";
+  const errorIds = {
+    baseRateTightness: "threshold-base-rate-error",
+    tightnessRegime: "threshold-tightness-error",
+    riskAppetiteRegime: "threshold-risk-error",
+  };
+  const appliedDefaults = DEFAULT_THRESHOLDS;
 
   useEffect(() => {
     setDraft(buildDraft(currentThresholds));
@@ -107,10 +113,16 @@ export const ThresholdsPanel = ({
     try {
       const parsed = JSON.parse(storedDraft) as ThresholdDraft;
       setDraft(parsed);
+      const nextErrors = validateDraft(parsed);
+      if (Object.keys(nextErrors).length === 0) {
+        const nextParams = new URLSearchParams(searchParams.toString());
+        buildThresholdSearchParams(buildThresholds(parsed), appliedDefaults, nextParams);
+        router.replace(`${pathname}?${nextParams.toString()}`, { scroll: false });
+      }
     } catch {
       // Ignore storage parse errors to keep console clean.
     }
-  }, [searchParams]);
+  }, [appliedDefaults, pathname, router, searchParams]);
 
   useEffect(() => {
     window.localStorage.setItem(storageKey, JSON.stringify(draft));
@@ -130,7 +142,6 @@ export const ThresholdsPanel = ({
   }, []);
 
   const formattedCurrent = useMemo(() => buildDraft(currentThresholds), [currentThresholds]);
-  const appliedDefaults = DEFAULT_THRESHOLDS;
 
   const updateUrl = (nextThresholds: RegimeThresholds, source: ThresholdAuditEntry["source"]) => {
     const nextParams = new URLSearchParams(searchParams.toString());
@@ -233,11 +244,14 @@ export const ThresholdsPanel = ({
               onChange={(event) => updateDraft("baseRateTightness", event.target.value)}
               onBlur={() => handleBlur("baseRateTightness")}
               aria-invalid={Boolean(errors.baseRateTightness)}
+              aria-describedby={errors.baseRateTightness ? errorIds.baseRateTightness : undefined}
               className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100"
             />
-            {errors.baseRateTightness ? (
-              <span className="text-[11px] text-amber-200">{errors.baseRateTightness}</span>
-            ) : null}
+            <span className="min-h-[18px] text-[11px] text-amber-200">
+              {errors.baseRateTightness ? (
+                <span id={errorIds.baseRateTightness}>{errors.baseRateTightness}</span>
+              ) : null}
+            </span>
           </label>
           <label
             htmlFor="threshold-tightness"
@@ -253,11 +267,14 @@ export const ThresholdsPanel = ({
               onChange={(event) => updateDraft("tightnessRegime", event.target.value)}
               onBlur={() => handleBlur("tightnessRegime")}
               aria-invalid={Boolean(errors.tightnessRegime)}
+              aria-describedby={errors.tightnessRegime ? errorIds.tightnessRegime : undefined}
               className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100"
             />
-            {errors.tightnessRegime ? (
-              <span className="text-[11px] text-amber-200">{errors.tightnessRegime}</span>
-            ) : null}
+            <span className="min-h-[18px] text-[11px] text-amber-200">
+              {errors.tightnessRegime ? (
+                <span id={errorIds.tightnessRegime}>{errors.tightnessRegime}</span>
+              ) : null}
+            </span>
           </label>
           <label
             htmlFor="threshold-risk"
@@ -273,11 +290,14 @@ export const ThresholdsPanel = ({
               onChange={(event) => updateDraft("riskAppetiteRegime", event.target.value)}
               onBlur={() => handleBlur("riskAppetiteRegime")}
               aria-invalid={Boolean(errors.riskAppetiteRegime)}
+              aria-describedby={errors.riskAppetiteRegime ? errorIds.riskAppetiteRegime : undefined}
               className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100"
             />
-            {errors.riskAppetiteRegime ? (
-              <span className="text-[11px] text-amber-200">{errors.riskAppetiteRegime}</span>
-            ) : null}
+            <span className="min-h-[18px] text-[11px] text-amber-200">
+              {errors.riskAppetiteRegime ? (
+                <span id={errorIds.riskAppetiteRegime}>{errors.riskAppetiteRegime}</span>
+              ) : null}
+            </span>
           </label>
           <div className="flex items-end gap-3">
             <button

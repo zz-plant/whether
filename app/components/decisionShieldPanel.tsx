@@ -281,22 +281,24 @@ export const DecisionShieldPanel = ({
         <p className="sr-only" role="status" aria-live="polite">
           {copied ? "Verdict copied to clipboard." : copyError ? "Clipboard blocked." : ""}
         </p>
-        {copyError ? (
-          <div className="mt-4 rounded-xl border border-amber-400/40 bg-amber-500/10 p-4 text-xs text-amber-100">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-amber-200">
-              Clipboard blocked
-            </p>
-            <p className="mt-2 text-amber-100/90">
-              Select and copy the verdict below to share it manually.
-            </p>
-            <textarea
-              readOnly
-              value={shareText}
-              rows={8}
-              className="mt-3 w-full rounded-lg border border-amber-400/30 bg-slate-950/80 p-3 font-mono text-base text-amber-100"
-            />
-          </div>
-        ) : null}
+        <div className="mt-4 min-h-[260px]">
+          {copyError ? (
+            <div className="rounded-xl border border-amber-400/40 bg-amber-500/10 p-4 text-xs text-amber-100">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-amber-200">
+                Clipboard blocked
+              </p>
+              <p className="mt-2 text-amber-100/90">
+                Select and copy the verdict below to share it manually.
+              </p>
+              <textarea
+                readOnly
+                value={shareText}
+                rows={8}
+                className="mt-3 w-full rounded-lg border border-amber-400/30 bg-slate-950/80 p-3 font-mono text-base text-amber-100"
+              />
+            </div>
+          ) : null}
+        </div>
 
         <div className="mt-6 space-y-4">
           <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">

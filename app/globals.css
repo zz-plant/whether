@@ -4,8 +4,8 @@
 
 :root {
   color-scheme: dark;
-  --display-offset-x: 0px;
-  --display-offset-y: 0px;
+  --display-drift-distance: 2px;
+  --display-drift-duration: 45s;
 }
 
 html {
@@ -76,8 +76,27 @@ input {
 }
 
 .display-drift {
-  transform: translate(var(--display-offset-x), var(--display-offset-y));
-  transition: transform 2.5s ease-in-out;
+  transform: translate(0, 0);
+  animation: display-drift var(--display-drift-duration) ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes display-drift {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(var(--display-drift-distance), 0);
+  }
+  50% {
+    transform: translate(0, var(--display-drift-distance));
+  }
+  75% {
+    transform: translate(calc(-1 * var(--display-drift-distance)), 0);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
 }
 
 button:focus-visible,
@@ -100,6 +119,6 @@ input:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .display-drift {
     transform: none;
-    transition: none;
+    animation: none;
   }
 }

@@ -4,7 +4,7 @@
  */
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 type DisplayGuardianProps = {
   refreshMinutes?: number;
@@ -20,29 +20,13 @@ export const DisplayGuardian = ({
   driftIntervalSeconds = 45,
 }: DisplayGuardianProps) => {
   const lastInteractionAt = useRef(Date.now());
-  const driftValues = useMemo(() => {
-    const max = clamp(Math.round(driftPixels), 1, 6);
-    return [-max, 0, max];
-  }, [driftPixels]);
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      document.documentElement.style.setProperty("--display-offset-x", "0px");
-      document.documentElement.style.setProperty("--display-offset-y", "0px");
-      return;
-    }
-
-    let driftIndex = 0;
-    const driftTimer = window.setInterval(() => {
-      driftIndex += 1;
-      const offsetX = driftValues[driftIndex % driftValues.length];
-      const offsetY = driftValues[(driftIndex + 1) % driftValues.length];
-      document.documentElement.style.setProperty("--display-offset-x", `${offsetX}px`);
-      document.documentElement.style.setProperty("--display-offset-y", `${offsetY}px`);
-    }, clamp(driftIntervalSeconds, 15, 180) * 1000);
-
-    return () => window.clearInterval(driftTimer);
-  }, [driftIntervalSeconds, driftValues]);
+    const max = clamp(Math.round(driftPixels), 1, 6);
+    const duration = clamp(driftIntervalSeconds, 15, 180);
+    document.documentElement.style.setProperty("--display-drift-distance", `${max}px`);
+    document.documentElement.style.setProperty("--display-drift-duration", `${duration}s`);
+  }, [driftIntervalSeconds, driftPixels]);
 
   useEffect(() => {
     const refreshMs = clamp(refreshMinutes, 2, 60) * 60 * 1000;
