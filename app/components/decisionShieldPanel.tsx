@@ -15,6 +15,7 @@ import {
   type LifecycleStage,
 } from "../../lib/decisionShield";
 import type { RegimeAssessment } from "../../lib/regimeEngine";
+import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
 
 const lifecycleOptions: { value: LifecycleStage; label: string }[] = [
   { value: "DISCOVERY", label: "Discovery" },
@@ -89,7 +90,13 @@ const parseParam = <T extends string>(
   options: { value: T; label: string }[]
 ): T | null => options.find((option) => option.value === value)?.value ?? null;
 
-export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessment }) => {
+export const DecisionShieldPanel = ({
+  assessment,
+  provenance,
+}: {
+  assessment: RegimeAssessment;
+  provenance: DataProvenance;
+}) => {
   const [lifecycle, setLifecycle] = useState<LifecycleStage>("GROWTH");
   const [category, setCategory] = useState<DecisionCategory>("HIRING");
   const [action, setAction] = useState<DecisionAction>("HIRE");
@@ -245,28 +252,31 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
   return (
     <section id="decision-shield" aria-labelledby="decision-shield-title" className="mt-10">
       <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
-            <p className="text-sm uppercase tracking-[0.2em] text-slate-400">Decision Shield</p>
-            <h3 id="decision-shield-title" className="text-xl font-semibold text-slate-100">
+            <p className="type-label text-slate-400">Decision Shield</p>
+            <h3 id="decision-shield-title" className="type-section text-slate-100">
               Validate an action
             </h3>
-            <p className="mt-2 text-sm text-slate-300">
+            <p className="mt-2 type-data text-slate-300">
               Pressure-test the next move against current regime physics, then share the verdict.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={handleCopy}
-            disabled={isCopying}
-            aria-busy={isCopying}
-            className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-slate-500 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
-          >
-            {isCopying ? (
-              <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />
-            ) : null}
-            {copied ? "Copied" : isCopying ? "Copying" : "Copy verdict"}
-          </button>
+          <div className="flex flex-col items-end gap-3">
+            <button
+              type="button"
+              onClick={handleCopy}
+              disabled={isCopying}
+              aria-busy={isCopying}
+              className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-slate-500 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
+            >
+              {isCopying ? (
+                <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />
+              ) : null}
+              {copied ? "Copied" : isCopying ? "Copying" : "Copy verdict"}
+            </button>
+            <DataProvenanceStrip provenance={provenance} />
+          </div>
         </div>
         <p className="sr-only" role="status" aria-live="polite">
           {copied ? "Verdict copied to clipboard." : copyError ? "Clipboard blocked." : ""}
@@ -289,6 +299,11 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
         ) : null}
 
         <div className="mt-6 grid gap-4 lg:grid-cols-3">
+          <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 lg:col-span-3">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+              Input → Verdict → Why → Guardrails
+            </p>
+          </div>
           <div className="space-y-2">
             <label
               htmlFor="decision-lifecycle"
@@ -351,7 +366,7 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
           </div>
         </div>
 
-        <div className="mt-6 grid gap-4 lg:grid-cols-[1.4fr,1fr]">
+        <div className="mt-6 grid gap-4 lg:grid-cols-[1.2fr,1fr]">
           <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Verdict</p>
             <div
@@ -359,9 +374,12 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
             >
               {output.verdict}
             </div>
-            <p className="mt-3 text-sm text-slate-200 break-words">{output.summary}</p>
-            <ul className="mt-4 space-y-2 text-sm text-slate-300">
-              {output.bullets.map((bullet) => (
+            <p className="mt-3 type-data text-slate-200 break-words">{output.summary}</p>
+            <p className="mt-4 text-xs uppercase tracking-[0.2em] text-slate-400">
+              Why this verdict
+            </p>
+            <ul className="mt-3 space-y-2 text-sm text-slate-300">
+              {output.bullets.slice(0, 4).map((bullet) => (
                 <li key={bullet} className="flex gap-2">
                   <span className="text-slate-500">•</span>
                   <span className="break-words">{bullet}</span>
@@ -372,11 +390,13 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
           <div className="grid gap-4">
             <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
               <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Guardrail</p>
-              <p className="mt-3 text-sm text-slate-300 break-words">{output.guardrail}</p>
+              <p className="mt-3 type-data text-slate-300 break-words">{output.guardrail}</p>
             </div>
             <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
               <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Reversal trigger</p>
-              <p className="mt-3 text-sm text-slate-300 break-words">{output.reversalTrigger}</p>
+              <p className="mt-3 type-data text-slate-300 break-words">
+                {output.reversalTrigger}
+              </p>
             </div>
           </div>
         </div>

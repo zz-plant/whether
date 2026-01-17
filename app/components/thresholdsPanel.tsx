@@ -10,6 +10,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { RegimeThresholds } from "../../lib/regimeEngine";
 import { DEFAULT_THRESHOLDS } from "../../lib/regimeEngine";
 import { buildThresholdSearchParams, THRESHOLD_PARAM_KEYS } from "../../lib/thresholds";
+import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
 
 type ThresholdDraft = {
   baseRateTightness: string;
@@ -69,8 +70,10 @@ const buildThresholds = (draft: ThresholdDraft): RegimeThresholds => {
 
 export const ThresholdsPanel = ({
   currentThresholds,
+  provenance,
 }: {
   currentThresholds: RegimeThresholds;
+  provenance: DataProvenance;
 }) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -191,19 +194,22 @@ export const ThresholdsPanel = ({
   return (
     <section id="thresholds" aria-labelledby="thresholds-title" className="mt-10">
       <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-sm uppercase tracking-[0.2em] text-slate-400">Regime thresholds</p>
-            <h3 id="thresholds-title" className="text-xl font-semibold text-slate-100">
+            <p className="type-label text-slate-400">Regime thresholds</p>
+            <h3 id="thresholds-title" className="type-section text-slate-100">
               Tune classification guardrails
             </h3>
-            <p className="mt-2 text-sm text-slate-300">
+            <p className="mt-2 type-data text-slate-300">
               Thresholds are URL-driven for deterministic back/forward behavior and auditability.
             </p>
           </div>
-          <div className="text-xs uppercase tracking-[0.2em] text-slate-400">
-            Defaults: {appliedDefaults.baseRateTightness}% ·{" "}
-            {appliedDefaults.tightnessRegime}/{appliedDefaults.riskAppetiteRegime}
+          <div className="flex flex-col items-end gap-2 text-xs uppercase tracking-[0.2em] text-slate-400">
+            <span>
+              Defaults: {appliedDefaults.baseRateTightness}% ·{" "}
+              {appliedDefaults.tightnessRegime}/{appliedDefaults.riskAppetiteRegime}
+            </span>
+            <DataProvenanceStrip provenance={provenance} />
           </div>
         </div>
 
