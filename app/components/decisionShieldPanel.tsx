@@ -100,7 +100,11 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
     () => parseParam(searchParams.get("action"), actionOptions),
     [searchParams]
   );
-  const hasUrlSelection = Boolean(urlLifecycle || urlCategory || urlAction);
+  const hasAnyUrlSelection =
+    searchParams.has("lifecycle") ||
+    searchParams.has("category") ||
+    searchParams.has("action");
+  const hasValidUrlSelection = Boolean(urlLifecycle || urlCategory || urlAction);
 
   const output = useMemo(
     () => evaluateDecision(assessment, { lifecycle, category, action }),
@@ -112,7 +116,7 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
   );
 
   useEffect(() => {
-    if (hasUrlSelection) {
+    if (hasValidUrlSelection) {
       if (urlLifecycle && urlLifecycle !== lifecycle) {
         setLifecycle(urlLifecycle);
       }
@@ -122,6 +126,9 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
       if (urlAction && urlAction !== action) {
         setAction(urlAction);
       }
+      return;
+    }
+    if (hasAnyUrlSelection) {
       return;
     }
     if (restoredFromStorage.current) {
@@ -134,18 +141,21 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
     }
     try {
       const parsed = JSON.parse(stored) as {
-        lifecycle?: LifecycleStage;
-        category?: DecisionCategory;
-        action?: DecisionAction;
+        lifecycle?: string;
+        category?: string;
+        action?: string;
       };
-      if (parsed.lifecycle) {
-        setLifecycle(parsed.lifecycle);
+      const storedLifecycle = parseParam(parsed.lifecycle ?? null, lifecycleOptions);
+      const storedCategory = parseParam(parsed.category ?? null, categoryOptions);
+      const storedAction = parseParam(parsed.action ?? null, actionOptions);
+      if (storedLifecycle) {
+        setLifecycle(storedLifecycle);
       }
-      if (parsed.category) {
-        setCategory(parsed.category);
+      if (storedCategory) {
+        setCategory(storedCategory);
       }
-      if (parsed.action) {
-        setAction(parsed.action);
+      if (storedAction) {
+        setAction(storedAction);
       }
     } catch (error) {
       console.warn("Unable to restore Decision Shield state.", error);
@@ -153,7 +163,8 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
   }, [
     action,
     category,
-    hasUrlSelection,
+    hasAnyUrlSelection,
+    hasValidUrlSelection,
     lifecycle,
     storageKey,
     urlAction,
@@ -187,7 +198,7 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
     nextParams.set("lifecycle", lifecycle);
     nextParams.set("category", category);
     nextParams.set("action", action);
-    router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
+    router.replace(`${pathname}?${nextParams.toString()}`, { scroll: false });
   }, [action, category, lifecycle, pathname, router, searchParams]);
 
   useEffect(() => {
