@@ -142,6 +142,9 @@ export default async function HomePage({
     snapshotFallback: snapshotData,
     asOf: historicalSelection?.asOf,
   });
+  const liveTreasuryPromise = historicalSelection
+    ? fetchTreasuryData({ snapshotFallback: snapshotData })
+    : null;
   const now = new Date();
   const latestCache = getLatestTimeMachineSnapshot();
   const defaultMonth = latestCache?.month ?? now.getUTCMonth() + 1;
@@ -154,10 +157,12 @@ export default async function HomePage({
   const selectedYear = requestedSelection?.year ?? defaultYear;
   const thresholds = parseThresholdsFromSearchParams(searchParams);
   const treasury = await treasuryPromise;
+  const liveTreasury = liveTreasuryPromise ? await liveTreasuryPromise : treasury;
   const recordDateLabel = formatDateValue(treasury.record_date);
   const fetchedAtLabel = formatTimestampValue(treasury.fetched_at);
   const sensors = buildSensorReadings(treasury);
   const assessment = evaluateRegime(treasury, thresholds);
+  const liveAssessment = historicalSelection ? evaluateRegime(liveTreasury, thresholds) : null;
   const { playbook, startItems, stopItems } = getPlaybookGuidance(assessment.regime);
   const fenceItems = assessment.constraints;
   const treasuryProvenance = {
@@ -182,6 +187,27 @@ export default async function HomePage({
     : treasury.isLive
       ? "Live"
       : "Offline / Simulated";
+  const historicalComparison =
+    historicalSelection && liveAssessment
+      ? {
+          then: {
+            regime: assessment.regime,
+            recordDate: treasury.record_date,
+            baseRate: assessment.scores.baseRate,
+            curveSlope: assessment.scores.curveSlope,
+            tightness: assessment.scores.tightness,
+            riskAppetite: assessment.scores.riskAppetite,
+          },
+          now: {
+            regime: liveAssessment.regime,
+            recordDate: liveTreasury.record_date,
+            baseRate: liveAssessment.scores.baseRate,
+            curveSlope: liveAssessment.scores.curveSlope,
+            tightness: liveAssessment.scores.tightness,
+            riskAppetite: liveAssessment.scores.riskAppetite,
+          },
+        }
+      : null;
 
   return (
     <main
@@ -202,7 +228,7 @@ export default async function HomePage({
             <div className="min-w-0 space-y-4">
               <p className="type-label text-slate-400">Regime Station</p>
               <div className="space-y-3">
-                <h1 className="type-display text-slate-100">Whether Report</h1>
+                <h1 className="type-headline text-slate-100">Whether Report</h1>
                 <p className="max-w-2xl type-data text-slate-300">
                   A deep-realist operating brief that translates Treasury signals into constraints you can
                   execute. Every output is sourced and time-stamped for traceability.
@@ -321,6 +347,9 @@ export default async function HomePage({
           monthsByYear={cacheMonthsByYear}
           invalidSelection={invalidHistoricalSelection}
           provenance={treasuryProvenance}
+          historicalRegime={historicalSelection ? assessment.regime : null}
+          historicalSummary={historicalSelection ? assessment.description : null}
+          comparison={historicalComparison}
         />
 
         <OperatorRequestsPanel provenance={internalProvenance} />

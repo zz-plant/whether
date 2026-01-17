@@ -137,25 +137,23 @@ const buildSensorBullets = (assessment: RegimeAssessment): string[] => {
   const bullets: string[] = [];
   const { baseRate, curveSlope, tightness, riskAppetite } = assessment.scores;
   const { baseRateTightness } = assessment.thresholds;
+  const rateDirection = baseRate > baseRateTightness ? "above" : "below";
+  const rateImpact = baseRate > baseRateTightness ? "capital is expensive" : "capital is moderate";
 
-  if (baseRate > baseRateTightness) {
-    bullets.push(
-      `Base rates are above ${baseRateTightness}%, making capital meaningfully expensive.`
-    );
-  } else {
-    bullets.push(`Base rates are below ${baseRateTightness}%, keeping capital costs moderate.`);
-  }
+  bullets.push(
+    `Base rate: ${baseRate.toFixed(2)}% is ${rateDirection} ${baseRateTightness}%, so ${rateImpact}.`
+  );
 
   if (curveSlope === null) {
-    bullets.push("The yield curve slope is unavailable, so inversion risk is unconfirmed.");
+    bullets.push("Curve slope: unavailable, so inversion risk is unconfirmed.");
   } else if (curveSlope < 0) {
-    bullets.push("The yield curve is inverted, signaling cautious market behavior.");
+    bullets.push(`Curve slope: inverted (${curveSlope.toFixed(2)}%), signaling caution.`);
   } else {
-    bullets.push("The yield curve is positive, signaling healthier risk appetite.");
+    bullets.push(`Curve slope: positive (${curveSlope.toFixed(2)}%), supporting risk taking.`);
   }
 
   bullets.push(
-    `Tightness score is ${tightness}, risk appetite score is ${riskAppetite}, placing you in ${assessment.regime.toLowerCase()} conditions.`
+    `Tightness ${tightness} vs risk appetite ${riskAppetite} keeps regime in ${assessment.regime.toLowerCase()}.`
   );
 
   return bullets;
@@ -175,7 +173,7 @@ export const evaluateDecision = (
 
   return {
     verdict,
-    summary: `${actionLabel} is ${verdict.toLowerCase()} in the current ${assessment.regime.toLowerCase()} regime for a ${input.lifecycle.toLowerCase()} team.`,
+    summary: `Verdict: ${actionLabel} is ${verdict.toLowerCase()} for a ${input.lifecycle.toLowerCase()} team in ${assessment.regime.toLowerCase()} conditions.`,
     bullets,
     guardrail: GUARDRAILS[input.action],
     reversalTrigger: buildReversalTrigger(assessment),

@@ -448,9 +448,12 @@ export const DataSourcePanel = ({
 
 export const HistoricalBanner = ({ banner }: { banner: string }) => {
   return (
-    <div className="mt-6 rounded-2xl border border-slate-700 bg-slate-900/60 px-4 py-3 text-sm text-slate-200">
-      <span className="text-xs uppercase tracking-[0.2em] text-slate-400">Time Machine</span>
-      <p className="mt-1">{banner}</p>
+    <div className="mt-6 rounded-2xl border border-slate-600 bg-slate-900/70 px-4 py-3 text-sm text-slate-200">
+      <span className="type-label text-slate-400">Historical mode</span>
+      <p className="mt-1 font-semibold text-slate-100">{banner}</p>
+      <p className="mt-2 text-xs text-slate-400">
+        You are viewing archived Treasury data; live signals are temporarily hidden.
+      </p>
     </div>
   );
 };

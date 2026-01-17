@@ -7,6 +7,7 @@
 import type { FormEvent } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
+import type { RegimeKey } from "../../lib/regimeEngine";
 
 const monthOptions = [
   { value: 1, label: "January" },
@@ -43,6 +44,26 @@ type TimeMachinePanelProps = {
   monthsByYear: Record<number, number[]>;
   invalidSelection: boolean;
   provenance: DataProvenance;
+  historicalRegime?: RegimeKey | null;
+  historicalSummary?: string | null;
+  comparison?: {
+    then: {
+      regime: RegimeKey;
+      recordDate: string;
+      baseRate: number;
+      curveSlope: number | null;
+      tightness: number;
+      riskAppetite: number;
+    };
+    now: {
+      regime: RegimeKey;
+      recordDate: string;
+      baseRate: number;
+      curveSlope: number | null;
+      tightness: number;
+      riskAppetite: number;
+    };
+  } | null;
 };
 
 export const TimeMachinePanel = ({
@@ -55,6 +76,9 @@ export const TimeMachinePanel = ({
   monthsByYear,
   invalidSelection,
   provenance,
+  historicalRegime,
+  historicalSummary,
+  comparison,
 }: TimeMachinePanelProps) => {
   const [month, setMonth] = useState(selectedMonth);
   const [year, setYear] = useState(selectedYear);
@@ -83,6 +107,18 @@ export const TimeMachinePanel = ({
       : "No cache loaded";
   const latestRecordLabel = formatDate(latestRecordDate);
   const selectedLabel = `${requestedMonthLabel} ${year}`;
+  const showHistoricalCallout = isHistorical && historicalSummary;
+  const showComparison = Boolean(isHistorical && comparison);
+
+  const formatPercent = (value: number) => `${value.toFixed(2)}%`;
+  const formatScore = (value: number) => value.toFixed(0);
+  const formatDelta = (thenValue: number, nowValue: number, unit = "") => {
+    const delta = nowValue - thenValue;
+    const sign = delta > 0 ? "+" : "";
+    return `${sign}${delta.toFixed(2)}${unit}`;
+  };
+  const formatCurve = (value: number | null) =>
+    value === null ? "—" : `${value.toFixed(2)}%`;
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     if (!isUnavailableSelection) {
@@ -144,21 +180,87 @@ export const TimeMachinePanel = ({
 
         <div className="mt-6 grid gap-4 lg:grid-cols-[1.2fr,1fr]">
           <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Historical context</p>
+            <p className="type-label text-slate-400">Historical mode</p>
             <p className="mt-3 type-data text-slate-300">
               You are replaying the macro regime from{" "}
               <span className="font-semibold text-slate-100">{selectedLabel}</span>. Treat the
               constraints as if those market conditions were active today.
             </p>
+            {showHistoricalCallout ? (
+              <div className="mt-4 rounded-lg border border-slate-700/70 bg-slate-950/80 p-3">
+                <p className="type-label text-slate-400">
+                  Operational implication · {historicalRegime?.toLowerCase()}
+                </p>
+                <p className="mt-2 text-sm text-slate-200">{historicalSummary}</p>
+              </div>
+            ) : null}
           </div>
           <div className="rounded-xl border border-slate-700 bg-slate-950/70 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Selected snapshot</p>
+            <p className="type-label text-slate-400">Snapshot</p>
             <p className="mt-3 text-lg font-semibold text-slate-100">{selectedLabel}</p>
-            <p className="mt-2 text-xs text-slate-500">
-              Highlights the month loaded into the report.
-            </p>
+            <p className="mt-2 text-xs text-slate-500">Highlights the month loaded into the report.</p>
           </div>
         </div>
+
+        {showComparison && comparison ? (
+          <div className="mt-4 rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="type-label text-slate-400">Then vs now</p>
+              <p className="text-xs text-slate-500">
+                Then: {formatDate(comparison.then.recordDate)} · Now:{" "}
+                {formatDate(comparison.now.recordDate)}
+              </p>
+            </div>
+            <div className="mt-3 grid gap-3 md:grid-cols-2">
+              <div className="rounded-lg border border-slate-800 bg-slate-950/80 p-3">
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Regime</p>
+                <p className="mt-2 text-sm text-slate-100">
+                  {comparison.then.regime.toLowerCase()} →{" "}
+                  {comparison.now.regime.toLowerCase()}
+                </p>
+              </div>
+              <div className="rounded-lg border border-slate-800 bg-slate-950/80 p-3">
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Base rate</p>
+                <p className="mt-2 text-sm text-slate-100">
+                  {formatPercent(comparison.then.baseRate)} →{" "}
+                  {formatPercent(comparison.now.baseRate)} (
+                  {formatDelta(
+                    comparison.then.baseRate,
+                    comparison.now.baseRate,
+                    "%"
+                  )}
+                  )
+                </p>
+              </div>
+              <div className="rounded-lg border border-slate-800 bg-slate-950/80 p-3">
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Curve slope</p>
+                <p className="mt-2 text-sm text-slate-100">
+                  {formatCurve(comparison.then.curveSlope)} →{" "}
+                  {formatCurve(comparison.now.curveSlope)}
+                  {comparison.then.curveSlope !== null && comparison.now.curveSlope !== null
+                    ? ` (${formatDelta(comparison.then.curveSlope, comparison.now.curveSlope, "%")})`
+                    : ""}
+                </p>
+              </div>
+              <div className="rounded-lg border border-slate-800 bg-slate-950/80 p-3">
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                  Tightness vs risk
+                </p>
+                <p className="mt-2 text-sm text-slate-100">
+                  {formatScore(comparison.then.tightness)}/
+                  {formatScore(comparison.then.riskAppetite)} →{" "}
+                  {formatScore(comparison.now.tightness)}/
+                  {formatScore(comparison.now.riskAppetite)} (
+                  {formatDelta(
+                    comparison.then.tightness,
+                    comparison.now.tightness
+                  )}
+                  /{formatDelta(comparison.then.riskAppetite, comparison.now.riskAppetite)})
+                </p>
+              </div>
+            </div>
+          </div>
+        ) : null}
 
         <form method="GET" onSubmit={handleSubmit} className="mt-6 grid gap-4 md:grid-cols-[1fr,1fr,auto]">
           <label
