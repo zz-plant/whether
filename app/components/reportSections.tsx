@@ -339,6 +339,9 @@ export const SignalMatrixPanel = ({ assessment }: { assessment: RegimeAssessment
 };
 
 export const DataSourcePanel = ({ treasury }: { treasury: TreasuryData }) => {
+  const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
+  const fallbackReason = treasury.fallback_reason ?? "Fallback triggered.";
+
   return (
     <section
       id="data-source"
@@ -353,6 +356,22 @@ export const DataSourcePanel = ({ treasury }: { treasury: TreasuryData }) => {
       <p className="mono text-sm text-slate-200">{formatDate(treasury.record_date)}</p>
       <p className="mt-4 text-xs text-slate-400">Fetched at</p>
       <p className="mono text-sm text-slate-200">{formatTimestamp(treasury.fetched_at)}</p>
+      {isFallback ? (
+        <div className="mt-4 rounded-xl border border-amber-400/40 bg-amber-500/10 p-3 text-xs text-amber-100">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-amber-200">Offline fallback</p>
+          <p className="mt-2 text-amber-100">{fallbackReason}</p>
+          <p className="mt-2 text-amber-200/80">
+            Snapshot fetched:{" "}
+            <span className="mono">{formatTimestamp(treasury.fetched_at)}</span>
+          </p>
+          <p className="text-amber-200/80">
+            Fallback activated:{" "}
+            <span className="mono">
+              {treasury.fallback_at ? formatTimestamp(treasury.fallback_at) : "Unknown"}
+            </span>
+          </p>
+        </div>
+      ) : null}
       <a
         href={treasury.source}
         target="_blank"
@@ -385,6 +404,8 @@ export const ExecutiveSnapshotPanel = ({
 }) => {
   const curveSlope = assessment.scores.curveSlope;
   const curveLabel = curveSlope === null ? "—" : curveSlope < 0 ? "Inverted" : "Normal";
+  const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
+  const fallbackReason = treasury.fallback_reason ?? "Fallback triggered.";
 
   return (
     <section id="executive-snapshot" aria-labelledby="executive-snapshot-title" className="mt-8">
@@ -405,6 +426,22 @@ export const ExecutiveSnapshotPanel = ({
             <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Data freshness</p>
             <p className="mono mt-2 text-sm text-slate-100">{treasury.record_date}</p>
             <p className="mt-2 text-xs text-slate-500">Fetched {formatTimestamp(treasury.fetched_at)}</p>
+            {isFallback ? (
+              <div className="mt-3 rounded-lg border border-amber-400/30 bg-amber-500/10 p-2 text-[11px] text-amber-100">
+                <p className="uppercase tracking-[0.2em] text-amber-200">Offline fallback</p>
+                <p className="mt-2 text-amber-100">{fallbackReason}</p>
+                <p className="mt-2 text-amber-200/80">
+                  Snapshot fetched:{" "}
+                  <span className="mono">{formatTimestamp(treasury.fetched_at)}</span>
+                </p>
+                <p className="text-amber-200/80">
+                  Fallback activated:{" "}
+                  <span className="mono">
+                    {treasury.fallback_at ? formatTimestamp(treasury.fallback_at) : "Unknown"}
+                  </span>
+                </p>
+              </div>
+            ) : null}
           </div>
           <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Rate baseline</p>

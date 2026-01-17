@@ -17,6 +17,15 @@ export interface TreasuryFetchOptions {
   asOf?: string;
 }
 
+const buildFallbackSnapshot = (snapshot: TreasuryData, reason: string): TreasuryData => {
+  return {
+    ...snapshot,
+    isLive: false,
+    fallback_at: new Date().toISOString(),
+    fallback_reason: reason,
+  };
+};
+
 const buildTreasuryUrl = (endpoint: string, asOf?: string) => {
   const params = new URLSearchParams({
     sort: "-record_date",
@@ -40,11 +49,10 @@ export const fetchTreasuryData = async (
     }
 
     if (options.snapshotFallback) {
-      return {
-        ...options.snapshotFallback,
-        fetched_at: new Date().toISOString(),
-        isLive: false,
-      };
+      return buildFallbackSnapshot(
+        options.snapshotFallback,
+        "Time Machine cache miss for historical selection."
+      );
     }
 
     throw new Error("Time Machine cache miss for historical selection.");
@@ -75,11 +83,9 @@ export const fetchTreasuryData = async (
     return normalized;
   } catch (error) {
     if (options.snapshotFallback) {
-      return {
-        ...options.snapshotFallback,
-        fetched_at,
-        isLive: false,
-      };
+      const message =
+        error instanceof Error ? error.message : "Unknown Treasury fetch error";
+      return buildFallbackSnapshot(options.snapshotFallback, message);
     }
 
     const message = error instanceof Error ? error.message : "Unknown Treasury fetch error";
