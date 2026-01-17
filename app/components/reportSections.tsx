@@ -161,8 +161,8 @@ export const RegimeAssessmentCard = ({
   const progressId = `regime-progress-${assessment.regime.toLowerCase()}`;
   const tightnessGradientId = `${progressId}-tightness-gradient`;
   const riskGradientId = `${progressId}-risk-gradient`;
-  const tightnessClipId = `${progressId}-tightness-clip`;
-  const riskClipId = `${progressId}-risk-clip`;
+  const tightnessMaskId = `${progressId}-tightness-mask`;
+  const riskMaskId = `${progressId}-risk-mask`;
 
   return (
     <section
@@ -242,11 +242,11 @@ export const RegimeAssessmentCard = ({
                 <stop offset="0%" stopColor="#fb7185" />
                 <stop offset="100%" stopColor="#f43f5e" />
               </linearGradient>
-              <clipPath id={tightnessClipId}>
-                <rect width="100" height="8" rx="4" />
-              </clipPath>
+              <mask id={tightnessMaskId} maskUnits="userSpaceOnUse">
+                <rect width="100" height="8" rx="4" fill="#fff" />
+              </mask>
             </defs>
-            <g clipPath={`url(#${tightnessClipId})`}>
+            <g mask={`url(#${tightnessMaskId})`}>
               <rect width="100" height="8" fill="#1e293b" />
               <rect width={tightnessScore} height="8" fill={`url(#${tightnessGradientId})`} />
             </g>
@@ -270,11 +270,11 @@ export const RegimeAssessmentCard = ({
                 <stop offset="0%" stopColor="#fbbf24" />
                 <stop offset="100%" stopColor="#f59e0b" />
               </linearGradient>
-              <clipPath id={riskClipId}>
-                <rect width="100" height="8" rx="4" />
-              </clipPath>
+              <mask id={riskMaskId} maskUnits="userSpaceOnUse">
+                <rect width="100" height="8" rx="4" fill="#fff" />
+              </mask>
             </defs>
-            <g clipPath={`url(#${riskClipId})`}>
+            <g mask={`url(#${riskMaskId})`}>
               <rect width="100" height="8" fill="#1e293b" />
               <rect width={riskScore} height="8" fill={`url(#${riskGradientId})`} />
             </g>
@@ -513,7 +513,13 @@ export const SignalMatrixPanel = ({
             A two-by-two matrix showing the balance of tightness and market bravery.
           </desc>
           <defs>
-            <pattern id={matrixGridId} width="50" height="50" patternUnits="userSpaceOnUse">
+            <pattern
+              id={matrixGridId}
+              width="50"
+              height="50"
+              patternUnits="userSpaceOnUse"
+              patternTransform="scale(1)"
+            >
               <path
                 d="M 50 0 H 0 V 50"
                 fill="none"
@@ -560,6 +566,9 @@ export const SignalMatrixPanel = ({
             fontSize="6"
             fontWeight="600"
             fill="#0f172a"
+            stroke="#0f172a"
+            strokeWidth="0.6"
+            paintOrder="stroke fill"
           >
             +
           </text>
@@ -697,7 +706,8 @@ export const ExecutiveSnapshotPanel = ({
                     markerHeight="6"
                     refX="5"
                     refY="3"
-                    orient="auto"
+                    markerUnits="strokeWidth"
+                    orient="auto-start-reverse"
                   >
                     <path d="M 0 0 L 6 3 L 0 6 Z" fill={curveIndicatorColor} />
                   </marker>
@@ -796,13 +806,14 @@ export const SensorArray = ({
                         <stop offset="100%" stopColor="rgba(56,189,248,0)" />
                       </linearGradient>
                     </defs>
-                    <path d={sparkline.area} fill={`url(#${sparklineId})`} />
+                    <path d={sparkline.area} fill={`url(#${sparklineId})`} pathLength={100} />
                     <path
                       d={sparkline.path}
                       fill="none"
                       stroke="#38bdf8"
                       strokeWidth="1.5"
                       vectorEffect="non-scaling-stroke"
+                      pathLength={100}
                     />
                   </svg>
                 ) : (
@@ -903,13 +914,14 @@ export const MacroSignalsPanel = ({
                           <stop offset="100%" stopColor="rgba(251,191,36,0)" />
                         </linearGradient>
                       </defs>
-                      <path d={sparkline.area} fill={`url(#${sparklineId})`} />
+                      <path d={sparkline.area} fill={`url(#${sparklineId})`} pathLength={100} />
                       <path
                         d={sparkline.path}
                         fill="none"
                         stroke="#fbbf24"
                         strokeWidth="1.5"
                         vectorEffect="non-scaling-stroke"
+                        pathLength={100}
                       />
                     </svg>
                   ) : (
