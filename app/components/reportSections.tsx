@@ -6,6 +6,7 @@ import type { RegimeAssessment } from "../../lib/regimeEngine";
 import type { PlaybookEntry } from "../../lib/playbook";
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../../lib/types";
 import { operatorRequests } from "../../lib/operatorRequests";
+import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
 
 const numberFormatter = new Intl.NumberFormat("en-US", {
   minimumFractionDigits: 2,
@@ -89,7 +90,13 @@ const getRegimeAccent = (regime: RegimeAssessment["regime"]) => {
   }
 };
 
-export const RegimeAssessmentCard = ({ assessment }: { assessment: RegimeAssessment }) => {
+export const RegimeAssessmentCard = ({
+  assessment,
+  provenance,
+}: {
+  assessment: RegimeAssessment;
+  provenance: DataProvenance;
+}) => {
   const regimeLabel = getRegimeLabel(assessment.regime);
   const regimeAccent = getRegimeAccent(assessment.regime);
   const hasWarnings = assessment.dataWarnings.length > 0;
@@ -102,17 +109,17 @@ export const RegimeAssessmentCard = ({ assessment }: { assessment: RegimeAssessm
     >
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br opacity-80 blur-2xl" />
       <div className={`absolute inset-0 bg-gradient-to-br ${regimeAccent.panel} opacity-40`} />
-      <div className="relative flex items-center justify-between gap-4">
+      <div className="relative flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
-          <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Current Regime</p>
-          <h2 id="regime-assessment-title" className="text-3xl font-semibold text-slate-100">
+          <p className="type-label text-slate-400">Current Regime</p>
+          <h2 id="regime-assessment-title" className="type-section text-slate-100">
             {regimeLabel}
           </h2>
           <p className="mt-2 text-xs uppercase tracking-[0.2em] text-slate-400">
             Classified as {assessment.regime}
           </p>
         </div>
-        <div className="flex flex-col items-end gap-2 text-xs uppercase tracking-[0.2em] text-slate-300">
+        <div className="flex flex-col items-end gap-3 text-xs uppercase tracking-[0.2em] text-slate-300">
           <span className="flex items-center gap-2 rounded-full border border-slate-700 px-3 py-1">
             <span className={`h-2 w-2 rounded-full ${regimeAccent.dot}`} />
             Regime status
@@ -123,8 +130,11 @@ export const RegimeAssessmentCard = ({ assessment }: { assessment: RegimeAssessm
             <span className="tabular-nums">{assessment.scores.riskAppetite}</span>
           </span>
         </div>
+        <div className="w-full">
+          <DataProvenanceStrip provenance={provenance} />
+        </div>
       </div>
-      <p className="relative mt-4 text-slate-200 break-words">{assessment.description}</p>
+      <p className="relative mt-4 type-data text-slate-200 break-words">{assessment.description}</p>
       <ul className="relative mt-4 space-y-2 text-sm text-slate-300">
         {assessment.constraints.map((item) => (
           <li key={item} className="flex gap-2">
@@ -160,15 +170,14 @@ export const RegimeAssessmentCard = ({ assessment }: { assessment: RegimeAssessm
 export const LiveTickerPanel = ({
   treasury,
   assessment,
-  modeLabel,
+  provenance,
 }: {
   treasury: TreasuryData;
   assessment: RegimeAssessment;
-  modeLabel?: string;
+  provenance: DataProvenance;
 }) => {
   const curveSlope = assessment.scores.curveSlope;
   const curveLabel = curveSlope === null ? "—" : curveSlope < 0 ? "Inverted" : "Normal";
-  const statusLabel = modeLabel ?? (treasury.isLive ? "Live" : "Offline");
 
   return (
     <section
@@ -176,13 +185,11 @@ export const LiveTickerPanel = ({
       aria-labelledby="live-ticker-title"
       className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6"
     >
-      <div className="flex items-center justify-between">
-        <h3 id="live-ticker-title" className="text-sm uppercase tracking-[0.2em] text-slate-400">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <h3 id="live-ticker-title" className="type-label text-slate-400">
           Live Ticker
         </h3>
-        <span className="rounded-full border border-slate-700 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-400">
-          {statusLabel}
-        </span>
+        <DataProvenanceStrip provenance={provenance} />
       </div>
       <div className="mt-4 grid gap-3 text-sm text-slate-300">
         <div className="flex items-center justify-between">
@@ -226,7 +233,7 @@ export const LiveTickerPanel = ({
   );
 };
 
-export const OperatorRequestsPanel = () => (
+export const OperatorRequestsPanel = ({ provenance }: { provenance: DataProvenance }) => (
   <section
     id="operator-requests"
     aria-labelledby="operator-requests-title"
@@ -234,16 +241,14 @@ export const OperatorRequestsPanel = () => (
   >
     <div className="flex flex-wrap items-center justify-between gap-4">
       <div>
-        <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Post-MVP demand</p>
-        <h3 id="operator-requests-title" className="text-2xl font-semibold text-slate-100">
+        <p className="type-label text-slate-400">Post-MVP demand</p>
+        <h3 id="operator-requests-title" className="type-section text-slate-100">
           Operator request backlog
         </h3>
       </div>
-      <span className="rounded-full border border-slate-700 px-3 py-1 text-[10px] uppercase tracking-[0.25em] text-slate-300">
-        Delivery tracker
-      </span>
+      <DataProvenanceStrip provenance={provenance} />
     </div>
-    <p className="mt-3 max-w-3xl text-sm text-slate-300">
+    <p className="mt-3 max-w-3xl type-data text-slate-300">
       These are the most common expansion requests expected after launch. Delivered items are
       labeled and the remaining backlog keeps traceable data sources and plain-English operational
       guidance front and center.
@@ -267,16 +272,25 @@ export const OperatorRequestsPanel = () => (
   </section>
 );
 
-export const ScoreReadoutPanel = ({ assessment }: { assessment: RegimeAssessment }) => {
+export const ScoreReadoutPanel = ({
+  assessment,
+  provenance,
+}: {
+  assessment: RegimeAssessment;
+  provenance: DataProvenance;
+}) => {
   return (
     <section
       id="sensor-readout"
       aria-labelledby="sensor-readout-title"
       className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6"
     >
-      <h3 id="sensor-readout-title" className="text-sm uppercase tracking-[0.2em] text-slate-400">
-        Sensor Readout
-      </h3>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <h3 id="sensor-readout-title" className="type-label text-slate-400">
+          Sensor Readout
+        </h3>
+        <DataProvenanceStrip provenance={provenance} />
+      </div>
       <div className="mt-4 space-y-5">
         <div>
           <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-slate-400">
@@ -307,7 +321,13 @@ export const ScoreReadoutPanel = ({ assessment }: { assessment: RegimeAssessment
   );
 };
 
-export const SignalMatrixPanel = ({ assessment }: { assessment: RegimeAssessment }) => {
+export const SignalMatrixPanel = ({
+  assessment,
+  provenance,
+}: {
+  assessment: RegimeAssessment;
+  provenance: DataProvenance;
+}) => {
   const x = assessment.scores.riskAppetite;
   const y = assessment.scores.tightness;
   const top = `${100 - y}%`;
@@ -320,14 +340,17 @@ export const SignalMatrixPanel = ({ assessment }: { assessment: RegimeAssessment
       aria-describedby="signal-matrix-description"
       className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6"
     >
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <h3
           id="signal-matrix-title"
-          className="text-sm uppercase tracking-[0.2em] text-slate-400"
+          className="type-label text-slate-400"
         >
           Signal Matrix
         </h3>
-        <span className="text-xs uppercase tracking-[0.2em] text-slate-500">Tightness vs. Bravery</span>
+        <div className="flex flex-col items-end gap-2 text-xs uppercase tracking-[0.2em] text-slate-500">
+          <span>Tightness vs. Bravery</span>
+          <DataProvenanceStrip provenance={provenance} />
+        </div>
       </div>
       <div className="relative mt-6 h-56 rounded-xl border border-slate-800 bg-slate-950/60">
         <div className="absolute inset-0 grid grid-cols-2 grid-rows-2">
@@ -366,7 +389,13 @@ export const SignalMatrixPanel = ({ assessment }: { assessment: RegimeAssessment
   );
 };
 
-export const DataSourcePanel = ({ treasury }: { treasury: TreasuryData }) => {
+export const DataSourcePanel = ({
+  treasury,
+  provenance,
+}: {
+  treasury: TreasuryData;
+  provenance: DataProvenance;
+}) => {
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
   const fallbackReason = treasury.fallback_reason ?? "Fallback triggered.";
 
@@ -376,10 +405,15 @@ export const DataSourcePanel = ({ treasury }: { treasury: TreasuryData }) => {
       aria-labelledby="data-source-title"
       className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6"
     >
-      <h3 id="data-source-title" className="text-sm uppercase tracking-[0.2em] text-slate-400">
-        Data Source
-      </h3>
-      <p className="mt-2 text-sm text-slate-200">US Treasury Fiscal Data API</p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h3 id="data-source-title" className="type-label text-slate-400">
+            Data Source
+          </h3>
+          <p className="mt-2 type-data text-slate-200">US Treasury Fiscal Data API</p>
+        </div>
+        <DataProvenanceStrip provenance={provenance} />
+      </div>
       <p className="mt-4 text-xs text-slate-400">Record date</p>
       <p className="mono text-sm text-slate-200">{formatDate(treasury.record_date)}</p>
       <p className="mt-4 text-xs text-slate-400">Fetched at</p>
@@ -424,11 +458,11 @@ export const HistoricalBanner = ({ banner }: { banner: string }) => {
 export const ExecutiveSnapshotPanel = ({
   treasury,
   assessment,
-  modeLabel,
+  provenance,
 }: {
   treasury: TreasuryData;
   assessment: RegimeAssessment;
-  modeLabel: string;
+  provenance: DataProvenance;
 }) => {
   const curveSlope = assessment.scores.curveSlope;
   const curveLabel = curveSlope === null ? "—" : curveSlope < 0 ? "Inverted" : "Normal";
@@ -438,16 +472,14 @@ export const ExecutiveSnapshotPanel = ({
   return (
     <section id="executive-snapshot" aria-labelledby="executive-snapshot-title" className="mt-8">
       <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="text-sm uppercase tracking-[0.2em] text-slate-400">Executive snapshot</p>
-            <h3 id="executive-snapshot-title" className="text-xl font-semibold text-slate-100">
+            <p className="type-label text-slate-400">Executive snapshot</p>
+            <h3 id="executive-snapshot-title" className="type-section text-slate-100">
               Operational pulse
             </h3>
           </div>
-          <span className="rounded-full border border-slate-700 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-300">
-            {modeLabel}
-          </span>
+          <DataProvenanceStrip provenance={provenance} />
         </div>
         <div className="mt-5 grid gap-4 md:grid-cols-3">
           <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
@@ -493,12 +525,21 @@ export const ExecutiveSnapshotPanel = ({
   );
 };
 
-export const SensorArray = ({ sensors }: { sensors: SensorReading[] }) => {
+export const SensorArray = ({
+  sensors,
+  provenance,
+}: {
+  sensors: SensorReading[];
+  provenance: DataProvenance;
+}) => {
   return (
     <section id="sensor-array" aria-labelledby="sensor-array-title" className="mt-10">
-      <h3 id="sensor-array-title" className="text-sm uppercase tracking-[0.2em] text-slate-400">
-        Live Sensor Array
-      </h3>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <h3 id="sensor-array-title" className="type-label text-slate-400">
+          Live Sensor Array
+        </h3>
+        <DataProvenanceStrip provenance={provenance} />
+      </div>
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         {sensors.map((sensor) => (
           <div key={sensor.id} className="rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
@@ -545,25 +586,34 @@ export const SensorArray = ({ sensors }: { sensors: SensorReading[] }) => {
   );
 };
 
-export const MacroSignalsPanel = ({ series }: { series: MacroSeriesReading[] }) => {
+export const MacroSignalsPanel = ({
+  series,
+  provenance,
+}: {
+  series: MacroSeriesReading[];
+  provenance: DataProvenance;
+}) => {
   const isLive = series.some((signal) => signal.isLive);
 
   return (
     <section id="macro-signals" aria-labelledby="macro-signals-title" className="mt-10">
       <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-sm uppercase tracking-[0.2em] text-slate-400">Macro signals</p>
-            <h3 id="macro-signals-title" className="text-xl font-semibold text-slate-100">
+            <p className="type-label text-slate-400">Macro signals</p>
+            <h3 id="macro-signals-title" className="type-section text-slate-100">
               Expanded signal pack
             </h3>
-            <p className="mt-2 text-sm text-slate-300">
+            <p className="mt-2 type-data text-slate-300">
               Supplement Treasury yields with inflation, labor health, and credit stress indicators.
             </p>
           </div>
-          <span className="rounded-full border border-slate-700 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-300">
-            {isLive ? "Live" : "Snapshot"}
-          </span>
+          <div className="flex flex-col items-end gap-2">
+            <span className="rounded-full border border-slate-700 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-300">
+              {isLive ? "Live" : "Snapshot"}
+            </span>
+            <DataProvenanceStrip provenance={provenance} />
+          </div>
         </div>
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           {series.map((signal) => (
@@ -613,36 +663,41 @@ export const PlaybookPanel = ({
   stopItems,
   startItems,
   fenceItems,
+  provenance,
 }: {
   playbook: PlaybookEntry | null;
   stopItems: string[];
   startItems: string[];
   fenceItems: string[];
+  provenance: DataProvenance;
 }) => {
   return (
     <section id="playbook" aria-labelledby="playbook-title" className="mt-10">
       <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-sm uppercase tracking-[0.2em] text-slate-400">Playbook</p>
-            <h3 id="playbook-title" className="text-xl font-semibold">
+            <p className="type-label text-slate-400">Playbook</p>
+            <h3 id="playbook-title" className="type-section text-slate-100">
               {playbook?.title ?? "Operational Guidance"}
             </h3>
             {playbook ? (
-              <p className="mt-2 text-sm text-slate-300 break-words">{playbook.insight}</p>
+              <p className="mt-2 type-data text-slate-300 break-words">{playbook.insight}</p>
             ) : (
-              <p className="mt-2 text-sm text-slate-300">
+              <p className="mt-2 type-data text-slate-300">
                 Playbook data unavailable. Use regime constraints as guardrails.
               </p>
             )}
           </div>
-          {playbook ? (
-            <div className="text-right text-xs text-slate-400">
-              <p>{playbook.tone}</p>
-              <p className="mt-1 text-slate-300">Mandate: {playbook.mandate}</p>
-              <p className="mt-1 text-slate-500">Metric: {playbook.metric}</p>
-            </div>
-          ) : null}
+          <div className="flex flex-col items-end gap-3">
+            {playbook ? (
+              <div className="text-right text-xs text-slate-400">
+                <p>{playbook.tone}</p>
+                <p className="mt-1 text-slate-300">Mandate: {playbook.mandate}</p>
+                <p className="mt-1 text-slate-500">Metric: {playbook.metric}</p>
+              </div>
+            ) : null}
+            <DataProvenanceStrip provenance={provenance} />
+          </div>
         </div>
         <div className="mt-6 grid gap-4 lg:grid-cols-3">
           <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">

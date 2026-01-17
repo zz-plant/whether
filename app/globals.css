@@ -45,6 +45,22 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+.type-display {
+  @apply text-4xl leading-[1.1] md:text-5xl;
+}
+
+.type-section {
+  @apply text-xl font-semibold leading-snug md:text-2xl;
+}
+
+.type-label {
+  @apply text-xs uppercase tracking-[0.25em] leading-none;
+}
+
+.type-data {
+  @apply text-sm leading-relaxed;
+}
+
 :where(h1, h2, h3, h4, h5, h6) {
   scroll-margin-top: 96px;
   text-wrap: balance;

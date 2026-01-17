@@ -7,6 +7,7 @@
 import { useMemo, useState } from "react";
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../../lib/types";
 import type { RegimeAssessment } from "../../lib/regimeEngine";
+import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
 
 const numberFormatter = new Intl.NumberFormat("en-US", {
   minimumFractionDigits: 2,
@@ -63,11 +64,13 @@ export const ExportBriefPanel = ({
   treasury,
   sensors,
   macroSeries,
+  provenance,
 }: {
   assessment: RegimeAssessment;
   treasury: TreasuryData;
   sensors: SensorReading[];
   macroSeries: MacroSeriesReading[];
+  provenance: DataProvenance;
 }) => {
   const [isCopying, setIsCopying] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
@@ -115,23 +118,26 @@ export const ExportBriefPanel = ({
   return (
     <section id="export-briefs" aria-labelledby="export-briefs-title" className="mt-10">
       <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-sm uppercase tracking-[0.2em] text-slate-400">Export briefs</p>
-            <h3 id="export-briefs-title" className="text-xl font-semibold text-slate-100">
+            <p className="type-label text-slate-400">Export briefs</p>
+            <h3 id="export-briefs-title" className="type-section text-slate-100">
               Share the report
             </h3>
-            <p className="mt-2 text-sm text-slate-300">
+            <p className="mt-2 type-data text-slate-300">
               Copy ready-made summaries for Slack, email, or slide decks, or print to PDF.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={handlePrint}
-            className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-slate-500 hover:text-slate-100"
-          >
-            Print / Save PDF
-          </button>
+          <div className="flex flex-col items-end gap-3">
+            <button
+              type="button"
+              onClick={handlePrint}
+              className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-slate-500 hover:text-slate-100"
+            >
+              Print / Save PDF
+            </button>
+            <DataProvenanceStrip provenance={provenance} />
+          </div>
         </div>
 
         <div className="mt-6 grid gap-4 lg:grid-cols-[1.4fr,1fr]">

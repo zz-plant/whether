@@ -160,6 +160,23 @@ export default async function HomePage({
   const assessment = evaluateRegime(treasury, thresholds);
   const { playbook, startItems, stopItems } = getPlaybookGuidance(assessment.regime);
   const fenceItems = assessment.constraints;
+  const treasuryProvenance = {
+    sourceLabel: "US Treasury Fiscal Data API",
+    sourceUrl: treasury.source,
+    timestampLabel: fetchedAtLabel,
+    statusLabel: treasury.isLive ? "Live" : "Offline",
+  };
+  const macroProvenance = {
+    sourceLabel: "FRED & US Treasury",
+    sourceUrl: macroSeries[0]?.sourceUrl,
+    timestampLabel: formatTimestampValue(macroSeries[0]?.fetched_at ?? treasury.fetched_at),
+    statusLabel: macroSeries.some((signal) => signal.isLive) ? "Live" : "Offline",
+  };
+  const internalProvenance = {
+    sourceLabel: "Whether internal backlog",
+    timestampLabel: "Static catalog",
+    statusLabel: "Offline",
+  };
   const statusLabel = historicalSelection
     ? "Historical"
     : treasury.isLive
@@ -183,10 +200,10 @@ export default async function HomePage({
         <header className="relative flex flex-col gap-6 border-b border-slate-800/70 pb-8">
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div className="min-w-0 space-y-4">
-              <p className="text-xs uppercase tracking-[0.35em] text-slate-400">Regime Station</p>
+              <p className="type-label text-slate-400">Regime Station</p>
               <div className="space-y-3">
-                <h1 className="text-4xl font-semibold text-slate-100 md:text-5xl">Whether Report</h1>
-                <p className="max-w-2xl text-sm text-slate-300 md:text-base">
+                <h1 className="type-display text-slate-100">Whether Report</h1>
+                <p className="max-w-2xl type-data text-slate-300">
                   A deep-realist operating brief that translates Treasury signals into constraints you can
                   execute. Every output is sourced and time-stamped for traceability.
                 </p>
@@ -251,41 +268,47 @@ export default async function HomePage({
           {historicalSelection ? <HistoricalBanner banner={historicalSelection.banner} /> : null}
         </header>
 
-        <ExecutiveSnapshotPanel treasury={treasury} assessment={assessment} modeLabel={statusLabel} />
+        <ExecutiveSnapshotPanel
+          treasury={treasury}
+          assessment={assessment}
+          provenance={treasuryProvenance}
+        />
 
         <section className="mt-10 grid gap-6 lg:grid-cols-[2.2fr,1fr]">
-          <RegimeAssessmentCard assessment={assessment} />
+          <RegimeAssessmentCard assessment={assessment} provenance={treasuryProvenance} />
           <div className="grid gap-6">
-            <LiveTickerPanel treasury={treasury} assessment={assessment} modeLabel={statusLabel} />
-            <ScoreReadoutPanel assessment={assessment} />
+            <LiveTickerPanel treasury={treasury} assessment={assessment} provenance={treasuryProvenance} />
+            <ScoreReadoutPanel assessment={assessment} provenance={treasuryProvenance} />
           </div>
         </section>
 
         <section className="mt-10 grid gap-6 lg:grid-cols-[1.2fr,1fr]">
-          <SignalMatrixPanel assessment={assessment} />
-          <DataSourcePanel treasury={treasury} />
+          <SignalMatrixPanel assessment={assessment} provenance={treasuryProvenance} />
+          <DataSourcePanel treasury={treasury} provenance={treasuryProvenance} />
         </section>
 
-        <SensorArray sensors={sensors} />
+        <SensorArray sensors={sensors} provenance={treasuryProvenance} />
 
-        <MacroSignalsPanel series={macroSeries} />
+        <MacroSignalsPanel series={macroSeries} provenance={macroProvenance} />
 
-        <ThresholdsPanel currentThresholds={assessment.thresholds} />
+        <ThresholdsPanel currentThresholds={assessment.thresholds} provenance={treasuryProvenance} />
 
         <PlaybookPanel
           playbook={playbook}
           stopItems={stopItems}
           startItems={startItems}
           fenceItems={fenceItems}
+          provenance={treasuryProvenance}
         />
 
-        <DecisionShieldPanel assessment={assessment} />
+        <DecisionShieldPanel assessment={assessment} provenance={treasuryProvenance} />
 
         <ExportBriefPanel
           assessment={assessment}
           treasury={treasury}
           sensors={sensors}
           macroSeries={macroSeries}
+          provenance={treasuryProvenance}
         />
 
         <TimeMachinePanel
@@ -297,9 +320,10 @@ export default async function HomePage({
           cacheCoverage={cacheCoverage}
           monthsByYear={cacheMonthsByYear}
           invalidSelection={invalidHistoricalSelection}
+          provenance={treasuryProvenance}
         />
 
-        <OperatorRequestsPanel />
+        <OperatorRequestsPanel provenance={internalProvenance} />
 
         <footer className="mt-12 border-t border-slate-800/70 pt-6 text-xs uppercase tracking-[0.3em] text-slate-500">
           Not Financial Advice.
