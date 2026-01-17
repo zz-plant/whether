@@ -252,99 +252,184 @@ export default async function HomePage({
               </a>
             </div>
           </div>
-          <nav aria-label="Report sections" className="space-y-3">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-slate-500">Jump to</p>
-            <ul className="flex flex-wrap gap-3">
+          <section aria-labelledby="report-flow-title" className="space-y-4">
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.3em] text-slate-500">Report flow</p>
+              <h2 id="report-flow-title" className="mt-2 text-sm font-semibold text-slate-200">
+                Start with the essentials, then move into diagnostics and execution.
+              </h2>
+            </div>
+            <div className="grid gap-4 lg:grid-cols-2">
               {[
-                { href: "#first-time-guide", label: "First-time guide" },
-                { href: "#executive-snapshot", label: "Executive snapshot" },
-                { href: "#regime-assessment", label: "Regime assessment" },
-                { href: "#signal-matrix", label: "Signal matrix" },
-                { href: "#sensor-array", label: "Sensor array" },
-                { href: "#macro-signals", label: "Macro signals" },
-                { href: "#thresholds", label: "Thresholds" },
-                { href: "#playbook", label: "Playbook" },
-                { href: "#decision-shield", label: "Decision shield" },
-                { href: "#export-briefs", label: "Export briefs" },
-                { href: "#time-machine", label: "Time machine" },
-                { href: "#cxo-functions", label: "CXO outputs" },
-                { href: "#operator-requests", label: "Operator requests" },
-              ].map((item) => (
-                <li key={item.href}>
-                  <a
-                    href={item.href}
-                    className="inline-flex min-h-[44px] items-center rounded-full border border-slate-800/70 bg-slate-950/60 px-4 py-2 text-[11px] uppercase tracking-[0.25em] text-slate-300 transition-colors hover:border-slate-500 hover:text-slate-100"
-                  >
-                    {item.label}
-                  </a>
-                </li>
+                {
+                  title: "Primary brief",
+                  description: "Fast orientation before you dive into the deeper signal stack.",
+                  items: [
+                    { href: "#first-time-guide", label: "First-time guide" },
+                    { href: "#executive-snapshot", label: "Executive snapshot" },
+                    { href: "#regime-assessment", label: "Regime assessment" },
+                  ],
+                },
+                {
+                  title: "Signal diagnostics",
+                  description: "Evidence trail behind the regime call and thresholds.",
+                  items: [
+                    { href: "#signal-matrix", label: "Signal matrix" },
+                    { href: "#sensor-array", label: "Sensor array" },
+                    { href: "#macro-signals", label: "Macro signals" },
+                    { href: "#thresholds", label: "Thresholds" },
+                  ],
+                },
+                {
+                  title: "Execution guidance",
+                  description: "Concrete operational moves and decision hygiene.",
+                  items: [
+                    { href: "#playbook", label: "Playbook" },
+                    { href: "#decision-shield", label: "Decision shield" },
+                    { href: "#export-briefs", label: "Export briefs" },
+                  ],
+                },
+                {
+                  title: "Archive & ops",
+                  description: "Historical comparisons and internal request catalog.",
+                  items: [
+                    { href: "#time-machine", label: "Time machine" },
+                    { href: "#cxo-functions", label: "CXO outputs" },
+                    { href: "#operator-requests", label: "Operator requests" },
+                  ],
+                },
+              ].map((section) => (
+                <div
+                  key={section.title}
+                  className="rounded-3xl border border-slate-800/70 bg-slate-950/60 px-5 py-4 shadow-[0_0_0_1px_rgba(15,23,42,0.6)]"
+                >
+                  <p className="text-[11px] uppercase tracking-[0.25em] text-slate-400">
+                    {section.title}
+                  </p>
+                  <p className="mt-2 text-sm text-slate-200">{section.description}</p>
+                  <ul className="mt-3 flex flex-wrap gap-2">
+                    {section.items.map((item) => (
+                      <li key={item.href}>
+                        <a
+                          href={item.href}
+                          className="inline-flex min-h-[44px] items-center rounded-full border border-slate-800/70 bg-slate-950/80 px-4 py-2 text-[11px] uppercase tracking-[0.25em] text-slate-300 transition-colors hover:border-slate-500 hover:text-slate-100"
+                        >
+                          {item.label}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               ))}
-            </ul>
-          </nav>
+            </div>
+          </section>
           {historicalSelection ? <HistoricalBanner banner={historicalSelection.banner} /> : null}
         </header>
 
-        <FirstTimeGuidePanel
-          statusLabel={statusLabel}
-          recordDateLabel={recordDateLabel}
-          fetchedAtLabel={fetchedAtLabel}
-        />
+        <section aria-labelledby="primary-brief-title" className="mt-10 space-y-6">
+          <div>
+            <p className="type-label text-slate-400">Primary brief</p>
+            <h2 id="primary-brief-title" className="type-section text-slate-100">
+              Start here for the headline constraints.
+            </h2>
+            <p className="mt-2 type-data text-slate-300">
+              Three tight sections to ground the regime call before you dive into diagnostics.
+            </p>
+          </div>
+          <FirstTimeGuidePanel
+            statusLabel={statusLabel}
+            recordDateLabel={recordDateLabel}
+            fetchedAtLabel={fetchedAtLabel}
+          />
 
-        <ExecutiveSnapshotPanel
-          treasury={treasury}
-          assessment={assessment}
-          provenance={treasuryProvenance}
-        />
+          <ExecutiveSnapshotPanel
+            treasury={treasury}
+            assessment={assessment}
+            provenance={treasuryProvenance}
+          />
 
-        <section className="mt-10">
           <RegimeAssessmentCard assessment={assessment} provenance={treasuryProvenance} />
         </section>
 
-        <section className="mt-10">
+        <section aria-labelledby="signal-diagnostics-title" className="mt-12 space-y-6">
+          <div>
+            <p className="type-label text-slate-400">Signal diagnostics</p>
+            <h2 id="signal-diagnostics-title" className="type-section text-slate-100">
+              Evidence trail behind the regime classification.
+            </h2>
+            <p className="mt-2 type-data text-slate-300">
+              Use these layers when you need to validate the call or explain it to stakeholders.
+            </p>
+          </div>
           <SignalMatrixPanel assessment={assessment} provenance={treasuryProvenance} />
+
+          <SensorArray sensors={sensors} provenance={treasuryProvenance} />
+
+          <MacroSignalsPanel series={macroSeries} provenance={macroProvenance} />
+
+          <ThresholdsPanel
+            currentThresholds={assessment.thresholds}
+            provenance={treasuryProvenance}
+          />
         </section>
 
-        <SensorArray sensors={sensors} provenance={treasuryProvenance} />
+        <section aria-labelledby="execution-guidance-title" className="mt-12 space-y-6">
+          <div>
+            <p className="type-label text-slate-400">Execution guidance</p>
+            <h2 id="execution-guidance-title" className="type-section text-slate-100">
+              Translate signals into concrete next moves.
+            </h2>
+            <p className="mt-2 type-data text-slate-300">
+              Actionable playbook steps, decision guardrails, and exportable briefs.
+            </p>
+          </div>
+          <PlaybookPanel
+            playbook={playbook}
+            stopItems={stopItems}
+            startItems={startItems}
+            fenceItems={fenceItems}
+            provenance={treasuryProvenance}
+          />
 
-        <MacroSignalsPanel series={macroSeries} provenance={macroProvenance} />
+          <DecisionShieldPanel assessment={assessment} provenance={treasuryProvenance} />
 
-        <ThresholdsPanel currentThresholds={assessment.thresholds} provenance={treasuryProvenance} />
+          <ExportBriefPanel
+            assessment={assessment}
+            treasury={treasury}
+            sensors={sensors}
+            macroSeries={macroSeries}
+            provenance={treasuryProvenance}
+          />
+        </section>
 
-        <PlaybookPanel
-          playbook={playbook}
-          stopItems={stopItems}
-          startItems={startItems}
-          fenceItems={fenceItems}
-          provenance={treasuryProvenance}
-        />
+        <section aria-labelledby="archive-ops-title" className="mt-12 space-y-6">
+          <div>
+            <p className="type-label text-slate-400">Archive & ops</p>
+            <h2 id="archive-ops-title" className="type-section text-slate-100">
+              Historical comparisons and internal catalogs.
+            </h2>
+            <p className="mt-2 type-data text-slate-300">
+              Use the time machine for retrospectives, then review internal operating requests.
+            </p>
+          </div>
+          <TimeMachinePanel
+            selectedYear={selectedYear}
+            selectedMonth={selectedMonth}
+            isHistorical={Boolean(historicalSelection)}
+            latestRecordDate={treasury.record_date}
+            cacheCoverage={cacheCoverage}
+            monthsByYear={cacheMonthsByYear}
+            invalidSelection={invalidHistoricalSelection}
+            provenance={treasuryProvenance}
+            historicalRegime={historicalSelection ? assessment.regime : null}
+            historicalSummary={historicalSelection ? assessment.description : null}
+            comparison={historicalComparison}
+          />
 
-        <DecisionShieldPanel assessment={assessment} provenance={treasuryProvenance} />
+          <CxoFunctionPanel provenance={internalProvenance} />
 
-        <ExportBriefPanel
-          assessment={assessment}
-          treasury={treasury}
-          sensors={sensors}
-          macroSeries={macroSeries}
-          provenance={treasuryProvenance}
-        />
-
-        <TimeMachinePanel
-          selectedYear={selectedYear}
-          selectedMonth={selectedMonth}
-          isHistorical={Boolean(historicalSelection)}
-          latestRecordDate={treasury.record_date}
-          cacheCoverage={cacheCoverage}
-          monthsByYear={cacheMonthsByYear}
-          invalidSelection={invalidHistoricalSelection}
-          provenance={treasuryProvenance}
-          historicalRegime={historicalSelection ? assessment.regime : null}
-          historicalSummary={historicalSelection ? assessment.description : null}
-          comparison={historicalComparison}
-        />
-
-        <CxoFunctionPanel provenance={internalProvenance} />
-
-        <OperatorRequestsPanel provenance={internalProvenance} />
+          <OperatorRequestsPanel provenance={internalProvenance} />
+        </section>
 
         <footer className="mt-12 border-t border-slate-800/70 pt-6 text-xs uppercase tracking-[0.3em] text-slate-500">
           Not Financial Advice.
