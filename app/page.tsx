@@ -27,8 +27,8 @@ import {
   SensorArray,
   SignalMatrixPanel,
   OperatorRequestsPanel,
-  TimeMachinePanel,
 } from "./components/reportSections";
+import { TimeMachinePanel } from "./components/timeMachinePanel";
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   dateStyle: "medium",

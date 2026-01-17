@@ -4,7 +4,7 @@
  */
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 type DisplayGuardianProps = {
   refreshMinutes?: number;
@@ -19,6 +19,7 @@ export const DisplayGuardian = ({
   driftPixels = 2,
   driftIntervalSeconds = 45,
 }: DisplayGuardianProps) => {
+  const lastInteractionAt = useRef(Date.now());
   const driftValues = useMemo(() => {
     const max = clamp(Math.round(driftPixels), 1, 6);
     return [-max, 0, max];
@@ -45,11 +46,27 @@ export const DisplayGuardian = ({
 
   useEffect(() => {
     const refreshMs = clamp(refreshMinutes, 2, 60) * 60 * 1000;
+    const updateInteraction = () => {
+      lastInteractionAt.current = Date.now();
+    };
+    const events = ["pointerdown", "keydown", "scroll", "touchstart"];
+    events.forEach((eventName) => {
+      window.addEventListener(eventName, updateInteraction, { passive: true });
+    });
     const refreshTimer = window.setInterval(() => {
-      window.location.reload();
+      const now = Date.now();
+      const idleMs = now - lastInteractionAt.current;
+      if (idleMs >= refreshMs) {
+        window.location.reload();
+      }
     }, refreshMs);
 
-    return () => window.clearInterval(refreshTimer);
+    return () => {
+      window.clearInterval(refreshTimer);
+      events.forEach((eventName) => {
+        window.removeEventListener(eventName, updateInteraction);
+      });
+    };
   }, [refreshMinutes]);
 
   useEffect(() => {
@@ -66,8 +83,8 @@ export const DisplayGuardian = ({
         wakeLock.addEventListener("release", () => {
           wakeLock = null;
         });
-      } catch (error) {
-        console.warn("Wake lock unavailable.", error);
+      } catch {
+        // Ignore wake lock failures to keep console clean.
       }
     };
 
