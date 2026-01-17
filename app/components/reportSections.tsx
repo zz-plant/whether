@@ -110,6 +110,33 @@ const getRegimeLabel = (regime: RegimeAssessment["regime"]) => {
   }
 };
 
+const regimeBadges = [
+  {
+    key: "SCARCITY",
+    label: "Survival",
+    description: "Cash is scarce; protect runway and defer bets.",
+    classes: "border-rose-500/60 bg-rose-500/15 text-rose-100",
+  },
+  {
+    key: "DEFENSIVE",
+    label: "Safety",
+    description: "Capital is cautious; prioritize durability and retention.",
+    classes: "border-amber-400/60 bg-amber-400/15 text-amber-100",
+  },
+  {
+    key: "VOLATILE",
+    label: "Stability",
+    description: "Signals are mixed; balance experimentation with controls.",
+    classes: "border-sky-400/60 bg-sky-400/15 text-sky-100",
+  },
+  {
+    key: "EXPANSION",
+    label: "Growth",
+    description: "Risk appetite is open; scale initiatives responsibly.",
+    classes: "border-emerald-400/60 bg-emerald-400/15 text-emerald-100",
+  },
+] as const;
+
 const getRegimeAccent = (regime: RegimeAssessment["regime"]) => {
   switch (regime) {
     case "SCARCITY":
@@ -197,6 +224,26 @@ export const RegimeAssessmentCard = ({
           <DataProvenanceStrip provenance={provenance} />
         </div>
       </div>
+      <div className="relative mt-4 flex flex-wrap gap-2 text-xs uppercase tracking-[0.2em]">
+        {regimeBadges.map((badge) => {
+          const isActive = badge.key === assessment.regime;
+          return (
+            <span
+              key={badge.key}
+              className={`weather-pill flex min-h-[44px] items-center gap-2 px-3 py-2 ${
+                badge.classes
+              } ${isActive ? "text-slate-100" : "opacity-60"}`}
+              aria-current={isActive ? "true" : undefined}
+            >
+              <span className="h-2 w-2 rounded-full bg-current" aria-hidden="true" />
+              <span className="text-[10px]">{badge.label}</span>
+            </span>
+          );
+        })}
+      </div>
+      <p className="relative mt-3 text-xs text-slate-400">
+        Badge colors map to regime posture for instant recognition across report panels.
+      </p>
       <p className="relative mt-4 type-data text-slate-200 break-words">{assessment.description}</p>
       <div className="weather-surface relative mt-4 grid gap-3 p-4 text-xs text-slate-400 md:grid-cols-3">
         <div>
@@ -401,6 +448,82 @@ export const FirstTimeGuidePanel = ({
   </section>
 );
 
+export const BeginnerGlossaryPanel = () => (
+  <section id="beginner-glossary" aria-labelledby="beginner-glossary-title" className="mt-10">
+    <div className="weather-panel p-6">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="type-label text-slate-400">Beginner mode</p>
+          <h3 id="beginner-glossary-title" className="type-section text-slate-100">
+            Glossary sidebar for policy-to-ops translation
+          </h3>
+          <p className="mt-2 type-data text-slate-300">
+            New to Treasury data? Use this sidebar to decode the language into operational
+            consequences before you share the report.
+          </p>
+        </div>
+        <div className="weather-surface px-4 py-3 text-xs uppercase tracking-[0.2em] text-slate-300">
+          <p className="text-[10px] text-slate-500">Onboarding lens</p>
+          <p className="mt-2 text-[11px] text-slate-200">Plain English over jargon</p>
+          <p className="mt-1 text-[11px] text-slate-400">Focus on constraints</p>
+        </div>
+      </div>
+      <div className="mt-6 grid gap-4 lg:grid-cols-[1.15fr,0.85fr]">
+        <div className="weather-surface p-4 text-sm text-slate-300">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-200">
+            How to read the report
+          </p>
+          <ul className="mt-3 space-y-2 text-sm text-slate-400">
+            <li>
+              <span className="text-slate-200">Start with the regime badge</span> to understand the
+              macro stance before you interpret any single metric.
+            </li>
+            <li>
+              <span className="text-slate-200">Translate signals into constraints</span>, not
+              predictions. This report emphasizes operational guardrails.
+            </li>
+            <li>
+              <span className="text-slate-200">Share the exports</span> when aligning leadership to
+              reduce interpretation drift.
+            </li>
+          </ul>
+        </div>
+        <aside className="weather-surface p-4" aria-label="Glossary sidebar">
+          <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Glossary</p>
+          <dl className="mt-3 space-y-3 text-sm text-slate-300">
+            <div>
+              <dt className="text-xs uppercase tracking-[0.2em] text-slate-200">Capital tightness</dt>
+              <dd className="mt-1 text-slate-400">
+                How hard it is to access funding. Higher tightness means conserve cash and focus on
+                runway.
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs uppercase tracking-[0.2em] text-slate-200">Market bravery</dt>
+              <dd className="mt-1 text-slate-400">
+                How willing the market is to take risk. Lower bravery means de-risk launches and
+                hiring.
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs uppercase tracking-[0.2em] text-slate-200">Curve slope</dt>
+              <dd className="mt-1 text-slate-400">
+                A read on recession risk. Inversion signals caution and favors defensive planning.
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs uppercase tracking-[0.2em] text-slate-200">Fallback mode</dt>
+              <dd className="mt-1 text-slate-400">
+                When live data is unavailable, the report uses the latest cached Treasury snapshot.
+              </dd>
+            </div>
+          </dl>
+        </aside>
+      </div>
+    </div>
+  </section>
+);
+
 export const OperatorRequestsPanel = ({ provenance }: { provenance: DataProvenance }) => (
   <section
     id="operator-requests"
@@ -494,6 +617,33 @@ export const SignalMatrixPanel = ({
   const matrixDotY = clampToRange(100 - y, 0, 100);
   const matrixGridId = "matrix-grid";
   const matrixGlowId = "matrix-glow";
+  const matrixTooltipId = "matrix-position-tooltip";
+  const quadrants = [
+    {
+      id: "tight-cautious",
+      label: "Tight + Cautious",
+      description: "Cash conservation, tighter budgets, and slower hiring.",
+      className: "left-3 top-3",
+    },
+    {
+      id: "tight-bold",
+      label: "Tight + Bold",
+      description: "Selective bets with strong governance and runway checks.",
+      className: "right-3 top-3",
+    },
+    {
+      id: "loose-cautious",
+      label: "Loose + Cautious",
+      description: "Stable funding but risk appetite is muted; prioritize durability.",
+      className: "left-3 bottom-3",
+    },
+    {
+      id: "loose-bold",
+      label: "Loose + Bold",
+      description: "Expansion-friendly conditions; scale responsibly.",
+      className: "right-3 bottom-3",
+    },
+  ];
 
   return (
     <section
@@ -515,7 +665,7 @@ export const SignalMatrixPanel = ({
         </div>
       </div>
       <figure className="mt-6">
-        <div className="weather-surface relative h-56">
+        <div className="weather-surface relative h-64">
           <svg
             className="absolute inset-0 h-full w-full"
             viewBox="0 0 100 100"
@@ -553,7 +703,25 @@ export const SignalMatrixPanel = ({
                 />
               </filter>
             </defs>
-            <rect width="100" height="100" fill="url(#matrix-grid)" />
+            <rect width="100" height="100" fill={`url(#${matrixGridId})`} />
+            <line
+              x1="50"
+              y1="0"
+              x2="50"
+              y2="100"
+              stroke="rgba(71,85,105,0.6)"
+              strokeWidth="1"
+              vectorEffect="non-scaling-stroke"
+            />
+            <line
+              x1="0"
+              y1="50"
+              x2="100"
+              y2="50"
+              stroke="rgba(71,85,105,0.6)"
+              strokeWidth="1"
+              vectorEffect="non-scaling-stroke"
+            />
             <text
               x="50"
               y="52"
@@ -588,18 +756,62 @@ export const SignalMatrixPanel = ({
               +
             </text>
           </svg>
-          <div className="absolute bottom-2 left-2 text-[10px] uppercase tracking-[0.2em] text-slate-500">
-            Cautious
+          <div className="pointer-events-none absolute inset-0">
+            <div className="absolute bottom-2 left-2 text-[10px] uppercase tracking-[0.2em] text-slate-500">
+              Cautious
+            </div>
+            <div className="absolute bottom-2 right-2 text-[10px] uppercase tracking-[0.2em] text-slate-500">
+              Bold
+            </div>
+            <div className="absolute left-2 top-2 -rotate-90 text-[10px] uppercase tracking-[0.2em] text-slate-500">
+              Tight
+            </div>
+            <div className="absolute right-2 top-2 -rotate-90 text-[10px] uppercase tracking-[0.2em] text-slate-500">
+              Loose
+            </div>
+            <div className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[10px] uppercase tracking-[0.2em] text-slate-500">
+              Market bravery →
+            </div>
+            <div className="absolute left-1 top-1/2 -translate-y-1/2 -rotate-90 text-[10px] uppercase tracking-[0.2em] text-slate-500">
+              Capital tightness ↑
+            </div>
           </div>
-          <div className="absolute bottom-2 right-2 text-[10px] uppercase tracking-[0.2em] text-slate-500">
-            Bold
-          </div>
-          <div className="absolute left-2 top-2 -rotate-90 text-[10px] uppercase tracking-[0.2em] text-slate-500">
-            Tight
-          </div>
-          <div className="absolute right-2 top-2 -rotate-90 text-[10px] uppercase tracking-[0.2em] text-slate-500">
-            Loose
-          </div>
+          <button
+            type="button"
+            aria-label={`Matrix position. Tightness ${assessment.scores.tightness}, bravery ${assessment.scores.riskAppetite}.`}
+            aria-describedby={matrixTooltipId}
+            className="group absolute flex min-h-[44px] min-w-[44px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full"
+            style={{ left: `${matrixDotX}%`, top: `${matrixDotY}%` }}
+          >
+            <span
+              id={matrixTooltipId}
+              role="tooltip"
+              className="pointer-events-none absolute top-0 -translate-y-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-[11px] text-slate-200 opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+            >
+              Tightness {assessment.scores.tightness} · Bravery {assessment.scores.riskAppetite}
+            </span>
+          </button>
+          {quadrants.map((quadrant) => {
+            const tooltipId = `matrix-${quadrant.id}-tooltip`;
+            return (
+              <div key={quadrant.id} className={`absolute ${quadrant.className}`}>
+                <button
+                  type="button"
+                  aria-describedby={tooltipId}
+                  className="group relative weather-pill flex min-h-[44px] items-center px-3 text-[10px] uppercase tracking-[0.2em] text-slate-300"
+                >
+                  {quadrant.label}
+                  <span
+                    id={tooltipId}
+                    role="tooltip"
+                    className="pointer-events-none absolute z-10 mt-2 w-44 rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-[11px] text-slate-200 opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+                  >
+                    {quadrant.description}
+                  </span>
+                </button>
+              </div>
+            );
+          })}
         </div>
         <figcaption id="signal-matrix-description" className="mt-4 text-xs text-slate-500">
           Position is derived from tightness (

@@ -26,6 +26,9 @@ export const ReportShell = ({
   pageSummary,
   pageLinks,
   sectionLinks,
+  trustStatusLabel,
+  trustStatusDetail,
+  trustStatusTone,
   structuredData,
   historicalBanner,
 }: {
@@ -38,6 +41,9 @@ export const ReportShell = ({
   pageSummary: string;
   pageLinks: ReportPageLink[];
   sectionLinks: ReportSectionLink[];
+  trustStatusLabel: string;
+  trustStatusDetail: string;
+  trustStatusTone: "stable" | "warning" | "historical";
   structuredData?: string;
   historicalBanner?: ReactNode;
 }) => {
@@ -99,6 +105,19 @@ export const ReportShell = ({
     ),
   };
 
+  const trustToneStyles =
+    trustStatusTone === "warning"
+      ? "border-amber-400/60 bg-amber-500/10 text-amber-100"
+      : trustStatusTone === "historical"
+        ? "border-slate-500/60 bg-slate-900/70 text-slate-200"
+        : "border-emerald-400/60 bg-emerald-500/10 text-emerald-100";
+  const trustLabelTone =
+    trustStatusTone === "warning"
+      ? "text-amber-200"
+      : trustStatusTone === "historical"
+        ? "text-slate-400"
+        : "text-emerald-200";
+
   return (
     <main
       id="main-content"
@@ -144,6 +163,17 @@ export const ReportShell = ({
               <p className="text-xs text-slate-400">
                 Signals stamped {recordDateLabel}
               </p>
+            </div>
+            <div className={`weather-panel flex min-w-[220px] flex-col gap-3 px-5 py-4 ${trustToneStyles}`}>
+              <p className={`text-[10px] uppercase tracking-[0.3em] ${trustLabelTone}`}>
+                Trust status
+              </p>
+              <div className="flex flex-col gap-2">
+                <span className="text-sm font-semibold uppercase tracking-[0.2em]">
+                  {trustStatusLabel}
+                </span>
+                <span className="text-xs">{trustStatusDetail}</span>
+              </div>
             </div>
           </div>
           <div className="weather-panel px-5 py-4">

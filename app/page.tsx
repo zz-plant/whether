@@ -3,6 +3,7 @@ import { resolveTimeMachineSelection, parseTimeMachineRequest } from "../lib/tim
 import { loadReportData } from "../lib/reportData";
 import {
   FirstTimeGuidePanel,
+  BeginnerGlossaryPanel,
   ExecutiveSnapshotPanel,
   RegimeAssessmentCard,
   SignalMatrixPanel,
@@ -88,6 +89,7 @@ export default async function HomePage({
   ];
   const sectionLinks = [
     { href: "#first-time-guide", label: "First-time guide" },
+    { href: "#beginner-glossary", label: "Glossary" },
     { href: "#executive-snapshot", label: "Executive snapshot" },
     { href: "#regime-assessment", label: "Regime assessment" },
     { href: "#signal-matrix", label: "Signal matrix" },
@@ -115,6 +117,18 @@ export default async function HomePage({
     treasury,
     treasuryProvenance,
   } = await loadReportData(searchParams);
+  const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
+  const trustStatusLabel = historicalSelection
+    ? "Historical snapshot"
+    : isFallback
+      ? "Fallback mode"
+      : "Verified live feed";
+  const trustStatusDetail = historicalSelection
+    ? "Viewing archived Treasury data for the selected month."
+    : isFallback
+      ? treasury.fallback_reason ?? "Using cached Treasury snapshot due to upstream outage."
+      : "Treasury API responding normally; live signals verified.";
+  const trustStatusTone = historicalSelection ? "historical" : isFallback ? "warning" : "stable";
 
   return (
     <ReportShell
@@ -122,6 +136,9 @@ export default async function HomePage({
       recordDateLabel={recordDateLabel}
       fetchedAtLabel={fetchedAtLabel}
       treasurySource={treasury.source}
+      trustStatusLabel={trustStatusLabel}
+      trustStatusDetail={trustStatusDetail}
+      trustStatusTone={trustStatusTone}
       pageTitle="Overview"
       pageSummary="Start here for a fast read on the regime and the executive implications. The rest of the report branches into deeper signal analysis and operational execution guidance."
       pageLinks={pageLinks}
@@ -137,6 +154,8 @@ export default async function HomePage({
         recordDateLabel={recordDateLabel}
         fetchedAtLabel={fetchedAtLabel}
       />
+
+      <BeginnerGlossaryPanel />
 
       <ExecutiveSnapshotPanel
         treasury={treasury}
