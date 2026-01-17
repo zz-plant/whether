@@ -12,16 +12,17 @@ It is inspired by high-level themes from:
 - **Drop-in compatibility**: prioritize compatibility with existing ecosystems so adoption requires little to no rewrites.
 - **Pragmatic defaults**: ship with sensible defaults and examples so new users can succeed quickly.
 
-## UI/UX themes (UI UX Pro Max)
+## UI/UX themes (modern Regime Station)
 
+- **Data-first hierarchy**: lead with one high-signal summary, then layer supporting panels in a predictable grid.
 - **Design system first**: define tokens (color, typography, spacing, radius, elevation) and reuse them across components.
-- **Pattern-driven layouts**: choose a primary layout pattern (e.g., hero-centric with social proof) and use it consistently.
+- **Dense, scannable layouts**: favor compact tables, aligned charts, and clear label/value pairings.
 - **Accessible by default**:
   - Maintain WCAG AA contrast.
   - Keep focus states visible.
   - Respect `prefers-reduced-motion`.
-- **Polished interaction**: use gentle motion (150–300ms) and subtle depth (soft shadows) to reinforce hierarchy.
-- **Clear CTA hierarchy**: surface a primary CTA above the fold and repeat it after supporting content.
+- **Calm, purposeful motion**: reserve animation for state changes and clarity (150–250ms).
+- **Trust cues everywhere**: show source links and freshness inline with every data view.
 
 ## Weather app inspiration (beloved references)
 

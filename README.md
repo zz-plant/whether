@@ -82,10 +82,12 @@ logic in a connected environment and committing the updated file.
   - Clamp to 100
 
 ## UX guidance
-- Dark mode default, high contrast.
-- Monospace for data readouts.
-- Small LED‑style status indicators.
-- Show **Data Source** + **Last Updated** timestamp prominently.
+- Dark mode default with strong contrast and restrained color accents.
+- Use a clean sans for labels and a monospace face for numeric readouts.
+- Lead with a single, high‑signal summary before secondary panels.
+- Prefer dense, grid‑aligned layouts with consistent spacing.
+- Show **Data Source** + **Last Updated** timestamp inline with each dataset.
+- Keep motion minimal and purposeful (status changes, hover affordances).
 
 ## Notes for developers
 This repo should make the product’s **purpose and market gap** obvious:
