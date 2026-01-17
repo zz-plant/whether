@@ -88,3 +88,17 @@ so outputs remain traceable, explainable, and operator‑friendly.
 - Decision Shield output can be copied cleanly.
 - TypeScript strict build passes.
 - Footer includes “Not Financial Advice”.
+
+## 7) Likely operator requests (post‑MVP)
+These are expected follow‑on requests once the product is in use. Each item should preserve
+traceability and plain‑English guidance.
+- Expand macro inputs beyond the yield curve (inflation, unemployment, credit spreads) with explicit sources.
+- Allow adjustable regime thresholds with a clear audit trail and defaults.
+- Add more Decision Shield categories (M&A, infra spend, geographic expansion, restructuring).
+- Provide export/share formats (PDF, slide-ready snapshot, scheduled email/Slack brief).
+- Build an Insight Database with citations to evidence and historic precedent.
+- Support historical comparisons (“then vs now”) with regime deltas.
+- Add regime-change alerts/notifications with reason codes.
+- Enable saved Decision Shield scenarios and team presets.
+- Deepen data provenance per sensor (direct source URLs, formula docs, timestamps).
+- Offer an API/export endpoint for embedding regimes into internal dashboards.

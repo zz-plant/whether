@@ -11,8 +11,25 @@ import {
 } from "./regimeEngine";
 
 export type LifecycleStage = "DISCOVERY" | "GROWTH" | "SCALE" | "MATURE";
-export type DecisionCategory = "HIRING" | "ROADMAP" | "PRICING" | "INFRASTRUCTURE";
-export type DecisionAction = "HIRE" | "REWRITE" | "LAUNCH" | "DISCOUNT" | "EXPAND";
+export type DecisionCategory =
+  | "HIRING"
+  | "ROADMAP"
+  | "PRICING"
+  | "INFRASTRUCTURE"
+  | "M_AND_A"
+  | "GEOGRAPHIC_EXPANSION"
+  | "RESTRUCTURING";
+export type DecisionAction =
+  | "HIRE"
+  | "REWRITE"
+  | "LAUNCH"
+  | "DISCOUNT"
+  | "EXPAND"
+  | "ACQUIRE"
+  | "DIVEST"
+  | "INFRA_SPEND"
+  | "REGIONAL_EXPANSION"
+  | "RESTRUCTURE";
 export type DecisionVerdict = "SAFE" | "RISKY" | "DANGEROUS";
 
 export interface DecisionInput {
@@ -61,6 +78,36 @@ const VERDICT_MATRIX: Record<DecisionAction, Record<RegimeKey, DecisionVerdict>>
     VOLATILE: "RISKY",
     EXPANSION: "SAFE",
   },
+  ACQUIRE: {
+    SCARCITY: "DANGEROUS",
+    DEFENSIVE: "RISKY",
+    VOLATILE: "RISKY",
+    EXPANSION: "SAFE",
+  },
+  DIVEST: {
+    SCARCITY: "SAFE",
+    DEFENSIVE: "RISKY",
+    VOLATILE: "RISKY",
+    EXPANSION: "RISKY",
+  },
+  INFRA_SPEND: {
+    SCARCITY: "DANGEROUS",
+    DEFENSIVE: "RISKY",
+    VOLATILE: "RISKY",
+    EXPANSION: "SAFE",
+  },
+  REGIONAL_EXPANSION: {
+    SCARCITY: "DANGEROUS",
+    DEFENSIVE: "RISKY",
+    VOLATILE: "RISKY",
+    EXPANSION: "SAFE",
+  },
+  RESTRUCTURE: {
+    SCARCITY: "SAFE",
+    DEFENSIVE: "RISKY",
+    VOLATILE: "RISKY",
+    EXPANSION: "RISKY",
+  },
 };
 
 const GUARDRAILS: Record<DecisionAction, string> = {
@@ -69,7 +116,27 @@ const GUARDRAILS: Record<DecisionAction, string> = {
   LAUNCH: "Launch only if it meaningfully reduces churn or expands ARPA within one quarter.",
   DISCOUNT: "Discounts must trade for annual prepay or multi-year commitments.",
   EXPAND: "Expand only when support capacity and retention metrics stay above baseline.",
+  ACQUIRE: "Acquire only if the target accelerates core metrics within 12 months at current burn.",
+  DIVEST: "Divest only with a transition plan that protects revenue continuity within two quarters.",
+  INFRA_SPEND: "Infrastructure spend must cut unit costs or unlock SLA gains within six months.",
+  REGIONAL_EXPANSION: "Expand regions only with localized demand proof and support readiness.",
+  RESTRUCTURE: "Restructure only when runway extends by at least two quarters post-change.",
 };
+
+const ACTION_LABELS: Record<DecisionAction, string> = {
+  HIRE: "Hire",
+  REWRITE: "Rewrite",
+  LAUNCH: "Launch",
+  DISCOUNT: "Discount",
+  EXPAND: "Expand",
+  ACQUIRE: "Acquire",
+  DIVEST: "Divest",
+  INFRA_SPEND: "Infra spend",
+  REGIONAL_EXPANSION: "Regional expansion",
+  RESTRUCTURE: "Restructure",
+};
+
+export const formatDecisionAction = (action: DecisionAction) => ACTION_LABELS[action];
 
 const buildSensorBullets = (assessment: RegimeAssessment): string[] => {
   const bullets: string[] = [];
@@ -107,11 +174,12 @@ export const evaluateDecision = (
   input: DecisionInput
 ): DecisionOutput => {
   const verdict = VERDICT_MATRIX[input.action][assessment.regime];
+  const actionLabel = formatDecisionAction(input.action);
   const bullets = buildSensorBullets(assessment);
 
   return {
     verdict,
-    summary: `${input.action} is ${verdict.toLowerCase()} in the current ${assessment.regime.toLowerCase()} regime for a ${input.lifecycle.toLowerCase()} team.`,
+    summary: `${actionLabel} is ${verdict.toLowerCase()} in the current ${assessment.regime.toLowerCase()} regime for a ${input.lifecycle.toLowerCase()} team.`,
     bullets,
     guardrail: GUARDRAILS[input.action],
     reversalTrigger: buildReversalTrigger(assessment),

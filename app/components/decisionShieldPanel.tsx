@@ -8,6 +8,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   evaluateDecision,
+  formatDecisionAction,
   type DecisionAction,
   type DecisionCategory,
   type DecisionOutput,
@@ -27,6 +28,9 @@ const categoryOptions: { value: DecisionCategory; label: string }[] = [
   { value: "ROADMAP", label: "Roadmap" },
   { value: "PRICING", label: "Pricing" },
   { value: "INFRASTRUCTURE", label: "Infrastructure" },
+  { value: "M_AND_A", label: "M&A" },
+  { value: "GEOGRAPHIC_EXPANSION", label: "Geographic expansion" },
+  { value: "RESTRUCTURING", label: "Restructuring" },
 ];
 
 const actionOptions: { value: DecisionAction; label: string }[] = [
@@ -35,6 +39,11 @@ const actionOptions: { value: DecisionAction; label: string }[] = [
   { value: "LAUNCH", label: "Launch" },
   { value: "DISCOUNT", label: "Discount" },
   { value: "EXPAND", label: "Expand" },
+  { value: "ACQUIRE", label: "Acquire" },
+  { value: "DIVEST", label: "Divest" },
+  { value: "INFRA_SPEND", label: "Infra spend" },
+  { value: "REGIONAL_EXPANSION", label: "Regional expansion" },
+  { value: "RESTRUCTURE", label: "Restructure" },
 ];
 
 const verdictStyles: Record<DecisionOutput["verdict"], string> = {
@@ -42,6 +51,11 @@ const verdictStyles: Record<DecisionOutput["verdict"], string> = {
   RISKY: "border-amber-400/40 bg-amber-500/10 text-amber-200",
   DANGEROUS: "border-rose-400/40 bg-rose-500/10 text-rose-200",
 };
+
+const formatOptionLabel = <T extends string>(
+  value: T,
+  options: { value: T; label: string }[]
+) => options.find((option) => option.value === value)?.label ?? value;
 
 const buildShareText = (
   assessment: RegimeAssessment,
@@ -53,9 +67,9 @@ const buildShareText = (
   const lines = [
     "Decision Shield — Whether Report",
     `Regime: ${assessment.regime}`,
-    `Lifecycle: ${lifecycle}`,
-    `Category: ${category}`,
-    `Action: ${action}`,
+    `Lifecycle: ${formatOptionLabel(lifecycle, lifecycleOptions)}`,
+    `Category: ${formatOptionLabel(category, categoryOptions)}`,
+    `Action: ${formatDecisionAction(action)}`,
     `Verdict: ${output.verdict}`,
     "",
     `Summary: ${output.summary}`,
