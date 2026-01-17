@@ -11,7 +11,14 @@
       "sourceLabel": "BLS Consumer Price Index",
       "sourceUrl": "https://www.bls.gov/cpi/",
       "formulaUrl": "/formulas#cpi-inflation",
-      "record_date": "2024-08-01"
+      "record_date": "2024-08-01",
+      "history": [
+        { "date": "2024-04-01", "value": 3.4 },
+        { "date": "2024-05-01", "value": 3.3 },
+        { "date": "2024-06-01", "value": 3.2 },
+        { "date": "2024-07-01", "value": 3.6 },
+        { "date": "2024-08-01", "value": 3.7 }
+      ]
     },
     {
       "id": "UNEMPLOYMENT_RATE",
@@ -22,7 +29,14 @@
       "sourceLabel": "BLS Employment Situation",
       "sourceUrl": "https://www.bls.gov/news.release/empsit.toc.htm",
       "formulaUrl": "/formulas#unemployment-rate",
-      "record_date": "2024-09-01"
+      "record_date": "2024-09-01",
+      "history": [
+        { "date": "2024-05-01", "value": 4.0 },
+        { "date": "2024-06-01", "value": 4.1 },
+        { "date": "2024-07-01", "value": 4.2 },
+        { "date": "2024-08-01", "value": 4.0 },
+        { "date": "2024-09-01", "value": 4.1 }
+      ]
     },
     {
       "id": "BBB_CREDIT_SPREAD",
@@ -33,7 +47,14 @@
       "sourceLabel": "ICE BofA BBB OAS (FRED)",
       "sourceUrl": "https://fred.stlouisfed.org/series/BAMLC0A4CBBB",
       "formulaUrl": "/formulas#credit-spread",
-      "record_date": "2024-10-01"
+      "record_date": "2024-10-01",
+      "history": [
+        { "date": "2024-06-01", "value": 1.55 },
+        { "date": "2024-07-01", "value": 1.62 },
+        { "date": "2024-08-01", "value": 1.7 },
+        { "date": "2024-09-01", "value": 1.58 },
+        { "date": "2024-10-01", "value": 1.65 }
+      ]
     }
   ]
 }

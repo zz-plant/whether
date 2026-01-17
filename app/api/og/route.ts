@@ -112,9 +112,38 @@ export async function GET(request: Request) {
       <stop offset="0%" stop-color="#020617" />
       <stop offset="100%" stop-color="#0f172a" />
     </linearGradient>
+    <linearGradient id="highlight" x1="0" y1="0" x2="1200" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="rgba(56,189,248,0.12)" />
+      <stop offset="50%" stop-color="rgba(56,189,248,0)" />
+      <stop offset="100%" stop-color="rgba(56,189,248,0.12)" />
+    </linearGradient>
+    <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#020617" flood-opacity="0.6" />
+    </filter>
+    <mask id="highlightMask">
+      <rect x="60" y="60" width="1080" height="510" rx="32" fill="white" />
+    </mask>
   </defs>
   <rect width="1200" height="630" fill="url(#bg)" />
-  <rect x="60" y="60" width="1080" height="510" rx="32" fill="#0b1120" stroke="#1f2937" stroke-width="2" />
+  <rect
+    x="60"
+    y="60"
+    width="1080"
+    height="510"
+    rx="32"
+    fill="#0b1120"
+    stroke="#1f2937"
+    stroke-width="2"
+    filter="url(#cardShadow)"
+  />
+  <rect
+    x="60"
+    y="120"
+    width="1080"
+    height="120"
+    fill="url(#highlight)"
+    mask="url(#highlightMask)"
+  />
   <text x="120" y="150" fill="#e2e8f0" font-family="Inter, system-ui, sans-serif" font-size="42" font-weight="600">
     ${escapeText("Whether Report")}
   </text>
