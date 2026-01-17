@@ -95,7 +95,7 @@ This repo should make the product’s **purpose and market gap** obvious:
 For UI and engineering inspiration, see `LEARNINGS.md`.
 
 ## Local development
-0. Use Node.js 20 (see `.nvmrc`) and npm 10.x.
-1. Install dependencies: `npm install`
-2. Run the dashboard: `npm run dev`
+0. Use Node.js 20 (see `.nvmrc`) and Bun 1.2.
+1. Install dependencies: `bun install`
+2. Run the dashboard: `bun run dev`
 3. Open `http://localhost:3000` to view the Regime Station UI.
