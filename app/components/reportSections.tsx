@@ -4,7 +4,12 @@
  */
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import type { PlaybookEntry } from "../../lib/playbook";
-import type { MacroSeriesReading, SensorReading, TreasuryData } from "../../lib/types";
+import type {
+  MacroSeriesReading,
+  SensorReading,
+  SeriesHistoryPoint,
+  TreasuryData,
+} from "../../lib/types";
 import { cxoFunctionOutputs } from "../../lib/cxoFunctionOutputs";
 import { operatorRequests } from "../../lib/operatorRequests";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
@@ -46,6 +51,47 @@ const clampToRange = (value: number, min: number, max: number) =>
 const mapToPercent = (value: number, min: number, max: number) => {
   const clamped = clampToRange(value, min, max);
   return ((clamped - min) / (max - min)) * 100;
+};
+
+const SPARKLINE_WIDTH = 120;
+const SPARKLINE_HEIGHT = 32;
+const SPARKLINE_PADDING = 4;
+
+const buildSparkline = (history?: SeriesHistoryPoint[]) => {
+  const points = (history ?? [])
+    .filter((point): point is { date: string; value: number } => typeof point.value === "number")
+    .map((point) => ({ value: point.value }));
+
+  if (points.length === 0) {
+    return null;
+  }
+
+  const normalizedPoints = points.length === 1 ? [points[0], points[0]] : points;
+  const values = normalizedPoints.map((point) => point.value);
+  const minValue = Math.min(...values);
+  const maxValue = Math.max(...values);
+  const range = maxValue - minValue || 1;
+  const innerWidth = SPARKLINE_WIDTH - SPARKLINE_PADDING * 2;
+  const innerHeight = SPARKLINE_HEIGHT - SPARKLINE_PADDING * 2;
+  const coords = normalizedPoints.map((point, index) => {
+    const x =
+      SPARKLINE_PADDING + (index / (normalizedPoints.length - 1)) * innerWidth;
+    const y =
+      SPARKLINE_HEIGHT -
+      SPARKLINE_PADDING -
+      ((point.value - minValue) / range) * innerHeight;
+    return { x, y };
+  });
+
+  const path = coords
+    .map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`)
+    .join(" ");
+  const first = coords[0];
+  const last = coords[coords.length - 1];
+  const baseY = SPARKLINE_HEIGHT - SPARKLINE_PADDING;
+  const area = `${path} L ${last.x} ${baseY} L ${first.x} ${baseY} Z`;
+
+  return { path, area };
 };
 
 
@@ -110,6 +156,13 @@ export const RegimeAssessmentCard = ({
   const regimeAccent = getRegimeAccent(assessment.regime);
   const hasWarnings = assessment.dataWarnings.length > 0;
   const constraintCount = assessment.constraints.length;
+  const tightnessScore = clampToRange(assessment.scores.tightness, 0, 100);
+  const riskScore = clampToRange(assessment.scores.riskAppetite, 0, 100);
+  const progressId = `regime-progress-${assessment.regime.toLowerCase()}`;
+  const tightnessGradientId = `${progressId}-tightness-gradient`;
+  const riskGradientId = `${progressId}-risk-gradient`;
+  const tightnessClipId = `${progressId}-tightness-clip`;
+  const riskClipId = `${progressId}-risk-clip`;
 
   return (
     <section
@@ -177,12 +230,27 @@ export const RegimeAssessmentCard = ({
             <span>Capital tightness</span>
             <span className="text-slate-200 tabular-nums">{assessment.scores.tightness}/100</span>
           </div>
-          <div className="h-2 rounded-full bg-slate-800">
-            <div
-              className="h-2 rounded-full bg-rose-500"
-              style={{ width: `${assessment.scores.tightness}%` }}
-            />
-          </div>
+          <svg
+            viewBox="0 0 100 8"
+            className="h-2 w-full"
+            aria-hidden="true"
+            focusable="false"
+            preserveAspectRatio="none"
+          >
+            <defs>
+              <linearGradient id={tightnessGradientId} x1="0" y1="0" x2="100" y2="0">
+                <stop offset="0%" stopColor="#fb7185" />
+                <stop offset="100%" stopColor="#f43f5e" />
+              </linearGradient>
+              <clipPath id={tightnessClipId}>
+                <rect width="100" height="8" rx="4" />
+              </clipPath>
+            </defs>
+            <g clipPath={`url(#${tightnessClipId})`}>
+              <rect width="100" height="8" fill="#1e293b" />
+              <rect width={tightnessScore} height="8" fill={`url(#${tightnessGradientId})`} />
+            </g>
+          </svg>
           <p>{assessment.tightnessExplanation}</p>
         </div>
         <div className="space-y-3">
@@ -190,12 +258,27 @@ export const RegimeAssessmentCard = ({
             <span>Market bravery</span>
             <span className="text-slate-200 tabular-nums">{assessment.scores.riskAppetite}/100</span>
           </div>
-          <div className="h-2 rounded-full bg-slate-800">
-            <div
-              className="h-2 rounded-full bg-amber-400"
-              style={{ width: `${assessment.scores.riskAppetite}%` }}
-            />
-          </div>
+          <svg
+            viewBox="0 0 100 8"
+            className="h-2 w-full"
+            aria-hidden="true"
+            focusable="false"
+            preserveAspectRatio="none"
+          >
+            <defs>
+              <linearGradient id={riskGradientId} x1="0" y1="0" x2="100" y2="0">
+                <stop offset="0%" stopColor="#fbbf24" />
+                <stop offset="100%" stopColor="#f59e0b" />
+              </linearGradient>
+              <clipPath id={riskClipId}>
+                <rect width="100" height="8" rx="4" />
+              </clipPath>
+            </defs>
+            <g clipPath={`url(#${riskClipId})`}>
+              <rect width="100" height="8" fill="#1e293b" />
+              <rect width={riskScore} height="8" fill={`url(#${riskGradientId})`} />
+            </g>
+          </svg>
           <p>{assessment.riskAppetiteExplanation}</p>
         </div>
       </div>
@@ -393,8 +476,10 @@ export const SignalMatrixPanel = ({
 }) => {
   const x = assessment.scores.riskAppetite;
   const y = assessment.scores.tightness;
-  const top = `${100 - y}%`;
-  const left = `${x}%`;
+  const matrixDotX = clampToRange(x, 0, 100);
+  const matrixDotY = clampToRange(100 - y, 0, 100);
+  const matrixGridId = "matrix-grid";
+  const matrixGlowId = "matrix-glow";
 
   return (
     <section
@@ -416,21 +501,69 @@ export const SignalMatrixPanel = ({
         </div>
       </div>
       <div className="relative mt-6 h-56 rounded-xl border border-slate-800 bg-slate-950/60">
-        <div className="absolute inset-0 grid grid-cols-2 grid-rows-2">
-          <div className="border-b border-r border-slate-800/80" />
-          <div className="border-b border-slate-800/80" />
-          <div className="border-r border-slate-800/80" />
-          <div />
-        </div>
-        <div className="absolute inset-0 flex items-center justify-center text-xs uppercase tracking-[0.4em] text-slate-700">
-          MATRIX
-        </div>
-        <div
-          className="absolute flex h-4 w-4 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-amber-400 text-[8px] font-semibold text-slate-900 shadow-lg"
-          style={{ top, left }}
+        <svg
+          className="absolute inset-0 h-full w-full"
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+          role="img"
+          aria-labelledby="signal-matrix-visual-title signal-matrix-visual-desc"
         >
-          +
-        </div>
+          <title id="signal-matrix-visual-title">Signal matrix grid</title>
+          <desc id="signal-matrix-visual-desc">
+            A two-by-two matrix showing the balance of tightness and market bravery.
+          </desc>
+          <defs>
+            <pattern id={matrixGridId} width="50" height="50" patternUnits="userSpaceOnUse">
+              <path
+                d="M 50 0 H 0 V 50"
+                fill="none"
+                stroke="rgba(30,41,59,0.9)"
+                strokeWidth="1"
+                vectorEffect="non-scaling-stroke"
+              />
+            </pattern>
+            <filter id={matrixGlowId} x="-50%" y="-50%" width="200%" height="200%">
+              <feDropShadow
+                dx="0"
+                dy="0"
+                stdDeviation="2"
+                floodColor="#fbbf24"
+                floodOpacity="0.45"
+              />
+            </filter>
+          </defs>
+          <rect width="100" height="100" fill="url(#matrix-grid)" />
+          <text
+            x="50"
+            y="52"
+            textAnchor="middle"
+            fill="rgba(100,116,139,0.55)"
+            fontSize="8"
+            letterSpacing="6"
+          >
+            MATRIX
+          </text>
+          <circle
+            cx={matrixDotX}
+            cy={matrixDotY}
+            r="4"
+            fill="#fbbf24"
+            stroke="#0f172a"
+            strokeWidth="1.5"
+            vectorEffect="non-scaling-stroke"
+            filter={`url(#${matrixGlowId})`}
+          />
+          <text
+            x={matrixDotX}
+            y={matrixDotY + 1.2}
+            textAnchor="middle"
+            fontSize="6"
+            fontWeight="600"
+            fill="#0f172a"
+          >
+            +
+          </text>
+        </svg>
         <div className="absolute bottom-2 left-2 text-[10px] uppercase tracking-[0.2em] text-slate-500">
           Cautious
         </div>
@@ -477,6 +610,10 @@ export const ExecutiveSnapshotPanel = ({
   const curveLabel = curveSlope === null ? "—" : curveSlope < 0 ? "Inverted" : "Normal";
   const curveSlopePercent =
     curveSlope === null ? 50 : mapToPercent(curveSlope, -2, 2);
+  const curveIndicator = clampToRange(curveSlopePercent, 0, 100);
+  const curveIndicatorColor =
+    curveSlope === null ? "#94a3b8" : curveSlope < 0 ? "#fb7185" : "#38bdf8";
+  const curveMarkerId = "curve-marker";
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
   const fallbackReason = treasury.fallback_reason ?? "Fallback triggered.";
 
@@ -546,16 +683,54 @@ export const ExecutiveSnapshotPanel = ({
               </div>
             </div>
             <div className="mt-3">
-              <div className="relative h-2 rounded-full bg-slate-800">
-                <div
-                  className="absolute left-1/2 top-0 h-2 w-px -translate-x-1/2 bg-slate-600"
-                  aria-hidden="true"
+              <svg
+                viewBox="0 0 100 12"
+                className="h-3 w-full"
+                aria-hidden="true"
+                focusable="false"
+                preserveAspectRatio="none"
+              >
+                <defs>
+                  <marker
+                    id={curveMarkerId}
+                    markerWidth="6"
+                    markerHeight="6"
+                    refX="5"
+                    refY="3"
+                    orient="auto"
+                  >
+                    <path d="M 0 0 L 6 3 L 0 6 Z" fill={curveIndicatorColor} />
+                  </marker>
+                </defs>
+                <line
+                  x1="6"
+                  y1="6"
+                  x2="94"
+                  y2="6"
+                  stroke="#1e293b"
+                  strokeWidth="2"
+                  vectorEffect="non-scaling-stroke"
                 />
-                <div
-                  className="h-2 rounded-full bg-sky-400"
-                  style={{ width: `${curveSlopePercent}%` }}
+                <line
+                  x1="50"
+                  y1="1"
+                  x2="50"
+                  y2="11"
+                  stroke="#475569"
+                  strokeWidth="1"
+                  vectorEffect="non-scaling-stroke"
                 />
-              </div>
+                <line
+                  x1="50"
+                  y1="6"
+                  x2={curveIndicator}
+                  y2="6"
+                  stroke={curveIndicatorColor}
+                  strokeWidth="2"
+                  vectorEffect="non-scaling-stroke"
+                  markerEnd={`url(#${curveMarkerId})`}
+                />
+              </svg>
               <div className="mt-2 flex items-center justify-between text-[10px] uppercase tracking-[0.2em] text-slate-500">
                 <span>-2%</span>
                 <span>0%</span>
@@ -586,46 +761,85 @@ export const SensorArray = ({
         <DataProvenanceStrip provenance={provenance} />
       </div>
       <div className="mt-4 grid gap-4 md:grid-cols-2">
-        {sensors.map((sensor) => (
-          <div key={sensor.id} className="rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
-            <div className="flex items-start justify-between gap-4">
-              <div className="min-w-0">
-                <p className="text-sm text-slate-300 break-words">{sensor.label}</p>
-                <p className="mono mt-2 text-2xl text-slate-100">
-                  {formatNumber(sensor.value, sensor.unit)}
-                </p>
+        {sensors.map((sensor) => {
+          const sparkline = buildSparkline(sensor.history);
+          const sparklineId = `sensor-spark-${sensor.id}`;
+
+          return (
+            <div
+              key={sensor.id}
+              className="rounded-2xl border border-slate-800 bg-slate-900/40 p-5"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0">
+                  <p className="text-sm text-slate-300 break-words">{sensor.label}</p>
+                  <p className="mono mt-2 text-2xl text-slate-100">
+                    {formatNumber(sensor.value, sensor.unit)}
+                  </p>
+                </div>
+                <span className="rounded-full border border-slate-700 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-400">
+                  {sensor.isLive ? "Live" : "Offline"}
+                </span>
               </div>
-              <span className="rounded-full border border-slate-700 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-400">
-                {sensor.isLive ? "Live" : "Offline"}
-              </span>
+              <div className="mt-3">
+                {sparkline ? (
+                  <svg
+                    viewBox={`0 0 ${SPARKLINE_WIDTH} ${SPARKLINE_HEIGHT}`}
+                    className="h-8 w-full"
+                    aria-hidden="true"
+                    focusable="false"
+                    preserveAspectRatio="none"
+                  >
+                    <defs>
+                      <linearGradient id={sparklineId} x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="rgba(56,189,248,0.35)" />
+                        <stop offset="100%" stopColor="rgba(56,189,248,0)" />
+                      </linearGradient>
+                    </defs>
+                    <path d={sparkline.area} fill={`url(#${sparklineId})`} />
+                    <path
+                      d={sparkline.path}
+                      fill="none"
+                      stroke="#38bdf8"
+                      strokeWidth="1.5"
+                      vectorEffect="non-scaling-stroke"
+                    />
+                  </svg>
+                ) : (
+                  <div
+                    className="h-8 rounded-md border border-slate-800/80 bg-slate-950/80"
+                    aria-hidden="true"
+                  />
+                )}
+              </div>
+              <p className="mt-3 text-xs text-slate-400 break-words">{sensor.explanation}</p>
+              <div className="mt-4 text-xs text-slate-500">
+                <p className="break-words">
+                  Source:{" "}
+                  <a
+                    href={sensor.sourceUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="touch-target text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+                  >
+                    {sensor.sourceLabel}
+                  </a>
+                </p>
+                <p>
+                  Formula:{" "}
+                  <a
+                    href={sensor.formulaUrl}
+                    className="touch-target text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+                  >
+                    Method notes
+                  </a>
+                </p>
+                <p>Record date: {formatDate(sensor.record_date)}</p>
+                <p>Fetched: {formatTimestamp(sensor.fetched_at)}</p>
+              </div>
             </div>
-            <p className="mt-3 text-xs text-slate-400 break-words">{sensor.explanation}</p>
-            <div className="mt-4 text-xs text-slate-500">
-              <p className="break-words">
-                Source:{" "}
-                <a
-                  href={sensor.sourceUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="touch-target text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
-                >
-                  {sensor.sourceLabel}
-                </a>
-              </p>
-              <p>
-                Formula:{" "}
-                <a
-                  href={sensor.formulaUrl}
-                  className="touch-target text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
-                >
-                  Method notes
-                </a>
-              </p>
-              <p>Record date: {formatDate(sensor.record_date)}</p>
-              <p>Fetched: {formatTimestamp(sensor.fetched_at)}</p>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );
@@ -661,42 +875,78 @@ export const MacroSignalsPanel = ({
           </div>
         </div>
         <div className="mt-6 grid gap-4 md:grid-cols-3">
-          {series.map((signal) => (
-            <div
-              key={signal.id}
-              className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4 shadow-[0_0_0_1px_rgba(15,23,42,0.4)]"
-            >
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{signal.label}</p>
-              <p className="mono mt-3 text-2xl text-slate-100">
-                {formatNumber(signal.value, signal.unit)}
-              </p>
-              <p className="mt-2 text-xs text-slate-500">{signal.explanation}</p>
-              <div className="mt-3 text-xs text-slate-500">
-                <p className="break-words">
-                  Source:{" "}
-                  <a
-                    href={signal.sourceUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="touch-target text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
-                  >
-                    {signal.sourceLabel}
-                  </a>
+          {series.map((signal) => {
+            const sparkline = buildSparkline(signal.history);
+            const sparklineId = `macro-spark-${signal.id}`;
+
+            return (
+              <div
+                key={signal.id}
+                className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4 shadow-[0_0_0_1px_rgba(15,23,42,0.4)]"
+              >
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{signal.label}</p>
+                <p className="mono mt-3 text-2xl text-slate-100">
+                  {formatNumber(signal.value, signal.unit)}
                 </p>
-                <p>
-                  Formula:{" "}
-                  <a
-                    href={signal.formulaUrl}
-                    className="touch-target text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
-                  >
-                    Method notes
-                  </a>
-                </p>
-                <p>Record date: {formatDate(signal.record_date)}</p>
-                <p>Fetched: {formatTimestamp(signal.fetched_at)}</p>
+                <div className="mt-3">
+                  {sparkline ? (
+                    <svg
+                      viewBox={`0 0 ${SPARKLINE_WIDTH} ${SPARKLINE_HEIGHT}`}
+                      className="h-8 w-full"
+                      aria-hidden="true"
+                      focusable="false"
+                      preserveAspectRatio="none"
+                    >
+                      <defs>
+                        <linearGradient id={sparklineId} x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="rgba(251,191,36,0.3)" />
+                          <stop offset="100%" stopColor="rgba(251,191,36,0)" />
+                        </linearGradient>
+                      </defs>
+                      <path d={sparkline.area} fill={`url(#${sparklineId})`} />
+                      <path
+                        d={sparkline.path}
+                        fill="none"
+                        stroke="#fbbf24"
+                        strokeWidth="1.5"
+                        vectorEffect="non-scaling-stroke"
+                      />
+                    </svg>
+                  ) : (
+                    <div
+                      className="h-8 rounded-md border border-slate-800/80 bg-slate-950/80"
+                      aria-hidden="true"
+                    />
+                  )}
+                </div>
+                <p className="mt-2 text-xs text-slate-500">{signal.explanation}</p>
+                <div className="mt-3 text-xs text-slate-500">
+                  <p className="break-words">
+                    Source:{" "}
+                    <a
+                      href={signal.sourceUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="touch-target text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+                    >
+                      {signal.sourceLabel}
+                    </a>
+                  </p>
+                  <p>
+                    Formula:{" "}
+                    <a
+                      href={signal.formulaUrl}
+                      className="touch-target text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+                    >
+                      Method notes
+                    </a>
+                  </p>
+                  <p>Record date: {formatDate(signal.record_date)}</p>
+                  <p>Fetched: {formatTimestamp(signal.fetched_at)}</p>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

@@ -22,6 +22,11 @@ export interface TreasuryData extends TreasuryMetadata {
   yields: TreasuryYields;
 }
 
+export interface SeriesHistoryPoint {
+  date: string;
+  value: number | null;
+}
+
 export interface SensorReading {
   id: "BASE_RATE" | "CURVE_SLOPE";
   label: string;
@@ -34,6 +39,7 @@ export interface SensorReading {
   record_date: string;
   fetched_at: string;
   isLive: boolean;
+  history?: SeriesHistoryPoint[];
 }
 
 export type MacroSeriesId = "CPI_YOY" | "UNEMPLOYMENT_RATE" | "BBB_CREDIT_SPREAD";
@@ -50,4 +56,5 @@ export interface MacroSeriesReading {
   record_date: string;
   fetched_at: string;
   isLive: boolean;
+  history?: SeriesHistoryPoint[];
 }

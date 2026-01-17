@@ -13,12 +13,13 @@ const CURVE_SLOPE_EXPLANATION =
 export const buildSensorReadings = (treasury: TreasuryData): SensorReading[] => {
   const baseRate = getBaseRate(treasury.yields);
   const curveSlope = computeCurveSlope(treasury.yields);
+  const baseRateValue = baseRate.used === "MISSING" ? null : baseRate.value;
 
   return [
     {
       id: "BASE_RATE",
       label: `Base rate (${baseRate.used})`,
-      value: baseRate.used === "MISSING" ? null : baseRate.value,
+      value: baseRateValue,
       unit: "%",
       explanation: BASE_RATE_EXPLANATION,
       sourceLabel: "US Treasury Fiscal Data API",
@@ -27,6 +28,7 @@ export const buildSensorReadings = (treasury: TreasuryData): SensorReading[] => 
       record_date: treasury.record_date,
       fetched_at: treasury.fetched_at,
       isLive: treasury.isLive,
+      history: baseRateValue === null ? [] : [{ date: treasury.record_date, value: baseRateValue }],
     },
     {
       id: "CURVE_SLOPE",
@@ -40,6 +42,7 @@ export const buildSensorReadings = (treasury: TreasuryData): SensorReading[] => 
       record_date: treasury.record_date,
       fetched_at: treasury.fetched_at,
       isLive: treasury.isLive,
+      history: curveSlope === null ? [] : [{ date: treasury.record_date, value: curveSlope }],
     },
   ];
 };
