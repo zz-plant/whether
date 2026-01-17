@@ -500,96 +500,99 @@ export const SignalMatrixPanel = ({
           <DataProvenanceStrip provenance={provenance} />
         </div>
       </div>
-      <div className="relative mt-6 h-56 rounded-xl border border-slate-800 bg-slate-950/60">
-        <svg
-          className="absolute inset-0 h-full w-full"
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-          role="img"
-          aria-labelledby="signal-matrix-visual-title signal-matrix-visual-desc"
-        >
-          <title id="signal-matrix-visual-title">Signal matrix grid</title>
-          <desc id="signal-matrix-visual-desc">
-            A two-by-two matrix showing the balance of tightness and market bravery.
-          </desc>
-          <defs>
-            <pattern
-              id={matrixGridId}
-              width="50"
-              height="50"
-              patternUnits="userSpaceOnUse"
-              patternTransform="scale(1)"
+      <figure className="mt-6">
+        <div className="relative h-56 rounded-xl border border-slate-800 bg-slate-950/60">
+          <svg
+            className="absolute inset-0 h-full w-full"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            role="img"
+            aria-labelledby="signal-matrix-visual-title signal-matrix-visual-desc"
+          >
+            <title id="signal-matrix-visual-title">Signal matrix grid</title>
+            <desc id="signal-matrix-visual-desc">
+              A two-by-two matrix showing the balance of tightness and market bravery.
+            </desc>
+            <defs>
+              <pattern
+                id={matrixGridId}
+                width="50"
+                height="50"
+                patternUnits="userSpaceOnUse"
+                patternTransform="scale(1)"
+              >
+                <path
+                  d="M 50 0 H 0 V 50"
+                  fill="none"
+                  stroke="rgba(30,41,59,0.9)"
+                  strokeWidth="1"
+                  vectorEffect="non-scaling-stroke"
+                />
+              </pattern>
+              <filter id={matrixGlowId} x="-50%" y="-50%" width="200%" height="200%">
+                <feDropShadow
+                  dx="0"
+                  dy="0"
+                  stdDeviation="2"
+                  floodColor="#fbbf24"
+                  floodOpacity="0.45"
+                />
+              </filter>
+            </defs>
+            <rect width="100" height="100" fill="url(#matrix-grid)" />
+            <text
+              x="50"
+              y="52"
+              textAnchor="middle"
+              fill="rgba(100,116,139,0.55)"
+              fontSize="8"
+              letterSpacing="6"
             >
-              <path
-                d="M 50 0 H 0 V 50"
-                fill="none"
-                stroke="rgba(30,41,59,0.9)"
-                strokeWidth="1"
-                vectorEffect="non-scaling-stroke"
-              />
-            </pattern>
-            <filter id={matrixGlowId} x="-50%" y="-50%" width="200%" height="200%">
-              <feDropShadow
-                dx="0"
-                dy="0"
-                stdDeviation="2"
-                floodColor="#fbbf24"
-                floodOpacity="0.45"
-              />
-            </filter>
-          </defs>
-          <rect width="100" height="100" fill="url(#matrix-grid)" />
-          <text
-            x="50"
-            y="52"
-            textAnchor="middle"
-            fill="rgba(100,116,139,0.55)"
-            fontSize="8"
-            letterSpacing="6"
-          >
-            MATRIX
-          </text>
-          <circle
-            cx={matrixDotX}
-            cy={matrixDotY}
-            r="4"
-            fill="#fbbf24"
-            stroke="#0f172a"
-            strokeWidth="1.5"
-            vectorEffect="non-scaling-stroke"
-            filter={`url(#${matrixGlowId})`}
-          />
-          <text
-            x={matrixDotX}
-            y={matrixDotY + 1.2}
-            textAnchor="middle"
-            fontSize="6"
-            fontWeight="600"
-            fill="#0f172a"
-            stroke="#0f172a"
-            strokeWidth="0.6"
-            paintOrder="stroke fill"
-          >
-            +
-          </text>
-        </svg>
-        <div className="absolute bottom-2 left-2 text-[10px] uppercase tracking-[0.2em] text-slate-500">
-          Cautious
+              MATRIX
+            </text>
+            <circle
+              cx={matrixDotX}
+              cy={matrixDotY}
+              r="4"
+              fill="#fbbf24"
+              stroke="#0f172a"
+              strokeWidth="1.5"
+              vectorEffect="non-scaling-stroke"
+              filter={`url(#${matrixGlowId})`}
+            />
+            <text
+              x={matrixDotX}
+              y={matrixDotY + 1.2}
+              textAnchor="middle"
+              fontSize="6"
+              fontWeight="600"
+              fill="#0f172a"
+              stroke="#0f172a"
+              strokeWidth="0.6"
+              paintOrder="stroke fill"
+            >
+              +
+            </text>
+          </svg>
+          <div className="absolute bottom-2 left-2 text-[10px] uppercase tracking-[0.2em] text-slate-500">
+            Cautious
+          </div>
+          <div className="absolute bottom-2 right-2 text-[10px] uppercase tracking-[0.2em] text-slate-500">
+            Bold
+          </div>
+          <div className="absolute left-2 top-2 -rotate-90 text-[10px] uppercase tracking-[0.2em] text-slate-500">
+            Tight
+          </div>
+          <div className="absolute right-2 top-2 -rotate-90 text-[10px] uppercase tracking-[0.2em] text-slate-500">
+            Loose
+          </div>
         </div>
-        <div className="absolute bottom-2 right-2 text-[10px] uppercase tracking-[0.2em] text-slate-500">
-          Bold
-        </div>
-        <div className="absolute left-2 top-2 -rotate-90 text-[10px] uppercase tracking-[0.2em] text-slate-500">
-          Tight
-        </div>
-        <div className="absolute right-2 top-2 -rotate-90 text-[10px] uppercase tracking-[0.2em] text-slate-500">
-          Loose
-        </div>
-      </div>
-      <p id="signal-matrix-description" className="mt-4 text-xs text-slate-500">
-        Position is derived from tightness (<span className="tabular-nums">{assessment.scores.tightness}</span>)
-        and market bravery (<span className="tabular-nums">{assessment.scores.riskAppetite}</span>).
-      </p>
+        <figcaption id="signal-matrix-description" className="mt-4 text-xs text-slate-500">
+          Position is derived from tightness (
+          <span className="tabular-nums">{assessment.scores.tightness}</span>) and market bravery (
+          <span className="tabular-nums">{assessment.scores.riskAppetite}</span>).
+        </figcaption>
+      </figure>
     </section>
   );
 };
@@ -806,7 +809,7 @@ export const SensorArray = ({
                   {sensor.isLive ? "Live" : "Offline"}
                 </span>
               </div>
-              <div className="mt-3">
+              <figure className="mt-3">
                 {sparkline ? (
                   <svg
                     viewBox={`0 0 ${SPARKLINE_WIDTH} ${SPARKLINE_HEIGHT}`}
@@ -837,8 +840,10 @@ export const SensorArray = ({
                     aria-hidden="true"
                   />
                 )}
-              </div>
-              <p className="mt-3 text-xs text-slate-400 break-words">{sensor.explanation}</p>
+                <figcaption className="mt-3 text-xs text-slate-400 break-words">
+                  {sensor.explanation}
+                </figcaption>
+              </figure>
               <div className="mt-4 text-xs text-slate-500">
                 <p className="break-words">
                   Source:{" "}
@@ -920,7 +925,7 @@ export const MacroSignalsPanel = ({
                 <p className="mono mt-3 text-2xl text-slate-100">
                   {formatNumber(signal.value, signal.unit)}
                 </p>
-                <div className="mt-3">
+                <figure className="mt-3">
                   {sparkline ? (
                     <svg
                       viewBox={`0 0 ${SPARKLINE_WIDTH} ${SPARKLINE_HEIGHT}`}
@@ -951,8 +956,10 @@ export const MacroSignalsPanel = ({
                       aria-hidden="true"
                     />
                   )}
-                </div>
-                <p className="mt-2 text-xs text-slate-500">{signal.explanation}</p>
+                  <figcaption className="mt-2 text-xs text-slate-500">
+                    {signal.explanation}
+                  </figcaption>
+                </figure>
                 <div className="mt-3 text-xs text-slate-500">
                   <p className="break-words">
                     Source:{" "}
