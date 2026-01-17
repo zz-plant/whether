@@ -5,7 +5,8 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
 import type { RegimeKey } from "../../lib/regimeEngine";
 
@@ -83,9 +84,13 @@ export const TimeMachinePanel = ({
   const [month, setMonth] = useState(selectedMonth);
   const [year, setYear] = useState(selectedYear);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
   const errorId = "time-machine-error";
   const monthRef = useRef<HTMLSelectElement | null>(null);
   const yearRef = useRef<HTMLSelectElement | null>(null);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     setMonth(selectedMonth);
@@ -121,12 +126,19 @@ export const TimeMachinePanel = ({
     value === null ? "—" : `${value.toFixed(2)}%`;
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    if (!isUnavailableSelection) {
+    event.preventDefault();
+    if (isUnavailableSelection) {
+      setErrorMessage("That month is not available for the selected year.");
+      monthRef.current?.focus();
       return;
     }
-    event.preventDefault();
-    setErrorMessage("That month is not available for the selected year.");
-    monthRef.current?.focus();
+    setErrorMessage(null);
+    startTransition(() => {
+      const nextParams = new URLSearchParams(searchParams.toString());
+      nextParams.set("month", String(month));
+      nextParams.set("year", String(year));
+      router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
+    });
   };
 
   const handleMonthBlur = () => {
@@ -147,7 +159,13 @@ export const TimeMachinePanel = ({
   };
 
   const handleYearChange = (value: number) => {
+    const nextAvailableMonths = monthsByYear[value] ?? [];
+    const nextMonth =
+      nextAvailableMonths.length > 0 && !nextAvailableMonths.includes(month)
+        ? nextAvailableMonths[0]
+        : month;
     setYear(value);
+    setMonth(nextMonth);
     setErrorMessage(null);
   };
 
@@ -262,7 +280,7 @@ export const TimeMachinePanel = ({
           </div>
         ) : null}
 
-        <form method="GET" onSubmit={handleSubmit} className="mt-6 grid gap-4 md:grid-cols-[1fr,1fr,auto]">
+        <form onSubmit={handleSubmit} className="mt-6 grid gap-4 md:grid-cols-[1fr,1fr,auto]">
           <label
             htmlFor="time-machine-month"
             className="space-y-2 text-xs uppercase tracking-[0.2em] text-slate-400"
@@ -323,9 +341,14 @@ export const TimeMachinePanel = ({
           </label>
           <button
             type="submit"
-            className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-slate-500 hover:text-slate-100"
+            disabled={isPending}
+            aria-busy={isPending}
+            className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-slate-500 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
           >
-            Load snapshot
+            {isPending ? (
+              <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />
+            ) : null}
+            {isPending ? "Loading" : "Load snapshot"}
           </button>
         </form>
         {errorMessage ? (
