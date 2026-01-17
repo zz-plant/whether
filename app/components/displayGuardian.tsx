@@ -25,6 +25,12 @@ export const DisplayGuardian = ({
   }, [driftPixels]);
 
   useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      document.documentElement.style.setProperty("--display-offset-x", "0px");
+      document.documentElement.style.setProperty("--display-offset-y", "0px");
+      return;
+    }
+
     let driftIndex = 0;
     const driftTimer = window.setInterval(() => {
       driftIndex += 1;
