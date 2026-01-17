@@ -1,0 +1,163 @@
+/**
+ * Shared report shell layout for Whether Report pages.
+ * Keeps header, navigation, and layout consistent across multi-page views.
+ */
+import type { ReactNode } from "react";
+import { DisplayGuardian } from "./displayGuardian";
+
+type ReportPageLink = {
+  href: string;
+  label: string;
+  description: string;
+};
+
+type ReportSectionLink = {
+  href: string;
+  label: string;
+};
+
+export const ReportShell = ({
+  children,
+  statusLabel,
+  recordDateLabel,
+  fetchedAtLabel,
+  treasurySource,
+  pageTitle,
+  pageSummary,
+  pageLinks,
+  sectionLinks,
+  structuredData,
+  historicalBanner,
+}: {
+  children: ReactNode;
+  statusLabel: string;
+  recordDateLabel: string;
+  fetchedAtLabel: string;
+  treasurySource: string;
+  pageTitle: string;
+  pageSummary: string;
+  pageLinks: ReportPageLink[];
+  sectionLinks: ReportSectionLink[];
+  structuredData?: string;
+  historicalBanner?: ReactNode;
+}) => {
+  return (
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="relative min-h-screen overflow-hidden bg-slate-950 text-slate-100"
+    >
+      {structuredData ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: structuredData }}
+        />
+      ) : null}
+      <DisplayGuardian />
+      <div className="pointer-events-none absolute left-1/2 top-0 h-[480px] w-[680px] -translate-x-1/2 rounded-full bg-sky-500/10 blur-[180px]" />
+      <div className="pointer-events-none absolute right-0 top-1/3 h-[520px] w-[520px] rounded-full bg-indigo-500/10 blur-[200px]" />
+      <div className="mx-auto max-w-6xl px-6 py-12 display-drift">
+        <header className="relative flex flex-col gap-6 border-b border-slate-800/70 pb-8">
+          <div className="flex flex-wrap items-start justify-between gap-6">
+            <div className="min-w-0 space-y-4">
+              <p className="type-label text-slate-400">Regime Station</p>
+              <div className="space-y-3">
+                <h1 className="type-headline text-slate-100">Whether Report</h1>
+                <p className="max-w-2xl type-data text-slate-300">
+                  A deep-realist operating brief that translates Treasury signals into constraints you can
+                  execute. Every output is sourced and time-stamped for traceability.
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col items-start gap-3 rounded-3xl border border-slate-800/80 bg-slate-900/60 px-5 py-4 shadow-[0_0_0_1px_rgba(15,23,42,0.6)]">
+              <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">Signal status</p>
+              <span className="rounded-full border border-slate-700 px-4 py-1 text-xs uppercase tracking-[0.2em] text-slate-200">
+                {statusLabel}
+              </span>
+            </div>
+          </div>
+          <div className="rounded-3xl border border-slate-800/70 bg-slate-950/70 px-5 py-4 shadow-[0_0_0_1px_rgba(15,23,42,0.6)]">
+            <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">Report lane</p>
+            <div className="mt-3 space-y-2">
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-100">
+                {pageTitle}
+              </p>
+              <p className="text-sm text-slate-300">{pageSummary}</p>
+            </div>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="rounded-3xl border border-slate-800/70 bg-slate-950/70 px-5 py-4 shadow-[0_0_0_1px_rgba(15,23,42,0.6)]">
+              <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">Record date</p>
+              <p className="mono mt-3 text-sm text-slate-100">{recordDateLabel}</p>
+            </div>
+            <div className="rounded-3xl border border-slate-800/70 bg-slate-950/70 px-5 py-4 shadow-[0_0_0_1px_rgba(15,23,42,0.6)]">
+              <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">Fetched at</p>
+              <p className="mono mt-3 text-sm text-slate-100">{fetchedAtLabel}</p>
+            </div>
+            <div className="rounded-3xl border border-slate-800/70 bg-slate-950/70 px-5 py-4 shadow-[0_0_0_1px_rgba(15,23,42,0.6)]">
+              <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">Source</p>
+              <a
+                href={treasurySource}
+                target="_blank"
+                rel="noreferrer"
+                className="touch-target mt-3 inline-flex min-h-[44px] items-center text-xs text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+              >
+                US Treasury Fiscal Data API
+              </a>
+            </div>
+          </div>
+          <nav aria-label="Report pages" className="space-y-3">
+            <p className="text-[10px] uppercase tracking-[0.3em] text-slate-500">Report lanes</p>
+            <ul className="grid gap-3 md:grid-cols-3">
+              {pageLinks.map((link) => {
+                const isActive = link.label === pageTitle;
+                return (
+                  <li key={link.href}>
+                    <a
+                      href={link.href}
+                      aria-current={isActive ? "page" : undefined}
+                      className={`flex min-h-[88px] flex-col gap-2 rounded-2xl border px-4 py-3 text-left text-xs uppercase tracking-[0.2em] transition-colors ${
+                        isActive
+                          ? "border-sky-400/70 bg-sky-500/10 text-sky-100"
+                          : "border-slate-800/70 bg-slate-950/60 text-slate-300 hover:border-slate-500 hover:text-slate-100"
+                      }`}
+                    >
+                      <span>{link.label}</span>
+                      <span className="text-[11px] normal-case tracking-normal text-slate-300">
+                        {link.description}
+                      </span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+          {sectionLinks.length > 0 ? (
+            <nav aria-label="Report sections" className="space-y-3">
+              <p className="text-[10px] uppercase tracking-[0.3em] text-slate-500">Jump to</p>
+              <ul className="flex flex-wrap gap-3">
+                {sectionLinks.map((item) => (
+                  <li key={item.href}>
+                    <a
+                      href={item.href}
+                      className="inline-flex min-h-[44px] items-center rounded-full border border-slate-800/70 bg-slate-950/60 px-4 py-2 text-[11px] uppercase tracking-[0.25em] text-slate-300 transition-colors hover:border-slate-500 hover:text-slate-100"
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ) : null}
+          {historicalBanner}
+        </header>
+
+        {children}
+
+        <footer className="mt-12 border-t border-slate-800/70 pt-6 text-xs uppercase tracking-[0.3em] text-slate-500">
+          Not Financial Advice.
+        </footer>
+      </div>
+    </main>
+  );
+};

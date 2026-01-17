@@ -356,12 +356,12 @@ export const FirstTimeGuidePanel = ({
           {
             title: "2. Validate the regime drivers",
             detail:
-              "Use the signal matrix and sensor array to see which Treasury levers are tightening or loosening.",
+              "Use the signal matrix here, then hop into the Signals & thresholds lane for the full sensor array.",
           },
           {
             title: "3. Translate into execution moves",
             detail:
-              "Use the playbook and export briefs to brief leadership with plain-English action constraints.",
+              "Use the Operations playbook lane to brief leadership with plain-English action constraints.",
           },
         ].map((step) => (
           <div
@@ -380,9 +380,9 @@ export const FirstTimeGuidePanel = ({
         {[
           { href: "#executive-snapshot", label: "Executive snapshot" },
           { href: "#regime-assessment", label: "Regime assessment" },
-          { href: "#playbook", label: "Playbook" },
-          { href: "#export-briefs", label: "Export briefs" },
-          { href: "#time-machine", label: "Time machine" },
+          { href: "/operations#playbook", label: "Playbook" },
+          { href: "/operations#export-briefs", label: "Export briefs" },
+          { href: "/signals#time-machine", label: "Time machine" },
         ].map((link) => (
           <a
             key={link.href}
