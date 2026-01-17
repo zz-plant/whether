@@ -114,8 +114,11 @@ export const TimeMachinePanel = ({
     monthOptions.find((option) => option.value === month)?.label ?? `Month ${month}`;
   const coverageLabel =
     cacheCoverage.earliest && cacheCoverage.latest
-      ? `${formatDate(cacheCoverage.earliest)} → ${formatDate(cacheCoverage.latest)}`
-      : "No cache loaded";
+      ? {
+          earliest: formatDate(cacheCoverage.earliest),
+          latest: formatDate(cacheCoverage.latest),
+        }
+      : null;
   const latestRecordLabel = formatDate(latestRecordDate);
   const selectedLabel = `${requestedMonthLabel} ${year}`;
   const showHistoricalCallout = isHistorical && historicalSummary;
@@ -389,10 +392,23 @@ export const TimeMachinePanel = ({
           </p>
         ) : null}
         <p className="mt-4 text-xs text-slate-500">
-          Latest available record: <span className="mono text-slate-300">{latestRecordLabel}</span>
+          Latest available record:{" "}
+          <span className="mono text-slate-300">
+            <time dateTime={latestRecordDate}>{latestRecordLabel}</time>
+          </span>
         </p>
         <p className="mt-2 text-xs text-slate-500">
-          Cache coverage: <span className="mono text-slate-300">{coverageLabel}</span>
+          Cache coverage:{" "}
+          <span className="mono text-slate-300">
+            {coverageLabel && cacheCoverage.earliest && cacheCoverage.latest ? (
+              <>
+                <time dateTime={cacheCoverage.earliest}>{coverageLabel.earliest}</time> →{" "}
+                <time dateTime={cacheCoverage.latest}>{coverageLabel.latest}</time>
+              </>
+            ) : (
+              "No cache loaded"
+            )}
+          </span>
         </p>
       </div>
     </section>

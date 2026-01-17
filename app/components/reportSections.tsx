@@ -641,20 +641,35 @@ export const ExecutiveSnapshotPanel = ({
         <div className="mt-5 grid gap-4 md:grid-cols-3">
           <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Data freshness</p>
-            <p className="mono mt-2 text-sm text-slate-100">{treasury.record_date}</p>
-            <p className="mt-2 text-xs text-slate-500">Fetched {formatTimestamp(treasury.fetched_at)}</p>
+            <p className="mono mt-2 text-sm text-slate-100">
+              <time dateTime={treasury.record_date}>{treasury.record_date}</time>
+            </p>
+            <p className="mt-2 text-xs text-slate-500">
+              Fetched{" "}
+              <time dateTime={treasury.fetched_at}>{formatTimestamp(treasury.fetched_at)}</time>
+            </p>
             {isFallback ? (
               <div className="mt-3 rounded-lg border border-amber-400/30 bg-amber-500/10 p-2 text-[11px] text-amber-100">
                 <p className="uppercase tracking-[0.2em] text-amber-200">Offline fallback</p>
                 <p className="mt-2 text-amber-100">{fallbackReason}</p>
                 <p className="mt-2 text-amber-200/80">
                   Snapshot fetched:{" "}
-                  <span className="mono">{formatTimestamp(treasury.fetched_at)}</span>
+                  <span className="mono">
+                    <time dateTime={treasury.fetched_at}>
+                      {formatTimestamp(treasury.fetched_at)}
+                    </time>
+                  </span>
                 </p>
                 <p className="text-amber-200/80">
                   Fallback activated:{" "}
                   <span className="mono">
-                    {treasury.fallback_at ? formatTimestamp(treasury.fallback_at) : "Unknown"}
+                    {treasury.fallback_at ? (
+                      <time dateTime={treasury.fallback_at}>
+                        {formatTimestamp(treasury.fallback_at)}
+                      </time>
+                    ) : (
+                      "Unknown"
+                    )}
                   </span>
                 </p>
               </div>
@@ -845,8 +860,14 @@ export const SensorArray = ({
                     Method notes
                   </a>
                 </p>
-                <p>Record date: {formatDate(sensor.record_date)}</p>
-                <p>Fetched: {formatTimestamp(sensor.fetched_at)}</p>
+                <p>
+                  Record date:{" "}
+                  <time dateTime={sensor.record_date}>{formatDate(sensor.record_date)}</time>
+                </p>
+                <p>
+                  Fetched:{" "}
+                  <time dateTime={sensor.fetched_at}>{formatTimestamp(sensor.fetched_at)}</time>
+                </p>
               </div>
             </div>
           );
@@ -953,8 +974,14 @@ export const MacroSignalsPanel = ({
                       Method notes
                     </a>
                   </p>
-                  <p>Record date: {formatDate(signal.record_date)}</p>
-                  <p>Fetched: {formatTimestamp(signal.fetched_at)}</p>
+                  <p>
+                    Record date:{" "}
+                    <time dateTime={signal.record_date}>{formatDate(signal.record_date)}</time>
+                  </p>
+                  <p>
+                    Fetched:{" "}
+                    <time dateTime={signal.fetched_at}>{formatTimestamp(signal.fetched_at)}</time>
+                  </p>
                 </div>
               </div>
             );
