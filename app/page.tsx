@@ -14,20 +14,25 @@ import {
   parseTimeMachineRequest,
   resolveTimeMachineSelection,
 } from "../lib/timeMachineSelection";
+import { macroSeries } from "../lib/macroSnapshot";
+import { parseThresholdsFromSearchParams } from "../lib/thresholds";
 import { DecisionShieldPanel } from "./components/decisionShieldPanel";
 import { DisplayGuardian } from "./components/displayGuardian";
 import {
   DataSourcePanel,
+  MacroSignalsPanel,
   ExecutiveSnapshotPanel,
   HistoricalBanner,
   LiveTickerPanel,
+  OperatorRequestsPanel,
   PlaybookPanel,
   RegimeAssessmentCard,
   ScoreReadoutPanel,
   SensorArray,
   SignalMatrixPanel,
-  OperatorRequestsPanel,
 } from "./components/reportSections";
+import { ExportBriefPanel } from "./components/exportBriefPanel";
+import { ThresholdsPanel } from "./components/thresholdsPanel";
 import { TimeMachinePanel } from "./components/timeMachinePanel";
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
@@ -114,7 +119,7 @@ export const generateMetadata = ({
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams?: { month?: string; year?: string };
+  searchParams?: { month?: string; year?: string; [key: string]: string | undefined };
 }) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://whether.report";
   const structuredData = {
@@ -147,11 +152,12 @@ export default async function HomePage({
   const invalidHistoricalSelection = Boolean(requestedSelection && !historicalSelection);
   const selectedMonth = requestedSelection?.month ?? defaultMonth;
   const selectedYear = requestedSelection?.year ?? defaultYear;
+  const thresholds = parseThresholdsFromSearchParams(searchParams);
   const treasury = await treasuryPromise;
   const recordDateLabel = formatDateValue(treasury.record_date);
   const fetchedAtLabel = formatTimestampValue(treasury.fetched_at);
   const sensors = buildSensorReadings(treasury);
-  const assessment = evaluateRegime(treasury);
+  const assessment = evaluateRegime(treasury, thresholds);
   const { playbook, startItems, stopItems } = getPlaybookGuidance(assessment.regime);
   const fenceItems = assessment.constraints;
   const statusLabel = historicalSelection
@@ -223,8 +229,11 @@ export default async function HomePage({
                 { href: "#signal-matrix", label: "Signal matrix" },
                 { href: "#data-source", label: "Data source" },
                 { href: "#sensor-array", label: "Sensor array" },
+                { href: "#macro-signals", label: "Macro signals" },
+                { href: "#thresholds", label: "Thresholds" },
                 { href: "#playbook", label: "Playbook" },
                 { href: "#decision-shield", label: "Decision shield" },
+                { href: "#export-briefs", label: "Export briefs" },
                 { href: "#time-machine", label: "Time machine" },
                 { href: "#operator-requests", label: "Operator requests" },
               ].map((item) => (
@@ -259,6 +268,10 @@ export default async function HomePage({
 
         <SensorArray sensors={sensors} />
 
+        <MacroSignalsPanel series={macroSeries} />
+
+        <ThresholdsPanel currentThresholds={assessment.thresholds} />
+
         <PlaybookPanel
           playbook={playbook}
           stopItems={stopItems}
@@ -267,6 +280,13 @@ export default async function HomePage({
         />
 
         <DecisionShieldPanel assessment={assessment} />
+
+        <ExportBriefPanel
+          assessment={assessment}
+          treasury={treasury}
+          sensors={sensors}
+          macroSeries={macroSeries}
+        />
 
         <TimeMachinePanel
           selectedYear={selectedYear}

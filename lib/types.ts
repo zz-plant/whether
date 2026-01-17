@@ -28,7 +28,25 @@ export interface SensorReading {
   value: number | null;
   unit: "%" | "bps";
   explanation: string;
-  source: string;
+  sourceLabel: string;
+  sourceUrl: string;
+  formulaUrl: string;
+  record_date: string;
+  fetched_at: string;
+  isLive: boolean;
+}
+
+export type MacroSeriesId = "CPI_YOY" | "UNEMPLOYMENT_RATE" | "BBB_CREDIT_SPREAD";
+
+export interface MacroSeriesReading {
+  id: MacroSeriesId;
+  label: string;
+  value: number | null;
+  unit: "%" | "bps";
+  explanation: string;
+  sourceLabel: string;
+  sourceUrl: string;
+  formulaUrl: string;
   record_date: string;
   fetched_at: string;
   isLive: boolean;

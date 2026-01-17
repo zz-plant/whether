@@ -22,6 +22,7 @@ export interface RegimeAssessment {
   tightnessExplanation: string;
   riskAppetiteExplanation: string;
   dataWarnings: string[];
+  thresholds: RegimeThresholds;
 }
 
 export const BASE_RATE_TIGHTNESS_THRESHOLD = 5;
@@ -33,6 +34,18 @@ export const RISK_APPETITE_MAX_SLOPE = 1.5;
 export const TIGHTNESS_REGIME_THRESHOLD = 70;
 export const RISK_APPETITE_REGIME_THRESHOLD = 50;
 export const REGIME_REVERSAL_DAYS = 30;
+
+export interface RegimeThresholds {
+  baseRateTightness: number;
+  tightnessRegime: number;
+  riskAppetiteRegime: number;
+}
+
+export const DEFAULT_THRESHOLDS: RegimeThresholds = {
+  baseRateTightness: BASE_RATE_TIGHTNESS_THRESHOLD,
+  tightnessRegime: TIGHTNESS_REGIME_THRESHOLD,
+  riskAppetiteRegime: RISK_APPETITE_REGIME_THRESHOLD,
+};
 
 const REGIME_PROFILES: Record<RegimeKey, { description: string; constraints: string[] }> = {
   SCARCITY: {
@@ -69,8 +82,8 @@ const REGIME_PROFILES: Record<RegimeKey, { description: string; constraints: str
   },
 };
 
-const TIGHTNESS_EXPLANATION =
-  `Tightness score: base rate > ${BASE_RATE_TIGHTNESS_THRESHOLD}% adds ${TIGHTNESS_BASE_RATE_POINTS} points. ` +
+const buildTightnessExplanation = (thresholds: RegimeThresholds) =>
+  `Tightness score: base rate > ${thresholds.baseRateTightness}% adds ${TIGHTNESS_BASE_RATE_POINTS} points. ` +
   `Inverted curve adds ${TIGHTNESS_INVERSION_POINTS} points. Score is capped at ${TIGHTNESS_CAP}.`;
 
 const RISK_APPETITE_EXPLANATION =
@@ -100,10 +113,24 @@ export const computeCurveSlope = (yields: TreasuryYields): number | null => {
   return tenYear - twoYear;
 };
 
-export const computeTightnessScore = (baseRate: number, curveSlope: number) => {
+export const resolveThresholds = (
+  overrides?: Partial<RegimeThresholds>
+): RegimeThresholds => {
+  return {
+    baseRateTightness: overrides?.baseRateTightness ?? DEFAULT_THRESHOLDS.baseRateTightness,
+    tightnessRegime: overrides?.tightnessRegime ?? DEFAULT_THRESHOLDS.tightnessRegime,
+    riskAppetiteRegime: overrides?.riskAppetiteRegime ?? DEFAULT_THRESHOLDS.riskAppetiteRegime,
+  };
+};
+
+export const computeTightnessScore = (
+  baseRate: number,
+  curveSlope: number,
+  baseRateThreshold: number
+) => {
   let score = 0;
 
-  if (baseRate > BASE_RATE_TIGHTNESS_THRESHOLD) {
+  if (baseRate > baseRateThreshold) {
     score += TIGHTNESS_BASE_RATE_POINTS;
   }
 
@@ -120,24 +147,32 @@ export const computeRiskAppetiteScore = (curveSlope: number) => {
   return clamp(Math.round(normalized * 100), 0, 100);
 };
 
-export const classifyRegime = (tightness: number, riskAppetite: number): RegimeKey => {
-  if (tightness > TIGHTNESS_REGIME_THRESHOLD && riskAppetite < RISK_APPETITE_REGIME_THRESHOLD) {
+export const classifyRegime = (
+  tightness: number,
+  riskAppetite: number,
+  thresholds: RegimeThresholds
+): RegimeKey => {
+  if (tightness > thresholds.tightnessRegime && riskAppetite < thresholds.riskAppetiteRegime) {
     return "SCARCITY";
   }
-  if (tightness > TIGHTNESS_REGIME_THRESHOLD && riskAppetite > RISK_APPETITE_REGIME_THRESHOLD) {
+  if (tightness > thresholds.tightnessRegime && riskAppetite > thresholds.riskAppetiteRegime) {
     return "DEFENSIVE";
   }
-  if (tightness < TIGHTNESS_REGIME_THRESHOLD && riskAppetite < RISK_APPETITE_REGIME_THRESHOLD) {
+  if (tightness < thresholds.tightnessRegime && riskAppetite < thresholds.riskAppetiteRegime) {
     return "VOLATILE";
   }
   return "EXPANSION";
 };
 
-export const evaluateRegime = (treasury: TreasuryData): RegimeAssessment => {
+export const evaluateRegime = (
+  treasury: TreasuryData,
+  overrides?: Partial<RegimeThresholds>
+): RegimeAssessment => {
   const dataWarnings: string[] = [];
   const baseRate = getBaseRate(treasury.yields);
   const curveSlope = computeCurveSlope(treasury.yields);
   const curveSlopeForScore = curveSlope ?? 0;
+  const thresholds = resolveThresholds(overrides);
 
   if (baseRate.used === "MISSING") {
     dataWarnings.push("Base rate missing; defaulted to 0% for scoring.");
@@ -146,9 +181,13 @@ export const evaluateRegime = (treasury: TreasuryData): RegimeAssessment => {
     dataWarnings.push("Curve slope missing; defaulted to 0% for scoring.");
   }
 
-  const tightness = computeTightnessScore(baseRate.value, curveSlopeForScore);
+  const tightness = computeTightnessScore(
+    baseRate.value,
+    curveSlopeForScore,
+    thresholds.baseRateTightness
+  );
   const riskAppetite = computeRiskAppetiteScore(curveSlopeForScore);
-  const regime = classifyRegime(tightness, riskAppetite);
+  const regime = classifyRegime(tightness, riskAppetite, thresholds);
   const profile = REGIME_PROFILES[regime];
 
   return {
@@ -162,8 +201,9 @@ export const evaluateRegime = (treasury: TreasuryData): RegimeAssessment => {
     },
     description: profile.description,
     constraints: profile.constraints,
-    tightnessExplanation: TIGHTNESS_EXPLANATION,
+    tightnessExplanation: buildTightnessExplanation(thresholds),
     riskAppetiteExplanation: RISK_APPETITE_EXPLANATION,
     dataWarnings,
+    thresholds,
   };
 };

@@ -3,12 +3,7 @@
  * Produces shareable, plain-English guidance tied to sensor conditions.
  */
 import type { RegimeAssessment, RegimeKey } from "./regimeEngine";
-import {
-  BASE_RATE_TIGHTNESS_THRESHOLD,
-  REGIME_REVERSAL_DAYS,
-  RISK_APPETITE_REGIME_THRESHOLD,
-  TIGHTNESS_REGIME_THRESHOLD,
-} from "./regimeEngine";
+import { REGIME_REVERSAL_DAYS } from "./regimeEngine";
 
 export type LifecycleStage = "DISCOVERY" | "GROWTH" | "SCALE" | "MATURE";
 export type DecisionCategory =
@@ -141,13 +136,14 @@ export const formatDecisionAction = (action: DecisionAction) => ACTION_LABELS[ac
 const buildSensorBullets = (assessment: RegimeAssessment): string[] => {
   const bullets: string[] = [];
   const { baseRate, curveSlope, tightness, riskAppetite } = assessment.scores;
+  const { baseRateTightness } = assessment.thresholds;
 
-  if (baseRate > BASE_RATE_TIGHTNESS_THRESHOLD) {
+  if (baseRate > baseRateTightness) {
     bullets.push(
-      `Base rates are above ${BASE_RATE_TIGHTNESS_THRESHOLD}%, making capital meaningfully expensive.`
+      `Base rates are above ${baseRateTightness}%, making capital meaningfully expensive.`
     );
   } else {
-    bullets.push(`Base rates are below ${BASE_RATE_TIGHTNESS_THRESHOLD}%, keeping capital costs moderate.`);
+    bullets.push(`Base rates are below ${baseRateTightness}%, keeping capital costs moderate.`);
   }
 
   if (curveSlope === null) {
@@ -166,7 +162,7 @@ const buildSensorBullets = (assessment: RegimeAssessment): string[] => {
 };
 
 const buildReversalTrigger = (assessment: RegimeAssessment) => {
-  return `Revisit when tightness drops below ${TIGHTNESS_REGIME_THRESHOLD} and risk appetite rises above ${RISK_APPETITE_REGIME_THRESHOLD} for ${REGIME_REVERSAL_DAYS} consecutive days (current: ${assessment.scores.tightness}/${assessment.scores.riskAppetite}).`;
+  return `Revisit when tightness drops below ${assessment.thresholds.tightnessRegime} and risk appetite rises above ${assessment.thresholds.riskAppetiteRegime} for ${REGIME_REVERSAL_DAYS} consecutive days (current: ${assessment.scores.tightness}/${assessment.scores.riskAppetite}).`;
 };
 
 export const evaluateDecision = (
