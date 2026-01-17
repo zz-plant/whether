@@ -168,7 +168,7 @@ export const RegimeAssessmentCard = ({
     <section
       id="regime-assessment"
       aria-labelledby="regime-assessment-title"
-      className="relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/40 p-6"
+      className="relative overflow-hidden weather-panel p-6"
     >
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br opacity-80 blur-2xl" />
       <div className={`absolute inset-0 bg-gradient-to-br ${regimeAccent.panel} opacity-40`} />
@@ -183,11 +183,11 @@ export const RegimeAssessmentCard = ({
           </p>
         </div>
         <div className="flex flex-col items-end gap-3 text-xs uppercase tracking-[0.2em] text-slate-300">
-          <span className="flex items-center gap-2 rounded-full border border-slate-700 px-3 py-1">
+          <span className="weather-pill flex items-center gap-2 px-3 py-1">
             <span className={`h-2 w-2 rounded-full ${regimeAccent.dot}`} />
             Regime status
           </span>
-          <span className="rounded-full border border-slate-700 px-3 py-1">
+          <span className="weather-pill px-3 py-1">
             Tightness{" "}
             <span className="tabular-nums">{assessment.scores.tightness}</span> · Risk{" "}
             <span className="tabular-nums">{assessment.scores.riskAppetite}</span>
@@ -198,7 +198,7 @@ export const RegimeAssessmentCard = ({
         </div>
       </div>
       <p className="relative mt-4 type-data text-slate-200 break-words">{assessment.description}</p>
-      <div className="relative mt-4 grid gap-3 rounded-xl border border-slate-800 bg-slate-950/60 p-4 text-xs text-slate-400 md:grid-cols-3">
+      <div className="weather-surface relative mt-4 grid gap-3 p-4 text-xs text-slate-400 md:grid-cols-3">
         <div>
           <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">Constraints</p>
           <p className="mt-2 text-lg font-semibold text-slate-100 tabular-nums">{constraintCount}</p>
@@ -224,7 +224,7 @@ export const RegimeAssessmentCard = ({
           </li>
         ))}
       </ul>
-      <div className="relative mt-6 grid gap-4 rounded-xl border border-slate-800 bg-slate-950/60 p-4 text-xs text-slate-400 md:grid-cols-2">
+      <div className="weather-surface relative mt-6 grid gap-4 p-4 text-xs text-slate-400 md:grid-cols-2">
         <div className="space-y-3">
           <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.2em] text-slate-500">
             <span>Capital tightness</span>
@@ -326,7 +326,7 @@ export const FirstTimeGuidePanel = ({
   fetchedAtLabel: string;
 }) => (
   <section id="first-time-guide" aria-labelledby="first-time-guide-title" className="mt-10">
-    <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+    <div className="weather-panel p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="type-label text-slate-400">First-time operator guide</p>
@@ -338,7 +338,7 @@ export const FirstTimeGuidePanel = ({
             here to ground decisions before you dive into the data.
           </p>
         </div>
-        <div className="rounded-xl border border-slate-800/70 bg-slate-950/60 px-4 py-3 text-xs uppercase tracking-[0.2em] text-slate-300">
+        <div className="weather-surface px-4 py-3 text-xs uppercase tracking-[0.2em] text-slate-300">
           <p className="text-[10px] text-slate-500">Current snapshot</p>
           <p className="mt-2 text-[11px] text-slate-200">Status: {statusLabel}</p>
           <p className="mt-1 text-[11px] text-slate-400">Record: {recordDateLabel}</p>
@@ -366,7 +366,7 @@ export const FirstTimeGuidePanel = ({
         ].map((step) => (
           <div
             key={step.title}
-            className="rounded-xl border border-slate-800/70 bg-slate-950/60 p-4 text-sm text-slate-300"
+            className="weather-surface p-4 text-sm text-slate-300"
           >
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-200">
               {step.title}
@@ -387,7 +387,7 @@ export const FirstTimeGuidePanel = ({
           <a
             key={link.href}
             href={link.href}
-            className="inline-flex min-h-[44px] items-center rounded-full border border-slate-800/70 bg-slate-950/60 px-4 py-2 text-[11px] uppercase tracking-[0.25em] text-slate-300 transition-colors hover:border-slate-500 hover:text-slate-100"
+            className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-[11px] uppercase tracking-[0.25em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100"
           >
             {link.label}
           </a>
@@ -405,7 +405,7 @@ export const OperatorRequestsPanel = ({ provenance }: { provenance: DataProvenan
   <section
     id="operator-requests"
     aria-labelledby="operator-requests-title"
-    className="mt-10 rounded-2xl border border-slate-800 bg-slate-900/40 p-6"
+    className="mt-10 weather-panel p-6"
   >
     <div className="flex flex-wrap items-center justify-between gap-4">
       <div>
@@ -425,11 +425,11 @@ export const OperatorRequestsPanel = ({ provenance }: { provenance: DataProvenan
       {operatorRequests.map((request) => (
         <div
           key={request.title}
-          className="rounded-2xl border border-slate-800/80 bg-slate-950/60 px-4 py-4 shadow-[0_0_0_1px_rgba(15,23,42,0.4)]"
+          className="weather-surface rounded-2xl px-4 py-4"
         >
           <div className="flex items-center justify-between gap-3">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{request.title}</p>
-            <span className="rounded-full border border-slate-700 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-400">
+            <span className="weather-pill px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-400">
               {request.status === "DELIVERED" ? "Delivered" : "Backlog"}
             </span>
           </div>
@@ -444,7 +444,7 @@ export const CxoFunctionPanel = ({ provenance }: { provenance: DataProvenance })
   <section
     id="cxo-functions"
     aria-labelledby="cxo-functions-title"
-    className="mt-10 rounded-2xl border border-slate-800 bg-slate-900/40 p-6"
+    className="mt-10 weather-panel p-6"
   >
     <div className="flex flex-wrap items-center justify-between gap-4">
       <div>
@@ -463,7 +463,7 @@ export const CxoFunctionPanel = ({ provenance }: { provenance: DataProvenance })
       {cxoFunctionOutputs.map((item) => (
         <div
           key={item.role}
-          className="rounded-2xl border border-slate-800/80 bg-slate-950/60 px-5 py-4 shadow-[0_0_0_1px_rgba(15,23,42,0.4)]"
+          className="weather-surface rounded-2xl px-5 py-4"
         >
           <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{item.role}</p>
           <p className="mt-3 text-sm text-slate-200">{item.focus}</p>
@@ -500,7 +500,7 @@ export const SignalMatrixPanel = ({
       id="signal-matrix"
       aria-labelledby="signal-matrix-title"
       aria-describedby="signal-matrix-description"
-      className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6"
+      className="weather-panel p-6"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <h3
@@ -515,7 +515,7 @@ export const SignalMatrixPanel = ({
         </div>
       </div>
       <figure className="mt-6">
-        <div className="relative h-56 rounded-xl border border-slate-800 bg-slate-950/60">
+        <div className="weather-surface relative h-56">
           <svg
             className="absolute inset-0 h-full w-full"
             viewBox="0 0 100 100"
@@ -645,7 +645,7 @@ export const ExecutiveSnapshotPanel = ({
 
   return (
     <section id="executive-snapshot" aria-labelledby="executive-snapshot-title" className="mt-8">
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+      <div className="weather-panel p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="type-label text-slate-400">Executive snapshot</p>
@@ -656,7 +656,7 @@ export const ExecutiveSnapshotPanel = ({
           <DataProvenanceStrip provenance={provenance} />
         </div>
         <div className="mt-5 grid gap-4 md:grid-cols-3">
-          <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+          <div className="weather-surface p-4">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Data freshness</p>
             <p className="mono mt-2 text-sm text-slate-100">
               <time dateTime={treasury.record_date}>{treasury.record_date}</time>
@@ -692,7 +692,7 @@ export const ExecutiveSnapshotPanel = ({
               </div>
             ) : null}
           </div>
-          <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+          <div className="weather-surface p-4">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Rate baseline</p>
             <p className="mono mt-2 text-sm text-slate-100">
               {formatNumber(assessment.scores.baseRate, "%")}
@@ -701,7 +701,7 @@ export const ExecutiveSnapshotPanel = ({
               Using {assessment.scores.baseRateUsed} for policy anchor
             </p>
           </div>
-          <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+          <div className="weather-surface p-4">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Yield curve</p>
             <div className="mt-3 space-y-2 text-xs text-slate-300">
               <div className="flex items-center justify-between">
@@ -810,7 +810,7 @@ export const SensorArray = ({
           return (
             <div
               key={sensor.id}
-              className="rounded-2xl border border-slate-800 bg-slate-900/40 p-5"
+              className="weather-panel rounded-2xl p-5"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
@@ -819,7 +819,7 @@ export const SensorArray = ({
                     {formatNumber(sensor.value, sensor.unit)}
                   </p>
                 </div>
-                <span className="rounded-full border border-slate-700 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-400">
+                <span className="weather-pill px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-400">
                   {sensor.isLive ? "Live" : "Offline"}
                 </span>
               </div>
@@ -850,7 +850,7 @@ export const SensorArray = ({
                   </svg>
                 ) : (
                   <div
-                    className="h-8 rounded-md border border-slate-800/80 bg-slate-950/80"
+                    className="h-8 rounded-md border border-sky-900/40 bg-slate-950/80"
                     aria-hidden="true"
                   />
                 )}
@@ -907,7 +907,7 @@ export const MacroSignalsPanel = ({
 
   return (
     <section id="macro-signals" aria-labelledby="macro-signals-title" className="mt-10">
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+      <div className="weather-panel p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="type-label text-slate-400">Macro signals</p>
@@ -919,7 +919,7 @@ export const MacroSignalsPanel = ({
             </p>
           </div>
           <div className="flex flex-col items-end gap-2">
-            <span className="rounded-full border border-slate-700 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-300">
+            <span className="weather-pill px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-300">
               {isLive ? "Live" : "Snapshot"}
             </span>
             <DataProvenanceStrip provenance={provenance} />
@@ -933,7 +933,7 @@ export const MacroSignalsPanel = ({
             return (
               <div
                 key={signal.id}
-                className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4 shadow-[0_0_0_1px_rgba(15,23,42,0.4)]"
+                className="weather-surface rounded-2xl p-4"
               >
                 <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{signal.label}</p>
                 <p className="mono mt-3 text-2xl text-slate-100">
@@ -966,7 +966,7 @@ export const MacroSignalsPanel = ({
                     </svg>
                   ) : (
                     <div
-                      className="h-8 rounded-md border border-slate-800/80 bg-slate-950/80"
+                      className="h-8 rounded-md border border-sky-900/40 bg-slate-950/80"
                       aria-hidden="true"
                     />
                   )}
@@ -1028,7 +1028,7 @@ export const PlaybookPanel = ({
 }) => {
   return (
     <section id="playbook" aria-labelledby="playbook-title" className="mt-10">
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+      <div className="weather-panel p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="type-label text-slate-400">Playbook</p>
@@ -1055,7 +1055,7 @@ export const PlaybookPanel = ({
           </div>
         </div>
         <div className="mt-6 grid gap-4 lg:grid-cols-3">
-          <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+          <div className="weather-surface p-4">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Stop</p>
             <ul className="mt-3 space-y-2 text-sm text-slate-300">
               {stopItems.map((item) => (
@@ -1065,7 +1065,7 @@ export const PlaybookPanel = ({
               ))}
             </ul>
           </div>
-          <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+          <div className="weather-surface p-4">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Start</p>
             <ul className="mt-3 space-y-2 text-sm text-slate-300">
               {startItems.map((item) => (
@@ -1075,7 +1075,7 @@ export const PlaybookPanel = ({
               ))}
             </ul>
           </div>
-          <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+          <div className="weather-surface p-4">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Fence</p>
             <ul className="mt-3 space-y-2 text-sm text-slate-300">
               {fenceItems.map((item) => (
@@ -1087,7 +1087,7 @@ export const PlaybookPanel = ({
           </div>
         </div>
         {playbook ? (
-          <div className="mt-6 rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+          <div className="weather-surface mt-6 p-4">
             <details open>
               <summary className="min-h-[44px] cursor-pointer text-xs uppercase tracking-[0.2em] text-slate-400 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300">
                 Leadership signals (phrases to use or avoid)

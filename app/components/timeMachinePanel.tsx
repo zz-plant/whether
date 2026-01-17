@@ -199,7 +199,7 @@ export const TimeMachinePanel = ({
 
   return (
     <section id="time-machine" aria-labelledby="time-machine-title" className="mt-10">
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+      <div className="weather-panel p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="type-label text-slate-400">Time Machine</p>
@@ -215,7 +215,7 @@ export const TimeMachinePanel = ({
             {isHistorical ? (
               <a
                 href="/"
-                className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-slate-500 hover:text-slate-100 touch-manipulation"
+                className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
               >
                 Exit historical view
               </a>
@@ -225,7 +225,7 @@ export const TimeMachinePanel = ({
         </div>
 
         <div className="mt-6 grid gap-4 lg:grid-cols-[1.2fr,1fr]">
-          <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+          <div className="weather-surface p-4">
             <p className="type-label text-slate-400">Historical mode</p>
             <p className="mt-3 type-data text-slate-300">
               You are replaying the macro regime from{" "}
@@ -233,7 +233,7 @@ export const TimeMachinePanel = ({
               constraints as if those market conditions were active today.
             </p>
             {showHistoricalCallout ? (
-              <div className="mt-4 rounded-lg border border-slate-700/70 bg-slate-950/80 p-3">
+              <div className="weather-surface mt-4 rounded-lg p-3">
                 <p className="type-label text-slate-400">
                   Operational implication · {historicalRegime?.toLowerCase()}
                 </p>
@@ -241,7 +241,7 @@ export const TimeMachinePanel = ({
               </div>
             ) : null}
           </div>
-          <div className="rounded-xl border border-slate-700 bg-slate-950/70 p-4">
+          <div className="weather-surface p-4">
             <p className="type-label text-slate-400">Snapshot</p>
             <p className="mt-3 text-lg font-semibold text-slate-100">{selectedLabel}</p>
             <p className="mt-2 text-xs text-slate-500">Highlights the month loaded into the report.</p>
@@ -249,7 +249,7 @@ export const TimeMachinePanel = ({
         </div>
 
         {showComparison && comparison ? (
-          <div className="mt-4 rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+          <div className="weather-surface mt-4 p-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="type-label text-slate-400">Then vs now</p>
               <p className="text-xs text-slate-500">
@@ -258,14 +258,14 @@ export const TimeMachinePanel = ({
               </p>
             </div>
             <div className="mt-3 grid gap-3 md:grid-cols-2">
-              <div className="rounded-lg border border-slate-800 bg-slate-950/80 p-3">
+              <div className="weather-surface rounded-lg p-3">
                 <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Regime</p>
                 <p className="mt-2 text-sm text-slate-100">
                   {comparison.then.regime.toLowerCase()} →{" "}
                   {comparison.now.regime.toLowerCase()}
                 </p>
               </div>
-              <div className="rounded-lg border border-slate-800 bg-slate-950/80 p-3">
+              <div className="weather-surface rounded-lg p-3">
                 <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Base rate</p>
                 <p className="mt-2 text-sm text-slate-100">
                   {formatPercent(comparison.then.baseRate)} →{" "}
@@ -278,7 +278,7 @@ export const TimeMachinePanel = ({
                   )
                 </p>
               </div>
-              <div className="rounded-lg border border-slate-800 bg-slate-950/80 p-3">
+              <div className="weather-surface rounded-lg p-3">
                 <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Curve slope</p>
                 <p className="mt-2 text-sm text-slate-100">
                   {formatCurve(comparison.then.curveSlope)} →{" "}
@@ -288,7 +288,7 @@ export const TimeMachinePanel = ({
                     : ""}
                 </p>
               </div>
-              <div className="rounded-lg border border-slate-800 bg-slate-950/80 p-3">
+              <div className="weather-surface rounded-lg p-3">
                 <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
                   Tightness vs risk
                 </p>
@@ -326,14 +326,14 @@ export const TimeMachinePanel = ({
               onBlur={handleMonthBlur}
               aria-invalid={isInvalid}
               aria-describedby={isInvalid ? errorId : undefined}
-              className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100 transition-colors hover:border-slate-700 touch-manipulation"
+              className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
             />
           </label>
           <button
             type="submit"
             disabled={isPending}
             aria-busy={isPending}
-            className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-slate-500 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+            className="weather-button inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
           >
             {isPending ? (
               <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />

@@ -209,7 +209,7 @@ export const ThresholdsPanel = ({
 
   return (
     <section id="thresholds" aria-labelledby="thresholds-title" className="mt-10">
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+      <div className="weather-panel p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="type-label text-slate-400">Regime thresholds</p>
@@ -249,7 +249,7 @@ export const ThresholdsPanel = ({
               onBlur={() => handleBlur("baseRateTightness")}
               aria-invalid={Boolean(errors.baseRateTightness)}
               aria-describedby={errors.baseRateTightness ? errorIds.baseRateTightness : undefined}
-              className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100"
+              className="weather-input min-h-[44px] w-full px-3 py-2 text-base"
             />
             <span className="min-h-[18px] text-[11px] text-amber-200">
               {errors.baseRateTightness ? (
@@ -276,7 +276,7 @@ export const ThresholdsPanel = ({
               onBlur={() => handleBlur("tightnessRegime")}
               aria-invalid={Boolean(errors.tightnessRegime)}
               aria-describedby={errors.tightnessRegime ? errorIds.tightnessRegime : undefined}
-              className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100"
+              className="weather-input min-h-[44px] w-full px-3 py-2 text-base"
             />
             <span className="min-h-[18px] text-[11px] text-amber-200">
               {errors.tightnessRegime ? (
@@ -303,7 +303,7 @@ export const ThresholdsPanel = ({
               onBlur={() => handleBlur("riskAppetiteRegime")}
               aria-invalid={Boolean(errors.riskAppetiteRegime)}
               aria-describedby={errors.riskAppetiteRegime ? errorIds.riskAppetiteRegime : undefined}
-              className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100"
+              className="weather-input min-h-[44px] w-full px-3 py-2 text-base"
             />
             <span className="min-h-[18px] text-[11px] text-amber-200">
               {errors.riskAppetiteRegime ? (
@@ -316,7 +316,7 @@ export const ThresholdsPanel = ({
               type="submit"
               disabled={isPending}
               aria-busy={isPending}
-              className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-slate-500 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
+              className="weather-button inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
             >
               {isPending ? (
                 <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />
@@ -328,7 +328,7 @@ export const ThresholdsPanel = ({
               onClick={handleReset}
               disabled={isPending}
               aria-busy={isPending}
-              className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-slate-800 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-400 transition-colors hover:border-slate-600 hover:text-slate-200 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
+              className="weather-button inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-400 transition-colors hover:border-sky-300/70 hover:text-slate-200 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
             >
               {isPending ? (
                 <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />
@@ -339,7 +339,7 @@ export const ThresholdsPanel = ({
         </form>
 
         <div className="mt-6 grid gap-4 lg:grid-cols-[1.2fr,1fr]">
-          <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+          <div className="weather-surface p-4">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Applied thresholds</p>
             <div className="mt-3 space-y-2 text-sm text-slate-300">
               <p>
@@ -356,7 +356,7 @@ export const ThresholdsPanel = ({
               </p>
             </div>
           </div>
-          <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+          <div className="weather-surface p-4">
             <details open>
               <summary className="min-h-[44px] cursor-pointer text-xs uppercase tracking-[0.2em] text-slate-400 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300">
                 Audit trail (recent overrides)

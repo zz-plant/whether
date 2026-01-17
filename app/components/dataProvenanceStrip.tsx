@@ -24,7 +24,7 @@ export const DataProvenanceStrip = ({
   const statusStyle = statusStyles[provenance.statusLabel as keyof typeof statusStyles];
 
   return (
-    <div className="flex flex-wrap items-center gap-3 rounded-full border border-slate-800/80 bg-slate-950/60 px-3 py-2 text-[10px] uppercase tracking-[0.25em] text-slate-400">
+    <div className="weather-pill flex flex-wrap items-center gap-3 px-3 py-2 text-[10px] uppercase tracking-[0.25em] text-slate-400">
       <span className="text-slate-500">{label}</span>
       <span className="h-1 w-1 rounded-full bg-slate-700" aria-hidden="true" />
       <span>
