@@ -4,7 +4,8 @@
  */
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   evaluateDecision,
   type DecisionAction,
@@ -69,6 +70,11 @@ const buildShareText = (
   return lines.join("\n");
 };
 
+const parseParam = <T extends string>(
+  value: string | null,
+  options: { value: T; label: string }[]
+): T | null => options.find((option) => option.value === value)?.value ?? null;
+
 export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessment }) => {
   const [lifecycle, setLifecycle] = useState<LifecycleStage>("GROWTH");
   const [category, setCategory] = useState<DecisionCategory>("HIRING");
@@ -77,6 +83,24 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
   const [isCopying, setIsCopying] = useState(false);
   const [copyError, setCopyError] = useState(false);
   const storageKey = "whether.decisionShield";
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const restoredFromStorage = useRef(false);
+
+  const urlLifecycle = useMemo(
+    () => parseParam(searchParams.get("lifecycle"), lifecycleOptions),
+    [searchParams]
+  );
+  const urlCategory = useMemo(
+    () => parseParam(searchParams.get("category"), categoryOptions),
+    [searchParams]
+  );
+  const urlAction = useMemo(
+    () => parseParam(searchParams.get("action"), actionOptions),
+    [searchParams]
+  );
+  const hasUrlSelection = Boolean(urlLifecycle || urlCategory || urlAction);
 
   const output = useMemo(
     () => evaluateDecision(assessment, { lifecycle, category, action }),
@@ -88,6 +112,22 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
   );
 
   useEffect(() => {
+    if (hasUrlSelection) {
+      if (urlLifecycle && urlLifecycle !== lifecycle) {
+        setLifecycle(urlLifecycle);
+      }
+      if (urlCategory && urlCategory !== category) {
+        setCategory(urlCategory);
+      }
+      if (urlAction && urlAction !== action) {
+        setAction(urlAction);
+      }
+      return;
+    }
+    if (restoredFromStorage.current) {
+      return;
+    }
+    restoredFromStorage.current = true;
     const stored = window.localStorage.getItem(storageKey);
     if (!stored) {
       return;
@@ -110,7 +150,16 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
     } catch (error) {
       console.warn("Unable to restore Decision Shield state.", error);
     }
-  }, [storageKey]);
+  }, [
+    action,
+    category,
+    hasUrlSelection,
+    lifecycle,
+    storageKey,
+    urlAction,
+    urlCategory,
+    urlLifecycle,
+  ]);
 
   useEffect(() => {
     try {
@@ -122,6 +171,24 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
       console.warn("Unable to persist Decision Shield state.", error);
     }
   }, [action, category, lifecycle, storageKey]);
+
+  useEffect(() => {
+    const currentLifecycle = searchParams.get("lifecycle");
+    const currentCategory = searchParams.get("category");
+    const currentAction = searchParams.get("action");
+    if (
+      currentLifecycle === lifecycle &&
+      currentCategory === category &&
+      currentAction === action
+    ) {
+      return;
+    }
+    const nextParams = new URLSearchParams(searchParams.toString());
+    nextParams.set("lifecycle", lifecycle);
+    nextParams.set("category", category);
+    nextParams.set("action", action);
+    router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
+  }, [action, category, lifecycle, pathname, router, searchParams]);
 
   useEffect(() => {
     setCopyError(false);
@@ -192,9 +259,15 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
         ) : null}
 
         <div className="mt-6 grid gap-4 lg:grid-cols-3">
-          <label className="space-y-2 text-xs uppercase tracking-[0.2em] text-slate-400">
-            Lifecycle
+          <div className="space-y-2">
+            <label
+              htmlFor="decision-shield-lifecycle"
+              className="text-xs uppercase tracking-[0.2em] text-slate-400"
+            >
+              Lifecycle
+            </label>
             <select
+              id="decision-shield-lifecycle"
               value={lifecycle}
               onChange={(event) => setLifecycle(event.target.value as LifecycleStage)}
               className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100 transition-colors hover:border-slate-700"
@@ -205,10 +278,16 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
                 </option>
               ))}
             </select>
-          </label>
-          <label className="space-y-2 text-xs uppercase tracking-[0.2em] text-slate-400">
-            Category
+          </div>
+          <div className="space-y-2">
+            <label
+              htmlFor="decision-shield-category"
+              className="text-xs uppercase tracking-[0.2em] text-slate-400"
+            >
+              Category
+            </label>
             <select
+              id="decision-shield-category"
               value={category}
               onChange={(event) => setCategory(event.target.value as DecisionCategory)}
               className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100 transition-colors hover:border-slate-700"
@@ -219,10 +298,16 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
                 </option>
               ))}
             </select>
-          </label>
-          <label className="space-y-2 text-xs uppercase tracking-[0.2em] text-slate-400">
-            Action
+          </div>
+          <div className="space-y-2">
+            <label
+              htmlFor="decision-shield-action"
+              className="text-xs uppercase tracking-[0.2em] text-slate-400"
+            >
+              Action
+            </label>
             <select
+              id="decision-shield-action"
               value={action}
               onChange={(event) => setAction(event.target.value as DecisionAction)}
               className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100 transition-colors hover:border-slate-700"
@@ -233,7 +318,7 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
                 </option>
               ))}
             </select>
-          </label>
+          </div>
         </div>
 
         <div className="mt-6 grid gap-4 lg:grid-cols-[1.4fr,1fr]">
