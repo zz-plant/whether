@@ -5,7 +5,7 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { RegimeThresholds } from "../../lib/regimeEngine";
 import { DEFAULT_THRESHOLDS } from "../../lib/regimeEngine";
@@ -81,6 +81,7 @@ export const ThresholdsPanel = ({
   const [draft, setDraft] = useState<ThresholdDraft>(() => buildDraft(currentThresholds));
   const [errors, setErrors] = useState<ThresholdErrorMap>({});
   const [auditLog, setAuditLog] = useState<ThresholdAuditEntry[]>([]);
+  const [isPending, startTransition] = useTransition();
   const baseRateRef = useRef<HTMLInputElement | null>(null);
   const tightnessRef = useRef<HTMLInputElement | null>(null);
   const riskRef = useRef<HTMLInputElement | null>(null);
@@ -168,14 +169,18 @@ export const ThresholdsPanel = ({
       focusFirstInvalid(nextErrors);
       return;
     }
-    updateUrl(buildThresholds(draft), "manual");
+    startTransition(() => {
+      updateUrl(buildThresholds(draft), "manual");
+    });
   };
 
   const handleReset = () => {
     const defaultDraft = buildDraft(appliedDefaults);
     setDraft(defaultDraft);
     setErrors({});
-    updateUrl(appliedDefaults, "reset");
+    startTransition(() => {
+      updateUrl(appliedDefaults, "reset");
+    });
   };
 
   const updateDraft = (key: keyof ThresholdDraft, value: string) => {
@@ -277,16 +282,26 @@ export const ThresholdsPanel = ({
           <div className="flex items-end gap-3">
             <button
               type="submit"
-              className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-slate-500 hover:text-slate-100"
+              disabled={isPending}
+              aria-busy={isPending}
+              className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-slate-500 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
             >
-              Apply thresholds
+              {isPending ? (
+                <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />
+              ) : null}
+              {isPending ? "Applying" : "Apply thresholds"}
             </button>
             <button
               type="button"
               onClick={handleReset}
-              className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-slate-800 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-400 transition-colors hover:border-slate-600 hover:text-slate-200"
+              disabled={isPending}
+              aria-busy={isPending}
+              className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-slate-800 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-400 transition-colors hover:border-slate-600 hover:text-slate-200 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
             >
-              Reset
+              {isPending ? (
+                <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />
+              ) : null}
+              {isPending ? "Resetting" : "Reset"}
             </button>
           </div>
         </form>
