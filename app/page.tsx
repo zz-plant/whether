@@ -1,16 +1,19 @@
+import type { Metadata } from "next";
 import { fetchTreasuryData } from "../lib/treasuryClient";
 import { snapshotData } from "../lib/snapshot";
 import { buildSensorReadings } from "../lib/sensors";
 import { evaluateRegime } from "../lib/regimeEngine";
 import { getPlaybookGuidance } from "../lib/playbook";
-import { formatHistoricalBanner, resolveHistoricalDate } from "../lib/timeMachine";
 import {
   getLatestTimeMachineSnapshot,
-  hasTimeMachineEntry,
   getTimeMachineCoverage,
   getTimeMachineYears,
   getTimeMachineMonthsByYear,
 } from "../lib/timeMachineCache";
+import {
+  parseTimeMachineRequest,
+  resolveTimeMachineSelection,
+} from "../lib/timeMachineSelection";
 import { DecisionShieldPanel } from "./components/decisionShieldPanel";
 import { DisplayGuardian } from "./components/displayGuardian";
 import {
@@ -46,68 +49,65 @@ const formatTimestampValue = (value: string) => {
   return Number.isNaN(date.valueOf()) ? value : timestampFormatter.format(date);
 };
 
-const parseHistoricalSelection = (searchParams?: { month?: string; year?: string }) => {
-  if (!searchParams?.month || !searchParams?.year) {
-    return null;
-  }
-
-  const month = Number(searchParams.month);
-  const year = Number(searchParams.year);
-
-  if (!Number.isInteger(month) || !Number.isInteger(year)) {
-    return null;
-  }
-
-  if (month < 1 || month > 12) {
-    return null;
-  }
-
-  if (year < 2000) {
-    return null;
-  }
-
-  if (!hasTimeMachineEntry(year, month)) {
-    return null;
-  }
-
-  const asOf = resolveHistoricalDate(year, month);
-  return {
-    month,
-    year,
-    asOf,
-    banner: formatHistoricalBanner(year, month),
-  };
-};
-
-const parseRequestedSelection = (searchParams?: { month?: string; year?: string }) => {
-  if (!searchParams?.month || !searchParams?.year) {
-    return null;
-  }
-
-  const month = Number(searchParams.month);
-  const year = Number(searchParams.year);
-
-  if (!Number.isInteger(month) || !Number.isInteger(year)) {
-    return null;
-  }
-
-  if (month < 1 || month > 12) {
-    return null;
-  }
-
-  if (year < 2000) {
-    return null;
-  }
-
-  return { month, year };
-};
-
 const buildYearOptions = (startYear: number, endYear: number) => {
   const years: number[] = [];
   for (let year = endYear; year >= startYear; year -= 1) {
     years.push(year);
   }
   return years;
+};
+
+export const generateMetadata = ({
+  searchParams,
+}: {
+  searchParams?: { month?: string; year?: string };
+}): Metadata => {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://whether.report";
+  const siteName = "Whether — Regime Station";
+  const siteDescription =
+    "Translate Treasury macro signals into plain-English operational constraints for product and engineering leaders.";
+  const selection = resolveTimeMachineSelection(searchParams);
+  const requestedSelection = parseTimeMachineRequest(searchParams);
+  const baseUrl = new URL("/api/og", siteUrl);
+
+  if (selection) {
+    baseUrl.searchParams.set("month", String(selection.month));
+    baseUrl.searchParams.set("year", String(selection.year));
+  } else if (requestedSelection) {
+    baseUrl.searchParams.set("month", String(requestedSelection.month));
+    baseUrl.searchParams.set("year", String(requestedSelection.year));
+    baseUrl.searchParams.set("status", "invalid");
+  }
+
+  const titleSuffix = selection?.banner ?? (requestedSelection ? "Time Machine Preview" : "Live");
+  const title = `Whether Report — ${titleSuffix}`;
+  const imageUrl = baseUrl.toString();
+
+  return {
+    title,
+    description: siteDescription,
+    openGraph: {
+      type: "website",
+      url: siteUrl,
+      title,
+      description: siteDescription,
+      siteName,
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: `Whether Report ${titleSuffix} Open Graph`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: siteDescription,
+      images: [imageUrl],
+    },
+  };
 };
 
 export default async function HomePage({
@@ -137,8 +137,8 @@ export default async function HomePage({
   const cacheCoverage = getTimeMachineCoverage();
   const cacheYears = getTimeMachineYears();
   const cacheMonthsByYear = getTimeMachineMonthsByYear();
-  const historicalSelection = parseHistoricalSelection(searchParams);
-  const requestedSelection = parseRequestedSelection(searchParams);
+  const historicalSelection = resolveTimeMachineSelection(searchParams);
+  const requestedSelection = parseTimeMachineRequest(searchParams);
   const invalidHistoricalSelection = Boolean(requestedSelection && !historicalSelection);
   const selectedMonth = requestedSelection?.month ?? defaultMonth;
   const selectedYear = requestedSelection?.year ?? defaultYear;
