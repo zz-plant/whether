@@ -117,7 +117,7 @@ export const ExportBriefPanel = ({
 
   return (
     <section id="export-briefs" aria-labelledby="export-briefs-title" className="mt-10">
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+      <div className="weather-panel p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="type-label text-slate-400">Export briefs</p>
@@ -132,7 +132,7 @@ export const ExportBriefPanel = ({
             <button
               type="button"
               onClick={handlePrint}
-              className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-slate-500 hover:text-slate-100"
+              className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100"
             >
               Print / Save PDF
             </button>
@@ -141,7 +141,7 @@ export const ExportBriefPanel = ({
         </div>
 
         <div className="mt-6 grid gap-4 lg:grid-cols-[1.4fr,1fr]">
-          <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+          <div className="weather-surface p-4">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Slack-ready brief</p>
             <p className="mt-3 text-sm text-slate-300">
               One pasteable block tuned for status updates.
@@ -152,19 +152,19 @@ export const ExportBriefPanel = ({
                 onClick={() => handleCopy(briefing, "Slack")}
                 disabled={isCopying}
                 aria-busy={isCopying}
-                className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-slate-500 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
               >
                 {isCopying && copyTarget === "Slack" ? "Copying" : "Copy Slack brief"}
               </button>
               <a
                 href={`mailto:?subject=${mailSubject}&body=${mailBody}`}
-                className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-slate-500 hover:text-slate-100"
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
               >
                 Open email draft
               </a>
             </div>
           </div>
-          <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+          <div className="weather-surface p-4">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Slide bullets</p>
             <p className="mt-3 text-sm text-slate-300">
               Compact bullets sized for quarterly planning decks.
@@ -174,7 +174,7 @@ export const ExportBriefPanel = ({
               onClick={() => handleCopy(slideBullets, "Slides")}
               disabled={isCopying}
               aria-busy={isCopying}
-              className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-xl border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-slate-500 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
+              className="weather-button mt-4 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
             >
               {isCopying && copyTarget === "Slides" ? "Copying" : "Copy slide bullets"}
             </button>

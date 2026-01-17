@@ -48,7 +48,7 @@ export const ReportShell = ({
     <main
       id="main-content"
       tabIndex={-1}
-      className="relative min-h-screen overflow-hidden bg-slate-950 text-slate-100"
+      className="weather-shell relative min-h-screen overflow-hidden text-slate-100"
     >
       {structuredData ? (
         <script
@@ -57,8 +57,10 @@ export const ReportShell = ({
         />
       ) : null}
       <DisplayGuardian />
-      <div className="pointer-events-none absolute left-1/2 top-0 h-[480px] w-[680px] -translate-x-1/2 rounded-full bg-sky-500/10 blur-[180px]" />
-      <div className="pointer-events-none absolute right-0 top-1/3 h-[520px] w-[520px] rounded-full bg-indigo-500/10 blur-[200px]" />
+      <div className="pointer-events-none absolute inset-0 weather-haze" />
+      <div className="pointer-events-none absolute left-1/2 top-0 h-[520px] w-[720px] -translate-x-1/2 rounded-full bg-sky-400/15 blur-[190px]" />
+      <div className="pointer-events-none absolute right-[-120px] top-[20%] h-[520px] w-[520px] rounded-full bg-cyan-500/15 blur-[190px]" />
+      <div className="pointer-events-none absolute left-[-120px] top-[40%] h-[420px] w-[420px] rounded-full bg-indigo-500/15 blur-[180px]" />
       <div className="mx-auto max-w-6xl px-6 py-12 display-drift">
         <header className="relative flex flex-col gap-6 border-b border-slate-800/70 pb-8">
           <div className="flex flex-wrap items-start justify-between gap-6">
@@ -72,15 +74,15 @@ export const ReportShell = ({
                 </p>
               </div>
             </div>
-            <div className="flex flex-col items-start gap-3 rounded-3xl border border-slate-800/80 bg-slate-900/60 px-5 py-4 shadow-[0_0_0_1px_rgba(15,23,42,0.6)]">
+            <div className="weather-panel flex flex-col items-start gap-3 px-5 py-4">
               <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">Signal status</p>
-              <span className="rounded-full border border-slate-700 px-4 py-1 text-xs uppercase tracking-[0.2em] text-slate-200">
+              <span className="weather-chip px-4 py-1 text-xs uppercase tracking-[0.2em]">
                 {statusLabel}
               </span>
             </div>
           </div>
-          <div className="rounded-3xl border border-slate-800/70 bg-slate-950/70 px-5 py-4 shadow-[0_0_0_1px_rgba(15,23,42,0.6)]">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">Report lane</p>
+          <div className="weather-panel px-5 py-4">
+            <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">Forecast lane</p>
             <div className="mt-3 space-y-2">
               <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-100">
                 {pageTitle}
@@ -89,15 +91,15 @@ export const ReportShell = ({
             </div>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
-            <div className="rounded-3xl border border-slate-800/70 bg-slate-950/70 px-5 py-4 shadow-[0_0_0_1px_rgba(15,23,42,0.6)]">
+            <div className="weather-panel px-5 py-4">
               <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">Record date</p>
               <p className="mono mt-3 text-sm text-slate-100">{recordDateLabel}</p>
             </div>
-            <div className="rounded-3xl border border-slate-800/70 bg-slate-950/70 px-5 py-4 shadow-[0_0_0_1px_rgba(15,23,42,0.6)]">
+            <div className="weather-panel px-5 py-4">
               <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">Fetched at</p>
               <p className="mono mt-3 text-sm text-slate-100">{fetchedAtLabel}</p>
             </div>
-            <div className="rounded-3xl border border-slate-800/70 bg-slate-950/70 px-5 py-4 shadow-[0_0_0_1px_rgba(15,23,42,0.6)]">
+            <div className="weather-panel px-5 py-4">
               <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">Source</p>
               <a
                 href={treasurySource}
@@ -119,10 +121,10 @@ export const ReportShell = ({
                     <a
                       href={link.href}
                       aria-current={isActive ? "page" : undefined}
-                      className={`flex min-h-[88px] flex-col gap-2 rounded-2xl border px-4 py-3 text-left text-xs uppercase tracking-[0.2em] transition-colors ${
+                      className={`weather-tile flex min-h-[88px] flex-col gap-2 px-4 py-3 text-left text-xs uppercase tracking-[0.2em] transition-colors ${
                         isActive
-                          ? "border-sky-400/70 bg-sky-500/10 text-sky-100"
-                          : "border-slate-800/70 bg-slate-950/60 text-slate-300 hover:border-slate-500 hover:text-slate-100"
+                          ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
+                          : "text-slate-300 hover:border-sky-300/70 hover:text-slate-100"
                       }`}
                     >
                       <span>{link.label}</span>
@@ -144,7 +146,7 @@ export const ReportShell = ({
                     <li key={item.href}>
                       <a
                         href={item.href}
-                        className="inline-flex min-h-[44px] items-center rounded-full border border-slate-800/70 bg-slate-950/60 px-4 py-2 text-[11px] uppercase tracking-[0.25em] text-slate-300 transition-colors hover:border-slate-500 hover:text-slate-100 touch-manipulation"
+                        className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-[11px] uppercase tracking-[0.25em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                       >
                         {item.label}
                       </a>
@@ -153,7 +155,7 @@ export const ReportShell = ({
                 </ul>
                 {secondarySectionLinks.length > 0 ? (
                   <details className="group">
-                    <summary className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-full border border-slate-800/70 bg-slate-950/60 px-4 py-2 text-[11px] uppercase tracking-[0.25em] text-slate-300 transition-colors hover:border-slate-500 hover:text-slate-100 touch-manipulation">
+                    <summary className="weather-pill inline-flex min-h-[44px] cursor-pointer items-center gap-2 px-4 py-2 text-[11px] uppercase tracking-[0.25em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation">
                       More sections
                       <span className="rounded-full border border-slate-700 px-2 py-0.5 text-[10px] uppercase tracking-[0.2em] text-slate-400">
                         {secondarySectionLinks.length}
@@ -164,7 +166,7 @@ export const ReportShell = ({
                         <li key={item.href}>
                           <a
                             href={item.href}
-                            className="inline-flex min-h-[44px] items-center rounded-full border border-slate-800/70 bg-slate-950/60 px-4 py-2 text-[11px] uppercase tracking-[0.25em] text-slate-300 transition-colors hover:border-slate-500 hover:text-slate-100 touch-manipulation"
+                            className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-[11px] uppercase tracking-[0.25em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                           >
                             {item.label}
                           </a>

@@ -251,7 +251,7 @@ export const DecisionShieldPanel = ({
 
   return (
     <section id="decision-shield" aria-labelledby="decision-shield-title" className="mt-10">
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+      <div className="weather-panel p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
             <p className="type-label text-slate-400">Decision Shield</p>
@@ -268,7 +268,7 @@ export const DecisionShieldPanel = ({
               onClick={handleCopy}
               disabled={isCopying}
               aria-busy={isCopying}
-              className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-slate-500 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
+              className="weather-pill inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
             >
               {isCopying ? (
                 <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />
@@ -301,7 +301,7 @@ export const DecisionShieldPanel = ({
         </div>
 
         <div className="mt-6 space-y-4">
-          <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+          <div className="weather-surface p-4">
             <p className="type-label text-slate-400">
               Inputs → Verdict → Why → Guardrail → Reversal trigger
             </p>
@@ -318,7 +318,7 @@ export const DecisionShieldPanel = ({
                 id="decision-lifecycle"
                 value={lifecycle}
                 onChange={(event) => setLifecycle(event.target.value as LifecycleStage)}
-                className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100 transition-colors hover:border-slate-700"
+                className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70"
               >
                 {lifecycleOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -338,7 +338,7 @@ export const DecisionShieldPanel = ({
                 id="decision-category"
                 value={category}
                 onChange={(event) => setCategory(event.target.value as DecisionCategory)}
-                className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100 transition-colors hover:border-slate-700"
+                className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70"
               >
                 {categoryOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -358,7 +358,7 @@ export const DecisionShieldPanel = ({
                 id="decision-action"
                 value={action}
                 onChange={(event) => setAction(event.target.value as DecisionAction)}
-                className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100 transition-colors hover:border-slate-700"
+                className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70"
               >
                 {actionOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -370,7 +370,7 @@ export const DecisionShieldPanel = ({
           </div>
 
           <div className="grid gap-4 lg:grid-cols-[1.2fr,1fr]">
-            <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+            <div className="weather-surface p-4">
               <p className="type-label text-slate-400">Verdict</p>
               <div
                 className={`mt-3 inline-flex items-center rounded-full border px-3 py-1 text-xs uppercase tracking-[0.2em] ${verdictStyles[output.verdict]}`}
@@ -380,7 +380,7 @@ export const DecisionShieldPanel = ({
               <p className="mt-3 type-data text-slate-200 break-words">{output.summary}</p>
               <p className="mt-3 text-xs text-slate-500">Copy-ready, shareable verdict.</p>
             </div>
-            <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+            <div className="weather-surface p-4">
               <p className="type-label text-slate-400">Why (signals)</p>
               <ul className="mt-3 space-y-2 text-sm text-slate-300">
                 {output.bullets.slice(0, 4).map((bullet) => (
@@ -393,11 +393,11 @@ export const DecisionShieldPanel = ({
             </div>
           </div>
           <div className="grid gap-4 lg:grid-cols-2">
-            <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+            <div className="weather-surface p-4">
               <p className="type-label text-slate-400">Guardrail</p>
               <p className="mt-3 type-data text-slate-300 break-words">{output.guardrail}</p>
             </div>
-            <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+            <div className="weather-surface p-4">
               <p className="type-label text-slate-400">Reversal trigger</p>
               <p className="mt-3 type-data text-slate-300 break-words">
                 {output.reversalTrigger}
