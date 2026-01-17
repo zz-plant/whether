@@ -171,8 +171,8 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
       if (storedAction) {
         setAction(storedAction);
       }
-    } catch (error) {
-      console.warn("Unable to restore Decision Shield state.", error);
+    } catch {
+      // Intentionally ignore storage restore errors to keep console clean.
     }
   }, [
     action,
@@ -192,8 +192,8 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
         storageKey,
         JSON.stringify({ lifecycle, category, action })
       );
-    } catch (error) {
-      console.warn("Unable to persist Decision Shield state.", error);
+    } catch {
+      // Intentionally ignore storage persistence errors to keep console clean.
     }
   }, [action, category, lifecycle, storageKey]);
 
@@ -212,7 +212,7 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
     nextParams.set("lifecycle", lifecycle);
     nextParams.set("category", category);
     nextParams.set("action", action);
-    router.replace(`${pathname}?${nextParams.toString()}`, { scroll: false });
+    router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
   }, [action, category, lifecycle, pathname, router, searchParams]);
 
   useEffect(() => {
@@ -221,6 +221,11 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
 
   const handleCopy = async () => {
     if (isCopying) {
+      return;
+    }
+    if (!navigator.clipboard?.writeText) {
+      setCopyError(true);
+      setCopied(false);
       return;
     }
     setIsCopying(true);
