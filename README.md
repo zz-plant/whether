@@ -60,6 +60,13 @@ The Time Machine now prefers the local cache (`data/time_machine_cache.json`) to
 third‑party lookups in replay mode. Refresh the cache by re-running the Treasury query
 logic in a connected environment and committing the updated file.
 
+### 5) Report lanes (multi-page workflow)
+The report now ships as three focused lanes so leaders can consume the right depth without
+scrolling a single mega-page:
+- **Overview**: executive snapshot and regime posture.
+- **Signals & thresholds**: sensor detail, macro signals, and historical time machine context.
+- **Operations playbook**: action guidance, decision shields, and export briefs.
+
 ## Technical requirements
 - **Snapshot mode**: render instantly from cached data (0ms), then fetch async.
 - **Live vs snapshot indicators**: clearly label data freshness.
