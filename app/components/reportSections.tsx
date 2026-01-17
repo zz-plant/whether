@@ -448,10 +448,11 @@ export const TimeMachinePanel = ({
   invalidSelection: boolean;
 }) => {
   const availableMonths = monthsByYear[selectedYear] ?? [];
-  const resolvedSelectedMonth =
-    availableMonths.length > 0 && !availableMonths.includes(selectedMonth)
-      ? availableMonths[0]
-      : selectedMonth;
+  const isUnavailableSelection =
+    invalidSelection || (availableMonths.length > 0 && !availableMonths.includes(selectedMonth));
+  const requestedMonthLabel =
+    monthOptions.find((option) => option.value === selectedMonth)?.label ??
+    `Month ${selectedMonth}`;
   const coverageLabel =
     cacheCoverage.earliest && cacheCoverage.latest
       ? `${formatDate(cacheCoverage.earliest)} → ${formatDate(cacheCoverage.latest)}`
@@ -487,19 +488,26 @@ export const TimeMachinePanel = ({
             Month
             <select
               name="month"
-              defaultValue={resolvedSelectedMonth}
+              defaultValue={selectedMonth}
               className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100 transition-colors hover:border-slate-700"
             >
-              {monthOptions.map((option) => {
-                const isUnavailable =
-                  availableMonths.length > 0 && !availableMonths.includes(option.value);
-                return (
-                  <option key={option.value} value={option.value} disabled={isUnavailable}>
-                    {option.label}
-                    {isUnavailable ? " (not available)" : ""}
-                  </option>
-                );
-              })}
+              {isUnavailableSelection ? (
+                <option value={selectedMonth} disabled>
+                  {requestedMonthLabel} (not available)
+                </option>
+              ) : null}
+              {monthOptions
+                .filter((option) => !(isUnavailableSelection && option.value === selectedMonth))
+                .map((option) => {
+                  const isUnavailable =
+                    availableMonths.length > 0 && !availableMonths.includes(option.value);
+                  return (
+                    <option key={option.value} value={option.value} disabled={isUnavailable}>
+                      {option.label}
+                      {isUnavailable ? " (not available)" : ""}
+                    </option>
+                  );
+                })}
             </select>
           </label>
           <label className="space-y-2 text-xs uppercase tracking-[0.2em] text-slate-400">
