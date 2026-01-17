@@ -71,6 +71,20 @@ plain‑English operational constraints with traceable sources.
 - Surface deep data provenance per sensor (direct source URLs, formulas, timestamps).
 - Introduce an API/export endpoint for embedding regimes in internal dashboards.
 
+## Milestone 8 — CXO Function Replacement (Week 8)
+- CFO / Finance Strategy mode:
+  - Translate regime outputs into runway, burn, and capital efficiency guardrails.
+  - Budget planning export with macro posture summary and source citations.
+- COO / Operating Strategy posture board:
+  - Company-wide execution constraints and operating cadences tied to regime shifts.
+  - Guardrail checklists for cross-functional planning reviews.
+- CTO/CPO Strategic Planning overlays:
+  - Roadmap posture toggles (growth vs. efficiency) with regime-aligned guidance.
+  - Hiring and pricing decision templates tied to current sensors.
+- Head of Strategy briefing suite:
+  - One-page executive brief with regime narrative, risk flags, and reversal triggers.
+  - Planning memo generator for leadership syncs with copy-ready language.
+
 ---
 
 ### Development stories (planned)
