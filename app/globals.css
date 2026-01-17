@@ -8,9 +8,53 @@
   --display-offset-y: 0px;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   @apply bg-slate-950 text-slate-100 antialiased;
   font-family: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+  z-index: 50;
+  transform: translateY(-200%);
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  background: rgba(15, 23, 42, 0.95);
+  padding: 0.6rem 1.2rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(248, 250, 252, 0.9);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+.mono {
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+:where(h1, h2, h3, h4, h5, h6) {
+  scroll-margin-top: 96px;
+  text-wrap: balance;
+}
+
+button,
+a,
+select,
+textarea,
+input {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(15, 23, 42, 0.6);
 }
 
 .display-drift {
@@ -18,15 +62,11 @@ body {
   transition: transform 2.5s ease-in-out;
 }
 
-.mono {
-  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
-    "Courier New", monospace;
-}
-
 button:focus-visible,
 a:focus-visible,
 select:focus-visible,
-textarea:focus-visible {
+textarea:focus-visible,
+input:focus-visible {
   outline: 2px solid rgba(56, 189, 248, 0.8);
   outline-offset: 3px;
 }
