@@ -484,9 +484,13 @@ export const TimeMachinePanel = ({
         </div>
 
         <form method="GET" className="mt-6 grid gap-4 md:grid-cols-[1fr,1fr,auto]">
-          <label className="space-y-2 text-xs uppercase tracking-[0.2em] text-slate-400">
+          <label
+            htmlFor="time-machine-month"
+            className="space-y-2 text-xs uppercase tracking-[0.2em] text-slate-400"
+          >
             Month
             <select
+              id="time-machine-month"
               name="month"
               defaultValue={selectedMonth}
               className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100 transition-colors hover:border-slate-700"
@@ -510,9 +514,13 @@ export const TimeMachinePanel = ({
                 })}
             </select>
           </label>
-          <label className="space-y-2 text-xs uppercase tracking-[0.2em] text-slate-400">
+          <label
+            htmlFor="time-machine-year"
+            className="space-y-2 text-xs uppercase tracking-[0.2em] text-slate-400"
+          >
             Year
             <select
+              id="time-machine-year"
               name="year"
               defaultValue={selectedYear}
               className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100 transition-colors hover:border-slate-700"
