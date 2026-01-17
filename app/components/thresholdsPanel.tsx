@@ -239,6 +239,10 @@ export const ThresholdsPanel = ({
               ref={baseRateRef}
               id="threshold-base-rate"
               name={THRESHOLD_PARAM_KEYS.baseRate}
+              type="number"
+              min={0}
+              max={10}
+              step={0.01}
               inputMode="decimal"
               value={draft.baseRateTightness}
               onChange={(event) => updateDraft("baseRateTightness", event.target.value)}
@@ -262,6 +266,10 @@ export const ThresholdsPanel = ({
               ref={tightnessRef}
               id="threshold-tightness"
               name={THRESHOLD_PARAM_KEYS.tightness}
+              type="number"
+              min={0}
+              max={100}
+              step={0.01}
               inputMode="numeric"
               value={draft.tightnessRegime}
               onChange={(event) => updateDraft("tightnessRegime", event.target.value)}
@@ -285,6 +293,10 @@ export const ThresholdsPanel = ({
               ref={riskRef}
               id="threshold-risk"
               name={THRESHOLD_PARAM_KEYS.risk}
+              type="number"
+              min={0}
+              max={100}
+              step={0.01}
               inputMode="numeric"
               value={draft.riskAppetiteRegime}
               onChange={(event) => updateDraft("riskAppetiteRegime", event.target.value)}
