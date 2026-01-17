@@ -43,6 +43,61 @@ export const ReportShell = ({
 }) => {
   const primarySectionLinks = sectionLinks.slice(0, 3);
   const secondarySectionLinks = sectionLinks.slice(3);
+  const pageLinkIcons: Record<string, ReactNode> = {
+    Overview: (
+      <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
+        <path
+          d="M12 4.5V2.75M12 21.25v-1.75M4.5 12H2.75M21.25 12h-1.75M6.75 6.75l-1.3-1.3M18.55 18.55l-1.3-1.3M6.75 17.25l-1.3 1.3M18.55 5.45l-1.3 1.3"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
+        <circle cx="12" cy="12" r="4.25" fill="currentColor" />
+      </svg>
+    ),
+    "Signals & thresholds": (
+      <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
+        <path
+          d="M4 18c0-4.4 3.6-8 8-8s8 3.6 8 8"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          fill="none"
+        />
+        <path
+          d="M7 18c0-2.8 2.2-5 5-5s5 2.2 5 5"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          fill="none"
+        />
+        <circle cx="12" cy="18" r="1.8" fill="currentColor" />
+      </svg>
+    ),
+    "Operations playbook": (
+      <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
+        <path
+          d="M6 4.75h9.25a2 2 0 0 1 2 2v10.5a2 2 0 0 1-2 2H6"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinejoin="round"
+          fill="none"
+        />
+        <path
+          d="M6 4.75v14.5"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
+        <path
+          d="M9.5 8.5h5M9.5 12h5"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
+      </svg>
+    ),
+  };
 
   return (
     <main
@@ -74,11 +129,21 @@ export const ReportShell = ({
                 </p>
               </div>
             </div>
-            <div className="weather-panel flex flex-col items-start gap-3 px-5 py-4">
-              <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">Signal status</p>
-              <span className="weather-chip px-4 py-1 text-xs uppercase tracking-[0.2em]">
-                {statusLabel}
-              </span>
+            <div className="weather-panel flex min-w-[220px] flex-col items-start gap-3 px-5 py-4">
+              <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">
+                Current conditions
+              </p>
+              <div className="flex items-end gap-3">
+                <span className="text-3xl font-semibold tracking-tight text-slate-100">
+                  {statusLabel}
+                </span>
+                <span className="weather-chip px-3 py-1 text-[10px] uppercase tracking-[0.2em]">
+                  Live
+                </span>
+              </div>
+              <p className="text-xs text-slate-400">
+                Signals stamped {recordDateLabel}
+              </p>
             </div>
           </div>
           <div className="weather-panel px-5 py-4">
@@ -116,18 +181,22 @@ export const ReportShell = ({
             <ul className="grid gap-3 md:grid-cols-3">
               {pageLinks.map((link) => {
                 const isActive = link.label === pageTitle;
+                const icon = pageLinkIcons[link.label];
                 return (
                   <li key={link.href}>
                     <a
                       href={link.href}
                       aria-current={isActive ? "page" : undefined}
-                      className={`weather-tile flex min-h-[88px] flex-col gap-2 px-4 py-3 text-left text-xs uppercase tracking-[0.2em] transition-colors ${
+                      className={`weather-tile flex min-h-[96px] flex-col gap-3 px-4 py-3 text-left text-xs uppercase tracking-[0.2em] transition-colors ${
                         isActive
                           ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
                           : "text-slate-300 hover:border-sky-300/70 hover:text-slate-100"
                       }`}
                     >
-                      <span>{link.label}</span>
+                      <span className="flex items-center gap-3">
+                        <span className="weather-icon-chip text-slate-100">{icon}</span>
+                        <span>{link.label}</span>
+                      </span>
                       <span className="text-[11px] normal-case tracking-normal text-slate-300">
                         {link.description}
                       </span>
