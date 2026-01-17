@@ -1,5 +1,5 @@
 /**
- * Decision Shield logic for translating regimes into operator-safe verdicts.
+ * Decision Shield logic for translating market climates into operator-safe verdicts.
  * Produces shareable, plain-English guidance tied to sensor conditions.
  */
 import type { RegimeAssessment, RegimeKey } from "./regimeEngine";
@@ -153,7 +153,7 @@ const buildSensorBullets = (assessment: RegimeAssessment): string[] => {
   }
 
   bullets.push(
-    `Tightness ${tightness} vs risk appetite ${riskAppetite} keeps regime in ${assessment.regime.toLowerCase()}.`
+    `Tightness ${tightness} vs risk appetite ${riskAppetite} keeps conditions in ${assessment.regime.toLowerCase()}.`
   );
 
   return bullets;

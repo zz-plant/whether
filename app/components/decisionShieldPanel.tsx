@@ -1,5 +1,5 @@
 /**
- * Decision Shield panel for validating operator actions against the current regime.
+ * Decision Shield panel for validating operator actions against the current market climate.
  * Keeps verdict output shareable and grounded in sensor-driven signals.
  */
 "use client";
@@ -67,7 +67,7 @@ const buildShareText = (
 ) => {
   const lines = [
     "Decision Shield — Whether Report",
-    `Regime: ${assessment.regime}`,
+    `Market climate: ${assessment.regime}`,
     `Lifecycle: ${formatOptionLabel(lifecycle, lifecycleOptions)}`,
     `Category: ${formatOptionLabel(category, categoryOptions)}`,
     `Action: ${formatDecisionAction(action)}`,
@@ -356,7 +356,7 @@ export const DecisionShieldPanel = ({
               Validate an action
             </h3>
             <p className="mt-2 type-data text-slate-300">
-              Pressure-test the next move against current regime physics, then share the verdict.
+              Pressure-test the next move against current market climate physics, then share the verdict.
             </p>
           </div>
           <div className="flex flex-col items-end gap-3">

@@ -1,5 +1,5 @@
 /**
- * Thresholds panel to tune regime classification and log overrides.
+ * Thresholds panel to tune market climate classification and log overrides.
  * Keeps URL-driven state and audit trail visible for operators.
  */
 "use client";
@@ -50,7 +50,7 @@ const validateDraft = (draft: ThresholdDraft): ThresholdErrorMap => {
     errors.baseRateTightness = "Base rate threshold must be between 0 and 10.";
   }
   if (Number.isNaN(tightness) || tightness < 0 || tightness > 100) {
-    errors.tightnessRegime = "Tightness regime threshold must be between 0 and 100.";
+    errors.tightnessRegime = "Tightness threshold must be between 0 and 100.";
   }
   if (Number.isNaN(risk) || risk < 0 || risk > 100) {
     errors.riskAppetiteRegime = "Risk appetite threshold must be between 0 and 100.";
@@ -212,7 +212,7 @@ export const ThresholdsPanel = ({
       <div className="weather-panel p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="type-label text-slate-400">Regime thresholds</p>
+            <p className="type-label text-slate-400">Market climate thresholds</p>
             <h3 id="thresholds-title" className="type-section text-slate-100">
               Tune classification guardrails
             </h3>
@@ -261,7 +261,7 @@ export const ThresholdsPanel = ({
             htmlFor="threshold-tightness"
             className="space-y-2 text-xs uppercase tracking-[0.2em] text-slate-400"
           >
-            Tightness regime score
+            Tightness score threshold
             <input
               ref={tightnessRef}
               id="threshold-tightness"
@@ -347,7 +347,7 @@ export const ThresholdsPanel = ({
                 <span className="mono text-slate-100">{formattedCurrent.baseRateTightness}%</span>
               </p>
               <p>
-                Tightness regime threshold:{" "}
+                Tightness threshold:{" "}
                 <span className="mono text-slate-100">{formattedCurrent.tightnessRegime}</span>
               </p>
               <p>

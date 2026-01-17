@@ -1,4 +1,4 @@
-# Whether — Regime Station v1.0
+# Whether — Market Climate Station v1.0
 
 Whether is a “Product Weather Report” that translates macroeconomic signals into **operational engineering constraints**.
 It bridges the gap between finance data and product execution so teams don’t run strategies that are 6–18 months behind economic reality.
@@ -20,11 +20,11 @@ This is **not** financial advice (“Buy Stock”). It’s operational advice (�
 ## Core product (MVP)
 
 ### 1) Regime Engine (logic core)
-Classifies the environment using two signals:
+Classifies the market climate using two signals:
 - **Cost of Money (Capital Tightness)**
 - **Market Bravery (Risk Appetite)**
 
-Four regimes:
+Four market climates:
 - **Survival Mode (Scarcity)**: High Cost + Low Bravery → *Extend runway.*
 - **Efficiency Mode (Defensive)**: High Cost + Moderate Bravery → *Cash conversion.*
 - **Safety Mode (Volatile)**: Low Cost + Low Bravery → *Trust/security.*
@@ -45,7 +45,7 @@ Sensors:
 - **Expanded Macro Signals** = CPI inflation, unemployment rate, and BBB credit spreads (snapshot) with explicit sources.
 
 ### 3) Decision Shield (action validator)
-Validates actions (Hiring, Roadmap, Pricing) against current regime.
+Validates actions (Hiring, Roadmap, Pricing) against the current market climate.
 Example logic:
 - If **Survival** and **Hire** ⇒ **Danger** (misaligned)
 - If **Growth** and **Hire** ⇒ **Safe** (aligned)
@@ -55,41 +55,41 @@ verdict text for sharing in planning reviews. Operators can also save common sce
 to speed up recurring decisions.
 
 ### 4) Time Machine (historical analysis)
-Query any month since 2000 via the Treasury API to show the regime on the latest available
+Query any month since 2000 via the Treasury API to show the market climate on the latest available
 record on or before that date, clearly labeled as historical.
 The Time Machine now prefers the local cache (`data/time_machine_cache.json`) to avoid
 third‑party lookups in replay mode. Refresh the cache by re-running the Treasury query
 logic in a connected environment and committing the updated file.
 
-### 4b) Regime change alerts (signal shifts)
-Surface regime transitions with a reason-code summary so leaders can spot when posture needs to
+### 4b) Market climate change alerts (signal shifts)
+Surface market climate transitions with a reason-code summary so leaders can spot when posture needs to
 change, and replay the prior month using the Time Machine for context.
 
 ### 5) Report lanes (multi-page workflow)
 The report now ships as three focused lanes so leaders can consume the right depth without
 scrolling a single mega-page:
-- **Overview**: executive snapshot and regime posture.
+- **Overview**: executive snapshot and market climate posture.
 - **Signals & thresholds**: sensor detail, macro signals, and historical time machine context.
 - **Operations playbook**: action guidance, decision shields, and export briefs.
 
 ### 6) Insight Database (evidence pack)
 Attach citations and historical precedent to playbook guidance, including a “Fossil Record” view
-of how organization and product artifacts map to capital regimes.
+of how organization and product artifacts map to capital climates.
 
 ## Technical requirements
 - **Snapshot mode**: render instantly from cached data (0ms), then fetch async.
 - **Live vs snapshot indicators**: clearly label data freshness.
 - **Fail gracefully** if the API is down or blocked.
-- **Regime thresholds**: adjustable via URL parameters with audit trail visibility.
+- **Market climate thresholds**: adjustable via URL parameters with audit trail visibility.
 - **Export briefs**: copy-ready Slack/email text and print-to-PDF support.
 
 ## Repo layout (current scaffolding)
-- `lib/regimeEngine.ts`: deterministic scoring + regime classification core.
-- `lib/decisionShield.ts`: decision verdicts tied to regimes and sensor states.
+- `lib/regimeEngine.ts`: deterministic scoring + market climate classification core.
+- `lib/decisionShield.ts`: decision verdicts tied to market climates and sensor states.
 - `lib/treasuryNormalizer.ts`: maps Treasury API payloads into normalized data shapes.
 - `lib/treasuryClient.ts`: Treasury fetcher with snapshot fallback and explicit metadata.
 - `lib/sensors.ts`: builds sensor readings with source + timestamp metadata.
-- `lib/playbook.ts`: selects regime playbook guidance from the insight database.
+- `lib/playbook.ts`: selects market climate playbook guidance from the insight database.
 - `lib/timeMachine.ts`: builds historical queries and labels.
 - `lib/types.ts`: shared Treasury data + sensor types.
 - `lib/macroSnapshot.ts`: expanded macro series snapshot loader.
@@ -122,4 +122,4 @@ For UI and engineering inspiration, see `LEARNINGS.md`.
 0. Use Node.js 20 (see `.nvmrc`) and Bun 1.2.
 1. Install dependencies: `bun install`
 2. Run the dashboard: `bun run dev`
-3. Open `http://localhost:3000` to view the Regime Station UI.
+3. Open `http://localhost:3000` to view the Market Climate Station UI.

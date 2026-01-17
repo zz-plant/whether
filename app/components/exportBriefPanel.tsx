@@ -1,5 +1,5 @@
 /**
- * Export-ready briefing panel for sharing regime status.
+ * Export-ready briefing panel for sharing market climate status.
  * Generates copyable summaries for Slack, email, and slide briefs.
  */
 "use client";
@@ -35,7 +35,7 @@ const buildBrief = (
 
   return [
     `Whether Report Brief — ${treasury.record_date}`,
-    `Regime: ${assessment.regime}`,
+    `Market climate: ${assessment.regime}`,
     `Tightness: ${assessment.scores.tightness} | Risk appetite: ${assessment.scores.riskAppetite}`,
     `Base rate: ${formatNumber(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
     `Curve slope: ${formatNumber(curveSlope?.value ?? null, "%")}`,
@@ -52,7 +52,7 @@ const buildBrief = (
 
 const buildSlideBullets = (assessment: RegimeAssessment, macros: MacroSeriesReading[]) => {
   return [
-    `Regime: ${assessment.regime}`,
+    `Market climate: ${assessment.regime}`,
     `Tightness ${assessment.scores.tightness} / Risk ${assessment.scores.riskAppetite}`,
     ...macros.map((macro) => `${macro.label}: ${formatNumber(macro.value, macro.unit)}`),
     ...assessment.constraints.map((item) => `Guardrail: ${item}`),

@@ -1,5 +1,5 @@
 /**
- * Time Machine panel for replaying historical regimes with client-side validation.
+ * Time Machine panel for replaying historical market climates with client-side validation.
  * Keeps URL-driven state consistent while providing immediate feedback on availability.
  */
 "use client";
@@ -204,11 +204,11 @@ export const TimeMachinePanel = ({
           <div>
             <p className="type-label text-slate-400">Time Machine</p>
             <h3 id="time-machine-title" className="type-section text-slate-100">
-              Replay a prior regime
+              Replay a prior market climate
             </h3>
             <p className="mt-2 type-data text-slate-300">
               Pull the latest available Treasury record on or before a chosen month to see the
-              historical regime.
+              historical climate read.
             </p>
           </div>
           <div className="flex flex-col items-end gap-3">
@@ -228,7 +228,7 @@ export const TimeMachinePanel = ({
           <div className="weather-surface p-4">
             <p className="type-label text-slate-400">Historical mode</p>
             <p className="mt-3 type-data text-slate-300">
-              You are replaying the macro regime from{" "}
+              You are replaying the macro climate from{" "}
               <span className="font-semibold text-slate-100">{selectedLabel}</span>. Treat the
               constraints as if those market conditions were active today.
             </p>
@@ -259,7 +259,7 @@ export const TimeMachinePanel = ({
             </div>
             <div className="mt-3 grid gap-3 md:grid-cols-2">
               <div className="weather-surface rounded-lg p-3">
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Regime</p>
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Market climate</p>
                 <p className="mt-2 text-sm text-slate-100">
                   {comparison.then.regime.toLowerCase()} →{" "}
                   {comparison.now.regime.toLowerCase()}

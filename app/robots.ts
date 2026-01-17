@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-// Regime Station SEO guardrails: make the dashboard discoverable and scannable.
+// Market Climate Station SEO guardrails: make the dashboard discoverable and scannable.
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://whether.report";
 

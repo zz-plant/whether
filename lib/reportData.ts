@@ -68,7 +68,7 @@ const buildRegimeAlert = (
   }
   if (reasons.length === 0) {
     reasons.push(
-      `Regime shifted as tightness (${formatScore(previous.scores.tightness)} → ${formatScore(current.scores.tightness)}) ` +
+      `Market climate shifted as tightness (${formatScore(previous.scores.tightness)} → ${formatScore(current.scores.tightness)}) ` +
         `and risk appetite (${formatScore(previous.scores.riskAppetite)} → ${formatScore(current.scores.riskAppetite)}) moved across boundaries.`
     );
   }
@@ -80,7 +80,7 @@ const buildRegimeAlert = (
     currentRecordDate,
     previousRecordDate,
     reasons,
-    summary: `From ${previous.regime} to ${current.regime}.`,
+    summary: `Market climate moved from ${previous.regime} to ${current.regime}.`,
   };
 };
 

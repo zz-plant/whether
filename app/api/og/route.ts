@@ -1,6 +1,6 @@
 /**
- * Open Graph SVG generator for shareable Regime Station time machine configurations.
- * Keeps time travel snapshots discoverable with contextual regime metadata.
+ * Open Graph SVG generator for shareable Market Climate Station time machine configurations.
+ * Keeps time travel snapshots discoverable with contextual market climate metadata.
  */
 import { evaluateRegime } from "../../../lib/regimeEngine";
 import { snapshotData } from "../../../lib/snapshot";
@@ -148,13 +148,13 @@ export async function GET(request: Request) {
     ${escapeText("Whether Report")}
   </text>
   <text x="120" y="190" fill="#94a3b8" font-family="Inter, system-ui, sans-serif" font-size="18" letter-spacing="2">
-    ${escapeText("REGIME STATION")}
+    ${escapeText("MARKET CLIMATE STATION")}
   </text>
   <text x="120" y="235" fill="#38bdf8" font-family="Inter, system-ui, sans-serif" font-size="20" font-weight="600">
     ${escapeText(statusLabel)}
   </text>
   <text x="120" y="300" fill="#f8fafc" font-family="Inter, system-ui, sans-serif" font-size="32" font-weight="600">
-    ${escapeText(`Regime: ${assessment.regime}`)}
+    ${escapeText(`Market climate: ${assessment.regime}`)}
   </text>
   ${descriptionLines
     .map(
