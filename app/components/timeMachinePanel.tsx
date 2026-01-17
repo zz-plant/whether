@@ -35,10 +35,36 @@ const formatDate = (value: string) => {
   return Number.isNaN(date.valueOf()) ? value : dateFormatter.format(date);
 };
 
+const formatMonthInput = (value: string) => {
+  const date = new Date(value);
+  if (Number.isNaN(date.valueOf())) {
+    return undefined;
+  }
+  const year = date.getUTCFullYear();
+  const month = date.getUTCMonth() + 1;
+  return `${year}-${String(month).padStart(2, "0")}`;
+};
+
+const parseMonthInput = (value: string) => {
+  const [yearPart, monthPart] = value.split("-");
+  const year = Number(yearPart);
+  const month = Number(monthPart);
+  if (
+    !yearPart ||
+    !monthPart ||
+    Number.isNaN(year) ||
+    Number.isNaN(month) ||
+    month < 1 ||
+    month > 12
+  ) {
+    return null;
+  }
+  return { year, month };
+};
+
 type TimeMachinePanelProps = {
   selectedYear: number;
   selectedMonth: number;
-  years: number[];
   isHistorical: boolean;
   latestRecordDate: string;
   cacheCoverage: { earliest: string | null; latest: string | null };
@@ -70,7 +96,6 @@ type TimeMachinePanelProps = {
 export const TimeMachinePanel = ({
   selectedYear,
   selectedMonth,
-  years,
   isHistorical,
   latestRecordDate,
   cacheCoverage,
@@ -84,8 +109,7 @@ export const TimeMachinePanel = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const errorId = "time-machine-error";
-  const monthRef = useRef<HTMLSelectElement | null>(null);
-  const yearRef = useRef<HTMLSelectElement | null>(null);
+  const monthRef = useRef<HTMLInputElement | null>(null);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -110,6 +134,7 @@ export const TimeMachinePanel = ({
   const isUnavailableSelection =
     invalidSelection || (availableMonths.length > 0 && !availableMonths.includes(month));
   const isInvalid = Boolean(errorMessage);
+  const currentMonthValue = `${year}-${String(month).padStart(2, "0")}`;
   const requestedMonthLabel =
     monthOptions.find((option) => option.value === month)?.label ?? `Month ${month}`;
   const coverageLabel =
@@ -123,6 +148,8 @@ export const TimeMachinePanel = ({
   const selectedLabel = `${requestedMonthLabel} ${year}`;
   const showHistoricalCallout = isHistorical && historicalSummary;
   const showComparison = Boolean(isHistorical && comparison);
+  const coverageMin = cacheCoverage.earliest ? formatMonthInput(cacheCoverage.earliest) : undefined;
+  const coverageMax = cacheCoverage.latest ? formatMonthInput(cacheCoverage.latest) : undefined;
 
   const formatPercent = (value: number) => `${value.toFixed(2)}%`;
   const formatScore = (value: number) => value.toFixed(0);
@@ -158,30 +185,15 @@ export const TimeMachinePanel = ({
     }
   };
 
-  const handleYearBlur = () => {
-    if (isUnavailableSelection) {
-      setErrorMessage("That month is not available for the selected year.");
+  const handleMonthChange = (value: string) => {
+    const parsed = parseMonthInput(value);
+    if (!parsed) {
+      return;
     }
-  };
-
-  const handleMonthChange = (value: number) => {
     setErrorMessage(null);
     const nextParams = new URLSearchParams(searchParams.toString());
-    nextParams.set("draftMonth", String(value));
-    nextParams.set("draftYear", String(year));
-    router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
-  };
-
-  const handleYearChange = (value: number) => {
-    const nextAvailableMonths = monthsByYear[value] ?? [];
-    const nextMonth =
-      nextAvailableMonths.length > 0 && !nextAvailableMonths.includes(month)
-        ? nextAvailableMonths[0]
-        : month;
-    setErrorMessage(null);
-    const nextParams = new URLSearchParams(searchParams.toString());
-    nextParams.set("draftMonth", String(nextMonth));
-    nextParams.set("draftYear", String(value));
+    nextParams.set("draftMonth", String(parsed.month));
+    nextParams.set("draftYear", String(parsed.year));
     router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
   };
 
@@ -203,7 +215,7 @@ export const TimeMachinePanel = ({
             {isHistorical ? (
               <a
                 href="/"
-                className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-slate-500 hover:text-slate-100"
+                className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-slate-500 hover:text-slate-100 touch-manipulation"
               >
                 Exit historical view
               </a>
@@ -296,70 +308,32 @@ export const TimeMachinePanel = ({
           </div>
         ) : null}
 
-        <form onSubmit={handleSubmit} className="mt-6 grid gap-4 md:grid-cols-[1fr,1fr,auto]">
+        <form onSubmit={handleSubmit} className="mt-6 grid gap-4 md:grid-cols-[1fr,auto]">
           <label
             htmlFor="time-machine-month"
             className="space-y-2 text-xs uppercase tracking-[0.2em] text-slate-400"
           >
             Month
-            <select
+            <input
               ref={monthRef}
               id="time-machine-month"
               name="month"
-              value={month}
-              onChange={(event) => handleMonthChange(Number(event.target.value))}
+              type="month"
+              value={currentMonthValue}
+              min={coverageMin}
+              max={coverageMax}
+              onChange={(event) => handleMonthChange(event.target.value)}
               onBlur={handleMonthBlur}
               aria-invalid={isInvalid}
               aria-describedby={isInvalid ? errorId : undefined}
-              className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100 transition-colors hover:border-slate-700"
-            >
-              {isUnavailableSelection ? (
-                <option value={month} disabled>
-                  {requestedMonthLabel} (not available)
-                </option>
-              ) : null}
-              {monthOptions
-                .filter((option) => !(isUnavailableSelection && option.value === month))
-                .map((option) => {
-                  const isUnavailable =
-                    availableMonths.length > 0 && !availableMonths.includes(option.value);
-                  return (
-                    <option key={option.value} value={option.value} disabled={isUnavailable}>
-                      {option.label}
-                      {isUnavailable ? " (not available)" : ""}
-                    </option>
-                  );
-                })}
-            </select>
-          </label>
-          <label
-            htmlFor="time-machine-year"
-            className="space-y-2 text-xs uppercase tracking-[0.2em] text-slate-400"
-          >
-            Year
-            <select
-              ref={yearRef}
-              id="time-machine-year"
-              name="year"
-              value={year}
-              onChange={(event) => handleYearChange(Number(event.target.value))}
-              onBlur={handleYearBlur}
-              aria-invalid={isInvalid}
-              aria-describedby={isInvalid ? errorId : undefined}
-              className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100 transition-colors hover:border-slate-700"
-            >
-              {years.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
+              className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100 transition-colors hover:border-slate-700 touch-manipulation"
+            />
           </label>
           <button
             type="submit"
             disabled={isPending}
             aria-busy={isPending}
-            className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-slate-500 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
+            className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-slate-500 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
           >
             {isPending ? (
               <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />
