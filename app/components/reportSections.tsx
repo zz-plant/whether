@@ -108,13 +108,19 @@ export const RegimeAssessmentCard = ({ assessment }: { assessment: RegimeAssessm
   const hasWarnings = assessment.dataWarnings.length > 0;
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+    <section
+      id="regime-assessment"
+      aria-labelledby="regime-assessment-title"
+      className="relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/40 p-6"
+    >
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br opacity-80 blur-2xl" />
       <div className={`absolute inset-0 bg-gradient-to-br ${regimeAccent.panel} opacity-40`} />
       <div className="relative flex items-center justify-between gap-4">
         <div className="min-w-0">
           <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Current Regime</p>
-          <h2 className="text-3xl font-semibold text-slate-100">{regimeLabel}</h2>
+          <h2 id="regime-assessment-title" className="text-3xl font-semibold text-slate-100">
+            {regimeLabel}
+          </h2>
           <p className="mt-2 text-xs uppercase tracking-[0.2em] text-slate-400">
             Classified as {assessment.regime}
           </p>
@@ -160,7 +166,7 @@ export const RegimeAssessmentCard = ({ assessment }: { assessment: RegimeAssessm
         <p>{assessment.tightnessExplanation}</p>
         <p>{assessment.riskAppetiteExplanation}</p>
       </div>
-    </div>
+    </section>
   );
 };
 
@@ -178,9 +184,15 @@ export const LiveTickerPanel = ({
   const statusLabel = modeLabel ?? (treasury.isLive ? "Live" : "Offline");
 
   return (
-    <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+    <section
+      id="live-ticker"
+      aria-labelledby="live-ticker-title"
+      className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6"
+    >
       <div className="flex items-center justify-between">
-        <h3 className="text-sm uppercase tracking-[0.2em] text-slate-400">Live Ticker</h3>
+        <h3 id="live-ticker-title" className="text-sm uppercase tracking-[0.2em] text-slate-400">
+          Live Ticker
+        </h3>
         <span className="rounded-full border border-slate-700 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-400">
           {statusLabel}
         </span>
@@ -223,14 +235,20 @@ export const LiveTickerPanel = ({
           Open source
         </a>
       </div>
-    </div>
+    </section>
   );
 };
 
 export const ScoreReadoutPanel = ({ assessment }: { assessment: RegimeAssessment }) => {
   return (
-    <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
-      <h3 className="text-sm uppercase tracking-[0.2em] text-slate-400">Sensor Readout</h3>
+    <section
+      id="sensor-readout"
+      aria-labelledby="sensor-readout-title"
+      className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6"
+    >
+      <h3 id="sensor-readout-title" className="text-sm uppercase tracking-[0.2em] text-slate-400">
+        Sensor Readout
+      </h3>
       <div className="mt-4 space-y-5">
         <div>
           <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-slate-400">
@@ -257,7 +275,7 @@ export const ScoreReadoutPanel = ({ assessment }: { assessment: RegimeAssessment
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 
@@ -268,9 +286,19 @@ export const SignalMatrixPanel = ({ assessment }: { assessment: RegimeAssessment
   const left = `${x}%`;
 
   return (
-    <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6" aria-describedby="signal-matrix-description">
+    <section
+      id="signal-matrix"
+      aria-labelledby="signal-matrix-title"
+      aria-describedby="signal-matrix-description"
+      className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6"
+    >
       <div className="flex items-center justify-between">
-        <h3 className="text-sm uppercase tracking-[0.2em] text-slate-400">Signal Matrix</h3>
+        <h3
+          id="signal-matrix-title"
+          className="text-sm uppercase tracking-[0.2em] text-slate-400"
+        >
+          Signal Matrix
+        </h3>
         <span className="text-xs uppercase tracking-[0.2em] text-slate-500">Tightness vs. Bravery</span>
       </div>
       <div className="relative mt-6 h-56 rounded-xl border border-slate-800 bg-slate-950/60">
@@ -306,14 +334,20 @@ export const SignalMatrixPanel = ({ assessment }: { assessment: RegimeAssessment
         Position is derived from tightness (<span className="tabular-nums">{assessment.scores.tightness}</span>)
         and market bravery (<span className="tabular-nums">{assessment.scores.riskAppetite}</span>).
       </p>
-    </div>
+    </section>
   );
 };
 
 export const DataSourcePanel = ({ treasury }: { treasury: TreasuryData }) => {
   return (
-    <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
-      <h3 className="text-sm uppercase tracking-[0.2em] text-slate-400">Data Source</h3>
+    <section
+      id="data-source"
+      aria-labelledby="data-source-title"
+      className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6"
+    >
+      <h3 id="data-source-title" className="text-sm uppercase tracking-[0.2em] text-slate-400">
+        Data Source
+      </h3>
       <p className="mt-2 text-sm text-slate-200">US Treasury Fiscal Data API</p>
       <p className="mt-4 text-xs text-slate-400">Record date</p>
       <p className="mono text-sm text-slate-200">{formatDate(treasury.record_date)}</p>
@@ -327,7 +361,7 @@ export const DataSourcePanel = ({ treasury }: { treasury: TreasuryData }) => {
       >
         {treasury.source}
       </a>
-    </div>
+    </section>
   );
 };
 
@@ -353,12 +387,14 @@ export const ExecutiveSnapshotPanel = ({
   const curveLabel = curveSlope === null ? "—" : curveSlope < 0 ? "Inverted" : "Normal";
 
   return (
-    <section className="mt-8">
+    <section id="executive-snapshot" aria-labelledby="executive-snapshot-title" className="mt-8">
       <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-sm uppercase tracking-[0.2em] text-slate-400">Executive snapshot</p>
-            <h3 className="text-xl font-semibold text-slate-100">Operational pulse</h3>
+            <h3 id="executive-snapshot-title" className="text-xl font-semibold text-slate-100">
+              Operational pulse
+            </h3>
           </div>
           <span className="rounded-full border border-slate-700 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-300">
             {modeLabel}
@@ -423,12 +459,14 @@ export const TimeMachinePanel = ({
   const latestRecordLabel = formatDate(latestRecordDate);
 
   return (
-    <section className="mt-10">
+    <section id="time-machine" aria-labelledby="time-machine-title" className="mt-10">
       <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-sm uppercase tracking-[0.2em] text-slate-400">Time Machine</p>
-            <h3 className="text-xl font-semibold text-slate-100">Replay a prior regime</h3>
+            <h3 id="time-machine-title" className="text-xl font-semibold text-slate-100">
+              Replay a prior regime
+            </h3>
             <p className="mt-2 text-sm text-slate-300">
               Pull the latest available Treasury record on or before a chosen month to see the
               historical regime.
@@ -486,7 +524,7 @@ export const TimeMachinePanel = ({
           </button>
         </form>
         {invalidSelection ? (
-          <p className="mt-4 text-xs text-amber-200">
+          <p className="mt-4 text-xs text-amber-200" role="status" aria-live="polite">
             That month is not available in the cache. Showing the latest data instead.
           </p>
         ) : null}
@@ -503,8 +541,10 @@ export const TimeMachinePanel = ({
 
 export const SensorArray = ({ sensors }: { sensors: SensorReading[] }) => {
   return (
-    <section className="mt-10">
-      <h3 className="text-sm uppercase tracking-[0.2em] text-slate-400">Live Sensor Array</h3>
+    <section id="sensor-array" aria-labelledby="sensor-array-title" className="mt-10">
+      <h3 id="sensor-array-title" className="text-sm uppercase tracking-[0.2em] text-slate-400">
+        Live Sensor Array
+      </h3>
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         {sensors.map((sensor) => (
           <div key={sensor.id} className="rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
@@ -544,12 +584,14 @@ export const PlaybookPanel = ({
   fenceItems: string[];
 }) => {
   return (
-    <section className="mt-10">
+    <section id="playbook" aria-labelledby="playbook-title" className="mt-10">
       <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-sm uppercase tracking-[0.2em] text-slate-400">Playbook</p>
-            <h3 className="text-xl font-semibold">{playbook?.title ?? "Operational Guidance"}</h3>
+            <h3 id="playbook-title" className="text-xl font-semibold">
+              {playbook?.title ?? "Operational Guidance"}
+            </h3>
             {playbook ? (
               <p className="mt-2 text-sm text-slate-300 break-words">{playbook.insight}</p>
             ) : (
