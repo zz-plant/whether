@@ -159,51 +159,62 @@ export default async function HomePage({
       : "Offline / Simulated";
 
   return (
-    <main id="main-content" tabIndex={-1} className="min-h-screen bg-slate-950 text-slate-100">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="relative min-h-screen overflow-hidden bg-slate-950 text-slate-100"
+    >
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
       <DisplayGuardian />
+      <div className="pointer-events-none absolute left-1/2 top-0 h-[480px] w-[680px] -translate-x-1/2 rounded-full bg-sky-500/10 blur-[180px]" />
+      <div className="pointer-events-none absolute right-0 top-1/3 h-[520px] w-[520px] rounded-full bg-indigo-500/10 blur-[200px]" />
       <div className="mx-auto max-w-6xl px-6 py-12 display-drift">
-        <header className="flex flex-col gap-4 border-b border-slate-800 pb-8">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="min-w-0">
-              <p className="text-sm uppercase tracking-[0.2em] text-slate-400">Regime Station</p>
-              <h1 className="text-3xl font-semibold">Whether Report</h1>
+        <header className="relative flex flex-col gap-6 border-b border-slate-800/70 pb-8">
+          <div className="flex flex-wrap items-start justify-between gap-6">
+            <div className="min-w-0 space-y-4">
+              <p className="text-xs uppercase tracking-[0.35em] text-slate-400">Regime Station</p>
+              <div className="space-y-3">
+                <h1 className="text-4xl font-semibold text-slate-100 md:text-5xl">Whether Report</h1>
+                <p className="max-w-2xl text-sm text-slate-300 md:text-base">
+                  A deep-realist operating brief that translates Treasury signals into constraints you can
+                  execute. Every output is sourced and time-stamped for traceability.
+                </p>
+              </div>
             </div>
-            <span className="rounded-full border border-slate-700 px-4 py-1 text-xs uppercase tracking-[0.2em] text-slate-300">
-              {statusLabel}
-            </span>
+            <div className="flex flex-col items-start gap-3 rounded-3xl border border-slate-800/80 bg-slate-900/60 px-5 py-4 shadow-[0_0_0_1px_rgba(15,23,42,0.6)]">
+              <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">Signal status</p>
+              <span className="rounded-full border border-slate-700 px-4 py-1 text-xs uppercase tracking-[0.2em] text-slate-200">
+                {statusLabel}
+              </span>
+            </div>
           </div>
-          <p className="max-w-3xl text-slate-300">
-            Translate Treasury signals into operational constraints. Every output is sourced and time-stamped
-            for traceability.
-          </p>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/50 px-4 py-3">
-              <p className="text-[10px] uppercase tracking-[0.2em] text-slate-400">Record date</p>
-              <p className="mono mt-2 text-sm text-slate-100">{recordDateLabel}</p>
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="rounded-3xl border border-slate-800/70 bg-slate-950/70 px-5 py-4 shadow-[0_0_0_1px_rgba(15,23,42,0.6)]">
+              <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">Record date</p>
+              <p className="mono mt-3 text-sm text-slate-100">{recordDateLabel}</p>
             </div>
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/50 px-4 py-3">
-              <p className="text-[10px] uppercase tracking-[0.2em] text-slate-400">Fetched at</p>
-              <p className="mono mt-2 text-sm text-slate-100">{fetchedAtLabel}</p>
+            <div className="rounded-3xl border border-slate-800/70 bg-slate-950/70 px-5 py-4 shadow-[0_0_0_1px_rgba(15,23,42,0.6)]">
+              <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">Fetched at</p>
+              <p className="mono mt-3 text-sm text-slate-100">{fetchedAtLabel}</p>
             </div>
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/50 px-4 py-3">
-              <p className="text-[10px] uppercase tracking-[0.2em] text-slate-400">Source</p>
+            <div className="rounded-3xl border border-slate-800/70 bg-slate-950/70 px-5 py-4 shadow-[0_0_0_1px_rgba(15,23,42,0.6)]">
+              <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">Source</p>
               <a
                 href={treasury.source}
                 target="_blank"
                 rel="noreferrer"
-                className="touch-target mt-2 block text-xs text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+                className="touch-target mt-3 inline-flex min-h-[44px] items-center text-xs text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
               >
                 US Treasury Fiscal Data API
               </a>
             </div>
           </div>
-          <nav aria-label="Report sections" className="mt-4">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">Jump to</p>
-            <ul className="mt-3 flex flex-wrap gap-2">
+          <nav aria-label="Report sections" className="space-y-3">
+            <p className="text-[10px] uppercase tracking-[0.3em] text-slate-500">Jump to</p>
+            <ul className="flex flex-wrap gap-3">
               {[
                 { href: "#executive-snapshot", label: "Executive snapshot" },
                 { href: "#regime-assessment", label: "Regime assessment" },
@@ -217,7 +228,7 @@ export default async function HomePage({
                 <li key={item.href}>
                   <a
                     href={item.href}
-                    className="inline-flex min-h-[44px] items-center rounded-full border border-slate-800 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-300 transition-colors hover:border-slate-600 hover:text-slate-100"
+                    className="inline-flex min-h-[44px] items-center rounded-full border border-slate-800/70 bg-slate-950/60 px-4 py-2 text-[11px] uppercase tracking-[0.25em] text-slate-300 transition-colors hover:border-slate-500 hover:text-slate-100"
                   >
                     {item.label}
                   </a>
@@ -265,7 +276,7 @@ export default async function HomePage({
           invalidSelection={invalidHistoricalSelection}
         />
 
-        <footer className="mt-12 border-t border-slate-800 pt-6 text-xs text-slate-500">
+        <footer className="mt-12 border-t border-slate-800/70 pt-6 text-xs uppercase tracking-[0.3em] text-slate-500">
           Not Financial Advice.
         </footer>
       </div>
