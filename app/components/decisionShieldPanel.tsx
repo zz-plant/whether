@@ -261,13 +261,13 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
         <div className="mt-6 grid gap-4 lg:grid-cols-3">
           <div className="space-y-2">
             <label
-              htmlFor="decision-shield-lifecycle"
+              htmlFor="decision-lifecycle"
               className="text-xs uppercase tracking-[0.2em] text-slate-400"
             >
               Lifecycle
             </label>
             <select
-              id="decision-shield-lifecycle"
+              id="decision-lifecycle"
               value={lifecycle}
               onChange={(event) => setLifecycle(event.target.value as LifecycleStage)}
               className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100 transition-colors hover:border-slate-700"
@@ -281,13 +281,13 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
           </div>
           <div className="space-y-2">
             <label
-              htmlFor="decision-shield-category"
+              htmlFor="decision-category"
               className="text-xs uppercase tracking-[0.2em] text-slate-400"
             >
               Category
             </label>
             <select
-              id="decision-shield-category"
+              id="decision-category"
               value={category}
               onChange={(event) => setCategory(event.target.value as DecisionCategory)}
               className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100 transition-colors hover:border-slate-700"
@@ -301,13 +301,13 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
           </div>
           <div className="space-y-2">
             <label
-              htmlFor="decision-shield-action"
+              htmlFor="decision-action"
               className="text-xs uppercase tracking-[0.2em] text-slate-400"
             >
               Action
             </label>
             <select
-              id="decision-shield-action"
+              id="decision-action"
               value={action}
               onChange={(event) => setAction(event.target.value as DecisionAction)}
               className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100 transition-colors hover:border-slate-700"
