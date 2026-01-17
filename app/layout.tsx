@@ -2,7 +2,7 @@ import "./globals.css";
 import type { Metadata, Viewport } from "next";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://whether.report";
-const siteName = "Whether — Regime Station";
+const siteName = "Whether — Market Climate Station";
 const siteDescription =
   "Translate Treasury macro signals into plain-English operational constraints for product and engineering leaders.";
 
@@ -13,14 +13,14 @@ export const metadata: Metadata = {
     template: "%s | Whether"
   },
   description: siteDescription,
-  applicationName: "Whether Regime Station",
+  applicationName: "Whether Market Climate Station",
   keywords: [
     "macroeconomic signals",
     "Treasury yield curve",
     "product strategy",
     "engineering strategy",
     "capital markets",
-    "regime classification",
+    "market climate classification",
     "operational constraints"
   ],
   authors: [{ name: "Whether" }],

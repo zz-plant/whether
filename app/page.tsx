@@ -18,7 +18,7 @@ export const generateMetadata = ({
   searchParams?: { month?: string; year?: string };
 }): Metadata => {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://whether.report";
-  const siteName = "Whether — Regime Station";
+  const siteName = "Whether — Market Climate Station";
   const siteDescription =
     "Translate Treasury macro signals into plain-English operational constraints for product and engineering leaders.";
   const selection = resolveTimeMachineSelection(searchParams);
@@ -75,7 +75,7 @@ export default async function HomePage({
     {
       href: "/",
       label: "Overview",
-      description: "Executive snapshot, regime posture, and the high-level read.",
+      description: "Executive snapshot, market climate posture, and the high-level read.",
     },
     {
       href: "/signals",
@@ -92,14 +92,14 @@ export default async function HomePage({
     { href: "#first-time-guide", label: "First-time guide" },
     { href: "#beginner-glossary", label: "Glossary" },
     { href: "#executive-snapshot", label: "Executive snapshot" },
-    { href: "#regime-alerts", label: "Regime alerts" },
-    { href: "#regime-assessment", label: "Regime assessment" },
+    { href: "#regime-alerts", label: "Market climate alerts" },
+    { href: "#regime-assessment", label: "Market climate assessment" },
     { href: "#signal-matrix", label: "Signal matrix" },
   ];
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "Whether — Regime Station",
+    name: "Whether — Market Climate Station",
     url: siteUrl,
     description:
       "Translate Treasury macro signals into plain-English operational constraints for product and engineering leaders.",
@@ -143,7 +143,7 @@ export default async function HomePage({
       trustStatusDetail={trustStatusDetail}
       trustStatusTone={trustStatusTone}
       pageTitle="Overview"
-      pageSummary="Start here for a fast read on the regime and the executive implications. The rest of the report branches into deeper signal analysis and operational execution guidance."
+      pageSummary="Start here for a fast read on the market climate and the executive implications. The rest of the report branches into deeper signal analysis and operational execution guidance."
       pageLinks={pageLinks}
       sectionLinks={sectionLinks}
       structuredData={JSON.stringify(structuredData)}

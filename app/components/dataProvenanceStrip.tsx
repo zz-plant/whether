@@ -1,6 +1,6 @@
 /**
  * Data provenance strip for surfacing source, freshness, and live status inline.
- * Keeps each Regime Station section traceable at the point of interpretation.
+ * Keeps each Market Climate Station section traceable at the point of interpretation.
  */
 export type DataProvenance = {
   sourceLabel: string;

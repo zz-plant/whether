@@ -1,5 +1,5 @@
 /**
- * Formula documentation for Regime Station sensors.
+ * Formula documentation for Market Climate Station sensors.
  * Keeps methodology transparent and shareable for operators.
  */
 import type { Metadata } from "next";

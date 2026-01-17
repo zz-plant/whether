@@ -1,6 +1,6 @@
 /**
  * Report section components for the Whether Report dashboard.
- * Keeps layout blocks focused and reusable across the Regime Station UI.
+ * Keeps layout blocks focused and reusable across the Market Climate Station UI.
  */
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import type { PlaybookEntry } from "../../lib/playbook";
@@ -202,18 +202,18 @@ export const RegimeAssessmentCard = ({
       <div className={`absolute inset-0 bg-gradient-to-br ${regimeAccent.panel} opacity-40`} />
       <div className="relative flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
-          <p className="type-label text-slate-400">Current Regime</p>
+          <p className="type-label text-slate-400">Current market climate</p>
           <h2 id="regime-assessment-title" className="type-section text-slate-100">
             {regimeLabel}
           </h2>
           <p className="mt-2 text-xs uppercase tracking-[0.2em] text-slate-400">
-            Classified as {assessment.regime}
+            System label: {assessment.regime}
           </p>
         </div>
         <div className="flex flex-col items-end gap-3 text-xs uppercase tracking-[0.2em] text-slate-300">
           <span className="weather-pill flex items-center gap-2 px-3 py-1">
             <span className={`h-2 w-2 rounded-full ${regimeAccent.dot}`} />
-            Regime status
+            Climate status
           </span>
           <span className="weather-pill px-3 py-1">
             Tightness{" "}
@@ -243,7 +243,7 @@ export const RegimeAssessmentCard = ({
         })}
       </div>
       <p className="relative mt-3 text-xs text-slate-400">
-        Badge colors map to regime posture for instant recognition across report panels.
+        Badge colors map to climate posture for instant recognition across report panels.
       </p>
       <p className="relative mt-4 type-data text-slate-200 break-words">{assessment.description}</p>
       <div className="weather-surface relative mt-4 grid gap-3 p-4 text-xs text-slate-400 md:grid-cols-3">
@@ -379,7 +379,7 @@ export const FirstTimeGuidePanel = ({
         <div>
           <p className="type-label text-slate-400">First-time operator guide</p>
           <h2 id="first-time-guide-title" className="type-section text-slate-100">
-            Orient to the live regime briefing in three moves
+            Orient to the live market climate briefing in three moves
           </h2>
           <p className="mt-2 type-data text-slate-300">
             This report is built to turn Treasury signals into immediate execution constraints. Start
@@ -399,10 +399,10 @@ export const FirstTimeGuidePanel = ({
           {
             title: "1. Scan the executive snapshot",
             detail:
-              "Confirm the operating regime and the top constraints before you open deeper diagnostics.",
+              "Confirm the operating climate and the top constraints before you open deeper diagnostics.",
           },
           {
-            title: "2. Validate the regime drivers",
+            title: "2. Validate the climate drivers",
             detail:
               "Use the signal matrix here, then hop into the Signals & thresholds lane for the full sensor array.",
           },
@@ -427,7 +427,7 @@ export const FirstTimeGuidePanel = ({
       <div className="mt-6 flex flex-wrap gap-3">
         {[
           { href: "#executive-snapshot", label: "Executive snapshot" },
-          { href: "#regime-assessment", label: "Regime assessment" },
+          { href: "#regime-assessment", label: "Market climate assessment" },
           { href: "/operations#playbook", label: "Playbook" },
           { href: "/operations#export-briefs", label: "Export briefs" },
           { href: "/signals#time-machine", label: "Time machine" },
@@ -443,7 +443,7 @@ export const FirstTimeGuidePanel = ({
       </div>
       <p className="mt-4 text-xs text-slate-500">
         Share the URL when you lock thresholds or time machine selections so every stakeholder sees
-        the same regime assumptions.
+        the same climate assumptions.
       </p>
     </div>
   </section>
@@ -476,7 +476,7 @@ export const BeginnerGlossaryPanel = () => (
           </p>
           <ul className="mt-3 space-y-2 text-sm text-slate-400">
             <li>
-              <span className="text-slate-200">Start with the regime badge</span> to understand the
+              <span className="text-slate-200">Start with the climate badge</span> to understand the
               macro stance before you interpret any single metric.
             </li>
             <li>
@@ -580,7 +580,7 @@ export const CxoFunctionPanel = ({ provenance }: { provenance: DataProvenance })
       <DataProvenanceStrip provenance={provenance} />
     </div>
     <p className="mt-3 max-w-3xl type-data text-slate-300">
-      Each module below translates regime signals into CXO-ready artifacts. Use them to align
+      Each module below translates market climate signals into CXO-ready artifacts. Use them to align
       finance, operations, and product leadership on a shared macro posture.
     </p>
     <div className="mt-6 grid gap-4 md:grid-cols-2">
@@ -1027,12 +1027,12 @@ export const RegimeChangeAlertPanel = ({
       <div className="weather-panel p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="type-label text-slate-400">Regime change alerts</p>
+            <p className="type-label text-slate-400">Market climate change alerts</p>
             <h3 id="regime-alerts-title" className="type-section text-slate-100">
               Alert preview and reason codes
             </h3>
             <p className="mt-2 type-data text-slate-300">
-              Monitor regime transitions with a clear before/after snapshot and the signal shifts
+              Monitor climate shifts with a clear before/after snapshot and the signal shifts
               that triggered the change.
             </p>
           </div>
@@ -1087,7 +1087,7 @@ export const RegimeChangeAlertPanel = ({
           <div className="mt-6 weather-surface p-4">
             <p className="text-sm text-slate-300">
               Alert history is unavailable for this view. Exit the Time Machine or refresh the
-              latest report to see the most recent regime transition.
+              latest report to see the most recent climate shift.
             </p>
           </div>
         )}
@@ -1348,7 +1348,7 @@ export const PlaybookPanel = ({
               <p className="mt-2 type-data text-slate-300 break-words">{playbook.insight}</p>
             ) : (
               <p className="mt-2 type-data text-slate-300">
-                Playbook data unavailable. Use regime constraints as guardrails.
+                Playbook data unavailable. Use climate constraints as guardrails.
               </p>
             )}
           </div>
@@ -1450,7 +1450,7 @@ export const InsightDatabasePanel = ({
           <div>
             <p className="type-label text-slate-400">Insight database</p>
             <h3 id="insight-database-title" className="type-section text-slate-100">
-              Evidence-backed regime rationale
+              Evidence-backed climate rationale
             </h3>
             <p className="mt-2 type-data text-slate-300">
               Attach cited macro evidence and historical patterns to explain the current posture.
@@ -1460,9 +1460,9 @@ export const InsightDatabasePanel = ({
         </div>
         <div className="mt-6 grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">
           <div className="weather-surface p-4">
-            <p className="type-label text-slate-400">Regime evidence</p>
+            <p className="type-label text-slate-400">Market climate evidence</p>
             <p className="mt-3 text-sm text-slate-200">
-              {evidence?.summary ?? "No evidence summary available for this regime."}
+              {evidence?.summary ?? "No evidence summary available for this climate."}
             </p>
             <ul className="mt-4 space-y-3 text-sm text-slate-300">
               {(evidence?.citations ?? []).map((citation) => (

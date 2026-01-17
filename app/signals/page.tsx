@@ -12,7 +12,7 @@ import { TimeMachinePanel } from "../components/timeMachinePanel";
 export const metadata: Metadata = {
   title: "Whether Report — Signals & thresholds",
   description:
-    "Macro signals, sensor detail, thresholds, and historical context for Whether Regime Station.",
+    "Macro signals, sensor detail, thresholds, and historical context for Whether Market Climate Station.",
 };
 
 export default async function SignalsPage({
@@ -24,7 +24,7 @@ export default async function SignalsPage({
     {
       href: "/",
       label: "Overview",
-      description: "Executive snapshot, regime posture, and the high-level read.",
+      description: "Executive snapshot, market climate posture, and the high-level read.",
     },
     {
       href: "/signals",
@@ -85,7 +85,7 @@ export default async function SignalsPage({
       trustStatusDetail={trustStatusDetail}
       trustStatusTone={trustStatusTone}
       pageTitle="Signals & thresholds"
-      pageSummary="Deep-dive into the live signal layer, the macro data sources, and how thresholds are shaping the regime classification."
+      pageSummary="Deep-dive into the live signal layer, the macro data sources, and how thresholds are shaping the market climate classification."
       pageLinks={pageLinks}
       sectionLinks={sectionLinks}
       historicalBanner={

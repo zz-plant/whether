@@ -1,5 +1,5 @@
 /**
- * Insight Database for Regime Station.
+ * Insight Database for Market Climate Station.
  * Translates macro signals into plain-English product and engineering constraints.
  */
 export const insightDatabase = {
@@ -27,7 +27,7 @@ export const insightDatabase = {
         lowRateArtifact: "Live chat, phone support, and concierge workflows",
         highRateArtifact: "Self-serve help centers and AI deflection",
         insight:
-          "In growth regimes, users are assets to retain. In tight regimes, support is a cost to control.",
+          "In growth climates, users are assets to retain. In tight climates, support is a cost to control.",
       },
       {
         domain: "Data",
@@ -60,7 +60,7 @@ export const insightDatabase = {
     ],
   },
   regimePlaybooks: {
-    title: "Regime Playbooks",
+    title: "Market Climate Playbooks",
     subtitle: "Operational heuristics by climate",
     regimes: [
       {
@@ -191,7 +191,7 @@ export const insightDatabase = {
     ],
   },
   regimeEvidence: {
-    title: "Regime Evidence",
+    title: "Market Climate Evidence",
     subtitle: "Signal-backed rationale with traceable sources",
     regimes: [
       {

@@ -1,5 +1,5 @@
 /**
- * Curated list of post-MVP operator requests for the Regime Station flow.
+ * Curated list of post-MVP operator requests for the Market Climate Station flow.
  * Captures expected expansion demand while preserving traceability and plain-English framing.
  */
 
@@ -17,7 +17,7 @@ export const operatorRequests: Array<{
     status: "DELIVERED",
   },
   {
-    title: "Adjustable regime thresholds",
+    title: "Adjustable market climate thresholds",
     description:
       "Let operators tune thresholds with an audit trail and defaults for transparent overrides.",
     status: "DELIVERED",
@@ -41,12 +41,12 @@ export const operatorRequests: Array<{
   },
   {
     title: "Historical comparisons",
-    description: "Show then-vs-now regime diffs with clear deltas and context.",
+    description: "Show then-vs-now market climate diffs with clear deltas and context.",
     status: "BACKLOG",
   },
   {
-    title: "Regime change alerts",
-    description: "Notify teams with reason codes when the regime flips.",
+    title: "Market climate change alerts",
+    description: "Notify teams with reason codes when the market climate flips.",
     status: "DELIVERED",
   },
   {

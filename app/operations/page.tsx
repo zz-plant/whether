@@ -26,7 +26,7 @@ export default async function OperationsPage({
     {
       href: "/",
       label: "Overview",
-      description: "Executive snapshot, regime posture, and the high-level read.",
+      description: "Executive snapshot, market climate posture, and the high-level read.",
     },
     {
       href: "/signals",
@@ -87,7 +87,7 @@ export default async function OperationsPage({
       trustStatusDetail={trustStatusDetail}
       trustStatusTone={trustStatusTone}
       pageTitle="Operations playbook"
-      pageSummary="Translate the regime into action: decision shields, playbook moves, and export-ready briefs for leadership review."
+      pageSummary="Translate the market climate into action: decision shields, playbook moves, and export-ready briefs for leadership review."
       pageLinks={pageLinks}
       sectionLinks={sectionLinks}
       historicalBanner={
