@@ -24,6 +24,7 @@ import {
   ExecutiveSnapshotPanel,
   HistoricalBanner,
   LiveTickerPanel,
+  CxoFunctionPanel,
   OperatorRequestsPanel,
   PlaybookPanel,
   RegimeAssessmentCard,
@@ -278,6 +279,7 @@ export default async function HomePage({
                 { href: "#decision-shield", label: "Decision shield" },
                 { href: "#export-briefs", label: "Export briefs" },
                 { href: "#time-machine", label: "Time machine" },
+                { href: "#cxo-functions", label: "CXO outputs" },
                 { href: "#operator-requests", label: "Operator requests" },
               ].map((item) => (
                 <li key={item.href}>
@@ -351,6 +353,8 @@ export default async function HomePage({
           historicalSummary={historicalSelection ? assessment.description : null}
           comparison={historicalComparison}
         />
+
+        <CxoFunctionPanel provenance={internalProvenance} />
 
         <OperatorRequestsPanel provenance={internalProvenance} />
 

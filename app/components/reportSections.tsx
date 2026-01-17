@@ -5,6 +5,7 @@
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import type { PlaybookEntry } from "../../lib/playbook";
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../../lib/types";
+import { cxoFunctionOutputs } from "../../lib/cxoFunctionOutputs";
 import { operatorRequests } from "../../lib/operatorRequests";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
 
@@ -266,6 +267,47 @@ export const OperatorRequestsPanel = ({ provenance }: { provenance: DataProvenan
             </span>
           </div>
           <p className="mt-2 text-sm text-slate-200">{request.description}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+);
+
+export const CxoFunctionPanel = ({ provenance }: { provenance: DataProvenance }) => (
+  <section
+    id="cxo-functions"
+    aria-labelledby="cxo-functions-title"
+    className="mt-10 rounded-2xl border border-slate-800 bg-slate-900/40 p-6"
+  >
+    <div className="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <p className="type-label text-slate-400">CXO outputs</p>
+        <h3 id="cxo-functions-title" className="type-section text-slate-100">
+          Executive function replacement map
+        </h3>
+      </div>
+      <DataProvenanceStrip provenance={provenance} />
+    </div>
+    <p className="mt-3 max-w-3xl type-data text-slate-300">
+      Each module below translates regime signals into CXO-ready artifacts. Use them to align
+      finance, operations, and product leadership on a shared macro posture.
+    </p>
+    <div className="mt-6 grid gap-4 md:grid-cols-2">
+      {cxoFunctionOutputs.map((item) => (
+        <div
+          key={item.role}
+          className="rounded-2xl border border-slate-800/80 bg-slate-950/60 px-5 py-4 shadow-[0_0_0_1px_rgba(15,23,42,0.4)]"
+        >
+          <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{item.role}</p>
+          <p className="mt-3 text-sm text-slate-200">{item.focus}</p>
+          <ul className="mt-4 space-y-2 text-sm text-slate-300">
+            {item.outputs.map((output) => (
+              <li key={output} className="flex gap-2">
+                <span className="text-slate-500">•</span>
+                <span className="break-words">{output}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       ))}
     </div>
