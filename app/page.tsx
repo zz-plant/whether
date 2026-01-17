@@ -130,6 +130,12 @@ export default async function HomePage({
     }
   };
 
+  const historicalSelection = resolveTimeMachineSelection(searchParams);
+  const requestedSelection = parseTimeMachineRequest(searchParams);
+  const treasuryPromise = fetchTreasuryData({
+    snapshotFallback: snapshotData,
+    asOf: historicalSelection?.asOf,
+  });
   const now = new Date();
   const latestCache = getLatestTimeMachineSnapshot();
   const defaultMonth = latestCache?.month ?? now.getUTCMonth() + 1;
@@ -137,15 +143,10 @@ export default async function HomePage({
   const cacheCoverage = getTimeMachineCoverage();
   const cacheYears = getTimeMachineYears();
   const cacheMonthsByYear = getTimeMachineMonthsByYear();
-  const historicalSelection = resolveTimeMachineSelection(searchParams);
-  const requestedSelection = parseTimeMachineRequest(searchParams);
   const invalidHistoricalSelection = Boolean(requestedSelection && !historicalSelection);
   const selectedMonth = requestedSelection?.month ?? defaultMonth;
   const selectedYear = requestedSelection?.year ?? defaultYear;
-  const treasury = await fetchTreasuryData({
-    snapshotFallback: snapshotData,
-    asOf: historicalSelection?.asOf,
-  });
+  const treasury = await treasuryPromise;
   const recordDateLabel = formatDateValue(treasury.record_date);
   const fetchedAtLabel = formatTimestampValue(treasury.fetched_at);
   const sensors = buildSensorReadings(treasury);
