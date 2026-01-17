@@ -20,6 +20,7 @@ import { DecisionShieldPanel } from "./components/decisionShieldPanel";
 import { DisplayGuardian } from "./components/displayGuardian";
 import {
   DataSourcePanel,
+  FirstTimeGuidePanel,
   MacroSignalsPanel,
   ExecutiveSnapshotPanel,
   HistoricalBanner,
@@ -268,6 +269,7 @@ export default async function HomePage({
             <p className="text-[10px] uppercase tracking-[0.3em] text-slate-500">Jump to</p>
             <ul className="flex flex-wrap gap-3">
               {[
+                { href: "#first-time-guide", label: "First-time guide" },
                 { href: "#executive-snapshot", label: "Executive snapshot" },
                 { href: "#regime-assessment", label: "Regime assessment" },
                 { href: "#signal-matrix", label: "Signal matrix" },
@@ -295,6 +297,12 @@ export default async function HomePage({
           </nav>
           {historicalSelection ? <HistoricalBanner banner={historicalSelection.banner} /> : null}
         </header>
+
+        <FirstTimeGuidePanel
+          statusLabel={statusLabel}
+          recordDateLabel={recordDateLabel}
+          fetchedAtLabel={fetchedAtLabel}
+        />
 
         <ExecutiveSnapshotPanel
           treasury={treasury}
