@@ -40,6 +40,14 @@ const formatNumber = (value: number | null, unit: string) => {
   return `${numberFormatter.format(value)}${unit}`;
 };
 
+const clampToRange = (value: number, min: number, max: number) =>
+  Math.min(Math.max(value, min), max);
+
+const mapToPercent = (value: number, min: number, max: number) => {
+  const clamped = clampToRange(value, min, max);
+  return ((clamped - min) / (max - min)) * 100;
+};
+
 
 const getRegimeLabel = (regime: RegimeAssessment["regime"]) => {
   switch (regime) {
@@ -101,6 +109,7 @@ export const RegimeAssessmentCard = ({
   const regimeLabel = getRegimeLabel(assessment.regime);
   const regimeAccent = getRegimeAccent(assessment.regime);
   const hasWarnings = assessment.dataWarnings.length > 0;
+  const constraintCount = assessment.constraints.length;
 
   return (
     <section
@@ -136,6 +145,24 @@ export const RegimeAssessmentCard = ({
         </div>
       </div>
       <p className="relative mt-4 type-data text-slate-200 break-words">{assessment.description}</p>
+      <div className="relative mt-4 grid gap-3 rounded-xl border border-slate-800 bg-slate-950/60 p-4 text-xs text-slate-400 md:grid-cols-3">
+        <div>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">Constraints</p>
+          <p className="mt-2 text-lg font-semibold text-slate-100 tabular-nums">{constraintCount}</p>
+        </div>
+        <div>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">Capital tightness</p>
+          <p className="mt-2 text-lg font-semibold text-slate-100 tabular-nums">
+            {assessment.scores.tightness}
+          </p>
+        </div>
+        <div>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">Market bravery</p>
+          <p className="mt-2 text-lg font-semibold text-slate-100 tabular-nums">
+            {assessment.scores.riskAppetite}
+          </p>
+        </div>
+      </div>
       <ul className="relative mt-4 space-y-2 text-sm text-slate-300">
         {assessment.constraints.map((item) => (
           <li key={item} className="flex gap-2">
@@ -144,6 +171,34 @@ export const RegimeAssessmentCard = ({
           </li>
         ))}
       </ul>
+      <div className="relative mt-6 grid gap-4 rounded-xl border border-slate-800 bg-slate-950/60 p-4 text-xs text-slate-400 md:grid-cols-2">
+        <div className="space-y-3">
+          <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.2em] text-slate-500">
+            <span>Capital tightness</span>
+            <span className="text-slate-200 tabular-nums">{assessment.scores.tightness}/100</span>
+          </div>
+          <div className="h-2 rounded-full bg-slate-800">
+            <div
+              className="h-2 rounded-full bg-rose-500"
+              style={{ width: `${assessment.scores.tightness}%` }}
+            />
+          </div>
+          <p>{assessment.tightnessExplanation}</p>
+        </div>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.2em] text-slate-500">
+            <span>Market bravery</span>
+            <span className="text-slate-200 tabular-nums">{assessment.scores.riskAppetite}/100</span>
+          </div>
+          <div className="h-2 rounded-full bg-slate-800">
+            <div
+              className="h-2 rounded-full bg-amber-400"
+              style={{ width: `${assessment.scores.riskAppetite}%` }}
+            />
+          </div>
+          <p>{assessment.riskAppetiteExplanation}</p>
+        </div>
+      </div>
       {hasWarnings ? (
         <div className="relative mt-6 rounded-xl border border-amber-400/40 bg-amber-500/10 p-4 text-xs text-amber-100">
           <p className="text-[10px] uppercase tracking-[0.2em] text-amber-200">Data quality flags</p>
@@ -160,10 +215,6 @@ export const RegimeAssessmentCard = ({
           </p>
         </div>
       ) : null}
-      <div className="relative mt-6 grid gap-4 rounded-xl border border-slate-800 bg-slate-950/60 p-4 text-xs text-slate-400">
-        <p>{assessment.tightnessExplanation}</p>
-        <p>{assessment.riskAppetiteExplanation}</p>
-      </div>
     </section>
   );
 };
@@ -253,72 +304,6 @@ export const FirstTimeGuidePanel = ({
   </section>
 );
 
-export const LiveTickerPanel = ({
-  treasury,
-  assessment,
-  provenance,
-}: {
-  treasury: TreasuryData;
-  assessment: RegimeAssessment;
-  provenance: DataProvenance;
-}) => {
-  const curveSlope = assessment.scores.curveSlope;
-  const curveLabel = curveSlope === null ? "—" : curveSlope < 0 ? "Inverted" : "Normal";
-
-  return (
-    <section
-      id="live-ticker"
-      aria-labelledby="live-ticker-title"
-      className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6"
-    >
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <h3 id="live-ticker-title" className="type-label text-slate-400">
-          Live Ticker
-        </h3>
-        <DataProvenanceStrip provenance={provenance} />
-      </div>
-      <div className="mt-4 grid gap-3 text-sm text-slate-300">
-        <div className="flex items-center justify-between">
-          <span className="text-slate-400">US 10Y Yield</span>
-          <span className="mono text-slate-100">{formatNumber(treasury.yields.tenYear, "%")}</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-slate-400">US 2Y Yield</span>
-          <span className="mono text-slate-100">{formatNumber(treasury.yields.twoYear, "%")}</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-slate-400">Curve Slope</span>
-          <span className="mono text-slate-100">
-            {curveSlope === null ? "—" : formatNumber(curveSlope, "%")}
-            <span className="ml-2 text-xs uppercase tracking-[0.2em] text-slate-500">{curveLabel}</span>
-          </span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-slate-400">Base Rate</span>
-          <span className="mono text-slate-100">
-            {formatNumber(assessment.scores.baseRate, "%")}
-            <span className="ml-2 text-xs uppercase tracking-[0.2em] text-slate-500">
-              {assessment.scores.baseRateUsed}
-            </span>
-          </span>
-        </div>
-      </div>
-      <div className="mt-4 text-xs text-slate-500">
-        Source:{" "}
-        <a
-          href={treasury.source}
-          target="_blank"
-          rel="noreferrer"
-          className="touch-target text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
-          title={treasury.source}
-        >
-          Open source
-        </a>
-      </div>
-    </section>
-  );
-};
-
 export const OperatorRequestsPanel = ({ provenance }: { provenance: DataProvenance }) => (
   <section
     id="operator-requests"
@@ -399,55 +384,6 @@ export const CxoFunctionPanel = ({ provenance }: { provenance: DataProvenance })
   </section>
 );
 
-export const ScoreReadoutPanel = ({
-  assessment,
-  provenance,
-}: {
-  assessment: RegimeAssessment;
-  provenance: DataProvenance;
-}) => {
-  return (
-    <section
-      id="sensor-readout"
-      aria-labelledby="sensor-readout-title"
-      className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6"
-    >
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <h3 id="sensor-readout-title" className="type-label text-slate-400">
-          Sensor Readout
-        </h3>
-        <DataProvenanceStrip provenance={provenance} />
-      </div>
-      <div className="mt-4 space-y-5">
-        <div>
-          <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-slate-400">
-            <span>Capital Tightness</span>
-            <span className="text-slate-200 tabular-nums">{assessment.scores.tightness}/100</span>
-          </div>
-          <div className="mt-2 h-2 rounded-full bg-slate-800">
-            <div
-              className="h-2 rounded-full bg-rose-500"
-              style={{ width: `${assessment.scores.tightness}%` }}
-            />
-          </div>
-        </div>
-        <div>
-          <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-slate-400">
-            <span>Market Bravery</span>
-            <span className="text-slate-200 tabular-nums">{assessment.scores.riskAppetite}/100</span>
-          </div>
-          <div className="mt-2 h-2 rounded-full bg-slate-800">
-            <div
-              className="h-2 rounded-full bg-amber-400"
-              style={{ width: `${assessment.scores.riskAppetite}%` }}
-            />
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
-
 export const SignalMatrixPanel = ({
   assessment,
   provenance,
@@ -516,63 +452,6 @@ export const SignalMatrixPanel = ({
   );
 };
 
-export const DataSourcePanel = ({
-  treasury,
-  provenance,
-}: {
-  treasury: TreasuryData;
-  provenance: DataProvenance;
-}) => {
-  const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
-  const fallbackReason = treasury.fallback_reason ?? "Fallback triggered.";
-
-  return (
-    <section
-      id="data-source"
-      aria-labelledby="data-source-title"
-      className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6"
-    >
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h3 id="data-source-title" className="type-label text-slate-400">
-            Data Source
-          </h3>
-          <p className="mt-2 type-data text-slate-200">US Treasury Fiscal Data API</p>
-        </div>
-        <DataProvenanceStrip provenance={provenance} />
-      </div>
-      <p className="mt-4 text-xs text-slate-400">Record date</p>
-      <p className="mono text-sm text-slate-200">{formatDate(treasury.record_date)}</p>
-      <p className="mt-4 text-xs text-slate-400">Fetched at</p>
-      <p className="mono text-sm text-slate-200">{formatTimestamp(treasury.fetched_at)}</p>
-      {isFallback ? (
-        <div className="mt-4 rounded-xl border border-amber-400/40 bg-amber-500/10 p-3 text-xs text-amber-100">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-amber-200">Offline fallback</p>
-          <p className="mt-2 text-amber-100">{fallbackReason}</p>
-          <p className="mt-2 text-amber-200/80">
-            Snapshot fetched:{" "}
-            <span className="mono">{formatTimestamp(treasury.fetched_at)}</span>
-          </p>
-          <p className="text-amber-200/80">
-            Fallback activated:{" "}
-            <span className="mono">
-              {treasury.fallback_at ? formatTimestamp(treasury.fallback_at) : "Unknown"}
-            </span>
-          </p>
-        </div>
-      ) : null}
-      <a
-        href={treasury.source}
-        target="_blank"
-        rel="noreferrer"
-        className="touch-target mt-4 break-all text-xs text-slate-400 underline decoration-slate-700 underline-offset-4 hover:text-slate-200"
-      >
-        {treasury.source}
-      </a>
-    </section>
-  );
-};
-
 export const HistoricalBanner = ({ banner }: { banner: string }) => {
   return (
     <div className="mt-6 rounded-2xl border border-slate-600 bg-slate-900/70 px-4 py-3 text-sm text-slate-200">
@@ -596,6 +475,8 @@ export const ExecutiveSnapshotPanel = ({
 }) => {
   const curveSlope = assessment.scores.curveSlope;
   const curveLabel = curveSlope === null ? "—" : curveSlope < 0 ? "Inverted" : "Normal";
+  const curveSlopePercent =
+    curveSlope === null ? 50 : mapToPercent(curveSlope, -2, 2);
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
   const fallbackReason = treasury.fallback_reason ?? "Fallback triggered.";
 
@@ -643,10 +524,44 @@ export const ExecutiveSnapshotPanel = ({
             </p>
           </div>
           <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Curve signal</p>
-            <p className="mono mt-2 text-sm text-slate-100">
-              {curveSlope === null ? "—" : `${curveSlope.toFixed(2)}%`}
-            </p>
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Yield curve</p>
+            <div className="mt-3 space-y-2 text-xs text-slate-300">
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400">US 10Y</span>
+                <span className="mono text-slate-100">
+                  {formatNumber(treasury.yields.tenYear, "%")}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400">US 2Y</span>
+                <span className="mono text-slate-100">
+                  {formatNumber(treasury.yields.twoYear, "%")}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400">Curve slope</span>
+                <span className="mono text-slate-100">
+                  {curveSlope === null ? "—" : formatNumber(curveSlope, "%")}
+                </span>
+              </div>
+            </div>
+            <div className="mt-3">
+              <div className="relative h-2 rounded-full bg-slate-800">
+                <div
+                  className="absolute left-1/2 top-0 h-2 w-px -translate-x-1/2 bg-slate-600"
+                  aria-hidden="true"
+                />
+                <div
+                  className="h-2 rounded-full bg-sky-400"
+                  style={{ width: `${curveSlopePercent}%` }}
+                />
+              </div>
+              <div className="mt-2 flex items-center justify-between text-[10px] uppercase tracking-[0.2em] text-slate-500">
+                <span>-2%</span>
+                <span>0%</span>
+                <span>+2%</span>
+              </div>
+            </div>
             <p className="mt-2 text-xs text-slate-500">Slope is {curveLabel}</p>
           </div>
         </div>
