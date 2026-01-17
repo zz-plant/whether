@@ -19,17 +19,14 @@ import { parseThresholdsFromSearchParams } from "../lib/thresholds";
 import { DecisionShieldPanel } from "./components/decisionShieldPanel";
 import { DisplayGuardian } from "./components/displayGuardian";
 import {
-  DataSourcePanel,
   FirstTimeGuidePanel,
   MacroSignalsPanel,
   ExecutiveSnapshotPanel,
   HistoricalBanner,
-  LiveTickerPanel,
   CxoFunctionPanel,
   OperatorRequestsPanel,
   PlaybookPanel,
   RegimeAssessmentCard,
-  ScoreReadoutPanel,
   SensorArray,
   SignalMatrixPanel,
 } from "./components/reportSections";
@@ -273,7 +270,6 @@ export default async function HomePage({
                 { href: "#executive-snapshot", label: "Executive snapshot" },
                 { href: "#regime-assessment", label: "Regime assessment" },
                 { href: "#signal-matrix", label: "Signal matrix" },
-                { href: "#data-source", label: "Data source" },
                 { href: "#sensor-array", label: "Sensor array" },
                 { href: "#macro-signals", label: "Macro signals" },
                 { href: "#thresholds", label: "Thresholds" },
@@ -310,17 +306,12 @@ export default async function HomePage({
           provenance={treasuryProvenance}
         />
 
-        <section className="mt-10 grid gap-6 lg:grid-cols-[2.2fr,1fr]">
+        <section className="mt-10">
           <RegimeAssessmentCard assessment={assessment} provenance={treasuryProvenance} />
-          <div className="grid gap-6">
-            <LiveTickerPanel treasury={treasury} assessment={assessment} provenance={treasuryProvenance} />
-            <ScoreReadoutPanel assessment={assessment} provenance={treasuryProvenance} />
-          </div>
         </section>
 
-        <section className="mt-10 grid gap-6 lg:grid-cols-[1.2fr,1fr]">
+        <section className="mt-10">
           <SignalMatrixPanel assessment={assessment} provenance={treasuryProvenance} />
-          <DataSourcePanel treasury={treasury} provenance={treasuryProvenance} />
         </section>
 
         <SensorArray sensors={sensors} provenance={treasuryProvenance} />
