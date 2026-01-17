@@ -105,7 +105,7 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
     <section className="mt-10">
       <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
+          <div className="min-w-0">
             <p className="text-sm uppercase tracking-[0.2em] text-slate-400">Decision Shield</p>
             <h3 className="text-xl font-semibold text-slate-100">Validate an action</h3>
             <p className="mt-2 text-sm text-slate-300">
@@ -193,12 +193,12 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
             >
               {output.verdict}
             </div>
-            <p className="mt-3 text-sm text-slate-200">{output.summary}</p>
+            <p className="mt-3 text-sm text-slate-200 break-words">{output.summary}</p>
             <ul className="mt-4 space-y-2 text-sm text-slate-300">
               {output.bullets.map((bullet) => (
                 <li key={bullet} className="flex gap-2">
                   <span className="text-slate-500">•</span>
-                  <span>{bullet}</span>
+                  <span className="break-words">{bullet}</span>
                 </li>
               ))}
             </ul>
@@ -206,11 +206,11 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
           <div className="grid gap-4">
             <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
               <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Guardrail</p>
-              <p className="mt-3 text-sm text-slate-300">{output.guardrail}</p>
+              <p className="mt-3 text-sm text-slate-300 break-words">{output.guardrail}</p>
             </div>
             <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
               <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Reversal trigger</p>
-              <p className="mt-3 text-sm text-slate-300">{output.reversalTrigger}</p>
+              <p className="mt-3 text-sm text-slate-300 break-words">{output.reversalTrigger}</p>
             </div>
           </div>
         </div>

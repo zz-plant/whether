@@ -6,16 +6,35 @@ import type { RegimeAssessment } from "../../lib/regimeEngine";
 import type { PlaybookEntry } from "../../lib/playbook";
 import type { SensorReading, TreasuryData } from "../../lib/types";
 
+const numberFormatter = new Intl.NumberFormat("en-US", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+  dateStyle: "medium",
+  timeZone: "UTC",
+});
+const timestampFormatter = new Intl.DateTimeFormat("en-US", {
+  dateStyle: "medium",
+  timeStyle: "short",
+  timeZone: "UTC",
+});
+
 const formatTimestamp = (iso: string) => {
   const date = new Date(iso);
-  return Number.isNaN(date.valueOf()) ? iso : date.toUTCString();
+  return Number.isNaN(date.valueOf()) ? iso : timestampFormatter.format(date);
+};
+
+const formatDate = (value: string) => {
+  const date = new Date(value);
+  return Number.isNaN(date.valueOf()) ? value : dateFormatter.format(date);
 };
 
 const formatNumber = (value: number | null, unit: string) => {
   if (value === null || Number.isNaN(value)) {
     return "—";
   }
-  return `${value.toFixed(2)}${unit}`;
+  return `${numberFormatter.format(value)}${unit}`;
 };
 
 const monthOptions = [
@@ -93,7 +112,7 @@ export const RegimeAssessmentCard = ({ assessment }: { assessment: RegimeAssessm
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br opacity-80 blur-2xl" />
       <div className={`absolute inset-0 bg-gradient-to-br ${regimeAccent.panel} opacity-40`} />
       <div className="relative flex items-center justify-between gap-4">
-        <div>
+        <div className="min-w-0">
           <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Current Regime</p>
           <h2 className="text-3xl font-semibold text-slate-100">{regimeLabel}</h2>
           <p className="mt-2 text-xs uppercase tracking-[0.2em] text-slate-400">
@@ -106,16 +125,18 @@ export const RegimeAssessmentCard = ({ assessment }: { assessment: RegimeAssessm
             Regime status
           </span>
           <span className="rounded-full border border-slate-700 px-3 py-1">
-            Tightness {assessment.scores.tightness} · Risk {assessment.scores.riskAppetite}
+            Tightness{" "}
+            <span className="tabular-nums">{assessment.scores.tightness}</span> · Risk{" "}
+            <span className="tabular-nums">{assessment.scores.riskAppetite}</span>
           </span>
         </div>
       </div>
-      <p className="relative mt-4 text-slate-200">{assessment.description}</p>
+      <p className="relative mt-4 text-slate-200 break-words">{assessment.description}</p>
       <ul className="relative mt-4 space-y-2 text-sm text-slate-300">
         {assessment.constraints.map((item) => (
           <li key={item} className="flex gap-2">
             <span className="text-slate-500">•</span>
-            <span>{item}</span>
+            <span className="break-words">{item}</span>
           </li>
         ))}
       </ul>
@@ -126,7 +147,7 @@ export const RegimeAssessmentCard = ({ assessment }: { assessment: RegimeAssessm
             {assessment.dataWarnings.map((warning) => (
               <li key={warning} className="flex gap-2">
                 <span className="text-amber-200/80">•</span>
-                <span>{warning}</span>
+                <span className="break-words">{warning}</span>
               </li>
             ))}
           </ul>
@@ -176,7 +197,7 @@ export const LiveTickerPanel = ({
         <div className="flex items-center justify-between">
           <span className="text-slate-400">Curve Slope</span>
           <span className="mono text-slate-100">
-            {curveSlope === null ? "—" : `${curveSlope.toFixed(2)}%`}
+            {curveSlope === null ? "—" : formatNumber(curveSlope, "%")}
             <span className="ml-2 text-xs uppercase tracking-[0.2em] text-slate-500">{curveLabel}</span>
           </span>
         </div>
@@ -214,7 +235,7 @@ export const ScoreReadoutPanel = ({ assessment }: { assessment: RegimeAssessment
         <div>
           <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-slate-400">
             <span>Capital Tightness</span>
-            <span className="text-slate-200">{assessment.scores.tightness}/100</span>
+            <span className="text-slate-200 tabular-nums">{assessment.scores.tightness}/100</span>
           </div>
           <div className="mt-2 h-2 rounded-full bg-slate-800">
             <div
@@ -226,7 +247,7 @@ export const ScoreReadoutPanel = ({ assessment }: { assessment: RegimeAssessment
         <div>
           <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-slate-400">
             <span>Market Bravery</span>
-            <span className="text-slate-200">{assessment.scores.riskAppetite}/100</span>
+            <span className="text-slate-200 tabular-nums">{assessment.scores.riskAppetite}/100</span>
           </div>
           <div className="mt-2 h-2 rounded-full bg-slate-800">
             <div
@@ -247,7 +268,7 @@ export const SignalMatrixPanel = ({ assessment }: { assessment: RegimeAssessment
   const left = `${x}%`;
 
   return (
-    <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+    <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6" aria-describedby="signal-matrix-description">
       <div className="flex items-center justify-between">
         <h3 className="text-sm uppercase tracking-[0.2em] text-slate-400">Signal Matrix</h3>
         <span className="text-xs uppercase tracking-[0.2em] text-slate-500">Tightness vs. Bravery</span>
@@ -281,9 +302,9 @@ export const SignalMatrixPanel = ({ assessment }: { assessment: RegimeAssessment
           Loose
         </div>
       </div>
-      <p className="mt-4 text-xs text-slate-500">
-        Position is derived from tightness ({assessment.scores.tightness}) and market bravery (
-        {assessment.scores.riskAppetite}).
+      <p id="signal-matrix-description" className="mt-4 text-xs text-slate-500">
+        Position is derived from tightness (<span className="tabular-nums">{assessment.scores.tightness}</span>)
+        and market bravery (<span className="tabular-nums">{assessment.scores.riskAppetite}</span>).
       </p>
     </div>
   );
@@ -295,7 +316,7 @@ export const DataSourcePanel = ({ treasury }: { treasury: TreasuryData }) => {
       <h3 className="text-sm uppercase tracking-[0.2em] text-slate-400">Data Source</h3>
       <p className="mt-2 text-sm text-slate-200">US Treasury Fiscal Data API</p>
       <p className="mt-4 text-xs text-slate-400">Record date</p>
-      <p className="mono text-sm text-slate-200">{treasury.record_date}</p>
+      <p className="mono text-sm text-slate-200">{formatDate(treasury.record_date)}</p>
       <p className="mt-4 text-xs text-slate-400">Fetched at</p>
       <p className="mono text-sm text-slate-200">{formatTimestamp(treasury.fetched_at)}</p>
       <a
@@ -345,8 +366,9 @@ export const TimeMachinePanel = ({
       : selectedMonth;
   const coverageLabel =
     cacheCoverage.earliest && cacheCoverage.latest
-      ? `${cacheCoverage.earliest} → ${cacheCoverage.latest}`
+      ? `${formatDate(cacheCoverage.earliest)} → ${formatDate(cacheCoverage.latest)}`
       : "No cache loaded";
+  const latestRecordLabel = formatDate(latestRecordDate);
 
   return (
     <section className="mt-10">
@@ -417,7 +439,7 @@ export const TimeMachinePanel = ({
           </p>
         ) : null}
         <p className="mt-4 text-xs text-slate-500">
-          Latest available record: <span className="mono text-slate-300">{latestRecordDate}</span>
+          Latest available record: <span className="mono text-slate-300">{latestRecordLabel}</span>
         </p>
         <p className="mt-2 text-xs text-slate-500">
           Cache coverage: <span className="mono text-slate-300">{coverageLabel}</span>
@@ -435,8 +457,8 @@ export const SensorArray = ({ sensors }: { sensors: SensorReading[] }) => {
         {sensors.map((sensor) => (
           <div key={sensor.id} className="rounded-2xl border border-slate-800 bg-slate-900/40 p-5">
             <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-sm text-slate-300">{sensor.label}</p>
+              <div className="min-w-0">
+                <p className="text-sm text-slate-300 break-words">{sensor.label}</p>
                 <p className="mono mt-2 text-2xl text-slate-100">
                   {formatNumber(sensor.value, sensor.unit)}
                 </p>
@@ -445,10 +467,10 @@ export const SensorArray = ({ sensors }: { sensors: SensorReading[] }) => {
                 {sensor.isLive ? "Live" : "Offline"}
               </span>
             </div>
-            <p className="mt-3 text-xs text-slate-400">{sensor.explanation}</p>
+            <p className="mt-3 text-xs text-slate-400 break-words">{sensor.explanation}</p>
             <div className="mt-4 text-xs text-slate-500">
-              <p>Source: {sensor.source}</p>
-              <p>Record date: {sensor.record_date}</p>
+              <p className="break-words">Source: {sensor.source}</p>
+              <p>Record date: {formatDate(sensor.record_date)}</p>
               <p>Fetched: {formatTimestamp(sensor.fetched_at)}</p>
             </div>
           </div>
@@ -477,7 +499,7 @@ export const PlaybookPanel = ({
             <p className="text-sm uppercase tracking-[0.2em] text-slate-400">Playbook</p>
             <h3 className="text-xl font-semibold">{playbook?.title ?? "Operational Guidance"}</h3>
             {playbook ? (
-              <p className="mt-2 text-sm text-slate-300">{playbook.insight}</p>
+              <p className="mt-2 text-sm text-slate-300 break-words">{playbook.insight}</p>
             ) : (
               <p className="mt-2 text-sm text-slate-300">
                 Playbook data unavailable. Use regime constraints as guardrails.
@@ -497,7 +519,9 @@ export const PlaybookPanel = ({
             <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Stop</p>
             <ul className="mt-3 space-y-2 text-sm text-slate-300">
               {stopItems.map((item) => (
-                <li key={item}>• {item}</li>
+                <li key={item} className="break-words">
+                  • {item}
+                </li>
               ))}
             </ul>
           </div>
@@ -505,7 +529,9 @@ export const PlaybookPanel = ({
             <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Start</p>
             <ul className="mt-3 space-y-2 text-sm text-slate-300">
               {startItems.map((item) => (
-                <li key={item}>• {item}</li>
+                <li key={item} className="break-words">
+                  • {item}
+                </li>
               ))}
             </ul>
           </div>
@@ -513,7 +539,9 @@ export const PlaybookPanel = ({
             <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Fence</p>
             <ul className="mt-3 space-y-2 text-sm text-slate-300">
               {fenceItems.map((item) => (
-                <li key={item}>• {item}</li>
+                <li key={item} className="break-words">
+                  • {item}
+                </li>
               ))}
             </ul>
           </div>
@@ -528,7 +556,9 @@ export const PlaybookPanel = ({
                 </p>
                 <ul className="mt-3 space-y-2 text-sm text-slate-300">
                   {playbook.leadershipPhrases.more.map((item) => (
-                    <li key={item}>• {item}</li>
+                    <li key={item} className="break-words">
+                      • {item}
+                    </li>
                   ))}
                 </ul>
               </div>
@@ -536,7 +566,9 @@ export const PlaybookPanel = ({
                 <p className="text-[10px] uppercase tracking-[0.2em] text-rose-200">Less often</p>
                 <ul className="mt-3 space-y-2 text-sm text-slate-300">
                   {playbook.leadershipPhrases.less.map((item) => (
-                    <li key={item}>• {item}</li>
+                    <li key={item} className="break-words">
+                      • {item}
+                    </li>
                   ))}
                 </ul>
               </div>
