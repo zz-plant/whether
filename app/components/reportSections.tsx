@@ -4,7 +4,7 @@
  */
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import type { PlaybookEntry } from "../../lib/playbook";
-import type { SensorReading, TreasuryData } from "../../lib/types";
+import type { MacroSeriesReading, SensorReading, TreasuryData } from "../../lib/types";
 import { operatorRequests } from "../../lib/operatorRequests";
 
 const numberFormatter = new Intl.NumberFormat("en-US", {
@@ -240,12 +240,13 @@ export const OperatorRequestsPanel = () => (
         </h3>
       </div>
       <span className="rounded-full border border-slate-700 px-3 py-1 text-[10px] uppercase tracking-[0.25em] text-slate-300">
-        Future scope
+        Delivery tracker
       </span>
     </div>
     <p className="mt-3 max-w-3xl text-sm text-slate-300">
-      These are the most common expansion requests expected after launch. Each item should preserve
-      traceable data sources and plain-English operational guidance.
+      These are the most common expansion requests expected after launch. Delivered items are
+      labeled and the remaining backlog keeps traceable data sources and plain-English operational
+      guidance front and center.
     </p>
     <div className="mt-6 grid gap-4 md:grid-cols-2">
       {operatorRequests.map((request) => (
@@ -253,7 +254,12 @@ export const OperatorRequestsPanel = () => (
           key={request.title}
           className="rounded-2xl border border-slate-800/80 bg-slate-950/60 px-4 py-4 shadow-[0_0_0_1px_rgba(15,23,42,0.4)]"
         >
-          <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{request.title}</p>
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{request.title}</p>
+            <span className="rounded-full border border-slate-700 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-400">
+              {request.status === "DELIVERED" ? "Delivered" : "Backlog"}
+            </span>
+          </div>
           <p className="mt-2 text-sm text-slate-200">{request.description}</p>
         </div>
       ))}
@@ -509,12 +515,94 @@ export const SensorArray = ({ sensors }: { sensors: SensorReading[] }) => {
             </div>
             <p className="mt-3 text-xs text-slate-400 break-words">{sensor.explanation}</p>
             <div className="mt-4 text-xs text-slate-500">
-              <p className="break-words">Source: {sensor.source}</p>
+              <p className="break-words">
+                Source:{" "}
+                <a
+                  href={sensor.sourceUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="touch-target text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+                >
+                  {sensor.sourceLabel}
+                </a>
+              </p>
+              <p>
+                Formula:{" "}
+                <a
+                  href={sensor.formulaUrl}
+                  className="touch-target text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+                >
+                  Method notes
+                </a>
+              </p>
               <p>Record date: {formatDate(sensor.record_date)}</p>
               <p>Fetched: {formatTimestamp(sensor.fetched_at)}</p>
             </div>
           </div>
         ))}
+      </div>
+    </section>
+  );
+};
+
+export const MacroSignalsPanel = ({ series }: { series: MacroSeriesReading[] }) => {
+  const isLive = series.some((signal) => signal.isLive);
+
+  return (
+    <section id="macro-signals" aria-labelledby="macro-signals-title" className="mt-10">
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="text-sm uppercase tracking-[0.2em] text-slate-400">Macro signals</p>
+            <h3 id="macro-signals-title" className="text-xl font-semibold text-slate-100">
+              Expanded signal pack
+            </h3>
+            <p className="mt-2 text-sm text-slate-300">
+              Supplement Treasury yields with inflation, labor health, and credit stress indicators.
+            </p>
+          </div>
+          <span className="rounded-full border border-slate-700 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-300">
+            {isLive ? "Live" : "Snapshot"}
+          </span>
+        </div>
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
+          {series.map((signal) => (
+            <div
+              key={signal.id}
+              className="rounded-2xl border border-slate-800 bg-slate-950/60 p-4 shadow-[0_0_0_1px_rgba(15,23,42,0.4)]"
+            >
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{signal.label}</p>
+              <p className="mono mt-3 text-2xl text-slate-100">
+                {formatNumber(signal.value, signal.unit)}
+              </p>
+              <p className="mt-2 text-xs text-slate-500">{signal.explanation}</p>
+              <div className="mt-3 text-xs text-slate-500">
+                <p className="break-words">
+                  Source:{" "}
+                  <a
+                    href={signal.sourceUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="touch-target text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+                  >
+                    {signal.sourceLabel}
+                  </a>
+                </p>
+                <p>
+                  Formula:{" "}
+                  <a
+                    href={signal.formulaUrl}
+                    className="touch-target text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+                  >
+                    Method notes
+                  </a>
+                </p>
+                <p>Record date: {formatDate(signal.record_date)}</p>
+                <p>Fetched: {formatTimestamp(signal.fetched_at)}</p>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );

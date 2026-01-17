@@ -1,0 +1,337 @@
+/**
+ * Thresholds panel to tune regime classification and log overrides.
+ * Keeps URL-driven state and audit trail visible for operators.
+ */
+"use client";
+
+import type { FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import type { RegimeThresholds } from "../../lib/regimeEngine";
+import { DEFAULT_THRESHOLDS } from "../../lib/regimeEngine";
+import { buildThresholdSearchParams, THRESHOLD_PARAM_KEYS } from "../../lib/thresholds";
+
+type ThresholdDraft = {
+  baseRateTightness: string;
+  tightnessRegime: string;
+  riskAppetiteRegime: string;
+};
+
+type ThresholdErrorMap = Partial<Record<keyof ThresholdDraft, string>>;
+
+type ThresholdAuditEntry = {
+  timestamp: string;
+  previous: RegimeThresholds;
+  next: RegimeThresholds;
+  source: "manual" | "reset";
+};
+
+const formatNumber = (value: number) => Number(value.toFixed(2));
+
+const buildDraft = (thresholds: RegimeThresholds): ThresholdDraft => ({
+  baseRateTightness: thresholds.baseRateTightness.toString(),
+  tightnessRegime: thresholds.tightnessRegime.toString(),
+  riskAppetiteRegime: thresholds.riskAppetiteRegime.toString(),
+});
+
+const parseDraft = (draft: ThresholdDraft) => {
+  const baseRate = Number(draft.baseRateTightness);
+  const tightness = Number(draft.tightnessRegime);
+  const risk = Number(draft.riskAppetiteRegime);
+  return { baseRate, tightness, risk };
+};
+
+const validateDraft = (draft: ThresholdDraft): ThresholdErrorMap => {
+  const errors: ThresholdErrorMap = {};
+  const { baseRate, tightness, risk } = parseDraft(draft);
+
+  if (Number.isNaN(baseRate) || baseRate < 0 || baseRate > 10) {
+    errors.baseRateTightness = "Base rate threshold must be between 0 and 10.";
+  }
+  if (Number.isNaN(tightness) || tightness < 0 || tightness > 100) {
+    errors.tightnessRegime = "Tightness regime threshold must be between 0 and 100.";
+  }
+  if (Number.isNaN(risk) || risk < 0 || risk > 100) {
+    errors.riskAppetiteRegime = "Risk appetite threshold must be between 0 and 100.";
+  }
+
+  return errors;
+};
+
+const buildThresholds = (draft: ThresholdDraft): RegimeThresholds => {
+  const { baseRate, tightness, risk } = parseDraft(draft);
+  return {
+    baseRateTightness: formatNumber(baseRate),
+    tightnessRegime: formatNumber(tightness),
+    riskAppetiteRegime: formatNumber(risk),
+  };
+};
+
+export const ThresholdsPanel = ({
+  currentThresholds,
+}: {
+  currentThresholds: RegimeThresholds;
+}) => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [draft, setDraft] = useState<ThresholdDraft>(() => buildDraft(currentThresholds));
+  const [errors, setErrors] = useState<ThresholdErrorMap>({});
+  const [auditLog, setAuditLog] = useState<ThresholdAuditEntry[]>([]);
+  const baseRateRef = useRef<HTMLInputElement | null>(null);
+  const tightnessRef = useRef<HTMLInputElement | null>(null);
+  const riskRef = useRef<HTMLInputElement | null>(null);
+  const storageKey = "whether.thresholdDraft";
+  const auditKey = "whether.thresholdAudit";
+
+  useEffect(() => {
+    setDraft(buildDraft(currentThresholds));
+  }, [currentThresholds]);
+
+  useEffect(() => {
+    const hasUrlThresholds =
+      searchParams.has(THRESHOLD_PARAM_KEYS.baseRate) ||
+      searchParams.has(THRESHOLD_PARAM_KEYS.tightness) ||
+      searchParams.has(THRESHOLD_PARAM_KEYS.risk);
+    if (hasUrlThresholds) {
+      return;
+    }
+    const storedDraft = window.localStorage.getItem(storageKey);
+    if (!storedDraft) {
+      return;
+    }
+    try {
+      const parsed = JSON.parse(storedDraft) as ThresholdDraft;
+      setDraft(parsed);
+    } catch {
+      // Ignore storage parse errors to keep console clean.
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    window.localStorage.setItem(storageKey, JSON.stringify(draft));
+  }, [draft]);
+
+  useEffect(() => {
+    const storedAudit = window.localStorage.getItem(auditKey);
+    if (!storedAudit) {
+      return;
+    }
+    try {
+      const parsed = JSON.parse(storedAudit) as ThresholdAuditEntry[];
+      setAuditLog(parsed);
+    } catch {
+      // Ignore audit parse errors to keep console clean.
+    }
+  }, []);
+
+  const formattedCurrent = useMemo(() => buildDraft(currentThresholds), [currentThresholds]);
+  const appliedDefaults = DEFAULT_THRESHOLDS;
+
+  const updateUrl = (nextThresholds: RegimeThresholds, source: ThresholdAuditEntry["source"]) => {
+    const nextParams = new URLSearchParams(searchParams.toString());
+    buildThresholdSearchParams(nextThresholds, appliedDefaults, nextParams);
+    router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
+    const entry: ThresholdAuditEntry = {
+      timestamp: new Date().toISOString(),
+      previous: currentThresholds,
+      next: nextThresholds,
+      source,
+    };
+    const nextAudit = [entry, ...auditLog].slice(0, 8);
+    setAuditLog(nextAudit);
+    window.localStorage.setItem(auditKey, JSON.stringify(nextAudit));
+  };
+
+  const focusFirstInvalid = (nextErrors: ThresholdErrorMap) => {
+    if (nextErrors.baseRateTightness) {
+      baseRateRef.current?.focus();
+      return;
+    }
+    if (nextErrors.tightnessRegime) {
+      tightnessRef.current?.focus();
+      return;
+    }
+    if (nextErrors.riskAppetiteRegime) {
+      riskRef.current?.focus();
+    }
+  };
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const nextErrors = validateDraft(draft);
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) {
+      focusFirstInvalid(nextErrors);
+      return;
+    }
+    updateUrl(buildThresholds(draft), "manual");
+  };
+
+  const handleReset = () => {
+    const defaultDraft = buildDraft(appliedDefaults);
+    setDraft(defaultDraft);
+    setErrors({});
+    updateUrl(appliedDefaults, "reset");
+  };
+
+  const updateDraft = (key: keyof ThresholdDraft, value: string) => {
+    setDraft((prev) => ({ ...prev, [key]: value }));
+    setErrors((prev) => ({ ...prev, [key]: undefined }));
+  };
+
+  const handleBlur = (key: keyof ThresholdDraft) => {
+    const nextErrors = validateDraft(draft);
+    setErrors(nextErrors);
+    if (nextErrors[key]) {
+      focusFirstInvalid(nextErrors);
+    }
+  };
+
+  return (
+    <section id="thresholds" aria-labelledby="thresholds-title" className="mt-10">
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="text-sm uppercase tracking-[0.2em] text-slate-400">Regime thresholds</p>
+            <h3 id="thresholds-title" className="text-xl font-semibold text-slate-100">
+              Tune classification guardrails
+            </h3>
+            <p className="mt-2 text-sm text-slate-300">
+              Thresholds are URL-driven for deterministic back/forward behavior and auditability.
+            </p>
+          </div>
+          <div className="text-xs uppercase tracking-[0.2em] text-slate-400">
+            Defaults: {appliedDefaults.baseRateTightness}% ·{" "}
+            {appliedDefaults.tightnessRegime}/{appliedDefaults.riskAppetiteRegime}
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="mt-6 grid gap-4 lg:grid-cols-[1fr,1fr,1fr,auto]">
+          <label
+            htmlFor="threshold-base-rate"
+            className="space-y-2 text-xs uppercase tracking-[0.2em] text-slate-400"
+          >
+            Base rate threshold (%)
+            <input
+              ref={baseRateRef}
+              id="threshold-base-rate"
+              name={THRESHOLD_PARAM_KEYS.baseRate}
+              inputMode="decimal"
+              value={draft.baseRateTightness}
+              onChange={(event) => updateDraft("baseRateTightness", event.target.value)}
+              onBlur={() => handleBlur("baseRateTightness")}
+              aria-invalid={Boolean(errors.baseRateTightness)}
+              className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100"
+            />
+            {errors.baseRateTightness ? (
+              <span className="text-[11px] text-amber-200">{errors.baseRateTightness}</span>
+            ) : null}
+          </label>
+          <label
+            htmlFor="threshold-tightness"
+            className="space-y-2 text-xs uppercase tracking-[0.2em] text-slate-400"
+          >
+            Tightness regime score
+            <input
+              ref={tightnessRef}
+              id="threshold-tightness"
+              name={THRESHOLD_PARAM_KEYS.tightness}
+              inputMode="numeric"
+              value={draft.tightnessRegime}
+              onChange={(event) => updateDraft("tightnessRegime", event.target.value)}
+              onBlur={() => handleBlur("tightnessRegime")}
+              aria-invalid={Boolean(errors.tightnessRegime)}
+              className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100"
+            />
+            {errors.tightnessRegime ? (
+              <span className="text-[11px] text-amber-200">{errors.tightnessRegime}</span>
+            ) : null}
+          </label>
+          <label
+            htmlFor="threshold-risk"
+            className="space-y-2 text-xs uppercase tracking-[0.2em] text-slate-400"
+          >
+            Risk appetite score
+            <input
+              ref={riskRef}
+              id="threshold-risk"
+              name={THRESHOLD_PARAM_KEYS.risk}
+              inputMode="numeric"
+              value={draft.riskAppetiteRegime}
+              onChange={(event) => updateDraft("riskAppetiteRegime", event.target.value)}
+              onBlur={() => handleBlur("riskAppetiteRegime")}
+              aria-invalid={Boolean(errors.riskAppetiteRegime)}
+              className="min-h-[44px] w-full rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-base text-slate-100"
+            />
+            {errors.riskAppetiteRegime ? (
+              <span className="text-[11px] text-amber-200">{errors.riskAppetiteRegime}</span>
+            ) : null}
+          </label>
+          <div className="flex items-end gap-3">
+            <button
+              type="submit"
+              className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-slate-500 hover:text-slate-100"
+            >
+              Apply thresholds
+            </button>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-slate-800 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-400 transition-colors hover:border-slate-600 hover:text-slate-200"
+            >
+              Reset
+            </button>
+          </div>
+        </form>
+
+        <div className="mt-6 grid gap-4 lg:grid-cols-[1.2fr,1fr]">
+          <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Applied thresholds</p>
+            <div className="mt-3 space-y-2 text-sm text-slate-300">
+              <p>
+                Base rate threshold:{" "}
+                <span className="mono text-slate-100">{formattedCurrent.baseRateTightness}%</span>
+              </p>
+              <p>
+                Tightness regime threshold:{" "}
+                <span className="mono text-slate-100">{formattedCurrent.tightnessRegime}</span>
+              </p>
+              <p>
+                Risk appetite threshold:{" "}
+                <span className="mono text-slate-100">{formattedCurrent.riskAppetiteRegime}</span>
+              </p>
+            </div>
+          </div>
+          <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Audit trail</p>
+            {auditLog.length ? (
+              <ul className="mt-3 space-y-3 text-xs text-slate-400">
+                {auditLog.map((entry) => (
+                  <li key={`${entry.timestamp}-${entry.source}`}>
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">
+                      {entry.source === "reset" ? "Reset" : "Override"} ·{" "}
+                      {new Date(entry.timestamp).toLocaleString("en-US", {
+                        timeStyle: "short",
+                        dateStyle: "medium",
+                      })}
+                    </p>
+                    <p className="mt-1 text-slate-300">
+                      {entry.previous.baseRateTightness}% → {entry.next.baseRateTightness}% ·{" "}
+                      {entry.previous.tightnessRegime}/{entry.previous.riskAppetiteRegime} →{" "}
+                      {entry.next.tightnessRegime}/{entry.next.riskAppetiteRegime}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-3 text-xs text-slate-500">
+                No overrides logged yet. Defaults are active.
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};

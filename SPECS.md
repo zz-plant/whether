@@ -19,6 +19,10 @@ so outputs remain traceable, explainable, and operator‑friendly.
   - `source`
   - `record_date`
   - `fetched_at`
+- Expanded macro snapshot:
+  - CPI (BLS), unemployment (BLS), and BBB credit spreads (FRED).
+  - Must include explicit source URLs and formula links.
+  - Snapshot is stored locally in `data/macro_snapshot.json` until live fetchers are added.
 
 ## 3) Regime Engine specs
 ### Inputs
@@ -66,6 +70,15 @@ so outputs remain traceable, explainable, and operator‑friendly.
   - Reversal trigger
 - Must include “Copy to Clipboard”.
 
+### Threshold controls
+- Operators can override base-rate and regime thresholds.
+- Overrides live in URL query params with an on-screen audit trail.
+
+### Export briefs
+- Slack/email copy blocks.
+- Print-to-PDF flow.
+- Slide-ready bullet list.
+
 ### Time Machine
 - Month/Year selector.
 - Historical banner across the UI (“Historical View: YYYY‑MM”).
@@ -92,13 +105,8 @@ so outputs remain traceable, explainable, and operator‑friendly.
 ## 7) Likely operator requests (post‑MVP)
 These are expected follow‑on requests once the product is in use. Each item should preserve
 traceability and plain‑English guidance.
-- Expand macro inputs beyond the yield curve (inflation, unemployment, credit spreads) with explicit sources.
-- Allow adjustable regime thresholds with a clear audit trail and defaults.
-- Add more Decision Shield categories (M&A, infra spend, geographic expansion, restructuring).
-- Provide export/share formats (PDF, slide-ready snapshot, scheduled email/Slack brief).
 - Build an Insight Database with citations to evidence and historic precedent.
 - Support historical comparisons (“then vs now”) with regime deltas.
 - Add regime-change alerts/notifications with reason codes.
 - Enable saved Decision Shield scenarios and team presets.
-- Deepen data provenance per sensor (direct source URLs, formula docs, timestamps).
 - Offer an API/export endpoint for embedding regimes into internal dashboards.

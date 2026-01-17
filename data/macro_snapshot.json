@@ -1,0 +1,39 @@
+{
+  "fetched_at": "2024-10-02T00:00:00Z",
+  "isLive": false,
+  "series": [
+    {
+      "id": "CPI_YOY",
+      "label": "CPI inflation (YoY)",
+      "value": 3.7,
+      "unit": "%",
+      "explanation": "Year-over-year change in CPI-U, tracking consumer inflation momentum.",
+      "sourceLabel": "BLS Consumer Price Index",
+      "sourceUrl": "https://www.bls.gov/cpi/",
+      "formulaUrl": "/formulas#cpi-inflation",
+      "record_date": "2024-08-01"
+    },
+    {
+      "id": "UNEMPLOYMENT_RATE",
+      "label": "Unemployment rate (U-3)",
+      "value": 4.1,
+      "unit": "%",
+      "explanation": "Headline unemployment rate for civilian workers.",
+      "sourceLabel": "BLS Employment Situation",
+      "sourceUrl": "https://www.bls.gov/news.release/empsit.toc.htm",
+      "formulaUrl": "/formulas#unemployment-rate",
+      "record_date": "2024-09-01"
+    },
+    {
+      "id": "BBB_CREDIT_SPREAD",
+      "label": "BBB credit spread (OAS)",
+      "value": 1.65,
+      "unit": "%",
+      "explanation": "Option-adjusted spread for BBB corporates, proxying credit risk appetite.",
+      "sourceLabel": "ICE BofA BBB OAS (FRED)",
+      "sourceUrl": "https://fred.stlouisfed.org/series/BAMLC0A4CBBB",
+      "formulaUrl": "/formulas#credit-spread",
+      "record_date": "2024-10-01"
+    }
+  ]
+}

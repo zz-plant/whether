@@ -42,6 +42,7 @@ Sensors:
 - **Market Bravery** = proxy via Yield Curve Slope (10Y − 2Y) in MVP
   - Positive slope ⇒ **Brave**
   - Inverted/flat ⇒ **Scared**
+- **Expanded Macro Signals** = CPI inflation, unemployment rate, and BBB credit spreads (snapshot) with explicit sources.
 
 ### 3) Decision Shield (action validator)
 Validates actions (Hiring, Roadmap, Pricing) against current regime.
@@ -63,6 +64,8 @@ logic in a connected environment and committing the updated file.
 - **Snapshot mode**: render instantly from cached data (0ms), then fetch async.
 - **Live vs snapshot indicators**: clearly label data freshness.
 - **Fail gracefully** if the API is down or blocked.
+- **Regime thresholds**: adjustable via URL parameters with audit trail visibility.
+- **Export briefs**: copy-ready Slack/email text and print-to-PDF support.
 
 ## Repo layout (current scaffolding)
 - `lib/regimeEngine.ts`: deterministic scoring + regime classification core.
@@ -73,7 +76,10 @@ logic in a connected environment and committing the updated file.
 - `lib/playbook.ts`: selects regime playbook guidance from the insight database.
 - `lib/timeMachine.ts`: builds historical queries and labels.
 - `lib/types.ts`: shared Treasury data + sensor types.
+- `lib/macroSnapshot.ts`: expanded macro series snapshot loader.
+- `lib/thresholds.ts`: URL threshold parsing helpers.
 - `data/snapshot_fallback.json`: offline snapshot with source and timestamps.
+- `data/macro_snapshot.json`: expanded macro series snapshot.
 
 ### Scoring (MVP)
 - Tightness score (0–100):
