@@ -70,6 +70,18 @@ export const insightDatabase = {
         mandate: "Don't die.",
         insight:
           "Time is your binding constraint. Survival is about shortening every payback window.",
+        leadershipPhrases: {
+          more: [
+            "We need payback in 90 days or less.",
+            "Runway is the priority; cash beats optionality.",
+            "Fund what earns, pause what doesn't.",
+          ],
+          less: [
+            "We'll figure out monetization later.",
+            "Scale now, optimize later.",
+            "Let's add headcount to get ahead.",
+          ],
+        },
         stop: [
           "Hiring ahead of revenue",
           "Brand-only marketing",
@@ -89,6 +101,18 @@ export const insightDatabase = {
         mandate: "Efficiency first.",
         insight:
           "Growth is expensive, so extract more value from the customers you already have.",
+        leadershipPhrases: {
+          more: [
+            "Protect margin and retention before chasing new logos.",
+            "Every hire must be accretive to unit economics.",
+            "Win rate and expansion matter more than top-line noise.",
+          ],
+          less: [
+            "Let's open three new markets at once.",
+            "Big R&D bets without a near-term customer.",
+            "Growth at any price.",
+          ],
+        },
         stop: [
           "New market expansion",
           "Low-margin tiers",
@@ -108,6 +132,18 @@ export const insightDatabase = {
         mandate: "Safety first.",
         insight:
           "Capital is cheap, but customers are anxious. They buy insurance, not experimentation.",
+        leadershipPhrases: {
+          more: [
+            "Trust and reliability beat novelty.",
+            "De-risk the roadmap; protect the core.",
+            "Make the safe choice easy for buyers.",
+          ],
+          less: [
+            "Let's rebrand right now.",
+            "Ship the bold new UI overhaul.",
+            "Complex pricing experiments in the funnel.",
+          ],
+        },
         stop: [
           "Rebrands or identity pivots",
           "Complex pricing experiments",
@@ -127,6 +163,18 @@ export const insightDatabase = {
         mandate: "Land grab.",
         insight:
           "The market rewards speed over accuracy. Some waste is the price of momentum.",
+        leadershipPhrases: {
+          more: [
+            "Move fast and capture share.",
+            "Invest ahead of demand; speed beats perfection.",
+            "Momentum is the strategy.",
+          ],
+          less: [
+            "Wait for certainty before we hire.",
+            "Optimize every cost before we grow.",
+            "Hold the roadmap until the data is perfect.",
+          ],
+        },
         stop: [
           "Premature optimization",
           "Penny-pinching that slows velocity",

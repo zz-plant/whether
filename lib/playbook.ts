@@ -11,6 +11,10 @@ export interface PlaybookEntry {
   tone: string;
   mandate: string;
   insight: string;
+  leadershipPhrases: {
+    more: string[];
+    less: string[];
+  };
   stop: string[];
   start: string[];
   metric: string;
