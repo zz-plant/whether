@@ -69,6 +69,14 @@ textarea:focus-visible,
 input:focus-visible {
   outline: 2px solid rgba(56, 189, 248, 0.8);
   outline-offset: 3px;
+  box-shadow: 0 0 0 4px rgba(14, 116, 144, 0.35);
+}
+
+.touch-target {
+  display: inline-flex;
+  align-items: center;
+  padding: 1rem 0.75rem;
+  margin: -1rem -0.75rem;
 }
 
 @media (prefers-reduced-motion: reduce) {

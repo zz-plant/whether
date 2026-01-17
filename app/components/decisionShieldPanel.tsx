@@ -74,6 +74,7 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
   const [category, setCategory] = useState<DecisionCategory>("HIRING");
   const [action, setAction] = useState<DecisionAction>("HIRE");
   const [copied, setCopied] = useState(false);
+  const [isCopying, setIsCopying] = useState(false);
   const [copyError, setCopyError] = useState(false);
 
   const output = useMemo(
@@ -90,6 +91,10 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
   }, [lifecycle, category, action]);
 
   const handleCopy = async () => {
+    if (isCopying) {
+      return;
+    }
+    setIsCopying(true);
     try {
       await navigator.clipboard.writeText(shareText);
       setCopied(true);
@@ -98,6 +103,8 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
     } catch {
       setCopied(false);
       setCopyError(true);
+    } finally {
+      setIsCopying(false);
     }
   };
 
@@ -115,9 +122,14 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
           <button
             type="button"
             onClick={handleCopy}
-            className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-slate-500 hover:text-slate-100"
+            disabled={isCopying}
+            aria-busy={isCopying}
+            className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full border border-slate-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-slate-500 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
           >
-            {copied ? "Copied" : "Copy verdict"}
+            {isCopying ? (
+              <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />
+            ) : null}
+            {copied ? "Copied" : isCopying ? "Copying" : "Copy verdict"}
           </button>
         </div>
         <p className="sr-only" role="status" aria-live="polite">
@@ -135,7 +147,7 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
               readOnly
               value={shareText}
               rows={8}
-              className="mt-3 w-full rounded-lg border border-amber-400/30 bg-slate-950/80 p-3 font-mono text-[11px] text-amber-100"
+              className="mt-3 w-full rounded-lg border border-amber-400/30 bg-slate-950/80 p-3 font-mono text-base text-amber-100"
             />
           </div>
         ) : null}
