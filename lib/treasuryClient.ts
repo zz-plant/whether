@@ -40,10 +40,12 @@ export const fetchTreasuryData = async (
     }
 
     if (options.snapshotFallback) {
+      const fallback_at = new Date().toISOString();
       return {
         ...options.snapshotFallback,
-        fetched_at: new Date().toISOString(),
         isLive: false,
+        fallback_at,
+        fallback_reason: "Time Machine cache miss for historical selection.",
       };
     }
 
@@ -75,10 +77,13 @@ export const fetchTreasuryData = async (
     return normalized;
   } catch (error) {
     if (options.snapshotFallback) {
+      const message =
+        error instanceof Error ? error.message : "Unknown Treasury fetch error";
       return {
         ...options.snapshotFallback,
-        fetched_at,
         isLive: false,
+        fallback_at: fetched_at,
+        fallback_reason: message,
       };
     }
 

@@ -4,7 +4,8 @@
  */
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   evaluateDecision,
   type DecisionAction,
@@ -35,6 +36,17 @@ const actionOptions: { value: DecisionAction; label: string }[] = [
   { value: "DISCOUNT", label: "Discount" },
   { value: "EXPAND", label: "Expand" },
 ];
+
+const lifecycleValues = new Set(lifecycleOptions.map((option) => option.value));
+const categoryValues = new Set(categoryOptions.map((option) => option.value));
+const actionValues = new Set(actionOptions.map((option) => option.value));
+
+const parseLifecycle = (value: string | null): LifecycleStage | null =>
+  value && lifecycleValues.has(value as LifecycleStage) ? (value as LifecycleStage) : null;
+const parseCategory = (value: string | null): DecisionCategory | null =>
+  value && categoryValues.has(value as DecisionCategory) ? (value as DecisionCategory) : null;
+const parseAction = (value: string | null): DecisionAction | null =>
+  value && actionValues.has(value as DecisionAction) ? (value as DecisionAction) : null;
 
 const verdictStyles: Record<DecisionOutput["verdict"], string> = {
   SAFE: "border-emerald-400/40 bg-emerald-500/10 text-emerald-200",
@@ -70,6 +82,9 @@ const buildShareText = (
 };
 
 export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessment }) => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const hasInitializedFromStorage = useRef(false);
   const [lifecycle, setLifecycle] = useState<LifecycleStage>("GROWTH");
   const [category, setCategory] = useState<DecisionCategory>("HIRING");
   const [action, setAction] = useState<DecisionAction>("HIRE");
@@ -88,29 +103,55 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
   );
 
   useEffect(() => {
+    const parsedLifecycle = parseLifecycle(searchParams.get("lifecycle"));
+    const parsedCategory = parseCategory(searchParams.get("category"));
+    const parsedAction = parseAction(searchParams.get("action"));
+    const hasUrlState = Boolean(parsedLifecycle || parsedCategory || parsedAction);
+
+    if (hasUrlState) {
+      if (parsedLifecycle && parsedLifecycle !== lifecycle) {
+        setLifecycle(parsedLifecycle);
+      }
+      if (parsedCategory && parsedCategory !== category) {
+        setCategory(parsedCategory);
+      }
+      if (parsedAction && parsedAction !== action) {
+        setAction(parsedAction);
+      }
+      return;
+    }
+
+    if (hasInitializedFromStorage.current) {
+      return;
+    }
+    hasInitializedFromStorage.current = true;
+
     const stored = window.localStorage.getItem(storageKey);
     if (!stored) {
       return;
     }
     try {
       const parsed = JSON.parse(stored) as {
-        lifecycle?: LifecycleStage;
-        category?: DecisionCategory;
-        action?: DecisionAction;
+        lifecycle?: string;
+        category?: string;
+        action?: string;
       };
-      if (parsed.lifecycle) {
-        setLifecycle(parsed.lifecycle);
+      const storedLifecycle = parseLifecycle(parsed.lifecycle ?? null);
+      const storedCategory = parseCategory(parsed.category ?? null);
+      const storedAction = parseAction(parsed.action ?? null);
+      if (storedLifecycle) {
+        setLifecycle(storedLifecycle);
       }
-      if (parsed.category) {
-        setCategory(parsed.category);
+      if (storedCategory) {
+        setCategory(storedCategory);
       }
-      if (parsed.action) {
-        setAction(parsed.action);
+      if (storedAction) {
+        setAction(storedAction);
       }
     } catch (error) {
       console.warn("Unable to restore Decision Shield state.", error);
     }
-  }, [storageKey]);
+  }, [searchParams, storageKey]);
 
   useEffect(() => {
     try {
@@ -122,6 +163,18 @@ export const DecisionShieldPanel = ({ assessment }: { assessment: RegimeAssessme
       console.warn("Unable to persist Decision Shield state.", error);
     }
   }, [action, category, lifecycle, storageKey]);
+
+  useEffect(() => {
+    const nextParams = new URLSearchParams(searchParams.toString());
+    nextParams.set("lifecycle", lifecycle);
+    nextParams.set("category", category);
+    nextParams.set("action", action);
+    const nextQuery = nextParams.toString();
+    const currentQuery = searchParams.toString();
+    if (nextQuery !== currentQuery) {
+      router.replace(`?${nextQuery}`, { scroll: false });
+    }
+  }, [action, category, lifecycle, router, searchParams]);
 
   useEffect(() => {
     setCopyError(false);

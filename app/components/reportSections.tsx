@@ -37,6 +37,13 @@ const formatNumber = (value: number | null, unit: string) => {
   return `${numberFormatter.format(value)}${unit}`;
 };
 
+const formatOptionalTimestamp = (value?: string) => {
+  if (!value) {
+    return "—";
+  }
+  return formatTimestamp(value);
+};
+
 const monthOptions = [
   { value: 1, label: "January" },
   { value: 2, label: "February" },
@@ -339,6 +346,8 @@ export const SignalMatrixPanel = ({ assessment }: { assessment: RegimeAssessment
 };
 
 export const DataSourcePanel = ({ treasury }: { treasury: TreasuryData }) => {
+  const hasFallback = Boolean(treasury.fallback_reason);
+
   return (
     <section
       id="data-source"
@@ -349,6 +358,18 @@ export const DataSourcePanel = ({ treasury }: { treasury: TreasuryData }) => {
         Data Source
       </h3>
       <p className="mt-2 text-sm text-slate-200">US Treasury Fiscal Data API</p>
+      {hasFallback ? (
+        <div className="mt-4 rounded-xl border border-amber-400/30 bg-amber-500/10 p-3 text-xs text-amber-100">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-amber-200">
+            Offline fallback in effect
+          </p>
+          <p className="mt-2 text-amber-100/90">
+            Snapshot fetched {formatTimestamp(treasury.fetched_at)} · Fallback recorded{" "}
+            {formatOptionalTimestamp(treasury.fallback_at)}
+          </p>
+          <p className="mt-2 text-amber-100/90">{treasury.fallback_reason}</p>
+        </div>
+      ) : null}
       <p className="mt-4 text-xs text-slate-400">Record date</p>
       <p className="mono text-sm text-slate-200">{formatDate(treasury.record_date)}</p>
       <p className="mt-4 text-xs text-slate-400">Fetched at</p>
@@ -385,6 +406,7 @@ export const ExecutiveSnapshotPanel = ({
 }) => {
   const curveSlope = assessment.scores.curveSlope;
   const curveLabel = curveSlope === null ? "—" : curveSlope < 0 ? "Inverted" : "Normal";
+  const hasFallback = Boolean(treasury.fallback_reason);
 
   return (
     <section id="executive-snapshot" aria-labelledby="executive-snapshot-title" className="mt-8">
@@ -403,8 +425,13 @@ export const ExecutiveSnapshotPanel = ({
         <div className="mt-5 grid gap-4 md:grid-cols-3">
           <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Data freshness</p>
-            <p className="mono mt-2 text-sm text-slate-100">{treasury.record_date}</p>
+            <p className="mono mt-2 text-sm text-slate-100">{formatDate(treasury.record_date)}</p>
             <p className="mt-2 text-xs text-slate-500">Fetched {formatTimestamp(treasury.fetched_at)}</p>
+            {hasFallback ? (
+              <p className="mt-2 text-xs text-amber-200">
+                Offline fallback recorded {formatOptionalTimestamp(treasury.fallback_at)}
+              </p>
+            ) : null}
           </div>
           <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Rate baseline</p>
@@ -436,7 +463,6 @@ export const TimeMachinePanel = ({
   latestRecordDate,
   cacheCoverage,
   monthsByYear,
-  invalidSelection,
 }: {
   selectedYear: number;
   selectedMonth: number;
@@ -445,7 +471,6 @@ export const TimeMachinePanel = ({
   latestRecordDate: string;
   cacheCoverage: { earliest: string | null; latest: string | null };
   monthsByYear: Record<number, number[]>;
-  invalidSelection: boolean;
 }) => {
   const availableMonths = monthsByYear[selectedYear] ?? [];
   const resolvedSelectedMonth =
@@ -523,11 +548,6 @@ export const TimeMachinePanel = ({
             Load snapshot
           </button>
         </form>
-        {invalidSelection ? (
-          <p className="mt-4 text-xs text-amber-200" role="status" aria-live="polite">
-            That month is not available in the cache. Showing the latest data instead.
-          </p>
-        ) : null}
         <p className="mt-4 text-xs text-slate-500">
           Latest available record: <span className="mono text-slate-300">{latestRecordLabel}</span>
         </p>

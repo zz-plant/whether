@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { fetchTreasuryData } from "../lib/treasuryClient";
 import { snapshotData } from "../lib/snapshot";
 import { buildSensorReadings } from "../lib/sensors";
@@ -60,7 +61,7 @@ const buildYearOptions = (startYear: number, endYear: number) => {
 export const generateMetadata = ({
   searchParams,
 }: {
-  searchParams?: { month?: string; year?: string };
+  searchParams?: Record<string, string | string[] | undefined>;
 }): Metadata => {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://whether.report";
   const siteName = "Whether — Regime Station";
@@ -73,13 +74,9 @@ export const generateMetadata = ({
   if (selection) {
     baseUrl.searchParams.set("month", String(selection.month));
     baseUrl.searchParams.set("year", String(selection.year));
-  } else if (requestedSelection) {
-    baseUrl.searchParams.set("month", String(requestedSelection.month));
-    baseUrl.searchParams.set("year", String(requestedSelection.year));
-    baseUrl.searchParams.set("status", "invalid");
   }
 
-  const titleSuffix = selection?.banner ?? (requestedSelection ? "Time Machine Preview" : "Live");
+  const titleSuffix = selection?.banner ?? "Live";
   const title = `Whether Report — ${titleSuffix}`;
   const imageUrl = baseUrl.toString();
 
@@ -113,7 +110,7 @@ export const generateMetadata = ({
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams?: { month?: string; year?: string };
+  searchParams?: Record<string, string | string[] | undefined>;
 }) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://whether.report";
   const structuredData = {
@@ -139,7 +136,28 @@ export default async function HomePage({
   const cacheMonthsByYear = getTimeMachineMonthsByYear();
   const historicalSelection = resolveTimeMachineSelection(searchParams);
   const requestedSelection = parseTimeMachineRequest(searchParams);
-  const invalidHistoricalSelection = Boolean(requestedSelection && !historicalSelection);
+  if (requestedSelection && !historicalSelection) {
+    const redirectParams = new URLSearchParams();
+    if (searchParams) {
+      Object.entries(searchParams).forEach(([key, value]) => {
+        if (!value) {
+          return;
+        }
+        if (Array.isArray(value)) {
+          const [first] = value;
+          if (first) {
+            redirectParams.set(key, first);
+          }
+          return;
+        }
+        redirectParams.set(key, value);
+      });
+    }
+    redirectParams.delete("month");
+    redirectParams.delete("year");
+    const redirectQuery = redirectParams.toString();
+    redirect(redirectQuery ? `/?${redirectQuery}` : "/");
+  }
   const selectedMonth = requestedSelection?.month ?? defaultMonth;
   const selectedYear = requestedSelection?.year ?? defaultYear;
   const treasury = await fetchTreasuryData({
@@ -262,7 +280,6 @@ export default async function HomePage({
           latestRecordDate={treasury.record_date}
           cacheCoverage={cacheCoverage}
           monthsByYear={cacheMonthsByYear}
-          invalidSelection={invalidHistoricalSelection}
         />
 
         <footer className="mt-12 border-t border-slate-800 pt-6 text-xs text-slate-500">

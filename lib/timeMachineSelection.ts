@@ -16,15 +16,20 @@ export interface TimeMachineSelection extends TimeMachineRequest {
 }
 
 export const parseTimeMachineRequest = (searchParams?: {
-  month?: string;
-  year?: string;
+  month?: string | string[];
+  year?: string | string[];
 }): TimeMachineRequest | null => {
-  if (!searchParams?.month || !searchParams?.year) {
+  const monthValue = Array.isArray(searchParams?.month)
+    ? searchParams?.month[0]
+    : searchParams?.month;
+  const yearValue = Array.isArray(searchParams?.year) ? searchParams?.year[0] : searchParams?.year;
+
+  if (!monthValue || !yearValue) {
     return null;
   }
 
-  const month = Number(searchParams.month);
-  const year = Number(searchParams.year);
+  const month = Number(monthValue);
+  const year = Number(yearValue);
 
   if (!Number.isInteger(month) || !Number.isInteger(year)) {
     return null;
@@ -42,8 +47,8 @@ export const parseTimeMachineRequest = (searchParams?: {
 };
 
 export const resolveTimeMachineSelection = (searchParams?: {
-  month?: string;
-  year?: string;
+  month?: string | string[];
+  year?: string | string[];
 }): TimeMachineSelection | null => {
   const request = parseTimeMachineRequest(searchParams);
   if (!request) {

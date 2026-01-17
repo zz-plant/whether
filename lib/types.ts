@@ -14,6 +14,8 @@ export interface TreasuryMetadata {
   record_date: string;
   fetched_at: string;
   isLive: boolean;
+  fallback_at?: string;
+  fallback_reason?: string;
 }
 
 export interface TreasuryData extends TreasuryMetadata {
