@@ -41,6 +41,9 @@ export const ReportShell = ({
   structuredData?: string;
   historicalBanner?: ReactNode;
 }) => {
+  const primarySectionLinks = sectionLinks.slice(0, 3);
+  const secondarySectionLinks = sectionLinks.slice(3);
+
   return (
     <main
       id="main-content"
@@ -135,18 +138,42 @@ export const ReportShell = ({
           {sectionLinks.length > 0 ? (
             <nav aria-label="Report sections" className="space-y-3">
               <p className="text-[10px] uppercase tracking-[0.3em] text-slate-500">Jump to</p>
-              <ul className="flex flex-wrap gap-3">
-                {sectionLinks.map((item) => (
-                  <li key={item.href}>
-                    <a
-                      href={item.href}
-                      className="inline-flex min-h-[44px] items-center rounded-full border border-slate-800/70 bg-slate-950/60 px-4 py-2 text-[11px] uppercase tracking-[0.25em] text-slate-300 transition-colors hover:border-slate-500 hover:text-slate-100"
-                    >
-                      {item.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
+              <div className="flex flex-wrap gap-3">
+                <ul className="flex flex-wrap gap-3">
+                  {primarySectionLinks.map((item) => (
+                    <li key={item.href}>
+                      <a
+                        href={item.href}
+                        className="inline-flex min-h-[44px] items-center rounded-full border border-slate-800/70 bg-slate-950/60 px-4 py-2 text-[11px] uppercase tracking-[0.25em] text-slate-300 transition-colors hover:border-slate-500 hover:text-slate-100 touch-manipulation"
+                      >
+                        {item.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+                {secondarySectionLinks.length > 0 ? (
+                  <details className="group">
+                    <summary className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-full border border-slate-800/70 bg-slate-950/60 px-4 py-2 text-[11px] uppercase tracking-[0.25em] text-slate-300 transition-colors hover:border-slate-500 hover:text-slate-100 touch-manipulation">
+                      More sections
+                      <span className="rounded-full border border-slate-700 px-2 py-0.5 text-[10px] uppercase tracking-[0.2em] text-slate-400">
+                        {secondarySectionLinks.length}
+                      </span>
+                    </summary>
+                    <ul className="mt-3 flex flex-wrap gap-3">
+                      {secondarySectionLinks.map((item) => (
+                        <li key={item.href}>
+                          <a
+                            href={item.href}
+                            className="inline-flex min-h-[44px] items-center rounded-full border border-slate-800/70 bg-slate-950/60 px-4 py-2 text-[11px] uppercase tracking-[0.25em] text-slate-300 transition-colors hover:border-slate-500 hover:text-slate-100 touch-manipulation"
+                          >
+                            {item.label}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                ) : null}
+              </div>
             </nav>
           ) : null}
           {historicalBanner}
