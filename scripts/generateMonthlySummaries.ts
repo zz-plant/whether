@@ -42,12 +42,20 @@ const formatAgeLabel = (value: string, now: Date) => {
 };
 
 const FRED_BASE_URL = "https://fred.stlouisfed.org/graph/fredgraph.csv?id=";
+const FRED_SERIES_URL = "https://fred.stlouisfed.org/series/";
 
 const seriesCatalog = {
   oneMonth: "DGS1MO",
   threeMonth: "DGS3MO",
   twoYear: "DGS2",
   tenYear: "DGS10",
+} as const;
+
+const seriesSourceUrls = {
+  oneMonth: `${FRED_SERIES_URL}${seriesCatalog.oneMonth}`,
+  threeMonth: `${FRED_SERIES_URL}${seriesCatalog.threeMonth}`,
+  twoYear: `${FRED_SERIES_URL}${seriesCatalog.twoYear}`,
+  tenYear: `${FRED_SERIES_URL}${seriesCatalog.tenYear}`,
 } as const;
 
 type SeriesKey = keyof typeof seriesCatalog;
@@ -81,6 +89,15 @@ const parseSeries = (csv: string) => {
   return { points, map };
 };
 
+const getLatestValidDate = (points: SeriesPoint[]) => {
+  for (let index = points.length - 1; index >= 0; index -= 1) {
+    if (points[index].value !== null) {
+      return points[index];
+    }
+  }
+  return null;
+};
+
 const fetchSeries = async (seriesId: string) => {
   const response = await fetch(`${FRED_BASE_URL}${seriesId}`);
   if (!response.ok) {
@@ -88,6 +105,50 @@ const fetchSeries = async (seriesId: string) => {
   }
   const csv = await response.text();
   return parseSeries(csv);
+};
+
+const isSameMonthAndYear = (value: string, asOf: string) => {
+  const valueDate = new Date(`${value}T00:00:00Z`);
+  const asOfDate = new Date(`${asOf}T00:00:00Z`);
+  return (
+    valueDate.getUTCFullYear() === asOfDate.getUTCFullYear() &&
+    valueDate.getUTCMonth() === asOfDate.getUTCMonth()
+  );
+};
+
+const assertCoverageForAsOf = (
+  asOf: string,
+  asOfTime: number,
+  datasets: Record<SeriesKey, SeriesDataset>
+) => {
+  const requiredCoverage = [
+    { key: "twoYear" as const, label: "DGS2" },
+    { key: "tenYear" as const, label: "DGS10" },
+  ];
+  const fallbackCoverage = [
+    { key: "oneMonth" as const, label: "DGS1MO" },
+    { key: "threeMonth" as const, label: "DGS3MO" },
+  ];
+
+  for (const series of requiredCoverage) {
+    const latest = getLatestValidDate(datasets[series.key].points);
+    if (!latest || latest.time < asOfTime) {
+      throw new Error(
+        `FRED coverage for ${series.label} ends on ${latest?.date ?? "unknown"}, which is before ${asOf}.`
+      );
+    }
+  }
+
+  const fallbackLatest = fallbackCoverage
+    .map((series) => getLatestValidDate(datasets[series.key].points))
+    .filter((point): point is SeriesPoint => Boolean(point))
+    .sort((a, b) => b.time - a.time)[0];
+
+  if (!fallbackLatest || fallbackLatest.time < asOfTime) {
+    throw new Error(
+      `FRED coverage for DGS1MO/DGS3MO ends on ${fallbackLatest?.date ?? "unknown"}, which is before ${asOf}.`
+    );
+  }
 };
 
 const findLatestCommonDate = (
@@ -116,7 +177,7 @@ const buildTreasurySnapshot = (
   datasets: Record<SeriesKey, SeriesDataset>
 ): TreasuryData => {
   return {
-    source: "https://fred.stlouisfed.org/series/DGS1MO",
+    source: seriesSourceUrls.oneMonth,
     record_date: recordDate,
     fetched_at,
     isLive: false,
@@ -155,6 +216,7 @@ const generateMonthlySummaries = async () => {
     for (let month = 1; month <= 12; month += 1) {
       const asOf = resolveHistoricalDate(year, month);
       const asOfTime = Date.parse(`${asOf}T00:00:00Z`);
+      assertCoverageForAsOf(asOf, asOfTime, datasets);
       const recordDate = findLatestCommonDate(
         asOfTime,
         basePoints,
@@ -165,13 +227,30 @@ const generateMonthlySummaries = async () => {
       if (!recordDate) {
         throw new Error(`No yield curve data found before ${asOf}.`);
       }
+      if (!isSameMonthAndYear(recordDate, asOf)) {
+        throw new Error(
+          `Latest available yield curve data ${recordDate} does not fall within ${year}-${String(
+            month
+          ).padStart(2, "0")}.`
+        );
+      }
 
       const treasury = buildTreasurySnapshot(recordDate, fetchedAt, datasets);
       const assessment = evaluateRegime(treasury);
       const recordDateLabel = formatDateValue(treasury.record_date);
+      const baseRateSourceUrl =
+        assessment.scores.baseRateUsed === "3M"
+          ? seriesSourceUrls.threeMonth
+          : seriesSourceUrls.oneMonth;
+      const inputSourceUrls = {
+        "base-rate": baseRateSourceUrl,
+        "two-year": seriesSourceUrls.twoYear,
+        "ten-year": seriesSourceUrls.tenYear,
+        "curve-slope": seriesSourceUrls.tenYear,
+      } as const;
       const provenance = {
         sourceLabel: "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
-        sourceUrl: treasury.source,
+        sourceUrl: seriesSourceUrls.tenYear,
         timestampLabel: formatTimestampValue(treasury.fetched_at),
         ageLabel: formatAgeLabel(treasury.fetched_at, now),
         statusLabel: "Historical (simulated)",
@@ -186,7 +265,7 @@ const generateMonthlySummaries = async () => {
         inputs: summary.inputs.map((input) => ({
           ...input,
           sourceLabel: "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
-          sourceUrl: treasury.source,
+          sourceUrl: inputSourceUrls[input.id],
         })),
       };
 
