@@ -51,6 +51,10 @@ plain‑English operational constraints with traceable sources.
 - Accessibility pass: keyboard nav, focus states, reduced motion.
 - Verify offline mode + snapshot labeling.
 - Add footer disclaimer: “Not Financial Advice.”
+- Add an executive decision brief block with a single recommendation + risk badge.
+- Add a “what changed since last read” delta panel on Overview with a Time Machine link.
+- Add inline “signal translation” helpers for jargon-heavy metrics.
+- Promote export/share actions (copy-ready leadership brief) to the Overview header.
 
 ## Milestone 6 — Reliability + Regression Tests (Week 6)
 - Unit tests for:

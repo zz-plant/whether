@@ -133,6 +133,11 @@ export default async function HomePage({
     : isFallback
       ? treasury.fallback_reason ?? "Using cached Treasury snapshot due to upstream outage."
       : "Treasury API responding normally; live signals verified.";
+  const trustStatusAction = historicalSelection
+    ? "Use for retrospectives only; avoid live planning calls until you return to current data."
+    : isFallback
+      ? "Pause irreversible decisions until the live feed returns or you confirm the cache."
+      : "Safe to use for near-term planning; proceed with normal approval flow.";
   const trustStatusTone = historicalSelection ? "historical" : isFallback ? "warning" : "stable";
 
   return (
@@ -143,6 +148,7 @@ export default async function HomePage({
       treasurySource={treasury.source}
       trustStatusLabel={trustStatusLabel}
       trustStatusDetail={trustStatusDetail}
+      trustStatusAction={trustStatusAction}
       trustStatusTone={trustStatusTone}
       pageTitle="Overview"
       pageSummary="Start here for a fast read on the market climate and the executive implications. The rest of the report branches into deeper signal analysis and operational execution guidance."

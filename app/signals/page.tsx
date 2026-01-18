@@ -73,6 +73,11 @@ export default async function SignalsPage({
     : isFallback
       ? treasury.fallback_reason ?? "Using cached Treasury snapshot due to upstream outage."
       : "Treasury API responding normally; live signals verified.";
+  const trustStatusAction = historicalSelection
+    ? "Use historical data to understand trends, not to approve live bets."
+    : isFallback
+      ? "Hold major decisions until live signals return or you validate the cache."
+      : "Signals are live; use them to confirm thresholds and trigger alerts.";
   const trustStatusTone = historicalSelection ? "historical" : isFallback ? "warning" : "stable";
 
   return (
@@ -83,6 +88,7 @@ export default async function SignalsPage({
       treasurySource={treasury.source}
       trustStatusLabel={trustStatusLabel}
       trustStatusDetail={trustStatusDetail}
+      trustStatusAction={trustStatusAction}
       trustStatusTone={trustStatusTone}
       pageTitle="Signals & thresholds"
       pageSummary="Deep-dive into the live signal layer, the macro data sources, and how thresholds are shaping the market climate classification."

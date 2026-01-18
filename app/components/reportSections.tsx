@@ -540,16 +540,19 @@ export const FirstTimeGuidePanel = ({
             title: "1. Scan the executive snapshot",
             detail:
               "Confirm the operating climate and the top constraints before you open deeper diagnostics.",
+            example: "Example decision: defer expansion hires when tightness is high.",
           },
           {
             title: "2. Validate the climate drivers",
             detail:
               "Use the signal matrix here, then hop into the Signals & thresholds lane for the full sensor array.",
+            example: "Example decision: investigate curve inversion before greenlighting long bets.",
           },
           {
             title: "3. Translate into execution moves",
             detail:
               "Use the Operations playbook lane to brief leadership with plain-English action constraints.",
+            example: "Example decision: commit to retention work when bravery is cautious.",
           },
         ].map((step) => (
           <div
@@ -560,6 +563,7 @@ export const FirstTimeGuidePanel = ({
               {step.title}
             </p>
             <p className="mt-2 text-sm text-slate-400">{step.detail}</p>
+            <p className="mt-3 text-xs text-slate-500">{step.example}</p>
           </div>
         ))}
       </div>
@@ -638,6 +642,18 @@ export const BeginnerGlossaryPanel = () => (
                 How hard it is to access funding. Higher tightness means conserve cash and focus on
                 runway.
               </dd>
+              <dd className="mt-2 text-xs text-slate-500">
+                Why it matters: tight capital makes long payback projects riskier.
+              </dd>
+              <dd className="mt-2 text-[11px] text-slate-400">
+                Used in:{" "}
+                <a
+                  href="#executive-snapshot"
+                  className="touch-target inline-flex min-h-[44px] items-center text-[11px] text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+                >
+                  Executive snapshot
+                </a>
+              </dd>
             </div>
             <div>
               <dt className="text-xs uppercase tracking-[0.2em] text-slate-200">Market bravery</dt>
@@ -645,17 +661,53 @@ export const BeginnerGlossaryPanel = () => (
                 How willing the market is to take risk. Lower bravery means de-risk launches and
                 hiring.
               </dd>
+              <dd className="mt-2 text-xs text-slate-500">
+                Why it matters: risk appetite sets how bold your roadmap can be.
+              </dd>
+              <dd className="mt-2 text-[11px] text-slate-400">
+                Used in:{" "}
+                <a
+                  href="#signal-matrix"
+                  className="touch-target inline-flex min-h-[44px] items-center text-[11px] text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+                >
+                  Signal matrix
+                </a>
+              </dd>
             </div>
             <div>
               <dt className="text-xs uppercase tracking-[0.2em] text-slate-200">Curve slope</dt>
               <dd className="mt-1 text-slate-400">
                 A read on recession risk. Inversion signals caution and favors defensive planning.
               </dd>
+              <dd className="mt-2 text-xs text-slate-500">
+                Why it matters: an inverted curve warns against long-horizon bets.
+              </dd>
+              <dd className="mt-2 text-[11px] text-slate-400">
+                Used in:{" "}
+                <a
+                  href="#executive-snapshot"
+                  className="touch-target inline-flex min-h-[44px] items-center text-[11px] text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+                >
+                  Executive snapshot
+                </a>
+              </dd>
             </div>
             <div>
               <dt className="text-xs uppercase tracking-[0.2em] text-slate-200">Fallback mode</dt>
               <dd className="mt-1 text-slate-400">
                 When live data is unavailable, the report uses the latest cached Treasury snapshot.
+              </dd>
+              <dd className="mt-2 text-xs text-slate-500">
+                Why it matters: stale inputs can mislead time-sensitive decisions.
+              </dd>
+              <dd className="mt-2 text-[11px] text-slate-400">
+                Used in:{" "}
+                <a
+                  href="#executive-snapshot"
+                  className="touch-target inline-flex min-h-[44px] items-center text-[11px] text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+                >
+                  Executive snapshot
+                </a>
               </dd>
             </div>
           </dl>
@@ -764,24 +816,28 @@ export const SignalMatrixPanel = ({
       id: "tight-cautious",
       label: "Tight + Cautious",
       description: "Cash conservation, tighter budgets, and slower hiring.",
+      action: "Default action: cut burn and freeze risky launches.",
       className: "left-3 top-3",
     },
     {
       id: "tight-bold",
       label: "Tight + Bold",
       description: "Selective bets with strong governance and runway checks.",
+      action: "Default action: fund only high-ROI bets with short payback.",
       className: "right-3 top-3",
     },
     {
       id: "loose-cautious",
       label: "Loose + Cautious",
       description: "Stable funding but risk appetite is muted; prioritize durability.",
+      action: "Default action: prioritize reliability and retention projects.",
       className: "left-3 bottom-3",
     },
     {
       id: "loose-bold",
       label: "Loose + Bold",
       description: "Expansion-friendly conditions; scale responsibly.",
+      action: "Default action: accelerate growth bets with clear guardrails.",
       className: "right-3 bottom-3",
     },
   ];
@@ -939,15 +995,19 @@ export const SignalMatrixPanel = ({
                 <button
                   type="button"
                   aria-describedby={tooltipId}
-                  className="group relative weather-pill flex min-h-[44px] items-center px-3 text-[10px] uppercase tracking-[0.2em] text-slate-300"
+                  className="group relative weather-pill flex min-h-[44px] flex-col justify-center px-3 text-[10px] uppercase tracking-[0.2em] text-slate-300"
                 >
-                  {quadrant.label}
+                  <span>{quadrant.label}</span>
+                  <span className="mt-1 text-[9px] normal-case tracking-normal text-slate-400">
+                    {quadrant.action}
+                  </span>
                   <span
                     id={tooltipId}
                     role="tooltip"
                     className="pointer-events-none absolute z-10 mt-2 w-44 rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-[11px] text-slate-200 opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
                   >
-                    {quadrant.description}
+                    <span className="block">{quadrant.description}</span>
+                    <span className="mt-2 block text-slate-300">{quadrant.action}</span>
                   </span>
                 </button>
               </div>
@@ -1025,6 +1085,9 @@ export const ExecutiveSnapshotPanel = ({
     : hasDataWarnings
       ? "Some Treasury inputs are missing; interpret signal strength with caution."
       : "Full Treasury data coverage verified for this report.";
+  const freshnessAction = isFallback
+    ? "Action: avoid irreversible decisions until live signals return."
+    : "Action: safe to use for day-to-day planning approvals.";
   const scoringInputs = assessment.inputs;
   const scoringSource = scoringInputs[0]?.sourceLabel ?? "US Treasury";
   const scoringSourceUrl = scoringInputs[0]?.sourceUrl ?? treasury.source;
@@ -1069,6 +1132,7 @@ export const ExecutiveSnapshotPanel = ({
               Fetched{" "}
               <time dateTime={treasury.fetched_at}>{formatTimestamp(treasury.fetched_at)}</time>
             </p>
+            <p className="mt-3 text-xs text-slate-400">{freshnessAction}</p>
             {isFallback ? (
               <div className="mt-3 rounded-lg border border-amber-400/30 bg-amber-500/10 p-2 text-[11px] text-amber-100">
                 <p className="uppercase tracking-[0.2em] text-amber-200">Cached fallback</p>
@@ -1216,6 +1280,34 @@ export const ExecutiveSnapshotPanel = ({
                 {formatTimestamp(treasury.fetched_at)}
               </time>
             </p>
+          </div>
+          <div className="weather-surface p-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">So what (1 minute)</p>
+            <p className="mt-2 text-xs text-slate-500">
+              Quick actions for teams without macro context.
+            </p>
+            <ul className="mt-3 space-y-2 text-xs text-slate-300">
+              <li className="flex gap-2">
+                <span className="text-slate-500">•</span>
+                <span className="break-words">
+                  {tightnessStatus === "tightening"
+                    ? "Freeze non-essential hires unless payback is under 6 months."
+                    : "Keep growth hires but require clear ROI and runway checks."}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-slate-500">•</span>
+                <span className="break-words">
+                  {riskStatus === "cautious"
+                    ? "Prioritize reliability and retention over risky launches."
+                    : "Greenlight measured growth bets with clear guardrails."}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-slate-500">•</span>
+                <span className="break-words">{curveRiskNote}</span>
+              </li>
+            </ul>
           </div>
         </div>
         <div className="mt-5 grid gap-4 lg:grid-cols-[1.15fr,0.85fr]">
