@@ -15,7 +15,7 @@ import {
 } from "../components/reportSections";
 
 export const metadata: Metadata = {
-  title: "Whether Report — Operations playbook",
+  title: "Whether Report — What to do next",
   description:
     "Execution-ready guidance, decision shield validation, and export briefs for the Whether Report.",
 };
@@ -28,18 +28,18 @@ export default async function OperationsPage({
   const pageLinks = [
     {
       href: "/",
-      label: "Overview",
-      description: "Executive snapshot, market climate posture, and the high-level read.",
+      label: "Quick start",
+      description: "What to do this week, plus the current climate in plain English.",
     },
     {
       href: "/signals",
-      label: "Signals & thresholds",
-      description: "Live sensor detail, macro inputs, and historical time machine coverage.",
+      label: "Why we believe this",
+      description: "See the data sources and how each signal is scored.",
     },
     {
       href: "/operations",
-      label: "Operations playbook",
-      description: "Action guidance, decision shields, and export-ready briefs.",
+      label: "What to do next",
+      description: "Concrete actions and decision safeguards for your team.",
     },
   ];
   const sectionLinks = [
@@ -92,7 +92,7 @@ export default async function OperationsPage({
       trustStatusLabel={trustStatusLabel}
       trustStatusDetail={trustStatusDetail}
       trustStatusTone={trustStatusTone}
-      pageTitle="Operations playbook"
+      pageTitle="What to do next"
       pageSummary="Translate the market climate into action: decision shields, playbook moves, and export-ready briefs for leadership review."
       pageLinks={pageLinks}
       sectionLinks={sectionLinks}

@@ -262,17 +262,17 @@ export const WeeklyActionSummaryPanel = ({
       <div className="weather-panel flex flex-col gap-3 px-5 py-4">
         <p className="type-label text-slate-400">What should I do this week?</p>
         <h2 id="weekly-action-summary-title" className="type-section text-slate-100">
-          Action summary
+          Weekly action summary
         </h2>
         <p className="text-sm text-slate-200">
-          This week, operate in {regimeLabel} mode: {actionGuidance}; review the{" "}
+          This week, operate in {regimeLabel} mode: {actionGuidance}. Then skim the{" "}
           <a
             href="#executive-snapshot"
             className="touch-target inline-flex min-h-[44px] items-center text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-slate-50 touch-manipulation"
           >
-            Executive Snapshot
+            leadership summary
           </a>{" "}
-          below for the supporting constraints.
+          below for the why.
         </p>
       </div>
     </section>
@@ -307,10 +307,10 @@ export const RegimeAssessmentCard = ({
       : curveSlopeValue < 0
         ? `Yield curve inversion (${curveSlopeValue.toFixed(2)}%).`
         : `Yield curve normal (${curveSlopeValue.toFixed(2)}%).`;
-  const tightnessLabel = `Capital tightness ${assessment.scores.tightness}/100 ${
+  const tightnessLabel = `Cash availability (tightness) ${assessment.scores.tightness}/100 ${
     assessment.scores.tightness > tightnessThreshold ? "above" : "below"
   } ${tightnessThreshold}.`;
-  const riskLabel = `Market bravery ${assessment.scores.riskAppetite}/100 ${
+  const riskLabel = `Market risk appetite ${assessment.scores.riskAppetite}/100 ${
     assessment.scores.riskAppetite > riskThreshold ? "above" : "below"
   } ${riskThreshold}.`;
   const baseRateLabel = `Rate baseline ${formatNumber(
@@ -361,7 +361,7 @@ export const RegimeAssessmentCard = ({
             {regimeLabel}
           </h2>
           <p className="mt-2 text-xs uppercase tracking-[0.2em] text-slate-400">
-            System label: {assessment.regime}
+            System code: {assessment.regime}
           </p>
         </div>
         <div className="flex flex-col items-end gap-3 text-xs uppercase tracking-[0.2em] text-slate-300">
@@ -370,7 +370,7 @@ export const RegimeAssessmentCard = ({
             Climate status
           </span>
           <span className="weather-pill px-3 py-1">
-            Tightness{" "}
+            Cash availability{" "}
             <span className="tabular-nums">{assessment.scores.tightness}</span> · Risk{" "}
             <span className="tabular-nums">{assessment.scores.riskAppetite}</span>
           </span>
@@ -397,7 +397,7 @@ export const RegimeAssessmentCard = ({
         })}
       </div>
       <p className="relative mt-3 text-xs text-slate-400">
-        Badge colors map to climate posture for instant recognition across report panels.
+        Badge colors map to posture so anyone can scan the report quickly.
       </p>
       <p className="relative mt-4 type-data text-slate-200 break-words">{assessment.description}</p>
       <div className="weather-surface relative mt-4 grid gap-3 p-4 text-xs text-slate-400 md:grid-cols-3">
@@ -406,15 +406,39 @@ export const RegimeAssessmentCard = ({
           <p className="mt-2 text-lg font-semibold text-slate-100 tabular-nums">{constraintCount}</p>
         </div>
         <div>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">Capital tightness</p>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">
+            Cash availability (tightness)
+          </p>
           <p className="mt-2 text-lg font-semibold text-slate-100 tabular-nums">
             {assessment.scores.tightness}
           </p>
         </div>
         <div>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">Market bravery</p>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">
+            Market risk appetite
+          </p>
           <p className="mt-2 text-lg font-semibold text-slate-100 tabular-nums">
             {assessment.scores.riskAppetite}
+          </p>
+        </div>
+      </div>
+      <div className="weather-surface relative mt-3 grid gap-3 p-4 text-xs text-slate-400 md:grid-cols-3">
+        <div>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">Cash availability</p>
+          <p className="mt-2 text-xs text-slate-400">
+            Higher tightness means cash is harder to access, so prefer short payback work.
+          </p>
+        </div>
+        <div>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">Risk appetite</p>
+          <p className="mt-2 text-xs text-slate-400">
+            Lower appetite means reduce experiments and protect core revenue.
+          </p>
+        </div>
+        <div>
+          <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">Score guidance</p>
+          <p className="mt-2 text-xs text-slate-400">
+            Treat scores above the threshold as a stronger constraint on approvals.
           </p>
         </div>
       </div>
@@ -456,7 +480,7 @@ export const RegimeAssessmentCard = ({
       <div className="weather-surface relative mt-6 grid gap-4 p-4 text-xs text-slate-400 md:grid-cols-2">
         <div className="space-y-3">
           <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.2em] text-slate-500">
-            <span>Capital tightness</span>
+            <span>Cash availability (tightness)</span>
             <span className="text-slate-200 tabular-nums">{assessment.scores.tightness}/100</span>
           </div>
           <meter
@@ -464,7 +488,7 @@ export const RegimeAssessmentCard = ({
             min={0}
             max={100}
             value={tightnessScore}
-            aria-label="Capital tightness score"
+            aria-label="Cash availability tightness score"
           />
           <svg
             viewBox="0 0 100 8"
@@ -491,7 +515,7 @@ export const RegimeAssessmentCard = ({
         </div>
         <div className="space-y-3">
           <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.2em] text-slate-500">
-            <span>Market bravery</span>
+            <span>Market risk appetite</span>
             <span className="text-slate-200 tabular-nums">{assessment.scores.riskAppetite}/100</span>
           </div>
           <meter
@@ -499,7 +523,7 @@ export const RegimeAssessmentCard = ({
             min={0}
             max={100}
             value={riskScore}
-            aria-label="Market bravery score"
+            aria-label="Market risk appetite score"
           />
           <svg
             viewBox="0 0 100 8"
@@ -558,13 +582,13 @@ export const FirstTimeGuidePanel = ({
     <div className="weather-panel p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="type-label text-slate-400">First-time operator guide</p>
+          <p className="type-label text-slate-400">New here? Start here</p>
           <h2 id="first-time-guide-title" className="type-section text-slate-100">
-            Orient to the live market climate briefing in three moves
+            Get oriented in three plain-English steps
           </h2>
           <p className="mt-2 type-data text-slate-300">
-            This report is built to turn Treasury signals into immediate execution constraints. Start
-            here to ground decisions before you dive into the data.
+            This report turns Treasury signals into weekly constraints. Start here before diving into
+            the deeper data lanes.
           </p>
         </div>
         <div className="weather-surface px-4 py-3 text-xs uppercase tracking-[0.2em] text-slate-300">
@@ -578,22 +602,22 @@ export const FirstTimeGuidePanel = ({
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
         {[
           {
-            title: "1. Scan the executive snapshot",
+            title: "1. Read the leadership summary",
             detail:
-              "Confirm the operating climate and the top constraints before you open deeper diagnostics.",
-            example: "Example decision: defer expansion hires when tightness is high.",
+              "Confirm the weekly posture and top constraints before you open deeper diagnostics.",
+            example: "Example decision: defer expansion hires when cash is tight.",
           },
           {
-            title: "2. Validate the climate drivers",
+            title: "2. Check the proof",
             detail:
-              "Use the signal matrix here, then hop into the Signals & thresholds lane for the full sensor array.",
-            example: "Example decision: investigate curve inversion before greenlighting long bets.",
+              "Use the signal breakdown here, then open the data lane to see the source metrics.",
+            example: "Example decision: confirm curve inversion before approving long bets.",
           },
           {
-            title: "3. Translate into execution moves",
+            title: "3. Turn it into actions",
             detail:
-              "Use the Operations playbook lane to brief leadership with plain-English action constraints.",
-            example: "Example decision: commit to retention work when bravery is cautious.",
+              "Use the actions lane to brief leadership with clear, plain-English constraints.",
+            example: "Example decision: focus on retention when risk appetite is cautious.",
           },
         ].map((step) => (
           <div
@@ -611,10 +635,10 @@ export const FirstTimeGuidePanel = ({
 
       <div className="mt-6 flex flex-wrap gap-3">
         {[
-          { href: "#executive-snapshot", label: "Executive snapshot" },
-          { href: "#regime-assessment", label: "Market climate assessment" },
-          { href: "/operations#playbook", label: "Playbook" },
-          { href: "/operations#export-briefs", label: "Export briefs" },
+          { href: "#executive-snapshot", label: "Leadership summary" },
+          { href: "#regime-assessment", label: "What the scores mean" },
+          { href: "/operations#playbook", label: "Actions playbook" },
+          { href: "/operations#export-briefs", label: "Shareable briefs" },
           { href: "/signals#time-machine", label: "Time machine" },
         ].map((link) => (
           <a
@@ -639,13 +663,13 @@ export const BeginnerGlossaryPanel = () => (
     <div className="weather-panel p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="type-label text-slate-400">Beginner mode</p>
+          <p className="type-label text-slate-400">Plain-English glossary</p>
           <h3 id="beginner-glossary-title" className="type-section text-slate-100">
-            Glossary sidebar for policy-to-ops translation
+            Translate finance terms into day-to-day product decisions
           </h3>
           <p className="mt-2 type-data text-slate-300">
-            New to Treasury data? Use this sidebar to decode the language into operational
-            consequences before you share the report.
+            New to Treasury data? Use this glossary to translate jargon into concrete product moves
+            before you share the report.
           </p>
         </div>
         <div className="weather-surface px-4 py-3 text-xs uppercase tracking-[0.2em] text-slate-300">
@@ -678,7 +702,9 @@ export const BeginnerGlossaryPanel = () => (
           <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Glossary</p>
           <dl className="mt-3 space-y-3 text-sm text-slate-300">
             <div>
-              <dt className="text-xs uppercase tracking-[0.2em] text-slate-200">Capital tightness</dt>
+              <dt className="text-xs uppercase tracking-[0.2em] text-slate-200">
+                Cash availability (tightness)
+              </dt>
               <dd className="mt-1 text-slate-400">
                 How hard it is to access funding. Higher tightness means conserve cash and focus on
                 runway.
@@ -697,9 +723,11 @@ export const BeginnerGlossaryPanel = () => (
               </dd>
             </div>
             <div>
-              <dt className="text-xs uppercase tracking-[0.2em] text-slate-200">Market bravery</dt>
+              <dt className="text-xs uppercase tracking-[0.2em] text-slate-200">
+                Market risk appetite
+              </dt>
               <dd className="mt-1 text-slate-400">
-                How willing the market is to take risk. Lower bravery means de-risk launches and
+                How willing the market is to take risk. Lower appetite means de-risk launches and
                 hiring.
               </dd>
               <dd className="mt-2 text-xs text-slate-500">
@@ -716,7 +744,9 @@ export const BeginnerGlossaryPanel = () => (
               </dd>
             </div>
             <div>
-              <dt className="text-xs uppercase tracking-[0.2em] text-slate-200">Curve slope</dt>
+              <dt className="text-xs uppercase tracking-[0.2em] text-slate-200">
+                Curve slope (recession risk)
+              </dt>
               <dd className="mt-1 text-slate-400">
                 A read on recession risk. Inversion signals caution and favors defensive planning.
               </dd>
@@ -884,21 +914,21 @@ export const SignalMatrixPanel = ({
   ];
 
   return (
-    <section
-      id="signal-matrix"
-      aria-labelledby="signal-matrix-title"
-      aria-describedby="signal-matrix-description"
-      className="weather-panel p-6"
-    >
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <h3
-          id="signal-matrix-title"
-          className="type-label text-slate-400"
-        >
-          Signal Matrix
-        </h3>
+  <section
+    id="signal-matrix"
+    aria-labelledby="signal-matrix-title"
+    aria-describedby="signal-matrix-description"
+    className="weather-panel p-6"
+  >
+    <div className="flex flex-wrap items-start justify-between gap-3">
+      <h3
+        id="signal-matrix-title"
+        className="type-label text-slate-400"
+      >
+        Signal breakdown
+      </h3>
         <div className="flex flex-col items-end gap-2 text-xs uppercase tracking-[0.2em] text-slate-500">
-          <span>Tightness vs. Bravery</span>
+          <span>Cash availability vs. risk appetite</span>
           <DataProvenanceStrip provenance={provenance} />
         </div>
       </div>
@@ -913,7 +943,7 @@ export const SignalMatrixPanel = ({
           >
             <title id="signal-matrix-visual-title">Signal matrix grid</title>
             <desc id="signal-matrix-visual-desc">
-              A two-by-two matrix showing the balance of tightness and market bravery.
+              A two-by-two matrix showing the balance of tightness and market risk appetite.
             </desc>
             <defs>
               <pattern
@@ -1008,15 +1038,15 @@ export const SignalMatrixPanel = ({
               Loose
             </div>
             <div className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[10px] uppercase tracking-[0.2em] text-slate-500">
-              Market bravery →
+              Risk appetite →
             </div>
             <div className="absolute left-1 top-1/2 -translate-y-1/2 -rotate-90 text-[10px] uppercase tracking-[0.2em] text-slate-500">
-              Capital tightness ↑
+              Cash tightness ↑
             </div>
           </div>
           <button
             type="button"
-            aria-label={`Matrix position. Tightness ${assessment.scores.tightness}, bravery ${assessment.scores.riskAppetite}.`}
+            aria-label={`Matrix position. Tightness ${assessment.scores.tightness}, risk appetite ${assessment.scores.riskAppetite}.`}
             aria-describedby={matrixTooltipId}
             className="group absolute flex min-h-[44px] min-w-[44px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full"
             style={{ left: `${matrixDotX}%`, top: `${matrixDotY}%` }}
@@ -1026,7 +1056,7 @@ export const SignalMatrixPanel = ({
               role="tooltip"
               className="pointer-events-none absolute top-0 -translate-y-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-[11px] text-slate-200 opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
             >
-              Tightness {assessment.scores.tightness} · Bravery {assessment.scores.riskAppetite}
+              Tightness {assessment.scores.tightness} · Risk appetite {assessment.scores.riskAppetite}
             </span>
           </button>
           {quadrants.map((quadrant) => {
@@ -1057,8 +1087,8 @@ export const SignalMatrixPanel = ({
         </div>
         <figcaption id="signal-matrix-description" className="mt-4 text-xs text-slate-500">
           Position is derived from tightness (
-          <span className="tabular-nums">{assessment.scores.tightness}</span>) and market bravery (
-          <span className="tabular-nums">{assessment.scores.riskAppetite}</span>).
+          <span className="tabular-nums">{assessment.scores.tightness}</span>) and market risk
+          appetite (<span className="tabular-nums">{assessment.scores.riskAppetite}</span>).
         </figcaption>
       </figure>
     </section>
@@ -1454,16 +1484,16 @@ export const RegimeSummaryPanel = ({
     assessment.scores.riskAppetite > assessment.thresholds.riskAppetiteRegime
       ? "open"
       : "cautious";
-  const narrative = `Capital is ${tightnessStatus} and risk appetite is ${riskStatus}. ${assessment.description}`;
+  const narrative = `Cash availability is ${tightnessStatus} and risk appetite is ${riskStatus}. ${assessment.description}`;
 
   return (
     <section id="regime-summary" aria-labelledby="regime-summary-title" className="mt-10">
       <div className="weather-panel p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="type-label text-slate-400">Regime summary</p>
+            <p className="type-label text-slate-400">Market climate summary</p>
             <h3 id="regime-summary-title" className="type-section text-slate-100">
-              Plain-English market translation
+              Plain-English market readout
             </h3>
             <p className="mt-2 type-data text-slate-300">
               A direct interpretation of Treasury signals into the posture you should operate under
@@ -1487,7 +1517,7 @@ export const RegimeSummaryPanel = ({
             <p className="mt-3 text-sm text-slate-200">{narrative}</p>
             <div className="mt-4 space-y-2 text-xs text-slate-400">
               <p>
-                Tightness score:{" "}
+                Cash availability (tightness):{" "}
                 <span className="mono text-slate-200">{assessment.scores.tightness}/100</span>{" "}
                 (threshold {assessment.thresholds.tightnessRegime}).
               </p>
@@ -1609,7 +1639,7 @@ export const RegimeChangeAlertPanel = ({
           <div className="mt-6 weather-surface p-4">
             <p className="text-sm text-slate-300">
               No alert right now. Notifications only fire when the regime changes or tightness /
-              bravery cross a threshold, so operators only get interrupted on state changes.
+              risk appetite cross a threshold, so operators only get interrupted on state changes.
             </p>
           </div>
         )}

@@ -52,7 +52,7 @@ export const ReportShell = ({
   const primarySectionLinks = sectionLinks.slice(0, 3);
   const secondarySectionLinks = sectionLinks.slice(3);
   const pageLinkIcons: Record<string, ReactNode> = {
-    Overview: (
+    "Quick start": (
       <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
         <path
           d="M12 4.5V2.75M12 21.25v-1.75M4.5 12H2.75M21.25 12h-1.75M6.75 6.75l-1.3-1.3M18.55 18.55l-1.3-1.3M6.75 17.25l-1.3 1.3M18.55 5.45l-1.3 1.3"
@@ -63,7 +63,7 @@ export const ReportShell = ({
         <circle cx="12" cy="12" r="4.25" fill="currentColor" />
       </svg>
     ),
-    "Signals & thresholds": (
+    "Why we believe this": (
       <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
         <path
           d="M4 18c0-4.4 3.6-8 8-8s8 3.6 8 8"
@@ -82,7 +82,7 @@ export const ReportShell = ({
         <circle cx="12" cy="18" r="1.8" fill="currentColor" />
       </svg>
     ),
-    "Operations playbook": (
+    "What to do next": (
       <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
         <path
           d="M6 4.75h9.25a2 2 0 0 1 2 2v10.5a2 2 0 0 1-2 2H6"
@@ -141,12 +141,12 @@ export const ReportShell = ({
         <header className="relative flex flex-col gap-6 border-b border-slate-800/70 pb-8">
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div className="min-w-0 space-y-4">
-              <p className="type-label text-slate-400">Market Climate Station</p>
+              <p className="type-label text-slate-400">Weekly product guidance</p>
               <div className="space-y-3">
                 <h1 className="type-headline text-slate-100">Whether Report</h1>
                 <p className="max-w-2xl type-data text-slate-300">
-                  A plain-English operating brief that turns Treasury signals into execution constraints.
-                  Every output is sourced and time-stamped for traceability.
+                  A plain-English brief that turns Treasury signals into week-by-week product and
+                  engineering constraints. Every output is sourced and time-stamped for traceability.
                 </p>
               </div>
             </div>
@@ -163,7 +163,7 @@ export const ReportShell = ({
             </div>
             <div className={`weather-panel flex min-w-[220px] flex-col gap-3 px-5 py-4 ${trustToneStyles}`}>
               <p className={`text-[10px] uppercase tracking-[0.3em] ${trustLabelTone}`}>
-                Trust status
+                Data trust level
               </p>
               <div className="flex flex-col gap-2">
                 <span className="text-sm font-semibold uppercase tracking-[0.2em]">
@@ -175,7 +175,7 @@ export const ReportShell = ({
             </div>
           </div>
           <div className="weather-panel px-5 py-4">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">Forecast lane</p>
+            <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">You're on</p>
             <div className="mt-3 space-y-2">
               <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-100">
                 {pageTitle}
@@ -186,28 +186,28 @@ export const ReportShell = ({
           <div className="grid gap-4 lg:grid-cols-[1.2fr,0.8fr]">
             <div className="weather-panel px-5 py-4">
               <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">
-                Operator briefing
+                How to use this report
               </p>
               <p className="mt-3 text-sm font-semibold uppercase tracking-[0.2em] text-slate-100">
-                How to use this report
+                Quick decision checklist
               </p>
               <ul className="mt-3 space-y-2 text-sm text-slate-300">
                 <li className="flex gap-2">
                   <span className="text-slate-500">•</span>
                   <span className="break-words">
-                    Confirm the market climate before approving new bets.
+                    Scan the quick start for the week’s recommended posture.
                   </span>
                 </li>
                 <li className="flex gap-2">
                   <span className="text-slate-500">•</span>
                   <span className="break-words">
-                    Align leadership on risk posture using the executive snapshot and alerts.
+                    Align leadership using the summary and any new alerts.
                   </span>
                 </li>
                 <li className="flex gap-2">
                   <span className="text-slate-500">•</span>
                   <span className="break-words">
-                    Turn signals into action via the Operations playbook.
+                    Translate the signals into actions in the playbook lane.
                   </span>
                 </li>
               </ul>
@@ -216,22 +216,22 @@ export const ReportShell = ({
                   href="#regime-assessment"
                   className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                 >
-                  Review constraints
+                  See the score meaning
                 </a>
                 <a
                   href="/operations"
                   className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                 >
-                  Operations playbook
+                  Go to actions
                 </a>
               </div>
             </div>
             <div className="weather-panel px-5 py-4">
               <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">
-                Signal integrity
+                Data timestamps
               </p>
               <p className="mt-3 text-sm font-semibold uppercase tracking-[0.2em] text-slate-100">
-                Data custody checks
+                Proof the data is current
               </p>
               <dl className="mt-4 space-y-3 text-sm text-slate-300">
                 <div className="flex items-center justify-between gap-3">
@@ -259,7 +259,7 @@ export const ReportShell = ({
             </div>
           </div>
           <nav aria-label="Report pages" className="space-y-3">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-slate-500">Report lanes</p>
+            <p className="text-[10px] uppercase tracking-[0.3em] text-slate-500">Report paths</p>
             <ul className="grid gap-3 md:grid-cols-3">
               {pageLinks.map((link) => {
                 const isActive = link.label === pageTitle;
@@ -307,7 +307,7 @@ export const ReportShell = ({
                 {secondarySectionLinks.length > 0 ? (
                   <details className="group">
                     <summary className="weather-pill inline-flex min-h-[44px] cursor-pointer items-center gap-2 px-4 py-2 text-[11px] uppercase tracking-[0.25em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation">
-                      More sections
+                      More detail
                       <span className="rounded-full border border-slate-700 px-2 py-0.5 text-[10px] uppercase tracking-[0.2em] text-slate-400">
                         {secondarySectionLinks.length}
                       </span>
