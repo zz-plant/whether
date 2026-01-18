@@ -725,7 +725,7 @@ export const FirstTimeGuidePanel = ({
   fetchedAtLabel: string;
 }) => (
   <section id="first-time-guide" aria-labelledby="first-time-guide-title" className="mt-10">
-    <div className="weather-panel p-6">
+    <div className="weather-panel weather-panel-static p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="type-label text-slate-400">New here? Start here</p>
@@ -806,7 +806,7 @@ export const FirstTimeGuidePanel = ({
 
 export const BeginnerGlossaryPanel = () => (
   <section id="beginner-glossary" aria-labelledby="beginner-glossary-title" className="mt-10">
-    <div className="weather-panel p-6">
+    <div className="weather-panel weather-panel-static p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="type-label text-slate-400">Plain-English glossary</p>

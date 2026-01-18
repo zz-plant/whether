@@ -39,6 +39,13 @@ body {
     inset 0 0 0 1px rgba(2, 6, 23, 0.4);
 }
 
+.weather-panel-static {
+  @apply border-slate-800/70 bg-slate-950/45;
+  box-shadow:
+    0 28px 72px -58px rgba(15, 23, 42, 0.6),
+    inset 0 0 0 1px rgba(15, 23, 42, 0.5);
+}
+
 .weather-tile {
   @apply rounded-2xl border border-sky-900/50 bg-slate-950/70 backdrop-blur-xl;
   box-shadow:
