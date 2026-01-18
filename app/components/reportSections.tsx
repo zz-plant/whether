@@ -932,6 +932,22 @@ export const ExecutiveSnapshotPanel = ({
   const fallbackReason = treasury.fallback_reason ?? "Fallback triggered.";
   const constraintHighlights = assessment.constraints.slice(0, 3);
   const hasDataWarnings = assessment.dataWarnings.length > 0;
+  const tightnessThreshold = assessment.thresholds.tightnessRegime;
+  const riskThreshold = assessment.thresholds.riskAppetiteRegime;
+  const tightnessStatus =
+    assessment.scores.tightness > tightnessThreshold ? "tightening" : "loosening";
+  const riskStatus = assessment.scores.riskAppetite > riskThreshold ? "open" : "cautious";
+  const curveRiskNote =
+    curveSlope === null
+      ? "Curve slope unavailable; avoid long-cycle bets without additional confirmation."
+      : curveSlope < 0
+        ? "Curve inverted; pressure-test long-horizon revenue bets and liquidity plans."
+        : "Curve normal; maintain growth bets but validate payback windows.";
+  const executionChecklist = [
+    `Capital is ${tightnessStatus} (${assessment.scores.tightness}/100 vs ${tightnessThreshold}).`,
+    `Risk appetite is ${riskStatus} (${assessment.scores.riskAppetite}/100 vs ${riskThreshold}).`,
+    curveRiskNote,
+  ];
   const confidenceLabel = isFallback || hasDataWarnings ? "Guarded" : "High";
   const confidenceTone =
     isFallback || hasDataWarnings
@@ -1125,6 +1141,44 @@ export const ExecutiveSnapshotPanel = ({
                 ))}
               </ul>
             ) : null}
+          </div>
+        </div>
+        <div className="mt-5 grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">
+          <div className="weather-surface p-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+              Execution checklist
+            </p>
+            <p className="mt-3 text-sm text-slate-200">
+              Use these calls to align next-week planning and leadership updates.
+            </p>
+            <ul className="mt-4 space-y-3 text-sm text-slate-300">
+              {executionChecklist.map((item) => (
+                <li key={item} className="flex gap-2">
+                  <span className="text-slate-500">•</span>
+                  <span className="break-words">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="weather-surface p-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Quick actions</p>
+            <p className="mt-3 text-sm text-slate-200">
+              Pull the full signal detail or export constraints directly into your operations brief.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <a
+                href="/signals#thresholds"
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+              >
+                Review thresholds
+              </a>
+              <a
+                href="/operations#export-briefs"
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+              >
+                Export brief
+              </a>
+            </div>
           </div>
         </div>
       </div>
