@@ -24,6 +24,11 @@ describe("regime engine scoring", () => {
     assert.equal(computeRiskAppetiteScore(-1.0), 0);
     assert.equal(computeRiskAppetiteScore(1.5), 100);
   });
+
+  it("clamps risk appetite when curve slope exceeds the range", () => {
+    assert.equal(computeRiskAppetiteScore(2.5), 100);
+    assert.equal(computeRiskAppetiteScore(-2.5), 0);
+  });
 });
 
 describe("regime classification", () => {
@@ -33,6 +38,17 @@ describe("regime classification", () => {
 
   it("classifies expansion with low tightness and high appetite", () => {
     assert.equal(classifyRegime(10, 80, DEFAULT_THRESHOLDS), "EXPANSION");
+  });
+
+  it("treats threshold equality as expansion", () => {
+    assert.equal(
+      classifyRegime(
+        DEFAULT_THRESHOLDS.tightnessRegime,
+        DEFAULT_THRESHOLDS.riskAppetiteRegime,
+        DEFAULT_THRESHOLDS
+      ),
+      "EXPANSION"
+    );
   });
 });
 
@@ -59,5 +75,24 @@ describe("regime assessment", () => {
     assert.equal(baseRateInput?.recordDate, treasury.record_date);
     assert.equal(baseRateInput?.fetchedAt, treasury.fetched_at);
     assert.equal(baseRateInput?.sourceUrl, treasury.source);
+  });
+
+  it("flags missing inputs with warnings", () => {
+    const treasury: TreasuryData = {
+      source: "US Treasury",
+      record_date: "2024-10-01",
+      fetched_at: "2024-10-02T00:00:00Z",
+      isLive: false,
+      yields: {
+        oneMonth: null,
+        threeMonth: null,
+        twoYear: null,
+        tenYear: null,
+      },
+    };
+
+    const assessment = evaluateRegime(treasury);
+    assert.ok(assessment.dataWarnings.some((warning) => warning.includes("Base rate missing")));
+    assert.ok(assessment.dataWarnings.some((warning) => warning.includes("Curve slope missing")));
   });
 });

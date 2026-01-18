@@ -95,6 +95,68 @@ const buildSparkline = (history?: SeriesHistoryPoint[]) => {
   return { path, area };
 };
 
+type SeriesFreshnessProps = {
+  label?: string;
+  sourceLabel: string;
+  sourceUrl: string;
+  recordDate: string;
+  fetchedAt: string;
+  isLive: boolean;
+};
+
+const SeriesFreshnessBadge = ({
+  label = "Data freshness",
+  sourceLabel,
+  sourceUrl,
+  recordDate,
+  fetchedAt,
+  isLive,
+}: SeriesFreshnessProps) => {
+  const statusLabel = isLive ? "Live source" : "Cached snapshot";
+  const statusTone = isLive
+    ? "border-emerald-400/50 bg-emerald-500/10 text-emerald-100"
+    : "border-amber-400/60 bg-amber-500/10 text-amber-100";
+
+  return (
+    <div className="rounded-lg border border-slate-800/70 bg-slate-950/70 px-3 py-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">{label}</p>
+        <span
+          className={`inline-flex min-h-[24px] items-center rounded-full border px-2 py-1 text-[10px] uppercase tracking-[0.2em] ${statusTone}`}
+        >
+          {statusLabel}
+        </span>
+      </div>
+      <dl className="mt-2 space-y-2 text-[11px] text-slate-400">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <dt className="text-slate-500">Source</dt>
+          <dd>
+            <a
+              href={sourceUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="touch-target inline-flex min-h-[44px] items-center text-slate-200 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+            >
+              {sourceLabel}
+            </a>
+          </dd>
+        </div>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <dt className="text-slate-500">Record date</dt>
+          <dd className="mono text-slate-200">
+            <time dateTime={recordDate}>{formatDate(recordDate)}</time>
+          </dd>
+        </div>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <dt className="text-slate-500">Fetched</dt>
+          <dd className="mono text-slate-200">
+            <time dateTime={fetchedAt}>{formatTimestamp(fetchedAt)}</time>
+          </dd>
+        </div>
+      </dl>
+    </div>
+  );
+};
 
 const getRegimeLabel = (regime: RegimeAssessment["regime"]) => {
   switch (regime) {
@@ -1244,6 +1306,87 @@ export const ExecutiveSnapshotPanel = ({
   );
 };
 
+export const RegimeSummaryPanel = ({
+  assessment,
+  provenance,
+}: {
+  assessment: RegimeAssessment;
+  provenance: DataProvenance;
+}) => {
+  const regimeLabel = getRegimeLabel(assessment.regime);
+  const regimeBadge = getRegimeBadge(assessment.regime);
+  const tightnessStatus =
+    assessment.scores.tightness > assessment.thresholds.tightnessRegime ? "tight" : "loose";
+  const riskStatus =
+    assessment.scores.riskAppetite > assessment.thresholds.riskAppetiteRegime
+      ? "open"
+      : "cautious";
+  const narrative = `Capital is ${tightnessStatus} and risk appetite is ${riskStatus}. ${assessment.description}`;
+
+  return (
+    <section id="regime-summary" aria-labelledby="regime-summary-title" className="mt-10">
+      <div className="weather-panel p-6">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="type-label text-slate-400">Regime summary</p>
+            <h3 id="regime-summary-title" className="type-section text-slate-100">
+              Plain-English market translation
+            </h3>
+            <p className="mt-2 type-data text-slate-300">
+              A direct interpretation of Treasury signals into the posture you should operate under
+              this week.
+            </p>
+          </div>
+          <div className="flex flex-col items-end gap-2">
+            <span
+              className={`inline-flex min-h-[44px] items-center rounded-full border px-3 py-1 text-[10px] uppercase tracking-[0.2em] ${
+                regimeBadge?.classes ?? "border-slate-600/60 bg-slate-500/10 text-slate-100"
+              }`}
+            >
+              {regimeBadge?.label ?? assessment.regime}
+            </span>
+            <DataProvenanceStrip provenance={provenance} label="Treasury source" />
+          </div>
+        </div>
+        <div className="mt-5 grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">
+          <div className="weather-surface p-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">What this means</p>
+            <p className="mt-3 text-sm text-slate-200">{narrative}</p>
+            <div className="mt-4 space-y-2 text-xs text-slate-400">
+              <p>
+                Tightness score:{" "}
+                <span className="mono text-slate-200">{assessment.scores.tightness}/100</span>{" "}
+                (threshold {assessment.thresholds.tightnessRegime}).
+              </p>
+              <p>
+                Risk appetite score:{" "}
+                <span className="mono text-slate-200">{assessment.scores.riskAppetite}/100</span>{" "}
+                (threshold {assessment.thresholds.riskAppetiteRegime}).
+              </p>
+            </div>
+          </div>
+          <div className="weather-surface p-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+              Operational consequences
+            </p>
+            <p className="mt-3 text-sm text-slate-200">
+              Use these guardrails to align product, engineering, and GTM planning.
+            </p>
+            <ul className="mt-4 space-y-3 text-sm text-slate-300">
+              {assessment.constraints.map((constraint) => (
+                <li key={constraint} className="flex gap-2">
+                  <span className="text-slate-500">•</span>
+                  <span className="break-words">{constraint}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 type RegimeAlert = {
   changed: boolean;
   currentRegime: RegimeAssessment["regime"];
@@ -1412,17 +1555,6 @@ export const SensorArray = ({
                 </figcaption>
               </figure>
               <div className="mt-4 text-xs text-slate-500">
-                <p className="break-words">
-                  Source:{" "}
-                  <a
-                    href={sensor.sourceUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="touch-target text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
-                  >
-                    {sensor.sourceLabel}
-                  </a>
-                </p>
                 <p>
                   Formula:{" "}
                   <a
@@ -1432,14 +1564,15 @@ export const SensorArray = ({
                     Method notes
                   </a>
                 </p>
-                <p>
-                  Record date:{" "}
-                  <time dateTime={sensor.record_date}>{formatDate(sensor.record_date)}</time>
-                </p>
-                <p>
-                  Fetched:{" "}
-                  <time dateTime={sensor.fetched_at}>{formatTimestamp(sensor.fetched_at)}</time>
-                </p>
+                <div className="mt-3">
+                  <SeriesFreshnessBadge
+                    sourceLabel={sensor.sourceLabel}
+                    sourceUrl={sensor.sourceUrl}
+                    recordDate={sensor.record_date}
+                    fetchedAt={sensor.fetched_at}
+                    isLive={sensor.isLive}
+                  />
+                </div>
               </div>
             </div>
           );
@@ -1526,17 +1659,6 @@ export const MacroSignalsPanel = ({
                   </figcaption>
                 </figure>
                 <div className="mt-3 text-xs text-slate-500">
-                  <p className="break-words">
-                    Source:{" "}
-                    <a
-                      href={signal.sourceUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="touch-target text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
-                    >
-                      {signal.sourceLabel}
-                    </a>
-                  </p>
                   <p>
                     Formula:{" "}
                     <a
@@ -1546,14 +1668,15 @@ export const MacroSignalsPanel = ({
                       Method notes
                     </a>
                   </p>
-                  <p>
-                    Record date:{" "}
-                    <time dateTime={signal.record_date}>{formatDate(signal.record_date)}</time>
-                  </p>
-                  <p>
-                    Fetched:{" "}
-                    <time dateTime={signal.fetched_at}>{formatTimestamp(signal.fetched_at)}</time>
-                  </p>
+                  <div className="mt-3">
+                    <SeriesFreshnessBadge
+                      sourceLabel={signal.sourceLabel}
+                      sourceUrl={signal.sourceUrl}
+                      recordDate={signal.record_date}
+                      fetchedAt={signal.fetched_at}
+                      isLive={signal.isLive}
+                    />
+                  </div>
                 </div>
               </div>
             );

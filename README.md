@@ -33,6 +33,9 @@ Four market climates:
 - **Safety Mode (Volatile)**: Low Cost + Low Bravery → *Trust/security.*
 - **Growth Mode (Expansion)**: Low Cost + High Bravery → *Land grab.*
 
+The dashboard now includes a **Regime summary** panel that translates the regime into plain-English
+operating guidance with the corresponding constraint list and Treasury provenance attached.
+
 ### 2) Live Sensor Array (dashboard)
 Data comes from the **US Treasury Fiscal Data API**:
 - Endpoint: `/v2/accounting/od/daily_treasury_yield_curve`
@@ -111,7 +114,7 @@ of how organization and product artifacts map to capital climates.
 - Use a clean sans for labels and a monospace face for numeric readouts.
 - Lead with a single, high‑signal summary before secondary panels.
 - Prefer dense, grid‑aligned layouts with consistent spacing.
-- Show **Data Source** + **Last Updated** timestamp inline with each dataset.
+- Show **Data Source** + **Last Updated** timestamp inline with each dataset using compact freshness badges.
 - Surface scoring inputs alongside the executive snapshot to keep constraints traceable.
 - Keep motion minimal and purposeful (status changes, hover affordances).
 

@@ -5,6 +5,7 @@ import {
   FirstTimeGuidePanel,
   BeginnerGlossaryPanel,
   ExecutiveSnapshotPanel,
+  RegimeSummaryPanel,
   RegimeAssessmentCard,
   RegimeChangeAlertPanel,
   SignalMatrixPanel,
@@ -90,6 +91,7 @@ export default async function HomePage({
   ];
   const sectionLinks = [
     { href: "#executive-snapshot", label: "Executive snapshot" },
+    { href: "#regime-summary", label: "Regime summary" },
     { href: "#regime-alerts", label: "Market climate alerts" },
     { href: "#regime-assessment", label: "Market climate assessment" },
     { href: "#signal-matrix", label: "Signal matrix" },
@@ -157,6 +159,8 @@ export default async function HomePage({
         assessment={assessment}
         provenance={treasuryProvenance}
       />
+
+      <RegimeSummaryPanel assessment={assessment} provenance={treasuryProvenance} />
 
       <RegimeChangeAlertPanel alert={regimeAlert} provenance={treasuryProvenance} />
 
