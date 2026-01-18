@@ -10,7 +10,7 @@ import { ThresholdsPanel } from "../components/thresholdsPanel";
 import { TimeMachinePanel } from "../components/timeMachinePanel";
 
 export const metadata: Metadata = {
-  title: "Whether Report — Signals & thresholds",
+  title: "Whether Report — Why we believe this",
   description:
     "Macro signals, sensor detail, thresholds, and historical context for Whether Market Climate Station.",
 };
@@ -23,24 +23,24 @@ export default async function SignalsPage({
   const pageLinks = [
     {
       href: "/",
-      label: "Overview",
-      description: "Executive snapshot, market climate posture, and the high-level read.",
+      label: "Quick start",
+      description: "What to do this week, plus the current climate in plain English.",
     },
     {
       href: "/signals",
-      label: "Signals & thresholds",
-      description: "Live sensor detail, macro inputs, and historical time machine coverage.",
+      label: "Why we believe this",
+      description: "See the data sources and how each signal is scored.",
     },
     {
       href: "/operations",
-      label: "Operations playbook",
-      description: "Action guidance, decision shields, and export-ready briefs.",
+      label: "What to do next",
+      description: "Concrete actions and decision safeguards for your team.",
     },
   ];
   const sectionLinks = [
-    { href: "#sensor-array", label: "Sensor array" },
-    { href: "#macro-signals", label: "Macro signals" },
-    { href: "#thresholds", label: "Thresholds" },
+    { href: "#sensor-array", label: "Live data feed" },
+    { href: "#macro-signals", label: "Macro sources" },
+    { href: "#thresholds", label: "How scores are set" },
     { href: "#time-machine", label: "Time machine" },
   ];
 
@@ -90,8 +90,8 @@ export default async function SignalsPage({
       trustStatusDetail={trustStatusDetail}
       trustStatusAction={trustStatusAction}
       trustStatusTone={trustStatusTone}
-      pageTitle="Signals & thresholds"
-      pageSummary="Deep-dive into the live signal layer, the macro data sources, and how thresholds are shaping the market climate classification."
+      pageTitle="Why we believe this"
+      pageSummary="Deep-dive into the live signal layer, the macro data sources, and how thresholds shape the market climate classification."
       pageLinks={pageLinks}
       sectionLinks={sectionLinks}
       historicalBanner={

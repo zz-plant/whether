@@ -76,29 +76,29 @@ export default async function HomePage({
   const pageLinks = [
     {
       href: "/",
-      label: "Overview",
-      description: "Executive snapshot, market climate posture, and the high-level read.",
+      label: "Quick start",
+      description: "What to do this week, plus the current climate in plain English.",
     },
     {
       href: "/signals",
-      label: "Signals & thresholds",
-      description: "Live sensor detail, macro inputs, and historical time machine coverage.",
+      label: "Why we believe this",
+      description: "See the data sources and how each signal is scored.",
     },
     {
       href: "/operations",
-      label: "Operations playbook",
-      description: "Action guidance, decision shields, and export-ready briefs.",
+      label: "What to do next",
+      description: "Concrete actions and decision safeguards for your team.",
     },
   ];
   const sectionLinks = [
-    { href: "#weekly-action-summary", label: "Weekly action" },
-    { href: "#executive-snapshot", label: "Executive snapshot" },
-    { href: "#regime-summary", label: "Regime summary" },
-    { href: "#regime-alerts", label: "Market climate alerts" },
-    { href: "#regime-assessment", label: "Market climate assessment" },
-    { href: "#signal-matrix", label: "Signal matrix" },
-    { href: "#first-time-guide", label: "First-time guide" },
-    { href: "#beginner-glossary", label: "Glossary" },
+    { href: "#weekly-action-summary", label: "This week's actions" },
+    { href: "#first-time-guide", label: "New here? Start here" },
+    { href: "#beginner-glossary", label: "Plain-English glossary" },
+    { href: "#executive-snapshot", label: "Leadership summary" },
+    { href: "#regime-summary", label: "Market climate summary" },
+    { href: "#regime-alerts", label: "New alerts" },
+    { href: "#regime-assessment", label: "What the scores mean" },
+    { href: "#signal-matrix", label: "Signal breakdown" },
   ];
   const structuredData = {
     "@context": "https://schema.org",
@@ -152,8 +152,8 @@ export default async function HomePage({
       trustStatusDetail={trustStatusDetail}
       trustStatusAction={trustStatusAction}
       trustStatusTone={trustStatusTone}
-      pageTitle="Overview"
-      pageSummary="Start here for a fast read on the market climate and the executive implications. The rest of the report branches into deeper signal analysis and operational execution guidance."
+      pageTitle="Quick start"
+      pageSummary="Start here for a fast, plain-English read of what to do this week, why, and where to dig deeper."
       pageLinks={pageLinks}
       sectionLinks={sectionLinks}
       structuredData={JSON.stringify(structuredData)}
@@ -162,6 +162,14 @@ export default async function HomePage({
       }
     >
       <WeeklyActionSummaryPanel assessment={assessment} />
+
+      <FirstTimeGuidePanel
+        statusLabel={statusLabel}
+        recordDateLabel={recordDateLabel}
+        fetchedAtLabel={fetchedAtLabel}
+      />
+
+      <BeginnerGlossaryPanel />
 
       <ExecutiveSnapshotPanel
         treasury={treasury}
@@ -180,14 +188,6 @@ export default async function HomePage({
       <section className="mt-10">
         <SignalMatrixPanel assessment={assessment} provenance={treasuryProvenance} />
       </section>
-
-      <FirstTimeGuidePanel
-        statusLabel={statusLabel}
-        recordDateLabel={recordDateLabel}
-        fetchedAtLabel={fetchedAtLabel}
-      />
-
-      <BeginnerGlossaryPanel />
     </ReportShell>
   );
 }
