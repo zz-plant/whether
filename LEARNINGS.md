@@ -15,6 +15,7 @@ It is inspired by high-level themes from:
 ## UI/UX themes (modern Regime Station)
 
 - **Data-first hierarchy**: lead with one high-signal summary, then layer supporting panels in a predictable grid.
+- **Plain-English regime translation**: provide a dedicated summary panel that turns macro jargon into immediate operating consequences.
 - **Design system first**: define tokens (color, typography, spacing, radius, elevation) and reuse them across components.
 - **Dense, scannable layouts**: favor compact tables, aligned charts, and clear label/value pairings.
 - **Accessible by default**:
