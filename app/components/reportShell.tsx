@@ -124,7 +124,7 @@ export const ReportShell = ({
     <main
       id="main-content"
       tabIndex={-1}
-      className="weather-shell relative min-h-screen overflow-hidden text-slate-100"
+      className="weather-shell display-drift relative min-h-screen overflow-hidden text-slate-100"
     >
       {structuredData ? (
         <script
