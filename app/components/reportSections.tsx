@@ -138,6 +138,9 @@ const regimeBadges = [
   },
 ] as const;
 
+const getRegimeBadge = (regime: RegimeAssessment["regime"]) =>
+  regimeBadges.find((badge) => badge.key === regime);
+
 const getRegimeAccent = (regime: RegimeAssessment["regime"]) => {
   switch (regime) {
     case "SCARCITY":
@@ -921,6 +924,8 @@ export const ExecutiveSnapshotPanel = ({
   provenance: DataProvenance;
 }) => {
   const curveSlope = assessment.scores.curveSlope;
+  const regimeLabel = getRegimeLabel(assessment.regime);
+  const regimeBadge = getRegimeBadge(assessment.regime);
   const curveLabel = curveSlope === null ? "—" : curveSlope < 0 ? "Inverted" : "Normal";
   const curveSlopePercent =
     curveSlope === null ? 50 : mapToPercent(curveSlope, -2, 2);
@@ -971,7 +976,25 @@ export const ExecutiveSnapshotPanel = ({
           </div>
           <DataProvenanceStrip provenance={provenance} />
         </div>
-        <div className="mt-5 grid gap-4 md:grid-cols-3">
+        <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div className="weather-surface p-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Market climate</p>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <span
+                className={`inline-flex min-h-[32px] items-center rounded-full border px-3 py-1 text-[10px] uppercase tracking-[0.2em] ${
+                  regimeBadge?.classes ?? "border-slate-600/60 bg-slate-500/10 text-slate-100"
+                }`}
+              >
+                {regimeBadge?.label ?? assessment.regime}
+              </span>
+              <span className="text-sm text-slate-200">{regimeLabel}</span>
+            </div>
+            <p className="mt-2 text-xs text-slate-500">{assessment.description}</p>
+            <p className="mt-2 text-xs text-slate-400">
+              Constraints tracked:{" "}
+              <span className="mono text-slate-100">{assessment.constraints.length}</span>
+            </p>
+          </div>
           <div className="weather-surface p-4">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Data freshness</p>
             <p className="mono mt-2 text-sm text-slate-100">
