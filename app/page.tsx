@@ -5,6 +5,7 @@ import {
   FirstTimeGuidePanel,
   BeginnerGlossaryPanel,
   ExecutiveSnapshotPanel,
+  WeeklyActionSummaryPanel,
   RegimeSummaryPanel,
   RegimeAssessmentCard,
   RegimeChangeAlertPanel,
@@ -90,6 +91,7 @@ export default async function HomePage({
     },
   ];
   const sectionLinks = [
+    { href: "#weekly-action-summary", label: "Weekly action" },
     { href: "#executive-snapshot", label: "Executive snapshot" },
     { href: "#regime-summary", label: "Regime summary" },
     { href: "#regime-alerts", label: "Market climate alerts" },
@@ -159,6 +161,7 @@ export default async function HomePage({
         historicalSelection ? <HistoricalBanner banner={historicalSelection.banner} /> : null
       }
     >
+      <WeeklyActionSummaryPanel assessment={assessment} />
 
       <ExecutiveSnapshotPanel
         treasury={treasury}
