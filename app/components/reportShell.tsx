@@ -135,9 +135,7 @@ export const ReportShell = ({
       <DisplayGuardian />
       <div className="pointer-events-none absolute inset-0 weather-haze" />
       <div className="pointer-events-none absolute left-1/2 top-0 h-[520px] w-[720px] -translate-x-1/2 rounded-full bg-sky-400/15 blur-[190px]" />
-      <div className="pointer-events-none absolute right-[-120px] top-[20%] h-[520px] w-[520px] rounded-full bg-cyan-500/15 blur-[190px]" />
-      <div className="pointer-events-none absolute left-[-120px] top-[40%] h-[420px] w-[420px] rounded-full bg-indigo-500/15 blur-[180px]" />
-      <div className="mx-auto max-w-6xl px-6 py-12 display-drift">
+      <div className="mx-auto max-w-6xl px-6 py-12">
         <header className="relative flex flex-col gap-6 border-b border-slate-800/70 pb-8">
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div className="min-w-0 space-y-4">
@@ -148,10 +146,13 @@ export const ReportShell = ({
                   A plain-English brief that turns Treasury signals into week-by-week product and
                   engineering constraints. Every output is sourced and time-stamped for traceability.
                 </p>
-                <p className="max-w-2xl text-sm text-slate-400">
-                  Built for the moments when you need to explain why scope, hiring, or delivery
-                  plans should bend with the macro climate—not just internal preference.
+              </div>
+              <div className="max-w-2xl space-y-2 border-l border-slate-800/80 pl-4">
+                <p className="text-[10px] uppercase tracking-[0.3em] text-slate-500">You're reading</p>
+                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-100">
+                  {pageTitle}
                 </p>
+                <p className="text-sm text-slate-400">{pageSummary}</p>
               </div>
             </div>
           </div>
@@ -193,12 +194,6 @@ export const ReportShell = ({
                       matters.
                     </span>
                   </li>
-                  <li className="flex gap-2">
-                    <span className="text-slate-500">3</span>
-                    <span className="break-words">
-                      Use the signals below to explain tradeoffs when stakeholders disagree.
-                    </span>
-                  </li>
                 </ul>
               </div>
               <div className="flex flex-wrap gap-3">
@@ -225,116 +220,36 @@ export const ReportShell = ({
                 <p className="text-xs text-slate-200/90">{trustStatusDetail}</p>
                 <p className="text-[11px] text-slate-200/90">{trustStatusAction}</p>
               </div>
-              <div className="weather-surface p-4 text-sm text-slate-200">
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-300">
-                  When this is most useful
-                </p>
-                <ul className="mt-3 space-y-2 text-sm text-slate-200">
-                  <li className="flex gap-2">
-                    <span className="text-slate-400">•</span>
-                    <span className="break-words">
-                      You need to justify a slower cadence without sounding risk-averse.
-                    </span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-slate-400">•</span>
-                    <span className="break-words">
-                      You need to frame why product bets must be staged or time-boxed.
-                    </span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-slate-400">•</span>
-                    <span className="break-words">
-                      You want shared language for “why now” across leadership.
-                    </span>
-                  </li>
-                </ul>
-              </div>
             </div>
           </div>
           <div className="weather-panel px-5 py-4">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">You're reading</p>
-            <div className="mt-3 space-y-2">
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-100">
-                {pageTitle}
-              </p>
-              <p className="text-sm text-slate-300">{pageSummary}</p>
-            </div>
-          </div>
-          <div className="grid gap-4 lg:grid-cols-[1.2fr,0.8fr]">
-            <div className="weather-panel px-5 py-4">
-              <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">
-                Decision flow
-              </p>
-              <p className="mt-3 text-sm font-semibold uppercase tracking-[0.2em] text-slate-100">
-                Reduce the cognitive load
-              </p>
-              <ul className="mt-3 space-y-2 text-sm text-slate-300">
-                <li className="flex gap-2">
-                  <span className="text-slate-500">1</span>
-                  <span className="break-words">
-                    Anchor on customer value and ROI so you keep strategic intent clear.
-                  </span>
-                </li>
-                <li className="flex gap-2">
-                  <span className="text-slate-500">2</span>
-                  <span className="break-words">
-                    Let the macro guardrails set pace, scope, and hiring tradeoffs.
-                  </span>
-                </li>
-                <li className="flex gap-2">
-                  <span className="text-slate-500">3</span>
-                  <span className="break-words">
-                    Use the signal matrix to document why you chose this week’s plan.
-                  </span>
-                </li>
-              </ul>
-              <div className="mt-4 flex flex-wrap gap-3">
-                <a
-                  href="#regime-assessment"
-                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
-                >
-                  Understand the scores
-                </a>
-                <a
-                  href="/operations"
-                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
-                >
-                  Move to actions
-                </a>
+            <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">Data timestamps</p>
+            <p className="mt-3 text-sm font-semibold uppercase tracking-[0.2em] text-slate-100">
+              Proof the data is current
+            </p>
+            <dl className="mt-4 space-y-3 text-sm text-slate-300">
+              <div className="flex items-center justify-between gap-3">
+                <dt className="text-slate-400">Record date</dt>
+                <dd className="mono text-slate-100">{recordDateLabel}</dd>
               </div>
-            </div>
-            <div className="weather-panel px-5 py-4">
-              <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">
-                Data timestamps
-              </p>
-              <p className="mt-3 text-sm font-semibold uppercase tracking-[0.2em] text-slate-100">
-                Proof the data is current
-              </p>
-              <dl className="mt-4 space-y-3 text-sm text-slate-300">
-                <div className="flex items-center justify-between gap-3">
-                  <dt className="text-slate-400">Record date</dt>
-                  <dd className="mono text-slate-100">{recordDateLabel}</dd>
-                </div>
-                <div className="flex items-center justify-between gap-3">
-                  <dt className="text-slate-400">Fetched at</dt>
-                  <dd className="mono text-slate-100">{fetchedAtLabel}</dd>
-                </div>
-                <div className="flex items-center justify-between gap-3">
-                  <dt className="text-slate-400">Source</dt>
-                  <dd>
-                    <a
-                      href={treasurySource}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="touch-target inline-flex min-h-[44px] items-center text-xs text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100 touch-manipulation"
-                    >
-                      US Treasury Fiscal Data API
-                    </a>
-                  </dd>
-                </div>
-              </dl>
-            </div>
+              <div className="flex items-center justify-between gap-3">
+                <dt className="text-slate-400">Fetched at</dt>
+                <dd className="mono text-slate-100">{fetchedAtLabel}</dd>
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <dt className="text-slate-400">Source</dt>
+                <dd>
+                  <a
+                    href={treasurySource}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="touch-target inline-flex min-h-[44px] items-center text-xs text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100 touch-manipulation"
+                  >
+                    US Treasury Fiscal Data API
+                  </a>
+                </dd>
+              </div>
+            </dl>
           </div>
           <nav aria-label="Report pages" className="space-y-3">
             <p className="text-[10px] uppercase tracking-[0.3em] text-slate-500">Report paths</p>

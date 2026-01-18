@@ -22,9 +22,8 @@ body {
 .weather-shell {
   background-color: #020617;
   background-image:
-    radial-gradient(900px 480px at 10% -10%, rgba(125, 211, 252, 0.2), transparent 60%),
-    radial-gradient(1000px 600px at 90% 0%, rgba(56, 189, 248, 0.16), transparent 65%),
-    radial-gradient(800px 520px at 50% 20%, rgba(30, 64, 175, 0.2), transparent 70%),
+    radial-gradient(900px 480px at 10% -10%, rgba(125, 211, 252, 0.12), transparent 60%),
+    radial-gradient(900px 520px at 90% 0%, rgba(56, 189, 248, 0.08), transparent 65%),
     linear-gradient(180deg, rgba(2, 6, 23, 1) 0%, rgba(10, 16, 31, 0.98) 45%, rgba(2, 6, 23, 1) 100%);
 }
 
