@@ -12,7 +12,9 @@ import type {
 } from "../../lib/types";
 import { cxoFunctionOutputs } from "../../lib/cxoFunctionOutputs";
 import { operatorRequests } from "../../lib/operatorRequests";
+import { buildWeeklySummary, getWeeklyActionGuidance } from "../../lib/weeklySummary";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
+import { WeeklySummaryCard } from "./weeklySummaryCard";
 import { insightDatabase } from "../../data/recommendations";
 
 const numberFormatter = new Intl.NumberFormat("en-US", {
@@ -238,24 +240,26 @@ const getRegimeAccent = (regime: RegimeAssessment["regime"]) => {
   }
 };
 
-const weeklyActionGuidance: Record<RegimeAssessment["regime"], string> = {
-  SCARCITY: "freeze discretionary scope, protect runway, and require proof before new bets",
-  DEFENSIVE: "prioritize retention, tighten costs, and ship only revenue or reliability work",
-  VOLATILE: "balance experiments with safeguards, and keep spend approvals reversible",
-  EXPANSION: "scale the highest-ROI bets, hire deliberately, and keep payback discipline",
-};
-
 export const WeeklyActionSummaryPanel = ({
   assessment,
+  provenance,
+  recordDateLabel,
 }: {
   assessment: RegimeAssessment;
+  provenance: DataProvenance;
+  recordDateLabel: string;
 }) => {
   const regimeLabel = getRegimeLabel(assessment.regime);
-  const actionGuidance = weeklyActionGuidance[assessment.regime];
+  const actionGuidance = getWeeklyActionGuidance(assessment.regime);
   const regimeBadge = getRegimeBadge(assessment.regime);
   const regimeDescription =
     regimeBadge?.description ??
     "Use the current signals to set weekly guardrails before debating strategy.";
+  const weeklySummary = buildWeeklySummary({
+    assessment,
+    provenance,
+    recordDateLabel,
+  });
 
   return (
     <section
@@ -278,6 +282,7 @@ export const WeeklyActionSummaryPanel = ({
           </a>{" "}
           for the source signals and decision guardrails.
         </p>
+        <WeeklySummaryCard summary={weeklySummary} />
         <div className="grid gap-3 md:grid-cols-2">
           <div className="weather-surface p-4">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-400">

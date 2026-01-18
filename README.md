@@ -101,6 +101,7 @@ of how organization and product artifacts map to capital climates.
 - **Fail gracefully** if the API is down or blocked.
 - **Market climate thresholds**: adjustable via URL parameters with audit trail visibility.
 - **Export briefs**: copy-ready Slack/email text and print-to-PDF support.
+- **Weekly summary API**: `/api/weekly` returns copy-ready weekly action text plus provenance metadata.
 
 ## Repo layout (current scaffolding)
 - `lib/regimeEngine.ts`: deterministic scoring + market climate classification core.

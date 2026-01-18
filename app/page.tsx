@@ -161,7 +161,11 @@ export default async function HomePage({
         historicalSelection ? <HistoricalBanner banner={historicalSelection.banner} /> : null
       }
     >
-      <WeeklyActionSummaryPanel assessment={assessment} />
+      <WeeklyActionSummaryPanel
+        assessment={assessment}
+        provenance={treasuryProvenance}
+        recordDateLabel={recordDateLabel}
+      />
 
       <FirstTimeGuidePanel
         statusLabel={statusLabel}
