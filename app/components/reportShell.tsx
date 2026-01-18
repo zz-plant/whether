@@ -180,25 +180,79 @@ export const ReportShell = ({
               <p className="text-sm text-slate-300">{pageSummary}</p>
             </div>
           </div>
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 lg:grid-cols-[1.2fr,0.8fr]">
             <div className="weather-panel px-5 py-4">
-              <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">Record date</p>
-              <p className="mono mt-3 text-sm text-slate-100">{recordDateLabel}</p>
+              <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">
+                Operator briefing
+              </p>
+              <p className="mt-3 text-sm font-semibold uppercase tracking-[0.2em] text-slate-100">
+                How to use this report
+              </p>
+              <ul className="mt-3 space-y-2 text-sm text-slate-300">
+                <li className="flex gap-2">
+                  <span className="text-slate-500">•</span>
+                  <span className="break-words">
+                    Confirm the market climate and top constraints before approving new bets.
+                  </span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-slate-500">•</span>
+                  <span className="break-words">
+                    Align leadership on risk posture using the executive snapshot and alerts.
+                  </span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-slate-500">•</span>
+                  <span className="break-words">
+                    Convert signals into action by pushing priorities through the Operations playbook.
+                  </span>
+                </li>
+              </ul>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <a
+                  href="#regime-assessment"
+                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                >
+                  Review constraints
+                </a>
+                <a
+                  href="/operations"
+                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                >
+                  Operations playbook
+                </a>
+              </div>
             </div>
             <div className="weather-panel px-5 py-4">
-              <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">Fetched at</p>
-              <p className="mono mt-3 text-sm text-slate-100">{fetchedAtLabel}</p>
-            </div>
-            <div className="weather-panel px-5 py-4">
-              <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">Source</p>
-              <a
-                href={treasurySource}
-                target="_blank"
-                rel="noreferrer"
-                className="touch-target mt-3 inline-flex min-h-[44px] items-center text-xs text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
-              >
-                US Treasury Fiscal Data API
-              </a>
+              <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">
+                Signal integrity
+              </p>
+              <p className="mt-3 text-sm font-semibold uppercase tracking-[0.2em] text-slate-100">
+                Data custody checks
+              </p>
+              <dl className="mt-4 space-y-3 text-sm text-slate-300">
+                <div className="flex items-center justify-between gap-3">
+                  <dt className="text-slate-400">Record date</dt>
+                  <dd className="mono text-slate-100">{recordDateLabel}</dd>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <dt className="text-slate-400">Fetched at</dt>
+                  <dd className="mono text-slate-100">{fetchedAtLabel}</dd>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <dt className="text-slate-400">Source</dt>
+                  <dd>
+                    <a
+                      href={treasurySource}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="touch-target inline-flex min-h-[44px] items-center text-xs text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+                    >
+                      US Treasury Fiscal Data API
+                    </a>
+                  </dd>
+                </div>
+              </dl>
             </div>
           </div>
           <nav aria-label="Report pages" className="space-y-3">

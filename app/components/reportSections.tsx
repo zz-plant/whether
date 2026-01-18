@@ -930,6 +930,18 @@ export const ExecutiveSnapshotPanel = ({
   const curveMarkerId = "curve-marker";
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
   const fallbackReason = treasury.fallback_reason ?? "Fallback triggered.";
+  const constraintHighlights = assessment.constraints.slice(0, 3);
+  const hasDataWarnings = assessment.dataWarnings.length > 0;
+  const confidenceLabel = isFallback || hasDataWarnings ? "Guarded" : "High";
+  const confidenceTone =
+    isFallback || hasDataWarnings
+      ? "border-amber-400/40 bg-amber-500/10 text-amber-100"
+      : "border-emerald-400/40 bg-emerald-500/10 text-emerald-100";
+  const confidenceDetail = isFallback
+    ? "Live feed degraded; operating off cached Treasury data."
+    : hasDataWarnings
+      ? "Some Treasury inputs are missing; interpret signal strength with caution."
+      : "Full Treasury data coverage verified for this report.";
 
   return (
     <section id="executive-snapshot" aria-labelledby="executive-snapshot-title" className="mt-8">
@@ -1068,6 +1080,51 @@ export const ExecutiveSnapshotPanel = ({
               </div>
             </div>
             <p className="mt-2 text-xs text-slate-500">Slope is {curveLabel}</p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-4 lg:grid-cols-[1.15fr,0.85fr]">
+          <div className="weather-surface p-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+              Executive constraints
+            </p>
+            <p className="mt-3 text-sm text-slate-200">
+              Translate macro signals into immediate operating guardrails for the next planning
+              cycle.
+            </p>
+            <ul className="mt-4 space-y-3 text-sm text-slate-300">
+              {constraintHighlights.map((constraint) => (
+                <li key={constraint} className="flex gap-2">
+                  <span className="text-slate-500">•</span>
+                  <span className="break-words">{constraint}</span>
+                </li>
+              ))}
+            </ul>
+            <a
+              href="#regime-assessment"
+              className="mt-4 inline-flex min-h-[44px] items-center text-xs uppercase tracking-[0.2em] text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100 touch-manipulation"
+            >
+              Review full constraint set
+            </a>
+          </div>
+          <div className="weather-surface p-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Signal confidence</p>
+            <div
+              className={`mt-3 inline-flex min-h-[44px] items-center gap-2 rounded-full border px-3 py-1 text-[10px] uppercase tracking-[0.2em] ${confidenceTone}`}
+            >
+              <span className="h-2 w-2 rounded-full bg-current" aria-hidden="true" />
+              {confidenceLabel} confidence
+            </div>
+            <p className="mt-3 text-sm text-slate-300">{confidenceDetail}</p>
+            {hasDataWarnings ? (
+              <ul className="mt-4 space-y-2 text-xs text-amber-100">
+                {assessment.dataWarnings.map((warning) => (
+                  <li key={warning} className="flex gap-2">
+                    <span className="text-amber-200/70">•</span>
+                    <span className="break-words">{warning}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
           </div>
         </div>
       </div>
