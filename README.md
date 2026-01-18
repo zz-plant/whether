@@ -60,6 +60,18 @@ Output includes a **status flag + concrete advice** (e.g., payback window), plus
 verdict text for sharing in planning reviews. Operators can also save common scenarios as presets
 to speed up recurring decisions.
 
+### 3b) Decision Memory (audit trail)
+Log decision context with the regime, constraints in force, and data confidence level. Each entry
+can be attached to URLs and copied into exported snapshots to prevent hindsight rewriting.
+
+### 3c) Assumption Locking (explicit posture)
+Teams can lock their risk posture, threshold tolerance, and interpretation stance. A banner makes
+the locked assumptions visible in reviews so disagreements stay explicit.
+
+### 3d) Counterfactual View (scenario literacy)
+Slide key drivers (base rate and curve slope) to preview how the regime and constraints would
+change under alternative narratives.
+
 ### 4) Time Machine (historical analysis)
 Query any month since 2000 via the Treasury API to show the market climate on the latest available
 record on or before that date, clearly labeled as historical.
@@ -68,8 +80,9 @@ third‑party lookups in replay mode. Refresh the cache by re-running the Treasu
 logic in a connected environment and committing the updated file.
 
 ### 4b) Market climate change alerts (signal shifts)
-Surface market climate transitions with a reason-code summary so leaders can spot when posture needs to
-change, and replay the prior month using the Time Machine for context.
+Surface notifications only when the regime changes or tightness/bravery cross a threshold, with a
+reason-code summary so leaders can spot when posture needs to change and replay the prior month using
+the Time Machine for context.
 
 ### 5) Report lanes (multi-page workflow)
 The report now ships as three focused lanes so leaders can consume the right depth without

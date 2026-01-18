@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { loadReportData } from "../../lib/reportData";
 import { ReportShell } from "../components/reportShell";
+import { AssumptionLockPanel } from "../components/assumptionLockPanel";
+import { CounterfactualPanel } from "../components/counterfactualPanel";
+import { DecisionMemoryPanel } from "../components/decisionMemoryPanel";
 import { DecisionShieldPanel } from "../components/decisionShieldPanel";
 import { ExportBriefPanel } from "../components/exportBriefPanel";
 import {
@@ -41,8 +44,11 @@ export default async function OperationsPage({
   ];
   const sectionLinks = [
     { href: "#playbook", label: "Playbook" },
+    { href: "#assumption-locking", label: "Assumption locking" },
     { href: "#insight-database", label: "Insight database" },
+    { href: "#decision-memory", label: "Decision memory" },
     { href: "#decision-shield", label: "Decision shield" },
+    { href: "#counterfactuals", label: "Counterfactual view" },
     { href: "#export-briefs", label: "Export briefs" },
     { href: "#cxo-functions", label: "CXO outputs" },
     { href: "#operator-requests", label: "Operator requests" },
@@ -102,9 +108,19 @@ export default async function OperationsPage({
         provenance={treasuryProvenance}
       />
 
+      <AssumptionLockPanel />
+
       <InsightDatabasePanel regime={assessment.regime} provenance={treasuryProvenance} />
 
+      <DecisionMemoryPanel
+        assessment={assessment}
+        provenance={treasuryProvenance}
+        recordDateLabel={recordDateLabel}
+      />
+
       <DecisionShieldPanel assessment={assessment} provenance={treasuryProvenance} />
+
+      <CounterfactualPanel assessment={assessment} provenance={treasuryProvenance} />
 
       <ExportBriefPanel
         assessment={assessment}

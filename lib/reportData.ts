@@ -66,7 +66,13 @@ const buildRegimeAlert = (
   const isTight = current.scores.tightness > tightnessThreshold;
   const wasBrave = previous.scores.riskAppetite > riskThreshold;
   const isBrave = current.scores.riskAppetite > riskThreshold;
+  const regimeChanged = current.regime !== previous.regime;
+  const thresholdCrossed = wasTight !== isTight || wasBrave !== isBrave;
   const reasons: string[] = [];
+
+  if (!regimeChanged && !thresholdCrossed) {
+    return null;
+  }
 
   if (wasTight !== isTight) {
     reasons.push(
@@ -86,7 +92,7 @@ const buildRegimeAlert = (
   }
 
   return {
-    changed: current.regime !== previous.regime,
+    changed: regimeChanged,
     currentRegime: current.regime,
     previousRegime: previous.regime,
     currentRecordDate,
