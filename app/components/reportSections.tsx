@@ -963,6 +963,9 @@ export const ExecutiveSnapshotPanel = ({
     : hasDataWarnings
       ? "Some Treasury inputs are missing; interpret signal strength with caution."
       : "Full Treasury data coverage verified for this report.";
+  const scoringInputs = assessment.inputs;
+  const scoringSource = scoringInputs[0]?.sourceLabel ?? "US Treasury";
+  const scoringSourceUrl = scoringInputs[0]?.sourceUrl ?? treasury.source;
 
   return (
     <section id="executive-snapshot" aria-labelledby="executive-snapshot-title" className="mt-8">
@@ -971,12 +974,12 @@ export const ExecutiveSnapshotPanel = ({
           <div>
             <p className="type-label text-slate-400">Executive snapshot</p>
             <h3 id="executive-snapshot-title" className="type-section text-slate-100">
-              Operational pulse
+              Operating constraints
             </h3>
           </div>
           <DataProvenanceStrip provenance={provenance} />
         </div>
-        <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
           <div className="weather-surface p-4">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Market climate</p>
             <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -1120,6 +1123,38 @@ export const ExecutiveSnapshotPanel = ({
             </div>
             <p className="mt-2 text-xs text-slate-500">Slope is {curveLabel}</p>
           </div>
+          <div className="weather-surface p-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Scoring inputs</p>
+            <ul className="mt-3 space-y-2 text-xs text-slate-300">
+              {scoringInputs.map((input) => (
+                <li key={input.id} className="flex items-start justify-between gap-3">
+                  <span className="text-slate-400">{input.label}</span>
+                  <span className="mono text-slate-100">
+                    {input.value === null ? "—" : formatNumber(input.value, input.unit)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-3 text-[11px] text-slate-500">
+              Source:{" "}
+              <a
+                href={scoringSourceUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="touch-target inline-flex min-h-[44px] items-center text-[11px] text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+              >
+                {scoringSource}
+              </a>{" "}
+              · Record{" "}
+              <time dateTime={treasury.record_date} className="mono text-slate-100">
+                {treasury.record_date}
+              </time>{" "}
+              · Fetched{" "}
+              <time dateTime={treasury.fetched_at} className="mono text-slate-100">
+                {formatTimestamp(treasury.fetched_at)}
+              </time>
+            </p>
+          </div>
         </div>
         <div className="mt-5 grid gap-4 lg:grid-cols-[1.15fr,0.85fr]">
           <div className="weather-surface p-4">
@@ -1127,7 +1162,7 @@ export const ExecutiveSnapshotPanel = ({
               Executive constraints
             </p>
             <p className="mt-3 text-sm text-slate-200">
-              Translate macro signals into immediate operating guardrails for the next planning
+              Translate Treasury signals into immediate operating guardrails for the next planning
               cycle.
             </p>
             <ul className="mt-4 space-y-3 text-sm text-slate-300">

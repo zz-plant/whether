@@ -143,8 +143,8 @@ export const ReportShell = ({
               <div className="space-y-3">
                 <h1 className="type-headline text-slate-100">Whether Report</h1>
                 <p className="max-w-2xl type-data text-slate-300">
-                  A deep-realist operating brief that translates Treasury signals into constraints you can
-                  execute. Every output is sourced and time-stamped for traceability.
+                  A plain-English operating brief that turns Treasury signals into execution constraints.
+                  Every output is sourced and time-stamped for traceability.
                 </p>
               </div>
             </div>
@@ -192,7 +192,7 @@ export const ReportShell = ({
                 <li className="flex gap-2">
                   <span className="text-slate-500">•</span>
                   <span className="break-words">
-                    Confirm the market climate and top constraints before approving new bets.
+                    Confirm the market climate before approving new bets.
                   </span>
                 </li>
                 <li className="flex gap-2">
@@ -204,7 +204,7 @@ export const ReportShell = ({
                 <li className="flex gap-2">
                   <span className="text-slate-500">•</span>
                   <span className="break-words">
-                    Convert signals into action by pushing priorities through the Operations playbook.
+                    Turn signals into action via the Operations playbook.
                   </span>
                 </li>
               </ul>

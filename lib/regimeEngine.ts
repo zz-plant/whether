@@ -14,6 +14,19 @@ export interface RegimeScores {
   curveSlope: number | null;
 }
 
+export type RegimeInput = {
+  id: "base-rate" | "two-year" | "ten-year" | "curve-slope";
+  label: string;
+  value: number | null;
+  unit: string;
+  sourceLabel: string;
+  sourceUrl: string;
+  recordDate: string;
+  fetchedAt: string;
+  derivedFrom?: string;
+  notes?: string;
+};
+
 export interface RegimeAssessment {
   regime: RegimeKey;
   scores: RegimeScores;
@@ -23,6 +36,7 @@ export interface RegimeAssessment {
   riskAppetiteExplanation: string;
   dataWarnings: string[];
   thresholds: RegimeThresholds;
+  inputs: RegimeInput[];
 }
 
 export const BASE_RATE_TIGHTNESS_THRESHOLD = 5;
@@ -34,6 +48,7 @@ export const RISK_APPETITE_MAX_SLOPE = 1.5;
 export const TIGHTNESS_REGIME_THRESHOLD = 70;
 export const RISK_APPETITE_REGIME_THRESHOLD = 50;
 export const REGIME_REVERSAL_DAYS = 30;
+export const TREASURY_SOURCE_LABEL = "US Treasury Fiscal Data API";
 
 export interface RegimeThresholds {
   baseRateTightness: number;
@@ -113,6 +128,66 @@ export const computeCurveSlope = (yields: TreasuryYields): number | null => {
   return tenYear - twoYear;
 };
 
+const buildRegimeInputs = (
+  treasury: TreasuryData,
+  baseRate: ReturnType<typeof getBaseRate>,
+  curveSlope: number | null
+): RegimeInput[] => {
+  const baseRateLabel =
+    baseRate.used === "MISSING" ? "Policy base rate (missing)" : `Policy base rate (${baseRate.used})`;
+  const baseRateNotes =
+    baseRate.used === "MISSING"
+      ? "No 1M or 3M Treasury rate available; defaulted to 0% for scoring."
+      : "Used as the cost-of-money anchor for tightness scoring.";
+  const sourceUrl = treasury.source;
+
+  return [
+    {
+      id: "base-rate",
+      label: baseRateLabel,
+      value: baseRate.used === "MISSING" ? null : baseRate.value,
+      unit: "%",
+      sourceLabel: TREASURY_SOURCE_LABEL,
+      sourceUrl,
+      recordDate: treasury.record_date,
+      fetchedAt: treasury.fetched_at,
+      notes: baseRateNotes,
+    },
+    {
+      id: "two-year",
+      label: "US Treasury 2Y",
+      value: treasury.yields.twoYear ?? null,
+      unit: "%",
+      sourceLabel: TREASURY_SOURCE_LABEL,
+      sourceUrl,
+      recordDate: treasury.record_date,
+      fetchedAt: treasury.fetched_at,
+    },
+    {
+      id: "ten-year",
+      label: "US Treasury 10Y",
+      value: treasury.yields.tenYear ?? null,
+      unit: "%",
+      sourceLabel: TREASURY_SOURCE_LABEL,
+      sourceUrl,
+      recordDate: treasury.record_date,
+      fetchedAt: treasury.fetched_at,
+    },
+    {
+      id: "curve-slope",
+      label: "Yield curve slope (10Y - 2Y)",
+      value: curveSlope,
+      unit: "%",
+      sourceLabel: TREASURY_SOURCE_LABEL,
+      sourceUrl,
+      recordDate: treasury.record_date,
+      fetchedAt: treasury.fetched_at,
+      derivedFrom: "US Treasury 10Y and 2Y yields",
+      notes: "Derived metric used to score risk appetite.",
+    },
+  ];
+};
+
 export const resolveThresholds = (
   overrides?: Partial<RegimeThresholds>
 ): RegimeThresholds => {
@@ -173,6 +248,7 @@ export const evaluateRegime = (
   const curveSlope = computeCurveSlope(treasury.yields);
   const curveSlopeForScore = curveSlope ?? 0;
   const thresholds = resolveThresholds(overrides);
+  const inputs = buildRegimeInputs(treasury, baseRate, curveSlope);
 
   if (baseRate.used === "MISSING") {
     dataWarnings.push("Base rate missing; defaulted to 0% for scoring.");
@@ -205,5 +281,6 @@ export const evaluateRegime = (
     riskAppetiteExplanation: RISK_APPETITE_EXPLANATION,
     dataWarnings,
     thresholds,
+    inputs,
   };
 };

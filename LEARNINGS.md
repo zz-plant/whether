@@ -23,6 +23,7 @@ It is inspired by high-level themes from:
   - Respect `prefers-reduced-motion`.
 - **Calm, purposeful motion**: reserve animation for state changes and clarity (150–250ms).
 - **Trust cues everywhere**: show source links and freshness inline with every data view.
+- **Traceable scoring**: surface the inputs and timestamps behind every regime classification.
 
 ## Weather app inspiration (beloved references)
 
