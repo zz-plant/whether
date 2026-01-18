@@ -195,19 +195,20 @@ export const ReportShell = ({
                 <li className="flex gap-2">
                   <span className="text-slate-500">•</span>
                   <span className="break-words">
-                    Scan the quick start for the week’s recommended posture.
+                    Confirm if the advice is strategy-driven (user problem, ROI) or macro-driven
+                    (capital constraints).
                   </span>
                 </li>
                 <li className="flex gap-2">
                   <span className="text-slate-500">•</span>
                   <span className="break-words">
-                    Align leadership using the summary and any new alerts.
+                    Pressure-test any plan that assumes easy funding when the curve is inverted.
                   </span>
                 </li>
                 <li className="flex gap-2">
                   <span className="text-slate-500">•</span>
                   <span className="break-words">
-                    Translate the signals into actions in the playbook lane.
+                    Translate the macro guardrails into scope, hiring, and timeline tradeoffs.
                   </span>
                 </li>
               </ul>

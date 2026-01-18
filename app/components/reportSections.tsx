@@ -252,6 +252,10 @@ export const WeeklyActionSummaryPanel = ({
 }) => {
   const regimeLabel = getRegimeLabel(assessment.regime);
   const actionGuidance = weeklyActionGuidance[assessment.regime];
+  const regimeBadge = getRegimeBadge(assessment.regime);
+  const regimeDescription =
+    regimeBadge?.description ??
+    "Use the current signals to set weekly guardrails before debating strategy.";
 
   return (
     <section
@@ -259,21 +263,75 @@ export const WeeklyActionSummaryPanel = ({
       aria-labelledby="weekly-action-summary-title"
       className="mt-8"
     >
-      <div className="weather-panel flex flex-col gap-3 px-5 py-4">
+      <div className="weather-panel flex flex-col gap-4 px-5 py-4">
         <p className="type-label text-slate-400">What should I do this week?</p>
         <h2 id="weekly-action-summary-title" className="type-section text-slate-100">
           Weekly action summary
         </h2>
         <p className="text-sm text-slate-200">
-          This week, operate in {regimeLabel} mode: {actionGuidance}. Then skim the{" "}
+          This week, operate in {regimeLabel} mode: {actionGuidance}. {regimeDescription} Skim the{" "}
           <a
             href="#executive-snapshot"
             className="touch-target inline-flex min-h-[44px] items-center text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-slate-50 touch-manipulation"
           >
             leadership summary
           </a>{" "}
-          below for the why.
+          for the source signals and decision guardrails.
         </p>
+        <div className="grid gap-3 md:grid-cols-2">
+          <div className="weather-surface p-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+              Good product strategy sounds like
+            </p>
+            <ul className="mt-3 space-y-2 text-sm text-slate-300">
+              <li className="flex gap-2">
+                <span className="text-slate-500">•</span>
+                <span className="break-words">
+                  “Our core user problem is unchanged, and we can prove the payoff in 1–2 quarters.”
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-slate-500">•</span>
+                <span className="break-words">
+                  “We’re trading scope for reliability because retention is the constraint.”
+                </span>
+              </li>
+            </ul>
+          </div>
+          <div className="weather-surface p-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+              Macro-driven advice sounds like
+            </p>
+            <ul className="mt-3 space-y-2 text-sm text-slate-300">
+              <li className="flex gap-2">
+                <span className="text-slate-500">•</span>
+                <span className="break-words">
+                  “Delay long-payback bets until cash availability loosens or risk appetite turns.”
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-slate-500">•</span>
+                <span className="break-words">
+                  “Keep hiring approvals tighter while the curve is inverted.”
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-3 text-xs uppercase tracking-[0.2em] text-slate-400">
+          <span className="weather-chip inline-flex min-h-[32px] items-center px-3 py-1">
+            Strategy: problem/ROI fit
+          </span>
+          <span className="weather-chip inline-flex min-h-[32px] items-center px-3 py-1">
+            Macro: cash + risk appetite
+          </span>
+          <a
+            href="#beginner-glossary"
+            className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-[11px] uppercase tracking-[0.25em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+          >
+            Open the glossary
+          </a>
+        </div>
       </div>
     </section>
   );
@@ -362,6 +420,9 @@ export const RegimeAssessmentCard = ({
           </h2>
           <p className="mt-2 text-xs uppercase tracking-[0.2em] text-slate-400">
             System code: {assessment.regime}
+          </p>
+          <p className="mt-2 text-sm text-slate-300">
+            Plain-English read: this is a macro guardrail, not a product vision change.
           </p>
         </div>
         <div className="flex flex-col items-end gap-3 text-xs uppercase tracking-[0.2em] text-slate-300">
@@ -1189,6 +1250,9 @@ export const ExecutiveSnapshotPanel = ({
               <span className="text-sm text-slate-200">{regimeLabel}</span>
             </div>
             <p className="mt-2 text-xs text-slate-500">{assessment.description}</p>
+            <p className="mt-2 text-xs text-slate-300">
+              Strategy signal: decide if the roadmap still fits the current payback window.
+            </p>
             <p className="mt-2 text-xs text-slate-400">
               Constraints tracked:{" "}
               <span className="mono text-slate-100">{assessment.constraints.length}</span>
@@ -1204,6 +1268,9 @@ export const ExecutiveSnapshotPanel = ({
               <time dateTime={treasury.fetched_at}>{formatTimestamp(treasury.fetched_at)}</time>
             </p>
             <p className="mt-3 text-xs text-slate-400">{freshnessAction}</p>
+            <p className="mt-2 text-xs text-slate-300">
+              Macro check: stale data can make strategy advice look stricter than it is.
+            </p>
             {isFallback ? (
               <div className="mt-3 rounded-lg border border-amber-400/30 bg-amber-500/10 p-2 text-[11px] text-amber-100">
                 <p className="uppercase tracking-[0.2em] text-amber-200">Cached fallback</p>
@@ -1239,6 +1306,9 @@ export const ExecutiveSnapshotPanel = ({
             <p className="mt-2 text-xs text-slate-500">
               Using {assessment.scores.baseRateUsed} for policy anchor
             </p>
+            <p className="mt-2 text-xs text-slate-300">
+              Macro check: higher rates usually mean capital is pickier about ROI.
+            </p>
           </div>
           <div className="weather-surface p-4">
             <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Yield curve</p>
@@ -1262,6 +1332,9 @@ export const ExecutiveSnapshotPanel = ({
                 </span>
               </div>
             </div>
+            <p className="mt-3 text-xs text-slate-300">
+              Macro check: inversion favors shorter-cycle bets and tighter hiring.
+            </p>
             <div className="mt-3">
               <svg
                 viewBox="0 0 100 12"
