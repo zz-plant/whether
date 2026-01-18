@@ -148,34 +148,112 @@ export const ReportShell = ({
                   A plain-English brief that turns Treasury signals into week-by-week product and
                   engineering constraints. Every output is sourced and time-stamped for traceability.
                 </p>
+                <p className="max-w-2xl text-sm text-slate-400">
+                  Built for the moments when you need to explain why scope, hiring, or delivery
+                  plans should bend with the macro climate—not just internal preference.
+                </p>
               </div>
             </div>
-            <div className="weather-panel flex min-w-[220px] flex-col items-start gap-3 px-5 py-4">
-              <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">
-                Current conditions
-              </p>
-              <span className="text-3xl font-semibold tracking-tight text-slate-100">
-                {statusLabel}
-              </span>
-              <p className="text-xs text-slate-400">
-                Signals stamped {recordDateLabel}
-              </p>
-            </div>
-            <div className={`weather-panel flex min-w-[220px] flex-col gap-3 px-5 py-4 ${trustToneStyles}`}>
-              <p className={`text-[10px] uppercase tracking-[0.3em] ${trustLabelTone}`}>
-                Data trust level
-              </p>
-              <div className="flex flex-col gap-2">
-                <span className="text-sm font-semibold uppercase tracking-[0.2em]">
+          </div>
+          <div className="grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">
+            <div className="weather-panel flex flex-col gap-4 px-5 py-4">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div className="space-y-2">
+                  <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">
+                    Current operating climate
+                  </p>
+                  <span className="text-3xl font-semibold tracking-tight text-slate-100">
+                    {statusLabel}
+                  </span>
+                  <p className="text-xs text-slate-400">Signals stamped {recordDateLabel}</p>
+                </div>
+                <div className={`rounded-lg border px-3 py-2 text-[11px] uppercase tracking-[0.2em] ${trustToneStyles}`}>
                   {trustStatusLabel}
-                </span>
-                <span className="text-xs">{trustStatusDetail}</span>
-                <span className="text-[11px] text-slate-200/90">{trustStatusAction}</span>
+                </div>
+              </div>
+              <p className="text-sm text-slate-300">
+                You are likely balancing delivery pressure with budget scrutiny. Use the climate
+                label as a neutral, external anchor in planning conversations.
+              </p>
+              <div className="space-y-2">
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                  How to interpret this week
+                </p>
+                <ul className="space-y-2 text-sm text-slate-300">
+                  <li className="flex gap-2">
+                    <span className="text-slate-500">1</span>
+                    <span className="break-words">
+                      Start with user outcomes and ROI. If the idea still wins, keep it on the table.
+                    </span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-slate-500">2</span>
+                    <span className="break-words">
+                      Let the climate dictate pacing, staffing, and sequencing—not whether the idea
+                      matters.
+                    </span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-slate-500">3</span>
+                    <span className="break-words">
+                      Use the signals below to explain tradeoffs when stakeholders disagree.
+                    </span>
+                  </li>
+                </ul>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <a
+                  href="#weekly-action-summary"
+                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                >
+                  Start with this week
+                </a>
+                <a
+                  href="#executive-snapshot"
+                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                >
+                  See leadership summary
+                </a>
+              </div>
+            </div>
+            <div className={`weather-panel flex flex-col gap-4 px-5 py-4 ${trustToneStyles}`}>
+              <p className={`text-[10px] uppercase tracking-[0.3em] ${trustLabelTone}`}>
+                Confidence in the signals
+              </p>
+              <div className="space-y-2 text-sm">
+                <p className="font-semibold uppercase tracking-[0.2em]">{trustStatusLabel}</p>
+                <p className="text-xs text-slate-200/90">{trustStatusDetail}</p>
+                <p className="text-[11px] text-slate-200/90">{trustStatusAction}</p>
+              </div>
+              <div className="weather-surface p-4 text-sm text-slate-200">
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-300">
+                  When this is most useful
+                </p>
+                <ul className="mt-3 space-y-2 text-sm text-slate-200">
+                  <li className="flex gap-2">
+                    <span className="text-slate-400">•</span>
+                    <span className="break-words">
+                      You need to justify a slower cadence without sounding risk-averse.
+                    </span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-slate-400">•</span>
+                    <span className="break-words">
+                      You need to frame why product bets must be staged or time-boxed.
+                    </span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-slate-400">•</span>
+                    <span className="break-words">
+                      You want shared language for “why now” across leadership.
+                    </span>
+                  </li>
+                </ul>
               </div>
             </div>
           </div>
           <div className="weather-panel px-5 py-4">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">You're on</p>
+            <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">You're reading</p>
             <div className="mt-3 space-y-2">
               <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-100">
                 {pageTitle}
@@ -186,29 +264,28 @@ export const ReportShell = ({
           <div className="grid gap-4 lg:grid-cols-[1.2fr,0.8fr]">
             <div className="weather-panel px-5 py-4">
               <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">
-                How to use this report
+                Decision flow
               </p>
               <p className="mt-3 text-sm font-semibold uppercase tracking-[0.2em] text-slate-100">
-                Quick decision checklist
+                Reduce the cognitive load
               </p>
               <ul className="mt-3 space-y-2 text-sm text-slate-300">
                 <li className="flex gap-2">
-                  <span className="text-slate-500">•</span>
+                  <span className="text-slate-500">1</span>
                   <span className="break-words">
-                    Confirm if the advice is strategy-driven (user problem, ROI) or macro-driven
-                    (capital constraints).
+                    Anchor on customer value and ROI so you keep strategic intent clear.
                   </span>
                 </li>
                 <li className="flex gap-2">
-                  <span className="text-slate-500">•</span>
+                  <span className="text-slate-500">2</span>
                   <span className="break-words">
-                    Pressure-test any plan that assumes easy funding when the curve is inverted.
+                    Let the macro guardrails set pace, scope, and hiring tradeoffs.
                   </span>
                 </li>
                 <li className="flex gap-2">
-                  <span className="text-slate-500">•</span>
+                  <span className="text-slate-500">3</span>
                   <span className="break-words">
-                    Translate the macro guardrails into scope, hiring, and timeline tradeoffs.
+                    Use the signal matrix to document why you chose this week’s plan.
                   </span>
                 </li>
               </ul>
@@ -217,13 +294,13 @@ export const ReportShell = ({
                   href="#regime-assessment"
                   className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                 >
-                  See the score meaning
+                  Understand the scores
                 </a>
                 <a
                   href="/operations"
                   className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                 >
-                  Go to actions
+                  Move to actions
                 </a>
               </div>
             </div>
@@ -250,7 +327,7 @@ export const ReportShell = ({
                       href={treasurySource}
                       target="_blank"
                       rel="noreferrer"
-                      className="touch-target inline-flex min-h-[44px] items-center text-xs text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+                      className="touch-target inline-flex min-h-[44px] items-center text-xs text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100 touch-manipulation"
                     >
                       US Treasury Fiscal Data API
                     </a>
@@ -270,7 +347,7 @@ export const ReportShell = ({
                     <a
                       href={link.href}
                       aria-current={isActive ? "page" : undefined}
-                      className={`weather-tile flex min-h-[96px] flex-col gap-3 px-4 py-3 text-left text-xs uppercase tracking-[0.2em] transition-colors ${
+                      className={`weather-tile flex min-h-[96px] flex-col gap-3 px-4 py-3 text-left text-xs uppercase tracking-[0.2em] transition-colors touch-manipulation ${
                         isActive
                           ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
                           : "text-slate-300 hover:border-sky-300/70 hover:text-slate-100"
