@@ -152,14 +152,9 @@ export const ReportShell = ({
               <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">
                 Current conditions
               </p>
-              <div className="flex items-end gap-3">
-                <span className="text-3xl font-semibold tracking-tight text-slate-100">
-                  {statusLabel}
-                </span>
-                <span className="weather-chip px-3 py-1 text-[10px] uppercase tracking-[0.2em]">
-                  Live
-                </span>
-              </div>
+              <span className="text-3xl font-semibold tracking-tight text-slate-100">
+                {statusLabel}
+              </span>
               <p className="text-xs text-slate-400">
                 Signals stamped {recordDateLabel}
               </p>

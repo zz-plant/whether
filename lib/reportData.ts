@@ -40,6 +40,18 @@ const formatTimestampValue = (value: string) => {
   return Number.isNaN(date.valueOf()) ? value : timestampFormatter.format(date);
 };
 
+const formatAgeLabel = (value: string | null, now: Date) => {
+  if (!value) {
+    return "—";
+  }
+  const timestamp = new Date(value);
+  if (Number.isNaN(timestamp.valueOf())) {
+    return "—";
+  }
+  const hours = Math.max(0, Math.round((now.getTime() - timestamp.getTime()) / 36e5));
+  return `${hours}h.`;
+};
+
 const formatScore = (value: number) => value.toFixed(0);
 
 const buildRegimeAlert = (
@@ -114,6 +126,7 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
   const liveTreasury = liveTreasuryPromise ? await liveTreasuryPromise : treasury;
   const recordDateLabel = formatDateValue(treasury.record_date);
   const fetchedAtLabel = formatTimestampValue(treasury.fetched_at);
+  const treasuryAgeLabel = formatAgeLabel(treasury.fetched_at, now);
   const sensors = buildSensorReadings(treasury);
   const assessment = evaluateRegime(treasury, thresholds);
   const liveAssessment = historicalSelection ? evaluateRegime(liveTreasury, thresholds) : null;
@@ -125,28 +138,38 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
   const previousAssessment = previousSnapshot
     ? evaluateRegime(previousSnapshot, thresholds)
     : null;
+  const confidenceLabel = historicalSelection
+    ? "Simulated (low)"
+    : treasury.isLive
+      ? "Live (high confidence)"
+      : "Cached (medium)";
   const treasuryProvenance = {
     sourceLabel: "US Treasury Fiscal Data API",
     sourceUrl: treasury.source,
     timestampLabel: fetchedAtLabel,
-    statusLabel: treasury.isLive ? "Live" : "Offline",
+    ageLabel: treasuryAgeLabel,
+    statusLabel: confidenceLabel,
   };
+  const macroTimestamp = macroSeries[0]?.fetched_at ?? treasury.fetched_at;
+  const macroAgeLabel = formatAgeLabel(macroTimestamp, now);
   const macroProvenance = {
     sourceLabel: "FRED & US Treasury",
     sourceUrl: macroSeries[0]?.sourceUrl,
-    timestampLabel: formatTimestampValue(macroSeries[0]?.fetched_at ?? treasury.fetched_at),
-    statusLabel: macroSeries.some((signal) => signal.isLive) ? "Live" : "Offline",
+    timestampLabel: formatTimestampValue(macroTimestamp),
+    ageLabel: macroAgeLabel,
+    statusLabel: historicalSelection
+      ? "Simulated (low)"
+      : macroSeries.some((signal) => signal.isLive)
+        ? "Live (high confidence)"
+        : "Cached (medium)",
   };
   const internalProvenance = {
     sourceLabel: "Whether internal backlog",
     timestampLabel: "Static catalog",
-    statusLabel: "Offline",
+    ageLabel: "Static.",
+    statusLabel: "Simulated (low)",
   };
-  const statusLabel = historicalSelection
-    ? "Historical"
-    : treasury.isLive
-      ? "Live"
-      : "Offline / Simulated";
+  const statusLabel = confidenceLabel;
   const historicalComparison =
     historicalSelection && liveAssessment
       ? {
