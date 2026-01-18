@@ -3,14 +3,21 @@
  */
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { classifyRegime, computeRiskAppetiteScore, computeTightnessScore, evaluateRegime } from "../lib/regimeEngine";
+import {
+  classifyRegime,
+  computeRiskAppetiteScore,
+  computeTightnessScore,
+  DEFAULT_THRESHOLDS,
+  evaluateRegime,
+} from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
 
 describe("regime engine scoring", () => {
   it("adds tightness points for high base rate and inverted curve", () => {
-    assert.equal(computeTightnessScore(5.2, -0.3), 100);
-    assert.equal(computeTightnessScore(5.2, 0.2), 90);
-    assert.equal(computeTightnessScore(4.2, -0.2), 25);
+    const threshold = DEFAULT_THRESHOLDS.baseRateTightness;
+    assert.equal(computeTightnessScore(5.2, -0.3, threshold), 100);
+    assert.equal(computeTightnessScore(5.2, 0.2, threshold), 90);
+    assert.equal(computeTightnessScore(4.2, -0.2, threshold), 25);
   });
 
   it("maps risk appetite to 0-100", () => {
@@ -21,11 +28,11 @@ describe("regime engine scoring", () => {
 
 describe("regime classification", () => {
   it("classifies scarcity with high tightness and low appetite", () => {
-    assert.equal(classifyRegime(90, 20), "SCARCITY");
+    assert.equal(classifyRegime(90, 20, DEFAULT_THRESHOLDS), "SCARCITY");
   });
 
   it("classifies expansion with low tightness and high appetite", () => {
-    assert.equal(classifyRegime(10, 80), "EXPANSION");
+    assert.equal(classifyRegime(10, 80, DEFAULT_THRESHOLDS), "EXPANSION");
   });
 });
 
@@ -46,5 +53,11 @@ describe("regime assessment", () => {
     const assessment = evaluateRegime(treasury);
     assert.equal(assessment.regime, "SCARCITY");
     assert.ok(assessment.tightnessExplanation.length > 0);
+    assert.equal(assessment.inputs.length, 4);
+
+    const baseRateInput = assessment.inputs.find((input) => input.id === "base-rate");
+    assert.equal(baseRateInput?.recordDate, treasury.record_date);
+    assert.equal(baseRateInput?.fetchedAt, treasury.fetched_at);
+    assert.equal(baseRateInput?.sourceUrl, treasury.source);
   });
 });

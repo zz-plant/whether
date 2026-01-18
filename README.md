@@ -24,6 +24,9 @@ Classifies the market climate using two signals:
 - **Cost of Money (Capital Tightness)**
 - **Market Bravery (Risk Appetite)**
 
+Every scoring output now includes explicit source metadata (Treasury endpoint URL) and freshness
+timestamps so operators can audit when each input was captured.
+
 Four market climates:
 - **Survival Mode (Scarcity)**: High Cost + Low Bravery → *Extend runway.*
 - **Efficiency Mode (Defensive)**: High Cost + Moderate Bravery → *Cash conversion.*
@@ -109,6 +112,7 @@ of how organization and product artifacts map to capital climates.
 - Lead with a single, high‑signal summary before secondary panels.
 - Prefer dense, grid‑aligned layouts with consistent spacing.
 - Show **Data Source** + **Last Updated** timestamp inline with each dataset.
+- Surface scoring inputs alongside the executive snapshot to keep constraints traceable.
 - Keep motion minimal and purposeful (status changes, hover affordances).
 
 ## Notes for developers
