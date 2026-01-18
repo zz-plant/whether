@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { resolveTimeMachineSelection, parseTimeMachineRequest } from "../lib/timeMachineSelection";
 import { loadReportData } from "../lib/reportData";
+import { buildWeeklySummaryApiHref } from "../lib/weeklySummary";
 import {
   FirstTimeGuidePanel,
   BeginnerGlossaryPanel,
@@ -124,6 +125,7 @@ export default async function HomePage({
     treasury,
     treasuryProvenance,
   } = await loadReportData(searchParams);
+  const weeklySummaryApiHref = buildWeeklySummaryApiHref(searchParams);
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
   const trustStatusLabel = historicalSelection
     ? "Historical snapshot"
@@ -161,7 +163,13 @@ export default async function HomePage({
         historicalSelection ? <HistoricalBanner banner={historicalSelection.banner} /> : null
       }
     >
-      <WeeklyActionSummaryPanel assessment={assessment} />
+      <WeeklyActionSummaryPanel
+        assessment={assessment}
+        recordDateLabel={recordDateLabel}
+        fetchedAtLabel={fetchedAtLabel}
+        treasurySource={treasury.source}
+        apiHref={weeklySummaryApiHref}
+      />
 
       <FirstTimeGuidePanel
         statusLabel={statusLabel}

@@ -3,6 +3,7 @@
  * Keeps layout blocks focused and reusable across the Market Climate Station UI.
  */
 import type { RegimeAssessment } from "../../lib/regimeEngine";
+import { TREASURY_SOURCE_LABEL } from "../../lib/regimeEngine";
 import type { PlaybookEntry } from "../../lib/playbook";
 import type {
   MacroSeriesReading,
@@ -12,8 +13,10 @@ import type {
 } from "../../lib/types";
 import { cxoFunctionOutputs } from "../../lib/cxoFunctionOutputs";
 import { operatorRequests } from "../../lib/operatorRequests";
+import { buildWeeklySummary, getRegimeLabel, weeklyActionGuidance } from "../../lib/weeklySummary";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
 import { insightDatabase } from "../../data/recommendations";
+import { WeeklySummaryCard } from "./weeklySummaryCard";
 
 const numberFormatter = new Intl.NumberFormat("en-US", {
   minimumFractionDigits: 2,
@@ -158,21 +161,6 @@ const SeriesFreshnessBadge = ({
   );
 };
 
-const getRegimeLabel = (regime: RegimeAssessment["regime"]) => {
-  switch (regime) {
-    case "SCARCITY":
-      return "Survival Mode";
-    case "DEFENSIVE":
-      return "Safety Mode";
-    case "VOLATILE":
-      return "Stability Mode";
-    case "EXPANSION":
-      return "Growth Mode";
-    default:
-      return regime;
-  }
-};
-
 const regimeBadges = [
   {
     key: "SCARCITY",
@@ -238,20 +226,28 @@ const getRegimeAccent = (regime: RegimeAssessment["regime"]) => {
   }
 };
 
-const weeklyActionGuidance: Record<RegimeAssessment["regime"], string> = {
-  SCARCITY: "freeze discretionary scope, protect runway, and require proof before new bets",
-  DEFENSIVE: "prioritize retention, tighten costs, and ship only revenue or reliability work",
-  VOLATILE: "balance experiments with safeguards, and keep spend approvals reversible",
-  EXPANSION: "scale the highest-ROI bets, hire deliberately, and keep payback discipline",
-};
-
 export const WeeklyActionSummaryPanel = ({
   assessment,
+  recordDateLabel,
+  fetchedAtLabel,
+  treasurySource,
+  apiHref,
 }: {
   assessment: RegimeAssessment;
+  recordDateLabel: string;
+  fetchedAtLabel: string;
+  treasurySource: string;
+  apiHref: string;
 }) => {
   const regimeLabel = getRegimeLabel(assessment.regime);
   const actionGuidance = weeklyActionGuidance[assessment.regime];
+  const weeklySummary = buildWeeklySummary({
+    assessment,
+    recordDateLabel,
+    fetchedAtLabel,
+    sourceLabel: TREASURY_SOURCE_LABEL,
+    sourceUrl: treasurySource,
+  });
 
   return (
     <section
@@ -274,6 +270,7 @@ export const WeeklyActionSummaryPanel = ({
           </a>{" "}
           below for the why.
         </p>
+        <WeeklySummaryCard summary={weeklySummary} apiHref={apiHref} />
       </div>
     </section>
   );
