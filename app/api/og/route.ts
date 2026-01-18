@@ -100,8 +100,8 @@ export async function GET(request: Request) {
     : requestedSelection
       ? "Time Machine selection unavailable"
       : treasury.isLive
-        ? "Live"
-        : "Offline / Simulated";
+        ? "Live (high confidence)"
+        : "Cached (medium)";
 
   const descriptionLines = wrapText(assessment.description, 60);
 

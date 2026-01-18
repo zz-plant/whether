@@ -191,6 +191,54 @@ export const RegimeAssessmentCard = ({
   const riskGradientId = `${progressId}-risk-gradient`;
   const tightnessMaskId = `${progressId}-tightness-mask`;
   const riskMaskId = `${progressId}-risk-mask`;
+  const baseRateThreshold = assessment.thresholds.baseRateTightness;
+  const tightnessThreshold = assessment.thresholds.tightnessRegime;
+  const riskThreshold = assessment.thresholds.riskAppetiteRegime;
+  const curveSlopeValue = assessment.scores.curveSlope;
+  const curveSlopeLabel =
+    curveSlopeValue === null
+      ? "Yield curve slope unavailable."
+      : curveSlopeValue < 0
+        ? `Yield curve inversion (${curveSlopeValue.toFixed(2)}%).`
+        : `Yield curve normal (${curveSlopeValue.toFixed(2)}%).`;
+  const tightnessLabel = `Capital tightness ${assessment.scores.tightness}/100 ${
+    assessment.scores.tightness > tightnessThreshold ? "above" : "below"
+  } ${tightnessThreshold}.`;
+  const riskLabel = `Market bravery ${assessment.scores.riskAppetite}/100 ${
+    assessment.scores.riskAppetite > riskThreshold ? "above" : "below"
+  } ${riskThreshold}.`;
+  const baseRateLabel = `Rate baseline ${formatNumber(
+    assessment.scores.baseRate,
+    "%"
+  )} ${
+    assessment.scores.baseRate > baseRateThreshold ? "above" : "below"
+  } ${baseRateThreshold}%.`;
+  const constraintDrivers = [
+    {
+      id: "curve-slope",
+      label: curveSlopeLabel,
+      href: "/signals#sensor-array",
+      linkLabel: "View curve slope",
+    },
+    {
+      id: "base-rate",
+      label: baseRateLabel,
+      href: "/signals#sensor-array",
+      linkLabel: "View base rate",
+    },
+    {
+      id: "tightness",
+      label: tightnessLabel,
+      href: "/signals#thresholds",
+      linkLabel: "View thresholds",
+    },
+    {
+      id: "risk-appetite",
+      label: riskLabel,
+      href: "/signals#thresholds",
+      linkLabel: "View thresholds",
+    },
+  ];
 
   return (
     <section
@@ -264,11 +312,38 @@ export const RegimeAssessmentCard = ({
           </p>
         </div>
       </div>
-      <ul className="relative mt-4 space-y-2 text-sm text-slate-300">
+      <ul className="relative mt-4 space-y-3 text-sm text-slate-300">
         {assessment.constraints.map((item) => (
-          <li key={item} className="flex gap-2">
-            <span className="text-slate-500">•</span>
-            <span className="break-words">{item}</span>
+          <li key={item} className="space-y-2">
+            <div className="flex gap-2">
+              <span className="text-slate-500">•</span>
+              <span className="break-words">{item}</span>
+            </div>
+            <details className="ml-5 rounded-xl border border-slate-800/80 bg-slate-950/40 px-3 py-2 text-xs text-slate-300">
+              <summary className="flex min-h-[44px] cursor-pointer items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-slate-400 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+                Because
+                <span className="text-slate-500">(show drivers)</span>
+              </summary>
+              <div className="mt-2 space-y-2">
+                <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">
+                  Driven by
+                </p>
+                <ul className="space-y-2">
+                  {constraintDrivers.map((driver) => (
+                    <li key={driver.id} className="flex flex-wrap items-center gap-2">
+                      <span className="text-slate-500">•</span>
+                      <span className="break-words">{driver.label}</span>
+                      <a
+                        href={driver.href}
+                        className="touch-target inline-flex min-h-[44px] items-center text-[10px] uppercase tracking-[0.2em] text-slate-200 underline decoration-slate-700 underline-offset-4 hover:text-slate-100 touch-manipulation"
+                      >
+                        {driver.linkLabel}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </details>
           </li>
         ))}
       </ul>
@@ -880,7 +955,7 @@ export const ExecutiveSnapshotPanel = ({
             </p>
             {isFallback ? (
               <div className="mt-3 rounded-lg border border-amber-400/30 bg-amber-500/10 p-2 text-[11px] text-amber-100">
-                <p className="uppercase tracking-[0.2em] text-amber-200">Offline fallback</p>
+                <p className="uppercase tracking-[0.2em] text-amber-200">Cached fallback</p>
                 <p className="mt-2 text-amber-100">{fallbackReason}</p>
                 <p className="mt-2 text-amber-200/80">
                   Snapshot fetched:{" "}
@@ -1129,7 +1204,7 @@ export const SensorArray = ({
                   </p>
                 </div>
                 <span className="weather-pill px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-400">
-                  {sensor.isLive ? "Live" : "Offline"}
+                  {provenance.statusLabel}
                 </span>
               </div>
               <figure className="mt-3">
@@ -1212,8 +1287,6 @@ export const MacroSignalsPanel = ({
   series: MacroSeriesReading[];
   provenance: DataProvenance;
 }) => {
-  const isLive = series.some((signal) => signal.isLive);
-
   return (
     <section id="macro-signals" aria-labelledby="macro-signals-title" className="mt-10">
       <div className="weather-panel p-6">
@@ -1229,7 +1302,7 @@ export const MacroSignalsPanel = ({
           </div>
           <div className="flex flex-col items-end gap-2">
             <span className="weather-pill px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-300">
-              {isLive ? "Live" : "Snapshot"}
+              {provenance.statusLabel}
             </span>
             <DataProvenanceStrip provenance={provenance} />
           </div>

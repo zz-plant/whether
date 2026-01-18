@@ -6,12 +6,14 @@ export type DataProvenance = {
   sourceLabel: string;
   sourceUrl?: string;
   timestampLabel: string;
+  ageLabel: string;
   statusLabel: string;
 };
 
 const statusStyles = {
-  Live: "border-emerald-400/50 bg-emerald-500/10 text-emerald-200",
-  Offline: "border-slate-600/70 bg-slate-800/40 text-slate-200",
+  "Live (high confidence)": "border-emerald-400/50 bg-emerald-500/10 text-emerald-200",
+  "Cached (medium)": "border-amber-400/60 bg-amber-500/10 text-amber-100",
+  "Simulated (low)": "border-slate-600/70 bg-slate-800/40 text-slate-200",
 } as const;
 
 export const DataProvenanceStrip = ({
@@ -45,6 +47,11 @@ export const DataProvenanceStrip = ({
       <span className="h-1 w-1 rounded-full bg-slate-700" aria-hidden="true" />
       <span>
         Timestamp: <span className="mono text-slate-200">{provenance.timestampLabel}</span>
+      </span>
+      <span className="h-1 w-1 rounded-full bg-slate-700" aria-hidden="true" />
+      <span>
+        <span className="text-slate-500">Data age:</span>{" "}
+        <span className="mono text-slate-200">{provenance.ageLabel}</span>
       </span>
       <span
         className={`rounded-full border px-2 py-1 text-[10px] uppercase tracking-[0.25em] ${
