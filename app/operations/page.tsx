@@ -5,9 +5,13 @@ import { AssumptionLockPanel } from "../components/assumptionLockPanel";
 import { CounterfactualPanel } from "../components/counterfactualPanel";
 import { DecisionMemoryPanel } from "../components/decisionMemoryPanel";
 import { DecisionShieldPanel } from "../components/decisionShieldPanel";
+import { ExecutiveBriefingPanel } from "../components/executiveBriefingPanel";
 import { ExportBriefPanel } from "../components/exportBriefPanel";
+import { StrategyBriefPanel } from "../components/strategyBriefPanel";
 import {
   CxoFunctionPanel,
+  DecisionShieldTemplatesPanel,
+  FinanceStrategyPanel,
   HistoricalBanner,
   InsightDatabasePanel,
   MonthlyActionSummaryPanel,
@@ -46,12 +50,16 @@ export default async function OperationsPage({
   const sectionLinks = [
     { href: "#monthly-action-summary", label: "Monthly summary" },
     { href: "#playbook", label: "Playbook" },
+    { href: "#finance-strategy", label: "Finance strategy" },
+    { href: "#strategy-brief", label: "Strategy brief" },
     { href: "#assumption-locking", label: "Assumption locking" },
     { href: "#insight-database", label: "Insight database" },
     { href: "#decision-memory", label: "Decision memory" },
     { href: "#decision-shield", label: "Decision shield" },
+    { href: "#decision-shield-templates", label: "Decision templates" },
     { href: "#counterfactuals", label: "Counterfactual view" },
     { href: "#export-briefs", label: "Export briefs" },
+    { href: "#executive-briefing", label: "Executive briefing" },
     { href: "#cxo-functions", label: "CXO outputs" },
     { href: "#operator-requests", label: "Operator requests" },
   ];
@@ -116,6 +124,14 @@ export default async function OperationsPage({
         provenance={treasuryProvenance}
       />
 
+      <FinanceStrategyPanel regime={assessment.regime} provenance={treasuryProvenance} />
+
+      <StrategyBriefPanel
+        assessment={assessment}
+        recordDateLabel={recordDateLabel}
+        provenance={treasuryProvenance}
+      />
+
       <AssumptionLockPanel />
 
       <InsightDatabasePanel regime={assessment.regime} provenance={treasuryProvenance} />
@@ -128,6 +144,8 @@ export default async function OperationsPage({
 
       <DecisionShieldPanel assessment={assessment} provenance={treasuryProvenance} />
 
+      <DecisionShieldTemplatesPanel provenance={treasuryProvenance} />
+
       <CounterfactualPanel assessment={assessment} provenance={treasuryProvenance} />
 
       <ExportBriefPanel
@@ -135,6 +153,12 @@ export default async function OperationsPage({
         treasury={treasury}
         sensors={sensors}
         macroSeries={macroSeries}
+        provenance={treasuryProvenance}
+      />
+
+      <ExecutiveBriefingPanel
+        assessment={assessment}
+        recordDateLabel={recordDateLabel}
         provenance={treasuryProvenance}
       />
 

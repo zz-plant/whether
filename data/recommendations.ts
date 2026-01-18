@@ -298,6 +298,187 @@ export const insightDatabase = {
       },
     ],
   },
+  financeStrategyMode: {
+    title: "Finance Strategy Mode",
+    subtitle: "Runway posture guidance without internal financial inputs",
+    description:
+      "Public macro data sets the default capital posture. These guardrails define how conservative to be without needing internal finance models.",
+    regimes: [
+      {
+        key: "SCARCITY",
+        runwayPosture: "Target 24+ months of runway; freeze non-essential spend.",
+        hiringThrottle: "Only roles with <90-day payback or critical retention impact.",
+        budgetFocus: ["Cash conversion wins", "Vendor consolidation", "Runway extensions"],
+        watchSignals: [
+          "Curve inversion deepening",
+          "Base rates holding above neutral range",
+          "Credit spreads widening",
+        ],
+      },
+      {
+        key: "DEFENSIVE",
+        runwayPosture: "Hold 18–24 months of runway; keep optionality limited.",
+        hiringThrottle: "Add capacity only for high-ROI customer expansion.",
+        budgetFocus: ["Gross margin lift", "Retention defenses", "Pricing cleanup"],
+        watchSignals: ["Curve stabilizing", "Base rate plateau", "Inflation cooling"],
+      },
+      {
+        key: "VOLATILE",
+        runwayPosture: "Maintain 18 months runway with liquidity buffers.",
+        hiringThrottle: "Favor customer trust and reliability roles over growth bets.",
+        budgetFocus: ["Risk controls", "Security/compliance", "Resilience spending"],
+        watchSignals: ["Risk appetite suppressed", "Flat curve", "Demand hesitancy"],
+      },
+      {
+        key: "EXPANSION",
+        runwayPosture: "12–18 months runway acceptable with growth safeguards.",
+        hiringThrottle: "Hire ahead of demand in revenue and product acceleration roles.",
+        budgetFocus: ["Market capture", "Sales capacity", "Product expansion bets"],
+        watchSignals: ["Curve steepening", "Base rates easing", "Risk-on funding"],
+      },
+    ],
+  },
+  strategyBriefing: {
+    title: "Strategy Brief Generator",
+    subtitle: "Macro-only executive narrative ready for leadership updates",
+    regimes: [
+      {
+        key: "SCARCITY",
+        headline: "Survival posture: protect cash and shorten payback windows.",
+        narrative:
+          "Capital is expensive and risk appetite is muted. Default to reversible moves and immediate cash conversion.",
+        priorities: ["Protect runway", "Monetize existing demand", "Cut optionality bets"],
+        watchlist: ["Cash conversion cycle", "Down-round signals", "Churn spike risk"],
+        reversalTriggers: ["Curve re-steepens", "Base rates fall below tightness band"],
+      },
+      {
+        key: "DEFENSIVE",
+        headline: "Efficiency posture: defend margins and deepen customer value.",
+        narrative:
+          "Funding is available but selective. This is a margin-defense environment where efficiency wins.",
+        priorities: ["Retention programs", "Packaging improvements", "Operational leverage"],
+        watchlist: ["Net dollar retention", "Gross margin drift", "Cycle time creep"],
+        reversalTriggers: ["Sustained curve steepening", "Risk appetite climbs"],
+      },
+      {
+        key: "VOLATILE",
+        headline: "Safety posture: prioritize trust, reliability, and proof.",
+        narrative:
+          "Liquidity exists but confidence is shaky. Buyers demand safety signals and reliable delivery.",
+        priorities: ["Trust & compliance", "Reliability SLAs", "Customer risk reduction"],
+        watchlist: ["Pipeline stalls", "Security incidents", "Procurement delays"],
+        reversalTriggers: ["Risk appetite rebound", "Bravery signal crosses threshold"],
+      },
+      {
+        key: "EXPANSION",
+        headline: "Growth posture: move fast, capture share, and accept controlled waste.",
+        narrative:
+          "Risk appetite is elevated. The opportunity cost of moving slowly is higher than modest inefficiency.",
+        priorities: ["Speed to market", "Distribution loops", "New product wedges"],
+        watchlist: ["Demand spike", "Capacity strain", "Competitive blitz moves"],
+        reversalTriggers: ["Curve flattens", "Base rates trend upward"],
+      },
+    ],
+  },
+  executiveBriefingSuite: {
+    title: "Executive Briefing Suite",
+    subtitle: "Board-ready posture summary and guardrails from public signals",
+    regimes: [
+      {
+        key: "SCARCITY",
+        executiveSummary: "Runway preservation and payback discipline are non-negotiable.",
+        decisionGuardrails: [
+          "Pause non-core initiatives without near-term revenue impact.",
+          "Demand <90-day payback on discretionary spend.",
+          "Concentrate on retention and cash recovery.",
+        ],
+        decisionTemplates: [
+          "Hiring: approve only revenue-protecting roles.",
+          "Pricing: exchange discounts for upfront cash.",
+          "Roadmap: ship stability and monetization only.",
+        ],
+        reversalTriggers: ["Curve exits inversion", "Policy easing signals stabilize"],
+      },
+      {
+        key: "DEFENSIVE",
+        executiveSummary: "Efficiency and margin protection lead; growth must prove ROI.",
+        decisionGuardrails: [
+          "Tie new spend to margin lift or churn reduction.",
+          "Limit expansion to proven channels.",
+          "Keep cadence stable; avoid whiplash pivots.",
+        ],
+        decisionTemplates: [
+          "Hiring: accretive revenue roles only.",
+          "Pricing: optimize packaging before adding discounts.",
+          "Roadmap: prioritize retention and upsell.",
+        ],
+        reversalTriggers: ["Risk appetite rises", "Base rates begin sustained decline"],
+      },
+      {
+        key: "VOLATILE",
+        executiveSummary: "Buyer anxiety is high—lead with trust and stability.",
+        decisionGuardrails: [
+          "Bias toward reliability and compliance improvements.",
+          "Delay disruptive changes that increase perceived risk.",
+          "Invest in proof points and customer reassurance.",
+        ],
+        decisionTemplates: [
+          "Hiring: prioritize trust and reliability roles.",
+          "Pricing: keep models simple and predictable.",
+          "Roadmap: emphasize safety features.",
+        ],
+        reversalTriggers: ["Risk appetite improves", "Curve steepens positively"],
+      },
+      {
+        key: "EXPANSION",
+        executiveSummary: "Speed and share capture outperform over-optimization.",
+        decisionGuardrails: [
+          "Fund growth bets with clear distribution upside.",
+          "Accept measured inefficiency to gain momentum.",
+          "Invest in scaling teams before bottlenecks hit.",
+        ],
+        decisionTemplates: [
+          "Hiring: add growth capacity ahead of demand.",
+          "Pricing: prioritize adoption and market penetration.",
+          "Roadmap: accelerate new product lines.",
+        ],
+        reversalTriggers: ["Risk appetite drops", "Rates move into tight band"],
+      },
+    ],
+  },
+  decisionShieldTemplates: {
+    title: "Decision Shield Templates",
+    subtitle: "Default public-data stances by regime",
+    decisions: [
+      {
+        title: "Hiring",
+        stances: {
+          SCARCITY: "Freeze unless role pays for itself in <90 days.",
+          DEFENSIVE: "Approve only high-ROI, margin-supporting roles.",
+          VOLATILE: "Bias toward trust, reliability, and customer safety roles.",
+          EXPANSION: "Hire ahead of demand in growth and revenue capacity.",
+        },
+      },
+      {
+        title: "Pricing",
+        stances: {
+          SCARCITY: "Trade discounts for upfront cash and shorter payback.",
+          DEFENSIVE: "Optimize packaging before discounting.",
+          VOLATILE: "Keep pricing simple; avoid complex experiments.",
+          EXPANSION: "Prioritize adoption; use generous trials.",
+        },
+      },
+      {
+        title: "Roadmap",
+        stances: {
+          SCARCITY: "Ship monetization and retention only.",
+          DEFENSIVE: "Prioritize margin and churn reduction.",
+          VOLATILE: "Lead with reliability and trust signals.",
+          EXPANSION: "Accelerate distribution and new product bets.",
+        },
+      },
+    ],
+  },
   metaInsight: {
     title: "Meta-Insight",
     statement: "Strategy is not a personality trait. It is an adaptation.",
