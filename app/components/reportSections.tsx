@@ -238,6 +238,47 @@ const getRegimeAccent = (regime: RegimeAssessment["regime"]) => {
   }
 };
 
+const weeklyActionGuidance: Record<RegimeAssessment["regime"], string> = {
+  SCARCITY: "freeze discretionary scope, protect runway, and require proof before new bets",
+  DEFENSIVE: "prioritize retention, tighten costs, and ship only revenue or reliability work",
+  VOLATILE: "balance experiments with safeguards, and keep spend approvals reversible",
+  EXPANSION: "scale the highest-ROI bets, hire deliberately, and keep payback discipline",
+};
+
+export const WeeklyActionSummaryPanel = ({
+  assessment,
+}: {
+  assessment: RegimeAssessment;
+}) => {
+  const regimeLabel = getRegimeLabel(assessment.regime);
+  const actionGuidance = weeklyActionGuidance[assessment.regime];
+
+  return (
+    <section
+      id="weekly-action-summary"
+      aria-labelledby="weekly-action-summary-title"
+      className="mt-8"
+    >
+      <div className="weather-panel flex flex-col gap-3 px-5 py-4">
+        <p className="type-label text-slate-400">What should I do this week?</p>
+        <h2 id="weekly-action-summary-title" className="type-section text-slate-100">
+          Action summary
+        </h2>
+        <p className="text-sm text-slate-200">
+          This week, operate in {regimeLabel} mode: {actionGuidance}; review the{" "}
+          <a
+            href="#executive-snapshot"
+            className="touch-target inline-flex min-h-[44px] items-center text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-slate-50 touch-manipulation"
+          >
+            Executive Snapshot
+          </a>{" "}
+          below for the supporting constraints.
+        </p>
+      </div>
+    </section>
+  );
+};
+
 export const RegimeAssessmentCard = ({
   assessment,
   provenance,
