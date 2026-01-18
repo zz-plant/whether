@@ -1404,9 +1404,11 @@ export const RegimeChangeAlertPanel = ({
   alert: RegimeAlert | null;
   provenance: DataProvenance;
 }) => {
-  const statusLabel = alert?.changed ? "Changed" : "Stable";
-  const statusTone = alert?.changed
-    ? "border-rose-500/40 bg-rose-500/10 text-rose-100"
+  const statusLabel = alert ? (alert.changed ? "Changed" : "Threshold crossed") : "Quiet";
+  const statusTone = alert
+    ? alert.changed
+      ? "border-rose-500/40 bg-rose-500/10 text-rose-100"
+      : "border-amber-500/40 bg-amber-500/10 text-amber-100"
     : "border-emerald-500/40 bg-emerald-500/10 text-emerald-100";
 
   return (
@@ -1473,8 +1475,8 @@ export const RegimeChangeAlertPanel = ({
         ) : (
           <div className="mt-6 weather-surface p-4">
             <p className="text-sm text-slate-300">
-              Alert history is unavailable for this view. Exit the Time Machine or refresh the
-              latest report to see the most recent climate shift.
+              No alert right now. Notifications only fire when the regime changes or tightness /
+              bravery cross a threshold, so operators only get interrupted on state changes.
             </p>
           </div>
         )}

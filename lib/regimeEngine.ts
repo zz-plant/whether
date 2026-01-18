@@ -97,6 +97,8 @@ const REGIME_PROFILES: Record<RegimeKey, { description: string; constraints: str
   },
 };
 
+export const getRegimeProfile = (regime: RegimeKey) => REGIME_PROFILES[regime];
+
 const buildTightnessExplanation = (thresholds: RegimeThresholds) =>
   `Tightness score: base rate > ${thresholds.baseRateTightness}% adds ${TIGHTNESS_BASE_RATE_POINTS} points. ` +
   `Inverted curve adds ${TIGHTNESS_INVERSION_POINTS} points. Score is capped at ${TIGHTNESS_CAP}.`;
