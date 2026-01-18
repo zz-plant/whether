@@ -89,12 +89,12 @@ export default async function HomePage({
     },
   ];
   const sectionLinks = [
-    { href: "#first-time-guide", label: "First-time guide" },
-    { href: "#beginner-glossary", label: "Glossary" },
     { href: "#executive-snapshot", label: "Executive snapshot" },
     { href: "#regime-alerts", label: "Market climate alerts" },
     { href: "#regime-assessment", label: "Market climate assessment" },
     { href: "#signal-matrix", label: "Signal matrix" },
+    { href: "#first-time-guide", label: "First-time guide" },
+    { href: "#beginner-glossary", label: "Glossary" },
   ];
   const structuredData = {
     "@context": "https://schema.org",
@@ -152,14 +152,6 @@ export default async function HomePage({
       }
     >
 
-      <FirstTimeGuidePanel
-        statusLabel={statusLabel}
-        recordDateLabel={recordDateLabel}
-        fetchedAtLabel={fetchedAtLabel}
-      />
-
-      <BeginnerGlossaryPanel />
-
       <ExecutiveSnapshotPanel
         treasury={treasury}
         assessment={assessment}
@@ -175,6 +167,14 @@ export default async function HomePage({
       <section className="mt-10">
         <SignalMatrixPanel assessment={assessment} provenance={treasuryProvenance} />
       </section>
+
+      <FirstTimeGuidePanel
+        statusLabel={statusLabel}
+        recordDateLabel={recordDateLabel}
+        fetchedAtLabel={fetchedAtLabel}
+      />
+
+      <BeginnerGlossaryPanel />
     </ReportShell>
   );
 }
