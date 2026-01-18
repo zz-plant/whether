@@ -28,6 +28,7 @@ export const ReportShell = ({
   sectionLinks,
   trustStatusLabel,
   trustStatusDetail,
+  trustStatusAction,
   trustStatusTone,
   structuredData,
   historicalBanner,
@@ -43,6 +44,7 @@ export const ReportShell = ({
   sectionLinks: ReportSectionLink[];
   trustStatusLabel: string;
   trustStatusDetail: string;
+  trustStatusAction: string;
   trustStatusTone: "stable" | "warning" | "historical";
   structuredData?: string;
   historicalBanner?: ReactNode;
@@ -168,6 +170,7 @@ export const ReportShell = ({
                   {trustStatusLabel}
                 </span>
                 <span className="text-xs">{trustStatusDetail}</span>
+                <span className="text-[11px] text-slate-200/90">{trustStatusAction}</span>
               </div>
             </div>
           </div>
