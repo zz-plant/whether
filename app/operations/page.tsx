@@ -10,6 +10,7 @@ import {
   CxoFunctionPanel,
   HistoricalBanner,
   InsightDatabasePanel,
+  MonthlyActionSummaryPanel,
   OperatorRequestsPanel,
   PlaybookPanel,
 } from "../components/reportSections";
@@ -43,6 +44,7 @@ export default async function OperationsPage({
     },
   ];
   const sectionLinks = [
+    { href: "#monthly-action-summary", label: "Monthly summary" },
     { href: "#playbook", label: "Playbook" },
     { href: "#assumption-locking", label: "Assumption locking" },
     { href: "#insight-database", label: "Insight database" },
@@ -100,6 +102,12 @@ export default async function OperationsPage({
         historicalSelection ? <HistoricalBanner banner={historicalSelection.banner} /> : null
       }
     >
+      <MonthlyActionSummaryPanel
+        assessment={assessment}
+        provenance={treasuryProvenance}
+        recordDateLabel={recordDateLabel}
+      />
+
       <PlaybookPanel
         playbook={playbook}
         stopItems={stopItems}

@@ -1,13 +1,13 @@
 /**
- * Weekly summary sharing card for quick copy and API retrieval.
- * Provides copy-ready text with direct access to the weekly summary endpoint.
+ * Monthly summary sharing card for quick copy and API retrieval.
+ * Keeps monthly action guidance shareable across the Regime Station UI.
  */
 "use client";
 
 import { useState } from "react";
-import type { WeeklySummary } from "../../lib/weeklySummary";
+import type { MonthlySummary } from "../../lib/monthlySummary";
 
-export const WeeklySummaryCard = ({ summary }: { summary: WeeklySummary }) => {
+export const MonthlySummaryCard = ({ summary }: { summary: MonthlySummary }) => {
   const [isCopying, setIsCopying] = useState(false);
   const [copied, setCopied] = useState(false);
   const [copyError, setCopyError] = useState(false);
@@ -41,7 +41,7 @@ export const WeeklySummaryCard = ({ summary }: { summary: WeeklySummary }) => {
             Copy-ready summary card
           </p>
           <p className="mt-2 text-sm text-slate-300">
-            Share the weekly posture in one pasteable block or pull it from the API for reuse.
+            Share the monthly posture in one pasteable block or pull it from the API for reuse.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -55,10 +55,10 @@ export const WeeklySummaryCard = ({ summary }: { summary: WeeklySummary }) => {
             {isCopying ? "Copying" : copied ? "Copied" : "Copy summary"}
           </button>
           <a
-            href="/api/weekly"
+            href="/api/monthly"
             className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
           >
-            View weekly API
+            View monthly API
           </a>
         </div>
       </div>

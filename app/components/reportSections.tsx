@@ -12,8 +12,10 @@ import type {
 } from "../../lib/types";
 import { cxoFunctionOutputs } from "../../lib/cxoFunctionOutputs";
 import { operatorRequests } from "../../lib/operatorRequests";
+import { buildMonthlySummary, getMonthlyActionGuidance } from "../../lib/monthlySummary";
 import { buildWeeklySummary, getWeeklyActionGuidance } from "../../lib/weeklySummary";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
+import { MonthlySummaryCard } from "./monthlySummaryCard";
 import { WeeklySummaryCard } from "./weeklySummaryCard";
 import { insightDatabase } from "../../data/recommendations";
 
@@ -336,6 +338,84 @@ export const WeeklyActionSummaryPanel = ({
           >
             Open the glossary
           </a>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export const MonthlyActionSummaryPanel = ({
+  assessment,
+  provenance,
+  recordDateLabel,
+}: {
+  assessment: RegimeAssessment;
+  provenance: DataProvenance;
+  recordDateLabel: string;
+}) => {
+  const regimeLabel = getRegimeLabel(assessment.regime);
+  const actionGuidance = getMonthlyActionGuidance(assessment.regime);
+  const monthlySummary = buildMonthlySummary({
+    assessment,
+    provenance,
+    recordDateLabel,
+  });
+
+  return (
+    <section
+      id="monthly-action-summary"
+      aria-labelledby="monthly-action-summary-title"
+      className="mt-8"
+    >
+      <div className="weather-panel flex flex-col gap-4 px-5 py-4">
+        <p className="type-label text-slate-400">What should I do this month?</p>
+        <h2 id="monthly-action-summary-title" className="type-section text-slate-100">
+          Monthly action summary
+        </h2>
+        <p className="text-sm text-slate-200">
+          This month, operate in {regimeLabel} mode: {actionGuidance}. Use these constraints to
+          align staffing, sequencing, and approval cadence before you lock the next sprint slate.
+        </p>
+        <MonthlySummaryCard summary={monthlySummary} />
+        <div className="grid gap-3 md:grid-cols-2">
+          <div className="weather-surface p-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+              Monthly leadership asks sound like
+            </p>
+            <ul className="mt-3 space-y-2 text-sm text-slate-300">
+              <li className="flex gap-2">
+                <span className="text-slate-500">•</span>
+                <span className="break-words">
+                  “These three bets can still pay back within the climate constraints.”
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-slate-500">•</span>
+                <span className="break-words">
+                  “We’re sequencing roadmap work to reduce risk before expanding scope.”
+                </span>
+              </li>
+            </ul>
+          </div>
+          <div className="weather-surface p-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+              Monthly constraints should force
+            </p>
+            <ul className="mt-3 space-y-2 text-sm text-slate-300">
+              <li className="flex gap-2">
+                <span className="text-slate-500">•</span>
+                <span className="break-words">
+                  “Only one major growth bet at a time until cash availability improves.”
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-slate-500">•</span>
+                <span className="break-words">
+                  “Move hires to contingency approval and revisit after the next Treasury refresh.”
+                </span>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </section>
