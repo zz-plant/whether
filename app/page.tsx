@@ -91,14 +91,14 @@ export default async function HomePage({
     },
   ];
   const sectionLinks = [
-    { href: "#weekly-action-summary", label: "This week's actions" },
-    { href: "#first-time-guide", label: "New here? Start here" },
-    { href: "#beginner-glossary", label: "Plain-English glossary" },
     { href: "#executive-snapshot", label: "Leadership summary" },
+    { href: "#weekly-action-summary", label: "This week's actions" },
     { href: "#regime-summary", label: "Market climate summary" },
     { href: "#regime-alerts", label: "New alerts" },
     { href: "#regime-assessment", label: "What the scores mean" },
     { href: "#signal-matrix", label: "Signal breakdown" },
+    { href: "#first-time-guide", label: "New here? Start here" },
+    { href: "#beginner-glossary", label: "Plain-English glossary" },
   ];
   const structuredData = {
     "@context": "https://schema.org",
@@ -161,24 +161,16 @@ export default async function HomePage({
         historicalSelection ? <HistoricalBanner banner={historicalSelection.banner} /> : null
       }
     >
-      <WeeklyActionSummaryPanel
-        assessment={assessment}
-        provenance={treasuryProvenance}
-        recordDateLabel={recordDateLabel}
-      />
-
-      <FirstTimeGuidePanel
-        statusLabel={statusLabel}
-        recordDateLabel={recordDateLabel}
-        fetchedAtLabel={fetchedAtLabel}
-      />
-
-      <BeginnerGlossaryPanel />
-
       <ExecutiveSnapshotPanel
         treasury={treasury}
         assessment={assessment}
         provenance={treasuryProvenance}
+      />
+
+      <WeeklyActionSummaryPanel
+        assessment={assessment}
+        provenance={treasuryProvenance}
+        recordDateLabel={recordDateLabel}
       />
 
       <RegimeSummaryPanel assessment={assessment} provenance={treasuryProvenance} />
@@ -192,6 +184,14 @@ export default async function HomePage({
       <section className="mt-10">
         <SignalMatrixPanel assessment={assessment} provenance={treasuryProvenance} />
       </section>
+
+      <FirstTimeGuidePanel
+        statusLabel={statusLabel}
+        recordDateLabel={recordDateLabel}
+        fetchedAtLabel={fetchedAtLabel}
+      />
+
+      <BeginnerGlossaryPanel />
     </ReportShell>
   );
 }
