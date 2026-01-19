@@ -49,8 +49,6 @@ export const ReportShell = ({
   structuredData?: string;
   historicalBanner?: ReactNode;
 }) => {
-  const primarySectionLinks = sectionLinks.slice(0, 3);
-  const secondarySectionLinks = sectionLinks.slice(3);
   const pageLinkIcons: Record<string, ReactNode> = {
     "Quick start": (
       <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
@@ -164,7 +162,7 @@ export const ReportShell = ({
                   </span>
                   <p className="text-xs text-slate-400">Signals stamped {recordDateLabel}</p>
                 </div>
-                <div className={`rounded-lg border px-3 py-2 text-[11px] uppercase tracking-[0.2em] ${trustToneStyles}`}>
+                <div className={`rounded-lg border px-3 py-2 text-xs uppercase tracking-[0.2em] ${trustToneStyles}`}>
                   {trustStatusLabel}
                 </div>
               </div>
@@ -208,52 +206,30 @@ export const ReportShell = ({
               </div>
             </div>
             <div className={`weather-panel flex flex-col gap-4 px-5 py-4 ${trustToneStyles}`}>
-              <p className={`text-xs font-semibold ${trustLabelTone}`}>Confidence in the signals</p>
+              <p className={`text-sm font-semibold ${trustLabelTone}`}>Confidence in the signals</p>
               <div className="space-y-2 text-sm">
                 <p className="font-semibold">{trustStatusLabel}</p>
-                <p className="text-xs text-slate-200/90">{trustStatusDetail}</p>
-                <p className="text-[11px] text-slate-200/90">{trustStatusAction}</p>
+                <p className="text-sm text-slate-200/90">{trustStatusDetail}</p>
+                <p className="text-xs text-slate-200/90">{trustStatusAction}</p>
               </div>
             </div>
           </div>
           {sectionLinks.length > 0 ? (
             <nav aria-label="Report sections" className="space-y-3">
-              <p className="text-xs font-semibold text-slate-500">Jump to</p>
+              <p className="text-sm font-semibold text-slate-500">Jump to</p>
               <div className="flex flex-wrap gap-3">
                 <ul className="flex flex-wrap gap-3">
-                  {primarySectionLinks.map((item) => (
+                  {sectionLinks.map((item) => (
                     <li key={item.href}>
                       <a
                         href={item.href}
-                        className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-[11px] font-semibold tracking-[0.2em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                        className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.2em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                       >
                         {item.label}
                       </a>
                     </li>
                   ))}
                 </ul>
-                {secondarySectionLinks.length > 0 ? (
-                  <details className="group">
-                    <summary className="weather-pill inline-flex min-h-[44px] cursor-pointer items-center gap-2 px-4 py-2 text-[11px] font-semibold tracking-[0.2em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation">
-                      More detail
-                      <span className="rounded-full border border-slate-700 px-2 py-0.5 text-[10px] uppercase tracking-[0.2em] text-slate-400">
-                        {secondarySectionLinks.length}
-                      </span>
-                    </summary>
-                    <ul className="mt-3 flex flex-wrap gap-3">
-                      {secondarySectionLinks.map((item) => (
-                        <li key={item.href}>
-                          <a
-                            href={item.href}
-                            className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-[11px] font-semibold tracking-[0.2em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
-                          >
-                            {item.label}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </details>
-                ) : null}
               </div>
             </nav>
           ) : null}
@@ -289,14 +265,14 @@ export const ReportShell = ({
                 </dl>
               </div>
             </details>
-            <details className="group">
-              <summary className="weather-pill inline-flex min-h-[44px] cursor-pointer items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation">
-                Explore other report paths
+            <section className="weather-panel flex flex-col gap-3 px-5 py-4">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-xs font-semibold text-slate-100">Explore other report paths</p>
                 <span className="rounded-full border border-slate-700 px-2 py-0.5 text-[10px] uppercase tracking-[0.2em] text-slate-400">
                   {pageLinks.length}
                 </span>
-              </summary>
-              <nav aria-label="Report paths" className="mt-3">
+              </div>
+              <nav aria-label="Report paths">
                 <ul className="grid gap-3 md:grid-cols-3">
                   {pageLinks.map((link) => {
                     const isActive = link.label === pageTitle;
@@ -316,7 +292,7 @@ export const ReportShell = ({
                             <span className="weather-icon-chip text-slate-100">{icon}</span>
                             <span>{link.label}</span>
                           </span>
-                          <span className="text-[11px] normal-case tracking-normal text-slate-300">
+                          <span className="text-xs normal-case tracking-normal text-slate-300">
                             {link.description}
                           </span>
                         </a>
@@ -325,7 +301,7 @@ export const ReportShell = ({
                   })}
                 </ul>
               </nav>
-            </details>
+            </section>
           </div>
           {historicalBanner}
         </header>

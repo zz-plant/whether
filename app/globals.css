@@ -183,6 +183,10 @@ summary:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
   .display-drift {
     transform: none;
     animation: none;
