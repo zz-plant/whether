@@ -148,10 +148,8 @@ export const ReportShell = ({
                 </p>
               </div>
               <div className="max-w-2xl space-y-2 border-l border-slate-800/80 pl-4">
-                <p className="text-[10px] uppercase tracking-[0.3em] text-slate-500">You're reading</p>
-                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-100">
-                  {pageTitle}
-                </p>
+                <p className="text-xs font-semibold text-slate-400">You&rsquo;re reading</p>
+                <p className="text-base font-semibold text-slate-100">{pageTitle}</p>
                 <p className="text-sm text-slate-400">{pageSummary}</p>
               </div>
             </div>
@@ -160,9 +158,7 @@ export const ReportShell = ({
             <div className="weather-panel flex flex-col gap-4 px-5 py-4">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="space-y-2">
-                  <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">
-                    Current operating climate
-                  </p>
+                  <p className="text-xs font-semibold text-slate-400">Current operating climate</p>
                   <span className="text-3xl font-semibold tracking-tight text-slate-100">
                     {statusLabel}
                   </span>
@@ -199,98 +195,37 @@ export const ReportShell = ({
               <div className="flex flex-wrap gap-3">
                 <a
                   href="#weekly-action-summary"
-                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.2em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                 >
                   Start with this week
                 </a>
                 <a
                   href="#executive-snapshot"
-                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                  className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.18em] text-slate-300 underline decoration-slate-600 underline-offset-4 hover:text-slate-100 touch-manipulation"
                 >
                   See leadership summary
                 </a>
               </div>
             </div>
             <div className={`weather-panel flex flex-col gap-4 px-5 py-4 ${trustToneStyles}`}>
-              <p className={`text-[10px] uppercase tracking-[0.3em] ${trustLabelTone}`}>
-                Confidence in the signals
-              </p>
+              <p className={`text-xs font-semibold ${trustLabelTone}`}>Confidence in the signals</p>
               <div className="space-y-2 text-sm">
-                <p className="font-semibold uppercase tracking-[0.2em]">{trustStatusLabel}</p>
+                <p className="font-semibold">{trustStatusLabel}</p>
                 <p className="text-xs text-slate-200/90">{trustStatusDetail}</p>
                 <p className="text-[11px] text-slate-200/90">{trustStatusAction}</p>
               </div>
             </div>
           </div>
-          <div className="weather-panel px-5 py-4">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400">Data timestamps</p>
-            <p className="mt-3 text-sm font-semibold uppercase tracking-[0.2em] text-slate-100">
-              Proof the data is current
-            </p>
-            <dl className="mt-4 space-y-3 text-sm text-slate-300">
-              <div className="flex items-center justify-between gap-3">
-                <dt className="text-slate-400">Record date</dt>
-                <dd className="mono text-slate-100">{recordDateLabel}</dd>
-              </div>
-              <div className="flex items-center justify-between gap-3">
-                <dt className="text-slate-400">Fetched at</dt>
-                <dd className="mono text-slate-100">{fetchedAtLabel}</dd>
-              </div>
-              <div className="flex items-center justify-between gap-3">
-                <dt className="text-slate-400">Source</dt>
-                <dd>
-                  <a
-                    href={treasurySource}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="touch-target inline-flex min-h-[44px] items-center text-xs text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100 touch-manipulation"
-                  >
-                    US Treasury Fiscal Data API
-                  </a>
-                </dd>
-              </div>
-            </dl>
-          </div>
-          <nav aria-label="Report pages" className="space-y-3">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-slate-500">Report paths</p>
-            <ul className="grid gap-3 md:grid-cols-3">
-              {pageLinks.map((link) => {
-                const isActive = link.label === pageTitle;
-                const icon = pageLinkIcons[link.label];
-                return (
-                  <li key={link.href}>
-                    <a
-                      href={link.href}
-                      aria-current={isActive ? "page" : undefined}
-                      className={`weather-tile flex min-h-[96px] flex-col gap-3 px-4 py-3 text-left text-xs uppercase tracking-[0.2em] transition-colors touch-manipulation ${
-                        isActive
-                          ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
-                          : "text-slate-300 hover:border-sky-300/70 hover:text-slate-100"
-                      }`}
-                    >
-                      <span className="flex items-center gap-3">
-                        <span className="weather-icon-chip text-slate-100">{icon}</span>
-                        <span>{link.label}</span>
-                      </span>
-                      <span className="text-[11px] normal-case tracking-normal text-slate-300">
-                        {link.description}
-                      </span>
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
           {sectionLinks.length > 0 ? (
             <nav aria-label="Report sections" className="space-y-3">
-              <p className="text-[10px] uppercase tracking-[0.3em] text-slate-500">Jump to</p>
+              <p className="text-xs font-semibold text-slate-500">Jump to</p>
               <div className="flex flex-wrap gap-3">
                 <ul className="flex flex-wrap gap-3">
                   {primarySectionLinks.map((item) => (
                     <li key={item.href}>
                       <a
                         href={item.href}
-                        className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-[11px] uppercase tracking-[0.25em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                        className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-[11px] font-semibold tracking-[0.2em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                       >
                         {item.label}
                       </a>
@@ -299,7 +234,7 @@ export const ReportShell = ({
                 </ul>
                 {secondarySectionLinks.length > 0 ? (
                   <details className="group">
-                    <summary className="weather-pill inline-flex min-h-[44px] cursor-pointer items-center gap-2 px-4 py-2 text-[11px] uppercase tracking-[0.25em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation">
+                    <summary className="weather-pill inline-flex min-h-[44px] cursor-pointer items-center gap-2 px-4 py-2 text-[11px] font-semibold tracking-[0.2em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation">
                       More detail
                       <span className="rounded-full border border-slate-700 px-2 py-0.5 text-[10px] uppercase tracking-[0.2em] text-slate-400">
                         {secondarySectionLinks.length}
@@ -310,7 +245,7 @@ export const ReportShell = ({
                         <li key={item.href}>
                           <a
                             href={item.href}
-                            className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-[11px] uppercase tracking-[0.25em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                            className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-[11px] font-semibold tracking-[0.2em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                           >
                             {item.label}
                           </a>
@@ -322,6 +257,76 @@ export const ReportShell = ({
               </div>
             </nav>
           ) : null}
+          <div className="grid gap-4 lg:grid-cols-2">
+            <details className="group">
+              <summary className="weather-pill inline-flex min-h-[44px] cursor-pointer items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation">
+                Data timestamps
+              </summary>
+              <div className="weather-panel mt-3 px-5 py-4">
+                <p className="text-xs font-semibold text-slate-100">Proof the data is current</p>
+                <dl className="mt-4 space-y-3 text-sm text-slate-300">
+                  <div className="flex items-center justify-between gap-3">
+                    <dt className="text-slate-400">Record date</dt>
+                    <dd className="mono text-slate-100">{recordDateLabel}</dd>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <dt className="text-slate-400">Fetched at</dt>
+                    <dd className="mono text-slate-100">{fetchedAtLabel}</dd>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <dt className="text-slate-400">Source</dt>
+                    <dd>
+                      <a
+                        href={treasurySource}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="touch-target inline-flex min-h-[44px] items-center text-xs text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100 touch-manipulation"
+                      >
+                        US Treasury Fiscal Data API
+                      </a>
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+            </details>
+            <details className="group">
+              <summary className="weather-pill inline-flex min-h-[44px] cursor-pointer items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation">
+                Explore other report paths
+                <span className="rounded-full border border-slate-700 px-2 py-0.5 text-[10px] uppercase tracking-[0.2em] text-slate-400">
+                  {pageLinks.length}
+                </span>
+              </summary>
+              <nav aria-label="Report paths" className="mt-3">
+                <ul className="grid gap-3 md:grid-cols-3">
+                  {pageLinks.map((link) => {
+                    const isActive = link.label === pageTitle;
+                    const icon = pageLinkIcons[link.label];
+                    return (
+                      <li key={link.href}>
+                        <a
+                          href={link.href}
+                          aria-current={isActive ? "page" : undefined}
+                          className={`weather-tile flex min-h-[96px] flex-col gap-3 px-4 py-3 text-left text-xs uppercase tracking-[0.2em] transition-colors touch-manipulation ${
+                            isActive
+                              ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
+                              : "text-slate-300 hover:border-sky-300/70 hover:text-slate-100"
+                          }`}
+                        >
+                          <span className="flex items-center gap-3">
+                            <span className="weather-icon-chip text-slate-100">{icon}</span>
+                            <span>{link.label}</span>
+                          </span>
+                          <span className="text-[11px] normal-case tracking-normal text-slate-300">
+                            {link.description}
+                          </span>
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </nav>
+            </details>
+          </div>
           {historicalBanner}
         </header>
 
