@@ -100,8 +100,8 @@ type DecisionMemoryEntryCardProps = {
   copyTarget: string | null;
   onCopy: (text: string, label: string) => void;
   onCopyLink: (entry: DecisionMemoryEntry) => void;
-  onAttach: (entry: DecisionMemoryEntry) => void;
-  onFocus: (entryId: string) => void;
+  attachHref: string;
+  focusHref: string;
 };
 
 const DecisionMemoryEntryCard = ({
@@ -111,8 +111,8 @@ const DecisionMemoryEntryCard = ({
   copyTarget,
   onCopy,
   onCopyLink,
-  onAttach,
-  onFocus,
+  attachHref,
+  focusHref,
 }: DecisionMemoryEntryCardProps) => {
   const snapshotText = buildSnapshotText(entry);
   const textTarget = `text-${entry.id}`;
@@ -151,20 +151,18 @@ const DecisionMemoryEntryCard = ({
         >
           {isCopying && copyTarget === linkTarget ? "Copying" : "Copy snapshot link"}
         </button>
-        <button
-          type="button"
-          onClick={() => onAttach(entry)}
+        <a
+          href={attachHref}
           className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
         >
           Attach to URL
-        </button>
-        <button
-          type="button"
-          onClick={() => onFocus(entry.id)}
+        </a>
+        <a
+          href={focusHref}
           className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-slate-500/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-200 touch-manipulation"
         >
           Focus entry
-        </button>
+        </a>
       </div>
     </div>
   );
@@ -317,19 +315,6 @@ export const DecisionMemoryPanel = ({
     router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
   };
 
-  const handleAttachSnapshot = (entry: DecisionMemoryEntry) => {
-    const nextParams = new URLSearchParams(searchParams.toString());
-    nextParams.set("decisionSnapshot", JSON.stringify(entry));
-    nextParams.set("decisionId", entry.id);
-    router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
-  };
-
-  const handleClearSnapshot = () => {
-    const nextParams = new URLSearchParams(searchParams.toString());
-    nextParams.delete("decisionSnapshot");
-    router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
-  };
-
   const handleCopy = async (text: string, label: string) => {
     if (isCopying) {
       return;
@@ -359,12 +344,6 @@ export const DecisionMemoryPanel = ({
     nextParams.set("decisionId", entry.id);
     const link = `${window.location.origin}${pathname}?${nextParams.toString()}`;
     handleCopy(link, `link-${entry.id}`);
-  };
-
-  const handleFocusEntry = (entryId: string) => {
-    const nextParams = new URLSearchParams(searchParams.toString());
-    nextParams.set("decisionId", entryId);
-    router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
   };
 
   const handleSnapshotSave = () => {
@@ -414,6 +393,17 @@ export const DecisionMemoryPanel = ({
     router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
   };
 
+  const buildDecisionHref = (mutateParams: (params: URLSearchParams) => void) => {
+    const nextParams = new URLSearchParams(searchParams.toString());
+    mutateParams(nextParams);
+    const queryString = nextParams.toString();
+    return queryString ? `${pathname}?${queryString}` : pathname;
+  };
+
+  const clearSnapshotHref = buildDecisionHref((params) => {
+    params.delete("decisionSnapshot");
+  });
+
   return (
     <section id="decision-memory" aria-labelledby="decision-memory-title" className="mt-10">
       <div className="weather-panel p-6">
@@ -453,13 +443,12 @@ export const DecisionMemoryPanel = ({
               >
                 Save to memory
               </button>
-              <button
-                type="button"
-                onClick={handleClearSnapshot}
+              <a
+                href={clearSnapshotHref}
                 className="weather-pill inline-flex min-h-[44px] items-center justify-center border border-slate-700/60 px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-slate-500/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-200 touch-manipulation"
               >
                 Clear snapshot link
-              </button>
+              </a>
             </div>
           </div>
         ) : null}
@@ -572,8 +561,13 @@ export const DecisionMemoryPanel = ({
                   copyTarget={copyTarget}
                   onCopy={handleCopy}
                   onCopyLink={handleCopySnapshotLink}
-                  onAttach={handleAttachSnapshot}
-                  onFocus={handleFocusEntry}
+                  attachHref={buildDecisionHref((params) => {
+                    params.set("decisionSnapshot", JSON.stringify(entry));
+                    params.set("decisionId", entry.id);
+                  })}
+                  focusHref={buildDecisionHref((params) => {
+                    params.set("decisionId", entry.id);
+                  })}
                 />
               ))
             )}

@@ -2552,7 +2552,7 @@ export const InsightDatabasePanel = ({
             <p className="mt-3 text-sm text-slate-300">{fossilRecord.description}</p>
           </div>
         </div>
-        <div className="mt-6 overflow-x-auto">
+        <div className="mt-6 overflow-x-auto overscroll-contain">
           <table className="min-w-full text-left text-sm text-slate-300">
             <thead className="text-xs font-semibold tracking-[0.12em] text-slate-400">
               <tr>

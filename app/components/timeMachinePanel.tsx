@@ -210,30 +210,30 @@ export const TimeMachinePanel = ({
     router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
   };
 
-  const handleClearDraft = () => {
-    setErrorMessage(null);
+  const clearDraftHref = useMemo(() => {
     const nextParams = new URLSearchParams(searchParams.toString());
     nextParams.delete("draftMonth");
     nextParams.delete("draftYear");
-    router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
-  };
+    const queryString = nextParams.toString();
+    return queryString ? `${pathname}?${queryString}` : pathname;
+  }, [pathname, searchParams]);
 
-  const handleJumpToLatest = () => {
+  const jumpToLatestHref = useMemo(() => {
     if (!latestMonthValue) {
-      return;
+      return `${pathname}?${searchParams.toString()}`;
     }
     const parsed = parseMonthInput(latestMonthValue);
     if (!parsed) {
-      return;
+      return `${pathname}?${searchParams.toString()}`;
     }
-    setErrorMessage(null);
     const nextParams = new URLSearchParams(searchParams.toString());
     nextParams.delete("draftMonth");
     nextParams.delete("draftYear");
     nextParams.set("month", String(parsed.month));
     nextParams.set("year", String(parsed.year));
-    router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
-  };
+    const queryString = nextParams.toString();
+    return queryString ? `${pathname}?${queryString}` : pathname;
+  }, [latestMonthValue, pathname, searchParams]);
 
   return (
     <section id="time-machine" aria-labelledby="time-machine-title" className="mt-10">
@@ -380,20 +380,18 @@ export const TimeMachinePanel = ({
           </button>
         </form>
         <div className="mt-3 flex flex-wrap gap-3 text-xs">
-          <button
-            type="button"
-            onClick={handleClearDraft}
+          <a
+            href={clearDraftHref}
             className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-slate-500/70 hover:text-slate-100 touch-manipulation"
           >
             Clear draft
-          </button>
-          <button
-            type="button"
-            onClick={handleJumpToLatest}
+          </a>
+          <a
+            href={jumpToLatestHref}
             className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
           >
             Jump to latest
-          </button>
+          </a>
         </div>
         <div className="mt-4 min-h-[20px]">
           {statusMessages.length > 0 ? (
