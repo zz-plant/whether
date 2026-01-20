@@ -5,6 +5,7 @@
 export type DataProvenance = {
   sourceLabel: string;
   sourceUrl?: string;
+  recordDateLabel: string;
   timestampLabel: string;
   ageLabel: string;
   statusLabel: string;
@@ -43,6 +44,10 @@ export const DataProvenanceStrip = ({
         ) : (
           <span className="text-slate-200">{provenance.sourceLabel}</span>
         )}
+      </span>
+      <span className="h-1 w-1 rounded-full bg-slate-700" aria-hidden="true" />
+      <span>
+        Record date: <span className="mono text-slate-200">{provenance.recordDateLabel}</span>
       </span>
       <span className="h-1 w-1 rounded-full bg-slate-700" aria-hidden="true" />
       <span>

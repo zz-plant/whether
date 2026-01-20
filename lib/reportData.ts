@@ -152,15 +152,18 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
   const treasuryProvenance = {
     sourceLabel: "US Treasury Fiscal Data API",
     sourceUrl: treasury.source,
+    recordDateLabel,
     timestampLabel: fetchedAtLabel,
     ageLabel: treasuryAgeLabel,
     statusLabel: confidenceLabel,
   };
   const macroTimestamp = macroSeries[0]?.fetched_at ?? treasury.fetched_at;
+  const macroRecordDate = macroSeries[0]?.record_date ?? treasury.record_date;
   const macroAgeLabel = formatAgeLabel(macroTimestamp, now);
   const macroProvenance = {
     sourceLabel: "FRED & US Treasury",
     sourceUrl: macroSeries[0]?.sourceUrl,
+    recordDateLabel: formatDateValue(macroRecordDate),
     timestampLabel: formatTimestampValue(macroTimestamp),
     ageLabel: macroAgeLabel,
     statusLabel: historicalSelection
@@ -171,6 +174,7 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
   };
   const internalProvenance = {
     sourceLabel: "Whether internal backlog",
+    recordDateLabel: "Static",
     timestampLabel: "Static catalog",
     ageLabel: "Static.",
     statusLabel: "Simulated (low)",

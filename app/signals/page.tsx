@@ -90,6 +90,7 @@ export default async function SignalsPage({
       trustStatusDetail={trustStatusDetail}
       trustStatusAction={trustStatusAction}
       trustStatusTone={trustStatusTone}
+      showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Why we believe this"
       pageSummary="Deep-dive into the live signal layer, the macro data sources, and how thresholds shape the market climate classification."
       pageLinks={pageLinks}

@@ -91,6 +91,11 @@ export default async function OperationsPage({
     : isFallback
       ? treasury.fallback_reason ?? "Using cached Treasury snapshot due to upstream outage."
       : "Treasury API responding normally; live signals verified.";
+  const trustStatusAction = historicalSelection
+    ? "Use historical data for retrospectives; avoid approving new bets until live signals return."
+    : isFallback
+      ? "Hold irreversible decisions until live signals return or you validate the cache."
+      : "Signals are live; use them to confirm playbook moves and decision shields.";
   const trustStatusTone = historicalSelection ? "historical" : isFallback ? "warning" : "stable";
 
   return (
@@ -101,7 +106,9 @@ export default async function OperationsPage({
       treasurySource={treasury.source}
       trustStatusLabel={trustStatusLabel}
       trustStatusDetail={trustStatusDetail}
+      trustStatusAction={trustStatusAction}
       trustStatusTone={trustStatusTone}
+      showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="What to do next"
       pageSummary="Translate the market climate into action: decision shields, playbook moves, and export-ready briefs for leadership review."
       pageLinks={pageLinks}
