@@ -148,6 +148,18 @@ export const TimeMachinePanel = ({
   const selectedLabel = `${requestedMonthLabel} ${year}`;
   const showHistoricalCallout = isHistorical && historicalSummary;
   const showComparison = Boolean(isHistorical && comparison);
+  const statusMessages = [
+    errorMessage
+      ? { key: "error", message: errorMessage, includeId: true }
+      : null,
+    invalidSelection
+      ? {
+          key: "invalid",
+          message: "That month is not available in the cache. Showing the latest data instead.",
+          includeId: false,
+        }
+      : null,
+  ].filter((item): item is { key: string; message: string; includeId: boolean } => Boolean(item));
   const coverageMin = cacheCoverage.earliest ? formatMonthInput(cacheCoverage.earliest) : undefined;
   const coverageMax = cacheCoverage.latest ? formatMonthInput(cacheCoverage.latest) : undefined;
 
@@ -311,7 +323,7 @@ export const TimeMachinePanel = ({
         <form onSubmit={handleSubmit} className="mt-6 grid gap-4 md:grid-cols-[1fr,auto]">
           <label
             htmlFor="time-machine-month"
-            className="space-y-2 text-xs uppercase tracking-[0.2em] text-slate-400"
+            className="space-y-2 text-xs uppercase tracking-[0.2em] text-slate-300"
           >
             Month
             <input
@@ -342,22 +354,17 @@ export const TimeMachinePanel = ({
           </button>
         </form>
         <div className="mt-4 min-h-[20px]">
-          {errorMessage ? (
-            <p
-              id={errorId}
-              className="text-xs text-amber-200"
+          {statusMessages.length > 0 ? (
+            <div
+              id={statusMessages.some((message) => message.includeId) ? errorId : undefined}
+              className="space-y-2 text-xs text-amber-200"
               role="status"
               aria-live="polite"
             >
-              {errorMessage}
-            </p>
-          ) : null}
-        </div>
-        <div className="mt-4 min-h-[20px]">
-          {invalidSelection ? (
-            <p className="text-xs text-amber-200" role="status" aria-live="polite">
-              That month is not available in the cache. Showing the latest data instead.
-            </p>
+              {statusMessages.map((message) => (
+                <p key={message.key}>{message.message}</p>
+              ))}
+            </div>
           ) : null}
         </div>
         {isDraft ? (
