@@ -122,7 +122,7 @@ export const ReportShell = ({
     <main
       id="main-content"
       tabIndex={-1}
-      className="weather-shell display-drift relative min-h-screen overflow-hidden text-slate-100"
+      className="weather-shell relative min-h-screen overflow-hidden text-slate-100"
     >
       {structuredData ? (
         <script
@@ -162,7 +162,7 @@ export const ReportShell = ({
                   </span>
                   <p className="text-xs text-slate-300">Signals stamped {recordDateLabel}</p>
                 </div>
-                <div className={`rounded-lg border px-3 py-2 text-xs uppercase tracking-[0.2em] ${trustToneStyles}`}>
+                <div className={`rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.12em] ${trustToneStyles}`}>
                   {trustStatusLabel}
                 </div>
               </div>
@@ -171,7 +171,7 @@ export const ReportShell = ({
                 label as a neutral, external anchor in planning conversations.
               </p>
               <details className="group">
-                <summary className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 text-xs uppercase tracking-[0.2em] text-slate-300 transition-colors hover:text-slate-100 touch-manipulation">
+                <summary className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:text-slate-100 touch-manipulation">
                   <span>How to interpret this week</span>
                   <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-300 transition-transform duration-200 group-open:rotate-180">
                     <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
@@ -211,7 +211,7 @@ export const ReportShell = ({
                 </a>
                 <a
                   href="#executive-snapshot"
-                  className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.18em] text-slate-300 underline decoration-slate-600 underline-offset-4 hover:text-slate-100 touch-manipulation"
+                  className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-slate-200 underline decoration-slate-400 underline-offset-4 hover:text-slate-100 touch-manipulation"
                 >
                   See leadership summary
                 </a>
@@ -235,7 +235,7 @@ export const ReportShell = ({
                     <li key={item.href}>
                       <a
                         href={item.href}
-                        className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                        className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                       >
                         {item.label}
                       </a>
@@ -247,7 +247,7 @@ export const ReportShell = ({
           ) : null}
           <div className="grid gap-4 lg:grid-cols-2">
             <details className="group">
-              <summary className="weather-pill inline-flex min-h-[44px] cursor-pointer items-center gap-2 px-4 py-2 text-xs font-semibold text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation">
+              <summary className="weather-pill-muted inline-flex min-h-[44px] cursor-pointer items-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.1em] transition-colors hover:border-slate-500/80 hover:text-slate-100 touch-manipulation">
                 Data timestamps
                 <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-300 transition-transform duration-200 group-open:rotate-180">
                   <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
@@ -280,7 +280,7 @@ export const ReportShell = ({
                         href={treasurySource}
                         target="_blank"
                         rel="noreferrer"
-                        className="touch-target inline-flex min-h-[44px] items-center text-xs text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100 touch-manipulation"
+                        className="touch-target inline-flex min-h-[44px] items-center text-xs text-slate-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 touch-manipulation"
                       >
                         US Treasury Fiscal Data API
                       </a>
@@ -292,7 +292,7 @@ export const ReportShell = ({
             <section className="weather-panel flex flex-col gap-3 px-5 py-4">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-xs font-semibold text-slate-100">Explore other report paths</p>
-                <span className="rounded-full border border-slate-700 px-2 py-0.5 text-[10px] uppercase tracking-[0.2em] text-slate-400">
+                <span className="rounded-full border border-slate-700 px-2 py-0.5 text-xs font-semibold tracking-[0.12em] text-slate-300">
                   {pageLinks.length}
                 </span>
               </div>
@@ -303,23 +303,23 @@ export const ReportShell = ({
                     const icon = pageLinkIcons[link.label];
                     return (
                       <li key={link.href}>
-                        <a
-                          href={link.href}
-                          aria-current={isActive ? "page" : undefined}
-                          className={`weather-tile flex min-h-[96px] flex-col gap-3 px-4 py-3 text-left text-xs uppercase tracking-[0.2em] transition-colors touch-manipulation ${
-                            isActive
-                              ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
-                              : "text-slate-300 hover:border-sky-300/70 hover:text-slate-100"
-                          }`}
-                        >
-                          <span className="flex items-center gap-3">
-                            <span className="weather-icon-chip text-slate-100">{icon}</span>
-                            <span>{link.label}</span>
-                          </span>
-                          <span className="text-xs normal-case tracking-normal text-slate-300">
-                            {link.description}
-                          </span>
-                        </a>
+                      <a
+                        href={link.href}
+                        aria-current={isActive ? "page" : undefined}
+                        className={`weather-tile flex min-h-[84px] flex-col gap-3 px-4 py-3 text-left text-sm font-semibold tracking-[0.08em] transition-colors touch-manipulation ${
+                          isActive
+                            ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
+                            : "text-slate-300 hover:border-sky-300/70 hover:text-slate-100"
+                        }`}
+                      >
+                        <span className="flex items-center gap-3">
+                          <span className="weather-icon-chip text-slate-100">{icon}</span>
+                          <span>{link.label}</span>
+                        </span>
+                        <span className="text-xs font-normal tracking-normal text-slate-300">
+                          {link.description}
+                        </span>
+                      </a>
                       </li>
                     );
                   })}
@@ -332,7 +332,7 @@ export const ReportShell = ({
 
         {children}
 
-        <footer className="mt-12 border-t border-slate-800/70 pt-6 text-xs uppercase tracking-[0.3em] text-slate-500">
+        <footer className="mt-12 border-t border-slate-800/70 pt-6 text-xs font-semibold tracking-[0.18em] text-slate-400">
           Not Financial Advice.
         </footer>
       </div>

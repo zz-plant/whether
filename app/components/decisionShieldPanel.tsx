@@ -393,7 +393,7 @@ export const DecisionShieldPanel = ({
               onClick={handleCopy}
               disabled={isCopying}
               aria-busy={isCopying}
-              className="weather-pill inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+              className="weather-pill inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
             >
               {isCopying ? (
                 <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />
@@ -405,7 +405,7 @@ export const DecisionShieldPanel = ({
               onClick={handleCopyLink}
               disabled={isCopying}
               aria-busy={isCopying}
-              className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+              className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
             >
               {linkCopied ? "Link copied" : isCopying ? "Copying" : "Copy link"}
             </button>
@@ -427,7 +427,7 @@ export const DecisionShieldPanel = ({
         <div className="mt-4 min-h-[260px]">
           {copyError ? (
             <div className="rounded-xl border border-amber-400/40 bg-amber-500/10 p-4 text-xs text-amber-100">
-              <p className="text-[10px] uppercase tracking-[0.2em] text-amber-200">
+              <p className="text-xs font-semibold tracking-[0.12em] text-amber-200">
                 Clipboard blocked
               </p>
               <p className="mt-2 text-amber-100/90">
@@ -523,7 +523,7 @@ export const DecisionShieldPanel = ({
               <p className="text-xs text-slate-500">Max 8 presets</p>
             </div>
             <div className="mt-4 flex flex-wrap items-start gap-3">
-              <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.2em] text-slate-400">
+              <label className="flex flex-col gap-2 text-xs font-semibold tracking-[0.12em] text-slate-400">
                 Preset name
                 <input
                   ref={presetInputRef}
@@ -539,7 +539,7 @@ export const DecisionShieldPanel = ({
               <button
                 type="button"
                 onClick={handlePresetSave}
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
               >
                 Save preset
               </button>
@@ -562,7 +562,7 @@ export const DecisionShieldPanel = ({
               ) : (
                 presets.map((preset) => (
                   <div key={preset.id} className="rounded-lg border border-slate-800/60 p-3">
-                    <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                    <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                       {preset.name}
                     </p>
                     <p className="mt-2 text-sm text-slate-200">
@@ -574,14 +574,14 @@ export const DecisionShieldPanel = ({
                       <button
                         type="button"
                         onClick={() => handlePresetApply(preset.id)}
-                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                       >
                         Apply
                       </button>
                       <button
                         type="button"
                         onClick={() => handlePresetDelete(preset.id)}
-                        className="weather-pill inline-flex min-h-[44px] items-center justify-center border border-rose-400/40 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-rose-200 transition-colors hover:border-rose-300/70 hover:text-rose-100 touch-manipulation"
+                        className="weather-pill inline-flex min-h-[44px] items-center justify-center border border-rose-400/40 px-3 py-1 text-xs font-semibold tracking-[0.12em] text-rose-200 transition-colors hover:border-rose-300/70 hover:text-rose-100 touch-manipulation"
                       >
                         Remove
                       </button>
@@ -596,7 +596,7 @@ export const DecisionShieldPanel = ({
             <div className="weather-surface p-4">
               <p className="type-label text-slate-400">Verdict</p>
               <div
-                className={`mt-3 inline-flex items-center rounded-full border px-3 py-1 text-xs uppercase tracking-[0.2em] ${verdictStyles[output.verdict]}`}
+                className={`mt-3 inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] ${verdictStyles[output.verdict]}`}
               >
                 {output.verdict}
               </div>

@@ -358,7 +358,7 @@ export const DecisionMemoryPanel = ({
 
         {attachedSnapshot ? (
           <div className="mt-6 rounded-2xl border border-sky-500/40 bg-sky-500/10 p-4 text-sm text-slate-100">
-            <p className="text-xs uppercase tracking-[0.2em] text-sky-200">
+            <p className="text-xs font-semibold tracking-[0.12em] text-sky-200">
               Attached snapshot
             </p>
             <p className="mt-2 text-sm text-slate-100">
@@ -372,14 +372,14 @@ export const DecisionMemoryPanel = ({
               <button
                 type="button"
                 onClick={handleSnapshotSave}
-                className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
+                className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
               >
                 Save to memory
               </button>
               <button
                 type="button"
                 onClick={handleClearSnapshot}
-                className="weather-pill inline-flex min-h-[44px] items-center justify-center border border-slate-700/60 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-300 transition-colors hover:border-slate-500/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-200 touch-manipulation"
+                className="weather-pill inline-flex min-h-[44px] items-center justify-center border border-slate-700/60 px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-slate-500/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-200 touch-manipulation"
               >
                 Clear snapshot link
               </button>
@@ -392,7 +392,7 @@ export const DecisionMemoryPanel = ({
             <p className="type-label text-slate-400">Log a decision</p>
             <div className="mt-4 grid gap-4">
               <div>
-                <label htmlFor="decision-title" className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                <label htmlFor="decision-title" className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                   Decision name
                 </label>
                 <input
@@ -413,7 +413,7 @@ export const DecisionMemoryPanel = ({
                 ) : null}
               </div>
               <div>
-                <label htmlFor="decision-note" className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                <label htmlFor="decision-note" className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                   Notes (optional)
                 </label>
                 <textarea
@@ -427,7 +427,7 @@ export const DecisionMemoryPanel = ({
               <button
                 type="button"
                 onClick={handleLogDecision}
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
               >
                 Log decision
               </button>
@@ -460,21 +460,21 @@ export const DecisionMemoryPanel = ({
               <button
                 type="button"
                 onClick={handleExportJson}
-                className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
               >
                 Export JSON
               </button>
               <button
                 type="button"
                 onClick={handleExportCsv}
-                className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
               >
                 Export CSV
               </button>
               <button
                 type="button"
                 onClick={handleClearLog}
-                className="weather-pill inline-flex min-h-[44px] items-center justify-center border border-rose-400/40 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-rose-200 transition-colors hover:border-rose-300/70 hover:text-rose-100 touch-manipulation"
+                className="weather-pill inline-flex min-h-[44px] items-center justify-center border border-rose-400/40 px-3 py-1 text-xs font-semibold tracking-[0.12em] text-rose-200 transition-colors hover:border-rose-300/70 hover:text-rose-100 touch-manipulation"
               >
                 Clear log
               </button>
@@ -498,7 +498,7 @@ export const DecisionMemoryPanel = ({
                         : "border-slate-800/60 bg-slate-950/60"
                     }`}
                   >
-                    <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                    <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                       {entry.title}
                     </p>
                     <p className="mt-2 text-sm text-slate-200">
@@ -516,7 +516,7 @@ export const DecisionMemoryPanel = ({
                         onClick={() => handleCopy(snapshotText, `text-${entry.id}`)}
                         disabled={isCopying}
                         aria-busy={isCopying && copyTarget === `text-${entry.id}`}
-                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
+                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
                       >
                         {isCopying && copyTarget === `text-${entry.id}` ? "Copying" : "Copy snapshot"}
                       </button>
@@ -525,21 +525,21 @@ export const DecisionMemoryPanel = ({
                         onClick={() => handleCopySnapshotLink(entry)}
                         disabled={isCopying}
                         aria-busy={isCopying && copyTarget === `link-${entry.id}`}
-                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
+                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
                       >
                         {isCopying && copyTarget === `link-${entry.id}` ? "Copying" : "Copy snapshot link"}
                       </button>
                       <button
                         type="button"
                         onClick={() => handleAttachSnapshot(entry)}
-                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
+                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
                       >
                         Attach to URL
                       </button>
                       <button
                         type="button"
                         onClick={() => handleFocusEntry(entry.id)}
-                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-300 transition-colors hover:border-slate-500/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-200 touch-manipulation"
+                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-slate-500/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-200 touch-manipulation"
                       >
                         Focus entry
                       </button>
@@ -553,7 +553,7 @@ export const DecisionMemoryPanel = ({
 
         {copyError ? (
           <div className="mt-6 rounded-xl border border-amber-400/40 bg-amber-500/10 p-4 text-xs text-amber-100">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-amber-200">
+            <p className="text-xs font-semibold tracking-[0.12em] text-amber-200">
               Clipboard blocked
             </p>
             <p className="mt-2 text-amber-100/90">

@@ -58,8 +58,8 @@ const mapToPercent = (value: number, min: number, max: number) => {
   return ((clamped - min) / (max - min)) * 100;
 };
 
-const SPARKLINE_WIDTH = 120;
-const SPARKLINE_HEIGHT = 32;
+const SPARKLINE_WIDTH = 160;
+const SPARKLINE_HEIGHT = 40;
 const SPARKLINE_PADDING = 4;
 
 const buildSparkline = (history?: SeriesHistoryPoint[]) => {
@@ -124,14 +124,14 @@ const SeriesFreshnessBadge = ({
   return (
     <div className="rounded-lg border border-slate-800/70 bg-slate-950/70 px-3 py-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">{label}</p>
+        <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">{label}</p>
         <span
-          className={`inline-flex min-h-[24px] items-center rounded-full border px-2 py-1 text-[10px] uppercase tracking-[0.2em] ${statusTone}`}
+          className={`inline-flex min-h-[24px] items-center rounded-full border px-2 py-1 text-xs font-semibold tracking-[0.12em] ${statusTone}`}
         >
           {statusLabel}
         </span>
       </div>
-      <dl className="mt-2 space-y-2 text-[11px] text-slate-400">
+      <dl className="mt-2 space-y-2 text-xs text-slate-400">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <dt className="text-slate-500">Source</dt>
           <dd>
@@ -139,7 +139,7 @@ const SeriesFreshnessBadge = ({
               href={sourceUrl}
               target="_blank"
               rel="noreferrer"
-              className="touch-target inline-flex min-h-[44px] items-center text-slate-200 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+              className="touch-target inline-flex min-h-[44px] items-center text-slate-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
             >
               {sourceLabel}
             </a>
@@ -287,7 +287,7 @@ export const WeeklyActionSummaryPanel = ({
         <WeeklySummaryCard summary={weeklySummary} />
         <div className="grid gap-3 md:grid-cols-2">
           <div className="weather-surface p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
               Good product strategy sounds like
             </p>
             <ul className="mt-3 space-y-2 text-sm text-slate-300">
@@ -306,7 +306,7 @@ export const WeeklyActionSummaryPanel = ({
             </ul>
           </div>
           <div className="weather-surface p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
               Macro-driven advice sounds like
             </p>
             <ul className="mt-3 space-y-2 text-sm text-slate-300">
@@ -325,7 +325,7 @@ export const WeeklyActionSummaryPanel = ({
             </ul>
           </div>
         </div>
-        <div className="flex flex-wrap gap-3 text-xs uppercase tracking-[0.2em] text-slate-400">
+        <div className="flex flex-wrap gap-3 text-xs font-semibold tracking-[0.12em] text-slate-400">
           <span className="weather-chip inline-flex min-h-[32px] items-center px-3 py-1">
             Strategy: problem/ROI fit
           </span>
@@ -334,7 +334,7 @@ export const WeeklyActionSummaryPanel = ({
           </span>
           <a
             href="#beginner-glossary"
-            className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-[11px] uppercase tracking-[0.25em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+            className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
           >
             Open the glossary
           </a>
@@ -379,7 +379,7 @@ export const MonthlyActionSummaryPanel = ({
         <MonthlySummaryCard summary={monthlySummary} />
         <div className="grid gap-3 md:grid-cols-2">
           <div className="weather-surface p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
               Monthly leadership asks sound like
             </p>
             <ul className="mt-3 space-y-2 text-sm text-slate-300">
@@ -398,7 +398,7 @@ export const MonthlyActionSummaryPanel = ({
             </ul>
           </div>
           <div className="weather-surface p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
               Monthly constraints should force
             </p>
             <ul className="mt-3 space-y-2 text-sm text-slate-300">
@@ -503,14 +503,14 @@ export const RegimeAssessmentCard = ({
           <h2 id="regime-assessment-title" className="type-section text-slate-100">
             {regimeLabel}
           </h2>
-          <p className="mt-2 text-xs uppercase tracking-[0.2em] text-slate-400">
+          <p className="mt-2 text-xs font-semibold tracking-[0.12em] text-slate-400">
             System code: {assessment.regime}
           </p>
           <p className="mt-2 text-sm text-slate-300">
             Plain-English read: this is a macro guardrail, not a product vision change.
           </p>
         </div>
-        <div className="flex flex-col items-end gap-3 text-xs uppercase tracking-[0.2em] text-slate-300">
+        <div className="flex flex-col items-end gap-3 text-xs font-semibold tracking-[0.12em] text-slate-300">
           <span className="weather-pill flex items-center gap-2 px-3 py-1">
             <span className={`h-2 w-2 rounded-full ${regimeAccent.dot}`} />
             Climate status
@@ -525,7 +525,7 @@ export const RegimeAssessmentCard = ({
           <DataProvenanceStrip provenance={provenance} />
         </div>
       </div>
-      <div className="relative mt-4 flex flex-wrap gap-2 text-xs uppercase tracking-[0.2em]">
+      <div className="relative mt-4 flex flex-wrap gap-2 text-xs font-semibold tracking-[0.12em]">
         {regimeBadges.map((badge) => {
           const isActive = badge.key === assessment.regime;
           return (
@@ -537,7 +537,7 @@ export const RegimeAssessmentCard = ({
               aria-current={isActive ? "true" : undefined}
             >
               <span className="h-2 w-2 rounded-full bg-current" aria-hidden="true" />
-              <span className="text-[10px]">{badge.label}</span>
+              <span className="text-xs">{badge.label}</span>
             </span>
           );
         })}
@@ -548,11 +548,11 @@ export const RegimeAssessmentCard = ({
       <p className="relative mt-4 type-data text-slate-200 break-words">{assessment.description}</p>
       <div className="weather-surface relative mt-4 grid gap-3 p-4 text-xs text-slate-400 md:grid-cols-3">
         <div>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">Constraints</p>
+          <p className="text-xs font-semibold tracking-[0.12em] text-slate-500">Constraints</p>
           <p className="mt-2 text-lg font-semibold text-slate-100 tabular-nums">{constraintCount}</p>
         </div>
         <div>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">
+          <p className="text-xs font-semibold tracking-[0.12em] text-slate-500">
             Cash availability (tightness)
           </p>
           <p className="mt-2 text-lg font-semibold text-slate-100 tabular-nums">
@@ -560,7 +560,7 @@ export const RegimeAssessmentCard = ({
           </p>
         </div>
         <div>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">
+          <p className="text-xs font-semibold tracking-[0.12em] text-slate-500">
             Market risk appetite
           </p>
           <p className="mt-2 text-lg font-semibold text-slate-100 tabular-nums">
@@ -570,19 +570,19 @@ export const RegimeAssessmentCard = ({
       </div>
       <div className="weather-surface relative mt-3 grid gap-3 p-4 text-xs text-slate-400 md:grid-cols-3">
         <div>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">Cash availability</p>
+          <p className="text-xs font-semibold tracking-[0.12em] text-slate-500">Cash availability</p>
           <p className="mt-2 text-xs text-slate-400">
             Higher tightness means cash is harder to access, so prefer short payback work.
           </p>
         </div>
         <div>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">Risk appetite</p>
+          <p className="text-xs font-semibold tracking-[0.12em] text-slate-500">Risk appetite</p>
           <p className="mt-2 text-xs text-slate-400">
             Lower appetite means reduce experiments and protect core revenue.
           </p>
         </div>
         <div>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">Score guidance</p>
+          <p className="text-xs font-semibold tracking-[0.12em] text-slate-500">Score guidance</p>
           <p className="mt-2 text-xs text-slate-400">
             Treat scores above the threshold as a stronger constraint on approvals.
           </p>
@@ -596,12 +596,12 @@ export const RegimeAssessmentCard = ({
               <span className="break-words">{item}</span>
             </div>
             <details className="ml-5 rounded-xl border border-slate-800/80 bg-slate-950/40 px-3 py-2 text-xs text-slate-300">
-              <summary className="flex min-h-[44px] cursor-pointer items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-slate-400 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+              <summary className="flex min-h-[44px] cursor-pointer items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-400 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
                 Because
                 <span className="text-slate-500">(show drivers)</span>
               </summary>
               <div className="mt-2 space-y-2">
-                <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-500">
                   Driven by
                 </p>
                 <ul className="space-y-2">
@@ -611,7 +611,7 @@ export const RegimeAssessmentCard = ({
                       <span className="break-words">{driver.label}</span>
                       <a
                         href={driver.href}
-                        className="touch-target inline-flex min-h-[44px] items-center text-[10px] uppercase tracking-[0.2em] text-slate-200 underline decoration-slate-700 underline-offset-4 hover:text-slate-100 touch-manipulation"
+                        className="touch-target inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-slate-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 touch-manipulation"
                       >
                         {driver.linkLabel}
                       </a>
@@ -625,7 +625,7 @@ export const RegimeAssessmentCard = ({
       </ul>
       <div className="weather-surface relative mt-6 grid gap-4 p-4 text-xs text-slate-400 md:grid-cols-2">
         <div className="space-y-3">
-          <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.2em] text-slate-500">
+          <div className="flex items-center justify-between text-xs font-semibold tracking-[0.12em] text-slate-500">
             <span>Cash availability (tightness)</span>
             <span className="text-slate-200 tabular-nums">{assessment.scores.tightness}/100</span>
           </div>
@@ -660,7 +660,7 @@ export const RegimeAssessmentCard = ({
           <p>{assessment.tightnessExplanation}</p>
         </div>
         <div className="space-y-3">
-          <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.2em] text-slate-500">
+          <div className="flex items-center justify-between text-xs font-semibold tracking-[0.12em] text-slate-500">
             <span>Market risk appetite</span>
             <span className="text-slate-200 tabular-nums">{assessment.scores.riskAppetite}/100</span>
           </div>
@@ -697,7 +697,7 @@ export const RegimeAssessmentCard = ({
       </div>
       {hasWarnings ? (
         <div className="relative mt-6 rounded-xl border border-amber-400/40 bg-amber-500/10 p-4 text-xs text-amber-100">
-          <p className="text-[10px] uppercase tracking-[0.2em] text-amber-200">Data quality flags</p>
+          <p className="text-xs font-semibold tracking-[0.12em] text-amber-200">Data quality flags</p>
           <ul className="mt-3 space-y-2">
             {assessment.dataWarnings.map((warning) => (
               <li key={warning} className="flex gap-2">
@@ -706,7 +706,7 @@ export const RegimeAssessmentCard = ({
               </li>
             ))}
           </ul>
-          <p className="mt-3 text-[11px] text-amber-200/80">
+          <p className="mt-3 text-xs text-amber-200/80">
             Scores may be less reliable when source fields are missing.
           </p>
         </div>
@@ -737,11 +737,11 @@ export const FirstTimeGuidePanel = ({
             the deeper data lanes.
           </p>
         </div>
-        <div className="weather-surface px-4 py-3 text-xs uppercase tracking-[0.2em] text-slate-300">
-          <p className="text-[10px] text-slate-500">Current snapshot</p>
-          <p className="mt-2 text-[11px] text-slate-200">Status: {statusLabel}</p>
-          <p className="mt-1 text-[11px] text-slate-400">Record: {recordDateLabel}</p>
-          <p className="mt-1 text-[11px] text-slate-500">Fetched: {fetchedAtLabel}</p>
+        <div className="weather-surface px-4 py-3 text-xs font-semibold tracking-[0.12em] text-slate-300">
+          <p className="text-xs text-slate-500">Current snapshot</p>
+          <p className="mt-2 text-xs text-slate-200">Status: {statusLabel}</p>
+          <p className="mt-1 text-xs text-slate-400">Record: {recordDateLabel}</p>
+          <p className="mt-1 text-xs text-slate-500">Fetched: {fetchedAtLabel}</p>
         </div>
       </div>
 
@@ -770,7 +770,7 @@ export const FirstTimeGuidePanel = ({
             key={step.title}
             className="weather-surface p-4 text-sm text-slate-300"
           >
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-200">
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-200">
               {step.title}
             </p>
             <p className="mt-2 text-sm text-slate-400">{step.detail}</p>
@@ -790,7 +790,7 @@ export const FirstTimeGuidePanel = ({
           <a
             key={link.href}
             href={link.href}
-            className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-[11px] uppercase tracking-[0.25em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100"
+            className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100"
           >
             {link.label}
           </a>
@@ -818,15 +818,15 @@ export const BeginnerGlossaryPanel = () => (
             before you share the report.
           </p>
         </div>
-        <div className="weather-surface px-4 py-3 text-xs uppercase tracking-[0.2em] text-slate-300">
-          <p className="text-[10px] text-slate-500">Onboarding lens</p>
-          <p className="mt-2 text-[11px] text-slate-200">Plain English over jargon</p>
-          <p className="mt-1 text-[11px] text-slate-400">Focus on constraints</p>
+        <div className="weather-surface px-4 py-3 text-xs font-semibold tracking-[0.12em] text-slate-300">
+          <p className="text-xs text-slate-500">Onboarding lens</p>
+          <p className="mt-2 text-xs text-slate-200">Plain English over jargon</p>
+          <p className="mt-1 text-xs text-slate-400">Focus on constraints</p>
         </div>
       </div>
       <div className="mt-6 grid gap-4 lg:grid-cols-[1.15fr,0.85fr]">
         <div className="weather-surface p-4 text-sm text-slate-300">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-200">
+          <p className="text-xs font-semibold tracking-[0.12em] text-slate-200">
             How to read the report
           </p>
           <ul className="mt-3 space-y-2 text-sm text-slate-400">
@@ -845,10 +845,10 @@ export const BeginnerGlossaryPanel = () => (
           </ul>
         </div>
         <aside className="weather-surface p-4" aria-label="Glossary sidebar">
-          <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Glossary</p>
+          <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Glossary</p>
           <dl className="mt-3 space-y-3 text-sm text-slate-300">
             <div>
-              <dt className="text-xs uppercase tracking-[0.2em] text-slate-200">
+              <dt className="text-xs font-semibold tracking-[0.12em] text-slate-200">
                 Cash availability (tightness)
               </dt>
               <dd className="mt-1 text-slate-400">
@@ -858,18 +858,18 @@ export const BeginnerGlossaryPanel = () => (
               <dd className="mt-2 text-xs text-slate-500">
                 Why it matters: tight capital makes long payback projects riskier.
               </dd>
-              <dd className="mt-2 text-[11px] text-slate-400">
+              <dd className="mt-2 text-xs text-slate-400">
                 Used in:{" "}
                 <a
                   href="#executive-snapshot"
-                  className="touch-target inline-flex min-h-[44px] items-center text-[11px] text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+                  className="touch-target inline-flex min-h-[44px] items-center text-xs text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
                 >
                   Executive snapshot
                 </a>
               </dd>
             </div>
             <div>
-              <dt className="text-xs uppercase tracking-[0.2em] text-slate-200">
+              <dt className="text-xs font-semibold tracking-[0.12em] text-slate-200">
                 Market risk appetite
               </dt>
               <dd className="mt-1 text-slate-400">
@@ -879,18 +879,18 @@ export const BeginnerGlossaryPanel = () => (
               <dd className="mt-2 text-xs text-slate-500">
                 Why it matters: risk appetite sets how bold your roadmap can be.
               </dd>
-              <dd className="mt-2 text-[11px] text-slate-400">
+              <dd className="mt-2 text-xs text-slate-400">
                 Used in:{" "}
                 <a
                   href="#signal-matrix"
-                  className="touch-target inline-flex min-h-[44px] items-center text-[11px] text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+                  className="touch-target inline-flex min-h-[44px] items-center text-xs text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
                 >
                   Signal matrix
                 </a>
               </dd>
             </div>
             <div>
-              <dt className="text-xs uppercase tracking-[0.2em] text-slate-200">
+              <dt className="text-xs font-semibold tracking-[0.12em] text-slate-200">
                 Curve slope (recession risk)
               </dt>
               <dd className="mt-1 text-slate-400">
@@ -899,29 +899,29 @@ export const BeginnerGlossaryPanel = () => (
               <dd className="mt-2 text-xs text-slate-500">
                 Why it matters: an inverted curve warns against long-horizon bets.
               </dd>
-              <dd className="mt-2 text-[11px] text-slate-400">
+              <dd className="mt-2 text-xs text-slate-400">
                 Used in:{" "}
                 <a
                   href="#executive-snapshot"
-                  className="touch-target inline-flex min-h-[44px] items-center text-[11px] text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+                  className="touch-target inline-flex min-h-[44px] items-center text-xs text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
                 >
                   Executive snapshot
                 </a>
               </dd>
             </div>
             <div>
-              <dt className="text-xs uppercase tracking-[0.2em] text-slate-200">Fallback mode</dt>
+              <dt className="text-xs font-semibold tracking-[0.12em] text-slate-200">Fallback mode</dt>
               <dd className="mt-1 text-slate-400">
                 When live data is unavailable, the report uses the latest cached Treasury snapshot.
               </dd>
               <dd className="mt-2 text-xs text-slate-500">
                 Why it matters: stale inputs can mislead time-sensitive decisions.
               </dd>
-              <dd className="mt-2 text-[11px] text-slate-400">
+              <dd className="mt-2 text-xs text-slate-400">
                 Used in:{" "}
                 <a
                   href="#executive-snapshot"
-                  className="touch-target inline-flex min-h-[44px] items-center text-[11px] text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+                  className="touch-target inline-flex min-h-[44px] items-center text-xs text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
                 >
                   Executive snapshot
                 </a>
@@ -961,8 +961,8 @@ export const OperatorRequestsPanel = ({ provenance }: { provenance: DataProvenan
           className="weather-surface rounded-2xl px-4 py-4"
         >
           <div className="flex items-center justify-between gap-3">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{request.title}</p>
-            <span className="weather-pill px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-400">
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">{request.title}</p>
+            <span className="weather-pill px-2 py-1 text-xs font-semibold tracking-[0.12em] text-slate-400">
               {request.status === "DELIVERED" ? "Delivered" : "Backlog"}
             </span>
           </div>
@@ -998,7 +998,7 @@ export const CxoFunctionPanel = ({ provenance }: { provenance: DataProvenance })
           key={item.role}
           className="weather-surface rounded-2xl px-5 py-4"
         >
-          <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{item.role}</p>
+          <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">{item.role}</p>
           <p className="mt-3 text-sm text-slate-200">{item.focus}</p>
           <ul className="mt-4 space-y-2 text-sm text-slate-300">
             {item.outputs.map((output) => (
@@ -1073,7 +1073,7 @@ export const SignalMatrixPanel = ({
       >
         Signal breakdown
       </h3>
-        <div className="flex flex-col items-end gap-2 text-xs uppercase tracking-[0.2em] text-slate-500">
+        <div className="flex flex-col items-end gap-2 text-xs font-semibold tracking-[0.12em] text-slate-500">
           <span>Cash availability vs. risk appetite</span>
           <DataProvenanceStrip provenance={provenance} />
         </div>
@@ -1171,22 +1171,22 @@ export const SignalMatrixPanel = ({
             </text>
           </svg>
           <div className="pointer-events-none absolute inset-0">
-            <div className="absolute bottom-2 left-2 text-[10px] uppercase tracking-[0.2em] text-slate-500">
+            <div className="absolute bottom-2 left-2 text-xs font-semibold tracking-[0.12em] text-slate-500">
               Cautious
             </div>
-            <div className="absolute bottom-2 right-2 text-[10px] uppercase tracking-[0.2em] text-slate-500">
+            <div className="absolute bottom-2 right-2 text-xs font-semibold tracking-[0.12em] text-slate-500">
               Bold
             </div>
-            <div className="absolute left-2 top-2 -rotate-90 text-[10px] uppercase tracking-[0.2em] text-slate-500">
+            <div className="absolute left-2 top-2 -rotate-90 text-xs font-semibold tracking-[0.12em] text-slate-500">
               Tight
             </div>
-            <div className="absolute right-2 top-2 -rotate-90 text-[10px] uppercase tracking-[0.2em] text-slate-500">
+            <div className="absolute right-2 top-2 -rotate-90 text-xs font-semibold tracking-[0.12em] text-slate-500">
               Loose
             </div>
-            <div className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[10px] uppercase tracking-[0.2em] text-slate-500">
+            <div className="absolute bottom-1 left-1/2 -translate-x-1/2 text-xs font-semibold tracking-[0.12em] text-slate-500">
               Risk appetite →
             </div>
-            <div className="absolute left-1 top-1/2 -translate-y-1/2 -rotate-90 text-[10px] uppercase tracking-[0.2em] text-slate-500">
+            <div className="absolute left-1 top-1/2 -translate-y-1/2 -rotate-90 text-xs font-semibold tracking-[0.12em] text-slate-500">
               Cash tightness ↑
             </div>
           </div>
@@ -1200,7 +1200,7 @@ export const SignalMatrixPanel = ({
             <span
               id={matrixTooltipId}
               role="tooltip"
-              className="pointer-events-none absolute top-0 -translate-y-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-[11px] text-slate-200 opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+              className="pointer-events-none absolute top-0 -translate-y-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-slate-200 opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
             >
               Tightness {assessment.scores.tightness} · Risk appetite {assessment.scores.riskAppetite}
             </span>
@@ -1212,7 +1212,7 @@ export const SignalMatrixPanel = ({
                 <button
                   type="button"
                   aria-describedby={tooltipId}
-                  className="group relative weather-pill flex min-h-[44px] flex-col justify-center px-3 text-[10px] uppercase tracking-[0.2em] text-slate-300"
+                  className="group relative weather-pill flex min-h-[44px] flex-col justify-center px-3 text-xs font-semibold tracking-[0.12em] text-slate-300"
                 >
                   <span>{quadrant.label}</span>
                   <span className="mt-1 text-[9px] normal-case tracking-normal text-slate-400">
@@ -1221,7 +1221,7 @@ export const SignalMatrixPanel = ({
                   <span
                     id={tooltipId}
                     role="tooltip"
-                    className="pointer-events-none absolute z-10 mt-2 w-44 rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-[11px] text-slate-200 opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+                    className="pointer-events-none absolute z-10 mt-2 w-44 rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-slate-200 opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
                   >
                     <span className="block">{quadrant.description}</span>
                     <span className="mt-2 block text-slate-300">{quadrant.action}</span>
@@ -1323,10 +1323,10 @@ export const ExecutiveSnapshotPanel = ({
         </div>
         <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
           <div className="weather-surface p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Market climate</p>
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Market climate</p>
             <div className="mt-2 flex flex-wrap items-center gap-2">
               <span
-                className={`inline-flex min-h-[32px] items-center rounded-full border px-3 py-1 text-[10px] uppercase tracking-[0.2em] ${
+                className={`inline-flex min-h-[32px] items-center rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] ${
                   regimeBadge?.classes ?? "border-slate-600/60 bg-slate-500/10 text-slate-100"
                 }`}
               >
@@ -1344,7 +1344,7 @@ export const ExecutiveSnapshotPanel = ({
             </p>
           </div>
           <div className="weather-surface p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Data freshness</p>
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Data freshness</p>
             <p className="mono mt-2 text-sm text-slate-100">
               <time dateTime={treasury.record_date}>{treasury.record_date}</time>
             </p>
@@ -1357,8 +1357,10 @@ export const ExecutiveSnapshotPanel = ({
               Macro check: stale data can make strategy advice look stricter than it is.
             </p>
             {isFallback ? (
-              <div className="mt-3 rounded-lg border border-amber-400/30 bg-amber-500/10 p-2 text-[11px] text-amber-100">
-                <p className="uppercase tracking-[0.2em] text-amber-200">Cached fallback</p>
+              <div className="mt-3 rounded-lg border border-amber-400/30 bg-amber-500/10 p-2 text-xs text-amber-100">
+                <p className="text-xs font-semibold tracking-[0.12em] text-amber-200">
+                  Cached fallback
+                </p>
                 <p className="mt-2 text-amber-100">{fallbackReason}</p>
                 <p className="mt-2 text-amber-200/80">
                   Snapshot fetched:{" "}
@@ -1384,7 +1386,7 @@ export const ExecutiveSnapshotPanel = ({
             ) : null}
           </div>
           <div className="weather-surface p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Rate baseline</p>
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Rate baseline</p>
             <p className="mono mt-2 text-sm text-slate-100">
               {formatNumber(assessment.scores.baseRate, "%")}
             </p>
@@ -1396,7 +1398,7 @@ export const ExecutiveSnapshotPanel = ({
             </p>
           </div>
           <div className="weather-surface p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Yield curve</p>
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Yield curve</p>
             <div className="mt-3 space-y-2 text-xs text-slate-300">
               <div className="flex items-center justify-between">
                 <span className="text-slate-400">US 10Y</span>
@@ -1470,7 +1472,7 @@ export const ExecutiveSnapshotPanel = ({
                   markerEnd={`url(#${curveMarkerId})`}
                 />
               </svg>
-              <div className="mt-2 flex items-center justify-between text-[10px] uppercase tracking-[0.2em] text-slate-500">
+              <div className="mt-2 flex items-center justify-between text-xs font-semibold tracking-[0.12em] text-slate-500">
                 <span>-2%</span>
                 <span>0%</span>
                 <span>+2%</span>
@@ -1479,7 +1481,7 @@ export const ExecutiveSnapshotPanel = ({
             <p className="mt-2 text-xs text-slate-500">Slope is {curveLabel}</p>
           </div>
           <div className="weather-surface p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Scoring inputs</p>
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Scoring inputs</p>
             <ul className="mt-3 space-y-2 text-xs text-slate-300">
               {scoringInputs.map((input) => (
                 <li key={input.id} className="flex items-start justify-between gap-3">
@@ -1490,13 +1492,13 @@ export const ExecutiveSnapshotPanel = ({
                 </li>
               ))}
             </ul>
-            <p className="mt-3 text-[11px] text-slate-500">
+            <p className="mt-3 text-xs text-slate-500">
               Source:{" "}
               <a
                 href={scoringSourceUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="touch-target inline-flex min-h-[44px] items-center text-[11px] text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+                className="touch-target inline-flex min-h-[44px] items-center text-xs text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
               >
                 {scoringSource}
               </a>{" "}
@@ -1511,7 +1513,7 @@ export const ExecutiveSnapshotPanel = ({
             </p>
           </div>
           <div className="weather-surface p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">So what (1 minute)</p>
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">So what (1 minute)</p>
             <p className="mt-2 text-xs text-slate-500">
               Quick actions for teams without macro context.
             </p>
@@ -1541,7 +1543,7 @@ export const ExecutiveSnapshotPanel = ({
         </div>
         <div className="mt-5 grid gap-4 lg:grid-cols-[1.15fr,0.85fr]">
           <div className="weather-surface p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
               Executive constraints
             </p>
             <p className="mt-3 text-sm text-slate-200">
@@ -1558,15 +1560,15 @@ export const ExecutiveSnapshotPanel = ({
             </ul>
             <a
               href="#regime-assessment"
-              className="mt-4 inline-flex min-h-[44px] items-center text-xs uppercase tracking-[0.2em] text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100 touch-manipulation"
+              className="mt-4 inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 touch-manipulation"
             >
               Review full constraint set
             </a>
           </div>
           <div className="weather-surface p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Signal confidence</p>
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Signal confidence</p>
             <div
-              className={`mt-3 inline-flex min-h-[44px] items-center gap-2 rounded-full border px-3 py-1 text-[10px] uppercase tracking-[0.2em] ${confidenceTone}`}
+              className={`mt-3 inline-flex min-h-[44px] items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] ${confidenceTone}`}
             >
               <span className="h-2 w-2 rounded-full bg-current" aria-hidden="true" />
               {confidenceLabel} confidence
@@ -1586,7 +1588,7 @@ export const ExecutiveSnapshotPanel = ({
         </div>
         <div className="mt-5 grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">
           <div className="weather-surface p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
               Execution checklist
             </p>
             <p className="mt-3 text-sm text-slate-200">
@@ -1602,20 +1604,20 @@ export const ExecutiveSnapshotPanel = ({
             </ul>
           </div>
           <div className="weather-surface p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Quick actions</p>
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Quick actions</p>
             <p className="mt-3 text-sm text-slate-200">
               Pull the full signal detail or export constraints directly into your operations brief.
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
               <a
                 href="/signals#thresholds"
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
               >
                 Review thresholds
               </a>
               <a
                 href="/operations#export-briefs"
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
               >
                 Export brief
               </a>
@@ -1660,7 +1662,7 @@ export const RegimeSummaryPanel = ({
           </div>
           <div className="flex flex-col items-end gap-2">
             <span
-              className={`inline-flex min-h-[44px] items-center rounded-full border px-3 py-1 text-[10px] uppercase tracking-[0.2em] ${
+              className={`inline-flex min-h-[44px] items-center rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] ${
                 regimeBadge?.classes ?? "border-slate-600/60 bg-slate-500/10 text-slate-100"
               }`}
             >
@@ -1671,7 +1673,7 @@ export const RegimeSummaryPanel = ({
         </div>
         <div className="mt-5 grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">
           <div className="weather-surface p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">What this means</p>
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">What this means</p>
             <p className="mt-3 text-sm text-slate-200">{narrative}</p>
             <div className="mt-4 space-y-2 text-xs text-slate-400">
               <p>
@@ -1687,7 +1689,7 @@ export const RegimeSummaryPanel = ({
             </div>
           </div>
           <div className="weather-surface p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
               Operational consequences
             </p>
             <p className="mt-3 text-sm text-slate-200">
@@ -1748,7 +1750,7 @@ export const RegimeChangeAlertPanel = ({
           </div>
           <div className="flex flex-col items-end gap-3">
             <span
-              className={`weather-pill inline-flex min-h-[44px] items-center px-3 py-1 text-[10px] uppercase tracking-[0.2em] ${statusTone}`}
+              className={`weather-pill inline-flex min-h-[44px] items-center px-3 py-1 text-xs font-semibold tracking-[0.12em] ${statusTone}`}
             >
               {statusLabel}
             </span>
@@ -1787,7 +1789,7 @@ export const RegimeChangeAlertPanel = ({
               </p>
               <a
                 href="/signals#time-machine"
-                className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-xl border border-sky-500/40 bg-slate-950/70 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-xl border border-sky-500/40 bg-slate-950/70 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
               >
                 Open Time Machine
               </a>
@@ -1838,7 +1840,7 @@ export const SensorArray = ({
                     {formatNumber(sensor.value, sensor.unit)}
                   </p>
                 </div>
-                <span className="weather-pill px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-400">
+                <span className="weather-pill px-2 py-1 text-xs font-semibold tracking-[0.12em] text-slate-400">
                   {provenance.statusLabel}
                 </span>
               </div>
@@ -1882,7 +1884,7 @@ export const SensorArray = ({
                   Formula:{" "}
                   <a
                     href={sensor.formulaUrl}
-                    className="touch-target text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+                    className="touch-target text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
                   >
                     Method notes
                   </a>
@@ -1926,7 +1928,7 @@ export const MacroSignalsPanel = ({
             </p>
           </div>
           <div className="flex flex-col items-end gap-2">
-            <span className="weather-pill px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-300">
+            <span className="weather-pill px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-300">
               {provenance.statusLabel}
             </span>
             <DataProvenanceStrip provenance={provenance} />
@@ -1942,7 +1944,7 @@ export const MacroSignalsPanel = ({
                 key={signal.id}
                 className="weather-surface rounded-2xl p-4"
               >
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{signal.label}</p>
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">{signal.label}</p>
                 <p className="mono mt-3 text-2xl text-slate-100">
                   {formatNumber(signal.value, signal.unit)}
                 </p>
@@ -1986,7 +1988,7 @@ export const MacroSignalsPanel = ({
                     Formula:{" "}
                     <a
                       href={signal.formulaUrl}
-                      className="touch-target text-slate-300 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+                      className="touch-target text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
                     >
                       Method notes
                     </a>
@@ -2053,7 +2055,7 @@ export const PlaybookPanel = ({
         </div>
         <div className="mt-6 grid gap-4 lg:grid-cols-3">
           <div className="weather-surface p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Stop</p>
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Stop</p>
             <ul className="mt-3 space-y-2 text-sm text-slate-300">
               {stopItems.map((item) => (
                 <li key={item} className="break-words">
@@ -2063,7 +2065,7 @@ export const PlaybookPanel = ({
             </ul>
           </div>
           <div className="weather-surface p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Start</p>
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Start</p>
             <ul className="mt-3 space-y-2 text-sm text-slate-300">
               {startItems.map((item) => (
                 <li key={item} className="break-words">
@@ -2073,7 +2075,7 @@ export const PlaybookPanel = ({
             </ul>
           </div>
           <div className="weather-surface p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Fence</p>
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Fence</p>
             <ul className="mt-3 space-y-2 text-sm text-slate-300">
               {fenceItems.map((item) => (
                 <li key={item} className="break-words">
@@ -2086,12 +2088,12 @@ export const PlaybookPanel = ({
         {playbook ? (
           <div className="weather-surface mt-6 p-4">
             <details open>
-              <summary className="min-h-[44px] cursor-pointer text-xs uppercase tracking-[0.2em] text-slate-400 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300">
+              <summary className="min-h-[44px] cursor-pointer text-xs font-semibold tracking-[0.12em] text-slate-400 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300">
                 Leadership signals (phrases to use or avoid)
               </summary>
               <div className="mt-4 grid gap-4 md:grid-cols-2">
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.2em] text-emerald-200">
+                  <p className="text-xs font-semibold tracking-[0.12em] text-emerald-200">
                     More often
                   </p>
                   <ul className="mt-3 space-y-2 text-sm text-slate-300">
@@ -2103,7 +2105,7 @@ export const PlaybookPanel = ({
                   </ul>
                 </div>
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.2em] text-rose-200">Less often</p>
+                  <p className="text-xs font-semibold tracking-[0.12em] text-rose-200">Less often</p>
                   <ul className="mt-3 space-y-2 text-sm text-slate-300">
                     {playbook.leadershipPhrases.less.map((item) => (
                       <li key={item} className="break-words">
@@ -2155,14 +2157,14 @@ export const InsightDatabasePanel = ({
             <ul className="mt-4 space-y-3 text-sm text-slate-300">
               {(evidence?.citations ?? []).map((citation) => (
                 <li key={citation.url} className="flex flex-col gap-1">
-                  <span className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                  <span className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                     {citation.source}
                   </span>
                   <a
                     href={citation.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="touch-target text-slate-200 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+                    className="touch-target text-slate-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
                   >
                     {citation.title}
                   </a>
@@ -2178,7 +2180,7 @@ export const InsightDatabasePanel = ({
         </div>
         <div className="mt-6 overflow-x-auto">
           <table className="min-w-full text-left text-sm text-slate-300">
-            <thead className="text-xs uppercase tracking-[0.2em] text-slate-400">
+            <thead className="text-xs font-semibold tracking-[0.12em] text-slate-400">
               <tr>
                 <th className="px-3 py-2">{fossilRecord.columns.domain}</th>
                 <th className="px-3 py-2">{fossilRecord.columns.lowRateArtifact}</th>
@@ -2229,17 +2231,17 @@ export const FinanceStrategyPanel = ({
         </div>
         <div className="mt-6 grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">
           <div className="weather-surface p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Runway posture</p>
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Runway posture</p>
             <p className="mt-3 text-sm text-slate-200">{entry?.runwayPosture}</p>
             <div className="mt-4 grid gap-3 text-sm text-slate-300">
               <div>
-                <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                   Hiring throttle
                 </p>
                 <p className="mt-2">{entry?.hiringThrottle}</p>
               </div>
               <div>
-                <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                   Budget focus
                 </p>
                 <ul className="mt-2 space-y-1">
@@ -2254,7 +2256,7 @@ export const FinanceStrategyPanel = ({
             </div>
           </div>
           <div className="weather-surface p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
               Watch these signals
             </p>
             <ul className="mt-3 space-y-2 text-sm text-slate-300">
@@ -2302,13 +2304,13 @@ export const DecisionShieldTemplatesPanel = ({
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           {templates.decisions.map((decision) => (
             <div key={decision.title} className="weather-surface p-4">
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                 {decision.title}
               </p>
               <ul className="mt-4 space-y-3 text-sm text-slate-300">
                 {Object.entries(decision.stances).map(([regimeKey, stance]) => (
                   <li key={regimeKey} className="flex flex-col gap-1">
-                    <span className="text-[11px] uppercase tracking-[0.2em] text-slate-500">
+                    <span className="text-xs font-semibold tracking-[0.12em] text-slate-500">
                       {regimeKey}
                     </span>
                     <span>{stance}</span>

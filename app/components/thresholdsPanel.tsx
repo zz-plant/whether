@@ -220,7 +220,7 @@ export const ThresholdsPanel = ({
               Thresholds are URL-driven for deterministic back/forward behavior and auditability.
             </p>
           </div>
-          <div className="flex flex-col items-end gap-2 text-xs uppercase tracking-[0.2em] text-slate-400">
+          <div className="flex flex-col items-end gap-2 text-xs font-semibold tracking-[0.12em] text-slate-400">
             <span>
               Defaults: {appliedDefaults.baseRateTightness}% ·{" "}
               {appliedDefaults.tightnessRegime}/{appliedDefaults.riskAppetiteRegime}
@@ -232,7 +232,7 @@ export const ThresholdsPanel = ({
         <form onSubmit={handleSubmit} className="mt-6 grid gap-4 lg:grid-cols-[1fr,1fr,1fr,auto]">
           <label
             htmlFor="threshold-base-rate"
-            className="space-y-2 text-xs uppercase tracking-[0.2em] text-slate-400"
+            className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-400"
           >
             Base rate threshold (%)
             <input
@@ -251,7 +251,7 @@ export const ThresholdsPanel = ({
               aria-describedby={errors.baseRateTightness ? errorIds.baseRateTightness : undefined}
               className="weather-input min-h-[44px] w-full px-3 py-2 text-base"
             />
-            <span className="min-h-[18px] text-[11px] text-amber-200">
+            <span className="min-h-[18px] text-xs text-amber-200">
               {errors.baseRateTightness ? (
                 <span id={errorIds.baseRateTightness}>{errors.baseRateTightness}</span>
               ) : null}
@@ -259,7 +259,7 @@ export const ThresholdsPanel = ({
           </label>
           <label
             htmlFor="threshold-tightness"
-            className="space-y-2 text-xs uppercase tracking-[0.2em] text-slate-400"
+            className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-400"
           >
             Tightness score threshold
             <input
@@ -278,7 +278,7 @@ export const ThresholdsPanel = ({
               aria-describedby={errors.tightnessRegime ? errorIds.tightnessRegime : undefined}
               className="weather-input min-h-[44px] w-full px-3 py-2 text-base"
             />
-            <span className="min-h-[18px] text-[11px] text-amber-200">
+            <span className="min-h-[18px] text-xs text-amber-200">
               {errors.tightnessRegime ? (
                 <span id={errorIds.tightnessRegime}>{errors.tightnessRegime}</span>
               ) : null}
@@ -286,7 +286,7 @@ export const ThresholdsPanel = ({
           </label>
           <label
             htmlFor="threshold-risk"
-            className="space-y-2 text-xs uppercase tracking-[0.2em] text-slate-400"
+            className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-400"
           >
             Risk appetite score
             <input
@@ -305,7 +305,7 @@ export const ThresholdsPanel = ({
               aria-describedby={errors.riskAppetiteRegime ? errorIds.riskAppetiteRegime : undefined}
               className="weather-input min-h-[44px] w-full px-3 py-2 text-base"
             />
-            <span className="min-h-[18px] text-[11px] text-amber-200">
+            <span className="min-h-[18px] text-xs text-amber-200">
               {errors.riskAppetiteRegime ? (
                 <span id={errorIds.riskAppetiteRegime}>{errors.riskAppetiteRegime}</span>
               ) : null}
@@ -316,7 +316,7 @@ export const ThresholdsPanel = ({
               type="submit"
               disabled={isPending}
               aria-busy={isPending}
-              className="weather-button inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
+              className="weather-button inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
             >
               {isPending ? (
                 <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />
@@ -328,7 +328,7 @@ export const ThresholdsPanel = ({
               onClick={handleReset}
               disabled={isPending}
               aria-busy={isPending}
-              className="weather-button inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-400 transition-colors hover:border-sky-300/70 hover:text-slate-200 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
+              className="weather-button inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-400 transition-colors hover:border-sky-300/70 hover:text-slate-200 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
             >
               {isPending ? (
                 <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />
@@ -340,7 +340,7 @@ export const ThresholdsPanel = ({
 
         <div className="mt-6 grid gap-4 lg:grid-cols-[1.2fr,1fr]">
           <div className="weather-surface p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Applied thresholds</p>
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Applied thresholds</p>
             <div className="mt-3 space-y-2 text-sm text-slate-300">
               <p>
                 Base rate threshold:{" "}
@@ -358,14 +358,14 @@ export const ThresholdsPanel = ({
           </div>
           <div className="weather-surface p-4">
             <details open>
-              <summary className="min-h-[44px] cursor-pointer text-xs uppercase tracking-[0.2em] text-slate-400 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300">
+              <summary className="min-h-[44px] cursor-pointer text-xs font-semibold tracking-[0.12em] text-slate-400 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300">
                 Audit trail (recent overrides)
               </summary>
               {auditLog.length ? (
                 <ul className="mt-3 space-y-3 text-xs text-slate-400">
                   {auditLog.map((entry) => (
                     <li key={`${entry.timestamp}-${entry.source}`}>
-                      <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500">
+                      <p className="text-xs font-semibold tracking-[0.12em] text-slate-500">
                         {entry.source === "reset" ? "Reset" : "Override"} ·{" "}
                         {new Date(entry.timestamp).toLocaleString("en-US", {
                           timeStyle: "short",

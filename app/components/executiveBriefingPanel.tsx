@@ -114,7 +114,7 @@ export const ExecutiveBriefingPanel = ({
         <div className="mt-6 grid gap-4 lg:grid-cols-[1.3fr,0.7fr]">
           <div className="weather-surface p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                 Board-ready memo
               </p>
               <button
@@ -122,7 +122,7 @@ export const ExecutiveBriefingPanel = ({
                 onClick={() => handleCopy(executiveMemo, "Memo")}
                 disabled={isCopying}
                 aria-busy={isCopying}
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
               >
                 {isCopying && copyTarget === "Memo" ? "Copying" : "Copy memo"}
               </button>
@@ -133,7 +133,7 @@ export const ExecutiveBriefingPanel = ({
           </div>
           <div className="weather-surface p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                 Guardrail checklist
               </p>
               <button
@@ -141,7 +141,7 @@ export const ExecutiveBriefingPanel = ({
                 onClick={() => handleCopy(guardrailChecklist, "Checklist")}
                 disabled={isCopying}
                 aria-busy={isCopying}
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
               >
                 {isCopying && copyTarget === "Checklist" ? "Copying" : "Copy checklist"}
               </button>
