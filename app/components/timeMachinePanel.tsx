@@ -253,7 +253,7 @@ export const TimeMachinePanel = ({
             {isHistorical ? (
               <a
                 href="/"
-                className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
               >
                 Exit historical view
               </a>
@@ -297,14 +297,14 @@ export const TimeMachinePanel = ({
             </div>
             <div className="mt-3 grid gap-3 md:grid-cols-2">
               <div className="weather-surface rounded-lg p-3">
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Market climate</p>
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Market climate</p>
                 <p className="mt-2 text-sm text-slate-100">
                   {comparison.then.regime.toLowerCase()} →{" "}
                   {comparison.now.regime.toLowerCase()}
                 </p>
               </div>
               <div className="weather-surface rounded-lg p-3">
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Base rate</p>
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Base rate</p>
                 <p className="mt-2 text-sm text-slate-100">
                   {formatPercent(comparison.then.baseRate)} →{" "}
                   {formatPercent(comparison.now.baseRate)} (
@@ -317,7 +317,7 @@ export const TimeMachinePanel = ({
                 </p>
               </div>
               <div className="weather-surface rounded-lg p-3">
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Curve slope</p>
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Curve slope</p>
                 <p className="mt-2 text-sm text-slate-100">
                   {formatCurve(comparison.then.curveSlope)} →{" "}
                   {formatCurve(comparison.now.curveSlope)}
@@ -327,7 +327,7 @@ export const TimeMachinePanel = ({
                 </p>
               </div>
               <div className="weather-surface rounded-lg p-3">
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                   Tightness vs risk
                 </p>
                 <p className="mt-2 text-sm text-slate-100">
@@ -349,7 +349,7 @@ export const TimeMachinePanel = ({
         <form onSubmit={handleSubmit} className="mt-6 grid gap-4 md:grid-cols-[1fr,auto]">
           <label
             htmlFor="time-machine-month"
-            className="space-y-2 text-xs uppercase tracking-[0.2em] text-slate-300"
+            className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-300"
           >
             Month
             <input
@@ -371,7 +371,7 @@ export const TimeMachinePanel = ({
             type="submit"
             disabled={isPending}
             aria-busy={isPending}
-            className="weather-button inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+            className="weather-button inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
           >
             {isPending ? (
               <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />
@@ -383,14 +383,14 @@ export const TimeMachinePanel = ({
           <button
             type="button"
             onClick={handleClearDraft}
-            className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-300 transition-colors hover:border-slate-500/70 hover:text-slate-100 touch-manipulation"
+            className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-slate-500/70 hover:text-slate-100 touch-manipulation"
           >
             Clear draft
           </button>
           <button
             type="button"
             onClick={handleJumpToLatest}
-            className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+            className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
           >
             Jump to latest
           </button>

@@ -177,7 +177,7 @@ export const ExportBriefPanel = ({
             <button
               type="button"
               onClick={handlePrint}
-              className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+              className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
             >
               Print / Save PDF
             </button>
@@ -187,7 +187,7 @@ export const ExportBriefPanel = ({
 
         <div className="mt-6 grid gap-4 lg:grid-cols-[1.4fr,1fr]">
           <div className="weather-surface p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Slack-ready brief</p>
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Slack-ready brief</p>
             <p className="mt-3 text-sm text-slate-300">
               One pasteable block tuned for status updates.
             </p>
@@ -197,7 +197,7 @@ export const ExportBriefPanel = ({
                 onClick={() => handleCopy(briefing, "Slack")}
                 disabled={isCopying}
                 aria-busy={isCopying}
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
               >
                 {isCopying && copyTarget === "Slack" ? "Copying" : "Copy Slack brief"}
               </button>
@@ -209,20 +209,20 @@ export const ExportBriefPanel = ({
                     `whether-brief-${treasury.record_date}.txt`
                   )
                 }
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
               >
                 Download brief
               </button>
               <a
                 href={`mailto:?subject=${mailSubject}&body=${mailBody}`}
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
               >
                 Open email draft
               </a>
             </div>
           </div>
           <div className="weather-surface p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Slide bullets</p>
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Slide bullets</p>
             <p className="mt-3 text-sm text-slate-300">
               Compact bullets sized for quarterly planning decks.
             </p>
@@ -231,7 +231,7 @@ export const ExportBriefPanel = ({
               onClick={() => handleCopy(slideBullets, "Slides")}
               disabled={isCopying}
               aria-busy={isCopying}
-              className="weather-button mt-4 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+              className="weather-button mt-4 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
             >
               {isCopying && copyTarget === "Slides" ? "Copying" : "Copy slide bullets"}
             </button>
@@ -243,7 +243,7 @@ export const ExportBriefPanel = ({
                   `whether-slide-bullets-${treasury.record_date}.txt`
                 )
               }
-              className="weather-button mt-3 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+              className="weather-button mt-3 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
             >
               Download bullets
             </button>
@@ -251,7 +251,7 @@ export const ExportBriefPanel = ({
         </div>
         <div className="mt-4 grid gap-4 lg:grid-cols-[1.4fr,1fr]">
           <div className="weather-surface p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
               Constraint headlines
             </p>
             <p className="mt-3 text-sm text-slate-300">
@@ -262,7 +262,7 @@ export const ExportBriefPanel = ({
               onClick={() => handleCopy(constraintHeadlines, "Headlines")}
               disabled={isCopying}
               aria-busy={isCopying}
-              className="weather-button mt-4 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+              className="weather-button mt-4 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
             >
               {isCopying && copyTarget === "Headlines" ? "Copying" : "Copy constraint headlines"}
             </button>
@@ -274,13 +274,13 @@ export const ExportBriefPanel = ({
                   `whether-headlines-${treasury.record_date}.txt`
                 )
               }
-              className="weather-button mt-3 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+              className="weather-button mt-3 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
             >
               Download headlines
             </button>
           </div>
           <div className="weather-surface p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
               Headline preview
             </p>
             <p className="mt-3 text-sm text-slate-300">
@@ -297,7 +297,7 @@ export const ExportBriefPanel = ({
         <div className="mt-4 min-h-[260px]">
           {copyError ? (
             <div className="rounded-xl border border-amber-400/40 bg-amber-500/10 p-4 text-xs text-amber-100">
-              <p className="text-[10px] uppercase tracking-[0.2em] text-amber-200">
+              <p className="text-xs font-semibold tracking-[0.12em] text-amber-200">
                 Clipboard blocked
               </p>
               <p className="mt-2 text-amber-100/90">

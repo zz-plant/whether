@@ -154,7 +154,7 @@ export const CounterfactualPanel = ({
             <p className="type-label text-slate-400">Scenario sliders</p>
             <div className="mt-4 space-y-5">
               <div>
-                <label htmlFor="rate-shift" className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                <label htmlFor="rate-shift" className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                   Base rate shift (bps)
                 </label>
                 <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -187,7 +187,7 @@ export const CounterfactualPanel = ({
                 </p>
               </div>
               <div>
-                <label htmlFor="slope-shift" className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                <label htmlFor="slope-shift" className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                   Curve slope shift (bps)
                 </label>
                 <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -229,7 +229,7 @@ export const CounterfactualPanel = ({
             <p className="mt-2 text-xs text-slate-500">
               Tightness {adjustedTightness}/100 · Risk appetite {adjustedRiskAppetite}/100
             </p>
-            <p className="mt-4 text-xs uppercase tracking-[0.2em] text-slate-400">
+            <p className="mt-4 text-xs font-semibold tracking-[0.12em] text-slate-400">
               Scenario constraints
             </p>
             <ul className="mt-3 space-y-2 text-sm text-slate-300">

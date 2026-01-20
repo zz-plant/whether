@@ -99,7 +99,7 @@ export const StrategyBriefPanel = ({
               onClick={handleCopy}
               disabled={isCopying}
               aria-busy={isCopying}
-              className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+              className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
             >
               {isCopying ? "Copying" : "Copy strategy brief"}
             </button>
@@ -108,7 +108,7 @@ export const StrategyBriefPanel = ({
         </div>
         <div className="mt-6 grid gap-4 lg:grid-cols-[1.4fr,0.6fr]">
           <div className="weather-surface p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
               Generated narrative
             </p>
             <pre className="mt-4 whitespace-pre-wrap text-sm text-slate-200">
@@ -116,7 +116,7 @@ export const StrategyBriefPanel = ({
             </pre>
           </div>
           <div className="weather-surface p-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Status</p>
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Status</p>
             <p className="mt-3 text-sm text-slate-300">
               {copyError
                 ? "Clipboard unavailable in this environment."
