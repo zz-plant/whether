@@ -1442,224 +1442,269 @@ export const ExecutiveSnapshotPanel = ({
           </div>
           <DataProvenanceStrip provenance={provenance} />
         </div>
-        <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-          <div className="weather-surface p-4">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Market climate</p>
-            <div className="mt-2 flex flex-wrap items-center gap-2">
-              <span
-                className={`inline-flex min-h-[32px] items-center rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] ${
-                  regimeBadge?.classes ?? "border-slate-600/60 bg-slate-500/10 text-slate-100"
-                }`}
-              >
-                {regimeBadge?.label ?? assessment.regime}
-              </span>
-              <span className="text-sm text-slate-200">{regimeLabel}</span>
-            </div>
-            <p className="mt-2 text-xs text-slate-500">{assessment.description}</p>
-            <p className="mt-2 text-xs text-slate-300">
-              Strategy signal: decide if the roadmap still fits the current payback window.
-            </p>
-            <p className="mt-2 text-xs text-slate-400">
-              Constraints tracked:{" "}
-              <span className="mono text-slate-100">{assessment.constraints.length}</span>
-            </p>
-          </div>
-          <div className="weather-surface p-4">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Data freshness</p>
-            <p className="mono mt-2 text-sm text-slate-100">
-              <time dateTime={treasury.record_date}>{treasury.record_date}</time>
-            </p>
-            <p className="mt-2 text-xs text-slate-500">
-              Fetched{" "}
-              <time dateTime={treasury.fetched_at}>{formatTimestamp(treasury.fetched_at)}</time>
-            </p>
-            <p className="mt-3 text-xs text-slate-400">{freshnessAction}</p>
-            <p className="mt-2 text-xs text-slate-300">
-              Macro check: stale data can make strategy advice look stricter than it is.
-            </p>
-            {isFallback ? (
-              <div className="mt-3 rounded-lg border border-amber-400/30 bg-amber-500/10 p-2 text-xs text-amber-100">
-                <p className="text-xs font-semibold tracking-[0.12em] text-amber-200">
-                  Cached fallback
-                </p>
-                <p className="mt-2 text-amber-100">{fallbackReason}</p>
-                <p className="mt-2 text-amber-200/80">
-                  Snapshot fetched:{" "}
-                  <span className="mono">
-                    <time dateTime={treasury.fetched_at}>
-                      {formatTimestamp(treasury.fetched_at)}
-                    </time>
-                  </span>
-                </p>
-                <p className="text-amber-200/80">
-                  Fallback activated:{" "}
-                  <span className="mono">
-                    {treasury.fallback_at ? (
-                      <time dateTime={treasury.fallback_at}>
-                        {formatTimestamp(treasury.fallback_at)}
-                      </time>
-                    ) : (
-                      "Unknown"
-                    )}
-                  </span>
-                </p>
-              </div>
-            ) : null}
-          </div>
-          <div className="weather-surface p-4">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Rate baseline</p>
-            <p className="mono mt-2 text-sm text-slate-100">
-              {formatNumber(assessment.scores.baseRate, "%")}
-            </p>
-            <p className="mt-2 text-xs text-slate-500">
-              Using {assessment.scores.baseRateUsed} for policy anchor
-            </p>
-            <p className="mt-2 text-xs text-slate-300">
-              Macro check: higher rates usually mean capital is pickier about ROI.
-            </p>
-          </div>
-          <div className="weather-surface p-4">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Yield curve</p>
-            <div className="mt-3 space-y-2 text-xs text-slate-300">
-              <div className="flex items-center justify-between">
-                <span className="text-slate-400">US 10Y</span>
-                <span className="mono text-slate-100">
-                  {formatNumber(treasury.yields.tenYear, "%")}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-slate-400">US 2Y</span>
-                <span className="mono text-slate-100">
-                  {formatNumber(treasury.yields.twoYear, "%")}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-slate-400">Curve slope</span>
-                <span className="mono text-slate-100">
-                  {curveSlope === null ? "—" : formatNumber(curveSlope, "%")}
-                </span>
-              </div>
-            </div>
-            <p className="mt-3 text-xs text-slate-300">
-              Macro check: inversion favors shorter-cycle bets and tighter hiring.
-            </p>
-            <div className="mt-3">
-              <svg
-                viewBox="0 0 100 12"
-                className="h-3 w-full"
-                aria-hidden="true"
-                focusable="false"
-                preserveAspectRatio="none"
-              >
-                <defs>
-                  <marker
-                    id={curveMarkerId}
-                    markerWidth="6"
-                    markerHeight="6"
-                    refX="5"
-                    refY="3"
-                    markerUnits="strokeWidth"
-                    orient="auto-start-reverse"
+        <div className="mt-5 grid gap-4 xl:grid-cols-[1.4fr,1fr]">
+          <div className="space-y-4">
+            <div className="weather-surface bg-gradient-to-br from-slate-950 via-slate-900/70 to-slate-950 p-5">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span
+                    className={`inline-flex min-h-[32px] items-center rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] ${
+                      regimeBadge?.classes ?? "border-slate-600/60 bg-slate-500/10 text-slate-100"
+                    }`}
                   >
-                    <path d="M 0 0 L 6 3 L 0 6 Z" fill={curveIndicatorColor} />
-                  </marker>
-                </defs>
-                <line
-                  x1="6"
-                  y1="6"
-                  x2="94"
-                  y2="6"
-                  stroke="#1e293b"
-                  strokeWidth="2"
-                  vectorEffect="non-scaling-stroke"
-                />
-                <line
-                  x1="50"
-                  y1="1"
-                  x2="50"
-                  y2="11"
-                  stroke="#475569"
-                  strokeWidth="1"
-                  vectorEffect="non-scaling-stroke"
-                />
-                <line
-                  x1="50"
-                  y1="6"
-                  x2={curveIndicator}
-                  y2="6"
-                  stroke={curveIndicatorColor}
-                  strokeWidth="2"
-                  vectorEffect="non-scaling-stroke"
-                  markerEnd={`url(#${curveMarkerId})`}
-                />
-              </svg>
-              <div className="mt-2 flex items-center justify-between text-xs font-semibold tracking-[0.12em] text-slate-500">
-                <span>-2%</span>
-                <span>0%</span>
-                <span>+2%</span>
+                    {regimeBadge?.label ?? assessment.regime}
+                  </span>
+                  <span className="text-sm text-slate-200">{regimeLabel}</span>
+                </div>
+                <div
+                  className={`inline-flex min-h-[44px] items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] ${confidenceTone}`}
+                >
+                  <span className="h-2 w-2 rounded-full bg-current" aria-hidden="true" />
+                  {confidenceLabel} confidence
+                </div>
+              </div>
+              <p className="mt-3 text-lg font-semibold text-slate-100">
+                The current macro posture requires clear ROI gates before approving new spend.
+              </p>
+              <p className="mt-2 text-sm text-slate-300">{assessment.description}</p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-xl border border-slate-800/80 bg-slate-950/70 p-3">
+                  <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                    Tightness score
+                  </p>
+                  <p className="mono mt-2 text-lg text-slate-100">
+                    {assessment.scores.tightness}/100
+                  </p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Threshold {assessment.thresholds.tightnessRegime}
+                  </p>
+                </div>
+                <div className="rounded-xl border border-slate-800/80 bg-slate-950/70 p-3">
+                  <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                    Risk appetite
+                  </p>
+                  <p className="mono mt-2 text-lg text-slate-100">
+                    {assessment.scores.riskAppetite}/100
+                  </p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Threshold {assessment.thresholds.riskAppetiteRegime}
+                  </p>
+                </div>
+              </div>
+              <p className="mt-4 text-xs text-slate-400">
+                Constraints tracked:{" "}
+                <span className="mono text-slate-100">{assessment.constraints.length}</span>
+              </p>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="weather-surface p-4">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                  Rate baseline
+                </p>
+                <p className="mono mt-2 text-sm text-slate-100">
+                  {formatNumber(assessment.scores.baseRate, "%")}
+                </p>
+                <p className="mt-2 text-xs text-slate-500">
+                  Using {assessment.scores.baseRateUsed} for policy anchor
+                </p>
+                <p className="mt-2 text-xs text-slate-300">
+                  Macro check: higher rates usually mean capital is pickier about ROI.
+                </p>
+              </div>
+              <div className="weather-surface p-4">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Yield curve</p>
+                <div className="mt-3 space-y-2 text-xs text-slate-300">
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-400">US 10Y</span>
+                    <span className="mono text-slate-100">
+                      {formatNumber(treasury.yields.tenYear, "%")}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-400">US 2Y</span>
+                    <span className="mono text-slate-100">
+                      {formatNumber(treasury.yields.twoYear, "%")}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-400">Curve slope</span>
+                    <span className="mono text-slate-100">
+                      {curveSlope === null ? "—" : formatNumber(curveSlope, "%")}
+                    </span>
+                  </div>
+                </div>
+                <p className="mt-3 text-xs text-slate-300">
+                  Macro check: inversion favors shorter-cycle bets and tighter hiring.
+                </p>
+                <div className="mt-3">
+                  <svg
+                    viewBox="0 0 100 12"
+                    className="h-3 w-full"
+                    aria-hidden="true"
+                    focusable="false"
+                    preserveAspectRatio="none"
+                  >
+                    <defs>
+                      <marker
+                        id={curveMarkerId}
+                        markerWidth="6"
+                        markerHeight="6"
+                        refX="5"
+                        refY="3"
+                        markerUnits="strokeWidth"
+                        orient="auto-start-reverse"
+                      >
+                        <path d="M 0 0 L 6 3 L 0 6 Z" fill={curveIndicatorColor} />
+                      </marker>
+                    </defs>
+                    <line
+                      x1="6"
+                      y1="6"
+                      x2="94"
+                      y2="6"
+                      stroke="#1e293b"
+                      strokeWidth="2"
+                      vectorEffect="non-scaling-stroke"
+                    />
+                    <line
+                      x1="50"
+                      y1="1"
+                      x2="50"
+                      y2="11"
+                      stroke="#475569"
+                      strokeWidth="1"
+                      vectorEffect="non-scaling-stroke"
+                    />
+                    <line
+                      x1="50"
+                      y1="6"
+                      x2={curveIndicator}
+                      y2="6"
+                      stroke={curveIndicatorColor}
+                      strokeWidth="2"
+                      vectorEffect="non-scaling-stroke"
+                      markerEnd={`url(#${curveMarkerId})`}
+                    />
+                  </svg>
+                  <div className="mt-2 flex items-center justify-between text-xs font-semibold tracking-[0.12em] text-slate-500">
+                    <span>-2%</span>
+                    <span>0%</span>
+                    <span>+2%</span>
+                  </div>
+                </div>
+                <p className="mt-2 text-xs text-slate-500">Slope is {curveLabel}</p>
               </div>
             </div>
-            <p className="mt-2 text-xs text-slate-500">Slope is {curveLabel}</p>
           </div>
-          <div className="weather-surface p-4">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Scoring inputs</p>
-            <ul className="mt-3 space-y-2 text-xs text-slate-300">
-              {scoringInputs.map((input) => (
-                <li key={input.id} className="flex items-start justify-between gap-3">
-                  <span className="text-slate-400">{input.label}</span>
-                  <span className="mono text-slate-100">
-                    {input.value === null ? "—" : formatNumber(input.value, input.unit)}
+          <div className="space-y-4">
+            <div className="weather-surface p-4">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                Data freshness
+              </p>
+              <p className="mono mt-2 text-sm text-slate-100">
+                <time dateTime={treasury.record_date}>{treasury.record_date}</time>
+              </p>
+              <p className="mt-2 text-xs text-slate-500">
+                Fetched{" "}
+                <time dateTime={treasury.fetched_at}>{formatTimestamp(treasury.fetched_at)}</time>
+              </p>
+              <p className="mt-3 text-xs text-slate-400">{freshnessAction}</p>
+              <p className="mt-2 text-xs text-slate-300">
+                Macro check: stale data can make strategy advice look stricter than it is.
+              </p>
+              {isFallback ? (
+                <div className="mt-3 rounded-lg border border-amber-400/30 bg-amber-500/10 p-2 text-xs text-amber-100">
+                  <p className="text-xs font-semibold tracking-[0.12em] text-amber-200">
+                    Cached fallback
+                  </p>
+                  <p className="mt-2 text-amber-100">{fallbackReason}</p>
+                  <p className="mt-2 text-amber-200/80">
+                    Snapshot fetched:{" "}
+                    <span className="mono">
+                      <time dateTime={treasury.fetched_at}>
+                        {formatTimestamp(treasury.fetched_at)}
+                      </time>
+                    </span>
+                  </p>
+                  <p className="text-amber-200/80">
+                    Fallback activated:{" "}
+                    <span className="mono">
+                      {treasury.fallback_at ? (
+                        <time dateTime={treasury.fallback_at}>
+                          {formatTimestamp(treasury.fallback_at)}
+                        </time>
+                      ) : (
+                        "Unknown"
+                      )}
+                    </span>
+                  </p>
+                </div>
+              ) : null}
+            </div>
+            <div className="weather-surface p-4">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                Scoring inputs
+              </p>
+              <ul className="mt-3 space-y-2 text-xs text-slate-300">
+                {scoringInputs.map((input) => (
+                  <li key={input.id} className="flex items-start justify-between gap-3">
+                    <span className="text-slate-400">{input.label}</span>
+                    <span className="mono text-slate-100">
+                      {input.value === null ? "—" : formatNumber(input.value, input.unit)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-3 text-xs text-slate-500">
+                Source:{" "}
+                <a
+                  href={scoringSourceUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="touch-target inline-flex min-h-[44px] items-center text-xs text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 touch-manipulation"
+                >
+                  {scoringSource}
+                </a>{" "}
+                · Record{" "}
+                <time dateTime={treasury.record_date} className="mono text-slate-100">
+                  {treasury.record_date}
+                </time>{" "}
+                · Fetched{" "}
+                <time dateTime={treasury.fetched_at} className="mono text-slate-100">
+                  {formatTimestamp(treasury.fetched_at)}
+                </time>
+              </p>
+            </div>
+            <div className="weather-surface p-4">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                So what (1 minute)
+              </p>
+              <p className="mt-2 text-xs text-slate-500">
+                Quick actions for teams without macro context.
+              </p>
+              <ul className="mt-3 space-y-2 text-xs text-slate-300">
+                <li className="flex gap-2">
+                  <span className="text-slate-500">•</span>
+                  <span className="break-words">
+                    {tightnessStatus === "tightening"
+                      ? "Freeze non-essential hires unless payback is under 6 months."
+                      : "Keep growth hires but require clear ROI and runway checks."}
                   </span>
                 </li>
-              ))}
-            </ul>
-            <p className="mt-3 text-xs text-slate-500">
-              Source:{" "}
-              <a
-                href={scoringSourceUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="touch-target inline-flex min-h-[44px] items-center text-xs text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
-              >
-                {scoringSource}
-              </a>{" "}
-              · Record{" "}
-              <time dateTime={treasury.record_date} className="mono text-slate-100">
-                {treasury.record_date}
-              </time>{" "}
-              · Fetched{" "}
-              <time dateTime={treasury.fetched_at} className="mono text-slate-100">
-                {formatTimestamp(treasury.fetched_at)}
-              </time>
-            </p>
-          </div>
-          <div className="weather-surface p-4">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">So what (1 minute)</p>
-            <p className="mt-2 text-xs text-slate-500">
-              Quick actions for teams without macro context.
-            </p>
-            <ul className="mt-3 space-y-2 text-xs text-slate-300">
-              <li className="flex gap-2">
-                <span className="text-slate-500">•</span>
-                <span className="break-words">
-                  {tightnessStatus === "tightening"
-                    ? "Freeze non-essential hires unless payback is under 6 months."
-                    : "Keep growth hires but require clear ROI and runway checks."}
-                </span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-slate-500">•</span>
-                <span className="break-words">
-                  {riskStatus === "cautious"
-                    ? "Prioritize reliability and retention over risky launches."
-                    : "Greenlight measured growth bets with clear guardrails."}
-                </span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-slate-500">•</span>
-                <span className="break-words">{curveRiskNote}</span>
-              </li>
-            </ul>
+                <li className="flex gap-2">
+                  <span className="text-slate-500">•</span>
+                  <span className="break-words">
+                    {riskStatus === "cautious"
+                      ? "Prioritize reliability and retention over risky launches."
+                      : "Greenlight measured growth bets with clear guardrails."}
+                  </span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-slate-500">•</span>
+                  <span className="break-words">{curveRiskNote}</span>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
         <div className="mt-5 grid gap-4 lg:grid-cols-[1.15fr,0.85fr]">
@@ -1688,12 +1733,6 @@ export const ExecutiveSnapshotPanel = ({
           </div>
           <div className="weather-surface p-4">
             <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Signal confidence</p>
-            <div
-              className={`mt-3 inline-flex min-h-[44px] items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] ${confidenceTone}`}
-            >
-              <span className="h-2 w-2 rounded-full bg-current" aria-hidden="true" />
-              {confidenceLabel} confidence
-            </div>
             <p className="mt-3 text-sm text-slate-300">{confidenceDetail}</p>
             {hasDataWarnings ? (
               <ul className="mt-4 space-y-2 text-xs text-amber-100">
@@ -1766,64 +1805,128 @@ export const RegimeSummaryPanel = ({
       ? "open"
       : "cautious";
   const narrative = `Cash availability is ${tightnessStatus} and risk appetite is ${riskStatus}. ${assessment.description}`;
+  const constraintHighlights = assessment.constraints.slice(0, 3);
 
   return (
     <section id="regime-summary" aria-labelledby="regime-summary-title" className="mt-10">
       <div className="weather-panel p-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="type-label text-slate-400">Market climate summary</p>
-            <h3 id="regime-summary-title" className="type-section text-slate-100">
-              Plain-English market readout
-            </h3>
-            <p className="mt-2 type-data text-slate-300">
-              A direct interpretation of Treasury signals into the posture you should operate under
-              this week.
-            </p>
-          </div>
-          <div className="flex flex-col items-end gap-2">
-            <span
-              className={`inline-flex min-h-[44px] items-center rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] ${
-                regimeBadge?.classes ?? "border-slate-600/60 bg-slate-500/10 text-slate-100"
-              }`}
-            >
-              {regimeBadge?.label ?? assessment.regime}
-            </span>
-            <DataProvenanceStrip provenance={provenance} label="Treasury source" />
-          </div>
+        <div>
+          <p className="type-label text-slate-400">Market climate summary</p>
+          <h3 id="regime-summary-title" className="type-section text-slate-100">
+            Plain-English market readout
+          </h3>
+          <p className="mt-2 type-data text-slate-300">
+            A direct interpretation of Treasury signals into the posture you should operate under
+            this week.
+          </p>
         </div>
         <div className="mt-5 grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">
-          <div className="weather-surface p-4">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">What this means</p>
-            <p className="mt-3 text-sm text-slate-200">{narrative}</p>
-            <div className="mt-4 space-y-2 text-xs text-slate-400">
-              <p>
-                Cash availability (tightness):{" "}
-                <span className="mono text-slate-200">{assessment.scores.tightness}/100</span>{" "}
-                (threshold {assessment.thresholds.tightnessRegime}).
-              </p>
-              <p>
-                Risk appetite score:{" "}
-                <span className="mono text-slate-200">{assessment.scores.riskAppetite}/100</span>{" "}
-                (threshold {assessment.thresholds.riskAppetiteRegime}).
+          <div className="space-y-4">
+            <div className="weather-surface bg-gradient-to-br from-slate-950 via-slate-900/80 to-slate-950 p-5">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <span
+                  className={`inline-flex min-h-[44px] items-center rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] ${
+                    regimeBadge?.classes ?? "border-slate-600/60 bg-slate-500/10 text-slate-100"
+                  }`}
+                >
+                  {regimeBadge?.label ?? assessment.regime}
+                </span>
+                <DataProvenanceStrip provenance={provenance} label="Treasury source" />
+              </div>
+              <p className="mt-3 text-sm text-slate-200">{narrative}</p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-xl border border-slate-800/80 bg-slate-950/70 p-3">
+                  <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                    Cash availability
+                  </p>
+                  <p className="mono mt-2 text-lg text-slate-100">
+                    {assessment.scores.tightness}/100
+                  </p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Threshold {assessment.thresholds.tightnessRegime}
+                  </p>
+                </div>
+                <div className="rounded-xl border border-slate-800/80 bg-slate-950/70 p-3">
+                  <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                    Risk appetite
+                  </p>
+                  <p className="mono mt-2 text-lg text-slate-100">
+                    {assessment.scores.riskAppetite}/100
+                  </p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Threshold {assessment.thresholds.riskAppetiteRegime}
+                  </p>
+                </div>
+              </div>
+              <p className="mt-4 text-xs text-slate-400">
+                Regime label: <span className="text-slate-200">{regimeLabel}</span>
               </p>
             </div>
+            <div className="weather-surface p-4">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                Operational consequences
+              </p>
+              <p className="mt-3 text-sm text-slate-200">
+                Use these guardrails to align product, engineering, and GTM planning.
+              </p>
+              <ul className="mt-4 space-y-3 text-sm text-slate-300">
+                {assessment.constraints.map((constraint) => (
+                  <li key={constraint} className="flex gap-2">
+                    <span className="text-slate-500">•</span>
+                    <span className="break-words">{constraint}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-          <div className="weather-surface p-4">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-              Operational consequences
-            </p>
-            <p className="mt-3 text-sm text-slate-200">
-              Use these guardrails to align product, engineering, and GTM planning.
-            </p>
-            <ul className="mt-4 space-y-3 text-sm text-slate-300">
-              {assessment.constraints.map((constraint) => (
-                <li key={constraint} className="flex gap-2">
-                  <span className="text-slate-500">•</span>
-                  <span className="break-words">{constraint}</span>
-                </li>
-              ))}
-            </ul>
+          <div className="space-y-4">
+            <div className="weather-surface p-4">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                Regime highlights
+              </p>
+              <p className="mt-3 text-sm text-slate-200">
+                This regime is defined by the tightness and risk scores above. Use these highlights
+                to anchor leadership conversations.
+              </p>
+              <ul className="mt-4 space-y-3 text-sm text-slate-300">
+                {constraintHighlights.map((constraint) => (
+                  <li key={constraint} className="flex gap-2">
+                    <span className="text-slate-500">•</span>
+                    <span className="break-words">{constraint}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="weather-surface p-4">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                Decision signals
+              </p>
+              <p className="mt-3 text-sm text-slate-200">
+                Translate the scores into how you run next-week approvals.
+              </p>
+              <div className="mt-4 space-y-3 text-sm text-slate-300">
+                <div className="rounded-lg border border-slate-800/80 bg-slate-950/60 p-3">
+                  <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                    Funding posture
+                  </p>
+                  <p className="mt-2 text-sm text-slate-200">
+                    {tightnessStatus === "tight"
+                      ? "Cap spend increases; require hard ROI evidence on any new headcount."
+                      : "Keep growth spend, but insist on payback clarity and runway updates."}
+                  </p>
+                </div>
+                <div className="rounded-lg border border-slate-800/80 bg-slate-950/60 p-3">
+                  <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                    Risk posture
+                  </p>
+                  <p className="mt-2 text-sm text-slate-200">
+                    {riskStatus === "open"
+                      ? "Greenlight growth experiments with guardrails and explicit exit points."
+                      : "Favor reliability bets and retention improvements over new launches."}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
