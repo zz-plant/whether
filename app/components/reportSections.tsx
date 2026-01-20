@@ -353,27 +353,55 @@ export const WeeklyActionSummaryPanel = ({
     { href: "/signals#thresholds", label: "Thresholds" },
     { href: "#beginner-glossary", label: "Glossary" },
   ];
+  const curveSlopeValue = assessment.scores.curveSlope;
+  const curveSlopeDisplay =
+    curveSlopeValue === null ? "Unavailable" : `${curveSlopeValue.toFixed(2)}%`;
+  const curveSlopeStatus =
+    curveSlopeValue === null
+      ? "Awaiting curve update"
+      : curveSlopeValue < 0
+        ? "Curve inverted"
+        : "Curve normal";
+  const weeklySignalTiles = [
+    {
+      label: "Cash availability",
+      value: `${assessment.scores.tightness}/100`,
+      detail: `Threshold ${assessment.thresholds.tightnessRegime}.`,
+    },
+    {
+      label: "Risk appetite",
+      value: `${assessment.scores.riskAppetite}/100`,
+      detail: `Threshold ${assessment.thresholds.riskAppetiteRegime}.`,
+    },
+    {
+      label: "Curve slope",
+      value: curveSlopeDisplay,
+      detail: curveSlopeStatus,
+    },
+  ];
 
   return (
     <section id="weekly-action-summary" aria-labelledby="weekly-action-summary-title" className="mt-8">
       <div className="weather-panel flex flex-col gap-6 px-6 py-5">
-        <div className="flex flex-wrap items-start justify-between gap-6">
-          <div className="max-w-2xl">
-            <p className="type-label text-slate-400">What should I do this week?</p>
-            <h2 id="weekly-action-summary-title" className="type-section text-slate-100">
-              Weekly action control room
-            </h2>
-            <p className="mt-3 text-sm text-slate-200">
-              This week, operate in {regimeLabel} mode: {actionGuidance}. {regimeDescription} Skim the{" "}
-              <a
-                href="#executive-snapshot"
-                className="touch-target inline-flex min-h-[44px] items-center text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-slate-50 touch-manipulation"
-              >
-                leadership summary
-              </a>{" "}
-              for the source signals and decision guardrails.
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
+        <div className="grid gap-6 lg:grid-cols-[1.35fr,0.65fr]">
+          <div className="space-y-4">
+            <div>
+              <p className="type-label text-slate-400">What should I do this week?</p>
+              <h2 id="weekly-action-summary-title" className="type-section text-slate-100">
+                Weekly action control room
+              </h2>
+              <p className="mt-3 text-sm text-slate-200">
+                This week, operate in {regimeLabel} mode: {actionGuidance}. {regimeDescription} Skim the{" "}
+                <a
+                  href="#executive-snapshot"
+                  className="touch-target inline-flex min-h-[44px] items-center text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-slate-50 touch-manipulation"
+                >
+                  leadership summary
+                </a>{" "}
+                for the source signals and decision guardrails.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
               <span className="weather-pill inline-flex min-h-[32px] items-center px-3 py-1">
                 Regime: {regimeLabel}
               </span>
@@ -384,13 +412,31 @@ export const WeeklyActionSummaryPanel = ({
                 Macro: cash + risk appetite
               </span>
             </div>
+            <div className="grid gap-3 sm:grid-cols-3">
+              {weeklySignalTiles.map((tile) => (
+                <div key={tile.label} className="weather-surface p-4">
+                  <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">{tile.label}</p>
+                  <p className="mono mt-3 text-2xl text-slate-100">{tile.value}</p>
+                  <p className="mt-2 text-xs text-slate-500">{tile.detail}</p>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="w-full lg:w-[360px]">
+          <div className="grid gap-4">
             <WeeklySummaryCard summary={weeklySummary} />
+            <div className="weather-surface p-4">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Cadence</p>
+              <p className="mt-3 text-sm text-slate-200">
+                Next Treasury refresh recorded {recordDateLabel}.
+              </p>
+              <p className="mt-2 text-xs text-slate-500">
+                Keep weekly decisions within this window unless new alerts publish.
+              </p>
+            </div>
           </div>
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-[1.25fr,0.75fr]">
+        <div className="grid gap-4 lg:grid-cols-[1.2fr,0.8fr]">
           <div className="grid gap-3">
             {weeklyBlocks.map((block) => (
               <div key={block.heading} className="weather-surface p-4">
@@ -410,10 +456,10 @@ export const WeeklyActionSummaryPanel = ({
           </div>
           <aside className="weather-surface p-4" aria-label="Weekly decision checklist">
             <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Decision checklist</p>
-            <ol className="mt-3 space-y-3 text-sm text-slate-300">
+            <ol className="mt-3 space-y-4 text-sm text-slate-300">
               {decisionChecklist.map((item, index) => (
                 <li key={item.title} className="flex gap-3">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-700/70 bg-slate-950 text-xs font-semibold text-slate-200">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-700/70 bg-slate-950 text-xs font-semibold text-slate-200">
                     {index + 1}
                   </span>
                   <div>
@@ -423,19 +469,25 @@ export const WeeklyActionSummaryPanel = ({
                 </li>
               ))}
             </ol>
+            <p className="mt-4 text-xs text-slate-500">
+              Run the checklist before any roadmap changes or staffing approvals.
+            </p>
           </aside>
         </div>
 
-        <div className="flex flex-wrap gap-3 text-xs font-semibold tracking-[0.12em] text-slate-400">
-          {weeklyQuickLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
-            >
-              {link.label}
-            </a>
-          ))}
+        <div>
+          <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Quick routes</p>
+          <div className="mt-3 flex flex-wrap gap-3 text-xs font-semibold tracking-[0.12em] text-slate-400">
+            {weeklyQuickLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
         </div>
         <p className="text-xs text-slate-500">
           Keep the weekly narrative tight so leaders can decide without re-reading the data lanes.
@@ -2217,10 +2269,16 @@ export const PlaybookPanel = ({
   fenceItems: string[];
   provenance: DataProvenance;
 }) => {
+  const playbookQuickLinks = [
+    { href: "/operations#decision-shield", label: "Decision shield" },
+    { href: "/operations#strategy-brief", label: "Strategy brief" },
+    { href: "/operations#export-briefs", label: "Export briefs" },
+  ];
+
   return (
     <section id="playbook" aria-labelledby="playbook-title" className="mt-10">
       <div className="weather-panel p-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="grid gap-6 lg:grid-cols-[1.25fr,0.75fr]">
           <div>
             <p className="type-label text-slate-400">Playbook</p>
             <h3 id="playbook-title" className="type-section text-slate-100">
@@ -2233,20 +2291,41 @@ export const PlaybookPanel = ({
                 Playbook data unavailable. Use climate constraints as guardrails.
               </p>
             )}
+            <p className="mt-4 text-xs text-slate-500">
+              Align the team on what to stop, start, and fence before approvals move forward.
+            </p>
           </div>
-          <div className="flex flex-col items-end gap-3">
-            {playbook ? (
-              <div className="text-right text-xs text-slate-400">
-                <p>{playbook.tone}</p>
-                <p className="mt-1 text-slate-300">Mandate: {playbook.mandate}</p>
-                <p className="mt-1 text-slate-500">Metric: {playbook.metric}</p>
+          <div className="grid gap-3">
+            <div className="weather-surface p-4">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Playbook snapshot</p>
+              {playbook ? (
+                <div className="mt-3 space-y-2 text-xs text-slate-300">
+                  <p className="font-semibold text-slate-200">{playbook.tone}</p>
+                  <p>Mandate: {playbook.mandate}</p>
+                  <p className="text-slate-400">Metric: {playbook.metric}</p>
+                </div>
+              ) : (
+                <p className="mt-3 text-xs text-slate-500">
+                  Playbook signals will return once Treasury data is refreshed.
+                </p>
+              )}
+              <div className="mt-4 flex flex-wrap gap-2">
+                {playbookQuickLinks.map((link) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-[0.6rem] font-semibold tracking-[0.18em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                  >
+                    {link.label}
+                  </a>
+                ))}
               </div>
-            ) : null}
+            </div>
             <DataProvenanceStrip provenance={provenance} />
           </div>
         </div>
         <div className="mt-6 grid gap-4 lg:grid-cols-3">
-          <div className="weather-surface p-4">
+          <div className="weather-surface border-l-4 border-rose-500/50 p-4">
             <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Stop</p>
             <ul className="mt-3 space-y-2 text-sm text-slate-300">
               {stopItems.map((item) => (
@@ -2256,7 +2335,7 @@ export const PlaybookPanel = ({
               ))}
             </ul>
           </div>
-          <div className="weather-surface p-4">
+          <div className="weather-surface border-l-4 border-emerald-400/50 p-4">
             <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Start</p>
             <ul className="mt-3 space-y-2 text-sm text-slate-300">
               {startItems.map((item) => (
@@ -2266,7 +2345,7 @@ export const PlaybookPanel = ({
               ))}
             </ul>
           </div>
-          <div className="weather-surface p-4">
+          <div className="weather-surface border-l-4 border-sky-400/50 p-4">
             <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Fence</p>
             <ul className="mt-3 space-y-2 text-sm text-slate-300">
               {fenceItems.map((item) => (
