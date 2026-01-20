@@ -2,6 +2,7 @@
  * Report section components for the Whether Report dashboard.
  * Keeps layout blocks focused and reusable across the Market Climate Station UI.
  */
+import type { ReactNode } from "react";
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import type { PlaybookEntry } from "../../lib/playbook";
 import type {
@@ -242,6 +243,60 @@ const getRegimeAccent = (regime: RegimeAssessment["regime"]) => {
   }
 };
 
+type ActionSummaryBlock = {
+  heading: string;
+  bullets: string[];
+};
+
+type ActionSummaryPanelProps = {
+  id: string;
+  label: string;
+  title: string;
+  description: ReactNode;
+  summaryCard: ReactNode;
+  blocks: ActionSummaryBlock[];
+  footer?: ReactNode;
+};
+
+const ActionSummaryPanel = ({
+  id,
+  label,
+  title,
+  description,
+  summaryCard,
+  blocks,
+  footer,
+}: ActionSummaryPanelProps) => (
+  <section id={id} aria-labelledby={`${id}-title`} className="mt-8">
+    <div className="weather-panel flex flex-col gap-4 px-5 py-4">
+      <p className="type-label text-slate-400">{label}</p>
+      <h2 id={`${id}-title`} className="type-section text-slate-100">
+        {title}
+      </h2>
+      <p className="text-sm text-slate-200">{description}</p>
+      {summaryCard}
+      <div className="grid gap-3 md:grid-cols-2">
+        {blocks.map((block) => (
+          <div key={block.heading} className="weather-surface p-4">
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+              {block.heading}
+            </p>
+            <ul className="mt-3 space-y-2 text-sm text-slate-300">
+              {block.bullets.map((bullet) => (
+                <li key={bullet} className="flex gap-2">
+                  <span className="text-slate-500">•</span>
+                  <span className="break-words">{bullet}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+      {footer}
+    </div>
+  </section>
+);
+
 export const WeeklyActionSummaryPanel = ({
   assessment,
   provenance,
@@ -262,19 +317,30 @@ export const WeeklyActionSummaryPanel = ({
     provenance,
     recordDateLabel,
   });
+  const weeklyBlocks: ActionSummaryBlock[] = [
+    {
+      heading: "Good product strategy sounds like",
+      bullets: [
+        "“Our core user problem is unchanged, and we can prove the payoff in 1–2 quarters.”",
+        "“We’re trading scope for reliability because retention is the constraint.”",
+      ],
+    },
+    {
+      heading: "Macro-driven advice sounds like",
+      bullets: [
+        "“Delay long-payback bets until cash availability loosens or risk appetite turns.”",
+        "“Keep hiring approvals tighter while the curve is inverted.”",
+      ],
+    },
+  ];
 
   return (
-    <section
+    <ActionSummaryPanel
       id="weekly-action-summary"
-      aria-labelledby="weekly-action-summary-title"
-      className="mt-8"
-    >
-      <div className="weather-panel flex flex-col gap-4 px-5 py-4">
-        <p className="type-label text-slate-400">What should I do this week?</p>
-        <h2 id="weekly-action-summary-title" className="type-section text-slate-100">
-          Weekly action summary
-        </h2>
-        <p className="text-sm text-slate-200">
+      label="What should I do this week?"
+      title="Weekly action summary"
+      description={
+        <>
           This week, operate in {regimeLabel} mode: {actionGuidance}. {regimeDescription} Skim the{" "}
           <a
             href="#executive-snapshot"
@@ -283,48 +349,11 @@ export const WeeklyActionSummaryPanel = ({
             leadership summary
           </a>{" "}
           for the source signals and decision guardrails.
-        </p>
-        <WeeklySummaryCard summary={weeklySummary} />
-        <div className="grid gap-3 md:grid-cols-2">
-          <div className="weather-surface p-4">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-              Good product strategy sounds like
-            </p>
-            <ul className="mt-3 space-y-2 text-sm text-slate-300">
-              <li className="flex gap-2">
-                <span className="text-slate-500">•</span>
-                <span className="break-words">
-                  “Our core user problem is unchanged, and we can prove the payoff in 1–2 quarters.”
-                </span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-slate-500">•</span>
-                <span className="break-words">
-                  “We’re trading scope for reliability because retention is the constraint.”
-                </span>
-              </li>
-            </ul>
-          </div>
-          <div className="weather-surface p-4">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-              Macro-driven advice sounds like
-            </p>
-            <ul className="mt-3 space-y-2 text-sm text-slate-300">
-              <li className="flex gap-2">
-                <span className="text-slate-500">•</span>
-                <span className="break-words">
-                  “Delay long-payback bets until cash availability loosens or risk appetite turns.”
-                </span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-slate-500">•</span>
-                <span className="break-words">
-                  “Keep hiring approvals tighter while the curve is inverted.”
-                </span>
-              </li>
-            </ul>
-          </div>
-        </div>
+        </>
+      }
+      summaryCard={<WeeklySummaryCard summary={weeklySummary} />}
+      blocks={weeklyBlocks}
+      footer={
         <div className="flex flex-wrap gap-3 text-xs font-semibold tracking-[0.12em] text-slate-400">
           <span className="weather-chip inline-flex min-h-[32px] items-center px-3 py-1">
             Strategy: problem/ROI fit
@@ -339,8 +368,8 @@ export const WeeklyActionSummaryPanel = ({
             Open the glossary
           </a>
         </div>
-      </div>
-    </section>
+      }
+    />
   );
 };
 
@@ -360,65 +389,37 @@ export const MonthlyActionSummaryPanel = ({
     provenance,
     recordDateLabel,
   });
+  const monthlyBlocks: ActionSummaryBlock[] = [
+    {
+      heading: "Monthly leadership asks sound like",
+      bullets: [
+        "“These three bets can still pay back within the climate constraints.”",
+        "“We’re sequencing roadmap work to reduce risk before expanding scope.”",
+      ],
+    },
+    {
+      heading: "Monthly constraints should force",
+      bullets: [
+        "“Only one major growth bet at a time until cash availability improves.”",
+        "“Move hires to contingency approval and revisit after the next Treasury refresh.”",
+      ],
+    },
+  ];
 
   return (
-    <section
+    <ActionSummaryPanel
       id="monthly-action-summary"
-      aria-labelledby="monthly-action-summary-title"
-      className="mt-8"
-    >
-      <div className="weather-panel flex flex-col gap-4 px-5 py-4">
-        <p className="type-label text-slate-400">What should I do this month?</p>
-        <h2 id="monthly-action-summary-title" className="type-section text-slate-100">
-          Monthly action summary
-        </h2>
-        <p className="text-sm text-slate-200">
+      label="What should I do this month?"
+      title="Monthly action summary"
+      description={
+        <>
           This month, operate in {regimeLabel} mode: {actionGuidance}. Use these constraints to
           align staffing, sequencing, and approval cadence before you lock the next sprint slate.
-        </p>
-        <MonthlySummaryCard summary={monthlySummary} />
-        <div className="grid gap-3 md:grid-cols-2">
-          <div className="weather-surface p-4">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-              Monthly leadership asks sound like
-            </p>
-            <ul className="mt-3 space-y-2 text-sm text-slate-300">
-              <li className="flex gap-2">
-                <span className="text-slate-500">•</span>
-                <span className="break-words">
-                  “These three bets can still pay back within the climate constraints.”
-                </span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-slate-500">•</span>
-                <span className="break-words">
-                  “We’re sequencing roadmap work to reduce risk before expanding scope.”
-                </span>
-              </li>
-            </ul>
-          </div>
-          <div className="weather-surface p-4">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-              Monthly constraints should force
-            </p>
-            <ul className="mt-3 space-y-2 text-sm text-slate-300">
-              <li className="flex gap-2">
-                <span className="text-slate-500">•</span>
-                <span className="break-words">
-                  “Only one major growth bet at a time until cash availability improves.”
-                </span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-slate-500">•</span>
-                <span className="break-words">
-                  “Move hires to contingency approval and revisit after the next Treasury refresh.”
-                </span>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </section>
+        </>
+      }
+      summaryCard={<MonthlySummaryCard summary={monthlySummary} />}
+      blocks={monthlyBlocks}
+    />
   );
 };
 

@@ -93,6 +93,83 @@ const buildCsvRows = (entries: DecisionMemoryEntry[]) => {
   ].join("\n");
 };
 
+type DecisionMemoryEntryCardProps = {
+  entry: DecisionMemoryEntry;
+  isFocused: boolean;
+  isCopying: boolean;
+  copyTarget: string | null;
+  onCopy: (text: string, label: string) => void;
+  onCopyLink: (entry: DecisionMemoryEntry) => void;
+  onAttach: (entry: DecisionMemoryEntry) => void;
+  onFocus: (entryId: string) => void;
+};
+
+const DecisionMemoryEntryCard = ({
+  entry,
+  isFocused,
+  isCopying,
+  copyTarget,
+  onCopy,
+  onCopyLink,
+  onAttach,
+  onFocus,
+}: DecisionMemoryEntryCardProps) => {
+  const snapshotText = buildSnapshotText(entry);
+  const textTarget = `text-${entry.id}`;
+  const linkTarget = `link-${entry.id}`;
+
+  return (
+    <div
+      className={`rounded-2xl border p-4 ${
+        isFocused ? "border-sky-500/60 bg-slate-950/80" : "border-slate-800/60 bg-slate-950/60"
+      }`}
+    >
+      <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">{entry.title}</p>
+      <p className="mt-2 text-sm text-slate-200">
+        {entry.regime} · {entry.confidence}
+      </p>
+      <p className="mt-1 text-xs text-slate-500">
+        Logged {formatTimestamp(entry.loggedAt)} · Record {entry.recordDate}
+      </p>
+      {entry.note ? <p className="mt-3 text-sm text-slate-300">{entry.note}</p> : null}
+      <div className="mt-4 flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={() => onCopy(snapshotText, textTarget)}
+          disabled={isCopying}
+          aria-busy={isCopying && copyTarget === textTarget}
+          className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
+        >
+          {isCopying && copyTarget === textTarget ? "Copying" : "Copy snapshot"}
+        </button>
+        <button
+          type="button"
+          onClick={() => onCopyLink(entry)}
+          disabled={isCopying}
+          aria-busy={isCopying && copyTarget === linkTarget}
+          className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
+        >
+          {isCopying && copyTarget === linkTarget ? "Copying" : "Copy snapshot link"}
+        </button>
+        <button
+          type="button"
+          onClick={() => onAttach(entry)}
+          className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
+        >
+          Attach to URL
+        </button>
+        <button
+          type="button"
+          onClick={() => onFocus(entry.id)}
+          className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-slate-500/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-200 touch-manipulation"
+        >
+          Focus entry
+        </button>
+      </div>
+    </div>
+  );
+};
+
 export const DecisionMemoryPanel = ({
   assessment,
   provenance,
@@ -486,67 +563,19 @@ export const DecisionMemoryPanel = ({
                 No decisions logged yet. Log a decision to start the audit trail.
               </p>
             ) : (
-              entries.map((entry) => {
-                const snapshotText = buildSnapshotText(entry);
-                const isFocused = focusedId === entry.id;
-                return (
-                  <div
-                    key={entry.id}
-                    className={`rounded-2xl border p-4 ${
-                      isFocused
-                        ? "border-sky-500/60 bg-slate-950/80"
-                        : "border-slate-800/60 bg-slate-950/60"
-                    }`}
-                  >
-                    <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                      {entry.title}
-                    </p>
-                    <p className="mt-2 text-sm text-slate-200">
-                      {entry.regime} · {entry.confidence}
-                    </p>
-                    <p className="mt-1 text-xs text-slate-500">
-                      Logged {formatTimestamp(entry.loggedAt)} · Record {entry.recordDate}
-                    </p>
-                    {entry.note ? (
-                      <p className="mt-3 text-sm text-slate-300">{entry.note}</p>
-                    ) : null}
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      <button
-                        type="button"
-                        onClick={() => handleCopy(snapshotText, `text-${entry.id}`)}
-                        disabled={isCopying}
-                        aria-busy={isCopying && copyTarget === `text-${entry.id}`}
-                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
-                      >
-                        {isCopying && copyTarget === `text-${entry.id}` ? "Copying" : "Copy snapshot"}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleCopySnapshotLink(entry)}
-                        disabled={isCopying}
-                        aria-busy={isCopying && copyTarget === `link-${entry.id}`}
-                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
-                      >
-                        {isCopying && copyTarget === `link-${entry.id}` ? "Copying" : "Copy snapshot link"}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleAttachSnapshot(entry)}
-                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
-                      >
-                        Attach to URL
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleFocusEntry(entry.id)}
-                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-slate-500/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-200 touch-manipulation"
-                      >
-                        Focus entry
-                      </button>
-                    </div>
-                  </div>
-                );
-              })
+              entries.map((entry) => (
+                <DecisionMemoryEntryCard
+                  key={entry.id}
+                  entry={entry}
+                  isFocused={focusedId === entry.id}
+                  isCopying={isCopying}
+                  copyTarget={copyTarget}
+                  onCopy={handleCopy}
+                  onCopyLink={handleCopySnapshotLink}
+                  onAttach={handleAttachSnapshot}
+                  onFocus={handleFocusEntry}
+                />
+              ))
             )}
           </div>
         </div>
