@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import { insightDatabase } from "../../data/recommendations";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
+import { useClipboardCopy } from "./useClipboardCopy";
 
 const buildStrategyBrief = (
   assessment: RegimeAssessment,
@@ -44,36 +45,17 @@ export const StrategyBriefPanel = ({
   recordDateLabel: string;
   provenance: DataProvenance;
 }) => {
-  const [isCopying, setIsCopying] = useState(false);
-  const [copyStatus, setCopyStatus] = useState<string | null>(null);
-  const [copyError, setCopyError] = useState(false);
+  const { status, error, copyToClipboard } = useClipboardCopy();
+  const isCopying = status === "copying";
+  const isCopied = status === "copied";
 
   const briefing = useMemo(
     () => buildStrategyBrief(assessment, recordDateLabel),
     [assessment, recordDateLabel]
   );
 
-  const handleCopy = async () => {
-    if (isCopying) {
-      return;
-    }
-    if (!navigator.clipboard?.writeText) {
-      setCopyError(true);
-      return;
-    }
-    setIsCopying(true);
-    setCopyStatus("copying");
-    try {
-      await navigator.clipboard.writeText(briefing);
-      setCopyError(false);
-      setCopyStatus("copied");
-      setTimeout(() => setCopyStatus(null), 2000);
-    } catch {
-      setCopyError(true);
-      setCopyStatus("error");
-    } finally {
-      setIsCopying(false);
-    }
+  const handleCopy = () => {
+    void copyToClipboard(briefing, "Strategy Brief");
   };
 
   return (
@@ -118,9 +100,9 @@ export const StrategyBriefPanel = ({
           <div className="weather-surface p-4">
             <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Status</p>
             <p className="mt-3 text-sm text-slate-300">
-              {copyError
+              {error
                 ? "Clipboard unavailable in this environment."
-                : copyStatus === "copied"
+                : isCopied
                   ? "Brief copied to clipboard."
                   : "Ready to share in leadership updates."}
             </p>

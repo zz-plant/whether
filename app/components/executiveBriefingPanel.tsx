@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import { insightDatabase } from "../../data/recommendations";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
+import { useClipboardCopy } from "./useClipboardCopy";
 
 const buildExecutiveMemo = (assessment: RegimeAssessment, recordDateLabel: string) => {
   const template = insightDatabase.executiveBriefingSuite.regimes.find(
@@ -55,10 +56,8 @@ export const ExecutiveBriefingPanel = ({
   recordDateLabel: string;
   provenance: DataProvenance;
 }) => {
-  const [isCopying, setIsCopying] = useState(false);
-  const [copyTarget, setCopyTarget] = useState<string | null>(null);
-  const [copyError, setCopyError] = useState(false);
-  const [copied, setCopied] = useState<string | null>(null);
+  const { status, error, activeTarget, copiedTarget, copyToClipboard } =
+    useClipboardCopy();
 
   const executiveMemo = useMemo(
     () => buildExecutiveMemo(assessment, recordDateLabel),
@@ -69,28 +68,7 @@ export const ExecutiveBriefingPanel = ({
     [assessment]
   );
 
-  const handleCopy = async (text: string, target: string) => {
-    if (isCopying) {
-      return;
-    }
-    if (!navigator.clipboard?.writeText) {
-      setCopyError(true);
-      return;
-    }
-    setIsCopying(true);
-    setCopyTarget(target);
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopyError(false);
-      setCopied(target);
-      setTimeout(() => setCopied(null), 2000);
-    } catch {
-      setCopyError(true);
-    } finally {
-      setIsCopying(false);
-      setCopyTarget(null);
-    }
-  };
+  const isCopying = status === "copying";
 
   return (
     <section
@@ -119,12 +97,12 @@ export const ExecutiveBriefingPanel = ({
               </p>
               <button
                 type="button"
-                onClick={() => handleCopy(executiveMemo, "Memo")}
+                onClick={() => copyToClipboard(executiveMemo, "Memo")}
                 disabled={isCopying}
                 aria-busy={isCopying}
                 className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
               >
-                {isCopying && copyTarget === "Memo" ? "Copying" : "Copy memo"}
+                {isCopying && activeTarget === "Memo" ? "Copying" : "Copy memo"}
               </button>
             </div>
             <pre className="mt-4 whitespace-pre-wrap text-sm text-slate-200">
@@ -138,22 +116,24 @@ export const ExecutiveBriefingPanel = ({
               </p>
               <button
                 type="button"
-                onClick={() => handleCopy(guardrailChecklist, "Checklist")}
+                onClick={() => copyToClipboard(guardrailChecklist, "Checklist")}
                 disabled={isCopying}
                 aria-busy={isCopying}
                 className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
               >
-                {isCopying && copyTarget === "Checklist" ? "Copying" : "Copy checklist"}
+                {isCopying && activeTarget === "Checklist"
+                  ? "Copying"
+                  : "Copy checklist"}
               </button>
             </div>
             <pre className="mt-4 whitespace-pre-wrap text-sm text-slate-200">
               {guardrailChecklist}
             </pre>
             <p className="mt-4 text-xs text-slate-500">
-              {copyError
+              {error
                 ? "Clipboard unavailable in this environment."
-                : copied
-                  ? `${copied} copied.`
+                : copiedTarget
+                  ? `${copiedTarget} copied.`
                   : "Ready to share in executive reviews."}
             </p>
           </div>
