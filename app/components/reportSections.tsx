@@ -1029,215 +1029,236 @@ export const SignalMatrixPanel = ({
   const matrixGridId = "matrix-grid";
   const matrixGlowId = "matrix-glow";
   const matrixTooltipId = "matrix-position-tooltip";
+  const tightnessThreshold = assessment.thresholds.tightnessRegime;
+  const riskThreshold = assessment.thresholds.riskAppetiteRegime;
+  const tightnessStatus = assessment.scores.tightness > tightnessThreshold ? "Tight" : "Loose";
+  const riskStatus = assessment.scores.riskAppetite > riskThreshold ? "Bold" : "Cautious";
+  const quadrantLabel = `${tightnessStatus} + ${riskStatus}`;
   const quadrants = [
     {
       id: "tight-cautious",
       label: "Tight + Cautious",
       description: "Cash conservation, tighter budgets, and slower hiring.",
       action: "Default action: cut burn and freeze risky launches.",
-      className: "left-3 top-3",
+      className: "border-rose-500/40 bg-rose-500/10 text-rose-100",
     },
     {
       id: "tight-bold",
       label: "Tight + Bold",
       description: "Selective bets with strong governance and runway checks.",
       action: "Default action: fund only high-ROI bets with short payback.",
-      className: "right-3 top-3",
+      className: "border-amber-400/40 bg-amber-500/10 text-amber-100",
     },
     {
       id: "loose-cautious",
       label: "Loose + Cautious",
       description: "Stable funding but risk appetite is muted; prioritize durability.",
       action: "Default action: prioritize reliability and retention projects.",
-      className: "left-3 bottom-3",
+      className: "border-sky-400/40 bg-sky-500/10 text-sky-100",
     },
     {
       id: "loose-bold",
       label: "Loose + Bold",
       description: "Expansion-friendly conditions; scale responsibly.",
       action: "Default action: accelerate growth bets with clear guardrails.",
-      className: "right-3 bottom-3",
+      className: "border-emerald-400/40 bg-emerald-500/10 text-emerald-100",
     },
   ];
 
   return (
-  <section
-    id="signal-matrix"
-    aria-labelledby="signal-matrix-title"
-    aria-describedby="signal-matrix-description"
-    className="weather-panel p-6"
-  >
-    <div className="flex flex-wrap items-start justify-between gap-3">
-      <h3
-        id="signal-matrix-title"
-        className="type-label text-slate-400"
-      >
-        Signal breakdown
-      </h3>
+    <section
+      id="signal-matrix"
+      aria-labelledby="signal-matrix-title"
+      aria-describedby="signal-matrix-description"
+      className="weather-panel p-6"
+    >
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p className="type-label text-slate-400">Signal breakdown</p>
+          <h3 id="signal-matrix-title" className="type-section text-slate-100">
+            Risk posture matrix
+          </h3>
+          <p className="mt-2 text-sm text-slate-300">
+            Read the balance of cash tightness and market risk appetite to anchor staffing and
+            roadmap approvals.
+          </p>
+        </div>
         <div className="flex flex-col items-end gap-2 text-xs font-semibold tracking-[0.12em] text-slate-500">
           <span>Cash availability vs. risk appetite</span>
           <DataProvenanceStrip provenance={provenance} />
         </div>
       </div>
-      <figure className="mt-6">
-        <div className="weather-surface relative h-64">
-          <svg
-            className="absolute inset-0 h-full w-full"
-            viewBox="0 0 100 100"
-            preserveAspectRatio="none"
-            role="img"
-            aria-labelledby="signal-matrix-visual-title signal-matrix-visual-desc"
-          >
-            <title id="signal-matrix-visual-title">Signal matrix grid</title>
-            <desc id="signal-matrix-visual-desc">
-              A two-by-two matrix showing the balance of tightness and market risk appetite.
-            </desc>
-            <defs>
-              <pattern
-                id={matrixGridId}
-                width="50"
-                height="50"
-                patternUnits="userSpaceOnUse"
-                patternTransform="scale(1)"
-              >
-                <path
-                  d="M 50 0 H 0 V 50"
-                  fill="none"
-                  stroke="rgba(30,41,59,0.9)"
-                  strokeWidth="1"
-                  vectorEffect="non-scaling-stroke"
-                />
-              </pattern>
-              <filter id={matrixGlowId} x="-50%" y="-50%" width="200%" height="200%">
-                <feDropShadow
-                  dx="0"
-                  dy="0"
-                  stdDeviation="2"
-                  floodColor="#fbbf24"
-                  floodOpacity="0.45"
-                />
-              </filter>
-            </defs>
-            <rect width="100" height="100" fill={`url(#${matrixGridId})`} />
-            <line
-              x1="50"
-              y1="0"
-              x2="50"
-              y2="100"
-              stroke="rgba(71,85,105,0.6)"
-              strokeWidth="1"
-              vectorEffect="non-scaling-stroke"
-            />
-            <line
-              x1="0"
-              y1="50"
-              x2="100"
-              y2="50"
-              stroke="rgba(71,85,105,0.6)"
-              strokeWidth="1"
-              vectorEffect="non-scaling-stroke"
-            />
-            <text
-              x="50"
-              y="52"
-              textAnchor="middle"
-              fill="rgba(100,116,139,0.55)"
-              fontSize="8"
-              letterSpacing="6"
-            >
-              MATRIX
-            </text>
-            <circle
-              cx={matrixDotX}
-              cy={matrixDotY}
-              r="4"
-              fill="#fbbf24"
-              stroke="#0f172a"
-              strokeWidth="1.5"
-              vectorEffect="non-scaling-stroke"
-              filter={`url(#${matrixGlowId})`}
-            />
-            <text
-              x={matrixDotX}
-              y={matrixDotY + 1.2}
-              textAnchor="middle"
-              fontSize="6"
-              fontWeight="600"
-              fill="#0f172a"
-              stroke="#0f172a"
-              strokeWidth="0.6"
-              paintOrder="stroke fill"
-            >
-              +
-            </text>
-          </svg>
-          <div className="pointer-events-none absolute inset-0">
-            <div className="absolute bottom-2 left-2 text-xs font-semibold tracking-[0.12em] text-slate-500">
-              Cautious
+      <div className="mt-6 grid gap-6 lg:grid-cols-[1.2fr,0.8fr]">
+        <figure className="space-y-4">
+          <div className="weather-surface p-4">
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Current posture</p>
+            <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-slate-200">
+              <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200">
+                {quadrantLabel}
+              </span>
+              <span className="text-xs text-slate-400">
+                Tightness{" "}
+                <span className="mono text-slate-100">{assessment.scores.tightness}</span> · Risk{" "}
+                <span className="mono text-slate-100">{assessment.scores.riskAppetite}</span>
+              </span>
             </div>
-            <div className="absolute bottom-2 right-2 text-xs font-semibold tracking-[0.12em] text-slate-500">
-              Bold
-            </div>
-            <div className="absolute left-2 top-2 -rotate-90 text-xs font-semibold tracking-[0.12em] text-slate-500">
-              Tight
-            </div>
-            <div className="absolute right-2 top-2 -rotate-90 text-xs font-semibold tracking-[0.12em] text-slate-500">
-              Loose
-            </div>
-            <div className="absolute bottom-1 left-1/2 -translate-x-1/2 text-xs font-semibold tracking-[0.12em] text-slate-500">
-              Risk appetite →
-            </div>
-            <div className="absolute left-1 top-1/2 -translate-y-1/2 -rotate-90 text-xs font-semibold tracking-[0.12em] text-slate-500">
-              Cash tightness ↑
-            </div>
+            <p className="mt-2 text-xs text-slate-500">
+              Thresholds: tightness {tightnessThreshold}, risk {riskThreshold}. Use these to decide
+              when to shift approvals.
+            </p>
           </div>
-          <button
-            type="button"
-            aria-label={`Matrix position. Tightness ${assessment.scores.tightness}, risk appetite ${assessment.scores.riskAppetite}.`}
-            aria-describedby={matrixTooltipId}
-            className="group absolute flex min-h-[44px] min-w-[44px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full"
-            style={{ left: `${matrixDotX}%`, top: `${matrixDotY}%` }}
-          >
-            <span
-              id={matrixTooltipId}
-              role="tooltip"
-              className="pointer-events-none absolute top-0 -translate-y-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-slate-200 opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+          <div className="weather-surface relative h-72">
+            <svg
+              className="absolute inset-0 h-full w-full"
+              viewBox="0 0 100 100"
+              preserveAspectRatio="none"
+              role="img"
+              aria-labelledby="signal-matrix-visual-title signal-matrix-visual-desc"
             >
-              Tightness {assessment.scores.tightness} · Risk appetite {assessment.scores.riskAppetite}
-            </span>
-          </button>
-          {quadrants.map((quadrant) => {
-            const tooltipId = `matrix-${quadrant.id}-tooltip`;
-            return (
-              <div key={quadrant.id} className={`absolute ${quadrant.className}`}>
-                <button
-                  type="button"
-                  aria-describedby={tooltipId}
-                  className="group relative weather-pill flex min-h-[44px] flex-col justify-center px-3 text-xs font-semibold tracking-[0.12em] text-slate-300"
+              <title id="signal-matrix-visual-title">Signal matrix grid</title>
+              <desc id="signal-matrix-visual-desc">
+                A two-by-two matrix showing the balance of tightness and market risk appetite.
+              </desc>
+              <defs>
+                <pattern
+                  id={matrixGridId}
+                  width="50"
+                  height="50"
+                  patternUnits="userSpaceOnUse"
+                  patternTransform="scale(1)"
                 >
-                  <span>{quadrant.label}</span>
-                  <span className="mt-1 text-[9px] normal-case tracking-normal text-slate-400">
-                    {quadrant.action}
-                  </span>
-                  <span
-                    id={tooltipId}
-                    role="tooltip"
-                    className="pointer-events-none absolute z-10 mt-2 w-44 rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-slate-200 opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
-                  >
-                    <span className="block">{quadrant.description}</span>
-                    <span className="mt-2 block text-slate-300">{quadrant.action}</span>
-                  </span>
-                </button>
+                  <path
+                    d="M 50 0 H 0 V 50"
+                    fill="none"
+                    stroke="rgba(30,41,59,0.9)"
+                    strokeWidth="1"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                </pattern>
+                <filter id={matrixGlowId} x="-50%" y="-50%" width="200%" height="200%">
+                  <feDropShadow
+                    dx="0"
+                    dy="0"
+                    stdDeviation="2"
+                    floodColor="#fbbf24"
+                    floodOpacity="0.45"
+                  />
+                </filter>
+              </defs>
+              <rect width="100" height="100" fill={`url(#${matrixGridId})`} />
+              <line
+                x1="50"
+                y1="0"
+                x2="50"
+                y2="100"
+                stroke="rgba(71,85,105,0.6)"
+                strokeWidth="1"
+                vectorEffect="non-scaling-stroke"
+              />
+              <line
+                x1="0"
+                y1="50"
+                x2="100"
+                y2="50"
+                stroke="rgba(71,85,105,0.6)"
+                strokeWidth="1"
+                vectorEffect="non-scaling-stroke"
+              />
+              <text
+                x="50"
+                y="52"
+                textAnchor="middle"
+                fill="rgba(100,116,139,0.55)"
+                fontSize="8"
+                letterSpacing="6"
+              >
+                MATRIX
+              </text>
+              <circle
+                cx={matrixDotX}
+                cy={matrixDotY}
+                r="4"
+                fill="#fbbf24"
+                stroke="#0f172a"
+                strokeWidth="1.5"
+                vectorEffect="non-scaling-stroke"
+                filter={`url(#${matrixGlowId})`}
+              />
+              <text
+                x={matrixDotX}
+                y={matrixDotY + 1.2}
+                textAnchor="middle"
+                fontSize="6"
+                fontWeight="600"
+                fill="#0f172a"
+                stroke="#0f172a"
+                strokeWidth="0.6"
+                paintOrder="stroke fill"
+              >
+                +
+              </text>
+            </svg>
+            <div className="pointer-events-none absolute inset-0">
+              <div className="absolute bottom-3 left-3 text-xs font-semibold tracking-[0.12em] text-slate-500">
+                Cautious
               </div>
-            );
-          })}
+              <div className="absolute bottom-3 right-3 text-xs font-semibold tracking-[0.12em] text-slate-500">
+                Bold
+              </div>
+              <div className="absolute left-3 top-3 -rotate-90 text-xs font-semibold tracking-[0.12em] text-slate-500">
+                Tight
+              </div>
+              <div className="absolute right-3 top-3 -rotate-90 text-xs font-semibold tracking-[0.12em] text-slate-500">
+                Loose
+              </div>
+              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-xs font-semibold tracking-[0.12em] text-slate-500">
+                Risk appetite →
+              </div>
+              <div className="absolute left-2 top-1/2 -translate-y-1/2 -rotate-90 text-xs font-semibold tracking-[0.12em] text-slate-500">
+                Cash tightness ↑
+              </div>
+            </div>
+            <button
+              type="button"
+              aria-label={`Matrix position. Tightness ${assessment.scores.tightness}, risk appetite ${assessment.scores.riskAppetite}.`}
+              aria-describedby={matrixTooltipId}
+              className="group absolute flex min-h-[44px] min-w-[44px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full"
+              style={{ left: `${matrixDotX}%`, top: `${matrixDotY}%` }}
+            >
+              <span
+                id={matrixTooltipId}
+                role="tooltip"
+                className="pointer-events-none absolute top-0 -translate-y-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-slate-200 opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+              >
+                Tightness {assessment.scores.tightness} · Risk appetite {assessment.scores.riskAppetite}
+              </span>
+            </button>
+          </div>
+          <figcaption id="signal-matrix-description" className="text-xs text-slate-500">
+            Position is derived from tightness (
+            <span className="tabular-nums">{assessment.scores.tightness}</span>) and market risk
+            appetite (<span className="tabular-nums">{assessment.scores.riskAppetite}</span>).
+          </figcaption>
+        </figure>
+        <div className="space-y-3">
+          <div className="weather-surface p-4">
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Decision guide</p>
+            <p className="mt-2 text-sm text-slate-200">
+              Use the quadrant actions below to align staffing, budget approvals, and roadmap bets
+              with the current macro posture.
+            </p>
+          </div>
+          <div className="grid gap-3">
+            {quadrants.map((quadrant) => (
+              <div key={quadrant.id} className={`rounded-xl border p-4 ${quadrant.className}`}>
+                <p className="text-xs font-semibold tracking-[0.12em]">{quadrant.label}</p>
+                <p className="mt-2 text-sm text-slate-100">{quadrant.description}</p>
+                <p className="mt-3 text-xs text-slate-200">{quadrant.action}</p>
+              </div>
+            ))}
+          </div>
         </div>
-        <figcaption id="signal-matrix-description" className="mt-4 text-xs text-slate-500">
-          Position is derived from tightness (
-          <span className="tabular-nums">{assessment.scores.tightness}</span>) and market risk
-          appetite (<span className="tabular-nums">{assessment.scores.riskAppetite}</span>).
-        </figcaption>
-      </figure>
+      </div>
     </section>
   );
 };
@@ -1742,11 +1763,11 @@ export const RegimeChangeAlertPanel = ({
           <div>
             <p className="type-label text-slate-400">Market climate change alerts</p>
             <h3 id="regime-alerts-title" className="type-section text-slate-100">
-              Alert preview and reason codes
+              Alert preview and response plan
             </h3>
             <p className="mt-2 type-data text-slate-300">
-              Monitor climate shifts with a clear before/after snapshot and the signal shifts
-              that triggered the change.
+              Monitor climate shifts with a clear before/after snapshot, reason codes, and the next
+              action to take.
             </p>
           </div>
           <div className="flex flex-col items-end gap-3">
@@ -1759,49 +1780,120 @@ export const RegimeChangeAlertPanel = ({
           </div>
         </div>
         {alert ? (
-          <div className="mt-6 grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">
-            <div className="weather-surface p-4">
-              <p className="type-label text-slate-400">Latest alert</p>
-              <p className="mt-3 text-sm text-slate-100">{alert.summary}</p>
-              <p className="mt-2 text-xs text-slate-500">
-                Previous record:{" "}
-                <time dateTime={alert.previousRecordDate}>
-                  {formatDate(alert.previousRecordDate)}
-                </time>{" "}
-                → Current record:{" "}
-                <time dateTime={alert.currentRecordDate}>
-                  {formatDate(alert.currentRecordDate)}
-                </time>
-              </p>
-              <ul className="mt-4 space-y-2 text-sm text-slate-300">
-                {alert.reasons.map((reason) => (
-                  <li key={reason} className="flex gap-2">
-                    <span className="text-slate-500">•</span>
-                    <span className="break-words">{reason}</span>
-                  </li>
-                ))}
-              </ul>
+          <div className="mt-6 grid gap-4 lg:grid-cols-[1.15fr,0.85fr]">
+            <div className="space-y-4">
+              <div className="weather-surface p-4">
+                <p className="type-label text-slate-400">Latest alert</p>
+                <p className="mt-3 text-sm text-slate-100">{alert.summary}</p>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-xl border border-slate-800/80 bg-slate-950/50 p-3">
+                    <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                      Previous record
+                    </p>
+                    <p className="mt-2 text-xs text-slate-200">
+                      <time dateTime={alert.previousRecordDate}>
+                        {formatDate(alert.previousRecordDate)}
+                      </time>
+                    </p>
+                    <p className="mt-2 text-xs text-slate-500">
+                      Regime: <span className="text-slate-200">{alert.previousRegime}</span>
+                    </p>
+                  </div>
+                  <div className="rounded-xl border border-slate-800/80 bg-slate-950/50 p-3">
+                    <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                      Current record
+                    </p>
+                    <p className="mt-2 text-xs text-slate-200">
+                      <time dateTime={alert.currentRecordDate}>
+                        {formatDate(alert.currentRecordDate)}
+                      </time>
+                    </p>
+                    <p className="mt-2 text-xs text-slate-500">
+                      Regime: <span className="text-slate-200">{alert.currentRegime}</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="weather-surface p-4">
+                <p className="type-label text-slate-400">Reason codes</p>
+                <ul className="mt-3 space-y-2 text-sm text-slate-300">
+                  {alert.reasons.map((reason) => (
+                    <li key={reason} className="flex gap-2">
+                      <span className="text-slate-500">•</span>
+                      <span className="break-words">{reason}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
-            <div className="weather-surface p-4">
-              <p className="type-label text-slate-400">Actions</p>
-              <p className="mt-3 text-sm text-slate-300">
-                Use the Time Machine to replay the prior month and share the shift in your planning
-                review.
-              </p>
-              <a
-                href="/signals#time-machine"
-                className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-xl border border-sky-500/40 bg-slate-950/70 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
-              >
-                Open Time Machine
-              </a>
+            <div className="space-y-4">
+              <div className="weather-surface p-4">
+                <p className="type-label text-slate-400">Next actions</p>
+                <p className="mt-3 text-sm text-slate-300">
+                  Use the Time Machine to replay the prior month and share the shift in your
+                  planning review.
+                </p>
+                <ul className="mt-4 space-y-2 text-xs text-slate-400">
+                  <li className="flex gap-2">
+                    <span className="text-slate-500">•</span>
+                    <span>Re-confirm approvals tied to long payback bets.</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-slate-500">•</span>
+                    <span>Update leadership briefs before the next planning sync.</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-slate-500">•</span>
+                    <span>Document the change in the operations log.</span>
+                  </li>
+                </ul>
+                <a
+                  href="/signals#time-machine"
+                  className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-xl border border-sky-500/40 bg-slate-950/70 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                >
+                  Open Time Machine
+                </a>
+              </div>
+              <div className="weather-surface p-4">
+                <p className="type-label text-slate-400">Alert discipline</p>
+                <p className="mt-2 text-sm text-slate-200">
+                  Alerts fire only on regime shifts or threshold crossings to avoid noise.
+                </p>
+                <p className="mt-2 text-xs text-slate-500">
+                  Use this section to confirm the new posture before you move backlog approvals.
+                </p>
+              </div>
             </div>
           </div>
         ) : (
-          <div className="mt-6 weather-surface p-4">
-            <p className="text-sm text-slate-300">
-              No alert right now. Notifications only fire when the regime changes or tightness /
-              risk appetite cross a threshold, so operators only get interrupted on state changes.
-            </p>
+          <div className="mt-6 grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">
+            <div className="weather-surface p-4">
+              <p className="type-label text-slate-400">No alert</p>
+              <p className="mt-3 text-sm text-slate-300">
+                There is no active change alert. Alerts only fire when the regime changes or
+                tightness / risk appetite cross a threshold.
+              </p>
+              <p className="mt-3 text-xs text-slate-500">
+                Stay focused on weekly execution until the next signal shift is confirmed.
+              </p>
+            </div>
+            <div className="weather-surface p-4">
+              <p className="type-label text-slate-400">What would trigger an alert?</p>
+              <ul className="mt-3 space-y-2 text-sm text-slate-300">
+                <li className="flex gap-2">
+                  <span className="text-slate-500">•</span>
+                  <span>Regime flips between Survival, Safety, Stability, and Growth.</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-slate-500">•</span>
+                  <span>Tightness or risk appetite crosses the configured threshold.</span>
+                </li>
+                <li className="flex gap-2">
+                  <span className="text-slate-500">•</span>
+                  <span>Material data quality flags force a posture review.</span>
+                </li>
+              </ul>
+            </div>
           </div>
         )}
       </div>
