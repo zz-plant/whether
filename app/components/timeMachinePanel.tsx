@@ -162,6 +162,7 @@ export const TimeMachinePanel = ({
   ].filter((item): item is { key: string; message: string; includeId: boolean } => Boolean(item));
   const coverageMin = cacheCoverage.earliest ? formatMonthInput(cacheCoverage.earliest) : undefined;
   const coverageMax = cacheCoverage.latest ? formatMonthInput(cacheCoverage.latest) : undefined;
+  const latestMonthValue = formatMonthInput(latestRecordDate);
 
   const formatPercent = (value: number) => `${value.toFixed(2)}%`;
   const formatScore = (value: number) => value.toFixed(0);
@@ -206,6 +207,31 @@ export const TimeMachinePanel = ({
     const nextParams = new URLSearchParams(searchParams.toString());
     nextParams.set("draftMonth", String(parsed.month));
     nextParams.set("draftYear", String(parsed.year));
+    router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
+  };
+
+  const handleClearDraft = () => {
+    setErrorMessage(null);
+    const nextParams = new URLSearchParams(searchParams.toString());
+    nextParams.delete("draftMonth");
+    nextParams.delete("draftYear");
+    router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
+  };
+
+  const handleJumpToLatest = () => {
+    if (!latestMonthValue) {
+      return;
+    }
+    const parsed = parseMonthInput(latestMonthValue);
+    if (!parsed) {
+      return;
+    }
+    setErrorMessage(null);
+    const nextParams = new URLSearchParams(searchParams.toString());
+    nextParams.delete("draftMonth");
+    nextParams.delete("draftYear");
+    nextParams.set("month", String(parsed.month));
+    nextParams.set("year", String(parsed.year));
     router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
   };
 
@@ -353,6 +379,22 @@ export const TimeMachinePanel = ({
             {isPending ? "Loading" : "Load snapshot"}
           </button>
         </form>
+        <div className="mt-3 flex flex-wrap gap-3 text-xs">
+          <button
+            type="button"
+            onClick={handleClearDraft}
+            className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-300 transition-colors hover:border-slate-500/70 hover:text-slate-100 touch-manipulation"
+          >
+            Clear draft
+          </button>
+          <button
+            type="button"
+            onClick={handleJumpToLatest}
+            className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+          >
+            Jump to latest
+          </button>
+        </div>
         <div className="mt-4 min-h-[20px]">
           {statusMessages.length > 0 ? (
             <div

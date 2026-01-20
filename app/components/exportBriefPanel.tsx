@@ -150,6 +150,16 @@ export const ExportBriefPanel = ({
     window.print();
   };
 
+  const handleDownload = (content: string, filename: string) => {
+    const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = filename;
+    anchor.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 0);
+  };
+
   return (
     <section id="export-briefs" aria-labelledby="export-briefs-title" className="mt-10">
       <div className="weather-panel p-6">
@@ -167,7 +177,7 @@ export const ExportBriefPanel = ({
             <button
               type="button"
               onClick={handlePrint}
-              className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100"
+              className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
             >
               Print / Save PDF
             </button>
@@ -187,13 +197,25 @@ export const ExportBriefPanel = ({
                 onClick={() => handleCopy(briefing, "Slack")}
                 disabled={isCopying}
                 aria-busy={isCopying}
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
               >
                 {isCopying && copyTarget === "Slack" ? "Copying" : "Copy Slack brief"}
               </button>
+              <button
+                type="button"
+                onClick={() =>
+                  handleDownload(
+                    briefing,
+                    `whether-brief-${treasury.record_date}.txt`
+                  )
+                }
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+              >
+                Download brief
+              </button>
               <a
                 href={`mailto:?subject=${mailSubject}&body=${mailBody}`}
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
               >
                 Open email draft
               </a>
@@ -209,9 +231,21 @@ export const ExportBriefPanel = ({
               onClick={() => handleCopy(slideBullets, "Slides")}
               disabled={isCopying}
               aria-busy={isCopying}
-              className="weather-button mt-4 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
+              className="weather-button mt-4 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
             >
               {isCopying && copyTarget === "Slides" ? "Copying" : "Copy slide bullets"}
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                handleDownload(
+                  slideBullets,
+                  `whether-slide-bullets-${treasury.record_date}.txt`
+                )
+              }
+              className="weather-button mt-3 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+            >
+              Download bullets
             </button>
           </div>
         </div>
@@ -228,9 +262,21 @@ export const ExportBriefPanel = ({
               onClick={() => handleCopy(constraintHeadlines, "Headlines")}
               disabled={isCopying}
               aria-busy={isCopying}
-              className="weather-button mt-4 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
+              className="weather-button mt-4 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
             >
               {isCopying && copyTarget === "Headlines" ? "Copying" : "Copy constraint headlines"}
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                handleDownload(
+                  constraintHeadlines,
+                  `whether-headlines-${treasury.record_date}.txt`
+                )
+              }
+              className="weather-button mt-3 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+            >
+              Download headlines
             </button>
           </div>
           <div className="weather-surface p-4">
@@ -244,7 +290,7 @@ export const ExportBriefPanel = ({
               readOnly
               value={constraintHeadlines}
               rows={6}
-              className="mt-3 w-full rounded-lg border border-slate-800 bg-slate-950/80 p-3 font-mono text-base text-slate-200"
+              className="mt-3 w-full rounded-lg border border-slate-800 bg-slate-950/80 p-3 font-mono text-base text-slate-200 touch-manipulation"
             />
           </div>
         </div>
@@ -261,7 +307,7 @@ export const ExportBriefPanel = ({
                 readOnly
                 value={briefing}
                 rows={8}
-                className="mt-3 w-full rounded-lg border border-amber-400/30 bg-slate-950/80 p-3 font-mono text-base text-amber-100"
+                className="mt-3 w-full rounded-lg border border-amber-400/30 bg-slate-950/80 p-3 font-mono text-base text-amber-100 touch-manipulation"
               />
             </div>
           ) : null}
