@@ -333,43 +333,115 @@ export const WeeklyActionSummaryPanel = ({
       ],
     },
   ];
+  const decisionChecklist = [
+    {
+      title: "Anchor on posture",
+      detail: `Operate in ${regimeLabel} mode: ${actionGuidance}.`,
+    },
+    {
+      title: "Name the constraint",
+      detail: `Cash availability ${assessment.scores.tightness}/100 · Risk appetite ${assessment.scores.riskAppetite}/100.`,
+    },
+    {
+      title: "Lock the one-week bet",
+      detail: "Pick the smallest scope that protects retention or reliability in under two quarters.",
+    },
+  ];
+  const weeklyQuickLinks = [
+    { href: "#executive-snapshot", label: "Leadership summary" },
+    { href: "/operations#playbook", label: "Actions playbook" },
+    { href: "/signals#thresholds", label: "Thresholds" },
+    { href: "#beginner-glossary", label: "Glossary" },
+  ];
 
   return (
-    <ActionSummaryPanel
-      id="weekly-action-summary"
-      label="What should I do this week?"
-      title="Weekly action summary"
-      description={
-        <>
-          This week, operate in {regimeLabel} mode: {actionGuidance}. {regimeDescription} Skim the{" "}
-          <a
-            href="#executive-snapshot"
-            className="touch-target inline-flex min-h-[44px] items-center text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-slate-50 touch-manipulation"
-          >
-            leadership summary
-          </a>{" "}
-          for the source signals and decision guardrails.
-        </>
-      }
-      summaryCard={<WeeklySummaryCard summary={weeklySummary} />}
-      blocks={weeklyBlocks}
-      footer={
-        <div className="flex flex-wrap gap-3 text-xs font-semibold tracking-[0.12em] text-slate-400">
-          <span className="weather-chip inline-flex min-h-[32px] items-center px-3 py-1">
-            Strategy: problem/ROI fit
-          </span>
-          <span className="weather-chip inline-flex min-h-[32px] items-center px-3 py-1">
-            Macro: cash + risk appetite
-          </span>
-          <a
-            href="#beginner-glossary"
-            className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
-          >
-            Open the glossary
-          </a>
+    <section id="weekly-action-summary" aria-labelledby="weekly-action-summary-title" className="mt-8">
+      <div className="weather-panel flex flex-col gap-6 px-6 py-5">
+        <div className="flex flex-wrap items-start justify-between gap-6">
+          <div className="max-w-2xl">
+            <p className="type-label text-slate-400">What should I do this week?</p>
+            <h2 id="weekly-action-summary-title" className="type-section text-slate-100">
+              Weekly action control room
+            </h2>
+            <p className="mt-3 text-sm text-slate-200">
+              This week, operate in {regimeLabel} mode: {actionGuidance}. {regimeDescription} Skim the{" "}
+              <a
+                href="#executive-snapshot"
+                className="touch-target inline-flex min-h-[44px] items-center text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-slate-50 touch-manipulation"
+              >
+                leadership summary
+              </a>{" "}
+              for the source signals and decision guardrails.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
+              <span className="weather-pill inline-flex min-h-[32px] items-center px-3 py-1">
+                Regime: {regimeLabel}
+              </span>
+              <span className="weather-pill-muted inline-flex min-h-[32px] items-center px-3 py-1">
+                Strategy: problem/ROI fit
+              </span>
+              <span className="weather-pill-muted inline-flex min-h-[32px] items-center px-3 py-1">
+                Macro: cash + risk appetite
+              </span>
+            </div>
+          </div>
+          <div className="w-full lg:w-[360px]">
+            <WeeklySummaryCard summary={weeklySummary} />
+          </div>
         </div>
-      }
-    />
+
+        <div className="grid gap-4 lg:grid-cols-[1.25fr,0.75fr]">
+          <div className="grid gap-3">
+            {weeklyBlocks.map((block) => (
+              <div key={block.heading} className="weather-surface p-4">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                  {block.heading}
+                </p>
+                <ul className="mt-3 space-y-2 text-sm text-slate-300">
+                  {block.bullets.map((bullet) => (
+                    <li key={bullet} className="flex gap-2">
+                      <span className="text-slate-500">•</span>
+                      <span className="break-words">{bullet}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <aside className="weather-surface p-4" aria-label="Weekly decision checklist">
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Decision checklist</p>
+            <ol className="mt-3 space-y-3 text-sm text-slate-300">
+              {decisionChecklist.map((item, index) => (
+                <li key={item.title} className="flex gap-3">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-700/70 bg-slate-950 text-xs font-semibold text-slate-200">
+                    {index + 1}
+                  </span>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-200">{item.title}</p>
+                    <p className="mt-1 text-xs text-slate-400">{item.detail}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </aside>
+        </div>
+
+        <div className="flex flex-wrap gap-3 text-xs font-semibold tracking-[0.12em] text-slate-400">
+          {weeklyQuickLinks.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+            >
+              {link.label}
+            </a>
+          ))}
+        </div>
+        <p className="text-xs text-slate-500">
+          Keep the weekly narrative tight so leaders can decide without re-reading the data lanes.
+        </p>
+      </div>
+    </section>
   );
 };
 
@@ -727,15 +799,15 @@ export const FirstTimeGuidePanel = ({
 }) => (
   <section id="first-time-guide" aria-labelledby="first-time-guide-title" className="mt-10">
     <div className="weather-panel weather-panel-static p-6">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
+      <div className="flex flex-wrap items-start justify-between gap-6">
+        <div className="max-w-2xl">
           <p className="type-label text-slate-400">New here? Start here</p>
           <h2 id="first-time-guide-title" className="type-section text-slate-100">
             Get oriented in three plain-English steps
           </h2>
           <p className="mt-2 type-data text-slate-300">
-            This report turns Treasury signals into weekly constraints. Start here before diving into
-            the deeper data lanes.
+            This report turns Treasury signals into weekly constraints. Use this quick onboarding
+            path before you dive into the deeper data lanes.
           </p>
         </div>
         <div className="weather-surface px-4 py-3 text-xs font-semibold tracking-[0.12em] text-slate-300">
@@ -746,38 +818,65 @@ export const FirstTimeGuidePanel = ({
         </div>
       </div>
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-3">
-        {[
-          {
-            title: "1. Read the leadership summary",
-            detail:
-              "Confirm the weekly posture and top constraints before you open deeper diagnostics.",
-            example: "Example decision: defer expansion hires when cash is tight.",
-          },
-          {
-            title: "2. Check the proof",
-            detail:
-              "Use the signal breakdown here, then open the data lane to see the source metrics.",
-            example: "Example decision: confirm curve inversion before approving long bets.",
-          },
-          {
-            title: "3. Turn it into actions",
-            detail:
-              "Use the actions lane to brief leadership with clear, plain-English constraints.",
-            example: "Example decision: focus on retention when risk appetite is cautious.",
-          },
-        ].map((step) => (
-          <div
-            key={step.title}
-            className="weather-surface p-4 text-sm text-slate-300"
-          >
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-200">
-              {step.title}
-            </p>
-            <p className="mt-2 text-sm text-slate-400">{step.detail}</p>
-            <p className="mt-3 text-xs text-slate-500">{step.example}</p>
+      <div className="mt-6 grid gap-4 lg:grid-cols-[1.15fr,0.85fr]">
+        <ol className="space-y-4">
+          {[
+            {
+              title: "Read the leadership summary",
+              detail:
+                "Confirm the weekly posture and top constraints before you open deeper diagnostics.",
+              example: "Example decision: defer expansion hires when cash is tight.",
+            },
+            {
+              title: "Check the proof",
+              detail:
+                "Use the signal breakdown here, then open the data lane to see the source metrics.",
+              example: "Example decision: confirm curve inversion before approving long bets.",
+            },
+            {
+              title: "Turn it into actions",
+              detail:
+                "Use the actions lane to brief leadership with clear, plain-English constraints.",
+              example: "Example decision: focus on retention when risk appetite is cautious.",
+            },
+          ].map((step, index) => (
+            <li key={step.title} className="weather-surface p-4 text-sm text-slate-300">
+              <div className="flex items-start gap-3">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-700/70 bg-slate-950 text-xs font-semibold text-slate-200">
+                  {index + 1}
+                </span>
+                <div>
+                  <p className="text-xs font-semibold tracking-[0.12em] text-slate-200">
+                    {step.title}
+                  </p>
+                  <p className="mt-2 text-sm text-slate-400">{step.detail}</p>
+                  <p className="mt-3 text-xs text-slate-500">{step.example}</p>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ol>
+        <aside className="weather-surface p-4" aria-label="Onboarding checklist">
+          <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">First 10 minutes</p>
+          <ul className="mt-3 space-y-3 text-sm text-slate-300">
+            <li className="flex gap-2">
+              <span className="text-slate-500">•</span>
+              <span>Skim the climate badge and the weekly action summary together.</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="text-slate-500">•</span>
+              <span>Verify the source freshness before you share a recommendation.</span>
+            </li>
+            <li className="flex gap-2">
+              <span className="text-slate-500">•</span>
+              <span>Use the playbook to translate macro constraints into concrete next steps.</span>
+            </li>
+          </ul>
+          <div className="mt-4 rounded-lg border border-sky-900/60 bg-slate-950/60 p-3 text-xs text-slate-400">
+            Tip: share the report URL after selecting a time machine snapshot so every stakeholder
+            sees the same assumptions.
           </div>
-        ))}
+        </aside>
       </div>
 
       <div className="mt-6 flex flex-wrap gap-3">
@@ -791,7 +890,7 @@ export const FirstTimeGuidePanel = ({
           <a
             key={link.href}
             href={link.href}
-            className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100"
+            className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
           >
             {link.label}
           </a>
