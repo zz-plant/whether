@@ -55,6 +55,44 @@ const buildSnapshotText = (entry: DecisionMemoryEntry) => {
     .join("\n");
 };
 
+const escapeCsvValue = (value: string) => {
+  const normalized = value.replace(/"/g, "\"\"");
+  if (/[",\n]/.test(normalized)) {
+    return `"${normalized}"`;
+  }
+  return normalized;
+};
+
+const buildCsvRows = (entries: DecisionMemoryEntry[]) => {
+  const header = [
+    "title",
+    "note",
+    "regime",
+    "confidence",
+    "recordDate",
+    "loggedAt",
+    "constraints",
+    "sourceLabel",
+    "sourceUrl",
+  ];
+  const rows = entries.map((entry) => [
+    entry.title,
+    entry.note,
+    entry.regime,
+    entry.confidence,
+    entry.recordDate,
+    entry.loggedAt,
+    entry.constraints.join(" | "),
+    entry.sourceLabel,
+    entry.sourceUrl ?? "",
+  ]);
+
+  return [
+    header.map(escapeCsvValue).join(","),
+    ...rows.map((row) => row.map(escapeCsvValue).join(",")),
+  ].join("\n");
+};
+
 export const DecisionMemoryPanel = ({
   assessment,
   provenance,
@@ -80,6 +118,9 @@ export const DecisionMemoryPanel = ({
   const titleInputRef = useRef<HTMLInputElement | null>(null);
   const snapshotParam = searchParams.get("decisionSnapshot");
   const focusedId = searchParams.get("decisionId");
+  const safeRecordLabel = recordDateLabel.replace(/[^a-zA-Z0-9-_]+/g, "-");
+  const defaultRecordLabel = new Date().toISOString().slice(0, 10);
+  const exportLabel = safeRecordLabel || defaultRecordLabel;
 
   const attachedSnapshot = useMemo(() => {
     if (!snapshotParam) {
@@ -260,6 +301,42 @@ export const DecisionMemoryPanel = ({
     setEntries((prev) => [attachedSnapshot, ...prev].slice(0, 12));
   };
 
+  const handleDownload = (content: string, filename: string, mime = "text/plain") => {
+    const blob = new Blob([content], { type: `${mime};charset=utf-8` });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = filename;
+    anchor.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 0);
+  };
+
+  const handleExportJson = () => {
+    const payload = JSON.stringify(entries, null, 2);
+    handleDownload(payload, `whether-decision-memory-${exportLabel}.json`, "application/json");
+  };
+
+  const handleExportCsv = () => {
+    const payload = buildCsvRows(entries);
+    handleDownload(payload, `whether-decision-memory-${exportLabel}.csv`, "text/csv");
+  };
+
+  const handleClearLog = () => {
+    if (!window.confirm("Clear the decision memory log? This cannot be undone.")) {
+      return;
+    }
+    setEntries([]);
+    try {
+      window.localStorage.removeItem(storageKey);
+    } catch {
+      // Intentionally ignore storage cleanup errors to keep console clean.
+    }
+    const nextParams = new URLSearchParams(searchParams.toString());
+    nextParams.delete("decisionId");
+    nextParams.delete("decisionSnapshot");
+    router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
+  };
+
   return (
     <section id="decision-memory" aria-labelledby="decision-memory-title" className="mt-10">
       <div className="weather-panel p-6">
@@ -295,14 +372,14 @@ export const DecisionMemoryPanel = ({
               <button
                 type="button"
                 onClick={handleSnapshotSave}
-                className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200"
+                className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
               >
                 Save to memory
               </button>
               <button
                 type="button"
                 onClick={handleClearSnapshot}
-                className="weather-pill inline-flex min-h-[44px] items-center justify-center border border-slate-700/60 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-300 transition-colors hover:border-slate-500/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-200"
+                className="weather-pill inline-flex min-h-[44px] items-center justify-center border border-slate-700/60 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-300 transition-colors hover:border-slate-500/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-200 touch-manipulation"
               >
                 Clear snapshot link
               </button>
@@ -327,7 +404,7 @@ export const DecisionMemoryPanel = ({
                   onBlur={handleTitleBlur}
                   aria-invalid={Boolean(titleError)}
                   aria-describedby={titleError ? "decision-title-error" : undefined}
-                  className="weather-input mt-2 min-h-[44px] w-full px-3 py-2 text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200"
+                  className="weather-input mt-2 min-h-[44px] w-full px-3 py-2 text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
                 />
                 {titleError ? (
                   <p id="decision-title-error" className="mt-2 text-xs text-amber-200">
@@ -344,13 +421,13 @@ export const DecisionMemoryPanel = ({
                   value={decisionNote}
                   onChange={(event) => setDecisionNote(event.target.value)}
                   rows={4}
-                  className="weather-input mt-2 w-full px-3 py-2 text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200"
+                  className="weather-input mt-2 w-full px-3 py-2 text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
                 />
               </div>
               <button
                 type="button"
                 onClick={handleLogDecision}
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200"
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
               >
                 Log decision
               </button>
@@ -377,7 +454,32 @@ export const DecisionMemoryPanel = ({
         </div>
 
         <div className="mt-6">
-          <p className="type-label text-slate-400">Decision memory log</p>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="type-label text-slate-400">Decision memory log</p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={handleExportJson}
+                className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+              >
+                Export JSON
+              </button>
+              <button
+                type="button"
+                onClick={handleExportCsv}
+                className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+              >
+                Export CSV
+              </button>
+              <button
+                type="button"
+                onClick={handleClearLog}
+                className="weather-pill inline-flex min-h-[44px] items-center justify-center border border-rose-400/40 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-rose-200 transition-colors hover:border-rose-300/70 hover:text-rose-100 touch-manipulation"
+              >
+                Clear log
+              </button>
+            </div>
+          </div>
           <div className="mt-4 grid gap-3 md:grid-cols-2">
             {entries.length === 0 ? (
               <p className="text-sm text-slate-500">
@@ -414,7 +516,7 @@ export const DecisionMemoryPanel = ({
                         onClick={() => handleCopy(snapshotText, `text-${entry.id}`)}
                         disabled={isCopying}
                         aria-busy={isCopying && copyTarget === `text-${entry.id}`}
-                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200"
+                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
                       >
                         {isCopying && copyTarget === `text-${entry.id}` ? "Copying" : "Copy snapshot"}
                       </button>
@@ -423,21 +525,21 @@ export const DecisionMemoryPanel = ({
                         onClick={() => handleCopySnapshotLink(entry)}
                         disabled={isCopying}
                         aria-busy={isCopying && copyTarget === `link-${entry.id}`}
-                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200"
+                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
                       >
                         {isCopying && copyTarget === `link-${entry.id}` ? "Copying" : "Copy snapshot link"}
                       </button>
                       <button
                         type="button"
                         onClick={() => handleAttachSnapshot(entry)}
-                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200"
+                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
                       >
                         Attach to URL
                       </button>
                       <button
                         type="button"
                         onClick={() => handleFocusEntry(entry.id)}
-                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-300 transition-colors hover:border-slate-500/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-200"
+                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-300 transition-colors hover:border-slate-500/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-200 touch-manipulation"
                       >
                         Focus entry
                       </button>
@@ -461,7 +563,7 @@ export const DecisionMemoryPanel = ({
               readOnly
               value={fallbackCopyText}
               rows={6}
-              className="mt-3 w-full rounded-lg border border-amber-400/30 bg-slate-950/80 p-3 font-mono text-base text-amber-100"
+              className="mt-3 w-full rounded-lg border border-amber-400/30 bg-slate-950/80 p-3 font-mono text-base text-amber-100 touch-manipulation"
             />
           </div>
         ) : null}

@@ -103,6 +103,8 @@ export const DecisionShieldPanel = ({
   const [copied, setCopied] = useState(false);
   const [isCopying, setIsCopying] = useState(false);
   const [copyError, setCopyError] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
+  const [linkCopyError, setLinkCopyError] = useState(false);
   const [presets, setPresets] = useState<
     Array<{
       id: string;
@@ -262,6 +264,8 @@ export const DecisionShieldPanel = ({
 
   useEffect(() => {
     setCopyError(false);
+    setLinkCopyError(false);
+    setLinkCopied(false);
   }, [lifecycle, category, action]);
 
   useEffect(() => {
@@ -346,6 +350,30 @@ export const DecisionShieldPanel = ({
     }
   };
 
+  const handleCopyLink = async () => {
+    if (isCopying) {
+      return;
+    }
+    if (!navigator.clipboard?.writeText) {
+      setLinkCopyError(true);
+      setLinkCopied(false);
+      return;
+    }
+    setIsCopying(true);
+    try {
+      const link = `${window.location.origin}${pathname}?${searchParams.toString()}`;
+      await navigator.clipboard.writeText(link);
+      setLinkCopied(true);
+      setLinkCopyError(false);
+      setTimeout(() => setLinkCopied(false), 2000);
+    } catch {
+      setLinkCopied(false);
+      setLinkCopyError(true);
+    } finally {
+      setIsCopying(false);
+    }
+  };
+
   return (
     <section id="decision-shield" aria-labelledby="decision-shield-title" className="mt-10">
       <div className="weather-panel p-6">
@@ -365,19 +393,37 @@ export const DecisionShieldPanel = ({
               onClick={handleCopy}
               disabled={isCopying}
               aria-busy={isCopying}
-              className="weather-pill inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500"
+              className="weather-pill inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
             >
               {isCopying ? (
                 <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />
               ) : null}
               {copied ? "Copied" : isCopying ? "Copying" : "Copy verdict"}
             </button>
+            <button
+              type="button"
+              onClick={handleCopyLink}
+              disabled={isCopying}
+              aria-busy={isCopying}
+              className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+            >
+              {linkCopied ? "Link copied" : isCopying ? "Copying" : "Copy link"}
+            </button>
             <DataProvenanceStrip provenance={provenance} />
           </div>
         </div>
         <p className="sr-only" role="status" aria-live="polite">
-          {copied ? "Verdict copied to clipboard." : copyError ? "Clipboard blocked." : ""}
+          {copied
+            ? "Verdict copied to clipboard."
+            : linkCopied
+              ? "Decision Shield link copied to clipboard."
+              : copyError || linkCopyError
+                ? "Clipboard blocked."
+                : ""}
         </p>
+        <div className="mt-2 min-h-[20px] text-xs text-amber-200" role="status" aria-live="polite">
+          {linkCopyError ? "Clipboard blocked. Copy the URL from your browser address bar." : ""}
+        </div>
         <div className="mt-4 min-h-[260px]">
           {copyError ? (
             <div className="rounded-xl border border-amber-400/40 bg-amber-500/10 p-4 text-xs text-amber-100">
@@ -391,7 +437,7 @@ export const DecisionShieldPanel = ({
                 readOnly
                 value={shareText}
                 rows={8}
-                className="mt-3 w-full rounded-lg border border-amber-400/30 bg-slate-950/80 p-3 font-mono text-base text-amber-100"
+                className="mt-3 w-full rounded-lg border border-amber-400/30 bg-slate-950/80 p-3 font-mono text-base text-amber-100 touch-manipulation"
               />
             </div>
           ) : null}
@@ -415,7 +461,7 @@ export const DecisionShieldPanel = ({
                 id="decision-lifecycle"
                 value={lifecycle}
                 onChange={(event) => setLifecycle(event.target.value as LifecycleStage)}
-                className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70"
+                className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
               >
                 {lifecycleOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -435,7 +481,7 @@ export const DecisionShieldPanel = ({
                 id="decision-category"
                 value={category}
                 onChange={(event) => setCategory(event.target.value as DecisionCategory)}
-                className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70"
+                className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
               >
                 {categoryOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -455,7 +501,7 @@ export const DecisionShieldPanel = ({
                 id="decision-action"
                 value={action}
                 onChange={(event) => setAction(event.target.value as DecisionAction)}
-                className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70"
+                className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
               >
                 {actionOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -487,13 +533,13 @@ export const DecisionShieldPanel = ({
                   onBlur={handlePresetBlur}
                   aria-invalid={Boolean(presetError)}
                   aria-describedby={presetError ? "preset-error" : undefined}
-                  className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70"
+                  className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
                 />
               </label>
               <button
                 type="button"
                 onClick={handlePresetSave}
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100"
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs uppercase tracking-[0.2em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
               >
                 Save preset
               </button>
@@ -528,14 +574,14 @@ export const DecisionShieldPanel = ({
                       <button
                         type="button"
                         onClick={() => handlePresetApply(preset.id)}
-                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100"
+                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                       >
                         Apply
                       </button>
                       <button
                         type="button"
                         onClick={() => handlePresetDelete(preset.id)}
-                        className="weather-pill inline-flex min-h-[44px] items-center justify-center border border-rose-400/40 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-rose-200 transition-colors hover:border-rose-300/70 hover:text-rose-100"
+                        className="weather-pill inline-flex min-h-[44px] items-center justify-center border border-rose-400/40 px-3 py-1 text-[10px] uppercase tracking-[0.2em] text-rose-200 transition-colors hover:border-rose-300/70 hover:text-rose-100 touch-manipulation"
                       >
                         Remove
                       </button>
