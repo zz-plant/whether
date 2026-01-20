@@ -144,4 +144,6 @@ For UI and engineering inspiration, see `LEARNINGS.md`.
 0. Use Node.js 20 (see `.nvmrc`) and Bun 1.2.
 1. Install dependencies: `bun install`
 2. Run the dashboard: `bun run dev`
+   - For Turbopack: `bun run dev:turbo`
 3. Open `http://localhost:3000` to view the Market Climate Station UI.
+4. Run full quality checks before shipping: `bun run check`

@@ -5,12 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
+    "dev:turbo": "next dev --turbo",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
+    "check": "bun run lint && bun run typecheck && bun run test",
     "typecheck": "tsc --noEmit",
-    "test": "node --test"
+    "test": "node --test",
+    "test:watch": "node --test --watch"
   },
   "engines": {
     "node": ">=20.16.0"
