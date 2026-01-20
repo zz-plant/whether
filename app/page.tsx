@@ -12,6 +12,7 @@ import {
   SignalMatrixPanel,
   HistoricalBanner,
 } from "./components/reportSections";
+import { ChangeSinceLastReadPanel } from "./components/changeSinceLastReadPanel";
 import { ReportShell } from "./components/reportShell";
 
 export const generateMetadata = ({
@@ -152,6 +153,7 @@ export default async function HomePage({
       trustStatusDetail={trustStatusDetail}
       trustStatusAction={trustStatusAction}
       trustStatusTone={trustStatusTone}
+      showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Quick start"
       pageSummary="Start here for a fast, plain-English read of what to do this week, why, and where to dig deeper."
       pageLinks={pageLinks}
@@ -164,6 +166,12 @@ export default async function HomePage({
       <ExecutiveSnapshotPanel
         treasury={treasury}
         assessment={assessment}
+        provenance={treasuryProvenance}
+      />
+
+      <ChangeSinceLastReadPanel
+        assessment={assessment}
+        recordDate={treasury.record_date}
         provenance={treasuryProvenance}
       />
 

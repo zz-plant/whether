@@ -30,6 +30,8 @@ export const ReportShell = ({
   trustStatusDetail,
   trustStatusAction,
   trustStatusTone,
+  showOfflineBadge = false,
+  offlineBadgeLabel = "OFFLINE / SIMULATED",
   structuredData,
   historicalBanner,
 }: {
@@ -46,6 +48,8 @@ export const ReportShell = ({
   trustStatusDetail: string;
   trustStatusAction: string;
   trustStatusTone: "stable" | "warning" | "historical";
+  showOfflineBadge?: boolean;
+  offlineBadgeLabel?: string;
   structuredData?: string;
   historicalBanner?: ReactNode;
 }) => {
@@ -162,8 +166,17 @@ export const ReportShell = ({
                   </span>
                   <p className="text-xs text-slate-300">Signals stamped {recordDateLabel}</p>
                 </div>
-                <div className={`rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.12em] ${trustToneStyles}`}>
-                  {trustStatusLabel}
+                <div className="flex flex-wrap items-center gap-2">
+                  <div
+                    className={`rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.12em] ${trustToneStyles}`}
+                  >
+                    {trustStatusLabel}
+                  </div>
+                  {showOfflineBadge ? (
+                    <span className="rounded-full border border-rose-400/60 bg-rose-500/10 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-rose-100">
+                      {offlineBadgeLabel}
+                    </span>
+                  ) : null}
                 </div>
               </div>
               <p className="text-sm text-slate-300">
