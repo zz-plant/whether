@@ -14,6 +14,7 @@ import {
   getPreviousTimeMachineSnapshot,
   getTimeMachineRegimeSeries,
 } from "./timeMachineCache";
+import { getSummaryArchive } from "./summaryArchive";
 import {
   parseTimeMachineRequest,
   resolveTimeMachineSelection,
@@ -125,6 +126,7 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
   const defaultYear = latestCache?.year ?? now.getUTCFullYear();
   const cacheCoverage = getTimeMachineCoverage();
   const cacheMonthsByYear = getTimeMachineMonthsByYear();
+  const summaryArchive = getSummaryArchive();
   const regimeSeries = getTimeMachineRegimeSeries();
   const invalidHistoricalSelection = Boolean(requestedSelection && !historicalSelection);
   const selectedMonth = requestedSelection?.month ?? defaultMonth;
@@ -239,6 +241,7 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
     statusLabel,
     stopItems,
     thresholds,
+    summaryArchive,
     treasury,
     treasuryProvenance,
   };

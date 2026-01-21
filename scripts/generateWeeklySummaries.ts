@@ -6,6 +6,7 @@ import { writeFile } from "node:fs/promises";
 import { buildWeeklySummary, type WeeklySummary } from "../lib/weeklySummary";
 import { evaluateRegime } from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
+import { writeSummaryArchive } from "./summaryArchive";
 
 const START_YEAR = 2018;
 const END_YEAR = new Date().getUTCFullYear();
@@ -339,6 +340,7 @@ const generateWeeklySummaries = async () => {
     `${JSON.stringify(output, null, 2)}\n`,
     "utf8"
   );
+  await writeSummaryArchive({ weeklyEntries: output });
 };
 
 generateWeeklySummaries().catch((error) => {

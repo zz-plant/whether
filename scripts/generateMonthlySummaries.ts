@@ -7,6 +7,7 @@ import { buildMonthlySummary, type MonthlySummary } from "../lib/monthlySummary"
 import { evaluateRegime } from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
 import { resolveHistoricalDate } from "../lib/timeMachine";
+import { writeSummaryArchive } from "./summaryArchive";
 
 const START_YEAR = 2012;
 const END_YEAR = 2025;
@@ -280,6 +281,7 @@ const generateMonthlySummaries = async () => {
   }
 
   await writeFile(OUTPUT_PATH, `${JSON.stringify(output, null, 2)}\n`, "utf8");
+  await writeSummaryArchive({ monthlyEntries: output });
 };
 
 generateMonthlySummaries().catch((error) => {
