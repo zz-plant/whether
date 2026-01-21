@@ -179,12 +179,12 @@ export const ReportShell = ({
               ) : null}
             </div>
           </div>
-          <nav aria-label="Report paths" className="mt-4">
-            <ul className="flex flex-wrap gap-2">
+          <nav aria-label="Report paths" className="mt-4 -mx-4 px-4 sm:mx-0 sm:px-0">
+            <ul className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible">
               {pageLinks.map((link) => {
                 const isActive = link.label === pageTitle;
                 return (
-                  <li key={link.href}>
+                  <li key={link.href} className="flex-shrink-0">
                     <a
                       href={link.href}
                       aria-current={isActive ? "page" : undefined}
@@ -401,6 +401,69 @@ export const ReportShell = ({
             </footer>
           </div>
         </div>
+      </div>
+      <div className="sm:hidden">
+        <nav
+          aria-label="Mobile report navigation"
+          className="fixed inset-x-0 bottom-0 z-30 px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3"
+        >
+          <div className="weather-panel flex items-center justify-between gap-2 px-3 py-2">
+            {pageLinks.map((link) => {
+              const isActive = link.label === pageTitle;
+              return (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  aria-current={isActive ? "page" : undefined}
+                  className={`flex min-h-[52px] flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-1 text-[10px] font-semibold tracking-[0.2em] transition-colors touch-manipulation ${
+                    isActive
+                      ? "bg-sky-500/15 text-sky-100"
+                      : "text-slate-300 hover:text-slate-100"
+                  }`}
+                >
+                  <span className="text-slate-200">{pageLinkIcons[link.label]}</span>
+                  <span className="uppercase">{link.label}</span>
+                </a>
+              );
+            })}
+            {sectionLinks.length > 0 ? (
+              <details className="group relative flex-1">
+                <summary className="flex min-h-[52px] cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl px-2 py-1 text-[10px] font-semibold tracking-[0.2em] text-slate-300 transition-colors hover:text-slate-100 touch-manipulation">
+                  <span className="text-slate-200">
+                    <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
+                      <path
+                        d="M4 6.5h16M4 12h16M4 17.5h10"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                  </span>
+                  <span className="uppercase">Sections</span>
+                </summary>
+                <div className="absolute bottom-full left-0 right-0 mb-3">
+                  <div className="weather-panel space-y-2 px-4 py-4">
+                    <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">
+                      Jump to section
+                    </p>
+                    <ul className="space-y-2">
+                      {sectionLinks.map((item) => (
+                        <li key={item.href}>
+                          <a
+                            href={item.href}
+                            className="weather-pill inline-flex min-h-[44px] w-full items-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                          >
+                            {item.label}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </details>
+            ) : null}
+          </div>
+        </nav>
       </div>
     </main>
   );
