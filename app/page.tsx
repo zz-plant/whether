@@ -13,6 +13,7 @@ import {
   HistoricalBanner,
 } from "./components/reportSections";
 import { ChangeSinceLastReadPanel } from "./components/changeSinceLastReadPanel";
+import { RegimeAlertsPanel } from "./components/regimeAlertsPanel";
 import { ReportShell } from "./components/reportShell";
 
 export const generateMetadata = ({
@@ -96,6 +97,7 @@ export default async function HomePage({
     { href: "#weekly-action-summary", label: "This week's actions" },
     { href: "#regime-summary", label: "Market climate summary" },
     { href: "#regime-alerts", label: "New alerts" },
+    { href: "#regime-alert-log", label: "Alert history" },
     { href: "#regime-assessment", label: "What the scores mean" },
     { href: "#signal-matrix", label: "Signal breakdown" },
     { href: "#first-time-guide", label: "New here? Start here" },
@@ -184,6 +186,8 @@ export default async function HomePage({
       <RegimeSummaryPanel assessment={assessment} provenance={treasuryProvenance} />
 
       <RegimeChangeAlertPanel alert={regimeAlert} provenance={treasuryProvenance} />
+
+      <RegimeAlertsPanel />
 
       <section className="mt-10">
         <RegimeAssessmentCard assessment={assessment} provenance={treasuryProvenance} />

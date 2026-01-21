@@ -5,16 +5,14 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import type { RegimeAssessment, RegimeKey } from "../../lib/regimeEngine";
+import type { RegimeAssessment } from "../../lib/regimeEngine";
+import { buildRegimeChangeReasons } from "../../lib/regimeEngine";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
+import { regimeAlertsStorageKey, type RegimeAlertLogEntry } from "./regimeAlertsStorage";
 
 type LastReadSnapshot = {
   recordDate: string;
-  regime: RegimeKey;
-  tightness: number;
-  riskAppetite: number;
-  baseRate: number;
-  curveSlope: number | null;
+  assessment: RegimeAssessment;
   readAt: string;
 };
 
@@ -39,6 +37,18 @@ const formatDelta = (thenValue: number, nowValue: number, unit = "") => {
 const formatOptionalDelta = (thenValue: number | null, nowValue: number | null, unit = "") =>
   thenValue === null || nowValue === null ? "—" : formatDelta(thenValue, nowValue, unit);
 
+const hasAssessmentChanged = (
+  previous: LastReadSnapshot,
+  current: RegimeAssessment,
+  recordDate: string
+) =>
+  previous.recordDate !== recordDate ||
+  previous.assessment.regime !== current.regime ||
+  previous.assessment.scores.tightness !== current.scores.tightness ||
+  previous.assessment.scores.riskAppetite !== current.scores.riskAppetite ||
+  previous.assessment.scores.baseRate !== current.scores.baseRate ||
+  previous.assessment.scores.curveSlope !== current.scores.curveSlope;
+
 export const ChangeSinceLastReadPanel = ({
   assessment,
   recordDate,
@@ -51,11 +61,13 @@ export const ChangeSinceLastReadPanel = ({
   const [previous, setPrevious] = useState<LastReadSnapshot | null>(null);
 
   useEffect(() => {
+    let storedSnapshot: LastReadSnapshot | null = null;
     try {
       const stored = window.localStorage.getItem(storageKey);
       if (stored) {
         const parsed = JSON.parse(stored) as LastReadSnapshot;
-        if (parsed?.recordDate) {
+        if (parsed?.recordDate && parsed?.assessment?.regime) {
+          storedSnapshot = parsed;
           setPrevious(parsed);
         }
       }
@@ -63,15 +75,54 @@ export const ChangeSinceLastReadPanel = ({
       // Ignore storage errors to keep console clean.
     }
 
+    const loggedAt = new Date().toISOString();
     const nextSnapshot: LastReadSnapshot = {
       recordDate,
-      regime: assessment.regime,
-      tightness: assessment.scores.tightness,
-      riskAppetite: assessment.scores.riskAppetite,
-      baseRate: assessment.scores.baseRate,
-      curveSlope: assessment.scores.curveSlope,
-      readAt: new Date().toISOString(),
+      assessment,
+      readAt: loggedAt,
     };
+
+    if (storedSnapshot && hasAssessmentChanged(storedSnapshot, assessment, recordDate)) {
+      const reasons = buildRegimeChangeReasons(storedSnapshot.assessment, assessment);
+      const alertEntry: RegimeAlertLogEntry = {
+        id:
+          typeof crypto?.randomUUID === "function"
+            ? crypto.randomUUID()
+            : `${recordDate}-${loggedAt}`,
+        loggedAt,
+        previous: {
+          recordDate: storedSnapshot.recordDate,
+          assessment: storedSnapshot.assessment,
+        },
+        current: {
+          recordDate,
+          assessment,
+        },
+        reasons,
+      };
+
+      try {
+        const storedAlerts = window.localStorage.getItem(regimeAlertsStorageKey);
+        const parsedAlerts = storedAlerts
+          ? (JSON.parse(storedAlerts) as RegimeAlertLogEntry[])
+          : [];
+        const alerts = Array.isArray(parsedAlerts) ? parsedAlerts : [];
+        const latest = alerts[0];
+        const isDuplicate =
+          latest &&
+          latest.current.recordDate === alertEntry.current.recordDate &&
+          latest.previous.recordDate === alertEntry.previous.recordDate &&
+          latest.current.assessment.regime === alertEntry.current.assessment.regime &&
+          latest.previous.assessment.regime === alertEntry.previous.assessment.regime;
+
+        if (!isDuplicate) {
+          const nextAlerts = [alertEntry, ...alerts].slice(0, 20);
+          window.localStorage.setItem(regimeAlertsStorageKey, JSON.stringify(nextAlerts));
+        }
+      } catch {
+        // Ignore storage errors to keep console clean.
+      }
+    }
 
     try {
       window.localStorage.setItem(storageKey, JSON.stringify(nextSnapshot));
@@ -95,12 +146,7 @@ export const ChangeSinceLastReadPanel = ({
 
   const hasChange =
     previous &&
-    (previous.recordDate !== recordDate ||
-      previous.regime !== assessment.regime ||
-      previous.tightness !== assessment.scores.tightness ||
-      previous.riskAppetite !== assessment.scores.riskAppetite ||
-      previous.baseRate !== assessment.scores.baseRate ||
-      previous.curveSlope !== assessment.scores.curveSlope);
+    hasAssessmentChanged(previous, assessment, recordDate);
 
   return (
     <section
@@ -137,7 +183,7 @@ export const ChangeSinceLastReadPanel = ({
                   Regime shift
                 </p>
                 <p className="mt-2 text-sm text-slate-100">
-                  {previous ? `${previous.regime} → ${assessment.regime}` : "—"}
+                  {previous ? `${previous.assessment.regime} → ${assessment.regime}` : "—"}
                 </p>
               </div>
               <div className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-3">
@@ -146,7 +192,7 @@ export const ChangeSinceLastReadPanel = ({
                 </p>
                 <p className="mt-2 text-sm text-slate-100">
                   {previous
-                    ? formatDelta(previous.tightness, assessment.scores.tightness)
+                    ? formatDelta(previous.assessment.scores.tightness, assessment.scores.tightness)
                     : "—"}
                 </p>
               </div>
@@ -156,7 +202,10 @@ export const ChangeSinceLastReadPanel = ({
                 </p>
                 <p className="mt-2 text-sm text-slate-100">
                   {previous
-                    ? formatDelta(previous.riskAppetite, assessment.scores.riskAppetite)
+                    ? formatDelta(
+                        previous.assessment.scores.riskAppetite,
+                        assessment.scores.riskAppetite
+                      )
                     : "—"}
                 </p>
               </div>
@@ -166,7 +215,7 @@ export const ChangeSinceLastReadPanel = ({
                 </p>
                 <p className="mt-2 text-sm text-slate-100">
                   {previous
-                    ? formatDelta(previous.baseRate, assessment.scores.baseRate, "%")
+                    ? formatDelta(previous.assessment.scores.baseRate, assessment.scores.baseRate, "%")
                     : "—"}
                 </p>
               </div>
@@ -177,7 +226,7 @@ export const ChangeSinceLastReadPanel = ({
                 <p className="mt-2 text-sm text-slate-100">
                   {previous
                     ? formatOptionalDelta(
-                        previous.curveSlope,
+                        previous.assessment.scores.curveSlope,
                         assessment.scores.curveSlope,
                         "%"
                       )
