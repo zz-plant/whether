@@ -2172,7 +2172,8 @@ export const SensorArray = ({
       </div>
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         {sensors.map((sensor) => {
-          const sparkline = buildSparkline(sensor.history);
+          const hasTrend = Boolean(sensor.trend?.length);
+          const sparkline = buildSparkline(sensor.trend ?? sensor.history);
           const sparklineId = `sensor-spark-${sensor.id}`;
 
           return (
@@ -2222,8 +2223,13 @@ export const SensorArray = ({
                     aria-hidden="true"
                   />
                 )}
-                <figcaption className="mt-3 text-xs text-slate-400 break-words">
-                  {sensor.explanation}
+                <figcaption className="mt-3 space-y-2 text-xs text-slate-400">
+                  {hasTrend ? (
+                    <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                      12-month trend (cache)
+                    </p>
+                  ) : null}
+                  <p className="break-words">{sensor.explanation}</p>
                 </figcaption>
               </figure>
               <div className="mt-4 text-xs text-slate-500">

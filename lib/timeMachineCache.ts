@@ -3,7 +3,7 @@
  * Keeps historical lookups local to avoid third-party calls in replay mode.
  */
 import { z } from "zod";
-import type { TreasuryData } from "./types";
+import type { SeriesHistoryPoint, TreasuryData } from "./types";
 import { TreasuryDataSchema } from "./treasurySchema";
 import rawCache from "../data/time_machine_cache.json";
 
@@ -107,4 +107,27 @@ export const findTimeMachineSnapshot = (asOf: string): TreasuryData | null => {
 
   const { year: _year, month: _month, ...data } = candidate;
   return data;
+};
+
+export const getTimeMachineRollingYieldSeries = (): {
+  oneMonth: SeriesHistoryPoint[];
+  twoYear: SeriesHistoryPoint[];
+  tenYear: SeriesHistoryPoint[];
+} => {
+  const rollingSnapshots = sortedSnapshots.slice(-12);
+
+  return {
+    oneMonth: rollingSnapshots.map((snapshot) => ({
+      date: snapshot.record_date,
+      value: snapshot.yields.oneMonth ?? null,
+    })),
+    twoYear: rollingSnapshots.map((snapshot) => ({
+      date: snapshot.record_date,
+      value: snapshot.yields.twoYear ?? null,
+    })),
+    tenYear: rollingSnapshots.map((snapshot) => ({
+      date: snapshot.record_date,
+      value: snapshot.yields.tenYear ?? null,
+    })),
+  };
 };
