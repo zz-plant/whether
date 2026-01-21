@@ -1307,177 +1307,191 @@ export const SignalMatrixPanel = ({
           <DataProvenanceStrip provenance={provenance} />
         </div>
       </div>
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1.2fr,0.8fr]">
-        <figure className="space-y-4">
-          <div className="weather-surface p-4">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Current posture</p>
-            <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-slate-200">
-              <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200">
-                {quadrantLabel}
-              </span>
-              <span className="text-xs text-slate-400">
-                Tightness{" "}
-                <span className="mono text-slate-100">{assessment.scores.tightness}</span> · Risk{" "}
-                <span className="mono text-slate-100">{assessment.scores.riskAppetite}</span>
-              </span>
+      <div className="mt-4 weather-surface p-4">
+        <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Executive summary</p>
+        <p className="mt-2 text-sm text-slate-200">
+          Current posture: {quadrantLabel}. Use tightness {assessment.scores.tightness}/100 and risk
+          appetite {assessment.scores.riskAppetite}/100 to decide whether approvals should tighten
+          or loosen.
+        </p>
+      </div>
+      <details className="mt-4" open>
+        <summary className="min-h-[44px] cursor-pointer text-xs font-semibold tracking-[0.12em] text-slate-300 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+          Deep dive: matrix positioning and quadrant guidance
+        </summary>
+        <div className="mt-4 grid gap-6 lg:grid-cols-[1.2fr,0.8fr]">
+          <figure className="space-y-4">
+            <div className="weather-surface p-4">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Current posture</p>
+              <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-slate-200">
+                <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200">
+                  {quadrantLabel}
+                </span>
+                <span className="text-xs text-slate-400">
+                  Tightness{" "}
+                  <span className="mono text-slate-100">{assessment.scores.tightness}</span> · Risk{" "}
+                  <span className="mono text-slate-100">{assessment.scores.riskAppetite}</span>
+                </span>
+              </div>
+              <p className="mt-2 text-xs text-slate-500">
+                Thresholds: tightness {tightnessThreshold}, risk {riskThreshold}. Use these to decide
+                when to shift approvals.
+              </p>
             </div>
-            <p className="mt-2 text-xs text-slate-500">
-              Thresholds: tightness {tightnessThreshold}, risk {riskThreshold}. Use these to decide
-              when to shift approvals.
-            </p>
-          </div>
-          <div className="weather-surface relative h-72">
-            <svg
-              className="absolute inset-0 h-full w-full"
-              viewBox="0 0 100 100"
-              preserveAspectRatio="none"
-              role="img"
-              aria-labelledby="signal-matrix-visual-title signal-matrix-visual-desc"
-            >
-              <title id="signal-matrix-visual-title">Signal matrix grid</title>
-              <desc id="signal-matrix-visual-desc">
-                A two-by-two matrix showing the balance of tightness and market risk appetite.
-              </desc>
-              <defs>
-                <pattern
-                  id={matrixGridId}
-                  width="50"
-                  height="50"
-                  patternUnits="userSpaceOnUse"
-                  patternTransform="scale(1)"
+            <div className="weather-surface relative h-72">
+              <svg
+                className="absolute inset-0 h-full w-full"
+                viewBox="0 0 100 100"
+                preserveAspectRatio="none"
+                role="img"
+                aria-labelledby="signal-matrix-visual-title signal-matrix-visual-desc"
+              >
+                <title id="signal-matrix-visual-title">Signal matrix grid</title>
+                <desc id="signal-matrix-visual-desc">
+                  A two-by-two matrix showing the balance of tightness and market risk appetite.
+                </desc>
+                <defs>
+                  <pattern
+                    id={matrixGridId}
+                    width="50"
+                    height="50"
+                    patternUnits="userSpaceOnUse"
+                    patternTransform="scale(1)"
+                  >
+                    <path
+                      d="M 50 0 H 0 V 50"
+                      fill="none"
+                      stroke="rgba(30,41,59,0.9)"
+                      strokeWidth="1"
+                      vectorEffect="non-scaling-stroke"
+                    />
+                  </pattern>
+                  <filter id={matrixGlowId} x="-50%" y="-50%" width="200%" height="200%">
+                    <feDropShadow
+                      dx="0"
+                      dy="0"
+                      stdDeviation="2"
+                      floodColor="#fbbf24"
+                      floodOpacity="0.45"
+                    />
+                  </filter>
+                </defs>
+                <rect width="100" height="100" fill={`url(#${matrixGridId})`} />
+                <line
+                  x1="50"
+                  y1="0"
+                  x2="50"
+                  y2="100"
+                  stroke="rgba(71,85,105,0.6)"
+                  strokeWidth="1"
+                  vectorEffect="non-scaling-stroke"
+                />
+                <line
+                  x1="0"
+                  y1="50"
+                  x2="100"
+                  y2="50"
+                  stroke="rgba(71,85,105,0.6)"
+                  strokeWidth="1"
+                  vectorEffect="non-scaling-stroke"
+                />
+                <text
+                  x="50"
+                  y="52"
+                  textAnchor="middle"
+                  fill="rgba(100,116,139,0.55)"
+                  fontSize="8"
+                  letterSpacing="6"
                 >
-                  <path
-                    d="M 50 0 H 0 V 50"
-                    fill="none"
-                    stroke="rgba(30,41,59,0.9)"
-                    strokeWidth="1"
-                    vectorEffect="non-scaling-stroke"
-                  />
-                </pattern>
-                <filter id={matrixGlowId} x="-50%" y="-50%" width="200%" height="200%">
-                  <feDropShadow
-                    dx="0"
-                    dy="0"
-                    stdDeviation="2"
-                    floodColor="#fbbf24"
-                    floodOpacity="0.45"
-                  />
-                </filter>
-              </defs>
-              <rect width="100" height="100" fill={`url(#${matrixGridId})`} />
-              <line
-                x1="50"
-                y1="0"
-                x2="50"
-                y2="100"
-                stroke="rgba(71,85,105,0.6)"
-                strokeWidth="1"
-                vectorEffect="non-scaling-stroke"
-              />
-              <line
-                x1="0"
-                y1="50"
-                x2="100"
-                y2="50"
-                stroke="rgba(71,85,105,0.6)"
-                strokeWidth="1"
-                vectorEffect="non-scaling-stroke"
-              />
-              <text
-                x="50"
-                y="52"
-                textAnchor="middle"
-                fill="rgba(100,116,139,0.55)"
-                fontSize="8"
-                letterSpacing="6"
+                  MATRIX
+                </text>
+                <circle
+                  cx={matrixDotX}
+                  cy={matrixDotY}
+                  r="4"
+                  fill="#fbbf24"
+                  stroke="#0f172a"
+                  strokeWidth="1.5"
+                  vectorEffect="non-scaling-stroke"
+                  filter={`url(#${matrixGlowId})`}
+                />
+                <text
+                  x={matrixDotX}
+                  y={matrixDotY + 1.2}
+                  textAnchor="middle"
+                  fontSize="6"
+                  fontWeight="600"
+                  fill="#0f172a"
+                  stroke="#0f172a"
+                  strokeWidth="0.6"
+                  paintOrder="stroke fill"
+                >
+                  +
+                </text>
+              </svg>
+              <div className="pointer-events-none absolute inset-0">
+                <div className="absolute bottom-3 left-3 text-xs font-semibold tracking-[0.12em] text-slate-500">
+                  Cautious
+                </div>
+                <div className="absolute bottom-3 right-3 text-xs font-semibold tracking-[0.12em] text-slate-500">
+                  Bold
+                </div>
+                <div className="absolute left-3 top-3 -rotate-90 text-xs font-semibold tracking-[0.12em] text-slate-500">
+                  Tight
+                </div>
+                <div className="absolute right-3 top-3 -rotate-90 text-xs font-semibold tracking-[0.12em] text-slate-500">
+                  Loose
+                </div>
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-xs font-semibold tracking-[0.12em] text-slate-500">
+                  Risk appetite →
+                </div>
+                <div className="absolute left-2 top-1/2 -translate-y-1/2 -rotate-90 text-xs font-semibold tracking-[0.12em] text-slate-500">
+                  Cash tightness ↑
+                </div>
+              </div>
+              <button
+                type="button"
+                aria-label={`Matrix position. Tightness ${assessment.scores.tightness}, risk appetite ${assessment.scores.riskAppetite}.`}
+                aria-describedby={matrixTooltipId}
+                className="group absolute flex min-h-[44px] min-w-[44px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full"
+                style={{ left: `${matrixDotX}%`, top: `${matrixDotY}%` }}
               >
-                MATRIX
-              </text>
-              <circle
-                cx={matrixDotX}
-                cy={matrixDotY}
-                r="4"
-                fill="#fbbf24"
-                stroke="#0f172a"
-                strokeWidth="1.5"
-                vectorEffect="non-scaling-stroke"
-                filter={`url(#${matrixGlowId})`}
-              />
-              <text
-                x={matrixDotX}
-                y={matrixDotY + 1.2}
-                textAnchor="middle"
-                fontSize="6"
-                fontWeight="600"
-                fill="#0f172a"
-                stroke="#0f172a"
-                strokeWidth="0.6"
-                paintOrder="stroke fill"
-              >
-                +
-              </text>
-            </svg>
-            <div className="pointer-events-none absolute inset-0">
-              <div className="absolute bottom-3 left-3 text-xs font-semibold tracking-[0.12em] text-slate-500">
-                Cautious
-              </div>
-              <div className="absolute bottom-3 right-3 text-xs font-semibold tracking-[0.12em] text-slate-500">
-                Bold
-              </div>
-              <div className="absolute left-3 top-3 -rotate-90 text-xs font-semibold tracking-[0.12em] text-slate-500">
-                Tight
-              </div>
-              <div className="absolute right-3 top-3 -rotate-90 text-xs font-semibold tracking-[0.12em] text-slate-500">
-                Loose
-              </div>
-              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-xs font-semibold tracking-[0.12em] text-slate-500">
-                Risk appetite →
-              </div>
-              <div className="absolute left-2 top-1/2 -translate-y-1/2 -rotate-90 text-xs font-semibold tracking-[0.12em] text-slate-500">
-                Cash tightness ↑
-              </div>
+                <span
+                  id={matrixTooltipId}
+                  role="tooltip"
+                  className="pointer-events-none absolute top-0 -translate-y-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-slate-200 opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+                >
+                  Tightness {assessment.scores.tightness} · Risk appetite{" "}
+                  {assessment.scores.riskAppetite}
+                </span>
+              </button>
             </div>
-            <button
-              type="button"
-              aria-label={`Matrix position. Tightness ${assessment.scores.tightness}, risk appetite ${assessment.scores.riskAppetite}.`}
-              aria-describedby={matrixTooltipId}
-              className="group absolute flex min-h-[44px] min-w-[44px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full"
-              style={{ left: `${matrixDotX}%`, top: `${matrixDotY}%` }}
-            >
-              <span
-                id={matrixTooltipId}
-                role="tooltip"
-                className="pointer-events-none absolute top-0 -translate-y-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-slate-200 opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
-              >
-                Tightness {assessment.scores.tightness} · Risk appetite {assessment.scores.riskAppetite}
-              </span>
-            </button>
-          </div>
-          <figcaption id="signal-matrix-description" className="text-xs text-slate-500">
-            Position is derived from tightness (
-            <span className="tabular-nums">{assessment.scores.tightness}</span>) and market risk
-            appetite (<span className="tabular-nums">{assessment.scores.riskAppetite}</span>).
-          </figcaption>
-        </figure>
-        <div className="space-y-3">
-          <div className="weather-surface p-4">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Decision guide</p>
-            <p className="mt-2 text-sm text-slate-200">
-              Use the quadrant actions below to align staffing, budget approvals, and roadmap bets
-              with the current macro posture.
-            </p>
-          </div>
-          <div className="grid gap-3">
-            {quadrants.map((quadrant) => (
-              <div key={quadrant.id} className={`rounded-xl border p-4 ${quadrant.className}`}>
-                <p className="text-xs font-semibold tracking-[0.12em]">{quadrant.label}</p>
-                <p className="mt-2 text-sm text-slate-100">{quadrant.description}</p>
-                <p className="mt-3 text-xs text-slate-200">{quadrant.action}</p>
-              </div>
-            ))}
+            <figcaption id="signal-matrix-description" className="text-xs text-slate-500">
+              Position is derived from tightness (
+              <span className="tabular-nums">{assessment.scores.tightness}</span>) and market risk
+              appetite (<span className="tabular-nums">{assessment.scores.riskAppetite}</span>).
+            </figcaption>
+          </figure>
+          <div className="space-y-3">
+            <div className="weather-surface p-4">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Decision guide</p>
+              <p className="mt-2 text-sm text-slate-200">
+                Use the quadrant actions below to align staffing, budget approvals, and roadmap bets
+                with the current macro posture.
+              </p>
+            </div>
+            <div className="grid gap-3">
+              {quadrants.map((quadrant) => (
+                <div key={quadrant.id} className={`rounded-xl border p-4 ${quadrant.className}`}>
+                  <p className="text-xs font-semibold tracking-[0.12em]">{quadrant.label}</p>
+                  <p className="mt-2 text-sm text-slate-100">{quadrant.description}</p>
+                  <p className="mt-3 text-xs text-slate-200">{quadrant.action}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      </details>
     </section>
   );
 };
@@ -2538,24 +2552,34 @@ export const MacroSignalsPanel = ({
               Supplement Treasury yields with inflation, labor health, and credit stress indicators.
             </p>
           </div>
-          <div className="flex flex-col items-end gap-2">
-            <span className="weather-pill px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-300">
-              {provenance.statusLabel}
-            </span>
-            <DataProvenanceStrip provenance={provenance} />
-          </div>
+        <div className="flex flex-col items-end gap-2">
+          <span className="weather-pill px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-300">
+            {provenance.statusLabel}
+          </span>
+          <DataProvenanceStrip provenance={provenance} />
         </div>
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
+      </div>
+      <div className="mt-4 weather-surface p-4">
+        <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Executive summary</p>
+        <p className="mt-2 text-sm text-slate-200">
+          Use this expanded pack to validate the Treasury-led climate call against inflation,
+          labor, and credit stress signals.
+        </p>
+      </div>
+      <details className="mt-4" open>
+        <summary className="min-h-[44px] cursor-pointer text-xs font-semibold tracking-[0.12em] text-slate-300 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+          Deep dive: signal cards and freshness checks
+        </summary>
+        <div className="mt-4 grid gap-4 md:grid-cols-3">
           {series.map((signal) => {
             const sparkline = buildSparkline(signal.history);
             const sparklineId = `macro-spark-${signal.id}`;
 
             return (
-              <div
-                key={signal.id}
-                className="weather-surface rounded-2xl p-4"
-              >
-                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">{signal.label}</p>
+              <div key={signal.id} className="weather-surface rounded-2xl p-4">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                  {signal.label}
+                </p>
                 <p className="mono mt-3 text-2xl text-slate-100">
                   {formatNumber(signal.value, signal.unit)}
                 </p>
@@ -2618,6 +2642,7 @@ export const MacroSignalsPanel = ({
             );
           })}
         </div>
+      </details>
       </div>
     </section>
   );
@@ -2645,117 +2670,127 @@ export const PlaybookPanel = ({
   return (
     <section id="playbook" aria-labelledby="playbook-title" className="mt-10">
       <div className="weather-panel p-6">
-        <div className="grid gap-6 lg:grid-cols-[1.25fr,0.75fr]">
-          <div>
-            <p className="type-label text-slate-400">Playbook</p>
-            <h3 id="playbook-title" className="type-section text-slate-100">
-              {playbook?.title ?? "Operational Guidance"}
-            </h3>
-            {playbook ? (
-              <p className="mt-2 type-data text-slate-300 break-words">{playbook.insight}</p>
-            ) : (
-              <p className="mt-2 type-data text-slate-300">
-                Playbook data unavailable. Use climate constraints as guardrails.
-              </p>
-            )}
-            <p className="mt-4 text-xs text-slate-500">
-              Align the team on what to stop, start, and fence before approvals move forward.
-            </p>
-          </div>
-          <div className="grid gap-3">
-            <div className="weather-surface p-4">
-              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Playbook snapshot</p>
-              {playbook ? (
-                <div className="mt-3 space-y-2 text-xs text-slate-300">
-                  <p className="font-semibold text-slate-200">{playbook.tone}</p>
-                  <p>Mandate: {playbook.mandate}</p>
-                  <p className="text-slate-400">Metric: {playbook.metric}</p>
-                </div>
-              ) : (
-                <p className="mt-3 text-xs text-slate-500">
-                  Playbook signals will return once Treasury data is refreshed.
-                </p>
-              )}
-              <div className="mt-4 flex flex-wrap gap-2">
-                {playbookQuickLinks.map((link) => (
-                  <a
-                    key={link.href}
-                    href={link.href}
-                    className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-[0.6rem] font-semibold tracking-[0.18em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
-                  >
-                    {link.label}
-                  </a>
-                ))}
+        <div>
+          <p className="type-label text-slate-400">Playbook</p>
+          <h3 id="playbook-title" className="type-section text-slate-100">
+            {playbook?.title ?? "Operational Guidance"}
+          </h3>
+        </div>
+        <div className="mt-4 weather-surface p-4">
+          <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Executive summary</p>
+          <p className="mt-2 text-sm text-slate-200">
+            {playbook
+              ? playbook.insight
+              : "Playbook data unavailable. Use climate constraints as guardrails."}
+          </p>
+          <p className="mt-3 text-xs text-slate-500">
+            Align the team on what to stop, start, and fence before approvals move forward.
+          </p>
+        </div>
+        <details className="mt-4" open>
+          <summary className="min-h-[44px] cursor-pointer text-xs font-semibold tracking-[0.12em] text-slate-300 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+            Deep dive: playbook snapshot and action lanes
+          </summary>
+          <div className="mt-4 grid gap-6 lg:grid-cols-[1.25fr,0.75fr]">
+            <div className="grid gap-4 lg:grid-cols-3 lg:col-span-2">
+              <div className="weather-surface border-l-4 border-rose-500/50 p-4">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Stop</p>
+                <ul className="mt-3 space-y-2 text-sm text-slate-300">
+                  {stopItems.map((item) => (
+                    <li key={item} className="break-words">
+                      • {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="weather-surface border-l-4 border-emerald-400/50 p-4">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Start</p>
+                <ul className="mt-3 space-y-2 text-sm text-slate-300">
+                  {startItems.map((item) => (
+                    <li key={item} className="break-words">
+                      • {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="weather-surface border-l-4 border-sky-400/50 p-4">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Fence</p>
+                <ul className="mt-3 space-y-2 text-sm text-slate-300">
+                  {fenceItems.map((item) => (
+                    <li key={item} className="break-words">
+                      • {item}
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
-            <DataProvenanceStrip provenance={provenance} />
-          </div>
-        </div>
-        <div className="mt-6 grid gap-4 lg:grid-cols-3">
-          <div className="weather-surface border-l-4 border-rose-500/50 p-4">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Stop</p>
-            <ul className="mt-3 space-y-2 text-sm text-slate-300">
-              {stopItems.map((item) => (
-                <li key={item} className="break-words">
-                  • {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="weather-surface border-l-4 border-emerald-400/50 p-4">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Start</p>
-            <ul className="mt-3 space-y-2 text-sm text-slate-300">
-              {startItems.map((item) => (
-                <li key={item} className="break-words">
-                  • {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="weather-surface border-l-4 border-sky-400/50 p-4">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Fence</p>
-            <ul className="mt-3 space-y-2 text-sm text-slate-300">
-              {fenceItems.map((item) => (
-                <li key={item} className="break-words">
-                  • {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-        {playbook ? (
-          <div className="weather-surface mt-6 p-4">
-            <details open>
-              <summary className="min-h-[44px] cursor-pointer text-xs font-semibold tracking-[0.12em] text-slate-400 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300">
-                Leadership signals (phrases to use or avoid)
-              </summary>
-              <div className="mt-4 grid gap-4 md:grid-cols-2">
-                <div>
-                  <p className="text-xs font-semibold tracking-[0.12em] text-emerald-200">
-                    More often
+            <div className="grid gap-3">
+              <div className="weather-surface p-4">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                  Playbook snapshot
+                </p>
+                {playbook ? (
+                  <div className="mt-3 space-y-2 text-xs text-slate-300">
+                    <p className="font-semibold text-slate-200">{playbook.tone}</p>
+                    <p>Mandate: {playbook.mandate}</p>
+                    <p className="text-slate-400">Metric: {playbook.metric}</p>
+                  </div>
+                ) : (
+                  <p className="mt-3 text-xs text-slate-500">
+                    Playbook signals will return once Treasury data is refreshed.
                   </p>
-                  <ul className="mt-3 space-y-2 text-sm text-slate-300">
-                    {playbook.leadershipPhrases.more.map((item) => (
-                      <li key={item} className="break-words">
-                        • {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold tracking-[0.12em] text-rose-200">Less often</p>
-                  <ul className="mt-3 space-y-2 text-sm text-slate-300">
-                    {playbook.leadershipPhrases.less.map((item) => (
-                      <li key={item} className="break-words">
-                        • {item}
-                      </li>
-                    ))}
-                  </ul>
+                )}
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {playbookQuickLinks.map((link) => (
+                    <a
+                      key={link.href}
+                      href={link.href}
+                      className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-[0.6rem] font-semibold tracking-[0.18em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                    >
+                      {link.label}
+                    </a>
+                  ))}
                 </div>
               </div>
-            </details>
+              <DataProvenanceStrip provenance={provenance} />
+            </div>
           </div>
-        ) : null}
+          {playbook ? (
+            <div className="weather-surface mt-6 p-4">
+              <details open>
+                <summary className="min-h-[44px] cursor-pointer text-xs font-semibold tracking-[0.12em] text-slate-400 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300">
+                  Leadership signals (phrases to use or avoid)
+                </summary>
+                <div className="mt-4 grid gap-4 md:grid-cols-2">
+                  <div>
+                    <p className="text-xs font-semibold tracking-[0.12em] text-emerald-200">
+                      More often
+                    </p>
+                    <ul className="mt-3 space-y-2 text-sm text-slate-300">
+                      {playbook.leadershipPhrases.more.map((item) => (
+                        <li key={item} className="break-words">
+                          • {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold tracking-[0.12em] text-rose-200">
+                      Less often
+                    </p>
+                    <ul className="mt-3 space-y-2 text-sm text-slate-300">
+                      {playbook.leadershipPhrases.less.map((item) => (
+                        <li key={item} className="break-words">
+                          • {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </details>
+            </div>
+          ) : null}
+        </details>
       </div>
     </section>
   );
@@ -2770,6 +2805,109 @@ export const InsightDatabasePanel = ({
 }) => {
   const evidence = insightDatabase.regimeEvidence.regimes.find((entry) => entry.key === regime);
   const fossilRecord = insightDatabase.fossilRecord;
+  const evidenceLibrary = useMemo(
+    () =>
+      insightDatabase.regimeEvidence.regimes.flatMap((entry) =>
+        entry.citations.map((citation, index) => {
+          const climate = citation.climate ?? entry.key;
+          return {
+            ...citation,
+            climate,
+            summary: entry.summary,
+            id: `${climate}-${index}-${citation.url}`,
+          };
+        })
+      ),
+    []
+  );
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedClimate, setSelectedClimate] = useState("all");
+  const [selectedSignal, setSelectedSignal] = useState("all");
+  const [dateRange, setDateRange] = useState({ start: "", end: "" });
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const climateOrder = ["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"];
+
+  const climateOptions = useMemo(
+    () =>
+      Array.from(new Set(evidenceLibrary.map((item) => item.climate))).sort(
+        (first, second) =>
+          climateOrder.indexOf(first) - climateOrder.indexOf(second)
+      ),
+    [evidenceLibrary]
+  );
+  const signalOptions = useMemo(
+    () => Array.from(new Set(evidenceLibrary.map((item) => item.signal))).sort(),
+    [evidenceLibrary]
+  );
+  const tagOptions = useMemo(
+    () => Array.from(new Set(evidenceLibrary.flatMap((item) => item.tags))).sort(),
+    [evidenceLibrary]
+  );
+  const filteredEvidence = useMemo(() => {
+    const normalizedQuery = searchQuery.trim().toLowerCase();
+    const startTime = dateRange.start ? Date.parse(dateRange.start) : null;
+    const endTime = dateRange.end ? Date.parse(dateRange.end) : null;
+
+    return evidenceLibrary.filter((item) => {
+      if (selectedClimate !== "all" && item.climate !== selectedClimate) {
+        return false;
+      }
+      if (selectedSignal !== "all" && item.signal !== selectedSignal) {
+        return false;
+      }
+      if (selectedTags.length > 0 && !selectedTags.some((tag) => item.tags.includes(tag))) {
+        return false;
+      }
+      if (normalizedQuery) {
+        const haystack = [
+          item.title,
+          item.source,
+          item.signal,
+          item.summary,
+          item.recommendation?.label,
+          ...item.tags,
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+        if (!haystack.includes(normalizedQuery)) {
+          return false;
+        }
+      }
+      if (startTime || endTime) {
+        const itemTime = Date.parse(item.date);
+        if (!Number.isNaN(itemTime)) {
+          if (startTime && itemTime < startTime) {
+            return false;
+          }
+          if (endTime && itemTime > endTime) {
+            return false;
+          }
+        }
+      }
+      return true;
+    });
+  }, [
+    dateRange.end,
+    dateRange.start,
+    evidenceLibrary,
+    searchQuery,
+    selectedClimate,
+    selectedSignal,
+    selectedTags,
+  ]);
+  const toggleTag = (tag: string) => {
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((entry) => entry !== tag) : [...prev, tag]
+    );
+  };
+  const clearFilters = () => {
+    setSearchQuery("");
+    setSelectedClimate("all");
+    setSelectedSignal("all");
+    setDateRange({ start: "", end: "" });
+    setSelectedTags([]);
+  };
 
   return (
     <section id="insight-database" aria-labelledby="insight-database-title" className="mt-10">
@@ -2786,58 +2924,213 @@ export const InsightDatabasePanel = ({
           </div>
           <DataProvenanceStrip provenance={provenance} />
         </div>
-        <div className="mt-6 grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">
-          <div className="weather-surface p-4">
-            <p className="type-label text-slate-400">Market climate evidence</p>
-            <p className="mt-3 text-sm text-slate-200">
-              {evidence?.summary ?? "No evidence summary available for this climate."}
-            </p>
-            <ul className="mt-4 space-y-3 text-sm text-slate-300">
-              {(evidence?.citations ?? []).map((citation) => (
-                <li key={citation.url} className="flex flex-col gap-1">
-                  <span className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                    {citation.source}
-                  </span>
+        <div className="mt-4 weather-surface p-4">
+          <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Executive summary</p>
+          <p className="mt-2 text-sm text-slate-200">
+            {evidence?.summary ?? "No evidence summary available for this climate."}
+          </p>
+        </div>
+        <details className="mt-4" open>
+          <summary className="min-h-[44px] cursor-pointer text-xs font-semibold tracking-[0.12em] text-slate-300 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+            Deep dive: searchable evidence library
+          </summary>
+          <div className="mt-4 weather-surface p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                Filter evidence
+              </p>
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="text-xs font-semibold tracking-[0.12em] text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
+              >
+                Clear filters
+              </button>
+            </div>
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
+              <label className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                Search
+                <input
+                  type="search"
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  placeholder="Search by source, tag, or recommendation"
+                  className="mt-2 w-full rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600"
+                />
+              </label>
+              <label className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                Climate
+                <select
+                  value={selectedClimate}
+                  onChange={(event) => setSelectedClimate(event.target.value)}
+                  className="mt-2 w-full rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+                >
+                  <option value="all">All climates</option>
+                  {climateOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {getRegimeLabel(option as RegimeAssessment["regime"])}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                Signal
+                <select
+                  value={selectedSignal}
+                  onChange={(event) => setSelectedSignal(event.target.value)}
+                  className="mt-2 w-full rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+                >
+                  <option value="all">All signals</option>
+                  {signalOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                  Start date
+                  <input
+                    type="date"
+                    value={dateRange.start}
+                    onChange={(event) =>
+                      setDateRange((prev) => ({ ...prev, start: event.target.value }))
+                    }
+                    className="mt-2 w-full rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+                  />
+                </label>
+                <label className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                  End date
+                  <input
+                    type="date"
+                    value={dateRange.end}
+                    onChange={(event) =>
+                      setDateRange((prev) => ({ ...prev, end: event.target.value }))
+                    }
+                    className="mt-2 w-full rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+                  />
+                </label>
+              </div>
+            </div>
+            <div className="mt-4">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Tags</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {tagOptions.map((tag) => {
+                  const isActive = selectedTags.includes(tag);
+                  return (
+                    <button
+                      key={tag}
+                      type="button"
+                      onClick={() => toggleTag(tag)}
+                      className={`rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] transition-colors ${
+                        isActive
+                          ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
+                          : "border-slate-700/70 text-slate-300 hover:border-slate-500/80 hover:text-slate-100"
+                      }`}
+                    >
+                      {tag}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+          <div className="mt-4 flex items-center justify-between text-xs font-semibold tracking-[0.12em] text-slate-400">
+            <span>{filteredEvidence.length} evidence items</span>
+            <span>Linked recommendations included</span>
+          </div>
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            {filteredEvidence.length === 0 ? (
+              <div className="weather-surface p-4 text-sm text-slate-400">
+                No evidence items match these filters. Try clearing the date range or tags.
+              </div>
+            ) : (
+              filteredEvidence.map((item) => (
+                <article key={item.id} className="weather-surface p-4">
+                  <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                    {item.source}
+                  </p>
                   <a
-                    href={citation.url}
+                    href={item.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="touch-target text-slate-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
+                    className="mt-2 block text-sm font-semibold text-slate-100 underline decoration-slate-500 underline-offset-4 hover:text-slate-50"
                   >
-                    {citation.title}
+                    {item.title}
                   </a>
-                </li>
-              ))}
-            </ul>
+                  <p className="mt-2 text-xs text-slate-500">{item.summary}</p>
+                  <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-400">
+                    <span className="weather-pill-muted inline-flex items-center px-2 py-1">
+                      Climate: {getRegimeLabel(item.climate as RegimeAssessment["regime"])}
+                    </span>
+                    <span className="weather-pill-muted inline-flex items-center px-2 py-1">
+                      Signal: {item.signal}
+                    </span>
+                    <span className="weather-pill-muted inline-flex items-center px-2 py-1">
+                      Date: {formatDate(item.date)}
+                    </span>
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {item.tags.map((tag) => (
+                      <button
+                        key={`${item.id}-${tag}`}
+                        type="button"
+                        onClick={() => toggleTag(tag)}
+                        className="rounded-full border border-slate-700/70 px-2.5 py-1 text-xs font-semibold tracking-[0.12em] text-slate-300 hover:border-slate-500/80 hover:text-slate-100"
+                      >
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
+                  {item.recommendation ? (
+                    <p className="mt-4 text-xs text-slate-400">
+                      Decision recommendation:{" "}
+                      <a
+                        href={item.recommendation.href}
+                        className="touch-target inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-slate-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
+                      >
+                        {item.recommendation.label}
+                      </a>
+                    </p>
+                  ) : null}
+                </article>
+              ))
+            )}
           </div>
-          <div className="weather-surface p-4">
+        </details>
+        <details className="mt-4">
+          <summary className="min-h-[44px] cursor-pointer text-xs font-semibold tracking-[0.12em] text-slate-300 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+            Deep dive: {fossilRecord.title}
+          </summary>
+          <div className="mt-4 weather-surface p-4">
             <p className="type-label text-slate-400">{fossilRecord.title}</p>
             <p className="mt-2 text-xs text-slate-500">{fossilRecord.subtitle}</p>
             <p className="mt-3 text-sm text-slate-300">{fossilRecord.description}</p>
           </div>
-        </div>
-        <div className="mt-6 overflow-x-auto overscroll-contain">
-          <table className="min-w-full text-left text-sm text-slate-300">
-            <thead className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-              <tr>
-                <th className="px-3 py-2">{fossilRecord.columns.domain}</th>
-                <th className="px-3 py-2">{fossilRecord.columns.lowRateArtifact}</th>
-                <th className="px-3 py-2">{fossilRecord.columns.highRateArtifact}</th>
-                <th className="px-3 py-2">{fossilRecord.columns.insight}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {fossilRecord.rows.map((row) => (
-                <tr key={row.domain} className="border-t border-slate-800/60">
-                  <td className="px-3 py-3 text-slate-200">{row.domain}</td>
-                  <td className="px-3 py-3">{row.lowRateArtifact}</td>
-                  <td className="px-3 py-3">{row.highRateArtifact}</td>
-                  <td className="px-3 py-3">{row.insight}</td>
+          <div className="mt-4 overflow-x-auto overscroll-contain">
+            <table className="min-w-full text-left text-sm text-slate-300">
+              <thead className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                <tr>
+                  <th className="px-3 py-2">{fossilRecord.columns.domain}</th>
+                  <th className="px-3 py-2">{fossilRecord.columns.lowRateArtifact}</th>
+                  <th className="px-3 py-2">{fossilRecord.columns.highRateArtifact}</th>
+                  <th className="px-3 py-2">{fossilRecord.columns.insight}</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {fossilRecord.rows.map((row) => (
+                  <tr key={row.domain} className="border-t border-slate-800/60">
+                    <td className="px-3 py-3 text-slate-200">{row.domain}</td>
+                    <td className="px-3 py-3">{row.lowRateArtifact}</td>
+                    <td className="px-3 py-3">{row.highRateArtifact}</td>
+                    <td className="px-3 py-3">{row.insight}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </details>
       </div>
     </section>
   );
@@ -2867,49 +3160,60 @@ export const FinanceStrategyPanel = ({
           </div>
           <DataProvenanceStrip provenance={provenance} />
         </div>
-        <div className="mt-6 grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">
-          <div className="weather-surface p-4">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Runway posture</p>
-            <p className="mt-3 text-sm text-slate-200">{entry?.runwayPosture}</p>
-            <div className="mt-4 grid gap-3 text-sm text-slate-300">
-              <div>
-                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                  Hiring throttle
-                </p>
-                <p className="mt-2">{entry?.hiringThrottle}</p>
-              </div>
-              <div>
-                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                  Budget focus
-                </p>
-                <ul className="mt-2 space-y-1">
-                  {(entry?.budgetFocus ?? []).map((item) => (
-                    <li key={item} className="flex gap-2">
-                      <span className="text-slate-500">•</span>
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
+        <div className="mt-4 weather-surface p-4">
+          <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Executive summary</p>
+          <p className="mt-2 text-sm text-slate-200">
+            {entry?.runwayPosture ?? "Runway posture will update when data refreshes."}
+          </p>
+        </div>
+        <details className="mt-4" open>
+          <summary className="min-h-[44px] cursor-pointer text-xs font-semibold tracking-[0.12em] text-slate-300 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+            Deep dive: runway guidance and watchlist
+          </summary>
+          <div className="mt-4 grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">
+            <div className="weather-surface p-4">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Runway posture</p>
+              <p className="mt-3 text-sm text-slate-200">{entry?.runwayPosture}</p>
+              <div className="mt-4 grid gap-3 text-sm text-slate-300">
+                <div>
+                  <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                    Hiring throttle
+                  </p>
+                  <p className="mt-2">{entry?.hiringThrottle}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                    Budget focus
+                  </p>
+                  <ul className="mt-2 space-y-1">
+                    {(entry?.budgetFocus ?? []).map((item) => (
+                      <li key={item} className="flex gap-2">
+                        <span className="text-slate-500">•</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             </div>
+            <div className="weather-surface p-4">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                Watch these signals
+              </p>
+              <ul className="mt-3 space-y-2 text-sm text-slate-300">
+                {(entry?.watchSignals ?? []).map((signal) => (
+                  <li key={signal} className="flex gap-2">
+                    <span className="text-slate-500">•</span>
+                    <span>{signal}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-4 text-xs text-slate-500">
+                Public data only. No internal finance inputs required.
+              </p>
+            </div>
           </div>
-          <div className="weather-surface p-4">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-              Watch these signals
-            </p>
-            <ul className="mt-3 space-y-2 text-sm text-slate-300">
-              {(entry?.watchSignals ?? []).map((signal) => (
-                <li key={signal} className="flex gap-2">
-                  <span className="text-slate-500">•</span>
-                  <span>{signal}</span>
-                </li>
-              ))}
-            </ul>
-            <p className="mt-4 text-xs text-slate-500">
-              Public data only. No internal finance inputs required.
-            </p>
-          </div>
-        </div>
+        </details>
       </div>
     </section>
   );
@@ -2939,25 +3243,37 @@ export const DecisionShieldTemplatesPanel = ({
           </div>
           <DataProvenanceStrip provenance={provenance} />
         </div>
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          {templates.decisions.map((decision) => (
-            <div key={decision.title} className="weather-surface p-4">
-              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                {decision.title}
-              </p>
-              <ul className="mt-4 space-y-3 text-sm text-slate-300">
-                {Object.entries(decision.stances).map(([regimeKey, stance]) => (
-                  <li key={regimeKey} className="flex flex-col gap-1">
-                    <span className="text-xs font-semibold tracking-[0.12em] text-slate-500">
-                      {regimeKey}
-                    </span>
-                    <span>{stance}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+        <div className="mt-4 weather-surface p-4">
+          <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Executive summary</p>
+          <p className="mt-2 text-sm text-slate-200">
+            Use these templates as default decision language when you brief leadership or document
+            approvals.
+          </p>
         </div>
+        <details className="mt-4" open>
+          <summary className="min-h-[44px] cursor-pointer text-xs font-semibold tracking-[0.12em] text-slate-300 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+            Deep dive: decision shield templates by regime
+          </summary>
+          <div className="mt-4 grid gap-4 md:grid-cols-3">
+            {templates.decisions.map((decision) => (
+              <div key={decision.title} className="weather-surface p-4">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                  {decision.title}
+                </p>
+                <ul className="mt-4 space-y-3 text-sm text-slate-300">
+                  {Object.entries(decision.stances).map(([regimeKey, stance]) => (
+                    <li key={regimeKey} className="flex flex-col gap-1">
+                      <span className="text-xs font-semibold tracking-[0.12em] text-slate-500">
+                        {regimeKey}
+                      </span>
+                      <span>{stance}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </details>
       </div>
     </section>
   );
