@@ -6,7 +6,7 @@
 
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
-import type { RegimeAssessment } from "../../lib/regimeEngine";
+import type { RegimeAssessment, RegimeThresholds } from "../../lib/regimeEngine";
 import type { PlaybookEntry } from "../../lib/playbook";
 import type {
   MacroSeriesReading,
@@ -423,6 +423,20 @@ export const WeeklyActionSummaryPanel = ({
                 </a>{" "}
                 for the source signals and decision guardrails.
               </p>
+            </div>
+            <div className="weather-surface p-4">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                What changed since last read
+              </p>
+              <p className="mt-2 text-xs text-slate-500">
+                Scan the delta snapshot before you lock the week so leaders see the latest shifts.
+              </p>
+              <a
+                href="#change-since-last-read"
+                className="mt-3 inline-flex min-h-[36px] items-center text-xs font-semibold tracking-[0.12em] text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 touch-manipulation"
+              >
+                Review delta snapshot
+              </a>
             </div>
             <div className="flex flex-wrap gap-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
               <span className="weather-pill inline-flex min-h-[32px] items-center px-3 py-1">
@@ -1497,11 +1511,27 @@ export const SignalMatrixPanel = ({
   );
 };
 
-export const HistoricalBanner = ({ banner }: { banner: string }) => {
+export const HistoricalBanner = ({
+  banner,
+  liveHref,
+}: {
+  banner: string;
+  liveHref: string;
+}) => {
   return (
     <div className="mt-6 rounded-2xl border border-slate-600 bg-slate-900/70 px-4 py-3 text-sm text-slate-200">
-      <span className="type-label text-slate-400">Historical mode</span>
-      <p className="mt-1 font-semibold text-slate-100">{banner}</p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <span className="type-label text-slate-400">Historical mode</span>
+          <p className="mt-1 font-semibold text-slate-100">{banner}</p>
+        </div>
+        <a
+          href={liveHref}
+          className="weather-pill inline-flex min-h-[36px] items-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100"
+        >
+          Return to live
+        </a>
+      </div>
       <p className="mt-2 text-xs text-slate-400">
         You are viewing archived Treasury data; live signals are temporarily hidden.
       </p>
@@ -2573,9 +2603,11 @@ export const SensorArray = ({
 export const MacroSignalsPanel = ({
   series,
   provenance,
+  thresholds,
 }: {
   series: MacroSeriesReading[];
   provenance: DataProvenance;
+  thresholds: RegimeThresholds;
 }) => {
   return (
     <section id="macro-signals" aria-labelledby="macro-signals-title" className="mt-10">
@@ -2620,6 +2652,10 @@ export const MacroSignalsPanel = ({
                 </p>
                 <p className="mono mt-3 text-2xl text-slate-100">
                   {formatNumber(signal.value, signal.unit)}
+                </p>
+                <p className="mt-2 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                  Thresholds · Base rate {thresholds.baseRateTightness}% · Tightness{" "}
+                  {thresholds.tightnessRegime} · Risk {thresholds.riskAppetiteRegime}
                 </p>
                 <figure className="mt-3">
                   {sparkline ? (

@@ -114,7 +114,9 @@ export default async function OperationsPage({
       pageLinks={pageLinks}
       sectionLinks={sectionLinks}
       historicalBanner={
-        historicalSelection ? <HistoricalBanner banner={historicalSelection.banner} /> : null
+        historicalSelection ? (
+          <HistoricalBanner banner={historicalSelection.banner} liveHref="/operations" />
+        ) : null
       }
     >
       <MonthlyActionSummaryPanel

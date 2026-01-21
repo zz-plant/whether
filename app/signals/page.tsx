@@ -100,12 +100,18 @@ export default async function SignalsPage({
       pageLinks={pageLinks}
       sectionLinks={sectionLinks}
       historicalBanner={
-        historicalSelection ? <HistoricalBanner banner={historicalSelection.banner} /> : null
+        historicalSelection ? (
+          <HistoricalBanner banner={historicalSelection.banner} liveHref="/signals" />
+        ) : null
       }
     >
       <SensorArray sensors={sensors} provenance={treasuryProvenance} />
 
-      <MacroSignalsPanel series={macroSeries} provenance={macroProvenance} />
+      <MacroSignalsPanel
+        series={macroSeries}
+        provenance={macroProvenance}
+        thresholds={assessment.thresholds}
+      />
 
       <ThresholdsPanel currentThresholds={assessment.thresholds} provenance={treasuryProvenance} />
 

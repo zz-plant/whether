@@ -1,3 +1,4 @@
+import { createHash } from "crypto";
 import { NextResponse } from "next/server";
 import { loadReportData } from "../../../lib/reportData";
 import { buildWeeklySummary } from "../../../lib/weeklySummary";
@@ -11,9 +12,13 @@ export async function GET() {
     provenance: treasuryProvenance,
     recordDateLabel,
   });
+  const summaryHash = createHash("sha256")
+    .update(JSON.stringify(summary))
+    .digest("hex");
 
   return NextResponse.json({
     summary,
+    summaryHash,
     copy: summary.copy,
     provenance: summary.provenance,
     recordDateLabel: summary.recordDateLabel,

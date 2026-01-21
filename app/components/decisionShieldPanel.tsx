@@ -448,6 +448,9 @@ export const DecisionShieldPanel = ({
             <p className="type-label text-slate-400">
               Inputs → Verdict → Why → Guardrail → Reversal trigger
             </p>
+            <p className="mt-2 text-xs text-slate-500">
+              Selections persist locally and sync to the URL so the scenario is easy to revisit.
+            </p>
           </div>
           <div className="grid gap-4 lg:grid-cols-3">
             <div className="space-y-2">
