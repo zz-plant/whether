@@ -160,7 +160,7 @@ body {
 }
 
 .type-headline {
-  @apply text-4xl font-semibold leading-[1.05] tracking-tight md:text-6xl;
+  @apply text-3xl font-semibold leading-[1.08] tracking-tight sm:text-4xl md:text-6xl;
 }
 
 .type-section {

@@ -140,28 +140,55 @@ export const ReportShell = ({
       <div className="pointer-events-none absolute inset-0 hidden sm:block weather-haze" />
       <div className="pointer-events-none absolute left-1/2 top-0 hidden h-[520px] w-[720px] -translate-x-1/2 rounded-full bg-sky-400/15 blur-[190px] sm:block" />
       <div className="pointer-events-none absolute -right-24 top-24 hidden h-[420px] w-[420px] rounded-full bg-fuchsia-400/10 blur-[160px] sm:block" />
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
-        <header className="relative flex flex-col gap-6 border-b border-slate-800/70 pb-8">
-          <div className="flex flex-wrap items-start justify-between gap-6">
-            <div className="min-w-0 space-y-4">
-              <div className="flex flex-wrap items-center gap-3 text-[0.65rem] font-semibold tracking-[0.3em] text-slate-400">
-                <span className="weather-chip px-3 py-1.5 uppercase">Weekly product guidance</span>
-                <span className="text-slate-500">Updated {fetchedAtLabel}</span>
+      <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-12">
+        <header className="relative flex flex-col gap-8 border-b border-slate-800/70 pb-8">
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-wrap items-center gap-3 text-[0.6rem] font-semibold tracking-[0.32em] text-slate-400">
+              <span className="weather-chip px-3 py-1.5 uppercase">Weekly product guidance</span>
+              <span className="text-slate-500">Updated {fetchedAtLabel}</span>
+            </div>
+            <div className="grid gap-6 lg:grid-cols-[1.2fr,0.8fr] lg:items-center">
+              <div className="space-y-4">
+                <div className="space-y-3">
+                  <h1 className="type-headline text-slate-100">Whether Report</h1>
+                  <p className="max-w-2xl text-sm text-slate-200 sm:text-base">
+                    A fast, sourced readout of Treasury signals translated into product guidance.
+                  </p>
+                </div>
+                <div className="weather-panel-static max-w-2xl space-y-2 px-4 py-3">
+                  <p className="text-xs font-semibold text-slate-400">You&rsquo;re reading</p>
+                  <p className="text-base font-semibold text-slate-100">{pageTitle}</p>
+                  <p className="text-sm text-slate-300">{pageSummary}</p>
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  <a
+                    href="#weekly-action-summary"
+                    className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.2em] transition-colors hover:border-sky-300/80 hover:text-white touch-manipulation"
+                  >
+                    Start with this week
+                  </a>
+                  <a
+                    href="#executive-snapshot"
+                    className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-slate-200 underline decoration-slate-400 underline-offset-4 hover:text-slate-100 touch-manipulation"
+                  >
+                    See leadership summary
+                  </a>
+                </div>
               </div>
-              <div className="space-y-3">
-                <h1 className="type-headline text-slate-100">Whether Report</h1>
-                <p className="max-w-2xl text-sm text-slate-200 sm:hidden">
-                  A fast, sourced readout of Treasury signals translated into product guidance.
+              <div className="weather-panel flex flex-col gap-4 px-5 py-4">
+                <p className="text-xs font-semibold text-slate-300">The readout in one line</p>
+                <p className="text-sm text-slate-200">
+                  Anchor planning conversations with the climate label and share the supporting
+                  signals if leadership needs proof.
                 </p>
-                <p className="max-w-2xl type-data text-slate-200 hidden sm:block">
-                  A plain-English brief that turns Treasury signals into week-by-week product and
-                  engineering constraints. Every output is sourced and time-stamped for traceability.
-                </p>
-              </div>
-              <div className="weather-panel-static max-w-2xl space-y-2 px-4 py-3">
-                <p className="text-xs font-semibold text-slate-400">You&rsquo;re reading</p>
-                <p className="text-base font-semibold text-slate-100">{pageTitle}</p>
-                <p className="text-sm text-slate-300">{pageSummary}</p>
+                <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
+                  <span className="rounded-full border border-slate-700/70 px-3 py-1 font-semibold tracking-[0.12em] text-slate-200">
+                    Record date {recordDateLabel}
+                  </span>
+                  <span className="rounded-full border border-slate-800/70 px-3 py-1 font-semibold tracking-[0.12em] text-slate-300">
+                    {trustStatusLabel}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -224,20 +251,6 @@ export const ReportShell = ({
                   </li>
                 </ul>
               </details>
-              <div className="flex flex-wrap gap-3">
-                <a
-                  href="#weekly-action-summary"
-                  className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.2em] transition-colors hover:border-sky-300/80 hover:text-white touch-manipulation"
-                >
-                  Start with this week
-                </a>
-                <a
-                  href="#executive-snapshot"
-                  className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-slate-200 underline decoration-slate-400 underline-offset-4 hover:text-slate-100 touch-manipulation"
-                >
-                  See leadership summary
-                </a>
-              </div>
             </div>
             <div className={`weather-panel flex flex-col gap-4 px-5 py-4 ${trustToneStyles}`}>
               <p className={`text-sm font-semibold ${trustLabelTone}`}>Confidence in the signals</p>
@@ -267,35 +280,24 @@ export const ReportShell = ({
                   </ul>
                 </div>
               </nav>
-              <details className="weather-panel group px-5 py-4 sm:hidden">
-                <summary className="inline-flex min-h-[44px] cursor-pointer items-center justify-between gap-3 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:text-slate-100 touch-manipulation">
-                  <span>Jump to sections</span>
-                  <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-300 transition-transform duration-200 group-open:rotate-180">
-                    <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
-                      <path
-                        d="M7 10l5 5 5-5"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </span>
-                </summary>
-                <ul className="mt-4 grid gap-2">
+              <nav
+                aria-label="Report sections"
+                className="sm:hidden"
+              >
+                <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Jump to</p>
+                <ul className="mt-3 flex gap-2 overflow-x-auto pb-2 pr-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                   {sectionLinks.map((item) => (
                     <li key={item.href}>
                       <a
                         href={item.href}
-                        className="weather-pill inline-flex min-h-[44px] w-full items-center justify-between px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                        className="weather-pill inline-flex min-h-[44px] items-center whitespace-nowrap px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                       >
                         {item.label}
                       </a>
                     </li>
                   ))}
                 </ul>
-              </details>
+              </nav>
             </>
           ) : null}
           <div className="grid gap-4 lg:grid-cols-2">
@@ -342,24 +344,24 @@ export const ReportShell = ({
                 </dl>
               </div>
             </details>
-            <details className="weather-panel flex flex-col gap-3 px-5 py-4 md:hidden">
-              <summary className="inline-flex min-h-[44px] cursor-pointer items-center justify-between gap-3 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:text-slate-100 touch-manipulation">
-                <span>Explore other report paths</span>
+            <section className="weather-panel flex flex-col gap-3 px-5 py-4 md:hidden">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-xs font-semibold text-slate-100">Explore other report paths</p>
                 <span className="rounded-full border border-slate-700 px-2 py-0.5 text-[10px] font-semibold tracking-[0.12em] text-slate-300">
                   {pageLinks.length}
                 </span>
-              </summary>
-              <nav aria-label="Report paths" className="mt-4">
-                <ul className="grid gap-3">
+              </div>
+              <nav aria-label="Report paths" className="mt-2">
+                <ul className="flex gap-3 overflow-x-auto pb-2 pr-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                   {pageLinks.map((link) => {
                     const isActive = link.label === pageTitle;
                     const icon = pageLinkIcons[link.label];
                     return (
-                      <li key={link.href}>
+                      <li key={link.href} className="min-w-[240px]">
                         <a
                           href={link.href}
                           aria-current={isActive ? "page" : undefined}
-                          className={`weather-tile flex min-h-[84px] flex-col gap-3 px-4 py-3 text-left text-sm font-semibold tracking-[0.08em] transition-colors hover:-translate-y-0.5 touch-manipulation ${
+                          className={`weather-tile flex min-h-[96px] flex-col gap-3 px-4 py-3 text-left text-sm font-semibold tracking-[0.08em] transition-colors hover:-translate-y-0.5 touch-manipulation ${
                             isActive
                               ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
                               : "text-slate-300 hover:border-sky-300/70 hover:text-slate-100"
@@ -378,7 +380,7 @@ export const ReportShell = ({
                   })}
                 </ul>
               </nav>
-            </details>
+            </section>
             <section className="weather-panel hidden flex-col gap-3 px-5 py-4 md:flex">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-xs font-semibold text-slate-100">Explore other report paths</p>
