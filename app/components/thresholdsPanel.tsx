@@ -7,6 +7,7 @@
 import type { FormEvent } from "react";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { Collapsible } from "@base-ui/react/collapsible";
+import { Popover } from "@base-ui/react/popover";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { RegimeThresholds } from "../../lib/regimeEngine";
 import { DEFAULT_THRESHOLDS } from "../../lib/regimeEngine";
@@ -226,6 +227,44 @@ export const ThresholdsPanel = ({
               Defaults: {appliedDefaults.baseRateTightness}% ·{" "}
               {appliedDefaults.tightnessRegime}/{appliedDefaults.riskAppetiteRegime}
             </span>
+            <Popover.Root>
+              <Popover.Trigger
+                type="button"
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-slate-800/70 px-4 py-2 text-[10px] font-semibold tracking-[0.18em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+              >
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-[9px] text-slate-400">
+                  ?
+                </span>
+                Threshold logic
+              </Popover.Trigger>
+              <Popover.Portal>
+                <Popover.Positioner side="bottom" align="end" sideOffset={12}>
+                  <Popover.Popup className="w-72 rounded-2xl border border-slate-800/80 bg-slate-950/95 p-4 text-xs text-slate-300 shadow-xl">
+                    <Popover.Title className="text-xs font-semibold tracking-[0.14em] text-slate-100">
+                      How these thresholds work
+                    </Popover.Title>
+                    <Popover.Description className="mt-2 text-xs text-slate-400">
+                      Thresholds define when a score flips the climate label. Adjust them to
+                      reflect your risk tolerance, then share the URL for audit-ready review.
+                    </Popover.Description>
+                    <ul className="mt-3 space-y-2 text-xs text-slate-300">
+                      <li className="flex gap-2">
+                        <span className="text-slate-500">•</span>
+                        <span>Lower numbers mean earlier alerts and stricter guardrails.</span>
+                      </li>
+                      <li className="flex gap-2">
+                        <span className="text-slate-500">•</span>
+                        <span>Higher numbers delay changes until signals are extreme.</span>
+                      </li>
+                    </ul>
+                    <Popover.Close className="mt-4 inline-flex min-h-[40px] items-center justify-center rounded-full border border-slate-800/70 px-3 py-2 text-[10px] font-semibold tracking-[0.18em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation">
+                      Close
+                    </Popover.Close>
+                    <Popover.Arrow className="h-3 w-3 translate-y-[1px] rotate-45 rounded-[3px] bg-slate-950/95" />
+                  </Popover.Popup>
+                </Popover.Positioner>
+              </Popover.Portal>
+            </Popover.Root>
             <DataProvenanceStrip provenance={provenance} />
           </div>
         </div>
