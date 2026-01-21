@@ -144,7 +144,10 @@ export const ReportShell = ({
         <header className="relative flex flex-col gap-6 border-b border-slate-800/70 pb-8">
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div className="min-w-0 space-y-4">
-              <p className="type-label text-slate-300">Weekly product guidance</p>
+              <div className="flex flex-wrap items-center gap-3 text-[0.65rem] font-semibold tracking-[0.3em] text-slate-400">
+                <span className="weather-chip px-3 py-1.5 uppercase">Weekly product guidance</span>
+                <span className="text-slate-500">Updated {fetchedAtLabel}</span>
+              </div>
               <div className="space-y-3">
                 <h1 className="type-headline text-slate-100">Whether Report</h1>
                 <p className="max-w-2xl text-sm text-slate-200 sm:hidden">
@@ -155,8 +158,8 @@ export const ReportShell = ({
                   engineering constraints. Every output is sourced and time-stamped for traceability.
                 </p>
               </div>
-              <div className="max-w-2xl space-y-2 border-l border-slate-800/80 pl-4">
-                <p className="text-xs font-semibold text-slate-300">You&rsquo;re reading</p>
+              <div className="weather-panel-static max-w-2xl space-y-2 px-4 py-3">
+                <p className="text-xs font-semibold text-slate-400">You&rsquo;re reading</p>
                 <p className="text-base font-semibold text-slate-100">{pageTitle}</p>
                 <p className="text-sm text-slate-300">{pageSummary}</p>
               </div>
@@ -224,7 +227,7 @@ export const ReportShell = ({
               <div className="flex flex-wrap gap-3">
                 <a
                   href="#weekly-action-summary"
-                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.2em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                  className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.2em] transition-colors hover:border-sky-300/80 hover:text-white touch-manipulation"
                 >
                   Start with this week
                 </a>
@@ -241,7 +244,7 @@ export const ReportShell = ({
               <div className="space-y-2 text-sm">
                 <p className="font-semibold">{trustStatusLabel}</p>
                 <p className="text-sm text-slate-200/90">{trustStatusDetail}</p>
-                <p className="text-xs text-slate-200/90">{trustStatusAction}</p>
+                <p className="text-xs text-slate-200/80">{trustStatusAction}</p>
               </div>
             </div>
           </div>
@@ -356,7 +359,7 @@ export const ReportShell = ({
                         <a
                           href={link.href}
                           aria-current={isActive ? "page" : undefined}
-                          className={`weather-tile flex min-h-[84px] flex-col gap-3 px-4 py-3 text-left text-sm font-semibold tracking-[0.08em] transition-colors touch-manipulation ${
+                          className={`weather-tile flex min-h-[84px] flex-col gap-3 px-4 py-3 text-left text-sm font-semibold tracking-[0.08em] transition-colors hover:-translate-y-0.5 touch-manipulation ${
                             isActive
                               ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
                               : "text-slate-300 hover:border-sky-300/70 hover:text-slate-100"
@@ -393,7 +396,7 @@ export const ReportShell = ({
                         <a
                           href={link.href}
                           aria-current={isActive ? "page" : undefined}
-                          className={`weather-tile flex min-h-[84px] flex-col gap-3 px-4 py-3 text-left text-sm font-semibold tracking-[0.08em] transition-colors touch-manipulation ${
+                          className={`weather-tile flex min-h-[84px] flex-col gap-3 px-4 py-3 text-left text-sm font-semibold tracking-[0.08em] transition-colors hover:-translate-y-0.5 touch-manipulation ${
                             isActive
                               ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
                               : "text-slate-300 hover:border-sky-300/70 hover:text-slate-100"
