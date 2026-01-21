@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { Collapsible } from "@base-ui/react/collapsible";
 import { NavigationMenu } from "@base-ui/react/navigation-menu";
+import { Tooltip } from "@base-ui/react/tooltip";
 
 export type ReportPageLink = {
   href: string;
@@ -81,28 +82,50 @@ export const ReportPageNavigation = ({
   className?: string;
 }) => (
   <NavigationMenu.Root aria-label="Report paths" className={className}>
-    <NavigationMenu.List className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible">
-      {pageLinks.map((link) => {
-        const isActive = link.label === pageTitle;
-        return (
-          <NavigationMenu.Item key={link.href} className="flex-shrink-0">
-            <NavigationMenu.Link
-              href={link.href}
-              active={isActive}
-              aria-current={isActive ? "page" : undefined}
-              className={`weather-tab inline-flex min-h-[44px] items-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors touch-manipulation ${
-                isActive
-                  ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
-                  : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
-              }`}
-            >
-              <span className="hidden sm:inline-flex">{pageLinkIcons[link.label]}</span>
-              {link.label}
-            </NavigationMenu.Link>
-          </NavigationMenu.Item>
-        );
-      })}
-    </NavigationMenu.List>
+    <Tooltip.Provider delay={200} closeDelay={50}>
+      <NavigationMenu.List className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible">
+        {pageLinks.map((link) => {
+          const isActive = link.label === pageTitle;
+          return (
+            <NavigationMenu.Item key={link.href} className="flex-shrink-0">
+              <Tooltip.Root>
+                <Tooltip.Trigger
+                  render={(props) => {
+                    const { type: _type, ...triggerProps } = props;
+                    return (
+                      <NavigationMenu.Link
+                        {...triggerProps}
+                        href={link.href}
+                        active={isActive}
+                        aria-current={isActive ? "page" : undefined}
+                        className={`weather-tab inline-flex min-h-[44px] items-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors touch-manipulation ${
+                          isActive
+                            ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
+                            : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
+                        }`}
+                      >
+                        <span className="hidden sm:inline-flex">
+                          {pageLinkIcons[link.label]}
+                        </span>
+                        {link.label}
+                      </NavigationMenu.Link>
+                    );
+                  }}
+                />
+                <Tooltip.Portal>
+                  <Tooltip.Positioner side="bottom" align="start" sideOffset={10}>
+                    <Tooltip.Popup className="hidden max-w-xs rounded-2xl border border-slate-800/80 bg-slate-950/95 px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-200 shadow-xl sm:block">
+                      {link.description}
+                      <Tooltip.Arrow className="h-2 w-2 translate-y-[1px] rotate-45 rounded-[2px] bg-slate-950/95" />
+                    </Tooltip.Popup>
+                  </Tooltip.Positioner>
+                </Tooltip.Portal>
+              </Tooltip.Root>
+            </NavigationMenu.Item>
+          );
+        })}
+      </NavigationMenu.List>
+    </Tooltip.Provider>
   </NavigationMenu.Root>
 );
 
