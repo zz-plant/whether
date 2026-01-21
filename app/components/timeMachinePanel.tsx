@@ -6,6 +6,7 @@
 
 import type { FormEvent } from "react";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { Tabs } from "@base-ui/react/tabs";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
 import type { RegimeKey } from "../../lib/regimeEngine";
@@ -180,6 +181,7 @@ export const TimeMachinePanel = ({
   };
   const formatCurve = (value: number | null) =>
     value === null ? "—" : `${value.toFixed(2)}%`;
+  const cadenceOptions = ["weekly", "monthly", "quarterly", "yearly"] as const;
 
   const buildProvenanceTooltip = (
     provenanceData: SummaryArchiveEntry["summary"]["provenance"]
@@ -545,53 +547,67 @@ export const TimeMachinePanel = ({
                   <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
                     Cadence
                   </p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {(["weekly", "monthly", "quarterly", "yearly"] as const).map((cadence) => (
-                      <button
-                        key={cadence}
-                        type="button"
-                        onClick={() => setTimelineCadence(cadence)}
-                        aria-pressed={timelineCadence === cadence}
-                        className={`weather-pill inline-flex min-h-[40px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] transition-colors touch-manipulation ${
-                          timelineCadence === cadence
-                            ? "border-sky-400/70 text-slate-100"
-                            : "text-slate-300 hover:border-slate-500/70 hover:text-slate-100"
-                        }`}
-                      >
-                        {cadence}
-                      </button>
+                  <Tabs.Root
+                    value={timelineCadence}
+                    onValueChange={(value) => {
+                      if (value) {
+                        setTimelineCadence(value as (typeof cadenceOptions)[number]);
+                      }
+                    }}
+                    className="mt-2"
+                  >
+                    <Tabs.List className="flex flex-wrap gap-2">
+                      {cadenceOptions.map((cadence) => (
+                        <Tabs.Tab
+                          key={cadence}
+                          value={cadence}
+                          className={({ active }) =>
+                            `weather-pill inline-flex min-h-[40px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] transition-colors touch-manipulation ${
+                              active
+                                ? "border-sky-400/70 text-slate-100"
+                                : "text-slate-300 hover:border-slate-500/70 hover:text-slate-100"
+                            }`
+                          }
+                        >
+                          {cadence}
+                        </Tabs.Tab>
+                      ))}
+                    </Tabs.List>
+                    {cadenceOptions.map((cadence) => (
+                      <Tabs.Panel key={cadence} value={cadence} className="mt-4 space-y-3">
+                        <div className="grid gap-3 sm:grid-cols-2">
+                          <label className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
+                            Start date
+                            <input
+                              type="date"
+                              value={rangeStart}
+                              min={cadenceRange.min ?? undefined}
+                              max={cadenceRange.max ?? undefined}
+                              onChange={(event) => setRangeStart(event.target.value)}
+                              className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
+                            />
+                          </label>
+                          <label className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
+                            End date
+                            <input
+                              type="date"
+                              value={rangeEnd}
+                              min={cadenceRange.min ?? undefined}
+                              max={cadenceRange.max ?? undefined}
+                              onChange={(event) => setRangeEnd(event.target.value)}
+                              className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
+                            />
+                          </label>
+                        </div>
+                        <p className="text-xs text-slate-500">
+                          {rangeStart && rangeEnd
+                            ? `${filteredEntries.length} entries match the range.`
+                            : "Select a date range to load the timeline."}
+                        </p>
+                      </Tabs.Panel>
                     ))}
-                  </div>
+                  </Tabs.Root>
                 </div>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <label className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
-                    Start date
-                    <input
-                      type="date"
-                      value={rangeStart}
-                      min={cadenceRange.min ?? undefined}
-                      max={cadenceRange.max ?? undefined}
-                      onChange={(event) => setRangeStart(event.target.value)}
-                      className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
-                    />
-                  </label>
-                  <label className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
-                    End date
-                    <input
-                      type="date"
-                      value={rangeEnd}
-                      min={cadenceRange.min ?? undefined}
-                      max={cadenceRange.max ?? undefined}
-                      onChange={(event) => setRangeEnd(event.target.value)}
-                      className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
-                    />
-                  </label>
-                </div>
-                <p className="text-xs text-slate-500">
-                  {rangeStart && rangeEnd
-                    ? `${filteredEntries.length} entries match the range.`
-                    : "Select a date range to load the timeline."}
-                </p>
               </div>
             </div>
             <div className="space-y-4">
