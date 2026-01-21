@@ -50,6 +50,99 @@ const buildBrief = (
   ].join("\n");
 };
 
+const buildJiraMarkdownBrief = (
+  assessment: RegimeAssessment,
+  treasury: TreasuryData,
+  sensors: SensorReading[],
+  macros: MacroSeriesReading[]
+) => {
+  const baseRate = sensors.find((sensor) => sensor.id === "BASE_RATE");
+  const curveSlope = sensors.find((sensor) => sensor.id === "CURVE_SLOPE");
+  const regimeLabel = getRegimeLabel(assessment.regime);
+  const macroLines = macros.map(
+    (macro) => `- ${macro.label}: ${formatNumber(macro.value, macro.unit)}`
+  );
+  const constraintLines = assessment.constraints.map((item) => `- ${item}`);
+
+  return [
+    `## Whether Report — ${treasury.record_date}`,
+    `**Regime:** ${regimeLabel} (${assessment.regime})`,
+    `**Tightness:** ${assessment.scores.tightness} / **Risk appetite:** ${assessment.scores.riskAppetite}`,
+    `**Base rate:** ${formatNumber(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
+    `**Curve slope:** ${formatNumber(curveSlope?.value ?? null, "%")}`,
+    "",
+    "### Macro signals",
+    ...macroLines,
+    "",
+    "### Constraints",
+    ...constraintLines,
+    "",
+    `Source: ${treasury.source}`,
+  ].join("\n");
+};
+
+const buildConfluenceWikiBrief = (
+  assessment: RegimeAssessment,
+  treasury: TreasuryData,
+  sensors: SensorReading[],
+  macros: MacroSeriesReading[]
+) => {
+  const baseRate = sensors.find((sensor) => sensor.id === "BASE_RATE");
+  const curveSlope = sensors.find((sensor) => sensor.id === "CURVE_SLOPE");
+  const regimeLabel = getRegimeLabel(assessment.regime);
+  const macroLines = macros.map(
+    (macro) => `* ${macro.label}: ${formatNumber(macro.value, macro.unit)}`
+  );
+  const constraintLines = assessment.constraints.map((item) => `* ${item}`);
+
+  return [
+    `h2. Whether Report — ${treasury.record_date}`,
+    `*Regime:* ${regimeLabel} (${assessment.regime})`,
+    `*Tightness:* ${assessment.scores.tightness} / *Risk appetite:* ${assessment.scores.riskAppetite}`,
+    `*Base rate:* ${formatNumber(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
+    `*Curve slope:* ${formatNumber(curveSlope?.value ?? null, "%")}`,
+    "",
+    "h3. Macro signals",
+    ...macroLines,
+    "",
+    "h3. Constraints",
+    ...constraintLines,
+    "",
+    `Source: [${treasury.source}|${treasury.source}]`,
+  ].join("\n");
+};
+
+const buildLinearMarkdownBrief = (
+  assessment: RegimeAssessment,
+  treasury: TreasuryData,
+  sensors: SensorReading[],
+  macros: MacroSeriesReading[]
+) => {
+  const baseRate = sensors.find((sensor) => sensor.id === "BASE_RATE");
+  const curveSlope = sensors.find((sensor) => sensor.id === "CURVE_SLOPE");
+  const regimeLabel = getRegimeLabel(assessment.regime);
+  const macroLines = macros.map(
+    (macro) => `- ${macro.label}: ${formatNumber(macro.value, macro.unit)}`
+  );
+  const constraintLines = assessment.constraints.map((item) => `- ${item}`);
+
+  return [
+    `## Whether Report — ${treasury.record_date}`,
+    `**Regime:** ${regimeLabel} (${assessment.regime})`,
+    `**Tightness:** ${assessment.scores.tightness} / **Risk appetite:** ${assessment.scores.riskAppetite}`,
+    `**Base rate:** ${formatNumber(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
+    `**Curve slope:** ${formatNumber(curveSlope?.value ?? null, "%")}`,
+    "",
+    "### Macro signals",
+    ...macroLines,
+    "",
+    "### Constraints",
+    ...constraintLines,
+    "",
+    `Source: ${treasury.source}`,
+  ].join("\n");
+};
+
 const buildSlideBullets = (assessment: RegimeAssessment, macros: MacroSeriesReading[]) => {
   return [
     `Market climate: ${assessment.regime}`,
@@ -110,6 +203,18 @@ export const ExportBriefPanel = ({
 
   const briefing = useMemo(
     () => buildBrief(assessment, treasury, sensors, macroSeries),
+    [assessment, treasury, sensors, macroSeries]
+  );
+  const jiraMarkdownBrief = useMemo(
+    () => buildJiraMarkdownBrief(assessment, treasury, sensors, macroSeries),
+    [assessment, treasury, sensors, macroSeries]
+  );
+  const confluenceWikiBrief = useMemo(
+    () => buildConfluenceWikiBrief(assessment, treasury, sensors, macroSeries),
+    [assessment, treasury, sensors, macroSeries]
+  );
+  const linearMarkdownBrief = useMemo(
+    () => buildLinearMarkdownBrief(assessment, treasury, sensors, macroSeries),
     [assessment, treasury, sensors, macroSeries]
   );
   const slideBullets = useMemo(
@@ -292,6 +397,115 @@ export const ExportBriefPanel = ({
               rows={6}
               className="mt-3 w-full rounded-lg border border-slate-800 bg-slate-950/80 p-3 font-mono text-base text-slate-200 touch-manipulation"
             />
+          </div>
+        </div>
+        <div className="mt-4 weather-surface p-4">
+          <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+            Jira, Confluence, and Linear
+          </p>
+          <p className="mt-3 text-sm text-slate-300">
+            Paste tool-optimized summaries into your issue trackers or documentation.
+          </p>
+          <div className="mt-4 grid gap-4">
+            <div className="rounded-lg border border-slate-800/80 bg-slate-950/60 p-3">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
+                Jira description
+              </p>
+              <p className="mt-2 text-sm text-slate-400">
+                Paste into the Jira issue description field.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleCopy(jiraMarkdownBrief, "Jira description")}
+                  disabled={isCopying}
+                  aria-busy={isCopying}
+                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+                >
+                  {isCopying && copyTarget === "Jira description"
+                    ? "Copying"
+                    : "Copy Jira description"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleDownload(
+                      jiraMarkdownBrief,
+                      `whether-jira-description-${treasury.record_date}.md`
+                    )
+                  }
+                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                >
+                  Download Jira description
+                </button>
+              </div>
+            </div>
+            <div className="rounded-lg border border-slate-800/80 bg-slate-950/60 p-3">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
+                Confluence page snippet
+              </p>
+              <p className="mt-2 text-sm text-slate-400">
+                Paste into the Confluence page body.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleCopy(confluenceWikiBrief, "Confluence page snippet")}
+                  disabled={isCopying}
+                  aria-busy={isCopying}
+                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+                >
+                  {isCopying && copyTarget === "Confluence page snippet"
+                    ? "Copying"
+                    : "Copy Confluence page snippet"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleDownload(
+                      confluenceWikiBrief,
+                      `whether-confluence-snippet-${treasury.record_date}.txt`
+                    )
+                  }
+                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                >
+                  Download Confluence page snippet
+                </button>
+              </div>
+            </div>
+            <div className="rounded-lg border border-slate-800/80 bg-slate-950/60 p-3">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
+                Linear issue description
+              </p>
+              <p className="mt-2 text-sm text-slate-400">
+                Paste into the Linear issue description field.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleCopy(linearMarkdownBrief, "Linear issue description")}
+                  disabled={isCopying}
+                  aria-busy={isCopying}
+                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+                >
+                  {isCopying && copyTarget === "Linear issue description"
+                    ? "Copying"
+                    : "Copy Linear issue description"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleDownload(
+                      linearMarkdownBrief,
+                      `whether-linear-description-${treasury.record_date}.md`
+                    )
+                  }
+                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                >
+                  Download Linear issue description
+                </button>
+              </div>
+            </div>
           </div>
         </div>
         <div className="mt-4 min-h-[260px]">
