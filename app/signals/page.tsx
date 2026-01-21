@@ -100,7 +100,9 @@ export default async function SignalsPage({
       pageLinks={pageLinks}
       sectionLinks={sectionLinks}
       historicalBanner={
-        historicalSelection ? <HistoricalBanner banner={historicalSelection.banner} /> : null
+        historicalSelection ? (
+          <HistoricalBanner banner={historicalSelection.banner} liveHref="/signals" />
+        ) : null
       }
     >
       <SensorArray sensors={sensors} provenance={treasuryProvenance} />

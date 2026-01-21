@@ -424,6 +424,21 @@ export const WeeklyActionSummaryPanel = ({
                 for the source signals and decision guardrails.
               </p>
             </div>
+            <div className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-4">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                What changed since last read
+              </p>
+              <p className="mt-2 text-sm text-slate-200">
+                View the delta snapshot before you lock weekly decisions.{" "}
+                <a
+                  href="#change-since-last-read"
+                  className="touch-target inline-flex min-h-[40px] items-center text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-slate-50 touch-manipulation"
+                >
+                  Jump to the change log
+                </a>
+                .
+              </p>
+            </div>
             <div className="flex flex-wrap gap-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
               <span className="weather-pill inline-flex min-h-[32px] items-center px-3 py-1">
                 Regime: {regimeLabel}
@@ -1497,10 +1512,26 @@ export const SignalMatrixPanel = ({
   );
 };
 
-export const HistoricalBanner = ({ banner }: { banner: string }) => {
+export const HistoricalBanner = ({
+  banner,
+  liveHref,
+}: {
+  banner: string;
+  liveHref?: string;
+}) => {
   return (
     <div className="mt-6 rounded-2xl border border-slate-600 bg-slate-900/70 px-4 py-3 text-sm text-slate-200">
-      <span className="type-label text-slate-400">Historical mode</span>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <span className="type-label text-slate-400">Historical mode</span>
+        {liveHref ? (
+          <a
+            href={liveHref}
+            className="inline-flex min-h-[32px] items-center rounded-full border border-slate-500/70 px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-100 transition hover:border-slate-300/80 hover:text-white"
+          >
+            Return to live
+          </a>
+        ) : null}
+      </div>
       <p className="mt-1 font-semibold text-slate-100">{banner}</p>
       <p className="mt-2 text-xs text-slate-400">
         You are viewing archived Treasury data; live signals are temporarily hidden.
