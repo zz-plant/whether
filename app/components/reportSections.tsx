@@ -7,6 +7,7 @@
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { Collapsible } from "@base-ui/react/collapsible";
+import { Tabs } from "@base-ui/react/tabs";
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import type { PlaybookEntry } from "../../lib/playbook";
 import type {
@@ -2285,6 +2286,7 @@ export const SensorArray = ({
 }) => {
   const [selectedCategories, setSelectedCategories] = useState<SensorCategory[]>(sensorCategories);
   const [selectedWindow, setSelectedWindow] = useState<SensorTimeWindow>("3M");
+  const [tabValue, setTabValue] = useState<"groups" | "windows">("groups");
 
   const availableWindows = useMemo(() => {
     const windowSet = new Set<SensorTimeWindow>();
@@ -2404,37 +2406,33 @@ export const SensorArray = ({
         </div>
         <div className="weather-panel p-5">
           <p className="type-label text-slate-400">Filters</p>
-          <div className="mt-3 space-y-4">
-            <fieldset className="space-y-2">
-              <legend className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-                Time window
-              </legend>
-              <div role="radiogroup" className="flex flex-wrap gap-2">
-                {availableWindows.map((window) => (
-                  <button
-                    key={window.id}
-                    type="button"
-                    role="radio"
-                    aria-checked={window.id === selectedWindow}
-                    onClick={() => setSelectedWindow(window.id)}
-                    className={`min-h-[40px] rounded-full border px-3 text-xs font-semibold tracking-[0.12em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${
-                      window.id === selectedWindow
-                        ? "border-sky-400/80 bg-sky-500/10 text-slate-100"
-                        : "border-slate-800/70 text-slate-400 hover:border-slate-700/80 hover:text-slate-200"
-                    }`}
-                  >
-                    {window.label}
-                  </button>
-                ))}
-              </div>
-              {activeWindow ? (
-                <p className="text-xs text-slate-500">{activeWindow.description}</p>
-              ) : null}
-            </fieldset>
-            <fieldset className="space-y-2">
-              <legend className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+          <Tabs.Root
+            value={tabValue}
+            onValueChange={(value) => {
+              if (value === "groups" || value === "windows") {
+                setTabValue(value);
+              }
+            }}
+            className="mt-3"
+          >
+            <Tabs.List className="flex gap-2 rounded-full border border-slate-800/80 bg-slate-950/70 p-1">
+              <Tabs.Tab
+                value="groups"
+                className="flex-1 rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 transition-colors data-[active]:bg-sky-500/15 data-[active]:text-slate-100"
+              >
                 Signal groups
-              </legend>
+              </Tabs.Tab>
+              <Tabs.Tab
+                value="windows"
+                className="flex-1 rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 transition-colors data-[active]:bg-sky-500/15 data-[active]:text-slate-100"
+              >
+                Time windows
+              </Tabs.Tab>
+            </Tabs.List>
+            <Tabs.Panel value="groups" className="mt-4 space-y-3">
+              <p className="text-xs text-slate-500">
+                Choose the signal groups to spotlight across the sensor array.
+              </p>
               <div className="grid gap-2 sm:grid-cols-2">
                 {sensorGroups.map((group) => {
                   const isActive = selectedCategories.includes(group.id);
@@ -2474,8 +2472,34 @@ export const SensorArray = ({
                   {filteredSensors.length === 1 ? "" : "s"}.
                 </span>
               </div>
-            </fieldset>
-          </div>
+            </Tabs.Panel>
+            <Tabs.Panel value="windows" className="mt-4 space-y-3">
+              <p className="text-xs text-slate-500">
+                Match the horizon to the decision cadence you are planning for.
+              </p>
+              <div role="radiogroup" className="flex flex-wrap gap-2">
+                {availableWindows.map((window) => (
+                  <button
+                    key={window.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={window.id === selectedWindow}
+                    onClick={() => setSelectedWindow(window.id)}
+                    className={`min-h-[40px] rounded-full border px-3 text-xs font-semibold tracking-[0.12em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${
+                      window.id === selectedWindow
+                        ? "border-sky-400/80 bg-sky-500/10 text-slate-100"
+                        : "border-slate-800/70 text-slate-400 hover:border-slate-700/80 hover:text-slate-200"
+                    }`}
+                  >
+                    {window.label}
+                  </button>
+                ))}
+              </div>
+              {activeWindow ? (
+                <p className="text-xs text-slate-500">{activeWindow.description}</p>
+              ) : null}
+            </Tabs.Panel>
+          </Tabs.Root>
         </div>
       </div>
       <div className="mt-4 space-y-4">
