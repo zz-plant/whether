@@ -15,6 +15,7 @@ import { cxoFunctionOutputs } from "../../lib/cxoFunctionOutputs";
 import { operatorRequests } from "../../lib/operatorRequests";
 import { buildMonthlySummary, getMonthlyActionGuidance } from "../../lib/monthlySummary";
 import { buildWeeklySummary, getWeeklyActionGuidance } from "../../lib/weeklySummary";
+import { buildCadenceAlignment } from "../../lib/cadenceAlignment";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
 import { MonthlySummaryCard } from "./monthlySummaryCard";
 import { SummaryDeltaPanel } from "./summaryDeltaPanel";
@@ -519,6 +520,22 @@ export const MonthlyActionSummaryPanel = ({
     provenance,
     recordDateLabel,
   });
+  const cadenceAlignment = buildCadenceAlignment(weeklySummary, monthlySummary);
+  const cadenceBadge =
+    cadenceAlignment.status === "aligned"
+      ? {
+          label: "Aligned",
+          classes: "border-emerald-400/60 bg-emerald-500/10 text-emerald-100",
+        }
+      : cadenceAlignment.status === "watch"
+        ? {
+            label: "Needs review",
+            classes: "border-amber-400/60 bg-amber-500/10 text-amber-100",
+          }
+        : {
+            label: "Mismatch",
+            classes: "border-rose-500/60 bg-rose-500/10 text-rose-100",
+          };
   const monthlyBlocks: ActionSummaryBlock[] = [
     {
       heading: "Monthly leadership asks sound like",
@@ -551,6 +568,19 @@ export const MonthlyActionSummaryPanel = ({
         <>
           <MonthlySummaryCard summary={monthlySummary} />
           <SummaryDeltaPanel weeklySummary={weeklySummary} monthlySummary={monthlySummary} />
+          <div className="weather-surface p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                Cadence alignment
+              </p>
+              <span
+                className={`inline-flex min-h-[24px] items-center rounded-full border px-2 py-1 text-xs font-semibold tracking-[0.12em] ${cadenceBadge.classes}`}
+              >
+                {cadenceBadge.label}
+              </span>
+            </div>
+            <p className="mt-3 text-sm text-slate-200">{cadenceAlignment.note}</p>
+          </div>
         </>
       }
       blocks={monthlyBlocks}
