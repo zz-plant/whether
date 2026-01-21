@@ -236,7 +236,7 @@ export const ReportMobileNavigation = ({
   className?: string;
 }) => (
   <NavigationMenu.Root aria-label="Mobile report navigation" className={className}>
-    <div className="weather-panel flex items-center justify-between gap-2 px-3 py-2">
+    <div className="weather-panel flex items-center justify-between gap-2 px-3 py-1.5">
       <NavigationMenu.List className="flex flex-1 items-center gap-2">
         {pageLinks.map((link) => {
           const isActive = link.label === pageTitle;
@@ -246,13 +246,15 @@ export const ReportMobileNavigation = ({
                 href={link.href}
                 active={isActive}
                 aria-current={isActive ? "page" : undefined}
-                className={`flex min-h-[52px] flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-1 text-[10px] font-semibold tracking-[0.2em] transition-colors touch-manipulation ${
+                className={`flex min-h-[40px] flex-1 flex-col items-center justify-center gap-0.5 rounded-2xl px-2 py-0.5 text-[9px] font-semibold tracking-[0.2em] transition-colors touch-manipulation ${
                   isActive
                     ? "bg-sky-500/15 text-sky-100"
                     : "text-slate-300 hover:text-slate-100"
                 }`}
               >
-                <span className="text-slate-200">{pageLinkIcons[link.label]}</span>
+                <span className="text-slate-200">
+                  {pageLinkIcons[link.label]}
+                </span>
                 <span className="uppercase">{link.label}</span>
               </NavigationMenu.Link>
             </NavigationMenu.Item>
@@ -263,10 +265,10 @@ export const ReportMobileNavigation = ({
         <Collapsible.Root className="relative flex-1">
           <Collapsible.Trigger
             type="button"
-            className="group flex min-h-[52px] w-full flex-col items-center justify-center gap-1 rounded-2xl px-2 py-1 text-[10px] font-semibold tracking-[0.2em] text-slate-300 transition-colors hover:text-slate-100 touch-manipulation"
+            className="group flex min-h-[40px] w-full flex-col items-center justify-center gap-0.5 rounded-2xl px-2 py-0.5 text-[9px] font-semibold tracking-[0.2em] text-slate-300 transition-colors hover:text-slate-100 touch-manipulation"
           >
             <span className="text-slate-200">
-              <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
+              <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
                 <path
                   d="M4 6.5h16M4 12h16M4 17.5h10"
                   stroke="currentColor"
