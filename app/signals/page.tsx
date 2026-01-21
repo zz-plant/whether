@@ -8,6 +8,7 @@ import {
 } from "../components/reportSections";
 import { ThresholdsPanel } from "../components/thresholdsPanel";
 import { TimeMachinePanel } from "../components/timeMachinePanel";
+import { RegimeTimelinePanel } from "../components/regimeTimelinePanel";
 
 export const metadata: Metadata = {
   title: "Whether Report — Why we believe this",
@@ -42,6 +43,7 @@ export default async function SignalsPage({
     { href: "#macro-signals", label: "Macro sources" },
     { href: "#thresholds", label: "How scores are set" },
     { href: "#time-machine", label: "Time machine" },
+    { href: "#regime-timeline", label: "Regime timeline" },
   ];
 
   const {
@@ -55,6 +57,7 @@ export default async function SignalsPage({
     macroProvenance,
     macroSeries,
     recordDateLabel,
+    regimeSeries,
     selectedMonth,
     selectedYear,
     sensors,
@@ -117,6 +120,13 @@ export default async function SignalsPage({
         historicalRegime={historicalSelection ? assessment.regime : null}
         historicalSummary={historicalSelection ? assessment.description : null}
         comparison={historicalComparison}
+      />
+
+      <RegimeTimelinePanel
+        series={regimeSeries}
+        selectedYear={selectedYear}
+        selectedMonth={selectedMonth}
+        searchParams={searchParams}
       />
     </ReportShell>
   );

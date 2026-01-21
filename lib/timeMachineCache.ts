@@ -5,6 +5,7 @@
 import { z } from "zod";
 import type { TreasuryData } from "./types";
 import { TreasuryDataSchema } from "./treasurySchema";
+import { evaluateRegime } from "./regimeEngine";
 import rawCache from "../data/time_machine_cache.json";
 
 const TimeMachineSnapshotSchema = TreasuryDataSchema.extend({
@@ -69,6 +70,28 @@ export const hasTimeMachineEntry = (year: number, month: number) => {
 
 export const getLatestTimeMachineSnapshot = () => {
   return sortedSnapshots.at(-1) ?? null;
+};
+
+export type TimeMachineRegimeEntry = {
+  year: number;
+  month: number;
+  recordDate: string;
+  regime: ReturnType<typeof evaluateRegime>["regime"];
+  summary: string;
+};
+
+export const getTimeMachineRegimeSeries = (months = 24): TimeMachineRegimeEntry[] => {
+  const sliceStart = Math.max(sortedSnapshots.length - months, 0);
+  return sortedSnapshots.slice(sliceStart).map((snapshot) => {
+    const assessment = evaluateRegime(snapshot);
+    return {
+      year: snapshot.year,
+      month: snapshot.month,
+      recordDate: snapshot.record_date,
+      regime: assessment.regime,
+      summary: assessment.description,
+    };
+  });
 };
 
 export const getPreviousTimeMachineSnapshot = (asOf: string): TreasuryData | null => {
