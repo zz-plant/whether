@@ -140,7 +140,7 @@ export const ReportShell = ({
       <div className="pointer-events-none absolute inset-0 hidden sm:block weather-haze" />
       <div className="pointer-events-none absolute left-1/2 top-0 hidden h-[520px] w-[720px] -translate-x-1/2 rounded-full bg-sky-400/15 blur-[190px] sm:block" />
       <div className="pointer-events-none absolute -right-24 top-24 hidden h-[420px] w-[420px] rounded-full bg-fuchsia-400/10 blur-[160px] sm:block" />
-      <div className="mx-auto max-w-7xl px-4 pb-12 pt-4 sm:px-6 sm:pt-6">
+      <div className="mx-auto max-w-7xl pb-[calc(env(safe-area-inset-bottom)+7rem)] pt-4 pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)] sm:pb-12 sm:pt-6 sm:pl-[calc(env(safe-area-inset-left)+1.5rem)] sm:pr-[calc(env(safe-area-inset-right)+1.5rem)]">
         <header className="weather-appbar sticky top-4 z-20 px-4 py-4 sm:px-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
@@ -405,7 +405,7 @@ export const ReportShell = ({
       <div className="sm:hidden">
         <nav
           aria-label="Mobile report navigation"
-          className="fixed inset-x-0 bottom-0 z-30 px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3"
+          className="fixed inset-x-0 bottom-0 z-30 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3 pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)]"
         >
           <div className="weather-panel flex items-center justify-between gap-2 px-3 py-2">
             {pageLinks.map((link) => {
