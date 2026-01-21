@@ -27,6 +27,26 @@ body {
     linear-gradient(180deg, rgba(2, 6, 23, 1) 0%, rgba(9, 14, 27, 0.98) 50%, rgba(2, 6, 23, 1) 100%);
 }
 
+.weather-grid {
+  background-image:
+    linear-gradient(rgba(30, 41, 59, 0.35) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30, 41, 59, 0.35) 1px, transparent 1px);
+  background-size: 120px 120px;
+  mask-image: radial-gradient(circle at top, rgba(0, 0, 0, 0.55) 0%, transparent 70%);
+  opacity: 0.35;
+}
+
+.weather-aurora {
+  background-image:
+    radial-gradient(60% 50% at 20% 15%, rgba(14, 165, 233, 0.18), transparent 65%),
+    radial-gradient(55% 45% at 80% 10%, rgba(56, 189, 248, 0.16), transparent 62%),
+    radial-gradient(50% 55% at 60% 30%, rgba(217, 70, 239, 0.12), transparent 70%);
+  filter: blur(20px);
+  opacity: 0.75;
+  animation: aurora-shift 32s ease-in-out infinite;
+  mix-blend-mode: screen;
+}
+
 .weather-haze {
   background: linear-gradient(180deg, rgba(15, 23, 42, 0.55) 0%, rgba(2, 6, 23, 0.75) 70%);
 }
@@ -168,6 +188,21 @@ summary {
   }
 }
 
+@keyframes aurora-shift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  35% {
+    transform: translate3d(-2%, 1%, 0) scale(1.03);
+  }
+  70% {
+    transform: translate3d(2%, -1%, 0) scale(0.98);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
 button:focus-visible,
 a:focus-visible,
 select:focus-visible,
@@ -193,6 +228,10 @@ summary:focus-visible {
 
   .display-drift {
     transform: none;
+    animation: none;
+  }
+
+  .weather-aurora {
     animation: none;
   }
 }
