@@ -5,6 +5,10 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Field } from "@base-ui/react/field";
+import { Input } from "@base-ui/react/input";
+import { Select } from "@base-ui/react/select";
+import { Toast } from "@base-ui/react/toast";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   evaluateDecision,
@@ -120,6 +124,7 @@ export const DecisionShieldPanel = ({
   const [presetStatus, setPresetStatus] = useState<string | null>(null);
   const storageKey = "whether.decisionShield";
   const presetStorageKey = "whether.decisionShieldPresets";
+  const { add } = Toast.useToastManager();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -334,6 +339,11 @@ export const DecisionShieldPanel = ({
     if (!navigator.clipboard?.writeText) {
       setCopyError(true);
       setCopied(false);
+      add({
+        title: "Clipboard blocked",
+        description: "Select the verdict text to share it manually.",
+        type: "error",
+      });
       return;
     }
     setIsCopying(true);
@@ -341,10 +351,20 @@ export const DecisionShieldPanel = ({
       await navigator.clipboard.writeText(shareText);
       setCopied(true);
       setCopyError(false);
+      add({
+        title: "Decision Shield copied",
+        description: "The verdict is ready to paste.",
+        type: "success",
+      });
       setTimeout(() => setCopied(false), 2000);
     } catch {
       setCopied(false);
       setCopyError(true);
+      add({
+        title: "Copy failed",
+        description: "Clipboard access failed. Try copying manually.",
+        type: "error",
+      });
     } finally {
       setIsCopying(false);
     }
@@ -357,6 +377,11 @@ export const DecisionShieldPanel = ({
     if (!navigator.clipboard?.writeText) {
       setLinkCopyError(true);
       setLinkCopied(false);
+      add({
+        title: "Clipboard blocked",
+        description: "Copy the URL from your browser address bar.",
+        type: "error",
+      });
       return;
     }
     setIsCopying(true);
@@ -365,10 +390,20 @@ export const DecisionShieldPanel = ({
       await navigator.clipboard.writeText(link);
       setLinkCopied(true);
       setLinkCopyError(false);
+      add({
+        title: "Link copied",
+        description: "Share this Decision Shield URL with your team.",
+        type: "success",
+      });
       setTimeout(() => setLinkCopied(false), 2000);
     } catch {
       setLinkCopied(false);
       setLinkCopyError(true);
+      add({
+        title: "Copy failed",
+        description: "Clipboard access failed. Try copying the URL manually.",
+        type: "error",
+      });
     } finally {
       setIsCopying(false);
     }
@@ -450,66 +485,132 @@ export const DecisionShieldPanel = ({
             </p>
           </div>
           <div className="grid gap-4 lg:grid-cols-3">
-            <div className="space-y-2">
-              <label
-                htmlFor="decision-lifecycle"
-                className="type-label text-slate-400"
-              >
+            <Field.Root className="space-y-2">
+              <Field.Label className="type-label text-slate-400" nativeLabel={false}>
                 Lifecycle
-              </label>
-              <select
-                id="decision-lifecycle"
+              </Field.Label>
+              <Select.Root
                 value={lifecycle}
-                onChange={(event) => setLifecycle(event.target.value as LifecycleStage)}
-                className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
+                onValueChange={(value) => setLifecycle(value as LifecycleStage)}
               >
-                {lifecycleOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="space-y-2">
-              <label
-                htmlFor="decision-category"
-                className="type-label text-slate-400"
-              >
+                <Select.Trigger className="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation">
+                  <Select.Value placeholder="Select lifecycle" />
+                  <Select.Icon className="text-slate-400">
+                    <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
+                      <path
+                        d="M7 10l5 5 5-5"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </Select.Icon>
+                </Select.Trigger>
+                <Select.Portal>
+                  <Select.Positioner side="bottom" align="start" sideOffset={8}>
+                    <Select.Popup className="min-w-[220px] rounded-xl border border-slate-800/80 bg-slate-950/95 p-1 text-sm text-slate-100 shadow-xl">
+                      <Select.List className="max-h-64 overflow-y-auto">
+                        {lifecycleOptions.map((option) => (
+                          <Select.Item
+                            key={option.value}
+                            value={option.value}
+                            className="flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm text-slate-200 outline-none transition-colors data-[highlighted]:bg-slate-800/70 data-[selected]:text-sky-200"
+                          >
+                            <Select.ItemText>{option.label}</Select.ItemText>
+                          </Select.Item>
+                        ))}
+                      </Select.List>
+                    </Select.Popup>
+                  </Select.Positioner>
+                </Select.Portal>
+              </Select.Root>
+            </Field.Root>
+            <Field.Root className="space-y-2">
+              <Field.Label className="type-label text-slate-400" nativeLabel={false}>
                 Category
-              </label>
-              <select
-                id="decision-category"
+              </Field.Label>
+              <Select.Root
                 value={category}
-                onChange={(event) => setCategory(event.target.value as DecisionCategory)}
-                className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
+                onValueChange={(value) => setCategory(value as DecisionCategory)}
               >
-                {categoryOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="space-y-2">
-              <label
-                htmlFor="decision-action"
-                className="type-label text-slate-400"
-              >
+                <Select.Trigger className="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation">
+                  <Select.Value placeholder="Select category" />
+                  <Select.Icon className="text-slate-400">
+                    <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
+                      <path
+                        d="M7 10l5 5 5-5"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </Select.Icon>
+                </Select.Trigger>
+                <Select.Portal>
+                  <Select.Positioner side="bottom" align="start" sideOffset={8}>
+                    <Select.Popup className="min-w-[220px] rounded-xl border border-slate-800/80 bg-slate-950/95 p-1 text-sm text-slate-100 shadow-xl">
+                      <Select.List className="max-h-64 overflow-y-auto">
+                        {categoryOptions.map((option) => (
+                          <Select.Item
+                            key={option.value}
+                            value={option.value}
+                            className="flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm text-slate-200 outline-none transition-colors data-[highlighted]:bg-slate-800/70 data-[selected]:text-sky-200"
+                          >
+                            <Select.ItemText>{option.label}</Select.ItemText>
+                          </Select.Item>
+                        ))}
+                      </Select.List>
+                    </Select.Popup>
+                  </Select.Positioner>
+                </Select.Portal>
+              </Select.Root>
+            </Field.Root>
+            <Field.Root className="space-y-2">
+              <Field.Label className="type-label text-slate-400" nativeLabel={false}>
                 Action
-              </label>
-              <select
-                id="decision-action"
+              </Field.Label>
+              <Select.Root
                 value={action}
-                onChange={(event) => setAction(event.target.value as DecisionAction)}
-                className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
+                onValueChange={(value) => setAction(value as DecisionAction)}
               >
-                {actionOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+                <Select.Trigger className="weather-input flex min-h-[44px] w-full items-center justify-between px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation">
+                  <Select.Value placeholder="Select action" />
+                  <Select.Icon className="text-slate-400">
+                    <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
+                      <path
+                        d="M7 10l5 5 5-5"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </Select.Icon>
+                </Select.Trigger>
+                <Select.Portal>
+                  <Select.Positioner side="bottom" align="start" sideOffset={8}>
+                    <Select.Popup className="min-w-[220px] rounded-xl border border-slate-800/80 bg-slate-950/95 p-1 text-sm text-slate-100 shadow-xl">
+                      <Select.List className="max-h-64 overflow-y-auto">
+                        {actionOptions.map((option) => (
+                          <Select.Item
+                            key={option.value}
+                            value={option.value}
+                            className="flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm text-slate-200 outline-none transition-colors data-[highlighted]:bg-slate-800/70 data-[selected]:text-sky-200"
+                          >
+                            <Select.ItemText>{option.label}</Select.ItemText>
+                          </Select.Item>
+                        ))}
+                      </Select.List>
+                    </Select.Popup>
+                  </Select.Positioner>
+                </Select.Portal>
+              </Select.Root>
+            </Field.Root>
           </div>
 
           <div className="weather-surface p-4">
@@ -523,9 +624,9 @@ export const DecisionShieldPanel = ({
               <p className="text-xs text-slate-500">Max 8 presets</p>
             </div>
             <div className="mt-4 flex flex-wrap items-start gap-3">
-              <label className="flex flex-col gap-2 text-xs font-semibold tracking-[0.12em] text-slate-400">
-                Preset name
-                <input
+              <Field.Root className="flex w-full flex-col gap-2 text-xs font-semibold tracking-[0.12em] text-slate-400 sm:max-w-xs">
+                <Field.Label nativeLabel={false}>Preset name</Field.Label>
+                <Input
                   ref={presetInputRef}
                   type="text"
                   value={presetName}
@@ -535,7 +636,7 @@ export const DecisionShieldPanel = ({
                   aria-describedby={presetError ? "preset-error" : undefined}
                   className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
                 />
-              </label>
+              </Field.Root>
               <button
                 type="button"
                 onClick={handlePresetSave}
