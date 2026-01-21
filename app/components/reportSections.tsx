@@ -7,6 +7,7 @@
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { Collapsible } from "@base-ui/react/collapsible";
+import { Tooltip } from "@base-ui/react/tooltip";
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import type { PlaybookEntry } from "../../lib/playbook";
 import type {
@@ -1267,7 +1268,6 @@ export const SignalMatrixPanel = ({
   const matrixDotY = clampToRange(100 - y, 0, 100);
   const matrixGridId = "matrix-grid";
   const matrixGlowId = "matrix-glow";
-  const matrixTooltipId = "matrix-position-tooltip";
   const tightnessThreshold = assessment.thresholds.tightnessRegime;
   const riskThreshold = assessment.thresholds.riskAppetiteRegime;
   const tightnessStatus = assessment.scores.tightness > tightnessThreshold ? "Tight" : "Loose";
@@ -1472,22 +1472,25 @@ export const SignalMatrixPanel = ({
                   Cash tightness ↑
                 </div>
               </div>
-              <button
-                type="button"
-                aria-label={`Matrix position. Tightness ${assessment.scores.tightness}, risk appetite ${assessment.scores.riskAppetite}.`}
-                aria-describedby={matrixTooltipId}
-                className="group absolute flex min-h-[44px] min-w-[44px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full"
-                style={{ left: `${matrixDotX}%`, top: `${matrixDotY}%` }}
-              >
-                <span
-                  id={matrixTooltipId}
-                  role="tooltip"
-                  className="pointer-events-none absolute top-0 -translate-y-full rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-slate-200 opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+              <Tooltip.Root>
+                <Tooltip.Trigger
+                  type="button"
+                  aria-label={`Matrix position. Tightness ${assessment.scores.tightness}, risk appetite ${assessment.scores.riskAppetite}.`}
+                  className="absolute flex min-h-[44px] min-w-[44px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                  style={{ left: `${matrixDotX}%`, top: `${matrixDotY}%` }}
                 >
-                  Tightness {assessment.scores.tightness} · Risk appetite{" "}
-                  {assessment.scores.riskAppetite}
-                </span>
-              </button>
+                  <span className="sr-only">Matrix position</span>
+                </Tooltip.Trigger>
+                <Tooltip.Portal>
+                  <Tooltip.Positioner side="top" align="center" className="z-20">
+                    <Tooltip.Popup className="rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-slate-200 shadow-lg">
+                      Tightness {assessment.scores.tightness} · Risk appetite{" "}
+                      {assessment.scores.riskAppetite}
+                      <Tooltip.Arrow className="h-2 w-2 rotate-45 border border-slate-700 bg-slate-950" />
+                    </Tooltip.Popup>
+                  </Tooltip.Positioner>
+                </Tooltip.Portal>
+              </Tooltip.Root>
             </div>
             <figcaption id="signal-matrix-description" className="text-xs text-slate-500">
               Position is derived from tightness (
