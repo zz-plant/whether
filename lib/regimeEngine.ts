@@ -39,6 +39,11 @@ export interface RegimeAssessment {
   inputs: RegimeInput[];
 }
 
+export type RegimeChangeReason = {
+  code: string;
+  message: string;
+};
+
 export const BASE_RATE_TIGHTNESS_THRESHOLD = 5;
 export const TIGHTNESS_BASE_RATE_POINTS = 90;
 export const TIGHTNESS_INVERSION_POINTS = 25;
@@ -239,6 +244,95 @@ export const classifyRegime = (
     return "VOLATILE";
   }
   return "EXPANSION";
+};
+
+export const buildRegimeChangeReasons = (
+  previous: RegimeAssessment | null,
+  current: RegimeAssessment
+): RegimeChangeReason[] => {
+  if (!previous) {
+    return [];
+  }
+
+  const reasons: RegimeChangeReason[] = [];
+  const previousTightnessThreshold = previous.thresholds.tightnessRegime;
+  const currentTightnessThreshold = current.thresholds.tightnessRegime;
+  const previousRiskThreshold = previous.thresholds.riskAppetiteRegime;
+  const currentRiskThreshold = current.thresholds.riskAppetiteRegime;
+  const previousBaseRateThreshold = previous.thresholds.baseRateTightness;
+  const currentBaseRateThreshold = current.thresholds.baseRateTightness;
+
+  const pushReason = (code: string, message: string) => {
+    reasons.push({ code, message });
+  };
+
+  if (previous.regime !== current.regime) {
+    pushReason("regime-change", `Regime shifted from ${previous.regime} to ${current.regime}.`);
+  }
+
+  if (
+    previous.scores.tightness <= previousTightnessThreshold &&
+    current.scores.tightness > currentTightnessThreshold
+  ) {
+    pushReason(
+      "tightness-upshift",
+      `Tightness crossed above ${currentTightnessThreshold}.`
+    );
+  } else if (
+    previous.scores.tightness >= previousTightnessThreshold &&
+    current.scores.tightness < currentTightnessThreshold
+  ) {
+    pushReason(
+      "tightness-downshift",
+      `Tightness fell below ${currentTightnessThreshold}.`
+    );
+  }
+
+  if (
+    previous.scores.riskAppetite <= previousRiskThreshold &&
+    current.scores.riskAppetite > currentRiskThreshold
+  ) {
+    pushReason(
+      "risk-appetite-upshift",
+      `Risk appetite crossed above ${currentRiskThreshold}.`
+    );
+  } else if (
+    previous.scores.riskAppetite >= previousRiskThreshold &&
+    current.scores.riskAppetite < currentRiskThreshold
+  ) {
+    pushReason(
+      "risk-appetite-downshift",
+      `Risk appetite fell below ${currentRiskThreshold}.`
+    );
+  }
+
+  if (
+    previous.scores.baseRate <= previousBaseRateThreshold &&
+    current.scores.baseRate > currentBaseRateThreshold
+  ) {
+    pushReason("base-rate-upshift", `Base rate crossed above ${currentBaseRateThreshold}%.`);
+  } else if (
+    previous.scores.baseRate >= previousBaseRateThreshold &&
+    current.scores.baseRate < currentBaseRateThreshold
+  ) {
+    pushReason("base-rate-downshift", `Base rate fell below ${currentBaseRateThreshold}%.`);
+  }
+
+  const previousSlope = previous.scores.curveSlope;
+  const currentSlope = current.scores.curveSlope;
+  if (previousSlope !== null && currentSlope !== null) {
+    if (previousSlope >= 0 && currentSlope < 0) {
+      pushReason("curve-slope-negative", "Curve slope turned negative.");
+    } else if (previousSlope <= 0 && currentSlope > 0) {
+      pushReason("curve-slope-positive", "Curve slope turned positive.");
+    }
+  }
+
+  if (reasons.length === 0) {
+    pushReason("signals-updated", "Signal values updated since the last read.");
+  }
+
+  return reasons;
 };
 
 export const evaluateRegime = (
