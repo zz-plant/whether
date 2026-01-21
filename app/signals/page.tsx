@@ -59,6 +59,7 @@ export default async function SignalsPage({
     selectedYear,
     sensors,
     statusLabel,
+    summaryArchive,
     treasury,
     treasuryProvenance,
   } = await loadReportData(searchParams);
@@ -114,6 +115,7 @@ export default async function SignalsPage({
         monthsByYear={cacheMonthsByYear}
         invalidSelection={invalidHistoricalSelection}
         provenance={treasuryProvenance}
+        summaryArchive={summaryArchive}
         historicalRegime={historicalSelection ? assessment.regime : null}
         historicalSummary={historicalSelection ? assessment.description : null}
         comparison={historicalComparison}
