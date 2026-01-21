@@ -4,6 +4,7 @@
  */
 import type { SensorReading, TreasuryData } from "./types";
 import { computeCurveSlope, getBaseRate } from "./regimeEngine";
+import { getTimeMachineRollingYieldSeries } from "./timeMachineCache";
 
 const BASE_RATE_EXPLANATION =
   "Base rate uses the 1-month Treasury yield (fallback to 3-month if missing).";
@@ -14,6 +15,20 @@ export const buildSensorReadings = (treasury: TreasuryData): SensorReading[] => 
   const baseRate = getBaseRate(treasury.yields);
   const curveSlope = computeCurveSlope(treasury.yields);
   const baseRateValue = baseRate.used === "MISSING" ? null : baseRate.value;
+  const rollingSeries = getTimeMachineRollingYieldSeries();
+  const curveSlopeTrend = rollingSeries.tenYear.map((point, index) => {
+    const twoYearPoint = rollingSeries.twoYear[index];
+    const tenYearValue = point.value;
+    const twoYearValue = twoYearPoint?.value ?? null;
+
+    return {
+      date: point.date,
+      value:
+        typeof tenYearValue === "number" && typeof twoYearValue === "number"
+          ? tenYearValue - twoYearValue
+          : null,
+    };
+  });
 
   return [
     {
@@ -29,6 +44,7 @@ export const buildSensorReadings = (treasury: TreasuryData): SensorReading[] => 
       fetched_at: treasury.fetched_at,
       isLive: treasury.isLive,
       history: baseRateValue === null ? [] : [{ date: treasury.record_date, value: baseRateValue }],
+      trend: rollingSeries.oneMonth,
     },
     {
       id: "CURVE_SLOPE",
@@ -43,6 +59,7 @@ export const buildSensorReadings = (treasury: TreasuryData): SensorReading[] => 
       fetched_at: treasury.fetched_at,
       isLive: treasury.isLive,
       history: curveSlope === null ? [] : [{ date: treasury.record_date, value: curveSlope }],
+      trend: curveSlopeTrend,
     },
   ];
 };
