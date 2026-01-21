@@ -127,11 +127,11 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
   const cacheCoverage = getTimeMachineCoverage();
   const cacheMonthsByYear = getTimeMachineMonthsByYear();
   const summaryArchive = getSummaryArchive();
-  const regimeSeries = getTimeMachineRegimeSeries();
   const invalidHistoricalSelection = Boolean(requestedSelection && !historicalSelection);
   const selectedMonth = requestedSelection?.month ?? defaultMonth;
   const selectedYear = requestedSelection?.year ?? defaultYear;
   const thresholds = parseThresholdsFromSearchParams(searchParams);
+  const regimeSeries = getTimeMachineRegimeSeries(24, thresholds);
   const treasury = await treasuryPromise;
   const liveTreasury = liveTreasuryPromise ? await liveTreasuryPromise : treasury;
   const recordDateLabel = formatDateValue(treasury.record_date);
