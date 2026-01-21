@@ -175,6 +175,9 @@ export const buildWeeklySummary = ({
     : "Weekly action summary";
   const template = weeklyOutputTemplates[assessment.regime];
   const updatedLabel = recordDateLabel ? `Updated ${recordDateLabel}` : "Updated —";
+  const sourceLine = provenance.sourceUrl
+    ? `${provenance.sourceLabel} (${provenance.sourceUrl})`
+    : provenance.sourceLabel;
   const copy = [
     "---",
     "WHETHER · Market Climate Station",
@@ -223,6 +226,25 @@ export const buildWeeklySummary = ({
     "RECOMMENDED LANGUAGE FOR PLANNING",
     "",
     `> ${template.planningQuote}`,
+    "",
+    "",
+    "",
+    "---",
+    "",
+    "EXECUTION CONSTRAINTS",
+    "",
+    ...assessment.constraints.map((item) => `• ${item}`),
+    "",
+    "",
+    "",
+    "---",
+    "",
+    "PROVENANCE",
+    "",
+    `Source: ${sourceLine}`,
+    `Timestamp: ${provenance.timestampLabel}`,
+    `Data age: ${provenance.ageLabel}`,
+    `Confidence: ${provenance.statusLabel}`,
     "",
     "",
     "",
