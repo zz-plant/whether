@@ -16,6 +16,12 @@ export const buildSensorReadings = (treasury: TreasuryData): SensorReading[] => 
   const curveSlope = computeCurveSlope(treasury.yields);
   const baseRateValue = baseRate.used === "MISSING" ? null : baseRate.value;
   const rollingSeries = getTimeMachineRollingYieldSeries();
+  const baseRateTrend =
+    baseRate.used === "3M"
+      ? rollingSeries.threeMonth
+      : baseRate.used === "1M"
+        ? rollingSeries.oneMonth
+        : [];
   const curveSlopeTrend = rollingSeries.tenYear.map((point, index) => {
     const twoYearPoint = rollingSeries.twoYear[index];
     const tenYearValue = point.value;
@@ -44,7 +50,7 @@ export const buildSensorReadings = (treasury: TreasuryData): SensorReading[] => 
       fetched_at: treasury.fetched_at,
       isLive: treasury.isLive,
       history: baseRateValue === null ? [] : [{ date: treasury.record_date, value: baseRateValue }],
-      trend: rollingSeries.oneMonth,
+      trend: baseRateTrend,
     },
     {
       id: "CURVE_SLOPE",

@@ -6,6 +6,7 @@ import { z } from "zod";
 import type { SeriesHistoryPoint, TreasuryData } from "./types";
 import { TreasuryDataSchema } from "./treasurySchema";
 import { evaluateRegime } from "./regimeEngine";
+import type { RegimeThresholds } from "./regimeEngine";
 import rawCache from "../data/time_machine_cache.json";
 
 const TimeMachineSnapshotSchema = TreasuryDataSchema.extend({
@@ -80,10 +81,13 @@ export type TimeMachineRegimeEntry = {
   summary: string;
 };
 
-export const getTimeMachineRegimeSeries = (months = 24): TimeMachineRegimeEntry[] => {
+export const getTimeMachineRegimeSeries = (
+  months = 24,
+  overrides?: Partial<RegimeThresholds>
+): TimeMachineRegimeEntry[] => {
   const sliceStart = Math.max(sortedSnapshots.length - months, 0);
   return sortedSnapshots.slice(sliceStart).map((snapshot) => {
-    const assessment = evaluateRegime(snapshot);
+    const assessment = evaluateRegime(snapshot, overrides);
     return {
       year: snapshot.year,
       month: snapshot.month,
@@ -134,6 +138,7 @@ export const findTimeMachineSnapshot = (asOf: string): TreasuryData | null => {
 
 export const getTimeMachineRollingYieldSeries = (): {
   oneMonth: SeriesHistoryPoint[];
+  threeMonth: SeriesHistoryPoint[];
   twoYear: SeriesHistoryPoint[];
   tenYear: SeriesHistoryPoint[];
 } => {
@@ -143,6 +148,10 @@ export const getTimeMachineRollingYieldSeries = (): {
     oneMonth: rollingSnapshots.map((snapshot) => ({
       date: snapshot.record_date,
       value: snapshot.yields.oneMonth ?? null,
+    })),
+    threeMonth: rollingSnapshots.map((snapshot) => ({
+      date: snapshot.record_date,
+      value: snapshot.yields.threeMonth ?? null,
     })),
     twoYear: rollingSnapshots.map((snapshot) => ({
       date: snapshot.record_date,

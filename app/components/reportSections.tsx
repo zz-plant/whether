@@ -2184,7 +2184,7 @@ export const SensorArray = ({
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         {sensors.map((sensor) => {
           const hasTrend = Boolean(sensor.trend?.length);
-          const sparkline = buildSparkline(sensor.trend ?? sensor.history);
+          const sparkline = buildSparkline(hasTrend ? sensor.trend : sensor.history);
           const sparklineId = `sensor-spark-${sensor.id}`;
 
           return (
