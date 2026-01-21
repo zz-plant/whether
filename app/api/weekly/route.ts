@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { loadReportData } from "../../../lib/reportData";
+import { buildSummaryHash } from "../../../lib/summaryHash";
 import { buildWeeklySummary } from "../../../lib/weeklySummary";
 
 export const revalidate = 3600;
@@ -17,6 +18,7 @@ export async function GET() {
     copy: summary.copy,
     provenance: summary.provenance,
     recordDateLabel: summary.recordDateLabel,
+    summaryHash: buildSummaryHash(summary),
     generatedAt: new Date().toISOString(),
     version: "v1",
   });
