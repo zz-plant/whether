@@ -6,6 +6,7 @@
 
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
+import { Collapsible } from "@base-ui/react/collapsible";
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import type { PlaybookEntry } from "../../lib/playbook";
 import type {
@@ -797,12 +798,15 @@ export const RegimeAssessmentCard = ({
               <span className="text-slate-500">•</span>
               <span className="break-words">{item}</span>
             </div>
-            <details className="ml-5 rounded-xl border border-slate-800/80 bg-slate-950/40 px-3 py-2 text-xs text-slate-300">
-              <summary className="flex min-h-[44px] cursor-pointer items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-400 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+            <Collapsible.Root className="ml-5 rounded-xl border border-slate-800/80 bg-slate-950/40 px-3 py-2 text-xs text-slate-300">
+              <Collapsible.Trigger
+                type="button"
+                className="flex min-h-[44px] items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-400 transition-colors hover:text-slate-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+              >
                 Because
                 <span className="text-slate-500">(show drivers)</span>
-              </summary>
-              <div className="mt-2 space-y-2">
+              </Collapsible.Trigger>
+              <Collapsible.Panel className="mt-2 space-y-2">
                 <p className="text-xs font-semibold tracking-[0.12em] text-slate-500">
                   Driven by
                 </p>
@@ -820,8 +824,8 @@ export const RegimeAssessmentCard = ({
                     </li>
                   ))}
                 </ul>
-              </div>
-            </details>
+              </Collapsible.Panel>
+            </Collapsible.Root>
           </li>
         ))}
       </ul>
@@ -1331,11 +1335,14 @@ export const SignalMatrixPanel = ({
           or loosen.
         </p>
       </div>
-      <details className="mt-4" open>
-        <summary className="min-h-[44px] cursor-pointer text-xs font-semibold tracking-[0.12em] text-slate-300 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+      <Collapsible.Root className="mt-4" defaultOpen>
+        <Collapsible.Trigger
+          type="button"
+          className="min-h-[44px] text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+        >
           Deep dive: matrix positioning and quadrant guidance
-        </summary>
-        <div className="mt-4 grid gap-6 lg:grid-cols-[1.2fr,0.8fr]">
+        </Collapsible.Trigger>
+        <Collapsible.Panel className="mt-4 grid gap-6 lg:grid-cols-[1.2fr,0.8fr]">
           <figure className="space-y-4">
             <div className="weather-surface p-4">
               <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Current posture</p>
@@ -1506,8 +1513,8 @@ export const SignalMatrixPanel = ({
               ))}
             </div>
           </div>
-        </div>
-      </details>
+        </Collapsible.Panel>
+      </Collapsible.Root>
     </section>
   );
 };
@@ -2635,11 +2642,14 @@ export const MacroSignalsPanel = ({
           labor, and credit stress signals.
         </p>
       </div>
-      <details className="mt-4" open>
-        <summary className="min-h-[44px] cursor-pointer text-xs font-semibold tracking-[0.12em] text-slate-300 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+      <Collapsible.Root className="mt-4" defaultOpen>
+        <Collapsible.Trigger
+          type="button"
+          className="min-h-[44px] text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+        >
           Deep dive: signal cards and freshness checks
-        </summary>
-        <div className="mt-4 grid gap-4 md:grid-cols-3">
+        </Collapsible.Trigger>
+        <Collapsible.Panel className="mt-4 grid gap-4 md:grid-cols-3">
           {series.map((signal) => {
             const sparkline = buildSparkline(signal.history);
             const sparklineId = `macro-spark-${signal.id}`;
@@ -2710,8 +2720,8 @@ export const MacroSignalsPanel = ({
               </div>
             );
           })}
-        </div>
-      </details>
+        </Collapsible.Panel>
+      </Collapsible.Root>
       </div>
     </section>
   );
@@ -2756,110 +2766,118 @@ export const PlaybookPanel = ({
             Align the team on what to stop, start, and fence before approvals move forward.
           </p>
         </div>
-        <details className="mt-4" open>
-          <summary className="min-h-[44px] cursor-pointer text-xs font-semibold tracking-[0.12em] text-slate-300 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+        <Collapsible.Root className="mt-4" defaultOpen>
+          <Collapsible.Trigger
+            type="button"
+            className="min-h-[44px] text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+          >
             Deep dive: playbook snapshot and action lanes
-          </summary>
-          <div className="mt-4 grid gap-6 lg:grid-cols-[1.25fr,0.75fr]">
-            <div className="grid gap-4 lg:grid-cols-3 lg:col-span-2">
-              <div className="weather-surface border-l-4 border-rose-500/50 p-4">
-                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Stop</p>
-                <ul className="mt-3 space-y-2 text-sm text-slate-300">
-                  {stopItems.map((item) => (
-                    <li key={item} className="break-words">
-                      • {item}
-                    </li>
-                  ))}
-                </ul>
+          </Collapsible.Trigger>
+          <Collapsible.Panel className="mt-4 space-y-6">
+            <div className="grid gap-6 lg:grid-cols-[1.25fr,0.75fr]">
+              <div className="grid gap-4 lg:grid-cols-3 lg:col-span-2">
+                <div className="weather-surface border-l-4 border-rose-500/50 p-4">
+                  <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Stop</p>
+                  <ul className="mt-3 space-y-2 text-sm text-slate-300">
+                    {stopItems.map((item) => (
+                      <li key={item} className="break-words">
+                        • {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="weather-surface border-l-4 border-emerald-400/50 p-4">
+                  <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Start</p>
+                  <ul className="mt-3 space-y-2 text-sm text-slate-300">
+                    {startItems.map((item) => (
+                      <li key={item} className="break-words">
+                        • {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="weather-surface border-l-4 border-sky-400/50 p-4">
+                  <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Fence</p>
+                  <ul className="mt-3 space-y-2 text-sm text-slate-300">
+                    {fenceItems.map((item) => (
+                      <li key={item} className="break-words">
+                        • {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-              <div className="weather-surface border-l-4 border-emerald-400/50 p-4">
-                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Start</p>
-                <ul className="mt-3 space-y-2 text-sm text-slate-300">
-                  {startItems.map((item) => (
-                    <li key={item} className="break-words">
-                      • {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="weather-surface border-l-4 border-sky-400/50 p-4">
-                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Fence</p>
-                <ul className="mt-3 space-y-2 text-sm text-slate-300">
-                  {fenceItems.map((item) => (
-                    <li key={item} className="break-words">
-                      • {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-            <div className="grid gap-3">
-              <div className="weather-surface p-4">
-                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                  Playbook snapshot
-                </p>
-                {playbook ? (
-                  <div className="mt-3 space-y-2 text-xs text-slate-300">
-                    <p className="font-semibold text-slate-200">{playbook.tone}</p>
-                    <p>Mandate: {playbook.mandate}</p>
-                    <p className="text-slate-400">Metric: {playbook.metric}</p>
-                  </div>
-                ) : (
-                  <p className="mt-3 text-xs text-slate-500">
-                    Playbook signals will return once Treasury data is refreshed.
+              <div className="grid gap-3">
+                <div className="weather-surface p-4">
+                  <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                    Playbook snapshot
                   </p>
-                )}
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {playbookQuickLinks.map((link) => (
-                    <a
-                      key={link.href}
-                      href={link.href}
-                      className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-[0.6rem] font-semibold tracking-[0.18em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
-                    >
-                      {link.label}
-                    </a>
-                  ))}
+                  {playbook ? (
+                    <div className="mt-3 space-y-2 text-xs text-slate-300">
+                      <p className="font-semibold text-slate-200">{playbook.tone}</p>
+                      <p>Mandate: {playbook.mandate}</p>
+                      <p className="text-slate-400">Metric: {playbook.metric}</p>
+                    </div>
+                  ) : (
+                    <p className="mt-3 text-xs text-slate-500">
+                      Playbook signals will return once Treasury data is refreshed.
+                    </p>
+                  )}
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {playbookQuickLinks.map((link) => (
+                      <a
+                        key={link.href}
+                        href={link.href}
+                        className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-[0.6rem] font-semibold tracking-[0.18em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                      >
+                        {link.label}
+                      </a>
+                    ))}
+                  </div>
                 </div>
+                <DataProvenanceStrip provenance={provenance} />
               </div>
-              <DataProvenanceStrip provenance={provenance} />
             </div>
-          </div>
-          {playbook ? (
-            <div className="weather-surface mt-6 p-4">
-              <details open>
-                <summary className="min-h-[44px] cursor-pointer text-xs font-semibold tracking-[0.12em] text-slate-400 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300">
-                  Leadership signals (phrases to use or avoid)
-                </summary>
-                <div className="mt-4 grid gap-4 md:grid-cols-2">
-                  <div>
-                    <p className="text-xs font-semibold tracking-[0.12em] text-emerald-200">
-                      More often
-                    </p>
-                    <ul className="mt-3 space-y-2 text-sm text-slate-300">
-                      {playbook.leadershipPhrases.more.map((item) => (
-                        <li key={item} className="break-words">
-                          • {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold tracking-[0.12em] text-rose-200">
-                      Less often
-                    </p>
-                    <ul className="mt-3 space-y-2 text-sm text-slate-300">
-                      {playbook.leadershipPhrases.less.map((item) => (
-                        <li key={item} className="break-words">
-                          • {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </details>
-            </div>
-          ) : null}
-        </details>
+            {playbook ? (
+              <div className="weather-surface p-4">
+                <Collapsible.Root defaultOpen>
+                  <Collapsible.Trigger
+                    type="button"
+                    className="min-h-[44px] text-xs font-semibold tracking-[0.12em] text-slate-400 transition-colors hover:text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300 touch-manipulation"
+                  >
+                    Leadership signals (phrases to use or avoid)
+                  </Collapsible.Trigger>
+                  <Collapsible.Panel className="mt-4 grid gap-4 md:grid-cols-2">
+                    <div>
+                      <p className="text-xs font-semibold tracking-[0.12em] text-emerald-200">
+                        More often
+                      </p>
+                      <ul className="mt-3 space-y-2 text-sm text-slate-300">
+                        {playbook.leadershipPhrases.more.map((item) => (
+                          <li key={item} className="break-words">
+                            • {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold tracking-[0.12em] text-rose-200">
+                        Less often
+                      </p>
+                      <ul className="mt-3 space-y-2 text-sm text-slate-300">
+                        {playbook.leadershipPhrases.less.map((item) => (
+                          <li key={item} className="break-words">
+                            • {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </Collapsible.Panel>
+                </Collapsible.Root>
+              </div>
+            ) : null}
+          </Collapsible.Panel>
+        </Collapsible.Root>
       </div>
     </section>
   );
@@ -2999,117 +3017,121 @@ export const InsightDatabasePanel = ({
             {evidence?.summary ?? "No evidence summary available for this climate."}
           </p>
         </div>
-        <details className="mt-4" open>
-          <summary className="min-h-[44px] cursor-pointer text-xs font-semibold tracking-[0.12em] text-slate-300 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+        <Collapsible.Root className="mt-4" defaultOpen>
+          <Collapsible.Trigger
+            type="button"
+            className="min-h-[44px] text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+          >
             Deep dive: searchable evidence library
-          </summary>
-          <div className="mt-4 weather-surface p-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                Filter evidence
-              </p>
-              <button
-                type="button"
-                onClick={clearFilters}
-                className="text-xs font-semibold tracking-[0.12em] text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
-              >
-                Clear filters
-              </button>
+          </Collapsible.Trigger>
+          <Collapsible.Panel className="mt-4 space-y-4">
+            <div className="weather-surface p-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                  Filter evidence
+                </p>
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  className="text-xs font-semibold tracking-[0.12em] text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
+                >
+                  Clear filters
+                </button>
+              </div>
+              <div className="mt-4 grid gap-4 md:grid-cols-2">
+                <label className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                  Search
+                  <input
+                    type="search"
+                    value={searchQuery}
+                    onChange={(event) => setSearchQuery(event.target.value)}
+                    placeholder="Search by source, tag, or recommendation"
+                    className="mt-2 w-full rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600"
+                  />
+                </label>
+                <label className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                  Climate
+                  <select
+                    value={selectedClimate}
+                    onChange={(event) => setSelectedClimate(event.target.value)}
+                    className="mt-2 w-full rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+                  >
+                    <option value="all">All climates</option>
+                    {climateOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {getRegimeLabel(option as RegimeAssessment["regime"])}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                  Signal
+                  <select
+                    value={selectedSignal}
+                    onChange={(event) => setSelectedSignal(event.target.value)}
+                    className="mt-2 w-full rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+                  >
+                    <option value="all">All signals</option>
+                    {signalOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <label className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                    Start date
+                    <input
+                      type="date"
+                      value={dateRange.start}
+                      onChange={(event) =>
+                        setDateRange((prev) => ({ ...prev, start: event.target.value }))
+                      }
+                      className="mt-2 w-full rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+                    />
+                  </label>
+                  <label className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                    End date
+                    <input
+                      type="date"
+                      value={dateRange.end}
+                      onChange={(event) =>
+                        setDateRange((prev) => ({ ...prev, end: event.target.value }))
+                      }
+                      className="mt-2 w-full rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+                    />
+                  </label>
+                </div>
+              </div>
+              <div className="mt-4">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Tags</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {tagOptions.map((tag) => {
+                    const isActive = selectedTags.includes(tag);
+                    return (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => toggleTag(tag)}
+                        className={`rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] transition-colors ${
+                          isActive
+                            ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
+                            : "border-slate-700/70 text-slate-300 hover:border-slate-500/80 hover:text-slate-100"
+                        }`}
+                      >
+                        {tag}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+            <div className="mt-4 flex items-center justify-between text-xs font-semibold tracking-[0.12em] text-slate-400">
+              <span>{filteredEvidence.length} evidence items</span>
+              <span>Linked recommendations included</span>
             </div>
             <div className="mt-4 grid gap-4 md:grid-cols-2">
-              <label className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                Search
-                <input
-                  type="search"
-                  value={searchQuery}
-                  onChange={(event) => setSearchQuery(event.target.value)}
-                  placeholder="Search by source, tag, or recommendation"
-                  className="mt-2 w-full rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600"
-                />
-              </label>
-              <label className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                Climate
-                <select
-                  value={selectedClimate}
-                  onChange={(event) => setSelectedClimate(event.target.value)}
-                  className="mt-2 w-full rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-sm text-slate-100"
-                >
-                  <option value="all">All climates</option>
-                  {climateOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {getRegimeLabel(option as RegimeAssessment["regime"])}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                Signal
-                <select
-                  value={selectedSignal}
-                  onChange={(event) => setSelectedSignal(event.target.value)}
-                  className="mt-2 w-full rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-sm text-slate-100"
-                >
-                  <option value="all">All signals</option>
-                  {signalOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                  Start date
-                  <input
-                    type="date"
-                    value={dateRange.start}
-                    onChange={(event) =>
-                      setDateRange((prev) => ({ ...prev, start: event.target.value }))
-                    }
-                    className="mt-2 w-full rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-sm text-slate-100"
-                  />
-                </label>
-                <label className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                  End date
-                  <input
-                    type="date"
-                    value={dateRange.end}
-                    onChange={(event) =>
-                      setDateRange((prev) => ({ ...prev, end: event.target.value }))
-                    }
-                    className="mt-2 w-full rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-sm text-slate-100"
-                  />
-                </label>
-              </div>
-            </div>
-            <div className="mt-4">
-              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Tags</p>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {tagOptions.map((tag) => {
-                  const isActive = selectedTags.includes(tag);
-                  return (
-                    <button
-                      key={tag}
-                      type="button"
-                      onClick={() => toggleTag(tag)}
-                      className={`rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] transition-colors ${
-                        isActive
-                          ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
-                          : "border-slate-700/70 text-slate-300 hover:border-slate-500/80 hover:text-slate-100"
-                      }`}
-                    >
-                      {tag}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-          <div className="mt-4 flex items-center justify-between text-xs font-semibold tracking-[0.12em] text-slate-400">
-            <span>{filteredEvidence.length} evidence items</span>
-            <span>Linked recommendations included</span>
-          </div>
-          <div className="mt-4 grid gap-4 md:grid-cols-2">
             {filteredEvidence.length === 0 ? (
               <div className="weather-surface p-4 text-sm text-slate-400">
                 No evidence items match these filters. Try clearing the date range or tags.
@@ -3167,39 +3189,45 @@ export const InsightDatabasePanel = ({
               ))
             )}
           </div>
-        </details>
-        <details className="mt-4">
-          <summary className="min-h-[44px] cursor-pointer text-xs font-semibold tracking-[0.12em] text-slate-300 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+          </Collapsible.Panel>
+        </Collapsible.Root>
+        <Collapsible.Root className="mt-4">
+          <Collapsible.Trigger
+            type="button"
+            className="min-h-[44px] text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+          >
             Deep dive: {fossilRecord.title}
-          </summary>
-          <div className="mt-4 weather-surface p-4">
-            <p className="type-label text-slate-400">{fossilRecord.title}</p>
-            <p className="mt-2 text-xs text-slate-500">{fossilRecord.subtitle}</p>
-            <p className="mt-3 text-sm text-slate-300">{fossilRecord.description}</p>
-          </div>
-          <div className="mt-4 overflow-x-auto overscroll-contain">
-            <table className="min-w-full text-left text-sm text-slate-300">
-              <thead className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                <tr>
-                  <th className="px-3 py-2">{fossilRecord.columns.domain}</th>
-                  <th className="px-3 py-2">{fossilRecord.columns.lowRateArtifact}</th>
-                  <th className="px-3 py-2">{fossilRecord.columns.highRateArtifact}</th>
-                  <th className="px-3 py-2">{fossilRecord.columns.insight}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {fossilRecord.rows.map((row) => (
-                  <tr key={row.domain} className="border-t border-slate-800/60">
-                    <td className="px-3 py-3 text-slate-200">{row.domain}</td>
-                    <td className="px-3 py-3">{row.lowRateArtifact}</td>
-                    <td className="px-3 py-3">{row.highRateArtifact}</td>
-                    <td className="px-3 py-3">{row.insight}</td>
+          </Collapsible.Trigger>
+          <Collapsible.Panel className="mt-4">
+            <div className="weather-surface p-4">
+              <p className="type-label text-slate-400">{fossilRecord.title}</p>
+              <p className="mt-2 text-xs text-slate-500">{fossilRecord.subtitle}</p>
+              <p className="mt-3 text-sm text-slate-300">{fossilRecord.description}</p>
+            </div>
+            <div className="mt-4 overflow-x-auto overscroll-contain">
+              <table className="min-w-full text-left text-sm text-slate-300">
+                <thead className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                  <tr>
+                    <th className="px-3 py-2">{fossilRecord.columns.domain}</th>
+                    <th className="px-3 py-2">{fossilRecord.columns.lowRateArtifact}</th>
+                    <th className="px-3 py-2">{fossilRecord.columns.highRateArtifact}</th>
+                    <th className="px-3 py-2">{fossilRecord.columns.insight}</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </details>
+                </thead>
+                <tbody>
+                  {fossilRecord.rows.map((row) => (
+                    <tr key={row.domain} className="border-t border-slate-800/60">
+                      <td className="px-3 py-3 text-slate-200">{row.domain}</td>
+                      <td className="px-3 py-3">{row.lowRateArtifact}</td>
+                      <td className="px-3 py-3">{row.highRateArtifact}</td>
+                      <td className="px-3 py-3">{row.insight}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Collapsible.Panel>
+        </Collapsible.Root>
       </div>
     </section>
   );
@@ -3235,11 +3263,14 @@ export const FinanceStrategyPanel = ({
             {entry?.runwayPosture ?? "Runway posture will update when data refreshes."}
           </p>
         </div>
-        <details className="mt-4" open>
-          <summary className="min-h-[44px] cursor-pointer text-xs font-semibold tracking-[0.12em] text-slate-300 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+        <Collapsible.Root className="mt-4" defaultOpen>
+          <Collapsible.Trigger
+            type="button"
+            className="min-h-[44px] text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+          >
             Deep dive: runway guidance and watchlist
-          </summary>
-          <div className="mt-4 grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">
+          </Collapsible.Trigger>
+          <Collapsible.Panel className="mt-4 grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">
             <div className="weather-surface p-4">
               <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Runway posture</p>
               <p className="mt-3 text-sm text-slate-200">{entry?.runwayPosture}</p>
@@ -3281,8 +3312,8 @@ export const FinanceStrategyPanel = ({
                 Public data only. No internal finance inputs required.
               </p>
             </div>
-          </div>
-        </details>
+          </Collapsible.Panel>
+        </Collapsible.Root>
       </div>
     </section>
   );
@@ -3319,11 +3350,14 @@ export const DecisionShieldTemplatesPanel = ({
             approvals.
           </p>
         </div>
-        <details className="mt-4" open>
-          <summary className="min-h-[44px] cursor-pointer text-xs font-semibold tracking-[0.12em] text-slate-300 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+        <Collapsible.Root className="mt-4" defaultOpen>
+          <Collapsible.Trigger
+            type="button"
+            className="min-h-[44px] text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+          >
             Deep dive: decision shield templates by regime
-          </summary>
-          <div className="mt-4 grid gap-4 md:grid-cols-3">
+          </Collapsible.Trigger>
+          <Collapsible.Panel className="mt-4 grid gap-4 md:grid-cols-3">
             {templates.decisions.map((decision) => (
               <div key={decision.title} className="weather-surface p-4">
                 <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
@@ -3341,8 +3375,8 @@ export const DecisionShieldTemplatesPanel = ({
                 </ul>
               </div>
             ))}
-          </div>
-        </details>
+          </Collapsible.Panel>
+        </Collapsible.Root>
       </div>
     </section>
   );
