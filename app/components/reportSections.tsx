@@ -142,11 +142,11 @@ const SeriesFreshnessBadge = ({
 }: SeriesFreshnessProps) => {
   const statusLabel = isLive ? "Live source" : "Cached snapshot";
   const statusTone = isLive
-    ? "border-emerald-400/50 bg-emerald-500/10 text-emerald-100"
-    : "border-amber-400/60 bg-amber-500/10 text-amber-100";
+    ? "border-emerald-400/50 bg-emerald-500/15 text-emerald-100"
+    : "border-amber-400/60 bg-amber-500/15 text-amber-100";
 
   return (
-    <div className="rounded-lg border border-slate-800/70 bg-slate-950/70 px-3 py-3">
+    <div className="weather-surface px-4 py-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">{label}</p>
         <span

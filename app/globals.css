@@ -6,6 +6,8 @@
   color-scheme: dark;
   --display-drift-distance: 2px;
   --display-drift-duration: 45s;
+  --shell-glow: rgba(56, 189, 248, 0.2);
+  --shell-glow-secondary: rgba(236, 72, 153, 0.18);
 }
 
 html {
@@ -22,25 +24,36 @@ body {
 .weather-shell {
   background-color: #020617;
   background-image:
-    radial-gradient(880px 420px at 12% -8%, rgba(125, 211, 252, 0.08), transparent 62%),
-    radial-gradient(880px 460px at 88% 0%, rgba(56, 189, 248, 0.06), transparent 70%),
-    linear-gradient(180deg, rgba(2, 6, 23, 1) 0%, rgba(9, 14, 27, 0.98) 50%, rgba(2, 6, 23, 1) 100%);
+    radial-gradient(900px 520px at 8% -10%, rgba(125, 211, 252, 0.12), transparent 60%),
+    radial-gradient(900px 520px at 88% 4%, rgba(56, 189, 248, 0.1), transparent 65%),
+    radial-gradient(700px 420px at 60% 15%, rgba(236, 72, 153, 0.08), transparent 60%),
+    linear-gradient(180deg, rgba(2, 6, 23, 1) 0%, rgba(7, 13, 26, 0.96) 48%, rgba(2, 6, 23, 1) 100%);
+}
+
+.weather-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(148, 163, 184, 0.12) 1px, transparent 1px);
+  background-size: 160px 160px;
+  opacity: 0.08;
+  pointer-events: none;
 }
 
 .weather-grid {
   background-image:
-    linear-gradient(rgba(30, 41, 59, 0.35) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(30, 41, 59, 0.35) 1px, transparent 1px);
-  background-size: 120px 120px;
-  mask-image: radial-gradient(circle at top, rgba(0, 0, 0, 0.55) 0%, transparent 70%);
-  opacity: 0.35;
+    linear-gradient(rgba(30, 41, 59, 0.28) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30, 41, 59, 0.28) 1px, transparent 1px);
+  background-size: 140px 140px;
+  mask-image: radial-gradient(circle at top, rgba(0, 0, 0, 0.65) 0%, transparent 70%);
+  opacity: 0.3;
 }
 
 .weather-aurora {
   background-image:
-    radial-gradient(60% 50% at 20% 15%, rgba(14, 165, 233, 0.18), transparent 65%),
-    radial-gradient(55% 45% at 80% 10%, rgba(56, 189, 248, 0.16), transparent 62%),
-    radial-gradient(50% 55% at 60% 30%, rgba(217, 70, 239, 0.12), transparent 70%);
+    radial-gradient(60% 50% at 15% 10%, rgba(14, 165, 233, 0.22), transparent 65%),
+    radial-gradient(55% 45% at 82% 12%, rgba(56, 189, 248, 0.18), transparent 62%),
+    radial-gradient(50% 55% at 58% 28%, rgba(217, 70, 239, 0.16), transparent 72%);
   filter: blur(20px);
   opacity: 0.75;
   animation: aurora-shift 32s ease-in-out infinite;
@@ -52,59 +65,72 @@ body {
 }
 
 .weather-panel {
-  @apply rounded-3xl border border-sky-900/40 bg-slate-950/55 backdrop-blur-xl;
+  @apply rounded-[28px] border border-slate-800/60 bg-slate-950/65 backdrop-blur-2xl;
   box-shadow:
-    0 26px 60px -60px rgba(56, 189, 248, 0.24),
-    inset 0 0 0 1px rgba(2, 6, 23, 0.35);
+    0 28px 70px -50px rgba(2, 6, 23, 0.7),
+    0 0 0 1px rgba(15, 23, 42, 0.4),
+    inset 0 0 0 1px rgba(15, 23, 42, 0.4);
 }
 
 .weather-panel-static {
-  @apply border-slate-800/60 bg-slate-950/45;
+  @apply border-slate-800/70 bg-slate-950/55;
   box-shadow:
-    0 24px 60px -56px rgba(15, 23, 42, 0.45),
-    inset 0 0 0 1px rgba(15, 23, 42, 0.45);
+    0 24px 60px -52px rgba(2, 6, 23, 0.6),
+    inset 0 0 0 1px rgba(15, 23, 42, 0.4);
 }
 
 .weather-tile {
-  @apply rounded-2xl border border-sky-900/40 bg-slate-950/60 backdrop-blur-xl;
+  @apply rounded-2xl border border-slate-800/60 bg-slate-950/60 backdrop-blur-xl;
   box-shadow:
-    0 24px 60px -54px rgba(56, 189, 248, 0.22),
-    inset 0 0 0 1px rgba(2, 6, 23, 0.4);
+    0 20px 50px -45px rgba(2, 6, 23, 0.7),
+    inset 0 0 0 1px rgba(15, 23, 42, 0.45);
 }
 
 .weather-icon-chip {
-  @apply inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-sky-800/50 bg-slate-900/60;
+  @apply inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-700/60 bg-slate-900/60;
   box-shadow:
-    inset 0 0 0 1px rgba(2, 6, 23, 0.45),
-    0 10px 24px -20px rgba(56, 189, 248, 0.25);
+    inset 0 0 0 1px rgba(15, 23, 42, 0.45),
+    0 10px 22px -18px rgba(56, 189, 248, 0.2);
 }
 
 .weather-surface {
-  @apply rounded-xl border border-sky-900/40 bg-slate-950/70 backdrop-blur;
-  box-shadow: inset 0 0 0 1px rgba(2, 6, 23, 0.45);
+  @apply rounded-2xl border border-slate-800/60 bg-slate-950/70 backdrop-blur;
+  box-shadow:
+    inset 0 0 0 1px rgba(15, 23, 42, 0.45),
+    0 16px 40px -30px rgba(2, 6, 23, 0.6);
 }
 
 .weather-chip {
-  @apply rounded-full border border-sky-700/60 bg-sky-500/15 text-sky-100;
+  @apply rounded-full border border-slate-700/60 bg-slate-900/70 text-slate-200;
 }
 
 .weather-pill {
-  @apply rounded-full border border-sky-900/50 bg-slate-950/70 backdrop-blur;
+  @apply rounded-full border border-slate-800/60 bg-slate-950/70 backdrop-blur;
 }
 
 .weather-pill-muted {
-  @apply rounded-full border border-slate-700/60 bg-slate-900/60 text-slate-200;
+  @apply rounded-full border border-slate-800/70 bg-slate-900/60 text-slate-200;
 }
 
 .weather-input {
-  @apply rounded-xl border border-sky-900/50 bg-slate-950/70 text-slate-100;
-  box-shadow: inset 0 0 0 1px rgba(2, 6, 23, 0.45);
+  @apply rounded-2xl border border-slate-800/70 bg-slate-950/70 text-slate-100;
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.45);
 }
 
 .weather-button {
-  @apply rounded-xl border border-sky-700/60 text-slate-200;
+  @apply rounded-2xl border border-slate-700/70 text-slate-200;
   background: rgba(2, 6, 23, 0.55);
-  box-shadow: inset 0 0 0 1px rgba(2, 6, 23, 0.45);
+  box-shadow:
+    inset 0 0 0 1px rgba(15, 23, 42, 0.5),
+    0 12px 24px -18px rgba(2, 6, 23, 0.8);
+}
+
+.weather-button-primary {
+  @apply rounded-2xl border border-sky-400/60 text-slate-100;
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.4), rgba(59, 130, 246, 0.25));
+  box-shadow:
+    0 16px 32px -20px rgba(14, 165, 233, 0.6),
+    inset 0 0 0 1px rgba(2, 6, 23, 0.35);
 }
 
 .skip-link {
@@ -134,15 +160,15 @@ body {
 }
 
 .type-headline {
-  @apply text-4xl font-semibold leading-[1.1] md:text-5xl;
+  @apply text-4xl font-semibold leading-[1.05] tracking-tight md:text-6xl;
 }
 
 .type-section {
-  @apply text-xl font-semibold leading-snug md:text-2xl;
+  @apply text-xl font-semibold leading-snug md:text-3xl;
 }
 
 .type-label {
-  @apply text-xs font-medium tracking-[0.12em] leading-none;
+  @apply text-xs font-medium tracking-[0.18em] leading-none uppercase;
 }
 
 .type-data {

@@ -259,7 +259,7 @@ export const ChangeSinceLastReadPanel = ({
             </p>
             <a
               href={timeMachineLink}
-              className="weather-button mt-4 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.2em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+              className="weather-button-primary mt-4 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.2em] text-slate-100 transition-colors hover:border-sky-300/80 hover:text-white touch-manipulation"
             >
               Open Time Machine
             </a>

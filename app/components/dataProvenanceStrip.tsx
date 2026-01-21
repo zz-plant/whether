@@ -27,9 +27,9 @@ export const DataProvenanceStrip = ({
   const statusStyle = statusStyles[provenance.statusLabel as keyof typeof statusStyles];
 
   return (
-    <div className="weather-pill flex flex-wrap items-center gap-3 px-3 py-2 text-xs font-semibold tracking-[0.14em] text-slate-400">
+    <div className="weather-pill flex flex-wrap items-center gap-2 px-4 py-2 text-[0.65rem] font-semibold tracking-[0.16em] text-slate-300">
       <span className="text-slate-500">{label}</span>
-      <span className="h-1 w-1 rounded-full bg-slate-700" aria-hidden="true" />
+      <span className="h-1 w-1 rounded-full bg-slate-600" aria-hidden="true" />
       <span>
         Source:{" "}
         {provenance.sourceUrl ? (
@@ -45,21 +45,21 @@ export const DataProvenanceStrip = ({
           <span className="text-slate-200">{provenance.sourceLabel}</span>
         )}
       </span>
-      <span className="h-1 w-1 rounded-full bg-slate-700" aria-hidden="true" />
+      <span className="h-1 w-1 rounded-full bg-slate-600" aria-hidden="true" />
       <span>
         Record date: <span className="mono text-slate-200">{provenance.recordDateLabel}</span>
       </span>
-      <span className="h-1 w-1 rounded-full bg-slate-700" aria-hidden="true" />
+      <span className="h-1 w-1 rounded-full bg-slate-600" aria-hidden="true" />
       <span>
         Timestamp: <span className="mono text-slate-200">{provenance.timestampLabel}</span>
       </span>
-      <span className="h-1 w-1 rounded-full bg-slate-700" aria-hidden="true" />
+      <span className="h-1 w-1 rounded-full bg-slate-600" aria-hidden="true" />
       <span>
         <span className="text-slate-500">Data age:</span>{" "}
         <span className="mono text-slate-200">{provenance.ageLabel}</span>
       </span>
       <span
-        className={`rounded-full border px-2 py-1 text-xs font-semibold tracking-[0.14em] ${
+        className={`weather-chip rounded-full border px-2 py-1 text-xs font-semibold tracking-[0.14em] ${
           statusStyle ?? "border-slate-700 text-slate-200"
         }`}
       >
