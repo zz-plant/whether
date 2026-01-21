@@ -934,6 +934,13 @@ export const FirstTimeGuidePanel = ({
               <span className="text-slate-500">•</span>
               <span>Use the playbook to translate macro constraints into concrete next steps.</span>
             </li>
+            <li className="flex gap-2">
+              <span className="text-slate-500">•</span>
+              <span>
+                Drop the constraints into your Jira/Linear issue template or Confluence decision
+                log to keep delivery aligned.
+              </span>
+            </li>
           </ul>
           <div className="mt-4 rounded-lg border border-sky-900/60 bg-slate-950/60 p-3 text-xs text-slate-400">
             Tip: share the report URL after selecting a time machine snapshot so every stakeholder
