@@ -4,17 +4,14 @@
  */
 import type { ReactNode } from "react";
 import { DisplayGuardian } from "./displayGuardian";
-
-type ReportPageLink = {
-  href: string;
-  label: string;
-  description: string;
-};
-
-type ReportSectionLink = {
-  href: string;
-  label: string;
-};
+import {
+  ReportDataTimestamps,
+  ReportInterpretationNotes,
+  ReportMobileNavigation,
+  ReportPageNavigation,
+  type ReportPageLink,
+  type ReportSectionLink,
+} from "./reportShellNavigation";
 
 export const ReportShell = ({
   children,
@@ -53,62 +50,6 @@ export const ReportShell = ({
   structuredData?: string;
   historicalBanner?: ReactNode;
 }) => {
-  const pageLinkIcons: Record<string, ReactNode> = {
-    "Quick start": (
-      <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
-        <path
-          d="M12 4.5V2.75M12 21.25v-1.75M4.5 12H2.75M21.25 12h-1.75M6.75 6.75l-1.3-1.3M18.55 18.55l-1.3-1.3M6.75 17.25l-1.3 1.3M18.55 5.45l-1.3 1.3"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-        />
-        <circle cx="12" cy="12" r="4.25" fill="currentColor" />
-      </svg>
-    ),
-    "Why we believe this": (
-      <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
-        <path
-          d="M4 18c0-4.4 3.6-8 8-8s8 3.6 8 8"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          fill="none"
-        />
-        <path
-          d="M7 18c0-2.8 2.2-5 5-5s5 2.2 5 5"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          fill="none"
-        />
-        <circle cx="12" cy="18" r="1.8" fill="currentColor" />
-      </svg>
-    ),
-    "What to do next": (
-      <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
-        <path
-          d="M6 4.75h9.25a2 2 0 0 1 2 2v10.5a2 2 0 0 1-2 2H6"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinejoin="round"
-          fill="none"
-        />
-        <path
-          d="M6 4.75v14.5"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-        />
-        <path
-          d="M9.5 8.5h5M9.5 12h5"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-        />
-      </svg>
-    ),
-  };
-
   const trustToneStyles =
     trustStatusTone === "warning"
       ? "border-amber-400/60 bg-amber-500/10 text-amber-100"
@@ -179,29 +120,11 @@ export const ReportShell = ({
               ) : null}
             </div>
           </div>
-          <nav aria-label="Report paths" className="mt-4 -mx-4 px-4 sm:mx-0 sm:px-0">
-            <ul className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible">
-              {pageLinks.map((link) => {
-                const isActive = link.label === pageTitle;
-                return (
-                  <li key={link.href} className="flex-shrink-0">
-                    <a
-                      href={link.href}
-                      aria-current={isActive ? "page" : undefined}
-                      className={`weather-tab inline-flex min-h-[44px] items-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors touch-manipulation ${
-                        isActive
-                          ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
-                          : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
-                      }`}
-                    >
-                      <span className="hidden sm:inline-flex">{pageLinkIcons[link.label]}</span>
-                      {link.label}
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
+          <ReportPageNavigation
+            pageLinks={pageLinks}
+            pageTitle={pageTitle}
+            className="mt-4 -mx-4 px-4 sm:mx-0 sm:px-0"
+          />
         </header>
 
         {historicalBanner}
@@ -247,46 +170,11 @@ export const ReportShell = ({
               </nav>
             ) : null}
 
-            <details className="group weather-panel px-4 py-4">
-              <summary className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 text-xs font-semibold tracking-[0.1em] text-slate-200 transition-colors hover:text-slate-100 touch-manipulation">
-                Data timestamps
-                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-300 transition-transform duration-200 group-open:rotate-180">
-                  <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
-                    <path
-                      d="M7 10l5 5 5-5"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.6"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </span>
-              </summary>
-              <dl className="mt-3 space-y-3 text-sm text-slate-300">
-                <div className="flex items-center justify-between gap-3">
-                  <dt className="text-slate-400">Record date</dt>
-                  <dd className="mono text-slate-100">{recordDateLabel}</dd>
-                </div>
-                <div className="flex items-center justify-between gap-3">
-                  <dt className="text-slate-400">Fetched at</dt>
-                  <dd className="mono text-slate-100">{fetchedAtLabel}</dd>
-                </div>
-                <div className="flex items-center justify-between gap-3">
-                  <dt className="text-slate-400">Source</dt>
-                  <dd>
-                    <a
-                      href={treasurySource}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="touch-target inline-flex min-h-[44px] items-center text-xs text-slate-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 touch-manipulation"
-                    >
-                      US Treasury Fiscal Data API
-                    </a>
-                  </dd>
-                </div>
-              </dl>
-            </details>
+            <ReportDataTimestamps
+              recordDateLabel={recordDateLabel}
+              fetchedAtLabel={fetchedAtLabel}
+              treasurySource={treasurySource}
+            />
           </aside>
 
           <div className="space-y-6">
@@ -343,39 +231,7 @@ export const ReportShell = ({
                   You are likely balancing delivery pressure with budget scrutiny. Use the climate
                   label as a neutral, external anchor in planning conversations.
                 </p>
-                <details className="group">
-                  <summary className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:text-slate-100 touch-manipulation">
-                    <span>How to interpret this week</span>
-                    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-300 transition-transform duration-200 group-open:rotate-180">
-                      <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
-                        <path
-                          d="M7 10l5 5 5-5"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1.6"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </span>
-                  </summary>
-                  <ul className="mt-3 space-y-2 text-sm text-slate-300">
-                    <li className="flex gap-2">
-                      <span className="text-slate-400">1</span>
-                      <span className="break-words">
-                        Start with user outcomes and ROI. If the idea still wins, keep it on the
-                        table.
-                      </span>
-                    </li>
-                    <li className="flex gap-2">
-                      <span className="text-slate-400">2</span>
-                      <span className="break-words">
-                        Let the climate dictate pacing, staffing, and sequencing—not whether the
-                        idea matters.
-                      </span>
-                    </li>
-                  </ul>
-                </details>
+                <ReportInterpretationNotes />
               </div>
               <div className="weather-panel flex flex-col gap-4 px-5 py-4">
                 <p className="text-xs font-semibold text-slate-300">The readout in one line</p>
@@ -403,67 +259,12 @@ export const ReportShell = ({
         </div>
       </div>
       <div className="sm:hidden">
-        <nav
-          aria-label="Mobile report navigation"
+        <ReportMobileNavigation
+          pageLinks={pageLinks}
+          pageTitle={pageTitle}
+          sectionLinks={sectionLinks}
           className="fixed inset-x-0 bottom-0 z-30 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3 pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)]"
-        >
-          <div className="weather-panel flex items-center justify-between gap-2 px-3 py-2">
-            {pageLinks.map((link) => {
-              const isActive = link.label === pageTitle;
-              return (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  aria-current={isActive ? "page" : undefined}
-                  className={`flex min-h-[52px] flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-1 text-[10px] font-semibold tracking-[0.2em] transition-colors touch-manipulation ${
-                    isActive
-                      ? "bg-sky-500/15 text-sky-100"
-                      : "text-slate-300 hover:text-slate-100"
-                  }`}
-                >
-                  <span className="text-slate-200">{pageLinkIcons[link.label]}</span>
-                  <span className="uppercase">{link.label}</span>
-                </a>
-              );
-            })}
-            {sectionLinks.length > 0 ? (
-              <details className="group relative flex-1">
-                <summary className="flex min-h-[52px] cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl px-2 py-1 text-[10px] font-semibold tracking-[0.2em] text-slate-300 transition-colors hover:text-slate-100 touch-manipulation">
-                  <span className="text-slate-200">
-                    <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
-                      <path
-                        d="M4 6.5h16M4 12h16M4 17.5h10"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                  </span>
-                  <span className="uppercase">Sections</span>
-                </summary>
-                <div className="absolute bottom-full left-0 right-0 mb-3">
-                  <div className="weather-panel space-y-2 px-4 py-4">
-                    <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">
-                      Jump to section
-                    </p>
-                    <ul className="space-y-2">
-                      {sectionLinks.map((item) => (
-                        <li key={item.href}>
-                          <a
-                            href={item.href}
-                            className="weather-pill inline-flex min-h-[44px] w-full items-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
-                          >
-                            {item.label}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </details>
-            ) : null}
-          </div>
-        </nav>
+        />
       </div>
     </main>
   );
