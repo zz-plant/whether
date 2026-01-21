@@ -31,6 +31,12 @@ export type SensorCategory = "Rates" | "Inflation" | "Labor" | "Credit";
 
 export type SensorTimeWindow = "1M" | "3M" | "6M" | "12M";
 
+export interface SensorGroupMeta {
+  id: SensorCategory;
+  label: string;
+  description: string;
+}
+
 export interface SensorWindowAggregation {
   window: SensorTimeWindow;
   change: number | null;
@@ -44,6 +50,8 @@ export interface SensorReading {
   unit: "%" | "bps";
   explanation: string;
   category: SensorCategory;
+  group: SensorGroupMeta;
+  availableTimeWindows: SensorTimeWindow[];
   sourceLabel: string;
   sourceUrl: string;
   formulaUrl: string;

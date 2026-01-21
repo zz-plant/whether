@@ -5,6 +5,7 @@
 import type {
   SensorCategory,
   SensorReading,
+  SensorGroupMeta,
   SensorTimeWindow,
   SensorWindowAggregation,
   SeriesHistoryPoint,
@@ -18,12 +19,38 @@ const BASE_RATE_EXPLANATION =
 const CURVE_SLOPE_EXPLANATION =
   "Curve slope is the 10-year yield minus the 2-year yield, a proxy for risk appetite.";
 
-export const sensorCategories: SensorCategory[] = [
-  "Rates",
-  "Inflation",
-  "Labor",
-  "Credit",
-];
+export const sensorGroups = [
+  {
+    id: "Rates",
+    label: "Rates",
+    description: "Policy stance, curve health, and funding rates.",
+  },
+  {
+    id: "Labor",
+    label: "Labor",
+    description: "Employment resilience, wage pressure, and hiring breadth.",
+  },
+  {
+    id: "Inflation",
+    label: "Inflation",
+    description: "Price stability, demand pressure, and purchasing power.",
+  },
+  {
+    id: "Credit",
+    label: "Credit",
+    description: "Funding spreads, liquidity stress, and risk appetite.",
+  },
+] as const satisfies SensorGroupMeta[];
+
+export const sensorCategories: SensorCategory[] = sensorGroups.map((group) => group.id);
+
+const sensorGroupLookup = sensorGroups.reduce<Record<SensorCategory, SensorGroupMeta>>(
+  (accumulator, group) => {
+    accumulator[group.id] = group;
+    return accumulator;
+  },
+  {} as Record<SensorCategory, SensorGroupMeta>
+);
 
 export const sensorTimeWindows = [
   { id: "1M", label: "1M", months: 1, description: "Past month" },
@@ -39,6 +66,8 @@ export const sensorTimeWindows = [
 
 export type SensorCategoryGroup = {
   category: SensorCategory;
+  label: string;
+  description: string;
   sensors: SensorReading[];
 };
 
@@ -106,10 +135,15 @@ export const groupSensorsByCategory = (
   sensors: SensorReading[],
   categories: SensorCategory[] = sensorCategories
 ): SensorCategoryGroup[] =>
-  categories.map((category) => ({
-    category,
-    sensors: sensors.filter((sensor) => sensor.category === category),
-  }));
+  categories.map((category) => {
+    const metadata = sensorGroupLookup[category];
+    return {
+      category,
+      label: metadata.label,
+      description: metadata.description,
+      sensors: sensors.filter((sensor) => sensor.category === category),
+    };
+  });
 
 export const getSensorWindowAggregation = (
   sensor: SensorReading,
@@ -121,6 +155,7 @@ export const buildSensorReadings = (treasury: TreasuryData): SensorReading[] => 
   const curveSlope = computeCurveSlope(treasury.yields);
   const baseRateValue = baseRate.used === "MISSING" ? null : baseRate.value;
   const rollingSeries = getTimeMachineRollingYieldSeries();
+  const availableTimeWindows = sensorTimeWindows.map((window) => window.id);
   const baseRateTrend =
     baseRate.used === "3M"
       ? rollingSeries.threeMonth
@@ -161,6 +196,8 @@ export const buildSensorReadings = (treasury: TreasuryData): SensorReading[] => 
       unit: "%",
       explanation: BASE_RATE_EXPLANATION,
       category: "Rates",
+      group: sensorGroupLookup.Rates,
+      availableTimeWindows,
       sourceLabel: "US Treasury Fiscal Data API",
       sourceUrl: treasury.source,
       formulaUrl: "/formulas#base-rate",
@@ -178,6 +215,8 @@ export const buildSensorReadings = (treasury: TreasuryData): SensorReading[] => 
       unit: "%",
       explanation: CURVE_SLOPE_EXPLANATION,
       category: "Rates",
+      group: sensorGroupLookup.Rates,
+      availableTimeWindows,
       sourceLabel: "US Treasury Fiscal Data API",
       sourceUrl: treasury.source,
       formulaUrl: "/formulas#curve-slope",
