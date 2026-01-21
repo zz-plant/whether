@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { loadReportData } from "../../../lib/reportData";
+import { buildSummaryDiff } from "../../../lib/summaryDiff";
+import { updateSummarySnapshot } from "../../../lib/summarySnapshotStore";
 import { buildMonthlySummary } from "../../../lib/monthlySummary";
 
 export const revalidate = 3600;
@@ -11,9 +13,23 @@ export async function GET() {
     provenance: treasuryProvenance,
     recordDateLabel,
   });
+  const previousSnapshot = updateSummarySnapshot("monthly", {
+    regime: summary.regime,
+    guidance: summary.guidance,
+    constraints: summary.constraints,
+  });
+  const diff = buildSummaryDiff(
+    {
+      regime: summary.regime,
+      guidance: summary.guidance,
+      constraints: summary.constraints,
+    },
+    previousSnapshot
+  );
 
   return NextResponse.json({
     summary,
+    diff,
     copy: summary.copy,
     provenance: summary.provenance,
     recordDateLabel: summary.recordDateLabel,
