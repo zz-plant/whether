@@ -140,40 +140,242 @@ export const ReportShell = ({
       <div className="pointer-events-none absolute inset-0 hidden sm:block weather-haze" />
       <div className="pointer-events-none absolute left-1/2 top-0 hidden h-[520px] w-[720px] -translate-x-1/2 rounded-full bg-sky-400/15 blur-[190px] sm:block" />
       <div className="pointer-events-none absolute -right-24 top-24 hidden h-[420px] w-[420px] rounded-full bg-fuchsia-400/10 blur-[160px] sm:block" />
-      <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-12">
-        <header className="relative flex flex-col gap-8 border-b border-slate-800/70 pb-8">
-          <div className="flex flex-col gap-6">
-            <div className="flex flex-wrap items-center gap-3 text-[0.6rem] font-semibold tracking-[0.32em] text-slate-400">
-              <span className="weather-chip px-3 py-1.5 uppercase">Weekly product guidance</span>
-              <span className="text-slate-500">Updated {fetchedAtLabel}</span>
+      <div className="mx-auto max-w-7xl px-4 pb-12 pt-4 sm:px-6 sm:pt-6">
+        <header className="weather-appbar sticky top-4 z-20 px-4 py-4 sm:px-6">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <span className="weather-icon-chip text-slate-100">
+                <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
+                  <path
+                    d="M4 14.5a6.5 6.5 0 0 1 12.8-2.4A4.5 4.5 0 1 1 18 21H7.6A5.1 5.1 0 0 1 4 14.5Z"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M8 9.5a4 4 0 0 1 6.9 2"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </span>
+              <div>
+                <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Whether</p>
+                <p className="text-sm font-semibold text-slate-100">Market Climate Station</p>
+              </div>
             </div>
-            <div className="grid gap-6 lg:grid-cols-[1.2fr,0.8fr] lg:items-center">
-              <div className="space-y-4">
-                <div className="space-y-3">
-                  <h1 className="type-headline text-slate-100">Whether Report</h1>
-                  <p className="max-w-2xl text-sm text-slate-200 sm:text-base">
-                    A fast, sourced readout of Treasury signals translated into product guidance.
-                  </p>
+            <div className="flex flex-wrap items-center gap-2 text-xs font-semibold tracking-[0.14em] text-slate-300">
+              <span className="rounded-full border border-slate-800/70 px-3 py-1">{statusLabel}</span>
+              <span className={`rounded-full border px-3 py-1 ${trustToneStyles}`}>
+                {trustStatusLabel}
+              </span>
+              {showOfflineBadge ? (
+                <span className="rounded-full border border-rose-400/60 bg-rose-500/10 px-3 py-1 text-rose-100">
+                  {offlineBadgeLabel}
+                </span>
+              ) : null}
+            </div>
+          </div>
+          <nav aria-label="Report paths" className="mt-4">
+            <ul className="flex flex-wrap gap-2">
+              {pageLinks.map((link) => {
+                const isActive = link.label === pageTitle;
+                return (
+                  <li key={link.href}>
+                    <a
+                      href={link.href}
+                      aria-current={isActive ? "page" : undefined}
+                      className={`weather-tab inline-flex min-h-[44px] items-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors touch-manipulation ${
+                        isActive
+                          ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
+                          : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
+                      }`}
+                    >
+                      <span className="hidden sm:inline-flex">{pageLinkIcons[link.label]}</span>
+                      {link.label}
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+        </header>
+
+        {historicalBanner}
+
+        <div className="mt-6 grid gap-6 lg:grid-cols-[260px,1fr]">
+          <aside className="space-y-4 lg:sticky lg:top-28 lg:self-start">
+            <section className="weather-panel space-y-3 px-4 py-4">
+              <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">You are here</p>
+              <p className="text-lg font-semibold text-slate-100">{pageTitle}</p>
+              <p className="text-sm text-slate-300">{pageSummary}</p>
+              <div className="space-y-2 text-xs text-slate-300">
+                <p className="text-xs font-semibold text-slate-400">Updated</p>
+                <p className="mono text-slate-100">{fetchedAtLabel}</p>
+              </div>
+            </section>
+
+            <section className={`weather-panel flex flex-col gap-3 px-4 py-4 ${trustToneStyles}`}>
+              <p className={`text-xs font-semibold tracking-[0.18em] ${trustLabelTone}`}>
+                Signal confidence
+              </p>
+              <div className="space-y-2 text-sm">
+                <p className="font-semibold text-slate-100">{trustStatusLabel}</p>
+                <p className="text-sm text-slate-200/90">{trustStatusDetail}</p>
+                <p className="text-xs text-slate-200/80">{trustStatusAction}</p>
+              </div>
+            </section>
+
+            {sectionLinks.length > 0 ? (
+              <nav aria-label="Report sections" className="weather-panel px-4 py-4">
+                <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Sections</p>
+                <ul className="mt-3 space-y-2">
+                  {sectionLinks.map((item) => (
+                    <li key={item.href}>
+                      <a
+                        href={item.href}
+                        className="weather-pill inline-flex min-h-[44px] w-full items-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                      >
+                        {item.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            ) : null}
+
+            <details className="group weather-panel px-4 py-4">
+              <summary className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 text-xs font-semibold tracking-[0.1em] text-slate-200 transition-colors hover:text-slate-100 touch-manipulation">
+                Data timestamps
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-300 transition-transform duration-200 group-open:rotate-180">
+                  <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
+                    <path
+                      d="M7 10l5 5 5-5"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </span>
+              </summary>
+              <dl className="mt-3 space-y-3 text-sm text-slate-300">
+                <div className="flex items-center justify-between gap-3">
+                  <dt className="text-slate-400">Record date</dt>
+                  <dd className="mono text-slate-100">{recordDateLabel}</dd>
                 </div>
-                <div className="weather-panel-static max-w-2xl space-y-2 px-4 py-3">
-                  <p className="text-xs font-semibold text-slate-400">You&rsquo;re reading</p>
-                  <p className="text-base font-semibold text-slate-100">{pageTitle}</p>
-                  <p className="text-sm text-slate-300">{pageSummary}</p>
+                <div className="flex items-center justify-between gap-3">
+                  <dt className="text-slate-400">Fetched at</dt>
+                  <dd className="mono text-slate-100">{fetchedAtLabel}</dd>
                 </div>
-                <div className="flex flex-wrap gap-3">
-                  <a
-                    href="#weekly-action-summary"
-                    className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.2em] transition-colors hover:border-sky-300/80 hover:text-white touch-manipulation"
-                  >
-                    Start with this week
-                  </a>
-                  <a
-                    href="#executive-snapshot"
-                    className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-slate-200 underline decoration-slate-400 underline-offset-4 hover:text-slate-100 touch-manipulation"
-                  >
-                    See leadership summary
-                  </a>
+                <div className="flex items-center justify-between gap-3">
+                  <dt className="text-slate-400">Source</dt>
+                  <dd>
+                    <a
+                      href={treasurySource}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="touch-target inline-flex min-h-[44px] items-center text-xs text-slate-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 touch-manipulation"
+                    >
+                      US Treasury Fiscal Data API
+                    </a>
+                  </dd>
                 </div>
+              </dl>
+            </details>
+          </aside>
+
+          <div className="space-y-6">
+            <section className="weather-panel-static space-y-4 px-5 py-5">
+              <div className="space-y-3">
+                <p className="text-xs font-semibold tracking-[0.32em] text-slate-400">
+                  Weekly product guidance
+                </p>
+                <h1 className="type-headline text-slate-100">Whether Report</h1>
+                <p className="max-w-2xl text-sm text-slate-200 sm:text-base">
+                  A fast, sourced readout of Treasury signals translated into product guidance.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <a
+                  href="#weekly-action-summary"
+                  className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.2em] transition-colors hover:border-sky-300/80 hover:text-white touch-manipulation"
+                >
+                  Start with this week
+                </a>
+                <a
+                  href="#executive-snapshot"
+                  className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-slate-200 underline decoration-slate-400 underline-offset-4 hover:text-slate-100 touch-manipulation"
+                >
+                  See leadership summary
+                </a>
+              </div>
+            </section>
+
+            <section className="grid gap-4 lg:grid-cols-2">
+              <div className="weather-panel flex flex-col gap-4 px-5 py-4">
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div className="space-y-2">
+                    <p className="text-xs font-semibold text-slate-300">Current operating climate</p>
+                    <span className="text-3xl font-semibold tracking-tight text-slate-100">
+                      {statusLabel}
+                    </span>
+                    <p className="text-xs text-slate-300">Signals stamped {recordDateLabel}</p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <div
+                      className={`rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.12em] ${trustToneStyles}`}
+                    >
+                      {trustStatusLabel}
+                    </div>
+                    {showOfflineBadge ? (
+                      <span className="rounded-full border border-rose-400/60 bg-rose-500/10 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-rose-100">
+                        {offlineBadgeLabel}
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
+                <p className="text-sm text-slate-300">
+                  You are likely balancing delivery pressure with budget scrutiny. Use the climate
+                  label as a neutral, external anchor in planning conversations.
+                </p>
+                <details className="group">
+                  <summary className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:text-slate-100 touch-manipulation">
+                    <span>How to interpret this week</span>
+                    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-300 transition-transform duration-200 group-open:rotate-180">
+                      <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
+                        <path
+                          d="M7 10l5 5 5-5"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </span>
+                  </summary>
+                  <ul className="mt-3 space-y-2 text-sm text-slate-300">
+                    <li className="flex gap-2">
+                      <span className="text-slate-400">1</span>
+                      <span className="break-words">
+                        Start with user outcomes and ROI. If the idea still wins, keep it on the
+                        table.
+                      </span>
+                    </li>
+                    <li className="flex gap-2">
+                      <span className="text-slate-400">2</span>
+                      <span className="break-words">
+                        Let the climate dictate pacing, staffing, and sequencing—not whether the
+                        idea matters.
+                      </span>
+                    </li>
+                  </ul>
+                </details>
               </div>
               <div className="weather-panel flex flex-col gap-4 px-5 py-4">
                 <p className="text-xs font-semibold text-slate-300">The readout in one line</p>
@@ -190,286 +392,15 @@ export const ReportShell = ({
                   </span>
                 </div>
               </div>
-            </div>
-          </div>
-          <div className="grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">
-            <div className="weather-panel flex flex-col gap-4 px-5 py-4">
-              <div className="flex flex-wrap items-start justify-between gap-4">
-                <div className="space-y-2">
-                  <p className="text-xs font-semibold text-slate-300">Current operating climate</p>
-                  <span className="text-3xl font-semibold tracking-tight text-slate-100">
-                    {statusLabel}
-                  </span>
-                  <p className="text-xs text-slate-300">Signals stamped {recordDateLabel}</p>
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <div
-                    className={`rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.12em] ${trustToneStyles}`}
-                  >
-                    {trustStatusLabel}
-                  </div>
-                  {showOfflineBadge ? (
-                    <span className="rounded-full border border-rose-400/60 bg-rose-500/10 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-rose-100">
-                      {offlineBadgeLabel}
-                    </span>
-                  ) : null}
-                </div>
-              </div>
-              <p className="text-sm text-slate-300">
-                You are likely balancing delivery pressure with budget scrutiny. Use the climate
-                label as a neutral, external anchor in planning conversations.
-              </p>
-              <details className="group">
-                <summary className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:text-slate-100 touch-manipulation">
-                  <span>How to interpret this week</span>
-                  <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-300 transition-transform duration-200 group-open:rotate-180">
-                    <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
-                      <path
-                        d="M7 10l5 5 5-5"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </span>
-                </summary>
-                <ul className="mt-3 space-y-2 text-sm text-slate-300">
-                  <li className="flex gap-2">
-                    <span className="text-slate-400">1</span>
-                    <span className="break-words">
-                      Start with user outcomes and ROI. If the idea still wins, keep it on the table.
-                    </span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="text-slate-400">2</span>
-                    <span className="break-words">
-                      Let the climate dictate pacing, staffing, and sequencing—not whether the idea
-                      matters.
-                    </span>
-                  </li>
-                </ul>
-              </details>
-            </div>
-            <div className={`weather-panel flex flex-col gap-4 px-5 py-4 ${trustToneStyles}`}>
-              <p className={`text-sm font-semibold ${trustLabelTone}`}>Confidence in the signals</p>
-              <div className="space-y-2 text-sm">
-                <p className="font-semibold">{trustStatusLabel}</p>
-                <p className="text-sm text-slate-200/90">{trustStatusDetail}</p>
-                <p className="text-xs text-slate-200/80">{trustStatusAction}</p>
-              </div>
-            </div>
-          </div>
-          {sectionLinks.length > 0 ? (
-            <>
-              <nav aria-label="Report sections" className="hidden space-y-3 sm:block">
-                <p className="text-sm font-semibold text-slate-300">Jump to</p>
-                <div className="flex flex-wrap gap-3">
-                  <ul className="flex flex-wrap gap-3">
-                    {sectionLinks.map((item) => (
-                      <li key={item.href}>
-                        <a
-                          href={item.href}
-                          className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
-                        >
-                          {item.label}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </nav>
-              <nav
-                aria-label="Report sections"
-                className="sm:hidden"
-              >
-                <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Jump to</p>
-                <ul className="mt-3 flex gap-2 overflow-x-auto pb-2 pr-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                  {sectionLinks.map((item) => (
-                    <li key={item.href}>
-                      <a
-                        href={item.href}
-                        className="weather-pill inline-flex min-h-[44px] items-center whitespace-nowrap px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
-                      >
-                        {item.label}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-            </>
-          ) : null}
-          <div className="grid gap-4 lg:grid-cols-2">
-            <details className="group">
-              <summary className="weather-pill-muted inline-flex min-h-[44px] cursor-pointer items-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.1em] transition-colors hover:border-slate-500/80 hover:text-slate-100 touch-manipulation">
-                Data timestamps
-                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-300 transition-transform duration-200 group-open:rotate-180">
-                  <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
-                    <path
-                      d="M7 10l5 5 5-5"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.6"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </span>
-              </summary>
-              <div className="weather-panel mt-3 px-5 py-4">
-                <p className="text-xs font-semibold text-slate-100">Proof the data is current</p>
-                <dl className="mt-4 space-y-3 text-sm text-slate-300">
-                  <div className="flex items-center justify-between gap-3">
-                    <dt className="text-slate-400">Record date</dt>
-                    <dd className="mono text-slate-100">{recordDateLabel}</dd>
-                  </div>
-                  <div className="flex items-center justify-between gap-3">
-                    <dt className="text-slate-400">Fetched at</dt>
-                    <dd className="mono text-slate-100">{fetchedAtLabel}</dd>
-                  </div>
-                  <div className="flex items-center justify-between gap-3">
-                    <dt className="text-slate-400">Source</dt>
-                    <dd>
-                      <a
-                        href={treasurySource}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="touch-target inline-flex min-h-[44px] items-center text-xs text-slate-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 touch-manipulation"
-                      >
-                        US Treasury Fiscal Data API
-                      </a>
-                    </dd>
-                  </div>
-                </dl>
-              </div>
-            </details>
-            <section className="weather-panel flex flex-col gap-3 px-5 py-4 md:hidden">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-xs font-semibold text-slate-100">Explore other report paths</p>
-                <span className="rounded-full border border-slate-700 px-2 py-0.5 text-[10px] font-semibold tracking-[0.12em] text-slate-300">
-                  {pageLinks.length}
-                </span>
-              </div>
-              <nav aria-label="Report paths" className="mt-2">
-                <ul className="flex gap-3 overflow-x-auto pb-2 pr-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                  {pageLinks.map((link) => {
-                    const isActive = link.label === pageTitle;
-                    const icon = pageLinkIcons[link.label];
-                    return (
-                      <li key={link.href} className="min-w-[240px]">
-                        <a
-                          href={link.href}
-                          aria-current={isActive ? "page" : undefined}
-                          className={`weather-tile flex min-h-[96px] flex-col gap-3 px-4 py-3 text-left text-sm font-semibold tracking-[0.08em] transition-colors hover:-translate-y-0.5 touch-manipulation ${
-                            isActive
-                              ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
-                              : "text-slate-300 hover:border-sky-300/70 hover:text-slate-100"
-                          }`}
-                        >
-                          <span className="flex items-center gap-3">
-                            <span className="weather-icon-chip text-slate-100">{icon}</span>
-                            <span>{link.label}</span>
-                          </span>
-                          <span className="text-xs font-normal tracking-normal text-slate-300">
-                            {link.description}
-                          </span>
-                        </a>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </nav>
             </section>
-            <section className="weather-panel hidden flex-col gap-3 px-5 py-4 md:flex">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-xs font-semibold text-slate-100">Explore other report paths</p>
-                <span className="rounded-full border border-slate-700 px-2 py-0.5 text-xs font-semibold tracking-[0.12em] text-slate-300">
-                  {pageLinks.length}
-                </span>
-              </div>
-              <nav aria-label="Report paths">
-                <ul className="grid gap-3 md:grid-cols-3">
-                  {pageLinks.map((link) => {
-                    const isActive = link.label === pageTitle;
-                    const icon = pageLinkIcons[link.label];
-                    return (
-                      <li key={link.href}>
-                        <a
-                          href={link.href}
-                          aria-current={isActive ? "page" : undefined}
-                          className={`weather-tile flex min-h-[84px] flex-col gap-3 px-4 py-3 text-left text-sm font-semibold tracking-[0.08em] transition-colors hover:-translate-y-0.5 touch-manipulation ${
-                            isActive
-                              ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
-                              : "text-slate-300 hover:border-sky-300/70 hover:text-slate-100"
-                          }`}
-                        >
-                          <span className="flex items-center gap-3">
-                            <span className="weather-icon-chip text-slate-100">{icon}</span>
-                            <span>{link.label}</span>
-                          </span>
-                          <span className="text-xs font-normal tracking-normal text-slate-300">
-                            {link.description}
-                          </span>
-                        </a>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </nav>
-            </section>
+
+            {children}
+
+            <footer className="mt-12 border-t border-slate-800/70 pt-6 text-xs font-semibold tracking-[0.18em] text-slate-400">
+              Not Financial Advice.
+            </footer>
           </div>
-          {sectionLinks.length > 0 ? (
-            <div className="space-y-3">
-              <nav aria-label="Report breadcrumb" className="text-xs text-slate-400">
-                <ol className="flex flex-wrap items-center gap-2">
-                  <li>
-                    <a
-                      href="/"
-                      className="touch-target inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-slate-300 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
-                    >
-                      Whether Report
-                    </a>
-                  </li>
-                  <li className="text-slate-600">/</li>
-                  <li className="text-xs font-semibold tracking-[0.12em] text-slate-200">
-                    {pageTitle}
-                  </li>
-                </ol>
-              </nav>
-              <nav aria-label="Section progress">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <p className="text-xs font-semibold text-slate-300">Section progress</p>
-                  <span className="text-xs text-slate-500">
-                    {sectionLinks.length} sections
-                  </span>
-                </div>
-                <ol className="mt-3 flex flex-wrap gap-2">
-                  {sectionLinks.map((item, index) => (
-                    <li key={item.href}>
-                      <a
-                        href={item.href}
-                        className="weather-pill inline-flex min-h-[44px] items-center gap-2 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
-                      >
-                        <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-[0.65rem] text-slate-300">
-                          {index + 1}
-                        </span>
-                        {item.label}
-                      </a>
-                    </li>
-                  ))}
-                </ol>
-              </nav>
-            </div>
-          ) : null}
-          {historicalBanner}
-        </header>
-
-        {children}
-
-        <footer className="mt-12 border-t border-slate-800/70 pt-6 text-xs font-semibold tracking-[0.18em] text-slate-400">
-          Not Financial Advice.
-        </footer>
+        </div>
       </div>
     </main>
   );
