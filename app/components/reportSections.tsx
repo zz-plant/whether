@@ -17,6 +17,7 @@ import { buildMonthlySummary, getMonthlyActionGuidance } from "../../lib/monthly
 import { buildWeeklySummary, getWeeklyActionGuidance } from "../../lib/weeklySummary";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
 import { MonthlySummaryCard } from "./monthlySummaryCard";
+import { SummaryDeltaPanel } from "./summaryDeltaPanel";
 import { WeeklySummaryCard } from "./weeklySummaryCard";
 import { insightDatabase } from "../../data/recommendations";
 
@@ -508,6 +509,11 @@ export const MonthlyActionSummaryPanel = ({
 }) => {
   const regimeLabel = getRegimeLabel(assessment.regime);
   const actionGuidance = getMonthlyActionGuidance(assessment.regime);
+  const weeklySummary = buildWeeklySummary({
+    assessment,
+    provenance,
+    recordDateLabel,
+  });
   const monthlySummary = buildMonthlySummary({
     assessment,
     provenance,
@@ -541,7 +547,12 @@ export const MonthlyActionSummaryPanel = ({
           align staffing, sequencing, and approval cadence before you lock the next sprint slate.
         </>
       }
-      summaryCard={<MonthlySummaryCard summary={monthlySummary} />}
+      summaryCard={
+        <>
+          <MonthlySummaryCard summary={monthlySummary} />
+          <SummaryDeltaPanel weeklySummary={weeklySummary} monthlySummary={monthlySummary} />
+        </>
+      }
       blocks={monthlyBlocks}
     />
   );
