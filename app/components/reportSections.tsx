@@ -7,6 +7,7 @@
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { Collapsible } from "@base-ui/react/collapsible";
+import { Tooltip } from "@base-ui/react/tooltip";
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import type { PlaybookEntry } from "../../lib/playbook";
 import type {
@@ -728,23 +729,35 @@ export const RegimeAssessmentCard = ({
           <DataProvenanceStrip provenance={provenance} />
         </div>
       </div>
-      <div className="relative mt-4 flex flex-wrap gap-2 text-xs font-semibold tracking-[0.12em]">
-        {regimeBadges.map((badge) => {
-          const isActive = badge.key === assessment.regime;
-          return (
-            <span
-              key={badge.key}
-              className={`weather-pill flex min-h-[44px] items-center gap-2 px-3 py-2 ${
-                badge.classes
-              } ${isActive ? "text-slate-100" : "opacity-60"}`}
-              aria-current={isActive ? "true" : undefined}
-            >
-              <span className="h-2 w-2 rounded-full bg-current" aria-hidden="true" />
-              <span className="text-xs">{badge.label}</span>
-            </span>
-          );
-        })}
-      </div>
+      <Tooltip.Provider delay={200} closeDelay={50}>
+        <div className="relative mt-4 flex flex-wrap gap-2 text-xs font-semibold tracking-[0.12em]">
+          {regimeBadges.map((badge) => {
+            const isActive = badge.key === assessment.regime;
+            return (
+              <Tooltip.Root key={badge.key}>
+                <Tooltip.Trigger
+                  type="button"
+                  className={`weather-pill flex min-h-[44px] items-center gap-2 px-3 py-2 ${
+                    badge.classes
+                  } ${isActive ? "text-slate-100" : "opacity-60"}`}
+                  aria-current={isActive ? "true" : undefined}
+                >
+                  <span className="h-2 w-2 rounded-full bg-current" aria-hidden="true" />
+                  <span className="text-xs">{badge.label}</span>
+                </Tooltip.Trigger>
+                <Tooltip.Portal>
+                  <Tooltip.Positioner side="bottom" align="start" sideOffset={10}>
+                    <Tooltip.Popup className="max-w-[220px] rounded-2xl border border-slate-800/80 bg-slate-950/95 px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-200 shadow-xl">
+                      {badge.description}
+                      <Tooltip.Arrow className="h-2 w-2 translate-y-[1px] rotate-45 rounded-[2px] bg-slate-950/95" />
+                    </Tooltip.Popup>
+                  </Tooltip.Positioner>
+                </Tooltip.Portal>
+              </Tooltip.Root>
+            );
+          })}
+        </div>
+      </Tooltip.Provider>
       <p className="relative mt-3 text-xs text-slate-400">
         Badge colors map to posture so anyone can scan the report quickly.
       </p>
