@@ -26,6 +26,14 @@ It is inspired by high-level themes from:
 - **Trust cues everywhere**: show source links and freshness inline with every data view.
 - **Traceable scoring**: surface the inputs and timestamps behind every regime classification.
 
+### Form and interaction hygiene
+
+- **Allow invalid submits**: never disable submit buttons for invalid forms. Accept the click, surface errors, and focus the first invalid field.
+- **Validate on blur**: avoid inline validation while the user is typing; validate on focus out instead.
+- **Keep focus outlines**: never remove focus outlines without an immediate accessible replacement.
+- **Animate only transform/opacity**: layout property animations (width/height/top/left/margins) are banned.
+- **Honor semantic controls**: avoid click handlers on non-interactive elements; use proper buttons or full keyboard/ARIA handling.
+
 ## Weather app inspiration (beloved references)
 
 - **Forecast-at-a-glance**: lead with a single, high-signal summary that answers "what should I do today?" before any charts.
