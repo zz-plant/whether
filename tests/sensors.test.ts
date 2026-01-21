@@ -24,5 +24,7 @@ describe("sensor readings", () => {
     assert.equal(readings.length, 2);
     assert.equal(readings[0].label.includes("Base rate"), true);
     assert.equal(readings[1].value, -0.2);
+    assert.equal(readings[0].category, "Rates");
+    assert.equal(Array.isArray(readings[0].timeWindows), true);
   });
 });
