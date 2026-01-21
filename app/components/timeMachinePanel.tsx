@@ -6,6 +6,8 @@
 
 import type { FormEvent } from "react";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { Field } from "@base-ui/react/field";
+import { Input } from "@base-ui/react/input";
 import { Tabs } from "@base-ui/react/tabs";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
@@ -437,12 +439,9 @@ export const TimeMachinePanel = ({
         ) : null}
 
         <form onSubmit={handleSubmit} className="mt-6 grid gap-4 md:grid-cols-[1fr,auto]">
-          <label
-            htmlFor="time-machine-month"
-            className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-300"
-          >
-            Month
-            <input
+          <Field.Root className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
+            <Field.Label>Month</Field.Label>
+            <Input
               ref={monthRef}
               id="time-machine-month"
               name="month"
@@ -456,7 +455,7 @@ export const TimeMachinePanel = ({
               aria-describedby={isInvalid ? errorId : undefined}
               className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
             />
-          </label>
+          </Field.Root>
           <button
             type="submit"
             disabled={isPending}
@@ -576,9 +575,9 @@ export const TimeMachinePanel = ({
                     {cadenceOptions.map((cadence) => (
                       <Tabs.Panel key={cadence} value={cadence} className="mt-4 space-y-3">
                         <div className="grid gap-3 sm:grid-cols-2">
-                          <label className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
-                            Start date
-                            <input
+                          <Field.Root className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
+                            <Field.Label>Start date</Field.Label>
+                            <Input
                               type="date"
                               value={rangeStart}
                               min={cadenceRange.min ?? undefined}
@@ -586,10 +585,10 @@ export const TimeMachinePanel = ({
                               onChange={(event) => setRangeStart(event.target.value)}
                               className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
                             />
-                          </label>
-                          <label className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
-                            End date
-                            <input
+                          </Field.Root>
+                          <Field.Root className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
+                            <Field.Label>End date</Field.Label>
+                            <Input
                               type="date"
                               value={rangeEnd}
                               min={cadenceRange.min ?? undefined}
@@ -597,7 +596,7 @@ export const TimeMachinePanel = ({
                               onChange={(event) => setRangeEnd(event.target.value)}
                               className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
                             />
-                          </label>
+                          </Field.Root>
                         </div>
                         <p className="text-xs text-slate-500">
                           {rangeStart && rangeEnd

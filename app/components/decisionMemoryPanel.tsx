@@ -4,6 +4,10 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { AlertDialog } from "@base-ui/react/alert-dialog";
+import { Field } from "@base-ui/react/field";
+import { Input } from "@base-ui/react/input";
+import { Toast } from "@base-ui/react/toast";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
@@ -145,7 +149,7 @@ type DecisionMemoryEntryCardProps = {
   isFocused: boolean;
   isCopying: boolean;
   copyTarget: string | null;
-  onCopy: (text: string, label: string) => void;
+  onCopy: (text: string, label: string, toastLabel: string) => void;
   onCopyLink: (entry: DecisionMemoryEntry) => void;
   attachHref: string;
   focusHref: string;
@@ -185,7 +189,7 @@ const DecisionMemoryEntryCard = ({
       <div className="mt-4 flex flex-wrap gap-2">
         <button
           type="button"
-          onClick={() => onCopy(buildDecisionTemplate(entry, "jira"), jiraTarget)}
+          onClick={() => onCopy(buildDecisionTemplate(entry, "jira"), jiraTarget, "Jira decision")}
           disabled={isCopying}
           aria-busy={isCopying && copyTarget === jiraTarget}
           className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
@@ -194,7 +198,9 @@ const DecisionMemoryEntryCard = ({
         </button>
         <button
           type="button"
-          onClick={() => onCopy(buildDecisionTemplate(entry, "confluence"), confluenceTarget)}
+          onClick={() =>
+            onCopy(buildDecisionTemplate(entry, "confluence"), confluenceTarget, "Confluence decision")
+          }
           disabled={isCopying}
           aria-busy={isCopying && copyTarget === confluenceTarget}
           className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
@@ -203,7 +209,7 @@ const DecisionMemoryEntryCard = ({
         </button>
         <button
           type="button"
-          onClick={() => onCopy(buildDecisionTemplate(entry, "linear"), linearTarget)}
+          onClick={() => onCopy(buildDecisionTemplate(entry, "linear"), linearTarget, "Linear decision")}
           disabled={isCopying}
           aria-busy={isCopying && copyTarget === linearTarget}
           className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
@@ -212,7 +218,7 @@ const DecisionMemoryEntryCard = ({
         </button>
         <button
           type="button"
-          onClick={() => onCopy(snapshotText, textTarget)}
+          onClick={() => onCopy(snapshotText, textTarget, "snapshot text")}
           disabled={isCopying}
           aria-busy={isCopying && copyTarget === textTarget}
           className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
@@ -268,6 +274,7 @@ export const DecisionMemoryPanel = ({
   const [fallbackCopyText, setFallbackCopyText] = useState("");
   const storageKey = "whether.decisionMemory";
   const draftKey = "whether.decisionMemoryDraft";
+  const { add } = Toast.useToastManager();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -396,13 +403,18 @@ export const DecisionMemoryPanel = ({
     router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
   };
 
-  const handleCopy = async (text: string, label: string) => {
+  const handleCopy = async (text: string, label: string, toastLabel: string) => {
     if (isCopying) {
       return;
     }
     if (!navigator.clipboard?.writeText) {
       setFallbackCopyText(text);
       setCopyError(true);
+      add({
+        title: "Clipboard blocked",
+        description: `Copy the ${toastLabel.toLowerCase()} manually.`,
+        type: "error",
+      });
       return;
     }
     setIsCopying(true);
@@ -410,9 +422,19 @@ export const DecisionMemoryPanel = ({
     try {
       await navigator.clipboard.writeText(text);
       setCopyError(false);
+      add({
+        title: "Copied to clipboard",
+        description: `${toastLabel} is ready to paste.`,
+        type: "success",
+      });
     } catch {
       setFallbackCopyText(text);
       setCopyError(true);
+      add({
+        title: "Copy failed",
+        description: `Copy the ${toastLabel.toLowerCase()} manually.`,
+        type: "error",
+      });
     } finally {
       setIsCopying(false);
       setCopyTarget(null);
@@ -421,7 +443,7 @@ export const DecisionMemoryPanel = ({
 
   const handleCopySnapshotLink = (entry: DecisionMemoryEntry) => {
     const link = buildSnapshotLink(entry);
-    handleCopy(link, `link-${entry.id}`);
+    handleCopy(link, `link-${entry.id}`, "snapshot link");
   };
 
   const handleSnapshotSave = () => {
@@ -448,17 +470,24 @@ export const DecisionMemoryPanel = ({
   const handleExportJson = () => {
     const payload = JSON.stringify(entries, null, 2);
     handleDownload(payload, `whether-decision-memory-${exportLabel}.json`, "application/json");
+    add({
+      title: "Export ready",
+      description: "Decision memory JSON downloaded.",
+      type: "success",
+    });
   };
 
   const handleExportCsv = () => {
     const payload = buildCsvRows(entries);
     handleDownload(payload, `whether-decision-memory-${exportLabel}.csv`, "text/csv");
+    add({
+      title: "Export ready",
+      description: "Decision memory CSV downloaded.",
+      type: "success",
+    });
   };
 
   const handleClearLog = () => {
-    if (!window.confirm("Clear the decision memory log? This cannot be undone.")) {
-      return;
-    }
     setEntries([]);
     try {
       window.localStorage.removeItem(storageKey);
@@ -469,6 +498,11 @@ export const DecisionMemoryPanel = ({
     nextParams.delete("decisionId");
     nextParams.delete("decisionSnapshot");
     router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
+    add({
+      title: "Decision memory cleared",
+      description: "The decision log has been reset.",
+      type: "success",
+    });
   };
 
   const buildDecisionHref = (mutateParams: (params: URLSearchParams) => void) => {
@@ -535,11 +569,9 @@ export const DecisionMemoryPanel = ({
           <div className="weather-surface p-4">
             <p className="type-label text-slate-400">Log a decision</p>
             <div className="mt-4 grid gap-4">
-              <div>
-                <label htmlFor="decision-title" className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                  Decision name
-                </label>
-                <input
+              <Field.Root className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                <Field.Label>Decision name</Field.Label>
+                <Input
                   ref={titleInputRef}
                   id="decision-title"
                   type="text"
@@ -550,12 +582,14 @@ export const DecisionMemoryPanel = ({
                   aria-describedby={titleError ? "decision-title-error" : undefined}
                   className="weather-input mt-2 min-h-[44px] w-full px-3 py-2 text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
                 />
-                {titleError ? (
-                  <p id="decision-title-error" className="mt-2 text-xs text-amber-200">
-                    {titleError}
-                  </p>
-                ) : null}
-              </div>
+                <Field.Error
+                  id="decision-title-error"
+                  match={Boolean(titleError)}
+                  className="mt-2 text-xs text-amber-200"
+                >
+                  {titleError ?? ""}
+                </Field.Error>
+              </Field.Root>
               <div>
                 <label htmlFor="decision-note" className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                   Notes (optional)
@@ -615,13 +649,42 @@ export const DecisionMemoryPanel = ({
               >
                 Export CSV
               </button>
-              <button
-                type="button"
-                onClick={handleClearLog}
-                className="weather-pill inline-flex min-h-[44px] items-center justify-center border border-rose-400/40 px-3 py-1 text-xs font-semibold tracking-[0.12em] text-rose-200 transition-colors hover:border-rose-300/70 hover:text-rose-100 touch-manipulation"
-              >
-                Clear log
-              </button>
+              <AlertDialog.Root>
+                <AlertDialog.Trigger
+                  type="button"
+                  className="weather-pill inline-flex min-h-[44px] items-center justify-center border border-rose-400/40 px-3 py-1 text-xs font-semibold tracking-[0.12em] text-rose-200 transition-colors hover:border-rose-300/70 hover:text-rose-100 touch-manipulation"
+                >
+                  Clear log
+                </AlertDialog.Trigger>
+                <AlertDialog.Portal>
+                  <AlertDialog.Backdrop className="fixed inset-0 bg-slate-950/80" />
+                  <AlertDialog.Viewport className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <AlertDialog.Popup className="w-full max-w-md rounded-2xl border border-slate-800/80 bg-slate-950/95 p-6 text-slate-100 shadow-xl">
+                      <AlertDialog.Title className="text-sm font-semibold tracking-[0.12em] text-slate-100">
+                        Clear decision memory?
+                      </AlertDialog.Title>
+                      <AlertDialog.Description className="mt-3 text-sm text-slate-300">
+                        This permanently removes the saved decision log and cannot be undone.
+                      </AlertDialog.Description>
+                      <div className="mt-6 flex flex-wrap justify-end gap-3">
+                        <AlertDialog.Close
+                          type="button"
+                          className="min-h-[40px] rounded-full border border-slate-700/70 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-slate-500/70 hover:text-slate-100"
+                        >
+                          Cancel
+                        </AlertDialog.Close>
+                        <AlertDialog.Close
+                          type="button"
+                          onClick={handleClearLog}
+                          className="min-h-[40px] rounded-full border border-rose-400/60 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-rose-100 transition-colors hover:border-rose-300/70 hover:text-rose-50"
+                        >
+                          Clear log
+                        </AlertDialog.Close>
+                      </div>
+                    </AlertDialog.Popup>
+                  </AlertDialog.Viewport>
+                </AlertDialog.Portal>
+              </AlertDialog.Root>
             </div>
           </div>
           <div className="mt-4 grid gap-3 md:grid-cols-2">

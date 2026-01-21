@@ -1,5 +1,6 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
+import { ToastProviderRoot } from "./components/toastProviderRoot";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://whether.report";
 const siteName = "Whether — Market Climate Station";
@@ -69,7 +70,7 @@ export default function RootLayout({
         <a className="skip-link" href="#main-content">
           Skip to content
         </a>
-        {children}
+        <ToastProviderRoot>{children}</ToastProviderRoot>
       </body>
     </html>
   );

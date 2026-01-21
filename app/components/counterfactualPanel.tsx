@@ -4,6 +4,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { NumberField } from "@base-ui/react/number-field";
+import { Slider } from "@base-ui/react/slider";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   classifyRegime,
@@ -154,32 +156,45 @@ export const CounterfactualPanel = ({
             <p className="type-label text-slate-400">Scenario sliders</p>
             <div className="mt-4 space-y-5">
               <div>
-                <label htmlFor="rate-shift" className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                   Base rate shift (bps)
-                </label>
+                </p>
                 <div className="mt-3 flex flex-wrap items-center gap-3">
-                  <input
+                  <Slider.Root
                     id="rate-shift"
-                    type="range"
                     min={-200}
                     max={200}
                     step={25}
                     value={rateShiftBps}
-                    onChange={(event) => setRateShiftBps(Number(event.target.value))}
-                    className="h-2 w-full cursor-pointer accent-sky-400"
-                  />
-                  <input
-                    type="number"
+                    onValueChange={(value) => setRateShiftBps(value as number)}
+                    className="w-full"
+                  >
+                    <Slider.Control className="relative flex h-2 w-full items-center">
+                      <Slider.Track className="relative h-2 w-full rounded-full bg-slate-800">
+                        <Slider.Indicator className="absolute h-full rounded-full bg-sky-500/70" />
+                      </Slider.Track>
+                      <Slider.Thumb
+                        className="absolute -top-1.5 h-5 w-5 rounded-full border border-slate-700/80 bg-slate-950 shadow-md transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200"
+                        getAriaLabel={() => "Base rate shift in basis points"}
+                      />
+                    </Slider.Control>
+                  </Slider.Root>
+                  <NumberField.Root
                     min={-200}
                     max={200}
                     step={25}
                     value={rateShiftBps}
-                    onChange={(event) =>
-                      setRateShiftBps(clamp(Number(event.target.value) || 0, -200, 200))
+                    onValueChange={(value) =>
+                      setRateShiftBps(clamp(value ?? 0, -200, 200))
                     }
-                    className="weather-input min-h-[44px] w-24 px-3 py-2 text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200"
-                    aria-label="Base rate shift in basis points"
-                  />
+                  >
+                    <NumberField.Group>
+                      <NumberField.Input
+                        className="weather-input min-h-[44px] w-24 px-3 py-2 text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200"
+                        aria-label="Base rate shift in basis points"
+                      />
+                    </NumberField.Group>
+                  </NumberField.Root>
                 </div>
                 <p className="mt-2 text-xs text-slate-500">
                   Current base rate: {baseRate.toFixed(2)}% → Scenario:{" "}
@@ -187,32 +202,45 @@ export const CounterfactualPanel = ({
                 </p>
               </div>
               <div>
-                <label htmlFor="slope-shift" className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                   Curve slope shift (bps)
-                </label>
+                </p>
                 <div className="mt-3 flex flex-wrap items-center gap-3">
-                  <input
+                  <Slider.Root
                     id="slope-shift"
-                    type="range"
                     min={-200}
                     max={200}
                     step={25}
                     value={slopeShiftBps}
-                    onChange={(event) => setSlopeShiftBps(Number(event.target.value))}
-                    className="h-2 w-full cursor-pointer accent-sky-400"
-                  />
-                  <input
-                    type="number"
+                    onValueChange={(value) => setSlopeShiftBps(value as number)}
+                    className="w-full"
+                  >
+                    <Slider.Control className="relative flex h-2 w-full items-center">
+                      <Slider.Track className="relative h-2 w-full rounded-full bg-slate-800">
+                        <Slider.Indicator className="absolute h-full rounded-full bg-sky-500/70" />
+                      </Slider.Track>
+                      <Slider.Thumb
+                        className="absolute -top-1.5 h-5 w-5 rounded-full border border-slate-700/80 bg-slate-950 shadow-md transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200"
+                        getAriaLabel={() => "Curve slope shift in basis points"}
+                      />
+                    </Slider.Control>
+                  </Slider.Root>
+                  <NumberField.Root
                     min={-200}
                     max={200}
                     step={25}
                     value={slopeShiftBps}
-                    onChange={(event) =>
-                      setSlopeShiftBps(clamp(Number(event.target.value) || 0, -200, 200))
+                    onValueChange={(value) =>
+                      setSlopeShiftBps(clamp(value ?? 0, -200, 200))
                     }
-                    className="weather-input min-h-[44px] w-24 px-3 py-2 text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200"
-                    aria-label="Curve slope shift in basis points"
-                  />
+                  >
+                    <NumberField.Group>
+                      <NumberField.Input
+                        className="weather-input min-h-[44px] w-24 px-3 py-2 text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200"
+                        aria-label="Curve slope shift in basis points"
+                      />
+                    </NumberField.Group>
+                  </NumberField.Root>
                 </div>
                 <p className="mt-2 text-xs text-slate-500">
                   Current slope: {curveSlope.toFixed(2)}% → Scenario:{" "}

@@ -7,8 +7,15 @@
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { Accordion } from "@base-ui/react/accordion";
+import { Checkbox } from "@base-ui/react/checkbox";
+import { CheckboxGroup } from "@base-ui/react/checkbox-group";
 import { Collapsible } from "@base-ui/react/collapsible";
+import { Field } from "@base-ui/react/field";
+import { Input } from "@base-ui/react/input";
+import { Select } from "@base-ui/react/select";
 import { Tabs } from "@base-ui/react/tabs";
+import { Toggle } from "@base-ui/react/toggle";
+import { ToggleGroup } from "@base-ui/react/toggle-group";
 import { Tooltip } from "@base-ui/react/tooltip";
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import type { PlaybookEntry } from "../../lib/playbook";
@@ -2378,14 +2385,6 @@ export const SensorArray = ({
     );
   }, [filteredSensors, selectedWindow]);
 
-  const handleToggleCategory = (category: SensorCategory) => {
-    setSelectedCategories((current) =>
-      current.includes(category)
-        ? current.filter((entry) => entry !== category)
-        : [...current, category]
-    );
-  };
-
   return (
     <section id="sensor-array" aria-labelledby="sensor-array-title" className="mt-10">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -2480,25 +2479,37 @@ export const SensorArray = ({
               <p className="text-xs text-slate-500">
                 Choose the signal groups to spotlight across the sensor array.
               </p>
-              <div className="grid gap-2 sm:grid-cols-2">
-                {sensorGroups.map((group) => {
-                  const isActive = selectedCategories.includes(group.id);
-                  return (
-                    <label
-                      key={group.id}
-                      className="flex items-center gap-2 rounded-xl border border-slate-800/70 bg-slate-950/70 px-3 py-2 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-slate-400 transition-colors hover:border-slate-700/80 hover:text-slate-200 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-sky-300"
+              <CheckboxGroup
+                value={selectedCategories}
+                onValueChange={(value) => setSelectedCategories(value as SensorCategory[])}
+                className="grid gap-2 sm:grid-cols-2"
+              >
+                {sensorGroups.map((group) => (
+                  <label
+                    key={group.id}
+                    className="flex items-center gap-2 rounded-xl border border-slate-800/70 bg-slate-950/70 px-3 py-2 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-slate-400 transition-colors hover:border-slate-700/80 hover:text-slate-200 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-sky-300"
+                  >
+                    <Checkbox.Root
+                      value={group.id}
+                      className="flex h-4 w-4 items-center justify-center rounded border border-slate-700 bg-slate-950 text-sky-400 transition-colors data-[checked]:border-sky-400 data-[checked]:bg-sky-500/20"
                     >
-                      <input
-                        type="checkbox"
-                        checked={isActive}
-                        onChange={() => handleToggleCategory(group.id)}
-                        className="h-4 w-4 rounded border-slate-700 bg-slate-950 text-sky-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-                      />
-                      <span>{group.label}</span>
-                    </label>
-                  );
-                })}
-              </div>
+                      <Checkbox.Indicator className="text-sky-300">
+                        <svg viewBox="0 0 16 16" className="h-3 w-3" aria-hidden="true">
+                          <path
+                            d="M3.5 8.5l2.5 2.5 6-6"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </Checkbox.Indicator>
+                    </Checkbox.Root>
+                    <span>{group.label}</span>
+                  </label>
+                ))}
+              </CheckboxGroup>
               <div className="flex flex-wrap gap-2 text-xs">
                 <button
                   type="button"
@@ -2524,24 +2535,26 @@ export const SensorArray = ({
               <p className="text-xs text-slate-500">
                 Match the horizon to the decision cadence you are planning for.
               </p>
-              <div role="radiogroup" className="flex flex-wrap gap-2">
+              <ToggleGroup
+                value={[selectedWindow]}
+                onValueChange={(value) => {
+                  const nextValue = value[0] as SensorTimeWindow | undefined;
+                  if (nextValue) {
+                    setSelectedWindow(nextValue);
+                  }
+                }}
+                className="flex flex-wrap gap-2"
+              >
                 {availableWindows.map((window) => (
-                  <button
+                  <Toggle
                     key={window.id}
-                    type="button"
-                    role="radio"
-                    aria-checked={window.id === selectedWindow}
-                    onClick={() => setSelectedWindow(window.id)}
-                    className={`min-h-[40px] rounded-full border px-3 text-xs font-semibold tracking-[0.12em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${
-                      window.id === selectedWindow
-                        ? "border-sky-400/80 bg-sky-500/10 text-slate-100"
-                        : "border-slate-800/70 text-slate-400 hover:border-slate-700/80 hover:text-slate-200"
-                    }`}
+                    value={window.id}
+                    className="min-h-[40px] rounded-full border px-3 text-xs font-semibold tracking-[0.12em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 data-[pressed]:border-sky-400/80 data-[pressed]:bg-sky-500/10 data-[pressed]:text-slate-100 border-slate-800/70 text-slate-400 hover:border-slate-700/80 hover:text-slate-200"
                   >
                     {window.label}
-                  </button>
+                  </Toggle>
                 ))}
-              </div>
+              </ToggleGroup>
               {activeWindow ? (
                 <p className="text-xs text-slate-500">{activeWindow.description}</p>
               ) : null}
@@ -3110,50 +3123,114 @@ export const InsightDatabasePanel = ({
                 </button>
               </div>
               <div className="mt-4 grid gap-4 md:grid-cols-2">
-                <label className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                  Search
-                  <input
+                <Field.Root className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                  <Field.Label>Search</Field.Label>
+                  <Input
                     type="search"
                     value={searchQuery}
                     onChange={(event) => setSearchQuery(event.target.value)}
                     placeholder="Search by source, tag, or recommendation"
                     className="mt-2 w-full rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-600"
                   />
-                </label>
-                <label className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                  Climate
-                  <select
+                </Field.Root>
+                <Field.Root className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                  <Field.Label nativeLabel={false}>Climate</Field.Label>
+                  <Select.Root
                     value={selectedClimate}
-                    onChange={(event) => setSelectedClimate(event.target.value)}
-                    className="mt-2 w-full rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+                    onValueChange={(value) => setSelectedClimate(value as string)}
                   >
-                    <option value="all">All climates</option>
-                    {climateOptions.map((option) => (
-                      <option key={option} value={option}>
-                        {getRegimeLabel(option as RegimeAssessment["regime"])}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                  Signal
-                  <select
+                    <Select.Trigger className="mt-2 flex min-h-[44px] w-full items-center justify-between rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-sm text-slate-100">
+                      <Select.Value placeholder="All climates" />
+                      <Select.Icon className="text-slate-400">
+                        <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
+                          <path
+                            d="M7 10l5 5 5-5"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.6"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </Select.Icon>
+                    </Select.Trigger>
+                    <Select.Portal>
+                      <Select.Positioner side="bottom" align="start" sideOffset={8}>
+                        <Select.Popup className="min-w-[220px] rounded-xl border border-slate-800/80 bg-slate-950/95 p-1 text-sm text-slate-100 shadow-xl">
+                          <Select.List className="max-h-64 overflow-y-auto">
+                            <Select.Item
+                              value="all"
+                              className="flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm text-slate-200 outline-none transition-colors data-[highlighted]:bg-slate-800/70 data-[selected]:text-sky-200"
+                            >
+                              <Select.ItemText>All climates</Select.ItemText>
+                            </Select.Item>
+                            {climateOptions.map((option) => (
+                              <Select.Item
+                                key={option}
+                                value={option}
+                                className="flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm text-slate-200 outline-none transition-colors data-[highlighted]:bg-slate-800/70 data-[selected]:text-sky-200"
+                              >
+                                <Select.ItemText>
+                                  {getRegimeLabel(option as RegimeAssessment["regime"])}
+                                </Select.ItemText>
+                              </Select.Item>
+                            ))}
+                          </Select.List>
+                        </Select.Popup>
+                      </Select.Positioner>
+                    </Select.Portal>
+                  </Select.Root>
+                </Field.Root>
+                <Field.Root className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                  <Field.Label nativeLabel={false}>Signal</Field.Label>
+                  <Select.Root
                     value={selectedSignal}
-                    onChange={(event) => setSelectedSignal(event.target.value)}
-                    className="mt-2 w-full rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+                    onValueChange={(value) => setSelectedSignal(value as string)}
                   >
-                    <option value="all">All signals</option>
-                    {signalOptions.map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                    <Select.Trigger className="mt-2 flex min-h-[44px] w-full items-center justify-between rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-sm text-slate-100">
+                      <Select.Value placeholder="All signals" />
+                      <Select.Icon className="text-slate-400">
+                        <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
+                          <path
+                            d="M7 10l5 5 5-5"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.6"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </Select.Icon>
+                    </Select.Trigger>
+                    <Select.Portal>
+                      <Select.Positioner side="bottom" align="start" sideOffset={8}>
+                        <Select.Popup className="min-w-[220px] rounded-xl border border-slate-800/80 bg-slate-950/95 p-1 text-sm text-slate-100 shadow-xl">
+                          <Select.List className="max-h-64 overflow-y-auto">
+                            <Select.Item
+                              value="all"
+                              className="flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm text-slate-200 outline-none transition-colors data-[highlighted]:bg-slate-800/70 data-[selected]:text-sky-200"
+                            >
+                              <Select.ItemText>All signals</Select.ItemText>
+                            </Select.Item>
+                            {signalOptions.map((option) => (
+                              <Select.Item
+                                key={option}
+                                value={option}
+                                className="flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm text-slate-200 outline-none transition-colors data-[highlighted]:bg-slate-800/70 data-[selected]:text-sky-200"
+                              >
+                                <Select.ItemText>{option}</Select.ItemText>
+                              </Select.Item>
+                            ))}
+                          </Select.List>
+                        </Select.Popup>
+                      </Select.Positioner>
+                    </Select.Portal>
+                  </Select.Root>
+                </Field.Root>
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <label className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                    Start date
-                    <input
+                  <Field.Root className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                    <Field.Label>Start date</Field.Label>
+                    <Input
                       type="date"
                       value={dateRange.start}
                       onChange={(event) =>
@@ -3161,10 +3238,10 @@ export const InsightDatabasePanel = ({
                       }
                       className="mt-2 w-full rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-sm text-slate-100"
                     />
-                  </label>
-                  <label className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                    End date
-                    <input
+                  </Field.Root>
+                  <Field.Root className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                    <Field.Label>End date</Field.Label>
+                    <Input
                       type="date"
                       value={dateRange.end}
                       onChange={(event) =>
@@ -3172,30 +3249,27 @@ export const InsightDatabasePanel = ({
                       }
                       className="mt-2 w-full rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-sm text-slate-100"
                     />
-                  </label>
+                  </Field.Root>
                 </div>
               </div>
               <div className="mt-4">
                 <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Tags</p>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {tagOptions.map((tag) => {
-                    const isActive = selectedTags.includes(tag);
-                    return (
-                      <button
-                        key={tag}
-                        type="button"
-                        onClick={() => toggleTag(tag)}
-                        className={`rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] transition-colors ${
-                          isActive
-                            ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
-                            : "border-slate-700/70 text-slate-300 hover:border-slate-500/80 hover:text-slate-100"
-                        }`}
-                      >
-                        {tag}
-                      </button>
-                    );
-                  })}
-                </div>
+                <ToggleGroup
+                  value={selectedTags}
+                  onValueChange={(value) => setSelectedTags(value as string[])}
+                  multiple
+                  className="mt-2 flex flex-wrap gap-2"
+                >
+                  {tagOptions.map((tag) => (
+                    <Toggle
+                      key={tag}
+                      value={tag}
+                      className="rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] transition-colors data-[pressed]:border-sky-400/70 data-[pressed]:bg-sky-500/20 data-[pressed]:text-sky-100 border-slate-700/70 text-slate-300 hover:border-slate-500/80 hover:text-slate-100"
+                    >
+                      {tag}
+                    </Toggle>
+                  ))}
+                </ToggleGroup>
               </div>
             </div>
             <div className="mt-4 flex items-center justify-between text-xs font-semibold tracking-[0.12em] text-slate-400">

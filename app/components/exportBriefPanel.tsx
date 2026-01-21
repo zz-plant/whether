@@ -5,6 +5,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Toast } from "@base-ui/react/toast";
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../../lib/types";
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
@@ -200,6 +201,7 @@ export const ExportBriefPanel = ({
   const [copied, setCopied] = useState<string | null>(null);
   const [copyTarget, setCopyTarget] = useState<string | null>(null);
   const [copyError, setCopyError] = useState(false);
+  const { add } = Toast.useToastManager();
 
   const briefing = useMemo(
     () => buildBrief(assessment, treasury, sensors, macroSeries),
@@ -234,6 +236,11 @@ export const ExportBriefPanel = ({
     }
     if (!navigator.clipboard?.writeText) {
       setCopyError(true);
+      add({
+        title: "Clipboard blocked",
+        description: `Copy the ${label.toLowerCase()} manually.`,
+        type: "error",
+      });
       return;
     }
     setIsCopying(true);
@@ -243,8 +250,18 @@ export const ExportBriefPanel = ({
       setCopied(label);
       setCopyError(false);
       setTimeout(() => setCopied(null), 2000);
+      add({
+        title: "Copied to clipboard",
+        description: `${label} is ready to paste.`,
+        type: "success",
+      });
     } catch {
       setCopyError(true);
+      add({
+        title: "Copy failed",
+        description: `Copy the ${label.toLowerCase()} manually.`,
+        type: "error",
+      });
     } finally {
       setIsCopying(false);
       setCopyTarget(null);
@@ -253,6 +270,11 @@ export const ExportBriefPanel = ({
 
   const handlePrint = () => {
     window.print();
+    add({
+      title: "Print dialog opened",
+      description: "Save to PDF or choose a printer.",
+      type: "success",
+    });
   };
 
   const handleDownload = (content: string, filename: string) => {
@@ -263,6 +285,11 @@ export const ExportBriefPanel = ({
     anchor.download = filename;
     anchor.click();
     window.setTimeout(() => URL.revokeObjectURL(url), 0);
+    add({
+      title: "Download started",
+      description: `${filename} is downloading.`,
+      type: "success",
+    });
   };
 
   return (

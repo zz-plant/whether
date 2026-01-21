@@ -6,6 +6,8 @@
 
 import type { FormEvent } from "react";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { Field } from "@base-ui/react/field";
+import { NumberField } from "@base-ui/react/number-field";
 import { Collapsible } from "@base-ui/react/collapsible";
 import { Popover } from "@base-ui/react/popover";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -270,87 +272,126 @@ export const ThresholdsPanel = ({
         </div>
 
         <form onSubmit={handleSubmit} className="mt-6 grid gap-4 lg:grid-cols-[1fr,1fr,1fr,auto]">
-          <label
-            htmlFor="threshold-base-rate"
-            className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-400"
-          >
-            Base rate threshold (%)
-            <input
-              ref={baseRateRef}
+          <Field.Root className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-400">
+            <Field.Label>Base rate threshold (%)</Field.Label>
+            <NumberField.Root
               id="threshold-base-rate"
               name={THRESHOLD_PARAM_KEYS.baseRate}
-              type="number"
               min={0}
               max={10}
               step={0.01}
-              inputMode="decimal"
-              value={draft.baseRateTightness}
-              onChange={(event) => updateDraft("baseRateTightness", event.target.value)}
-              onBlur={() => handleBlur("baseRateTightness")}
-              aria-invalid={Boolean(errors.baseRateTightness)}
-              aria-describedby={errors.baseRateTightness ? errorIds.baseRateTightness : undefined}
-              className="weather-input min-h-[44px] w-full px-3 py-2 text-base"
-            />
-            <span className="min-h-[18px] text-xs text-amber-200">
-              {errors.baseRateTightness ? (
-                <span id={errorIds.baseRateTightness}>{errors.baseRateTightness}</span>
-              ) : null}
-            </span>
-          </label>
-          <label
-            htmlFor="threshold-tightness"
-            className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-400"
-          >
-            Tightness score threshold
-            <input
-              ref={tightnessRef}
+              value={
+                draft.baseRateTightness === ""
+                  ? null
+                  : Number.isNaN(Number(draft.baseRateTightness))
+                    ? null
+                    : Number(draft.baseRateTightness)
+              }
+              onValueChange={(value) =>
+                updateDraft("baseRateTightness", value === null ? "" : value.toString())
+              }
+            >
+              <NumberField.Group>
+                <NumberField.Input
+                  ref={baseRateRef}
+                  inputMode="decimal"
+                  onBlur={() => handleBlur("baseRateTightness")}
+                  aria-invalid={Boolean(errors.baseRateTightness)}
+                  aria-describedby={
+                    errors.baseRateTightness ? errorIds.baseRateTightness : undefined
+                  }
+                  className="weather-input min-h-[44px] w-full px-3 py-2 text-base"
+                />
+              </NumberField.Group>
+            </NumberField.Root>
+            <Field.Error
+              id={errorIds.baseRateTightness}
+              match={Boolean(errors.baseRateTightness)}
+              className="min-h-[18px] text-xs text-amber-200"
+            >
+              {errors.baseRateTightness ?? ""}
+            </Field.Error>
+          </Field.Root>
+          <Field.Root className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-400">
+            <Field.Label>Tightness score threshold</Field.Label>
+            <NumberField.Root
               id="threshold-tightness"
               name={THRESHOLD_PARAM_KEYS.tightness}
-              type="number"
               min={0}
               max={100}
               step={0.01}
-              inputMode="numeric"
-              value={draft.tightnessRegime}
-              onChange={(event) => updateDraft("tightnessRegime", event.target.value)}
-              onBlur={() => handleBlur("tightnessRegime")}
-              aria-invalid={Boolean(errors.tightnessRegime)}
-              aria-describedby={errors.tightnessRegime ? errorIds.tightnessRegime : undefined}
-              className="weather-input min-h-[44px] w-full px-3 py-2 text-base"
-            />
-            <span className="min-h-[18px] text-xs text-amber-200">
-              {errors.tightnessRegime ? (
-                <span id={errorIds.tightnessRegime}>{errors.tightnessRegime}</span>
-              ) : null}
-            </span>
-          </label>
-          <label
-            htmlFor="threshold-risk"
-            className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-400"
-          >
-            Risk appetite score
-            <input
-              ref={riskRef}
+              value={
+                draft.tightnessRegime === ""
+                  ? null
+                  : Number.isNaN(Number(draft.tightnessRegime))
+                    ? null
+                    : Number(draft.tightnessRegime)
+              }
+              onValueChange={(value) =>
+                updateDraft("tightnessRegime", value === null ? "" : value.toString())
+              }
+            >
+              <NumberField.Group>
+                <NumberField.Input
+                  ref={tightnessRef}
+                  inputMode="numeric"
+                  onBlur={() => handleBlur("tightnessRegime")}
+                  aria-invalid={Boolean(errors.tightnessRegime)}
+                  aria-describedby={
+                    errors.tightnessRegime ? errorIds.tightnessRegime : undefined
+                  }
+                  className="weather-input min-h-[44px] w-full px-3 py-2 text-base"
+                />
+              </NumberField.Group>
+            </NumberField.Root>
+            <Field.Error
+              id={errorIds.tightnessRegime}
+              match={Boolean(errors.tightnessRegime)}
+              className="min-h-[18px] text-xs text-amber-200"
+            >
+              {errors.tightnessRegime ?? ""}
+            </Field.Error>
+          </Field.Root>
+          <Field.Root className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-400">
+            <Field.Label>Risk appetite score</Field.Label>
+            <NumberField.Root
               id="threshold-risk"
               name={THRESHOLD_PARAM_KEYS.risk}
-              type="number"
               min={0}
               max={100}
               step={0.01}
-              inputMode="numeric"
-              value={draft.riskAppetiteRegime}
-              onChange={(event) => updateDraft("riskAppetiteRegime", event.target.value)}
-              onBlur={() => handleBlur("riskAppetiteRegime")}
-              aria-invalid={Boolean(errors.riskAppetiteRegime)}
-              aria-describedby={errors.riskAppetiteRegime ? errorIds.riskAppetiteRegime : undefined}
-              className="weather-input min-h-[44px] w-full px-3 py-2 text-base"
-            />
-            <span className="min-h-[18px] text-xs text-amber-200">
-              {errors.riskAppetiteRegime ? (
-                <span id={errorIds.riskAppetiteRegime}>{errors.riskAppetiteRegime}</span>
-              ) : null}
-            </span>
-          </label>
+              value={
+                draft.riskAppetiteRegime === ""
+                  ? null
+                  : Number.isNaN(Number(draft.riskAppetiteRegime))
+                    ? null
+                    : Number(draft.riskAppetiteRegime)
+              }
+              onValueChange={(value) =>
+                updateDraft("riskAppetiteRegime", value === null ? "" : value.toString())
+              }
+            >
+              <NumberField.Group>
+                <NumberField.Input
+                  ref={riskRef}
+                  inputMode="numeric"
+                  onBlur={() => handleBlur("riskAppetiteRegime")}
+                  aria-invalid={Boolean(errors.riskAppetiteRegime)}
+                  aria-describedby={
+                    errors.riskAppetiteRegime ? errorIds.riskAppetiteRegime : undefined
+                  }
+                  className="weather-input min-h-[44px] w-full px-3 py-2 text-base"
+                />
+              </NumberField.Group>
+            </NumberField.Root>
+            <Field.Error
+              id={errorIds.riskAppetiteRegime}
+              match={Boolean(errors.riskAppetiteRegime)}
+              className="min-h-[18px] text-xs text-amber-200"
+            >
+              {errors.riskAppetiteRegime ?? ""}
+            </Field.Error>
+          </Field.Root>
           <div className="flex items-end gap-3">
             <button
               type="submit"
