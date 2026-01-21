@@ -162,7 +162,9 @@ export default async function HomePage({
       sectionLinks={sectionLinks}
       structuredData={JSON.stringify(structuredData)}
       historicalBanner={
-        historicalSelection ? <HistoricalBanner banner={historicalSelection.banner} /> : null
+        historicalSelection ? (
+          <HistoricalBanner banner={historicalSelection.banner} liveHref="/" />
+        ) : null
       }
     >
       <ExecutiveSnapshotPanel
