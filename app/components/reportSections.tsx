@@ -6,6 +6,7 @@
 
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
+import { Accordion } from "@base-ui/react/accordion";
 import { Collapsible } from "@base-ui/react/collapsible";
 import { Tooltip } from "@base-ui/react/tooltip";
 import type { RegimeAssessment } from "../../lib/regimeEngine";
@@ -1057,135 +1058,140 @@ export const FirstTimeGuidePanel = ({
   </section>
 );
 
-export const BeginnerGlossaryPanel = () => (
-  <section id="beginner-glossary" aria-labelledby="beginner-glossary-title" className="mt-10">
-    <div className="weather-panel weather-panel-static p-6">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <p className="type-label text-slate-400">Plain-English glossary</p>
-          <h3 id="beginner-glossary-title" className="type-section text-slate-100">
-            Translate finance terms into day-to-day product decisions
-          </h3>
-          <p className="mt-2 type-data text-slate-300">
-            New to Treasury data? Use this glossary to translate jargon into concrete product moves
-            before you share the report.
-          </p>
+export const BeginnerGlossaryPanel = () => {
+  const glossaryEntries = [
+    {
+      value: "tightness",
+      term: "Cash availability (tightness)",
+      summary:
+        "How hard it is to access funding. Higher tightness means conserve cash and focus on runway.",
+      why: "Why it matters: tight capital makes long payback projects riskier.",
+      usedInLabel: "Executive snapshot",
+      usedInHref: "#executive-snapshot",
+    },
+    {
+      value: "risk-appetite",
+      term: "Market risk appetite",
+      summary:
+        "How willing the market is to take risk. Lower appetite means de-risk launches and hiring.",
+      why: "Why it matters: risk appetite sets how bold your roadmap can be.",
+      usedInLabel: "Signal matrix",
+      usedInHref: "#signal-matrix",
+    },
+    {
+      value: "curve-slope",
+      term: "Curve slope (recession risk)",
+      summary:
+        "A read on recession risk. Inversion signals caution and favors defensive planning.",
+      why: "Why it matters: an inverted curve warns against long-horizon bets.",
+      usedInLabel: "Executive snapshot",
+      usedInHref: "#executive-snapshot",
+    },
+    {
+      value: "fallback-mode",
+      term: "Fallback mode",
+      summary:
+        "When live data is unavailable, the report uses the latest cached Treasury snapshot.",
+      why: "Why it matters: stale inputs can mislead time-sensitive decisions.",
+      usedInLabel: "Executive snapshot",
+      usedInHref: "#executive-snapshot",
+    },
+  ];
+
+  return (
+    <section id="beginner-glossary" aria-labelledby="beginner-glossary-title" className="mt-10">
+      <div className="weather-panel weather-panel-static p-6">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="type-label text-slate-400">Plain-English glossary</p>
+            <h3 id="beginner-glossary-title" className="type-section text-slate-100">
+              Translate finance terms into day-to-day product decisions
+            </h3>
+            <p className="mt-2 type-data text-slate-300">
+              New to Treasury data? Use this glossary to translate jargon into concrete product moves
+              before you share the report.
+            </p>
+          </div>
+          <div className="weather-surface px-4 py-3 text-xs font-semibold tracking-[0.12em] text-slate-300">
+            <p className="text-xs text-slate-500">Onboarding lens</p>
+            <p className="mt-2 text-xs text-slate-200">Plain English over jargon</p>
+            <p className="mt-1 text-xs text-slate-400">Focus on constraints</p>
+          </div>
         </div>
-        <div className="weather-surface px-4 py-3 text-xs font-semibold tracking-[0.12em] text-slate-300">
-          <p className="text-xs text-slate-500">Onboarding lens</p>
-          <p className="mt-2 text-xs text-slate-200">Plain English over jargon</p>
-          <p className="mt-1 text-xs text-slate-400">Focus on constraints</p>
+        <div className="mt-6 grid gap-4 lg:grid-cols-[1.15fr,0.85fr]">
+          <div className="weather-surface p-4 text-sm text-slate-300">
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-200">
+              How to read the report
+            </p>
+            <ul className="mt-3 space-y-2 text-sm text-slate-400">
+              <li>
+                <span className="text-slate-200">Start with the climate badge</span> to understand the
+                macro stance before you interpret any single metric.
+              </li>
+              <li>
+                <span className="text-slate-200">Translate signals into constraints</span>, not
+                predictions. This report emphasizes operational guardrails.
+              </li>
+              <li>
+                <span className="text-slate-200">Share the exports</span> when aligning leadership to
+                reduce interpretation drift.
+              </li>
+            </ul>
+          </div>
+          <aside className="weather-surface p-4" aria-label="Glossary sidebar">
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Glossary</p>
+            <Accordion.Root
+              multiple
+              defaultValue={[glossaryEntries[0].value]}
+              className="mt-3 space-y-3 text-sm text-slate-300"
+            >
+              {glossaryEntries.map((entry) => (
+                <Accordion.Item
+                  key={entry.value}
+                  value={entry.value}
+                  className="rounded-xl border border-slate-800/80 bg-slate-950/40 px-3 py-2"
+                >
+                  <Accordion.Header>
+                    <Accordion.Trigger className="group flex w-full items-center justify-between gap-3 text-left">
+                      <span className="text-xs font-semibold tracking-[0.12em] text-slate-200">
+                        {entry.term}
+                      </span>
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-300 transition-transform group-data-[panel-open]:rotate-180">
+                        <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
+                          <path
+                            d="M7 10l5 5 5-5"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.6"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </span>
+                    </Accordion.Trigger>
+                  </Accordion.Header>
+                  <Accordion.Panel className="mt-3 space-y-2 text-sm text-slate-400">
+                    <p>{entry.summary}</p>
+                    <p className="text-xs text-slate-500">{entry.why}</p>
+                    <p className="text-xs text-slate-400">
+                      Used in:{" "}
+                      <a
+                        href={entry.usedInHref}
+                        className="touch-target inline-flex min-h-[44px] items-center text-xs text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
+                      >
+                        {entry.usedInLabel}
+                      </a>
+                    </p>
+                  </Accordion.Panel>
+                </Accordion.Item>
+              ))}
+            </Accordion.Root>
+          </aside>
         </div>
       </div>
-      <div className="mt-6 grid gap-4 lg:grid-cols-[1.15fr,0.85fr]">
-        <div className="weather-surface p-4 text-sm text-slate-300">
-          <p className="text-xs font-semibold tracking-[0.12em] text-slate-200">
-            How to read the report
-          </p>
-          <ul className="mt-3 space-y-2 text-sm text-slate-400">
-            <li>
-              <span className="text-slate-200">Start with the climate badge</span> to understand the
-              macro stance before you interpret any single metric.
-            </li>
-            <li>
-              <span className="text-slate-200">Translate signals into constraints</span>, not
-              predictions. This report emphasizes operational guardrails.
-            </li>
-            <li>
-              <span className="text-slate-200">Share the exports</span> when aligning leadership to
-              reduce interpretation drift.
-            </li>
-          </ul>
-        </div>
-        <aside className="weather-surface p-4" aria-label="Glossary sidebar">
-          <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Glossary</p>
-          <dl className="mt-3 space-y-3 text-sm text-slate-300">
-            <div>
-              <dt className="text-xs font-semibold tracking-[0.12em] text-slate-200">
-                Cash availability (tightness)
-              </dt>
-              <dd className="mt-1 text-slate-400">
-                How hard it is to access funding. Higher tightness means conserve cash and focus on
-                runway.
-              </dd>
-              <dd className="mt-2 text-xs text-slate-500">
-                Why it matters: tight capital makes long payback projects riskier.
-              </dd>
-              <dd className="mt-2 text-xs text-slate-400">
-                Used in:{" "}
-                <a
-                  href="#executive-snapshot"
-                  className="touch-target inline-flex min-h-[44px] items-center text-xs text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
-                >
-                  Executive snapshot
-                </a>
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs font-semibold tracking-[0.12em] text-slate-200">
-                Market risk appetite
-              </dt>
-              <dd className="mt-1 text-slate-400">
-                How willing the market is to take risk. Lower appetite means de-risk launches and
-                hiring.
-              </dd>
-              <dd className="mt-2 text-xs text-slate-500">
-                Why it matters: risk appetite sets how bold your roadmap can be.
-              </dd>
-              <dd className="mt-2 text-xs text-slate-400">
-                Used in:{" "}
-                <a
-                  href="#signal-matrix"
-                  className="touch-target inline-flex min-h-[44px] items-center text-xs text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
-                >
-                  Signal matrix
-                </a>
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs font-semibold tracking-[0.12em] text-slate-200">
-                Curve slope (recession risk)
-              </dt>
-              <dd className="mt-1 text-slate-400">
-                A read on recession risk. Inversion signals caution and favors defensive planning.
-              </dd>
-              <dd className="mt-2 text-xs text-slate-500">
-                Why it matters: an inverted curve warns against long-horizon bets.
-              </dd>
-              <dd className="mt-2 text-xs text-slate-400">
-                Used in:{" "}
-                <a
-                  href="#executive-snapshot"
-                  className="touch-target inline-flex min-h-[44px] items-center text-xs text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
-                >
-                  Executive snapshot
-                </a>
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs font-semibold tracking-[0.12em] text-slate-200">Fallback mode</dt>
-              <dd className="mt-1 text-slate-400">
-                When live data is unavailable, the report uses the latest cached Treasury snapshot.
-              </dd>
-              <dd className="mt-2 text-xs text-slate-500">
-                Why it matters: stale inputs can mislead time-sensitive decisions.
-              </dd>
-              <dd className="mt-2 text-xs text-slate-400">
-                Used in:{" "}
-                <a
-                  href="#executive-snapshot"
-                  className="touch-target inline-flex min-h-[44px] items-center text-xs text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
-                >
-                  Executive snapshot
-                </a>
-              </dd>
-            </div>
-          </dl>
-        </aside>
-      </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 export const OperatorRequestsPanel = ({ provenance }: { provenance: DataProvenance }) => (
   <section
@@ -1642,12 +1648,28 @@ export const ExecutiveSnapshotPanel = ({
                   </span>
                   <span className="text-sm text-slate-200">{regimeLabel}</span>
                 </div>
-                <div
-                  className={`inline-flex min-h-[44px] items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] ${confidenceTone}`}
-                >
-                  <span className="h-2 w-2 rounded-full bg-current" aria-hidden="true" />
-                  {confidenceLabel} confidence
-                </div>
+                <Tooltip.Root>
+                  <Tooltip.Trigger
+                    type="button"
+                    className={`inline-flex min-h-[44px] items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] ${confidenceTone}`}
+                    aria-label={`${confidenceLabel} confidence`}
+                  >
+                    <span className="h-2 w-2 rounded-full bg-current" aria-hidden="true" />
+                    {confidenceLabel} confidence
+                  </Tooltip.Trigger>
+                  <Tooltip.Portal>
+                    <Tooltip.Positioner side="bottom" sideOffset={8} className="z-30">
+                      <Tooltip.Popup className="weather-panel w-72 space-y-2 border border-slate-800/80 bg-slate-950/95 px-3 py-3 text-left text-xs text-slate-200 shadow-lg">
+                        <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                          Signal confidence
+                        </p>
+                        <p className="text-sm text-slate-200">{confidenceDetail}</p>
+                        <p className="text-xs text-slate-400">{freshnessAction}</p>
+                        <Tooltip.Arrow className="h-2.5 w-2.5 rotate-45 border border-slate-800/80 bg-slate-950/95" />
+                      </Tooltip.Popup>
+                    </Tooltip.Positioner>
+                  </Tooltip.Portal>
+                </Tooltip.Root>
               </div>
               <p className="mt-3 text-lg font-semibold text-slate-100">
                 The current macro posture requires clear ROI gates before approving new spend.
