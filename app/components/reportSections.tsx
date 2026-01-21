@@ -5,7 +5,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import type { PlaybookEntry } from "../../lib/playbook";
 import type {
@@ -21,6 +21,7 @@ import {
   getSensorWindowAggregation,
   groupSensorsByCategory,
   sensorCategories,
+  sensorGroups,
   sensorTimeWindows,
 } from "../../lib/sensors";
 import { cxoFunctionOutputs } from "../../lib/cxoFunctionOutputs";
@@ -2233,6 +2234,23 @@ export const SensorArray = ({
   const [selectedCategories, setSelectedCategories] = useState<SensorCategory[]>(sensorCategories);
   const [selectedWindow, setSelectedWindow] = useState<SensorTimeWindow>("3M");
 
+  const availableWindows = useMemo(() => {
+    const windowSet = new Set<SensorTimeWindow>();
+    sensors.forEach((sensor) => {
+      sensor.availableTimeWindows?.forEach((window) => windowSet.add(window));
+    });
+    if (windowSet.size === 0) {
+      return sensorTimeWindows;
+    }
+    return sensorTimeWindows.filter((window) => windowSet.has(window.id));
+  }, [sensors]);
+
+  useEffect(() => {
+    if (!availableWindows.find((window) => window.id === selectedWindow)) {
+      setSelectedWindow(availableWindows[0]?.id ?? "3M");
+    }
+  }, [availableWindows, selectedWindow]);
+
   const filteredSensors = useMemo(
     () => filterSensorsByCategory(sensors, selectedCategories),
     [sensors, selectedCategories]
@@ -2242,7 +2260,7 @@ export const SensorArray = ({
     [filteredSensors, selectedCategories]
   );
   const activeWindow =
-    sensorTimeWindows.find((window) => window.id === selectedWindow) ?? sensorTimeWindows[0];
+    availableWindows.find((window) => window.id === selectedWindow) ?? availableWindows[0];
   const mostChanged = useMemo(() => {
     const candidates = filteredSensors.flatMap((sensor) => {
       const aggregation = getSensorWindowAggregation(sensor, selectedWindow);
@@ -2275,36 +2293,60 @@ export const SensorArray = ({
         </h3>
         <DataProvenanceStrip provenance={provenance} />
       </div>
-      <div className="mt-4 grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">
-        <div className="weather-panel p-5">
-          <p className="type-label text-slate-400">Signal summary</p>
-          <h4 className="mt-2 text-lg font-semibold text-slate-100">Top signal delta</h4>
+      <div className="mt-4 grid gap-4 lg:grid-cols-[1.2fr,0.8fr]">
+        <div className="weather-panel p-6">
+          <p className="type-label text-slate-400">Primary market pulse</p>
+          <h4 className="mt-2 text-lg font-semibold text-slate-100">Signal spotlight</h4>
+          <p className="mt-2 text-sm text-slate-300">
+            Tracking {filteredSensors.length} signal
+            {filteredSensors.length === 1 ? "" : "s"} across{" "}
+            {selectedCategories.length} active group
+            {selectedCategories.length === 1 ? "" : "s"}.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-400">
+            <span className="weather-pill px-3 py-1">{activeWindow.label} window</span>
+            <span className="weather-pill px-3 py-1">
+              {availableWindows.length} time horizon
+              {availableWindows.length === 1 ? "" : "s"}
+            </span>
+            <span className="weather-pill px-3 py-1">
+              {selectedCategories.length === 0 ? "No groups selected" : "Filters applied"}
+            </span>
+          </div>
           {mostChanged ? (
-            <div className="mt-3 space-y-2">
-              <p className="text-sm text-slate-300">{mostChanged.sensor.label}</p>
-              <p className="mono text-2xl text-slate-100">
-                {formatDelta(
-                  mostChanged.change ?? null,
-                  mostChanged.sensor.unit
-                )}
-              </p>
-              <p className="text-xs text-slate-500">
-                {activeWindow.label} change · Current{" "}
-                <span className="text-slate-300">
-                  {formatNumber(mostChanged.sensor.value, mostChanged.sensor.unit)}
-                </span>{" "}
-                · Prior{" "}
-                <span className="text-slate-300">
-                  {formatNumber(
-                    mostChanged.aggregation?.previousValue ?? null,
-                    mostChanged.sensor.unit
-                  )}
-                </span>
-              </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-[1.1fr,0.9fr]">
+              <div>
+                <p className="text-sm text-slate-300">{mostChanged.sensor.label}</p>
+                <p className="mono mt-2 text-3xl text-slate-100">
+                  {formatDelta(mostChanged.change ?? null, mostChanged.sensor.unit)}
+                </p>
+                <p className="mt-2 text-xs text-slate-500">
+                  {activeWindow.label} change · Current{" "}
+                  <span className="text-slate-300">
+                    {formatNumber(mostChanged.sensor.value, mostChanged.sensor.unit)}
+                  </span>{" "}
+                  · Prior{" "}
+                  <span className="text-slate-300">
+                    {formatNumber(
+                      mostChanged.aggregation?.previousValue ?? null,
+                      mostChanged.sensor.unit
+                    )}
+                  </span>
+                </p>
+              </div>
+              <div className="rounded-2xl border border-slate-800/70 bg-slate-950/70 p-4 text-xs text-slate-400">
+                <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                  Leading group
+                </p>
+                <p className="mt-2 text-sm text-slate-200">
+                  {mostChanged.sensor.group.label}
+                </p>
+                <p className="mt-2 text-slate-500">{mostChanged.sensor.group.description}</p>
+              </div>
             </div>
           ) : (
-            <p className="mt-3 text-sm text-slate-500">
-              Select sensor groups to highlight the biggest movement.
+            <p className="mt-4 text-sm text-slate-500">
+              Select signal groups to highlight the biggest movement.
             </p>
           )}
         </div>
@@ -2315,11 +2357,13 @@ export const SensorArray = ({
               <legend className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
                 Time window
               </legend>
-              <div className="flex flex-wrap gap-2">
-                {sensorTimeWindows.map((window) => (
+              <div role="radiogroup" className="flex flex-wrap gap-2">
+                {availableWindows.map((window) => (
                   <button
                     key={window.id}
                     type="button"
+                    role="radio"
+                    aria-checked={window.id === selectedWindow}
                     onClick={() => setSelectedWindow(window.id)}
                     className={`min-h-[40px] rounded-full border px-3 text-xs font-semibold tracking-[0.12em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${
                       window.id === selectedWindow
@@ -2331,27 +2375,29 @@ export const SensorArray = ({
                   </button>
                 ))}
               </div>
-              <p className="text-xs text-slate-500">{activeWindow.description}</p>
+              {activeWindow ? (
+                <p className="text-xs text-slate-500">{activeWindow.description}</p>
+              ) : null}
             </fieldset>
             <fieldset className="space-y-2">
               <legend className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-                Sensor groups
+                Signal groups
               </legend>
               <div className="grid gap-2 sm:grid-cols-2">
-                {sensorCategories.map((category) => {
-                  const isActive = selectedCategories.includes(category);
+                {sensorGroups.map((group) => {
+                  const isActive = selectedCategories.includes(group.id);
                   return (
                     <label
-                      key={category}
-                      className="flex items-center gap-2 rounded-xl border border-slate-800/70 bg-slate-950/70 px-3 py-2 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-slate-400 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-sky-300"
+                      key={group.id}
+                      className="flex items-center gap-2 rounded-xl border border-slate-800/70 bg-slate-950/70 px-3 py-2 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-slate-400 transition-colors hover:border-slate-700/80 hover:text-slate-200 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-sky-300"
                     >
                       <input
                         type="checkbox"
                         checked={isActive}
-                        onChange={() => handleToggleCategory(category)}
-                        className="h-4 w-4 accent-sky-400"
+                        onChange={() => handleToggleCategory(group.id)}
+                        className="h-4 w-4 rounded border-slate-700 bg-slate-950 text-sky-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
                       />
-                      <span>{category}</span>
+                      <span>{group.label}</span>
                     </label>
                   );
                 })}
@@ -2390,16 +2436,8 @@ export const SensorArray = ({
             <div key={group.category} className="weather-panel p-5">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p className="type-label text-slate-400">{group.category}</p>
-                  <p className="text-xs text-slate-500">
-                    {group.category === "Rates"
-                      ? "Policy stance and curve health."
-                      : group.category === "Inflation"
-                        ? "Price stability and demand pressure."
-                        : group.category === "Labor"
-                          ? "Employment resilience and wage momentum."
-                          : "Funding spreads and liquidity stress."}
-                  </p>
+                  <p className="type-label text-slate-400">{group.label}</p>
+                  <p className="text-xs text-slate-500">{group.description}</p>
                 </div>
                 <span className="weather-pill px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-400">
                   {group.sensors.length} sensor{group.sensors.length === 1 ? "" : "s"}
@@ -2410,7 +2448,7 @@ export const SensorArray = ({
                   No sensors in this category yet.
                 </p>
               ) : (
-                <div className="mt-4 grid gap-4 md:grid-cols-2">
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
                   {group.sensors.map((sensor) => {
                     const hasTrend = Boolean(sensor.trend?.length);
                     const sparkline = buildSparkline(hasTrend ? sensor.trend : sensor.history);

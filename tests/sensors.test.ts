@@ -26,5 +26,7 @@ describe("sensor readings", () => {
     assert.equal(readings[1].value, -0.2);
     assert.equal(readings[0].category, "Rates");
     assert.equal(Array.isArray(readings[0].timeWindows), true);
+    assert.equal(readings[0].group.label, "Rates");
+    assert.equal(readings[0].availableTimeWindows.length > 0, true);
   });
 });
