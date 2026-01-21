@@ -55,6 +55,53 @@ const buildSnapshotText = (entry: DecisionMemoryEntry) => {
     .join("\n");
 };
 
+const buildSnapshotLink = (entry: DecisionMemoryEntry) => {
+  if (typeof window === "undefined") {
+    return "";
+  }
+  const params = new URLSearchParams(window.location.search);
+  params.set("decisionSnapshot", JSON.stringify(entry));
+  params.set("decisionId", entry.id);
+  const query = params.toString();
+  return `${window.location.origin}${window.location.pathname}${query ? `?${query}` : ""}`;
+};
+
+type DecisionTemplateTarget = "jira" | "linear" | "confluence";
+
+const buildDecisionTemplate = (entry: DecisionMemoryEntry, target: DecisionTemplateTarget) => {
+  const snapshotLink = buildSnapshotLink(entry);
+  const isConfluence = target === "confluence";
+  const headingPrefix = isConfluence ? "h3. " : "### ";
+  const listPrefix = isConfluence ? "* " : "- ";
+  const formatLink = (label: string, href: string) =>
+    isConfluence ? `[${label}|${href}]` : `[${label}](${href})`;
+  const formatSection = (title: string, lines: string[]) => {
+    const body = lines.map((line) => `${listPrefix}${line}`).join("\n");
+    return `${headingPrefix}${title}\n${body}`;
+  };
+
+  const contextLines = [
+    `Regime: ${entry.regime}`,
+    `Record date: ${entry.recordDate}`,
+    snapshotLink ? `Snapshot: ${formatLink("Decision snapshot", snapshotLink)}` : null,
+  ].filter(Boolean) as string[];
+
+  const decisionLines = [
+    `Decision: ${entry.title}`,
+    entry.note ? `Notes: ${entry.note}` : null,
+  ].filter(Boolean) as string[];
+
+  const constraintsLines = entry.constraints.length > 0 ? entry.constraints : ["None noted"];
+  const confidenceLines = [`Confidence: ${entry.confidence}`];
+
+  return [
+    formatSection("Context", contextLines),
+    formatSection("Decision", decisionLines),
+    formatSection("Constraints", constraintsLines),
+    formatSection("Confidence", confidenceLines),
+  ].join("\n\n");
+};
+
 const escapeCsvValue = (value: string) => {
   const normalized = value.replace(/"/g, "\"\"");
   if (/[",\n]/.test(normalized)) {
@@ -115,6 +162,9 @@ const DecisionMemoryEntryCard = ({
   focusHref,
 }: DecisionMemoryEntryCardProps) => {
   const snapshotText = buildSnapshotText(entry);
+  const jiraTarget = `jira-${entry.id}`;
+  const confluenceTarget = `confluence-${entry.id}`;
+  const linearTarget = `linear-${entry.id}`;
   const textTarget = `text-${entry.id}`;
   const linkTarget = `link-${entry.id}`;
 
@@ -133,6 +183,33 @@ const DecisionMemoryEntryCard = ({
       </p>
       {entry.note ? <p className="mt-3 text-sm text-slate-300">{entry.note}</p> : null}
       <div className="mt-4 flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={() => onCopy(buildDecisionTemplate(entry, "jira"), jiraTarget)}
+          disabled={isCopying}
+          aria-busy={isCopying && copyTarget === jiraTarget}
+          className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
+        >
+          {isCopying && copyTarget === jiraTarget ? "Copying" : "Copy Jira decision"}
+        </button>
+        <button
+          type="button"
+          onClick={() => onCopy(buildDecisionTemplate(entry, "confluence"), confluenceTarget)}
+          disabled={isCopying}
+          aria-busy={isCopying && copyTarget === confluenceTarget}
+          className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
+        >
+          {isCopying && copyTarget === confluenceTarget ? "Copying" : "Copy Confluence decision"}
+        </button>
+        <button
+          type="button"
+          onClick={() => onCopy(buildDecisionTemplate(entry, "linear"), linearTarget)}
+          disabled={isCopying}
+          aria-busy={isCopying && copyTarget === linearTarget}
+          className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
+        >
+          {isCopying && copyTarget === linearTarget ? "Copying" : "Copy Linear decision"}
+        </button>
         <button
           type="button"
           onClick={() => onCopy(snapshotText, textTarget)}
@@ -164,6 +241,10 @@ const DecisionMemoryEntryCard = ({
           Focus entry
         </a>
       </div>
+      <p className="mt-3 text-xs text-slate-500">
+        Paste Jira/Linear templates into issue descriptions, and Confluence templates into decision
+        log pages.
+      </p>
     </div>
   );
 };
@@ -339,10 +420,7 @@ export const DecisionMemoryPanel = ({
   };
 
   const handleCopySnapshotLink = (entry: DecisionMemoryEntry) => {
-    const nextParams = new URLSearchParams(searchParams.toString());
-    nextParams.set("decisionSnapshot", JSON.stringify(entry));
-    nextParams.set("decisionId", entry.id);
-    const link = `${window.location.origin}${pathname}?${nextParams.toString()}`;
+    const link = buildSnapshotLink(entry);
     handleCopy(link, `link-${entry.id}`);
   };
 
