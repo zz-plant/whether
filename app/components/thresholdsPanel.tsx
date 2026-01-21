@@ -203,10 +203,7 @@ export const ThresholdsPanel = ({
 
   const handleBlur = (key: keyof ThresholdDraft) => {
     const nextErrors = validateDraft(draft);
-    setErrors(nextErrors);
-    if (nextErrors[key]) {
-      focusFirstInvalid(nextErrors);
-    }
+    setErrors((prev) => ({ ...prev, [key]: nextErrors[key] }));
   };
 
   return (
