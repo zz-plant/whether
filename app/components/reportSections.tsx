@@ -17,6 +17,7 @@ import { buildMonthlySummary, getMonthlyActionGuidance } from "../../lib/monthly
 import { buildWeeklySummary, getWeeklyActionGuidance } from "../../lib/weeklySummary";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
 import { MonthlySummaryCard } from "./monthlySummaryCard";
+import { SummaryDeltaPanel } from "./summaryDeltaPanel";
 import { WeeklySummaryCard } from "./weeklySummaryCard";
 import { insightDatabase } from "../../data/recommendations";
 
@@ -508,6 +509,11 @@ export const MonthlyActionSummaryPanel = ({
 }) => {
   const regimeLabel = getRegimeLabel(assessment.regime);
   const actionGuidance = getMonthlyActionGuidance(assessment.regime);
+  const weeklySummary = buildWeeklySummary({
+    assessment,
+    provenance,
+    recordDateLabel,
+  });
   const monthlySummary = buildMonthlySummary({
     assessment,
     provenance,
@@ -541,7 +547,12 @@ export const MonthlyActionSummaryPanel = ({
           align staffing, sequencing, and approval cadence before you lock the next sprint slate.
         </>
       }
-      summaryCard={<MonthlySummaryCard summary={monthlySummary} />}
+      summaryCard={
+        <>
+          <MonthlySummaryCard summary={monthlySummary} />
+          <SummaryDeltaPanel weeklySummary={weeklySummary} monthlySummary={monthlySummary} />
+        </>
+      }
       blocks={monthlyBlocks}
     />
   );
@@ -2172,7 +2183,8 @@ export const SensorArray = ({
       </div>
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         {sensors.map((sensor) => {
-          const sparkline = buildSparkline(sensor.history);
+          const hasTrend = Boolean(sensor.trend?.length);
+          const sparkline = buildSparkline(sensor.trend ?? sensor.history);
           const sparklineId = `sensor-spark-${sensor.id}`;
 
           return (
@@ -2222,8 +2234,13 @@ export const SensorArray = ({
                     aria-hidden="true"
                   />
                 )}
-                <figcaption className="mt-3 text-xs text-slate-400 break-words">
-                  {sensor.explanation}
+                <figcaption className="mt-3 space-y-2 text-xs text-slate-400">
+                  {hasTrend ? (
+                    <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                      12-month trend (cache)
+                    </p>
+                  ) : null}
+                  <p className="break-words">{sensor.explanation}</p>
                 </figcaption>
               </figure>
               <div className="mt-4 text-xs text-slate-500">

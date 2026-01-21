@@ -40,6 +40,7 @@ export interface SensorReading {
   fetched_at: string;
   isLive: boolean;
   history?: SeriesHistoryPoint[];
+  trend?: SeriesHistoryPoint[];
 }
 
 export type MacroSeriesId = "CPI_YOY" | "UNEMPLOYMENT_RATE" | "BBB_CREDIT_SPREAD";

@@ -3,8 +3,9 @@
  * Keeps historical lookups local to avoid third-party calls in replay mode.
  */
 import { z } from "zod";
-import type { TreasuryData } from "./types";
+import type { SeriesHistoryPoint, TreasuryData } from "./types";
 import { TreasuryDataSchema } from "./treasurySchema";
+import { evaluateRegime } from "./regimeEngine";
 import rawCache from "../data/time_machine_cache.json";
 
 const TimeMachineSnapshotSchema = TreasuryDataSchema.extend({
@@ -71,6 +72,28 @@ export const getLatestTimeMachineSnapshot = () => {
   return sortedSnapshots.at(-1) ?? null;
 };
 
+export type TimeMachineRegimeEntry = {
+  year: number;
+  month: number;
+  recordDate: string;
+  regime: ReturnType<typeof evaluateRegime>["regime"];
+  summary: string;
+};
+
+export const getTimeMachineRegimeSeries = (months = 24): TimeMachineRegimeEntry[] => {
+  const sliceStart = Math.max(sortedSnapshots.length - months, 0);
+  return sortedSnapshots.slice(sliceStart).map((snapshot) => {
+    const assessment = evaluateRegime(snapshot);
+    return {
+      year: snapshot.year,
+      month: snapshot.month,
+      recordDate: snapshot.record_date,
+      regime: assessment.regime,
+      summary: assessment.description,
+    };
+  });
+};
+
 export const getPreviousTimeMachineSnapshot = (asOf: string): TreasuryData | null => {
   const target = new Date(asOf);
   if (Number.isNaN(target.valueOf())) {
@@ -107,4 +130,27 @@ export const findTimeMachineSnapshot = (asOf: string): TreasuryData | null => {
 
   const { year: _year, month: _month, ...data } = candidate;
   return data;
+};
+
+export const getTimeMachineRollingYieldSeries = (): {
+  oneMonth: SeriesHistoryPoint[];
+  twoYear: SeriesHistoryPoint[];
+  tenYear: SeriesHistoryPoint[];
+} => {
+  const rollingSnapshots = sortedSnapshots.slice(-12);
+
+  return {
+    oneMonth: rollingSnapshots.map((snapshot) => ({
+      date: snapshot.record_date,
+      value: snapshot.yields.oneMonth ?? null,
+    })),
+    twoYear: rollingSnapshots.map((snapshot) => ({
+      date: snapshot.record_date,
+      value: snapshot.yields.twoYear ?? null,
+    })),
+    tenYear: rollingSnapshots.map((snapshot) => ({
+      date: snapshot.record_date,
+      value: snapshot.yields.tenYear ?? null,
+    })),
+  };
 };

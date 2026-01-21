@@ -12,6 +12,7 @@ import {
   getTimeMachineCoverage,
   getTimeMachineMonthsByYear,
   getPreviousTimeMachineSnapshot,
+  getTimeMachineRegimeSeries,
 } from "./timeMachineCache";
 import { getSummaryArchive } from "./summaryArchive";
 import {
@@ -126,6 +127,7 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
   const cacheCoverage = getTimeMachineCoverage();
   const cacheMonthsByYear = getTimeMachineMonthsByYear();
   const summaryArchive = getSummaryArchive();
+  const regimeSeries = getTimeMachineRegimeSeries();
   const invalidHistoricalSelection = Boolean(requestedSelection && !historicalSelection);
   const selectedMonth = requestedSelection?.month ?? defaultMonth;
   const selectedYear = requestedSelection?.year ?? defaultYear;
@@ -230,6 +232,7 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
     playbook,
     recordDateLabel,
     requestedSelection,
+    regimeSeries,
     regimeAlert,
     selectedMonth,
     selectedYear,
