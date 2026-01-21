@@ -4,7 +4,9 @@
  */
 import { readFile, writeFile } from "node:fs/promises";
 import type { MonthlySummary } from "../lib/monthlySummary";
+import type { QuarterlySummary } from "../lib/quarterlySummary";
 import type { WeeklySummary } from "../lib/weeklySummary";
+import type { YearlySummary } from "../lib/yearlySummary";
 
 const ARCHIVE_PATH = "data/summary_archive.json";
 
@@ -24,6 +26,21 @@ type MonthlySummaryArchiveEntry = {
   summary: MonthlySummary;
 };
 
+type QuarterlySummaryArchiveEntry = {
+  year: number;
+  quarter: number;
+  asOf: string;
+  record_date: string;
+  summary: QuarterlySummary;
+};
+
+type YearlySummaryArchiveEntry = {
+  year: number;
+  asOf: string;
+  record_date: string;
+  summary: YearlySummary;
+};
+
 type SummaryArchiveEntry =
   | {
       cadence: "weekly";
@@ -40,6 +57,21 @@ type SummaryArchiveEntry =
       asOf: string;
       record_date: string;
       summary: MonthlySummary;
+    }
+  | {
+      cadence: "quarterly";
+      year: number;
+      quarter: number;
+      asOf: string;
+      record_date: string;
+      summary: QuarterlySummary;
+    }
+  | {
+      cadence: "yearly";
+      year: number;
+      asOf: string;
+      record_date: string;
+      summary: YearlySummary;
     };
 
 const readExistingArchive = async () => {
@@ -65,9 +97,13 @@ const sortArchive = (entries: SummaryArchiveEntry[]) => {
 export const writeSummaryArchive = async ({
   weeklyEntries,
   monthlyEntries,
+  quarterlyEntries,
+  yearlyEntries,
 }: {
   weeklyEntries?: WeeklySummaryArchiveEntry[];
   monthlyEntries?: MonthlySummaryArchiveEntry[];
+  quarterlyEntries?: QuarterlySummaryArchiveEntry[];
+  yearlyEntries?: YearlySummaryArchiveEntry[];
 }) => {
   const existing = await readExistingArchive();
   const nextEntries = existing.filter((entry) => {
@@ -75,6 +111,12 @@ export const writeSummaryArchive = async ({
       return false;
     }
     if (monthlyEntries && entry.cadence === "monthly") {
+      return false;
+    }
+    if (quarterlyEntries && entry.cadence === "quarterly") {
+      return false;
+    }
+    if (yearlyEntries && entry.cadence === "yearly") {
       return false;
     }
     return true;
@@ -99,6 +141,31 @@ export const writeSummaryArchive = async ({
         cadence: "monthly" as const,
         year: entry.year,
         month: entry.month,
+        asOf: entry.asOf,
+        record_date: entry.record_date,
+        summary: entry.summary,
+      }))
+    );
+  }
+
+  if (quarterlyEntries) {
+    nextEntries.push(
+      ...quarterlyEntries.map((entry) => ({
+        cadence: "quarterly" as const,
+        year: entry.year,
+        quarter: entry.quarter,
+        asOf: entry.asOf,
+        record_date: entry.record_date,
+        summary: entry.summary,
+      }))
+    );
+  }
+
+  if (yearlyEntries) {
+    nextEntries.push(
+      ...yearlyEntries.map((entry) => ({
+        cadence: "yearly" as const,
+        year: entry.year,
         asOf: entry.asOf,
         record_date: entry.record_date,
         summary: entry.summary,

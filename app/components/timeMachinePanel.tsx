@@ -11,7 +11,9 @@ import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip"
 import type { RegimeKey } from "../../lib/regimeEngine";
 import type { SummaryArchiveEntry } from "../../lib/summaryArchive";
 import { MonthlySummaryCard } from "./monthlySummaryCard";
+import { QuarterlySummaryCard } from "./quarterlySummaryCard";
 import { WeeklySummaryCard } from "./weeklySummaryCard";
+import { YearlySummaryCard } from "./yearlySummaryCard";
 
 const monthOptions = [
   { value: 1, label: "January" },
@@ -193,9 +195,9 @@ export const TimeMachinePanel = ({
       .join("\n");
   };
 
-  const [timelineCadence, setTimelineCadence] = useState<"weekly" | "monthly">(
-    "monthly"
-  );
+  const [timelineCadence, setTimelineCadence] = useState<
+    "weekly" | "monthly" | "quarterly" | "yearly"
+  >("monthly");
   const cadenceEntries = useMemo(
     () => summaryArchive.filter((entry) => entry.cadence === timelineCadence),
     [summaryArchive, timelineCadence]
@@ -544,7 +546,7 @@ export const TimeMachinePanel = ({
                     Cadence
                   </p>
                   <div className="mt-2 flex flex-wrap gap-2">
-                    {(["weekly", "monthly"] as const).map((cadence) => (
+                    {(["weekly", "monthly", "quarterly", "yearly"] as const).map((cadence) => (
                       <button
                         key={cadence}
                         type="button"
@@ -602,10 +604,20 @@ export const TimeMachinePanel = ({
                 </div>
               ) : null}
               {filteredEntries.map((entry) => {
-                const label =
-                  entry.cadence === "weekly"
-                    ? `Week ${entry.week}, ${entry.year}`
-                    : `${monthOptions.find((option) => option.value === entry.month)?.label ?? "Month"} ${entry.year}`;
+                const label = (() => {
+                  switch (entry.cadence) {
+                    case "weekly":
+                      return `Week ${entry.week}, ${entry.year}`;
+                    case "monthly":
+                      return `${monthOptions.find((option) => option.value === entry.month)?.label ?? "Month"} ${entry.year}`;
+                    case "quarterly":
+                      return `Q${entry.quarter} ${entry.year}`;
+                    case "yearly":
+                      return `${entry.year}`;
+                    default:
+                      return `${entry.year}`;
+                  }
+                })();
                 const tooltip = buildProvenanceTooltip(entry.summary.provenance);
                 return (
                   <div key={`${entry.cadence}-${entry.asOf}`} className="weather-surface p-4">
@@ -627,8 +639,12 @@ export const TimeMachinePanel = ({
                     </div>
                     {entry.cadence === "weekly" ? (
                       <WeeklySummaryCard summary={entry.summary} />
-                    ) : (
+                    ) : entry.cadence === "monthly" ? (
                       <MonthlySummaryCard summary={entry.summary} />
+                    ) : entry.cadence === "quarterly" ? (
+                      <QuarterlySummaryCard summary={entry.summary} />
+                    ) : (
+                      <YearlySummaryCard summary={entry.summary} />
                     )}
                   </div>
                 );

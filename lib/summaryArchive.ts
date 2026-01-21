@@ -4,7 +4,9 @@
  */
 import { z } from "zod";
 import type { MonthlySummary } from "./monthlySummary";
+import type { QuarterlySummary } from "./quarterlySummary";
 import type { WeeklySummary } from "./weeklySummary";
+import type { YearlySummary } from "./yearlySummary";
 import rawArchive from "../data/summary_archive.json";
 
 export type SummaryArchiveEntry =
@@ -23,6 +25,21 @@ export type SummaryArchiveEntry =
       asOf: string;
       record_date: string;
       summary: MonthlySummary;
+    }
+  | {
+      cadence: "quarterly";
+      year: number;
+      quarter: number;
+      asOf: string;
+      record_date: string;
+      summary: QuarterlySummary;
+    }
+  | {
+      cadence: "yearly";
+      year: number;
+      asOf: string;
+      record_date: string;
+      summary: YearlySummary;
     };
 
 const SummaryInputSchema = z.object({}).passthrough();
@@ -66,7 +83,26 @@ const MonthlyArchiveSchema = z.object({
   summary: SummarySchema,
 });
 
-const SummaryArchiveSchema = z.array(z.union([WeeklyArchiveSchema, MonthlyArchiveSchema]));
+const QuarterlyArchiveSchema = z.object({
+  cadence: z.literal("quarterly"),
+  year: z.number(),
+  quarter: z.number(),
+  asOf: z.string(),
+  record_date: z.string(),
+  summary: SummarySchema,
+});
+
+const YearlyArchiveSchema = z.object({
+  cadence: z.literal("yearly"),
+  year: z.number(),
+  asOf: z.string(),
+  record_date: z.string(),
+  summary: SummarySchema,
+});
+
+const SummaryArchiveSchema = z.array(
+  z.union([WeeklyArchiveSchema, MonthlyArchiveSchema, QuarterlyArchiveSchema, YearlyArchiveSchema])
+);
 
 const parsedArchive = SummaryArchiveSchema.safeParse(rawArchive);
 
