@@ -8,9 +8,9 @@ import { evaluateRegime } from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
 import { resolveHistoricalDate } from "../lib/timeMachine";
 
-const START_YEAR = 2020;
+const START_YEAR = 2012;
 const END_YEAR = 2025;
-const OUTPUT_PATH = "data/monthly_summaries_2020_2025.json";
+const OUTPUT_PATH = "data/monthly_summaries_2012_2025.json";
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   dateStyle: "medium",
