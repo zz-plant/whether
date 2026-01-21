@@ -27,12 +27,23 @@ export interface SeriesHistoryPoint {
   value: number | null;
 }
 
+export type SensorCategory = "Rates" | "Inflation" | "Labor" | "Credit";
+
+export type SensorTimeWindow = "1M" | "3M" | "6M" | "12M";
+
+export interface SensorWindowAggregation {
+  window: SensorTimeWindow;
+  change: number | null;
+  previousValue: number | null;
+}
+
 export interface SensorReading {
   id: "BASE_RATE" | "CURVE_SLOPE";
   label: string;
   value: number | null;
   unit: "%" | "bps";
   explanation: string;
+  category: SensorCategory;
   sourceLabel: string;
   sourceUrl: string;
   formulaUrl: string;
@@ -41,6 +52,7 @@ export interface SensorReading {
   isLive: boolean;
   history?: SeriesHistoryPoint[];
   trend?: SeriesHistoryPoint[];
+  timeWindows?: SensorWindowAggregation[];
 }
 
 export type MacroSeriesId = "CPI_YOY" | "UNEMPLOYMENT_RATE" | "BBB_CREDIT_SPREAD";
