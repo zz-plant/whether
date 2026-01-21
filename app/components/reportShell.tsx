@@ -414,6 +414,49 @@ export const ReportShell = ({
               </nav>
             </section>
           </div>
+          {sectionLinks.length > 0 ? (
+            <div className="space-y-3">
+              <nav aria-label="Report breadcrumb" className="text-xs text-slate-400">
+                <ol className="flex flex-wrap items-center gap-2">
+                  <li>
+                    <a
+                      href="/"
+                      className="touch-target inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-slate-300 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
+                    >
+                      Whether Report
+                    </a>
+                  </li>
+                  <li className="text-slate-600">/</li>
+                  <li className="text-xs font-semibold tracking-[0.12em] text-slate-200">
+                    {pageTitle}
+                  </li>
+                </ol>
+              </nav>
+              <nav aria-label="Section progress">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-xs font-semibold text-slate-300">Section progress</p>
+                  <span className="text-xs text-slate-500">
+                    {sectionLinks.length} sections
+                  </span>
+                </div>
+                <ol className="mt-3 flex flex-wrap gap-2">
+                  {sectionLinks.map((item, index) => (
+                    <li key={item.href}>
+                      <a
+                        href={item.href}
+                        className="weather-pill inline-flex min-h-[44px] items-center gap-2 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                      >
+                        <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-[0.65rem] text-slate-300">
+                          {index + 1}
+                        </span>
+                        {item.label}
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              </nav>
+            </div>
+          ) : null}
           {historicalBanner}
         </header>
 
