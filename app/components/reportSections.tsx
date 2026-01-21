@@ -15,6 +15,8 @@ import { cxoFunctionOutputs } from "../../lib/cxoFunctionOutputs";
 import { operatorRequests } from "../../lib/operatorRequests";
 import { buildMonthlySummary, getMonthlyActionGuidance } from "../../lib/monthlySummary";
 import { buildWeeklySummary, getWeeklyActionGuidance } from "../../lib/weeklySummary";
+import { buildSummaryDiff, type SummaryDiff } from "../../lib/summaryDiff";
+import { getSummarySnapshot, updateSummarySnapshot } from "../../lib/summarySnapshotStore";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
 import { MonthlySummaryCard } from "./monthlySummaryCard";
 import { WeeklySummaryCard } from "./weeklySummaryCard";
@@ -98,6 +100,118 @@ const buildSparkline = (history?: SeriesHistoryPoint[]) => {
   const area = `${path} L ${last.x} ${baseY} L ${first.x} ${baseY} Z`;
 
   return { path, area };
+};
+
+const SummaryDiffPanel = ({
+  diff,
+  cadenceLabel,
+}: {
+  diff: SummaryDiff;
+  cadenceLabel: string;
+}) => {
+  const changeItems: ReactNode[] = [];
+
+  if (!diff.hasPrevious) {
+    return (
+      <div className="weather-surface p-4">
+        <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">What changed</p>
+        <p className="mt-3 text-xs text-slate-500">
+          No prior {cadenceLabel} summary snapshot captured yet.
+        </p>
+      </div>
+    );
+  }
+
+  if (diff.regimeShift.changed) {
+    changeItems.push(
+      <li key="regime" className="flex gap-2">
+        <span className="text-slate-500">•</span>
+        <span className="break-words">
+          Regime shifted from {diff.regimeShift.from} to {diff.regimeShift.to}.
+        </span>
+      </li>
+    );
+  }
+
+  if (diff.guidance.changed) {
+    changeItems.push(
+      <li key="guidance" className="flex gap-2">
+        <span className="text-slate-500">•</span>
+        <span className="break-words">
+          Guidance updated from “{diff.guidance.previous}” to “{diff.guidance.current}”.
+        </span>
+      </li>
+    );
+  }
+
+  if (diff.constraints.added.length > 0) {
+    changeItems.push(
+      <li key="constraints-added" className="flex gap-2">
+        <span className="text-slate-500">•</span>
+        <div className="space-y-2">
+          <p className="text-slate-200">
+            Added constraints ({diff.constraints.added.length})
+          </p>
+          <ul className="space-y-1 text-xs text-slate-400">
+            {diff.constraints.added.map((item) => (
+              <li key={item} className="flex gap-2">
+                <span className="text-slate-500">+</span>
+                <span className="break-words">{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </li>
+    );
+  }
+
+  if (diff.constraints.removed.length > 0) {
+    changeItems.push(
+      <li key="constraints-removed" className="flex gap-2">
+        <span className="text-slate-500">•</span>
+        <div className="space-y-2">
+          <p className="text-slate-200">
+            Removed constraints ({diff.constraints.removed.length})
+          </p>
+          <ul className="space-y-1 text-xs text-slate-400">
+            {diff.constraints.removed.map((item) => (
+              <li key={item} className="flex gap-2">
+                <span className="text-slate-500">−</span>
+                <span className="break-words">{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </li>
+    );
+  }
+
+  if (changeItems.length === 0) {
+    changeItems.push(
+      <li key="no-change" className="flex gap-2">
+        <span className="text-slate-500">•</span>
+        <span className="break-words">No changes from the previous summary.</span>
+      </li>
+    );
+  }
+
+  return (
+    <div className="weather-surface p-4">
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">What changed</p>
+        {diff.hasChanges ? (
+          <span className="weather-pill-muted px-2 py-1 text-[10px] font-semibold tracking-[0.14em] text-slate-300">
+            Updates detected
+          </span>
+        ) : (
+          <span className="weather-pill-muted px-2 py-1 text-[10px] font-semibold tracking-[0.14em] text-slate-400">
+            No changes
+          </span>
+        )}
+      </div>
+      <ul className="mt-3 space-y-3 text-sm text-slate-300">{changeItems}</ul>
+    </div>
+  );
 };
 
 type SeriesFreshnessProps = {
@@ -317,6 +431,14 @@ export const WeeklyActionSummaryPanel = ({
     provenance,
     recordDateLabel,
   });
+  const weeklySnapshot = {
+    regime: weeklySummary.regime,
+    guidance: weeklySummary.guidance,
+    constraints: weeklySummary.constraints,
+  };
+  const previousWeeklySnapshot = getSummarySnapshot("weekly");
+  const weeklyDiff = buildSummaryDiff(weeklySnapshot, previousWeeklySnapshot);
+  updateSummarySnapshot("weekly", weeklySnapshot);
   const weeklyBlocks: ActionSummaryBlock[] = [
     {
       heading: "Good product strategy sounds like",
@@ -424,6 +546,7 @@ export const WeeklyActionSummaryPanel = ({
           </div>
           <div className="grid gap-4">
             <WeeklySummaryCard summary={weeklySummary} />
+            <SummaryDiffPanel diff={weeklyDiff} cadenceLabel="weekly" />
             <div className="weather-surface p-4">
               <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Cadence</p>
               <p className="mt-3 text-sm text-slate-200">
@@ -513,6 +636,14 @@ export const MonthlyActionSummaryPanel = ({
     provenance,
     recordDateLabel,
   });
+  const monthlySnapshot = {
+    regime: monthlySummary.regime,
+    guidance: monthlySummary.guidance,
+    constraints: monthlySummary.constraints,
+  };
+  const previousMonthlySnapshot = getSummarySnapshot("monthly");
+  const monthlyDiff = buildSummaryDiff(monthlySnapshot, previousMonthlySnapshot);
+  updateSummarySnapshot("monthly", monthlySnapshot);
   const monthlyBlocks: ActionSummaryBlock[] = [
     {
       heading: "Monthly leadership asks sound like",
@@ -541,7 +672,12 @@ export const MonthlyActionSummaryPanel = ({
           align staffing, sequencing, and approval cadence before you lock the next sprint slate.
         </>
       }
-      summaryCard={<MonthlySummaryCard summary={monthlySummary} />}
+      summaryCard={
+        <div className="grid gap-4">
+          <MonthlySummaryCard summary={monthlySummary} />
+          <SummaryDiffPanel diff={monthlyDiff} cadenceLabel="monthly" />
+        </div>
+      }
       blocks={monthlyBlocks}
     />
   );
