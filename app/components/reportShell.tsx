@@ -135,8 +135,11 @@ export const ReportShell = ({
         />
       ) : null}
       <DisplayGuardian />
+      <div className="pointer-events-none absolute inset-0 weather-grid" />
+      <div className="pointer-events-none absolute inset-0 weather-aurora" />
       <div className="pointer-events-none absolute inset-0 weather-haze" />
       <div className="pointer-events-none absolute left-1/2 top-0 h-[520px] w-[720px] -translate-x-1/2 rounded-full bg-sky-400/15 blur-[190px]" />
+      <div className="pointer-events-none absolute -right-24 top-24 h-[420px] w-[420px] rounded-full bg-fuchsia-400/10 blur-[160px]" />
       <div className="mx-auto max-w-6xl px-6 py-12">
         <header className="relative flex flex-col gap-6 border-b border-slate-800/70 pb-8">
           <div className="flex flex-wrap items-start justify-between gap-6">
