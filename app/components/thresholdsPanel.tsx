@@ -6,6 +6,7 @@
 
 import type { FormEvent } from "react";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { Collapsible } from "@base-ui/react/collapsible";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { RegimeThresholds } from "../../lib/regimeEngine";
 import { DEFAULT_THRESHOLDS } from "../../lib/regimeEngine";
@@ -357,35 +358,40 @@ export const ThresholdsPanel = ({
             </div>
           </div>
           <div className="weather-surface p-4">
-            <details open>
-              <summary className="min-h-[44px] cursor-pointer text-xs font-semibold tracking-[0.12em] text-slate-400 touch-manipulation focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300">
+            <Collapsible.Root defaultOpen>
+              <Collapsible.Trigger
+                type="button"
+                className="min-h-[44px] text-xs font-semibold tracking-[0.12em] text-slate-400 transition-colors hover:text-slate-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300 touch-manipulation"
+              >
                 Audit trail (recent overrides)
-              </summary>
-              {auditLog.length ? (
-                <ul className="mt-3 space-y-3 text-xs text-slate-400">
-                  {auditLog.map((entry) => (
-                    <li key={`${entry.timestamp}-${entry.source}`}>
-                      <p className="text-xs font-semibold tracking-[0.12em] text-slate-500">
-                        {entry.source === "reset" ? "Reset" : "Override"} ·{" "}
-                        {new Date(entry.timestamp).toLocaleString("en-US", {
-                          timeStyle: "short",
-                          dateStyle: "medium",
-                        })}
-                      </p>
-                      <p className="mt-1 text-slate-300">
-                        {entry.previous.baseRateTightness}% → {entry.next.baseRateTightness}% ·{" "}
-                        {entry.previous.tightnessRegime}/{entry.previous.riskAppetiteRegime} →{" "}
-                        {entry.next.tightnessRegime}/{entry.next.riskAppetiteRegime}
-                      </p>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="mt-3 text-xs text-slate-500">
-                  No overrides logged yet. Defaults are active.
-                </p>
-              )}
-            </details>
+              </Collapsible.Trigger>
+              <Collapsible.Panel className="mt-3">
+                {auditLog.length ? (
+                  <ul className="space-y-3 text-xs text-slate-400">
+                    {auditLog.map((entry) => (
+                      <li key={`${entry.timestamp}-${entry.source}`}>
+                        <p className="text-xs font-semibold tracking-[0.12em] text-slate-500">
+                          {entry.source === "reset" ? "Reset" : "Override"} ·{" "}
+                          {new Date(entry.timestamp).toLocaleString("en-US", {
+                            timeStyle: "short",
+                            dateStyle: "medium",
+                          })}
+                        </p>
+                        <p className="mt-1 text-slate-300">
+                          {entry.previous.baseRateTightness}% → {entry.next.baseRateTightness}% ·{" "}
+                          {entry.previous.tightnessRegime}/{entry.previous.riskAppetiteRegime} →{" "}
+                          {entry.next.tightnessRegime}/{entry.next.riskAppetiteRegime}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-xs text-slate-500">
+                    No overrides logged yet. Defaults are active.
+                  </p>
+                )}
+              </Collapsible.Panel>
+            </Collapsible.Root>
           </div>
         </div>
       </div>
