@@ -83,7 +83,7 @@ export const ReportPageNavigation = ({
 }) => (
   <NavigationMenu.Root aria-label="Report paths" className={className}>
     <Tooltip.Provider delay={200} closeDelay={50}>
-      <NavigationMenu.List className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+      <NavigationMenu.List className="grid grid-cols-2 gap-1.5 sm:flex sm:flex-wrap sm:gap-2">
         {pageLinks.map((link, index) => {
           const isActive = link.label === pageTitle;
           const isOddTail = pageLinks.length % 2 === 1 && index === pageLinks.length - 1;
@@ -102,7 +102,7 @@ export const ReportPageNavigation = ({
                         href={link.href}
                         active={isActive}
                         aria-current={isActive ? "page" : undefined}
-                        className={`weather-tab inline-flex min-h-[44px] w-full items-center justify-center gap-2 px-3 py-2 text-center text-[10px] font-semibold tracking-[0.16em] transition-colors touch-manipulation sm:w-auto sm:px-4 sm:text-xs sm:tracking-[0.12em] ${
+                        className={`weather-tab inline-flex min-h-[44px] w-full items-center justify-center gap-2 px-3 py-2 text-center text-[9px] font-semibold tracking-[0.14em] transition-colors touch-manipulation sm:w-auto sm:px-4 sm:text-xs sm:tracking-[0.12em] ${
                           isActive
                             ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
                             : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
@@ -240,8 +240,8 @@ export const ReportMobileNavigation = ({
   className?: string;
 }) => (
   <NavigationMenu.Root aria-label="Mobile report navigation" className={className}>
-    <div className="weather-panel flex items-center justify-between gap-2 px-3 py-2">
-      <NavigationMenu.List className="flex flex-1 items-center gap-2">
+    <div className="weather-mobile-nav flex items-center justify-between gap-2 px-3 py-2">
+      <NavigationMenu.List className="flex flex-1 items-center gap-1.5">
         {pageLinks.map((link) => {
           const isActive = link.label === pageTitle;
           return (
@@ -250,13 +250,15 @@ export const ReportMobileNavigation = ({
                 href={link.href}
                 active={isActive}
                 aria-current={isActive ? "page" : undefined}
-                className={`flex min-h-[44px] flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-1 text-[10px] font-semibold tracking-[0.18em] transition-colors touch-manipulation ${
+                className={`flex min-h-[44px] flex-1 flex-col items-center justify-center gap-1 rounded-2xl border border-transparent px-2 py-2 text-[9px] font-semibold tracking-[0.14em] transition-colors touch-manipulation ${
                   isActive
-                    ? "bg-sky-500/15 text-sky-100"
-                    : "text-slate-300 hover:text-slate-100"
+                    ? "border-sky-400/60 bg-sky-500/15 text-sky-100"
+                    : "text-slate-300 hover:border-slate-700/70 hover:text-slate-100"
                 }`}
               >
-                <span className="text-slate-200">{pageLinkIcons[link.label]}</span>
+                <span className={isActive ? "text-sky-100" : "text-slate-200"}>
+                  {pageLinkIcons[link.label]}
+                </span>
                 <span className="uppercase">{link.label}</span>
               </NavigationMenu.Link>
             </NavigationMenu.Item>
@@ -267,7 +269,7 @@ export const ReportMobileNavigation = ({
         <Collapsible.Root className="relative flex-1">
           <Collapsible.Trigger
             type="button"
-            className="group flex min-h-[44px] w-full flex-col items-center justify-center gap-1 rounded-2xl px-2 py-1 text-[10px] font-semibold tracking-[0.18em] text-slate-300 transition-colors hover:text-slate-100 touch-manipulation"
+            className="group flex min-h-[44px] w-full flex-col items-center justify-center gap-1 rounded-2xl border border-transparent px-2 py-2 text-[9px] font-semibold tracking-[0.14em] text-slate-300 transition-colors hover:border-slate-700/70 hover:text-slate-100 touch-manipulation"
           >
             <span className="text-slate-200">
               <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
@@ -282,7 +284,7 @@ export const ReportMobileNavigation = ({
             <span className="uppercase">Sections</span>
           </Collapsible.Trigger>
           <Collapsible.Panel className="absolute bottom-full left-0 right-0 mb-3">
-            <div className="weather-panel max-h-[60vh] space-y-2 overflow-auto px-4 py-4">
+            <div className="weather-mobile-panel max-h-[60vh] space-y-2 overflow-auto px-4 py-4">
               <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">
                 Jump to section
               </p>

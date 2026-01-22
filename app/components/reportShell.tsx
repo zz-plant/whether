@@ -83,8 +83,8 @@ export const ReportShell = ({
       <div className="pointer-events-none absolute left-1/2 top-0 hidden h-[520px] w-[720px] -translate-x-1/2 rounded-full bg-sky-400/15 blur-[190px] sm:block" />
       <div className="pointer-events-none absolute -right-24 top-24 hidden h-[420px] w-[420px] rounded-full bg-fuchsia-400/10 blur-[160px] sm:block" />
       <div className="mx-auto max-w-7xl pb-[calc(env(safe-area-inset-bottom)+12rem)] pt-3 pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)] sm:pb-12 sm:pt-6 sm:pl-[calc(env(safe-area-inset-left)+1.5rem)] sm:pr-[calc(env(safe-area-inset-right)+1.5rem)]">
-        <header className="weather-appbar sticky top-3 z-20 px-4 py-5 sm:top-4 sm:px-6 sm:py-4">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <header className="weather-appbar sticky top-3 z-20 px-4 py-4 sm:top-4 sm:px-6 sm:py-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
               <span className="weather-icon-chip text-slate-100">
                 <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
@@ -110,7 +110,7 @@ export const ReportShell = ({
                 <p className="text-xs text-slate-400 sm:hidden">Signals refreshed {fetchedAtLabel}</p>
               </div>
             </div>
-            <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold tracking-[0.2em] text-slate-300 sm:text-xs sm:tracking-[0.14em]">
+            <div className="flex flex-wrap items-center gap-2 text-[9px] font-semibold tracking-[0.16em] text-slate-300 sm:text-xs sm:tracking-[0.14em]">
               <span className="rounded-full border border-slate-800/70 px-3 py-1">{statusLabel}</span>
               <span className={`rounded-full border px-3 py-1 ${trustToneStyles}`}>
                 {trustStatusLabel}
@@ -182,7 +182,7 @@ export const ReportShell = ({
           <div className="order-1 space-y-6 lg:order-none">
             <section className="weather-panel-static space-y-4 px-4 py-5 sm:px-5">
               <div className="space-y-3">
-                <p className="text-xs font-semibold tracking-[0.32em] text-slate-400">
+                <p className="text-xs font-semibold tracking-[0.26em] text-slate-400 sm:tracking-[0.32em]">
                   Weekly product guidance
                 </p>
                 <h1 className="type-headline text-slate-100">Whether Report</h1>
@@ -190,7 +190,7 @@ export const ReportShell = ({
                   A fast, sourced readout of Treasury signals translated into product guidance.
                 </p>
               </div>
-              <div className="weather-surface flex flex-col gap-2 px-4 py-3 sm:hidden">
+              <div className="weather-surface weather-quick-glance flex flex-col gap-2 px-4 py-3 sm:hidden">
                 <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">
                   Quick glance
                 </p>
@@ -202,16 +202,16 @@ export const ReportShell = ({
                 </div>
                 <p className="text-xs text-slate-300">Signals stamped {recordDateLabel}</p>
               </div>
-              <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
                 <a
                   href="#weekly-action-summary"
-                  className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.2em] transition-colors hover:border-sky-300/80 hover:text-white touch-manipulation"
+                  className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-[11px] font-semibold tracking-[0.2em] transition-colors hover:border-sky-300/80 hover:text-white touch-manipulation sm:text-xs"
                 >
                   Start with this week
                 </a>
                 <a
                   href="#executive-snapshot"
-                  className="inline-flex min-h-[44px] items-center justify-center text-xs font-semibold tracking-[0.12em] text-slate-200 underline decoration-slate-400 underline-offset-4 hover:text-slate-100 touch-manipulation sm:justify-start"
+                  className="inline-flex min-h-[44px] items-center justify-center text-[11px] font-semibold tracking-[0.12em] text-slate-200 underline decoration-slate-400 underline-offset-4 hover:text-slate-100 touch-manipulation sm:justify-start sm:text-xs"
                 >
                   See leadership summary
                 </a>
