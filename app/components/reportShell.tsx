@@ -12,6 +12,7 @@ import {
   type ReportPageLink,
   type ReportSectionLink,
 } from "./reportShellNavigation";
+import { ReportSummaryTabs } from "./reportSummaryTabs";
 
 export const ReportShell = ({
   children,
@@ -217,41 +218,20 @@ export const ReportShell = ({
               </div>
             </section>
 
-            <section className="grid gap-4 lg:grid-cols-2">
-              <div className="weather-panel flex flex-col gap-4 px-5 py-4">
-                <div className="flex flex-wrap items-start justify-between gap-4">
-                  <div className="space-y-2">
-                    <p className="text-xs font-semibold text-slate-300">Current operating climate</p>
-                    <span className="text-3xl font-semibold tracking-tight text-slate-100">
-                      {statusLabel}
-                    </span>
-                    <p className="text-xs text-slate-300">Signals stamped {recordDateLabel}</p>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <div
-                      className={`rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.12em] ${trustToneStyles}`}
-                    >
-                      {trustStatusLabel}
-                    </div>
-                    {showOfflineBadge ? (
-                      <span className="rounded-full border border-rose-400/60 bg-rose-500/10 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-rose-100">
-                        {offlineBadgeLabel}
-                      </span>
-                    ) : null}
-                  </div>
-                </div>
-                <p className="text-sm text-slate-300">
-                  You are likely balancing delivery pressure with budget scrutiny. Use the climate
-                  label as a neutral, external anchor in planning conversations.
-                </p>
+            <div className="space-y-4">
+              <ReportSummaryTabs
+                statusLabel={statusLabel}
+                recordDateLabel={recordDateLabel}
+                trustStatusLabel={trustStatusLabel}
+                trustStatusDetail={trustStatusDetail}
+                trustStatusAction={trustStatusAction}
+                trustToneStyles={trustToneStyles}
+                showOfflineBadge={showOfflineBadge}
+                offlineBadgeLabel={offlineBadgeLabel}
+              />
+              <section className="weather-panel flex flex-col gap-4 px-5 py-4">
+                <p className="text-xs font-semibold text-slate-300">Interpretation notes</p>
                 <ReportInterpretationNotes />
-              </div>
-              <div className="weather-panel flex flex-col gap-4 px-5 py-4">
-                <p className="text-xs font-semibold text-slate-300">The readout in one line</p>
-                <p className="text-sm text-slate-200">
-                  Anchor planning conversations with the climate label and share the supporting
-                  signals if leadership needs proof.
-                </p>
                 <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
                   <span className="rounded-full border border-slate-700/70 px-3 py-1 font-semibold tracking-[0.12em] text-slate-200">
                     Record date {recordDateLabel}
@@ -260,8 +240,8 @@ export const ReportShell = ({
                     {trustStatusLabel}
                   </span>
                 </div>
-              </div>
-            </section>
+              </section>
+            </div>
 
             {children}
 
