@@ -81,9 +81,9 @@ export const ReportShell = ({
       <div className="pointer-events-none absolute inset-0 hidden sm:block weather-haze" />
       <div className="pointer-events-none absolute left-1/2 top-0 hidden h-[520px] w-[720px] -translate-x-1/2 rounded-full bg-sky-400/15 blur-[190px] sm:block" />
       <div className="pointer-events-none absolute -right-24 top-24 hidden h-[420px] w-[420px] rounded-full bg-fuchsia-400/10 blur-[160px] sm:block" />
-      <div className="mx-auto max-w-7xl pb-[calc(env(safe-area-inset-bottom)+12rem)] pt-4 pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)] sm:pb-12 sm:pt-6 sm:pl-[calc(env(safe-area-inset-left)+1.5rem)] sm:pr-[calc(env(safe-area-inset-right)+1.5rem)]">
-        <header className="weather-appbar sticky top-4 z-20 px-4 py-4 sm:px-6">
-          <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="mx-auto max-w-7xl pb-[calc(env(safe-area-inset-bottom)+12rem)] pt-3 pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)] sm:pb-12 sm:pt-6 sm:pl-[calc(env(safe-area-inset-left)+1.5rem)] sm:pr-[calc(env(safe-area-inset-right)+1.5rem)]">
+        <header className="weather-appbar sticky top-3 z-20 px-4 py-5 sm:top-4 sm:px-6 sm:py-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
               <span className="weather-icon-chip text-slate-100">
                 <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
@@ -106,9 +106,10 @@ export const ReportShell = ({
               <div>
                 <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Whether</p>
                 <p className="text-sm font-semibold text-slate-100">Market Climate Station</p>
+                <p className="text-xs text-slate-400 sm:hidden">Signals refreshed {fetchedAtLabel}</p>
               </div>
             </div>
-            <div className="flex flex-wrap items-center gap-2 text-xs font-semibold tracking-[0.14em] text-slate-300">
+            <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold tracking-[0.2em] text-slate-300 sm:text-xs sm:tracking-[0.14em]">
               <span className="rounded-full border border-slate-800/70 px-3 py-1">{statusLabel}</span>
               <span className={`rounded-full border px-3 py-1 ${trustToneStyles}`}>
                 {trustStatusLabel}
@@ -130,7 +131,7 @@ export const ReportShell = ({
         {historicalBanner}
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[260px,1fr]">
-          <aside className="space-y-4 lg:sticky lg:top-28 lg:self-start">
+          <aside className="order-2 space-y-4 lg:order-none lg:sticky lg:top-28 lg:self-start">
             <section className="weather-panel space-y-3 px-4 py-4">
               <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">You are here</p>
               <p className="text-lg font-semibold text-slate-100">{pageTitle}</p>
@@ -177,8 +178,8 @@ export const ReportShell = ({
             />
           </aside>
 
-          <div className="space-y-6">
-            <section className="weather-panel-static space-y-4 px-5 py-5">
+          <div className="order-1 space-y-6 lg:order-none">
+            <section className="weather-panel-static space-y-4 px-4 py-5 sm:px-5">
               <div className="space-y-3">
                 <p className="text-xs font-semibold tracking-[0.32em] text-slate-400">
                   Weekly product guidance
@@ -188,7 +189,19 @@ export const ReportShell = ({
                   A fast, sourced readout of Treasury signals translated into product guidance.
                 </p>
               </div>
-              <div className="flex flex-wrap gap-3">
+              <div className="weather-surface flex flex-col gap-2 px-4 py-3 sm:hidden">
+                <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">
+                  Quick glance
+                </p>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-2xl font-semibold text-slate-100">{statusLabel}</span>
+                  <span className={`rounded-full border px-3 py-1 text-[10px] ${trustToneStyles}`}>
+                    {trustStatusLabel}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-300">Signals stamped {recordDateLabel}</p>
+              </div>
+              <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 <a
                   href="#weekly-action-summary"
                   className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.2em] transition-colors hover:border-sky-300/80 hover:text-white touch-manipulation"
@@ -197,7 +210,7 @@ export const ReportShell = ({
                 </a>
                 <a
                   href="#executive-snapshot"
-                  className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-slate-200 underline decoration-slate-400 underline-offset-4 hover:text-slate-100 touch-manipulation"
+                  className="inline-flex min-h-[44px] items-center justify-center text-xs font-semibold tracking-[0.12em] text-slate-200 underline decoration-slate-400 underline-offset-4 hover:text-slate-100 touch-manipulation sm:justify-start"
                 >
                   See leadership summary
                 </a>
