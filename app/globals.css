@@ -24,9 +24,10 @@ body {
 .weather-shell {
   background-color: #020617;
   background-image:
-    radial-gradient(900px 520px at 8% -10%, rgba(125, 211, 252, 0.12), transparent 60%),
-    radial-gradient(900px 520px at 88% 4%, rgba(56, 189, 248, 0.1), transparent 65%),
-    radial-gradient(700px 420px at 60% 15%, rgba(236, 72, 153, 0.08), transparent 60%),
+    radial-gradient(880px 520px at 6% -12%, rgba(125, 211, 252, 0.14), transparent 62%),
+    radial-gradient(920px 560px at 92% 6%, rgba(56, 189, 248, 0.12), transparent 65%),
+    radial-gradient(760px 520px at 58% 18%, rgba(236, 72, 153, 0.1), transparent 60%),
+    radial-gradient(620px 420px at 50% 72%, rgba(14, 116, 144, 0.08), transparent 70%),
     linear-gradient(180deg, rgba(2, 6, 23, 1) 0%, rgba(7, 13, 26, 0.96) 48%, rgba(2, 6, 23, 1) 100%);
 }
 
@@ -35,18 +36,28 @@ body {
   position: absolute;
   inset: 0;
   background-image: radial-gradient(rgba(148, 163, 184, 0.12) 1px, transparent 1px);
-  background-size: 160px 160px;
-  opacity: 0.08;
+  background-size: 180px 180px;
+  opacity: 0.06;
   pointer-events: none;
+}
+
+.weather-shell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 20% 0%, rgba(56, 189, 248, 0.08), transparent 55%);
+  opacity: 0.6;
+  pointer-events: none;
+  mix-blend-mode: screen;
 }
 
 .weather-grid {
   background-image:
     linear-gradient(rgba(30, 41, 59, 0.28) 1px, transparent 1px),
     linear-gradient(90deg, rgba(30, 41, 59, 0.28) 1px, transparent 1px);
-  background-size: 140px 140px;
+  background-size: 120px 120px;
   mask-image: radial-gradient(circle at top, rgba(0, 0, 0, 0.65) 0%, transparent 70%);
-  opacity: 0.3;
+  opacity: 0.22;
 }
 
 .weather-aurora {
@@ -65,24 +76,27 @@ body {
 }
 
 .weather-panel {
-  @apply rounded-[28px] border border-slate-800/60 bg-slate-950/65 backdrop-blur-2xl;
+  @apply rounded-[28px] border border-slate-800/70 bg-slate-950/70 backdrop-blur-2xl;
+  background-image: linear-gradient(160deg, rgba(15, 23, 42, 0.5), rgba(2, 6, 23, 0.65));
   box-shadow:
-    0 28px 70px -50px rgba(2, 6, 23, 0.7),
+    0 30px 70px -52px rgba(2, 6, 23, 0.75),
     0 0 0 1px rgba(15, 23, 42, 0.4),
     inset 0 0 0 1px rgba(15, 23, 42, 0.4);
 }
 
 .weather-appbar {
-  @apply rounded-[28px] border border-slate-800/70 bg-slate-950/80 backdrop-blur-2xl;
+  @apply rounded-[28px] border border-slate-800/80 bg-slate-950/85 backdrop-blur-2xl;
+  background-image: linear-gradient(180deg, rgba(15, 23, 42, 0.75), rgba(2, 6, 23, 0.8));
   box-shadow:
-    0 24px 56px -46px rgba(2, 6, 23, 0.8),
+    0 26px 58px -46px rgba(2, 6, 23, 0.82),
     inset 0 0 0 1px rgba(15, 23, 42, 0.5);
 }
 
 .weather-panel-static {
-  @apply border-slate-800/70 bg-slate-950/55;
+  @apply rounded-[28px] border border-slate-800/70 bg-slate-950/60;
+  background-image: linear-gradient(160deg, rgba(15, 23, 42, 0.55), rgba(2, 6, 23, 0.5));
   box-shadow:
-    0 24px 60px -52px rgba(2, 6, 23, 0.6),
+    0 26px 60px -52px rgba(2, 6, 23, 0.65),
     inset 0 0 0 1px rgba(15, 23, 42, 0.4);
 }
 
@@ -118,10 +132,11 @@ body {
 }
 
 .weather-icon-chip {
-  @apply inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-700/60 bg-slate-900/60;
+  @apply inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-700/70 bg-slate-900/70;
+  background-image: linear-gradient(150deg, rgba(30, 41, 59, 0.6), rgba(2, 6, 23, 0.8));
   box-shadow:
     inset 0 0 0 1px rgba(15, 23, 42, 0.45),
-    0 10px 22px -18px rgba(56, 189, 248, 0.2);
+    0 12px 26px -20px rgba(56, 189, 248, 0.25);
 }
 
 .weather-surface {
@@ -147,7 +162,7 @@ body {
   @apply rounded-full border border-slate-800/60 bg-slate-950/70 backdrop-blur;
   box-shadow:
     inset 0 0 0 1px rgba(15, 23, 42, 0.35),
-    0 12px 24px -20px rgba(2, 6, 23, 0.5);
+    0 14px 26px -20px rgba(2, 6, 23, 0.55);
   transition:
     transform 200ms ease,
     border-color 200ms ease,
@@ -177,9 +192,9 @@ body {
 
 .weather-button-primary {
   @apply rounded-2xl border border-sky-400/60 text-slate-100;
-  background: linear-gradient(135deg, rgba(14, 165, 233, 0.4), rgba(59, 130, 246, 0.25));
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.55), rgba(56, 189, 248, 0.28));
   box-shadow:
-    0 16px 32px -20px rgba(14, 165, 233, 0.6),
+    0 18px 34px -22px rgba(14, 165, 233, 0.7),
     inset 0 0 0 1px rgba(2, 6, 23, 0.35);
   transition:
     transform 200ms ease,
