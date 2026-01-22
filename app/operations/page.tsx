@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SectionedReportPanel } from "../components/sectionedReportPanel";
 import { loadReportData } from "../../lib/reportData";
 import { ReportShell } from "../components/reportShell";
 import { AssumptionLockPanel } from "../components/assumptionLockPanel";
@@ -18,6 +19,7 @@ import {
   OperatorRequestsPanel,
   PlaybookPanel,
 } from "../components/reportSections";
+import { reportPageLinks } from "../../lib/reportNavigation";
 
 export const metadata: Metadata = {
   title: "Whether Report — What to do next",
@@ -30,38 +32,40 @@ export default async function OperationsPage({
 }: {
   searchParams?: { month?: string; year?: string; [key: string]: string | undefined };
 }) {
-  const pageLinks = [
-    {
-      href: "/",
-      label: "Quick start",
-      description: "What to do this week, plus the current climate in plain English.",
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://whether.report";
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: "Whether Report — What to do next",
+    url: `${siteUrl}/operations`,
+    description:
+      "Execution-ready guidance, decision shield validation, and export briefs for the Whether Report.",
+    inLanguage: "en",
+    isPartOf: {
+      "@type": "WebSite",
+      name: "Whether — Market Climate Station",
+      url: siteUrl,
     },
-    {
-      href: "/signals",
-      label: "Why we believe this",
-      description: "See the data sources and how each signal is scored.",
+    publisher: {
+      "@type": "Organization",
+      name: "Whether",
     },
-    {
-      href: "/operations",
-      label: "What to do next",
-      description: "Concrete actions and decision safeguards for your team.",
-    },
-  ];
+  };
   const sectionLinks = [
-    { href: "#monthly-action-summary", label: "Monthly summary" },
-    { href: "#playbook", label: "Playbook" },
-    { href: "#finance-strategy", label: "Finance strategy" },
-    { href: "#strategy-brief", label: "Strategy brief" },
-    { href: "#assumption-locking", label: "Assumption locking" },
-    { href: "#insight-database", label: "Insight database" },
-    { href: "#decision-memory", label: "Decision memory" },
-    { href: "#decision-shield", label: "Decision shield" },
-    { href: "#decision-shield-templates", label: "Decision templates" },
-    { href: "#counterfactuals", label: "Counterfactual view" },
-    { href: "#export-briefs", label: "Export briefs" },
-    { href: "#executive-briefing", label: "Executive briefing" },
-    { href: "#cxo-functions", label: "CXO outputs" },
-    { href: "#operator-requests", label: "Operator requests" },
+    { href: "#ops-monthly-action-summary", label: "Monthly summary" },
+    { href: "#ops-playbook", label: "Playbook" },
+    { href: "#ops-finance-strategy", label: "Finance strategy" },
+    { href: "#ops-strategy-brief", label: "Strategy brief" },
+    { href: "#ops-assumption-locking", label: "Assumption locking" },
+    { href: "#ops-insight-database", label: "Insight database" },
+    { href: "#ops-decision-memory", label: "Decision memory" },
+    { href: "#ops-decision-shield", label: "Decision shield" },
+    { href: "#ops-decision-shield-templates", label: "Decision templates" },
+    { href: "#ops-counterfactuals", label: "Counterfactual view" },
+    { href: "#ops-export-briefs", label: "Export briefs" },
+    { href: "#ops-executive-briefing", label: "Executive briefing" },
+    { href: "#ops-cxo-functions", label: "CXO outputs" },
+    { href: "#ops-operator-requests", label: "Operator requests" },
   ];
 
   const {
@@ -111,69 +115,154 @@ export default async function OperationsPage({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="What to do next"
       pageSummary="Translate the market climate into action: decision shields, playbook moves, and export-ready briefs for leadership review."
-      pageLinks={pageLinks}
+      pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
+      structuredData={JSON.stringify(structuredData)}
       historicalBanner={
         historicalSelection ? (
           <HistoricalBanner banner={historicalSelection.banner} liveHref="/operations" />
         ) : null
       }
     >
-      <MonthlyActionSummaryPanel
-        assessment={assessment}
-        provenance={treasuryProvenance}
-        recordDateLabel={recordDateLabel}
-      />
+      <SectionedReportPanel
+        id="ops-monthly-action-summary"
+        title="Monthly action summary"
+        description="What moves the regime recommends this month."
+      >
+        <MonthlyActionSummaryPanel
+          assessment={assessment}
+          provenance={treasuryProvenance}
+          recordDateLabel={recordDateLabel}
+        />
+      </SectionedReportPanel>
 
-      <PlaybookPanel
-        playbook={playbook}
-        stopItems={stopItems}
-        startItems={startItems}
-        fenceItems={fenceItems}
-        provenance={treasuryProvenance}
-      />
+      <SectionedReportPanel
+        id="ops-playbook"
+        title="Playbook"
+        description="Start, stop, and fence actions tuned to the current regime."
+      >
+        <PlaybookPanel
+          playbook={playbook}
+          stopItems={stopItems}
+          startItems={startItems}
+          fenceItems={fenceItems}
+          provenance={treasuryProvenance}
+        />
+      </SectionedReportPanel>
 
-      <FinanceStrategyPanel regime={assessment.regime} provenance={treasuryProvenance} />
+      <SectionedReportPanel
+        id="ops-finance-strategy"
+        title="Finance strategy"
+        description="Budget posture and cash timing guidance for the quarter."
+      >
+        <FinanceStrategyPanel regime={assessment.regime} provenance={treasuryProvenance} />
+      </SectionedReportPanel>
 
-      <StrategyBriefPanel
-        assessment={assessment}
-        recordDateLabel={recordDateLabel}
-        provenance={treasuryProvenance}
-      />
+      <SectionedReportPanel
+        id="ops-strategy-brief"
+        title="Strategy brief"
+        description="Board-ready narrative to align leaders on the regime shift."
+      >
+        <StrategyBriefPanel
+          assessment={assessment}
+          recordDateLabel={recordDateLabel}
+          provenance={treasuryProvenance}
+        />
+      </SectionedReportPanel>
 
-      <AssumptionLockPanel />
+      <SectionedReportPanel
+        id="ops-assumption-locking"
+        title="Assumption locking"
+        description="Document the operating assumptions behind major bets."
+      >
+        <AssumptionLockPanel />
+      </SectionedReportPanel>
 
-      <InsightDatabasePanel regime={assessment.regime} provenance={treasuryProvenance} />
+      <SectionedReportPanel
+        id="ops-insight-database"
+        title="Insight database"
+        description="Capture what the regime implies for product signals and experiments."
+      >
+        <InsightDatabasePanel regime={assessment.regime} provenance={treasuryProvenance} />
+      </SectionedReportPanel>
 
-      <DecisionMemoryPanel
-        assessment={assessment}
-        provenance={treasuryProvenance}
-        recordDateLabel={recordDateLabel}
-      />
+      <SectionedReportPanel
+        id="ops-decision-memory"
+        title="Decision memory"
+        description="Maintain a living log of decisions and their outcomes."
+      >
+        <DecisionMemoryPanel
+          assessment={assessment}
+          provenance={treasuryProvenance}
+          recordDateLabel={recordDateLabel}
+        />
+      </SectionedReportPanel>
 
-      <DecisionShieldPanel assessment={assessment} provenance={treasuryProvenance} />
+      <SectionedReportPanel
+        id="ops-decision-shield"
+        title="Decision shield"
+        description="Validate decisions against regime-specific guardrails."
+      >
+        <DecisionShieldPanel assessment={assessment} provenance={treasuryProvenance} />
+      </SectionedReportPanel>
 
-      <DecisionShieldTemplatesPanel provenance={treasuryProvenance} />
+      <SectionedReportPanel
+        id="ops-decision-shield-templates"
+        title="Decision templates"
+        description="Copy-ready templates for decision shield reviews."
+      >
+        <DecisionShieldTemplatesPanel provenance={treasuryProvenance} />
+      </SectionedReportPanel>
 
-      <CounterfactualPanel assessment={assessment} provenance={treasuryProvenance} />
+      <SectionedReportPanel
+        id="ops-counterfactuals"
+        title="Counterfactual view"
+        description="Stress-test priorities against alternate macro regimes."
+      >
+        <CounterfactualPanel assessment={assessment} provenance={treasuryProvenance} />
+      </SectionedReportPanel>
 
-      <ExportBriefPanel
-        assessment={assessment}
-        treasury={treasury}
-        sensors={sensors}
-        macroSeries={macroSeries}
-        provenance={treasuryProvenance}
-      />
+      <SectionedReportPanel
+        id="ops-export-briefs"
+        title="Export briefs"
+        description="Downloadable briefs for leadership and planning cycles."
+      >
+        <ExportBriefPanel
+          assessment={assessment}
+          treasury={treasury}
+          sensors={sensors}
+          macroSeries={macroSeries}
+          provenance={treasuryProvenance}
+        />
+      </SectionedReportPanel>
 
-      <ExecutiveBriefingPanel
-        assessment={assessment}
-        recordDateLabel={recordDateLabel}
-        provenance={treasuryProvenance}
-      />
+      <SectionedReportPanel
+        id="ops-executive-briefing"
+        title="Executive briefing"
+        description="One-page readout for exec leadership syncs."
+      >
+        <ExecutiveBriefingPanel
+          assessment={assessment}
+          recordDateLabel={recordDateLabel}
+          provenance={treasuryProvenance}
+        />
+      </SectionedReportPanel>
 
-      <CxoFunctionPanel provenance={internalProvenance} />
+      <SectionedReportPanel
+        id="ops-cxo-functions"
+        title="CXO outputs"
+        description="Functional deliverables by executive leader."
+      >
+        <CxoFunctionPanel provenance={internalProvenance} />
+      </SectionedReportPanel>
 
-      <OperatorRequestsPanel provenance={internalProvenance} />
+      <SectionedReportPanel
+        id="ops-operator-requests"
+        title="Operator requests"
+        description="Current asks for operators driving execution."
+      >
+        <OperatorRequestsPanel provenance={internalProvenance} />
+      </SectionedReportPanel>
     </ReportShell>
   );
 }

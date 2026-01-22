@@ -9,6 +9,7 @@ import {
 import { ThresholdsPanel } from "../components/thresholdsPanel";
 import { TimeMachinePanel } from "../components/timeMachinePanel";
 import { RegimeTimelinePanel } from "../components/regimeTimelinePanel";
+import { reportPageLinks } from "../../lib/reportNavigation";
 
 export const metadata: Metadata = {
   title: "Whether Report — Why we believe this",
@@ -21,23 +22,25 @@ export default async function SignalsPage({
 }: {
   searchParams?: { month?: string; year?: string; [key: string]: string | undefined };
 }) {
-  const pageLinks = [
-    {
-      href: "/",
-      label: "Quick start",
-      description: "What to do this week, plus the current climate in plain English.",
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://whether.report";
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: "Whether Report — Why we believe this",
+    url: `${siteUrl}/signals`,
+    description:
+      "Macro signals, sensor detail, thresholds, and historical context for Whether Market Climate Station.",
+    inLanguage: "en",
+    isPartOf: {
+      "@type": "WebSite",
+      name: "Whether — Market Climate Station",
+      url: siteUrl,
     },
-    {
-      href: "/signals",
-      label: "Why we believe this",
-      description: "See the data sources and how each signal is scored.",
+    publisher: {
+      "@type": "Organization",
+      name: "Whether",
     },
-    {
-      href: "/operations",
-      label: "What to do next",
-      description: "Concrete actions and decision safeguards for your team.",
-    },
-  ];
+  };
   const sectionLinks = [
     { href: "#sensor-array", label: "Live data feed" },
     { href: "#macro-signals", label: "Macro sources" },
@@ -97,8 +100,9 @@ export default async function SignalsPage({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Why we believe this"
       pageSummary="Deep-dive into the live signal layer, the macro data sources, and how thresholds shape the market climate classification."
-      pageLinks={pageLinks}
+      pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
+      structuredData={JSON.stringify(structuredData)}
       historicalBanner={
         historicalSelection ? (
           <HistoricalBanner banner={historicalSelection.banner} liveHref="/signals" />
