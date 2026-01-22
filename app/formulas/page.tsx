@@ -10,6 +10,13 @@ export const metadata: Metadata = {
 };
 
 const formulaCard = "rounded-2xl border border-slate-800 bg-slate-900/40 p-6";
+const formulaLinks = [
+  { href: "#base-rate", label: "Base rate" },
+  { href: "#curve-slope", label: "Yield curve slope" },
+  { href: "#cpi-inflation", label: "CPI inflation" },
+  { href: "#unemployment-rate", label: "Unemployment rate" },
+  { href: "#credit-spread", label: "Credit spread" },
+];
 
 export default function FormulasPage() {
   return (
@@ -24,7 +31,25 @@ export default function FormulasPage() {
           </p>
         </header>
 
-        <div className="mt-10 space-y-6">
+        <nav aria-label="Formula sections" className="mt-8">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
+            Jump to
+          </p>
+          <ul className="mt-3 flex flex-wrap gap-2">
+            {formulaLinks.map((item) => (
+              <li key={item.href}>
+                <a
+                  href={item.href}
+                  className="inline-flex min-h-[36px] items-center rounded-full border border-slate-800 px-4 text-xs font-semibold tracking-[0.14em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100"
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <div className="mt-8 space-y-6">
           <section id="base-rate" className={formulaCard}>
             <h2 className="text-xl font-semibold text-slate-100">Base rate</h2>
             <p className="mt-2 text-sm text-slate-300">

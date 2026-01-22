@@ -15,6 +15,7 @@ import {
 import { ChangeSinceLastReadPanel } from "./components/changeSinceLastReadPanel";
 import { RegimeAlertsPanel } from "./components/regimeAlertsPanel";
 import { ReportShell } from "./components/reportShell";
+import { reportPageLinks } from "../lib/reportNavigation";
 
 export const generateMetadata = ({
   searchParams,
@@ -75,23 +76,6 @@ export default async function HomePage({
   searchParams?: { month?: string; year?: string; [key: string]: string | undefined };
 }) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://whether.report";
-  const pageLinks = [
-    {
-      href: "/",
-      label: "Quick start",
-      description: "What to do this week, plus the current climate in plain English.",
-    },
-    {
-      href: "/signals",
-      label: "Why we believe this",
-      description: "See the data sources and how each signal is scored.",
-    },
-    {
-      href: "/operations",
-      label: "What to do next",
-      description: "Concrete actions and decision safeguards for your team.",
-    },
-  ];
   const sectionLinks = [
     { href: "#executive-snapshot", label: "Leadership summary" },
     { href: "#weekly-action-summary", label: "This week's actions" },
@@ -158,7 +142,7 @@ export default async function HomePage({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Quick start"
       pageSummary="Start here for a fast, plain-English read of what to do this week, why, and where to dig deeper."
-      pageLinks={pageLinks}
+      pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
       structuredData={JSON.stringify(structuredData)}
       historicalBanner={

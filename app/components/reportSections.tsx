@@ -383,7 +383,7 @@ export const WeeklyActionSummaryPanel = ({
   ];
   const weeklyQuickLinks = [
     { href: "#executive-snapshot", label: "Leadership summary" },
-    { href: "/operations#playbook", label: "Actions playbook" },
+    { href: "/operations#ops-playbook", label: "Actions playbook" },
     { href: "/signals#thresholds", label: "Thresholds" },
     { href: "#beginner-glossary", label: "Glossary" },
   ];
@@ -1045,8 +1045,8 @@ export const FirstTimeGuidePanel = ({
         {[
           { href: "#executive-snapshot", label: "Leadership summary" },
           { href: "#regime-assessment", label: "What the scores mean" },
-          { href: "/operations#playbook", label: "Actions playbook" },
-          { href: "/operations#export-briefs", label: "Shareable briefs" },
+          { href: "/operations#ops-playbook", label: "Actions playbook" },
+          { href: "/operations#ops-export-briefs", label: "Shareable briefs" },
           { href: "/signals#time-machine", label: "Time machine" },
         ].map((link) => (
           <a
@@ -2004,7 +2004,7 @@ export const ExecutiveSnapshotPanel = ({
                 Review thresholds
               </a>
               <a
-                href="/operations#export-briefs"
+                href="/operations#ops-export-briefs"
                 className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
               >
                 Export brief
@@ -2825,9 +2825,9 @@ export const PlaybookPanel = ({
   provenance: DataProvenance;
 }) => {
   const playbookQuickLinks = [
-    { href: "/operations#decision-shield", label: "Decision shield" },
-    { href: "/operations#strategy-brief", label: "Strategy brief" },
-    { href: "/operations#export-briefs", label: "Export briefs" },
+    { href: "/operations#ops-decision-shield", label: "Decision shield" },
+    { href: "/operations#ops-strategy-brief", label: "Strategy brief" },
+    { href: "/operations#ops-export-briefs", label: "Export briefs" },
   ];
 
   return (
