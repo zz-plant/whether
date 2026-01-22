@@ -24,7 +24,7 @@ export const ReportSummaryTabs = ({
   <section className="weather-panel space-y-4 px-5 py-4">
     <div className="space-y-2">
       <p className="text-xs font-semibold tracking-[0.32em] text-slate-400">Signal console</p>
-      <h2 className="text-2xl font-semibold text-slate-100">Weekly operating brief</h2>
+      <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">Weekly operating brief</h2>
       <p className="max-w-2xl text-sm text-slate-300">
         Toggle between the climate readout, practical guidance, and confidence notes for this
         week’s signals.
@@ -42,7 +42,7 @@ export const ReportSummaryTabs = ({
             key={tab.value}
             value={tab.value}
             className={({ active }) =>
-              `weather-tab inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.18em] transition-colors ${
+              `weather-tab inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.14em] transition-colors sm:px-4 sm:tracking-[0.18em] ${
                 active
                   ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
                   : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
