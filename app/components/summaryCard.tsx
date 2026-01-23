@@ -5,6 +5,8 @@
 "use client";
 
 import { Button } from "@base-ui/react/button";
+import { Toast } from "@base-ui/react/toast";
+import { Tooltip } from "@base-ui/react/tooltip";
 import { useState } from "react";
 
 type SummaryCardProps = {
@@ -17,6 +19,7 @@ export const SummaryCard = ({ summaryCopy, cadenceLabel, apiHref }: SummaryCardP
   const [isCopying, setIsCopying] = useState(false);
   const [copied, setCopied] = useState(false);
   const [copyError, setCopyError] = useState(false);
+  const { add } = Toast.useToastManager();
 
   const handleCopy = async () => {
     if (isCopying) {
@@ -24,6 +27,10 @@ export const SummaryCard = ({ summaryCopy, cadenceLabel, apiHref }: SummaryCardP
     }
     if (!navigator.clipboard?.writeText) {
       setCopyError(true);
+      add({
+        title: "Clipboard blocked",
+        description: "Select the summary block to copy it manually.",
+      });
       return;
     }
     setIsCopying(true);
@@ -31,9 +38,17 @@ export const SummaryCard = ({ summaryCopy, cadenceLabel, apiHref }: SummaryCardP
       await navigator.clipboard.writeText(summaryCopy);
       setCopied(true);
       setCopyError(false);
+      add({
+        title: "Summary copied",
+        description: "Paste the posture card wherever you need it.",
+      });
       setTimeout(() => setCopied(false), 2000);
     } catch {
       setCopyError(true);
+      add({
+        title: "Copy failed",
+        description: "Select the summary text and copy it manually.",
+      });
     } finally {
       setIsCopying(false);
     }
@@ -43,9 +58,27 @@ export const SummaryCard = ({ summaryCopy, cadenceLabel, apiHref }: SummaryCardP
     <div className="weather-surface mt-4 p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-            Copy-ready summary card
-          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+              Copy-ready summary card
+            </p>
+            <Tooltip.Root>
+              <Tooltip.Trigger
+                type="button"
+                className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-800/80 text-[10px] font-semibold text-slate-400 transition-colors hover:border-slate-600/70 hover:text-slate-200"
+                aria-label="Summary card details"
+              >
+                i
+              </Tooltip.Trigger>
+              <Tooltip.Portal>
+                <Tooltip.Positioner side="top" align="center" sideOffset={8}>
+                  <Tooltip.Popup className="max-w-[220px] rounded-xl border border-slate-700/80 bg-slate-950/95 px-3 py-2 text-xs text-slate-200 shadow-lg">
+                    Includes the posture summary plus API pointers for sharing with stakeholders.
+                  </Tooltip.Popup>
+                </Tooltip.Positioner>
+              </Tooltip.Portal>
+            </Tooltip.Root>
+          </div>
           <p className="mt-2 text-sm text-slate-300">
             Share the {cadenceLabel} posture in one pasteable block or pull it from the API for reuse.
           </p>
