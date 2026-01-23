@@ -9,6 +9,7 @@ import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { Field } from "@base-ui/react/field";
 import { Input } from "@base-ui/react/input";
 import { Tabs } from "@base-ui/react/tabs";
+import type { Route } from "next";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
 import type { RegimeKey } from "../../lib/regimeEngine";
@@ -280,7 +281,7 @@ export const TimeMachinePanel = ({
       nextParams.delete("draftYear");
       nextParams.set("month", String(month));
       nextParams.set("year", String(year));
-      router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
+      router.push(`${pathname}?${nextParams.toString()}` as Route, { scroll: false });
     });
   };
 
@@ -299,7 +300,7 @@ export const TimeMachinePanel = ({
     const nextParams = new URLSearchParams(searchParams.toString());
     nextParams.set("draftMonth", String(parsed.month));
     nextParams.set("draftYear", String(parsed.year));
-    router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
+    router.push(`${pathname}?${nextParams.toString()}` as Route, { scroll: false });
   };
 
   const clearDraftHref = useMemo(() => {

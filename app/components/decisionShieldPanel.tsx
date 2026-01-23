@@ -9,6 +9,7 @@ import { Field } from "@base-ui/react/field";
 import { Input } from "@base-ui/react/input";
 import { Select } from "@base-ui/react/select";
 import { Toast } from "@base-ui/react/toast";
+import type { Route } from "next";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   evaluateDecision,
@@ -264,7 +265,7 @@ export const DecisionShieldPanel = ({
     nextParams.set("lifecycle", lifecycle);
     nextParams.set("category", category);
     nextParams.set("action", action);
-    router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
+    router.push(`${pathname}?${nextParams.toString()}` as Route, { scroll: false });
   }, [action, category, lifecycle, pathname, router, searchParams]);
 
   useEffect(() => {
