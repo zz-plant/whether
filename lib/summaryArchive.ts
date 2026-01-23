@@ -5,6 +5,7 @@
 import { z } from "zod";
 import type { MonthlySummary } from "./monthlySummary";
 import type { QuarterlySummary } from "./quarterlySummary";
+import type { RegimeKey } from "./regimeEngine";
 import type { WeeklySummary } from "./weeklySummary";
 import type { YearlySummary } from "./yearlySummary";
 import rawArchive from "../data/summary_archive.json";
@@ -42,7 +43,18 @@ export type SummaryArchiveEntry =
       summary: YearlySummary;
     };
 
-const SummaryInputSchema = z.object({}).passthrough();
+const SummaryInputSchema = z.object({
+  id: z.enum(["base-rate", "two-year", "ten-year", "curve-slope"]),
+  label: z.string(),
+  value: z.number().nullable(),
+  unit: z.string(),
+  sourceLabel: z.string(),
+  sourceUrl: z.string(),
+  recordDate: z.string(),
+  fetchedAt: z.string(),
+  derivedFrom: z.string().optional(),
+  notes: z.string().optional(),
+});
 
 const SummaryProvenanceSchema = z.object({
   sourceLabel: z.string(),
@@ -55,7 +67,7 @@ const SummaryProvenanceSchema = z.object({
 const SummarySchema = z.object({
   title: z.string(),
   summary: z.string(),
-  regime: z.string(),
+  regime: z.enum(["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"]) as z.ZodType<RegimeKey>,
   regimeLabel: z.string(),
   guidance: z.string(),
   constraints: z.array(z.string()),

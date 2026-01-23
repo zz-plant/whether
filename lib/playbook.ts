@@ -12,11 +12,11 @@ export interface PlaybookEntry {
   mandate: string;
   insight: string;
   leadershipPhrases: {
-    more: string[];
-    less: string[];
+    more: readonly string[];
+    less: readonly string[];
   };
-  stop: string[];
-  start: string[];
+  stop: readonly string[];
+  start: readonly string[];
   metric: string;
 }
 
@@ -38,7 +38,7 @@ export const getPlaybookGuidance = (regime: RegimeKey): PlaybookGuidance => {
   const playbook = getPlaybookForRegime(regime);
   return {
     playbook,
-    stopItems: playbook?.stop ?? DEFAULT_STOP_ITEMS,
-    startItems: playbook?.start ?? DEFAULT_START_ITEMS,
+    stopItems: playbook ? [...playbook.stop] : DEFAULT_STOP_ITEMS,
+    startItems: playbook ? [...playbook.start] : DEFAULT_START_ITEMS,
   };
 };
