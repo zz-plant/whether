@@ -1,0 +1,6 @@
+name = "whether"
+main = ".vercel/output/static/_worker.js"
+compatibility_date = "2026-01-23"
+
+[assets]
+directory = ".vercel/output/static"
