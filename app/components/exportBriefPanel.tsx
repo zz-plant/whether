@@ -5,6 +5,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Button } from "@base-ui/react/button";
 import { Toast } from "@base-ui/react/toast";
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../../lib/types";
 import type { RegimeAssessment } from "../../lib/regimeEngine";
@@ -306,13 +307,13 @@ export const ExportBriefPanel = ({
             </p>
           </div>
           <div className="flex flex-col items-end gap-3">
-            <button
+            <Button
               type="button"
               onClick={handlePrint}
               className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
             >
               Print / Save PDF
-            </button>
+            </Button>
             <DataProvenanceStrip provenance={provenance} />
           </div>
         </div>
@@ -324,7 +325,7 @@ export const ExportBriefPanel = ({
               One pasteable block tuned for status updates.
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
-              <button
+              <Button
                 type="button"
                 onClick={() => handleCopy(briefing, "Slack")}
                 disabled={isCopying}
@@ -332,8 +333,8 @@ export const ExportBriefPanel = ({
                 className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
               >
                 {isCopying && copyTarget === "Slack" ? "Copying" : "Copy Slack brief"}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={() =>
                   handleDownload(
@@ -344,7 +345,7 @@ export const ExportBriefPanel = ({
                 className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
               >
                 Download brief
-              </button>
+              </Button>
               <a
                 href={`mailto:?subject=${mailSubject}&body=${mailBody}`}
                 className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
@@ -358,7 +359,7 @@ export const ExportBriefPanel = ({
             <p className="mt-3 text-sm text-slate-300">
               Compact bullets sized for quarterly planning decks.
             </p>
-            <button
+            <Button
               type="button"
               onClick={() => handleCopy(slideBullets, "Slides")}
               disabled={isCopying}
@@ -366,8 +367,8 @@ export const ExportBriefPanel = ({
               className="weather-button mt-4 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
             >
               {isCopying && copyTarget === "Slides" ? "Copying" : "Copy slide bullets"}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={() =>
                 handleDownload(
@@ -378,7 +379,7 @@ export const ExportBriefPanel = ({
               className="weather-button mt-3 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
             >
               Download bullets
-            </button>
+            </Button>
           </div>
         </div>
         <div className="mt-4 grid gap-4 lg:grid-cols-[1.4fr,1fr]">
@@ -389,7 +390,7 @@ export const ExportBriefPanel = ({
             <p className="mt-3 text-sm text-slate-300">
               Plain-English summary lines that can drop into status updates or exec briefings.
             </p>
-            <button
+            <Button
               type="button"
               onClick={() => handleCopy(constraintHeadlines, "Headlines")}
               disabled={isCopying}
@@ -397,8 +398,8 @@ export const ExportBriefPanel = ({
               className="weather-button mt-4 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
             >
               {isCopying && copyTarget === "Headlines" ? "Copying" : "Copy constraint headlines"}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={() =>
                 handleDownload(
@@ -409,7 +410,7 @@ export const ExportBriefPanel = ({
               className="weather-button mt-3 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
             >
               Download headlines
-            </button>
+            </Button>
           </div>
           <div className="weather-surface p-4">
             <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
@@ -442,7 +443,7 @@ export const ExportBriefPanel = ({
                 Paste into the Jira issue description field.
               </p>
               <div className="mt-3 flex flex-wrap gap-3">
-                <button
+                <Button
                   type="button"
                   onClick={() => handleCopy(jiraMarkdownBrief, "Jira description")}
                   disabled={isCopying}
@@ -452,8 +453,8 @@ export const ExportBriefPanel = ({
                   {isCopying && copyTarget === "Jira description"
                     ? "Copying"
                     : "Copy Jira description"}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
                   onClick={() =>
                     handleDownload(
@@ -464,7 +465,7 @@ export const ExportBriefPanel = ({
                   className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                 >
                   Download Jira description
-                </button>
+                </Button>
               </div>
             </div>
             <div className="rounded-lg border border-slate-800/80 bg-slate-950/60 p-3">
@@ -475,7 +476,7 @@ export const ExportBriefPanel = ({
                 Paste into the Confluence page body.
               </p>
               <div className="mt-3 flex flex-wrap gap-3">
-                <button
+                <Button
                   type="button"
                   onClick={() => handleCopy(confluenceWikiBrief, "Confluence page snippet")}
                   disabled={isCopying}
@@ -485,8 +486,8 @@ export const ExportBriefPanel = ({
                   {isCopying && copyTarget === "Confluence page snippet"
                     ? "Copying"
                     : "Copy Confluence page snippet"}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
                   onClick={() =>
                     handleDownload(
@@ -497,7 +498,7 @@ export const ExportBriefPanel = ({
                   className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                 >
                   Download Confluence page snippet
-                </button>
+                </Button>
               </div>
             </div>
             <div className="rounded-lg border border-slate-800/80 bg-slate-950/60 p-3">
@@ -508,7 +509,7 @@ export const ExportBriefPanel = ({
                 Paste into the Linear issue description field.
               </p>
               <div className="mt-3 flex flex-wrap gap-3">
-                <button
+                <Button
                   type="button"
                   onClick={() => handleCopy(linearMarkdownBrief, "Linear issue description")}
                   disabled={isCopying}
@@ -518,8 +519,8 @@ export const ExportBriefPanel = ({
                   {isCopying && copyTarget === "Linear issue description"
                     ? "Copying"
                     : "Copy Linear issue description"}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
                   onClick={() =>
                     handleDownload(
@@ -530,7 +531,7 @@ export const ExportBriefPanel = ({
                   className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                 >
                   Download Linear issue description
-                </button>
+                </Button>
               </div>
             </div>
           </div>
