@@ -2974,9 +2974,18 @@ export const InsightDatabasePanel = ({
   regime: RegimeAssessment["regime"];
   provenance: DataProvenance;
 }) => {
+  type EvidenceLibraryItem = Omit<
+    (typeof insightDatabase.regimeEvidence.regimes)[number]["citations"][number],
+    "tags"
+  > & {
+    climate: string;
+    summary: string;
+    id: string;
+    tags: readonly string[];
+  };
   const evidence = insightDatabase.regimeEvidence.regimes.find((entry) => entry.key === regime);
   const fossilRecord = insightDatabase.fossilRecord;
-  const evidenceLibrary = useMemo(
+  const evidenceLibrary = useMemo<EvidenceLibraryItem[]>(
     () =>
       insightDatabase.regimeEvidence.regimes.flatMap((entry) =>
         entry.citations.map((citation, index) => {
@@ -2986,6 +2995,7 @@ export const InsightDatabasePanel = ({
             climate,
             summary: entry.summary,
             id: `${climate}-${index}-${citation.url}`,
+            tags: citation.tags,
           };
         })
       ),
