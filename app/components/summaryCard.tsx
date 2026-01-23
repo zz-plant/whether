@@ -4,6 +4,7 @@
  */
 "use client";
 
+import { Button } from "@base-ui/react/button";
 import { useState } from "react";
 
 type SummaryCardProps = {
@@ -50,7 +51,7 @@ export const SummaryCard = ({ summaryCopy, cadenceLabel, apiHref }: SummaryCardP
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <button
+          <Button
             type="button"
             onClick={handleCopy}
             disabled={isCopying}
@@ -58,7 +59,7 @@ export const SummaryCard = ({ summaryCopy, cadenceLabel, apiHref }: SummaryCardP
             className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-300/80 hover:text-white disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
           >
             {isCopying ? "Copying" : copied ? "Copied" : "Copy summary"}
-          </button>
+          </Button>
           <a
             href={apiHref}
             className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-slate-500/80 hover:text-slate-100 touch-manipulation"
