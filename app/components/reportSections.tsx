@@ -2981,7 +2981,7 @@ export const InsightDatabasePanel = ({
     climate: string;
     summary: string;
     id: string;
-    tags: string[];
+    tags: readonly string[];
   };
   const evidence = insightDatabase.regimeEvidence.regimes.find((entry) => entry.key === regime);
   const fossilRecord = insightDatabase.fossilRecord;
@@ -2995,7 +2995,7 @@ export const InsightDatabasePanel = ({
             climate,
             summary: entry.summary,
             id: `${climate}-${index}-${citation.url}`,
-            tags: citation.tags as string[],
+            tags: citation.tags,
           };
         })
       ),
