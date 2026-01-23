@@ -84,8 +84,8 @@ export const ReportSummaryTabs = ({
 
       <Tabs.Panel value="guidance" className="mt-4 space-y-4">
         <p className="text-sm text-slate-200">
-          Focus on the highest-leverage initiatives, communicate the climate change early, and keep
-          leadership aligned on why priorities shift.
+          Keep the weekly plan tight: align on the posture, broadcast any changes early, and
+          prioritize the smallest scope that protects retention or reliability.
         </p>
         <div className="grid gap-3 sm:grid-cols-2">
           <a
@@ -100,6 +100,34 @@ export const ReportSummaryTabs = ({
           >
             Share the leadership snapshot
           </a>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-3">
+          {[
+            {
+              title: "Confirm changes",
+              detail: "Delta snapshot + alerts before approving the sprint.",
+              href: "#change-since-last-read",
+            },
+            {
+              title: "Lock a single bet",
+              detail: "Choose the smallest scope that preserves outcomes.",
+              href: "#weekly-action-summary",
+            },
+            {
+              title: "Back it with evidence",
+              detail: "Use the signal matrix if decisions need justification.",
+              href: "#signal-matrix",
+            },
+          ].map((item) => (
+            <a
+              key={item.title}
+              href={item.href}
+              className="weather-surface flex min-h-[96px] flex-col gap-2 p-3 text-left transition-colors hover:border-sky-400/70 touch-manipulation"
+            >
+              <p className="text-xs font-semibold tracking-[0.14em] text-slate-400">{item.title}</p>
+              <p className="text-xs text-slate-300">{item.detail}</p>
+            </a>
+          ))}
         </div>
       </Tabs.Panel>
 
