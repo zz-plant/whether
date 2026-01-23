@@ -7,8 +7,15 @@
 import { useMemo, useState } from "react";
 import { Toast } from "@base-ui/react/toast";
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../../lib/types";
-import type { RegimeAssessment } from "../../lib/regimeEngine";
+import {
+  classifyRegime,
+  computeRiskAppetiteScore,
+  computeTightnessScore,
+  getRegimeProfile,
+  type RegimeAssessment,
+} from "../../lib/regimeEngine";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
+import { useSearchParams } from "next/navigation";
 
 const numberFormatter = new Intl.NumberFormat("en-US", {
   minimumFractionDigits: 2,
@@ -20,6 +27,105 @@ const formatNumber = (value: number | null, unit: string) => {
     return "—";
   }
   return `${numberFormatter.format(value)}${unit}`;
+};
+
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+
+const parseNumericParam = (value: string | null) => {
+  if (!value) {
+    return null;
+  }
+  const parsed = Number(value);
+  return Number.isNaN(parsed) ? null : parsed;
+};
+
+type ScenarioSnapshot = {
+  label: string;
+  baseRate: number;
+  curveSlope: number;
+  tightness: number;
+  riskAppetite: number;
+  regime: RegimeAssessment["regime"];
+  constraints: string[];
+};
+
+const buildScenarioSnapshot = (
+  assessment: RegimeAssessment,
+  label: string,
+  rateShiftBps: number,
+  slopeShiftBps: number
+): ScenarioSnapshot => {
+  const baseRate = assessment.scores.baseRate;
+  const curveSlope = assessment.scores.curveSlope ?? 0;
+  const adjustedBaseRate = clamp(baseRate + rateShiftBps / 100, 0, 15);
+  const adjustedSlope = clamp(curveSlope + slopeShiftBps / 100, -5, 5);
+  const tightness = computeTightnessScore(
+    adjustedBaseRate,
+    adjustedSlope,
+    assessment.thresholds.baseRateTightness
+  );
+  const riskAppetite = computeRiskAppetiteScore(adjustedSlope);
+  const regime = classifyRegime(tightness, riskAppetite, assessment.thresholds);
+  const profile = getRegimeProfile(regime);
+
+  return {
+    label,
+    baseRate: adjustedBaseRate,
+    curveSlope: adjustedSlope,
+    tightness,
+    riskAppetite,
+    regime,
+    constraints: profile.constraints,
+  };
+};
+
+const formatDelta = (value: number) => (value > 0 ? `+${value}` : `${value}`);
+
+const buildScenarioCompareBrief = (
+  assessment: RegimeAssessment,
+  treasury: TreasuryData,
+  scenarioA: ScenarioSnapshot,
+  scenarioB: ScenarioSnapshot
+) => {
+  const addedConstraints = scenarioB.constraints.filter(
+    (constraint) => !scenarioA.constraints.includes(constraint)
+  );
+  const removedConstraints = scenarioA.constraints.filter(
+    (constraint) => !scenarioB.constraints.includes(constraint)
+  );
+  const regimeDelta =
+    scenarioA.regime === scenarioB.regime
+      ? "No change"
+      : `${scenarioA.regime} → ${scenarioB.regime}`;
+
+  return [
+    `Scenario compare — ${treasury.record_date}`,
+    "",
+    `${scenarioA.label}`,
+    `Regime: ${scenarioA.regime}`,
+    `Tightness: ${scenarioA.tightness} | Risk appetite: ${scenarioA.riskAppetite}`,
+    `Base rate: ${formatNumber(scenarioA.baseRate, "%")} | Curve slope: ${formatNumber(scenarioA.curveSlope, "%")}`,
+    "Constraints:",
+    ...scenarioA.constraints.map((item) => `• ${item}`),
+    "",
+    `${scenarioB.label}`,
+    `Regime: ${scenarioB.regime}`,
+    `Tightness: ${scenarioB.tightness} | Risk appetite: ${scenarioB.riskAppetite}`,
+    `Base rate: ${formatNumber(scenarioB.baseRate, "%")} | Curve slope: ${formatNumber(scenarioB.curveSlope, "%")}`,
+    "Constraints:",
+    ...scenarioB.constraints.map((item) => `• ${item}`),
+    "",
+    "Delta summary (B - A):",
+    `Tightness: ${formatDelta(scenarioB.tightness - scenarioA.tightness)}`,
+    `Risk appetite: ${formatDelta(scenarioB.riskAppetite - scenarioA.riskAppetite)}`,
+    `Regime: ${regimeDelta}`,
+    "Constraints added:",
+    ...(addedConstraints.length ? addedConstraints.map((item) => `• ${item}`) : ["• None"]),
+    "Constraints removed:",
+    ...(removedConstraints.length ? removedConstraints.map((item) => `• ${item}`) : ["• None"]),
+    "",
+    `Source: ${treasury.source}`,
+  ].join("\n");
 };
 
 const buildBrief = (
@@ -202,6 +308,31 @@ export const ExportBriefPanel = ({
   const [copyTarget, setCopyTarget] = useState<string | null>(null);
   const [copyError, setCopyError] = useState(false);
   const { add } = Toast.useToastManager();
+  const searchParams = useSearchParams();
+  const scenarioRateShiftA = useMemo(
+    () => parseNumericParam(searchParams.get("cfRateBpsA")) ?? 0,
+    [searchParams]
+  );
+  const scenarioSlopeShiftA = useMemo(
+    () => parseNumericParam(searchParams.get("cfSlopeBpsA")) ?? 0,
+    [searchParams]
+  );
+  const scenarioRateShiftB = useMemo(
+    () => parseNumericParam(searchParams.get("cfRateBpsB")) ?? 0,
+    [searchParams]
+  );
+  const scenarioSlopeShiftB = useMemo(
+    () => parseNumericParam(searchParams.get("cfSlopeBpsB")) ?? 0,
+    [searchParams]
+  );
+  const scenarioA = useMemo(
+    () => buildScenarioSnapshot(assessment, "Scenario A", scenarioRateShiftA, scenarioSlopeShiftA),
+    [assessment, scenarioRateShiftA, scenarioSlopeShiftA]
+  );
+  const scenarioB = useMemo(
+    () => buildScenarioSnapshot(assessment, "Scenario B", scenarioRateShiftB, scenarioSlopeShiftB),
+    [assessment, scenarioRateShiftB, scenarioSlopeShiftB]
+  );
 
   const briefing = useMemo(
     () => buildBrief(assessment, treasury, sensors, macroSeries),
@@ -226,6 +357,10 @@ export const ExportBriefPanel = ({
   const constraintHeadlines = useMemo(
     () => buildConstraintHeadlines(assessment, treasury),
     [assessment, treasury]
+  );
+  const scenarioCompareBrief = useMemo(
+    () => buildScenarioCompareBrief(assessment, treasury, scenarioA, scenarioB),
+    [assessment, scenarioA, scenarioB, treasury]
   );
   const mailSubject = encodeURIComponent(`Whether Report — ${treasury.record_date}`);
   const mailBody = encodeURIComponent(briefing);
@@ -382,6 +517,39 @@ export const ExportBriefPanel = ({
           </div>
         </div>
         <div className="mt-4 grid gap-4 lg:grid-cols-[1.4fr,1fr]">
+          <div className="weather-surface p-4">
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+              Scenario compare brief
+            </p>
+            <p className="mt-3 text-sm text-slate-300">
+              Export a side-by-side Scenario A/B summary with delta callouts.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => handleCopy(scenarioCompareBrief, "Scenario compare")}
+                disabled={isCopying}
+                aria-busy={isCopying}
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+              >
+                {isCopying && copyTarget === "Scenario compare"
+                  ? "Copying"
+                  : "Copy scenario compare"}
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  handleDownload(
+                    scenarioCompareBrief,
+                    `whether-scenario-compare-${treasury.record_date}.txt`
+                  )
+                }
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+              >
+                Download compare
+              </button>
+            </div>
+          </div>
           <div className="weather-surface p-4">
             <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
               Constraint headlines
