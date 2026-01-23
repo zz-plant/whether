@@ -6,6 +6,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { NumberField } from "@base-ui/react/number-field";
 import { Slider } from "@base-ui/react/slider";
+import type { Route } from "next";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   classifyRegime,
@@ -111,7 +112,7 @@ export const CounterfactualPanel = ({
     if (nextSearch === searchParams.toString()) {
       return;
     }
-    router.push(`${pathname}?${nextSearch}`, { scroll: false });
+    router.push(`${pathname}?${nextSearch}` as Route, { scroll: false });
   }, [pathname, rateShiftBps, router, searchParams, slopeShiftBps]);
 
   const baseRate = assessment.scores.baseRate;

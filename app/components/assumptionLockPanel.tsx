@@ -6,6 +6,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Field } from "@base-ui/react/field";
 import { Select } from "@base-ui/react/select";
+import type { Route } from "next";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 type AssumptionOption<T extends string> = {
@@ -225,7 +226,7 @@ export const AssumptionLockPanel = () => {
     if (nextSearch === currentSearch) {
       return;
     }
-    router.push(`${pathname}?${nextSearch}`, { scroll: false });
+    router.push(`${pathname}?${nextSearch}` as Route, { scroll: false });
   }, [interpretationStance, lockedAt, pathname, riskPosture, router, searchParams, thresholdTolerance]);
 
   const handleLock = () => {

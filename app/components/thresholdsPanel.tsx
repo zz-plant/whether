@@ -10,6 +10,7 @@ import { Field } from "@base-ui/react/field";
 import { NumberField } from "@base-ui/react/number-field";
 import { Collapsible } from "@base-ui/react/collapsible";
 import { Popover } from "@base-ui/react/popover";
+import type { Route } from "next";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { RegimeThresholds } from "../../lib/regimeEngine";
 import { DEFAULT_THRESHOLDS } from "../../lib/regimeEngine";
@@ -150,7 +151,7 @@ export const ThresholdsPanel = ({
   const updateUrl = (nextThresholds: RegimeThresholds, source: ThresholdAuditEntry["source"]) => {
     const nextParams = new URLSearchParams(searchParams.toString());
     buildThresholdSearchParams(nextThresholds, appliedDefaults, nextParams);
-    router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
+    router.push(`${pathname}?${nextParams.toString()}` as Route, { scroll: false });
     const entry: ThresholdAuditEntry = {
       timestamp: new Date().toISOString(),
       previous: currentThresholds,

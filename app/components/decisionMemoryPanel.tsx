@@ -8,6 +8,7 @@ import { AlertDialog } from "@base-ui/react/alert-dialog";
 import { Field } from "@base-ui/react/field";
 import { Input } from "@base-ui/react/input";
 import { Toast } from "@base-ui/react/toast";
+import type { Route } from "next";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
@@ -450,7 +451,7 @@ export const DecisionMemoryPanel = ({
     setTitleError(null);
     const nextParams = new URLSearchParams(searchParams.toString());
     nextParams.set("decisionId", entry.id);
-    router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
+    router.push(`${pathname}?${nextParams.toString()}` as Route, { scroll: false });
   };
 
   const handleCopy = async (text: string, label: string, toastLabel: string) => {
@@ -547,7 +548,7 @@ export const DecisionMemoryPanel = ({
     const nextParams = new URLSearchParams(searchParams.toString());
     nextParams.delete("decisionId");
     nextParams.delete("decisionSnapshot");
-    router.push(`${pathname}?${nextParams.toString()}`, { scroll: false });
+    router.push(`${pathname}?${nextParams.toString()}` as Route, { scroll: false });
     add({
       title: "Decision memory cleared",
       description: "The decision log has been reset.",
