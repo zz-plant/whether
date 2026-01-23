@@ -122,7 +122,7 @@ export const ThresholdsPanel = ({
       if (Object.keys(nextErrors).length === 0) {
         const nextParams = new URLSearchParams(searchParams.toString());
         buildThresholdSearchParams(buildThresholds(parsed), appliedDefaults, nextParams);
-        router.replace(`${pathname}?${nextParams.toString()}`, { scroll: false });
+        router.replace(`${pathname}?${nextParams.toString()}` as Route, { scroll: false });
       }
     } catch {
       // Ignore storage parse errors to keep console clean.
