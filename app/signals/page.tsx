@@ -11,6 +11,8 @@ import { TimeMachinePanel } from "../components/timeMachinePanel";
 import { RegimeTimelinePanel } from "../components/regimeTimelinePanel";
 import { reportPageLinks } from "../../lib/reportNavigation";
 
+export const runtime = "edge";
+
 export const metadata: Metadata = {
   title: "Whether Report — Why we believe this",
   description:
