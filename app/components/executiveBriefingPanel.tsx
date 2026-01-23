@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@base-ui/react/button";
 import { useMemo } from "react";
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import { insightDatabase } from "../../data/recommendations";
@@ -95,7 +96,7 @@ export const ExecutiveBriefingPanel = ({
               <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                 Board-ready memo
               </p>
-              <button
+              <Button
                 type="button"
                 onClick={() => copyToClipboard(executiveMemo, "Memo")}
                 disabled={isCopying}
@@ -103,7 +104,7 @@ export const ExecutiveBriefingPanel = ({
                 className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
               >
                 {isCopying && activeTarget === "Memo" ? "Copying" : "Copy memo"}
-              </button>
+              </Button>
             </div>
             <pre className="mt-4 whitespace-pre-wrap text-sm text-slate-200">
               {executiveMemo}
@@ -114,7 +115,7 @@ export const ExecutiveBriefingPanel = ({
               <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                 Guardrail checklist
               </p>
-              <button
+              <Button
                 type="button"
                 onClick={() => copyToClipboard(guardrailChecklist, "Checklist")}
                 disabled={isCopying}
@@ -124,7 +125,7 @@ export const ExecutiveBriefingPanel = ({
                 {isCopying && activeTarget === "Checklist"
                   ? "Copying"
                   : "Copy checklist"}
-              </button>
+              </Button>
             </div>
             <pre className="mt-4 whitespace-pre-wrap text-sm text-slate-200">
               {guardrailChecklist}
