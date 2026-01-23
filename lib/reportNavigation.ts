@@ -3,8 +3,13 @@ import type { ReportPageLink } from "../app/components/reportShellNavigation";
 export const reportPageLinks: ReportPageLink[] = [
   {
     href: "/",
-    label: "Quick start",
-    description: "What to do this week, plus the current climate in plain English.",
+    label: "Weekly briefing",
+    description: "Weekly decisions, leadership summary, and climate signals in plain English.",
+  },
+  {
+    href: "/onboarding",
+    label: "Onboarding",
+    description: "Get oriented with the glossary and a quick guide to reading the report.",
   },
   {
     href: "/signals",
