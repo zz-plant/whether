@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "dev:turbo": "next dev --turbo",
-    "build": "next build && next-on-pages",
+    "build": "node scripts/build.mjs",
     "build:pages": "next-on-pages",
     "start": "next start",
     "lint": "next lint",
