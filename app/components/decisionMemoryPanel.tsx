@@ -25,6 +25,12 @@ type DecisionMemoryEntry = {
   sourceUrl: string | null;
 };
 
+type StructuredDecisionNote = {
+  summary: string;
+  bullets: string[];
+  tags: string[];
+};
+
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   dateStyle: "medium",
   timeStyle: "short",
@@ -37,6 +43,36 @@ const formatTimestamp = (value: string) => {
     return value;
   }
   return dateFormatter.format(parsed);
+};
+
+const structureDecisionNote = (note: string): StructuredDecisionNote => {
+  const trimmed = note.trim();
+  if (!trimmed) {
+    return { summary: "", bullets: [], tags: [] };
+  }
+
+  const lines = trimmed
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  const tags = Array.from(trimmed.matchAll(/(^|\s)#([a-z0-9-_]+)/gi))
+    .map((match) => match[2].toLowerCase())
+    .filter((tag, index, self) => self.indexOf(tag) === index);
+
+  const bulletLines = lines
+    .filter((line) => /^[-*•]\s+/.test(line))
+    .map((line) => line.replace(/^[-*•]\s+/, ""));
+
+  const summaryLine =
+    lines.find((line) => !/^[-*•]\s+/.test(line)) ?? bulletLines[0] ?? "";
+  const summary = summaryLine.replace(/#([a-z0-9-_]+)/gi, "").replace(/\s{2,}/g, " ").trim();
+
+  return {
+    summary,
+    bullets: bulletLines,
+    tags,
+  };
 };
 
 const buildSnapshotText = (entry: DecisionMemoryEntry) => {
@@ -58,6 +94,11 @@ const buildSnapshotText = (entry: DecisionMemoryEntry) => {
     .filter(Boolean)
     .join("\n");
 };
+
+const buildStructuredDecisionEntry = (entry: DecisionMemoryEntry) => ({
+  ...entry,
+  noteData: structureDecisionNote(entry.note),
+});
 
 const buildSnapshotLink = (entry: DecisionMemoryEntry) => {
   if (typeof window === "undefined") {
@@ -118,6 +159,9 @@ const buildCsvRows = (entries: DecisionMemoryEntry[]) => {
   const header = [
     "title",
     "note",
+    "noteSummary",
+    "noteBullets",
+    "noteTags",
     "regime",
     "confidence",
     "recordDate",
@@ -126,17 +170,23 @@ const buildCsvRows = (entries: DecisionMemoryEntry[]) => {
     "sourceLabel",
     "sourceUrl",
   ];
-  const rows = entries.map((entry) => [
-    entry.title,
-    entry.note,
-    entry.regime,
-    entry.confidence,
-    entry.recordDate,
-    entry.loggedAt,
-    entry.constraints.join(" | "),
-    entry.sourceLabel,
-    entry.sourceUrl ?? "",
-  ]);
+  const rows = entries.map((entry) => {
+    const noteData = structureDecisionNote(entry.note);
+    return [
+      entry.title,
+      entry.note,
+      noteData.summary,
+      noteData.bullets.join(" | "),
+      noteData.tags.join(" | "),
+      entry.regime,
+      entry.confidence,
+      entry.recordDate,
+      entry.loggedAt,
+      entry.constraints.join(" | "),
+      entry.sourceLabel,
+      entry.sourceUrl ?? "",
+    ];
+  });
 
   return [
     header.map(escapeCsvValue).join(","),
@@ -468,7 +518,7 @@ export const DecisionMemoryPanel = ({
   };
 
   const handleExportJson = () => {
-    const payload = JSON.stringify(entries, null, 2);
+    const payload = JSON.stringify(entries.map(buildStructuredDecisionEntry), null, 2);
     handleDownload(payload, `whether-decision-memory-${exportLabel}.json`, "application/json");
     add({
       title: "Export ready",
