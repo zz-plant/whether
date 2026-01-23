@@ -17,7 +17,7 @@ export type ReportSectionLink = {
 };
 
 const pageLinkIcons: Record<string, ReactNode> = {
-  "Quick start": (
+  "Weekly briefing": (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
       <path
         d="M12 4.5V2.75M12 21.25v-1.75M4.5 12H2.75M21.25 12h-1.75M6.75 6.75l-1.3-1.3M18.55 18.55l-1.3-1.3M6.75 17.25l-1.3 1.3M18.55 5.45l-1.3 1.3"
@@ -26,6 +26,25 @@ const pageLinkIcons: Record<string, ReactNode> = {
         strokeLinecap="round"
       />
       <circle cx="12" cy="12" r="4.25" fill="currentColor" />
+    </svg>
+  ),
+  Onboarding: (
+    <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
+      <path
+        d="M4 5.5h16v13H4z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M8 9h8M8 12h5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      <circle cx="17" cy="15.5" r="2.5" fill="currentColor" />
     </svg>
   ),
   "Why we believe this": (

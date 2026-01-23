@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { resolveTimeMachineSelection, parseTimeMachineRequest } from "../lib/timeMachineSelection";
 import { loadReportData } from "../lib/reportData";
 import {
-  FirstTimeGuidePanel,
-  BeginnerGlossaryPanel,
   ExecutiveSnapshotPanel,
   WeeklyActionSummaryPanel,
   RegimeSummaryPanel,
@@ -84,8 +82,6 @@ export default async function HomePage({
     { href: "#regime-alert-log", label: "Alert history" },
     { href: "#regime-assessment", label: "What the scores mean" },
     { href: "#signal-matrix", label: "Signal breakdown" },
-    { href: "#first-time-guide", label: "New here? Start here" },
-    { href: "#beginner-glossary", label: "Plain-English glossary" },
   ];
   const structuredData = {
     "@context": "https://schema.org",
@@ -140,8 +136,8 @@ export default async function HomePage({
       trustStatusAction={trustStatusAction}
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
-      pageTitle="Quick start"
-      pageSummary="Start here for a fast, plain-English read of what to do this week, why, and where to dig deeper."
+      pageTitle="Weekly briefing"
+      pageSummary="A fast, plain-English briefing on what to do this week, why it matters, and where to dig deeper."
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
       structuredData={JSON.stringify(structuredData)}
@@ -182,14 +178,6 @@ export default async function HomePage({
       <section className="mt-10">
         <SignalMatrixPanel assessment={assessment} provenance={treasuryProvenance} />
       </section>
-
-      <FirstTimeGuidePanel
-        statusLabel={statusLabel}
-        recordDateLabel={recordDateLabel}
-        fetchedAtLabel={fetchedAtLabel}
-      />
-
-      <BeginnerGlossaryPanel />
     </ReportShell>
   );
 }
