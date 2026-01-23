@@ -220,20 +220,21 @@ export const TimeMachinePanel = ({
   const [rangeEnd, setRangeEnd] = useState(() => cadenceRange.max ?? "");
 
   useEffect(() => {
-    if (!cadenceRange.min || !cadenceRange.max) {
+    const { min, max } = cadenceRange;
+    if (!min || !max) {
       setRangeStart("");
       setRangeEnd("");
       return;
     }
     setRangeStart((previous) => {
-      if (!previous || previous < cadenceRange.min || previous > cadenceRange.max) {
-        return cadenceRange.min;
+      if (!previous || previous < min || previous > max) {
+        return min;
       }
       return previous;
     });
     setRangeEnd((previous) => {
-      if (!previous || previous < cadenceRange.min || previous > cadenceRange.max) {
-        return cadenceRange.max;
+      if (!previous || previous < min || previous > max) {
+        return max;
       }
       return previous;
     });
@@ -631,7 +632,7 @@ export const TimeMachinePanel = ({
                     case "yearly":
                       return `${entry.year}`;
                     default:
-                      return `${entry.year}`;
+                      return "Unknown";
                   }
                 })();
                 const tooltip = buildProvenanceTooltip(entry.summary.provenance);

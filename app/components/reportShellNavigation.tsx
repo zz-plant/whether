@@ -111,7 +111,7 @@ export const ReportPageNavigation = ({
               <Tooltip.Root>
                 <Tooltip.Trigger
                   render={(props) => {
-                    const { type: _type, ...triggerProps } = props;
+                    const triggerProps = props;
                     return (
                       <NavigationMenu.Link
                         {...triggerProps}
