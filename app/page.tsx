@@ -15,6 +15,8 @@ import { RegimeAlertsPanel } from "./components/regimeAlertsPanel";
 import { ReportShell } from "./components/reportShell";
 import { reportPageLinks } from "../lib/reportNavigation";
 
+export const runtime = "edge";
+
 export const generateMetadata = ({
   searchParams,
 }: {

@@ -8,6 +8,8 @@ import {
 } from "../components/reportSections";
 import { reportPageLinks } from "../../lib/reportNavigation";
 
+export const runtime = "edge";
+
 export const metadata: Metadata = {
   title: "Whether Report — Onboarding",
   description:
