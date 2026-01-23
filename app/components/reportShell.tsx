@@ -190,6 +190,58 @@ export const ReportShell = ({
                   A fast, sourced readout of Treasury signals translated into product guidance.
                 </p>
               </div>
+              <div className="space-y-3">
+                <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
+                  Start here in 6 minutes
+                </p>
+                <ol className="grid gap-3 text-sm text-slate-200 sm:grid-cols-3">
+                  <li className="weather-surface flex h-full flex-col gap-2 p-3">
+                    <span className="text-xs font-semibold tracking-[0.16em] text-slate-400">
+                      Step 1
+                    </span>
+                    <p className="text-sm font-semibold text-slate-100">Set the weekly posture</p>
+                    <p className="text-xs text-slate-400">
+                      Read the action control room before you lock priorities.
+                    </p>
+                    <a
+                      href="#weekly-action-summary"
+                      className="touch-target inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-slate-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100 touch-manipulation"
+                    >
+                      Go to actions
+                    </a>
+                  </li>
+                  <li className="weather-surface flex h-full flex-col gap-2 p-3">
+                    <span className="text-xs font-semibold tracking-[0.16em] text-slate-400">
+                      Step 2
+                    </span>
+                    <p className="text-sm font-semibold text-slate-100">Scan the delta + alerts</p>
+                    <p className="text-xs text-slate-400">
+                      Confirm what shifted since your last read.
+                    </p>
+                    <a
+                      href="#change-since-last-read"
+                      className="touch-target inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-slate-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100 touch-manipulation"
+                    >
+                      Review changes
+                    </a>
+                  </li>
+                  <li className="weather-surface flex h-full flex-col gap-2 p-3">
+                    <span className="text-xs font-semibold tracking-[0.16em] text-slate-400">
+                      Step 3
+                    </span>
+                    <p className="text-sm font-semibold text-slate-100">Go deeper if needed</p>
+                    <p className="text-xs text-slate-400">
+                      Use the signal matrix for evidence and the glossary for terms.
+                    </p>
+                    <a
+                      href="#signal-matrix"
+                      className="touch-target inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-slate-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100 touch-manipulation"
+                    >
+                      Open signals
+                    </a>
+                  </li>
+                </ol>
+              </div>
               <div className="weather-surface weather-quick-glance flex flex-col gap-2 px-4 py-3 sm:hidden">
                 <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">
                   Quick glance
@@ -207,13 +259,13 @@ export const ReportShell = ({
                   href="#weekly-action-summary"
                   className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-[11px] font-semibold tracking-[0.2em] transition-colors hover:border-sky-300/80 hover:text-white touch-manipulation sm:text-xs"
                 >
-                  Start with this week
+                  Open action control room
                 </a>
                 <a
                   href="#executive-snapshot"
                   className="inline-flex min-h-[44px] items-center justify-center text-[11px] font-semibold tracking-[0.12em] text-slate-200 underline decoration-slate-400 underline-offset-4 hover:text-slate-100 touch-manipulation sm:justify-start sm:text-xs"
                 >
-                  See leadership summary
+                  Share leadership summary
                 </a>
               </div>
             </section>

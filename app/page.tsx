@@ -77,8 +77,9 @@ export default async function HomePage({
 }) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://whether.report";
   const sectionLinks = [
-    { href: "#executive-snapshot", label: "Leadership summary" },
     { href: "#weekly-action-summary", label: "This week's actions" },
+    { href: "#change-since-last-read", label: "What changed since last read" },
+    { href: "#executive-snapshot", label: "Leadership summary" },
     { href: "#regime-summary", label: "Market climate summary" },
     { href: "#regime-alerts", label: "New alerts" },
     { href: "#regime-alert-log", label: "Alert history" },
