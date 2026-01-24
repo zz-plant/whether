@@ -19,6 +19,6 @@ describe("time machine helpers", () => {
   });
 
   it("formats a historical banner label", () => {
-    assert.equal(formatHistoricalBanner(2024, 5), "Historical View: 2024-05");
+    assert.equal(formatHistoricalBanner(2024, 5), "Historical mode active · 2024-05");
   });
 });

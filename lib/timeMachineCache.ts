@@ -8,21 +8,52 @@ import { TreasuryDataSchema } from "./treasurySchema";
 import { evaluateRegime } from "./regimeEngine";
 import type { RegimeThresholds } from "./regimeEngine";
 import rawCache from "../data/time_machine_cache.json";
+import { snapshotData } from "./snapshot";
 
 const TimeMachineSnapshotSchema = TreasuryDataSchema.extend({
   year: z.number(),
   month: z.number(),
 });
 
+type TimeMachineSnapshot = z.infer<typeof TimeMachineSnapshotSchema>;
+
 const TimeMachineCacheSchema = z.array(TimeMachineSnapshotSchema);
 
-const parsedCache = TimeMachineCacheSchema.safeParse(rawCache);
+const deriveYearMonth = (recordDate: string) => {
+  const parsedDate = new Date(recordDate);
+  if (Number.isNaN(parsedDate.valueOf())) {
+    const now = new Date();
+    return { year: now.getUTCFullYear(), month: now.getUTCMonth() + 1 };
+  }
 
-if (!parsedCache.success) {
-  throw new Error("Time Machine cache failed validation.");
-}
+  return {
+    year: parsedDate.getUTCFullYear(),
+    month: parsedDate.getUTCMonth() + 1,
+  };
+};
 
-const sortedSnapshots = parsedCache.data
+const buildValidationFallbackSnapshot = (): TimeMachineSnapshot => {
+  const { year, month } = deriveYearMonth(snapshotData.record_date);
+  return {
+    ...snapshotData,
+    year,
+    month,
+  };
+};
+
+export const parseTimeMachineCache = (input: unknown): TimeMachineSnapshot[] => {
+  const parsedCache = TimeMachineCacheSchema.safeParse(input);
+
+  if (parsedCache.success) {
+    return parsedCache.data;
+  }
+
+  const fallback = [buildValidationFallbackSnapshot()];
+  console.error("Time Machine cache failed validation.", parsedCache.error.format());
+  return fallback;
+};
+
+const sortedSnapshots = parseTimeMachineCache(rawCache)
   .map((snapshot) => ({
     ...snapshot,
     isLive: false,
