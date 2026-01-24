@@ -216,29 +216,29 @@ export const TimeMachinePanel = ({
     );
     return { min: sorted[0].asOf, max: sorted.at(-1)?.asOf ?? null };
   }, [cadenceEntries]);
+  const { min: cadenceMin, max: cadenceMax } = cadenceRange;
   const [rangeStart, setRangeStart] = useState(() => cadenceRange.min ?? "");
   const [rangeEnd, setRangeEnd] = useState(() => cadenceRange.max ?? "");
 
   useEffect(() => {
-    const { min, max } = cadenceRange;
-    if (!min || !max) {
+    if (!cadenceMin || !cadenceMax) {
       setRangeStart("");
       setRangeEnd("");
       return;
     }
     setRangeStart((previous) => {
-      if (!previous || previous < min || previous > max) {
-        return min;
+      if (!previous || previous < cadenceMin || previous > cadenceMax) {
+        return cadenceMin;
       }
       return previous;
     });
     setRangeEnd((previous) => {
-      if (!previous || previous < min || previous > max) {
-        return max;
+      if (!previous || previous < cadenceMin || previous > cadenceMax) {
+        return cadenceMax;
       }
       return previous;
     });
-  }, [cadenceRange.max, cadenceRange.min]);
+  }, [cadenceMax, cadenceMin]);
 
   const filteredEntries = useMemo(() => {
     if (!rangeStart || !rangeEnd) {
