@@ -10,6 +10,7 @@ import {
   operationsSectionLinks,
   operationsWorkstreamLinks,
 } from "../../lib/operationsNavigation";
+import { appendSearchParamsToRoute } from "../../lib/routeSearchParams";
 import { OperationsWorkstreamNav } from "../components/operationsWorkstreamNav";
 
 export const runtime = "edge";
@@ -150,7 +151,7 @@ export default async function OperationsPage({
                 ))}
               </ul>
               <Link
-                href={link.href}
+                href={appendSearchParamsToRoute(link.href, searchParams)}
                 className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.2em] transition-colors hover:border-sky-300/80 hover:text-white"
               >
                 Open {link.label}
