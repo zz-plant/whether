@@ -1,26 +1,16 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { SectionedReportPanel } from "../components/sectionedReportPanel";
 import { loadReportData } from "../../lib/reportData";
 import { siteUrl } from "../../lib/siteUrl";
 import { ReportShell } from "../components/reportShell";
-import { AssumptionLockPanel } from "../components/assumptionLockPanel";
-import { CounterfactualPanel } from "../components/counterfactualPanel";
-import { DecisionMemoryPanel } from "../components/decisionMemoryPanel";
-import { DecisionShieldPanel } from "../components/decisionShieldPanel";
-import { ExecutiveBriefingPanel } from "../components/executiveBriefingPanel";
-import { ExportBriefPanel } from "../components/exportBriefPanel";
-import { StrategyBriefPanel } from "../components/strategyBriefPanel";
-import {
-  CxoFunctionPanel,
-  DecisionShieldTemplatesPanel,
-  FinanceStrategyPanel,
-  HistoricalBanner,
-  InsightDatabasePanel,
-  MonthlyActionSummaryPanel,
-  OperatorRequestsPanel,
-  PlaybookPanel,
-} from "../components/reportSections";
+import { HistoricalBanner, MonthlyActionSummaryPanel } from "../components/reportSections";
 import { reportPageLinks } from "../../lib/reportNavigation";
+import {
+  operationsSectionLinks,
+  operationsWorkstreamLinks,
+} from "../../lib/operationsNavigation";
+import { OperationsWorkstreamNav } from "../components/operationsWorkstreamNav";
 
 export const runtime = "edge";
 
@@ -28,6 +18,24 @@ export const metadata: Metadata = {
   title: "Whether Report — What to do next",
   description:
     "Execution-ready guidance, decision shield validation, and export briefs for the Whether Report.",
+};
+
+const workstreamHighlights: Record<string, string[]> = {
+  "/operations/plan": [
+    "Start, stop, and fence playbook moves",
+    "Quarterly finance posture",
+    "Signal-driven operator requests",
+  ],
+  "/operations/decisions": [
+    "Lock assumptions before committing",
+    "Decision shield validation and templates",
+    "Counterfactual pressure tests",
+  ],
+  "/operations/briefings": [
+    "Board-ready strategy brief",
+    "Exportable leadership briefs",
+    "CXO-specific deliverables",
+  ],
 };
 
 export default async function OperationsPage({
@@ -53,36 +61,13 @@ export default async function OperationsPage({
       name: "Whether",
     },
   };
-  const sectionLinks = [
-    { href: "#ops-monthly-action-summary", label: "Monthly summary" },
-    { href: "#ops-playbook", label: "Playbook" },
-    { href: "#ops-finance-strategy", label: "Finance strategy" },
-    { href: "#ops-strategy-brief", label: "Strategy brief" },
-    { href: "#ops-assumption-locking", label: "Assumption locking" },
-    { href: "#ops-insight-database", label: "Insight database" },
-    { href: "#ops-decision-memory", label: "Decision memory" },
-    { href: "#ops-decision-shield", label: "Decision shield" },
-    { href: "#ops-decision-shield-templates", label: "Decision templates" },
-    { href: "#ops-counterfactuals", label: "Counterfactual view" },
-    { href: "#ops-export-briefs", label: "Export briefs" },
-    { href: "#ops-executive-briefing", label: "Executive briefing" },
-    { href: "#ops-cxo-functions", label: "CXO outputs" },
-    { href: "#ops-operator-requests", label: "Operator requests" },
-  ];
 
   const {
     assessment,
     fetchedAtLabel,
-    fenceItems,
     historicalSelection,
-    internalProvenance,
-    macroSeries,
-    playbook,
     recordDateLabel,
-    sensors,
-    startItems,
     statusLabel,
-    stopItems,
     treasury,
     treasuryProvenance,
   } = await loadReportData(searchParams);
@@ -104,6 +89,8 @@ export default async function OperationsPage({
       : "Signals are live; use them to confirm playbook moves and decision shields.";
   const trustStatusTone = historicalSelection ? "historical" : isFallback ? "warning" : "stable";
 
+  const workstreamCards = operationsWorkstreamLinks.filter((link) => link.href !== "/operations");
+
   return (
     <ReportShell
       statusLabel={statusLabel}
@@ -118,7 +105,7 @@ export default async function OperationsPage({
       pageTitle="What to do next"
       pageSummary="Translate the market climate into action: decision shields, playbook moves, and export-ready briefs for leadership review."
       pageLinks={reportPageLinks}
-      sectionLinks={sectionLinks}
+      sectionLinks={operationsSectionLinks.overview}
       structuredData={JSON.stringify(structuredData)}
       historicalBanner={
         historicalSelection ? (
@@ -126,6 +113,8 @@ export default async function OperationsPage({
         ) : null
       }
     >
+      <OperationsWorkstreamNav currentPath="/operations" />
+
       <SectionedReportPanel
         id="ops-monthly-action-summary"
         title="Monthly action summary"
@@ -139,131 +128,36 @@ export default async function OperationsPage({
       </SectionedReportPanel>
 
       <SectionedReportPanel
-        id="ops-playbook"
-        title="Playbook"
-        description="Start, stop, and fence actions tuned to the current regime."
+        id="ops-workstreams"
+        title="Operational workstreams"
+        description="Pick a focused view so you do not have to scroll through every panel."
       >
-        <PlaybookPanel
-          playbook={playbook}
-          stopItems={stopItems}
-          startItems={startItems}
-          fenceItems={fenceItems}
-          provenance={treasuryProvenance}
-        />
-      </SectionedReportPanel>
-
-      <SectionedReportPanel
-        id="ops-finance-strategy"
-        title="Finance strategy"
-        description="Budget posture and cash timing guidance for the quarter."
-      >
-        <FinanceStrategyPanel regime={assessment.regime} provenance={treasuryProvenance} />
-      </SectionedReportPanel>
-
-      <SectionedReportPanel
-        id="ops-strategy-brief"
-        title="Strategy brief"
-        description="Board-ready narrative to align leaders on the regime shift."
-      >
-        <StrategyBriefPanel
-          assessment={assessment}
-          recordDateLabel={recordDateLabel}
-          provenance={treasuryProvenance}
-        />
-      </SectionedReportPanel>
-
-      <SectionedReportPanel
-        id="ops-assumption-locking"
-        title="Assumption locking"
-        description="Document the operating assumptions behind major bets."
-      >
-        <AssumptionLockPanel />
-      </SectionedReportPanel>
-
-      <SectionedReportPanel
-        id="ops-insight-database"
-        title="Insight database"
-        description="Capture what the regime implies for product signals and experiments."
-      >
-        <InsightDatabasePanel regime={assessment.regime} provenance={treasuryProvenance} />
-      </SectionedReportPanel>
-
-      <SectionedReportPanel
-        id="ops-decision-memory"
-        title="Decision memory"
-        description="Maintain a living log of decisions and their outcomes."
-      >
-        <DecisionMemoryPanel
-          assessment={assessment}
-          provenance={treasuryProvenance}
-          recordDateLabel={recordDateLabel}
-        />
-      </SectionedReportPanel>
-
-      <SectionedReportPanel
-        id="ops-decision-shield"
-        title="Decision shield"
-        description="Validate decisions against regime-specific guardrails."
-      >
-        <DecisionShieldPanel assessment={assessment} provenance={treasuryProvenance} />
-      </SectionedReportPanel>
-
-      <SectionedReportPanel
-        id="ops-decision-shield-templates"
-        title="Decision templates"
-        description="Copy-ready templates for decision shield reviews."
-      >
-        <DecisionShieldTemplatesPanel provenance={treasuryProvenance} />
-      </SectionedReportPanel>
-
-      <SectionedReportPanel
-        id="ops-counterfactuals"
-        title="Counterfactual view"
-        description="Stress-test priorities against alternate macro regimes."
-      >
-        <CounterfactualPanel assessment={assessment} provenance={treasuryProvenance} />
-      </SectionedReportPanel>
-
-      <SectionedReportPanel
-        id="ops-export-briefs"
-        title="Export briefs"
-        description="Downloadable briefs for leadership and planning cycles."
-      >
-        <ExportBriefPanel
-          assessment={assessment}
-          treasury={treasury}
-          sensors={sensors}
-          macroSeries={macroSeries}
-          provenance={treasuryProvenance}
-        />
-      </SectionedReportPanel>
-
-      <SectionedReportPanel
-        id="ops-executive-briefing"
-        title="Executive briefing"
-        description="One-page readout for exec leadership syncs."
-      >
-        <ExecutiveBriefingPanel
-          assessment={assessment}
-          recordDateLabel={recordDateLabel}
-          provenance={treasuryProvenance}
-        />
-      </SectionedReportPanel>
-
-      <SectionedReportPanel
-        id="ops-cxo-functions"
-        title="CXO outputs"
-        description="Functional deliverables by executive leader."
-      >
-        <CxoFunctionPanel provenance={internalProvenance} />
-      </SectionedReportPanel>
-
-      <SectionedReportPanel
-        id="ops-operator-requests"
-        title="Operator requests"
-        description="Current asks for operators driving execution."
-      >
-        <OperatorRequestsPanel provenance={internalProvenance} />
+        <div className="grid gap-4 lg:grid-cols-3">
+          {workstreamCards.map((link) => (
+            <article key={link.href} className="weather-surface flex h-full flex-col gap-4 p-5">
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.26em] text-slate-400">
+                  {link.label}
+                </p>
+                <p className="text-sm text-slate-300">{link.description}</p>
+              </div>
+              <ul className="space-y-2 text-sm text-slate-200">
+                {workstreamHighlights[link.href]?.map((item) => (
+                  <li key={item} className="flex items-start gap-2">
+                    <span className="mt-1 h-1.5 w-1.5 rounded-full bg-sky-400" aria-hidden="true" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href={link.href}
+                className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.2em] transition-colors hover:border-sky-300/80 hover:text-white"
+              >
+                Open {link.label}
+              </Link>
+            </article>
+          ))}
+        </div>
       </SectionedReportPanel>
     </ReportShell>
   );
