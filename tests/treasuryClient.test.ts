@@ -27,11 +27,11 @@ describe("treasury client", () => {
 
     const data = await fetchTreasuryData({
       fetcher,
-      asOf: "2024-10-01",
     });
     assert.equal(data.record_date, "2024-10-01");
     assert.equal(data.isLive, true);
-    assert.ok(requestedUrl.includes("record_date%3Alte%3A2024-10-01"));
+    assert.ok(requestedUrl.includes("page%5Bsize%5D=1"));
+    assert.equal(requestedUrl.includes("filter="), false);
   });
 
   it("falls back to snapshot on fetch failure", async () => {
