@@ -19,6 +19,7 @@ const getItemClasses = (link: OperationsWorkstreamLink, currentPath: Route) =>
 export const OperationsWorkstreamNav = ({ currentPath }: { currentPath: Route }) => {
   const searchParams = useSearchParams();
   const currentSearch = searchParams.toString();
+  const currentQuery = Object.fromEntries(searchParams.entries());
 
   return (
     <nav aria-label="Operations workstreams" className="weather-panel px-4 py-4">
@@ -33,7 +34,9 @@ export const OperationsWorkstreamNav = ({ currentPath }: { currentPath: Route })
           const isActive = link.href === currentPath;
           const labelTone = isActive ? "text-sky-200" : "text-slate-400";
           const descriptionTone = isActive ? "text-sky-100" : "text-slate-100";
-          const href = currentSearch ? `${link.href}?${currentSearch}` : link.href;
+          const href = currentSearch
+            ? { pathname: link.href, query: currentQuery }
+            : link.href;
           return (
             <li key={link.href}>
               <Link
