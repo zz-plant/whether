@@ -23,7 +23,7 @@ describe("sensor readings", () => {
     const readings = buildSensorReadings(treasury);
     assert.equal(readings.length, 2);
     assert.equal(readings[0].label.includes("Base rate"), true);
-    assert.equal(readings[1].value, -0.2);
+    assert.ok(Math.abs((readings[1].value ?? 0) - -0.2) < 1e-9);
     assert.equal(readings[0].category, "Rates");
     assert.equal(Array.isArray(readings[0].timeWindows), true);
     assert.equal(readings[0].group.label, "Rates");

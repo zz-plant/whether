@@ -116,13 +116,18 @@ const SummaryArchiveSchema = z.array(
   z.union([WeeklyArchiveSchema, MonthlyArchiveSchema, QuarterlyArchiveSchema, YearlyArchiveSchema])
 );
 
-const parsedArchive = SummaryArchiveSchema.safeParse(rawArchive);
+export const parseSummaryArchive = (input: unknown): SummaryArchiveEntry[] => {
+  const parsedArchive = SummaryArchiveSchema.safeParse(input);
 
-if (!parsedArchive.success) {
-  throw new Error("Summary archive failed validation.");
-}
+  if (parsedArchive.success) {
+    return parsedArchive.data;
+  }
 
-const sortedArchive = parsedArchive.data.sort(
+  console.error("Summary archive failed validation.", parsedArchive.error.format());
+  return [];
+};
+
+const sortedArchive = parseSummaryArchive(rawArchive).sort(
   (a, b) => new Date(a.asOf).getTime() - new Date(b.asOf).getTime()
 );
 
