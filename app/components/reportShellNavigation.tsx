@@ -273,72 +273,190 @@ export const ReportMobileNavigation = ({
   pageTitle: string;
   sectionLinks: ReportSectionLink[];
   className?: string;
-}) => (
-  <NavigationMenu.Root aria-label="Mobile report navigation" className={className}>
-    <div className="weather-mobile-nav flex items-center justify-between gap-2 px-3 py-2">
-      <NavigationMenu.List className="flex flex-1 items-center gap-1.5">
-        {pageLinks.map((link) => {
-          const isActive = link.label === pageTitle;
-          return (
-            <NavigationMenu.Item key={link.href} className="flex-1">
-              <NavigationMenu.Link
-                href={link.href}
-                active={isActive}
-                aria-current={isActive ? "page" : undefined}
-                className={`flex min-h-[44px] flex-1 flex-col items-center justify-center gap-1 rounded-2xl border border-transparent px-2 py-2 text-[9px] font-semibold tracking-[0.14em] transition-colors touch-manipulation ${
-                  isActive
-                    ? "border-sky-400/60 bg-sky-500/15 text-sky-100"
-                    : "text-slate-300 hover:border-slate-700/70 hover:text-slate-100"
-                }`}
+}) => {
+  const currentIndex = pageLinks.findIndex((link) => link.label === pageTitle);
+  const currentLink = currentIndex >= 0 ? pageLinks[currentIndex] : pageLinks[0];
+  const prevLink = currentIndex > 0 ? pageLinks[currentIndex - 1] : null;
+  const nextLink =
+    currentIndex >= 0 && currentIndex < pageLinks.length - 1 ? pageLinks[currentIndex + 1] : null;
+  const sectionCountLabel =
+    sectionLinks.length === 0
+      ? "No sections"
+      : sectionLinks.length === 1
+        ? "1 section"
+        : `${sectionLinks.length} sections`;
+
+  return (
+    <NavigationMenu.Root aria-label="Mobile report navigation" className={className}>
+      <Collapsible.Root className="relative">
+        <div className="weather-mobile-nav flex items-stretch gap-2 px-3 py-3">
+          <div className="flex min-w-0 flex-1 items-center gap-3 rounded-2xl border border-slate-800/80 bg-slate-950/70 px-3 py-2">
+            <span className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl border border-slate-800/80 bg-slate-950/80 text-slate-100">
+              {pageLinkIcons[currentLink.label]}
+            </span>
+            <div className="min-w-0">
+              <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-400">
+                Current page
+              </p>
+              <p className="truncate text-sm font-semibold tracking-[0.08em] text-slate-100">
+                {currentLink.label}
+              </p>
+            </div>
+          </div>
+
+          <div className="grid w-[108px] flex-shrink-0 grid-cols-2 gap-1.5">
+            {prevLink ? (
+              <a
+                href={prevLink.href}
+                className="weather-pill inline-flex min-h-[44px] flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/80 px-2 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
               >
-                <span className={isActive ? "text-sky-100" : "text-slate-200"}>
-                  {pageLinkIcons[link.label]}
+                <span aria-hidden="true" className="text-base leading-none text-slate-300">
+                  ←
                 </span>
-                <span className="uppercase">{link.label}</span>
-              </NavigationMenu.Link>
-            </NavigationMenu.Item>
-          );
-        })}
-      </NavigationMenu.List>
-      {sectionLinks.length > 0 ? (
-        <Collapsible.Root className="relative flex-1">
+                <span className="uppercase">Prev</span>
+              </a>
+            ) : (
+              <button
+                type="button"
+                aria-disabled="true"
+                className="weather-pill pointer-events-none inline-flex min-h-[44px] flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/60 px-2 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-500/80 opacity-70"
+              >
+                <span aria-hidden="true" className="text-base leading-none">
+                  ←
+                </span>
+                <span className="uppercase">Prev</span>
+              </button>
+            )}
+            {nextLink ? (
+              <a
+                href={nextLink.href}
+                className="weather-pill inline-flex min-h-[44px] flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/80 px-2 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+              >
+                <span aria-hidden="true" className="text-base leading-none text-slate-300">
+                  →
+                </span>
+                <span className="uppercase">Next</span>
+              </a>
+            ) : (
+              <button
+                type="button"
+                aria-disabled="true"
+                className="weather-pill pointer-events-none inline-flex min-h-[44px] flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/60 px-2 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-500/80 opacity-70"
+              >
+                <span aria-hidden="true" className="text-base leading-none">
+                  →
+                </span>
+                <span className="uppercase">Next</span>
+              </button>
+            )}
+          </div>
+
           <Collapsible.Trigger
             type="button"
-            className="group flex min-h-[44px] w-full flex-col items-center justify-center gap-1 rounded-2xl border border-transparent px-2 py-2 text-[9px] font-semibold tracking-[0.14em] text-slate-300 transition-colors hover:border-slate-700/70 hover:text-slate-100 touch-manipulation"
+            className="group weather-pill flex min-h-[44px] w-[92px] flex-shrink-0 flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/80 px-2 py-2 text-[10px] font-semibold tracking-[0.18em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
           >
-            <span className="text-slate-200">
+            <span className="text-slate-100 transition-transform duration-200 group-data-[panel-open]:rotate-90">
               <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
                 <path
-                  d="M4 6.5h16M4 12h16M4 17.5h10"
+                  d="M6.5 5.5h11a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2Z"
+                  fill="none"
                   stroke="currentColor"
-                  strokeWidth="1.6"
+                  strokeWidth="1.4"
+                />
+                <path
+                  d="M8.75 9.25h6.5M8.75 12h6.5M8.75 14.75h4"
+                  fill="none"
+                  stroke="currentColor"
                   strokeLinecap="round"
+                  strokeWidth="1.5"
                 />
               </svg>
             </span>
-            <span className="uppercase">Sections</span>
+            <span className="uppercase">Menu</span>
+            <span className="text-[9px] font-medium tracking-[0.12em] text-slate-400">
+              {sectionCountLabel}
+            </span>
           </Collapsible.Trigger>
-          <Collapsible.Panel className="absolute bottom-full left-0 right-0 mb-3">
-            <div className="weather-mobile-panel max-h-[60vh] space-y-2 overflow-auto px-4 py-4">
-              <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">
-                Jump to section
-              </p>
-              <ul className="space-y-2">
-                {sectionLinks.map((item) => (
-                  <li key={item.href}>
-                    <a
-                      href={item.href}
-                      className="weather-pill inline-flex min-h-[44px] w-full items-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
-                    >
-                      {item.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
+        </div>
+
+        <Collapsible.Panel className="absolute bottom-full left-0 right-0 mb-3">
+          <div className="weather-mobile-panel max-h-[70vh] space-y-4 overflow-auto px-4 py-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="space-y-1">
+                <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
+                  Navigate report
+                </p>
+                <p className="text-base font-semibold text-slate-100">{currentLink.label}</p>
+                <p className="text-xs text-slate-300">{currentLink.description}</p>
+              </div>
+              <span className="weather-chip inline-flex min-h-[44px] items-center px-3 py-1 text-[10px] font-semibold tracking-[0.18em] text-slate-200">
+                {sectionCountLabel}
+              </span>
             </div>
-          </Collapsible.Panel>
-        </Collapsible.Root>
-      ) : null}
-    </div>
-  </NavigationMenu.Root>
-);
+
+            <NavigationMenu.List className="grid gap-2">
+              {pageLinks.map((link) => {
+                const isActive = link.label === pageTitle;
+                return (
+                  <NavigationMenu.Item key={link.href}>
+                    <NavigationMenu.Link
+                      href={link.href}
+                      active={isActive}
+                      aria-current={isActive ? "page" : undefined}
+                      className={`weather-pill flex min-h-[56px] items-start gap-3 rounded-2xl border px-3 py-3 text-left text-sm font-semibold tracking-[0.08em] transition-colors touch-manipulation ${
+                        isActive
+                          ? "border-sky-400/70 bg-sky-500/15 text-sky-100"
+                          : "border-slate-800/80 text-slate-100 hover:border-sky-400/70 hover:text-sky-100"
+                      }`}
+                    >
+                      <span
+                        className={`inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl border ${
+                          isActive
+                            ? "border-sky-300/70 bg-sky-500/20 text-sky-100"
+                            : "border-slate-800/80 bg-slate-950/70 text-slate-200"
+                        }`}
+                      >
+                        {pageLinkIcons[link.label]}
+                      </span>
+                      <span className="space-y-1">
+                        <span className="block text-xs uppercase tracking-[0.2em] text-slate-400">
+                          Report page
+                        </span>
+                        <span className="block text-sm font-semibold text-current">
+                          {link.label}
+                        </span>
+                        <span className="block text-xs font-medium tracking-[0.12em] text-slate-300">
+                          {link.description}
+                        </span>
+                      </span>
+                    </NavigationMenu.Link>
+                  </NavigationMenu.Item>
+                );
+              })}
+            </NavigationMenu.List>
+
+            {sectionLinks.length > 0 ? (
+              <div className="space-y-2">
+                <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">
+                  Jump to section
+                </p>
+                <ul className="space-y-2">
+                  {sectionLinks.map((item) => (
+                    <li key={item.href}>
+                      <a
+                        href={item.href}
+                        className="weather-pill inline-flex min-h-[44px] w-full items-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                      >
+                        {item.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+          </div>
+        </Collapsible.Panel>
+      </Collapsible.Root>
+    </NavigationMenu.Root>
+  );
+};
