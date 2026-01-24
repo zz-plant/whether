@@ -78,10 +78,6 @@ export const ReportShell = ({
       ) : null}
       <DisplayGuardian />
       <div className="pointer-events-none absolute inset-0 weather-grid" />
-      <div className="pointer-events-none absolute inset-0 hidden sm:block weather-aurora" />
-      <div className="pointer-events-none absolute inset-0 hidden sm:block weather-haze" />
-      <div className="pointer-events-none absolute left-1/2 top-0 hidden h-[520px] w-[720px] -translate-x-1/2 rounded-full bg-sky-400/15 blur-[190px] sm:block" />
-      <div className="pointer-events-none absolute -right-24 top-24 hidden h-[420px] w-[420px] rounded-full bg-fuchsia-400/10 blur-[160px] sm:block" />
       <div className="mx-auto max-w-7xl pb-[calc(env(safe-area-inset-bottom)+12rem)] pt-3 pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)] sm:pb-12 sm:pt-6 sm:pl-[calc(env(safe-area-inset-left)+1.5rem)] sm:pr-[calc(env(safe-area-inset-right)+1.5rem)]">
         <header className="weather-appbar sticky top-3 z-20 px-4 py-4 sm:top-4 sm:px-6 sm:py-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -157,7 +153,7 @@ export const ReportShell = ({
             {sectionLinks.length > 0 ? (
               <nav aria-label="Report sections" className="weather-panel px-4 py-4">
                 <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Sections</p>
-                <ul className="mt-3 space-y-2">
+                <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
                   {sectionLinks.map((item) => (
                     <li key={item.href}>
                       <a
