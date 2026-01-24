@@ -1,4 +1,6 @@
 import { spawnSync } from "node:child_process";
+import { existsSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 
 const isVercel = process.env.VERCEL === "1" || process.env.VERCEL === "true";
 const command = isVercel ? "next" : "next-on-pages";
@@ -8,4 +10,9 @@ const result = spawnSync(command, args, { stdio: "inherit", shell: true });
 
 if (result.status !== 0) {
   process.exit(result.status ?? 1);
+}
+
+const assetsIgnorePath = join(".vercel", "output", "static", ".assetsignore");
+if (existsSync(join(".vercel", "output", "static"))) {
+  writeFileSync(assetsIgnorePath, "_worker.js\n");
 }
