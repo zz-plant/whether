@@ -9,11 +9,10 @@ import type { TreasuryData } from "../lib/types";
 describe("treasury client", () => {
   it("returns live data when fetch succeeds", async () => {
     let requestedUrl = "";
-    const fetcher = async (input: RequestInfo | URL) => {
+    const fetcher: typeof fetch = async (input) => {
       requestedUrl = input.toString();
-      return {
-        ok: true,
-        json: async () => ({
+      return new Response(
+        JSON.stringify({
           data: [
             {
               record_date: "2024-10-01",
@@ -23,11 +22,11 @@ describe("treasury client", () => {
             },
           ],
         }),
-      };
+      );
     };
 
     const data = await fetchTreasuryData({
-      fetcher: fetcher as typeof fetch,
+      fetcher,
       asOf: "2024-10-01",
     });
     assert.equal(data.record_date, "2024-10-01");
@@ -36,13 +35,7 @@ describe("treasury client", () => {
   });
 
   it("falls back to snapshot on fetch failure", async () => {
-    const fetcher = async () => {
-      return {
-        ok: false,
-        status: 500,
-        json: async () => ({}),
-      };
-    };
+    const fetcher: typeof fetch = async () => new Response("{}", { status: 500 });
 
     const snapshot: TreasuryData = {
       source: "snapshot",
@@ -57,7 +50,7 @@ describe("treasury client", () => {
     };
 
     const data = await fetchTreasuryData({
-      fetcher: fetcher as typeof fetch,
+      fetcher,
       snapshotFallback: snapshot,
     });
 
