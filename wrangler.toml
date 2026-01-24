@@ -1,8 +1,15 @@
 name = "whether"
 main = ".vercel/output/static/_worker.js"
+base_dir = ".vercel/output/static/_worker.js"
+find_additional_modules = true
 compatibility_date = "2026-01-23"
+compatibility_flags = ["nodejs_compat"]
 workers_dev = true
 preview_urls = true
+
+[[rules]]
+type = "ESModule"
+globs = ["__next-on-pages-dist__/**/*.js"]
 
 [assets]
 directory = ".vercel/output/static"
