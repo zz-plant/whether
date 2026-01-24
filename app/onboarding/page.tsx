@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { loadReportData } from "../../lib/reportData";
+import { siteUrl } from "../../lib/siteUrl";
 import { ReportShell } from "../components/reportShell";
 import {
   BeginnerGlossaryPanel,
@@ -21,7 +22,6 @@ export default async function OnboardingPage({
 }: {
   searchParams?: { month?: string; year?: string; [key: string]: string | undefined };
 }) {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://whether.report";
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebPage",

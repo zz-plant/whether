@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SectionedReportPanel } from "../components/sectionedReportPanel";
 import { loadReportData } from "../../lib/reportData";
+import { siteUrl } from "../../lib/siteUrl";
 import { ReportShell } from "../components/reportShell";
 import { AssumptionLockPanel } from "../components/assumptionLockPanel";
 import { CounterfactualPanel } from "../components/counterfactualPanel";
@@ -34,7 +35,6 @@ export default async function OperationsPage({
 }: {
   searchParams?: { month?: string; year?: string; [key: string]: string | undefined };
 }) {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://whether.report";
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebPage",

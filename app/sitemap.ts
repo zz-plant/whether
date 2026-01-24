@@ -1,8 +1,7 @@
 import type { MetadataRoute } from "next";
+import { siteUrl } from "../lib/siteUrl";
 
 // Market Climate Station SEO map for the primary report surface.
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://whether.report";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
