@@ -125,7 +125,7 @@ export const ReportShell = ({
           <ReportPageNavigation
             pageLinks={pageLinks}
             pageTitle={pageTitle}
-            className="mt-4 -mx-4 px-4 sm:mx-0 sm:px-0"
+            className="mt-4 -mx-4 hidden px-4 sm:mx-0 sm:block sm:px-0"
           />
         </header>
 
