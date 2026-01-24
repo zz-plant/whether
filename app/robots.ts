@@ -1,8 +1,7 @@
 import type { MetadataRoute } from "next";
+import { siteUrl } from "../lib/siteUrl";
 
 // Market Climate Station SEO guardrails: make the dashboard discoverable and scannable.
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://whether.report";
 
 export default function robots(): MetadataRoute.Robots {
   return {

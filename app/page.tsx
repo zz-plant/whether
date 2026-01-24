@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { resolveTimeMachineSelection, parseTimeMachineRequest } from "../lib/timeMachineSelection";
 import { loadReportData } from "../lib/reportData";
+import { siteUrl } from "../lib/siteUrl";
 import {
   ExecutiveSnapshotPanel,
   WeeklyActionSummaryPanel,
@@ -22,7 +23,6 @@ export const generateMetadata = ({
 }: {
   searchParams?: { month?: string; year?: string };
 }): Metadata => {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://whether.report";
   const siteName = "Whether — Market Climate Station";
   const siteDescription =
     "Translate Treasury macro signals into plain-English operational constraints for product and engineering leaders.";
@@ -75,7 +75,6 @@ export default async function HomePage({
 }: {
   searchParams?: { month?: string; year?: string; [key: string]: string | undefined };
 }) {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://whether.report";
   const sectionLinks = [
     { href: "#executive-snapshot", label: "Leadership summary" },
     { href: "#weekly-action-summary", label: "This week's actions" },
