@@ -59,6 +59,7 @@ const timestampFormatter = new Intl.DateTimeFormat("en-US", {
   timeStyle: "short",
   timeZone: "UTC",
 });
+const CLIMATE_ORDER = ["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"] as const;
 
 const formatTimestamp = (iso: string) => {
   const date = new Date(iso);
@@ -3006,13 +3007,12 @@ export const InsightDatabasePanel = ({
   const [selectedSignal, setSelectedSignal] = useState("all");
   const [dateRange, setDateRange] = useState({ start: "", end: "" });
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const climateOrder = ["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"];
 
   const climateOptions = useMemo(
     () =>
       Array.from(new Set(evidenceLibrary.map((item) => item.climate))).sort(
         (first, second) =>
-          climateOrder.indexOf(first) - climateOrder.indexOf(second)
+          CLIMATE_ORDER.indexOf(first) - CLIMATE_ORDER.indexOf(second)
       ),
     [evidenceLibrary]
   );
