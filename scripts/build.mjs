@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { existsSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const isVercel = process.env.VERCEL === "1" || process.env.VERCEL === "true";
@@ -15,4 +15,24 @@ if (result.status !== 0) {
 const assetsIgnorePath = join(".vercel", "output", "static", ".assetsignore");
 if (existsSync(join(".vercel", "output", "static"))) {
   writeFileSync(assetsIgnorePath, "_worker.js\n");
+}
+
+const workerIndexPath = join(
+  ".vercel",
+  "output",
+  "static",
+  "_worker.js",
+  "index.js",
+);
+
+if (existsSync(workerIndexPath)) {
+  const workerSource = readFileSync(workerIndexPath, "utf8");
+  const rewrittenSource = workerSource.replaceAll(
+    '"__next-on-pages-dist__/',
+    '"./__next-on-pages-dist__/',
+  );
+
+  if (rewrittenSource !== workerSource) {
+    writeFileSync(workerIndexPath, rewrittenSource);
+  }
 }
