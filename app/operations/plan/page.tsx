@@ -91,7 +91,8 @@ export default async function OperationsPlanPage({
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="What to do next"
-      pageSummary="Workstream: plan. Translate the regime into quarterly posture, playbook moves, and operator requests."
+      pageSummary="Workstream: plan. See which moves the regime wants next."
+      pageSummaryLink={{ href: "#ops-playbook", label: "Explore details →" }}
       pageLinks={reportPageLinks}
       sectionLinks={operationsSectionLinks.plan}
       structuredData={JSON.stringify(structuredData)}

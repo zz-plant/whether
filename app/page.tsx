@@ -138,7 +138,8 @@ export default async function HomePage({
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Weekly briefing"
-      pageSummary="A fast, plain-English briefing on what to do this week, why it matters, and where to dig deeper."
+      pageSummary="A quick pulse on the week’s regime and the moves it hints at."
+      pageSummaryLink={{ href: "#weekly-action-summary", label: "Explore details →" }}
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
       structuredData={JSON.stringify(structuredData)}

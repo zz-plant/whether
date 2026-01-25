@@ -104,7 +104,8 @@ export default async function OperationsPage({
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="What to do next"
-      pageSummary="Translate the market climate into action: decision shields, playbook moves, and export-ready briefs for leadership review."
+      pageSummary="See how the regime turns into plan, decisions, and briefings."
+      pageSummaryLink={{ href: "#ops-workstreams", label: "Explore details →" }}
       pageLinks={reportPageLinks}
       sectionLinks={operationsSectionLinks.overview}
       heroVariant="compact"

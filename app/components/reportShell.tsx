@@ -21,6 +21,7 @@ export const ReportShell = ({
   treasurySource,
   pageTitle,
   pageSummary,
+  pageSummaryLink,
   pageLinks,
   sectionLinks,
   trustStatusLabel,
@@ -43,6 +44,7 @@ export const ReportShell = ({
   treasurySource: string;
   pageTitle: string;
   pageSummary: string;
+  pageSummaryLink?: { href: string; label: string };
   pageLinks: ReportPageLink[];
   sectionLinks: ReportSectionLink[];
   trustStatusLabel: string;
@@ -70,6 +72,14 @@ export const ReportShell = ({
       : trustStatusTone === "historical"
         ? "text-slate-400"
         : "text-emerald-200";
+  const summaryLink = pageSummaryLink ? (
+    <a
+      href={pageSummaryLink.href}
+      className="inline-flex min-h-[44px] items-center text-xs font-semibold text-sky-200 underline decoration-slate-500/80 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+    >
+      {pageSummaryLink.label}
+    </a>
+  ) : null;
 
   return (
     <main
@@ -142,7 +152,10 @@ export const ReportShell = ({
             <section className="weather-panel space-y-3 px-4 py-4">
               <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">You are here</p>
               <p className="text-lg font-semibold text-slate-100">{pageTitle}</p>
-              <p className="text-sm text-slate-300">{pageSummary}</p>
+              <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-slate-300">
+                <span>{pageSummary}</span>
+                {summaryLink}
+              </p>
               <div className="space-y-2 text-xs text-slate-300">
                 <p className="text-xs font-semibold text-slate-400">Updated</p>
                 <p className="mono text-slate-100">{fetchedAtLabel}</p>
@@ -196,8 +209,9 @@ export const ReportShell = ({
                     <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
                       {pageTitle}
                     </h1>
-                    <p className="max-w-2xl text-sm text-slate-200 sm:text-base">
-                      {pageSummary}
+                    <p className="flex max-w-2xl flex-wrap items-center gap-x-2 gap-y-1 text-sm text-slate-200 sm:text-base">
+                      <span>{pageSummary}</span>
+                      {summaryLink}
                     </p>
                   </>
                 ) : (

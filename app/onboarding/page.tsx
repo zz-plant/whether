@@ -82,7 +82,8 @@ export default async function OnboardingPage({
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Onboarding"
-      pageSummary="Get oriented fast with a quick reading guide and a plain-English glossary of the key signals."
+      pageSummary="Start with the basics, then decode the signals in plain English."
+      pageSummaryLink={{ href: "#first-time-guide", label: "Explore details →" }}
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
       heroVariant="compact"

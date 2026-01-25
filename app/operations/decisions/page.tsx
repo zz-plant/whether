@@ -86,7 +86,8 @@ export default async function OperationsDecisionsPage({
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="What to do next"
-      pageSummary="Workstream: decisions. Lock assumptions, validate decision shields, and pressure-test bets before committing."
+      pageSummary="Workstream: decisions. Pressure-test the big bets before they harden."
+      pageSummaryLink={{ href: "#ops-decision-shield", label: "Explore details →" }}
       pageLinks={reportPageLinks}
       sectionLinks={operationsSectionLinks.decisions}
       structuredData={JSON.stringify(structuredData)}
