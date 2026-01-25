@@ -20,7 +20,7 @@ import {
   type LifecycleStage,
 } from "../../lib/decisionShield";
 import type { RegimeAssessment } from "../../lib/regimeEngine";
-import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
+import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 
 const lifecycleOptions: { value: LifecycleStage; label: string }[] = [
   { value: "DISCOVERY", label: "Discovery" },

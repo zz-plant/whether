@@ -4,8 +4,8 @@ import { Button } from "@base-ui/react/button";
 import { useMemo } from "react";
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import { insightDatabase } from "../../data/recommendations";
-import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
-import { useClipboardCopy } from "./useClipboardCopy";
+import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
+import { useClipboardCopy } from "../../components/useClipboardCopy";
 
 const buildExecutiveMemo = (assessment: RegimeAssessment, recordDateLabel: string) => {
   const template = insightDatabase.executiveBriefingSuite.regimes.find(
