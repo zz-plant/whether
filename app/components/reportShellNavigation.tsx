@@ -111,10 +111,12 @@ export const ReportPageNavigation = ({
   pageLinks,
   pageTitle,
   className,
+  variant = "full",
 }: {
   pageLinks: ReportPageLink[];
   pageTitle: string;
   className?: string;
+  variant?: "full" | "compact";
 }) => {
   const currentIndex = pageLinks.findIndex((link) => link.label === pageTitle);
   const currentPosition = currentIndex >= 0 ? currentIndex + 1 : 1;
@@ -128,9 +130,14 @@ export const ReportPageNavigation = ({
       <Tooltip.Provider delay={200} closeDelay={50}>
         <div className="space-y-2">
           <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] font-semibold tracking-[0.18em] text-slate-400">
-            <span>
-              Page {currentPosition} of {pageLinks.length}
-            </span>
+            <div className="flex flex-wrap items-center gap-3">
+              <span>
+                Page {currentPosition} of {pageLinks.length}
+              </span>
+              <span className="hidden text-[10px] font-semibold tracking-[0.16em] text-slate-300 sm:inline">
+                Current: {currentLink.label}
+              </span>
+            </div>
             <div className="flex flex-wrap items-center gap-2">
               {prevLink ? (
                 <a
@@ -165,60 +172,64 @@ export const ReportPageNavigation = ({
             </div>
           </div>
 
-          <div className="rounded-2xl border border-slate-800/70 bg-slate-950/40 px-3 py-2">
-            <p className="text-[10px] font-semibold tracking-[0.2em] text-slate-400">
-              Current page
-            </p>
-            <p className="text-sm font-semibold text-slate-100">{currentLink.label}</p>
-            <p className="text-xs text-slate-300">{currentLink.description}</p>
-          </div>
+          {variant === "full" ? (
+            <>
+              <div className="rounded-2xl border border-slate-800/70 bg-slate-950/40 px-3 py-2">
+                <p className="text-[10px] font-semibold tracking-[0.2em] text-slate-400">
+                  Current page
+                </p>
+                <p className="text-sm font-semibold text-slate-100">{currentLink.label}</p>
+                <p className="text-xs text-slate-300">{currentLink.description}</p>
+              </div>
 
-          <NavigationMenu.List className="grid grid-cols-2 gap-1.5 sm:flex sm:flex-wrap sm:gap-2">
-            {pageLinks.map((link, index) => {
-              const isActive = link.label === pageTitle;
-              const isOddTail = pageLinks.length % 2 === 1 && index === pageLinks.length - 1;
-              return (
-                <NavigationMenu.Item
-                  key={link.href}
-                  className={`flex ${isOddTail ? "col-span-2 sm:col-auto" : ""} sm:flex-shrink-0`}
-                >
-                  <Tooltip.Root>
-                    <Tooltip.Trigger
-                      render={(props) => {
-                        const triggerProps = props;
-                        return (
-                          <NavigationMenu.Link
-                            {...triggerProps}
-                            href={link.href}
-                            active={isActive}
-                            aria-current={isActive ? "page" : undefined}
-                            className={`weather-tab inline-flex min-h-[44px] w-full items-center justify-center gap-2 px-3 py-2 text-center text-[9px] font-semibold tracking-[0.14em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:px-4 sm:text-xs sm:tracking-[0.12em] ${
-                              isActive
-                                ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
-                                : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
-                            } ${isOddTail ? "mx-auto max-w-[240px]" : ""}`}
-                          >
-                            <span className="hidden sm:inline-flex">
-                              {pageLinkIcons[link.label]}
-                            </span>
-                            {link.label}
-                          </NavigationMenu.Link>
-                        );
-                      }}
-                    />
-                    <Tooltip.Portal>
-                      <Tooltip.Positioner side="bottom" align="start" sideOffset={10}>
-                        <Tooltip.Popup className="hidden max-w-xs rounded-2xl border border-slate-800/80 bg-slate-950/95 px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-200 shadow-xl sm:block">
-                          {link.description}
-                          <Tooltip.Arrow className="h-2 w-2 translate-y-[1px] rotate-45 rounded-[2px] bg-slate-950/95" />
-                        </Tooltip.Popup>
-                      </Tooltip.Positioner>
-                    </Tooltip.Portal>
-                  </Tooltip.Root>
-                </NavigationMenu.Item>
-              );
-            })}
-          </NavigationMenu.List>
+              <NavigationMenu.List className="grid grid-cols-2 gap-1.5 sm:flex sm:flex-wrap sm:gap-2">
+                {pageLinks.map((link, index) => {
+                  const isActive = link.label === pageTitle;
+                  const isOddTail = pageLinks.length % 2 === 1 && index === pageLinks.length - 1;
+                  return (
+                    <NavigationMenu.Item
+                      key={link.href}
+                      className={`flex ${isOddTail ? "col-span-2 sm:col-auto" : ""} sm:flex-shrink-0`}
+                    >
+                      <Tooltip.Root>
+                        <Tooltip.Trigger
+                          render={(props) => {
+                            const triggerProps = props;
+                            return (
+                              <NavigationMenu.Link
+                                {...triggerProps}
+                                href={link.href}
+                                active={isActive}
+                                aria-current={isActive ? "page" : undefined}
+                                className={`weather-tab inline-flex min-h-[44px] w-full items-center justify-center gap-2 px-3 py-2 text-center text-[9px] font-semibold tracking-[0.14em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:px-4 sm:text-xs sm:tracking-[0.12em] ${
+                                  isActive
+                                    ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
+                                    : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
+                                } ${isOddTail ? "mx-auto max-w-[240px]" : ""}`}
+                              >
+                                <span className="hidden sm:inline-flex">
+                                  {pageLinkIcons[link.label]}
+                                </span>
+                                {link.label}
+                              </NavigationMenu.Link>
+                            );
+                          }}
+                        />
+                        <Tooltip.Portal>
+                          <Tooltip.Positioner side="bottom" align="start" sideOffset={10}>
+                            <Tooltip.Popup className="hidden max-w-xs rounded-2xl border border-slate-800/80 bg-slate-950/95 px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-200 shadow-xl sm:block">
+                              {link.description}
+                              <Tooltip.Arrow className="h-2 w-2 translate-y-[1px] rotate-45 rounded-[2px] bg-slate-950/95" />
+                            </Tooltip.Popup>
+                          </Tooltip.Positioner>
+                        </Tooltip.Portal>
+                      </Tooltip.Root>
+                    </NavigationMenu.Item>
+                  );
+                })}
+              </NavigationMenu.List>
+            </>
+          ) : null}
         </div>
       </Tooltip.Provider>
     </NavigationMenu.Root>

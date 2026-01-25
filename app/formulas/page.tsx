@@ -10,12 +10,137 @@ export const metadata: Metadata = {
 };
 
 const formulaCard = "rounded-2xl border border-slate-800 bg-slate-900/40 p-6";
-const formulaLinks = [
-  { href: "#base-rate", label: "Base rate" },
-  { href: "#curve-slope", label: "Yield curve slope" },
-  { href: "#cpi-inflation", label: "CPI inflation" },
-  { href: "#unemployment-rate", label: "Unemployment rate" },
-  { href: "#credit-spread", label: "Credit spread" },
+const formulaSections = [
+  {
+    id: "base-rate",
+    label: "Base rate",
+    description:
+      "Uses the 1-month Treasury yield; falls back to 3-month if missing. This anchors the cost of capital in the current policy environment.",
+    sourceHref: "https://fiscaldata.treasury.gov/api-documentation/",
+    sourceLabel: "US Treasury Fiscal Data API",
+    accentClass: "border-sky-400/50 bg-sky-500/10 text-sky-100",
+    icon: (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+        <path
+          d="M6 15.5h12M8.5 11.5h7M11 7.5h2"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+        />
+        <path
+          d="M5.5 18.5h13a1.5 1.5 0 0 0 1.5-1.5V7a1.5 1.5 0 0 0-1.5-1.5h-13A1.5 1.5 0 0 0 4 7v10a1.5 1.5 0 0 0 1.5 1.5Z"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        />
+      </svg>
+    ),
+  },
+  {
+    id: "curve-slope",
+    label: "Yield curve slope",
+    description:
+      "10-year Treasury yield minus 2-year Treasury yield. A negative slope signals risk aversion in credit markets.",
+    sourceHref: "https://fiscaldata.treasury.gov/api-documentation/",
+    sourceLabel: "US Treasury Fiscal Data API",
+    accentClass: "border-indigo-400/50 bg-indigo-500/10 text-indigo-100",
+    icon: (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+        <path
+          d="M6 16c2-4 4-6 6-6s4 2 6 6"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+        />
+        <path
+          d="M5 19h14"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.4"
+          strokeLinecap="round"
+        />
+      </svg>
+    ),
+  },
+  {
+    id: "cpi-inflation",
+    label: "CPI inflation (YoY)",
+    description:
+      "Year-over-year change in CPI-U. Tracks consumer inflation pressure across the basket of goods and services.",
+    sourceHref: "https://www.bls.gov/cpi/",
+    sourceLabel: "Bureau of Labor Statistics CPI",
+    accentClass: "border-amber-400/50 bg-amber-500/10 text-amber-100",
+    icon: (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+        <path
+          d="M6 16h3l2-4 2 3 3-6h2"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <circle cx="6" cy="16" r="1.5" fill="currentColor" />
+        <circle cx="18" cy="9" r="1.5" fill="currentColor" />
+      </svg>
+    ),
+  },
+  {
+    id: "unemployment-rate",
+    label: "Unemployment rate (U-3)",
+    description:
+      "Headline unemployment rate for the civilian labor force. Indicates labor market tightness and potential demand softness.",
+    sourceHref: "https://www.bls.gov/news.release/empsit.toc.htm",
+    sourceLabel: "BLS Employment Situation",
+    accentClass: "border-emerald-400/50 bg-emerald-500/10 text-emerald-100",
+    icon: (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+        <path
+          d="M5 18V9a2 2 0 0 1 2-2h3l1 2h6a2 2 0 0 1 2 2v7"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M9 12h6"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+        />
+      </svg>
+    ),
+  },
+  {
+    id: "credit-spread",
+    label: "BBB credit spread (OAS)",
+    description:
+      "ICE BofA BBB option-adjusted spread. Higher spreads imply tighter credit conditions and lower market risk appetite.",
+    sourceHref: "https://fred.stlouisfed.org/series/BAMLC0A4CBBB",
+    sourceLabel: "FRED Series: BAMLC0A4CBBB",
+    accentClass: "border-rose-400/50 bg-rose-500/10 text-rose-100",
+    icon: (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+        <path
+          d="M6 17V7m6 10V7m6 10V7"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+        />
+        <path
+          d="M4 19h16"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.4"
+          strokeLinecap="round"
+        />
+      </svg>
+    ),
+  },
 ];
 
 export default function FormulasPage() {
@@ -36,10 +161,10 @@ export default function FormulasPage() {
             Jump to
           </p>
           <ul className="mt-3 flex flex-wrap gap-2">
-            {formulaLinks.map((item) => (
-              <li key={item.href}>
+            {formulaSections.map((item) => (
+              <li key={item.id}>
                 <a
-                  href={item.href}
+                  href={`#${item.id}`}
                   className="inline-flex min-h-[36px] items-center rounded-full border border-slate-800 px-4 text-xs font-semibold tracking-[0.14em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100"
                 >
                   {item.label}
@@ -50,100 +175,37 @@ export default function FormulasPage() {
         </nav>
 
         <div className="mt-8 space-y-6">
-          <section id="base-rate" className={formulaCard}>
-            <h2 className="text-xl font-semibold text-slate-100">Base rate</h2>
-            <p className="mt-2 text-sm text-slate-300">
-              Uses the 1-month Treasury yield; falls back to 3-month if missing. This anchors the
-              cost of capital in the current policy environment.
-            </p>
-            <p className="mt-3 text-xs text-slate-400">
-              Source:{" "}
-              <a
-                href="https://fiscaldata.treasury.gov/api-documentation/"
-                target="_blank"
-                rel="noreferrer"
-                className="touch-target text-slate-200 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
-              >
-                US Treasury Fiscal Data API
-              </a>
-            </p>
-          </section>
-
-          <section id="curve-slope" className={formulaCard}>
-            <h2 className="text-xl font-semibold text-slate-100">Yield curve slope</h2>
-            <p className="mt-2 text-sm text-slate-300">
-              10-year Treasury yield minus 2-year Treasury yield. A negative slope signals risk
-              aversion in credit markets.
-            </p>
-            <p className="mt-3 text-xs text-slate-400">
-              Source:{" "}
-              <a
-                href="https://fiscaldata.treasury.gov/api-documentation/"
-                target="_blank"
-                rel="noreferrer"
-                className="touch-target text-slate-200 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
-              >
-                US Treasury Fiscal Data API
-              </a>
-            </p>
-          </section>
-
-          <section id="cpi-inflation" className={formulaCard}>
-            <h2 className="text-xl font-semibold text-slate-100">CPI inflation (YoY)</h2>
-            <p className="mt-2 text-sm text-slate-300">
-              Year-over-year change in CPI-U. Tracks consumer inflation pressure across the basket
-              of goods and services.
-            </p>
-            <p className="mt-3 text-xs text-slate-400">
-              Source:{" "}
-              <a
-                href="https://www.bls.gov/cpi/"
-                target="_blank"
-                rel="noreferrer"
-                className="touch-target text-slate-200 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
-              >
-                Bureau of Labor Statistics CPI
-              </a>
-            </p>
-          </section>
-
-          <section id="unemployment-rate" className={formulaCard}>
-            <h2 className="text-xl font-semibold text-slate-100">Unemployment rate (U-3)</h2>
-            <p className="mt-2 text-sm text-slate-300">
-              Headline unemployment rate for the civilian labor force. Indicates labor market
-              tightness and potential demand softness.
-            </p>
-            <p className="mt-3 text-xs text-slate-400">
-              Source:{" "}
-              <a
-                href="https://www.bls.gov/news.release/empsit.toc.htm"
-                target="_blank"
-                rel="noreferrer"
-                className="touch-target text-slate-200 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
-              >
-                BLS Employment Situation
-              </a>
-            </p>
-          </section>
-
-          <section id="credit-spread" className={formulaCard}>
-            <h2 className="text-xl font-semibold text-slate-100">BBB credit spread (OAS)</h2>
-            <p className="mt-2 text-sm text-slate-300">
-              ICE BofA BBB option-adjusted spread. Higher spreads imply tighter credit conditions
-              and lower market risk appetite.
-            </p>
-            <p className="mt-3 text-xs text-slate-400">
-              Source:{" "}
-              <a
-                href="https://fred.stlouisfed.org/series/BAMLC0A4CBBB"
-                target="_blank"
-                rel="noreferrer"
-                className="touch-target text-slate-200 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
-              >
-                FRED Series: BAMLC0A4CBBB
-              </a>
-            </p>
-          </section>
+          {formulaSections.map((item) => (
+            <section key={item.id} id={item.id} className={`${formulaCard} space-y-3`}>
+              <div className="flex flex-wrap items-center gap-3">
+                <span
+                  className={`inline-flex h-10 w-10 items-center justify-center rounded-xl border ${item.accentClass}`}
+                >
+                  {item.icon}
+                </span>
+                <div className="space-y-1">
+                  <h2 className="text-xl font-semibold text-slate-100">{item.label}</h2>
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                    Signal formula
+                  </p>
+                </div>
+              </div>
+              <p className="text-sm text-slate-300">{item.description}</p>
+              <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
+                <span className="rounded-full border border-slate-700/70 px-3 py-1 text-[10px] font-semibold tracking-[0.12em] text-slate-200">
+                  Source
+                </span>
+                <a
+                  href={item.sourceHref}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="touch-target text-slate-200 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+                >
+                  {item.sourceLabel}
+                </a>
+              </div>
+            </section>
+          ))}
         </div>
       </div>
     </main>

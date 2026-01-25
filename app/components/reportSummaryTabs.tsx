@@ -1,6 +1,7 @@
 "use client";
 
 import { Tabs } from "@base-ui/react/tabs";
+import { ReportInterpretationNotes } from "./reportShellNavigation";
 
 export const ReportSummaryTabs = ({
   statusLabel,
@@ -9,8 +10,6 @@ export const ReportSummaryTabs = ({
   trustStatusDetail,
   trustStatusAction,
   trustToneStyles,
-  showOfflineBadge,
-  offlineBadgeLabel,
 }: {
   statusLabel: string;
   recordDateLabel: string;
@@ -18,8 +17,6 @@ export const ReportSummaryTabs = ({
   trustStatusDetail: string;
   trustStatusAction: string;
   trustToneStyles: string;
-  showOfflineBadge: boolean;
-  offlineBadgeLabel: string;
 }) => (
   <section className="weather-panel space-y-4 px-5 py-4">
     <div className="space-y-2">
@@ -62,19 +59,13 @@ export const ReportSummaryTabs = ({
               {statusLabel}
             </span>
             <p className="text-xs text-slate-300">Signals stamped {recordDateLabel}</p>
+            <p className="text-xs text-slate-300">Signal confidence: {trustStatusLabel}</p>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <span
-              className={`rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.12em] ${trustToneStyles}`}
-            >
-              {trustStatusLabel}
-            </span>
-            {showOfflineBadge ? (
-              <span className="rounded-full border border-rose-400/60 bg-rose-500/10 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-rose-100">
-                {offlineBadgeLabel}
-              </span>
-            ) : null}
-          </div>
+          <span
+            className={`rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.12em] ${trustToneStyles}`}
+          >
+            {trustStatusLabel}
+          </span>
         </div>
         <p className="text-sm text-slate-300">
           Use the climate label as a neutral, external anchor in planning conversations and keep
@@ -109,5 +100,9 @@ export const ReportSummaryTabs = ({
         <p className="text-xs text-slate-200/80">{trustStatusAction}</p>
       </Tabs.Panel>
     </Tabs.Root>
+
+    <div className="border-t border-slate-800/70 pt-4">
+      <ReportInterpretationNotes />
+    </div>
   </section>
 );

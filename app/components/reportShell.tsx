@@ -6,7 +6,6 @@ import type { ReactNode } from "react";
 import { DisplayGuardian } from "./displayGuardian";
 import {
   ReportDataTimestamps,
-  ReportInterpretationNotes,
   ReportMobileNavigation,
   ReportPageNavigation,
   type ReportPageLink,
@@ -30,6 +29,10 @@ export const ReportShell = ({
   trustStatusTone,
   showOfflineBadge = false,
   offlineBadgeLabel = "OFFLINE / SIMULATED",
+  heroVariant = "full",
+  pageNavVariant = "full",
+  primaryCta = { href: "#weekly-action-summary", label: "Start with this week" },
+  secondaryCta = { href: "#executive-snapshot", label: "See leadership summary" },
   structuredData,
   historicalBanner,
 }: {
@@ -48,6 +51,10 @@ export const ReportShell = ({
   trustStatusTone: "stable" | "warning" | "historical";
   showOfflineBadge?: boolean;
   offlineBadgeLabel?: string;
+  heroVariant?: "full" | "compact";
+  pageNavVariant?: "full" | "compact";
+  primaryCta?: { href: string; label: string };
+  secondaryCta?: { href: string; label: string };
   structuredData?: string;
   historicalBanner?: ReactNode;
 }) => {
@@ -112,21 +119,18 @@ export const ReportShell = ({
                 <p className="text-xs text-slate-400 sm:hidden">Signals refreshed {fetchedAtLabel}</p>
               </div>
             </div>
-            <div className="flex flex-wrap items-center gap-2 text-[9px] font-semibold tracking-[0.16em] text-slate-300 sm:text-xs sm:tracking-[0.14em]">
+            <div className="flex flex-col items-start gap-2 text-[9px] font-semibold tracking-[0.16em] text-slate-300 sm:items-end sm:text-xs sm:tracking-[0.14em]">
               <span className="rounded-full border border-slate-800/70 px-3 py-1">{statusLabel}</span>
-              <span className={`rounded-full border px-3 py-1 ${trustToneStyles}`}>
-                {trustStatusLabel}
+              <span className="text-[10px] font-semibold tracking-[0.18em] text-slate-400">
+                Confidence: {trustStatusLabel}
+                {showOfflineBadge ? ` · ${offlineBadgeLabel}` : ""}
               </span>
-              {showOfflineBadge ? (
-                <span className="rounded-full border border-rose-400/60 bg-rose-500/10 px-3 py-1 text-rose-100">
-                  {offlineBadgeLabel}
-                </span>
-              ) : null}
             </div>
           </div>
           <ReportPageNavigation
             pageLinks={pageLinks}
             pageTitle={pageTitle}
+            variant={pageNavVariant}
             className="mt-4 -mx-4 hidden px-4 sm:mx-0 sm:block sm:px-0"
           />
         </header>
@@ -184,13 +188,29 @@ export const ReportShell = ({
           <div className="order-1 space-y-6 lg:order-none">
             <section className="weather-panel-static space-y-4 px-4 py-5 sm:px-5">
               <div className="space-y-3">
-                <p className="text-xs font-semibold tracking-[0.26em] text-slate-400 sm:tracking-[0.32em]">
-                  Weekly product guidance
-                </p>
-                <h1 className="type-headline text-slate-100">Whether Report</h1>
-                <p className="max-w-2xl text-sm text-slate-200 sm:text-base">
-                  A fast, sourced readout of Treasury signals translated into product guidance.
-                </p>
+                {heroVariant === "compact" ? (
+                  <>
+                    <p className="text-xs font-semibold tracking-[0.26em] text-slate-400 sm:tracking-[0.32em]">
+                      Whether report
+                    </p>
+                    <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
+                      {pageTitle}
+                    </h1>
+                    <p className="max-w-2xl text-sm text-slate-200 sm:text-base">
+                      {pageSummary}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-xs font-semibold tracking-[0.26em] text-slate-400 sm:tracking-[0.32em]">
+                      Weekly product guidance
+                    </p>
+                    <h1 className="type-headline text-slate-100">Whether Report</h1>
+                    <p className="max-w-2xl text-sm text-slate-200 sm:text-base">
+                      A fast, sourced readout of Treasury signals translated into product guidance.
+                    </p>
+                  </>
+                )}
               </div>
               <div className="weather-surface weather-quick-glance flex flex-col gap-2 px-4 py-3 sm:hidden">
                 <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">
@@ -198,25 +218,25 @@ export const ReportShell = ({
                 </p>
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-2xl font-semibold text-slate-100">{statusLabel}</span>
-                  <span className={`rounded-full border px-3 py-1 text-[10px] ${trustToneStyles}`}>
-                    {trustStatusLabel}
-                  </span>
                 </div>
                 <p className="text-xs text-slate-300">Signals stamped {recordDateLabel}</p>
+                <p className="text-xs text-slate-300">Confidence: {trustStatusLabel}</p>
               </div>
               <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
                 <a
-                  href="#weekly-action-summary"
+                  href={primaryCta.href}
                   className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-[11px] font-semibold tracking-[0.2em] transition-colors hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:text-xs"
                 >
-                  Start with this week
+                  {primaryCta.label}
                 </a>
-                <a
-                  href="#executive-snapshot"
-                  className="inline-flex min-h-[44px] items-center justify-center text-[11px] font-semibold tracking-[0.12em] text-slate-200 underline decoration-slate-400 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:justify-start sm:text-xs"
-                >
-                  See leadership summary
-                </a>
+                {secondaryCta ? (
+                  <a
+                    href={secondaryCta.href}
+                    className="inline-flex min-h-[44px] items-center justify-center text-[11px] font-semibold tracking-[0.12em] text-slate-200 underline decoration-slate-400 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:justify-start sm:text-xs"
+                  >
+                    {secondaryCta.label}
+                  </a>
+                ) : null}
               </div>
             </section>
 
@@ -228,21 +248,7 @@ export const ReportShell = ({
                 trustStatusDetail={trustStatusDetail}
                 trustStatusAction={trustStatusAction}
                 trustToneStyles={trustToneStyles}
-                showOfflineBadge={showOfflineBadge}
-                offlineBadgeLabel={offlineBadgeLabel}
               />
-              <section className="weather-panel flex flex-col gap-4 px-5 py-4">
-                <p className="text-xs font-semibold text-slate-300">Interpretation notes</p>
-                <ReportInterpretationNotes />
-                <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
-                  <span className="rounded-full border border-slate-700/70 px-3 py-1 font-semibold tracking-[0.12em] text-slate-200">
-                    Record date {recordDateLabel}
-                  </span>
-                  <span className="rounded-full border border-slate-800/70 px-3 py-1 font-semibold tracking-[0.12em] text-slate-300">
-                    {trustStatusLabel}
-                  </span>
-                </div>
-              </section>
             </div>
 
             {children}

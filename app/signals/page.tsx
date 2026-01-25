@@ -104,6 +104,10 @@ export default async function SignalsPage({
       pageSummary="Deep-dive into the live signal layer, the macro data sources, and how thresholds shape the market climate classification."
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
+      heroVariant="compact"
+      pageNavVariant="compact"
+      primaryCta={{ href: "#sensor-array", label: "Review live data feed" }}
+      secondaryCta={{ href: "#thresholds", label: "Check scoring thresholds" }}
       structuredData={JSON.stringify(structuredData)}
       historicalBanner={
         historicalSelection ? (
