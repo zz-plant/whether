@@ -10,7 +10,7 @@ import { Input } from "@base-ui/react/input";
 import { Toast } from "@base-ui/react/toast";
 import type { Route } from "next";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import type { RegimeAssessment } from "../../lib/regimeEngine";
+import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 
 type DecisionMemoryEntry = {

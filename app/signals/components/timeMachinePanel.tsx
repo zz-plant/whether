@@ -13,12 +13,12 @@ import { Tabs } from "@base-ui/react/tabs";
 import type { Route } from "next";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
-import type { RegimeKey } from "../../lib/regimeEngine";
-import type { SummaryArchiveEntry } from "../../lib/summary/summaryArchive";
-import { MonthlySummaryCard } from "./monthlySummaryCard";
-import { QuarterlySummaryCard } from "./quarterlySummaryCard";
-import { WeeklySummaryCard } from "./weeklySummaryCard";
-import { YearlySummaryCard } from "./yearlySummaryCard";
+import type { RegimeKey } from "../../../lib/regimeEngine";
+import type { SummaryArchiveEntry } from "../../../lib/summary/summaryArchive";
+import { MonthlySummaryCard } from "../../components/monthlySummaryCard";
+import { QuarterlySummaryCard } from "../../components/quarterlySummaryCard";
+import { WeeklySummaryCard } from "../../components/weeklySummaryCard";
+import { YearlySummaryCard } from "../../components/yearlySummaryCard";
 
 const monthOptions = [
   { value: 1, label: "January" },

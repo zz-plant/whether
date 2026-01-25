@@ -7,8 +7,8 @@
 import { useMemo, useState } from "react";
 import { Button } from "@base-ui/react/button";
 import { Toast } from "@base-ui/react/toast";
-import type { MacroSeriesReading, SensorReading, TreasuryData } from "../../lib/types";
-import type { RegimeAssessment } from "../../lib/regimeEngine";
+import type { MacroSeriesReading, SensorReading, TreasuryData } from "../../../lib/types";
+import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 
 const numberFormatter = new Intl.NumberFormat("en-US", {

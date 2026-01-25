@@ -2,7 +2,7 @@
  * Yearly summary builder for annual planning guidance.
  * Mirrors monthly summary structure with year-specific framing.
  */
-import type { RegimeAssessment } from "./regimeEngine";
+import type { RegimeAssessment } from "../regimeEngine";
 
 export type YearlySummaryProvenance = {
   sourceLabel: string;

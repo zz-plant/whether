@@ -12,9 +12,9 @@ import { Collapsible } from "@base-ui/react/collapsible";
 import { Popover } from "@base-ui/react/popover";
 import type { Route } from "next";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import type { RegimeThresholds } from "../../lib/regimeEngine";
-import { DEFAULT_THRESHOLDS } from "../../lib/regimeEngine";
-import { buildThresholdSearchParams, THRESHOLD_PARAM_KEYS } from "../../lib/thresholds";
+import type { RegimeThresholds } from "../../../lib/regimeEngine";
+import { DEFAULT_THRESHOLDS } from "../../../lib/regimeEngine";
+import { buildThresholdSearchParams, THRESHOLD_PARAM_KEYS } from "../../../lib/thresholds";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 
 type ThresholdDraft = {

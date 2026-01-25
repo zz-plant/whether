@@ -7,11 +7,6 @@ export const reportPageLinks: ReportPageLink[] = [
     description: "Weekly decisions, leadership summary, and climate signals in plain English.",
   },
   {
-    href: "/onboarding",
-    label: "Onboarding",
-    description: "Get oriented with the glossary and a quick guide to reading the report.",
-  },
-  {
     href: "/signals",
     label: "Why we believe this",
     description: "See the data sources and how each signal is scored.",
@@ -20,6 +15,11 @@ export const reportPageLinks: ReportPageLink[] = [
     href: "/operations",
     label: "What to do next",
     description: "Concrete actions and decision safeguards for your team.",
+  },
+  {
+    href: "/onboarding",
+    label: "Onboarding",
+    description: "Get oriented with the glossary and a quick guide to reading the report.",
   },
   {
     href: "/formulas",

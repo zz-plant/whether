@@ -14,7 +14,7 @@ import {
   computeTightnessScore,
   getRegimeProfile,
   type RegimeAssessment,
-} from "../../lib/regimeEngine";
+} from "../../../lib/regimeEngine";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));

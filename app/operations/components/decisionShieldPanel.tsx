@@ -18,8 +18,8 @@ import {
   type DecisionCategory,
   type DecisionOutput,
   type LifecycleStage,
-} from "../../lib/decisionShield";
-import type { RegimeAssessment } from "../../lib/regimeEngine";
+} from "../../../lib/decisionShield";
+import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 
 const lifecycleOptions: { value: LifecycleStage; label: string }[] = [

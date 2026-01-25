@@ -2,7 +2,7 @@
  * Treasury normalization helpers for mapping API payloads into Regime Station data shapes.
  * Keeps source metadata and freshness explicit for traceable outputs.
  */
-import type { TreasuryData, TreasuryYields } from "./types";
+import type { TreasuryData, TreasuryYields } from "../types";
 
 const parseNumber = (value: unknown): number | null => {
   if (value == null) {

@@ -2,7 +2,7 @@
  * Monthly summary builder for consistent action guidance in the Regime Station flow.
  * Powers copy-ready cards and API responses with traceable provenance metadata.
  */
-import type { RegimeAssessment } from "./regimeEngine";
+import type { RegimeAssessment } from "../regimeEngine";
 
 export type MonthlySummaryProvenance = {
   sourceLabel: string;

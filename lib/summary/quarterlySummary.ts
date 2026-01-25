@@ -2,7 +2,7 @@
  * Quarterly summary builder for longer-range action guidance.
  * Mirrors monthly summary structure with quarter-specific framing.
  */
-import type { RegimeAssessment } from "./regimeEngine";
+import type { RegimeAssessment } from "../regimeEngine";
 
 export type QuarterlySummaryProvenance = {
   sourceLabel: string;
