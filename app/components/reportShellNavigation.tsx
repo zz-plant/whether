@@ -320,6 +320,7 @@ export const ReportMobileNavigation = ({
               <button
                 type="button"
                 aria-disabled="true"
+                disabled
                 className="weather-pill pointer-events-none inline-flex min-h-[44px] flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/60 px-2 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-500/80 opacity-70"
               >
                 <span aria-hidden="true" className="text-base leading-none">
@@ -343,6 +344,7 @@ export const ReportMobileNavigation = ({
               <button
                 type="button"
                 aria-disabled="true"
+                disabled
                 className="weather-pill pointer-events-none inline-flex min-h-[44px] flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/60 px-2 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-500/80 opacity-70"
               >
                 <span aria-hidden="true" className="text-base leading-none">

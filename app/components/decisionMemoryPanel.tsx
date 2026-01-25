@@ -778,6 +778,7 @@ export const DecisionMemoryPanel = ({
               readOnly
               value={fallbackCopyText}
               rows={6}
+              aria-label="Copy-ready decision snapshot text"
               className="mt-3 w-full rounded-lg border border-amber-400/30 bg-slate-950/80 p-3 font-mono text-base text-amber-100 touch-manipulation"
             />
           </div>

@@ -101,11 +101,19 @@ export const SummaryCard = ({ summaryCopy, cadenceLabel, apiHref }: SummaryCardP
           </a>
         </div>
       </div>
-      <pre className="mt-4 whitespace-pre-wrap rounded-2xl border border-slate-800/80 bg-slate-950/80 p-4 text-xs text-slate-100">
+      <pre
+        tabIndex={0}
+        aria-label="Summary card text"
+        className="mt-4 whitespace-pre-wrap rounded-2xl border border-slate-800/80 bg-slate-950/80 p-4 text-xs text-slate-100"
+      >
         {summaryCopy}
       </pre>
       <div className="mt-2 min-h-[20px] text-xs text-slate-400" role="status" aria-live="polite">
-        {copyError ? "Clipboard blocked. Select and copy the text above manually." : ""}
+        {copyError
+          ? "Clipboard blocked. Select and copy the text above manually."
+          : copied
+            ? "Summary copied to clipboard."
+            : ""}
       </div>
     </div>
   );

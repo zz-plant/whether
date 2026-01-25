@@ -410,6 +410,8 @@ export const DecisionShieldPanel = ({
     }
   };
 
+  const presetHintId = "preset-limit-hint";
+
   return (
     <section id="decision-shield" aria-labelledby="decision-shield-title" className="mt-10">
       <div className="weather-panel p-6">
@@ -473,6 +475,7 @@ export const DecisionShieldPanel = ({
                 readOnly
                 value={shareText}
                 rows={8}
+                aria-label="Copy-ready Decision Shield verdict"
                 className="mt-3 w-full rounded-lg border border-amber-400/30 bg-slate-950/80 p-3 font-mono text-base text-amber-100 touch-manipulation"
               />
             </div>
@@ -622,7 +625,9 @@ export const DecisionShieldPanel = ({
                   Store common Decision Shield inputs as presets for faster reviews.
                 </p>
               </div>
-              <p className="text-xs text-slate-500">Max 8 presets</p>
+              <p id={presetHintId} className="text-xs text-slate-500">
+                Max 8 presets
+              </p>
             </div>
             <div className="mt-4 flex flex-wrap items-start gap-3">
               <Field.Root className="flex w-full flex-col gap-2 text-xs font-semibold tracking-[0.12em] text-slate-400 sm:max-w-xs">
@@ -634,7 +639,9 @@ export const DecisionShieldPanel = ({
                   onChange={(event) => setPresetName(event.target.value)}
                   onBlur={handlePresetBlur}
                   aria-invalid={Boolean(presetError)}
-                  aria-describedby={presetError ? "preset-error" : undefined}
+                  aria-describedby={[presetError ? "preset-error" : null, presetHintId]
+                    .filter(Boolean)
+                    .join(" ")}
                   className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
                 />
               </Field.Root>
