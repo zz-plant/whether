@@ -444,7 +444,7 @@ export const WeeklyActionSummaryPanel = ({
                 View the delta snapshot before you lock weekly decisions.{" "}
                 <a
                   href="#change-since-last-read"
-                  className="touch-target inline-flex min-h-[40px] items-center text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-slate-50 touch-manipulation"
+                  className="touch-target inline-flex min-h-[44px] items-center text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-slate-50 touch-manipulation"
                 >
                   Jump to the change log
                 </a>
@@ -1161,7 +1161,7 @@ export const BeginnerGlossaryPanel = () => {
                   className="rounded-xl border border-slate-800/80 bg-slate-950/40 px-3 py-2"
                 >
                   <Accordion.Header>
-                    <Accordion.Trigger className="group flex w-full items-center justify-between gap-3 text-left">
+                    <Accordion.Trigger className="group flex min-h-[44px] w-full items-center justify-between gap-3 py-2 text-left touch-manipulation">
                       <span className="text-xs font-semibold tracking-[0.12em] text-slate-200">
                         {entry.term}
                       </span>
@@ -1867,7 +1867,7 @@ export const ExecutiveSnapshotPanel = ({
                 </p>
                 <Collapsible.Trigger
                   type="button"
-                  className="inline-flex min-h-[36px] items-center rounded-full border border-slate-700/70 bg-slate-950/60 px-3 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-slate-500/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                  className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/70 bg-slate-950/60 px-3 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-slate-500/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
                 >
                   View {scoringInputs.length} inputs
                 </Collapsible.Trigger>
@@ -2462,20 +2462,20 @@ export const SensorArray = ({
             }}
             className="mt-3"
           >
-            <Tabs.List className="flex gap-2 rounded-full border border-slate-800/80 bg-slate-950/70 p-1">
-              <Tabs.Tab
-                value="groups"
-                className="flex-1 rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 transition-colors data-[active]:bg-sky-500/15 data-[active]:text-slate-100"
-              >
-                Signal groups
-              </Tabs.Tab>
-              <Tabs.Tab
-                value="windows"
-                className="flex-1 rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 transition-colors data-[active]:bg-sky-500/15 data-[active]:text-slate-100"
-              >
-                Time windows
-              </Tabs.Tab>
-            </Tabs.List>
+              <Tabs.List className="flex gap-2 rounded-full border border-slate-800/80 bg-slate-950/70 p-1">
+                <Tabs.Tab
+                  value="groups"
+                  className="flex-1 min-h-[44px] rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 transition-colors data-[active]:bg-sky-500/15 data-[active]:text-slate-100 touch-manipulation"
+                >
+                  Signal groups
+                </Tabs.Tab>
+                <Tabs.Tab
+                  value="windows"
+                  className="flex-1 min-h-[44px] rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 transition-colors data-[active]:bg-sky-500/15 data-[active]:text-slate-100 touch-manipulation"
+                >
+                  Time windows
+                </Tabs.Tab>
+              </Tabs.List>
             <Tabs.Panel value="groups" className="mt-4 space-y-3">
               <p className="text-xs text-slate-500">
                 Choose the signal groups to spotlight across the sensor array.
@@ -2488,7 +2488,7 @@ export const SensorArray = ({
                 {sensorGroups.map((group) => (
                   <label
                     key={group.id}
-                    className="flex items-center gap-2 rounded-xl border border-slate-800/70 bg-slate-950/70 px-3 py-2 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-slate-400 transition-colors hover:border-slate-700/80 hover:text-slate-200 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-sky-300"
+                    className="flex min-h-[44px] items-center gap-2 rounded-xl border border-slate-800/70 bg-slate-950/70 px-3 py-2 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-slate-400 transition-colors hover:border-slate-700/80 hover:text-slate-200 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-sky-300 touch-manipulation sm:text-xs"
                   >
                     <Checkbox.Root
                       value={group.id}
@@ -2515,14 +2515,14 @@ export const SensorArray = ({
                 <button
                   type="button"
                   onClick={() => setSelectedCategories(sensorCategories)}
-                  className="min-h-[36px] rounded-full border border-slate-800/70 px-3 text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-slate-700/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                  className="min-h-[44px] rounded-full border border-slate-800/70 px-3 text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-slate-700/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
                 >
                   Select all
                 </button>
                 <button
                   type="button"
                   onClick={() => setSelectedCategories([])}
-                  className="min-h-[36px] rounded-full border border-slate-800/70 px-3 text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-slate-700/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                  className="min-h-[44px] rounded-full border border-slate-800/70 px-3 text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-slate-700/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
                 >
                   Clear
                 </button>
@@ -2550,7 +2550,7 @@ export const SensorArray = ({
                   <Toggle
                     key={window.id}
                     value={window.id}
-                    className="min-h-[40px] rounded-full border px-3 text-xs font-semibold tracking-[0.12em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 data-[pressed]:border-sky-400/80 data-[pressed]:bg-sky-500/10 data-[pressed]:text-slate-100 border-slate-800/70 text-slate-400 hover:border-slate-700/80 hover:text-slate-200"
+                    className="min-h-[44px] rounded-full border px-3 text-xs font-semibold tracking-[0.12em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 data-[pressed]:border-sky-400/80 data-[pressed]:bg-sky-500/10 data-[pressed]:text-slate-100 border-slate-800/70 text-slate-400 hover:border-slate-700/80 hover:text-slate-200 touch-manipulation"
                   >
                     {window.label}
                   </Toggle>
@@ -3288,7 +3288,7 @@ export const InsightDatabasePanel = ({
                     <Toggle
                       key={tag}
                       value={tag}
-                      className="rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] transition-colors data-[pressed]:border-sky-400/70 data-[pressed]:bg-sky-500/20 data-[pressed]:text-sky-100 border-slate-700/70 text-slate-300 hover:border-slate-500/80 hover:text-slate-100"
+                      className="min-h-[44px] rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.12em] transition-colors data-[pressed]:border-sky-400/70 data-[pressed]:bg-sky-500/20 data-[pressed]:text-sky-100 border-slate-700/70 text-slate-300 hover:border-slate-500/80 hover:text-slate-100 touch-manipulation"
                     >
                       {tag}
                     </Toggle>
@@ -3343,7 +3343,7 @@ export const InsightDatabasePanel = ({
                           onClick={() => toggleTag(tag)}
                           aria-pressed={selectedTags.includes(tag)}
                           aria-label={`Filter by ${tag}`}
-                          className={`rounded-full border px-2.5 py-1 text-xs font-semibold tracking-[0.12em] transition-colors ${
+                          className={`min-h-[44px] rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.12em] transition-colors touch-manipulation ${
                             selectedTags.includes(tag)
                               ? "border-sky-400/70 bg-sky-500/15 text-sky-100"
                               : "border-slate-700/70 text-slate-300 hover:border-slate-500/80 hover:text-slate-100"

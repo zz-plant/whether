@@ -143,13 +143,13 @@ export const ReportPageNavigation = ({
                 <a
                   href={prevLink.href}
                   aria-label={`Previous page: ${prevLink.label}`}
-                  className="weather-pill inline-flex min-h-[36px] items-center gap-2 px-3 py-1 text-[10px] font-semibold tracking-[0.18em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100"
+                  className="weather-pill inline-flex min-h-[44px] items-center gap-2 px-3 py-1 text-[10px] font-semibold tracking-[0.18em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                 >
                   <span aria-hidden="true">←</span>
                   Prev
                 </a>
               ) : (
-                <span className="weather-pill inline-flex min-h-[36px] items-center gap-2 border border-slate-800/50 px-3 py-1 text-[10px] font-semibold tracking-[0.18em] text-slate-500/80">
+                <span className="weather-pill inline-flex min-h-[44px] items-center gap-2 border border-slate-800/50 px-3 py-1 text-[10px] font-semibold tracking-[0.18em] text-slate-500/80">
                   <span aria-hidden="true">←</span>
                   Prev
                 </span>
@@ -158,13 +158,13 @@ export const ReportPageNavigation = ({
                 <a
                   href={nextLink.href}
                   aria-label={`Next page: ${nextLink.label}`}
-                  className="weather-pill inline-flex min-h-[36px] items-center gap-2 px-3 py-1 text-[10px] font-semibold tracking-[0.18em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100"
+                  className="weather-pill inline-flex min-h-[44px] items-center gap-2 px-3 py-1 text-[10px] font-semibold tracking-[0.18em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                 >
                   Next
                   <span aria-hidden="true">→</span>
                 </a>
               ) : (
-                <span className="weather-pill inline-flex min-h-[36px] items-center gap-2 border border-slate-800/50 px-3 py-1 text-[10px] font-semibold tracking-[0.18em] text-slate-500/80">
+                <span className="weather-pill inline-flex min-h-[44px] items-center gap-2 border border-slate-800/50 px-3 py-1 text-[10px] font-semibold tracking-[0.18em] text-slate-500/80">
                   Next
                   <span aria-hidden="true">→</span>
                 </span>

@@ -469,7 +469,7 @@ export const TimeMachinePanel = ({
                         type="button"
                         onClick={() => setCalendarYear((prev) => Math.max(minYear, prev - 1))}
                         disabled={calendarYear <= minYear}
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-800/70 text-xs font-semibold text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800/70 disabled:text-slate-600"
+                        className="inline-flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-slate-800/70 text-xs font-semibold text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800/70 disabled:text-slate-600 touch-manipulation"
                       >
                         ‹
                       </button>
@@ -478,7 +478,7 @@ export const TimeMachinePanel = ({
                         type="button"
                         onClick={() => setCalendarYear((prev) => Math.min(maxYear, prev + 1))}
                         disabled={calendarYear >= maxYear}
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-800/70 text-xs font-semibold text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800/70 disabled:text-slate-600"
+                        className="inline-flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-slate-800/70 text-xs font-semibold text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800/70 disabled:text-slate-600 touch-manipulation"
                       >
                         ›
                       </button>
@@ -504,7 +504,7 @@ export const TimeMachinePanel = ({
                               }
                             }}
                             disabled={!isAvailable}
-                            className={`inline-flex min-h-[36px] items-center justify-center rounded-lg border px-2 py-1 text-[11px] font-semibold tracking-[0.12em] transition-colors ${
+                            className={`inline-flex min-h-[44px] items-center justify-center rounded-lg border px-2 py-1 text-[11px] font-semibold tracking-[0.12em] transition-colors touch-manipulation ${
                               isActive
                                 ? "border-sky-400/70 text-slate-100"
                                 : "border-slate-800/70 text-slate-300"
@@ -635,7 +635,7 @@ export const TimeMachinePanel = ({
                           key={cadence}
                           value={cadence}
                           className={({ active }) =>
-                            `weather-pill inline-flex min-h-[40px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] transition-colors touch-manipulation ${
+                            `weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-1 text-xs font-semibold tracking-[0.12em] transition-colors touch-manipulation ${
                               active
                                 ? "border-sky-400/70 text-slate-100"
                                 : "text-slate-300 hover:border-slate-500/70 hover:text-slate-100"
