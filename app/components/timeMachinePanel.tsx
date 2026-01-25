@@ -8,6 +8,7 @@ import type { FormEvent } from "react";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { Field } from "@base-ui/react/field";
 import { Input } from "@base-ui/react/input";
+import { Popover } from "@base-ui/react/popover";
 import { Tabs } from "@base-ui/react/tabs";
 import type { Route } from "next";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -120,7 +121,7 @@ export const TimeMachinePanel = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const errorId = "time-machine-error";
-  const monthRef = useRef<HTMLInputElement | null>(null);
+  const monthRef = useRef<HTMLButtonElement | null>(null);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -145,7 +146,6 @@ export const TimeMachinePanel = ({
   const isUnavailableSelection =
     invalidSelection || (availableMonths.length > 0 && !availableMonths.includes(month));
   const isInvalid = Boolean(errorMessage);
-  const currentMonthValue = `${year}-${String(month).padStart(2, "0")}`;
   const requestedMonthLabel =
     monthOptions.find((option) => option.value === month)?.label ?? `Month ${month}`;
   const coverageLabel =
@@ -174,6 +174,18 @@ export const TimeMachinePanel = ({
   const coverageMin = cacheCoverage.earliest ? formatMonthInput(cacheCoverage.earliest) : undefined;
   const coverageMax = cacheCoverage.latest ? formatMonthInput(cacheCoverage.latest) : undefined;
   const latestMonthValue = formatMonthInput(latestRecordDate);
+  const availableYears = useMemo(
+    () =>
+      Object.keys(monthsByYear)
+        .map((value) => Number(value))
+        .filter((value) => !Number.isNaN(value))
+        .sort((a, b) => a - b),
+    [monthsByYear]
+  );
+  const minYear = availableYears.at(0) ?? year;
+  const maxYear = availableYears.at(-1) ?? year;
+  const [calendarYear, setCalendarYear] = useState(year);
+  const calendarMonths = monthsByYear[calendarYear] ?? [];
 
   const formatPercent = (value: number) => `${value.toFixed(2)}%`;
   const formatScore = (value: number) => value.toFixed(0);
@@ -219,6 +231,10 @@ export const TimeMachinePanel = ({
   const { min: cadenceMin, max: cadenceMax } = cadenceRange;
   const [rangeStart, setRangeStart] = useState(() => cadenceRange.min ?? "");
   const [rangeEnd, setRangeEnd] = useState(() => cadenceRange.max ?? "");
+
+  useEffect(() => {
+    setCalendarYear(year);
+  }, [year]);
 
   useEffect(() => {
     if (!cadenceMin || !cadenceMax) {
@@ -286,21 +302,11 @@ export const TimeMachinePanel = ({
     });
   };
 
-  const handleMonthBlur = () => {
-    if (isUnavailableSelection) {
-      setErrorMessage("That month is not available for the selected year.");
-    }
-  };
-
-  const handleMonthChange = (value: string) => {
-    const parsed = parseMonthInput(value);
-    if (!parsed) {
-      return;
-    }
+  const handleMonthChange = (nextYear: number, nextMonth: number) => {
     setErrorMessage(null);
     const nextParams = new URLSearchParams(searchParams.toString());
-    nextParams.set("draftMonth", String(parsed.month));
-    nextParams.set("draftYear", String(parsed.year));
+    nextParams.set("draftMonth", String(nextMonth));
+    nextParams.set("draftYear", String(nextYear));
     router.push(`${pathname}?${nextParams.toString()}` as Route, { scroll: false });
   };
 
@@ -443,20 +449,85 @@ export const TimeMachinePanel = ({
         <form onSubmit={handleSubmit} className="mt-6 grid gap-4 md:grid-cols-[1fr,auto]">
           <Field.Root className="space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
             <Field.Label>Month</Field.Label>
-            <Input
-              ref={monthRef}
-              id="time-machine-month"
-              name="month"
-              type="month"
-              value={currentMonthValue}
-              min={coverageMin}
-              max={coverageMax}
-              onChange={(event) => handleMonthChange(event.target.value)}
-              onBlur={handleMonthBlur}
-              aria-invalid={isInvalid}
-              aria-describedby={isInvalid ? errorId : undefined}
-              className="weather-input min-h-[44px] w-full px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
-            />
+            <Popover.Root>
+              <Popover.Trigger
+                ref={monthRef}
+                id="time-machine-month"
+                aria-invalid={isInvalid}
+                aria-describedby={isInvalid ? errorId : undefined}
+                className="weather-input inline-flex min-h-[44px] w-full items-center justify-between gap-3 px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
+              >
+                <span>{selectedLabel}</span>
+                <span className="text-xs text-slate-400">Pick month</span>
+              </Popover.Trigger>
+              <Popover.Portal>
+                <Popover.Positioner side="bottom" align="start" sideOffset={10}>
+                  <Popover.Popup className="w-72 rounded-2xl border border-slate-800/80 bg-slate-950/95 p-4 text-xs text-slate-300 shadow-xl">
+                    <div className="flex items-center justify-between gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setCalendarYear((prev) => Math.max(minYear, prev - 1))}
+                        disabled={calendarYear <= minYear}
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-800/70 text-xs font-semibold text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800/70 disabled:text-slate-600"
+                      >
+                        ‹
+                      </button>
+                      <span className="text-sm font-semibold text-slate-100">{calendarYear}</span>
+                      <button
+                        type="button"
+                        onClick={() => setCalendarYear((prev) => Math.min(maxYear, prev + 1))}
+                        disabled={calendarYear >= maxYear}
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-800/70 text-xs font-semibold text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800/70 disabled:text-slate-600"
+                      >
+                        ›
+                      </button>
+                    </div>
+                    <div className="mt-3 grid grid-cols-3 gap-2">
+                      {monthOptions.map((option) => {
+                        const isAvailable =
+                          calendarMonths.length === 0
+                            ? false
+                            : calendarMonths.includes(option.value);
+                        const isActive = calendarYear === year && option.value === month;
+                        return (
+                          <Popover.Close
+                            key={`${calendarYear}-${option.value}`}
+                            type="button"
+                            onClick={() => {
+                              if (isAvailable) {
+                                handleMonthChange(calendarYear, option.value);
+                              } else {
+                                setErrorMessage(
+                                  "That month is not available for the selected year."
+                                );
+                              }
+                            }}
+                            disabled={!isAvailable}
+                            className={`inline-flex min-h-[36px] items-center justify-center rounded-lg border px-2 py-1 text-[11px] font-semibold tracking-[0.12em] transition-colors ${
+                              isActive
+                                ? "border-sky-400/70 text-slate-100"
+                                : "border-slate-800/70 text-slate-300"
+                            } ${
+                              isAvailable
+                                ? "hover:border-sky-400/70 hover:text-slate-100"
+                                : "cursor-not-allowed text-slate-600"
+                            }`}
+                          >
+                            {option.label.slice(0, 3)}
+                          </Popover.Close>
+                        );
+                      })}
+                    </div>
+                    <div className="mt-3 text-[11px] text-slate-500">
+                      {coverageMin && coverageMax
+                        ? `Coverage: ${coverageMin} → ${coverageMax}`
+                        : "No cache loaded yet."}
+                    </div>
+                    <Popover.Arrow className="h-3 w-3 translate-y-[1px] rotate-45 rounded-[3px] bg-slate-950/95" />
+                  </Popover.Popup>
+                </Popover.Positioner>
+              </Popover.Portal>
+            </Popover.Root>
           </Field.Root>
           <button
             type="submit"
