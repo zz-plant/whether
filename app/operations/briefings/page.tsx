@@ -85,7 +85,8 @@ export default async function OperationsBriefingsPage({
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="What to do next"
-      pageSummary="Workstream: briefings. Export aligned narratives, leadership briefs, and CXO deliverables without scrolling through every workflow."
+      pageSummary="Workstream: briefings. Pull the narrative leaders will ask for."
+      pageSummaryLink={{ href: "#ops-strategy-brief", label: "Explore details →" }}
       pageLinks={reportPageLinks}
       sectionLinks={operationsSectionLinks.briefings}
       structuredData={JSON.stringify(structuredData)}

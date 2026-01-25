@@ -101,7 +101,8 @@ export default async function SignalsPage({
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Why we believe this"
-      pageSummary="Deep-dive into the live signal layer, the macro data sources, and how thresholds shape the market climate classification."
+      pageSummary="See what’s powering the regime call and how the signals line up."
+      pageSummaryLink={{ href: "#sensor-array", label: "Explore details →" }}
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
       heroVariant="compact"
