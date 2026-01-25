@@ -308,6 +308,7 @@ export const ReportMobileNavigation = ({
             {prevLink ? (
               <a
                 href={prevLink.href}
+                aria-label={`Previous page: ${prevLink.label}`}
                 className="weather-pill inline-flex min-h-[44px] flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/80 px-2 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
               >
                 <span aria-hidden="true" className="text-base leading-none text-slate-300">
@@ -319,6 +320,7 @@ export const ReportMobileNavigation = ({
               <button
                 type="button"
                 aria-disabled="true"
+                disabled
                 className="weather-pill pointer-events-none inline-flex min-h-[44px] flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/60 px-2 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-500/80 opacity-70"
               >
                 <span aria-hidden="true" className="text-base leading-none">
@@ -330,6 +332,7 @@ export const ReportMobileNavigation = ({
             {nextLink ? (
               <a
                 href={nextLink.href}
+                aria-label={`Next page: ${nextLink.label}`}
                 className="weather-pill inline-flex min-h-[44px] flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/80 px-2 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
               >
                 <span aria-hidden="true" className="text-base leading-none text-slate-300">
@@ -341,6 +344,7 @@ export const ReportMobileNavigation = ({
               <button
                 type="button"
                 aria-disabled="true"
+                disabled
                 className="weather-pill pointer-events-none inline-flex min-h-[44px] flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/60 px-2 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-500/80 opacity-70"
               >
                 <span aria-hidden="true" className="text-base leading-none">
