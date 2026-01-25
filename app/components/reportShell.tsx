@@ -70,6 +70,12 @@ export const ReportShell = ({
       tabIndex={-1}
       className="weather-shell relative min-h-screen overflow-hidden text-slate-100"
     >
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-30 focus:rounded-full focus:bg-slate-950 focus:px-4 focus:py-2 focus:text-xs focus:font-semibold focus:tracking-[0.2em] focus:text-slate-100 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-sky-300"
+      >
+        Skip to main content
+      </a>
       {structuredData ? (
         <script
           type="application/ld+json"
@@ -158,7 +164,7 @@ export const ReportShell = ({
                     <li key={item.href}>
                       <a
                         href={item.href}
-                        className="weather-pill inline-flex min-h-[44px] w-full items-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                        className="weather-pill inline-flex min-h-[44px] w-full items-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
                       >
                         {item.label}
                       </a>
@@ -201,13 +207,13 @@ export const ReportShell = ({
               <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
                 <a
                   href="#weekly-action-summary"
-                  className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-[11px] font-semibold tracking-[0.2em] transition-colors hover:border-sky-300/80 hover:text-white touch-manipulation sm:text-xs"
+                  className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-[11px] font-semibold tracking-[0.2em] transition-colors hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:text-xs"
                 >
                   Start with this week
                 </a>
                 <a
                   href="#executive-snapshot"
-                  className="inline-flex min-h-[44px] items-center justify-center text-[11px] font-semibold tracking-[0.12em] text-slate-200 underline decoration-slate-400 underline-offset-4 hover:text-slate-100 touch-manipulation sm:justify-start sm:text-xs"
+                  className="inline-flex min-h-[44px] items-center justify-center text-[11px] font-semibold tracking-[0.12em] text-slate-200 underline decoration-slate-400 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:justify-start sm:text-xs"
                 >
                   See leadership summary
                 </a>
