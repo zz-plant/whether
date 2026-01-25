@@ -100,6 +100,14 @@ export default async function OperationsDecisionsPage({
       <OperationsWorkstreamNav currentPath="/operations/decisions" />
 
       <SectionedReportPanel
+        id="ops-decision-shield"
+        title="Decision shield"
+        description="Validate decisions against regime-specific guardrails."
+      >
+        <DecisionShieldPanel assessment={assessment} provenance={treasuryProvenance} />
+      </SectionedReportPanel>
+
+      <SectionedReportPanel
         id="ops-assumption-locking"
         title="Assumption locking"
         description="Document the operating assumptions behind major bets."
@@ -117,14 +125,6 @@ export default async function OperationsDecisionsPage({
           provenance={treasuryProvenance}
           recordDateLabel={recordDateLabel}
         />
-      </SectionedReportPanel>
-
-      <SectionedReportPanel
-        id="ops-decision-shield"
-        title="Decision shield"
-        description="Validate decisions against regime-specific guardrails."
-      >
-        <DecisionShieldPanel assessment={assessment} provenance={treasuryProvenance} />
       </SectionedReportPanel>
 
       <SectionedReportPanel

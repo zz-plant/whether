@@ -43,9 +43,9 @@ export const operationsSectionLinks: Record<string, ReportSectionLink[]> = {
     { href: "#ops-operator-requests", label: "Operator requests" },
   ],
   decisions: [
+    { href: "#ops-decision-shield", label: "Decision shield" },
     { href: "#ops-assumption-locking", label: "Assumption locking" },
     { href: "#ops-decision-memory", label: "Decision memory" },
-    { href: "#ops-decision-shield", label: "Decision shield" },
     { href: "#ops-decision-shield-templates", label: "Decision templates" },
     { href: "#ops-counterfactuals", label: "Counterfactual view" },
   ],
