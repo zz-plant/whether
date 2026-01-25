@@ -2,7 +2,7 @@
  * Treasury client for fetching yield curve data with explicit metadata and fallback support.
  * Keeps network access isolated behind a small interface for future Cloudflare migration.
  */
-import type { TreasuryData } from "./types";
+import type { TreasuryData } from "../types";
 import { findTimeMachineSnapshot } from "../timeMachine/timeMachineCache";
 import { buildHistoricalQuery } from "../timeMachine/timeMachine";
 import { normalizeTreasuryResponse } from "./treasuryNormalizer";

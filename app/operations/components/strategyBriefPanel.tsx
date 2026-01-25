@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import type { RegimeAssessment } from "../../lib/regimeEngine";
-import { insightDatabase } from "../../data/recommendations";
+import type { RegimeAssessment } from "../../../lib/regimeEngine";
+import { insightDatabase } from "../../../data/recommendations";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 import { useClipboardCopy } from "../../components/useClipboardCopy";
 

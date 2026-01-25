@@ -5,10 +5,10 @@
 import { z } from "zod";
 import type { MonthlySummary } from "./monthlySummary";
 import type { QuarterlySummary } from "./quarterlySummary";
-import type { RegimeKey } from "./regimeEngine";
+import type { RegimeKey } from "../regimeEngine";
 import type { WeeklySummary } from "./weeklySummary";
 import type { YearlySummary } from "./yearlySummary";
-import rawArchive from "../data/summary_archive.json";
+import rawArchive from "../../data/summary_archive.json";
 
 export type SummaryArchiveEntry =
   | {

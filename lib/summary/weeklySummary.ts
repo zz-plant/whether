@@ -2,7 +2,7 @@
  * Weekly summary builder for copy-ready guidance and API payloads.
  * Keeps weekly action copy consistent across UI and shared endpoints.
  */
-import type { RegimeAssessment } from "./regimeEngine";
+import type { RegimeAssessment } from "../regimeEngine";
 
 export type WeeklySummaryProvenance = {
   sourceLabel: string;
