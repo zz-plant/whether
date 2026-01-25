@@ -137,7 +137,7 @@ export const ReportPageNavigation = ({
                         href={link.href}
                         active={isActive}
                         aria-current={isActive ? "page" : undefined}
-                        className={`weather-tab inline-flex min-h-[44px] w-full items-center justify-center gap-2 px-3 py-2 text-center text-[9px] font-semibold tracking-[0.14em] transition-colors touch-manipulation sm:w-auto sm:px-4 sm:text-xs sm:tracking-[0.12em] ${
+                        className={`weather-tab inline-flex min-h-[44px] w-full items-center justify-center gap-2 px-3 py-2 text-center text-[9px] font-semibold tracking-[0.14em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:px-4 sm:text-xs sm:tracking-[0.12em] ${
                           isActive
                             ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
                             : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
@@ -308,7 +308,8 @@ export const ReportMobileNavigation = ({
             {prevLink ? (
               <a
                 href={prevLink.href}
-                className="weather-pill inline-flex min-h-[44px] flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/80 px-2 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                aria-label={`Previous page: ${prevLink.label}`}
+                className="weather-pill inline-flex min-h-[44px] flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/80 px-2 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
               >
                 <span aria-hidden="true" className="text-base leading-none text-slate-300">
                   ←
@@ -330,7 +331,8 @@ export const ReportMobileNavigation = ({
             {nextLink ? (
               <a
                 href={nextLink.href}
-                className="weather-pill inline-flex min-h-[44px] flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/80 px-2 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                aria-label={`Next page: ${nextLink.label}`}
+                className="weather-pill inline-flex min-h-[44px] flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/80 px-2 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
               >
                 <span aria-hidden="true" className="text-base leading-none text-slate-300">
                   →
@@ -403,7 +405,7 @@ export const ReportMobileNavigation = ({
                       href={link.href}
                       active={isActive}
                       aria-current={isActive ? "page" : undefined}
-                      className={`weather-pill flex min-h-[56px] items-start gap-3 rounded-2xl border px-3 py-3 text-left text-sm font-semibold tracking-[0.08em] transition-colors touch-manipulation ${
+                      className={`weather-pill flex min-h-[56px] items-start gap-3 rounded-2xl border px-3 py-3 text-left text-sm font-semibold tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation ${
                         isActive
                           ? "border-sky-400/70 bg-sky-500/15 text-sky-100"
                           : "border-slate-800/80 text-slate-100 hover:border-sky-400/70 hover:text-sky-100"
@@ -445,7 +447,7 @@ export const ReportMobileNavigation = ({
                     <li key={item.href}>
                       <a
                         href={item.href}
-                        className="weather-pill inline-flex min-h-[44px] w-full items-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                        className="weather-pill inline-flex min-h-[44px] w-full items-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
                       >
                         {item.label}
                       </a>

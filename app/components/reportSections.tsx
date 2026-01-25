@@ -3089,6 +3089,13 @@ export const InsightDatabasePanel = ({
     setDateRange({ start: "", end: "" });
     setSelectedTags([]);
   };
+  const hasActiveFilters =
+    searchQuery.trim().length > 0 ||
+    selectedClimate !== "all" ||
+    selectedSignal !== "all" ||
+    dateRange.start !== "" ||
+    dateRange.end !== "" ||
+    selectedTags.length > 0;
 
   return (
     <section id="insight-database" aria-labelledby="insight-database-title" className="mt-10">
@@ -3127,7 +3134,9 @@ export const InsightDatabasePanel = ({
                 <button
                   type="button"
                   onClick={clearFilters}
-                  className="text-xs font-semibold tracking-[0.12em] text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
+                  disabled={!hasActiveFilters}
+                  aria-disabled={!hasActiveFilters}
+                  className="text-xs font-semibold tracking-[0.12em] text-slate-300 underline decoration-slate-500 underline-offset-4 transition-opacity hover:text-slate-100 disabled:cursor-not-allowed disabled:text-slate-600 disabled:opacity-60"
                 >
                   Clear filters
                 </button>
@@ -3243,6 +3252,7 @@ export const InsightDatabasePanel = ({
                     <Input
                       type="date"
                       value={dateRange.start}
+                      aria-describedby="evidence-date-hint"
                       onChange={(event) =>
                         setDateRange((prev) => ({ ...prev, start: event.target.value }))
                       }
@@ -3254,6 +3264,7 @@ export const InsightDatabasePanel = ({
                     <Input
                       type="date"
                       value={dateRange.end}
+                      aria-describedby="evidence-date-hint"
                       onChange={(event) =>
                         setDateRange((prev) => ({ ...prev, end: event.target.value }))
                       }
@@ -3261,6 +3272,9 @@ export const InsightDatabasePanel = ({
                     />
                   </Field.Root>
                 </div>
+                <p id="evidence-date-hint" className="text-xs text-slate-500">
+                  Use YYYY-MM-DD to filter evidence by publish date.
+                </p>
               </div>
               <div className="mt-4">
                 <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Tags</p>
@@ -3282,68 +3296,78 @@ export const InsightDatabasePanel = ({
                 </ToggleGroup>
               </div>
             </div>
-            <div className="mt-4 flex items-center justify-between text-xs font-semibold tracking-[0.12em] text-slate-400">
+            <div
+              className="mt-4 flex items-center justify-between text-xs font-semibold tracking-[0.12em] text-slate-400"
+              role="status"
+              aria-live="polite"
+            >
               <span>{filteredEvidence.length} evidence items</span>
               <span>Linked recommendations included</span>
             </div>
             <div className="mt-4 grid gap-4 md:grid-cols-2">
-            {filteredEvidence.length === 0 ? (
-              <div className="weather-surface p-4 text-sm text-slate-400">
-                No evidence items match these filters. Try clearing the date range or tags.
-              </div>
-            ) : (
-              filteredEvidence.map((item) => (
-                <article key={item.id} className="weather-surface p-4">
-                  <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                    {item.source}
-                  </p>
-                  <a
-                    href={item.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-2 block text-sm font-semibold text-slate-100 underline decoration-slate-500 underline-offset-4 hover:text-slate-50"
-                  >
-                    {item.title}
-                  </a>
-                  <p className="mt-2 text-xs text-slate-500">{item.summary}</p>
-                  <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-400">
-                    <span className="weather-pill-muted inline-flex items-center px-2 py-1">
-                      Climate: {getRegimeLabel(item.climate as RegimeAssessment["regime"])}
-                    </span>
-                    <span className="weather-pill-muted inline-flex items-center px-2 py-1">
-                      Signal: {item.signal}
-                    </span>
-                    <span className="weather-pill-muted inline-flex items-center px-2 py-1">
-                      Date: {formatDate(item.date)}
-                    </span>
-                  </div>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {item.tags.map((tag) => (
-                      <button
-                        key={`${item.id}-${tag}`}
-                        type="button"
-                        onClick={() => toggleTag(tag)}
-                        className="rounded-full border border-slate-700/70 px-2.5 py-1 text-xs font-semibold tracking-[0.12em] text-slate-300 hover:border-slate-500/80 hover:text-slate-100"
-                      >
-                        {tag}
-                      </button>
-                    ))}
-                  </div>
-                  {item.recommendation ? (
-                    <p className="mt-4 text-xs text-slate-400">
-                      Decision recommendation:{" "}
-                      <a
-                        href={item.recommendation.href}
-                        className="touch-target inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-slate-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
-                      >
-                        {item.recommendation.label}
-                      </a>
+              {filteredEvidence.length === 0 ? (
+                <div className="weather-surface p-4 text-sm text-slate-400">
+                  No evidence items match these filters. Try clearing the date range or tags.
+                </div>
+              ) : (
+                filteredEvidence.map((item) => (
+                  <article key={item.id} className="weather-surface p-4">
+                    <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                      {item.source}
                     </p>
-                  ) : null}
-                </article>
-              ))
-            )}
-          </div>
+                    <a
+                      href={item.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-2 block text-sm font-semibold text-slate-100 underline decoration-slate-500 underline-offset-4 hover:text-slate-50"
+                    >
+                      {item.title}
+                    </a>
+                    <p className="mt-2 text-xs text-slate-500">{item.summary}</p>
+                    <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-400">
+                      <span className="weather-pill-muted inline-flex items-center px-2 py-1">
+                        Climate: {getRegimeLabel(item.climate as RegimeAssessment["regime"])}
+                      </span>
+                      <span className="weather-pill-muted inline-flex items-center px-2 py-1">
+                        Signal: {item.signal}
+                      </span>
+                      <span className="weather-pill-muted inline-flex items-center px-2 py-1">
+                        Date: {formatDate(item.date)}
+                      </span>
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {item.tags.map((tag) => (
+                        <button
+                          key={`${item.id}-${tag}`}
+                          type="button"
+                          onClick={() => toggleTag(tag)}
+                          aria-pressed={selectedTags.includes(tag)}
+                          aria-label={`Filter by ${tag}`}
+                          className={`rounded-full border px-2.5 py-1 text-xs font-semibold tracking-[0.12em] transition-colors ${
+                            selectedTags.includes(tag)
+                              ? "border-sky-400/70 bg-sky-500/15 text-sky-100"
+                              : "border-slate-700/70 text-slate-300 hover:border-slate-500/80 hover:text-slate-100"
+                          }`}
+                        >
+                          {tag}
+                        </button>
+                      ))}
+                    </div>
+                    {item.recommendation ? (
+                      <p className="mt-4 text-xs text-slate-400">
+                        Decision recommendation:{" "}
+                        <a
+                          href={item.recommendation.href}
+                          className="touch-target inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-slate-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
+                        >
+                          {item.recommendation.label}
+                        </a>
+                      </p>
+                    ) : null}
+                  </article>
+                ))
+              )}
+            </div>
           </Collapsible.Panel>
         </Collapsible.Root>
         <Collapsible.Root className="mt-4">
