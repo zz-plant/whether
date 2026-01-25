@@ -63,22 +63,22 @@ const sortedSnapshots = parseTimeMachineCache(rawCache)
       new Date(a.record_date).getTime() - new Date(b.record_date).getTime()
   );
 
-export const getTimeMachineCoverage = () => {
+const timeMachineCoverage = (() => {
   const earliest = sortedSnapshots[0];
   const latest = sortedSnapshots.at(-1);
   return {
     earliest: earliest?.record_date ?? null,
     latest: latest?.record_date ?? null,
   };
-};
+})();
 
-export const getTimeMachineYears = () => {
+const timeMachineYears = (() => {
   const years = new Set<number>();
   sortedSnapshots.forEach((snapshot) => years.add(snapshot.year));
   return Array.from(years).sort((a, b) => b - a);
-};
+})();
 
-export const getTimeMachineMonthsByYear = () => {
+const timeMachineMonthsByYear = (() => {
   const monthsByYear: Record<number, number[]> = {};
   sortedSnapshots.forEach((snapshot) => {
     if (!monthsByYear[snapshot.year]) {
@@ -92,6 +92,18 @@ export const getTimeMachineMonthsByYear = () => {
     monthsByYear[Number(year)].sort((a, b) => a - b);
   });
   return monthsByYear;
+})();
+
+export const getTimeMachineCoverage = () => {
+  return timeMachineCoverage;
+};
+
+export const getTimeMachineYears = () => {
+  return timeMachineYears;
+};
+
+export const getTimeMachineMonthsByYear = () => {
+  return timeMachineMonthsByYear;
 };
 
 export const hasTimeMachineEntry = (year: number, month: number) => {
@@ -112,12 +124,35 @@ export type TimeMachineRegimeEntry = {
   summary: string;
 };
 
+const timeMachineRegimeSeriesCache = new Map<string, TimeMachineRegimeEntry[]>();
+
+const buildRegimeSeriesCacheKey = (
+  months: number,
+  overrides?: Partial<RegimeThresholds>
+) => {
+  if (!overrides) {
+    return `${months}:default`;
+  }
+
+  return [
+    months,
+    overrides.baseRateTightness ?? "default",
+    overrides.tightnessRegime ?? "default",
+    overrides.riskAppetiteRegime ?? "default",
+  ].join(":");
+};
+
 export const getTimeMachineRegimeSeries = (
   months = 24,
   overrides?: Partial<RegimeThresholds>
 ): TimeMachineRegimeEntry[] => {
+  const cacheKey = buildRegimeSeriesCacheKey(months, overrides);
+  const cached = timeMachineRegimeSeriesCache.get(cacheKey);
+  if (cached) {
+    return cached;
+  }
   const sliceStart = Math.max(sortedSnapshots.length - months, 0);
-  return sortedSnapshots.slice(sliceStart).map((snapshot) => {
+  const series = sortedSnapshots.slice(sliceStart).map((snapshot) => {
     const assessment = evaluateRegime(snapshot, overrides);
     return {
       year: snapshot.year,
@@ -127,6 +162,8 @@ export const getTimeMachineRegimeSeries = (
       summary: assessment.description,
     };
   });
+  timeMachineRegimeSeriesCache.set(cacheKey, series);
+  return series;
 };
 
 export const getPreviousTimeMachineSnapshot = (asOf: string): TreasuryData | null => {
