@@ -112,12 +112,30 @@ export type TimeMachineRegimeEntry = {
   summary: string;
 };
 
+const regimeSeriesCache = new Map<string, TimeMachineRegimeEntry[]>();
+
+const buildRegimeSeriesCacheKey = (
+  months: number,
+  overrides?: Partial<RegimeThresholds>
+) => {
+  if (!overrides || Object.keys(overrides).length === 0) {
+    return `${months}:default`;
+  }
+  return `${months}:${JSON.stringify(overrides)}`;
+};
+
 export const getTimeMachineRegimeSeries = (
   months = 24,
   overrides?: Partial<RegimeThresholds>
 ): TimeMachineRegimeEntry[] => {
+  const cacheKey = buildRegimeSeriesCacheKey(months, overrides);
+  const cached = regimeSeriesCache.get(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
   const sliceStart = Math.max(sortedSnapshots.length - months, 0);
-  return sortedSnapshots.slice(sliceStart).map((snapshot) => {
+  const series = sortedSnapshots.slice(sliceStart).map((snapshot) => {
     const assessment = evaluateRegime(snapshot, overrides);
     return {
       year: snapshot.year,
@@ -127,6 +145,9 @@ export const getTimeMachineRegimeSeries = (
       summary: assessment.description,
     };
   });
+
+  regimeSeriesCache.set(cacheKey, series);
+  return series;
 };
 
 export const getPreviousTimeMachineSnapshot = (asOf: string): TreasuryData | null => {
@@ -135,17 +156,16 @@ export const getPreviousTimeMachineSnapshot = (asOf: string): TreasuryData | nul
     return null;
   }
 
-  const candidate = [...sortedSnapshots].reverse().find((snapshot) => {
+  for (let index = sortedSnapshots.length - 1; index >= 0; index -= 1) {
+    const snapshot = sortedSnapshots[index];
     const recordDate = new Date(snapshot.record_date);
-    return recordDate < target;
-  });
-
-  if (!candidate) {
-    return null;
+    if (recordDate < target) {
+      const { year: _year, month: _month, ...data } = snapshot;
+      return data;
+    }
   }
 
-  const { year: _year, month: _month, ...data } = candidate;
-  return data;
+  return null;
 };
 
 export const findTimeMachineSnapshot = (asOf: string): TreasuryData | null => {
@@ -154,17 +174,16 @@ export const findTimeMachineSnapshot = (asOf: string): TreasuryData | null => {
     return null;
   }
 
-  const candidate = [...sortedSnapshots].reverse().find((snapshot) => {
+  for (let index = sortedSnapshots.length - 1; index >= 0; index -= 1) {
+    const snapshot = sortedSnapshots[index];
     const recordDate = new Date(snapshot.record_date);
-    return recordDate <= target;
-  });
-
-  if (!candidate) {
-    return null;
+    if (recordDate <= target) {
+      const { year: _year, month: _month, ...data } = snapshot;
+      return data;
+    }
   }
 
-  const { year: _year, month: _month, ...data } = candidate;
-  return data;
+  return null;
 };
 
 export const getTimeMachineRollingYieldSeries = (): {
