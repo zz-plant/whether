@@ -3,7 +3,7 @@
  * Keeps monthly action guidance shareable across the Regime Station UI.
  */
 
-import type { MonthlySummary } from "../../lib/monthlySummary";
+import type { MonthlySummary } from "../../lib/summary/monthlySummary";
 import { SummaryCard } from "./summaryCard";
 
 export const MonthlySummaryCard = ({ summary }: { summary: MonthlySummary }) => (

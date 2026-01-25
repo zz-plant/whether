@@ -1,6 +1,6 @@
 import type { Route } from "next";
 import type { UrlObject } from "url";
-import type { ReportSearchParams } from "./reportData";
+import type { ReportSearchParams } from "../report/reportData";
 
 export const appendSearchParamsToRoute = (
   href: Route,

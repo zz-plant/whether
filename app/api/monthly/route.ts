@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { loadReportData } from "../../../lib/reportData";
-import { buildMonthlySummary } from "../../../lib/monthlySummary";
-import { buildSummaryHash } from "../../../lib/summaryHash";
+import { loadReportData } from "../../../lib/report/reportData";
+import { buildMonthlySummary } from "../../../lib/summary/monthlySummary";
+import { buildSummaryHash } from "../../../lib/summary/summaryHash";
 
 export const revalidate = 3600;
 

@@ -14,7 +14,7 @@ import type { Route } from "next";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
 import type { RegimeKey } from "../../lib/regimeEngine";
-import type { SummaryArchiveEntry } from "../../lib/summaryArchive";
+import type { SummaryArchiveEntry } from "../../lib/summary/summaryArchive";
 import { MonthlySummaryCard } from "./monthlySummaryCard";
 import { QuarterlySummaryCard } from "./quarterlySummaryCard";
 import { WeeklySummaryCard } from "./weeklySummaryCard";

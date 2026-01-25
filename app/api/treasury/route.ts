@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { fetchTreasuryData } from "../../../lib/treasuryClient";
+import { fetchTreasuryData } from "../../../lib/treasury/treasuryClient";
 import { snapshotData } from "../../../lib/snapshot";
 
 export const revalidate = 86400;

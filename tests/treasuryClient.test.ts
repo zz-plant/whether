@@ -3,7 +3,7 @@
  */
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { fetchTreasuryData } from "../lib/treasuryClient";
+import { fetchTreasuryData } from "../lib/treasury/treasuryClient";
 import type { TreasuryData } from "../lib/types";
 
 describe("treasury client", () => {

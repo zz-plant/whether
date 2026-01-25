@@ -2,8 +2,8 @@
  * Cadence alignment helper for comparing weekly vs monthly guidance.
  * Uses regime agreement and constraint themes to surface drift.
  */
-import type { MonthlySummary } from "./monthlySummary";
-import type { WeeklySummary } from "./weeklySummary";
+import type { MonthlySummary } from "./summary/monthlySummary";
+import type { WeeklySummary } from "./summary/weeklySummary";
 
 export type CadenceAlignmentStatus = "aligned" | "watch" | "mismatch";
 

@@ -37,8 +37,8 @@ import {
 } from "../../lib/sensors";
 import { cxoFunctionOutputs } from "../../lib/cxoFunctionOutputs";
 import { operatorRequests } from "../../lib/operatorRequests";
-import { buildMonthlySummary, getMonthlyActionGuidance } from "../../lib/monthlySummary";
-import { buildWeeklySummary, getWeeklyActionGuidance } from "../../lib/weeklySummary";
+import { buildMonthlySummary, getMonthlyActionGuidance } from "../../lib/summary/monthlySummary";
+import { buildWeeklySummary, getWeeklyActionGuidance } from "../../lib/summary/weeklySummary";
 import { buildCadenceAlignment } from "../../lib/cadenceAlignment";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
 import { MonthlySummaryCard } from "./monthlySummaryCard";

@@ -2,9 +2,9 @@
  * Summary delta panel comparing weekly and monthly action guidance.
  * Uses SummaryCard styling to keep the delta lane consistent with copy-ready cards.
  */
-import type { MonthlySummary } from "../../lib/monthlySummary";
-import type { WeeklySummary } from "../../lib/weeklySummary";
-import { buildSummaryDelta } from "../../lib/summaryDelta";
+import type { MonthlySummary } from "../../lib/summary/monthlySummary";
+import type { WeeklySummary } from "../../lib/summary/weeklySummary";
+import { buildSummaryDelta } from "../../lib/summary/summaryDelta";
 
 export const SummaryDeltaPanel = ({
   weeklySummary,

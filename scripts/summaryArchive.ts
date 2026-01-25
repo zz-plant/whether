@@ -3,10 +3,10 @@
  * Keeps historical summary cache in a single file for timeline playback.
  */
 import { readFile, writeFile } from "node:fs/promises";
-import type { MonthlySummary } from "../lib/monthlySummary";
-import type { QuarterlySummary } from "../lib/quarterlySummary";
-import type { WeeklySummary } from "../lib/weeklySummary";
-import type { YearlySummary } from "../lib/yearlySummary";
+import type { MonthlySummary } from "../lib/summary/monthlySummary";
+import type { QuarterlySummary } from "../lib/summary/quarterlySummary";
+import type { WeeklySummary } from "../lib/summary/weeklySummary";
+import type { YearlySummary } from "../lib/summary/yearlySummary";
 
 const ARCHIVE_PATH = "data/summary_archive.json";
 

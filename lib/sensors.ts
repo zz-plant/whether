@@ -12,7 +12,7 @@ import type {
   TreasuryData,
 } from "./types";
 import { computeCurveSlope, getBaseRate } from "./regimeEngine";
-import { getTimeMachineRollingYieldSeries } from "./timeMachineCache";
+import { getTimeMachineRollingYieldSeries } from "./timeMachine/timeMachineCache";
 
 const BASE_RATE_EXPLANATION =
   "Base rate uses the 1-month Treasury yield (fallback to 3-month if missing).";

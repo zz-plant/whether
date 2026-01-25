@@ -1,4 +1,4 @@
-import type { ReportPageLink } from "../app/components/reportShellNavigation";
+import type { ReportPageLink } from "../../app/components/reportShellNavigation";
 
 export const reportPageLinks: ReportPageLink[] = [
   {

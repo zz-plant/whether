@@ -3,11 +3,11 @@
  * Pulls Treasury snapshots and builds copy-ready summaries for historical review.
  */
 import { writeSummaryArchive } from "./summaryArchive";
-import { buildQuarterlySummary } from "../lib/quarterlySummary";
-import { buildYearlySummary } from "../lib/yearlySummary";
+import { buildQuarterlySummary } from "../lib/summary/quarterlySummary";
+import { buildYearlySummary } from "../lib/summary/yearlySummary";
 import { evaluateRegime } from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
-import { resolveHistoricalDate } from "../lib/timeMachine";
+import { resolveHistoricalDate } from "../lib/timeMachine/timeMachine";
 
 const START_YEAR = 2010;
 const END_YEAR = 2025;

@@ -7,7 +7,7 @@ import {
   buildHistoricalQuery,
   formatHistoricalBanner,
   resolveHistoricalDate,
-} from "../lib/timeMachine";
+} from "../lib/timeMachine/timeMachine";
 
 describe("time machine helpers", () => {
   it("builds a historical query filter", () => {

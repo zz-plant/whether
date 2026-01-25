@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { resolveTimeMachineSelection, parseTimeMachineRequest } from "../lib/timeMachineSelection";
-import { loadReportData } from "../lib/reportData";
+import { resolveTimeMachineSelection, parseTimeMachineRequest } from "../lib/timeMachine/timeMachineSelection";
+import { loadReportData } from "../lib/report/reportData";
 import { siteUrl } from "../lib/siteUrl";
 import {
   ExecutiveSnapshotPanel,
@@ -14,7 +14,7 @@ import {
 import { ChangeSinceLastReadPanel } from "./components/changeSinceLastReadPanel";
 import { RegimeAlertsPanel } from "./components/regimeAlertsPanel";
 import { ReportShell } from "./components/reportShell";
-import { reportPageLinks } from "../lib/reportNavigation";
+import { reportPageLinks } from "../lib/report/reportNavigation";
 
 export const runtime = "edge";
 

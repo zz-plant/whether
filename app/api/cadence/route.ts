@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { buildCadenceAlignment } from "../../../lib/cadenceAlignment";
-import { buildMonthlySummary } from "../../../lib/monthlySummary";
-import { loadReportData } from "../../../lib/reportData";
-import { buildWeeklySummary } from "../../../lib/weeklySummary";
+import { buildMonthlySummary } from "../../../lib/summary/monthlySummary";
+import { loadReportData } from "../../../lib/report/reportData";
+import { buildWeeklySummary } from "../../../lib/summary/weeklySummary";
 
 export const revalidate = 3600;
 
