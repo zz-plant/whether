@@ -107,6 +107,10 @@ export default async function OperationsPage({
       pageSummary="Translate the market climate into action: decision shields, playbook moves, and export-ready briefs for leadership review."
       pageLinks={reportPageLinks}
       sectionLinks={operationsSectionLinks.overview}
+      heroVariant="compact"
+      pageNavVariant="compact"
+      primaryCta={{ href: "#ops-monthly-action-summary", label: "Review monthly actions" }}
+      secondaryCta={{ href: "#ops-workstreams", label: "Open workstreams" }}
       structuredData={JSON.stringify(structuredData)}
       historicalBanner={
         historicalSelection ? (

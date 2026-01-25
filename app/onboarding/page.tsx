@@ -85,6 +85,10 @@ export default async function OnboardingPage({
       pageSummary="Get oriented fast with a quick reading guide and a plain-English glossary of the key signals."
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
+      heroVariant="compact"
+      pageNavVariant="compact"
+      primaryCta={{ href: "#first-time-guide", label: "Start orientation" }}
+      secondaryCta={{ href: "#beginner-glossary", label: "Open glossary" }}
       structuredData={JSON.stringify(structuredData)}
       historicalBanner={
         historicalSelection ? (
