@@ -185,7 +185,7 @@ export const ReportShell = ({
             />
           </aside>
 
-          <div className="order-1 space-y-6 lg:order-none">
+          <div className="order-1 space-y-8 lg:order-none lg:space-y-10">
             <section className="weather-panel-static space-y-4 px-4 py-5 sm:px-5">
               <div className="space-y-3">
                 {heroVariant === "compact" ? (

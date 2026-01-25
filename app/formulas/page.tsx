@@ -156,7 +156,40 @@ export default function FormulasPage() {
           </p>
         </header>
 
-        <nav aria-label="Formula sections" className="mt-8">
+        <div className="mt-6 weather-panel p-5">
+          <div className="grid gap-4 lg:grid-cols-[1.2fr,0.8fr]">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
+                How to use this page
+              </p>
+              <p className="mt-2 text-sm text-slate-300">
+                Use these formulas to validate the live signal feed, align with finance partners,
+                and share audit-ready methodology links with stakeholders.
+              </p>
+            </div>
+            <div className="weather-surface p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                Continue the briefing
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <a
+                  href="/signals"
+                  className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.2em] transition-colors hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                >
+                  Open signals report
+                </a>
+                <a
+                  href="/"
+                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                >
+                  Weekly briefing
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <nav aria-label="Formula sections" className="mt-8 weather-panel p-5">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
             Jump to
           </p>
@@ -165,7 +198,7 @@ export default function FormulasPage() {
               <li key={item.id}>
                 <a
                   href={`#${item.id}`}
-                  className="inline-flex min-h-[36px] items-center rounded-full border border-slate-800 px-4 text-xs font-semibold tracking-[0.14em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100"
+                  className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
                 >
                   {item.label}
                 </a>

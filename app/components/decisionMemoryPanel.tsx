@@ -720,14 +720,14 @@ export const DecisionMemoryPanel = ({
                       <div className="mt-6 flex flex-wrap justify-end gap-3">
                         <AlertDialog.Close
                           type="button"
-                          className="min-h-[40px] rounded-full border border-slate-700/70 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-slate-500/70 hover:text-slate-100"
+                          className="min-h-[44px] rounded-full border border-slate-700/70 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-slate-500/70 hover:text-slate-100 touch-manipulation"
                         >
                           Cancel
                         </AlertDialog.Close>
                         <AlertDialog.Close
                           type="button"
                           onClick={handleClearLog}
-                          className="min-h-[40px] rounded-full border border-rose-400/60 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-rose-100 transition-colors hover:border-rose-300/70 hover:text-rose-50"
+                          className="min-h-[44px] rounded-full border border-rose-400/60 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-rose-100 transition-colors hover:border-rose-300/70 hover:text-rose-50 touch-manipulation"
                         >
                           Clear log
                         </AlertDialog.Close>
