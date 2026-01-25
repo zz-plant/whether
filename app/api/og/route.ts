@@ -4,11 +4,11 @@
  */
 import { evaluateRegime } from "../../../lib/regimeEngine";
 import { snapshotData } from "../../../lib/snapshot";
-import { fetchTreasuryData } from "../../../lib/treasuryClient";
+import { fetchTreasuryData } from "../../../lib/treasury/treasuryClient";
 import {
   parseTimeMachineRequest,
   resolveTimeMachineSelection,
-} from "../../../lib/timeMachineSelection";
+} from "../../../lib/timeMachine/timeMachineSelection";
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   dateStyle: "medium",

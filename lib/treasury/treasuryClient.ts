@@ -3,8 +3,8 @@
  * Keeps network access isolated behind a small interface for future Cloudflare migration.
  */
 import type { TreasuryData } from "./types";
-import { findTimeMachineSnapshot } from "./timeMachineCache";
-import { buildHistoricalQuery } from "./timeMachine";
+import { findTimeMachineSnapshot } from "../timeMachine/timeMachineCache";
+import { buildHistoricalQuery } from "../timeMachine/timeMachine";
 import { normalizeTreasuryResponse } from "./treasuryNormalizer";
 
 export const TREASURY_ENDPOINT =

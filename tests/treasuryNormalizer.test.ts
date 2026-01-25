@@ -3,7 +3,7 @@
  */
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { normalizeTreasuryResponse } from "../lib/treasuryNormalizer";
+import { normalizeTreasuryResponse } from "../lib/treasury/treasuryNormalizer";
 
 describe("treasury normalizer", () => {
   it("maps API payload into normalized row", () => {

@@ -4,8 +4,8 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { parseSnapshotData } from "../lib/snapshot";
-import { parseTimeMachineCache } from "../lib/timeMachineCache";
-import { parseSummaryArchive } from "../lib/summaryArchive";
+import { parseTimeMachineCache } from "../lib/timeMachine/timeMachineCache";
+import { parseSummaryArchive } from "../lib/summary/summaryArchive";
 
 const withConsoleErrorSpy = async (run: (calls: unknown[][]) => void | Promise<void>) => {
   const originalError = console.error;

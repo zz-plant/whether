@@ -4,7 +4,7 @@
  */
 import snapshotFallback from "../data/snapshot_fallback.json";
 import type { TreasuryData } from "./types";
-import { TreasuryDataSchema } from "./treasurySchema";
+import { TreasuryDataSchema } from "./treasury/treasurySchema";
 
 const buildValidationFallback = (reason: string): TreasuryData => {
   const timestamp = new Date().toISOString();

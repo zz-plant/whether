@@ -1,4 +1,4 @@
-import type { TimeMachineRegimeEntry } from "../../lib/timeMachineCache";
+import type { TimeMachineRegimeEntry } from "../../lib/timeMachine/timeMachineCache";
 import type { RegimeKey } from "../../lib/regimeEngine";
 
 const monthFormatter = new Intl.DateTimeFormat("en-US", {

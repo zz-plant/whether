@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SectionedReportPanel } from "../components/sectionedReportPanel";
-import { loadReportData } from "../../lib/reportData";
+import { loadReportData } from "../../lib/report/reportData";
 import { siteUrl } from "../../lib/siteUrl";
 import { ReportShell } from "../components/reportShell";
 import { HistoricalBanner, MonthlyActionSummaryPanel } from "../components/reportSections";
-import { reportPageLinks } from "../../lib/reportNavigation";
+import { reportPageLinks } from "../../lib/report/reportNavigation";
 import {
   operationsSectionLinks,
   operationsWorkstreamLinks,
-} from "../../lib/operationsNavigation";
-import { appendSearchParamsToRoute } from "../../lib/routeSearchParams";
+} from "../../lib/navigation/operationsNavigation";
+import { appendSearchParamsToRoute } from "../../lib/navigation/routeSearchParams";
 import { OperationsWorkstreamNav } from "../components/operationsWorkstreamNav";
 
 export const runtime = "edge";

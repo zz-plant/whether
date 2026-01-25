@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { loadReportData } from "../../../lib/reportData";
-import { buildMonthlySummary } from "../../../lib/monthlySummary";
-import { buildSummaryDelta } from "../../../lib/summaryDelta";
-import { buildWeeklySummary } from "../../../lib/weeklySummary";
+import { loadReportData } from "../../../lib/report/reportData";
+import { buildMonthlySummary } from "../../../lib/summary/monthlySummary";
+import { buildSummaryDelta } from "../../../lib/summary/summaryDelta";
+import { buildWeeklySummary } from "../../../lib/summary/weeklySummary";
 
 export const revalidate = 3600;
 

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { loadReportData } from "../../../lib/reportData";
-import { buildYearlySummary, getYearLabel } from "../../../lib/yearlySummary";
+import { loadReportData } from "../../../lib/report/reportData";
+import { buildYearlySummary, getYearLabel } from "../../../lib/summary/yearlySummary";
 
 export const revalidate = 3600;
 

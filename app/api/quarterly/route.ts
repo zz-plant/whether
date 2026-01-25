@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { loadReportData } from "../../../lib/reportData";
-import { buildQuarterlySummary, getQuarterLabel } from "../../../lib/quarterlySummary";
+import { loadReportData } from "../../../lib/report/reportData";
+import { buildQuarterlySummary, getQuarterLabel } from "../../../lib/summary/quarterlySummary";
 
 export const revalidate = 3600;
 

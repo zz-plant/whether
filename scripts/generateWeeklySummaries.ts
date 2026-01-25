@@ -3,7 +3,7 @@
  * Pulls Treasury snapshots and builds copy-ready weekly summaries for historical review.
  */
 import { writeFile } from "node:fs/promises";
-import { buildWeeklySummary, type WeeklySummary } from "../lib/weeklySummary";
+import { buildWeeklySummary, type WeeklySummary } from "../lib/summary/weeklySummary";
 import { evaluateRegime } from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
 import { writeSummaryArchive } from "./summaryArchive";

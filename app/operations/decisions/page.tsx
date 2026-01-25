@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { SectionedReportPanel } from "../../components/sectionedReportPanel";
-import { loadReportData } from "../../../lib/reportData";
+import { loadReportData } from "../../../lib/report/reportData";
 import { siteUrl } from "../../../lib/siteUrl";
 import { ReportShell } from "../../components/reportShell";
 import { AssumptionLockPanel } from "../../components/assumptionLockPanel";
@@ -11,8 +11,8 @@ import {
   DecisionShieldTemplatesPanel,
   HistoricalBanner,
 } from "../../components/reportSections";
-import { reportPageLinks } from "../../../lib/reportNavigation";
-import { operationsSectionLinks } from "../../../lib/operationsNavigation";
+import { reportPageLinks } from "../../../lib/report/reportNavigation";
+import { operationsSectionLinks } from "../../../lib/navigation/operationsNavigation";
 import { OperationsWorkstreamNav } from "../../components/operationsWorkstreamNav";
 
 export const runtime = "edge";

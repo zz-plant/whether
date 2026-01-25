@@ -3,10 +3,10 @@
  * Pulls Treasury snapshots and builds copy-ready monthly summaries for historical review.
  */
 import { writeFile } from "node:fs/promises";
-import { buildMonthlySummary, type MonthlySummary } from "../lib/monthlySummary";
+import { buildMonthlySummary, type MonthlySummary } from "../lib/summary/monthlySummary";
 import { evaluateRegime } from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
-import { resolveHistoricalDate } from "../lib/timeMachine";
+import { resolveHistoricalDate } from "../lib/timeMachine/timeMachine";
 import { writeSummaryArchive } from "./summaryArchive";
 
 const START_YEAR = 2012;

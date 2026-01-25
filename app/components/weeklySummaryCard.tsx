@@ -3,7 +3,7 @@
  * Provides copy-ready text with direct access to the weekly summary endpoint.
  */
 
-import type { WeeklySummary } from "../../lib/weeklySummary";
+import type { WeeklySummary } from "../../lib/summary/weeklySummary";
 import { SummaryCard } from "./summaryCard";
 
 export const WeeklySummaryCard = ({ summary }: { summary: WeeklySummary }) => (

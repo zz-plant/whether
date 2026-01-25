@@ -4,7 +4,7 @@
  */
 import { z } from "zod";
 import type { SeriesHistoryPoint, TreasuryData } from "./types";
-import { TreasuryDataSchema } from "./treasurySchema";
+import { TreasuryDataSchema } from "../treasury/treasurySchema";
 import { evaluateRegime } from "./regimeEngine";
 import type { RegimeThresholds } from "./regimeEngine";
 import rawCache from "../data/time_machine_cache.json";

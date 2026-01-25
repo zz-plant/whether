@@ -1,5 +1,5 @@
 import type { Route } from "next";
-import type { ReportSectionLink } from "../app/components/reportShellNavigation";
+import type { ReportSectionLink } from "../../app/components/reportShellNavigation";
 
 export type OperationsWorkstreamLink = {
   href: Route;

@@ -2,25 +2,25 @@
  * Shared loader for Whether Report pages.
  * Centralizes Treasury data fetching and formatting for multi-page layouts.
  */
-import { fetchTreasuryData } from "./treasuryClient";
-import { snapshotData } from "./snapshot";
-import { buildSensorReadings } from "./sensors";
-import { evaluateRegime } from "./regimeEngine";
-import { getPlaybookGuidance } from "./playbook";
+import { fetchTreasuryData } from "../treasury/treasuryClient";
+import { snapshotData } from "../snapshot";
+import { buildSensorReadings } from "../sensors";
+import { evaluateRegime } from "../regimeEngine";
+import { getPlaybookGuidance } from "../playbook";
 import {
   getLatestTimeMachineSnapshot,
   getTimeMachineCoverage,
   getTimeMachineMonthsByYear,
   getPreviousTimeMachineSnapshot,
   getTimeMachineRegimeSeries,
-} from "./timeMachineCache";
-import { getSummaryArchive } from "./summaryArchive";
+} from "../timeMachine/timeMachineCache";
+import { getSummaryArchive } from "../summary/summaryArchive";
 import {
   parseTimeMachineRequest,
   resolveTimeMachineSelection,
-} from "./timeMachineSelection";
-import { macroSeries } from "./macroSnapshot";
-import { parseThresholdsFromSearchParams } from "./thresholds";
+} from "../timeMachine/timeMachineSelection";
+import { macroSeries } from "../macroSnapshot";
+import { parseThresholdsFromSearchParams } from "../thresholds";
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   dateStyle: "medium",

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { loadReportData } from "../../lib/reportData";
+import { loadReportData } from "../../lib/report/reportData";
 import { siteUrl } from "../../lib/siteUrl";
 import { ReportShell } from "../components/reportShell";
 import {
@@ -7,7 +7,7 @@ import {
   FirstTimeGuidePanel,
   HistoricalBanner,
 } from "../components/reportSections";
-import { reportPageLinks } from "../../lib/reportNavigation";
+import { reportPageLinks } from "../../lib/report/reportNavigation";
 
 export const runtime = "edge";
 

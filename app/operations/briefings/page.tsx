@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { SectionedReportPanel } from "../../components/sectionedReportPanel";
-import { loadReportData } from "../../../lib/reportData";
+import { loadReportData } from "../../../lib/report/reportData";
 import { siteUrl } from "../../../lib/siteUrl";
 import { ReportShell } from "../../components/reportShell";
 import { ExecutiveBriefingPanel } from "../../components/executiveBriefingPanel";
 import { ExportBriefPanel } from "../../components/exportBriefPanel";
 import { StrategyBriefPanel } from "../../components/strategyBriefPanel";
-import { reportPageLinks } from "../../../lib/reportNavigation";
-import { operationsSectionLinks } from "../../../lib/operationsNavigation";
+import { reportPageLinks } from "../../../lib/report/reportNavigation";
+import { operationsSectionLinks } from "../../../lib/navigation/operationsNavigation";
 import { OperationsWorkstreamNav } from "../../components/operationsWorkstreamNav";
 import { CxoFunctionPanel, HistoricalBanner } from "../../components/reportSections";
 
