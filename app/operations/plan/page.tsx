@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { SectionedReportPanel } from "../../components/sectionedReportPanel";
+import { SectionedReportPanel } from "../components/sectionedReportPanel";
 import { loadReportData } from "../../../lib/report/reportData";
 import { siteUrl } from "../../../lib/siteUrl";
 import { ReportShell } from "../../components/reportShell";
@@ -13,7 +13,7 @@ import {
 } from "../../components/reportSections";
 import { reportPageLinks } from "../../../lib/report/reportNavigation";
 import { operationsSectionLinks } from "../../../lib/navigation/operationsNavigation";
-import { OperationsWorkstreamNav } from "../../components/operationsWorkstreamNav";
+import { OperationsWorkstreamNav } from "../components/operationsWorkstreamNav";
 
 export const runtime = "edge";
 

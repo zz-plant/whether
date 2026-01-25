@@ -7,9 +7,9 @@ import {
   MacroSignalsPanel,
   SensorArray,
 } from "../components/reportSections";
-import { ThresholdsPanel } from "../components/thresholdsPanel";
-import { TimeMachinePanel } from "../components/timeMachinePanel";
-import { RegimeTimelinePanel } from "../components/regimeTimelinePanel";
+import { ThresholdsPanel } from "./components/thresholdsPanel";
+import { TimeMachinePanel } from "./components/timeMachinePanel";
+import { RegimeTimelinePanel } from "./components/regimeTimelinePanel";
 import { reportPageLinks } from "../../lib/report/reportNavigation";
 
 export const runtime = "edge";

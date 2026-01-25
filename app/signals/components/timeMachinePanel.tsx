@@ -12,7 +12,7 @@ import { Popover } from "@base-ui/react/popover";
 import { Tabs } from "@base-ui/react/tabs";
 import type { Route } from "next";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
+import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 import type { RegimeKey } from "../../lib/regimeEngine";
 import type { SummaryArchiveEntry } from "../../lib/summary/summaryArchive";
 import { MonthlySummaryCard } from "./monthlySummaryCard";

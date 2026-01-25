@@ -15,7 +15,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { RegimeThresholds } from "../../lib/regimeEngine";
 import { DEFAULT_THRESHOLDS } from "../../lib/regimeEngine";
 import { buildThresholdSearchParams, THRESHOLD_PARAM_KEYS } from "../../lib/thresholds";
-import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
+import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 
 type ThresholdDraft = {
   baseRateTightness: string;
