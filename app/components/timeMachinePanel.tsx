@@ -453,6 +453,7 @@ export const TimeMachinePanel = ({
               <Popover.Trigger
                 ref={monthRef}
                 id="time-machine-month"
+                type="button"
                 aria-invalid={isInvalid}
                 aria-describedby={isInvalid ? errorId : undefined}
                 className="weather-input inline-flex min-h-[44px] w-full items-center justify-between gap-3 px-3 py-2 text-base transition-colors hover:border-sky-500/70 touch-manipulation"
