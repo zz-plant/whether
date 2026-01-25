@@ -957,13 +957,13 @@ export const FirstTimeGuidePanel = ({
     <div className="weather-panel weather-panel-static p-6">
       <div className="flex flex-wrap items-start justify-between gap-6">
         <div className="max-w-2xl">
-          <p className="type-label text-slate-400">New here? Start here</p>
+          <p className="type-label text-slate-400">Explore (optional)</p>
           <h2 id="first-time-guide-title" className="type-section text-slate-100">
-            Get oriented in three plain-English steps
+            Explore the report in three quick stops
           </h2>
           <p className="mt-2 type-data text-slate-300">
-            This report turns Treasury signals into weekly constraints. Use this quick onboarding
-            path before you dive into the deeper data lanes.
+            If you want a light walkthrough, use this optional path before diving into the deeper
+            data lanes.
           </p>
         </div>
         <div className="weather-surface px-4 py-3 text-xs font-semibold tracking-[0.12em] text-slate-300">
@@ -975,63 +975,75 @@ export const FirstTimeGuidePanel = ({
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-[1.15fr,0.85fr]">
-        <ol className="space-y-4">
+        <ul className="space-y-3">
           {[
             {
-              title: "Read the leadership summary",
+              label: "Summary",
               detail:
                 "Confirm the weekly posture and top constraints before you open deeper diagnostics.",
               example: "Example decision: defer expansion hires when cash is tight.",
             },
             {
-              title: "Check the proof",
+              label: "Proof",
               detail:
                 "Use the signal breakdown here, then open the data lane to see the source metrics.",
               example: "Example decision: confirm curve inversion before approving long bets.",
             },
             {
-              title: "Turn it into actions",
+              label: "Actions",
               detail:
                 "Use the actions lane to brief leadership with clear, plain-English constraints.",
               example: "Example decision: focus on retention when risk appetite is cautious.",
             },
-          ].map((step, index) => (
-            <li key={step.title} className="weather-surface p-4 text-sm text-slate-300">
-              <div className="flex items-start gap-3">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-700/70 bg-slate-950 text-xs font-semibold text-slate-200">
-                  {index + 1}
-                </span>
-                <div>
-                  <p className="text-xs font-semibold tracking-[0.12em] text-slate-200">
-                    {step.title}
-                  </p>
-                  <p className="mt-2 text-sm text-slate-400">{step.detail}</p>
-                  <p className="mt-3 text-xs text-slate-500">{step.example}</p>
+          ].map((step) => (
+            <li key={step.label} className="weather-surface p-4 text-sm text-slate-300">
+              <Collapsible.Root className="space-y-2">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-700/70 bg-slate-950 text-xs font-semibold text-slate-300">
+                      ✓
+                    </span>
+                    <p className="text-xs font-semibold tracking-[0.12em] text-slate-200">
+                      {step.label}
+                    </p>
+                  </div>
+                  <Collapsible.Trigger
+                    type="button"
+                    className="flex min-h-[44px] items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-400 transition-colors hover:text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                  >
+                    Details
+                    <span className="text-slate-500">(expand)</span>
+                  </Collapsible.Trigger>
                 </div>
-              </div>
+                <Collapsible.Panel className="space-y-2 text-xs text-slate-400">
+                  <p>{step.detail}</p>
+                  <p className="text-xs text-slate-500">{step.example}</p>
+                </Collapsible.Panel>
+              </Collapsible.Root>
             </li>
           ))}
-        </ol>
+        </ul>
         <aside className="weather-surface p-4" aria-label="Onboarding checklist">
-          <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">First 10 minutes</p>
+          <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+            Optional quick scan
+          </p>
           <ul className="mt-3 space-y-3 text-sm text-slate-300">
             <li className="flex gap-2">
               <span className="text-slate-500">•</span>
-              <span>Skim the climate badge and the weekly action summary together.</span>
+              <span>Skim the climate badge with the weekly action summary.</span>
             </li>
             <li className="flex gap-2">
               <span className="text-slate-500">•</span>
-              <span>Verify the source freshness before you share a recommendation.</span>
+              <span>Verify source freshness before sharing recommendations.</span>
             </li>
             <li className="flex gap-2">
               <span className="text-slate-500">•</span>
-              <span>Use the playbook to translate macro constraints into concrete next steps.</span>
+              <span>Use the playbook to translate constraints into next steps.</span>
             </li>
             <li className="flex gap-2">
               <span className="text-slate-500">•</span>
               <span>
-                Drop the constraints into your Jira/Linear issue template or Confluence decision
-                log to keep delivery aligned.
+                Drop constraints into Jira/Linear or Confluence to keep delivery aligned.
               </span>
             </li>
           </ul>
@@ -1151,7 +1163,6 @@ export const BeginnerGlossaryPanel = () => {
             <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Glossary</p>
             <Accordion.Root
               multiple
-              defaultValue={[glossaryEntries[0].value]}
               className="mt-3 space-y-3 text-sm text-slate-300"
             >
               {glossaryEntries.map((entry) => (
@@ -1162,8 +1173,13 @@ export const BeginnerGlossaryPanel = () => {
                 >
                   <Accordion.Header>
                     <Accordion.Trigger className="group flex min-h-[44px] w-full items-center justify-between gap-3 py-2 text-left touch-manipulation">
-                      <span className="text-xs font-semibold tracking-[0.12em] text-slate-200">
-                        {entry.term}
+                      <span>
+                        <span className="text-xs font-semibold tracking-[0.12em] text-slate-200">
+                          {entry.term}
+                        </span>
+                        <span className="mt-1 block text-xs text-slate-400">
+                          {entry.summary}
+                        </span>
                       </span>
                       <span className="flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-300 transition-transform group-data-[panel-open]:rotate-180">
                         <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
@@ -1180,7 +1196,6 @@ export const BeginnerGlossaryPanel = () => {
                     </Accordion.Trigger>
                   </Accordion.Header>
                   <Accordion.Panel className="mt-3 space-y-2 text-sm text-slate-400">
-                    <p>{entry.summary}</p>
                     <p className="text-xs text-slate-500">{entry.why}</p>
                     <p className="text-xs text-slate-400">
                       Used in:{" "}
