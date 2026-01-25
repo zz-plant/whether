@@ -132,8 +132,10 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
   const selectedYear = requestedSelection?.year ?? defaultYear;
   const thresholds = parseThresholdsFromSearchParams(searchParams);
   const regimeSeries = getTimeMachineRegimeSeries(24, thresholds);
-  const treasury = await treasuryPromise;
-  const liveTreasury = liveTreasuryPromise ? await liveTreasuryPromise : treasury;
+  const [treasury, liveTreasury] = await Promise.all([
+    treasuryPromise,
+    liveTreasuryPromise ?? treasuryPromise,
+  ]);
   const recordDateLabel = formatDateValue(treasury.record_date);
   const fetchedAtLabel = formatTimestampValue(treasury.fetched_at);
   const treasuryAgeLabel = formatAgeLabel(treasury.fetched_at, now);
