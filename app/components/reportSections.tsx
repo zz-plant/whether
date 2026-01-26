@@ -496,22 +496,15 @@ export const WeeklyActionSummaryPanel = ({
                 <div key={tile.label} className="weather-surface p-4">
                   <div className="flex items-center justify-between gap-2 text-xs font-semibold tracking-[0.12em] text-slate-400">
                     <span>{tile.label}</span>
-                    {tile.label === "Cash availability" ? (
-                      <TermHelp
-                        term="Cash availability"
-                        description="A normalized score of how tight or loose credit conditions appear in public Treasury data."
-                      />
-                    ) : tile.label === "Risk appetite" ? (
-                      <TermHelp
-                        term="Risk appetite"
-                        description="A normalized score of how willing markets are to fund riskier growth bets versus defensive moves."
-                      />
-                    ) : (
-                      <TermHelp
-                        term="Curve slope"
-                        description="The difference between long- and short-term Treasury rates; negative values are often called an inverted curve."
-                      />
-                    )}
+                    {(() => {
+                      const termData = {
+                        "Cash availability": "A normalized score of how tight or loose credit conditions appear in public Treasury data.",
+                        "Risk appetite": "A normalized score of how willing markets are to fund riskier growth bets versus defensive moves.",
+                        "Curve slope": "The difference between long- and short-term Treasury rates; negative values are often called an inverted curve."
+                      };
+                      const description = termData[tile.label as keyof typeof termData];
+                      return description ? <TermHelp term={tile.label} description={description} /> : null;
+                    })()}
                   </div>
                   <p className="mono mt-3 text-2xl text-slate-100">{tile.value}</p>
                   <p className="mt-2 text-xs text-slate-500">{tile.detail}</p>
