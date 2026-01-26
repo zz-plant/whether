@@ -3,6 +3,7 @@
 This roadmap focuses on shipping a defensible, operator-facing “product strategy weather report.”
 Each milestone is tied to the core loop: ingest Treasury data → compute regime → translate into
 plain‑English operational constraints with traceable sources.
+Audit notes for Milestones 5–8 live in `docs/roadmap-audit.md`.
 
 ## Milestone 0 — Repo scaffolding (Week 0)
 - [x] Establish Next.js 14 + TypeScript strict + Tailwind baseline.
@@ -47,47 +48,47 @@ plain‑English operational constraints with traceable sources.
 - [x] Handle missing data and “latest available” lookup.
 
 ## Milestone 5 — UX Polish + Verification (Week 5)
-- Cockpit-style layout with high-density panels.
-- Accessibility pass: keyboard nav, focus states, reduced motion.
-- Verify offline mode + snapshot labeling.
-- Add footer disclaimer: “Not Financial Advice.”
-- Add an executive decision brief block with a single recommendation + risk badge.
-- Add a “what changed since last read” delta panel on Overview with a Time Machine link.
-- Add inline “signal translation” helpers for jargon-heavy metrics.
-- Promote export/share actions (copy-ready leadership brief) to the Overview header.
+- [x] Cockpit-style layout with high-density panels.
+- [x] Accessibility pass: keyboard nav, focus states, reduced motion.
+- [x] Verify offline mode + snapshot labeling.
+- [x] Add footer disclaimer: “Not Financial Advice.”
+- [x] Add an executive decision brief block with a single recommendation + risk badge.
+- [x] Add a “what changed since last read” delta panel on Overview with a Time Machine link.
+- [x] Add inline “signal translation” helpers for jargon-heavy metrics.
+- [ ] Promote export/share actions (copy-ready leadership brief) to the Overview header. (See audit.)
 
 ## Milestone 6 — Reliability + Regression Tests (Week 6)
-- Unit tests for:
-  - Regime scoring boundaries.
-  - Classification rules.
-  - Decision Shield verdicts.
-- Add data parsing tests for Treasury response normalization.
+- [x] Unit tests for:
+  - [x] Regime scoring boundaries.
+  - [x] Classification rules.
+  - [x] Decision Shield verdicts.
+- [x] Add data parsing tests for Treasury response normalization.
 
 ## Milestone 7 — Operator Demand Expansion (Week 7)
-- Broaden macro inputs beyond the yield curve (inflation, unemployment, credit spreads) with explicit source links.
-- Add adjustable regime thresholds with audit trails for custom tuning.
-- Expand Decision Shield to cover additional decision types (M&A, infra spend, geographic expansion).
-- Add export/share flows (PDF, slide-ready summary, scheduled email or Slack brief).
-- Build an Insight Database with citations to evidence and historical precedents.
-- Add time-series comparisons (“then vs now”) with regime change diffs.
-- Add alerts/notifications on regime changes.
-- Support saved Decision Shield scenarios and team presets.
-- Surface deep data provenance per sensor (direct source URLs, formulas, timestamps).
-- Introduce an API/export endpoint for embedding regimes in internal dashboards.
+- [x] Broaden macro inputs beyond the yield curve (inflation, unemployment, credit spreads) with explicit source links.
+- [x] Add adjustable regime thresholds with audit trails for custom tuning.
+- [x] Expand Decision Shield to cover additional decision types (M&A, infra spend, geographic expansion).
+- [x] Add export/share flows (PDF, slide-ready summary, scheduled email or Slack brief).
+- [x] Build an Insight Database with citations to evidence and historical precedents.
+- [x] Add time-series comparisons (“then vs now”) with regime change diffs.
+- [x] Add alerts/notifications on regime changes.
+- [x] Support saved Decision Shield scenarios and team presets.
+- [x] Surface deep data provenance per sensor (direct source URLs, formulas, timestamps).
+- [x] Introduce an API/export endpoint for embedding regimes in internal dashboards.
 
 ## Milestone 8 — CXO Function Replacement (Week 8)
-- CFO / Finance Strategy mode:
-  - Translate regime outputs into runway, burn, and capital efficiency guardrails.
-  - Budget planning export with macro posture summary and source citations.
-- COO / Operating Strategy posture board:
-  - Company-wide execution constraints and operating cadences tied to regime shifts.
-  - Guardrail checklists for cross-functional planning reviews.
-- CTO/CPO Strategic Planning overlays:
-  - Roadmap posture toggles (growth vs. efficiency) with regime-aligned guidance.
-  - Hiring and pricing decision templates tied to current sensors.
-- Head of Strategy briefing suite:
-  - One-page executive brief with regime narrative, risk flags, and reversal triggers.
-  - Planning memo generator for leadership syncs with copy-ready language.
+- [x] CFO / Finance Strategy mode:
+  - [x] Translate regime outputs into runway, burn, and capital efficiency guardrails.
+  - [x] Budget planning export with macro posture summary and source citations.
+- [x] COO / Operating Strategy posture board:
+  - [x] Company-wide execution constraints and operating cadences tied to regime shifts.
+  - [x] Guardrail checklists for cross-functional planning reviews.
+- [x] CTO/CPO Strategic Planning overlays:
+  - [x] Roadmap posture toggles (growth vs. efficiency) with regime-aligned guidance.
+  - [x] Hiring and pricing decision templates tied to current sensors.
+- [x] Head of Strategy briefing suite:
+  - [x] One-page executive brief with regime narrative, risk flags, and reversal triggers.
+  - [x] Planning memo generator for leadership syncs with copy-ready language.
 
 ---
 
