@@ -145,12 +145,18 @@ export default async function SignalsPage({
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
               Regime read
             </p>
+            <p className="text-xs text-slate-500">
+              Regime = cash tightness + market risk appetite from Treasury signals.
+            </p>
             <p className="text-lg font-semibold text-slate-100">{regimeLabel}</p>
             <p className="text-sm text-slate-300">{assessment.description}</p>
           </div>
           <div className="weather-surface space-y-2 p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
               Score drivers
+            </p>
+            <p className="text-xs text-slate-500">
+              0–100 gauges: higher tightness = harder funding, higher risk appetite = more risk-on.
             </p>
             <div className="flex items-baseline justify-between text-sm text-slate-300">
               <span>Tightness</span>
@@ -167,6 +173,9 @@ export default async function SignalsPage({
           <div className="weather-surface space-y-2 p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
               Constraint focus
+            </p>
+            <p className="text-xs text-slate-500">
+              Operating guardrails the leadership team should enforce this cycle.
             </p>
             <ul className="space-y-2 text-sm text-slate-200">
               {assessment.constraints.slice(0, 3).map((constraint) => (
@@ -194,7 +203,7 @@ export default async function SignalsPage({
             href="#thresholds"
             className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
           >
-            Review scoring thresholds →
+            Review score thresholds →
           </a>
         </div>
         <p className="text-sm text-slate-200">{assessment.description}</p>

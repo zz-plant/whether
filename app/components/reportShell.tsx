@@ -226,7 +226,8 @@ export const ReportShell = ({
                     </p>
                     <h1 className="type-headline text-slate-100">Whether Report</h1>
                     <p className="max-w-2xl text-sm text-slate-200 sm:text-base">
-                      A fast, sourced readout of public Treasury signals translated into product guidance.
+                      A fast, sourced readout of public Treasury signals translated into product
+                      guidance. Interpret as planning input, not official advice.
                     </p>
                   </>
                 )}
