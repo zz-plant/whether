@@ -180,8 +180,8 @@ export default async function HomePage({
         </div>
         <ol className="grid gap-3 text-sm text-slate-300 sm:grid-cols-3">
           {[
-            "Read the weekly action control room to lock posture.",
-            "Confirm operating constraints and score context.",
+            "Read the weekly action control room to lock posture (your default operating stance).",
+            "Confirm operating constraints (budget and approval guardrails) and score context (0–100 gauges).",
             "Open signal breakdowns only when decisions hinge on evidence.",
           ].map((step, index) => (
             <li key={step} className="weather-surface flex gap-3 p-4">
@@ -197,12 +197,18 @@ export default async function HomePage({
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
               Regime posture
             </p>
+            <p className="text-xs text-slate-500">
+              A combined read of cash tightness and market risk appetite from Treasury signals.
+            </p>
             <p className="text-lg font-semibold text-slate-100">{regimeLabel}</p>
             <p className="text-sm text-slate-300">{assessment.description}</p>
           </div>
           <div className="weather-surface space-y-2 p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
               Operating constraints
+            </p>
+            <p className="text-xs text-slate-500">
+              Guardrails that translate the regime into budget, hiring, and approval guidance.
             </p>
             <ul className="space-y-2 text-sm text-slate-200">
               {assessment.constraints.slice(0, 3).map((constraint) => (
@@ -216,6 +222,10 @@ export default async function HomePage({
           <div className="weather-surface space-y-2 p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
               Score context
+            </p>
+            <p className="text-xs text-slate-500">
+              0–100 scores: higher tightness = tougher funding, higher risk appetite = more growth
+              funding.
             </p>
             <div className="flex items-baseline justify-between text-sm text-slate-300">
               <span>Tightness</span>

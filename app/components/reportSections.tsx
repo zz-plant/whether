@@ -395,7 +395,7 @@ export const WeeklyActionSummaryPanel = ({
     },
     {
       title: "Name the constraint",
-      detail: `Cash availability ${assessment.scores.tightness}/100 · Risk appetite ${assessment.scores.riskAppetite}/100.`,
+      detail: `Cash availability ${assessment.scores.tightness}/100 · Risk appetite ${assessment.scores.riskAppetite}/100 (0–100 scores).`,
     },
     {
       title: "Lock the one-week bet",
@@ -405,7 +405,7 @@ export const WeeklyActionSummaryPanel = ({
   const weeklyQuickLinks = [
     { href: "#executive-snapshot", label: "Leadership summary" },
     { href: "/operations#ops-playbook", label: "Actions playbook" },
-    { href: "/signals#thresholds", label: "Thresholds" },
+    { href: "/signals#thresholds", label: "Thresholds (score cutoffs)" },
   ];
   const curveSlopeValue = assessment.scores.curveSlope;
   const curveSlopeDisplay =
@@ -420,12 +420,12 @@ export const WeeklyActionSummaryPanel = ({
     {
       label: "Cash availability",
       value: `${assessment.scores.tightness}/100`,
-      detail: `Threshold ${assessment.thresholds.tightnessRegime}.`,
+      detail: `Threshold ${assessment.thresholds.tightnessRegime} (higher = tighter).`,
     },
     {
       label: "Risk appetite",
       value: `${assessment.scores.riskAppetite}/100`,
-      detail: `Threshold ${assessment.thresholds.riskAppetiteRegime}.`,
+      detail: `Threshold ${assessment.thresholds.riskAppetiteRegime} (higher = more risk-on).`,
     },
     {
       label: "Curve slope",
@@ -453,7 +453,7 @@ export const WeeklyActionSummaryPanel = ({
                   >
                     leadership summary
                   </a>{" "}
-                  for the source signals and decision guardrails.
+                  for the source signals and decision guardrails (budget, hiring, and roadmap approvals).
                 </p>
               </div>
             <div className="rounded-2xl border border-sky-400/40 bg-slate-950/60 p-4">
@@ -1415,11 +1415,12 @@ export const SignalMatrixPanel = ({
           </h3>
           <p className="mt-2 text-sm text-slate-300">
             Read the balance of cash tightness and market risk appetite to anchor staffing and
-            roadmap approvals.
+            roadmap approvals. Tightness tracks funding friction; risk appetite tracks how willing
+            markets are to fund growth bets.
           </p>
         </div>
         <div className="flex flex-col items-end gap-2 text-xs font-semibold tracking-[0.12em] text-slate-500">
-          <span>Cash availability vs. risk appetite</span>
+          <span>Cash availability (tightness) vs. market risk appetite</span>
           <DataProvenanceStrip provenance={provenance} />
         </div>
       </div>
@@ -1427,8 +1428,8 @@ export const SignalMatrixPanel = ({
         <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Executive summary</p>
         <p className="mt-2 text-sm text-slate-200">
           Current posture: {quadrantLabel}. Use tightness {assessment.scores.tightness}/100 and risk
-          appetite {assessment.scores.riskAppetite}/100 to decide whether approvals should tighten
-          or loosen.
+          appetite {assessment.scores.riskAppetite}/100 (normalized 0–100) to decide whether
+          approvals should tighten or loosen.
         </p>
       </div>
       <Collapsible.Root className="mt-4">
@@ -1457,7 +1458,7 @@ export const SignalMatrixPanel = ({
               </div>
               <p className="mt-2 text-xs text-slate-500">
                 Thresholds: tightness {tightnessThreshold}, risk {riskThreshold}. Use these to decide
-                when to shift approvals.
+                when to shift approvals or move between quadrants.
               </p>
             </div>
             <div className="weather-surface relative h-72">
@@ -1595,6 +1596,8 @@ export const SignalMatrixPanel = ({
               Position is derived from tightness (
               <span className="tabular-nums">{assessment.scores.tightness}</span>) and market risk
               appetite (<span className="tabular-nums">{assessment.scores.riskAppetite}</span>).
+              Higher tightness means less cash availability; higher risk appetite means more
+              willingness to fund growth.
             </figcaption>
           </figure>
           <div className="space-y-3">
@@ -1718,6 +1721,9 @@ export const ExecutiveSnapshotPanel = ({
             <h3 id="executive-snapshot-title" className="type-section text-slate-100">
               Operating constraints
             </h3>
+            <p className="mt-2 text-sm text-slate-300">
+              Guardrails that translate macro conditions into budget, hiring, and approval policy.
+            </p>
           </div>
           <DataProvenanceStrip provenance={provenance} />
         </div>
@@ -1750,6 +1756,9 @@ export const ExecutiveSnapshotPanel = ({
                           Signal confidence
                         </p>
                         <p className="text-sm text-slate-200">{confidenceDetail}</p>
+                        <p className="text-xs text-slate-400">
+                          Confidence reflects data freshness and missing inputs, not forecast certainty.
+                        </p>
                         <p className="text-xs text-slate-400">{freshnessAction}</p>
                         <Tooltip.Arrow className="h-2.5 w-2.5 rotate-45 border border-slate-800/80 bg-slate-950/95" />
                       </Tooltip.Popup>
@@ -1761,6 +1770,9 @@ export const ExecutiveSnapshotPanel = ({
                 The current macro posture requires clear ROI gates before approving new spend.
               </p>
               <p className="mt-2 text-sm text-slate-300">{assessment.description}</p>
+              <p className="mt-2 text-xs text-slate-500">
+                Regime posture blends cash tightness and market risk appetite from Treasury signals.
+              </p>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 <div className="rounded-xl border border-slate-800/80 bg-slate-950/70 p-3">
                   <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
@@ -1772,6 +1784,9 @@ export const ExecutiveSnapshotPanel = ({
                   <p className="mt-1 text-xs text-slate-500">
                     Threshold {assessment.thresholds.tightnessRegime}
                   </p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    0 = easy capital access, 100 = tightest funding conditions.
+                  </p>
                 </div>
                 <div className="rounded-xl border border-slate-800/80 bg-slate-950/70 p-3">
                   <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
@@ -1782,6 +1797,9 @@ export const ExecutiveSnapshotPanel = ({
                   </p>
                   <p className="mt-1 text-xs text-slate-500">
                     Threshold {assessment.thresholds.riskAppetiteRegime}
+                  </p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    0 = risk-off, 100 = markets most willing to fund growth bets.
                   </p>
                 </div>
               </div>
@@ -1826,6 +1844,9 @@ export const ExecutiveSnapshotPanel = ({
                 </span>
               </div>
             </div>
+            <p className="mt-3 text-xs text-slate-500">
+              Curve slope = 10Y minus 2Y; negative values indicate inversion risk.
+            </p>
             <p className="mt-3 text-xs text-slate-300">
               Macro check: inversion favors shorter-cycle bets and tighter hiring.
             </p>
@@ -2035,6 +2056,10 @@ export const ExecutiveSnapshotPanel = ({
           <div className="weather-tile p-4">
             <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Signal confidence</p>
             <p className="mt-3 text-sm text-slate-300">{confidenceDetail}</p>
+            <p className="mt-2 text-xs text-slate-500">
+              Confidence is derived from data freshness and missing input checks, not forecasting
+              precision.
+            </p>
             {hasDataWarnings ? (
               <ul className="mt-4 space-y-2 text-xs text-amber-100">
                 {assessment.dataWarnings.map((warning) => (
