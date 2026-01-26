@@ -167,11 +167,15 @@ export default function FormulasPage() {
                 and share audit-ready methodology links with stakeholders.
               </p>
             </div>
-            <div className="weather-surface p-4">
+            <div className="weather-surface space-y-3 p-4">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
                 Continue the briefing
               </p>
-              <div className="mt-3 flex flex-wrap gap-2">
+              <p className="text-sm text-slate-300">
+                Apply the formulas to live signals or return to the weekly briefing to align on
+                guardrails.
+              </p>
+              <div className="flex flex-wrap gap-2">
                 <a
                   href="/signals"
                   className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.2em] transition-colors hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"

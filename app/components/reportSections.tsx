@@ -436,6 +436,15 @@ export const WeeklyActionSummaryPanel = ({
                 for the source signals and decision guardrails.
               </p>
             </div>
+            <div className="rounded-2xl border border-sky-400/40 bg-slate-950/60 p-4">
+              <p className="text-xs font-semibold tracking-[0.18em] text-sky-200">
+                Primary recommendation
+              </p>
+              <p className="mt-2 text-lg font-semibold text-slate-100">
+                Operate in {regimeLabel} mode.
+              </p>
+              <p className="mt-2 text-sm text-slate-200">{actionGuidance}</p>
+            </div>
             <div className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-4">
               <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                 What changed since last read

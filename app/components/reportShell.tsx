@@ -2,7 +2,7 @@
  * Shared report shell layout for Whether Report pages.
  * Keeps header, navigation, and layout consistent across multi-page views.
  */
-import type { ReactNode } from "react";
+import { Children, type ReactNode } from "react";
 import { DisplayGuardian } from "./displayGuardian";
 import {
   ReportDataTimestamps,
@@ -72,6 +72,7 @@ export const ReportShell = ({
       : trustStatusTone === "historical"
         ? "text-slate-400"
         : "text-emerald-200";
+  const contentSections = Children.toArray(children);
   const summaryLink = pageSummaryLink ? (
     <a
       href={pageSummaryLink.href}
@@ -198,7 +199,7 @@ export const ReportShell = ({
             />
           </aside>
 
-          <div className="order-1 space-y-8 lg:order-none lg:space-y-10">
+          <div className="order-1 space-y-10 lg:order-none lg:space-y-12">
             <section className="weather-panel-static space-y-4 px-4 py-5 sm:px-5">
               <div className="space-y-3">
                 {heroVariant === "compact" ? (
@@ -239,14 +240,14 @@ export const ReportShell = ({
               <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
                 <a
                   href={primaryCta.href}
-                  className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-[11px] font-semibold tracking-[0.2em] transition-colors hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:text-xs"
+                  className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-[11px] font-semibold tracking-[0.2em] shadow-lg shadow-sky-500/20 transition-colors hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:text-xs"
                 >
                   {primaryCta.label}
                 </a>
                 {secondaryCta ? (
                   <a
                     href={secondaryCta.href}
-                    className="inline-flex min-h-[44px] items-center justify-center text-[11px] font-semibold tracking-[0.12em] text-slate-200 underline decoration-slate-400 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:justify-start sm:text-xs"
+                    className="inline-flex min-h-[44px] items-center justify-center text-[11px] font-semibold tracking-[0.12em] text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:justify-start sm:text-xs"
                   >
                     {secondaryCta.label}
                   </a>
@@ -265,7 +266,17 @@ export const ReportShell = ({
               />
             </div>
 
-            {children}
+            <div className="space-y-12">
+              {contentSections.map((section, index) => (
+                <div
+                  // eslint-disable-next-line react/no-array-index-key
+                  key={index}
+                  className={index === 0 ? "" : "border-t border-slate-800/70 pt-10"}
+                >
+                  {section}
+                </div>
+              ))}
+            </div>
 
             <footer className="mt-12 border-t border-slate-800/70 pt-6 text-xs font-semibold tracking-[0.18em] text-slate-400">
               Not Financial Advice.
