@@ -116,6 +116,33 @@ export default async function SignalsPage({
         ) : null
       }
     >
+      <section className="weather-panel space-y-4 px-6 py-5">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
+              Signal highlights
+            </p>
+            <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
+              What the signals are implying right now
+            </h2>
+          </div>
+          <a
+            href="#thresholds"
+            className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+          >
+            See how scores are set →
+          </a>
+        </div>
+        <p className="text-sm text-slate-200">{assessment.description}</p>
+        <ul className="grid gap-3 md:grid-cols-3">
+          {assessment.constraints.slice(0, 3).map((constraint) => (
+            <li key={constraint} className="weather-surface p-4 text-sm text-slate-200">
+              {constraint}
+            </li>
+          ))}
+        </ul>
+      </section>
+
       <SensorArray sensors={sensors} provenance={treasuryProvenance} />
 
       <MacroSignalsPanel series={macroSeries} provenance={macroProvenance} />
