@@ -34,7 +34,10 @@ export const ReportShell = ({
   pageNavVariant = "full",
   primaryCta = { href: "#weekly-action-summary", label: "Start with this week" },
   secondaryCta = { href: "#executive-snapshot", label: "See leadership summary" },
-  exportCta = { href: "/operations#ops-export-briefs", label: "Copy-ready leadership brief" },
+  exportCta = {
+    href: "/operations/briefings#ops-export-briefs",
+    label: "Copy-ready leadership brief",
+  },
   structuredData,
   historicalBanner,
 }: {
