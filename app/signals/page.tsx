@@ -184,27 +184,55 @@ export default async function SignalsPage({
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
-              Signal highlights
+              Evidence priorities
             </p>
             <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-              What the signals are implying right now
+              Confirm these drivers before you call the regime.
             </h2>
           </div>
           <a
             href="#thresholds"
             className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
           >
-            See how scores are set →
+            Review scoring thresholds →
           </a>
         </div>
         <p className="text-sm text-slate-200">{assessment.description}</p>
-        <ul className="grid gap-3 md:grid-cols-3">
-          {assessment.constraints.slice(0, 3).map((constraint) => (
-            <li key={constraint} className="weather-surface p-4 text-sm text-slate-200">
-              {constraint}
-            </li>
+        <div className="grid gap-3 md:grid-cols-3">
+          {[
+            {
+              title: "Validate live sensor data",
+              detail: "Check the latest feeds driving the tightness and risk scores.",
+              href: "#sensor-array",
+              label: "Open live data feed",
+            },
+            {
+              title: "Cross-check macro sources",
+              detail: "Verify the Treasury, CPI, and labor inputs behind the signal stack.",
+              href: "#macro-signals",
+              label: "Review macro sources",
+            },
+            {
+              title: "Confirm scoring thresholds",
+              detail: "Ensure the regime thresholds still map to your risk tolerance.",
+              href: "#thresholds",
+              label: "See thresholds",
+            },
+          ].map((item) => (
+            <div key={item.title} className="weather-surface flex h-full flex-col gap-3 p-4">
+              <div className="space-y-2">
+                <p className="text-sm font-semibold text-slate-100">{item.title}</p>
+                <p className="text-sm text-slate-300">{item.detail}</p>
+              </div>
+              <a
+                href={item.href}
+                className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+              >
+                {item.label} →
+              </a>
+            </div>
           ))}
-        </ul>
+        </div>
       </section>
 
       <SensorArray sensors={sensors} provenance={treasuryProvenance} />

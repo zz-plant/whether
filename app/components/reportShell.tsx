@@ -29,7 +29,7 @@ export const ReportShell = ({
   trustStatusAction,
   trustStatusTone,
   showOfflineBadge = false,
-  offlineBadgeLabel = "OFFLINE / SIMULATED",
+  offlineBadgeLabel = "Cached snapshot",
   heroVariant = "full",
   pageNavVariant = "full",
   primaryCta = { href: "#weekly-action-summary", label: "Start with this week" },
@@ -131,9 +131,11 @@ export const ReportShell = ({
               </div>
             </div>
             <div className="flex flex-col items-start gap-2 text-[9px] font-semibold tracking-[0.16em] text-slate-300 sm:items-end sm:text-xs sm:tracking-[0.14em]">
-              <span className="rounded-full border border-slate-800/70 px-3 py-1">{statusLabel}</span>
+              <span className="rounded-full border border-slate-800/70 px-3 py-1">
+                Operating climate: {statusLabel}
+              </span>
               <span className="text-[10px] font-semibold tracking-[0.18em] text-slate-400">
-                Confidence: {trustStatusLabel}
+                Data mode: {trustStatusLabel}
                 {showOfflineBadge ? ` · ${offlineBadgeLabel}` : ""}
               </span>
             </div>
@@ -151,12 +153,9 @@ export const ReportShell = ({
         <div className="mt-6 grid gap-6 lg:grid-cols-[260px,1fr]">
           <aside className="order-2 space-y-4 lg:order-none lg:sticky lg:top-28 lg:self-start">
             <section className="weather-panel space-y-3 px-4 py-4">
-              <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">You are here</p>
-              <p className="text-lg font-semibold text-slate-100">{pageTitle}</p>
-              <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-slate-300">
-                <span>{pageSummary}</span>
-                {summaryLink}
-              </p>
+              <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Page overview</p>
+              <p className="text-base font-semibold text-slate-100">{pageTitle}</p>
+              <p className="text-sm text-slate-300">{pageSummary}</p>
               <div className="space-y-2 text-xs text-slate-300">
                 <p className="text-xs font-semibold text-slate-400">Updated</p>
                 <p className="mono text-slate-100">{fetchedAtLabel}</p>
