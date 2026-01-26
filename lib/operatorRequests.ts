@@ -34,6 +34,12 @@ export const operatorRequests: Array<{
     status: "DELIVERED",
   },
   {
+    title: "Briefing reuse",
+    description:
+      "Save recurring leadership narratives so teams stop re-explaining the same context.",
+    status: "BACKLOG",
+  },
+  {
     title: "Insight Database",
     description:
       "Attach citations and historical precedent to the playbook guidance for defensibility.",
