@@ -18,6 +18,13 @@ import { reportPageLinks } from "../lib/report/reportNavigation";
 
 export const runtime = "edge";
 
+const regimeLabels = {
+  SCARCITY: "Scarcity",
+  DEFENSIVE: "Defensive",
+  VOLATILE: "Volatile",
+  EXPANSION: "Expansion",
+} as const;
+
 export const generateMetadata = ({
   searchParams,
 }: {
@@ -108,6 +115,7 @@ export default async function HomePage({
     treasury,
     treasuryProvenance,
   } = await loadReportData(searchParams);
+  const regimeLabel = regimeLabels[assessment.regime];
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
   const trustStatusLabel = historicalSelection
     ? "Historical snapshot"
@@ -149,6 +157,63 @@ export default async function HomePage({
         ) : null
       }
     >
+      <section className="weather-panel space-y-4 px-5 py-5">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-[0.26em] text-slate-400">
+              Weekly focus
+            </p>
+            <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
+              Anchor decisions before you dive into the detail.
+            </h2>
+          </div>
+          <a
+            href="#weekly-action-summary"
+            className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+          >
+            Jump to action summary →
+          </a>
+        </div>
+        <div className="grid gap-3 lg:grid-cols-3">
+          <div className="weather-surface space-y-2 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+              Regime posture
+            </p>
+            <p className="text-lg font-semibold text-slate-100">{regimeLabel}</p>
+            <p className="text-sm text-slate-300">{assessment.description}</p>
+          </div>
+          <div className="weather-surface space-y-2 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+              Operating constraints
+            </p>
+            <ul className="space-y-2 text-sm text-slate-200">
+              {assessment.constraints.slice(0, 3).map((constraint) => (
+                <li key={constraint} className="flex items-start gap-2">
+                  <span className="mt-1 h-1.5 w-1.5 rounded-full bg-sky-400" aria-hidden="true" />
+                  <span>{constraint}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="weather-surface space-y-2 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+              Score context
+            </p>
+            <div className="flex items-baseline justify-between text-sm text-slate-300">
+              <span>Tightness</span>
+              <span className="mono text-slate-100">{assessment.scores.tightness}/100</span>
+            </div>
+            <div className="flex items-baseline justify-between text-sm text-slate-300">
+              <span>Risk appetite</span>
+              <span className="mono text-slate-100">{assessment.scores.riskAppetite}/100</span>
+            </div>
+            <p className="text-xs text-slate-400">
+              Use scores to validate urgency before committing roadmap shifts.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <ExecutiveSnapshotPanel
         treasury={treasury}
         assessment={assessment}

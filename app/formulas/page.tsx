@@ -16,6 +16,7 @@ const formulaSections = [
     label: "Base rate",
     description:
       "Uses the 1-month Treasury yield; falls back to 3-month if missing. This anchors the cost of capital in the current policy environment.",
+    application: "Sets the baseline for capital tightness and runway planning.",
     sourceHref: "https://fiscaldata.treasury.gov/api-documentation/",
     sourceLabel: "US Treasury Fiscal Data API",
     accentClass: "border-sky-400/50 bg-sky-500/10 text-sky-100",
@@ -42,6 +43,7 @@ const formulaSections = [
     label: "Yield curve slope",
     description:
       "10-year Treasury yield minus 2-year Treasury yield. A negative slope signals risk aversion in credit markets.",
+    application: "Explains the risk appetite score and recession signals.",
     sourceHref: "https://fiscaldata.treasury.gov/api-documentation/",
     sourceLabel: "US Treasury Fiscal Data API",
     accentClass: "border-indigo-400/50 bg-indigo-500/10 text-indigo-100",
@@ -69,6 +71,7 @@ const formulaSections = [
     label: "CPI inflation (YoY)",
     description:
       "Year-over-year change in CPI-U. Tracks consumer inflation pressure across the basket of goods and services.",
+    application: "Used to contextualize pricing and margin pressure narratives.",
     sourceHref: "https://www.bls.gov/cpi/",
     sourceLabel: "Bureau of Labor Statistics CPI",
     accentClass: "border-amber-400/50 bg-amber-500/10 text-amber-100",
@@ -92,6 +95,7 @@ const formulaSections = [
     label: "Unemployment rate (U-3)",
     description:
       "Headline unemployment rate for the civilian labor force. Indicates labor market tightness and potential demand softness.",
+    application: "Signals hiring appetite and demand resilience in planning.",
     sourceHref: "https://www.bls.gov/news.release/empsit.toc.htm",
     sourceLabel: "BLS Employment Situation",
     accentClass: "border-emerald-400/50 bg-emerald-500/10 text-emerald-100",
@@ -119,6 +123,7 @@ const formulaSections = [
     label: "BBB credit spread (OAS)",
     description:
       "ICE BofA BBB option-adjusted spread. Higher spreads imply tighter credit conditions and lower market risk appetite.",
+    application: "Supports board-level risk narratives and financing timing.",
     sourceHref: "https://fred.stlouisfed.org/series/BAMLC0A4CBBB",
     sourceLabel: "FRED Series: BAMLC0A4CBBB",
     accentClass: "border-rose-400/50 bg-rose-500/10 text-rose-100",
@@ -210,6 +215,32 @@ export default function FormulasPage() {
             ))}
           </ul>
         </nav>
+
+        <section className="mt-8 weather-panel p-5">
+          <div className="space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
+              Formula map
+            </p>
+            <h2 className="text-lg font-semibold text-slate-100">
+              Pick the formulas that answer your immediate question.
+            </h2>
+          </div>
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
+            {formulaSections.map((item) => (
+              <a
+                key={item.id}
+                href={`#${item.id}`}
+                className="weather-surface flex min-h-[120px] flex-col gap-2 p-4 transition-colors hover:border-sky-400/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+              >
+                <p className="text-sm font-semibold text-slate-100">{item.label}</p>
+                <p className="text-sm text-slate-300">{item.application}</p>
+                <span className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-200">
+                  View formula →
+                </span>
+              </a>
+            ))}
+          </div>
+        </section>
 
         <div className="mt-8 space-y-6">
           {formulaSections.map((item) => (

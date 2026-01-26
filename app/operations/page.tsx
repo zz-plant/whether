@@ -44,6 +44,26 @@ export default async function OperationsPage({
 }: {
   searchParams?: { month?: string; year?: string; [key: string]: string | undefined };
 }) {
+  const quickSteps = [
+    {
+      title: "Confirm the posture",
+      detail: "Lock the monthly action summary before you approve new scope.",
+      href: "#ops-monthly-action-summary",
+      cta: "Review monthly actions",
+    },
+    {
+      title: "Pick a workstream",
+      detail: "Choose the lane that matches your immediate operating cadence.",
+      href: "#ops-workstreams",
+      cta: "Open workstreams",
+    },
+    {
+      title: "Export the brief",
+      detail: "Move the narrative into leadership materials or planning decks.",
+      href: "/operations/briefings",
+      cta: "Open briefing kits",
+    },
+  ];
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebPage",
@@ -120,6 +140,41 @@ export default async function OperationsPage({
       }
     >
       <OperationsWorkstreamNav currentPath="/operations" />
+
+      <section className="weather-panel space-y-4 px-6 py-5">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
+              Immediate next steps
+            </p>
+            <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
+              Translate the regime into decisions your team can execute.
+            </h2>
+          </div>
+          <a
+            href="#ops-workstreams"
+            className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+          >
+            See workstreams →
+          </a>
+        </div>
+        <div className="grid gap-3 lg:grid-cols-3">
+          {quickSteps.map((step) => (
+            <article key={step.title} className="weather-surface flex h-full flex-col gap-3 p-4">
+              <div className="space-y-2">
+                <p className="text-sm font-semibold text-slate-100">{step.title}</p>
+                <p className="text-sm text-slate-300">{step.detail}</p>
+              </div>
+              <a
+                href={step.href}
+                className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+              >
+                {step.cta} →
+              </a>
+            </article>
+          ))}
+        </div>
+      </section>
 
       <SectionedReportPanel
         id="ops-monthly-action-summary"

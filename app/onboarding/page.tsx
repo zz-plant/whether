@@ -22,6 +22,26 @@ export default async function OnboardingPage({
 }: {
   searchParams?: { month?: string; year?: string; [key: string]: string | undefined };
 }) {
+  const onboardingSteps = [
+    {
+      title: "Orient to the report",
+      detail: "Scan the weekly summary, confidence score, and operating constraints.",
+      href: "#first-time-guide",
+      cta: "Start the guide",
+    },
+    {
+      title: "Decode the vocabulary",
+      detail: "Use the glossary to translate macro terms into product implications.",
+      href: "#beginner-glossary",
+      cta: "Open the glossary",
+    },
+    {
+      title: "Apply the signals",
+      detail: "Move to the signals page when you need line-item evidence.",
+      href: "/signals",
+      cta: "Go to signals",
+    },
+  ];
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebPage",
@@ -97,6 +117,44 @@ export default async function OnboardingPage({
         ) : null
       }
     >
+      <section className="weather-panel space-y-4 px-6 py-5">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
+              Your onboarding path
+            </p>
+            <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
+              Follow the steps and know exactly what to do next.
+            </h2>
+          </div>
+          <a
+            href="#first-time-guide"
+            className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+          >
+            Start now →
+          </a>
+        </div>
+        <div className="grid gap-3 lg:grid-cols-3">
+          {onboardingSteps.map((step, index) => (
+            <article key={step.title} className="weather-surface flex h-full flex-col gap-3 p-4">
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                  Step {index + 1}
+                </p>
+                <p className="text-sm font-semibold text-slate-100">{step.title}</p>
+                <p className="text-sm text-slate-300">{step.detail}</p>
+              </div>
+              <a
+                href={step.href}
+                className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+              >
+                {step.cta} →
+              </a>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <FirstTimeGuidePanel
         statusLabel={statusLabel}
         recordDateLabel={recordDateLabel}
