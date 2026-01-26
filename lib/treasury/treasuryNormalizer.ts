@@ -3,6 +3,7 @@
  * Keeps source metadata and freshness explicit for traceable outputs.
  */
 import type { TreasuryData, TreasuryYields } from "../types";
+import { parseTreasuryData } from "./treasurySchema";
 
 const parseNumber = (value: unknown): number | null => {
   if (value == null) {
@@ -41,5 +42,6 @@ export const normalizeTreasuryResponse = (
     return null;
   }
 
-  return normalizeTreasuryRow(firstRow, metadata);
+  const normalized = normalizeTreasuryRow(firstRow, metadata);
+  return parseTreasuryData(normalized);
 };

@@ -77,7 +77,7 @@ export const fetchTreasuryData = async (
     });
 
     if (!normalized) {
-      throw new Error("Treasury API returned no data.");
+      throw new Error("Treasury API returned no data or invalid payload.");
     }
 
     return normalized;

@@ -63,6 +63,14 @@ const sortedSnapshots = parseTimeMachineCache(rawCache)
       new Date(a.record_date).getTime() - new Date(b.record_date).getTime()
   );
 
+const snapshotTimestamps = sortedSnapshots.map((snapshot) =>
+  new Date(snapshot.record_date).getTime()
+);
+
+const timeMachineEntryKeys = new Set(
+  sortedSnapshots.map((snapshot) => `${snapshot.year}-${snapshot.month}`)
+);
+
 const timeMachineCoverage = (() => {
   const earliest = sortedSnapshots[0];
   const latest = sortedSnapshots.at(-1);
@@ -107,9 +115,7 @@ export const getTimeMachineMonthsByYear = () => {
 };
 
 export const hasTimeMachineEntry = (year: number, month: number) => {
-  return sortedSnapshots.some(
-    (snapshot) => snapshot.year === year && snapshot.month === month
-  );
+  return timeMachineEntryKeys.has(`${year}-${month}`);
 };
 
 export const getLatestTimeMachineSnapshot = () => {
@@ -172,10 +178,18 @@ export const getPreviousTimeMachineSnapshot = (asOf: string): TreasuryData | nul
     return null;
   }
 
-  const candidate = [...sortedSnapshots].reverse().find((snapshot) => {
-    const recordDate = new Date(snapshot.record_date);
-    return recordDate < target;
-  });
+  const targetTime = target.getTime();
+  const index = findSnapshotIndexAtOrBefore(targetTime);
+  const candidateIndex =
+    index === null
+      ? null
+      : snapshotTimestamps[index] < targetTime
+        ? index
+        : index - 1;
+  const candidate =
+    candidateIndex === null || candidateIndex < 0
+      ? null
+      : sortedSnapshots[candidateIndex];
 
   if (!candidate) {
     return null;
@@ -191,10 +205,9 @@ export const findTimeMachineSnapshot = (asOf: string): TreasuryData | null => {
     return null;
   }
 
-  const candidate = [...sortedSnapshots].reverse().find((snapshot) => {
-    const recordDate = new Date(snapshot.record_date);
-    return recordDate <= target;
-  });
+  const targetTime = target.getTime();
+  const index = findSnapshotIndexAtOrBefore(targetTime);
+  const candidate = index === null ? null : sortedSnapshots[index];
 
   if (!candidate) {
     return null;
@@ -230,4 +243,28 @@ export const getTimeMachineRollingYieldSeries = (): {
       value: snapshot.yields.tenYear ?? null,
     })),
   };
+};
+
+const findSnapshotIndexAtOrBefore = (targetTime: number): number | null => {
+  if (snapshotTimestamps.length === 0) {
+    return null;
+  }
+
+  let low = 0;
+  let high = snapshotTimestamps.length - 1;
+  let candidate: number | null = null;
+
+  while (low <= high) {
+    const mid = Math.floor((low + high) / 2);
+    const currentTime = snapshotTimestamps[mid];
+
+    if (currentTime <= targetTime) {
+      candidate = mid;
+      low = mid + 1;
+    } else {
+      high = mid - 1;
+    }
+  }
+
+  return candidate;
 };

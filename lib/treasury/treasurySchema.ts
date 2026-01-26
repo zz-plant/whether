@@ -20,3 +20,8 @@ export const TreasuryDataSchema = z.object({
   fallback_reason: z.string().nullable().optional(),
   yields: TreasuryYieldsSchema,
 });
+
+export const parseTreasuryData = (input: unknown) => {
+  const parsed = TreasuryDataSchema.safeParse(input);
+  return parsed.success ? parsed.data : null;
+};
