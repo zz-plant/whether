@@ -86,6 +86,26 @@ const formatDelta = (value: number | null, unit: string) => {
   return `${sign}${numberFormatter.format(value)}${unit}`;
 };
 
+const TermHelp = ({ term, description }: { term: string; description: string }) => (
+  <Tooltip.Root>
+    <Tooltip.Trigger
+      type="button"
+      aria-label={`Definition of ${term}`}
+      className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-slate-700/70 text-[10px] font-semibold text-slate-300 transition-colors hover:border-slate-500/80 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+    >
+      i
+    </Tooltip.Trigger>
+    <Tooltip.Portal>
+      <Tooltip.Positioner side="top" align="center" className="z-30">
+        <Tooltip.Popup className="max-w-xs rounded-lg border border-slate-800/80 bg-slate-950/95 px-3 py-2 text-xs text-slate-200 shadow-xl">
+          {description}
+          <Tooltip.Arrow className="h-2 w-2 rotate-45 border border-slate-800/80 bg-slate-950/95" />
+        </Tooltip.Popup>
+      </Tooltip.Positioner>
+    </Tooltip.Portal>
+  </Tooltip.Root>
+);
+
 const clampToRange = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max);
 
@@ -417,24 +437,25 @@ export const WeeklyActionSummaryPanel = ({
   return (
     <section id="weekly-action-summary" aria-labelledby="weekly-action-summary-title" className="mt-8">
       <div className="weather-panel flex flex-col gap-6 px-6 py-5">
-        <div className="grid gap-6 lg:grid-cols-[1.35fr,0.65fr]">
-          <div className="space-y-4">
-            <div>
-              <p className="type-label text-slate-400">What should I do this week?</p>
-              <h2 id="weekly-action-summary-title" className="type-section text-slate-100">
-                Weekly action control room
-              </h2>
-              <p className="mt-3 text-sm text-slate-200">
-                This week, operate in {regimeLabel} mode: {actionGuidance}. {regimeDescription} Skim the{" "}
-                <a
-                  href="#executive-snapshot"
-                  className="touch-target inline-flex min-h-[44px] items-center text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-slate-50 touch-manipulation"
-                >
-                  leadership summary
-                </a>{" "}
-                for the source signals and decision guardrails.
-              </p>
-            </div>
+        <Tooltip.Provider delay={200} closeDelay={50}>
+          <div className="grid gap-6 lg:grid-cols-[1.35fr,0.65fr]">
+            <div className="space-y-4">
+              <div>
+                <p className="type-label text-slate-400">What should I do this week?</p>
+                <h2 id="weekly-action-summary-title" className="type-section text-slate-100">
+                  Weekly action control room
+                </h2>
+                <p className="mt-3 text-sm text-slate-200">
+                  This week, operate in {regimeLabel} mode: {actionGuidance}. {regimeDescription} Skim the{" "}
+                  <a
+                    href="#executive-snapshot"
+                    className="touch-target inline-flex min-h-[44px] items-center text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-slate-50 touch-manipulation"
+                  >
+                    leadership summary
+                  </a>{" "}
+                  for the source signals and decision guardrails.
+                </p>
+              </div>
             <div className="rounded-2xl border border-sky-400/40 bg-slate-950/60 p-4">
               <p className="text-xs font-semibold tracking-[0.18em] text-sky-200">
                 Primary recommendation
@@ -473,7 +494,25 @@ export const WeeklyActionSummaryPanel = ({
             <div className="grid gap-3 sm:grid-cols-3">
               {weeklySignalTiles.map((tile) => (
                 <div key={tile.label} className="weather-surface p-4">
-                  <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">{tile.label}</p>
+                  <div className="flex items-center justify-between gap-2 text-xs font-semibold tracking-[0.12em] text-slate-400">
+                    <span>{tile.label}</span>
+                    {tile.label === "Cash availability" ? (
+                      <TermHelp
+                        term="Cash availability"
+                        description="A normalized score of how tight or loose credit conditions appear in public Treasury data."
+                      />
+                    ) : tile.label === "Risk appetite" ? (
+                      <TermHelp
+                        term="Risk appetite"
+                        description="A normalized score of how willing markets are to fund riskier growth bets versus defensive moves."
+                      />
+                    ) : (
+                      <TermHelp
+                        term="Curve slope"
+                        description="The difference between long- and short-term Treasury rates; negative values are often called an inverted curve."
+                      />
+                    )}
+                  </div>
                   <p className="mono mt-3 text-2xl text-slate-100">{tile.value}</p>
                   <p className="mt-2 text-xs text-slate-500">{tile.detail}</p>
                 </div>
@@ -493,6 +532,7 @@ export const WeeklyActionSummaryPanel = ({
             </div>
           </div>
         </div>
+        </Tooltip.Provider>
 
         <div className="grid gap-4 lg:grid-cols-[1.2fr,0.8fr]">
           <div className="grid gap-3">

@@ -169,7 +169,7 @@ export const ReportShell = ({
 
             <section className={`weather-panel flex flex-col gap-3 px-4 py-4 ${trustToneStyles}`}>
               <p className={`text-xs font-semibold tracking-[0.18em] ${trustLabelTone}`}>
-                Signal confidence
+                Data confidence
               </p>
               <div className="space-y-2 text-sm">
                 <p className="font-semibold text-slate-100">{trustStatusLabel}</p>
@@ -226,7 +226,7 @@ export const ReportShell = ({
                     </p>
                     <h1 className="type-headline text-slate-100">Whether Report</h1>
                     <p className="max-w-2xl text-sm text-slate-200 sm:text-base">
-                      A fast, sourced readout of Treasury signals translated into product guidance.
+                      A fast, sourced readout of public Treasury signals translated into product guidance.
                     </p>
                   </>
                 )}
@@ -291,7 +291,7 @@ export const ReportShell = ({
             </div>
 
             <footer className="mt-12 border-t border-slate-800/70 pt-6 text-xs font-semibold tracking-[0.18em] text-slate-400">
-              Not Financial Advice.
+              Not financial, legal, or investment advice.
             </footer>
           </div>
         </div>
