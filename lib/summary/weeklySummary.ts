@@ -169,7 +169,7 @@ export const buildWeeklySummary = ({
 }): WeeklySummary => {
   const regimeLabel = getRegimeLabel(assessment.regime);
   const guidance = getWeeklyActionGuidance(assessment.regime);
-  const summary = `This week, operate in ${regimeLabel} mode: ${guidance}. ${assessment.description}`;
+  const summary = `${regimeLabel} posture: ${assessment.description} Priority: ${guidance}.`;
   const title = recordDateLabel
     ? `Weekly action summary — ${recordDateLabel}`
     : "Weekly action summary";

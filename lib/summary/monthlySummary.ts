@@ -65,7 +65,7 @@ export const buildMonthlySummary = ({
 }): MonthlySummary => {
   const regimeLabel = getRegimeLabel(assessment.regime);
   const guidance = getMonthlyActionGuidance(assessment.regime);
-  const summary = `This month, operate in ${regimeLabel} mode: ${guidance}. ${assessment.description}`;
+  const summary = `${regimeLabel} posture: ${assessment.description} Priority: ${guidance}.`;
   const title = recordDateLabel
     ? `Monthly action summary — ${recordDateLabel}`
     : "Monthly action summary";
