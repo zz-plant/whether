@@ -20,11 +20,11 @@ export const ReportSummaryTabs = ({
 }) => (
   <section className="weather-panel space-y-4 px-5 py-4">
     <div className="space-y-2">
-      <p className="text-xs font-semibold tracking-[0.32em] text-slate-400">Signal console</p>
-      <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">Weekly operating brief</h2>
+      <p className="text-xs font-semibold tracking-[0.32em] text-slate-400">Signal readout</p>
+      <h2 className="text-lg font-semibold text-slate-100 sm:text-xl">Weekly signal readout</h2>
       <p className="max-w-2xl text-sm text-slate-300">
-        Toggle between the climate readout, practical guidance, and confidence notes for this
-        week’s signals.
+        A fast view of climate, guidance, and confidence so you can stay oriented as you move
+        through the report.
       </p>
     </div>
 

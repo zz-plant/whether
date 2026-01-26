@@ -147,8 +147,13 @@ const formulaSections = [
     ),
   },
 ];
+const primaryFormulaIds = ["base-rate", "curve-slope", "credit-spread"];
+const contextFormulaIds = ["cpi-inflation", "unemployment-rate"];
 
 export default function FormulasPage() {
+  const primaryFormulas = formulaSections.filter((item) => primaryFormulaIds.includes(item.id));
+  const contextFormulas = formulaSections.filter((item) => contextFormulaIds.includes(item.id));
+
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
       <div className="mx-auto max-w-4xl px-6 py-12">
@@ -174,13 +179,12 @@ export default function FormulasPage() {
             </div>
             <div className="weather-surface space-y-3 p-4">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                Continue the briefing
+                Next steps
               </p>
               <p className="text-sm text-slate-300">
-                Apply the formulas to live signals or return to the weekly briefing to align on
-                guardrails.
+                When you are ready, move to the live signals report to validate each data lane.
               </p>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-3">
                 <a
                   href="/signals"
                   className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.2em] transition-colors hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
@@ -189,9 +193,9 @@ export default function FormulasPage() {
                 </a>
                 <a
                   href="/"
-                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                  className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-slate-300 underline decoration-slate-600 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
                 >
-                  Weekly briefing
+                  Return to weekly briefing →
                 </a>
               </div>
             </div>
@@ -202,18 +206,42 @@ export default function FormulasPage() {
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
             Jump to
           </p>
-          <ul className="mt-3 flex flex-wrap gap-2">
-            {formulaSections.map((item) => (
-              <li key={item.id}>
-                <a
-                  href={`#${item.id}`}
-                  className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                >
-                  {item.label}
-                </a>
-              </li>
-            ))}
-          </ul>
+          <div className="mt-3 space-y-4">
+            <div>
+              <p className="text-xs font-semibold tracking-[0.18em] text-slate-500">
+                Core policy signals
+              </p>
+              <ul className="mt-2 flex flex-wrap gap-2">
+                {primaryFormulas.map((item) => (
+                  <li key={item.id}>
+                    <a
+                      href={`#${item.id}`}
+                      className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="text-xs font-semibold tracking-[0.18em] text-slate-500">
+                Context signals
+              </p>
+              <ul className="mt-2 flex flex-wrap gap-2">
+                {contextFormulas.map((item) => (
+                  <li key={item.id}>
+                    <a
+                      href={`#${item.id}`}
+                      className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </nav>
 
         <section className="mt-8 weather-panel p-5">
@@ -259,6 +287,10 @@ export default function FormulasPage() {
                 </div>
               </div>
               <p className="text-sm text-slate-300">{item.description}</p>
+              <div className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-3">
+                <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Best for</p>
+                <p className="mt-2 text-sm text-slate-200">{item.application}</p>
+              </div>
               <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
                 <span className="rounded-full border border-slate-700/70 px-3 py-1 text-[10px] font-semibold tracking-[0.12em] text-slate-200">
                   Source
@@ -267,7 +299,7 @@ export default function FormulasPage() {
                   href={item.sourceHref}
                   target="_blank"
                   rel="noreferrer"
-                  className="touch-target text-slate-200 underline decoration-slate-700 underline-offset-4 hover:text-slate-100"
+                  className="weather-pill inline-flex min-h-[36px] items-center px-3 py-1 text-xs font-semibold tracking-[0.14em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100"
                 >
                   {item.sourceLabel}
                 </a>

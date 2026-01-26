@@ -161,11 +161,15 @@ export default async function HomePage({
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-2">
             <p className="text-xs font-semibold uppercase tracking-[0.26em] text-slate-400">
-              Weekly focus
+              Start here
             </p>
             <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
               Anchor decisions before you dive into the detail.
             </h2>
+            <p className="text-sm text-slate-300">
+              Use the report in a clear sequence: summarize the week, confirm the constraints, then
+              inspect the evidence.
+            </p>
           </div>
           <a
             href="#weekly-action-summary"
@@ -174,6 +178,20 @@ export default async function HomePage({
             Jump to action summary →
           </a>
         </div>
+        <ol className="grid gap-3 text-sm text-slate-300 sm:grid-cols-3">
+          {[
+            "Read the weekly action control room to lock posture.",
+            "Confirm operating constraints and score context.",
+            "Open signal breakdowns only when decisions hinge on evidence.",
+          ].map((step, index) => (
+            <li key={step} className="weather-surface flex gap-3 p-4">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-700/70 bg-slate-950 text-xs font-semibold text-slate-200">
+                {index + 1}
+              </span>
+              <span>{step}</span>
+            </li>
+          ))}
+        </ol>
         <div className="grid gap-3 lg:grid-cols-3">
           <div className="weather-surface space-y-2 p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">

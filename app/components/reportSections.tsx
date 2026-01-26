@@ -386,7 +386,6 @@ export const WeeklyActionSummaryPanel = ({
     { href: "#executive-snapshot", label: "Leadership summary" },
     { href: "/operations#ops-playbook", label: "Actions playbook" },
     { href: "/signals#thresholds", label: "Thresholds" },
-    { href: "#beginner-glossary", label: "Glossary" },
   ];
   const curveSlopeValue = assessment.scores.curveSlope;
   const curveSlopeDisplay =
@@ -536,17 +535,18 @@ export const WeeklyActionSummaryPanel = ({
 
         <div>
           <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Quick routes</p>
-          <div className="mt-3 flex flex-wrap gap-3 text-xs font-semibold tracking-[0.12em] text-slate-400">
+          <ul className="mt-3 space-y-2 text-sm text-slate-300">
             {weeklyQuickLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
-              >
-                {link.label}
-              </a>
+              <li key={link.href}>
+                <a
+                  href={link.href}
+                  className="touch-target inline-flex min-h-[44px] items-center text-sm text-slate-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
+                >
+                  {link.label}
+                </a>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
         <p className="text-xs text-slate-500">
           Keep the weekly narrative tight so leaders can decide without re-reading the data lanes.
@@ -609,6 +609,7 @@ export const MonthlyActionSummaryPanel = ({
       ],
     },
   ];
+  const monthlyFocus = assessment.constraints.slice(0, 3);
 
   return (
     <ActionSummaryPanel
@@ -623,6 +624,19 @@ export const MonthlyActionSummaryPanel = ({
       }
       summaryCard={
         <>
+          <div className="weather-surface p-4">
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+              Monthly focus (at a glance)
+            </p>
+            <ul className="mt-3 space-y-2 text-sm text-slate-200">
+              {monthlyFocus.map((item) => (
+                <li key={item} className="flex gap-2">
+                  <span className="text-slate-500">•</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
           <MonthlySummaryCard summary={monthlySummary} />
           <SummaryDeltaPanel weeklySummary={weeklySummary} monthlySummary={monthlySummary} />
           <div className="weather-surface p-4">
@@ -968,11 +982,11 @@ export const FirstTimeGuidePanel = ({
         <div className="max-w-2xl">
           <p className="type-label text-slate-400">Explore (optional)</p>
           <h2 id="first-time-guide-title" className="type-section text-slate-100">
-            Explore the report in three quick stops
+            Optional quick scan in three stops
           </h2>
           <p className="mt-2 type-data text-slate-300">
-            If you want a light walkthrough, use this optional path before diving into the deeper
-            data lanes.
+            Use this light walkthrough to orient yourself before diving into the deeper data
+            lanes.
           </p>
         </div>
         <div className="weather-surface px-4 py-3 text-xs font-semibold tracking-[0.12em] text-slate-300">
@@ -1034,7 +1048,7 @@ export const FirstTimeGuidePanel = ({
         </ul>
         <aside className="weather-surface p-4" aria-label="Onboarding checklist">
           <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-            Optional quick scan
+            Quick scan checklist
           </p>
           <ul className="mt-3 space-y-3 text-sm text-slate-300">
             <li className="flex gap-2">
@@ -1049,12 +1063,6 @@ export const FirstTimeGuidePanel = ({
               <span className="text-slate-500">•</span>
               <span>Use the playbook to translate constraints into next steps.</span>
             </li>
-            <li className="flex gap-2">
-              <span className="text-slate-500">•</span>
-              <span>
-                Drop constraints into Jira/Linear or Confluence to keep delivery aligned.
-              </span>
-            </li>
           </ul>
           <div className="mt-4 rounded-lg border border-sky-900/60 bg-slate-950/60 p-3 text-xs text-slate-400">
             Tip: share the report URL after selecting a time machine snapshot so every stakeholder
@@ -1063,22 +1071,26 @@ export const FirstTimeGuidePanel = ({
         </aside>
       </div>
 
-      <div className="mt-6 flex flex-wrap gap-3">
-        {[
-          { href: "#executive-snapshot", label: "Leadership summary" },
-          { href: "#regime-assessment", label: "What the scores mean" },
-          { href: "/operations#ops-playbook", label: "Actions playbook" },
-          { href: "/operations#ops-export-briefs", label: "Shareable briefs" },
-          { href: "/signals#time-machine", label: "Time machine" },
-        ].map((link) => (
-          <a
-            key={link.href}
-            href={link.href}
-            className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
-          >
-            {link.label}
-          </a>
-        ))}
+      <div className="mt-6 space-y-2 text-sm text-slate-300">
+        <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+          Suggested next stops
+        </p>
+        <ul className="space-y-2">
+          {[
+            { href: "#executive-snapshot", label: "Leadership summary" },
+            { href: "/operations#ops-playbook", label: "Actions playbook" },
+            { href: "/signals#time-machine", label: "Time machine" },
+          ].map((link) => (
+            <li key={link.href}>
+              <a
+                href={link.href}
+                className="touch-target inline-flex min-h-[44px] items-center text-sm text-slate-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
+              >
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
       </div>
       <p className="mt-4 text-xs text-slate-500">
         Share the URL when you lock thresholds or time machine selections so every stakeholder sees
@@ -1133,13 +1145,13 @@ export const BeginnerGlossaryPanel = () => {
       <div className="weather-panel weather-panel-static p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="type-label text-slate-400">Plain-English glossary</p>
+            <p className="type-label text-slate-400">Optional glossary</p>
             <h3 id="beginner-glossary-title" className="type-section text-slate-100">
               Translate finance terms into day-to-day product decisions
             </h3>
             <p className="mt-2 type-data text-slate-300">
-              New to Treasury data? Use this glossary to translate jargon into concrete product moves
-              before you share the report.
+              New to Treasury data? Reference this glossary as needed to translate jargon into
+              concrete product moves before you share the report.
             </p>
           </div>
           <div className="weather-surface px-4 py-3 text-xs font-semibold tracking-[0.12em] text-slate-300">

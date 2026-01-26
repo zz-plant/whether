@@ -50,18 +50,21 @@ export default async function OperationsPage({
       detail: "Lock the monthly action summary before you approve new scope.",
       href: "#ops-monthly-action-summary",
       cta: "Review monthly actions",
+      emphasis: "primary",
     },
     {
       title: "Pick a workstream",
       detail: "Choose the lane that matches your immediate operating cadence.",
       href: "#ops-workstreams",
       cta: "Open workstreams",
+      emphasis: "secondary",
     },
     {
       title: "Export the brief",
       detail: "Move the narrative into leadership materials or planning decks.",
       href: "/operations/briefings",
       cta: "Open briefing kits",
+      emphasis: "secondary",
     },
   ];
   const structuredData = {
@@ -165,12 +168,21 @@ export default async function OperationsPage({
                 <p className="text-sm font-semibold text-slate-100">{step.title}</p>
                 <p className="text-sm text-slate-300">{step.detail}</p>
               </div>
-              <a
-                href={step.href}
-                className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-              >
-                {step.cta} →
-              </a>
+              {step.emphasis === "primary" ? (
+                <a
+                  href={step.href}
+                  className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.2em] transition-colors hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                >
+                  {step.cta}
+                </a>
+              ) : (
+                <a
+                  href={step.href}
+                  className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-slate-300 underline decoration-slate-600 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                >
+                  {step.cta} →
+                </a>
+              )}
             </article>
           ))}
         </div>
