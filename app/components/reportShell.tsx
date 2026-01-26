@@ -34,6 +34,7 @@ export const ReportShell = ({
   pageNavVariant = "full",
   primaryCta = { href: "#weekly-action-summary", label: "Start with this week" },
   secondaryCta = { href: "#executive-snapshot", label: "See leadership summary" },
+  exportCta = { href: "/operations#ops-export-briefs", label: "Copy-ready leadership brief" },
   structuredData,
   historicalBanner,
 }: {
@@ -57,6 +58,7 @@ export const ReportShell = ({
   pageNavVariant?: "full" | "compact";
   primaryCta?: { href: string; label: string };
   secondaryCta?: { href: string; label: string };
+  exportCta?: { href: string; label: string } | null;
   structuredData?: string;
   historicalBanner?: ReactNode;
 }) => {
@@ -249,6 +251,14 @@ export const ReportShell = ({
                     className="inline-flex min-h-[44px] items-center justify-center text-[11px] font-semibold tracking-[0.12em] text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:justify-start sm:text-xs"
                   >
                     {secondaryCta.label}
+                  </a>
+                ) : null}
+                {exportCta ? (
+                  <a
+                    href={exportCta.href}
+                    className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-700/70 px-3 py-2 text-[11px] font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-300/80 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:text-xs"
+                  >
+                    {exportCta.label}
                   </a>
                 ) : null}
               </div>
