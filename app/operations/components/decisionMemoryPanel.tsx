@@ -12,6 +12,7 @@ import type { Route } from "next";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
+import { createClientId } from "./clientId";
 
 type DecisionMemoryEntry = {
   id: string;
@@ -411,13 +412,6 @@ export const DecisionMemoryPanel = ({
     return () => window.clearTimeout(timeout);
   }, [copyError]);
 
-  const resolveEntryId = () => {
-    if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-      return crypto.randomUUID();
-    }
-    return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-  };
-
   const handleTitleBlur = () => {
     if (!decisionTitle.trim()) {
       setTitleError("Decision name is required to log an entry.");
@@ -434,7 +428,7 @@ export const DecisionMemoryPanel = ({
     }
     const now = new Date().toISOString();
     const entry: DecisionMemoryEntry = {
-      id: resolveEntryId(),
+      id: createClientId(),
       title: decisionTitle.trim(),
       note: decisionNote.trim(),
       regime: assessment.regime,

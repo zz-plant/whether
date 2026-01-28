@@ -21,6 +21,7 @@ import {
 } from "../../../lib/decisionShield";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
+import { createClientId } from "./clientId";
 
 const lifecycleOptions: { value: LifecycleStage; label: string }[] = [
   { value: "DISCOVERY", label: "Discovery" },
@@ -282,13 +283,6 @@ export const DecisionShieldPanel = ({
     return () => window.clearTimeout(timeout);
   }, [presetStatus]);
 
-  const resolvePresetId = () => {
-    if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-      return crypto.randomUUID();
-    }
-    return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-  };
-
   const handlePresetSave = () => {
     if (!presetName.trim()) {
       setPresetError("Name your preset so it can be reused.");
@@ -296,7 +290,7 @@ export const DecisionShieldPanel = ({
       return;
     }
     const nextPreset = {
-      id: resolvePresetId(),
+      id: createClientId(),
       name: presetName.trim(),
       lifecycle,
       category,
