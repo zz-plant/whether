@@ -4,12 +4,13 @@
  */
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Button } from "@base-ui/react/button";
 import { Toast } from "@base-ui/react/toast";
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../../../lib/types";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
+import { useClipboardCopy, type ClipboardCopyState } from "../../components/useClipboardCopy";
 
 const numberFormatter = new Intl.NumberFormat("en-US", {
   minimumFractionDigits: 2,
@@ -198,11 +199,38 @@ export const ExportBriefPanel = ({
   macroSeries: MacroSeriesReading[];
   provenance: DataProvenance;
 }) => {
-  const [isCopying, setIsCopying] = useState(false);
-  const [copied, setCopied] = useState<string | null>(null);
-  const [copyTarget, setCopyTarget] = useState<string | null>(null);
-  const [copyError, setCopyError] = useState(false);
+  const { status, error, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy();
+  const lastStatusRef = useRef<ClipboardCopyState["status"]>("idle");
+  const lastLabelRef = useRef<string | null>(null);
+  const blockedRef = useRef(false);
   const { add } = Toast.useToastManager();
+  const isCopying = status === "copying";
+  const copyError = error;
+
+  useEffect(() => {
+    if (status === lastStatusRef.current) {
+      return;
+    }
+    if (status === "copied" && copiedTarget) {
+      add({
+        title: "Copied to clipboard",
+        description: `${copiedTarget} is ready to paste.`,
+        type: "success",
+      });
+      blockedRef.current = false;
+    }
+    if (status === "error") {
+      const label = lastLabelRef.current ?? "brief";
+      const isBlocked = blockedRef.current;
+      add({
+        title: isBlocked ? "Clipboard blocked" : "Copy failed",
+        description: `Copy the ${label.toLowerCase()} manually.`,
+        type: "error",
+      });
+      blockedRef.current = false;
+    }
+    lastStatusRef.current = status;
+  }, [add, copiedTarget, status]);
 
   const briefing = useMemo(
     () => buildBrief(assessment, treasury, sensors, macroSeries),
@@ -232,41 +260,12 @@ export const ExportBriefPanel = ({
   const mailBody = encodeURIComponent(briefing);
 
   const handleCopy = async (text: string, label: string) => {
-    if (isCopying) {
+    if (status === "copying") {
       return;
     }
-    if (!navigator.clipboard?.writeText) {
-      setCopyError(true);
-      add({
-        title: "Clipboard blocked",
-        description: `Copy the ${label.toLowerCase()} manually.`,
-        type: "error",
-      });
-      return;
-    }
-    setIsCopying(true);
-    setCopyTarget(label);
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(label);
-      setCopyError(false);
-      setTimeout(() => setCopied(null), 2000);
-      add({
-        title: "Copied to clipboard",
-        description: `${label} is ready to paste.`,
-        type: "success",
-      });
-    } catch {
-      setCopyError(true);
-      add({
-        title: "Copy failed",
-        description: `Copy the ${label.toLowerCase()} manually.`,
-        type: "error",
-      });
-    } finally {
-      setIsCopying(false);
-      setCopyTarget(null);
-    }
+    lastLabelRef.current = label;
+    blockedRef.current = !navigator.clipboard?.writeText;
+    await copyToClipboard(text, label);
   };
 
   const handlePrint = () => {
@@ -332,7 +331,7 @@ export const ExportBriefPanel = ({
                 aria-busy={isCopying}
                 className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
               >
-                {isCopying && copyTarget === "Slack" ? "Copying" : "Copy Slack brief"}
+                {isCopying && activeTarget === "Slack" ? "Copying" : "Copy Slack brief"}
               </Button>
               <Button
                 type="button"
@@ -366,7 +365,7 @@ export const ExportBriefPanel = ({
               aria-busy={isCopying}
               className="weather-button mt-4 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
             >
-              {isCopying && copyTarget === "Slides" ? "Copying" : "Copy slide bullets"}
+              {isCopying && activeTarget === "Slides" ? "Copying" : "Copy slide bullets"}
             </Button>
             <Button
               type="button"
@@ -397,7 +396,7 @@ export const ExportBriefPanel = ({
               aria-busy={isCopying}
               className="weather-button mt-4 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
             >
-              {isCopying && copyTarget === "Headlines" ? "Copying" : "Copy constraint headlines"}
+              {isCopying && activeTarget === "Headlines" ? "Copying" : "Copy constraint headlines"}
             </Button>
             <Button
               type="button"
@@ -450,7 +449,7 @@ export const ExportBriefPanel = ({
                   aria-busy={isCopying}
                   className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
                 >
-                  {isCopying && copyTarget === "Jira description"
+                  {isCopying && activeTarget === "Jira description"
                     ? "Copying"
                     : "Copy Jira description"}
                 </Button>
@@ -483,7 +482,7 @@ export const ExportBriefPanel = ({
                   aria-busy={isCopying}
                   className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
                 >
-                  {isCopying && copyTarget === "Confluence page snippet"
+                  {isCopying && activeTarget === "Confluence page snippet"
                     ? "Copying"
                     : "Copy Confluence page snippet"}
                 </Button>
@@ -516,7 +515,7 @@ export const ExportBriefPanel = ({
                   aria-busy={isCopying}
                   className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
                 >
-                  {isCopying && copyTarget === "Linear issue description"
+                  {isCopying && activeTarget === "Linear issue description"
                     ? "Copying"
                     : "Copy Linear issue description"}
                 </Button>
@@ -555,7 +554,7 @@ export const ExportBriefPanel = ({
           ) : null}
         </div>
         <p className="sr-only" role="status" aria-live="polite">
-          {copied ? `${copied} brief copied to clipboard.` : ""}
+          {copiedTarget ? `${copiedTarget} brief copied to clipboard.` : ""}
         </p>
       </div>
     </section>
