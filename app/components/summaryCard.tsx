@@ -7,7 +7,8 @@
 import { Button } from "@base-ui/react/button";
 import { Toast } from "@base-ui/react/toast";
 import { Tooltip } from "@base-ui/react/tooltip";
-import { useState } from "react";
+import { useEffect, useRef } from "react";
+import { useClipboardCopy, type ClipboardCopyState } from "./useClipboardCopy";
 
 type SummaryCardProps = {
   summaryCopy: string;
@@ -16,43 +17,52 @@ type SummaryCardProps = {
 };
 
 export const SummaryCard = ({ summaryCopy, cadenceLabel, apiHref }: SummaryCardProps) => {
-  const [isCopying, setIsCopying] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const [copyError, setCopyError] = useState(false);
+  const { status, error, copyToClipboard } = useClipboardCopy();
+  const lastStatusRef = useRef<ClipboardCopyState["status"]>("idle");
+  const lastErrorRef = useRef<"blocked" | "failed" | null>(null);
   const { add } = Toast.useToastManager();
 
-  const handleCopy = async () => {
-    if (isCopying) {
+  useEffect(() => {
+    if (status === lastStatusRef.current) {
       return;
     }
-    if (!navigator.clipboard?.writeText) {
-      setCopyError(true);
-      add({
-        title: "Clipboard blocked",
-        description: "Select the summary block to copy it manually.",
-      });
-      return;
-    }
-    setIsCopying(true);
-    try {
-      await navigator.clipboard.writeText(summaryCopy);
-      setCopied(true);
-      setCopyError(false);
+    if (status === "copied") {
       add({
         title: "Summary copied",
         description: "Paste the posture card wherever you need it.",
       });
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      setCopyError(true);
-      add({
-        title: "Copy failed",
-        description: "Select the summary text and copy it manually.",
-      });
-    } finally {
-      setIsCopying(false);
+      lastErrorRef.current = null;
     }
+    if (status === "error") {
+      const isBlocked = lastErrorRef.current === "blocked";
+      add({
+        title: isBlocked ? "Clipboard blocked" : "Copy failed",
+        description: isBlocked
+          ? "Select the summary block to copy it manually."
+          : "Select the summary text and copy it manually.",
+      });
+    }
+    if (status === "idle") {
+      lastErrorRef.current = null;
+    }
+    lastStatusRef.current = status;
+  }, [add, status]);
+
+  const handleCopy = async () => {
+    if (status === "copying") {
+      return;
+    }
+    lastErrorRef.current = navigator.clipboard?.writeText ? "failed" : "blocked";
+    await copyToClipboard(summaryCopy);
   };
+
+  const isCopying = status === "copying";
+  const copied = status === "copied";
+  const copyError = error;
+  const errorMessage =
+    lastErrorRef.current === "blocked"
+      ? "Clipboard blocked. Select and copy the text above manually."
+      : "Copy failed. Select and copy the text above manually.";
 
   return (
     <div className="weather-surface mt-4 p-4">
@@ -109,11 +119,7 @@ export const SummaryCard = ({ summaryCopy, cadenceLabel, apiHref }: SummaryCardP
         {summaryCopy}
       </pre>
       <div className="mt-2 min-h-[20px] text-xs text-slate-400" role="status" aria-live="polite">
-        {copyError
-          ? "Clipboard blocked. Select and copy the text above manually."
-          : copied
-            ? "Summary copied to clipboard."
-            : ""}
+        {copyError ? errorMessage : copied ? "Summary copied to clipboard." : ""}
       </div>
     </div>
   );
