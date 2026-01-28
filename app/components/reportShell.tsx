@@ -2,7 +2,7 @@
  * Shared report shell layout for Whether Report pages.
  * Keeps header, navigation, and layout consistent across multi-page views.
  */
-import { Children, type ReactNode } from "react";
+import { Children, type ReactNode, isValidElement } from "react";
 import { DisplayGuardian } from "./displayGuardian";
 import {
   ReportDataTimestamps,
@@ -280,15 +280,20 @@ export const ReportShell = ({
             </div>
 
             <div className="space-y-12">
-              {contentSections.map((section, index) => (
-                <div
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={index}
-                  className={index === 0 ? "" : "border-t border-slate-800/70 pt-10"}
-                >
-                  {section}
-                </div>
-              ))}
+              {contentSections.map((section, index) => {
+                const sectionKey =
+                  isValidElement(section) && section.key != null
+                    ? section.key
+                    : `section-${index}`;
+                return (
+                  <div
+                    key={sectionKey}
+                    className={index === 0 ? "" : "border-t border-slate-800/70 pt-10"}
+                  >
+                    {section}
+                  </div>
+                );
+              })}
             </div>
 
             <footer className="mt-12 border-t border-slate-800/70 pt-6 text-xs font-semibold tracking-[0.18em] text-slate-400">
