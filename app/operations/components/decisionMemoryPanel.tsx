@@ -25,6 +25,9 @@ type DecisionMemoryEntry = {
   loggedAt: string;
   sourceLabel: string;
   sourceUrl: string | null;
+  thresholds?: RegimeAssessment["thresholds"];
+  inputs?: RegimeAssessment["inputs"];
+  scores?: RegimeAssessment["scores"];
 };
 
 type StructuredDecisionNote = {
@@ -77,7 +80,50 @@ const structureDecisionNote = (note: string): StructuredDecisionNote => {
   };
 };
 
+const formatMetricValue = (value: number | null | undefined, unit: string) => {
+  if (typeof value !== "number" || Number.isNaN(value)) {
+    return "Unavailable";
+  }
+  return `${value.toFixed(2)}${unit}`;
+};
+
+const formatBaseRate = (scores?: RegimeAssessment["scores"]) => {
+  if (!scores || scores.baseRateUsed === "MISSING") {
+    return "Unavailable";
+  }
+  return `${scores.baseRate.toFixed(2)}% (${scores.baseRateUsed})`;
+};
+
+const formatCurveSlope = (scores?: RegimeAssessment["scores"]) =>
+  formatMetricValue(scores?.curveSlope ?? null, "%");
+
+const buildThresholdSummary = (thresholds?: RegimeAssessment["thresholds"]) => {
+  if (!thresholds) {
+    return [];
+  }
+  return [
+    `Base rate tightness trigger: ${thresholds.baseRateTightness}%`,
+    `Tightness regime trigger: ${thresholds.tightnessRegime}`,
+    `Risk appetite regime trigger: ${thresholds.riskAppetiteRegime}`,
+  ];
+};
+
+const buildSourceSummary = (inputs?: RegimeAssessment["inputs"]) => {
+  if (!inputs || inputs.length === 0) {
+    return [];
+  }
+  return inputs.map((input) => {
+    const valueLabel = formatMetricValue(input.value, input.unit);
+    return `${input.label}: ${valueLabel} · ${input.sourceLabel} · ${input.recordDate}`;
+  });
+};
+
 const buildSnapshotText = (entry: DecisionMemoryEntry) => {
+  const thresholdLines = buildThresholdSummary(entry.thresholds);
+  const sourceLines = buildSourceSummary(entry.inputs);
+  const baseRateText = formatBaseRate(entry.scores);
+  const curveSlopeText = formatCurveSlope(entry.scores);
+
   return [
     "Decision Memory — Whether Report",
     `Decision: ${entry.title}`,
@@ -87,8 +133,18 @@ const buildSnapshotText = (entry: DecisionMemoryEntry) => {
     `Record date: ${entry.recordDate}`,
     `Logged at: ${formatTimestamp(entry.loggedAt)}`,
     "",
+    "Sensor snapshot:",
+    `Base rate: ${baseRateText}`,
+    `Curve slope (10Y-2Y): ${curveSlopeText}`,
+    "",
+    "Thresholds in force:",
+    ...thresholdLines.map((threshold) => `• ${threshold}`),
+    "",
     "Constraints in force:",
     ...entry.constraints.map((constraint) => `• ${constraint}`),
+    "",
+    sourceLines.length > 0 ? "Sources:" : null,
+    ...sourceLines.map((source) => `• ${source}`),
     "",
     `Source: ${entry.sourceLabel}`,
     entry.sourceUrl ? `Source URL: ${entry.sourceUrl}` : null,
@@ -130,6 +186,8 @@ const buildDecisionTemplate = (entry: DecisionMemoryEntry, target: DecisionTempl
   const contextLines = [
     `Regime: ${entry.regime}`,
     `Record date: ${entry.recordDate}`,
+    `Base rate: ${formatBaseRate(entry.scores)}`,
+    `Curve slope (10Y-2Y): ${formatCurveSlope(entry.scores)}`,
     snapshotLink ? `Snapshot: ${formatLink("Decision snapshot", snapshotLink)}` : null,
   ].filter(Boolean) as string[];
 
@@ -140,10 +198,14 @@ const buildDecisionTemplate = (entry: DecisionMemoryEntry, target: DecisionTempl
 
   const constraintsLines = entry.constraints.length > 0 ? entry.constraints : ["None noted"];
   const confidenceLines = [`Confidence: ${entry.confidence}`];
+  const thresholdLines = buildThresholdSummary(entry.thresholds);
+  const sourceLines = buildSourceSummary(entry.inputs);
 
   return [
     formatSection("Context", contextLines),
     formatSection("Decision", decisionLines),
+    ...(thresholdLines.length ? [formatSection("Thresholds", thresholdLines)] : []),
+    ...(sourceLines.length ? [formatSection("Sources", sourceLines)] : []),
     formatSection("Constraints", constraintsLines),
     formatSection("Confidence", confidenceLines),
   ].join("\n\n");
@@ -169,11 +231,23 @@ const buildCsvRows = (entries: DecisionMemoryEntry[]) => {
     "recordDate",
     "loggedAt",
     "constraints",
+    "baseRate",
+    "baseRateUsed",
+    "curveSlope",
+    "tightnessScore",
+    "riskAppetiteScore",
+    "thresholdBaseRateTightness",
+    "thresholdTightnessRegime",
+    "thresholdRiskAppetiteRegime",
+    "sources",
     "sourceLabel",
     "sourceUrl",
   ];
   const rows = entries.map((entry) => {
     const noteData = structureDecisionNote(entry.note);
+    const thresholds = entry.thresholds;
+    const scores = entry.scores;
+    const sourceLines = buildSourceSummary(entry.inputs);
     return [
       entry.title,
       entry.note,
@@ -185,6 +259,15 @@ const buildCsvRows = (entries: DecisionMemoryEntry[]) => {
       entry.recordDate,
       entry.loggedAt,
       entry.constraints.join(" | "),
+      scores ? scores.baseRate.toFixed(2) : "",
+      scores?.baseRateUsed ?? "",
+      scores?.curveSlope != null ? scores.curveSlope.toFixed(2) : "",
+      scores ? scores.tightness.toFixed(2) : "",
+      scores ? scores.riskAppetite.toFixed(2) : "",
+      thresholds ? thresholds.baseRateTightness.toString() : "",
+      thresholds ? thresholds.tightnessRegime.toString() : "",
+      thresholds ? thresholds.riskAppetiteRegime.toString() : "",
+      sourceLines.join(" | "),
       entry.sourceLabel,
       entry.sourceUrl ?? "",
     ];
@@ -218,6 +301,9 @@ const DecisionMemoryEntryCard = ({
   focusHref,
 }: DecisionMemoryEntryCardProps) => {
   const snapshotText = buildSnapshotText(entry);
+  const baseRateSummary = formatBaseRate(entry.scores);
+  const curveSlopeSummary = formatCurveSlope(entry.scores);
+  const thresholdSummary = buildThresholdSummary(entry.thresholds);
   const jiraTarget = `jira-${entry.id}`;
   const confluenceTarget = `confluence-${entry.id}`;
   const linearTarget = `linear-${entry.id}`;
@@ -237,6 +323,19 @@ const DecisionMemoryEntryCard = ({
       <p className="mt-1 text-xs text-slate-500">
         Logged {formatTimestamp(entry.loggedAt)} · Record {entry.recordDate}
       </p>
+      <p className="mt-2 text-xs text-slate-400">
+        Base rate: {baseRateSummary} · Curve slope: {curveSlopeSummary}
+      </p>
+      {thresholdSummary.length > 0 ? (
+        <ul className="mt-2 space-y-1 text-xs text-slate-500">
+          {thresholdSummary.map((threshold) => (
+            <li key={threshold} className="flex gap-2">
+              <span className="text-slate-600">•</span>
+              <span>{threshold}</span>
+            </li>
+          ))}
+        </ul>
+      ) : null}
       {entry.note ? <p className="mt-3 text-sm text-slate-300">{entry.note}</p> : null}
       <div className="mt-4 flex flex-wrap gap-2">
         <button
@@ -438,6 +537,9 @@ export const DecisionMemoryPanel = ({
       loggedAt: now,
       sourceLabel: provenance.sourceLabel,
       sourceUrl: provenance.sourceUrl ?? null,
+      thresholds: assessment.thresholds,
+      inputs: assessment.inputs,
+      scores: assessment.scores,
     };
     setEntries((prev) => [entry, ...prev].slice(0, 12));
     setDecisionTitle("");
