@@ -88,17 +88,18 @@ export const ReportShell = ({
   ) : null;
 
   return (
-    <main
-      id="main-content"
-      tabIndex={-1}
-      className="weather-shell relative min-h-screen overflow-hidden text-slate-100"
-    >
+    <>
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-30 focus:rounded-full focus:bg-slate-950 focus:px-4 focus:py-2 focus:text-xs focus:font-semibold focus:tracking-[0.2em] focus:text-slate-100 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-sky-300"
       >
         Skip to main content
       </a>
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className="weather-shell relative min-h-screen overflow-hidden text-slate-100"
+      >
       {structuredData ? (
         <script
           type="application/ld+json"
@@ -310,6 +311,7 @@ export const ReportShell = ({
           className="fixed inset-x-0 bottom-0 z-30 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3 pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)]"
         />
       </div>
-    </main>
+      </main>
+    </>
   );
 };
