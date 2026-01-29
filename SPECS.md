@@ -110,3 +110,44 @@ traceability and plain‑English guidance.
 - Add regime-change alerts/notifications with reason codes.
 - Enable saved Decision Shield scenarios and team presets.
 - Offer an API/export endpoint for embedding regimes into internal dashboards.
+
+## 8) Next-level scope (v1.1)
+These requirements define the next-level release and should align with `docs/prd-next-level.md`
+and `docs/specs-next-level.md`.
+
+### Signal Ops (alerts + briefs)
+- Trigger alerts only on regime changes or threshold crossings.
+- Every alert must include:
+  - Regime label + reason codes.
+  - The exact sensor values and thresholds at the time of evaluation.
+  - Source URLs and timestamps for each signal.
+  - A Time Machine deep link for replay.
+- Provide weekly digest output with “what changed” deltas.
+
+### Executive briefing pack
+- One-click export for:
+  - Slack/email copy block.
+  - Slide-ready bullet list.
+  - PDF-friendly brief view.
+- All exports must embed citations and data freshness badges.
+
+### Decision Memory
+- Append-only log capturing:
+  - Decision inputs + category + action.
+  - Regime + sensor values + thresholds in force.
+  - Source URLs + timestamps for evidence.
+  - Optional operator notes and external links.
+- Entries must be immutable once saved and exportable as JSON/CSV.
+
+### Scenario Studio (counterfactuals)
+- Allow simulated sliders for base rate and curve slope.
+- Show “Simulated” badge and block exporting as live data.
+- Provide a summary of deltas vs. current regime, including constraint changes.
+
+### Evidence pack upgrades
+- Expand Insight Database with citations and a Fossil Record view.
+- Surface evidence links inline with playbook and briefing outputs.
+
+### Macro data reliability
+- Add live fetchers for CPI, unemployment, and BBB spreads.
+- Cache with explicit `fetched_at` timestamps and clear fallback reasons.
