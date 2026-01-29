@@ -138,6 +138,14 @@ This repo should make the product’s **purpose and market gap** obvious:
 - We are the bridge between **CFO macro data** and **CTO/CPO execution decisions**.
 - The “Whether Report” output should be shareable (copy/screenshot) to influence decisions.
 
+## Next-level initiatives (planned)
+- Signal Ops: regime-change alerts, weekly digests, and briefing packs with citations.
+- Decision Memory: append-only audit trail for Decision Shield usage.
+- Scenario Studio: counterfactuals with explicit “Simulated” labeling.
+- Evidence expansion: Insight Database + Fossil Record view.
+- Live macro fetchers for CPI, unemployment, and BBB credit spreads.
+- Reference docs: `docs/prd-next-level.md` and `docs/specs-next-level.md`.
+
 For UI and engineering inspiration, see `LEARNINGS.md`.
 
 ## Local development

@@ -90,6 +90,26 @@ Audit notes for Milestones 5–8 live in `docs/roadmap-audit.md`.
   - [x] One-page executive brief with regime narrative, risk flags, and reversal triggers.
   - [x] Planning memo generator for leadership syncs with copy-ready language.
 
+## Milestone 9 — Signal Ops + Briefing Pack (Week 9)
+- [ ] Promote export/share actions (copy-ready leadership brief) to the Overview header.
+- [ ] Launch executive briefing pack (Slack/email/slide-ready) with citations and regime summary.
+- [ ] Add regime-shift alerting with reason codes and Time Machine deep links.
+- [ ] Add weekly digest output with “what changed” delta summary.
+- [ ] Allow role-specific alert routing (CFO/COO/CTO/CPO presets).
+
+## Milestone 10 — Decision Memory + Scenario Studio (Week 10)
+- [ ] Decision Memory log with immutable records (regime, sensors, thresholds, sources).
+- [ ] Scenario presets library with shareable templates.
+- [ ] Counterfactual slider view with explicit “Simulated” labeling.
+- [ ] Then-vs-now comparisons baked into the Scenario Studio.
+- [ ] Assumption locking banner to keep posture choices explicit in reviews.
+
+## Milestone 11 — Evidence + Data Reliability (Week 11)
+- [ ] Live macro fetchers for CPI, unemployment, and BBB spreads with source URLs.
+- [ ] Evidence pack upgrades: Insight Database citations and Fossil Record view.
+- [ ] Data freshness health checks with explicit fallback reasons.
+- [ ] Add a “source health” panel that surfaces stale/failed data feeds.
+
 ---
 
 ### Development stories (planned)
@@ -99,6 +119,9 @@ Audit notes for Milestones 5–8 live in `docs/roadmap-audit.md`.
 - As an executive, I can read a one-sentence meta-insight that explains why posture must change with macro physics.
 - As a strategy lead, I can subscribe to regime-change alerts and distribute summaries automatically.
 - As a finance partner, I can export a slide-ready snapshot of the current regime with citations for planning reviews.
+- As an operations lead, I can generate a briefing pack with citations in under a minute.
+- As a planning reviewer, I can audit decisions against the exact regime and threshold settings at the time.
+- As a staff leader, I can run a counterfactual and share the deltas as a link.
 
 ### Success criteria
 - Every output is traceable to a public source and includes timestamps.
