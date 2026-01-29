@@ -19,6 +19,9 @@ import { DataProvenanceStrip, type DataProvenance } from "../../components/dataP
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
+const formatSigned = (value: number, suffix = "") =>
+  `${value >= 0 ? "+" : ""}${value}${suffix}`;
+
 const parseNumericParam = (value: string | null) => {
   if (!value) {
     return null;
@@ -132,6 +135,9 @@ export const CounterfactualPanel = ({
   );
   const adjustedProfile = getRegimeProfile(adjustedRegime);
   const currentProfile = getRegimeProfile(assessment.regime);
+  const hasScenarioShift = rateShiftBps !== 0 || slopeShiftBps !== 0;
+  const tightnessDelta = adjustedTightness - assessment.scores.tightness;
+  const riskAppetiteDelta = adjustedRiskAppetite - assessment.scores.riskAppetite;
 
   return (
     <section id="counterfactuals" aria-labelledby="counterfactuals-title" className="mt-10">
@@ -148,9 +154,29 @@ export const CounterfactualPanel = ({
             </p>
           </div>
           <div className="flex flex-col items-end gap-2">
+            <span
+              className={`weather-chip rounded-full border px-2 py-1 text-[10px] font-semibold tracking-[0.18em] ${
+                hasScenarioShift
+                  ? "border-amber-500/60 text-amber-200"
+                  : "border-slate-700 text-slate-300"
+              }`}
+            >
+              {hasScenarioShift ? "SIMULATED" : "BASELINE"}
+            </span>
             <DataProvenanceStrip provenance={provenance} />
           </div>
         </div>
+        {hasScenarioShift ? (
+          <div className="mt-4 rounded-2xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-200">
+              Assumptions locked
+            </p>
+            <p className="mt-2">
+              Base rate {formatSigned(rateShiftBps, "bps")}, curve slope{" "}
+              {formatSigned(slopeShiftBps, "bps")}. Treat this as simulated guidance.
+            </p>
+          </div>
+        ) : null}
 
         <div className="mt-6 grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">
           <div className="weather-surface p-4">
@@ -258,6 +284,42 @@ export const CounterfactualPanel = ({
             <p className="mt-2 text-xs text-slate-500">
               Tightness {adjustedTightness}/100 · Risk appetite {adjustedRiskAppetite}/100
             </p>
+            <p className="mt-4 text-xs font-semibold tracking-[0.12em] text-slate-400">
+              Scenario deltas
+            </p>
+            <ul className="mt-3 space-y-2 text-sm text-slate-300">
+              <li className="flex gap-2">
+                <span className="text-slate-500">•</span>
+                <span>
+                  Base rate shift: {formatSigned(rateShiftBps, "bps")}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-slate-500">•</span>
+                <span>
+                  Curve slope shift: {formatSigned(slopeShiftBps, "bps")}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-slate-500">•</span>
+                <span>
+                  Tightness change: {formatSigned(Number(tightnessDelta.toFixed(1)))}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-slate-500">•</span>
+                <span>
+                  Risk appetite change: {formatSigned(Number(riskAppetiteDelta.toFixed(1)))}
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-slate-500">•</span>
+                <span>
+                  Regime {assessment.regime === adjustedRegime ? "unchanged" : "shift"}:{" "}
+                  {assessment.regime} → {adjustedRegime}
+                </span>
+              </li>
+            </ul>
             <p className="mt-4 text-xs font-semibold tracking-[0.12em] text-slate-400">
               Scenario constraints
             </p>
