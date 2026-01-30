@@ -157,9 +157,9 @@ export default async function HomePage({
         ) : null
       }
     >
-      <section className="weather-panel space-y-4 px-5 py-5">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="space-y-2">
+      <section className="weather-panel space-y-5 px-5 py-6">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="space-y-3">
             <p className="text-xs font-semibold uppercase tracking-[0.26em] text-slate-400">
               Start here
             </p>
@@ -178,14 +178,17 @@ export default async function HomePage({
             Jump to action summary →
           </a>
         </div>
-        <ol className="grid gap-3 text-sm text-slate-300 sm:grid-cols-3">
+        <ol className="grid gap-4 text-sm text-slate-300 sm:grid-cols-3">
           {[
             "Read the weekly action control room to lock posture (your default operating stance).",
             "Confirm operating constraints (budget and approval guardrails) and score context (0–100 gauges).",
             "Open signal breakdowns only when decisions hinge on evidence.",
           ].map((step, index) => (
-            <li key={step} className="weather-surface flex gap-3 p-4">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-700/70 bg-slate-950 text-xs font-semibold text-slate-200">
+            <li
+              key={step}
+              className="weather-surface flex gap-3 rounded-2xl border border-slate-800/60 bg-slate-950/60 p-4"
+            >
+              <span className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-700/70 bg-slate-950 text-xs font-semibold text-slate-100">
                 {index + 1}
               </span>
               <span>{step}</span>
@@ -200,7 +203,11 @@ export default async function HomePage({
             <p className="text-xs text-slate-500">
               A combined read of cash tightness and market risk appetite from Treasury signals.
             </p>
-            <p className="text-lg font-semibold text-slate-100">{regimeLabel}</p>
+            <p className="text-lg font-semibold text-slate-100">
+              <span className="inline-flex items-center rounded-full border border-sky-400/40 bg-sky-500/10 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-sky-100">
+                {regimeLabel}
+              </span>
+            </p>
             <p className="text-sm text-slate-300">{assessment.description}</p>
           </div>
           <div className="weather-surface space-y-2 p-4">

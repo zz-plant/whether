@@ -71,7 +71,11 @@ export const RegimeAlertsPanel = () => {
   }, [loadAlerts]);
 
   return (
-    <section id="regime-alert-log" aria-labelledby="regime-alert-log-title" className="mt-10">
+    <section
+      id="regime-alert-log"
+      aria-labelledby="regime-alert-log-title"
+      className="mt-10 border-t border-slate-800/60 pt-10"
+    >
       <div className="weather-panel p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
