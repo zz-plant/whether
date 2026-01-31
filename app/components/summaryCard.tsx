@@ -52,7 +52,8 @@ export const SummaryCard = ({ summaryCopy, cadenceLabel, apiHref }: SummaryCardP
     if (status === "copying") {
       return;
     }
-    lastErrorRef.current = navigator.clipboard?.writeText ? "failed" : "blocked";
+    const clipboard = (navigator as Navigator & { clipboard?: Clipboard }).clipboard;
+    lastErrorRef.current = clipboard?.writeText ? "failed" : "blocked";
     await copyToClipboard(summaryCopy);
   };
 
