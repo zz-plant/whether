@@ -98,7 +98,7 @@ export const ReportShell = ({
       <main
         id="main-content"
         tabIndex={-1}
-        className="weather-shell relative min-h-screen overflow-hidden text-slate-100"
+        className="weather-shell relative min-h-screen text-slate-100"
       >
       {structuredData ? (
         <script
@@ -136,12 +136,12 @@ export const ReportShell = ({
                 <p className="text-xs text-slate-400 sm:hidden">Signals refreshed {fetchedAtLabel}</p>
               </div>
             </div>
-            <div className="flex flex-col items-start gap-2 text-[9px] font-semibold tracking-[0.16em] text-slate-300 sm:items-end sm:text-xs sm:tracking-[0.14em]">
+            <div className="flex flex-col items-start gap-1 text-[9px] font-semibold tracking-[0.16em] text-slate-300 sm:items-end sm:text-xs sm:tracking-[0.14em]">
               <span className="rounded-full border border-slate-800/70 px-3 py-1">
-                Operating climate: {statusLabel}
+                Status: {statusLabel}
               </span>
-              <span className="text-[10px] font-semibold tracking-[0.18em] text-slate-400">
-                Data mode: {trustStatusLabel}
+              <span className="text-[10px] font-semibold tracking-[0.16em] text-slate-400">
+                Data: {trustStatusLabel}
                 {showOfflineBadge ? ` · ${offlineBadgeLabel}` : ""}
               </span>
             </div>
@@ -158,25 +158,20 @@ export const ReportShell = ({
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[260px,1fr]">
           <aside className="order-2 space-y-4 lg:order-none lg:sticky lg:top-28 lg:self-start">
-            <section className="weather-panel space-y-4 px-4 py-4">
-              <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Page overview</p>
+            <section className="weather-panel space-y-3 px-4 py-4">
+              <p className="text-xs font-semibold tracking-[0.16em] text-slate-400">Overview</p>
               <p className="text-base font-semibold text-slate-100">{pageTitle}</p>
               <p className="text-sm text-slate-300">{pageSummary}</p>
-              <div className="space-y-2 border-t border-slate-800/70 pt-3 text-xs text-slate-300">
-                <p className="text-xs font-semibold text-slate-400">Updated</p>
-                <p className="mono text-slate-100">{fetchedAtLabel}</p>
-              </div>
+              <p className="text-xs text-slate-400">Updated {fetchedAtLabel}</p>
             </section>
 
-            <section className={`weather-panel flex flex-col gap-3 px-4 py-4 ${trustToneStyles}`}>
-              <p className={`text-xs font-semibold tracking-[0.18em] ${trustLabelTone}`}>
-                Data confidence
+            <section className={`weather-panel flex flex-col gap-2 px-4 py-4 ${trustToneStyles}`}>
+              <p className={`text-xs font-semibold tracking-[0.16em] ${trustLabelTone}`}>
+                Confidence
               </p>
-              <div className="space-y-2 text-sm">
-                <p className="font-semibold text-slate-100">{trustStatusLabel}</p>
-                <p className="text-sm text-slate-200/90">{trustStatusDetail}</p>
-                <p className="text-xs text-slate-200/80">{trustStatusAction}</p>
-              </div>
+              <p className="text-sm font-semibold text-slate-100">{trustStatusLabel}</p>
+              <p className="text-xs text-slate-200/90">{trustStatusDetail}</p>
+              <p className="text-xs text-slate-200/80">{trustStatusAction}</p>
             </section>
 
             {sectionLinks.length > 0 ? (
@@ -209,7 +204,7 @@ export const ReportShell = ({
               <div className="space-y-3">
                 {heroVariant === "compact" ? (
                   <>
-                    <p className="text-xs font-semibold tracking-[0.26em] text-slate-400 sm:tracking-[0.32em]">
+                    <p className="text-xs font-semibold tracking-[0.2em] text-slate-400 sm:tracking-[0.26em]">
                       Whether report
                     </p>
                     <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
@@ -222,13 +217,13 @@ export const ReportShell = ({
                   </>
                 ) : (
                   <>
-                    <p className="text-xs font-semibold tracking-[0.26em] text-slate-400 sm:tracking-[0.32em]">
-                      Weekly product guidance
+                    <p className="text-xs font-semibold tracking-[0.2em] text-slate-400 sm:tracking-[0.26em]">
+                      Whether report
                     </p>
-                    <h1 className="type-headline text-slate-100">Whether Report</h1>
-                    <p className="max-w-2xl text-sm text-slate-200 sm:text-base">
-                      A fast, sourced readout of public Treasury signals translated into product
-                      guidance. Interpret as planning input, not official advice.
+                    <h1 className="type-headline text-slate-100">{pageTitle}</h1>
+                    <p className="flex max-w-2xl flex-wrap items-center gap-x-2 gap-y-1 text-sm text-slate-200 sm:text-base">
+                      <span>{pageSummary}</span>
+                      {summaryLink}
                     </p>
                   </>
                 )}

@@ -160,14 +160,14 @@ export default async function HomePage({
       <section className="weather-panel space-y-4 px-5 py-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-[0.26em] text-slate-400">
-              Operating flow
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
+              Weekly flow
             </p>
             <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-              Decision-ready in minutes.
+              Decision-ready, fast.
             </h2>
             <p className="text-sm text-slate-300">
-              Start with posture. Confirm constraints. Open signals only when needed.
+              Start with posture, then open signals only if needed.
             </p>
           </div>
           <a
@@ -182,9 +182,6 @@ export default async function HomePage({
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
               Posture snapshot
             </p>
-            <p className="text-xs text-slate-500">
-              Tightness + risk appetite, translated into guardrails.
-            </p>
             <div className="flex flex-wrap items-center gap-3">
               <span className="inline-flex items-center rounded-full border border-sky-400/40 bg-sky-500/10 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-sky-100">
                 {regimeLabel}
@@ -197,7 +194,7 @@ export default async function HomePage({
                 Risk appetite{" "}
                 <span className="mono text-slate-100">{assessment.scores.riskAppetite}</span>/100
               </span>
-              <span className="text-xs text-slate-400">Confidence: {trustStatusLabel}</span>
+              <span className="text-xs text-slate-400">Confidence {trustStatusLabel}</span>
             </div>
             <p className="text-sm text-slate-300">{assessment.description}</p>
           </div>

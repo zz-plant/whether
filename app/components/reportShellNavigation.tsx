@@ -3,7 +3,6 @@
 import type { ReactNode } from "react";
 import { Collapsible } from "@base-ui/react/collapsible";
 import { NavigationMenu } from "@base-ui/react/navigation-menu";
-import { Tooltip } from "@base-ui/react/tooltip";
 
 export type ReportPageLink = {
   href: string;
@@ -127,111 +126,87 @@ export const ReportPageNavigation = ({
 
   return (
     <NavigationMenu.Root aria-label="Report paths" className={className}>
-      <Tooltip.Provider delay={200} closeDelay={50}>
-        <div className="space-y-2">
-          <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] font-semibold tracking-[0.18em] text-slate-400">
-            <div className="flex flex-wrap items-center gap-3">
-              <span>
-                Page {currentPosition} of {pageLinks.length}
-              </span>
-              <span className="hidden text-[10px] font-semibold tracking-[0.16em] text-slate-300 sm:inline">
-                Current: {currentLink.label}
-              </span>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              {prevLink ? (
-                <a
-                  href={prevLink.href}
-                  aria-label={`Previous page: ${prevLink.label}`}
-                  className="weather-pill inline-flex min-h-[44px] items-center gap-2 px-3 py-1 text-[10px] font-semibold tracking-[0.18em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
-                >
-                  <span aria-hidden="true">←</span>
-                  Prev
-                </a>
-              ) : (
-                <span className="weather-pill inline-flex min-h-[44px] items-center gap-2 border border-slate-800/50 px-3 py-1 text-[10px] font-semibold tracking-[0.18em] text-slate-500/80">
-                  <span aria-hidden="true">←</span>
-                  Prev
-                </span>
-              )}
-              {nextLink ? (
-                <a
-                  href={nextLink.href}
-                  aria-label={`Next page: ${nextLink.label}`}
-                  className="weather-pill inline-flex min-h-[44px] items-center gap-2 px-3 py-1 text-[10px] font-semibold tracking-[0.18em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
-                >
-                  Next
-                  <span aria-hidden="true">→</span>
-                </a>
-              ) : (
-                <span className="weather-pill inline-flex min-h-[44px] items-center gap-2 border border-slate-800/50 px-3 py-1 text-[10px] font-semibold tracking-[0.18em] text-slate-500/80">
-                  Next
-                  <span aria-hidden="true">→</span>
-                </span>
-              )}
-            </div>
+      <div className="space-y-3">
+        <div className="flex flex-col gap-2 text-[10px] font-semibold tracking-[0.16em] text-slate-400 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-wrap items-center gap-3">
+            <span>
+              Page {currentPosition} of {pageLinks.length}
+            </span>
+            <span className="hidden text-[10px] font-semibold tracking-[0.14em] text-slate-300 sm:inline">
+              {currentLink.label}
+            </span>
           </div>
-
-          {variant === "full" ? (
-            <>
-              <div className="rounded-2xl border border-slate-800/70 bg-slate-950/40 px-3 py-2">
-                <p className="text-[10px] font-semibold tracking-[0.2em] text-slate-400">
-                  Current page
-                </p>
-                <p className="text-sm font-semibold text-slate-100">{currentLink.label}</p>
-                <p className="text-xs text-slate-300">{currentLink.description}</p>
-              </div>
-
-              <NavigationMenu.List className="grid grid-cols-2 gap-1.5 sm:flex sm:flex-wrap sm:gap-2">
-                {pageLinks.map((link, index) => {
-                  const isActive = link.label === pageTitle;
-                  const isOddTail = pageLinks.length % 2 === 1 && index === pageLinks.length - 1;
-                  return (
-                    <NavigationMenu.Item
-                      key={link.href}
-                      className={`flex ${isOddTail ? "col-span-2 sm:col-auto" : ""} sm:flex-shrink-0`}
-                    >
-                      <Tooltip.Root>
-                        <Tooltip.Trigger
-                          render={(props) => {
-                            const triggerProps = props;
-                            return (
-                              <NavigationMenu.Link
-                                {...triggerProps}
-                                href={link.href}
-                                active={isActive}
-                                aria-current={isActive ? "page" : undefined}
-                                className={`weather-tab inline-flex min-h-[44px] w-full items-center justify-center gap-2 px-3 py-2 text-center text-[9px] font-semibold tracking-[0.14em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:px-4 sm:text-xs sm:tracking-[0.12em] ${
-                                  isActive
-                                    ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
-                                    : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
-                                } ${isOddTail ? "mx-auto max-w-[240px]" : ""}`}
-                              >
-                                <span className="hidden sm:inline-flex">
-                                  {pageLinkIcons[link.label]}
-                                </span>
-                                {link.label}
-                              </NavigationMenu.Link>
-                            );
-                          }}
-                        />
-                        <Tooltip.Portal>
-                          <Tooltip.Positioner side="bottom" align="start" sideOffset={10}>
-                            <Tooltip.Popup className="hidden max-w-xs rounded-2xl border border-slate-800/80 bg-slate-950/95 px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-200 shadow-xl sm:block">
-                              {link.description}
-                              <Tooltip.Arrow className="h-2 w-2 translate-y-[1px] rotate-45 rounded-[2px] bg-slate-950/95" />
-                            </Tooltip.Popup>
-                          </Tooltip.Positioner>
-                        </Tooltip.Portal>
-                      </Tooltip.Root>
-                    </NavigationMenu.Item>
-                  );
-                })}
-              </NavigationMenu.List>
-            </>
-          ) : null}
+          <div className="flex flex-wrap items-center gap-2">
+            {prevLink ? (
+              <a
+                href={prevLink.href}
+                aria-label={`Previous page: ${prevLink.label}`}
+                className="weather-pill inline-flex min-h-[44px] items-center gap-2 px-3 py-1 text-[10px] font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+              >
+                <span aria-hidden="true">←</span>
+                Prev
+              </a>
+            ) : (
+              <span className="weather-pill inline-flex min-h-[44px] items-center gap-2 border border-slate-800/50 px-3 py-1 text-[10px] font-semibold tracking-[0.16em] text-slate-500/80">
+                <span aria-hidden="true">←</span>
+                Prev
+              </span>
+            )}
+            {nextLink ? (
+              <a
+                href={nextLink.href}
+                aria-label={`Next page: ${nextLink.label}`}
+                className="weather-pill inline-flex min-h-[44px] items-center gap-2 px-3 py-1 text-[10px] font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+              >
+                Next
+                <span aria-hidden="true">→</span>
+              </a>
+            ) : (
+              <span className="weather-pill inline-flex min-h-[44px] items-center gap-2 border border-slate-800/50 px-3 py-1 text-[10px] font-semibold tracking-[0.16em] text-slate-500/80">
+                Next
+                <span aria-hidden="true">→</span>
+              </span>
+            )}
+          </div>
         </div>
-      </Tooltip.Provider>
+
+        {variant === "full" ? (
+          <>
+            <div className="rounded-2xl border border-slate-800/70 bg-slate-950/40 px-3 py-2 text-left">
+              <p className="text-[10px] font-semibold tracking-[0.18em] text-slate-400">
+                Current page
+              </p>
+              <p className="text-sm font-semibold text-slate-100">{currentLink.label}</p>
+              <p className="text-xs text-slate-300">{currentLink.description}</p>
+            </div>
+            <NavigationMenu.List className="grid grid-cols-2 gap-1.5 sm:flex sm:flex-wrap sm:gap-2">
+              {pageLinks.map((link, index) => {
+                const isActive = link.label === pageTitle;
+                const isOddTail = pageLinks.length % 2 === 1 && index === pageLinks.length - 1;
+                return (
+                  <NavigationMenu.Item
+                    key={link.href}
+                    className={`flex ${isOddTail ? "col-span-2 sm:col-auto" : ""} sm:flex-shrink-0`}
+                  >
+                    <NavigationMenu.Link
+                      href={link.href}
+                      active={isActive}
+                      aria-current={isActive ? "page" : undefined}
+                      className={`weather-tab inline-flex min-h-[44px] w-full items-center justify-center px-3 py-2 text-center text-[9px] font-semibold tracking-[0.12em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:px-4 sm:text-xs ${
+                        isActive
+                          ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
+                          : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
+                      } ${isOddTail ? "mx-auto max-w-[240px]" : ""}`}
+                    >
+                      {link.label}
+                    </NavigationMenu.Link>
+                  </NavigationMenu.Item>
+                );
+              })}
+            </NavigationMenu.List>
+          </>
+        ) : null}
+      </div>
     </NavigationMenu.Root>
   );
 };
@@ -364,13 +339,10 @@ export const ReportMobileNavigation = ({
               {pageLinkIcons[currentLink.label]}
             </span>
             <div className="min-w-0">
-              <p className="text-[10px] font-semibold tracking-[0.22em] text-slate-400">
-                Current page
-              </p>
               <p className="truncate text-sm font-semibold tracking-[0.08em] text-slate-100">
                 {currentLink.label}
               </p>
-              <p className="text-[10px] font-semibold tracking-[0.2em] text-slate-400">
+              <p className="text-[10px] font-semibold tracking-[0.18em] text-slate-400">
                 Page {currentPosition} of {pageLinks.length}
               </p>
             </div>
@@ -459,8 +431,8 @@ export const ReportMobileNavigation = ({
           <div className="weather-mobile-panel max-h-[70vh] space-y-4 overflow-auto px-4 py-4">
             <div className="flex items-start justify-between gap-3">
               <div className="space-y-1">
-                <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
-                  Navigate report
+                <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">
+                  Navigation
                 </p>
                 <p className="text-base font-semibold text-slate-100">{currentLink.label}</p>
                 <p className="text-xs text-slate-300">{currentLink.description}</p>
@@ -516,9 +488,6 @@ export const ReportMobileNavigation = ({
                         {pageLinkIcons[link.label]}
                       </span>
                       <span className="space-y-1">
-                        <span className="block text-xs uppercase tracking-[0.2em] text-slate-400">
-                          Report page
-                        </span>
                         <span className="block text-sm font-semibold text-current">
                           {link.label}
                         </span>

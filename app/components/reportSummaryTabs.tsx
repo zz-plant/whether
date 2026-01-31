@@ -20,11 +20,10 @@ export const ReportSummaryTabs = ({
 }) => (
   <section className="weather-panel space-y-4 px-5 py-4">
     <div className="space-y-2">
-      <p className="text-xs font-semibold tracking-[0.32em] text-slate-400">Signal readout</p>
-      <h2 className="text-lg font-semibold text-slate-100 sm:text-xl">Weekly signal readout</h2>
+      <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">At a glance</p>
+      <h2 className="text-lg font-semibold text-slate-100 sm:text-xl">Weekly readout</h2>
       <p className="max-w-2xl text-sm text-slate-300">
-        A fast view of climate, guidance, and confidence so you can stay oriented as you move
-        through the report.
+        Climate, guidance, and confidence in one pass.
       </p>
     </div>
 
@@ -51,32 +50,28 @@ export const ReportSummaryTabs = ({
         ))}
       </Tabs.List>
 
-      <Tabs.Panel value="climate" className="mt-4 space-y-4">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="space-y-2">
-            <p className="text-xs font-semibold text-slate-300">Current operating climate</p>
+      <Tabs.Panel value="climate" className="mt-4 space-y-3">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div className="space-y-1">
+            <p className="text-xs text-slate-400">Signals stamped {recordDateLabel}</p>
             <span className="text-3xl font-semibold tracking-tight text-slate-100">
               {statusLabel}
             </span>
-            <p className="text-xs text-slate-300">Signals stamped {recordDateLabel}</p>
-            <p className="text-xs text-slate-300">Signal confidence: {trustStatusLabel}</p>
           </div>
           <span
-            className={`rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.12em] ${trustToneStyles}`}
+            className={`rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] ${trustToneStyles}`}
           >
             {trustStatusLabel}
           </span>
         </div>
         <p className="text-sm text-slate-300">
-          Use the climate label as a neutral, external anchor in planning conversations and keep
-          delivery pacing aligned with capital conditions.
+          Use the label to anchor pacing and scope decisions.
         </p>
       </Tabs.Panel>
 
       <Tabs.Panel value="guidance" className="mt-4 space-y-4">
         <p className="text-sm text-slate-200">
-          Focus on the highest-leverage initiatives, communicate the climate change early, and keep
-          leadership aligned on why priorities shift.
+          Lead with the highest-leverage work and state the climate shift early.
         </p>
         <div className="grid gap-3 sm:grid-cols-2">
           <a
@@ -94,7 +89,7 @@ export const ReportSummaryTabs = ({
         </div>
       </Tabs.Panel>
 
-      <Tabs.Panel value="confidence" className="mt-4 space-y-3">
+      <Tabs.Panel value="confidence" className="mt-4 space-y-2">
         <p className="text-sm font-semibold text-slate-100">{trustStatusLabel}</p>
         <p className="text-sm text-slate-200/90">{trustStatusDetail}</p>
         <p className="text-xs text-slate-200/80">{trustStatusAction}</p>
