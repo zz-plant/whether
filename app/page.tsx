@@ -157,117 +157,53 @@ export default async function HomePage({
         ) : null
       }
     >
-      <section className="weather-panel space-y-5 px-5 py-6">
+      <section className="weather-panel space-y-4 px-5 py-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="space-y-3">
+          <div className="space-y-2">
             <p className="text-xs font-semibold uppercase tracking-[0.26em] text-slate-400">
-              Start here
+              Operating flow
             </p>
             <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-              Get decision-ready in five minutes.
+              Decision-ready in minutes.
             </h2>
             <p className="text-sm text-slate-300">
-              Follow the flow below to align leadership on posture, capture constraints, and only
-              then drill into signals.
+              Start with posture. Confirm constraints. Open signals only when needed.
             </p>
           </div>
           <a
             href="#weekly-action-summary"
             className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
           >
-            Jump to action summary →
+            Weekly action summary →
           </a>
         </div>
-        <ol className="grid gap-4 text-sm text-slate-300 sm:grid-cols-3">
-          {[
-            "Read the weekly action control room to lock posture (your default operating stance).",
-            "Confirm operating constraints (budget and approval guardrails) and score context (0–100 gauges).",
-            "Open signal breakdowns only when decisions hinge on evidence.",
-          ].map((step, index) => (
-            <li
-              key={step}
-              className="weather-surface flex gap-3 rounded-2xl border border-slate-800/60 bg-slate-950/60 p-4"
-            >
-              <span className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-700/70 bg-slate-950 text-xs font-semibold text-slate-100">
-                {index + 1}
-              </span>
-              <span>{step}</span>
-            </li>
-          ))}
-        </ol>
-        <div className="grid gap-4 lg:grid-cols-[1.15fr,0.85fr]">
+        <div className="grid gap-3 lg:grid-cols-[1.4fr,0.6fr]">
           <div className="weather-surface space-y-3 p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              Decision checklist
-            </p>
-            <ul className="space-y-3 text-sm text-slate-200">
-              {[
-                {
-                  href: "#weekly-action-summary",
-                  label: "Set the weekly posture and action summary.",
-                },
-                {
-                  href: "#change-since-last-read",
-                  label: "Confirm what changed since your last read.",
-                },
-                {
-                  href: "#regime-summary",
-                  label: "Align constraints before approving spend or hiring.",
-                },
-              ].map((item) => (
-                <li key={item.href}>
-                  <a
-                    href={item.href}
-                    className="inline-flex min-h-[44px] items-center gap-2 text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                  >
-                    <span aria-hidden="true">→</span>
-                    <span>{item.label}</span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="weather-surface space-y-3 p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              Meeting prompts
-            </p>
-            <ul className="space-y-2 text-sm text-slate-200">
-              <li>Are we acting like a {regimeLabel} week across product and delivery?</li>
-              <li>
-                Tightness score is{" "}
-                <span className="mono text-slate-100">{assessment.scores.tightness}</span>
-                /100 — does this force spending gates?
-              </li>
-              <li>
-                Risk appetite sits at{" "}
-                <span className="mono text-slate-100">{assessment.scores.riskAppetite}</span>
-                /100 — do we pause or accelerate growth bets?
-              </li>
-              <li>Data confidence: {trustStatusLabel}. Confirm with your finance lead.</li>
-            </ul>
-          </div>
-        </div>
-        <div className="grid gap-3 lg:grid-cols-3">
-          <div className="weather-surface space-y-2 p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              Regime posture
+              Posture snapshot
             </p>
             <p className="text-xs text-slate-500">
-              A combined read of cash tightness and market risk appetite from Treasury signals.
+              Tightness + risk appetite, translated into guardrails.
             </p>
-            <p className="text-lg font-semibold text-slate-100">
+            <div className="flex flex-wrap items-center gap-3">
               <span className="inline-flex items-center rounded-full border border-sky-400/40 bg-sky-500/10 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-sky-100">
                 {regimeLabel}
               </span>
-            </p>
+              <span className="text-xs text-slate-300">
+                Tightness <span className="mono text-slate-100">{assessment.scores.tightness}</span>
+                /100
+              </span>
+              <span className="text-xs text-slate-300">
+                Risk appetite{" "}
+                <span className="mono text-slate-100">{assessment.scores.riskAppetite}</span>/100
+              </span>
+              <span className="text-xs text-slate-400">Confidence: {trustStatusLabel}</span>
+            </div>
             <p className="text-sm text-slate-300">{assessment.description}</p>
           </div>
-          <div className="weather-surface space-y-2 p-4">
+          <div className="weather-surface space-y-3 p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              Operating constraints
-            </p>
-            <p className="text-xs text-slate-500">
-              Guardrails that translate the regime into budget, hiring, and approval guidance.
+              Actions
             </p>
             <ul className="space-y-2 text-sm text-slate-200">
               {assessment.constraints.slice(0, 3).map((constraint) => (
@@ -277,26 +213,6 @@ export default async function HomePage({
                 </li>
               ))}
             </ul>
-          </div>
-          <div className="weather-surface space-y-2 p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              Score context
-            </p>
-            <p className="text-xs text-slate-500">
-              0–100 scores: higher tightness = tougher funding, higher risk appetite = more growth
-              funding.
-            </p>
-            <div className="flex items-baseline justify-between text-sm text-slate-300">
-              <span>Tightness</span>
-              <span className="mono text-slate-100">{assessment.scores.tightness}/100</span>
-            </div>
-            <div className="flex items-baseline justify-between text-sm text-slate-300">
-              <span>Risk appetite</span>
-              <span className="mono text-slate-100">{assessment.scores.riskAppetite}/100</span>
-            </div>
-            <p className="text-xs text-slate-400">
-              Use scores to validate urgency before committing roadmap shifts.
-            </p>
           </div>
         </div>
       </section>
