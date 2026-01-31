@@ -127,7 +127,7 @@ export default async function OnboardingPage({
               Recommended onboarding path
             </p>
             <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-              Start with one clear flow, then branch out as needed.
+              Start with the three-step baseline, then branch out as needed.
             </h2>
           </div>
         </div>
@@ -136,7 +136,7 @@ export default async function OnboardingPage({
             <article key={step.title} className="weather-surface flex h-full flex-col gap-3 p-4">
               <div className="space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                  Step {index + 1}
+                  Step {index + 1} of {onboardingSteps.length}
                 </p>
                 <p className="text-sm font-semibold text-slate-100">{step.title}</p>
                 <p className="text-sm text-slate-300">{step.detail}</p>

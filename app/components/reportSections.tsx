@@ -1013,13 +1013,12 @@ export const FirstTimeGuidePanel = ({
     <div className="weather-panel weather-panel-static p-6">
       <div className="flex flex-wrap items-start justify-between gap-6">
         <div className="max-w-2xl">
-          <p className="type-label text-slate-400">Explore (optional)</p>
+          <p className="type-label text-slate-400">Start here</p>
           <h2 id="first-time-guide-title" className="type-section text-slate-100">
-            Optional quick scan in three stops
+            Recommended quick scan in three stops
           </h2>
           <p className="mt-2 type-data text-slate-300">
-            Use this light walkthrough to orient yourself before diving into the deeper data
-            lanes.
+            Use this walkthrough to align on the core posture before you dive into deeper lanes.
           </p>
         </div>
         <div className="weather-surface px-4 py-3 text-xs font-semibold tracking-[0.12em] text-slate-300">
@@ -1065,10 +1064,15 @@ export const FirstTimeGuidePanel = ({
                   </div>
                   <Collapsible.Trigger
                     type="button"
-                    className="flex min-h-[44px] items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-400 transition-colors hover:text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                    className="group flex min-h-[44px] items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-400 transition-colors hover:text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
                   >
                     Details
-                    <span className="text-slate-500">(expand)</span>
+                    <span className="text-slate-500 group-data-[state=open]:hidden">
+                      (expand)
+                    </span>
+                    <span className="hidden text-slate-500 group-data-[state=open]:inline">
+                      (collapse)
+                    </span>
                   </Collapsible.Trigger>
                 </div>
                 <Collapsible.Panel className="space-y-2 text-xs text-slate-400">
@@ -1178,7 +1182,7 @@ export const BeginnerGlossaryPanel = () => {
       <div className="weather-panel weather-panel-static p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="type-label text-slate-400">Optional glossary</p>
+            <p className="type-label text-slate-400">Glossary</p>
             <h3 id="beginner-glossary-title" className="type-section text-slate-100">
               Translate finance terms into day-to-day product decisions
             </h3>
