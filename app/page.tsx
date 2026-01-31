@@ -164,11 +164,11 @@ export default async function HomePage({
               Start here
             </p>
             <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-              Anchor decisions before you dive into the detail.
+              Get decision-ready in five minutes.
             </h2>
             <p className="text-sm text-slate-300">
-              Use the report in a clear sequence: summarize the week, confirm the constraints, then
-              inspect the evidence.
+              Follow the flow below to align leadership on posture, capture constraints, and only
+              then drill into signals.
             </p>
           </div>
           <a
@@ -195,6 +195,58 @@ export default async function HomePage({
             </li>
           ))}
         </ol>
+        <div className="grid gap-4 lg:grid-cols-[1.15fr,0.85fr]">
+          <div className="weather-surface space-y-3 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+              Decision checklist
+            </p>
+            <ul className="space-y-3 text-sm text-slate-200">
+              {[
+                {
+                  href: "#weekly-action-summary",
+                  label: "Set the weekly posture and action summary.",
+                },
+                {
+                  href: "#change-since-last-read",
+                  label: "Confirm what changed since your last read.",
+                },
+                {
+                  href: "#regime-summary",
+                  label: "Align constraints before approving spend or hiring.",
+                },
+              ].map((item) => (
+                <li key={item.href}>
+                  <a
+                    href={item.href}
+                    className="inline-flex min-h-[44px] items-center gap-2 text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                  >
+                    <span aria-hidden="true">→</span>
+                    <span>{item.label}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="weather-surface space-y-3 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+              Meeting prompts
+            </p>
+            <ul className="space-y-2 text-sm text-slate-200">
+              <li>Are we acting like a {regimeLabel} week across product and delivery?</li>
+              <li>
+                Tightness score is{" "}
+                <span className="mono text-slate-100">{assessment.scores.tightness}</span>
+                /100 — does this force spending gates?
+              </li>
+              <li>
+                Risk appetite sits at{" "}
+                <span className="mono text-slate-100">{assessment.scores.riskAppetite}</span>
+                /100 — do we pause or accelerate growth bets?
+              </li>
+              <li>Data confidence: {trustStatusLabel}. Confirm with your finance lead.</li>
+            </ul>
+          </div>
+        </div>
         <div className="grid gap-3 lg:grid-cols-3">
           <div className="weather-surface space-y-2 p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
