@@ -363,10 +363,6 @@ export const WeeklyActionSummaryPanel = ({
 }) => {
   const regimeLabel = getRegimeLabel(assessment.regime);
   const actionGuidance = getWeeklyActionGuidance(assessment.regime);
-  const regimeBadge = getRegimeBadge(assessment.regime);
-  const regimeDescription =
-    regimeBadge?.description ??
-    "Use the current signals to set weekly guardrails before debating strategy.";
   const weeklySummary = buildWeeklySummary({
     assessment,
     provenance,
@@ -400,6 +396,23 @@ export const WeeklyActionSummaryPanel = ({
     {
       title: "Lock the one-week bet",
       detail: "Pick the smallest scope that protects retention or reliability in under two quarters.",
+    },
+  ];
+  const decisionFlow = [
+    {
+      title: "Posture",
+      value: regimeLabel,
+      detail: actionGuidance,
+    },
+    {
+      title: "Constraints",
+      value: `${assessment.scores.tightness}/100 · ${assessment.scores.riskAppetite}/100`,
+      detail: "Cash availability · Risk appetite",
+    },
+    {
+      title: "One-week bet",
+      value: "Smallest scope",
+      detail: "Protect retention or reliability.",
     },
   ];
   const weeklyQuickLinks = [
@@ -446,15 +459,45 @@ export const WeeklyActionSummaryPanel = ({
                   Weekly action control room
                 </h2>
                 <p className="mt-3 text-sm text-slate-200">
-                  This week, operate in {regimeLabel} mode: {actionGuidance}. {regimeDescription} Skim the{" "}
+                  Use the flow below to set posture and scope fast. Then skim the{" "}
                   <a
                     href="#executive-snapshot"
                     className="touch-target inline-flex min-h-[44px] items-center text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-slate-50 touch-manipulation"
                   >
                     leadership summary
                   </a>{" "}
-                  for the source signals and decision guardrails (budget, hiring, and roadmap approvals).
+                  for source signals.
                 </p>
+                <div className="mt-4">
+                  <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">
+                    Decision flow
+                  </p>
+                  <ol className="mt-3 grid gap-3 sm:grid-cols-3">
+                    {decisionFlow.map((step, index) => (
+                      <li
+                        key={step.title}
+                        className="relative rounded-xl border border-slate-800/80 bg-slate-950/60 p-4"
+                      >
+                        <span className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-700/70 text-xs font-semibold text-slate-200">
+                          {index + 1}
+                        </span>
+                        <p className="mt-3 text-xs font-semibold tracking-[0.14em] text-slate-400">
+                          {step.title}
+                        </p>
+                        <p className="mt-2 text-sm font-semibold text-slate-100">{step.value}</p>
+                        <p className="mt-1 text-xs text-slate-400">{step.detail}</p>
+                        {index < decisionFlow.length - 1 ? (
+                          <span
+                            className="absolute -right-3 top-1/2 hidden -translate-y-1/2 text-slate-600 sm:block"
+                            aria-hidden="true"
+                          >
+                            →
+                          </span>
+                        ) : null}
+                      </li>
+                    ))}
+                  </ol>
+                </div>
               </div>
             <div className="rounded-2xl border border-sky-400/40 bg-slate-950/60 p-4">
               <p className="text-xs font-semibold tracking-[0.18em] text-sky-200">
