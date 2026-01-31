@@ -266,57 +266,75 @@ export const buildRegimeChangeReasons = (
     reasons.push({ code, message });
   };
 
+  const addThresholdShift = (options: {
+    previousValue: number;
+    currentValue: number;
+    previousThreshold: number;
+    currentThreshold: number;
+    up: { code: string; message: string };
+    down: { code: string; message: string };
+  }) => {
+    if (
+      options.previousValue <= options.previousThreshold &&
+      options.currentValue > options.currentThreshold
+    ) {
+      pushReason(options.up.code, options.up.message);
+    } else if (
+      options.previousValue >= options.previousThreshold &&
+      options.currentValue < options.currentThreshold
+    ) {
+      pushReason(options.down.code, options.down.message);
+    }
+  };
+
   if (previous.regime !== current.regime) {
     pushReason("regime-change", `Regime shifted from ${previous.regime} to ${current.regime}.`);
   }
 
-  if (
-    previous.scores.tightness <= previousTightnessThreshold &&
-    current.scores.tightness > currentTightnessThreshold
-  ) {
-    pushReason(
-      "tightness-upshift",
-      `Tightness crossed above ${currentTightnessThreshold}.`
-    );
-  } else if (
-    previous.scores.tightness >= previousTightnessThreshold &&
-    current.scores.tightness < currentTightnessThreshold
-  ) {
-    pushReason(
-      "tightness-downshift",
-      `Tightness fell below ${currentTightnessThreshold}.`
-    );
-  }
+  addThresholdShift({
+    previousValue: previous.scores.tightness,
+    currentValue: current.scores.tightness,
+    previousThreshold: previousTightnessThreshold,
+    currentThreshold: currentTightnessThreshold,
+    up: {
+      code: "tightness-upshift",
+      message: `Tightness crossed above ${currentTightnessThreshold}.`,
+    },
+    down: {
+      code: "tightness-downshift",
+      message: `Tightness fell below ${currentTightnessThreshold}.`,
+    },
+  });
 
-  if (
-    previous.scores.riskAppetite <= previousRiskThreshold &&
-    current.scores.riskAppetite > currentRiskThreshold
-  ) {
-    pushReason(
-      "risk-appetite-upshift",
-      `Risk appetite crossed above ${currentRiskThreshold}.`
-    );
-  } else if (
-    previous.scores.riskAppetite >= previousRiskThreshold &&
-    current.scores.riskAppetite < currentRiskThreshold
-  ) {
-    pushReason(
-      "risk-appetite-downshift",
-      `Risk appetite fell below ${currentRiskThreshold}.`
-    );
-  }
+  addThresholdShift({
+    previousValue: previous.scores.riskAppetite,
+    currentValue: current.scores.riskAppetite,
+    previousThreshold: previousRiskThreshold,
+    currentThreshold: currentRiskThreshold,
+    up: {
+      code: "risk-appetite-upshift",
+      message: `Risk appetite crossed above ${currentRiskThreshold}.`,
+    },
+    down: {
+      code: "risk-appetite-downshift",
+      message: `Risk appetite fell below ${currentRiskThreshold}.`,
+    },
+  });
 
-  if (
-    previous.scores.baseRate <= previousBaseRateThreshold &&
-    current.scores.baseRate > currentBaseRateThreshold
-  ) {
-    pushReason("base-rate-upshift", `Base rate crossed above ${currentBaseRateThreshold}%.`);
-  } else if (
-    previous.scores.baseRate >= previousBaseRateThreshold &&
-    current.scores.baseRate < currentBaseRateThreshold
-  ) {
-    pushReason("base-rate-downshift", `Base rate fell below ${currentBaseRateThreshold}%.`);
-  }
+  addThresholdShift({
+    previousValue: previous.scores.baseRate,
+    currentValue: current.scores.baseRate,
+    previousThreshold: previousBaseRateThreshold,
+    currentThreshold: currentBaseRateThreshold,
+    up: {
+      code: "base-rate-upshift",
+      message: `Base rate crossed above ${currentBaseRateThreshold}%.`,
+    },
+    down: {
+      code: "base-rate-downshift",
+      message: `Base rate fell below ${currentBaseRateThreshold}%.`,
+    },
+  });
 
   const previousSlope = previous.scores.curveSlope;
   const currentSlope = current.scores.curveSlope;
