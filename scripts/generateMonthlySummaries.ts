@@ -2,15 +2,16 @@
  * Monthly summary archive generator for the Regime Station Time Machine.
  * Pulls Treasury snapshots and builds copy-ready monthly summaries for historical review.
  */
-import { writeFile } from "node:fs/promises";
 import { buildMonthlySummary, type MonthlySummary } from "../lib/summary/monthlySummary";
 import { evaluateRegime } from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
 import { resolveHistoricalDate } from "../lib/timeMachine/timeMachine";
 import { writeSummaryArchive } from "./summaryArchive";
+import { writeSummaryFile } from "./summaryFile";
+import { resolveYearRange } from "./summaryRange";
 
-const START_YEAR = 2012;
-const END_YEAR = 2025;
+const DEFAULT_START_YEAR = 2012;
+const DEFAULT_END_YEAR = 2025;
 const OUTPUT_PATH = "data/monthly_summaries_2012_2025.json";
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
@@ -203,6 +204,12 @@ const generateMonthlySummaries = async () => {
   const output: MonthlySummaryArchiveEntry[] = [];
   const now = new Date();
   const fetchedAt = now.toISOString();
+  const { startYear, endYear, isPartial } = resolveYearRange({
+    defaultStartYear: DEFAULT_START_YEAR,
+    defaultEndYear: DEFAULT_END_YEAR,
+    minYear: DEFAULT_START_YEAR,
+    maxYear: DEFAULT_END_YEAR,
+  });
   const datasets = {
     oneMonth: await fetchSeries(seriesCatalog.oneMonth),
     threeMonth: await fetchSeries(seriesCatalog.threeMonth),
@@ -213,7 +220,7 @@ const generateMonthlySummaries = async () => {
   const requiredMaps = [datasets.twoYear, datasets.tenYear];
   const fallbackMaps = [datasets.oneMonth, datasets.threeMonth];
 
-  for (let year = START_YEAR; year <= END_YEAR; year += 1) {
+  for (let year = startYear; year <= endYear; year += 1) {
     for (let month = 1; month <= 12; month += 1) {
       const asOf = resolveHistoricalDate(year, month);
       const asOfTime = Date.parse(`${asOf}T00:00:00Z`);
@@ -280,8 +287,14 @@ const generateMonthlySummaries = async () => {
     }
   }
 
-  await writeFile(OUTPUT_PATH, `${JSON.stringify(output, null, 2)}\n`, "utf8");
-  await writeSummaryArchive({ monthlyEntries: output });
+  const mode = isPartial ? "merge" : "replace";
+  await writeSummaryFile({
+    path: OUTPUT_PATH,
+    entries: output,
+    mode,
+    getKey: (entry) => `${entry.year}-${entry.month}`,
+  });
+  await writeSummaryArchive({ monthlyEntries: output, mode });
 };
 
 generateMonthlySummaries().catch((error) => {
