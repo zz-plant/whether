@@ -127,7 +127,7 @@ export default async function OnboardingPage({
               Recommended onboarding path
             </p>
             <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-              Start with the three-step baseline, then branch out as needed.
+              Start with the three-step path, then branch out as needed.
             </h2>
           </div>
         </div>

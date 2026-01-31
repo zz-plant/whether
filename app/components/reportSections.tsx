@@ -1013,7 +1013,7 @@ export const FirstTimeGuidePanel = ({
     <div className="weather-panel weather-panel-static p-6">
       <div className="flex flex-wrap items-start justify-between gap-6">
         <div className="max-w-2xl">
-          <p className="type-label text-slate-400">Start here</p>
+          <p className="type-label text-slate-400">Recommended start</p>
           <h2 id="first-time-guide-title" className="type-section text-slate-100">
             Recommended quick scan in three stops
           </h2>
@@ -1067,10 +1067,10 @@ export const FirstTimeGuidePanel = ({
                     className="group flex min-h-[44px] items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-400 transition-colors hover:text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
                   >
                     Details
-                    <span className="text-slate-500 group-data-[state=open]:hidden">
+                    <span className="text-slate-500 group-data-[panel-open]:hidden">
                       (expand)
                     </span>
-                    <span className="hidden text-slate-500 group-data-[state=open]:inline">
+                    <span className="hidden text-slate-500 group-data-[panel-open]:inline">
                       (collapse)
                     </span>
                   </Collapsible.Trigger>
