@@ -8,6 +8,7 @@ import { buildYearlySummary } from "../lib/summary/yearlySummary";
 import { evaluateRegime } from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
 import { resolveHistoricalDate } from "../lib/timeMachine/timeMachine";
+import { resolveYearRange } from "./summaryRange";
 
 const START_YEAR = 2010;
 const END_YEAR = 2025;
@@ -239,6 +240,12 @@ const generateQuarterlyAndYearlySummaries = async () => {
   const yearlyOutput: YearlySummaryArchiveEntry[] = [];
   const now = new Date();
   const fetchedAt = now.toISOString();
+  const { startYear, endYear, isPartial } = resolveYearRange({
+    defaultStartYear: START_YEAR,
+    defaultEndYear: END_YEAR,
+    minYear: START_YEAR,
+    maxYear: END_YEAR,
+  });
   const datasets = {
     oneMonth: await fetchSeries(seriesCatalog.oneMonth),
     threeMonth: await fetchSeries(seriesCatalog.threeMonth),
@@ -249,7 +256,7 @@ const generateQuarterlyAndYearlySummaries = async () => {
   const requiredMaps = [datasets.twoYear, datasets.tenYear];
   const fallbackMaps = [datasets.oneMonth, datasets.threeMonth];
 
-  for (let year = START_YEAR; year <= END_YEAR; year += 1) {
+  for (let year = startYear; year <= endYear; year += 1) {
     for (let quarter = 1; quarter <= 4; quarter += 1) {
       const month = quarter * 3;
       const asOf = resolveHistoricalDate(year, month);
@@ -350,6 +357,7 @@ const generateQuarterlyAndYearlySummaries = async () => {
   await writeSummaryArchive({
     quarterlyEntries: quarterlyOutput,
     yearlyEntries: yearlyOutput,
+    mode: isPartial ? "merge" : "replace",
   });
 };
 

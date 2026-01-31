@@ -74,6 +74,8 @@ type SummaryArchiveEntry =
       summary: YearlySummary;
     };
 
+type SummaryArchiveMode = "replace" | "merge";
+
 const readExistingArchive = async () => {
   try {
     const raw = await readFile(ARCHIVE_PATH, "utf8");
@@ -94,83 +96,125 @@ const sortArchive = (entries: SummaryArchiveEntry[]) => {
   );
 };
 
+const getArchiveKey = (entry: SummaryArchiveEntry) => {
+  switch (entry.cadence) {
+    case "weekly":
+      return `${entry.year}-${entry.week}`;
+    case "monthly":
+      return `${entry.year}-${entry.month}`;
+    case "quarterly":
+      return `${entry.year}-${entry.quarter}`;
+    case "yearly":
+      return `${entry.year}`;
+    default:
+      return "";
+  }
+};
+
+const mergeCadenceEntries = (
+  existing: SummaryArchiveEntry[],
+  cadence: SummaryArchiveEntry["cadence"],
+  incoming: SummaryArchiveEntry[]
+) => {
+  const preserved = existing.filter((entry) => entry.cadence !== cadence);
+  const merged = new Map<string, SummaryArchiveEntry>();
+  existing
+    .filter((entry) => entry.cadence === cadence)
+    .forEach((entry) => merged.set(getArchiveKey(entry), entry));
+  incoming.forEach((entry) => merged.set(getArchiveKey(entry), entry));
+  return [...preserved, ...merged.values()];
+};
+
 export const writeSummaryArchive = async ({
   weeklyEntries,
   monthlyEntries,
   quarterlyEntries,
   yearlyEntries,
+  mode = "replace",
 }: {
   weeklyEntries?: WeeklySummaryArchiveEntry[];
   monthlyEntries?: MonthlySummaryArchiveEntry[];
   quarterlyEntries?: QuarterlySummaryArchiveEntry[];
   yearlyEntries?: YearlySummaryArchiveEntry[];
+  mode?: SummaryArchiveMode;
 }) => {
   const existing = await readExistingArchive();
-  const nextEntries = existing.filter((entry) => {
-    if (weeklyEntries && entry.cadence === "weekly") {
-      return false;
-    }
-    if (monthlyEntries && entry.cadence === "monthly") {
-      return false;
-    }
-    if (quarterlyEntries && entry.cadence === "quarterly") {
-      return false;
-    }
-    if (yearlyEntries && entry.cadence === "yearly") {
-      return false;
-    }
-    return true;
-  });
+  let nextEntries =
+    mode === "replace"
+      ? existing.filter((entry) => {
+          if (weeklyEntries && entry.cadence === "weekly") {
+            return false;
+          }
+          if (monthlyEntries && entry.cadence === "monthly") {
+            return false;
+          }
+          if (quarterlyEntries && entry.cadence === "quarterly") {
+            return false;
+          }
+          if (yearlyEntries && entry.cadence === "yearly") {
+            return false;
+          }
+          return true;
+        })
+      : existing;
 
   if (weeklyEntries) {
-    nextEntries.push(
-      ...weeklyEntries.map((entry) => ({
-        cadence: "weekly" as const,
-        year: entry.year,
-        week: entry.week,
-        asOf: entry.asOf,
-        record_date: entry.record_date,
-        summary: entry.summary,
-      }))
-    );
+    const normalized = weeklyEntries.map((entry) => ({
+      cadence: "weekly" as const,
+      year: entry.year,
+      week: entry.week,
+      asOf: entry.asOf,
+      record_date: entry.record_date,
+      summary: entry.summary,
+    }));
+    nextEntries =
+      mode === "merge"
+        ? mergeCadenceEntries(nextEntries, "weekly", normalized)
+        : [...nextEntries, ...normalized];
   }
 
   if (monthlyEntries) {
-    nextEntries.push(
-      ...monthlyEntries.map((entry) => ({
-        cadence: "monthly" as const,
-        year: entry.year,
-        month: entry.month,
-        asOf: entry.asOf,
-        record_date: entry.record_date,
-        summary: entry.summary,
-      }))
-    );
+    const normalized = monthlyEntries.map((entry) => ({
+      cadence: "monthly" as const,
+      year: entry.year,
+      month: entry.month,
+      asOf: entry.asOf,
+      record_date: entry.record_date,
+      summary: entry.summary,
+    }));
+    nextEntries =
+      mode === "merge"
+        ? mergeCadenceEntries(nextEntries, "monthly", normalized)
+        : [...nextEntries, ...normalized];
   }
 
   if (quarterlyEntries) {
-    nextEntries.push(
-      ...quarterlyEntries.map((entry) => ({
-        cadence: "quarterly" as const,
-        year: entry.year,
-        quarter: entry.quarter,
-        asOf: entry.asOf,
-        record_date: entry.record_date,
-        summary: entry.summary,
-      }))
-    );
+    const normalized = quarterlyEntries.map((entry) => ({
+      cadence: "quarterly" as const,
+      year: entry.year,
+      quarter: entry.quarter,
+      asOf: entry.asOf,
+      record_date: entry.record_date,
+      summary: entry.summary,
+    }));
+    nextEntries =
+      mode === "merge"
+        ? mergeCadenceEntries(nextEntries, "quarterly", normalized)
+        : [...nextEntries, ...normalized];
   }
 
   if (yearlyEntries) {
-    nextEntries.push(
-      ...yearlyEntries.map((entry) => ({
-        cadence: "yearly" as const,
-        year: entry.year,
-        asOf: entry.asOf,
-        record_date: entry.record_date,
-        summary: entry.summary,
-      }))
-    );
+    const normalized = yearlyEntries.map((entry) => ({
+      cadence: "yearly" as const,
+      year: entry.year,
+      asOf: entry.asOf,
+      record_date: entry.record_date,
+      summary: entry.summary,
+    }));
+    nextEntries =
+      mode === "merge"
+        ? mergeCadenceEntries(nextEntries, "yearly", normalized)
+        : [...nextEntries, ...normalized];
   }
 
   const sorted = sortArchive(nextEntries);

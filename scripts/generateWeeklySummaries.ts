@@ -2,11 +2,12 @@
  * Weekly summary archive generator for the Regime Station Time Machine.
  * Pulls Treasury snapshots and builds copy-ready weekly summaries for historical review.
  */
-import { writeFile } from "node:fs/promises";
 import { buildWeeklySummary, type WeeklySummary } from "../lib/summary/weeklySummary";
 import { evaluateRegime } from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
 import { writeSummaryArchive } from "./summaryArchive";
+import { writeSummaryFile } from "./summaryFile";
+import { resolveYearRange } from "./summaryRange";
 
 const START_YEAR = 2018;
 const END_YEAR = new Date().getUTCFullYear();
@@ -276,7 +277,17 @@ const generateWeeklySummaries = async () => {
   const effectiveEndDate = new Date(effectiveEndTime);
   const effectiveEndYear = effectiveEndDate.getUTCFullYear();
 
-  const weeks = buildWeekDescriptors(START_YEAR, effectiveEndYear, effectiveEndDate);
+  const { startYear, endYear, isPartial } = resolveYearRange({
+    defaultStartYear: START_YEAR,
+    defaultEndYear: Math.min(END_YEAR, effectiveEndYear),
+    minYear: START_YEAR,
+    maxYear: effectiveEndYear,
+  });
+  const endDateOverride =
+    endYear === effectiveEndYear
+      ? effectiveEndDate
+      : new Date(Date.UTC(endYear, 11, 31));
+  const weeks = buildWeekDescriptors(startYear, endYear, endDateOverride);
 
   for (const { year, week, asOf } of weeks) {
     const asOfTime = Date.parse(`${asOf}T00:00:00Z`);
@@ -335,12 +346,14 @@ const generateWeeklySummaries = async () => {
     });
   }
 
-  await writeFile(
-    OUTPUT_PATH(effectiveEndYear),
-    `${JSON.stringify(output, null, 2)}\n`,
-    "utf8"
-  );
-  await writeSummaryArchive({ weeklyEntries: output });
+  const mode = isPartial ? "merge" : "replace";
+  await writeSummaryFile({
+    path: OUTPUT_PATH(effectiveEndYear),
+    entries: output,
+    mode,
+    getKey: (entry) => `${entry.year}-${entry.week}`,
+  });
+  await writeSummaryArchive({ weeklyEntries: output, mode });
 };
 
 generateWeeklySummaries().catch((error) => {

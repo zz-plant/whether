@@ -79,6 +79,11 @@ The Time Machine now prefers the local cache (`data/time_machine_cache.json`) to
 third‑party lookups in replay mode. Refresh the cache by re-running the Treasury query
 logic in a connected environment and committing the updated file.
 
+To refresh historical summaries without regenerating the full archive, run the scripts in
+`scripts/` with `HISTORY_START_YEAR` and `HISTORY_END_YEAR` set to the slice you want to
+update (for example, a single year). Partial runs merge into the existing summary files and
+`data/summary_archive.json`, keeping diffs small while still updating the requested window.
+
 ### 4b) Market climate change alerts (signal shifts)
 Surface notifications only when the regime changes or tightness/bravery cross a threshold, with a
 reason-code summary so leaders can spot when posture needs to change and replay the prior month using
