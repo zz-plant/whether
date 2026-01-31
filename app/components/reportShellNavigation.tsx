@@ -15,6 +15,17 @@ export type ReportSectionLink = {
   label: string;
 };
 
+const getPageNavigationState = (pageLinks: ReportPageLink[], pageTitle: string) => {
+  const currentIndex = pageLinks.findIndex((link) => link.label === pageTitle);
+  const currentPosition = currentIndex >= 0 ? currentIndex + 1 : 1;
+  const currentLink = currentIndex >= 0 ? pageLinks[currentIndex] : pageLinks[0];
+  const prevLink = currentIndex > 0 ? pageLinks[currentIndex - 1] : null;
+  const nextLink =
+    currentIndex >= 0 && currentIndex < pageLinks.length - 1 ? pageLinks[currentIndex + 1] : null;
+
+  return { currentIndex, currentPosition, currentLink, prevLink, nextLink };
+};
+
 const pageLinkIcons: Record<string, ReactNode> = {
   "Weekly briefing": (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
@@ -117,12 +128,10 @@ export const ReportPageNavigation = ({
   className?: string;
   variant?: "full" | "compact";
 }) => {
-  const currentIndex = pageLinks.findIndex((link) => link.label === pageTitle);
-  const currentPosition = currentIndex >= 0 ? currentIndex + 1 : 1;
-  const currentLink = currentIndex >= 0 ? pageLinks[currentIndex] : pageLinks[0];
-  const prevLink = currentIndex > 0 ? pageLinks[currentIndex - 1] : null;
-  const nextLink =
-    currentIndex >= 0 && currentIndex < pageLinks.length - 1 ? pageLinks[currentIndex + 1] : null;
+  const { currentLink, currentPosition, prevLink, nextLink } = getPageNavigationState(
+    pageLinks,
+    pageTitle,
+  );
 
   return (
     <NavigationMenu.Root aria-label="Report paths" className={className}>
@@ -317,12 +326,10 @@ export const ReportMobileNavigation = ({
   sectionLinks: ReportSectionLink[];
   className?: string;
 }) => {
-  const currentIndex = pageLinks.findIndex((link) => link.label === pageTitle);
-  const currentLink = currentIndex >= 0 ? pageLinks[currentIndex] : pageLinks[0];
-  const prevLink = currentIndex > 0 ? pageLinks[currentIndex - 1] : null;
-  const nextLink =
-    currentIndex >= 0 && currentIndex < pageLinks.length - 1 ? pageLinks[currentIndex + 1] : null;
-  const currentPosition = currentIndex >= 0 ? currentIndex + 1 : 1;
+  const { currentLink, currentPosition, prevLink, nextLink } = getPageNavigationState(
+    pageLinks,
+    pageTitle,
+  );
   const sectionCountLabel =
     sectionLinks.length === 0
       ? "No sections"
