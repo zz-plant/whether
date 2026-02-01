@@ -107,7 +107,7 @@ export default async function OperationsPlanPage({
       <SectionedReportPanel
         id="ops-monthly-action-summary"
         title="Monthly action summary"
-        description="What moves the regime recommends this month."
+        description="The moves the regime recommends this month."
       >
         <MonthlyActionSummaryPanel
           assessment={assessment}
