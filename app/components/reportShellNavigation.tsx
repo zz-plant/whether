@@ -220,62 +220,6 @@ export const ReportPageNavigation = ({
   );
 };
 
-export const ReportDataTimestamps = ({
-  recordDateLabel,
-  fetchedAtLabel,
-  treasurySource,
-}: {
-  recordDateLabel: string;
-  fetchedAtLabel: string;
-  treasurySource: string;
-}) => (
-  <Collapsible.Root className="weather-panel px-4 py-4">
-    <Collapsible.Trigger
-      type="button"
-      className="group inline-flex min-h-[44px] w-full items-center justify-between gap-2 text-xs font-semibold tracking-[0.1em] text-slate-200 transition-colors hover:text-slate-100 touch-manipulation"
-    >
-      Data timestamps
-      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-300 transition-transform duration-200 group-data-[panel-open]:rotate-180">
-        <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
-          <path
-            d="M7 10l5 5 5-5"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </span>
-    </Collapsible.Trigger>
-    <Collapsible.Panel className="mt-3 text-sm text-slate-300">
-      <dl className="space-y-3">
-        <div className="flex items-center justify-between gap-3">
-          <dt className="text-slate-400">Record date</dt>
-          <dd className="mono text-slate-100">{recordDateLabel}</dd>
-        </div>
-        <div className="flex items-center justify-between gap-3">
-          <dt className="text-slate-400">Fetched at</dt>
-          <dd className="mono text-slate-100">{fetchedAtLabel}</dd>
-        </div>
-        <div className="flex items-center justify-between gap-3">
-          <dt className="text-slate-400">Source</dt>
-          <dd>
-            <a
-              href={treasurySource}
-              target="_blank"
-              rel="noreferrer"
-              className="touch-target inline-flex min-h-[44px] items-center text-xs text-slate-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 touch-manipulation"
-            >
-              US Treasury Fiscal Data API
-            </a>
-          </dd>
-        </div>
-      </dl>
-    </Collapsible.Panel>
-  </Collapsible.Root>
-);
-
 export const ReportInterpretationNotes = () => (
   <Collapsible.Root>
     <Collapsible.Trigger

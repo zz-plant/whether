@@ -36,12 +36,9 @@ const ReportGroup = ({
   children: ReactNode;
 }) => (
   <section aria-label={title} className="space-y-6">
-    <div className="weather-panel space-y-2 px-5 py-4">
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-        Section guide
-      </p>
-      <p className="text-lg font-semibold text-slate-100 sm:text-xl">{title}</p>
-      <p className="text-sm text-slate-300">{description}</p>
+    <div className="sr-only">
+      <h2>{title}</h2>
+      <p>{description}</p>
     </div>
     <div className="space-y-10">{children}</div>
   </section>
@@ -192,12 +189,6 @@ export default async function HomePage({
               Start with posture; open signals only if needed.
             </p>
           </div>
-          <a
-            href="#weekly-action-summary"
-            className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-          >
-            Go to actions →
-          </a>
         </div>
         <div className="grid gap-3 lg:grid-cols-[1.4fr,0.6fr]">
           <div className="weather-surface space-y-3 p-4">

@@ -5,13 +5,11 @@
 import { Children, type ReactNode, isValidElement } from "react";
 import { DisplayGuardian } from "./displayGuardian";
 import {
-  ReportDataTimestamps,
   ReportMobileNavigation,
   ReportPageNavigation,
   type ReportPageLink,
   type ReportSectionLink,
 } from "./reportShellNavigation";
-import { ReportSummaryTabs } from "./reportSummaryTabs";
 
 export const ReportShell = ({
   children,
@@ -192,11 +190,6 @@ export const ReportShell = ({
               </nav>
             ) : null}
 
-            <ReportDataTimestamps
-              recordDateLabel={recordDateLabel}
-              fetchedAtLabel={fetchedAtLabel}
-              treasurySource={treasurySource}
-            />
           </aside>
 
           <div className="order-1 space-y-10 lg:order-none lg:space-y-12">
@@ -225,18 +218,9 @@ export const ReportShell = ({
                       <span>{pageSummary}</span>
                       {summaryLink}
                     </p>
+                    <span className="sr-only">Signals stamped {recordDateLabel}</span>
                   </>
                 )}
-              </div>
-              <div className="weather-surface weather-quick-glance flex flex-col gap-2 px-4 py-3 sm:hidden">
-                <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">
-                  Quick glance
-                </p>
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-2xl font-semibold text-slate-100">{statusLabel}</span>
-                </div>
-                <p className="text-xs text-slate-300">Signals stamped {recordDateLabel}</p>
-                <p className="text-xs text-slate-300">Confidence: {trustStatusLabel}</p>
               </div>
               <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
                 <a
@@ -263,17 +247,6 @@ export const ReportShell = ({
                 ) : null}
               </div>
             </section>
-
-            <div className="space-y-4">
-              <ReportSummaryTabs
-                statusLabel={statusLabel}
-                recordDateLabel={recordDateLabel}
-                trustStatusLabel={trustStatusLabel}
-                trustStatusDetail={trustStatusDetail}
-                trustStatusAction={trustStatusAction}
-                trustToneStyles={trustToneStyles}
-              />
-            </div>
 
             <div className="space-y-12">
               {contentSections.map((section, index) => {
