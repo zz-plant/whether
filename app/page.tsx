@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { resolveTimeMachineSelection, parseTimeMachineRequest } from "../lib/timeMachine/timeMachineSelection";
 import { loadReportData } from "../lib/report/reportData";
 import { siteUrl } from "../lib/siteUrl";
@@ -24,6 +25,27 @@ const regimeLabels = {
   VOLATILE: "Volatile",
   EXPANSION: "Expansion",
 } as const;
+
+const ReportGroup = ({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description: string;
+  children: ReactNode;
+}) => (
+  <section aria-label={title} className="space-y-6">
+    <div className="weather-panel space-y-2 px-5 py-4">
+      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+        Section guide
+      </p>
+      <p className="text-lg font-semibold text-slate-100 sm:text-xl">{title}</p>
+      <p className="text-sm text-slate-300">{description}</p>
+    </div>
+    <div className="space-y-10">{children}</div>
+  </section>
+);
 
 export const generateMetadata = ({
   searchParams,
@@ -214,37 +236,53 @@ export default async function HomePage({
         </div>
       </section>
 
-      <ExecutiveSnapshotPanel
-        treasury={treasury}
-        assessment={assessment}
-        provenance={treasuryProvenance}
-      />
+      <ReportGroup
+        title="Leadership readout"
+        description="Confirm the live signal health, then scan the executive snapshot for the week’s guardrails."
+      >
+        <ExecutiveSnapshotPanel
+          treasury={treasury}
+          assessment={assessment}
+          provenance={treasuryProvenance}
+        />
 
-      <ChangeSinceLastReadPanel
-        assessment={assessment}
-        recordDate={treasury.record_date}
-        provenance={treasuryProvenance}
-      />
+        <ChangeSinceLastReadPanel
+          assessment={assessment}
+          recordDate={treasury.record_date}
+          provenance={treasuryProvenance}
+        />
+      </ReportGroup>
 
-      <WeeklyActionSummaryPanel
-        assessment={assessment}
-        provenance={treasuryProvenance}
-        recordDateLabel={recordDateLabel}
-      />
+      <ReportGroup
+        title="Action priorities"
+        description="Lock posture, pick the weekly bet, and align on the constraints before you dig deeper."
+      >
+        <WeeklyActionSummaryPanel
+          assessment={assessment}
+          provenance={treasuryProvenance}
+          recordDateLabel={recordDateLabel}
+        />
 
-      <RegimeSummaryPanel assessment={assessment} provenance={treasuryProvenance} />
+        <RegimeSummaryPanel assessment={assessment} provenance={treasuryProvenance} />
+      </ReportGroup>
 
-      <RegimeChangeAlertPanel alert={regimeAlert} provenance={treasuryProvenance} />
+      <ReportGroup
+        title="Alert center"
+        description="Review new regime alerts first, then scan the recent alert log for context."
+      >
+        <RegimeChangeAlertPanel alert={regimeAlert} provenance={treasuryProvenance} />
 
-      <RegimeAlertsPanel />
+        <RegimeAlertsPanel />
+      </ReportGroup>
 
-      <section className="mt-10">
+      <ReportGroup
+        title="Deep dive signals"
+        description="Use these references when you need the full scoring detail and signal breakdown."
+      >
         <RegimeAssessmentCard assessment={assessment} provenance={treasuryProvenance} />
-      </section>
 
-      <section className="mt-10">
         <SignalMatrixPanel assessment={assessment} provenance={treasuryProvenance} />
-      </section>
+      </ReportGroup>
     </ReportShell>
   );
 }
