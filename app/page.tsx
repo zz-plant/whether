@@ -19,13 +19,6 @@ import { reportPageLinks } from "../lib/report/reportNavigation";
 
 export const runtime = "edge";
 
-const regimeLabels = {
-  SCARCITY: "Scarcity",
-  DEFENSIVE: "Defensive",
-  VOLATILE: "Volatile",
-  EXPANSION: "Expansion",
-} as const;
-
 const ReportGroup = ({
   title,
   description,
@@ -106,7 +99,6 @@ export default async function HomePage({
     { href: "#weekly-action-summary", label: "This week's actions" },
     { href: "#regime-summary", label: "Market climate summary" },
     { href: "#regime-alerts", label: "New alerts" },
-    { href: "#regime-alert-log", label: "Alert history" },
     { href: "#regime-assessment", label: "What the scores mean" },
     { href: "#signal-matrix", label: "Signal breakdown" },
   ];
@@ -134,7 +126,6 @@ export default async function HomePage({
     treasury,
     treasuryProvenance,
   } = await loadReportData(searchParams);
-  const regimeLabel = regimeLabels[assessment.regime];
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
   const trustStatusLabel = historicalSelection
     ? "Historical snapshot"
@@ -166,7 +157,6 @@ export default async function HomePage({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Weekly briefing"
       pageSummary="A quick pulse on the week’s regime and the moves it hints at."
-      pageSummaryLink={{ href: "#weekly-action-summary", label: "Explore details →" }}
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
       structuredData={JSON.stringify(structuredData)}
@@ -176,57 +166,6 @@ export default async function HomePage({
         ) : null
       }
     >
-      <section className="weather-panel space-y-4 px-5 py-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">
-              Weekly flow
-            </p>
-            <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-              Decisions at a glance.
-            </h2>
-            <p className="text-sm text-slate-300">
-              Start with posture; open signals only if needed.
-            </p>
-          </div>
-        </div>
-        <div className="grid gap-3 lg:grid-cols-[1.4fr,0.6fr]">
-          <div className="weather-surface space-y-3 p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              Posture now
-            </p>
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="inline-flex items-center rounded-full border border-sky-400/40 bg-sky-500/10 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-sky-100">
-                {regimeLabel}
-              </span>
-              <span className="text-xs text-slate-300">
-                Tightness <span className="mono text-slate-100">{assessment.scores.tightness}</span>
-                /100
-              </span>
-              <span className="text-xs text-slate-300">
-                Risk appetite{" "}
-                <span className="mono text-slate-100">{assessment.scores.riskAppetite}</span>/100
-              </span>
-              <span className="text-xs text-slate-400">Confidence {trustStatusLabel}</span>
-            </div>
-            <p className="text-sm text-slate-300">{assessment.description}</p>
-          </div>
-          <div className="weather-surface space-y-3 p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              Top actions
-            </p>
-            <ul className="space-y-2 text-sm text-slate-200">
-              {assessment.constraints.slice(0, 3).map((constraint) => (
-                <li key={constraint} className="flex items-start gap-2">
-                  <span className="mt-1 h-1.5 w-1.5 rounded-full bg-sky-400" aria-hidden="true" />
-                  <span>{constraint}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </section>
-
       <ReportGroup
         title="Leadership readout"
         description="Confirm the live signal health, then scan the executive snapshot for the week’s guardrails."
