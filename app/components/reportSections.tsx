@@ -1316,44 +1316,45 @@ export const BeginnerGlossaryPanel = () => {
   );
 };
 
-export const OperatorRequestsPanel = ({ provenance }: { provenance: DataProvenance }) => (
-  <section
-    id="operator-requests"
-    aria-labelledby="operator-requests-title"
-    className="mt-10 weather-panel p-6"
-  >
-    <div className="flex flex-wrap items-center justify-between gap-4">
-      <div>
-        <p className="type-label text-slate-400">Post-MVP demand</p>
-        <h3 id="operator-requests-title" className="type-section text-slate-100">
-          Operator request backlog
-        </h3>
-      </div>
-      <DataProvenanceStrip provenance={provenance} />
-    </div>
-    <p className="mt-3 max-w-3xl type-data text-slate-300">
-      These are the most common expansion requests expected after launch. Delivered items are
-      labeled and the remaining backlog keeps traceable data sources and plain-English operational
-      guidance front and center.
-    </p>
-    <div className="mt-6 grid gap-4 md:grid-cols-2">
-      {operatorRequests.map((request) => (
-        <div
-          key={request.title}
-          className="weather-surface rounded-2xl px-4 py-4"
-        >
-          <div className="flex items-center justify-between gap-3">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">{request.title}</p>
-            <span className="weather-pill px-2 py-1 text-xs font-semibold tracking-[0.12em] text-slate-400">
-              {request.status === "DELIVERED" ? "Delivered" : "Backlog"}
-            </span>
-          </div>
-          <p className="mt-2 text-sm text-slate-200">{request.description}</p>
+export const OperatorRequestsPanel = ({ provenance }: { provenance: DataProvenance }) => {
+  const backlogRequests = operatorRequests.filter((request) => request.status === "BACKLOG");
+
+  return (
+    <section
+      id="operator-requests"
+      aria-labelledby="operator-requests-title"
+      className="mt-10 weather-panel p-6"
+    >
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <p className="type-label text-slate-400">Post-MVP demand</p>
+          <h3 id="operator-requests-title" className="type-section text-slate-100">
+            Operator request backlog
+          </h3>
         </div>
-      ))}
-    </div>
-  </section>
-);
+        <DataProvenanceStrip provenance={provenance} />
+      </div>
+      <p className="mt-3 max-w-3xl type-data text-slate-300">
+        These are the most common expansion requests expected after launch, curated to highlight
+        what remains outstanding while keeping traceable data sources and plain-English operational
+        guidance front and center.
+      </p>
+      <div className="mt-6 grid gap-4 md:grid-cols-2">
+        {backlogRequests.map((request) => (
+          <div
+            key={request.title}
+            className="weather-surface rounded-2xl px-4 py-4"
+          >
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+              {request.title}
+            </p>
+            <p className="mt-2 text-sm text-slate-200">{request.description}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+};
 
 export const CxoFunctionPanel = ({ provenance }: { provenance: DataProvenance }) => (
   <section
