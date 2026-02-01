@@ -528,7 +528,7 @@ export const WeeklyActionSummaryPanel = ({
                 Regime: {regimeLabel}
               </span>
               <span className="weather-pill-muted inline-flex min-h-[32px] items-center px-3 py-1">
-                Strategy: problem/ROI fit
+                Strategy: tool-need fit
               </span>
               <span className="weather-pill-muted inline-flex min-h-[32px] items-center px-3 py-1">
                 Macro: cash + risk appetite
