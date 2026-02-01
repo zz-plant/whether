@@ -454,19 +454,19 @@ export const WeeklyActionSummaryPanel = ({
           <div className="grid gap-6 lg:grid-cols-[1.35fr,0.65fr]">
             <div className="space-y-4">
               <div>
-                <p className="type-label text-slate-400">What should I do this week?</p>
+                <p className="type-label text-slate-400">This week</p>
                 <h2 id="weekly-action-summary-title" className="type-section text-slate-100">
-                  Weekly action control room
+                  Weekly action map
                 </h2>
                 <p className="mt-3 text-sm text-slate-200">
-                  Use the flow below to set posture and scope fast. Then skim the{" "}
+                  Set posture fast, then skim the{" "}
                   <a
                     href="#executive-snapshot"
                     className="touch-target inline-flex min-h-[44px] items-center text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-slate-50 touch-manipulation"
                   >
                     leadership summary
                   </a>{" "}
-                  for source signals.
+                  for sources.
                 </p>
                 <div className="mt-4">
                   <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">
@@ -501,7 +501,7 @@ export const WeeklyActionSummaryPanel = ({
               </div>
             <div className="rounded-2xl border border-sky-400/40 bg-slate-950/60 p-4">
               <p className="text-xs font-semibold tracking-[0.18em] text-sky-200">
-                Primary recommendation
+                Recommended posture
               </p>
               <p className="mt-2 text-lg font-semibold text-slate-100">
                 Operate in {regimeLabel} mode.
@@ -509,9 +509,7 @@ export const WeeklyActionSummaryPanel = ({
               <p className="mt-2 text-sm text-slate-200">{actionGuidance}</p>
             </div>
             <div className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-4">
-              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                What changed since last read
-              </p>
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Since last read</p>
               <p className="mt-2 text-sm text-slate-200">
                 View the delta snapshot before you lock weekly decisions.{" "}
                 <a

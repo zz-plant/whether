@@ -164,23 +164,23 @@ export default async function HomePage({
               Weekly flow
             </p>
             <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-              Decision-ready, fast.
+              Decisions at a glance.
             </h2>
             <p className="text-sm text-slate-300">
-              Start with posture, then open signals only if needed.
+              Start with posture; open signals only if needed.
             </p>
           </div>
           <a
             href="#weekly-action-summary"
             className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
           >
-            Weekly action summary →
+            Go to actions →
           </a>
         </div>
         <div className="grid gap-3 lg:grid-cols-[1.4fr,0.6fr]">
           <div className="weather-surface space-y-3 p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              Posture snapshot
+              Posture now
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <span className="inline-flex items-center rounded-full border border-sky-400/40 bg-sky-500/10 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-sky-100">
@@ -200,7 +200,7 @@ export default async function HomePage({
           </div>
           <div className="weather-surface space-y-3 p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              Actions
+              Top actions
             </p>
             <ul className="space-y-2 text-sm text-slate-200">
               {assessment.constraints.slice(0, 3).map((constraint) => (
