@@ -48,12 +48,14 @@ import { insightDatabase } from "../../data/recommendations";
 import {
   buildSparkline,
   CLIMATE_ORDER,
+  clampToRange,
   formatDelta,
   formatNumber,
   getRegimeAccent,
   getRegimeBadge,
   getRegimeLabel,
   mapToPercent,
+  regimeBadges,
 } from "./reportSectionUtils";
 
 const TermHelp = ({ term, description }: { term: string; description: string }) => (
