@@ -123,6 +123,10 @@ of how organization and product artifacts map to capital climates.
 - `data/snapshot_fallback.json`: offline snapshot with source and timestamps.
 - `data/macro_snapshot.json`: expanded macro series snapshot.
 
+## Architecture reference
+For a system-level overview of data flow, modules, and extension points, see
+`docs/architecture.md`.
+
 ### Scoring (MVP)
 - Tightness score (0–100):
   - Base rate > 5% adds 90
