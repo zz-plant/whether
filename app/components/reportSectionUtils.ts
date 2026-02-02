@@ -23,7 +23,7 @@ export const formatDelta = (value: number | null, unit: string) => {
 
 export const CLIMATE_ORDER = ["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"] as const;
 
-const clampToRange = (value: number, min: number, max: number) =>
+export const clampToRange = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max);
 
 export const mapToPercent = (value: number, min: number, max: number) => {
@@ -86,7 +86,7 @@ export const getRegimeLabel = (regime: RegimeAssessment["regime"]) => {
   }
 };
 
-const regimeBadges = [
+export const regimeBadges = [
   {
     key: "SCARCITY",
     label: "Survival",

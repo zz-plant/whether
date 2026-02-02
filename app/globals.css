@@ -394,6 +394,7 @@ summary:focus-visible {
   @apply rounded-[24px] border border-slate-800/80 bg-slate-950/95 backdrop-blur-2xl;
   box-shadow: 0 20px 40px -32px rgba(2, 6, 23, 0.85);
   overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 @media (prefers-reduced-motion: reduce) {
