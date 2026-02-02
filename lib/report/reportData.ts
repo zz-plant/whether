@@ -21,88 +21,8 @@ import {
 } from "../timeMachine/timeMachineSelection";
 import { macroSeries } from "../macroSnapshot";
 import { parseThresholdsFromSearchParams } from "../thresholds";
-
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
-  dateStyle: "medium",
-  timeZone: "UTC",
-});
-const timestampFormatter = new Intl.DateTimeFormat("en-US", {
-  dateStyle: "medium",
-  timeStyle: "short",
-  timeZone: "UTC",
-});
-
-const formatDateValue = (value: string) => {
-  const date = new Date(value);
-  return Number.isNaN(date.valueOf()) ? value : dateFormatter.format(date);
-};
-
-const formatTimestampValue = (value: string) => {
-  const date = new Date(value);
-  return Number.isNaN(date.valueOf()) ? value : timestampFormatter.format(date);
-};
-
-const formatAgeLabel = (value: string | null, now: Date) => {
-  if (!value) {
-    return "—";
-  }
-  const timestamp = new Date(value);
-  if (Number.isNaN(timestamp.valueOf())) {
-    return "—";
-  }
-  const hours = Math.max(0, Math.round((now.getTime() - timestamp.getTime()) / 36e5));
-  return `${hours}h.`;
-};
-
-const formatScore = (value: number) => value.toFixed(0);
-
-const buildRegimeAlert = (
-  current: ReturnType<typeof evaluateRegime>,
-  previous: ReturnType<typeof evaluateRegime>,
-  currentRecordDate: string,
-  previousRecordDate: string
-) => {
-  const tightnessThreshold = current.thresholds.tightnessRegime;
-  const riskThreshold = current.thresholds.riskAppetiteRegime;
-  const wasTight = previous.scores.tightness > tightnessThreshold;
-  const isTight = current.scores.tightness > tightnessThreshold;
-  const wasBrave = previous.scores.riskAppetite > riskThreshold;
-  const isBrave = current.scores.riskAppetite > riskThreshold;
-  const regimeChanged = current.regime !== previous.regime;
-  const thresholdCrossed = wasTight !== isTight || wasBrave !== isBrave;
-  const reasons: string[] = [];
-
-  if (!regimeChanged && !thresholdCrossed) {
-    return null;
-  }
-
-  if (wasTight !== isTight) {
-    reasons.push(
-      `Tightness moved ${isTight ? "above" : "below"} ${formatScore(tightnessThreshold)}.`
-    );
-  }
-  if (wasBrave !== isBrave) {
-    reasons.push(
-      `Risk appetite moved ${isBrave ? "above" : "below"} ${formatScore(riskThreshold)}.`
-    );
-  }
-  if (reasons.length === 0) {
-    reasons.push(
-      `Market climate shifted as tightness (${formatScore(previous.scores.tightness)} → ${formatScore(current.scores.tightness)}) ` +
-        `and risk appetite (${formatScore(previous.scores.riskAppetite)} → ${formatScore(current.scores.riskAppetite)}) moved across boundaries.`
-    );
-  }
-
-  return {
-    changed: regimeChanged,
-    currentRegime: current.regime,
-    previousRegime: previous.regime,
-    currentRecordDate,
-    previousRecordDate,
-    reasons,
-    summary: `Market climate moved from ${previous.regime} to ${current.regime}.`,
-  };
-};
+import { formatAgeHours, formatDateUTC, formatTimestampUTC } from "../formatters";
+import { buildRegimeAlert } from "./reportFormatting";
 
 export type ReportSearchParams = {
   month?: string;
@@ -136,9 +56,9 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
     treasuryPromise,
     liveTreasuryPromise ?? treasuryPromise,
   ]);
-  const recordDateLabel = formatDateValue(treasury.record_date);
-  const fetchedAtLabel = formatTimestampValue(treasury.fetched_at);
-  const treasuryAgeLabel = formatAgeLabel(treasury.fetched_at, now);
+  const recordDateLabel = formatDateUTC(treasury.record_date);
+  const fetchedAtLabel = formatTimestampUTC(treasury.fetched_at);
+  const treasuryAgeLabel = formatAgeHours(treasury.fetched_at, now);
   const sensors = buildSensorReadings(treasury);
   const assessment = evaluateRegime(treasury, thresholds);
   const liveAssessment = historicalSelection ? evaluateRegime(liveTreasury, thresholds) : null;
@@ -165,12 +85,12 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
   };
   const macroTimestamp = macroSeries[0]?.fetched_at ?? treasury.fetched_at;
   const macroRecordDate = macroSeries[0]?.record_date ?? treasury.record_date;
-  const macroAgeLabel = formatAgeLabel(macroTimestamp, now);
+  const macroAgeLabel = formatAgeHours(macroTimestamp, now);
   const macroProvenance = {
     sourceLabel: "FRED & US Treasury",
     sourceUrl: macroSeries[0]?.sourceUrl,
-    recordDateLabel: formatDateValue(macroRecordDate),
-    timestampLabel: formatTimestampValue(macroTimestamp),
+    recordDateLabel: formatDateUTC(macroRecordDate),
+    timestampLabel: formatTimestampUTC(macroTimestamp),
     ageLabel: macroAgeLabel,
     statusLabel: historicalSelection
       ? "Simulated (low)"

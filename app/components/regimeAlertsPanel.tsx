@@ -4,29 +4,12 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { formatDateUTC, formatTimestampUTC } from "../../lib/formatters";
 import { useClipboardCopy } from "./useClipboardCopy";
 import { regimeAlertsStorageKey, type RegimeAlertLogEntry } from "./regimeAlertsStorage";
 
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
-  dateStyle: "medium",
-  timeStyle: "short",
-  timeZone: "UTC",
-});
-
-const recordFormatter = new Intl.DateTimeFormat("en-US", {
-  dateStyle: "medium",
-  timeZone: "UTC",
-});
-
-const formatTimestamp = (value: string) => {
-  const parsed = new Date(value);
-  return Number.isNaN(parsed.valueOf()) ? value : dateFormatter.format(parsed);
-};
-
-const formatRecordDate = (value: string) => {
-  const parsed = new Date(value);
-  return Number.isNaN(parsed.valueOf()) ? value : recordFormatter.format(parsed);
-};
+const formatTimestamp = (value: string) => formatTimestampUTC(value);
+const formatRecordDate = (value: string) => formatDateUTC(value);
 
 const buildAlertCopyText = (entry: RegimeAlertLogEntry) => {
   const { previous, current, reasons, loggedAt } = entry;

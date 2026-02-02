@@ -19,58 +19,16 @@ import { MonthlySummaryCard } from "../../components/monthlySummaryCard";
 import { QuarterlySummaryCard } from "../../components/quarterlySummaryCard";
 import { WeeklySummaryCard } from "../../components/weeklySummaryCard";
 import { YearlySummaryCard } from "../../components/yearlySummaryCard";
-
-const monthOptions = [
-  { value: 1, label: "January" },
-  { value: 2, label: "February" },
-  { value: 3, label: "March" },
-  { value: 4, label: "April" },
-  { value: 5, label: "May" },
-  { value: 6, label: "June" },
-  { value: 7, label: "July" },
-  { value: 8, label: "August" },
-  { value: 9, label: "September" },
-  { value: 10, label: "October" },
-  { value: 11, label: "November" },
-  { value: 12, label: "December" },
-];
-
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
-  dateStyle: "medium",
-  timeZone: "UTC",
-});
-
-const formatDate = (value: string) => {
-  const date = new Date(value);
-  return Number.isNaN(date.valueOf()) ? value : dateFormatter.format(date);
-};
-
-const formatMonthInput = (value: string) => {
-  const date = new Date(value);
-  if (Number.isNaN(date.valueOf())) {
-    return undefined;
-  }
-  const year = date.getUTCFullYear();
-  const month = date.getUTCMonth() + 1;
-  return `${year}-${String(month).padStart(2, "0")}`;
-};
-
-const parseMonthInput = (value: string) => {
-  const [yearPart, monthPart] = value.split("-");
-  const year = Number(yearPart);
-  const month = Number(monthPart);
-  if (
-    !yearPart ||
-    !monthPart ||
-    Number.isNaN(year) ||
-    Number.isNaN(month) ||
-    month < 1 ||
-    month > 12
-  ) {
-    return null;
-  }
-  return { year, month };
-};
+import {
+  formatCurve,
+  formatDateLabel,
+  formatDelta,
+  formatMonthInput,
+  formatPercent,
+  formatScore,
+  monthOptions,
+  parseMonthInput,
+} from "./timeMachineUtils";
 
 type TimeMachinePanelProps = {
   selectedYear: number;
@@ -151,11 +109,11 @@ export const TimeMachinePanel = ({
   const coverageLabel =
     cacheCoverage.earliest && cacheCoverage.latest
       ? {
-          earliest: formatDate(cacheCoverage.earliest),
-          latest: formatDate(cacheCoverage.latest),
+          earliest: formatDateLabel(cacheCoverage.earliest),
+          latest: formatDateLabel(cacheCoverage.latest),
         }
       : null;
-  const latestRecordLabel = formatDate(latestRecordDate);
+  const latestRecordLabel = formatDateLabel(latestRecordDate);
   const selectedLabel = `${requestedMonthLabel} ${year}`;
   const showHistoricalCallout = isHistorical && historicalSummary;
   const showComparison = Boolean(isHistorical && comparison);
@@ -187,15 +145,6 @@ export const TimeMachinePanel = ({
   const [calendarYear, setCalendarYear] = useState(year);
   const calendarMonths = monthsByYear[calendarYear] ?? [];
 
-  const formatPercent = (value: number) => `${value.toFixed(2)}%`;
-  const formatScore = (value: number) => value.toFixed(0);
-  const formatDelta = (thenValue: number, nowValue: number, unit = "") => {
-    const delta = nowValue - thenValue;
-    const sign = delta > 0 ? "+" : "";
-    return `${sign}${delta.toFixed(2)}${unit}`;
-  };
-  const formatCurve = (value: number | null) =>
-    value === null ? "—" : `${value.toFixed(2)}%`;
   const cadenceOptions = ["weekly", "monthly", "quarterly", "yearly"] as const;
 
   const buildProvenanceTooltip = (
@@ -391,8 +340,8 @@ export const TimeMachinePanel = ({
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="type-label text-slate-400">Then vs now</p>
               <p className="text-xs text-slate-500">
-                Then: {formatDate(comparison.then.recordDate)} · Now:{" "}
-                {formatDate(comparison.now.recordDate)}
+                Then: {formatDateLabel(comparison.then.recordDate)} · Now:{" "}
+                {formatDateLabel(comparison.now.recordDate)}
               </p>
             </div>
             <div className="mt-3 grid gap-3 md:grid-cols-2">
@@ -715,7 +664,7 @@ export const TimeMachinePanel = ({
                         <p className="type-label text-slate-400">{label}</p>
                         <p className="mt-2 text-sm text-slate-200">
                           As of{" "}
-                          <time dateTime={entry.asOf}>{formatDate(entry.asOf)}</time>
+                          <time dateTime={entry.asOf}>{formatDateLabel(entry.asOf)}</time>
                         </p>
                       </div>
                       <span
