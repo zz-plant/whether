@@ -8,6 +8,7 @@ import { Field } from "@base-ui/react/field";
 import { Select } from "@base-ui/react/select";
 import type { Route } from "next";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { formatDateUTC } from "../../../lib/formatters";
 
 type AssumptionOption<T extends string> = {
   value: T;
@@ -78,21 +79,7 @@ const parseOption = <T extends string>(
   options: AssumptionOption<T>[]
 ): T | null => options.find((option) => option.value === value)?.value ?? null;
 
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
-  dateStyle: "medium",
-  timeZone: "UTC",
-});
-
-const formatDate = (value: string | null) => {
-  if (!value) {
-    return null;
-  }
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.valueOf())) {
-    return value;
-  }
-  return dateFormatter.format(parsed);
-};
+const formatDate = (value: string | null) => (value ? formatDateUTC(value) : null);
 
 export const AssumptionLockPanel = () => {
   const [riskPosture, setRiskPosture] = useState<RiskPosture>("BALANCED");

@@ -7,6 +7,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import { buildRegimeChangeReasons } from "../../lib/regimeEngine";
+import { formatDateUTC } from "../../lib/formatters";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
 import { regimeAlertsStorageKey, type RegimeAlertLogEntry } from "./regimeAlertsStorage";
 
@@ -18,15 +19,7 @@ type LastReadSnapshot = {
 
 const storageKey = "whether.lastReadSnapshot";
 
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
-  dateStyle: "medium",
-  timeZone: "UTC",
-});
-
-const formatDate = (value: string) => {
-  const date = new Date(value);
-  return Number.isNaN(date.valueOf()) ? value : dateFormatter.format(date);
-};
+const formatDate = (value: string) => formatDateUTC(value);
 
 const formatDelta = (thenValue: number, nowValue: number, unit = "") => {
   const delta = nowValue - thenValue;

@@ -24,7 +24,6 @@ import type {
   SensorCategory,
   SensorReading,
   SensorTimeWindow,
-  SeriesHistoryPoint,
   TreasuryData,
 } from "../../lib/types";
 import {
@@ -40,51 +39,22 @@ import { operatorRequests } from "../../lib/operatorRequests";
 import { buildMonthlySummary, getMonthlyActionGuidance } from "../../lib/summary/monthlySummary";
 import { buildWeeklySummary, getWeeklyActionGuidance } from "../../lib/summary/weeklySummary";
 import { buildCadenceAlignment } from "../../lib/cadenceAlignment";
+import { formatDateUTC, formatTimestampUTC } from "../../lib/formatters";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
 import { MonthlySummaryCard } from "./monthlySummaryCard";
 import { SummaryDeltaPanel } from "./summaryDeltaPanel";
 import { WeeklySummaryCard } from "./weeklySummaryCard";
 import { insightDatabase } from "../../data/recommendations";
-
-const numberFormatter = new Intl.NumberFormat("en-US", {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-});
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
-  dateStyle: "medium",
-  timeZone: "UTC",
-});
-const timestampFormatter = new Intl.DateTimeFormat("en-US", {
-  dateStyle: "medium",
-  timeStyle: "short",
-  timeZone: "UTC",
-});
-const CLIMATE_ORDER = ["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"] as const;
-
-const formatTimestamp = (iso: string) => {
-  const date = new Date(iso);
-  return Number.isNaN(date.valueOf()) ? iso : timestampFormatter.format(date);
-};
-
-const formatDate = (value: string) => {
-  const date = new Date(value);
-  return Number.isNaN(date.valueOf()) ? value : dateFormatter.format(date);
-};
-
-const formatNumber = (value: number | null, unit: string) => {
-  if (value === null || Number.isNaN(value)) {
-    return "—";
-  }
-  return `${numberFormatter.format(value)}${unit}`;
-};
-
-const formatDelta = (value: number | null, unit: string) => {
-  if (value === null || Number.isNaN(value)) {
-    return "—";
-  }
-  const sign = value > 0 ? "+" : "";
-  return `${sign}${numberFormatter.format(value)}${unit}`;
-};
+import {
+  buildSparkline,
+  CLIMATE_ORDER,
+  formatDelta,
+  formatNumber,
+  getRegimeAccent,
+  getRegimeBadge,
+  getRegimeLabel,
+  mapToPercent,
+} from "./reportSectionUtils";
 
 const TermHelp = ({ term, description }: { term: string; description: string }) => (
   <Tooltip.Root>
@@ -106,54 +76,6 @@ const TermHelp = ({ term, description }: { term: string; description: string }) 
   </Tooltip.Root>
 );
 
-const clampToRange = (value: number, min: number, max: number) =>
-  Math.min(Math.max(value, min), max);
-
-const mapToPercent = (value: number, min: number, max: number) => {
-  const clamped = clampToRange(value, min, max);
-  return ((clamped - min) / (max - min)) * 100;
-};
-
-const SPARKLINE_WIDTH = 160;
-const SPARKLINE_HEIGHT = 40;
-const SPARKLINE_PADDING = 4;
-
-const buildSparkline = (history?: SeriesHistoryPoint[]) => {
-  const points = (history ?? [])
-    .filter((point): point is { date: string; value: number } => typeof point.value === "number")
-    .map((point) => ({ value: point.value }));
-
-  if (points.length === 0) {
-    return null;
-  }
-
-  const normalizedPoints = points.length === 1 ? [points[0], points[0]] : points;
-  const values = normalizedPoints.map((point) => point.value);
-  const minValue = Math.min(...values);
-  const maxValue = Math.max(...values);
-  const range = maxValue - minValue || 1;
-  const innerWidth = SPARKLINE_WIDTH - SPARKLINE_PADDING * 2;
-  const innerHeight = SPARKLINE_HEIGHT - SPARKLINE_PADDING * 2;
-  const coords = normalizedPoints.map((point, index) => {
-    const x =
-      SPARKLINE_PADDING + (index / (normalizedPoints.length - 1)) * innerWidth;
-    const y =
-      SPARKLINE_HEIGHT -
-      SPARKLINE_PADDING -
-      ((point.value - minValue) / range) * innerHeight;
-    return { x, y };
-  });
-
-  const path = coords
-    .map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`)
-    .join(" ");
-  const first = coords[0];
-  const last = coords[coords.length - 1];
-  const baseY = SPARKLINE_HEIGHT - SPARKLINE_PADDING;
-  const area = `${path} L ${last.x} ${baseY} L ${first.x} ${baseY} Z`;
-
-  return { path, area };
-};
 
 type SeriesFreshnessProps = {
   label?: string;
@@ -204,13 +126,13 @@ const SeriesFreshnessBadge = ({
         <div className="flex flex-wrap items-center justify-between gap-2">
           <dt className="text-slate-500">Record date</dt>
           <dd className="mono text-slate-200">
-            <time dateTime={recordDate}>{formatDate(recordDate)}</time>
+            <time dateTime={recordDate}>{formatDateUTC(recordDate)}</time>
           </dd>
         </div>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <dt className="text-slate-500">Fetched</dt>
           <dd className="mono text-slate-200">
-            <time dateTime={fetchedAt}>{formatTimestamp(fetchedAt)}</time>
+            <time dateTime={fetchedAt}>{formatTimestampUTC(fetchedAt)}</time>
           </dd>
         </div>
       </dl>
@@ -218,85 +140,6 @@ const SeriesFreshnessBadge = ({
   );
 };
 
-const getRegimeLabel = (regime: RegimeAssessment["regime"]) => {
-  switch (regime) {
-    case "SCARCITY":
-      return "Survival Mode";
-    case "DEFENSIVE":
-      return "Safety Mode";
-    case "VOLATILE":
-      return "Stability Mode";
-    case "EXPANSION":
-      return "Growth Mode";
-    default:
-      return regime;
-  }
-};
-
-const regimeBadges = [
-  {
-    key: "SCARCITY",
-    label: "Survival",
-    description: "Cash is scarce; protect runway and defer bets.",
-    classes: "border-rose-500/60 bg-rose-500/15 text-rose-100",
-  },
-  {
-    key: "DEFENSIVE",
-    label: "Safety",
-    description: "Capital is cautious; prioritize durability and retention.",
-    classes: "border-amber-400/60 bg-amber-400/15 text-amber-100",
-  },
-  {
-    key: "VOLATILE",
-    label: "Stability",
-    description: "Signals are mixed; balance experimentation with controls.",
-    classes: "border-sky-400/60 bg-sky-400/15 text-sky-100",
-  },
-  {
-    key: "EXPANSION",
-    label: "Growth",
-    description: "Risk appetite is open; scale initiatives responsibly.",
-    classes: "border-emerald-400/60 bg-emerald-400/15 text-emerald-100",
-  },
-] as const;
-
-const getRegimeBadge = (regime: RegimeAssessment["regime"]) =>
-  regimeBadges.find((badge) => badge.key === regime);
-
-const getRegimeAccent = (regime: RegimeAssessment["regime"]) => {
-  switch (regime) {
-    case "SCARCITY":
-      return {
-        panel: "from-rose-600/20 via-rose-500/10 to-transparent border-rose-500/40",
-        dot: "bg-rose-500",
-        text: "text-rose-200",
-      };
-    case "DEFENSIVE":
-      return {
-        panel: "from-amber-500/20 via-amber-400/10 to-transparent border-amber-400/40",
-        dot: "bg-amber-400",
-        text: "text-amber-200",
-      };
-    case "VOLATILE":
-      return {
-        panel: "from-sky-500/20 via-sky-400/10 to-transparent border-sky-400/40",
-        dot: "bg-sky-400",
-        text: "text-sky-200",
-      };
-    case "EXPANSION":
-      return {
-        panel: "from-emerald-500/20 via-emerald-400/10 to-transparent border-emerald-400/40",
-        dot: "bg-emerald-400",
-        text: "text-emerald-200",
-      };
-    default:
-      return {
-        panel: "from-slate-700/20 via-slate-600/10 to-transparent border-slate-600/40",
-        dot: "bg-slate-500",
-        text: "text-slate-200",
-      };
-  }
-};
 
 type ActionSummaryBlock = {
   heading: string;
@@ -1963,7 +1806,9 @@ export const ExecutiveSnapshotPanel = ({
             </p>
             <p className="mt-2 text-xs text-slate-500">
               Fetched{" "}
-              <time dateTime={treasury.fetched_at}>{formatTimestamp(treasury.fetched_at)}</time>
+              <time dateTime={treasury.fetched_at}>
+                {formatTimestampUTC(treasury.fetched_at)}
+              </time>
             </p>
             <p className="mt-3 text-xs text-slate-400">{freshnessAction}</p>
             <p className="mt-2 text-xs text-slate-300">
@@ -1979,7 +1824,7 @@ export const ExecutiveSnapshotPanel = ({
                   Snapshot fetched:{" "}
                   <span className="mono">
                     <time dateTime={treasury.fetched_at}>
-                      {formatTimestamp(treasury.fetched_at)}
+                      {formatTimestampUTC(treasury.fetched_at)}
                     </time>
                   </span>
                 </p>
@@ -1988,7 +1833,7 @@ export const ExecutiveSnapshotPanel = ({
                   <span className="mono">
                     {treasury.fallback_at ? (
                       <time dateTime={treasury.fallback_at}>
-                        {formatTimestamp(treasury.fallback_at)}
+                        {formatTimestampUTC(treasury.fallback_at)}
                       </time>
                     ) : (
                       "Unknown"
@@ -2027,7 +1872,7 @@ export const ExecutiveSnapshotPanel = ({
                 </time>{" "}
                 · Fetched{" "}
                 <time dateTime={treasury.fetched_at} className="mono text-slate-100">
-                  {formatTimestamp(treasury.fetched_at)}
+                  {formatTimestampUTC(treasury.fetched_at)}
                 </time>
               </p>
               <Collapsible.Panel className="space-y-2 text-xs text-slate-300">
@@ -2366,7 +2211,7 @@ export const RegimeChangeAlertPanel = ({
                     </p>
                     <p className="mt-2 text-xs text-slate-200">
                       <time dateTime={alert.previousRecordDate}>
-                        {formatDate(alert.previousRecordDate)}
+                        {formatDateUTC(alert.previousRecordDate)}
                       </time>
                     </p>
                     <p className="mt-2 text-xs text-slate-500">
@@ -2379,7 +2224,7 @@ export const RegimeChangeAlertPanel = ({
                     </p>
                     <p className="mt-2 text-xs text-slate-200">
                       <time dateTime={alert.currentRecordDate}>
-                        {formatDate(alert.currentRecordDate)}
+                        {formatDateUTC(alert.currentRecordDate)}
                       </time>
                     </p>
                     <p className="mt-2 text-xs text-slate-500">
@@ -3484,7 +3329,7 @@ export const InsightDatabasePanel = ({
                         Signal: {item.signal}
                       </span>
                       <span className="weather-pill-muted inline-flex items-center px-2 py-1">
-                        Date: {formatDate(item.date)}
+                        Date: {formatDateUTC(item.date)}
                       </span>
                     </div>
                     <div className="mt-3 flex flex-wrap gap-2">

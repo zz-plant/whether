@@ -9,27 +9,7 @@ import {
   parseTimeMachineRequest,
   resolveTimeMachineSelection,
 } from "../../../lib/timeMachine/timeMachineSelection";
-
-const dateFormatter = new Intl.DateTimeFormat("en-US", {
-  dateStyle: "medium",
-  timeZone: "UTC",
-});
-
-const timestampFormatter = new Intl.DateTimeFormat("en-US", {
-  dateStyle: "medium",
-  timeStyle: "short",
-  timeZone: "UTC",
-});
-
-const formatDateValue = (value: string) => {
-  const date = new Date(value);
-  return Number.isNaN(date.valueOf()) ? value : dateFormatter.format(date);
-};
-
-const formatTimestampValue = (value: string) => {
-  const date = new Date(value);
-  return Number.isNaN(date.valueOf()) ? value : timestampFormatter.format(date);
-};
+import { formatDateUTC, formatTimestampUTC } from "../../../lib/formatters";
 
 const formatRateValue = (value: number | null) => {
   if (typeof value !== "number") {
@@ -90,8 +70,8 @@ export async function GET(request: Request) {
     : await fetchTreasuryData({ snapshotFallback: snapshotData });
 
   const assessment = evaluateRegime(treasury);
-  const recordDateLabel = formatDateValue(treasury.record_date);
-  const fetchedAtLabel = formatTimestampValue(treasury.fetched_at);
+  const recordDateLabel = formatDateUTC(treasury.record_date);
+  const fetchedAtLabel = formatTimestampUTC(treasury.fetched_at);
   const baseRateLabel = formatRateValue(assessment.scores.baseRate);
   const slopeLabel = formatRateValue(assessment.scores.curveSlope);
 
