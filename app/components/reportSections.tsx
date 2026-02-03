@@ -3152,12 +3152,17 @@ export const InsightDatabasePanel = ({
                   />
                 </Field.Root>
                 <Field.Root className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                  <Field.Label nativeLabel={false}>Climate</Field.Label>
+                  <Field.Label id="evidence-climate-label" nativeLabel={false}>
+                    Climate
+                  </Field.Label>
                   <Select.Root
                     value={selectedClimate}
                     onValueChange={(value) => setSelectedClimate(value as string)}
                   >
-                    <Select.Trigger className="mt-2 flex min-h-[44px] w-full items-center justify-between rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-sm text-slate-100">
+                    <Select.Trigger
+                      aria-labelledby="evidence-climate-label"
+                      className="mt-2 flex min-h-[44px] w-full items-center justify-between rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+                    >
                       <Select.Value placeholder="All climates" />
                       <Select.Icon className="text-slate-400">
                         <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
@@ -3200,12 +3205,17 @@ export const InsightDatabasePanel = ({
                   </Select.Root>
                 </Field.Root>
                 <Field.Root className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                  <Field.Label nativeLabel={false}>Signal</Field.Label>
+                  <Field.Label id="evidence-signal-label" nativeLabel={false}>
+                    Signal
+                  </Field.Label>
                   <Select.Root
                     value={selectedSignal}
                     onValueChange={(value) => setSelectedSignal(value as string)}
                   >
-                    <Select.Trigger className="mt-2 flex min-h-[44px] w-full items-center justify-between rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-sm text-slate-100">
+                    <Select.Trigger
+                      aria-labelledby="evidence-signal-label"
+                      className="mt-2 flex min-h-[44px] w-full items-center justify-between rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+                    >
                       <Select.Value placeholder="All signals" />
                       <Select.Icon className="text-slate-400">
                         <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
@@ -3276,11 +3286,17 @@ export const InsightDatabasePanel = ({
                 </p>
               </div>
               <div className="mt-4">
-                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Tags</p>
+                <p
+                  id="evidence-tags-label"
+                  className="text-xs font-semibold tracking-[0.12em] text-slate-400"
+                >
+                  Tags
+                </p>
                 <ToggleGroup
                   value={selectedTags}
                   onValueChange={(value) => setSelectedTags(value as string[])}
                   multiple
+                  aria-labelledby="evidence-tags-label"
                   className="mt-2 flex flex-wrap gap-2"
                 >
                   {tagOptions.map((tag) => (
@@ -3387,12 +3403,21 @@ export const InsightDatabasePanel = ({
             </div>
             <div className="mt-4 overflow-x-auto overscroll-contain">
               <table className="min-w-full text-left text-sm text-slate-300">
+                <caption className="sr-only">{fossilRecord.title} comparison table</caption>
                 <thead className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                   <tr>
-                    <th className="px-3 py-2">{fossilRecord.columns.domain}</th>
-                    <th className="px-3 py-2">{fossilRecord.columns.lowRateArtifact}</th>
-                    <th className="px-3 py-2">{fossilRecord.columns.highRateArtifact}</th>
-                    <th className="px-3 py-2">{fossilRecord.columns.insight}</th>
+                    <th scope="col" className="px-3 py-2">
+                      {fossilRecord.columns.domain}
+                    </th>
+                    <th scope="col" className="px-3 py-2">
+                      {fossilRecord.columns.lowRateArtifact}
+                    </th>
+                    <th scope="col" className="px-3 py-2">
+                      {fossilRecord.columns.highRateArtifact}
+                    </th>
+                    <th scope="col" className="px-3 py-2">
+                      {fossilRecord.columns.insight}
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
