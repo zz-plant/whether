@@ -89,10 +89,13 @@ export const ReportShell = ({
   const hasSidebar = sidebarVariant === "full";
   const overviewPanel = (
     <section className="weather-panel space-y-3 px-4 py-4">
-      <p className="text-xs font-semibold tracking-[0.16em] text-slate-400">Overview</p>
-      <p className="text-base font-semibold text-slate-100">{pageTitle}</p>
-      <p className="text-sm text-slate-300">{pageSummary}</p>
-      <p className="text-xs text-slate-400">Updated {fetchedAtLabel}</p>
+      <p className="text-xs font-semibold tracking-[0.16em] text-slate-400">Snapshot</p>
+      <div className="space-y-2 text-sm text-slate-200">
+        <p className="font-semibold text-slate-100">Status: {statusLabel}</p>
+        <p className="text-slate-300">Signals stamped {recordDateLabel}.</p>
+        <p className="text-slate-300">Updated {fetchedAtLabel}.</p>
+        <p className="text-slate-300">Source: {treasurySource}.</p>
+      </div>
     </section>
   );
   const confidencePanel = (
@@ -123,70 +126,6 @@ export const ReportShell = ({
         </ul>
       </nav>
     ) : null;
-  const forecastGlanceCards = [
-    {
-      title: "Forecast",
-      value: statusLabel,
-      detail: `Signals stamped ${recordDateLabel}.`,
-      icon: (
-        <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
-          <path
-            d="M5 14.5a5.5 5.5 0 0 1 10.8-2A4 4 0 1 1 17.5 20H8.2A4.7 4.7 0 0 1 5 14.5Z"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M8.5 9a3.5 3.5 0 0 1 6 2"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          />
-        </svg>
-      ),
-    },
-    {
-      title: "Visibility",
-      value: trustStatusLabel,
-      detail: showOfflineBadge ? offlineBadgeLabel : "Live signal clarity.",
-      icon: (
-        <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
-          <path
-            d="M2.5 12s3.8-6 9.5-6 9.5 6 9.5 6-3.8 6-9.5 6-9.5-6-9.5-6Z"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-          />
-          <circle cx="12" cy="12" r="2.8" fill="none" stroke="currentColor" strokeWidth="1.5" />
-        </svg>
-      ),
-    },
-    {
-      title: "Observatory",
-      value: treasurySource,
-      detail: `Updated ${fetchedAtLabel}.`,
-      icon: (
-        <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
-          <path
-            d="M6 18h12M8 18v-5.5a4 4 0 1 1 8 0V18"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          />
-          <path
-            d="M9 10.5 6.5 8m8 2.5 2.5-2.5M12 6.5V4"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          />
-        </svg>
-      ),
-    },
-  ];
   return (
     <>
       <a
@@ -200,15 +139,15 @@ export const ReportShell = ({
         tabIndex={-1}
         className="weather-shell relative min-h-screen text-slate-100"
       >
-      {structuredData ? (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: structuredData }}
-        />
-      ) : null}
-      <DisplayGuardian />
-      <div className="pointer-events-none absolute inset-0 weather-grid" aria-hidden="true" />
-      <div className="mx-auto max-w-7xl pb-[calc(env(safe-area-inset-bottom)+12rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)] pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)] sm:pb-12 sm:pt-6 sm:pl-[calc(env(safe-area-inset-left)+1.5rem)] sm:pr-[calc(env(safe-area-inset-right)+1.5rem)]">
+        {structuredData ? (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: structuredData }}
+          />
+        ) : null}
+        <DisplayGuardian />
+        <div className="pointer-events-none absolute inset-0 weather-grid" aria-hidden="true" />
+        <div className="mx-auto max-w-7xl pb-[calc(env(safe-area-inset-bottom)+12rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)] pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)] sm:pb-12 sm:pt-6 sm:pl-[calc(env(safe-area-inset-left)+1.5rem)] sm:pr-[calc(env(safe-area-inset-right)+1.5rem)]">
         <header className="weather-appbar sticky top-[calc(env(safe-area-inset-top)+0.75rem)] z-20 px-4 py-4 sm:top-4 sm:px-6 sm:py-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
@@ -235,15 +174,6 @@ export const ReportShell = ({
                 <p className="text-sm font-semibold text-slate-100">Market Climate Station</p>
                 <p className="text-xs text-slate-400 sm:hidden">Signals refreshed {fetchedAtLabel}</p>
               </div>
-            </div>
-            <div className="flex flex-col items-start gap-1 text-[9px] font-semibold tracking-[0.16em] text-slate-300 sm:items-end sm:text-xs sm:tracking-[0.14em]">
-              <span className="rounded-full border border-slate-800/70 px-3 py-1">
-                Status: {statusLabel}
-              </span>
-              <span className="text-[10px] font-semibold tracking-[0.16em] text-slate-400">
-                Data: {trustStatusLabel}
-                {showOfflineBadge ? ` · ${offlineBadgeLabel}` : ""}
-              </span>
             </div>
           </div>
           <ReportPageNavigation
@@ -318,25 +248,6 @@ export const ReportShell = ({
                     {exportCta.label}
                   </a>
                 ) : null}
-              </div>
-              <div
-                className="weather-forecast-strip mt-4"
-                aria-label="Forecast glance cards"
-              >
-                {forecastGlanceCards.map((card) => (
-                  <div key={card.title} className="weather-forecast-card">
-                    <span className="weather-forecast-icon" aria-hidden="true">
-                      {card.icon}
-                    </span>
-                    <div className="space-y-1">
-                      <p className="text-[10px] font-semibold tracking-[0.24em] text-slate-400">
-                        {card.title}
-                      </p>
-                      <p className="text-sm font-semibold text-slate-100">{card.value}</p>
-                      <p className="text-xs text-slate-400">{card.detail}</p>
-                    </div>
-                  </div>
-                ))}
               </div>
             </section>
 
