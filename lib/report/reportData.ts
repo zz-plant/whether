@@ -31,14 +31,17 @@ export type ReportSearchParams = {
 };
 
 export const loadReportData = async (searchParams?: ReportSearchParams) => {
+  const liveFetcher: typeof fetch = (input, init) =>
+    fetch(input, { ...init, cache: "no-store" });
   const historicalSelection = resolveTimeMachineSelection(searchParams);
   const requestedSelection = parseTimeMachineRequest(searchParams);
   const treasuryPromise = fetchTreasuryData({
+    fetcher: liveFetcher,
     snapshotFallback: snapshotData,
     asOf: historicalSelection?.asOf,
   });
   const liveTreasuryPromise = historicalSelection
-    ? fetchTreasuryData({ snapshotFallback: snapshotData })
+    ? fetchTreasuryData({ snapshotFallback: snapshotData, fetcher: liveFetcher })
     : null;
   const now = new Date();
   const latestCache = getLatestTimeMachineSnapshot();

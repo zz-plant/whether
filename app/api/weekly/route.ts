@@ -3,7 +3,8 @@ import { loadReportData } from "../../../lib/report/reportData";
 import { buildSummaryHash } from "../../../lib/summary/summaryHash";
 import { buildWeeklySummary } from "../../../lib/summary/weeklySummary";
 
-export const revalidate = 3600;
+export const revalidate = 0;
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   const { assessment, treasuryProvenance, recordDateLabel } = await loadReportData();
