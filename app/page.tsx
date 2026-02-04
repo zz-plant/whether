@@ -18,6 +18,7 @@ import { ReportShell } from "./components/reportShell";
 import { reportPageLinks } from "../lib/report/reportNavigation";
 
 export const runtime = "edge";
+export const dynamic = "force-dynamic";
 
 const ReportGroup = ({
   title,
