@@ -90,12 +90,24 @@ export const ReportShell = ({
   const overviewPanel = (
     <section className="weather-panel space-y-3 px-4 py-4">
       <p className="text-xs font-semibold tracking-[0.16em] text-slate-400">Snapshot</p>
-      <div className="space-y-2 text-sm text-slate-200">
-        <p className="font-semibold text-slate-100">Status: {statusLabel}</p>
-        <p className="text-slate-300">Signals stamped {recordDateLabel}.</p>
-        <p className="text-slate-300">Updated {fetchedAtLabel}.</p>
-        <p className="text-slate-300">Source: {treasurySource}.</p>
-      </div>
+      <dl className="grid gap-2 text-xs text-slate-300">
+        <div className="flex items-center justify-between gap-3">
+          <dt className="text-slate-400">Status</dt>
+          <dd className="font-semibold text-slate-100">{statusLabel}</dd>
+        </div>
+        <div className="flex items-center justify-between gap-3">
+          <dt className="text-slate-400">Signals stamped</dt>
+          <dd className="text-slate-200">{recordDateLabel}</dd>
+        </div>
+        <div className="flex items-center justify-between gap-3">
+          <dt className="text-slate-400">Updated</dt>
+          <dd className="text-slate-200">{fetchedAtLabel}</dd>
+        </div>
+        <div className="flex items-center justify-between gap-3">
+          <dt className="text-slate-400">Source</dt>
+          <dd className="text-slate-200">{treasurySource}</dd>
+        </div>
+      </dl>
     </section>
   );
   const confidencePanel = (
@@ -104,8 +116,8 @@ export const ReportShell = ({
         Confidence
       </p>
       <p className="text-sm font-semibold text-slate-100">{trustStatusLabel}</p>
-      <p className="text-xs text-slate-200/90">{trustStatusDetail}</p>
-      <p className="text-xs text-slate-200/80">{trustStatusAction}</p>
+      <p className="text-xs leading-relaxed text-slate-200/90">{trustStatusDetail}</p>
+      <p className="text-xs leading-relaxed text-slate-200/80">{trustStatusAction}</p>
     </section>
   );
   const sectionsNav =
@@ -206,7 +218,7 @@ export const ReportShell = ({
                     <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
                       {pageTitle}
                     </h1>
-                    <p className="flex max-w-2xl flex-wrap items-center gap-x-2 gap-y-1 text-sm text-slate-200 sm:text-base">
+                    <p className="flex max-w-2xl flex-wrap items-center gap-x-2 gap-y-1 text-sm leading-relaxed text-slate-200 sm:text-base">
                       <span>{pageSummary}</span>
                       {summaryLink}
                     </p>
@@ -217,7 +229,7 @@ export const ReportShell = ({
                       Whether report
                     </p>
                     <h1 className="type-headline text-slate-100">{pageTitle}</h1>
-                    <p className="flex max-w-2xl flex-wrap items-center gap-x-2 gap-y-1 text-sm text-slate-200 sm:text-base">
+                    <p className="flex max-w-2xl flex-wrap items-center gap-x-2 gap-y-1 text-sm leading-relaxed text-slate-200 sm:text-base">
                       <span>{pageSummary}</span>
                       {summaryLink}
                     </p>
