@@ -123,6 +123,70 @@ export const ReportShell = ({
         </ul>
       </nav>
     ) : null;
+  const forecastGlanceCards = [
+    {
+      title: "Forecast",
+      value: statusLabel,
+      detail: `Signals stamped ${recordDateLabel}.`,
+      icon: (
+        <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+          <path
+            d="M5 14.5a5.5 5.5 0 0 1 10.8-2A4 4 0 1 1 17.5 20H8.2A4.7 4.7 0 0 1 5 14.5Z"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M8.5 9a3.5 3.5 0 0 1 6 2"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          />
+        </svg>
+      ),
+    },
+    {
+      title: "Visibility",
+      value: trustStatusLabel,
+      detail: showOfflineBadge ? offlineBadgeLabel : "Live signal clarity.",
+      icon: (
+        <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+          <path
+            d="M2.5 12s3.8-6 9.5-6 9.5 6 9.5 6-3.8 6-9.5 6-9.5-6-9.5-6Z"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          />
+          <circle cx="12" cy="12" r="2.8" fill="none" stroke="currentColor" strokeWidth="1.5" />
+        </svg>
+      ),
+    },
+    {
+      title: "Observatory",
+      value: treasurySource,
+      detail: `Updated ${fetchedAtLabel}.`,
+      icon: (
+        <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+          <path
+            d="M6 18h12M8 18v-5.5a4 4 0 1 1 8 0V18"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          />
+          <path
+            d="M9 10.5 6.5 8m8 2.5 2.5-2.5M12 6.5V4"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          />
+        </svg>
+      ),
+    },
+  ];
   return (
     <>
       <a
@@ -254,6 +318,25 @@ export const ReportShell = ({
                     {exportCta.label}
                   </a>
                 ) : null}
+              </div>
+              <div
+                className="weather-forecast-strip mt-4"
+                aria-label="Forecast glance cards"
+              >
+                {forecastGlanceCards.map((card) => (
+                  <div key={card.title} className="weather-forecast-card">
+                    <span className="weather-forecast-icon" aria-hidden="true">
+                      {card.icon}
+                    </span>
+                    <div className="space-y-1">
+                      <p className="text-[10px] font-semibold tracking-[0.24em] text-slate-400">
+                        {card.title}
+                      </p>
+                      <p className="text-sm font-semibold text-slate-100">{card.value}</p>
+                      <p className="text-xs text-slate-400">{card.detail}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </section>
 
