@@ -173,7 +173,7 @@ const ActionSummaryPanel = ({
       <h2 id={`${id}-title`} className="type-section text-slate-100">
         {title}
       </h2>
-      <p className="text-sm text-slate-200">{description}</p>
+      <p className="max-w-3xl text-sm leading-relaxed text-slate-300/90">{description}</p>
       {summaryCard}
       <div className="grid gap-3 md:grid-cols-2">
         {blocks.map((block) => (
