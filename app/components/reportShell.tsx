@@ -84,7 +84,6 @@ export const ReportShell = ({
       {pageSummaryLink.label}
     </a>
   ) : null;
-
   return (
     <>
       <a
