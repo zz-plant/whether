@@ -157,6 +157,7 @@ export default async function HomePage({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Weekly briefing"
       pageSummary="A quick pulse on the week’s regime and the moves it hints at."
+      sidebarVariant="hidden"
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
       structuredData={JSON.stringify(structuredData)}
