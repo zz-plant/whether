@@ -30,6 +30,7 @@ export const ReportShell = ({
   offlineBadgeLabel = "Cached snapshot",
   heroVariant = "full",
   pageNavVariant = "full",
+  sidebarVariant = "full",
   primaryCta = { href: "#weekly-action-summary", label: "Start with this week" },
   secondaryCta = { href: "#executive-snapshot", label: "See leadership summary" },
   exportCta = {
@@ -57,6 +58,7 @@ export const ReportShell = ({
   offlineBadgeLabel?: string;
   heroVariant?: "full" | "compact";
   pageNavVariant?: "full" | "compact";
+  sidebarVariant?: "full" | "hidden";
   primaryCta?: { href: string; label: string };
   secondaryCta?: { href: string; label: string };
   exportCta?: { href: string; label: string } | null;
@@ -84,6 +86,43 @@ export const ReportShell = ({
       {pageSummaryLink.label}
     </a>
   ) : null;
+  const hasSidebar = sidebarVariant === "full";
+  const overviewPanel = (
+    <section className="weather-panel space-y-3 px-4 py-4">
+      <p className="text-xs font-semibold tracking-[0.16em] text-slate-400">Overview</p>
+      <p className="text-base font-semibold text-slate-100">{pageTitle}</p>
+      <p className="text-sm text-slate-300">{pageSummary}</p>
+      <p className="text-xs text-slate-400">Updated {fetchedAtLabel}</p>
+    </section>
+  );
+  const confidencePanel = (
+    <section className={`weather-panel flex flex-col gap-2 px-4 py-4 ${trustToneStyles}`}>
+      <p className={`text-xs font-semibold tracking-[0.16em] ${trustLabelTone}`}>
+        Confidence
+      </p>
+      <p className="text-sm font-semibold text-slate-100">{trustStatusLabel}</p>
+      <p className="text-xs text-slate-200/90">{trustStatusDetail}</p>
+      <p className="text-xs text-slate-200/80">{trustStatusAction}</p>
+    </section>
+  );
+  const sectionsNav =
+    sectionLinks.length > 0 ? (
+      <nav aria-label="Report sections" className="weather-panel px-4 py-4">
+        <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Sections</p>
+        <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
+          {sectionLinks.map((item) => (
+            <li key={item.href}>
+              <a
+                href={item.href}
+                className="weather-pill inline-flex min-h-[44px] w-full items-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    ) : null;
   return (
     <>
       <a
@@ -153,43 +192,14 @@ export const ReportShell = ({
 
         {historicalBanner}
 
-        <div className="mt-6 grid gap-6 lg:grid-cols-[260px,1fr]">
-          <aside className="order-2 space-y-4 lg:order-none lg:sticky lg:top-28 lg:self-start">
-            <section className="weather-panel space-y-3 px-4 py-4">
-              <p className="text-xs font-semibold tracking-[0.16em] text-slate-400">Overview</p>
-              <p className="text-base font-semibold text-slate-100">{pageTitle}</p>
-              <p className="text-sm text-slate-300">{pageSummary}</p>
-              <p className="text-xs text-slate-400">Updated {fetchedAtLabel}</p>
-            </section>
-
-            <section className={`weather-panel flex flex-col gap-2 px-4 py-4 ${trustToneStyles}`}>
-              <p className={`text-xs font-semibold tracking-[0.16em] ${trustLabelTone}`}>
-                Confidence
-              </p>
-              <p className="text-sm font-semibold text-slate-100">{trustStatusLabel}</p>
-              <p className="text-xs text-slate-200/90">{trustStatusDetail}</p>
-              <p className="text-xs text-slate-200/80">{trustStatusAction}</p>
-            </section>
-
-            {sectionLinks.length > 0 ? (
-              <nav aria-label="Report sections" className="weather-panel px-4 py-4">
-                <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Sections</p>
-                <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
-                  {sectionLinks.map((item) => (
-                    <li key={item.href}>
-                      <a
-                        href={item.href}
-                        className="weather-pill inline-flex min-h-[44px] w-full items-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                      >
-                        {item.label}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-            ) : null}
-
-          </aside>
+        <div className={`mt-6 grid gap-6 ${hasSidebar ? "lg:grid-cols-[260px,1fr]" : ""}`}>
+          {hasSidebar ? (
+            <aside className="order-2 space-y-4 lg:order-none lg:sticky lg:top-28 lg:self-start">
+              {overviewPanel}
+              {confidencePanel}
+              {sectionsNav}
+            </aside>
+          ) : null}
 
           <div className="order-1 space-y-10 lg:order-none lg:space-y-12">
             <section className="weather-panel-static space-y-4 px-4 py-5 sm:px-5">
@@ -246,6 +256,16 @@ export const ReportShell = ({
                 ) : null}
               </div>
             </section>
+
+            {!hasSidebar ? (
+              <section className="space-y-4">
+                <div className="grid gap-4 lg:grid-cols-2">
+                  {overviewPanel}
+                  {confidencePanel}
+                </div>
+                {sectionsNav ? <div>{sectionsNav}</div> : null}
+              </section>
+            ) : null}
 
             <div className="space-y-12">
               {contentSections.map((section, index) => {
