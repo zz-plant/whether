@@ -25,6 +25,7 @@ import {
   actionOptions,
   buildShareText,
   categoryOptions,
+  formatOptionLabel,
   lifecycleOptions,
   parseParam,
   verdictStyles,
