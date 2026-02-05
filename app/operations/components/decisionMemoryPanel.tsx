@@ -16,6 +16,7 @@ import { DataProvenanceStrip, type DataProvenance } from "../../components/dataP
 import { createClientId } from "./clientId";
 import {
   buildDecisionTemplate,
+  buildSnapshotLink,
   buildSnapshotText,
   buildStructuredDecisionEntry,
   buildSourceSummary,

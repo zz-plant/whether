@@ -126,7 +126,7 @@ export const buildSnapshotText = (entry: DecisionMemoryEntry) => {
     .join("\n");
 };
 
-const buildSnapshotLink = (entry: DecisionMemoryEntry) => {
+export const buildSnapshotLink = (entry: DecisionMemoryEntry) => {
   if (typeof window === "undefined") {
     return "";
   }

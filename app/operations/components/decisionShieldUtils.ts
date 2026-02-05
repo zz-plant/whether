@@ -43,7 +43,7 @@ export const verdictStyles: Record<DecisionOutput["verdict"], string> = {
   DANGEROUS: "border-rose-400/40 bg-rose-500/10 text-rose-200",
 };
 
-const formatOptionLabel = <T extends string>(
+export const formatOptionLabel = <T extends string>(
   value: T,
   options: { value: T; label: string }[]
 ) => options.find((option) => option.value === value)?.label ?? value;
