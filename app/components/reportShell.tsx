@@ -187,6 +187,24 @@ export const ReportShell = ({
                 <p className="text-xs text-slate-400 sm:hidden">Signals refreshed {fetchedAtLabel}</p>
               </div>
             </div>
+            <div className="hidden flex-wrap items-center gap-2 sm:flex">
+              {exportCta ? (
+                <a
+                  href={exportCta.href}
+                  className="inline-flex min-h-[40px] items-center justify-center rounded-full border border-slate-700/70 px-3 py-2 text-[11px] font-semibold tracking-[0.14em] text-slate-200 transition-colors hover:border-sky-300/80 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                >
+                  {exportCta.label}
+                </a>
+              ) : null}
+              {primaryCta ? (
+                <a
+                  href={primaryCta.href}
+                  className="weather-button-primary inline-flex min-h-[40px] items-center justify-center px-4 py-2 text-[11px] font-semibold tracking-[0.2em] shadow-lg shadow-sky-500/30 ring-1 ring-sky-200/30 transition-colors hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                >
+                  {primaryCta.label}
+                </a>
+              ) : null}
+            </div>
           </div>
           <ReportPageNavigation
             pageLinks={pageLinks}
