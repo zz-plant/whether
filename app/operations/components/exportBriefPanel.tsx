@@ -10,6 +10,7 @@ import { Toast } from "@base-ui/react/toast";
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../../../lib/types";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import { formatNumberValue } from "../../../lib/formatters";
+import { buildAgentPayloadJson, buildAgentPrompt } from "../../../lib/agentHandoff";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 import { useClipboardCopy, type ClipboardCopyState } from "../../components/useClipboardCopy";
 
@@ -250,6 +251,14 @@ export const ExportBriefPanel = ({
     () => buildConstraintHeadlines(assessment, treasury),
     [assessment, treasury]
   );
+  const agentPayload = useMemo(
+    () => buildAgentPayloadJson(assessment, treasury, sensors, macroSeries),
+    [assessment, treasury, sensors, macroSeries]
+  );
+  const agentPrompt = useMemo(
+    () => buildAgentPrompt(assessment, treasury),
+    [assessment, treasury]
+  );
   const mailSubject = encodeURIComponent(`Whether Report — ${treasury.record_date}`);
   const mailBody = encodeURIComponent(briefing);
 
@@ -416,6 +425,76 @@ export const ExportBriefPanel = ({
               readOnly
               value={constraintHeadlines}
               rows={6}
+              className="mt-3 w-full rounded-lg border border-slate-800 bg-slate-950/80 p-3 font-mono text-base text-slate-200 touch-manipulation"
+            />
+          </div>
+        </div>
+        <div className="mt-4 grid gap-4 lg:grid-cols-[1.4fr,1fr]">
+          <div className="weather-surface p-4">
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+              Autonomous agent handoff
+            </p>
+            <p className="mt-3 text-sm text-slate-300">
+              Structured JSON plus a ready-to-use prompt for PM assistants and copilots.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <Button
+                type="button"
+                onClick={() => handleCopy(agentPayload, "Agent JSON payload")}
+                disabled={isCopying}
+                aria-busy={isCopying}
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+              >
+                {isCopying && activeTarget === "Agent JSON payload"
+                  ? "Copying"
+                  : "Copy JSON payload"}
+              </Button>
+              <Button
+                type="button"
+                onClick={() =>
+                  handleDownload(
+                    agentPayload,
+                    `whether-agent-payload-${treasury.record_date}.json`
+                  )
+                }
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+              >
+                Download JSON
+              </Button>
+              <Button
+                type="button"
+                onClick={() => handleCopy(agentPrompt, "Agent prompt")}
+                disabled={isCopying}
+                aria-busy={isCopying}
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+              >
+                {isCopying && activeTarget === "Agent prompt" ? "Copying" : "Copy agent prompt"}
+              </Button>
+              <Button
+                type="button"
+                onClick={() =>
+                  handleDownload(
+                    agentPrompt,
+                    `whether-agent-prompt-${treasury.record_date}.txt`
+                  )
+                }
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+              >
+                Download prompt
+              </Button>
+            </div>
+          </div>
+          <div className="weather-surface p-4">
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+              Agent payload preview
+            </p>
+            <p className="mt-3 text-sm text-slate-300">
+              Keep the JSON intact to preserve provenance and timestamps.
+            </p>
+            <textarea
+              readOnly
+              value={agentPayload}
+              rows={10}
               className="mt-3 w-full rounded-lg border border-slate-800 bg-slate-950/80 p-3 font-mono text-base text-slate-200 touch-manipulation"
             />
           </div>
