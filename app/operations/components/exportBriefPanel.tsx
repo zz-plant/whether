@@ -9,19 +9,13 @@ import { Button } from "@base-ui/react/button";
 import { Toast } from "@base-ui/react/toast";
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../../../lib/types";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
+import { formatNumberValue } from "../../../lib/formatters";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 import { useClipboardCopy, type ClipboardCopyState } from "../../components/useClipboardCopy";
 
-const numberFormatter = new Intl.NumberFormat("en-US", {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-});
-
 const formatNumber = (value: number | null, unit: string) => {
-  if (value === null || Number.isNaN(value)) {
-    return "—";
-  }
-  return `${numberFormatter.format(value)}${unit}`;
+  const formatted = formatNumberValue(value);
+  return formatted === "—" ? formatted : `${formatted}${unit}`;
 };
 
 const buildBrief = (

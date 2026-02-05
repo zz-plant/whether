@@ -1,16 +1,10 @@
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import type { SeriesHistoryPoint } from "../../lib/types";
-
-const numberFormatter = new Intl.NumberFormat("en-US", {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-});
+import { formatNumberValue } from "../../lib/formatters";
 
 export const formatNumber = (value: number | null, unit: string) => {
-  if (value === null || Number.isNaN(value)) {
-    return "—";
-  }
-  return `${numberFormatter.format(value)}${unit}`;
+  const formatted = formatNumberValue(value);
+  return formatted === "—" ? formatted : `${formatted}${unit}`;
 };
 
 export const formatDelta = (value: number | null, unit: string) => {
@@ -18,7 +12,7 @@ export const formatDelta = (value: number | null, unit: string) => {
     return "—";
   }
   const sign = value > 0 ? "+" : "";
-  return `${sign}${numberFormatter.format(value)}${unit}`;
+  return `${sign}${formatNumberValue(value)}${unit}`;
 };
 
 export const CLIMATE_ORDER = ["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"] as const;
