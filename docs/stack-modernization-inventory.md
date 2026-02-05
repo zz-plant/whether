@@ -12,7 +12,7 @@
 - **Linting:** `next lint` via `bun run lint`.
 
 ## Build & deployment pipeline
-- **Primary build entry:** `scripts/build.mjs` chooses `next build` on Vercel or `next-on-pages` elsewhere and rewrites the worker output for Cloudflare Pages.
+- **Primary build entry:** `scripts/build.mjs` chooses `next build` by default, uses `next-on-pages` on Cloudflare Pages (or `BUILD_TARGET=pages`), and rewrites the worker output for Cloudflare Pages.
 - **Cloudflare output wiring:** `wrangler.toml` targets the `.vercel/output/static/_worker.js` output with Node.js compatibility enabled.
 
 ## App Router usage & runtimes
