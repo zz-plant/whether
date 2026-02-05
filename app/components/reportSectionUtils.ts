@@ -31,8 +31,8 @@ export const mapToPercent = (value: number, min: number, max: number) => {
   return ((clamped - min) / (max - min)) * 100;
 };
 
-const SPARKLINE_WIDTH = 160;
-const SPARKLINE_HEIGHT = 40;
+export const SPARKLINE_WIDTH = 160;
+export const SPARKLINE_HEIGHT = 40;
 const SPARKLINE_PADDING = 4;
 
 export const buildSparkline = (history?: SeriesHistoryPoint[]) => {
