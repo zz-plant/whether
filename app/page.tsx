@@ -96,9 +96,9 @@ export default async function HomePage({
   searchParams?: { month?: string; year?: string; [key: string]: string | undefined };
 }) {
   const sectionLinks = [
-    { href: "#executive-snapshot", label: "Leadership summary" },
     { href: "#weekly-action-summary", label: "This week's actions" },
     { href: "#regime-summary", label: "Market climate summary" },
+    { href: "#executive-snapshot", label: "Leadership summary" },
     { href: "#regime-alerts", label: "New alerts" },
     { href: "#regime-assessment", label: "What the scores mean" },
     { href: "#signal-matrix", label: "Signal breakdown" },
@@ -175,6 +175,19 @@ export default async function HomePage({
       }
     >
       <ReportGroup
+        title="Action priorities"
+        description="Lock posture, pick the weekly bet, and align on the constraints before you dig deeper."
+      >
+        <WeeklyActionSummaryPanel
+          assessment={assessment}
+          provenance={treasuryProvenance}
+          recordDateLabel={recordDateLabel}
+        />
+
+        <RegimeSummaryPanel assessment={assessment} provenance={treasuryProvenance} />
+      </ReportGroup>
+
+      <ReportGroup
         title="Leadership readout"
         description="Confirm the live signal health, then scan the executive snapshot for the week’s guardrails."
       >
@@ -189,19 +202,6 @@ export default async function HomePage({
           recordDate={treasury.record_date}
           provenance={treasuryProvenance}
         />
-      </ReportGroup>
-
-      <ReportGroup
-        title="Action priorities"
-        description="Lock posture, pick the weekly bet, and align on the constraints before you dig deeper."
-      >
-        <WeeklyActionSummaryPanel
-          assessment={assessment}
-          provenance={treasuryProvenance}
-          recordDateLabel={recordDateLabel}
-        />
-
-        <RegimeSummaryPanel assessment={assessment} provenance={treasuryProvenance} />
       </ReportGroup>
 
       <ReportGroup

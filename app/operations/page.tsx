@@ -16,7 +16,7 @@ import { OperationsWorkstreamNav } from "./components/operationsWorkstreamNav";
 export const runtime = "edge";
 
 export const metadata: Metadata = {
-  title: "Whether Report — What to do next",
+  title: "Whether Report — Action playbook",
   description:
     "Execution-ready guidance, decision shield validation, and export briefs for the Whether Report.",
 };
@@ -70,7 +70,7 @@ export default async function OperationsPage({
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    name: "Whether Report — What to do next",
+    name: "Whether Report — Action playbook",
     url: `${siteUrl}/operations`,
     description:
       "Execution-ready guidance, decision shield validation, and export briefs for the Whether Report.",
@@ -126,7 +126,7 @@ export default async function OperationsPage({
       trustStatusAction={trustStatusAction}
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
-      pageTitle="What to do next"
+      pageTitle="Action playbook"
       pageSummary="See how the regime turns into plan, decisions, and briefings."
       pageSummaryLink={{ href: "#ops-workstreams", label: "Explore details →" }}
       pageLinks={reportPageLinks}

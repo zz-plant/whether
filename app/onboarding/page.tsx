@@ -12,7 +12,7 @@ import { reportPageLinks } from "../../lib/report/reportNavigation";
 export const runtime = "edge";
 
 export const metadata: Metadata = {
-  title: "Whether Report — Onboarding",
+  title: "Whether Report — Onboarding & glossary",
   description:
     "Get oriented with the Whether Report: a quick guide to reading the signals and a plain-English glossary.",
 };
@@ -48,7 +48,7 @@ export default async function OnboardingPage({
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    name: "Whether Report — Onboarding",
+    name: "Whether Report — Onboarding & glossary",
     url: `${siteUrl}/onboarding`,
     description:
       "Get oriented with the Whether Report: a quick guide to reading the signals and a plain-English glossary.",
@@ -104,7 +104,7 @@ export default async function OnboardingPage({
       trustStatusAction={trustStatusAction}
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
-      pageTitle="Onboarding"
+      pageTitle="Onboarding & glossary"
       pageSummary="Start with the basics, then decode the signals in plain English."
       pageSummaryLink={{ href: "#first-time-guide", label: "Explore details →" }}
       pageLinks={reportPageLinks}

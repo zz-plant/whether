@@ -14,7 +14,7 @@ import { CxoFunctionPanel, HistoricalBanner } from "../../components/reportSecti
 export const runtime = "edge";
 
 export const metadata: Metadata = {
-  title: "Whether Report — Leadership briefings",
+  title: "Whether Report — Action playbook: Briefings",
   description:
     "Strategy narratives, export briefs, and CXO-ready outputs aligned to the current regime.",
 };
@@ -27,7 +27,7 @@ export default async function OperationsBriefingsPage({
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    name: "Whether Report — Leadership briefings",
+    name: "Whether Report — Action playbook: Briefings",
     url: `${siteUrl}/operations/briefings`,
     description:
       "Strategy narratives, export briefs, and CXO-ready outputs aligned to the current regime.",
@@ -84,7 +84,7 @@ export default async function OperationsBriefingsPage({
       trustStatusAction={trustStatusAction}
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
-      pageTitle="What to do next"
+      pageTitle="Action playbook"
       pageSummary="Workstream: briefings. Pull the narrative leaders will ask for."
       pageSummaryLink={{ href: "#ops-strategy-brief", label: "Explore details →" }}
       pageLinks={reportPageLinks}
