@@ -7,23 +7,23 @@ export const reportPageLinks: ReportPageLink[] = [
     description: "Weekly decisions, leadership summary, and climate signals in plain English.",
   },
   {
-    href: "/signals",
-    label: "Why we believe this",
-    description: "See the data sources and how each signal is scored.",
-  },
-  {
     href: "/operations",
-    label: "What to do next",
-    description: "Concrete actions and decision safeguards for your team.",
+    label: "Action playbook",
+    description: "Execution-ready moves, decision guardrails, and briefing kits.",
   },
   {
-    href: "/onboarding",
-    label: "Onboarding",
-    description: "Get oriented with the glossary and a quick guide to reading the report.",
+    href: "/signals",
+    label: "Signal evidence",
+    description: "Live data sources, thresholds, and historical context.",
   },
   {
     href: "/formulas",
-    label: "Sensor formulas",
-    description: "Plain-English methods and source links for each signal.",
+    label: "Methodology",
+    description: "Plain-English formulas and source links for each signal.",
+  },
+  {
+    href: "/onboarding",
+    label: "Onboarding & glossary",
+    description: "Start here for the quick guide and plain-English glossary.",
   },
 ];

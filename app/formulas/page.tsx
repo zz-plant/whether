@@ -5,8 +5,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Sensor Formulas — Whether",
-  description: "Method notes and source links for macro sensor calculations.",
+  title: "Methodology — Whether",
+  description: "Sensor formulas and source links for macro signal calculations.",
 };
 
 const formulaCard = "rounded-2xl border border-slate-800 bg-slate-900/40 p-6";
@@ -159,7 +159,7 @@ export default function FormulasPage() {
       <div className="mx-auto max-w-4xl px-6 py-12">
         <header className="space-y-4">
           <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Method notes</p>
-          <h1 className="text-3xl font-semibold text-slate-100">Sensor formulas</h1>
+          <h1 className="text-3xl font-semibold text-slate-100">Methodology</h1>
           <p className="text-sm text-slate-300">
             Each signal includes a plain-English formula and its direct source. All calculations are
             deterministic and traceable.

@@ -15,7 +15,7 @@ import { reportPageLinks } from "../../lib/report/reportNavigation";
 export const runtime = "edge";
 
 export const metadata: Metadata = {
-  title: "Whether Report — Why we believe this",
+  title: "Whether Report — Signal evidence",
   description:
     "Macro signals, sensor detail, thresholds, and historical context for Whether Market Climate Station.",
 };
@@ -34,7 +34,7 @@ export default async function SignalsPage({
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    name: "Whether Report — Why we believe this",
+    name: "Whether Report — Signal evidence",
     url: `${siteUrl}/signals`,
     description:
       "Macro signals, sensor detail, thresholds, and historical context for Whether Market Climate Station.",
@@ -107,8 +107,8 @@ export default async function SignalsPage({
       trustStatusAction={trustStatusAction}
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
-      pageTitle="Why we believe this"
-      pageSummary="See what’s powering the regime call and how the signals line up."
+      pageTitle="Signal evidence"
+      pageSummary="See the sources and scoring behind the regime call."
       pageSummaryLink={{ href: "#sensor-array", label: "Explore details →" }}
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}

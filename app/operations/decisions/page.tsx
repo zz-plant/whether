@@ -18,7 +18,7 @@ import { OperationsWorkstreamNav } from "../components/operationsWorkstreamNav";
 export const runtime = "edge";
 
 export const metadata: Metadata = {
-  title: "Whether Report — Decision workflows",
+  title: "Whether Report — Action playbook: Decisions",
   description:
     "Assumption locking, decision shields, and counterfactual pressure tests for major bets.",
 };
@@ -31,7 +31,7 @@ export default async function OperationsDecisionsPage({
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    name: "Whether Report — Decision workflows",
+    name: "Whether Report — Action playbook: Decisions",
     url: `${siteUrl}/operations/decisions`,
     description:
       "Assumption locking, decision shields, and counterfactual pressure tests for major bets.",
@@ -85,7 +85,7 @@ export default async function OperationsDecisionsPage({
       trustStatusAction={trustStatusAction}
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
-      pageTitle="What to do next"
+      pageTitle="Action playbook"
       pageSummary="Workstream: decisions. Pressure-test the big bets before they harden."
       pageSummaryLink={{ href: "#ops-decision-shield", label: "Explore details →" }}
       pageLinks={reportPageLinks}
