@@ -284,8 +284,8 @@ export const ReportMobileNavigation = ({
   return (
     <NavigationMenu.Root aria-label="Mobile report navigation" className={className}>
       <Collapsible.Root className="relative">
-        <div className="weather-mobile-nav flex flex-col gap-2 px-3 py-3 min-[420px]:flex-row min-[420px]:items-stretch">
-          <div className="flex min-w-0 flex-1 items-center gap-3 rounded-2xl border border-slate-800/80 bg-slate-950/70 px-3 py-2">
+        <div className="weather-mobile-nav flex flex-col gap-3 px-3 py-3">
+          <div className="flex min-w-0 items-center gap-3 rounded-2xl border border-slate-800/80 bg-slate-950/70 px-3 py-2">
             <span className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl border border-slate-800/80 bg-slate-950/80 text-slate-100">
               {pageLinkIcons[currentLink.label]}
             </span>
@@ -299,61 +299,35 @@ export const ReportMobileNavigation = ({
             </div>
           </div>
 
-          <div className="grid gap-2 min-[420px]:w-[200px] min-[420px]:flex-shrink-0">
-            <div className="grid grid-cols-2 gap-2">
-              {prevLink ? (
-                <a
-                  href={prevLink.href}
-                  aria-label={`Previous page: ${prevLink.label}`}
-                  className="weather-pill inline-flex min-h-[48px] w-full flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/80 px-2 py-2 text-[11px] font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                >
-                  <span aria-hidden="true" className="text-base leading-none text-slate-300">
-                    ←
-                  </span>
-                  <span className="uppercase">Prev</span>
-                </a>
-              ) : (
-                <button
-                  type="button"
-                  aria-disabled="true"
-                  disabled
-                  className="weather-pill pointer-events-none inline-flex min-h-[48px] w-full flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/60 px-2 py-2 text-[11px] font-semibold tracking-[0.16em] text-slate-500/80 opacity-70"
-                >
-                  <span aria-hidden="true" className="text-base leading-none">
-                    ←
-                  </span>
-                  <span className="uppercase">Prev</span>
-                </button>
-              )}
-              {nextLink ? (
-                <a
-                  href={nextLink.href}
-                  aria-label={`Next page: ${nextLink.label}`}
-                  className="weather-pill inline-flex min-h-[48px] w-full flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/80 px-2 py-2 text-[11px] font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                >
-                  <span aria-hidden="true" className="text-base leading-none text-slate-300">
-                    →
-                  </span>
-                  <span className="uppercase">Next</span>
-                </a>
-              ) : (
-                <button
-                  type="button"
-                  aria-disabled="true"
-                  disabled
-                  className="weather-pill pointer-events-none inline-flex min-h-[48px] w-full flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/60 px-2 py-2 text-[11px] font-semibold tracking-[0.16em] text-slate-500/80 opacity-70"
-                >
-                  <span aria-hidden="true" className="text-base leading-none">
-                    →
-                  </span>
-                  <span className="uppercase">Next</span>
-                </button>
-              )}
-            </div>
+          <div className="grid grid-cols-3 gap-2">
+            {prevLink ? (
+              <a
+                href={prevLink.href}
+                aria-label={`Previous page: ${prevLink.label}`}
+                className="weather-pill inline-flex min-h-[48px] w-full flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/80 px-2 py-2 text-[11px] font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+              >
+                <span aria-hidden="true" className="text-base leading-none text-slate-300">
+                  ←
+                </span>
+                <span className="uppercase">Prev</span>
+              </a>
+            ) : (
+              <button
+                type="button"
+                aria-disabled="true"
+                disabled
+                className="weather-pill pointer-events-none inline-flex min-h-[48px] w-full flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/60 px-2 py-2 text-[11px] font-semibold tracking-[0.16em] text-slate-500/80 opacity-70"
+              >
+                <span aria-hidden="true" className="text-base leading-none">
+                  ←
+                </span>
+                <span className="uppercase">Prev</span>
+              </button>
+            )}
 
             <Collapsible.Trigger
               type="button"
-              className="group weather-pill flex min-h-[48px] w-full items-center justify-between gap-3 rounded-2xl border border-slate-800/80 px-3 py-2 text-[11px] font-semibold tracking-[0.18em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+              className="group weather-pill flex min-h-[48px] w-full flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/80 px-2 py-2 text-[11px] font-semibold tracking-[0.18em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
             >
               <span className="inline-flex items-center gap-2 text-slate-100">
                 <span className="transition-transform duration-200 group-data-[panel-open]:rotate-90">
@@ -379,6 +353,31 @@ export const ReportMobileNavigation = ({
                 {sectionCountLabel}
               </span>
             </Collapsible.Trigger>
+
+            {nextLink ? (
+              <a
+                href={nextLink.href}
+                aria-label={`Next page: ${nextLink.label}`}
+                className="weather-pill inline-flex min-h-[48px] w-full flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/80 px-2 py-2 text-[11px] font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+              >
+                <span aria-hidden="true" className="text-base leading-none text-slate-300">
+                  →
+                </span>
+                <span className="uppercase">Next</span>
+              </a>
+            ) : (
+              <button
+                type="button"
+                aria-disabled="true"
+                disabled
+                className="weather-pill pointer-events-none inline-flex min-h-[48px] w-full flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/60 px-2 py-2 text-[11px] font-semibold tracking-[0.16em] text-slate-500/80 opacity-70"
+              >
+                <span aria-hidden="true" className="text-base leading-none">
+                  →
+                </span>
+                <span className="uppercase">Next</span>
+              </button>
+            )}
           </div>
         </div>
 
