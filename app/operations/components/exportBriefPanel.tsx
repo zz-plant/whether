@@ -10,6 +10,7 @@ import { Toast } from "@base-ui/react/toast";
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../../../lib/types";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import { formatNumberValue } from "../../../lib/formatters";
+import { buildAgentPayloadJson, buildAgentPrompt } from "../../../lib/agentHandoff";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 import { useClipboardCopy, type ClipboardCopyState } from "../../components/useClipboardCopy";
 
@@ -149,85 +150,6 @@ const buildSlideBullets = (assessment: RegimeAssessment, macros: MacroSeriesRead
   ].join("\n");
 };
 
-const buildAgentPayload = (
-  assessment: RegimeAssessment,
-  treasury: TreasuryData,
-  sensors: SensorReading[],
-  macros: MacroSeriesReading[]
-) => {
-  const baseRate = sensors.find((sensor) => sensor.id === "BASE_RATE");
-  const curveSlope = sensors.find((sensor) => sensor.id === "CURVE_SLOPE");
-  const regimeLabel = getRegimeLabel(assessment.regime);
-
-  return JSON.stringify(
-    {
-      report_date: treasury.record_date,
-      fetched_at: treasury.fetched_at,
-      source: treasury.source,
-      regime: {
-        key: assessment.regime,
-        label: regimeLabel,
-        description: assessment.description,
-      },
-      scores: assessment.scores,
-      thresholds: assessment.thresholds,
-      constraints: assessment.constraints,
-      data_warnings: assessment.dataWarnings,
-      signals: [
-        {
-          id: baseRate?.id ?? "BASE_RATE",
-          label: baseRate?.label ?? "Policy base rate",
-          value: baseRate?.value ?? null,
-          unit: baseRate?.unit ?? "%",
-          record_date: baseRate?.record_date ?? treasury.record_date,
-          fetched_at: baseRate?.fetched_at ?? treasury.fetched_at,
-          source_url: baseRate?.sourceUrl ?? treasury.source,
-        },
-        {
-          id: curveSlope?.id ?? "CURVE_SLOPE",
-          label: curveSlope?.label ?? "Yield curve slope (10Y - 2Y)",
-          value: curveSlope?.value ?? null,
-          unit: curveSlope?.unit ?? "%",
-          record_date: curveSlope?.record_date ?? treasury.record_date,
-          fetched_at: curveSlope?.fetched_at ?? treasury.fetched_at,
-          source_url: curveSlope?.sourceUrl ?? treasury.source,
-        },
-      ],
-      macro_signals: macros.map((macro) => ({
-        id: macro.id,
-        label: macro.label,
-        value: macro.value,
-        unit: macro.unit,
-        record_date: macro.record_date,
-        fetched_at: macro.fetched_at,
-        source_url: macro.sourceUrl,
-      })),
-      pm_handoff: {
-        decision_focus: "Use constraints to validate roadmap, hiring, and pricing moves.",
-        briefing_actions: [
-          "Summarize the regime in plain English.",
-          "Call out constraints that block or enable new initiatives.",
-          "List open questions for the product manager.",
-        ],
-      },
-    },
-    null,
-    2
-  );
-};
-
-const buildAgentPrompt = (assessment: RegimeAssessment, treasury: TreasuryData) => {
-  return [
-    "You are an autonomous PM assistant.",
-    "Use the JSON payload to draft:",
-    "1) A 3-bullet summary of the market climate.",
-    "2) The top 3 constraints that should shape roadmap decisions.",
-    "3) A short list of questions to confirm with the PM before acting.",
-    "",
-    `Context: Whether Report for ${treasury.record_date} (${assessment.regime}).`,
-  ].join("\n");
-};
-
 const getRegimeLabel = (regime: RegimeAssessment["regime"]) => {
   switch (regime) {
     case "SCARCITY":
@@ -330,7 +252,7 @@ export const ExportBriefPanel = ({
     [assessment, treasury]
   );
   const agentPayload = useMemo(
-    () => buildAgentPayload(assessment, treasury, sensors, macroSeries),
+    () => buildAgentPayloadJson(assessment, treasury, sensors, macroSeries),
     [assessment, treasury, sensors, macroSeries]
   );
   const agentPrompt = useMemo(

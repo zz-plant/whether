@@ -109,6 +109,7 @@ of how organization and product artifacts map to capital climates.
 - **Agent handoff payloads**: structured JSON + prompt exports for autonomous PM assistants (available in Action playbook → Briefings).
 - **Weekly summary API**: `/api/weekly` returns copy-ready weekly action text plus provenance metadata.
 - **Monthly summary API**: `/api/monthly` returns copy-ready monthly action text plus provenance metadata.
+- **Summary APIs**: weekly/monthly responses include an `agentHandoff` payload and prompt for automation.
 
 ## Repo layout (current scaffolding)
 - `lib/regimeEngine.ts`: deterministic scoring + market climate classification core.
