@@ -9,6 +9,11 @@ const timestampFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: "UTC",
 });
 
+const numberFormatter = new Intl.NumberFormat("en-US", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
 export const formatDateUTC = (value: string) => {
   const date = new Date(value);
   return Number.isNaN(date.valueOf()) ? value : dateFormatter.format(date);
@@ -29,6 +34,13 @@ export const formatAgeHours = (value: string | null, now: Date) => {
   }
   const hours = Math.max(0, Math.round((now.getTime() - timestamp.getTime()) / 36e5));
   return `${hours}h.`;
+};
+
+export const formatNumberValue = (value: number | null) => {
+  if (value === null || Number.isNaN(value)) {
+    return "—";
+  }
+  return numberFormatter.format(value);
 };
 
 export const formatScoreValue = (value: number) => value.toFixed(0);
