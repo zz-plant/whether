@@ -149,6 +149,85 @@ const buildSlideBullets = (assessment: RegimeAssessment, macros: MacroSeriesRead
   ].join("\n");
 };
 
+const buildAgentPayload = (
+  assessment: RegimeAssessment,
+  treasury: TreasuryData,
+  sensors: SensorReading[],
+  macros: MacroSeriesReading[]
+) => {
+  const baseRate = sensors.find((sensor) => sensor.id === "BASE_RATE");
+  const curveSlope = sensors.find((sensor) => sensor.id === "CURVE_SLOPE");
+  const regimeLabel = getRegimeLabel(assessment.regime);
+
+  return JSON.stringify(
+    {
+      report_date: treasury.record_date,
+      fetched_at: treasury.fetched_at,
+      source: treasury.source,
+      regime: {
+        key: assessment.regime,
+        label: regimeLabel,
+        description: assessment.description,
+      },
+      scores: assessment.scores,
+      thresholds: assessment.thresholds,
+      constraints: assessment.constraints,
+      data_warnings: assessment.dataWarnings,
+      signals: [
+        {
+          id: baseRate?.id ?? "BASE_RATE",
+          label: baseRate?.label ?? "Policy base rate",
+          value: baseRate?.value ?? null,
+          unit: baseRate?.unit ?? "%",
+          record_date: baseRate?.record_date ?? treasury.record_date,
+          fetched_at: baseRate?.fetched_at ?? treasury.fetched_at,
+          source_url: baseRate?.sourceUrl ?? treasury.source,
+        },
+        {
+          id: curveSlope?.id ?? "CURVE_SLOPE",
+          label: curveSlope?.label ?? "Yield curve slope (10Y - 2Y)",
+          value: curveSlope?.value ?? null,
+          unit: curveSlope?.unit ?? "%",
+          record_date: curveSlope?.record_date ?? treasury.record_date,
+          fetched_at: curveSlope?.fetched_at ?? treasury.fetched_at,
+          source_url: curveSlope?.sourceUrl ?? treasury.source,
+        },
+      ],
+      macro_signals: macros.map((macro) => ({
+        id: macro.id,
+        label: macro.label,
+        value: macro.value,
+        unit: macro.unit,
+        record_date: macro.record_date,
+        fetched_at: macro.fetched_at,
+        source_url: macro.sourceUrl,
+      })),
+      pm_handoff: {
+        decision_focus: "Use constraints to validate roadmap, hiring, and pricing moves.",
+        briefing_actions: [
+          "Summarize the regime in plain English.",
+          "Call out constraints that block or enable new initiatives.",
+          "List open questions for the product manager.",
+        ],
+      },
+    },
+    null,
+    2
+  );
+};
+
+const buildAgentPrompt = (assessment: RegimeAssessment, treasury: TreasuryData) => {
+  return [
+    "You are an autonomous PM assistant.",
+    "Use the JSON payload to draft:",
+    "1) A 3-bullet summary of the market climate.",
+    "2) The top 3 constraints that should shape roadmap decisions.",
+    "3) A short list of questions to confirm with the PM before acting.",
+    "",
+    `Context: Whether Report for ${treasury.record_date} (${assessment.regime}).`,
+  ].join("\n");
+};
+
 const getRegimeLabel = (regime: RegimeAssessment["regime"]) => {
   switch (regime) {
     case "SCARCITY":
@@ -248,6 +327,14 @@ export const ExportBriefPanel = ({
   );
   const constraintHeadlines = useMemo(
     () => buildConstraintHeadlines(assessment, treasury),
+    [assessment, treasury]
+  );
+  const agentPayload = useMemo(
+    () => buildAgentPayload(assessment, treasury, sensors, macroSeries),
+    [assessment, treasury, sensors, macroSeries]
+  );
+  const agentPrompt = useMemo(
+    () => buildAgentPrompt(assessment, treasury),
     [assessment, treasury]
   );
   const mailSubject = encodeURIComponent(`Whether Report — ${treasury.record_date}`);
@@ -416,6 +503,76 @@ export const ExportBriefPanel = ({
               readOnly
               value={constraintHeadlines}
               rows={6}
+              className="mt-3 w-full rounded-lg border border-slate-800 bg-slate-950/80 p-3 font-mono text-base text-slate-200 touch-manipulation"
+            />
+          </div>
+        </div>
+        <div className="mt-4 grid gap-4 lg:grid-cols-[1.4fr,1fr]">
+          <div className="weather-surface p-4">
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+              Autonomous agent handoff
+            </p>
+            <p className="mt-3 text-sm text-slate-300">
+              Structured JSON plus a ready-to-use prompt for PM assistants and copilots.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-3">
+              <Button
+                type="button"
+                onClick={() => handleCopy(agentPayload, "Agent JSON payload")}
+                disabled={isCopying}
+                aria-busy={isCopying}
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+              >
+                {isCopying && activeTarget === "Agent JSON payload"
+                  ? "Copying"
+                  : "Copy JSON payload"}
+              </Button>
+              <Button
+                type="button"
+                onClick={() =>
+                  handleDownload(
+                    agentPayload,
+                    `whether-agent-payload-${treasury.record_date}.json`
+                  )
+                }
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+              >
+                Download JSON
+              </Button>
+              <Button
+                type="button"
+                onClick={() => handleCopy(agentPrompt, "Agent prompt")}
+                disabled={isCopying}
+                aria-busy={isCopying}
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+              >
+                {isCopying && activeTarget === "Agent prompt" ? "Copying" : "Copy agent prompt"}
+              </Button>
+              <Button
+                type="button"
+                onClick={() =>
+                  handleDownload(
+                    agentPrompt,
+                    `whether-agent-prompt-${treasury.record_date}.txt`
+                  )
+                }
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+              >
+                Download prompt
+              </Button>
+            </div>
+          </div>
+          <div className="weather-surface p-4">
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+              Agent payload preview
+            </p>
+            <p className="mt-3 text-sm text-slate-300">
+              Keep the JSON intact to preserve provenance and timestamps.
+            </p>
+            <textarea
+              readOnly
+              value={agentPayload}
+              rows={10}
               className="mt-3 w-full rounded-lg border border-slate-800 bg-slate-950/80 p-3 font-mono text-base text-slate-200 touch-manipulation"
             />
           </div>

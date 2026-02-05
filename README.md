@@ -106,6 +106,7 @@ of how organization and product artifacts map to capital climates.
 - **Fail gracefully** if the API is down or blocked.
 - **Market climate thresholds**: adjustable via URL parameters with audit trail visibility.
 - **Export briefs**: copy-ready Slack/email text and print-to-PDF support.
+- **Agent handoff payloads**: structured JSON + prompt exports for autonomous PM assistants (available in Action playbook → Briefings).
 - **Weekly summary API**: `/api/weekly` returns copy-ready weekly action text plus provenance metadata.
 - **Monthly summary API**: `/api/monthly` returns copy-ready monthly action text plus provenance metadata.
 
