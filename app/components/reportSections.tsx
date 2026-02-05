@@ -3087,14 +3087,6 @@ export const InsightDatabasePanel = ({
     setDateRange({ start: "", end: "" });
     setSelectedTags([]);
   };
-  const hasActiveFilters =
-    searchQuery.trim().length > 0 ||
-    selectedClimate !== "all" ||
-    selectedSignal !== "all" ||
-    dateRange.start !== "" ||
-    dateRange.end !== "" ||
-    selectedTags.length > 0;
-
   return (
     <section id="insight-database" aria-labelledby="insight-database-title" className="mt-10">
       <div className="weather-panel p-6">
@@ -3135,9 +3127,7 @@ export const InsightDatabasePanel = ({
                 <button
                   type="button"
                   onClick={clearFilters}
-                  disabled={!hasActiveFilters}
-                  aria-disabled={!hasActiveFilters}
-                  className="text-xs font-semibold tracking-[0.12em] text-slate-300 underline decoration-slate-500 underline-offset-4 transition-opacity hover:text-slate-100 disabled:cursor-not-allowed disabled:text-slate-600 disabled:opacity-60"
+                  className="text-xs font-semibold tracking-[0.12em] text-slate-300 underline decoration-slate-500 underline-offset-4 transition-opacity hover:text-slate-100"
                 >
                   Clear filters
                 </button>
