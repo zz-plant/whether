@@ -56,6 +56,8 @@ import {
   getRegimeLabel,
   mapToPercent,
   regimeBadges,
+  SPARKLINE_HEIGHT,
+  SPARKLINE_WIDTH,
 } from "./reportSectionUtils";
 
 const TermHelp = ({ term, description }: { term: string; description: string }) => (
