@@ -14,22 +14,27 @@ const numberFormatter = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 2,
 });
 
-export const formatDateUTC = (value: string) => {
+const parseDateValue = (value: string) => {
   const date = new Date(value);
-  return Number.isNaN(date.valueOf()) ? value : dateFormatter.format(date);
+  return Number.isNaN(date.valueOf()) ? null : date;
 };
 
-export const formatTimestampUTC = (value: string) => {
-  const date = new Date(value);
-  return Number.isNaN(date.valueOf()) ? value : timestampFormatter.format(date);
+const formatDateValue = (value: string, formatter: Intl.DateTimeFormat) => {
+  const date = parseDateValue(value);
+  return date ? formatter.format(date) : value;
 };
+
+export const formatDateUTC = (value: string) => formatDateValue(value, dateFormatter);
+
+export const formatTimestampUTC = (value: string) =>
+  formatDateValue(value, timestampFormatter);
 
 export const formatAgeHours = (value: string | null, now: Date) => {
   if (!value) {
     return "—";
   }
-  const timestamp = new Date(value);
-  if (Number.isNaN(timestamp.valueOf())) {
+  const timestamp = parseDateValue(value);
+  if (!timestamp) {
     return "—";
   }
   const hours = Math.max(0, Math.round((now.getTime() - timestamp.getTime()) / 36e5));
