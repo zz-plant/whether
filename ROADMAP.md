@@ -127,3 +127,15 @@ Audit notes for Milestones 5–8 live in `docs/roadmap-audit.md`.
 - Every output is traceable to a public source and includes timestamps.
 - Operators can copy/paste a defensible, plain‑English decision rationale.
 - Offline mode is explicit and safe.
+
+---
+
+## Acquisition readiness (Reforge)
+Track these items to present Whether as a Reforge-grade operating system.
+- [ ] Executive brief CTA is primary in the Overview header.
+- [ ] Weekly/monthly briefing APIs are stable and copy-ready with citations.
+- [ ] Insight Database includes precedent case studies per regime.
+- [ ] Decision Memory logs are immutable and exportable.
+- [ ] Role-based presets ship for CFO/COO/CTO/CPO workflows.
+- [ ] Source health panel surfaces stale or failed data feeds.
+- [ ] Live macro fetchers replace snapshot-only CPI/unemployment/BBB inputs.
