@@ -160,126 +160,154 @@ export const ReportShell = ({
         <DisplayGuardian />
         <div className="pointer-events-none absolute inset-0 weather-grid" aria-hidden="true" />
         <div className="mx-auto max-w-7xl pb-[calc(env(safe-area-inset-bottom)+12rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)] pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)] sm:pb-12 sm:pt-6 sm:pl-[calc(env(safe-area-inset-left)+1.5rem)] sm:pr-[calc(env(safe-area-inset-right)+1.5rem)]">
-        <header className="weather-appbar sticky top-[calc(env(safe-area-inset-top)+0.75rem)] z-20 px-4 py-4 sm:top-4 sm:px-6 sm:py-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-3">
-              <span className="weather-icon-chip text-slate-100">
-                <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
-                  <path
-                    d="M4 14.5a6.5 6.5 0 0 1 12.8-2.4A4.5 4.5 0 1 1 18 21H7.6A5.1 5.1 0 0 1 4 14.5Z"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M8 9.5a4 4 0 0 1 6.9 2"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </span>
-              <div>
-                <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Whether</p>
-                <p className="text-sm font-semibold text-slate-100">Market Climate Station</p>
-                <p className="text-xs text-slate-400 sm:hidden">Signals refreshed {fetchedAtLabel}</p>
+          <header className="weather-appbar sticky top-[calc(env(safe-area-inset-top)+0.75rem)] z-20 px-4 py-4 sm:top-4 sm:px-6 sm:py-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-3">
+                <span className="weather-icon-chip text-slate-100">
+                  <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
+                    <path
+                      d="M4 14.5a6.5 6.5 0 0 1 12.8-2.4A4.5 4.5 0 1 1 18 21H7.6A5.1 5.1 0 0 1 4 14.5Z"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M8 9.5a4 4 0 0 1 6.9 2"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </span>
+                <div>
+                  <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
+                    Whether
+                  </p>
+                  <p className="text-sm font-semibold text-slate-100">
+                    Market Climate Station
+                  </p>
+                  <p className="text-xs text-slate-400 sm:hidden">
+                    Signals refreshed {fetchedAtLabel}
+                  </p>
+                </div>
               </div>
-            </div>
-            <div className="hidden flex-wrap items-center gap-2 sm:flex">
-              {exportCta ? (
-                <a
-                  href={exportCta.href}
-                  className="inline-flex min-h-[40px] items-center justify-center rounded-full border border-slate-700/70 px-3 py-2 text-[11px] font-semibold tracking-[0.14em] text-slate-200 transition-colors hover:border-sky-300/80 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                >
-                  {exportCta.label}
-                </a>
-              ) : null}
-              {primaryCta ? (
-                <a
-                  href={primaryCta.href}
-                  className="weather-button-primary inline-flex min-h-[40px] items-center justify-center px-4 py-2 text-[11px] font-semibold tracking-[0.2em] shadow-lg shadow-sky-500/30 ring-1 ring-sky-200/30 transition-colors hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                >
-                  {primaryCta.label}
-                </a>
-              ) : null}
-            </div>
-          </div>
-          <ReportPageNavigation
-            pageLinks={pageLinks}
-            pageTitle={pageTitle}
-            variant={pageNavVariant}
-            className="mt-4 -mx-4 hidden px-4 sm:mx-0 sm:block sm:px-0"
-          />
-        </header>
-
-        {historicalBanner}
-
-        <div className={`mt-6 grid gap-6 ${hasSidebar ? "lg:grid-cols-[260px,1fr]" : ""}`}>
-          {hasSidebar ? (
-            <aside className="order-2 space-y-4 lg:order-none lg:sticky lg:top-28 lg:self-start">
-              {overviewPanel}
-              {confidencePanel}
-              {sectionsNav}
-            </aside>
-          ) : null}
-
-          <div className="order-1 space-y-10 lg:order-none lg:space-y-12">
-            <section className="weather-panel-static space-y-4 px-4 py-5 sm:px-5">
-              <div className="space-y-3">
-                {heroVariant === "compact" ? (
-                  <>
-                    <p className="text-xs font-semibold tracking-[0.2em] text-slate-400 sm:tracking-[0.26em]">
-                      Whether report
-                    </p>
-                    <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
-                      {pageTitle}
-                    </h1>
-                    <p className="flex max-w-2xl flex-wrap items-center gap-x-2 gap-y-1 text-sm leading-relaxed text-slate-200 sm:text-base">
-                      <span>{pageSummary}</span>
-                      {summaryLink}
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <p className="text-xs font-semibold tracking-[0.2em] text-slate-400 sm:tracking-[0.26em]">
-                      Whether report
-                    </p>
-                    <h1 className="type-headline text-slate-100">{pageTitle}</h1>
-                    <p className="flex max-w-2xl flex-wrap items-center gap-x-2 gap-y-1 text-sm leading-relaxed text-slate-200 sm:text-base">
-                      <span>{pageSummary}</span>
-                      {summaryLink}
-                    </p>
-                    <span className="sr-only">Signals stamped {recordDateLabel}</span>
-                  </>
-                )}
-              </div>
-              <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
-                <a
-                  href={primaryCta.href}
-                  className="weather-button-primary inline-flex min-h-[44px] w-full items-center justify-center px-4 py-2 text-[11px] font-semibold tracking-[0.2em] shadow-lg shadow-sky-500/30 ring-1 ring-sky-200/30 transition-colors hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:text-xs"
-                >
-                  {primaryCta.label}
-                </a>
-                {secondaryCta ? (
-                  <a
-                    href={secondaryCta.href}
-                    className="inline-flex min-h-[44px] w-full items-center justify-center text-[11px] font-semibold tracking-[0.12em] text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:justify-start sm:text-xs"
-                  >
-                    {secondaryCta.label}
-                  </a>
-                ) : null}
+              <div className="hidden flex-wrap items-center gap-2 sm:flex">
                 {exportCta ? (
                   <a
                     href={exportCta.href}
-                    className="inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-slate-700/70 px-3 py-2 text-[11px] font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-300/80 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:text-xs"
+                    className="inline-flex min-h-[40px] items-center justify-center rounded-full border border-slate-700/70 px-3 py-2 text-[11px] font-semibold tracking-[0.14em] text-slate-200 transition-colors hover:border-sky-300/80 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
                   >
                     {exportCta.label}
                   </a>
                 ) : null}
+                {primaryCta ? (
+                  <a
+                    href={primaryCta.href}
+                    className="weather-button-primary inline-flex min-h-[40px] items-center justify-center px-4 py-2 text-[11px] font-semibold tracking-[0.2em] shadow-lg shadow-sky-500/30 ring-1 ring-sky-200/30 transition-colors hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                  >
+                    {primaryCta.label}
+                  </a>
+                ) : null}
               </div>
-            </section>
+            </div>
+            <ReportPageNavigation
+              pageLinks={pageLinks}
+              pageTitle={pageTitle}
+              variant={pageNavVariant}
+              className="mt-4 -mx-4 hidden px-4 sm:mx-0 sm:block sm:px-0"
+            />
+          </header>
+
+          {historicalBanner}
+
+          <div className={`mt-6 grid gap-6 ${hasSidebar ? "lg:grid-cols-[260px,1fr]" : ""}`}>
+            {hasSidebar ? (
+              <aside className="order-2 space-y-4 lg:order-none lg:sticky lg:top-28 lg:self-start">
+                {overviewPanel}
+                {confidencePanel}
+                {sectionsNav}
+              </aside>
+            ) : null}
+
+            <div className="order-1 space-y-10 lg:order-none lg:space-y-12">
+              <section className="weather-panel-static space-y-4 px-4 py-5 sm:px-5">
+                <div className="space-y-3">
+                  {heroVariant === "compact" ? (
+                    <>
+                      <p className="text-xs font-semibold tracking-[0.2em] text-slate-400 sm:tracking-[0.26em]">
+                        Whether report
+                      </p>
+                      <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
+                        {pageTitle}
+                      </h1>
+                      <p className="flex max-w-2xl flex-wrap items-center gap-x-2 gap-y-1 text-sm leading-relaxed text-slate-200 sm:text-base">
+                        <span>{pageSummary}</span>
+                        {summaryLink}
+                      </p>
+                      <div className="flex flex-wrap gap-2 text-[10px] font-semibold tracking-[0.18em] text-slate-300 sm:hidden">
+                        <span className="weather-chip px-3 py-1">
+                          Status · {statusLabel}
+                        </span>
+                        <span className="weather-chip px-3 py-1">
+                          Signals · {recordDateLabel}
+                        </span>
+                        <span className={`weather-chip px-3 py-1 ${trustLabelTone}`}>
+                          {trustStatusLabel}
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-xs font-semibold tracking-[0.2em] text-slate-400 sm:tracking-[0.26em]">
+                        Whether report
+                      </p>
+                      <h1 className="type-headline text-slate-100">{pageTitle}</h1>
+                      <p className="flex max-w-2xl flex-wrap items-center gap-x-2 gap-y-1 text-sm leading-relaxed text-slate-200 sm:text-base">
+                        <span>{pageSummary}</span>
+                        {summaryLink}
+                      </p>
+                      <div className="flex flex-wrap gap-2 text-[10px] font-semibold tracking-[0.18em] text-slate-300 sm:hidden">
+                        <span className="weather-chip px-3 py-1">
+                          Status · {statusLabel}
+                        </span>
+                        <span className="weather-chip px-3 py-1">
+                          Signals · {recordDateLabel}
+                        </span>
+                        <span className={`weather-chip px-3 py-1 ${trustLabelTone}`}>
+                          {trustStatusLabel}
+                        </span>
+                      </div>
+                      <span className="sr-only">Signals stamped {recordDateLabel}</span>
+                    </>
+                  )}
+                </div>
+                <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
+                  <a
+                    href={primaryCta.href}
+                    className="weather-button-primary inline-flex min-h-[44px] w-full items-center justify-center px-4 py-2 text-[11px] font-semibold tracking-[0.2em] shadow-lg shadow-sky-500/30 ring-1 ring-sky-200/30 transition-colors hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:text-xs"
+                  >
+                    {primaryCta.label}
+                  </a>
+                  {secondaryCta ? (
+                    <a
+                      href={secondaryCta.href}
+                      className="inline-flex min-h-[44px] w-full items-center justify-center text-[11px] font-semibold tracking-[0.12em] text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:justify-start sm:text-xs"
+                    >
+                      {secondaryCta.label}
+                    </a>
+                  ) : null}
+                  {exportCta ? (
+                    <a
+                      href={exportCta.href}
+                      className="inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-slate-700/70 px-3 py-2 text-[11px] font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-300/80 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:text-xs"
+                    >
+                      {exportCta.label}
+                    </a>
+                  ) : null}
+                </div>
+              </section>
 
             {!hasSidebar ? (
               <section className="space-y-4">
