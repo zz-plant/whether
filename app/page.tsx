@@ -158,6 +158,12 @@ export default async function HomePage({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Weekly briefing"
       pageSummary="A quick pulse on the week’s regime and the moves it hints at."
+      primaryCta={{
+        href: "/operations/briefings#ops-export-briefs",
+        label: "Copy-ready leadership brief",
+      }}
+      secondaryCta={{ href: "#weekly-action-summary", label: "Start with this week" }}
+      exportCta={{ href: "#executive-snapshot", label: "See leadership summary" }}
       sidebarVariant="hidden"
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}

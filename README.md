@@ -157,6 +157,11 @@ This repo should make the product’s **purpose and market gap** obvious:
 
 For UI and engineering inspiration, see `LEARNINGS.md`.
 
+## Reforge acquisition readiness
+Whether is designed to become a product strategy operating system for modern product and
+engineering leaders. The acquisition-ready narrative, artifacts, and checklist live in
+`docs/acquisition/reforge-ready.md`.
+
 ## Local development
 0. Use Node.js 20 (see `.nvmrc`) and Bun 1.2.
 1. Install dependencies: `bun install`
