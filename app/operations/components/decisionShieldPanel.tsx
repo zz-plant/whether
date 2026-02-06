@@ -13,6 +13,7 @@ import type { Route } from "next";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   evaluateDecision,
+  formatDecisionAction,
   type DecisionAction,
   type DecisionCategory,
   type DecisionOutput,
