@@ -11,6 +11,18 @@ Teams often lag the macro environment:
 Whether closes this gap by turning public Treasury data into clear, actionable guidance.
 This is **not** financial advice (“Buy Stock”). It’s operational advice (“Ship Faster” vs. “Cut Burn”).
 
+
+## The core questions Whether answers
+- **What regime are we in right now?** (and how confident should we be in that call)
+- **What should we do this week/month?** (which moves to start, stop, or defer)
+- **Are our major bets aligned?** (hiring, roadmap, pricing, and infrastructure decisions)
+- **How do we explain this to leadership fast?** (copy-ready briefs with source provenance)
+
+## Who it is for
+- **Product and engineering leaders (CPO/CTO)** translating macro shifts into roadmap and team posture.
+- **Operating and finance leaders (COO/CFO)** setting guardrails on spend, runway, and pace.
+- **Strategy and planning partners** who need auditable, shareable guidance for leadership reviews.
+
 ## Product principles
 - **Physics, not philosophy**: strategy follows the market’s funding realities, not opinions.
 - **Serious, not cute**: a professional utility with high data density.
