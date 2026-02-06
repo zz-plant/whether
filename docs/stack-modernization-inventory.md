@@ -11,6 +11,27 @@
 - **Testing:** `node --test` via `bun test`.
 - **Linting:** `next lint` via `bun run lint`.
 
+## Newer capabilities snapshot (research baseline)
+
+This section maps the currently pinned stack to newer stable versions and highlights capabilities worth evaluating during modernization.
+
+| Element | Current in repo | Newer stable (observed) | Notable newer capabilities to evaluate |
+| --- | --- | --- | --- |
+| Bun | 1.2.14 | 1.3.8 | Runtime and package manager performance improvements, plus continued Node compatibility expansion for tooling/scripts. |
+| Next.js | 14.2.5 | 16.1.6 | Turbopack maturity improvements, Cache Components/PPR-oriented caching model, and `proxy.ts` replacing `middleware.ts` naming for network boundary clarity. |
+| React / React DOM | 18.3.1 | 19.2.4 | React 19 Actions for async mutations, `useOptimistic`, form-centric hooks (`useFormStatus`, `useActionState`), improved Suspense behavior, and static React DOM APIs. |
+| TypeScript | 5.5.3 | 5.9.3 | Language service and type-checking improvements, faster editor workflows, and newer type-system ergonomics from 5.6–5.9 releases. |
+| Tailwind CSS | 3.4.6 | 4.1.18 | Tailwind v4 CSS-first setup, streamlined content/source detection, and reduced PostCSS plugin surface for common setups. |
+| Zod | 3.23.8 | 4.3.6 | Zod 4 API/performance updates and schema ergonomics improvements for large validation surfaces. |
+| ESLint | 8.57.0 | 9.39.2 | Flat config-first ecosystem direction and updated rule/tooling compatibility expectations. |
+
+### Research sources used for this snapshot
+- `npm view <package> version` for version baselining.
+- Next.js 16 release post: <https://nextjs.org/blog/next-16>
+- React 19 release post: <https://react.dev/blog/2024/12/05/react-19>
+- Tailwind CSS v4 release post: <https://tailwindcss.com/blog/tailwindcss-v4>
+- TypeScript 5.9 release post: <https://devblogs.microsoft.com/typescript/announcing-typescript-5-9/>
+
 ## Build & deployment pipeline
 - **Primary build entry:** `scripts/build.mjs` chooses `next build` by default, uses `next-on-pages` on Cloudflare Pages (or `BUILD_TARGET=pages`), and rewrites the worker output for Cloudflare Pages.
 - **Cloudflare output wiring:** `wrangler.toml` targets the `.vercel/output/static/_worker.js` output with Node.js compatibility enabled.

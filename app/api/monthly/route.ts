@@ -4,6 +4,7 @@ import { buildAgentPayload, buildAgentPrompt } from "../../../lib/agentHandoff";
 import { buildMonthlySummary } from "../../../lib/summary/monthlySummary";
 import { buildSummaryHash } from "../../../lib/summary/summaryHash";
 
+export const runtime = "edge";
 export const revalidate = 3600;
 
 export async function GET() {
