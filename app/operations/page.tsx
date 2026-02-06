@@ -47,21 +47,21 @@ export default async function OperationsPage({
   const quickSteps = [
     {
       title: "Confirm the posture",
-      detail: "Lock the monthly action summary before you approve new scope.",
+      detail: "Use the current regime to decide what to fund now vs defer.",
       href: "#ops-monthly-action-summary",
       cta: "Review monthly actions",
       emphasis: "primary",
     },
     {
       title: "Pick a workstream",
-      detail: "Choose the lane that matches your immediate operating cadence.",
+      detail: "Route to plan, decisions, or briefings based on the question in front of you.",
       href: "#ops-workstreams",
       cta: "Open workstreams",
       emphasis: "secondary",
     },
     {
       title: "Export the brief",
-      detail: "Move the narrative into leadership materials or planning decks.",
+      detail: "Generate copy-ready output for exec syncs, board prep, and team alignment.",
       href: "/operations/briefings",
       cta: "Open briefing kits",
       emphasis: "secondary",
@@ -127,7 +127,7 @@ export default async function OperationsPage({
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Action playbook"
-      pageSummary="See how the regime turns into plan, decisions, and briefings."
+      pageSummary="Turn macro signals into execution posture, decision guardrails, and leadership-ready briefs."
       pageSummaryLink={{ href: "#ops-workstreams", label: "Explore details →" }}
       pageLinks={reportPageLinks}
       sectionLinks={operationsSectionLinks.overview}
@@ -151,7 +151,7 @@ export default async function OperationsPage({
               Immediate next steps
             </p>
             <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-              Translate the regime into decisions your team can execute.
+              Answer the operating questions leadership asks every planning cycle.
             </h2>
           </div>
           <a

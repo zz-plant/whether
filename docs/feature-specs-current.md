@@ -3,6 +3,8 @@
 This document captures the **implemented** feature set in the repo. It is an audit of what the
 product does today, based on shipped UI routes, data loaders, and APIs.
 
+Positioning summary: Whether is an operator briefing system for leadership teams answering three recurring questions: what regime are we in, what should we do now, and which decisions are misaligned with current macro conditions.
+
 ## 1) Product surfaces (UI routes)
 
 ### 1.1 Weekly briefing (/) 

@@ -96,6 +96,7 @@ export default async function HomePage({
   searchParams?: { month?: string; year?: string; [key: string]: string | undefined };
 }) {
   const sectionLinks = [
+    { href: "#operator-fit", label: "Who this is for" },
     { href: "#weekly-action-summary", label: "This week's actions" },
     { href: "#regime-summary", label: "Market climate summary" },
     { href: "#executive-snapshot", label: "Leadership summary" },
@@ -174,6 +175,40 @@ export default async function HomePage({
         ) : null
       }
     >
+      <section id="operator-fit" className="weather-panel space-y-4 px-6 py-5">
+        <div className="space-y-2">
+          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Operator fit</p>
+          <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
+            Built for leaders who need fast, defensible calls under changing macro conditions.
+          </h2>
+          <p className="max-w-3xl text-sm text-slate-300">
+            Whether helps CPO/CTO/COO/CFO teams answer three questions every week: what regime are we
+            in, what should we do now, and which bets should we pause until conditions improve.
+          </p>
+        </div>
+        <div className="grid gap-3 lg:grid-cols-3">
+          {[
+            {
+              title: "Read the regime",
+              detail: "Convert Treasury and macro signals into a plain-English operating posture.",
+            },
+            {
+              title: "Validate key bets",
+              detail: "Pressure-test roadmap, hiring, pricing, and spend decisions before they lock in.",
+            },
+            {
+              title: "Brief leadership quickly",
+              detail: "Export copy-ready guidance with source provenance for weekly and monthly reviews.",
+            },
+          ].map((item) => (
+            <article key={item.title} className="weather-surface space-y-2 p-4">
+              <p className="text-sm font-semibold text-slate-100">{item.title}</p>
+              <p className="text-sm text-slate-300">{item.detail}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <ReportGroup
         title="Action priorities"
         description="Lock posture, pick the weekly bet, and align on the constraints before you dig deeper."

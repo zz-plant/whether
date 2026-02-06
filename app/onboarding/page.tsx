@@ -25,21 +25,21 @@ export default async function OnboardingPage({
   const onboardingSteps = [
     {
       title: "Orient to the report",
-      detail: "Scan the weekly summary, confidence score, and operating constraints.",
+      detail: "Start with the core leadership questions: what regime are we in, what moves does it favor, and what should we avoid.",
       href: "#first-time-guide",
       cta: "Start the guide",
       emphasis: "primary",
     },
     {
       title: "Decode the vocabulary",
-      detail: "Use the glossary to translate macro terms into product implications.",
+      detail: "Translate macro terms into product, engineering, and finance decisions your team can act on.",
       href: "#beginner-glossary",
       cta: "Open the glossary",
       emphasis: "secondary",
     },
     {
       title: "Apply the signals",
-      detail: "Move to the signals page when you need line-item evidence.",
+      detail: "Open signal-level evidence when someone asks why the posture changed.",
       href: "/signals",
       cta: "Go to signals",
       emphasis: "secondary",
@@ -105,7 +105,7 @@ export default async function OnboardingPage({
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Onboarding & glossary"
-      pageSummary="Start with the basics, then decode the signals in plain English."
+      pageSummary="Learn the core questions Whether answers before diving into signal-level detail."
       pageSummaryLink={{ href: "#first-time-guide", label: "Explore details →" }}
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
