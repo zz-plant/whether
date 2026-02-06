@@ -3,6 +3,7 @@
  * Provides structured payloads and prompts for downstream automation.
  */
 import type { RegimeAssessment } from "./regimeEngine";
+import { agentSkills } from "./agentSkills";
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "./types";
 
 const getRegimeLabel = (regime: RegimeAssessment["regime"]) => {
@@ -80,6 +81,7 @@ export const buildAgentPayload = (
       fetched_at: macro.fetched_at,
       source_url: macro.sourceUrl,
     })),
+    skills: agentSkills,
     pm_handoff: {
       decision_focus: "Use constraints to validate roadmap, hiring, and pricing moves.",
       briefing_actions: [
@@ -104,6 +106,7 @@ export const buildAgentPrompt = (
 ) => {
   return [
     "You are an autonomous PM assistant.",
+    "Follow the skills list in the JSON payload and deliver outputs in the same order.",
     "Use the JSON payload to draft:",
     "1) A 3-bullet summary of the market climate.",
     "2) The top 3 constraints that should shape roadmap decisions.",
