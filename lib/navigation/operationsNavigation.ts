@@ -32,8 +32,8 @@ export const operationsWorkstreamLinks: OperationsWorkstreamLink[] = [
 
 export const operationsSectionLinks: Record<string, ReportSectionLink[]> = {
   overview: [
-    { href: "#ops-monthly-action-summary", label: "Monthly summary" },
-    { href: "#ops-workstreams", label: "Workstreams" },
+    { href: "#ops-monthly-action-summary", label: "Step 1: Monthly summary" },
+    { href: "#ops-workstreams", label: "Step 2: Workstreams" },
   ],
   plan: [
     { href: "#ops-monthly-action-summary", label: "Monthly summary" },
