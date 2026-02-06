@@ -96,13 +96,13 @@ export default async function HomePage({
   searchParams?: { month?: string; year?: string; [key: string]: string | undefined };
 }) {
   const sectionLinks = [
-    { href: "#operator-fit", label: "Who this is for" },
-    { href: "#weekly-action-summary", label: "This week's actions" },
-    { href: "#regime-summary", label: "Market climate summary" },
-    { href: "#executive-snapshot", label: "Leadership summary" },
-    { href: "#regime-alerts", label: "New alerts" },
-    { href: "#regime-assessment", label: "What the scores mean" },
-    { href: "#signal-matrix", label: "Signal breakdown" },
+    { href: "#operator-fit", label: "Start here" },
+    { href: "#weekly-action-summary", label: "1) Decide this week" },
+    { href: "#regime-summary", label: "2) Confirm market posture" },
+    { href: "#executive-snapshot", label: "3) Align leadership" },
+    { href: "#regime-alerts", label: "4) Review alerts" },
+    { href: "#regime-assessment", label: "5) Open the deep dive" },
+    { href: "#signal-matrix", label: "Signal details" },
   ];
   const structuredData = {
     "@context": "https://schema.org",
@@ -158,7 +158,7 @@ export default async function HomePage({
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Weekly briefing"
-      pageSummary="A quick pulse on the week’s regime and the moves it hints at."
+      pageSummary="A step-by-step weekly briefing: decide the move, align the team, then inspect details only if needed."
       primaryCta={{
         href: "/operations/briefings#ops-export-briefs",
         label: "Copy-ready leadership brief",
@@ -177,28 +177,28 @@ export default async function HomePage({
     >
       <section id="operator-fit" className="weather-panel space-y-4 px-6 py-5">
         <div className="space-y-2">
-          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Operator fit</p>
+          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Start here</p>
           <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-            Built for leaders who need fast, defensible calls under changing macro conditions.
+            One clear flow for fast decisions under changing macro conditions.
           </h2>
           <p className="max-w-3xl text-sm text-slate-300">
-            Whether helps CPO/CTO/COO/CFO teams answer three questions every week: what regime are we
-            in, what should we do now, and which bets should we pause until conditions improve.
+            Use this page in order: decide what to do this week, align leaders on guardrails, then open
+            supporting diagnostics only when you need more proof.
           </p>
         </div>
         <div className="grid gap-3 lg:grid-cols-3">
           {[
             {
-              title: "Read the regime",
-              detail: "Convert Treasury and macro signals into a plain-English operating posture.",
+              title: "Step 1 · Decide",
+              detail: "Start with this week’s recommended posture and one-week bet.",
             },
             {
-              title: "Validate key bets",
-              detail: "Pressure-test roadmap, hiring, pricing, and spend decisions before they lock in.",
+              title: "Step 2 · Align",
+              detail: "Use leadership summaries to confirm constraints before approving spend and scope.",
             },
             {
-              title: "Brief leadership quickly",
-              detail: "Export copy-ready guidance with source provenance for weekly and monthly reviews.",
+              title: "Step 3 · Verify",
+              detail: "Open alerts and score detail only when a decision needs deeper evidence.",
             },
           ].map((item) => (
             <article key={item.title} className="weather-surface space-y-2 p-4">
@@ -210,8 +210,8 @@ export default async function HomePage({
       </section>
 
       <ReportGroup
-        title="Action priorities"
-        description="Lock posture, pick the weekly bet, and align on the constraints before you dig deeper."
+        title="Step 1: Decide this week"
+        description="Pick the weekly move first, then confirm posture and constraints."
       >
         <WeeklyActionSummaryPanel
           assessment={assessment}
@@ -223,8 +223,8 @@ export default async function HomePage({
       </ReportGroup>
 
       <ReportGroup
-        title="Leadership readout"
-        description="Confirm the live signal health, then scan the executive snapshot for the week’s guardrails."
+        title="Step 2: Align leadership"
+        description="Share a concise readout so teams operate from the same guardrails."
       >
         <ExecutiveSnapshotPanel
           treasury={treasury}
@@ -240,8 +240,8 @@ export default async function HomePage({
       </ReportGroup>
 
       <ReportGroup
-        title="Alert center"
-        description="Review new regime alerts first, then scan the recent alert log for context."
+        title="Step 3: Check alerts"
+        description="Scan change alerts to catch anything that should alter this week’s plan."
       >
         <RegimeChangeAlertPanel alert={regimeAlert} provenance={treasuryProvenance} />
 
@@ -249,8 +249,8 @@ export default async function HomePage({
       </ReportGroup>
 
       <ReportGroup
-        title="Deep dive signals"
-        description="Use these references when you need the full scoring detail and signal breakdown."
+        title="Step 4: Open deep dive (optional)"
+        description="Use score math and signal breakdown only when stakeholders need full justification."
       >
         <RegimeAssessmentCard assessment={assessment} provenance={treasuryProvenance} />
 

@@ -46,22 +46,22 @@ export default async function OperationsPage({
 }) {
   const quickSteps = [
     {
-      title: "Confirm the posture",
-      detail: "Use the current regime to decide what to fund now vs defer.",
+      title: "Step 1 · Confirm posture",
+      detail: "Review the monthly recommendation to decide what to fund now vs defer.",
       href: "#ops-monthly-action-summary",
       cta: "Review monthly actions",
       emphasis: "primary",
     },
     {
-      title: "Pick a workstream",
-      detail: "Route to plan, decisions, or briefings based on the question in front of you.",
+      title: "Step 2 · Pick a workstream",
+      detail: "Choose plan, decisions, or briefings so teams see only what they need.",
       href: "#ops-workstreams",
       cta: "Open workstreams",
       emphasis: "secondary",
     },
     {
-      title: "Export the brief",
-      detail: "Generate copy-ready output for exec syncs, board prep, and team alignment.",
+      title: "Step 3 · Export the brief",
+      detail: "Create copy-ready output for exec syncs, board prep, and cross-functional alignment.",
       href: "/operations/briefings",
       cta: "Open briefing kits",
       emphasis: "secondary",
@@ -127,7 +127,7 @@ export default async function OperationsPage({
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Action playbook"
-      pageSummary="Turn macro signals into execution posture, decision guardrails, and leadership-ready briefs."
+      pageSummary="Follow a simple sequence: set posture, open the right workstream, then export aligned briefs."
       pageSummaryLink={{ href: "#ops-workstreams", label: "Explore details →" }}
       pageLinks={reportPageLinks}
       sectionLinks={operationsSectionLinks.overview}
@@ -148,10 +148,10 @@ export default async function OperationsPage({
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
-              Immediate next steps
+              Start with this sequence
             </p>
             <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-              Answer the operating questions leadership asks every planning cycle.
+              Reduce noise by moving through planning, decisions, and briefings in order.
             </h2>
           </div>
           <a
@@ -190,8 +190,8 @@ export default async function OperationsPage({
 
       <SectionedReportPanel
         id="ops-monthly-action-summary"
-        title="Monthly action summary"
-        description="What moves the regime recommends this month."
+        title="Step 1: Monthly action summary"
+        description="Start with the regime-recommended moves before opening detailed workflows."
       >
         <MonthlyActionSummaryPanel
           assessment={assessment}
@@ -202,8 +202,8 @@ export default async function OperationsPage({
 
       <SectionedReportPanel
         id="ops-workstreams"
-        title="Operational workstreams"
-        description="Pick a focused view so you do not have to scroll through every panel."
+        title="Step 2: Choose a focused workstream"
+        description="Open only the workflow you need so each meeting stays concise and decision-oriented."
       >
         <div className="grid gap-4 lg:grid-cols-3">
           {workstreamCards.map((link) => (
