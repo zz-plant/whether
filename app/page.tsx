@@ -158,7 +158,7 @@ export default async function HomePage({
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Weekly briefing"
-      pageSummary="A quick pulse on the week’s regime and the moves it hints at."
+      pageSummary="Weekly regime pulse and recommended moves."
       primaryCta={{
         href: "/operations/briefings#ops-export-briefs",
         label: "Copy-ready leadership brief",
@@ -179,26 +179,26 @@ export default async function HomePage({
         <div className="space-y-2">
           <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Operator fit</p>
           <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-            Built for leaders who need fast, defensible calls under changing macro conditions.
+            Fast operating guidance for macro-driven weeks.
           </h2>
           <p className="max-w-3xl text-sm text-slate-300">
-            Whether helps CPO/CTO/COO/CFO teams answer three questions every week: what regime are we
-            in, what should we do now, and which bets should we pause until conditions improve.
+            Answer three questions quickly: what regime are we in, what should we do now, and what
+            should wait.
           </p>
         </div>
         <div className="grid gap-3 lg:grid-cols-3">
           {[
             {
               title: "Read the regime",
-              detail: "Convert Treasury and macro signals into a plain-English operating posture.",
+              detail: "Convert Treasury and macro data into an operating posture.",
             },
             {
               title: "Validate key bets",
-              detail: "Pressure-test roadmap, hiring, pricing, and spend decisions before they lock in.",
+              detail: "Pressure-test roadmap, hiring, pricing, and spend before lock-in.",
             },
             {
               title: "Brief leadership quickly",
-              detail: "Export copy-ready guidance with source provenance for weekly and monthly reviews.",
+              detail: "Export source-linked guidance for weekly and monthly reviews.",
             },
           ].map((item) => (
             <article key={item.title} className="weather-surface space-y-2 p-4">
