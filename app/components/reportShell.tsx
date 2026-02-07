@@ -5,6 +5,10 @@
 import { Children, type ReactNode, isValidElement } from "react";
 import { DisplayGuardian } from "./displayGuardian";
 import {
+  OperatorCommandCenter,
+  type OperatorCommandAction,
+} from "./operatorCommandCenter";
+import {
   ReportMobileNavigation,
   ReportPageNavigation,
   type ReportPageLink,
@@ -138,6 +142,61 @@ export const ReportShell = ({
         </ul>
       </nav>
     ) : null;
+  const commandActions = [
+    ...(primaryCta
+      ? [
+          {
+            href: primaryCta.href,
+            label: primaryCta.label,
+            description: "Primary action",
+            keywords: ["start", "weekly", "plan", "priorities"],
+            group: "Playbook",
+          },
+        ]
+      : []),
+    ...(secondaryCta
+      ? [
+          {
+            href: secondaryCta.href,
+            label: secondaryCta.label,
+            description: "Secondary action",
+            keywords: ["summary", "leadership", "overview"],
+            group: "Playbook",
+          },
+        ]
+      : []),
+    ...(exportCta
+      ? [
+          {
+            href: exportCta.href,
+            label: exportCta.label,
+            description: "Export brief",
+            keywords: ["copy", "share", "brief", "leadership"],
+            group: "Playbook",
+          },
+        ]
+      : []),
+    ...pageLinks.map((page) => ({
+      href: page.href,
+      label: page.label,
+      description: page.description,
+      keywords: ["navigate", "page"],
+      group: "Pages",
+    })),
+    ...sectionLinks.map((section) => ({
+      href: section.href,
+      label: section.label,
+      description: "Jump section",
+      keywords: ["section", "jump"],
+      group: "Sections",
+    })),
+  ].reduce<OperatorCommandAction[]>((accumulator, action) => {
+    if (!accumulator.some((item) => item.href === action.href && item.label === action.label)) {
+      accumulator.push(action);
+    }
+
+    return accumulator;
+  }, []);
   return (
     <>
       <a
@@ -308,6 +367,8 @@ export const ReportShell = ({
                   ) : null}
                 </div>
               </section>
+
+              <OperatorCommandCenter actions={commandActions} />
 
             {!hasSidebar ? (
               <section className="space-y-4">
