@@ -33,7 +33,7 @@ This section maps the currently pinned stack to newer stable versions and highli
 - TypeScript 5.9 release post: <https://devblogs.microsoft.com/typescript/announcing-typescript-5-9/>
 
 ## Build & deployment pipeline
-- **Primary build entry:** `scripts/build.mjs` chooses `next build` by default, uses `next-on-pages` on Cloudflare Pages (or `BUILD_TARGET=pages`), and rewrites the worker output for Cloudflare Pages.
+- **Primary build entry:** `scripts/build.mjs` uses `next build` by default, switches to `next-on-pages` for Cloudflare Pages or Cloudflare deploy environments (`CF_PAGES`, `CLOUDFLARE_ACCOUNT_ID`, or `BUILD_TARGET=pages`), and rewrites worker output paths for Cloudflare deployment compatibility.
 - **Cloudflare output wiring:** `wrangler.toml` targets the `.vercel/output/static/_worker.js` output with Node.js compatibility enabled.
 
 ## App Router usage & runtimes
