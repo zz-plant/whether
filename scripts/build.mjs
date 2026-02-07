@@ -2,12 +2,17 @@ import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
+const isTruthyEnv = (value) => value === "1" || value === "true";
+
 const buildTarget = process.env.BUILD_TARGET;
-const isVercel = process.env.VERCEL === "1" || process.env.VERCEL === "true";
-const isCloudflarePages =
-  process.env.CF_PAGES === "1" || process.env.CF_PAGES === "true";
+const isVercel = isTruthyEnv(process.env.VERCEL);
+const isCloudflarePages = isTruthyEnv(process.env.CF_PAGES);
+const isCloudflareDeploy = Boolean(process.env.CLOUDFLARE_ACCOUNT_ID);
 const useNextOnPages =
-  buildTarget === "pages" || (buildTarget !== "vercel" && isCloudflarePages);
+  !isVercel &&
+  (buildTarget === "pages" ||
+    (buildTarget !== "vercel" && (isCloudflarePages || isCloudflareDeploy)));
+
 const command = useNextOnPages ? "next-on-pages" : "next";
 const args = useNextOnPages ? [] : ["build"];
 
