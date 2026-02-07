@@ -20,6 +20,7 @@ export const DisplayGuardian = ({
   driftIntervalSeconds = 45,
 }: DisplayGuardianProps) => {
   const lastInteractionAt = useRef(Date.now());
+  const lastRefreshAt = useRef(Date.now());
 
   useEffect(() => {
     const max = clamp(Math.round(driftPixels), 1, 6);
@@ -30,26 +31,46 @@ export const DisplayGuardian = ({
 
   useEffect(() => {
     const refreshMs = clamp(refreshMinutes, 2, 60) * 60 * 1000;
+    const heartbeatMs = 30 * 1000;
+
+    const refresh = () => {
+      lastRefreshAt.current = Date.now();
+      window.location.reload();
+    };
+
+    const refreshIfStale = () => {
+      const now = Date.now();
+      const idleMs = now - lastInteractionAt.current;
+      const elapsedSinceRefresh = now - lastRefreshAt.current;
+      if (idleMs >= refreshMs || elapsedSinceRefresh >= refreshMs) {
+        refresh();
+      }
+    };
+
     const updateInteraction = () => {
       lastInteractionAt.current = Date.now();
+    };
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") {
+        refreshIfStale();
+      }
     };
     const events = ["pointerdown", "keydown", "scroll", "touchstart"];
     events.forEach((eventName) => {
       window.addEventListener(eventName, updateInteraction, { passive: true });
     });
-    const refreshTimer = window.setInterval(() => {
-      const now = Date.now();
-      const idleMs = now - lastInteractionAt.current;
-      if (idleMs >= refreshMs) {
-        window.location.reload();
-      }
-    }, refreshMs);
+    window.addEventListener("online", refreshIfStale);
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    const refreshTimer = window.setInterval(refreshIfStale, heartbeatMs);
 
     return () => {
       window.clearInterval(refreshTimer);
       events.forEach((eventName) => {
         window.removeEventListener(eventName, updateInteraction);
       });
+      window.removeEventListener("online", refreshIfStale);
+      document.removeEventListener("visibilitychange", handleVisibility);
     };
   }, [refreshMinutes]);
 
