@@ -69,7 +69,7 @@ export const fetchTreasuryData = async (
       throw new Error(`Treasury API error: ${response.status}`);
     }
 
-    const payload = (await response.json()) as { data?: Record<string, unknown>[] };
+    const payload: unknown = await response.json();
     const normalized = normalizeTreasuryResponse(payload, {
       fetched_at,
       source: requestUrl,
