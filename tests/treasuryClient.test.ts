@@ -60,6 +60,39 @@ describe("treasury client", () => {
     assert.ok(data.fallback_at);
   });
 
+
+  it("falls back to snapshot when payload shape is invalid", async () => {
+    const fetcher: typeof fetch = async () =>
+      new Response(
+        JSON.stringify({
+          data: "invalid",
+        })
+      );
+
+    const snapshot: TreasuryData = {
+      source: "snapshot",
+      record_date: "2024-09-30",
+      fetched_at: "2024-10-01T00:00:00Z",
+      isLive: false,
+      yields: {
+        oneMonth: 5.1,
+        twoYear: 4.7,
+        tenYear: 4.5,
+      },
+    };
+
+    const data = await fetchTreasuryData({
+      fetcher,
+      snapshotFallback: snapshot,
+    });
+
+    assert.equal(data.record_date, "2024-09-30");
+    assert.equal(data.isLive, false);
+    assert.equal(data.fallback_reason, "Treasury API returned no data or invalid payload.");
+    assert.ok(data.fallback_at);
+  });
+
+
   it("returns snapshot fallback with explicit reason for historical cache miss", async () => {
     const snapshot: TreasuryData = {
       source: "snapshot",

@@ -29,4 +29,18 @@ describe("treasury normalizer", () => {
     assert.equal(normalized?.yields.oneMonth, 5.12);
     assert.equal(normalized?.isLive, true);
   });
+
+  it("returns null for invalid payload shape", () => {
+    const normalized = normalizeTreasuryResponse(
+      { data: "not-an-array" },
+      {
+        fetched_at: "2024-10-02T00:00:00Z",
+        source: "Treasury",
+        isLive: true,
+      }
+    );
+
+    assert.equal(normalized, null);
+  });
+
 });

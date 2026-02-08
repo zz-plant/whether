@@ -3,7 +3,7 @@
  * Keeps source metadata and freshness explicit for traceable outputs.
  */
 import type { TreasuryData, TreasuryYields } from "../types";
-import { parseTreasuryData } from "./treasurySchema";
+import { parseTreasuryApiPayload, parseTreasuryData } from "./treasurySchema";
 
 const parseNumber = (value: unknown): number | null => {
   if (value == null) {
@@ -34,10 +34,15 @@ export const normalizeTreasuryRow = (
 };
 
 export const normalizeTreasuryResponse = (
-  payload: { data?: Record<string, unknown>[] },
+  payload: unknown,
   metadata: { fetched_at: string; source: string; isLive: boolean }
 ): TreasuryData | null => {
-  const firstRow = payload.data?.[0];
+  const parsedPayload = parseTreasuryApiPayload(payload);
+  if (!parsedPayload) {
+    return null;
+  }
+
+  const firstRow = parsedPayload.data?.[0];
   if (!firstRow) {
     return null;
   }

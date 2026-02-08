@@ -4,6 +4,12 @@
  */
 import { z } from "zod";
 
+export const TreasuryApiRowSchema = z.record(z.string(), z.unknown());
+
+export const TreasuryApiPayloadSchema = z.object({
+  data: z.array(TreasuryApiRowSchema).optional(),
+});
+
 export const TreasuryYieldsSchema = z.object({
   oneMonth: z.number().nullable(),
   threeMonth: z.number().nullable().optional(),
@@ -23,5 +29,10 @@ export const TreasuryDataSchema = z.object({
 
 export const parseTreasuryData = (input: unknown) => {
   const parsed = TreasuryDataSchema.safeParse(input);
+  return parsed.success ? parsed.data : null;
+};
+
+export const parseTreasuryApiPayload = (input: unknown) => {
+  const parsed = TreasuryApiPayloadSchema.safeParse(input);
   return parsed.success ? parsed.data : null;
 };
