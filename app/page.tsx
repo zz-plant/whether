@@ -4,6 +4,13 @@ import { resolveTimeMachineSelection, parseTimeMachineRequest } from "../lib/tim
 import { loadReportData } from "../lib/report/reportData";
 import { siteUrl } from "../lib/siteUrl";
 import {
+  buildBreadcrumbList,
+  buildCanonicalUrl,
+  defaultSiteDescription,
+  organizationName,
+  websiteName,
+} from "../lib/seo";
+import {
   ExecutiveSnapshotPanel,
   WeeklyActionSummaryPanel,
   RegimeSummaryPanel,
@@ -15,6 +22,7 @@ import {
 import { ChangeSinceLastReadPanel } from "./components/changeSinceLastReadPanel";
 import { RegimeAlertsPanel } from "./components/regimeAlertsPanel";
 import { ReportShell } from "./components/reportShell";
+import { RelatedReportLinks } from "./components/relatedReportLinks";
 import { reportPageLinks } from "../lib/report/reportNavigation";
 
 export const runtime = "edge";
@@ -44,8 +52,7 @@ export const generateMetadata = ({
   searchParams?: { month?: string; year?: string };
 }): Metadata => {
   const siteName = "Whether — Market Climate Station";
-  const siteDescription =
-    "Translate Treasury macro signals into plain-English operational constraints for product and engineering leaders.";
+  const siteDescription = defaultSiteDescription;
   const selection = resolveTimeMachineSelection(searchParams);
   const requestedSelection = parseTimeMachineRequest(searchParams);
   const baseUrl = new URL("/api/og", siteUrl);
@@ -62,13 +69,17 @@ export const generateMetadata = ({
   const titleSuffix = selection?.banner ?? (requestedSelection ? "Time Machine Preview" : "Live");
   const title = `Whether Report — ${titleSuffix}`;
   const imageUrl = baseUrl.toString();
+  const canonicalUrl = buildCanonicalUrl("/");
 
   return {
     title,
     description: siteDescription,
+    alternates: {
+      canonical: "/",
+    },
     openGraph: {
       type: "website",
-      url: siteUrl,
+      url: canonicalUrl,
       title,
       description: siteDescription,
       siteName,
@@ -106,16 +117,50 @@ export default async function HomePage({
   ];
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": "WebSite",
-    name: "Whether — Market Climate Station",
-    url: siteUrl,
-    description:
-      "Translate Treasury macro signals into plain-English operational constraints for product and engineering leaders.",
-    inLanguage: "en",
-    publisher: {
-      "@type": "Organization",
-      name: "Whether"
-    }
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": `${siteUrl}#organization`,
+        name: organizationName,
+        url: siteUrl,
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${siteUrl}#website`,
+        name: websiteName,
+        url: siteUrl,
+        description: defaultSiteDescription,
+        inLanguage: "en",
+        publisher: {
+          "@id": `${siteUrl}#organization`,
+        },
+      },
+      {
+        "@type": "CollectionPage",
+        "@id": `${siteUrl}/#webpage`,
+        name: "Whether Report — Weekly briefing",
+        url: siteUrl,
+        description: defaultSiteDescription,
+        inLanguage: "en",
+        isPartOf: {
+          "@id": `${siteUrl}#website`,
+        },
+        about: {
+          "@type": "Thing",
+          name: "Macro signal operations guidance",
+        },
+        mainEntity: {
+          "@type": "Dataset",
+          name: "US Treasury yield curve snapshot",
+          isBasedOn: {
+            "@type": "CreativeWork",
+            name: "US Treasury Fiscal Data API",
+            url: "https://fiscaldata.treasury.gov/api-documentation/",
+          },
+        },
+      },
+      buildBreadcrumbList([{ name: "Weekly briefing", path: "/" }]),
+    ],
   };
 
   const {
@@ -256,6 +301,27 @@ export default async function HomePage({
 
         <SignalMatrixPanel assessment={assessment} provenance={treasuryProvenance} />
       </ReportGroup>
+
+      <RelatedReportLinks
+        title="Continue through the report system"
+        links={[
+          {
+            href: "/signals",
+            label: "Signal evidence",
+            description: "Inspect every macro source, threshold, and trend behind this week's regime call.",
+          },
+          {
+            href: "/operations",
+            label: "Action playbook",
+            description: "Convert the current climate into specific execution moves, shields, and briefings.",
+          },
+          {
+            href: "/formulas",
+            label: "Methodology",
+            description: "Review the exact formulas and official source links used in scoring.",
+          },
+        ]}
+      />
     </ReportShell>
   );
 }

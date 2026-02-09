@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { loadReportData } from "../../lib/report/reportData";
 import { siteUrl } from "../../lib/siteUrl";
+import { buildBreadcrumbList, buildPageMetadata, organizationName, websiteName } from "../../lib/seo";
 import { ReportShell } from "../components/reportShell";
+import { RelatedReportLinks } from "../components/relatedReportLinks";
 import {
   BeginnerGlossaryPanel,
   FirstTimeGuidePanel,
@@ -11,11 +13,13 @@ import { reportPageLinks } from "../../lib/report/reportNavigation";
 
 export const runtime = "edge";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Whether Report — Onboarding & glossary",
   description:
     "Get oriented with the Whether Report: a quick guide to reading the signals and a plain-English glossary.",
-};
+  path: "/onboarding",
+  imageAlt: "Whether Report onboarding and glossary overview",
+});
 
 export default async function OnboardingPage({
   searchParams,
@@ -47,21 +51,30 @@ export default async function OnboardingPage({
   ];
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": "WebPage",
-    name: "Whether Report — Onboarding & glossary",
-    url: `${siteUrl}/onboarding`,
-    description:
-      "Get oriented with the Whether Report: a quick guide to reading the signals and a plain-English glossary.",
-    inLanguage: "en",
-    isPartOf: {
-      "@type": "WebSite",
-      name: "Whether — Market Climate Station",
-      url: siteUrl,
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "Whether",
-    },
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": `${siteUrl}/onboarding#webpage`,
+        name: "Whether Report — Onboarding & glossary",
+        url: `${siteUrl}/onboarding`,
+        description:
+          "Get oriented with the Whether Report: a quick guide to reading the signals and a plain-English glossary.",
+        inLanguage: "en",
+        isPartOf: {
+          "@type": "WebSite",
+          name: websiteName,
+          url: siteUrl,
+        },
+        publisher: {
+          "@type": "Organization",
+          name: organizationName,
+        },
+      },
+      buildBreadcrumbList([
+        { name: "Weekly briefing", path: "/" },
+        { name: "Onboarding & glossary", path: "/onboarding" },
+      ]),
+    ],
   };
   const sectionLinks = [
     { href: "#first-time-guide", label: "Orientation steps" },
@@ -168,6 +181,27 @@ export default async function OnboardingPage({
       />
 
       <BeginnerGlossaryPanel />
+
+      <RelatedReportLinks
+        title="Where to go after onboarding"
+        links={[
+          {
+            href: "/signals",
+            label: "Signal evidence",
+            description: "Apply the glossary with live source data and threshold diagnostics.",
+          },
+          {
+            href: "/operations",
+            label: "Action playbook",
+            description: "Turn the regime readout into concrete execution guidance.",
+          },
+          {
+            href: "/formulas",
+            label: "Methodology",
+            description: "Explore the exact formula logic and original data providers.",
+          },
+        ]}
+      />
     </ReportShell>
   );
 }

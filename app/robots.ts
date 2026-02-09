@@ -5,14 +5,15 @@ import { siteUrl } from "../lib/siteUrl";
 
 export default function robots(): MetadataRoute.Robots {
   return {
+    // Allow social unfurlers and crawlers to resolve dynamic OG images while blocking other API routes.
     rules: [
       {
         userAgent: "*",
-        allow: "/",
-        disallow: ["/api/"]
-      }
+        allow: ["/", "/api/og"],
+        disallow: ["/api/"],
+      },
     ],
     sitemap: `${siteUrl}/sitemap.xml`,
-    host: siteUrl
+    host: siteUrl,
   };
 }
