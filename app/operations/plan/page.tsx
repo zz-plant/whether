@@ -90,8 +90,8 @@ export default async function OperationsPlanPage({
       trustStatusAction={trustStatusAction}
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
-      pageTitle="Action playbook"
-      pageSummary="Workstream: plan. See which moves the regime wants next."
+      pageTitle="Action playbook · Plan"
+      pageSummary="First action: review the monthly summary, then lock the playbook for this cycle."
       pageSummaryLink={{ href: "#ops-playbook", label: "Explore details →" }}
       pageLinks={reportPageLinks}
       sectionLinks={operationsSectionLinks.plan}
@@ -103,6 +103,13 @@ export default async function OperationsPlanPage({
       }
     >
       <OperationsWorkstreamNav currentPath="/operations/plan" />
+
+      <section className="weather-panel space-y-2 px-6 py-5">
+        <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">First action</p>
+        <p className="text-sm text-slate-200">
+          Start with the monthly action summary, then align the playbook before reviewing finance strategy and operator asks.
+        </p>
+      </section>
 
       <SectionedReportPanel
         id="ops-monthly-action-summary"

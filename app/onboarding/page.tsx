@@ -119,7 +119,7 @@ export default async function OnboardingPage({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Onboarding & glossary"
       pageSummary="Learn the core questions Whether answers before diving into signal-level detail."
-      pageSummaryLink={{ href: "#first-time-guide", label: "Explore details →" }}
+      pageSummaryLink={{ href: "#onboarding-checklist", label: "Start checklist →" }}
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
       heroVariant="compact"
@@ -133,8 +133,21 @@ export default async function OnboardingPage({
         ) : null
       }
     >
-      <section className="weather-panel space-y-4 px-6 py-5">
+
+      <section id="onboarding-checklist" className="weather-panel space-y-4 px-6 py-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Quick-start checklist</p>
+            <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
+              Complete these three steps in order.
+            </h2>
+          </div>
+          <span className="rounded-full border border-slate-700/70 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-slate-300">
+            Completion target: 3/3
+          </span>
+        </div>
+        <div className="grid gap-3 lg:grid-cols-3">
+
           <div>
             <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
               Recommended onboarding path
@@ -151,6 +164,7 @@ export default async function OnboardingPage({
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
                   Step {index + 1} of {onboardingSteps.length}
                 </p>
+                <p className="text-xs text-emerald-300">Mark complete after reviewing this step.</p>
                 <p className="text-sm font-semibold text-slate-100">{step.title}</p>
                 <p className="text-sm text-slate-300">{step.detail}</p>
               </div>
@@ -181,6 +195,44 @@ export default async function OnboardingPage({
       />
 
       <BeginnerGlossaryPanel />
+
+      <section className="weather-panel space-y-4 px-6 py-5">
+        <div>
+          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Apply each concept</p>
+          <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
+            Jump straight from glossary concepts to the live report sections.
+          </h2>
+        </div>
+        <ul className="grid gap-3 md:grid-cols-3">
+          {[
+            {
+              concept: "Cash availability (tightness)",
+              href: "/signals#sensor-array",
+              label: "Open live sensor feed",
+            },
+            {
+              concept: "Market risk appetite",
+              href: "/signals#thresholds",
+              label: "Review threshold logic",
+            },
+            {
+              concept: "Regime call and actions",
+              href: "/operations/plan#ops-playbook",
+              label: "Open action playbook",
+            },
+          ].map((item) => (
+            <li key={item.concept} className="weather-surface flex flex-col gap-3 p-4">
+              <p className="text-sm font-semibold text-slate-100">{item.concept}</p>
+              <a
+                href={item.href}
+                className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+              >
+                {item.label} →
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <RelatedReportLinks
         title="Where to go after onboarding"

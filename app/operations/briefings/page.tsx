@@ -84,8 +84,8 @@ export default async function OperationsBriefingsPage({
       trustStatusAction={trustStatusAction}
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
-      pageTitle="Action playbook"
-      pageSummary="Workstream: briefings. Pull the narrative leaders will ask for."
+      pageTitle="Action playbook · Briefings"
+      pageSummary="First action: draft the strategy brief, then export leadership-ready kits."
       pageSummaryLink={{ href: "#ops-strategy-brief", label: "Explore details →" }}
       pageLinks={reportPageLinks}
       sectionLinks={operationsSectionLinks.briefings}
@@ -97,6 +97,13 @@ export default async function OperationsBriefingsPage({
       }
     >
       <OperationsWorkstreamNav currentPath="/operations/briefings" />
+
+      <section className="weather-panel space-y-2 px-6 py-5">
+        <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">First action</p>
+        <p className="text-sm text-slate-200">
+          Start by tailoring the strategy brief narrative, then export board/CXO brief packets for circulation.
+        </p>
+      </section>
 
       <SectionedReportPanel
         id="ops-strategy-brief"

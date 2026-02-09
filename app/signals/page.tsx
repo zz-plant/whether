@@ -126,7 +126,7 @@ export default async function SignalsPage({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Signal evidence"
       pageSummary="See the sources and scoring behind the regime call."
-      pageSummaryLink={{ href: "#sensor-array", label: "Explore details →" }}
+      pageSummaryLink={{ href: "#signals-scan-order", label: "Start suggested scan →" }}
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
       heroVariant="compact"
@@ -140,6 +140,33 @@ export default async function SignalsPage({
         ) : null
       }
     >
+      <section id="signals-scan-order" className="weather-panel space-y-4 px-6 py-5">
+        <div>
+          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Suggested scan order</p>
+          <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
+            Run this quick 3-step review before deep diving.
+          </h2>
+        </div>
+        <ol className="grid gap-3 md:grid-cols-3">
+          {[
+            { title: "1) Review regime timeline", href: "#regime-timeline", detail: "Start with sequence changes to frame context." },
+            { title: "2) Check scoring thresholds", href: "#thresholds", detail: "Confirm guardrails still match current tolerance." },
+            { title: "3) Inspect live sensor feed", href: "#sensor-array", detail: "Validate the source readings behind the call." },
+          ].map((item) => (
+            <li key={item.title} className="weather-surface flex flex-col gap-2 p-4">
+              <p className="text-sm font-semibold text-slate-100">{item.title}</p>
+              <p className="text-sm text-slate-300">{item.detail}</p>
+              <a
+                href={item.href}
+                className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+              >
+                Open step →
+              </a>
+            </li>
+          ))}
+        </ol>
+      </section>
+
       <section className="weather-panel space-y-4 px-6 py-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>

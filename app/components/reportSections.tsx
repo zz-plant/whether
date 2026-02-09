@@ -2445,6 +2445,12 @@ export const SensorArray = ({
         </div>
         <div className="weather-panel p-5">
           <p className="type-label text-slate-400">Filters</p>
+          <Collapsible.Root className="mt-3" defaultOpen={false}>
+            <Collapsible.Trigger className="inline-flex min-h-[44px] w-full items-center justify-between rounded-xl border border-slate-800/70 bg-slate-950/60 px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.16em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation">
+              <span>Advanced filters</span>
+              <span className="text-[10px] text-slate-500">Show / hide</span>
+            </Collapsible.Trigger>
+            <Collapsible.Panel className="mt-3">
           <Tabs.Root
             value={tabValue}
             onValueChange={(value) => {
@@ -2553,6 +2559,8 @@ export const SensorArray = ({
               ) : null}
             </Tabs.Panel>
           </Tabs.Root>
+            </Collapsible.Panel>
+          </Collapsible.Root>
         </div>
       </div>
       <div className="mt-4 space-y-4">
