@@ -1,16 +1,18 @@
 # Documentation expectations
 
-## Audience split
-- `README.md`: product framing and local development quick start.
-- `CONTRIBUTING.md`: human contributor workflow and PR expectations.
-- `AGENTS.md` + `docs/agents/*`: AI/agent operating instructions.
-- `docs/README.md`: canonical map for repository documentation.
+## Audience split (source of truth)
+- `README.md` — product framing and local development quick start.
+- `CONTRIBUTING.md` — human contributor workflow and standards.
+- `AGENTS.md` + `docs/agents/*` — AI/agent operating instructions.
+- `docs/README.md` — canonical documentation map.
 
-## When docs must be updated
-- If behavior or interfaces change, update the nearest source-of-truth doc in the same change.
-- If you add a new doc, link it from `docs/README.md`.
-- If guidance changes for contributors or agents, update `CONTRIBUTING.md` or `docs/agents/README.md` respectively.
+## When documentation updates are required
+- Behavior/interface/workflow changes must update relevant docs in the same change.
+- New commands/scripts should be reflected in setup-oriented docs.
+- New documents must be linked from `docs/README.md`.
+- Significant contributor-policy updates should be mirrored in `CONTRIBUTING.md` or `AGENTS.md`.
 
-## Style constraints
-- Prefer concise, scannable sections and explicit command examples.
-- Avoid duplicating full instructions across multiple files; link to canonical docs instead.
+## Writing style
+- Keep sections short, scannable, and command-first.
+- Prefer canonical references over duplicated long-form instructions.
+- Document tradeoffs and assumptions when they affect future contributors.

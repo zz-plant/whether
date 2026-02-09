@@ -1,21 +1,21 @@
 # Agent docs hub
 
-This folder contains task-focused guidance for AI agents and code assistants working in this repository.
+Task-focused guidance for AI agents and code assistants working in this repository.
 
-## Read order
-1. `AGENTS.md` (repo-root operating instructions and precedence)
+## Recommended read order
+1. `../../AGENTS.md` (operating rules and precedence)
 2. `setup.md` (commands)
-3. `project-layout.md` (where code and data live)
-4. Remaining guides as needed for the current task
+3. `project-layout.md` (where to edit)
+4. Remaining guides as needed for the task
 
 ## Guide index
-- `setup.md` — install, run, and quality commands.
-- `project-layout.md` — key directories and ownership boundaries.
-- `engineering-principles.md` — coding and product-engineering conventions.
-- `documentation.md` — doc update expectations and linking rules.
-- `data-and-platform.md` — sourcing and platform readiness constraints.
-- `quality-and-pr.md` — testing and PR hygiene.
-- `ui-ux-standards.md` — strict interface and accessibility constraints.
+- `setup.md` — install/run/build/quality commands.
+- `project-layout.md` — key directories and responsibility boundaries.
+- `engineering-principles.md` — coding conventions and product-engineering posture.
+- `documentation.md` — when/how to update docs and avoid duplication.
+- `data-and-platform.md` — provenance expectations and platform constraints.
+- `quality-and-pr.md` — validation depth, commit hygiene, PR quality bar.
+- `ui-ux-standards.md` — strict UI, accessibility, and performance requirements.
 
-## Scope rule
-These docs are agent-facing guidance, not end-user product documentation. Broader repository docs are indexed in `docs/README.md`.
+## Scope note
+These files are contributor-operational guidance. Product docs and strategic specs are indexed in `../README.md`.
