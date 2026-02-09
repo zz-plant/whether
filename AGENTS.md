@@ -13,7 +13,7 @@ Whether (Regime Station) turns public macro signals into operational guidance fo
 
 ## Operating principles
 - Follow instruction priority: system > developer > user > AGENTS > repo docs.
-- Always check for nested `AGENTS.md` files in directories you touch.
+- Always check for nested `AGENTS.md` files in directories you touch; deeper files override this one.
 - Keep changes focused; avoid drive-by refactors unless requested.
 - Prefer existing patterns/utilities over introducing new parallel systems.
 - Use `rg` for discovery; avoid `ls -R` / `grep -R`.
