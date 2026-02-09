@@ -341,6 +341,12 @@ summary {
   will-change: transform;
 }
 
+
+html {
+  scroll-padding-top: calc(env(safe-area-inset-top) + 6.5rem);
+  scroll-padding-bottom: calc(env(safe-area-inset-bottom) + 8.5rem);
+}
+
 @keyframes display-drift {
   0% {
     transform: translate(0, 0);
@@ -411,7 +417,7 @@ summary:focus-visible {
 }
 
 .weather-mobile-sheet {
-  max-height: min(70vh, calc(100dvh - env(safe-area-inset-top) - 7.5rem));
+  max-height: min(72vh, calc(100dvh - env(safe-area-inset-top) - 6.75rem));
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -428,3 +434,4 @@ summary:focus-visible {
     animation: none;
   }
 }
+
