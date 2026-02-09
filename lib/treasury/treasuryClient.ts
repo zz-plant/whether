@@ -4,11 +4,13 @@
  */
 import type { TreasuryData } from "../types";
 import { findTimeMachineSnapshot } from "../timeMachine/timeMachineCache";
-import { buildHistoricalQuery } from "../timeMachine/timeMachine";
-import { normalizeTreasuryResponse } from "./treasuryNormalizer";
 
-export const TREASURY_ENDPOINT =
-  "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v2/accounting/od/daily_treasury_yield_curve";
+export const TREASURY_ENDPOINTS = {
+  oneMonth: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS1MO",
+  threeMonth: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS3MO",
+  twoYear: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS2",
+  tenYear: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS10",
+} as const;
 
 export interface TreasuryFetchOptions {
   fetcher?: typeof fetch;
@@ -26,17 +28,49 @@ const buildFallbackSnapshot = (snapshot: TreasuryData, reason: string): Treasury
   };
 };
 
-const buildTreasuryUrl = (endpoint: string, asOf?: string) => {
-  const params = new URLSearchParams({
-    sort: "-record_date",
-    "page[size]": "1",
-  });
-
-  if (asOf) {
-    params.set("filter", buildHistoricalQuery(asOf));
+const parseFredCsv = (csv: string) => {
+  const [header, ...rows] = csv.trim().split(/\r?\n/);
+  if (!header) {
+    return new Map<string, number | null>();
   }
 
-  return `${endpoint}?${params.toString()}`;
+  const values = new Map<string, number | null>();
+  for (const row of rows) {
+    const [date, value] = row.split(",");
+    if (!date) {
+      continue;
+    }
+    if (!value || value === ".") {
+      values.set(date, null);
+      continue;
+    }
+    const numeric = Number(value);
+    values.set(date, Number.isFinite(numeric) ? numeric : null);
+  }
+
+  return values;
+};
+
+const findLatestCommonDate = (seriesMaps: Map<string, number | null>[]) => {
+  const firstSeriesDates = Array.from(seriesMaps[0]?.keys() ?? []);
+
+  for (let index = firstSeriesDates.length - 1; index >= 0; index -= 1) {
+    const candidateDate = firstSeriesDates[index];
+    if (!candidateDate) {
+      continue;
+    }
+
+    const hasAllValues = seriesMaps.every((series) => {
+      const value = series.get(candidateDate);
+      return typeof value === "number";
+    });
+
+    if (hasAllValues) {
+      return candidateDate;
+    }
+  }
+
+  return null;
 };
 
 export const fetchTreasuryData = async (
@@ -59,28 +93,62 @@ export const fetchTreasuryData = async (
   }
 
   const fetcher = options.fetcher ?? fetch;
-  const endpoint = options.endpoint ?? TREASURY_ENDPOINT;
+  const baseEndpoint = options.endpoint;
   const fetched_at = new Date().toISOString();
-  const requestUrl = buildTreasuryUrl(endpoint, options.asOf);
+  const endpoints = {
+    oneMonth: baseEndpoint ? `${baseEndpoint}?id=DGS1MO` : TREASURY_ENDPOINTS.oneMonth,
+    threeMonth: baseEndpoint ? `${baseEndpoint}?id=DGS3MO` : TREASURY_ENDPOINTS.threeMonth,
+    twoYear: baseEndpoint ? `${baseEndpoint}?id=DGS2` : TREASURY_ENDPOINTS.twoYear,
+    tenYear: baseEndpoint ? `${baseEndpoint}?id=DGS10` : TREASURY_ENDPOINTS.tenYear,
+  };
 
   try {
-    const response = await fetcher(requestUrl);
-    if (!response.ok) {
-      throw new Error(`Treasury API error: ${response.status}`);
+    const [oneMonthResponse, threeMonthResponse, twoYearResponse, tenYearResponse] =
+      await Promise.all([
+        fetcher(endpoints.oneMonth),
+        fetcher(endpoints.threeMonth),
+        fetcher(endpoints.twoYear),
+        fetcher(endpoints.tenYear),
+      ]);
+
+    const responses = [oneMonthResponse, threeMonthResponse, twoYearResponse, tenYearResponse];
+    const badResponse = responses.find((response) => !response.ok);
+    if (badResponse) {
+      throw new Error(`Treasury API error: ${badResponse.status}`);
     }
 
-    const payload: unknown = await response.json();
-    const normalized = normalizeTreasuryResponse(payload, {
-      fetched_at,
-      source: requestUrl,
-      isLive: true,
-    });
+    const [oneMonthCsv, threeMonthCsv, twoYearCsv, tenYearCsv] = await Promise.all(
+      responses.map((response) => response.text())
+    );
 
-    if (!normalized) {
+    const oneMonthSeries = parseFredCsv(oneMonthCsv);
+    const threeMonthSeries = parseFredCsv(threeMonthCsv);
+    const twoYearSeries = parseFredCsv(twoYearCsv);
+    const tenYearSeries = parseFredCsv(tenYearCsv);
+
+    const recordDate = findLatestCommonDate([
+      oneMonthSeries,
+      threeMonthSeries,
+      twoYearSeries,
+      tenYearSeries,
+    ]);
+
+    if (!recordDate) {
       throw new Error("Treasury API returned no data or invalid payload.");
     }
 
-    return normalized;
+    return {
+      source: "https://fred.stlouisfed.org",
+      record_date: recordDate,
+      fetched_at,
+      isLive: true,
+      yields: {
+        oneMonth: oneMonthSeries.get(recordDate) ?? null,
+        threeMonth: threeMonthSeries.get(recordDate) ?? null,
+        twoYear: twoYearSeries.get(recordDate) ?? null,
+        tenYear: tenYearSeries.get(recordDate) ?? null,
+      },
+    };
   } catch (error) {
     if (options.snapshotFallback) {
       const message =
