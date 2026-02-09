@@ -183,3 +183,8 @@ engineering leaders. The acquisition-ready narrative, artifacts, and checklist l
    - For Turbopack: `bun run dev:turbo`
 3. Open `http://localhost:3000` to view the Market Climate Station UI.
 4. Run full quality checks before shipping: `bun run check`
+
+## Documentation navigation
+- Human contributors: `CONTRIBUTING.md`
+- Agent contributors: `AGENTS.md` and `docs/agents/`
+- Full docs index: `docs/README.md`
