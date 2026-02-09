@@ -3,7 +3,7 @@
 Task-focused guidance for AI agents and code assistants working in this repository.
 
 ## Recommended read order
-1. `../AGENTS.md` (operating rules and precedence)
+1. `../../AGENTS.md` (operating rules and precedence)
 2. `setup.md` (commands)
 3. `project-layout.md` (where to edit)
 4. Remaining guides as needed for the task
