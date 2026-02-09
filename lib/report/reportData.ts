@@ -79,7 +79,7 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
       ? "Live (high confidence)"
       : "Cached (medium)";
   const treasuryProvenance = {
-    sourceLabel: "US Treasury Fiscal Data API",
+    sourceLabel: "Federal Reserve Economic Data (FRED)",
     sourceUrl: treasury.source,
     recordDateLabel,
     timestampLabel: fetchedAtLabel,

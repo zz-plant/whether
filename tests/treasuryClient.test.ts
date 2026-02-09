@@ -6,32 +6,61 @@ import { describe, it } from "node:test";
 import { fetchTreasuryData } from "../lib/treasury/treasuryClient";
 import type { TreasuryData } from "../lib/types";
 
+const buildCsv = (seriesId: string, values: Array<{ date: string; value: string }>) => {
+  const rows = values.map(({ date, value }) => `${date},${value}`).join("\n");
+  return `DATE,${seriesId}\n${rows}`;
+};
+
 describe("treasury client", () => {
   it("returns live data when fetch succeeds", async () => {
-    let requestedUrl = "";
+    const requestedUrls: string[] = [];
     const fetcher: typeof fetch = async (input) => {
-      requestedUrl = input.toString();
+      const url = input.toString();
+      requestedUrls.push(url);
+
+      if (url.includes("DGS1MO")) {
+        return new Response(
+          buildCsv("DGS1MO", [
+            { date: "2024-10-01", value: "5.2" },
+            { date: "2024-10-02", value: "5.1" },
+          ])
+        );
+      }
+
+      if (url.includes("DGS3MO")) {
+        return new Response(
+          buildCsv("DGS3MO", [
+            { date: "2024-10-01", value: "5.0" },
+            { date: "2024-10-02", value: "4.9" },
+          ])
+        );
+      }
+
+      if (url.includes("DGS2")) {
+        return new Response(
+          buildCsv("DGS2", [
+            { date: "2024-10-01", value: "4.8" },
+            { date: "2024-10-02", value: "4.7" },
+          ])
+        );
+      }
+
       return new Response(
-        JSON.stringify({
-          data: [
-            {
-              record_date: "2024-10-01",
-              bc_1month: "5.2",
-              bc_2year: "4.8",
-              bc_10year: "4.6",
-            },
-          ],
-        }),
+        buildCsv("DGS10", [
+          { date: "2024-10-01", value: "4.6" },
+          { date: "2024-10-02", value: "4.5" },
+        ])
       );
     };
 
-    const data = await fetchTreasuryData({
-      fetcher,
-    });
-    assert.equal(data.record_date, "2024-10-01");
+    const data = await fetchTreasuryData({ fetcher });
+    assert.equal(data.record_date, "2024-10-02");
     assert.equal(data.isLive, true);
-    assert.ok(requestedUrl.includes("page%5Bsize%5D=1"));
-    assert.equal(requestedUrl.includes("filter="), false);
+    assert.equal(requestedUrls.length, 4);
+    assert.ok(requestedUrls.some((url) => url.includes("DGS1MO")));
+    assert.ok(requestedUrls.some((url) => url.includes("DGS3MO")));
+    assert.ok(requestedUrls.some((url) => url.includes("DGS2")));
+    assert.ok(requestedUrls.some((url) => url.includes("DGS10")));
   });
 
   it("falls back to snapshot on fetch failure", async () => {
@@ -60,13 +89,13 @@ describe("treasury client", () => {
     assert.ok(data.fallback_at);
   });
 
-
   it("falls back to snapshot when payload shape is invalid", async () => {
     const fetcher: typeof fetch = async () =>
       new Response(
-        JSON.stringify({
-          data: "invalid",
-        })
+        buildCsv("DGS1MO", [
+          { date: "2024-10-01", value: "." },
+          { date: "2024-10-02", value: "." },
+        ])
       );
 
     const snapshot: TreasuryData = {
@@ -92,7 +121,6 @@ describe("treasury client", () => {
     assert.ok(data.fallback_at);
   });
 
-
   it("returns snapshot fallback with explicit reason for historical cache miss", async () => {
     const snapshot: TreasuryData = {
       source: "snapshot",
@@ -117,30 +145,26 @@ describe("treasury client", () => {
     assert.ok(data.fallback_at);
   });
 
-  it("preserves request URL as source metadata for live reads", async () => {
-    const endpoint = "https://example.com/treasury";
-    const fetcher: typeof fetch = async () =>
-      new Response(
-        JSON.stringify({
-          data: [
-            {
-              record_date: "2024-10-01",
-              bc_1month: "5.2",
-              bc_2year: "4.8",
-              bc_10year: "4.6",
-            },
-          ],
-        }),
+  it("preserves custom endpoint support for live reads", async () => {
+    const endpoint = "https://example.com/fredgraph.csv";
+    const requestedUrls: string[] = [];
+    const fetcher: typeof fetch = async (input) => {
+      requestedUrls.push(input.toString());
+      return new Response(
+        buildCsv("DGS", [
+          { date: "2024-10-01", value: "5.2" },
+          { date: "2024-10-02", value: "5.1" },
+        ])
       );
+    };
 
     const data = await fetchTreasuryData({
       fetcher,
       endpoint,
     });
 
-    assert.ok(data.source.startsWith(`${endpoint}?`));
-    assert.equal(data.source.includes("sort=-record_date"), true);
-    assert.equal(data.source.includes("page%5Bsize%5D=1"), true);
+    assert.equal(data.source, "https://fred.stlouisfed.org");
+    assert.equal(requestedUrls.every((url) => url.startsWith(`${endpoint}?id=`)), true);
     assert.equal(data.fetched_at.length > 0, true);
   });
 });
