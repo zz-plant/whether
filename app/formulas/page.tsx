@@ -3,11 +3,14 @@
  * Keeps methodology transparent and shareable for operators.
  */
 import type { Metadata } from "next";
+import { buildBreadcrumbList, buildCanonicalUrl, buildPageMetadata, organizationName, websiteName } from "../../lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Methodology — Whether",
   description: "Sensor formulas and source links for macro signal calculations.",
-};
+  path: "/formulas",
+  imageAlt: "Whether methodology and formula reference",
+});
 
 const formulaCard = "rounded-2xl border border-slate-800 bg-slate-900/40 p-6";
 const formulaSections = [
@@ -153,9 +156,36 @@ const contextFormulaIds = ["cpi-inflation", "unemployment-rate"];
 export default function FormulasPage() {
   const primaryFormulas = formulaSections.filter((item) => primaryFormulaIds.includes(item.id));
   const contextFormulas = formulaSections.filter((item) => contextFormulaIds.includes(item.id));
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "TechArticle",
+        "@id": `${buildCanonicalUrl("/formulas")}#webpage`,
+        headline: "Methodology — Whether",
+        url: buildCanonicalUrl("/formulas"),
+        description: "Sensor formulas and source links for macro signal calculations.",
+        inLanguage: "en",
+        publisher: {
+          "@type": "Organization",
+          name: organizationName,
+        },
+        isPartOf: {
+          "@type": "WebSite",
+          name: websiteName,
+          url: buildCanonicalUrl("/"),
+        },
+      },
+      buildBreadcrumbList([
+        { name: "Weekly briefing", path: "/" },
+        { name: "Methodology", path: "/formulas" },
+      ]),
+    ],
+  };
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       <div className="mx-auto max-w-4xl px-6 py-12">
         <header className="space-y-4">
           <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Method notes</p>
@@ -307,6 +337,40 @@ export default function FormulasPage() {
             </section>
           ))}
         </div>
+
+        <section className="mt-8 weather-panel p-5" aria-label="Related report pages">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Explore next</p>
+          <h2 className="mt-2 text-lg font-semibold text-slate-100">Related report pages</h2>
+          <div className="mt-4 grid gap-3 md:grid-cols-3">
+            {[
+              {
+                href: "/signals",
+                label: "Signal evidence",
+                description: "Trace live data and threshold logic behind each scored regime.",
+              },
+              {
+                href: "/operations",
+                label: "Action playbook",
+                description: "Use formula outcomes to drive planning, decision reviews, and briefings.",
+              },
+              {
+                href: "/onboarding",
+                label: "Onboarding & glossary",
+                description: "Share plain-English definitions with new stakeholders.",
+              },
+            ].map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                className="weather-surface space-y-2 p-4 transition-colors hover:border-sky-400/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+              >
+                <p className="text-sm font-semibold text-slate-100">{item.label}</p>
+                <p className="text-sm text-slate-300">{item.description}</p>
+                <p className="text-xs font-semibold tracking-[0.14em] text-sky-200">Open page →</p>
+              </a>
+            ))}
+          </div>
+        </section>
       </div>
     </main>
   );

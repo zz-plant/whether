@@ -3,7 +3,9 @@ import Link from "next/link";
 import { SectionedReportPanel } from "./components/sectionedReportPanel";
 import { loadReportData } from "../../lib/report/reportData";
 import { siteUrl } from "../../lib/siteUrl";
+import { buildBreadcrumbList, buildPageMetadata, organizationName, websiteName } from "../../lib/seo";
 import { ReportShell } from "../components/reportShell";
+import { RelatedReportLinks } from "../components/relatedReportLinks";
 import { HistoricalBanner, MonthlyActionSummaryPanel } from "../components/reportSections";
 import { reportPageLinks } from "../../lib/report/reportNavigation";
 import {
@@ -15,11 +17,13 @@ import { OperationsWorkstreamNav } from "./components/operationsWorkstreamNav";
 
 export const runtime = "edge";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Whether Report — Action playbook",
   description:
     "Execution-ready guidance, decision shield validation, and export briefs for the Whether Report.",
-};
+  path: "/operations",
+  imageAlt: "Whether Report action playbook overview",
+});
 
 const workstreamHighlights: Record<string, string[]> = {
   "/operations/plan": [
@@ -69,21 +73,30 @@ export default async function OperationsPage({
   ];
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": "WebPage",
-    name: "Whether Report — Action playbook",
-    url: `${siteUrl}/operations`,
-    description:
-      "Execution-ready guidance, decision shield validation, and export briefs for the Whether Report.",
-    inLanguage: "en",
-    isPartOf: {
-      "@type": "WebSite",
-      name: "Whether — Market Climate Station",
-      url: siteUrl,
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "Whether",
-    },
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": `${siteUrl}/operations#webpage`,
+        name: "Whether Report — Action playbook",
+        url: `${siteUrl}/operations`,
+        description:
+          "Execution-ready guidance, decision shield validation, and export briefs for the Whether Report.",
+        inLanguage: "en",
+        isPartOf: {
+          "@type": "WebSite",
+          name: websiteName,
+          url: siteUrl,
+        },
+        publisher: {
+          "@type": "Organization",
+          name: organizationName,
+        },
+      },
+      buildBreadcrumbList([
+        { name: "Weekly briefing", path: "/" },
+        { name: "Action playbook", path: "/operations" },
+      ]),
+    ],
   };
 
   const {
@@ -232,6 +245,27 @@ export default async function OperationsPage({
           ))}
         </div>
       </SectionedReportPanel>
+
+      <RelatedReportLinks
+        title="Keep navigating the report"
+        links={[
+          {
+            href: "/signals",
+            label: "Signal evidence",
+            description: "Trace the macro evidence and thresholds behind each recommended action.",
+          },
+          {
+            href: "/operations/briefings",
+            label: "Briefing kits",
+            description: "Export leadership-ready summaries for board, CXO, and planning reviews.",
+          },
+          {
+            href: "/formulas",
+            label: "Methodology",
+            description: "Review source-linked formula details before finalizing major decisions.",
+          },
+        ]}
+      />
     </ReportShell>
   );
 }

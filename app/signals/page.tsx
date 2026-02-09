@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { loadReportData } from "../../lib/report/reportData";
 import { siteUrl } from "../../lib/siteUrl";
+import { buildBreadcrumbList, buildPageMetadata, organizationName, websiteName } from "../../lib/seo";
 import { ReportShell } from "../components/reportShell";
+import { RelatedReportLinks } from "../components/relatedReportLinks";
 import {
   HistoricalBanner,
   MacroSignalsPanel,
@@ -14,11 +16,13 @@ import { reportPageLinks } from "../../lib/report/reportNavigation";
 
 export const runtime = "edge";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Whether Report — Signal evidence",
   description:
     "Macro signals, sensor detail, thresholds, and historical context for Whether Market Climate Station.",
-};
+  path: "/signals",
+  imageAlt: "Whether Report signal evidence overview",
+});
 
 export default async function SignalsPage({
   searchParams,
@@ -33,21 +37,34 @@ export default async function SignalsPage({
   } as const;
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": "WebPage",
-    name: "Whether Report — Signal evidence",
-    url: `${siteUrl}/signals`,
-    description:
-      "Macro signals, sensor detail, thresholds, and historical context for Whether Market Climate Station.",
-    inLanguage: "en",
-    isPartOf: {
-      "@type": "WebSite",
-      name: "Whether — Market Climate Station",
-      url: siteUrl,
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "Whether",
-    },
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": `${siteUrl}/signals#webpage`,
+        name: "Whether Report — Signal evidence",
+        url: `${siteUrl}/signals`,
+        description:
+          "Macro signals, sensor detail, thresholds, and historical context for Whether Market Climate Station.",
+        inLanguage: "en",
+        isPartOf: {
+          "@type": "WebSite",
+          name: websiteName,
+          url: siteUrl,
+        },
+        publisher: {
+          "@type": "Organization",
+          name: organizationName,
+        },
+        mainEntity: {
+          "@type": "Dataset",
+          name: "Macro signal evidence feed",
+        },
+      },
+      buildBreadcrumbList([
+        { name: "Weekly briefing", path: "/" },
+        { name: "Signal evidence", path: "/signals" },
+      ]),
+    ],
   };
   const sectionLinks = [
     { href: "#sensor-array", label: "Live data feed" },
@@ -270,6 +287,27 @@ export default async function SignalsPage({
         selectedYear={selectedYear}
         selectedMonth={selectedMonth}
         searchParams={searchParams}
+      />
+
+      <RelatedReportLinks
+        title="Related report pages"
+        links={[
+          {
+            href: "/operations",
+            label: "Action playbook",
+            description: "Use the scored signals to drive execution moves and decision safeguards.",
+          },
+          {
+            href: "/formulas",
+            label: "Methodology",
+            description: "Inspect formula definitions and source documentation for each signal.",
+          },
+          {
+            href: "/onboarding",
+            label: "Onboarding & glossary",
+            description: "Share plain-English definitions with teams new to macro-driven planning.",
+          },
+        ]}
       />
     </ReportShell>
   );
