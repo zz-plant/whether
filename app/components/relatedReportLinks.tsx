@@ -1,7 +1,8 @@
+import type { Route } from "next";
 import Link from "next/link";
 
 type RelatedReportLink = {
-  href: string;
+  href: Route;
   label: string;
   description: string;
 };
