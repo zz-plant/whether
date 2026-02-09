@@ -205,8 +205,8 @@ export default async function HomePage({
       pageTitle="Weekly briefing"
       pageSummary="Weekly regime pulse and recommended moves."
       primaryCta={{
-        href: "/operations/briefings#ops-export-briefs",
-        label: "Copy-ready leadership brief",
+        href: "/onboarding",
+        label: "Start here: onboarding",
       }}
       secondaryCta={{ href: "#weekly-action-summary", label: "Start with this week" }}
       exportCta={{ href: "#executive-snapshot", label: "See leadership summary" }}

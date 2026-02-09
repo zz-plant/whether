@@ -161,6 +161,11 @@ export const TimeMachinePanel = ({
       .join("\n");
   };
 
+  const toTimestamp = (value: string) => {
+    const parsed = new Date(value).getTime();
+    return Number.isNaN(parsed) ? null : parsed;
+  };
+
   const [timelineCadence, setTimelineCadence] = useState<
     "weekly" | "monthly" | "quarterly" | "yearly"
   >("monthly");
@@ -192,13 +197,25 @@ export const TimeMachinePanel = ({
       return;
     }
     setRangeStart((previous) => {
-      if (!previous || previous < cadenceMin || previous > cadenceMax) {
+      const previousTimestamp = toTimestamp(previous);
+      const minTimestamp = toTimestamp(cadenceMin);
+      const maxTimestamp = toTimestamp(cadenceMax);
+      if (!previousTimestamp || !minTimestamp || !maxTimestamp) {
+        return cadenceMin;
+      }
+      if (previousTimestamp < minTimestamp || previousTimestamp > maxTimestamp) {
         return cadenceMin;
       }
       return previous;
     });
     setRangeEnd((previous) => {
-      if (!previous || previous < cadenceMin || previous > cadenceMax) {
+      const previousTimestamp = toTimestamp(previous);
+      const minTimestamp = toTimestamp(cadenceMin);
+      const maxTimestamp = toTimestamp(cadenceMax);
+      if (!previousTimestamp || !minTimestamp || !maxTimestamp) {
+        return cadenceMax;
+      }
+      if (previousTimestamp < minTimestamp || previousTimestamp > maxTimestamp) {
         return cadenceMax;
       }
       return previous;
@@ -209,11 +226,20 @@ export const TimeMachinePanel = ({
     if (!rangeStart || !rangeEnd) {
       return [];
     }
-    if (rangeEnd < rangeStart) {
+    const rangeStartTimestamp = toTimestamp(rangeStart);
+    const rangeEndTimestamp = toTimestamp(rangeEnd);
+    if (!rangeStartTimestamp || !rangeEndTimestamp || rangeEndTimestamp < rangeStartTimestamp) {
       return [];
     }
     return cadenceEntries
-      .filter((entry) => entry.asOf >= rangeStart && entry.asOf <= rangeEnd)
+      .filter((entry) => {
+        const entryTimestamp = toTimestamp(entry.asOf);
+        return Boolean(
+          entryTimestamp &&
+            entryTimestamp >= rangeStartTimestamp &&
+            entryTimestamp <= rangeEndTimestamp
+        );
+      })
       .sort((a, b) => new Date(b.asOf).getTime() - new Date(a.asOf).getTime());
   }, [cadenceEntries, rangeEnd, rangeStart]);
 
