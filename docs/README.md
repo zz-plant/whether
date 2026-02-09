@@ -1,23 +1,28 @@
 # Documentation map
 
-This directory is organized by audience so developers, contributors, and agents can quickly find the right source of truth.
+This directory is organized by audience so contributors can find the right source of truth quickly.
 
-## For developers & contributors
-- Start with [`../CONTRIBUTING.md`](../CONTRIBUTING.md) for setup, workflow, and quality gates.
-- Use [`architecture.md`](architecture.md) for system-level design.
-- Use [`stack-compatibility-matrix.md`](stack-compatibility-matrix.md) and modernization docs when changing platform/runtime assumptions.
+## Start here by role
+- **Human contributors:** `../CONTRIBUTING.md`
+- **Agent contributors:** `../AGENTS.md` then `agents/README.md`
+- **System design and architecture:** `architecture.md`
 
-## For agents (AI/code assistants)
-- Start with [`agents/README.md`](agents/README.md).
-- Follow task-focused guidance in `docs/agents/*`.
-- Treat [`../AGENTS.md`](../AGENTS.md) as operating instructions and precedence rules.
+## Core technical docs
+- `architecture.md` — data flow, modules, and extension points.
+- `stack-compatibility-matrix.md` — runtime/platform support and constraints.
+- `stack-modernization-*.md` — modernization inventory, plan, and execution tracking.
 
-## Product and planning artifacts
-- PRD/spec direction: `prd-next-level.md`, `specs-next-level.md`, `feature-specs-current.md`.
-- Execution and planning: `roadmap-audit.md`, `issue-scan.md`.
-- Acquisition narrative: `acquisition/reforge-ready.md`.
+## Product direction and planning
+- `feature-specs-current.md` — implemented/current feature intent.
+- `prd-next-level.md` and `specs-next-level.md` — next-level product/spec direction.
+- `roadmap-audit.md` and `issue-scan.md` — planning and execution context.
+- `acquisition/reforge-ready.md` — acquisition narrative and readiness assets.
 
-## Maintenance conventions
-- Prefer updating an existing document over creating a near-duplicate.
-- When adding a new document, link it from this map and (if relevant) from `CONTRIBUTING.md` or `docs/agents/README.md`.
-- Keep this map concise; detailed policy belongs in audience-specific docs.
+## Agent guidance
+- `agents/README.md` — entry point for task-oriented agent guidance.
+- `agents/*.md` — concise policies for setup, quality, docs, data, and UI standards.
+
+## Maintenance rules
+- Prefer updating existing docs over creating near-duplicates.
+- When adding a doc, link it here and from the relevant audience entrypoint.
+- Keep docs action-oriented: explicit commands, owners, and source-of-truth pointers.

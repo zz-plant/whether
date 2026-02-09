@@ -1,13 +1,14 @@
 # Engineering principles & coding conventions
 
 ## Working agreements
-- **Clarity over cleverness**: prioritize readability and explicit naming over terse abstractions.
-- **Traceable data**: every output should point back to a verifiable public source (US Treasury).
-- **Plain English first**: translate financial jargon into operational consequences.
-- **Serious, not cute**: avoid playful UI patterns; aim for professional, high-density dashboards.
+- **Clarity over cleverness:** explicit names and readable control flow.
+- **Traceable outputs:** user-visible data should map to verifiable sources.
+- **Plain-English interpretation:** financial signals should become operational language.
+- **Serious product posture:** optimize for trust, not novelty.
 
-## Coding conventions
-- Prefer small, pure functions with clear inputs/outputs.
-- Keep scoring and classification logic in a dedicated core module.
-- Co-locate types and logic for the Regime Engine to avoid drift.
-- Avoid hidden side effects in data fetchers; surface freshness and source metadata explicitly.
+## Implementation guidance
+- Prefer small, composable functions with explicit inputs/outputs.
+- Keep regime scoring and classification deterministic and well-tested.
+- Avoid hidden side effects in fetch/transformation paths.
+- Propagate metadata (source URL, capture timestamp, confidence) whenever available.
+- Reuse existing utilities/types before creating new abstractions.

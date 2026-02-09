@@ -1,10 +1,12 @@
 # Data sourcing & platform readiness
 
-## Data and sourcing requirements
-- Surface data freshness (timestamp) and source metadata for every fetched series.
-- Prefer explicit source URLs in code comments or metadata objects.
-- Avoid silent fallbacks; propagate errors with enough context to debug missing data.
+## Data and provenance requirements
+- Surface freshness (timestamp) and source metadata for fetched series.
+- Prefer explicit source URLs in metadata objects and/or comments.
+- Avoid silent fallbacks; return debuggable errors when data is missing.
+- Keep snapshots/cache artifacts clearly named and documented in nearby docs.
 
-## Cloudflare readiness (planned)
-- Design data-fetching code so it can run in Cloudflare Workers/Pages functions later.
-- Keep API calls isolated behind a small client interface.
+## Platform readiness guidance
+- Isolate external API calls behind small client interfaces.
+- Keep transform logic runtime-portable (Node today, edge/serverless-friendly tomorrow).
+- Avoid Node-only APIs in shared logic unless intentionally server-only.

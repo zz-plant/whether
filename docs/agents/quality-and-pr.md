@@ -1,9 +1,18 @@
 # Testing & PR hygiene
 
-## Testing and verification
-- Add unit tests for regime classification, scoring, and decision rules.
-- If tests are skipped, call it out explicitly in the PR summary.
+## Validation expectations
+- Run the smallest meaningful verification set for the scope of change.
+- Typical baseline for non-trivial changes: `bun run lint` + `bun test`.
+- Prefer `bun run check` before shipping broad/refactor changes.
+- Add/update tests when changing scoring, classification, or decision behavior.
 
-## Commit and PR hygiene
-- Use clear, descriptive commit messages.
-- Summaries should answer: *what changed* and *why it matters*.
+## Commit quality
+- Keep commits coherent and reviewable.
+- Use descriptive commit subjects (what changed + intent).
+
+## PR quality bar
+PR summaries should clearly state:
+1. What changed.
+2. Why it matters.
+3. How it was validated (commands + outcomes).
+4. Any known risks, limitations, or follow-up work.
