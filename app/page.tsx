@@ -46,6 +46,50 @@ const ReportGroup = ({
   </section>
 );
 
+const homeSectionSequence = [
+  { href: "#operator-fit", label: "Who this is for" },
+  { href: "#briefing-flow", label: "Recommended read order" },
+  { href: "#weekly-action-summary", label: "This week's actions" },
+  { href: "#executive-snapshot", label: "Leadership summary" },
+  { href: "#regime-alerts", label: "New alerts" },
+  { href: "#regime-summary", label: "Market climate summary" },
+  { href: "#signal-matrix", label: "Signal breakdown" },
+  { href: "#regime-assessment", label: "What the scores mean" },
+] as const;
+
+const operatorFitPrimitives = [
+  {
+    title: "Audience",
+    detail: "Product and engineering leaders navigating macro-sensitive planning cycles.",
+  },
+  {
+    title: "Decision window",
+    detail: "Weekly planning, staff, and budget checkpoints where timing and risk matter.",
+  },
+  {
+    title: "Primary output",
+    detail: "A clear posture: what to do now, what to monitor, and what to delay.",
+  },
+] as const;
+
+const briefingFlowSteps = [
+  {
+    title: "Set this week",
+    detail: "Read This week's actions and lock the operating posture before meetings.",
+    href: "#weekly-action-summary",
+  },
+  {
+    title: "Align leadership",
+    detail: "Use the leadership summary to confirm confidence, constraints, and non-negotiables.",
+    href: "#executive-snapshot",
+  },
+  {
+    title: "Validate with evidence",
+    detail: "Scan alerts and signal detail before committing to pricing, hiring, or spend.",
+    href: "#regime-alerts",
+  },
+] as const;
+
 export const generateMetadata = ({
   searchParams,
 }: {
@@ -106,15 +150,10 @@ export default async function HomePage({
 }: {
   searchParams?: { month?: string; year?: string; [key: string]: string | undefined };
 }) {
-  const sectionLinks = [
-    { href: "#operator-fit", label: "Who this is for" },
-    { href: "#weekly-action-summary", label: "This week's actions" },
-    { href: "#regime-summary", label: "Market climate summary" },
-    { href: "#executive-snapshot", label: "Leadership summary" },
-    { href: "#regime-alerts", label: "New alerts" },
-    { href: "#regime-assessment", label: "What the scores mean" },
-    { href: "#signal-matrix", label: "Signal breakdown" },
-  ];
+  const sectionLinks = homeSectionSequence.map((section, index) => ({
+    href: section.href,
+    label: `${index}. ${section.label}`,
+  }));
   const structuredData = {
     "@context": "https://schema.org",
     "@graph": [
@@ -232,26 +271,45 @@ export default async function HomePage({
           </p>
         </div>
         <div className="grid gap-3 lg:grid-cols-3">
-          {[
-            {
-              title: "Read the regime",
-              detail: "Convert Treasury and macro data into an operating posture.",
-            },
-            {
-              title: "Validate key bets",
-              detail: "Pressure-test roadmap, hiring, pricing, and spend before lock-in.",
-            },
-            {
-              title: "Brief leadership quickly",
-              detail: "Export source-linked guidance for weekly and monthly reviews.",
-            },
-          ].map((item) => (
+          {operatorFitPrimitives.map((item) => (
             <article key={item.title} className="weather-surface space-y-2 p-4">
               <p className="text-sm font-semibold text-slate-100">{item.title}</p>
               <p className="text-sm text-slate-300">{item.detail}</p>
             </article>
           ))}
         </div>
+      </section>
+
+      <section id="briefing-flow" className="weather-panel space-y-4 px-6 py-5">
+        <div className="space-y-2">
+          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Read order</p>
+          <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
+            Follow this sequence to brief fast and avoid missed context.
+          </h2>
+          <p className="max-w-3xl text-sm text-slate-300">
+            Start with immediate decisions, validate constraints for leadership, then use alerts and
+            raw signals to pressure-test any irreversible move.
+          </p>
+        </div>
+        <ol className="grid gap-3 lg:grid-cols-3">
+          {briefingFlowSteps.map((item, index) => (
+            <li key={item.title} className="weather-surface space-y-3 p-4">
+              <div className="inline-flex min-h-[44px] items-center gap-2">
+                <span className="weather-pill inline-flex h-7 min-w-7 items-center justify-center px-2 text-[11px] font-semibold tracking-[0.14em] text-slate-200">
+                  {index + 1}
+                </span>
+                <p className="text-sm font-semibold text-slate-100">{item.title}</p>
+              </div>
+              <p className="text-sm text-slate-300">{item.detail}</p>
+              <a
+                href={item.href}
+                className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-sky-200 underline decoration-slate-500/80 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+              >
+                Open section
+              </a>
+            </li>
+          ))}
+        </ol>
       </section>
 
       <ReportGroup
