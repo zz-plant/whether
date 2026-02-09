@@ -14,11 +14,14 @@ html {
   scroll-behavior: smooth;
   color-scheme: dark;
   background-color: #020617;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
   @apply bg-slate-950 text-slate-100 antialiased;
   font-family: "Inter", system-ui, -apple-system, sans-serif;
+  min-height: 100dvh;
 }
 
 .weather-shell {
@@ -395,6 +398,7 @@ summary:focus-visible {
     0 -20px 40px -28px rgba(2, 6, 23, 0.92),
     0 -8px 18px -14px rgba(56, 189, 248, 0.24);
   overscroll-behavior: contain;
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
 }
 
 .weather-mobile-panel {
@@ -404,6 +408,10 @@ summary:focus-visible {
     0 10px 22px -18px rgba(56, 189, 248, 0.25);
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
+}
+
+.weather-mobile-sheet {
+  max-height: min(70vh, calc(100dvh - env(safe-area-inset-top) - 7.5rem));
 }
 
 @media (prefers-reduced-motion: reduce) {

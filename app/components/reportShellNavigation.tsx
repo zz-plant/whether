@@ -382,7 +382,7 @@ export const ReportMobileNavigation = ({
         </div>
 
         <Collapsible.Panel className="absolute bottom-full left-0 right-0 mb-3">
-          <div className="weather-mobile-panel max-h-[70vh] space-y-4 overflow-auto px-4 py-4">
+          <div className="weather-mobile-panel weather-mobile-sheet space-y-4 overflow-auto px-4 py-4">
             <div className="flex items-start justify-between gap-3">
               <div className="space-y-1">
                 <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">
