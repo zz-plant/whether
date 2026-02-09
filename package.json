@@ -13,8 +13,8 @@
     "lint:fix": "next lint --fix",
     "check": "bun run lint && bun run typecheck && bun run test",
     "typecheck": "tsc --noEmit",
-    "test": "node --test",
-    "test:watch": "node --test --watch"
+    "test": "bun test",
+    "test:watch": "bun test --watch"
   },
   "engines": {
     "node": ">=20.16.0"
