@@ -146,7 +146,7 @@ describe("treasury client", () => {
   });
 
   it("preserves custom endpoint support for live reads", async () => {
-    const endpoint = "https://example.com/fredgraph.csv";
+    const endpoint = "https://example.com/fredgraph.csv?cosd=2024-01-01&coed=2024-12-31&auth=token";
     const requestedUrls: string[] = [];
     const fetcher: typeof fetch = async (input) => {
       requestedUrls.push(input.toString());
@@ -164,7 +164,18 @@ describe("treasury client", () => {
     });
 
     assert.equal(data.source, "https://fred.stlouisfed.org");
-    assert.equal(requestedUrls.every((url) => url.startsWith(`${endpoint}?id=`)), true);
+    assert.equal(
+      requestedUrls.every((url) => {
+        const parsed = new URL(url);
+        return (
+          parsed.searchParams.get("cosd") === "2024-01-01" &&
+          parsed.searchParams.get("coed") === "2024-12-31" &&
+          parsed.searchParams.get("auth") === "token" &&
+          ["DGS1MO", "DGS3MO", "DGS2", "DGS10"].includes(parsed.searchParams.get("id") ?? "")
+        );
+      }),
+      true
+    );
     assert.equal(data.fetched_at.length > 0, true);
   });
 });
