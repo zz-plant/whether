@@ -62,3 +62,24 @@ export const resolveTimeMachineSelection = (searchParams?: {
     banner: formatHistoricalBanner(request.year, request.month),
   };
 };
+
+export const buildTimeMachineHref = (
+  href: string,
+  selection?: TimeMachineRequest | null
+) => {
+  if (!selection) {
+    return href;
+  }
+
+  const [baseHref, hash = ""] = href.split("#");
+  const [pathname, queryString = ""] = baseHref.split("?");
+  const params = new URLSearchParams(queryString);
+
+  params.set("month", String(selection.month));
+  params.set("year", String(selection.year));
+
+  const query = params.toString();
+  const hashSuffix = hash ? `#${hash}` : "";
+
+  return query ? `${pathname}?${query}${hashSuffix}` : `${pathname}${hashSuffix}`;
+};

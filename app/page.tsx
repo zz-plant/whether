@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { resolveTimeMachineSelection, parseTimeMachineRequest } from "../lib/timeMachine/timeMachineSelection";
+import {
+  resolveTimeMachineSelection,
+  parseTimeMachineRequest,
+  buildTimeMachineHref,
+} from "../lib/timeMachine/timeMachineSelection";
 import { loadReportData } from "../lib/report/reportData";
 import { siteUrl } from "../lib/siteUrl";
 import {
@@ -217,6 +221,7 @@ export default async function HomePage({
     treasuryProvenance,
   } = await loadReportData(searchParams);
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
+  const operationsPlanHref = buildTimeMachineHref("/operations/plan", historicalSelection);
   const trustStatusLabel = historicalSelection
     ? "Historical snapshot"
     : isFallback
@@ -324,7 +329,7 @@ export default async function HomePage({
           Move directly into the execution flow so the plan, decision checks, and briefing outputs stay in sequence.
         </p>
         <a
-          href="/operations/plan"
+          href={operationsPlanHref}
           className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-sky-200 underline decoration-slate-500/80 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
         >
           Open plan workspace
