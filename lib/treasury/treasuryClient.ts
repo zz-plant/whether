@@ -19,6 +19,12 @@ export interface TreasuryFetchOptions {
   asOf?: string;
 }
 
+const buildSeriesEndpoint = (baseEndpoint: string, seriesId: string): string => {
+  const endpointUrl = new URL(baseEndpoint);
+  endpointUrl.searchParams.set("id", seriesId);
+  return endpointUrl.toString();
+};
+
 const buildFallbackSnapshot = (snapshot: TreasuryData, reason: string): TreasuryData => {
   return {
     ...snapshot,
@@ -96,10 +102,10 @@ export const fetchTreasuryData = async (
   const baseEndpoint = options.endpoint;
   const fetched_at = new Date().toISOString();
   const endpoints = {
-    oneMonth: baseEndpoint ? `${baseEndpoint}?id=DGS1MO` : TREASURY_ENDPOINTS.oneMonth,
-    threeMonth: baseEndpoint ? `${baseEndpoint}?id=DGS3MO` : TREASURY_ENDPOINTS.threeMonth,
-    twoYear: baseEndpoint ? `${baseEndpoint}?id=DGS2` : TREASURY_ENDPOINTS.twoYear,
-    tenYear: baseEndpoint ? `${baseEndpoint}?id=DGS10` : TREASURY_ENDPOINTS.tenYear,
+    oneMonth: baseEndpoint ? buildSeriesEndpoint(baseEndpoint, "DGS1MO") : TREASURY_ENDPOINTS.oneMonth,
+    threeMonth: baseEndpoint ? buildSeriesEndpoint(baseEndpoint, "DGS3MO") : TREASURY_ENDPOINTS.threeMonth,
+    twoYear: baseEndpoint ? buildSeriesEndpoint(baseEndpoint, "DGS2") : TREASURY_ENDPOINTS.twoYear,
+    tenYear: baseEndpoint ? buildSeriesEndpoint(baseEndpoint, "DGS10") : TREASURY_ENDPOINTS.tenYear,
   };
 
   try {
