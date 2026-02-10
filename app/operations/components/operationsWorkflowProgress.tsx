@@ -42,7 +42,7 @@ export const OperationsWorkflowProgress = ({ currentPath }: { currentPath: Route
           return (
             <li key={step.href}>
               <Link
-                href={href}
+                href={href as Route}
                 aria-current={isActive ? "step" : undefined}
                 className={`weather-surface flex min-h-[84px] flex-col gap-1 rounded-xl border p-3 transition-colors ${
                   isActive

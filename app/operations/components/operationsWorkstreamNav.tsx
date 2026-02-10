@@ -37,7 +37,7 @@ export const OperationsWorkstreamNav = ({ currentPath }: { currentPath: Route })
           return (
             <li key={link.href}>
               <Link
-                href={href}
+                href={href as Route}
                 aria-current={isActive ? "page" : undefined}
                 className={getItemClasses(link, currentPath)}
               >
