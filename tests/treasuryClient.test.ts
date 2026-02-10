@@ -167,4 +167,32 @@ describe("treasury client", () => {
     assert.equal(requestedUrls.every((url) => url.startsWith(`${endpoint}?id=`)), true);
     assert.equal(data.fetched_at.length > 0, true);
   });
+
+  it("preserves existing custom endpoint query params when setting series id", async () => {
+    const endpoint = "https://example.com/fredgraph.csv?cosd=2024-01-01&coed=2024-12-31&api_key=test";
+    const requestedUrls: string[] = [];
+    const fetcher: typeof fetch = async (input) => {
+      requestedUrls.push(input.toString());
+      return new Response(
+        buildCsv("DGS", [
+          { date: "2024-10-01", value: "5.2" },
+          { date: "2024-10-02", value: "5.1" },
+        ])
+      );
+    };
+
+    await fetchTreasuryData({
+      fetcher,
+      endpoint,
+    });
+
+    assert.equal(requestedUrls.length, 4);
+    for (const requestUrl of requestedUrls) {
+      const parsed = new URL(requestUrl);
+      assert.equal(parsed.searchParams.get("cosd"), "2024-01-01");
+      assert.equal(parsed.searchParams.get("coed"), "2024-12-31");
+      assert.equal(parsed.searchParams.get("api_key"), "test");
+      assert.ok(["DGS1MO", "DGS3MO", "DGS2", "DGS10"].includes(parsed.searchParams.get("id") ?? ""));
+    }
+  });
 });
