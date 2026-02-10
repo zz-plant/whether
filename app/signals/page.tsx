@@ -131,7 +131,7 @@ export default async function SignalsPage({
       sectionLinks={sectionLinks}
       heroVariant="compact"
       pageNavVariant="compact"
-      primaryCta={{ href: "#sensor-array", label: "Review live data feed" }}
+      primaryCta={{ href: "#sensor-array", label: "Open live data feed" }}
       secondaryCta={{ href: "#thresholds", label: "Check scoring thresholds" }}
       structuredData={JSON.stringify(structuredData)}
       historicalBanner={

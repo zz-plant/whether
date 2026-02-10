@@ -1,67 +1,70 @@
 # User Journey Critique (3 Typical Journeys)
 
-Date: 2026-02-10
-Scope: Weekly briefing, Signal evidence, and Action playbook workflows.
+Date: 2026-02-10  
+Method: Manual traversal on local dev server (`bun run dev`) with Playwright.
 
-## Journey 1 — New leader onboarding (Home → Onboarding → Signals)
+## Journey 1 — First-time orientation (Home → Onboarding → Signals)
 
 ### What works well
-- The home page leads with role fit and an explicit reading sequence, which lowers orientation time.
-- "Start here: onboarding" is a strong primary CTA for first-time users.
-- Onboarding uses a clear three-step sequence and points users to live evidence pages.
+- The homepage offers a clear “Weekly briefing” entry point and a visible onboarding CTA (`Start here: onboarding`), which gives new users an immediate first click.
+- Onboarding content is sequenced and practical (orientation steps + glossary + jump links to report destinations).
+- The Signals page opens with a compact “quick 3-step review,” reinforcing a fast analysis path before deeper tooling.
 
 ### Friction observed
-- There are many top-level paths early (weekly, operations, signals, formulas, onboarding). For first-time users, this can feel like "choose your own adventure" before they understand the model.
-- The onboarding checklist communicates completion target but does not appear to persist completion state, so users may lose progress cues between visits.
-- Some CTA labels vary between "Start here", "Start checklist", "Start orientation", and "Start the guide", increasing cognitive load.
+- Early navigation still presents multiple parallel options (`Weekly briefing`, `Action playbook`, `Signal evidence`, `Methodology`, `Onboarding & glossary`), which can increase decision overhead for first-time users.
+- CTA language is directionally good but still slightly fragmented across pages (`Start here`, `Start orientation`, `Open signal evidence`, `Review live data feed`).
+- Onboarding emphasizes sequence but does not expose an obvious persistent “completion” state in-page (for example, completed step markers).
 
 ### Constructive recommendations
-1. Add a lightweight "mode switch" (First-time vs Returning) near the hero to reduce initial branch complexity.
-2. Persist onboarding step completion in local storage and reflect progress in the header badge.
-3. Standardize onboarding CTA verbs to one pattern (for example: "Start orientation", "Open glossary", "Open signal evidence").
+1. Add a first-session guidance mode that visually narrows choices to one recommended next action per screen.
+2. Normalize CTA verbs to one pattern (for example: “Start …” for first actions, “Open …” for destinations).
+3. Introduce explicit completion affordances in onboarding (checkmarks + persisted step state).
 
 ---
 
-## Journey 2 — Evidence validation under time pressure (Signals page)
+## Journey 2 — Weekly decision scan (Weekly briefing → Action playbook)
 
 ### What works well
-- The suggested 3-step scan order is excellent for time-boxed checks.
-- The page combines summary, threshold controls, and time-machine context in one place.
-- Keyboard accessibility starts strong: skip link receives focus on first Tab.
+- The Weekly briefing page communicates intent quickly: “Fast operating guidance for macro-driven weeks.”
+- The top section order (action priorities, weekly action map, leadership readout) supports rapid executive scanning.
+- Transition to the Action playbook is straightforward and keeps context anchored around execution.
 
 ### Friction observed
-- The page is feature-dense; users can hit advanced controls before they finish the suggested scan path.
-- "Open step" is repeated on all cards and can feel ambiguous when quickly scanning.
-- Browser console shows a Base UI label mismatch warning while navigating this area, which can erode trust for technical users.
+- The initial viewport is information-rich; section controls and navigation elements compete with the primary “what should I do first?” flow.
+- Some labels are close in meaning (`Action priorities`, `Weekly action map`, `Leadership readout`) without explicit hierarchy for urgency.
+- Users can move into detailed report sections quickly without confirmation that the weekly top-line interpretation is complete.
 
 ### Constructive recommendations
-1. Collapse advanced controls by default behind a sticky "Advanced diagnostics" drawer, with the 3-step scan pinned above.
-2. Replace generic "Open step" with specific actions ("Open timeline", "Open thresholds", "Open sensor feed").
-3. Resolve the Base UI label warning to keep the console clean for analyst/operator users.
+1. Add a pinned “Start with this sequence” strip that remains visible through the first scroll region.
+2. Apply explicit urgency tags to major sections (e.g., “Read first”, “Then decide”, “Reference”).
+3. Add a completion handoff cue before deep-linking into operations (e.g., “Weekly interpretation complete → continue to Plan”).
 
 ---
 
-## Journey 3 — From strategy to execution deliverables (Operations → Plan/Decisions/Briefings)
+## Journey 3 — Execution handoff (Operations overview → Plan → Decisions → Briefings)
 
 ### What works well
-- Workstream segmentation (Overview / Plan / Decisions / Briefings) is clear and closely aligned with leadership workflows.
-- Overview page provides immediate next steps and a direct path to each workstream.
-- Briefings page starts with explicit "first action" framing, which helps users begin quickly.
+- The operations architecture maps to real execution behavior (`Plan`, `Decisions`, `Briefings`).
+- Page titles are explicit and scoped (`Action playbook · Plan`, `· Decisions`, `· Briefings`), which aids orientation.
+- Copy/export actions are prominent in decision and briefing views, matching operator needs.
 
 ### Friction observed
-- Users can lose "where am I in this workflow" context when moving between workstreams; the hierarchy feels broad rather than sequential.
-- Similar copy blocks across pages can make subpages feel less differentiated on first glance.
-- There is no obvious completion/progress model across Plan → Decisions → Briefings for users preparing an end-to-end packet.
+- The “plan → decisions → briefings” sequence is stated in copy, but progress is not strongly visualized as a persistent stepper.
+- Similar shell/navigation patterns across subpages can make first-view differentiation weaker than intended.
+- System trust is slightly affected by a visible console warning in this area (`Base UI <Field.Label> ... nativeLabel`).
 
 ### Constructive recommendations
-1. Add a visible progress rail across operations pages (Step 1 Plan, Step 2 Decisions, Step 3 Briefings).
-2. Add "Next recommended action" cards at each workstream footer to encourage forward movement.
-3. Introduce a final "brief readiness" checklist that confirms assumptions, decisions, and exports are complete.
+1. Add a persistent operations progress rail with current step, completed steps, and next step callout.
+2. Increase subpage-specific first-action blocks at top of each workstream.
+3. Resolve console warnings on core execution surfaces to preserve trust for technical users.
 
 ---
 
-## Overall priority list
-1. **Highest impact:** enforce a linear default path for first-time and execution workflows.
-2. **Medium impact:** reduce language inconsistency in CTAs and repeated generic labels.
-3. **Medium impact:** surface progress persistence (onboarding + operations completion cues).
-4. **Quick win:** fix console warnings in critical analyst flows.
+## Cross-journey themes
+1. **Orientation and focus:** Reduce first-view branching and highlight one recommended next action.
+2. **Progress visibility:** Persist and display completion state for onboarding and operations workflows.
+3. **Language consistency:** Standardize CTA/action verbs and reduce near-duplicate labels.
+4. **Trust signals:** Keep console clean on mission-critical analyst/operator flows.
+
+## Bottom line
+The product already demonstrates strong decision-support depth. The largest UX opportunity is improving **guided momentum**: making first actions clearer, reducing early choice overload, and showing users visible completion from orientation through execution.

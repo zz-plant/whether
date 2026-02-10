@@ -170,7 +170,7 @@ export default async function OnboardingPage({
             {
               concept: "Market risk appetite",
               href: "/signals#thresholds",
-              label: "Review threshold logic",
+              label: "Open threshold logic",
             },
             {
               concept: "Regime call and actions",
