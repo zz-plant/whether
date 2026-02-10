@@ -87,6 +87,7 @@ export default async function OperationsDecisionsPage({
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Action playbook · Decisions"
+      currentPath="/operations/decisions"
       pageSummary="First action: run decision-shield checks before locking assumptions."
       pageSummaryLink={{ href: "#ops-decision-shield", label: "Explore details →" }}
       pageLinks={reportPageLinks}

@@ -141,6 +141,7 @@ export default async function OperationsPage({
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Action playbook"
+      currentPath="/operations"
       pageSummary="Turn macro signals into execution posture, decision guardrails, and leadership-ready briefs."
       pageSummaryLink={{ href: "#ops-workstreams", label: "Explore details →" }}
       pageLinks={reportPageLinks}

@@ -92,6 +92,7 @@ export default async function OperationsPlanPage({
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Action playbook · Plan"
+      currentPath="/operations/plan"
       pageSummary="First action: review the monthly summary, then lock the playbook for this cycle."
       pageSummaryLink={{ href: "#ops-playbook", label: "Explore details →" }}
       pageLinks={reportPageLinks}

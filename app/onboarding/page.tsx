@@ -119,6 +119,7 @@ export default async function OnboardingPage({
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Onboarding & glossary"
+      currentPath="/onboarding"
       pageSummary="Learn the core questions Whether answers before diving into signal-level detail."
       pageSummaryLink={{ href: "#onboarding-checklist", label: "Start orientation checklist →" }}
       pageLinks={reportPageLinks}
