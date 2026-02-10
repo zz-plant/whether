@@ -1,5 +1,8 @@
+"use client";
+
 import type { Route } from "next";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 const steps = [
   {
@@ -23,6 +26,10 @@ const steps = [
 ] as const;
 
 export const OperationsWorkflowProgress = ({ currentPath }: { currentPath: Route }) => {
+  const searchParams = useSearchParams();
+  const currentSearch = searchParams.toString();
+  const currentQuery = Object.fromEntries(searchParams.entries());
+
   return (
     <section className="weather-panel space-y-3 px-4 py-4" aria-label="Operations workflow progress">
       <div>
@@ -32,10 +39,11 @@ export const OperationsWorkflowProgress = ({ currentPath }: { currentPath: Route
       <ol className="grid gap-3 md:grid-cols-3">
         {steps.map((step) => {
           const isActive = step.href === currentPath;
+          const href = currentSearch ? { pathname: step.href, query: currentQuery } : step.href;
           return (
             <li key={step.href}>
               <Link
-                href={step.href}
+                href={href}
                 aria-current={isActive ? "step" : undefined}
                 className={`weather-surface flex min-h-[84px] flex-col gap-1 rounded-xl border p-3 transition-colors ${
                   isActive
