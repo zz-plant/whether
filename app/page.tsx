@@ -251,6 +251,7 @@ export default async function HomePage({
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Weekly briefing"
+      currentPath="/"
       pageSummary="Weekly regime pulse and recommended moves."
       primaryCta={{
         href: "/onboarding",

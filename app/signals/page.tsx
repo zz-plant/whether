@@ -125,6 +125,7 @@ export default async function SignalsPage({
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Signal evidence"
+      currentPath="/signals"
       pageSummary="See the sources and scoring behind the regime call."
       pageSummaryLink={{ href: "#signals-scan-order", label: "Start suggested scan →" }}
       pageLinks={reportPageLinks}

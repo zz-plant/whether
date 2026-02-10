@@ -86,6 +86,7 @@ export default async function OperationsBriefingsPage({
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Action playbook · Briefings"
+      currentPath="/operations/briefings"
       pageSummary="First action: draft the strategy brief, then export leadership-ready kits."
       pageSummaryLink={{ href: "#ops-strategy-brief", label: "Explore details →" }}
       pageLinks={reportPageLinks}

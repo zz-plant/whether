@@ -23,6 +23,8 @@ const groupGlyph: Record<OperatorCommandAction["group"], string> = {
 
 const normalize = (value: string) => value.toLowerCase().trim();
 
+const isInPageLink = (href: string) => href.startsWith("#") || href.includes("/#");
+
 const isTextInputTarget = (target: EventTarget | null) => {
   if (!(target instanceof HTMLElement)) {
     return false;
@@ -101,7 +103,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
   const topMatch = groupedActions.Playbook[0] ?? groupedActions.Pages[0] ?? groupedActions.Sections[0];
 
   return (
-    <section className="weather-panel space-y-4 px-4 py-4 sm:px-5" aria-label="Command center">
+    <section className="weather-panel relative z-10 space-y-4 px-4 py-4 sm:px-5" aria-label="Command center">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-base font-semibold tracking-[0.08em] text-slate-100">Command center</h2>
         <div className="flex flex-wrap items-center gap-2">
@@ -111,9 +113,9 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
           {topMatch ? (
             <a
               href={topMatch.href}
-              className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+              className="weather-pill hidden min-h-[44px] items-center px-3 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:inline-flex"
             >
-              Open top
+              {isInPageLink(topMatch.href) ? "Open top section" : "Open top page"}
             </a>
           ) : null}
         </div>
@@ -166,23 +168,35 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
             }
 
             return (
-              <section key={group} className="weather-surface space-y-2 p-3">
+              <section key={group} className="weather-surface relative z-10 space-y-2 p-3">
                 <p className="text-[10px] font-semibold tracking-[0.18em] text-slate-400">{group}</p>
                 <ul className="space-y-2">
                   {groupedActions[group].map((action) => (
                     <li key={`${group}-${action.href}`}>
                       <a
                         href={action.href}
-                        className="weather-pill inline-flex min-h-[44px] w-full items-center justify-between gap-2 px-3 py-2 text-left transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                        className="weather-pill inline-flex min-h-[44px] w-full items-center justify-between gap-3 px-3 py-2 text-left transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
                         title={action.description}
+                        aria-label={`${action.label} (${isInPageLink(action.href) ? "section jump" : "page navigation"})`}
                       >
-                        <span className="inline-flex items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-100">
+                        <span className="inline-flex min-w-0 items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-100">
                           <span aria-hidden="true" className="text-slate-400">
                             {groupGlyph[action.group]}
                           </span>
                           {action.label}
                         </span>
-                        <span aria-hidden="true" className="text-xs text-slate-500">→</span>
+                        <span className="inline-flex items-center gap-2">
+                          {isInPageLink(action.href) ? (
+                            <span className="rounded-full border border-slate-700/70 px-2 py-0.5 text-[9px] font-semibold tracking-[0.12em] text-slate-400">
+                              SECTION
+                            </span>
+                          ) : (
+                            <span className="rounded-full border border-slate-700/70 px-2 py-0.5 text-[9px] font-semibold tracking-[0.12em] text-slate-400">
+                              PAGE
+                            </span>
+                          )}
+                          <span aria-hidden="true" className="text-xs text-slate-500">→</span>
+                        </span>
                       </a>
                     </li>
                   ))}

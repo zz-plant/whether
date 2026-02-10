@@ -43,6 +43,7 @@ export const ReportShell = ({
   },
   structuredData,
   historicalBanner,
+  currentPath,
 }: {
   children: ReactNode;
   statusLabel: string;
@@ -68,6 +69,7 @@ export const ReportShell = ({
   exportCta?: { href: string; label: string } | null;
   structuredData?: string;
   historicalBanner?: ReactNode;
+  currentPath: string;
 }) => {
   const trustToneStyles =
     trustStatusTone === "warning"
@@ -192,7 +194,23 @@ export const ReportShell = ({
   );
 
   const commandActions = commandActionCandidates.reduce<OperatorCommandAction[]>((accumulator, action) => {
-    if (!accumulator.some((item) => item.href === action.href && item.label === action.label)) {
+    const isCurrentPageLink =
+      action.href.startsWith("/") &&
+      !action.href.includes("#") &&
+      action.href === currentPath;
+
+    if (isCurrentPageLink) {
+      return accumulator;
+    }
+
+    if (
+      !accumulator.some(
+        (item) =>
+          item.href === action.href &&
+          item.group === action.group &&
+          item.label === action.label,
+      )
+    ) {
       accumulator.push(action);
     }
 
