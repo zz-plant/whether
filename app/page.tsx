@@ -50,6 +50,7 @@ const homeSectionSequence = [
   { href: "#operator-fit", label: "Who this is for" },
   { href: "#briefing-flow", label: "Recommended read order" },
   { href: "#weekly-action-summary", label: "This week's actions" },
+  { href: "#weekly-handoff", label: "Next recommended action" },
   { href: "#executive-snapshot", label: "Leadership summary" },
   { href: "#regime-alerts", label: "New alerts" },
   { href: "#regime-summary", label: "Market climate summary" },
@@ -77,16 +78,19 @@ const briefingFlowSteps = [
     title: "Set this week",
     detail: "Read This week's actions and lock the operating posture before meetings.",
     href: "#weekly-action-summary",
+    ctaLabel: "Open this week's actions",
   },
   {
     title: "Align leadership",
     detail: "Use the leadership summary to confirm confidence, constraints, and non-negotiables.",
     href: "#executive-snapshot",
+    ctaLabel: "Open leadership summary",
   },
   {
     title: "Validate with evidence",
     detail: "Scan alerts and signal detail before committing to pricing, hiring, or spend.",
     href: "#regime-alerts",
+    ctaLabel: "Open signal alerts",
   },
 ] as const;
 
@@ -305,11 +309,26 @@ export default async function HomePage({
                 href={item.href}
                 className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-sky-200 underline decoration-slate-500/80 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
               >
-                Open section
+                {item.ctaLabel}
               </a>
             </li>
           ))}
         </ol>
+      </section>
+
+
+      <section id="weekly-handoff" className="weather-panel space-y-3 px-6 py-5">
+        <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Next recommended action</p>
+        <h2 className="text-lg font-semibold text-slate-100">Weekly interpretation complete?</h2>
+        <p className="max-w-3xl text-sm text-slate-300">
+          Move directly into the execution flow so the plan, decision checks, and briefing outputs stay in sequence.
+        </p>
+        <a
+          href="/operations/plan"
+          className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-sky-200 underline decoration-slate-500/80 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+        >
+          Open plan workspace
+        </a>
       </section>
 
       <ReportGroup
