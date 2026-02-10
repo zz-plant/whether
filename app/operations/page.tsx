@@ -14,6 +14,7 @@ import {
 } from "../../lib/navigation/operationsNavigation";
 import { appendSearchParamsToRoute } from "../../lib/navigation/routeSearchParams";
 import { OperationsWorkstreamNav } from "./components/operationsWorkstreamNav";
+import { OperationsWorkflowProgress } from "./components/operationsWorkflowProgress";
 
 export const runtime = "edge";
 
@@ -155,6 +156,7 @@ export default async function OperationsPage({
         ) : null
       }
     >
+      <OperationsWorkflowProgress currentPath="/operations" />
       <OperationsWorkstreamNav currentPath="/operations" />
 
       <section className="weather-panel space-y-4 px-6 py-5">

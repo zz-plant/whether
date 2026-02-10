@@ -79,6 +79,16 @@ const findLatestCommonDate = (seriesMaps: Map<string, number | null>[]) => {
   return null;
 };
 
+const buildSeriesEndpoint = (baseEndpoint: string | undefined, seriesId: string, fallback: string) => {
+  if (!baseEndpoint) {
+    return fallback;
+  }
+
+  const url = new URL(baseEndpoint);
+  url.searchParams.set("id", seriesId);
+  return url.toString();
+};
+
 export const fetchTreasuryData = async (
   options: TreasuryFetchOptions = {}
 ): Promise<TreasuryData> => {
@@ -102,10 +112,10 @@ export const fetchTreasuryData = async (
   const baseEndpoint = options.endpoint;
   const fetched_at = new Date().toISOString();
   const endpoints = {
-    oneMonth: baseEndpoint ? buildSeriesEndpoint(baseEndpoint, "DGS1MO") : TREASURY_ENDPOINTS.oneMonth,
-    threeMonth: baseEndpoint ? buildSeriesEndpoint(baseEndpoint, "DGS3MO") : TREASURY_ENDPOINTS.threeMonth,
-    twoYear: baseEndpoint ? buildSeriesEndpoint(baseEndpoint, "DGS2") : TREASURY_ENDPOINTS.twoYear,
-    tenYear: baseEndpoint ? buildSeriesEndpoint(baseEndpoint, "DGS10") : TREASURY_ENDPOINTS.tenYear,
+    oneMonth: buildSeriesEndpoint(baseEndpoint, "DGS1MO", TREASURY_ENDPOINTS.oneMonth),
+    threeMonth: buildSeriesEndpoint(baseEndpoint, "DGS3MO", TREASURY_ENDPOINTS.threeMonth),
+    twoYear: buildSeriesEndpoint(baseEndpoint, "DGS2", TREASURY_ENDPOINTS.twoYear),
+    tenYear: buildSeriesEndpoint(baseEndpoint, "DGS10", TREASURY_ENDPOINTS.tenYear),
   };
 
   try {

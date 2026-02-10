@@ -9,6 +9,7 @@ import { StrategyBriefPanel } from "../components/strategyBriefPanel";
 import { reportPageLinks } from "../../../lib/report/reportNavigation";
 import { operationsSectionLinks } from "../../../lib/navigation/operationsNavigation";
 import { OperationsWorkstreamNav } from "../components/operationsWorkstreamNav";
+import { OperationsWorkflowProgress } from "../components/operationsWorkflowProgress";
 import { CxoFunctionPanel, HistoricalBanner } from "../../components/reportSections";
 
 export const runtime = "edge";
@@ -96,6 +97,7 @@ export default async function OperationsBriefingsPage({
         ) : null
       }
     >
+      <OperationsWorkflowProgress currentPath="/operations/briefings" />
       <OperationsWorkstreamNav currentPath="/operations/briefings" />
 
       <section className="weather-panel space-y-2 px-6 py-5">

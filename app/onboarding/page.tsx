@@ -10,6 +10,7 @@ import {
   HistoricalBanner,
 } from "../components/reportSections";
 import { reportPageLinks } from "../../lib/report/reportNavigation";
+import { OnboardingChecklistProgress } from "./components/onboardingChecklistProgress";
 
 export const runtime = "edge";
 
@@ -31,7 +32,7 @@ export default async function OnboardingPage({
       title: "Orient to the report",
       detail: "Start with the core leadership questions: what regime are we in, what moves does it favor, and what should we avoid.",
       href: "#first-time-guide",
-      cta: "Start the guide",
+      cta: "Start orientation",
       emphasis: "primary",
     },
     {
@@ -45,7 +46,7 @@ export default async function OnboardingPage({
       title: "Apply the signals",
       detail: "Open signal-level evidence when someone asks why the posture changed.",
       href: "/signals",
-      cta: "Go to signals",
+      cta: "Open signal evidence",
       emphasis: "secondary",
     },
   ];
@@ -119,7 +120,7 @@ export default async function OnboardingPage({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Onboarding & glossary"
       pageSummary="Learn the core questions Whether answers before diving into signal-level detail."
-      pageSummaryLink={{ href: "#onboarding-checklist", label: "Start checklist →" }}
+      pageSummaryLink={{ href: "#onboarding-checklist", label: "Start orientation checklist →" }}
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
       heroVariant="compact"
@@ -135,57 +136,13 @@ export default async function OnboardingPage({
     >
 
       <section id="onboarding-checklist" className="weather-panel space-y-4 px-6 py-5">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Quick-start checklist</p>
-            <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-              Complete these three steps in order.
-            </h2>
-          </div>
-          <span className="rounded-full border border-slate-700/70 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-slate-300">
-            Completion target: 3/3
-          </span>
+        <div>
+          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Quick-start checklist</p>
+          <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
+            Complete these three steps in order.
+          </h2>
         </div>
-        <div className="grid gap-3 lg:grid-cols-3">
-
-          <div>
-            <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
-              Recommended onboarding path
-            </p>
-            <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-              Start with the three-step path, then branch out as needed.
-            </h2>
-          </div>
-        </div>
-        <div className="grid gap-3 lg:grid-cols-3">
-          {onboardingSteps.map((step, index) => (
-            <article key={step.title} className="weather-surface flex h-full flex-col gap-3 p-4">
-              <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                  Step {index + 1} of {onboardingSteps.length}
-                </p>
-                <p className="text-xs text-emerald-300">Mark complete after reviewing this step.</p>
-                <p className="text-sm font-semibold text-slate-100">{step.title}</p>
-                <p className="text-sm text-slate-300">{step.detail}</p>
-              </div>
-              {step.emphasis === "primary" ? (
-                <a
-                  href={step.href}
-                  className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.2em] transition-colors hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                >
-                  {step.cta}
-                </a>
-              ) : (
-                <a
-                  href={step.href}
-                  className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-slate-300 underline decoration-slate-600 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                >
-                  {step.cta} →
-                </a>
-              )}
-            </article>
-          ))}
-        </div>
+        <OnboardingChecklistProgress steps={onboardingSteps} />
       </section>
 
       <FirstTimeGuidePanel

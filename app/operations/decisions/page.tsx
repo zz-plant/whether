@@ -14,6 +14,7 @@ import {
 import { reportPageLinks } from "../../../lib/report/reportNavigation";
 import { operationsSectionLinks } from "../../../lib/navigation/operationsNavigation";
 import { OperationsWorkstreamNav } from "../components/operationsWorkstreamNav";
+import { OperationsWorkflowProgress } from "../components/operationsWorkflowProgress";
 
 export const runtime = "edge";
 
@@ -97,6 +98,7 @@ export default async function OperationsDecisionsPage({
         ) : null
       }
     >
+      <OperationsWorkflowProgress currentPath="/operations/decisions" />
       <OperationsWorkstreamNav currentPath="/operations/decisions" />
 
       <section className="weather-panel space-y-2 px-6 py-5">

@@ -149,9 +149,9 @@ export default async function SignalsPage({
         </div>
         <ol className="grid gap-3 md:grid-cols-3">
           {[
-            { title: "1) Review regime timeline", href: "#regime-timeline", detail: "Start with sequence changes to frame context." },
-            { title: "2) Check scoring thresholds", href: "#thresholds", detail: "Confirm guardrails still match current tolerance." },
-            { title: "3) Inspect live sensor feed", href: "#sensor-array", detail: "Validate the source readings behind the call." },
+            { title: "1) Review regime timeline", href: "#regime-timeline", detail: "Start with sequence changes to frame context.", action: "Open timeline" },
+            { title: "2) Check scoring thresholds", href: "#thresholds", detail: "Confirm guardrails still match current tolerance.", action: "Open thresholds" },
+            { title: "3) Inspect live sensor feed", href: "#sensor-array", detail: "Validate the source readings behind the call.", action: "Open sensor feed" },
           ].map((item) => (
             <li key={item.title} className="weather-surface flex flex-col gap-2 p-4">
               <p className="text-sm font-semibold text-slate-100">{item.title}</p>
@@ -160,7 +160,7 @@ export default async function SignalsPage({
                 href={item.href}
                 className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
               >
-                Open step →
+                {item.action} →
               </a>
             </li>
           ))}
