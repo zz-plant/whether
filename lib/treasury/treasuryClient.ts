@@ -19,6 +19,12 @@ export interface TreasuryFetchOptions {
   asOf?: string;
 }
 
+const buildSeriesEndpoint = (baseEndpoint: string, seriesId: string): string => {
+  const endpointUrl = new URL(baseEndpoint);
+  endpointUrl.searchParams.set("id", seriesId);
+  return endpointUrl.toString();
+};
+
 const buildFallbackSnapshot = (snapshot: TreasuryData, reason: string): TreasuryData => {
   return {
     ...snapshot,
