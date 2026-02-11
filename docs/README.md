@@ -24,6 +24,7 @@ This directory is organized by audience so contributors can find the right sourc
 ## Agent guidance
 - `agents/README.md` — entry point for task-oriented agent guidance.
 - `agents/*.md` — concise policies for setup, quality, docs, data, and UI standards.
+- `agents/mcp-and-skills-playbook.md` — MCP and skill rollout playbook for agent contributors.
 
 ## Maintenance rules
 - Prefer updating existing docs over creating near-duplicates.
