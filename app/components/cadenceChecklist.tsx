@@ -72,31 +72,42 @@ export const CadenceChecklist = ({
 
   const completedCount = items.filter((item) => state[item.id]).length;
   const isComplete = completedCount === items.length;
+  const completionRatio = items.length === 0 ? 0 : completedCount / items.length;
 
   return (
-    <section className="weather-panel space-y-4 px-6 py-5" aria-label={`${cadence} review checklist`}>
+    <section
+      className="cadence-checklist weather-panel space-y-4 px-6 py-5"
+      aria-label={`${cadence} review checklist`}
+    >
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="space-y-1">
           <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">{title}</p>
           <h2 className="text-lg font-semibold text-slate-100 sm:text-xl">{subtitle}</h2>
         </div>
-        <p className="text-xs font-semibold text-slate-300">
+        <p className="text-xs font-semibold text-slate-300" role="status" aria-live="polite">
           {completedCount}/{items.length} complete
         </p>
+      </div>
+
+      <div className="space-y-2">
+        <label htmlFor={`${storageKey}-progress`} className="sr-only">
+          {cadence} review progress
+        </label>
+        <progress
+          id={`${storageKey}-progress`}
+          className="cadence-progress h-2 w-full"
+          max={1}
+          value={completionRatio}
+        />
       </div>
 
       <ol className="grid gap-3 md:grid-cols-3">
         {items.map((item, index) => {
           const done = Boolean(state[item.id]);
           return (
-            <li key={item.id} className="weather-surface flex h-full flex-col gap-3 p-4">
+            <li key={item.id} className="cadence-item weather-surface flex h-full flex-col gap-3 p-4">
               <div className="flex items-center gap-2">
-                <span
-                  aria-hidden="true"
-                  className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-semibold ${
-                    done ? "bg-emerald-500/20 text-emerald-200" : "bg-slate-800 text-slate-300"
-                  }`}
-                >
+                <span aria-hidden="true" className="cadence-step-index inline-flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-semibold">
                   {done ? "✓" : index + 1}
                 </span>
                 <p className="text-sm font-semibold text-slate-100">{item.label}</p>
@@ -111,11 +122,7 @@ export const CadenceChecklist = ({
                 </a>
                 <button
                   type="button"
-                  className={`inline-flex min-h-[44px] items-center rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.14em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation ${
-                    done
-                      ? "border-emerald-400/60 bg-emerald-500/10 text-emerald-100 hover:bg-emerald-500/20"
-                      : "border-slate-700/80 text-slate-200 hover:border-sky-300/70 hover:text-slate-100"
-                  }`}
+                  className="cadence-toggle inline-flex min-h-[44px] items-center rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.14em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
                   onClick={() => {
                     setState((current) => ({
                       ...current,
