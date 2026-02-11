@@ -66,36 +66,36 @@ const homeSectionSequence = [
 const operatorFitPrimitives = [
   {
     title: "Audience",
-    detail: "Product and engineering leaders navigating macro-sensitive planning cycles.",
+    detail: "Product and engineering leaders.",
   },
   {
     title: "Decision window",
-    detail: "Weekly planning, staff, and budget checkpoints where timing and risk matter.",
+    detail: "Weekly planning, staffing, and budget checkpoints.",
   },
   {
     title: "Primary output",
-    detail: "A clear posture: what to do now, what to monitor, and what to delay.",
+    detail: "What to do now, monitor, or delay.",
   },
 ] as const;
 
 const briefingFlowSteps = [
   {
     title: "Set this week",
-    detail: "Read This week's actions and lock the operating posture before meetings.",
+    detail: "Lock this week's operating posture.",
     href: "#weekly-action-summary",
-    ctaLabel: "Open this week's actions",
+    ctaLabel: "Open actions",
   },
   {
     title: "Align leadership",
-    detail: "Use the leadership summary to confirm confidence, constraints, and non-negotiables.",
+    detail: "Confirm constraints and confidence.",
     href: "#executive-snapshot",
-    ctaLabel: "Open leadership summary",
+    ctaLabel: "Open summary",
   },
   {
     title: "Validate with evidence",
-    detail: "Scan alerts and signal detail before committing to pricing, hiring, or spend.",
+    detail: "Check alerts and signals before committing.",
     href: "#regime-alerts",
-    ctaLabel: "Open signal alerts",
+    ctaLabel: "Open alerts",
   },
 ] as const;
 
@@ -276,10 +276,6 @@ export default async function HomePage({
           <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
             Fast operating guidance for macro-driven weeks.
           </h2>
-          <p className="max-w-3xl text-sm text-slate-300">
-            Answer three questions quickly: what regime are we in, what should we do now, and what
-            should wait.
-          </p>
         </div>
         <div className="grid gap-3 lg:grid-cols-3">
           {operatorFitPrimitives.map((item) => (
@@ -294,13 +290,7 @@ export default async function HomePage({
       <section id="briefing-flow" className="weather-panel space-y-4 px-6 py-5">
         <div className="space-y-2">
           <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Read order</p>
-          <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-            Follow this sequence to brief fast and avoid missed context.
-          </h2>
-          <p className="max-w-3xl text-sm text-slate-300">
-            Start with immediate decisions, validate constraints for leadership, then use alerts and
-            raw signals to pressure-test any irreversible move.
-          </p>
+          <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">Briefing sequence</h2>
         </div>
         <ol className="grid gap-3 lg:grid-cols-3">
           {briefingFlowSteps.map((item, index) => (
@@ -327,7 +317,7 @@ export default async function HomePage({
         cadence="weekly"
         storageKey="whether-weekly-review-checklist"
         title="Weekly review ritual"
-        subtitle="Complete this sequence every week before execution calls."
+        subtitle="Complete before execution calls."
         items={[
           {
             id: "weekly-actions",
@@ -351,9 +341,6 @@ export default async function HomePage({
       <section id="weekly-handoff" className="weather-panel space-y-3 px-6 py-5">
         <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Next recommended action</p>
         <h2 className="text-lg font-semibold text-slate-100">Weekly interpretation complete?</h2>
-        <p className="max-w-3xl text-sm text-slate-300">
-          Move directly into the execution flow so the plan, decision checks, and briefing outputs stay in sequence.
-        </p>
         <a
           href={operationsPlanHref}
           className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-sky-200 underline decoration-slate-500/80 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
@@ -364,7 +351,7 @@ export default async function HomePage({
 
       <ReportGroup
         title="Action priorities"
-        description="Lock posture, pick the weekly bet, and align on the constraints before you dig deeper."
+        description="Lock posture and align on this week's constraints."
       >
         <WeeklyActionSummaryPanel
           assessment={assessment}
@@ -377,7 +364,7 @@ export default async function HomePage({
 
       <ReportGroup
         title="Leadership readout"
-        description="Confirm the live signal health, then scan the executive snapshot for the week’s guardrails."
+        description="Confirm signal health and review this week's guardrails."
       >
         <ExecutiveSnapshotPanel
           treasury={treasury}
@@ -394,7 +381,7 @@ export default async function HomePage({
 
       <ReportGroup
         title="Alert center"
-        description="Review new regime alerts first, then scan the recent alert log for context."
+        description="Review new alerts, then scan the recent log."
       >
         <RegimeChangeAlertPanel alert={regimeAlert} provenance={treasuryProvenance} />
 
@@ -403,7 +390,7 @@ export default async function HomePage({
 
       <ReportGroup
         title="Deep dive signals"
-        description="Use these references when you need the full scoring detail and signal breakdown."
+        description="Use these references for full scoring detail."
       >
         <RegimeAssessmentCard assessment={assessment} provenance={treasuryProvenance} />
 
@@ -416,17 +403,17 @@ export default async function HomePage({
           {
             href: "/signals",
             label: "Signal evidence",
-            description: "Inspect every macro source, threshold, and trend behind this week's regime call.",
+            description: "Inspect source data, thresholds, and trend context.",
           },
           {
             href: "/operations",
             label: "Action playbook",
-            description: "Convert the current climate into specific execution moves, shields, and briefings.",
+            description: "Convert the climate into concrete execution moves.",
           },
           {
             href: "/formulas",
             label: "Methodology",
-            description: "Review the exact formulas and official source links used in scoring.",
+            description: "Review formulas and official source links.",
           },
         ]}
       />
