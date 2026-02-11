@@ -255,9 +255,9 @@ export default async function HomePage({
       pageSummary="Weekly regime pulse and recommended moves."
       primaryCta={{
         href: "/onboarding",
-        label: "Start here: onboarding",
+        label: "Start onboarding",
       }}
-      secondaryCta={{ href: "#weekly-action-summary", label: "Start with this week" }}
+      secondaryCta={{ href: "#weekly-action-summary", label: "Start weekly review" }}
       exportCta={{ href: "#executive-snapshot", label: "See leadership summary" }}
       sidebarVariant="hidden"
       pageLinks={reportPageLinks}

@@ -132,7 +132,7 @@ export default async function SignalsPage({
       sectionLinks={sectionLinks}
       heroVariant="compact"
       pageNavVariant="compact"
-      primaryCta={{ href: "#sensor-array", label: "Open live data feed" }}
+      primaryCta={{ href: "#sensor-array", label: "Open live feed" }}
       secondaryCta={{ href: "#thresholds", label: "Check scoring thresholds" }}
       structuredData={JSON.stringify(structuredData)}
       historicalBanner={
@@ -258,7 +258,7 @@ export default async function SignalsPage({
               title: "Validate live sensor data",
               detail: "Check the latest feeds driving the tightness and risk scores.",
               href: "#sensor-array",
-              label: "Open live data feed",
+              label: "Open live feed",
             },
             {
               title: "Cross-check macro sources",

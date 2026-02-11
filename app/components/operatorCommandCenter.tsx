@@ -15,6 +15,13 @@ type CommandFilter = "All" | OperatorCommandAction["group"];
 const STORAGE_KEY = "whether-command-center-query";
 const filterOrder: CommandFilter[] = ["All", "Playbook", "Pages", "Sections"];
 
+const filterHelper: Record<CommandFilter, string> = {
+  All: "All results across actions, pages, and sections.",
+  Playbook: "Do now: immediate actions and operator moves.",
+  Pages: "Switch surfaces: navigate to another report page.",
+  Sections: "Jump within this page to a specific section.",
+};
+
 const groupGlyph: Record<OperatorCommandAction["group"], string> = {
   Playbook: "⚡",
   Pages: "◉",
@@ -134,25 +141,28 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
           placeholder="Search… (/ to focus)"
           className="w-full rounded-2xl border border-slate-700/80 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
         />
-        <div className="flex flex-wrap gap-2">
-          {filterOrder.map((item) => {
-            const isActive = item === filter;
-            return (
-              <button
-                key={item}
-                type="button"
-                onClick={() => setFilter(item)}
-                className={`weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[10px] font-semibold tracking-[0.16em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation ${
-                  isActive
-                    ? "border-sky-400/70 bg-sky-500/15 text-sky-100"
-                    : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
-                }`}
-                aria-pressed={isActive}
-              >
-                {item}
-              </button>
-            );
-          })}
+        <div className="space-y-2">
+          <div className="flex flex-wrap gap-2">
+            {filterOrder.map((item) => {
+              const isActive = item === filter;
+              return (
+                <button
+                  key={item}
+                  type="button"
+                  onClick={() => setFilter(item)}
+                  className={`weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[10px] font-semibold tracking-[0.16em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation ${
+                    isActive
+                      ? "border-sky-400/70 bg-sky-500/15 text-sky-100"
+                      : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
+                  }`}
+                  aria-pressed={isActive}
+                >
+                  {item}
+                </button>
+              );
+            })}
+          </div>
+          <p className="text-xs text-slate-400">{filterHelper[filter]}</p>
         </div>
       </div>
 
