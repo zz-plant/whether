@@ -16,6 +16,7 @@ Task-focused guidance for AI agents and code assistants working in this reposito
 - `data-and-platform.md` — provenance expectations and platform constraints.
 - `quality-and-pr.md` — validation depth, commit hygiene, PR quality bar.
 - `ui-ux-standards.md` — strict UI, accessibility, and performance requirements.
+- `mcp-and-skills-playbook.md` — practical MCP + skill adoption guidance for contributors.
 
 ## Scope note
 These files are contributor-operational guidance. Product docs and strategic specs are indexed in `../README.md`.

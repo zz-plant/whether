@@ -34,3 +34,11 @@ Whether (Regime Station) turns public macro signals into operational guidance fo
 - [Testing & PR hygiene](docs/agents/quality-and-pr.md)
 - [UI/UX standards](docs/agents/ui-ux-standards.md)
 - [Agent docs hub](docs/agents/README.md)
+
+## Skill conventions (repo-local)
+- Preferred repo-local skill path: `.codex/skills/<skill-name>/SKILL.md`.
+- Use kebab-case for skill directory names (e.g., `research-brief`).
+- Keep skills task-specific with explicit output contracts and non-goals.
+- Default to least-privilege tool access and avoid write/mutation tools unless required.
+- When adding new skills, include a short note in `docs/agents/mcp-and-skills-playbook.md` if it changes recommended workflows.
+
