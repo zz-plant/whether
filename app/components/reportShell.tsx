@@ -382,7 +382,7 @@ export const ReportShell = ({
                         <span aria-hidden="true" className="transition-transform duration-200 group-open:rotate-180">▾</span>
                         <span className="sr-only">Tap to expand actions</span>
                       </summary>
-                      <div className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+6.5rem)] z-40 mx-4 rounded-2xl border border-slate-700/80 bg-slate-950/95 p-3 shadow-2xl">
+                      <div className="mt-2 rounded-2xl border border-slate-700/80 bg-slate-950/95 p-3 shadow-2xl">
                         <a
                           href={exportCta.href}
                           className="inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-slate-700/70 px-3 py-2 text-center text-[11px] font-semibold leading-tight tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-300/80 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:text-xs"
