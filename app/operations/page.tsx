@@ -175,12 +175,12 @@ export default async function OperationsPage({
           {
             id: "decision-checks",
             label: "Validate decision guardrails",
-            href: "/operations/decisions",
+            href: appendSearchParamsToRoute("/operations/decisions", searchParams),
           },
           {
             id: "briefing-export",
             label: "Export leadership brief",
-            href: "/operations/briefings#ops-export-briefs",
+            href: `${appendSearchParamsToRoute("/operations/briefings", searchParams)}#ops-export-briefs`,
           },
         ]}
       />
