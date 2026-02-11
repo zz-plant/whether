@@ -32,7 +32,7 @@ export default async function OnboardingPage({
       title: "Orient to the report",
       detail: "Start with the core leadership questions: what regime are we in, what moves does it favor, and what should we avoid.",
       href: "#first-time-guide",
-      cta: "Start orientation",
+      cta: "Start onboarding",
       emphasis: "primary",
     },
     {
@@ -121,12 +121,12 @@ export default async function OnboardingPage({
       pageTitle="Onboarding & glossary"
       currentPath="/onboarding"
       pageSummary="Learn the core questions Whether answers before diving into signal-level detail."
-      pageSummaryLink={{ href: "#onboarding-checklist", label: "Start orientation checklist →" }}
+      pageSummaryLink={{ href: "#onboarding-checklist", label: "Start onboarding checklist →" }}
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
       heroVariant="compact"
       pageNavVariant="compact"
-      primaryCta={{ href: "#first-time-guide", label: "Start orientation" }}
+      primaryCta={{ href: "#first-time-guide", label: "Start onboarding" }}
       secondaryCta={undefined}
       structuredData={JSON.stringify(structuredData)}
       historicalBanner={

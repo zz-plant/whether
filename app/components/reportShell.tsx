@@ -93,6 +93,8 @@ export const ReportShell = ({
     </a>
   ) : null;
   const hasSidebar = sidebarVariant === "full";
+  const showFirstActionGuide = trustStatusTone !== "stable" || !secondaryCta;
+  const sourceHref = treasurySource.startsWith("http") ? treasurySource : undefined;
   const overviewPanel = (
     <section className="weather-panel space-y-3 px-4 py-4">
       <p className="text-xs font-semibold tracking-[0.16em] text-slate-400">Snapshot</p>
@@ -111,7 +113,19 @@ export const ReportShell = ({
         </div>
         <div className="flex items-center justify-between gap-3">
           <dt className="text-slate-400">Source</dt>
-          <dd className="text-slate-200">{treasurySource}</dd>
+          <dd className="text-right text-slate-200">
+            <span>Treasury fiscal API</span>
+            {sourceHref ? (
+              <a
+                href={sourceHref}
+                target="_blank"
+                rel="noreferrer"
+                className="ml-2 text-sky-200 underline decoration-slate-500/80 underline-offset-2 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+              >
+                View source
+              </a>
+            ) : null}
+          </dd>
         </div>
       </dl>
     </section>
@@ -203,14 +217,7 @@ export const ReportShell = ({
       return accumulator;
     }
 
-    if (
-      !accumulator.some(
-        (item) =>
-          item.href === action.href &&
-          item.group === action.group &&
-          item.label === action.label,
-      )
-    ) {
+    if (!accumulator.some((item) => item.href === action.href && item.label === action.label)) {
       accumulator.push(action);
     }
 
@@ -280,14 +287,6 @@ export const ReportShell = ({
                     {exportCta.label}
                   </a>
                 ) : null}
-                {primaryCta ? (
-                  <a
-                    href={primaryCta.href}
-                    className="weather-button-primary inline-flex min-h-[40px] items-center justify-center px-4 py-2 text-[11px] font-semibold tracking-[0.2em] shadow-lg shadow-sky-500/30 ring-1 ring-sky-200/30 transition-colors hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                  >
-                    {primaryCta.label}
-                  </a>
-                ) : null}
               </div>
             </div>
             <ReportPageNavigation
@@ -324,17 +323,17 @@ export const ReportShell = ({
                         <span>{pageSummary}</span>
                         {summaryLink}
                       </p>
-                      <div className="flex flex-wrap gap-2 text-[10px] font-semibold tracking-[0.18em] text-slate-300 sm:hidden">
-                        <span className="weather-chip max-w-full px-3 py-1 text-center leading-tight">
-                          Status · {statusLabel}
-                        </span>
-                        <span className="weather-chip max-w-full px-3 py-1 text-center leading-tight">
-                          Signals · {recordDateLabel}
-                        </span>
-                        <span className={`weather-chip px-3 py-1 ${trustLabelTone}`}>
-                          {trustStatusLabel}
-                        </span>
-                      </div>
+                      <details className="group sm:hidden">
+                        <summary className={`weather-chip inline-flex min-h-[44px] cursor-pointer list-none items-center gap-2 px-3 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-200 marker:content-none ${trustStatusTone === "warning" ? "border-amber-400/70 text-amber-100" : ""}`}>
+                          <span>Data status · {statusLabel}</span>
+                          <span aria-hidden="true" className="transition-transform duration-200 group-open:rotate-180">▾</span>
+                          <span className="sr-only">Tap to expand data status</span>
+                        </summary>
+                        <div className="mt-2 rounded-2xl border border-slate-800/70 bg-slate-950/70 px-3 py-3 text-xs text-slate-300">
+                          <p>Signals stamped: {recordDateLabel}</p>
+                          <p className={trustLabelTone}>Confidence: {trustStatusLabel}</p>
+                        </div>
+                      </details>
                     </>
                   ) : (
                     <>
@@ -346,46 +345,68 @@ export const ReportShell = ({
                         <span>{pageSummary}</span>
                         {summaryLink}
                       </p>
-                      <div className="flex flex-wrap gap-2 text-[10px] font-semibold tracking-[0.18em] text-slate-300 sm:hidden">
-                        <span className="weather-chip max-w-full px-3 py-1 text-center leading-tight">
-                          Status · {statusLabel}
-                        </span>
-                        <span className="weather-chip max-w-full px-3 py-1 text-center leading-tight">
-                          Signals · {recordDateLabel}
-                        </span>
-                        <span className={`weather-chip px-3 py-1 ${trustLabelTone}`}>
-                          {trustStatusLabel}
-                        </span>
-                      </div>
+                      <details className="group sm:hidden">
+                        <summary className={`weather-chip inline-flex min-h-[44px] cursor-pointer list-none items-center gap-2 px-3 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-200 marker:content-none ${trustStatusTone === "warning" ? "border-amber-400/70 text-amber-100" : ""}`}>
+                          <span>Data status · {statusLabel}</span>
+                          <span aria-hidden="true" className="transition-transform duration-200 group-open:rotate-180">▾</span>
+                          <span className="sr-only">Tap to expand data status</span>
+                        </summary>
+                        <div className="mt-2 rounded-2xl border border-slate-800/70 bg-slate-950/70 px-3 py-3 text-xs text-slate-300">
+                          <p>Signals stamped: {recordDateLabel}</p>
+                          <p className={trustLabelTone}>Confidence: {trustStatusLabel}</p>
+                        </div>
+                      </details>
                       <span className="sr-only">Signals stamped {recordDateLabel}</span>
                     </>
                   )}
                 </div>
-                <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
+                <div className="flex w-full min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
                   <a
                     href={primaryCta.href}
-                    className="weather-button-primary inline-flex min-h-[44px] w-full items-center justify-center px-4 py-2 text-center text-[11px] font-semibold leading-tight tracking-[0.12em] shadow-lg shadow-sky-500/30 ring-1 ring-sky-200/30 transition-colors hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:text-xs sm:tracking-[0.2em]"
+                    className="weather-button-primary inline-flex min-h-[44px] w-full max-w-full items-center justify-center px-4 py-2 text-center text-[11px] font-semibold leading-tight tracking-[0.12em] shadow-lg shadow-sky-500/30 ring-1 ring-sky-200/30 transition-colors hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:text-xs sm:tracking-[0.2em]"
                   >
-                    {primaryCta.label}
+                    <span className="max-w-full break-words text-center">{primaryCta.label}</span>
                   </a>
                   {secondaryCta ? (
                     <a
                       href={secondaryCta.href}
-                      className="inline-flex min-h-[44px] w-full items-center justify-center text-center text-[11px] font-semibold leading-tight tracking-[0.12em] text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:justify-start sm:text-xs"
+                      className="inline-flex min-h-[44px] w-full max-w-full items-center justify-center text-center text-[11px] font-semibold leading-tight tracking-[0.12em] text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:justify-start sm:text-xs"
                     >
-                      {secondaryCta.label}
+                      <span className="max-w-full break-words text-center">{secondaryCta.label}</span>
                     </a>
                   ) : null}
                   {exportCta ? (
-                    <a
-                      href={exportCta.href}
-                      className="inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-slate-700/70 px-3 py-2 text-center text-[11px] font-semibold leading-tight tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-300/80 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:text-xs"
-                    >
-                      {exportCta.label}
-                    </a>
+                    <details className="group w-full sm:hidden">
+                      <summary className="weather-pill inline-flex min-h-[44px] w-full cursor-pointer list-none items-center justify-center gap-2 rounded-full px-3 py-2 text-center text-[11px] font-semibold tracking-[0.12em] text-slate-200 marker:content-none">
+                        <span>More actions</span>
+                        <span aria-hidden="true" className="transition-transform duration-200 group-open:rotate-180">▾</span>
+                        <span className="sr-only">Tap to expand actions</span>
+                      </summary>
+                      <div className="mt-2 rounded-2xl border border-slate-700/80 bg-slate-950/95 p-3 shadow-2xl">
+                        <a
+                          href={exportCta.href}
+                          className="inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-slate-700/70 px-3 py-2 text-center text-[11px] font-semibold leading-tight tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-300/80 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:text-xs"
+                        >
+                          {exportCta.label}
+                        </a>
+                      </div>
+                    </details>
                   ) : null}
                 </div>
+                <p className={`inline-flex items-center gap-2 text-xs leading-relaxed ${trustLabelTone}`}>
+                  <span aria-hidden="true">{trustStatusTone === "warning" ? "⚠" : trustStatusTone === "historical" ? "⏱" : "✓"}</span>
+                  <span>{trustStatusLabel}: {trustStatusAction}</span>
+                </p>
               </section>
+
+              {showFirstActionGuide ? (
+                <section className="weather-panel space-y-2 px-4 py-4 sm:px-5" aria-label="First action guidance">
+                  <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">First action</p>
+                  <p className="text-sm text-slate-200">
+                    Start with <span className="font-semibold text-slate-100">{primaryCta.label}</span>, then continue to {secondaryCta?.label ?? "the next section"}.
+                  </p>
+                </section>
+              ) : null}
 
               <OperatorCommandCenter actions={commandActions} />
 
