@@ -27,6 +27,7 @@ import { ChangeSinceLastReadPanel } from "./components/changeSinceLastReadPanel"
 import { RegimeAlertsPanel } from "./components/regimeAlertsPanel";
 import { ReportShell } from "./components/reportShell";
 import { RelatedReportLinks } from "./components/relatedReportLinks";
+import { CadenceChecklist } from "./components/cadenceChecklist";
 import { reportPageLinks } from "../lib/report/reportNavigation";
 
 export const runtime = "edge";
@@ -321,6 +322,30 @@ export default async function HomePage({
           ))}
         </ol>
       </section>
+
+      <CadenceChecklist
+        cadence="weekly"
+        storageKey="whether-weekly-review-checklist"
+        title="Weekly review ritual"
+        subtitle="Complete this sequence every week before execution calls."
+        items={[
+          {
+            id: "weekly-actions",
+            label: "Confirm this week's actions",
+            href: "#weekly-action-summary",
+          },
+          {
+            id: "leadership-summary",
+            label: "Align leadership summary",
+            href: "#executive-snapshot",
+          },
+          {
+            id: "signal-alerts",
+            label: "Validate alerts and signals",
+            href: "#regime-alerts",
+          },
+        ]}
+      />
 
 
       <section id="weekly-handoff" className="weather-panel space-y-3 px-6 py-5">

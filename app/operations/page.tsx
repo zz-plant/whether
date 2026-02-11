@@ -6,6 +6,7 @@ import { siteUrl } from "../../lib/siteUrl";
 import { buildBreadcrumbList, buildPageMetadata, organizationName, websiteName } from "../../lib/seo";
 import { ReportShell } from "../components/reportShell";
 import { RelatedReportLinks } from "../components/relatedReportLinks";
+import { CadenceChecklist } from "../components/cadenceChecklist";
 import { HistoricalBanner, MonthlyActionSummaryPanel } from "../components/reportSections";
 import { reportPageLinks } from "../../lib/report/reportNavigation";
 import {
@@ -159,6 +160,30 @@ export default async function OperationsPage({
     >
       <OperationsWorkflowProgress currentPath="/operations" />
       <OperationsWorkstreamNav currentPath="/operations" />
+
+      <CadenceChecklist
+        cadence="monthly"
+        storageKey="whether-monthly-review-checklist"
+        title="Monthly operating review"
+        subtitle="Run this sequence once per month to keep teams aligned."
+        items={[
+          {
+            id: "monthly-summary",
+            label: "Review monthly summary",
+            href: "#ops-monthly-action-summary",
+          },
+          {
+            id: "decision-checks",
+            label: "Validate decision guardrails",
+            href: "/operations/decisions",
+          },
+          {
+            id: "briefing-export",
+            label: "Export leadership brief",
+            href: "/operations/briefings#ops-export-briefs",
+          },
+        ]}
+      />
 
       <section className="weather-panel space-y-4 px-6 py-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
