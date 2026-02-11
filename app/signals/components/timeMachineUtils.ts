@@ -28,6 +28,10 @@ export const formatMonthInput = (value: string) => {
 };
 
 export const parseMonthInput = (value: string) => {
+  if (!/^\d{4}-\d{2}$/.test(value)) {
+    return null;
+  }
+
   const [yearPart, monthPart] = value.split("-");
   const year = Number(yearPart);
   const month = Number(monthPart);
@@ -36,6 +40,8 @@ export const parseMonthInput = (value: string) => {
     !monthPart ||
     Number.isNaN(year) ||
     Number.isNaN(month) ||
+    !Number.isInteger(year) ||
+    !Number.isInteger(month) ||
     month < 1 ||
     month > 12
   ) {
