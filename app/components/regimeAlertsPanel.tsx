@@ -8,6 +8,18 @@ import { formatDateUTC, formatTimestampUTC } from "../../lib/formatters";
 import { useClipboardCopy } from "./useClipboardCopy";
 import { regimeAlertsStorageKey, type RegimeAlertLogEntry } from "./regimeAlertsStorage";
 
+type ServerAlert = {
+  id: string;
+  createdAt: string;
+  payload: {
+    previousRecordDate: string;
+    currentRecordDate: string;
+    previousAssessment: { regime: string };
+    currentAssessment: { regime: string };
+    reasons: Array<{ code: string; message: string }>;
+  };
+};
+
 const formatTimestamp = (value: string) => formatTimestampUTC(value);
 const formatRecordDate = (value: string) => formatDateUTC(value);
 
@@ -20,9 +32,28 @@ const buildAlertCopyText = (entry: RegimeAlertLogEntry) => {
     `Previous record: ${formatRecordDate(previous.recordDate)} — ${previous.assessment.regime}`,
     `Current record: ${formatRecordDate(current.recordDate)} — ${current.assessment.regime}`,
     "Reasons:",
-    ...reasons.map((reason) => `• ${reason.message}`),
+    ...reasons.map((reason) => `• ${reason.code}: ${reason.message}`),
   ].join("\n");
 };
+
+const mapServerAlerts = (alerts: ServerAlert[]): RegimeAlertLogEntry[] =>
+  alerts.map((entry) => ({
+    id: entry.id,
+    loggedAt: entry.createdAt,
+    previous: {
+      recordDate: entry.payload.previousRecordDate,
+      assessment: {
+        regime: entry.payload.previousAssessment.regime,
+      } as RegimeAlertLogEntry["previous"]["assessment"],
+    },
+    current: {
+      recordDate: entry.payload.currentRecordDate,
+      assessment: {
+        regime: entry.payload.currentAssessment.regime,
+      } as RegimeAlertLogEntry["current"]["assessment"],
+    },
+    reasons: entry.payload.reasons,
+  }));
 
 export const RegimeAlertsPanel = () => {
   const [alerts, setAlerts] = useState<RegimeAlertLogEntry[]>([]);
@@ -43,6 +74,23 @@ export const RegimeAlertsPanel = () => {
   }, []);
 
   useEffect(() => {
+    let active = true;
+
+    void fetch("/api/regime-alerts")
+      .then(async (response) => {
+        if (!response.ok) {
+          return;
+        }
+        const payload = (await response.json()) as { alerts?: ServerAlert[] };
+        if (!active || !Array.isArray(payload.alerts) || payload.alerts.length === 0) {
+          return;
+        }
+        setAlerts(mapServerAlerts(payload.alerts));
+      })
+      .catch(() => {
+        loadAlerts();
+      });
+
     loadAlerts();
     const handleStorage = (event: StorageEvent) => {
       if (event.key === regimeAlertsStorageKey) {
@@ -50,7 +98,10 @@ export const RegimeAlertsPanel = () => {
       }
     };
     window.addEventListener("storage", handleStorage);
-    return () => window.removeEventListener("storage", handleStorage);
+    return () => {
+      active = false;
+      window.removeEventListener("storage", handleStorage);
+    };
   }, [loadAlerts]);
 
   return (
@@ -114,7 +165,9 @@ export const RegimeAlertsPanel = () => {
                     {entry.reasons.map((reason) => (
                       <li key={reason.code} className="flex gap-2">
                         <span className="mt-1 h-1.5 w-1.5 rounded-full bg-slate-500" />
-                        <span>{reason.message}</span>
+                        <span>
+                          <span className="font-semibold text-slate-200">{reason.code}</span>: {reason.message}
+                        </span>
                       </li>
                     ))}
                   </ul>

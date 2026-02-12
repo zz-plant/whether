@@ -111,6 +111,29 @@ export const ChangeSinceLastReadPanel = ({
         if (!isDuplicate) {
           const nextAlerts = [alertEntry, ...alerts].slice(0, 20);
           window.localStorage.setItem(regimeAlertsStorageKey, JSON.stringify(nextAlerts));
+
+          void fetch("/api/regime-alerts", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({
+              previousRecordDate: storedSnapshot.recordDate,
+              currentRecordDate: recordDate,
+              previousAssessment: storedSnapshot.assessment,
+              currentAssessment: assessment,
+              reasons,
+              sourceUrls: Array.from(
+                new Set(
+                  [
+                    ...storedSnapshot.assessment.inputs.map((input) => input.sourceUrl),
+                    ...assessment.inputs.map((input) => input.sourceUrl),
+                  ].filter(Boolean),
+                ),
+              ),
+              timeMachineHref: `/signals#time-machine`,
+            }),
+          }).catch(() => {
+            // Ignore network failures and keep local alerting as fallback.
+          });
         }
       } catch {
         // Ignore storage errors to keep console clean.

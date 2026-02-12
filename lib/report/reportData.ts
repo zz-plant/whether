@@ -19,7 +19,7 @@ import {
   parseTimeMachineRequest,
   resolveTimeMachineSelection,
 } from "../timeMachine/timeMachineSelection";
-import { macroSeries } from "../macroSnapshot";
+import { loadMacroSeries } from "../macroSnapshot";
 import { parseThresholdsFromSearchParams } from "../thresholds";
 import { formatAgeHours, formatDateUTC, formatTimestampUTC } from "../formatters";
 import { buildRegimeAlert } from "./reportFormatting";
@@ -55,9 +55,10 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
   const selectedYear = requestedSelection?.year ?? defaultYear;
   const thresholds = parseThresholdsFromSearchParams(searchParams);
   const regimeSeries = getTimeMachineRegimeSeries(24, thresholds);
-  const [treasury, liveTreasury] = await Promise.all([
+  const [treasury, liveTreasury, macroSeries] = await Promise.all([
     treasuryPromise,
     liveTreasuryPromise ?? treasuryPromise,
+    loadMacroSeries(liveFetcher),
   ]);
   const recordDateLabel = formatDateUTC(treasury.record_date);
   const fetchedAtLabel = formatTimestampUTC(treasury.fetched_at);

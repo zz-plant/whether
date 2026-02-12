@@ -25,6 +25,7 @@ import {
 } from "./components/reportSections";
 import { ChangeSinceLastReadPanel } from "./components/changeSinceLastReadPanel";
 import { RegimeAlertsPanel } from "./components/regimeAlertsPanel";
+import { WeeklyDigestPanel } from "./components/weeklyDigestPanel";
 import { ReportShell } from "./components/reportShell";
 import { RelatedReportLinks } from "./components/relatedReportLinks";
 import { CadenceChecklist } from "./components/cadenceChecklist";
@@ -58,6 +59,7 @@ const homeSectionSequence = [
   { href: "#weekly-handoff", label: "Next recommended action" },
   { href: "#executive-snapshot", label: "Leadership summary" },
   { href: "#regime-alerts", label: "New alerts" },
+  { href: "#weekly-digest", label: "Weekly digest" },
   { href: "#regime-summary", label: "Market climate summary" },
   { href: "#signal-matrix", label: "Signal breakdown" },
   { href: "#regime-assessment", label: "What the scores mean" },
@@ -386,6 +388,7 @@ export default async function HomePage({
         <RegimeChangeAlertPanel alert={regimeAlert} provenance={treasuryProvenance} />
 
         <RegimeAlertsPanel />
+          <WeeklyDigestPanel />
       </ReportGroup>
 
       <ReportGroup

@@ -28,8 +28,10 @@ const buildBrief = (
   const baseRate = sensors.find((sensor) => sensor.id === "BASE_RATE");
   const curveSlope = sensors.find((sensor) => sensor.id === "CURVE_SLOPE");
   const macroLines = macros.map(
-    (macro) => `• ${macro.label}: ${formatNumber(macro.value, macro.unit)}`
+    (macro) => `• ${macro.label}: ${formatNumber(macro.value, macro.unit)} · refreshed ${macro.record_date}`
   );
+  const decisionHighlights = buildDecisionHighlights(assessment);
+  const citations = buildCitationLines(treasury, macros);
 
   return [
     `Whether Report Brief — ${treasury.record_date}`,
@@ -41,12 +43,26 @@ const buildBrief = (
     "Macro signals:",
     ...macroLines,
     "",
+    "Decision Shield highlights (top 3):",
+    ...decisionHighlights,
+    "",
     "Constraints:",
     ...assessment.constraints.map((item) => `• ${item}`),
     "",
-    `Source: ${treasury.source}`,
+    "Citations:",
+    ...citations
   ].join("\n");
 };
+
+
+
+const buildDecisionHighlights = (assessment: RegimeAssessment) =>
+  assessment.constraints.slice(0, 3).map((constraint) => `• ${constraint}`);
+
+const buildCitationLines = (treasury: TreasuryData, macros: MacroSeriesReading[]) => [
+  `Treasury source: ${treasury.source} (${treasury.record_date})`,
+  ...macros.map((macro) => `${macro.label}: ${macro.sourceUrl} (${macro.record_date})`),
+];
 
 const buildJiraMarkdownBrief = (
   assessment: RegimeAssessment,
@@ -247,6 +263,11 @@ export const ExportBriefPanel = ({
     () => buildSlideBullets(assessment, macroSeries),
     [assessment, macroSeries]
   );
+  const boardBrief = useMemo(
+    () => [briefing, "", "---", "", slideBullets].join("\n"),
+    [briefing, slideBullets],
+  );
+
   const constraintHeadlines = useMemo(
     () => buildConstraintHeadlines(assessment, treasury),
     [assessment, treasury]
@@ -335,6 +356,15 @@ export const ExportBriefPanel = ({
                 className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
               >
                 {isCopying && activeTarget === "Slack" ? "Copying" : "Copy Slack brief"}
+              </Button>
+              <Button
+                type="button"
+                onClick={() => handleCopy(boardBrief, "Board")}
+                disabled={isCopying}
+                aria-busy={isCopying}
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+              >
+                {isCopying && activeTarget === "Board" ? "Copying" : "Copy board brief (1-click)"}
               </Button>
               <Button
                 type="button"

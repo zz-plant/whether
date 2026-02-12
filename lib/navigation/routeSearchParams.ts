@@ -1,25 +1,21 @@
 import type { Route } from "next";
-import type { UrlObject } from "url";
 import type { ReportSearchParams } from "../report/reportData";
 
 export const appendSearchParamsToRoute = (
   href: Route,
   searchParams?: ReportSearchParams
-): Route | UrlObject => {
+): string => {
   if (!searchParams) {
     return href;
   }
 
-  const query = Object.entries(searchParams).reduce<Record<string, string>>(
-    (acc, [key, value]) => {
-      if (typeof value !== "string" || value.length === 0) {
-        return acc;
-      }
-      acc[key] = value;
-      return acc;
-    },
-    {}
-  );
+  const query = Object.entries(searchParams).reduce<URLSearchParams>((acc, [key, value]) => {
+    if (typeof value === "string" && value.length > 0) {
+      acc.set(key, value);
+    }
+    return acc;
+  }, new URLSearchParams());
 
-  return Object.keys(query).length > 0 ? { pathname: href, query } : href;
+  const queryString = query.toString();
+  return queryString.length > 0 ? `${href}?${queryString}` : href;
 };
