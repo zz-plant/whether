@@ -20,6 +20,12 @@ export const MobileActionSheet = ({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
+  const shouldRestoreFocusRef = useRef(true);
+
+  const closeSheet = ({ restoreFocus = true }: { restoreFocus?: boolean } = {}) => {
+    shouldRestoreFocusRef.current = restoreFocus;
+    setOpen(false);
+  };
 
   useEffect(() => {
     if (!open) {
@@ -28,13 +34,14 @@ export const MobileActionSheet = ({
 
     const originalOverflow = document.body.style.overflow;
     const triggerElement = triggerRef.current;
+    shouldRestoreFocusRef.current = true;
     document.body.style.overflow = "hidden";
     closeRef.current?.focus();
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         event.preventDefault();
-        setOpen(false);
+        closeSheet();
       }
     };
 
@@ -43,7 +50,9 @@ export const MobileActionSheet = ({
     return () => {
       window.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = originalOverflow;
-      triggerElement?.focus();
+      if (shouldRestoreFocusRef.current) {
+        triggerElement?.focus({ preventScroll: true });
+      }
     };
   }, [open]);
 
@@ -99,7 +108,7 @@ export const MobileActionSheet = ({
         <div
           className="fixed inset-0 z-40 flex items-end bg-slate-950/70 px-4 pb-[calc(env(safe-area-inset-bottom)+5.5rem)] pt-6"
           role="presentation"
-          onClick={() => setOpen(false)}
+          onClick={() => closeSheet()}
         >
           <div
             ref={sheetRef}
@@ -115,7 +124,7 @@ export const MobileActionSheet = ({
               <button
                 ref={closeRef}
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={() => closeSheet()}
                 className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-slate-700/80 text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
               >
                 <span aria-hidden="true">✕</span>
@@ -128,7 +137,7 @@ export const MobileActionSheet = ({
                   <a
                     href={action.href}
                     className="inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-slate-700/70 px-3 py-2 text-center text-[11px] font-semibold leading-tight tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-300/80 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                    onClick={() => setOpen(false)}
+                    onClick={() => closeSheet({ restoreFocus: false })}
                   >
                     {action.label}
                   </a>
