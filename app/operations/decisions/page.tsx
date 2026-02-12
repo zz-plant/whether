@@ -88,7 +88,7 @@ export default async function OperationsDecisionsPage({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Action playbook · Decisions"
       currentPath="/operations/decisions"
-      pageSummary="First action: run decision-shield checks before locking assumptions."
+      pageSummary="Run decision guardrails, lock assumptions, and capture counterfactuals."
       pageSummaryLink={{ href: "#ops-decision-shield", label: "Explore details →" }}
       pageLinks={reportPageLinks}
       sectionLinks={operationsSectionLinks.decisions}
@@ -101,13 +101,6 @@ export default async function OperationsDecisionsPage({
     >
       <OperationsWorkflowProgress currentPath="/operations/decisions" />
       <OperationsWorkstreamNav currentPath="/operations/decisions" />
-
-      <section className="weather-panel space-y-2 px-6 py-5">
-        <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">First action</p>
-        <p className="text-sm text-slate-200">
-          Run decision-shield guardrails first, then capture assumptions and counterfactual stress tests before commit.
-        </p>
-      </section>
 
       <SectionedReportPanel
         id="ops-decision-shield"
