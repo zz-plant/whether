@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 type WeeklyDigestPayload = {
   generatedAt: string;
   alertCount: number;
+  deliveryCount: number;
   digest: {
     summary: string;
     bullets: string[];
@@ -58,7 +59,7 @@ export const WeeklyDigestPanel = () => {
           </ul>
           {payload ? (
             <p className="mt-3 text-xs text-slate-500">
-              {payload.alertCount} alerts tracked · generated {new Date(payload.generatedAt).toLocaleString()}
+              {payload.alertCount} alerts tracked · {payload.deliveryCount} deliveries · generated {new Date(payload.generatedAt).toLocaleString()}
             </p>
           ) : null}
         </div>

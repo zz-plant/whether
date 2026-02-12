@@ -5,10 +5,11 @@ import { buildWeeklyDigest } from "../../../lib/signalOps";
 export const runtime = "nodejs";
 
 export async function GET() {
-  const digest = buildWeeklyDigest(serverStore.regimeAlerts);
+  const digest = buildWeeklyDigest(serverStore.snapshot.regimeAlerts);
   return NextResponse.json({
     generatedAt: new Date().toISOString(),
     digest,
-    alertCount: serverStore.regimeAlerts.length,
+    alertCount: serverStore.snapshot.regimeAlerts.length,
+    deliveryCount: serverStore.snapshot.alertDeliveries.length,
   });
 }

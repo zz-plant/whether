@@ -1,9 +1,18 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { shouldCreateSignalAlert, type RegimeAlertEvent, type SignalAlertPayload } from "../lib/signalOps";
+import {
+  buildDeliverySummary,
+  shouldCreateSignalAlert,
+  type RegimeAlertEvent,
+  type SignalAlertPayload,
+} from "../lib/signalOps";
 import { DEFAULT_THRESHOLDS, type RegimeAssessment } from "../lib/regimeEngine";
 
-const assessment = (regime: RegimeAssessment["regime"], tightness: number, riskAppetite: number): RegimeAssessment => ({
+const assessment = (
+  regime: RegimeAssessment["regime"],
+  tightness: number,
+  riskAppetite: number
+): RegimeAssessment => ({
   regime,
   constraints: [],
   dataWarnings: [],
@@ -44,5 +53,17 @@ describe("signalOps", () => {
     };
 
     assert.equal(shouldCreateSignalAlert(payload, latest), false);
+  });
+
+  it("builds delivery summaries with regime and reason codes", () => {
+    const latest: RegimeAlertEvent = {
+      id: "1",
+      createdAt: new Date().toISOString(),
+      payload,
+    };
+
+    const summary = buildDeliverySummary(latest);
+    assert.match(summary, /SCARCITY/);
+    assert.match(summary, /regime-change/);
   });
 });
