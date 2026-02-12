@@ -4,6 +4,7 @@
  */
 import { Children, type ReactNode, isValidElement } from "react";
 import { DisplayGuardian } from "./displayGuardian";
+import { MobileActionSheet } from "./mobileActionSheet";
 import {
   OperatorCommandCenter,
   type OperatorCommandAction,
@@ -376,21 +377,13 @@ export const ReportShell = ({
                     </a>
                   ) : null}
                   {exportCta ? (
-                    <details className="group w-full sm:hidden">
-                      <summary className="weather-pill inline-flex min-h-[44px] w-full cursor-pointer list-none items-center justify-center gap-2 rounded-full px-3 py-2 text-center text-[11px] font-semibold tracking-[0.12em] text-slate-200 marker:content-none">
-                        <span>More actions</span>
-                        <span aria-hidden="true" className="transition-transform duration-200 group-open:rotate-180">▾</span>
-                        <span className="sr-only">Tap to expand actions</span>
-                      </summary>
-                      <div className="mt-2 rounded-2xl border border-slate-700/80 bg-slate-950/95 p-3 shadow-2xl">
-                        <a
-                          href={exportCta.href}
-                          className="inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-slate-700/70 px-3 py-2 text-center text-[11px] font-semibold leading-tight tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-300/80 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:text-xs"
-                        >
-                          {exportCta.label}
-                        </a>
-                      </div>
-                    </details>
+                    <div className="w-full sm:hidden">
+                      <MobileActionSheet
+                        triggerLabel="More actions"
+                        srHint="Open additional actions"
+                        actions={[{ href: exportCta.href, label: exportCta.label }]}
+                      />
+                    </div>
                   ) : null}
                 </div>
                 <p className={`inline-flex items-center gap-2 text-xs leading-relaxed ${trustLabelTone}`}>
