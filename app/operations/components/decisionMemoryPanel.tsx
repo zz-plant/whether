@@ -240,6 +240,7 @@ export const DecisionMemoryPanel = ({
   const [isCopying, setIsCopying] = useState(false);
   const [fallbackCopyText, setFallbackCopyText] = useState("");
   const storageKey = "whether.decisionMemory";
+  const clientIdStorageKey = "whether.decisionMemoryClientId";
   const draftKey = "whether.decisionMemoryDraft";
   const { add } = Toast.useToastManager();
   const router = useRouter();
@@ -251,7 +252,19 @@ export const DecisionMemoryPanel = ({
   const safeRecordLabel = recordDateLabel.replace(/[^a-zA-Z0-9-_]+/g, "-");
   const defaultRecordLabel = new Date().toISOString().slice(0, 10);
   const exportLabel = safeRecordLabel || defaultRecordLabel;
-  const clientId = useMemo(() => createClientId(), []);
+  const [clientId, setClientId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedClientId = window.localStorage.getItem(clientIdStorageKey);
+    if (storedClientId) {
+      setClientId(storedClientId);
+      return;
+    }
+
+    const nextClientId = createClientId();
+    window.localStorage.setItem(clientIdStorageKey, nextClientId);
+    setClientId(nextClientId);
+  }, [clientIdStorageKey]);
 
   const attachedSnapshot = useMemo(() => {
     if (!snapshotParam) {
@@ -269,6 +282,10 @@ export const DecisionMemoryPanel = ({
   }, [snapshotParam]);
 
   useEffect(() => {
+    if (!clientId) {
+      return;
+    }
+
     let active = true;
 
     const load = async () => {
