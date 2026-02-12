@@ -240,6 +240,7 @@ export const DecisionMemoryPanel = ({
   const [isCopying, setIsCopying] = useState(false);
   const [fallbackCopyText, setFallbackCopyText] = useState("");
   const storageKey = "whether.decisionMemory";
+  const clientIdStorageKey = "whether.decisionMemoryClientId";
   const draftKey = "whether.decisionMemoryDraft";
   const { add } = Toast.useToastManager();
   const router = useRouter();
@@ -251,6 +252,19 @@ export const DecisionMemoryPanel = ({
   const safeRecordLabel = recordDateLabel.replace(/[^a-zA-Z0-9-_]+/g, "-");
   const defaultRecordLabel = new Date().toISOString().slice(0, 10);
   const exportLabel = safeRecordLabel || defaultRecordLabel;
+  const [clientId, setClientId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedClientId = window.localStorage.getItem(clientIdStorageKey);
+    if (storedClientId) {
+      setClientId(storedClientId);
+      return;
+    }
+
+    const nextClientId = createClientId();
+    window.localStorage.setItem(clientIdStorageKey, nextClientId);
+    setClientId(nextClientId);
+  }, [clientIdStorageKey]);
 
   const attachedSnapshot = useMemo(() => {
     if (!snapshotParam) {
@@ -268,19 +282,45 @@ export const DecisionMemoryPanel = ({
   }, [snapshotParam]);
 
   useEffect(() => {
-    const stored = window.localStorage.getItem(storageKey);
-    if (!stored) {
+    if (!clientId) {
       return;
     }
-    try {
-      const parsed = JSON.parse(stored) as DecisionMemoryEntry[];
-      if (Array.isArray(parsed)) {
-        setEntries(parsed);
+
+    let active = true;
+
+    const load = async () => {
+      try {
+        const response = await fetch(`/api/decision-memory?clientId=${encodeURIComponent(clientId)}`);
+        if (response.ok) {
+          const payload = (await response.json()) as { entries?: DecisionMemoryEntry[] };
+          if (active && Array.isArray(payload.entries)) {
+            setEntries(payload.entries);
+            return;
+          }
+        }
+      } catch {
+        // fallback to local cache below.
       }
-    } catch {
-      // Intentionally ignore storage restore errors to keep console clean.
-    }
-  }, [storageKey]);
+
+      const stored = window.localStorage.getItem(storageKey);
+      if (!stored) {
+        return;
+      }
+      try {
+        const parsed = JSON.parse(stored) as DecisionMemoryEntry[];
+        if (active && Array.isArray(parsed)) {
+          setEntries(parsed);
+        }
+      } catch {
+        // Intentionally ignore storage restore errors to keep console clean.
+      }
+    };
+
+    void load();
+    return () => {
+      active = false;
+    };
+  }, [clientId, storageKey]);
 
   useEffect(() => {
     const storedDraft = window.localStorage.getItem(draftKey);
@@ -358,6 +398,23 @@ export const DecisionMemoryPanel = ({
       scores: assessment.scores,
     };
     setEntries((prev) => [entry, ...prev].slice(0, 12));
+    void fetch("/api/decision-memory", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ clientId, entry }),
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          return;
+        }
+        const payload = (await response.json()) as { entries?: DecisionMemoryEntry[] };
+        if (Array.isArray(payload.entries)) {
+          setEntries(payload.entries);
+        }
+      })
+      .catch(() => {
+        // keep local entries when API is unavailable.
+      });
     setDecisionTitle("");
     setDecisionNote("");
     setTitleError(null);
@@ -462,8 +519,8 @@ export const DecisionMemoryPanel = ({
     nextParams.delete("decisionSnapshot");
     router.push(`${pathname}?${nextParams.toString()}` as Route, { scroll: false });
     add({
-      title: "Decision memory cleared",
-      description: "The decision log has been reset.",
+      title: "Local decision view cleared",
+      description: "Your browser view was reset. Server audit records remain intact.",
       type: "success",
     });
   };
@@ -617,17 +674,17 @@ export const DecisionMemoryPanel = ({
                   type="button"
                   className="weather-pill inline-flex min-h-[44px] items-center justify-center border border-rose-400/40 px-3 py-1 text-xs font-semibold tracking-[0.12em] text-rose-200 transition-colors hover:border-rose-300/70 hover:text-rose-100 touch-manipulation"
                 >
-                  Clear log
+                  Clear local view
                 </AlertDialog.Trigger>
                 <AlertDialog.Portal>
                   <AlertDialog.Backdrop className="fixed inset-0 bg-slate-950/80" />
                   <AlertDialog.Viewport className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <AlertDialog.Popup className="w-full max-w-md rounded-2xl border border-slate-800/80 bg-slate-950/95 p-6 text-slate-100 shadow-xl">
                       <AlertDialog.Title className="text-sm font-semibold tracking-[0.12em] text-slate-100">
-                        Clear decision memory?
+                        Clear local decision view?
                       </AlertDialog.Title>
                       <AlertDialog.Description className="mt-3 text-sm text-slate-300">
-                        This permanently removes the saved decision log and cannot be undone.
+                        This clears the local list in your browser. Append-only server records remain preserved for audit history.
                       </AlertDialog.Description>
                       <div className="mt-6 flex flex-wrap justify-end gap-3">
                         <AlertDialog.Close
@@ -641,7 +698,7 @@ export const DecisionMemoryPanel = ({
                           onClick={handleClearLog}
                           className="min-h-[44px] rounded-full border border-rose-400/60 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-rose-100 transition-colors hover:border-rose-300/70 hover:text-rose-50 touch-manipulation"
                         >
-                          Clear log
+                          Clear local view
                         </AlertDialog.Close>
                       </div>
                     </AlertDialog.Popup>
