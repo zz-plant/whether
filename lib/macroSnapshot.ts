@@ -81,9 +81,60 @@ const readBlsLatestValue = async (seriesId: string, fetcher: typeof fetch) => {
   };
 };
 
+const readBlsLatestYearOverYear = async (seriesId: string, fetcher: typeof fetch) => {
+  const currentYear = new Date().getUTCFullYear();
+  const response = await fetcher("https://api.bls.gov/publicAPI/v2/timeseries/data/", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    cache: "no-store",
+    body: JSON.stringify({
+      seriesid: [seriesId],
+      startyear: String(currentYear - 2),
+      endyear: String(currentYear),
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`BLS request failed for ${seriesId}`);
+  }
+
+  const payload = (await response.json()) as {
+    Results?: { series?: Array<{ data?: Array<{ year: string; period: string; value: string }> }> };
+  };
+
+  const points = (payload.Results?.series?.[0]?.data ?? [])
+    .filter((point) => /^M\d{2}$/.test(point.period) && point.period !== "M13")
+    .sort((a, b) => `${b.year}${b.period}`.localeCompare(`${a.year}${a.period}`));
+  const latest = points[0];
+
+  if (!latest) {
+    throw new Error(`No BLS rows for ${seriesId}`);
+  }
+
+  const previousYearPoint = points.find(
+    (point) => point.period === latest.period && point.year === String(Number(latest.year) - 1),
+  );
+
+  if (!previousYearPoint) {
+    throw new Error(`No prior year BLS row for ${seriesId}`);
+  }
+
+  const latestValue = Number(latest.value);
+  const previousYearValue = Number(previousYearPoint.value);
+  if (!Number.isFinite(latestValue) || !Number.isFinite(previousYearValue) || previousYearValue === 0) {
+    throw new Error(`Invalid BLS rows for ${seriesId}`);
+  }
+
+  const month = latest.period.replace("M", "");
+  return {
+    recordDate: `${latest.year}-${month}-01`,
+    value: ((latestValue - previousYearValue) / previousYearValue) * 100,
+  };
+};
+
 const buildLiveSeries = async (fetcher: typeof fetch): Promise<MacroSeriesReading[]> => {
   const [cpi, unemployment, bbbSpread] = await Promise.all([
-    readBlsLatestValue("CUUR0000SA0", fetcher),
+    readBlsLatestYearOverYear("CUUR0000SA0", fetcher),
     readBlsLatestValue("LNS14000000", fetcher),
     readFredLatestValue("BAA10Y", fetcher),
   ]);
