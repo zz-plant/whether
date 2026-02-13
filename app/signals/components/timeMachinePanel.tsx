@@ -11,6 +11,7 @@ import { Input } from "@base-ui/react/input";
 import { Popover } from "@base-ui/react/popover";
 import { Tabs } from "@base-ui/react/tabs";
 import type { Route } from "next";
+import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 import type { RegimeKey } from "../../../lib/regimeEngine";
@@ -326,12 +327,12 @@ export const TimeMachinePanel = ({
           </div>
           <div className="flex flex-col items-end gap-3">
             {isHistorical ? (
-              <a
+              <Link
                 href="/"
                 className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
               >
                 Exit historical view
-              </a>
+              </Link>
             ) : null}
             <DataProvenanceStrip provenance={provenance} />
           </div>

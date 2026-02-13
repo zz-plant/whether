@@ -1,11 +1,11 @@
 # Stack modernization inventory & constraints
 
 ## Runtime & tooling versions
-- **Package manager:** Bun 1.2.14 (`packageManager`).
+- **Package manager:** Bun 1.3.9 (`packageManager`).
 - **Node engine:** >=20.16.0.
-- **Next.js:** 14.2.5.
-- **React / React DOM:** 18.3.1.
-- **TypeScript:** 5.5.3.
+- **Next.js:** 15.5.12.
+- **React / React DOM:** 19.2.4.
+- **TypeScript:** 5.9.3.
 - **Tailwind CSS:** 3.4.6.
 - **Cloudflare adapter:** @cloudflare/next-on-pages 1.13.16.
 - **Testing:** `node --test` via `bun test`.
@@ -17,10 +17,10 @@ This section maps the currently pinned stack to newer stable versions and highli
 
 | Element | Current in repo | Newer stable (observed) | Notable newer capabilities to evaluate |
 | --- | --- | --- | --- |
-| Bun | 1.2.14 | 1.3.8 | Runtime and package manager performance improvements, plus continued Node compatibility expansion for tooling/scripts. |
-| Next.js | 14.2.5 | 16.1.6 | Turbopack maturity improvements, Cache Components/PPR-oriented caching model, and `proxy.ts` replacing `middleware.ts` naming for network boundary clarity. |
-| React / React DOM | 18.3.1 | 19.2.4 | React 19 Actions for async mutations, `useOptimistic`, form-centric hooks (`useFormStatus`, `useActionState`), improved Suspense behavior, and static React DOM APIs. |
-| TypeScript | 5.5.3 | 5.9.3 | Language service and type-checking improvements, faster editor workflows, and newer type-system ergonomics from 5.6–5.9 releases. |
+| Bun | 1.3.9 | 1.3.9 | Runtime and package manager performance improvements, plus continued Node compatibility expansion for tooling/scripts. |
+| Next.js | 15.5.12 | 16.1.6 | Turbopack maturity improvements, Cache Components/PPR-oriented caching model, and `proxy.ts` replacing `middleware.ts` naming for network boundary clarity. |
+| React / React DOM | 19.2.4 | 19.2.4 | React 19 Actions for async mutations, `useOptimistic`, form-centric hooks (`useFormStatus`, `useActionState`), improved Suspense behavior, and static React DOM APIs. |
+| TypeScript | 5.9.3 | 5.9.3 | Language service and type-checking improvements, faster editor workflows, and newer type-system ergonomics from 5.6–5.9 releases. |
 | Tailwind CSS | 3.4.6 | 4.1.18 | Tailwind v4 CSS-first setup, streamlined content/source detection, and reduced PostCSS plugin surface for common setups. |
 | Zod | 3.23.8 | 4.3.6 | Zod 4 API/performance updates and schema ergonomics improvements for large validation surfaces. |
 | ESLint | 8.57.0 | 9.39.2 | Flat config-first ecosystem direction and updated rule/tooling compatibility expectations. |
