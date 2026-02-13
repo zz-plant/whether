@@ -15,6 +15,12 @@ import {
   type ReportPageLink,
   type ReportSectionLink,
 } from "./reportShellNavigation";
+import {
+  ActionSequence,
+  DecisionBanner,
+  StageRail,
+  type ReportStageItem,
+} from "./reportRevampElements";
 
 export const ReportShell = ({
   children,
@@ -45,6 +51,9 @@ export const ReportShell = ({
   structuredData,
   historicalBanner,
   currentPath,
+  stageRail,
+  decisionBanner,
+  actionSequence,
 }: {
   children: ReactNode;
   statusLabel: string;
@@ -71,6 +80,23 @@ export const ReportShell = ({
   structuredData?: string;
   historicalBanner?: ReactNode;
   currentPath: string;
+  stageRail?: {
+    title?: string;
+    items: ReportStageItem[];
+  };
+  decisionBanner?: {
+    label?: string;
+    decision: string;
+    horizon: string;
+    confidence: string;
+    confidenceScore?: number;
+    effectiveDate: string;
+    evidenceHref?: string;
+  };
+  actionSequence?: {
+    title: string;
+    items: Array<{ title: string; detail: string; href: string; cta: string }>;
+  };
 }) => {
   const trustToneStyles =
     trustStatusTone === "warning"
@@ -413,6 +439,24 @@ export const ReportShell = ({
                   <span>{trustStatusLabel}: {trustStatusAction}</span>
                 </p>
               </section>
+
+              {stageRail ? <StageRail title={stageRail.title} items={stageRail.items} /> : null}
+
+              {decisionBanner ? (
+                <DecisionBanner
+                  label={decisionBanner.label}
+                  decision={decisionBanner.decision}
+                  horizon={decisionBanner.horizon}
+                  confidence={decisionBanner.confidence}
+                  confidenceScore={decisionBanner.confidenceScore}
+                  effectiveDate={decisionBanner.effectiveDate}
+                  evidenceHref={decisionBanner.evidenceHref}
+                />
+              ) : null}
+
+              {actionSequence ? (
+                <ActionSequence title={actionSequence.title} items={actionSequence.items} />
+              ) : null}
 
               {showFirstActionGuide ? (
                 <section className="weather-panel space-y-2 px-4 py-4 sm:px-5" aria-label="First action guidance">

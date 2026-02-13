@@ -113,6 +113,13 @@ export default async function SignalsPage({
       ? "Hold major decisions until live signals return or you validate the cache."
       : "Signals are live; use them to confirm thresholds and trigger alerts.";
   const trustStatusTone = historicalSelection ? "historical" : isFallback ? "warning" : "stable";
+  const stageItems = [
+    { id: "assess", label: "Assess regime", href: "#regime-timeline", status: "current" as const },
+    { id: "decide", label: "Decide posture", href: "/", status: "upcoming" as const },
+    { id: "guardrails", label: "Set guardrails", href: "/operations/decisions", status: "upcoming" as const },
+    { id: "owners", label: "Assign owners", href: "/operations/plan", status: "upcoming" as const },
+    { id: "export", label: "Export brief", href: "/operations/briefings", status: "upcoming" as const },
+  ];
 
   return (
     <ReportShell
@@ -128,13 +135,30 @@ export default async function SignalsPage({
       pageTitle="Signal evidence"
       currentPath="/signals"
       pageSummary="See the sources and scoring behind the regime call."
-      pageSummaryLink={{ href: "#signals-scan-order", label: "Start suggested scan →" }}
+      pageSummaryLink={{ href: "#regime-timeline", label: "Start evidence scan →" }}
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
       heroVariant="compact"
       pageNavVariant="compact"
       primaryCta={{ href: "#sensor-array", label: "Open live feed" }}
       secondaryCta={{ href: "#thresholds", label: "Check scoring thresholds" }}
+      stageRail={{ title: "Global decision flow", items: stageItems }}
+      decisionBanner={{
+        label: "Explain why",
+        decision: `${regimeLabel} regime is supported by current macro readings.`,
+        horizon: "Current cycle",
+        confidence: trustStatusLabel,
+        effectiveDate: recordDateLabel,
+        evidenceHref: "#macro-signals",
+      }}
+      actionSequence={{
+        title: "Evidence scan",
+        items: [
+          { title: "Review regime timeline", detail: "Start with sequence changes to frame context.", href: "#regime-timeline", cta: "Open timeline" },
+          { title: "Check scoring thresholds", detail: "Confirm guardrails still match current tolerance.", href: "#thresholds", cta: "Open thresholds" },
+          { title: "Inspect live sensor feed", detail: "Validate source readings behind the call.", href: "#sensor-array", cta: "Open sensor feed" },
+        ],
+      }}
       structuredData={JSON.stringify(structuredData)}
       historicalBanner={
         historicalSelection ? (
@@ -142,33 +166,6 @@ export default async function SignalsPage({
         ) : null
       }
     >
-      <section id="signals-scan-order" className="weather-panel space-y-4 px-6 py-5">
-        <div>
-          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Suggested scan order</p>
-          <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-            Run this quick 3-step review before deep diving.
-          </h2>
-        </div>
-        <ol className="grid gap-3 md:grid-cols-3">
-          {[
-            { title: "1) Review regime timeline", href: "#regime-timeline", detail: "Start with sequence changes to frame context.", action: "Open timeline" },
-            { title: "2) Check scoring thresholds", href: "#thresholds", detail: "Confirm guardrails still match current tolerance.", action: "Open thresholds" },
-            { title: "3) Inspect live sensor feed", href: "#sensor-array", detail: "Validate the source readings behind the call.", action: "Open sensor feed" },
-          ].map((item) => (
-            <li key={item.title} className="weather-surface flex flex-col gap-2 p-4">
-              <p className="text-sm font-semibold text-slate-100">{item.title}</p>
-              <p className="text-sm text-slate-300">{item.detail}</p>
-              <a
-                href={item.href}
-                className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-              >
-                {item.action} →
-              </a>
-            </li>
-          ))}
-        </ol>
-      </section>
-
       <section className="weather-panel space-y-4 px-6 py-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
