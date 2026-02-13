@@ -14,7 +14,7 @@ Whether translates public macro signals into operational guidance for product an
 - Planning and operations teams that need copy-ready, source-backed leadership summaries.
 
 ## Local development
-1. Use Node.js 20+ (`.nvmrc`) and Bun 1.2.x.
+1. Use Node.js 20+ (`.nvmrc`) and Bun 1.3.x.
 2. Install dependencies: `bun install`
 3. Start development server: `bun run dev` (or `bun run dev:turbo`)
 4. Open `http://localhost:3000`

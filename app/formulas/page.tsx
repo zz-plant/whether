@@ -3,6 +3,7 @@
  * Keeps methodology transparent and shareable for operators.
  */
 import type { Metadata } from "next";
+import Link from "next/link";
 import { buildBreadcrumbList, buildCanonicalUrl, buildPageMetadata, organizationName, websiteName } from "../../lib/seo";
 
 export const metadata: Metadata = buildPageMetadata({
@@ -215,18 +216,18 @@ export default function FormulasPage() {
                 When you are ready, move to the live signals report to validate each data lane.
               </p>
               <div className="flex flex-wrap gap-3">
-                <a
+                <Link
                   href="/signals"
                   className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.2em] transition-colors hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
                 >
                   Open signals report
-                </a>
-                <a
+                </Link>
+                <Link
                   href="/"
                   className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-slate-300 underline decoration-slate-600 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
                 >
                   Return to weekly briefing →
-                </a>
+                </Link>
               </div>
             </div>
           </div>

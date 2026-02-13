@@ -2,7 +2,7 @@
 
 ## Toolchain
 - Node.js 20+ (`.nvmrc`)
-- Bun 1.2.x (`packageManager` in `package.json`)
+- Bun 1.3.x (`packageManager` in `package.json`)
 
 ## Core commands
 - Install dependencies: `bun install`
