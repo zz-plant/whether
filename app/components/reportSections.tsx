@@ -293,6 +293,22 @@ export const WeeklyActionSummaryPanel = ({
       detail: curveSlopeStatus,
     },
   ];
+  const timingWindows = [
+    {
+      label: "Best window to commit roadmap scope",
+      detail:
+        assessment.scores.riskAppetite >= assessment.thresholds.riskAppetiteRegime
+          ? "Early week after leadership sync; confidence supports bounded expansion."
+          : "After review with finance guardrails; keep reversibility explicit.",
+    },
+    {
+      label: "Best window for hiring approvals",
+      detail:
+        assessment.scores.tightness >= assessment.thresholds.tightnessRegime
+          ? "Late week with contingency plan attached."
+          : "Midweek once role-to-revenue linkage is clear.",
+    },
+  ];
 
   return (
     <section id="weekly-action-summary" aria-labelledby="weekly-action-summary-title" className="mt-8">
@@ -301,7 +317,7 @@ export const WeeklyActionSummaryPanel = ({
           <div className="grid gap-6 lg:grid-cols-[1.35fr,0.65fr]">
             <div className="space-y-4">
               <div>
-                <p className="type-label text-slate-400">This week</p>
+                <p className="type-label text-slate-400">This week&apos;s forecast</p>
                 <h2 id="weekly-action-summary-title" className="type-section text-slate-100">
                   Weekly action map
                 </h2>
@@ -348,7 +364,7 @@ export const WeeklyActionSummaryPanel = ({
               </div>
             <div className="rounded-2xl border border-sky-400/40 bg-slate-950/60 p-4">
               <p className="text-xs font-semibold tracking-[0.18em] text-sky-200">
-                Recommended posture
+                Recommended stance
               </p>
               <p className="mt-2 text-lg font-semibold text-slate-100">
                 Operate in {regimeLabel} mode.
@@ -410,6 +426,21 @@ export const WeeklyActionSummaryPanel = ({
               <p className="mt-2 text-xs text-slate-500">
                 Keep weekly decisions within this window unless new alerts publish.
               </p>
+            </div>
+            <div className="weather-surface p-4">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                Best timing windows
+              </p>
+              <ul className="mt-3 space-y-2 text-sm text-slate-300">
+                {timingWindows.map((window) => (
+                  <li key={window.label}>
+                    <p className="text-xs font-semibold tracking-[0.08em] text-slate-200">
+                      {window.label}
+                    </p>
+                    <p className="mt-1 text-xs text-slate-400">{window.detail}</p>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>

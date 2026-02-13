@@ -54,11 +54,11 @@ const ReportGroup = ({
 
 const homeSectionSequence = [
   { href: "#operator-fit", label: "Who this is for" },
-  { href: "#weekly-action-summary", label: "This week's actions" },
-  { href: "#weekly-action-summary", label: "Next recommended action" },
+  { href: "#weekly-action-summary", label: "This week's forecast" },
+  { href: "#weekly-action-summary", label: "Next recommended move" },
   { href: "#executive-snapshot", label: "Leadership summary" },
   { href: "#regime-alerts", label: "New alerts" },
-  { href: "#weekly-digest", label: "Weekly digest" },
+  { href: "#weekly-digest", label: "Signs to watch" },
   { href: "#regime-summary", label: "Market climate summary" },
   { href: "#signal-matrix", label: "Signal breakdown" },
   { href: "#regime-assessment", label: "What the scores mean" },
@@ -84,16 +84,19 @@ const commandCenterHighlights = [
     label: "Cadence",
     value: "Weekly",
     detail: "Mon briefing + midweek check",
+    glyph: "◴",
   },
   {
     label: "Decision horizon",
     value: "2-6 weeks",
     detail: "Staffing, roadmap, budget timing",
+    glyph: "⌖",
   },
   {
     label: "Evidence model",
     value: "Treasury + trend checks",
     detail: "Regime score + alert status",
+    glyph: "◌",
   },
 ] as const;
 
@@ -238,6 +241,7 @@ export default async function HomePage({
     historicalSelection,
     recordDateLabel,
     regimeAlert,
+    lastYearComparison,
     statusLabel,
     treasury,
     treasuryProvenance,
@@ -322,7 +326,7 @@ export default async function HomePage({
         <div className="space-y-3">
           <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Command center</p>
           <h1 className="max-w-3xl text-2xl font-semibold text-slate-100 sm:text-3xl">
-            Weekly planning view with current macro context.
+            Weekly forecast view with current macro context.
           </h1>
         </div>
         <div className="flex flex-wrap gap-3">
@@ -336,7 +340,12 @@ export default async function HomePage({
         <div className="grid gap-3 md:grid-cols-3">
           {commandCenterHighlights.map((item) => (
             <article key={item.label} className="weather-surface space-y-2 p-4">
-              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">{item.label}</p>
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                <span className="mr-1 text-slate-300" aria-hidden="true">
+                  {item.glyph}
+                </span>
+                {item.label}
+              </p>
               <p className="text-base font-semibold text-slate-100">{item.value}</p>
               <p className="text-sm text-slate-300">{item.detail}</p>
             </article>
@@ -348,7 +357,7 @@ export default async function HomePage({
         <div className="space-y-2">
           <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Operator fit</p>
           <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-            Operating guidance for macro-sensitive weeks.
+            Operational guidance for macro-sensitive weeks.
           </h2>
         </div>
         <div className="grid gap-3 lg:grid-cols-3">
@@ -387,6 +396,7 @@ export default async function HomePage({
 
         <ChangeSinceLastReadPanel
           assessment={assessment}
+          lastYearComparison={lastYearComparison}
           recordDate={treasury.record_date}
           provenance={treasuryProvenance}
         />
@@ -399,7 +409,7 @@ export default async function HomePage({
         <RegimeChangeAlertPanel alert={regimeAlert} provenance={treasuryProvenance} />
 
         <RegimeAlertsPanel />
-        <WeeklyDigestPanel />
+        <WeeklyDigestPanel assessment={assessment} />
       </ReportGroup>
 
       <ReportGroup
