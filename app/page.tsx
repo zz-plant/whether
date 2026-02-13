@@ -54,7 +54,6 @@ const ReportGroup = ({
 
 const homeSectionSequence = [
   { href: "#operator-fit", label: "Who this is for" },
-  { href: "#briefing-flow", label: "Recommended read order" },
   { href: "#weekly-action-summary", label: "This week's actions" },
   { href: "#weekly-handoff", label: "Next recommended action" },
   { href: "#executive-snapshot", label: "Leadership summary" },
@@ -261,6 +260,13 @@ export default async function HomePage({
       ? "Pause irreversible decisions until the live feed returns or you confirm the cache."
       : "Safe to use for near-term planning; proceed with normal approval flow.";
   const trustStatusTone = historicalSelection ? "historical" : isFallback ? "warning" : "stable";
+  const stageItems = [
+    { id: "assess", label: "Assess regime", href: "/signals#regime-timeline", status: "completed" as const },
+    { id: "decide", label: "Decide posture", href: "#weekly-action-summary", status: "current" as const },
+    { id: "guardrails", label: "Set guardrails", href: "/operations/decisions", status: "upcoming" as const },
+    { id: "owners", label: "Assign owners", href: "/operations/plan", status: "upcoming" as const },
+    { id: "export", label: "Export brief", href: "/operations/briefings", status: "upcoming" as const },
+  ];
 
   return (
     <ReportShell
@@ -277,8 +283,27 @@ export default async function HomePage({
       currentPath="/"
       pageSummary="Weekly regime pulse and recommended moves."
       primaryCta={{
-        href: "/onboarding",
-        label: "Start onboarding",
+        href: "#weekly-action-summary",
+        label: "Review weekly actions",
+      }}
+      secondaryCta={{ href: "#executive-snapshot", label: "Align leadership" }}
+      stageRail={{ title: "Global decision flow", items: stageItems }}
+      decisionBanner={{
+        label: "Decide now",
+        decision: "Set this week's operating posture before committing scope.",
+        horizon: "This week",
+        confidence: trustStatusLabel,
+        effectiveDate: recordDateLabel,
+        evidenceHref: "#signal-matrix",
+      }}
+      actionSequence={{
+        title: "Recommended sequence",
+        items: briefingFlowSteps.map((step) => ({
+          title: step.title,
+          detail: step.detail,
+          href: step.href,
+          cta: step.ctaLabel,
+        })),
       }}
       sidebarVariant="hidden"
       pageLinks={reportPageLinks}
@@ -336,67 +361,6 @@ export default async function HomePage({
         </div>
       </section>
 
-      <section id="briefing-flow" className="weather-panel space-y-4 px-6 py-5">
-        <div className="space-y-2">
-          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Read order</p>
-          <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">Briefing sequence</h2>
-        </div>
-        <ol className="grid gap-3 lg:grid-cols-3">
-          {briefingFlowSteps.map((item, index) => (
-            <li key={item.title} className="weather-surface space-y-3 p-4">
-              <div className="inline-flex min-h-[44px] items-center gap-2">
-                <span className="weather-pill inline-flex h-7 min-w-7 items-center justify-center px-2 text-[11px] font-semibold tracking-[0.14em] text-slate-200">
-                  {index + 1}
-                </span>
-                <p className="text-sm font-semibold text-slate-100">{item.title}</p>
-              </div>
-              <p className="text-sm text-slate-300">{item.detail}</p>
-              <a
-                href={item.href}
-                className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-sky-200 underline decoration-slate-500/80 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-              >
-                {item.ctaLabel}
-              </a>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      <CadenceChecklist
-        cadence="weekly"
-        storageKey="whether-weekly-review-checklist"
-        title="Weekly review ritual"
-        subtitle="Complete before execution calls."
-        items={[
-          {
-            id: "weekly-actions",
-            label: "Confirm this week's actions",
-            href: "#weekly-action-summary",
-          },
-          {
-            id: "leadership-summary",
-            label: "Align leadership summary",
-            href: "#executive-snapshot",
-          },
-          {
-            id: "signal-alerts",
-            label: "Validate alerts and signals",
-            href: "#regime-alerts",
-          },
-        ]}
-      />
-
-
-      <section id="weekly-handoff" className="weather-panel space-y-3 px-6 py-5">
-        <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Next recommended action</p>
-        <h2 className="text-lg font-semibold text-slate-100">Weekly interpretation complete?</h2>
-        <a
-          href={operationsPlanHref}
-          className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-sky-200 underline decoration-slate-500/80 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-        >
-          Open plan workspace
-        </a>
-      </section>
 
       <ReportGroup
         title="Action priorities"

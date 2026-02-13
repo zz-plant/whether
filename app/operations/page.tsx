@@ -131,6 +131,14 @@ export default async function OperationsPage({
 
   const workstreamCards = operationsWorkstreamLinks.filter((link) => link.href !== "/operations");
 
+  const stageItems = [
+    { id: "assess", label: "Assess regime", href: "/signals#regime-timeline", status: "completed" as const },
+    { id: "decide", label: "Decide posture", href: "/", status: "completed" as const },
+    { id: "guardrails", label: "Set guardrails", href: "/operations/decisions", status: "current" as const },
+    { id: "owners", label: "Assign owners", href: "/operations/plan", status: "upcoming" as const },
+    { id: "export", label: "Export brief", href: "/operations/briefings", status: "upcoming" as const },
+  ];
+
   return (
     <ReportShell
       statusLabel={statusLabel}
@@ -151,6 +159,19 @@ export default async function OperationsPage({
       heroVariant="compact"
       pageNavVariant="compact"
       primaryCta={{ href: "#ops-monthly-action-summary", label: "Review monthly actions" }}
+      stageRail={{ title: "Global decision flow", items: stageItems }}
+      decisionBanner={{
+        label: "Decide now",
+        decision: "Set this month's operating posture and commit guardrails.",
+        horizon: "2-6 weeks",
+        confidence: trustStatusLabel,
+        effectiveDate: recordDateLabel,
+        evidenceHref: "#ops-monthly-action-summary",
+      }}
+      actionSequence={{
+        title: "Execution sequence",
+        items: quickSteps.map((step) => ({ title: step.title, detail: step.detail, href: step.href, cta: step.cta })),
+      }}
       structuredData={JSON.stringify(structuredData)}
       historicalBanner={
         historicalSelection ? (
@@ -183,44 +204,6 @@ export default async function OperationsPage({
           },
         ]}
       />
-
-      <section className="weather-panel space-y-4 px-6 py-5">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
-              Immediate next steps
-            </p>
-            <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-              Answer the operating questions leadership asks every planning cycle.
-            </h2>
-          </div>
-        </div>
-        <div className="grid gap-3 lg:grid-cols-3">
-          {quickSteps.map((step) => (
-            <article key={step.title} className="weather-surface flex h-full flex-col gap-3 p-4">
-              <div className="space-y-2">
-                <p className="text-sm font-semibold text-slate-100">{step.title}</p>
-                <p className="text-sm text-slate-300">{step.detail}</p>
-              </div>
-              {step.emphasis === "primary" ? (
-                <a
-                  href={step.href}
-                  className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.2em] transition-colors hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                >
-                  {step.cta}
-                </a>
-              ) : (
-                <a
-                  href={step.href}
-                  className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-slate-300 underline decoration-slate-600 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                >
-                  {step.cta} →
-                </a>
-              )}
-            </article>
-          ))}
-        </div>
-      </section>
 
       <SectionedReportPanel
         id="ops-monthly-action-summary"
