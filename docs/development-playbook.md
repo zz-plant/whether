@@ -1,93 +1,103 @@
 # Development playbook
 
-This playbook expands on `CONTRIBUTING.md` with practical guidance for shipping safe, reviewable changes quickly.
+This playbook is the practical companion to `CONTRIBUTING.md`: use it when you want concrete, high-signal workflows for planning, implementing, validating, and reviewing changes.
 
-## 1) Fast local workflow
+## 1) Preferred day-to-day workflow
 
-1. **Sync + install**
+1. **Sync and install**
    - `git pull --rebase`
    - `bun install`
-2. **Start app**
+2. **Run locally**
    - `bun run dev`
-3. **Develop in small slices**
-   - Favor thin vertical increments (UI + logic + tests/docs together).
+3. **Ship in vertical slices**
+   - Land thin increments that include implementation + tests + docs when behavior changes.
 4. **Validate before push**
    - Typical: `bun run lint && bun test`
-   - Broad changes: `bun run check`
+   - Broad/high-risk: `bun run check`
 
-## 2) Change sizing and branch hygiene
+## 2) Scope management and PR sizing
 
-- Prefer PRs that can be reviewed in one sitting.
-- Keep one intent per PR (feature, fix, refactor, or docs).
-- If a task is large, split into stacked PRs:
+- Favor PRs that can be reviewed in a single pass.
+- Keep one intent per PR.
+- Split large work into stacked PRs where possible:
   - PR 1: enabling refactor/infrastructure
-  - PR 2: behavior change
-  - PR 3: cleanup/docs follow-through
+  - PR 2: behavioral change
+  - PR 3: cleanup and documentation follow-through
 
-## 3) Testing strategy by risk
+## 3) Risk-based validation matrix
 
-### Low-risk changes (copy/docs/non-behavioral)
-- Validate links, references, and command accuracy.
+| Risk profile | Examples | Expected validation |
+| --- | --- | --- |
+| Low | Docs/copy/metadata-only updates | Verify links, references, and command correctness |
+| Medium | UI behavior, orchestration/glue logic | `bun run lint` + `bun test` |
+| High | Regime/scoring/decision logic, data plumbing | `bun run check` + targeted regression tests |
 
-### Medium-risk changes (UI behavior, glue logic)
-- Run `bun run lint` and `bun test`.
-- Add/update tests where behavior changed.
-
-### High-risk changes (regime/scoring/decision logic, data plumbing)
-- Run `bun run check`.
-- Add or expand tests around edge cases and regression boundaries.
-- Call out assumptions and tradeoffs in PR notes.
+### Regression priorities for high-risk changes
+- Boundary conditions around thresholds/classification transitions.
+- Deterministic fallbacks when upstream/live data is unavailable.
+- User-facing explanation quality (guidance should remain understandable and auditable).
 
 ## 4) Data and decision integrity checklist
 
-When touching macro inputs, regime logic, or decision outputs:
+When touching macro data, regime logic, or decision outputs:
 
-- Keep source provenance explicit.
-- Preserve or improve freshness metadata behavior.
-- Confirm fallback behavior remains deterministic when live data is unavailable.
-- Ensure user-facing guidance remains explainable (not just “correct”).
+- [ ] Source provenance remains explicit.
+- [ ] Freshness metadata behavior is preserved or improved.
+- [ ] Offline/deterministic fallback paths still produce stable outputs.
+- [ ] Assumptions/tradeoffs are documented in the PR.
 
-## 5) Documentation contract
+## 5) Documentation update contract
 
-Update docs in the same PR when you change:
+Update documentation in the same PR when you change:
 - Behavior or user workflows.
 - Contributor workflows/commands.
 - Source-of-truth locations.
 
 Where to update:
-- `README.md` for product framing + quickstart basics.
-- `CONTRIBUTING.md` for contributor workflow.
-- `docs/README.md` for documentation index/map.
-- `docs/architecture.md` for meaningful module/data-flow changes.
+- `README.md` → product overview and local quickstart basics.
+- `CONTRIBUTING.md` → human contributor workflow standards.
+- `docs/README.md` → documentation map/index discoverability.
+- `docs/architecture.md` → meaningful module/data-flow changes.
+- `docs/feature-specs-current.md` → current behavior intent.
 
 ## 6) Review-ready PR checklist
 
 Before opening PR:
 - [ ] Scope is focused and intentional.
-- [ ] Tests/docs updated for behavior/workflow changes.
-- [ ] Validation commands run; outcomes captured.
-- [ ] Risks/follow-ups explicitly documented.
+- [ ] Tests/docs are updated for behavior/workflow changes.
+- [ ] Validation commands are run and outcomes captured.
+- [ ] Risks, constraints, and follow-ups are explicitly called out.
 
-Suggested PR body sections:
-- **Summary**
-- **Why this matters**
-- **Validation**
-- **Risks / follow-ups**
+Suggested PR body scaffold:
 
-## 7) Common issues and fixes
+```md
+## Summary
+## Why this matters
+## Validation
+- `bun run lint`
+- `bun test`
+## Risks / follow-ups
+```
 
-### Dev server fails to start
-- Confirm Node + Bun versions (`node -v`, `bun -v`).
+## 7) Practical troubleshooting
+
+### Dev server does not start
+- Confirm runtime versions: `node -v` and `bun -v`.
 - Reinstall dependencies: `bun install`.
+- Retry with a clean terminal session.
 
-### Types pass locally but behavior is wrong
-- Add/adjust focused tests under `tests/` around changed behavior.
-- Verify assumptions against current docs in `docs/feature-specs-current.md`.
+### Lint/tests pass but behavior seems off
+- Add a focused regression test in `tests/` reproducing expected behavior.
+- Re-check intended behavior in `docs/feature-specs-current.md`.
+- Validate nearby assumptions in `lib/` modules touched by the change.
 
-### Large PR is hard to review
-- Split by intent and land incrementally.
-- Move non-essential cleanup into a follow-up PR.
+### PR is hard to review
+- Separate concerns and split into smaller PRs.
+- Move opportunistic cleanup to a follow-up PR.
+- Add a short “review map” in PR summary (file-by-file or concern-by-concern).
 
-## 8) Guiding principle
+## 8) Team heuristics
 
-Optimize for **clarity over cleverness**: obvious code, explicit assumptions, and visible validation beat hidden complexity.
+- Optimize for **clarity over cleverness**.
+- Prefer explicit assumptions and visible validation over implicit behavior.
+- Bias toward changes that are easy to reason about six months later.
