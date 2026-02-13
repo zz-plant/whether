@@ -121,6 +121,16 @@ export const ReportShell = ({
     phase: missionSequenceLabels[index] ?? `Step ${index + 1}`,
   }));
   const sourceHref = treasurySource.startsWith("http") ? treasurySource : undefined;
+  const hasTwoPrimaryActions = Boolean(primaryCta && secondaryCta);
+  const hasSpecialCaveat = trustStatusTone !== "stable";
+  const showActNowCard = !hasTwoPrimaryActions || hasSpecialCaveat;
+  const missionGridClassName = showActNowCard
+    ? "grid gap-4 lg:grid-cols-[1.6fr,1.4fr,1.2fr]"
+    : "grid gap-4 lg:grid-cols-[1.6fr,1.4fr]";
+  const mobileStatusSummaryToneClass =
+    trustStatusTone === "warning"
+      ? "border-amber-300/80 bg-amber-500/15 text-amber-100"
+      : "text-slate-200";
   const overviewPanel = (
     <section className="weather-panel space-y-3 px-4 py-4">
       <p className="text-xs font-semibold tracking-[0.16em] text-slate-400">Snapshot</p>
@@ -369,10 +379,24 @@ export const ReportShell = ({
                         {summaryLink}
                       </p>
                       <details className="group sm:hidden">
-                        <summary className={`weather-chip inline-flex min-h-[44px] cursor-pointer list-none items-center gap-2 px-3 py-2 text-xs font-semibold tracking-[0.16em] text-slate-200 marker:content-none ${trustStatusTone === "warning" ? "border-amber-400/70 text-amber-100" : ""}`}>
+                        <summary className={`weather-chip inline-flex min-h-[44px] w-full cursor-pointer list-none items-center justify-between gap-3 px-3 py-2 text-xs font-semibold tracking-[0.16em] marker:content-none ${mobileStatusSummaryToneClass}`}>
                           <span>Data status · {statusLabel}</span>
-                          <span aria-hidden="true" className="transition-transform duration-200 group-open:rotate-180">▾</span>
-                          <span className="sr-only">Tap to expand data status</span>
+                          <span
+                            aria-hidden="true"
+                            className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-300 transition-transform duration-200 group-open:rotate-180"
+                          >
+                            <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
+                              <path
+                                d="M7 10l5 5 5-5"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.6"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          </span>
+                          <span className="sr-only">Toggle data status details.</span>
                         </summary>
                         <div className="mt-2 rounded-2xl border border-slate-800/70 bg-slate-950/70 px-3 py-3 text-xs text-slate-300">
                           <p>Signals stamped: {recordDateLabel}</p>
@@ -391,10 +415,24 @@ export const ReportShell = ({
                         {summaryLink}
                       </p>
                       <details className="group sm:hidden">
-                        <summary className={`weather-chip inline-flex min-h-[44px] cursor-pointer list-none items-center gap-2 px-3 py-2 text-xs font-semibold tracking-[0.16em] text-slate-200 marker:content-none ${trustStatusTone === "warning" ? "border-amber-400/70 text-amber-100" : ""}`}>
+                        <summary className={`weather-chip inline-flex min-h-[44px] w-full cursor-pointer list-none items-center justify-between gap-3 px-3 py-2 text-xs font-semibold tracking-[0.16em] marker:content-none ${mobileStatusSummaryToneClass}`}>
                           <span>Data status · {statusLabel}</span>
-                          <span aria-hidden="true" className="transition-transform duration-200 group-open:rotate-180">▾</span>
-                          <span className="sr-only">Tap to expand data status</span>
+                          <span
+                            aria-hidden="true"
+                            className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-300 transition-transform duration-200 group-open:rotate-180"
+                          >
+                            <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
+                              <path
+                                d="M7 10l5 5 5-5"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.6"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          </span>
+                          <span className="sr-only">Toggle data status details.</span>
                         </summary>
                         <div className="mt-2 rounded-2xl border border-slate-800/70 bg-slate-950/70 px-3 py-3 text-xs text-slate-300">
                           <p>Signals stamped: {recordDateLabel}</p>
@@ -427,13 +465,14 @@ export const ReportShell = ({
                     <div className="w-full sm:hidden">
                       <MobileActionSheet
                         triggerLabel="More actions"
-                        srHint="Open additional actions"
+                        srHint="Open additional actions menu"
                         actions={[{ href: exportCta.href, label: exportCta.label }]}
                       />
                     </div>
                   ) : null}
                 </div>
                 <p className={`inline-flex items-center gap-2 text-xs leading-relaxed ${trustLabelTone}`}>
+                  <span className="font-semibold tracking-[0.14em]">Confidence cue</span>
                   <span aria-hidden="true">{trustStatusTone === "warning" ? "⚠" : trustStatusTone === "historical" ? "⏱" : "✓"}</span>
                   <span>{trustStatusLabel}: {trustStatusAction}</span>
                 </p>
@@ -445,7 +484,7 @@ export const ReportShell = ({
               </section>
 
               <section className="weather-panel space-y-5 px-4 py-5 sm:px-5" aria-label="Mission control">
-                <div className="grid gap-4 lg:grid-cols-[1.6fr,1.4fr,1.2fr]">
+                <div className={missionGridClassName}>
                   <article className="weather-surface space-y-3 p-4">
                     <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">{decisionBanner?.label ?? "Decide now"}</p>
                     <h2 className="text-lg font-semibold text-slate-100 sm:text-xl">
@@ -477,37 +516,46 @@ export const ReportShell = ({
                     </ol>
                   </article>
 
-                  <article className="weather-surface space-y-3 p-4">
-                    <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">Act now</p>
-                    <a
-                      href={primaryCta.href}
-                      className="weather-button-primary inline-flex min-h-[44px] w-full items-center justify-center px-3 py-2 text-center text-xs font-semibold tracking-[0.14em] hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-                    >
-                      {primaryCta.label}
-                    </a>
-                    {secondaryCta ? (
+                  {showActNowCard ? (
+                    <article className="weather-surface space-y-3 p-4">
+                      <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">Act now</p>
                       <a
-                        href={secondaryCta.href}
-                        className="inline-flex min-h-[44px] w-full items-center justify-center text-xs font-semibold text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                        href={primaryCta.href}
+                        className="weather-button-primary inline-flex min-h-[44px] w-full items-center justify-center px-3 py-2 text-center text-xs font-semibold tracking-[0.14em] hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
                       >
-                        {secondaryCta.label}
+                        {primaryCta.label}
                       </a>
-                    ) : null}
-                    {exportCta ? (
-                      <a
-                        href={exportCta.href}
-                        className="inline-flex min-h-[44px] w-full items-center justify-center text-xs font-semibold text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-                      >
-                        {exportCta.label}
-                      </a>
-                    ) : null}
-                  </article>
+                      {secondaryCta ? (
+                        <a
+                          href={secondaryCta.href}
+                          className="inline-flex min-h-[44px] w-full items-center justify-center text-xs font-semibold text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                        >
+                          {secondaryCta.label}
+                        </a>
+                      ) : null}
+                    </article>
+                  ) : null}
                 </div>
 
-                <details className="rounded-2xl border border-slate-800/80 bg-slate-950/40 px-4 py-3">
-                  <summary className="inline-flex min-h-[44px] cursor-pointer list-none items-center gap-2 text-xs font-semibold tracking-[0.16em] text-slate-300 marker:content-none">
-                    Data quality and confidence
-                    <span aria-hidden="true">▾</span>
+                <details className="group rounded-2xl border border-slate-800/80 bg-slate-950/40 px-4 py-3">
+                  <summary className="inline-flex min-h-[44px] w-full cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.16em] text-slate-300 marker:content-none">
+                    <span>Data quality and confidence</span>
+                    <span
+                      aria-hidden="true"
+                      className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-300 transition-transform duration-200 group-open:rotate-180"
+                    >
+                      <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
+                        <path
+                          d="M7 10l5 5 5-5"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.6"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </span>
+                    <span className="sr-only">Toggle data quality and confidence details.</span>
                   </summary>
                   <div className="grid gap-3 pt-2 text-xs text-slate-300 sm:grid-cols-2">
                     <p>Signals stamped: {recordDateLabel}</p>
