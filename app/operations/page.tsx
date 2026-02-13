@@ -16,7 +16,6 @@ import {
 } from "../../lib/navigation/operationsNavigation";
 import { appendSearchParamsToRoute } from "../../lib/navigation/routeSearchParams";
 import { OperationsWorkstreamNav } from "./components/operationsWorkstreamNav";
-import { OperationsWorkflowProgress } from "./components/operationsWorkflowProgress";
 
 export const runtime = "edge";
 
@@ -152,7 +151,6 @@ export default async function OperationsPage({
       heroVariant="compact"
       pageNavVariant="compact"
       primaryCta={{ href: "#ops-monthly-action-summary", label: "Review monthly actions" }}
-      secondaryCta={{ href: "#ops-workstreams", label: "Open workstreams" }}
       structuredData={JSON.stringify(structuredData)}
       historicalBanner={
         historicalSelection ? (
@@ -160,7 +158,6 @@ export default async function OperationsPage({
         ) : null
       }
     >
-      <OperationsWorkflowProgress currentPath="/operations" />
       <OperationsWorkstreamNav currentPath="/operations" />
 
       <CadenceChecklist
@@ -197,12 +194,6 @@ export default async function OperationsPage({
               Answer the operating questions leadership asks every planning cycle.
             </h2>
           </div>
-          <a
-            href="#ops-workstreams"
-            className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-          >
-            See workstreams →
-          </a>
         </div>
         <div className="grid gap-3 lg:grid-cols-3">
           {quickSteps.map((step) => (

@@ -80,6 +80,24 @@ const operatorFitPrimitives = [
   },
 ] as const;
 
+const commandCenterHighlights = [
+  {
+    label: "Cadence",
+    value: "Weekly",
+    detail: "Mon briefing + midweek check",
+  },
+  {
+    label: "Decision horizon",
+    value: "2-6 weeks",
+    detail: "Staffing, roadmap, budget timing",
+  },
+  {
+    label: "Evidence model",
+    value: "Treasury + trend checks",
+    detail: "Regime score + alert status",
+  },
+] as const;
+
 const briefingFlowSteps = [
   {
     title: "Set this week",
@@ -165,7 +183,7 @@ export default async function HomePage({
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const sectionLinks = homeSectionSequence.map((section, index) => ({
     href: section.href,
-    label: `${index}. ${section.label}`,
+    label: `${index + 1}. ${section.label}`,
   }));
   const structuredData = {
     "@context": "https://schema.org",
@@ -262,8 +280,6 @@ export default async function HomePage({
         href: "/onboarding",
         label: "Start onboarding",
       }}
-      secondaryCta={{ href: "#weekly-action-summary", label: "Start weekly review" }}
-      exportCta={{ href: "#executive-snapshot", label: "See leadership summary" }}
       sidebarVariant="hidden"
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
@@ -274,11 +290,40 @@ export default async function HomePage({
         ) : null
       }
     >
+      <section
+        aria-label="Command center"
+        className="weather-panel space-y-6 px-6 py-6"
+      >
+        <div className="space-y-3">
+          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Command center</p>
+          <h1 className="max-w-3xl text-2xl font-semibold text-slate-100 sm:text-3xl">
+            Weekly planning view with current macro context.
+          </h1>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <a
+            href="#weekly-action-summary"
+            className="inline-flex min-h-[44px] items-center rounded-full border border-sky-300/70 bg-sky-300/10 px-4 text-xs font-semibold tracking-[0.12em] text-sky-100 transition-colors hover:bg-sky-300/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
+          >
+            Review weekly briefing
+          </a>
+        </div>
+        <div className="grid gap-3 md:grid-cols-3">
+          {commandCenterHighlights.map((item) => (
+            <article key={item.label} className="weather-surface space-y-2 p-4">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">{item.label}</p>
+              <p className="text-base font-semibold text-slate-100">{item.value}</p>
+              <p className="text-sm text-slate-300">{item.detail}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <section id="operator-fit" className="weather-panel space-y-4 px-6 py-5">
         <div className="space-y-2">
           <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Operator fit</p>
           <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-            Fast operating guidance for macro-driven weeks.
+            Operating guidance for macro-sensitive weeks.
           </h2>
         </div>
         <div className="grid gap-3 lg:grid-cols-3">
@@ -390,7 +435,7 @@ export default async function HomePage({
         <RegimeChangeAlertPanel alert={regimeAlert} provenance={treasuryProvenance} />
 
         <RegimeAlertsPanel />
-          <WeeklyDigestPanel />
+        <WeeklyDigestPanel />
       </ReportGroup>
 
       <ReportGroup

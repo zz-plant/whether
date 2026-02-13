@@ -7,6 +7,11 @@ export const reportPageLinks: ReportPageLink[] = [
     description: "Weekly decisions, leadership summary, and climate signals in plain English.",
   },
   {
+    href: "/onboarding",
+    label: "Onboarding & glossary",
+    description: "Start here for the quick guide and plain-English glossary.",
+  },
+  {
     href: "/operations",
     label: "Action playbook",
     description: "Execution-ready moves, decision guardrails, and briefing kits.",
@@ -20,10 +25,5 @@ export const reportPageLinks: ReportPageLink[] = [
     href: "/formulas",
     label: "Methodology",
     description: "Plain-English formulas and source links for each signal.",
-  },
-  {
-    href: "/onboarding",
-    label: "Onboarding & glossary",
-    description: "Start here for the quick guide and plain-English glossary.",
   },
 ];
