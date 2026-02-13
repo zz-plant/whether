@@ -27,8 +27,9 @@ export const metadata: Metadata = {
 export default async function OperationsDecisionsPage({
   searchParams,
 }: {
-  searchParams?: { month?: string; year?: string; [key: string]: string | undefined };
+  searchParams?: Promise<{ month?: string; year?: string; [key: string]: string | undefined }>;
 }) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebPage",
@@ -56,7 +57,7 @@ export default async function OperationsDecisionsPage({
     statusLabel,
     treasury,
     treasuryProvenance,
-  } = await loadReportData(searchParams);
+  } = await loadReportData(resolvedSearchParams);
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
   const trustStatusLabel = historicalSelection
     ? "Historical snapshot"

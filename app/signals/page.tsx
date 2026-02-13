@@ -27,8 +27,9 @@ export const metadata: Metadata = buildPageMetadata({
 export default async function SignalsPage({
   searchParams,
 }: {
-  searchParams?: { month?: string; year?: string; [key: string]: string | undefined };
+  searchParams?: Promise<{ month?: string; year?: string; [key: string]: string | undefined }>;
 }) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const regimeLabels = {
     SCARCITY: "Scarcity",
     DEFENSIVE: "Defensive",
@@ -93,7 +94,7 @@ export default async function SignalsPage({
     summaryArchive,
     treasury,
     treasuryProvenance,
-  } = await loadReportData(searchParams);
+  } = await loadReportData(resolvedSearchParams);
   const regimeLabel = regimeLabels[assessment.regime];
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
   const trustStatusLabel = historicalSelection
@@ -314,7 +315,7 @@ export default async function SignalsPage({
         series={regimeSeries}
         selectedYear={selectedYear}
         selectedMonth={selectedMonth}
-        searchParams={searchParams}
+        searchParams={resolvedSearchParams}
       />
 
       <RelatedReportLinks
