@@ -98,10 +98,27 @@ export const MobileActionSheet = ({
         className="weather-pill inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full px-3 py-2 text-center text-xs font-semibold tracking-[0.12em] text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
         aria-haspopup="dialog"
         aria-expanded={open}
+        aria-controls="mobile-action-sheet-dialog"
       >
         <span>{triggerLabel}</span>
-        <span aria-hidden="true">▾</span>
-        <span className="sr-only">{srHint}</span>
+        <span
+          aria-hidden="true"
+          className={`inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-300 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+        >
+          <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
+            <path
+              d="M7 10l5 5 5-5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </span>
+        <span className="sr-only">
+          {srHint}. {open ? "Expanded" : "Collapsed"}.
+        </span>
       </button>
 
       {open ? (
@@ -112,6 +129,7 @@ export const MobileActionSheet = ({
         >
           <div
             ref={sheetRef}
+            id="mobile-action-sheet-dialog"
             role="dialog"
             aria-modal="true"
             aria-label="Additional actions"
