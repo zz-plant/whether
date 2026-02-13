@@ -15,12 +15,7 @@ import {
   type ReportPageLink,
   type ReportSectionLink,
 } from "./reportShellNavigation";
-import {
-  ActionSequence,
-  DecisionBanner,
-  StageRail,
-  type ReportStageItem,
-} from "./reportRevampElements";
+import { type ReportStageItem } from "./reportRevampElements";
 
 export const ReportShell = ({
   children,
@@ -120,7 +115,11 @@ export const ReportShell = ({
     </a>
   ) : null;
   const hasSidebar = sidebarVariant === "full";
-  const showFirstActionGuide = trustStatusTone !== "stable" || !secondaryCta;
+  const missionSequenceLabels = ["Now", "Next", "Later"];
+  const missionSequenceItems = (actionSequence?.items ?? []).slice(0, 3).map((item, index) => ({
+    ...item,
+    phase: missionSequenceLabels[index] ?? `Step ${index + 1}`,
+  }));
   const sourceHref = treasurySource.startsWith("http") ? treasurySource : undefined;
   const overviewPanel = (
     <section className="weather-panel space-y-3 px-4 py-4">
@@ -438,32 +437,104 @@ export const ReportShell = ({
                   <span aria-hidden="true">{trustStatusTone === "warning" ? "⚠" : trustStatusTone === "historical" ? "⏱" : "✓"}</span>
                   <span>{trustStatusLabel}: {trustStatusAction}</span>
                 </p>
+                {showOfflineBadge ? (
+                  <p className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.14em] text-amber-100">
+                    {offlineBadgeLabel}
+                  </p>
+                ) : null}
               </section>
 
-              {stageRail ? <StageRail title={stageRail.title} items={stageRail.items} /> : null}
+              <section className="weather-panel space-y-5 px-4 py-5 sm:px-5" aria-label="Mission control">
+                <div className="grid gap-4 lg:grid-cols-[1.6fr,1.4fr,1.2fr]">
+                  <article className="weather-surface space-y-3 p-4">
+                    <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">{decisionBanner?.label ?? "Decide now"}</p>
+                    <h2 className="text-lg font-semibold text-slate-100 sm:text-xl">
+                      {decisionBanner?.decision ?? `Start with ${primaryCta.label}.`}
+                    </h2>
+                    <p className="text-sm text-slate-300">{trustStatusAction}</p>
+                    {decisionBanner?.evidenceHref ? (
+                      <a
+                        href={decisionBanner.evidenceHref}
+                        className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                      >
+                        Review evidence trail →
+                      </a>
+                    ) : null}
+                  </article>
 
-              {decisionBanner ? (
-                <DecisionBanner
-                  label={decisionBanner.label}
-                  decision={decisionBanner.decision}
-                  horizon={decisionBanner.horizon}
-                  confidence={decisionBanner.confidence}
-                  confidenceScore={decisionBanner.confidenceScore}
-                  effectiveDate={decisionBanner.effectiveDate}
-                  evidenceHref={decisionBanner.evidenceHref}
-                />
-              ) : null}
+                  <article className="weather-surface space-y-3 p-4">
+                    <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">
+                      {actionSequence?.title ?? "Execution sequence"}
+                    </p>
+                    <ol className="space-y-2">
+                      {missionSequenceItems.map((item) => (
+                        <li key={item.title} className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-3">
+                          <p className="text-[11px] font-semibold tracking-[0.18em] text-slate-400">{item.phase}</p>
+                          <p className="mt-1 text-sm font-semibold text-slate-100">{item.title}</p>
+                          <p className="mt-1 text-xs text-slate-300">{item.detail}</p>
+                        </li>
+                      ))}
+                    </ol>
+                  </article>
 
-              {actionSequence ? (
-                <ActionSequence title={actionSequence.title} items={actionSequence.items} />
-              ) : null}
+                  <article className="weather-surface space-y-3 p-4">
+                    <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">Act now</p>
+                    <a
+                      href={primaryCta.href}
+                      className="weather-button-primary inline-flex min-h-[44px] w-full items-center justify-center px-3 py-2 text-center text-xs font-semibold tracking-[0.14em] hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                    >
+                      {primaryCta.label}
+                    </a>
+                    {secondaryCta ? (
+                      <a
+                        href={secondaryCta.href}
+                        className="inline-flex min-h-[44px] w-full items-center justify-center text-xs font-semibold text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                      >
+                        {secondaryCta.label}
+                      </a>
+                    ) : null}
+                    {exportCta ? (
+                      <a
+                        href={exportCta.href}
+                        className="inline-flex min-h-[44px] w-full items-center justify-center text-xs font-semibold text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                      >
+                        {exportCta.label}
+                      </a>
+                    ) : null}
+                  </article>
+                </div>
 
-              {showFirstActionGuide ? (
-                <section className="weather-panel space-y-2 px-4 py-4 sm:px-5" aria-label="First action guidance">
-                  <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">First action</p>
-                  <p className="text-sm text-slate-200">
-                    Start with <span className="font-semibold text-slate-100">{primaryCta.label}</span>, then continue to {secondaryCta?.label ?? "the next section"}.
-                  </p>
+                <details className="rounded-2xl border border-slate-800/80 bg-slate-950/40 px-4 py-3">
+                  <summary className="inline-flex min-h-[44px] cursor-pointer list-none items-center gap-2 text-xs font-semibold tracking-[0.16em] text-slate-300 marker:content-none">
+                    Data quality and confidence
+                    <span aria-hidden="true">▾</span>
+                  </summary>
+                  <div className="grid gap-3 pt-2 text-xs text-slate-300 sm:grid-cols-2">
+                    <p>Signals stamped: {recordDateLabel}</p>
+                    <p>Updated: {fetchedAtLabel}</p>
+                    <p className={trustLabelTone}>Confidence: {trustStatusLabel}</p>
+                    <p>{trustStatusDetail}</p>
+                  </div>
+                </details>
+              </section>
+
+              {stageRail ? (
+                <section className="weather-panel space-y-3 px-4 py-4 sm:px-5" aria-label={stageRail.title ?? "Decision flow"}>
+                  <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">{stageRail.title ?? "Decision flow"}</p>
+                  <ol className="grid gap-2 md:grid-cols-5">
+                    {stageRail.items.map((item, index) => (
+                      <li key={item.id}>
+                        <a
+                          href={item.href}
+                          className="weather-pill inline-flex min-h-[44px] w-full items-center gap-2 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                          aria-current={item.status === "current" ? "step" : undefined}
+                        >
+                          <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-current text-[10px]">{index + 1}</span>
+                          <span>{item.label}</span>
+                        </a>
+                      </li>
+                    ))}
+                  </ol>
                 </section>
               ) : null}
 
