@@ -143,7 +143,7 @@ export const ReportShell = ({
   );
   const sectionsNav =
     sectionLinks.length > 0 ? (
-      <nav aria-label="Report sections" className="weather-panel px-4 py-4">
+      <nav id="report-sections-nav" aria-label="Report sections" className="weather-panel px-4 py-4">
         <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Sections</p>
         <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
           {sectionLinks.map((item) => (
@@ -226,12 +226,31 @@ export const ReportShell = ({
   }, []);
   return (
     <>
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-30 focus:rounded-full focus:bg-slate-950 focus:px-4 focus:py-2 focus:text-xs focus:font-semibold focus:tracking-[0.2em] focus:text-slate-100 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-sky-300"
+      <nav
+        aria-label="Skip links"
+        className="sr-only focus-within:not-sr-only focus-within:absolute focus-within:left-4 focus-within:top-4 focus-within:z-30 focus-within:flex focus-within:flex-col focus-within:gap-2 focus-within:rounded-2xl focus-within:border focus-within:border-slate-700/70 focus-within:bg-slate-950/95 focus-within:p-2 focus-within:shadow-xl focus-within:shadow-black/40"
       >
-        Skip to main content
-      </a>
+        <a
+          href="#main-content"
+          className="inline-flex min-h-[44px] items-center rounded-xl border border-slate-700/70 bg-slate-900/80 px-3 py-2 text-xs font-semibold tracking-[0.14em] text-slate-100 transition-colors hover:border-sky-300/70 hover:text-white focus-visible:border-sky-300/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+        >
+          Skip to main content
+        </a>
+        <a
+          href="#report-primary-actions"
+          className="inline-flex min-h-[44px] items-center rounded-xl border border-slate-700/70 bg-slate-900/80 px-3 py-2 text-xs font-semibold tracking-[0.14em] text-slate-100 transition-colors hover:border-sky-300/70 hover:text-white focus-visible:border-sky-300/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+        >
+          Skip to action controls
+        </a>
+        {hasSidebar ? (
+          <a
+            href="#report-sections-nav"
+            className="inline-flex min-h-[44px] items-center rounded-xl border border-slate-700/70 bg-slate-900/80 px-3 py-2 text-xs font-semibold tracking-[0.14em] text-slate-100 transition-colors hover:border-sky-300/70 hover:text-white focus-visible:border-sky-300/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+          >
+            Skip to section navigation
+          </a>
+        ) : null}
+      </nav>
       <main
         id="main-content"
         tabIndex={-1}
@@ -361,7 +380,10 @@ export const ReportShell = ({
                     </>
                   )}
                 </div>
-                <div className="flex w-full min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+                <div
+                  id="report-primary-actions"
+                  className="flex w-full min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3"
+                >
                   <a
                     href={primaryCta.href}
                     className="weather-button-primary inline-flex min-h-[44px] w-full max-w-full items-center justify-center px-4 py-2 text-center text-[11px] font-semibold leading-tight tracking-[0.12em] shadow-lg shadow-sky-500/30 ring-1 ring-sky-200/30 transition-colors hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:text-xs sm:tracking-[0.2em]"
