@@ -46,3 +46,23 @@
 - CLS (Cumulative Layout Shift) MUST be 0. Content does not jump. Ever.
 - LCP (Largest Contentful Paint) < 2.5s.
 - Console is clean. No warnings. No "Key prop missing." No "Unrecognized attribute."
+
+## VIII. Quantitative visual communication (Tufte-aligned)
+Apply these principles to every quantitative visualization whenever possible.
+
+- MUST: Maximize data-ink ratio. Prefer direct marks and labels over decorative chrome, gradients, shadows, or heavy containers.
+- MUST: Use high information density with legibility. Show meaningful context (baselines, historical ranges, comparators) without forcing drill-down for basic interpretation.
+- MUST: Preserve graphical integrity. Visual magnitude must match numerical magnitude (no truncated axes without explicit annotation; no area/3D distortion).
+- MUST: Prefer small multiples over overloaded combo charts when comparing related series across time or categories.
+- MUST: Integrate words, numbers, and marks. Keep annotations near data points so users do not have to cross-reference distant legends.
+- MUST: Surface uncertainty and data quality. Confidence bands, source recency, and missing-data states should be explicit.
+- MUST: State quantitative framing in-view: unit, time window, aggregation method (e.g., 7-day avg), and denominator if rates/ratios are shown.
+- SHOULD: Replace detached legends with direct labels at line ends or near bars/points when space allows.
+- NEVER: Add chartjunk (ornamental icons, redundant pictograms, gratuitous motion) that competes with quantitative signal.
+- NEVER: Hide units, timescales, denominators, or smoothing/normalization transforms.
+
+### Review checklist for chart PRs
+- Axes and scales are truthful; any truncation/break is clearly annotated.
+- Labels are close to data; users can interpret key takeaways without legend-hopping.
+- Uncertainty, missing data, and freshness are visible.
+- Visual hierarchy favors signal over decoration.
