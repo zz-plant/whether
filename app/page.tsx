@@ -55,7 +55,7 @@ const ReportGroup = ({
 const homeSectionSequence = [
   { href: "#operator-fit", label: "Who this is for" },
   { href: "#weekly-action-summary", label: "This week's actions" },
-  { href: "#weekly-handoff", label: "Next recommended action" },
+  { href: "#weekly-action-summary", label: "Next recommended action" },
   { href: "#executive-snapshot", label: "Leadership summary" },
   { href: "#regime-alerts", label: "New alerts" },
   { href: "#weekly-digest", label: "Weekly digest" },
@@ -261,11 +261,11 @@ export default async function HomePage({
       : "Safe to use for near-term planning; proceed with normal approval flow.";
   const trustStatusTone = historicalSelection ? "historical" : isFallback ? "warning" : "stable";
   const stageItems = [
-    { id: "assess", label: "Assess regime", href: "/signals#regime-timeline", status: "completed" as const },
+    { id: "assess", label: "Assess regime", href: buildTimeMachineHref("/signals#regime-timeline", historicalSelection), status: "completed" as const },
     { id: "decide", label: "Decide posture", href: "#weekly-action-summary", status: "current" as const },
-    { id: "guardrails", label: "Set guardrails", href: "/operations/decisions", status: "upcoming" as const },
-    { id: "owners", label: "Assign owners", href: "/operations/plan", status: "upcoming" as const },
-    { id: "export", label: "Export brief", href: "/operations/briefings", status: "upcoming" as const },
+    { id: "guardrails", label: "Set guardrails", href: buildTimeMachineHref("/operations/decisions", historicalSelection), status: "upcoming" as const },
+    { id: "owners", label: "Assign owners", href: buildTimeMachineHref("/operations/plan", historicalSelection), status: "upcoming" as const },
+    { id: "export", label: "Export brief", href: buildTimeMachineHref("/operations/briefings", historicalSelection), status: "upcoming" as const },
   ];
 
   return (
