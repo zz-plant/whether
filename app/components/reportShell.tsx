@@ -302,7 +302,7 @@ export const ReportShell = ({
                 {exportCta ? (
                   <a
                     href={exportCta.href}
-                    className="inline-flex min-h-[40px] items-center justify-center rounded-full border border-slate-700/70 px-3 py-2 text-[11px] font-semibold tracking-[0.14em] text-slate-200 transition-colors hover:border-sky-300/80 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                    className="inline-flex min-h-[40px] items-center justify-center rounded-full border border-slate-700/70 px-3 py-2 text-xs font-semibold tracking-[0.14em] text-slate-200 transition-colors hover:border-sky-300/80 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
                   >
                     {exportCta.label}
                   </a>
@@ -344,7 +344,7 @@ export const ReportShell = ({
                         {summaryLink}
                       </p>
                       <details className="group sm:hidden">
-                        <summary className={`weather-chip inline-flex min-h-[44px] cursor-pointer list-none items-center gap-2 px-3 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-200 marker:content-none ${trustStatusTone === "warning" ? "border-amber-400/70 text-amber-100" : ""}`}>
+                        <summary className={`weather-chip inline-flex min-h-[44px] cursor-pointer list-none items-center gap-2 px-3 py-2 text-xs font-semibold tracking-[0.16em] text-slate-200 marker:content-none ${trustStatusTone === "warning" ? "border-amber-400/70 text-amber-100" : ""}`}>
                           <span>Data status · {statusLabel}</span>
                           <span aria-hidden="true" className="transition-transform duration-200 group-open:rotate-180">▾</span>
                           <span className="sr-only">Tap to expand data status</span>
@@ -366,7 +366,7 @@ export const ReportShell = ({
                         {summaryLink}
                       </p>
                       <details className="group sm:hidden">
-                        <summary className={`weather-chip inline-flex min-h-[44px] cursor-pointer list-none items-center gap-2 px-3 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-200 marker:content-none ${trustStatusTone === "warning" ? "border-amber-400/70 text-amber-100" : ""}`}>
+                        <summary className={`weather-chip inline-flex min-h-[44px] cursor-pointer list-none items-center gap-2 px-3 py-2 text-xs font-semibold tracking-[0.16em] text-slate-200 marker:content-none ${trustStatusTone === "warning" ? "border-amber-400/70 text-amber-100" : ""}`}>
                           <span>Data status · {statusLabel}</span>
                           <span aria-hidden="true" className="transition-transform duration-200 group-open:rotate-180">▾</span>
                           <span className="sr-only">Tap to expand data status</span>
@@ -386,14 +386,14 @@ export const ReportShell = ({
                 >
                   <a
                     href={primaryCta.href}
-                    className="weather-button-primary inline-flex min-h-[44px] w-full max-w-full items-center justify-center px-4 py-2 text-center text-[11px] font-semibold leading-tight tracking-[0.12em] shadow-lg shadow-sky-500/30 ring-1 ring-sky-200/30 transition-colors hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:text-xs sm:tracking-[0.2em]"
+                    className="weather-button-primary inline-flex min-h-[44px] w-full max-w-full items-center justify-center px-4 py-2 text-center text-xs font-semibold leading-tight tracking-[0.12em] shadow-lg shadow-sky-500/30 ring-1 ring-sky-200/30 transition-colors hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:text-xs sm:tracking-[0.2em]"
                   >
                     <span className="max-w-full break-words text-center">{primaryCta.label}</span>
                   </a>
                   {secondaryCta ? (
                     <a
                       href={secondaryCta.href}
-                      className="inline-flex min-h-[44px] w-full max-w-full items-center justify-center text-center text-[11px] font-semibold leading-tight tracking-[0.12em] text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:justify-start sm:text-xs"
+                      className="inline-flex min-h-[44px] w-full max-w-full items-center justify-center text-center text-xs font-semibold leading-tight tracking-[0.12em] text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:justify-start sm:text-xs"
                     >
                       <span className="max-w-full break-words text-center">{secondaryCta.label}</span>
                     </a>
