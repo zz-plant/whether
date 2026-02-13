@@ -6,8 +6,10 @@ This directory is organized by audience so contributors can find the right sourc
 - **Human contributors:** `../CONTRIBUTING.md`
 - **Agent contributors:** `../AGENTS.md` then `agents/README.md`
 - **System design and architecture:** `architecture.md`
+- **Engineering workflow deep-dive:** `development-playbook.md`
 
 ## Core technical docs
+- `development-playbook.md` — practical engineering workflow, validation depth by risk, and troubleshooting tips.
 - `mobile-journey-audit.md` — mobile UX walkthrough of three representative user journeys with prioritized recommendations.
 - `ux-audit-kondo-2026-02-11.md` — remove/move/modify UX audit with prioritized decluttering recommendations.
 - `ux-audit-kondo-followup-2026-02-11.md` — follow-up Kondo UX re-audit after shell/CTA changes, with next-step priorities.

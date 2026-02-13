@@ -35,6 +35,7 @@ Whether translates public macro signals into operational guidance for product an
 
 ## Contributor entry points
 - Human contributors: `CONTRIBUTING.md`
+- Engineering workflow deep-dive: `docs/development-playbook.md`
 - Agent contributors: `AGENTS.md` and `docs/agents/`
 - Documentation index: `docs/README.md`
 
