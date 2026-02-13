@@ -53,21 +53,21 @@ export default async function OperationsPage({
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const quickSteps = [
     {
-      title: "Confirm the posture",
-      detail: "Use the current regime to decide what to fund now vs defer.",
+      title: "Now: confirm the posture",
+      detail: "Use the current regime to decide what to fund immediately versus defer.",
       href: "#ops-monthly-action-summary",
       cta: "Review monthly actions",
       emphasis: "primary",
     },
     {
-      title: "Pick a workstream",
+      title: "Next: pick a workstream",
       detail: "Route to plan, decisions, or briefings based on the question in front of you.",
       href: "#ops-workstreams",
       cta: "Open workstreams",
       emphasis: "secondary",
     },
     {
-      title: "Export the brief",
+      title: "Later: export the brief",
       detail: "Generate copy-ready output for exec syncs, board prep, and team alignment.",
       href: "/operations/briefings",
       cta: "Open briefing kits",
@@ -181,6 +181,39 @@ export default async function OperationsPage({
     >
       <OperationsWorkstreamNav currentPath="/operations" />
 
+      <SectionedReportPanel
+        id="ops-workstreams"
+        title="Operational workstreams"
+        description="Pick a focused view so you do not have to scroll through every panel."
+      >
+        <div className="grid gap-4 lg:grid-cols-3">
+          {workstreamCards.map((link) => (
+            <article key={link.href} className="weather-surface flex h-full flex-col gap-4 p-5">
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.26em] text-slate-400">
+                  {link.label}
+                </p>
+                <p className="text-sm text-slate-300">{link.description}</p>
+              </div>
+              <ul className="space-y-2 text-sm text-slate-200">
+                {workstreamHighlights[link.href]?.map((item) => (
+                  <li key={item} className="flex items-start gap-2">
+                    <span className="mt-1 h-1.5 w-1.5 rounded-full bg-sky-400" aria-hidden="true" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href={appendSearchParamsToRoute(link.href, resolvedSearchParams) as Route}
+                className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.2em] transition-colors hover:border-sky-300/80 hover:text-white"
+              >
+                Open {link.label}
+              </Link>
+            </article>
+          ))}
+        </div>
+      </SectionedReportPanel>
+
       <CadenceChecklist
         cadence="monthly"
         storageKey="whether-monthly-review-checklist"
@@ -217,38 +250,6 @@ export default async function OperationsPage({
         />
       </SectionedReportPanel>
 
-      <SectionedReportPanel
-        id="ops-workstreams"
-        title="Operational workstreams"
-        description="Pick a focused view so you do not have to scroll through every panel."
-      >
-        <div className="grid gap-4 lg:grid-cols-3">
-          {workstreamCards.map((link) => (
-            <article key={link.href} className="weather-surface flex h-full flex-col gap-4 p-5">
-              <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.26em] text-slate-400">
-                  {link.label}
-                </p>
-                <p className="text-sm text-slate-300">{link.description}</p>
-              </div>
-              <ul className="space-y-2 text-sm text-slate-200">
-                {workstreamHighlights[link.href]?.map((item) => (
-                  <li key={item} className="flex items-start gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 rounded-full bg-sky-400" aria-hidden="true" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href={appendSearchParamsToRoute(link.href, resolvedSearchParams) as Route}
-                className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.2em] transition-colors hover:border-sky-300/80 hover:text-white"
-              >
-                Open {link.label}
-              </Link>
-            </article>
-          ))}
-        </div>
-      </SectionedReportPanel>
 
       <RelatedReportLinks
         title="Keep navigating the report"
