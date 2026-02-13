@@ -6,6 +6,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { RegimeAssessment } from "../../lib/regimeEngine";
+import type { LastYearComparison } from "../../lib/report/reportData";
 import { buildRegimeChangeReasons } from "../../lib/regimeEngine";
 import { formatDateUTC } from "../../lib/formatters";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
@@ -44,10 +45,12 @@ const hasAssessmentChanged = (
 
 export const ChangeSinceLastReadPanel = ({
   assessment,
+  lastYearComparison,
   recordDate,
   provenance,
 }: {
   assessment: RegimeAssessment;
+  lastYearComparison: LastYearComparison | null;
   recordDate: string;
   provenance: DataProvenance;
 }) => {
@@ -279,6 +282,27 @@ export const ChangeSinceLastReadPanel = ({
             >
               Open Time Machine
             </a>
+
+            <div className="mt-4 rounded-xl border border-slate-800/80 bg-slate-950/60 p-3">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                Last-year snapshot (nearest cached)
+              </p>
+              {lastYearComparison ? (
+                <>
+                  <p className="mt-2 text-sm text-slate-200">
+                    {formatDate(lastYearComparison.prior.recordDate)}: {lastYearComparison.prior.regime}
+                    {" "}→ now: {lastYearComparison.current.regime}
+                  </p>
+                  <p className="mt-2 text-xs text-slate-400">
+                    Tightness {formatDelta(lastYearComparison.prior.tightness, lastYearComparison.current.tightness)} · Risk appetite {formatDelta(lastYearComparison.prior.riskAppetite, lastYearComparison.current.riskAppetite)}
+                  </p>
+                </>
+              ) : (
+                <p className="mt-2 text-xs text-slate-500">
+                  Historical match unavailable for this week in the Time Machine cache.
+                </p>
+              )}
+            </div>
           </div>
         </div>
       </div>

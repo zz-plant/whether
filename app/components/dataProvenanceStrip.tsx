@@ -27,6 +27,12 @@ const statusDescriptions = {
   "Simulated (low)": "Modeled inputs or backfilled estimates where live data is absent.",
 } as const;
 
+const statusCycles = {
+  "Live (high confidence)": { phase: "Full moon", pct: 100 },
+  "Cached (medium)": { phase: "Half moon", pct: 64 },
+  "Simulated (low)": { phase: "New moon", pct: 28 },
+} as const;
+
 export const DataProvenanceStrip = ({
   provenance,
   label = "Data provenance",
@@ -38,6 +44,9 @@ export const DataProvenanceStrip = ({
   const statusDescription =
     statusDescriptions[provenance.statusLabel as keyof typeof statusDescriptions] ??
     "Signal status defined by source availability.";
+  const cycle =
+    statusCycles[provenance.statusLabel as keyof typeof statusCycles] ??
+    ({ phase: "Unknown phase", pct: 50 } as const);
 
   return (
     <div className="weather-pill flex flex-wrap items-center gap-2 px-4 py-2 text-[0.65rem] font-semibold tracking-[0.16em] text-slate-300">
@@ -70,6 +79,23 @@ export const DataProvenanceStrip = ({
       <span>
         <span className="text-slate-500">Data age:</span>{" "}
         <span className="mono text-slate-200">{provenance.ageLabel}</span>
+      </span>
+      <span className="h-1 w-1 rounded-full bg-slate-600" aria-hidden="true" />
+      <span className="inline-flex items-center gap-2 rounded-full border border-slate-700/70 bg-slate-900/70 px-2 py-1 text-xs tracking-[0.12em] text-slate-200">
+        <span
+          className="relative h-4 w-4 overflow-hidden rounded-full border border-slate-500/70 bg-slate-900"
+          role="img"
+          aria-label={`Confidence cycle visual: ${cycle.phase}, ${cycle.pct} percent`}
+        >
+          <span
+            className="absolute inset-y-0 right-0 bg-slate-100"
+            style={{ width: `${cycle.pct}%` }}
+            aria-hidden="true"
+          />
+        </span>
+        <span>
+          Confidence cycle: {cycle.phase} ({cycle.pct}%)
+        </span>
       </span>
       <Tooltip.Root>
         <Tooltip.Trigger

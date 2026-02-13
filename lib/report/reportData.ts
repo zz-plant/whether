@@ -13,6 +13,7 @@ import {
   getTimeMachineMonthsByYear,
   getPreviousTimeMachineSnapshot,
   getTimeMachineRegimeSeries,
+  findTimeMachineSnapshot,
 } from "../timeMachine/timeMachineCache";
 import { getSummaryArchive } from "../summary/summaryArchive";
 import {
@@ -29,6 +30,54 @@ export type ReportSearchParams = {
   year?: string;
   [key: string]: string | undefined;
 };
+
+export type LastYearComparison = {
+  current: {
+    recordDate: string;
+    regime: string;
+    tightness: number;
+    riskAppetite: number;
+    curveSlope: number | null;
+    baseRate: number;
+  };
+  prior: {
+    recordDate: string;
+    regime: string;
+    tightness: number;
+    riskAppetite: number;
+    curveSlope: number | null;
+    baseRate: number;
+  };
+};
+
+export const buildLastYearComparison = ({
+  current,
+  currentRecordDate,
+  prior,
+  priorRecordDate,
+}: {
+  current: ReturnType<typeof evaluateRegime>;
+  currentRecordDate: string;
+  prior: ReturnType<typeof evaluateRegime>;
+  priorRecordDate: string;
+}): LastYearComparison => ({
+  current: {
+    recordDate: currentRecordDate,
+    regime: current.regime,
+    tightness: current.scores.tightness,
+    riskAppetite: current.scores.riskAppetite,
+    curveSlope: current.scores.curveSlope,
+    baseRate: current.scores.baseRate,
+  },
+  prior: {
+    recordDate: priorRecordDate,
+    regime: prior.regime,
+    tightness: prior.scores.tightness,
+    riskAppetite: prior.scores.riskAppetite,
+    curveSlope: prior.scores.curveSlope,
+    baseRate: prior.scores.baseRate,
+  },
+});
 
 export const loadReportData = async (searchParams?: ReportSearchParams) => {
   const liveFetcher: typeof fetch = (input, init) =>
@@ -71,9 +120,14 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
   const previousSnapshot = historicalSelection
     ? null
     : getPreviousTimeMachineSnapshot(treasury.record_date);
+  const recordDate = new Date(treasury.record_date);
+  const comparisonDate = new Date(treasury.record_date);
+  comparisonDate.setUTCFullYear(recordDate.getUTCFullYear() - 1);
+  const lastYearSnapshot = findTimeMachineSnapshot(comparisonDate.toISOString());
   const previousAssessment = previousSnapshot
     ? evaluateRegime(previousSnapshot, thresholds)
     : null;
+  const lastYearAssessment = lastYearSnapshot ? evaluateRegime(lastYearSnapshot, thresholds) : null;
   const confidenceLabel = historicalSelection
     ? "Simulated (low)"
     : treasury.isLive
@@ -140,6 +194,15 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
           previousSnapshot.record_date
         )
       : null;
+  const lastYearComparison =
+    lastYearSnapshot && lastYearAssessment
+      ? buildLastYearComparison({
+          current: assessment,
+          currentRecordDate: treasury.record_date,
+          prior: lastYearAssessment,
+          priorRecordDate: lastYearSnapshot.record_date,
+        })
+      : null;
 
   return {
     assessment,
@@ -151,6 +214,7 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
     historicalSelection,
     internalProvenance,
     invalidHistoricalSelection,
+    lastYearComparison,
     liveAssessment,
     liveTreasury,
     macroProvenance,
