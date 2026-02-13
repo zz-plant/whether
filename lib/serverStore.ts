@@ -1,5 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
 import type { DecisionMemoryEntry } from "../app/operations/components/decisionMemoryUtils";
 import type { AlertChannel, AlertDeliveryEvent, RegimeAlertEvent } from "./signalOps";
 
@@ -11,9 +9,6 @@ type Store = {
   alertPreferencesByClient: Record<string, AlertDeliveryPreferences>;
   alertDeliveries: AlertDeliveryEvent[];
 };
-
-const STORE_DIR = path.join(process.cwd(), ".whether");
-const STORE_PATH = path.join(STORE_DIR, "server-store.json");
 
 const defaultPreferences: AlertDeliveryPreferences = {
   slack: true,
@@ -28,35 +23,12 @@ const createStore = (): Store => ({
   alertDeliveries: [],
 });
 
-const readStore = (): Store => {
-  try {
-    if (!fs.existsSync(STORE_PATH)) {
-      return createStore();
-    }
-    const raw = fs.readFileSync(STORE_PATH, "utf-8");
-    const parsed = JSON.parse(raw) as Partial<Store>;
-    return {
-      regimeAlerts: Array.isArray(parsed.regimeAlerts) ? parsed.regimeAlerts : [],
-      decisionMemoryByClient: parsed.decisionMemoryByClient ?? {},
-      alertPreferencesByClient: parsed.alertPreferencesByClient ?? {},
-      alertDeliveries: Array.isArray(parsed.alertDeliveries) ? parsed.alertDeliveries : [],
-    };
-  } catch {
-    return createStore();
-  }
-};
-
-const writeStore = (store: Store) => {
-  fs.mkdirSync(STORE_DIR, { recursive: true });
-  fs.writeFileSync(STORE_PATH, JSON.stringify(store, null, 2), "utf-8");
-};
-
 declare global {
   // eslint-disable-next-line no-var
   var __whetherServerStore: Store | undefined;
 }
 
-const initialStore = globalThis.__whetherServerStore ?? readStore();
+const initialStore = globalThis.__whetherServerStore ?? createStore();
 if (!globalThis.__whetherServerStore) {
   globalThis.__whetherServerStore = initialStore;
 }
@@ -67,7 +39,6 @@ export const serverStore = {
   },
   save(nextStore: Store) {
     globalThis.__whetherServerStore = nextStore;
-    writeStore(nextStore);
   },
   getPreferences(clientId: string): AlertDeliveryPreferences {
     const current = this.snapshot;

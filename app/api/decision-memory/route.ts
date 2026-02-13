@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { pruneDecisionMemoryEntries, serverStore } from "../../../lib/serverStore";
 import type { DecisionMemoryEntry } from "../../operations/components/decisionMemoryUtils";
 
-export const runtime = "nodejs";
+export const runtime = "edge";
 
 const RETENTION_DAYS = 180;
 
