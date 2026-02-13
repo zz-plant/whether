@@ -101,15 +101,16 @@ const briefingFlowSteps = [
   },
 ] as const;
 
-export const generateMetadata = ({
+export const generateMetadata = async ({
   searchParams,
 }: {
-  searchParams?: { month?: string; year?: string };
-}): Metadata => {
+  searchParams?: Promise<{ month?: string; year?: string }>;
+}): Promise<Metadata> => {
   const siteName = "Whether — Market Climate Station";
   const siteDescription = defaultSiteDescription;
-  const selection = resolveTimeMachineSelection(searchParams);
-  const requestedSelection = parseTimeMachineRequest(searchParams);
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const selection = resolveTimeMachineSelection(resolvedSearchParams);
+  const requestedSelection = parseTimeMachineRequest(resolvedSearchParams);
   const baseUrl = new URL("/api/og", siteUrl);
 
   if (selection) {
@@ -159,8 +160,9 @@ export const generateMetadata = ({
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams?: { month?: string; year?: string; [key: string]: string | undefined };
+  searchParams?: Promise<{ month?: string; year?: string; [key: string]: string | undefined }>;
 }) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const sectionLinks = homeSectionSequence.map((section, index) => ({
     href: section.href,
     label: `${index}. ${section.label}`,
@@ -222,7 +224,7 @@ export default async function HomePage({
     statusLabel,
     treasury,
     treasuryProvenance,
-  } = await loadReportData(searchParams);
+  } = await loadReportData(resolvedSearchParams);
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
   const operationsPlanHref = buildTimeMachineHref("/operations/plan", historicalSelection);
   const trustStatusLabel = historicalSelection

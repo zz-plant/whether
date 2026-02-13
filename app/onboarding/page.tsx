@@ -25,8 +25,9 @@ export const metadata: Metadata = buildPageMetadata({
 export default async function OnboardingPage({
   searchParams,
 }: {
-  searchParams?: { month?: string; year?: string; [key: string]: string | undefined };
+  searchParams?: Promise<{ month?: string; year?: string; [key: string]: string | undefined }>;
 }) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const onboardingSteps = [
     {
       title: "Orient to the report",
@@ -88,7 +89,7 @@ export default async function OnboardingPage({
     recordDateLabel,
     statusLabel,
     treasury,
-  } = await loadReportData(searchParams);
+  } = await loadReportData(resolvedSearchParams);
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
   const trustStatusLabel = historicalSelection
     ? "Historical snapshot"

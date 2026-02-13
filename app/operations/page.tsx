@@ -49,8 +49,9 @@ const workstreamHighlights: Record<string, string[]> = {
 export default async function OperationsPage({
   searchParams,
 }: {
-  searchParams?: { month?: string; year?: string; [key: string]: string | undefined };
+  searchParams?: Promise<{ month?: string; year?: string; [key: string]: string | undefined }>;
 }) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const quickSteps = [
     {
       title: "Confirm the posture",
@@ -110,7 +111,7 @@ export default async function OperationsPage({
     statusLabel,
     treasury,
     treasuryProvenance,
-  } = await loadReportData(searchParams);
+  } = await loadReportData(resolvedSearchParams);
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
   const trustStatusLabel = historicalSelection
     ? "Historical snapshot"
@@ -176,12 +177,12 @@ export default async function OperationsPage({
           {
             id: "decision-checks",
             label: "Validate decision guardrails",
-            href: appendSearchParamsToRoute("/operations/decisions", searchParams),
+            href: appendSearchParamsToRoute("/operations/decisions", resolvedSearchParams),
           },
           {
             id: "briefing-export",
             label: "Export leadership brief",
-            href: `${appendSearchParamsToRoute("/operations/briefings", searchParams)}#ops-export-briefs`,
+            href: `${appendSearchParamsToRoute("/operations/briefings", resolvedSearchParams)}#ops-export-briefs`,
           },
         ]}
       />
@@ -265,7 +266,7 @@ export default async function OperationsPage({
                 ))}
               </ul>
               <Link
-                href={appendSearchParamsToRoute(link.href, searchParams) as Route}
+                href={appendSearchParamsToRoute(link.href, resolvedSearchParams) as Route}
                 className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.2em] transition-colors hover:border-sky-300/80 hover:text-white"
               >
                 Open {link.label}
