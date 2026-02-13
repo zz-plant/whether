@@ -226,12 +226,6 @@ export const ReportShell = ({
   }, []);
   return (
     <>
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-30 focus:rounded-full focus:bg-slate-950 focus:px-4 focus:py-2 focus:text-xs focus:font-semibold focus:tracking-[0.2em] focus:text-slate-100 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-sky-300"
-      >
-        Skip to main content
-      </a>
       <main
         id="main-content"
         tabIndex={-1}

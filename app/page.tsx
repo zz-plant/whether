@@ -165,7 +165,7 @@ export default async function HomePage({
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const sectionLinks = homeSectionSequence.map((section, index) => ({
     href: section.href,
-    label: `${index}. ${section.label}`,
+    label: `${index + 1}. ${section.label}`,
   }));
   const structuredData = {
     "@context": "https://schema.org",
@@ -263,7 +263,7 @@ export default async function HomePage({
         label: "Start onboarding",
       }}
       secondaryCta={{ href: "#weekly-action-summary", label: "Start weekly review" }}
-      exportCta={{ href: "#executive-snapshot", label: "See leadership summary" }}
+      exportCta={null}
       sidebarVariant="hidden"
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
