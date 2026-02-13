@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { serverStore, type AlertDeliveryPreferences } from "../../../lib/serverStore";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
