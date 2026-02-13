@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { serverStore } from "../../../lib/serverStore";
 import { buildDeliverySummary, type AlertChannel, type AlertDeliveryEvent } from "../../../lib/signalOps";
 
-export const runtime = "nodejs";
+export const runtime = "edge";
 
 export async function GET() {
   return NextResponse.json({ deliveries: serverStore.snapshot.alertDeliveries });
