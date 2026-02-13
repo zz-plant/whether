@@ -3,6 +3,7 @@ import type { Route } from "next";
 import Link from "next/link";
 import { SectionedReportPanel } from "./components/sectionedReportPanel";
 import { loadReportData } from "../../lib/report/reportData";
+import { buildTimeMachineHref } from "../../lib/timeMachine/timeMachineSelection";
 import { siteUrl } from "../../lib/siteUrl";
 import { buildBreadcrumbList, buildPageMetadata, organizationName, websiteName } from "../../lib/seo";
 import { ReportShell } from "../components/reportShell";
@@ -132,11 +133,11 @@ export default async function OperationsPage({
   const workstreamCards = operationsWorkstreamLinks.filter((link) => link.href !== "/operations");
 
   const stageItems = [
-    { id: "assess", label: "Assess regime", href: "/signals#regime-timeline", status: "completed" as const },
-    { id: "decide", label: "Decide posture", href: "/", status: "completed" as const },
-    { id: "guardrails", label: "Set guardrails", href: "/operations/decisions", status: "current" as const },
-    { id: "owners", label: "Assign owners", href: "/operations/plan", status: "upcoming" as const },
-    { id: "export", label: "Export brief", href: "/operations/briefings", status: "upcoming" as const },
+    { id: "assess", label: "Assess regime", href: buildTimeMachineHref("/signals#regime-timeline", historicalSelection), status: "completed" as const },
+    { id: "decide", label: "Decide posture", href: buildTimeMachineHref("/", historicalSelection), status: "completed" as const },
+    { id: "guardrails", label: "Set guardrails", href: buildTimeMachineHref("/operations/decisions", historicalSelection), status: "current" as const },
+    { id: "owners", label: "Assign owners", href: buildTimeMachineHref("/operations/plan", historicalSelection), status: "upcoming" as const },
+    { id: "export", label: "Export brief", href: buildTimeMachineHref("/operations/briefings", historicalSelection), status: "upcoming" as const },
   ];
 
   return (
