@@ -228,24 +228,24 @@ export const ReportShell = ({
     <>
       <nav
         aria-label="Skip links"
-        className="sr-only focus-within:not-sr-only focus-within:absolute focus-within:left-4 focus-within:top-4 focus-within:z-30 focus-within:flex focus-within:flex-col focus-within:gap-2"
+        className="sr-only focus-within:not-sr-only focus-within:absolute focus-within:left-4 focus-within:top-4 focus-within:z-30 focus-within:flex focus-within:flex-col focus-within:gap-2 focus-within:rounded-2xl focus-within:border focus-within:border-slate-700/70 focus-within:bg-slate-950/95 focus-within:p-2 focus-within:shadow-xl focus-within:shadow-black/40"
       >
         <a
           href="#main-content"
-          className="rounded-full bg-slate-950 px-4 py-2 text-xs font-semibold tracking-[0.18em] text-slate-100 outline outline-2 outline-offset-2 outline-sky-300"
+          className="inline-flex min-h-[44px] items-center rounded-xl border border-slate-700/70 bg-slate-900/80 px-3 py-2 text-xs font-semibold tracking-[0.14em] text-slate-100 transition-colors hover:border-sky-300/70 hover:text-white focus-visible:border-sky-300/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
         >
           Skip to main content
         </a>
         <a
           href="#report-primary-actions"
-          className="rounded-full bg-slate-950 px-4 py-2 text-xs font-semibold tracking-[0.18em] text-slate-100 outline outline-2 outline-offset-2 outline-sky-300"
+          className="inline-flex min-h-[44px] items-center rounded-xl border border-slate-700/70 bg-slate-900/80 px-3 py-2 text-xs font-semibold tracking-[0.14em] text-slate-100 transition-colors hover:border-sky-300/70 hover:text-white focus-visible:border-sky-300/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
         >
           Skip to action controls
         </a>
         {hasSidebar ? (
           <a
             href="#report-sections-nav"
-            className="rounded-full bg-slate-950 px-4 py-2 text-xs font-semibold tracking-[0.18em] text-slate-100 outline outline-2 outline-offset-2 outline-sky-300"
+            className="inline-flex min-h-[44px] items-center rounded-xl border border-slate-700/70 bg-slate-900/80 px-3 py-2 text-xs font-semibold tracking-[0.14em] text-slate-100 transition-colors hover:border-sky-300/70 hover:text-white focus-visible:border-sky-300/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
           >
             Skip to section navigation
           </a>
