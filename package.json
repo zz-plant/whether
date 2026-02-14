@@ -14,7 +14,8 @@
     "check": "bun run lint && bun run typecheck && bun run test",
     "typecheck": "tsc --noEmit",
     "test": "node scripts/run-tests.mjs",
-    "test:watch": "node scripts/run-tests.mjs --watch"
+    "test:watch": "node scripts/run-tests.mjs --watch",
+    "mcp:whether": "tsx scripts/mcp/whether-mcp-server.ts"
   },
   "engines": {
     "node": ">=20.16.0"
@@ -29,6 +30,7 @@
   },
   "devDependencies": {
     "@cloudflare/next-on-pages": "1.13.16",
+    "@modelcontextprotocol/sdk": "^1.26.0",
     "@types/node": "24.4.0",
     "@types/react": "19.2.14",
     "autoprefixer": "10.4.24",
