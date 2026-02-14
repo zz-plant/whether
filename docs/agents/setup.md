@@ -14,6 +14,7 @@
 - Run type checks: `bun run typecheck`
 - Run tests: `bun test`
 - Run tests in watch mode: `bun run test:watch`
+- Run Whether MCP server (stdio): `bun run mcp:whether`
 
 ## MCP starter profile (contributor baseline)
 
