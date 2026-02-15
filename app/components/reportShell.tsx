@@ -537,33 +537,35 @@ export const ReportShell = ({
                   ) : null}
                 </div>
 
-                <details className="group rounded-2xl border border-slate-800/80 bg-slate-950/40 px-4 py-3">
-                  <summary className="inline-flex min-h-[44px] w-full cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.16em] text-slate-300 marker:content-none">
-                    <span>Data quality and confidence</span>
-                    <span
-                      aria-hidden="true"
-                      className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-300 transition-transform duration-200 group-open:rotate-180"
-                    >
-                      <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
-                        <path
-                          d="M7 10l5 5 5-5"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1.6"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </span>
-                    <span className="sr-only">Toggle data quality and confidence details.</span>
-                  </summary>
-                  <div className="grid gap-3 pt-2 text-xs text-slate-300 sm:grid-cols-2">
-                    <p>Signals stamped: {recordDateLabel}</p>
-                    <p>Updated: {fetchedAtLabel}</p>
-                    <p className={trustLabelTone}>Confidence: {trustStatusLabel}</p>
-                    <p>{trustStatusDetail}</p>
-                  </div>
-                </details>
+                {!hasSidebar ? (
+                  <details className="group rounded-2xl border border-slate-800/80 bg-slate-950/40 px-4 py-3">
+                    <summary className="inline-flex min-h-[44px] w-full cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.16em] text-slate-300 marker:content-none">
+                      <span>Data quality and confidence</span>
+                      <span
+                        aria-hidden="true"
+                        className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-300 transition-transform duration-200 group-open:rotate-180"
+                      >
+                        <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
+                          <path
+                            d="M7 10l5 5 5-5"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="1.6"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </span>
+                      <span className="sr-only">Toggle data quality and confidence details.</span>
+                    </summary>
+                    <div className="grid gap-3 pt-2 text-xs text-slate-300 sm:grid-cols-2">
+                      <p>Signals stamped: {recordDateLabel}</p>
+                      <p>Updated: {fetchedAtLabel}</p>
+                      <p className={trustLabelTone}>Confidence: {trustStatusLabel}</p>
+                      <p>{trustStatusDetail}</p>
+                    </div>
+                  </details>
+                ) : null}
               </section>
 
               {stageRail ? (

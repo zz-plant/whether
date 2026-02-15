@@ -290,7 +290,7 @@ export default async function HomePage({
         href: "#weekly-action-summary",
         label: "Review weekly actions",
       }}
-      secondaryCta={{ href: "#executive-snapshot", label: "Align leadership" }}
+      secondaryCta={{ href: "#executive-snapshot", label: "Review leadership summary" }}
       stageRail={{ title: "Global decision flow", items: stageItems }}
       decisionBanner={{
         label: "Decide now",
@@ -320,23 +320,39 @@ export default async function HomePage({
       }
     >
       <section
-        aria-label="Command center"
+        aria-label="Read this first"
         className="weather-panel space-y-6 px-6 py-6"
       >
         <div className="space-y-3">
-          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Command center</p>
+          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Read this first</p>
           <h1 className="max-w-3xl text-2xl font-semibold text-slate-100 sm:text-3xl">
-            Weekly forecast view with current macro context.
+            Decision card: what changed, what to do now, and how confident to be.
           </h1>
         </div>
-        <div className="flex flex-wrap gap-3">
-          <a
-            href="#weekly-action-summary"
-            className="inline-flex min-h-[44px] items-center rounded-full border border-sky-300/70 bg-sky-300/10 px-4 text-xs font-semibold tracking-[0.12em] text-sky-100 transition-colors hover:bg-sky-300/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200 touch-manipulation"
-          >
-            Review weekly briefing
-          </a>
-        </div>
+        <article className="weather-surface space-y-4 p-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">What changed</p>
+          <p className="text-sm text-slate-200">{assessment.description}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">What to do now</p>
+          <p className="text-sm text-slate-200">{trustStatusAction}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Confidence and caveat</p>
+          <p className="text-sm text-slate-200">
+            {trustStatusLabel} · {trustStatusDetail}
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <a
+              href="#weekly-action-summary"
+              className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-300/80 hover:text-white"
+            >
+              Execute weekly actions
+            </a>
+            <a
+              href="#signal-matrix"
+              className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+            >
+              Review evidence trail
+            </a>
+          </div>
+        </article>
         <div className="grid gap-3 md:grid-cols-3">
           {commandCenterHighlights.map((item) => (
             <article key={item.label} className="weather-surface space-y-2 p-4">

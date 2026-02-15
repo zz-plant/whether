@@ -17,6 +17,7 @@ import {
 } from "../../lib/navigation/operationsNavigation";
 import { appendSearchParamsToRoute } from "../../lib/navigation/routeSearchParams";
 import { OperationsWorkstreamNav } from "./components/operationsWorkstreamNav";
+import { ExecutionTable } from "../components/executionTable";
 
 export const runtime = "edge";
 
@@ -64,14 +65,14 @@ export default async function OperationsPage({
       title: "Next: pick a workstream",
       detail: "Route to plan, decisions, or briefings based on the question in front of you.",
       href: "#ops-workstreams",
-      cta: "Open workstreams",
+      cta: "Review workstreams",
       emphasis: "secondary",
     },
     {
       title: "Later: export the brief",
       detail: "Generate copy-ready output for exec syncs, board prep, and team alignment.",
       href: "/operations/briefings",
-      cta: "Open briefing kits",
+      cta: "Review briefing kits",
       emphasis: "secondary",
     },
   ];
@@ -131,6 +132,32 @@ export default async function OperationsPage({
   const trustStatusTone = historicalSelection ? "historical" : isFallback ? "warning" : "stable";
 
   const workstreamCards = operationsWorkstreamLinks.filter((link) => link.href !== "/operations");
+  const horizonPlan = [
+    {
+      horizon: "This week",
+      objective: "Commit immediate scope and freeze non-essential spend.",
+      ownerRole: "Product + Engineering",
+      dueWindow: "Friday EOD",
+      impact: "Protect reliability and preserve delivery confidence.",
+      href: "#ops-monthly-action-summary",
+    },
+    {
+      horizon: "This month",
+      objective: "Align workstream owners and publish operating guardrails.",
+      ownerRole: "Staff PM + Finance partner",
+      dueWindow: "Month-end review",
+      impact: "Reduce execution drift and improve cross-team sequencing.",
+      href: "#ops-workstreams",
+    },
+    {
+      horizon: "This quarter",
+      objective: "Rebalance roadmap bets against regime constraints.",
+      ownerRole: "Exec staff",
+      dueWindow: "Quarterly planning",
+      impact: "Improve capital efficiency under current climate posture.",
+      href: "/operations/plan",
+    },
+  ] as const;
 
   const stageItems = [
     { id: "assess", label: "Assess regime", href: buildTimeMachineHref("/signals#regime-timeline", historicalSelection), status: "completed" as const },
@@ -154,7 +181,7 @@ export default async function OperationsPage({
       pageTitle="Action playbook"
       currentPath="/operations"
       pageSummary="Turn macro signals into execution posture, decision guardrails, and leadership-ready briefs."
-      pageSummaryLink={{ href: "#ops-workstreams", label: "Explore details →" }}
+      pageSummaryLink={{ href: "#ops-workstreams", label: "Review execution details" }}
       pageLinks={reportPageLinks}
       sectionLinks={operationsSectionLinks.overview}
       heroVariant="compact"
@@ -183,6 +210,54 @@ export default async function OperationsPage({
       <OperationsWorkstreamNav currentPath="/operations" />
 
       <SectionedReportPanel
+        id="ops-horizon-plan"
+        title="Time horizon plan"
+        description="Decide execution moves by this week, this month, and this quarter."
+      >
+        <div className="grid gap-4 lg:grid-cols-3">
+          {horizonPlan.map((item) => (
+            <article key={item.horizon} className="weather-surface flex h-full flex-col gap-3 p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
+                {item.horizon}
+              </p>
+              <p className="text-sm font-semibold text-slate-100">{item.objective}</p>
+              <dl className="space-y-2 text-xs text-slate-300">
+                <div className="flex items-start justify-between gap-3">
+                  <dt className="text-slate-500">Owner</dt>
+                  <dd className="text-right text-slate-200">{item.ownerRole}</dd>
+                </div>
+                <div className="flex items-start justify-between gap-3">
+                  <dt className="text-slate-500">Due</dt>
+                  <dd className="text-right text-slate-200">{item.dueWindow}</dd>
+                </div>
+                <div className="flex items-start justify-between gap-3">
+                  <dt className="text-slate-500">Expected impact</dt>
+                  <dd className="text-right text-slate-200">{item.impact}</dd>
+                </div>
+              </dl>
+              <Link
+                href={appendSearchParamsToRoute(item.href, resolvedSearchParams) as Route}
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
+              >
+                Review {item.horizon.toLowerCase()} actions
+              </Link>
+            </article>
+          ))}
+        </div>
+        <ExecutionTable
+          title="Execution table"
+          rows={horizonPlan.map((item) => ({
+            horizon: item.horizon,
+            owner: item.ownerRole,
+            due: item.dueWindow,
+            impact: item.impact,
+            href: appendSearchParamsToRoute(item.href, resolvedSearchParams),
+            ctaLabel: `Review ${item.horizon.toLowerCase()} actions`,
+          }))}
+        />
+      </SectionedReportPanel>
+
+      <SectionedReportPanel
         id="ops-workstreams"
         title="Operational workstreams"
         description="Pick a focused view so you do not have to scroll through every panel."
@@ -204,11 +279,25 @@ export default async function OperationsPage({
                   </li>
                 ))}
               </ul>
+              <dl className="space-y-1 text-xs text-slate-300">
+                <div className="flex items-center justify-between gap-3">
+                  <dt className="text-slate-500">Owner</dt>
+                  <dd className="text-slate-200">Assign in weekly ops review</dd>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <dt className="text-slate-500">Due date</dt>
+                  <dd className="text-slate-200">This cycle</dd>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <dt className="text-slate-500">Impact</dt>
+                  <dd className="text-slate-200">High operational leverage</dd>
+                </div>
+              </dl>
               <Link
                 href={appendSearchParamsToRoute(link.href, resolvedSearchParams) as Route}
                 className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.2em] transition-colors hover:border-sky-300/80 hover:text-white"
               >
-                Open {link.label}
+                Review {link.label}
               </Link>
             </article>
           ))}

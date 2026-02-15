@@ -73,6 +73,7 @@ export const CadenceChecklist = ({
   const completedCount = items.filter((item) => state[item.id]).length;
   const isComplete = completedCount === items.length;
   const completionRatio = items.length === 0 ? 0 : completedCount / items.length;
+  const progressLabel = isComplete ? "Complete" : completedCount === 0 ? "Not started" : "In progress";
 
   return (
     <section
@@ -84,9 +85,14 @@ export const CadenceChecklist = ({
           <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">{title}</p>
           <h2 className="text-lg font-semibold text-slate-100 sm:text-xl">{subtitle}</h2>
         </div>
-        <p className="text-xs font-semibold text-slate-300" role="status" aria-live="polite">
-          {completedCount}/{items.length} complete
-        </p>
+        <div className="flex flex-col items-end gap-2">
+          <span className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.14em] text-slate-100">
+            {progressLabel}
+          </span>
+          <p className="text-xs font-semibold text-slate-300" role="status" aria-live="polite">
+            {completedCount}/{items.length} complete
+          </p>
+        </div>
       </div>
 
       <div className="space-y-2">
@@ -105,7 +111,10 @@ export const CadenceChecklist = ({
         {items.map((item, index) => {
           const done = Boolean(state[item.id]);
           return (
-            <li key={item.id} className="cadence-item weather-surface flex h-full flex-col gap-3 p-4">
+            <li
+              key={item.id}
+              className={`cadence-item weather-surface flex h-full flex-col gap-3 p-4 ${done ? "border-emerald-400/50 bg-emerald-500/10" : ""}`}
+            >
               <div className="flex items-center gap-2">
                 <span aria-hidden="true" className="cadence-step-index inline-flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-semibold">
                   {done ? "✓" : index + 1}
