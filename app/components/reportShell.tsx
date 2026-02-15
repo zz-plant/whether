@@ -259,18 +259,16 @@ export const ReportShell = ({
 
     return accumulator;
   }, []);
+  const primaryDecisionText =
+    decisionBanner?.decision ??
+    (/^start\b/i.test(primaryCta.label) ? `${primaryCta.label}.` : `Start with ${primaryCta.label}.`);
+
   return (
     <>
       <nav
         aria-label="Skip links"
         className="sr-only focus-within:not-sr-only focus-within:absolute focus-within:left-4 focus-within:top-4 focus-within:z-30 focus-within:flex focus-within:flex-col focus-within:gap-2 focus-within:rounded-2xl focus-within:border focus-within:border-slate-700/70 focus-within:bg-slate-950/95 focus-within:p-2 focus-within:shadow-xl focus-within:shadow-black/40"
       >
-        <a
-          href="#main-content"
-          className="inline-flex min-h-[44px] items-center rounded-xl border border-slate-700/70 bg-slate-900/80 px-3 py-2 text-xs font-semibold tracking-[0.14em] text-slate-100 transition-colors hover:border-sky-300/70 hover:text-white focus-visible:border-sky-300/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-        >
-          Skip to main content
-        </a>
         <a
           href="#report-primary-actions"
           className="inline-flex min-h-[44px] items-center rounded-xl border border-slate-700/70 bg-slate-900/80 px-3 py-2 text-xs font-semibold tracking-[0.14em] text-slate-100 transition-colors hover:border-sky-300/70 hover:text-white focus-visible:border-sky-300/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
@@ -488,7 +486,7 @@ export const ReportShell = ({
                   <article className="weather-surface space-y-3 p-4">
                     <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">{decisionBanner?.label ?? "Decide now"}</p>
                     <h2 className="text-lg font-semibold text-slate-100 sm:text-xl">
-                      {decisionBanner?.decision ?? `Start with ${primaryCta.label}.`}
+                      {primaryDecisionText}
                     </h2>
                     <p className="text-sm text-slate-300">{trustStatusAction}</p>
                     {decisionBanner?.evidenceHref ? (
