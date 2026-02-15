@@ -1,8 +1,10 @@
 "use client";
 
+import { useRef, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import type { ReactNode } from "react";
 import { Collapsible } from "@base-ui/react/collapsible";
 import { NavigationMenu } from "@base-ui/react/navigation-menu";
+import { handleDirectionalFocus } from "./directionalFocus";
 
 export type ReportPageLink = {
   href: string;
@@ -281,9 +283,19 @@ export const ReportMobileNavigation = ({
         ? "1 section"
         : `${sectionLinks.length} sections`;
 
+  const navigationRootRef = useRef<HTMLDivElement>(null);
+
+  const onDirectionalKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+    if (!navigationRootRef.current) {
+      return;
+    }
+
+    handleDirectionalFocus(event, navigationRootRef.current);
+  };
+
   return (
     <NavigationMenu.Root aria-label="Mobile report navigation" className={className}>
-      <Collapsible.Root className="relative">
+      <Collapsible.Root className="relative" ref={navigationRootRef} onKeyDown={onDirectionalKeyDown}>
         <div className="weather-mobile-nav flex flex-col gap-3 px-3 py-3">
           <div className="flex min-w-0 items-center gap-3 rounded-2xl border border-slate-800/80 bg-slate-950/70 px-3 py-2">
             <span className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl border border-slate-800/80 bg-slate-950/80 text-slate-100">

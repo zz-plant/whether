@@ -297,7 +297,7 @@ export const ReportShell = ({
         ) : null}
         <DisplayGuardian />
         <div className="pointer-events-none absolute inset-0 weather-grid" aria-hidden="true" />
-        <div className="mx-auto max-w-7xl pb-[calc(env(safe-area-inset-bottom)+12rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)] pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)] sm:pb-12 sm:pt-6 sm:pl-[calc(env(safe-area-inset-left)+1.5rem)] sm:pr-[calc(env(safe-area-inset-right)+1.5rem)]">
+        <div className="tv-rail-safe mx-auto max-w-7xl pb-[calc(env(safe-area-inset-bottom)+12rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)] pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)] sm:pb-12 sm:pt-6 sm:pl-[calc(env(safe-area-inset-left)+1.5rem)] sm:pr-[calc(env(safe-area-inset-right)+1.5rem)]">
           <header className="weather-appbar sticky top-[calc(env(safe-area-inset-top)+0.75rem)] z-20 px-4 py-4 sm:top-4 sm:px-6 sm:py-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-3">
@@ -629,6 +629,40 @@ export const ReportShell = ({
           className="fixed inset-x-0 bottom-0 z-30 pb-3 pt-3 pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)]"
         />
       </div>
+
+      <aside className="tv-action-rail" aria-label="TV quick actions">
+        <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Quick actions</p>
+        <div className="mt-2 grid gap-2">
+          <a
+            href={primaryCta.href}
+            className="weather-button-primary inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+          >
+            {primaryCta.label}
+          </a>
+          {secondaryCta ? (
+            <a
+              href={secondaryCta.href}
+              className="weather-pill inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+            >
+              {secondaryCta.label}
+            </a>
+          ) : null}
+          {exportCta ? (
+            <a
+              href={exportCta.href}
+              className="weather-pill inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+            >
+              {exportCta.label}
+            </a>
+          ) : null}
+          <a
+            href="#operator-command-center"
+            className="weather-pill inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+          >
+            Open command center
+          </a>
+        </div>
+      </aside>
       </main>
     </>
   );
