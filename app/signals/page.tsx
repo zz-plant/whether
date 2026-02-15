@@ -75,6 +75,13 @@ export default async function SignalsPage({
     { href: "#time-machine", label: "Time machine" },
     { href: "#regime-timeline", label: "Regime timeline" },
   ];
+  const focusOptions = [
+    { key: "all", label: "All" },
+    { key: "inflation", label: "Inflation" },
+    { key: "growth", label: "Growth" },
+    { key: "labor", label: "Labor" },
+    { key: "financial", label: "Financial conditions" },
+  ] as const;
 
   const {
     assessment,
@@ -121,6 +128,28 @@ export default async function SignalsPage({
     { id: "owners", label: "Assign owners", href: buildTimeMachineHref("/operations/plan", historicalSelection), status: "upcoming" as const },
     { id: "export", label: "Export brief", href: buildTimeMachineHref("/operations/briefings", historicalSelection), status: "upcoming" as const },
   ];
+  const requestedFocus = resolvedSearchParams?.focus;
+  const activeFocus = focusOptions.some((option) => option.key === requestedFocus)
+    ? requestedFocus
+    : "all";
+  const buildFocusHref = (focus: (typeof focusOptions)[number]["key"]) => {
+    const params = new URLSearchParams();
+    if (resolvedSearchParams) {
+      Object.entries(resolvedSearchParams).forEach(([key, value]) => {
+        if (value && key !== "focus") {
+          params.set(key, value);
+        }
+      });
+    }
+    if (focus !== "all") {
+      params.set("focus", focus);
+    }
+    const query = params.toString();
+    return query ? `/signals?${query}` : "/signals";
+  };
+  const showSensorArray = activeFocus === "all" || activeFocus === "labor" || activeFocus === "financial";
+  const showMacroPanel = activeFocus === "all" || activeFocus === "inflation" || activeFocus === "growth";
+  const showThresholds = activeFocus === "all" || activeFocus === "inflation" || activeFocus === "financial";
 
   return (
     <ReportShell
@@ -136,13 +165,13 @@ export default async function SignalsPage({
       pageTitle="Signal evidence"
       currentPath="/signals"
       pageSummary="See the sources and scoring behind the regime call."
-      pageSummaryLink={{ href: "#regime-timeline", label: "Start evidence scan →" }}
+      pageSummaryLink={{ href: "#regime-timeline", label: "Review evidence scan" }}
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
       heroVariant="compact"
       pageNavVariant="compact"
-      primaryCta={{ href: "#sensor-array", label: "Open live feed" }}
-      secondaryCta={{ href: "#thresholds", label: "Check scoring thresholds" }}
+      primaryCta={{ href: "#sensor-array", label: "Review live feed" }}
+      secondaryCta={{ href: "#thresholds", label: "Review scoring thresholds" }}
       stageRail={{ title: "Global decision flow", items: stageItems }}
       decisionBanner={{
         label: "Explain why",
@@ -167,6 +196,36 @@ export default async function SignalsPage({
         ) : null
       }
     >
+      <section className="weather-panel space-y-4 px-6 py-5" aria-labelledby="signal-focus-title">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Signal filters</p>
+            <h2 id="signal-focus-title" className="text-xl font-semibold text-slate-100 sm:text-2xl">
+              Start with a simple focus, then open advanced threshold controls if needed.
+            </h2>
+          </div>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+          {focusOptions.map((option) => {
+            const active = option.key === activeFocus;
+            return (
+              <a
+                key={option.key}
+                href={buildFocusHref(option.key)}
+                aria-current={active ? "page" : undefined}
+                className={`weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation ${
+                  active
+                    ? "border-sky-300/80 text-slate-100"
+                    : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
+                }`}
+              >
+                {option.label}
+              </a>
+            );
+          })}
+        </div>
+      </section>
+
       <section className="weather-panel space-y-4 px-6 py-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -247,7 +306,7 @@ export default async function SignalsPage({
             href="#thresholds"
             className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
           >
-            Review score thresholds →
+            Review score thresholds
           </a>
         </div>
         <p className="text-sm text-slate-200">{assessment.description}</p>
@@ -257,7 +316,7 @@ export default async function SignalsPage({
               title: "Validate live sensor data",
               detail: "Check the latest feeds driving the tightness and risk scores.",
               href: "#sensor-array",
-              label: "Open live feed",
+              label: "Review live feed",
             },
             {
               title: "Cross-check macro sources",
@@ -269,7 +328,7 @@ export default async function SignalsPage({
               title: "Confirm scoring thresholds",
               detail: "Ensure the regime thresholds still map to your risk tolerance.",
               href: "#thresholds",
-              label: "See thresholds",
+              label: "Review thresholds",
             },
           ].map((item) => (
             <div key={item.title} className="weather-surface flex h-full flex-col gap-3 p-4">
@@ -281,18 +340,20 @@ export default async function SignalsPage({
                 href={item.href}
                 className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
               >
-                {item.label} →
+                {item.label}
               </a>
             </div>
           ))}
         </div>
       </section>
 
-      <SensorArray sensors={sensors} provenance={treasuryProvenance} />
+      {showSensorArray ? <SensorArray sensors={sensors} provenance={treasuryProvenance} /> : null}
 
-      <MacroSignalsPanel series={macroSeries} provenance={macroProvenance} />
+      {showMacroPanel ? <MacroSignalsPanel series={macroSeries} provenance={macroProvenance} /> : null}
 
-      <ThresholdsPanel currentThresholds={assessment.thresholds} provenance={treasuryProvenance} />
+      {showThresholds ? (
+        <ThresholdsPanel currentThresholds={assessment.thresholds} provenance={treasuryProvenance} />
+      ) : null}
 
       <TimeMachinePanel
         selectedYear={selectedYear}
