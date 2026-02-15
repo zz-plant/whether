@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { handleDirectionalFocus } from "./directionalFocus";
 
 type MobileAction = {
   href: string;
@@ -57,11 +58,15 @@ export const MobileActionSheet = ({
   }, [open]);
 
   const handleFocusTrap = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+    const sheet = sheetRef.current;
+    if (sheet) {
+      handleDirectionalFocus(event, sheet);
+    }
+
     if (event.key !== "Tab") {
       return;
     }
 
-    const sheet = sheetRef.current;
     if (!sheet) {
       return;
     }

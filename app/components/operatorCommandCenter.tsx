@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { handleDirectionalFocus } from "./directionalFocus";
 
 export type OperatorCommandAction = {
   href: string;
@@ -54,6 +55,15 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
   const [isFirstSession, setIsFirstSession] = useState(false);
   const [isExpanded, setIsExpanded] = useState(true);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
+  const commandCenterRef = useRef<HTMLElement | null>(null);
+
+  const onDirectionalKeyDown = (event: ReactKeyboardEvent<HTMLElement>) => {
+    if (!commandCenterRef.current) {
+      return;
+    }
+
+    handleDirectionalFocus(event, commandCenterRef.current);
+  };
 
   useEffect(() => {
     const initialQuery = sessionStorage.getItem(STORAGE_KEY);
@@ -153,7 +163,13 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
   };
 
   return (
-    <section className="weather-panel relative z-10 space-y-4 px-4 py-4 sm:px-5" aria-label="Command center">
+    <section
+      ref={commandCenterRef}
+      onKeyDown={onDirectionalKeyDown}
+      id="operator-command-center"
+      className="weather-panel relative z-10 space-y-4 px-4 py-4 sm:px-5"
+      aria-label="Command center"
+    >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-base font-semibold tracking-[0.08em] text-slate-100">Command center</h2>
         <div className="flex flex-wrap items-center gap-2">
@@ -198,7 +214,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search… (/ to focus)"
+              placeholder="Search links"
               className="w-full rounded-2xl border border-slate-700/80 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
             />
             <div className="space-y-2">
@@ -229,6 +245,12 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
               {isMobile ? (
                 <p className="text-xs text-slate-500">Mobile default is Playbook for faster “do now” access.</p>
               ) : null}
+              <div className="weather-surface grid gap-2 p-3 text-xs text-slate-300 sm:grid-cols-2">
+                <p><span className="font-semibold text-slate-100">↑/↓</span> move focus</p>
+                <p><span className="font-semibold text-slate-100">←/→</span> switch controls</p>
+                <p><span className="font-semibold text-slate-100">Enter / OK</span> open link</p>
+                <p><span className="font-semibold text-slate-100">Esc / Back</span> clear search field</p>
+              </div>
             </div>
           </div>
 
