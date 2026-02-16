@@ -555,6 +555,59 @@ summary:focus-visible {
   }
 }
 
+:root[data-display-mode="tv"] {
+  font-size: 18px;
+}
+
+:root[data-display-mode="tv"] .type-headline {
+  @apply text-5xl leading-tight md:text-7xl;
+}
+
+:root[data-display-mode="tv"] .type-section {
+  @apply text-3xl;
+}
+
+:root[data-display-mode="tv"] .type-label {
+  @apply text-sm tracking-[0.2em];
+}
+
+:root[data-display-mode="tv"] .type-data {
+  @apply text-lg leading-relaxed;
+}
+
+:root[data-display-mode="tv"] .weather-pill,
+:root[data-display-mode="tv"] .weather-button,
+:root[data-display-mode="tv"] .weather-button-primary,
+:root[data-display-mode="tv"] .weather-tab {
+  min-height: 56px;
+}
+
+:root[data-display-mode="tv"] .weather-mobile-nav,
+:root[data-display-mode="tv"] .weather-mobile-panel {
+  font-size: 1.05rem;
+}
+
+:root[data-display-mode="tv"] .tv-rail-safe {
+  padding-right: max(calc(env(safe-area-inset-right) + 22rem), 32vw);
+}
+
+:root[data-display-mode="tv"] .tv-action-rail {
+  position: fixed;
+  right: calc(env(safe-area-inset-right) + 1rem);
+  top: calc(env(safe-area-inset-top) + 6rem);
+  z-index: 35;
+  width: min(22rem, 30vw);
+  border: 1px solid rgba(51, 65, 85, 0.8);
+  border-radius: 1rem;
+  background: rgba(2, 6, 23, 0.92);
+  padding: 0.85rem;
+  backdrop-filter: blur(14px);
+  box-shadow:
+    0 20px 40px -24px rgba(2, 6, 23, 0.9),
+    0 8px 20px -16px rgba(56, 189, 248, 0.28);
+  display: block;
+}
+
 .tv-action-rail {
   display: none;
 }

@@ -4,6 +4,8 @@
  */
 import { Children, type ReactNode, isValidElement } from "react";
 import { DisplayGuardian } from "./displayGuardian";
+import { DisplayModeManager } from "./displayModeManager";
+import { DisplayModeToggle } from "./displayModeToggle";
 import { MobileActionSheet } from "./mobileActionSheet";
 import {
   OperatorCommandCenter,
@@ -305,6 +307,7 @@ export const ReportShell = ({
             dangerouslySetInnerHTML={{ __html: structuredData }}
           />
         ) : null}
+        <DisplayModeManager />
         <DisplayGuardian />
         <div className="pointer-events-none absolute inset-0 weather-grid" aria-hidden="true" />
         <div className="tv-rail-safe mx-auto max-w-7xl pb-[calc(env(safe-area-inset-bottom)+12rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)] pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)] sm:pb-12 sm:pt-6 sm:pl-[calc(env(safe-area-inset-left)+1.5rem)] sm:pr-[calc(env(safe-area-inset-right)+1.5rem)]">
@@ -686,6 +689,7 @@ export const ReportShell = ({
           >
             Open command center
           </a>
+          <DisplayModeToggle />
         </div>
       </aside>
       </main>
