@@ -28,24 +28,49 @@ export default async function OnboardingPage({
   searchParams?: Promise<{ month?: string; year?: string; [key: string]: string | undefined }>;
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const activeExperience = resolvedSearchParams?.experience === "returning" ? "returning" : "new";
+  const buildExperienceHref = (experience: "new" | "returning") => {
+    const params = new URLSearchParams();
+    if (resolvedSearchParams) {
+      Object.entries(resolvedSearchParams).forEach(([key, value]) => {
+        if (value && key !== "experience") {
+          params.set(key, value);
+        }
+      });
+    }
+    if (experience === "returning") {
+      params.set("experience", "returning");
+    }
+    const query = params.toString();
+    return query ? `/onboarding?${query}` : "/onboarding";
+  };
   const onboardingSteps = [
     {
       title: "Orient to the report",
-      detail: "Start with the core leadership questions: what regime are we in, what moves does it favor, and what should we avoid.",
+      detail:
+        activeExperience === "new"
+          ? "Start with the core leadership questions: what regime are we in, what moves does it favor, and what should we avoid."
+          : "Start with a fast refresh of the current regime, confidence cue, and recommended operating posture.",
       href: "#first-time-guide",
       cta: "Start onboarding",
       emphasis: "primary",
     },
     {
       title: "Decode the vocabulary",
-      detail: "Translate macro terms into product, engineering, and finance decisions your team can act on.",
+      detail:
+        activeExperience === "new"
+          ? "Translate macro terms into product, engineering, and finance decisions your team can act on."
+          : "Skim only the terms that changed your last decision memo so leadership language stays aligned.",
       href: "#beginner-glossary",
       cta: "Open the glossary",
       emphasis: "secondary",
     },
     {
       title: "Apply the signals",
-      detail: "Open signal-level evidence when someone asks why the posture changed.",
+      detail:
+        activeExperience === "new"
+          ? "Open signal-level evidence when someone asks why the posture changed."
+          : "Jump straight to evidence and thresholds when you need to defend a decision quickly.",
       href: "/signals",
       cta: "Open signal evidence",
       emphasis: "secondary",
@@ -144,8 +169,33 @@ export default async function OnboardingPage({
             Complete these three steps in order.
           </h2>
           <p className="text-sm text-slate-300">
-            Estimated time: ~3 minutes. Outcome: a clear read on what to do this week and what to defer.
+            {activeExperience === "new"
+              ? "Estimated time: ~3 minutes. Outcome: a clear read on what to do this week and what to defer."
+              : "Estimated time: ~90 seconds. Outcome: refresh your context and jump to evidence faster."}
           </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-xs font-semibold tracking-[0.14em] text-slate-400">Experience mode</p>
+            {[
+              { key: "new", label: "I’m new" },
+              { key: "returning", label: "I’m returning" },
+            ].map((option) => {
+              const isActive = option.key === activeExperience;
+              return (
+                <a
+                  key={option.key}
+                  href={buildExperienceHref(option.key as "new" | "returning")}
+                  aria-current={isActive ? "page" : undefined}
+                  className={`weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] touch-manipulation ${
+                    isActive
+                      ? "border-sky-300/80 text-slate-100"
+                      : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
+                  }`}
+                >
+                  {option.label}
+                </a>
+              );
+            })}
+          </div>
         </div>
         <OnboardingChecklistProgress steps={onboardingSteps} />
       </section>
