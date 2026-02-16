@@ -268,6 +268,10 @@ export const ReportShell = ({
       : trustStatusTone === "historical"
         ? "Historical snapshot for retrospective planning."
         : "Live signals verified for this cycle.";
+  const missionSupportText =
+    trustStatusTone === "stable"
+      ? trustStatusAction
+      : "Use the execution sequence below to convert this signal posture into concrete team actions.";
 
   return (
     <>
@@ -478,7 +482,7 @@ export const ReportShell = ({
                 <p className={`inline-flex items-center gap-2 text-xs leading-relaxed ${trustLabelTone}`}>
                   <span className="font-semibold tracking-[0.14em]">Confidence cue</span>
                   <span aria-hidden="true">{trustStatusTone === "warning" ? "⚠" : trustStatusTone === "historical" ? "⏱" : "✓"}</span>
-                  <span>{trustStatusLabel}: {confidenceCueSummary}</span>
+                  <span>{confidenceCueSummary}</span>
                 </p>
                 <details className="rounded-2xl border border-slate-800/80 bg-slate-950/40 px-4 py-3">
                   <summary className="inline-flex min-h-[44px] w-full cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.14em] text-slate-300 marker:content-none">
@@ -509,7 +513,7 @@ export const ReportShell = ({
                     <h2 className="text-lg font-semibold text-slate-100 sm:text-xl">
                       {primaryDecisionText}
                     </h2>
-                    <p className="text-sm text-slate-300">{trustStatusAction}</p>
+                    <p className="text-sm text-slate-300">{missionSupportText}</p>
                     {decisionBanner?.evidenceHref ? (
                       <a
                         href={decisionBanner.evidenceHref}

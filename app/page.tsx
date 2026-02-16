@@ -183,6 +183,22 @@ export default async function HomePage({
   searchParams?: Promise<{ month?: string; year?: string; [key: string]: string | undefined }>;
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const activeView = resolvedSearchParams?.view === "summary" ? "summary" : "full";
+  const buildViewHref = (view: "summary" | "full") => {
+    const params = new URLSearchParams();
+    if (resolvedSearchParams) {
+      Object.entries(resolvedSearchParams).forEach(([key, value]) => {
+        if (value && key !== "view") {
+          params.set(key, value);
+        }
+      });
+    }
+    if (view === "summary") {
+      params.set("view", "summary");
+    }
+    const query = params.toString();
+    return query ? `/?${query}` : "/";
+  };
   const sectionLinks = homeSectionSequence.map((section, index) => ({
     href: section.href,
     label: `${index + 1}. ${section.label}`,
@@ -328,6 +344,29 @@ export default async function HomePage({
           <h1 className="max-w-3xl text-2xl font-semibold text-slate-100 sm:text-3xl">
             Decision card: what changed, what to do now, and how confident to be.
           </h1>
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-xs font-semibold tracking-[0.14em] text-slate-400">View mode</p>
+            {[
+              { key: "summary", label: "Summary" },
+              { key: "full", label: "Full report" },
+            ].map((option) => {
+              const isActive = option.key === activeView;
+              return (
+                <a
+                  key={option.key}
+                  href={buildViewHref(option.key as "summary" | "full")}
+                  aria-current={isActive ? "page" : undefined}
+                  className={`weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] touch-manipulation ${
+                    isActive
+                      ? "border-sky-300/80 text-slate-100"
+                      : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
+                  }`}
+                >
+                  {option.label}
+                </a>
+              );
+            })}
+          </div>
         </div>
         <article className="weather-surface space-y-4 p-5">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">What changed</p>
@@ -418,45 +457,111 @@ export default async function HomePage({
         />
       </ReportGroup>
 
-      <ReportGroup
-        title="Alert center"
-        description="Review new alerts, then scan the recent log."
-      >
-        <RegimeChangeAlertPanel alert={regimeAlert} provenance={treasuryProvenance} />
+      {activeView === "summary" ? (
+        <details className="weather-panel group space-y-4 px-6 py-5">
+          <summary className="inline-flex min-h-[44px] w-full cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.16em] text-slate-300 marker:content-none">
+            Open alerts, deep-dive signals, and continuation links
+            <span
+              aria-hidden="true"
+              className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-300 transition-transform duration-200 group-open:rotate-180"
+            >
+              <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
+                <path
+                  d="M7 10l5 5 5-5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </span>
+          </summary>
+          <div className="space-y-10 pt-2">
+            <ReportGroup
+              title="Alert center"
+              description="Review new alerts, then scan the recent log."
+            >
+              <RegimeChangeAlertPanel alert={regimeAlert} provenance={treasuryProvenance} />
 
-        <RegimeAlertsPanel />
-        <WeeklyDigestPanel assessment={assessment} />
-      </ReportGroup>
+              <RegimeAlertsPanel />
+              <WeeklyDigestPanel assessment={assessment} />
+            </ReportGroup>
 
-      <ReportGroup
-        title="Deep dive signals"
-        description="Use these references for full scoring detail."
-      >
-        <RegimeAssessmentCard assessment={assessment} provenance={treasuryProvenance} />
+            <ReportGroup
+              title="Deep dive signals"
+              description="Use these references for full scoring detail."
+            >
+              <RegimeAssessmentCard assessment={assessment} provenance={treasuryProvenance} />
 
-        <SignalMatrixPanel assessment={assessment} provenance={treasuryProvenance} />
-      </ReportGroup>
+              <SignalMatrixPanel assessment={assessment} provenance={treasuryProvenance} />
+            </ReportGroup>
 
-      <RelatedReportLinks
-        title="Continue through the report system"
-        links={[
-          {
-            href: "/signals",
-            label: "Signal evidence",
-            description: "Inspect source data, thresholds, and trend context.",
-          },
-          {
-            href: "/operations",
-            label: "Action playbook",
-            description: "Convert the climate into concrete execution moves.",
-          },
-          {
-            href: "/formulas",
-            label: "Methodology",
-            description: "Review formulas and official source links.",
-          },
-        ]}
-      />
+            <RelatedReportLinks
+              title="Continue through the report system"
+              links={[
+                {
+                  href: "/signals",
+                  label: "Signal evidence",
+                  description: "Inspect source data, thresholds, and trend context.",
+                },
+                {
+                  href: "/operations",
+                  label: "Action playbook",
+                  description: "Convert the climate into concrete execution moves.",
+                },
+                {
+                  href: "/formulas",
+                  label: "Methodology",
+                  description: "Review formulas and official source links.",
+                },
+              ]}
+            />
+          </div>
+        </details>
+      ) : (
+        <>
+          <ReportGroup
+            title="Alert center"
+            description="Review new alerts, then scan the recent log."
+          >
+            <RegimeChangeAlertPanel alert={regimeAlert} provenance={treasuryProvenance} />
+
+            <RegimeAlertsPanel />
+            <WeeklyDigestPanel assessment={assessment} />
+          </ReportGroup>
+
+          <ReportGroup
+            title="Deep dive signals"
+            description="Use these references for full scoring detail."
+          >
+            <RegimeAssessmentCard assessment={assessment} provenance={treasuryProvenance} />
+
+            <SignalMatrixPanel assessment={assessment} provenance={treasuryProvenance} />
+          </ReportGroup>
+
+          <RelatedReportLinks
+            title="Continue through the report system"
+            links={[
+              {
+                href: "/signals",
+                label: "Signal evidence",
+                description: "Inspect source data, thresholds, and trend context.",
+              },
+              {
+                href: "/operations",
+                label: "Action playbook",
+                description: "Convert the climate into concrete execution moves.",
+              },
+              {
+                href: "/formulas",
+                label: "Methodology",
+                description: "Review formulas and official source links.",
+              },
+            ]}
+          />
+        </>
+      )}
     </ReportShell>
   );
 }
