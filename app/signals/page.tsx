@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { Route } from "next";
 import { loadReportData } from "../../lib/report/reportData";
 import { buildTimeMachineHref } from "../../lib/timeMachine/timeMachineSelection";
 import { siteUrl } from "../../lib/siteUrl";
@@ -14,6 +15,7 @@ import { ThresholdsPanel } from "./components/thresholdsPanel";
 import { TimeMachinePanel } from "./components/timeMachinePanel";
 import { RegimeTimelinePanel } from "./components/regimeTimelinePanel";
 import { reportPageLinks } from "../../lib/report/reportNavigation";
+import { appendSearchParamsToRoute } from "../../lib/navigation/routeSearchParams";
 
 export const runtime = "edge";
 
@@ -83,6 +85,14 @@ export default async function SignalsPage({
     { key: "financial", label: "Financial conditions" },
   ] as const;
 
+  const roleOptions = [
+    { key: "all", label: "Cross-functional" },
+    { key: "product", label: "Product lead" },
+    { key: "engineering", label: "Eng lead" },
+    { key: "finance", label: "Finance partner" },
+  ] as const;
+  type RoleKey = (typeof roleOptions)[number]["key"];
+
   const {
     assessment,
     cacheCoverage,
@@ -150,6 +160,44 @@ export default async function SignalsPage({
   const showSensorArray = activeFocus === "all" || activeFocus === "labor" || activeFocus === "financial";
   const showMacroPanel = activeFocus === "all" || activeFocus === "inflation" || activeFocus === "growth";
   const showThresholds = activeFocus === "all" || activeFocus === "inflation" || activeFocus === "financial";
+  const requestedRole = resolvedSearchParams?.role;
+  const activeRole: RoleKey =
+    roleOptions.some((option) => option.key === requestedRole)
+      ? (requestedRole as RoleKey)
+      : "all";
+  const buildRoleHref = (role: RoleKey) => {
+    const params = new URLSearchParams();
+    if (resolvedSearchParams) {
+      Object.entries(resolvedSearchParams).forEach(([key, value]) => {
+        if (value && key !== "role") {
+          params.set(key, value);
+        }
+      });
+    }
+    if (role !== "all") {
+      params.set("role", role);
+    }
+    const query = params.toString();
+    return query ? `/signals?${query}` : "/signals";
+  };
+  const roleActionSequence =
+    activeRole === "engineering"
+      ? [
+          { title: "Inspect live sensor feed", detail: "Start with source readings impacting delivery risk.", href: "#sensor-array", cta: "Open sensor feed" },
+          { title: "Check scoring thresholds", detail: "Confirm signal tolerances before changing execution guardrails.", href: "#thresholds", cta: "Open thresholds" },
+          { title: "Review regime timeline", detail: "Validate context before committing roadmap changes.", href: "#regime-timeline", cta: "Open timeline" },
+        ]
+      : activeRole === "finance"
+        ? [
+            { title: "Review macro sources", detail: "Start with top-line external drivers relevant to budget timing.", href: "#macro-signals", cta: "Open macro sources" },
+            { title: "Check scoring thresholds", detail: "Verify guardrails before approving new spend windows.", href: "#thresholds", cta: "Open thresholds" },
+            { title: "Inspect live sensor feed", detail: "Confirm real-time confirmation signals before decisions.", href: "#sensor-array", cta: "Open sensor feed" },
+          ]
+        : [
+            { title: "Review regime timeline", detail: "Start with sequence changes to frame context.", href: "#regime-timeline", cta: "Open timeline" },
+            { title: "Check scoring thresholds", detail: "Confirm guardrails still match current tolerance.", href: "#thresholds", cta: "Open thresholds" },
+            { title: "Inspect live sensor feed", detail: "Validate source readings behind the call.", href: "#sensor-array", cta: "Open sensor feed" },
+          ];
 
   return (
     <ReportShell
@@ -183,11 +231,23 @@ export default async function SignalsPage({
       }}
       actionSequence={{
         title: "Evidence scan",
-        items: [
-          { title: "Review regime timeline", detail: "Start with sequence changes to frame context.", href: "#regime-timeline", cta: "Open timeline" },
-          { title: "Check scoring thresholds", detail: "Confirm guardrails still match current tolerance.", href: "#thresholds", cta: "Open thresholds" },
-          { title: "Inspect live sensor feed", detail: "Validate source readings behind the call.", href: "#sensor-array", cta: "Open sensor feed" },
-        ],
+        items: roleActionSequence,
+      }}
+      roleSwitcher={{
+        active: activeRole,
+        options: roleOptions.map((role) => ({
+          key: role.key,
+          label: role.label,
+          href: buildRoleHref(role.key),
+        })),
+      }}
+      decisionDiffs={[
+        { label: `Regime: ${regimeLabel}`, tone: "neutral" },
+        { label: `Trust: ${trustStatusLabel}`, tone: trustStatusTone === "stable" ? "positive" : "warning" },
+      ]}
+      nextStep={{
+        description: "Convert evidence into an execution posture.",
+        href: `${appendSearchParamsToRoute("/operations" as Route, resolvedSearchParams)}#ops-monthly-action-summary`,
       }}
       structuredData={JSON.stringify(structuredData)}
       historicalBanner={

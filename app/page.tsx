@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { Route } from "next";
 import type { ReactNode } from "react";
 import {
   resolveTimeMachineSelection,
@@ -30,6 +31,7 @@ import { ReportShell } from "./components/reportShell";
 import { RelatedReportLinks } from "./components/relatedReportLinks";
 import { CadenceChecklist } from "./components/cadenceChecklist";
 import { reportPageLinks } from "../lib/report/reportNavigation";
+import { appendSearchParamsToRoute } from "../lib/navigation/routeSearchParams";
 
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
@@ -121,6 +123,69 @@ const briefingFlowSteps = [
   },
 ] as const;
 
+const roleFlowOverrides = {
+  product: [
+    {
+      title: "Set product scope",
+      detail: "Decide what to accelerate, defer, or sequence with guardrails.",
+      href: "#weekly-action-summary",
+      ctaLabel: "Open scope actions",
+    },
+    {
+      title: "Align engineering risk",
+      detail: "Confirm reliability and staffing constraints for in-flight work.",
+      href: "#executive-snapshot",
+      ctaLabel: "Open risk summary",
+    },
+    {
+      title: "Confirm budget timing",
+      detail: "Validate spend windows before committing irreversible bets.",
+      href: "#regime-alerts",
+      ctaLabel: "Open spend alerts",
+    },
+  ],
+  engineering: [
+    {
+      title: "Set delivery posture",
+      detail: "Confirm whether to protect throughput or prioritize resiliency work.",
+      href: "#weekly-action-summary",
+      ctaLabel: "Open delivery actions",
+    },
+    {
+      title: "Validate constraints",
+      detail: "Review risk signals before adding operational complexity.",
+      href: "#signal-matrix",
+      ctaLabel: "Open constraints",
+    },
+    {
+      title: "Assign execution owners",
+      detail: "Route guardrail decisions to the right team owners this week.",
+      href: "#regime-summary",
+      ctaLabel: "Open owner view",
+    },
+  ],
+  finance: [
+    {
+      title: "Set spending posture",
+      detail: "Lock this week's discretionary spend stance.",
+      href: "#weekly-action-summary",
+      ctaLabel: "Open spend actions",
+    },
+    {
+      title: "Review confidence",
+      detail: "Check fallback and confidence before approving medium-term commitments.",
+      href: "#executive-snapshot",
+      ctaLabel: "Open confidence summary",
+    },
+    {
+      title: "Verify evidence trail",
+      detail: "Confirm signals before changing quarterly budget allocations.",
+      href: "#signal-matrix",
+      ctaLabel: "Open evidence",
+    },
+  ],
+} as const;
+
 export const generateMetadata = async ({
   searchParams,
 }: {
@@ -183,6 +248,33 @@ export default async function HomePage({
   searchParams?: Promise<{ month?: string; year?: string; [key: string]: string | undefined }>;
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const roleOptions = [
+    { key: "all", label: "Cross-functional" },
+    { key: "product", label: "Product lead" },
+    { key: "engineering", label: "Eng lead" },
+    { key: "finance", label: "Finance partner" },
+  ] as const;
+  type RoleKey = (typeof roleOptions)[number]["key"];
+  const requestedRole = resolvedSearchParams?.role;
+  const activeRole: RoleKey =
+    roleOptions.some((role) => role.key === requestedRole)
+      ? (requestedRole as RoleKey)
+      : "all";
+  const buildRoleHref = (role: RoleKey) => {
+    const params = new URLSearchParams();
+    if (resolvedSearchParams) {
+      Object.entries(resolvedSearchParams).forEach(([key, value]) => {
+        if (value && key !== "role") {
+          params.set(key, value);
+        }
+      });
+    }
+    if (role !== "all") {
+      params.set("role", role);
+    }
+    const query = params.toString();
+    return query ? `/?${query}` : "/";
+  };
   const activeView = resolvedSearchParams?.view === "summary" ? "summary" : "full";
   const buildViewHref = (view: "summary" | "full") => {
     const params = new URLSearchParams();
@@ -287,6 +379,8 @@ export default async function HomePage({
     { id: "owners", label: "Assign owners", href: buildTimeMachineHref("/operations/plan", historicalSelection), status: "upcoming" as const },
     { id: "export", label: "Export brief", href: buildTimeMachineHref("/operations/briefings", historicalSelection), status: "upcoming" as const },
   ];
+  const activeBriefingFlowSteps =
+    activeRole === "all" ? briefingFlowSteps : roleFlowOverrides[activeRole];
 
   return (
     <ReportShell
@@ -318,12 +412,31 @@ export default async function HomePage({
       }}
       actionSequence={{
         title: "Recommended sequence",
-        items: briefingFlowSteps.map((step) => ({
+        items: activeBriefingFlowSteps.map((step) => ({
           title: step.title,
           detail: step.detail,
           href: step.href,
           cta: step.ctaLabel,
         })),
+      }}
+      roleSwitcher={{
+        active: activeRole,
+        options: roleOptions.map((role) => ({
+          key: role.key,
+          label: role.label,
+          href: buildRoleHref(role.key),
+        })),
+      }}
+      decisionDiffs={[
+        { label: "New this cycle", tone: "neutral" },
+        {
+          label: `Trust: ${trustStatusLabel}`,
+          tone: trustStatusTone === "stable" ? "positive" : "warning",
+        },
+      ]}
+      nextStep={{
+        description: "Validate the signal evidence before assigning owners.",
+        href: `${appendSearchParamsToRoute("/signals" as Route, resolvedSearchParams)}#regime-timeline`,
       }}
       sidebarVariant="hidden"
       pageLinks={reportPageLinks}
@@ -346,6 +459,7 @@ export default async function HomePage({
           </h1>
           <div className="flex flex-wrap items-center gap-2">
             <p className="text-xs font-semibold tracking-[0.14em] text-slate-400">View mode</p>
+            <p className="text-xs text-slate-500">Summary ≈ 2 min · Full report ≈ 8 min</p>
             {[
               { key: "summary", label: "Summary" },
               { key: "full", label: "Full report" },

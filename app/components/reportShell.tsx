@@ -7,6 +7,7 @@ import { DisplayGuardian } from "./displayGuardian";
 import { DisplayModeManager } from "./displayModeManager";
 import { DisplayModeToggle } from "./displayModeToggle";
 import { MobileActionSheet } from "./mobileActionSheet";
+import { CanonicalTrustModule } from "./canonicalTrustModule";
 import {
   OperatorCommandCenter,
   type OperatorCommandAction,
@@ -51,6 +52,9 @@ export const ReportShell = ({
   stageRail,
   decisionBanner,
   actionSequence,
+  roleSwitcher,
+  decisionDiffs,
+  nextStep,
 }: {
   children: ReactNode;
   statusLabel: string;
@@ -94,13 +98,13 @@ export const ReportShell = ({
     title: string;
     items: Array<{ title: string; detail: string; href: string; cta: string }>;
   };
+  roleSwitcher?: {
+    active: string;
+    options: Array<{ key: string; label: string; href: string }>;
+  };
+  decisionDiffs?: Array<{ label: string; tone?: "neutral" | "positive" | "warning" }>;
+  nextStep?: { description: string; href: string };
 }) => {
-  const trustToneStyles =
-    trustStatusTone === "warning"
-      ? "border-amber-400/60 bg-amber-500/10 text-amber-100"
-      : trustStatusTone === "historical"
-        ? "border-slate-500/60 bg-slate-900/70 text-slate-200"
-        : "border-emerald-400/60 bg-emerald-500/10 text-emerald-100";
   const trustLabelTone =
     trustStatusTone === "warning"
       ? "text-amber-200"
@@ -169,14 +173,12 @@ export const ReportShell = ({
     </section>
   );
   const confidencePanel = (
-    <section className={`weather-panel flex flex-col gap-2 px-4 py-4 ${trustToneStyles}`}>
-      <p className={`text-xs font-semibold tracking-[0.16em] ${trustLabelTone}`}>
-        Confidence
-      </p>
-      <p className="text-sm font-semibold text-slate-100">{trustStatusLabel}</p>
-      <p className="text-xs leading-relaxed text-slate-200/90">{trustStatusDetail}</p>
-      <p className="text-xs leading-relaxed text-slate-200/80">{trustStatusAction}</p>
-    </section>
+    <CanonicalTrustModule
+      tone={trustStatusTone}
+      label={trustStatusLabel}
+      detail={trustStatusDetail}
+      action={trustStatusAction}
+    />
   );
   const sectionsNav =
     sectionLinks.length > 0 ? (
@@ -377,6 +379,30 @@ export const ReportShell = ({
             <div className="order-1 min-w-0 space-y-10 lg:order-none lg:space-y-12">
               <section className="weather-panel-static min-w-0 space-y-4 px-4 py-5 sm:px-5">
                 <div className="space-y-3">
+                  {roleSwitcher ? (
+                    <div className="space-y-2">
+                      <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Role view</p>
+                      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                        {roleSwitcher.options.map((option) => {
+                          const isActive = option.key === roleSwitcher.active;
+                          return (
+                            <a
+                              key={option.key}
+                              href={option.href}
+                              aria-current={isActive ? "page" : undefined}
+                              className={`weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] touch-manipulation ${
+                                isActive
+                                  ? "border-sky-300/80 text-slate-100"
+                                  : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
+                              }`}
+                            >
+                              {option.label}
+                            </a>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ) : null}
                   {heroVariant === "compact" ? (
                     <>
                       <p className="text-xs font-semibold tracking-[0.2em] text-slate-400 sm:tracking-[0.26em]">
@@ -516,8 +542,28 @@ export const ReportShell = ({
                     <h2 className="text-lg font-semibold text-slate-100 sm:text-xl">
                       {primaryDecisionText}
                     </h2>
-                    <p className="text-sm text-slate-300">{missionSupportText}</p>
-                    {decisionBanner?.evidenceHref ? (
+                      <p className="text-sm text-slate-300">{missionSupportText}</p>
+                      {decisionDiffs && decisionDiffs.length > 0 ? (
+                        <ul className="mt-2 flex flex-wrap gap-2" aria-label="Decision deltas">
+                          {decisionDiffs.map((item) => {
+                            const toneClassName =
+                              item.tone === "positive"
+                                ? "border-emerald-300/70 bg-emerald-500/10 text-emerald-100"
+                                : item.tone === "warning"
+                                  ? "border-amber-300/80 bg-amber-500/15 text-amber-100"
+                                  : "border-slate-700/80 bg-slate-900/60 text-slate-200";
+                            return (
+                              <li
+                                key={item.label}
+                                className={`inline-flex min-h-[28px] items-center rounded-full border px-2 py-1 text-[11px] font-semibold tracking-[0.12em] ${toneClassName}`}
+                              >
+                                {item.label}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      ) : null}
+                      {decisionBanner?.evidenceHref ? (
                       <a
                         href={decisionBanner.evidenceHref}
                         className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
@@ -590,8 +636,39 @@ export const ReportShell = ({
                       <p className={trustLabelTone}>Confidence: {trustStatusLabel}</p>
                       <p>{trustStatusDetail}</p>
                     </div>
+                    <div className="mt-3">
+                      <CanonicalTrustModule
+                        tone={trustStatusTone}
+                        label={trustStatusLabel}
+                        detail={trustStatusDetail}
+                        action={trustStatusAction}
+                        compact
+                      />
+                    </div>
                   </details>
                 ) : null}
+              </section>
+
+              <section className="weather-panel sticky bottom-24 z-10 space-y-3 border-sky-500/30 bg-slate-950/95 px-4 py-3 sm:bottom-4">
+                <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Current posture</p>
+                <p className="text-sm font-semibold text-slate-100">{primaryDecisionText}</p>
+                <p className="text-xs text-slate-300">Confidence: {trustStatusLabel}</p>
+                <div className="flex flex-wrap gap-2">
+                  <a
+                    href={primaryCta.href}
+                    className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.14em]"
+                  >
+                    {primaryCta.label}
+                  </a>
+                  {decisionBanner?.evidenceHref ? (
+                    <a
+                      href={decisionBanner.evidenceHref}
+                      className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100"
+                    >
+                      Open evidence
+                    </a>
+                  ) : null}
+                </div>
               </section>
 
               {stageRail ? (
@@ -642,6 +719,31 @@ export const ReportShell = ({
             </div>
 
             <OperatorCommandCenter actions={commandActions} />
+
+            <section className="weather-panel space-y-3 px-4 py-4" aria-label="Next step">
+              <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">Next recommended move</p>
+              <p className="text-sm text-slate-200">
+                {nextStep?.description ??
+                  (currentPath === "/"
+                    ? "Validate the signal evidence before assigning owners."
+                    : currentPath === "/signals"
+                      ? "Convert evidence into an execution posture."
+                      : "Turn this playbook into owner-level assignments and export briefings.")}
+              </p>
+              <a
+                href={
+                  nextStep?.href ??
+                  (currentPath === "/"
+                    ? "/signals#regime-timeline"
+                    : currentPath === "/signals"
+                      ? "/operations#ops-monthly-action-summary"
+                      : "/operations/plan")
+                }
+                className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+              >
+                Continue workflow →
+              </a>
+            </section>
 
             <footer className="mt-12 border-t border-slate-800/70 pt-6 text-xs font-semibold tracking-[0.18em] text-slate-400">
               Not financial, legal, or investment advice.
