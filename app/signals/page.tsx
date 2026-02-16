@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { Route } from "next";
 import { loadReportData } from "../../lib/report/reportData";
 import { buildTimeMachineHref } from "../../lib/timeMachine/timeMachineSelection";
 import { siteUrl } from "../../lib/siteUrl";
@@ -14,6 +15,7 @@ import { ThresholdsPanel } from "./components/thresholdsPanel";
 import { TimeMachinePanel } from "./components/timeMachinePanel";
 import { RegimeTimelinePanel } from "./components/regimeTimelinePanel";
 import { reportPageLinks } from "../../lib/report/reportNavigation";
+import { appendSearchParamsToRoute } from "../../lib/navigation/routeSearchParams";
 
 export const runtime = "edge";
 
@@ -243,6 +245,10 @@ export default async function SignalsPage({
         { label: `Regime: ${regimeLabel}`, tone: "neutral" },
         { label: `Trust: ${trustStatusLabel}`, tone: trustStatusTone === "stable" ? "positive" : "warning" },
       ]}
+      nextStep={{
+        description: "Convert evidence into an execution posture.",
+        href: `${appendSearchParamsToRoute("/operations" as Route, resolvedSearchParams)}#ops-monthly-action-summary`,
+      }}
       structuredData={JSON.stringify(structuredData)}
       historicalBanner={
         historicalSelection ? (

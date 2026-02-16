@@ -54,6 +54,7 @@ export const ReportShell = ({
   actionSequence,
   roleSwitcher,
   decisionDiffs,
+  nextStep,
 }: {
   children: ReactNode;
   statusLabel: string;
@@ -102,6 +103,7 @@ export const ReportShell = ({
     options: Array<{ key: string; label: string; href: string }>;
   };
   decisionDiffs?: Array<{ label: string; tone?: "neutral" | "positive" | "warning" }>;
+  nextStep?: { description: string; href: string };
 }) => {
   const trustLabelTone =
     trustStatusTone === "warning"
@@ -721,19 +723,21 @@ export const ReportShell = ({
             <section className="weather-panel space-y-3 px-4 py-4" aria-label="Next step">
               <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">Next recommended move</p>
               <p className="text-sm text-slate-200">
-                {currentPath === "/"
-                  ? "Validate the signal evidence before assigning owners."
-                  : currentPath === "/signals"
-                    ? "Convert evidence into an execution posture."
-                    : "Turn this playbook into owner-level assignments and export briefings."}
+                {nextStep?.description ??
+                  (currentPath === "/"
+                    ? "Validate the signal evidence before assigning owners."
+                    : currentPath === "/signals"
+                      ? "Convert evidence into an execution posture."
+                      : "Turn this playbook into owner-level assignments and export briefings.")}
               </p>
               <a
                 href={
-                  currentPath === "/"
+                  nextStep?.href ??
+                  (currentPath === "/"
                     ? "/signals#regime-timeline"
                     : currentPath === "/signals"
                       ? "/operations#ops-monthly-action-summary"
-                      : "/operations/plan"
+                      : "/operations/plan")
                 }
                 className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
               >

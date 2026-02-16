@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { Route } from "next";
 import type { ReactNode } from "react";
 import {
   resolveTimeMachineSelection,
@@ -30,6 +31,7 @@ import { ReportShell } from "./components/reportShell";
 import { RelatedReportLinks } from "./components/relatedReportLinks";
 import { CadenceChecklist } from "./components/cadenceChecklist";
 import { reportPageLinks } from "../lib/report/reportNavigation";
+import { appendSearchParamsToRoute } from "../lib/navigation/routeSearchParams";
 
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
@@ -432,6 +434,10 @@ export default async function HomePage({
           tone: trustStatusTone === "stable" ? "positive" : "warning",
         },
       ]}
+      nextStep={{
+        description: "Validate the signal evidence before assigning owners.",
+        href: `${appendSearchParamsToRoute("/signals" as Route, resolvedSearchParams)}#regime-timeline`,
+      }}
       sidebarVariant="hidden"
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}

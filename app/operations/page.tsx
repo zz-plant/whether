@@ -246,6 +246,10 @@ export default async function OperationsPage({
         { label: "Up from last week", tone: "positive" },
         { label: `Trust: ${trustStatusLabel}`, tone: trustStatusTone === "stable" ? "positive" : "warning" },
       ]}
+      nextStep={{
+        description: "Turn this playbook into owner-level assignments and export briefings.",
+        href: appendSearchParamsToRoute("/operations/plan", resolvedSearchParams),
+      }}
       structuredData={JSON.stringify(structuredData)}
       historicalBanner={
         historicalSelection ? (
