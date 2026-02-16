@@ -76,6 +76,13 @@ export default async function OperationsPage({
       emphasis: "secondary",
     },
   ];
+  const roleOptions = [
+    { key: "all", label: "Cross-functional" },
+    { key: "product", label: "Product lead" },
+    { key: "engineering", label: "Eng lead" },
+    { key: "finance", label: "Finance partner" },
+  ] as const;
+  type RoleKey = (typeof roleOptions)[number]["key"];
   const structuredData = {
     "@context": "https://schema.org",
     "@graph": [
@@ -167,6 +174,33 @@ export default async function OperationsPage({
     { id: "export", label: "Export brief", href: buildTimeMachineHref("/operations/briefings", historicalSelection), status: "upcoming" as const },
   ];
 
+  const requestedRole = resolvedSearchParams?.role;
+  const activeRole: RoleKey =
+    roleOptions.some((option) => option.key === requestedRole)
+      ? (requestedRole as RoleKey)
+      : "all";
+  const buildRoleHref = (role: RoleKey) => {
+    const params = new URLSearchParams();
+    if (resolvedSearchParams) {
+      Object.entries(resolvedSearchParams).forEach(([key, value]) => {
+        if (value && key !== "role") {
+          params.set(key, value);
+        }
+      });
+    }
+    if (role !== "all") {
+      params.set("role", role);
+    }
+    const query = params.toString();
+    return query ? `/operations?${query}` : "/operations";
+  };
+  const roleQuickSteps =
+    activeRole === "engineering"
+      ? [quickSteps[0], { ...quickSteps[1], title: "Next: assign engineering owners" }, quickSteps[2]]
+      : activeRole === "finance"
+        ? [{ ...quickSteps[0], title: "Now: set budget posture" }, quickSteps[1], quickSteps[2]]
+        : quickSteps;
+
   return (
     <ReportShell
       statusLabel={statusLabel}
@@ -198,8 +232,20 @@ export default async function OperationsPage({
       }}
       actionSequence={{
         title: "Execution sequence",
-        items: quickSteps.map((step) => ({ title: step.title, detail: step.detail, href: step.href, cta: step.cta })),
+        items: roleQuickSteps.map((step) => ({ title: step.title, detail: step.detail, href: step.href, cta: step.cta })),
       }}
+      roleSwitcher={{
+        active: activeRole,
+        options: roleOptions.map((role) => ({
+          key: role.key,
+          label: role.label,
+          href: buildRoleHref(role.key),
+        })),
+      }}
+      decisionDiffs={[
+        { label: "Up from last week", tone: "positive" },
+        { label: `Trust: ${trustStatusLabel}`, tone: trustStatusTone === "stable" ? "positive" : "warning" },
+      ]}
       structuredData={JSON.stringify(structuredData)}
       historicalBanner={
         historicalSelection ? (
