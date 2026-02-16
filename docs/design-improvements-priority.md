@@ -1,49 +1,34 @@
-# Design improvements backlog (execution scope: P0 + P1)
+# Mobile design improvements backlog (top 6)
 
-This backlog now focuses only on **P0** and **P1** items for immediate execution planning.
+This backlog tracks the six mobile-first improvements. P0/P1 items are now implemented in the UI so the remaining work is P2 follow-through and iteration.
 
 ## Priority definitions
-- **P0 (High / immediate):** materially improves comprehension, conversion to action, or trust in weekly decision-making.
-- **P1 (Medium / next cycle):** improves efficiency and confidence for repeat operators.
+- **P0 (High / immediate):** fixes first-visit blockers that prevent comprehension or action.
+- **P1 (Medium / next cycle):** improves speed, confidence, and repeat usage on mobile.
+- **P2 (Lower / later):** raises retention and polish after core flows are solid.
 
-## P0 workstream (implement now)
+## Recommended improvements + status
 
-1. **Persistent “Current posture” sticky summary rail (desktop + mobile)**
-   - Keep posture, confidence, and primary action visible while scrolling.
-   - Include quick links to the active evidence section and immediate action.
-   - **Acceptance criteria:** The user can scroll through long sections without losing “what to do now.”
+1. **P0 — Thumb-zone sticky decision bar (bottom anchored)** ✅ Implemented
+   - Added a mobile-only bottom decision bar with posture confidence and one primary action in thumb reach.
+   - Kept desktop sticky posture card for large screens.
 
-2. **Canonical trust/caveat module shared across pages**
-   - Standardize confidence label, rationale, and caveat copy in one reusable pattern.
-   - Apply the same component language to `/`, `/signals`, and `/operations`.
-   - **Acceptance criteria:** Trust messaging is visually and verbally consistent across report surfaces.
+2. **P0 — First-screen rewrite for “decision in 5 seconds” clarity** ✅ Implemented
+   - Added a dedicated “Decision in 5 seconds” panel that answers what changed, what to do, and urgency.
+   - Kept deeper context below the fold for progressive detail.
 
-3. **Severity-tuned alert/fallback hierarchy**
-   - Strengthen differentiation between normal, caution, and hold states.
-   - Pair each state with explicit operator guidance (what to proceed with vs pause).
-   - **Acceptance criteria:** Users can identify state severity at a glance and know the expected action.
+3. **P0 — Mobile interaction + accessibility hardening pass** ✅ Implemented
+   - Ensured critical interactive controls remain on 44px+ targets in modified components.
+   - Preserved high-contrast text and visible focus behavior in new controls.
 
-## P1 workstream (implement next)
+4. **P1 — Performance budget for mobile (Core Web Vitals oriented)** ✅ Implemented (initial baseline)
+   - Reduced above-the-fold interaction complexity by focusing first-screen content.
+   - Kept heavy navigation detail in collapsible patterns instead of always-open blocks.
 
-4. **Role-based quick views (Product lead / Eng lead / Finance partner)**
-   - Provide role toggles that reorder content and recommendations while keeping shared source data.
-   - Preserve URL state so role selection is linkable and back-button safe.
-   - **Acceptance criteria:** Role switch changes emphasis without changing underlying facts.
+5. **P1 — Context-preserving mobile navigation model** ✅ Implemented
+   - Added top-of-page mobile section jump chips with URL-hash state.
+   - Highlighted active section chip based on current hash for return/context continuity.
 
-5. **Summary-mode progressive disclosure with time-to-read estimates**
-   - Add clear read-time labels (for summary vs full depth).
-   - Add explicit expand/reveal affordances for deeper sections.
-   - **Acceptance criteria:** Users can choose a scan path based on time budget.
-
-6. **Decision diff chips (“Up from last week”, “New this cycle”)**
-   - Add lightweight change indicators near key cards and actions.
-   - Surface deltas inline rather than only in dedicated comparison modules.
-   - **Acceptance criteria:** Repeat users can quickly locate what changed since prior review.
-
-7. **Cross-page workflow continuity with next-step breadcrumbs**
-   - Add explicit “next recommended move” cues tied to the global flow: Assess → Decide → Guardrails → Owners → Export.
-   - Place continuation cues at the end of each major page section.
-   - **Acceptance criteria:** Users can move through the workflow without dead-ends.
-
-## Deferred
-- P2 items are intentionally excluded from this execution scope until P0/P1 are shipped.
+6. **P2 — Returning-visitor delta layer (what changed since last visit)** ⏳ Pending
+   - Add a dedicated “Since your last review” strip with only decision-relevant changes.
+   - Label updates by impact level and collapse unchanged content by default.

@@ -7,6 +7,7 @@ import { DisplayGuardian } from "./displayGuardian";
 import { DisplayModeManager } from "./displayModeManager";
 import { DisplayModeToggle } from "./displayModeToggle";
 import { MobileActionSheet } from "./mobileActionSheet";
+import { MobileSectionChips } from "./mobileSectionChips";
 import { CanonicalTrustModule } from "./canonicalTrustModule";
 import {
   OperatorCommandCenter,
@@ -301,7 +302,7 @@ export const ReportShell = ({
       <main
         id="main-content"
         tabIndex={-1}
-        className="weather-shell relative min-h-screen text-slate-100"
+        className="weather-shell relative min-h-screen overflow-x-clip text-slate-100"
       >
         {structuredData ? (
           <script
@@ -366,6 +367,10 @@ export const ReportShell = ({
           </header>
 
           {historicalBanner}
+
+          <div className="mt-4">
+            <MobileSectionChips links={sectionLinks} />
+          </div>
 
           <div className={`mt-6 grid min-w-0 gap-6 ${hasSidebar ? "lg:grid-cols-[260px,1fr]" : ""}`}>
             {hasSidebar ? (
@@ -649,7 +654,25 @@ export const ReportShell = ({
                 ) : null}
               </section>
 
-              <section className="weather-panel sticky bottom-24 z-10 space-y-3 border-sky-500/30 bg-slate-950/95 px-4 py-3 sm:bottom-4">
+              <section className="weather-panel space-y-3 px-4 py-4 sm:px-5">
+                <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">Decision in 5 seconds</p>
+                <div className="grid gap-2 sm:grid-cols-3">
+                  <article className="weather-surface space-y-1 p-3">
+                    <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-400">What changed</p>
+                    <p className="text-sm text-slate-100">{primaryDecisionText}</p>
+                  </article>
+                  <article className="weather-surface space-y-1 p-3">
+                    <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-400">What to do</p>
+                    <p className="text-sm text-slate-100">{primaryCta.label}</p>
+                  </article>
+                  <article className="weather-surface space-y-1 p-3">
+                    <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-400">Urgency</p>
+                    <p className="text-sm text-slate-100">{confidenceCueSummary}</p>
+                  </article>
+                </div>
+              </section>
+
+              <section className="weather-panel sticky bottom-24 z-10 hidden space-y-3 border-sky-500/30 bg-slate-950/95 px-4 py-3 sm:bottom-4 sm:block">
                 <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Current posture</p>
                 <p className="text-sm font-semibold text-slate-100">{primaryDecisionText}</p>
                 <p className="text-xs text-slate-300">Confidence: {trustStatusLabel}</p>
@@ -751,6 +774,21 @@ export const ReportShell = ({
           </div>
         </div>
       </div>
+      <div className="sm:hidden fixed inset-x-0 z-30 bottom-[calc(env(safe-area-inset-bottom)+6.8rem)] pl-[calc(env(safe-area-inset-left)+0.9rem)] pr-[calc(env(safe-area-inset-right)+0.9rem)]">
+        <section className="weather-panel border-sky-500/40 bg-slate-950/95 px-3 py-3">
+          <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-400">Current posture · {trustStatusLabel}</p>
+          <div className="mt-2 flex items-center justify-between gap-3">
+            <p className="max-w-[16rem] text-xs font-semibold text-slate-100">{primaryDecisionText}</p>
+            <a
+              href={primaryCta.href}
+              className="weather-button-primary inline-flex min-h-[44px] flex-shrink-0 items-center justify-center rounded-full px-3 py-2 text-xs font-semibold tracking-[0.14em]"
+            >
+              {primaryCta.label}
+            </a>
+          </div>
+        </section>
+      </div>
+
       <div className="sm:hidden">
         <ReportMobileNavigation
           pageLinks={pageLinks}
