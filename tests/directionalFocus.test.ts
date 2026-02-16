@@ -38,7 +38,23 @@ describe("getNextDirectionalIndex", () => {
       wrap: true,
     });
 
-    assert.equal(result, 1);
+    assert.equal(result, 3);
+  });
+
+  it("wraps away from the current item when it shares the extreme edge", () => {
+    const result = getNextDirectionalIndex({
+      currentIndex: 1,
+      rects: [
+        { top: 0, left: 0, right: 100, bottom: 100 },
+        { top: 0, left: 120, right: 220, bottom: 100 },
+        { top: 120, left: 0, right: 100, bottom: 220 },
+        { top: 120, left: 120, right: 220, bottom: 220 },
+      ],
+      direction: "right",
+      wrap: true,
+    });
+
+    assert.equal(result, 3);
   });
 
   it("returns -1 when direction has no target and wrap is off", () => {
