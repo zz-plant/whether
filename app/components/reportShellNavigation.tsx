@@ -290,7 +290,7 @@ export const ReportMobileNavigation = ({
       return;
     }
 
-    handleDirectionalFocus(event, navigationRootRef.current);
+    handleDirectionalFocus(event, navigationRootRef.current, { wrap: true });
   };
 
   return (

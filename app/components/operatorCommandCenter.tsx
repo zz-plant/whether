@@ -62,7 +62,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
       return;
     }
 
-    handleDirectionalFocus(event, commandCenterRef.current);
+    handleDirectionalFocus(event, commandCenterRef.current, { wrap: true });
   };
 
   useEffect(() => {
@@ -120,10 +120,35 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
       if (event.key === "Escape" && document.activeElement === searchInputRef.current) {
         setQuery("");
       }
+
+      if (event.key === "Backspace" && document.activeElement === searchInputRef.current && query.length === 0) {
+        setIsExpanded(false);
+      }
     };
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
+  }, [isExpanded, query.length]);
+
+  useEffect(() => {
+    if (!isExpanded || !commandCenterRef.current) {
+      return;
+    }
+
+    const isTvMode = document.documentElement.dataset.displayMode === "tv";
+    if (!isTvMode) {
+      return;
+    }
+
+    const activeElement = document.activeElement;
+    if (activeElement && commandCenterRef.current.contains(activeElement)) {
+      return;
+    }
+
+    const firstFocusable = commandCenterRef.current.querySelector<HTMLElement>(
+      'button:not([disabled]), a[href], input:not([disabled]), [tabindex]:not([tabindex="-1"])',
+    );
+    firstFocusable?.focus();
   }, [isExpanded]);
 
   const groupedActions = useMemo(() => {
