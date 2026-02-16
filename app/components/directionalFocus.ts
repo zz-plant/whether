@@ -28,6 +28,38 @@ const directionMap: Record<string, FocusDirection | null> = {
 const centerX = (rect: FocusRect) => (rect.left + rect.right) / 2;
 const centerY = (rect: FocusRect) => (rect.top + rect.bottom) / 2;
 
+const getWrappedAxisDelta = (current: FocusRect, candidate: FocusRect, direction: FocusDirection) => {
+  if (direction === "up" || direction === "down") {
+    return Math.abs(centerX(candidate) - centerX(current));
+  }
+
+  return Math.abs(centerY(candidate) - centerY(current));
+};
+
+const getEdgeValue = (rect: FocusRect, direction: FocusDirection) => {
+  if (direction === "up") {
+    return rect.top;
+  }
+
+  if (direction === "down") {
+    return rect.bottom;
+  }
+
+  if (direction === "left") {
+    return rect.left;
+  }
+
+  return rect.right;
+};
+
+const isMoreExtreme = (candidate: number, selected: number, direction: FocusDirection) => {
+  if (direction === "up" || direction === "left") {
+    return candidate < selected;
+  }
+
+  return candidate > selected;
+};
+
 const isVisible = (element: HTMLElement) => {
   const style = window.getComputedStyle(element);
   return style.display !== "none" && style.visibility !== "hidden";
@@ -116,20 +148,50 @@ export const getNextDirectionalIndex = ({
   if (bestIndex >= 0 || !wrap) {
     return bestIndex;
   }
+  let targetEdge = getEdgeValue(rects[0], direction);
 
-  if (direction === "up") {
-    return rects.reduce((selected, rect, index) => (rect.top < rects[selected].top ? index : selected), 0);
-  }
+  rects.forEach((rect) => {
+    const edge = getEdgeValue(rect, direction);
+    if (isMoreExtreme(edge, targetEdge, direction)) {
+      targetEdge = edge;
+    }
+  });
 
-  if (direction === "down") {
-    return rects.reduce((selected, rect, index) => (rect.bottom > rects[selected].bottom ? index : selected), 0);
-  }
+  const edgeCandidates = rects
+    .map((rect, index) => ({ index, rect }))
+    .filter(({ rect }) => getEdgeValue(rect, direction) === targetEdge);
+  const nonCurrentCandidates = edgeCandidates.filter(({ index }) => index !== currentIndex);
+  const candidates = nonCurrentCandidates.length > 0 ? nonCurrentCandidates : edgeCandidates;
 
-  if (direction === "left") {
-    return rects.reduce((selected, rect, index) => (rect.left < rects[selected].left ? index : selected), 0);
-  }
+  const bestWrappedTarget = candidates.reduce((selected, candidate) => {
+    const selectedDelta = getWrappedAxisDelta(currentRect, selected.rect, direction);
+    const candidateDelta = getWrappedAxisDelta(currentRect, candidate.rect, direction);
 
-  return rects.reduce((selected, rect, index) => (rect.right > rects[selected].right ? index : selected), 0);
+    if (candidateDelta < selectedDelta) {
+      return candidate;
+    }
+
+    if (candidateDelta > selectedDelta) {
+      return selected;
+    }
+
+    const selectedDistance = Math.hypot(
+      centerX(selected.rect) - centerX(currentRect),
+      centerY(selected.rect) - centerY(currentRect),
+    );
+    const candidateDistance = Math.hypot(
+      centerX(candidate.rect) - centerX(currentRect),
+      centerY(candidate.rect) - centerY(currentRect),
+    );
+
+    if (candidateDistance < selectedDistance) {
+      return candidate;
+    }
+
+    return selected;
+  });
+
+  return bestWrappedTarget?.index ?? -1;
 };
 
 export const handleDirectionalFocus = (
