@@ -44,6 +44,8 @@ This starts a stdio MCP server with tools:
   - returns the same structured agent brief as `/api/agent`
 - `list_agent_skills()`
   - returns the current Whether skill contract used in payloads
+- `pull_recent_site_info(cadence?, siteUrl?)`
+  - fetches the latest `/api/agent` payload from the site so an agent can pull recent live context
 
 ### Example MCP client config (shape)
 

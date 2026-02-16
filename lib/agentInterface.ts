@@ -5,6 +5,7 @@ import { buildMonthlySummary } from "./summary/monthlySummary";
 import { buildQuarterlySummary, getQuarterLabel } from "./summary/quarterlySummary";
 import { buildWeeklySummary } from "./summary/weeklySummary";
 import { buildYearlySummary, getYearLabel } from "./summary/yearlySummary";
+import { resolveSiteUrl } from "./siteUrl";
 
 export const supportedAgentCadences = ["weekly", "monthly", "quarterly", "yearly"] as const;
 
@@ -60,5 +61,41 @@ export const buildAgentInterfaceResponse = async (cadence: AgentCadence) => {
     summaryHash: cadence === "weekly" || cadence === "monthly" ? buildSummaryHash(summary) : null,
     generatedAt: new Date().toISOString(),
     version: "v1",
+  };
+};
+
+interface PullRecentSiteInfoOptions {
+  cadence?: AgentCadence;
+  siteBaseUrl?: string;
+  fetchImpl?: typeof fetch;
+}
+
+export const pullRecentSiteInfo = async ({
+  cadence = "weekly",
+  siteBaseUrl,
+  fetchImpl = fetch,
+}: PullRecentSiteInfoOptions = {}) => {
+  const baseUrl = resolveSiteUrl(siteBaseUrl ?? process.env.NEXT_PUBLIC_SITE_URL);
+  const endpoint = new URL("/api/agent", baseUrl);
+  endpoint.searchParams.set("cadence", cadence);
+
+  const response = await fetchImpl(endpoint.toString(), {
+    headers: {
+      accept: "application/json",
+    },
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `Unable to pull recent site info from ${endpoint.toString()} (status ${response.status}).`
+    );
+  }
+
+  return {
+    siteUrl: baseUrl,
+    endpoint: endpoint.toString(),
+    cadence,
+    payload: await response.json(),
   };
 };
