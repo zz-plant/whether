@@ -187,7 +187,7 @@ export default function FormulasPage() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
-      <div className="mx-auto max-w-4xl px-6 py-12">
+      <div className="mx-auto max-w-6xl px-6 py-12">
         <header className="space-y-4">
           <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Method notes</p>
           <h1 className="text-3xl font-semibold text-slate-100">Methodology</h1>
@@ -196,6 +196,32 @@ export default function FormulasPage() {
             deterministic and traceable.
           </p>
         </header>
+
+        <section className="mt-6 weather-panel p-5" aria-label="Reference mode context">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Reference mode</p>
+              <p className="text-sm text-slate-300">
+                You are in a source-of-truth workspace. Use this page for audit-ready formulas, then return to
+                operational surfaces to apply decisions.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href="/"
+                className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+              >
+                Weekly briefing
+              </Link>
+              <Link
+                href="/signals"
+                className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+              >
+                Signal evidence
+              </Link>
+            </div>
+          </div>
+        </section>
 
         <div className="mt-6 weather-panel p-5">
           <div className="grid gap-4 lg:grid-cols-[1.2fr,0.8fr]">

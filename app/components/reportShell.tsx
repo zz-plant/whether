@@ -262,6 +262,12 @@ export const ReportShell = ({
   const primaryDecisionText =
     decisionBanner?.decision ??
     (/^start\b/i.test(primaryCta.label) ? `${primaryCta.label}.` : `Start with ${primaryCta.label}.`);
+  const confidenceCueSummary =
+    trustStatusTone === "warning"
+      ? "Use cached readings with caution."
+      : trustStatusTone === "historical"
+        ? "Historical snapshot for retrospective planning."
+        : "Live signals verified for this cycle.";
 
   return (
     <>
@@ -472,8 +478,23 @@ export const ReportShell = ({
                 <p className={`inline-flex items-center gap-2 text-xs leading-relaxed ${trustLabelTone}`}>
                   <span className="font-semibold tracking-[0.14em]">Confidence cue</span>
                   <span aria-hidden="true">{trustStatusTone === "warning" ? "⚠" : trustStatusTone === "historical" ? "⏱" : "✓"}</span>
-                  <span>{trustStatusLabel}: {trustStatusAction}</span>
+                  <span>{trustStatusLabel}: {confidenceCueSummary}</span>
                 </p>
+                <details className="rounded-2xl border border-slate-800/80 bg-slate-950/40 px-4 py-3">
+                  <summary className="inline-flex min-h-[44px] w-full cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.14em] text-slate-300 marker:content-none">
+                    Why this confidence level
+                    <span
+                      aria-hidden="true"
+                      className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-300"
+                    >
+                      ⌄
+                    </span>
+                  </summary>
+                  <div className="grid gap-2 pt-2 text-xs leading-relaxed text-slate-300">
+                    <p>{trustStatusDetail}</p>
+                    <p>{trustStatusAction}</p>
+                  </div>
+                </details>
                 {showOfflineBadge ? (
                   <p className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.14em] text-amber-100">
                     {offlineBadgeLabel}
@@ -586,8 +607,6 @@ export const ReportShell = ({
                 </section>
               ) : null}
 
-              <OperatorCommandCenter actions={commandActions} />
-
             {!hasSidebar ? (
               <section className="space-y-4">
                 <div className="grid gap-4 lg:grid-cols-2">
@@ -614,6 +633,8 @@ export const ReportShell = ({
                 );
               })}
             </div>
+
+            <OperatorCommandCenter actions={commandActions} />
 
             <footer className="mt-12 border-t border-slate-800/70 pt-6 text-xs font-semibold tracking-[0.18em] text-slate-400">
               Not financial, legal, or investment advice.

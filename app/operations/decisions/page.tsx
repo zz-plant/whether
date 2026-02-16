@@ -91,6 +91,39 @@ export default async function OperationsDecisionsPage({
       currentPath="/operations/decisions"
       pageSummary="Run decision guardrails, lock assumptions, and capture counterfactuals."
       pageSummaryLink={{ href: "#ops-decision-shield", label: "Explore details →" }}
+      primaryCta={{ href: "#ops-decision-shield", label: "Run decision shield" }}
+      secondaryCta={{ href: "#ops-assumption-locking", label: "Lock assumptions" }}
+      decisionBanner={{
+        label: "Validate now",
+        decision: "Pressure-test this week's commitments before execution.",
+        horizon: "This week",
+        confidence: trustStatusLabel,
+        effectiveDate: recordDateLabel,
+        evidenceHref: "#ops-decision-shield",
+      }}
+      actionSequence={{
+        title: "Decision sequence",
+        items: [
+          {
+            title: "Run decision shield",
+            detail: "Check each move against regime guardrails.",
+            href: "#ops-decision-shield",
+            cta: "Open shield",
+          },
+          {
+            title: "Lock assumptions",
+            detail: "Document risk stance, tolerance, and posture.",
+            href: "#ops-assumption-locking",
+            cta: "Open assumptions",
+          },
+          {
+            title: "Record decision memory",
+            detail: "Capture rationale for faster future reviews.",
+            href: "#ops-decision-memory",
+            cta: "Open memory",
+          },
+        ],
+      }}
       pageLinks={reportPageLinks}
       sectionLinks={operationsSectionLinks.decisions}
       structuredData={JSON.stringify(structuredData)}
