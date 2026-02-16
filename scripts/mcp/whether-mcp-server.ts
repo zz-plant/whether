@@ -3,6 +3,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import {
   buildAgentInterfaceResponse,
+  pullRecentSiteInfo,
   supportedAgentCadences,
   type AgentCadence,
 } from "../../lib/agentInterface";
@@ -47,6 +48,30 @@ server.tool(
       },
     ],
   })
+);
+
+server.tool(
+  "pull_recent_site_info",
+  "Pull the latest Whether site agent brief from /api/agent so downstream agents can use fresh site context.",
+  {
+    cadence: cadenceSchema.default("weekly"),
+    siteUrl: z.string().optional(),
+  },
+  async ({ cadence, siteUrl }) => {
+    const recentInfo = await pullRecentSiteInfo({
+      cadence: cadence as AgentCadence,
+      siteBaseUrl: siteUrl,
+    });
+
+    return {
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify(recentInfo, null, 2),
+        },
+      ],
+    };
+  }
 );
 
 const transport = new StdioServerTransport();
