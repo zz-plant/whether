@@ -90,6 +90,39 @@ export default async function OperationsBriefingsPage({
       currentPath="/operations/briefings"
       pageSummary="Draft strategy narratives and export leadership-ready briefing kits."
       pageSummaryLink={{ href: "#ops-strategy-brief", label: "Explore details →" }}
+      primaryCta={{ href: "#ops-strategy-brief", label: "Draft strategy brief" }}
+      secondaryCta={{ href: "#ops-export-briefs", label: "Export briefing kit" }}
+      decisionBanner={{
+        label: "Narrate now",
+        decision: "Turn the regime signal into a board-ready story.",
+        horizon: "Exec review",
+        confidence: trustStatusLabel,
+        effectiveDate: recordDateLabel,
+        evidenceHref: "#ops-strategy-brief",
+      }}
+      actionSequence={{
+        title: "Briefing sequence",
+        items: [
+          {
+            title: "Draft strategy brief",
+            detail: "Frame posture, risks, and recommended moves.",
+            href: "#ops-strategy-brief",
+            cta: "Open strategy brief",
+          },
+          {
+            title: "Export briefing kit",
+            detail: "Prepare leadership-ready distribution formats.",
+            href: "#ops-export-briefs",
+            cta: "Open exports",
+          },
+          {
+            title: "Customize executive briefing",
+            detail: "Tailor the narrative for stakeholder context.",
+            href: "#ops-executive-briefing",
+            cta: "Open executive briefing",
+          },
+        ],
+      }}
       pageLinks={reportPageLinks}
       sectionLinks={operationsSectionLinks.briefings}
       structuredData={JSON.stringify(structuredData)}

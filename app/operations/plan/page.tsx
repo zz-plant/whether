@@ -96,6 +96,39 @@ export default async function OperationsPlanPage({
       currentPath="/operations/plan"
       pageSummary="Review the monthly summary and align the execution playbook for this cycle."
       pageSummaryLink={{ href: "#ops-playbook", label: "Explore details →" }}
+      primaryCta={{ href: "#ops-monthly-action-summary", label: "Review monthly summary" }}
+      secondaryCta={{ href: "#ops-playbook", label: "Open execution playbook" }}
+      decisionBanner={{
+        label: "Align now",
+        decision: "Translate the regime into an execution-ready monthly plan.",
+        horizon: "This month",
+        confidence: trustStatusLabel,
+        effectiveDate: recordDateLabel,
+        evidenceHref: "#ops-monthly-action-summary",
+      }}
+      actionSequence={{
+        title: "Planning sequence",
+        items: [
+          {
+            title: "Review monthly summary",
+            detail: "Confirm posture and priorities for this cycle.",
+            href: "#ops-monthly-action-summary",
+            cta: "Open summary",
+          },
+          {
+            title: "Apply playbook moves",
+            detail: "Choose start, stop, and fence actions.",
+            href: "#ops-playbook",
+            cta: "Open playbook",
+          },
+          {
+            title: "Sync finance strategy",
+            detail: "Check funding signals before commitments.",
+            href: "#ops-finance-strategy",
+            cta: "Open finance strategy",
+          },
+        ],
+      }}
       pageLinks={reportPageLinks}
       sectionLinks={operationsSectionLinks.plan}
       structuredData={JSON.stringify(structuredData)}
