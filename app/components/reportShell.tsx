@@ -21,6 +21,8 @@ import {
 } from "./reportShellNavigation";
 import { type ReportStageItem } from "./reportRevampElements";
 
+const MOBILE_NAVIGATION_STACK_OFFSET_REM = 10.5;
+
 export const ReportShell = ({
   children,
   statusLabel,
@@ -774,7 +776,12 @@ export const ReportShell = ({
           </div>
         </div>
       </div>
-      <div className="sm:hidden fixed inset-x-0 z-30 bottom-[calc(env(safe-area-inset-bottom)+6.8rem)] pl-[calc(env(safe-area-inset-left)+0.9rem)] pr-[calc(env(safe-area-inset-right)+0.9rem)]">
+      <div
+        className="sm:hidden fixed inset-x-0 z-30 pl-[calc(env(safe-area-inset-left)+0.9rem)] pr-[calc(env(safe-area-inset-right)+0.9rem)]"
+        style={{
+          bottom: `calc(env(safe-area-inset-bottom) + ${MOBILE_NAVIGATION_STACK_OFFSET_REM}rem)`,
+        }}
+      >
         <section className="weather-panel border-sky-500/40 bg-slate-950/95 px-3 py-3">
           <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-400">Current posture · {trustStatusLabel}</p>
           <div className="mt-2 flex items-center justify-between gap-3">
