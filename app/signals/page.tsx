@@ -16,6 +16,7 @@ import { TimeMachinePanel } from "./components/timeMachinePanel";
 import { RegimeTimelinePanel } from "./components/regimeTimelinePanel";
 import { reportPageLinks } from "../../lib/report/reportNavigation";
 import { appendSearchParamsToRoute } from "../../lib/navigation/routeSearchParams";
+import { ReturningVisitorDeltaStrip } from "../components/changeSinceLastReadPanel";
 
 export const runtime = "edge";
 
@@ -256,6 +257,44 @@ export default async function SignalsPage({
         ) : null
       }
     >
+      <ReturningVisitorDeltaStrip
+        assessment={assessment}
+        recordDate={treasury.record_date}
+        impactLinks={[
+          { label: "Tightness", href: "#regime-timeline", metric: "tightness" },
+          { label: "Risk appetite", href: "#macro-signals", metric: "riskAppetite" },
+          { label: "Base rate", href: "#sensor-array", metric: "baseRate" },
+        ]}
+        openPanelHref="#time-machine"
+      />
+
+      <section className="weather-panel space-y-4 px-6 py-5" aria-label="Suggested scan order">
+        <div>
+          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Suggested scan order</p>
+          <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
+            Run this 3-step check before opening advanced controls.
+          </h2>
+        </div>
+        <ol className="grid gap-3 md:grid-cols-3">
+          {[
+            { title: "1. Regime timeline", href: "#regime-timeline", helper: "Understand sequence shifts first." },
+            { title: "2. Key thresholds", href: "#thresholds", helper: "Confirm guardrails still match risk tolerance." },
+            { title: "3. Live sensor feed", href: "#sensor-array", helper: "Validate live readings before decisions." },
+          ].map((item) => (
+            <li key={item.title} className="weather-surface flex h-full flex-col gap-3 p-4">
+              <p className="text-sm font-semibold text-slate-100">{item.title}</p>
+              <p className="text-xs text-slate-400">Why this matters: {item.helper}</p>
+              <a
+                href={item.href}
+                className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+              >
+                Open step
+              </a>
+            </li>
+          ))}
+        </ol>
+      </section>
+
       <section className="weather-panel space-y-4 px-6 py-5" aria-labelledby="signal-focus-title">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -313,6 +352,7 @@ export default async function SignalsPage({
             </p>
             <p className="text-lg font-semibold text-slate-100">{regimeLabel}</p>
             <p className="text-sm text-slate-300">{assessment.description}</p>
+            <p className="text-xs text-slate-400">Why this matters: this sets the risk posture for near-term operating bets.</p>
           </div>
           <div className="weather-surface space-y-2 p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
@@ -332,6 +372,7 @@ export default async function SignalsPage({
             <p className="text-xs text-slate-400">
               Confirm the base rate and curve slope before you brief leadership.
             </p>
+            <p className="text-xs text-slate-400">Why this matters: these two scores drive whether teams should preserve cash or accelerate.</p>
           </div>
           <div className="weather-surface space-y-2 p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
@@ -348,6 +389,7 @@ export default async function SignalsPage({
                 </li>
               ))}
             </ul>
+            <p className="text-xs text-slate-400">Why this matters: clear constraints reduce rework during weekly planning.</p>
           </div>
         </div>
       </section>

@@ -372,12 +372,39 @@ export const ChangeSinceLastReadPanel = ({
   );
 };
 
+type DeltaMetricKey = "tightness" | "riskAppetite" | "baseRate";
+
+const getDeltaValueForMetric = ({
+  metric,
+  current,
+  previous,
+}: {
+  metric: DeltaMetricKey;
+  current: RegimeAssessment;
+  previous: RegimeAssessment;
+}) => {
+  switch (metric) {
+    case "tightness":
+      return Math.abs(current.scores.tightness - previous.scores.tightness);
+    case "riskAppetite":
+      return Math.abs(current.scores.riskAppetite - previous.scores.riskAppetite);
+    case "baseRate":
+      return Math.abs(current.scores.baseRate - previous.scores.baseRate);
+    default:
+      return 0;
+  }
+};
+
 export const ReturningVisitorDeltaStrip = ({
   assessment,
   recordDate,
+  impactLinks,
+  openPanelHref = "#change-since-last-read",
 }: {
   assessment: RegimeAssessment;
   recordDate: string;
+  impactLinks?: Array<{ label: string; href: string; metric: DeltaMetricKey }>;
+  openPanelHref?: string;
 }) => {
   const [previous, setPrevious] = useState<LastReadSnapshot | null>(null);
 
@@ -405,23 +432,22 @@ export const ReturningVisitorDeltaStrip = ({
     return null;
   }
 
-  const impactItems = [
-    {
-      label: "Tightness",
-      delta: Math.abs(assessment.scores.tightness - previous.assessment.scores.tightness),
-      href: "#weekly-action-summary",
-    },
-    {
-      label: "Risk appetite",
-      delta: Math.abs(assessment.scores.riskAppetite - previous.assessment.scores.riskAppetite),
-      href: "#executive-snapshot",
-    },
-    {
-      label: "Base rate",
-      delta: Math.abs(assessment.scores.baseRate - previous.assessment.scores.baseRate),
-      href: "#signal-matrix",
-    },
-  ]
+  const defaultImpactLinks = [
+    { label: "Tightness", href: "#weekly-action-summary", metric: "tightness" as const },
+    { label: "Risk appetite", href: "#executive-snapshot", metric: "riskAppetite" as const },
+    { label: "Base rate", href: "#signal-matrix", metric: "baseRate" as const },
+  ];
+  const configuredImpactLinks = impactLinks && impactLinks.length > 0 ? impactLinks : defaultImpactLinks;
+
+  const impactItems = configuredImpactLinks
+    .map((item) => ({
+      ...item,
+      delta: getDeltaValueForMetric({
+        metric: item.metric,
+        current: assessment,
+        previous: previous.assessment,
+      }),
+    }))
     .map((item) => ({ ...item, tone: getImpactTone(item.delta) }))
     .sort((left, right) => right.delta - left.delta)
     .slice(0, 3);
@@ -442,7 +468,7 @@ export const ReturningVisitorDeltaStrip = ({
           </p>
         </div>
         <a
-          href="#change-since-last-read"
+          href={openPanelHref}
           className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
         >
           Open full delta panel
