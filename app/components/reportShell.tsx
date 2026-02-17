@@ -140,6 +140,10 @@ export const ReportShell = ({
     trustStatusTone === "warning"
       ? "border-amber-300/80 bg-amber-500/15 text-amber-100"
       : "text-slate-200";
+  const heroHeaderSpacingClassName = "space-y-4 sm:space-y-5";
+  const heroSectionSpacingClassName = "weather-panel-static min-w-0 space-y-5 px-4 py-5 sm:space-y-6 sm:px-5";
+  const disclosureSummaryClassName =
+    "weather-chip inline-flex min-h-[44px] w-full cursor-pointer list-none items-center justify-between gap-3 border-slate-600/80 px-3 py-2 text-xs font-semibold tracking-[0.16em] marker:content-none";
   const overviewPanel = (
     <section className="weather-panel space-y-3 px-4 py-4">
       <p className="text-xs font-semibold tracking-[0.16em] text-slate-400">Snapshot</p>
@@ -223,15 +227,6 @@ export const ReportShell = ({
     });
   }
 
-  if (exportCta) {
-    commandActionCandidates.push({
-      href: exportCta.href,
-      label: exportCta.label,
-      description: "Export brief",
-      keywords: ["copy", "share", "brief", "leadership"],
-      group: "Playbook",
-    });
-  }
 
   commandActionCandidates.push(
     ...pageLinks.map<OperatorCommandAction>((page) => ({
@@ -393,8 +388,8 @@ export const ReportShell = ({
             ) : null}
 
             <div className="order-1 min-w-0 space-y-10 lg:order-none lg:space-y-12">
-              <section className="weather-panel-static min-w-0 space-y-4 px-4 py-5 sm:px-5">
-                <div className="space-y-3">
+              <section className={heroSectionSpacingClassName}>
+                <div className={heroHeaderSpacingClassName}>
                   {roleSwitcher ? (
                     <div className="space-y-2">
                       <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Role view</p>
@@ -432,7 +427,7 @@ export const ReportShell = ({
                         {summaryLink}
                       </p>
                       <details className="group sm:hidden">
-                        <summary className={`weather-chip inline-flex min-h-[44px] w-full cursor-pointer list-none items-center justify-between gap-3 px-3 py-2 text-xs font-semibold tracking-[0.16em] marker:content-none ${mobileStatusSummaryToneClass}`}>
+                        <summary className={`${disclosureSummaryClassName} ${mobileStatusSummaryToneClass}`}>
                           <span>Data status · {statusLabel}</span>
                           <span
                             aria-hidden="true"
@@ -449,7 +444,7 @@ export const ReportShell = ({
                               />
                             </svg>
                           </span>
-                          <span className="sr-only">Toggle data status details.</span>
+                          <span className="sr-only">Toggle data status details. Expanded when content is visible; collapsed when hidden.</span>
                         </summary>
                         <div className="mt-2 rounded-2xl border border-slate-800/70 bg-slate-950/70 px-3 py-3 text-xs text-slate-300">
                           <p>Signals stamped: {recordDateLabel}</p>
@@ -468,7 +463,7 @@ export const ReportShell = ({
                         {summaryLink}
                       </p>
                       <details className="group sm:hidden">
-                        <summary className={`weather-chip inline-flex min-h-[44px] w-full cursor-pointer list-none items-center justify-between gap-3 px-3 py-2 text-xs font-semibold tracking-[0.16em] marker:content-none ${mobileStatusSummaryToneClass}`}>
+                        <summary className={`${disclosureSummaryClassName} ${mobileStatusSummaryToneClass}`}>
                           <span>Data status · {statusLabel}</span>
                           <span
                             aria-hidden="true"
@@ -485,7 +480,7 @@ export const ReportShell = ({
                               />
                             </svg>
                           </span>
-                          <span className="sr-only">Toggle data status details.</span>
+                          <span className="sr-only">Toggle data status details. Expanded when content is visible; collapsed when hidden.</span>
                         </summary>
                         <div className="mt-2 rounded-2xl border border-slate-800/70 bg-slate-950/70 px-3 py-3 text-xs text-slate-300">
                           <p>Signals stamped: {recordDateLabel}</p>
@@ -519,7 +514,7 @@ export const ReportShell = ({
                       <MobileActionSheet
                         triggerLabel="More actions"
                         srHint="Open additional actions menu"
-                        actions={[{ href: exportCta.href, label: exportCta.label }]}
+                        actions={[{ href: exportCta.href, label: exportCta.label }, { href: "#operator-command-center", label: "Open command center" }]}
                       />
                     </div>
                   ) : null}
@@ -529,20 +524,21 @@ export const ReportShell = ({
                   <span aria-hidden="true">{trustStatusTone === "warning" ? "⚠" : trustStatusTone === "historical" ? "⏱" : "✓"}</span>
                   <span>{confidenceCueSummary}</span>
                 </p>
-                <details className="rounded-2xl border border-slate-800/80 bg-slate-950/40 px-4 py-3">
-                  <summary className="inline-flex min-h-[44px] w-full cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.14em] text-slate-300 marker:content-none">
+                <details className="group rounded-2xl border border-slate-700/90 bg-slate-950/50 px-4 py-3">
+                  <summary className="inline-flex min-h-[44px] w-full cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.14em] text-slate-200 marker:content-none">
                     Why this confidence level
                     <span
                       aria-hidden="true"
                       className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-300"
                     >
-                      ⌄
+                      <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 transition-transform duration-200 group-open:rotate-180" aria-hidden="true"><path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
                     </span>
                   </summary>
                   <div className="grid gap-2 pt-2 text-xs leading-relaxed text-slate-300">
                     <p>{trustStatusDetail}</p>
                     <p>{trustStatusAction}</p>
                   </div>
+                  <p className="sr-only">Expanded when confidence detail is visible; collapsed when hidden.</p>
                 </details>
                 {showOfflineBadge ? (
                   <p className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.14em] text-amber-100">
@@ -848,14 +844,6 @@ export const ReportShell = ({
               className="weather-pill inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
             >
               {secondaryCta.label}
-            </a>
-          ) : null}
-          {exportCta ? (
-            <a
-              href={exportCta.href}
-              className="weather-pill inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-            >
-              {exportCta.label}
             </a>
           ) : null}
           <a
