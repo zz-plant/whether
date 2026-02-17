@@ -44,7 +44,7 @@ export const ReportShell = ({
   pageNavVariant = "full",
   sidebarVariant = "full",
   primaryCta = { href: "#weekly-action-summary", label: "Start with this week" },
-  secondaryCta = { href: "#executive-snapshot", label: "See leadership summary" },
+  secondaryCta,
   exportCta = {
     href: "/operations/briefings#ops-export-briefs",
     label: "Copy-ready leadership brief",
@@ -279,8 +279,11 @@ export const ReportShell = ({
     decisionBanner?.confidenceScore ??
     (trustStatusTone === "stable" ? 84 : trustStatusTone === "warning" ? 58 : 66);
   const decisionHorizon = decisionBanner?.horizon ?? "Next 2 weeks";
-  const fallbackActionLabel = secondaryCta?.label ?? "Review evidence trail";
-  const fallbackActionHref = secondaryCta?.href ?? decisionBanner?.evidenceHref ?? "#signal-matrix";
+  const fallbackAction = secondaryCta
+    ? { href: secondaryCta.href, label: secondaryCta.label }
+    : decisionBanner?.evidenceHref
+      ? { href: decisionBanner.evidenceHref, label: "Review evidence trail" }
+      : null;
   const missionSupportText =
     trustStatusTone === "stable"
       ? trustStatusAction
@@ -687,12 +690,14 @@ export const ReportShell = ({
                     >
                       Primary action: {primaryCta.label}
                     </a>
-                    <a
-                      href={fallbackActionHref}
-                      className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-center text-xs font-semibold tracking-[0.12em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-                    >
-                      Fallback: {fallbackActionLabel}
-                    </a>
+                    {fallbackAction ? (
+                      <a
+                        href={fallbackAction.href}
+                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-center text-xs font-semibold tracking-[0.12em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                      >
+                        Fallback: {fallbackAction.label}
+                      </a>
+                    ) : null}
                   </div>
                 </article>
               </section>
