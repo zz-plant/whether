@@ -11,7 +11,7 @@ import {
   MacroSignalsPanel,
   SensorArray,
 } from "../components/reportSections";
-import { ThresholdsPanel } from "./components/thresholdsPanel";
+import { AdvancedThresholdsSection } from "./components/advancedThresholdsSection";
 import { TimeMachinePanel } from "./components/timeMachinePanel";
 import { RegimeTimelinePanel } from "./components/regimeTimelinePanel";
 import { reportPageLinks } from "../../lib/report/reportNavigation";
@@ -412,7 +412,10 @@ export default async function SignalsPage({
       {showMacroPanel ? <MacroSignalsPanel series={macroSeries} provenance={macroProvenance} /> : null}
 
       {showThresholds ? (
-        <ThresholdsPanel currentThresholds={assessment.thresholds} provenance={treasuryProvenance} />
+        <AdvancedThresholdsSection
+          currentThresholds={assessment.thresholds}
+          provenance={treasuryProvenance}
+        />
       ) : null}
 
       <TimeMachinePanel

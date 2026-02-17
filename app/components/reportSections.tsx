@@ -40,6 +40,7 @@ import { buildMonthlySummary, getMonthlyActionGuidance } from "../../lib/summary
 import { buildWeeklySummary, getWeeklyActionGuidance } from "../../lib/summary/weeklySummary";
 import { buildCadenceAlignment } from "../../lib/cadenceAlignment";
 import { formatDateUTC, formatTimestampUTC } from "../../lib/formatters";
+import { buildMacroPriorityScore, rankMacroSignalsByPriority } from "../../lib/macroPrioritization";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
 import { MonthlySummaryCard } from "./monthlySummaryCard";
 import { SummaryDeltaPanel } from "./summaryDeltaPanel";
@@ -2731,6 +2732,8 @@ export const MacroSignalsPanel = ({
   series: MacroSeriesReading[];
   provenance: DataProvenance;
 }) => {
+  const prioritizedSeries = useMemo(() => rankMacroSignalsByPriority(series), [series]);
+
   return (
     <section id="macro-signals" aria-labelledby="macro-signals-title" className="mt-10">
       <div className="weather-panel p-6">
@@ -2757,6 +2760,10 @@ export const MacroSignalsPanel = ({
           Use this expanded pack to validate the Treasury-led climate call against inflation,
           labor, and credit stress signals.
         </p>
+        <p className="mt-2 text-xs text-slate-400">
+          Cards are ranked by action impact × recency so the first scan surfaces the most urgent
+          checks.
+        </p>
       </div>
       <Collapsible.Root className="mt-4">
         <Collapsible.Trigger
@@ -2769,17 +2776,26 @@ export const MacroSignalsPanel = ({
           </span>
         </Collapsible.Trigger>
         <Collapsible.Panel className="mt-4 grid gap-4 md:grid-cols-3">
-          {series.map((signal) => {
+          {prioritizedSeries.map((signal, index) => {
             const sparkline = buildSparkline(signal.history);
             const sparklineId = `macro-spark-${signal.id}`;
+            const priority = buildMacroPriorityScore(signal);
 
             return (
               <div key={signal.id} className="weather-surface rounded-2xl p-4">
-                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                  {signal.label}
-                </p>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                    {signal.label}
+                  </p>
+                  <span className="rounded-full border border-sky-400/40 bg-sky-500/10 px-2 py-1 text-[10px] font-semibold tracking-[0.14em] text-sky-100">
+                    Priority #{index + 1}
+                  </span>
+                </div>
                 <p className="mono mt-3 text-2xl text-slate-100">
                   {formatNumber(signal.value, signal.unit)}
+                </p>
+                <p className="mt-2 text-xs text-slate-400">
+                  Impact {Math.round(priority.impact * 100)} · Recency {Math.round(priority.recency * 100)}
                 </p>
                 <figure className="mt-3">
                   {sparkline ? (
