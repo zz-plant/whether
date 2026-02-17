@@ -1,0 +1,50 @@
+import { describe, expect, test } from "bun:test";
+import type { MacroSeriesReading } from "../lib/types";
+import { buildMacroPriorityScore, rankMacroSignalsByPriority } from "../lib/macroPrioritization";
+
+const baseSignal = (overrides: Partial<MacroSeriesReading>): MacroSeriesReading => ({
+  id: "CPI_YOY",
+  label: "CPI YoY",
+  value: 3,
+  unit: "%",
+  explanation: "Inflation",
+  sourceLabel: "BLS",
+  sourceUrl: "https://example.com",
+  formulaUrl: "https://example.com/formula",
+  record_date: "2026-01-01",
+  fetched_at: "2026-01-02T00:00:00.000Z",
+  isLive: true,
+  history: [],
+  ...overrides,
+});
+
+describe("buildMacroPriorityScore", () => {
+  test("returns lower recency score for older signals", () => {
+    const now = Date.parse("2026-02-01T00:00:00.000Z");
+    const fresh = buildMacroPriorityScore(baseSignal({ record_date: "2026-01-25" }), now);
+    const stale = buildMacroPriorityScore(baseSignal({ record_date: "2025-08-01" }), now);
+
+    expect(fresh.recency).toBeGreaterThan(stale.recency);
+    expect(fresh.score).toBeGreaterThan(stale.score);
+  });
+});
+
+describe("rankMacroSignalsByPriority", () => {
+  test("sorts by impact x recency", () => {
+    const now = Date.parse("2026-02-01T00:00:00.000Z");
+    const ordered = rankMacroSignalsByPriority(
+      [
+        baseSignal({ id: "CPI_YOY", record_date: "2026-01-28" }),
+        baseSignal({ id: "UNEMPLOYMENT_RATE", record_date: "2026-01-15" }),
+        baseSignal({ id: "BBB_CREDIT_SPREAD", record_date: "2026-01-20" }),
+      ],
+      now
+    );
+
+    expect(ordered.map((item) => item.id)).toEqual([
+      "BBB_CREDIT_SPREAD",
+      "UNEMPLOYMENT_RATE",
+      "CPI_YOY",
+    ]);
+  });
+});
