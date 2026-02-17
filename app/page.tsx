@@ -388,7 +388,7 @@ export default async function HomePage({
   const unemploymentSignal = macroSeries.find((series) => series.id === "UNEMPLOYMENT_RATE");
   const spreadSignal = macroSeries.find((series) => series.id === "BBB_CREDIT_SPREAD");
 
-  const rollingYieldSeries = getTimeMachineRollingYieldSeries(60);
+  const rollingYieldSeries = getTimeMachineRollingYieldSeries(60, treasury.record_date);
   const curveSeries = rollingYieldSeries.tenYear.map((point, index) => ({
     date: point.date,
     value:
@@ -459,7 +459,7 @@ export default async function HomePage({
       latestValue:
         spreadSignal?.value === null || spreadSignal?.value === undefined
           ? "N/A"
-          : `${spreadSignal.value.toFixed(2)} bps`,
+          : `${spreadSignal.value.toFixed(2)}%`,
       zScore: computeZScore(spreadSignal?.history ?? [], spreadSignal?.value ?? null),
       series: spreadSignal?.history ?? [],
       thresholds: [{ label: "Stress line", value: 2.5 }],

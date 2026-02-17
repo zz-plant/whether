@@ -217,13 +217,27 @@ export const findTimeMachineSnapshot = (asOf: string): TreasuryData | null => {
   return data;
 };
 
-export const getTimeMachineRollingYieldSeries = (months = 12): {
+export const getTimeMachineRollingYieldSeries = (
+  months = 12,
+  asOf?: string
+): {
   oneMonth: SeriesHistoryPoint[];
   threeMonth: SeriesHistoryPoint[];
   twoYear: SeriesHistoryPoint[];
   tenYear: SeriesHistoryPoint[];
 } => {
-  const rollingSnapshots = sortedSnapshots.slice(-Math.max(months, 1));
+  const resolvedMonths = Math.max(months, 1);
+  const asOfTime = asOf ? new Date(asOf).getTime() : Number.NaN;
+  const asOfIndex =
+    asOf && Number.isFinite(asOfTime)
+      ? findSnapshotIndexAtOrBefore(asOfTime)
+      : sortedSnapshots.length - 1;
+  const lastIndex =
+    typeof asOfIndex === "number" && asOfIndex >= 0
+      ? asOfIndex
+      : sortedSnapshots.length - 1;
+  const sliceStart = Math.max(lastIndex + 1 - resolvedMonths, 0);
+  const rollingSnapshots = sortedSnapshots.slice(sliceStart, lastIndex + 1);
 
   return {
     oneMonth: rollingSnapshots.map((snapshot) => ({
