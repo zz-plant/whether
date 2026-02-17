@@ -5,7 +5,6 @@ import { siteUrl } from "../../../lib/siteUrl";
 import { ReportShell } from "../../components/reportShell";
 import { AssumptionLockPanel } from "../components/assumptionLockPanel";
 import { CounterfactualPanel } from "../components/counterfactualPanel";
-import { DecisionMemoryPanel } from "../components/decisionMemoryPanel";
 import { DecisionShieldPanel } from "../components/decisionShieldPanel";
 import {
   DecisionShieldTemplatesPanel,
@@ -117,10 +116,10 @@ export default async function OperationsDecisionsPage({
             cta: "Open assumptions",
           },
           {
-            title: "Record decision memory",
-            detail: "Capture rationale for faster future reviews.",
-            href: "#ops-decision-memory",
-            cta: "Open memory",
+            title: "Run counterfactual view",
+            detail: "Stress-test priorities against alternate macro regimes.",
+            href: "#ops-counterfactuals",
+            cta: "Open counterfactuals",
           },
         ],
       }}
@@ -150,18 +149,6 @@ export default async function OperationsDecisionsPage({
         description="Document the operating assumptions behind major bets."
       >
         <AssumptionLockPanel />
-      </SectionedReportPanel>
-
-      <SectionedReportPanel
-        id="ops-decision-memory"
-        title="Decision memory"
-        description="Maintain a living log of decisions and their outcomes."
-      >
-        <DecisionMemoryPanel
-          assessment={assessment}
-          provenance={treasuryProvenance}
-          recordDateLabel={recordDateLabel}
-        />
       </SectionedReportPanel>
 
       <SectionedReportPanel
