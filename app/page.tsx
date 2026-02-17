@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import type { Route } from "next";
 import type { ReactNode } from "react";
+import type { SeriesHistoryPoint } from "../lib/types";
 import {
   resolveTimeMachineSelection,
   parseTimeMachineRequest,
   buildTimeMachineHref,
 } from "../lib/timeMachine/timeMachineSelection";
 import { loadReportData } from "../lib/report/reportData";
+import { getTimeMachineRollingYieldSeries } from "../lib/timeMachine/timeMachineCache";
 import { siteUrl } from "../lib/siteUrl";
 import {
   buildBreadcrumbList,
@@ -32,6 +34,8 @@ import { RelatedReportLinks } from "./components/relatedReportLinks";
 import { CadenceChecklist } from "./components/cadenceChecklist";
 import { reportPageLinks } from "../lib/report/reportNavigation";
 import { appendSearchParamsToRoute } from "../lib/navigation/routeSearchParams";
+import { formatTimestampUTC } from "../lib/formatters";
+import { MiniSeriesRow } from "./components/miniSeriesRow";
 
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
@@ -275,8 +279,8 @@ export default async function HomePage({
     const query = params.toString();
     return query ? `/?${query}` : "/";
   };
-  const activeView = resolvedSearchParams?.view === "summary" ? "summary" : "full";
-  const buildViewHref = (view: "summary" | "full") => {
+  const activeView = resolvedSearchParams?.view === "evidence" ? "evidence" : "narrative";
+  const buildViewHref = (view: "narrative" | "evidence") => {
     const params = new URLSearchParams();
     if (resolvedSearchParams) {
       Object.entries(resolvedSearchParams).forEach(([key, value]) => {
@@ -285,8 +289,8 @@ export default async function HomePage({
         }
       });
     }
-    if (view === "summary") {
-      params.set("view", "summary");
+    if (view === "evidence") {
+      params.set("view", "evidence");
     }
     const query = params.toString();
     return query ? `/?${query}` : "/";
@@ -353,7 +357,119 @@ export default async function HomePage({
     statusLabel,
     treasury,
     treasuryProvenance,
+    macroSeries,
   } = await loadReportData(resolvedSearchParams);
+
+  const computeZScore = (series: SeriesHistoryPoint[], latestValue: number | null) => {
+    if (latestValue === null) {
+      return null;
+    }
+
+    const values = series
+      .map((point) => point.value)
+      .filter((value): value is number => typeof value === "number");
+
+    if (values.length < 2) {
+      return null;
+    }
+
+    const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
+    const variance = values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / values.length;
+    const deviation = Math.sqrt(variance);
+
+    if (!Number.isFinite(deviation) || deviation === 0) {
+      return null;
+    }
+
+    return (latestValue - mean) / deviation;
+  };
+
+  const cpiSignal = macroSeries.find((series) => series.id === "CPI_YOY");
+  const unemploymentSignal = macroSeries.find((series) => series.id === "UNEMPLOYMENT_RATE");
+  const spreadSignal = macroSeries.find((series) => series.id === "BBB_CREDIT_SPREAD");
+
+  const rollingYieldSeries = getTimeMachineRollingYieldSeries(60);
+  const curveSeries = rollingYieldSeries.tenYear.map((point, index) => ({
+    date: point.date,
+    value:
+      point.value !== null && rollingYieldSeries.twoYear[index]?.value !== null
+        ? Number((point.value - (rollingYieldSeries.twoYear[index]?.value ?? 0)).toFixed(2))
+        : null,
+  }));
+
+  const evidenceRows = [
+    {
+      key: "curve",
+      name: "Yield curve slope (10Y−2Y)",
+      latestValue: assessment.scores.curveSlope === null ? "N/A" : `${assessment.scores.curveSlope.toFixed(2)}%`,
+      zScore: computeZScore(curveSeries, assessment.scores.curveSlope),
+      series: curveSeries,
+      thresholds: [{ label: "Inversion", value: 0 }],
+      updatedAt: formatTimestampUTC(treasury.fetched_at),
+      insight:
+        assessment.scores.curveSlope !== null && assessment.scores.curveSlope < 0
+          ? "Curve remains inverted; keep approval bars high and prioritize fast-payback bets."
+          : "Curve has normalized; selective medium-horizon investments can move into review.",
+    },
+    {
+      key: "base-rate",
+      name: "Policy proxy rate (1M Treasury)",
+      latestValue: treasury.yields.oneMonth === null ? "N/A" : `${treasury.yields.oneMonth.toFixed(2)}%`,
+      zScore: computeZScore(rollingYieldSeries.oneMonth, treasury.yields.oneMonth),
+      series: rollingYieldSeries.oneMonth,
+      thresholds: [{ label: "Tightness threshold", value: assessment.thresholds.baseRateTightness }],
+      updatedAt: formatTimestampUTC(treasury.fetched_at),
+      insight:
+        treasury.yields.oneMonth !== null && treasury.yields.oneMonth >= assessment.thresholds.baseRateTightness
+          ? "Funding conditions are still restrictive; gate discretionary hiring and long-payback work."
+          : "Funding pressure is easing; plan controlled re-acceleration only where demand is validated.",
+    },
+    {
+      key: "cpi",
+      name: "Inflation pulse (CPI YoY)",
+      latestValue: cpiSignal?.value === null || cpiSignal?.value === undefined ? "N/A" : `${cpiSignal.value.toFixed(2)}%`,
+      zScore: computeZScore(cpiSignal?.history ?? [], cpiSignal?.value ?? null),
+      series: cpiSignal?.history ?? [],
+      thresholds: [{ label: "Target", value: 2 }],
+      updatedAt: formatTimestampUTC(cpiSignal?.fetched_at ?? treasury.fetched_at),
+      insight:
+        (cpiSignal?.value ?? 0) > 3
+          ? "Sticky inflation reinforces pricing discipline and cost-control checks in weekly planning."
+          : "Cooling inflation supports steadier assumptions for supplier and payroll planning.",
+    },
+    {
+      key: "unemployment",
+      name: "Labor slack (unemployment rate)",
+      latestValue:
+        unemploymentSignal?.value === null || unemploymentSignal?.value === undefined
+          ? "N/A"
+          : `${unemploymentSignal.value.toFixed(2)}%`,
+      zScore: computeZScore(unemploymentSignal?.history ?? [], unemploymentSignal?.value ?? null),
+      series: unemploymentSignal?.history ?? [],
+      thresholds: [{ label: "Stress watch", value: 5 }],
+      updatedAt: formatTimestampUTC(unemploymentSignal?.fetched_at ?? treasury.fetched_at),
+      insight:
+        (unemploymentSignal?.value ?? 0) >= 4.5
+          ? "Labor softening calls for conservative revenue assumptions and tighter hiring plans."
+          : "Labor remains resilient; focus on retention and selective backfills over broad expansion.",
+    },
+    {
+      key: "credit",
+      name: "Credit stress (BBB spread)",
+      latestValue:
+        spreadSignal?.value === null || spreadSignal?.value === undefined
+          ? "N/A"
+          : `${spreadSignal.value.toFixed(2)} bps`,
+      zScore: computeZScore(spreadSignal?.history ?? [], spreadSignal?.value ?? null),
+      series: spreadSignal?.history ?? [],
+      thresholds: [{ label: "Stress line", value: 2.5 }],
+      updatedAt: formatTimestampUTC(spreadSignal?.fetched_at ?? treasury.fetched_at),
+      insight:
+        (spreadSignal?.value ?? 0) > 2.5
+          ? "Wider spreads signal tighter credit access; protect runway and avoid fragile launch timing."
+          : "Contained spreads support normal execution cadence with standard contingency buffers.",
+    },
+  ] as const;
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
   const operationsPlanHref = buildTimeMachineHref("/operations/plan", historicalSelection);
   const trustStatusLabel = historicalSelection
@@ -464,16 +580,16 @@ export default async function HomePage({
           </h1>
           <div className="flex flex-wrap items-center gap-2">
             <p className="text-xs font-semibold tracking-[0.14em] text-slate-400">View mode</p>
-            <p className="text-xs text-slate-500">Summary ≈ 2 min · Full report ≈ 8 min</p>
+            <p className="text-xs text-slate-500">Narrative briefing · Dense evidence view</p>
             {[
-              { key: "summary", label: "Summary" },
-              { key: "full", label: "Full report" },
+              { key: "narrative", label: "Narrative" },
+              { key: "evidence", label: "Evidence" },
             ].map((option) => {
               const isActive = option.key === activeView;
               return (
                 <a
                   key={option.key}
-                  href={buildViewHref(option.key as "summary" | "full")}
+                  href={buildViewHref(option.key as "narrative" | "evidence")}
                   aria-current={isActive ? "page" : undefined}
                   className={`weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] touch-manipulation ${
                     isActive
@@ -527,119 +643,73 @@ export default async function HomePage({
         </div>
       </section>
 
-      <section id="operator-fit" className="weather-panel space-y-4 px-6 py-5">
-        <div className="space-y-2">
-          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Operator fit</p>
-          <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-            Operational guidance for macro-sensitive weeks.
-          </h2>
-        </div>
-        <div className="grid gap-3 lg:grid-cols-3">
-          {operatorFitPrimitives.map((item) => (
-            <article key={item.title} className="weather-surface space-y-2 p-4">
-              <p className="text-sm font-semibold text-slate-100">{item.title}</p>
-              <p className="text-sm text-slate-300">{item.detail}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-
-      <ReportGroup
-        title="Action priorities"
-        description="Lock posture and align on this week's constraints."
-      >
-        <WeeklyActionSummaryPanel
-          assessment={assessment}
-          provenance={treasuryProvenance}
-          recordDateLabel={recordDateLabel}
-        />
-
-        <RegimeSummaryPanel assessment={assessment} provenance={treasuryProvenance} />
-      </ReportGroup>
-
-      <ReportGroup
-        title="Leadership readout"
-        description="Confirm signal health and review this week's guardrails."
-      >
-        <ExecutiveSnapshotPanel
-          treasury={treasury}
-          assessment={assessment}
-          provenance={treasuryProvenance}
-        />
-
-        <ChangeSinceLastReadPanel
-          assessment={assessment}
-          lastYearComparison={lastYearComparison}
-          recordDate={treasury.record_date}
-          provenance={treasuryProvenance}
-        />
-      </ReportGroup>
-
-      {activeView === "summary" ? (
-        <details className="weather-panel group space-y-4 px-6 py-5">
-          <summary className="inline-flex min-h-[44px] w-full cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.16em] text-slate-300 marker:content-none">
-            Open alerts, deep-dive signals, and continuation links
-            <span
-              aria-hidden="true"
-              className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-300 transition-transform duration-200 group-open:rotate-180"
-            >
-              <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
-                <path
-                  d="M7 10l5 5 5-5"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </span>
-          </summary>
-          <div className="space-y-10 pt-2">
-            <ReportGroup
-              title="Alert center"
-              description="Review new alerts, then scan the recent log."
-            >
-              <RegimeChangeAlertPanel alert={regimeAlert} provenance={treasuryProvenance} />
-
-              <RegimeAlertsPanel />
-              <WeeklyDigestPanel assessment={assessment} />
-            </ReportGroup>
-
-            <ReportGroup
-              title="Deep dive signals"
-              description="Use these references for full scoring detail."
-            >
-              <RegimeAssessmentCard assessment={assessment} provenance={treasuryProvenance} />
-
-              <SignalMatrixPanel assessment={assessment} provenance={treasuryProvenance} />
-            </ReportGroup>
-
-            <RelatedReportLinks
-              title="Continue through the report system"
-              links={[
-                {
-                  href: "/signals",
-                  label: "Signal evidence",
-                  description: "Inspect source data, thresholds, and trend context.",
-                },
-                {
-                  href: "/operations",
-                  label: "Action playbook",
-                  description: "Convert the climate into concrete execution moves.",
-                },
-                {
-                  href: "/formulas",
-                  label: "Methodology",
-                  description: "Review formulas and official source links.",
-                },
-              ]}
-            />
+      {activeView === "evidence" ? (
+        <section id="evidence-matrix" aria-labelledby="evidence-matrix-title" className="weather-panel space-y-4 px-6 py-5">
+          <div className="space-y-2">
+            <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Evidence matrix</p>
+            <h2 id="evidence-matrix-title" className="text-xl font-semibold text-slate-100 sm:text-2xl">
+              High-density macro evidence for weekly operating decisions.
+            </h2>
+            <p className="text-sm text-slate-300">
+              <abbr title="Year-over-year" className="cursor-help no-underline">YoY</abbr>, <abbr title="Basis points" className="cursor-help no-underline">bps</abbr>, and <abbr title="10-year minus 2-year Treasury spread" className="cursor-help no-underline">10Y−2Y</abbr> use inline tooltip definitions.
+            </p>
           </div>
-        </details>
+          <div className="space-y-3">
+            {evidenceRows.map(({ key, ...row }) => (
+              <MiniSeriesRow key={key} {...row} />
+            ))}
+          </div>
+        </section>
       ) : (
         <>
+          <section id="operator-fit" className="weather-panel space-y-4 px-6 py-5">
+            <div className="space-y-2">
+              <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Operator fit</p>
+              <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
+                Operational guidance for macro-sensitive weeks.
+              </h2>
+            </div>
+            <div className="grid gap-3 lg:grid-cols-3">
+              {operatorFitPrimitives.map((item) => (
+                <article key={item.title} className="weather-surface space-y-2 p-4">
+                  <p className="text-sm font-semibold text-slate-100">{item.title}</p>
+                  <p className="text-sm text-slate-300">{item.detail}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <ReportGroup
+            title="Action priorities"
+            description="Lock posture and align on this week's constraints."
+          >
+            <WeeklyActionSummaryPanel
+              assessment={assessment}
+              provenance={treasuryProvenance}
+              recordDateLabel={recordDateLabel}
+            />
+
+            <RegimeSummaryPanel assessment={assessment} provenance={treasuryProvenance} />
+          </ReportGroup>
+
+          <ReportGroup
+            title="Leadership readout"
+            description="Confirm signal health and review this week's guardrails."
+          >
+            <ExecutiveSnapshotPanel
+              treasury={treasury}
+              assessment={assessment}
+              provenance={treasuryProvenance}
+            />
+
+            <ChangeSinceLastReadPanel
+              assessment={assessment}
+              lastYearComparison={lastYearComparison}
+              recordDate={treasury.record_date}
+              provenance={treasuryProvenance}
+            />
+          </ReportGroup>
+
           <ReportGroup
             title="Alert center"
             description="Review new alerts, then scan the recent log."

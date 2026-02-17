@@ -217,13 +217,13 @@ export const findTimeMachineSnapshot = (asOf: string): TreasuryData | null => {
   return data;
 };
 
-export const getTimeMachineRollingYieldSeries = (): {
+export const getTimeMachineRollingYieldSeries = (months = 12): {
   oneMonth: SeriesHistoryPoint[];
   threeMonth: SeriesHistoryPoint[];
   twoYear: SeriesHistoryPoint[];
   tenYear: SeriesHistoryPoint[];
 } => {
-  const rollingSnapshots = sortedSnapshots.slice(-12);
+  const rollingSnapshots = sortedSnapshots.slice(-Math.max(months, 1));
 
   return {
     oneMonth: rollingSnapshots.map((snapshot) => ({

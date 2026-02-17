@@ -48,3 +48,16 @@ If we only pick three areas for the next UX/design cycle, prioritize these:
 6. **P2 — Returning-visitor delta layer (what changed since last visit)** ⏳ Pending
    - Add a dedicated “Since your last review” strip with only decision-relevant changes.
    - Label updates by impact level and collapse unchanged content by default.
+
+## Added design standard: dense evidence mode (dashboard)
+
+A dedicated `?view=evidence` mode now complements the narrative dashboard for operators who need a
+fast, high-density scan before planning calls.
+
+Preservation rules for future contributors:
+- Keep one deterministic row per core indicator, ordered by decision relevance.
+- Keep row anatomy fixed: left (label/value/freshness), middle (5Y sparkline with median +
+  threshold lines), right (one operational implication sentence).
+- Do not reintroduce detached legends for this view; use direct end-of-line labels.
+- Reserve accent color for outliers/regime breaks only.
+- Maintain keyboard row focus order and screen-reader row summaries.
