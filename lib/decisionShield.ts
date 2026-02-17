@@ -127,7 +127,7 @@ const buildReversalTrigger = (assessment: RegimeAssessment) => {
     return `Revisit when tightness rises above ${tightnessRegime} or risk appetite rises above ${riskAppetiteRegime} for ${REGIME_REVERSAL_DAYS} consecutive days (current: ${assessment.scores.tightness}/${assessment.scores.riskAppetite}).`;
   }
 
-  return `Revisit when tightness rises above ${tightnessRegime} and risk appetite falls below ${riskAppetiteRegime} for ${REGIME_REVERSAL_DAYS} consecutive days (current: ${assessment.scores.tightness}/${assessment.scores.riskAppetite}).`;
+  return `Revisit when tightness rises above ${tightnessRegime} or risk appetite falls below ${riskAppetiteRegime} for ${REGIME_REVERSAL_DAYS} consecutive days (current: ${assessment.scores.tightness}/${assessment.scores.riskAppetite}).`;
 };
 
 export const evaluateDecision = (

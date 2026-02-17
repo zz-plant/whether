@@ -106,6 +106,40 @@ describe("decision shield verdicts", () => {
     assert.match(output.reversalTrigger, /risk appetite falls below 50/);
   });
 
+
+
+  it("uses one-signal reversal trigger for expansion", () => {
+    const assessment: RegimeAssessment = {
+      regime: "EXPANSION",
+      scores: {
+        tightness: 20,
+        riskAppetite: 80,
+        baseRateUsed: "1M",
+        baseRate: 3.1,
+        curveSlope: 1.1,
+      },
+      description: "",
+      constraints: [],
+      tightnessExplanation: "",
+      riskAppetiteExplanation: "",
+      dataWarnings: [],
+      thresholds: {
+        baseRateTightness: 5,
+        tightnessRegime: 70,
+        riskAppetiteRegime: 50,
+      },
+      inputs: [],
+    };
+
+    const output = evaluateDecision(assessment, {
+      lifecycle: "GROWTH",
+      category: "HIRING",
+      action: "HIRE",
+    });
+
+    assert.match(output.reversalTrigger, /tightness rises above 70 or risk appetite falls below 50/);
+  });
+
   it("applies lifecycle context to tighten discovery-stage verdicts", () => {
     const assessment: RegimeAssessment = {
       regime: "EXPANSION",

@@ -234,13 +234,13 @@ export const classifyRegime = (
   riskAppetite: number,
   thresholds: RegimeThresholds
 ): RegimeKey => {
-  if (tightness >= thresholds.tightnessRegime && riskAppetite < thresholds.riskAppetiteRegime) {
+  if (tightness > thresholds.tightnessRegime && riskAppetite <= thresholds.riskAppetiteRegime) {
     return "SCARCITY";
   }
-  if (tightness >= thresholds.tightnessRegime && riskAppetite >= thresholds.riskAppetiteRegime) {
+  if (tightness > thresholds.tightnessRegime && riskAppetite > thresholds.riskAppetiteRegime) {
     return "DEFENSIVE";
   }
-  if (tightness < thresholds.tightnessRegime && riskAppetite < thresholds.riskAppetiteRegime) {
+  if (tightness <= thresholds.tightnessRegime && riskAppetite <= thresholds.riskAppetiteRegime) {
     return "VOLATILE";
   }
   return "EXPANSION";
@@ -280,8 +280,8 @@ export const buildRegimeChangeReasons = (
     ) {
       pushReason(options.up.code, options.up.message);
     } else if (
-      options.previousValue >= options.previousThreshold &&
-      options.currentValue < options.currentThreshold
+      options.previousValue > options.previousThreshold &&
+      options.currentValue <= options.currentThreshold
     ) {
       pushReason(options.down.code, options.down.message);
     }

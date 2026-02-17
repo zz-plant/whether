@@ -40,14 +40,14 @@ describe("regime classification", () => {
     assert.equal(classifyRegime(10, 80, DEFAULT_THRESHOLDS), "EXPANSION");
   });
 
-  it("treats threshold equality as defensive", () => {
+  it("treats threshold equality as volatile", () => {
     assert.equal(
       classifyRegime(
         DEFAULT_THRESHOLDS.tightnessRegime,
         DEFAULT_THRESHOLDS.riskAppetiteRegime,
         DEFAULT_THRESHOLDS
       ),
-      "DEFENSIVE"
+      "VOLATILE"
     );
   });
 });
