@@ -24,7 +24,7 @@ import {
   SignalMatrixPanel,
   HistoricalBanner,
 } from "./components/reportSections";
-import { ChangeSinceLastReadPanel } from "./components/changeSinceLastReadPanel";
+import { ChangeSinceLastReadPanel, ReturningVisitorDeltaStrip } from "./components/changeSinceLastReadPanel";
 import { RegimeAlertsPanel } from "./components/regimeAlertsPanel";
 import { WeeklyDigestPanel } from "./components/weeklyDigestPanel";
 import { ReportShell } from "./components/reportShell";
@@ -448,6 +448,11 @@ export default async function HomePage({
         ) : null
       }
     >
+      <ReturningVisitorDeltaStrip
+        assessment={assessment}
+        recordDate={treasury.record_date}
+      />
+
       <section
         aria-label="Read this first"
         className="weather-panel space-y-6 px-6 py-6"

@@ -18,7 +18,7 @@ type LastReadSnapshot = {
   readAt: string;
 };
 
-const storageKey = "whether.lastReadSnapshot";
+export const LAST_READ_SNAPSHOT_STORAGE_KEY = "whether.lastReadSnapshot";
 
 const formatDate = (value: string) => formatDateUTC(value);
 
@@ -69,7 +69,7 @@ export const ChangeSinceLastReadPanel = ({
   useEffect(() => {
     let storedSnapshot: LastReadSnapshot | null = null;
     try {
-      const stored = window.localStorage.getItem(storageKey);
+      const stored = window.localStorage.getItem(LAST_READ_SNAPSHOT_STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored) as LastReadSnapshot;
         if (parsed?.recordDate && parsed?.assessment?.regime) {
@@ -154,7 +154,7 @@ export const ChangeSinceLastReadPanel = ({
     }
 
     try {
-      window.localStorage.setItem(storageKey, JSON.stringify(nextSnapshot));
+      window.localStorage.setItem(LAST_READ_SNAPSHOT_STORAGE_KEY, JSON.stringify(nextSnapshot));
     } catch {
       // Ignore storage errors to keep console clean.
     }
@@ -368,6 +368,98 @@ export const ChangeSinceLastReadPanel = ({
           </div>
         </div>
       </div>
+    </section>
+  );
+};
+
+export const ReturningVisitorDeltaStrip = ({
+  assessment,
+  recordDate,
+}: {
+  assessment: RegimeAssessment;
+  recordDate: string;
+}) => {
+  const [previous, setPrevious] = useState<LastReadSnapshot | null>(null);
+
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(LAST_READ_SNAPSHOT_STORAGE_KEY);
+      if (!stored) {
+        return;
+      }
+      const parsed = JSON.parse(stored) as LastReadSnapshot;
+      if (parsed?.recordDate && parsed?.assessment?.regime) {
+        setPrevious(parsed);
+      }
+    } catch {
+      // Ignore storage errors to keep console clean.
+    }
+  }, []);
+
+  if (!previous) {
+    return null;
+  }
+
+  const hasChange = hasAssessmentChanged(previous, assessment, recordDate);
+  if (!hasChange) {
+    return null;
+  }
+
+  const impactItems = [
+    {
+      label: "Tightness",
+      delta: Math.abs(assessment.scores.tightness - previous.assessment.scores.tightness),
+      href: "#weekly-action-summary",
+    },
+    {
+      label: "Risk appetite",
+      delta: Math.abs(assessment.scores.riskAppetite - previous.assessment.scores.riskAppetite),
+      href: "#executive-snapshot",
+    },
+    {
+      label: "Base rate",
+      delta: Math.abs(assessment.scores.baseRate - previous.assessment.scores.baseRate),
+      href: "#signal-matrix",
+    },
+  ]
+    .map((item) => ({ ...item, tone: getImpactTone(item.delta) }))
+    .sort((left, right) => right.delta - left.delta)
+    .slice(0, 3);
+
+  return (
+    <section
+      aria-labelledby="returning-visitor-delta-title"
+      className="weather-panel border-sky-500/40 bg-slate-950/90 px-4 py-4 sm:px-5"
+    >
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="space-y-2">
+          <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">Since your last review</p>
+          <h2 id="returning-visitor-delta-title" className="text-base font-semibold text-slate-100 sm:text-lg">
+            What changed and where to act first.
+          </h2>
+          <p className="text-xs text-slate-300">
+            Previous snapshot {formatDate(previous.recordDate)} · now {formatDate(recordDate)}
+          </p>
+        </div>
+        <a
+          href="#change-since-last-read"
+          className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+        >
+          Open full delta panel
+        </a>
+      </div>
+      <ul className="mt-3 flex flex-wrap gap-2" aria-label="Returning visitor impact tags">
+        {impactItems.map((item) => (
+          <li key={item.label}>
+            <a
+              href={item.href}
+              className={`inline-flex min-h-[44px] items-center rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.12em] touch-manipulation ${item.tone.className}`}
+            >
+              {item.label} · {item.tone.label}
+            </a>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 };
