@@ -275,6 +275,12 @@ export const ReportShell = ({
       : trustStatusTone === "historical"
         ? "Historical snapshot for retrospective planning."
         : "Live signals verified for this cycle.";
+  const confidenceScore =
+    decisionBanner?.confidenceScore ??
+    (trustStatusTone === "stable" ? 84 : trustStatusTone === "warning" ? 58 : 66);
+  const decisionHorizon = decisionBanner?.horizon ?? "Next 2 weeks";
+  const fallbackActionLabel = secondaryCta?.label ?? "Review evidence trail";
+  const fallbackActionHref = secondaryCta?.href ?? decisionBanner?.evidenceHref ?? "#signal-matrix";
   const missionSupportText =
     trustStatusTone === "stable"
       ? trustStatusAction
@@ -656,22 +662,39 @@ export const ReportShell = ({
                 ) : null}
               </section>
 
-              <section className="weather-panel space-y-3 px-4 py-4 sm:px-5">
+              <section className="weather-panel space-y-3 px-4 py-4 sm:px-5" aria-label="Decision in 5 seconds">
                 <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">Decision in 5 seconds</p>
-                <div className="grid gap-2 sm:grid-cols-3">
-                  <article className="weather-surface space-y-1 p-3">
-                    <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-400">What changed</p>
-                    <p className="text-sm text-slate-100">{primaryDecisionText}</p>
-                  </article>
-                  <article className="weather-surface space-y-1 p-3">
-                    <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-400">What to do</p>
-                    <p className="text-sm text-slate-100">{primaryCta.label}</p>
-                  </article>
-                  <article className="weather-surface space-y-1 p-3">
-                    <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-400">Urgency</p>
-                    <p className="text-sm text-slate-100">{confidenceCueSummary}</p>
-                  </article>
-                </div>
+                <article className="weather-surface space-y-3 p-4">
+                  <p className="text-sm font-semibold text-slate-100">{primaryDecisionText}</p>
+                  <div className="grid gap-2 sm:grid-cols-3">
+                    <div className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-3">
+                      <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-400">Confidence</p>
+                      <p className="mt-1 text-sm font-semibold text-slate-100">{confidenceScore}% · {trustStatusLabel}</p>
+                    </div>
+                    <div className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-3">
+                      <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-400">Time horizon</p>
+                      <p className="mt-1 text-sm font-semibold text-slate-100">{decisionHorizon}</p>
+                    </div>
+                    <div className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-3">
+                      <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-400">Urgency cue</p>
+                      <p className="mt-1 text-sm font-semibold text-slate-100">{confidenceCueSummary}</p>
+                    </div>
+                  </div>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <a
+                      href={primaryCta.href}
+                      className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-center text-xs font-semibold tracking-[0.14em] hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                    >
+                      Primary action: {primaryCta.label}
+                    </a>
+                    <a
+                      href={fallbackActionHref}
+                      className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-center text-xs font-semibold tracking-[0.12em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                    >
+                      Fallback: {fallbackActionLabel}
+                    </a>
+                  </div>
+                </article>
               </section>
 
               <section className="weather-panel sticky bottom-24 z-10 hidden space-y-3 border-sky-500/30 bg-slate-950/95 px-4 py-3 sm:bottom-4 sm:block">

@@ -31,6 +31,16 @@ const formatDelta = (thenValue: number, nowValue: number, unit = "") => {
 const formatOptionalDelta = (thenValue: number | null, nowValue: number | null, unit = "") =>
   thenValue === null || nowValue === null ? "—" : formatDelta(thenValue, nowValue, unit);
 
+const getImpactTone = (value: number) => {
+  if (value >= 1.5) {
+    return { label: "High impact", className: "border-rose-300/80 bg-rose-500/15 text-rose-100" };
+  }
+  if (value >= 0.75) {
+    return { label: "Medium impact", className: "border-amber-300/80 bg-amber-500/15 text-amber-100" };
+  }
+  return { label: "Low impact", className: "border-emerald-300/80 bg-emerald-500/15 text-emerald-100" };
+};
+
 const hasAssessmentChanged = (
   previous: LastReadSnapshot,
   current: RegimeAssessment,
@@ -167,6 +177,30 @@ export const ChangeSinceLastReadPanel = ({
     previous &&
     hasAssessmentChanged(previous, assessment, recordDate);
 
+  const impactItems = previous
+    ? [
+        {
+          label: "Tightness",
+          delta: Math.abs(assessment.scores.tightness - previous.assessment.scores.tightness),
+          href: "#weekly-action-summary",
+        },
+        {
+          label: "Risk appetite",
+          delta: Math.abs(
+            assessment.scores.riskAppetite - previous.assessment.scores.riskAppetite,
+          ),
+          href: "#executive-snapshot",
+        },
+        {
+          label: "Base rate",
+          delta: Math.abs(assessment.scores.baseRate - previous.assessment.scores.baseRate),
+          href: "#signal-matrix",
+        },
+      ]
+        .map((item) => ({ ...item, tone: getImpactTone(item.delta) }))
+        .sort((left, right) => right.delta - left.delta)
+    : [];
+
   return (
     <section
       id="change-since-last-read"
@@ -181,9 +215,21 @@ export const ChangeSinceLastReadPanel = ({
               Delta snapshot
             </h3>
             <p className="mt-2 type-data text-slate-300">
-              Compare the current climate against the last report you opened, then jump to the
-              Time Machine to replay that previous view.
+              Since your last review, these are the highest-impact deltas and where to act first.
             </p>
+            {previous ? (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {impactItems.map((item) => (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    className={`inline-flex min-h-[44px] items-center rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.12em] touch-manipulation ${item.tone.className}`}
+                  >
+                    {item.label}: {item.tone.label}
+                  </a>
+                ))}
+              </div>
+            ) : null}
           </div>
           <DataProvenanceStrip provenance={provenance} />
         </div>
@@ -258,6 +304,22 @@ export const ChangeSinceLastReadPanel = ({
                 ? `Last read logged ${formatDate(previous.readAt)}.`
                 : "No previous read captured yet. Open the report again to view a delta snapshot."}
             </p>
+            {previous ? (
+              <div className="mt-3 flex flex-wrap gap-2">
+                <a
+                  href="#weekly-action-summary"
+                  className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100"
+                >
+                  Jump to action priorities
+                </a>
+                <a
+                  href="#executive-snapshot"
+                  className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100"
+                >
+                  Jump to leadership readout
+                </a>
+              </div>
+            ) : null}
             {hasChange ? (
               <p className="mt-4 text-xs text-emerald-200">
                 Changes detected since your last read.

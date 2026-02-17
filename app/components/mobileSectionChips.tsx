@@ -1,7 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ReportSectionLink } from "./reportShellNavigation";
+
+const toDecisionLabel = (label: string) => {
+  const normalized = label.toLowerCase();
+  if (normalized.includes("weekly") || normalized.includes("action")) {
+    return "Act now";
+  }
+  if (normalized.includes("executive") || normalized.includes("leadership")) {
+    return "Leadership";
+  }
+  if (normalized.includes("change") || normalized.includes("delta")) {
+    return "Delta";
+  }
+  if (normalized.includes("alert")) {
+    return "Alerts";
+  }
+  if (normalized.includes("signal") || normalized.includes("matrix")) {
+    return "Signal risks";
+  }
+  return label;
+};
 
 export const MobileSectionChips = ({
   links,
@@ -20,16 +40,31 @@ export const MobileSectionChips = ({
     return () => window.removeEventListener("hashchange", updateHash);
   }, []);
 
+  const activeIndex = useMemo(() => {
+    if (links.length === 0) {
+      return -1;
+    }
+    const selectedIndex = links.findIndex((item) => item.href === activeHash);
+    return selectedIndex >= 0 ? selectedIndex : 0;
+  }, [activeHash, links]);
+
   if (links.length === 0) {
     return null;
   }
 
+  const activeLabel = activeIndex >= 0 ? toDecisionLabel(links[activeIndex].label) : "Overview";
+
   return (
     <nav aria-label="Quick section jumps" className="sm:hidden overflow-hidden">
-      <p className="mb-2 text-xs font-semibold tracking-[0.16em] text-slate-400">Jump to section</p>
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <p className="text-xs font-semibold tracking-[0.16em] text-slate-400">Jump to section</p>
+        <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-400" aria-live="polite">
+          {activeIndex + 1}/{links.length} · {activeLabel}
+        </p>
+      </div>
       <ul className="flex w-full max-w-full gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {links.map((link) => {
-          const isActive = activeHash === link.href;
+          const isActive = activeHash === link.href || (activeHash === "" && link.href === links[0]?.href);
           return (
             <li key={link.href} className="flex-shrink-0">
               <a
@@ -41,7 +76,7 @@ export const MobileSectionChips = ({
                     : "text-slate-200 hover:border-sky-400/70 hover:text-slate-100"
                 }`}
               >
-                {link.label}
+                {toDecisionLabel(link.label)}
               </a>
             </li>
           );
