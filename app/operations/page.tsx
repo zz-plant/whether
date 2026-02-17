@@ -18,6 +18,7 @@ import {
 import { appendSearchParamsToRoute } from "../../lib/navigation/routeSearchParams";
 import { OperationsWorkstreamNav } from "./components/operationsWorkstreamNav";
 import { ExecutionTable } from "../components/executionTable";
+import { ReturningVisitorDeltaStrip } from "../components/changeSinceLastReadPanel";
 
 export const runtime = "edge";
 
@@ -257,6 +258,17 @@ export default async function OperationsPage({
         ) : null
       }
     >
+      <ReturningVisitorDeltaStrip
+        assessment={assessment}
+        recordDate={treasury.record_date}
+        impactLinks={[
+          { label: "Tightness", href: "#ops-monthly-action-summary", metric: "tightness" },
+          { label: "Risk appetite", href: "#ops-workstreams", metric: "riskAppetite" },
+          { label: "Base rate", href: "#ops-horizon-plan", metric: "baseRate" },
+        ]}
+        openPanelHref="/signals#time-machine"
+      />
+
       <OperationsWorkstreamNav currentPath="/operations" />
 
       <SectionedReportPanel
