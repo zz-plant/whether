@@ -13,6 +13,9 @@ includes status metadata (data freshness, confidence label, offline badges), fix
 links, and section anchors used across the report experience. 
 
 Content blocks on the overview page include:
+- URL-controlled view mode toggle:
+  - `?view=narrative` (default): full narrative briefing layout.
+  - `?view=evidence`: dense analytical evidence matrix with one row per core indicator.
 - Executive snapshot (summary + constraints + provenance)
 - Weekly action summary
 - Market climate summary
@@ -21,6 +24,10 @@ Content blocks on the overview page include:
 - New alert list
 - Regime assessment card with score explanations
 - Signal matrix with sensor details and history
+
+The evidence matrix is intentionally high-density: direct row labels replace detached legends, long-run
+median/threshold references are embedded in each sparkline, and accent color is reserved for outlier
+conditions so contributors preserve scanability under operational time pressure.
 
 ### 1.2 Signals report (/signals)
 The signals report focuses on evidence and methodology, with sections for:
