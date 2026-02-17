@@ -1,11 +1,9 @@
-import type { DecisionMemoryEntry } from "../app/operations/components/decisionMemoryUtils";
 import type { AlertChannel, AlertDeliveryEvent, RegimeAlertEvent } from "./signalOps";
 
 export type AlertDeliveryPreferences = Record<AlertChannel, boolean>;
 
 type Store = {
   regimeAlerts: RegimeAlertEvent[];
-  decisionMemoryByClient: Record<string, DecisionMemoryEntry[]>;
   alertPreferencesByClient: Record<string, AlertDeliveryPreferences>;
   alertDeliveries: AlertDeliveryEvent[];
 };
@@ -18,7 +16,6 @@ const defaultPreferences: AlertDeliveryPreferences = {
 
 const createStore = (): Store => ({
   regimeAlerts: [],
-  decisionMemoryByClient: {},
   alertPreferencesByClient: {},
   alertDeliveries: [],
 });
@@ -60,15 +57,4 @@ export const serverStore = {
     });
     return merged;
   },
-};
-
-export const pruneDecisionMemoryEntries = (entries: DecisionMemoryEntry[], maxAgeDays: number) => {
-  const cutoffMs = Date.now() - maxAgeDays * 24 * 60 * 60 * 1000;
-  return entries.filter((entry) => {
-    const loggedAtMs = Date.parse(entry.loggedAt);
-    if (Number.isNaN(loggedAtMs)) {
-      return true;
-    }
-    return loggedAtMs >= cutoffMs;
-  });
 };

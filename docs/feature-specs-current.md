@@ -38,7 +38,7 @@ summary data.
 - **Plan** (`/operations/plan`): playbook moves (start/stop/fence), finance strategy,
   insight database prompts, and operator requests.
 - **Decisions** (`/operations/decisions`): decision shield workflow, assumption locking,
-  decision memory logging, templates, and counterfactual simulation controls.
+  decision shield templates, and counterfactual simulation controls.
 - **Briefings** (`/operations/briefings`): strategy brief, export brief tooling,
   executive briefing, and CXO output catalog.
 
@@ -111,14 +111,7 @@ locally stored. Results can be copied as shareable text.
 A lightweight form captures operating assumptions (risk posture, evidence stance, constraints)
 and stores them locally for later review.
 
-### 4.3 Decision Memory
-Decision Memory is a client-side log of decisions with snapshot metadata. It supports:
-- Structured note parsing (summary, bullets, tags)
-- Snapshot link generation
-- Copy-ready text and templates (Jira/Linear/Confluence formats)
-- CSV export
-
-### 4.4 Counterfactual view
+### 4.3 Counterfactual view
 Counterfactual sliders adjust base rate and curve slope in basis points to preview regime changes
 and constraints under simulated conditions. Scenario state is persisted via URL parameters and
 local storage.
