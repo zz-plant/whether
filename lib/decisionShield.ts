@@ -32,6 +32,8 @@ export type DecisionAction =
   | "RESTRUCTURE";
 export type DecisionVerdict = "SAFE" | "RISKY" | "DANGEROUS";
 
+const VERDICT_ORDER: DecisionVerdict[] = ["SAFE", "RISKY", "DANGEROUS"];
+
 export interface DecisionInput {
   lifecycle: LifecycleStage;
   category: DecisionCategory;
@@ -49,6 +51,40 @@ export interface DecisionOutput {
 
 export const formatDecisionAction = (action: DecisionAction) =>
   DECISION_ACTION_LABELS[action];
+
+
+const adjustVerdict = (verdict: DecisionVerdict, direction: "up" | "down"): DecisionVerdict => {
+  const index = VERDICT_ORDER.indexOf(verdict);
+  if (direction === "up") {
+    return VERDICT_ORDER[Math.min(index + 1, VERDICT_ORDER.length - 1)];
+  }
+  return VERDICT_ORDER[Math.max(index - 1, 0)];
+};
+
+const applyContextualVerdict = (baseVerdict: DecisionVerdict, input: DecisionInput): DecisionVerdict => {
+  const capitalIntensiveActions: DecisionAction[] = [
+    "HIRE",
+    "REWRITE",
+    "INFRA_SPEND",
+    "EXPAND",
+    "ACQUIRE",
+    "REGIONAL_EXPANSION",
+  ];
+
+  if (input.lifecycle === "DISCOVERY" && capitalIntensiveActions.includes(input.action)) {
+    return adjustVerdict(baseVerdict, "up");
+  }
+
+  if (
+    input.lifecycle === "MATURE" &&
+    input.category === "RESTRUCTURING" &&
+    (input.action === "DIVEST" || input.action === "RESTRUCTURE")
+  ) {
+    return adjustVerdict(baseVerdict, "down");
+  }
+
+  return baseVerdict;
+};
 
 const buildSensorBullets = (assessment: RegimeAssessment): string[] => {
   const bullets: string[] = [];
@@ -77,14 +113,29 @@ const buildSensorBullets = (assessment: RegimeAssessment): string[] => {
 };
 
 const buildReversalTrigger = (assessment: RegimeAssessment) => {
-  return `Revisit when tightness drops below ${assessment.thresholds.tightnessRegime} and risk appetite rises above ${assessment.thresholds.riskAppetiteRegime} for ${REGIME_REVERSAL_DAYS} consecutive days (current: ${assessment.scores.tightness}/${assessment.scores.riskAppetite}).`;
+  const { tightnessRegime, riskAppetiteRegime } = assessment.thresholds;
+
+  if (assessment.regime === "SCARCITY") {
+    return `Revisit when tightness drops below ${tightnessRegime} and risk appetite rises above ${riskAppetiteRegime} for ${REGIME_REVERSAL_DAYS} consecutive days (current: ${assessment.scores.tightness}/${assessment.scores.riskAppetite}).`;
+  }
+
+  if (assessment.regime === "DEFENSIVE") {
+    return `Revisit when tightness drops below ${tightnessRegime} or risk appetite falls below ${riskAppetiteRegime} for ${REGIME_REVERSAL_DAYS} consecutive days (current: ${assessment.scores.tightness}/${assessment.scores.riskAppetite}).`;
+  }
+
+  if (assessment.regime === "VOLATILE") {
+    return `Revisit when tightness rises above ${tightnessRegime} or risk appetite rises above ${riskAppetiteRegime} for ${REGIME_REVERSAL_DAYS} consecutive days (current: ${assessment.scores.tightness}/${assessment.scores.riskAppetite}).`;
+  }
+
+  return `Revisit when tightness rises above ${tightnessRegime} and risk appetite falls below ${riskAppetiteRegime} for ${REGIME_REVERSAL_DAYS} consecutive days (current: ${assessment.scores.tightness}/${assessment.scores.riskAppetite}).`;
 };
 
 export const evaluateDecision = (
   assessment: RegimeAssessment,
   input: DecisionInput
 ): DecisionOutput => {
-  const verdict = DECISION_VERDICT_MATRIX[input.action][assessment.regime];
+  const baseVerdict = DECISION_VERDICT_MATRIX[input.action][assessment.regime];
+  const verdict = applyContextualVerdict(baseVerdict, input);
   const actionLabel = formatDecisionAction(input.action);
   const bullets = buildSensorBullets(assessment);
 

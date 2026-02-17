@@ -13,11 +13,11 @@ import {
 import type { TreasuryData } from "../lib/types";
 
 describe("regime engine scoring", () => {
-  it("adds tightness points for high base rate and inverted curve", () => {
+  it("ramps tightness as rates move above threshold and curve inverts", () => {
     const threshold = DEFAULT_THRESHOLDS.baseRateTightness;
-    assert.equal(computeTightnessScore(5.2, -0.3, threshold), 100);
-    assert.equal(computeTightnessScore(5.2, 0.2, threshold), 90);
-    assert.equal(computeTightnessScore(4.2, -0.2, threshold), 25);
+    assert.equal(computeTightnessScore(5.2, -0.3, threshold), 51);
+    assert.equal(computeTightnessScore(5.2, 0.2, threshold), 36);
+    assert.equal(computeTightnessScore(4.2, -0.2, threshold), 10);
   });
 
   it("maps risk appetite to 0-100", () => {
@@ -40,14 +40,14 @@ describe("regime classification", () => {
     assert.equal(classifyRegime(10, 80, DEFAULT_THRESHOLDS), "EXPANSION");
   });
 
-  it("treats threshold equality as expansion", () => {
+  it("treats threshold equality as defensive", () => {
     assert.equal(
       classifyRegime(
         DEFAULT_THRESHOLDS.tightnessRegime,
         DEFAULT_THRESHOLDS.riskAppetiteRegime,
         DEFAULT_THRESHOLDS
       ),
-      "EXPANSION"
+      "DEFENSIVE"
     );
   });
 });
@@ -67,7 +67,7 @@ describe("regime assessment", () => {
     };
 
     const assessment = evaluateRegime(treasury);
-    assert.equal(assessment.regime, "SCARCITY");
+    assert.equal(assessment.regime, "VOLATILE");
     assert.ok(assessment.tightnessExplanation.length > 0);
     assert.equal(assessment.inputs.length, 4);
 
@@ -94,5 +94,6 @@ describe("regime assessment", () => {
     const assessment = evaluateRegime(treasury);
     assert.ok(assessment.dataWarnings.some((warning) => warning.includes("Base rate missing")));
     assert.ok(assessment.dataWarnings.some((warning) => warning.includes("Curve slope missing")));
+    assert.equal(assessment.scores.riskAppetite, 0);
   });
 });

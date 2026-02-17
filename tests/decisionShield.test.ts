@@ -103,6 +103,39 @@ describe("decision shield verdicts", () => {
     });
 
     assert.match(output.reversalTrigger, /tightness drops below 70/);
-    assert.match(output.reversalTrigger, /risk appetite rises above 50/);
+    assert.match(output.reversalTrigger, /risk appetite falls below 50/);
   });
+
+  it("applies lifecycle context to tighten discovery-stage verdicts", () => {
+    const assessment: RegimeAssessment = {
+      regime: "EXPANSION",
+      scores: {
+        tightness: 20,
+        riskAppetite: 80,
+        baseRateUsed: "1M",
+        baseRate: 3.1,
+        curveSlope: 1.1,
+      },
+      description: "",
+      constraints: [],
+      tightnessExplanation: "",
+      riskAppetiteExplanation: "",
+      dataWarnings: [],
+      thresholds: {
+        baseRateTightness: 5,
+        tightnessRegime: 70,
+        riskAppetiteRegime: 50,
+      },
+      inputs: [],
+    };
+
+    const output = evaluateDecision(assessment, {
+      lifecycle: "DISCOVERY",
+      category: "HIRING",
+      action: "HIRE",
+    });
+
+    assert.equal(output.verdict, "RISKY");
+  });
+
 });
