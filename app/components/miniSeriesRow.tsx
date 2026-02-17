@@ -13,7 +13,7 @@ export type MiniSeriesRowProps = {
   latestValue: string;
   zScore: number | null;
   series: SeriesHistoryPoint[];
-  thresholds: RowThreshold[];
+  thresholds: readonly RowThreshold[];
   updatedAt: string;
   insight: string;
 };
