@@ -123,6 +123,11 @@ Counterfactual sliders adjust base rate and curve slope in basis points to previ
 and constraints under simulated conditions. Scenario state is persisted via URL parameters and
 local storage.
 
+### 4.4 Decision Memory
+Decision Shield runs can be saved to Decision Memory, which stores an append-only trail of
+inputs, verdict metadata, thresholds, and source URLs. Entries are viewable in the Decisions
+workstream and exportable as JSON/CSV through `GET /api/decision-memory`.
+
 ## 5) Playbooks, summaries, and briefings
 
 ### 5.1 Playbook & operator requests
@@ -150,6 +155,8 @@ macro context embedded for leadership consumption.
 - `GET /api/yearly` — yearly summary payload with provenance.
 - `GET /api/summary-delta` — difference between weekly and monthly summaries.
 - `GET /api/cadence` — alignment check between weekly and monthly constraints.
+- `GET /api/decision-memory` — Decision Memory entries (supports CSV export via `?format=csv`).
+- `POST /api/decision-memory` — append a Decision Shield run to Decision Memory.
 
 ### 6.3 Open Graph
 - `GET /api/og` — SVG Open Graph image with regime metadata (supports Time Machine selection).

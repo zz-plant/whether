@@ -1,4 +1,5 @@
 import type { AlertChannel, AlertDeliveryEvent, RegimeAlertEvent } from "./signalOps";
+import type { DecisionMemoryEntry } from "./decisionMemory";
 
 export type AlertDeliveryPreferences = Record<AlertChannel, boolean>;
 
@@ -6,6 +7,7 @@ type Store = {
   regimeAlerts: RegimeAlertEvent[];
   alertPreferencesByClient: Record<string, AlertDeliveryPreferences>;
   alertDeliveries: AlertDeliveryEvent[];
+  decisionMemory: DecisionMemoryEntry[];
 };
 
 const defaultPreferences: AlertDeliveryPreferences = {
@@ -18,6 +20,7 @@ const createStore = (): Store => ({
   regimeAlerts: [],
   alertPreferencesByClient: {},
   alertDeliveries: [],
+  decisionMemory: [],
 });
 
 declare global {

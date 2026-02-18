@@ -6,6 +6,7 @@ import { ReportShell } from "../../components/reportShell";
 import { AssumptionLockPanel } from "../components/assumptionLockPanel";
 import { CounterfactualPanel } from "../components/counterfactualPanel";
 import { DecisionShieldPanel } from "../components/decisionShieldPanel";
+import { DecisionMemoryPanel } from "../components/decisionMemoryPanel";
 import {
   DecisionShieldTemplatesPanel,
   HistoricalBanner,
@@ -157,6 +158,14 @@ export default async function OperationsDecisionsPage({
         description="Copy-ready templates for decision shield reviews."
       >
         <DecisionShieldTemplatesPanel provenance={treasuryProvenance} />
+      </SectionedReportPanel>
+
+      <SectionedReportPanel
+        id="ops-decision-memory"
+        title="Decision Memory"
+        description="Persist decision runs as exportable, source-backed audit entries."
+      >
+        <DecisionMemoryPanel />
       </SectionedReportPanel>
 
       <SectionedReportPanel
