@@ -143,7 +143,7 @@ export const ReportShell = ({
   const heroHeaderSpacingClassName = "space-y-4 sm:space-y-5";
   const heroSectionSpacingClassName = "weather-panel-static min-w-0 space-y-5 px-4 py-5 sm:space-y-6 sm:px-5";
   const disclosureSummaryClassName =
-    "weather-chip inline-flex min-h-[44px] w-full cursor-pointer list-none items-center justify-between gap-3 border-slate-600/80 px-3 py-2 text-xs font-semibold tracking-[0.16em] marker:content-none";
+    "weather-chip inline-flex min-h-[44px] w-full cursor-pointer list-none items-center justify-between gap-3 border-slate-600/80 px-3 py-2 text-sm font-semibold tracking-[0.1em] marker:content-none";
   const overviewPanel = (
     <section className="weather-panel space-y-3 px-4 py-4">
       <p className="text-xs font-semibold tracking-[0.16em] text-slate-400">Snapshot</p>
@@ -342,7 +342,7 @@ export const ReportShell = ({
                   </svg>
                 </span>
                 <div>
-                  <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
+                  <p className="text-xs font-semibold tracking-[0.14em] text-slate-400">
                     Whether
                   </p>
                   <p className="text-sm font-semibold text-slate-100">
@@ -392,7 +392,7 @@ export const ReportShell = ({
                 <div className={heroHeaderSpacingClassName}>
                   {roleSwitcher ? (
                     <div className="space-y-2">
-                      <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Role view</p>
+                      <p className="text-xs font-semibold tracking-[0.1em] text-slate-400">Role view</p>
                       <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
                         {roleSwitcher.options.map((option) => {
                           const isActive = option.key === roleSwitcher.active;
@@ -401,7 +401,7 @@ export const ReportShell = ({
                               key={option.key}
                               href={option.href}
                               aria-current={isActive ? "page" : undefined}
-                              className={`weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] touch-manipulation ${
+                              className={`weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-sm font-semibold tracking-[0.08em] touch-manipulation ${
                                 isActive
                                   ? "border-sky-300/80 text-slate-100"
                                   : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
@@ -416,7 +416,7 @@ export const ReportShell = ({
                   ) : null}
                   {heroVariant === "compact" ? (
                     <>
-                      <p className="text-xs font-semibold tracking-[0.2em] text-slate-400 sm:tracking-[0.26em]">
+                      <p className="text-xs font-semibold tracking-[0.14em] text-slate-400 sm:tracking-[0.18em]">
                         Whether report
                       </p>
                       <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
@@ -454,7 +454,7 @@ export const ReportShell = ({
                     </>
                   ) : (
                     <>
-                      <p className="text-xs font-semibold tracking-[0.2em] text-slate-400 sm:tracking-[0.26em]">
+                      <p className="text-xs font-semibold tracking-[0.14em] text-slate-400 sm:tracking-[0.18em]">
                         Whether report
                       </p>
                       <h1 className="type-headline text-slate-100">{pageTitle}</h1>
@@ -501,14 +501,6 @@ export const ReportShell = ({
                   >
                     <span className="max-w-full break-words text-center">{primaryCta.label}</span>
                   </a>
-                  {secondaryCta ? (
-                    <a
-                      href={secondaryCta.href}
-                      className="inline-flex min-h-[44px] w-full max-w-full items-center justify-center text-center text-xs font-semibold leading-tight tracking-[0.12em] text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:justify-start sm:text-xs"
-                    >
-                      <span className="max-w-full break-words text-center">{secondaryCta.label}</span>
-                    </a>
-                  ) : null}
                   {exportCta ? (
                     <div className="w-full sm:hidden">
                       <MobileActionSheet
@@ -519,13 +511,13 @@ export const ReportShell = ({
                     </div>
                   ) : null}
                 </div>
-                <p className={`inline-flex items-center gap-2 text-xs leading-relaxed ${trustLabelTone}`}>
-                  <span className="font-semibold tracking-[0.14em]">Confidence cue</span>
+                <p className={`inline-flex items-center gap-2 text-sm leading-relaxed ${trustLabelTone}`}>
+                  <span className="font-semibold tracking-[0.08em]">Confidence cue</span>
                   <span aria-hidden="true">{trustStatusTone === "warning" ? "⚠" : trustStatusTone === "historical" ? "⏱" : "✓"}</span>
                   <span>{confidenceCueSummary}</span>
                 </p>
                 <details className="group rounded-2xl border border-slate-700/90 bg-slate-950/50 px-4 py-3">
-                  <summary className="inline-flex min-h-[44px] w-full cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.14em] text-slate-200 marker:content-none">
+                  <summary className="inline-flex min-h-[44px] w-full cursor-pointer list-none items-center justify-between gap-2 text-sm font-semibold tracking-[0.1em] text-slate-200 marker:content-none">
                     Why this confidence level
                     <span
                       aria-hidden="true"
@@ -550,7 +542,7 @@ export const ReportShell = ({
               <section className="weather-panel space-y-5 px-4 py-5 sm:px-5" aria-label="Mission control">
                 <div className={missionGridClassName}>
                   <article className="weather-surface space-y-3 p-4">
-                    <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">{decisionBanner?.label ?? "Decide now"}</p>
+                    <p className="text-sm font-semibold tracking-[0.12em] text-slate-400">{decisionBanner?.label ?? "Decide now"}</p>
                     <h2 className="text-lg font-semibold text-slate-100 sm:text-xl">
                       {primaryDecisionText}
                     </h2>
@@ -586,13 +578,13 @@ export const ReportShell = ({
                   </article>
 
                   <article className="weather-surface space-y-3 p-4">
-                    <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">
+                      <p className="text-sm font-semibold tracking-[0.12em] text-slate-400">
                       {actionSequence?.title ?? "Execution sequence"}
                     </p>
                     <ol className="space-y-2">
                       {missionSequenceItems.map((item) => (
                         <li key={item.title} className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-3">
-                          <p className="text-[11px] font-semibold tracking-[0.18em] text-slate-400">{item.phase}</p>
+                          <p className="text-xs font-semibold tracking-[0.1em] text-slate-400">{item.phase}</p>
                           <p className="mt-1 text-sm font-semibold text-slate-100">{item.title}</p>
                           <p className="mt-1 text-xs text-slate-300">{item.detail}</p>
                         </li>
@@ -602,10 +594,10 @@ export const ReportShell = ({
 
                   {showActNowCard ? (
                     <article className="weather-surface space-y-3 p-4">
-                      <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">Act now</p>
+                      <p className="text-sm font-semibold tracking-[0.12em] text-slate-400">Act now</p>
                       <a
                         href={primaryCta.href}
-                        className="weather-button-primary inline-flex min-h-[44px] w-full items-center justify-center px-3 py-2 text-center text-xs font-semibold tracking-[0.14em] hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                        className="weather-pill inline-flex min-h-[44px] w-full items-center justify-center px-3 py-2 text-center text-xs font-semibold tracking-[0.12em] text-slate-100 hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
                       >
                         {primaryCta.label}
                       </a>
@@ -623,7 +615,7 @@ export const ReportShell = ({
 
                 {!hasSidebar ? (
                   <details className="group rounded-2xl border border-slate-800/80 bg-slate-950/40 px-4 py-3">
-                    <summary className="inline-flex min-h-[44px] w-full cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.16em] text-slate-300 marker:content-none">
+                    <summary className="inline-flex min-h-[44px] w-full cursor-pointer list-none items-center justify-between gap-2 text-sm font-semibold tracking-[0.1em] text-slate-300 marker:content-none">
                       <span>Data quality and confidence</span>
                       <span
                         aria-hidden="true"
@@ -662,29 +654,29 @@ export const ReportShell = ({
               </section>
 
               <section className="weather-panel space-y-3 px-4 py-4 sm:px-5" aria-label="Decision in 5 seconds">
-                <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">Decision in 5 seconds</p>
+                <p className="text-xs font-semibold tracking-[0.1em] text-slate-400">Decision in 5 seconds</p>
                 <article className="weather-surface space-y-3 p-4">
                   <p className="text-sm font-semibold text-slate-100">{primaryDecisionText}</p>
                   <div className="grid gap-2 sm:grid-cols-3">
                     <div className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-3">
-                      <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-400">Confidence</p>
+                      <p className="text-xs font-semibold tracking-[0.1em] text-slate-400">Confidence</p>
                       <p className="mt-1 text-sm font-semibold text-slate-100">{confidenceScore}% · {trustStatusLabel}</p>
                     </div>
                     <div className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-3">
-                      <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-400">Time horizon</p>
+                      <p className="text-xs font-semibold tracking-[0.1em] text-slate-400">Time horizon</p>
                       <p className="mt-1 text-sm font-semibold text-slate-100">{decisionHorizon}</p>
                     </div>
                     <div className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-3">
-                      <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-400">Urgency cue</p>
+                      <p className="text-xs font-semibold tracking-[0.1em] text-slate-400">Urgency cue</p>
                       <p className="mt-1 text-sm font-semibold text-slate-100">{confidenceCueSummary}</p>
                     </div>
                   </div>
                   <div className="grid gap-2 sm:grid-cols-2">
                     <a
                       href={primaryCta.href}
-                      className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-center text-xs font-semibold tracking-[0.14em] hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                      className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-center text-xs font-semibold tracking-[0.12em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
                     >
-                      Primary action: {primaryCta.label}
+                      Open action: {primaryCta.label}
                     </a>
                     {fallbackAction ? (
                       <a
@@ -699,7 +691,7 @@ export const ReportShell = ({
               </section>
 
               <section className="weather-panel sticky bottom-24 z-10 hidden space-y-3 border-sky-500/30 bg-slate-950/95 px-4 py-3 sm:bottom-4 sm:block">
-                <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Current posture</p>
+                <p className="text-sm font-semibold tracking-[0.12em] text-slate-400">Current posture</p>
                 <p className="text-sm font-semibold text-slate-100">{primaryDecisionText}</p>
                 <p className="text-xs text-slate-300">Confidence: {trustStatusLabel}</p>
                 <div className="flex flex-wrap gap-2">
@@ -722,7 +714,7 @@ export const ReportShell = ({
 
               {stageRail ? (
                 <section className="weather-panel space-y-3 px-4 py-4 sm:px-5" aria-label={stageRail.title ?? "Decision flow"}>
-                  <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">{stageRail.title ?? "Decision flow"}</p>
+                  <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">{stageRail.title ?? "Decision flow"}</p>
                   <ol className="grid gap-2 md:grid-cols-5">
                     {stageRail.items.map((item, index) => (
                       <li key={item.id}>
