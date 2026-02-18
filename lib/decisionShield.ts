@@ -120,14 +120,14 @@ const buildReversalTrigger = (assessment: RegimeAssessment) => {
   }
 
   if (assessment.regime === "DEFENSIVE") {
-    return `Revisit when tightness drops below ${tightnessRegime} or risk appetite falls below ${riskAppetiteRegime} for ${REGIME_REVERSAL_DAYS} consecutive days (current: ${assessment.scores.tightness}/${assessment.scores.riskAppetite}).`;
+    return `Revisit when tightness drops below ${tightnessRegime} or risk appetite falls to or below ${riskAppetiteRegime} for ${REGIME_REVERSAL_DAYS} consecutive days (current: ${assessment.scores.tightness}/${assessment.scores.riskAppetite}).`;
   }
 
   if (assessment.regime === "VOLATILE") {
     return `Revisit when tightness rises above ${tightnessRegime} or risk appetite rises above ${riskAppetiteRegime} for ${REGIME_REVERSAL_DAYS} consecutive days (current: ${assessment.scores.tightness}/${assessment.scores.riskAppetite}).`;
   }
 
-  return `Revisit when tightness rises above ${tightnessRegime} or risk appetite falls below ${riskAppetiteRegime} for ${REGIME_REVERSAL_DAYS} consecutive days (current: ${assessment.scores.tightness}/${assessment.scores.riskAppetite}).`;
+  return `Revisit when tightness rises above ${tightnessRegime} or risk appetite falls to or below ${riskAppetiteRegime} for ${REGIME_REVERSAL_DAYS} consecutive days (current: ${assessment.scores.tightness}/${assessment.scores.riskAppetite}).`;
 };
 
 export const evaluateDecision = (
