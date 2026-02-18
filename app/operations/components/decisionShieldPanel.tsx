@@ -60,6 +60,8 @@ export const DecisionShieldPanel = ({
   const [presetName, setPresetName] = useState("");
   const [presetError, setPresetError] = useState<string | null>(null);
   const [presetStatus, setPresetStatus] = useState<string | null>(null);
+  const [memoryStatus, setMemoryStatus] = useState<string | null>(null);
+  const [isSavingMemory, setIsSavingMemory] = useState(false);
   const storageKey = "whether.decisionShield";
   const presetStorageKey = "whether.decisionShieldPresets";
   const { add } = Toast.useToastManager();
@@ -68,6 +70,8 @@ export const DecisionShieldPanel = ({
   const searchParams = useSearchParams();
   const restoredFromStorage = useRef(false);
   const presetInputRef = useRef<HTMLInputElement | null>(null);
+
+  const clientId = useMemo(() => createClientId(), []);
 
   const urlLifecycle = useMemo(
     () => parseParam(searchParams.get("lifecycle"), lifecycleOptions),
@@ -340,6 +344,51 @@ export const DecisionShieldPanel = ({
     }
   };
 
+
+  const handleSaveToDecisionMemory = () => {
+    if (isSavingMemory) {
+      return;
+    }
+
+    setIsSavingMemory(true);
+    setMemoryStatus("Saving to Decision Memory…");
+
+    void fetch("/api/decision-memory", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        clientId,
+        recordDate: provenance.recordDateLabel,
+        decision: { lifecycle, category, action },
+        outcome: {
+          verdict: output.verdict,
+          summary: output.summary,
+          guardrail: output.guardrail,
+          reversalTrigger: output.reversalTrigger,
+        },
+        assessment,
+      }),
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          setMemoryStatus("Failed to save Decision Memory entry.");
+          return;
+        }
+        setMemoryStatus("Decision Memory entry saved.");
+      })
+      .catch(() => {
+        setMemoryStatus("Failed to save Decision Memory entry.");
+      })
+      .finally(() => {
+        setIsSavingMemory(false);
+      });
+  };
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => setMemoryStatus(null), 2600);
+    return () => window.clearTimeout(timeout);
+  }, [memoryStatus]);
+
   const presetHintId = "preset-limit-hint";
 
   return (
@@ -377,6 +426,15 @@ export const DecisionShieldPanel = ({
             >
               {linkCopied ? "Link copied" : isCopying ? "Copying" : "Copy link"}
             </button>
+            <button
+              type="button"
+              onClick={handleSaveToDecisionMemory}
+              disabled={isSavingMemory}
+              aria-busy={isSavingMemory}
+              className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+            >
+              {isSavingMemory ? "Saving" : "Save to memory"}
+            </button>
             <DataProvenanceStrip provenance={provenance} />
           </div>
         </div>
@@ -391,6 +449,9 @@ export const DecisionShieldPanel = ({
         </p>
         <div className="mt-2 min-h-[20px] text-xs text-amber-200" role="status" aria-live="polite">
           {linkCopyError ? "Clipboard blocked. Copy the URL from your browser address bar." : ""}
+        </div>
+        <div className="mt-1 min-h-[20px] text-xs text-slate-300" role="status" aria-live="polite">
+          {memoryStatus ?? ""}
         </div>
         <div className="mt-4 min-h-[260px]">
           {copyError ? (
