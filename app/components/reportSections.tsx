@@ -218,14 +218,14 @@ export const WeeklyActionSummaryPanel = ({
   });
   const weeklyBlocks: ActionSummaryBlock[] = [
     {
-      heading: "Good product strategy sounds like",
+      heading: "Product strategy",
       bullets: [
         "“Our core user problem is unchanged, and we can prove the payoff in 1–2 quarters.”",
         "“We’re trading scope for reliability because retention is the constraint.”",
       ],
     },
     {
-      heading: "Macro-driven advice sounds like",
+      heading: "Macro guidance",
       bullets: [
         "“Delay long-payback bets until cash availability loosens or risk appetite turns.”",
         "“Keep hiring approvals tighter while the curve is inverted.”",
@@ -243,7 +243,7 @@ export const WeeklyActionSummaryPanel = ({
     },
     {
       title: "Lock the one-week bet",
-      detail: "Pick the smallest scope that protects retention or reliability in under two quarters.",
+      detail: "Pick the smallest scope that protects retention or reliability.",
     },
   ];
   const decisionFlow = [

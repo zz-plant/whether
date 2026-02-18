@@ -73,7 +73,7 @@ const homeSectionSequence = [
 const operatorFitPrimitives = [
   {
     title: "Audience",
-    detail: "Product and engineering leaders.",
+    detail: "Product, engineering, and finance leaders.",
   },
   {
     title: "Decision window",
@@ -576,11 +576,11 @@ export default async function HomePage({
         <div className="space-y-3">
           <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Read this first</p>
           <h1 className="max-w-3xl text-2xl font-semibold text-slate-100 sm:text-3xl">
-            Decision card: what changed, what to do now, and how confident to be.
+            Decision card: what changed and what to do now.
           </h1>
           <div className="flex flex-wrap items-center gap-2">
             <p className="text-xs font-semibold tracking-[0.14em] text-slate-400">View mode</p>
-            <p className="text-xs text-slate-500">Narrative briefing · Dense evidence view</p>
+            <p className="text-xs text-slate-500">Narrative · Evidence</p>
             {[
               { key: "narrative", label: "Narrative" },
               { key: "evidence", label: "Evidence" },
@@ -608,7 +608,7 @@ export default async function HomePage({
           <p className="text-sm text-slate-200">{assessment.description}</p>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">What to do now</p>
           <p className="text-sm text-slate-200">{trustStatusAction}</p>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Confidence and caveat</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Confidence</p>
           <p className="text-sm text-slate-200">
             {trustStatusLabel} · {trustStatusDetail}
           </p>
@@ -650,8 +650,8 @@ export default async function HomePage({
             <h2 id="evidence-matrix-title" className="text-xl font-semibold text-slate-100 sm:text-2xl">
               High-density macro evidence for weekly operating decisions.
             </h2>
-            <p className="text-sm text-slate-300">
-              <abbr title="Year-over-year" className="cursor-help no-underline">YoY</abbr>, <abbr title="Basis points" className="cursor-help no-underline">bps</abbr>, and <abbr title="10-year minus 2-year Treasury spread" className="cursor-help no-underline">10Y−2Y</abbr> use inline tooltip definitions.
+              <p className="text-sm text-slate-300">
+              <abbr title="Year-over-year" className="cursor-help no-underline">YoY</abbr>, <abbr title="Basis points" className="cursor-help no-underline">bps</abbr>, and <abbr title="10-year minus 2-year Treasury spread" className="cursor-help no-underline">10Y−2Y</abbr> are defined inline.
             </p>
           </div>
           <div className="space-y-3">

@@ -51,6 +51,7 @@ so outputs remain traceable, explainable, and operator‑friendly.
 ## 4) UI requirements
 ### Regime Hero
 - Large label + short description that translates to operator constraints.
+- Keep above-the-fold copy scan-first: max one headline + one support sentence before primary CTA.
 - Color-coded badge (sparse semantic color only).
 
 ### Sensor Array
@@ -60,6 +61,7 @@ so outputs remain traceable, explainable, and operator‑friendly.
 ### Playbook
 - STOP / START / FENCE lists with reasons.
 - Lists should be concise (≤ 5 items each).
+- Prefer action-first bullets; avoid repeating the same guidance in multiple adjacent modules.
 
 ### Decision Shield
 - Dropdown inputs (Lifecycle, Category, Action).

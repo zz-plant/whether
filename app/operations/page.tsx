@@ -57,14 +57,14 @@ export default async function OperationsPage({
   const quickSteps = [
     {
       title: "Now: confirm the posture",
-      detail: "Use the current regime to decide what to fund immediately versus defer.",
+      detail: "Use the regime to decide what to fund now vs. defer.",
       href: "#ops-monthly-action-summary",
       cta: "Review monthly actions",
       emphasis: "primary",
     },
     {
       title: "Next: pick a workstream",
-      detail: "Route to plan, decisions, or briefings based on the question in front of you.",
+      detail: "Route to plan, decisions, or briefings based on the question at hand.",
       href: "#ops-workstreams",
       cta: "Review workstreams",
       emphasis: "secondary",
@@ -146,7 +146,7 @@ export default async function OperationsPage({
       objective: "Commit immediate scope and freeze non-essential spend.",
       ownerRole: "Product + Engineering",
       dueWindow: "Friday EOD",
-      impact: "Protect reliability and preserve delivery confidence.",
+      impact: "Protect reliability and delivery confidence.",
       href: "#ops-monthly-action-summary",
     },
     {
@@ -154,7 +154,7 @@ export default async function OperationsPage({
       objective: "Align workstream owners and publish operating guardrails.",
       ownerRole: "Staff PM + Finance partner",
       dueWindow: "Month-end review",
-      impact: "Reduce execution drift and improve cross-team sequencing.",
+      impact: "Reduce drift and improve sequencing.",
       href: "#ops-workstreams",
     },
     {
@@ -162,7 +162,7 @@ export default async function OperationsPage({
       objective: "Rebalance roadmap bets against regime constraints.",
       ownerRole: "Exec staff",
       dueWindow: "Quarterly planning",
-      impact: "Improve capital efficiency under current climate posture.",
+      impact: "Improve capital efficiency under current posture.",
       href: "/operations/plan",
     },
   ] as const;
@@ -215,7 +215,7 @@ export default async function OperationsPage({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Action playbook"
       currentPath="/operations"
-      pageSummary="Turn macro signals into execution posture, decision guardrails, and leadership-ready briefs."
+      pageSummary="Turn macro signals into execution posture and decision guardrails."
       pageSummaryLink={{ href: "#ops-workstreams", label: "Review execution details" }}
       pageLinks={reportPageLinks}
       sectionLinks={operationsSectionLinks.overview}
@@ -225,7 +225,7 @@ export default async function OperationsPage({
       stageRail={{ title: "Global decision flow", items: stageItems }}
       decisionBanner={{
         label: "Decide now",
-        decision: "Set this month's operating posture and commit guardrails.",
+        decision: "Set this month's posture and commit guardrails.",
         horizon: "2-6 weeks",
         confidence: trustStatusLabel,
         effectiveDate: recordDateLabel,
@@ -248,7 +248,7 @@ export default async function OperationsPage({
         { label: `Trust: ${trustStatusLabel}`, tone: trustStatusTone === "stable" ? "positive" : "warning" },
       ]}
       nextStep={{
-        description: "Turn this playbook into owner-level assignments and export briefings.",
+        description: "Turn this playbook into owner assignments and exports.",
         href: appendSearchParamsToRoute("/operations/plan", resolvedSearchParams),
       }}
       structuredData={JSON.stringify(structuredData)}
@@ -274,7 +274,7 @@ export default async function OperationsPage({
       <SectionedReportPanel
         id="ops-horizon-plan"
         title="Time horizon plan"
-        description="Decide execution moves by this week, this month, and this quarter."
+        description="Decide moves for this week, month, and quarter."
       >
         <div className="grid gap-4 lg:grid-cols-3">
           {horizonPlan.map((item) => (
