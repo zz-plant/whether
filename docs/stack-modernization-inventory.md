@@ -9,7 +9,7 @@
 - **Tailwind CSS:** 3.4.6.
 - **Cloudflare adapter:** @cloudflare/next-on-pages 1.13.16.
 - **Testing:** `node --test` via `bun test`.
-- **Linting:** `next lint` via `bun run lint`.
+- **Linting:** `eslint` CLI via `bun run lint`.
 
 ## Newer capabilities snapshot (research baseline)
 
@@ -22,7 +22,7 @@ This section maps the currently pinned stack to newer stable versions and highli
 | React / React DOM | 19.2.4 | 19.2.4 | React 19 Actions for async mutations, `useOptimistic`, form-centric hooks (`useFormStatus`, `useActionState`), improved Suspense behavior, and static React DOM APIs. |
 | TypeScript | 5.9.3 | 5.9.3 | Language service and type-checking improvements, faster editor workflows, and newer type-system ergonomics from 5.6–5.9 releases. |
 | Tailwind CSS | 3.4.6 | 4.1.18 | Tailwind v4 CSS-first setup, streamlined content/source detection, and reduced PostCSS plugin surface for common setups. |
-| Zod | 3.23.8 | 4.3.6 | Zod 4 API/performance updates and schema ergonomics improvements for large validation surfaces. |
+| Zod | 3.25.76 | 4.3.6 | Zod 4 API/performance updates and schema ergonomics improvements for large validation surfaces. |
 | ESLint | 8.57.0 | 9.39.2 | Flat config-first ecosystem direction and updated rule/tooling compatibility expectations. |
 
 ### Research sources used for this snapshot
