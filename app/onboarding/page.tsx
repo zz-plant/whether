@@ -49,8 +49,8 @@ export default async function OnboardingPage({
       title: "Orient to the report",
       detail:
         activeExperience === "new"
-          ? "Start with the core leadership questions: what regime are we in, what moves does it favor, and what should we avoid."
-          : "Start with a fast refresh of the current regime, confidence cue, and recommended operating posture.",
+          ? "Start with three questions: what regime are we in, what moves does it favor, and what should we avoid?"
+          : "Refresh the regime, confidence cue, and operating posture.",
       href: "#first-time-guide",
       cta: "Start onboarding",
       emphasis: "primary",
@@ -59,8 +59,8 @@ export default async function OnboardingPage({
       title: "Decode the vocabulary",
       detail:
         activeExperience === "new"
-          ? "Translate macro terms into product, engineering, and finance decisions your team can act on."
-          : "Skim only the terms that changed your last decision memo so leadership language stays aligned.",
+          ? "Translate macro terms into product, engineering, and finance decisions."
+          : "Skim only terms that changed since your last memo.",
       href: "#beginner-glossary",
       cta: "Open the glossary",
       emphasis: "secondary",
@@ -170,8 +170,8 @@ export default async function OnboardingPage({
           </h2>
           <p className="text-sm text-slate-300">
             {activeExperience === "new"
-              ? "Estimated time: ~3 minutes. Outcome: a clear read on what to do this week and what to defer."
-              : "Estimated time: ~90 seconds. Outcome: refresh your context and jump to evidence faster."}
+              ? "~3 minutes to get a clear weekly action read."
+              : "~90 seconds to refresh context and jump to evidence."}
           </p>
           <div className="flex flex-wrap items-center gap-2">
             <p className="text-xs font-semibold tracking-[0.14em] text-slate-400">Experience mode</p>
@@ -212,7 +212,7 @@ export default async function OnboardingPage({
         <div>
           <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Apply each concept</p>
           <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-            Jump straight from glossary concepts to the live report sections.
+            Jump from concepts to live report sections.
           </h2>
         </div>
         <ul className="grid gap-3 md:grid-cols-3">

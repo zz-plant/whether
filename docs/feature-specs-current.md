@@ -29,6 +29,8 @@ The evidence matrix is intentionally high-density: direct row labels replace det
 median/threshold references are embedded in each sparkline, and accent color is reserved for outlier
 conditions so contributors preserve scanability under operational time pressure.
 
+Copy strategy for briefing and onboarding surfaces favors concise, action-first language: one headline plus one support sentence before primary actions, with deeper rationale moved into expandable or secondary sections.
+
 ### 1.2 Signals report (/signals)
 The signals report focuses on evidence and methodology, with sections for:
 - Sensor array (live yield curve readings + derived scores)
