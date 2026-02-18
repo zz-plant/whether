@@ -255,7 +255,7 @@ export const ReportShell = ({
       return accumulator;
     }
 
-    if (!accumulator.some((item) => item.href === action.href && item.label === action.label)) {
+    if (!accumulator.some((item) => item.href === action.href && item.group === action.group)) {
       accumulator.push(action);
     }
 
