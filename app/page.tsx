@@ -61,7 +61,6 @@ const ReportGroup = ({
 const homeSectionSequence = [
   { href: "#operator-fit", label: "Who this is for" },
   { href: "#weekly-action-summary", label: "This week's forecast" },
-  { href: "#weekly-action-summary", label: "Next recommended move" },
   { href: "#executive-snapshot", label: "Leadership summary" },
   { href: "#regime-alerts", label: "New alerts" },
   { href: "#weekly-digest", label: "Signs to watch" },
