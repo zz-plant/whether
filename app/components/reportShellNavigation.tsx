@@ -158,7 +158,7 @@ export const ReportPageNavigation = ({
                 Prev
               </a>
             ) : (
-              <span className="weather-pill inline-flex min-h-[44px] items-center gap-2 border border-slate-800/50 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-slate-500/80">
+              <span aria-disabled="true" className="weather-pill inline-flex min-h-[44px] items-center gap-2 border border-slate-800/50 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-slate-500/80">
                 <span aria-hidden="true">←</span>
                 Prev
               </span>
@@ -173,7 +173,7 @@ export const ReportPageNavigation = ({
                 <span aria-hidden="true">→</span>
               </a>
             ) : (
-              <span className="weather-pill inline-flex min-h-[44px] items-center gap-2 border border-slate-800/50 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-slate-500/80">
+              <span aria-disabled="true" className="weather-pill inline-flex min-h-[44px] items-center gap-2 border border-slate-800/50 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-slate-500/80">
                 Next
                 <span aria-hidden="true">→</span>
               </span>
@@ -324,17 +324,15 @@ export const ReportMobileNavigation = ({
                 <span className="uppercase">Prev</span>
               </a>
             ) : (
-              <button
-                type="button"
+              <span
                 aria-disabled="true"
-                disabled
                 className="weather-pill pointer-events-none inline-flex min-h-[48px] w-full flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/60 px-2 py-2 text-xs font-semibold tracking-[0.16em] text-slate-500/80 opacity-70"
               >
                 <span aria-hidden="true" className="text-base leading-none">
                   ←
                 </span>
                 <span className="uppercase">Prev</span>
-              </button>
+              </span>
             )}
 
             <Collapsible.Trigger
@@ -378,17 +376,15 @@ export const ReportMobileNavigation = ({
                 <span className="uppercase">Next</span>
               </a>
             ) : (
-              <button
-                type="button"
+              <span
                 aria-disabled="true"
-                disabled
                 className="weather-pill pointer-events-none inline-flex min-h-[48px] w-full flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/60 px-2 py-2 text-xs font-semibold tracking-[0.16em] text-slate-500/80 opacity-70"
               >
                 <span aria-hidden="true" className="text-base leading-none">
                   →
                 </span>
                 <span className="uppercase">Next</span>
-              </button>
+              </span>
             )}
           </div>
         </div>
