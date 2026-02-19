@@ -28,7 +28,18 @@ export const DisplayModeToggle = () => {
   const [mode, setMode] = useState<"auto" | "tv">("auto");
 
   useEffect(() => {
-    setMode(getInitialToggleMode());
+    const syncFromLocation = () => {
+      setMode(getInitialToggleMode());
+    };
+
+    syncFromLocation();
+    window.addEventListener("popstate", syncFromLocation);
+    window.addEventListener("storage", syncFromLocation);
+
+    return () => {
+      window.removeEventListener("popstate", syncFromLocation);
+      window.removeEventListener("storage", syncFromLocation);
+    };
   }, []);
 
   const updateMode = (nextMode: "auto" | "tv") => {
@@ -54,6 +65,7 @@ export const DisplayModeToggle = () => {
       type="button"
       onClick={() => updateMode(isTv ? "auto" : "tv")}
       aria-pressed={isTv}
+      aria-label={isTv ? "Switch to auto display mode" : "Switch to TV display mode"}
       className="weather-pill inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
     >
       {isTv ? "Use auto display mode" : "Force TV display mode"}

@@ -19,6 +19,7 @@ export const MobileActionSheet = ({
 }) => {
   const [open, setOpen] = useState(false);
   const dialogId = useId();
+  const titleId = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -138,13 +139,13 @@ export const MobileActionSheet = ({
             id={dialogId}
             role="dialog"
             aria-modal="true"
-            aria-label="Additional actions"
-            className="w-full rounded-3xl border border-slate-700/80 bg-slate-950/95 p-4 shadow-2xl"
+            aria-labelledby={titleId}
+            className="weather-mobile-panel weather-mobile-sheet w-full overflow-auto p-4 shadow-2xl"
             onKeyDown={handleFocusTrap}
             onClick={(event) => event.stopPropagation()}
           >
             <div className="mb-3 flex items-center justify-between gap-3">
-              <p className="text-xs font-semibold tracking-[0.2em] text-slate-300">More actions</p>
+              <p id={titleId} className="text-xs font-semibold tracking-[0.2em] text-slate-300">More actions</p>
               <button
                 ref={closeRef}
                 type="button"
