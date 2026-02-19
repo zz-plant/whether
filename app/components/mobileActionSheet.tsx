@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { useEffect, useId, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { handleDirectionalFocus } from "./directionalFocus";
 
 type MobileAction = {
@@ -18,6 +18,7 @@ export const MobileActionSheet = ({
   actions: MobileAction[];
 }) => {
   const [open, setOpen] = useState(false);
+  const dialogId = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -103,7 +104,7 @@ export const MobileActionSheet = ({
         className="weather-pill inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full px-3 py-2 text-center text-xs font-semibold tracking-[0.12em] text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
         aria-haspopup="dialog"
         aria-expanded={open}
-        aria-controls="mobile-action-sheet-dialog"
+        aria-controls={dialogId}
       >
         <span>{triggerLabel}</span>
         <span
@@ -134,7 +135,7 @@ export const MobileActionSheet = ({
         >
           <div
             ref={sheetRef}
-            id="mobile-action-sheet-dialog"
+            id={dialogId}
             role="dialog"
             aria-modal="true"
             aria-label="Additional actions"

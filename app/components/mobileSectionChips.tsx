@@ -70,6 +70,7 @@ export const MobileSectionChips = ({
               <a
                 href={link.href}
                 aria-current={isActive ? "location" : undefined}
+                onClick={() => setActiveHash(link.href)}
                 className={`weather-pill inline-flex min-h-[44px] items-center rounded-full px-3 py-2 text-xs font-semibold tracking-[0.12em] touch-manipulation ${
                   isActive
                     ? "border-sky-300/80 bg-sky-500/15 text-sky-100"

@@ -158,7 +158,7 @@ export const ReportPageNavigation = ({
                 Prev
               </a>
             ) : (
-              <span className="weather-pill inline-flex min-h-[44px] items-center gap-2 border border-slate-800/50 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-slate-500/80">
+              <span aria-disabled="true" className="weather-pill inline-flex min-h-[44px] items-center gap-2 border border-slate-800/50 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-slate-500/80">
                 <span aria-hidden="true">←</span>
                 Prev
               </span>
@@ -173,7 +173,7 @@ export const ReportPageNavigation = ({
                 <span aria-hidden="true">→</span>
               </a>
             ) : (
-              <span className="weather-pill inline-flex min-h-[44px] items-center gap-2 border border-slate-800/50 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-slate-500/80">
+              <span aria-disabled="true" className="weather-pill inline-flex min-h-[44px] items-center gap-2 border border-slate-800/50 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-slate-500/80">
                 Next
                 <span aria-hidden="true">→</span>
               </span>
