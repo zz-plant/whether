@@ -14,6 +14,7 @@ export type OperatorCommandAction = {
 type CommandFilter = "All" | OperatorCommandAction["group"];
 
 const STORAGE_KEY = "whether-command-center-query";
+const FILTER_STORAGE_KEY = "whether-command-center-filter";
 const VISITED_KEY = "whether-command-center-visited";
 const filterOrder: CommandFilter[] = ["All", "Playbook", "Pages", "Sections"];
 
@@ -71,6 +72,16 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
       setQuery(initialQuery);
     }
 
+    const storedFilter = sessionStorage.getItem(FILTER_STORAGE_KEY);
+    if (
+      storedFilter === "All" ||
+      storedFilter === "Playbook" ||
+      storedFilter === "Pages" ||
+      storedFilter === "Sections"
+    ) {
+      setFilter(storedFilter);
+    }
+
     const mobileMedia = window.matchMedia("(max-width: 639px)");
     const applyViewport = () => setIsMobile(mobileMedia.matches);
     applyViewport();
@@ -81,7 +92,9 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
       setIsExpanded(false);
     }
 
-    setFilter(mobileMedia.matches ? "Playbook" : "All");
+    if (!storedFilter) {
+      setFilter(mobileMedia.matches ? "Playbook" : "All");
+    }
 
     const onChange = () => {
       applyViewport();
@@ -102,6 +115,10 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
   useEffect(() => {
     sessionStorage.setItem(STORAGE_KEY, query);
   }, [query]);
+
+  useEffect(() => {
+    sessionStorage.setItem(FILTER_STORAGE_KEY, filter);
+  }, [filter]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -187,6 +204,18 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
     window.setTimeout(() => searchInputRef.current?.focus(), 0);
   };
 
+  const handleCollapse = () => {
+    setIsExpanded(false);
+  };
+
+  const handleReset = () => {
+    setQuery("");
+    setFilter(isMobile ? "Playbook" : "All");
+    searchInputRef.current?.focus();
+  };
+
+  const hasActiveRefinement = query.length > 0 || (isMobile ? filter !== "Playbook" : filter !== "All");
+
   return (
     <section
       ref={commandCenterRef}
@@ -198,6 +227,15 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-base font-semibold tracking-[0.08em] text-slate-100">Command center</h2>
         <div className="flex flex-wrap items-center gap-2">
+          {isExpanded ? (
+            <button
+              type="button"
+              onClick={handleCollapse}
+              className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+            >
+              Collapse
+            </button>
+          ) : null}
           <span className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-300">
             {totalResults} links
           </span>
@@ -212,11 +250,17 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
         </div>
       </div>
 
-      {isFirstSession && !isExpanded ? (
+      {!isExpanded ? (
         <div className="weather-surface space-y-3 p-4">
-          <p className="text-sm text-slate-200">
-            First session: start with this page’s content first. Open command center when you need to jump.
-          </p>
+          {isFirstSession ? (
+            <p className="text-sm text-slate-200">
+              First session: start with this page’s content first. Open command center when you need to jump.
+            </p>
+          ) : (
+            <p className="text-sm text-slate-200">
+              Command center is collapsed. Open it any time to jump to playbook actions, pages, or sections.
+            </p>
+          )}
           <button
             type="button"
             onClick={handleExpand}
@@ -270,6 +314,15 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
               {isMobile ? (
                 <p className="text-xs text-slate-500">Mobile default is Playbook for faster “do now” access.</p>
               ) : null}
+              {hasActiveRefinement ? (
+                <button
+                  type="button"
+                  onClick={handleReset}
+                  className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                >
+                  Reset search
+                </button>
+              ) : null}
               <div className="weather-surface grid gap-2 p-3 text-xs text-slate-300 sm:grid-cols-2">
                 <p><span className="font-semibold text-slate-100">↑/↓</span> move focus</p>
                 <p><span className="font-semibold text-slate-100">←/→</span> switch controls</p>
@@ -281,7 +334,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
 
           {totalResults === 0 ? (
             <p className="rounded-2xl border border-slate-800/70 bg-slate-950/50 px-3 py-3 text-sm text-slate-300">
-              No matches.
+              No matches. Try broader terms or reset search.
             </p>
           ) : (
             <div className="grid gap-3 lg:grid-cols-3">
@@ -329,6 +382,9 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
               })}
             </div>
           )}
+          <p className="sr-only" role="status" aria-live="polite">
+            {totalResults} command center results shown.
+          </p>
         </>
       ) : null}
     </section>
