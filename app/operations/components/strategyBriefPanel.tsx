@@ -36,6 +36,30 @@ const buildStrategyBrief = (
   ].join("\n");
 };
 
+const strategySections = [
+  {
+    key: "priorities",
+    title: "Priority now",
+    badge: "Focus",
+    icon: "🎯",
+    surfaceClass: "border-sky-400/35 bg-sky-500/10",
+  },
+  {
+    key: "watchlist",
+    title: "Watch closely",
+    badge: "Monitor",
+    icon: "👀",
+    surfaceClass: "border-amber-400/35 bg-amber-500/10",
+  },
+  {
+    key: "reversalTriggers",
+    title: "Pivot signals",
+    badge: "Trigger",
+    icon: "↩",
+    surfaceClass: "border-violet-400/35 bg-violet-500/10",
+  },
+] as const;
+
 export const StrategyBriefPanel = ({
   assessment,
   recordDateLabel,
@@ -52,6 +76,14 @@ export const StrategyBriefPanel = ({
   const briefing = useMemo(
     () => buildStrategyBrief(assessment, recordDateLabel),
     [assessment, recordDateLabel]
+  );
+
+  const strategyTemplate = useMemo(
+    () =>
+      insightDatabase.strategyBriefing.regimes.find(
+        (entry) => entry.key === assessment.regime
+      ),
+    [assessment.regime]
   );
 
   const handleCopy = () => {
@@ -89,13 +121,68 @@ export const StrategyBriefPanel = ({
           </div>
         </div>
         <div className="mt-6 grid gap-4 lg:grid-cols-[1.4fr,0.6fr]">
-          <div className="weather-surface p-4">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-              Generated narrative
-            </p>
-            <pre className="mt-4 whitespace-pre-wrap text-sm text-slate-200">
-              {briefing}
-            </pre>
+          <div className="space-y-4">
+            {strategyTemplate ? (
+              <>
+                <div className="weather-surface border border-sky-400/40 bg-sky-500/10 p-4">
+                  <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
+                    At a glance
+                  </p>
+                  <p className="mt-2 text-lg font-semibold text-slate-50">
+                    {strategyTemplate.headline}
+                  </p>
+                  <p className="mt-3 text-sm leading-relaxed text-slate-200">
+                    {strategyTemplate.narrative}
+                  </p>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-3">
+                  {strategySections.map((section) => {
+                    const entries = strategyTemplate[section.key];
+                    return (
+                      <article
+                        key={section.key}
+                        className={`weather-surface border p-4 ${section.surfaceClass}`}
+                      >
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-slate-300">
+                          {section.badge}
+                        </p>
+                        <h4 className="mt-2 flex items-center gap-2 text-sm font-semibold text-slate-50">
+                          <span aria-hidden="true">{section.icon}</span>
+                          {section.title}
+                        </h4>
+                        <ul className="mt-3 space-y-2 text-sm text-slate-200">
+                          {entries.map((entry) => (
+                            <li key={entry} className="flex items-start gap-2">
+                              <span
+                                className="mt-[6px] inline-block h-1.5 w-1.5 rounded-full bg-current"
+                                aria-hidden="true"
+                              />
+                              <span>{entry}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </article>
+                    );
+                  })}
+                </div>
+              </>
+            ) : (
+              <div className="weather-surface p-4">
+                <p className="text-sm text-slate-300">
+                  Strategy Brief unavailable for current market climate.
+                </p>
+              </div>
+            )}
+
+            <details className="weather-surface p-4">
+              <summary className="cursor-pointer text-xs font-semibold tracking-[0.12em] text-slate-300">
+                Full copy-ready narrative
+              </summary>
+              <pre className="mt-4 whitespace-pre-wrap text-sm text-slate-300">
+                {briefing}
+              </pre>
+            </details>
           </div>
           <div className="weather-surface p-4">
             <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Status</p>
