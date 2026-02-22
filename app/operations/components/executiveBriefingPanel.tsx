@@ -7,10 +7,14 @@ import { insightDatabase } from "../../../data/recommendations";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 import { useClipboardCopy } from "../../components/useClipboardCopy";
 
-const buildExecutiveMemo = (assessment: RegimeAssessment, recordDateLabel: string) => {
-  const template = insightDatabase.executiveBriefingSuite.regimes.find(
-    (entry) => entry.key === assessment.regime
-  );
+type ExecutiveTemplate =
+  (typeof insightDatabase.executiveBriefingSuite.regimes)[number];
+
+const buildExecutiveMemo = (
+  assessment: RegimeAssessment,
+  recordDateLabel: string,
+  template: ExecutiveTemplate | undefined
+) => {
 
   if (!template) {
     return "Executive memo unavailable for current market climate.";
@@ -33,10 +37,10 @@ const buildExecutiveMemo = (assessment: RegimeAssessment, recordDateLabel: strin
   ].join("\n");
 };
 
-const buildGuardrailChecklist = (assessment: RegimeAssessment) => {
-  const template = insightDatabase.executiveBriefingSuite.regimes.find(
-    (entry) => entry.key === assessment.regime
-  );
+const buildGuardrailChecklist = (
+  assessment: RegimeAssessment,
+  template: ExecutiveTemplate | undefined
+) => {
 
   if (!template) {
     return "Guardrail checklist unavailable.";
@@ -47,6 +51,33 @@ const buildGuardrailChecklist = (assessment: RegimeAssessment) => {
     ...template.decisionGuardrails.map((item) => `• ${item}`),
   ].join("\n");
 };
+
+const visualSections = [
+  {
+    key: "decisionGuardrails",
+    title: "Guardrails",
+    subtitle: "Do this by default",
+    badge: "Operate",
+    icon: "🛡️",
+    surfaceClass: "border-sky-400/35 bg-sky-500/10",
+  },
+  {
+    key: "decisionTemplates",
+    title: "Decision calls",
+    subtitle: "Use these ready-made stances",
+    badge: "Decide",
+    icon: "🧭",
+    surfaceClass: "border-emerald-400/35 bg-emerald-500/10",
+  },
+  {
+    key: "reversalTriggers",
+    title: "Reversal triggers",
+    subtitle: "Signals to pivot quickly",
+    badge: "Watch",
+    icon: "↩",
+    surfaceClass: "border-violet-400/35 bg-violet-500/10",
+  },
+] as const;
 
 export const ExecutiveBriefingPanel = ({
   assessment,
@@ -60,13 +91,21 @@ export const ExecutiveBriefingPanel = ({
   const { status, error, activeTarget, copiedTarget, copyToClipboard } =
     useClipboardCopy();
 
+  const template = useMemo(
+    () =>
+      insightDatabase.executiveBriefingSuite.regimes.find(
+        (entry) => entry.key === assessment.regime
+      ),
+    [assessment.regime]
+  );
+
   const executiveMemo = useMemo(
-    () => buildExecutiveMemo(assessment, recordDateLabel),
-    [assessment, recordDateLabel]
+    () => buildExecutiveMemo(assessment, recordDateLabel, template),
+    [assessment, recordDateLabel, template]
   );
   const guardrailChecklist = useMemo(
-    () => buildGuardrailChecklist(assessment),
-    [assessment]
+    () => buildGuardrailChecklist(assessment, template),
+    [assessment, template]
   );
 
   const isCopying = status === "copying";
@@ -90,54 +129,105 @@ export const ExecutiveBriefingPanel = ({
           </div>
           <DataProvenanceStrip provenance={provenance} />
         </div>
-        <div className="mt-6 grid gap-4 lg:grid-cols-[1.3fr,0.7fr]">
-          <div className="weather-surface p-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                Board-ready memo
+        <div className="mt-6 space-y-4">
+          {template ? (
+            <>
+              <div className="weather-surface border border-sky-400/35 bg-sky-500/10 p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
+                      Board summary
+                    </p>
+                    <p className="mt-2 text-xl font-semibold text-slate-50">
+                      {template.executiveSummary}
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    onClick={() => copyToClipboard(executiveMemo, "Memo")}
+                    disabled={isCopying}
+                    aria-busy={isCopying}
+                    className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+                  >
+                    {isCopying && activeTarget === "Memo" ? "Copying" : "Copy memo"}
+                  </Button>
+                </div>
+              </div>
+
+              <div className="grid gap-3 lg:grid-cols-3">
+                {visualSections.map((section) => {
+                  const items = template[section.key];
+                  return (
+                    <article
+                      key={section.key}
+                      className={`weather-surface border p-4 ${section.surfaceClass}`}
+                    >
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-slate-300">
+                        {section.badge}
+                      </p>
+                      <h4 className="mt-2 flex items-center gap-2 text-sm font-semibold text-slate-50">
+                        <span aria-hidden="true">{section.icon}</span>
+                        {section.title}
+                      </h4>
+                      <p className="mt-1 text-xs text-slate-300">{section.subtitle}</p>
+                      <ul className="mt-3 space-y-2 text-sm text-slate-100">
+                        {items.map((item) => (
+                          <li key={item} className="flex items-start gap-2">
+                            <span
+                              className="mt-[6px] inline-block h-1.5 w-1.5 rounded-full bg-current"
+                              aria-hidden="true"
+                            />
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </article>
+                  );
+                })}
+              </div>
+
+              <div className="weather-surface p-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                    Guardrail checklist
+                  </p>
+                  <Button
+                    type="button"
+                    onClick={() => copyToClipboard(guardrailChecklist, "Checklist")}
+                    disabled={isCopying}
+                    aria-busy={isCopying}
+                    className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+                  >
+                    {isCopying && activeTarget === "Checklist"
+                      ? "Copying"
+                      : "Copy checklist"}
+                  </Button>
+                </div>
+                <p className="mt-4 text-xs text-slate-500">
+                  {error
+                    ? "Clipboard unavailable in this environment."
+                    : copiedTarget
+                      ? `${copiedTarget} copied.`
+                      : "Ready to share in executive reviews."}
+                </p>
+              </div>
+
+              <details className="weather-surface p-4">
+                <summary className="cursor-pointer text-xs font-semibold tracking-[0.12em] text-slate-300">
+                  Full copy-ready executive memo
+                </summary>
+                <pre className="mt-4 whitespace-pre-wrap text-sm text-slate-200">
+                  {executiveMemo}
+                </pre>
+              </details>
+            </>
+          ) : (
+            <div className="weather-surface p-4">
+              <p className="text-sm text-slate-300">
+                Executive memo unavailable for current market climate.
               </p>
-              <Button
-                type="button"
-                onClick={() => copyToClipboard(executiveMemo, "Memo")}
-                disabled={isCopying}
-                aria-busy={isCopying}
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
-              >
-                {isCopying && activeTarget === "Memo" ? "Copying" : "Copy memo"}
-              </Button>
             </div>
-            <pre className="mt-4 whitespace-pre-wrap text-sm text-slate-200">
-              {executiveMemo}
-            </pre>
-          </div>
-          <div className="weather-surface p-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                Guardrail checklist
-              </p>
-              <Button
-                type="button"
-                onClick={() => copyToClipboard(guardrailChecklist, "Checklist")}
-                disabled={isCopying}
-                aria-busy={isCopying}
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
-              >
-                {isCopying && activeTarget === "Checklist"
-                  ? "Copying"
-                  : "Copy checklist"}
-              </Button>
-            </div>
-            <pre className="mt-4 whitespace-pre-wrap text-sm text-slate-200">
-              {guardrailChecklist}
-            </pre>
-            <p className="mt-4 text-xs text-slate-500">
-              {error
-                ? "Clipboard unavailable in this environment."
-                : copiedTarget
-                  ? `${copiedTarget} copied.`
-                  : "Ready to share in executive reviews."}
-            </p>
-          </div>
+          )}
         </div>
       </div>
     </section>
