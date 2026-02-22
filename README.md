@@ -1,10 +1,10 @@
-# Whether — Regime Station
+# Whether — Market Climate Station
 
 Whether translates public macro signals into operational guidance for product and engineering leaders.
 
 ## What Whether does
-- Detects the current market regime from Treasury yield data and companion macro signals.
-- Converts that regime into concrete operating constraints (pace, hiring posture, roadmap bias).
+- Detects the current market climate from Treasury yield data and companion macro signals.
+- Converts that climate read into concrete operating constraints (pace, hiring posture, roadmap bias).
 - Provides decision support tools (Decision Shield, assumption locks, scenario previews, brief exports).
 - Keeps outputs auditable with explicit source metadata and freshness timestamps.
 
@@ -27,7 +27,7 @@ Whether translates public macro signals into operational guidance for product an
 
 ## Project map (high signal)
 - `app/` — Next.js App Router pages and UI features.
-- `lib/` — Regime logic, data clients, thresholds, and shared utilities.
+- `lib/` — Market-climate logic, data clients, thresholds, and shared utilities.
 - `data/` — Snapshot/cache artifacts used for deterministic and offline-safe behavior.
 - `tests/` — Node test suites for engine logic and decision rules.
 - `scripts/` — Build and data-maintenance scripts.
