@@ -4,7 +4,7 @@ import { resolveSiteUrl } from "../lib/siteUrl";
 
 describe("site URL resolution", () => {
   it("falls back to the default URL when the value is missing", () => {
-    assert.equal(resolveSiteUrl(undefined), "https://whether.report");
+    assert.equal(resolveSiteUrl(undefined), "https://whether.work");
   });
 
   it("adds https when the value is missing a protocol", () => {
@@ -19,6 +19,6 @@ describe("site URL resolution", () => {
   });
 
   it("falls back to the default URL when the value is invalid", () => {
-    assert.equal(resolveSiteUrl("http://[::1"), "https://whether.report");
+    assert.equal(resolveSiteUrl("http://[::1"), "https://whether.work");
   });
 });

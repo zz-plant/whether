@@ -1,4 +1,4 @@
-const DEFAULT_SITE_URL = "https://whether.report";
+const DEFAULT_SITE_URL = "https://whether.work";
 
 const hasProtocol = (value: string) => /^https?:\/\//i.test(value);
 
