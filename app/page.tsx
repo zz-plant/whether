@@ -556,7 +556,7 @@ export default async function HomePage({
       sidebarVariant="hidden"
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
-      structuredData={JSON.stringify(structuredData)}
+      structuredData={structuredData}
       historicalBanner={
         historicalSelection ? (
           <HistoricalBanner banner={historicalSelection.banner} liveHref="/" />

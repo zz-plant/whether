@@ -251,7 +251,7 @@ export default async function OperationsPage({
         description: "Turn this playbook into owner assignments and exports.",
         href: appendSearchParamsToRoute("/operations/plan", resolvedSearchParams),
       }}
-      structuredData={JSON.stringify(structuredData)}
+      structuredData={structuredData}
       historicalBanner={
         historicalSelection ? (
           <HistoricalBanner banner={historicalSelection.banner} liveHref="/operations" />

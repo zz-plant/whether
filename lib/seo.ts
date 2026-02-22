@@ -28,6 +28,18 @@ export const buildBreadcrumbList = (items: Array<{ name: string; path: string }>
   })),
 });
 
+/**
+ * Safely serializes JSON-LD for embedding in a script tag.
+ * Escapes characters that can terminate the script context in HTML.
+ */
+export const serializeJsonLd = (value: unknown) =>
+  JSON.stringify(value)
+    .replaceAll("<", "\\u003c")
+    .replaceAll(">", "\\u003e")
+    .replaceAll("&", "\\u0026")
+    .replaceAll("\u2028", "\\u2028")
+    .replaceAll("\u2029", "\\u2029");
+
 export const buildPageMetadata = ({
   title,
   description,

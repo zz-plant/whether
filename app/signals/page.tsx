@@ -250,7 +250,7 @@ export default async function SignalsPage({
         description: "Convert evidence into an execution posture.",
         href: `${appendSearchParamsToRoute("/operations" as Route, resolvedSearchParams)}#ops-monthly-action-summary`,
       }}
-      structuredData={JSON.stringify(structuredData)}
+      structuredData={structuredData}
       historicalBanner={
         historicalSelection ? (
           <HistoricalBanner banner={historicalSelection.banner} liveHref="/signals" />

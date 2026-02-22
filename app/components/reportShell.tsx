@@ -20,6 +20,7 @@ import {
   type ReportSectionLink,
 } from "./reportShellNavigation";
 import { type ReportStageItem } from "./reportRevampElements";
+import { serializeJsonLd } from "../../lib/seo";
 
 const MOBILE_NAVIGATION_STACK_OFFSET_REM = 10.5;
 
@@ -81,7 +82,7 @@ export const ReportShell = ({
   primaryCta?: { href: string; label: string };
   secondaryCta?: { href: string; label: string };
   exportCta?: { href: string; label: string } | null;
-  structuredData?: string;
+  structuredData?: unknown;
   historicalBanner?: ReactNode;
   currentPath: string;
   stageRail?: {
@@ -313,7 +314,7 @@ export const ReportShell = ({
         {structuredData ? (
           <script
             type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: structuredData }}
+            dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }}
           />
         ) : null}
         <DisplayModeManager />
