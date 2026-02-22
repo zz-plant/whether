@@ -154,7 +154,7 @@ export default async function OnboardingPage({
       pageNavVariant="compact"
       primaryCta={{ href: "#first-time-guide", label: "Start onboarding" }}
       secondaryCta={undefined}
-      structuredData={JSON.stringify(structuredData)}
+      structuredData={structuredData}
       historicalBanner={
         historicalSelection ? (
           <HistoricalBanner banner={historicalSelection.banner} liveHref="/onboarding" />

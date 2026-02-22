@@ -126,7 +126,7 @@ export default async function OperationsDecisionsPage({
       }}
       pageLinks={reportPageLinks}
       sectionLinks={operationsSectionLinks.decisions}
-      structuredData={JSON.stringify(structuredData)}
+      structuredData={structuredData}
       historicalBanner={
         historicalSelection ? (
           <HistoricalBanner banner={historicalSelection.banner} liveHref="/operations/decisions" />

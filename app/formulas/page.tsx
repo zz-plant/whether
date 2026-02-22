@@ -4,7 +4,7 @@
  */
 import type { Metadata } from "next";
 import Link from "next/link";
-import { buildBreadcrumbList, buildCanonicalUrl, buildPageMetadata, organizationName, websiteName } from "../../lib/seo";
+import { buildBreadcrumbList, buildCanonicalUrl, buildPageMetadata, organizationName, serializeJsonLd, websiteName } from "../../lib/seo";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Methodology — Whether",
@@ -186,7 +186,7 @@ export default function FormulasPage() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }} />
       <div className="mx-auto max-w-6xl px-6 py-12">
         <header className="space-y-4">
           <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Method notes</p>
