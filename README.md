@@ -38,6 +38,10 @@ Whether translates public macro signals into operational guidance for product an
 - Engineering workflow deep-dive: `docs/development-playbook.md`
 - Agent contributors: `AGENTS.md` and `docs/agents/`
 - Documentation index: `docs/README.md`
+- Domain launch guidance: `docs/domain-and-deployment.md`
+- Security reporting policy: `SECURITY.md`
+- Community standards: `CODE_OF_CONDUCT.md`
+- License: `LICENSE`
 
 ## Product and architecture references
 - Architecture: `docs/architecture.md`

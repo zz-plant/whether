@@ -13,3 +13,6 @@ globs = ["__next-on-pages-dist__/**/*.js"]
 
 [assets]
 directory = ".vercel/output/static"
+
+[vars]
+NEXT_PUBLIC_SITE_URL = "https://whether.work"

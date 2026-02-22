@@ -16,8 +16,8 @@ describe("pullRecentSiteInfo", () => {
 
     const result = await pullRecentSiteInfo({ fetchImpl: mockFetch });
 
-    assert.equal(requestedUrl, "https://whether.report/api/agent?cadence=weekly");
-    assert.equal(result.siteUrl, "https://whether.report");
+    assert.equal(requestedUrl, "https://whether.work/api/agent?cadence=weekly");
+    assert.equal(result.siteUrl, "https://whether.work");
     assert.equal(result.cadence, "weekly");
     assert.equal(result.payload.cadence, "weekly");
   });
@@ -52,7 +52,7 @@ describe("pullRecentSiteInfo", () => {
 
     await assert.rejects(() => pullRecentSiteInfo({ fetchImpl: mockFetch }), {
       message:
-        "Unable to pull recent site info from https://whether.report/api/agent?cadence=weekly (status 503).",
+        "Unable to pull recent site info from https://whether.work/api/agent?cadence=weekly (status 503).",
     });
   });
 });

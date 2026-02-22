@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability report (private)
+    url: ../../security/advisories/new
+    about: Use GitHub private vulnerability reporting and avoid public issues for security findings.
+  - name: Question / support
+    url: ../../issues/new?template=question.md
+    about: Ask maintainers for help or product/usage guidance.
