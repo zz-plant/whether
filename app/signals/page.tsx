@@ -161,6 +161,7 @@ export default async function SignalsPage({
   const showSensorArray = activeFocus === "all" || activeFocus === "labor" || activeFocus === "financial";
   const showMacroPanel = activeFocus === "all" || activeFocus === "inflation" || activeFocus === "growth";
   const showThresholds = activeFocus === "all" || activeFocus === "inflation" || activeFocus === "financial";
+  const showAdvanced = resolvedSearchParams?.advanced === "1";
   const requestedRole = resolvedSearchParams?.role;
   const activeRole: RoleKey =
     roleOptions.some((option) => option.key === requestedRole)
@@ -177,6 +178,21 @@ export default async function SignalsPage({
     }
     if (role !== "all") {
       params.set("role", role);
+    }
+    const query = params.toString();
+    return query ? `/signals?${query}` : "/signals";
+  };
+  const buildAdvancedHref = (advanced: boolean) => {
+    const params = new URLSearchParams();
+    if (resolvedSearchParams) {
+      Object.entries(resolvedSearchParams).forEach(([key, value]) => {
+        if (value && key !== "advanced") {
+          params.set(key, value);
+        }
+      });
+    }
+    if (advanced) {
+      params.set("advanced", "1");
     }
     const query = params.toString();
     return query ? `/signals?${query}` : "/signals";
@@ -453,34 +469,55 @@ export default async function SignalsPage({
 
       {showMacroPanel ? <MacroSignalsPanel series={macroSeries} provenance={macroProvenance} /> : null}
 
-      {showThresholds ? (
-        <AdvancedThresholdsSection
-          currentThresholds={assessment.thresholds}
-          provenance={treasuryProvenance}
-        />
+      <section className="weather-panel space-y-4 px-6 py-5" id="advanced-controls">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Advanced controls</p>
+            <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
+              Keep the default flow simple and open analyst controls only when needed.
+            </h2>
+          </div>
+          <a
+            href={buildAdvancedHref(!showAdvanced)}
+            className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
+          >
+            {showAdvanced ? "Hide advanced" : "Show advanced"}
+          </a>
+        </div>
+      </section>
+
+      {showAdvanced ? (
+        <>
+          {showThresholds ? (
+            <AdvancedThresholdsSection
+              currentThresholds={assessment.thresholds}
+              provenance={treasuryProvenance}
+            />
+          ) : null}
+
+          <TimeMachinePanel
+            selectedYear={selectedYear}
+            selectedMonth={selectedMonth}
+            isHistorical={Boolean(historicalSelection)}
+            latestRecordDate={treasury.record_date}
+            cacheCoverage={cacheCoverage}
+            monthsByYear={cacheMonthsByYear}
+            invalidSelection={invalidHistoricalSelection}
+            provenance={treasuryProvenance}
+            summaryArchive={summaryArchive}
+            historicalRegime={historicalSelection ? assessment.regime : null}
+            historicalSummary={historicalSelection ? assessment.description : null}
+            comparison={historicalComparison}
+          />
+
+          <RegimeTimelinePanel
+            series={regimeSeries}
+            selectedYear={selectedYear}
+            selectedMonth={selectedMonth}
+            searchParams={resolvedSearchParams}
+          />
+        </>
       ) : null}
-
-      <TimeMachinePanel
-        selectedYear={selectedYear}
-        selectedMonth={selectedMonth}
-        isHistorical={Boolean(historicalSelection)}
-        latestRecordDate={treasury.record_date}
-        cacheCoverage={cacheCoverage}
-        monthsByYear={cacheMonthsByYear}
-        invalidSelection={invalidHistoricalSelection}
-        provenance={treasuryProvenance}
-        summaryArchive={summaryArchive}
-        historicalRegime={historicalSelection ? assessment.regime : null}
-        historicalSummary={historicalSelection ? assessment.description : null}
-        comparison={historicalComparison}
-      />
-
-      <RegimeTimelinePanel
-        series={regimeSeries}
-        selectedYear={selectedYear}
-        selectedMonth={selectedMonth}
-        searchParams={resolvedSearchParams}
-      />
 
       <RelatedReportLinks
         title="Related report pages"

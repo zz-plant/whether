@@ -176,6 +176,13 @@ export default async function OperationsPage({
   ];
 
   const requestedRole = resolvedSearchParams?.role;
+  const horizonTabs = ["week", "month", "quarter"] as const;
+  type HorizonTab = (typeof horizonTabs)[number];
+  const requestedHorizon = resolvedSearchParams?.horizon;
+  const activeHorizon: HorizonTab =
+    requestedHorizon && horizonTabs.includes(requestedHorizon as HorizonTab)
+      ? (requestedHorizon as HorizonTab)
+      : "week";
   const activeRole: RoleKey =
     roleOptions.some((option) => option.key === requestedRole)
       ? (requestedRole as RoleKey)
@@ -195,6 +202,29 @@ export default async function OperationsPage({
     const query = params.toString();
     return query ? `/operations?${query}` : "/operations";
   };
+  const buildHorizonHref = (horizon: HorizonTab) => {
+    const params = new URLSearchParams();
+    if (resolvedSearchParams) {
+      Object.entries(resolvedSearchParams).forEach(([key, value]) => {
+        if (value && key !== "horizon") {
+          params.set(key, value);
+        }
+      });
+    }
+    if (horizon !== "week") {
+      params.set("horizon", horizon);
+    }
+    const query = params.toString();
+    return query ? `/operations?${query}` : "/operations";
+  };
+  const horizonKeyByLabel = {
+    "This week": "week",
+    "This month": "month",
+    "This quarter": "quarter",
+  } as const;
+  const visibleHorizonPlan = horizonPlan.filter(
+    (item) => horizonKeyByLabel[item.horizon] === activeHorizon,
+  );
   const roleQuickSteps =
     activeRole === "engineering"
       ? [quickSteps[0], { ...quickSteps[1], title: "Next: assign engineering owners" }, quickSteps[2]]
@@ -276,8 +306,28 @@ export default async function OperationsPage({
         title="Time horizon plan"
         description="Decide moves for this week, month, and quarter."
       >
+        <div className="grid gap-2 sm:grid-cols-3">
+          {horizonTabs.map((horizon) => {
+            const active = horizon === activeHorizon;
+            const label = horizon === "week" ? "This week" : horizon === "month" ? "This month" : "This quarter";
+            return (
+              <Link
+                key={horizon}
+                href={buildHorizonHref(horizon) as Route}
+                aria-current={active ? "page" : undefined}
+                className={`weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation ${
+                  active
+                    ? "border-sky-300/80 text-slate-100"
+                    : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
+                }`}
+              >
+                {label}
+              </Link>
+            );
+          })}
+        </div>
         <div className="grid gap-4 lg:grid-cols-3">
-          {horizonPlan.map((item) => (
+          {visibleHorizonPlan.map((item) => (
             <article key={item.horizon} className="weather-surface flex h-full flex-col gap-3 p-5">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
                 {item.horizon}
@@ -308,7 +358,7 @@ export default async function OperationsPage({
         </div>
         <ExecutionTable
           title="Execution table"
-          rows={horizonPlan.map((item) => ({
+          rows={visibleHorizonPlan.map((item) => ({
             horizon: item.horizon,
             owner: item.ownerRole,
             due: item.dueWindow,
