@@ -281,6 +281,7 @@ export const WeeklyActionSummaryPanel = ({
           : "Midweek once role-to-revenue linkage is clear.",
     },
   ];
+  const [showMetricDefinitions, setShowMetricDefinitions] = useState(false);
 
   return (
     <section id="weekly-action-summary" aria-labelledby="weekly-action-summary-title" className="mt-8">
@@ -376,16 +377,40 @@ export const WeeklyActionSummaryPanel = ({
                 </div>
               ))}
             </div>
-            <details className="rounded-xl border border-slate-800/80 bg-slate-950/60 px-4 py-3">
-              <summary className="cursor-pointer list-none text-xs font-semibold tracking-[0.12em] text-slate-300 marker:content-none">
-                How these three metrics are defined
-              </summary>
-              <ul className="mt-3 space-y-2 text-xs text-slate-400">
-                <li><span className="text-slate-200">Cash availability:</span> Normalized score of how tight or loose credit conditions appear in Treasury-linked signals.</li>
-                <li><span className="text-slate-200">Risk appetite:</span> Normalized score of market willingness to fund risk-on bets versus defensive posture.</li>
-                <li><span className="text-slate-200">Curve slope:</span> Difference between long- and short-term Treasury rates; negative values indicate inversion risk.</li>
-              </ul>
-            </details>
+            <div className="rounded-xl border border-slate-700/90 bg-slate-950/60 px-4 py-3">
+              <button
+                type="button"
+                aria-expanded={showMetricDefinitions}
+                aria-controls="weekly-metric-definitions"
+                onClick={() => setShowMetricDefinitions((current) => !current)}
+                className="flex min-h-[44px] w-full items-center justify-between gap-3 text-left text-xs font-semibold tracking-[0.12em] text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+              >
+                <span>How these three metrics are defined</span>
+                <span
+                  aria-hidden="true"
+                  className={`inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-600/80 text-slate-300 transition-transform duration-200 ${showMetricDefinitions ? "rotate-180" : ""}`}
+                >
+                  <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
+                    <path
+                      d="M7 10l5 5 5-5"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </span>
+                <span className="sr-only">{showMetricDefinitions ? "Expanded" : "Collapsed"}</span>
+              </button>
+              {showMetricDefinitions ? (
+                <ul id="weekly-metric-definitions" className="mt-3 space-y-2 text-xs text-slate-400">
+                  <li><span className="text-slate-200">Cash availability:</span> Normalized score of how tight or loose credit conditions appear in Treasury-linked signals.</li>
+                  <li><span className="text-slate-200">Risk appetite:</span> Normalized score of market willingness to fund risk-on bets versus defensive posture.</li>
+                  <li><span className="text-slate-200">Curve slope:</span> Difference between long- and short-term Treasury rates; negative values indicate inversion risk.</li>
+                </ul>
+              ) : null}
+            </div>
           </div>
           <div className="grid gap-4">
             <WeeklySummaryCard summary={weeklySummary} />

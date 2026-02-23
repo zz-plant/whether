@@ -103,6 +103,7 @@ export const MobileActionSheet = ({
         type="button"
         onClick={() => setOpen(true)}
         className="weather-pill inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full px-3 py-2 text-center text-xs font-semibold tracking-[0.12em] text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+        aria-label={`${triggerLabel}. ${open ? "Expanded" : "Collapsed"}.`}
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-controls={dialogId}
