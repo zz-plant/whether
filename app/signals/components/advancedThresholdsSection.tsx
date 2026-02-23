@@ -30,7 +30,7 @@ export const AdvancedThresholdsSection = ({
   }, []);
 
   return (
-    <section className="mt-10">
+    <section id="thresholds" className="mt-10">
       <div className="weather-panel space-y-4 px-6 py-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>

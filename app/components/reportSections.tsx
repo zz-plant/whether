@@ -968,29 +968,22 @@ export const FirstTimeGuidePanel = ({
           ].map((step) => (
             <li key={step.label} className="weather-surface p-4 text-sm text-slate-300">
               <Collapsible.Root className="space-y-2">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
+                <Collapsible.Trigger
+                  type="button"
+                  className="group flex min-h-[56px] w-full cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-3 text-left transition-colors hover:bg-slate-800/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                >
+                  <span className="flex items-center gap-3">
                     <span className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-700/70 bg-slate-950 text-xs font-semibold text-slate-300">
                       ✓
                     </span>
-                    <p className="text-xs font-semibold tracking-[0.12em] text-slate-200">
-                      {step.label}
-                    </p>
-                  </div>
-                  <Collapsible.Trigger
-                    type="button"
-                    className="group flex min-h-[44px] items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-400 transition-colors hover:text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                  >
-                    Details
-                    <span className="text-slate-500 group-data-[panel-open]:hidden">
-                      (expand)
-                    </span>
-                    <span className="hidden text-slate-500 group-data-[panel-open]:inline">
-                      (collapse)
-                    </span>
-                  </Collapsible.Trigger>
-                </div>
-                <Collapsible.Panel className="space-y-2 text-xs text-slate-400">
+                    <span className="text-xs font-semibold tracking-[0.12em] text-slate-200">{step.label}</span>
+                  </span>
+                  <span className="inline-flex items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-400">
+                    <span>Details</span>
+                    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-400 transition-transform duration-200 group-data-[panel-open]:rotate-180">⌄</span>
+                  </span>
+                </Collapsible.Trigger>
+                <Collapsible.Panel className="animate-collapsible-in space-y-2 text-xs text-slate-400">
                   <p>{step.detail}</p>
                   <p className="text-xs text-slate-500">{step.example}</p>
                 </Collapsible.Panel>

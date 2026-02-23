@@ -20,6 +20,7 @@ import {
 } from "./reportShellNavigation";
 import { type ReportStageItem } from "./reportRevampElements";
 import { serializeJsonLd } from "../../lib/seo";
+import { AnchorFeedback } from "./anchorFeedback";
 
 const MOBILE_NAVIGATION_STACK_OFFSET_REM = 10.5;
 
@@ -145,12 +146,14 @@ export const ReportShell = ({
   const heroHeaderSpacingClassName = "space-y-3 sm:space-y-4";
   const heroSectionSpacingClassName =
     "weather-panel-static min-w-0 space-y-4 px-4 py-4 sm:space-y-5 sm:px-5";
+  const sectionDividerLabels = ["REGIME", "EXECUTION", "EVIDENCE", "EXPORTS"];
   const overviewPanel = (
-    <section className="weather-panel space-y-3 px-4 py-4">
-      <p className="text-xs font-semibold tracking-[0.16em] text-slate-400">
-        Snapshot
-      </p>
-      <dl className="grid gap-2 text-xs text-slate-300">
+    <details className="weather-panel group px-4 py-4">
+      <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.16em] text-slate-300">
+        Data provenance
+        <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-400 transition-transform group-open:rotate-180">⌄</span>
+      </summary>
+      <dl className="mt-3 grid gap-2 text-xs text-slate-300">
         <div className="flex items-center justify-between gap-3">
           <dt className="text-slate-400">Status</dt>
           <dd className="font-semibold text-slate-100">{statusLabel}</dd>
@@ -160,8 +163,12 @@ export const ReportShell = ({
           <dd className="text-slate-200">{recordDateLabel}</dd>
         </div>
         <div className="flex items-center justify-between gap-3">
-          <dt className="text-slate-400">Updated</dt>
+          <dt className="text-slate-400">Last refresh</dt>
           <dd className="text-slate-200">{fetchedAtLabel}</dd>
+        </div>
+        <div className="flex items-center justify-between gap-3">
+          <dt className="text-slate-400">Next expected update</dt>
+          <dd className="text-slate-200">48h cadence</dd>
         </div>
         <div className="flex items-center justify-between gap-3">
           <dt className="text-slate-400">Source</dt>
@@ -180,7 +187,7 @@ export const ReportShell = ({
           </dd>
         </div>
       </dl>
-    </section>
+    </details>
   );
   const confidencePanel = (
     <CanonicalTrustModule
@@ -323,6 +330,7 @@ export const ReportShell = ({
           />
         ) : null}
         <DisplayModeManager />
+        <AnchorFeedback />
         <DisplayGuardian />
         <div
           className="pointer-events-none absolute inset-0 weather-grid"
@@ -704,12 +712,10 @@ export const ReportShell = ({
                       ? section.key
                       : `section-${index}`;
                   return (
-                    <div
-                      key={sectionKey}
-                      className={
-                        index === 0 ? "" : "border-t border-slate-800/70 pt-8"
-                      }
-                    >
+                    <div key={sectionKey} className={index === 0 ? "" : "border-t border-slate-800/70 pt-10"}>
+                      {index > 0 ? (
+                        <p className="mb-4 text-xs font-semibold tracking-[0.24em] text-slate-500">— {sectionDividerLabels[Math.min(index - 1, sectionDividerLabels.length - 1)]} —</p>
+                      ) : null}
                       {section}
                     </div>
                   );

@@ -618,3 +618,55 @@ summary:focus-visible {
 .tv-action-rail {
   display: none;
 }
+
+.anchor-feedback-active {
+  animation: anchorGlow 820ms ease-out;
+}
+
+.anchor-feedback-active > header h2,
+.anchor-feedback-active > h2,
+.anchor-feedback-active [data-anchor-title='true'] {
+  animation: anchorTitlePulse 800ms ease-out;
+}
+
+@keyframes anchorGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.45);
+    background-color: rgba(14, 116, 144, 0.12);
+  }
+  100% {
+    box-shadow: 0 0 0 10px rgba(56, 189, 248, 0);
+    background-color: transparent;
+  }
+}
+
+@keyframes anchorTitlePulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+.animate-collapsible-in {
+  animation: fadeInPanel 180ms ease-out;
+}
+
+@keyframes fadeInPanel {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anchor-feedback-active,
+  .anchor-feedback-active > header h2,
+  .anchor-feedback-active > h2,
+  .anchor-feedback-active [data-anchor-title='true'],
+  .animate-collapsible-in {
+    animation: none;
+  }
+}

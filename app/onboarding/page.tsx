@@ -129,19 +129,19 @@ export default async function OnboardingPage({
   const trustStatusLabel = historicalSelection
     ? "Historical snapshot"
     : isFallback
-      ? "Fallback mode"
-      : "Verified live feed";
+      ? "Using last verified snapshot"
+      : "Live • Treasury verified";
   const trustStatusDetail = historicalSelection
     ? "Viewing archived Treasury data for the selected month."
     : isFallback
       ? (treasury.fallback_reason ??
-        "Using cached Treasury snapshot due to upstream outage.")
-      : "Treasury live feed verified for this cycle.";
+        "Live refresh pending. Using last verified snapshot.")
+      : "Live refresh healthy. Next expected update: 48h.";
   const trustStatusAction = historicalSelection
     ? "Use for retrospectives only; return to live data for real-time planning."
     : isFallback
       ? "Hold critical decisions until live signals return or you validate the cache."
-      : "Safe to use for onboarding; proceed with normal planning workflows.";
+      : "No signal instability detected. Safe for planning decisions.";
   const trustStatusTone = historicalSelection
     ? "historical"
     : isFallback
@@ -297,7 +297,7 @@ export default async function OnboardingPage({
               "Turn the regime readout into concrete execution guidance.",
           },
           {
-            href: "/formulas",
+            href: "/methodology",
             label: "Methodology",
             description:
               "Explore the exact formula logic and original data providers.",

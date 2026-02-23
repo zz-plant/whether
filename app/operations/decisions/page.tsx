@@ -61,14 +61,14 @@ export default async function OperationsDecisionsPage({
   const trustStatusLabel = historicalSelection
     ? "Historical snapshot"
     : isFallback
-      ? "Fallback mode"
-      : "Verified live feed";
+      ? "Using last verified snapshot"
+      : "Live • Treasury verified";
   const trustStatusDetail = historicalSelection
     ? "Viewing archived Treasury data for the selected month."
     : isFallback
       ? (treasury.fallback_reason ??
-        "Using cached Treasury snapshot due to upstream outage.")
-      : "Treasury live feed verified for this cycle.";
+        "Live refresh pending. Using last verified snapshot.")
+      : "Live refresh healthy. Next expected update: 48h.";
   const trustStatusAction = historicalSelection
     ? "Use historical data for retrospectives; avoid approving new bets until live signals return."
     : isFallback
