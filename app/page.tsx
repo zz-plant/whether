@@ -245,19 +245,19 @@ export default async function HomePage({
               href="#weekly-action-summary"
               className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
             >
-              Open weekly actions
+              Open decide summary
             </a>
             <a
-              href="/operations"
+              href="/plan"
               className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
             >
-              Open operations workspace
+              Open plan board
             </a>
             <a
-              href="/signals"
+              href="/evidence"
               className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
             >
-              Open signal evidence
+              Open evidence trail
             </a>
           </div>
         </article>
@@ -299,19 +299,19 @@ export default async function HomePage({
             id="evidence-matrix-title"
             className="text-xl font-semibold text-slate-100 sm:text-2xl"
           >
-            Deep evidence has moved to the dedicated Signal evidence page.
+            Deep evidence has moved to the dedicated Evidence page.
           </h2>
           <p className="text-sm text-slate-300">
-            Keep the weekly briefing focused on decisions; use Signal evidence for full macro series,
+            Keep the decide screen focused on action; use Evidence for full macro series,
             thresholds, and source-level methodology.
           </p>
         </header>
         <RelatedReportLinks
-          title="Open the evidence workspace"
+          title="Open Evidence"
           links={[
             {
-              href: "/signals",
-              label: "Signal evidence",
+              href: "/evidence",
+              label: "Evidence",
               description:
                 "Inspect the full macro evidence matrix, historical series context, and source links.",
             },

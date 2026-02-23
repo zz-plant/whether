@@ -17,8 +17,20 @@ export type ReportSectionLink = {
   label: string;
 };
 
-const getPageNavigationState = (pageLinks: ReportPageLink[], pageTitle: string) => {
-  const currentIndex = pageLinks.findIndex((link) => link.label === pageTitle);
+const getPageNavigationState = (
+  pageLinks: ReportPageLink[],
+  pageTitle: string,
+  currentPath?: string,
+) => {
+  const currentIndexByPath = currentPath
+    ? pageLinks.findIndex((link) =>
+        link.href === "/"
+          ? currentPath === "/"
+          : currentPath === link.href || currentPath.startsWith(`${link.href}/`),
+      )
+    : -1;
+  const currentIndexByLabel = pageLinks.findIndex((link) => link.label === pageTitle);
+  const currentIndex = currentIndexByPath >= 0 ? currentIndexByPath : currentIndexByLabel;
   const currentPosition = currentIndex >= 0 ? currentIndex + 1 : 1;
   const currentLink = currentIndex >= 0 ? pageLinks[currentIndex] : pageLinks[0];
   const prevLink = currentIndex > 0 ? pageLinks[currentIndex - 1] : null;
@@ -28,8 +40,20 @@ const getPageNavigationState = (pageLinks: ReportPageLink[], pageTitle: string) 
   return { currentIndex, currentPosition, currentLink, prevLink, nextLink };
 };
 
+const isLinkActiveForPath = (linkHref: string, currentPath?: string) => {
+  if (!currentPath) {
+    return false;
+  }
+
+  if (linkHref === "/") {
+    return currentPath === "/";
+  }
+
+  return currentPath === linkHref || currentPath.startsWith(`${linkHref}/`);
+};
+
 const pageLinkIcons: Record<string, ReactNode> = {
-  "Weekly briefing": (
+  Decide: (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
       <path
         d="M12 4.5V2.75M12 21.25v-1.75M4.5 12H2.75M21.25 12h-1.75M6.75 6.75l-1.3-1.3M18.55 18.55l-1.3-1.3M6.75 17.25l-1.3 1.3M18.55 5.45l-1.3 1.3"
@@ -40,7 +64,7 @@ const pageLinkIcons: Record<string, ReactNode> = {
       <circle cx="12" cy="12" r="4.25" fill="currentColor" />
     </svg>
   ),
-  "Onboarding & glossary": (
+  Plan: (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
       <path
         d="M4 5.5h16v13H4z"
@@ -59,7 +83,7 @@ const pageLinkIcons: Record<string, ReactNode> = {
       <circle cx="17" cy="15.5" r="2.5" fill="currentColor" />
     </svg>
   ),
-  "Signal evidence": (
+  Evidence: (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
       <path
         d="M4 18c0-4.4 3.6-8 8-8s8 3.6 8 8"
@@ -78,7 +102,7 @@ const pageLinkIcons: Record<string, ReactNode> = {
       <circle cx="12" cy="18" r="1.8" fill="currentColor" />
     </svg>
   ),
-  "Action playbook": (
+  Brief: (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
       <path
         d="M6 4.75h9.25a2 2 0 0 1 2 2v10.5a2 2 0 0 1-2 2H6"
@@ -122,17 +146,20 @@ const pageLinkIcons: Record<string, ReactNode> = {
 export const ReportPageNavigation = ({
   pageLinks,
   pageTitle,
+  currentPath,
   className,
   variant = "full",
 }: {
   pageLinks: ReportPageLink[];
   pageTitle: string;
+  currentPath?: string;
   className?: string;
   variant?: "full" | "compact";
 }) => {
   const { currentLink, currentPosition, prevLink, nextLink } = getPageNavigationState(
     pageLinks,
     pageTitle,
+    currentPath,
   );
 
   return (
@@ -192,7 +219,9 @@ export const ReportPageNavigation = ({
             </div>
             <NavigationMenu.List className="grid grid-cols-2 gap-1.5 sm:flex sm:flex-wrap sm:gap-2">
               {pageLinks.map((link, index) => {
-                const isActive = link.label === pageTitle;
+                const isActive = currentPath
+                  ? isLinkActiveForPath(link.href, currentPath)
+                  : link.label === pageTitle;
                 const isOddTail = pageLinks.length % 2 === 1 && index === pageLinks.length - 1;
                 return (
                   <NavigationMenu.Item
@@ -264,17 +293,20 @@ export const ReportInterpretationNotes = () => (
 export const ReportMobileNavigation = ({
   pageLinks,
   pageTitle,
+  currentPath,
   sectionLinks,
   className,
 }: {
   pageLinks: ReportPageLink[];
   pageTitle: string;
+  currentPath?: string;
   sectionLinks: ReportSectionLink[];
   className?: string;
 }) => {
   const { currentLink, currentPosition, prevLink, nextLink } = getPageNavigationState(
     pageLinks,
     pageTitle,
+    currentPath,
   );
   const sectionCountLabel =
     sectionLinks.length === 0
@@ -299,7 +331,7 @@ export const ReportMobileNavigation = ({
         <div className="weather-mobile-nav flex flex-col gap-3 px-3 py-3">
           <div className="flex min-w-0 items-center gap-3 rounded-2xl border border-slate-800/80 bg-slate-950/70 px-3 py-2">
             <span className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl border border-slate-800/80 bg-slate-950/80 text-slate-100">
-              {pageLinkIcons[currentLink.label]}
+              {pageLinkIcons[currentLink.label] ?? pageLinkIcons.Methodology}
             </span>
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold tracking-[0.08em] text-slate-100">

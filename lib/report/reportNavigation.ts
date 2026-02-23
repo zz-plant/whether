@@ -3,23 +3,23 @@ import type { ReportPageLink } from "../../app/components/reportShellNavigation"
 export const reportPageLinks: ReportPageLink[] = [
   {
     href: "/",
-    label: "Weekly briefing",
-    description: "Weekly decisions, leadership summary, and climate signals in plain English.",
+    label: "Decide",
+    description: "Confirm this week's posture and immediate cross-functional actions.",
   },
   {
-    href: "/onboarding",
-    label: "Onboarding & glossary",
-    description: "Quick guide and plain-English glossary.",
+    href: "/plan",
+    label: "Plan",
+    description: "Assign owners and sequence work by Now, Next, and Watch horizons.",
   },
   {
-    href: "/operations",
-    label: "Action playbook",
-    description: "Execution-ready moves, decision guardrails, and briefing kits.",
+    href: "/evidence",
+    label: "Evidence",
+    description: "Validate confidence with thresholds, timelines, and source provenance.",
   },
   {
-    href: "/signals",
-    label: "Signal evidence",
-    description: "Live data sources, thresholds, and historical context.",
+    href: "/brief",
+    label: "Brief",
+    description: "Prepare copy-ready narratives for leadership and team alignment.",
   },
   {
     href: "/formulas",
