@@ -26,10 +26,10 @@ export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
 const homeSectionSequence = [
-  { href: "#weekly-action-summary", label: "Weekly actions" },
-  { href: "#executive-snapshot", label: "Leadership summary" },
-  { href: "#signal-matrix", label: "Signal breakdown" },
-  { href: "#evidence-matrix", label: "Evidence matrix" },
+  { href: "#weekly-action-summary", label: "Start: weekly actions" },
+  { href: "#executive-snapshot", label: "Then: leadership summary" },
+  { href: "#signal-matrix", label: "Inspect: signal breakdown" },
+  { href: "#evidence-matrix", label: "Deep dive: evidence matrix" },
 ] as const;
 
 export const generateMetadata = async ({
@@ -99,9 +99,9 @@ export default async function HomePage({
   }>;
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const sectionLinks = homeSectionSequence.map((section, index) => ({
+  const sectionLinks = homeSectionSequence.map((section) => ({
     href: section.href,
-    label: `${index + 1}. ${section.label}`,
+    label: section.label,
   }));
   const structuredData = {
     "@context": "https://schema.org",
@@ -243,6 +243,34 @@ export default async function HomePage({
           <p className="text-sm text-slate-200">
             {trustStatusLabel} · {trustStatusDetail}
           </p>
+        </article>
+        <article className="weather-surface space-y-4 p-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+            Quick start
+          </p>
+          <p className="text-sm text-slate-200">
+            Jump straight to the workspace you need.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <a
+              href="#weekly-action-summary"
+              className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+            >
+              Open weekly actions
+            </a>
+            <a
+              href="/operations"
+              className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+            >
+              Open operations workspace
+            </a>
+            <a
+              href="/signals"
+              className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+            >
+              Open signal evidence
+            </a>
+          </div>
         </article>
       </section>
 
