@@ -23,9 +23,9 @@ import {
   operationsWorkstreamLinks,
 } from "../../lib/navigation/operationsNavigation";
 import { appendSearchParamsToRoute } from "../../lib/navigation/routeSearchParams";
-import { OperationsWorkstreamNav } from "./components/operationsWorkstreamNav";
 import { ExecutionTable } from "../components/executionTable";
 import { ReturningVisitorDeltaStrip } from "../components/changeSinceLastReadPanel";
+import { OperationsWorkflowProgress } from "./components/operationsWorkflowProgress";
 
 export const runtime = "edge";
 
@@ -210,6 +210,23 @@ export default async function OperationsPage({
   const visibleHorizonPlan = horizonPlan.filter(
     (item) => horizonKeyByLabel[item.horizon] === activeHorizon,
   );
+  const requestedMode = resolvedSearchParams?.mode;
+  const isExpertMode = requestedMode === "expert";
+  const buildModeHref = (mode: "guided" | "expert") => {
+    const params = new URLSearchParams();
+    if (resolvedSearchParams) {
+      Object.entries(resolvedSearchParams).forEach(([key, value]) => {
+        if (value && key !== "mode") {
+          params.set(key, value);
+        }
+      });
+    }
+    if (mode === "expert") {
+      params.set("mode", "expert");
+    }
+    const query = params.toString();
+    return query ? `/operations?${query}` : "/operations";
+  };
   return (
     <ReportShell
       statusLabel={statusLabel}
@@ -232,6 +249,7 @@ export default async function OperationsPage({
       sectionLinks={operationsSectionLinks.overview}
       heroVariant="compact"
       pageNavVariant="compact"
+      showPageNavigation={false}
       primaryCta={{
         href: "#ops-monthly-action-summary",
         label: "Review monthly actions",
@@ -253,13 +271,7 @@ export default async function OperationsPage({
           cta: step.cta,
         })),
       }}
-      decisionDiffs={[
-        { label: "Up from last week", tone: "positive" },
-        {
-          label: `Trust: ${trustStatusLabel}`,
-          tone: trustStatusTone === "stable" ? "positive" : "warning",
-        },
-      ]}
+      decisionDiffs={[{ label: "Up from last week", tone: "positive" }]}
       nextStep={{
         description: "Turn this playbook into owner assignments and exports.",
         href: appendSearchParamsToRoute(
@@ -296,7 +308,55 @@ export default async function OperationsPage({
         openPanelHref="/signals#time-machine"
       />
 
-      <OperationsWorkstreamNav currentPath="/operations" />
+      <section className="weather-panel space-y-4 px-6 py-5" aria-label="Playbook mode selector">
+        <header className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Workflow mode</p>
+            <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
+              {isExpertMode ? "Expert mode: open all planning surfaces." : "Guided mode: plan → decisions → briefings."}
+            </h2>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <a
+              href={buildModeHref("guided")}
+              aria-current={!isExpertMode ? "page" : undefined}
+              className={`weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] ${
+                !isExpertMode
+                  ? "border-sky-300/80 text-slate-100"
+                  : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
+              }`}
+            >
+              Guided mode
+            </a>
+            <a
+              href={buildModeHref("expert")}
+              aria-current={isExpertMode ? "page" : undefined}
+              className={`weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] ${
+                isExpertMode
+                  ? "border-sky-300/80 text-slate-100"
+                  : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
+              }`}
+            >
+              Expert mode
+            </a>
+          </div>
+        </header>
+        {!isExpertMode ? <OperationsWorkflowProgress currentPath="/operations/plan" /> : null}
+        {!isExpertMode ? (
+          <article className="weather-surface space-y-3 p-4">
+            <p className="text-xs font-semibold tracking-[0.16em] text-slate-400">Next action</p>
+            <p className="text-sm font-semibold text-slate-100">
+              Step 1 complete once you assign owners and due dates for this horizon.
+            </p>
+            <a
+              href={appendSearchParamsToRoute("/operations/decisions", resolvedSearchParams)}
+              className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.16em]"
+            >
+              Step complete — continue to Decisions
+            </a>
+          </article>
+        ) : null}
+      </section>
 
       <section
         className="weather-panel space-y-4 px-6 py-5"

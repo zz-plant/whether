@@ -42,6 +42,7 @@ export const ReportShell = ({
   offlineBadgeLabel = "Cached snapshot",
   heroVariant = "full",
   pageNavVariant = "full",
+  showPageNavigation = true,
   sidebarVariant = "full",
   primaryCta = {
     href: "#weekly-action-summary",
@@ -80,6 +81,7 @@ export const ReportShell = ({
   offlineBadgeLabel?: string;
   heroVariant?: "full" | "compact";
   pageNavVariant?: "full" | "compact";
+  showPageNavigation?: boolean;
   sidebarVariant?: "full" | "hidden";
   primaryCta?: { href: string; label: string };
   secondaryCta?: { href: string; label: string };
@@ -375,12 +377,14 @@ export const ReportShell = ({
                 ) : null}
               </div>
             </div>
-            <ReportPageNavigation
-              pageLinks={pageLinks}
-              pageTitle={pageTitle}
-              variant={pageNavVariant}
-              className="mt-4 -mx-4 hidden px-4 sm:mx-0 sm:block sm:px-0"
-            />
+            {showPageNavigation ? (
+              <ReportPageNavigation
+                pageLinks={pageLinks}
+                pageTitle={pageTitle}
+                variant={pageNavVariant}
+                className="mt-4 -mx-4 hidden px-4 sm:mx-0 sm:block sm:px-0"
+              />
+            ) : null}
           </header>
 
           {historicalBanner}

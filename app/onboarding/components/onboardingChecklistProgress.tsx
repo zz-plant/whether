@@ -41,6 +41,7 @@ export const OnboardingChecklistProgress = ({ steps }: { steps: OnboardingStep[]
   const completionText = `${completedTitles.length}/${steps.length} complete`;
 
   const completedSet = useMemo(() => new Set(completedTitles), [completedTitles]);
+  const nextIncompleteStep = steps.find((step) => !completedSet.has(step.title));
 
   const toggleStep = (title: string) => {
     setCompletedTitles((current) =>
@@ -50,9 +51,16 @@ export const OnboardingChecklistProgress = ({ steps }: { steps: OnboardingStep[]
 
   return (
     <>
-      <div className="flex items-center justify-between rounded-xl border border-slate-700/70 bg-slate-900/40 px-3 py-2 text-xs font-semibold tracking-[0.16em] text-slate-300">
-        <span>Progress</span>
-        <span>{completionText}</span>
+      <div className="space-y-2 rounded-xl border border-slate-700/70 bg-slate-900/40 px-3 py-3 text-xs text-slate-300">
+        <div className="flex items-center justify-between font-semibold tracking-[0.16em]">
+          <span>Progress</span>
+          <span>{completionText}</span>
+        </div>
+        <p className="text-xs font-semibold tracking-[0.14em] text-slate-400">
+          {nextIncompleteStep
+            ? `Next action: Step ${steps.findIndex((step) => step.title === nextIncompleteStep.title) + 1} — ${nextIncompleteStep.cta}`
+            : "Next action: All steps complete. Open signal evidence to validate your current call."}
+        </p>
       </div>
       <div className="grid gap-3 lg:grid-cols-3">
         {steps.map((step, index) => {
