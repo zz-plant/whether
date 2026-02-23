@@ -198,7 +198,7 @@ export default function FormulasPage() {
         </header>
 
         <section className="mt-6 weather-panel p-5" aria-label="Reference mode context">
-          <div className="flex flex-wrap items-start justify-between gap-3">
+          <header className="flex flex-wrap items-start justify-between gap-3">
             <div className="space-y-2">
               <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Reference mode</p>
               <p className="text-sm text-slate-300">
@@ -220,7 +220,7 @@ export default function FormulasPage() {
                 Signal evidence
               </Link>
             </div>
-          </div>
+          </header>
         </section>
 
         <div className="mt-6 weather-panel p-5">

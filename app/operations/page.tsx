@@ -310,7 +310,7 @@ export default async function OperationsPage({
         className="weather-panel space-y-4 px-6 py-5"
         aria-label="Execution lenses"
       >
-        <div>
+        <header>
           <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
             Perspective lenses
           </p>
@@ -318,7 +318,7 @@ export default async function OperationsPage({
             Keep one shared execution sequence, then apply team-specific
             emphasis.
           </h2>
-        </div>
+        </header>
         <div className="grid gap-3 lg:grid-cols-3">
           {[
             {

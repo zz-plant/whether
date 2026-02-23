@@ -437,7 +437,7 @@ export default async function HomePage({
         aria-labelledby="evidence-matrix-title"
         className="weather-panel space-y-4 px-6 py-5"
       >
-        <div className="space-y-2">
+        <header className="space-y-2">
           <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
             Evidence matrix
           </p>
@@ -464,7 +464,7 @@ export default async function HomePage({
             </abbr>{" "}
             are defined inline.
           </p>
-        </div>
+        </header>
         <div className="space-y-3">
           {evidenceRows.map(({ key, ...row }) => (
             <MiniSeriesRow key={key} {...row} />

@@ -186,7 +186,7 @@ export default async function OnboardingPage({
         id="onboarding-checklist"
         className="weather-panel space-y-4 px-6 py-5"
       >
-        <div className="space-y-2">
+        <header className="space-y-2">
           <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
             Checklist
           </p>
@@ -223,7 +223,7 @@ export default async function OnboardingPage({
               );
             })}
           </div>
-        </div>
+        </header>
         <OnboardingChecklistProgress steps={onboardingSteps} />
       </section>
 
@@ -236,14 +236,14 @@ export default async function OnboardingPage({
       <BeginnerGlossaryPanel />
 
       <section className="weather-panel space-y-4 px-6 py-5">
-        <div>
+        <header>
           <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
             Apply each concept
           </p>
           <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
             Jump from concepts to live report sections.
           </h2>
-        </div>
+        </header>
         <ul className="grid gap-3 md:grid-cols-3">
           {[
             {
