@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import type { Route } from "next";
 import { loadReportData } from "../../lib/report/reportData";
-import { buildTimeMachineHref } from "../../lib/timeMachine/timeMachineSelection";
 import { siteUrl } from "../../lib/siteUrl";
 import { buildBreadcrumbList, buildPageMetadata, organizationName, websiteName } from "../../lib/seo";
 import { ReportShell } from "../components/reportShell";
@@ -158,13 +157,6 @@ export default async function SignalsPage({
     { href: timeMachineHref, label: "Time machine" },
     { href: regimeTimelineHref, label: "Regime timeline" },
   ];
-  const stageItems = [
-    { id: "assess", label: "Assess regime", href: regimeTimelineHref, status: "current" as const },
-    { id: "decide", label: "Decide posture", href: buildTimeMachineHref("/", historicalSelection), status: "upcoming" as const },
-    { id: "guardrails", label: "Set guardrails", href: buildTimeMachineHref("/operations/decisions", historicalSelection), status: "upcoming" as const },
-    { id: "owners", label: "Assign owners", href: buildTimeMachineHref("/operations/plan", historicalSelection), status: "upcoming" as const },
-    { id: "export", label: "Export brief", href: buildTimeMachineHref("/operations/briefings", historicalSelection), status: "upcoming" as const },
-  ];
   const requestedRole = resolvedSearchParams?.role;
   const activeRole: RoleKey =
     roleOptions.some((option) => option.key === requestedRole)
@@ -240,7 +232,6 @@ export default async function SignalsPage({
       pageNavVariant="compact"
       primaryCta={{ href: "#sensor-array", label: "Review live feed" }}
       secondaryCta={{ href: thresholdsHref, label: "Review scoring thresholds" }}
-      stageRail={{ title: "Global decision flow", items: stageItems }}
       decisionBanner={{
         label: "Explain why",
         decision: `${regimeLabel} regime is supported by current macro readings.`,

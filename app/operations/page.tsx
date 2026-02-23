@@ -3,7 +3,6 @@ import type { Route } from "next";
 import Link from "next/link";
 import { SectionedReportPanel } from "./components/sectionedReportPanel";
 import { loadReportData } from "../../lib/report/reportData";
-import { buildTimeMachineHref } from "../../lib/timeMachine/timeMachineSelection";
 import { siteUrl } from "../../lib/siteUrl";
 import { buildBreadcrumbList, buildPageMetadata, organizationName, websiteName } from "../../lib/seo";
 import { ReportShell } from "../components/reportShell";
@@ -167,14 +166,6 @@ export default async function OperationsPage({
     },
   ] as const;
 
-  const stageItems = [
-    { id: "assess", label: "Assess regime", href: buildTimeMachineHref("/signals#regime-timeline", historicalSelection), status: "completed" as const },
-    { id: "decide", label: "Decide posture", href: buildTimeMachineHref("/", historicalSelection), status: "completed" as const },
-    { id: "guardrails", label: "Set guardrails", href: buildTimeMachineHref("/operations/decisions", historicalSelection), status: "current" as const },
-    { id: "owners", label: "Assign owners", href: buildTimeMachineHref("/operations/plan", historicalSelection), status: "upcoming" as const },
-    { id: "export", label: "Export brief", href: buildTimeMachineHref("/operations/briefings", historicalSelection), status: "upcoming" as const },
-  ];
-
   const requestedRole = resolvedSearchParams?.role;
   const horizonTabs = ["week", "month", "quarter"] as const;
   type HorizonTab = (typeof horizonTabs)[number];
@@ -252,7 +243,6 @@ export default async function OperationsPage({
       heroVariant="compact"
       pageNavVariant="compact"
       primaryCta={{ href: "#ops-monthly-action-summary", label: "Review monthly actions" }}
-      stageRail={{ title: "Global decision flow", items: stageItems }}
       decisionBanner={{
         label: "Decide now",
         decision: "Set this month's posture and commit guardrails.",
