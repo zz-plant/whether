@@ -736,7 +736,21 @@ Open related page →
               </section>
 
               <footer className="mt-12 border-t border-slate-800/70 pt-6 text-xs font-semibold tracking-[0.18em] text-slate-400">
-                Not financial, legal, or investment advice.
+                <p>Not financial, legal, or investment advice.</p>
+                <p className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] tracking-[0.14em]">
+                  <a
+                    href="/terms-of-service"
+                    className="text-slate-300 underline decoration-slate-600 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                  >
+                    Terms of Service
+                  </a>
+                  <a
+                    href="/acceptable-use-policy"
+                    className="text-slate-300 underline decoration-slate-600 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                  >
+                    Acceptable Use Policy
+                  </a>
+                </p>
               </footer>
             </div>
           </div>
