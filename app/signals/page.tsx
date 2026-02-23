@@ -378,13 +378,13 @@ export default async function SignalsPage({
       <MacroSignalsPanel series={macroSeries} provenance={macroProvenance} />
 
       <section className="weather-panel space-y-4 px-6 py-5" id="advanced-controls">
-        <details className="group rounded-2xl border border-slate-800/80 bg-slate-950/50 p-4" open={showAdvanced}>
-          <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-slate-100">
+        <div className="rounded-2xl border border-slate-800/80 bg-slate-950/50 p-4">
+          <div className="flex min-h-[44px] items-center justify-between gap-3 text-sm font-semibold text-slate-100">
             <span>Advanced filters and historical tools</span>
-            <span className="text-xs tracking-[0.14em] text-slate-400 group-open:text-slate-300">
+            <span className="text-xs tracking-[0.14em] text-slate-300">
               {showAdvanced ? "Open" : "Closed"}
             </span>
-          </summary>
+          </div>
           <p className="mt-3 text-xs text-slate-300">
             Use these controls for threshold tuning, historical snapshots, and timeline diagnostics after you complete the default review path.
           </p>
@@ -402,7 +402,7 @@ export default async function SignalsPage({
               Export focused brief ({focusLabelByTab[activeFocus]}) →
             </a>
           </div>
-        </details>
+        </div>
       </section>
 
       {showAdvanced ? (
