@@ -77,13 +77,20 @@ export default async function OperationsPage({
       emphasis: "secondary",
     },
   ];
-  const roleOptions = [
-    { key: "all", label: "Cross-functional" },
-    { key: "product", label: "Product lead" },
-    { key: "engineering", label: "Eng lead" },
-    { key: "finance", label: "Finance partner" },
+  const lensCallouts = [
+    {
+      title: "Finance lens",
+      detail: "Prioritize spend timing and preserve optionality before locking irreversible commitments.",
+    },
+    {
+      title: "Product lens",
+      detail: "Protect near-term customer value while sequencing roadmap bets against the current regime.",
+    },
+    {
+      title: "Engineering lens",
+      detail: "Guard reliability capacity first, then commit delivery scope with explicit risk guardrails.",
+    },
   ] as const;
-  type RoleKey = (typeof roleOptions)[number]["key"];
   const structuredData = {
     "@context": "https://schema.org",
     "@graph": [
@@ -175,7 +182,6 @@ export default async function OperationsPage({
     { id: "export", label: "Export brief", href: buildTimeMachineHref("/operations/briefings", historicalSelection), status: "upcoming" as const },
   ];
 
-  const requestedRole = resolvedSearchParams?.role;
   const horizonTabs = ["week", "month", "quarter"] as const;
   type HorizonTab = (typeof horizonTabs)[number];
   const requestedHorizon = resolvedSearchParams?.horizon;
@@ -183,25 +189,6 @@ export default async function OperationsPage({
     requestedHorizon && horizonTabs.includes(requestedHorizon as HorizonTab)
       ? (requestedHorizon as HorizonTab)
       : "week";
-  const activeRole: RoleKey =
-    roleOptions.some((option) => option.key === requestedRole)
-      ? (requestedRole as RoleKey)
-      : "all";
-  const buildRoleHref = (role: RoleKey) => {
-    const params = new URLSearchParams();
-    if (resolvedSearchParams) {
-      Object.entries(resolvedSearchParams).forEach(([key, value]) => {
-        if (value && key !== "role") {
-          params.set(key, value);
-        }
-      });
-    }
-    if (role !== "all") {
-      params.set("role", role);
-    }
-    const query = params.toString();
-    return query ? `/operations?${query}` : "/operations";
-  };
   const buildHorizonHref = (horizon: HorizonTab) => {
     const params = new URLSearchParams();
     if (resolvedSearchParams) {
@@ -225,13 +212,6 @@ export default async function OperationsPage({
   const visibleHorizonPlan = horizonPlan.filter(
     (item) => horizonKeyByLabel[item.horizon] === activeHorizon,
   );
-  const roleQuickSteps =
-    activeRole === "engineering"
-      ? [quickSteps[0], { ...quickSteps[1], title: "Next: assign engineering owners" }, quickSteps[2]]
-      : activeRole === "finance"
-        ? [{ ...quickSteps[0], title: "Now: set budget posture" }, quickSteps[1], quickSteps[2]]
-        : quickSteps;
-
   return (
     <ReportShell
       statusLabel={statusLabel}
@@ -263,15 +243,7 @@ export default async function OperationsPage({
       }}
       actionSequence={{
         title: "Execution sequence",
-        items: roleQuickSteps.map((step) => ({ title: step.title, detail: step.detail, href: step.href, cta: step.cta })),
-      }}
-      roleSwitcher={{
-        active: activeRole,
-        options: roleOptions.map((role) => ({
-          key: role.key,
-          label: role.label,
-          href: buildRoleHref(role.key),
-        })),
+        items: quickSteps.map((step) => ({ title: step.title, detail: step.detail, href: step.href, cta: step.cta })),
       }}
       decisionDiffs={[
         { label: "Up from last week", tone: "positive" },
@@ -300,6 +272,21 @@ export default async function OperationsPage({
       />
 
       <OperationsWorkstreamNav currentPath="/operations" />
+
+      <SectionedReportPanel
+        id="ops-lens-callouts"
+        title="Role callouts"
+        description="One canonical plan, with lens-specific callouts for shared discussion."
+      >
+        <div className="grid gap-4 md:grid-cols-3">
+          {lensCallouts.map((callout) => (
+            <article key={callout.title} className="weather-surface space-y-2 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{callout.title}</p>
+              <p className="text-sm text-slate-200">{callout.detail}</p>
+            </article>
+          ))}
+        </div>
+      </SectionedReportPanel>
 
       <SectionedReportPanel
         id="ops-horizon-plan"
