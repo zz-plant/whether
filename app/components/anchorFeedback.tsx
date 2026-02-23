@@ -11,6 +11,9 @@ const TARGET_IDS = new Set([
   "ops-playbook",
   "sensor-array",
   "advanced-controls",
+  "onboarding-checklist",
+  "ops-strategy-brief",
+  "ops-monthly-action-summary",
 ]);
 
 const flashTarget = (hash: string) => {
