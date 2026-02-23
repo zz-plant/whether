@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { buildPageMetadata } from "../../lib/seo";
+import { stakeholderGuides, stakeholderPositioning } from "./stakeholderGuides";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "What Whether Is — Whether",
@@ -159,6 +161,50 @@ export default function BriefPage() {
             </li>
           ))}
         </ul>
+      </section>
+
+
+      <section className="weather-panel space-y-6 px-6 py-6">
+        <header className="space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+            Stakeholder solutions
+          </p>
+          <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
+            Explore role-specific pages for leadership teams.
+          </h2>
+          <p className="text-sm text-slate-300">
+            Each role now has a dedicated page so your team can share tailored, search-friendly
+            guidance for founders, product, finance, strategy, engineering, and boards.
+          </p>
+        </header>
+        <div className="grid gap-4 xl:grid-cols-2">
+          {stakeholderGuides.map((stakeholder) => (
+            <article key={stakeholder.slug} className="weather-surface space-y-4 px-4 py-4">
+              <h3 className="text-base font-semibold text-slate-100">For {stakeholder.title}</h3>
+              <p className="text-sm text-sky-200">{stakeholder.tagline}</p>
+              <p className="text-sm text-slate-300">{stakeholder.seoDescription}</p>
+              <Link
+                href={`/brief/${stakeholder.slug}`}
+                className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+              >
+                Open {stakeholder.title} page →
+              </Link>
+            </article>
+          ))}
+        </div>
+        <article className="weather-surface space-y-4 px-4 py-4">
+          <h3 className="text-base font-semibold text-slate-100">Condensed positioning by role</h3>
+          <div className="flex flex-wrap gap-2">
+            {stakeholderPositioning.map((line) => (
+              <p
+                key={line}
+                className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100"
+              >
+                {line}
+              </p>
+            ))}
+          </div>
+        </article>
       </section>
 
       <section className="weather-panel space-y-3 px-6 py-6">
