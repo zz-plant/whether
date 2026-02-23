@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { buildPageMetadata } from "../../lib/seo";
+import { stageGuides } from "./stageGuides";
 import { stakeholderGuides, stakeholderPositioning } from "./stakeholderGuides";
 
 export const metadata: Metadata = buildPageMetadata({
@@ -163,6 +164,42 @@ export default function BriefPage() {
         </ul>
       </section>
 
+
+      <section className="weather-panel space-y-6 px-6 py-6">
+        <header className="space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+            Company stage pages
+          </p>
+          <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
+            Seed through Series C operating playbooks.
+          </h2>
+          <p className="text-sm text-slate-300">
+            Share stage-specific guidance with leadership teams so posture expectations match the
+            company&apos;s coordination needs, burn profile, and board pressure.
+          </p>
+        </header>
+        <div className="grid gap-4 xl:grid-cols-2">
+          {stageGuides.map((stage) => (
+            <article key={stage.slug} className="weather-surface space-y-3 px-4 py-4">
+              <h3 className="text-base font-semibold text-slate-100">{stage.title}</h3>
+              <p className="text-sm text-slate-200">{stage.primaryValue}</p>
+              <p className="text-sm text-slate-300">{stage.summary}</p>
+              <Link
+                href={`/brief/stage/${stage.slug}`}
+                className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+              >
+                Open {stage.title} guide →
+              </Link>
+            </article>
+          ))}
+        </div>
+        <Link
+          href="/brief/stage"
+          className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+        >
+          View full company stage map →
+        </Link>
+      </section>
 
       <section className="weather-panel space-y-6 px-6 py-6">
         <header className="space-y-2">
