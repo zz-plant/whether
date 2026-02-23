@@ -330,7 +330,7 @@ export const ReportShell = ({
           className="pointer-events-none absolute inset-0 weather-grid"
           aria-hidden="true"
         />
-        <div className="tv-rail-safe mx-auto max-w-7xl pb-[calc(env(safe-area-inset-bottom)+16rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)] pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)] sm:pb-12 sm:pt-6 sm:pl-[calc(env(safe-area-inset-left)+1.5rem)] sm:pr-[calc(env(safe-area-inset-right)+1.5rem)]">
+        <div className="tv-rail-safe mx-auto max-w-[90rem] pb-[calc(env(safe-area-inset-bottom)+13rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)] pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)] sm:pb-12 sm:pt-6 sm:pl-[calc(env(safe-area-inset-left)+1.5rem)] sm:pr-[calc(env(safe-area-inset-right)+1.5rem)]">
           <header className="weather-appbar sticky top-[calc(env(safe-area-inset-top)+0.75rem)] z-20 px-4 py-4 sm:top-4 sm:px-6 sm:py-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-3">
@@ -394,17 +394,17 @@ export const ReportShell = ({
           </div>
 
           <div
-            className={`mt-6 grid min-w-0 gap-6 ${hasSidebar ? "lg:grid-cols-[260px,1fr]" : ""}`}
+            className={`mt-6 grid min-w-0 gap-6 ${hasSidebar ? "lg:grid-cols-[minmax(0,1fr),280px] lg:items-start" : ""}`}
           >
             {hasSidebar ? (
-              <aside className="order-2 space-y-4 lg:order-none lg:sticky lg:top-28 lg:self-start">
+              <aside className="order-2 space-y-4 lg:order-none lg:col-start-2 lg:row-start-1 lg:sticky lg:top-28 lg:self-start">
                 {overviewPanel}
                 {confidencePanel}
                 {sectionsNav}
               </aside>
             ) : null}
 
-            <div className="order-1 min-w-0 space-y-10 lg:order-none lg:space-y-12">
+            <div className="order-1 min-w-0 space-y-10 lg:order-none lg:col-start-1 lg:row-start-1 lg:space-y-12">
               <section className={heroSectionSpacingClassName}>
                 <div className={heroHeaderSpacingClassName}>
                   {roleSwitcher ? (
