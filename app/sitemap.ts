@@ -1,11 +1,18 @@
 import type { MetadataRoute } from "next";
 import { siteUrl } from "../lib/siteUrl";
 import { snapshotData } from "../lib/snapshot";
+import { stakeholderGuides } from "./brief/stakeholderGuides";
 
 // Market Climate Station SEO map for the primary report surface.
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const contentLastModified = new Date(snapshotData.record_date);
+  const stakeholderPages: MetadataRoute.Sitemap = stakeholderGuides.map((guide) => ({
+    url: `${siteUrl}/brief/${guide.slug}`,
+    lastModified: contentLastModified,
+    changeFrequency: "monthly",
+    priority: 0.6,
+  }));
 
   return [
     {
@@ -62,6 +69,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.7
     },
+    {
+      url: `${siteUrl}/brief`,
+      lastModified: contentLastModified,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    ...stakeholderPages,
     {
       url: `${siteUrl}/llms.txt`,
       lastModified: contentLastModified,
