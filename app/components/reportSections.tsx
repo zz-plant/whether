@@ -7,13 +7,10 @@
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { Accordion } from "@base-ui/react/accordion";
-import { Checkbox } from "@base-ui/react/checkbox";
-import { CheckboxGroup } from "@base-ui/react/checkbox-group";
 import { Collapsible } from "@base-ui/react/collapsible";
 import { Field } from "@base-ui/react/field";
 import { Input } from "@base-ui/react/input";
 import { Select } from "@base-ui/react/select";
-import { Tabs } from "@base-ui/react/tabs";
 import { Toggle } from "@base-ui/react/toggle";
 import { ToggleGroup } from "@base-ui/react/toggle-group";
 import { Tooltip } from "@base-ui/react/tooltip";
@@ -21,17 +18,12 @@ import type { RegimeAssessment } from "../../lib/regimeEngine";
 import type { PlaybookEntry } from "../../lib/playbook";
 import type {
   MacroSeriesReading,
-  SensorCategory,
   SensorReading,
   SensorTimeWindow,
   TreasuryData,
 } from "../../lib/types";
 import {
-  filterSensorsByCategory,
   getSensorWindowAggregation,
-  groupSensorsByCategory,
-  sensorCategories,
-  sensorGroups,
   sensorTimeWindows,
 } from "../../lib/sensors";
 import { cxoFunctionOutputs } from "../../lib/cxoFunctionOutputs";
@@ -2341,9 +2333,7 @@ export const SensorArray = ({
   sensors: SensorReading[];
   provenance: DataProvenance;
 }) => {
-  const [selectedCategories, setSelectedCategories] = useState<SensorCategory[]>(sensorCategories);
   const [selectedWindow, setSelectedWindow] = useState<SensorTimeWindow>("3M");
-  const [tabValue, setTabValue] = useState<"groups" | "windows">("groups");
 
   const availableWindows = useMemo(() => {
     const windowSet = new Set<SensorTimeWindow>();
@@ -2362,18 +2352,10 @@ export const SensorArray = ({
     }
   }, [availableWindows, selectedWindow]);
 
-  const filteredSensors = useMemo(
-    () => filterSensorsByCategory(sensors, selectedCategories),
-    [sensors, selectedCategories]
-  );
-  const groupedSensors = useMemo(
-    () => groupSensorsByCategory(filteredSensors, selectedCategories),
-    [filteredSensors, selectedCategories]
-  );
   const activeWindow =
     availableWindows.find((window) => window.id === selectedWindow) ?? availableWindows[0];
   const mostChanged = useMemo(() => {
-    const candidates = filteredSensors.flatMap((sensor) => {
+    const candidates = sensors.flatMap((sensor) => {
       const aggregation = getSensorWindowAggregation(sensor, selectedWindow);
       const change = aggregation?.change;
       return typeof change === "number" ? [{ sensor, aggregation, change }] : [];
@@ -2386,7 +2368,7 @@ export const SensorArray = ({
     return candidates.reduce((best, entry) =>
       Math.abs(entry.change) > Math.abs(best.change) ? entry : best
     );
-  }, [filteredSensors, selectedWindow]);
+  }, [sensors, selectedWindow]);
 
   return (
     <section id="sensor-array" aria-labelledby="sensor-array-title" className="mt-10">
@@ -2401,21 +2383,8 @@ export const SensorArray = ({
           <p className="type-label text-slate-400">Primary market pulse</p>
           <h4 className="mt-2 text-lg font-semibold text-slate-100">Signal spotlight</h4>
           <p className="mt-2 text-sm text-slate-300">
-            Tracking {filteredSensors.length} signal
-            {filteredSensors.length === 1 ? "" : "s"} across{" "}
-            {selectedCategories.length} active group
-            {selectedCategories.length === 1 ? "" : "s"}.
+            Tracking {sensors.length} signal{sensors.length === 1 ? "" : "s"}.
           </p>
-          <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-400">
-            <span className="weather-pill px-3 py-1">{activeWindow.label} window</span>
-            <span className="weather-pill px-3 py-1">
-              {availableWindows.length} time horizon
-              {availableWindows.length === 1 ? "" : "s"}
-            </span>
-            <span className="weather-pill px-3 py-1">
-              {selectedCategories.length === 0 ? "No groups selected" : "Filters applied"}
-            </span>
-          </div>
           {mostChanged ? (
             <div className="mt-4 grid gap-3 sm:grid-cols-[1.1fr,0.9fr]">
               <div>
@@ -2441,267 +2410,133 @@ export const SensorArray = ({
                 <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
                   Leading group
                 </p>
-                <p className="mt-2 text-sm text-slate-200">
-                  {mostChanged.sensor.group.label}
-                </p>
+                <p className="mt-2 text-sm text-slate-200">{mostChanged.sensor.group.label}</p>
                 <p className="mt-2 text-slate-500">{mostChanged.sensor.group.description}</p>
               </div>
             </div>
           ) : (
-            <p className="mt-4 text-sm text-slate-500">
-              Select signal groups to highlight the biggest movement.
-            </p>
+            <p className="mt-4 text-sm text-slate-500">No measurable change in this window.</p>
           )}
         </div>
         <div className="weather-panel p-5">
-          <p className="type-label text-slate-400">Filters</p>
-          <Collapsible.Root className="mt-3" defaultOpen={false}>
-            <Collapsible.Trigger className="inline-flex min-h-[44px] w-full items-center justify-between rounded-xl border border-slate-800/70 bg-slate-950/60 px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.16em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation">
-              <span>Advanced filters</span>
-              <span className="text-[10px] text-slate-500">Show / hide</span>
-            </Collapsible.Trigger>
-            <Collapsible.Panel className="mt-3">
-          <Tabs.Root
-            value={tabValue}
+          <p className="type-label text-slate-400">Window</p>
+          <ToggleGroup
+            value={[selectedWindow]}
             onValueChange={(value) => {
-              if (value === "groups" || value === "windows") {
-                setTabValue(value);
+              const nextValue = value[0] as SensorTimeWindow | undefined;
+              if (nextValue) {
+                setSelectedWindow(nextValue);
               }
             }}
-            className="mt-3"
+            className="mt-3 flex flex-wrap gap-2"
           >
-              <Tabs.List className="flex gap-2 rounded-full border border-slate-800/80 bg-slate-950/70 p-1">
-                <Tabs.Tab
-                  value="groups"
-                  className="flex-1 min-h-[44px] rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 transition-colors data-[active]:bg-sky-500/15 data-[active]:text-slate-100 touch-manipulation"
-                >
-                  Signal groups
-                </Tabs.Tab>
-                <Tabs.Tab
-                  value="windows"
-                  className="flex-1 min-h-[44px] rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 transition-colors data-[active]:bg-sky-500/15 data-[active]:text-slate-100 touch-manipulation"
-                >
-                  Time windows
-                </Tabs.Tab>
-              </Tabs.List>
-            <Tabs.Panel value="groups" className="mt-4 space-y-3">
-              <p className="text-xs text-slate-500">
-                Choose the signal groups to spotlight across the sensor array.
-              </p>
-              <CheckboxGroup
-                value={selectedCategories}
-                onValueChange={(value) => setSelectedCategories(value as SensorCategory[])}
-                className="grid gap-2 sm:grid-cols-2"
+            {availableWindows.map((window) => (
+              <Toggle
+                key={window.id}
+                value={window.id}
+                className="min-h-[44px] rounded-full border border-slate-800/70 px-3 text-xs font-semibold uppercase tracking-[0.14em] text-slate-300 transition-colors data-[pressed]:border-sky-400/70 data-[pressed]:bg-sky-500/15 data-[pressed]:text-slate-100 touch-manipulation"
               >
-                {sensorGroups.map((group) => (
-                  <label
-                    key={group.id}
-                    className="flex min-h-[44px] items-center gap-2 rounded-xl border border-slate-800/70 bg-slate-950/70 px-3 py-2 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-slate-400 transition-colors hover:border-slate-700/80 hover:text-slate-200 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-sky-300 touch-manipulation sm:text-xs"
-                  >
-                    <Checkbox.Root
-                      value={group.id}
-                      className="flex h-4 w-4 items-center justify-center rounded border border-slate-700 bg-slate-950 text-sky-400 transition-colors data-[checked]:border-sky-400 data-[checked]:bg-sky-500/20"
-                    >
-                      <Checkbox.Indicator className="text-sky-300">
-                        <svg viewBox="0 0 16 16" className="h-3 w-3" aria-hidden="true">
-                          <path
-                            d="M3.5 8.5l2.5 2.5 6-6"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="1.8"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      </Checkbox.Indicator>
-                    </Checkbox.Root>
-                    <span>{group.label}</span>
-                  </label>
-                ))}
-              </CheckboxGroup>
-              <div className="flex flex-wrap gap-2 text-xs">
-                <button
-                  type="button"
-                  onClick={() => setSelectedCategories(sensorCategories)}
-                  className="min-h-[44px] rounded-full border border-slate-800/70 px-3 text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-slate-700/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                >
-                  Select all
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSelectedCategories([])}
-                  className="min-h-[44px] rounded-full border border-slate-800/70 px-3 text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-slate-700/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                >
-                  Clear
-                </button>
-                <span className="text-xs text-slate-500">
-                  Showing {filteredSensors.length} sensor
-                  {filteredSensors.length === 1 ? "" : "s"}.
-                </span>
-              </div>
-            </Tabs.Panel>
-            <Tabs.Panel value="windows" className="mt-4 space-y-3">
-              <p className="text-xs text-slate-500">
-                Match the horizon to the decision cadence you are planning for.
-              </p>
-              <ToggleGroup
-                value={[selectedWindow]}
-                onValueChange={(value) => {
-                  const nextValue = value[0] as SensorTimeWindow | undefined;
-                  if (nextValue) {
-                    setSelectedWindow(nextValue);
-                  }
-                }}
-                className="flex flex-wrap gap-2"
-              >
-                {availableWindows.map((window) => (
-                  <Toggle
-                    key={window.id}
-                    value={window.id}
-                    className="min-h-[44px] rounded-full border px-3 text-xs font-semibold tracking-[0.12em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 data-[pressed]:border-sky-400/80 data-[pressed]:bg-sky-500/10 data-[pressed]:text-slate-100 border-slate-800/70 text-slate-400 hover:border-slate-700/80 hover:text-slate-200 touch-manipulation"
-                  >
-                    {window.label}
-                  </Toggle>
-                ))}
-              </ToggleGroup>
-              {activeWindow ? (
-                <p className="text-xs text-slate-500">{activeWindow.description}</p>
-              ) : null}
-            </Tabs.Panel>
-          </Tabs.Root>
-            </Collapsible.Panel>
-          </Collapsible.Root>
+                {window.label}
+              </Toggle>
+            ))}
+          </ToggleGroup>
+          {activeWindow ? <p className="mt-3 text-xs text-slate-500">{activeWindow.description}</p> : null}
         </div>
       </div>
-      <div className="mt-4 space-y-4">
-        {groupedSensors.length === 0 ? (
-          <div className="weather-surface p-4 text-sm text-slate-500">
-            No sensors match the current filters.
-          </div>
-        ) : (
-          groupedSensors.map((group) => (
-            <div key={group.category} className="weather-panel p-5">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <p className="type-label text-slate-400">{group.label}</p>
-                  <p className="text-xs text-slate-500">{group.description}</p>
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        {sensors.map((sensor) => {
+          const hasTrend = Boolean(sensor.trend?.length);
+          const sparkline = buildSparkline(hasTrend ? sensor.trend : sensor.history);
+          const sparklineId = `sensor-spark-${sensor.id}`;
+          const windowAggregation = getSensorWindowAggregation(sensor, selectedWindow);
+
+          return (
+            <div key={sensor.id} className="weather-panel rounded-2xl p-5">
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0">
+                  <p className="break-words text-sm text-slate-300">{sensor.label}</p>
+                  <p className="mono mt-2 text-2xl text-slate-100">
+                    {formatNumber(sensor.value, sensor.unit)}
+                  </p>
+                  <p className="mt-2 text-xs text-slate-500">
+                    Δ {activeWindow.label}{" "}
+                    <span className="text-slate-300">
+                      {formatDelta(windowAggregation?.change ?? null, sensor.unit)}
+                    </span>
+                  </p>
                 </div>
-                <span className="weather-pill px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-400">
-                  {group.sensors.length} sensor{group.sensors.length === 1 ? "" : "s"}
+                <span className="weather-pill px-2 py-1 text-xs font-semibold tracking-[0.12em] text-slate-400">
+                  {provenance.statusLabel}
                 </span>
               </div>
-              {group.sensors.length === 0 ? (
-                <p className="mt-4 text-sm text-slate-500">
-                  No sensors in this category yet.
+              <figure className="mt-3">
+                {sparkline ? (
+                  <svg
+                    viewBox={`0 0 ${SPARKLINE_WIDTH} ${SPARKLINE_HEIGHT}`}
+                    className="h-8 w-full"
+                    aria-hidden="true"
+                    focusable="false"
+                    preserveAspectRatio="none"
+                  >
+                    <defs>
+                      <linearGradient id={sparklineId} x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="rgba(56,189,248,0.35)" />
+                        <stop offset="100%" stopColor="rgba(56,189,248,0)" />
+                      </linearGradient>
+                    </defs>
+                    <path d={sparkline.area} fill={`url(#${sparklineId})`} pathLength={100} />
+                    <path
+                      d={sparkline.path}
+                      fill="none"
+                      stroke="#38bdf8"
+                      strokeWidth="1.5"
+                      vectorEffect="non-scaling-stroke"
+                      pathLength={100}
+                    />
+                  </svg>
+                ) : (
+                  <div
+                    className="h-8 rounded-md border border-sky-900/40 bg-slate-950/80"
+                    aria-hidden="true"
+                  />
+                )}
+                <figcaption className="mt-3 space-y-2 text-xs text-slate-400">
+                  {hasTrend ? (
+                    <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                      12-month trend (cache)
+                    </p>
+                  ) : null}
+                  <p className="break-words">{sensor.explanation}</p>
+                </figcaption>
+              </figure>
+              <div className="mt-4 text-xs text-slate-500">
+                <p>
+                  Formula:{" "}
+                  <a
+                    href={sensor.formulaUrl}
+                    className="touch-target text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
+                  >
+                    Method notes
+                  </a>
                 </p>
-              ) : (
-                <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                  {group.sensors.map((sensor) => {
-                    const hasTrend = Boolean(sensor.trend?.length);
-                    const sparkline = buildSparkline(hasTrend ? sensor.trend : sensor.history);
-                    const sparklineId = `sensor-spark-${sensor.id}`;
-                    const windowAggregation = getSensorWindowAggregation(
-                      sensor,
-                      selectedWindow
-                    );
-
-                    return (
-                      <div key={sensor.id} className="weather-panel rounded-2xl p-5">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="min-w-0">
-                            <p className="break-words text-sm text-slate-300">
-                              {sensor.label}
-                            </p>
-                            <p className="mono mt-2 text-2xl text-slate-100">
-                              {formatNumber(sensor.value, sensor.unit)}
-                            </p>
-                            <p className="mt-2 text-xs text-slate-500">
-                              Δ {activeWindow.label}{" "}
-                              <span className="text-slate-300">
-                                {formatDelta(windowAggregation?.change ?? null, sensor.unit)}
-                              </span>
-                            </p>
-                          </div>
-                          <span className="weather-pill px-2 py-1 text-xs font-semibold tracking-[0.12em] text-slate-400">
-                            {provenance.statusLabel}
-                          </span>
-                        </div>
-                        <figure className="mt-3">
-                          {sparkline ? (
-                            <svg
-                              viewBox={`0 0 ${SPARKLINE_WIDTH} ${SPARKLINE_HEIGHT}`}
-                              className="h-8 w-full"
-                              aria-hidden="true"
-                              focusable="false"
-                              preserveAspectRatio="none"
-                            >
-                              <defs>
-                                <linearGradient id={sparklineId} x1="0" y1="0" x2="0" y2="1">
-                                  <stop offset="0%" stopColor="rgba(56,189,248,0.35)" />
-                                  <stop offset="100%" stopColor="rgba(56,189,248,0)" />
-                                </linearGradient>
-                              </defs>
-                              <path
-                                d={sparkline.area}
-                                fill={`url(#${sparklineId})`}
-                                pathLength={100}
-                              />
-                              <path
-                                d={sparkline.path}
-                                fill="none"
-                                stroke="#38bdf8"
-                                strokeWidth="1.5"
-                                vectorEffect="non-scaling-stroke"
-                                pathLength={100}
-                              />
-                            </svg>
-                          ) : (
-                            <div
-                              className="h-8 rounded-md border border-sky-900/40 bg-slate-950/80"
-                              aria-hidden="true"
-                            />
-                          )}
-                          <figcaption className="mt-3 space-y-2 text-xs text-slate-400">
-                            {hasTrend ? (
-                              <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
-                                12-month trend (cache)
-                              </p>
-                            ) : null}
-                            <p className="break-words">{sensor.explanation}</p>
-                          </figcaption>
-                        </figure>
-                        <div className="mt-4 text-xs text-slate-500">
-                          <p>
-                            Formula:{" "}
-                            <a
-                              href={sensor.formulaUrl}
-                              className="touch-target text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
-                            >
-                              Method notes
-                            </a>
-                          </p>
-                          <div className="mt-3">
-                            <SeriesFreshnessBadge
-                              sourceLabel={sensor.sourceLabel}
-                              sourceUrl={sensor.sourceUrl}
-                              recordDate={sensor.record_date}
-                              fetchedAt={sensor.fetched_at}
-                              isLive={sensor.isLive}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
+                <div className="mt-3">
+                  <SeriesFreshnessBadge
+                    sourceLabel={sensor.sourceLabel}
+                    sourceUrl={sensor.sourceUrl}
+                    recordDate={sensor.record_date}
+                    fetchedAt={sensor.fetched_at}
+                    isLive={sensor.isLive}
+                  />
                 </div>
-              )}
+              </div>
             </div>
-          ))
-        )}
+          );
+        })}
       </div>
     </section>
   );
 };
+
 
 export const MacroSignalsPanel = ({
   series,
