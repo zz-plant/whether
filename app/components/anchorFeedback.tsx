@@ -2,7 +2,16 @@
 
 import { useEffect } from "react";
 
-const TARGET_IDS = new Set(["current-scores", "thresholds", "ops-workstreams"]);
+const TARGET_IDS = new Set([
+  "current-scores",
+  "thresholds",
+  "ops-workstreams",
+  "first-time-guide",
+  "beginner-glossary",
+  "ops-playbook",
+  "sensor-array",
+  "advanced-controls",
+]);
 
 const flashTarget = (hash: string) => {
   const id = hash.replace(/^#/, "");

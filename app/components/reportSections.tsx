@@ -1142,9 +1142,10 @@ export const BeginnerGlossaryPanel = () => {
                         <span className="mt-1 block text-xs text-slate-400">
                           {entry.summary}
                         </span>
+                        <span className="mt-1 block text-[11px] uppercase tracking-[0.14em] text-slate-500">Tap to expand</span>
                       </span>
-                      <span className="flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-300 transition-transform group-data-[panel-open]:rotate-180">
-                        <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
+                      <span className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-slate-700/70 text-slate-300 transition-transform group-data-[panel-open]:rotate-180" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
                           <path
                             d="M7 10l5 5 5-5"
                             fill="none"
@@ -1347,8 +1348,8 @@ export const SignalMatrixPanel = ({
           className="flex min-h-[44px] w-full items-center justify-between gap-3 text-left text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
         >
           <span>Deep dive: matrix positioning and quadrant guidance</span>
-          <span className="text-[0.6rem] font-semibold tracking-[0.18em] text-slate-500">
-            Explore details
+          <span className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/80 px-3 text-[0.65rem] font-semibold tracking-[0.14em] text-slate-200">
+            Expand section
           </span>
         </Collapsible.Trigger>
         <Collapsible.Panel className="mt-4 grid gap-6 lg:grid-cols-[1.2fr,0.8fr]">
@@ -2598,8 +2599,8 @@ export const MacroSignalsPanel = ({
           className="flex min-h-[44px] w-full items-center justify-between gap-3 text-left text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
         >
           <span>Deep dive: signal cards and freshness checks</span>
-          <span className="text-[0.6rem] font-semibold tracking-[0.18em] text-slate-500">
-            Explore details
+          <span className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/80 px-3 text-[0.65rem] font-semibold tracking-[0.14em] text-slate-200">
+            Expand section
           </span>
         </Collapsible.Trigger>
         <Collapsible.Panel className="mt-4 grid gap-4 md:grid-cols-3">
@@ -2734,8 +2735,8 @@ export const PlaybookPanel = ({
             className="flex min-h-[44px] w-full items-center justify-between gap-3 text-left text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
           >
             <span>Deep dive: playbook snapshot and action lanes</span>
-            <span className="text-[0.6rem] font-semibold tracking-[0.18em] text-slate-500">
-              Explore details
+            <span className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/80 px-3 text-[0.65rem] font-semibold tracking-[0.14em] text-slate-200">
+              Expand section
             </span>
           </Collapsible.Trigger>
           <Collapsible.Panel className="mt-4 space-y-6">
@@ -2996,8 +2997,8 @@ export const InsightDatabasePanel = ({
             className="flex min-h-[44px] w-full items-center justify-between gap-3 text-left text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
           >
             <span>Deep dive: searchable evidence library</span>
-            <span className="text-[0.6rem] font-semibold tracking-[0.18em] text-slate-500">
-              Explore details
+            <span className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/80 px-3 text-[0.65rem] font-semibold tracking-[0.14em] text-slate-200">
+              Expand section
             </span>
           </Collapsible.Trigger>
           <Collapsible.Panel className="mt-4 space-y-4">
@@ -3265,8 +3266,8 @@ export const InsightDatabasePanel = ({
             className="flex min-h-[44px] w-full items-center justify-between gap-3 text-left text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
           >
             <span>Deep dive: {fossilRecord.title}</span>
-            <span className="text-[0.6rem] font-semibold tracking-[0.18em] text-slate-500">
-              Explore details
+            <span className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/80 px-3 text-[0.65rem] font-semibold tracking-[0.14em] text-slate-200">
+              Expand section
             </span>
           </Collapsible.Trigger>
           <Collapsible.Panel className="mt-4">
@@ -3349,8 +3350,8 @@ export const FinanceStrategyPanel = ({
             className="flex min-h-[44px] w-full items-center justify-between gap-3 text-left text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
           >
             <span>Deep dive: runway guidance and watchlist</span>
-            <span className="text-[0.6rem] font-semibold tracking-[0.18em] text-slate-500">
-              Explore details
+            <span className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/80 px-3 text-[0.65rem] font-semibold tracking-[0.14em] text-slate-200">
+              Expand section
             </span>
           </Collapsible.Trigger>
           <Collapsible.Panel className="mt-4 grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">
@@ -3439,8 +3440,8 @@ export const DecisionShieldTemplatesPanel = ({
             className="flex min-h-[44px] w-full items-center justify-between gap-3 text-left text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
           >
             <span>Deep dive: decision shield templates by regime</span>
-            <span className="text-[0.6rem] font-semibold tracking-[0.18em] text-slate-500">
-              Explore details
+            <span className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/80 px-3 text-[0.65rem] font-semibold tracking-[0.14em] text-slate-200">
+              Expand section
             </span>
           </Collapsible.Trigger>
           <Collapsible.Panel className="mt-4 grid gap-4 md:grid-cols-3">
