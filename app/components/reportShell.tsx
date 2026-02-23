@@ -2,6 +2,7 @@
  * Shared report shell layout for Whether Report pages.
  * Keeps header, navigation, and layout consistent across multi-page views.
  */
+import Image from "next/image";
 import { Children, type ReactNode, isValidElement } from "react";
 import { DisplayGuardian } from "./displayGuardian";
 import { DisplayModeManager } from "./displayModeManager";
@@ -340,35 +341,15 @@ export const ReportShell = ({
           <header className="weather-appbar sticky top-[calc(env(safe-area-inset-top)+0.75rem)] z-20 px-4 py-4 sm:top-4 sm:px-6 sm:py-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-3">
-                <span className="weather-icon-chip text-slate-100">
-                  <svg
-                    viewBox="0 0 24 24"
-                    className="h-6 w-6"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M4 14.5a6.5 6.5 0 0 1 12.8-2.4A4.5 4.5 0 1 1 18 21H7.6A5.1 5.1 0 0 1 4 14.5Z"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M8 9.5a4 4 0 0 1 6.9 2"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </span>
+                <Image
+                  src="/whether-logo.svg"
+                  alt="Whether Market Climate Station"
+                  width={156}
+                  height={36}
+                  className="h-9 w-auto"
+                  priority
+                />
                 <div>
-                  <p className="text-xs font-semibold tracking-[0.14em] text-slate-400">
-                    Whether
-                  </p>
-                  <p className="text-sm font-semibold text-slate-100">
-                    Market Climate Station
-                  </p>
                   <p className="text-xs text-slate-400 sm:hidden">
                     Signals refreshed {fetchedAtLabel}
                   </p>
