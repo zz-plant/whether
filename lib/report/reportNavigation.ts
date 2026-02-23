@@ -22,7 +22,7 @@ export const reportPageLinks: ReportPageLink[] = [
     description: "Prepare copy-ready narratives for leadership and team alignment.",
   },
   {
-    href: "/formulas",
+    href: "/methodology",
     label: "Methodology",
     description: "Plain-English formulas and source links for each signal.",
   },

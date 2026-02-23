@@ -104,14 +104,14 @@ export default async function SignalsPage({
   const trustStatusLabel = historicalSelection
     ? "Historical snapshot"
     : isFallback
-      ? "Fallback mode"
-      : "Verified live feed";
+      ? "Using last verified snapshot"
+      : "Live • Treasury verified";
   const trustStatusDetail = historicalSelection
     ? "Viewing archived Treasury data for the selected month."
     : isFallback
       ? (treasury.fallback_reason ??
-        "Using cached Treasury snapshot due to upstream outage.")
-      : "Treasury live feed verified for this cycle.";
+        "Live refresh pending. Using last verified snapshot.")
+      : "Live refresh healthy. Next expected update: 48h.";
   const trustStatusAction = historicalSelection
     ? "Use historical data to understand trends, not to approve live bets."
     : isFallback
@@ -135,7 +135,7 @@ export default async function SignalsPage({
   const sectionLinks = [
     { href: "#current-scores", label: "Current scores" },
     { href: "#source-links", label: "Source links" },
-    { href: "#advanced-controls", label: "See full methodology" },
+    { href: "#thresholds", label: "Thresholds" },
   ];
   const buildAdvancedHref = (advanced: boolean) => {
     const params = new URLSearchParams();
@@ -217,8 +217,8 @@ export default async function SignalsPage({
       currentPath="/signals"
       pageSummary="See the sources and scoring behind the regime call."
       pageSummaryLink={{
-        href: "#advanced-controls",
-        label: "See full methodology",
+        href: "#thresholds",
+        label: "See thresholds",
       }}
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
@@ -448,7 +448,7 @@ export default async function SignalsPage({
               "Use the scored signals to drive execution moves and decision safeguards.",
           },
           {
-            href: "/formulas",
+            href: "/methodology",
             label: "Methodology",
             description:
               "Inspect formula definitions and source documentation for each signal.",

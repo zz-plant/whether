@@ -131,14 +131,14 @@ export default async function OperationsPage({
   const trustStatusLabel = historicalSelection
     ? "Historical snapshot"
     : isFallback
-      ? "Fallback mode"
-      : "Verified live feed";
+      ? "Using last verified snapshot"
+      : "Live • Treasury verified";
   const trustStatusDetail = historicalSelection
     ? "Viewing archived Treasury data for the selected month."
     : isFallback
       ? (treasury.fallback_reason ??
-        "Using cached Treasury snapshot due to upstream outage.")
-      : "Treasury live feed verified for this cycle.";
+        "Live refresh pending. Using last verified snapshot.")
+      : "Live refresh healthy. Next expected update: 48h.";
   const trustStatusAction = historicalSelection
     ? "Use historical data for retrospectives; avoid approving new bets until live signals return."
     : isFallback
@@ -311,9 +311,9 @@ export default async function OperationsPage({
       <section className="weather-panel space-y-4 px-6 py-5" aria-label="Playbook mode selector">
         <header className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Workflow mode</p>
+            <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Mode</p>
             <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-              {isExpertMode ? "Expert mode: open all planning surfaces." : "Guided mode: plan → decisions → briefings."}
+              {isExpertMode ? "Advanced view: open all planning surfaces." : "Simple view: plan → decisions → briefings."}
             </h2>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -326,7 +326,7 @@ export default async function OperationsPage({
                   : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
               }`}
             >
-              Guided mode
+              Simple view
             </a>
             <a
               href={buildModeHref("expert")}
@@ -337,7 +337,7 @@ export default async function OperationsPage({
                   : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
               }`}
             >
-              Expert mode
+              Advanced view
             </a>
           </div>
         </header>
@@ -419,8 +419,8 @@ export default async function OperationsPage({
                 aria-current={active ? "page" : undefined}
                 className={`weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation ${
                   active
-                    ? "border-sky-300/80 text-slate-100"
-                    : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
+                    ? "border-sky-200/90 bg-sky-500/20 text-white shadow-sm shadow-sky-900/40"
+                    : "opacity-80 text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
                 }`}
               >
                 {label}
@@ -428,6 +428,7 @@ export default async function OperationsPage({
             );
           })}
         </div>
+        <p className="text-sm font-semibold text-slate-200">Time horizon: {activeHorizon === "week" ? "This week" : activeHorizon === "month" ? "This month" : "This quarter"}</p>
         <div className="grid gap-4 lg:grid-cols-3">
           {visibleHorizonPlan.map((item) => (
             <article
@@ -487,8 +488,8 @@ export default async function OperationsPage({
 
       <SectionedReportPanel
         id="ops-workstreams"
-        title="Operational workstreams"
-        description="Pick a focused view so you do not have to scroll through every panel."
+        title="Upcoming Enhancements"
+        description="Roadmap view of capability investments and delivery status."
       >
         <div className="grid gap-4 lg:grid-cols-3">
           {workstreamCards.map((link) => (
@@ -509,7 +510,17 @@ export default async function OperationsPage({
                   ) : null}
                   {link.availability === "coming-soon" ? (
                     <span className="inline-flex min-h-[22px] items-center rounded-full border border-amber-300/50 bg-amber-400/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-100">
-                      Coming soon
+                      Planned
+                    </span>
+                  ) : null}
+                  {link.tier === "premium" ? (
+                    <span className="inline-flex min-h-[22px] items-center rounded-full border border-sky-300/50 bg-sky-400/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-sky-100">
+                      In development
+                    </span>
+                  ) : null}
+                  {link.availability !== "coming-soon" ? (
+                    <span className="inline-flex min-h-[22px] items-center rounded-full border border-indigo-300/50 bg-indigo-400/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-indigo-100">
+                      Researching
                     </span>
                   ) : null}
                 </div>
@@ -613,7 +624,7 @@ export default async function OperationsPage({
               "Export leadership-ready summaries for board, CXO, and planning reviews.",
           },
           {
-            href: "/formulas",
+            href: "/methodology",
             label: "Methodology",
             description:
               "Review source-linked formula details before finalizing major decisions.",
