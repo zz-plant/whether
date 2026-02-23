@@ -71,13 +71,6 @@ export default async function SignalsPage({
       ]),
     ],
   };
-  const sectionLinks = [
-    { href: "#sensor-array", label: "Live data feed" },
-    { href: "#macro-signals", label: "Macro sources" },
-    { href: "#thresholds", label: "How scores are set" },
-    { href: "#time-machine", label: "Time machine" },
-    { href: "#regime-timeline", label: "Regime timeline" },
-  ];
   const focusOptions = [
     { key: "all", label: "All" },
     { key: "inflation", label: "Inflation" },
@@ -132,13 +125,6 @@ export default async function SignalsPage({
       ? "Hold major decisions until live signals return or you validate the cache."
       : "Signals are live; use them to confirm thresholds and trigger alerts.";
   const trustStatusTone = historicalSelection ? "historical" : isFallback ? "warning" : "stable";
-  const stageItems = [
-    { id: "assess", label: "Assess regime", href: "#regime-timeline", status: "current" as const },
-    { id: "decide", label: "Decide posture", href: buildTimeMachineHref("/", historicalSelection), status: "upcoming" as const },
-    { id: "guardrails", label: "Set guardrails", href: buildTimeMachineHref("/operations/decisions", historicalSelection), status: "upcoming" as const },
-    { id: "owners", label: "Assign owners", href: buildTimeMachineHref("/operations/plan", historicalSelection), status: "upcoming" as const },
-    { id: "export", label: "Export brief", href: buildTimeMachineHref("/operations/briefings", historicalSelection), status: "upcoming" as const },
-  ];
   const requestedFocus = resolvedSearchParams?.focus;
   const activeFocus = focusOptions.some((option) => option.key === requestedFocus)
     ? requestedFocus
@@ -162,6 +148,23 @@ export default async function SignalsPage({
   const showMacroPanel = activeFocus === "all" || activeFocus === "inflation" || activeFocus === "growth";
   const showThresholds = activeFocus === "all" || activeFocus === "inflation" || activeFocus === "financial";
   const showAdvanced = resolvedSearchParams?.advanced === "1";
+  const thresholdsHref = showAdvanced && showThresholds ? "#thresholds" : "#advanced-controls";
+  const timeMachineHref = showAdvanced ? "#time-machine" : "#advanced-controls";
+  const regimeTimelineHref = showAdvanced ? "#regime-timeline" : "#advanced-controls";
+  const sectionLinks = [
+    { href: "#sensor-array", label: "Live data feed" },
+    { href: "#macro-signals", label: "Macro sources" },
+    { href: thresholdsHref, label: "How scores are set" },
+    { href: timeMachineHref, label: "Time machine" },
+    { href: regimeTimelineHref, label: "Regime timeline" },
+  ];
+  const stageItems = [
+    { id: "assess", label: "Assess regime", href: regimeTimelineHref, status: "current" as const },
+    { id: "decide", label: "Decide posture", href: buildTimeMachineHref("/", historicalSelection), status: "upcoming" as const },
+    { id: "guardrails", label: "Set guardrails", href: buildTimeMachineHref("/operations/decisions", historicalSelection), status: "upcoming" as const },
+    { id: "owners", label: "Assign owners", href: buildTimeMachineHref("/operations/plan", historicalSelection), status: "upcoming" as const },
+    { id: "export", label: "Export brief", href: buildTimeMachineHref("/operations/briefings", historicalSelection), status: "upcoming" as const },
+  ];
   const requestedRole = resolvedSearchParams?.role;
   const activeRole: RoleKey =
     roleOptions.some((option) => option.key === requestedRole)
@@ -201,18 +204,18 @@ export default async function SignalsPage({
     activeRole === "engineering"
       ? [
           { title: "Inspect live sensor feed", detail: "Start with source readings impacting delivery risk.", href: "#sensor-array", cta: "Open sensor feed" },
-          { title: "Check scoring thresholds", detail: "Confirm signal tolerances before changing execution guardrails.", href: "#thresholds", cta: "Open thresholds" },
-          { title: "Review regime timeline", detail: "Validate context before committing roadmap changes.", href: "#regime-timeline", cta: "Open timeline" },
+          { title: "Check scoring thresholds", detail: "Confirm signal tolerances before changing execution guardrails.", href: thresholdsHref, cta: "Open thresholds" },
+          { title: "Review regime timeline", detail: "Validate context before committing roadmap changes.", href: regimeTimelineHref, cta: "Open timeline" },
         ]
       : activeRole === "finance"
         ? [
             { title: "Review macro sources", detail: "Start with top-line external drivers relevant to budget timing.", href: "#macro-signals", cta: "Open macro sources" },
-            { title: "Check scoring thresholds", detail: "Verify guardrails before approving new spend windows.", href: "#thresholds", cta: "Open thresholds" },
+            { title: "Check scoring thresholds", detail: "Verify guardrails before approving new spend windows.", href: thresholdsHref, cta: "Open thresholds" },
             { title: "Inspect live sensor feed", detail: "Confirm real-time confirmation signals before decisions.", href: "#sensor-array", cta: "Open sensor feed" },
           ]
         : [
-            { title: "Review regime timeline", detail: "Start with sequence changes to frame context.", href: "#regime-timeline", cta: "Open timeline" },
-            { title: "Check scoring thresholds", detail: "Confirm guardrails still match current tolerance.", href: "#thresholds", cta: "Open thresholds" },
+            { title: "Review regime timeline", detail: "Start with sequence changes to frame context.", href: regimeTimelineHref, cta: "Open timeline" },
+            { title: "Check scoring thresholds", detail: "Confirm guardrails still match current tolerance.", href: thresholdsHref, cta: "Open thresholds" },
             { title: "Inspect live sensor feed", detail: "Validate source readings behind the call.", href: "#sensor-array", cta: "Open sensor feed" },
           ];
 
@@ -230,13 +233,13 @@ export default async function SignalsPage({
       pageTitle="Signal evidence"
       currentPath="/signals"
       pageSummary="See the sources and scoring behind the regime call."
-      pageSummaryLink={{ href: "#regime-timeline", label: "Review evidence scan" }}
+      pageSummaryLink={{ href: regimeTimelineHref, label: "Review evidence scan" }}
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
       heroVariant="compact"
       pageNavVariant="compact"
       primaryCta={{ href: "#sensor-array", label: "Review live feed" }}
-      secondaryCta={{ href: "#thresholds", label: "Review scoring thresholds" }}
+      secondaryCta={{ href: thresholdsHref, label: "Review scoring thresholds" }}
       stageRail={{ title: "Global decision flow", items: stageItems }}
       decisionBanner={{
         label: "Explain why",
@@ -277,24 +280,24 @@ export default async function SignalsPage({
         assessment={assessment}
         recordDate={treasury.record_date}
         impactLinks={[
-          { label: "Tightness", href: "#regime-timeline", metric: "tightness" },
+          { label: "Tightness", href: regimeTimelineHref, metric: "tightness" },
           { label: "Risk appetite", href: "#macro-signals", metric: "riskAppetite" },
           { label: "Base rate", href: "#sensor-array", metric: "baseRate" },
         ]}
-        openPanelHref="#time-machine"
+        openPanelHref={timeMachineHref}
       />
 
       <section className="weather-panel space-y-4 px-6 py-5" aria-label="Suggested scan order">
         <div>
-          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Suggested scan order</p>
+          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Where to start</p>
           <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-            Run this 3-step check before opening advanced controls.
+            Use this 3-step quick check.
           </h2>
         </div>
         <ol className="grid gap-3 md:grid-cols-3">
           {[
-            { title: "1. Regime timeline", href: "#regime-timeline", helper: "Understand sequence shifts first." },
-            { title: "2. Key thresholds", href: "#thresholds", helper: "Confirm guardrails still match risk tolerance." },
+            { title: "1. Regime timeline", href: regimeTimelineHref, helper: "Understand sequence shifts first." },
+            { title: "2. Key thresholds", href: thresholdsHref, helper: "Confirm guardrails still match risk tolerance." },
             { title: "3. Live sensor feed", href: "#sensor-array", helper: "Validate live readings before decisions." },
           ].map((item) => (
             <li key={item.title} className="weather-surface flex h-full flex-col gap-3 p-4">
@@ -314,9 +317,9 @@ export default async function SignalsPage({
       <section className="weather-panel space-y-4 px-6 py-5" aria-labelledby="signal-focus-title">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Signal filters</p>
+            <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">View options</p>
             <h2 id="signal-focus-title" className="text-xl font-semibold text-slate-100 sm:text-2xl">
-              Start with a simple focus, then open advanced threshold controls if needed.
+              Choose a focus area, then open extra controls if you want more detail.
             </h2>
           </div>
         </div>
@@ -345,10 +348,10 @@ export default async function SignalsPage({
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
-              Signal summary
+              Quick summary
             </p>
             <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-              Scan the drivers before you read the full feed.
+              See the key drivers before diving into the full feed.
             </h2>
           </div>
           <a
@@ -414,17 +417,17 @@ export default async function SignalsPage({
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
-              Evidence priorities
+              What to review first
             </p>
             <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-              Confirm these drivers before you call the regime.
+              Check these drivers before finalizing your call.
             </h2>
           </div>
           <a
-            href="#thresholds"
+            href={thresholdsHref}
             className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
           >
-            Review score thresholds
+            Review scoring rules
           </a>
         </div>
         <p className="text-sm text-slate-200">{assessment.description}</p>
@@ -445,7 +448,7 @@ export default async function SignalsPage({
             {
               title: "Confirm scoring thresholds",
               detail: "Ensure the regime thresholds still map to your risk tolerance.",
-              href: "#thresholds",
+              href: thresholdsHref,
               label: "Review thresholds",
             },
           ].map((item) => (
@@ -472,9 +475,9 @@ export default async function SignalsPage({
       <section className="weather-panel space-y-4 px-6 py-5" id="advanced-controls">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Advanced controls</p>
+            <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Extra tools</p>
             <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-              Keep the default flow simple and open analyst controls only when needed.
+              Adjust thresholds and explore the historical timeline.
             </h2>
           </div>
           <a
