@@ -1,21 +1,21 @@
 import type { MetadataRoute } from "next";
 import { siteUrl } from "../lib/siteUrl";
 import { snapshotData } from "../lib/snapshot";
-import { stageGuides } from "./brief/stageGuides";
-import { stakeholderGuides } from "./brief/stakeholderGuides";
+import { stageGuides } from "./guides/stageGuides";
+import { stakeholderGuides } from "./guides/stakeholderGuides";
 
 // Market Climate Station SEO map for the primary report surface.
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const contentLastModified = new Date(snapshotData.record_date);
   const stakeholderPages: MetadataRoute.Sitemap = stakeholderGuides.map((guide) => ({
-    url: `${siteUrl}/brief/${guide.slug}`,
+    url: `${siteUrl}/guides/${guide.slug}`,
     lastModified: contentLastModified,
     changeFrequency: "monthly",
     priority: 0.6,
   }));
   const stagePages: MetadataRoute.Sitemap = stageGuides.map((guide) => ({
-    url: `${siteUrl}/brief/stage/${guide.slug}`,
+    url: `${siteUrl}/guides/stage/${guide.slug}`,
     lastModified: contentLastModified,
     changeFrequency: "monthly",
     priority: 0.6,
@@ -77,13 +77,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7
     },
     {
-      url: `${siteUrl}/brief`,
+      url: `${siteUrl}/guides`,
       lastModified: contentLastModified,
       changeFrequency: "monthly",
       priority: 0.7,
     },
     {
-      url: `${siteUrl}/brief/stage`,
+      url: `${siteUrl}/guides/stage`,
       lastModified: contentLastModified,
       changeFrequency: "monthly",
       priority: 0.7,
