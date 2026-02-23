@@ -103,7 +103,7 @@ export default async function OperationsBriefingsPage({
       pageSummary="Draft strategy narratives and export leadership-ready briefing kits."
       pageSummaryLink={{
         href: "#ops-strategy-brief",
-        label: "Explore details →",
+        label: "Jump to strategy brief section ↓",
       }}
       primaryCta={{
         href: "#ops-strategy-brief",

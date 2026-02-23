@@ -387,13 +387,14 @@ export default async function SignalsPage({
           </div>
           <p className="mt-3 text-xs text-slate-300">
             Use these controls for threshold tuning, historical snapshots, and timeline diagnostics after you complete the default review path.
+            This toggle keeps you on the signal evidence page.
           </p>
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <a
               href={buildAdvancedHref(!showAdvanced)}
               className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
             >
-              {showAdvanced ? "Hide advanced tools" : "Open advanced tools"}
+              {showAdvanced ? "Hide advanced filters" : "Show advanced filters"}
             </a>
             <a
               href={`${appendSearchParamsToRoute("/operations/briefings" as Route, resolvedSearchParams)}#ops-export-briefs`}

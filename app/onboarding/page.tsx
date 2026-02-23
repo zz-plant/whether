@@ -62,7 +62,7 @@ export default async function OnboardingPage({
           ? "Three questions: current regime, favored moves, and avoidances."
           : "Refresh the regime, confidence cue, and operating posture.",
       href: "#first-time-guide",
-      cta: "View orientation",
+      cta: "View orientation steps",
       emphasis: "primary",
     },
     {
@@ -171,7 +171,7 @@ export default async function OnboardingPage({
       heroVariant="compact"
       pageNavVariant="compact"
       showPageNavigation={false}
-      primaryCta={{ href: "#first-time-guide", label: "View orientation" }}
+      primaryCta={{ href: "#first-time-guide", label: "Jump to orientation steps" }}
       secondaryCta={undefined}
       structuredData={structuredData}
       historicalBanner={

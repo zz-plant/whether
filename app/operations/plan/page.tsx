@@ -104,7 +104,7 @@ export default async function OperationsPlanPage({
       pageTitle="Action playbook · Plan"
       currentPath="/operations/plan"
       pageSummary="Review the monthly summary and align the execution playbook for this cycle."
-      pageSummaryLink={{ href: "#ops-playbook", label: "Explore details →" }}
+      pageSummaryLink={{ href: "#ops-playbook", label: "Jump to playbook section ↓" }}
       primaryCta={{
         href: "#ops-monthly-action-summary",
         label: "Review monthly summary",
