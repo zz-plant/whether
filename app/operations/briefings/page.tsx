@@ -122,7 +122,7 @@ export default async function OperationsBriefingsPage({
         evidenceHref: "#ops-strategy-brief",
       }}
       actionSequence={{
-        title: "Briefing sequence",
+        title: "Briefing sections",
         items: [
           {
             title: "Draft strategy brief",

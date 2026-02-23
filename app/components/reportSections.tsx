@@ -435,8 +435,8 @@ export const WeeklyActionSummaryPanel = ({
               </div>
             ))}
           </div>
-          <aside className="weather-surface p-4" aria-label="Weekly decision checklist">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Decision checklist</p>
+          <aside className="weather-surface p-4" aria-label="Weekly decision points">
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Decision points</p>
             <ol className="mt-3 space-y-4 text-sm text-slate-300">
               {decisionChecklist.map((item, index) => (
                 <li key={item.title} className="flex gap-3">
@@ -451,7 +451,7 @@ export const WeeklyActionSummaryPanel = ({
               ))}
             </ol>
             <p className="mt-4 text-xs text-slate-500">
-              Run the checklist before any roadmap changes or staffing approvals.
+              Reference these points before roadmap or staffing changes.
             </p>
           </aside>
         </div>
@@ -973,27 +973,26 @@ export const FirstTimeGuidePanel = ({
             </li>
           ))}
         </ul>
-        <aside className="weather-surface p-4" aria-label="Onboarding checklist">
+        <aside className="weather-surface p-4" aria-label="Onboarding highlights">
           <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-            Quick scan checklist
+            Quick scan highlights
           </p>
           <ul className="mt-3 space-y-3 text-sm text-slate-300">
             <li className="flex gap-2">
               <span className="text-slate-500">•</span>
-              <span>Skim the climate badge with the weekly action summary.</span>
+              <span>Climate badge and weekly action summary.</span>
             </li>
             <li className="flex gap-2">
               <span className="text-slate-500">•</span>
-              <span>Verify source freshness before sharing recommendations.</span>
+              <span>Source freshness and capture timestamp.</span>
             </li>
             <li className="flex gap-2">
               <span className="text-slate-500">•</span>
-              <span>Use the playbook to translate constraints into next steps.</span>
+              <span>Playbook links for constraint and action context.</span>
             </li>
           </ul>
           <div className="mt-4 rounded-lg border border-sky-900/60 bg-slate-950/60 p-3 text-xs text-slate-400">
-            Tip: share the report URL after selecting a time machine snapshot so every stakeholder
-            sees the same assumptions.
+            Tip: share the selected time-machine URL to keep assumptions aligned.
           </div>
         </aside>
       </div>
@@ -1090,20 +1089,17 @@ export const BeginnerGlossaryPanel = () => {
         <div className="mt-6 grid gap-4 lg:grid-cols-[1.15fr,0.85fr]">
           <div className="weather-surface p-4 text-sm text-slate-300">
             <p className="text-xs font-semibold tracking-[0.12em] text-slate-200">
-              How to read the report
+              Reading notes
             </p>
             <ul className="mt-3 space-y-2 text-sm text-slate-400">
               <li>
-                <span className="text-slate-200">Start with the climate badge</span> to understand the
-                macro stance before you interpret any single metric.
+                <span className="text-slate-200">Climate badge</span> summarizes current macro stance.
               </li>
               <li>
-                <span className="text-slate-200">Translate signals into constraints</span>, not
-                predictions. This report emphasizes operational guardrails.
+                <span className="text-slate-200">Signals map to constraints</span> rather than forecasts.
               </li>
               <li>
-                <span className="text-slate-200">Share the exports</span> when aligning leadership to
-                reduce interpretation drift.
+                <span className="text-slate-200">Exports support alignment</span> across teams.
               </li>
             </ul>
           </div>
@@ -1972,10 +1968,10 @@ export const ExecutiveSnapshotPanel = ({
         <div className="mt-5 grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">
           <div className="weather-tile p-4">
             <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-              Execution checklist
+              Execution points
             </p>
             <p className="mt-3 text-sm text-slate-200">
-              Use these calls to align next-week planning and leadership updates.
+              Reference points for next-week planning and leadership updates.
             </p>
             <ul className="mt-4 space-y-3 text-sm text-slate-300">
               {executionChecklist.map((item) => (

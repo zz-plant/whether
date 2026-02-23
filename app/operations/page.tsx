@@ -67,14 +67,14 @@ export default async function OperationsPage({
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const quickSteps = [
     {
-      title: "Now: confirm the posture",
+      title: "Confirm the posture",
       detail: "Use the regime to decide what to fund now vs. defer.",
       href: "#ops-monthly-action-summary",
       cta: "Review monthly actions",
       emphasis: "primary",
     },
     {
-      title: "Next: pick a workstream",
+      title: "Pick a workstream",
       detail:
         "Route to plan, decisions, or briefings based on the question at hand.",
       href: "#ops-workstreams",
@@ -82,7 +82,7 @@ export default async function OperationsPage({
       emphasis: "secondary",
     },
     {
-      title: "Later: export the brief",
+      title: "Export the brief",
       detail:
         "Generate copy-ready output for exec syncs, board prep, and team alignment.",
       href: "/operations/briefings",
@@ -307,8 +307,7 @@ export default async function OperationsPage({
             Perspective lenses
           </p>
           <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-            Keep one shared execution sequence, then apply team-specific
-            emphasis.
+            Shared execution view with team-specific emphasis.
           </h2>
         </header>
         <div className="grid gap-3 lg:grid-cols-3">
@@ -490,7 +489,7 @@ export default async function OperationsPage({
         cadence="monthly"
         storageKey="whether-monthly-review-checklist"
         title="Monthly operating review"
-        subtitle="Run this sequence once per month to keep teams aligned."
+        subtitle="Monthly review for team alignment."
         items={[
           {
             id: "monthly-summary",

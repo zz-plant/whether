@@ -16,7 +16,7 @@ export const RelatedReportLinks = ({
 }) => {
   return (
     <section className="weather-panel space-y-3 px-6 py-5" aria-label={title}>
-      <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Explore next</p>
+      <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Related pages</p>
       <h2 className="text-lg font-semibold text-slate-100">{title}</h2>
       <div className="grid gap-3 md:grid-cols-3">
         {links.map((link) => (
@@ -27,7 +27,7 @@ export const RelatedReportLinks = ({
           >
             <p className="text-sm font-semibold text-slate-100">{link.label}</p>
             <p className="text-sm text-slate-300">{link.description}</p>
-            <p className="text-xs font-semibold tracking-[0.14em] text-sky-200">Open page →</p>
+            <p className="text-xs font-semibold tracking-[0.14em] text-sky-200">View page →</p>
           </Link>
         ))}
       </div>
