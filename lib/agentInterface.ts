@@ -50,6 +50,8 @@ export const buildAgentInterfaceResponse = async (cadence: AgentCadence) => {
 
   return {
     cadence,
+    defaultCadence: "weekly" as const,
+    supportedCadences: [...supportedAgentCadences],
     summary,
     copy: summary.copy,
     provenance: summary.provenance,
@@ -59,6 +61,11 @@ export const buildAgentInterfaceResponse = async (cadence: AgentCadence) => {
       prompt: agentPrompt,
     },
     summaryHash: cadence === "weekly" || cadence === "monthly" ? buildSummaryHash(summary) : null,
+    links: {
+      self: `/api/agent?cadence=${cadence}`,
+      llms: "/llms.txt",
+      discovery: "/.well-known/whether-agent.json",
+    },
     generatedAt: new Date().toISOString(),
     version: "v1",
   };
