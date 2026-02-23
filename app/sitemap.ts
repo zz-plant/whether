@@ -7,16 +7,19 @@ import { stakeholderGuides } from "./guides/stakeholderGuides";
 // Market Climate Station SEO map for the primary report surface.
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const contentLastModified = new Date(snapshotData.record_date);
+  const reportLastModified = new Date(snapshotData.record_date);
+  const staticLastModified = new Date("2026-02-01");
+
   const stakeholderPages: MetadataRoute.Sitemap = stakeholderGuides.map((guide) => ({
     url: `${siteUrl}/guides/${guide.slug}`,
-    lastModified: contentLastModified,
+    lastModified: staticLastModified,
     changeFrequency: "monthly",
     priority: 0.6,
   }));
+
   const stagePages: MetadataRoute.Sitemap = stageGuides.map((guide) => ({
     url: `${siteUrl}/guides/stage/${guide.slug}`,
-    lastModified: contentLastModified,
+    lastModified: staticLastModified,
     changeFrequency: "monthly",
     priority: 0.6,
   }));
@@ -24,67 +27,85 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
       url: siteUrl,
-      lastModified: contentLastModified,
+      lastModified: reportLastModified,
       changeFrequency: "weekly",
-      priority: 1
-    },
-    {
-      url: `${siteUrl}/formulas`,
-      lastModified: contentLastModified,
-      changeFrequency: "monthly",
-      priority: 0.6
-    },
-    {
-      url: `${siteUrl}/methodology`,
-      lastModified: contentLastModified,
-      changeFrequency: "monthly",
-      priority: 0.7
+      priority: 1,
     },
     {
       url: `${siteUrl}/signals`,
-      lastModified: contentLastModified,
+      lastModified: reportLastModified,
       changeFrequency: "weekly",
-      priority: 0.8
-    },
-    {
-      url: `${siteUrl}/onboarding`,
-      lastModified: contentLastModified,
-      changeFrequency: "monthly",
-      priority: 0.6
+      priority: 0.8,
     },
     {
       url: `${siteUrl}/operations`,
-      lastModified: contentLastModified,
+      lastModified: reportLastModified,
       changeFrequency: "weekly",
-      priority: 0.8
+      priority: 0.8,
     },
     {
       url: `${siteUrl}/operations/plan`,
-      lastModified: contentLastModified,
+      lastModified: reportLastModified,
       changeFrequency: "weekly",
-      priority: 0.7
+      priority: 0.7,
     },
     {
       url: `${siteUrl}/operations/decisions`,
-      lastModified: contentLastModified,
+      lastModified: reportLastModified,
       changeFrequency: "weekly",
-      priority: 0.7
+      priority: 0.7,
     },
     {
       url: `${siteUrl}/operations/briefings`,
-      lastModified: contentLastModified,
+      lastModified: reportLastModified,
       changeFrequency: "weekly",
-      priority: 0.7
+      priority: 0.7,
+    },
+    {
+      url: `${siteUrl}/formulas`,
+      lastModified: staticLastModified,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+    {
+      url: `${siteUrl}/methodology`,
+      lastModified: staticLastModified,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${siteUrl}/onboarding`,
+      lastModified: staticLastModified,
+      changeFrequency: "monthly",
+      priority: 0.6,
     },
     {
       url: `${siteUrl}/guides`,
-      lastModified: contentLastModified,
+      lastModified: staticLastModified,
       changeFrequency: "monthly",
       priority: 0.7,
     },
     {
       url: `${siteUrl}/guides/stage`,
-      lastModified: contentLastModified,
+      lastModified: staticLastModified,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${siteUrl}/solutions/product-roadmapping`,
+      lastModified: staticLastModified,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${siteUrl}/solutions/engineering-capacity`,
+      lastModified: staticLastModified,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${siteUrl}/solutions/market-regime-playbook`,
+      lastModified: staticLastModified,
       changeFrequency: "monthly",
       priority: 0.7,
     },
@@ -92,9 +113,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...stagePages,
     {
       url: `${siteUrl}/llms.txt`,
-      lastModified: contentLastModified,
+      lastModified: reportLastModified,
       changeFrequency: "weekly",
       priority: 0.5,
-    }
+    },
   ];
 }

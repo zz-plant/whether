@@ -53,7 +53,7 @@ export const generateMetadata = async ({
     baseUrl.searchParams.set("status", "invalid");
   }
 
-  const title = "Whether Report — Weekly briefing";
+  const title = "Macro signals for product and engineering planning — Whether";
   const imageUrl = baseUrl.toString();
   const canonicalUrl = buildCanonicalUrl("/");
   const hasTimeMachineParams = Boolean(
@@ -62,7 +62,8 @@ export const generateMetadata = async ({
 
   return {
     title,
-    description: siteDescription,
+    description:
+      "Track Treasury yield curve regime shifts and turn macro signals into clear product, engineering, and operating priorities.",
     alternates: {
       canonical: "/",
     },
@@ -70,7 +71,8 @@ export const generateMetadata = async ({
       type: "website",
       url: canonicalUrl,
       title,
-      description: siteDescription,
+      description:
+        "Track Treasury yield curve regime shifts and turn macro signals into clear product, engineering, and operating priorities.",
       siteName,
       images: [
         {
@@ -84,7 +86,8 @@ export const generateMetadata = async ({
     twitter: {
       card: "summary_large_image",
       title,
-      description: siteDescription,
+      description:
+        "Track Treasury yield curve regime shifts and turn macro signals into clear product, engineering, and operating priorities.",
       images: [imageUrl],
     },
     robots: hasTimeMachineParams
@@ -119,6 +122,7 @@ export default async function HomePage({
         "@id": `${siteUrl}#organization`,
         name: organizationName,
         url: siteUrl,
+        logo: `${siteUrl}/icon.png`,
       },
       {
         "@type": "WebSite",
@@ -127,6 +131,7 @@ export default async function HomePage({
         url: siteUrl,
         description: defaultSiteDescription,
         inLanguage: "en",
+        mainEntityOfPage: `${siteUrl}/`,
         publisher: {
           "@id": `${siteUrl}#organization`,
         },
@@ -138,12 +143,16 @@ export default async function HomePage({
         url: siteUrl,
         description: defaultSiteDescription,
         inLanguage: "en",
+        mainEntityOfPage: {
+          "@type": "WebPage",
+          "@id": `${siteUrl}/`,
+        },
         isPartOf: {
           "@id": `${siteUrl}#website`,
         },
         about: {
           "@type": "Thing",
-          name: "Macro signal operations guidance",
+          name: "Treasury yield curve strategy planning",
         },
         mainEntity: {
           "@type": "Dataset",
@@ -227,8 +236,12 @@ export default async function HomePage({
       <section aria-label="Decision card" className="weather-panel space-y-6 px-6 py-6">
         <div className="space-y-3">
           <h1 className="max-w-3xl text-2xl font-semibold text-slate-100 sm:text-3xl">
-            Decision card: what changed and what to do now.
+            Treasury macro signals for product and engineering planning.
           </h1>
+          <p className="max-w-3xl text-sm text-slate-300 sm:text-base">
+            Use live Treasury curve shifts to set weekly operating posture, prioritize roadmap risk,
+            and align engineering execution with market conditions.
+          </p>
         </div>
         <article className="weather-surface space-y-4 p-5">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
@@ -322,6 +335,24 @@ export default async function HomePage({
               label: "Evidence",
               description:
                 "Inspect the full macro evidence matrix, historical series context, and source links.",
+            },
+            {
+              href: "/solutions/product-roadmapping",
+              label: "Product roadmapping",
+              description:
+                "Apply macro signals to product roadmap sequencing, pricing posture, and launch timing.",
+            },
+            {
+              href: "/solutions/engineering-capacity",
+              label: "Engineering capacity planning",
+              description:
+                "Use regime-aware signals to plan hiring, delivery risk, and reliability investments.",
+            },
+            {
+              href: "/solutions/market-regime-playbook",
+              label: "Market regime playbook",
+              description:
+                "Operational playbook for high, moderate, and low market-stress environments.",
             },
           ]}
         />
