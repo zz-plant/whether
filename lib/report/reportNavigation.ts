@@ -17,9 +17,9 @@ export const reportPageLinks: ReportPageLink[] = [
     description: "Validate confidence with thresholds, timelines, and source provenance.",
   },
   {
-    href: "/brief",
+    href: "/operations/briefings",
     label: "Brief",
-    description: "Prepare copy-ready narratives for leadership and team alignment.",
+    description: "Prepare copy-ready narratives in Briefings for leadership and team alignment.",
   },
   {
     href: "/methodology",
