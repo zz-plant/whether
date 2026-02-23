@@ -381,6 +381,7 @@ export const ReportShell = ({
               <ReportPageNavigation
                 pageLinks={pageLinks}
                 pageTitle={pageTitle}
+                currentPath={currentPath}
                 variant={pageNavVariant}
                 className="mt-4 -mx-4 hidden px-4 sm:mx-0 sm:block sm:px-0"
               />
@@ -727,17 +728,17 @@ export const ReportShell = ({
                 <p className="text-sm text-slate-200">
                   {nextStep?.description ??
                     (currentPath === "/"
-                      ? "Signal evidence and operations pages are available for deeper context."
-                      : currentPath === "/signals"
-                        ? "Operations pages are available for execution planning."
+                      ? "Evidence and Plan pages are available for deeper context."
+                      : currentPath === "/signals" || currentPath === "/evidence"
+                        ? "Plan and Brief pages are available for execution planning."
                         : "Plan, decisions, and briefings pages are available from here.")}
                 </p>
                 <a
                   href={
                     nextStep?.href ??
                     (currentPath === "/"
-                      ? "/signals#regime-timeline"
-                      : currentPath === "/signals"
+                      ? "/evidence#regime-timeline"
+                      : currentPath === "/signals" || currentPath === "/evidence"
                         ? "/operations#ops-monthly-action-summary"
                         : "/operations/plan")
                   }
@@ -781,6 +782,7 @@ Open related page →
           <ReportMobileNavigation
             pageLinks={pageLinks}
             pageTitle={pageTitle}
+            currentPath={currentPath}
             sectionLinks={sectionLinks}
             className="fixed inset-x-0 bottom-0 z-30 pb-3 pt-3 pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)]"
           />

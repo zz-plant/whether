@@ -13,6 +13,7 @@ This directory is organized by audience so contributors can find the right sourc
 - `mobile-journey-audit.md` — mobile UX walkthrough of three representative user journeys with prioritized recommendations.
 - `ux-audit-kondo-2026-02-11.md` — remove/move/modify UX audit with prioritized decluttering recommendations.
 - `ux-audit-kondo-followup-2026-02-11.md` — follow-up Kondo UX re-audit after shell/CTA changes, with next-step priorities.
+- `rethought-ia-ux-proposal.md` — proposed navigation and interaction redesign centered on Decide/Plan/Evidence/Brief workflows.
 - `architecture.md` — data flow, modules, and extension points.
 - `stack-compatibility-matrix.md` — runtime/platform support and constraints.
 - `stack-modernization-*.md` — modernization inventory, plan, and execution tracking.
