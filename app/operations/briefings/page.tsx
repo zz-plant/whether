@@ -10,7 +10,10 @@ import { reportPageLinks } from "../../../lib/report/reportNavigation";
 import { operationsSectionLinks } from "../../../lib/navigation/operationsNavigation";
 import { OperationsWorkstreamNav } from "../components/operationsWorkstreamNav";
 import { OperationsWorkflowProgress } from "../components/operationsWorkflowProgress";
-import { CxoFunctionPanel, HistoricalBanner } from "../../components/reportSections";
+import {
+  CxoFunctionPanel,
+  HistoricalBanner,
+} from "../../components/reportSections";
 
 export const runtime = "edge";
 
@@ -23,7 +26,11 @@ export const metadata: Metadata = {
 export default async function OperationsBriefingsPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ month?: string; year?: string; [key: string]: string | undefined }>;
+  searchParams?: Promise<{
+    month?: string;
+    year?: string;
+    [key: string]: string | undefined;
+  }>;
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const structuredData = {
@@ -66,14 +73,19 @@ export default async function OperationsBriefingsPage({
   const trustStatusDetail = historicalSelection
     ? "Viewing archived Treasury data for the selected month."
     : isFallback
-      ? treasury.fallback_reason ?? "Using cached Treasury snapshot due to upstream outage."
-      : "Treasury API responding normally; live signals verified.";
+      ? (treasury.fallback_reason ??
+        "Using cached Treasury snapshot due to upstream outage.")
+      : "Treasury live feed verified for this cycle.";
   const trustStatusAction = historicalSelection
     ? "Use historical data for retrospectives; avoid approving new bets until live signals return."
     : isFallback
       ? "Hold irreversible decisions until live signals return or you validate the cache."
       : "Signals are live; use them to confirm playbook moves and decision shields.";
-  const trustStatusTone = historicalSelection ? "historical" : isFallback ? "warning" : "stable";
+  const trustStatusTone = historicalSelection
+    ? "historical"
+    : isFallback
+      ? "warning"
+      : "stable";
 
   return (
     <ReportShell
@@ -89,9 +101,18 @@ export default async function OperationsBriefingsPage({
       pageTitle="Action playbook · Briefings"
       currentPath="/operations/briefings"
       pageSummary="Draft strategy narratives and export leadership-ready briefing kits."
-      pageSummaryLink={{ href: "#ops-strategy-brief", label: "Explore details →" }}
-      primaryCta={{ href: "#ops-strategy-brief", label: "Draft strategy brief" }}
-      secondaryCta={{ href: "#ops-export-briefs", label: "Export briefing kit" }}
+      pageSummaryLink={{
+        href: "#ops-strategy-brief",
+        label: "Explore details →",
+      }}
+      primaryCta={{
+        href: "#ops-strategy-brief",
+        label: "Draft strategy brief",
+      }}
+      secondaryCta={{
+        href: "#ops-export-briefs",
+        label: "Export briefing kit",
+      }}
       decisionBanner={{
         label: "Narrate now",
         decision: "Turn the regime signal into a board-ready story.",
@@ -128,7 +149,10 @@ export default async function OperationsBriefingsPage({
       structuredData={structuredData}
       historicalBanner={
         historicalSelection ? (
-          <HistoricalBanner banner={historicalSelection.banner} liveHref="/operations/briefings" />
+          <HistoricalBanner
+            banner={historicalSelection.banner}
+            liveHref="/operations/briefings"
+          />
         ) : null
       }
     >

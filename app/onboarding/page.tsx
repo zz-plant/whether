@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import { loadReportData } from "../../lib/report/reportData";
 import { siteUrl } from "../../lib/siteUrl";
-import { buildBreadcrumbList, buildPageMetadata, organizationName, websiteName } from "../../lib/seo";
+import {
+  buildBreadcrumbList,
+  buildPageMetadata,
+  organizationName,
+  websiteName,
+} from "../../lib/seo";
 import { ReportShell } from "../components/reportShell";
 import { RelatedReportLinks } from "../components/relatedReportLinks";
 import {
@@ -25,10 +30,15 @@ export const metadata: Metadata = buildPageMetadata({
 export default async function OnboardingPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ month?: string; year?: string; [key: string]: string | undefined }>;
+  searchParams?: Promise<{
+    month?: string;
+    year?: string;
+    [key: string]: string | undefined;
+  }>;
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const activeExperience = resolvedSearchParams?.experience === "returning" ? "returning" : "new";
+  const activeExperience =
+    resolvedSearchParams?.experience === "returning" ? "returning" : "new";
   const buildExperienceHref = (experience: "new" | "returning") => {
     const params = new URLSearchParams();
     if (resolvedSearchParams) {
@@ -124,14 +134,19 @@ export default async function OnboardingPage({
   const trustStatusDetail = historicalSelection
     ? "Viewing archived Treasury data for the selected month."
     : isFallback
-      ? treasury.fallback_reason ?? "Using cached Treasury snapshot due to upstream outage."
-      : "Treasury API responding normally; live signals verified.";
+      ? (treasury.fallback_reason ??
+        "Using cached Treasury snapshot due to upstream outage.")
+      : "Treasury live feed verified for this cycle.";
   const trustStatusAction = historicalSelection
     ? "Use for retrospectives only; return to live data for real-time planning."
     : isFallback
       ? "Hold critical decisions until live signals return or you validate the cache."
       : "Safe to use for onboarding; proceed with normal planning workflows.";
-  const trustStatusTone = historicalSelection ? "historical" : isFallback ? "warning" : "stable";
+  const trustStatusTone = historicalSelection
+    ? "historical"
+    : isFallback
+      ? "warning"
+      : "stable";
 
   return (
     <ReportShell
@@ -147,7 +162,10 @@ export default async function OnboardingPage({
       pageTitle="Onboarding & glossary"
       currentPath="/onboarding"
       pageSummary="Learn the core questions Whether answers before diving into signal-level detail."
-      pageSummaryLink={{ href: "#onboarding-checklist", label: "Open checklist →" }}
+      pageSummaryLink={{
+        href: "#onboarding-checklist",
+        label: "Open checklist →",
+      }}
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
       heroVariant="compact"
@@ -157,14 +175,21 @@ export default async function OnboardingPage({
       structuredData={structuredData}
       historicalBanner={
         historicalSelection ? (
-          <HistoricalBanner banner={historicalSelection.banner} liveHref="/onboarding" />
+          <HistoricalBanner
+            banner={historicalSelection.banner}
+            liveHref="/onboarding"
+          />
         ) : null
       }
     >
-
-      <section id="onboarding-checklist" className="weather-panel space-y-4 px-6 py-5">
+      <section
+        id="onboarding-checklist"
+        className="weather-panel space-y-4 px-6 py-5"
+      >
         <div className="space-y-2">
-          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Checklist</p>
+          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
+            Checklist
+          </p>
           <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
             Complete these three steps in order.
           </h2>
@@ -174,7 +199,9 @@ export default async function OnboardingPage({
               : "~90 seconds to refresh context and jump to evidence."}
           </p>
           <div className="flex flex-wrap items-center gap-2">
-            <p className="text-xs font-semibold tracking-[0.14em] text-slate-400">Experience mode</p>
+            <p className="text-xs font-semibold tracking-[0.14em] text-slate-400">
+              Experience mode
+            </p>
             {[
               { key: "new", label: "I’m new" },
               { key: "returning", label: "I’m returning" },
@@ -210,7 +237,9 @@ export default async function OnboardingPage({
 
       <section className="weather-panel space-y-4 px-6 py-5">
         <div>
-          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Apply each concept</p>
+          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
+            Apply each concept
+          </p>
           <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
             Jump from concepts to live report sections.
           </h2>
@@ -233,8 +262,13 @@ export default async function OnboardingPage({
               label: "Open action playbook",
             },
           ].map((item) => (
-            <li key={item.concept} className="weather-surface flex flex-col gap-3 p-4">
-              <p className="text-sm font-semibold text-slate-100">{item.concept}</p>
+            <li
+              key={item.concept}
+              className="weather-surface flex flex-col gap-3 p-4"
+            >
+              <p className="text-sm font-semibold text-slate-100">
+                {item.concept}
+              </p>
               <a
                 href={item.href}
                 className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
@@ -252,17 +286,20 @@ export default async function OnboardingPage({
           {
             href: "/signals",
             label: "Signal evidence",
-            description: "Apply the glossary with live source data and threshold diagnostics.",
+            description:
+              "Apply the glossary with live source data and threshold diagnostics.",
           },
           {
             href: "/operations",
             label: "Action playbook",
-            description: "Turn the regime readout into concrete execution guidance.",
+            description:
+              "Turn the regime readout into concrete execution guidance.",
           },
           {
             href: "/formulas",
             label: "Methodology",
-            description: "Explore the exact formula logic and original data providers.",
+            description:
+              "Explore the exact formula logic and original data providers.",
           },
         ]}
       />
