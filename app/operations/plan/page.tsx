@@ -27,7 +27,11 @@ export const metadata: Metadata = {
 export default async function OperationsPlanPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ month?: string; year?: string; [key: string]: string | undefined }>;
+  searchParams?: Promise<{
+    month?: string;
+    year?: string;
+    [key: string]: string | undefined;
+  }>;
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const structuredData = {
@@ -72,14 +76,19 @@ export default async function OperationsPlanPage({
   const trustStatusDetail = historicalSelection
     ? "Viewing archived Treasury data for the selected month."
     : isFallback
-      ? treasury.fallback_reason ?? "Using cached Treasury snapshot due to upstream outage."
-      : "Treasury API responding normally; live signals verified.";
+      ? (treasury.fallback_reason ??
+        "Using cached Treasury snapshot due to upstream outage.")
+      : "Treasury live feed verified for this cycle.";
   const trustStatusAction = historicalSelection
     ? "Use historical data for retrospectives; avoid approving new bets until live signals return."
     : isFallback
       ? "Hold irreversible decisions until live signals return or you validate the cache."
       : "Signals are live; use them to confirm playbook moves and decision shields.";
-  const trustStatusTone = historicalSelection ? "historical" : isFallback ? "warning" : "stable";
+  const trustStatusTone = historicalSelection
+    ? "historical"
+    : isFallback
+      ? "warning"
+      : "stable";
 
   return (
     <ReportShell
@@ -96,7 +105,10 @@ export default async function OperationsPlanPage({
       currentPath="/operations/plan"
       pageSummary="Review the monthly summary and align the execution playbook for this cycle."
       pageSummaryLink={{ href: "#ops-playbook", label: "Explore details →" }}
-      primaryCta={{ href: "#ops-monthly-action-summary", label: "Review monthly summary" }}
+      primaryCta={{
+        href: "#ops-monthly-action-summary",
+        label: "Review monthly summary",
+      }}
       secondaryCta={{ href: "#ops-playbook", label: "Open execution playbook" }}
       decisionBanner={{
         label: "Align now",
@@ -134,7 +146,10 @@ export default async function OperationsPlanPage({
       structuredData={structuredData}
       historicalBanner={
         historicalSelection ? (
-          <HistoricalBanner banner={historicalSelection.banner} liveHref="/operations/plan" />
+          <HistoricalBanner
+            banner={historicalSelection.banner}
+            liveHref="/operations/plan"
+          />
         ) : null
       }
     >
@@ -172,7 +187,10 @@ export default async function OperationsPlanPage({
         title="Finance strategy"
         description="Budget posture and cash timing guidance for the quarter."
       >
-        <FinanceStrategyPanel regime={assessment.regime} provenance={treasuryProvenance} />
+        <FinanceStrategyPanel
+          regime={assessment.regime}
+          provenance={treasuryProvenance}
+        />
       </SectionedReportPanel>
 
       <SectionedReportPanel
@@ -180,7 +198,10 @@ export default async function OperationsPlanPage({
         title="Insight database"
         description="Capture what the regime implies for product signals and experiments."
       >
-        <InsightDatabasePanel regime={assessment.regime} provenance={treasuryProvenance} />
+        <InsightDatabasePanel
+          regime={assessment.regime}
+          provenance={treasuryProvenance}
+        />
       </SectionedReportPanel>
 
       <SectionedReportPanel

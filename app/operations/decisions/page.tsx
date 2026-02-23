@@ -27,7 +27,11 @@ export const metadata: Metadata = {
 export default async function OperationsDecisionsPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ month?: string; year?: string; [key: string]: string | undefined }>;
+  searchParams?: Promise<{
+    month?: string;
+    year?: string;
+    [key: string]: string | undefined;
+  }>;
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const structuredData = {
@@ -67,14 +71,19 @@ export default async function OperationsDecisionsPage({
   const trustStatusDetail = historicalSelection
     ? "Viewing archived Treasury data for the selected month."
     : isFallback
-      ? treasury.fallback_reason ?? "Using cached Treasury snapshot due to upstream outage."
-      : "Treasury API responding normally; live signals verified.";
+      ? (treasury.fallback_reason ??
+        "Using cached Treasury snapshot due to upstream outage.")
+      : "Treasury live feed verified for this cycle.";
   const trustStatusAction = historicalSelection
     ? "Use historical data for retrospectives; avoid approving new bets until live signals return."
     : isFallback
       ? "Hold irreversible decisions until live signals return or you validate the cache."
       : "Signals are live; use them to confirm playbook moves and decision shields.";
-  const trustStatusTone = historicalSelection ? "historical" : isFallback ? "warning" : "stable";
+  const trustStatusTone = historicalSelection
+    ? "historical"
+    : isFallback
+      ? "warning"
+      : "stable";
 
   return (
     <ReportShell
@@ -90,9 +99,18 @@ export default async function OperationsDecisionsPage({
       pageTitle="Action playbook · Decisions"
       currentPath="/operations/decisions"
       pageSummary="Run decision guardrails, lock assumptions, and capture counterfactuals."
-      pageSummaryLink={{ href: "#ops-decision-shield", label: "Explore details →" }}
-      primaryCta={{ href: "#ops-decision-shield", label: "Run decision shield" }}
-      secondaryCta={{ href: "#ops-assumption-locking", label: "Lock assumptions" }}
+      pageSummaryLink={{
+        href: "#ops-decision-shield",
+        label: "Explore details →",
+      }}
+      primaryCta={{
+        href: "#ops-decision-shield",
+        label: "Run decision shield",
+      }}
+      secondaryCta={{
+        href: "#ops-assumption-locking",
+        label: "Lock assumptions",
+      }}
       decisionBanner={{
         label: "Validate now",
         decision: "Pressure-test this week's commitments before execution.",
@@ -129,7 +147,10 @@ export default async function OperationsDecisionsPage({
       structuredData={structuredData}
       historicalBanner={
         historicalSelection ? (
-          <HistoricalBanner banner={historicalSelection.banner} liveHref="/operations/decisions" />
+          <HistoricalBanner
+            banner={historicalSelection.banner}
+            liveHref="/operations/decisions"
+          />
         ) : null
       }
     >
@@ -141,7 +162,10 @@ export default async function OperationsDecisionsPage({
         title="Decision shield"
         description="Validate decisions against regime-specific guardrails."
       >
-        <DecisionShieldPanel assessment={assessment} provenance={treasuryProvenance} />
+        <DecisionShieldPanel
+          assessment={assessment}
+          provenance={treasuryProvenance}
+        />
       </SectionedReportPanel>
 
       <SectionedReportPanel
@@ -173,7 +197,10 @@ export default async function OperationsDecisionsPage({
         title="Counterfactual view"
         description="Stress-test priorities against alternate macro regimes."
       >
-        <CounterfactualPanel assessment={assessment} provenance={treasuryProvenance} />
+        <CounterfactualPanel
+          assessment={assessment}
+          provenance={treasuryProvenance}
+        />
       </SectionedReportPanel>
     </ReportShell>
   );

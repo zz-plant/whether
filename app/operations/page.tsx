@@ -4,11 +4,19 @@ import Link from "next/link";
 import { SectionedReportPanel } from "./components/sectionedReportPanel";
 import { loadReportData } from "../../lib/report/reportData";
 import { siteUrl } from "../../lib/siteUrl";
-import { buildBreadcrumbList, buildPageMetadata, organizationName, websiteName } from "../../lib/seo";
+import {
+  buildBreadcrumbList,
+  buildPageMetadata,
+  organizationName,
+  websiteName,
+} from "../../lib/seo";
 import { ReportShell } from "../components/reportShell";
 import { RelatedReportLinks } from "../components/relatedReportLinks";
 import { CadenceChecklist } from "../components/cadenceChecklist";
-import { HistoricalBanner, MonthlyActionSummaryPanel } from "../components/reportSections";
+import {
+  HistoricalBanner,
+  MonthlyActionSummaryPanel,
+} from "../components/reportSections";
 import { reportPageLinks } from "../../lib/report/reportNavigation";
 import {
   operationsSectionLinks,
@@ -50,7 +58,11 @@ const workstreamHighlights: Record<string, string[]> = {
 export default async function OperationsPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ month?: string; year?: string; [key: string]: string | undefined }>;
+  searchParams?: Promise<{
+    month?: string;
+    year?: string;
+    [key: string]: string | undefined;
+  }>;
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const quickSteps = [
@@ -63,14 +75,16 @@ export default async function OperationsPage({
     },
     {
       title: "Next: pick a workstream",
-      detail: "Route to plan, decisions, or briefings based on the question at hand.",
+      detail:
+        "Route to plan, decisions, or briefings based on the question at hand.",
       href: "#ops-workstreams",
       cta: "Review workstreams",
       emphasis: "secondary",
     },
     {
       title: "Later: export the brief",
-      detail: "Generate copy-ready output for exec syncs, board prep, and team alignment.",
+      detail:
+        "Generate copy-ready output for exec syncs, board prep, and team alignment.",
       href: "/operations/briefings",
       cta: "Review briefing kits",
       emphasis: "secondary",
@@ -122,16 +136,23 @@ export default async function OperationsPage({
   const trustStatusDetail = historicalSelection
     ? "Viewing archived Treasury data for the selected month."
     : isFallback
-      ? treasury.fallback_reason ?? "Using cached Treasury snapshot due to upstream outage."
-      : "Treasury API responding normally; live signals verified.";
+      ? (treasury.fallback_reason ??
+        "Using cached Treasury snapshot due to upstream outage.")
+      : "Treasury live feed verified for this cycle.";
   const trustStatusAction = historicalSelection
     ? "Use historical data for retrospectives; avoid approving new bets until live signals return."
     : isFallback
       ? "Hold irreversible decisions until live signals return or you validate the cache."
       : "Signals are live; use them to confirm playbook moves and decision shields.";
-  const trustStatusTone = historicalSelection ? "historical" : isFallback ? "warning" : "stable";
+  const trustStatusTone = historicalSelection
+    ? "historical"
+    : isFallback
+      ? "warning"
+      : "stable";
 
-  const workstreamCards = operationsWorkstreamLinks.filter((link) => link.href !== "/operations");
+  const workstreamCards = operationsWorkstreamLinks.filter(
+    (link) => link.href !== "/operations",
+  );
   const horizonPlan = [
     {
       horizon: "This week",
@@ -203,12 +224,18 @@ export default async function OperationsPage({
       pageTitle="Action playbook"
       currentPath="/operations"
       pageSummary="Turn macro signals into execution posture and decision guardrails."
-      pageSummaryLink={{ href: "#ops-workstreams", label: "Review execution details" }}
+      pageSummaryLink={{
+        href: "#ops-workstreams",
+        label: "Review execution details",
+      }}
       pageLinks={reportPageLinks}
       sectionLinks={operationsSectionLinks.overview}
       heroVariant="compact"
       pageNavVariant="compact"
-      primaryCta={{ href: "#ops-monthly-action-summary", label: "Review monthly actions" }}
+      primaryCta={{
+        href: "#ops-monthly-action-summary",
+        label: "Review monthly actions",
+      }}
       decisionBanner={{
         label: "Decide now",
         decision: "Set this month's posture and commit guardrails.",
@@ -219,7 +246,12 @@ export default async function OperationsPage({
       }}
       actionSequence={{
         title: "Plan",
-        items: roleQuickSteps.map((step) => ({ title: step.title, detail: step.detail, href: step.href, cta: step.cta })),
+        items: roleQuickSteps.map((step) => ({
+          title: step.title,
+          detail: step.detail,
+          href: step.href,
+          cta: step.cta,
+        })),
       }}
       roleSwitcher={{
         active: activeRole,
@@ -231,16 +263,25 @@ export default async function OperationsPage({
       }}
       decisionDiffs={[
         { label: "Up from last week", tone: "positive" },
-        { label: `Trust: ${trustStatusLabel}`, tone: trustStatusTone === "stable" ? "positive" : "warning" },
+        {
+          label: `Trust: ${trustStatusLabel}`,
+          tone: trustStatusTone === "stable" ? "positive" : "warning",
+        },
       ]}
       nextStep={{
         description: "Turn this playbook into owner assignments and exports.",
-        href: appendSearchParamsToRoute("/operations/plan", resolvedSearchParams),
+        href: appendSearchParamsToRoute(
+          "/operations/plan",
+          resolvedSearchParams,
+        ),
       }}
       structuredData={structuredData}
       historicalBanner={
         historicalSelection ? (
-          <HistoricalBanner banner={historicalSelection.banner} liveHref="/operations" />
+          <HistoricalBanner
+            banner={historicalSelection.banner}
+            liveHref="/operations"
+          />
         ) : null
       }
     >
@@ -248,8 +289,16 @@ export default async function OperationsPage({
         assessment={assessment}
         recordDate={treasury.record_date}
         impactLinks={[
-          { label: "Tightness", href: "#ops-monthly-action-summary", metric: "tightness" },
-          { label: "Risk appetite", href: "#ops-workstreams", metric: "riskAppetite" },
+          {
+            label: "Tightness",
+            href: "#ops-monthly-action-summary",
+            metric: "tightness",
+          },
+          {
+            label: "Risk appetite",
+            href: "#ops-workstreams",
+            metric: "riskAppetite",
+          },
           { label: "Base rate", href: "#ops-horizon-plan", metric: "baseRate" },
         ]}
         openPanelHref="/signals#time-machine"
@@ -257,30 +306,41 @@ export default async function OperationsPage({
 
       <OperationsWorkstreamNav currentPath="/operations" />
 
-      <section className="weather-panel space-y-4 px-6 py-5" aria-label="Execution lenses">
+      <section
+        className="weather-panel space-y-4 px-6 py-5"
+        aria-label="Execution lenses"
+      >
         <div>
-          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Perspective lenses</p>
+          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
+            Perspective lenses
+          </p>
           <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-            Keep one shared execution sequence, then apply team-specific emphasis.
+            Keep one shared execution sequence, then apply team-specific
+            emphasis.
           </h2>
         </div>
         <div className="grid gap-3 lg:grid-cols-3">
           {[
             {
               title: "Finance lens",
-              detail: "Stress-test funding posture, margin protection, and spend pacing before locking commitments.",
+              detail:
+                "Stress-test funding posture, margin protection, and spend pacing before locking commitments.",
             },
             {
               title: "Product lens",
-              detail: "Prioritize customer-critical scope and sequence bets around near-term demand certainty.",
+              detail:
+                "Prioritize customer-critical scope and sequence bets around near-term demand certainty.",
             },
             {
               title: "Engineering lens",
-              detail: "Translate posture into capacity guardrails, reliability thresholds, and delivery constraints.",
+              detail:
+                "Translate posture into capacity guardrails, reliability thresholds, and delivery constraints.",
             },
           ].map((lens) => (
             <article key={lens.title} className="weather-surface space-y-2 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{lens.title}</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                {lens.title}
+              </p>
               <p className="text-sm text-slate-200">{lens.detail}</p>
             </article>
           ))}
@@ -295,7 +355,12 @@ export default async function OperationsPage({
         <div className="grid gap-2 sm:grid-cols-3">
           {horizonTabs.map((horizon) => {
             const active = horizon === activeHorizon;
-            const label = horizon === "week" ? "This week" : horizon === "month" ? "This month" : "This quarter";
+            const label =
+              horizon === "week"
+                ? "This week"
+                : horizon === "month"
+                  ? "This month"
+                  : "This quarter";
             return (
               <Link
                 key={horizon}
@@ -314,19 +379,28 @@ export default async function OperationsPage({
         </div>
         <div className="grid gap-4 lg:grid-cols-3">
           {visibleHorizonPlan.map((item) => (
-            <article key={item.horizon} className="weather-surface flex h-full flex-col gap-3 p-5">
+            <article
+              key={item.horizon}
+              className="weather-surface flex h-full flex-col gap-3 p-5"
+            >
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
                 {item.horizon}
               </p>
-              <p className="text-sm font-semibold text-slate-100">{item.objective}</p>
+              <p className="text-sm font-semibold text-slate-100">
+                {item.objective}
+              </p>
               <dl className="space-y-2 text-xs text-slate-300">
                 <div className="flex items-start justify-between gap-3">
                   <dt className="text-slate-500">Owner</dt>
-                  <dd className="text-right text-slate-200">{item.ownerRole}</dd>
+                  <dd className="text-right text-slate-200">
+                    {item.ownerRole}
+                  </dd>
                 </div>
                 <div className="flex items-start justify-between gap-3">
                   <dt className="text-slate-500">Due</dt>
-                  <dd className="text-right text-slate-200">{item.dueWindow}</dd>
+                  <dd className="text-right text-slate-200">
+                    {item.dueWindow}
+                  </dd>
                 </div>
                 <div className="flex items-start justify-between gap-3">
                   <dt className="text-slate-500">Expected impact</dt>
@@ -334,7 +408,12 @@ export default async function OperationsPage({
                 </div>
               </dl>
               <Link
-                href={appendSearchParamsToRoute(item.href, resolvedSearchParams) as Route}
+                href={
+                  appendSearchParamsToRoute(
+                    item.href,
+                    resolvedSearchParams,
+                  ) as Route
+                }
                 className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
               >
                 Review {item.horizon.toLowerCase()} actions
@@ -362,7 +441,10 @@ export default async function OperationsPage({
       >
         <div className="grid gap-4 lg:grid-cols-3">
           {workstreamCards.map((link) => (
-            <article key={link.href} className="weather-surface flex h-full flex-col gap-4 p-5">
+            <article
+              key={link.href}
+              className="weather-surface flex h-full flex-col gap-4 p-5"
+            >
               <div className="space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-[0.26em] text-slate-400">
                   {link.label}
@@ -372,7 +454,10 @@ export default async function OperationsPage({
               <ul className="space-y-2 text-sm text-slate-200">
                 {workstreamHighlights[link.href]?.map((item) => (
                   <li key={item} className="flex items-start gap-2">
-                    <span className="mt-1 h-1.5 w-1.5 rounded-full bg-sky-400" aria-hidden="true" />
+                    <span
+                      className="mt-1 h-1.5 w-1.5 rounded-full bg-sky-400"
+                      aria-hidden="true"
+                    />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -380,7 +465,9 @@ export default async function OperationsPage({
               <dl className="space-y-1 text-xs text-slate-300">
                 <div className="flex items-center justify-between gap-3">
                   <dt className="text-slate-500">Owner</dt>
-                  <dd className="text-slate-200">Assign in weekly ops review</dd>
+                  <dd className="text-slate-200">
+                    Assign in weekly ops review
+                  </dd>
                 </div>
                 <div className="flex items-center justify-between gap-3">
                   <dt className="text-slate-500">Due date</dt>
@@ -392,7 +479,12 @@ export default async function OperationsPage({
                 </div>
               </dl>
               <Link
-                href={appendSearchParamsToRoute(link.href, resolvedSearchParams) as Route}
+                href={
+                  appendSearchParamsToRoute(
+                    link.href,
+                    resolvedSearchParams,
+                  ) as Route
+                }
                 className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.2em] transition-colors hover:border-sky-300/80 hover:text-white"
               >
                 Review {link.label}
@@ -416,7 +508,10 @@ export default async function OperationsPage({
           {
             id: "decision-checks",
             label: "Validate decision guardrails",
-            href: appendSearchParamsToRoute("/operations/decisions", resolvedSearchParams),
+            href: appendSearchParamsToRoute(
+              "/operations/decisions",
+              resolvedSearchParams,
+            ),
           },
           {
             id: "briefing-export",
@@ -438,24 +533,26 @@ export default async function OperationsPage({
         />
       </SectionedReportPanel>
 
-
       <RelatedReportLinks
         title="Keep navigating the report"
         links={[
           {
             href: "/signals",
             label: "Signal evidence",
-            description: "Trace the macro evidence and thresholds behind each recommended action.",
+            description:
+              "Trace the macro evidence and thresholds behind each recommended action.",
           },
           {
             href: "/operations/briefings",
             label: "Briefing kits",
-            description: "Export leadership-ready summaries for board, CXO, and planning reviews.",
+            description:
+              "Export leadership-ready summaries for board, CXO, and planning reviews.",
           },
           {
             href: "/formulas",
             label: "Methodology",
-            description: "Review source-linked formula details before finalizing major decisions.",
+            description:
+              "Review source-linked formula details before finalizing major decisions.",
           },
         ]}
       />

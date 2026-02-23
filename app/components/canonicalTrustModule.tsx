@@ -41,7 +41,12 @@ const toneConfig: Record<
           strokeWidth="1.6"
           strokeLinejoin="round"
         />
-        <path d="M12 9v4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        <path
+          d="M12 9v4"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        />
         <circle cx="12" cy="16" r="1" fill="currentColor" />
       </svg>
     ),
@@ -93,17 +98,27 @@ export const CanonicalTrustModule = ({
   const config = toneConfig[tone];
 
   return (
-    <section className={`weather-panel flex flex-col gap-2 px-4 py-4 ${config.panelClassName}`}>
+    <section
+      className={`weather-panel flex flex-col gap-2 px-4 py-4 ${config.panelClassName}`}
+    >
       <div className="flex flex-wrap items-center gap-2">
-        <span className={`inline-flex min-h-[24px] items-center gap-1 rounded-full border px-2 py-1 text-[11px] font-semibold tracking-[0.14em] ${config.badgeClassName}`}>
+        <span
+          className={`inline-flex min-h-[24px] items-center gap-1 rounded-full border px-2 py-1 text-[11px] font-semibold tracking-[0.14em] ${config.badgeClassName}`}
+        >
           {config.icon}
           {config.label}
         </span>
-        <p className="text-xs font-semibold tracking-[0.16em]">Trust state</p>
+        <p className="text-xs font-semibold tracking-[0.16em]">
+          Data provenance
+        </p>
       </div>
       <p className="text-sm font-semibold text-slate-100">{label}</p>
-      <p className={`text-xs leading-relaxed ${config.detailClassName}`}>{detail}</p>
-      {!compact ? <p className="text-xs leading-relaxed text-slate-200/80">{action}</p> : null}
+      <p className={`text-xs leading-relaxed ${config.detailClassName}`}>
+        {detail}
+      </p>
+      {!compact ? (
+        <p className="text-xs leading-relaxed text-slate-200/80">{action}</p>
+      ) : null}
     </section>
   );
 };
