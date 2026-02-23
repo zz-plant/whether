@@ -981,52 +981,23 @@ export const FirstTimeGuidePanel = ({
             </li>
           ))}
         </ul>
-        <aside className="weather-surface p-4" aria-label="Onboarding checklist">
+        <aside className="weather-surface p-4" aria-label="Report highlights">
           <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-            Quick scan checklist
+            Highlights
           </p>
           <ul className="mt-3 space-y-3 text-sm text-slate-300">
             <li className="flex gap-2">
               <span className="text-slate-500">•</span>
-              <span>Skim the climate badge with the weekly action summary.</span>
+              <span>Climate badge and weekly action summary</span>
             </li>
             <li className="flex gap-2">
               <span className="text-slate-500">•</span>
-              <span>Verify source freshness before sharing recommendations.</span>
-            </li>
-            <li className="flex gap-2">
-              <span className="text-slate-500">•</span>
-              <span>Use the playbook to translate constraints into next steps.</span>
+              <span>Source freshness and signal evidence links</span>
             </li>
           </ul>
-          <div className="mt-4 rounded-lg border border-sky-900/60 bg-slate-950/60 p-3 text-xs text-slate-400">
-            Tip: share the report URL after selecting a time machine snapshot so every stakeholder
-            sees the same assumptions.
-          </div>
         </aside>
       </div>
 
-      <div className="mt-6 space-y-2 text-sm text-slate-300">
-        <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-          Suggested next stops
-        </p>
-        <ul className="space-y-2">
-          {[
-            { href: "#executive-snapshot", label: "Leadership summary" },
-            { href: "/operations#ops-playbook", label: "Actions playbook" },
-            { href: "/signals#time-machine", label: "Time machine" },
-          ].map((link) => (
-            <li key={link.href}>
-              <a
-                href={link.href}
-                className="touch-target inline-flex min-h-[44px] items-center text-sm text-slate-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
-              >
-                {link.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
       <p className="mt-4 text-xs text-slate-500">
         Share the URL when you lock thresholds or time machine selections so every stakeholder sees
         the same climate assumptions.

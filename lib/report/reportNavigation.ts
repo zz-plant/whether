@@ -9,7 +9,7 @@ export const reportPageLinks: ReportPageLink[] = [
   {
     href: "/onboarding",
     label: "Onboarding & glossary",
-    description: "Start here for the quick guide and plain-English glossary.",
+    description: "Quick guide and plain-English glossary.",
   },
   {
     href: "/operations",
