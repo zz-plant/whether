@@ -129,6 +129,10 @@ Current repo bootstrap:
   - `.codex/skills/research-brief/SKILL.md`
   - `.codex/skills/feature-audit/SKILL.md`
   - `.codex/skills/pr-hygiene/SKILL.md`
+  - `.codex/skills/agent-skill-architect/SKILL.md` (for creating/updating high-quality repo-local skills)
+  - `.codex/skills/regime-briefing-operator/SKILL.md` (for weekly decision-ready regime briefs)
+  - `.codex/skills/signal-provenance-audit/SKILL.md` (for source/freshness verification)
+  - `.codex/skills/executive-brief-pack/SKILL.md` (for share-ready leadership briefs)
 - Setup guidance: `docs/agents/setup.md` (MCP starter profile + skill usage)
 - Conventions: `AGENTS.md` (repo-local skill conventions)
 

@@ -53,12 +53,16 @@ Available starter skills:
 - `research-brief` → structured external research synthesis
 - `feature-audit` → remove/move/modify UX/content audits
 - `pr-hygiene` → pre-commit and pre-PR validation checks
+- `agent-skill-architect` → create/upgrade repo-local skills with clear contracts
+- `regime-briefing-operator` → decision-ready weekly/regime briefings
+- `signal-provenance-audit` → source URL/timestamp/formula provenance audits
+- `executive-brief-pack` → leadership-ready strategy/export brief outputs
 
 Repository path convention:
 - `.codex/skills/<skill-name>/SKILL.md`
 
 Usage (tool/runtime dependent):
 - invoke by skill name (for example `research-brief`) when the task matches the skill description
-- if direct slash invocation is supported by your agent runtime, use `/research-brief`, `/feature-audit`, or `/pr-hygiene`
+- if direct slash invocation is supported by your agent runtime, use `/research-brief`, `/feature-audit`, `/pr-hygiene`, `/regime-briefing-operator`, `/signal-provenance-audit`, or `/executive-brief-pack`
 
 When using skill outputs in a deliverable, preserve the skill's output contract sections so reviewers can quickly verify completeness.
