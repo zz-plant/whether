@@ -370,7 +370,7 @@ export const ReportShell = ({
                 {exportCta ? (
                   <a
                     href={exportCta.href}
-                    className="inline-flex min-h-[40px] items-center justify-center rounded-full border border-slate-700/70 px-3 py-2 text-xs font-semibold tracking-[0.14em] text-slate-200 transition-colors hover:border-sky-300/80 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                    className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-700/70 px-3 py-2 text-xs font-semibold tracking-[0.14em] text-slate-200 transition-colors hover:border-sky-300/80 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
                   >
                     {exportCta.label}
                   </a>
