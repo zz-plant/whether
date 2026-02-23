@@ -86,6 +86,7 @@ export default async function OnboardingPage({
       emphasis: "secondary",
     },
   ];
+
   const structuredData = {
     "@context": "https://schema.org",
     "@graph": [
@@ -227,6 +228,8 @@ export default async function OnboardingPage({
         </header>
         <OnboardingChecklistProgress steps={onboardingSteps} />
       </section>
+
+
 
       <FirstTimeGuidePanel
         statusLabel={statusLabel}
