@@ -76,13 +76,6 @@ export default async function OperationsPage({
       emphasis: "secondary",
     },
   ];
-  const roleOptions = [
-    { key: "all", label: "Cross-functional" },
-    { key: "product", label: "Product lead" },
-    { key: "engineering", label: "Eng lead" },
-    { key: "finance", label: "Finance partner" },
-  ] as const;
-  type RoleKey = (typeof roleOptions)[number]["key"];
   const structuredData = {
     "@context": "https://schema.org",
     "@graph": [
@@ -166,7 +159,6 @@ export default async function OperationsPage({
     },
   ] as const;
 
-  const requestedRole = resolvedSearchParams?.role;
   const horizonTabs = ["week", "month", "quarter"] as const;
   type HorizonTab = (typeof horizonTabs)[number];
   const requestedHorizon = resolvedSearchParams?.horizon;
@@ -174,25 +166,6 @@ export default async function OperationsPage({
     requestedHorizon && horizonTabs.includes(requestedHorizon as HorizonTab)
       ? (requestedHorizon as HorizonTab)
       : "week";
-  const activeRole: RoleKey =
-    roleOptions.some((option) => option.key === requestedRole)
-      ? (requestedRole as RoleKey)
-      : "all";
-  const buildRoleHref = (role: RoleKey) => {
-    const params = new URLSearchParams();
-    if (resolvedSearchParams) {
-      Object.entries(resolvedSearchParams).forEach(([key, value]) => {
-        if (value && key !== "role") {
-          params.set(key, value);
-        }
-      });
-    }
-    if (role !== "all") {
-      params.set("role", role);
-    }
-    const query = params.toString();
-    return query ? `/operations?${query}` : "/operations";
-  };
   const buildHorizonHref = (horizon: HorizonTab) => {
     const params = new URLSearchParams();
     if (resolvedSearchParams) {
@@ -216,13 +189,6 @@ export default async function OperationsPage({
   const visibleHorizonPlan = horizonPlan.filter(
     (item) => horizonKeyByLabel[item.horizon] === activeHorizon,
   );
-  const roleQuickSteps =
-    activeRole === "engineering"
-      ? [quickSteps[0], { ...quickSteps[1], title: "Next: assign engineering owners" }, quickSteps[2]]
-      : activeRole === "finance"
-        ? [{ ...quickSteps[0], title: "Now: set budget posture" }, quickSteps[1], quickSteps[2]]
-        : quickSteps;
-
   return (
     <ReportShell
       statusLabel={statusLabel}
@@ -253,15 +219,7 @@ export default async function OperationsPage({
       }}
       actionSequence={{
         title: "Execution sequence",
-        items: roleQuickSteps.map((step) => ({ title: step.title, detail: step.detail, href: step.href, cta: step.cta })),
-      }}
-      roleSwitcher={{
-        active: activeRole,
-        options: roleOptions.map((role) => ({
-          key: role.key,
-          label: role.label,
-          href: buildRoleHref(role.key),
-        })),
+        items: quickSteps.map((step) => ({ title: step.title, detail: step.detail, href: step.href, cta: step.cta })),
       }}
       decisionDiffs={[
         { label: "Up from last week", tone: "positive" },
@@ -290,6 +248,36 @@ export default async function OperationsPage({
       />
 
       <OperationsWorkstreamNav currentPath="/operations" />
+
+      <section className="weather-panel space-y-4 px-6 py-5" aria-label="Execution lenses">
+        <div>
+          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Perspective lenses</p>
+          <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
+            Keep one shared execution sequence, then apply team-specific emphasis.
+          </h2>
+        </div>
+        <div className="grid gap-3 lg:grid-cols-3">
+          {[
+            {
+              title: "Finance lens",
+              detail: "Stress-test funding posture, margin protection, and spend pacing before locking commitments.",
+            },
+            {
+              title: "Product lens",
+              detail: "Prioritize customer-critical scope and sequence bets around near-term demand certainty.",
+            },
+            {
+              title: "Engineering lens",
+              detail: "Translate posture into capacity guardrails, reliability thresholds, and delivery constraints.",
+            },
+          ].map((lens) => (
+            <article key={lens.title} className="weather-surface space-y-2 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{lens.title}</p>
+              <p className="text-sm text-slate-200">{lens.detail}</p>
+            </article>
+          ))}
+        </div>
+      </section>
 
       <SectionedReportPanel
         id="ops-horizon-plan"

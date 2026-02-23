@@ -78,13 +78,6 @@ export default async function SignalsPage({
     { key: "financial", label: "Financial conditions" },
   ] as const;
 
-  const roleOptions = [
-    { key: "all", label: "Cross-functional" },
-    { key: "product", label: "Product lead" },
-    { key: "engineering", label: "Eng lead" },
-    { key: "finance", label: "Finance partner" },
-  ] as const;
-  type RoleKey = (typeof roleOptions)[number]["key"];
 
   const {
     assessment,
@@ -157,26 +150,6 @@ export default async function SignalsPage({
     { href: timeMachineHref, label: "Time machine" },
     { href: regimeTimelineHref, label: "Regime timeline" },
   ];
-  const requestedRole = resolvedSearchParams?.role;
-  const activeRole: RoleKey =
-    roleOptions.some((option) => option.key === requestedRole)
-      ? (requestedRole as RoleKey)
-      : "all";
-  const buildRoleHref = (role: RoleKey) => {
-    const params = new URLSearchParams();
-    if (resolvedSearchParams) {
-      Object.entries(resolvedSearchParams).forEach(([key, value]) => {
-        if (value && key !== "role") {
-          params.set(key, value);
-        }
-      });
-    }
-    if (role !== "all") {
-      params.set("role", role);
-    }
-    const query = params.toString();
-    return query ? `/signals?${query}` : "/signals";
-  };
   const buildAdvancedHref = (advanced: boolean) => {
     const params = new URLSearchParams();
     if (resolvedSearchParams) {
@@ -192,24 +165,26 @@ export default async function SignalsPage({
     const query = params.toString();
     return query ? `/signals?${query}` : "/signals";
   };
-  const roleActionSequence =
-    activeRole === "engineering"
-      ? [
-          { title: "Inspect live sensor feed", detail: "Start with source readings impacting delivery risk.", href: "#sensor-array", cta: "Open sensor feed" },
-          { title: "Check scoring thresholds", detail: "Confirm signal tolerances before changing execution guardrails.", href: thresholdsHref, cta: "Open thresholds" },
-          { title: "Review regime timeline", detail: "Validate context before committing roadmap changes.", href: regimeTimelineHref, cta: "Open timeline" },
-        ]
-      : activeRole === "finance"
-        ? [
-            { title: "Review macro sources", detail: "Start with top-line external drivers relevant to budget timing.", href: "#macro-signals", cta: "Open macro sources" },
-            { title: "Check scoring thresholds", detail: "Verify guardrails before approving new spend windows.", href: thresholdsHref, cta: "Open thresholds" },
-            { title: "Inspect live sensor feed", detail: "Confirm real-time confirmation signals before decisions.", href: "#sensor-array", cta: "Open sensor feed" },
-          ]
-        : [
-            { title: "Review regime timeline", detail: "Start with sequence changes to frame context.", href: regimeTimelineHref, cta: "Open timeline" },
-            { title: "Check scoring thresholds", detail: "Confirm guardrails still match current tolerance.", href: thresholdsHref, cta: "Open thresholds" },
-            { title: "Inspect live sensor feed", detail: "Validate source readings behind the call.", href: "#sensor-array", cta: "Open sensor feed" },
-          ];
+  const evidenceSequence = [
+    {
+      title: "Review regime timeline",
+      detail: "Start with sequence changes to frame current context.",
+      href: regimeTimelineHref,
+      cta: "Open timeline",
+    },
+    {
+      title: "Check scoring thresholds",
+      detail: "Confirm guardrails still match current tolerance.",
+      href: thresholdsHref,
+      cta: "Open thresholds",
+    },
+    {
+      title: "Inspect live sensor feed",
+      detail: "Validate source readings behind the call.",
+      href: "#sensor-array",
+      cta: "Open sensor feed",
+    },
+  ];
 
   return (
     <ReportShell
@@ -242,15 +217,7 @@ export default async function SignalsPage({
       }}
       actionSequence={{
         title: "Evidence scan",
-        items: roleActionSequence,
-      }}
-      roleSwitcher={{
-        active: activeRole,
-        options: roleOptions.map((role) => ({
-          key: role.key,
-          label: role.label,
-          href: buildRoleHref(role.key),
-        })),
+        items: evidenceSequence,
       }}
       decisionDiffs={[
         { label: `Regime: ${regimeLabel}`, tone: "neutral" },
@@ -303,6 +270,36 @@ export default async function SignalsPage({
             </li>
           ))}
         </ol>
+      </section>
+
+      <section className="weather-panel space-y-4 px-6 py-5" aria-label="Evidence lenses">
+        <div>
+          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Perspective lenses</p>
+          <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
+            Keep one evidence scan sequence, then apply team-specific interpretation.
+          </h2>
+        </div>
+        <div className="grid gap-3 lg:grid-cols-3">
+          {[
+            {
+              title: "Finance lens",
+              detail: "Interpret macro shifts through budget timing, cost of capital, and downside exposure.",
+            },
+            {
+              title: "Product lens",
+              detail: "Map signal movement to demand confidence, roadmap sequencing, and customer impact tradeoffs.",
+            },
+            {
+              title: "Engineering lens",
+              detail: "Translate evidence into delivery risk, reliability posture, and platform capacity constraints.",
+            },
+          ].map((lens) => (
+            <article key={lens.title} className="weather-surface space-y-2 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{lens.title}</p>
+              <p className="text-sm text-slate-200">{lens.detail}</p>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section className="weather-panel space-y-4 px-6 py-5" aria-labelledby="signal-focus-title">
