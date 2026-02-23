@@ -579,8 +579,8 @@ export const ReportShell = ({
                   </article>
 
                   <article className="weather-surface space-y-3 p-4">
-                      <p className="text-sm font-semibold tracking-[0.12em] text-slate-400">
-                      {actionSequence?.title ?? "Execution sequence"}
+                    <p className="text-sm font-semibold tracking-[0.12em] text-slate-400">
+                      {actionSequence?.title ?? "Plan"}
                     </p>
                     <ol className="space-y-2">
                       {missionSequenceItems.map((item) => (
@@ -654,8 +654,8 @@ export const ReportShell = ({
                 ) : null}
               </section>
 
-              <section className="weather-panel space-y-3 px-4 py-4 sm:px-5" aria-label="Decision in 5 seconds">
-                <p className="text-xs font-semibold tracking-[0.1em] text-slate-400">Decision in 5 seconds</p>
+              <section className="weather-panel space-y-3 px-4 py-4 sm:px-5" aria-label="Decision">
+                <p className="text-xs font-semibold tracking-[0.1em] text-slate-400">Decision</p>
                 <article className="weather-surface space-y-3 p-4">
                   <p className="text-sm font-semibold text-slate-100">{primaryDecisionText}</p>
                   <div className="grid gap-2 sm:grid-cols-3">

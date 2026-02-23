@@ -54,12 +54,6 @@ export const OnboardingChecklistProgress = ({ steps }: { steps: OnboardingStep[]
         <span>Progress</span>
         <span>{completionText}</span>
       </div>
-      <div>
-        <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Recommended onboarding path</p>
-        <h3 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-          Start with the three-step path, then branch out as needed.
-        </h3>
-      </div>
       <div className="grid gap-3 lg:grid-cols-3">
         {steps.map((step, index) => {
           const isCompleted = completedSet.has(step.title);

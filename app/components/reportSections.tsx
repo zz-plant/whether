@@ -1008,7 +1008,7 @@ export const FirstTimeGuidePanel = ({
 
       <div className="mt-6 space-y-2 text-sm text-slate-300">
         <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-          Suggested next stops
+          Next
         </p>
         <ul className="space-y-2">
           {[
