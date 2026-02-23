@@ -170,6 +170,7 @@ export default async function OnboardingPage({
       sectionLinks={sectionLinks}
       heroVariant="compact"
       pageNavVariant="compact"
+      showPageNavigation={false}
       primaryCta={{ href: "#first-time-guide", label: "View orientation" }}
       secondaryCta={undefined}
       structuredData={structuredData}
@@ -191,7 +192,7 @@ export default async function OnboardingPage({
             Overview
           </p>
           <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-            Core onboarding touchpoints.
+            Start onboarding with three focused steps.
           </h2>
           <p className="text-sm text-slate-300">
             {activeExperience === "new"

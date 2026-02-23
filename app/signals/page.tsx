@@ -125,6 +125,13 @@ export default async function SignalsPage({
   const showAdvanced = resolvedSearchParams?.advanced === "1";
   const timeMachineHref = showAdvanced ? "#time-machine" : "#advanced-controls";
   const regimeTimelineHref = showAdvanced ? "#regime-timeline" : "#advanced-controls";
+  const focusTabs = ["all", "growth", "inflation", "labor", "financial"] as const;
+  type FocusTab = (typeof focusTabs)[number];
+  const requestedFocus = resolvedSearchParams?.focus;
+  const activeFocus: FocusTab =
+    requestedFocus && focusTabs.includes(requestedFocus as FocusTab)
+      ? (requestedFocus as FocusTab)
+      : "all";
   const sectionLinks = [
     { href: "#current-scores", label: "Current scores" },
     { href: "#source-links", label: "Source links" },
@@ -144,6 +151,55 @@ export default async function SignalsPage({
     }
     const query = params.toString();
     return query ? `/signals?${query}` : "/signals";
+  };
+  const buildFocusHref = (focus: FocusTab) => {
+    const params = new URLSearchParams();
+    if (resolvedSearchParams) {
+      Object.entries(resolvedSearchParams).forEach(([key, value]) => {
+        if (value && key !== "focus") {
+          params.set(key, value);
+        }
+      });
+    }
+    if (focus !== "all") {
+      params.set("focus", focus);
+    }
+    const query = params.toString();
+    return query ? `/signals?${query}` : "/signals";
+  };
+  const prioritizedSignalsByFocus: Record<FocusTab, Array<{ label: string; why: string; href: string }>> = {
+    all: [
+      { label: "Tightness", why: "Primary liquidity constraint for near-term execution", href: "#current-scores" },
+      { label: "Risk appetite", why: "Market risk-on/off posture changes funding and launch tolerance", href: "#macro-signals" },
+      { label: "Curve slope", why: "Forward growth signal to validate regime durability", href: "#sensor-array" },
+    ],
+    growth: [
+      { label: "Curve slope", why: "Best early growth stress read in current framework", href: "#current-scores" },
+      { label: "Regime timeline", why: "Compare current growth posture against prior transitions", href: regimeTimelineHref },
+      { label: "Macro source series", why: "Validate growth-sensitive inputs directly from sources", href: "#macro-signals" },
+    ],
+    inflation: [
+      { label: "Base rate", why: "Rate level is the strongest inflation pressure proxy in this report", href: "#sensor-array" },
+      { label: "Tightness", why: "Liquidity stress compounds inflation pass-through risk", href: "#current-scores" },
+      { label: "Threshold logic", why: "Check if inflation-sensitive trigger bands need adjustment", href: "#advanced-controls" },
+    ],
+    labor: [
+      { label: "Risk appetite", why: "Hiring pace risk sits downstream of confidence and market risk", href: "#current-scores" },
+      { label: "Regime timeline", why: "Labor plans should align with regime persistence, not one data print", href: regimeTimelineHref },
+      { label: "Time machine", why: "Test labor-related planning against prior regime windows", href: timeMachineHref },
+    ],
+    financial: [
+      { label: "Tightness", why: "Funding conditions drive immediate financial operating constraints", href: "#current-scores" },
+      { label: "Risk appetite", why: "Credit and valuation tolerance shift with risk-on/off posture", href: "#macro-signals" },
+      { label: "Source links", why: "Trace inputs before finalizing treasury-sensitive moves", href: "#source-links" },
+    ],
+  };
+  const focusLabelByTab: Record<FocusTab, string> = {
+    all: "All",
+    growth: "Growth",
+    inflation: "Inflation",
+    labor: "Labor",
+    financial: "Financial conditions",
   };
 
   return (
@@ -169,10 +225,6 @@ export default async function SignalsPage({
       heroVariant="compact"
       pageNavVariant="compact"
       primaryCta={{ href: "#current-scores", label: "View current scores" }}
-      secondaryCta={{
-        href: "#source-links",
-        label: "Open source links",
-      }}
       decisionBanner={{
         label: "Explain why",
         decision: `${regimeLabel} regime is supported by current macro readings.`,
@@ -181,13 +233,7 @@ export default async function SignalsPage({
         effectiveDate: recordDateLabel,
         evidenceHref: "#macro-signals",
       }}
-      decisionDiffs={[
-        { label: `Regime: ${regimeLabel}`, tone: "neutral" },
-        {
-          label: `Trust: ${trustStatusLabel}`,
-          tone: trustStatusTone === "stable" ? "positive" : "warning",
-        },
-      ]}
+      decisionDiffs={[{ label: `Regime: ${regimeLabel}`, tone: "neutral" }]}
       nextStep={{
         description: "Convert evidence into an execution posture.",
         href: `${appendSearchParamsToRoute("/operations" as Route, resolvedSearchParams)}#ops-monthly-action-summary`,
@@ -216,6 +262,49 @@ export default async function SignalsPage({
         ]}
         openPanelHref={timeMachineHref}
       />
+
+      <section className="weather-panel space-y-4 px-6 py-5" aria-label="Default signal review path">
+        <header className="space-y-2">
+          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Default review path</p>
+          <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
+            Start simple, then open advanced controls only when needed.
+          </h2>
+        </header>
+        <div className="grid gap-2 sm:grid-cols-5">
+          {focusTabs.map((focus) => {
+            const isActive = focus === activeFocus;
+            return (
+              <a
+                key={focus}
+                href={buildFocusHref(focus)}
+                aria-current={isActive ? "page" : undefined}
+                className={`weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] touch-manipulation ${
+                  isActive
+                    ? "border-sky-300/80 text-slate-100"
+                    : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
+                }`}
+              >
+                {focusLabelByTab[focus]}
+              </a>
+            );
+          })}
+        </div>
+        <ol className="grid gap-3 md:grid-cols-3" aria-label="Prioritized signal queue">
+          {prioritizedSignalsByFocus[activeFocus].map((item, index) => (
+            <li key={item.label} className="weather-surface space-y-2 p-4">
+              <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Priority {index + 1}</p>
+              <p className="text-sm font-semibold text-slate-100">{item.label}</p>
+              <p className="text-xs text-slate-300">{item.why}</p>
+              <a
+                href={item.href}
+                className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+              >
+                Open {item.label.toLowerCase()} →
+              </a>
+            </li>
+          ))}
+        </ol>
+      </section>
 
       <section id="current-scores" className="weather-panel space-y-4 px-6 py-5">
         <header>
@@ -288,26 +377,32 @@ export default async function SignalsPage({
 
       <MacroSignalsPanel series={macroSeries} provenance={macroProvenance} />
 
-      <section
-        className="weather-panel space-y-4 px-6 py-5"
-        id="advanced-controls"
-      >
-        <header className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
-              Methodology
-            </p>
-            <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-              See full methodology.
-            </h2>
+      <section className="weather-panel space-y-4 px-6 py-5" id="advanced-controls">
+        <div className="rounded-2xl border border-slate-800/80 bg-slate-950/50 p-4">
+          <div className="flex min-h-[44px] items-center justify-between gap-3 text-sm font-semibold text-slate-100">
+            <span>Advanced filters and historical tools</span>
+            <span className="text-xs tracking-[0.14em] text-slate-300">
+              {showAdvanced ? "Open" : "Closed"}
+            </span>
           </div>
-          <a
-            href={buildAdvancedHref(!showAdvanced)}
-            className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
-          >
-            {showAdvanced ? "Hide methodology" : "See full methodology"}
-          </a>
-        </header>
+          <p className="mt-3 text-xs text-slate-300">
+            Use these controls for threshold tuning, historical snapshots, and timeline diagnostics after you complete the default review path.
+          </p>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <a
+              href={buildAdvancedHref(!showAdvanced)}
+              className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
+            >
+              {showAdvanced ? "Hide advanced tools" : "Open advanced tools"}
+            </a>
+            <a
+              href={`${appendSearchParamsToRoute("/operations/briefings" as Route, resolvedSearchParams)}#ops-export-briefs`}
+              className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+            >
+              Export focused brief ({focusLabelByTab[activeFocus]}) →
+            </a>
+          </div>
+        </div>
       </section>
 
       {showAdvanced ? (
