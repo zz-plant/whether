@@ -22,6 +22,7 @@ This directory is organized by audience so contributors can find the right sourc
 - `feature-specs-current.md` — implemented/current feature intent.
 - `prd-next-level.md` and `specs-next-level.md` — next-level product/spec direction.
 - `roadmap-audit.md` and `issue-scan.md` — planning and execution context.
+- `sunset-plan-user-input-client-tracking.md` — phased plan to retire user-input and client decision-tracking features.
 - `acquisition/reforge-ready.md` — acquisition narrative and readiness assets.
 
 ## Agent guidance

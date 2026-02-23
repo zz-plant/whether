@@ -44,9 +44,9 @@ const workstreamHighlights: Record<string, string[]> = {
     "Signal-driven operator requests",
   ],
   "/operations/decisions": [
-    "Lock assumptions before committing",
-    "Decision shield validation and templates",
-    "Counterfactual pressure tests",
+    "Premium module preview",
+    "Coming-soon status and rollout guidance",
+    "Use Plan + Briefings in the current release",
   ],
   "/operations/briefings": [
     "Board-ready strategy brief",
@@ -497,9 +497,22 @@ export default async function OperationsPage({
               className="weather-surface flex h-full flex-col gap-4 p-5"
             >
               <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.26em] text-slate-400">
-                  {link.label}
-                </p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-xs font-semibold uppercase tracking-[0.26em] text-slate-400">
+                    {link.label}
+                  </p>
+                  {link.tier === "premium" ? (
+                    <span className="inline-flex min-h-[22px] items-center gap-1 rounded-full border border-amber-300/50 bg-amber-400/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-100">
+                      <span aria-hidden="true">👑</span>
+                      Premium
+                    </span>
+                  ) : null}
+                  {link.availability === "coming-soon" ? (
+                    <span className="inline-flex min-h-[22px] items-center rounded-full border border-amber-300/50 bg-amber-400/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-100">
+                      Coming soon
+                    </span>
+                  ) : null}
+                </div>
                 <p className="text-sm text-slate-300">{link.description}</p>
               </div>
               <ul className="space-y-2 text-sm text-slate-200">
