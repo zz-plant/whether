@@ -26,9 +26,10 @@ Route: `GET /api/agent?cadence=<weekly|monthly|quarterly|yearly>`
 - Includes read-only CORS headers for browser-based tool clients.
 - Supports `OPTIONS /api/agent` preflight with `204`.
 
-Machine-discovery route:
+Machine-discovery routes:
 
 - `GET /llms.txt` provides a plain-text integration guide for autonomous agents.
+- `GET /.well-known/whether-agent.json` provides a machine-readable JSON manifest (endpoints, cadences, MCP tools).
 
 ### Example
 
