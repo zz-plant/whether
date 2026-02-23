@@ -140,11 +140,11 @@ export const ReportShell = ({
   const hasSpecialCaveat = trustStatusTone !== "stable";
   const showActNowCard = !hasTwoPrimaryActions || hasSpecialCaveat;
   const missionGridClassName = showActNowCard
-    ? "grid gap-4 lg:grid-cols-[1.6fr,1.4fr,1.2fr]"
-    : "grid gap-4 lg:grid-cols-[1.6fr,1.4fr]";
-  const heroHeaderSpacingClassName = "space-y-4 sm:space-y-5";
+    ? "grid gap-3 lg:grid-cols-[1.6fr,1.4fr,1.2fr]"
+    : "grid gap-3 lg:grid-cols-[1.6fr,1.4fr]";
+  const heroHeaderSpacingClassName = "space-y-3 sm:space-y-4";
   const heroSectionSpacingClassName =
-    "weather-panel-static min-w-0 space-y-5 px-4 py-5 sm:space-y-6 sm:px-5";
+    "weather-panel-static min-w-0 space-y-4 px-4 py-4 sm:space-y-5 sm:px-5";
   const overviewPanel = (
     <section className="weather-panel space-y-3 px-4 py-4">
       <p className="text-xs font-semibold tracking-[0.16em] text-slate-400">
@@ -328,7 +328,7 @@ export const ReportShell = ({
           className="pointer-events-none absolute inset-0 weather-grid"
           aria-hidden="true"
         />
-        <div className="tv-rail-safe mx-auto max-w-[90rem] pb-[calc(env(safe-area-inset-bottom)+13rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)] pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)] sm:pb-12 sm:pt-6 sm:pl-[calc(env(safe-area-inset-left)+1.5rem)] sm:pr-[calc(env(safe-area-inset-right)+1.5rem)]">
+        <div className="tv-rail-safe mx-auto max-w-[82rem] pb-[calc(env(safe-area-inset-bottom)+13rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)] pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)] sm:pb-10 sm:pt-5 sm:pl-[calc(env(safe-area-inset-left)+1.25rem)] sm:pr-[calc(env(safe-area-inset-right)+1.25rem)]">
           <header className="weather-appbar sticky top-[calc(env(safe-area-inset-top)+0.75rem)] z-20 px-4 py-4 sm:top-4 sm:px-6 sm:py-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-3">
@@ -391,7 +391,7 @@ export const ReportShell = ({
 
 
           <div
-            className={`mt-6 grid min-w-0 gap-6 ${hasSidebar ? "lg:grid-cols-[minmax(0,1fr),280px] lg:items-start" : ""}`}
+            className={`mt-5 grid min-w-0 gap-5 ${hasSidebar ? "lg:grid-cols-[minmax(0,1fr),260px] lg:items-start" : ""}`}
           >
             {hasSidebar ? (
               <aside className="order-2 space-y-4 lg:order-none lg:col-start-2 lg:row-start-1 lg:sticky lg:top-28 lg:self-start">
@@ -401,7 +401,7 @@ export const ReportShell = ({
               </aside>
             ) : null}
 
-            <div className="order-1 min-w-0 space-y-10 lg:order-none lg:col-start-1 lg:row-start-1 lg:space-y-12">
+            <div className="order-1 min-w-0 space-y-8 lg:order-none lg:col-start-1 lg:row-start-1 lg:space-y-10">
               <section className={heroSectionSpacingClassName}>
                 <div className={heroHeaderSpacingClassName}>
                   {roleSwitcher ? (
@@ -696,7 +696,7 @@ export const ReportShell = ({
                 </section>
               ) : null}
 
-              <div className="space-y-12">
+              <div className="space-y-10">
                 {contentSections.map((section, index) => {
                   const sectionKey =
                     isValidElement(section) && section.key != null
@@ -706,7 +706,7 @@ export const ReportShell = ({
                     <div
                       key={sectionKey}
                       className={
-                        index === 0 ? "" : "border-t border-slate-800/70 pt-10"
+                        index === 0 ? "" : "border-t border-slate-800/70 pt-8"
                       }
                     >
                       {section}
