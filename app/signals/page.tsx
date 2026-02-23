@@ -218,58 +218,70 @@ export default async function SignalsPage({
       />
 
       <section id="current-scores" className="weather-panel space-y-4 px-6 py-5">
-        <div>
+        <header>
           <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
             Current scores
           </p>
           <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
             Tightness, risk appetite, and curve slope at a glance.
           </h2>
-        </div>
+        </header>
         <div className="grid gap-3 md:grid-cols-3">
           <article className="weather-surface space-y-2 p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Tightness</p>
-            <p className="mono text-2xl text-slate-100">{assessment.scores.tightness}/100</p>
+            <dl>
+              <dt className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Tightness</dt>
+              <dd className="mono mt-2 text-2xl text-slate-100">{assessment.scores.tightness}/100</dd>
+            </dl>
             <p className="text-xs text-slate-500">Higher values indicate tighter funding conditions.</p>
           </article>
           <article className="weather-surface space-y-2 p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Risk appetite</p>
-            <p className="mono text-2xl text-slate-100">{assessment.scores.riskAppetite}/100</p>
+            <dl>
+              <dt className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Risk appetite</dt>
+              <dd className="mono mt-2 text-2xl text-slate-100">{assessment.scores.riskAppetite}/100</dd>
+            </dl>
             <p className="text-xs text-slate-500">Higher values indicate more risk-on market behavior.</p>
           </article>
           <article className="weather-surface space-y-2 p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Curve slope</p>
-            <p className="mono text-2xl text-slate-100">{assessment.scores.curveSlope === null ? "N/A" : `${assessment.scores.curveSlope.toFixed(2)}%`}</p>
+            <dl>
+              <dt className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Curve slope</dt>
+              <dd className="mono mt-2 text-2xl text-slate-100">{assessment.scores.curveSlope === null ? "N/A" : `${assessment.scores.curveSlope.toFixed(2)}%`}</dd>
+            </dl>
             <p className="text-xs text-slate-500">10Y minus 2Y Treasury yield spread.</p>
           </article>
         </div>
       </section>
 
       <section id="source-links" className="weather-panel space-y-4 px-6 py-5">
-        <div className="flex flex-wrap items-start justify-between gap-3">
+        <header className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Source links</p>
             <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
               Open the live feeds behind the current call.
             </h2>
           </div>
-        </div>
-        <div className="grid gap-3 md:grid-cols-2">
-          <a
-            href="#sensor-array"
-            className="weather-surface inline-flex min-h-[44px] items-center justify-between gap-3 p-4 text-sm text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100"
-          >
-            <span>Live sensor array</span>
-            <span aria-hidden="true">→</span>
-          </a>
-          <a
-            href="#macro-signals"
-            className="weather-surface inline-flex min-h-[44px] items-center justify-between gap-3 p-4 text-sm text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100"
-          >
-            <span>Macro source series</span>
-            <span aria-hidden="true">→</span>
-          </a>
-        </div>
+        </header>
+        <nav aria-label="Signal source links">
+          <ul className="grid gap-3 md:grid-cols-2">
+            <li>
+              <a
+                href="#sensor-array"
+                className="weather-surface inline-flex min-h-[44px] w-full items-center justify-between gap-3 p-4 text-sm text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100"
+              >
+                <span>Live sensor array</span>
+                <span aria-hidden="true">→</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="#macro-signals"
+                className="weather-surface inline-flex min-h-[44px] w-full items-center justify-between gap-3 p-4 text-sm text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100"
+              >
+                <span>Macro source series</span>
+                <span aria-hidden="true">→</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
       </section>
 
       <SensorArray sensors={sensors} provenance={treasuryProvenance} />
@@ -280,7 +292,7 @@ export default async function SignalsPage({
         className="weather-panel space-y-4 px-6 py-5"
         id="advanced-controls"
       >
-        <div className="flex flex-wrap items-center justify-between gap-3">
+        <header className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
               Methodology
@@ -295,7 +307,7 @@ export default async function SignalsPage({
           >
             {showAdvanced ? "Hide methodology" : "See full methodology"}
           </a>
-        </div>
+        </header>
       </section>
 
       {showAdvanced ? (
