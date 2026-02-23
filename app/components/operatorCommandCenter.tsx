@@ -254,11 +254,11 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
         <div className="weather-surface space-y-3 p-4">
           {isFirstSession ? (
             <p className="text-sm text-slate-200">
-              First session: start with this page’s content first. Open command center when you need to jump.
+              This page content is available below. Open command center any time to jump.
             </p>
           ) : (
             <p className="text-sm text-slate-200">
-              Command center is collapsed. Open it any time to jump to playbook actions, pages, or sections.
+              Command center is collapsed. Open it to jump to actions, pages, or sections.
             </p>
           )}
           <button

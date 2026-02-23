@@ -26,10 +26,10 @@ export const runtime = "edge";
 export const dynamic = "force-dynamic";
 
 const homeSectionSequence = [
-  { href: "#weekly-action-summary", label: "Start: weekly actions" },
-  { href: "#executive-snapshot", label: "Then: leadership summary" },
-  { href: "#signal-matrix", label: "Inspect: signal breakdown" },
-  { href: "#evidence-matrix", label: "Deep dive: evidence matrix" },
+  { href: "#weekly-action-summary", label: "Weekly actions" },
+  { href: "#executive-snapshot", label: "Leadership summary" },
+  { href: "#signal-matrix", label: "Signal breakdown" },
+  { href: "#evidence-matrix", label: "Evidence matrix" },
 ] as const;
 
 export const generateMetadata = async ({
@@ -216,14 +216,8 @@ export default async function HomePage({
         ) : null
       }
     >
-      <section
-        aria-label="Read this first"
-        className="weather-panel space-y-6 px-6 py-6"
-      >
+      <section aria-label="Decision card" className="weather-panel space-y-6 px-6 py-6">
         <div className="space-y-3">
-          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
-            Read this first
-          </p>
           <h1 className="max-w-3xl text-2xl font-semibold text-slate-100 sm:text-3xl">
             Decision card: what changed and what to do now.
           </h1>
@@ -245,12 +239,7 @@ export default async function HomePage({
           </p>
         </article>
         <article className="weather-surface space-y-4 p-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-            Quick start
-          </p>
-          <p className="text-sm text-slate-200">
-            Jump straight to the workspace you need.
-          </p>
+          <p className="text-sm text-slate-200">Open the workspace you need.</p>
           <div className="flex flex-wrap gap-2">
             <a
               href="#weekly-action-summary"

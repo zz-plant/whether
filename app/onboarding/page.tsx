@@ -59,10 +59,10 @@ export default async function OnboardingPage({
       title: "Orient to the report",
       detail:
         activeExperience === "new"
-          ? "Start with three questions: what regime are we in, what moves does it favor, and what should we avoid?"
+          ? "Three questions: current regime, favored moves, and avoidances."
           : "Refresh the regime, confidence cue, and operating posture.",
       href: "#first-time-guide",
-      cta: "Start onboarding",
+      cta: "View orientation",
       emphasis: "primary",
     },
     {
@@ -164,13 +164,13 @@ export default async function OnboardingPage({
       pageSummary="Learn the core questions Whether answers before diving into signal-level detail."
       pageSummaryLink={{
         href: "#onboarding-checklist",
-        label: "Open checklist →",
+        label: "View onboarding overview",
       }}
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
       heroVariant="compact"
       pageNavVariant="compact"
-      primaryCta={{ href: "#first-time-guide", label: "Start onboarding" }}
+      primaryCta={{ href: "#first-time-guide", label: "View orientation" }}
       secondaryCta={undefined}
       structuredData={structuredData}
       historicalBanner={
@@ -188,10 +188,10 @@ export default async function OnboardingPage({
       >
         <header className="space-y-2">
           <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
-            Checklist
+            Overview
           </p>
           <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-            Complete these three steps in order.
+            Core onboarding touchpoints.
           </h2>
           <p className="text-sm text-slate-300">
             {activeExperience === "new"

@@ -46,7 +46,7 @@ export const ReportShell = ({
   sidebarVariant = "full",
   primaryCta = {
     href: "#weekly-action-summary",
-    label: "Start with this week",
+    label: "This week",
   },
   secondaryCta,
   exportCta = {
@@ -275,10 +275,7 @@ export const ReportShell = ({
     return accumulator;
   }, []);
   const primaryDecisionText =
-    decisionBanner?.decision ??
-    (/^start\b/i.test(primaryCta.label)
-      ? `${primaryCta.label}.`
-      : `Start with ${primaryCta.label}.`);
+    decisionBanner?.decision ?? `${primaryCta.label}.`;
   const decisionHorizon = decisionBanner?.horizon ?? "Next 2 weeks";
   const fallbackAction = secondaryCta
     ? { href: secondaryCta.href, label: secondaryCta.label }
@@ -288,7 +285,7 @@ export const ReportShell = ({
   const missionSupportText =
     trustStatusTone === "stable"
       ? trustStatusAction
-      : "Use the execution sequence below to convert this signal posture into concrete team actions.";
+      : "Use this page to translate the current signal posture into team actions.";
 
   return (
     <>
@@ -722,18 +719,18 @@ export const ReportShell = ({
 
               <section
                 className="weather-panel space-y-3 px-4 py-4"
-                aria-label="Next step"
+                aria-label="Related move"
               >
                 <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">
-                  Next recommended move
+                  Related move
                 </p>
                 <p className="text-sm text-slate-200">
                   {nextStep?.description ??
                     (currentPath === "/"
-                      ? "Validate the signal evidence before assigning owners."
+                      ? "Signal evidence and operations pages are available for deeper context."
                       : currentPath === "/signals"
-                        ? "Convert evidence into an execution posture."
-                        : "Turn this playbook into owner-level assignments and export briefings.")}
+                        ? "Operations pages are available for execution planning."
+                        : "Plan, decisions, and briefings pages are available from here.")}
                 </p>
                 <a
                   href={
@@ -746,7 +743,7 @@ export const ReportShell = ({
                   }
                   className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
                 >
-                  Continue workflow →
+Open related page →
                 </a>
               </section>
 
