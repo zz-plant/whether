@@ -218,8 +218,16 @@ export default async function OperationsPage({
         evidenceHref: "#ops-monthly-action-summary",
       }}
       actionSequence={{
-        title: "Execution sequence",
-        items: quickSteps.map((step) => ({ title: step.title, detail: step.detail, href: step.href, cta: step.cta })),
+        title: "Plan",
+        items: roleQuickSteps.map((step) => ({ title: step.title, detail: step.detail, href: step.href, cta: step.cta })),
+      }}
+      roleSwitcher={{
+        active: activeRole,
+        options: roleOptions.map((role) => ({
+          key: role.key,
+          label: role.label,
+          href: buildRoleHref(role.key),
+        })),
       }}
       decisionDiffs={[
         { label: "Up from last week", tone: "positive" },

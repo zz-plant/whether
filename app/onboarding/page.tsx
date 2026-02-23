@@ -147,7 +147,7 @@ export default async function OnboardingPage({
       pageTitle="Onboarding & glossary"
       currentPath="/onboarding"
       pageSummary="Learn the core questions Whether answers before diving into signal-level detail."
-      pageSummaryLink={{ href: "#onboarding-checklist", label: "Start onboarding checklist →" }}
+      pageSummaryLink={{ href: "#onboarding-checklist", label: "Open checklist →" }}
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
       heroVariant="compact"
@@ -164,7 +164,7 @@ export default async function OnboardingPage({
 
       <section id="onboarding-checklist" className="weather-panel space-y-4 px-6 py-5">
         <div className="space-y-2">
-          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Quick-start checklist</p>
+          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Checklist</p>
           <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
             Complete these three steps in order.
           </h2>
