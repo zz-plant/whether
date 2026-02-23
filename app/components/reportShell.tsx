@@ -7,7 +7,6 @@ import { DisplayGuardian } from "./displayGuardian";
 import { DisplayModeManager } from "./displayModeManager";
 import { DisplayModeToggle } from "./displayModeToggle";
 import { MobileActionSheet } from "./mobileActionSheet";
-import { MobileSectionChips } from "./mobileSectionChips";
 import { CanonicalTrustModule } from "./canonicalTrustModule";
 import {
   OperatorCommandCenter,
@@ -386,9 +385,6 @@ export const ReportShell = ({
 
           {historicalBanner}
 
-          <div className="mt-4">
-            <MobileSectionChips links={sectionLinks} />
-          </div>
 
           <div
             className={`mt-6 grid min-w-0 gap-6 ${hasSidebar ? "lg:grid-cols-[minmax(0,1fr),280px] lg:items-start" : ""}`}
