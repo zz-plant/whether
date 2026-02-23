@@ -4,6 +4,7 @@ import {
   isAgentCadence,
   supportedAgentCadences,
 } from "../../../lib/agentInterface";
+import { agentApiCorsHeaders } from "../../../lib/agentApiCors";
 
 export const runtime = "edge";
 export const revalidate = 0;
@@ -19,11 +20,23 @@ export async function GET(request: Request) {
         error: "Invalid cadence.",
         allowedCadences: supportedAgentCadences,
       },
-      { status: 400 }
+      {
+        status: 400,
+        headers: agentApiCorsHeaders,
+      }
     );
   }
 
   const payload = await buildAgentInterfaceResponse(requestedCadence);
 
-  return NextResponse.json(payload);
+  return NextResponse.json(payload, {
+    headers: agentApiCorsHeaders,
+  });
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: agentApiCorsHeaders,
+  });
 }

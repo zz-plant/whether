@@ -23,6 +23,12 @@ Route: `GET /api/agent?cadence=<weekly|monthly|quarterly|yearly>`
 - Defaults to `weekly`.
 - Returns summary copy, provenance, and `agentHandoff` (`payload` + `prompt`).
 - Returns HTTP 400 for invalid cadence values.
+- Includes read-only CORS headers for browser-based tool clients.
+- Supports `OPTIONS /api/agent` preflight with `204`.
+
+Machine-discovery route:
+
+- `GET /llms.txt` provides a plain-text integration guide for autonomous agents.
 
 ### Example
 
