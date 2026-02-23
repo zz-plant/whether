@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SectionedReportPanel } from "../components/sectionedReportPanel";
 import { loadReportData } from "../../../lib/report/reportData";
 import { siteUrl } from "../../../lib/siteUrl";
+import { buildPageMetadata } from "../../../lib/seo";
 import { ReportShell } from "../../components/reportShell";
 import {
   DecisionShieldTemplatesPanel,
@@ -14,11 +15,16 @@ import { OperationsWorkflowProgress } from "../components/operationsWorkflowProg
 
 export const runtime = "edge";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Whether Report — Action playbook: Decisions",
   description:
     "Premium decisions workstream preview with default guidance paths available now.",
-};
+  path: "/operations/decisions",
+  imageAlt: "Whether action playbook decisions view",
+  imageParams: {
+    view: "operations-decisions",
+  },
+});
 
 export default async function OperationsDecisionsPage({
   searchParams,

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SectionedReportPanel } from "../components/sectionedReportPanel";
 import { loadReportData } from "../../../lib/report/reportData";
 import { siteUrl } from "../../../lib/siteUrl";
+import { buildPageMetadata } from "../../../lib/seo";
 import { ReportShell } from "../../components/reportShell";
 import { ExecutiveBriefingPanel } from "../components/executiveBriefingPanel";
 import { ExportBriefPanel } from "../components/exportBriefPanel";
@@ -17,11 +18,16 @@ import {
 
 export const runtime = "edge";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
   title: "Whether Report — Action playbook: Briefings",
   description:
     "Strategy narratives, export briefs, and CXO-ready outputs aligned to the current regime.",
-};
+  path: "/operations/briefings",
+  imageAlt: "Whether action playbook briefings view",
+  imageParams: {
+    view: "operations-briefings",
+  },
+});
 
 export default async function OperationsBriefingsPage({
   searchParams,

@@ -53,11 +53,12 @@ export const generateMetadata = async ({
     baseUrl.searchParams.set("status", "invalid");
   }
 
-  const titleSuffix =
-    selection?.banner ?? (requestedSelection ? "Time Machine Preview" : "Live");
-  const title = `Whether Report — ${titleSuffix}`;
+  const title = "Whether Report — Weekly briefing";
   const imageUrl = baseUrl.toString();
   const canonicalUrl = buildCanonicalUrl("/");
+  const hasTimeMachineParams = Boolean(
+    resolvedSearchParams?.month || resolvedSearchParams?.year,
+  );
 
   return {
     title,
@@ -76,7 +77,7 @@ export const generateMetadata = async ({
           url: imageUrl,
           width: 1200,
           height: 630,
-          alt: `Whether Report ${titleSuffix} Open Graph`,
+          alt: "Whether Report Weekly briefing Open Graph",
         },
       ],
     },
@@ -86,6 +87,13 @@ export const generateMetadata = async ({
       description: siteDescription,
       images: [imageUrl],
     },
+    robots: hasTimeMachineParams
+      ? {
+          index: false,
+          follow: true,
+        }
+      : undefined,
+
   };
 };
 
