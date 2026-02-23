@@ -252,7 +252,7 @@ export default async function OperationsPage({
         evidenceHref: "#ops-monthly-action-summary",
       }}
       actionSequence={{
-        title: "Execution sequence",
+        title: "Action sequence",
         items: roleQuickSteps.map((step) => ({ title: step.title, detail: step.detail, href: step.href, cta: step.cta })),
       }}
       roleSwitcher={{

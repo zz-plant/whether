@@ -164,9 +164,9 @@ export default async function OnboardingPage({
 
       <section id="onboarding-checklist" className="weather-panel space-y-4 px-6 py-5">
         <div className="space-y-2">
-          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Quick-start checklist</p>
+          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Onboarding overview</p>
           <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-            Complete these three steps in order.
+            Three steps to orient quickly.
           </h2>
           <p className="text-sm text-slate-300">
             {activeExperience === "new"
