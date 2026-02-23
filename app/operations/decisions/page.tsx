@@ -3,10 +3,6 @@ import { SectionedReportPanel } from "../components/sectionedReportPanel";
 import { loadReportData } from "../../../lib/report/reportData";
 import { siteUrl } from "../../../lib/siteUrl";
 import { ReportShell } from "../../components/reportShell";
-import { AssumptionLockPanel } from "../components/assumptionLockPanel";
-import { CounterfactualPanel } from "../components/counterfactualPanel";
-import { DecisionShieldPanel } from "../components/decisionShieldPanel";
-import { DecisionMemoryPanel } from "../components/decisionMemoryPanel";
 import {
   DecisionShieldTemplatesPanel,
   HistoricalBanner,
@@ -21,7 +17,7 @@ export const runtime = "edge";
 export const metadata: Metadata = {
   title: "Whether Report — Action playbook: Decisions",
   description:
-    "Assumption locking, decision shields, and counterfactual pressure tests for major bets.",
+    "Premium decisions workstream preview with default guidance paths available now.",
 };
 
 export default async function OperationsDecisionsPage({
@@ -40,7 +36,7 @@ export default async function OperationsDecisionsPage({
     name: "Whether Report — Action playbook: Decisions",
     url: `${siteUrl}/operations/decisions`,
     description:
-      "Assumption locking, decision shields, and counterfactual pressure tests for major bets.",
+      "Premium decisions workstream preview with default guidance paths available now.",
     inLanguage: "en",
     isPartOf: {
       "@type": "WebSite",
@@ -54,7 +50,6 @@ export default async function OperationsDecisionsPage({
   };
 
   const {
-    assessment,
     fetchedAtLabel,
     historicalSelection,
     recordDateLabel,
@@ -78,7 +73,7 @@ export default async function OperationsDecisionsPage({
     ? "Use historical data for retrospectives; avoid approving new bets until live signals return."
     : isFallback
       ? "Hold irreversible decisions until live signals return or you validate the cache."
-      : "Signals are live; use them to confirm playbook moves and decision shields.";
+      : "Signals are live; use plan and briefing workstreams for this cycle's decisions.";
   const trustStatusTone = historicalSelection
     ? "historical"
     : isFallback
@@ -98,47 +93,47 @@ export default async function OperationsDecisionsPage({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Action playbook · Decisions"
       currentPath="/operations/decisions"
-      pageSummary="Run decision guardrails, lock assumptions, and capture counterfactuals."
+      pageSummary="Premium decisions tools are marked coming soon; use current plan and briefing guidance now."
       pageSummaryLink={{
-        href: "#ops-decision-shield",
-        label: "Explore details →",
+        href: "#ops-decisions-availability",
+        label: "See availability",
       }}
       primaryCta={{
-        href: "#ops-decision-shield",
-        label: "Run decision shield",
+        href: "/operations/plan",
+        label: "Use plan workstream",
       }}
       secondaryCta={{
-        href: "#ops-assumption-locking",
-        label: "Lock assumptions",
+        href: "/operations/briefings",
+        label: "Use briefing workstream",
       }}
       decisionBanner={{
-        label: "Validate now",
-        decision: "Pressure-test this week's commitments before execution.",
-        horizon: "This week",
+        label: "Coming soon",
+        decision: "Premium decision tooling is not enabled in the current release.",
+        horizon: "Current release",
         confidence: trustStatusLabel,
         effectiveDate: recordDateLabel,
-        evidenceHref: "#ops-decision-shield",
+        evidenceHref: "#ops-decisions-availability",
       }}
       actionSequence={{
-        title: "Decision sequence",
+        title: "What to do now",
         items: [
           {
-            title: "Run decision shield",
-            detail: "Check each move against regime guardrails.",
-            href: "#ops-decision-shield",
-            cta: "Open shield",
+            title: "Plan commitments",
+            detail: "Use Plan to align roadmap moves with current regime constraints.",
+            href: "/operations/plan",
+            cta: "Open plan",
           },
           {
-            title: "Lock assumptions",
-            detail: "Document risk stance, tolerance, and posture.",
-            href: "#ops-assumption-locking",
-            cta: "Open assumptions",
+            title: "Generate leadership output",
+            detail: "Use Briefings for export-ready leadership narratives.",
+            href: "/operations/briefings",
+            cta: "Open briefings",
           },
           {
-            title: "Run counterfactual view",
-            detail: "Stress-test priorities against alternate macro regimes.",
-            href: "#ops-counterfactuals",
-            cta: "Open counterfactuals",
+            title: "Track release status",
+            detail: "Decisions workstream remains visible as a premium coming-soon preview.",
+            href: "#ops-decisions-availability",
+            cta: "View status",
           },
         ],
       }}
@@ -158,49 +153,28 @@ export default async function OperationsDecisionsPage({
       <OperationsWorkstreamNav currentPath="/operations/decisions" />
 
       <SectionedReportPanel
-        id="ops-decision-shield"
-        title="Decision shield"
-        description="Validate decisions against regime-specific guardrails."
+        id="ops-decisions-availability"
+        title="Decisions workstream availability"
+        description="The decision input and decision-memory modules are sunset for the current release."
       >
-        <DecisionShieldPanel
-          assessment={assessment}
-          provenance={treasuryProvenance}
-        />
+        <div className="weather-surface space-y-3 p-5 text-sm text-slate-200">
+          <p>
+            Decision input flows, assumption locking, counterfactual controls, and decision memory
+            tracking are not active in this release.
+          </p>
+          <p>
+            Use <strong>Plan</strong> for execution posture and <strong>Briefings</strong> for
+            export-ready narratives while this premium module is in coming-soon status.
+          </p>
+        </div>
       </SectionedReportPanel>
 
       <SectionedReportPanel
-        id="ops-assumption-locking"
-        title="Assumption locking"
-        description="Document the operating assumptions behind major bets."
-      >
-        <AssumptionLockPanel />
-      </SectionedReportPanel>
-
-      <SectionedReportPanel
-        id="ops-decision-shield-templates"
+        id="ops-decision-templates"
         title="Decision templates"
-        description="Copy-ready templates for decision shield reviews."
+        description="Reference templates remain available for async review notes."
       >
         <DecisionShieldTemplatesPanel provenance={treasuryProvenance} />
-      </SectionedReportPanel>
-
-      <SectionedReportPanel
-        id="ops-decision-memory"
-        title="Decision Memory"
-        description="Persist decision runs as exportable, source-backed audit entries."
-      >
-        <DecisionMemoryPanel />
-      </SectionedReportPanel>
-
-      <SectionedReportPanel
-        id="ops-counterfactuals"
-        title="Counterfactual view"
-        description="Stress-test priorities against alternate macro regimes."
-      >
-        <CounterfactualPanel
-          assessment={assessment}
-          provenance={treasuryProvenance}
-        />
       </SectionedReportPanel>
     </ReportShell>
   );

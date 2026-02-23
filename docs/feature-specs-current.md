@@ -104,31 +104,16 @@ The regime assessment includes:
 
 ## 4) Decision support tooling
 
-### 4.1 Decision Shield
-A client-side decision shield evaluates a lifecycle + category + action against the current
-regime. It returns:
-- Verdict (safe / risky / dangerous)
-- Summary text
-- Sensor-based bullet rationale
-- Guardrail guidance
-- Reversal trigger definition
+### 4.1 Decisions workstream status
+The Decisions route remains visible as a premium coming-soon surface. In the current release,
+interactive decision inputs and per-client decision-memory tracking are sunset.
 
-Selections persist in URL parameters and local storage, and operators can save presets that are
-locally stored. Results can be copied as shareable text.
+### 4.2 Decision templates
+Copy-ready decision templates remain available for async review notes and leadership discussion.
 
-### 4.2 Assumption locking
-A lightweight form captures operating assumptions (risk posture, evidence stance, constraints)
-and stores them locally for later review.
-
-### 4.3 Counterfactual view
-Counterfactual sliders adjust base rate and curve slope in basis points to preview regime changes
-and constraints under simulated conditions. Scenario state is persisted via URL parameters and
-local storage.
-
-### 4.4 Decision Memory
-Decision Shield runs can be saved to Decision Memory, which stores an append-only trail of
-inputs, verdict metadata, thresholds, and source URLs. Entries are viewable in the Decisions
-workstream and exportable as JSON/CSV through `GET /api/decision-memory`.
+### 4.3 Export behavior
+Briefing/report exports remain available where they package current signal-driven guidance.
+Exports tied to persisted per-client decision memory are removed.
 
 ## 5) Playbooks, summaries, and briefings
 
@@ -157,8 +142,6 @@ macro context embedded for leadership consumption.
 - `GET /api/yearly` — yearly summary payload with provenance.
 - `GET /api/summary-delta` — difference between weekly and monthly summaries.
 - `GET /api/cadence` — alignment check between weekly and monthly constraints.
-- `GET /api/decision-memory` — Decision Memory entries (supports CSV export via `?format=csv`).
-- `POST /api/decision-memory` — append a Decision Shield run to Decision Memory.
 
 ### 6.3 Open Graph
 - `GET /api/og` — SVG Open Graph image with regime metadata (supports Time Machine selection).

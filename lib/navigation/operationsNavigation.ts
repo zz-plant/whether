@@ -5,6 +5,8 @@ export type OperationsWorkstreamLink = {
   href: Route;
   label: string;
   description: string;
+  availability?: "available" | "coming-soon";
+  tier?: "standard" | "premium";
 };
 
 export const operationsWorkstreamLinks: OperationsWorkstreamLink[] = [
@@ -22,6 +24,8 @@ export const operationsWorkstreamLinks: OperationsWorkstreamLink[] = [
     href: "/operations/decisions",
     label: "Decisions",
     description: "Lock assumptions, validate guardrails, and pressure-test bets before committing.",
+    availability: "coming-soon",
+    tier: "premium",
   },
   {
     href: "/operations/briefings",
@@ -43,11 +47,8 @@ export const operationsSectionLinks: Record<string, ReportSectionLink[]> = {
     { href: "#ops-operator-requests", label: "Operator requests" },
   ],
   decisions: [
-    { href: "#ops-decision-shield", label: "Decision shield" },
-    { href: "#ops-assumption-locking", label: "Assumption locking" },
-    { href: "#ops-decision-shield-templates", label: "Decision templates" },
-    { href: "#ops-decision-memory", label: "Decision memory" },
-    { href: "#ops-counterfactuals", label: "Counterfactual view" },
+    { href: "#ops-decisions-availability", label: "Availability" },
+    { href: "#ops-decision-templates", label: "Decision templates" },
   ],
   briefings: [
     { href: "#ops-strategy-brief", label: "Strategy brief" },
