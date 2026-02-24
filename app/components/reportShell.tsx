@@ -3,6 +3,7 @@
  * Keeps header, navigation, and layout consistent across multi-page views.
  */
 import Image from "next/image";
+import Link from "next/link";
 import { Children, type ReactNode, isValidElement } from "react";
 import { DisplayGuardian } from "./displayGuardian";
 import { DisplayModeManager } from "./displayModeManager";
@@ -46,6 +47,7 @@ export const ReportShell = ({
   pageNavVariant = "full",
   showPageNavigation = true,
   sidebarVariant = "full",
+  hideHeroChrome = false,
   primaryCta = {
     href: "#weekly-action-summary",
     label: "This week",
@@ -85,6 +87,7 @@ export const ReportShell = ({
   pageNavVariant?: "full" | "compact";
   showPageNavigation?: boolean;
   sidebarVariant?: "full" | "hidden";
+  hideHeroChrome?: boolean;
   primaryCta?: { href: string; label: string };
   secondaryCta?: { href: string; label: string };
   exportCta?: { href: string; label: string } | null;
@@ -309,6 +312,23 @@ export const ReportShell = ({
       ? trustStatusAction
       : "Use this page to translate the current signal posture into team actions.";
 
+  const showPostureRibbon = currentPath !== "/";
+  const postureRibbon = showPostureRibbon ? (
+    <div className="weather-panel-static sticky top-[calc(env(safe-area-inset-top)+5.9rem)] z-[18] mb-4 flex flex-wrap items-center justify-between gap-2 border border-slate-700/70 px-4 py-2 text-xs sm:top-[5.8rem]">
+      <p className="text-slate-300">
+        Current Posture: <span className="font-semibold text-slate-100">{statusLabel}</span>
+        <span className="ml-2 text-slate-400">Updated {recordDateLabel}</span>
+        <span className="ml-2 text-slate-500">Next refresh expected: 48h</span>
+      </p>
+      <Link
+        href="/"
+        className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-[11px] font-semibold tracking-[0.14em]"
+      >
+        View Full Climate
+      </Link>
+    </div>
+  ) : null;
+
   return (
     <>
       <nav
@@ -390,8 +410,8 @@ export const ReportShell = ({
             ) : null}
           </header>
 
+          {postureRibbon}
           {historicalBanner}
-
 
           <div
             className={`mt-5 grid min-w-0 gap-5 ${hasSidebar ? "lg:grid-cols-[minmax(0,1fr),260px] lg:items-start" : ""}`}
@@ -405,6 +425,8 @@ export const ReportShell = ({
             ) : null}
 
             <div className="order-1 min-w-0 space-y-8 lg:order-none lg:col-start-1 lg:row-start-1 lg:space-y-10">
+              {!hideHeroChrome ? (
+                <>
               <section className={heroSectionSpacingClassName}>
                 <div className={heroHeaderSpacingClassName}>
                   {roleSwitcher ? (
@@ -664,6 +686,9 @@ export const ReportShell = ({
                   ) : null}
                 </div>
               </section>
+
+                                </>
+              ) : null}
 
               {stageRail ? (
                 <section

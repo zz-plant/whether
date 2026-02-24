@@ -82,8 +82,8 @@ export const MethodologyContent = () => {
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
-              <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation">Weekly briefing</Link>
-              <Link href="/signals" className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation">Signal evidence</Link>
+              <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation">Current Climate</Link>
+              <Link href="/signals" className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation">Signals</Link>
             </div>
           </header>
         </section>
@@ -93,7 +93,7 @@ export const MethodologyContent = () => {
             <article key={item.id} id={item.id} className={`${formulaCard} ${item.accentClass}`}>
               <h2 className="text-lg font-semibold text-slate-100">{item.label}</h2>
               <p className="mt-2 text-sm text-slate-200/90">{item.description}</p>
-              <p className="mt-2 text-xs text-slate-300">Decision implication: {item.application}</p>
+              <p className="mt-2 text-xs text-slate-300">Interpretation note: {item.application}</p>
               <a href={item.sourceHref} target="_blank" rel="noreferrer" className="mt-4 inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] underline decoration-slate-500 underline-offset-4 hover:text-white">{item.sourceLabel}</a>
             </article>
           ))}

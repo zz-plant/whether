@@ -116,7 +116,7 @@ export default async function SignalsPage({
     ? "Use historical data to understand trends, not to approve live bets."
     : isFallback
       ? "Hold major decisions until live signals return or you validate the cache."
-      : "Signals are live; use them to confirm thresholds and trigger alerts.";
+      : "Signals are live with current thresholds and timestamps.";
   const trustStatusTone = historicalSelection
     ? "historical"
     : isFallback
@@ -213,9 +213,9 @@ export default async function SignalsPage({
       trustStatusAction={trustStatusAction}
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
-      pageTitle="Signal evidence"
+      pageTitle="Signals"
       currentPath="/signals"
-      pageSummary="See the sources and scoring behind the regime call."
+      pageSummary="Evidence layer: the drivers, thresholds, and timestamps behind posture."
       pageSummaryLink={{
         href: "#thresholds",
         label: "See thresholds",
@@ -235,7 +235,7 @@ export default async function SignalsPage({
       }}
       decisionDiffs={[{ label: `Regime: ${regimeLabel}`, tone: "neutral" }]}
       nextStep={{
-        description: "Convert evidence into an execution posture.",
+        description: "Return to the playbook to apply this evidence.",
         href: `${appendSearchParamsToRoute("/operations" as Route, resolvedSearchParams)}#ops-monthly-action-summary`,
       }}
       structuredData={structuredData}
@@ -321,6 +321,9 @@ export default async function SignalsPage({
               <dt className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Tightness</dt>
               <dd className="mono mt-2 text-2xl text-slate-100">{assessment.scores.tightness}/100</dd>
             </dl>
+            <p className="text-xs font-semibold text-slate-300">
+              Threshold: {assessment.thresholds.tightnessRegime}/100
+            </p>
             <p className="text-xs text-slate-500">Higher values indicate tighter funding conditions.</p>
           </article>
           <article className="weather-surface space-y-2 p-4">
@@ -328,6 +331,9 @@ export default async function SignalsPage({
               <dt className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Risk appetite</dt>
               <dd className="mono mt-2 text-2xl text-slate-100">{assessment.scores.riskAppetite}/100</dd>
             </dl>
+            <p className="text-xs font-semibold text-slate-300">
+              Threshold: {assessment.thresholds.riskAppetiteRegime}/100
+            </p>
             <p className="text-xs text-slate-500">Higher values indicate more risk-on market behavior.</p>
           </article>
           <article className="weather-surface space-y-2 p-4">
@@ -335,6 +341,7 @@ export default async function SignalsPage({
               <dt className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Curve slope</dt>
               <dd className="mono mt-2 text-2xl text-slate-100">{assessment.scores.curveSlope === null ? "N/A" : `${assessment.scores.curveSlope.toFixed(2)}%`}</dd>
             </dl>
+            <p className="text-xs font-semibold text-slate-300">Threshold: 0.00% (inversion boundary)</p>
             <p className="text-xs text-slate-500">10Y minus 2Y Treasury yield spread.</p>
           </article>
         </div>
