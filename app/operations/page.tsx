@@ -143,7 +143,7 @@ export default async function OperationsPage({
     ? "Use historical data for retrospectives; avoid approving new bets until live signals return."
     : isFallback
       ? "Hold irreversible decisions until live signals return or you validate the cache."
-      : "Signals are live; use them to confirm playbook moves and decision shields.";
+      : "Signals are live; apply these guardrails in weekly and monthly planning.";
   const trustStatusTone = historicalSelection
     ? "historical"
     : isFallback
@@ -238,18 +238,17 @@ export default async function OperationsPage({
       trustStatusAction={trustStatusAction}
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
-      pageTitle="Action playbook"
+      pageTitle="Playbook"
       currentPath="/operations"
-      pageSummary="Turn macro signals into execution posture and decision guardrails."
+      pageSummary="Translate posture into hiring, spend, and planning guardrails."
       pageSummaryLink={{
         href: "#ops-workstreams",
-        label: "Review execution details",
+        label: "Review guardrails",
       }}
       pageLinks={reportPageLinks}
       sectionLinks={operationsSectionLinks.overview}
       heroVariant="compact"
       pageNavVariant="compact"
-      showPageNavigation={false}
       primaryCta={{
         href: "#ops-monthly-action-summary",
         label: "Review monthly actions",
@@ -364,10 +363,10 @@ export default async function OperationsPage({
       >
         <header>
           <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
-            Perspective lenses
+            Operating guardrails
           </p>
           <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-            Shared execution view with team-specific emphasis.
+            Convert the current posture into concrete planning constraints.
           </h2>
         </header>
         <div className="grid gap-3 lg:grid-cols-3">

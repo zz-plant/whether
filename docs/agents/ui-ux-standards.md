@@ -46,3 +46,11 @@
 - CLS (Cumulative Layout Shift) MUST be 0. Content does not jump. Ever.
 - LCP (Largest Contentful Paint) < 2.5s.
 - Console is clean. No warnings. No "Key prop missing." No "Unrecognized attribute."
+
+## VIII. IA boundary checklist (Current Climate stack)
+- **Current Climate:** posture call only (label, confidence, timestamp, prioritize, avoid, trigger conditions).
+- **Playbook:** operating guardrails only (hiring, spend, payback, growth vs. efficiency, cadence).
+- **Signals:** evidence only (drivers, thresholds, timestamps, historical context).
+- **Method:** transparency only (formulas, sources, cadence, limitations).
+- **For Teams:** role translation only (founder, product, finance, strategy views).
+- Avoid overlap between layers; if copy fits two layers, keep it on the earliest layer and link out.

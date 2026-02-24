@@ -3,27 +3,27 @@ import type { ReportPageLink } from "../../app/components/reportShellNavigation"
 export const reportPageLinks: ReportPageLink[] = [
   {
     href: "/",
-    label: "Decide",
-    description: "Confirm this week's posture and immediate cross-functional actions.",
+    label: "Current Climate",
+    description: "Canonical operating posture for the current planning cycle.",
   },
   {
-    href: "/operations/plan",
-    label: "Plan",
-    description: "Assign owners and sequence work by Now, Next, and Watch horizons.",
+    href: "/operations",
+    label: "Playbook",
+    description: "Translate posture into hiring, spend, and execution guardrails.",
   },
   {
     href: "/signals",
-    label: "Evidence",
-    description: "Validate confidence with thresholds, timelines, and source provenance.",
-  },
-  {
-    href: "/operations/briefings",
-    label: "Brief",
-    description: "Prepare copy-ready narratives in Briefings for leadership and team alignment.",
+    label: "Signals",
+    description: "Inspect drivers, thresholds, and timestamps behind the posture call.",
   },
   {
     href: "/methodology",
-    label: "Methodology",
-    description: "Plain-English formulas and source links for each signal.",
+    label: "Method",
+    description: "Audit plain-English formulas, source links, and refresh cadence.",
+  },
+  {
+    href: "/guides",
+    label: "Teams",
+    description: "Apply the posture by role without fragmenting the operating model.",
   },
 ];

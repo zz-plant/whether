@@ -32,28 +32,12 @@ const homeSectionSequence = [
   { href: "#evidence-matrix", label: "Evidence matrix" },
 ] as const;
 
-const workspaceQuickActions = [
-  {
-    href: "#weekly-action-summary",
-    label: "Open weekly summary",
-    ariaLabel: "Jump to weekly action summary section",
-  },
-  {
-    href: "/operations/plan",
-    label: "Open plan board",
-    ariaLabel: "Open plan board workspace",
-  },
-  {
-    href: "/signals",
-    label: "Open evidence trail",
-    ariaLabel: "Open evidence trail workspace",
-  },
-  {
-    href: "/guides",
-    label: "Open role guides",
-    ariaLabel: "Open stakeholder and stage guides",
-  },
-] as const;
+const regimeLabelMap = {
+  SCARCITY: "Scarcity",
+  DEFENSIVE: "Defensive",
+  VOLATILE: "Neutral",
+  EXPANSION: "Expansion",
+} as const;
 
 export const generateMetadata = async ({
   searchParams,
@@ -198,7 +182,9 @@ export default async function HomePage({
     recordDateLabel,
     regimeAlert,
     lastYearComparison,
+    startItems,
     statusLabel,
+    stopItems,
     treasury,
     treasuryProvenance,
   } = await loadReportData(resolvedSearchParams);
@@ -224,6 +210,11 @@ export default async function HomePage({
     : isFallback
       ? "warning"
       : "stable";
+  const postureDelta = regimeAlert
+    ? `Shifted from ${regimeLabelMap[regimeAlert.previousRegime]}.`
+    : "No change since last week.";
+  const tightnessThreshold = assessment.thresholds.tightnessRegime;
+  const riskThreshold = assessment.thresholds.riskAppetiteRegime;
   return (
     <ReportShell
       statusLabel={statusLabel}
@@ -235,18 +226,19 @@ export default async function HomePage({
       trustStatusAction={trustStatusAction}
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
-      pageTitle="Weekly briefing"
+      pageTitle="Current Climate"
       currentPath="/"
-      pageSummary="Weekly regime pulse and recommended moves."
+      pageSummary="Canonical operating posture for the current cycle."
       primaryCta={{
         href: "#weekly-action-summary",
-        label: "Review weekly actions",
+        label: "Review posture details",
       }}
       secondaryCta={{
         href: "#executive-snapshot",
-        label: "Review leadership summary",
+        label: "What changed this week",
       }}
       sidebarVariant="hidden"
+      hideHeroChrome={true}
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
       structuredData={structuredData}
@@ -258,83 +250,70 @@ export default async function HomePage({
     >
       <section
         aria-labelledby="decision-card-title"
-        className="weather-panel space-y-6 px-6 py-6"
+        className="weather-panel space-y-10 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.16),rgba(15,23,42,0.3)_45%,rgba(2,6,23,0.92)_75%)] px-6 py-10 sm:space-y-12 sm:py-12"
       >
-        <div className="space-y-3">
-          <h1
-            id="decision-card-title"
-            className="max-w-3xl text-2xl font-semibold text-slate-100 sm:text-3xl"
-          >
-            Treasury macro signals for product and engineering planning.
+        <div className="space-y-5 text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.26em] text-sky-200">
+            Posture for the next 2–6 weeks
+          </p>
+          <h1 id="decision-card-title" className="text-4xl font-semibold text-slate-100 sm:text-5xl">
+            How should your company operate right now?
           </h1>
-          <p className="max-w-3xl text-sm text-slate-300 sm:text-base">
-            Use live Treasury curve shifts to set weekly operating posture, prioritize roadmap risk,
-            and align engineering execution with market conditions.
+          <p className="mx-auto max-w-3xl text-base text-slate-300">
+            Live market and capital conditions translated into a clear operating posture for the next cycle.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-3 py-4 sm:py-6">
+            <p className="text-7xl font-bold tracking-[-0.04em] text-slate-50 sm:text-8xl">{statusLabel}</p>
+            <a
+              href="/signals#current-scores"
+              className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.14em] text-sky-100 hover:border-sky-300/80"
+            >
+              Why?
+            </a>
+          </div>
+          <p className="text-sm font-semibold tracking-[0.08em] text-slate-100">{postureDelta}</p>
+          <p className="text-xs text-slate-300">Since Last Review: {postureDelta}</p>
+          <a
+            href="/signals#regime-timeline"
+            className="inline-flex min-h-[44px] items-center justify-center text-xs font-semibold tracking-[0.12em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
+          >
+            What changed?
+          </a>
+          <p className="text-[11px] font-medium tracking-[0.14em] text-slate-400">
+            Updated {recordDateLabel} · Confidence: {trustStatusLabel} · Next refresh expected: 48h
           </p>
         </div>
-        <article className="weather-surface space-y-4 p-5" aria-label="Executive takeaways">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">
-            Executive takeaways
-          </p>
-          <ul className="grid gap-3 text-sm text-slate-100 sm:grid-cols-3">
-            <li className="rounded-xl border border-slate-700/55 bg-slate-900/45 px-3 py-3">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
-                Current regime
-              </p>
-              <p className="mt-2 text-base font-semibold text-slate-100">{statusLabel}</p>
-            </li>
-            <li className="rounded-xl border border-amber-400/35 bg-amber-500/10 px-3 py-3">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-100/85">
-                Top risk this week
-              </p>
-              <p className="mt-2 text-base font-semibold text-amber-50">{trustStatusDetail}</p>
-            </li>
-            <li className="rounded-xl border border-sky-400/45 bg-sky-500/10 px-3 py-3">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-sky-100/90">
-                Recommended move
-              </p>
-              <p className="mt-2 text-base font-semibold text-sky-50">{trustStatusAction}</p>
-            </li>
-          </ul>
-        </article>
-        <article className="weather-surface space-y-4 p-5" aria-label="Decision summary">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-            What changed
-          </p>
+
+        <article className="weather-surface space-y-4 p-5" aria-label="Current climate summary">
           <p className="text-sm text-slate-200">{assessment.description}</p>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-            What to do now
-          </p>
-          <p className="text-sm text-slate-200">{trustStatusAction}</p>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-            Confidence
-          </p>
-          <p className="text-sm text-slate-200">
-            {trustStatusLabel} · {trustStatusDetail}
-          </p>
+          <p className="text-sm text-slate-300">{trustStatusAction}</p>
         </article>
-        <article className="weather-surface space-y-4 p-5" aria-labelledby="workspace-jump-title">
-          <div className="space-y-1">
-            <h2
-              id="workspace-jump-title"
-              className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-300"
-            >
-              Jump to workspace
-            </h2>
-            <p className="text-sm text-slate-200">Open the workflow you need in one tap.</p>
-          </div>
-          <ul className="flex flex-wrap gap-2" aria-label="Workspace quick actions">
-            {workspaceQuickActions.map((action) => (
-              <li key={action.href}>
-                <a
-                  href={action.href}
-                  aria-label={action.ariaLabel}
-                  className="weather-pill inline-flex min-h-[44px] items-center whitespace-nowrap px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                >
-                  {action.label}
-                </a>
-              </li>
-            ))}
+
+        <div className="grid gap-4 lg:grid-cols-2">
+          <article className="weather-surface space-y-3 p-5" aria-label="Prioritize">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-200">Prioritize</h2>
+            <ul className="space-y-2 text-sm text-slate-100">
+              {startItems.slice(0, 5).map((item) => (
+                <li key={item} className="flex items-start gap-2"><span aria-hidden="true" className="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-300" />{item}</li>
+              ))}
+            </ul>
+          </article>
+          <article className="weather-surface space-y-3 p-5" aria-label="Avoid">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-200">Avoid</h2>
+            <ul className="space-y-2 text-sm text-slate-100">
+              {stopItems.slice(0, 5).map((item) => (
+                <li key={item} className="flex items-start gap-2"><span aria-hidden="true" className="mt-1 h-1.5 w-1.5 rounded-full bg-amber-300" />{item}</li>
+              ))}
+            </ul>
+          </article>
+        </div>
+
+        <article className="weather-surface space-y-3 p-5" aria-label="Posture change triggers">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">What would change this posture</p>
+          <ul className="space-y-2 text-sm text-slate-200">
+            <li>• Will shift if Capital Tightness rises above {tightnessThreshold} for two consecutive reads.</li>
+            <li>• Will shift if Risk Appetite falls below {riskThreshold} and remains there through the next update.</li>
+            <li>• Curve slope turns negative and stays inverted through the next cycle.</li>
           </ul>
         </article>
       </section>
