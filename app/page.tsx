@@ -37,6 +37,14 @@ const regimeLabelMap = {
   EXPANSION: "Expansion",
 } as const;
 
+const postureForecastHorizons = ["Now", "+1 week", "+2 weeks", "+4 weeks"] as const;
+
+type PostureForecastItem = {
+  horizon: (typeof postureForecastHorizons)[number];
+  label: "Stable" | "Watch" | "Likely shift" | "Projection unavailable";
+  rationale: string;
+  confidence: "High confidence" | "Medium confidence" | "Low confidence";
+};
 
 const RegimeStatusIcon = ({ regime }: { regime: keyof typeof regimeLabelMap }) => {
   switch (regime) {
@@ -249,6 +257,46 @@ export default async function HomePage({
     : "No change since last week.";
   const tightnessThreshold = assessment.thresholds.tightnessRegime;
   const riskThreshold = assessment.thresholds.riskAppetiteRegime;
+  const tightnessGap = Math.abs(assessment.scores.tightness - tightnessThreshold);
+  const riskGap = Math.abs(assessment.scores.riskAppetite - riskThreshold);
+  const nearestThresholdGap = Math.min(tightnessGap, riskGap);
+  const hasProjectionData =
+    Number.isFinite(assessment.scores.tightness) &&
+    Number.isFinite(assessment.scores.riskAppetite) &&
+    Number.isFinite(tightnessThreshold) &&
+    Number.isFinite(riskThreshold);
+  const horizonForecast: PostureForecastItem[] = hasProjectionData
+    ? postureForecastHorizons.map((horizon, index) => {
+        const alertBias = regimeAlert ? 8 : 0;
+        const projectedGap = nearestThresholdGap - index * 5 - alertBias;
+        const label: PostureForecastItem["label"] =
+          projectedGap <= 2 ? "Likely shift" : projectedGap <= 8 ? "Watch" : "Stable";
+        const rationale =
+          label === "Likely shift"
+            ? `Risk appetite and tightness are near regime boundaries (${riskThreshold}/${tightnessThreshold}); trigger conditions are close.`
+            : label === "Watch"
+              ? `Risk appetite or tightness is within monitoring range of thresholds (${riskThreshold}/${tightnessThreshold}).`
+              : `Risk appetite and tightness remain comfortably away from thresholds (${riskThreshold}/${tightnessThreshold}).`;
+        const confidence: PostureForecastItem["confidence"] =
+          horizon === "Now"
+            ? "High confidence"
+            : horizon === "+1 week"
+              ? "Medium confidence"
+              : "Low confidence";
+
+        return {
+          horizon,
+          label,
+          rationale,
+          confidence,
+        };
+      })
+    : postureForecastHorizons.map((horizon) => ({
+        horizon,
+        label: "Projection unavailable",
+        rationale: "Projection unavailable: missing score inputs for this horizon.",
+        confidence: "Low confidence",
+      }));
   return (
     <ReportShell
       statusLabel={statusLabel}
@@ -310,6 +358,34 @@ export default async function HomePage({
           <p className="text-sm text-slate-200">{assessment.description}</p>
           <p className="text-sm text-slate-300">{trustStatusAction}</p>
         </article>
+
+        <section className="space-y-3" aria-label="Posture forecast timeline">
+          <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-sky-100">
+            Trigger outlook timeline
+          </h2>
+          <div className="weather-forecast-strip lg:grid-cols-4" role="list" aria-label="Posture forecast timeline">
+            {horizonForecast.map((item) => (
+              <article
+                key={item.horizon}
+                className="weather-forecast-card"
+                role="listitem"
+                aria-label={`Posture forecast ${item.horizon}: ${item.label}`}
+              >
+                <span className="weather-forecast-icon" aria-hidden="true">
+                  {item.label === "Likely shift" ? "⚠" : item.label === "Watch" ? "◔" : item.label === "Stable" ? "✓" : "?"}
+                </span>
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">{item.horizon}</p>
+                  <p className="text-sm font-semibold text-slate-50">{item.label}</p>
+                  <p className="text-sm text-slate-300">{item.rationale}</p>
+                  <p className="inline-flex rounded-full border border-slate-600/70 bg-slate-900/70 px-2.5 py-1 text-[11px] font-medium text-slate-200">
+                    {item.confidence}
+                  </p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
 
         <div className="grid gap-4 md:grid-cols-2">
           <article className="weather-surface space-y-3 p-5" aria-label="Prioritize">
