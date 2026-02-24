@@ -179,7 +179,7 @@ export const ReportPageNavigation = ({
               <a
                 href={prevLink.href}
                 aria-label={`Previous page: ${prevLink.label}`}
-                className="weather-pill inline-flex min-h-[44px] items-center gap-2 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                className="weather-pill inline-flex min-h-[44px] items-center gap-2 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
               >
                 <span aria-hidden="true">←</span>
                 Prev
@@ -194,7 +194,7 @@ export const ReportPageNavigation = ({
               <a
                 href={nextLink.href}
                 aria-label={`Next page: ${nextLink.label}`}
-                className="weather-pill inline-flex min-h-[44px] items-center gap-2 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                className="weather-pill inline-flex min-h-[44px] items-center gap-2 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
               >
                 Next
                 <span aria-hidden="true">→</span>
@@ -217,6 +217,7 @@ export const ReportPageNavigation = ({
               <p className="text-sm font-semibold text-slate-100">{currentLink.label}</p>
               <p className="text-xs text-slate-300">{currentLink.description}</p>
             </div>
+            <p className="text-xs text-slate-400">Switch surfaces</p>
             <NavigationMenu.List className="grid grid-cols-2 gap-1.5 sm:flex sm:flex-wrap sm:gap-2">
               {pageLinks.map((link, index) => {
                 const isActive = currentPath

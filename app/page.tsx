@@ -32,6 +32,29 @@ const homeSectionSequence = [
   { href: "#evidence-matrix", label: "Evidence matrix" },
 ] as const;
 
+const workspaceQuickActions = [
+  {
+    href: "#weekly-action-summary",
+    label: "Open weekly summary",
+    ariaLabel: "Jump to weekly action summary section",
+  },
+  {
+    href: "/plan",
+    label: "Open plan board",
+    ariaLabel: "Open plan board workspace",
+  },
+  {
+    href: "/evidence",
+    label: "Open evidence trail",
+    ariaLabel: "Open evidence trail workspace",
+  },
+  {
+    href: "/guides",
+    label: "Open role guides",
+    ariaLabel: "Open stakeholder and stage guides",
+  },
+] as const;
+
 export const generateMetadata = async ({
   searchParams,
 }: {
@@ -233,9 +256,15 @@ export default async function HomePage({
         ) : null
       }
     >
-      <section aria-label="Decision card" className="weather-panel space-y-6 px-6 py-6">
+      <section
+        aria-labelledby="decision-card-title"
+        className="weather-panel space-y-6 px-6 py-6"
+      >
         <div className="space-y-3">
-          <h1 className="max-w-3xl text-2xl font-semibold text-slate-100 sm:text-3xl">
+          <h1
+            id="decision-card-title"
+            className="max-w-3xl text-2xl font-semibold text-slate-100 sm:text-3xl"
+          >
             Treasury macro signals for product and engineering planning.
           </h1>
           <p className="max-w-3xl text-sm text-slate-300 sm:text-base">
@@ -243,7 +272,7 @@ export default async function HomePage({
             and align engineering execution with market conditions.
           </p>
         </div>
-        <article className="weather-surface space-y-4 p-5">
+        <article className="weather-surface space-y-4 p-5" aria-label="Decision summary">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
             What changed
           </p>
@@ -259,32 +288,37 @@ export default async function HomePage({
             {trustStatusLabel} · {trustStatusDetail}
           </p>
         </article>
-        <article className="weather-surface space-y-4 p-5">
-          <p className="text-sm text-slate-200">Open the workspace you need.</p>
-          <div className="flex flex-wrap gap-2">
-            <a
-              href="#weekly-action-summary"
-              className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+        <article className="weather-surface space-y-4 p-5" aria-labelledby="workspace-jump-title">
+          <div className="space-y-1">
+            <h2
+              id="workspace-jump-title"
+              className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-300"
             >
-              Open decide summary
-            </a>
-            <a
-              href="/plan"
-              className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-            >
-              Open plan board
-            </a>
-            <a
-              href="/evidence"
-              className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-            >
-              Open evidence trail
-            </a>
+              Jump to workspace
+            </h2>
+            <p className="text-sm text-slate-200">Open the workflow you need in one tap.</p>
           </div>
+          <ul className="flex flex-wrap gap-2" aria-label="Workspace quick actions">
+            {workspaceQuickActions.map((action) => (
+              <li key={action.href}>
+                <a
+                  href={action.href}
+                  aria-label={action.ariaLabel}
+                  className="weather-pill inline-flex min-h-[44px] items-center whitespace-nowrap px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                >
+                  {action.label}
+                </a>
+              </li>
+            ))}
+          </ul>
         </article>
       </section>
 
-      <section id="weekly-action-summary" className="space-y-8">
+      <section
+        id="weekly-action-summary"
+        aria-label="Weekly action summary"
+        className="space-y-8"
+      >
         <WeeklyActionSummaryPanel
           assessment={assessment}
           provenance={treasuryProvenance}
@@ -292,7 +326,7 @@ export default async function HomePage({
         />
       </section>
 
-      <section id="executive-snapshot" className="space-y-8">
+      <section id="executive-snapshot" aria-label="Leadership summary" className="space-y-8">
         <ExecutiveSnapshotPanel
           treasury={treasury}
           assessment={assessment}
@@ -300,7 +334,7 @@ export default async function HomePage({
         />
       </section>
 
-      <section id="signal-matrix" className="space-y-8">
+      <section id="signal-matrix" aria-label="Signal breakdown" className="space-y-8">
         <SignalMatrixPanel
           assessment={assessment}
           provenance={treasuryProvenance}

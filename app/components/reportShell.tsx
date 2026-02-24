@@ -150,8 +150,10 @@ export const ReportShell = ({
   const sectionDividerLabels = ["REGIME", "EXECUTION", "EVIDENCE", "EXPORTS"];
   const overviewPanel = (
     <details className="weather-panel group px-4 py-4">
-      <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.16em] text-slate-300">
-        Data provenance
+      <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.16em] text-slate-200">
+        <span>Data provenance</span>
+        <span className="sr-only group-open:hidden">Collapsed</span>
+        <span className="sr-only hidden group-open:inline">Expanded</span>
         <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-400 transition-transform group-open:rotate-180">⌄</span>
       </summary>
       <dl className="mt-3 grid gap-2 text-xs text-slate-300">
@@ -213,6 +215,7 @@ export const ReportShell = ({
             <li key={item.href}>
               <a
                 href={item.href}
+                aria-label={`Jump to ${item.label}`}
                 className="weather-pill inline-flex min-h-[44px] w-full items-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
               >
                 {item.label}
