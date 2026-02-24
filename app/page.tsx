@@ -233,10 +233,6 @@ export default async function HomePage({
         href: "#weekly-action-summary",
         label: "Review posture details",
       }}
-      secondaryCta={{
-        href: "#executive-snapshot",
-        label: "What changed this week",
-      }}
       sidebarVariant="hidden"
       hideHeroChrome={true}
       pageLinks={reportPageLinks}
@@ -262,23 +258,10 @@ export default async function HomePage({
           <p className="mx-auto max-w-3xl text-base text-slate-300">
             Live market and capital conditions translated into a clear operating posture for the next cycle.
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-3 py-4 sm:py-6">
-            <p className="text-7xl font-bold tracking-[-0.04em] text-slate-50 sm:text-8xl">{statusLabel}</p>
-            <a
-              href="/signals#current-scores"
-              className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.14em] text-sky-100 hover:border-sky-300/80"
-            >
-              Why?
-            </a>
+          <div className="py-4 sm:py-6">
+            <p className="text-6xl font-bold tracking-[-0.04em] text-slate-50 sm:text-7xl">{statusLabel}</p>
           </div>
           <p className="text-sm font-semibold tracking-[0.08em] text-slate-100">{postureDelta}</p>
-          <p className="text-xs text-slate-300">Since Last Review: {postureDelta}</p>
-          <a
-            href="/signals#regime-timeline"
-            className="inline-flex min-h-[44px] items-center justify-center text-xs font-semibold tracking-[0.12em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
-          >
-            What changed?
-          </a>
           <p className="text-[11px] font-medium tracking-[0.14em] text-slate-400">
             Updated {recordDateLabel} · Confidence: {trustStatusLabel} · Next refresh expected: 48h
           </p>
@@ -289,7 +272,7 @@ export default async function HomePage({
           <p className="text-sm text-slate-300">{trustStatusAction}</p>
         </article>
 
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid gap-4">
           <article className="weather-surface space-y-3 p-5" aria-label="Prioritize">
             <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-200">Prioritize</h2>
             <ul className="space-y-2 text-sm text-slate-100">
@@ -298,24 +281,19 @@ export default async function HomePage({
               ))}
             </ul>
           </article>
-          <article className="weather-surface space-y-3 p-5" aria-label="Avoid">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-200">Avoid</h2>
-            <ul className="space-y-2 text-sm text-slate-100">
+          <details className="weather-surface group p-5" aria-label="Avoid">
+            <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-2 text-sm font-semibold uppercase tracking-[0.2em] text-amber-200">
+              <span>Avoid</span>
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-400 transition-transform group-open:rotate-180">⌄</span>
+            </summary>
+            <ul className="mt-3 space-y-2 text-sm text-slate-100">
               {stopItems.slice(0, 5).map((item) => (
                 <li key={item} className="flex items-start gap-2"><span aria-hidden="true" className="mt-1 h-1.5 w-1.5 rounded-full bg-amber-300" />{item}</li>
               ))}
             </ul>
-          </article>
+          </details>
         </div>
 
-        <article className="weather-surface space-y-3 p-5" aria-label="Posture change triggers">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">What would change this posture</p>
-          <ul className="space-y-2 text-sm text-slate-200">
-            <li>• Will shift if Capital Tightness rises above {tightnessThreshold} for two consecutive reads.</li>
-            <li>• Will shift if Risk Appetite falls below {riskThreshold} and remains there through the next update.</li>
-            <li>• Curve slope turns negative and stays inverted through the next cycle.</li>
-          </ul>
-        </article>
       </section>
 
       <section
@@ -343,6 +321,17 @@ export default async function HomePage({
           assessment={assessment}
           provenance={treasuryProvenance}
         />
+      </section>
+
+      <section aria-label="Posture change triggers" className="space-y-8">
+        <article className="weather-surface space-y-3 p-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">What would change this posture</p>
+          <ul className="space-y-2 text-sm text-slate-200">
+            <li>• Will shift if Capital Tightness rises above {tightnessThreshold} for two consecutive reads.</li>
+            <li>• Will shift if Risk Appetite falls below {riskThreshold} and remains there through the next update.</li>
+            <li>• Curve slope turns negative and stays inverted through the next cycle.</li>
+          </ul>
+        </article>
       </section>
 
       <section

@@ -18,12 +18,8 @@ import {
   MonthlyActionSummaryPanel,
 } from "../components/reportSections";
 import { reportPageLinks } from "../../lib/report/reportNavigation";
-import {
-  operationsSectionLinks,
-  operationsWorkstreamLinks,
-} from "../../lib/navigation/operationsNavigation";
+import { operationsSectionLinks } from "../../lib/navigation/operationsNavigation";
 import { appendSearchParamsToRoute } from "../../lib/navigation/routeSearchParams";
-import { ExecutionTable } from "../components/executionTable";
 import { ReturningVisitorDeltaStrip } from "../components/changeSinceLastReadPanel";
 import { OperationsWorkflowProgress } from "./components/operationsWorkflowProgress";
 
@@ -37,23 +33,6 @@ export const metadata: Metadata = buildPageMetadata({
   imageAlt: "Whether Report action playbook overview",
 });
 
-const workstreamHighlights: Record<string, string[]> = {
-  "/operations/plan": [
-    "Start, stop, and fence playbook moves",
-    "Quarterly finance posture",
-    "Signal-driven operator requests",
-  ],
-  "/operations/decisions": [
-    "Premium module preview",
-    "Coming-soon status and rollout guidance",
-    "Use Plan + Briefings in the current release",
-  ],
-  "/operations/briefings": [
-    "Board-ready strategy brief",
-    "Exportable leadership briefs",
-    "CXO-specific deliverables",
-  ],
-};
 
 export default async function OperationsPage({
   searchParams,
@@ -74,11 +53,11 @@ export default async function OperationsPage({
       emphasis: "primary",
     },
     {
-      title: "Pick a workstream",
+      title: "Choose the planning horizon",
       detail:
-        "Route to plan, decisions, or briefings based on the question at hand.",
-      href: "#ops-workstreams",
-      cta: "Review workstreams",
+        "Focus this week, month, or quarter before assigning owners and due dates.",
+      href: "#ops-horizon-plan",
+      cta: "Review horizon plan",
       emphasis: "secondary",
     },
     {
@@ -150,9 +129,6 @@ export default async function OperationsPage({
       ? "warning"
       : "stable";
 
-  const workstreamCards = operationsWorkstreamLinks.filter(
-    (link) => link.href !== "/operations",
-  );
   const horizonPlan = [
     {
       horizon: "This week",
@@ -168,7 +144,7 @@ export default async function OperationsPage({
       ownerRole: "Staff PM + Finance partner",
       dueWindow: "Month-end review",
       impact: "Reduce drift and improve sequencing.",
-      href: "#ops-workstreams",
+      href: "#ops-monthly-action-summary",
     },
     {
       horizon: "This quarter",
@@ -242,7 +218,7 @@ export default async function OperationsPage({
       currentPath="/operations"
       pageSummary="Translate posture into hiring, spend, and planning guardrails."
       pageSummaryLink={{
-        href: "#ops-workstreams",
+        href: "#ops-horizon-plan",
         label: "Review guardrails",
       }}
       pageLinks={reportPageLinks}
@@ -299,13 +275,91 @@ export default async function OperationsPage({
           },
           {
             label: "Risk appetite",
-            href: "#ops-workstreams",
+            href: "#ops-horizon-plan",
             metric: "riskAppetite",
           },
           { label: "Base rate", href: "#ops-horizon-plan", metric: "baseRate" },
         ]}
         openPanelHref="/signals#time-machine"
       />
+
+
+
+      <SectionedReportPanel
+        id="ops-horizon-plan"
+        title="Time horizon plan"
+        description="Decide moves for this week, month, and quarter."
+      >
+        <div className="grid gap-2 sm:grid-cols-3">
+          {horizonTabs.map((horizon) => {
+            const active = horizon === activeHorizon;
+            const label =
+              horizon === "week"
+                ? "This week"
+                : horizon === "month"
+                  ? "This month"
+                  : "This quarter";
+            return (
+              <Link
+                key={horizon}
+                href={buildHorizonHref(horizon) as Route}
+                aria-current={active ? "page" : undefined}
+                className={`weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation ${
+                  active
+                    ? "border-sky-200/90 bg-sky-500/20 text-white shadow-sm shadow-sky-900/40"
+                    : "opacity-80 text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
+                }`}
+              >
+                {label}
+              </Link>
+            );
+          })}
+        </div>
+        <div className="grid gap-4 lg:grid-cols-3">
+          {visibleHorizonPlan.map((item) => (
+            <article
+              key={item.horizon}
+              className="weather-surface flex h-full flex-col gap-3 p-5"
+            >
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
+                {item.horizon}
+              </p>
+              <p className="text-sm font-semibold text-slate-100">
+                {item.objective}
+              </p>
+              <dl className="space-y-2 text-xs text-slate-300">
+                <div className="flex items-start justify-between gap-3">
+                  <dt className="text-slate-500">Owner</dt>
+                  <dd className="text-right text-slate-200">
+                    {item.ownerRole}
+                  </dd>
+                </div>
+                <div className="flex items-start justify-between gap-3">
+                  <dt className="text-slate-500">Due</dt>
+                  <dd className="text-right text-slate-200">
+                    {item.dueWindow}
+                  </dd>
+                </div>
+                <div className="flex items-start justify-between gap-3">
+                  <dt className="text-slate-500">Expected impact</dt>
+                  <dd className="text-right text-slate-200">{item.impact}</dd>
+                </div>
+              </dl>
+              <Link
+                href={
+                  appendSearchParamsToRoute(
+                    item.href,
+                    resolvedSearchParams,
+                  ) as Route
+                }
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
+              >
+                Review {item.horizon.toLowerCase()} actions
+              </Link>
+            </article>
+          ))}
+        </div>
+      </SectionedReportPanel>
 
       <section className="weather-panel space-y-4 px-6 py-5" aria-label="Playbook mode selector">
         <header className="flex flex-wrap items-center justify-between gap-3">
@@ -356,217 +410,6 @@ export default async function OperationsPage({
           </article>
         ) : null}
       </section>
-
-      <section
-        className="weather-panel space-y-4 px-6 py-5"
-        aria-label="Execution lenses"
-      >
-        <header>
-          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
-            Operating guardrails
-          </p>
-          <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-            Convert the current posture into concrete planning constraints.
-          </h2>
-        </header>
-        <div className="grid gap-3 lg:grid-cols-3">
-          {[
-            {
-              title: "Finance lens",
-              detail:
-                "Stress-test funding posture, margin protection, and spend pacing before locking commitments.",
-            },
-            {
-              title: "Product lens",
-              detail:
-                "Prioritize customer-critical scope and sequence bets around near-term demand certainty.",
-            },
-            {
-              title: "Engineering lens",
-              detail:
-                "Translate posture into capacity guardrails, reliability thresholds, and delivery constraints.",
-            },
-          ].map((lens) => (
-            <article key={lens.title} className="weather-surface space-y-2 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                {lens.title}
-              </p>
-              <p className="text-sm text-slate-200">{lens.detail}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <SectionedReportPanel
-        id="ops-horizon-plan"
-        title="Time horizon plan"
-        description="Decide moves for this week, month, and quarter."
-      >
-        <div className="grid gap-2 sm:grid-cols-3">
-          {horizonTabs.map((horizon) => {
-            const active = horizon === activeHorizon;
-            const label =
-              horizon === "week"
-                ? "This week"
-                : horizon === "month"
-                  ? "This month"
-                  : "This quarter";
-            return (
-              <Link
-                key={horizon}
-                href={buildHorizonHref(horizon) as Route}
-                aria-current={active ? "page" : undefined}
-                className={`weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation ${
-                  active
-                    ? "border-sky-200/90 bg-sky-500/20 text-white shadow-sm shadow-sky-900/40"
-                    : "opacity-80 text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
-                }`}
-              >
-                {label}
-              </Link>
-            );
-          })}
-        </div>
-        <p className="text-sm font-semibold text-slate-200">Time horizon: {activeHorizon === "week" ? "This week" : activeHorizon === "month" ? "This month" : "This quarter"}</p>
-        <div className="grid gap-4 lg:grid-cols-3">
-          {visibleHorizonPlan.map((item) => (
-            <article
-              key={item.horizon}
-              className="weather-surface flex h-full flex-col gap-3 p-5"
-            >
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
-                {item.horizon}
-              </p>
-              <p className="text-sm font-semibold text-slate-100">
-                {item.objective}
-              </p>
-              <dl className="space-y-2 text-xs text-slate-300">
-                <div className="flex items-start justify-between gap-3">
-                  <dt className="text-slate-500">Owner</dt>
-                  <dd className="text-right text-slate-200">
-                    {item.ownerRole}
-                  </dd>
-                </div>
-                <div className="flex items-start justify-between gap-3">
-                  <dt className="text-slate-500">Due</dt>
-                  <dd className="text-right text-slate-200">
-                    {item.dueWindow}
-                  </dd>
-                </div>
-                <div className="flex items-start justify-between gap-3">
-                  <dt className="text-slate-500">Expected impact</dt>
-                  <dd className="text-right text-slate-200">{item.impact}</dd>
-                </div>
-              </dl>
-              <Link
-                href={
-                  appendSearchParamsToRoute(
-                    item.href,
-                    resolvedSearchParams,
-                  ) as Route
-                }
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
-              >
-                Review {item.horizon.toLowerCase()} actions
-              </Link>
-            </article>
-          ))}
-        </div>
-        <ExecutionTable
-          title="Execution table"
-          rows={visibleHorizonPlan.map((item) => ({
-            horizon: item.horizon,
-            owner: item.ownerRole,
-            due: item.dueWindow,
-            impact: item.impact,
-            href: appendSearchParamsToRoute(item.href, resolvedSearchParams),
-            ctaLabel: `Review ${item.horizon.toLowerCase()} actions`,
-          }))}
-        />
-      </SectionedReportPanel>
-
-      <SectionedReportPanel
-        id="ops-workstreams"
-        title="Upcoming Enhancements"
-        description="Roadmap view of capability investments and delivery status."
-      >
-        <div className="grid gap-4 lg:grid-cols-3">
-          {workstreamCards.map((link) => (
-            <article
-              key={link.href}
-              className="weather-surface flex h-full flex-col gap-4 p-5"
-            >
-              <div className="space-y-2">
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="text-xs font-semibold uppercase tracking-[0.26em] text-slate-400">
-                    {link.label}
-                  </p>
-                  {link.tier === "premium" ? (
-                    <span className="inline-flex min-h-[22px] items-center gap-1 rounded-full border border-amber-300/50 bg-amber-400/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-100">
-                      <span aria-hidden="true">👑</span>
-                      Premium
-                    </span>
-                  ) : null}
-                  {link.availability === "coming-soon" ? (
-                    <span className="inline-flex min-h-[22px] items-center rounded-full border border-amber-300/50 bg-amber-400/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-100">
-                      Planned
-                    </span>
-                  ) : null}
-                  {link.tier === "premium" ? (
-                    <span className="inline-flex min-h-[22px] items-center rounded-full border border-sky-300/50 bg-sky-400/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-sky-100">
-                      In development
-                    </span>
-                  ) : null}
-                  {link.availability !== "coming-soon" ? (
-                    <span className="inline-flex min-h-[22px] items-center rounded-full border border-indigo-300/50 bg-indigo-400/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-indigo-100">
-                      Researching
-                    </span>
-                  ) : null}
-                </div>
-                <p className="text-sm text-slate-300">{link.description}</p>
-              </div>
-              <ul className="space-y-2 text-sm text-slate-200">
-                {workstreamHighlights[link.href]?.map((item) => (
-                  <li key={item} className="flex items-start gap-2">
-                    <span
-                      className="mt-1 h-1.5 w-1.5 rounded-full bg-sky-400"
-                      aria-hidden="true"
-                    />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-              <dl className="space-y-1 text-xs text-slate-300">
-                <div className="flex items-center justify-between gap-3">
-                  <dt className="text-slate-500">Owner</dt>
-                  <dd className="text-slate-200">
-                    Assign in weekly ops review
-                  </dd>
-                </div>
-                <div className="flex items-center justify-between gap-3">
-                  <dt className="text-slate-500">Due date</dt>
-                  <dd className="text-slate-200">This cycle</dd>
-                </div>
-                <div className="flex items-center justify-between gap-3">
-                  <dt className="text-slate-500">Impact</dt>
-                  <dd className="text-slate-200">High operational leverage</dd>
-                </div>
-              </dl>
-              <Link
-                href={
-                  appendSearchParamsToRoute(
-                    link.href,
-                    resolvedSearchParams,
-                  ) as Route
-                }
-                className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.2em] transition-colors hover:border-sky-300/80 hover:text-white"
-              >
-                Review {link.label}
-              </Link>
-            </article>
-          ))}
-        </div>
-      </SectionedReportPanel>
 
       <CadenceChecklist
         cadence="monthly"
