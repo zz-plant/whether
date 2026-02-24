@@ -398,10 +398,10 @@ export const DecisionShieldPanel = ({
           <div className="min-w-0">
             <p className="type-label text-slate-400">Decision Shield</p>
             <h3 id="decision-shield-title" className="type-section text-slate-100">
-              Validate an action
+              Commit to the next move
             </h3>
             <p className="mt-2 type-data text-slate-300">
-              Pressure-test the next move against current market climate physics, then share the verdict.
+              Take a decisive, evidence-backed call for this market climate, then circulate the readout as an operator recommendation—not a guarantee.
             </p>
           </div>
           <div className="flex flex-col items-end gap-3">
@@ -476,7 +476,7 @@ export const DecisionShieldPanel = ({
         <div className="mt-6 space-y-4">
           <div className="weather-surface p-4">
             <p className="type-label text-slate-400">
-              Inputs → Verdict → Why → Guardrail → Reversal trigger
+              Inputs → Execution call → Why now → Execution boundary → Pivot signal
             </p>
           </div>
           <div className="grid gap-4 lg:grid-cols-3">
@@ -694,14 +694,16 @@ export const DecisionShieldPanel = ({
 
           <div className="grid gap-4 lg:grid-cols-[1.2fr,1fr]">
             <div className="weather-surface p-4">
-              <p className="type-label text-slate-400">Verdict</p>
+              <p className="type-label text-slate-400">Execution call</p>
               <div
                 className={`mt-3 inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] ${verdictStyles[output.verdict]}`}
               >
                 {output.verdict}
               </div>
               <p className="mt-3 type-data text-slate-200 break-words">{output.summary}</p>
-              <p className="mt-3 text-xs text-slate-500">Copy-ready, shareable verdict.</p>
+              <p className="mt-3 text-xs text-slate-500">
+                Copy-ready board update based on current signals; outcomes remain uncertain.
+              </p>
             </div>
             <div className="weather-surface p-4">
               <p className="type-label text-slate-400">Why (signals)</p>
@@ -717,11 +719,11 @@ export const DecisionShieldPanel = ({
           </div>
           <div className="grid gap-4 lg:grid-cols-2">
             <div className="weather-surface p-4">
-              <p className="type-label text-slate-400">Guardrail</p>
+              <p className="type-label text-slate-400">Execution boundary</p>
               <p className="mt-3 type-data text-slate-300 break-words">{output.guardrail}</p>
             </div>
             <div className="weather-surface p-4">
-              <p className="type-label text-slate-400">Reversal trigger</p>
+              <p className="type-label text-slate-400">Pivot signal</p>
               <p className="mt-3 type-data text-slate-300 break-words">
                 {output.reversalTrigger}
               </p>
