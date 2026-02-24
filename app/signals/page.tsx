@@ -134,7 +134,6 @@ export default async function SignalsPage({
       : "all";
   const sectionLinks = [
     { href: "#current-scores", label: "Current scores" },
-    { href: "#source-links", label: "Source links" },
     { href: "#thresholds", label: "Thresholds" },
   ];
   const buildAdvancedHref = (advanced: boolean) => {
@@ -191,7 +190,7 @@ export default async function SignalsPage({
     financial: [
       { label: "Tightness", why: "Funding conditions drive immediate financial operating constraints", href: "#current-scores" },
       { label: "Risk appetite", why: "Credit and valuation tolerance shift with risk-on/off posture", href: "#macro-signals" },
-      { label: "Source links", why: "Trace inputs before finalizing treasury-sensitive moves", href: "#source-links" },
+      { label: "Macro source series", why: "Trace inputs before finalizing treasury-sensitive moves", href: "#macro-signals" },
     ],
   };
   const focusLabelByTab: Record<FocusTab, string> = {
@@ -347,39 +346,6 @@ export default async function SignalsPage({
         </div>
       </section>
 
-      <section id="source-links" className="weather-panel space-y-4 px-6 py-5">
-        <header className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Source links</p>
-            <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-              Open the live feeds behind the current call.
-            </h2>
-          </div>
-        </header>
-        <nav aria-label="Signal source links">
-          <ul className="grid gap-3 md:grid-cols-2">
-            <li>
-              <a
-                href="#sensor-array"
-                className="weather-surface inline-flex min-h-[44px] w-full items-center justify-between gap-3 p-4 text-sm text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100"
-              >
-                <span>Live sensor array</span>
-                <span aria-hidden="true">→</span>
-              </a>
-            </li>
-            <li>
-              <a
-                href="#macro-signals"
-                className="weather-surface inline-flex min-h-[44px] w-full items-center justify-between gap-3 p-4 text-sm text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100"
-              >
-                <span>Macro source series</span>
-                <span aria-hidden="true">→</span>
-              </a>
-            </li>
-          </ul>
-        </nav>
-      </section>
-
       <SensorArray sensors={sensors} provenance={treasuryProvenance} />
 
       <MacroSignalsPanel series={macroSeries} provenance={macroProvenance} />
@@ -402,12 +368,6 @@ export default async function SignalsPage({
               className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
             >
               {showAdvanced ? "Hide advanced filters" : "Show advanced filters"}
-            </a>
-            <a
-              href={`${appendSearchParamsToRoute("/operations/briefings" as Route, resolvedSearchParams)}#ops-export-briefs`}
-              className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-            >
-              Export focused brief ({focusLabelByTab[activeFocus]}) →
             </a>
           </div>
         </div>
