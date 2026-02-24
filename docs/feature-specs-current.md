@@ -55,7 +55,7 @@ summary data.
 Onboarding provides a first-time guide and a plain‑English glossary so new operators can decode
 signals and navigate the report pages.
 
-### 1.6 Formula reference (/formulas)
+### 1.6 Formula reference (/methodology)
 The formulas page documents the sensor methodology and links directly to public data sources used
 in the report (Treasury API, BLS CPI, BLS labor, FRED credit spreads).
 

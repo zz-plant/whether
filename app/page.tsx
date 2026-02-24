@@ -39,12 +39,12 @@ const workspaceQuickActions = [
     ariaLabel: "Jump to weekly action summary section",
   },
   {
-    href: "/plan",
+    href: "/operations/plan",
     label: "Open plan board",
     ariaLabel: "Open plan board workspace",
   },
   {
-    href: "/evidence",
+    href: "/signals",
     label: "Open evidence trail",
     ariaLabel: "Open evidence trail workspace",
   },
@@ -365,7 +365,7 @@ export default async function HomePage({
           title="Open Evidence"
           links={[
             {
-              href: "/evidence",
+              href: "/signals",
               label: "Evidence",
               description:
                 "Inspect the full macro evidence matrix, historical series context, and source links.",
