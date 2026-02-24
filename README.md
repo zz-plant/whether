@@ -2,11 +2,22 @@
 
 Whether translates public macro signals into operational guidance for product and engineering leaders.
 
+In practical terms, it helps leadership teams answer: **"Given today's funding and risk environment, how aggressively should we operate right now?"**
+
 ## What Whether does
 - Detects the current market climate from Treasury yield data and companion macro signals.
 - Converts that climate read into concrete operating constraints (pace, hiring posture, roadmap bias).
 - Provides decision support tools (Decision Shield, assumption locks, scenario previews, brief exports).
 - Keeps outputs auditable with explicit source metadata and freshness timestamps.
+
+## What Whether is not
+- Not a macro crystal ball or future-prediction engine.
+- Not a product strategy generator.
+- Not a substitute for leadership judgment.
+
+Whether is designed to reduce two common mistakes:
+1. Operating like capital is easy when conditions are tightening.
+2. Over-correcting into defensive mode when conditions are supportive.
 
 ## Who this is for
 - Product and engineering leaders aligning roadmap and team velocity to market conditions.
