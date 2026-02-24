@@ -233,10 +233,6 @@ export default async function HomePage({
         href: "#weekly-action-summary",
         label: "Review posture details",
       }}
-      secondaryCta={{
-        href: "#executive-snapshot",
-        label: "What changed this week",
-      }}
       sidebarVariant="hidden"
       hideHeroChrome={true}
       pageLinks={reportPageLinks}
@@ -272,13 +268,6 @@ export default async function HomePage({
             </a>
           </div>
           <p className="text-sm font-semibold tracking-[0.08em] text-slate-100">{postureDelta}</p>
-          <p className="text-xs text-slate-300">Since Last Review: {postureDelta}</p>
-          <a
-            href="/signals#regime-timeline"
-            className="inline-flex min-h-[44px] items-center justify-center text-xs font-semibold tracking-[0.12em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
-          >
-            What changed?
-          </a>
           <p className="text-[11px] font-medium tracking-[0.14em] text-slate-400">
             Updated {recordDateLabel} · Confidence: {trustStatusLabel} · Next refresh expected: 48h
           </p>
