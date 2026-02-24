@@ -113,10 +113,10 @@ export default async function SignalsPage({
         "Live refresh pending. Using last verified snapshot.")
       : "Live refresh healthy. Next expected update: 48h.";
   const trustStatusAction = historicalSelection
-    ? "Use historical data to understand trends, not to approve live bets."
+    ? "Use historical data for trend review and scenario drills; lock live thresholds after confirming current signals."
     : isFallback
       ? "Hold major decisions until live signals return or you validate the cache."
-      : "Signals are live; use them to confirm thresholds and trigger alerts.";
+      : "Signals are live; proceed with this cycle's approvals using the recommended workflows.";
   const trustStatusTone = historicalSelection
     ? "historical"
     : isFallback

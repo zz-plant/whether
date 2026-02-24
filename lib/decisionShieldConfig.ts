@@ -24,7 +24,7 @@ export const DECISION_VERDICT_MATRIX: Record<
   LAUNCH: {
     SCARCITY: "RISKY",
     DEFENSIVE: "RISKY",
-    VOLATILE: "RISKY",
+    VOLATILE: "SAFE",
     EXPANSION: "SAFE",
   },
   DISCOUNT: {
@@ -54,7 +54,7 @@ export const DECISION_VERDICT_MATRIX: Record<
   INFRA_SPEND: {
     SCARCITY: "DANGEROUS",
     DEFENSIVE: "RISKY",
-    VOLATILE: "RISKY",
+    VOLATILE: "SAFE",
     EXPANSION: "SAFE",
   },
   REGIONAL_EXPANSION: {
@@ -65,23 +65,23 @@ export const DECISION_VERDICT_MATRIX: Record<
   },
   RESTRUCTURE: {
     SCARCITY: "SAFE",
-    DEFENSIVE: "RISKY",
+    DEFENSIVE: "SAFE",
     VOLATILE: "RISKY",
     EXPANSION: "RISKY",
   },
 };
 
 export const DECISION_GUARDRAILS: Record<DecisionAction, string> = {
-  HIRE: "New headcount must repay within 90 days through direct revenue or cost savings.",
-  REWRITE: "Only proceed if the rewrite unlocks 2x shipping velocity within two quarters.",
-  LAUNCH: "Launch only if it meaningfully reduces churn or expands ARPA within one quarter.",
+  HIRE: "Hire in waves tied to funded demand; each wave should show payback within one quarter.",
+  REWRITE: "Proceed only when scope is staged and each milestone protects delivery for the core roadmap.",
+  LAUNCH: "Launch on schedule when success metrics are pre-registered and rollback paths are in place.",
   DISCOUNT: "Discounts must trade for annual prepay or multi-year commitments.",
-  EXPAND: "Expand only when support capacity and retention metrics stay above baseline.",
+  EXPAND: "Expand in phases only when support capacity and retention stay at or above baseline.",
   ACQUIRE: "Acquire only if the target accelerates core metrics within 12 months at current burn.",
   DIVEST: "Divest only with a transition plan that protects revenue continuity within two quarters.",
-  INFRA_SPEND: "Infrastructure spend must cut unit costs or unlock SLA gains within six months.",
-  REGIONAL_EXPANSION: "Expand regions only with localized demand proof and support readiness.",
-  RESTRUCTURE: "Restructure only when runway extends by at least two quarters post-change.",
+  INFRA_SPEND: "Approve infra spend in tranches when each tranche cuts unit costs or improves SLA reliability.",
+  REGIONAL_EXPANSION: "Open new regions sequentially with localized demand proof and support readiness.",
+  RESTRUCTURE: "Restructure when the plan measurably extends runway or protects margin within two quarters.",
 };
 
 export const DECISION_ACTION_LABELS: Record<DecisionAction, string> = {

@@ -139,10 +139,10 @@ export default async function OnboardingPage({
         "Live refresh pending. Using last verified snapshot.")
       : "Live refresh healthy. Next expected update: 48h.";
   const trustStatusAction = historicalSelection
-    ? "Use for retrospectives only; return to live data for real-time planning."
+    ? "Use historical data for onboarding context and scenario drills; switch to live data before final approvals."
     : isFallback
       ? "Hold critical decisions until live signals return or you validate the cache."
-      : "No signal instability detected. Safe for planning decisions.";
+      : "Signals are live; proceed with this cycle's approvals using the recommended workflows.";
   const trustStatusTone = historicalSelection
     ? "historical"
     : isFallback

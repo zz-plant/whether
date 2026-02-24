@@ -692,7 +692,7 @@ export const RegimeAssessmentCard = ({
             System code: {assessment.regime}
           </p>
           <p className="mt-2 text-sm text-slate-300">
-            Plain-English read: this is a macro guardrail, not a product vision change.
+            Plain-English read: this defines the operating envelope for decisions this cycle.
           </p>
         </div>
         <div className="flex flex-col items-end gap-3 text-xs font-semibold tracking-[0.12em] text-slate-300">
@@ -1608,13 +1608,13 @@ export const ExecutiveSnapshotPanel = ({
       ? "border-amber-400/40 bg-amber-500/10 text-amber-100"
       : "border-emerald-400/40 bg-emerald-500/10 text-emerald-100";
   const confidenceDetail = isFallback
-    ? "Live feed degraded; operating off cached Treasury data."
+    ? "Live feed degraded; this report is running on cached Treasury data until the stream recovers."
     : hasDataWarnings
-      ? "Some Treasury inputs are missing; interpret signal strength with caution."
-      : "Full Treasury data coverage verified for this report.";
+      ? "Some Treasury inputs are missing; treat this as directional guidance and tighten approval checks."
+      : "Full Treasury coverage verified; signal quality is strong for this planning cycle.";
   const freshnessAction = isFallback
-    ? "Action: avoid irreversible decisions until live signals return."
-    : "Action: safe to use for day-to-day planning approvals.";
+    ? "Action: keep decisions reversible and hold long-lock commitments until live signals return."
+    : "Action: proceed with routine budget, hiring, and roadmap approvals using standard human review.";
   const scoringInputs = assessment.inputs;
   const scoringSource = scoringInputs[0]?.sourceLabel ?? "US Treasury";
   const scoringSourceUrl = scoringInputs[0]?.sourceUrl ?? treasury.source;
@@ -1630,10 +1630,10 @@ export const ExecutiveSnapshotPanel = ({
           <div>
             <p className="type-label text-slate-400">Executive snapshot</p>
             <h3 id="executive-snapshot-title" className="type-section text-slate-100">
-              Operating constraints
+              Operating directives
             </h3>
             <p className="mt-2 text-sm text-slate-300">
-              Guardrails that translate macro conditions into budget, hiring, and approval policy.
+              Execution directives that translate macro conditions into budget, hiring, and approval policy.
             </p>
           </div>
           <DataProvenanceStrip provenance={provenance} />
@@ -1678,7 +1678,7 @@ export const ExecutiveSnapshotPanel = ({
                 </Tooltip.Root>
               </div>
               <p className="mt-3 text-lg font-semibold text-slate-100">
-                The current macro posture requires clear ROI gates before approving new spend.
+                Set hard ROI gates before approving net-new spend, and sequence commitments by payback speed.
               </p>
               <p className="mt-2 text-sm text-slate-300">{assessment.description}</p>
               <p className="mt-2 text-xs text-slate-500">
