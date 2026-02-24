@@ -17,9 +17,16 @@ type CommandFilter = "All" | OperatorCommandAction["group"];
 const STORAGE_KEY = "whether-command-center-query";
 const FILTER_STORAGE_KEY = "whether-command-center-filter";
 const VISITED_KEY = "whether-command-center-visited";
+const MAX_RESULTS = 12;
 const filterOrder: CommandFilter[] = ["All", "Playbook", "Pages", "Sections"];
+const groupOrder: OperatorCommandAction["group"][] = ["Playbook", "Pages", "Sections"];
 
-const filterHelper: Record<CommandFilter, string> = {
+const filterClassName =
+  "weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[10px] font-semibold tracking-[0.16em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation";
+const commandButtonClassName =
+  "weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation";
+
+const filterDescriptions: Record<CommandFilter, string> = {
   All: "All results across actions, pages, and sections.",
   Playbook: "Do now: immediate actions and operator moves.",
   Pages: "Switch surfaces: navigate to another report page.",
@@ -33,6 +40,18 @@ const groupGlyph: Record<OperatorCommandAction["group"], string> = {
 };
 
 const normalize = (value: string) => value.toLowerCase().trim();
+const isCommandFilter = (value: string): value is CommandFilter => filterOrder.includes(value as CommandFilter);
+
+const buildSearchTarget = (action: OperatorCommandAction) =>
+  `${action.label} ${action.description} ${action.group} ${(action.keywords ?? []).join(" ")}`.toLowerCase();
+
+const tagLabelMap: Record<OperatorCommandAction["group"], string> = {
+  Playbook: "DO NOW",
+  Pages: "PAGE",
+  Sections: "SECTION",
+};
+
+const getTagLabel = (tag: OperatorCommandAction["group"]) => tagLabelMap[tag];
 
 const isInPageLink = (href: string) => href.startsWith("#") || href.includes("/#");
 
@@ -74,12 +93,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
     }
 
     const storedFilter = sessionStorage.getItem(FILTER_STORAGE_KEY);
-    if (
-      storedFilter === "All" ||
-      storedFilter === "Playbook" ||
-      storedFilter === "Pages" ||
-      storedFilter === "Sections"
-    ) {
+    if (storedFilter && isCommandFilter(storedFilter)) {
       setFilter(storedFilter);
     }
 
@@ -173,14 +187,14 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
     const normalizedQuery = normalize(query);
     const filtered = actions.filter((action) => {
       const actionTags = action.tags ?? [action.group];
-      const target = `${action.label} ${action.description} ${action.group} ${(action.keywords ?? []).join(" ")}`.toLowerCase();
+      const target = buildSearchTarget(action);
       const queryMatches = normalizedQuery.length === 0 || target.includes(normalizedQuery);
       const filterMatches = filter === "All" || actionTags.includes(filter);
 
       return queryMatches && filterMatches;
     });
 
-    return filtered.slice(0, 12).reduce<Record<OperatorCommandAction["group"], OperatorCommandAction[]>>(
+    return filtered.slice(0, MAX_RESULTS).reduce<Record<OperatorCommandAction["group"], OperatorCommandAction[]>>(
       (accumulator, action) => {
         accumulator[action.group].push(action);
         return accumulator;
@@ -216,7 +230,8 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
     searchInputRef.current?.focus();
   };
 
-  const hasActiveRefinement = query.length > 0 || (isMobile ? filter !== "Playbook" : filter !== "All");
+  const defaultFilter = isMobile ? "Playbook" : "All";
+  const hasActiveRefinement = query.length > 0 || filter !== defaultFilter;
 
   return (
     <section
@@ -233,7 +248,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
             <button
               type="button"
               onClick={handleCollapse}
-              className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+              className={commandButtonClassName}
             >
               Collapse
             </button>
@@ -297,7 +312,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
                       key={item}
                       type="button"
                       onClick={() => setFilter(item)}
-                      className={`weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[10px] font-semibold tracking-[0.16em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation ${
+                      className={`${filterClassName} ${
                         isActive
                           ? "border-sky-400/70 bg-sky-500/15 text-sky-100"
                           : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
@@ -309,7 +324,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
                   );
                 })}
               </div>
-              <p className="text-xs text-slate-400">{filterHelper[filter]}</p>
+              <p className="text-xs text-slate-400">{filterDescriptions[filter]}</p>
               <p className="text-xs text-slate-500">
                 Playbook = Do now · Pages = Switch surfaces · Sections = Jump within page.
               </p>
@@ -320,7 +335,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
                 <button
                   type="button"
                   onClick={handleReset}
-                  className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                  className={commandButtonClassName}
                 >
                   Reset search
                 </button>
@@ -340,7 +355,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
             </p>
           ) : (
             <div className="grid gap-3 lg:grid-cols-3">
-              {(Object.keys(groupedActions) as OperatorCommandAction["group"][]).map((group) => {
+              {groupOrder.map((group) => {
                 if (groupedActions[group].length === 0) {
                   return null;
                 }
@@ -370,7 +385,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
                                     key={`${action.href}-${tag}`}
                                     className="rounded-full border border-slate-700/70 px-2 py-0.5 text-[9px] font-semibold tracking-[0.12em] text-slate-400"
                                   >
-                                    {tag === "Sections" ? "SECTION" : tag === "Pages" ? "PAGE" : "DO NOW"}
+                                    {getTagLabel(tag)}
                                   </span>
                                 ))}
                               </span>
