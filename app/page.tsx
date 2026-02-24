@@ -272,6 +272,31 @@ export default async function HomePage({
             and align engineering execution with market conditions.
           </p>
         </div>
+        <article className="weather-surface space-y-4 p-5" aria-label="Executive takeaways">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">
+            Executive takeaways
+          </p>
+          <ul className="grid gap-3 text-sm text-slate-100 sm:grid-cols-3">
+            <li className="rounded-xl border border-slate-700/55 bg-slate-900/45 px-3 py-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                Current regime
+              </p>
+              <p className="mt-2 text-base font-semibold text-slate-100">{statusLabel}</p>
+            </li>
+            <li className="rounded-xl border border-amber-400/35 bg-amber-500/10 px-3 py-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-100/85">
+                Top risk this week
+              </p>
+              <p className="mt-2 text-base font-semibold text-amber-50">{trustStatusDetail}</p>
+            </li>
+            <li className="rounded-xl border border-sky-400/45 bg-sky-500/10 px-3 py-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-sky-100/90">
+                Recommended move
+              </p>
+              <p className="mt-2 text-base font-semibold text-sky-50">{trustStatusAction}</p>
+            </li>
+          </ul>
+        </article>
         <article className="weather-surface space-y-4 p-5" aria-label="Decision summary">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
             What changed
