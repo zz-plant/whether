@@ -194,7 +194,7 @@ const buildSlideBullets = (
 const getRegimeLabel = (regime: RegimeAssessment["regime"]) => {
   switch (regime) {
     case "SCARCITY":
-      return "Survival Mode";
+      return "Scarcity";
     case "DEFENSIVE":
       return "Safety Mode";
     case "VOLATILE":
