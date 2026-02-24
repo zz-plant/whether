@@ -265,7 +265,7 @@ export default async function HomePage({
       pageSummary="Canonical operating posture for the current cycle."
       primaryCta={{
         href: "#weekly-action-summary",
-        label: "Review posture details",
+        label: "See posture rationale",
       }}
       sidebarVariant="hidden"
       hideHeroChrome={true}

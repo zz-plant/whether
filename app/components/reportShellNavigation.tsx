@@ -359,7 +359,7 @@ export const ReportMobileNavigation = ({
             <div className="flex items-start justify-between gap-3">
               <div className="space-y-1">
                 <p className="text-base font-semibold text-slate-100">{currentLink.label}</p>
-                <p className="text-xs text-slate-400">Choose a page or jump to a section.</p>
+                <p className="text-xs text-slate-300">Choose a page or jump to a section.</p>
               </div>
               <div className="flex items-center gap-2">
                 <span className="weather-chip inline-flex min-h-[44px] items-center px-3 py-1 text-xs font-semibold tracking-[0.18em] text-slate-200">
