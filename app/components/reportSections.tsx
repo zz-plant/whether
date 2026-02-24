@@ -995,7 +995,9 @@ export const FirstTimeGuidePanel = ({
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-[1.15fr,0.85fr]">
-        <ul className="space-y-3">
+        <div className="space-y-3">
+          <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Scan order</p>
+          <ul className="space-y-3">
           {[
             {
               label: "Summary",
@@ -1015,7 +1017,7 @@ export const FirstTimeGuidePanel = ({
                 "Use the actions lane to brief leadership with clear, plain-English constraints.",
               example: "Example decision: focus on retention when risk appetite is cautious.",
             },
-          ].map((step) => (
+          ].map((step, index) => (
             <li key={step.label} className="weather-surface p-4 text-sm text-slate-300">
               <Collapsible.Root className="space-y-2">
                 <Collapsible.Trigger
@@ -1024,7 +1026,7 @@ export const FirstTimeGuidePanel = ({
                 >
                   <span className="flex items-center gap-3">
                     <span className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-700/70 bg-slate-950 text-xs font-semibold text-slate-300">
-                      ✓
+                      {index + 1}
                     </span>
                     <span className="text-xs font-semibold tracking-[0.12em] text-slate-200">{step.label}</span>
                   </span>
@@ -1040,7 +1042,8 @@ export const FirstTimeGuidePanel = ({
               </Collapsible.Root>
             </li>
           ))}
-        </ul>
+          </ul>
+        </div>
         <aside className="weather-surface p-4" aria-label="Onboarding highlights">
           <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
             Quick scan highlights
@@ -1065,11 +1068,9 @@ export const FirstTimeGuidePanel = ({
         </aside>
       </div>
 
-      <div className="mt-6 space-y-2 text-sm text-slate-300">
-        <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-          Next
-        </p>
-        <ul className="space-y-2">
+      <div className="mt-6 space-y-3 text-sm text-slate-300">
+        <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Where to go next</p>
+        <ul className="grid gap-2 md:grid-cols-3">
           {[
             { href: "#executive-snapshot", label: "Leadership summary" },
             { href: "/operations#ops-playbook", label: "Actions playbook" },
@@ -1078,9 +1079,10 @@ export const FirstTimeGuidePanel = ({
             <li key={link.href}>
               <a
                 href={link.href}
-                className="touch-target inline-flex min-h-[44px] items-center text-sm text-slate-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
+                className="weather-surface touch-target inline-flex min-h-[44px] w-full items-center justify-between gap-2 rounded-xl px-3 py-2 text-sm text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100"
               >
                 {link.label}
+                <span aria-hidden="true">→</span>
               </a>
             </li>
           ))}
@@ -1155,24 +1157,8 @@ export const BeginnerGlossaryPanel = () => {
           </div>
         </div>
         <div className="mt-6 grid gap-4 lg:grid-cols-[1.15fr,0.85fr]">
-          <div className="weather-surface p-4 text-sm text-slate-300">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-200">
-              Reading notes
-            </p>
-            <ul className="mt-3 space-y-2 text-sm text-slate-400">
-              <li>
-                <span className="text-slate-200">Climate badge</span> summarizes current macro stance.
-              </li>
-              <li>
-                <span className="text-slate-200">Signals map to constraints</span> rather than forecasts.
-              </li>
-              <li>
-                <span className="text-slate-200">Exports support alignment</span> across teams.
-              </li>
-            </ul>
-          </div>
           <aside className="weather-surface p-4" aria-label="Glossary sidebar">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Glossary</p>
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Glossary terms</p>
             <Accordion.Root
               multiple
               className="mt-3 space-y-3 text-sm text-slate-300"
@@ -1224,6 +1210,36 @@ export const BeginnerGlossaryPanel = () => {
               ))}
             </Accordion.Root>
           </aside>
+          <div className="space-y-4">
+            <div className="weather-surface p-4 text-sm text-slate-300">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-200">How to use this glossary</p>
+              <ul className="mt-3 space-y-2 text-sm text-slate-400">
+                <li>
+                  <span className="text-slate-200">Start with current climate</span> to anchor this week&apos;s stance.
+                </li>
+                <li>
+                  <span className="text-slate-200">Translate terms into constraints</span> before discussing bets.
+                </li>
+                <li>
+                  <span className="text-slate-200">Use linked sections</span> to pull supporting evidence fast.
+                </li>
+              </ul>
+            </div>
+            <div className="weather-surface p-4 text-sm text-slate-300">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-200">Reading notes</p>
+              <ul className="mt-3 space-y-2 text-sm text-slate-400">
+                <li>
+                  <span className="text-slate-200">Climate badge</span> summarizes current macro stance.
+                </li>
+                <li>
+                  <span className="text-slate-200">Signals map to constraints</span> rather than forecasts.
+                </li>
+                <li>
+                  <span className="text-slate-200">Exports support alignment</span> across teams.
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </section>
