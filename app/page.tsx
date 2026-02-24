@@ -39,6 +39,22 @@ const regimeLabelMap = {
 
 const postureForecastHorizons = ["Now", "+1 week", "+2 weeks", "+4 weeks"] as const;
 
+const clampPercentage = (value: number) => Math.min(100, Math.max(0, value));
+
+const describeProbabilityBand = (value: number) => {
+  if (value >= 75) {
+    return "High";
+  }
+  if (value >= 50) {
+    return "Elevated";
+  }
+  if (value >= 25) {
+    return "Moderate";
+  }
+
+  return "Low";
+};
+
 type PostureForecastItem = {
   horizon: (typeof postureForecastHorizons)[number];
   label: "Stable" | "Watch" | "Likely shift" | "Projection unavailable";
@@ -260,6 +276,56 @@ export default async function HomePage({
   const tightnessGap = Math.abs(assessment.scores.tightness - tightnessThreshold);
   const riskGap = Math.abs(assessment.scores.riskAppetite - riskThreshold);
   const nearestThresholdGap = Math.min(tightnessGap, riskGap);
+  const adjacentShiftRegimeLabel =
+    assessment.regime === "EXPANSION"
+      ? regimeLabelMap.DEFENSIVE
+      : assessment.regime === "SCARCITY"
+        ? regimeLabelMap.DEFENSIVE
+        : assessment.regime === "DEFENSIVE"
+          ? regimeLabelMap.EXPANSION
+          : regimeLabelMap.DEFENSIVE;
+  const normalizedTightnessGap = clampPercentage((tightnessGap / 40) * 100);
+  const normalizedRiskGap = clampPercentage((riskGap / 40) * 100);
+  const defensivePressure = clampPercentage(100 - normalizedRiskGap);
+  const expansionPressure = clampPercentage(100 - normalizedTightnessGap);
+  const shiftPressure = clampPercentage((defensivePressure + expansionPressure) / 2);
+  const probabilityStay = Math.round(clampPercentage(100 - shiftPressure));
+  const shiftAllocationWeight =
+    assessment.regime === "EXPANSION"
+      ? 0.7
+      : assessment.regime === "SCARCITY"
+        ? 0.55
+        : assessment.regime === "DEFENSIVE"
+          ? 0.6
+          : 0.65;
+  const probabilityShiftPool = 100 - probabilityStay;
+  const probabilityShiftDefensive = Math.round(
+    clampPercentage(probabilityShiftPool * shiftAllocationWeight),
+  );
+  const probabilityShiftExpansion = Math.max(0, 100 - probabilityStay - probabilityShiftDefensive);
+  const probabilityPills = [
+    {
+      id: "shift-defensive",
+      label: `Shift risk (${regimeLabelMap.DEFENSIVE})`,
+      copy: `${probabilityShiftDefensive}%`,
+      qualitativeBand: describeProbabilityBand(probabilityShiftDefensive),
+      className: "weather-chip",
+    },
+    {
+      id: "stay",
+      label: "Stay likely",
+      copy: `${probabilityStay}%`,
+      qualitativeBand: describeProbabilityBand(probabilityStay),
+      className: "weather-pill",
+    },
+    {
+      id: "shift-adjacent",
+      label: `Shift risk (${adjacentShiftRegimeLabel})`,
+      copy: `${probabilityShiftExpansion}%`,
+      qualitativeBand: describeProbabilityBand(probabilityShiftExpansion),
+      className: "weather-pill-muted",
+    },
+  ];
   const hasProjectionData =
     Number.isFinite(assessment.scores.tightness) &&
     Number.isFinite(assessment.scores.riskAppetite) &&
@@ -349,6 +415,24 @@ export default async function HomePage({
             </p>
           </div>
           <p className="text-sm font-semibold tracking-[0.08em] text-slate-100">{postureDelta}</p>
+          <div className="flex flex-wrap items-center justify-center gap-2" aria-label="Operational posture probabilities">
+            {probabilityPills.map((pill) => (
+              <p
+                key={pill.id}
+                className={`${pill.className} inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100`}
+              >
+                <span>
+                  {pill.label}: {pill.copy} ({pill.qualitativeBand})
+                </span>
+              </p>
+            ))}
+          </div>
+          <p className="text-xs text-slate-300">
+            Heuristic operational probabilities only; this translates current threshold distance into posture shift odds and is not a financial forecast.
+          </p>
+          <p className="text-xs text-slate-300">
+            These percentages use the same trigger logic as <span className="font-semibold text-slate-100">What would change this posture</span>: scores closer to threshold imply higher shift risk.
+          </p>
           <p className="text-[11px] font-medium tracking-[0.14em] text-slate-400">
             Updated {recordDateLabel} · Confidence: {trustStatusLabel}
           </p>
