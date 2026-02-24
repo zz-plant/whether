@@ -3,6 +3,7 @@
  * Mirrors monthly summary structure with year-specific framing.
  */
 import type { RegimeAssessment } from "../regimeEngine";
+import { buildComplianceStamp } from "../exportNotices";
 
 export type YearlySummaryProvenance = {
   sourceLabel: string;
@@ -72,6 +73,11 @@ export const buildYearlySummary = ({
   const sourceLine = provenance.sourceUrl
     ? `${provenance.sourceLabel} (${provenance.sourceUrl})`
     : provenance.sourceLabel;
+  const complianceStamp = buildComplianceStamp({
+    sourceLine,
+    timestamp: provenance.timestampLabel,
+    confidence: provenance.statusLabel,
+  });
   const copy = [
     title,
     summary,
@@ -83,7 +89,8 @@ export const buildYearlySummary = ({
     `Source: ${sourceLine}`,
     `Timestamp: ${provenance.timestampLabel}`,
     `Data age: ${provenance.ageLabel}`,
-    `Confidence: ${provenance.statusLabel}`,
+    "",
+    ...complianceStamp,
   ].join("\n");
 
   return {

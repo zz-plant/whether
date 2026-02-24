@@ -3,6 +3,7 @@
  * Keeps weekly action copy consistent across UI and shared endpoints.
  */
 import type { RegimeAssessment } from "../regimeEngine";
+import { buildComplianceStamp } from "../exportNotices";
 
 export type WeeklySummaryProvenance = {
   sourceLabel: string;
@@ -178,6 +179,11 @@ export const buildWeeklySummary = ({
   const sourceLine = provenance.sourceUrl
     ? `${provenance.sourceLabel} (${provenance.sourceUrl})`
     : provenance.sourceLabel;
+  const complianceStamp = buildComplianceStamp({
+    sourceLine,
+    timestamp: provenance.timestampLabel,
+    confidence: provenance.statusLabel,
+  });
   const copy = [
     "---",
     "WHETHER · Market Climate Station",
@@ -239,14 +245,21 @@ export const buildWeeklySummary = ({
     "",
     "---",
     "",
+    "RECOMMENDATION CONFIDENCE",
+    "",
+    `Confidence: ${provenance.statusLabel}`,
+    "Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.",
+    "",
+    "",
+    "---",
+    "",
     "DATA PROVENANCE & QUALITY",
     "",
     `Source: ${sourceLine}`,
     `Timestamp: ${provenance.timestampLabel}`,
     `Data age: ${provenance.ageLabel}`,
-    `Confidence: ${provenance.statusLabel}`,
     "",
-    "",
+    ...complianceStamp,
     "",
     "---",
     "",

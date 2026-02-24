@@ -3,6 +3,7 @@
  * Mirrors monthly summary structure with quarter-specific framing.
  */
 import type { RegimeAssessment } from "../regimeEngine";
+import { buildComplianceStamp } from "../exportNotices";
 
 export type QuarterlySummaryProvenance = {
   sourceLabel: string;
@@ -74,6 +75,11 @@ export const buildQuarterlySummary = ({
   const sourceLine = provenance.sourceUrl
     ? `${provenance.sourceLabel} (${provenance.sourceUrl})`
     : provenance.sourceLabel;
+  const complianceStamp = buildComplianceStamp({
+    sourceLine,
+    timestamp: provenance.timestampLabel,
+    confidence: provenance.statusLabel,
+  });
   const copy = [
     title,
     summary,
@@ -85,7 +91,8 @@ export const buildQuarterlySummary = ({
     `Source: ${sourceLine}`,
     `Timestamp: ${provenance.timestampLabel}`,
     `Data age: ${provenance.ageLabel}`,
-    `Confidence: ${provenance.statusLabel}`,
+    "",
+    ...complianceStamp,
   ].join("\n");
 
   return {
