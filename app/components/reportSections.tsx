@@ -454,75 +454,12 @@ export const WeeklyActionSummaryPanel = ({
           </div>
           <div className="grid gap-4">
             <WeeklySummaryCard summary={weeklySummary} />
-            <div className="weather-surface weather-surface-teal p-4">
-              <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">Cadence</p>
-              <p className="mt-3 text-sm text-slate-200">
-                Next Treasury refresh recorded {recordDateLabel}.
-              </p>
-              <p className="mt-2 text-xs text-slate-300">
-                Keep weekly decisions within this window unless new alerts publish.
-              </p>
-            </div>
-            <div className="weather-surface weather-surface-sky p-4">
-              <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
-                Best timing windows
-              </p>
-              <ul className="mt-3 space-y-2 text-sm text-slate-300">
-                {timingWindows.map((window) => (
-                  <li key={window.label}>
-                    <p className="text-xs font-semibold tracking-[0.08em] text-slate-200">
-                      {window.label}
-                    </p>
-                    <p className="mt-1 text-xs text-slate-400">{window.detail}</p>
-                  </li>
-                ))}
-              </ul>
-            </div>
           </div>
         </div>
         </Tooltip.Provider>
 
-        <div className="grid gap-4 lg:grid-cols-[1.2fr,0.8fr]">
-          <div className="grid gap-3">
-            {weeklyBlocks.map((block, index) => (
-              <div key={block.heading} className={`weather-surface p-4 ${index % 2 === 0 ? "weather-surface-indigo" : "weather-surface-sky"}`}>
-                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                  {block.heading}
-                </p>
-                <ul className="mt-3 space-y-2 text-sm text-slate-300">
-                  {block.bullets.map((bullet) => (
-                    <li key={bullet} className="flex gap-2">
-                      <span className="text-slate-500">•</span>
-                      <span className="break-words">{bullet}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-          <aside className="weather-surface weather-surface-amber p-4" aria-label="Weekly decision points">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Decision points</p>
-            <ol className="mt-3 space-y-4 text-sm text-slate-300">
-              {decisionChecklist.map((item, index) => (
-                <li key={item.title} className="flex gap-3">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-700/70 bg-slate-950 text-xs font-semibold text-slate-200">
-                    {index + 1}
-                  </span>
-                  <div>
-                    <p className="text-sm font-semibold text-slate-200">{item.title}</p>
-                    <p className="mt-1 text-xs text-slate-400">{item.detail}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-            <p className="mt-4 text-xs text-slate-300">
-              Reference these points before roadmap or staffing changes.
-            </p>
-          </aside>
-        </div>
-
-        <div className="weather-surface weather-surface-indigo p-4">
-          <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">Quick routes</p>
+        <div className="weather-surface weather-surface-indigo p-4 sm:p-5">
+          <p className="text-sm font-semibold tracking-[0.08em] text-slate-200">Quick routes</p>
           <ul className="mt-3 space-y-2 text-sm text-slate-300">
             {weeklyQuickLinks.map((link) => (
               <li key={link.href}>
@@ -536,6 +473,79 @@ export const WeeklyActionSummaryPanel = ({
             ))}
           </ul>
         </div>
+
+        <details className="weather-surface group p-4 sm:p-5" aria-label="Weekly supporting details">
+          <summary className="flex min-h-[48px] cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold tracking-[0.08em] text-slate-100 focus-visible:rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation">
+            Weekly supporting details
+            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-400 transition-transform group-open:rotate-180">
+              ⌄
+            </span>
+          </summary>
+          <div className="mt-5 grid gap-5 lg:grid-cols-[1.2fr,0.8fr]">
+            <div className="grid gap-4">
+              <div className="weather-surface weather-surface-teal p-4">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">Cadence</p>
+                <p className="mt-3 text-sm text-slate-200">
+                  Next Treasury refresh recorded {recordDateLabel}.
+                </p>
+                <p className="mt-2 text-xs text-slate-300">
+                  Keep weekly decisions within this window unless new alerts publish.
+                </p>
+              </div>
+              <div className="weather-surface weather-surface-sky p-4">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
+                  Best timing windows
+                </p>
+                <ul className="mt-3 space-y-2 text-sm text-slate-300">
+                  {timingWindows.map((window) => (
+                    <li key={window.label}>
+                      <p className="text-xs font-semibold tracking-[0.08em] text-slate-200">
+                        {window.label}
+                      </p>
+                      <p className="mt-1 text-xs text-slate-400">{window.detail}</p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="grid gap-3">
+                {weeklyBlocks.map((block, index) => (
+                  <div key={block.heading} className={`weather-surface p-4 ${index % 2 === 0 ? "weather-surface-indigo" : "weather-surface-sky"}`}>
+                    <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                      {block.heading}
+                    </p>
+                    <ul className="mt-3 space-y-2 text-sm text-slate-300">
+                      {block.bullets.map((bullet) => (
+                        <li key={bullet} className="flex gap-2">
+                          <span className="text-slate-500">•</span>
+                          <span className="break-words">{bullet}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <aside className="weather-surface weather-surface-amber p-4" aria-label="Weekly decision points">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Decision points</p>
+              <ol className="mt-3 space-y-4 text-sm text-slate-300">
+                {decisionChecklist.map((item, index) => (
+                  <li key={item.title} className="flex gap-3">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-700/70 bg-slate-950 text-xs font-semibold text-slate-200">
+                      {index + 1}
+                    </span>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-200">{item.title}</p>
+                      <p className="mt-1 text-xs text-slate-400">{item.detail}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+              <p className="mt-4 text-xs text-slate-300">
+                Reference these points before roadmap or staffing changes.
+              </p>
+            </aside>
+          </div>
+        </details>
         <p className="text-xs text-slate-300">
           Keep the weekly narrative tight so leaders can decide without re-reading the data lanes.
         </p>
