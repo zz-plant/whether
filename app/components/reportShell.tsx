@@ -150,7 +150,7 @@ export const ReportShell = ({
     "weather-panel-static min-w-0 space-y-4 px-4 py-4 sm:space-y-5 sm:px-5";
   const overviewPanel = (
     <details className="weather-panel group px-4 py-4">
-      <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.16em] text-slate-200">
+      <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.16em] text-slate-200 focus-visible:rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation">
         <span>Data provenance</span>
         <span className="sr-only group-open:hidden">Collapsed</span>
         <span className="sr-only hidden group-open:inline">Expanded</span>
