@@ -316,6 +316,7 @@ export const ReportShell = ({
       <p className="text-slate-300">
         Current Posture: <span className="font-semibold text-slate-100">{statusLabel}</span>
         <span className="ml-2 text-slate-400">Updated {recordDateLabel}</span>
+        <span className="ml-2 text-slate-500">Next refresh expected: 48h</span>
       </p>
       <Link
         href="/"
