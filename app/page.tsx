@@ -29,7 +29,6 @@ const homeSectionSequence = [
   { href: "#weekly-action-summary", label: "Weekly actions" },
   { href: "#executive-snapshot", label: "Leadership summary" },
   { href: "#signal-matrix", label: "Signal breakdown" },
-  { href: "#evidence-matrix", label: "Evidence matrix" },
 ] as const;
 
 const regimeLabelMap = {
@@ -246,9 +245,9 @@ export default async function HomePage({
     >
       <section
         aria-labelledby="decision-card-title"
-        className="weather-panel space-y-10 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.16),rgba(15,23,42,0.3)_45%,rgba(2,6,23,0.92)_75%)] px-6 py-10 sm:space-y-12 sm:py-12"
+        className="weather-panel space-y-8 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.16),rgba(15,23,42,0.3)_45%,rgba(2,6,23,0.92)_75%)] px-6 py-8 sm:space-y-10 sm:py-10"
       >
-        <div className="space-y-5 text-center">
+        <div className="space-y-4 text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.26em] text-sky-200">
             Posture for the next 2–6 weeks
           </p>
@@ -258,8 +257,8 @@ export default async function HomePage({
           <p className="mx-auto max-w-3xl text-base text-slate-300">
             Live market and capital conditions translated into a clear operating posture for the next cycle.
           </p>
-          <div className="py-4 sm:py-6">
-            <p className="text-6xl font-bold tracking-[-0.04em] text-slate-50 sm:text-7xl">{statusLabel}</p>
+          <div className="py-2 sm:py-4">
+            <p className="text-5xl font-bold tracking-[-0.03em] text-slate-50 sm:text-6xl">{statusLabel}</p>
           </div>
           <p className="text-sm font-semibold tracking-[0.08em] text-slate-100">{postureDelta}</p>
           <p className="text-[11px] font-medium tracking-[0.14em] text-slate-400">
@@ -272,6 +271,15 @@ export default async function HomePage({
           <p className="text-sm text-slate-300">{trustStatusAction}</p>
         </article>
 
+        <article className="weather-surface space-y-3 p-5" aria-label="Posture change triggers">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">What would change this posture</p>
+          <ul className="space-y-2 text-sm text-slate-200">
+            <li>• Will shift if Capital Tightness rises above {tightnessThreshold} for two consecutive reads.</li>
+            <li>• Will shift if Risk Appetite falls below {riskThreshold} and remains there through the next update.</li>
+            <li>• Curve slope turns negative and stays inverted through the next cycle.</li>
+          </ul>
+        </article>
+
         <div className="grid gap-4">
           <article className="weather-surface space-y-3 p-5" aria-label="Prioritize">
             <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-200">Prioritize</h2>
@@ -281,17 +289,14 @@ export default async function HomePage({
               ))}
             </ul>
           </article>
-          <details className="weather-surface group p-5" aria-label="Avoid">
-            <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-2 text-sm font-semibold uppercase tracking-[0.2em] text-amber-200">
-              <span>Avoid</span>
-              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-400 transition-transform group-open:rotate-180">⌄</span>
-            </summary>
-            <ul className="mt-3 space-y-2 text-sm text-slate-100">
+          <article className="weather-surface space-y-3 p-5" aria-label="Avoid">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-200">Avoid</h2>
+            <ul className="space-y-2 text-sm text-slate-100">
               {stopItems.slice(0, 5).map((item) => (
                 <li key={item} className="flex items-start gap-2"><span aria-hidden="true" className="mt-1 h-1.5 w-1.5 rounded-full bg-amber-300" />{item}</li>
               ))}
             </ul>
-          </details>
+          </article>
         </div>
 
       </section>
@@ -323,62 +328,33 @@ export default async function HomePage({
         />
       </section>
 
-      <section aria-label="Posture change triggers" className="space-y-8">
-        <article className="weather-surface space-y-3 p-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">What would change this posture</p>
-          <ul className="space-y-2 text-sm text-slate-200">
-            <li>• Will shift if Capital Tightness rises above {tightnessThreshold} for two consecutive reads.</li>
-            <li>• Will shift if Risk Appetite falls below {riskThreshold} and remains there through the next update.</li>
-            <li>• Curve slope turns negative and stays inverted through the next cycle.</li>
-          </ul>
-        </article>
-      </section>
-
-      <section
-        id="evidence-matrix"
-        aria-labelledby="evidence-matrix-title"
-        className="weather-panel space-y-4 px-6 py-5"
-      >
-        <header className="space-y-2">
-          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
-            Evidence matrix
-          </p>
-          <h2
-            id="evidence-matrix-title"
-            className="text-xl font-semibold text-slate-100 sm:text-2xl"
-          >
-            Evidence and context
-          </h2>
-          <p className="text-sm text-slate-300">
-            Open the Evidence page for full macro series, thresholds, and source-level methodology.
-          </p>
-        </header>
+      <section className="weather-panel px-6 py-5" aria-label="Evidence link">
         <RelatedReportLinks
-          title="Open Evidence"
+          title="Explore deeper context"
           links={[
             {
               href: "/signals",
-              label: "Evidence",
+              label: "Open Signals",
               description:
-                "Inspect the full macro evidence matrix, historical series context, and source links.",
+                "Inspect the full evidence matrix, thresholds, historical context, and source links.",
             },
             {
               href: "/solutions/product-roadmapping",
               label: "Product roadmapping",
               description:
-                "Apply macro signals to product roadmap sequencing, pricing posture, and launch timing.",
+                "Apply macro signals to roadmap sequencing, pricing posture, and launch timing.",
             },
             {
               href: "/solutions/engineering-capacity",
-              label: "Engineering capacity planning",
+              label: "Engineering capacity",
               description:
-                "Use regime-aware signals to plan hiring, delivery risk, and reliability investments.",
+                "Plan hiring pace, delivery risk, and reliability investment by regime.",
             },
             {
               href: "/solutions/market-regime-playbook",
               label: "Market regime playbook",
               description:
-                "Operational playbook for high, moderate, and low market-stress environments.",
+                "Use operating guardrails for high-, moderate-, and low-stress environments.",
             },
           ]}
         />
