@@ -186,13 +186,14 @@ export default async function OnboardingPage({
     >
       <section
         id="onboarding-checklist"
+        aria-labelledby="onboarding-checklist-title"
         className="weather-panel space-y-4 px-6 py-5"
       >
         <header className="space-y-2">
           <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
             Overview
           </p>
-          <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
+          <h2 id="onboarding-checklist-title" className="text-xl font-semibold text-slate-100 sm:text-2xl">
             Start onboarding with three focused steps.
           </h2>
           <p className="text-sm text-slate-300">
@@ -200,31 +201,34 @@ export default async function OnboardingPage({
               ? "~3 minutes to get a clear weekly action read."
               : "~90 seconds to refresh context and jump to evidence."}
           </p>
-          <div className="flex flex-wrap items-center gap-2">
-            <p className="text-xs font-semibold tracking-[0.14em] text-slate-400">
-              Experience mode
-            </p>
-            {[
-              { key: "new", label: "I’m new" },
-              { key: "returning", label: "I’m returning" },
-            ].map((option) => {
-              const isActive = option.key === activeExperience;
-              return (
-                <a
-                  key={option.key}
-                  href={buildExperienceHref(option.key as "new" | "returning")}
-                  aria-current={isActive ? "page" : undefined}
-                  className={`weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] touch-manipulation ${
-                    isActive
-                      ? "border-sky-300/80 text-slate-100"
-                      : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
-                  }`}
-                >
-                  {option.label}
-                </a>
-              );
-            })}
-          </div>
+          <fieldset className="space-y-2">
+            <legend className="text-xs font-semibold tracking-[0.14em] text-slate-400">Experience mode</legend>
+            <p id="experience-mode-help" className="text-xs text-slate-500">Choose the lens that matches your familiarity. The checklist text adapts instantly.</p>
+            <div className="flex flex-wrap items-center gap-2" role="radiogroup" aria-describedby="experience-mode-help">
+              {[
+                { key: "new", label: "I’m new" },
+                { key: "returning", label: "I’m returning" },
+              ].map((option) => {
+                const isActive = option.key === activeExperience;
+                return (
+                  <a
+                    key={option.key}
+                    href={buildExperienceHref(option.key as "new" | "returning")}
+                    role="radio"
+                    aria-checked={isActive}
+                    aria-current={isActive ? "page" : undefined}
+                    className={`weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] touch-manipulation ${
+                      isActive
+                        ? "border-sky-300/80 bg-sky-500/10 text-slate-100"
+                        : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
+                    }`}
+                  >
+                    {option.label}
+                  </a>
+                );
+              })}
+            </div>
+          </fieldset>
         </header>
         <OnboardingChecklistProgress steps={onboardingSteps} />
       </section>
@@ -239,12 +243,12 @@ export default async function OnboardingPage({
 
       <BeginnerGlossaryPanel />
 
-      <section className="weather-panel space-y-4 px-6 py-5">
+      <section aria-labelledby="apply-concepts-title" className="weather-panel space-y-4 px-6 py-5">
         <header>
           <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
             Apply each concept
           </p>
-          <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
+          <h2 id="apply-concepts-title" className="text-xl font-semibold text-slate-100 sm:text-2xl">
             Jump from concepts to live report sections.
           </h2>
         </header>
@@ -275,9 +279,9 @@ export default async function OnboardingPage({
               </p>
               <a
                 href={item.href}
-                className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.14em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
               >
-                {item.label} →
+                {item.label}
               </a>
             </li>
           ))}
