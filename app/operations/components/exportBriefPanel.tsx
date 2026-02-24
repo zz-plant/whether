@@ -11,6 +11,7 @@ import type { MacroSeriesReading, SensorReading, TreasuryData } from "../../../l
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import { formatNumberValue } from "../../../lib/formatters";
 import { buildAgentPayloadJson, buildAgentPrompt } from "../../../lib/agentHandoff";
+import { buildComplianceStamp, INTERNAL_USE_LABEL } from "../../../lib/exportNotices";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 import { useClipboardCopy, type ClipboardCopyState } from "../../components/useClipboardCopy";
 
@@ -50,7 +51,9 @@ const buildBrief = (
     ...assessment.constraints.map((item) => `• ${item}`),
     "",
     "Citations:",
-    ...citations
+    ...citations,
+    "",
+    ...buildExportStamp(treasury, "Score-based posture confidence"),
   ].join("\n");
 };
 
@@ -63,6 +66,16 @@ const buildCitationLines = (treasury: TreasuryData, macros: MacroSeriesReading[]
   `Treasury source: ${treasury.source} (${treasury.record_date})`,
   ...macros.map((macro) => `${macro.label}: ${macro.sourceUrl} (${macro.record_date})`),
 ];
+
+const buildExportStamp = (
+  treasury: TreasuryData,
+  confidence: string
+) =>
+  buildComplianceStamp({
+    sourceLine: treasury.source,
+    timestamp: treasury.record_date,
+    confidence,
+  });
 
 const buildJiraMarkdownBrief = (
   assessment: RegimeAssessment,
@@ -92,6 +105,8 @@ const buildJiraMarkdownBrief = (
     ...constraintLines,
     "",
     `Source: ${treasury.source}`,
+    "",
+    ...buildExportStamp(treasury, "Score-based posture confidence"),
   ].join("\n");
 };
 
@@ -123,6 +138,8 @@ const buildConfluenceWikiBrief = (
     ...constraintLines,
     "",
     `Source: [${treasury.source}|${treasury.source}]`,
+    "",
+    ...buildExportStamp(treasury, "Score-based posture confidence"),
   ].join("\n");
 };
 
@@ -154,15 +171,23 @@ const buildLinearMarkdownBrief = (
     ...constraintLines,
     "",
     `Source: ${treasury.source}`,
+    "",
+    ...buildExportStamp(treasury, "Score-based posture confidence"),
   ].join("\n");
 };
 
-const buildSlideBullets = (assessment: RegimeAssessment, macros: MacroSeriesReading[]) => {
+const buildSlideBullets = (
+  assessment: RegimeAssessment,
+  treasury: TreasuryData,
+  macros: MacroSeriesReading[]
+) => {
   return [
     `Market climate: ${assessment.regime}`,
     `Tightness ${assessment.scores.tightness} / Risk ${assessment.scores.riskAppetite}`,
     ...macros.map((macro) => `${macro.label}: ${formatNumber(macro.value, macro.unit)}`),
     ...assessment.constraints.map((item) => `Guardrail: ${item}`),
+    "",
+    ...buildExportStamp(treasury, "Score-based posture confidence"),
   ].join("\n");
 };
 
@@ -194,6 +219,8 @@ const buildConstraintHeadlines = (assessment: RegimeAssessment, treasury: Treasu
     ...constraints,
     "",
     `Source: ${treasury.source}`,
+    "",
+    ...buildExportStamp(treasury, "Score-based posture confidence"),
   ].join("\n");
 };
 
@@ -260,8 +287,8 @@ export const ExportBriefPanel = ({
     [assessment, treasury, sensors, macroSeries]
   );
   const slideBullets = useMemo(
-    () => buildSlideBullets(assessment, macroSeries),
-    [assessment, macroSeries]
+    () => buildSlideBullets(assessment, treasury, macroSeries),
+    [assessment, treasury, macroSeries]
   );
   const boardBrief = useMemo(
     () => [briefing, "", "---", "", slideBullets].join("\n"),
@@ -327,6 +354,9 @@ export const ExportBriefPanel = ({
             </h3>
             <p className="mt-2 type-data text-slate-300">
               Copy ready-made summaries for Slack, email, or slide decks, or print to PDF.
+            </p>
+            <p className="mt-2 text-xs font-semibold tracking-[0.12em] text-amber-300">
+              {INTERNAL_USE_LABEL} · informational output only
             </p>
           </div>
           <div className="flex flex-col items-end gap-3">

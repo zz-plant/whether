@@ -3,6 +3,7 @@
  * Powers copy-ready cards and API responses with traceable provenance metadata.
  */
 import type { RegimeAssessment } from "../regimeEngine";
+import { buildComplianceStamp } from "../exportNotices";
 
 export type MonthlySummaryProvenance = {
   sourceLabel: string;
@@ -72,6 +73,11 @@ export const buildMonthlySummary = ({
   const sourceLine = provenance.sourceUrl
     ? `${provenance.sourceLabel} (${provenance.sourceUrl})`
     : provenance.sourceLabel;
+  const complianceStamp = buildComplianceStamp({
+    sourceLine,
+    timestamp: provenance.timestampLabel,
+    confidence: provenance.statusLabel,
+  });
   const copy = [
     title,
     summary,
@@ -83,7 +89,8 @@ export const buildMonthlySummary = ({
     `Source: ${sourceLine}`,
     `Timestamp: ${provenance.timestampLabel}`,
     `Data age: ${provenance.ageLabel}`,
-    `Confidence: ${provenance.statusLabel}`,
+    "",
+    ...complianceStamp,
   ].join("\n");
 
   return {

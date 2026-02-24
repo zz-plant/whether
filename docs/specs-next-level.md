@@ -68,3 +68,56 @@
 - All new UI controls must pass the “no mouse” rule.
 - Alerts and brief exports must be reachable via keyboard and screen reader.
 - No layout shifts when loading export content.
+
+## 7) AUP-enabled operating posture (less restrained, still compliant)
+
+Now that an Acceptable Use Policy is in place, the product can move from strictly descriptive
+briefing language toward stronger internal operating guidance. This section defines where we can
+be more assertive without crossing legal boundaries.
+
+### 7.1 Recommendation tone upgrade
+- Upgrade selected surfaces from "signals only" phrasing to action-oriented posture:
+  - "Recommended default posture"
+  - "Base case / upside / downside operating plan"
+  - "Do now / hold / monitor" blocks
+- Keep probabilistic qualifiers in all recommendation surfaces.
+- Never present outcomes as guaranteed or deterministic.
+
+### 7.2 Internal distribution + embed permissions
+- Enable first-class internal export + reuse workflows:
+  - Copy-ready board memo blocks.
+  - Investor update snippets.
+  - Internal wiki-compatible markdown exports.
+- Add an "Internal use" label on exported assets.
+
+### 7.3 Human-in-the-loop decision assist
+- Allow the app to prefill draft recommendations for:
+  - Hiring pace options.
+  - Budget allocation trade-offs.
+  - Product roadmap sequencing under macro constraints.
+- Require explicit human attestation before marking any draft as a final decision.
+- Block or warn when users attempt to use generated content as sole basis for
+  people-affecting decisions.
+
+### 7.4 Guardrail UX and enforcement controls
+- Add policy-aware interaction checks:
+  - Warning banner for regulated-advice-like wording.
+  - Confirmation modal when exporting high-certainty language.
+  - Admin event logs for policy-triggered warnings and blocks.
+- Preserve an enforcement path for repeat or severe policy violations.
+
+### 7.5 API and platform boundaries
+- Permit richer operational integrations for internal workflows.
+- Keep anti-circumvention controls explicit:
+  - Rate-limit and authentication enforcement.
+  - No unauthorized resale/white-label operation.
+  - No reverse-engineering of proprietary scoring logic.
+
+### 7.6 Acceptance criteria
+- Recommendation modules include confidence + uncertainty labels by default.
+- Export flows stamp every artifact with:
+  - "Informational, not professional advice"
+  - Timestamp and source links
+  - "Internal use" marker
+- Any workflow producing legally significant individual-impact decisions must
+  require human review and cannot complete in fully automated mode.
