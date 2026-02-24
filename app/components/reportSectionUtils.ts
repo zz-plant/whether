@@ -83,25 +83,29 @@ export const getRegimeLabel = (regime: RegimeAssessment["regime"]) => {
 export const regimeBadges = [
   {
     key: "SCARCITY",
-    label: "Survival",
+    label: "Scarcity",
+    icon: "shield",
     description: "Cash is scarce; protect runway and defer bets.",
     classes: "border-rose-500/60 bg-rose-500/15 text-rose-100",
   },
   {
     key: "DEFENSIVE",
     label: "Safety",
+    icon: "lock",
     description: "Capital is cautious; prioritize durability and retention.",
     classes: "border-amber-400/60 bg-amber-400/15 text-amber-100",
   },
   {
     key: "VOLATILE",
     label: "Stability",
+    icon: "balance",
     description: "Signals are mixed; balance experimentation with controls.",
     classes: "border-sky-400/60 bg-sky-400/15 text-sky-100",
   },
   {
     key: "EXPANSION",
     label: "Growth",
+    icon: "rocket",
     description: "Risk appetite is open; scale initiatives responsibly.",
     classes: "border-emerald-400/60 bg-emerald-400/15 text-emerald-100",
   },

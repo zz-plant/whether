@@ -38,6 +38,42 @@ const regimeLabelMap = {
   EXPANSION: "Expansion",
 } as const;
 
+
+const RegimeStatusIcon = ({ regime }: { regime: keyof typeof regimeLabelMap }) => {
+  switch (regime) {
+    case "SCARCITY":
+      return (
+        <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+          <path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6l7-3z" />
+        </svg>
+      );
+    case "DEFENSIVE":
+      return (
+        <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+          <rect x="5" y="11" width="14" height="10" rx="2" />
+          <path d="M8 11V8a4 4 0 118 0v3" />
+        </svg>
+      );
+    case "VOLATILE":
+      return (
+        <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+          <path d="M12 4v15" />
+          <path d="M6 8h12" />
+          <path d="M4 8l-2 4h4l-2-4zm16 0l-2 4h4l-2-4z" />
+          <path d="M9 19h6" />
+        </svg>
+      );
+    case "EXPANSION":
+      return (
+        <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+          <path d="M14 4c3 0 6 3 6 6-2 .3-4.4 1.6-6.3 3.5C11.7 15.5 10.3 18 10 20c-3 0-6-3-6-6 2-.3 4.4-1.7 6.4-3.7C12.3 8.4 13.7 6 14 4z" />
+          <circle cx="14.5" cy="9.5" r="1.3" />
+          <path d="M7 17l-3 3" />
+        </svg>
+      );
+  }
+};
+
 export const generateMetadata = async ({
   searchParams,
 }: {
@@ -258,7 +294,12 @@ export default async function HomePage({
             Live market and capital conditions translated into a clear operating posture for the next cycle.
           </p>
           <div className="py-2 sm:py-4">
-            <p className="text-5xl font-bold tracking-[-0.03em] text-slate-50 sm:text-6xl">{statusLabel}</p>
+            <p className="inline-flex items-center justify-center gap-3 text-5xl font-bold tracking-[-0.03em] text-slate-50 sm:text-6xl">
+              <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-700/80 bg-slate-900/70 text-slate-100 sm:h-14 sm:w-14">
+                <RegimeStatusIcon regime={assessment.regime} />
+              </span>
+              <span>{statusLabel}</span>
+            </p>
           </div>
           <p className="text-sm font-semibold tracking-[0.08em] text-slate-100">{postureDelta}</p>
           <p className="text-[11px] font-medium tracking-[0.14em] text-slate-400">
@@ -280,7 +321,7 @@ export default async function HomePage({
           </ul>
         </article>
 
-        <div className="grid gap-4">
+        <div className="grid gap-4 md:grid-cols-2">
           <article className="weather-surface space-y-3 p-5" aria-label="Prioritize">
             <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-200">Prioritize</h2>
             <ul className="space-y-2 text-sm text-slate-100">
