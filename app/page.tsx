@@ -457,65 +457,69 @@ export default async function HomePage({
           <p className="text-sm text-slate-300">{trustStatusAction}</p>
         </article>
 
-        <section className="space-y-3" aria-label="Posture forecast timeline">
-          <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-sky-100">
-            Trigger outlook timeline
-          </h2>
-          <div className="weather-forecast-strip lg:grid-cols-4" role="list" aria-label="Posture forecast timeline">
-            {horizonForecast.map((item) => (
-              <article
-                key={item.horizon}
-                className="weather-forecast-card"
-                role="listitem"
-                aria-label={`Posture forecast ${item.horizon}: ${item.label}`}
-              >
-                <span className="weather-forecast-icon" aria-hidden="true">
-                  {item.label === "Likely shift" ? "⚠" : item.label === "Watch" ? "◔" : item.label === "Stable" ? "✓" : "?"}
-                </span>
-                <div className="space-y-2">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">{item.horizon}</p>
-                  <p className="text-sm font-semibold text-slate-50">{item.label}</p>
-                  <p className="text-sm text-slate-300">{item.rationale}</p>
-                  <p className="inline-flex rounded-full border border-slate-600/70 bg-slate-900/70 px-2.5 py-1 text-[11px] font-medium text-slate-200">
-                    {item.confidence}
-                  </p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <article className="weather-surface space-y-3 p-5" aria-label="Prioritize">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-200">Prioritize</h2>
-            <ul className="space-y-2 text-sm text-slate-100">
-              {startItems.slice(0, 5).map((item) => (
-                <li key={item} className="flex items-start gap-2"><span aria-hidden="true" className="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-300" />{item}</li>
-              ))}
-            </ul>
-          </article>
-          <article className="weather-surface space-y-3 p-5" aria-label="Avoid">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-200">Avoid</h2>
-            <ul className="space-y-2 text-sm text-slate-100">
-              {stopItems.slice(0, 5).map((item) => (
-                <li key={item} className="flex items-start gap-2"><span aria-hidden="true" className="mt-1 h-1.5 w-1.5 rounded-full bg-amber-300" />{item}</li>
-              ))}
-            </ul>
-          </article>
-        </div>
-
-        <details className="weather-surface group p-4 sm:p-5" aria-label="Posture change triggers">
+        <details className="weather-surface group p-4 sm:p-5" aria-label="Expanded posture details">
           <summary className="flex min-h-[48px] cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold tracking-[0.08em] text-slate-200 focus-visible:rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation">
-            <span>What would change this posture</span>
+            <span>See detailed triggers and execution checklist</span>
             <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-400 transition-transform group-open:rotate-180">
               ⌄
             </span>
           </summary>
-          <ul className="mt-3 space-y-2 text-sm text-slate-200">
-            <li>• Will shift if Capital Tightness rises above {tightnessThreshold} for two consecutive reads.</li>
-            <li>• Will shift if Risk Appetite falls below {riskThreshold} and remains there through the next update.</li>
-            <li>• Curve slope turns negative and stays inverted through the next cycle.</li>
-          </ul>
+
+          <section className="mt-4 space-y-3" aria-label="Posture forecast timeline">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-sky-100">
+              Trigger outlook timeline
+            </h2>
+            <div className="weather-forecast-strip lg:grid-cols-4" role="list" aria-label="Posture forecast timeline">
+              {horizonForecast.map((item) => (
+                <article
+                  key={item.horizon}
+                  className="weather-forecast-card"
+                  role="listitem"
+                  aria-label={`Posture forecast ${item.horizon}: ${item.label}`}
+                >
+                  <span className="weather-forecast-icon" aria-hidden="true">
+                    {item.label === "Likely shift" ? "⚠" : item.label === "Watch" ? "◔" : item.label === "Stable" ? "✓" : "?"}
+                  </span>
+                  <div className="space-y-2">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">{item.horizon}</p>
+                    <p className="text-sm font-semibold text-slate-50">{item.label}</p>
+                    <p className="text-sm text-slate-300">{item.rationale}</p>
+                    <p className="inline-flex rounded-full border border-slate-600/70 bg-slate-900/70 px-2.5 py-1 text-[11px] font-medium text-slate-200">
+                      {item.confidence}
+                    </p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            <article className="weather-panel space-y-3 p-5" aria-label="Prioritize">
+              <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-200">Prioritize</h2>
+              <ul className="space-y-2 text-sm text-slate-100">
+                {startItems.slice(0, 5).map((item) => (
+                  <li key={item} className="flex items-start gap-2"><span aria-hidden="true" className="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-300" />{item}</li>
+                ))}
+              </ul>
+            </article>
+            <article className="weather-panel space-y-3 p-5" aria-label="Avoid">
+              <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-200">Avoid</h2>
+              <ul className="space-y-2 text-sm text-slate-100">
+                {stopItems.slice(0, 5).map((item) => (
+                  <li key={item} className="flex items-start gap-2"><span aria-hidden="true" className="mt-1 h-1.5 w-1.5 rounded-full bg-amber-300" />{item}</li>
+                ))}
+              </ul>
+            </article>
+          </div>
+
+          <div className="mt-4 border-t border-slate-800/70 pt-4">
+            <p className="text-sm font-semibold tracking-[0.08em] text-slate-200">What would change this posture</p>
+            <ul className="mt-3 space-y-2 text-sm text-slate-200">
+              <li>• Will shift if Capital Tightness rises above {tightnessThreshold} for two consecutive reads.</li>
+              <li>• Will shift if Risk Appetite falls below {riskThreshold} and remains there through the next update.</li>
+              <li>• Curve slope turns negative and stays inverted through the next cycle.</li>
+            </ul>
+          </div>
         </details>
 
       </section>
