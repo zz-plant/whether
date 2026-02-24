@@ -11,6 +11,7 @@
   --shell-glow-tertiary: rgba(45, 212, 191, 0.08);
   --surface-edge: rgba(99, 102, 241, 0.1);
   --surface-sheen: rgba(148, 163, 184, 0.08);
+  --surface-elevated: rgba(56, 189, 248, 0.05);
 }
 
 html {
@@ -68,17 +69,21 @@ body {
 }
 
 .weather-appbar {
-  @apply rounded-[22px] border border-slate-800/70 bg-slate-950/85 backdrop-blur-lg;
+  @apply rounded-[22px] border border-slate-700/75 bg-slate-950/85 backdrop-blur-lg;
+  background-image: linear-gradient(150deg, rgba(56, 189, 248, 0.07), rgba(99, 102, 241, 0.05) 48%, rgba(2, 6, 23, 0.2));
   box-shadow:
-    0 16px 32px -24px rgba(2, 6, 23, 0.72),
+    0 18px 34px -24px rgba(2, 6, 23, 0.76),
+    0 0 0 1px rgba(99, 102, 241, 0.07),
     inset 0 1px 0 rgba(148, 163, 184, 0.12),
     inset 0 0 0 1px rgba(15, 23, 42, 0.45);
 }
 
 .weather-panel-static {
-  @apply rounded-[22px] border border-slate-800/60 bg-slate-950/65;
+  @apply rounded-[22px] border border-slate-700/65 bg-slate-950/65;
+  background-image: linear-gradient(156deg, rgba(56, 189, 248, 0.05), rgba(15, 23, 42, 0.18) 70%);
   box-shadow:
-    0 14px 28px -24px rgba(2, 6, 23, 0.65),
+    0 16px 30px -24px rgba(2, 6, 23, 0.68),
+    0 0 0 1px rgba(56, 189, 248, 0.05),
     inset 0 1px 0 rgba(148, 163, 184, 0.1),
     inset 0 0 0 1px rgba(15, 23, 42, 0.38);
 }
@@ -106,13 +111,15 @@ body {
 }
 
 .weather-forecast-card {
-  @apply rounded-2xl border border-slate-800/70 bg-slate-950/70 p-3;
+  @apply rounded-2xl border border-slate-700/75 bg-slate-950/70 p-3;
   display: flex;
   gap: 0.75rem;
   align-items: flex-start;
+  background-image: linear-gradient(150deg, rgba(56, 189, 248, 0.05), rgba(99, 102, 241, 0.04) 56%, rgba(2, 6, 23, 0.16));
   box-shadow:
-    0 14px 26px -22px rgba(2, 6, 23, 0.7),
-    inset 0 1px 0 rgba(148, 163, 184, 0.1),
+    0 16px 28px -22px rgba(2, 6, 23, 0.72),
+    0 0 0 1px rgba(56, 189, 248, 0.05),
+    inset 0 1px 0 rgba(148, 163, 184, 0.11),
     inset 0 0 0 1px rgba(15, 23, 42, 0.45);
 }
 
@@ -155,8 +162,8 @@ body {
 }
 
 .weather-surface {
-  @apply rounded-2xl border border-slate-800/65 bg-slate-950/60 backdrop-blur;
-  background-image: linear-gradient(160deg, rgba(56, 189, 248, 0.04), rgba(15, 23, 42, 0.16) 72%);
+  @apply rounded-2xl border border-slate-700/70 bg-slate-950/60 backdrop-blur;
+  background-image: linear-gradient(162deg, rgba(56, 189, 248, 0.05), rgba(99, 102, 241, 0.04) 54%, rgba(15, 23, 42, 0.17));
   box-shadow:
     inset 0 1px 0 rgba(186, 230, 253, 0.1),
     inset 0 0 0 1px rgba(15, 23, 42, 0.45);
@@ -164,8 +171,8 @@ body {
 
 :where(.weather-panel > .weather-surface),
 :where(.weather-surface > .weather-surface) {
-  border-color: rgba(51, 65, 85, 0.48);
-  background-color: rgba(2, 6, 23, 0.46);
+  border-color: rgba(71, 85, 105, 0.52);
+  background-color: rgba(2, 6, 23, 0.5);
   box-shadow:
     inset 0 1px 0 rgba(186, 230, 253, 0.04),
     inset 0 0 0 1px rgba(15, 23, 42, 0.28);
@@ -190,7 +197,8 @@ body {
 }
 
 .weather-pill-muted {
-  @apply rounded-full border border-slate-800/70 bg-slate-900/60 text-slate-200;
+  @apply rounded-full border border-slate-700/75 bg-slate-900/65 text-slate-200;
+  background-image: linear-gradient(120deg, rgba(99, 102, 241, 0.08), rgba(15, 23, 42, 0.24));
 }
 
 .weather-tab {
@@ -213,8 +221,8 @@ body {
 }
 
 .weather-button {
-  @apply rounded-2xl border border-slate-700/70 text-slate-200;
-  background: rgba(2, 6, 23, 0.55);
+  @apply rounded-2xl border border-slate-700/75 text-slate-200;
+  background: linear-gradient(150deg, rgba(30, 41, 59, 0.66), rgba(2, 6, 23, 0.7));
   box-shadow:
     inset 0 0 0 1px rgba(15, 23, 42, 0.5),
     0 14px 26px -18px rgba(2, 6, 23, 0.85),
@@ -260,7 +268,7 @@ body {
     box-shadow:
       inset 0 0 0 1px rgba(15, 23, 42, 0.35),
       0 20px 36px -24px rgba(2, 6, 23, 0.7),
-      0 8px 18px -14px rgba(56, 189, 248, 0.3);
+      0 10px 20px -14px rgba(99, 102, 241, 0.28);
   }
 
   .weather-button:hover {
@@ -269,7 +277,7 @@ body {
     box-shadow:
       inset 0 0 0 1px rgba(15, 23, 42, 0.45),
       0 20px 32px -22px rgba(2, 6, 23, 0.9),
-      0 8px 18px -14px rgba(56, 189, 248, 0.24);
+      0 8px 18px -14px rgba(99, 102, 241, 0.24);
   }
 
   .weather-button-primary:hover {
