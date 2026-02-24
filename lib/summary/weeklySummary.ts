@@ -49,22 +49,22 @@ const weeklyOutputTemplates: Record<RegimeAssessment["regime"], WeeklyOutputTemp
       "Assume slower approvals, tighter scrutiny, and low patience for long-horizon bets.",
     ],
     productMeaning: [
-      "Optimize for runway and near-term ROI, not velocity",
-      "Reduce exposure to bets that require external optimism",
-      "Prefer reversible decisions and staged commitments",
+      "Anchor the roadmap to runway protection and near-term ROI",
+      "Cut bets that depend on external sentiment improving",
+      "Use reversible releases and staged commitments by default",
     ],
     safeBets: [
-      "Retention, expansion, and monetization of existing users",
+      "Retention, expansion, and monetization for existing users",
       "Reliability, trust, and cost-to-serve improvements",
-      "Features with payback < 6 months",
+      "Features with payback in under 6 months",
     ],
     failureModes: [
-      "Headcount growth without committed revenue",
-      "Long-horizon platform rewrites",
-      "Experiments that reduce short-term cash flow",
+      "Adding headcount before revenue is committed",
+      "Starting long-horizon platform rewrites",
+      "Running experiments that weaken short-term cash flow",
     ],
     planningQuote:
-      "“Given current market conditions, we should bias toward short-payback, reversible work and avoid expansion bets that increase burn or rely on improved risk appetite.”",
+      "“Prioritize short-payback, reversible work and stop expansion bets that raise burn or depend on a rebound in risk appetite.”",
   },
   DEFENSIVE: {
     climateLabel: "⚠️ RISK-SELECTIVE / CAPITAL-TIGHT",
@@ -73,9 +73,9 @@ const weeklyOutputTemplates: Record<RegimeAssessment["regime"], WeeklyOutputTemp
       "Expect tighter ROI gates and a focus on efficiency over growth-at-any-price.",
     ],
     productMeaning: [
-      "Run a tighter portfolio: fewer bets, clearer payback",
-      "Prioritize retention and margin over net-new expansion",
-      "Ship in staged commitments with checkpoints every quarter",
+      "Run a tighter portfolio with fewer bets and explicit payback",
+      "Put retention and margin ahead of net-new expansion",
+      "Release in stages with quarterly continuation checkpoints",
     ],
     safeBets: [
       "Retention, expansion, and pricing optimization",
@@ -83,12 +83,12 @@ const weeklyOutputTemplates: Record<RegimeAssessment["regime"], WeeklyOutputTemp
       "Revenue protection features with fast payback",
     ],
     failureModes: [
-      "Low-leverage experiments with unclear monetization",
-      "Headcount growth without unit economics proof",
-      "Aggressive expansions that dilute focus",
+      "Running low-leverage experiments without clear monetization",
+      "Growing headcount before unit economics are proven",
+      "Pushing aggressive expansions that dilute focus",
     ],
     planningQuote:
-      "“Given current market conditions, we should focus on efficiency-first bets that improve retention and margins, with explicit payback gates.”",
+      "“Commit to efficiency-first bets that improve retention and margins, and enforce explicit payback gates on every expansion proposal.”",
   },
   VOLATILE: {
     climateLabel: "⚠️ RISK-OFF / CAPITAL-LOOSE",
@@ -97,9 +97,9 @@ const weeklyOutputTemplates: Record<RegimeAssessment["regime"], WeeklyOutputTemp
       "Expect buyers to favor reliability and proof over novelty.",
     ],
     productMeaning: [
-      "De-risk the roadmap with reliability and trust bets",
-      "Avoid disruptive changes that spook cautious buyers",
-      "Prioritize reversible launches and staged rollouts",
+      "De-risk the roadmap with reliability and trust investments",
+      "Avoid disruptive changes that unsettle cautious buyers",
+      "Launch in reversible stages with clear rollback paths",
     ],
     safeBets: [
       "Reliability, security, and trust improvements",
@@ -107,12 +107,12 @@ const weeklyOutputTemplates: Record<RegimeAssessment["regime"], WeeklyOutputTemp
       "Payback-positive enhancements to core workflows",
     ],
     failureModes: [
-      "Flashy launches without proof of value",
-      "Broad rebrands or UX overhauls",
-      "Experiments that reduce short-term revenue confidence",
+      "Shipping flashy launches before value is proven",
+      "Attempting broad rebrands or UX overhauls",
+      "Running experiments that erode short-term revenue confidence",
     ],
     planningQuote:
-      "“Given current market conditions, we should lead with reliability and evidence, keeping launches reversible until buyer confidence returns.”",
+      "“Lead with reliability and evidence, and keep launches reversible until buyer confidence strengthens.”",
   },
   EXPANSION: {
     climateLabel: "✅ RISK-ON / CAPITAL-LOOSE",
@@ -122,8 +122,8 @@ const weeklyOutputTemplates: Record<RegimeAssessment["regime"], WeeklyOutputTemp
     ],
     productMeaning: [
       "Prioritize speed and distribution over perfection",
-      "Scale proven growth channels and expand market coverage",
-      "Keep guardrails on payback, but move decisively",
+      "Scale proven growth channels and widen market coverage",
+      "Move decisively while enforcing payback guardrails",
     ],
     safeBets: [
       "Growth experiments with clear scaling paths",
@@ -132,11 +132,11 @@ const weeklyOutputTemplates: Record<RegimeAssessment["regime"], WeeklyOutputTemp
     ],
     failureModes: [
       "Over-optimizing cost at the expense of momentum",
-      "Delayed launches waiting for perfect data",
+      "Delaying launches while waiting for perfect data",
       "Under-investing in capacity while demand is strong",
     ],
     planningQuote:
-      "“Given current market conditions, we should move quickly on growth bets while maintaining payback discipline and clear exit criteria.”",
+      "“Move quickly on growth bets, maintain payback discipline, and set clear exit criteria before scaling spend.”",
   },
 };
 
@@ -199,7 +199,7 @@ export const buildWeeklySummary = ({
     "",
     "---",
     "",
-    "WHAT THIS MEANS FOR PRODUCT TEAMS (NOW)",
+    "RECOMMENDED MOVES FOR PRODUCT TEAMS (NOW)",
     "",
     ...template.productMeaning,
     "",
@@ -207,7 +207,7 @@ export const buildWeeklySummary = ({
     "",
     "---",
     "",
-    "SAFE BETS IN THIS CLIMATE",
+    "EXECUTION PRIORITIES THAT TRAVEL WELL",
     "",
     ...template.safeBets,
     "",
@@ -215,7 +215,7 @@ export const buildWeeklySummary = ({
     "",
     "---",
     "",
-    "LIKELY FAILURE MODES RIGHT NOW",
+    "WATCHOUTS THAT BREAK EXECUTION",
     "",
     ...template.failureModes,
     "",
@@ -223,7 +223,7 @@ export const buildWeeklySummary = ({
     "",
     "---",
     "",
-    "RECOMMENDED LANGUAGE FOR PLANNING",
+    "PLANNING LANGUAGE TO USE",
     "",
     `> ${template.planningQuote}`,
     "",
@@ -239,7 +239,7 @@ export const buildWeeklySummary = ({
     "",
     "---",
     "",
-    "PROVENANCE",
+    "DATA PROVENANCE & QUALITY",
     "",
     `Source: ${sourceLine}`,
     `Timestamp: ${provenance.timestampLabel}`,
