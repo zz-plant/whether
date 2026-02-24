@@ -398,10 +398,10 @@ export const DecisionShieldPanel = ({
           <div className="min-w-0">
             <p className="type-label text-slate-400">Decision Shield</p>
             <h3 id="decision-shield-title" className="type-section text-slate-100">
-              Validate an action
+              Decide the next move
             </h3>
             <p className="mt-2 type-data text-slate-300">
-              Pressure-test the next move against current market climate physics, then share the verdict.
+              Run the action through current market conditions, then share the recommendation with guardrails.
             </p>
           </div>
           <div className="flex flex-col items-end gap-3">
@@ -415,7 +415,7 @@ export const DecisionShieldPanel = ({
               {isCopying ? (
                 <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />
               ) : null}
-              {copied ? "Copied" : isCopying ? "Copying" : "Copy verdict"}
+              {copied ? "Copied" : isCopying ? "Copying" : "Copy recommendation"}
             </button>
             <button
               type="button"
@@ -440,7 +440,7 @@ export const DecisionShieldPanel = ({
         </div>
         <p className="sr-only" role="status" aria-live="polite">
           {copied
-            ? "Verdict copied to clipboard."
+            ? "Recommendation copied to clipboard."
             : linkCopied
               ? "Decision Shield link copied to clipboard."
               : copyError || linkCopyError
@@ -460,13 +460,13 @@ export const DecisionShieldPanel = ({
                 Clipboard blocked
               </p>
               <p className="mt-2 text-amber-100/90">
-                Select and copy the verdict below to share it manually.
+                Select and copy the recommendation below to share it manually.
               </p>
               <textarea
                 readOnly
                 value={shareText}
                 rows={8}
-                aria-label="Copy-ready Decision Shield verdict"
+                aria-label="Copy-ready Decision Shield recommendation"
                 className="mt-3 w-full rounded-lg border border-amber-400/30 bg-slate-950/80 p-3 font-mono text-base text-amber-100 touch-manipulation"
               />
             </div>
@@ -476,7 +476,7 @@ export const DecisionShieldPanel = ({
         <div className="mt-6 space-y-4">
           <div className="weather-surface p-4">
             <p className="type-label text-slate-400">
-              Inputs → Verdict → Why → Guardrail → Reversal trigger
+              Inputs → Recommendation → Why → Guardrail → Re-check trigger
             </p>
           </div>
           <div className="grid gap-4 lg:grid-cols-3">
@@ -694,14 +694,16 @@ export const DecisionShieldPanel = ({
 
           <div className="grid gap-4 lg:grid-cols-[1.2fr,1fr]">
             <div className="weather-surface p-4">
-              <p className="type-label text-slate-400">Verdict</p>
+              <p className="type-label text-slate-400">Recommendation</p>
               <div
                 className={`mt-3 inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] ${verdictStyles[output.verdict]}`}
               >
                 {output.verdict}
               </div>
               <p className="mt-3 type-data text-slate-200 break-words">{output.summary}</p>
-              <p className="mt-3 text-xs text-slate-500">Copy-ready, shareable verdict.</p>
+              <p className="mt-3 text-xs text-slate-500">
+                Share-ready recommendation. Use with human review and team judgment.
+              </p>
             </div>
             <div className="weather-surface p-4">
               <p className="type-label text-slate-400">Why (signals)</p>
@@ -717,11 +719,11 @@ export const DecisionShieldPanel = ({
           </div>
           <div className="grid gap-4 lg:grid-cols-2">
             <div className="weather-surface p-4">
-              <p className="type-label text-slate-400">Guardrail</p>
+              <p className="type-label text-slate-400">Execution guardrail</p>
               <p className="mt-3 type-data text-slate-300 break-words">{output.guardrail}</p>
             </div>
             <div className="weather-surface p-4">
-              <p className="type-label text-slate-400">Reversal trigger</p>
+              <p className="type-label text-slate-400">Re-check trigger</p>
               <p className="mt-3 type-data text-slate-300 break-words">
                 {output.reversalTrigger}
               </p>

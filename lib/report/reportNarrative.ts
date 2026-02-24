@@ -2,12 +2,12 @@ import type { RegimeAssessment } from "../regimeEngine";
 
 const narrativeSigns = {
   inversion:
-    "When curve slope stays inverted, assume decision caution will persist for 1–2 quarters.",
+    "If curve slope stays inverted for multiple reads, keep hiring and spend approvals in short-cycle tranches for the next 1–2 quarters.",
   tightness:
-    "When cash availability tightens and approvals slow, expect roadmap compression before demand recovers.",
+    "If cash availability tightens and approvals slow, compress roadmap scope to near-term revenue, retention, and reliability outcomes.",
   risk:
-    "When risk appetite softens, keep launches reversible and measure retention before scaling scope.",
-  fallback: "No additional caution signs this cycle; maintain baseline monitoring.",
+    "If risk appetite softens, keep launches reversible and require retention/conversion proof before scaling.",
+  fallback: "No additional stress signals this cycle; execute the baseline plan and monitor weekly.",
 } as const;
 
 export const buildSignsToWatch = (assessment: RegimeAssessment) => {

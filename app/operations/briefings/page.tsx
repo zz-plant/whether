@@ -83,10 +83,10 @@ export default async function OperationsBriefingsPage({
         "Live refresh pending. Using last verified snapshot.")
       : "Live refresh healthy. Next expected update: 48h.";
   const trustStatusAction = historicalSelection
-    ? "Use historical data for retrospectives; avoid approving new bets until live signals return."
+    ? "Use historical data for retrospectives and scenario drills; finalize approvals after confirming live signals."
     : isFallback
       ? "Hold irreversible decisions until live signals return or you validate the cache."
-      : "Signals are live; use them to confirm playbook moves and decision shields.";
+      : "Signals are live; proceed with this cycle's approvals using plan, decision, and briefing workflows.";
   const trustStatusTone = historicalSelection
     ? "historical"
     : isFallback

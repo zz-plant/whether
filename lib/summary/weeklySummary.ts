@@ -64,7 +64,7 @@ const weeklyOutputTemplates: Record<RegimeAssessment["regime"], WeeklyOutputTemp
       "Experiments that reduce short-term cash flow",
     ],
     planningQuote:
-      "“Given current market conditions, we should bias toward short-payback, reversible work and avoid expansion bets that increase burn or rely on improved risk appetite.”",
+      "“This cycle, prioritize short-payback, reversible work and pause expansion bets that increase burn or depend on improved risk appetite.”",
   },
   DEFENSIVE: {
     climateLabel: "⚠️ RISK-SELECTIVE / CAPITAL-TIGHT",
@@ -88,7 +88,7 @@ const weeklyOutputTemplates: Record<RegimeAssessment["regime"], WeeklyOutputTemp
       "Aggressive expansions that dilute focus",
     ],
     planningQuote:
-      "“Given current market conditions, we should focus on efficiency-first bets that improve retention and margins, with explicit payback gates.”",
+      "“This cycle, run an efficiency-first portfolio: prioritize retention and margin gains, and require explicit payback gates before scaling scope.”",
   },
   VOLATILE: {
     climateLabel: "⚠️ RISK-OFF / CAPITAL-LOOSE",
@@ -112,7 +112,7 @@ const weeklyOutputTemplates: Record<RegimeAssessment["regime"], WeeklyOutputTemp
       "Experiments that reduce short-term revenue confidence",
     ],
     planningQuote:
-      "“Given current market conditions, we should lead with reliability and evidence, keeping launches reversible until buyer confidence returns.”",
+      "“This cycle, lead with reliability and proof: ship reversible launches and scale only when buyer confidence and conversion data hold.”",
   },
   EXPANSION: {
     climateLabel: "✅ RISK-ON / CAPITAL-LOOSE",
@@ -136,7 +136,7 @@ const weeklyOutputTemplates: Record<RegimeAssessment["regime"], WeeklyOutputTemp
       "Under-investing in capacity while demand is strong",
     ],
     planningQuote:
-      "“Given current market conditions, we should move quickly on growth bets while maintaining payback discipline and clear exit criteria.”",
+      "“This cycle, accelerate proven growth bets while holding payback discipline and explicit exit criteria for underperforming lanes.”",
   },
 };
 
@@ -207,7 +207,7 @@ export const buildWeeklySummary = ({
     "",
     "---",
     "",
-    "SAFE BETS IN THIS CLIMATE",
+    "PRIMARY MOVES THIS CYCLE",
     "",
     ...template.safeBets,
     "",
@@ -215,7 +215,7 @@ export const buildWeeklySummary = ({
     "",
     "---",
     "",
-    "LIKELY FAILURE MODES RIGHT NOW",
+    "COMMITMENTS TO AVOID THIS CYCLE",
     "",
     ...template.failureModes,
     "",
@@ -250,8 +250,18 @@ export const buildWeeklySummary = ({
     "",
     "---",
     "",
+    "EXECUTION OWNERSHIP",
+    "",
+    "Owner: Product + Engineering lead",
+    "Cadence: weekly review, monthly recommit",
+    "Deadline: confirm this cycle's moves by Friday EOD",
+    "",
+    "",
+    "",
+    "---",
+    "",
     "Actions:",
-    "Copy for roadmap review Check a decision Why this verdict",
+    "Copy for roadmap review Check a decision Export for board sync",
   ].join("\n");
 
   return {

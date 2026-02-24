@@ -141,7 +141,7 @@ export const evaluateDecision = (
 
   return {
     verdict,
-    summary: `Verdict: ${actionLabel} is ${verdict.toLowerCase()} for a ${input.lifecycle.toLowerCase()} team in ${assessment.regime.toLowerCase()} conditions.`,
+    summary: `Recommendation: ${actionLabel} is ${verdict.toLowerCase()} for a ${input.lifecycle.toLowerCase()} team in ${assessment.regime.toLowerCase()} conditions; confirm with human review.`,
     bullets,
     guardrail: DECISION_GUARDRAILS[input.action],
     reversalTrigger: buildReversalTrigger(assessment),

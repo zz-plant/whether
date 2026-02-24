@@ -192,10 +192,10 @@ export default async function HomePage({
         "Live refresh pending. Using last verified snapshot.")
       : "Live refresh healthy. Next expected update: 48h.";
   const trustStatusAction = historicalSelection
-    ? "Use for retrospectives only; avoid live planning calls until you return to current data."
+    ? "Use historical data for retrospectives and scenario drills; finalize approvals after confirming live signals."
     : isFallback
       ? "Pause irreversible decisions until the live feed returns or you confirm the cache."
-      : "Safe to use for near-term planning; proceed with normal approval flow.";
+      : "Signals are live; proceed with this cycle's approvals using the recommended workflows.";
   const trustStatusTone = historicalSelection
     ? "historical"
     : isFallback
