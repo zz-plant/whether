@@ -238,6 +238,7 @@ export default async function HomePage({
         label: "What changed this week",
       }}
       sidebarVariant="hidden"
+      hideHeroChrome={true}
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
       structuredData={structuredData}

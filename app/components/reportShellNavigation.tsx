@@ -167,10 +167,10 @@ export const ReportPageNavigation = ({
       <div className="space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-semibold tracking-[0.16em] text-slate-400">
           <span>Current Climate is the default answer surface.</span>
-          <span className="text-slate-300">Optional context: {currentLink.label}</span>
+          <span className="text-slate-300">{currentLink.label === "Current Climate" ? "Optional context pages are available." : `Optional context: ${currentLink.label}`}</span>
         </div>
 
-        {variant === "full" ? (
+        {variant === "full" && currentLink.label !== "Current Climate" ? (
           <div className="rounded-2xl border border-slate-800/70 bg-slate-950/40 px-3 py-2 text-left">
             <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">
               Current page

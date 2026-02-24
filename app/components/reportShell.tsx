@@ -47,6 +47,7 @@ export const ReportShell = ({
   pageNavVariant = "full",
   showPageNavigation = true,
   sidebarVariant = "full",
+  hideHeroChrome = false,
   primaryCta = {
     href: "#weekly-action-summary",
     label: "This week",
@@ -86,6 +87,7 @@ export const ReportShell = ({
   pageNavVariant?: "full" | "compact";
   showPageNavigation?: boolean;
   sidebarVariant?: "full" | "hidden";
+  hideHeroChrome?: boolean;
   primaryCta?: { href: string; label: string };
   secondaryCta?: { href: string; label: string };
   exportCta?: { href: string; label: string } | null;
@@ -423,6 +425,8 @@ export const ReportShell = ({
             ) : null}
 
             <div className="order-1 min-w-0 space-y-8 lg:order-none lg:col-start-1 lg:row-start-1 lg:space-y-10">
+              {!hideHeroChrome ? (
+                <>
               <section className={heroSectionSpacingClassName}>
                 <div className={heroHeaderSpacingClassName}>
                   {roleSwitcher ? (
@@ -682,6 +686,9 @@ export const ReportShell = ({
                   ) : null}
                 </div>
               </section>
+
+                                </>
+              ) : null}
 
               {stageRail ? (
                 <section
