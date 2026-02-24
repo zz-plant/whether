@@ -753,6 +753,42 @@ summary:focus-visible {
   animation: fadeInPanel 180ms ease-out;
 }
 
+.onboarding-step-card {
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
+}
+
+.onboarding-step-card[data-completed="true"] {
+  border-color: rgba(52, 211, 153, 0.45);
+  box-shadow:
+    inset 0 1px 0 rgba(110, 231, 183, 0.18),
+    inset 0 0 0 1px rgba(5, 46, 22, 0.42),
+    0 14px 26px -20px rgba(16, 185, 129, 0.45);
+  transform: translateY(-2px);
+}
+
+.onboarding-step-state {
+  transition:
+    color 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease;
+  animation: onboardingStatePulse 220ms ease-out;
+}
+
+@keyframes onboardingStatePulse {
+  from {
+    opacity: 0;
+    transform: translateY(3px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 @keyframes fadeInPanel {
   from {
     opacity: 0;
@@ -769,7 +805,16 @@ summary:focus-visible {
   .anchor-feedback-active > header h2,
   .anchor-feedback-active > h2,
   .anchor-feedback-active [data-anchor-title='true'],
-  .animate-collapsible-in {
+  .animate-collapsible-in,
+  .onboarding-step-state {
     animation: none;
+  }
+
+  .onboarding-step-card {
+    transition: none;
+  }
+
+  .onboarding-step-card[data-completed="true"] {
+    transform: none;
   }
 }

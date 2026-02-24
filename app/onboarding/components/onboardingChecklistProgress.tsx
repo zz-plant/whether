@@ -130,14 +130,19 @@ export const OnboardingChecklistProgress = ({ steps }: { steps: OnboardingStep[]
 
           return (
             <li key={step.title} className="list-none">
-              <article id={`onboarding-step-${index + 1}`} className="weather-surface flex h-full scroll-mt-28 flex-col gap-3 p-4">
+              <article
+                id={`onboarding-step-${index + 1}`}
+                data-completed={isCompleted ? "true" : "false"}
+                className="weather-surface onboarding-step-card flex h-full scroll-mt-28 flex-col gap-3 p-4"
+              >
               <div className="space-y-2">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
                     Step {index + 1} of {steps.length}
                   </p>
                   <span
-                    className={`weather-chip inline-flex min-h-[32px] items-center px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${isCompleted ? "text-emerald-200" : "text-amber-200"}`}
+                    key={stepState}
+                    className={`weather-chip onboarding-step-state inline-flex min-h-[32px] items-center px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${isCompleted ? "text-emerald-200" : "text-amber-200"}`}
                   >
                     {stepState}
                   </span>
