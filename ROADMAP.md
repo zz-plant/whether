@@ -5,6 +5,25 @@ Each milestone is tied to the core loop: ingest Treasury data → compute regime
 plain‑English operational constraints with traceable sources.
 Audit notes for Milestones 5–8 live in `docs/roadmap-audit.md`.
 
+## Immediate priority backlog (lowest-hanging fruit)
+These items are sequenced for maximum operator impact with minimal net-new system design.
+
+1. **Promote export/share to the Overview header**
+   - Move leadership brief actions to the top-level report header as a primary CTA.
+   - Success signal: operators can copy or share a briefing from the first screen without scrolling.
+2. **Ship weekly digest output from existing summary primitives**
+   - Reuse weekly/monthly summary + delta generation to produce a lightweight digest payload.
+   - Success signal: recurring digest can be consumed in Slack/email workflows with citations.
+3. **Add regime alert reason codes + Time Machine deep links**
+   - Enrich alert payloads with explicit trigger reason(s) and historical context links.
+   - Success signal: every alert is actionable and auditable in one click.
+4. **Replace static macro snapshot with live fetchers (CPI, unemployment, BBB spreads)**
+   - Preserve fallback behavior and provenance metadata while moving macro data to live pulls.
+   - Success signal: macro cards show current record dates without manual snapshot refreshes.
+5. **Add source health panel (stale/failed feed visibility)**
+   - Surface per-source freshness, fallback reasons, and last successful fetch metadata.
+   - Success signal: operators can immediately see whether guidance is live, stale, or degraded.
+
 ## Milestone 0 — Repo scaffolding (Week 0)
 - [x] Establish Next.js 14 + TypeScript strict + Tailwind baseline.
 - [x] Add core directories: `app/`, `lib/`, `data/`, `public/`.
