@@ -187,8 +187,8 @@ const ActionSummaryPanel = ({
       <p className="max-w-3xl text-sm leading-relaxed text-slate-300/90">{description}</p>
       {summaryCard}
       <div className="grid gap-3 md:grid-cols-2">
-        {blocks.map((block) => (
-          <div key={block.heading} className="weather-surface p-4">
+        {blocks.map((block, index) => (
+          <div key={block.heading} className={`weather-surface p-4 ${index % 2 === 0 ? "weather-surface-sky" : "weather-surface-indigo"}`}>
             <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
               {block.heading}
             </p>
@@ -290,16 +290,19 @@ export const WeeklyActionSummaryPanel = ({
       label: "Cash availability",
       value: `${assessment.scores.tightness}/100`,
       detail: `Threshold ${assessment.thresholds.tightnessRegime} (higher = tighter).`,
+      tone: "weather-surface-indigo",
     },
     {
       label: "Risk appetite",
       value: `${assessment.scores.riskAppetite}/100`,
       detail: `Threshold ${assessment.thresholds.riskAppetiteRegime} (higher = more risk-on).`,
+      tone: "weather-surface-teal",
     },
     {
       label: "Curve slope",
       value: curveSlopeDisplay,
       detail: curveSlopeStatus,
+      tone: "weather-surface-sky",
     },
   ];
   const timingWindows = [
@@ -407,14 +410,14 @@ export const WeeklyActionSummaryPanel = ({
             </div>
             <div className="grid gap-3 sm:grid-cols-3">
               {weeklySignalTiles.map((tile) => (
-                <div key={tile.label} className="weather-surface p-4">
+                <div key={tile.label} className={`weather-surface ${tile.tone} p-4`}>
                   <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">{tile.label}</p>
                   <p className="mono mt-3 text-2xl text-slate-100">{tile.value}</p>
-                  <p className="mt-2 text-xs text-slate-500">{tile.detail}</p>
+                  <p className="mt-2 text-xs text-slate-300">{tile.detail}</p>
                 </div>
               ))}
             </div>
-            <div className="rounded-xl border border-slate-700/90 bg-slate-950/60 px-4 py-3">
+            <div className="weather-surface weather-surface-indigo rounded-xl px-4 py-3">
               <button
                 type="button"
                 aria-expanded={showMetricDefinitions}
@@ -451,17 +454,17 @@ export const WeeklyActionSummaryPanel = ({
           </div>
           <div className="grid gap-4">
             <WeeklySummaryCard summary={weeklySummary} />
-            <div className="weather-surface p-4">
-              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Cadence</p>
+            <div className="weather-surface weather-surface-teal p-4">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">Cadence</p>
               <p className="mt-3 text-sm text-slate-200">
                 Next Treasury refresh recorded {recordDateLabel}.
               </p>
-              <p className="mt-2 text-xs text-slate-500">
+              <p className="mt-2 text-xs text-slate-300">
                 Keep weekly decisions within this window unless new alerts publish.
               </p>
             </div>
-            <div className="weather-surface p-4">
-              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+            <div className="weather-surface weather-surface-sky p-4">
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
                 Best timing windows
               </p>
               <ul className="mt-3 space-y-2 text-sm text-slate-300">
@@ -481,8 +484,8 @@ export const WeeklyActionSummaryPanel = ({
 
         <div className="grid gap-4 lg:grid-cols-[1.2fr,0.8fr]">
           <div className="grid gap-3">
-            {weeklyBlocks.map((block) => (
-              <div key={block.heading} className="weather-surface p-4">
+            {weeklyBlocks.map((block, index) => (
+              <div key={block.heading} className={`weather-surface p-4 ${index % 2 === 0 ? "weather-surface-indigo" : "weather-surface-sky"}`}>
                 <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                   {block.heading}
                 </p>
@@ -497,7 +500,7 @@ export const WeeklyActionSummaryPanel = ({
               </div>
             ))}
           </div>
-          <aside className="weather-surface p-4" aria-label="Weekly decision points">
+          <aside className="weather-surface weather-surface-amber p-4" aria-label="Weekly decision points">
             <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Decision points</p>
             <ol className="mt-3 space-y-4 text-sm text-slate-300">
               {decisionChecklist.map((item, index) => (
@@ -512,14 +515,14 @@ export const WeeklyActionSummaryPanel = ({
                 </li>
               ))}
             </ol>
-            <p className="mt-4 text-xs text-slate-500">
+            <p className="mt-4 text-xs text-slate-300">
               Reference these points before roadmap or staffing changes.
             </p>
           </aside>
         </div>
 
-        <div>
-          <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Quick routes</p>
+        <div className="weather-surface weather-surface-indigo p-4">
+          <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">Quick routes</p>
           <ul className="mt-3 space-y-2 text-sm text-slate-300">
             {weeklyQuickLinks.map((link) => (
               <li key={link.href}>
@@ -533,7 +536,7 @@ export const WeeklyActionSummaryPanel = ({
             ))}
           </ul>
         </div>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-slate-300">
           Keep the weekly narrative tight so leaders can decide without re-reading the data lanes.
         </p>
       </div>
@@ -1073,7 +1076,7 @@ export const FirstTimeGuidePanel = ({
           ))}
         </ul>
       </div>
-      <p className="mt-4 text-xs text-slate-500">
+      <p className="mt-4 text-xs text-slate-300">
         Share the URL when you lock thresholds or time machine selections so every stakeholder sees
         the same climate assumptions.
       </p>
@@ -2562,7 +2565,7 @@ export const SensorArray = ({
                   <p className="break-words">{sensor.explanation}</p>
                 </figcaption>
               </figure>
-              <div className="mt-4 text-xs text-slate-500">
+              <div className="mt-4 text-xs text-slate-300">
                 <p>
                   Formula:{" "}
                   <a
@@ -3435,7 +3438,7 @@ export const FinanceStrategyPanel = ({
                   </li>
                 ))}
               </ul>
-              <p className="mt-4 text-xs text-slate-500">
+              <p className="mt-4 text-xs text-slate-300">
                 Public data only. No internal finance inputs required.
               </p>
             </div>

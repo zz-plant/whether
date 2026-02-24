@@ -256,6 +256,8 @@ export const ReportMobileNavigation = ({
       : sectionLinks.length === 1
         ? "1 section"
         : `${sectionLinks.length} sections`;
+  const pageCountLabel =
+    pageLinks.length === 1 ? "1 page" : `${pageLinks.length} pages`;
 
   const navigationRootRef = useRef<HTMLDivElement>(null);
 
@@ -279,14 +281,17 @@ export const ReportMobileNavigation = ({
               <p className="truncate text-sm font-semibold tracking-[0.08em] text-slate-100">
                 {currentLink.label}
               </p>
+              <p className="mt-1 truncate text-xs text-slate-400">{currentLink.description}</p>
             </div>
           </div>
 
-          <NavigationMenu.List className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <NavigationMenu.List aria-label="Primary report pages" className="flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {pageLinks.map((link) => {
-              const isActive = link.label === pageTitle;
+              const isActive = currentPath
+                ? isLinkActiveForPath(link.href, currentPath)
+                : link.label === pageTitle;
               return (
-                <NavigationMenu.Item key={link.href} className="flex-shrink-0">
+                <NavigationMenu.Item key={link.href} className="snap-start flex-shrink-0">
                   <NavigationMenu.Link
                     href={link.href}
                     active={isActive}
@@ -319,7 +324,7 @@ export const ReportMobileNavigation = ({
                 <span className="uppercase">All pages</span>
               </span>
               <span className="text-xs font-medium tracking-[0.12em] text-slate-400">
-                {sectionCountLabel}
+                {pageCountLabel}
               </span>
             </Collapsible.Trigger>
           </div>
@@ -330,15 +335,26 @@ export const ReportMobileNavigation = ({
             <div className="flex items-start justify-between gap-3">
               <div className="space-y-1">
                 <p className="text-base font-semibold text-slate-100">{currentLink.label}</p>
+                <p className="text-xs text-slate-400">Choose a page or jump to a section.</p>
               </div>
-              <span className="weather-chip inline-flex min-h-[44px] items-center px-3 py-1 text-xs font-semibold tracking-[0.18em] text-slate-200">
-                {sectionCountLabel}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="weather-chip inline-flex min-h-[44px] items-center px-3 py-1 text-xs font-semibold tracking-[0.18em] text-slate-200">
+                  {sectionCountLabel}
+                </span>
+                <Collapsible.Trigger
+                  type="button"
+                  className="weather-pill inline-flex min-h-[44px] items-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                >
+                  Close
+                </Collapsible.Trigger>
+              </div>
             </div>
 
-            <NavigationMenu.List className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2">
+            <NavigationMenu.List aria-label="All report pages" className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2">
               {pageLinks.map((link) => {
-                const isActive = link.label === pageTitle;
+                const isActive = currentPath
+                  ? isLinkActiveForPath(link.href, currentPath)
+                  : link.label === pageTitle;
                 return (
                   <NavigationMenu.Item key={link.href}>
                     <NavigationMenu.Link
@@ -360,7 +376,7 @@ export const ReportMobileNavigation = ({
                             : "border-slate-800/80 bg-slate-950/70 text-slate-200"
                         }`}
                       >
-                        {pageLinkIcons[link.label]}
+                        {pageLinkIcons[link.label] ?? pageLinkIcons.Method}
                       </span>
                       <span className="block text-sm font-semibold text-current">
                         {link.label}
