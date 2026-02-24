@@ -7,12 +7,12 @@ export const reportPageLinks: ReportPageLink[] = [
     description: "Confirm this week's posture and immediate cross-functional actions.",
   },
   {
-    href: "/plan",
+    href: "/operations/plan",
     label: "Plan",
     description: "Assign owners and sequence work by Now, Next, and Watch horizons.",
   },
   {
-    href: "/evidence",
+    href: "/signals",
     label: "Evidence",
     description: "Validate confidence with thresholds, timelines, and source provenance.",
   },

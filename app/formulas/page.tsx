@@ -1,14 +1,5 @@
-import type { Metadata } from "next";
-import { buildPageMetadata } from "../../lib/seo";
-import { MethodologyContent } from "./components/methodologyContent";
-
-export const metadata: Metadata = buildPageMetadata({
-  title: "Methodology — Whether",
-  description: "Sensor formulas and source links for macro signal calculations.",
-  path: "/formulas",
-  imageAlt: "Whether methodology and formula reference",
-});
+import { permanentRedirect } from "next/navigation";
 
 export default function FormulasPage() {
-  return <MethodologyContent />;
+  permanentRedirect("/methodology");
 }

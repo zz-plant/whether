@@ -62,12 +62,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     },
     {
-      url: `${siteUrl}/formulas`,
-      lastModified: staticLastModified,
-      changeFrequency: "monthly",
-      priority: 0.6,
-    },
-    {
       url: `${siteUrl}/methodology`,
       lastModified: staticLastModified,
       changeFrequency: "monthly",
