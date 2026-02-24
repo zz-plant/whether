@@ -159,6 +159,8 @@ const getRegimeLabel = (regime: RegimeAssessment["regime"]) => {
 export const getWeeklyActionGuidance = (regime: RegimeAssessment["regime"]) =>
   weeklyActionGuidance[regime];
 
+const toBullets = (items: string[]) => items.map((item) => `• ${item}`);
+
 export const buildWeeklySummary = ({
   assessment,
   provenance,
@@ -185,11 +187,13 @@ export const buildWeeklySummary = ({
     confidence: provenance.statusLabel,
   });
   const copy = [
+    title,
+    summary,
+    "",
     "---",
     "WHETHER · Market Climate Station",
     "",
     updatedLabel,
-    "",
     "",
     "---",
     "",
@@ -207,24 +211,21 @@ export const buildWeeklySummary = ({
     "",
     "RECOMMENDED MOVES FOR PRODUCT TEAMS (NOW)",
     "",
-    ...template.productMeaning,
-    "",
+    ...toBullets(template.productMeaning),
     "",
     "",
     "---",
     "",
     "EXECUTION PRIORITIES THAT TRAVEL WELL",
     "",
-    ...template.safeBets,
-    "",
+    ...toBullets(template.safeBets),
     "",
     "",
     "---",
     "",
     "WATCHOUTS THAT BREAK EXECUTION",
     "",
-    ...template.failureModes,
-    "",
+    ...toBullets(template.failureModes),
     "",
     "",
     "---",
