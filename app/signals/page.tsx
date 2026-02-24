@@ -134,7 +134,6 @@ export default async function SignalsPage({
       : "all";
   const sectionLinks = [
     { href: "#current-scores", label: "Current scores" },
-    { href: "#source-links", label: "Source links" },
     { href: "#thresholds", label: "Thresholds" },
   ];
   const buildAdvancedHref = (advanced: boolean) => {
@@ -191,7 +190,7 @@ export default async function SignalsPage({
     financial: [
       { label: "Tightness", why: "Funding conditions drive immediate financial operating constraints", href: "#current-scores" },
       { label: "Risk appetite", why: "Credit and valuation tolerance shift with risk-on/off posture", href: "#macro-signals" },
-      { label: "Source links", why: "Trace inputs before finalizing treasury-sensitive moves", href: "#source-links" },
+      { label: "Macro source series", why: "Trace inputs before finalizing treasury-sensitive moves", href: "#macro-signals" },
     ],
   };
   const focusLabelByTab: Record<FocusTab, string> = {
@@ -201,6 +200,9 @@ export default async function SignalsPage({
     labor: "Labor",
     financial: "Financial conditions",
   };
+  const priorityQueue = prioritizedSignalsByFocus[activeFocus];
+  const essentialPriorityQueue = priorityQueue.slice(0, 2);
+  const additionalPriorityQueue = priorityQueue.slice(2);
 
   return (
     <ReportShell
@@ -289,8 +291,8 @@ export default async function SignalsPage({
             );
           })}
         </div>
-        <ol className="grid gap-3 md:grid-cols-3" aria-label="Prioritized signal queue">
-          {prioritizedSignalsByFocus[activeFocus].map((item, index) => (
+        <ol className="grid gap-3 md:grid-cols-2" aria-label="Prioritized signal queue">
+          {essentialPriorityQueue.map((item, index) => (
             <li key={item.label} className="weather-surface space-y-2 p-4">
               <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Priority {index + 1}</p>
               <p className="text-sm font-semibold text-slate-100">{item.label}</p>
@@ -304,6 +306,29 @@ export default async function SignalsPage({
             </li>
           ))}
         </ol>
+        {additionalPriorityQueue.length ? (
+          <details className="weather-surface group p-4">
+            <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.14em] text-slate-200">
+              <span>Show full priority queue</span>
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-400 transition-transform group-open:rotate-180">⌄</span>
+            </summary>
+            <ol className="mt-3 grid gap-3" aria-label="Additional prioritized signal queue">
+              {additionalPriorityQueue.map((item, index) => (
+                <li key={item.label} className="rounded-xl border border-slate-800/80 bg-slate-950/50 p-4">
+                  <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Priority {index + essentialPriorityQueue.length + 1}</p>
+                  <p className="mt-2 text-sm font-semibold text-slate-100">{item.label}</p>
+                  <p className="mt-1 text-xs text-slate-300">{item.why}</p>
+                  <a
+                    href={item.href}
+                    className="mt-2 inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                  >
+                    Open {item.label.toLowerCase()} →
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </details>
+        ) : null}
       </section>
 
       <section id="current-scores" className="weather-panel space-y-4 px-6 py-5">
@@ -347,39 +372,6 @@ export default async function SignalsPage({
         </div>
       </section>
 
-      <section id="source-links" className="weather-panel space-y-4 px-6 py-5">
-        <header className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Source links</p>
-            <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-              Open the live feeds behind the current call.
-            </h2>
-          </div>
-        </header>
-        <nav aria-label="Signal source links">
-          <ul className="grid gap-3 md:grid-cols-2">
-            <li>
-              <a
-                href="#sensor-array"
-                className="weather-surface inline-flex min-h-[44px] w-full items-center justify-between gap-3 p-4 text-sm text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100"
-              >
-                <span>Live sensor array</span>
-                <span aria-hidden="true">→</span>
-              </a>
-            </li>
-            <li>
-              <a
-                href="#macro-signals"
-                className="weather-surface inline-flex min-h-[44px] w-full items-center justify-between gap-3 p-4 text-sm text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100"
-              >
-                <span>Macro source series</span>
-                <span aria-hidden="true">→</span>
-              </a>
-            </li>
-          </ul>
-        </nav>
-      </section>
-
       <SensorArray sensors={sensors} provenance={treasuryProvenance} />
 
       <MacroSignalsPanel series={macroSeries} provenance={macroProvenance} />
@@ -402,12 +394,6 @@ export default async function SignalsPage({
               className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
             >
               {showAdvanced ? "Hide advanced filters" : "Show advanced filters"}
-            </a>
-            <a
-              href={`${appendSearchParamsToRoute("/operations/briefings" as Route, resolvedSearchParams)}#ops-export-briefs`}
-              className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-            >
-              Export focused brief ({focusLabelByTab[activeFocus]}) →
             </a>
           </div>
         </div>

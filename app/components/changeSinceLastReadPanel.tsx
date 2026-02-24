@@ -200,6 +200,7 @@ export const ChangeSinceLastReadPanel = ({
         .map((item) => ({ ...item, tone: getImpactTone(item.delta) }))
         .sort((left, right) => right.delta - left.delta)
     : [];
+  const topImpactItems = impactItems.slice(0, 2);
 
   return (
     <section
@@ -219,7 +220,7 @@ export const ChangeSinceLastReadPanel = ({
             </p>
             {previous ? (
               <div className="mt-3 flex flex-wrap gap-2">
-                {impactItems.map((item) => (
+                {topImpactItems.map((item) => (
                   <a
                     key={item.label}
                     href={item.href}
