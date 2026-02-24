@@ -37,6 +37,25 @@ const regimeLabelMap = {
   EXPANSION: "Expansion",
 } as const;
 
+const regimeShiftTargets = {
+  SCARCITY: {
+    defensive: "DEFENSIVE",
+    adjacent: "VOLATILE",
+  },
+  DEFENSIVE: {
+    defensive: "SCARCITY",
+    adjacent: "EXPANSION",
+  },
+  VOLATILE: {
+    defensive: "SCARCITY",
+    adjacent: "EXPANSION",
+  },
+  EXPANSION: {
+    defensive: "DEFENSIVE",
+    adjacent: "VOLATILE",
+  },
+} as const;
+
 const postureForecastHorizons = ["Now", "+1 week", "+2 weeks", "+4 weeks"] as const;
 
 const clampPercentage = (value: number) => Math.min(100, Math.max(0, value));
@@ -276,14 +295,9 @@ export default async function HomePage({
   const tightnessGap = Math.abs(assessment.scores.tightness - tightnessThreshold);
   const riskGap = Math.abs(assessment.scores.riskAppetite - riskThreshold);
   const nearestThresholdGap = Math.min(tightnessGap, riskGap);
-  const adjacentShiftRegimeLabel =
-    assessment.regime === "EXPANSION"
-      ? regimeLabelMap.DEFENSIVE
-      : assessment.regime === "SCARCITY"
-        ? regimeLabelMap.DEFENSIVE
-        : assessment.regime === "DEFENSIVE"
-          ? regimeLabelMap.EXPANSION
-          : regimeLabelMap.DEFENSIVE;
+  const shiftTargets = regimeShiftTargets[assessment.regime];
+  const primaryShiftRegimeLabel = regimeLabelMap[shiftTargets.defensive];
+  const adjacentShiftRegimeLabel = regimeLabelMap[shiftTargets.adjacent];
   const normalizedTightnessGap = clampPercentage((tightnessGap / 40) * 100);
   const normalizedRiskGap = clampPercentage((riskGap / 40) * 100);
   const defensivePressure = clampPercentage(100 - normalizedRiskGap);
@@ -306,7 +320,7 @@ export default async function HomePage({
   const probabilityPills = [
     {
       id: "shift-defensive",
-      label: `Shift risk (${regimeLabelMap.DEFENSIVE})`,
+      label: `Shift risk (${primaryShiftRegimeLabel})`,
       copy: `${probabilityShiftDefensive}%`,
       qualitativeBand: describeProbabilityBand(probabilityShiftDefensive),
       className: "weather-chip",
