@@ -279,11 +279,31 @@ export const ReportMobileNavigation = ({
               <p className="truncate text-sm font-semibold tracking-[0.08em] text-slate-100">
                 {currentLink.label}
               </p>
-              <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">
-                Current Climate remains the primary surface.
-              </p>
+              <p className="text-xs text-slate-400">{currentLink.description}</p>
             </div>
           </div>
+
+          <NavigationMenu.List className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {pageLinks.map((link) => {
+              const isActive = link.label === pageTitle;
+              return (
+                <NavigationMenu.Item key={link.href} className="flex-shrink-0">
+                  <NavigationMenu.Link
+                    href={link.href}
+                    active={isActive}
+                    aria-current={isActive ? "page" : undefined}
+                    className={`weather-pill inline-flex min-h-[44px] items-center rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.12em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation ${
+                      isActive
+                        ? "border-sky-400/80 bg-sky-500/20 text-sky-100"
+                        : "border-slate-800/80 text-slate-200 hover:border-sky-400/70 hover:text-slate-100"
+                    }`}
+                  >
+                    {link.label}
+                  </NavigationMenu.Link>
+                </NavigationMenu.Item>
+              );
+            })}
+          </NavigationMenu.List>
 
           <div className="grid grid-cols-1 gap-2">
             <Collapsible.Trigger
@@ -297,7 +317,7 @@ export const ReportMobileNavigation = ({
                     <path d="M8.75 9.25h6.5M8.75 12h6.5M8.75 14.75h4" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="1.5" />
                   </svg>
                 </span>
-                <span className="uppercase">Menu</span>
+                <span className="uppercase">All pages</span>
               </span>
               <span className="text-xs font-medium tracking-[0.12em] text-slate-400">
                 {sectionCountLabel}
@@ -326,7 +346,7 @@ export const ReportMobileNavigation = ({
               </div>
             </div>
 
-            <NavigationMenu.List className="grid gap-2">
+            <NavigationMenu.List className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2">
               {pageLinks.map((link) => {
                 const isActive = link.label === pageTitle;
                 return (

@@ -24,8 +24,6 @@ import { type ReportStageItem } from "./reportRevampElements";
 import { serializeJsonLd } from "../../lib/seo";
 import { AnchorFeedback } from "./anchorFeedback";
 
-const MOBILE_NAVIGATION_STACK_OFFSET_REM = 10.5;
-
 export const ReportShell = ({
   children,
   statusLabel,
@@ -799,10 +797,7 @@ Open related page →
           </div>
         </div>
         <div
-          className="sm:hidden fixed inset-x-0 z-30 pl-[calc(env(safe-area-inset-left)+0.9rem)] pr-[calc(env(safe-area-inset-right)+0.9rem)]"
-          style={{
-            bottom: `calc(env(safe-area-inset-bottom) + ${MOBILE_NAVIGATION_STACK_OFFSET_REM}rem)`,
-          }}
+          className="sm:hidden mt-6 px-4"
         >
           <section className="weather-panel border-sky-500/40 bg-slate-950/95 px-3 py-3">
             <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-400">
@@ -828,7 +823,7 @@ Open related page →
             pageTitle={pageTitle}
             currentPath={currentPath}
             sectionLinks={sectionLinks}
-            className="fixed inset-x-0 bottom-0 z-30 pb-3 pt-3 pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)]"
+            className="mt-3 px-4 pb-6"
           />
         </div>
 
