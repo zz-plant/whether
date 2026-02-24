@@ -59,7 +59,7 @@ body {
 }
 
 .weather-panel {
-  @apply rounded-[22px] border border-slate-800/60 bg-slate-950/80 backdrop-blur-lg;
+  @apply rounded-[22px] border border-slate-800/50 bg-slate-950/80 backdrop-blur-lg;
   background-image: linear-gradient(160deg, rgba(56, 189, 248, 0.08), rgba(99, 102, 241, 0.07) 44%, rgba(2, 6, 23, 0.2) 78%);
   box-shadow:
     0 22px 36px -30px rgba(2, 6, 23, 0.78),
@@ -162,7 +162,7 @@ body {
 }
 
 .weather-surface {
-  @apply rounded-2xl border border-slate-700/70 bg-slate-950/60 backdrop-blur;
+  @apply rounded-2xl border border-slate-700/55 bg-slate-950/60 backdrop-blur;
   background-image: linear-gradient(162deg, rgba(56, 189, 248, 0.05), rgba(99, 102, 241, 0.04) 54%, rgba(15, 23, 42, 0.17));
   box-shadow:
     inset 0 1px 0 rgba(186, 230, 253, 0.1),
@@ -171,7 +171,7 @@ body {
 
 :where(.weather-panel > .weather-surface),
 :where(.weather-surface > .weather-surface) {
-  border-color: rgba(71, 85, 105, 0.52);
+  border-color: rgba(71, 85, 105, 0.42);
   background-color: rgba(2, 6, 23, 0.5);
   box-shadow:
     inset 0 1px 0 rgba(186, 230, 253, 0.04),
@@ -338,7 +338,7 @@ body {
 }
 
 .type-section {
-  @apply text-xl font-semibold leading-snug md:text-3xl;
+  @apply text-2xl font-semibold leading-snug md:text-3xl;
 }
 
 .type-label {
@@ -346,7 +346,11 @@ body {
 }
 
 .type-data {
-  @apply text-sm leading-relaxed;
+  @apply text-base leading-relaxed;
+}
+
+:where(.weather-panel p, .weather-panel li, .weather-surface p, .weather-surface li) {
+  line-height: 1.6;
 }
 
 :where(h1, h2, h3, h4, h5, h6) {
