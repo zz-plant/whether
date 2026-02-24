@@ -38,15 +38,15 @@ export const OnboardingChecklistProgress = ({ steps }: { steps: OnboardingStep[]
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(completedTitles));
   }, [completedTitles, isHydrated]);
 
-  const completionText = `${completedTitles.length}/${steps.length} complete`;
-  const completionPercent = steps.length === 0 ? 0 : Math.round((completedTitles.length / steps.length) * 100);
-
   const completedSet = useMemo(() => new Set(completedTitles), [completedTitles]);
+  const completedCurrentStepCount = steps.filter((step) => completedSet.has(step.title)).length;
+  const completionText = `${completedCurrentStepCount}/${steps.length} complete`;
+  const completionPercent = steps.length === 0 ? 0 : Math.round((completedCurrentStepCount / steps.length) * 100);
   const nextIncompleteStep = steps.find((step) => !completedSet.has(step.title));
   const nextIncompleteIndex = nextIncompleteStep
     ? steps.findIndex((step) => step.title === nextIncompleteStep.title)
     : -1;
-  const remainingSteps = Math.max(steps.length - completedTitles.length, 0);
+  const remainingSteps = Math.max(steps.length - completedCurrentStepCount, 0);
   const allComplete = steps.length > 0 && remainingSteps === 0;
 
   const toggleStep = (title: string) => {
@@ -73,7 +73,7 @@ export const OnboardingChecklistProgress = ({ steps }: { steps: OnboardingStep[]
           </span>
         </div>
         <progress
-          value={completedTitles.length}
+          value={completedCurrentStepCount}
           max={Math.max(steps.length, 1)}
           className="cadence-progress h-2 w-full"
           aria-label="Onboarding checklist completion"
@@ -123,7 +123,7 @@ export const OnboardingChecklistProgress = ({ steps }: { steps: OnboardingStep[]
       <ol className="grid gap-3 lg:grid-cols-3">
         {steps.map((step, index) => {
           const isCompleted = completedSet.has(step.title);
-          const checkboxId = `onboarding-step-${index + 1}`;
+          const checkboxId = `onboarding-step-checkbox-${index + 1}`;
           const detailId = `${checkboxId}-detail`;
           const stepState = isCompleted ? "Completed" : "Incomplete";
           const isNextStep = nextIncompleteStep?.title === step.title;
