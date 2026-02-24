@@ -53,7 +53,7 @@ const isLinkActiveForPath = (linkHref: string, currentPath?: string) => {
 };
 
 const pageLinkIcons: Record<string, ReactNode> = {
-  Decide: (
+  "Current Climate": (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
       <path
         d="M12 4.5V2.75M12 21.25v-1.75M4.5 12H2.75M21.25 12h-1.75M6.75 6.75l-1.3-1.3M18.55 18.55l-1.3-1.3M6.75 17.25l-1.3 1.3M18.55 5.45l-1.3 1.3"
@@ -64,7 +64,7 @@ const pageLinkIcons: Record<string, ReactNode> = {
       <circle cx="12" cy="12" r="4.25" fill="currentColor" />
     </svg>
   ),
-  Plan: (
+  Playbook: (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
       <path
         d="M4 5.5h16v13H4z"
@@ -83,7 +83,7 @@ const pageLinkIcons: Record<string, ReactNode> = {
       <circle cx="17" cy="15.5" r="2.5" fill="currentColor" />
     </svg>
   ),
-  Evidence: (
+  Signals: (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
       <path
         d="M4 18c0-4.4 3.6-8 8-8s8 3.6 8 8"
@@ -102,7 +102,7 @@ const pageLinkIcons: Record<string, ReactNode> = {
       <circle cx="12" cy="18" r="1.8" fill="currentColor" />
     </svg>
   ),
-  Brief: (
+  Teams: (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
       <path
         d="M6 4.75h9.25a2 2 0 0 1 2 2v10.5a2 2 0 0 1-2 2H6"
@@ -125,7 +125,7 @@ const pageLinkIcons: Record<string, ReactNode> = {
       />
     </svg>
   ),
-  Methodology: (
+  Method: (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
       <path
         d="M7 5.5h10a1.5 1.5 0 0 1 1.5 1.5v10a1.5 1.5 0 0 1-1.5 1.5H7A1.5 1.5 0 0 1 5.5 17V7A1.5 1.5 0 0 1 7 5.5Z"
@@ -156,7 +156,7 @@ export const ReportPageNavigation = ({
   className?: string;
   variant?: "full" | "compact";
 }) => {
-  const { currentLink, currentPosition, prevLink, nextLink } = getPageNavigationState(
+  const { currentLink } = getPageNavigationState(
     pageLinks,
     pageTitle,
     currentPath,
@@ -165,88 +165,50 @@ export const ReportPageNavigation = ({
   return (
     <NavigationMenu.Root aria-label="Report paths" className={className}>
       <div className="space-y-3">
-        <div className="flex flex-col gap-2 text-xs font-semibold tracking-[0.16em] text-slate-400 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-wrap items-center gap-3">
-            <span>
-              Page {currentPosition} of {pageLinks.length}
-            </span>
-            <span className="hidden text-xs font-semibold tracking-[0.14em] text-slate-300 sm:inline">
-              {currentLink.label}
-            </span>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            {prevLink ? (
-              <a
-                href={prevLink.href}
-                aria-label={`Previous page: ${prevLink.label}`}
-                className="weather-pill inline-flex min-h-[44px] items-center gap-2 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-              >
-                <span aria-hidden="true">←</span>
-                Prev
-              </a>
-            ) : (
-              <span aria-disabled="true" className="weather-pill inline-flex min-h-[44px] items-center gap-2 border border-slate-800/50 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-slate-500/80">
-                <span aria-hidden="true">←</span>
-                Prev
-              </span>
-            )}
-            {nextLink ? (
-              <a
-                href={nextLink.href}
-                aria-label={`Next page: ${nextLink.label}`}
-                className="weather-pill inline-flex min-h-[44px] items-center gap-2 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-              >
-                Next
-                <span aria-hidden="true">→</span>
-              </a>
-            ) : (
-              <span aria-disabled="true" className="weather-pill inline-flex min-h-[44px] items-center gap-2 border border-slate-800/50 px-3 py-1 text-xs font-semibold tracking-[0.16em] text-slate-500/80">
-                Next
-                <span aria-hidden="true">→</span>
-              </span>
-            )}
-          </div>
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-semibold tracking-[0.16em] text-slate-400">
+          <span>Current Climate is the default answer surface.</span>
+          <span className="text-slate-300">{currentLink.label === "Current Climate" ? "Optional context pages are available." : `Optional context: ${currentLink.label}`}</span>
         </div>
 
-        {variant === "full" ? (
-          <>
-            <div className="rounded-2xl border border-slate-800/70 bg-slate-950/40 px-3 py-2 text-left">
-              <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">
-                Current page
-              </p>
-              <p className="text-sm font-semibold text-slate-100">{currentLink.label}</p>
-              <p className="text-xs text-slate-300">{currentLink.description}</p>
-            </div>
-            <p className="text-xs text-slate-400">Switch surfaces</p>
-            <NavigationMenu.List className="grid grid-cols-2 gap-1.5 sm:flex sm:flex-wrap sm:gap-2">
-              {pageLinks.map((link, index) => {
-                const isActive = currentPath
-                  ? isLinkActiveForPath(link.href, currentPath)
-                  : link.label === pageTitle;
-                const isOddTail = pageLinks.length % 2 === 1 && index === pageLinks.length - 1;
-                return (
-                  <NavigationMenu.Item
-                    key={link.href}
-                    className={`flex ${isOddTail ? "col-span-2 sm:col-auto" : ""} sm:flex-shrink-0`}
-                  >
-                    <NavigationMenu.Link
-                      href={link.href}
-                      active={isActive}
-                      aria-current={isActive ? "page" : undefined}
-                      className={`weather-tab inline-flex min-h-[44px] w-full items-center justify-center px-3 py-2 text-center text-xs font-semibold tracking-[0.12em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:px-4 sm:text-xs ${
-                        isActive
-                          ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
-                          : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
-                      } ${isOddTail ? "mx-auto max-w-[240px]" : ""}`}
-                    >
-                      {link.label}
-                    </NavigationMenu.Link>
-                  </NavigationMenu.Item>
-                );
-              })}
-            </NavigationMenu.List>
-          </>
+        {variant === "full" && currentLink.label !== "Current Climate" ? (
+          <div className="rounded-2xl border border-slate-800/70 bg-slate-950/40 px-3 py-2 text-left">
+            <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">
+              Current page
+            </p>
+            <p className="text-sm font-semibold text-slate-100">{currentLink.label}</p>
+            <p className="text-xs text-slate-300">{currentLink.description}</p>
+          </div>
         ) : null}
+        <p className="text-xs text-slate-400">Switch surfaces</p>
+        <NavigationMenu.List className="grid grid-cols-2 gap-1.5 sm:flex sm:flex-wrap sm:gap-2">
+          {pageLinks.map((link, index) => {
+            const isActive = currentPath
+              ? isLinkActiveForPath(link.href, currentPath)
+              : link.label === pageTitle;
+            const isOddTail = pageLinks.length % 2 === 1 && index === pageLinks.length - 1;
+            return (
+              <NavigationMenu.Item
+                key={link.href}
+                className={`flex ${isOddTail ? "col-span-2 sm:col-auto" : ""} sm:flex-shrink-0`}
+              >
+                <NavigationMenu.Link
+                  href={link.href}
+                  active={isActive}
+                  aria-current={isActive ? "page" : undefined}
+                  className={`weather-tab inline-flex min-h-[44px] w-full items-center justify-center px-3 py-2 text-center text-xs font-semibold tracking-[0.12em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:px-4 sm:text-xs ${
+                    isActive
+                      ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
+                      : link.label === "Current Climate"
+                        ? "border-slate-600/90 text-slate-100 hover:border-sky-400/70 hover:text-slate-100"
+                        : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
+                  } ${isOddTail ? "mx-auto max-w-[240px]" : ""}`}
+                >
+                  {link.label}
+                </NavigationMenu.Link>
+              </NavigationMenu.Item>
+            );
+          })}
+        </NavigationMenu.List>
       </div>
     </NavigationMenu.Root>
   );
@@ -304,7 +266,7 @@ export const ReportMobileNavigation = ({
   sectionLinks: ReportSectionLink[];
   className?: string;
 }) => {
-  const { currentLink, currentPosition, prevLink, nextLink } = getPageNavigationState(
+  const { currentLink } = getPageNavigationState(
     pageLinks,
     pageTitle,
     currentPath,
@@ -332,42 +294,19 @@ export const ReportMobileNavigation = ({
         <div className="weather-mobile-nav flex flex-col gap-3 px-3 py-3">
           <div className="flex min-w-0 items-center gap-3 rounded-2xl border border-slate-800/80 bg-slate-950/70 px-3 py-2">
             <span className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl border border-slate-800/80 bg-slate-950/80 text-slate-100">
-              {pageLinkIcons[currentLink.label] ?? pageLinkIcons.Methodology}
+              {pageLinkIcons[currentLink.label] ?? pageLinkIcons.Method}
             </span>
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold tracking-[0.08em] text-slate-100">
                 {currentLink.label}
               </p>
               <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">
-                Page {currentPosition} of {pageLinks.length}
+                Current Climate remains the primary surface.
               </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-2">
-            {prevLink ? (
-              <a
-                href={prevLink.href}
-                aria-label={`Previous page: ${prevLink.label}`}
-                className="weather-pill inline-flex min-h-[48px] w-full flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/80 px-2 py-2 text-xs font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-              >
-                <span aria-hidden="true" className="text-base leading-none text-slate-300">
-                  ←
-                </span>
-                <span className="uppercase">Prev</span>
-              </a>
-            ) : (
-              <span
-                aria-disabled="true"
-                className="weather-pill pointer-events-none inline-flex min-h-[48px] w-full flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/60 px-2 py-2 text-xs font-semibold tracking-[0.16em] text-slate-500/80 opacity-70"
-              >
-                <span aria-hidden="true" className="text-base leading-none">
-                  ←
-                </span>
-                <span className="uppercase">Prev</span>
-              </span>
-            )}
-
+          <div className="grid grid-cols-1 gap-2">
             <Collapsible.Trigger
               type="button"
               className="group weather-pill flex min-h-[48px] w-full flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/80 px-2 py-2 text-xs font-semibold tracking-[0.18em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
@@ -375,19 +314,8 @@ export const ReportMobileNavigation = ({
               <span className="inline-flex items-center gap-2 text-slate-100">
                 <span className="transition-transform duration-200 group-data-[panel-open]:rotate-90">
                   <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
-                    <path
-                      d="M6.5 5.5h11a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2Z"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.4"
-                    />
-                    <path
-                      d="M8.75 9.25h6.5M8.75 12h6.5M8.75 14.75h4"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeWidth="1.5"
-                    />
+                    <path d="M6.5 5.5h11a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" strokeWidth="1.4" />
+                    <path d="M8.75 9.25h6.5M8.75 12h6.5M8.75 14.75h4" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="1.5" />
                   </svg>
                 </span>
                 <span className="uppercase">Menu</span>
@@ -396,29 +324,6 @@ export const ReportMobileNavigation = ({
                 {sectionCountLabel}
               </span>
             </Collapsible.Trigger>
-
-            {nextLink ? (
-              <a
-                href={nextLink.href}
-                aria-label={`Next page: ${nextLink.label}`}
-                className="weather-pill inline-flex min-h-[48px] w-full flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/80 px-2 py-2 text-xs font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-              >
-                <span aria-hidden="true" className="text-base leading-none text-slate-300">
-                  →
-                </span>
-                <span className="uppercase">Next</span>
-              </a>
-            ) : (
-              <span
-                aria-disabled="true"
-                className="weather-pill pointer-events-none inline-flex min-h-[48px] w-full flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/60 px-2 py-2 text-xs font-semibold tracking-[0.16em] text-slate-500/80 opacity-70"
-              >
-                <span aria-hidden="true" className="text-base leading-none">
-                  →
-                </span>
-                <span className="uppercase">Next</span>
-              </span>
-            )}
           </div>
         </div>
 
@@ -437,26 +342,10 @@ export const ReportMobileNavigation = ({
                   {sectionCountLabel}
                 </span>
                 <span className="rounded-full border border-slate-800/70 px-3 py-1 text-xs font-semibold tracking-[0.18em] text-slate-400">
-                  Page {currentPosition} of {pageLinks.length}
+                  Optional context pages
                 </span>
               </div>
             </div>
-
-            {nextLink ? (
-              <div className="weather-panel space-y-2 px-3 py-3">
-                <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">
-                  Up next
-                </p>
-                <p className="text-sm font-semibold text-slate-100">{nextLink.label}</p>
-                <p className="text-xs text-slate-300">{nextLink.description}</p>
-                <a
-                  href={nextLink.href}
-                  className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.18em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100"
-                >
-                  Go to next page
-                </a>
-              </div>
-            ) : null}
 
             <NavigationMenu.List className="grid gap-2">
               {pageLinks.map((link) => {
@@ -470,7 +359,9 @@ export const ReportMobileNavigation = ({
                       className={`weather-pill flex min-h-[56px] items-start gap-3 rounded-2xl border px-3 py-3 text-left text-sm font-semibold tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation ${
                         isActive
                           ? "border-sky-400/70 bg-sky-500/15 text-sky-100"
-                          : "border-slate-800/80 text-slate-100 hover:border-sky-400/70 hover:text-sky-100"
+                          : link.label === "Current Climate"
+                            ? "border-slate-600/90 text-slate-100 hover:border-sky-400/70 hover:text-sky-100"
+                            : "border-slate-800/80 text-slate-100 hover:border-sky-400/70 hover:text-sky-100"
                       }`}
                     >
                       <span
