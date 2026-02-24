@@ -324,12 +324,23 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
                   );
                 })}
               </div>
-              <p className="text-xs text-slate-400">{filterDescriptions[filter]}</p>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-300">{filterDescriptions[filter]}</p>
+              <p className="text-xs text-slate-400">
                 Playbook = Do now · Pages = Switch surfaces · Sections = Jump within page.
               </p>
               {isMobile ? (
-                <p className="text-xs text-slate-500">Mobile default is Playbook for faster “do now” access.</p>
+                <details className="weather-surface p-3">
+                  <summary className="cursor-pointer list-none text-xs font-semibold tracking-[0.12em] text-slate-300 focus-visible:rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+                    Tips for keyboard and remote users
+                  </summary>
+                  <p className="mt-2 text-xs text-slate-400">Mobile default is Playbook for faster “do now” access.</p>
+                  <div className="mt-2 grid gap-2 text-xs text-slate-300 sm:grid-cols-2">
+                    <p><span className="font-semibold text-slate-100">↑/↓</span> move focus</p>
+                    <p><span className="font-semibold text-slate-100">←/→</span> switch controls</p>
+                    <p><span className="font-semibold text-slate-100">Enter / OK</span> open link</p>
+                    <p><span className="font-semibold text-slate-100">Esc / Back</span> clear search field</p>
+                  </div>
+                </details>
               ) : null}
               {hasActiveRefinement ? (
                 <button
@@ -340,12 +351,14 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
                   Reset search
                 </button>
               ) : null}
-              <div className="weather-surface grid gap-2 p-3 text-xs text-slate-300 sm:grid-cols-2">
-                <p><span className="font-semibold text-slate-100">↑/↓</span> move focus</p>
-                <p><span className="font-semibold text-slate-100">←/→</span> switch controls</p>
-                <p><span className="font-semibold text-slate-100">Enter / OK</span> open link</p>
-                <p><span className="font-semibold text-slate-100">Esc / Back</span> clear search field</p>
-              </div>
+              {!isMobile ? (
+                <div className="weather-surface grid gap-2 p-3 text-xs text-slate-300 sm:grid-cols-2">
+                  <p><span className="font-semibold text-slate-100">↑/↓</span> move focus</p>
+                  <p><span className="font-semibold text-slate-100">←/→</span> switch controls</p>
+                  <p><span className="font-semibold text-slate-100">Enter / OK</span> open link</p>
+                  <p><span className="font-semibold text-slate-100">Esc / Back</span> clear search field</p>
+                </div>
+              ) : null}
             </div>
           </div>
 
