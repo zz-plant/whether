@@ -273,12 +273,22 @@ export const ReportShell = ({
       return accumulator;
     }
 
-    if (
-      !accumulator.some(
-        (item) => item.href === action.href && item.group === action.group,
-      )
-    ) {
-      accumulator.push(action);
+    const existingAction = accumulator.find((item) => item.href === action.href);
+
+    if (!existingAction) {
+      accumulator.push({
+        ...action,
+        tags: [action.group],
+      });
+      return accumulator;
+    }
+
+    if (!existingAction.tags) {
+      existingAction.tags = [existingAction.group];
+    }
+
+    if (!existingAction.tags.includes(action.group)) {
+      existingAction.tags.push(action.group);
     }
 
     return accumulator;
@@ -479,6 +489,11 @@ export const ReportShell = ({
                     </div>
                   ) : null}
                 </div>
+                <p className="text-xs text-slate-300">
+                  {trustStatusTone === "stable"
+                    ? `Confidence: ${trustStatusLabel}. ${trustStatusAction}`
+                    : `Caution: ${trustStatusAction}`}
+                </p>
                 {showOfflineBadge ? (
                   <p className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.14em] text-amber-100">
                     {offlineBadgeLabel}
