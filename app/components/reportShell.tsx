@@ -148,7 +148,6 @@ export const ReportShell = ({
   const heroHeaderSpacingClassName = "space-y-3 sm:space-y-4";
   const heroSectionSpacingClassName =
     "weather-panel-static min-w-0 space-y-4 px-4 py-4 sm:space-y-5 sm:px-5";
-  const sectionDividerLabels = ["REGIME", "EXECUTION", "EVIDENCE", "EXPORTS"];
   const overviewPanel = (
     <details className="weather-panel group px-4 py-4">
       <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.16em] text-slate-200">
@@ -201,31 +200,6 @@ export const ReportShell = ({
       action={trustStatusAction}
     />
   );
-  const sectionsNav =
-    sectionLinks.length > 0 ? (
-      <nav
-        id="report-sections-nav"
-        aria-label="Report sections"
-        className="weather-panel px-4 py-4"
-      >
-        <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">
-          Sections
-        </p>
-        <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
-          {sectionLinks.map((item) => (
-            <li key={item.href}>
-              <a
-                href={item.href}
-                aria-label={`Jump to ${item.label}`}
-                className="weather-pill inline-flex min-h-[44px] w-full items-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-              >
-                {item.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    ) : null;
   const commandActionCandidates: OperatorCommandAction[] = [];
 
   if (primaryCta) {
@@ -302,13 +276,12 @@ export const ReportShell = ({
   const decisionHorizon = decisionBanner?.horizon ?? "Next 2 weeks";
   const fallbackAction = secondaryCta
     ? { href: secondaryCta.href, label: secondaryCta.label }
-    : decisionBanner?.evidenceHref
-      ? { href: decisionBanner.evidenceHref, label: "Review evidence trail" }
-      : null;
-  const missionSupportText =
-    trustStatusTone === "stable"
-      ? trustStatusAction
-      : "Use this page to translate the current signal posture into team actions.";
+    : nextStep
+      ? { href: nextStep.href, label: "Open next page" }
+      : decisionBanner?.evidenceHref
+        ? { href: decisionBanner.evidenceHref, label: "Review evidence trail" }
+        : null;
+  const missionSupportText = trustStatusDetail;
 
   const showPostureRibbon = currentPath !== "/";
   const postureRibbon = showPostureRibbon ? (
@@ -316,7 +289,6 @@ export const ReportShell = ({
       <p className="text-slate-300">
         Current Posture: <span className="font-semibold text-slate-100">{statusLabel}</span>
         <span className="ml-2 text-slate-400">Updated {recordDateLabel}</span>
-        <span className="ml-2 text-slate-500">Next refresh expected: 48h</span>
       </p>
       <Link
         href="/"
@@ -339,14 +311,6 @@ export const ReportShell = ({
         >
           Skip to action controls
         </a>
-        {hasSidebar ? (
-          <a
-            href="#report-sections-nav"
-            className="inline-flex min-h-[44px] items-center rounded-xl border border-slate-700/70 bg-slate-900/80 px-3 py-2 text-xs font-semibold tracking-[0.14em] text-slate-100 transition-colors hover:border-sky-300/70 hover:text-white focus-visible:border-sky-300/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-          >
-            Skip to section navigation
-          </a>
-        ) : null}
       </nav>
       <main
         id="main-content"
@@ -418,7 +382,6 @@ export const ReportShell = ({
               <aside className="order-2 space-y-4 lg:order-none lg:col-start-2 lg:row-start-1 lg:sticky lg:top-28 lg:self-start">
                 {overviewPanel}
                 {confidencePanel}
-                {sectionsNav}
               </aside>
             ) : null}
 
@@ -723,7 +686,6 @@ export const ReportShell = ({
                     {overviewPanel}
                     {confidencePanel}
                   </div>
-                  {sectionsNav ? <div>{sectionsNav}</div> : null}
                 </section>
               ) : null}
 
@@ -735,9 +697,6 @@ export const ReportShell = ({
                       : `section-${index}`;
                   return (
                     <div key={sectionKey} className={index === 0 ? "" : "border-t border-slate-800/70 pt-10"}>
-                      {index > 0 ? (
-                        <p className="mb-4 text-xs font-semibold tracking-[0.24em] text-slate-500">— {sectionDividerLabels[Math.min(index - 1, sectionDividerLabels.length - 1)]} —</p>
-                      ) : null}
                       {section}
                     </div>
                   );
@@ -745,36 +704,6 @@ export const ReportShell = ({
               </div>
 
               <OperatorCommandCenter actions={commandActions} />
-
-              <section
-                className="weather-panel space-y-3 px-4 py-4"
-                aria-label="Related move"
-              >
-                <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">
-                  Related move
-                </p>
-                <p className="text-sm text-slate-200">
-                  {nextStep?.description ??
-                    (currentPath === "/"
-                      ? "Evidence and Plan pages are available for deeper context."
-                      : currentPath === "/signals" || currentPath === "/evidence"
-                        ? "Plan and Brief pages are available for execution planning."
-                        : "Plan, decisions, and briefings pages are available from here.")}
-                </p>
-                <a
-                  href={
-                    nextStep?.href ??
-                    (currentPath === "/"
-                      ? "/evidence#regime-timeline"
-                      : currentPath === "/signals" || currentPath === "/evidence"
-                        ? "/operations#ops-monthly-action-summary"
-                        : "/operations/plan")
-                  }
-                  className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-                >
-Open related page →
-                </a>
-              </section>
 
               <footer className="mt-12 border-t border-slate-800/70 pt-6 text-xs font-semibold tracking-[0.18em] text-slate-400">
                 <p>Not financial, legal, or investment advice.</p>

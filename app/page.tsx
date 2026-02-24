@@ -358,11 +358,10 @@ export default async function HomePage({
             id="evidence-matrix-title"
             className="text-xl font-semibold text-slate-100 sm:text-2xl"
           >
-            Deep evidence has moved to the dedicated Evidence page.
+            Evidence and context
           </h2>
           <p className="text-sm text-slate-300">
-            Keep the decide screen focused on action; use Evidence for full macro series,
-            thresholds, and source-level methodology.
+            Open the Evidence page for full macro series, thresholds, and source-level methodology.
           </p>
         </header>
         <RelatedReportLinks

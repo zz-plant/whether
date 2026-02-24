@@ -279,7 +279,6 @@ export const ReportMobileNavigation = ({
               <p className="truncate text-sm font-semibold tracking-[0.08em] text-slate-100">
                 {currentLink.label}
               </p>
-              <p className="text-xs text-slate-400">{currentLink.description}</p>
             </div>
           </div>
 
@@ -330,20 +329,11 @@ export const ReportMobileNavigation = ({
           <div className="weather-mobile-panel weather-mobile-sheet space-y-4 overflow-auto px-4 py-4">
             <div className="flex items-start justify-between gap-3">
               <div className="space-y-1">
-                <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">
-                  Navigation
-                </p>
                 <p className="text-base font-semibold text-slate-100">{currentLink.label}</p>
-                <p className="text-xs text-slate-300">{currentLink.description}</p>
               </div>
-              <div className="flex flex-col items-end gap-2">
-                <span className="weather-chip inline-flex min-h-[44px] items-center px-3 py-1 text-xs font-semibold tracking-[0.18em] text-slate-200">
-                  {sectionCountLabel}
-                </span>
-                <span className="rounded-full border border-slate-800/70 px-3 py-1 text-xs font-semibold tracking-[0.18em] text-slate-400">
-                  Optional context pages
-                </span>
-              </div>
+              <span className="weather-chip inline-flex min-h-[44px] items-center px-3 py-1 text-xs font-semibold tracking-[0.18em] text-slate-200">
+                {sectionCountLabel}
+              </span>
             </div>
 
             <NavigationMenu.List className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2">
@@ -372,39 +362,14 @@ export const ReportMobileNavigation = ({
                       >
                         {pageLinkIcons[link.label]}
                       </span>
-                      <span className="space-y-1">
-                        <span className="block text-sm font-semibold text-current">
-                          {link.label}
-                        </span>
-                        <span className="block text-xs font-medium tracking-[0.12em] text-slate-300">
-                          {link.description}
-                        </span>
+                      <span className="block text-sm font-semibold text-current">
+                        {link.label}
                       </span>
                     </NavigationMenu.Link>
                   </NavigationMenu.Item>
                 );
               })}
             </NavigationMenu.List>
-
-            {sectionLinks.length > 0 ? (
-              <div className="space-y-2">
-                <p className="text-xs font-semibold tracking-[0.2em] text-slate-400">
-                  Jump to section
-                </p>
-                <ul className="space-y-2">
-                  {sectionLinks.map((item) => (
-                    <li key={item.href}>
-                      <a
-                        href={item.href}
-                        className="weather-pill inline-flex min-h-[44px] w-full items-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                      >
-                        {item.label}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
           </div>
         </Collapsible.Panel>
       </Collapsible.Root>
