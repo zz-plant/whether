@@ -8,6 +8,7 @@ export type OperatorCommandAction = {
   label: string;
   description: string;
   group: "Playbook" | "Pages" | "Sections";
+  tags?: Array<"Playbook" | "Pages" | "Sections">;
   keywords?: string[];
 };
 
@@ -171,9 +172,10 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
   const groupedActions = useMemo(() => {
     const normalizedQuery = normalize(query);
     const filtered = actions.filter((action) => {
+      const actionTags = action.tags ?? [action.group];
       const target = `${action.label} ${action.description} ${action.group} ${(action.keywords ?? []).join(" ")}`.toLowerCase();
       const queryMatches = normalizedQuery.length === 0 || target.includes(normalizedQuery);
-      const filterMatches = filter === "All" || action.group === filter;
+      const filterMatches = filter === "All" || actionTags.includes(filter);
 
       return queryMatches && filterMatches;
     });
@@ -362,15 +364,16 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
                               {action.label}
                             </span>
                             <span className="inline-flex items-center gap-2">
-                              {isInPageLink(action.href) ? (
-                                <span className="rounded-full border border-slate-700/70 px-2 py-0.5 text-[9px] font-semibold tracking-[0.12em] text-slate-400">
-                                  SECTION
-                                </span>
-                              ) : (
-                                <span className="rounded-full border border-slate-700/70 px-2 py-0.5 text-[9px] font-semibold tracking-[0.12em] text-slate-400">
-                                  PAGE
-                                </span>
-                              )}
+                              <span className="flex flex-wrap justify-end gap-1">
+                                {(action.tags ?? [action.group]).map((tag) => (
+                                  <span
+                                    key={`${action.href}-${tag}`}
+                                    className="rounded-full border border-slate-700/70 px-2 py-0.5 text-[9px] font-semibold tracking-[0.12em] text-slate-400"
+                                  >
+                                    {tag === "Sections" ? "SECTION" : tag === "Pages" ? "PAGE" : "DO NOW"}
+                                  </span>
+                                ))}
+                              </span>
                               <span aria-hidden="true" className="text-xs text-slate-500">→</span>
                             </span>
                           </a>
