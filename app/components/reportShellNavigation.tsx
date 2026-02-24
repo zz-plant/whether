@@ -309,6 +309,7 @@ export const ReportMobileNavigation = ({
             })}
           </NavigationMenu.List>
 
+
           <div className="grid grid-cols-1 gap-2">
             <Collapsible.Trigger
               type="button"
@@ -335,7 +336,7 @@ export const ReportMobileNavigation = ({
             <div className="flex items-start justify-between gap-3">
               <div className="space-y-1">
                 <p className="text-base font-semibold text-slate-100">{currentLink.label}</p>
-                <p className="text-xs text-slate-400">Choose a page or jump to a section.</p>
+                <p className="text-xs text-slate-300">Choose a page or open a section.</p>
               </div>
               <div className="flex items-center gap-2">
                 <span className="weather-chip inline-flex min-h-[44px] items-center px-3 py-1 text-xs font-semibold tracking-[0.18em] text-slate-200">
@@ -386,6 +387,27 @@ export const ReportMobileNavigation = ({
                 );
               })}
             </NavigationMenu.List>
+
+            {sectionLinks.length > 0 ? (
+              <div className="space-y-2">
+                <p className="text-xs font-semibold tracking-[0.14em] text-slate-400">
+                  Sections on this page
+                </p>
+                <NavigationMenu.List aria-label="All section links" className="grid grid-cols-1 gap-2">
+                  {sectionLinks.map((section) => (
+                    <NavigationMenu.Item key={section.href}>
+                      <NavigationMenu.Link
+                        href={section.href}
+                        className="weather-pill inline-flex min-h-[44px] w-full items-center justify-between gap-3 rounded-2xl border border-slate-800/80 px-3 py-2 text-left text-xs font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-sky-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                      >
+                        <span>{section.label}</span>
+                        <span aria-hidden="true" className="text-slate-500">↗</span>
+                      </NavigationMenu.Link>
+                    </NavigationMenu.Item>
+                  ))}
+                </NavigationMenu.List>
+              </div>
+            ) : null}
           </div>
         </Collapsible.Panel>
       </Collapsible.Root>

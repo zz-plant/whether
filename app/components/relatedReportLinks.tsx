@@ -27,7 +27,7 @@ export const RelatedReportLinks = ({
           >
             <p className="text-sm font-semibold text-slate-100">{link.label}</p>
             <p className="text-sm text-slate-300">{link.description}</p>
-            <p className="text-xs font-semibold tracking-[0.14em] text-sky-200">View page →</p>
+            <p className="text-xs font-semibold tracking-[0.14em] text-sky-200">Open {link.label} →</p>
           </Link>
         ))}
       </div>

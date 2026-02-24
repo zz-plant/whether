@@ -172,7 +172,7 @@ export default async function OnboardingPage({
       heroVariant="compact"
       pageNavVariant="compact"
       showPageNavigation={false}
-      primaryCta={{ href: "#first-time-guide", label: "Jump to orientation steps" }}
+      primaryCta={{ href: "#first-time-guide", label: "Start orientation steps" }}
       secondaryCta={undefined}
       structuredData={structuredData}
       historicalBanner={

@@ -284,8 +284,10 @@ export const ReportShell = ({
   const missionSupportText = trustStatusDetail;
 
   const showPostureRibbon = currentPath !== "/";
+  const isPrimaryActionInSectionLinks = sectionLinks.some((section) => section.href === primaryCta.href);
+  const showMobileActionCard = !isPrimaryActionInSectionLinks;
   const postureRibbon = showPostureRibbon ? (
-    <div className="weather-panel-static sticky top-[calc(env(safe-area-inset-top)+5.9rem)] z-[18] mb-4 flex flex-wrap items-center justify-between gap-2 border border-slate-700/70 px-4 py-2 text-xs sm:top-[5.8rem]">
+    <div className="weather-panel-static sticky top-[calc(env(safe-area-inset-top)+5.9rem)] z-[18] mb-4 hidden flex-wrap items-center justify-between gap-2 border border-slate-700/70 px-4 py-2 text-xs sm:top-[5.8rem] sm:flex">
       <p className="text-slate-300">
         Current Posture: <span className="font-semibold text-slate-100">{statusLabel}</span>
         <span className="ml-2 text-slate-400">Updated {recordDateLabel}</span>
@@ -725,26 +727,28 @@ export const ReportShell = ({
             </div>
           </div>
         </div>
-        <div
-          className="sm:hidden mt-6 px-4"
-        >
-          <section className="weather-panel border-sky-500/40 bg-slate-950/95 px-3 py-3">
-            <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-400">
-              Current posture
-            </p>
-            <div className="mt-2 flex items-center justify-between gap-3">
-              <p className="max-w-[16rem] text-xs font-semibold text-slate-100">
-                {primaryDecisionText}
+        {showMobileActionCard ? (
+          <div
+            className="sm:hidden mt-6 px-4"
+          >
+            <section className="weather-panel border-sky-500/40 bg-slate-950/95 px-3 py-3">
+              <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-400">
+                Current posture
               </p>
-              <a
-                href={primaryCta.href}
-                className="weather-button-primary inline-flex min-h-[44px] flex-shrink-0 items-center justify-center rounded-full px-3 py-2 text-xs font-semibold tracking-[0.14em]"
-              >
-                {primaryCta.label}
-              </a>
-            </div>
-          </section>
-        </div>
+              <div className="mt-2 flex items-center justify-between gap-3">
+                <p className="max-w-[16rem] text-xs font-semibold text-slate-100">
+                  {primaryDecisionText}
+                </p>
+                <a
+                  href={primaryCta.href}
+                  className="weather-button-primary inline-flex min-h-[44px] flex-shrink-0 items-center justify-center rounded-full px-3 py-2 text-xs font-semibold tracking-[0.14em]"
+                >
+                  {primaryCta.label}
+                </a>
+              </div>
+            </section>
+          </div>
+        ) : null}
 
         <div className="sm:hidden">
           <ReportMobileNavigation
