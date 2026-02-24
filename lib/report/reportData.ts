@@ -50,6 +50,13 @@ export type LastYearComparison = {
   };
 };
 
+const regimeStatusLabelMap = {
+  SCARCITY: "Scarcity",
+  DEFENSIVE: "Defensive",
+  VOLATILE: "Neutral",
+  EXPANSION: "Expansion",
+} as const;
+
 export const buildLastYearComparison = ({
   current,
   currentRecordDate,
@@ -163,7 +170,7 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
     ageLabel: "Static.",
     statusLabel: "Simulated (low)",
   };
-  const statusLabel = confidenceLabel;
+  const statusLabel = regimeStatusLabelMap[assessment.regime];
   const historicalComparison =
     historicalSelection && liveAssessment
       ? {
