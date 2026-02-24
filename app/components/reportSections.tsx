@@ -1608,13 +1608,13 @@ export const ExecutiveSnapshotPanel = ({
       ? "border-amber-400/40 bg-amber-500/10 text-amber-100"
       : "border-emerald-400/40 bg-emerald-500/10 text-emerald-100";
   const confidenceDetail = isFallback
-    ? "Live feed degraded; operating off cached Treasury data."
+    ? "Data quality status: live Treasury feed is degraded, so this snapshot is running on cached inputs."
     : hasDataWarnings
-      ? "Some Treasury inputs are missing; interpret signal strength with caution."
-      : "Full Treasury data coverage verified for this report.";
+      ? "Data quality status: some Treasury inputs are missing; verify the gaps before escalating commitment size."
+      : "Data quality status: full Treasury coverage is healthy for this report window.";
   const freshnessAction = isFallback
-    ? "Action: avoid irreversible decisions until live signals return."
-    : "Action: safe to use for day-to-day planning approvals.";
+    ? "Forecast certainty remains probabilistic; pause irreversible budget, hiring, or sequencing approvals until live data returns and leadership review is complete."
+    : "Forecast certainty remains probabilistic, but with healthy data this is suitable for day-to-day budget sequencing, hiring pacing, and approval routing with human judgment.";
   const scoringInputs = assessment.inputs;
   const scoringSource = scoringInputs[0]?.sourceLabel ?? "US Treasury";
   const scoringSourceUrl = scoringInputs[0]?.sourceUrl ?? treasury.source;
@@ -1633,7 +1633,7 @@ export const ExecutiveSnapshotPanel = ({
               Operating constraints
             </h3>
             <p className="mt-2 text-sm text-slate-300">
-              Guardrails that translate macro conditions into budget, hiring, and approval policy.
+              Decision guardrails for what to fund now, which roles to open, and how to sequence approvals under current macro conditions.
             </p>
           </div>
           <DataProvenanceStrip provenance={provenance} />
