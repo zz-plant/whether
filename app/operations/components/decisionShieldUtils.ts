@@ -61,15 +61,15 @@ export const buildShareText = (
     `Lifecycle: ${formatOptionLabel(lifecycle, lifecycleOptions)}`,
     `Category: ${formatOptionLabel(category, categoryOptions)}`,
     `Action: ${formatDecisionAction(action)}`,
-    `Verdict: ${output.verdict}`,
+    `Execution call: ${output.verdict}`,
     "",
     `Summary: ${output.summary}`,
     "",
     "Signals:",
     ...output.bullets.map((bullet) => `- ${bullet}`),
     "",
-    `Guardrail: ${output.guardrail}`,
-    `Reversal trigger: ${output.reversalTrigger}`,
+    `Execution boundary: ${output.guardrail}`,
+    `Pivot signal: ${output.reversalTrigger}`,
   ];
 
   return lines.join("\n");
