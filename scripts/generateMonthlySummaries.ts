@@ -11,7 +11,6 @@ import { writeSummaryFile } from "./summaryFile";
 import { resolveYearRange } from "./summaryRange";
 
 const DEFAULT_START_YEAR = 2012;
-const DEFAULT_END_YEAR = 2025;
 const OUTPUT_PATH = "data/monthly_summaries_2012_2025.json";
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
@@ -204,12 +203,6 @@ const generateMonthlySummaries = async () => {
   const output: MonthlySummaryArchiveEntry[] = [];
   const now = new Date();
   const fetchedAt = now.toISOString();
-  const { startYear, endYear, isPartial } = resolveYearRange({
-    defaultStartYear: DEFAULT_START_YEAR,
-    defaultEndYear: DEFAULT_END_YEAR,
-    minYear: DEFAULT_START_YEAR,
-    maxYear: DEFAULT_END_YEAR,
-  });
   const datasets = {
     oneMonth: await fetchSeries(seriesCatalog.oneMonth),
     threeMonth: await fetchSeries(seriesCatalog.threeMonth),
@@ -220,10 +213,37 @@ const generateMonthlySummaries = async () => {
   const requiredMaps = [datasets.twoYear, datasets.tenYear];
   const fallbackMaps = [datasets.oneMonth, datasets.threeMonth];
 
+  const latestRequired = [
+    getLatestValidDate(datasets.twoYear.points),
+    getLatestValidDate(datasets.tenYear.points),
+  ]
+    .filter((point): point is SeriesPoint => Boolean(point))
+    .map((point) => point.time)
+    .reduce((min, value) => Math.min(min, value), Number.POSITIVE_INFINITY);
+  const latestFallback = [
+    getLatestValidDate(datasets.oneMonth.points),
+    getLatestValidDate(datasets.threeMonth.points),
+  ]
+    .filter((point): point is SeriesPoint => Boolean(point))
+    .map((point) => point.time)
+    .reduce((max, value) => Math.max(max, value), 0);
+  const effectiveEndTime = Math.min(latestRequired, latestFallback);
+  const effectiveEndYear = new Date(effectiveEndTime).getUTCFullYear();
+
+  const { startYear, endYear, isPartial } = resolveYearRange({
+    defaultStartYear: DEFAULT_START_YEAR,
+    defaultEndYear: effectiveEndYear,
+    minYear: DEFAULT_START_YEAR,
+    maxYear: effectiveEndYear,
+  });
+
   for (let year = startYear; year <= endYear; year += 1) {
     for (let month = 1; month <= 12; month += 1) {
       const asOf = resolveHistoricalDate(year, month);
       const asOfTime = Date.parse(`${asOf}T00:00:00Z`);
+      if (year === effectiveEndYear && asOfTime > effectiveEndTime) {
+        break;
+      }
       assertCoverageForAsOf(asOf, asOfTime, datasets);
       const recordDate = findLatestCommonDate(
         asOfTime,
