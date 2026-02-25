@@ -3,6 +3,7 @@ import { siteUrl } from "../lib/siteUrl";
 import { snapshotData } from "../lib/snapshot";
 import { stageGuides } from "./guides/stageGuides";
 import { stakeholderGuides } from "./guides/stakeholderGuides";
+import { roleLandings } from "./solutions/career-paths/roleLandingData";
 
 // Market Climate Station SEO map for the primary report surface.
 
@@ -19,6 +20,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const stagePages: MetadataRoute.Sitemap = stageGuides.map((guide) => ({
     url: `${siteUrl}/guides/stage/${guide.slug}`,
+    lastModified: staticLastModified,
+    changeFrequency: "monthly",
+    priority: 0.6,
+  }));
+
+  const careerPathPages: MetadataRoute.Sitemap = roleLandings.map((role) => ({
+    url: `${siteUrl}/solutions/career-paths/${role.slug}`,
     lastModified: staticLastModified,
     changeFrequency: "monthly",
     priority: 0.6,
@@ -117,6 +125,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     ...stakeholderPages,
     ...stagePages,
+    ...careerPathPages,
     {
       url: `${siteUrl}/llms.txt`,
       lastModified: reportLastModified,
