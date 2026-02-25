@@ -128,6 +128,7 @@ export const generateMetadata = async ({
   const selection = resolveTimeMachineSelection(resolvedSearchParams);
   const requestedSelection = parseTimeMachineRequest(resolvedSearchParams);
   const baseUrl = new URL("/api/og", siteUrl);
+  baseUrl.searchParams.set("template", "report");
 
   if (selection) {
     baseUrl.searchParams.set("month", String(selection.month));

@@ -8,6 +8,14 @@ export const metadata: Metadata = buildPageMetadata({
     "Use Treasury yield curve changes to sequence roadmap bets, adjust pricing posture, and reduce product delivery risk.",
   path: "/solutions/product-roadmapping",
   imageAlt: "Treasury signals for product roadmapping",
+  imageParams: {
+    template: "solutions",
+    eyebrow: "Solution · Product roadmapping",
+    title: "Roadmap with macro-aware conviction",
+    subtitle:
+      "Sequence bets using Treasury signal posture so priorities survive market pressure shifts.",
+    kicker: "Whether solutions for product leaders.",
+  },
 });
 
 const roadmapMoves = [

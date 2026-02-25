@@ -30,6 +30,14 @@ export const metadata: Metadata = buildPageMetadata({
     "Macro signals, sensor detail, thresholds, and historical context for Whether Market Climate Station.",
   path: "/signals",
   imageAlt: "Whether Report signal evidence overview",
+  imageParams: {
+    template: "signals",
+    eyebrow: "Signal evidence",
+    title: "Macro signals and threshold context",
+    subtitle:
+      "Inspect drivers, confidence, and historical context before changing operating posture.",
+    kicker: "Built for evidence-first planning.",
+  },
 });
 
 export default async function SignalsPage({

@@ -10,6 +10,14 @@ export const metadata: Metadata = buildPageMetadata({
     "Client-friendly overview of how Whether helps leadership teams set operating posture from live market conditions.",
   path: "/guides",
   imageAlt: "Whether overview for leadership teams",
+  imageParams: {
+    template: "guides",
+    eyebrow: "Leadership guides",
+    title: "Role-based playbooks for market climate",
+    subtitle:
+      "Find the right guidance by function, then pressure-test decisions against current macro posture.",
+    kicker: "For product, engineering, finance, and strategy.",
+  },
 });
 
 const operatingQuestions = [

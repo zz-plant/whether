@@ -23,6 +23,13 @@ export async function generateMetadata({ params }: StagePageProps): Promise<Meta
       description: "Stage-specific guidance for leadership teams.",
       path: "/guides/stage",
       imageAlt: "Whether stage guidance",
+      imageParams: {
+        template: "guides",
+        eyebrow: "Company stage guide",
+        title: "Stage-specific macro guidance",
+        subtitle: "Map market climate posture to planning expectations at your company stage.",
+        kicker: "Whether stage playbooks.",
+      },
     });
   }
 
@@ -31,6 +38,13 @@ export async function generateMetadata({ params }: StagePageProps): Promise<Meta
     description: guide.seoDescription,
     path: `/guides/stage/${guide.slug}`,
     imageAlt: `${guide.title} company stage guidance`,
+    imageParams: {
+      template: "guides",
+      eyebrow: "Company stage guide",
+      title: guide.title,
+      subtitle: guide.seoDescription,
+      kicker: "Stage-specific operating guidance.",
+    },
   });
 }
 

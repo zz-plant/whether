@@ -25,7 +25,12 @@ export const metadata: Metadata = buildPageMetadata({
   path: "/operations/briefings",
   imageAlt: "Whether action playbook briefings view",
   imageParams: {
-    view: "operations-briefings",
+    template: "operations",
+    eyebrow: "Action playbook · Briefings",
+    title: "Export board-ready and team-ready briefs",
+    subtitle:
+      "Package macro posture, confidence, and priorities into clear communication artifacts.",
+    kicker: "Briefings workstream · Whether",
   },
 });
 
