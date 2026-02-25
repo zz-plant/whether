@@ -24,6 +24,32 @@ Whether is designed to reduce two common mistakes:
 - COO/CFO/strategy partners setting spend, runway, and risk posture.
 - Planning and operations teams that need copy-ready, source-backed leadership summaries.
 
+## How a product manager can use Whether to become more strategic
+Whether does not replace product strategy, but it helps PMs build strategic habits with real market constraints in view.
+
+### A practical PM-to-strategy workflow
+1. **Start planning with climate context**
+   - Read the current market climate before roadmap grooming or quarterly planning.
+   - Convert signals into explicit constraints (risk tolerance, hiring pace, roadmap aggressiveness).
+2. **Shift from features to portfolio posture**
+   - Rebalance roadmap mix (core reliability, expansion bets, exploratory work) based on climate guidance.
+   - Explain trade-offs with market-aware reasoning, not only internal capacity constraints.
+3. **Frame decisions at executive altitude**
+   - Pressure-test major product bets against downside scenarios.
+   - Use assumption locks and scenario previews to show decision quality, not just confidence.
+4. **Create repeatable strategy narratives**
+   - Use brief exports to communicate why priorities changed and what signals support the shift.
+   - Track recommendations across climate regimes to demonstrate strategic maturity over time.
+
+The progression is: **macro awareness → operating posture → portfolio choices → evidence-backed narrative**.
+
+### Promotion pathways this can support
+- **Senior Product Manager:** Lead sharper prioritization and clearer cross-functional trade-offs.
+- **Group Product Manager / Lead PM:** Balance multiple teams and bets with a coherent risk posture.
+- **Director of Product:** Set market-aware planning cadence, investment pacing, and executive framing.
+- **Head of Product / VP Product:** Align product narrative with CEO, board, and finance expectations.
+- **Product Strategy / Chief of Staff:** Translate external signals into company-level planning guidance.
+
 ## Local development
 1. Use Node.js 20+ (`.nvmrc`) and Bun 1.3.x.
 2. Install dependencies: `bun install`
