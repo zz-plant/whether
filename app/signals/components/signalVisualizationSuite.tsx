@@ -48,6 +48,19 @@ const formatNumber = (value: number | null, decimals = 2) => {
   return value.toFixed(decimals);
 };
 
+const getSensorDeltaTone = (sensorId: SensorReading["id"], value: number | null) => {
+  if (value === null) {
+    return "bg-slate-800/80 text-slate-400";
+  }
+
+  if (value === 0) {
+    return "bg-slate-700/70 text-slate-100";
+  }
+
+  const isAdverse = sensorId === "CURVE_SLOPE" ? value < 0 : value > 0;
+  return isAdverse ? "bg-rose-500/25 text-rose-200" : "bg-emerald-500/25 text-emerald-200";
+};
+
 const regimeTone: Record<RegimeKey, string> = {
   SCARCITY: "bg-rose-400/80",
   DEFENSIVE: "bg-amber-400/80",
@@ -96,6 +109,11 @@ export const SignalVisualizationSuite = ({
     assessment.scores.curveSlope !== null && assessment.scores.curveSlope < 0
       ? clamp(Math.round(Math.abs(assessment.scores.curveSlope) * 50), 0, TIGHTNESS_INVERSION_POINTS)
       : 0;
+  const decompositionTotalPoints = baseRatePoints + inversionPoints;
+  const decompositionBaseRateWidth = decompositionTotalPoints ? (baseRatePoints / decompositionTotalPoints) * 100 : 0;
+  const decompositionInversionWidth = decompositionTotalPoints
+    ? (inversionPoints / decompositionTotalPoints) * 100
+    : 0;
 
   const yieldPoints = [
     { label: "1M", value: treasury.yields.oneMonth },
@@ -182,12 +200,12 @@ export const SignalVisualizationSuite = ({
               <div className="flex h-full">
                 <div
                   className="bg-indigo-400"
-                  style={{ width: `${(baseRatePoints / 100) * 100}%` }}
+                  style={{ width: `${decompositionBaseRateWidth}%` }}
                   aria-label="Base rate contribution"
                 />
                 <div
                   className="bg-rose-400"
-                  style={{ width: `${(inversionPoints / 100) * 100}%` }}
+                  style={{ width: `${decompositionInversionWidth}%` }}
                   aria-label="Inversion contribution"
                 />
               </div>
@@ -206,6 +224,9 @@ export const SignalVisualizationSuite = ({
                 <dd className="mono text-slate-100">{assessment.scores.tightness}/100</dd>
               </div>
             </dl>
+            <p className="text-[11px] text-slate-400">
+              Segment widths are normalized to active points so composition remains accurate at high tightness.
+            </p>
           </div>
         </article>
 
@@ -249,14 +270,7 @@ export const SignalVisualizationSuite = ({
                     <th className="py-2 pr-3 text-left font-medium text-slate-200">{sensor.label}</th>
                     {sensorTimeWindows.map((window) => {
                       const value = sensor.timeWindows?.find((entry) => entry.window === window.id)?.change ?? null;
-                      const tone =
-                        value === null
-                          ? "bg-slate-800/80 text-slate-400"
-                          : value > 0
-                            ? "bg-rose-500/25 text-rose-200"
-                            : value < 0
-                              ? "bg-emerald-500/25 text-emerald-200"
-                              : "bg-slate-700/70 text-slate-100";
+                      const tone = getSensorDeltaTone(sensor.id, value);
                       return (
                         <td key={window.id} className="py-2 pr-3">
                           <span className={`inline-flex min-h-[32px] min-w-[56px] items-center justify-center rounded-md px-2 ${tone}`}>
