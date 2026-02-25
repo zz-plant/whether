@@ -4,7 +4,7 @@
 - Node.js 20+ (`.nvmrc`)
 - Bun 1.3.x (`packageManager` in `package.json`)
 
-## Core commands
+## Core repo commands
 - Install dependencies: `bun install`
 - Start dev server: `bun run dev`
 - Start dev server (Turbopack): `bun run dev:turbo`
@@ -16,20 +16,20 @@
 - Run tests in watch mode: `bun run test:watch`
 - Run Whether MCP server (stdio): `bun run mcp:whether`
 
-## MCP starter profile (contributor baseline)
+## Default execution profile for agents
 
-Use a small MCP set first and expand only when there is a repeated workflow need.
+Use a minimal tool set first and expand only when a repeated workflow requires it.
 
-Recommended initial servers:
+Recommended starter MCP servers:
 - `filesystem` (repo-scoped only)
 - `github` (issues/PR metadata)
-- `playwright` (browser validation/screenshots)
+- `playwright` (browser validation/screenshots when applicable)
 - one trusted `fetch`/`search` server for external research
 
 ### Auth and security
-- Use environment variables for credentials; do not commit tokens or secrets.
-- Prefer read-only scopes first; require explicit opt-in for mutating tools.
-- Keep server allowlists narrow (only required hosts/repos).
+- Use environment variables for credentials; never commit tokens or secrets.
+- Prefer read-only scopes first; require explicit need before enabling mutating tools.
+- Keep allowlists narrow (only required hosts/repos).
 
 ### Example env vars
 Set only what your MCP client/server combination needs:
@@ -39,13 +39,11 @@ export GITHUB_TOKEN="<token-with-minimum-required-scopes>"
 export BRAVE_API_KEY="<optional-search-provider-key>"
 ```
 
-### Suggested verification after setup
+## Baseline verification after setup
 - `bun run lint`
 - `bun test`
 
-If MCP-backed research is used in a deliverable, include URL + retrieval date + confidence in the final write-up.
-
-
+If MCP-backed research appears in a deliverable, include URL + retrieval date + confidence.
 
 ## Repo-local skills quick start
 
@@ -63,6 +61,6 @@ Repository path convention:
 
 Usage (tool/runtime dependent):
 - invoke by skill name (for example `research-brief`) when the task matches the skill description
-- if direct slash invocation is supported by your agent runtime, use `/research-brief`, `/feature-audit`, `/pr-hygiene`, `/regime-briefing-operator`, `/signal-provenance-audit`, or `/executive-brief-pack`
+- if direct slash invocation is supported by your runtime, use `/research-brief`, `/feature-audit`, `/pr-hygiene`, `/regime-briefing-operator`, `/signal-provenance-audit`, or `/executive-brief-pack`
 
-When using skill outputs in a deliverable, preserve the skill's output contract sections so reviewers can quickly verify completeness.
+When using skill outputs in a deliverable, preserve each skill's output-contract sections so reviewers can verify completeness quickly.

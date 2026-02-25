@@ -1,6 +1,12 @@
 # Development playbook
 
-This playbook is the practical companion to `CONTRIBUTING.md`: use it when you want concrete, high-signal workflows for planning, implementing, validating, and reviewing changes.
+This playbook is the practical companion to `CONTRIBUTING.md`: use it for concrete, high-signal workflows to plan, implement, validate, and review changes.
+
+
+## 0) When to use this playbook
+
+Use this document when you need execution detail (validation depth, PR shaping, troubleshooting).
+For baseline project orientation, start with `CONTRIBUTING.md`.
 
 ## 1) Preferred day-to-day workflow
 
@@ -96,7 +102,14 @@ Suggested PR body scaffold:
 - Move opportunistic cleanup to a follow-up PR.
 - Add a short “review map” in PR summary (file-by-file or concern-by-concern).
 
-## 8) Team heuristics
+## 8) Documentation sync reminders
+
+When behavior or workflows change, update docs in the same PR:
+- `README.md` for user-facing quickstart context changes.
+- `CONTRIBUTING.md` for human contributor workflow changes.
+- `docs/agents/*` when agent-specific instructions shift.
+
+## 9) Team heuristics
 
 - Optimize for **clarity over cleverness**.
 - Prefer explicit assumptions and visible validation over implicit behavior.

@@ -2,7 +2,7 @@
 
 Thanks for helping improve Whether.
 
-This is the **human contributor** source of truth for day-to-day development workflow.
+This is the **human contributor** source of truth for day-to-day development workflows.
 For AI/agent operating rules, use `AGENTS.md` and `docs/agents/*`.
 
 ## 1) Environment and bootstrap
@@ -29,11 +29,22 @@ For AI/agent operating rules, use `AGENTS.md` and `docs/agents/*`.
 | Tests in watch mode | `bun run test:watch` |
 | Full pre-PR checks | `bun run check` |
 
-## 3) What good contributions look like
+## 3) Contribution workflow
 
-### Keep scope intentional
-- Prefer one clear intent per PR (feature, fix, refactor, docs).
-- Avoid drive-by cleanup unless it is required to safely land your main change.
+1. **Sync and install**
+   - `git pull --rebase`
+   - `bun install`
+2. **Implement in focused slices**
+   - Prefer one clear intent per PR.
+   - Avoid drive-by cleanup unless required for correctness.
+3. **Validate by risk**
+   - Docs-only: verify links/commands/references.
+   - Typical app/logic changes: `bun run lint && bun test`.
+   - Broad/high-risk changes: `bun run check`.
+4. **Ship with docs/tests**
+   - If behavior, interfaces, commands, or contributor workflows change, update relevant docs in the same PR.
+
+## 4) What good contributions look like
 
 ### Reuse existing patterns
 - Extend existing modules/utilities first.
@@ -41,36 +52,23 @@ For AI/agent operating rules, use `AGENTS.md` and `docs/agents/*`.
 
 ### Preserve product trust
 - Keep macro data provenance and freshness metadata explicit.
-- If behavior/workflows/interfaces change, update tests and docs in the same PR.
+- Ensure deterministic fallback behavior remains intact when touching data paths.
+- Add/update tests for scoring, classification, or decision-behavior changes.
 
-## 4) Where to make changes
+## 5) Where to make changes
 
 - `app/` — UI, routes, and user-facing interaction surfaces.
 - `lib/` — regime engine, data ingestion/normalization, decision logic.
 - `tests/` — behavior and regression coverage.
 - `docs/` — architecture, specs, audits, and contributor guidance.
 
-If unsure where logic belongs, prefer colocating with the nearest existing feature module and follow established patterns.
-
-## 5) Validation depth rubric (Definition of Done)
-
-Pick the smallest meaningful validation set for your risk level:
-
-| Change type | Minimum validation |
-| --- | --- |
-| Docs/copy only | Verify links/commands/references are accurate |
-| Typical product or logic change | `bun run lint` + `bun test` |
-| Broad/refactor/high-risk logic changes | `bun run check` |
-
-Additional expectations:
-- Add/update tests for scoring, classification, or decision-behavior changes.
-- For data-path changes, verify deterministic fallback behavior still works.
+If unsure where logic belongs, colocate with the nearest existing feature module and follow established patterns.
 
 ## 6) Commit and PR expectations
 
 ### Commit quality
-- Use clear, descriptive commit subjects that convey user/contributor impact.
 - Keep commits coherent and reviewable.
+- Use descriptive commit subjects that describe user/contributor impact.
 
 ### PR quality
 A strong PR description should answer:
@@ -87,11 +85,11 @@ Recommended section headings:
 
 ## 7) Documentation ownership map
 
-- `README.md` → product framing + quick local run basics.
+- `README.md` → product framing + local quickstart basics.
 - `CONTRIBUTING.md` (this file) → human workflow and contribution standards.
 - `AGENTS.md` + `docs/agents/*` → agent/AI contributor instructions.
 - `docs/README.md` → canonical documentation index.
-- `docs/development-playbook.md` → deeper engineering workflow, checklists, and troubleshooting.
+- `docs/development-playbook.md` → detailed engineering workflow, checklists, and troubleshooting.
 
 ## 8) Quick links
 
