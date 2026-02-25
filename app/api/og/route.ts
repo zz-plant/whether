@@ -102,8 +102,8 @@ const renderStaticTemplate = ({
   subtitle: string;
   kicker: string;
 }) => {
-  const titleLines = wrapText(title, 34).slice(0, 2);
-  const subtitleLines = wrapText(subtitle, 64).slice(0, 3);
+  const titleLines = wrapText(title, 30).slice(0, 2);
+  const subtitleLines = wrapText(subtitle, 42).slice(0, 3);
   const accent = templateAccent[template];
 
   return `<?xml version="1.0" encoding="UTF-8"?>
@@ -111,15 +111,37 @@ const renderStaticTemplate = ({
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#020617" />
+      <stop offset="45%" stop-color="#0b1220" />
       <stop offset="100%" stop-color="#111827" />
+    </linearGradient>
+    <radialGradient id="spot" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(980 70) rotate(132.677) scale(520 360)">
+      <stop stop-color="${accent}" stop-opacity="0.32" />
+      <stop offset="1" stop-color="${accent}" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="accentLine" x1="60" y1="68" x2="1140" y2="68" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="${accent}" stop-opacity="0.35" />
+      <stop offset="0.5" stop-color="${accent}" />
+      <stop offset="1" stop-color="${accent}" stop-opacity="0.35" />
     </linearGradient>
     <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
       <feDropShadow dx="0" dy="10" stdDeviation="16" flood-color="#020617" flood-opacity="0.55" />
     </filter>
+    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="18" />
+    </filter>
   </defs>
   <rect width="1200" height="630" fill="url(#bg)" />
+  <circle cx="980" cy="70" r="420" fill="url(#spot)" filter="url(#softGlow)" />
   <rect x="60" y="64" width="1080" height="502" rx="30" fill="#0b1220" stroke="#1f2937" stroke-width="2" filter="url(#shadow)" />
-  <rect x="60" y="64" width="1080" height="8" rx="4" fill="${accent}" />
+  <rect x="60" y="64" width="1080" height="8" rx="4" fill="url(#accentLine)" />
+  <rect x="744" y="118" width="320" height="316" rx="24" fill="#0f172a" stroke="${accent}" stroke-opacity="0.35" />
+  <text x="772" y="172" fill="#cbd5e1" font-family="Inter, system-ui, sans-serif" font-size="15" letter-spacing="1.6">FRAMEWORK</text>
+  <text x="772" y="222" fill="#f8fafc" font-family="Inter, system-ui, sans-serif" font-size="36" font-weight="700">Whether</text>
+  <text x="772" y="258" fill="#94a3b8" font-family="Inter, system-ui, sans-serif" font-size="17">Signal → Interpretation → Action</text>
+  <line x1="772" y1="286" x2="1034" y2="286" stroke="#334155" />
+  <text x="772" y="324" fill="${accent}" font-family="Inter, system-ui, sans-serif" font-size="18" font-weight="600">For product &amp; engineering</text>
+  <text x="772" y="356" fill="#cbd5e1" font-family="Inter, system-ui, sans-serif" font-size="17">Operational playbooks grounded</text>
+  <text x="772" y="381" fill="#cbd5e1" font-family="Inter, system-ui, sans-serif" font-size="17">in public macro data.</text>
   <text x="120" y="155" fill="${accent}" font-family="Inter, system-ui, sans-serif" font-size="18" font-weight="700" letter-spacing="2">
     ${escapeText(eyebrow.toUpperCase())}
   </text>
@@ -132,7 +154,7 @@ const renderStaticTemplate = ({
     .join("\n")}
   ${subtitleLines
     .map(
-      (line, index) => `<text x="120" y="${350 + index * 34}" fill="#cbd5e1" font-family="Inter, system-ui, sans-serif" font-size="26">
+      (line, index) => `<text x="120" y="${350 + index * 34}" fill="#cbd5e1" font-family="Inter, system-ui, sans-serif" font-size="24">
     ${escapeText(line)}
   </text>`
     )
@@ -140,7 +162,7 @@ const renderStaticTemplate = ({
   <text x="120" y="536" fill="#94a3b8" font-family="Inter, system-ui, sans-serif" font-size="20">
     ${escapeText(kicker)}
   </text>
-  <text x="950" y="536" text-anchor="end" fill="#e2e8f0" font-family="Inter, system-ui, sans-serif" font-size="20" font-weight="600">
+  <text x="1048" y="536" text-anchor="end" fill="#e2e8f0" font-family="Inter, system-ui, sans-serif" font-size="20" font-weight="600">
     Whether
   </text>
 </svg>`;
@@ -214,28 +236,39 @@ export async function GET(request: Request) {
         ? "Live (high confidence)"
         : "Cached (medium)";
 
-  const descriptionLines = wrapText(assessment.description, 60);
+  const statusLines = wrapText(statusLabel, 34).slice(0, 2);
+  const descriptionLines = wrapText(assessment.description, 52).slice(0, 3);
 
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#020617" />
-      <stop offset="100%" stop-color="#0f172a" />
+      <stop offset="65%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#111827" />
     </linearGradient>
-    <linearGradient id="highlight" x1="0" y1="0" x2="1200" y2="0" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="rgba(56,189,248,0.12)" />
-      <stop offset="50%" stop-color="rgba(56,189,248,0)" />
-      <stop offset="100%" stop-color="rgba(56,189,248,0.12)" />
+    <radialGradient id="glowTop" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1060 90) rotate(137.442) scale(520 420)">
+      <stop stop-color="#38bdf8" stop-opacity="0.34" />
+      <stop offset="1" stop-color="#38bdf8" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="highlight" x1="60" y1="64" x2="1140" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.38" />
+      <stop offset="50%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.32" />
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#111d34" />
+      <stop offset="1" stop-color="#0b1324" />
     </linearGradient>
     <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="120%">
       <feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="#020617" flood-opacity="0.6" />
     </filter>
-    <mask id="highlightMask">
-      <rect x="60" y="60" width="1080" height="510" rx="32" fill="white" />
-    </mask>
+    <filter id="blurGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="24" />
+    </filter>
   </defs>
   <rect width="1200" height="630" fill="url(#bg)" />
+  <circle cx="1050" cy="92" r="390" fill="url(#glowTop)" filter="url(#blurGlow)" />
   <rect
     x="60"
     y="60"
@@ -247,29 +280,35 @@ export async function GET(request: Request) {
     stroke-width="2"
     filter="url(#cardShadow)"
   />
-  <rect
-    x="60"
-    y="120"
-    width="1080"
-    height="120"
-    fill="url(#highlight)"
-    mask="url(#highlightMask)"
-  />
+  <rect x="60" y="60" width="1080" height="8" rx="4" fill="url(#highlight)" />
+  <rect x="750" y="116" width="334" height="330" rx="24" fill="url(#panel)" stroke="#334155" stroke-width="1.5" />
+  <text x="784" y="164" fill="#93c5fd" font-family="Inter, system-ui, sans-serif" font-size="15" letter-spacing="1.5">LIVE METRICS</text>
+  <text x="784" y="220" fill="#f8fafc" font-family="Inter, system-ui, sans-serif" font-size="18">Record date</text>
+  <text x="784" y="248" fill="#cbd5e1" font-family="Inter, system-ui, sans-serif" font-size="23" font-weight="600">${escapeText(recordDateLabel)}</text>
+  <line x1="784" y1="268" x2="1052" y2="268" stroke="#334155" />
+  <text x="784" y="304" fill="#f8fafc" font-family="Inter, system-ui, sans-serif" font-size="18">Base rate</text>
+  <text x="784" y="333" fill="#7dd3fc" font-family="Inter, system-ui, sans-serif" font-size="30" font-weight="700">${escapeText(baseRateLabel)}</text>
+  <text x="784" y="374" fill="#f8fafc" font-family="Inter, system-ui, sans-serif" font-size="18">10Y-2Y slope</text>
+  <text x="784" y="403" fill="#67e8f9" font-family="Inter, system-ui, sans-serif" font-size="30" font-weight="700">${escapeText(slopeLabel)}</text>
   <text x="120" y="150" fill="#e2e8f0" font-family="Inter, system-ui, sans-serif" font-size="42" font-weight="600">
     ${escapeText("Whether Report")}
   </text>
   <text x="120" y="190" fill="#94a3b8" font-family="Inter, system-ui, sans-serif" font-size="18" letter-spacing="2">
     ${escapeText("MARKET CLIMATE STATION")}
   </text>
-  <text x="120" y="235" fill="#38bdf8" font-family="Inter, system-ui, sans-serif" font-size="20" font-weight="600">
-    ${escapeText(statusLabel)}
-  </text>
-  <text x="120" y="300" fill="#f8fafc" font-family="Inter, system-ui, sans-serif" font-size="32" font-weight="600">
+  ${statusLines
+    .map(
+      (line, index) => `<text x="120" y="${235 + index * 24}" fill="#38bdf8" font-family="Inter, system-ui, sans-serif" font-size="20" font-weight="600">
+    ${escapeText(line)}
+  </text>`
+    )
+    .join("\n")}
+  <text x="120" y="${300 + (statusLines.length - 1) * 20}" fill="#f8fafc" font-family="Inter, system-ui, sans-serif" font-size="32" font-weight="600">
     ${escapeText(`Market climate: ${assessment.regime}`)}
   </text>
   ${descriptionLines
     .map(
-      (line, index) => `<text x="120" y="${340 + index * 28}" fill="#cbd5f5" font-family="Inter, system-ui, sans-serif" font-size="20">
+      (line, index) => `<text x="120" y="${340 + (statusLines.length - 1) * 20 + index * 28}" fill="#cbd5f5" font-family="Inter, system-ui, sans-serif" font-size="20">
     ${escapeText(line)}
   </text>`
     )
