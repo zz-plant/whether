@@ -4,22 +4,22 @@ export const reportPageLinks: ReportPageLink[] = [
   {
     href: "/",
     label: "Current Climate",
-    description: "Canonical operating posture for the current planning cycle.",
+    description: "Verdict and immediate decision call for the current planning cycle.",
   },
   {
     href: "/operations",
     label: "Playbook",
-    description: "Translate posture into hiring, spend, and execution guardrails.",
+    description: "Guardrails, sequencing, and execution trade-offs for the active posture.",
   },
   {
     href: "/signals",
     label: "Signals",
-    description: "Inspect drivers, thresholds, and timestamps behind the posture call.",
+    description: "Evidence and raw diagnostics behind the posture call.",
   },
   {
     href: "/methodology",
     label: "Method",
-    description: "Audit plain-English formulas, source links, and refresh cadence.",
+    description: "Model logic and formulas only, with source-linked definitions.",
   },
   {
     href: "/guides",

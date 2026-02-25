@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import type { Route } from "next";
 import { loadReportData } from "../../lib/report/reportData";
 import { siteUrl } from "../../lib/siteUrl";
 import {
@@ -19,7 +18,6 @@ import { AdvancedThresholdsSection } from "./components/advancedThresholdsSectio
 import { TimeMachinePanel } from "./components/timeMachinePanel";
 import { RegimeTimelinePanel } from "./components/regimeTimelinePanel";
 import { reportPageLinks } from "../../lib/report/reportNavigation";
-import { appendSearchParamsToRoute } from "../../lib/navigation/routeSearchParams";
 import { ReturningVisitorDeltaStrip } from "../components/changeSinceLastReadPanel";
 
 export const runtime = "edge";
@@ -217,7 +215,7 @@ export default async function SignalsPage({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Signals"
       currentPath="/signals"
-      pageSummary="Evidence layer: the drivers, thresholds, and timestamps behind posture."
+      pageSummary="Evidence and raw diagnostics only: drivers, thresholds, and timestamps behind posture."
       pageSummaryLink={{
         href: "#thresholds",
         label: "See thresholds",
@@ -228,18 +226,14 @@ export default async function SignalsPage({
       pageNavVariant="compact"
       primaryCta={{ href: "#current-scores", label: "View current scores" }}
       decisionBanner={{
-        label: "Explain why",
-        decision: `${regimeLabel} regime is supported by current macro readings.`,
+        label: "Evidence status",
+        decision: `${regimeLabel} regime matches the current macro diagnostics.`,
         horizon: "Current cycle",
         confidence: trustStatusLabel,
         effectiveDate: recordDateLabel,
         evidenceHref: "#macro-signals",
       }}
       decisionDiffs={[{ label: `Regime: ${regimeLabel}`, tone: "neutral" }]}
-      nextStep={{
-        description: "Return to the playbook to apply this evidence.",
-        href: `${appendSearchParamsToRoute("/operations" as Route, resolvedSearchParams)}#ops-monthly-action-summary`,
-      }}
       structuredData={structuredData}
       historicalBanner={
         historicalSelection ? (
@@ -265,11 +259,11 @@ export default async function SignalsPage({
         openPanelHref={timeMachineHref}
       />
 
-      <section className="weather-panel space-y-4 px-6 py-5" aria-label="Default signal review path">
+      <section className="weather-panel space-y-4 px-6 py-5" aria-label="Signal diagnostics queue">
         <header className="space-y-2">
-          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Default review path</p>
+          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Diagnostics queue</p>
           <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-            Start simple, then open advanced controls only when needed.
+            Prioritized diagnostics by focus area.
           </h2>
         </header>
         <div className="grid gap-2 sm:grid-cols-5">
@@ -385,7 +379,7 @@ export default async function SignalsPage({
             </span>
           </div>
           <p className="mt-3 text-xs text-slate-300">
-            Use these controls for threshold tuning, historical snapshots, and timeline diagnostics after you complete the default review path.
+            Use these controls for threshold tuning, historical snapshots, and timeline diagnostics.
             This toggle keeps you on the signal evidence page.
           </p>
           <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -437,9 +431,9 @@ export default async function SignalsPage({
         links={[
           {
             href: "/operations",
-            label: "Action playbook",
+            label: "Operations playbook",
             description:
-              "Use the scored signals to drive execution moves and decision safeguards.",
+              "Apply these diagnostics in guardrails, sequencing, and execution trade-offs.",
           },
           {
             href: "/methodology",

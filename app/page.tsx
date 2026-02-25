@@ -390,7 +390,7 @@ export default async function HomePage({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Current Climate"
       currentPath="/"
-      pageSummary="Canonical operating posture for the current cycle."
+      pageSummary="Verdict and immediate decision call for this planning cycle."
       primaryCta={{
         href: "#weekly-action-summary",
         label: "See posture rationale",
