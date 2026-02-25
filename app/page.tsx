@@ -132,13 +132,13 @@ export const generateMetadata = async ({
       siteName,
       images: [
         {
-          url: socialImageUrl,
+          url: imageUrl,
           width: 1200,
           height: 630,
           alt: "Whether Report Weekly briefing Open Graph",
         },
         {
-          url: imageUrl,
+          url: socialImageUrl,
           width: 1200,
           height: 630,
           alt: "Whether Report Weekly briefing Open Graph",
