@@ -127,6 +127,8 @@ export default async function SignalsPage({
       ? (requestedFocus as FocusTab)
       : "all";
   const sectionLinks = [
+    { href: "#decision-summary", label: "Decision summary" },
+    { href: "#evidence-priorities", label: "Evidence priorities" },
     { href: "#current-scores", label: "Current scores" },
     { href: "#thresholds", label: "Thresholds" },
   ];
@@ -197,6 +199,7 @@ export default async function SignalsPage({
   const priorityQueue = prioritizedSignalsByFocus[activeFocus];
   const essentialPriorityQueue = priorityQueue.slice(0, 2);
   const additionalPriorityQueue = priorityQueue.slice(2);
+  const topDiagnosticCallouts = priorityQueue.slice(0, 3);
 
   return (
     <ReportShell
@@ -220,9 +223,9 @@ export default async function SignalsPage({
       sectionLinks={sectionLinks}
       heroVariant="compact"
       pageNavVariant="compact"
-      primaryCta={{ href: "#current-scores", label: "View current scores" }}
+      primaryCta={{ href: "#macro-signals", label: "Review evidence" }}
       decisionBanner={{
-        label: "Evidence status",
+        label: "Decision",
         decision: `${regimeLabel} regime matches the current macro diagnostics.`,
         horizon: "Current cycle",
         confidence: trustStatusLabel,
@@ -255,9 +258,72 @@ export default async function SignalsPage({
         openPanelHref={timeMachineHref}
       />
 
-      <section className="weather-panel space-y-4 px-6 py-5" aria-label="Signal diagnostics queue">
+      <section id="decision-summary" className="weather-panel space-y-4 px-6 py-5" aria-label="Decision summary">
         <header className="space-y-2">
-          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Diagnostics queue</p>
+          <p className="text-sm font-semibold tracking-[0.18em] text-slate-300">Decision summary</p>
+          <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
+            {regimeLabel} posture is supported by current signal evidence.
+          </h2>
+        </header>
+        <p className="text-sm leading-relaxed text-slate-200 sm:text-base">
+          Confidence is <span className="font-semibold text-slate-100">{trustStatusLabel}</span>. Signals are stamped {" "}
+          <span className="font-semibold text-slate-100">{recordDateLabel}</span> with last refresh at {" "}
+          <span className="font-semibold text-slate-100">{fetchedAtLabel}</span>.
+        </p>
+        <ul className="grid gap-2 md:grid-cols-3" aria-label="Top evidence callouts">
+          {topDiagnosticCallouts.map((item) => (
+            <li key={item.label} className="weather-surface p-3">
+              <p className="text-xs font-semibold tracking-[0.14em] text-slate-400">{item.label}</p>
+              <p className="mt-1 text-sm text-slate-200">{item.why}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section id="current-scores" className="weather-panel space-y-4 px-6 py-5">
+        <header>
+          <p className="text-sm font-semibold tracking-[0.18em] text-slate-300">
+            Current scores
+          </p>
+          <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
+            Tightness, risk appetite, and curve slope at a glance.
+          </h2>
+        </header>
+        <div className="grid gap-3 md:grid-cols-3">
+          <article className="weather-surface space-y-2 p-4">
+            <dl>
+              <dt className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Tightness</dt>
+              <dd className="mono mt-2 text-2xl text-slate-100">{assessment.scores.tightness}/100</dd>
+            </dl>
+            <p className="text-sm font-semibold text-slate-200">
+              Threshold: {assessment.thresholds.tightnessRegime}/100
+            </p>
+            <p className="text-sm text-slate-300">Higher values indicate tighter funding conditions.</p>
+          </article>
+          <article className="weather-surface space-y-2 p-4">
+            <dl>
+              <dt className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Risk appetite</dt>
+              <dd className="mono mt-2 text-2xl text-slate-100">{assessment.scores.riskAppetite}/100</dd>
+            </dl>
+            <p className="text-sm font-semibold text-slate-200">
+              Threshold: {assessment.thresholds.riskAppetiteRegime}/100
+            </p>
+            <p className="text-sm text-slate-300">Higher values indicate more risk-on market behavior.</p>
+          </article>
+          <article className="weather-surface space-y-2 p-4">
+            <dl>
+              <dt className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Curve slope</dt>
+              <dd className="mono mt-2 text-2xl text-slate-100">{assessment.scores.curveSlope === null ? "N/A" : `${assessment.scores.curveSlope.toFixed(2)}%`}</dd>
+            </dl>
+            <p className="text-sm font-semibold text-slate-200">Threshold: 0.00% (inversion boundary)</p>
+            <p className="text-sm text-slate-300">10Y minus 2Y Treasury yield spread.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="evidence-priorities" className="weather-panel space-y-4 px-6 py-5" aria-label="Signal diagnostics queue">
+        <header className="space-y-2">
+          <p className="text-sm font-semibold tracking-[0.18em] text-slate-300">Evidence priorities</p>
           <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
             Prioritized diagnostics by focus area.
           </h2>
@@ -284,9 +350,9 @@ export default async function SignalsPage({
         <ol className="grid gap-3 md:grid-cols-2" aria-label="Prioritized signal queue">
           {essentialPriorityQueue.map((item, index) => (
             <li key={item.label} className="weather-surface space-y-2 p-4">
-              <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Priority {index + 1}</p>
+              <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">Priority {index + 1}</p>
               <p className="text-sm font-semibold text-slate-100">{item.label}</p>
-              <p className="text-xs text-slate-300">{item.why}</p>
+              <p className="text-sm text-slate-200">{item.why}</p>
               <a
                 href={item.href}
                 className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
@@ -305,9 +371,9 @@ export default async function SignalsPage({
             <ol className="mt-3 grid gap-3" aria-label="Additional prioritized signal queue">
               {additionalPriorityQueue.map((item, index) => (
                 <li key={item.label} className="rounded-xl border border-slate-800/80 bg-slate-950/50 p-4">
-                  <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Priority {index + essentialPriorityQueue.length + 1}</p>
+                  <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">Priority {index + essentialPriorityQueue.length + 1}</p>
                   <p className="mt-2 text-sm font-semibold text-slate-100">{item.label}</p>
-                  <p className="mt-1 text-xs text-slate-300">{item.why}</p>
+                  <p className="mt-1 text-sm text-slate-200">{item.why}</p>
                   <a
                     href={item.href}
                     className="mt-2 inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
@@ -319,47 +385,6 @@ export default async function SignalsPage({
             </ol>
           </details>
         ) : null}
-      </section>
-
-      <section id="current-scores" className="weather-panel space-y-4 px-6 py-5">
-        <header>
-          <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">
-            Current scores
-          </p>
-          <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-            Tightness, risk appetite, and curve slope at a glance.
-          </h2>
-        </header>
-        <div className="grid gap-3 md:grid-cols-3">
-          <article className="weather-surface space-y-2 p-4">
-            <dl>
-              <dt className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Tightness</dt>
-              <dd className="mono mt-2 text-2xl text-slate-100">{assessment.scores.tightness}/100</dd>
-            </dl>
-            <p className="text-xs font-semibold text-slate-300">
-              Threshold: {assessment.thresholds.tightnessRegime}/100
-            </p>
-            <p className="text-xs text-slate-500">Higher values indicate tighter funding conditions.</p>
-          </article>
-          <article className="weather-surface space-y-2 p-4">
-            <dl>
-              <dt className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Risk appetite</dt>
-              <dd className="mono mt-2 text-2xl text-slate-100">{assessment.scores.riskAppetite}/100</dd>
-            </dl>
-            <p className="text-xs font-semibold text-slate-300">
-              Threshold: {assessment.thresholds.riskAppetiteRegime}/100
-            </p>
-            <p className="text-xs text-slate-500">Higher values indicate more risk-on market behavior.</p>
-          </article>
-          <article className="weather-surface space-y-2 p-4">
-            <dl>
-              <dt className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Curve slope</dt>
-              <dd className="mono mt-2 text-2xl text-slate-100">{assessment.scores.curveSlope === null ? "N/A" : `${assessment.scores.curveSlope.toFixed(2)}%`}</dd>
-            </dl>
-            <p className="text-xs font-semibold text-slate-300">Threshold: 0.00% (inversion boundary)</p>
-            <p className="text-xs text-slate-500">10Y minus 2Y Treasury yield spread.</p>
-          </article>
-        </div>
       </section>
 
       <SignalVisualizationSuite

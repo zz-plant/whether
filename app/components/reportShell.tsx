@@ -139,12 +139,7 @@ export const ReportShell = ({
   const sourceHref = treasurySource.startsWith("http")
     ? treasurySource
     : undefined;
-  const hasTwoPrimaryActions = Boolean(primaryCta && secondaryCta);
-  const hasSpecialCaveat = trustStatusTone !== "stable";
-  const showActNowCard = !hasTwoPrimaryActions || hasSpecialCaveat;
-  const missionGridClassName = showActNowCard
-    ? "grid gap-3 lg:grid-cols-[1.6fr,1.4fr,1.2fr]"
-    : "grid gap-3 lg:grid-cols-[1.6fr,1.4fr]";
+  const missionGridClassName = "grid gap-3 lg:grid-cols-[1.6fr,1.4fr]";
   const heroHeaderSpacingClassName = "space-y-3 sm:space-y-4";
   const heroSectionSpacingClassName =
     "weather-panel-static min-w-0 space-y-4 px-4 py-4 sm:space-y-5 sm:px-5";
@@ -273,21 +268,13 @@ export const ReportShell = ({
   }, []);
   const primaryDecisionText =
     decisionBanner?.decision ?? `${primaryCta.label}.`;
-  const decisionHorizon = decisionBanner?.horizon ?? "Next 2 weeks";
-  const fallbackAction = secondaryCta
-    ? { href: secondaryCta.href, label: secondaryCta.label }
-    : nextStep
-      ? { href: nextStep.href, label: "Open next page" }
-      : decisionBanner?.evidenceHref
-        ? { href: decisionBanner.evidenceHref, label: "Review evidence trail" }
-        : null;
   const missionSupportText = trustStatusDetail;
 
   const showPostureRibbon = currentPath !== "/";
   const isPrimaryActionInSectionLinks = sectionLinks.some((section) => section.href === primaryCta.href);
   const showMobileActionCard = !isPrimaryActionInSectionLinks;
   const postureRibbon = showPostureRibbon ? (
-    <div className="weather-panel-static sticky top-[calc(env(safe-area-inset-top)+5.9rem)] z-[18] mb-4 hidden flex-wrap items-center justify-between gap-2 border border-slate-700/70 px-4 py-2 text-xs sm:top-[5.8rem] sm:flex">
+    <div className="weather-panel-static mb-4 hidden flex-wrap items-center justify-between gap-2 border border-slate-700/70 px-4 py-2 text-xs sm:flex">
       <p className="text-slate-300">
         Current Posture: <span className="font-semibold text-slate-100">{statusLabel}</span>
         <span className="ml-2 text-slate-400">Updated {recordDateLabel}</span>
@@ -477,11 +464,25 @@ export const ReportShell = ({
                     </div>
                   ) : null}
                 </div>
-                <p className="text-xs text-slate-300">
+                <p className="text-sm text-slate-200">
                   {trustStatusTone === "stable"
                     ? `Confidence: ${trustStatusLabel}. ${trustStatusAction}`
                     : `Caution: ${trustStatusAction}`}
                 </p>
+                <dl className="grid gap-2 text-sm text-slate-200 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="weather-surface px-3 py-2">
+                    <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Confidence</dt>
+                    <dd className="mt-1 font-semibold text-slate-100">{trustStatusLabel}</dd>
+                  </div>
+                  <div className="weather-surface px-3 py-2">
+                    <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Signals stamped</dt>
+                    <dd className="mt-1 text-slate-100">{recordDateLabel}</dd>
+                  </div>
+                  <div className="weather-surface px-3 py-2 sm:col-span-2 lg:col-span-1">
+                    <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Last refresh</dt>
+                    <dd className="mt-1 text-slate-100">{fetchedAtLabel}</dd>
+                  </div>
+                </dl>
                 {showOfflineBadge ? (
                   <p className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.14em] text-amber-100">
                     {offlineBadgeLabel}
@@ -561,92 +562,6 @@ export const ReportShell = ({
                     </ol>
                   </article>
 
-                  {showActNowCard ? (
-                    <article className="weather-surface space-y-3 p-4">
-                      <p className="text-sm font-semibold tracking-[0.12em] text-slate-400">
-                        Act now
-                      </p>
-                      <a
-                        href={primaryCta.href}
-                        className="weather-pill inline-flex min-h-[44px] w-full items-center justify-center px-3 py-2 text-center text-xs font-semibold tracking-[0.12em] text-slate-100 hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-                      >
-                        {primaryCta.label}
-                      </a>
-                      {secondaryCta ? (
-                        <a
-                          href={secondaryCta.href}
-                          className="inline-flex min-h-[44px] w-full items-center justify-center text-xs font-semibold text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-                        >
-                          {secondaryCta.label}
-                        </a>
-                      ) : null}
-                    </article>
-                  ) : null}
-                </div>
-              </section>
-
-              <section
-                className="weather-panel space-y-3 px-4 py-4 sm:px-5"
-                aria-label="Decision"
-              >
-                <p className="text-xs font-semibold tracking-[0.1em] text-slate-400">
-                  Decision
-                </p>
-                <article className="weather-surface space-y-3 p-4">
-                  <p className="text-sm font-semibold text-slate-100">
-                    {primaryDecisionText}
-                  </p>
-                  <div className="grid gap-2 sm:grid-cols-1">
-                    <div className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-3">
-                      <p className="text-xs font-semibold tracking-[0.1em] text-slate-400">
-                        Time horizon
-                      </p>
-                      <p className="mt-1 text-sm font-semibold text-slate-100">
-                        {decisionHorizon}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="grid gap-2 sm:grid-cols-2">
-                    <a
-                      href={primaryCta.href}
-                      className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-center text-xs font-semibold tracking-[0.12em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-                    >
-                      Open action: {primaryCta.label}
-                    </a>
-                    {fallbackAction ? (
-                      <a
-                        href={fallbackAction.href}
-                        className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-center text-xs font-semibold tracking-[0.12em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-                      >
-                        Fallback: {fallbackAction.label}
-                      </a>
-                    ) : null}
-                  </div>
-                </article>
-              </section>
-
-              <section className="weather-panel sticky bottom-24 z-10 hidden space-y-3 border-sky-500/30 bg-slate-950/95 px-4 py-3 sm:bottom-4 sm:block">
-                <p className="text-sm font-semibold tracking-[0.12em] text-slate-400">
-                  Current posture
-                </p>
-                <p className="text-sm font-semibold text-slate-100">
-                  {primaryDecisionText}
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  <a
-                    href={primaryCta.href}
-                    className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.14em]"
-                  >
-                    {primaryCta.label}
-                  </a>
-                  {decisionBanner?.evidenceHref ? (
-                    <a
-                      href={decisionBanner.evidenceHref}
-                      className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100"
-                    >
-                      Open evidence
-                    </a>
-                  ) : null}
                 </div>
               </section>
 
