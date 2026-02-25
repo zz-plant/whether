@@ -6,7 +6,7 @@ Use this command sequence in CI to keep Cloudflare Pages/Workers deploys determi
 
 ```bash
 bun install --frozen-lockfile
-bun run build:pages
+bun run build:cloudflare
 npx wrangler versions upload
 ```
 
@@ -48,7 +48,7 @@ This produces two deploy artifacts:
 
 When warning budget fails:
 1. Open `cloudflare-warning-summary.md` artifact and identify unexpected classes.
-2. Confirm whether warning appears in local Pages build (`bun run build:pages`).
+2. Confirm whether warning appears in local Pages build (`bun run build:cloudflare`).
 3. If warning is actionable, fix root cause and keep baseline unchanged.
 4. If warning is known-safe external noise, add exact warning class to baseline with a short PR note explaining why.
 
@@ -57,7 +57,7 @@ When warning budget fails:
 When CI already has a fresh `.vercel/output` from `vercel build`, you can skip the nested Vercel build that `next-on-pages` normally performs:
 
 ```bash
-bun run build:pages:skip-next-build
+bun run build:cloudflare:skip-next-build
 ```
 
 This uses `NEXT_ON_PAGES_SKIP_BUILD=1` and forwards `--skip-build` to `next-on-pages`, reducing redundant work in multi-phase pipelines.
