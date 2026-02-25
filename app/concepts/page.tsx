@@ -8,6 +8,8 @@ import {
   regimeToneByKey,
 } from "../../lib/productCanon";
 
+export const runtime = "edge";
+
 export const metadata: Metadata = buildPageMetadata({
   title: "Product management canon in macro context — Whether",
   description:
