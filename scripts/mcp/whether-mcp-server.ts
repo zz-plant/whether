@@ -10,20 +10,24 @@ import {
 import { agentSkills } from "../../lib/agentSkills";
 
 const cadenceSchema = z.enum(supportedAgentCadences);
+const defaultCadence: AgentCadence = "weekly";
 
 const server = new McpServer({
   name: "whether-agent-interface",
   version: "1.0.0",
 });
 
-server.tool(
+const registerTool = server.tool.bind(server) as any;
+
+registerTool(
   "get_agent_brief",
   "Fetch a cadence-specific Whether summary with structured agent handoff payload and prompt.",
   {
-    cadence: cadenceSchema.default("weekly"),
+    cadence: cadenceSchema.optional(),
   },
-  async ({ cadence }) => {
-    const response = await buildAgentInterfaceResponse(cadence as AgentCadence);
+  async ({ cadence }: { cadence?: AgentCadence }) => {
+    const resolvedCadence = cadence ?? defaultCadence;
+    const response = await buildAgentInterfaceResponse(resolvedCadence);
 
     return {
       content: [
@@ -36,7 +40,7 @@ server.tool(
   }
 );
 
-server.tool(
+registerTool(
   "list_agent_skills",
   "List Whether agent skills expected by the agent handoff payload.",
   {},
@@ -50,16 +54,22 @@ server.tool(
   })
 );
 
-server.tool(
+registerTool(
   "pull_recent_site_info",
   "Pull the latest Whether site agent brief from /api/agent so downstream agents can use fresh site context.",
   {
-    cadence: cadenceSchema.default("weekly"),
+    cadence: cadenceSchema.optional(),
     siteUrl: z.string().optional(),
   },
-  async ({ cadence, siteUrl }) => {
+  async ({
+    cadence,
+    siteUrl,
+  }: {
+    cadence?: AgentCadence;
+    siteUrl?: string;
+  }) => {
     const recentInfo = await pullRecentSiteInfo({
-      cadence: cadence as AgentCadence,
+      cadence: cadence ?? defaultCadence,
       siteBaseUrl: siteUrl,
     });
 
