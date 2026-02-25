@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { buildCanonicalUrl, buildPageMetadata, serializeJsonLd } from "../../../lib/seo";
 import { roleLandings, type ScopeType, type SeniorityBand } from "./roleLandingData";
-export const runtime = "edge";
 
+export const dynamic = "force-static";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Career paths for product leaders — Whether",
