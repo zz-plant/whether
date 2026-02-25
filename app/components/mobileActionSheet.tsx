@@ -60,13 +60,13 @@ export const MobileActionSheet = ({
         <Dialog.Backdrop className="fixed inset-0 z-40 bg-slate-950/70" />
         <Dialog.Popup
           className="fixed inset-x-4 bottom-[calc(env(safe-area-inset-bottom)+5.5rem)] z-50 max-h-[calc(100vh-2rem)] overflow-auto pt-6"
-          onCloseAutoFocus={(event) => {
+          finalFocus={() => {
             if (!suppressCloseAutoFocusRef.current) {
-              return;
+              return true;
             }
 
-            event.preventDefault();
             suppressCloseAutoFocusRef.current = false;
+            return false;
           }}
         >
           <div className="weather-mobile-panel weather-mobile-sheet w-full p-4 shadow-2xl">
