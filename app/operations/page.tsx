@@ -47,7 +47,7 @@ export default async function OperationsPage({
   const quickSteps = [
     {
       title: "Confirm the posture",
-      detail: "Use the regime to decide what to fund now vs. defer.",
+      detail: "Set what ships now vs. what waits, then tie each call to explicit guardrails.",
       href: "#ops-monthly-action-summary",
       cta: "Review monthly actions",
       emphasis: "primary",
@@ -55,7 +55,7 @@ export default async function OperationsPage({
     {
       title: "Choose the planning horizon",
       detail:
-        "Focus this week, month, or quarter before assigning owners and due dates.",
+        "Pick this week, month, or quarter first so owners, due dates, and check-ins stay accountable.",
       href: "#ops-horizon-plan",
       cta: "Review horizon plan",
       emphasis: "secondary",
@@ -63,7 +63,7 @@ export default async function OperationsPage({
     {
       title: "Export the brief",
       detail:
-        "Generate copy-ready output for exec syncs, board prep, and team alignment.",
+        "Generate briefing-ready output so leadership decisions and team execution stay in sync.",
       href: "/operations/briefings",
       cta: "Review briefing kits",
       emphasis: "secondary",
@@ -122,7 +122,7 @@ export default async function OperationsPage({
     ? "Use historical data for retrospectives; avoid approving new bets until live signals return."
     : isFallback
       ? "Hold irreversible decisions until live signals return or you validate the cache."
-      : "Signals are live; apply these guardrails in weekly and monthly planning.";
+      : "Signals are live; apply these guardrails now and validate outcomes each review cycle.";
   const trustStatusTone = historicalSelection
     ? "historical"
     : isFallback
@@ -248,7 +248,7 @@ export default async function OperationsPage({
       }}
       decisionDiffs={[{ label: "Up from last week", tone: "positive" }]}
       nextStep={{
-        description: "Turn this playbook into owner assignments and exports.",
+        description: "Turn this playbook into owner assignments, review checkpoints, and exports.",
         href: appendSearchParamsToRoute(
           "/operations/plan",
           resolvedSearchParams,
@@ -288,7 +288,7 @@ export default async function OperationsPage({
       <SectionedReportPanel
         id="ops-horizon-plan"
         title="Time horizon plan"
-        description="Decide moves for this week, month, and quarter."
+        description="Commit actions for this week, month, and quarter with explicit risk boundaries."
       >
         <div className="grid gap-2 sm:grid-cols-3">
           {horizonTabs.map((horizon) => {
@@ -415,7 +415,7 @@ export default async function OperationsPage({
         cadence="monthly"
         storageKey="whether-monthly-review-checklist"
         title="Monthly operating review"
-        subtitle="Monthly review for team alignment."
+        subtitle="Monthly review to lock decisions and evidence-based follow-through."
         items={[
           {
             id: "monthly-summary",
@@ -441,7 +441,7 @@ export default async function OperationsPage({
       <SectionedReportPanel
         id="ops-monthly-action-summary"
         title="Monthly action summary"
-        description="What moves the regime recommends this month."
+        description="Execute the highest-leverage moves this month while holding posture guardrails."
       >
         <MonthlyActionSummaryPanel
           assessment={assessment}
