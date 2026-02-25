@@ -7,136 +7,140 @@ import { roleLandings } from "./solutions/career-paths/roleLandingData";
 
 // Market Climate Station SEO map for the primary report surface.
 
+type ChangeFrequency = NonNullable<MetadataRoute.Sitemap[number]["changeFrequency"]>;
+
+type SitemapEntryDescriptor = {
+  path: `/${string}` | "";
+  changeFrequency: ChangeFrequency;
+  priority: number;
+  lastModified: Date;
+};
+
+const fallbackLastModified = new Date("2026-02-01T00:00:00.000Z");
+
+const parseLastModified = (value: string): Date | null => {
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
+
+const resolveLastModified = (...candidates: string[]): Date => {
+  for (const candidate of candidates) {
+    const parsed = parseLastModified(candidate);
+
+    if (parsed) {
+      return parsed;
+    }
+  }
+
+  return fallbackLastModified;
+};
+
+const buildEntry = ({
+  path,
+  changeFrequency,
+  priority,
+  lastModified,
+}: SitemapEntryDescriptor): MetadataRoute.Sitemap[number] => ({
+  url: `${siteUrl}${path}`,
+  lastModified,
+  changeFrequency,
+  priority,
+});
+
 export default function sitemap(): MetadataRoute.Sitemap {
-  const reportLastModified = new Date(snapshotData.record_date);
-  const staticLastModified = new Date("2026-02-01");
+  const reportLastModified = resolveLastModified(snapshotData.record_date, snapshotData.fetched_at);
+  const staticLastModified = resolveLastModified(snapshotData.fetched_at, snapshotData.record_date);
 
-  const stakeholderPages: MetadataRoute.Sitemap = stakeholderGuides.map((guide) => ({
-    url: `${siteUrl}/guides/${guide.slug}`,
-    lastModified: staticLastModified,
-    changeFrequency: "monthly",
-    priority: 0.6,
-  }));
-
-  const stagePages: MetadataRoute.Sitemap = stageGuides.map((guide) => ({
-    url: `${siteUrl}/guides/stage/${guide.slug}`,
-    lastModified: staticLastModified,
-    changeFrequency: "monthly",
-    priority: 0.6,
-  }));
-
-  const careerPathPages: MetadataRoute.Sitemap = roleLandings.map((role) => ({
-    url: `${siteUrl}/solutions/career-paths/${role.slug}`,
-    lastModified: staticLastModified,
-    changeFrequency: "monthly",
-    priority: 0.6,
-  }));
-
-  return [
+  const coreEntries: SitemapEntryDescriptor[] = [
+    { path: "", lastModified: reportLastModified, changeFrequency: "weekly", priority: 1 },
+    { path: "/signals", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.8 },
+    { path: "/operations", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.8 },
     {
-      url: siteUrl,
-      lastModified: reportLastModified,
-      changeFrequency: "weekly",
-      priority: 1,
-    },
-    {
-      url: `${siteUrl}/signals`,
-      lastModified: reportLastModified,
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: `${siteUrl}/operations`,
-      lastModified: reportLastModified,
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: `${siteUrl}/operations/plan`,
+      path: "/operations/plan",
       lastModified: reportLastModified,
       changeFrequency: "weekly",
       priority: 0.7,
     },
     {
-      url: `${siteUrl}/operations/decisions`,
+      path: "/operations/decisions",
       lastModified: reportLastModified,
       changeFrequency: "weekly",
       priority: 0.7,
     },
     {
-      url: `${siteUrl}/operations/briefings`,
+      path: "/operations/briefings",
       lastModified: reportLastModified,
       changeFrequency: "weekly",
       priority: 0.7,
     },
     {
-      url: `${siteUrl}/methodology`,
+      path: "/methodology",
       lastModified: staticLastModified,
       changeFrequency: "monthly",
       priority: 0.7,
     },
     {
-      url: `${siteUrl}/terms-of-service`,
+      path: "/terms-of-service",
       lastModified: staticLastModified,
       changeFrequency: "yearly",
       priority: 0.4,
     },
     {
-      url: `${siteUrl}/acceptable-use-policy`,
+      path: "/acceptable-use-policy",
       lastModified: staticLastModified,
       changeFrequency: "yearly",
       priority: 0.4,
     },
+    { path: "/onboarding", lastModified: staticLastModified, changeFrequency: "monthly", priority: 0.6 },
+    { path: "/guides", lastModified: staticLastModified, changeFrequency: "monthly", priority: 0.7 },
+    { path: "/guides/stage", lastModified: staticLastModified, changeFrequency: "monthly", priority: 0.7 },
     {
-      url: `${siteUrl}/onboarding`,
-      lastModified: staticLastModified,
-      changeFrequency: "monthly",
-      priority: 0.6,
-    },
-    {
-      url: `${siteUrl}/guides`,
+      path: "/solutions/product-roadmapping",
       lastModified: staticLastModified,
       changeFrequency: "monthly",
       priority: 0.7,
     },
     {
-      url: `${siteUrl}/guides/stage`,
+      path: "/solutions/engineering-capacity",
       lastModified: staticLastModified,
       changeFrequency: "monthly",
       priority: 0.7,
     },
     {
-      url: `${siteUrl}/solutions/product-roadmapping`,
+      path: "/solutions/market-regime-playbook",
       lastModified: staticLastModified,
       changeFrequency: "monthly",
       priority: 0.7,
     },
     {
-      url: `${siteUrl}/solutions/engineering-capacity`,
+      path: "/solutions/career-paths",
       lastModified: staticLastModified,
       changeFrequency: "monthly",
       priority: 0.7,
     },
-    {
-      url: `${siteUrl}/solutions/market-regime-playbook`,
-      lastModified: staticLastModified,
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: `${siteUrl}/solutions/career-paths`,
-      lastModified: staticLastModified,
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    ...stakeholderPages,
-    ...stagePages,
-    ...careerPathPages,
-    {
-      url: `${siteUrl}/llms.txt`,
-      lastModified: reportLastModified,
-      changeFrequency: "weekly",
-      priority: 0.5,
-    },
+    { path: "/llms.txt", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.5 },
   ];
+
+  const stakeholderEntries: SitemapEntryDescriptor[] = stakeholderGuides.map((guide) => ({
+    path: `/guides/${guide.slug}`,
+    lastModified: staticLastModified,
+    changeFrequency: "monthly",
+    priority: 0.6,
+  }));
+
+  const stageEntries: SitemapEntryDescriptor[] = stageGuides.map((guide) => ({
+    path: `/guides/stage/${guide.slug}`,
+    lastModified: staticLastModified,
+    changeFrequency: "monthly",
+    priority: 0.6,
+  }));
+
+  const careerPathEntries: SitemapEntryDescriptor[] = roleLandings.map((role) => ({
+    path: `/solutions/career-paths/${role.slug}`,
+    lastModified: staticLastModified,
+    changeFrequency: "monthly",
+    priority: 0.6,
+  }));
+
+  return [...coreEntries, ...stakeholderEntries, ...stageEntries, ...careerPathEntries].map(buildEntry);
 }
