@@ -74,13 +74,13 @@ export const buildPageMetadata = ({
       siteName: websiteName,
       images: [
         {
-          url: socialImageUrl,
+          url: imageUrl,
           width: 1200,
           height: 630,
           alt: imageAlt,
         },
         {
-          url: imageUrl,
+          url: socialImageUrl,
           width: 1200,
           height: 630,
           alt: imageAlt,
