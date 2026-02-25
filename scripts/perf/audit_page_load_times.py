@@ -7,6 +7,7 @@ JSON that can be pasted into docs.
 from __future__ import annotations
 
 import json
+import math
 import statistics
 import subprocess
 from dataclasses import dataclass
@@ -83,7 +84,8 @@ def percentile(values: list[float], pct: int) -> float:
     if not values:
         return 0.0
     sorted_values = sorted(values)
-    idx = max(0, min(len(sorted_values) - 1, round((pct / 100) * len(sorted_values) + 0.5) - 1))
+    rank = max(1, math.ceil((pct / 100) * len(sorted_values)))
+    idx = min(len(sorted_values) - 1, rank - 1)
     return sorted_values[idx]
 
 
