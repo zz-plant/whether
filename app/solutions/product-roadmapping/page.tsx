@@ -24,6 +24,27 @@ const roadmapMoves = [
   "Protect core reliability and activation flows before long-horizon initiatives.",
 ] as const;
 
+const connectedPages = [
+  {
+    title: "Engineering capacity",
+    description: "Keep roadmap commitments and engineering staffing plans synchronized to the same market assumptions.",
+    href: "/solutions/engineering-capacity",
+    cta: "Open engineering capacity",
+  },
+  {
+    title: "Career paths",
+    description: "Give PMs and product leaders role-based guidance to apply this posture in weekly execution.",
+    href: "/solutions/career-paths",
+    cta: "Open career paths",
+  },
+  {
+    title: "Market regime playbook",
+    description: "Escalate roadmap pivots into executive-level keep, pause, and accelerate calls.",
+    href: "/solutions/market-regime-playbook",
+    cta: "Open regime playbook",
+  },
+] as const;
+
 export default function ProductRoadmappingPage() {
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
@@ -70,6 +91,24 @@ export default function ProductRoadmappingPage() {
           >
             Review macro signal matrix
           </Link>
+        </div>
+      </section>
+
+      <section className="weather-panel space-y-4 px-6 py-6">
+        <h2 className="text-xl font-semibold text-slate-100">Connect this page to adjacent workflows</h2>
+        <div className="grid gap-3 sm:grid-cols-3">
+          {connectedPages.map((page) => (
+            <article key={page.href} className="weather-surface flex h-full flex-col gap-3 px-4 py-4">
+              <h3 className="text-base font-semibold text-slate-100">{page.title}</h3>
+              <p className="text-sm text-slate-300">{page.description}</p>
+              <Link
+                href={page.href}
+                className="weather-pill mt-auto inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+              >
+                {page.cta}
+              </Link>
+            </article>
+          ))}
         </div>
       </section>
     </main>

@@ -252,6 +252,74 @@ export default function BriefPage() {
         </article>
       </section>
 
+
+      <section className="weather-panel space-y-6 px-6 py-6">
+        <header className="space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+            Connected landing pages
+          </p>
+          <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
+            Move from overview to workflow-specific execution.
+          </h2>
+          <p className="text-sm text-slate-300">
+            Use these solution pages when you need deeper guidance for role growth, roadmap
+            sequencing, capacity planning, or regime-level operating guardrails.
+          </p>
+        </header>
+        <div className="grid gap-4 xl:grid-cols-2">
+          <article className="weather-surface space-y-3 px-4 py-4">
+            <h3 className="text-base font-semibold text-slate-100">Career paths for product leaders</h3>
+            <p className="text-sm text-slate-300">
+              Role-based playbooks for PM through VP scopes, with outcomes and proof points tied to
+              market-aware operating habits.
+            </p>
+            <Link
+              href="/solutions/career-paths"
+              className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+            >
+              Open career paths →
+            </Link>
+          </article>
+          <article className="weather-surface space-y-3 px-4 py-4">
+            <h3 className="text-base font-semibold text-slate-100">Product roadmapping</h3>
+            <p className="text-sm text-slate-300">
+              Turn live macro posture into concrete roadmap sequencing, launch pacing, and risk
+              framing.
+            </p>
+            <Link
+              href="/solutions/product-roadmapping"
+              className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+            >
+              Open product roadmapping →
+            </Link>
+          </article>
+          <article className="weather-surface space-y-3 px-4 py-4">
+            <h3 className="text-base font-semibold text-slate-100">Engineering capacity</h3>
+            <p className="text-sm text-slate-300">
+              Align hiring and delivery commitments with confidence-scored market conditions.
+            </p>
+            <Link
+              href="/solutions/engineering-capacity"
+              className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+            >
+              Open engineering capacity →
+            </Link>
+          </article>
+          <article className="weather-surface space-y-3 px-4 py-4">
+            <h3 className="text-base font-semibold text-slate-100">Market regime playbook</h3>
+            <p className="text-sm text-slate-300">
+              Connect posture classification to executive keep / pause / accelerate decisions.
+            </p>
+            <Link
+              href="/solutions/market-regime-playbook"
+              className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+            >
+              Open regime playbook →
+            </Link>
+          </article>
+        </div>
+      </section>
+
       <section className="weather-panel space-y-3 px-6 py-6">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
           In one sentence

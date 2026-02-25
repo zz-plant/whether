@@ -44,6 +44,30 @@ const levelingUpReasons = [
   },
 ] as const;
 
+const connectedSolutions = [
+  {
+    title: "Product roadmapping",
+    description:
+      "Translate macro posture into roadmap sequencing choices and quarterly prioritization trade-offs.",
+    href: "/solutions/product-roadmapping",
+    cta: "Connect to product roadmapping",
+  },
+  {
+    title: "Engineering capacity",
+    description:
+      "Pressure-test staffing plans and delivery commitments with the same signal baseline your product org uses.",
+    href: "/solutions/engineering-capacity",
+    cta: "Connect to engineering capacity",
+  },
+  {
+    title: "Market regime playbook",
+    description:
+      "Align executive-level keep / pause / accelerate decisions across product, engineering, and finance.",
+    href: "/solutions/market-regime-playbook",
+    cta: "Connect to regime playbook",
+  },
+] as const;
+
 export default function CareerPathsPage() {
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
@@ -100,6 +124,28 @@ export default function CareerPathsPage() {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section className="weather-panel space-y-4 px-6 py-6">
+        <h2 className="text-xl font-semibold text-slate-100">Connect role growth to team execution</h2>
+        <p className="text-sm text-slate-300">
+          Career progress compounds faster when your individual operating habits connect directly to
+          team-level planning workflows.
+        </p>
+        <div className="grid gap-3 sm:grid-cols-3">
+          {connectedSolutions.map((solution) => (
+            <article key={solution.href} className="weather-surface flex h-full flex-col gap-3 px-4 py-4">
+              <h3 className="text-base font-semibold text-slate-100">{solution.title}</h3>
+              <p className="text-sm text-slate-300">{solution.description}</p>
+              <Link
+                href={solution.href}
+                className="weather-pill mt-auto inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+              >
+                {solution.cta}
+              </Link>
+            </article>
+          ))}
+        </div>
       </section>
     </main>
   );
