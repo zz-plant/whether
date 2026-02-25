@@ -18,6 +18,8 @@ type MacroSnapshotPayload = {
 
 const payload = macroSnapshot as MacroSnapshotPayload;
 
+const MACRO_SERIES_REVALIDATE_SECONDS = 900;
+
 const snapshotSeries: MacroSeriesReading[] = payload.series.map((series) => ({
   ...series,
   fetched_at: series.fetched_at ?? payload.fetched_at,
@@ -29,7 +31,7 @@ export const macroSeries: MacroSeriesReading[] = snapshotSeries;
 const readFredLatestValue = async (seriesId: string, fetcher: typeof fetch) => {
   const response = await fetcher(
     `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${encodeURIComponent(seriesId)}`,
-    { cache: "no-store" },
+    { next: { revalidate: MACRO_SERIES_REVALIDATE_SECONDS } },
   );
 
   if (!response.ok) {
@@ -57,7 +59,7 @@ const readBlsLatestValue = async (seriesId: string, fetcher: typeof fetch) => {
   const response = await fetcher("https://api.bls.gov/publicAPI/v2/timeseries/data/", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    cache: "no-store",
+    next: { revalidate: MACRO_SERIES_REVALIDATE_SECONDS },
     body: JSON.stringify({ seriesid: [seriesId], latest: true }),
   });
 
@@ -86,7 +88,7 @@ const readBlsLatestYearOverYear = async (seriesId: string, fetcher: typeof fetch
   const response = await fetcher("https://api.bls.gov/publicAPI/v2/timeseries/data/", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    cache: "no-store",
+    next: { revalidate: MACRO_SERIES_REVALIDATE_SECONDS },
     body: JSON.stringify({
       seriesid: [seriesId],
       startyear: String(currentYear - 2),

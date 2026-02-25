@@ -25,7 +25,7 @@ import { reportPageLinks } from "../lib/report/reportNavigation";
 import { buildTrustStatus } from "../lib/report/trustStatus";
 
 export const runtime = "edge";
-export const dynamic = "force-dynamic";
+export const revalidate = 900;
 
 const homeSectionSequence = [
   { href: "#weekly-action-summary", label: "Weekly actions" },

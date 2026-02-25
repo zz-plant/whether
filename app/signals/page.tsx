@@ -23,6 +23,7 @@ import { ReturningVisitorDeltaStrip } from "../components/changeSinceLastReadPan
 import { buildTrustStatus } from "../../lib/report/trustStatus";
 
 export const runtime = "edge";
+export const revalidate = 900;
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Whether Report — Signal evidence",

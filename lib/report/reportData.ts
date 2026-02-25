@@ -86,9 +86,17 @@ export const buildLastYearComparison = ({
   },
 });
 
+const REPORT_DATA_REVALIDATE_SECONDS = 900;
+
 export const loadReportData = async (searchParams?: ReportSearchParams) => {
   const liveFetcher: typeof fetch = (input, init) =>
-    fetch(input, { ...init, cache: "no-store" });
+    fetch(input, {
+      ...init,
+      next: {
+        ...((init as RequestInit & { next?: { revalidate?: number } })?.next ?? {}),
+        revalidate: REPORT_DATA_REVALIDATE_SECONDS,
+      },
+    });
   const historicalSelection = resolveTimeMachineSelection(searchParams);
   const requestedSelection = parseTimeMachineRequest(searchParams);
   const treasuryPromise = fetchTreasuryData({
