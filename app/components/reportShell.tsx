@@ -328,7 +328,7 @@ export const ReportShell = ({
           className="pointer-events-none absolute inset-0 weather-grid"
           aria-hidden="true"
         />
-        <div className="tv-rail-safe mx-auto max-w-[82rem] pb-[calc(env(safe-area-inset-bottom)+13rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)] pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)] sm:pb-10 sm:pt-5 sm:pl-[calc(env(safe-area-inset-left)+1.25rem)] sm:pr-[calc(env(safe-area-inset-right)+1.25rem)]">
+        <div className="tv-rail-safe mx-auto max-w-[82rem] pb-[calc(env(safe-area-inset-bottom)+10rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)] pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)] sm:pb-10 sm:pt-5 sm:pl-[calc(env(safe-area-inset-left)+1.25rem)] sm:pr-[calc(env(safe-area-inset-right)+1.25rem)]">
           <header className="weather-appbar sticky top-[calc(env(safe-area-inset-top)+0.75rem)] z-20 px-4 py-4 sm:top-4 sm:px-6 sm:py-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-3">
@@ -341,8 +341,8 @@ export const ReportShell = ({
                   priority
                 />
                 <div>
-                  <p className="text-xs text-slate-400 sm:hidden">
-                    Signals refreshed {fetchedAtLabel}
+                  <p className="text-xs text-slate-300 sm:hidden">
+                    Signals updated {fetchedAtLabel}
                   </p>
                 </div>
               </div>
@@ -654,18 +654,18 @@ export const ReportShell = ({
 
               <OperatorCommandCenter actions={commandActions} />
 
-              <footer className="mt-12 border-t border-slate-800/70 pt-6 text-xs font-semibold tracking-[0.18em] text-slate-400">
+              <footer className="mt-12 border-t border-slate-800/70 pt-6 text-xs font-semibold tracking-[0.18em] text-slate-300">
                 <p>{INFORMATIONAL_NOTICE}</p>
                 <p className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] tracking-[0.14em]">
                   <a
                     href="/terms-of-service"
-                    className="text-slate-300 underline decoration-slate-600 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                    className="text-slate-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
                   >
                     Terms of Service
                   </a>
                   <a
                     href="/acceptable-use-policy"
-                    className="text-slate-300 underline decoration-slate-600 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                    className="text-slate-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
                   >
                     Acceptable Use Policy
                   </a>
@@ -679,7 +679,7 @@ export const ReportShell = ({
             className="sm:hidden mt-6 px-4"
           >
             <section className="weather-panel border-sky-500/40 bg-slate-950/95 px-3 py-3">
-              <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-400">
+              <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-300">
                 Current posture
               </p>
               <div className="mt-2 flex items-center justify-between gap-3">

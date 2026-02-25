@@ -281,7 +281,7 @@ export const ReportMobileNavigation = ({
               <p className="truncate text-sm font-semibold tracking-[0.08em] text-slate-100">
                 {currentLink.label}
               </p>
-              <p className="mt-1 truncate text-xs text-slate-400">
+              <p className="mt-1 truncate text-xs text-slate-300">
                 {currentPosition}/{pageLinks.length} · {currentLink.description}
               </p>
             </div>
@@ -310,7 +310,11 @@ export const ReportMobileNavigation = ({
               );
             })}
           </NavigationMenu.List>
-
+          {pageLinks.length > 3 ? (
+            <p className="px-1 text-xs text-slate-300" aria-live="polite">
+              Swipe to view more pages →
+            </p>
+          ) : null}
 
           <div className="grid grid-cols-1 gap-2">
             <Collapsible.Trigger
@@ -326,7 +330,7 @@ export const ReportMobileNavigation = ({
                 </span>
                 <span className="uppercase">All pages</span>
               </span>
-              <span className="text-xs font-medium tracking-[0.12em] text-slate-400">
+              <span className="text-xs font-medium tracking-[0.12em] text-slate-300">
                 {pageCountLabel}
               </span>
             </Collapsible.Trigger>

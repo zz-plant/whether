@@ -389,7 +389,7 @@ export default async function HomePage({
       pageSummary="Verdict and immediate decision call for this planning cycle."
       primaryCta={{
         href: "#weekly-action-summary",
-        label: "See posture rationale",
+        label: "View rationale and next actions",
       }}
       sidebarVariant="hidden"
       hideHeroChrome={true}
