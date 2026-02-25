@@ -20,6 +20,8 @@ This directory is organized by audience so contributors can find the right sourc
 
 ## Product direction and planning
 - `feature-specs-current.md` — implemented/current feature intent.
+- `concepts-enhancements.md` — prioritized UX and product enhancement ideas for the `/concepts` timeline and detail experience.
+- `solutions-enhancements.md` — prioritized UX and product enhancement ideas for `/solutions` and `/solutions/career-paths`.
 - `prd-next-level.md` and `specs-next-level.md` — next-level product/spec direction.
 - `roadmap-audit.md` and `issue-scan.md` — planning and execution context.
 - `sunset-plan-user-input-client-tracking.md` — phased plan to retire user-input and client decision-tracking features.

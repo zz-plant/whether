@@ -34,6 +34,7 @@ describe("sitemap", () => {
     }
 
     assert.ok(urls.has(`${siteUrl}/concepts`));
+    assert.ok(urls.has(`${siteUrl}/solutions`));
 
     for (const article of productConceptArticles) {
       assert.ok(urls.has(`${siteUrl}/concepts/${article.slug}`));
