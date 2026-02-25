@@ -5,8 +5,11 @@ export const organizationName = "Whether";
 export const websiteName = "Whether — Market Climate Station";
 export const defaultSiteDescription =
   "Translate Treasury macro signals into plain-English operational constraints for product and engineering leaders.";
+export const defaultSocialImagePath = "/twitter-image";
 
 export const buildCanonicalUrl = (path: string) => new URL(path, siteUrl).toString();
+export const buildSocialImageUrl = (path = defaultSocialImagePath) =>
+  buildCanonicalUrl(path);
 
 export const buildOgImageUrl = (params?: Record<string, string>) => {
   const imageUrl = new URL("/api/og", siteUrl);
@@ -55,6 +58,7 @@ export const buildPageMetadata = ({
 }): Metadata => {
   const canonicalUrl = buildCanonicalUrl(path);
   const imageUrl = buildOgImageUrl(imageParams);
+  const socialImageUrl = buildSocialImageUrl();
 
   return {
     title,
@@ -70,6 +74,12 @@ export const buildPageMetadata = ({
       siteName: websiteName,
       images: [
         {
+          url: socialImageUrl,
+          width: 1200,
+          height: 630,
+          alt: imageAlt,
+        },
+        {
           url: imageUrl,
           width: 1200,
           height: 630,
@@ -81,7 +91,7 @@ export const buildPageMetadata = ({
       card: "summary_large_image",
       title,
       description,
-      images: [imageUrl],
+      images: [socialImageUrl],
     },
   };
 };

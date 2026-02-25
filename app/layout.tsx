@@ -2,10 +2,12 @@ import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import { ToastProviderRoot } from "./components/toastProviderRoot";
 import { siteUrl } from "../lib/siteUrl";
+import { buildSocialImageUrl } from "../lib/seo";
 
 const siteName = "Whether — Market Climate Station";
 const siteDescription =
   "Translate Treasury macro signals into plain-English operational constraints for product and engineering leaders.";
+const socialImageUrl = buildSocialImageUrl();
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -40,12 +42,21 @@ export const metadata: Metadata = {
     url: siteUrl,
     title: siteName,
     description: siteDescription,
-    siteName
+    siteName,
+    images: [
+      {
+        url: socialImageUrl,
+        width: 1200,
+        height: 630,
+        alt: "Whether market climate social preview",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: siteName,
-    description: siteDescription
+    description: siteDescription,
+    images: [socialImageUrl],
   },
   robots: {
     index: true,
