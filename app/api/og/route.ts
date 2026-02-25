@@ -102,8 +102,8 @@ const renderStaticTemplate = ({
   subtitle: string;
   kicker: string;
 }) => {
-  const titleLines = wrapText(title, 30).slice(0, 2);
-  const subtitleLines = wrapText(subtitle, 42).slice(0, 3);
+  const titleLines = wrapText(title, 22).slice(0, 2);
+  const subtitleLines = wrapText(subtitle, 38).slice(0, 3);
   const accent = templateAccent[template];
 
   return `<?xml version="1.0" encoding="UTF-8"?>
@@ -147,7 +147,7 @@ const renderStaticTemplate = ({
   </text>
   ${titleLines
     .map(
-      (line, index) => `<text x="120" y="${230 + index * 62}" fill="#f8fafc" font-family="Inter, system-ui, sans-serif" font-size="54" font-weight="700">
+      (line, index) => `<text x="120" y="${230 + index * 62}" fill="#f8fafc" font-family="Inter, system-ui, sans-serif" font-size="50" font-weight="700">
     ${escapeText(line)}
   </text>`
     )
