@@ -4,6 +4,7 @@
  */
 import Image from "next/image";
 import Link from "next/link";
+import { Collapsible } from "@base-ui/react/collapsible";
 import { Children, type ReactNode, isValidElement } from "react";
 import { DisplayGuardian } from "./displayGuardian";
 import { DisplayModeManager } from "./displayModeManager";
@@ -144,48 +145,53 @@ export const ReportShell = ({
   const heroSectionSpacingClassName =
     "weather-panel-static min-w-0 space-y-4 px-4 py-4 sm:space-y-5 sm:px-5";
   const overviewPanel = (
-    <details className="weather-panel group px-4 py-4">
-      <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.16em] text-slate-200 focus-visible:rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation">
+    <Collapsible.Root className="weather-panel px-4 py-4">
+      <Collapsible.Trigger
+        type="button"
+        className="group flex min-h-[44px] w-full items-center justify-between gap-2 text-xs font-semibold tracking-[0.16em] text-slate-200 focus-visible:rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+      >
         <span>Data provenance</span>
-        <span className="sr-only group-open:hidden">Collapsed</span>
-        <span className="sr-only hidden group-open:inline">Expanded</span>
-        <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-400 transition-transform group-open:rotate-180">⌄</span>
-      </summary>
-      <dl className="mt-3 grid gap-2 text-xs text-slate-300">
-        <div className="flex items-center justify-between gap-3">
-          <dt className="text-slate-400">Status</dt>
-          <dd className="font-semibold text-slate-100">{statusLabel}</dd>
-        </div>
-        <div className="flex items-center justify-between gap-3">
-          <dt className="text-slate-400">Signals stamped</dt>
-          <dd className="text-slate-200">{recordDateLabel}</dd>
-        </div>
-        <div className="flex items-center justify-between gap-3">
-          <dt className="text-slate-400">Last refresh</dt>
-          <dd className="text-slate-200">{fetchedAtLabel}</dd>
-        </div>
-        <div className="flex items-center justify-between gap-3">
-          <dt className="text-slate-400">Next expected update</dt>
-          <dd className="text-slate-200">48h cadence</dd>
-        </div>
-        <div className="flex items-center justify-between gap-3">
-          <dt className="text-slate-400">Source</dt>
-          <dd className="text-right text-slate-200">
-            <span>Treasury fiscal API</span>
-            {sourceHref ? (
-              <a
-                href={sourceHref}
-                target="_blank"
-                rel="noreferrer"
-                className="ml-2 text-sky-200 underline decoration-slate-500/80 underline-offset-2 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-              >
-                View source
-              </a>
-            ) : null}
-          </dd>
-        </div>
-      </dl>
-    </details>
+        <span className="sr-only group-data-[panel-open]:hidden">Collapsed</span>
+        <span className="sr-only hidden group-data-[panel-open]:inline">Expanded</span>
+        <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-400 transition-transform group-data-[panel-open]:rotate-180">⌄</span>
+      </Collapsible.Trigger>
+      <Collapsible.Panel className="mt-3">
+        <dl className="grid gap-2 text-xs text-slate-300">
+          <div className="flex items-center justify-between gap-3">
+            <dt className="text-slate-400">Status</dt>
+            <dd className="font-semibold text-slate-100">{statusLabel}</dd>
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <dt className="text-slate-400">Signals stamped</dt>
+            <dd className="text-slate-200">{recordDateLabel}</dd>
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <dt className="text-slate-400">Last refresh</dt>
+            <dd className="text-slate-200">{fetchedAtLabel}</dd>
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <dt className="text-slate-400">Next expected update</dt>
+            <dd className="text-slate-200">48h cadence</dd>
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <dt className="text-slate-400">Source</dt>
+            <dd className="text-right text-slate-200">
+              <span>Treasury fiscal API</span>
+              {sourceHref ? (
+                <a
+                  href={sourceHref}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="ml-2 text-sky-200 underline decoration-slate-500/80 underline-offset-2 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                >
+                  View source
+                </a>
+              ) : null}
+            </dd>
+          </div>
+        </dl>
+      </Collapsible.Panel>
+    </Collapsible.Root>
   );
   const confidencePanel = (
     <CanonicalTrustModule
@@ -469,26 +475,31 @@ export const ReportShell = ({
                     ? `Confidence: ${trustStatusLabel}. ${trustStatusAction}`
                     : `Caution: ${trustStatusAction}`}
                 </p>
-                <details className="weather-surface px-3 py-2 sm:hidden">
-                  <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.12em] text-slate-100">
+                <Collapsible.Root className="weather-surface px-3 py-2 sm:hidden">
+                  <Collapsible.Trigger
+                    type="button"
+                    className="group flex min-h-[44px] w-full items-center justify-between gap-2 text-xs font-semibold tracking-[0.12em] text-slate-100"
+                  >
                     <span>Data status</span>
-                    <span aria-hidden="true" className="text-slate-400">⌄</span>
-                  </summary>
-                  <dl className="mt-2 grid gap-2 text-sm text-slate-200">
-                    <div>
-                      <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Confidence</dt>
-                      <dd className="mt-1 font-semibold text-slate-100">{trustStatusLabel}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Signals stamped</dt>
-                      <dd className="mt-1 text-slate-100">{recordDateLabel}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Last refresh</dt>
-                      <dd className="mt-1 text-slate-100">{fetchedAtLabel}</dd>
-                    </div>
-                  </dl>
-                </details>
+                    <span aria-hidden="true" className="text-slate-400 transition-transform group-data-[panel-open]:rotate-180">⌄</span>
+                  </Collapsible.Trigger>
+                  <Collapsible.Panel className="mt-2">
+                    <dl className="grid gap-2 text-sm text-slate-200">
+                      <div>
+                        <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Confidence</dt>
+                        <dd className="mt-1 font-semibold text-slate-100">{trustStatusLabel}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Signals stamped</dt>
+                        <dd className="mt-1 text-slate-100">{recordDateLabel}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Last refresh</dt>
+                        <dd className="mt-1 text-slate-100">{fetchedAtLabel}</dd>
+                      </div>
+                    </dl>
+                  </Collapsible.Panel>
+                </Collapsible.Root>
                 <dl className="hidden gap-2 text-sm text-slate-200 sm:grid sm:grid-cols-2 lg:grid-cols-3">
                   <div className="weather-surface px-3 py-2">
                     <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Confidence</dt>
