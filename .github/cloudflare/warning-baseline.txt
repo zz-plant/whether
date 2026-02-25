@@ -1,0 +1,7 @@
+Build not running on Vercel. System environment variables will not be available.
+Invalid prerender config for /concepts/[slug]
+Invalid prerender config for /guides/[stakeholder]
+Invalid prerender config for /guides/stage/[stage]
+Invalid prerender config for /solutions/career-paths/[role]
+Using edge runtime on a page currently disables static generation for that page
+Duplicate key "options" in object literal [duplicate-object-key]

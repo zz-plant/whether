@@ -34,4 +34,23 @@ jobs:
         run: bun run test
 
       - name: Build for Cloudflare Pages target
-        run: bun run build:pages
+        run: |
+          mkdir -p artifacts
+          bun run build:pages 2>&1 | tee artifacts/cloudflare-build.log
+
+      - name: Audit Cloudflare warning budget
+        run: |
+          node scripts/cloudflare-warning-audit.mjs \
+            --log artifacts/cloudflare-build.log \
+            --expected .github/cloudflare/warning-baseline.txt \
+            --critical .github/cloudflare/warning-critical.txt \
+            --metrics-out artifacts/cloudflare-warning-metrics.json \
+            --summary-out artifacts/cloudflare-warning-summary.md \
+            --fail-on-new
+
+      - name: Upload Cloudflare warning artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cloudflare-warning-audit
+          path: artifacts/
