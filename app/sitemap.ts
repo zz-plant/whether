@@ -4,6 +4,7 @@ import { snapshotData } from "../lib/snapshot";
 import { stageGuides } from "./guides/stageGuides";
 import { stakeholderGuides } from "./guides/stakeholderGuides";
 import { roleLandings } from "./solutions/career-paths/roleLandingData";
+import { productConceptArticles } from "../lib/productCanon";
 
 // Market Climate Station SEO map for the primary report surface.
 
@@ -94,6 +95,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/onboarding", lastModified: staticLastModified, changeFrequency: "monthly", priority: 0.6 },
     { path: "/guides", lastModified: staticLastModified, changeFrequency: "monthly", priority: 0.7 },
     { path: "/guides/stage", lastModified: staticLastModified, changeFrequency: "monthly", priority: 0.7 },
+    { path: "/concepts", lastModified: staticLastModified, changeFrequency: "monthly", priority: 0.7 },
     {
       path: "/solutions/product-roadmapping",
       lastModified: staticLastModified,
@@ -135,6 +137,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
+
+  const conceptArticleEntries: SitemapEntryDescriptor[] = productConceptArticles.map((article) => ({
+    path: `/concepts/${article.slug}`,
+    lastModified: staticLastModified,
+    changeFrequency: "monthly",
+    priority: 0.6,
+  }));
+
   const careerPathEntries: SitemapEntryDescriptor[] = roleLandings.map((role) => ({
     path: `/solutions/career-paths/${role.slug}`,
     lastModified: staticLastModified,
@@ -142,5 +152,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
-  return [...coreEntries, ...stakeholderEntries, ...stageEntries, ...careerPathEntries].map(buildEntry);
+  return [...coreEntries, ...stakeholderEntries, ...stageEntries, ...conceptArticleEntries, ...careerPathEntries].map(buildEntry);
 }

@@ -6,6 +6,7 @@ import { siteUrl } from "../lib/siteUrl";
 import { roleLandings } from "../app/solutions/career-paths/roleLandingData";
 import { stageGuides } from "../app/guides/stageGuides";
 import { stakeholderGuides } from "../app/guides/stakeholderGuides";
+import { productConceptArticles } from "../lib/productCanon";
 
 describe("sitemap", () => {
   it("returns only canonical URLs and includes dynamic guide routes", () => {
@@ -30,6 +31,12 @@ describe("sitemap", () => {
 
     for (const role of roleLandings) {
       assert.ok(urls.has(`${siteUrl}/solutions/career-paths/${role.slug}`));
+    }
+
+    assert.ok(urls.has(`${siteUrl}/concepts`));
+
+    for (const article of productConceptArticles) {
+      assert.ok(urls.has(`${siteUrl}/concepts/${article.slug}`));
     }
   });
 
