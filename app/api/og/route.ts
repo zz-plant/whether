@@ -89,6 +89,38 @@ const templateAccent: Record<Exclude<OgTemplate, "report">, string> = {
   guides: "#f59e0b",
 };
 
+const templatePanelCopy: Record<Exclude<OgTemplate, "report">, {
+  label: string;
+  title: string;
+  body: string;
+}> = {
+  operations: {
+    label: "OPERATIONS LENS",
+    title: "Execution rhythm",
+    body: "Translate macro posture into planning cadence and staffing pacing.",
+  },
+  signals: {
+    label: "SIGNALS LENS",
+    title: "Evidence first",
+    body: "Track leading indicators, threshold crossings, and direction changes.",
+  },
+  method: {
+    label: "METHOD LENS",
+    title: "How it works",
+    body: "Make every call traceable to formulas, sources, and update cadence.",
+  },
+  solutions: {
+    label: "SOLUTIONS LENS",
+    title: "Decision support",
+    body: "Turn climate calls into role-based operating guardrails for teams.",
+  },
+  guides: {
+    label: "GUIDES LENS",
+    title: "Team enablement",
+    body: "Help leaders align product, finance, and strategy on one posture.",
+  },
+};
+
 const renderStaticTemplate = ({
   template,
   eyebrow,
@@ -105,6 +137,8 @@ const renderStaticTemplate = ({
   const titleLines = wrapText(title, 22).slice(0, 2);
   const subtitleLines = wrapText(subtitle, 38).slice(0, 3);
   const accent = templateAccent[template];
+  const panelCopy = templatePanelCopy[template];
+  const panelBodyLines = wrapText(panelCopy.body, 31).slice(0, 3);
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="${OG_WIDTH}" height="${OG_HEIGHT}" viewBox="0 0 ${OG_WIDTH} ${OG_HEIGHT}" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -135,13 +169,17 @@ const renderStaticTemplate = ({
   <rect x="60" y="64" width="1080" height="502" rx="30" fill="#0b1220" stroke="#1f2937" stroke-width="2" filter="url(#shadow)" />
   <rect x="60" y="64" width="1080" height="8" rx="4" fill="url(#accentLine)" />
   <rect x="744" y="118" width="320" height="316" rx="24" fill="#0f172a" stroke="${accent}" stroke-opacity="0.35" />
-  <text x="772" y="172" fill="#cbd5e1" font-family="Inter, system-ui, sans-serif" font-size="15" letter-spacing="1.6">FRAMEWORK</text>
-  <text x="772" y="222" fill="#f8fafc" font-family="Inter, system-ui, sans-serif" font-size="36" font-weight="700">Whether</text>
-  <text x="772" y="258" fill="#94a3b8" font-family="Inter, system-ui, sans-serif" font-size="17">Signal → Interpretation → Action</text>
-  <line x1="772" y1="286" x2="1034" y2="286" stroke="#334155" />
-  <text x="772" y="324" fill="${accent}" font-family="Inter, system-ui, sans-serif" font-size="18" font-weight="600">For product &amp; engineering</text>
-  <text x="772" y="356" fill="#cbd5e1" font-family="Inter, system-ui, sans-serif" font-size="17">Operational playbooks grounded</text>
-  <text x="772" y="381" fill="#cbd5e1" font-family="Inter, system-ui, sans-serif" font-size="17">in public macro data.</text>
+  <text x="772" y="172" fill="#cbd5e1" font-family="Inter, system-ui, sans-serif" font-size="15" letter-spacing="1.6">${escapeText(panelCopy.label)}</text>
+  <text x="772" y="216" fill="#f8fafc" font-family="Inter, system-ui, sans-serif" font-size="33" font-weight="700">${escapeText(panelCopy.title)}</text>
+  <line x1="772" y1="244" x2="1034" y2="244" stroke="#334155" />
+  <text x="772" y="278" fill="${accent}" font-family="Inter, system-ui, sans-serif" font-size="17" font-weight="600">${escapeText(eyebrow)}</text>
+  ${panelBodyLines
+    .map(
+      (line, index) => `<text x="772" y="${312 + index * 26}" fill="#cbd5e1" font-family="Inter, system-ui, sans-serif" font-size="17">
+    ${escapeText(line)}
+  </text>`
+    )
+    .join("\n")}
   <text x="120" y="155" fill="${accent}" font-family="Inter, system-ui, sans-serif" font-size="18" font-weight="700" letter-spacing="2">
     ${escapeText(eyebrow.toUpperCase())}
   </text>
