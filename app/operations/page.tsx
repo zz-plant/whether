@@ -216,7 +216,7 @@ export default async function OperationsPage({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Playbook"
       currentPath="/operations"
-      pageSummary="Translate posture into hiring, spend, and planning guardrails."
+      pageSummary="Guardrails, sequencing, and execution trade-offs for this posture."
       pageSummaryLink={{
         href: "#ops-horizon-plan",
         label: "Review guardrails",
