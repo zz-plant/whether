@@ -245,7 +245,7 @@ export const ReportMobileNavigation = ({
   sectionLinks: ReportSectionLink[];
   className?: string;
 }) => {
-  const { currentLink } = getPageNavigationState(
+  const { currentLink, currentPosition } = getPageNavigationState(
     pageLinks,
     pageTitle,
     currentPath,
@@ -281,7 +281,9 @@ export const ReportMobileNavigation = ({
               <p className="truncate text-sm font-semibold tracking-[0.08em] text-slate-100">
                 {currentLink.label}
               </p>
-              <p className="mt-1 truncate text-xs text-slate-400">{currentLink.description}</p>
+              <p className="mt-1 truncate text-xs text-slate-400">
+                {currentPosition}/{pageLinks.length} · {currentLink.description}
+              </p>
             </div>
           </div>
 

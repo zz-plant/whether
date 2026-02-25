@@ -469,7 +469,27 @@ export const ReportShell = ({
                     ? `Confidence: ${trustStatusLabel}. ${trustStatusAction}`
                     : `Caution: ${trustStatusAction}`}
                 </p>
-                <dl className="grid gap-2 text-sm text-slate-200 sm:grid-cols-2 lg:grid-cols-3">
+                <details className="weather-surface px-3 py-2 sm:hidden">
+                  <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.12em] text-slate-100">
+                    <span>Data status</span>
+                    <span aria-hidden="true" className="text-slate-400">⌄</span>
+                  </summary>
+                  <dl className="mt-2 grid gap-2 text-sm text-slate-200">
+                    <div>
+                      <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Confidence</dt>
+                      <dd className="mt-1 font-semibold text-slate-100">{trustStatusLabel}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Signals stamped</dt>
+                      <dd className="mt-1 text-slate-100">{recordDateLabel}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Last refresh</dt>
+                      <dd className="mt-1 text-slate-100">{fetchedAtLabel}</dd>
+                    </div>
+                  </dl>
+                </details>
+                <dl className="hidden gap-2 text-sm text-slate-200 sm:grid sm:grid-cols-2 lg:grid-cols-3">
                   <div className="weather-surface px-3 py-2">
                     <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Confidence</dt>
                     <dd className="mt-1 font-semibold text-slate-100">{trustStatusLabel}</dd>
