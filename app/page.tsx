@@ -11,6 +11,7 @@ import {
   defaultSiteDescription,
   organizationName,
   websiteName,
+  buildSocialImageUrl,
 } from "../lib/seo";
 import {
   ExecutiveSnapshotPanel,
@@ -109,6 +110,7 @@ export const generateMetadata = async ({
 
   const title = "Macro signals for product and engineering planning — Whether";
   const imageUrl = baseUrl.toString();
+  const socialImageUrl = buildSocialImageUrl();
   const canonicalUrl = buildCanonicalUrl("/");
   const hasTimeMachineParams = Boolean(
     resolvedSearchParams?.month || resolvedSearchParams?.year,
@@ -130,6 +132,12 @@ export const generateMetadata = async ({
       siteName,
       images: [
         {
+          url: socialImageUrl,
+          width: 1200,
+          height: 630,
+          alt: "Whether Report Weekly briefing Open Graph",
+        },
+        {
           url: imageUrl,
           width: 1200,
           height: 630,
@@ -142,7 +150,7 @@ export const generateMetadata = async ({
       title,
       description:
         "Track Treasury yield curve regime shifts and turn macro signals into clear product, engineering, and operating priorities.",
-      images: [imageUrl],
+      images: [socialImageUrl],
     },
     robots: hasTimeMachineParams
       ? {
