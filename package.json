@@ -8,6 +8,7 @@
     "dev:turbo": "next dev --turbo",
     "build": "node scripts/build.mjs",
     "build:pages": "BUILD_TARGET=pages node scripts/build.mjs",
+    "build:pages:skip-next-build": "BUILD_TARGET=pages NEXT_ON_PAGES_SKIP_BUILD=1 node scripts/build.mjs",
     "start": "next start",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --fix",

@@ -51,3 +51,14 @@ When warning budget fails:
 2. Confirm whether warning appears in local Pages build (`bun run build:pages`).
 3. If warning is actionable, fix root cause and keep baseline unchanged.
 4. If warning is known-safe external noise, add exact warning class to baseline with a short PR note explaining why.
+
+## Faster rebuild mode for Cloudflare (optional)
+
+When CI already has a fresh `.vercel/output` from `vercel build`, you can skip the nested Vercel build that `next-on-pages` normally performs:
+
+```bash
+bun run build:pages:skip-next-build
+```
+
+This uses `NEXT_ON_PAGES_SKIP_BUILD=1` and forwards `--skip-build` to `next-on-pages`, reducing redundant work in multi-phase pipelines.
+
