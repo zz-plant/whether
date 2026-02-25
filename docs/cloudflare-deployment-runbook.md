@@ -6,9 +6,10 @@ Use this command sequence in CI to keep Cloudflare Pages/Workers deploys determi
 
 ```bash
 bun install --frozen-lockfile
-bun run build:cloudflare
-npx wrangler versions upload
+bun run deploy:cloudflare
 ```
+
+`bun run deploy:cloudflare` reuses an existing `.vercel/output` build for the same commit when available and falls back to a full `build:pages` + upload when not.
 
 ## Expected warnings (non-blocking)
 
