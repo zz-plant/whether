@@ -17,6 +17,7 @@ This directory is organized by audience so contributors can find the right sourc
 - `architecture.md` — data flow, modules, and extension points.
 - `stack-compatibility-matrix.md` — runtime/platform support and constraints.
 - `stack-modernization-*.md` — modernization inventory, plan, and execution tracking.
+- `vinext-cloudflare-evaluation.md` — safe Cloudflare-first vinext rollout gates and cutover criteria.
 
 ## Product direction and planning
 - `feature-specs-current.md` — implemented/current feature intent.
