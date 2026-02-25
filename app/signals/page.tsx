@@ -200,6 +200,32 @@ export default async function SignalsPage({
   const essentialPriorityQueue = priorityQueue.slice(0, 2);
   const additionalPriorityQueue = priorityQueue.slice(2);
   const topDiagnosticCallouts = priorityQueue.slice(0, 3);
+  const scoreCards = [
+    {
+      label: "Tightness",
+      value: `${assessment.scores.tightness}/100`,
+      threshold: `${assessment.thresholds.tightnessRegime}/100`,
+      description: "Higher values indicate tighter funding conditions.",
+      href: "#sensor-array",
+    },
+    {
+      label: "Risk appetite",
+      value: `${assessment.scores.riskAppetite}/100`,
+      threshold: `${assessment.thresholds.riskAppetiteRegime}/100`,
+      description: "Higher values indicate more risk-on market behavior.",
+      href: "#macro-signals",
+    },
+    {
+      label: "Curve slope",
+      value:
+        assessment.scores.curveSlope === null
+          ? "N/A"
+          : `${assessment.scores.curveSlope.toFixed(2)}%`,
+      threshold: "0.00%",
+      description: "10Y minus 2Y Treasury yield spread.",
+      href: "#sensor-array",
+    },
+  ];
 
   return (
     <ReportShell
@@ -258,66 +284,72 @@ export default async function SignalsPage({
         openPanelHref={timeMachineHref}
       />
 
-      <section id="decision-summary" className="weather-panel space-y-4 px-6 py-5" aria-label="Decision summary">
-        <header className="space-y-2">
-          <p className="text-sm font-semibold tracking-[0.18em] text-slate-300">Decision summary</p>
-          <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-            {regimeLabel} posture is supported by current signal evidence.
-          </h2>
-        </header>
-        <p className="text-sm leading-relaxed text-slate-200 sm:text-base">
-          Confidence is <span className="font-semibold text-slate-100">{trustStatusLabel}</span>. Signals are stamped {" "}
-          <span className="font-semibold text-slate-100">{recordDateLabel}</span> with last refresh at {" "}
-          <span className="font-semibold text-slate-100">{fetchedAtLabel}</span>.
-        </p>
-        <ul className="grid gap-2 md:grid-cols-3" aria-label="Top evidence callouts">
-          {topDiagnosticCallouts.map((item) => (
-            <li key={item.label} className="weather-surface p-3">
-              <p className="text-xs font-semibold tracking-[0.14em] text-slate-400">{item.label}</p>
-              <p className="mt-1 text-sm text-slate-200">{item.why}</p>
-            </li>
-          ))}
-        </ul>
+      <section id="decision-summary" className="weather-panel space-y-6 px-6 py-5" aria-label="Decision summary">
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]">
+          <article className="weather-surface space-y-3 p-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Current posture</p>
+            <h2 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
+              {regimeLabel} regime is the active operating climate.
+            </h2>
+            <p className="text-sm leading-relaxed text-slate-200 sm:text-base">
+              Confidence is <span className="font-semibold text-slate-100">{trustStatusLabel}</span>. Signals are stamped {" "}
+              <span className="font-semibold text-slate-100">{recordDateLabel}</span> with last refresh at {" "}
+              <span className="font-semibold text-slate-100">{fetchedAtLabel}</span>.
+            </p>
+            <div className="flex flex-wrap gap-2 pt-1">
+              <a
+                href="#macro-signals"
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
+              >
+                Review raw evidence
+              </a>
+              <a
+                href="#thresholds"
+                className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100"
+              >
+                Inspect threshold logic
+              </a>
+            </div>
+          </article>
+          <article className="weather-surface space-y-3 p-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Top diagnostics</p>
+            <ul className="space-y-3" aria-label="Top evidence callouts">
+              {topDiagnosticCallouts.map((item, index) => (
+                <li key={item.label} className="rounded-xl border border-slate-800/80 bg-slate-950/40 p-3">
+                  <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">Signal {index + 1}</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-100">{item.label}</p>
+                  <p className="mt-1 text-sm text-slate-200">{item.why}</p>
+                </li>
+              ))}
+            </ul>
+          </article>
+        </div>
       </section>
 
       <section id="current-scores" className="weather-panel space-y-4 px-6 py-5">
-        <header>
-          <p className="text-sm font-semibold tracking-[0.18em] text-slate-300">
-            Current scores
-          </p>
+        <header className="space-y-2">
+          <p className="text-sm font-semibold tracking-[0.18em] text-slate-300">Current scores</p>
           <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-            Tightness, risk appetite, and curve slope at a glance.
+            Real-time scorecard for the three regime drivers.
           </h2>
         </header>
-        <div className="grid gap-3 md:grid-cols-3">
-          <article className="weather-surface space-y-2 p-4">
-            <dl>
-              <dt className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Tightness</dt>
-              <dd className="mono mt-2 text-2xl text-slate-100">{assessment.scores.tightness}/100</dd>
-            </dl>
-            <p className="text-sm font-semibold text-slate-200">
-              Threshold: {assessment.thresholds.tightnessRegime}/100
-            </p>
-            <p className="text-sm text-slate-300">Higher values indicate tighter funding conditions.</p>
-          </article>
-          <article className="weather-surface space-y-2 p-4">
-            <dl>
-              <dt className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Risk appetite</dt>
-              <dd className="mono mt-2 text-2xl text-slate-100">{assessment.scores.riskAppetite}/100</dd>
-            </dl>
-            <p className="text-sm font-semibold text-slate-200">
-              Threshold: {assessment.thresholds.riskAppetiteRegime}/100
-            </p>
-            <p className="text-sm text-slate-300">Higher values indicate more risk-on market behavior.</p>
-          </article>
-          <article className="weather-surface space-y-2 p-4">
-            <dl>
-              <dt className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Curve slope</dt>
-              <dd className="mono mt-2 text-2xl text-slate-100">{assessment.scores.curveSlope === null ? "N/A" : `${assessment.scores.curveSlope.toFixed(2)}%`}</dd>
-            </dl>
-            <p className="text-sm font-semibold text-slate-200">Threshold: 0.00% (inversion boundary)</p>
-            <p className="text-sm text-slate-300">10Y minus 2Y Treasury yield spread.</p>
-          </article>
+        <div className="grid gap-3 lg:grid-cols-3">
+          {scoreCards.map((card) => (
+            <article key={card.label} className="weather-surface space-y-3 p-4">
+              <dl>
+                <dt className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">{card.label}</dt>
+                <dd className="mono mt-2 text-3xl leading-none text-slate-100">{card.value}</dd>
+              </dl>
+              <p className="text-sm font-semibold text-slate-200">Threshold: {card.threshold}</p>
+              <p className="text-sm text-slate-300">{card.description}</p>
+              <a
+                href={card.href}
+                className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+              >
+                Open source signals →
+              </a>
+            </article>
+          ))}
         </div>
       </section>
 
@@ -400,25 +432,25 @@ export default async function SignalsPage({
       <MacroSignalsPanel series={macroSeries} provenance={macroProvenance} />
 
       <section className="weather-panel space-y-4 px-6 py-5" id="advanced-controls">
-        <div className="rounded-2xl border border-slate-800/80 bg-slate-950/50 p-4">
-          <div className="flex min-h-[44px] items-center justify-between gap-3 text-sm font-semibold text-slate-100">
-            <span>Advanced filters and historical tools</span>
-            <span className="text-xs tracking-[0.14em] text-slate-300">
-              {showAdvanced ? "Open" : "Closed"}
-            </span>
+        <div className="grid gap-4 rounded-2xl border border-slate-800/80 bg-slate-950/50 p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+          <div className="space-y-3">
+            <div className="flex min-h-[44px] items-center gap-3 text-sm font-semibold text-slate-100">
+              <span>Advanced filters and historical tools</span>
+              <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs tracking-[0.14em] text-slate-200">
+                {showAdvanced ? "Open" : "Closed"}
+              </span>
+            </div>
+            <p className="text-sm leading-relaxed text-slate-300">
+              Use advanced controls when you need threshold tuning, historical snapshots, or regime
+              timeline diagnostics. Keep this closed for the default executive scan.
+            </p>
           </div>
-          <p className="mt-3 text-xs text-slate-300">
-            Use these controls for threshold tuning, historical snapshots, and timeline diagnostics.
-            This toggle keeps you on the signal evidence page.
-          </p>
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            <a
-              href={buildAdvancedHref(!showAdvanced)}
-              className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
-            >
-              {showAdvanced ? "Hide advanced filters" : "Show advanced filters"}
-            </a>
-          </div>
+          <a
+            href={buildAdvancedHref(!showAdvanced)}
+            className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
+          >
+            {showAdvanced ? "Hide advanced filters" : "Show advanced filters"}
+          </a>
         </div>
       </section>
 
