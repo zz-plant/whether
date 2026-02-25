@@ -13,6 +13,8 @@ type StakeholderPageProps = {
   params: Promise<{ stakeholder: string }>;
 };
 
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return stakeholderGuides.map((guide) => ({ stakeholder: guide.slug }));
 }
