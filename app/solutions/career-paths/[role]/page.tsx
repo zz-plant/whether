@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { buildPageMetadata } from "../../../../lib/seo";
+import { buildBreadcrumbList, buildCanonicalUrl, buildPageMetadata, serializeJsonLd } from "../../../../lib/seo";
 import { roleLandingBySlug, roleLandings } from "../roleLandingData";
 
 const rolePageTitleSuffix = "career growth playbook";
@@ -60,6 +60,25 @@ export default async function CareerPathRolePage({
     "Track confidence and trigger conditions so your recommendations hold up in exec review.",
     "Export concise, evidence-backed updates that prove judgment and leadership range.",
   ] as const;
+  const rolePageStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: `${roleLanding.roleTitle} career growth playbook`,
+    url: buildCanonicalUrl(`/solutions/career-paths/${roleLanding.slug}`),
+    description: roleLanding.summary,
+    about: [roleLanding.seniorityBand, roleLanding.scopeType],
+  };
+
+  const breadcrumbStructuredData = {
+    "@context": "https://schema.org",
+    ...buildBreadcrumbList([
+      { name: "Home", path: "/" },
+      { name: "Solutions", path: "/solutions" },
+      { name: "Career paths", path: "/solutions/career-paths" },
+      { name: roleLanding.roleTitle, path: `/solutions/career-paths/${roleLanding.slug}` },
+    ]),
+  };
+
   const connectedWorkflow = [
     {
       title: "Product roadmapping",
@@ -83,6 +102,14 @@ export default async function CareerPathRolePage({
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(rolePageStructuredData) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }}
+      />
       <section className="weather-panel space-y-4 px-6 py-6">
         <Link
           href="/solutions/career-paths"
@@ -127,6 +154,51 @@ export default async function CareerPathRolePage({
           {roleLanding.proofPoints.map((point) => (
             <li key={point} className="weather-surface px-4 py-3">
               {point}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+
+      <section className="weather-panel space-y-4 px-6 py-6">
+        <h2 className="text-xl font-semibold text-slate-100">30/60/90-day execution plan</h2>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <article className="weather-surface space-y-2 px-4 py-4">
+            <h3 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-100">First 30 days</h3>
+            <ul className="space-y-2 text-sm text-slate-300">
+              {roleLanding.plan30_60_90.days30.map((step) => (
+                <li key={step}>• {step}</li>
+              ))}
+            </ul>
+          </article>
+          <article className="weather-surface space-y-2 px-4 py-4">
+            <h3 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-100">Days 31-60</h3>
+            <ul className="space-y-2 text-sm text-slate-300">
+              {roleLanding.plan30_60_90.days60.map((step) => (
+                <li key={step}>• {step}</li>
+              ))}
+            </ul>
+          </article>
+          <article className="weather-surface space-y-2 px-4 py-4">
+            <h3 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-100">Days 61-90</h3>
+            <ul className="space-y-2 text-sm text-slate-300">
+              {roleLanding.plan30_60_90.days90.map((step) => (
+                <li key={step}>• {step}</li>
+              ))}
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section className="weather-panel space-y-4 px-6 py-6">
+        <h2 className="text-xl font-semibold text-slate-100">Promotion packet template</h2>
+        <p className="text-sm text-slate-300">
+          Use this structure when writing impact narratives for your manager, promotion panel, or calibration review.
+        </p>
+        <ul className="space-y-2 text-sm text-slate-200">
+          {roleLanding.promotionPacketTemplate.map((section) => (
+            <li key={section} className="weather-surface px-4 py-3">
+              {section}
             </li>
           ))}
         </ul>

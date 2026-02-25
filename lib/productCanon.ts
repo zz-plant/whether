@@ -30,6 +30,8 @@ export type ProductConceptEra =
   | "Tactical masterclasses"
   | "Institutional friction";
 
+export type ConceptConfidence = "High" | "Medium" | "Exploratory";
+
 export type ProductConceptArticle = {
   slug: string;
   title: string;
@@ -43,11 +45,15 @@ export type ProductConceptArticle = {
   summary: string;
   whyItMattered: string;
   demystificationPrompt: string;
+  sourceType: "Essay" | "Framework" | "Book excerpt" | "Case study";
+  readMins: number;
+  contextConfidence: ConceptConfidence;
+  provenanceNote: string;
 };
 
 const entries = monthlySummaries as MonthlySummaryEntry[];
 
-export const productConceptArticles: ProductConceptArticle[] = [
+const baseProductConceptArticles: Omit<ProductConceptArticle, "sourceType" | "readMins" | "contextConfidence" | "provenanceNote">[] = [
   {
     slug: "what-exactly-is-a-product-manager",
     title: "What, exactly, is a Product Manager?",
@@ -406,6 +412,42 @@ export const productConceptArticles: ProductConceptArticle[] = [
       "Did this framing become urgent because institutions needed adaptability as forecast confidence declined?",
   },
 ];
+
+const conceptMetadataOverrides: Partial<
+  Record<
+    string,
+    Pick<ProductConceptArticle, "sourceType" | "readMins" | "contextConfidence" | "provenanceNote">
+  >
+> = {
+  "pm-levels-career-ladder": {
+    sourceType: "Framework",
+    readMins: 14,
+    contextConfidence: "Medium",
+    provenanceNote:
+      "Role ladder coverage is synthesized from public progression repositories and widely referenced company leveling frameworks.",
+  },
+  "psychology-of-product-growth": {
+    sourceType: "Case study",
+    readMins: 12,
+    contextConfidence: "Medium",
+    provenanceNote:
+      "Behavioral growth interpretation draws on illustrated product teardown case studies rather than a single canonical long-form essay.",
+  },
+};
+
+const defaultConceptMetadata = {
+  sourceType: "Essay" as const,
+  readMins: 10,
+  contextConfidence: "Medium" as const,
+  provenanceNote:
+    "Macro linkages are directional interpretations grounded in Whether monthly summaries and publication timing, not strict causal proof.",
+};
+
+export const productConceptArticles: ProductConceptArticle[] = baseProductConceptArticles.map((article) => ({
+  ...defaultConceptMetadata,
+  ...article,
+  ...conceptMetadataOverrides[article.slug],
+}));
 
 export const productConceptEras: ProductConceptEra[] = [
   "Foundational classics",

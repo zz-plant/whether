@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { buildPageMetadata } from "../../../lib/seo";
+import { buildCanonicalUrl, buildBreadcrumbList, buildPageMetadata, serializeJsonLd } from "../../../lib/seo";
 import {
   findProductConceptArticle,
   getMacroContextForArticle,
@@ -76,14 +76,45 @@ export default async function ConceptArticlePage({ params }: ConceptArticlePageP
 
   const macroContext = getMacroContextForArticle(article);
   const publishedLabel = formatPublishedLabel(article.publishedYear, article.publishedMonth);
+  const conceptArticleStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: article.title,
+    datePublished: new Date(Date.UTC(article.publishedYear, article.publishedMonth - 1, 1)).toISOString(),
+    author: {
+      "@type": "Person",
+      name: article.author,
+    },
+    description: article.summary,
+    mainEntityOfPage: buildCanonicalUrl(`/concepts/${article.slug}`),
+    url: article.sourceUrl,
+    about: [article.era, article.focus, article.audience],
+  };
+
+  const breadcrumbStructuredData = {
+    "@context": "https://schema.org",
+    ...buildBreadcrumbList([
+      { name: "Home", path: "/" },
+      { name: "Concepts", path: "/concepts" },
+      { name: article.title, path: `/concepts/${article.slug}` },
+    ]),
+  };
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(conceptArticleStructuredData) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }}
+      />
       <section className="weather-panel space-y-4 px-6 py-6">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">PM canon article</p>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{article.title}</h1>
         <p className="text-sm text-slate-300">
-          {article.author} · {publishedLabel} · Focus: {article.focus} · Most relevant to {article.audience}
+          {article.author} · {publishedLabel} · Focus: {article.focus} · {article.sourceType} · ~{article.readMins} min read · Most relevant to {article.audience}
         </p>
         <p className="text-sm text-slate-200">{article.summary}</p>
       </section>
@@ -100,6 +131,17 @@ export default async function ConceptArticlePage({ params }: ConceptArticlePageP
         >
           Read source article
         </a>
+      </section>
+
+
+      <section className="weather-panel space-y-4 px-6 py-6">
+        <h2 className="text-lg font-semibold text-slate-100">Interpretation confidence & provenance</h2>
+        <div className="weather-surface space-y-3 px-4 py-4">
+          <p className="text-sm text-slate-200">
+            Confidence level: <span className="font-semibold text-slate-100">{article.contextConfidence}</span>
+          </p>
+          <p className="text-sm text-slate-300">{article.provenanceNote}</p>
+        </div>
       </section>
 
       {macroContext ? (

@@ -90,6 +90,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/guides", lastModified: staticLastModified, changeFrequency: "monthly", priority: 0.7 },
     { path: "/guides/stage", lastModified: staticLastModified, changeFrequency: "monthly", priority: 0.7 },
     { path: "/concepts", lastModified: staticLastModified, changeFrequency: "monthly", priority: 0.7 },
+    { path: "/solutions", lastModified: staticLastModified, changeFrequency: "monthly", priority: 0.7 },
     {
       path: "/solutions/product-roadmapping",
       lastModified: staticLastModified,
