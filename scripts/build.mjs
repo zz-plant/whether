@@ -5,14 +5,17 @@ import { join } from "node:path";
 const isTruthyEnv = (value) => value === "1" || value === "true";
 
 const buildTarget = process.env.BUILD_TARGET;
-const isVercel = isTruthyEnv(process.env.VERCEL);
+const isVercelRuntime = isTruthyEnv(process.env.VERCEL);
 const isCloudflarePages = isTruthyEnv(process.env.CF_PAGES);
 const isCloudflareDeploy = Boolean(process.env.CLOUDFLARE_ACCOUNT_ID);
 const skipNextOnPagesBuild = isTruthyEnv(process.env.NEXT_ON_PAGES_SKIP_BUILD);
+const forceCloudflareBuild =
+  buildTarget === "cloudflare" || buildTarget === "pages";
+const forceNextBuild = buildTarget === "next";
 const useNextOnPages =
-  !isVercel &&
-  (buildTarget === "pages" ||
-    (buildTarget !== "vercel" && (isCloudflarePages || isCloudflareDeploy)));
+  !isVercelRuntime &&
+  (forceCloudflareBuild ||
+    (!forceNextBuild && (isCloudflarePages || isCloudflareDeploy)));
 
 const command = useNextOnPages ? "next-on-pages" : "next";
 const args = useNextOnPages
