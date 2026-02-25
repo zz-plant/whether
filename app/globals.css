@@ -179,6 +179,22 @@ body {
   box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.08);
 }
 
+.weather-data-mode {
+  @apply inline-flex items-center rounded-full border px-2 py-1 text-xs font-semibold tracking-[0.14em];
+}
+
+.weather-data-mode-dynamic {
+  border-color: rgba(16, 185, 129, 0.5);
+  background-color: rgba(16, 185, 129, 0.12);
+  color: rgb(167 243 208);
+}
+
+.weather-data-mode-static {
+  border-color: rgba(148, 163, 184, 0.45);
+  background-color: rgba(30, 41, 59, 0.45);
+  color: rgb(226 232 240);
+}
+
 .weather-surface-indigo {
   border-color: rgba(129, 140, 248, 0.24);
   background-color: rgba(30, 27, 75, 0.2);
