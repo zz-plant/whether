@@ -20,6 +20,7 @@ import {
 } from "./components/reportSections";
 import { ReportShell } from "./components/reportShell";
 import { reportPageLinks } from "../lib/report/reportNavigation";
+import { buildTrustStatus } from "../lib/report/trustStatus";
 
 export const runtime = "edge";
 export const dynamic = "force-dynamic";
@@ -266,27 +267,22 @@ export default async function HomePage({
     treasuryProvenance,
   } = await loadReportData(resolvedSearchParams);
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
-  const trustStatusLabel = historicalSelection
-    ? "Historical snapshot"
-    : isFallback
-      ? "Using last verified snapshot"
-      : "Live • Treasury verified";
-  const trustStatusDetail = historicalSelection
-    ? "Viewing archived Treasury data for the selected month."
-    : isFallback
-      ? (treasury.fallback_reason ??
-        "Live refresh pending. Using last verified snapshot.")
-      : "Live refresh healthy. Next expected update: 48h.";
-  const trustStatusAction = historicalSelection
-    ? "Use for retrospectives only; avoid live planning calls until you return to current data."
-    : isFallback
-      ? "Pause irreversible decisions until the live feed returns or you confirm the cache."
-      : "Safe to use for near-term planning; proceed with normal approval flow.";
-  const trustStatusTone = historicalSelection
-    ? "historical"
-    : isFallback
-      ? "warning"
-      : "stable";
+  const {
+    trustStatusLabel,
+    trustStatusDetail,
+    trustStatusAction,
+    trustStatusTone,
+  } = buildTrustStatus({
+    historicalSelection: Boolean(historicalSelection),
+    isFallback,
+    fallbackReason: treasury.fallback_reason,
+    historicalAction:
+      "Use for retrospectives only; avoid live planning calls until you return to current data.",
+    fallbackAction:
+      "Pause irreversible decisions until the live feed returns or you confirm the cache.",
+    stableAction:
+      "Safe to use for near-term planning; proceed with normal approval flow.",
+  });
   const postureDelta = regimeAlert
     ? `Shifted from ${regimeLabelMap[regimeAlert.previousRegime]}.`
     : "No change since last week.";
@@ -444,9 +440,6 @@ export default async function HomePage({
           <p className="text-xs text-slate-300">
             Heuristic operational probabilities only; this translates current threshold distance into posture shift odds and is not a financial forecast.
           </p>
-          <p className="text-xs text-slate-300">
-            These percentages use the same trigger logic as <span className="font-semibold text-slate-100">What would change this posture</span>: scores closer to threshold imply higher shift risk.
-          </p>
           <p className="text-[11px] font-medium tracking-[0.14em] text-slate-400">
             Updated {recordDateLabel} · Confidence: {trustStatusLabel}
           </p>
@@ -455,6 +448,15 @@ export default async function HomePage({
         <article className="weather-surface space-y-4 p-5" aria-label="Current climate summary">
           <p className="text-sm text-slate-200">{assessment.description}</p>
           <p className="text-sm text-slate-300">{trustStatusAction}</p>
+        </article>
+
+        <article className="weather-surface space-y-3 p-5" aria-label="Posture flip criteria">
+          <p className="text-sm font-semibold tracking-[0.08em] text-slate-200">What would change this posture</p>
+          <ul className="space-y-2 text-sm text-slate-200">
+            <li>• Will shift if Capital Tightness rises above {tightnessThreshold} for two consecutive reads.</li>
+            <li>• Will shift if Risk Appetite falls below {riskThreshold} and remains there through the next update.</li>
+            <li>• Curve slope turns negative and stays inverted through the next cycle.</li>
+          </ul>
         </article>
 
         <details className="weather-surface group p-4 sm:p-5" aria-label="Expanded posture details">
@@ -510,15 +512,6 @@ export default async function HomePage({
                 ))}
               </ul>
             </article>
-          </div>
-
-          <div className="mt-4 border-t border-slate-800/70 pt-4">
-            <p className="text-sm font-semibold tracking-[0.08em] text-slate-200">What would change this posture</p>
-            <ul className="mt-3 space-y-2 text-sm text-slate-200">
-              <li>• Will shift if Capital Tightness rises above {tightnessThreshold} for two consecutive reads.</li>
-              <li>• Will shift if Risk Appetite falls below {riskThreshold} and remains there through the next update.</li>
-              <li>• Curve slope turns negative and stays inverted through the next cycle.</li>
-            </ul>
           </div>
         </details>
 

@@ -22,6 +22,7 @@ import { operationsSectionLinks } from "../../lib/navigation/operationsNavigatio
 import { appendSearchParamsToRoute } from "../../lib/navigation/routeSearchParams";
 import { ReturningVisitorDeltaStrip } from "../components/changeSinceLastReadPanel";
 import { OperationsWorkflowProgress } from "./components/operationsWorkflowProgress";
+import { buildTrustStatus } from "../../lib/report/trustStatus";
 
 export const runtime = "edge";
 
@@ -107,27 +108,22 @@ export default async function OperationsPage({
     treasuryProvenance,
   } = await loadReportData(resolvedSearchParams);
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
-  const trustStatusLabel = historicalSelection
-    ? "Historical snapshot"
-    : isFallback
-      ? "Using last verified snapshot"
-      : "Live • Treasury verified";
-  const trustStatusDetail = historicalSelection
-    ? "Viewing archived Treasury data for the selected month."
-    : isFallback
-      ? (treasury.fallback_reason ??
-        "Live refresh pending. Using last verified snapshot.")
-      : "Live refresh healthy. Next expected update: 48h.";
-  const trustStatusAction = historicalSelection
-    ? "Use historical data for retrospectives; avoid approving new bets until live signals return."
-    : isFallback
-      ? "Hold irreversible decisions until live signals return or you validate the cache."
-      : "Signals are live; apply these guardrails in weekly and monthly planning.";
-  const trustStatusTone = historicalSelection
-    ? "historical"
-    : isFallback
-      ? "warning"
-      : "stable";
+  const {
+    trustStatusLabel,
+    trustStatusDetail,
+    trustStatusAction,
+    trustStatusTone,
+  } = buildTrustStatus({
+    historicalSelection: Boolean(historicalSelection),
+    isFallback,
+    fallbackReason: treasury.fallback_reason,
+    historicalAction:
+      "Use historical data for retrospectives; avoid approving new bets until live signals return.",
+    fallbackAction:
+      "Hold irreversible decisions until live signals return or you validate the cache.",
+    stableAction:
+      "Signals are live; apply these guardrails in weekly and monthly planning.",
+  });
 
   const horizonPlan = [
     {
