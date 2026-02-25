@@ -19,6 +19,7 @@ import {
   HistoricalBanner,
 } from "./components/reportSections";
 import { ReportShell } from "./components/reportShell";
+import { RegimeStatusIcon } from "./components/regimeIcons";
 import { reportPageLinks } from "../lib/report/reportNavigation";
 import { buildTrustStatus } from "../lib/report/trustStatus";
 
@@ -82,40 +83,7 @@ type PostureForecastItem = {
   confidence: "High confidence" | "Medium confidence" | "Low confidence";
 };
 
-const RegimeStatusIcon = ({ regime }: { regime: keyof typeof regimeLabelMap }) => {
-  switch (regime) {
-    case "SCARCITY":
-      return (
-        <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-          <path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6l7-3z" />
-        </svg>
-      );
-    case "DEFENSIVE":
-      return (
-        <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-          <rect x="5" y="11" width="14" height="10" rx="2" />
-          <path d="M8 11V8a4 4 0 118 0v3" />
-        </svg>
-      );
-    case "VOLATILE":
-      return (
-        <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-          <path d="M12 4v15" />
-          <path d="M6 8h12" />
-          <path d="M4 8l-2 4h4l-2-4zm16 0l-2 4h4l-2-4z" />
-          <path d="M9 19h6" />
-        </svg>
-      );
-    case "EXPANSION":
-      return (
-        <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-          <path d="M14 4c3 0 6 3 6 6-2 .3-4.4 1.6-6.3 3.5C11.7 15.5 10.3 18 10 20c-3 0-6-3-6-6 2-.3 4.4-1.7 6.4-3.7C12.3 8.4 13.7 6 14 4z" />
-          <circle cx="14.5" cy="9.5" r="1.3" />
-          <path d="M7 17l-3 3" />
-        </svg>
-      );
-  }
-};
+/* RegimeStatusIcon moved to components/regimeIcons.tsx */
 
 export const generateMetadata = async ({
   searchParams,
@@ -178,9 +146,9 @@ export const generateMetadata = async ({
     },
     robots: hasTimeMachineParams
       ? {
-          index: false,
-          follow: true,
-        }
+        index: false,
+        follow: true,
+      }
       : undefined,
 
   };
@@ -344,38 +312,39 @@ export default async function HomePage({
     Number.isFinite(riskThreshold);
   const horizonForecast: PostureForecastItem[] = hasProjectionData
     ? postureForecastHorizons.map((horizon, index) => {
-        const alertBias = regimeAlert ? 8 : 0;
-        const projectedGap = nearestThresholdGap - index * 5 - alertBias;
-        const label: PostureForecastItem["label"] =
-          projectedGap <= 2 ? "Likely shift" : projectedGap <= 8 ? "Watch" : "Stable";
-        const rationale =
-          label === "Likely shift"
-            ? `Risk appetite and tightness are near regime boundaries (${riskThreshold}/${tightnessThreshold}); trigger conditions are close.`
-            : label === "Watch"
-              ? `Risk appetite or tightness is within monitoring range of thresholds (${riskThreshold}/${tightnessThreshold}).`
-              : `Risk appetite and tightness remain comfortably away from thresholds (${riskThreshold}/${tightnessThreshold}).`;
-        const confidence: PostureForecastItem["confidence"] =
-          horizon === "Now"
-            ? "High confidence"
-            : horizon === "+1 week"
-              ? "Medium confidence"
-              : "Low confidence";
+      const alertBias = regimeAlert ? 8 : 0;
+      const projectedGap = nearestThresholdGap - index * 5 - alertBias;
+      const label: PostureForecastItem["label"] =
+        projectedGap <= 2 ? "Likely shift" : projectedGap <= 8 ? "Watch" : "Stable";
+      const rationale =
+        label === "Likely shift"
+          ? `Risk appetite and tightness are near regime boundaries (${riskThreshold}/${tightnessThreshold}); trigger conditions are close.`
+          : label === "Watch"
+            ? `Risk appetite or tightness is within monitoring range of thresholds (${riskThreshold}/${tightnessThreshold}).`
+            : `Risk appetite and tightness remain comfortably away from thresholds (${riskThreshold}/${tightnessThreshold}).`;
+      const confidence: PostureForecastItem["confidence"] =
+        horizon === "Now"
+          ? "High confidence"
+          : horizon === "+1 week"
+            ? "Medium confidence"
+            : "Low confidence";
 
-        return {
-          horizon,
-          label,
-          rationale,
-          confidence,
-        };
-      })
-    : postureForecastHorizons.map((horizon) => ({
+      return {
         horizon,
-        label: "Projection unavailable",
-        rationale: "Projection unavailable: missing score inputs for this horizon.",
-        confidence: "Low confidence",
-      }));
+        label,
+        rationale,
+        confidence,
+      };
+    })
+    : postureForecastHorizons.map((horizon) => ({
+      horizon,
+      label: "Projection unavailable",
+      rationale: "Projection unavailable: missing score inputs for this horizon.",
+      confidence: "Low confidence",
+    }));
   return (
     <ReportShell
+      regime={assessment.regime}
       statusLabel={statusLabel}
       recordDateLabel={recordDateLabel}
       fetchedAtLabel={fetchedAtLabel}

@@ -462,6 +462,60 @@ html {
   }
 }
 
+@keyframes vibrate {
+  0% { transform: translate(0); }
+  20% { transform: translate(-1px, 1px); }
+  40% { transform: translate(-1px, -1px); }
+  60% { transform: translate(1px, 1px); }
+  80% { transform: translate(1px, -1px); }
+  100% { transform: translate(0); }
+}
+
+@keyframes sway {
+  0% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
+  100% { transform: rotate(-5deg); }
+}
+
+@keyframes sheen {
+  0% { opacity: 0.8; filter: brightness(1); }
+  50% { opacity: 1; filter: brightness(1.3); }
+  100% { opacity: 0.8; filter: brightness(1); }
+}
+
+@keyframes pulse-slow {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.8; }
+}
+
+@keyframes shield-ripple {
+  0% { stroke-width: 1.8; opacity: 1; }
+  50% { stroke-width: 2.2; opacity: 0.7; }
+  100% { stroke-width: 1.8; opacity: 1; }
+}
+
+.animate-vibrate {
+  animation: vibrate 0.3s linear infinite;
+}
+
+.animate-sway {
+  animation: sway 3s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.animate-sheen {
+  animation: sheen 2s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 4s ease-in-out infinite;
+}
+
+.animate-shield-ripple {
+  animation: shield-ripple 3s ease-in-out infinite;
+}
+
 @keyframes aurora-shift {
   0% {
     transform: translate3d(0, 0, 0) scale(1);

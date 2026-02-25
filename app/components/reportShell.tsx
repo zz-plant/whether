@@ -26,9 +26,13 @@ import { INFORMATIONAL_NOTICE } from "../../lib/exportNotices";
 import { serializeJsonLd } from "../../lib/seo";
 import { AnchorFeedback } from "./anchorFeedback";
 
+import { ClimateBackdrop } from "./climateBackdrop";
+import { RegimeIconType } from "./regimeIcons";
+
 export const ReportShell = ({
   children,
   statusLabel,
+  regime, // Correctly using the prop
   recordDateLabel,
   fetchedAtLabel,
   treasurySource,
@@ -69,6 +73,7 @@ export const ReportShell = ({
 }: {
   children: ReactNode;
   statusLabel: string;
+  regime?: RegimeIconType; // Added to support backdrop
   recordDateLabel: string;
   fetchedAtLabel: string;
   treasurySource: string;
@@ -313,6 +318,7 @@ export const ReportShell = ({
         tabIndex={-1}
         className="weather-shell relative min-h-screen overflow-x-clip text-slate-100"
       >
+        <ClimateBackdrop regime={regime || "NEUTRAL"} />
         {structuredData ? (
           <script
             type="application/ld+json"
@@ -384,216 +390,215 @@ export const ReportShell = ({
             <div className="order-1 min-w-0 space-y-8 lg:order-none lg:col-start-1 lg:row-start-1 lg:space-y-10">
               {!hideHeroChrome ? (
                 <>
-              <section className={heroSectionSpacingClassName}>
-                <div className={heroHeaderSpacingClassName}>
-                  {roleSwitcher ? (
-                    <div className="space-y-2">
-                      <p className="text-xs font-semibold tracking-[0.1em] text-slate-400">
-                        Role view
-                      </p>
-                      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-                        {roleSwitcher.options.map((option) => {
-                          const isActive = option.key === roleSwitcher.active;
-                          return (
-                            <a
-                              key={option.key}
-                              href={option.href}
-                              aria-current={isActive ? "page" : undefined}
-                              className={`weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-sm font-semibold tracking-[0.08em] touch-manipulation ${
-                                isActive
-                                  ? "border-sky-300/80 text-slate-100"
-                                  : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
-                              }`}
-                            >
-                              {option.label}
-                            </a>
-                          );
-                        })}
-                      </div>
+                  <section className={heroSectionSpacingClassName}>
+                    <div className={heroHeaderSpacingClassName}>
+                      {roleSwitcher ? (
+                        <div className="space-y-2">
+                          <p className="text-xs font-semibold tracking-[0.1em] text-slate-400">
+                            Role view
+                          </p>
+                          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                            {roleSwitcher.options.map((option) => {
+                              const isActive = option.key === roleSwitcher.active;
+                              return (
+                                <a
+                                  key={option.key}
+                                  href={option.href}
+                                  aria-current={isActive ? "page" : undefined}
+                                  className={`weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-sm font-semibold tracking-[0.08em] touch-manipulation ${isActive
+                                    ? "border-sky-300/80 text-slate-100"
+                                    : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
+                                    }`}
+                                >
+                                  {option.label}
+                                </a>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ) : null}
+                      {heroVariant === "compact" ? (
+                        <>
+                          <p className="text-xs font-semibold tracking-[0.14em] text-slate-400 sm:tracking-[0.18em]">
+                            Whether report
+                          </p>
+                          <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
+                            {pageTitle}
+                          </h1>
+                          <p className="flex max-w-2xl flex-wrap items-center gap-x-2 gap-y-1 text-sm leading-relaxed text-slate-200 sm:text-base">
+                            <span>{pageSummary}</span>
+                            {summaryLink}
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <p className="text-xs font-semibold tracking-[0.14em] text-slate-400 sm:tracking-[0.18em]">
+                            Whether report
+                          </p>
+                          <h1 className="type-headline text-slate-100">
+                            {pageTitle}
+                          </h1>
+                          <p className="flex max-w-2xl flex-wrap items-center gap-x-2 gap-y-1 text-sm leading-relaxed text-slate-200 sm:text-base">
+                            <span>{pageSummary}</span>
+                            {summaryLink}
+                          </p>
+                          <span className="sr-only">
+                            Signals stamped {recordDateLabel}
+                          </span>
+                        </>
+                      )}
                     </div>
-                  ) : null}
-                  {heroVariant === "compact" ? (
-                    <>
-                      <p className="text-xs font-semibold tracking-[0.14em] text-slate-400 sm:tracking-[0.18em]">
-                        Whether report
-                      </p>
-                      <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
-                        {pageTitle}
-                      </h1>
-                      <p className="flex max-w-2xl flex-wrap items-center gap-x-2 gap-y-1 text-sm leading-relaxed text-slate-200 sm:text-base">
-                        <span>{pageSummary}</span>
-                        {summaryLink}
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <p className="text-xs font-semibold tracking-[0.14em] text-slate-400 sm:tracking-[0.18em]">
-                        Whether report
-                      </p>
-                      <h1 className="type-headline text-slate-100">
-                        {pageTitle}
-                      </h1>
-                      <p className="flex max-w-2xl flex-wrap items-center gap-x-2 gap-y-1 text-sm leading-relaxed text-slate-200 sm:text-base">
-                        <span>{pageSummary}</span>
-                        {summaryLink}
-                      </p>
-                      <span className="sr-only">
-                        Signals stamped {recordDateLabel}
-                      </span>
-                    </>
-                  )}
-                </div>
-                <div
-                  id="report-primary-actions"
-                  className="flex w-full min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3"
-                >
-                  <a
-                    href={primaryCta.href}
-                    className="weather-button-primary inline-flex min-h-[44px] w-full max-w-full items-center justify-center px-4 py-2 text-center text-xs font-semibold leading-tight tracking-[0.12em] shadow-lg shadow-sky-500/30 ring-1 ring-sky-200/30 transition-colors hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:text-xs sm:tracking-[0.2em]"
-                  >
-                    <span className="max-w-full break-words text-center">
-                      {primaryCta.label}
-                    </span>
-                  </a>
-                  {exportCta ? (
-                    <div className="w-full sm:hidden">
-                      <MobileActionSheet
-                        triggerLabel="More actions"
-                        srHint="Open additional actions menu"
-                        actions={[
-                          { href: exportCta.href, label: exportCta.label },
-                        ]}
-                      />
+                    <div
+                      id="report-primary-actions"
+                      className="flex w-full min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3"
+                    >
+                      <a
+                        href={primaryCta.href}
+                        className="weather-button-primary inline-flex min-h-[44px] w-full max-w-full items-center justify-center px-4 py-2 text-center text-xs font-semibold leading-tight tracking-[0.12em] shadow-lg shadow-sky-500/30 ring-1 ring-sky-200/30 transition-colors hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:text-xs sm:tracking-[0.2em]"
+                      >
+                        <span className="max-w-full break-words text-center">
+                          {primaryCta.label}
+                        </span>
+                      </a>
+                      {exportCta ? (
+                        <div className="w-full sm:hidden">
+                          <MobileActionSheet
+                            triggerLabel="More actions"
+                            srHint="Open additional actions menu"
+                            actions={[
+                              { href: exportCta.href, label: exportCta.label },
+                            ]}
+                          />
+                        </div>
+                      ) : null}
                     </div>
-                  ) : null}
-                </div>
-                <p className="text-sm text-slate-200">
-                  {trustStatusTone === "stable"
-                    ? `Confidence: ${trustStatusLabel}. ${trustStatusAction}`
-                    : `Caution: ${trustStatusAction}`}
-                </p>
-                <Collapsible.Root className="weather-surface px-3 py-2 sm:hidden">
-                  <Collapsible.Trigger
-                    type="button"
-                    className="group flex min-h-[44px] w-full items-center justify-between gap-2 text-xs font-semibold tracking-[0.12em] text-slate-100"
-                  >
-                    <span>Data status</span>
-                    <span aria-hidden="true" className="text-slate-400 transition-transform group-data-[panel-open]:rotate-180">⌄</span>
-                  </Collapsible.Trigger>
-                  <Collapsible.Panel className="mt-2">
-                    <dl className="grid gap-2 text-sm text-slate-200">
-                      <div>
+                    <p className="text-sm text-slate-200">
+                      {trustStatusTone === "stable"
+                        ? `Confidence: ${trustStatusLabel}. ${trustStatusAction}`
+                        : `Caution: ${trustStatusAction}`}
+                    </p>
+                    <Collapsible.Root className="weather-surface px-3 py-2 sm:hidden">
+                      <Collapsible.Trigger
+                        type="button"
+                        className="group flex min-h-[44px] w-full items-center justify-between gap-2 text-xs font-semibold tracking-[0.12em] text-slate-100"
+                      >
+                        <span>Data status</span>
+                        <span aria-hidden="true" className="text-slate-400 transition-transform group-data-[panel-open]:rotate-180">⌄</span>
+                      </Collapsible.Trigger>
+                      <Collapsible.Panel className="mt-2">
+                        <dl className="grid gap-2 text-sm text-slate-200">
+                          <div>
+                            <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Confidence</dt>
+                            <dd className="mt-1 font-semibold text-slate-100">{trustStatusLabel}</dd>
+                          </div>
+                          <div>
+                            <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Signals stamped</dt>
+                            <dd className="mt-1 text-slate-100">{recordDateLabel}</dd>
+                          </div>
+                          <div>
+                            <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Last refresh</dt>
+                            <dd className="mt-1 text-slate-100">{fetchedAtLabel}</dd>
+                          </div>
+                        </dl>
+                      </Collapsible.Panel>
+                    </Collapsible.Root>
+                    <dl className="hidden gap-2 text-sm text-slate-200 sm:grid sm:grid-cols-2 lg:grid-cols-3">
+                      <div className="weather-surface px-3 py-2">
                         <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Confidence</dt>
                         <dd className="mt-1 font-semibold text-slate-100">{trustStatusLabel}</dd>
                       </div>
-                      <div>
+                      <div className="weather-surface px-3 py-2">
                         <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Signals stamped</dt>
                         <dd className="mt-1 text-slate-100">{recordDateLabel}</dd>
                       </div>
-                      <div>
+                      <div className="weather-surface px-3 py-2 sm:col-span-2 lg:col-span-1">
                         <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Last refresh</dt>
                         <dd className="mt-1 text-slate-100">{fetchedAtLabel}</dd>
                       </div>
                     </dl>
-                  </Collapsible.Panel>
-                </Collapsible.Root>
-                <dl className="hidden gap-2 text-sm text-slate-200 sm:grid sm:grid-cols-2 lg:grid-cols-3">
-                  <div className="weather-surface px-3 py-2">
-                    <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Confidence</dt>
-                    <dd className="mt-1 font-semibold text-slate-100">{trustStatusLabel}</dd>
-                  </div>
-                  <div className="weather-surface px-3 py-2">
-                    <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Signals stamped</dt>
-                    <dd className="mt-1 text-slate-100">{recordDateLabel}</dd>
-                  </div>
-                  <div className="weather-surface px-3 py-2 sm:col-span-2 lg:col-span-1">
-                    <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Last refresh</dt>
-                    <dd className="mt-1 text-slate-100">{fetchedAtLabel}</dd>
-                  </div>
-                </dl>
-                {showOfflineBadge ? (
-                  <p className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.14em] text-amber-100">
-                    {offlineBadgeLabel}
-                  </p>
-                ) : null}
-              </section>
+                    {showOfflineBadge ? (
+                      <p className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.14em] text-amber-100">
+                        {offlineBadgeLabel}
+                      </p>
+                    ) : null}
+                  </section>
 
-              <section
-                className="weather-panel space-y-5 px-4 py-5 sm:px-5"
-                aria-label="Mission control"
-              >
-                <div className={missionGridClassName}>
-                  <article className="weather-surface space-y-3 p-4">
-                    <p className="text-sm font-semibold tracking-[0.12em] text-slate-400">
-                      {decisionBanner?.label ?? "Decide now"}
-                    </p>
-                    <h2 className="text-lg font-semibold text-slate-100 sm:text-xl">
-                      {primaryDecisionText}
-                    </h2>
-                    <p className="text-sm text-slate-300">
-                      {missionSupportText}
-                    </p>
-                    {decisionDiffs && decisionDiffs.length > 0 ? (
-                      <ul
-                        className="mt-2 flex flex-wrap gap-2"
-                        aria-label="Decision deltas"
-                      >
-                        {decisionDiffs.map((item) => {
-                          const toneClassName =
-                            item.tone === "positive"
-                              ? "border-emerald-300/70 bg-emerald-500/10 text-emerald-100"
-                              : item.tone === "warning"
-                                ? "border-amber-300/80 bg-amber-500/15 text-amber-100"
-                                : "border-slate-700/80 bg-slate-900/60 text-slate-200";
-                          return (
+                  <section
+                    className="weather-panel space-y-5 px-4 py-5 sm:px-5"
+                    aria-label="Mission control"
+                  >
+                    <div className={missionGridClassName}>
+                      <article className="weather-surface space-y-3 p-4">
+                        <p className="text-sm font-semibold tracking-[0.12em] text-slate-400">
+                          {decisionBanner?.label ?? "Decide now"}
+                        </p>
+                        <h2 className="text-lg font-semibold text-slate-100 sm:text-xl">
+                          {primaryDecisionText}
+                        </h2>
+                        <p className="text-sm text-slate-300">
+                          {missionSupportText}
+                        </p>
+                        {decisionDiffs && decisionDiffs.length > 0 ? (
+                          <ul
+                            className="mt-2 flex flex-wrap gap-2"
+                            aria-label="Decision deltas"
+                          >
+                            {decisionDiffs.map((item) => {
+                              const toneClassName =
+                                item.tone === "positive"
+                                  ? "border-emerald-300/70 bg-emerald-500/10 text-emerald-100"
+                                  : item.tone === "warning"
+                                    ? "border-amber-300/80 bg-amber-500/15 text-amber-100"
+                                    : "border-slate-700/80 bg-slate-900/60 text-slate-200";
+                              return (
+                                <li
+                                  key={item.label}
+                                  className={`inline-flex min-h-[28px] items-center rounded-full border px-2 py-1 text-[11px] font-semibold tracking-[0.12em] ${toneClassName}`}
+                                >
+                                  {item.label}
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        ) : null}
+                        {decisionBanner?.evidenceHref ? (
+                          <a
+                            href={decisionBanner.evidenceHref}
+                            className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                          >
+                            Review evidence trail →
+                          </a>
+                        ) : null}
+                      </article>
+
+                      <article className="weather-surface space-y-3 p-4">
+                        <p className="text-sm font-semibold tracking-[0.12em] text-slate-400">
+                          {actionSequence?.title ?? "Plan"}
+                        </p>
+                        <ol className="space-y-2">
+                          {missionSequenceItems.map((item) => (
                             <li
-                              key={item.label}
-                              className={`inline-flex min-h-[28px] items-center rounded-full border px-2 py-1 text-[11px] font-semibold tracking-[0.12em] ${toneClassName}`}
+                              key={item.title}
+                              className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-3"
                             >
-                              {item.label}
+                              <p className="text-xs font-semibold tracking-[0.1em] text-slate-400">
+                                {item.phase}
+                              </p>
+                              <p className="mt-1 text-sm font-semibold text-slate-100">
+                                {item.title}
+                              </p>
+                              <p className="mt-1 text-xs text-slate-300">
+                                {item.detail}
+                              </p>
                             </li>
-                          );
-                        })}
-                      </ul>
-                    ) : null}
-                    {decisionBanner?.evidenceHref ? (
-                      <a
-                        href={decisionBanner.evidenceHref}
-                        className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-                      >
-                        Review evidence trail →
-                      </a>
-                    ) : null}
-                  </article>
+                          ))}
+                        </ol>
+                      </article>
 
-                  <article className="weather-surface space-y-3 p-4">
-                    <p className="text-sm font-semibold tracking-[0.12em] text-slate-400">
-                      {actionSequence?.title ?? "Plan"}
-                    </p>
-                    <ol className="space-y-2">
-                      {missionSequenceItems.map((item) => (
-                        <li
-                          key={item.title}
-                          className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-3"
-                        >
-                          <p className="text-xs font-semibold tracking-[0.1em] text-slate-400">
-                            {item.phase}
-                          </p>
-                          <p className="mt-1 text-sm font-semibold text-slate-100">
-                            {item.title}
-                          </p>
-                          <p className="mt-1 text-xs text-slate-300">
-                            {item.detail}
-                          </p>
-                        </li>
-                      ))}
-                    </ol>
-                  </article>
+                    </div>
+                  </section>
 
-                </div>
-              </section>
-
-                                </>
+                </>
               ) : null}
 
               {stageRail ? (
@@ -641,15 +646,14 @@ export const ReportShell = ({
                       ? section.key
                       : `section-${index}`;
                   return (
-                    <div key={sectionKey} className={index === 0 ? "" : "border-t border-slate-800/70 pt-10"}>
+                    <div
+                      key={sectionKey}
+                      className={index === 0 ? "" : "border-t border-slate-800/70 pt-10"}
+                    >
                       {section}
                     </div>
                   );
                 })}
-              </div>
-
-              <div className="hidden sm:block">
-                <OperatorCommandCenter actions={commandActions} />
               </div>
 
               <footer className="mt-12 border-t border-slate-800/70 pt-6 text-xs font-semibold tracking-[0.18em] text-slate-300">

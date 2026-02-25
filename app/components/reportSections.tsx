@@ -37,6 +37,7 @@ import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip"
 import { MonthlySummaryCard } from "./monthlySummaryCard";
 import { SummaryDeltaPanel } from "./summaryDeltaPanel";
 import { WeeklySummaryCard } from "./weeklySummaryCard";
+import { RegimeBadgeIcon } from "./regimeIcons";
 import { insightDatabase } from "../../data/recommendations";
 import {
   buildSparkline,
@@ -52,6 +53,7 @@ import {
   SPARKLINE_HEIGHT,
   SPARKLINE_WIDTH,
 } from "./reportSectionUtils";
+import { DataGauge } from "./dataGauge";
 
 type SeriesFreshnessProps = {
   label?: string;
@@ -116,42 +118,7 @@ const SeriesFreshnessBadge = ({
   );
 };
 
-const RegimeBadgeIcon = ({ icon }: { icon: (typeof regimeBadges)[number]["icon"] }) => {
-  switch (icon) {
-    case "shield":
-      return (
-        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
-          <path d="M12 3l7 3v5c0 5-3.4 8.5-7 10-3.6-1.5-7-5-7-10V6l7-3z" />
-        </svg>
-      );
-    case "lock":
-      return (
-        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
-          <rect x="5" y="11" width="14" height="10" rx="2" />
-          <path d="M8 11V8a4 4 0 118 0v3" />
-        </svg>
-      );
-    case "balance":
-      return (
-        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
-          <path d="M12 4v15" />
-          <path d="M6 8h12" />
-          <path d="M4 8l-2 4h4l-2-4zm16 0l-2 4h4l-2-4z" />
-          <path d="M9 19h6" />
-        </svg>
-      );
-    case "rocket":
-      return (
-        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
-          <path d="M14 4c3 0 6 3 6 6-2 .3-4.4 1.6-6.3 3.5C11.7 15.5 10.3 18 10 20c-3 0-6-3-6-6 2-.3 4.4-1.7 6.4-3.7C12.3 8.4 13.7 6 14 4z" />
-          <circle cx="14.5" cy="9.5" r="1.3" />
-          <path d="M7 17l-3 3" />
-        </svg>
-      );
-    default:
-      return <span className="h-2 w-2 rounded-full bg-current" aria-hidden="true" />;
-  }
-};
+/* RegimeBadgeIcon moved to components/regimeIcons.tsx */
 
 
 type ActionSummaryBlock = {
@@ -375,87 +342,87 @@ export const WeeklyActionSummaryPanel = ({
                   </ol>
                 </div>
               </div>
-            <div className="rounded-2xl border border-sky-400/40 bg-slate-950/60 p-4">
-              <p className="text-xs font-semibold tracking-[0.18em] text-sky-200">
-                Recommended stance
-              </p>
-              <p className="mt-2 text-lg font-semibold text-slate-100">
-                Operate in {regimeLabel} mode.
-              </p>
-              <p className="mt-2 text-sm text-slate-200">{actionGuidance}</p>
-            </div>
-            <div className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-4">
-              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Since last read</p>
-              <p className="mt-2 text-sm text-slate-200">
-                View the delta snapshot before you lock weekly decisions.{" "}
-                <a
-                  href="#change-since-last-read"
-                  className="touch-target inline-flex min-h-[44px] items-center text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-slate-50 touch-manipulation"
-                >
-                  Jump to the change log
-                </a>
-                .
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
-              <span className="weather-pill inline-flex min-h-[32px] items-center px-3 py-1">
-                Regime: {regimeLabel}
-              </span>
-              <span className="weather-pill-muted inline-flex min-h-[32px] items-center px-3 py-1">
-                Strategy: tool-need fit
-              </span>
-              <span className="weather-pill-muted inline-flex min-h-[32px] items-center px-3 py-1">
-                Macro: cash + risk appetite
-              </span>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-3">
-              {weeklySignalTiles.map((tile) => (
-                <div key={tile.label} className={`weather-surface ${tile.tone} p-4`}>
-                  <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">{tile.label}</p>
-                  <p className="mono mt-3 text-2xl text-slate-100">{tile.value}</p>
-                  <p className="mt-2 text-xs text-slate-300">{tile.detail}</p>
-                </div>
-              ))}
-            </div>
-            <div className="weather-surface weather-surface-indigo rounded-xl px-4 py-3">
-              <button
-                type="button"
-                aria-expanded={showMetricDefinitions}
-                aria-controls="weekly-metric-definitions"
-                onClick={() => setShowMetricDefinitions((current) => !current)}
-                className="flex min-h-[44px] w-full items-center justify-between gap-3 text-left text-xs font-semibold tracking-[0.12em] text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-              >
-                <span>How these three metrics are defined</span>
-                <span
-                  aria-hidden="true"
-                  className={`inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-600/80 text-slate-300 transition-transform duration-200 ${showMetricDefinitions ? "rotate-180" : ""}`}
-                >
-                  <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
-                    <path
-                      d="M7 10l5 5 5-5"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.6"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+              <div className="rounded-2xl border border-sky-400/40 bg-slate-950/60 p-4">
+                <p className="text-xs font-semibold tracking-[0.18em] text-sky-200">
+                  Recommended stance
+                </p>
+                <p className="mt-2 text-lg font-semibold text-slate-100">
+                  Operate in {regimeLabel} mode.
+                </p>
+                <p className="mt-2 text-sm text-slate-200">{actionGuidance}</p>
+              </div>
+              <div className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-4">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Since last read</p>
+                <p className="mt-2 text-sm text-slate-200">
+                  View the delta snapshot before you lock weekly decisions.{" "}
+                  <a
+                    href="#change-since-last-read"
+                    className="touch-target inline-flex min-h-[44px] items-center text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-slate-50 touch-manipulation"
+                  >
+                    Jump to the change log
+                  </a>
+                  .
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2 text-xs font-semibold tracking-[0.12em] text-slate-300">
+                <span className="weather-pill inline-flex min-h-[32px] items-center px-3 py-1">
+                  Regime: {regimeLabel}
                 </span>
-                <span className="sr-only">{showMetricDefinitions ? "Expanded" : "Collapsed"}</span>
-              </button>
-              {showMetricDefinitions ? (
-                <ul id="weekly-metric-definitions" className="mt-3 space-y-2 text-xs text-slate-400">
-                  <li><span className="text-slate-200">Cash availability:</span> Normalized score of how tight or loose credit conditions appear in Treasury-linked signals.</li>
-                  <li><span className="text-slate-200">Risk appetite:</span> Normalized score of market willingness to fund risk-on bets versus defensive posture.</li>
-                  <li><span className="text-slate-200">Curve slope:</span> Difference between long- and short-term Treasury rates; negative values indicate inversion risk.</li>
-                </ul>
-              ) : null}
+                <span className="weather-pill-muted inline-flex min-h-[32px] items-center px-3 py-1">
+                  Strategy: tool-need fit
+                </span>
+                <span className="weather-pill-muted inline-flex min-h-[32px] items-center px-3 py-1">
+                  Macro: cash + risk appetite
+                </span>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-3">
+                {weeklySignalTiles.map((tile) => (
+                  <div key={tile.label} className={`weather-surface ${tile.tone} p-4`}>
+                    <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">{tile.label}</p>
+                    <p className="mono mt-3 text-2xl text-slate-100">{tile.value}</p>
+                    <p className="mt-2 text-xs text-slate-300">{tile.detail}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="weather-surface weather-surface-indigo rounded-xl px-4 py-3">
+                <button
+                  type="button"
+                  aria-expanded={showMetricDefinitions}
+                  aria-controls="weekly-metric-definitions"
+                  onClick={() => setShowMetricDefinitions((current) => !current)}
+                  className="flex min-h-[44px] w-full items-center justify-between gap-3 text-left text-xs font-semibold tracking-[0.12em] text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                >
+                  <span>How these three metrics are defined</span>
+                  <span
+                    aria-hidden="true"
+                    className={`inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-600/80 text-slate-300 transition-transform duration-200 ${showMetricDefinitions ? "rotate-180" : ""}`}
+                  >
+                    <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
+                      <path
+                        d="M7 10l5 5 5-5"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.6"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </span>
+                  <span className="sr-only">{showMetricDefinitions ? "Expanded" : "Collapsed"}</span>
+                </button>
+                {showMetricDefinitions ? (
+                  <ul id="weekly-metric-definitions" className="mt-3 space-y-2 text-xs text-slate-400">
+                    <li><span className="text-slate-200">Cash availability:</span> Normalized score of how tight or loose credit conditions appear in Treasury-linked signals.</li>
+                    <li><span className="text-slate-200">Risk appetite:</span> Normalized score of market willingness to fund risk-on bets versus defensive posture.</li>
+                    <li><span className="text-slate-200">Curve slope:</span> Difference between long- and short-term Treasury rates; negative values indicate inversion risk.</li>
+                  </ul>
+                ) : null}
+              </div>
+            </div>
+            <div className="grid gap-4">
+              <WeeklySummaryCard summary={weeklySummary} />
             </div>
           </div>
-          <div className="grid gap-4">
-            <WeeklySummaryCard summary={weeklySummary} />
-          </div>
-        </div>
         </Tooltip.Provider>
 
         <div className="weather-surface weather-surface-indigo p-4 sm:p-5">
@@ -579,18 +546,18 @@ export const MonthlyActionSummaryPanel = ({
   const cadenceBadge =
     cadenceAlignment.status === "aligned"
       ? {
-          label: "Aligned",
-          classes: "border-emerald-400/60 bg-emerald-500/10 text-emerald-100",
-        }
+        label: "Aligned",
+        classes: "border-emerald-400/60 bg-emerald-500/10 text-emerald-100",
+      }
       : cadenceAlignment.status === "watch"
         ? {
-            label: "Needs review",
-            classes: "border-amber-400/60 bg-amber-500/10 text-amber-100",
-          }
+          label: "Needs review",
+          classes: "border-amber-400/60 bg-amber-500/10 text-amber-100",
+        }
         : {
-            label: "Mismatch",
-            classes: "border-rose-500/60 bg-rose-500/10 text-rose-100",
-          };
+          label: "Mismatch",
+          classes: "border-rose-500/60 bg-rose-500/10 text-rose-100",
+        };
   const monthlyBlocks: ActionSummaryBlock[] = [
     {
       heading: "Monthly leadership asks sound like",
@@ -685,18 +652,15 @@ export const RegimeAssessmentCard = ({
       : curveSlopeValue < 0
         ? `Yield curve inversion (${curveSlopeValue.toFixed(2)}%).`
         : `Yield curve normal (${curveSlopeValue.toFixed(2)}%).`;
-  const tightnessLabel = `Cash availability (tightness) ${assessment.scores.tightness}/100 ${
-    assessment.scores.tightness > tightnessThreshold ? "above" : "below"
-  } ${tightnessThreshold}.`;
-  const riskLabel = `Market risk appetite ${assessment.scores.riskAppetite}/100 ${
-    assessment.scores.riskAppetite > riskThreshold ? "above" : "below"
-  } ${riskThreshold}.`;
+  const tightnessLabel = `Cash availability (tightness) ${assessment.scores.tightness}/100 ${assessment.scores.tightness > tightnessThreshold ? "above" : "below"
+    } ${tightnessThreshold}.`;
+  const riskLabel = `Market risk appetite ${assessment.scores.riskAppetite}/100 ${assessment.scores.riskAppetite > riskThreshold ? "above" : "below"
+    } ${riskThreshold}.`;
   const baseRateLabel = `Rate baseline ${formatNumber(
     assessment.scores.baseRate,
     "%"
-  )} ${
-    assessment.scores.baseRate > baseRateThreshold ? "above" : "below"
-  } ${baseRateThreshold}%.`;
+  )} ${assessment.scores.baseRate > baseRateThreshold ? "above" : "below"
+    } ${baseRateThreshold}%.`;
   const constraintDrivers = [
     {
       id: "curve-slope",
@@ -768,9 +732,8 @@ export const RegimeAssessmentCard = ({
               <Tooltip.Root key={badge.key}>
                 <Tooltip.Trigger
                   type="button"
-                  className={`weather-pill flex min-h-[44px] items-center gap-2 px-3 py-2 ${
-                    badge.classes
-                  } ${isActive ? "text-slate-100" : "opacity-60"}`}
+                  className={`weather-pill flex min-h-[44px] items-center gap-2 px-3 py-2 ${badge.classes
+                    } ${isActive ? "text-slate-100" : "opacity-60"}`}
                   aria-current={isActive ? "true" : undefined}
                 >
                   <RegimeBadgeIcon icon={badge.icon} />
@@ -998,50 +961,50 @@ export const FirstTimeGuidePanel = ({
         <div className="space-y-3">
           <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Scan order</p>
           <ul className="space-y-3">
-          {[
-            {
-              label: "Summary",
-              detail:
-                "Confirm the weekly posture and top constraints before you open deeper diagnostics.",
-              example: "Example decision: defer expansion hires when cash is tight.",
-            },
-            {
-              label: "Proof",
-              detail:
-                "Use the signal breakdown here, then open the data lane to see the source metrics.",
-              example: "Example decision: confirm curve inversion before approving long bets.",
-            },
-            {
-              label: "Actions",
-              detail:
-                "Use the actions lane to brief leadership with clear, plain-English constraints.",
-              example: "Example decision: focus on retention when risk appetite is cautious.",
-            },
-          ].map((step, index) => (
-            <li key={step.label} className="weather-surface p-4 text-sm text-slate-300">
-              <Collapsible.Root className="space-y-2">
-                <Collapsible.Trigger
-                  type="button"
-                  className="group flex min-h-[56px] w-full cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-3 text-left transition-colors hover:bg-slate-800/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                >
-                  <span className="flex items-center gap-3">
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-700/70 bg-slate-950 text-xs font-semibold text-slate-300">
-                      {index + 1}
+            {[
+              {
+                label: "Summary",
+                detail:
+                  "Confirm the weekly posture and top constraints before you open deeper diagnostics.",
+                example: "Example decision: defer expansion hires when cash is tight.",
+              },
+              {
+                label: "Proof",
+                detail:
+                  "Use the signal breakdown here, then open the data lane to see the source metrics.",
+                example: "Example decision: confirm curve inversion before approving long bets.",
+              },
+              {
+                label: "Actions",
+                detail:
+                  "Use the actions lane to brief leadership with clear, plain-English constraints.",
+                example: "Example decision: focus on retention when risk appetite is cautious.",
+              },
+            ].map((step, index) => (
+              <li key={step.label} className="weather-surface p-4 text-sm text-slate-300">
+                <Collapsible.Root className="space-y-2">
+                  <Collapsible.Trigger
+                    type="button"
+                    className="group flex min-h-[56px] w-full cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-3 text-left transition-colors hover:bg-slate-800/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                  >
+                    <span className="flex items-center gap-3">
+                      <span className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-700/70 bg-slate-950 text-xs font-semibold text-slate-300">
+                        {index + 1}
+                      </span>
+                      <span className="text-xs font-semibold tracking-[0.12em] text-slate-200">{step.label}</span>
                     </span>
-                    <span className="text-xs font-semibold tracking-[0.12em] text-slate-200">{step.label}</span>
-                  </span>
-                  <span className="inline-flex items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-400">
-                    <span>Details</span>
-                    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-400 transition-transform duration-200 group-data-[panel-open]:rotate-180">⌄</span>
-                  </span>
-                </Collapsible.Trigger>
-                <Collapsible.Panel className="animate-collapsible-in space-y-2 text-xs text-slate-400">
-                  <p>{step.detail}</p>
-                  <p className="text-xs text-slate-500">{step.example}</p>
-                </Collapsible.Panel>
-              </Collapsible.Root>
-            </li>
-          ))}
+                    <span className="inline-flex items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-400">
+                      <span>Details</span>
+                      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-400 transition-transform duration-200 group-data-[panel-open]:rotate-180">⌄</span>
+                    </span>
+                  </Collapsible.Trigger>
+                  <Collapsible.Panel className="animate-collapsible-in space-y-2 text-xs text-slate-400">
+                    <p>{step.detail}</p>
+                    <p className="text-xs text-slate-500">{step.example}</p>
+                  </Collapsible.Panel>
+                </Collapsible.Root>
+              </li>
+            ))}
           </ul>
         </div>
         <aside className="weather-surface p-4" aria-label="Onboarding highlights">
@@ -1706,85 +1669,94 @@ export const ExecutiveSnapshotPanel = ({
         </div>
         <div className="mt-5 weather-bento-grid">
           <div className="weather-tile col-span-1 sm:col-span-2 lg:col-span-2 lg:row-span-2 p-5 bg-gradient-to-br from-slate-950 via-slate-900/70 to-slate-950">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span
-                    className={`inline-flex min-h-[32px] items-center rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] ${
-                      regimeBadge?.classes ?? "border-slate-600/60 bg-slate-500/10 text-slate-100"
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <span
+                  className={`inline-flex min-h-[32px] items-center rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] ${regimeBadge?.classes ?? "border-slate-600/60 bg-slate-500/10 text-slate-100"
                     }`}
-                  >
-                    {regimeBadge?.label ?? assessment.regime}
-                  </span>
-                  <span className="text-sm text-slate-200">{regimeLabel}</span>
-                </div>
-                <Tooltip.Root>
-                  <Tooltip.Trigger
-                    type="button"
-                    className={`inline-flex min-h-[44px] items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] ${confidenceTone}`}
-                    aria-label={`${confidenceLabel} confidence`}
-                  >
-                    <span className="h-2 w-2 rounded-full bg-current" aria-hidden="true" />
-                    {confidenceLabel} confidence
-                  </Tooltip.Trigger>
-                  <Tooltip.Portal>
-                    <Tooltip.Positioner side="bottom" sideOffset={8} className="z-30">
-                      <Tooltip.Popup className="weather-panel w-72 space-y-2 border border-slate-800/80 bg-slate-950/95 px-3 py-3 text-left text-xs text-slate-200 shadow-lg">
-                        <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                          Signal confidence
-                        </p>
-                        <p className="text-sm text-slate-200">{confidenceDetail}</p>
-                        <p className="text-xs text-slate-400">
-                          Confidence reflects data freshness and missing inputs, not forecast certainty.
-                        </p>
-                        <p className="text-xs text-slate-400">{freshnessAction}</p>
-                        <Tooltip.Arrow className="h-2.5 w-2.5 rotate-45 border border-slate-800/80 bg-slate-950/95" />
-                      </Tooltip.Popup>
-                    </Tooltip.Positioner>
-                  </Tooltip.Portal>
-                </Tooltip.Root>
+                >
+                  {regimeBadge?.label ?? assessment.regime}
+                </span>
+                <span className="text-sm text-slate-200">{regimeLabel}</span>
               </div>
-              <p className="mt-3 text-lg font-semibold text-slate-100">
-                The current macro posture requires clear ROI gates before approving new spend.
-              </p>
-              <p className="mt-2 text-sm text-slate-300">{assessment.description}</p>
-              <p className="mt-2 text-xs text-slate-500">
-                Regime posture blends cash tightness and market risk appetite from Treasury signals.
-              </p>
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-xl border border-slate-800/80 bg-slate-950/70 p-3">
+              <Tooltip.Root>
+                <Tooltip.Trigger
+                  type="button"
+                  className={`inline-flex min-h-[44px] items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] ${confidenceTone}`}
+                  aria-label={`${confidenceLabel} confidence`}
+                >
+                  <span className="h-2 w-2 rounded-full bg-current" aria-hidden="true" />
+                  {confidenceLabel} confidence
+                </Tooltip.Trigger>
+                <Tooltip.Portal>
+                  <Tooltip.Positioner side="bottom" sideOffset={8} className="z-30">
+                    <Tooltip.Popup className="weather-panel w-72 space-y-2 border border-slate-800/80 bg-slate-950/95 px-3 py-3 text-left text-xs text-slate-200 shadow-lg">
+                      <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                        Signal confidence
+                      </p>
+                      <p className="text-sm text-slate-200">{confidenceDetail}</p>
+                      <p className="text-xs text-slate-400">
+                        Confidence reflects data freshness and missing inputs, not forecast certainty.
+                      </p>
+                      <p className="text-xs text-slate-400">{freshnessAction}</p>
+                      <Tooltip.Arrow className="h-2.5 w-2.5 rotate-45 border border-slate-800/80 bg-slate-950/95" />
+                    </Tooltip.Popup>
+                  </Tooltip.Positioner>
+                </Tooltip.Portal>
+              </Tooltip.Root>
+            </div>
+            <p className="mt-3 text-lg font-semibold text-slate-100">
+              The current macro posture requires clear ROI gates before approving new spend.
+            </p>
+            <p className="mt-2 text-sm text-slate-300">{assessment.description}</p>
+            <p className="mt-2 text-xs text-slate-500">
+              Regime posture blends cash tightness and market risk appetite from Treasury signals.
+            </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <div className="rounded-xl border border-slate-800/80 bg-slate-950/70 p-4 flex items-center justify-between">
+                <div className="space-y-1">
                   <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                     Tightness score
-                  </p>
-                  <p className="mono mt-2 text-lg text-slate-100">
-                    {assessment.scores.tightness}/100
                   </p>
                   <p className="mt-1 text-xs text-slate-500">
                     Threshold {assessment.thresholds.tightnessRegime}
                   </p>
-                  <p className="mt-1 text-xs text-slate-500">
-                    0 = easy capital access, 100 = tightest funding conditions.
+                  <p className="mt-1 text-[10px] leading-relaxed text-slate-500 max-w-[120px]">
+                    0 = easy capital access, 100 = tightest conditions.
                   </p>
                 </div>
-                <div className="rounded-xl border border-slate-800/80 bg-slate-950/70 p-3">
+                <DataGauge
+                  value={assessment.scores.tightness}
+                  threshold={assessment.thresholds.tightnessRegime}
+                  label="Tightness"
+                  color={assessment.scores.tightness > assessment.thresholds.tightnessRegime ? "rose" : "sky"}
+                />
+              </div>
+              <div className="rounded-xl border border-slate-800/80 bg-slate-950/70 p-4 flex items-center justify-between">
+                <div className="space-y-1">
                   <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                     Risk appetite
-                  </p>
-                  <p className="mono mt-2 text-lg text-slate-100">
-                    {assessment.scores.riskAppetite}/100
                   </p>
                   <p className="mt-1 text-xs text-slate-500">
                     Threshold {assessment.thresholds.riskAppetiteRegime}
                   </p>
-                  <p className="mt-1 text-xs text-slate-500">
-                    0 = risk-off, 100 = markets most willing to fund growth bets.
+                  <p className="mt-1 text-[10px] leading-relaxed text-slate-500 max-w-[120px]">
+                    0 = risk-off, 100 = funding growth bets.
                   </p>
                 </div>
+                <DataGauge
+                  value={assessment.scores.riskAppetite}
+                  threshold={assessment.thresholds.riskAppetiteRegime}
+                  label="Appetite"
+                  color={assessment.scores.riskAppetite > assessment.thresholds.riskAppetiteRegime ? "emerald" : "amber"}
+                />
               </div>
-              <p className="mt-4 text-xs text-slate-400">
-                Constraints tracked:{" "}
-                <span className="mono text-slate-100">{assessment.constraints.length}</span>
-              </p>
             </div>
+            <p className="mt-4 text-xs text-slate-400">
+              Constraints tracked:{" "}
+              <span className="mono text-slate-100">{assessment.constraints.length}</span>
+            </p>
+          </div>
           <div className="weather-tile p-4">
             <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
               Rate baseline
@@ -2130,9 +2102,8 @@ export const RegimeSummaryPanel = ({
             <div className="weather-surface bg-gradient-to-br from-slate-950 via-slate-900/80 to-slate-950 p-5">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <span
-                  className={`inline-flex min-h-[44px] items-center rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] ${
-                    regimeBadge?.classes ?? "border-slate-600/60 bg-slate-500/10 text-slate-100"
-                  }`}
+                  className={`inline-flex min-h-[44px] items-center rounded-full border px-3 py-1 text-xs font-semibold tracking-[0.12em] ${regimeBadge?.classes ?? "border-slate-600/60 bg-slate-500/10 text-slate-100"
+                    }`}
                 >
                   {regimeBadge?.label ?? assessment.regime}
                 </span>
@@ -2642,117 +2613,117 @@ export const MacroSignalsPanel = ({
               Supplement Treasury yields with inflation, labor health, and credit stress indicators.
             </p>
           </div>
-        <div className="flex flex-col items-end gap-2">
-          <span className="weather-pill px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-300">
-            {provenance.statusLabel}
-          </span>
-          <DataProvenanceStrip provenance={provenance} />
+          <div className="flex flex-col items-end gap-2">
+            <span className="weather-pill px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-300">
+              {provenance.statusLabel}
+            </span>
+            <DataProvenanceStrip provenance={provenance} />
+          </div>
         </div>
-      </div>
-      <div className="mt-4 weather-surface p-4">
-        <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Executive summary</p>
-        <p className="mt-2 text-sm text-slate-200">
-          Use this expanded pack to validate the Treasury-led climate call against inflation,
-          labor, and credit stress signals.
-        </p>
-        <p className="mt-2 text-xs text-slate-400">
-          Cards are ranked by action impact × recency so the first scan surfaces the most urgent
-          checks.
-        </p>
-      </div>
-      <Collapsible.Root className="mt-4">
-        <Collapsible.Trigger
-          type="button"
-          className="group flex min-h-[44px] w-full items-center justify-between gap-3 text-left text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-        >
-          <span>Deep dive: signal cards and freshness checks</span>
-          <span className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/80 px-3 text-[0.65rem] font-semibold tracking-[0.14em] text-slate-200">
-            <span className="group-data-[panel-open]:hidden">Expand section</span>
-            <span className="hidden group-data-[panel-open]:inline">Collapse section</span>
-          </span>
-        </Collapsible.Trigger>
-        <Collapsible.Panel className="mt-4 grid gap-4 md:grid-cols-3">
-          {prioritizedSeries.map((signal, index) => {
-            const sparkline = buildSparkline(signal.history);
-            const sparklineId = `macro-spark-${signal.id}`;
-            const priority = buildMacroPriorityScore(signal);
+        <div className="mt-4 weather-surface p-4">
+          <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Executive summary</p>
+          <p className="mt-2 text-sm text-slate-200">
+            Use this expanded pack to validate the Treasury-led climate call against inflation,
+            labor, and credit stress signals.
+          </p>
+          <p className="mt-2 text-xs text-slate-400">
+            Cards are ranked by action impact × recency so the first scan surfaces the most urgent
+            checks.
+          </p>
+        </div>
+        <Collapsible.Root className="mt-4">
+          <Collapsible.Trigger
+            type="button"
+            className="group flex min-h-[44px] w-full items-center justify-between gap-3 text-left text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+          >
+            <span>Deep dive: signal cards and freshness checks</span>
+            <span className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/80 px-3 text-[0.65rem] font-semibold tracking-[0.14em] text-slate-200">
+              <span className="group-data-[panel-open]:hidden">Expand section</span>
+              <span className="hidden group-data-[panel-open]:inline">Collapse section</span>
+            </span>
+          </Collapsible.Trigger>
+          <Collapsible.Panel className="mt-4 grid gap-4 md:grid-cols-3">
+            {prioritizedSeries.map((signal, index) => {
+              const sparkline = buildSparkline(signal.history);
+              const sparklineId = `macro-spark-${signal.id}`;
+              const priority = buildMacroPriorityScore(signal);
 
-            return (
-              <div key={signal.id} className="weather-surface rounded-2xl p-4">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-                    {signal.label}
+              return (
+                <div key={signal.id} className="weather-surface rounded-2xl p-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                      {signal.label}
+                    </p>
+                    <span className="rounded-full border border-sky-400/40 bg-sky-500/10 px-2 py-1 text-[10px] font-semibold tracking-[0.14em] text-sky-100">
+                      Priority #{index + 1}
+                    </span>
+                  </div>
+                  <p className="mono mt-3 text-2xl text-slate-100">
+                    {formatNumber(signal.value, signal.unit)}
                   </p>
-                  <span className="rounded-full border border-sky-400/40 bg-sky-500/10 px-2 py-1 text-[10px] font-semibold tracking-[0.14em] text-sky-100">
-                    Priority #{index + 1}
-                  </span>
-                </div>
-                <p className="mono mt-3 text-2xl text-slate-100">
-                  {formatNumber(signal.value, signal.unit)}
-                </p>
-                <p className="mt-2 text-xs text-slate-400">
-                  Impact {Math.round(priority.impact * 100)} · Recency {Math.round(priority.recency * 100)}
-                </p>
-                <figure className="mt-3">
-                  {sparkline ? (
-                    <svg
-                      viewBox={`0 0 ${SPARKLINE_WIDTH} ${SPARKLINE_HEIGHT}`}
-                      className="h-8 w-full"
-                      aria-hidden="true"
-                      focusable="false"
-                      preserveAspectRatio="none"
-                    >
-                      <defs>
-                        <linearGradient id={sparklineId} x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="rgba(251,191,36,0.3)" />
-                          <stop offset="100%" stopColor="rgba(251,191,36,0)" />
-                        </linearGradient>
-                      </defs>
-                      <path d={sparkline.area} fill={`url(#${sparklineId})`} pathLength={100} />
-                      <path
-                        d={sparkline.path}
-                        fill="none"
-                        stroke="#fbbf24"
-                        strokeWidth="1.5"
-                        vectorEffect="non-scaling-stroke"
-                        pathLength={100}
+                  <p className="mt-2 text-xs text-slate-400">
+                    Impact {Math.round(priority.impact * 100)} · Recency {Math.round(priority.recency * 100)}
+                  </p>
+                  <figure className="mt-3">
+                    {sparkline ? (
+                      <svg
+                        viewBox={`0 0 ${SPARKLINE_WIDTH} ${SPARKLINE_HEIGHT}`}
+                        className="h-8 w-full"
+                        aria-hidden="true"
+                        focusable="false"
+                        preserveAspectRatio="none"
+                      >
+                        <defs>
+                          <linearGradient id={sparklineId} x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="rgba(251,191,36,0.3)" />
+                            <stop offset="100%" stopColor="rgba(251,191,36,0)" />
+                          </linearGradient>
+                        </defs>
+                        <path d={sparkline.area} fill={`url(#${sparklineId})`} pathLength={100} />
+                        <path
+                          d={sparkline.path}
+                          fill="none"
+                          stroke="#fbbf24"
+                          strokeWidth="1.5"
+                          vectorEffect="non-scaling-stroke"
+                          pathLength={100}
+                        />
+                      </svg>
+                    ) : (
+                      <div
+                        className="h-8 rounded-md border border-sky-900/40 bg-slate-950/80"
+                        aria-hidden="true"
                       />
-                    </svg>
-                  ) : (
-                    <div
-                      className="h-8 rounded-md border border-sky-900/40 bg-slate-950/80"
-                      aria-hidden="true"
-                    />
-                  )}
-                  <figcaption className="mt-2 text-xs text-slate-500">
-                    {signal.explanation}
-                  </figcaption>
-                </figure>
-                <div className="mt-3 text-xs text-slate-500">
-                  <p>
-                    Formula:{" "}
-                    <a
-                      href={signal.formulaUrl}
-                      className="touch-target text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
-                    >
-                      Method notes
-                    </a>
-                  </p>
-                  <div className="mt-3">
-                    <SeriesFreshnessBadge
-                      sourceLabel={signal.sourceLabel}
-                      sourceUrl={signal.sourceUrl}
-                      recordDate={signal.record_date}
-                      fetchedAt={signal.fetched_at}
-                      isLive={signal.isLive}
-                    />
+                    )}
+                    <figcaption className="mt-2 text-xs text-slate-500">
+                      {signal.explanation}
+                    </figcaption>
+                  </figure>
+                  <div className="mt-3 text-xs text-slate-500">
+                    <p>
+                      Formula:{" "}
+                      <a
+                        href={signal.formulaUrl}
+                        className="touch-target text-slate-300 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
+                      >
+                        Method notes
+                      </a>
+                    </p>
+                    <div className="mt-3">
+                      <SeriesFreshnessBadge
+                        sourceLabel={signal.sourceLabel}
+                        sourceUrl={signal.sourceUrl}
+                        recordDate={signal.record_date}
+                        fetchedAt={signal.fetched_at}
+                        isLive={signal.isLive}
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </Collapsible.Panel>
-      </Collapsible.Root>
+              );
+            })}
+          </Collapsible.Panel>
+        </Collapsible.Root>
       </div>
     </section>
   );
@@ -2961,7 +2932,7 @@ export const InsightDatabasePanel = ({
   const climateOptions = useMemo(
     () =>
       Array.from(new Set(evidenceLibrary.map((item) => item.climate))).sort(
-        (first, second) =>
+        (first: any, second: any) =>
           CLIMATE_ORDER.indexOf(first) - CLIMATE_ORDER.indexOf(second)
       ),
     [evidenceLibrary]
@@ -3303,11 +3274,10 @@ export const InsightDatabasePanel = ({
                           onClick={() => toggleTag(tag)}
                           aria-pressed={selectedTags.includes(tag)}
                           aria-label={`Filter by ${tag}`}
-                          className={`min-h-[44px] rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.12em] transition-colors touch-manipulation ${
-                            selectedTags.includes(tag)
-                              ? "border-sky-400/70 bg-sky-500/15 text-sky-100"
-                              : "border-slate-700/70 text-slate-300 hover:border-slate-500/80 hover:text-slate-100"
-                          }`}
+                          className={`min-h-[44px] rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.12em] transition-colors touch-manipulation ${selectedTags.includes(tag)
+                            ? "border-sky-400/70 bg-sky-500/15 text-sky-100"
+                            : "border-slate-700/70 text-slate-300 hover:border-slate-500/80 hover:text-slate-100"
+                            }`}
                         >
                           {tag}
                         </button>
