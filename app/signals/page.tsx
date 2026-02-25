@@ -17,6 +17,7 @@ import {
 import { AdvancedThresholdsSection } from "./components/advancedThresholdsSection";
 import { TimeMachinePanel } from "./components/timeMachinePanel";
 import { RegimeTimelinePanel } from "./components/regimeTimelinePanel";
+import { SignalVisualizationSuite } from "./components/signalVisualizationSuite";
 import { reportPageLinks } from "../../lib/report/reportNavigation";
 import { ReturningVisitorDeltaStrip } from "../components/changeSinceLastReadPanel";
 import { buildTrustStatus } from "../../lib/report/trustStatus";
@@ -360,6 +361,14 @@ export default async function SignalsPage({
           </article>
         </div>
       </section>
+
+      <SignalVisualizationSuite
+        assessment={assessment}
+        treasury={treasury}
+        macroSeries={macroSeries}
+        sensors={sensors}
+        regimeSeries={regimeSeries}
+      />
 
       <SensorArray sensors={sensors} provenance={treasuryProvenance} />
 
