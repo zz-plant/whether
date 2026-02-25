@@ -33,6 +33,21 @@ const statusCycles = {
   "Simulated (low)": { phase: "New moon", pct: 28 },
 } as const;
 
+const statusDataMode = {
+  "Live (high confidence)": {
+    label: "Dynamic feed",
+    className: "weather-data-mode weather-data-mode-dynamic",
+  },
+  "Cached (medium)": {
+    label: "Static snapshot",
+    className: "weather-data-mode weather-data-mode-static",
+  },
+  "Simulated (low)": {
+    label: "Static snapshot",
+    className: "weather-data-mode weather-data-mode-static",
+  },
+} as const;
+
 export const DataProvenanceStrip = ({
   provenance,
   label = "Data provenance",
@@ -47,6 +62,11 @@ export const DataProvenanceStrip = ({
   const cycle =
     statusCycles[provenance.statusLabel as keyof typeof statusCycles] ??
     ({ phase: "Unknown phase", pct: 50 } as const);
+  const dataMode =
+    statusDataMode[provenance.statusLabel as keyof typeof statusDataMode] ?? {
+      label: "Static snapshot",
+      className: "weather-data-mode weather-data-mode-static",
+    };
 
   return (
     <div className="weather-pill flex flex-wrap items-center gap-2 px-4 py-2 text-[0.65rem] font-semibold tracking-[0.16em] text-slate-300">
@@ -80,6 +100,8 @@ export const DataProvenanceStrip = ({
         <span className="text-slate-500">Data age:</span>{" "}
         <span className="mono text-slate-200">{provenance.ageLabel}</span>
       </span>
+      <span className="h-1 w-1 rounded-full bg-slate-600" aria-hidden="true" />
+      <span className={dataMode.className}>{dataMode.label}</span>
       <span className="h-1 w-1 rounded-full bg-slate-600" aria-hidden="true" />
       <span className="inline-flex items-center gap-2 rounded-full border border-slate-700/70 bg-slate-900/70 px-2 py-1 text-xs tracking-[0.12em] text-slate-200">
         <span
