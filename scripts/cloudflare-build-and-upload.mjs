@@ -35,12 +35,16 @@ const currentCommitSha =
   null;
 
 const buildMeta = readBuildMeta();
+const hasMatchingCommit =
+  Boolean(currentCommitSha) &&
+  Boolean(buildMeta?.commitSha) &&
+  buildMeta.commitSha === currentCommitSha;
 const hasReusableOutput =
   Boolean(buildMeta?.buildTarget === 'cloudflare') &&
   Boolean(buildMeta?.useNextOnPages) &&
   Boolean(buildMeta?.workerIndexExists) &&
   Boolean(buildMeta?.commandSucceeded) &&
-  (!currentCommitSha || buildMeta?.commitSha === currentCommitSha);
+  hasMatchingCommit;
 
 if (hasReusableOutput) {
   run('bun', ['run', 'build:pages:skip-next-build']);
