@@ -12,11 +12,6 @@ export type OperationsWorkstreamLink = {
 export const operationsWorkstreamLinks: OperationsWorkstreamLink[] = [
   {
     href: "/operations",
-    label: "Overview",
-    description: "Get the monthly action summary and choose a focused workstream.",
-  },
-  {
-    href: "/operations/plan",
     label: "Plan",
     description: "Translate the regime into quarterly posture, playbook moves, and operator asks.",
   },

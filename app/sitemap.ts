@@ -56,12 +56,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/signals", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.8 },
     { path: "/operations", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.8 },
     {
-      path: "/operations/plan",
-      lastModified: reportLastModified,
-      changeFrequency: "weekly",
-      priority: 0.7,
-    },
-    {
       path: "/operations/decisions",
       lastModified: reportLastModified,
       changeFrequency: "weekly",

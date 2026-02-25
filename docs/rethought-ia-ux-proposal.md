@@ -48,6 +48,18 @@ Whether should feel like a **weekly operating system for leadership decisions**,
 If a screen does not help users complete the Decide → Plan → Brief loop,
 it belongs in Evidence/Methods/History, not in Decide.
 
+### Pages to combine/reorganize (single source of truth)
+
+| Keep as canonical | Combine/reorganize from | Action |
+| --- | --- | --- |
+| `/operations` | `/operations/plan`, `/operations/decisions`, `/operations/briefings`, `/plan` | Use `/operations` as the single planning workspace and merge remaining workstreams into this screen over time. |
+| `/signals` (or future `/evidence`) | `/evidence` alias + trust/provenance sections duplicated in `/` and `/operations/*` | Keep one evidence destination and remove repeated deep evidence blocks from action pages. |
+| `/guides` + `/guides/stage/*` + `/guides/[stakeholder]` | `/brief`, `/brief/stage`, `/brief/stage/[stage]`, `/brief/[stakeholder]`, and overlapping `/solutions/*` pages | Keep one “For Teams” tree (role + stage guidance) and fold solution content into role/stage pages. |
+| `/methodology` | `/formulas` | Keep `/methodology` as canonical and retain alias redirect only while external links migrate. |
+| First-run modules in `/` + `/operations` | `/onboarding` | Integrate setup into first-run flow; keep `/onboarding` as optional fallback entry. |
+
+This list is the direct answer to **“which pages can be combined/reorganized?”** and is intended to be implementation-first (canonical route + migration sources).
+
 ---
 
 ## 4) Screen contracts (what each route must do)

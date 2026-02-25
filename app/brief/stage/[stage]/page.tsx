@@ -1,4 +1,4 @@
-import { permanentRedirect } from "next/navigation";
+import { redirectWithParams } from "../../../../lib/navigation/legacyRedirects";
 
 export const runtime = "edge";
 
@@ -7,6 +7,5 @@ type BriefStageGuidePageProps = {
 };
 
 export default async function BriefStageGuidePage({ params }: BriefStageGuidePageProps) {
-  const { stage } = await params;
-  permanentRedirect(`/guides/stage/${stage}`);
+  return redirectWithParams(params, ({ stage }) => `/guides/stage/${stage}`);
 }
