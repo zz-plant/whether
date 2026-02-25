@@ -211,6 +211,12 @@ export default async function HomePage({
         mainEntity: {
           "@type": "Dataset",
           name: "US Treasury yield curve snapshot",
+          description:
+            "Weekly US Treasury yield-curve regime snapshot used by Whether to guide product and engineering operating posture.",
+          creator: {
+            "@id": `${siteUrl}#organization`,
+          },
+          license: `${siteUrl}/terms-of-service`,
           isBasedOn: {
             "@type": "CreativeWork",
             name: "US Treasury Fiscal Data API",

@@ -73,13 +73,24 @@ export default async function SignalsPage({
           url: siteUrl,
         },
         publisher: {
-          "@type": "Organization",
-          name: organizationName,
+          "@id": `${siteUrl}#organization`,
         },
         mainEntity: {
           "@type": "Dataset",
           name: "Macro signal evidence feed",
+          description:
+            "Macro signal dataset for Whether, including thresholds, sensor readings, and regime evidence used for decision support.",
+          creator: {
+            "@id": `${siteUrl}#organization`,
+          },
+          license: `${siteUrl}/terms-of-service`,
         },
+      },
+      {
+        "@type": "Organization",
+        "@id": `${siteUrl}#organization`,
+        name: organizationName,
+        url: siteUrl,
       },
       buildBreadcrumbList([
         { name: "Weekly briefing", path: "/" },
