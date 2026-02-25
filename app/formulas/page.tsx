@@ -1,5 +1,5 @@
-import { permanentRedirect } from "next/navigation";
+import { redirectTo } from "../../lib/navigation/legacyRedirects";
 
 export default function FormulasPage() {
-  permanentRedirect("/methodology");
+  return redirectTo("/methodology");
 }

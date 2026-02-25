@@ -6,7 +6,7 @@ import { useSearchParams } from "next/navigation";
 
 const steps = [
   {
-    href: "/operations/plan",
+    href: "/operations",
     label: "Step 1",
     title: "Plan",
     description: "Translate the regime into quarterly posture.",

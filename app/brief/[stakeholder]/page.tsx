@@ -1,4 +1,4 @@
-import { permanentRedirect } from "next/navigation";
+import { redirectWithParams } from "../../../lib/navigation/legacyRedirects";
 
 export const runtime = "edge";
 
@@ -7,6 +7,5 @@ type BriefStakeholderPageProps = {
 };
 
 export default async function BriefStakeholderPage({ params }: BriefStakeholderPageProps) {
-  const { stakeholder } = await params;
-  permanentRedirect(`/guides/${stakeholder}`);
+  return redirectWithParams(params, ({ stakeholder }) => `/guides/${stakeholder}`);
 }
