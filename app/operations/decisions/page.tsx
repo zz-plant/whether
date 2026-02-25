@@ -22,7 +22,12 @@ export const metadata: Metadata = buildPageMetadata({
   path: "/operations/decisions",
   imageAlt: "Whether action playbook decisions view",
   imageParams: {
-    view: "operations-decisions",
+    template: "operations",
+    eyebrow: "Action playbook · Decisions",
+    title: "Review bets with a macro decision shield",
+    subtitle:
+      "Use posture-aware prompts and approval checks before committing cross-functional resources.",
+    kicker: "Decisions workstream · Whether",
   },
 });
 

@@ -25,6 +25,14 @@ export const metadata: Metadata = buildPageMetadata({
     "Get oriented with the Whether Report: a quick guide to reading the signals and a plain-English glossary.",
   path: "/onboarding",
   imageAlt: "Whether Report onboarding and glossary overview",
+  imageParams: {
+    template: "guides",
+    eyebrow: "Onboarding",
+    title: "Get fluent in the weekly macro briefing",
+    subtitle:
+      "Learn the signal vocabulary, reading flow, and operating cues used across Whether.",
+    kicker: "Start here for first-time and returning users.",
+  },
 });
 
 export default async function OnboardingPage({

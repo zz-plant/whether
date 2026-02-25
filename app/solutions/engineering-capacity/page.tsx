@@ -8,6 +8,14 @@ export const metadata: Metadata = buildPageMetadata({
     "Translate market stress signals into engineering capacity plans for hiring, delivery scope, and reliability investment.",
   path: "/solutions/engineering-capacity",
   imageAlt: "Macro signals for engineering capacity planning",
+  imageParams: {
+    template: "solutions",
+    eyebrow: "Solution · Engineering capacity",
+    title: "Align capacity plans to market climate",
+    subtitle:
+      "Tune hiring velocity, staffing risk, and delivery commitments with a shared macro baseline.",
+    kicker: "Whether solutions for engineering leaders.",
+  },
 });
 
 const capacityChecks = [

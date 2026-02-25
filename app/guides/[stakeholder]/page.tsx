@@ -29,6 +29,13 @@ export async function generateMetadata({
       description: "Role-based guidance for leadership teams.",
       path: "/guides",
       imageAlt: "Whether stakeholder guidance",
+      imageParams: {
+        template: "guides",
+        eyebrow: "Stakeholder guide",
+        title: "Role-specific macro guidance",
+        subtitle: "Use Whether to translate signal posture into role-level planning decisions.",
+        kicker: "Guides for leadership stakeholders.",
+      },
     });
   }
 
@@ -37,6 +44,13 @@ export async function generateMetadata({
     description: guide.seoDescription,
     path: `/guides/${guide.slug}`,
     imageAlt: `${guide.title} stakeholder guidance`,
+    imageParams: {
+      template: "guides",
+      eyebrow: "Stakeholder guide",
+      title: `For ${guide.title}`,
+      subtitle: guide.seoDescription,
+      kicker: "Role-based operating guidance.",
+    },
   });
 }
 

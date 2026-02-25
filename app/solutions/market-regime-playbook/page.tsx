@@ -8,6 +8,14 @@ export const metadata: Metadata = buildPageMetadata({
     "Action framework for operating in high, moderate, and low market-stress regimes using Treasury macro signal guidance.",
   path: "/solutions/market-regime-playbook",
   imageAlt: "Market regime operations playbook",
+  imageParams: {
+    template: "solutions",
+    eyebrow: "Solution · Regime playbook",
+    title: "Operationalize each market regime",
+    subtitle:
+      "Move from classification to repeatable guardrails across product, engineering, and finance.",
+    kicker: "Whether solutions for operating teams.",
+  },
 });
 
 const regimeRows = [

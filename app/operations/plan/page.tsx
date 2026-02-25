@@ -26,7 +26,12 @@ export const metadata: Metadata = buildPageMetadata({
   path: "/operations/plan",
   imageAlt: "Whether action playbook plan view",
   imageParams: {
-    view: "operations-plan",
+    template: "operations",
+    eyebrow: "Action playbook · Plan",
+    title: "Set priorities and resource posture",
+    subtitle:
+      "Translate regime context into playbook moves, finance posture, and operator requests.",
+    kicker: "Plan workstream · Whether",
   },
 });
 

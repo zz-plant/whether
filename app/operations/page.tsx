@@ -32,6 +32,14 @@ export const metadata: Metadata = buildPageMetadata({
     "Execution-ready guidance, decision shield validation, and export briefs for the Whether Report.",
   path: "/operations",
   imageAlt: "Whether Report action playbook overview",
+  imageParams: {
+    template: "operations",
+    eyebrow: "Action playbook",
+    title: "Turn macro posture into execution",
+    subtitle:
+      "Move from market climate classification to concrete plan, decision, and briefing workflows.",
+    kicker: "Execution-ready operating guidance.",
+  },
 });
 
 
