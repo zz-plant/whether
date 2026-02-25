@@ -390,10 +390,10 @@ export default async function HomePage({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Current Climate"
       currentPath="/"
-      pageSummary="Canonical operating posture for the current cycle."
+      pageSummary="Set the current operating posture, then execute quickly with measurable guardrails."
       primaryCta={{
         href: "#weekly-action-summary",
-        label: "See posture rationale",
+        label: "Set posture with evidence",
       }}
       sidebarVariant="hidden"
       hideHeroChrome={true}
@@ -418,7 +418,7 @@ export default async function HomePage({
             How should your company operate right now?
           </h1>
           <p className="mx-auto max-w-3xl text-base text-slate-300">
-            Live market and capital conditions translated into a clear operating posture for the next cycle.
+            Move quickly on this cycle&apos;s priorities while keeping scope, spend, and outcomes measurable.
           </p>
           <div className="py-2 sm:py-3">
             <p className="inline-flex items-center justify-center gap-3 text-5xl font-bold tracking-[-0.02em] text-slate-50 sm:text-[3.5rem]">
@@ -442,7 +442,7 @@ export default async function HomePage({
             ))}
           </div>
           <p className="text-xs text-slate-300">
-            Heuristic operational probabilities only; this translates current threshold distance into posture shift odds and is not a financial forecast.
+            Heuristic operational probabilities only; use them to pace decisions and measurement, not as a financial forecast.
           </p>
           <p className="text-xs text-slate-300">
             These percentages use the same trigger logic as <span className="font-semibold text-slate-100">What would change this posture</span>: scores closer to threshold imply higher shift risk.

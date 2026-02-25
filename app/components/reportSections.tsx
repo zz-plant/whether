@@ -228,15 +228,15 @@ export const WeeklyActionSummaryPanel = ({
     {
       heading: "Product strategy",
       bullets: [
-        "“Our core user problem is unchanged, and we can prove the payoff in 1–2 quarters.”",
-        "“We’re trading scope for reliability because retention is the constraint.”",
+        "“Keep solving the core user problem, and instrument proof of payoff inside 1–2 quarters.”",
+        "“Trade scope for reliability now, then verify retention response each sprint.”",
       ],
     },
     {
       heading: "Macro guidance",
       bullets: [
-        "“Delay long-payback bets until cash availability loosens or risk appetite turns.”",
-        "“Keep hiring approvals tighter while the curve is inverted.”",
+        "“Hold long-payback bets until cash availability loosens or risk appetite turns, then re-open with staged milestones.”",
+        "“Keep hiring approvals tight while the curve is inverted, with role-level ROI checks before approval.”",
       ],
     },
   ];
@@ -251,7 +251,7 @@ export const WeeklyActionSummaryPanel = ({
     },
     {
       title: "Lock the one-week bet",
-      detail: "Pick the smallest scope that protects retention or reliability.",
+      detail: "Pick the smallest measurable scope that protects retention or reliability.",
     },
   ];
   const decisionFlow = [
@@ -268,7 +268,7 @@ export const WeeklyActionSummaryPanel = ({
     {
       title: "One-week bet",
       value: "Smallest scope",
-      detail: "Protect retention or reliability.",
+      detail: "Protect retention or reliability with measurable checkpoints.",
     },
   ];
   const weeklyQuickLinks = [
@@ -310,15 +310,15 @@ export const WeeklyActionSummaryPanel = ({
       label: "Best window to commit roadmap scope",
       detail:
         assessment.scores.riskAppetite >= assessment.thresholds.riskAppetiteRegime
-          ? "Early week after leadership sync; confidence supports bounded expansion."
-          : "After review with finance guardrails; keep reversibility explicit.",
+          ? "Early week after leadership sync; move fast on bounded expansion with checkpoint metrics in place."
+          : "After finance guardrail review; keep reversibility and success metrics explicit.",
     },
     {
       label: "Best window for hiring approvals",
       detail:
         assessment.scores.tightness >= assessment.thresholds.tightnessRegime
-          ? "Late week with contingency plan attached."
-          : "Midweek once role-to-revenue linkage is clear.",
+          ? "Late week with a contingency plan and 30/60-day impact checkpoints attached."
+          : "Midweek once role-to-revenue linkage and measurement owners are explicit.",
     },
   ];
   const [showMetricDefinitions, setShowMetricDefinitions] = useState(false);
@@ -335,14 +335,14 @@ export const WeeklyActionSummaryPanel = ({
                   Weekly action map
                 </h2>
                 <p className="mt-3 text-sm text-slate-200">
-                  Set posture fast, then skim the{" "}
+                  Set posture fast, then validate the decision trail in the{" "}
                   <a
                     href="#executive-snapshot"
                     className="touch-target inline-flex min-h-[44px] items-center text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-slate-50 touch-manipulation"
                   >
                     leadership summary
                   </a>{" "}
-                  for sources.
+                  for source checks.
                 </p>
                 <div className="mt-4">
                   <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">
@@ -387,7 +387,7 @@ export const WeeklyActionSummaryPanel = ({
             <div className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-4">
               <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Since last read</p>
               <p className="mt-2 text-sm text-slate-200">
-                View the delta snapshot before you lock weekly decisions.{" "}
+                Review the delta snapshot before you lock weekly decisions or accelerate scope.{" "}
                 <a
                   href="#change-since-last-read"
                   className="touch-target inline-flex min-h-[44px] items-center text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-slate-50 touch-manipulation"
@@ -541,13 +541,13 @@ export const WeeklyActionSummaryPanel = ({
                 ))}
               </ol>
               <p className="mt-4 text-xs text-slate-300">
-                Reference these points before roadmap or staffing changes.
+                Use these points to speed approvals while keeping measurement discipline intact.
               </p>
             </aside>
           </div>
         </details>
         <p className="text-xs text-slate-300">
-          Keep the weekly narrative tight so leaders can decide without re-reading the data lanes.
+          Keep the weekly narrative tight so leaders can act quickly without skipping evidence checks.
         </p>
       </div>
     </section>
@@ -595,15 +595,15 @@ export const MonthlyActionSummaryPanel = ({
     {
       heading: "Monthly leadership asks sound like",
       bullets: [
-        "“These three bets can still pay back within the climate constraints.”",
-        "“We’re sequencing roadmap work to reduce risk before expanding scope.”",
+        "“Advance only the three bets that can pay back inside current climate constraints, and track leading indicators weekly.”",
+        "“Sequence roadmap work to reduce risk first, then expand scope only when metrics hold.”",
       ],
     },
     {
       heading: "Monthly constraints should force",
       bullets: [
-        "“Only one major growth bet at a time until cash availability improves.”",
-        "“Move hires to contingency approval and revisit after the next Treasury refresh.”",
+        "“Run one major growth bet at a time until cash availability improves, with stop-loss criteria documented.”",
+        "“Move hires to contingency approval and re-evaluate after the next Treasury refresh with updated evidence.”",
       ],
     },
   ];
@@ -617,7 +617,7 @@ export const MonthlyActionSummaryPanel = ({
       description={
         <>
           This month, operate in {regimeLabel} mode: {actionGuidance}. Use these constraints to
-          align staffing, sequencing, and approval cadence before you lock the next sprint slate.
+          accelerate staffing and sequencing decisions while preserving approval cadence and measurement discipline before you lock the next sprint slate.
         </>
       }
       summaryCard={
