@@ -19,6 +19,7 @@ This directory is organized by audience so contributors can find the right sourc
 - `stack-compatibility-matrix.md` — runtime/platform support and constraints.
 - `stack-modernization-*.md` — modernization inventory, plan, and execution tracking.
 - `vinext-cloudflare-evaluation.md` — safe Cloudflare-first vinext rollout gates and cutover criteria.
+- `notes/page-load-audit-whether-work-2026-02-25.md` — curl-based page load timing audit across key whether.work routes, including latency variance findings.
 
 ## Product direction and planning
 - `feature-specs-current.md` — implemented/current feature intent.
