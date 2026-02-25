@@ -19,6 +19,7 @@ import { TimeMachinePanel } from "./components/timeMachinePanel";
 import { RegimeTimelinePanel } from "./components/regimeTimelinePanel";
 import { reportPageLinks } from "../../lib/report/reportNavigation";
 import { ReturningVisitorDeltaStrip } from "../components/changeSinceLastReadPanel";
+import { buildTrustStatus } from "../../lib/report/trustStatus";
 
 export const runtime = "edge";
 
@@ -99,27 +100,21 @@ export default async function SignalsPage({
   } = await loadReportData(resolvedSearchParams);
   const regimeLabel = regimeLabels[assessment.regime];
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
-  const trustStatusLabel = historicalSelection
-    ? "Historical snapshot"
-    : isFallback
-      ? "Using last verified snapshot"
-      : "Live • Treasury verified";
-  const trustStatusDetail = historicalSelection
-    ? "Viewing archived Treasury data for the selected month."
-    : isFallback
-      ? (treasury.fallback_reason ??
-        "Live refresh pending. Using last verified snapshot.")
-      : "Live refresh healthy. Next expected update: 48h.";
-  const trustStatusAction = historicalSelection
-    ? "Use historical data to understand trends, not to approve live bets."
-    : isFallback
-      ? "Hold major decisions until live signals return or you validate the cache."
-      : "Signals are live with current thresholds and timestamps.";
-  const trustStatusTone = historicalSelection
-    ? "historical"
-    : isFallback
-      ? "warning"
-      : "stable";
+  const {
+    trustStatusLabel,
+    trustStatusDetail,
+    trustStatusAction,
+    trustStatusTone,
+  } = buildTrustStatus({
+    historicalSelection: Boolean(historicalSelection),
+    isFallback,
+    fallbackReason: treasury.fallback_reason,
+    historicalAction:
+      "Use historical data to understand trends, not to approve live bets.",
+    fallbackAction:
+      "Hold major decisions until live signals return or you validate the cache.",
+    stableAction: "Signals are live with current thresholds and timestamps.",
+  });
   const showAdvanced = resolvedSearchParams?.advanced === "1";
   const timeMachineHref = showAdvanced ? "#time-machine" : "#advanced-controls";
   const regimeTimelineHref = showAdvanced ? "#regime-timeline" : "#advanced-controls";
