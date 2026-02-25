@@ -28,9 +28,9 @@ const commandButtonClassName =
 
 const filterDescriptions: Record<CommandFilter, string> = {
   All: "All results across actions, pages, and sections.",
-  Playbook: "Do now: immediate actions and operator moves.",
-  Pages: "Switch surfaces: navigate to another report page.",
-  Sections: "Jump within this page to a specific section.",
+  Playbook: "Recommended actions you can take right now.",
+  Pages: "Switch to a different report surface.",
+  Sections: "Jump to a specific section on this page.",
 };
 
 const groupGlyph: Record<OperatorCommandAction["group"], string> = {
@@ -46,9 +46,9 @@ const buildSearchTarget = (action: OperatorCommandAction) =>
   `${action.label} ${action.description} ${action.group} ${(action.keywords ?? []).join(" ")}`.toLowerCase();
 
 const tagLabelMap: Record<OperatorCommandAction["group"], string> = {
-  Playbook: "DO NOW",
+  Playbook: "ACTION",
   Pages: "PAGE",
-  Sections: "SECTION",
+  Sections: "OPEN SECTION",
 };
 
 const getTagLabel = (tag: OperatorCommandAction["group"]) => tagLabelMap[tag];
@@ -326,7 +326,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
               </div>
               <p className="text-xs text-slate-300">{filterDescriptions[filter]}</p>
               <p className="text-xs text-slate-400">
-                Playbook = Do now · Pages = Switch surfaces · Sections = Jump within page.
+                Playbook = Recommended actions · Pages = Switch surfaces · Sections = Open section.
               </p>
               {isMobile ? (
                 <details className="weather-surface p-3">
