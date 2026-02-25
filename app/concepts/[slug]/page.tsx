@@ -13,6 +13,8 @@ type ConceptArticlePageProps = {
   params: Promise<{ slug: string }>;
 };
 
+export const dynamicParams = false;
+
 const monthFormatter = new Intl.DateTimeFormat("en-US", {
   month: "short",
   year: "numeric",
