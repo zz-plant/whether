@@ -116,7 +116,7 @@ export default async function OperationsPage({
   } = buildTrustStatus({
     historicalSelection: Boolean(historicalSelection),
     isFallback,
-    fallbackReason: treasury.fallback_reason,
+    fallbackReason: treasury.fallback_reason ?? undefined,
     historicalAction:
       "Use historical data for retrospectives; avoid approving new bets until live signals return.",
     fallbackAction:

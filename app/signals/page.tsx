@@ -109,7 +109,7 @@ export default async function SignalsPage({
   } = buildTrustStatus({
     historicalSelection: Boolean(historicalSelection),
     isFallback,
-    fallbackReason: treasury.fallback_reason,
+    fallbackReason: treasury.fallback_reason ?? undefined,
     historicalAction:
       "Use historical data to understand trends, not to approve live bets.",
     fallbackAction:

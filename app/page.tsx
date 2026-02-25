@@ -275,7 +275,7 @@ export default async function HomePage({
   } = buildTrustStatus({
     historicalSelection: Boolean(historicalSelection),
     isFallback,
-    fallbackReason: treasury.fallback_reason,
+    fallbackReason: treasury.fallback_reason ?? undefined,
     historicalAction:
       "Use for retrospectives only; avoid live planning calls until you return to current data.",
     fallbackAction:
