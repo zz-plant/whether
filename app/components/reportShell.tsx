@@ -22,6 +22,7 @@ import {
   type ReportSectionLink,
 } from "./reportShellNavigation";
 import { type ReportStageItem } from "./reportRevampElements";
+import { INFORMATIONAL_NOTICE } from "../../lib/exportNotices";
 import { serializeJsonLd } from "../../lib/seo";
 import { AnchorFeedback } from "./anchorFeedback";
 
@@ -654,7 +655,7 @@ export const ReportShell = ({
               <OperatorCommandCenter actions={commandActions} />
 
               <footer className="mt-12 border-t border-slate-800/70 pt-6 text-xs font-semibold tracking-[0.18em] text-slate-400">
-                <p>Not financial, legal, or investment advice.</p>
+                <p>{INFORMATIONAL_NOTICE}</p>
                 <p className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] tracking-[0.14em]">
                   <a
                     href="/terms-of-service"

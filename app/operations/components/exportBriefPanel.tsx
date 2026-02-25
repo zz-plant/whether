@@ -11,7 +11,7 @@ import type { MacroSeriesReading, SensorReading, TreasuryData } from "../../../l
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import { formatNumberValue } from "../../../lib/formatters";
 import { buildAgentPayloadJson, buildAgentPrompt } from "../../../lib/agentHandoff";
-import { buildComplianceStamp, INTERNAL_USE_LABEL } from "../../../lib/exportNotices";
+import { buildComplianceStamp } from "../../../lib/exportNotices";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 import { useClipboardCopy, type ClipboardCopyState } from "../../components/useClipboardCopy";
 
@@ -354,9 +354,6 @@ export const ExportBriefPanel = ({
             </h3>
             <p className="mt-2 type-data text-slate-300">
               Copy ready-made summaries for Slack, email, or slide decks, or print to PDF.
-            </p>
-            <p className="mt-2 text-xs font-semibold tracking-[0.12em] text-amber-300">
-              {INTERNAL_USE_LABEL} · informational output only
             </p>
           </div>
           <div className="flex flex-col items-end gap-3">
