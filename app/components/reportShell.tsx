@@ -462,10 +462,6 @@ export const ReportShell = ({
                         srHint="Open additional actions menu"
                         actions={[
                           { href: exportCta.href, label: exportCta.label },
-                          {
-                            href: "#operator-command-center",
-                            label: "Open command center",
-                          },
                         ]}
                       />
                     </div>
@@ -652,7 +648,9 @@ export const ReportShell = ({
                 })}
               </div>
 
-              <OperatorCommandCenter actions={commandActions} />
+              <div className="hidden sm:block">
+                <OperatorCommandCenter actions={commandActions} />
+              </div>
 
               <footer className="mt-12 border-t border-slate-800/70 pt-6 text-xs font-semibold tracking-[0.18em] text-slate-300">
                 <p>{INFORMATIONAL_NOTICE}</p>
