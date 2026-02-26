@@ -1346,8 +1346,8 @@ export const SignalMatrixPanel = ({
       aria-describedby="signal-matrix-description"
       className="weather-panel p-6"
     >
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="max-w-2xl">
           <p className="type-label text-slate-400">Signal breakdown</p>
           <h3 id="signal-matrix-title" className="type-section text-slate-100">
             Risk posture matrix
@@ -1358,27 +1358,36 @@ export const SignalMatrixPanel = ({
             markets are to fund growth bets.
           </p>
         </div>
-        <div className="flex flex-col items-end gap-2 text-xs font-semibold tracking-[0.12em] text-slate-500">
-          <span>Cash availability (tightness) vs. market risk appetite</span>
-          <DataProvenanceStrip provenance={provenance} />
+        <div className="w-full max-w-md space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-300 lg:w-auto">
+          <span className="block">Cash availability (tightness) vs. market risk appetite</span>
+          <DataProvenanceStrip provenance={provenance} variant="compact" />
         </div>
       </div>
-      <div className="mt-4 weather-surface p-4">
+      <div className="mt-4 weather-surface border-slate-800/80 bg-slate-950/55 p-4 shadow-none">
         <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Executive summary</p>
         <p className="mt-2 text-sm text-slate-200">
-          Current posture: {quadrantLabel}. Use tightness {assessment.scores.tightness}/100 and risk
-          appetite {assessment.scores.riskAppetite}/100 (normalized 0–100) to decide whether
-          approvals should tighten or loosen.
+          <span className="font-semibold text-slate-50">Posture: {quadrantLabel}.</span> Bias
+          approval velocity using tightness <span className="mono">{assessment.scores.tightness}</span>
+          /100 and risk appetite <span className="mono">{assessment.scores.riskAppetite}</span>/100.
+          In this regime, prioritize fast growth decisions with burn-rate guardrails.
         </p>
+        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-medium tracking-[0.1em] text-slate-300">
+          <span className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/80 bg-slate-900/75 px-3 py-2 text-xs font-medium tracking-[0.1em]">
+            Recommended mode: Move fast, protect runway
+          </span>
+          <span className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/80 bg-slate-900/75 px-3 py-2 text-xs font-medium tracking-[0.1em]">
+            Next step: View recommended actions ↓
+          </span>
+        </div>
       </div>
       <Collapsible.Root className="mt-4">
         <Collapsible.Trigger
           type="button"
-          className="group flex min-h-[44px] w-full items-center justify-between gap-3 text-left text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+          className="group flex min-h-[48px] w-full items-center justify-between gap-3 rounded-2xl border border-slate-700/80 bg-slate-900/45 p-3 text-left text-xs font-medium tracking-[0.1em] text-slate-200 transition-colors hover:text-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
         >
-          <span>Deep dive: matrix positioning and quadrant guidance</span>
-          <span className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/80 px-3 text-[0.65rem] font-semibold tracking-[0.14em] text-slate-200">
-            <span className="group-data-[panel-open]:hidden">Expand section</span>
+          <span>Decision playbook: matrix positioning and quadrant guidance</span>
+          <span className="inline-flex min-h-[44px] items-center rounded-full border border-slate-600/85 bg-slate-950/65 px-3 py-2 text-xs font-medium tracking-[0.1em] text-slate-100">
+            <span className="group-data-[panel-open]:hidden">View recommended actions</span>
             <span className="hidden group-data-[panel-open]:inline">Collapse section</span>
           </span>
         </Collapsible.Trigger>
@@ -1387,7 +1396,7 @@ export const SignalMatrixPanel = ({
             <div className="weather-surface p-4">
               <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Current posture</p>
               <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-slate-200">
-                <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200">
+                <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-1 text-xs font-medium tracking-[0.1em] text-slate-200">
                   {quadrantLabel}
                 </span>
                 <span className="text-xs text-slate-400">
@@ -1433,9 +1442,9 @@ export const SignalMatrixPanel = ({
                     <feDropShadow
                       dx="0"
                       dy="0"
-                      stdDeviation="2"
+                      stdDeviation="1.4"
                       floodColor="#fbbf24"
-                      floodOpacity="0.45"
+                      floodOpacity="0.28"
                     />
                   </filter>
                 </defs>
