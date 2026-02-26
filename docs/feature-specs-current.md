@@ -161,7 +161,10 @@ $$
 $$
 
 ### 5.5 Prioritized refactors (summary system)
-- **P0:** Shared structured→copy renderer across weekly/monthly for deterministic formatting reuse.
+- **P0 (implemented):** Shared structured→copy renderer across weekly/monthly for deterministic formatting reuse.
+  - Renderer module: `lib/summary/summaryCopyRenderer.ts`
+  - Shared contracts: `lib/summary/summaryTypes.ts`
+  - Coverage: `tests/summaryCopyRenderer.test.ts`
 - **P1:** Offline archive materialization for historical `structured` fields (instead of runtime-only hydration).
 - **P1:** API contract tests for `/api/weekly` and `/api/monthly` structured payload guarantees.
 - **P2:** Monthly section expansion toward weekly parity where operator value is clear.

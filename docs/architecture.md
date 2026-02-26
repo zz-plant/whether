@@ -78,8 +78,9 @@ Historical summary playback uses `lib/summary/summaryArchive.ts`, which validate
 hydrates missing weekly/monthly structured fields for legacy records.
 
 ## Prioritized refactor backlog (structured summaries)
-1. **P0 — Centralize copy rendering contracts**
-   - Move weekly/monthly copy assembly into shared renderer helpers keyed by structured sections.
+1. **P0 — Centralize copy rendering contracts** ✅ Implemented
+   - Weekly/monthly copy assembly now routes through shared renderer helpers keyed by structured sections.
+   - Implemented in `lib/summary/summaryCopyRenderer.ts` with shared contracts in `lib/summary/summaryTypes.ts`.
    - Goal: remove formatting drift risk between builders and UI/export surfaces.
 2. **P1 — Formalize archive migration step**
    - Add a script to materialize `structured` into historical weekly/monthly archive records.
