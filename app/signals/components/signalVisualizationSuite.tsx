@@ -133,13 +133,21 @@ export const SignalVisualizationSuite = ({
   return (
     <section id="visual-diagnostics" className="weather-panel space-y-5 px-6 py-5" aria-labelledby="visual-diagnostics-title">
       <header className="space-y-2">
-        <p className="text-xs font-semibold tracking-[0.22em] text-slate-400">Visual diagnostics</p>
+        <p className="text-xs font-semibold tracking-[0.22em] text-slate-300">Visual diagnostics</p>
         <h2 id="visual-diagnostics-title" className="text-xl font-semibold text-slate-100 sm:text-2xl">
           Six visualizations for rapid signal interpretation.
         </h2>
       </header>
+      <details className="weather-surface group p-4">
+        <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.14em] text-slate-100">
+          <span>Open visual diagnostics</span>
+          <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-400 transition-transform group-open:rotate-180">⌄</span>
+        </summary>
+        <p className="mt-2 text-xs text-slate-300">
+          Use this section when you need chart-level context. Keep it closed for faster executive scans.
+        </p>
 
-      <div className="grid gap-4 xl:grid-cols-2">
+      <div className="mt-4 grid gap-4 xl:grid-cols-2">
         <article className="weather-surface p-4">
           <p className="text-xs font-semibold tracking-[0.14em] text-slate-400">1) Regime quadrant</p>
           <div className="mt-3 rounded-xl border border-slate-800/80 bg-slate-950/70 p-3">
@@ -251,7 +259,7 @@ export const SignalVisualizationSuite = ({
         </article>
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-2">
+      <div className="mt-4 grid gap-4 xl:grid-cols-2">
         <article className="weather-surface p-4">
           <p className="text-xs font-semibold tracking-[0.14em] text-slate-400">5) Sensor delta heatmap</p>
           <div className="mt-3 overflow-x-auto rounded-xl border border-slate-800/80 bg-slate-950/70 p-3">
@@ -312,9 +320,10 @@ export const SignalVisualizationSuite = ({
         </article>
       </div>
 
-      <p className="text-xs text-slate-400">
+      <p className="mt-4 text-xs text-slate-300">
         Risk threshold default: {RISK_APPETITE_REGIME_THRESHOLD}/100. Active threshold: {assessment.thresholds.riskAppetiteRegime}/100.
       </p>
+      </details>
     </section>
   );
 };
