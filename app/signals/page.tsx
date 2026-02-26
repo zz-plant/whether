@@ -306,17 +306,49 @@ export default async function SignalsPage({
       />
 
       <section id="decision-summary" className="weather-panel space-y-6 px-6 py-5" aria-label="Decision summary">
+        <div className="weather-surface grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-200">Regime now</p>
+            <p className="mt-1 text-sm font-semibold text-slate-100">{regimeLabel}</p>
+          </div>
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-200">Confidence</p>
+            <p className="mt-1 text-sm font-semibold text-slate-100">{trustStatusLabel}</p>
+          </div>
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-200">Signals stamped</p>
+            <p className="mt-1 text-sm font-semibold text-slate-100">{recordDateLabel}</p>
+          </div>
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-200">Last refresh</p>
+            <p className="mt-1 text-sm font-semibold text-slate-100">{fetchedAtLabel}</p>
+          </div>
+        </div>
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]">
           <article className="weather-surface space-y-3 p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Current posture</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-200">Current posture</p>
             <h2 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
               {regimeLabel} regime is the active operating climate.
             </h2>
             <p className="text-sm leading-relaxed text-slate-200 sm:text-base">
               Confidence is <span className="font-semibold text-slate-100">{trustStatusLabel}</span>. Signals are stamped {" "}
               <span className="font-semibold text-slate-100">{recordDateLabel}</span> with last refresh at {" "}
-              <span className="font-semibold text-slate-100">{fetchedAtLabel}</span>.
+                <span className="font-semibold text-slate-100">{fetchedAtLabel}</span>.
             </p>
+            <dl className="grid gap-3 rounded-xl border border-slate-800/80 bg-slate-950/40 p-3 sm:grid-cols-3">
+              <div>
+                <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">Recommended action</dt>
+                <dd className="mt-1 text-xs text-slate-100">Continue current operating posture and monitor top diagnostics daily.</dd>
+              </div>
+              <div>
+                <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">Impact if wrong</dt>
+                <dd className="mt-1 text-xs text-slate-100">Execution pacing can drift if liquidity conditions shift before the next review.</dd>
+              </div>
+              <div>
+                <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">Next checkpoint</dt>
+                <dd className="mt-1 text-xs text-slate-100">Re-check after the next data refresh and threshold confirmation.</dd>
+              </div>
+            </dl>
             <div className="flex flex-wrap gap-2 pt-1">
               <a
                 href="#macro-signals"
@@ -333,7 +365,7 @@ export default async function SignalsPage({
             </div>
           </article>
           <article className="weather-surface space-y-3 p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Top diagnostics</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-200">Top diagnostics</p>
             <ul className="space-y-3" aria-label="Top evidence callouts">
               {topDiagnosticCallouts.map((item, index) => (
                 <li key={item.label} className="rounded-xl border border-slate-800/80 bg-slate-950/40 p-3">
