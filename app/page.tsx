@@ -517,7 +517,7 @@ export default async function HomePage({
             </span>
           </summary>
 
-          <section className="mt-4 space-y-3" aria-label="Posture forecast timeline">
+          <section id="posture-forecast" className="mt-4 space-y-3" aria-label="Posture forecast timeline">
             <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-sky-100">
               Trigger outlook timeline
             </h2>

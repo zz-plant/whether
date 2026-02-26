@@ -143,6 +143,24 @@ export const TimeMachinePanel = ({
   );
   const minYear = availableYears.at(0) ?? year;
   const maxYear = availableYears.at(-1) ?? year;
+  const orderedSnapshots = useMemo(
+    () =>
+      Object.entries(monthsByYear)
+        .flatMap(([yearKey, months]) =>
+          months.map((monthValue) => ({ year: Number(yearKey), month: monthValue }))
+        )
+        .filter((entry) => !Number.isNaN(entry.year))
+        .sort((a, b) => a.year - b.year || a.month - b.month),
+    [monthsByYear]
+  );
+  const selectedSnapshotIndex = orderedSnapshots.findIndex(
+    (entry) => entry.year === year && entry.month === month
+  );
+  const previousSnapshot = selectedSnapshotIndex > 0 ? orderedSnapshots[selectedSnapshotIndex - 1] : null;
+  const nextSnapshot =
+    selectedSnapshotIndex >= 0 && selectedSnapshotIndex < orderedSnapshots.length - 1
+      ? orderedSnapshots[selectedSnapshotIndex + 1]
+      : null;
   const [calendarYear, setCalendarYear] = useState(year);
   const calendarMonths = monthsByYear[calendarYear] ?? [];
 
@@ -311,6 +329,32 @@ export const TimeMachinePanel = ({
     return queryString ? `${pathname}?${queryString}` : pathname;
   }, [latestMonthValue, pathname, searchParams]);
 
+  const nowHref = useMemo(() => {
+    const nextParams = new URLSearchParams(searchParams.toString());
+    nextParams.delete("draftMonth");
+    nextParams.delete("draftYear");
+    nextParams.delete("month");
+    nextParams.delete("year");
+    const queryString = nextParams.toString();
+    return queryString ? `${pathname}?${queryString}` : pathname;
+  }, [pathname, searchParams]);
+
+  const buildSnapshotHref = (selection: { year: number; month: number } | null) => {
+    if (!selection) {
+      return null;
+    }
+    const nextParams = new URLSearchParams(searchParams.toString());
+    nextParams.delete("draftMonth");
+    nextParams.delete("draftYear");
+    nextParams.set("month", String(selection.month));
+    nextParams.set("year", String(selection.year));
+    const queryString = nextParams.toString();
+    return queryString ? `${pathname}?${queryString}` : pathname;
+  };
+
+  const previousSnapshotHref = buildSnapshotHref(previousSnapshot);
+  const nextSnapshotHref = buildSnapshotHref(nextSnapshot);
+
   return (
     <section id="time-machine" aria-labelledby="time-machine-title" className="mt-10">
       <div className="weather-panel p-6">
@@ -359,6 +403,52 @@ export const TimeMachinePanel = ({
             <p className="type-label text-slate-400">Snapshot</p>
             <p className="mt-3 text-lg font-semibold text-slate-100">{selectedLabel}</p>
             <p className="mt-2 text-xs text-slate-500">Highlights the month loaded into the report.</p>
+          </div>
+        </div>
+
+        <div className="mt-4 weather-surface p-4" aria-label="Time navigation controls">
+          <p className="type-label text-slate-400">Time navigation</p>
+          <p className="mt-2 text-sm text-slate-300">
+            Move backward and forward month-by-month, jump to live data, or open the forward-looking
+            forecast view.
+          </p>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            {previousSnapshotHref ? (
+              <Link
+                href={previousSnapshotHref as Route}
+                className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+              >
+                ← Previous month
+              </Link>
+            ) : (
+              <span className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-500">
+                ← Previous month
+              </span>
+            )}
+            {nextSnapshotHref ? (
+              <Link
+                href={nextSnapshotHref as Route}
+                className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+              >
+                Next month →
+              </Link>
+            ) : (
+              <span className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-500">
+                Next month →
+              </span>
+            )}
+            <Link
+              href={nowHref as Route}
+              className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+            >
+              Jump to now
+            </Link>
+            <Link
+              href="/#posture-forecast"
+              className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+            >
+              Open forecast view
+            </Link>
           </div>
         </div>
 
