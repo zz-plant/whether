@@ -18,7 +18,7 @@ const steps = [
     description: "Validate assumptions and guardrails before committing.",
   },
   {
-    href: "/operations/briefings",
+    href: "/operations#ops-export-briefs",
     label: "Step 3",
     title: "Briefings",
     description: "Export aligned narratives and leadership-ready kits.",

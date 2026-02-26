@@ -58,7 +58,7 @@ export const ReportShell = ({
   },
   secondaryCta,
   exportCta = {
-    href: "/operations/briefings#ops-export-briefs",
+    href: "/operations#ops-export-briefs",
     label: "Copy-ready leadership brief",
   },
   structuredData,

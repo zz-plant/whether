@@ -16,6 +16,7 @@ import { reportPageLinks } from "../../lib/report/reportNavigation";
 import { operationsSectionLinks } from "../../lib/navigation/operationsNavigation";
 import { OperationsWorkstreamNav } from "./components/operationsWorkstreamNav";
 import { OperationsWorkflowProgress } from "./components/operationsWorkflowProgress";
+import { ExportBriefPanel } from "./components/exportBriefPanel";
 
 export const runtime = "edge";
 
@@ -70,8 +71,10 @@ export default async function OperationsPage({
     fetchedAtLabel,
     historicalSelection,
     internalProvenance,
+    macroSeries,
     playbook,
     recordDateLabel,
+    sensors,
     startItems,
     statusLabel,
     stopItems,
@@ -213,6 +216,21 @@ export default async function OperationsPage({
       >
         <InsightDatabasePanel
           regime={assessment.regime}
+          provenance={treasuryProvenance}
+          showProvenance={false}
+        />
+      </SectionedReportPanel>
+
+      <SectionedReportPanel
+        id="ops-export-briefs"
+        title="Export briefs"
+        description="Copy-ready narratives for leadership updates and stakeholder syncs."
+      >
+        <ExportBriefPanel
+          assessment={assessment}
+          treasury={treasury}
+          sensors={sensors}
+          macroSeries={macroSeries}
           provenance={treasuryProvenance}
           showProvenance={false}
         />
