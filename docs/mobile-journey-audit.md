@@ -70,3 +70,23 @@ Viewport tested: 390x844 (mobile touch context)
 - Journey 1 onboarding: `browser:/tmp/codex_browser_invocations/f26a846b6a6c58f1/artifacts/artifacts/j1-onboarding.png`
 - Journey 2 weekly attempt: `browser:/tmp/codex_browser_invocations/f26a846b6a6c58f1/artifacts/artifacts/j2-home-weekly-attempt.png`
 - Journey 3 operations: `browser:/tmp/codex_browser_invocations/f26a846b6a6c58f1/artifacts/artifacts/j3-operations.png`
+
+## Addendum — screenshot-only landing follow-up (2026-02-26)
+
+To avoid splitting closely related mobile UX findings across multiple docs, the landing-page screenshot review is consolidated here.
+
+### Additional prioritized opportunities
+1. **Hero scanability (P1):** tighten above-the-fold copy to one outcome-oriented statement, keep one primary CTA, and add a short “what you get” list.
+2. **Card density reduction (P1):** merge adjacent informational cards and reserve high-contrast treatments for decision-critical modules.
+3. **Section wayfinding (P1):** add a compact sticky “you are here” navigator for Overview / Signals / Method / FAQ jumps.
+4. **Earlier trust cues (P1):** surface concise proof snippets (data cadence, source count, freshness) before long explanatory sections.
+5. **Typography rhythm (P2):** increase line-height in dense panels and convert long paragraphs into bullets where possible.
+6. **CTA normalization (P1):** align repeated CTA copy/styling to reinforce one primary mobile conversion path.
+
+### Validation metrics to instrument
+- Mobile primary CTA click-through rate.
+- Bounce rate from first viewport.
+- Scroll depth percentiles (25/50/75).
+- Section-to-section drop-off.
+- Evidence/method interaction rate.
+
