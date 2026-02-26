@@ -56,6 +56,5 @@ Milestone 9 (Interactive Decision Intelligence) remains proposed and not yet exe
 
 ## Source docs
 
-- `docs/roadmap-audit.md` (evidence mapping for milestones 5–8 + milestone 9 proposal).
 - `docs/feature-specs-current.md` (current shipped behavior + summary refactor backlog).
 - `docs/stack-modernization-plan.md` (upgrade plan and execution checklists).
