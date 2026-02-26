@@ -41,7 +41,7 @@ describe("sitemap", () => {
     }
   });
 
-  it("uses valid last modified dates for both report and static pages", () => {
+  it("uses valid last modified dates for report pages, static pages, and concept article pages", () => {
     const entries = sitemap();
 
     const root = entries.find((entry) => entry.url === siteUrl);
@@ -52,7 +52,19 @@ describe("sitemap", () => {
     assert.ok(methodology?.lastModified instanceof Date);
     assert.equal(
       methodology?.lastModified?.toISOString(),
-      new Date(snapshotData.fetched_at).toISOString(),
+      new Date("2026-02-01T00:00:00.000Z").toISOString(),
+    );
+
+    const firstConceptArticle = productConceptArticles[0];
+    const firstConceptEntry = entries.find(
+      (entry) => entry.url === `${siteUrl}/concepts/${firstConceptArticle.slug}`,
+    );
+    assert.ok(firstConceptEntry?.lastModified instanceof Date);
+    assert.equal(
+      firstConceptEntry?.lastModified?.toISOString(),
+      new Date(
+        Date.UTC(firstConceptArticle.publishedYear, firstConceptArticle.publishedMonth - 1, 1),
+      ).toISOString(),
     );
   });
 });

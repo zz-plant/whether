@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { buildCanonicalUrl, buildBreadcrumbList, buildPageMetadata, serializeJsonLd } from "../../../lib/seo";
+import {
+  buildCanonicalUrl,
+  buildBreadcrumbList,
+  buildPageMetadata,
+  organizationName,
+  serializeJsonLd,
+} from "../../../lib/seo";
 import {
   findProductConceptArticle,
   getMacroContextForArticle,
@@ -78,6 +84,7 @@ export default async function ConceptArticlePage({ params }: ConceptArticlePageP
 
   const macroContext = getMacroContextForArticle(article);
   const publishedLabel = formatPublishedLabel(article.publishedYear, article.publishedMonth);
+  const canonicalArticleUrl = buildCanonicalUrl(`/concepts/${article.slug}`);
   const conceptArticleStructuredData = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -87,9 +94,14 @@ export default async function ConceptArticlePage({ params }: ConceptArticlePageP
       "@type": "Person",
       name: article.author,
     },
+    publisher: {
+      "@type": "Organization",
+      name: organizationName,
+    },
     description: article.summary,
-    mainEntityOfPage: buildCanonicalUrl(`/concepts/${article.slug}`),
-    url: article.sourceUrl,
+    mainEntityOfPage: canonicalArticleUrl,
+    url: canonicalArticleUrl,
+    sameAs: article.sourceUrl,
     about: [article.era, article.focus, article.audience],
   };
 

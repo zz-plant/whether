@@ -91,7 +91,7 @@ export const buildPageMetadata = ({
       card: "summary_large_image",
       title,
       description,
-      images: [socialImageUrl],
+      images: [imageUrl, socialImageUrl],
     },
   };
 };

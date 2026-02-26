@@ -35,6 +35,10 @@ const resolveLastModified = (...candidates: string[]): Date => {
 
   return fallbackLastModified;
 };
+const staticContentLastModified = new Date("2026-02-01T00:00:00.000Z");
+
+const buildPublishedMonthDate = (year: number, month: number): Date =>
+  new Date(Date.UTC(year, Math.max(0, month - 1), 1));
 
 const buildEntry = ({
   path,
@@ -50,7 +54,7 @@ const buildEntry = ({
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const reportLastModified = resolveLastModified(snapshotData.record_date, snapshotData.fetched_at);
-  const staticLastModified = resolveLastModified(snapshotData.fetched_at, snapshotData.record_date);
+  const staticLastModified = staticContentLastModified;
 
   const coreEntries: SitemapEntryDescriptor[] = [
     { path: "", lastModified: reportLastModified, changeFrequency: "weekly", priority: 1 },
@@ -115,7 +119,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
-    { path: "/llms.txt", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.5 },
   ];
 
   const stakeholderEntries: SitemapEntryDescriptor[] = stakeholderGuides.map((guide) => ({
@@ -135,7 +138,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const conceptArticleEntries: SitemapEntryDescriptor[] = productConceptArticles.map((article) => ({
     path: `/concepts/${article.slug}`,
-    lastModified: staticLastModified,
+    lastModified: buildPublishedMonthDate(article.publishedYear, article.publishedMonth),
     changeFrequency: "monthly",
     priority: 0.6,
   }));
