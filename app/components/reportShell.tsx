@@ -353,6 +353,12 @@ export const ReportShell = ({
                 </div>
               </div>
               <div className="hidden flex-wrap items-center gap-2 sm:flex">
+                <a
+                  href="/about#subscribe"
+                  className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-sky-400/70 bg-sky-500/15 px-3 py-2 text-xs font-semibold tracking-[0.14em] text-sky-100 transition-colors hover:border-sky-300/90 hover:text-sky-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                >
+                  Subscribe
+                </a>
                 {exportCta ? (
                   <a
                     href={exportCta.href}

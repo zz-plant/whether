@@ -53,7 +53,7 @@ const isLinkActiveForPath = (linkHref: string, currentPath?: string) => {
 };
 
 const pageLinkIcons: Record<string, ReactNode> = {
-  "Current Climate": (
+  "Start Here": (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
       <path
         d="M12 4.5V2.75M12 21.25v-1.75M4.5 12H2.75M21.25 12h-1.75M6.75 6.75l-1.3-1.3M18.55 18.55l-1.3-1.3M6.75 17.25l-1.3 1.3M18.55 5.45l-1.3 1.3"
@@ -64,7 +64,7 @@ const pageLinkIcons: Record<string, ReactNode> = {
       <circle cx="12" cy="12" r="4.25" fill="currentColor" />
     </svg>
   ),
-  Playbook: (
+  "Use Cases": (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
       <path
         d="M4 5.5h16v13H4z"
@@ -83,7 +83,7 @@ const pageLinkIcons: Record<string, ReactNode> = {
       <circle cx="17" cy="15.5" r="2.5" fill="currentColor" />
     </svg>
   ),
-  Signals: (
+  Toolkits: (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
       <path
         d="M4 18c0-4.4 3.6-8 8-8s8 3.6 8 8"
@@ -102,7 +102,7 @@ const pageLinkIcons: Record<string, ReactNode> = {
       <circle cx="12" cy="18" r="1.8" fill="currentColor" />
     </svg>
   ),
-  Teams: (
+  Library: (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
       <path
         d="M6 4.75h9.25a2 2 0 0 1 2 2v10.5a2 2 0 0 1-2 2H6"
@@ -125,7 +125,7 @@ const pageLinkIcons: Record<string, ReactNode> = {
       />
     </svg>
   ),
-  Method: (
+  About: (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
       <path
         d="M7 5.5h10a1.5 1.5 0 0 1 1.5 1.5v10a1.5 1.5 0 0 1-1.5 1.5H7A1.5 1.5 0 0 1 5.5 17V7A1.5 1.5 0 0 1 7 5.5Z"
@@ -177,7 +177,7 @@ export const ReportPageNavigation = ({
                   className={`weather-tab inline-flex min-h-[46px] w-full items-center justify-center rounded-xl border px-4 py-2 text-center text-sm font-semibold tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:px-4 sm:text-xs ${
                     isActive
                       ? "border-sky-300/90 bg-sky-500/25 text-sky-50 shadow-sm shadow-sky-900/40"
-                      : link.label === "Current Climate"
+                  : link.label === "Start Here"
                         ? "border-slate-600/90 bg-slate-900/70 text-slate-100 hover:border-sky-400/70 hover:text-slate-100"
                         : "border-slate-700/80 bg-slate-900/45 text-slate-200 hover:border-sky-400/70 hover:text-slate-100"
                   } ${isOddTail ? "mx-auto max-w-[240px]" : ""}`}
@@ -274,7 +274,7 @@ export const ReportMobileNavigation = ({
         <div className="weather-mobile-nav flex flex-col gap-3 px-3 py-3">
           <div className="flex min-w-0 items-center gap-3 rounded-2xl border border-slate-800/80 bg-slate-950/70 px-3 py-2">
             <span className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl border border-slate-800/80 bg-slate-950/80 text-slate-100">
-              {pageLinkIcons[currentLink.label] ?? pageLinkIcons.Method}
+              {pageLinkIcons[currentLink.label] ?? pageLinkIcons.About}
             </span>
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold tracking-[0.08em] text-slate-100">
