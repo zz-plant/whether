@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import {
   resolveTimeMachineSelection,
   parseTimeMachineRequest,
@@ -28,9 +29,9 @@ export const runtime = "edge";
 export const revalidate = 900;
 
 const homeSectionSequence = [
-  { href: "#weekly-action-summary", label: "Weekly actions" },
-  { href: "#executive-snapshot", label: "Leadership summary" },
-  { href: "#signal-matrix", label: "Signal breakdown" },
+  { href: "#weekly-action-summary", label: "Read first: Weekly actions" },
+  { href: "#executive-snapshot", label: "Then decide: Leadership summary" },
+  { href: "#signal-matrix", label: "Reference: Signal breakdown" },
 ] as const;
 
 const regimeLabelMap = {
@@ -373,7 +374,11 @@ export default async function HomePage({
       pageSummary="Verdict and immediate decision call for this planning cycle."
       primaryCta={{
         href: "#weekly-action-summary",
-        label: "View rationale and next actions",
+        label: "Start weekly decision sequence",
+      }}
+      secondaryCta={{
+        href: "/onboarding",
+        label: "Start onboarding (3 min)",
       }}
       sidebarVariant="hidden"
       hideHeroChrome={true}
@@ -419,7 +424,13 @@ export default async function HomePage({
               href="#weekly-action-summary"
               className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em]"
             >
-              View weekly actions
+              Start weekly decision sequence
+            </a>
+            <a
+              href="/onboarding"
+              className="inline-flex min-h-[44px] items-center rounded-full border border-sky-400/60 bg-sky-500/15 px-4 py-2 text-xs font-semibold tracking-[0.14em] text-sky-100 transition-colors hover:border-sky-300 hover:bg-sky-500/25 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+            >
+              Start onboarding (3 min)
             </a>
             <a
               href="/methodology"
@@ -475,6 +486,27 @@ export default async function HomePage({
             <li>• Will shift if Risk Appetite falls below {riskThreshold} and remains there through the next update.</li>
             <li>• Curve slope turns negative and stays inverted through the next cycle.</li>
           </ul>
+        </article>
+
+        <article className="weather-surface space-y-4 p-5" aria-label="Recommended weekly reading sequence">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-100">Start with this sequence</p>
+          <ol className="space-y-2 text-sm text-slate-200">
+            <li>1. Read first: Weekly actions to anchor near-term priorities.</li>
+            <li>2. Then decide: Leadership summary to confirm operating posture.</li>
+            <li>3. Reference: Signal breakdown for threshold and evidence checks.</li>
+          </ol>
+          <p className="text-xs text-slate-300">
+            Complete this sequence before opening deeper planning workflows.
+          </p>
+        </article>
+
+        <article className="weather-surface space-y-3 p-5" aria-label="Explore additional guidance routes">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-200">Explore next</p>
+          <div className="flex flex-wrap gap-2 text-xs font-semibold tracking-[0.08em]">
+            <Link href="/solutions" className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2">Solutions library</Link>
+            <Link href="/concepts" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2">Concepts glossary</Link>
+            <Link href="/guides" className="weather-pill-muted inline-flex min-h-[44px] items-center px-3 py-2">Team guides</Link>
+          </div>
         </article>
 
         <details className="weather-surface group p-4 sm:p-5" aria-label="Expanded posture details">
