@@ -22,6 +22,7 @@ export async function GET() {
   return NextResponse.json({
     summary,
     copy: summary.copy,
+    structured: summary.structured,
     provenance: summary.provenance,
     recordDateLabel: summary.recordDateLabel,
     agentHandoff: {

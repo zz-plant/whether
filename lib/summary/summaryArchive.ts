@@ -3,10 +3,10 @@
  * Validates cached weekly/monthly summaries for historical review.
  */
 import { z } from "zod";
-import type { MonthlySummary } from "./monthlySummary";
+import { buildMonthlyStructured, type MonthlySummary } from "./monthlySummary";
 import type { QuarterlySummary } from "./quarterlySummary";
 import type { RegimeKey } from "../regimeEngine";
-import type { WeeklySummary } from "./weeklySummary";
+import { buildWeeklyStructured, type WeeklySummary } from "./weeklySummary";
 import type { YearlySummary } from "./yearlySummary";
 import rawArchive from "../../data/summary_archive.json";
 
@@ -64,7 +64,7 @@ const SummaryProvenanceSchema = z.object({
   statusLabel: z.string(),
 });
 
-const SummarySchema = z.object({
+const BaseSummarySchema = z.object({
   title: z.string(),
   summary: z.string(),
   regime: z.enum(["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"]) as z.ZodType<RegimeKey>,
@@ -77,13 +77,61 @@ const SummarySchema = z.object({
   copy: z.string(),
 });
 
+const WeeklyStructuredSchema = z.object({
+  climate: z.object({
+    label: z.string(),
+    summary: z.array(z.string()),
+  }),
+  recommendedMoves: z.array(z.string()),
+  executionPriorities: z.array(z.string()),
+  watchouts: z.array(z.string()),
+  planningLanguage: z.string(),
+  executionConstraints: z.array(z.string()),
+});
+
+const MonthlyStructuredSchema = z.object({
+  executionConstraints: z.array(z.string()),
+  provenance: z.object({
+    source: z.string(),
+    timestamp: z.string(),
+    dataAge: z.string(),
+  }),
+});
+
+const WeeklySummaryArchiveSchema = BaseSummarySchema.extend({
+  structured: WeeklyStructuredSchema.optional(),
+}).transform((summary): WeeklySummary => ({
+  ...summary,
+  structured:
+    summary.structured ??
+    buildWeeklyStructured({
+      regime: summary.regime,
+      constraints: summary.constraints,
+    }),
+}));
+
+const MonthlySummaryArchiveSchema = BaseSummarySchema.extend({
+  structured: MonthlyStructuredSchema.optional(),
+}).transform((summary): MonthlySummary => ({
+  ...summary,
+  structured:
+    summary.structured ??
+    buildMonthlyStructured({
+      constraints: summary.constraints,
+      provenance: summary.provenance,
+    }),
+}));
+
+const QuarterlySummaryArchiveSchema = BaseSummarySchema;
+const YearlySummaryArchiveSchema = BaseSummarySchema;
+
 const WeeklyArchiveSchema = z.object({
   cadence: z.literal("weekly"),
   year: z.number(),
   week: z.number(),
   asOf: z.string(),
   record_date: z.string(),
-  summary: SummarySchema,
+  summary: WeeklySummaryArchiveSchema,
 });
 
 const MonthlyArchiveSchema = z.object({
@@ -92,7 +140,7 @@ const MonthlyArchiveSchema = z.object({
   month: z.number(),
   asOf: z.string(),
   record_date: z.string(),
-  summary: SummarySchema,
+  summary: MonthlySummaryArchiveSchema,
 });
 
 const QuarterlyArchiveSchema = z.object({
@@ -101,7 +149,7 @@ const QuarterlyArchiveSchema = z.object({
   quarter: z.number(),
   asOf: z.string(),
   record_date: z.string(),
-  summary: SummarySchema,
+  summary: QuarterlySummaryArchiveSchema,
 });
 
 const YearlyArchiveSchema = z.object({
@@ -109,7 +157,7 @@ const YearlyArchiveSchema = z.object({
   year: z.number(),
   asOf: z.string(),
   record_date: z.string(),
-  summary: SummarySchema,
+  summary: YearlySummaryArchiveSchema,
 });
 
 const SummaryArchiveSchema = z.array(

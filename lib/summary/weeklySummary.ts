@@ -13,6 +13,18 @@ export type WeeklySummaryProvenance = {
   statusLabel: string;
 };
 
+export type WeeklyStructured = {
+  climate: {
+    label: string;
+    summary: string[];
+  };
+  recommendedMoves: string[];
+  executionPriorities: string[];
+  watchouts: string[];
+  planningLanguage: string;
+  executionConstraints: string[];
+};
+
 export type WeeklySummary = {
   title: string;
   summary: string;
@@ -23,6 +35,7 @@ export type WeeklySummary = {
   recordDateLabel: string | null;
   provenance: WeeklySummaryProvenance;
   inputs: RegimeAssessment["inputs"];
+  structured: WeeklyStructured;
   copy: string;
 };
 
@@ -161,6 +174,28 @@ export const getWeeklyActionGuidance = (regime: RegimeAssessment["regime"]) =>
 
 const toBullets = (items: string[]) => items.map((item) => `• ${item}`);
 
+export const buildWeeklyStructured = ({
+  regime,
+  constraints,
+}: {
+  regime: RegimeAssessment["regime"];
+  constraints: string[];
+}): WeeklyStructured => {
+  const template = weeklyOutputTemplates[regime];
+
+  return {
+    climate: {
+      label: template.climateLabel,
+      summary: template.climateSummary,
+    },
+    recommendedMoves: template.productMeaning,
+    executionPriorities: template.safeBets,
+    watchouts: template.failureModes,
+    planningLanguage: template.planningQuote,
+    executionConstraints: constraints,
+  };
+};
+
 export const buildWeeklySummary = ({
   assessment,
   provenance,
@@ -176,7 +211,10 @@ export const buildWeeklySummary = ({
   const title = recordDateLabel
     ? `Weekly action summary — ${recordDateLabel}`
     : "Weekly action summary";
-  const template = weeklyOutputTemplates[assessment.regime];
+  const structured = buildWeeklyStructured({
+    regime: assessment.regime,
+    constraints: assessment.constraints,
+  });
   const updatedLabel = recordDateLabel ? `Updated ${recordDateLabel}` : "Updated —";
   const sourceLine = provenance.sourceUrl
     ? `${provenance.sourceLabel} (${provenance.sourceUrl})`
@@ -199,9 +237,9 @@ export const buildWeeklySummary = ({
     "",
     "MARKET CLIMATE",
     "",
-    template.climateLabel,
+    structured.climate.label,
     "",
-    ...template.climateSummary,
+    ...structured.climate.summary,
     "",
     "",
     "Contextual, not moral: this is what the environment is rewarding right now.",
@@ -211,28 +249,28 @@ export const buildWeeklySummary = ({
     "",
     "RECOMMENDED MOVES FOR PRODUCT TEAMS (NOW)",
     "",
-    ...toBullets(template.productMeaning),
+    ...toBullets(structured.recommendedMoves),
     "",
     "",
     "---",
     "",
     "EXECUTION PRIORITIES THAT TRAVEL WELL",
     "",
-    ...toBullets(template.safeBets),
+    ...toBullets(structured.executionPriorities),
     "",
     "",
     "---",
     "",
     "WATCHOUTS THAT BREAK EXECUTION",
     "",
-    ...toBullets(template.failureModes),
+    ...toBullets(structured.watchouts),
     "",
     "",
     "---",
     "",
     "PLANNING LANGUAGE TO USE",
     "",
-    `> ${template.planningQuote}`,
+    `> ${structured.planningLanguage}`,
     "",
     "",
     "",
@@ -240,7 +278,7 @@ export const buildWeeklySummary = ({
     "",
     "EXECUTION CONSTRAINTS",
     "",
-    ...assessment.constraints.map((item) => `• ${item}`),
+    ...toBullets(structured.executionConstraints),
     "",
     "",
     "",
@@ -278,6 +316,7 @@ export const buildWeeklySummary = ({
     recordDateLabel: recordDateLabel ?? null,
     provenance,
     inputs: assessment.inputs,
+    structured,
     copy,
   };
 };
