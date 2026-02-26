@@ -704,7 +704,6 @@ export const ReportShell = ({
             pageLinks={pageLinks}
             pageTitle={pageTitle}
             currentPath={currentPath}
-            sectionLinks={sectionLinks}
             className="mt-3 px-4 pb-6"
           />
         </div>

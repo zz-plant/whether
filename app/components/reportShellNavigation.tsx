@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, type KeyboardEvent as ReactKeyboardEvent } from "react";
+import { useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import type { ReactNode } from "react";
 import { Collapsible } from "@base-ui/react/collapsible";
 import { NavigationMenu } from "@base-ui/react/navigation-menu";
@@ -236,30 +236,23 @@ export const ReportMobileNavigation = ({
   pageLinks,
   pageTitle,
   currentPath,
-  sectionLinks,
   className,
 }: {
   pageLinks: ReportPageLink[];
   pageTitle: string;
   currentPath?: string;
-  sectionLinks: ReportSectionLink[];
   className?: string;
 }) => {
-  const { currentLink, currentPosition } = getPageNavigationState(
+  const { currentLink, currentPosition, prevLink, nextLink } = getPageNavigationState(
     pageLinks,
     pageTitle,
     currentPath,
   );
-  const sectionCountLabel =
-    sectionLinks.length === 0
-      ? "No sections"
-      : sectionLinks.length === 1
-        ? "1 section"
-        : `${sectionLinks.length} sections`;
   const pageCountLabel =
     pageLinks.length === 1 ? "1 page" : `${pageLinks.length} pages`;
 
   const navigationRootRef = useRef<HTMLDivElement>(null);
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
 
   const onDirectionalKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
     if (!navigationRootRef.current) {
@@ -271,7 +264,13 @@ export const ReportMobileNavigation = ({
 
   return (
     <NavigationMenu.Root aria-label="Mobile report navigation" className={className}>
-      <Collapsible.Root className="relative" ref={navigationRootRef} onKeyDown={onDirectionalKeyDown}>
+      <Collapsible.Root
+        className="relative"
+        open={isPanelOpen}
+        onOpenChange={setIsPanelOpen}
+        ref={navigationRootRef}
+        onKeyDown={onDirectionalKeyDown}
+      >
         <div className="weather-mobile-nav flex flex-col gap-3 px-3 py-3">
           <div className="flex min-w-0 items-center gap-3 rounded-2xl border border-slate-800/80 bg-slate-950/70 px-3 py-2">
             <span className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl border border-slate-800/80 bg-slate-950/80 text-slate-100">
@@ -287,34 +286,42 @@ export const ReportMobileNavigation = ({
             </div>
           </div>
 
-          <NavigationMenu.List aria-label="Primary report pages" className="flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {pageLinks.map((link) => {
-              const isActive = currentPath
-                ? isLinkActiveForPath(link.href, currentPath)
-                : link.label === pageTitle;
-              return (
-                <NavigationMenu.Item key={link.href} className="snap-start flex-shrink-0">
-                  <NavigationMenu.Link
-                    href={link.href}
-                    active={isActive}
-                    aria-current={isActive ? "page" : undefined}
-                    className={`weather-pill inline-flex min-h-[44px] items-center rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.12em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation ${
-                      isActive
-                        ? "border-sky-400/80 bg-sky-500/20 text-sky-100"
-                        : "border-slate-800/80 text-slate-200 hover:border-sky-400/70 hover:text-slate-100"
-                    }`}
-                  >
-                    {link.label}
-                  </NavigationMenu.Link>
-                </NavigationMenu.Item>
-              );
-            })}
+          <NavigationMenu.List aria-label="Page traversal" className="grid grid-cols-2 gap-2">
+            <NavigationMenu.Item>
+              {prevLink ? (
+                <NavigationMenu.Link
+                  href={prevLink.href}
+                  className="weather-pill inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-slate-800/80 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                >
+                  ← {prevLink.label}
+                </NavigationMenu.Link>
+              ) : (
+                <span
+                  aria-hidden="true"
+                  className="weather-pill inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-slate-900/70 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-500"
+                >
+                  Start of report
+                </span>
+              )}
+            </NavigationMenu.Item>
+            <NavigationMenu.Item>
+              {nextLink ? (
+                <NavigationMenu.Link
+                  href={nextLink.href}
+                  className="weather-pill inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-slate-800/80 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                >
+                  {nextLink.label} →
+                </NavigationMenu.Link>
+              ) : (
+                <span
+                  aria-hidden="true"
+                  className="weather-pill inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-slate-900/70 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-500"
+                >
+                  End of report
+                </span>
+              )}
+            </NavigationMenu.Item>
           </NavigationMenu.List>
-          {pageLinks.length > 3 ? (
-            <p className="px-1 text-xs text-slate-300" aria-live="polite">
-              Swipe to view more pages →
-            </p>
-          ) : null}
 
           <div className="grid grid-cols-1 gap-2">
             <Collapsible.Trigger
@@ -342,12 +349,9 @@ export const ReportMobileNavigation = ({
             <div className="flex items-start justify-between gap-3">
               <div className="space-y-1">
                 <p className="text-base font-semibold text-slate-100">{currentLink.label}</p>
-                <p className="text-xs text-slate-300">Choose a page or open a section.</p>
+                <p className="text-xs text-slate-300">Switch pages directly from this list.</p>
               </div>
               <div className="flex items-center gap-2">
-                <span className="weather-chip inline-flex min-h-[44px] items-center px-3 py-1 text-xs font-semibold tracking-[0.18em] text-slate-200">
-                  {sectionCountLabel}
-                </span>
                 <Collapsible.Trigger
                   type="button"
                   className="weather-pill inline-flex min-h-[44px] items-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
@@ -368,6 +372,7 @@ export const ReportMobileNavigation = ({
                       href={link.href}
                       active={isActive}
                       aria-current={isActive ? "page" : undefined}
+                      onClick={() => setIsPanelOpen(false)}
                       className={`weather-pill flex min-h-[56px] items-start gap-3 rounded-2xl border px-3 py-3 text-left text-sm font-semibold tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation ${
                         isActive
                           ? "border-sky-400/70 bg-sky-500/15 text-sky-100"
@@ -393,27 +398,6 @@ export const ReportMobileNavigation = ({
                 );
               })}
             </NavigationMenu.List>
-
-            {sectionLinks.length > 0 ? (
-              <div className="space-y-2">
-                <p className="text-xs font-semibold tracking-[0.14em] text-slate-400">
-                  Sections on this page
-                </p>
-                <NavigationMenu.List aria-label="All section links" className="grid grid-cols-1 gap-2">
-                  {sectionLinks.map((section) => (
-                    <NavigationMenu.Item key={section.href}>
-                      <NavigationMenu.Link
-                        href={section.href}
-                        className="weather-pill inline-flex min-h-[44px] w-full items-center justify-between gap-3 rounded-2xl border border-slate-800/80 px-3 py-2 text-left text-xs font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-sky-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                      >
-                        <span>{section.label}</span>
-                        <span aria-hidden="true" className="text-slate-500">↗</span>
-                      </NavigationMenu.Link>
-                    </NavigationMenu.Item>
-                  ))}
-                </NavigationMenu.List>
-              </div>
-            ) : null}
           </div>
         </Collapsible.Panel>
       </Collapsible.Root>
