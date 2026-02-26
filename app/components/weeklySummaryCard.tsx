@@ -11,6 +11,7 @@ export const WeeklySummaryCard = ({ summary }: { summary: WeeklySummary }) => (
     summaryCopy={summary.copy}
     cadenceLabel="weekly"
     apiHref="/api/weekly"
+    companionHref="/operations/data#weekly-api"
     structuredSections={[
       { title: "Market climate", items: [summary.structured.climate.label, ...summary.structured.climate.summary] },
       { title: "Recommended moves", items: summary.structured.recommendedMoves },

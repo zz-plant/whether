@@ -27,6 +27,11 @@ export const operationsWorkstreamLinks: OperationsWorkstreamLink[] = [
     label: "Briefings",
     description: "Export aligned narratives, leadership briefs, and CXO-ready deliverables.",
   },
+  {
+    href: "/operations/data",
+    label: "Data",
+    description: "Access weekly API usage guidance and handoff references for operators.",
+  },
 ];
 
 export const operationsSectionLinks: Record<string, ReportSectionLink[]> = {

@@ -14,6 +14,7 @@ type SummaryCardProps = {
   summaryCopy: string;
   cadenceLabel: string;
   apiHref: string;
+  companionHref?: string;
   structuredSections?: Array<{
     title: string;
     items: string[];
@@ -24,6 +25,7 @@ export const SummaryCard = ({
   summaryCopy,
   cadenceLabel,
   apiHref,
+  companionHref,
   structuredSections = [],
 }: SummaryCardProps) => {
   const { status, error, copyToClipboard } = useClipboardCopy();
@@ -122,6 +124,14 @@ export const SummaryCard = ({
           >
             View {cadenceLabel} API
           </a>
+          {companionHref ? (
+            <a
+              href={companionHref}
+              className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-slate-500/80 hover:text-slate-100 touch-manipulation"
+            >
+              API companion guide
+            </a>
+          ) : null}
         </div>
       </div>
       {hasStructuredSections ? (
