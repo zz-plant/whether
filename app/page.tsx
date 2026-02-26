@@ -151,7 +151,7 @@ export const generateMetadata = async ({
       title,
       description:
         "Track Treasury yield curve regime shifts and turn macro signals into clear product, engineering, and operating priorities.",
-      images: [socialImageUrl],
+      images: [imageUrl, socialImageUrl],
     },
     robots: hasTimeMachineParams
       ? {
