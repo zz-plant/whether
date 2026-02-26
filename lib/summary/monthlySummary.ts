@@ -3,24 +3,12 @@
  * Powers copy-ready cards and API responses with traceable provenance metadata.
  */
 import type { RegimeAssessment } from "../regimeEngine";
-import { buildComplianceStamp } from "../exportNotices";
+import { renderMonthlySummaryCopy } from "./summaryCopyRenderer";
 
-export type MonthlySummaryProvenance = {
-  sourceLabel: string;
-  sourceUrl?: string;
-  timestampLabel: string;
-  ageLabel: string;
-  statusLabel: string;
-};
+import type { MonthlyStructured, SummaryProvenance } from "./summaryTypes";
 
-export type MonthlyStructured = {
-  executionConstraints: string[];
-  provenance: {
-    source: string;
-    timestamp: string;
-    dataAge: string;
-  };
-};
+export type MonthlySummaryProvenance = SummaryProvenance;
+export type { MonthlyStructured } from "./summaryTypes";
 
 export type MonthlySummary = {
   title: string;
@@ -105,25 +93,12 @@ export const buildMonthlySummary = ({
     constraints: assessment.constraints,
     provenance,
   });
-  const complianceStamp = buildComplianceStamp({
-    sourceLine: structured.provenance.source,
-    timestamp: provenance.timestampLabel,
-    confidence: provenance.statusLabel,
-  });
-  const copy = [
+  const copy = renderMonthlySummaryCopy({
     title,
     summary,
-    "",
-    "Execution constraints:",
-    ...structured.executionConstraints.map((item) => `• ${item}`),
-    "",
-    "Provenance:",
-    `Source: ${structured.provenance.source}`,
-    `Timestamp: ${structured.provenance.timestamp}`,
-    `Data age: ${structured.provenance.dataAge}`,
-    "",
-    ...complianceStamp,
-  ].join("\n");
+    provenance,
+    structured,
+  });
 
   return {
     title,

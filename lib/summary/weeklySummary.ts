@@ -3,27 +3,12 @@
  * Keeps weekly action copy consistent across UI and shared endpoints.
  */
 import type { RegimeAssessment } from "../regimeEngine";
-import { buildComplianceStamp } from "../exportNotices";
+import { renderWeeklySummaryCopy } from "./summaryCopyRenderer";
 
-export type WeeklySummaryProvenance = {
-  sourceLabel: string;
-  sourceUrl?: string;
-  timestampLabel: string;
-  ageLabel: string;
-  statusLabel: string;
-};
+import type { SummaryProvenance, WeeklyStructured } from "./summaryTypes";
 
-export type WeeklyStructured = {
-  climate: {
-    label: string;
-    summary: string[];
-  };
-  recommendedMoves: string[];
-  executionPriorities: string[];
-  watchouts: string[];
-  planningLanguage: string;
-  executionConstraints: string[];
-};
+export type WeeklySummaryProvenance = SummaryProvenance;
+export type { WeeklyStructured } from "./summaryTypes";
 
 export type WeeklySummary = {
   title: string;
@@ -172,7 +157,6 @@ const getRegimeLabel = (regime: RegimeAssessment["regime"]) => {
 export const getWeeklyActionGuidance = (regime: RegimeAssessment["regime"]) =>
   weeklyActionGuidance[regime];
 
-const toBullets = (items: string[]) => items.map((item) => `• ${item}`);
 
 export const buildWeeklyStructured = ({
   regime,
@@ -215,96 +199,13 @@ export const buildWeeklySummary = ({
     regime: assessment.regime,
     constraints: assessment.constraints,
   });
-  const updatedLabel = recordDateLabel ? `Updated ${recordDateLabel}` : "Updated —";
-  const sourceLine = provenance.sourceUrl
-    ? `${provenance.sourceLabel} (${provenance.sourceUrl})`
-    : provenance.sourceLabel;
-  const complianceStamp = buildComplianceStamp({
-    sourceLine,
-    timestamp: provenance.timestampLabel,
-    confidence: provenance.statusLabel,
-  });
-  const copy = [
+  const copy = renderWeeklySummaryCopy({
     title,
     summary,
-    "",
-    "---",
-    "WHETHER · Market Climate Station",
-    "",
-    updatedLabel,
-    "",
-    "---",
-    "",
-    "MARKET CLIMATE",
-    "",
-    structured.climate.label,
-    "",
-    ...structured.climate.summary,
-    "",
-    "",
-    "Contextual, not moral: this is what the environment is rewarding right now.",
-    "",
-    "",
-    "---",
-    "",
-    "RECOMMENDED MOVES FOR PRODUCT TEAMS (NOW)",
-    "",
-    ...toBullets(structured.recommendedMoves),
-    "",
-    "",
-    "---",
-    "",
-    "EXECUTION PRIORITIES THAT TRAVEL WELL",
-    "",
-    ...toBullets(structured.executionPriorities),
-    "",
-    "",
-    "---",
-    "",
-    "WATCHOUTS THAT BREAK EXECUTION",
-    "",
-    ...toBullets(structured.watchouts),
-    "",
-    "",
-    "---",
-    "",
-    "PLANNING LANGUAGE TO USE",
-    "",
-    `> ${structured.planningLanguage}`,
-    "",
-    "",
-    "",
-    "---",
-    "",
-    "EXECUTION CONSTRAINTS",
-    "",
-    ...toBullets(structured.executionConstraints),
-    "",
-    "",
-    "",
-    "---",
-    "",
-    "RECOMMENDATION CONFIDENCE",
-    "",
-    `Confidence: ${provenance.statusLabel}`,
-    "Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.",
-    "",
-    "",
-    "---",
-    "",
-    "DATA PROVENANCE & QUALITY",
-    "",
-    `Source: ${sourceLine}`,
-    `Timestamp: ${provenance.timestampLabel}`,
-    `Data age: ${provenance.ageLabel}`,
-    "",
-    ...complianceStamp,
-    "",
-    "---",
-    "",
-    "Actions:",
-    "Copy for roadmap review Check a decision Why this verdict",
-  ].join("\n");
+    recordDateLabel,
+    provenance,
+    structured,
+  });
 
   return {
     title,
