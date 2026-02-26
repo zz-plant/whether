@@ -1,5 +1,7 @@
 # Roadmap audit (Milestones 5–8)
 
+> Consolidated checklist view: see `docs/implementation-status.md` for the single status tracker.
+
 This audit maps roadmap checklist items to concrete evidence in the codebase.
 It is meant to validate that Milestones 5–8 are implemented and traceable.
 

@@ -32,7 +32,8 @@ Use this index to find the **current** source of truth quickly.
 - `concepts-enhancements.md` — enhancement opportunities for `/concepts` experiences.
 - `solutions-enhancements.md` — enhancement opportunities for `/solutions` and career-path flows.
 - `design-improvements-priority.md` — prioritized design/UX improvement backlog.
-- `roadmap-audit.md` / `issue-scan.md` — planning and execution context.
+- `implementation-status.md` — consolidated implementation checklist across roadmap, summary follow-ups, and modernization work.
+- `roadmap-audit.md` / `issue-scan.md` — detailed audit evidence and scan history.
 
 ## Agent docs
 - `agents/setup.md` — install/run/check commands and MCP baseline.
