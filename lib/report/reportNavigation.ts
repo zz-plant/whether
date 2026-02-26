@@ -7,6 +7,16 @@ export const reportPageLinks: ReportPageLink[] = [
     description: "Posture-first onboarding and situation routing.",
   },
   {
+    href: "/signals",
+    label: "Signals",
+    description: "Live inputs, thresholds, and regime diagnostics.",
+  },
+  {
+    href: "/operations",
+    label: "Operations",
+    description: "Action playbooks, briefs, and decision workflows.",
+  },
+  {
     href: "/use-cases",
     label: "Use Cases",
     description: "Curated role and situation entry points into operational guidance.",

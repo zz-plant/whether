@@ -46,6 +46,15 @@ export const postureDefinitions: PostureDefinition[] = [
 
 export const startSituations = ["Hiring", "Pricing", "Roadmap", "PMF", "Launch", "Governance"] as const;
 
+export const startSituationRoutes: Record<(typeof startSituations)[number], string> = {
+  Hiring: "/use-cases/avoid-premature-scaling",
+  Pricing: "/use-cases/pricing-change",
+  Roadmap: "/use-cases/roadmap-focus",
+  PMF: "/use-cases/measure-pmf",
+  Launch: "/use-cases/launch-gates",
+  Governance: "/use-cases/decision-rights",
+};
+
 export type UseCaseRole = {
   slug: string;
   title: string;
@@ -116,6 +125,17 @@ export const situationUseCases = [
   "ops-capacity",
   "ai-claims",
 ] as const;
+
+export const situationRecommendedToolkits: Record<(typeof situationUseCases)[number], string[]> = {
+  "measure-pmf": ["pmf", "claims", "focus"],
+  "avoid-premature-scaling": ["rollback", "launch-gates", "ops-capacity"],
+  "roadmap-focus": ["focus", "pmf", "decision-rights"],
+  "pricing-change": ["claims", "pmf", "focus"],
+  "launch-gates": ["launch-gates", "rollback", "ops-capacity"],
+  "decision-rights": ["decision-rights", "ops-capacity", "rollback"],
+  "ops-capacity": ["ops-capacity", "decision-rights", "rollback"],
+  "ai-claims": ["claims", "launch-gates", "pmf"],
+};
 
 export type ToolkitDefinition = {
   slug: string;
