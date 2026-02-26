@@ -1,42 +1,50 @@
 # Documentation map
 
-This directory is organized by audience so contributors can find the right source of truth quickly.
+Use this index to find the **current** source of truth quickly.
 
-## Start here by role
-- **Human contributors:** `../CONTRIBUTING.md`
-- **Agent contributors:** `../AGENTS.md` then `agents/README.md`
-- **System design and architecture:** `architecture.md`
-- **Engineering workflow deep-dive:** `development-playbook.md`
+## Start here
 
-## Core technical docs
-- `development-playbook.md` — practical engineering workflow, risk-based validation matrix, PR readiness checklist, and troubleshooting guidance.
-- `cloudflare-deployment-runbook.md` — expected Cloudflare build/deploy warnings, warning budget policy, and CI artifact workflow.
-- `mobile-journey-audit.md` — mobile UX walkthrough of three representative user journeys with prioritized recommendations.
-- `ux-audit-kondo-2026-02-11.md` — remove/move/modify UX audit with prioritized decluttering recommendations.
-- `ux-audit-kondo-followup-2026-02-11.md` — follow-up Kondo UX re-audit after shell/CTA changes, with next-step priorities.
-- `rethought-ia-ux-proposal.md` — proposed navigation and interaction redesign centered on Decide/Plan/Evidence/Brief workflows.
-- `architecture.md` — data flow, modules, and extension points.
-- `stack-compatibility-matrix.md` — runtime/platform support and constraints.
-- `stack-modernization-*.md` — modernization inventory, plan, and execution tracking.
-- `vinext-cloudflare-evaluation.md` — safe Cloudflare-first vinext rollout gates and cutover criteria.
-- `notes/page-load-audit-whether-work-2026-02-25.md` — curl-based page load timing audit across key whether.work routes, including latency variance findings.
+### Human contributors
+- `../CONTRIBUTING.md` — contribution workflow and review standards.
+- `development-playbook.md` — day-to-day engineering workflow, validation depth, and troubleshooting.
 
-## Product direction and planning
-- `feature-specs-current.md` — implemented/current feature intent.
-- `concepts-enhancements.md` — prioritized UX and product enhancement ideas for the `/concepts` timeline and detail experience.
-- `solutions-enhancements.md` — prioritized UX and product enhancement ideas for `/solutions` and `/solutions/career-paths`.
-- `prd-next-level.md` and `specs-next-level.md` — next-level product/spec direction.
-- `roadmap-audit.md` and `issue-scan.md` — planning and execution context.
-- `sunset-plan-user-input-client-tracking.md` — phased plan to retire user-input and client decision-tracking features.
-- `acquisition/reforge-ready.md` — acquisition narrative and readiness assets.
+### Agent contributors
+- `../AGENTS.md` — instruction hierarchy and operating constraints.
+- `agents/README.md` — task-oriented agent guidance and policy index.
 
-## Agent guidance
-- `agents/README.md` — entry point for task-oriented agent guidance.
-- `agents/*.md` — concise policies for setup, quality, docs, data, and UI standards.
-- `agents/mcp-and-skills-playbook.md` — MCP and skill rollout playbook for agent contributors.
-- `agents/agent-interface.md` — API and MCP interface docs for agentic LLM consumers.
+### Product and technical stakeholders
+- `architecture.md` — system boundaries, data flow, and extension points.
+- `feature-specs-current.md` — implemented product intent and present-day behavior.
+
+## Core engineering docs
+- `development-playbook.md` — practical engineering workflow and PR readiness checks.
+- `cloudflare-deployment-runbook.md` — Cloudflare deployment expectations and CI artifact workflow.
+- `architecture.md` — modules, runtime flow, and extension points.
+- `stack-compatibility-matrix.md` — platform/runtime support constraints.
+- `stack-modernization-inventory.md` — modernization baseline.
+- `stack-modernization-plan.md` — modernization implementation plan.
+- `domain-and-deployment.md` — deployment topology and domain model.
+- `vinext-cloudflare-evaluation.md` — Cloudflare-first rollout safeguards.
+
+## Product direction docs
+- `feature-specs-current.md` — current shipped feature intent.
+- `prd-next-level.md` / `specs-next-level.md` — next-level product and specification direction.
+- `concepts-enhancements.md` — enhancement opportunities for `/concepts` experiences.
+- `solutions-enhancements.md` — enhancement opportunities for `/solutions` and career-path flows.
+- `design-improvements-priority.md` — prioritized design/UX improvement backlog.
+- `roadmap-audit.md` / `issue-scan.md` — planning and execution context.
+
+## Agent docs
+- `agents/setup.md` — install/run/check commands and MCP baseline.
+- `agents/project-layout.md` — directory ownership boundaries.
+- `agents/engineering-principles.md` — implementation posture and coding conventions.
+- `agents/documentation.md` — docs source-of-truth and update triggers.
+- `agents/quality-and-pr.md` — validation depth and PR hygiene.
+- `agents/data-and-platform.md` — data provenance and platform-readiness constraints.
+- `agents/ui-ux-standards.md` — UI consistency and accessibility standards.
+- `agents/mcp-and-skills-playbook.md` / `agents/agent-interface.md` — MCP workflows and integration interfaces.
 
 ## Maintenance rules
-- Prefer updating existing docs over creating near-duplicates.
-- When adding a doc, link it here and from the relevant audience entrypoint.
-- Keep docs action-oriented: explicit commands, owners, and source-of-truth pointers.
+- Prefer updating an existing active document over creating a near-duplicate.
+- If you add a new active document, link it here and from the relevant audience entrypoint.
+- Delete stale documents instead of keeping unlabeled historical references.
