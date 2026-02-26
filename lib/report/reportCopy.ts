@@ -1,15 +1,7 @@
-import type { Route } from "next";
-
 export type ReportLinkCopy = {
   href: string;
   label: string;
   description?: string;
-};
-
-export type RelatedReportLinkCopy = {
-  href: Route;
-  label: string;
-  description: string;
 };
 
 export type FirstTimeGuideStep = {
@@ -120,7 +112,7 @@ export const GLOSSARY_USAGE_NOTES: GlossaryUsageNote[] = [
   },
 ];
 
-export const SIGNALS_RELATED_LINKS: RelatedReportLinkCopy[] = [
+export const SIGNALS_RELATED_LINKS: Array<Required<ReportLinkCopy>> = [
   {
     href: "/operations",
     label: "Operations playbook",
@@ -138,7 +130,7 @@ export const SIGNALS_RELATED_LINKS: RelatedReportLinkCopy[] = [
   },
 ];
 
-export const ONBOARDING_RELATED_LINKS: RelatedReportLinkCopy[] = [
+export const ONBOARDING_RELATED_LINKS: Array<Required<ReportLinkCopy>> = [
   {
     href: "/signals",
     label: "Signal evidence",

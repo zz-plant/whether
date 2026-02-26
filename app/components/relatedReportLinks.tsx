@@ -2,7 +2,7 @@ import type { Route } from "next";
 import Link from "next/link";
 
 type RelatedReportLink = {
-  href: Route;
+  href: string;
   label: string;
   description?: string;
 };
@@ -24,7 +24,7 @@ export const RelatedReportLinks = ({
           {links.map((link) => (
             <Link
               key={link.href}
-              href={link.href}
+              href={link.href as Route}
               className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.14em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
             >
               {link.label}
@@ -43,7 +43,7 @@ export const RelatedReportLinks = ({
         {links.map((link) => (
           <Link
             key={link.href}
-            href={link.href}
+            href={link.href as Route}
             className="weather-surface space-y-2 p-4 transition-colors hover:border-sky-400/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
           >
             <p className="text-sm font-semibold text-slate-100">{link.label}</p>
