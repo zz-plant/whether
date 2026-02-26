@@ -73,6 +73,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     },
     {
+      path: "/operations/data",
+      lastModified: reportLastModified,
+      changeFrequency: "weekly",
+      priority: 0.6,
+    },
+    {
       path: "/methodology",
       lastModified: staticLastModified,
       changeFrequency: "monthly",
