@@ -124,7 +124,8 @@ insight database and operator request catalog in `data/recommendations.ts` and
 
 ### 5.2 Weekly + monthly summaries
 Weekly and monthly summaries are generated from the current assessment for use in the overview
-page and APIs. These summaries include copy blocks, constraints, and provenance metadata.
+page and APIs. These summaries are structured-first payloads (sections + provenance metadata) with
+copy blocks rendered from the same structured data for sharing/export.
 
 ### 5.3 Briefing exports
 Operations briefings support copy-ready briefs and executive narratives with sensor data and

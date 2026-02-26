@@ -7,16 +7,25 @@
 import { Button } from "@base-ui/react/button";
 import { Toast } from "@base-ui/react/toast";
 import { Tooltip } from "@base-ui/react/tooltip";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useClipboardCopy, type ClipboardCopyState } from "./useClipboardCopy";
 
 type SummaryCardProps = {
   summaryCopy: string;
   cadenceLabel: string;
   apiHref: string;
+  structuredSections?: Array<{
+    title: string;
+    items: string[];
+  }>;
 };
 
-export const SummaryCard = ({ summaryCopy, cadenceLabel, apiHref }: SummaryCardProps) => {
+export const SummaryCard = ({
+  summaryCopy,
+  cadenceLabel,
+  apiHref,
+  structuredSections = [],
+}: SummaryCardProps) => {
   const { status, error, copyToClipboard } = useClipboardCopy();
   const lastStatusRef = useRef<ClipboardCopyState["status"]>("idle");
   const lastErrorRef = useRef<"blocked" | "failed" | null>(null);
@@ -64,6 +73,9 @@ export const SummaryCard = ({ summaryCopy, cadenceLabel, apiHref }: SummaryCardP
     lastErrorRef.current === "blocked"
       ? "Clipboard blocked. Select and copy the text above manually."
       : "Copy failed. Select and copy the text above manually.";
+  const visibleStructuredSections = structuredSections.filter((section) => section.items.length > 0);
+  const hasStructuredSections = visibleStructuredSections.length > 0;
+  const [showRawCopy, setShowRawCopy] = useState(!hasStructuredSections);
 
   return (
     <div className="weather-surface mt-4 p-4">
@@ -112,13 +124,47 @@ export const SummaryCard = ({ summaryCopy, cadenceLabel, apiHref }: SummaryCardP
           </a>
         </div>
       </div>
-      <pre
-        tabIndex={0}
-        aria-label="Summary card text"
-        className="mt-4 whitespace-pre-wrap rounded-2xl border border-slate-800/80 bg-slate-950/80 p-4 text-xs text-slate-100"
-      >
-        {summaryCopy}
-      </pre>
+      {hasStructuredSections ? (
+        <div className="mt-4 rounded-2xl border border-slate-800/80 bg-slate-950/60 p-4">
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-slate-400">Structured data</p>
+          <div className="mt-3 grid gap-3 md:grid-cols-2">
+            {visibleStructuredSections.map((section) => (
+              <div key={section.title}>
+                <p className="text-xs font-semibold text-slate-200">{section.title}</p>
+                <ul className="mt-1 space-y-1 text-xs text-slate-300">
+                  {section.items.map((item) => (
+                    <li key={item} className="flex gap-2">
+                      <span className="text-slate-500">•</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
+      {hasStructuredSections ? (
+        <div className="mt-4">
+          <Button
+            type="button"
+            onClick={() => setShowRawCopy((current) => !current)}
+            className="weather-button inline-flex min-h-[40px] items-center justify-center px-3 py-2 text-[11px] font-semibold tracking-[0.12em]"
+            aria-expanded={showRawCopy}
+          >
+            {showRawCopy ? "Hide raw summary text" : "Show raw summary text"}
+          </Button>
+        </div>
+      ) : null}
+      {showRawCopy ? (
+        <pre
+          tabIndex={0}
+          aria-label="Summary card text"
+          className="mt-4 whitespace-pre-wrap rounded-2xl border border-slate-800/80 bg-slate-950/80 p-4 text-xs text-slate-100"
+        >
+          {summaryCopy}
+        </pre>
+      ) : null}
       <div className="mt-2 min-h-[20px] text-xs text-slate-400" role="status" aria-live="polite">
         {copyError ? errorMessage : copied ? "Summary copied to clipboard." : ""}
       </div>
