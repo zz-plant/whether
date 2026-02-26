@@ -2,10 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { buildCanonicalUrl, buildPageMetadata, serializeJsonLd } from "../../lib/seo";
 import {
+  conceptAudiences,
+  conceptFocuses,
   getMacroContextForArticle,
   productConceptArticles,
   productConceptEras,
   regimeToneByKey,
+  toConceptTaxonomySlug,
 } from "../../lib/productCanon";
 
 export const dynamic = "force-static";
@@ -219,6 +222,40 @@ export default async function ProductConceptTimelinePage({
         </form>
       </section>
 
+
+      <section className="weather-panel space-y-3 px-6 py-5">
+        <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-300">Explore concept maps</h2>
+        <div className="space-y-3">
+          <div>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">By focus</p>
+            <div className="flex flex-wrap gap-2">
+              {conceptFocuses.map((focusOption) => (
+                <Link
+                  key={focusOption}
+                  href={`/concepts/focus/${toConceptTaxonomySlug(focusOption)}`}
+                  className="weather-pill inline-flex min-h-[38px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100"
+                >
+                  {focusOption}
+                </Link>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">By audience</p>
+            <div className="flex flex-wrap gap-2">
+              {conceptAudiences.map((audienceOption) => (
+                <Link
+                  key={audienceOption}
+                  href={`/concepts/audience/${toConceptTaxonomySlug(audienceOption)}`}
+                  className="weather-pill inline-flex min-h-[38px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100"
+                >
+                  {audienceOption}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
       <section className="weather-panel space-y-3 px-6 py-5">
         <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-300">Jump to era</h2>
         <div className="flex flex-wrap gap-2">
