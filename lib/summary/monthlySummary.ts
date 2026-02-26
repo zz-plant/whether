@@ -13,6 +13,15 @@ export type MonthlySummaryProvenance = {
   statusLabel: string;
 };
 
+export type MonthlyStructured = {
+  executionConstraints: string[];
+  provenance: {
+    source: string;
+    timestamp: string;
+    dataAge: string;
+  };
+};
+
 export type MonthlySummary = {
   title: string;
   summary: string;
@@ -23,6 +32,7 @@ export type MonthlySummary = {
   recordDateLabel: string | null;
   provenance: MonthlySummaryProvenance;
   inputs: RegimeAssessment["inputs"];
+  structured: MonthlyStructured;
   copy: string;
 };
 
@@ -55,6 +65,27 @@ const getRegimeLabel = (regime: RegimeAssessment["regime"]) => {
 export const getMonthlyActionGuidance = (regime: RegimeAssessment["regime"]) =>
   monthlyActionGuidance[regime];
 
+export const buildMonthlyStructured = ({
+  constraints,
+  provenance,
+}: {
+  constraints: string[];
+  provenance: MonthlySummaryProvenance;
+}): MonthlyStructured => {
+  const source = provenance.sourceUrl
+    ? `${provenance.sourceLabel} (${provenance.sourceUrl})`
+    : provenance.sourceLabel;
+
+  return {
+    executionConstraints: constraints,
+    provenance: {
+      source,
+      timestamp: provenance.timestampLabel,
+      dataAge: provenance.ageLabel,
+    },
+  };
+};
+
 export const buildMonthlySummary = ({
   assessment,
   provenance,
@@ -70,11 +101,12 @@ export const buildMonthlySummary = ({
   const title = recordDateLabel
     ? `Monthly action summary — ${recordDateLabel}`
     : "Monthly action summary";
-  const sourceLine = provenance.sourceUrl
-    ? `${provenance.sourceLabel} (${provenance.sourceUrl})`
-    : provenance.sourceLabel;
+  const structured = buildMonthlyStructured({
+    constraints: assessment.constraints,
+    provenance,
+  });
   const complianceStamp = buildComplianceStamp({
-    sourceLine,
+    sourceLine: structured.provenance.source,
     timestamp: provenance.timestampLabel,
     confidence: provenance.statusLabel,
   });
@@ -83,12 +115,12 @@ export const buildMonthlySummary = ({
     summary,
     "",
     "Execution constraints:",
-    ...assessment.constraints.map((item) => `• ${item}`),
+    ...structured.executionConstraints.map((item) => `• ${item}`),
     "",
     "Provenance:",
-    `Source: ${sourceLine}`,
-    `Timestamp: ${provenance.timestampLabel}`,
-    `Data age: ${provenance.ageLabel}`,
+    `Source: ${structured.provenance.source}`,
+    `Timestamp: ${structured.provenance.timestamp}`,
+    `Data age: ${structured.provenance.dataAge}`,
     "",
     ...complianceStamp,
   ].join("\n");
@@ -103,6 +135,7 @@ export const buildMonthlySummary = ({
     recordDateLabel: recordDateLabel ?? null,
     provenance,
     inputs: assessment.inputs,
+    structured,
     copy,
   };
 };

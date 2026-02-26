@@ -33,5 +33,8 @@ describe("buildWeeklySummary", () => {
     assert.match(summary.copy, /RECOMMENDED MOVES FOR PRODUCT TEAMS \(NOW\)\n\n• /);
     assert.match(summary.copy, /EXECUTION PRIORITIES THAT TRAVEL WELL\n\n• /);
     assert.match(summary.copy, /WATCHOUTS THAT BREAK EXECUTION\n\n• /);
+    assert.ok(summary.structured);
+    assert.deepEqual(summary.structured.executionConstraints, summary.constraints);
+    assert.equal(summary.structured.planningLanguage.length > 0, true);
   });
 });
