@@ -33,6 +33,13 @@ import { buildWeeklySummary, getWeeklyActionGuidance } from "../../lib/summary/w
 import { buildCadenceAlignment } from "../../lib/cadenceAlignment";
 import { formatDateUTC, formatTimestampUTC } from "../../lib/formatters";
 import { buildMacroPriorityScore, rankMacroSignalsByPriority } from "../../lib/macroPrioritization";
+import {
+  BEGINNER_GLOSSARY_ENTRIES,
+  FIRST_TIME_GUIDE_HIGHLIGHTS,
+  FIRST_TIME_GUIDE_NEXT_LINKS,
+  FIRST_TIME_GUIDE_STEPS,
+  GLOSSARY_USAGE_NOTES,
+} from "../../lib/report/reportCopy";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
 import { MonthlySummaryCard } from "./monthlySummaryCard";
 import { SummaryDeltaPanel } from "./summaryDeltaPanel";
@@ -963,26 +970,7 @@ export const FirstTimeGuidePanel = ({
         <div className="space-y-3">
           <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Scan order</p>
           <ul className="space-y-3">
-            {[
-              {
-                label: "Summary",
-                detail:
-                  "Confirm the weekly posture and top constraints before you open deeper diagnostics.",
-                example: "Example decision: defer expansion hires when cash is tight.",
-              },
-              {
-                label: "Proof",
-                detail:
-                  "Use the signal breakdown here, then open the data lane to see the source metrics.",
-                example: "Example decision: confirm curve inversion before approving long bets.",
-              },
-              {
-                label: "Actions",
-                detail:
-                  "Use the actions lane to brief leadership with clear, plain-English constraints.",
-                example: "Example decision: focus on retention when risk appetite is cautious.",
-              },
-            ].map((step, index) => (
+            {FIRST_TIME_GUIDE_STEPS.map((step, index) => (
               <li key={step.label} className="weather-surface p-4 text-sm text-slate-300">
                 <Collapsible.Root className="space-y-2">
                   <Collapsible.Trigger
@@ -1014,18 +1002,12 @@ export const FirstTimeGuidePanel = ({
             Quick scan highlights
           </p>
           <ul className="mt-3 space-y-3 text-sm text-slate-300">
-            <li className="flex gap-2">
-              <span className="text-slate-500">•</span>
-              <span>Climate badge and weekly action summary.</span>
-            </li>
-            <li className="flex gap-2">
-              <span className="text-slate-500">•</span>
-              <span>Source freshness and capture timestamp.</span>
-            </li>
-            <li className="flex gap-2">
-              <span className="text-slate-500">•</span>
-              <span>Playbook links for constraint and action context.</span>
-            </li>
+            {FIRST_TIME_GUIDE_HIGHLIGHTS.map((highlight) => (
+              <li key={highlight.text} className="flex gap-2">
+                <span className="text-slate-500">•</span>
+                <span>{highlight.text}</span>
+              </li>
+            ))}
           </ul>
           <div className="mt-4 rounded-lg border border-sky-900/60 bg-slate-950/60 p-3 text-xs text-slate-400">
             Tip: share the selected time-machine URL to keep assumptions aligned.
@@ -1036,11 +1018,7 @@ export const FirstTimeGuidePanel = ({
       <div className="mt-6 space-y-3 text-sm text-slate-300">
         <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Where to go next</p>
         <ul className="grid gap-2 md:grid-cols-3">
-          {[
-            { href: "#executive-snapshot", label: "Leadership summary" },
-            { href: "/operations#ops-playbook", label: "Actions playbook" },
-            { href: "/signals#time-machine", label: "Time machine" },
-          ].map((link) => (
+          {FIRST_TIME_GUIDE_NEXT_LINKS.map((link) => (
             <li key={link.href}>
               <a
                 href={link.href}
@@ -1062,45 +1040,6 @@ export const FirstTimeGuidePanel = ({
 );
 
 export const BeginnerGlossaryPanel = () => {
-  const glossaryEntries = [
-    {
-      value: "tightness",
-      term: "Cash availability (tightness)",
-      summary:
-        "How hard it is to access funding. Higher tightness means conserve cash and focus on runway.",
-      why: "Why it matters: tight capital makes long payback projects riskier.",
-      usedInLabel: "Executive snapshot",
-      usedInHref: "#executive-snapshot",
-    },
-    {
-      value: "risk-appetite",
-      term: "Market risk appetite",
-      summary:
-        "How willing the market is to take risk. Lower appetite means de-risk launches and hiring.",
-      why: "Why it matters: risk appetite sets how bold your roadmap can be.",
-      usedInLabel: "Signal matrix",
-      usedInHref: "#signal-matrix",
-    },
-    {
-      value: "curve-slope",
-      term: "Curve slope (recession risk)",
-      summary:
-        "A read on recession risk. Inversion signals caution and favors defensive planning.",
-      why: "Why it matters: an inverted curve warns against long-horizon bets.",
-      usedInLabel: "Executive snapshot",
-      usedInHref: "#executive-snapshot",
-    },
-    {
-      value: "fallback-mode",
-      term: "Fallback mode",
-      summary:
-        "When live data is unavailable, the report uses the latest cached Treasury snapshot.",
-      why: "Why it matters: stale inputs can mislead time-sensitive decisions.",
-      usedInLabel: "Executive snapshot",
-      usedInHref: "#executive-snapshot",
-    },
-  ];
-
   return (
     <section id="beginner-glossary" aria-labelledby="beginner-glossary-title" className="mt-10">
       <div className="weather-panel weather-panel-static p-6">
@@ -1128,7 +1067,7 @@ export const BeginnerGlossaryPanel = () => {
               multiple
               className="mt-3 space-y-3 text-sm text-slate-300"
             >
-              {glossaryEntries.map((entry) => (
+              {BEGINNER_GLOSSARY_ENTRIES.map((entry) => (
                 <Accordion.Item
                   key={entry.value}
                   value={entry.value}
@@ -1176,34 +1115,19 @@ export const BeginnerGlossaryPanel = () => {
             </Accordion.Root>
           </aside>
           <div className="space-y-4">
-            <div className="weather-surface p-4 text-sm text-slate-300">
-              <p className="text-xs font-semibold tracking-[0.12em] text-slate-200">How to use this glossary</p>
-              <ul className="mt-3 space-y-2 text-sm text-slate-400">
-                <li>
-                  <span className="text-slate-200">Start with current climate</span> to anchor this week&apos;s stance.
-                </li>
-                <li>
-                  <span className="text-slate-200">Translate terms into constraints</span> before discussing bets.
-                </li>
-                <li>
-                  <span className="text-slate-200">Use linked sections</span> to pull supporting evidence fast.
-                </li>
-              </ul>
-            </div>
-            <div className="weather-surface p-4 text-sm text-slate-300">
-              <p className="text-xs font-semibold tracking-[0.12em] text-slate-200">Reading notes</p>
-              <ul className="mt-3 space-y-2 text-sm text-slate-400">
-                <li>
-                  <span className="text-slate-200">Climate badge</span> summarizes current macro stance.
-                </li>
-                <li>
-                  <span className="text-slate-200">Signals map to constraints</span> rather than forecasts.
-                </li>
-                <li>
-                  <span className="text-slate-200">Exports support alignment</span> across teams.
-                </li>
-              </ul>
-            </div>
+            {GLOSSARY_USAGE_NOTES.map((note) => (
+              <div key={note.title} className="weather-surface p-4 text-sm text-slate-300">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-200">{note.title}</p>
+                <ul className="mt-3 space-y-2 text-sm text-slate-400">
+                  {note.bullets.map((bullet) => (
+                    <li key={bullet.emphasis}>
+                      <span className="text-slate-200">{bullet.emphasis}</span>{" "}
+                      {bullet.detail}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         </div>
       </div>

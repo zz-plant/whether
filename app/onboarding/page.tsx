@@ -15,6 +15,7 @@ import {
   HistoricalBanner,
 } from "../components/reportSections";
 import { reportPageLinks } from "../../lib/report/reportNavigation";
+import { ONBOARDING_RELATED_LINKS } from "../../lib/report/reportCopy";
 import { OnboardingChecklistProgress } from "./components/onboardingChecklistProgress";
 
 export const runtime = "edge";
@@ -298,26 +299,7 @@ export default async function OnboardingPage({
 
       <RelatedReportLinks
         title="Where to go after onboarding"
-        links={[
-          {
-            href: "/signals",
-            label: "Signal evidence",
-            description:
-              "Apply the glossary with live source data and threshold diagnostics.",
-          },
-          {
-            href: "/operations",
-            label: "Action playbook",
-            description:
-              "Turn the regime readout into concrete execution guidance.",
-          },
-          {
-            href: "/methodology",
-            label: "Methodology",
-            description:
-              "Explore the exact formula logic and original data providers.",
-          },
-        ]}
+        links={ONBOARDING_RELATED_LINKS}
       />
     </ReportShell>
   );

@@ -21,6 +21,7 @@ import { SignalVisualizationSuite } from "./components/signalVisualizationSuite"
 import { reportPageLinks } from "../../lib/report/reportNavigation";
 import { ReturningVisitorDeltaStrip } from "../components/changeSinceLastReadPanel";
 import { buildTrustStatus } from "../../lib/report/trustStatus";
+import { SIGNALS_RELATED_LINKS } from "../../lib/report/reportCopy";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -508,27 +509,9 @@ export default async function SignalsPage({
       ) : null}
 
       <RelatedReportLinks
-        title="Related report pages"
-        links={[
-          {
-            href: "/operations",
-            label: "Operations playbook",
-            description:
-              "Apply these diagnostics in guardrails, sequencing, and execution trade-offs.",
-          },
-          {
-            href: "/methodology",
-            label: "Methodology",
-            description:
-              "Inspect formula definitions and source documentation for each signal.",
-          },
-          {
-            href: "/onboarding",
-            label: "Onboarding & glossary",
-            description:
-              "Share plain-English definitions with teams new to macro-driven planning.",
-          },
-        ]}
+        title="Need more context?"
+        links={SIGNALS_RELATED_LINKS}
+        variant="compact"
       />
     </ReportShell>
   );
