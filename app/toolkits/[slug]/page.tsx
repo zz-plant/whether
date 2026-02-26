@@ -1,8 +1,10 @@
-import type { Metadata } from "next";
+import type { Metadata, Route } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../lib/seo";
 import { toolkitDefinitions } from "../../../lib/informationArchitecture";
+export const runtime = "edge";
+
 
 type Params = { slug: string };
 
@@ -39,7 +41,7 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
         <h2 className="text-lg font-semibold text-slate-100">Common mistakes to avoid</h2>
         <ul className="space-y-2 text-sm text-slate-300">{toolkit.misuseCases.map((item) => <li key={item}>• {item}</li>)}</ul>
         <h2 className="pt-2 text-lg font-semibold text-slate-100">Canon references</h2>
-        <div className="flex flex-wrap gap-2">{toolkit.canonLinks.map((link) => <Link key={link.href} href={link.href} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">{link.label}</Link>)}</div>
+        <div className="flex flex-wrap gap-2">{toolkit.canonLinks.map((link) => <Link key={link.href} href={link.href as Route} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">{link.label}</Link>)}</div>
       </section>
     </main>
   );
