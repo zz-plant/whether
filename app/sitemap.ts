@@ -4,7 +4,12 @@ import { snapshotData } from "../lib/snapshot";
 import { stageGuides } from "./guides/stageGuides";
 import { stakeholderGuides } from "./guides/stakeholderGuides";
 import { roleLandings } from "./solutions/career-paths/roleLandingData";
-import { productConceptArticles } from "../lib/productCanon";
+import {
+  conceptAudiences,
+  conceptFocuses,
+  productConceptArticles,
+  toConceptTaxonomySlug,
+} from "../lib/productCanon";
 
 // Market Climate Station SEO map for the primary report surface.
 
@@ -149,6 +154,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
+  const conceptFocusEntries: SitemapEntryDescriptor[] = conceptFocuses.map((focus) => ({
+    path: `/concepts/focus/${toConceptTaxonomySlug(focus)}`,
+    lastModified: staticLastModified,
+    changeFrequency: "monthly",
+    priority: 0.55,
+  }));
+
+  const conceptAudienceEntries: SitemapEntryDescriptor[] = conceptAudiences.map((audience) => ({
+    path: `/concepts/audience/${toConceptTaxonomySlug(audience)}`,
+    lastModified: staticLastModified,
+    changeFrequency: "monthly",
+    priority: 0.55,
+  }));
+
   const careerPathEntries: SitemapEntryDescriptor[] = roleLandings.map((role) => ({
     path: `/solutions/career-paths/${role.slug}`,
     lastModified: staticLastModified,
@@ -156,5 +175,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
-  return [...coreEntries, ...stakeholderEntries, ...stageEntries, ...conceptArticleEntries, ...careerPathEntries].map(buildEntry);
+  return [
+    ...coreEntries,
+    ...stakeholderEntries,
+    ...stageEntries,
+    ...conceptArticleEntries,
+    ...conceptFocusEntries,
+    ...conceptAudienceEntries,
+    ...careerPathEntries,
+  ].map(buildEntry);
 }

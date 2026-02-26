@@ -459,6 +459,35 @@ export const productConceptEras: ProductConceptEra[] = [
   "Institutional friction",
 ];
 
+export const toConceptTaxonomySlug = (value: string) =>
+  value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+
+export const conceptFocuses = [...new Set(productConceptArticles.map((article) => article.focus))].sort();
+export const conceptAudiences = [
+  ...new Set(productConceptArticles.map((article) => article.audience)),
+].sort();
+
+export const findConceptFocusBySlug = (slug: string) =>
+  conceptFocuses.find((focus) => toConceptTaxonomySlug(focus) === slug);
+
+export const findConceptAudienceBySlug = (slug: string) =>
+  conceptAudiences.find((audience) => toConceptTaxonomySlug(audience) === slug);
+
+export const getArticlesByFocus = (focus: ProductConceptArticle["focus"]) => {
+  return productConceptArticles
+    .filter((article) => article.focus === focus)
+    .sort((a, b) => a.publishedYear - b.publishedYear || a.publishedMonth - b.publishedMonth);
+};
+
+export const getArticlesByAudience = (audience: string) => {
+  return productConceptArticles
+    .filter((article) => article.audience === audience)
+    .sort((a, b) => a.publishedYear - b.publishedYear || a.publishedMonth - b.publishedMonth);
+};
+
 const regimeBadgeTone: Record<RegimeKey, string> = {
   SCARCITY: "text-rose-200 border-rose-400/60 bg-rose-900/30",
   DEFENSIVE: "text-amber-200 border-amber-400/60 bg-amber-900/30",
