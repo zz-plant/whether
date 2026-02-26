@@ -185,7 +185,7 @@ export default async function OperationsDecisionsPage({
         title="Decision templates"
         description="Reference templates remain available for async review notes."
       >
-        <DecisionShieldTemplatesPanel provenance={treasuryProvenance} />
+        <DecisionShieldTemplatesPanel provenance={treasuryProvenance} showProvenance={false} />
       </SectionedReportPanel>
     </ReportShell>
   );

@@ -27,10 +27,10 @@ const statusDescriptions = {
   "Simulated (low)": "Modeled inputs or backfilled estimates where live data is absent.",
 } as const;
 
-const statusCycles = {
-  "Live (high confidence)": { phase: "Full moon", pct: 100 },
-  "Cached (medium)": { phase: "Half moon", pct: 64 },
-  "Simulated (low)": { phase: "New moon", pct: 28 },
+const statusConfidence = {
+  "Live (high confidence)": 100,
+  "Cached (medium)": 64,
+  "Simulated (low)": 28,
 } as const;
 
 const statusDataMode = {
@@ -61,9 +61,8 @@ export const DataProvenanceStrip = ({
   const statusDescription =
     statusDescriptions[provenance.statusLabel as keyof typeof statusDescriptions] ??
     "Signal status defined by source availability.";
-  const cycle =
-    statusCycles[provenance.statusLabel as keyof typeof statusCycles] ??
-    ({ phase: "Unknown phase", pct: 50 } as const);
+  const confidencePct =
+    statusConfidence[provenance.statusLabel as keyof typeof statusConfidence] ?? 50;
   const dataMode =
     statusDataMode[provenance.statusLabel as keyof typeof statusDataMode] ?? {
       label: "Static snapshot",
@@ -77,7 +76,7 @@ export const DataProvenanceStrip = ({
           <span className={`${dataMode.className} font-medium`}>{dataMode.label}</span>
           <span className="h-1 w-1 rounded-full bg-slate-600" aria-hidden="true" />
           <span className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/75 bg-slate-900/70 px-3 py-2 text-xs font-medium tracking-[0.1em] text-slate-100">
-            Confidence {cycle.pct}%
+            Confidence {confidencePct}%
           </span>
           <Tooltip.Root>
             <Tooltip.Trigger
@@ -171,20 +170,18 @@ export const DataProvenanceStrip = ({
       <span className={`${dataMode.className} font-medium`}>{dataMode.label}</span>
       <span className="h-1 w-1 rounded-full bg-slate-600" aria-hidden="true" />
       <span className="inline-flex items-center gap-2 rounded-full border border-slate-700/70 bg-slate-900/70 px-2 py-1 text-xs tracking-[0.12em] text-slate-200">
-        <span
-          className="relative h-4 w-4 overflow-hidden rounded-full border border-slate-500/70 bg-slate-900"
-          role="img"
-          aria-label={`Confidence cycle visual: ${cycle.phase}, ${cycle.pct} percent`}
-        >
           <span
-            className="absolute inset-y-0 right-0 bg-slate-100"
-            style={{ width: `${cycle.pct}%` }}
-            aria-hidden="true"
-          />
-        </span>
-        <span>
-          Confidence cycle: {cycle.phase} ({cycle.pct}%)
-        </span>
+            className="relative h-4 w-4 overflow-hidden rounded-full border border-slate-500/70 bg-slate-900"
+            role="img"
+            aria-label={`Confidence visual: ${confidencePct} percent`}
+          >
+            <span
+              className="absolute inset-y-0 right-0 bg-slate-100"
+              style={{ width: `${confidencePct}%` }}
+              aria-hidden="true"
+            />
+          </span>
+        <span>Confidence: {confidencePct}%</span>
       </span>
       <Tooltip.Root>
         <Tooltip.Trigger
