@@ -179,6 +179,7 @@ export default async function OperationsBriefingsPage({
           assessment={assessment}
           recordDateLabel={recordDateLabel}
           provenance={treasuryProvenance}
+          showProvenance={false}
         />
       </SectionedReportPanel>
 
@@ -193,6 +194,7 @@ export default async function OperationsBriefingsPage({
           sensors={sensors}
           macroSeries={macroSeries}
           provenance={treasuryProvenance}
+          showProvenance={false}
         />
       </SectionedReportPanel>
 
@@ -205,6 +207,7 @@ export default async function OperationsBriefingsPage({
           assessment={assessment}
           recordDateLabel={recordDateLabel}
           provenance={treasuryProvenance}
+          showProvenance={false}
         />
       </SectionedReportPanel>
 
@@ -213,7 +216,7 @@ export default async function OperationsBriefingsPage({
         title="CXO outputs"
         description="Functional deliverables by executive leader."
       >
-        <CxoFunctionPanel provenance={internalProvenance} />
+        <CxoFunctionPanel provenance={internalProvenance} showProvenance={false} />
       </SectionedReportPanel>
     </ReportShell>
   );

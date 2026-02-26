@@ -190,6 +190,7 @@ export default async function OperationsPage({
           startItems={startItems}
           fenceItems={fenceItems}
           provenance={treasuryProvenance}
+          showProvenance={false}
         />
       </SectionedReportPanel>
 
@@ -201,6 +202,7 @@ export default async function OperationsPage({
         <FinanceStrategyPanel
           regime={assessment.regime}
           provenance={treasuryProvenance}
+          showProvenance={false}
         />
       </SectionedReportPanel>
 
@@ -212,6 +214,7 @@ export default async function OperationsPage({
         <InsightDatabasePanel
           regime={assessment.regime}
           provenance={treasuryProvenance}
+          showProvenance={false}
         />
       </SectionedReportPanel>
 
@@ -220,7 +223,7 @@ export default async function OperationsPage({
         title="Operator requests"
         description="Current asks for operators driving execution."
       >
-        <OperatorRequestsPanel provenance={internalProvenance} />
+        <OperatorRequestsPanel provenance={internalProvenance} showProvenance={false} />
       </SectionedReportPanel>
     </ReportShell>
   );

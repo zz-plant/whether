@@ -1209,7 +1209,13 @@ export const BeginnerGlossaryPanel = () => {
   );
 };
 
-export const OperatorRequestsPanel = ({ provenance }: { provenance: DataProvenance }) => {
+export const OperatorRequestsPanel = ({
+  provenance,
+  showProvenance = true,
+}: {
+  provenance: DataProvenance;
+  showProvenance?: boolean;
+}) => {
   const backlogRequests = operatorRequests.filter((request) => request.status === "BACKLOG");
 
   return (
@@ -1225,7 +1231,7 @@ export const OperatorRequestsPanel = ({ provenance }: { provenance: DataProvenan
             Operator request backlog
           </h3>
         </div>
-        <DataProvenanceStrip provenance={provenance} />
+        {showProvenance ? <DataProvenanceStrip provenance={provenance} /> : null}
       </div>
       <p className="mt-3 max-w-3xl type-data text-slate-300">
         These are the most common expansion requests expected after launch, curated to highlight
@@ -1249,7 +1255,13 @@ export const OperatorRequestsPanel = ({ provenance }: { provenance: DataProvenan
   );
 };
 
-export const CxoFunctionPanel = ({ provenance }: { provenance: DataProvenance }) => (
+export const CxoFunctionPanel = ({
+  provenance,
+  showProvenance = true,
+}: {
+  provenance: DataProvenance;
+  showProvenance?: boolean;
+}) => (
   <section
     id="cxo-functions"
     aria-labelledby="cxo-functions-title"
@@ -1262,7 +1274,7 @@ export const CxoFunctionPanel = ({ provenance }: { provenance: DataProvenance })
           Executive function replacement map
         </h3>
       </div>
-      <DataProvenanceStrip provenance={provenance} />
+      {showProvenance ? <DataProvenanceStrip provenance={provenance} /> : null}
     </div>
     <p className="mt-3 max-w-3xl type-data text-slate-300">
       Each module below translates market climate signals into CXO-ready artifacts. Use them to align
@@ -2744,12 +2756,14 @@ export const PlaybookPanel = ({
   startItems,
   fenceItems,
   provenance,
+  showProvenance = true,
 }: {
   playbook: PlaybookEntry | null;
   stopItems: string[];
   startItems: string[];
   fenceItems: string[];
   provenance: DataProvenance;
+  showProvenance?: boolean;
 }) => {
   const playbookQuickLinks = [
     { href: "/operations#ops-decision-shield", label: "Decision shield" },
@@ -2850,7 +2864,7 @@ export const PlaybookPanel = ({
                     ))}
                   </div>
                 </div>
-                <DataProvenanceStrip provenance={provenance} />
+                {showProvenance ? <DataProvenanceStrip provenance={provenance} /> : null}
               </div>
             </div>
             {playbook ? (
@@ -2901,9 +2915,11 @@ export const PlaybookPanel = ({
 export const InsightDatabasePanel = ({
   regime,
   provenance,
+  showProvenance = true,
 }: {
   regime: RegimeAssessment["regime"];
   provenance: DataProvenance;
+  showProvenance?: boolean;
 }) => {
   type EvidenceLibraryItem = Omit<
     (typeof insightDatabase.regimeEvidence.regimes)[number]["citations"][number],
@@ -3032,7 +3048,7 @@ export const InsightDatabasePanel = ({
               Attach cited macro evidence and historical patterns to explain the current posture.
             </p>
           </div>
-          <DataProvenanceStrip provenance={provenance} />
+          {showProvenance ? <DataProvenanceStrip provenance={provenance} /> : null}
         </div>
         <div className="mt-4 weather-surface p-4">
           <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Executive summary</p>
@@ -3367,9 +3383,11 @@ export const InsightDatabasePanel = ({
 export const FinanceStrategyPanel = ({
   regime,
   provenance,
+  showProvenance = true,
 }: {
   regime: RegimeAssessment["regime"];
   provenance: DataProvenance;
+  showProvenance?: boolean;
 }) => {
   const financeMode = insightDatabase.financeStrategyMode;
   const entry = financeMode.regimes.find((item) => item.key === regime);
@@ -3386,7 +3404,7 @@ export const FinanceStrategyPanel = ({
             <p className="mt-2 type-data text-slate-300">{financeMode.subtitle}</p>
             <p className="mt-2 text-sm text-slate-400">{financeMode.description}</p>
           </div>
-          <DataProvenanceStrip provenance={provenance} />
+          {showProvenance ? <DataProvenanceStrip provenance={provenance} /> : null}
         </div>
         <div className="mt-4 weather-surface p-4">
           <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Executive summary</p>
@@ -3456,8 +3474,10 @@ export const FinanceStrategyPanel = ({
 
 export const DecisionShieldTemplatesPanel = ({
   provenance,
+  showProvenance = true,
 }: {
   provenance: DataProvenance;
+  showProvenance?: boolean;
 }) => {
   const templates = insightDatabase.decisionShieldTemplates;
 
@@ -3476,7 +3496,7 @@ export const DecisionShieldTemplatesPanel = ({
             </h3>
             <p className="mt-2 type-data text-slate-300">{templates.subtitle}</p>
           </div>
-          <DataProvenanceStrip provenance={provenance} />
+          {showProvenance ? <DataProvenanceStrip provenance={provenance} /> : null}
         </div>
         <div className="mt-4 weather-surface p-4">
           <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Executive summary</p>

@@ -83,10 +83,12 @@ export const ExecutiveBriefingPanel = ({
   assessment,
   recordDateLabel,
   provenance,
+  showProvenance = true,
 }: {
   assessment: RegimeAssessment;
   recordDateLabel: string;
   provenance: DataProvenance;
+  showProvenance?: boolean;
 }) => {
   const { status, error, activeTarget, copiedTarget, copyToClipboard } =
     useClipboardCopy();
@@ -127,7 +129,7 @@ export const ExecutiveBriefingPanel = ({
               {insightDatabase.executiveBriefingSuite.subtitle}
             </p>
           </div>
-          <DataProvenanceStrip provenance={provenance} />
+          {showProvenance ? <DataProvenanceStrip provenance={provenance} /> : null}
         </div>
         <div className="mt-6 space-y-4">
           {template ? (

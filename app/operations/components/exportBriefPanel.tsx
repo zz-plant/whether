@@ -230,12 +230,14 @@ export const ExportBriefPanel = ({
   sensors,
   macroSeries,
   provenance,
+  showProvenance = true,
 }: {
   assessment: RegimeAssessment;
   treasury: TreasuryData;
   sensors: SensorReading[];
   macroSeries: MacroSeriesReading[];
   provenance: DataProvenance;
+  showProvenance?: boolean;
 }) => {
   const { status, error, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy();
   const lastStatusRef = useRef<ClipboardCopyState["status"]>("idle");
@@ -364,7 +366,7 @@ export const ExportBriefPanel = ({
             >
               Print / Save PDF
             </Button>
-            <DataProvenanceStrip provenance={provenance} />
+            {showProvenance ? <DataProvenanceStrip provenance={provenance} /> : null}
           </div>
         </div>
 

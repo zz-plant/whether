@@ -64,10 +64,12 @@ export const StrategyBriefPanel = ({
   assessment,
   recordDateLabel,
   provenance,
+  showProvenance = true,
 }: {
   assessment: RegimeAssessment;
   recordDateLabel: string;
   provenance: DataProvenance;
+  showProvenance?: boolean;
 }) => {
   const { status, error, copyToClipboard } = useClipboardCopy();
   const isCopying = status === "copying";
@@ -117,7 +119,7 @@ export const StrategyBriefPanel = ({
             >
               {isCopying ? "Copying" : "Copy strategy brief"}
             </button>
-            <DataProvenanceStrip provenance={provenance} />
+            {showProvenance ? <DataProvenanceStrip provenance={provenance} /> : null}
           </div>
         </div>
         <div className="mt-6 grid gap-4 lg:grid-cols-[1.4fr,0.6fr]">
