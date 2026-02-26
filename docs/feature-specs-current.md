@@ -137,8 +137,8 @@ macro context embedded for leadership consumption.
 - `GET /api/treasury` — normalized Treasury yield data with fallback support.
 
 ### 6.2 Summary APIs
-- `GET /api/weekly` — weekly summary payload with provenance.
-- `GET /api/monthly` — monthly summary payload with provenance.
+- `GET /api/weekly` — weekly summary payload with structured sections, copy text, and provenance.
+- `GET /api/monthly` — monthly summary payload with structured sections, copy text, and provenance.
 - `GET /api/quarterly` — quarterly summary payload with provenance.
 - `GET /api/yearly` — yearly summary payload with provenance.
 - `GET /api/summary-delta` — difference between weekly and monthly summaries.

@@ -36,8 +36,12 @@ fetch/normalize data, score the regime, generate guidance, and render reports.
 ## API routes
 Summary APIs live under `app/api/*` and mirror the time horizon they serve:
 - `/api/weekly`, `/api/monthly`, `/api/quarterly`, `/api/yearly`
+  - weekly/monthly payloads expose structured sections plus copy/provenance fields for UI and automation reuse
 - `/api/summary-delta` for change detection
 - `/api/treasury` for direct Treasury-derived data access
+
+Historical summary playback uses `lib/summary/summaryArchive.ts`, which validates archive entries and
+hydrates missing weekly/monthly structured fields for legacy records.
 
 ## Extension points
 - **New sensors**: add a normalized source in `lib/treasury/*` or `lib/macroSnapshot.ts`, then
