@@ -27,6 +27,40 @@ fetch/normalize data, score the regime, generate guidance, and render reports.
 - **Report generation**: `lib/report/*`, `lib/summary/*`.
 - **Navigation + UX framing**: `lib/navigation/*`, `lib/operatorRequests.ts`.
 
+## Summary structure pipeline (weekly/monthly)
+```mermaid
+flowchart TD
+  A[Treasury + macro inputs] --> B[Regime assessment
+lib/regimeEngine.ts]
+  B --> C[Structured summary builders
+lib/summary/weeklySummary.ts
+lib/summary/monthlySummary.ts]
+  C --> D[Copy renderer
+(summary.copy derived from structured)]
+  C --> E[/api/weekly + /api/monthly
+structured + provenance + copy/]
+  F[data/summary_archive.json] --> G[parseSummaryArchive
+legacy hydration]
+  G --> C
+```
+
+### Core formulas (deterministic)
+- **Constraint continuity check (weekly vs monthly):**
+
+  $$
+  \text{unchanged} = W \cap M, \quad
+  \text{added} = M \setminus W, \quad
+  \text{removed} = W \setminus M
+  $$
+
+- **Summary-hash stability input:**
+
+  \[
+  H = \operatorname{hash}(\{title, summary, regime, regimeLabel, guidance, constraints, recordDateLabel, provenance\})
+  \]
+
+These formulas keep archive hydration, API output, and UI rendering deterministic across current and historical summaries.
+
 ## Caches and snapshots
 - `data/snapshot_fallback.json` provides an offline baseline for the latest Treasury reading.
 - `data/macro_snapshot.json` stores expanded macro signals with explicit sources.
