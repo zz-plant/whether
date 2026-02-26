@@ -46,7 +46,7 @@ export default function OperationsDataPage() {
             <Link href="/operations" className="weather-button-primary px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em]">
               Back to playbook
             </Link>
-            <Link href="/operations/briefings" className="weather-button px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em]">
+            <Link href="/operations#ops-export-briefs" className="weather-button px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em]">
               Open briefings
             </Link>
           </div>
