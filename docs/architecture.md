@@ -27,6 +27,40 @@ fetch/normalize data, score the regime, generate guidance, and render reports.
 - **Report generation**: `lib/report/*`, `lib/summary/*`.
 - **Navigation + UX framing**: `lib/navigation/*`, `lib/operatorRequests.ts`.
 
+## Summary structure pipeline (weekly/monthly)
+```mermaid
+flowchart TD
+  A[Treasury + macro inputs] --> B[Regime assessment
+lib/regimeEngine.ts]
+  B --> C[Structured summary builders
+lib/summary/weeklySummary.ts
+lib/summary/monthlySummary.ts]
+  C --> D[Copy renderer
+(summary.copy derived from structured)]
+  C --> E[/api/weekly + /api/monthly
+structured + provenance + copy/]
+  F[data/summary_archive.json] --> G[parseSummaryArchive
+legacy hydration]
+  G --> C
+```
+
+### Core formulas (deterministic)
+- **Constraint continuity check (weekly vs monthly):**
+
+  $$
+  \text{unchanged} = W \cap M, \quad
+  \text{added} = M \setminus W, \quad
+  \text{removed} = W \setminus M
+  $$
+
+- **Summary-hash stability input:**
+
+  \[
+  H = \operatorname{hash}(\{title, summary, regime, regimeLabel, guidance, constraints, recordDateLabel, provenance\})
+  \]
+
+These formulas keep archive hydration, API output, and UI rendering deterministic across current and historical summaries.
+
 ## Caches and snapshots
 - `data/snapshot_fallback.json` provides an offline baseline for the latest Treasury reading.
 - `data/macro_snapshot.json` stores expanded macro signals with explicit sources.
@@ -36,8 +70,12 @@ fetch/normalize data, score the regime, generate guidance, and render reports.
 ## API routes
 Summary APIs live under `app/api/*` and mirror the time horizon they serve:
 - `/api/weekly`, `/api/monthly`, `/api/quarterly`, `/api/yearly`
+  - weekly/monthly payloads expose structured sections plus copy/provenance fields for UI and automation reuse
 - `/api/summary-delta` for change detection
 - `/api/treasury` for direct Treasury-derived data access
+
+Historical summary playback uses `lib/summary/summaryArchive.ts`, which validates archive entries and
+hydrates missing weekly/monthly structured fields for legacy records.
 
 ## Extension points
 - **New sensors**: add a normalized source in `lib/treasury/*` or `lib/macroSnapshot.ts`, then

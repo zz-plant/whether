@@ -1,7 +1,16 @@
-import type { MonthlySummary } from "./monthlySummary";
-import type { WeeklySummary } from "./weeklySummary";
-
-type SummaryHashInput = MonthlySummary | WeeklySummary;
+type SummaryHashInput = {
+  title: string;
+  summary: string;
+  regime: string;
+  regimeLabel: string;
+  guidance: string;
+  constraints: string[];
+  recordDateLabel: string | null;
+  provenance: {
+    sourceLabel: string;
+    sourceUrl?: string;
+  };
+};
 
 type StableSummaryPayload = {
   title: string;

@@ -124,7 +124,41 @@ insight database and operator request catalog in `data/recommendations.ts` and
 
 ### 5.2 Weekly + monthly summaries
 Weekly and monthly summaries are generated from the current assessment for use in the overview
-page and APIs. These summaries include copy blocks, constraints, and provenance metadata.
+page and APIs. These summaries are structured-first payloads (sections + provenance metadata) with
+copy blocks rendered from the same structured data for sharing/export.
+
+### 5.4 Structured summary contract (weekly/monthly)
+Weekly/monthly summaries use a structured-first contract and render raw copy from that structure.
+
+```mermaid
+flowchart LR
+  R[Regime + constraints] --> S[Structured fields]
+  S --> U[UI sections
+(climate, moves, constraints, provenance)]
+  S --> C[Copy block
+for sharing/export]
+  S --> A[API payload
+structured + copy + provenance]
+```
+
+Required weekly structure:
+- `climate.label`, `climate.summary[]`
+- `recommendedMoves[]`, `executionPriorities[]`, `watchouts[]`
+- `planningLanguage`, `executionConstraints[]`
+
+Required monthly structure:
+- `executionConstraints[]`
+- `provenance.source`, `provenance.timestamp`, `provenance.dataAge`
+
+Archive compatibility formula for legacy records:
+
+$$
+\text{structured}_{legacy} =
+\begin{cases}
+\text{existing structured}, & \text{if present} \\
+\text{buildStructured}(regime, constraints, provenance), & \text{otherwise}
+\end{cases}
+$$
 
 ### 5.3 Briefing exports
 Operations briefings support copy-ready briefs and executive narratives with sensor data and
@@ -136,8 +170,8 @@ macro context embedded for leadership consumption.
 - `GET /api/treasury` — normalized Treasury yield data with fallback support.
 
 ### 6.2 Summary APIs
-- `GET /api/weekly` — weekly summary payload with provenance.
-- `GET /api/monthly` — monthly summary payload with provenance.
+- `GET /api/weekly` — weekly summary payload with structured sections, copy text, and provenance.
+- `GET /api/monthly` — monthly summary payload with structured sections, copy text, and provenance.
 - `GET /api/quarterly` — quarterly summary payload with provenance.
 - `GET /api/yearly` — yearly summary payload with provenance.
 - `GET /api/summary-delta` — difference between weekly and monthly summaries.
