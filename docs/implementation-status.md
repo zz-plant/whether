@@ -27,10 +27,10 @@ This document consolidates delivery status across product roadmap audits, known 
 
 ## Summary-system follow-ups
 
-- [x] Shared structured → copy renderer and contract unification.
-- [ ] Offline archive materialization for historical `structured` fields.
-- [ ] API contract tests for `/api/weekly` and `/api/monthly` payload guarantees.
-- [ ] Monthly section expansion toward weekly parity where operator value is clear.
+- [x] (P0) Shared `structured` → copy renderer and contract unification.
+- [ ] (P1) Offline archive materialization for historical `structured` fields.
+- [ ] (P1) API contract tests for `/api/weekly` and `/api/monthly` payload guarantees.
+- [ ] (P2) Monthly section expansion toward weekly parity where operator value is clear.
 
 ## Stack modernization
 
