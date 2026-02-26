@@ -1,25 +1,28 @@
-import type { Metadata } from "next";
-import { buildPageMetadata } from "../../lib/seo";
-import OperationsPage from "../operations/page";
-
-export const metadata: Metadata = buildPageMetadata({
-  title: "Whether Report — Action playbook",
-  description:
-    "Playbook moves, finance posture, and operator requests tuned to the current regime.",
-  path: "/plan",
-  imageAlt: "Whether action playbook plan view",
-});
+import { redirectTo } from "../../lib/navigation/legacyRedirects";
 
 export const runtime = "edge";
 
-export default async function PlanPage({
-  searchParams,
-}: {
+type PlanPageProps = {
   searchParams?: Promise<{
     month?: string;
     year?: string;
     [key: string]: string | undefined;
   }>;
-}) {
-  return <OperationsPage searchParams={searchParams} />;
+};
+
+export default async function PlanPage({ searchParams }: PlanPageProps) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const params = new URLSearchParams();
+
+  if (resolvedSearchParams) {
+    Object.entries(resolvedSearchParams).forEach(([key, value]) => {
+      if (value) {
+        params.set(key, value);
+      }
+    });
+  }
+
+  const query = params.toString();
+  const destination = query ? `/operations?${query}` : "/operations";
+  return redirectTo(destination);
 }

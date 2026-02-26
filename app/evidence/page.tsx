@@ -1,26 +1,28 @@
-import type { Metadata } from "next";
-import { buildPageMetadata } from "../../lib/seo";
-import SignalsPage from "../signals/page";
-
-export const metadata: Metadata = buildPageMetadata({
-  title: "Whether Report — Signal evidence",
-  description:
-    "Macro signals, sensor detail, thresholds, and historical context for Whether Market Climate Station.",
-  path: "/evidence",
-  imageAlt: "Whether Report signal evidence overview",
-});
+import { redirectTo } from "../../lib/navigation/legacyRedirects";
 
 export const runtime = "edge";
-export const revalidate = 900;
 
-export default async function EvidencePage({
-  searchParams,
-}: {
+type EvidencePageProps = {
   searchParams?: Promise<{
     month?: string;
     year?: string;
     [key: string]: string | undefined;
   }>;
-}) {
-  return <SignalsPage searchParams={searchParams} />;
+};
+
+export default async function EvidencePage({ searchParams }: EvidencePageProps) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const params = new URLSearchParams();
+
+  if (resolvedSearchParams) {
+    Object.entries(resolvedSearchParams).forEach(([key, value]) => {
+      if (value) {
+        params.set(key, value);
+      }
+    });
+  }
+
+  const query = params.toString();
+  const destination = query ? `/signals?${query}` : "/signals";
+  return redirectTo(destination);
 }
