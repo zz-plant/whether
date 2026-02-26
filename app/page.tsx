@@ -30,8 +30,8 @@ export const revalidate = 900;
 
 const homeSectionSequence = [
   { href: "#weekly-action-summary", label: "Read first: Weekly actions" },
-  { href: "#executive-snapshot", label: "Then decide: Leadership summary" },
-  { href: "#signal-matrix", label: "Reference: Signal breakdown" },
+  { href: "#signal-matrix", label: "Then calibrate: Risk posture" },
+  { href: "#executive-snapshot", label: "Then decide: Operating constraints" },
 ] as const;
 
 const regimeLabelMap = {
@@ -579,16 +579,16 @@ export default async function HomePage({
         />
       </section>
 
-      <section id="executive-snapshot" aria-label="Leadership summary" className="space-y-8">
-        <ExecutiveSnapshotPanel
-          treasury={treasury}
+      <section id="signal-matrix" aria-label="Signal breakdown" className="space-y-8">
+        <SignalMatrixPanel
           assessment={assessment}
           provenance={treasuryProvenance}
         />
       </section>
 
-      <section id="signal-matrix" aria-label="Signal breakdown" className="space-y-8">
-        <SignalMatrixPanel
+      <section id="executive-snapshot" aria-label="Leadership summary" className="space-y-8">
+        <ExecutiveSnapshotPanel
+          treasury={treasury}
           assessment={assessment}
           provenance={treasuryProvenance}
         />

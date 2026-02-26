@@ -17,6 +17,20 @@ export const formatDelta = (value: number | null, unit: string) => {
 
 export const CLIMATE_ORDER = ["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"] as const;
 
+export const sortClimateKeys = (first: string, second: string) => {
+  const climateOrder = CLIMATE_ORDER as readonly string[];
+  const firstIndex = climateOrder.indexOf(first);
+  const secondIndex = climateOrder.indexOf(second);
+  const normalizedFirst = firstIndex === -1 ? Number.MAX_SAFE_INTEGER : firstIndex;
+  const normalizedSecond = secondIndex === -1 ? Number.MAX_SAFE_INTEGER : secondIndex;
+
+  if (normalizedFirst === normalizedSecond) {
+    return first.localeCompare(second);
+  }
+
+  return normalizedFirst - normalizedSecond;
+};
+
 export const clampToRange = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max);
 

@@ -38,6 +38,7 @@ import { MonthlySummaryCard } from "./monthlySummaryCard";
 import { SummaryDeltaPanel } from "./summaryDeltaPanel";
 import { WeeklySummaryCard } from "./weeklySummaryCard";
 import { RegimeBadgeIcon } from "./regimeIcons";
+import { CollapsibleDeepDive } from "./collapsibleDeepDive";
 import { insightDatabase } from "../../data/recommendations";
 import {
   buildSparkline,
@@ -52,6 +53,7 @@ import {
   regimeBadges,
   SPARKLINE_HEIGHT,
   SPARKLINE_WIDTH,
+  sortClimateKeys,
 } from "./reportSectionUtils";
 import { DataGauge } from "./dataGauge";
 
@@ -2652,18 +2654,7 @@ export const MacroSignalsPanel = ({
             checks.
           </p>
         </div>
-        <Collapsible.Root className="mt-4">
-          <Collapsible.Trigger
-            type="button"
-            className="group flex min-h-[44px] w-full items-center justify-between gap-3 text-left text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-          >
-            <span>Deep dive: signal cards and freshness checks</span>
-            <span className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/80 px-3 text-[0.65rem] font-semibold tracking-[0.14em] text-slate-200">
-              <span className="group-data-[panel-open]:hidden">Expand section</span>
-              <span className="hidden group-data-[panel-open]:inline">Collapse section</span>
-            </span>
-          </Collapsible.Trigger>
-          <Collapsible.Panel className="mt-4 grid gap-4 md:grid-cols-3">
+        <CollapsibleDeepDive label="Deep dive: signal cards and freshness checks" panelClassName="mt-4 grid gap-4 md:grid-cols-3">
             {prioritizedSeries.map((signal, index) => {
               const sparkline = buildSparkline(signal.history);
               const sparklineId = `macro-spark-${signal.id}`;
@@ -2743,8 +2734,7 @@ export const MacroSignalsPanel = ({
                 </div>
               );
             })}
-          </Collapsible.Panel>
-        </Collapsible.Root>
+        </CollapsibleDeepDive>
       </div>
     </section>
   );
@@ -2791,18 +2781,7 @@ export const PlaybookPanel = ({
             Align the team on what to stop, start, and fence before approvals move forward.
           </p>
         </div>
-        <Collapsible.Root className="mt-4">
-          <Collapsible.Trigger
-            type="button"
-            className="group flex min-h-[44px] w-full items-center justify-between gap-3 text-left text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-          >
-            <span>Deep dive: playbook snapshot and action lanes</span>
-            <span className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/80 px-3 text-[0.65rem] font-semibold tracking-[0.14em] text-slate-200">
-              <span className="group-data-[panel-open]:hidden">Expand section</span>
-              <span className="hidden group-data-[panel-open]:inline">Collapse section</span>
-            </span>
-          </Collapsible.Trigger>
-          <Collapsible.Panel className="mt-4 space-y-6">
+        <CollapsibleDeepDive label="Deep dive: playbook snapshot and action lanes" panelClassName="mt-4 space-y-6">
             <div className="grid gap-6 lg:grid-cols-[1.25fr,0.75fr]">
               <div className="grid gap-4 lg:grid-cols-3 lg:col-span-2">
                 <div className="weather-surface border-l-4 border-rose-500/50 p-4">
@@ -2905,8 +2884,7 @@ export const PlaybookPanel = ({
                 </Collapsible.Root>
               </div>
             ) : null}
-          </Collapsible.Panel>
-        </Collapsible.Root>
+        </CollapsibleDeepDive>
       </div>
     </section>
   );
@@ -2956,10 +2934,7 @@ export const InsightDatabasePanel = ({
 
   const climateOptions = useMemo(
     () =>
-      Array.from(new Set(evidenceLibrary.map((item) => item.climate))).sort(
-        (first: any, second: any) =>
-          CLIMATE_ORDER.indexOf(first) - CLIMATE_ORDER.indexOf(second)
-      ),
+      Array.from(new Set(evidenceLibrary.map((item) => item.climate))).sort(sortClimateKeys),
     [evidenceLibrary]
   );
   const signalOptions = useMemo(
@@ -3056,18 +3031,7 @@ export const InsightDatabasePanel = ({
             {evidence?.summary ?? "No evidence summary available for this climate."}
           </p>
         </div>
-        <Collapsible.Root className="mt-4">
-          <Collapsible.Trigger
-            type="button"
-            className="group flex min-h-[44px] w-full items-center justify-between gap-3 text-left text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-          >
-            <span>Deep dive: searchable evidence library</span>
-            <span className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/80 px-3 text-[0.65rem] font-semibold tracking-[0.14em] text-slate-200">
-              <span className="group-data-[panel-open]:hidden">Expand section</span>
-              <span className="hidden group-data-[panel-open]:inline">Collapse section</span>
-            </span>
-          </Collapsible.Trigger>
-          <Collapsible.Panel className="mt-4 space-y-4">
+        <CollapsibleDeepDive label="Deep dive: searchable evidence library" panelClassName="mt-4 space-y-4">
             <div className="weather-surface p-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
@@ -3323,20 +3287,8 @@ export const InsightDatabasePanel = ({
                 ))
               )}
             </div>
-          </Collapsible.Panel>
-        </Collapsible.Root>
-        <Collapsible.Root className="mt-4">
-          <Collapsible.Trigger
-            type="button"
-            className="group flex min-h-[44px] w-full items-center justify-between gap-3 text-left text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-          >
-            <span>Deep dive: {fossilRecord.title}</span>
-            <span className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/80 px-3 text-[0.65rem] font-semibold tracking-[0.14em] text-slate-200">
-              <span className="group-data-[panel-open]:hidden">Expand section</span>
-              <span className="hidden group-data-[panel-open]:inline">Collapse section</span>
-            </span>
-          </Collapsible.Trigger>
-          <Collapsible.Panel className="mt-4">
+        </CollapsibleDeepDive>
+        <CollapsibleDeepDive label={`Deep dive: ${fossilRecord.title}`}>
             <div className="weather-surface p-4">
               <p className="type-label text-slate-400">{fossilRecord.title}</p>
               <p className="mt-2 text-xs text-slate-500">{fossilRecord.subtitle}</p>
@@ -3373,8 +3325,7 @@ export const InsightDatabasePanel = ({
                 </tbody>
               </table>
             </div>
-          </Collapsible.Panel>
-        </Collapsible.Root>
+        </CollapsibleDeepDive>
       </div>
     </section>
   );
@@ -3412,18 +3363,10 @@ export const FinanceStrategyPanel = ({
             {entry?.runwayPosture ?? "Runway posture will update when data refreshes."}
           </p>
         </div>
-        <Collapsible.Root className="mt-4">
-          <Collapsible.Trigger
-            type="button"
-            className="group flex min-h-[44px] w-full items-center justify-between gap-3 text-left text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-          >
-            <span>Deep dive: runway guidance and watchlist</span>
-            <span className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/80 px-3 text-[0.65rem] font-semibold tracking-[0.14em] text-slate-200">
-              <span className="group-data-[panel-open]:hidden">Expand section</span>
-              <span className="hidden group-data-[panel-open]:inline">Collapse section</span>
-            </span>
-          </Collapsible.Trigger>
-          <Collapsible.Panel className="mt-4 grid gap-4 lg:grid-cols-[1.1fr,0.9fr]">
+        <CollapsibleDeepDive
+          label="Deep dive: runway guidance and watchlist"
+          panelClassName="mt-4 grid gap-4 lg:grid-cols-[1.1fr,0.9fr]"
+        >
             <div className="weather-surface p-4">
               <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Runway posture</p>
               <p className="mt-3 text-sm text-slate-200">{entry?.runwayPosture}</p>
@@ -3465,8 +3408,7 @@ export const FinanceStrategyPanel = ({
                 Public data only. No internal finance inputs required.
               </p>
             </div>
-          </Collapsible.Panel>
-        </Collapsible.Root>
+        </CollapsibleDeepDive>
       </div>
     </section>
   );
@@ -3505,18 +3447,10 @@ export const DecisionShieldTemplatesPanel = ({
             approvals.
           </p>
         </div>
-        <Collapsible.Root className="mt-4">
-          <Collapsible.Trigger
-            type="button"
-            className="group flex min-h-[44px] w-full items-center justify-between gap-3 text-left text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-          >
-            <span>Deep dive: decision shield templates by regime</span>
-            <span className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/80 px-3 text-[0.65rem] font-semibold tracking-[0.14em] text-slate-200">
-              <span className="group-data-[panel-open]:hidden">Expand section</span>
-              <span className="hidden group-data-[panel-open]:inline">Collapse section</span>
-            </span>
-          </Collapsible.Trigger>
-          <Collapsible.Panel className="mt-4 grid gap-4 md:grid-cols-3">
+        <CollapsibleDeepDive
+          label="Deep dive: decision shield templates by regime"
+          panelClassName="mt-4 grid gap-4 md:grid-cols-3"
+        >
             {templates.decisions.map((decision) => (
               <div key={decision.title} className="weather-surface p-4">
                 <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
@@ -3534,8 +3468,7 @@ export const DecisionShieldTemplatesPanel = ({
                 </ul>
               </div>
             ))}
-          </Collapsible.Panel>
-        </Collapsible.Root>
+        </CollapsibleDeepDive>
       </div>
     </section>
   );
