@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { loadReportData } from "../../lib/report/reportData";
+import { getSummaryArchive } from "../../lib/summary/summaryArchive";
 import { siteUrl } from "../../lib/siteUrl";
 import {
   buildBreadcrumbList,
@@ -116,10 +117,10 @@ export default async function SignalsPage({
     selectedYear,
     sensors,
     statusLabel,
-    summaryArchive,
     treasury,
     treasuryProvenance,
   } = await loadReportData(resolvedSearchParams);
+  const summaryArchive = getSummaryArchive();
   const regimeLabel = regimeLabels[assessment.regime];
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
   const {

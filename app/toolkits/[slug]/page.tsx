@@ -3,10 +3,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../lib/seo";
 import { toolkitDefinitions } from "../../../lib/informationArchitecture";
-export const runtime = "edge";
-
-
 type Params = { slug: string };
+
+export function generateStaticParams() {
+  return toolkitDefinitions.map((entry) => ({ slug: entry.slug }));
+}
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug } = await params;
