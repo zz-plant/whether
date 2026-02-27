@@ -22,7 +22,7 @@ const args = useNextOnPages
   ? skipNextOnPagesBuild
     ? ["--skip-build"]
     : []
-  : ["build"];
+  : ["build", "--webpack"];
 
 const result = spawnSync(command, args, {
   stdio: "inherit",
