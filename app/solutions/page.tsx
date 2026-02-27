@@ -1,5 +1,5 @@
 import { redirectTo } from "../../lib/navigation/legacyRedirects";
 
 export default function SolutionsHubPage() {
-  return redirectTo("/plan");
+  return redirectTo("/toolkits");
 }

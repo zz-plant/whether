@@ -22,7 +22,7 @@ export const reportPageLinks: ReportPageLink[] = [
     description: "Curated role and situation entry points into operational guidance.",
   },
   {
-    href: "/plan",
+    href: "/toolkits",
     label: "Plan",
     description: "Runnable instruments and templates by decision surface.",
   },

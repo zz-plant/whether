@@ -43,12 +43,10 @@ It does **not** change macro scoring logic, regime methodology, or source-data p
 5. `/history`
 6. `/method`
 
-### 4.2 Canonicalization of legacy routes
-Use direct canonical redirects (no transitional bridge surfaces):
-- `/plan` → `/operations/plan`
-- `/evidence` → `/signals`
-- `/operations/briefings` → `/operations`
-- `/operations/decisions` → `/operations`
+### 4.2 Legacy route posture
+This project is pre-production, so frontend v2 does not need legacy-route preservation.
+
+Deprecated routes (`/plan`, `/evidence`, and similar aliases) may be removed instead of redirected.
 
 ### 4.3 URL-as-state contract
 - Tab: `?tab=`
@@ -184,7 +182,6 @@ Required events:
 - `brief_export_started`
 - `brief_export_succeeded`
 - `brief_export_failed`
-- `legacy_redirect_hit`
 
 Event payload baseline: route, posture label, freshness class, and timestamp.
 
@@ -193,7 +190,7 @@ Event payload baseline: route, posture label, freshness class, and timestamp.
 ### Phase 1 — Foundation
 - Ship `/briefing` in parallel.
 - Introduce shared primitives and tokenized layout.
-- Canonicalize `/plan` and `/evidence` redirects.
+- Remove legacy `/plan` and `/evidence` route handlers.
 
 ### Phase 2 — Workflow migration
 - Move Signals + Playbook to v2 primitives.
@@ -208,19 +205,19 @@ Event payload baseline: route, posture label, freshness class, and timestamp.
 ### Phase 4 — Cutover
 - Make v2 navigation default.
 - Remove redundant v1 components/routes.
-- Remove temporary redirect exceptions.
+- Remove any temporary compatibility routes/aliases.
 
 ## 12) Acceptance criteria
 - Navigation + route map are available behind a controlled release flag.
 - Keyboard-only walkthrough succeeds for Briefing, Signals, and export flows.
 - Freshness/fallback are visible in all evidence-bearing modules.
 - Scenario state cannot be mistaken for live outputs.
-- Legacy routes canonically redirect to v2 destinations.
+- Legacy aliases are removed or explicitly deprecated without user-facing guarantees.
 - Core route web vitals meet CLS/LCP targets.
 - Required instrumentation events are emitted.
 
 ## 13) Validation checklist
-- Route QA for all v2 routes + canonical redirects.
+- Route QA for all v2 routes and removal of deprecated aliases.
 - Accessibility audit (focus, semantics, keyboard path).
 - Contract tests for required fields from summary/signals/scenario/history APIs.
 - Smoke test of briefing export success + failure behavior.
@@ -228,7 +225,7 @@ Event payload baseline: route, posture label, freshness class, and timestamp.
 ## 14) Risks and open questions
 
 ### Risks
-- Redirect canonicalization may break stale bookmarks during active rollout.
+- Removing deprecated aliases may break stale bookmarks during active rollout.
 - Contract gaps in scenario/history payloads may block complete UI states.
 - Above-the-fold density may regress first-load performance without sequencing.
 
