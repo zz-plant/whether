@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { buildPageMetadata } from "../../lib/seo";
-import { postureDefinitions, startSituations, toolkitDefinitions } from "../../lib/informationArchitecture";
+import { postureDefinitions, situationRouting, startSituations, toolkitDefinitions } from "../../lib/informationArchitecture";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Start Here — Whether onboarding",
@@ -38,9 +38,13 @@ export default function StartHerePage() {
         <h2 className="text-xl font-semibold text-slate-100">Step 2: Pick your situation</h2>
         <div className="flex flex-wrap gap-2">
           {startSituations.map((situation) => (
-            <span key={situation} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100">
+            <Link
+              key={situation}
+              href={`/use-cases/${situationRouting[situation]}`}
+              className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100"
+            >
               {situation}
-            </span>
+            </Link>
           ))}
         </div>
       </section>

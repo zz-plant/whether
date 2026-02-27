@@ -51,7 +51,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/toolkits", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.8 },
     { path: "/library", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.75 },
     { path: "/library/failure-modes", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.75 },
-    { path: "/library/canon", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.75 },
+    { path: "/concepts", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.75 },
     { path: "/about", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.6 },
     { path: "/terms-of-service", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },
     { path: "/acceptable-use-policy", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },
@@ -93,7 +93,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }));
 
   const canonEntries: SitemapEntryDescriptor[] = productConceptArticles.map((article) => ({
-    path: `/library/canon/${article.slug}`,
+    path: `/concepts/${article.slug}`,
     lastModified: buildPublishedMonthDate(article.publishedYear, article.publishedMonth),
     changeFrequency: "monthly",
     priority: 0.6,

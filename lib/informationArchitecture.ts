@@ -117,6 +117,26 @@ export const situationUseCases = [
   "ai-claims",
 ] as const;
 
+export const situationRouting = {
+  Hiring: "avoid-premature-scaling",
+  Pricing: "pricing-change",
+  Roadmap: "roadmap-focus",
+  PMF: "measure-pmf",
+  Launch: "launch-gates",
+  Governance: "decision-rights",
+} as const satisfies Record<(typeof startSituations)[number], (typeof situationUseCases)[number]>;
+
+export const recommendedSituationToolkits = {
+  "measure-pmf": ["pmf", "focus"],
+  "avoid-premature-scaling": ["rollback", "launch-gates"],
+  "roadmap-focus": ["focus", "ops-capacity"],
+  "pricing-change": ["claims", "rollback"],
+  "launch-gates": ["launch-gates", "rollback"],
+  "decision-rights": ["decision-rights", "ops-capacity"],
+  "ops-capacity": ["ops-capacity", "decision-rights"],
+  "ai-claims": ["claims", "launch-gates"],
+} as const satisfies Record<(typeof situationUseCases)[number], readonly ToolkitDefinition["slug"][]>;
+
 export type ToolkitDefinition = {
   slug: string;
   title: string;
@@ -135,7 +155,7 @@ export const toolkitDefinitions: ToolkitDefinition[] = [
     byPosture: "In Safety Mode, focus on retention proof; in Risk-On, push for repeatable growth.",
     instruments: ["PMF evidence checklist", "Cohort quality rubric", "Retention interview template"],
     misuseCases: ["Treating top-line growth as PMF", "Scaling channels before cohort quality is stable"],
-    canonLinks: [{ label: "PMF concepts", href: "/library/canon" }],
+    canonLinks: [{ label: "PMF concepts", href: "/concepts" }],
   },
   {
     slug: "focus",
@@ -144,7 +164,7 @@ export const toolkitDefinitions: ToolkitDefinition[] = [
     byPosture: "In Safety Mode, narrow scope; in Risk-On, re-open adjacent options with guardrails.",
     instruments: ["Keep/pause/accelerate board", "Dependency heatmap", "Focus memo template"],
     misuseCases: ["Adding projects without explicit trade-offs"],
-    canonLinks: [{ label: "Roadmap canon", href: "/library/canon" }],
+    canonLinks: [{ label: "Roadmap canon", href: "/concepts" }],
   },
   {
     slug: "rollback",
@@ -162,7 +182,7 @@ export const toolkitDefinitions: ToolkitDefinition[] = [
     byPosture: "In Safety Mode, increase escalation rigor; in Risk-On, increase delegated speed.",
     instruments: ["Decision rights matrix", "Escalation ladder", "Governance cadence checklist"],
     misuseCases: ["Confusing consensus with accountability"],
-    canonLinks: [{ label: "Governance canon", href: "/library/canon" }],
+    canonLinks: [{ label: "Governance canon", href: "/concepts" }],
   },
   {
     slug: "launch-gates",
