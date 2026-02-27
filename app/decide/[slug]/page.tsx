@@ -9,8 +9,6 @@ import {
   useCaseRoles,
 } from "../../../lib/informationArchitecture";
 
-export const runtime = "edge";
-
 type Params = { slug: string };
 
 const titleCase = (value: string) => value

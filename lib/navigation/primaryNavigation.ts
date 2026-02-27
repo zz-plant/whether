@@ -1,5 +1,7 @@
+import type { Route } from "next";
+
 export type PrimaryNavigationItem = {
-  href: string;
+  href: Route;
   label: string;
   description: string;
   staticHub?: boolean;
