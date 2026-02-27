@@ -112,7 +112,7 @@ export const GLOSSARY_USAGE_NOTES: GlossaryUsageNote[] = [
   },
 ];
 
-export const SIGNALS_RELATED_LINKS: Array<Required<ReportLinkCopy>> = [
+export const SIGNALS_RELATED_LINKS = [
   {
     href: "/operations",
     label: "Operations playbook",
@@ -128,9 +128,9 @@ export const SIGNALS_RELATED_LINKS: Array<Required<ReportLinkCopy>> = [
     label: "Onboarding & glossary",
     description: "Share plain-English definitions with teams new to macro-driven planning.",
   },
-];
+ ] as const satisfies ReadonlyArray<Required<ReportLinkCopy>>;
 
-export const ONBOARDING_RELATED_LINKS: Array<Required<ReportLinkCopy>> = [
+export const ONBOARDING_RELATED_LINKS = [
   {
     href: "/signals",
     label: "Signal evidence",
@@ -146,4 +146,4 @@ export const ONBOARDING_RELATED_LINKS: Array<Required<ReportLinkCopy>> = [
     label: "Methodology",
     description: "Explore the exact formula logic and original data providers.",
   },
-];
+ ] as const satisfies ReadonlyArray<Required<ReportLinkCopy>>;

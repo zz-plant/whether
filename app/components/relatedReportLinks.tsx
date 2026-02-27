@@ -13,7 +13,7 @@ export const RelatedReportLinks = ({
   variant = "full",
 }: {
   title?: string;
-  links: RelatedReportLink[];
+  links: readonly RelatedReportLink[];
   variant?: "full" | "compact";
 }) => {
   if (variant === "compact") {
