@@ -1,5 +1,7 @@
 import { redirectWithParams } from "../../../lib/navigation/legacyRedirects";
 
+export const runtime = "edge";
+
 type DecideRouteParams = {
   slug: string;
 };
