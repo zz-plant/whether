@@ -17,17 +17,26 @@ export type ReportSectionLink = {
   label: string;
 };
 
+const pathMatchesLink = (linkHref: string, currentPath: string) => {
+  if (linkHref === "/") {
+    return currentPath === "/";
+  }
+
+  if (currentPath === linkHref || currentPath.startsWith(`${linkHref}/`)) {
+    return true;
+  }
+
+  const aliases = legacyPathAliases[linkHref] ?? [];
+  return aliases.some((alias) => currentPath === alias || currentPath.startsWith(`${alias}/`));
+};
+
 const getPageNavigationState = (
   pageLinks: ReportPageLink[],
   pageTitle: string,
   currentPath?: string,
 ) => {
   const currentIndexByPath = currentPath
-    ? pageLinks.findIndex((link) =>
-        link.href === "/"
-          ? currentPath === "/"
-          : currentPath === link.href || currentPath.startsWith(`${link.href}/`),
-      )
+    ? pageLinks.findIndex((link) => pathMatchesLink(link.href, currentPath))
     : -1;
   const currentIndexByLabel = pageLinks.findIndex((link) => link.label === pageTitle);
   const currentIndex = currentIndexByPath >= 0 ? currentIndexByPath : currentIndexByLabel;
@@ -40,20 +49,23 @@ const getPageNavigationState = (
   return { currentIndex, currentPosition, currentLink, prevLink, nextLink };
 };
 
+const legacyPathAliases: Record<string, string[]> = {
+  "/decide": ["/use-cases"],
+  "/plan": ["/toolkits"],
+  "/learn": ["/library"],
+  "/method": ["/about", "/methodology"],
+};
+
 const isLinkActiveForPath = (linkHref: string, currentPath?: string) => {
   if (!currentPath) {
     return false;
   }
 
-  if (linkHref === "/") {
-    return currentPath === "/";
-  }
-
-  return currentPath === linkHref || currentPath.startsWith(`${linkHref}/`);
+  return pathMatchesLink(linkHref, currentPath);
 };
 
 const pageLinkIcons: Record<string, ReactNode> = {
-  "Start Here": (
+  "Command Center": (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
       <path
         d="M12 4.5V2.75M12 21.25v-1.75M4.5 12H2.75M21.25 12h-1.75M6.75 6.75l-1.3-1.3M18.55 18.55l-1.3-1.3M6.75 17.25l-1.3 1.3M18.55 5.45l-1.3 1.3"
@@ -107,7 +119,7 @@ const pageLinkIcons: Record<string, ReactNode> = {
       <circle cx="16.5" cy="12" r="1.6" fill="currentColor" />
     </svg>
   ),
-  "Use Cases": (
+  "Decide": (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
       <path
         d="M4 5.5h16v13H4z"
@@ -126,7 +138,7 @@ const pageLinkIcons: Record<string, ReactNode> = {
       <circle cx="17" cy="15.5" r="2.5" fill="currentColor" />
     </svg>
   ),
-  Toolkits: (
+  Plan: (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
       <path
         d="M4 18c0-4.4 3.6-8 8-8s8 3.6 8 8"
@@ -145,7 +157,7 @@ const pageLinkIcons: Record<string, ReactNode> = {
       <circle cx="12" cy="18" r="1.8" fill="currentColor" />
     </svg>
   ),
-  Library: (
+  Learn: (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
       <path
         d="M6 4.75h9.25a2 2 0 0 1 2 2v10.5a2 2 0 0 1-2 2H6"
@@ -168,7 +180,7 @@ const pageLinkIcons: Record<string, ReactNode> = {
       />
     </svg>
   ),
-  About: (
+  Method: (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
       <path
         d="M7 5.5h10a1.5 1.5 0 0 1 1.5 1.5v10a1.5 1.5 0 0 1-1.5 1.5H7A1.5 1.5 0 0 1 5.5 17V7A1.5 1.5 0 0 1 7 5.5Z"
@@ -220,7 +232,7 @@ export const ReportPageNavigation = ({
                   className={`weather-tab inline-flex min-h-[46px] w-full items-center justify-center rounded-xl border px-4 py-2 text-center text-sm font-semibold tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:px-4 sm:text-xs ${
                     isActive
                       ? "border-sky-300/90 bg-sky-500/25 text-sky-50 shadow-sm shadow-sky-900/40"
-                  : link.label === "Start Here"
+                  : link.label === "Command Center"
                         ? "border-slate-600/90 bg-slate-900/70 text-slate-100 hover:border-sky-400/70 hover:text-slate-100"
                         : "border-slate-700/80 bg-slate-900/45 text-slate-200 hover:border-sky-400/70 hover:text-slate-100"
                   } ${isOddTail ? "mx-auto max-w-[240px]" : ""}`}
@@ -317,7 +329,7 @@ export const ReportMobileNavigation = ({
         <div className="weather-mobile-nav flex flex-col gap-3 px-3 py-3">
           <div className="flex min-w-0 items-center gap-3 rounded-2xl border border-slate-800/80 bg-slate-950/70 px-3 py-2">
             <span className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl border border-slate-800/80 bg-slate-950/80 text-slate-100">
-              {pageLinkIcons[currentLink.label] ?? pageLinkIcons.About}
+              {pageLinkIcons[currentLink.label] ?? pageLinkIcons.Method}
             </span>
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold tracking-[0.08em] text-slate-100">
@@ -419,7 +431,7 @@ export const ReportMobileNavigation = ({
                       className={`weather-pill flex min-h-[56px] items-start gap-3 rounded-2xl border px-3 py-3 text-left text-sm font-semibold tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation ${
                         isActive
                           ? "border-sky-400/70 bg-sky-500/15 text-sky-100"
-                          : link.label === "Start Here"
+                          : link.label === "Command Center"
                             ? "border-slate-600/90 text-slate-100 hover:border-sky-400/70 hover:text-sky-100"
                             : "border-slate-800/80 text-slate-100 hover:border-sky-400/70 hover:text-sky-100"
                       }`}
@@ -431,7 +443,7 @@ export const ReportMobileNavigation = ({
                             : "border-slate-800/80 bg-slate-950/70 text-slate-200"
                         }`}
                       >
-                        {pageLinkIcons[link.label] ?? pageLinkIcons.About}
+                        {pageLinkIcons[link.label] ?? pageLinkIcons.Method}
                       </span>
                       <span className="block text-sm font-semibold text-current">
                         {link.label}

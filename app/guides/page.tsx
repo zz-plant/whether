@@ -1,5 +1,5 @@
 import { redirectTo } from "../../lib/navigation/legacyRedirects";
 
 export default function GuidesPage() {
-  redirectTo("/use-cases");
+  return redirectTo("/learn");
 }
