@@ -38,7 +38,7 @@ export default async function FailureModeDetailPage({ params }: { params: Promis
         <div className="flex flex-wrap gap-2">
           <Link href="/toolkits" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Relevant toolkits</Link>
           <Link href="/posture" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Posture adjustment</Link>
-          <Link href="/library/canon" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Canon references</Link>
+          <Link href="/concepts" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Concept references</Link>
         </div>
       </section>
     </main>

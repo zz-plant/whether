@@ -2,7 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../lib/seo";
-import { situationUseCases, toolkitDefinitions, useCaseRoles } from "../../../lib/informationArchitecture";
+import {
+  situationToolkitRecommendations,
+  situationUseCases,
+  toolkitDefinitions,
+  useCaseRoles,
+} from "../../../lib/informationArchitecture";
 export const runtime = "edge";
 
 
@@ -57,6 +62,9 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<Pa
     );
   }
 
+  const recommendedToolkits = situationToolkitRecommendations[slug as (typeof situationUseCases)[number]] ??
+    toolkitDefinitions.slice(0, 4).map((toolkit) => toolkit.slug);
+
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
       <section className="weather-panel space-y-3 px-6 py-6">
@@ -66,16 +74,22 @@ export default async function UseCaseDetailPage({ params }: { params: Promise<Pa
       <section className="weather-panel space-y-3 px-6 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Start here</h2>
         <div className="grid gap-3 sm:grid-cols-2">
-          {toolkitDefinitions.slice(0, 4).map((toolkit) => (
-            <Link key={toolkit.slug} href={`/toolkits/${toolkit.slug}`} className="weather-surface px-4 py-4 text-sm text-slate-100">{toolkit.title}</Link>
-          ))}
+          {recommendedToolkits.map((slugItem) => {
+            const toolkit = toolkitDefinitions.find((entry) => entry.slug === slugItem);
+            if (!toolkit) return null;
+            return (
+              <Link key={slugItem} href={`/toolkits/${slugItem}`} className="weather-surface px-4 py-4 text-sm text-slate-100">
+                {toolkit.title}
+              </Link>
+            );
+          })}
         </div>
       </section>
       <section className="weather-panel space-y-3 px-6 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Need more depth?</h2>
         <div className="flex gap-3">
           <Link href="/library/failure-modes" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Failure modes</Link>
-          <Link href="/library/canon" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Canon</Link>
+          <Link href="/concepts" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Concepts</Link>
         </div>
       </section>
     </main>
