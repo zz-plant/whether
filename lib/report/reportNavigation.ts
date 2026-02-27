@@ -17,6 +17,16 @@ export const reportPageLinks: ReportPageLink[] = [
     description: "Runnable instruments and templates by decision surface.",
   },
   {
+    href: "/signals",
+    label: "Signals",
+    description: "Live macro inputs, thresholds, and supporting evidence.",
+  },
+  {
+    href: "/operations",
+    label: "Operations",
+    description: "Execution playbooks and operating guardrails by workstream.",
+  },
+  {
     href: "/library",
     label: "Library",
     description: "Failure modes diagnostics and canon depth.",

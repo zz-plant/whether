@@ -21,10 +21,20 @@ export default function LibraryPage() {
           <h2 className="text-lg font-semibold text-slate-100">Failure Modes</h2>
           <p className="text-sm text-slate-300">Spot the pattern, then jump to the toolkit that helps prevent it.</p>
         </Link>
-        <Link href="/library/canon" className="weather-panel space-y-2 px-4 py-4">
-          <h2 className="text-lg font-semibold text-slate-100">Canon</h2>
+        <Link href="/concepts" className="weather-panel space-y-2 px-4 py-4">
+          <h2 className="text-lg font-semibold text-slate-100">Concepts</h2>
           <p className="text-sm text-slate-300">Concept pages that explain why the tools work and when to apply them.</p>
         </Link>
+      </section>
+      <section className="weather-panel space-y-3 px-6 py-6">
+        <h2 className="text-lg font-semibold text-slate-100">Quick diagnostics</h2>
+        <p className="text-sm text-slate-300">Jump directly into common failure modes when you need fast triage.</p>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/library/failure-modes/premature-scaling" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Premature scaling</Link>
+          <Link href="/library/failure-modes/proxy-lock-in" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Proxy lock-in</Link>
+          <Link href="/library/failure-modes/feedback-latency" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Feedback latency</Link>
+          <Link href="/library/failure-modes/fragility-under-stress" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Fragility under stress</Link>
+        </div>
       </section>
     </main>
   );

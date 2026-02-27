@@ -102,6 +102,46 @@ const pageLinkIcons: Record<string, ReactNode> = {
       <circle cx="12" cy="18" r="1.8" fill="currentColor" />
     </svg>
   ),
+  Signals: (
+    <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
+      <path
+        d="M4.5 16.5l4-4 3 2.5 5-6 3 2.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M4 19.25h16"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      <circle cx="8.5" cy="12.5" r="1.2" fill="currentColor" />
+      <circle cx="16.5" cy="9" r="1.2" fill="currentColor" />
+    </svg>
+  ),
+  Operations: (
+    <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
+      <path
+        d="M5.5 6.5h13v11h-13z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9 6.5v11M15 6.5v11M5.5 12h13"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      <circle cx="9" cy="12" r="1.5" fill="currentColor" />
+    </svg>
+  ),
   Library: (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
       <path

@@ -44,7 +44,46 @@ export const postureDefinitions: PostureDefinition[] = [
   },
 ];
 
-export const startSituations = ["Hiring", "Pricing", "Roadmap", "PMF", "Launch", "Governance"] as const;
+export const startSituationDefinitions = [
+  {
+    label: "Hiring",
+    slug: "avoid-premature-scaling",
+    description: "Pressure-test headcount plans against demand confidence and payback speed.",
+    recommendedToolkits: ["rollback", "ops-capacity"],
+  },
+  {
+    label: "Pricing",
+    slug: "pricing-change",
+    description: "Sequence pricing changes with clear evidence and rollback criteria.",
+    recommendedToolkits: ["claims", "rollback"],
+  },
+  {
+    label: "Roadmap",
+    slug: "roadmap-focus",
+    description: "Refocus commitments around runway protection and fast learning loops.",
+    recommendedToolkits: ["focus", "ops-capacity"],
+  },
+  {
+    label: "PMF",
+    slug: "measure-pmf",
+    description: "Assess cohort strength before adding growth cost or complexity.",
+    recommendedToolkits: ["pmf", "focus"],
+  },
+  {
+    label: "Launch",
+    slug: "launch-gates",
+    description: "Use objective go/no-go thresholds to protect trust and reliability.",
+    recommendedToolkits: ["launch-gates", "rollback"],
+  },
+  {
+    label: "Governance",
+    slug: "decision-rights",
+    description: "Clarify decision ownership and escalation cadence before risk rises.",
+    recommendedToolkits: ["decision-rights", "ops-capacity"],
+  },
+] as const;
+
+export const startSituations = startSituationDefinitions.map((situation) => situation.label);
 
 export type UseCaseRole = {
   slug: string;
@@ -117,6 +156,17 @@ export const situationUseCases = [
   "ai-claims",
 ] as const;
 
+export const situationToolkitRecommendations: Record<(typeof situationUseCases)[number], string[]> = {
+  "measure-pmf": ["pmf", "focus", "claims"],
+  "avoid-premature-scaling": ["rollback", "ops-capacity", "pmf"],
+  "roadmap-focus": ["focus", "ops-capacity", "rollback"],
+  "pricing-change": ["claims", "rollback", "pmf"],
+  "launch-gates": ["launch-gates", "rollback", "claims"],
+  "decision-rights": ["decision-rights", "ops-capacity", "rollback"],
+  "ops-capacity": ["ops-capacity", "decision-rights", "focus"],
+  "ai-claims": ["claims", "launch-gates", "decision-rights"],
+};
+
 export type ToolkitDefinition = {
   slug: string;
   title: string;
@@ -135,7 +185,7 @@ export const toolkitDefinitions: ToolkitDefinition[] = [
     byPosture: "In Safety Mode, focus on retention proof; in Risk-On, push for repeatable growth.",
     instruments: ["PMF evidence checklist", "Cohort quality rubric", "Retention interview template"],
     misuseCases: ["Treating top-line growth as PMF", "Scaling channels before cohort quality is stable"],
-    canonLinks: [{ label: "PMF concepts", href: "/library/canon" }],
+    canonLinks: [{ label: "PMF concepts", href: "/concepts" }],
   },
   {
     slug: "focus",
@@ -144,7 +194,7 @@ export const toolkitDefinitions: ToolkitDefinition[] = [
     byPosture: "In Safety Mode, narrow scope; in Risk-On, re-open adjacent options with guardrails.",
     instruments: ["Keep/pause/accelerate board", "Dependency heatmap", "Focus memo template"],
     misuseCases: ["Adding projects without explicit trade-offs"],
-    canonLinks: [{ label: "Roadmap canon", href: "/library/canon" }],
+    canonLinks: [{ label: "Roadmap canon", href: "/concepts" }],
   },
   {
     slug: "rollback",
@@ -162,7 +212,7 @@ export const toolkitDefinitions: ToolkitDefinition[] = [
     byPosture: "In Safety Mode, increase escalation rigor; in Risk-On, increase delegated speed.",
     instruments: ["Decision rights matrix", "Escalation ladder", "Governance cadence checklist"],
     misuseCases: ["Confusing consensus with accountability"],
-    canonLinks: [{ label: "Governance canon", href: "/library/canon" }],
+    canonLinks: [{ label: "Governance canon", href: "/concepts" }],
   },
   {
     slug: "launch-gates",
