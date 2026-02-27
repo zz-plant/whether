@@ -503,9 +503,9 @@ export default async function HomePage({
         <article className="weather-surface space-y-3 p-5" aria-label="Explore additional guidance routes">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-200">Explore next</p>
           <div className="flex flex-wrap gap-2 text-xs font-semibold tracking-[0.08em]">
-            <Link href="/solutions" className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2">Solutions library</Link>
-            <Link href="/concepts" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2">Concepts glossary</Link>
-            <Link href="/guides" className="weather-pill-muted inline-flex min-h-[44px] items-center px-3 py-2">Team guides</Link>
+            <Link href="/plan" className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2">Plan workflows</Link>
+            <Link href="/learn" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2">Learn references</Link>
+            <Link href="/method" className="weather-pill-muted inline-flex min-h-[44px] items-center px-3 py-2">Method details</Link>
           </div>
         </article>
 

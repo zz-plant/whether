@@ -32,6 +32,7 @@ Use this index to find the **current** source of truth quickly.
 - `concepts-enhancements.md` — enhancement opportunities for `/concepts` experiences.
 - `solutions-enhancements.md` — enhancement opportunities for `/solutions` and career-path flows.
 - `design-improvements-priority.md` — prioritized design/UX improvement backlog.
+- `information-architecture-proposal.md` — proposed IA consolidation and route taxonomy updates.
 - `implementation-status.md` — consolidated implementation checklist across roadmap, summary follow-ups, and modernization work.
 
 ## Agent docs

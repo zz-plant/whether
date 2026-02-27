@@ -2,28 +2,28 @@ import type { ReportPageLink } from "../../app/components/reportShellNavigation"
 
 export const reportPageLinks: ReportPageLink[] = [
   {
-    href: "/start",
-    label: "Start Here",
-    description: "Posture-first onboarding and situation routing.",
+    href: "/",
+    label: "Command Center",
+    description: "Weekly posture and immediate decision call.",
   },
   {
-    href: "/use-cases",
-    label: "Use Cases",
-    description: "Curated role and situation entry points into operational guidance.",
+    href: "/decide",
+    label: "Decide",
+    description: "Assess live signals, posture confidence, and near-term action choices.",
   },
   {
-    href: "/toolkits",
-    label: "Toolkits",
-    description: "Runnable instruments and templates by decision surface.",
+    href: "/plan",
+    label: "Plan",
+    description: "Convert the current posture into execution plans and role-based workflows.",
   },
   {
-    href: "/library",
-    label: "Library",
-    description: "Failure modes diagnostics and canon depth.",
+    href: "/learn",
+    label: "Learn",
+    description: "Reference toolkits, concepts, and diagnostics that support execution.",
   },
   {
-    href: "/about",
-    label: "About",
-    description: "Method, trust context, and contact surfaces.",
+    href: "/method",
+    label: "Method",
+    description: "Inspect methodology, formulas, sources, and trust framing.",
   },
 ];
