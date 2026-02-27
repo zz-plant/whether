@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { Metadata } from "next";
+import type { Metadata, Route } from "next";
 import { buildPageMetadata } from "../../lib/seo";
 import {
   postureDefinitions,
@@ -45,7 +45,7 @@ export default function StartHerePage() {
           {startSituations.map((situation) => (
             <Link
               key={situation}
-              href={startSituationRoutes[situation]}
+              href={startSituationRoutes[situation] as Route}
               className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100"
             >
               {situation}
