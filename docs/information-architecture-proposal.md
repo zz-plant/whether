@@ -1,109 +1,92 @@
-# Information architecture (IA) change proposal
+# Information architecture (IA) proposal (v2)
 
-This proposal updates Whether IA with implementation-ready changes tied to current navigation, route inventory, and user jobs.
+This proposal recommends a unified IA that keeps the current top-level labels but clarifies ownership boundaries, route intent, and migration rules for legacy surfaces.
 
-## Current-state snapshot (source of truth)
+## Goals
 
-### Current main nav (implemented in `reportPageLinks`)
-- `Command Center` → `/`
-- `Decide` → `/decide`
-- `Plan` → `/plan`
-- `Learn` → `/learn`
-- `Method` → `/method`
+1. Reduce route ambiguity between decision workflows and reference content.
+2. Make user journeys predictable: **understand → decide → plan → learn → trust-check**.
+3. Keep SEO continuity while consolidating legacy hubs.
 
-### IA unification notes (implemented)
-- Legacy `guides` entry now routes to `Learn` (`/learn`).
-- Legacy `solutions` entry now routes to `Plan` (`/plan`).
-- Legacy `brief` routes now point to the unified intake or planning surfaces (`/start`, `/plan`).
+## Proposed primary IA (canonical)
 
-## IA problems to solve
+- **Command Center** (`/`) — current climate summary + immediate call.
+- **Decide** (`/decide`) — evidence, posture confidence, and short-horizon choices.
+- **Plan** (`/plan`) — execution workflows, role/situation pathways, and operating plans.
+- **Learn** (`/learn`) — reusable concepts, diagnostics, and practical references.
+- **Method** (`/method`, canonical alias to `/methodology`) — formulas, provenance, and trust framing.
 
-1. **Documentation and workflow are split across too many labels**
-   - "Toolkits", "Library", "Concepts", "Guides", and "Methodology" are all learning/reference surfaces but are fragmented.
+## Ownership model (what belongs where)
 
-2. **Main nav does not mirror the primary user journey**
-   - Typical flow is: understand climate → decide action → plan execution → learn details.
-   - Existing nav mixes onboarding labels (`Start Here`) with content containers (`Library`) and omits decision hubs (`signals`, `operations`).
+### Decide owns
+- Signal interpretation (`/signals`)
+- Posture context (`/posture/*`)
+- Decision-specific operations diagnostics (`/operations` decision lanes)
 
-3. **Critical trust docs are discoverable but not structured**
-   - `About` mixes product narrative, trust context, and contact.
-   - `Methodology` is separate and not consistently adjacent to other trust cues.
+### Plan owns
+- Role and situation workflow entry points (`/use-cases/*`)
+- Solution execution pathways (`/solutions/*`)
+- Plan-oriented briefs and sequencing patterns
 
-## Proposed top-level IA
+### Learn owns
+- Toolkit references (`/toolkits/*`)
+- Canon/failure-mode learning assets (`/library/*`)
+- Conceptual guidance (`/concepts/*`) and non-planning guides
 
-Adopt five persistent destinations:
+### Method owns
+- Data + formula transparency (`/methodology`)
+- Confidence/provenance interpretation
 
-1. **Command Center** (`/`)
-   - Current weekly posture and immediate action.
+## Legacy route policy (proposed)
 
-2. **Decide** (`/decide`)
-   - Consolidates `/signals`, `/posture`, and decision-focused `/operations` views.
+Keep deep legacy routes available for continuity, but unify **top-level entry points**:
 
-3. **Plan** (`/plan`)
-   - Consolidates `/solutions/*`, `/use-cases/*`, and planning-specific guides.
-
-4. **Learn** (`/learn`)
-   - Consolidates `/toolkits`, `/library/*`, `/concepts/*`, and reference guides.
-
-5. **Method** (`/method` aliasing `/methodology`)
-   - Source logic, formulas, confidence framing, and provenance.
-
-## Proposed main nav changes (concrete)
-
-### Replace current nav with
-- `Command Center` (`/`)
-- `Decide` (`/decide`)
-- `Plan` (`/plan`)
-- `Learn` (`/learn`)
-- `Method` (`/method`)
-
-### What moves where
-| Existing route | New canonical home | Rationale |
+| Legacy entry | Canonical destination | Policy |
 | --- | --- | --- |
-| `/start`, `/onboarding`, `/brief` | `/start` (single intake funnel) | One entry path avoids duplicated onboarding intent |
-| `/signals`, `/posture`, `/operations` (decision panels) | `/decide/*` | Decision-making surfaces grouped together |
-| `/solutions/*`, `/use-cases/*`, planning guides | `/plan/*` | Workflow outputs grouped under execution planning |
-| `/toolkits`, `/library/*`, `/concepts/*`, non-planning guides | `/learn/*` | Documentation + reusable knowledge unified |
-| `/methodology`, trust internals from `/about` | `/method/*` | Consistent trust and model-transparency surface |
+| `/guides` | `/learn` | 301 redirect |
+| `/solutions` | `/plan` | 301 redirect |
+| `/brief` | `/start` | 301 redirect |
+| `/brief/stage` | `/plan` | 301 redirect |
+| `/onboarding` | `/start` | 301 redirect |
 
-## Documentation placement changes
+## Navigation contract
 
-1. Move high-level "How it works" content from `/about` into `/method/overview`.
-2. Keep company/contact/subscription info in `/about` only.
-3. Add clear cross-links:
-   - `/learn/*` pages link to `/method` for source/provenance.
-   - `/decide/*` and `/plan/*` pages link to the exact supporting `/learn/*` assets.
+1. Main nav must always expose: `Command Center`, `Decide`, `Plan`, `Learn`, `Method`.
+2. Any page linked from hero or home “Explore next” modules should use canonical IA routes, not legacy hubs.
+3. Cross-links should follow this loop:
+   - Decide pages link forward to Plan and supporting Learn pages.
+   - Plan pages link back to Decide evidence and out to Learn assets.
+   - Learn pages link to Method for provenance.
 
-## URL + SEO transition plan
+## Content boundary decisions
 
-1. Add aliases first (`/decide`, `/plan`, `/learn`, `/method`) with existing pages rendered behind wrappers.
-2. Keep legacy URLs active with canonical tags pointing to new route families once parity is complete.
-3. Add permanent redirects only after analytics show stable adoption.
-4. Update `app/sitemap.ts` in phases so new families gain priority gradually.
+- Keep `/about` as company/contact/subscription only.
+- Keep explanatory model/trust content under Method surfaces.
+- Avoid duplicating “how it works” content across About + Method.
 
-## Rollout phases
+## Rollout plan
 
-### Phase 1 — Label alignment (low risk)
-- Update nav labels and command palette taxonomy.
-- Keep current routes, add aliases and cross-links.
+### Phase 1 — IA consistency hardening
+- Normalize nav labels and cross-links to canonical IA routes.
+- Keep existing deep content routes intact.
 
-### Phase 2 — Route family introduction (medium risk)
-- Launch `/decide`, `/plan`, `/learn`, `/method` with reused modules.
-- Backfill breadcrumb and "next step" links across pages.
+### Phase 2 — Canonical signals
+- Add canonical tags from legacy hubs to IA canonical routes.
+- Ensure sitemap priority favors `/decide`, `/plan`, `/learn`, `/method` families.
 
-### Phase 3 — Canonicalization (higher risk)
-- Set canonical URLs and begin redirecting duplicated legacy entry points.
-- Trim duplicated hubs once traffic and engagement are stable.
+### Phase 3 — Migration quality gates
+- Require no critical funnel regressions before expanding redirects.
+- Track path adoption (legacy vs canonical) and decide if additional alias cleanup is needed.
 
 ## Success metrics
 
-- Lower bounce and faster first action from Command Center.
-- Increased Decide → Plan pathway completion.
-- Fewer backtracks between docs/reference and action pages.
-- Higher methodology open rate from decision pages (trust validation behavior).
+- Higher completion of `Decide → Plan` path.
+- Lower backtracking between workflow pages and reference pages.
+- Higher Method page opens from decision/planning contexts.
+- Reduced traffic share on legacy top-level hubs.
 
 ## Open decisions
 
-1. Keep `Method` as top-level permanently or demote to utility nav after familiarity grows?
-2. Should `Learn` launch with role-based landing slices (PM/Eng/Exec) or remain unified first?
-3. Which legacy route family should be canonicalized last to preserve SEO equity?
+1. Should `/start` remain separate from Plan, or become a Plan subsection once onboarding intent stabilizes?
+2. Should Learn split by persona (PM/Eng/Exec) at top level, or stay single-hub with filters?
+3. What adoption threshold should trigger stricter redirect/canonical enforcement?
