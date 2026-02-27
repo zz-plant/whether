@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { Collapsible } from "@base-ui/react/collapsible";
 import { NavigationMenu } from "@base-ui/react/navigation-menu";
 import { handleDirectionalFocus } from "./directionalFocus";
+import { pathMatchesLink } from "../../lib/navigation/pathMatching";
 
 export type ReportPageLink = {
   href: string;
@@ -15,19 +16,6 @@ export type ReportPageLink = {
 export type ReportSectionLink = {
   href: string;
   label: string;
-};
-
-const pathMatchesLink = (linkHref: string, currentPath: string) => {
-  if (linkHref === "/") {
-    return currentPath === "/";
-  }
-
-  if (currentPath === linkHref || currentPath.startsWith(`${linkHref}/`)) {
-    return true;
-  }
-
-  const aliases = legacyPathAliases[linkHref] ?? [];
-  return aliases.some((alias) => currentPath === alias || currentPath.startsWith(`${alias}/`));
 };
 
 const getPageNavigationState = (
@@ -44,12 +32,6 @@ const getPageNavigationState = (
   const adjacentLinks = pageLinks.filter((link) => link.href !== currentLink.href).slice(0, 2);
 
   return { currentLink, adjacentLinks };
-};
-
-const legacyPathAliases: Record<string, string[]> = {
-  "/decide": ["/use-cases"],
-  "/learn": ["/library"],
-  "/method": ["/about", "/methodology"],
 };
 
 const isLinkActiveForPath = (linkHref: string, currentPath?: string) => {
