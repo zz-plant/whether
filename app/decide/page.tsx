@@ -32,6 +32,10 @@ export default function DecidePage() {
           <p className="text-sm text-slate-300">Review posture-specific guidance and trade-off framing.</p>
         </Link>
       </section>
+      <section className="weather-panel flex flex-wrap items-center justify-between gap-3 px-6 py-4 text-sm">
+        <p className="text-slate-300">Next step: turn your decision read into execution sequencing.</p>
+        <Link href="/plan" className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2">Go to Plan</Link>
+      </section>
     </main>
   );
 }

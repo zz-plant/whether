@@ -32,6 +32,13 @@ export default function PlanPage() {
           <p className="text-sm text-slate-300">Templates and checklists to operationalize decisions.</p>
         </Link>
       </section>
+      <section className="weather-panel flex flex-wrap items-center justify-between gap-3 px-6 py-4 text-sm">
+        <p className="text-slate-300">Need supporting rationale for your plan?</p>
+        <div className="flex gap-2">
+          <Link href="/decide" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2">Back to Decide</Link>
+          <Link href="/learn" className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2">Open Learn</Link>
+        </div>
+      </section>
     </main>
   );
 }
