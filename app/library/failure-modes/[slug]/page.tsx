@@ -3,12 +3,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../../lib/seo";
 import { failureModes } from "../../../../lib/informationArchitecture";
-export const runtime = 'edge';
-
-
 type Params = { slug: string };
 
 const titleCase = (value: string) => value.split("-").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(" ");
+
+export function generateStaticParams() {
+  return failureModes.map((slug) => ({ slug }));
+}
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug } = await params;

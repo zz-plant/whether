@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../lib/seo";
 import { postureDefinitions } from "../../../lib/informationArchitecture";
-export const runtime = 'edge';
-
-
 type Params = { slug: string };
+
+export function generateStaticParams() {
+  return postureDefinitions.map((entry) => ({ slug: entry.slug }));
+}
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug } = await params;
