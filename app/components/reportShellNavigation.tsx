@@ -40,13 +40,10 @@ const getPageNavigationState = (
     : -1;
   const currentIndexByLabel = pageLinks.findIndex((link) => link.label === pageTitle);
   const currentIndex = currentIndexByPath >= 0 ? currentIndexByPath : currentIndexByLabel;
-  const currentPosition = currentIndex >= 0 ? currentIndex + 1 : 1;
   const currentLink = currentIndex >= 0 ? pageLinks[currentIndex] : pageLinks[0];
-  const prevLink = currentIndex > 0 ? pageLinks[currentIndex - 1] : null;
-  const nextLink =
-    currentIndex >= 0 && currentIndex < pageLinks.length - 1 ? pageLinks[currentIndex + 1] : null;
+  const adjacentLinks = pageLinks.filter((link) => link.href !== currentLink.href).slice(0, 2);
 
-  return { currentIndex, currentPosition, currentLink, prevLink, nextLink };
+  return { currentLink, adjacentLinks };
 };
 
 const legacyPathAliases: Record<string, string[]> = {
@@ -298,7 +295,7 @@ export const ReportMobileNavigation = ({
   currentPath?: string;
   className?: string;
 }) => {
-  const { currentLink, currentPosition, prevLink, nextLink } = getPageNavigationState(
+  const { currentLink, adjacentLinks } = getPageNavigationState(
     pageLinks,
     pageTitle,
     currentPath,
@@ -336,47 +333,25 @@ export const ReportMobileNavigation = ({
                 {currentLink.label}
               </p>
               <p className="mt-1 truncate text-xs text-slate-300">
-                {currentPosition}/{pageLinks.length} · {currentLink.description}
+                {currentLink.description}
               </p>
             </div>
           </div>
 
-          <NavigationMenu.List aria-label="Page traversal" className="grid grid-cols-2 gap-2">
-            <NavigationMenu.Item>
-              {prevLink ? (
-                <NavigationMenu.Link
-                  href={prevLink.href}
-                  className="weather-pill inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-slate-800/80 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                >
-                  ← {prevLink.label}
-                </NavigationMenu.Link>
-              ) : (
-                <span
-                  aria-hidden="true"
-                  className="weather-pill inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-slate-900/70 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-500"
-                >
-                  Start of report
-                </span>
-              )}
-            </NavigationMenu.Item>
-            <NavigationMenu.Item>
-              {nextLink ? (
-                <NavigationMenu.Link
-                  href={nextLink.href}
-                  className="weather-pill inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-slate-800/80 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                >
-                  {nextLink.label} →
-                </NavigationMenu.Link>
-              ) : (
-                <span
-                  aria-hidden="true"
-                  className="weather-pill inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-slate-900/70 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-500"
-                >
-                  End of report
-                </span>
-              )}
-            </NavigationMenu.Item>
-          </NavigationMenu.List>
+          {adjacentLinks.length > 0 ? (
+            <NavigationMenu.List aria-label="Suggested destinations" className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2">
+              {adjacentLinks.map((link) => (
+                <NavigationMenu.Item key={link.href}>
+                  <NavigationMenu.Link
+                    href={link.href}
+                    className="weather-pill inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-slate-800/80 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                  >
+                    Explore {link.label}
+                  </NavigationMenu.Link>
+                </NavigationMenu.Item>
+              ))}
+            </NavigationMenu.List>
+          ) : null}
 
           <div className="grid grid-cols-1 gap-2">
             <Collapsible.Trigger
@@ -390,10 +365,10 @@ export const ReportMobileNavigation = ({
                     <path d="M8.75 9.25h6.5M8.75 12h6.5M8.75 14.75h4" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="1.5" />
                   </svg>
                 </span>
-                <span className="uppercase">All pages</span>
+                <span className="uppercase">Explore all</span>
               </span>
               <span className="text-xs font-medium tracking-[0.12em] text-slate-300">
-                {pageCountLabel}
+                {pageCountLabel} by intent
               </span>
             </Collapsible.Trigger>
           </div>
@@ -404,7 +379,7 @@ export const ReportMobileNavigation = ({
             <div className="flex items-start justify-between gap-3">
               <div className="space-y-1">
                 <p className="text-base font-semibold text-slate-100">{currentLink.label}</p>
-                <p className="text-xs text-slate-300">Switch pages directly from this list.</p>
+                <p className="text-xs text-slate-300">Jump directly to the area you need right now.</p>
               </div>
               <div className="flex items-center gap-2">
                 <Collapsible.Trigger
