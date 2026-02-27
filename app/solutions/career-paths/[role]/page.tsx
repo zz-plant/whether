@@ -6,8 +6,6 @@ import { roleLandingBySlug, roleLandings } from "../roleLandingData";
 
 const rolePageTitleSuffix = "career growth playbook";
 
-export const dynamicParams = false;
-
 export function generateStaticParams() {
   return roleLandings.map((role) => ({ role: role.slug }));
 }

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../lib/seo";
 import { postureDefinitions } from "../../../lib/informationArchitecture";
-export const runtime = "edge";
+export const runtime = 'edge';
 
 
 type Params = { slug: string };

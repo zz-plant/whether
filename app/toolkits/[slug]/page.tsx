@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../lib/seo";
 import { toolkitDefinitions } from "../../../lib/informationArchitecture";
-export const runtime = "edge";
+export const runtime = 'edge';
 
 
 type Params = { slug: string };

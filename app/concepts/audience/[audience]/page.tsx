@@ -15,8 +15,6 @@ type AudiencePageProps = {
   params: Promise<{ audience: string }>;
 };
 
-export const dynamicParams = false;
-
 const formatPublishedLabel = (year: number, month: number) =>
   new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric", timeZone: "UTC" }).format(
     new Date(Date.UTC(year, month - 1, 1)),

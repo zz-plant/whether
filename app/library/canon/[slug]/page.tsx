@@ -1,5 +1,5 @@
 import { redirectWithParams } from "../../../../lib/navigation/legacyRedirects";
-export const runtime = "edge";
+export const runtime = 'edge';
 
 
 export default async function CanonArticlePage({ params }: { params: Promise<{ slug: string }> }) {
