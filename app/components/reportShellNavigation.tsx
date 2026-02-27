@@ -48,7 +48,6 @@ const getPageNavigationState = (
 
 const legacyPathAliases: Record<string, string[]> = {
   "/decide": ["/use-cases"],
-  "/plan": ["/toolkits"],
   "/learn": ["/library"],
   "/method": ["/about", "/methodology"],
 };

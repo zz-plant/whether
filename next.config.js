@@ -15,16 +15,6 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: '/evidence',
-        destination: '/signals',
-        permanent: false,
-      },
-      {
-        source: '/plan',
-        destination: '/operations',
-        permanent: false,
-      },
-      {
         source: '/operations/briefings',
         destination: '/operations',
         permanent: false,

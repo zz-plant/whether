@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { buildPageMetadata } from "../../lib/seo";
+import { StaticHubNav } from "../components/staticHubNav";
 import { toolkitDefinitions } from "../../lib/informationArchitecture";
 
 export const metadata: Metadata = buildPageMetadata({
@@ -13,9 +14,10 @@ export const metadata: Metadata = buildPageMetadata({
 export default function ToolkitsPage() {
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+      <StaticHubNav currentPath="/toolkits" />
       <section className="weather-panel space-y-3 px-6 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Toolkits</h1>
-        <p className="text-sm text-slate-300">Each toolkit gives you concrete steps, what to avoid, and supporting references so your team can act with confidence.</p>
+        <p className="text-sm text-slate-300">Run one toolkit end-to-end for your current decision. Each toolkit includes step order, misuse warnings, and references so teams can move without ambiguity.</p>
       </section>
       <section className="grid gap-3 sm:grid-cols-2">
         {toolkitDefinitions.map((toolkit) => (
