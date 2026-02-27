@@ -110,12 +110,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  const planToolkitBridgeEntries: SitemapEntryDescriptor[] = toolkitDefinitions.map((toolkit) => ({
-    path: `/plan/${toolkit.slug}`,
-    lastModified: staticContentLastModified,
-    changeFrequency: "monthly",
-    priority: 0.58,
-  }));
 
   const toolkitEntries: SitemapEntryDescriptor[] = toolkitDefinitions.map((toolkit) => ({
     path: `/toolkits/${toolkit.slug}`,
@@ -157,7 +151,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...postureEntries,
     ...decideRoleBridgeEntries,
     ...decideSituationBridgeEntries,
-    ...planToolkitBridgeEntries,
     ...learnFailureModeBridgeEntries,
     ...learnConceptBridgeEntries,
     ...roleUseCaseEntries,
