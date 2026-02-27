@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { buildPageMetadata } from "../../lib/seo";
+import { StaticHubNav } from "../components/staticHubNav";
 import { situationUseCases, useCaseRoles } from "../../lib/informationArchitecture";
 
 export const metadata: Metadata = buildPageMetadata({
@@ -15,9 +16,10 @@ const titleCase = (value: string) => value.split("-").map((part) => part.charAt(
 export default function UseCasesPage() {
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+      <StaticHubNav currentPath="/use-cases" />
       <section className="weather-panel space-y-3 px-6 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Use Cases</h1>
-        <p className="text-sm text-slate-300">Start by role if you want a full decision map, or start by situation if you need a direct path to action.</p>
+        <p className="text-sm text-slate-300">Choose one entrypoint only: role for a complete decision map, or situation for the fastest route to next action.</p>
       </section>
       <section className="weather-panel space-y-3 px-6 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Explore by role</h2>
