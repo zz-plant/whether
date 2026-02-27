@@ -50,7 +50,7 @@ describe("sitemap", () => {
     }
 
     for (const article of productConceptArticles) {
-      assert.ok(urls.has(`${siteUrl}/library/canon/${article.slug}`));
+      assert.ok(urls.has(`${siteUrl}/concepts/${article.slug}`));
     }
   });
 
@@ -67,7 +67,7 @@ describe("sitemap", () => {
 
     const firstConceptArticle = productConceptArticles[0];
     const firstConceptEntry = entries.find(
-      (entry) => entry.url === `${siteUrl}/library/canon/${firstConceptArticle.slug}`,
+      (entry) => entry.url === `${siteUrl}/concepts/${firstConceptArticle.slug}`,
     );
     assert.ok(firstConceptEntry?.lastModified instanceof Date);
     assert.equal(

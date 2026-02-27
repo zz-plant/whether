@@ -64,6 +64,49 @@ const pageLinkIcons: Record<string, ReactNode> = {
       <circle cx="12" cy="12" r="4.25" fill="currentColor" />
     </svg>
   ),
+  Signals: (
+    <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
+      <path
+        d="M4 16.5 8.5 12l3 2.75L16 9l4 3.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="8.5" cy="12" r="1.4" fill="currentColor" />
+      <circle cx="16" cy="9" r="1.4" fill="currentColor" />
+      <path
+        d="M4 19.25h16"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  ),
+  Operations: (
+    <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
+      <rect
+        x="4.75"
+        y="5"
+        width="14.5"
+        height="14"
+        rx="2"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M8 9h8M8 12h5M8 15h6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      <circle cx="16.5" cy="12" r="1.6" fill="currentColor" />
+    </svg>
+  ),
   "Use Cases": (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
       <path
@@ -376,7 +419,7 @@ export const ReportMobileNavigation = ({
                       className={`weather-pill flex min-h-[56px] items-start gap-3 rounded-2xl border px-3 py-3 text-left text-sm font-semibold tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation ${
                         isActive
                           ? "border-sky-400/70 bg-sky-500/15 text-sky-100"
-                          : link.label === "Current Climate"
+                          : link.label === "Start Here"
                             ? "border-slate-600/90 text-slate-100 hover:border-sky-400/70 hover:text-sky-100"
                             : "border-slate-800/80 text-slate-100 hover:border-sky-400/70 hover:text-sky-100"
                       }`}
@@ -388,7 +431,7 @@ export const ReportMobileNavigation = ({
                             : "border-slate-800/80 bg-slate-950/70 text-slate-200"
                         }`}
                       >
-                        {pageLinkIcons[link.label] ?? pageLinkIcons.Method}
+                        {pageLinkIcons[link.label] ?? pageLinkIcons.About}
                       </span>
                       <span className="block text-sm font-semibold text-current">
                         {link.label}
