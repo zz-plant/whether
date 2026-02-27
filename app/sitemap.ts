@@ -65,7 +65,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/decide/use-cases", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.55 },
     { path: "/learn/failure-modes", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.55 },
     { path: "/learn/concepts", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.55 },
-    { path: "/use-cases", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.52 },
     { path: "/toolkits", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.52 },
     { path: "/library", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
     { path: "/library/failure-modes", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.75 },
@@ -95,21 +94,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: "monthly",
     priority: 0.58,
   }));
-
-  const roleUseCaseEntries: SitemapEntryDescriptor[] = useCaseRoles.map((role) => ({
-    path: `/use-cases/${role.slug}`,
-    lastModified: staticContentLastModified,
-    changeFrequency: "monthly",
-    priority: 0.7,
-  }));
-
-  const situationEntries: SitemapEntryDescriptor[] = situationUseCases.map((slug) => ({
-    path: `/use-cases/${slug}`,
-    lastModified: staticContentLastModified,
-    changeFrequency: "monthly",
-    priority: 0.7,
-  }));
-
 
   const toolkitEntries: SitemapEntryDescriptor[] = toolkitDefinitions.map((toolkit) => ({
     path: `/toolkits/${toolkit.slug}`,
@@ -153,8 +137,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...decideSituationBridgeEntries,
     ...learnFailureModeBridgeEntries,
     ...learnConceptBridgeEntries,
-    ...roleUseCaseEntries,
-    ...situationEntries,
     ...toolkitEntries,
     ...failureModeEntries,
     ...canonEntries,
