@@ -64,8 +64,8 @@ bun run build:cloudflare:skip-next-build
 This uses `NEXT_ON_PAGES_SKIP_BUILD=1` and forwards `--skip-build` to `next-on-pages`, reducing redundant work in multi-phase pipelines.
 
 `scripts/build.mjs` also auto-enables this skip behavior when all of the following are true:
-- `CI=1` (or `CI=true`),
-- target is Cloudflare Pages (`build:cloudflare` / `build:pages`), and
-- `.vercel/output/config.json` already exists.
+- target is Cloudflare Pages (`build:cloudflare` / `build:pages`),
+- a restored Vercel/Next-on-Pages output exists (`.vercel/output/config.json` or `_worker.js/index.js`), and
+- the environment indicates CI/deploy context (`CI=1|true|yes`, `CF_PAGES=1|true|yes`, or `CLOUDFLARE_ACCOUNT_ID` is present).
 
 This keeps CI pipelines from rebuilding the same commit twice while still preserving explicit local behavior by default.
