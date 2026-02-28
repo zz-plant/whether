@@ -20,6 +20,8 @@ const formatPublishedLabel = (year: number, month: number) =>
     new Date(Date.UTC(year, month - 1, 1)),
   );
 
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return conceptAudiences.map((audience) => ({ audience: toConceptTaxonomySlug(audience) }));
 }

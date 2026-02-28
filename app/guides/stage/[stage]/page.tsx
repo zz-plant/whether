@@ -9,6 +9,8 @@ type StagePageProps = {
   params: Promise<{ stage: string }>;
 };
 
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return stageGuides.map((guide) => ({ stage: guide.slug }));
 }
