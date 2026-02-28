@@ -2,7 +2,14 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-const isTruthyEnv = (value) => value === "1" || value === "true";
+const isTruthyEnv = (value) => {
+  if (typeof value !== "string") {
+    return false;
+  }
+
+  const normalized = value.trim().toLowerCase();
+  return normalized === "1" || normalized === "true" || normalized === "yes";
+};
 
 const buildMetaPath = join(
   ".vercel",
@@ -45,11 +52,12 @@ const isCloudflareDeploy = Boolean(process.env.CLOUDFLARE_ACCOUNT_ID);
 const isCi = isTruthyEnv(process.env.CI);
 const skipNextOnPagesBuild = isTruthyEnv(process.env.NEXT_ON_PAGES_SKIP_BUILD);
 const hasVercelBuildOutput = existsSync(vercelOutputConfigPath);
+const hasWorkerBuildOutput = existsSync(workerIndexPath);
 const priorBuildMeta = readBuildMeta();
 
 const hasReusableBuildOutput =
   hasVercelBuildOutput &&
-  existsSync(workerIndexPath) &&
+  hasWorkerBuildOutput &&
   Boolean(priorBuildMeta?.useNextOnPages) &&
   Boolean(priorBuildMeta?.commandSucceeded) &&
   Boolean(currentCommitSha) &&
@@ -61,7 +69,11 @@ const useNextOnPages =
   !isVercelRuntime &&
   (forceCloudflareBuild ||
     (!forceNextBuild && (isCloudflarePages || isCloudflareDeploy)));
-const shouldAutoSkipInCi = useNextOnPages && isCi && hasVercelBuildOutput;
+const hasRestoredCloudflareOutput = hasVercelBuildOutput || hasWorkerBuildOutput;
+const shouldAutoSkipInCi =
+  useNextOnPages &&
+  hasRestoredCloudflareOutput &&
+  (isCi || isCloudflarePages || isCloudflareDeploy);
 const shouldSkipNextOnPagesBuild =
   useNextOnPages &&
   (skipNextOnPagesBuild || hasReusableBuildOutput || shouldAutoSkipInCi);
