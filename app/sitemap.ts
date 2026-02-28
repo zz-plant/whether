@@ -102,6 +102,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
+
   const learnFailureModeBridgeEntries: SitemapEntryDescriptor[] = failureModes.map((slug) => ({
     path: `/learn/failure-modes/${slug}`,
     lastModified: staticContentLastModified,
@@ -115,6 +116,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: "monthly",
     priority: 0.65,
   }));
+
 
   const learnConceptBridgeEntries: SitemapEntryDescriptor[] = productConceptArticles.map((article) => ({
     path: `/learn/concepts/${article.slug}` as const,

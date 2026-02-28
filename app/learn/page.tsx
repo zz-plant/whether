@@ -19,11 +19,11 @@ export default function LearnPage() {
         <p className="text-sm text-slate-300">Use Learn when you need to validate reasoning depth: diagnose failure patterns or inspect concepts that shape guidance.</p>
       </section>
       <section className="grid gap-3 sm:grid-cols-2">
-        <Link href="/learn/failure-modes" className="weather-panel space-y-2 px-4 py-4">
+        <Link href="/library/failure-modes" className="weather-panel space-y-2 px-4 py-4">
           <h2 className="text-lg font-semibold text-slate-100">Diagnostics library</h2>
           <p className="text-sm text-slate-300">Diagnose common failure patterns and trace the underlying concepts.</p>
         </Link>
-        <Link href="/learn/concepts" className="weather-panel space-y-2 px-4 py-4">
+        <Link href="/concepts" className="weather-panel space-y-2 px-4 py-4">
           <h2 className="text-lg font-semibold text-slate-100">Concepts</h2>
           <p className="text-sm text-slate-300">Understand the reasoning model used in Whether guidance.</p>
         </Link>

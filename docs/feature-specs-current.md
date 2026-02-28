@@ -44,20 +44,27 @@ Operations overview organizes execution guidance into workstreams and highlights
 summary data.
 
 ### 1.4 Operations workstreams
-- **Plan** (`/operations/plan`): playbook moves (start/stop/fence), finance strategy,
-  insight database prompts, and operator requests.
-- **Decisions** (`/operations/decisions`): decision shield workflow, assumption locking,
-  decision shield templates, and counterfactual simulation controls.
-- **Briefings** (`/operations/briefings`): strategy brief, export brief tooling,
-  executive briefing, and CXO output catalog.
+- **Plan** (`/operations`): playbook moves (start/stop/fence), finance strategy,
+  insight database prompts, export briefs, and operator requests.
+- **Data** (`/operations/data`): API companion guidance for weekly endpoint usage and operator handoff.
+- **Decisions** (`/operations/decisions`): represented in navigation as coming soon (no shipped page yet).
 
-### 1.5 Onboarding (/onboarding)
-Onboarding provides a first-time guide and a plain‑English glossary so new operators can decode
-signals and navigate the report pages.
+### 1.5 Start guide (/start)
+Start provides the first-time posture → situation → toolkit workflow and serves as the canonical
+onboarding route for glossary-level orientation.
 
 ### 1.6 Formula reference (/methodology)
 The formulas page documents the sensor methodology and links directly to public data sources used
 in the report (Treasury API, BLS CPI, BLS labor, FRED credit spreads).
+
+
+### 1.7 Legacy route compatibility
+Legacy route stubs are maintained for migration safety and backlink continuity, including:
+- `/onboarding` → `/start`
+- `/operations/plan` → `/operations`
+- `/use-cases/*` → `/decide/*`
+- `/learn/concepts/*` → `/concepts/*`
+- `/learn/failure-modes/*` → `/library/failure-modes/*`
 
 ## 2) Data sourcing & provenance
 
@@ -170,7 +177,7 @@ $$
 - **P2:** Monthly section expansion toward weekly parity where operator value is clear.
 
 ### 5.3 Briefing exports
-Operations briefings support copy-ready briefs and executive narratives with sensor data and
+Operations export surfaces support copy-ready briefs and executive narratives with sensor data and
 macro context embedded for leadership consumption.
 
 ## 6) APIs (server routes)

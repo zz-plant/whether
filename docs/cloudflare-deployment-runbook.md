@@ -18,9 +18,6 @@ The warning classes below are currently expected in this project and are tracked
 - `Build not running on Vercel. System environment variables will not be available.`
 - `Using edge runtime on a page currently disables static generation for that page`
 - `Invalid prerender config for /concepts/[slug]`
-- `Invalid prerender config for /guides/[stakeholder]`
-- `Invalid prerender config for /guides/stage/[stage]`
-- `Invalid prerender config for /solutions/career-paths/[role]`
 - `Duplicate key "options" in object literal [duplicate-object-key]`
 
 If CI reports a new warning class, treat it as action-required until triaged and either:
