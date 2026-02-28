@@ -32,3 +32,16 @@ Avoid maintaining long-lived duplicate bridge pages in the application tree.
 - Update sitemap priorities to reflect canonical IA anchors only.
 - Keep legacy entrypoints discoverable via redirects temporarily, then retire after link/traffic decay.
 - Ensure report shell navigation highlights canonical labels even when users arrive from old URLs.
+
+
+## Deprecation window policy
+- Keep redirect stubs for legacy paths for at least one migration window before removal.
+- Track legacy route hits at the edge/app layer and retire only when usage is materially decayed.
+- Prioritize stability for bookmarked and shared links over aggressive route deletion.
+
+Current compatibility stubs should include:
+- `/onboarding` → `/start`
+- `/operations/plan` → `/operations`
+- `/use-cases/*` → `/decide/*`
+- `/learn/concepts/*` → `/concepts/*`
+- `/learn/failure-modes/*` → `/library/failure-modes/*`

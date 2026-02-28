@@ -21,18 +21,18 @@ describe("time machine selection helpers", () => {
 
   it("appends month/year params to handoff links", () => {
     assert.equal(
-      buildTimeMachineHref("/operations", { month: 3, year: 2023 }),
-      "/operations?month=3&year=2023"
+      buildTimeMachineHref("/operations/plan", { month: 3, year: 2023 }),
+      "/operations/plan?month=3&year=2023"
     );
   });
 
   it("preserves existing query/hash while overriding month/year", () => {
     assert.equal(
       buildTimeMachineHref(
-        "/operations?tab=checklist&month=1&year=2020#ops-playbook",
+        "/operations/plan?tab=checklist&month=1&year=2020#ops-playbook",
         { month: 7, year: 2025 }
       ),
-      "/operations?tab=checklist&month=7&year=2025#ops-playbook"
+      "/operations/plan?tab=checklist&month=7&year=2025#ops-playbook"
     );
   });
 });

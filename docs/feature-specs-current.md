@@ -57,6 +57,15 @@ onboarding route for glossary-level orientation.
 The formulas page documents the sensor methodology and links directly to public data sources used
 in the report (Treasury API, BLS CPI, BLS labor, FRED credit spreads).
 
+
+### 1.7 Legacy route compatibility
+Legacy route stubs are maintained for migration safety and backlink continuity, including:
+- `/onboarding` → `/start`
+- `/operations/plan` → `/operations`
+- `/use-cases/*` → `/decide/*`
+- `/learn/concepts/*` → `/concepts/*`
+- `/learn/failure-modes/*` → `/library/failure-modes/*`
+
 ## 2) Data sourcing & provenance
 
 ### 2.1 Treasury yields (live + fallback)

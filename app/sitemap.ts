@@ -63,6 +63,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/method", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.62 },
     { path: "/methodology", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.56 },
     { path: "/decide/use-cases", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.55 },
+    { path: "/learn/failure-modes", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.55 },
+    { path: "/learn/concepts", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.55 },
     { path: "/toolkits", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.52 },
     { path: "/library", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
     { path: "/library/failure-modes", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.75 },
@@ -100,11 +102,27 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
+
+  const learnFailureModeBridgeEntries: SitemapEntryDescriptor[] = failureModes.map((slug) => ({
+    path: `/learn/failure-modes/${slug}`,
+    lastModified: staticContentLastModified,
+    changeFrequency: "monthly",
+    priority: 0.58,
+  }));
+
   const failureModeEntries: SitemapEntryDescriptor[] = failureModes.map((slug) => ({
     path: `/library/failure-modes/${slug}`,
     lastModified: staticContentLastModified,
     changeFrequency: "monthly",
     priority: 0.65,
+  }));
+
+
+  const learnConceptBridgeEntries: SitemapEntryDescriptor[] = productConceptArticles.map((article) => ({
+    path: `/learn/concepts/${article.slug}` as const,
+    lastModified: buildPublishedMonthDate(article.publishedYear, article.publishedMonth),
+    changeFrequency: "monthly",
+    priority: 0.58,
   }));
 
   const canonEntries: SitemapEntryDescriptor[] = productConceptArticles.map((article) => ({
@@ -119,6 +137,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...postureEntries,
     ...decideRoleBridgeEntries,
     ...decideSituationBridgeEntries,
+    ...learnFailureModeBridgeEntries,
+    ...learnConceptBridgeEntries,
     ...toolkitEntries,
     ...failureModeEntries,
     ...canonEntries,

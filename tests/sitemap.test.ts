@@ -26,6 +26,8 @@ describe("sitemap", () => {
     assert.ok(urls.has(`${siteUrl}/start`));
     assert.ok(urls.has(`${siteUrl}/posture`));
     assert.ok(urls.has(`${siteUrl}/decide/use-cases`));
+    assert.ok(urls.has(`${siteUrl}/learn/failure-modes`));
+    assert.ok(urls.has(`${siteUrl}/learn/concepts`));
     assert.ok(urls.has(`${siteUrl}/toolkits`));
     assert.ok(urls.has(`${siteUrl}/library`));
 
@@ -47,10 +49,12 @@ describe("sitemap", () => {
     }
 
     for (const mode of failureModes) {
+      assert.ok(urls.has(`${siteUrl}/learn/failure-modes/${mode}`));
       assert.ok(urls.has(`${siteUrl}/library/failure-modes/${mode}`));
     }
 
     for (const article of productConceptArticles) {
+      assert.ok(urls.has(`${siteUrl}/learn/concepts/${article.slug}`));
       assert.ok(urls.has(`${siteUrl}/concepts/${article.slug}`));
     }
   });
