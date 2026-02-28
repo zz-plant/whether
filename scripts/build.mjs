@@ -42,6 +42,7 @@ const buildTarget = process.env.BUILD_TARGET;
 const isVercelRuntime = isTruthyEnv(process.env.VERCEL);
 const isCloudflarePages = isTruthyEnv(process.env.CF_PAGES);
 const isCloudflareDeploy = Boolean(process.env.CLOUDFLARE_ACCOUNT_ID);
+const isCi = isTruthyEnv(process.env.CI);
 const skipNextOnPagesBuild = isTruthyEnv(process.env.NEXT_ON_PAGES_SKIP_BUILD);
 const hasVercelBuildOutput = existsSync(vercelOutputConfigPath);
 const priorBuildMeta = readBuildMeta();
@@ -60,8 +61,10 @@ const useNextOnPages =
   !isVercelRuntime &&
   (forceCloudflareBuild ||
     (!forceNextBuild && (isCloudflarePages || isCloudflareDeploy)));
+const shouldAutoSkipInCi = useNextOnPages && isCi && hasVercelBuildOutput;
 const shouldSkipNextOnPagesBuild =
-  useNextOnPages && (skipNextOnPagesBuild || hasReusableBuildOutput);
+  useNextOnPages &&
+  (skipNextOnPagesBuild || hasReusableBuildOutput || shouldAutoSkipInCi);
 
 const command = useNextOnPages ? "next-on-pages" : "next";
 const args = useNextOnPages
@@ -100,7 +103,9 @@ if (useNextOnPages) {
         skipBuildReason: shouldSkipNextOnPagesBuild
           ? skipNextOnPagesBuild
             ? "NEXT_ON_PAGES_SKIP_BUILD"
-            : "cache-hit-same-commit"
+            : hasReusableBuildOutput
+              ? "cache-hit-same-commit"
+              : "ci-prebuilt-vercel-output"
           : null,
         commitSha: currentCommitSha,
         command,
