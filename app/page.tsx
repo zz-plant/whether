@@ -29,9 +29,9 @@ export const runtime = "edge";
 export const revalidate = 900;
 
 const homeSectionSequence = [
-  { href: "#weekly-action-summary", label: "Read first: Weekly actions" },
-  { href: "#signal-matrix", label: "Then calibrate: Risk posture" },
-  { href: "#executive-snapshot", label: "Then decide: Operating constraints" },
+  { href: "#weekly-action-summary", label: "Weekly actions" },
+  { href: "#signal-matrix", label: "Risk posture" },
+  { href: "#executive-snapshot", label: "Operating constraints" },
 ] as const;
 
 const regimeLabelMap = {
@@ -402,23 +402,6 @@ export default async function HomePage({
           <h1 id="decision-card-title" className="text-4xl font-semibold text-slate-100 sm:text-[2.8rem]">
             How should your company operate right now?
           </h1>
-          <p className="mx-auto max-w-3xl text-base text-slate-300">
-            Live market and capital conditions translated into a clear operating posture for the next cycle.
-          </p>
-          <ul className="mx-auto max-w-3xl space-y-2 text-left text-sm text-slate-200" aria-label="What you get in this briefing">
-            <li className="flex items-start gap-2">
-              <span aria-hidden="true" className="mt-1 h-1.5 w-1.5 rounded-full bg-sky-300" />
-              <span>One clear call on operating posture for this week.</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span aria-hidden="true" className="mt-1 h-1.5 w-1.5 rounded-full bg-sky-300" />
-              <span>Prioritized actions to start and avoid based on live signals.</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span aria-hidden="true" className="mt-1 h-1.5 w-1.5 rounded-full bg-sky-300" />
-              <span>Transparent method and data recency for confidence checks.</span>
-            </li>
-          </ul>
           <div className="flex flex-wrap items-center justify-center gap-3">
             <a
               href="#weekly-action-summary"
@@ -486,18 +469,6 @@ export default async function HomePage({
             <li>• Will shift if Risk Appetite falls below {riskThreshold} and remains there through the next update.</li>
             <li>• Curve slope turns negative and stays inverted through the next cycle.</li>
           </ul>
-        </article>
-
-        <article className="weather-surface space-y-4 p-5" aria-label="Recommended weekly reading sequence">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-100">Start with this sequence</p>
-          <ol className="space-y-2 text-sm text-slate-200">
-            <li>1. Read first: Weekly actions to anchor near-term priorities.</li>
-            <li>2. Then decide: Leadership summary to confirm operating posture.</li>
-            <li>3. Reference: Signal breakdown for threshold and evidence checks.</li>
-          </ol>
-          <p className="text-xs text-slate-300">
-            Complete this sequence before opening deeper planning workflows.
-          </p>
         </article>
 
         <article className="weather-surface space-y-3 p-5" aria-label="Explore additional guidance routes">
