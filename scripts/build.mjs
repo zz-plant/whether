@@ -9,6 +9,8 @@ const isVercelRuntime = isTruthyEnv(process.env.VERCEL);
 const isCloudflarePages = isTruthyEnv(process.env.CF_PAGES);
 const isCloudflareDeploy = Boolean(process.env.CLOUDFLARE_ACCOUNT_ID);
 const skipNextOnPagesBuild = isTruthyEnv(process.env.NEXT_ON_PAGES_SKIP_BUILD);
+const canAutoSkipNestedBuild = isTruthyEnv(process.env.CI);
+const hasVercelBuildOutput = existsSync(join(".vercel", "output", "config.json"));
 const forceCloudflareBuild =
   buildTarget === "cloudflare" || buildTarget === "pages";
 const forceNextBuild = buildTarget === "next";
@@ -16,10 +18,12 @@ const useNextOnPages =
   !isVercelRuntime &&
   (forceCloudflareBuild ||
     (!forceNextBuild && (isCloudflarePages || isCloudflareDeploy)));
+const shouldSkipNextOnPagesBuild =
+  useNextOnPages && (skipNextOnPagesBuild || (canAutoSkipNestedBuild && hasVercelBuildOutput));
 
 const command = useNextOnPages ? "next-on-pages" : "next";
 const args = useNextOnPages
-  ? skipNextOnPagesBuild
+  ? shouldSkipNextOnPagesBuild
     ? ["--skip-build"]
     : []
   : ["build", "--webpack"];
@@ -70,7 +74,12 @@ if (useNextOnPages) {
       {
         buildTarget: buildTarget ?? null,
         useNextOnPages,
-        skipNextOnPagesBuild,
+        skipNextOnPagesBuild: shouldSkipNextOnPagesBuild,
+        skipBuildReason: shouldSkipNextOnPagesBuild
+          ? skipNextOnPagesBuild
+            ? "NEXT_ON_PAGES_SKIP_BUILD"
+            : "auto-skip-existing-vercel-output"
+          : null,
         commitSha,
         command,
         args,
