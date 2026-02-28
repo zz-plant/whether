@@ -8,6 +8,7 @@ import {
   computeRiskAppetiteScore,
   computeTightnessScore,
   DEFAULT_THRESHOLDS,
+  deriveRegimeTrend,
   evaluateRegime,
 } from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
@@ -75,6 +76,9 @@ describe("regime assessment", () => {
     assert.equal(baseRateInput?.recordDate, treasury.record_date);
     assert.equal(baseRateInput?.fetchedAt, treasury.fetched_at);
     assert.equal(baseRateInput?.sourceUrl, treasury.source);
+    assert.equal(assessment.diagnostics.confidence, "MEDIUM");
+    assert.equal(assessment.diagnostics.intensity, "STANDARD");
+    assert.equal(assessment.diagnostics.transitionWatch, false);
   });
 
   it("flags missing inputs with warnings", () => {
@@ -95,5 +99,35 @@ describe("regime assessment", () => {
     assert.ok(assessment.dataWarnings.some((warning) => warning.includes("Base rate missing")));
     assert.ok(assessment.dataWarnings.some((warning) => warning.includes("Curve slope missing")));
     assert.equal(assessment.scores.riskAppetite, 0);
+  });
+});
+
+
+describe("regime trend", () => {
+  it("derives improving trend when tightness eases across the threshold", () => {
+    const previous = evaluateRegime({
+      source: "US Treasury",
+      record_date: "2024-10-01",
+      fetched_at: "2024-10-02T00:00:00Z",
+      isLive: true,
+      yields: {
+        oneMonth: 5.8,
+        twoYear: 5.1,
+        tenYear: 4.0,
+      },
+    });
+    const current = evaluateRegime({
+      source: "US Treasury",
+      record_date: "2024-11-01",
+      fetched_at: "2024-11-02T00:00:00Z",
+      isLive: true,
+      yields: {
+        oneMonth: 4.2,
+        twoYear: 4.0,
+        tenYear: 4.4,
+      },
+    });
+
+    assert.equal(deriveRegimeTrend(previous, current), "IMPROVING");
   });
 });

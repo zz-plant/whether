@@ -21,6 +21,17 @@ const assessment = (
   riskAppetiteExplanation: "",
   tightnessExplanation: "",
   thresholds: DEFAULT_THRESHOLDS,
+  diagnostics: {
+    tightnessDelta: tightness - DEFAULT_THRESHOLDS.tightnessRegime,
+    riskAppetiteDelta: riskAppetite - DEFAULT_THRESHOLDS.riskAppetiteRegime,
+    nearestThresholdDelta: Math.min(
+      Math.abs(tightness - DEFAULT_THRESHOLDS.tightnessRegime),
+      Math.abs(riskAppetite - DEFAULT_THRESHOLDS.riskAppetiteRegime)
+    ),
+    confidence: "MEDIUM",
+    transitionWatch: false,
+    intensity: "STANDARD",
+  },
   scores: {
     baseRate: 5,
     baseRateUsed: "1M",
