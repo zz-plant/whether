@@ -92,7 +92,7 @@ export default async function OperationsPage({
     : isFallback
       ? (treasury.fallback_reason ??
         "Live refresh pending. Using last verified snapshot.")
-      : "Live refresh healthy. Next expected update: 48h.";
+      : "Live refresh healthy. Next expected update: 15m.";
   const trustStatusAction = historicalSelection
     ? "Use historical data for retrospectives; avoid approving new bets until live signals return."
     : isFallback

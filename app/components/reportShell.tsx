@@ -170,7 +170,7 @@ export const ReportShell = ({
           </div>
           <div className="flex items-center justify-between gap-3">
             <dt className="text-slate-400">Next expected update</dt>
-            <dd className="text-slate-200">48h cadence</dd>
+            <dd className="text-slate-200">15m cadence</dd>
           </div>
           <div className="flex items-center justify-between gap-3">
             <dt className="text-slate-400">Source</dt>
