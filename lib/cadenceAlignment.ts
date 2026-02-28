@@ -33,6 +33,8 @@ const CONSTRAINT_THEMES: ConstraintTheme[] = [
   { label: "Sales efficiency", pattern: /sales|conversion/i },
 ];
 
+const MAX_FALLBACK_THEMES = 2;
+
 const buildThemeList = (constraints: string[]) => {
   const themes = new Set<string>();
 
@@ -48,7 +50,9 @@ const buildThemeList = (constraints: string[]) => {
     return Array.from(themes);
   }
 
-  return constraints.slice(0, 2).map((constraint) => constraint.replace(/[.\s]+$/, ""));
+  return constraints
+    .slice(0, MAX_FALLBACK_THEMES)
+    .map((constraint) => constraint.replace(/[.\s]+$/, ""));
 };
 
 const formatThemeList = (themes: string[]) => {
