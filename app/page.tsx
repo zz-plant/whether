@@ -451,32 +451,36 @@ export default async function HomePage({
           </p>
         </div>
 
-        <article className="weather-surface space-y-4 p-5" aria-label="Proof and recency snapshot">
-          <h2 className="text-sm font-semibold tracking-[0.08em] text-slate-100">Evidence snapshot</h2>
-          <ul className="space-y-2 text-sm text-slate-200">
-            <li>• Data source: {treasury.source}.</li>
-            <li>• Signals stamped: {recordDateLabel}.</li>
-            <li>• Last pipeline refresh: {fetchedAtLabel}.</li>
-          </ul>
-        </article>
+        <article className="weather-surface space-y-6 p-5" aria-label="Current climate summary and evidence">
+          <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+            <div className="space-y-4">
+              <p className="text-sm text-slate-200">{assessment.description}</p>
+              <p className="text-sm text-slate-300">{trustStatusAction}</p>
+              <p className="text-sm font-semibold tracking-[0.08em] text-slate-200">What would change this posture</p>
+              <ul className="space-y-2 text-sm text-slate-200">
+                <li>• Will shift if Capital Tightness rises above {tightnessThreshold} for two consecutive reads.</li>
+                <li>• Will shift if Risk Appetite falls below {riskThreshold} and remains there through the next update.</li>
+                <li>• Curve slope turns negative and stays inverted through the next cycle.</li>
+              </ul>
+            </div>
 
-        <article className="weather-surface space-y-4 p-5" aria-label="Current climate summary and flip criteria">
-          <p className="text-sm text-slate-200">{assessment.description}</p>
-          <p className="text-sm text-slate-300">{trustStatusAction}</p>
-          <p className="text-sm font-semibold tracking-[0.08em] text-slate-200">What would change this posture</p>
-          <ul className="space-y-2 text-sm text-slate-200">
-            <li>• Will shift if Capital Tightness rises above {tightnessThreshold} for two consecutive reads.</li>
-            <li>• Will shift if Risk Appetite falls below {riskThreshold} and remains there through the next update.</li>
-            <li>• Curve slope turns negative and stays inverted through the next cycle.</li>
-          </ul>
-        </article>
+            <aside className="space-y-4 rounded-2xl border border-slate-700/70 bg-slate-950/40 p-4" aria-label="Proof and recency snapshot">
+              <h2 className="text-sm font-semibold tracking-[0.08em] text-slate-100">Evidence snapshot</h2>
+              <ul className="space-y-2 text-sm text-slate-200">
+                <li>• Data source: {treasury.source}.</li>
+                <li>• Signals stamped: {recordDateLabel}.</li>
+                <li>• Last pipeline refresh: {fetchedAtLabel}.</li>
+              </ul>
+            </aside>
+          </div>
 
-        <article className="weather-surface space-y-3 p-5" aria-label="Explore additional guidance routes">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-200">Explore next</p>
-          <div className="flex flex-wrap gap-2 text-xs font-semibold tracking-[0.08em]">
-            <Link href="/solutions" className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2">Solutions library</Link>
-            <Link href="/concepts" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2">Concepts glossary</Link>
-            <Link href="/guides" className="weather-pill-muted inline-flex min-h-[44px] items-center px-3 py-2">Team guides</Link>
+          <div className="space-y-3 border-t border-slate-700/70 pt-4" aria-label="Explore additional guidance routes">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-200">Explore next</p>
+            <div className="flex flex-wrap gap-2 text-xs font-semibold tracking-[0.08em]">
+              <Link href="/solutions" className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2">Solutions library</Link>
+              <Link href="/concepts" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2">Concepts glossary</Link>
+              <Link href="/guides" className="weather-pill-muted inline-flex min-h-[44px] items-center px-3 py-2">Team guides</Link>
+            </div>
           </div>
         </article>
 
