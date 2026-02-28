@@ -35,15 +35,18 @@ const statusConfidence = {
 
 const statusDataMode = {
   "Live (high confidence)": {
-    label: "Dynamic feed",
+    label: "Dynamic · live feed",
+    icon: "●",
     className: "weather-data-mode weather-data-mode-dynamic",
   },
   "Cached (medium)": {
-    label: "Static snapshot",
+    label: "Static · cached snapshot",
+    icon: "◼",
     className: "weather-data-mode weather-data-mode-static",
   },
   "Simulated (low)": {
-    label: "Static snapshot",
+    label: "Static · simulated model",
+    icon: "◼",
     className: "weather-data-mode weather-data-mode-static",
   },
 } as const;
@@ -65,7 +68,8 @@ export const DataProvenanceStrip = ({
     statusConfidence[provenance.statusLabel as keyof typeof statusConfidence] ?? 50;
   const dataMode =
     statusDataMode[provenance.statusLabel as keyof typeof statusDataMode] ?? {
-      label: "Static snapshot",
+      label: "Static · snapshot",
+      icon: "◼",
       className: "weather-data-mode weather-data-mode-static",
     };
 
@@ -73,7 +77,10 @@ export const DataProvenanceStrip = ({
     return (
       <div className="weather-surface space-y-3 border-slate-800/80 bg-slate-950/55 p-3 text-xs font-medium tracking-[0.1em] text-slate-200 shadow-none">
         <div className="flex flex-wrap items-center gap-2">
-          <span className={`${dataMode.className} font-medium`}>{dataMode.label}</span>
+          <span className={`${dataMode.className} font-medium`}>
+            <span aria-hidden="true">{dataMode.icon}</span>
+            <span>{dataMode.label}</span>
+          </span>
           <span className="h-1 w-1 rounded-full bg-slate-600" aria-hidden="true" />
           <span className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/75 bg-slate-900/70 px-3 py-2 text-xs font-medium tracking-[0.1em] text-slate-100">
             Confidence {confidencePct}%
@@ -167,7 +174,10 @@ export const DataProvenanceStrip = ({
         <span className="mono text-slate-200">{provenance.ageLabel}</span>
       </span>
       <span className="h-1 w-1 rounded-full bg-slate-600" aria-hidden="true" />
-      <span className={`${dataMode.className} font-medium`}>{dataMode.label}</span>
+      <span className={`${dataMode.className} font-medium`}>
+        <span aria-hidden="true">{dataMode.icon}</span>
+        <span>{dataMode.label}</span>
+      </span>
       <span className="h-1 w-1 rounded-full bg-slate-600" aria-hidden="true" />
       <span className="inline-flex items-center gap-2 rounded-full border border-slate-700/70 bg-slate-900/70 px-2 py-1 text-xs tracking-[0.12em] text-slate-200">
           <span
