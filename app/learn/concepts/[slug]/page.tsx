@@ -1,10 +1,10 @@
 import { redirectWithParams } from "../../../../lib/navigation/legacyRedirects";
 
-export const runtime = "edge";
-
 type ConceptRouteParams = {
   slug: string;
 };
+
+export const runtime = "edge";
 
 export default function LearnConceptDetailPage({
   params,

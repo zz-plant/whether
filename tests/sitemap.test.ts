@@ -26,6 +26,10 @@ describe("sitemap", () => {
     assert.ok(urls.has(`${siteUrl}/start`));
     assert.ok(urls.has(`${siteUrl}/posture`));
     assert.ok(urls.has(`${siteUrl}/decide/use-cases`));
+    assert.ok(urls.has(`${siteUrl}/guides`));
+    assert.ok(urls.has(`${siteUrl}/solutions`));
+    assert.ok(urls.has(`${siteUrl}/learn/failure-modes`));
+    assert.ok(urls.has(`${siteUrl}/learn/concepts`));
     assert.ok(urls.has(`${siteUrl}/toolkits`));
     assert.ok(urls.has(`${siteUrl}/library`));
 
@@ -41,8 +45,6 @@ describe("sitemap", () => {
       assert.ok(urls.has(`${siteUrl}/decide/${situation}`));
     }
 
-    assert.ok(urls.has(`${siteUrl}/learn/failure-modes`));
-    assert.ok(urls.has(`${siteUrl}/learn/concepts`));
 
     for (const toolkit of toolkitDefinitions) {
       assert.ok(urls.has(`${siteUrl}/toolkits/${toolkit.slug}`));
