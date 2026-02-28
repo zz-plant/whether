@@ -5,7 +5,7 @@
 import { fetchTreasuryData } from "../treasury/treasuryClient";
 import { snapshotData } from "../snapshot";
 import { buildSensorReadings } from "../sensors";
-import { evaluateRegime } from "../regimeEngine";
+import { deriveRegimeTrend, evaluateRegime } from "../regimeEngine";
 import { getPlaybookGuidance } from "../playbook";
 import {
   getLatestTimeMachineSnapshot,
@@ -207,6 +207,7 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
           previousSnapshot.record_date
         )
       : null;
+  const regimeTrend = deriveRegimeTrend(previousAssessment, assessment);
   const lastYearComparison =
     lastYearSnapshot && lastYearAssessment
       ? buildLastYearComparison({
@@ -237,6 +238,7 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
     requestedSelection,
     regimeSeries,
     regimeAlert,
+    regimeTrend,
     selectedMonth,
     selectedYear,
     sensors,

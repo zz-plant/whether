@@ -16,6 +16,9 @@ export type MonthlySummary = {
   regime: RegimeAssessment["regime"];
   regimeLabel: string;
   guidance: string;
+  confidence: RegimeAssessment["diagnostics"]["confidence"];
+  transitionWatch: boolean;
+  intensity: RegimeAssessment["diagnostics"]["intensity"];
   constraints: string[];
   recordDateLabel: string | null;
   provenance: MonthlySummaryProvenance;
@@ -85,7 +88,10 @@ export const buildMonthlySummary = ({
 }): MonthlySummary => {
   const regimeLabel = getRegimeLabel(assessment.regime);
   const guidance = getMonthlyActionGuidance(assessment.regime);
-  const summary = `${regimeLabel} posture: ${assessment.description} Priority: ${guidance}.`;
+  const transitionCue = assessment.diagnostics.transitionWatch
+    ? " Signals are near a regime boundary; hold major scope changes until the next read."
+    : "";
+  const summary = `${regimeLabel} posture: ${assessment.description} Priority: ${guidance}. Confidence: ${assessment.diagnostics.confidence.toLowerCase()} (${assessment.diagnostics.intensity.toLowerCase()} signal).${transitionCue}`;
   const title = recordDateLabel
     ? `Monthly action summary — ${recordDateLabel}`
     : "Monthly action summary";
@@ -106,6 +112,9 @@ export const buildMonthlySummary = ({
     regime: assessment.regime,
     regimeLabel,
     guidance,
+    confidence: assessment.diagnostics.confidence,
+    transitionWatch: assessment.diagnostics.transitionWatch,
+    intensity: assessment.diagnostics.intensity,
     constraints: assessment.constraints,
     recordDateLabel: recordDateLabel ?? null,
     provenance,

@@ -30,6 +30,7 @@ export type RegimeInput = {
 export interface RegimeAssessment {
   regime: RegimeKey;
   scores: RegimeScores;
+  diagnostics: RegimeDiagnostics;
   description: string;
   constraints: string[];
   tightnessExplanation: string;
@@ -38,6 +39,17 @@ export interface RegimeAssessment {
   thresholds: RegimeThresholds;
   inputs: RegimeInput[];
 }
+
+export type RegimeTrend = "IMPROVING" | "DETERIORATING" | "MIXED" | "STABLE";
+
+export type RegimeDiagnostics = {
+  tightnessDelta: number;
+  riskAppetiteDelta: number;
+  nearestThresholdDelta: number;
+  confidence: "LOW" | "MEDIUM" | "HIGH";
+  transitionWatch: boolean;
+  intensity: "MILD" | "STANDARD" | "STRONG";
+};
 
 export type RegimeChangeReason = {
   code: string;
@@ -246,6 +258,66 @@ export const classifyRegime = (
   return "EXPANSION";
 };
 
+const computeDiagnostics = (
+  tightness: number,
+  riskAppetite: number,
+  thresholds: RegimeThresholds
+): RegimeDiagnostics => {
+  const tightnessDelta = Math.round(tightness - thresholds.tightnessRegime);
+  const riskAppetiteDelta = Math.round(riskAppetite - thresholds.riskAppetiteRegime);
+  const nearestThresholdDelta = Math.min(Math.abs(tightnessDelta), Math.abs(riskAppetiteDelta));
+  const confidence =
+    nearestThresholdDelta >= 20 ? "HIGH" : nearestThresholdDelta >= 10 ? "MEDIUM" : "LOW";
+  const transitionWatch = nearestThresholdDelta <= 5;
+  const intensity =
+    nearestThresholdDelta >= 25 ? "STRONG" : nearestThresholdDelta >= 10 ? "STANDARD" : "MILD";
+
+  return {
+    tightnessDelta,
+    riskAppetiteDelta,
+    nearestThresholdDelta,
+    confidence,
+    transitionWatch,
+    intensity,
+  };
+};
+
+export const deriveRegimeTrend = (
+  previous: RegimeAssessment | null,
+  current: RegimeAssessment
+): RegimeTrend => {
+  if (!previous) {
+    return "STABLE";
+  }
+
+  const tightnessMovedUp =
+    previous.scores.tightness <= previous.thresholds.tightnessRegime &&
+    current.scores.tightness > current.thresholds.tightnessRegime;
+  const tightnessMovedDown =
+    previous.scores.tightness > previous.thresholds.tightnessRegime &&
+    current.scores.tightness <= current.thresholds.tightnessRegime;
+  const riskMovedUp =
+    previous.scores.riskAppetite <= previous.thresholds.riskAppetiteRegime &&
+    current.scores.riskAppetite > current.thresholds.riskAppetiteRegime;
+  const riskMovedDown =
+    previous.scores.riskAppetite > previous.thresholds.riskAppetiteRegime &&
+    current.scores.riskAppetite <= current.thresholds.riskAppetiteRegime;
+
+  const improvingSignals = Number(tightnessMovedDown) + Number(riskMovedUp);
+  const deterioratingSignals = Number(tightnessMovedUp) + Number(riskMovedDown);
+
+  if (improvingSignals > 0 && deterioratingSignals > 0) {
+    return "MIXED";
+  }
+  if (improvingSignals > 0) {
+    return "IMPROVING";
+  }
+  if (deterioratingSignals > 0) {
+    return "DETERIORATING";
+  }
+  return "STABLE";
+};
+
 export const buildRegimeChangeReasons = (
   previous: RegimeAssessment | null,
   current: RegimeAssessment
@@ -381,6 +453,7 @@ export const evaluateRegime = (
   );
   const riskAppetite = computeRiskAppetiteScore(curveSlopeForScore);
   const regime = classifyRegime(tightness, riskAppetite, thresholds);
+  const diagnostics = computeDiagnostics(tightness, riskAppetite, thresholds);
   const profile = REGIME_PROFILES[regime];
 
   return {
@@ -392,6 +465,7 @@ export const evaluateRegime = (
       baseRate: baseRate.value,
       curveSlope,
     },
+    diagnostics,
     description: profile.description,
     constraints: profile.constraints,
     tightnessExplanation: buildTightnessExplanation(thresholds),

@@ -1,4 +1,5 @@
-import { describe, expect, test } from "bun:test";
+import assert from "node:assert/strict";
+import { describe, it } from "node:test";
 import {
   buildBoldnessScore,
   buildWeeklyLeadershipBriefModel,
@@ -10,23 +11,23 @@ import { evaluateRegime } from "../lib/regimeEngine";
 import { snapshotData } from "../lib/snapshot";
 
 describe("weeklyLeadershipBrief helpers", () => {
-  test("buildBoldnessScore clamps between 0 and 100", () => {
-    expect(buildBoldnessScore(100, 100)).toBe(70);
-    expect(buildBoldnessScore(0, 100)).toBe(100);
-    expect(buildBoldnessScore(100, 0)).toBe(0);
+  it("buildBoldnessScore clamps between 0 and 100", () => {
+    assert.equal(buildBoldnessScore(100, 100), 70);
+    assert.equal(buildBoldnessScore(0, 100), 100);
+    assert.equal(buildBoldnessScore(100, 0), 0);
   });
 
-  test("trend and window labels are deterministic", () => {
-    expect(toTrendLabel(3)).toBe("Strengthening");
-    expect(toTrendLabel(-3)).toBe("Cooling");
-    expect(toTrendLabel(0)).toBe("Flat");
+  it("trend and window labels are deterministic", () => {
+    assert.equal(toTrendLabel(3), "Strengthening");
+    assert.equal(toTrendLabel(-3), "Cooling");
+    assert.equal(toTrendLabel(0), "Flat");
 
-    expect(getWindowState(80, { open: 38, strong: 64 })).toBe("Strong");
-    expect(getWindowState(40, { open: 38, strong: 64 })).toBe("Open");
-    expect(getWindowState(20, { open: 38, strong: 64 })).toBe("Constrained");
+    assert.equal(getWindowState(80, { open: 38, strong: 64 }), "Strong");
+    assert.equal(getWindowState(40, { open: 38, strong: 64 }), "Open");
+    assert.equal(getWindowState(20, { open: 38, strong: 64 }), "Constrained");
   });
 
-  test("buildWeeklyLeadershipBriefModel returns expected shape", () => {
+  it("buildWeeklyLeadershipBriefModel returns expected shape", () => {
     const assessment = evaluateRegime(snapshotData);
     const model = buildWeeklyLeadershipBriefModel({
       assessment,
@@ -37,11 +38,11 @@ describe("weeklyLeadershipBrief helpers", () => {
       stabilityWeeks: 3,
     });
 
-    expect(typeof model.boldnessScore).toBe("number");
-    expect(typeof model.boldnessDelta).toBe("number");
-    expect(model.stabilityWeeks).toBe(3);
-    expect(model.hiringTrend).toBe("Strengthening");
-    expect(model.inputsComplete).toBeTrue();
-    expect(getNetDeltaLabel(2)).toBe("Slightly more aggressive than last week.");
+    assert.equal(typeof model.boldnessScore, "number");
+    assert.equal(typeof model.boldnessDelta, "number");
+    assert.equal(model.stabilityWeeks, 3);
+    assert.equal(model.hiringTrend, "Strengthening");
+    assert.equal(model.inputsComplete, true);
+    assert.equal(getNetDeltaLabel(2), "Slightly more aggressive than last week.");
   });
 });
