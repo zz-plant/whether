@@ -33,6 +33,7 @@ Use this index to find the **current** source of truth quickly.
 - `concepts-enhancements.md` — enhancement opportunities for `/concepts` experiences.
 - `solutions-enhancements.md` — enhancement opportunities for `/solutions` and career-path flows.
 - `design-improvements-priority.md` — prioritized design/UX improvement backlog.
+- `one-screen-weekly-brief-spec.md` — decision-first one-screen weekly leadership brief specification.
 - `information-architecture-proposal.md` — proposed navigation model and route-transition plan.
 - `implementation-status.md` — consolidated implementation checklist across roadmap, summary follow-ups, and modernization work.
 
