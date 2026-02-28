@@ -579,25 +579,94 @@ summary:focus-visible {
 }
 
 .weather-mobile-nav {
-  @apply rounded-[26px] border border-slate-800/80 bg-slate-950/90 backdrop-blur-2xl;
+  @apply rounded-[28px] border border-slate-700/80 bg-slate-950/90 backdrop-blur-2xl;
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(56, 189, 248, 0.18), rgba(15, 23, 42, 0) 46%),
+    linear-gradient(165deg, rgba(2, 6, 23, 0.96), rgba(15, 23, 42, 0.88));
   box-shadow:
-    0 -20px 40px -28px rgba(2, 6, 23, 0.92),
-    0 -8px 18px -14px rgba(56, 189, 248, 0.24);
+    0 -22px 42px -26px rgba(2, 6, 23, 0.94),
+    0 -10px 24px -16px rgba(56, 189, 248, 0.28),
+    inset 0 1px 0 rgba(148, 163, 184, 0.18);
   overscroll-behavior: contain;
   padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
 }
 
+.weather-mobile-spotlight {
+  border: 1px solid rgba(71, 85, 105, 0.75);
+  background-image: linear-gradient(135deg, rgba(2, 6, 23, 0.72), rgba(30, 41, 59, 0.55));
+}
+
+.weather-mobile-link {
+  background: color-mix(in oklab, rgb(2 6 23) 84%, rgb(30 41 59));
+}
+
 .weather-mobile-panel {
   @apply rounded-[24px] border border-slate-800/80 bg-slate-950/95 backdrop-blur-2xl;
+  background-image:
+    radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.16), rgba(2, 6, 23, 0) 54%),
+    linear-gradient(170deg, rgba(2, 6, 23, 0.97), rgba(15, 23, 42, 0.92));
   box-shadow:
     0 22px 44px -32px rgba(2, 6, 23, 0.88),
-    0 10px 22px -18px rgba(56, 189, 248, 0.25);
+    0 10px 22px -18px rgba(56, 189, 248, 0.25),
+    inset 0 1px 0 rgba(148, 163, 184, 0.15);
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
 }
 
 .weather-mobile-sheet {
   max-height: min(80vh, calc(100dvh - env(safe-area-inset-top) - 5.75rem));
+}
+
+.report-hero-shell {
+  border-color: rgba(56, 189, 248, 0.26);
+  background-image:
+    radial-gradient(circle at 10% 0%, rgba(56, 189, 248, 0.2), rgba(2, 6, 23, 0) 38%),
+    linear-gradient(160deg, rgba(2, 6, 23, 0.96), rgba(15, 23, 42, 0.84));
+  box-shadow:
+    0 28px 44px -34px rgba(2, 6, 23, 0.94),
+    inset 0 1px 0 rgba(125, 211, 252, 0.25);
+}
+
+.report-hero-metric {
+  border: 1px solid rgba(51, 65, 85, 0.85);
+  border-radius: 0.85rem;
+  padding: 0.5rem 0.65rem;
+  background: color-mix(in oklab, rgb(2 6 23) 88%, rgb(30 41 59));
+}
+
+.report-hero-actions {
+  border-top: 1px solid rgba(51, 65, 85, 0.65);
+  padding-top: 0.75rem;
+}
+
+.weather-hero-revamp {
+  border-color: rgba(56, 189, 248, 0.28);
+  background-image:
+    radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.2), rgba(15, 23, 42, 0) 45%),
+    linear-gradient(170deg, rgba(2, 6, 23, 0.96), rgba(15, 23, 42, 0.9));
+  box-shadow:
+    0 26px 38px -30px rgba(2, 6, 23, 0.95),
+    inset 0 1px 0 rgba(125, 211, 252, 0.24);
+}
+
+.weather-hero-chip {
+  border: 1px solid rgba(71, 85, 105, 0.8);
+  border-radius: 0.85rem;
+  background: color-mix(in oklab, rgb(2 6 23) 86%, rgb(30 41 59));
+  padding: 0.5rem 0.65rem;
+  font-size: 0.8rem;
+  line-height: 1.25rem;
+}
+
+.weather-mobile-sheet-trigger {
+  background: color-mix(in oklab, rgb(2 6 23) 84%, rgb(30 41 59));
+  border-color: rgba(71, 85, 105, 0.85);
+}
+
+.weather-mobile-sheet-link {
+  border-radius: 0.9rem;
+  border-color: rgba(71, 85, 105, 0.85);
+  background: color-mix(in oklab, rgb(2 6 23) 86%, rgb(30 41 59));
 }
 
 @media (prefers-reduced-motion: reduce) {

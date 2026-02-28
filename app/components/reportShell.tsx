@@ -149,7 +149,13 @@ export const ReportShell = ({
   const missionGridClassName = "grid gap-3 lg:grid-cols-[1.6fr,1.4fr]";
   const heroHeaderSpacingClassName = "space-y-3 sm:space-y-4";
   const heroSectionSpacingClassName =
-    "weather-panel-static min-w-0 space-y-4 px-4 py-4 sm:space-y-5 sm:px-5";
+    "report-hero-shell weather-panel-static min-w-0 space-y-5 px-4 py-5 sm:space-y-6 sm:px-5";
+  const trustToneClassName =
+    trustStatusTone === "stable"
+      ? "text-emerald-100 border-emerald-400/35 bg-emerald-500/10"
+      : trustStatusTone === "historical"
+        ? "text-amber-100 border-amber-400/35 bg-amber-500/10"
+        : "text-amber-100 border-amber-400/45 bg-amber-500/12";
   const overviewPanel = (
     <Collapsible.Root className="weather-panel px-4 py-4">
       <Collapsible.Trigger
@@ -425,9 +431,14 @@ export const ReportShell = ({
                       ) : null}
                       {heroVariant === "compact" ? (
                         <>
-                          <p className="text-xs font-semibold tracking-[0.14em] text-slate-400 sm:tracking-[0.18em]">
-                            Whether report
-                          </p>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <p className="text-xs font-semibold tracking-[0.14em] text-slate-400 sm:tracking-[0.18em]">
+                              Whether report
+                            </p>
+                            <p className={`inline-flex min-h-[28px] items-center rounded-full border px-2 py-1 text-[10px] font-semibold tracking-[0.12em] ${trustToneClassName}`}>
+                              {trustStatusTone === "stable" ? "Signal confidence" : "Use caution"}
+                            </p>
+                          </div>
                           <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
                             {pageTitle}
                           </h1>
@@ -438,9 +449,14 @@ export const ReportShell = ({
                         </>
                       ) : (
                         <>
-                          <p className="text-xs font-semibold tracking-[0.14em] text-slate-400 sm:tracking-[0.18em]">
-                            Whether report
-                          </p>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <p className="text-xs font-semibold tracking-[0.14em] text-slate-400 sm:tracking-[0.18em]">
+                              Whether report
+                            </p>
+                            <p className={`inline-flex min-h-[28px] items-center rounded-full border px-2 py-1 text-[10px] font-semibold tracking-[0.12em] ${trustToneClassName}`}>
+                              {trustStatusTone === "stable" ? "Signal confidence" : "Use caution"}
+                            </p>
+                          </div>
                           <h1 className="type-headline text-slate-100">
                             {pageTitle}
                           </h1>
@@ -453,10 +469,24 @@ export const ReportShell = ({
                           </span>
                         </>
                       )}
+                      <dl className="grid gap-2 text-xs text-slate-200 sm:grid-cols-3">
+                        <div className="report-hero-metric">
+                          <dt className="text-[10px] font-semibold tracking-[0.14em] text-slate-400">Confidence</dt>
+                          <dd className="mt-1 text-sm font-semibold text-slate-100">{trustStatusLabel}</dd>
+                        </div>
+                        <div className="report-hero-metric">
+                          <dt className="text-[10px] font-semibold tracking-[0.14em] text-slate-400">Signals stamped</dt>
+                          <dd className="mt-1 text-sm text-slate-100">{recordDateLabel}</dd>
+                        </div>
+                        <div className="report-hero-metric">
+                          <dt className="text-[10px] font-semibold tracking-[0.14em] text-slate-400">Last refresh</dt>
+                          <dd className="mt-1 text-sm text-slate-100">{fetchedAtLabel}</dd>
+                        </div>
+                      </dl>
                     </div>
                     <div
                       id="report-primary-actions"
-                      className="flex w-full min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3"
+                      className="report-hero-actions flex w-full min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3"
                     >
                       <a
                         href={primaryCta.href}
@@ -480,8 +510,8 @@ export const ReportShell = ({
                     </div>
                     <p className="text-sm text-slate-200">
                       {trustStatusTone === "stable"
-                        ? `Confidence: ${trustStatusLabel}. ${trustStatusAction}`
-                        : `Caution: ${trustStatusAction}`}
+                        ? `Confidence: ${trustStatusLabel}`
+                        : "Use caution"}
                     </p>
                     <Collapsible.Root className="weather-surface px-3 py-2 sm:hidden">
                       <Collapsible.Trigger
@@ -508,7 +538,7 @@ export const ReportShell = ({
                         </dl>
                       </Collapsible.Panel>
                     </Collapsible.Root>
-                    <dl className="hidden gap-2 text-sm text-slate-200 sm:grid sm:grid-cols-2 lg:grid-cols-3">
+                    <dl className="hidden gap-2 text-sm text-slate-200 lg:grid lg:grid-cols-3">
                       <div className="weather-surface px-3 py-2">
                         <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Confidence</dt>
                         <dd className="mt-1 font-semibold text-slate-100">{trustStatusLabel}</dd>
@@ -688,7 +718,7 @@ export const ReportShell = ({
           >
             <section className="weather-panel border-sky-500/40 bg-slate-950/95 px-3 py-3">
               <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-300">
-                Current posture
+                Posture
               </p>
               <div className="mt-2 flex items-center justify-between gap-3">
                 <p className="max-w-[16rem] text-xs font-semibold text-slate-100">
@@ -737,7 +767,7 @@ export const ReportShell = ({
               href="#operator-command-center"
               className="weather-pill inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
             >
-              Open command center
+              Command center
             </a>
             <DisplayModeToggle />
           </div>

@@ -29,9 +29,9 @@ export const runtime = "edge";
 export const revalidate = 900;
 
 const homeSectionSequence = [
-  { href: "#weekly-action-summary", label: "Read first: Weekly actions" },
-  { href: "#signal-matrix", label: "Then calibrate: Risk posture" },
-  { href: "#executive-snapshot", label: "Then decide: Operating constraints" },
+  { href: "#weekly-action-summary", label: "Weekly actions" },
+  { href: "#signal-matrix", label: "Risk posture" },
+  { href: "#executive-snapshot", label: "Operating constraints" },
 ] as const;
 
 const regimeLabelMap = {
@@ -374,11 +374,11 @@ export default async function HomePage({
       pageSummary="Verdict and immediate decision call for this planning cycle."
       primaryCta={{
         href: "#weekly-action-summary",
-        label: "Start weekly decision sequence",
+        label: "Weekly actions",
       }}
       secondaryCta={{
         href: "/onboarding",
-        label: "Start onboarding (3 min)",
+        label: "Onboarding",
       }}
       sidebarVariant="hidden"
       hideHeroChrome={true}
@@ -393,50 +393,41 @@ export default async function HomePage({
     >
       <section
         aria-labelledby="decision-card-title"
-        className="weather-panel space-y-7 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.16),rgba(15,23,42,0.3)_45%,rgba(2,6,23,0.92)_75%)] px-6 py-8 sm:space-y-9 sm:py-9"
+        className="weather-hero-revamp weather-panel space-y-6 px-5 py-7 sm:space-y-8 sm:px-6 sm:py-9"
       >
         <div className="space-y-4 text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.26em] text-sky-200">
-            Posture for the next 2–6 weeks
+            2–6 week posture
           </p>
           <h1 id="decision-card-title" className="text-4xl font-semibold text-slate-100 sm:text-[2.8rem]">
-            How should your company operate right now?
+            Operating posture now
           </h1>
           <p className="mx-auto max-w-3xl text-base text-slate-300">
-            Live market and capital conditions translated into a clear operating posture for the next cycle.
+            Live signals converted into one operating call.
           </p>
-          <ul className="mx-auto max-w-3xl space-y-2 text-left text-sm text-slate-200" aria-label="What you get in this briefing">
-            <li className="flex items-start gap-2">
-              <span aria-hidden="true" className="mt-1 h-1.5 w-1.5 rounded-full bg-sky-300" />
-              <span>One clear call on operating posture for this week.</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span aria-hidden="true" className="mt-1 h-1.5 w-1.5 rounded-full bg-sky-300" />
-              <span>Prioritized actions to start and avoid based on live signals.</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span aria-hidden="true" className="mt-1 h-1.5 w-1.5 rounded-full bg-sky-300" />
-              <span>Transparent method and data recency for confidence checks.</span>
-            </li>
-          </ul>
+          <div className="mx-auto grid w-full max-w-3xl gap-2 text-left sm:grid-cols-3" aria-label="Briefing highlights">
+            <p className="weather-hero-chip">Weekly posture call</p>
+            <p className="weather-hero-chip">Start / avoid actions</p>
+            <p className="weather-hero-chip">Method + freshness</p>
+          </div>
           <div className="flex flex-wrap items-center justify-center gap-3">
             <a
               href="#weekly-action-summary"
               className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em]"
             >
-              Start weekly decision sequence
+              Weekly actions
             </a>
             <a
               href="/onboarding"
               className="inline-flex min-h-[44px] items-center rounded-full border border-sky-400/60 bg-sky-500/15 px-4 py-2 text-xs font-semibold tracking-[0.14em] text-sky-100 transition-colors hover:border-sky-300 hover:bg-sky-500/25 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
             >
-              Start onboarding (3 min)
+              Onboarding
             </a>
             <a
               href="/methodology"
               className="inline-flex min-h-[44px] items-center text-xs font-semibold text-sky-200 underline decoration-slate-500/80 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
             >
-              Review method
+              Method
             </a>
           </div>
           <div className="py-2 sm:py-3">
@@ -460,27 +451,25 @@ export default async function HomePage({
               </p>
             ))}
           </div>
-          <p className="text-xs text-slate-300">
-            Heuristic operational probabilities only; this translates current threshold distance into posture shift odds and is not a financial forecast.
-          </p>
+          <p className="text-xs text-slate-300">Heuristic odds, not a forecast.</p>
           <p className="text-[11px] font-medium tracking-[0.14em] text-slate-400">
             Updated {recordDateLabel} · Confidence: {trustStatusLabel}
           </p>
         </div>
 
-        <article className="weather-surface space-y-4 p-5" aria-label="Proof and recency snapshot">
+        <article className="weather-surface space-y-3 p-5" aria-label="Proof and recency snapshot">
           <h2 className="text-sm font-semibold tracking-[0.08em] text-slate-100">Evidence snapshot</h2>
-          <ul className="space-y-2 text-sm text-slate-200">
-            <li>• Data source: {treasury.source}.</li>
-            <li>• Signals stamped: {recordDateLabel}.</li>
-            <li>• Last pipeline refresh: {fetchedAtLabel}.</li>
+          <ul className="grid gap-2 text-sm text-slate-200 sm:grid-cols-3">
+            <li className="weather-hero-chip">Source: {treasury.source}</li>
+            <li className="weather-hero-chip">Stamped: {recordDateLabel}</li>
+            <li className="weather-hero-chip">Refresh: {fetchedAtLabel}</li>
           </ul>
         </article>
 
         <article className="weather-surface space-y-4 p-5" aria-label="Current climate summary and flip criteria">
           <p className="text-sm text-slate-200">{assessment.description}</p>
           <p className="text-sm text-slate-300">{trustStatusAction}</p>
-          <p className="text-sm font-semibold tracking-[0.08em] text-slate-200">What would change this posture</p>
+          <p className="text-sm font-semibold tracking-[0.08em] text-slate-200">Shift triggers</p>
           <ul className="space-y-2 text-sm text-slate-200">
             <li>• Will shift if Capital Tightness rises above {tightnessThreshold} for two consecutive reads.</li>
             <li>• Will shift if Risk Appetite falls below {riskThreshold} and remains there through the next update.</li>
@@ -488,20 +477,17 @@ export default async function HomePage({
           </ul>
         </article>
 
-        <article className="weather-surface space-y-4 p-5" aria-label="Recommended weekly reading sequence">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-100">Start with this sequence</p>
+        <article className="weather-surface space-y-3 p-5" aria-label="Core sections">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-100">Core sections</p>
           <ol className="space-y-2 text-sm text-slate-200">
-            <li>1. Read first: Weekly actions to anchor near-term priorities.</li>
-            <li>2. Then decide: Leadership summary to confirm operating posture.</li>
-            <li>3. Reference: Signal breakdown for threshold and evidence checks.</li>
+            <li>1. Weekly actions</li>
+            <li>2. Operating constraints</li>
+            <li>3. Signal matrix</li>
           </ol>
-          <p className="text-xs text-slate-300">
-            Complete this sequence before opening deeper planning workflows.
-          </p>
         </article>
 
         <article className="weather-surface space-y-3 p-5" aria-label="Explore additional guidance routes">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-200">Explore next</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-200">Next</p>
           <div className="flex flex-wrap gap-2 text-xs font-semibold tracking-[0.08em]">
             <Link href="/solutions" className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2">Solutions library</Link>
             <Link href="/concepts" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2">Concepts glossary</Link>
@@ -511,7 +497,7 @@ export default async function HomePage({
 
         <details className="weather-surface group p-4 sm:p-5" aria-label="Expanded posture details">
           <summary className="flex min-h-[48px] cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold tracking-[0.08em] text-slate-200 focus-visible:rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation">
-            <span>See detailed triggers and execution checklist</span>
+            <span>Detailed triggers</span>
             <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-400 transition-transform group-open:rotate-180">
               ⌄
             </span>
