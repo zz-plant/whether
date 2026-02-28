@@ -267,18 +267,39 @@ export const WeeklyActionSummaryPanel = ({
       value: `${assessment.scores.tightness}/100`,
       detail: `Threshold ${assessment.thresholds.tightnessRegime} (higher = tighter).`,
       tone: "weather-surface-indigo",
+      accent: "bg-violet-300/80",
+      status:
+        assessment.scores.tightness >= assessment.thresholds.tightnessRegime
+          ? "Funding tighter than baseline"
+          : "Funding looser than baseline",
+      progressValue: assessment.scores.tightness,
     },
     {
       label: "Risk appetite",
       value: `${assessment.scores.riskAppetite}/100`,
       detail: `Threshold ${assessment.thresholds.riskAppetiteRegime} (higher = more risk-on).`,
       tone: "weather-surface-teal",
+      accent: "bg-cyan-300/80",
+      status:
+        assessment.scores.riskAppetite >= assessment.thresholds.riskAppetiteRegime
+          ? "Risk-taking above baseline"
+          : "Risk-taking below baseline",
+      progressValue: assessment.scores.riskAppetite,
     },
     {
       label: "Curve slope",
       value: curveSlopeDisplay,
       detail: curveSlopeStatus,
       tone: "weather-surface-sky",
+      accent: "bg-sky-300/80",
+      status:
+        curveSlopeValue === null
+          ? "Awaiting curve print"
+          : curveSlopeValue < 0
+            ? "Inversion risk present"
+            : "Curve shape supportive",
+      progressValue:
+        curveSlopeValue === null ? 50 : clampToRange(Math.round((curveSlopeValue + 1.5) * 25), 0, 100),
     },
   ];
   const timingWindows = [
@@ -425,10 +446,25 @@ export const WeeklyActionSummaryPanel = ({
               </div>
               <div className="grid gap-3 sm:grid-cols-3">
                 {weeklySignalTiles.map((tile) => (
-                  <div key={tile.label} className={`weather-surface ${tile.tone} p-4`}>
-                    <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">{tile.label}</p>
-                    <p className="mono mt-3 text-2xl text-slate-100">{tile.value}</p>
-                    <p className="mt-2 text-xs text-slate-300">{tile.detail}</p>
+                  <div key={tile.label} className={`weather-surface ${tile.tone} space-y-3 p-4`}>
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">{tile.label}</p>
+                      <span className="rounded-full border border-slate-600/70 bg-slate-900/70 px-2 py-1 text-[10px] font-semibold tracking-[0.12em] text-slate-300">
+                        Live
+                      </span>
+                    </div>
+                    <p className="mono text-3xl leading-none text-slate-100">{tile.value}</p>
+                    <div>
+                      <p className="text-xs text-slate-300">{tile.status}</p>
+                      <div className="mt-2 h-1.5 rounded-full bg-slate-900/80">
+                        <span
+                          className={`block h-full rounded-full ${tile.accent}`}
+                          style={{ width: `${tile.progressValue}%` }}
+                          aria-hidden="true"
+                        />
+                      </div>
+                    </div>
+                    <p className="text-xs text-slate-400">{tile.detail}</p>
                   </div>
                 ))}
               </div>
@@ -1283,6 +1319,7 @@ export const SignalMatrixPanel = ({
   const tightnessStatus = assessment.scores.tightness > tightnessThreshold ? "Tight" : "Loose";
   const riskStatus = assessment.scores.riskAppetite > riskThreshold ? "Bold" : "Cautious";
   const quadrantLabel = `${tightnessStatus} + ${riskStatus}`;
+  const currentQuadrantId = `${tightnessStatus.toLowerCase()}-${riskStatus.toLowerCase()}`;
   const quadrants = [
     {
       id: "tight-cautious",
@@ -1290,6 +1327,7 @@ export const SignalMatrixPanel = ({
       description: "Cash conservation, tighter budgets, and slower hiring.",
       action: "Default action: cut burn and freeze risky launches.",
       className: "border-rose-500/40 bg-rose-500/10 text-rose-100",
+      chipClassName: "border-rose-300/40 bg-rose-500/20 text-rose-100",
     },
     {
       id: "tight-bold",
@@ -1297,6 +1335,7 @@ export const SignalMatrixPanel = ({
       description: "Selective bets with strong governance and runway checks.",
       action: "Default action: fund only high-ROI bets with short payback.",
       className: "border-amber-400/40 bg-amber-500/10 text-amber-100",
+      chipClassName: "border-amber-300/40 bg-amber-500/20 text-amber-100",
     },
     {
       id: "loose-cautious",
@@ -1304,6 +1343,7 @@ export const SignalMatrixPanel = ({
       description: "Stable funding but risk appetite is muted; prioritize durability.",
       action: "Default action: prioritize reliability and retention projects.",
       className: "border-sky-400/40 bg-sky-500/10 text-sky-100",
+      chipClassName: "border-sky-300/40 bg-sky-500/20 text-sky-100",
     },
     {
       id: "loose-bold",
@@ -1311,6 +1351,7 @@ export const SignalMatrixPanel = ({
       description: "Expansion-friendly conditions; scale responsibly.",
       action: "Default action: accelerate growth bets with clear guardrails.",
       className: "border-emerald-400/40 bg-emerald-500/10 text-emerald-100",
+      chipClassName: "border-emerald-300/40 bg-emerald-500/20 text-emerald-100",
     },
   ];
 
@@ -1338,7 +1379,7 @@ export const SignalMatrixPanel = ({
           <DataProvenanceStrip provenance={provenance} variant="compact" />
         </div>
       </div>
-      <div className="mt-4 weather-surface border-slate-800/80 bg-slate-950/55 p-4 shadow-none">
+      <div className="mt-4 weather-surface border-slate-700/80 bg-gradient-to-br from-slate-900/85 via-slate-950/70 to-slate-900/60 p-4 shadow-none">
         <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Executive summary</p>
         <p className="mt-2 text-sm text-slate-200">
           <span className="font-semibold text-slate-50">Posture: {quadrantLabel}.</span> Bias
@@ -1346,11 +1387,11 @@ export const SignalMatrixPanel = ({
           /100 and risk appetite <span className="mono">{assessment.scores.riskAppetite}</span>/100.
           In this regime, prioritize fast growth decisions with burn-rate guardrails.
         </p>
-        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-medium tracking-[0.1em] text-slate-300">
-          <span className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/80 bg-slate-900/75 px-3 py-2 text-xs font-medium tracking-[0.1em]">
+        <div className="mt-4 grid gap-2 sm:grid-cols-2 text-xs font-medium tracking-[0.1em] text-slate-300">
+          <span className="inline-flex min-h-[44px] items-center rounded-xl border border-slate-700/80 bg-slate-900/75 px-3 py-2 text-xs font-medium tracking-[0.1em]">
             Recommended mode: Move fast, protect runway
           </span>
-          <span className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/80 bg-slate-900/75 px-3 py-2 text-xs font-medium tracking-[0.1em]">
+          <span className="inline-flex min-h-[44px] items-center rounded-xl border border-slate-700/80 bg-slate-900/75 px-3 py-2 text-xs font-medium tracking-[0.1em]">
             Next step: View recommended actions ↓
           </span>
         </div>
@@ -1368,13 +1409,13 @@ export const SignalMatrixPanel = ({
         </Collapsible.Trigger>
         <Collapsible.Panel className="mt-4 grid gap-6 lg:grid-cols-[1.2fr,0.8fr]">
           <figure className="space-y-4">
-            <div className="weather-surface p-4">
+            <div className="weather-surface border-slate-700/80 bg-slate-950/60 p-4">
               <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Current posture</p>
               <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-slate-200">
-                <span className="weather-pill inline-flex min-h-[44px] items-center px-3 py-1 text-xs font-medium tracking-[0.1em] text-slate-200">
+                <span className="weather-pill inline-flex min-h-[44px] items-center px-4 py-1 text-xs font-semibold tracking-[0.12em] text-slate-100">
                   {quadrantLabel}
                 </span>
-                <span className="text-xs text-slate-400">
+                <span className="rounded-full border border-slate-700/70 px-3 py-1 text-xs text-slate-300">
                   Tightness{" "}
                   <span className="mono text-slate-100">{assessment.scores.tightness}</span> · Risk{" "}
                   <span className="mono text-slate-100">{assessment.scores.riskAppetite}</span>
@@ -1534,8 +1575,18 @@ export const SignalMatrixPanel = ({
             </div>
             <div className="grid gap-3">
               {quadrants.map((quadrant) => (
-                <div key={quadrant.id} className={`rounded-xl border p-4 ${quadrant.className}`}>
-                  <p className="text-xs font-semibold tracking-[0.12em]">{quadrant.label}</p>
+                <div
+                  key={quadrant.id}
+                  className={`rounded-xl border p-4 ${quadrant.className} ${quadrant.id === currentQuadrantId ? "ring-1 ring-slate-100/45" : ""}`}
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-xs font-semibold tracking-[0.12em]">{quadrant.label}</p>
+                    {quadrant.id === currentQuadrantId ? (
+                      <span className={`rounded-full border px-2 py-1 text-[10px] font-semibold tracking-[0.12em] ${quadrant.chipClassName}`}>
+                        Current
+                      </span>
+                    ) : null}
+                  </div>
                   <p className="mt-2 text-sm text-slate-100">{quadrant.description}</p>
                   <p className="mt-3 text-xs text-slate-200">{quadrant.action}</p>
                 </div>
