@@ -377,7 +377,7 @@ export default async function HomePage({
         label: "Start weekly decision sequence",
       }}
       secondaryCta={{
-        href: "/onboarding",
+        href: "/start",
         label: "Start onboarding (3 min)",
       }}
       sidebarVariant="hidden"
@@ -410,7 +410,7 @@ export default async function HomePage({
               Start weekly decision sequence
             </a>
             <a
-              href="/onboarding"
+              href="/start"
               className="inline-flex min-h-[44px] items-center rounded-full border border-sky-400/60 bg-sky-500/15 px-4 py-2 text-xs font-semibold tracking-[0.14em] text-sky-100 transition-colors hover:border-sky-300 hover:bg-sky-500/25 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
             >
               Start onboarding (3 min)
@@ -477,7 +477,7 @@ export default async function HomePage({
           <div className="space-y-3 border-t border-slate-700/70 pt-4" aria-label="Explore additional guidance routes">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-200">Explore next</p>
             <div className="flex flex-wrap gap-2 text-xs font-semibold tracking-[0.08em]">
-              <Link href="/operations/plan" className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2">Plan toolkits</Link>
+              <Link href="/toolkits" className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2">Toolkits</Link>
               <Link href="/learn" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2">Learn hub</Link>
               <Link href="/decide" className="weather-pill-muted inline-flex min-h-[44px] items-center px-3 py-2">Decide pathways</Link>
             </div>

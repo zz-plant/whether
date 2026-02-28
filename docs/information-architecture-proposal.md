@@ -8,21 +8,27 @@ Align primary navigation labels with task intent so leaders can move from contex
 - **Signals** (`/signals`) for macro state and confidence context.
 - **Operations** (`/operations`) for execution guardrails by posture.
 - **Decide** (`/decide`) for role/situation decision pathways.
-- **Plan** (`/plan`) for implementation surfaces and toolkits.
+- **Plan** (`/toolkits`) for implementation surfaces and runnable instruments.
 - **Learn** (`/learn`) for diagnostics and conceptual references.
 - **Method** (`/method`) for model transparency and trust context.
 
+## Canonical route policy
+- Keep one canonical namespace per content family.
+- Canonical failures path: `/library/failure-modes/*`.
+- Canonical concepts path: `/concepts/*`.
+- Canonical decision path: `/decide/*`.
+- Canonical planning path: `/toolkits/*`.
+
 ## Legacy route compatibility
-To preserve inbound links and historical references, legacy entrypoints should redirect:
+During migration windows, use redirect infrastructure at the edge/app boundary only.
 - `/guides` → `/learn`
-- `/solutions` → `/plan`
-- `/brief/stage` → `/plan`
+- `/solutions` → `/toolkits`
 - `/brief` → `/start`
-- `/method` should act as a hub that links to both `/methodology` and `/about` to align trust expectations with user intent.
+
+Avoid maintaining long-lived duplicate bridge pages in the application tree.
 
 ## Migration notes
-- Provide IA-consistent bridge paths (`/decide/use-cases`, `/plan/toolkits`, `/learn/failure-modes`, `/learn/concepts`) that redirect to legacy surfaces while preserving old information depth.
-- Extend bridge-path coverage to detail routes (`/decide/[slug]`, `/plan/[slug]`, `/learn/failure-modes/[slug]`, `/learn/concepts/[slug]`) to keep URL semantics consistent beyond hub pages.
-- Keep legacy destination pages available during transition windows for backlink continuity.
-- Update sitemap priorities to reflect new IA anchors while retaining discoverability for legacy paths.
-- Ensure report shell navigation highlights new labels when users land on legacy URLs.
+- Remove duplicate bridge-route files once canonical URLs are active in navigation and internal links.
+- Update sitemap priorities to reflect canonical IA anchors only.
+- Keep legacy entrypoints discoverable via redirects temporarily, then retire after link/traffic decay.
+- Ensure report shell navigation highlights canonical labels even when users arrive from old URLs.
