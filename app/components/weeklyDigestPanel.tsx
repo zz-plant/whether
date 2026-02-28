@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import { buildSignsToWatch } from "../../lib/report/reportNarrative";
+import { formatTimestampUTC } from "../../lib/formatters";
 
 type WeeklyDigestPayload = {
   generatedAt: string;
@@ -62,7 +63,7 @@ export const WeeklyDigestPanel = ({ assessment }: { assessment: RegimeAssessment
           </ul>
           {payload ? (
             <p className="mt-3 text-xs text-slate-500">
-              {payload.alertCount} alerts tracked · {payload.deliveryCount} deliveries · generated {new Date(payload.generatedAt).toLocaleString()}
+              {payload.alertCount} alerts tracked · {payload.deliveryCount} deliveries · generated {formatTimestampUTC(payload.generatedAt)}
             </p>
           ) : null}
         </div>
