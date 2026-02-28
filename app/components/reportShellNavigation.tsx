@@ -1,10 +1,8 @@
 "use client";
 
-import { useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import type { ReactNode } from "react";
 import { Collapsible } from "@base-ui/react/collapsible";
 import { NavigationMenu } from "@base-ui/react/navigation-menu";
-import { handleDirectionalFocus } from "./directionalFocus";
 import { pathMatchesLink } from "../../lib/navigation/pathMatching";
 
 export type ReportPageLink = {
@@ -284,26 +282,9 @@ export const ReportMobileNavigation = ({
   const pageCountLabel =
     pageLinks.length === 1 ? "1 page" : `${pageLinks.length} pages`;
 
-  const navigationRootRef = useRef<HTMLDivElement>(null);
-  const [isPanelOpen, setIsPanelOpen] = useState(false);
-
-  const onDirectionalKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
-    if (!navigationRootRef.current) {
-      return;
-    }
-
-    handleDirectionalFocus(event, navigationRootRef.current, { wrap: true });
-  };
-
   return (
     <NavigationMenu.Root aria-label="Mobile report navigation" className={className}>
-      <Collapsible.Root
-        className="relative"
-        open={isPanelOpen}
-        onOpenChange={setIsPanelOpen}
-        ref={navigationRootRef}
-        onKeyDown={onDirectionalKeyDown}
-      >
+      <div className="relative">
         <div className="weather-mobile-nav flex flex-col gap-2 px-3 py-3">
           <div className="flex min-w-0 items-center justify-between gap-3 rounded-2xl border border-slate-800/80 bg-slate-950/70 px-3 py-2">
             <div className="flex min-w-0 items-center gap-3">
@@ -341,85 +322,8 @@ export const ReportMobileNavigation = ({
               ))}
             </NavigationMenu.List>
           ) : null}
-
-          <div className="grid grid-cols-1 gap-2">
-            <Collapsible.Trigger
-              type="button"
-              className="group weather-pill flex min-h-[48px] w-full flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/80 px-2 py-2 text-xs font-semibold tracking-[0.18em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
-            >
-                <span className="inline-flex items-center gap-2 text-slate-100">
-                <span className="transition-transform duration-200 group-data-[panel-open]:rotate-90">
-                  <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
-                    <path d="M6.5 5.5h11a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" strokeWidth="1.4" />
-                    <path d="M8.75 9.25h6.5M8.75 12h6.5M8.75 14.75h4" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="1.5" />
-                  </svg>
-                </span>
-                  <span className="uppercase">All pages</span>
-                </span>
-              <span className="text-xs font-medium tracking-[0.12em] text-slate-300">
-                Open full report map
-              </span>
-            </Collapsible.Trigger>
-          </div>
         </div>
-
-        <Collapsible.Panel className="absolute bottom-full left-0 right-0 mb-3">
-          <div className="weather-mobile-panel weather-mobile-sheet space-y-4 overflow-auto px-4 py-4">
-            <div className="flex items-start justify-between gap-3">
-              <div className="space-y-1">
-                <p className="text-base font-semibold text-slate-100">{currentLink.label}</p>
-                <p className="text-xs text-slate-300">Select a report page.</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Collapsible.Trigger
-                  type="button"
-                  className="weather-pill inline-flex min-h-[44px] items-center px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-                >
-                  Close
-                </Collapsible.Trigger>
-              </div>
-            </div>
-
-            <NavigationMenu.List aria-label="All report pages" className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2">
-              {pageLinks.map((link) => {
-                const isActive = currentPath
-                  ? isLinkActiveForPath(link.href, currentPath)
-                  : link.label === pageTitle;
-                return (
-                  <NavigationMenu.Item key={link.href}>
-                    <NavigationMenu.Link
-                      href={link.href}
-                      active={isActive}
-                      aria-current={isActive ? "page" : undefined}
-                      onClick={() => setIsPanelOpen(false)}
-                      className={`weather-pill flex min-h-[56px] items-start gap-3 rounded-2xl border px-3 py-3 text-left text-sm font-semibold tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation ${
-                        isActive
-                          ? "border-sky-400/70 bg-sky-500/15 text-sky-100"
-                          : link.label === "Command Center"
-                            ? "border-slate-600/90 text-slate-100 hover:border-sky-400/70 hover:text-sky-100"
-                            : "border-slate-800/80 text-slate-100 hover:border-sky-400/70 hover:text-sky-100"
-                      }`}
-                    >
-                      <span
-                        className={`inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl border ${
-                          isActive
-                            ? "border-sky-300/70 bg-sky-500/20 text-sky-100"
-                            : "border-slate-800/80 bg-slate-950/70 text-slate-200"
-                        }`}
-                      >
-                        {pageLinkIcons[link.label] ?? pageLinkIcons.Method}
-                      </span>
-                      <span className="block text-sm font-semibold text-current">
-                        {link.label}
-                      </span>
-                    </NavigationMenu.Link>
-                  </NavigationMenu.Item>
-                );
-              })}
-            </NavigationMenu.List>
-          </div>
-        </Collapsible.Panel>
-      </Collapsible.Root>
+      </div>
     </NavigationMenu.Root>
   );
 };
