@@ -25,7 +25,7 @@ export const buildTrustStatus = ({
     ? "Viewing archived Treasury data for the selected month."
     : isFallback
       ? (fallbackReason ?? "Live refresh pending. Using last verified snapshot.")
-      : "Live refresh healthy. Next expected update: 48h.";
+      : "Live refresh healthy. Next expected update: 15m.";
 
   const action = historicalSelection
     ? historicalAction
@@ -46,4 +46,3 @@ export const buildTrustStatus = ({
     trustStatusTone: tone,
   };
 };
-
