@@ -297,6 +297,26 @@ export const WeeklyActionSummaryPanel = ({
           : "Midweek once role-to-revenue linkage is clear.",
     },
   ];
+  const primaryActionConfidence = Math.round(
+    (assessment.scores.riskAppetite + (100 - assessment.scores.tightness)) / 2,
+  );
+  const decisionCards = [
+    {
+      label: "Primary action",
+      action:
+        assessment.regime === "EXPANSION"
+          ? "Commit bounded roadmap scope this week and assign clear owners."
+          : "Prioritize retention and reliability bets with short payback windows.",
+      fallback: "Avoid irreversible headcount or spend expansion until confidence improves.",
+      confidence: primaryActionConfidence,
+    },
+    {
+      label: "Secondary action",
+      action: "Keep experiments reversible with explicit rollback paths.",
+      fallback: "Delay scope growth and stage approvals behind next data refresh.",
+      confidence: Math.max(primaryActionConfidence - 12, 15),
+    },
+  ];
   const [showMetricDefinitions, setShowMetricDefinitions] = useState(false);
 
   return (
@@ -353,22 +373,41 @@ export const WeeklyActionSummaryPanel = ({
               </div>
               <div className="rounded-2xl border border-sky-400/40 bg-slate-950/60 p-4">
                 <p className="text-xs font-semibold tracking-[0.18em] text-sky-200">
-                  Recommended stance
+                  Current stance
                 </p>
                 <p className="mt-2 text-lg font-semibold text-slate-100">
                   Operate in {regimeLabel} mode.
                 </p>
                 <p className="mt-2 text-sm text-slate-200">{actionGuidance}</p>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  {decisionCards.map((card) => (
+                    <div key={card.label} className="rounded-xl border border-slate-700/70 bg-slate-950/65 p-3">
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">{card.label}</p>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        <span className="weather-pill inline-flex min-h-[32px] items-center px-3 py-1 text-[10px] font-semibold tracking-[0.12em] text-slate-100">Primary</span>
+                        <span className="weather-pill-muted inline-flex min-h-[32px] items-center px-3 py-1 text-[10px] font-semibold tracking-[0.12em] text-slate-200">Fallback</span>
+                      </div>
+                      <p className="mt-2 text-xs text-slate-100">{card.action}</p>
+                      <p className="mt-1 text-xs text-slate-400">Alternative: {card.fallback}</p>
+                      <div className="mt-3">
+                        <p className="text-[10px] uppercase tracking-[0.12em] text-slate-400">Confidence {card.confidence}%</p>
+                        <div className="mt-1 h-2 rounded-full border border-slate-700/80 bg-slate-900">
+                          <span className="block h-full rounded-full bg-sky-300/70" style={{ width: `${card.confidence}%` }} aria-hidden="true" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
               <div className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-4">
                 <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Since last read</p>
                 <p className="mt-2 text-sm text-slate-200">
-                  View the delta snapshot before you lock weekly decisions.{" "}
+                  Delta snapshot available for last-read comparison.{" "}
                   <a
                     href="#change-since-last-read"
                     className="touch-target inline-flex min-h-[44px] items-center text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-slate-50 touch-manipulation"
                   >
-                    Jump to the change log
+                    Change log
                   </a>
                   .
                 </p>
@@ -465,23 +504,21 @@ export const WeeklyActionSummaryPanel = ({
                   Next Treasury refresh recorded {recordDateLabel}.
                 </p>
                 <p className="mt-2 text-xs text-slate-300">
-                  Keep weekly decisions within this window unless new alerts publish.
+                  Current window reflects latest published Treasury refresh.
                 </p>
               </div>
               <div className="weather-surface weather-surface-sky p-4">
                 <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
-                  Best timing windows
+                  Decision windows
                 </p>
-                <ul className="mt-3 space-y-2 text-sm text-slate-300">
+                <div className="mt-3 grid gap-2">
                   {timingWindows.map((window) => (
-                    <li key={window.label}>
-                      <p className="text-xs font-semibold tracking-[0.08em] text-slate-200">
-                        {window.label}
-                      </p>
+                    <div key={window.label} className="rounded-lg border border-slate-700/70 bg-slate-950/55 p-3">
+                      <p className="text-xs font-semibold tracking-[0.08em] text-slate-200">{window.label}</p>
                       <p className="mt-1 text-xs text-slate-400">{window.detail}</p>
-                    </li>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </div>
               <div className="grid gap-3">
                 {weeklyBlocks.map((block, index) => (
@@ -523,7 +560,7 @@ export const WeeklyActionSummaryPanel = ({
           </div>
         </details>
         <p className="text-xs text-slate-300">
-          Keep the weekly narrative tight so leaders can decide without re-reading the data lanes.
+          Weekly view optimized for quick decision scanning across data lanes.
         </p>
       </div>
     </section>

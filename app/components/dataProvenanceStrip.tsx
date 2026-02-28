@@ -33,6 +33,12 @@ const statusConfidence = {
   "Simulated (low)": 28,
 } as const;
 
+const statusTimelinePosition = {
+  "Live (high confidence)": 100,
+  "Cached (medium)": 62,
+  "Simulated (low)": 28,
+} as const;
+
 const statusDataMode = {
   "Live (high confidence)": {
     label: "Dynamic · live feed",
@@ -66,6 +72,8 @@ export const DataProvenanceStrip = ({
     "Signal status defined by source availability.";
   const confidencePct =
     statusConfidence[provenance.statusLabel as keyof typeof statusConfidence] ?? 50;
+  const freshnessPosition =
+    statusTimelinePosition[provenance.statusLabel as keyof typeof statusTimelinePosition] ?? 50;
   const dataMode =
     statusDataMode[provenance.statusLabel as keyof typeof statusDataMode] ?? {
       label: "Static · snapshot",
@@ -84,6 +92,13 @@ export const DataProvenanceStrip = ({
           <span className="h-1 w-1 rounded-full bg-slate-600" aria-hidden="true" />
           <span className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/75 bg-slate-900/70 px-3 py-2 text-xs font-medium tracking-[0.1em] text-slate-100">
             Confidence {confidencePct}%
+          </span>
+          <span
+            className="relative inline-flex h-2 min-w-[120px] flex-1 rounded-full border border-slate-700/70 bg-slate-900"
+            role="img"
+            aria-label={`Freshness meter ${freshnessPosition} percent`}
+          >
+            <span className="absolute inset-y-0 left-0 rounded-full bg-sky-300/70" style={{ width: `${freshnessPosition}%` }} aria-hidden="true" />
           </span>
           <Tooltip.Root>
             <Tooltip.Trigger
@@ -110,7 +125,18 @@ export const DataProvenanceStrip = ({
           <summary className="touch-target min-h-[44px] cursor-pointer text-xs font-medium uppercase tracking-[0.12em] text-slate-200">
             Data details
           </summary>
-          <div className="mt-2 space-y-1.5 text-xs tracking-[0.08em] text-slate-200">
+          <div className="mt-2 space-y-2 text-xs tracking-[0.08em] text-slate-200">
+            <div className="space-y-1">
+              <p className="text-[10px] uppercase tracking-[0.12em] text-slate-400">Refresh timeline</p>
+              <div className="relative h-2 rounded-full border border-slate-700/70 bg-slate-900">
+                <span className="absolute inset-y-0 left-0 rounded-full bg-sky-300/70" style={{ width: `${freshnessPosition}%` }} aria-hidden="true" />
+              </div>
+              <div className="flex justify-between text-[10px] text-slate-400">
+                <span>Model</span>
+                <span>Cached</span>
+                <span>Live</span>
+              </div>
+            </div>
             <p>
               Source:{" "}
               {provenance.sourceUrl ? (
