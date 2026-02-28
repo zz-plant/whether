@@ -4,13 +4,55 @@ import { join } from "node:path";
 
 const isTruthyEnv = (value) => value === "1" || value === "true";
 
+const buildMetaPath = join(
+  ".vercel",
+  "output",
+  "static",
+  "_worker.js",
+  "build-meta.json",
+);
+const workerIndexPath = join(
+  ".vercel",
+  "output",
+  "static",
+  "_worker.js",
+  "index.js",
+);
+const vercelOutputConfigPath = join(".vercel", "output", "config.json");
+
+const readBuildMeta = () => {
+  if (!existsSync(buildMetaPath)) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(readFileSync(buildMetaPath, "utf8"));
+  } catch {
+    return null;
+  }
+};
+
+const currentCommitSha =
+  process.env.CF_PAGES_COMMIT_SHA ??
+  process.env.GITHUB_SHA ??
+  process.env.VERCEL_GIT_COMMIT_SHA ??
+  null;
+
 const buildTarget = process.env.BUILD_TARGET;
 const isVercelRuntime = isTruthyEnv(process.env.VERCEL);
 const isCloudflarePages = isTruthyEnv(process.env.CF_PAGES);
 const isCloudflareDeploy = Boolean(process.env.CLOUDFLARE_ACCOUNT_ID);
 const skipNextOnPagesBuild = isTruthyEnv(process.env.NEXT_ON_PAGES_SKIP_BUILD);
-const canAutoSkipNestedBuild = isTruthyEnv(process.env.CI);
-const hasVercelBuildOutput = existsSync(join(".vercel", "output", "config.json"));
+const hasVercelBuildOutput = existsSync(vercelOutputConfigPath);
+const priorBuildMeta = readBuildMeta();
+
+const hasReusableBuildOutput =
+  hasVercelBuildOutput &&
+  existsSync(workerIndexPath) &&
+  Boolean(priorBuildMeta?.useNextOnPages) &&
+  Boolean(priorBuildMeta?.commandSucceeded) &&
+  Boolean(currentCommitSha) &&
+  priorBuildMeta?.commitSha === currentCommitSha;
 const forceCloudflareBuild =
   buildTarget === "cloudflare" || buildTarget === "pages";
 const forceNextBuild = buildTarget === "next";
@@ -19,7 +61,7 @@ const useNextOnPages =
   (forceCloudflareBuild ||
     (!forceNextBuild && (isCloudflarePages || isCloudflareDeploy)));
 const shouldSkipNextOnPagesBuild =
-  useNextOnPages && (skipNextOnPagesBuild || (canAutoSkipNestedBuild && hasVercelBuildOutput));
+  useNextOnPages && (skipNextOnPagesBuild || hasReusableBuildOutput);
 
 const command = useNextOnPages ? "next-on-pages" : "next";
 const args = useNextOnPages
@@ -41,32 +83,12 @@ if (result.status !== 0) {
   process.exit(result.status ?? 1);
 }
 
-const buildMetaPath = join(
-  ".vercel",
-  "output",
-  "static",
-  "_worker.js",
-  "build-meta.json",
-);
 const commandSucceeded = result.status === 0;
-const workerIndexPath = join(
-  ".vercel",
-  "output",
-  "static",
-  "_worker.js",
-  "index.js",
-);
 
 if (useNextOnPages) {
   mkdirSync(join(".vercel", "output", "static", "_worker.js"), {
     recursive: true,
   });
-
-  const commitSha =
-    process.env.CF_PAGES_COMMIT_SHA ??
-    process.env.GITHUB_SHA ??
-    process.env.VERCEL_GIT_COMMIT_SHA ??
-    null;
 
   writeFileSync(
     buildMetaPath,
@@ -78,9 +100,9 @@ if (useNextOnPages) {
         skipBuildReason: shouldSkipNextOnPagesBuild
           ? skipNextOnPagesBuild
             ? "NEXT_ON_PAGES_SKIP_BUILD"
-            : "auto-skip-existing-vercel-output"
+            : "cache-hit-same-commit"
           : null,
-        commitSha,
+        commitSha: currentCommitSha,
         command,
         args,
         commandSucceeded,
