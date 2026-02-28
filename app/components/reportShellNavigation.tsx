@@ -232,7 +232,7 @@ export const ReportInterpretationNotes = () => (
       type="button"
       className="group inline-flex min-h-[44px] w-full items-center justify-between gap-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:text-slate-100 touch-manipulation"
     >
-      <span>How to interpret this week</span>
+      <span>Notes</span>
       <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-300 transition-transform duration-200 group-data-[panel-open]:rotate-180">
         <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
           <path
@@ -251,13 +251,13 @@ export const ReportInterpretationNotes = () => (
         <li className="flex gap-2">
           <span className="text-slate-400">1</span>
           <span className="break-words">
-            Start with user outcomes and ROI. If the idea still wins, keep it on the table.
+            Prioritize ROI.
           </span>
         </li>
         <li className="flex gap-2">
           <span className="text-slate-400">2</span>
           <span className="break-words">
-            Let the climate dictate pacing, staffing, and sequencing—not whether the idea matters.
+            Adjust pace to climate.
           </span>
         </li>
       </ul>
@@ -305,15 +305,18 @@ export const ReportMobileNavigation = ({
         onKeyDown={onDirectionalKeyDown}
       >
         <div className="weather-mobile-nav flex flex-col gap-3 px-3 py-3">
-          <div className="flex min-w-0 items-center gap-3 rounded-2xl border border-slate-800/80 bg-slate-950/70 px-3 py-2">
-            <span className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl border border-slate-800/80 bg-slate-950/80 text-slate-100">
+          <div className="weather-mobile-spotlight flex min-w-0 items-center gap-3 rounded-2xl px-3 py-2.5">
+            <span className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl border border-sky-400/35 bg-slate-950/85 text-slate-100 shadow-[0_10px_20px_-16px_rgba(56,189,248,0.65)]">
               {pageLinkIcons[currentLink.label] ?? pageLinkIcons.Method}
             </span>
-            <div className="min-w-0">
+            <div className="min-w-0 space-y-1">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-sky-200/90">
+                Current
+              </p>
               <p className="truncate text-sm font-semibold tracking-[0.08em] text-slate-100">
                 {currentLink.label}
               </p>
-              <p className="mt-1 truncate text-xs text-slate-300">
+              <p className="truncate text-xs text-slate-300">
                 {currentLink.description}
               </p>
             </div>
@@ -325,9 +328,9 @@ export const ReportMobileNavigation = ({
                 <NavigationMenu.Item key={link.href}>
                   <NavigationMenu.Link
                     href={link.href}
-                    className="weather-pill inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-slate-800/80 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                    className="weather-mobile-link weather-pill inline-flex min-h-[48px] w-full items-center justify-center rounded-2xl border border-slate-700/80 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
                   >
-                    Explore {link.label}
+                    {link.label}
                   </NavigationMenu.Link>
                 </NavigationMenu.Item>
               ))}
@@ -337,7 +340,7 @@ export const ReportMobileNavigation = ({
           <div className="grid grid-cols-1 gap-2">
             <Collapsible.Trigger
               type="button"
-              className="group weather-pill flex min-h-[48px] w-full flex-col items-center justify-center gap-1 rounded-2xl border border-slate-800/80 px-2 py-2 text-xs font-semibold tracking-[0.18em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+              className="group weather-pill flex min-h-[52px] w-full flex-col items-center justify-center gap-1 rounded-2xl border border-slate-700/80 bg-slate-950/45 px-2 py-2 text-xs font-semibold tracking-[0.18em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
             >
               <span className="inline-flex items-center gap-2 text-slate-100">
                 <span className="transition-transform duration-200 group-data-[panel-open]:rotate-90">
@@ -346,10 +349,10 @@ export const ReportMobileNavigation = ({
                     <path d="M8.75 9.25h6.5M8.75 12h6.5M8.75 14.75h4" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="1.5" />
                   </svg>
                 </span>
-                <span className="uppercase">Explore all</span>
+                <span className="uppercase">All pages</span>
               </span>
               <span className="text-xs font-medium tracking-[0.12em] text-slate-300">
-                {pageCountLabel} by intent
+                {pageCountLabel}
               </span>
             </Collapsible.Trigger>
           </div>
@@ -360,7 +363,7 @@ export const ReportMobileNavigation = ({
             <div className="flex items-start justify-between gap-3">
               <div className="space-y-1">
                 <p className="text-base font-semibold text-slate-100">{currentLink.label}</p>
-                <p className="text-xs text-slate-300">Jump directly to the area you need right now.</p>
+                <p className="text-xs text-slate-300">Select page.</p>
               </div>
               <div className="flex items-center gap-2">
                 <Collapsible.Trigger

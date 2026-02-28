@@ -32,7 +32,7 @@ export const MobileActionSheet = ({
       }}
     >
       <Dialog.Trigger
-        className="weather-pill inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-full px-3 py-2 text-center text-xs font-semibold tracking-[0.12em] text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+        className="weather-mobile-sheet-trigger weather-pill inline-flex min-h-[46px] w-full items-center justify-center gap-2 rounded-2xl px-3 py-2 text-center text-xs font-semibold tracking-[0.12em] text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
         aria-label={`${triggerLabel}. ${open ? "Expanded" : "Collapsed"}.`}
       >
         <span>{triggerLabel}</span>
@@ -71,7 +71,7 @@ export const MobileActionSheet = ({
         >
           <div className="weather-mobile-panel weather-mobile-sheet w-full p-4 shadow-2xl">
             <div className="mb-3 flex items-center justify-between gap-3">
-              <Dialog.Title className="text-xs font-semibold tracking-[0.2em] text-slate-300">More actions</Dialog.Title>
+              <Dialog.Title className="text-xs font-semibold tracking-[0.2em] text-slate-300">Actions</Dialog.Title>
               <Dialog.Close className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-slate-700/80 text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation">
                 <span aria-hidden="true">✕</span>
                 <span className="sr-only">Close actions menu</span>
@@ -82,7 +82,7 @@ export const MobileActionSheet = ({
                 <li key={`${action.href}-${action.label}`}>
                   <a
                     href={action.href}
-                    className="inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-slate-700/70 px-3 py-2 text-center text-xs font-semibold leading-tight tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-300/80 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                    className="weather-mobile-sheet-link inline-flex min-h-[46px] w-full items-center justify-center border px-3 py-2 text-center text-xs font-semibold leading-tight tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-300/80 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
                     onClick={() => {
                       suppressCloseAutoFocusRef.current = true;
                       setOpen(false);
