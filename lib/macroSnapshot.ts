@@ -19,6 +19,8 @@ type MacroSnapshotPayload = {
 const payload = macroSnapshot as MacroSnapshotPayload;
 
 const MACRO_SERIES_REVALIDATE_SECONDS = 900;
+const BLS_YOY_LOOKBACK_YEARS = 2;
+const YEAR_OVER_YEAR_PERCENT_MULTIPLIER = 100;
 
 const snapshotSeries: MacroSeriesReading[] = payload.series.map((series) => ({
   ...series,
@@ -91,7 +93,7 @@ const readBlsLatestYearOverYear = async (seriesId: string, fetcher: typeof fetch
     next: { revalidate: MACRO_SERIES_REVALIDATE_SECONDS },
     body: JSON.stringify({
       seriesid: [seriesId],
-      startyear: String(currentYear - 2),
+      startyear: String(currentYear - BLS_YOY_LOOKBACK_YEARS),
       endyear: String(currentYear),
     }),
   });
@@ -130,7 +132,9 @@ const readBlsLatestYearOverYear = async (seriesId: string, fetcher: typeof fetch
   const month = latest.period.replace("M", "");
   return {
     recordDate: `${latest.year}-${month}-01`,
-    value: ((latestValue - previousYearValue) / previousYearValue) * 100,
+    value:
+      ((latestValue - previousYearValue) / previousYearValue) *
+      YEAR_OVER_YEAR_PERCENT_MULTIPLIER,
   };
 };
 

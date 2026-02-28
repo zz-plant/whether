@@ -14,6 +14,7 @@ import {
   getPreviousTimeMachineSnapshot,
   getTimeMachineRegimeSeries,
   findTimeMachineSnapshot,
+  DEFAULT_REGIME_SERIES_MONTHS,
 } from "../timeMachine/timeMachineCache";
 import {
   parseTimeMachineRequest,
@@ -116,7 +117,7 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
   const selectedMonth = requestedSelection?.month ?? defaultMonth;
   const selectedYear = requestedSelection?.year ?? defaultYear;
   const thresholds = parseThresholdsFromSearchParams(searchParams);
-  const regimeSeries = getTimeMachineRegimeSeries(24, thresholds);
+  const regimeSeries = getTimeMachineRegimeSeries(DEFAULT_REGIME_SERIES_MONTHS, thresholds);
   const [treasury, liveTreasury, macroSeries] = await Promise.all([
     treasuryPromise,
     liveTreasuryPromise ?? treasuryPromise,

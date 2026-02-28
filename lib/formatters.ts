@@ -18,6 +18,8 @@ const numberFormatter = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 2,
 });
 
+const MS_PER_HOUR = 60 * 60 * 1000;
+
 const parseDateValue = (value: string) => {
   const date = new Date(value);
   return Number.isNaN(date.valueOf()) ? null : date;
@@ -41,7 +43,7 @@ export const formatAgeHours = (value: string | null, now: Date) => {
   if (!timestamp) {
     return "—";
   }
-  const hours = Math.max(0, Math.round((now.getTime() - timestamp.getTime()) / 36e5));
+  const hours = Math.max(0, Math.round((now.getTime() - timestamp.getTime()) / MS_PER_HOUR));
   return `${hours}h.`;
 };
 

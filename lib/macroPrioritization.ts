@@ -8,9 +8,10 @@ const impactWeights: Record<MacroSeriesId, number> = {
 
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
 const RECENCY_WINDOW_DAYS = 120;
+const DEFAULT_IMPACT_WEIGHT = 0.5;
 
 export const buildMacroPriorityScore = (signal: MacroSeriesReading, now = Date.now()) => {
-  const impact = impactWeights[signal.id] ?? 0.5;
+  const impact = impactWeights[signal.id] ?? DEFAULT_IMPACT_WEIGHT;
   const recordTimestamp = Date.parse(signal.record_date);
   if (!Number.isFinite(recordTimestamp)) {
     return { impact, recency: 0, score: 0 };

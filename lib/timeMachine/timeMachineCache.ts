@@ -18,6 +18,9 @@ const TimeMachineSnapshotSchema = TreasuryDataSchema.extend({
 type TimeMachineSnapshot = z.infer<typeof TimeMachineSnapshotSchema>;
 
 const TimeMachineCacheSchema = z.array(TimeMachineSnapshotSchema);
+export const DEFAULT_REGIME_SERIES_MONTHS = 24;
+export const DEFAULT_ROLLING_YIELD_MONTHS = 12;
+const MIN_ROLLING_YIELD_MONTHS = 1;
 
 const deriveYearMonth = (recordDate: string) => {
   const parsedDate = new Date(recordDate);
@@ -149,7 +152,7 @@ const buildRegimeSeriesCacheKey = (
 };
 
 export const getTimeMachineRegimeSeries = (
-  months = 24,
+  months = DEFAULT_REGIME_SERIES_MONTHS,
   overrides?: Partial<RegimeThresholds>
 ): TimeMachineRegimeEntry[] => {
   const cacheKey = buildRegimeSeriesCacheKey(months, overrides);
@@ -218,7 +221,7 @@ export const findTimeMachineSnapshot = (asOf: string): TreasuryData | null => {
 };
 
 export const getTimeMachineRollingYieldSeries = (
-  months = 12,
+  months = DEFAULT_ROLLING_YIELD_MONTHS,
   asOf?: string
 ): {
   oneMonth: SeriesHistoryPoint[];
@@ -226,7 +229,7 @@ export const getTimeMachineRollingYieldSeries = (
   twoYear: SeriesHistoryPoint[];
   tenYear: SeriesHistoryPoint[];
 } => {
-  const resolvedMonths = Math.max(months, 1);
+  const resolvedMonths = Math.max(months, MIN_ROLLING_YIELD_MONTHS);
   const asOfTime = asOf ? new Date(asOf).getTime() : Number.NaN;
   const asOfIndex =
     asOf && Number.isFinite(asOfTime)
