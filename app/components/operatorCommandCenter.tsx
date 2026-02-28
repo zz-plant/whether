@@ -28,10 +28,24 @@ const commandButtonClassName =
 
 const filterDescriptions: Record<CommandFilter, string> = {
   All: "All results across actions, pages, and sections.",
-  Playbook: "Recommended actions you can take right now.",
+  Playbook: "Action-focused results sorted for immediate relevance.",
   Pages: "Switch to a different report surface.",
-  Sections: "Jump to a specific section on this page.",
+  Sections: "Section-level jumps within the current page.",
 };
+
+const filterIcons: Record<CommandFilter, string> = {
+  All: "◉",
+  Playbook: "⚡",
+  Pages: "▣",
+  Sections: "↳",
+};
+
+const hotkeyHints = [
+  { keys: "↑/↓", action: "Move" },
+  { keys: "←/→", action: "Filters" },
+  { keys: "Enter", action: "Select" },
+  { keys: "Esc", action: "Reset" },
+] as const;
 
 const groupGlyph: Record<OperatorCommandAction["group"], string> = {
   Playbook: "⚡",
@@ -250,7 +264,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
               onClick={handleCollapse}
               className={commandButtonClassName}
             >
-              Collapse
+              Hide panel
             </button>
           ) : null}
           <span className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-300">
@@ -261,7 +275,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
               href={topMatch.href}
               className="weather-pill hidden min-h-[44px] items-center px-3 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:inline-flex"
             >
-              {isInPageLink(topMatch.href) ? "Open top section" : "Open top page"}
+              {isInPageLink(topMatch.href) ? "Top section" : "Top page"}
             </a>
           ) : null}
         </div>
@@ -270,12 +284,14 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
       {!isExpanded ? (
         <div className="weather-surface space-y-3 p-4">
           {isFirstSession ? (
-            <p className="text-sm text-slate-200">
-              This page content is available below. Open command center any time to jump.
+            <p className="inline-flex items-center gap-2 text-sm text-slate-200">
+              <span aria-hidden="true" className="text-sky-300">◉</span>
+              Content remains visible below; command center stays available for quick jumps.
             </p>
           ) : (
-            <p className="text-sm text-slate-200">
-              Command center is collapsed. Open it to jump to actions, pages, or sections.
+            <p className="inline-flex items-center gap-2 text-sm text-slate-200">
+              <span aria-hidden="true" className="text-slate-400">▸</span>
+              Panel hidden; quick-jump controls return when expanded.
             </p>
           )}
           <button
@@ -283,7 +299,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
             onClick={handleExpand}
             className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
           >
-            Open command center
+            Show command center
           </button>
         </div>
       ) : null}
@@ -292,7 +308,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
         <>
           <div className="grid gap-3 lg:grid-cols-[1fr,auto] lg:items-start">
             <label htmlFor="operator-command-search" className="sr-only">
-              Search links
+              Search
             </label>
             <input
               ref={searchInputRef}
@@ -300,7 +316,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search links"
+              placeholder="Search"
               className="w-full rounded-2xl border border-slate-700/80 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
             />
             <div className="space-y-2">
@@ -319,26 +335,33 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
                       }`}
                       aria-pressed={isActive}
                     >
-                      {item}
+                      {filterIcons[item]} {item}
                     </button>
                   );
                 })}
               </div>
               <p className="text-xs text-slate-300">{filterDescriptions[filter]}</p>
-              <p className="text-xs text-slate-400">
-                Playbook = Recommended actions · Pages = Switch surfaces · Sections = Open section.
-              </p>
+              <div className="flex flex-wrap gap-2 text-[10px] font-semibold tracking-[0.12em] text-slate-300">
+                {filterOrder.map((item) => (
+                  <span key={`legend-${item}`} className="inline-flex items-center gap-1 rounded-full border border-slate-700/70 px-2 py-1">
+                    <span aria-hidden="true">{filterIcons[item]}</span>
+                    <span>{item}</span>
+                  </span>
+                ))}
+              </div>
               {isMobile ? (
                 <details className="weather-surface p-3">
                   <summary className="cursor-pointer list-none text-xs font-semibold tracking-[0.12em] text-slate-300 focus-visible:rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
-                    Tips for keyboard and remote users
+                    Input map
                   </summary>
-                  <p className="mt-2 text-xs text-slate-400">Mobile default is Playbook for faster “do now” access.</p>
-                  <div className="mt-2 grid gap-2 text-xs text-slate-300 sm:grid-cols-2">
-                    <p><span className="font-semibold text-slate-100">↑/↓</span> move focus</p>
-                    <p><span className="font-semibold text-slate-100">←/→</span> switch controls</p>
-                    <p><span className="font-semibold text-slate-100">Enter / OK</span> open link</p>
-                    <p><span className="font-semibold text-slate-100">Esc / Back</span> clear search field</p>
+                  <p className="mt-2 text-xs text-slate-400">Mobile default: ⚡ Playbook view.</p>
+                  <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-200">
+                    {hotkeyHints.map((hint) => (
+                      <span key={`mobile-${hint.keys}`} className="inline-flex items-center gap-2 rounded-full border border-slate-700/70 px-2 py-1">
+                        <span className="font-semibold text-slate-100">{hint.keys}</span>
+                        <span>{hint.action}</span>
+                      </span>
+                    ))}
                   </div>
                 </details>
               ) : null}
@@ -352,11 +375,13 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
                 </button>
               ) : null}
               {!isMobile ? (
-                <div className="weather-surface grid gap-2 p-3 text-xs text-slate-300 sm:grid-cols-2">
-                  <p><span className="font-semibold text-slate-100">↑/↓</span> move focus</p>
-                  <p><span className="font-semibold text-slate-100">←/→</span> switch controls</p>
-                  <p><span className="font-semibold text-slate-100">Enter / OK</span> open link</p>
-                  <p><span className="font-semibold text-slate-100">Esc / Back</span> clear search field</p>
+                <div className="weather-surface flex flex-wrap gap-2 p-3 text-xs text-slate-200">
+                  {hotkeyHints.map((hint) => (
+                    <span key={`desktop-${hint.keys}`} className="inline-flex items-center gap-2 rounded-full border border-slate-700/70 px-2 py-1">
+                      <span className="font-semibold text-slate-100">{hint.keys}</span>
+                      <span>{hint.action}</span>
+                    </span>
+                  ))}
                 </div>
               ) : null}
             </div>

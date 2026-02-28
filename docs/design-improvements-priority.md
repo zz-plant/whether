@@ -61,3 +61,27 @@ Preservation rules for future contributors:
 - Do not reintroduce detached legends for this view; use direct end-of-line labels.
 - Reserve accent color for outliers/regime breaks only.
 - Maintain keyboard row focus order and screen-reader row summaries.
+
+## Text-first UI needs that can shift to non-text cues
+
+The current UI still relies on explanatory copy in several places where structure, state, or visual encoding could carry more of the load:
+
+1. **Onboarding orientation and wayfinding**
+   - Current text role: three "Step N" sections and explanatory paragraph carry the onboarding model.
+   - Alternative: progress stepper with completion state, optional mini-map, and contextual defaults (instead of repeated instructional prose).
+
+2. **System/data state comprehension**
+   - Current text role: provenance modules communicate freshness, update cadence, and source reliability with labels and helper text.
+   - Alternative: stronger state icons/timeline markers + compact status meter with drill-down on demand.
+
+3. **Action prioritization and decision confidence**
+   - Current text role: weekly bullets, constraints, and timing windows are largely sentence-driven.
+   - Alternative: explicit decision cards with primary/secondary action chips, confidence bars, and tradeoff toggles.
+
+4. **Navigation education in command center**
+   - Current text role: filter meaning, keyboard/remote instructions, and collapsed-state explanation are copy-heavy.
+   - Alternative: icon-led filter legend, contextual hotkey hint chips, and progressive disclosure for advanced controls.
+
+5. **Workflow status communication**
+   - Current text role: workflow and checklist modules rely on labels like "Step 1", "In progress", and completion instructions.
+   - Alternative: timeline rail + completion rings + state transitions (empty → active → complete) with less explanatory text.
