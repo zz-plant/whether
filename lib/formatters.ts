@@ -4,9 +4,13 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
 });
 
 const timestampFormatter = new Intl.DateTimeFormat("en-US", {
-  dateStyle: "medium",
-  timeStyle: "short",
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+  hour: "numeric",
+  minute: "2-digit",
   timeZone: "UTC",
+  timeZoneName: "short",
 });
 
 const numberFormatter = new Intl.NumberFormat("en-US", {
