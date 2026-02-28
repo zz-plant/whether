@@ -72,6 +72,7 @@ const useNextOnPages =
 const hasRestoredCloudflareOutput = hasVercelBuildOutput || hasWorkerBuildOutput;
 const shouldAutoSkipInCi =
   useNextOnPages &&
+  !forceCloudflareBuild &&
   hasRestoredCloudflareOutput &&
   (isCi || isCloudflarePages || isCloudflareDeploy);
 const shouldSkipNextOnPagesBuild =
