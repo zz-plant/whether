@@ -139,7 +139,7 @@ export const DataProvenanceStrip = ({
           {provenanceRows.map((row) => (
             <p key={row.label} className="space-y-1">
               <span className="block text-[10px] uppercase tracking-[0.12em] text-slate-400">{row.label}</span>
-              <span className="block">{row.value}</span>
+              <span className="block tracking-normal normal-case">{row.value}</span>
             </p>
           ))}
         </div>
@@ -148,9 +148,9 @@ export const DataProvenanceStrip = ({
   }
 
   return (
-    <div className="weather-pill space-y-2 px-4 py-3 text-[0.65rem] font-semibold tracking-[0.14em] text-slate-300">
+    <div className="weather-pill space-y-2 px-4 py-3 text-[0.65rem] font-semibold text-slate-300">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-slate-500 uppercase">{label}</span>
+        <span className="text-slate-500 uppercase tracking-[0.14em]">{label}</span>
         <span className="h-1 w-1 rounded-full bg-slate-600" aria-hidden="true" />
         <span className={`${dataMode.className} font-medium uppercase tracking-[0.12em]`}>
           <span aria-hidden="true">{dataMode.icon}</span>
@@ -181,11 +181,11 @@ export const DataProvenanceStrip = ({
           </Tooltip.Portal>
         </Tooltip.Root>
       </div>
-      <div className="grid gap-2 text-xs tracking-[0.1em] text-slate-200 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-2 text-xs text-slate-200 sm:grid-cols-2 xl:grid-cols-4">
         {provenanceRows.map((row) => (
           <p key={row.label} className="space-y-1">
             <span className="block text-[10px] uppercase tracking-[0.12em] text-slate-500">{row.label}</span>
-            <span className="block">{row.value}</span>
+            <span className="block tracking-normal normal-case">{row.value}</span>
           </p>
         ))}
       </div>
