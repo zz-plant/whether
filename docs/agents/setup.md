@@ -12,7 +12,7 @@
 - Run full quality checks: `bun run check`
 - Run lint checks: `bun run lint`
 - Run type checks: `bun run typecheck`
-- Run tests: `bun test`
+- Run tests: `bun run test`
 - Run tests in watch mode: `bun run test:watch`
 - Run Whether MCP server (stdio): `bun run mcp:whether`
 
@@ -41,7 +41,7 @@ export BRAVE_API_KEY="<optional-search-provider-key>"
 
 ## Baseline verification after setup
 - `bun run lint`
-- `bun test`
+- `bun run test`
 
 If MCP-backed research appears in a deliverable, include URL + retrieval date + confidence.
 

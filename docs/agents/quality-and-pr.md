@@ -6,7 +6,7 @@ Run the smallest meaningful verification set for the scope and risk of your chan
 | Change profile | Minimum validation |
 | --- | --- |
 | Docs/copy-only | Verify links, commands, and references manually |
-| Typical product/logic change | `bun run lint` + `bun test` |
+| Typical product/logic change | `bun run lint` + `bun run test` |
 | Broad/refactor/high-risk logic change | `bun run check` + targeted regression coverage |
 
 Additional requirements:
