@@ -9,7 +9,6 @@ import { Children, type ReactNode, isValidElement } from "react";
 import { DisplayGuardian } from "./displayGuardian";
 import { DisplayModeManager } from "./displayModeManager";
 import { DisplayModeToggle } from "./displayModeToggle";
-import { MobileActionSheet } from "./mobileActionSheet";
 import { CanonicalTrustModule } from "./canonicalTrustModule";
 import {
   OperatorCommandCenter,
@@ -466,49 +465,36 @@ export const ReportShell = ({
                           {primaryCta.label}
                         </span>
                       </a>
+                      {secondaryCta ? (
+                        <a
+                          href={secondaryCta.href}
+                          className="weather-pill inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-slate-700/80 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto"
+                        >
+                          {secondaryCta.label}
+                        </a>
+                      ) : null}
                       {exportCta ? (
-                        <div className="w-full sm:hidden">
-                          <MobileActionSheet
-                            triggerLabel="More actions"
-                            srHint="Open additional actions menu"
-                            actions={[
-                              { href: exportCta.href, label: exportCta.label },
-                            ]}
-                          />
-                        </div>
+                        <a
+                          href={exportCta.href}
+                          className="weather-pill inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-slate-700/80 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto"
+                        >
+                          {exportCta.label}
+                        </a>
                       ) : null}
                     </div>
-                    <p className="text-sm text-slate-200">
-                      {trustStatusTone === "stable"
-                        ? `Confidence: ${trustStatusLabel}. ${trustStatusAction}`
-                        : `Caution: ${trustStatusAction}`}
-                    </p>
-                    <Collapsible.Root className="weather-surface px-3 py-2 sm:hidden">
-                      <Collapsible.Trigger
-                        type="button"
-                        className="group flex min-h-[44px] w-full items-center justify-between gap-2 text-xs font-semibold tracking-[0.12em] text-slate-100"
-                      >
-                        <span>Data status</span>
-                        <span aria-hidden="true" className="text-slate-400 transition-transform group-data-[panel-open]:rotate-180">⌄</span>
-                      </Collapsible.Trigger>
-                      <Collapsible.Panel className="mt-2">
-                        <dl className="grid gap-2 text-sm text-slate-200">
-                          <div>
-                            <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Confidence</dt>
-                            <dd className="mt-1 font-semibold text-slate-100">{trustStatusLabel}</dd>
-                          </div>
-                          <div>
-                            <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Signals stamped</dt>
-                            <dd className="mt-1 text-slate-100">{recordDateLabel}</dd>
-                          </div>
-                          <div>
-                            <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Last refresh</dt>
-                            <dd className="mt-1 text-slate-100">{fetchedAtLabel}</dd>
-                          </div>
-                        </dl>
-                      </Collapsible.Panel>
-                    </Collapsible.Root>
-                    <dl className="hidden gap-2 text-sm text-slate-200 sm:grid sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="flex flex-wrap gap-2 text-xs font-semibold tracking-[0.1em] text-slate-200">
+                      <span className="weather-chip inline-flex min-h-[32px] items-center px-3 py-1 text-[11px]">
+                        {trustStatusTone === "stable" ? "Stable" : "Caution"} · {trustStatusLabel}
+                      </span>
+                      <span className="weather-chip inline-flex min-h-[32px] items-center px-3 py-1 text-[11px] text-slate-200">
+                        Signals {recordDateLabel}
+                      </span>
+                      <span className="weather-chip inline-flex min-h-[32px] items-center px-3 py-1 text-[11px] text-slate-200">
+                        Refresh {fetchedAtLabel}
+                      </span>
+                    </div>
+                    <p className="text-sm text-slate-200">{trustStatusAction}</p>
+                    <dl className="grid gap-2 text-sm text-slate-200 min-[420px]:grid-cols-2 lg:grid-cols-3">
                       <div className="weather-surface px-3 py-2">
                         <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Confidence</dt>
                         <dd className="mt-1 font-semibold text-slate-100">{trustStatusLabel}</dd>
@@ -517,7 +503,7 @@ export const ReportShell = ({
                         <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Signals stamped</dt>
                         <dd className="mt-1 text-slate-100">{recordDateLabel}</dd>
                       </div>
-                      <div className="weather-surface px-3 py-2 sm:col-span-2 lg:col-span-1">
+                      <div className="weather-surface px-3 py-2 min-[420px]:col-span-2 lg:col-span-1">
                         <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Last refresh</dt>
                         <dd className="mt-1 text-slate-100">{fetchedAtLabel}</dd>
                       </div>
