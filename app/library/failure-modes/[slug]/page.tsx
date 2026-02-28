@@ -7,6 +7,8 @@ type Params = { slug: string };
 
 const titleCase = (value: string) => value.split("-").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(" ");
 
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return failureModes.map((slug) => ({ slug }));
 }

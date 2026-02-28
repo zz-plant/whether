@@ -40,6 +40,8 @@ const formatRecordDate = (isoDate: string) => {
   return recordDateFormatter.format(new Date(`${isoDate}T00:00:00Z`));
 };
 
+export const dynamicParams = false;
+
 export async function generateStaticParams() {
   return productConceptArticles.map((article) => ({ slug: article.slug }));
 }

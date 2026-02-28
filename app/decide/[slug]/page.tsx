@@ -16,6 +16,8 @@ const titleCase = (value: string) => value
   .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
   .join(" ");
 
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return [
     ...useCaseRoles.map((entry) => ({ slug: entry.slug })),

@@ -5,6 +5,8 @@ import { buildPageMetadata } from "../../../lib/seo";
 import { toolkitDefinitions } from "../../../lib/informationArchitecture";
 type Params = { slug: string };
 
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return toolkitDefinitions.map((entry) => ({ slug: entry.slug }));
 }
