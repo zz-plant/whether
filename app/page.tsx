@@ -477,7 +477,7 @@ export default async function HomePage({
           <div className="space-y-3 border-t border-slate-700/70 pt-4" aria-label="Explore additional guidance routes">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-200">Explore next</p>
             <div className="flex flex-wrap gap-2 text-xs font-semibold tracking-[0.08em]">
-              <Link href="/plan" className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2">Plan toolkits</Link>
+              <Link href="/operations/plan" className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2">Plan toolkits</Link>
               <Link href="/learn" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2">Learn hub</Link>
               <Link href="/decide" className="weather-pill-muted inline-flex min-h-[44px] items-center px-3 py-2">Decide pathways</Link>
             </div>
