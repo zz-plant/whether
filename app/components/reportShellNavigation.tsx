@@ -187,15 +187,21 @@ export const ReportPageNavigation = ({
   className?: string;
   variant?: "full" | "compact";
 }) => {
+  const coreReportHrefs = new Set(["/start", "/signals", "/operations"]);
+  const primaryLinks = pageLinks.filter((link) => coreReportHrefs.has(link.href));
+  const secondaryLinks = pageLinks.filter((link) => !coreReportHrefs.has(link.href));
+  const visibleLinks = primaryLinks.length > 0 ? primaryLinks : pageLinks;
+
   return (
     <NavigationMenu.Root aria-label="Report paths" className={className}>
       <div className="space-y-2">
         <NavigationMenu.List className="grid grid-cols-2 gap-2 rounded-2xl border border-slate-800/80 bg-slate-950/45 p-2 sm:flex sm:flex-wrap sm:gap-2">
-          {pageLinks.map((link, index) => {
+          {visibleLinks.map((link, index) => {
             const isActive = currentPath
               ? isLinkActiveForPath(link.href, currentPath)
               : link.label === pageTitle;
-            const isOddTail = pageLinks.length % 2 === 1 && index === pageLinks.length - 1;
+            const isOddTail =
+              visibleLinks.length % 2 === 1 && index === visibleLinks.length - 1;
             return (
               <NavigationMenu.Item
                 key={link.href}
@@ -219,6 +225,54 @@ export const ReportPageNavigation = ({
             );
           })}
         </NavigationMenu.List>
+
+        {secondaryLinks.length > 0 ? (
+          <Collapsible.Root>
+            <Collapsible.Trigger
+              type="button"
+              className="group inline-flex min-h-[44px] w-full items-center justify-between gap-2 rounded-xl border border-slate-800/80 bg-slate-950/40 px-3 py-2 text-left text-xs font-semibold tracking-[0.1em] text-slate-200 transition-colors hover:border-sky-400/60 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+            >
+              <span>Explore all pages</span>
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-300 transition-transform duration-200 group-data-[panel-open]:rotate-180">
+                <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
+                  <path
+                    d="M7 10l5 5 5-5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
+            </Collapsible.Trigger>
+            <Collapsible.Panel className="pt-2">
+              <NavigationMenu.List className="grid grid-cols-2 gap-2 rounded-2xl border border-slate-800/70 bg-slate-950/35 p-2 sm:flex sm:flex-wrap sm:gap-2">
+                {secondaryLinks.map((link) => {
+                  const isActive = currentPath
+                    ? isLinkActiveForPath(link.href, currentPath)
+                    : link.label === pageTitle;
+                  return (
+                    <NavigationMenu.Item key={link.href} className="flex sm:flex-shrink-0">
+                      <NavigationMenu.Link
+                        href={link.href}
+                        active={isActive}
+                        aria-current={isActive ? "page" : undefined}
+                        className={`weather-tab inline-flex min-h-[46px] w-full items-center justify-center rounded-xl border px-4 py-2 text-center text-sm font-semibold tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:px-4 sm:text-xs ${
+                          isActive
+                            ? "border-sky-300/90 bg-sky-500/25 text-sky-50 shadow-sm shadow-sky-900/40"
+                            : "border-slate-700/80 bg-slate-900/45 text-slate-200 hover:border-sky-400/70 hover:text-slate-100"
+                        }`}
+                      >
+                        {link.label}
+                      </NavigationMenu.Link>
+                    </NavigationMenu.Item>
+                  );
+                })}
+              </NavigationMenu.List>
+            </Collapsible.Panel>
+          </Collapsible.Root>
+        ) : null}
       </div>
     </NavigationMenu.Root>
   );
