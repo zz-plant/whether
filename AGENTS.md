@@ -9,7 +9,7 @@ Whether (Regime Station) turns public macro signals into operational guidance fo
 - Build for production: `bun run build`
 - Run full checks: `bun run check`
 - Run lint checks: `bun run lint`
-- Run tests: `bun test`
+- Run tests: `bun run test`
 
 ## Operating principles
 - Follow instruction priority: system > developer > user > AGENTS > repo docs.
@@ -22,7 +22,7 @@ Whether (Regime Station) turns public macro signals into operational guidance fo
 ## Workflow checklist
 1. Read relevant docs in `docs/agents/` before editing.
 2. Confirm the source of truth for any content/data changes.
-3. Run the smallest useful verification set (`bun run lint`, `bun test`, `bun run check`, or targeted checks).
+3. Run the smallest useful verification set (`bun run lint`, `bun run test`, `bun run check`, or targeted checks).
 4. Summarize code/doc changes and commands run in the final response.
 
 ## Progressive guidance
@@ -41,4 +41,3 @@ Whether (Regime Station) turns public macro signals into operational guidance fo
 - Keep skills task-specific with explicit output contracts and non-goals.
 - Default to least-privilege tool access and avoid write/mutation tools unless required.
 - When adding new skills, include a short note in `docs/agents/mcp-and-skills-playbook.md` if it changes recommended workflows.
-

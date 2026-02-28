@@ -13,7 +13,7 @@ import {
 import { productConceptArticles } from "../lib/productCanon";
 
 describe("sitemap", () => {
-  it("returns canonical URLs and includes posture/use-case/toolkit/library routes", () => {
+  it("returns canonical URLs and includes posture, decide, learn, toolkit, and library routes", () => {
     const entries = sitemap();
 
     assert.ok(entries.length > 0);
@@ -25,7 +25,7 @@ describe("sitemap", () => {
     assert.ok(urls.has(siteUrl));
     assert.ok(urls.has(`${siteUrl}/start`));
     assert.ok(urls.has(`${siteUrl}/posture`));
-    assert.ok(urls.has(`${siteUrl}/use-cases`));
+    assert.ok(urls.has(`${siteUrl}/decide/use-cases`));
     assert.ok(urls.has(`${siteUrl}/toolkits`));
     assert.ok(urls.has(`${siteUrl}/library`));
 
@@ -34,22 +34,27 @@ describe("sitemap", () => {
     }
 
     for (const role of useCaseRoles) {
-      assert.ok(urls.has(`${siteUrl}/use-cases/${role.slug}`));
+      assert.ok(urls.has(`${siteUrl}/decide/${role.slug}`));
     }
 
     for (const situation of situationUseCases) {
-      assert.ok(urls.has(`${siteUrl}/use-cases/${situation}`));
+      assert.ok(urls.has(`${siteUrl}/decide/${situation}`));
     }
+
+    assert.ok(urls.has(`${siteUrl}/learn/failure-modes`));
+    assert.ok(urls.has(`${siteUrl}/learn/concepts`));
 
     for (const toolkit of toolkitDefinitions) {
       assert.ok(urls.has(`${siteUrl}/toolkits/${toolkit.slug}`));
     }
 
     for (const mode of failureModes) {
+      assert.ok(urls.has(`${siteUrl}/learn/failure-modes/${mode}`));
       assert.ok(urls.has(`${siteUrl}/library/failure-modes/${mode}`));
     }
 
     for (const article of productConceptArticles) {
+      assert.ok(urls.has(`${siteUrl}/learn/concepts/${article.slug}`));
       assert.ok(urls.has(`${siteUrl}/concepts/${article.slug}`));
     }
   });
