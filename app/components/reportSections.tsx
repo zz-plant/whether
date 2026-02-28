@@ -1625,9 +1625,6 @@ export const ExecutiveSnapshotPanel = ({
     : hasDataWarnings
       ? "Data quality status: some Treasury inputs are missing; verify the gaps before escalating commitment size."
       : "Data quality status: full Treasury coverage is healthy for this report window.";
-  const freshnessAction = isFallback
-    ? "Forecast certainty remains probabilistic; pause irreversible budget, hiring, or sequencing approvals until live data returns and leadership review is complete."
-    : "Forecast certainty remains probabilistic, but with healthy data this is suitable for day-to-day budget sequencing, hiring pacing, and approval routing with human judgment.";
   const scoringInputs = assessment.inputs;
   const scoringSource = scoringInputs[0]?.sourceLabel ?? "US Treasury";
   const scoringSourceUrl = scoringInputs[0]?.sourceUrl ?? treasury.source;
@@ -1682,7 +1679,6 @@ export const ExecutiveSnapshotPanel = ({
                       <p className="text-xs text-slate-400">
                         Confidence reflects data freshness and missing inputs, not forecast certainty.
                       </p>
-                      <p className="text-xs text-slate-400">{freshnessAction}</p>
                       <Tooltip.Arrow className="h-2.5 w-2.5 rotate-45 border border-slate-800/80 bg-slate-950/95" />
                     </Tooltip.Popup>
                   </Tooltip.Positioner>
@@ -1751,9 +1747,6 @@ export const ExecutiveSnapshotPanel = ({
             <p className="mt-2 text-xs text-slate-500">
               Using {assessment.scores.baseRateUsed} for policy anchor
             </p>
-            <p className="mt-2 text-xs text-slate-300">
-              Macro check: higher rates usually mean capital is pickier about ROI.
-            </p>
           </div>
           <div className="weather-tile p-4">
             <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Yield curve</p>
@@ -1779,9 +1772,6 @@ export const ExecutiveSnapshotPanel = ({
             </div>
             <p className="mt-3 text-xs text-slate-500">
               Curve slope = 10Y minus 2Y; negative values indicate inversion risk.
-            </p>
-            <p className="mt-3 text-xs text-slate-300">
-              Macro check: inversion favors shorter-cycle bets and tighter hiring.
             </p>
             <div className="mt-3">
               <svg
@@ -1854,9 +1844,8 @@ export const ExecutiveSnapshotPanel = ({
                 {formatTimestampUTC(treasury.fetched_at)}
               </time>
             </p>
-            <p className="mt-3 text-xs text-slate-400">{freshnessAction}</p>
-            <p className="mt-2 text-xs text-slate-300">
-              Macro check: stale data can make strategy advice look stricter than it is.
+            <p className="mt-3 text-xs text-slate-300">
+              {isFallback ? "Using cached fallback data." : "Live Treasury inputs are current."}
             </p>
             {isFallback ? (
               <div className="mt-3 rounded-lg border border-amber-400/30 bg-amber-500/10 p-2 text-xs text-amber-100">
@@ -1935,10 +1924,7 @@ export const ExecutiveSnapshotPanel = ({
           </div>
           <div className="weather-tile min-[420px]:col-span-2 xl:col-span-2 p-4">
             <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
-              So what (1 minute)
-            </p>
-            <p className="mt-2 text-xs text-slate-500">
-              Quick actions for teams without macro context.
+              Immediate actions
             </p>
             <ul className="mt-3 space-y-2 text-xs text-slate-300">
               <li className="flex gap-2">
@@ -2026,9 +2012,6 @@ export const ExecutiveSnapshotPanel = ({
           </div>
           <div className="weather-tile p-4">
             <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Quick actions</p>
-            <p className="mt-3 text-sm text-slate-200">
-              Pull the full signal detail or export constraints directly into your operations brief.
-            </p>
             <div className="mt-4 flex flex-wrap gap-3">
               <a
                 href="/signals#thresholds"
