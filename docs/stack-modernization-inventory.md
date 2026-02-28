@@ -38,7 +38,7 @@ This section maps the currently pinned stack to newer stable versions and highli
 
 ## App Router usage & runtimes
 - **App Router layout:** `app/` directory with top-level `layout.tsx`, route segments, and API handlers under `app/api`.
-- **Edge runtime:** `app/page.tsx`, onboarding, signals, operations (root/decisions/plan/briefings), and `app/api/og/route.ts` export `runtime = "edge"`.
+- **Edge runtime:** `app/page.tsx`, `app/signals/page.tsx`, `app/operations/page.tsx`, and `app/api/og/route.ts` export `runtime = "edge"`.
 - **Typed routes:** enabled via `experimental.typedRoutes` in `next.config.js`.
 
 ## Data fetching & caching

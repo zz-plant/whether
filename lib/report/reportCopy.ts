@@ -124,8 +124,8 @@ export const SIGNALS_RELATED_LINKS: Array<Required<ReportLinkCopy>> = [
     description: "Inspect formula definitions and source documentation for each signal.",
   },
   {
-    href: "/onboarding",
-    label: "Onboarding & glossary",
+    href: "/start",
+    label: "Start guide & glossary",
     description: "Share plain-English definitions with teams new to macro-driven planning.",
   },
 ];

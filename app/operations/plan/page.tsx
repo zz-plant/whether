@@ -1,5 +1,5 @@
-import { permanentRedirect } from "next/navigation";
+import { redirectTo } from "../../../lib/navigation/legacyRedirects";
 
 export default function OperationsPlanPage() {
-  permanentRedirect("/operations");
+  return redirectTo("/operations");
 }

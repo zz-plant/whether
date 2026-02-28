@@ -63,6 +63,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/method", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.62 },
     { path: "/methodology", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.56 },
     { path: "/decide/use-cases", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.55 },
+    { path: "/guides", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.42 },
+    { path: "/solutions", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.42 },
     { path: "/learn/failure-modes", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.55 },
     { path: "/learn/concepts", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.55 },
     { path: "/toolkits", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.52 },
@@ -102,6 +104,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
+
   const learnFailureModeBridgeEntries: SitemapEntryDescriptor[] = failureModes.map((slug) => ({
     path: `/learn/failure-modes/${slug}`,
     lastModified: staticContentLastModified,
@@ -115,6 +118,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: "monthly",
     priority: 0.65,
   }));
+
 
   const learnConceptBridgeEntries: SitemapEntryDescriptor[] = productConceptArticles.map((article) => ({
     path: `/learn/concepts/${article.slug}` as const,
