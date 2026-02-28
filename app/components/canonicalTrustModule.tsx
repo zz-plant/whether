@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Collapsible } from "@base-ui/react/collapsible";
 
 type TrustTone = "stable" | "warning" | "historical";
 
@@ -87,12 +88,14 @@ export const CanonicalTrustModule = ({
   label,
   detail,
   action,
+  sourceDetails,
   compact = false,
 }: {
   tone: TrustTone;
   label: string;
   detail: string;
   action: string;
+  sourceDetails?: ReactNode;
   compact?: boolean;
 }) => {
   const config = toneConfig[tone];
@@ -118,6 +121,22 @@ export const CanonicalTrustModule = ({
       </p>
       {!compact ? (
         <p className="text-xs leading-relaxed text-slate-200/80">{action}</p>
+      ) : null}
+      {sourceDetails ? (
+        <Collapsible.Root className="mt-1 border-t border-slate-700/70 pt-3 text-slate-200">
+          <Collapsible.Trigger
+            type="button"
+            className="group flex min-h-[44px] w-full items-center justify-between gap-2 text-left text-xs font-semibold tracking-[0.16em] text-slate-200 focus-visible:rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+          >
+            <span>Data source details</span>
+            <span className="sr-only group-data-[panel-open]:hidden">Collapsed</span>
+            <span className="sr-only hidden group-data-[panel-open]:inline">Expanded</span>
+            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-400 transition-transform group-data-[panel-open]:rotate-180">
+              ⌄
+            </span>
+          </Collapsible.Trigger>
+          <Collapsible.Panel className="mt-2">{sourceDetails}</Collapsible.Panel>
+        </Collapsible.Root>
       ) : null}
     </section>
   );
