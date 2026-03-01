@@ -60,7 +60,8 @@ The progression is: **macro awareness → operating posture → portfolio choice
 - Full pre-PR check: `bun run check`
 - Lint only: `bun run lint`
 - Typecheck only: `bun run typecheck`
-- Tests only: `bun test`
+- Tests only: `bun run test`
+- Clean generated build/dependency artifacts: `bun run clean`
 
 ## Project map (high signal)
 - `app/` — Next.js App Router pages and UI features.
