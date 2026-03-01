@@ -3,6 +3,10 @@ import { loadReportData } from "../../lib/report/reportData";
 import { getSummaryArchive } from "../../lib/summary/summaryArchive";
 import { siteUrl } from "../../lib/siteUrl";
 import {
+  buildTimeMachineHref,
+  getAdjacentTimeMachineRequest,
+} from "../../lib/timeMachine/timeMachineSelection";
+import {
   buildBreadcrumbList,
   buildPageMetadata,
   organizationName,
@@ -120,6 +124,15 @@ export default async function SignalsPage({
     treasury,
     treasuryProvenance,
   } = await loadReportData(resolvedSearchParams);
+  const previousHistoricalSelection = historicalSelection
+    ? getAdjacentTimeMachineRequest(historicalSelection, "previous")
+    : null;
+  const previousHistoricalHref = previousHistoricalSelection
+    ? buildTimeMachineHref("/signals", previousHistoricalSelection)
+    : undefined;
+  const historicalTimeMachineHref = historicalSelection
+    ? buildTimeMachineHref("/signals?advanced=1#time-machine", historicalSelection)
+    : "/signals?advanced=1#time-machine";
   const summaryArchive = getSummaryArchive();
   const regimeLabel = regimeLabels[assessment.regime];
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
@@ -287,6 +300,8 @@ export default async function SignalsPage({
           <HistoricalBanner
             banner={historicalSelection.banner}
             liveHref="/signals"
+            previousHref={previousHistoricalHref}
+            timeMachineHref={historicalTimeMachineHref}
           />
         ) : null
       }

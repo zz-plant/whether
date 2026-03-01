@@ -3,7 +3,7 @@
  * Keeps time travel inputs consistent across metadata and report rendering.
  */
 import { formatHistoricalBanner, resolveHistoricalDate } from "./timeMachine";
-import { hasTimeMachineEntry } from "./timeMachineCache";
+import { getAdjacentTimeMachineEntry, hasTimeMachineEntry } from "./timeMachineCache";
 
 export interface TimeMachineRequest {
   month: number;
@@ -82,4 +82,11 @@ export const buildTimeMachineHref = (
   const hashSuffix = hash ? `#${hash}` : "";
 
   return query ? `${pathname}?${query}${hashSuffix}` : `${pathname}${hashSuffix}`;
+};
+
+export const getAdjacentTimeMachineRequest = (
+  selection: TimeMachineRequest,
+  direction: "previous" | "next"
+): TimeMachineRequest | null => {
+  return getAdjacentTimeMachineEntry(selection.year, selection.month, direction);
 };
