@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import {
   resolveTimeMachineSelection,
   parseTimeMachineRequest,
@@ -21,7 +20,6 @@ import {
   HistoricalBanner,
 } from "./components/reportSections";
 import { ReportShell } from "./components/reportShell";
-import { RegimeStatusIcon } from "./components/regimeIcons";
 import { reportPageLinks } from "../lib/report/reportNavigation";
 import { buildTrustStatus } from "../lib/report/trustStatus";
 import { WeeklyDecisionCard } from "./components/weeklyDecisionCard";
@@ -86,7 +84,6 @@ type PostureForecastItem = {
   confidence: "High confidence" | "Medium confidence" | "Low confidence";
 };
 
-/* RegimeStatusIcon moved to components/regimeIcons.tsx */
 
 export const generateMetadata = async ({
   searchParams,
@@ -298,29 +295,6 @@ export default async function HomePage({
     clampPercentage(probabilityShiftPool * shiftAllocationWeight),
   );
   const probabilityShiftExpansion = Math.max(0, 100 - probabilityStay - probabilityShiftDefensive);
-  const probabilityPills = [
-    {
-      id: "shift-defensive",
-      label: `Shift risk (${primaryShiftRegimeLabel})`,
-      copy: `${probabilityShiftDefensive}%`,
-      qualitativeBand: describeProbabilityBand(probabilityShiftDefensive),
-      className: "weather-chip",
-    },
-    {
-      id: "stay",
-      label: "Stay likely",
-      copy: `${probabilityStay}%`,
-      qualitativeBand: describeProbabilityBand(probabilityStay),
-      className: "weather-pill",
-    },
-    {
-      id: "shift-adjacent",
-      label: `Shift risk (${adjacentShiftRegimeLabel})`,
-      copy: `${probabilityShiftExpansion}%`,
-      qualitativeBand: describeProbabilityBand(probabilityShiftExpansion),
-      className: "weather-pill-muted",
-    },
-  ];
   const hasProjectionData =
     Number.isFinite(assessment.scores.tightness) &&
     Number.isFinite(assessment.scores.riskAppetite) &&
@@ -403,142 +377,82 @@ export default async function HomePage({
       />
 
       <section
-        aria-labelledby="decision-card-title"
-        className="weather-panel space-y-7 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.16),rgba(15,23,42,0.3)_45%,rgba(2,6,23,0.92)_75%)] px-6 py-8 sm:space-y-9 sm:py-9"
+        aria-labelledby="decision-surface-title"
+        className="weather-panel space-y-6 px-5 py-6 sm:px-7 sm:py-8"
       >
-        <div className="space-y-4 text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.26em] text-sky-200">
-            Deeper posture context (2–6 weeks)
-          </p>
-          <h1 id="decision-card-title" className="text-4xl font-semibold text-slate-100 sm:text-[2.8rem]">
-            How should your company operate right now?
+        <header className="space-y-3 border-b border-slate-700/70 pb-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-200">Executive summary</p>
+          <h1 id="decision-surface-title" className="text-3xl font-semibold text-slate-50 sm:text-4xl">
+            Macro posture: {statusLabel}
           </h1>
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <a
-              href="#posture-forecast"
-              className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em]"
-            >
-              Review trigger outlook
-            </a>
+          <p className="max-w-3xl text-base text-slate-200">{postureDelta}</p>
+          <div className="grid gap-3 md:grid-cols-3" aria-label="Primary posture metrics">
+            <article className="rounded-xl border border-slate-700/70 bg-slate-900/60 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">Stay likely</p>
+              <p className="mt-2 text-3xl font-semibold text-slate-50">{probabilityStay}%</p>
+              <p className="mt-1 text-sm text-slate-300">{describeProbabilityBand(probabilityStay)} confidence in holding this posture.</p>
+            </article>
+            <article className="rounded-xl border border-amber-500/40 bg-slate-900/60 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-200">Defensive shift risk</p>
+              <p className="mt-2 text-3xl font-semibold text-amber-100">{probabilityShiftDefensive}%</p>
+              <p className="mt-1 text-sm text-slate-300">Pressure toward {primaryShiftRegimeLabel} if constraints tighten.</p>
+            </article>
+            <article className="rounded-xl border border-emerald-500/40 bg-slate-900/60 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-200">Expansion shift risk</p>
+              <p className="mt-2 text-3xl font-semibold text-emerald-100">{probabilityShiftExpansion}%</p>
+              <p className="mt-1 text-sm text-slate-300">Chance of rotating toward {adjacentShiftRegimeLabel}.</p>
+            </article>
           </div>
-          <div className="py-2 sm:py-3">
-            <p className="inline-flex items-center justify-center gap-3 text-5xl font-bold tracking-[-0.02em] text-slate-50 sm:text-[3.5rem]">
-              <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-700/80 bg-slate-900/70 text-slate-100 sm:h-14 sm:w-14">
-                <RegimeStatusIcon regime={assessment.regime} />
-              </span>
-              <span>{statusLabel}</span>
-            </p>
-          </div>
-          <p className="text-sm font-semibold tracking-[0.08em] text-slate-100">{postureDelta}</p>
-          <div className="flex flex-wrap items-center justify-center gap-2" aria-label="Operational posture probabilities">
-            {probabilityPills.map((pill) => (
-              <p
-                key={pill.id}
-                className={`${pill.className} inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100`}
-              >
-                <span>
-                  {pill.label}: {pill.copy} ({pill.qualitativeBand})
-                </span>
-              </p>
-            ))}
-          </div>
-          <p className="text-xs text-slate-300">
-            Heuristic operational probabilities only; this translates current threshold distance into posture shift odds and is not a financial forecast.
-          </p>
-          <p className="text-[11px] font-medium tracking-[0.14em] text-slate-400">
-            Updated {recordDateLabel} · Confidence: {trustStatusLabel}
-          </p>
+        </header>
+
+        <div className="grid gap-4 lg:grid-cols-3">
+          <article className="rounded-xl border border-slate-700/70 bg-slate-900/50 p-4 lg:col-span-2" aria-label="What changed">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">What changed</h2>
+            <ul className="mt-3 space-y-2 text-sm text-slate-200">
+              <li>• {postureDelta}</li>
+              <li>• Tightness score: {assessment.scores.tightness.toFixed(1)} vs trigger {tightnessThreshold.toFixed(1)}.</li>
+              <li>• Risk appetite score: {assessment.scores.riskAppetite.toFixed(1)} vs trigger {riskThreshold.toFixed(1)}.</li>
+              {lastYearComparison ? (
+                <li>
+                  • Year-over-year regime reference: {regimeLabelMap[lastYearComparison.prior.regime as keyof typeof regimeLabelMap] ?? lastYearComparison.prior.regime} ({lastYearComparison.prior.recordDate}).
+                </li>
+              ) : null}
+            </ul>
+          </article>
+
+          <article className="rounded-xl border border-slate-700/70 bg-slate-900/50 p-4" aria-label="Decision implications">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">Decision implications</h2>
+            <ul className="mt-3 space-y-2 text-sm text-slate-200">
+              {startItems.slice(0, 3).map((item) => (
+                <li key={item}>• Prioritize: {item}</li>
+              ))}
+              {stopItems.slice(0, 2).map((item) => (
+                <li key={item}>• Avoid: {item}</li>
+              ))}
+            </ul>
+          </article>
         </div>
 
-        <article className="weather-surface space-y-6 p-5" aria-label="Current climate summary and evidence">
-          <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="space-y-4">
-              <p className="text-sm text-slate-200">{assessment.description}</p>
-              <p className="text-sm text-slate-300">{trustStatusAction}</p>
-              <p className="text-sm font-semibold tracking-[0.08em] text-slate-200">What would change this posture</p>
-              <ul className="space-y-2 text-sm text-slate-200">
-                <li>• Will shift if Capital Tightness rises above {tightnessThreshold} for two consecutive reads.</li>
-                <li>• Will shift if Risk Appetite falls below {riskThreshold} and remains there through the next update.</li>
-                <li>• Curve slope turns negative and stays inverted through the next cycle.</li>
-              </ul>
-            </div>
-
-            <aside className="space-y-4 rounded-2xl border border-slate-700/70 bg-slate-950/40 p-4" aria-label="Proof and recency snapshot">
-              <h2 className="text-sm font-semibold tracking-[0.08em] text-slate-100">Evidence snapshot</h2>
-              <ul className="space-y-2 text-sm text-slate-200">
-                <li>• Data source: {treasury.source}.</li>
-                <li>• Signals stamped: {recordDateLabel}.</li>
-                <li>• Last pipeline refresh: {fetchedAtLabel}.</li>
-              </ul>
-            </aside>
-          </div>
-
-          <div className="space-y-3 border-t border-slate-700/70 pt-4" aria-label="Explore additional guidance routes">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-200">Explore next</p>
-            <div className="flex flex-wrap gap-2 text-xs font-semibold tracking-[0.08em]">
-              <Link href="/operations/plan" className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2">Plan toolkits</Link>
-              <Link href="/learn" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2">Learn hub</Link>
-              <Link href="/decide" className="weather-pill-muted inline-flex min-h-[44px] items-center px-3 py-2">Decide pathways</Link>
-            </div>
-          </div>
-        </article>
-
-        <details className="weather-surface group p-4 sm:p-5" aria-label="Expanded posture details">
+        <details className="rounded-xl border border-slate-700/70 bg-slate-950/40 p-4" aria-label="Trigger outlook details">
           <summary className="flex min-h-[48px] cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold tracking-[0.08em] text-slate-200 focus-visible:rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation">
-            <span>See detailed triggers and execution checklist</span>
-            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-400 transition-transform group-open:rotate-180">
-              ⌄
-            </span>
+            <span>Trigger outlook (expand)</span>
+            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-400">⌄</span>
           </summary>
-
-          <section id="posture-forecast" className="mt-4 space-y-3" aria-label="Posture forecast timeline">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-sky-100">
-              Trigger outlook timeline
-            </h2>
-            <div className="weather-forecast-strip lg:grid-cols-4" role="list" aria-label="Posture forecast timeline">
-              {horizonForecast.map((item) => (
-                <article
-                  key={item.horizon}
-                  className="weather-forecast-card"
-                  role="listitem"
-                  aria-label={`Posture forecast ${item.horizon}: ${item.label}`}
-                >
-                  <span className="weather-forecast-icon" aria-hidden="true">
-                    {item.label === "Likely shift" ? "⚠" : item.label === "Watch" ? "◔" : item.label === "Stable" ? "✓" : "?"}
-                  </span>
-                  <div className="space-y-2">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">{item.horizon}</p>
-                    <p className="text-sm font-semibold text-slate-50">{item.label}</p>
-                    <p className="text-sm text-slate-300">{item.rationale}</p>
-                    <p className="inline-flex rounded-full border border-slate-600/70 bg-slate-900/70 px-2.5 py-1 text-[11px] font-medium text-slate-200">
-                      {item.confidence}
-                    </p>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </section>
-
-          <div className="mt-4 grid gap-4 md:grid-cols-2">
-            <article className="weather-panel space-y-3 p-5" aria-label="Prioritize">
-              <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-200">Prioritize</h2>
-              <ul className="space-y-2 text-sm text-slate-100">
-                {startItems.slice(0, 5).map((item) => (
-                  <li key={item} className="flex items-start gap-2"><span aria-hidden="true" className="mt-1 h-1.5 w-1.5 rounded-full bg-emerald-300" />{item}</li>
-                ))}
-              </ul>
-            </article>
-            <article className="weather-panel space-y-3 p-5" aria-label="Avoid">
-              <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-200">Avoid</h2>
-              <ul className="space-y-2 text-sm text-slate-100">
-                {stopItems.slice(0, 5).map((item) => (
-                  <li key={item} className="flex items-start gap-2"><span aria-hidden="true" className="mt-1 h-1.5 w-1.5 rounded-full bg-amber-300" />{item}</li>
-                ))}
-              </ul>
-            </article>
+          <div id="posture-forecast" className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-4" role="list" aria-label="Posture forecast timeline">
+            {horizonForecast.map((item) => (
+              <article
+                key={item.horizon}
+                className="rounded-lg border border-slate-700/60 bg-slate-900/70 p-3"
+                role="listitem"
+                aria-label={`Posture forecast ${item.horizon}: ${item.label}`}
+              >
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">{item.horizon}</p>
+                <p className="mt-1 text-sm font-semibold text-slate-50">{item.label}</p>
+                <p className="mt-1 text-sm text-slate-300">{item.rationale}</p>
+              </article>
+            ))}
           </div>
         </details>
-
       </section>
 
       <section id="executive-snapshot" aria-label="Leadership summary" className="space-y-8">
