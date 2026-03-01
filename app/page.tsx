@@ -30,9 +30,9 @@ export const runtime = "edge";
 export const revalidate = 900;
 
 const homeSectionSequence = [
-  { href: "#weekly-action-summary", label: "Weekly actions" },
-  { href: "#signal-matrix", label: "Risk posture" },
   { href: "#executive-snapshot", label: "Operating constraints" },
+  { href: "#signal-matrix", label: "Risk posture" },
+  { href: "#weekly-action-summary", label: "Weekly actions" },
 ] as const;
 
 const regimeLabelMap = {
@@ -541,15 +541,11 @@ export default async function HomePage({
 
       </section>
 
-      <section
-        id="weekly-action-summary"
-        aria-label="Weekly action summary"
-        className="space-y-8"
-      >
-        <WeeklyActionSummaryPanel
+      <section id="executive-snapshot" aria-label="Leadership summary" className="space-y-8">
+        <ExecutiveSnapshotPanel
+          treasury={treasury}
           assessment={assessment}
           provenance={treasuryProvenance}
-          recordDateLabel={recordDateLabel}
         />
       </section>
 
@@ -560,11 +556,15 @@ export default async function HomePage({
         />
       </section>
 
-      <section id="executive-snapshot" aria-label="Leadership summary" className="space-y-8">
-        <ExecutiveSnapshotPanel
-          treasury={treasury}
+      <section
+        id="weekly-action-summary"
+        aria-label="Weekly action summary"
+        className="space-y-8"
+      >
+        <WeeklyActionSummaryPanel
           assessment={assessment}
           provenance={treasuryProvenance}
+          recordDateLabel={recordDateLabel}
         />
       </section>
     </ReportShell>
