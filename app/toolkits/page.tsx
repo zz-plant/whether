@@ -46,7 +46,9 @@ export default async function ToolkitsPage({
       <section className="grid gap-3 sm:grid-cols-2">
         {filteredToolkits.map((toolkit) => (
           <Link key={toolkit.slug} href={`/toolkits/${toolkit.slug}`} className="weather-panel space-y-2 px-4 py-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-200">🧰 Toolkit</p>
+            <span className="inline-flex w-fit items-center rounded-full border border-emerald-400/45 bg-emerald-500/10 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-200">
+              Toolkit
+            </span>
             <h2 className="text-base font-semibold text-slate-100">{toolkit.title}</h2>
             <p className="text-sm text-slate-200">{toolkit.whenToUse}</p>
           </Link>

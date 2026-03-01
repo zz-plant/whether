@@ -85,9 +85,25 @@ export function GlobalHeader() {
               );
             })}
           </nav>
-          <button type="button" onClick={toggleTheme} className="weather-button text-sm" aria-label="Toggle light mode">
-            {theme === "dark" ? "Light mode" : "Dark mode"}
-          </button>
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <nav aria-label="Quick actions" className="flex flex-wrap items-center gap-2">
+              <Link
+                href="/operations/plan"
+                className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.06em] text-sky-100 hover:border-sky-400/70"
+              >
+                Weekly sequence
+              </Link>
+              <Link
+                href="/briefing"
+                className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.06em] text-slate-100 hover:border-sky-400/70"
+              >
+                Leadership brief
+              </Link>
+            </nav>
+            <button type="button" onClick={toggleTheme} className="weather-button text-sm" aria-label="Toggle light mode">
+              {theme === "dark" ? "Light mode" : "Dark mode"}
+            </button>
+          </div>
         </div>
 
         <nav aria-label="Breadcrumb" className="mt-4 overflow-x-auto">
@@ -109,22 +125,6 @@ export function GlobalHeader() {
             })}
           </ol>
         </nav>
-
-        <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-slate-700/70 pt-4">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-300">Primary actions</p>
-          <Link
-            href="/operations/plan"
-            className="weather-button-primary inline-flex min-h-[44px] items-center justify-center"
-          >
-            Run weekly operating sequence
-          </Link>
-          <Link
-            href="/briefing"
-            className="weather-button inline-flex min-h-[44px] items-center justify-center"
-          >
-            Generate leadership brief
-          </Link>
-        </div>
       </div>
     </header>
   );

@@ -20,7 +20,9 @@ export default function PosturePage() {
       <section className="grid gap-3 sm:grid-cols-3">
         {postureDefinitions.map((posture) => (
           <Link key={posture.slug} href={`/posture/${posture.slug}`} className="weather-panel space-y-2 px-4 py-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-sky-200">🧭 Posture</p>
+            <span className="inline-flex w-fit items-center rounded-full border border-sky-400/45 bg-sky-500/10 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-200">
+              Posture
+            </span>
             <h2 className="text-lg font-semibold text-slate-100">{posture.title}</h2>
             <p className="text-sm text-slate-300">{posture.summary}</p>
           </Link>

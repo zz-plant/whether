@@ -42,7 +42,9 @@ export default async function FailureModesPage({
       <section className="grid gap-3 sm:grid-cols-2">
         {filteredFailureModes.map((slug) => (
           <Link key={slug} href={`/library/failure-modes/${slug}`} className="weather-panel space-y-2 px-4 py-4 text-sm text-slate-100">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-rose-200">🛟 Failure mode</p>
+            <span className="inline-flex w-fit items-center rounded-full border border-rose-400/45 bg-rose-500/10 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-rose-200">
+              Failure mode
+            </span>
             <p className="font-semibold text-slate-100">{titleCase(slug)}</p>
           </Link>
         ))}
