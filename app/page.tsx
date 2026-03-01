@@ -24,6 +24,7 @@ import { ReportShell } from "./components/reportShell";
 import { RegimeStatusIcon } from "./components/regimeIcons";
 import { reportPageLinks } from "../lib/report/reportNavigation";
 import { buildTrustStatus } from "../lib/report/trustStatus";
+import { WeeklyDecisionCard } from "./components/weeklyDecisionCard";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -391,35 +392,32 @@ export default async function HomePage({
         ) : null
       }
     >
+      <WeeklyDecisionCard
+        regime={assessment.regime}
+        statusLabel={statusLabel}
+        startItems={startItems}
+        stopItems={stopItems}
+        recordDateLabel={recordDateLabel}
+        fetchedAtLabel={fetchedAtLabel}
+      />
+
       <section
         aria-labelledby="decision-card-title"
         className="weather-panel space-y-7 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.16),rgba(15,23,42,0.3)_45%,rgba(2,6,23,0.92)_75%)] px-6 py-8 sm:space-y-9 sm:py-9"
       >
         <div className="space-y-4 text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.26em] text-sky-200">
-            Posture for the next 2–6 weeks
+            Deeper posture context (2–6 weeks)
           </p>
           <h1 id="decision-card-title" className="text-4xl font-semibold text-slate-100 sm:text-[2.8rem]">
             How should your company operate right now?
           </h1>
           <div className="flex flex-wrap items-center justify-center gap-3">
             <a
-              href="#weekly-action-summary"
+              href="#posture-forecast"
               className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em]"
             >
-              Start weekly decision sequence
-            </a>
-            <a
-              href="/onboarding"
-              className="inline-flex min-h-[44px] items-center rounded-full border border-sky-400/60 bg-sky-500/15 px-4 py-2 text-xs font-semibold tracking-[0.14em] text-sky-100 transition-colors hover:border-sky-300 hover:bg-sky-500/25 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-            >
-              Start onboarding (3 min)
-            </a>
-            <a
-              href="/method"
-              className="inline-flex min-h-[44px] items-center text-xs font-semibold text-sky-200 underline decoration-slate-500/80 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-            >
-              Review method
+              Review trigger outlook
             </a>
           </div>
           <div className="py-2 sm:py-3">
