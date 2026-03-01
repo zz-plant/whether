@@ -337,21 +337,10 @@ export const ReportShell = ({
                   </p>
                 </div>
               </div>
-              <div className="hidden flex-wrap items-center gap-2 sm:flex">
-                <a
-                  href="/about#subscribe"
-                  className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-sky-400/70 bg-sky-500/15 px-3 py-2 text-xs font-semibold tracking-[0.14em] text-sky-100 transition-colors hover:border-sky-300/90 hover:text-sky-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                >
-                  Subscribe
-                </a>
-                {exportCta ? (
-                  <a
-                    href={exportCta.href}
-                    className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-700/70 px-3 py-2 text-xs font-semibold tracking-[0.14em] text-slate-200 transition-colors hover:border-sky-300/80 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                  >
-                    {exportCta.label}
-                  </a>
-                ) : null}
+              <div className="hidden items-center sm:flex">
+                <p className="text-xs text-slate-300">
+                  Signals updated {fetchedAtLabel}
+                </p>
               </div>
             </div>
             {showPageNavigation ? (
@@ -466,33 +455,23 @@ export const ReportShell = ({
                           {exportCta.label}
                         </a>
                       ) : null}
+                      <a
+                        href="/about#subscribe"
+                        className="inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-slate-700/80 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto"
+                      >
+                        More updates
+                      </a>
                     </div>
-                    <div className="flex flex-wrap gap-2 text-xs font-semibold tracking-[0.1em] text-slate-200">
-                      <span className="weather-chip inline-flex min-h-[32px] items-center px-3 py-1 text-[11px]">
-                        {trustStatusTone === "stable" ? "Stable" : "Caution"} · {trustStatusLabel}
-                      </span>
-                      <span className="weather-chip inline-flex min-h-[32px] items-center px-3 py-1 text-[11px] text-slate-200">
-                        Signals {recordDateLabel}
-                      </span>
-                      <span className="weather-chip inline-flex min-h-[32px] items-center px-3 py-1 text-[11px] text-slate-200">
-                        Refresh {fetchedAtLabel}
-                      </span>
-                    </div>
+                    <p className="weather-surface inline-flex min-h-[44px] flex-wrap items-center gap-x-2 px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100">
+                      <span>{trustStatusTone === "stable" ? "Stable" : "Caution"}</span>
+                      <span className="text-slate-400">·</span>
+                      <span>{trustStatusLabel}</span>
+                      <span className="text-slate-400">·</span>
+                      <span>Signals {recordDateLabel}</span>
+                      <span className="text-slate-400">·</span>
+                      <span>Refresh {fetchedAtLabel}</span>
+                    </p>
                     <p className="text-sm text-slate-200">{trustStatusAction}</p>
-                    <dl className="grid gap-2 text-sm text-slate-200 min-[420px]:grid-cols-2 lg:grid-cols-3">
-                      <div className="weather-surface px-3 py-2">
-                        <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Confidence</dt>
-                        <dd className="mt-1 font-semibold text-slate-100">{trustStatusLabel}</dd>
-                      </div>
-                      <div className="weather-surface px-3 py-2">
-                        <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Signals stamped</dt>
-                        <dd className="mt-1 text-slate-100">{recordDateLabel}</dd>
-                      </div>
-                      <div className="weather-surface px-3 py-2 min-[420px]:col-span-2 lg:col-span-1">
-                        <dt className="text-xs font-semibold tracking-[0.1em] text-slate-400">Last refresh</dt>
-                        <dd className="mt-1 text-slate-100">{fetchedAtLabel}</dd>
-                      </div>
-                    </dl>
                     {showOfflineBadge ? (
                       <p className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.14em] text-amber-100">
                         {offlineBadgeLabel}
