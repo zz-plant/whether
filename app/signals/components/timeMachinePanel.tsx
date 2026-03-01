@@ -166,6 +166,36 @@ export const TimeMachinePanel = ({
 
   const cadenceOptions = ["weekly", "monthly", "quarterly", "yearly"] as const;
 
+  const buildTimelineEntryLabel = (entry: SummaryArchiveEntry) => {
+    switch (entry.cadence) {
+      case "weekly":
+        return `Week ${entry.week}, ${entry.year}`;
+      case "monthly":
+        return `${monthOptions.find((option) => option.value === entry.month)?.label ?? "Month"} ${entry.year}`;
+      case "quarterly":
+        return `Q${entry.quarter} ${entry.year}`;
+      case "yearly":
+        return `${entry.year}`;
+      default:
+        return "Unknown";
+    }
+  };
+
+  const renderTimelineSummaryCard = (entry: SummaryArchiveEntry) => {
+    switch (entry.cadence) {
+      case "weekly":
+        return <WeeklySummaryCard summary={entry.summary} />;
+      case "monthly":
+        return <MonthlySummaryCard summary={entry.summary} />;
+      case "quarterly":
+        return <QuarterlySummaryCard summary={entry.summary} />;
+      case "yearly":
+        return <YearlySummaryCard summary={entry.summary} />;
+      default:
+        return null;
+    }
+  };
+
   const buildProvenanceTooltip = (
     provenanceData: SummaryArchiveEntry["summary"]["provenance"]
   ) => {
@@ -759,20 +789,7 @@ export const TimeMachinePanel = ({
                 </div>
               ) : null}
               {filteredEntries.map((entry) => {
-                const label = (() => {
-                  switch (entry.cadence) {
-                    case "weekly":
-                      return `Week ${entry.week}, ${entry.year}`;
-                    case "monthly":
-                      return `${monthOptions.find((option) => option.value === entry.month)?.label ?? "Month"} ${entry.year}`;
-                    case "quarterly":
-                      return `Q${entry.quarter} ${entry.year}`;
-                    case "yearly":
-                      return `${entry.year}`;
-                    default:
-                      return "Unknown";
-                  }
-                })();
+                const label = buildTimelineEntryLabel(entry);
                 const tooltip = buildProvenanceTooltip(entry.summary.provenance);
                 return (
                   <div key={`${entry.cadence}-${entry.asOf}`} className="weather-surface p-4">
@@ -792,15 +809,7 @@ export const TimeMachinePanel = ({
                         ⓘ
                       </span>
                     </div>
-                    {entry.cadence === "weekly" ? (
-                      <WeeklySummaryCard summary={entry.summary} />
-                    ) : entry.cadence === "monthly" ? (
-                      <MonthlySummaryCard summary={entry.summary} />
-                    ) : entry.cadence === "quarterly" ? (
-                      <QuarterlySummaryCard summary={entry.summary} />
-                    ) : (
-                      <YearlySummaryCard summary={entry.summary} />
-                    )}
+                    {renderTimelineSummaryCard(entry)}
                   </div>
                 );
               })}
