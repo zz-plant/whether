@@ -3,6 +3,12 @@ import { redirectTo } from "../../../lib/navigation/legacyRedirects";
 type Params = { slug?: string[] };
 
 const stakeholderSlugs = new Set([
+  "founders-ceos",
+  "heads-of-product",
+  "finance-leaders",
+  "strategy-chief-of-staff",
+  "vps-of-engineering",
+  "boards-investors",
   "ceo",
   "cfo",
   "cto",
