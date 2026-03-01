@@ -191,6 +191,7 @@ export const ReportPageNavigation = ({
   const primaryLinks = pageLinks.filter((link) => coreReportHrefs.has(link.href));
   const secondaryLinks = pageLinks.filter((link) => !coreReportHrefs.has(link.href));
   const visibleLinks = primaryLinks.length > 0 ? primaryLinks : pageLinks;
+  const shouldShowSecondaryLinks = variant === "full" && secondaryLinks.length > 0;
 
   return (
     <NavigationMenu.Root aria-label="Report paths" className={className}>
@@ -226,13 +227,13 @@ export const ReportPageNavigation = ({
           })}
         </NavigationMenu.List>
 
-        {secondaryLinks.length > 0 ? (
+        {shouldShowSecondaryLinks ? (
           <Collapsible.Root>
             <Collapsible.Trigger
               type="button"
-              className="group inline-flex min-h-[44px] w-full items-center justify-between gap-2 rounded-xl border border-slate-800/80 bg-slate-950/40 px-3 py-2 text-left text-xs font-semibold tracking-[0.1em] text-slate-200 transition-colors hover:border-sky-400/60 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+              className="group inline-flex min-h-[44px] w-full items-center justify-between gap-2 rounded-xl border border-slate-800/70 bg-slate-950/20 px-3 py-2 text-left text-xs font-semibold tracking-[0.08em] text-slate-300 transition-colors hover:border-sky-400/50 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
             >
-              <span>Explore all pages</span>
+              <span>More destinations ({secondaryLinks.length})</span>
               <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-300 transition-transform duration-200 group-data-[panel-open]:rotate-180">
                 <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
                   <path

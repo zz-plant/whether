@@ -124,6 +124,7 @@ export default async function OperationsPage({
         label: "Review weekly + monthly summary",
       }}
       secondaryCta={{ href: "#ops-playbook", label: "Open execution playbook" }}
+      pageNavVariant="compact"
       decisionBanner={{
         label: "Align now",
         decision: "Translate the regime into weekly execution calls and a monthly plan.",

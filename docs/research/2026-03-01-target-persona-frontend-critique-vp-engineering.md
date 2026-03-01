@@ -16,12 +16,30 @@ Jordan considers the frontend successful if it helps answer, quickly and unambig
 
 ## Constructive front-end critique
 
+## Route walkthrough (live site spot-check)
+Routes traversed during this review:
+- `/`
+- `/signals`
+- `/operations`
+- `/method`
+- `/about`
+- Attempted but currently returning `Internal Server Error`: `/current-climate`, `/playbook`, `/for-teams`
+
+### First impression from a VP Engineering lens
+- The homepage does a strong job of immediately answering **"what is the posture now?"** and shows freshness metadata quickly.
+- However, the interaction density near the top (skip links, subscribe, copy-ready brief, command center, signals, operations, explore-all-pages, climate state, provenance state) can feel like a control panel before it feels like a decision memo.
+- For a weekly 5–7 minute check-in persona, this creates avoidable parsing overhead.
+
 ### What works well for this persona
 - **Macro-to-operations framing matches leadership jobs-to-be-done.** The product promises operational guidance rather than macro commentary, which aligns with an engineering executive’s decision needs.
 - **Method and signal surfaces support defensible decisions.** Jordan can validate recommendation logic when challenged by peers.
 - **Operations and briefing destinations are directionally strong.** They indicate the site is trying to produce decision artifacts, not just insight pages.
 
 ### Friction points (persona-specific)
+0. **Some top-level routes fail outright, breaking trust in information architecture.**
+   - `current-climate`, `playbook`, and `for-teams` returning `Internal Server Error` undermines confidence in the product's navigation model.
+   - For an executive user, route reliability is interpreted as product reliability.
+
 1. **Engineering-specific action mapping is implicit rather than explicit.**
    - Current guidance can read cross-functional first, engineering second.
    - Jordan still has to manually map recommendations to concrete levers (capacity allocation, reliability budget, hiring pace, platform investments).
@@ -41,6 +59,156 @@ Jordan considers the frontend successful if it helps answer, quickly and unambig
 5. **Confidence layering could better match engineering review depth.**
    - Executives often need a 10-second summary first, then one level deeper for challenge sessions.
    - Current paths can require too many route transitions before Jordan reaches a concise confidence narrative.
+
+6. **Top-of-page chrome feels excessive relative to the core job-to-be-done.**
+   - Potentially superfluous (or at least over-prominent) at first paint:
+     - "Explore all pages" next to primary operating controls.
+     - Multiple neighboring utility controls (subscribe + copy-ready brief + command center) before the core recommendation lockup.
+     - Repeated posture/provenance framing on several routes where the user primarily needs role-specific actions.
+   - These items are useful, but could be progressively disclosed after the core weekly directive.
+
+## What seems excessive/superfluous right now
+
+From a VP Engineering target persona standpoint, the following likely exceed what is needed in the first 30 seconds:
+
+1. **Too many competing primary actions above the fold.**
+   - Keep one primary CTA and one secondary CTA; demote the rest.
+
+2. **Utility nav and action controls mixed together.**
+   - Separate "navigation" from "workflow actions" visually and structurally.
+
+3. **Repetition of status language across adjacent components.**
+   - Condense posture + provenance + refresh into one compact trust strip.
+
+4. **Cross-route conceptual overlap at executive scan depth.**
+   - "Signals," "Method," and "Operations" are conceptually distinct, but first-screen snippets can feel too similar in purpose copy.
+   - Sharpen each route's first-screen sentence to reduce "which page should I use now?" friction.
+
+
+## Granular route-by-route critique (VP Engineering workflow)
+
+### 1) `/` (home): "Decide this week's engineering posture"
+**Primary user task:** Get to a defensible weekly operating directive in under 60 seconds.
+
+**What is working**
+- Clear posture framing appears early.
+- Freshness/provenance metadata is present near the top.
+
+**What feels excessive/superfluous**
+- Too many same-level controls before commitment (subscribe, copy-ready brief, command center, multi-page navigation controls).
+- Utility and decision actions share similar visual priority, so the eye has no obvious first action.
+- Repeated status language (posture + provenance + refresh) consumes vertical space that could be a single compact trust row.
+
+**Granular recommendations**
+- Keep exactly one primary CTA (e.g., "Run weekly operating sequence") and one secondary CTA (e.g., "Copy engineering brief").
+- Move tertiary controls (subscribe, explore pages, optional command utilities) behind a single "More" affordance.
+- Collapse trust metadata into one line: `Posture · Confidence · Updated at · Next refresh`.
+
+### 2) `/operations`: "Translate posture into sprint and staffing choices"
+**Primary user task:** Map macro posture to engineering levers (scope, reliability, hiring, platform).
+
+**What is working**
+- Route intent aligns closely with operations execution.
+- Content indicates conversion from insight to action.
+
+**What feels excessive/superfluous**
+- Cross-functional language can still dominate over explicit engineering levers.
+- The route still repeats global header controls that are useful but not needed once the user is in execution mode.
+- Action blocks can read as recommendations without explicit operating boundaries.
+
+**Granular recommendations**
+- Add a fixed "Engineering levers" strip at top of content:
+  - Scope aggressiveness
+  - Reliability strictness
+  - Hiring/backfill pace
+  - Platform investment intensity
+- For each recommendation, add three micro-fields:
+  - `Over-apply risk`
+  - `Under-apply risk`
+  - `Trigger to revisit`
+- Reduce global control prominence on this page to keep focus on execution artifacts.
+
+### 3) `/signals`: "Validate evidence for peer challenge"
+**Primary user task:** Quickly verify why the recommendation is defensible.
+
+**What is working**
+- The page provides evidence-oriented framing.
+- Signal context supports challenge-session preparation.
+
+**What feels excessive/superfluous**
+- Heavy diagnostic depth can appear before a concise "top 3 signals that matter now" summary.
+- Similar top navigation/action chrome appears again, increasing repeated cognitive load.
+- Threshold and context details may not be prioritized by decision impact.
+
+**Granular recommendations**
+- Start with a ranked "Top 3 signal movers this week" summary card.
+- Group remaining diagnostics into collapsible sections by impact tier (high/medium/low).
+- Keep deep raw details available, but one click deeper to preserve executive scan speed.
+
+### 4) `/method`: "Decide trust level without reading full methodology"
+**Primary user task:** Determine whether to trust and operationalize recommendations now.
+
+**What is working**
+- Route communicates transparency and source confidence intent.
+- Methodology and contact/trust surfaces are discoverable.
+
+**What feels excessive/superfluous**
+- If a user arrives here from weekly planning flow, deep method paths can feel like a detour.
+- Multiple method-related links may compete before a quick trust verdict is provided.
+
+**Granular recommendations**
+- Add an above-the-fold "30-second trust verdict" block:
+  - Data sources used this week
+  - Last successful refresh time
+  - Known limitations relevant to current posture
+- Place full formulas/source specs behind expandable details.
+
+### 5) `/about`: "Confirm product credibility and audience fit"
+**Primary user task:** Validate this product is built for leadership operating decisions.
+
+**What is working**
+- Messaging aligns with product+engineering leadership use case.
+- Method/source narrative helps explain product posture.
+
+**What feels excessive/superfluous**
+- For returning executive users, generic descriptive copy can be more than needed.
+- About content can overlap with method narrative and dilute route specificity.
+
+**Granular recommendations**
+- Add a compact "Who gets value fastest" matrix (VP Eng, VP Product, CFO).
+- Add one concrete "What changes in a typical week" example to improve practical credibility.
+
+### 6) Erroring routes (`/current-climate`, `/playbook`, `/for-teams`): "Preserve trust under failure"
+**Primary user task:** Continue workflow even if a route fails.
+
+**Observed issue**
+- During traversal, these routes returned `Internal Server Error`.
+
+**Why this is high impact for target persona**
+- Executives infer operational rigor from navigation reliability.
+- Hard-fail routes create uncertainty around source-of-truth pages.
+
+**Granular recommendations**
+- Replace hard 500 experiences with intent-preserving fallback pages:
+  - Explain temporary unavailability.
+  - Provide nearest valid destination and one-click continuation.
+  - Preserve task context (e.g., "Continue with this week's engineering brief").
+- Instrument route failure alerts with owner + SLA metadata visible internally.
+
+## Excessiveness audit (specific UI elements to demote)
+
+Ranked by likely impact on VP Engineering task completion latency:
+
+1. **Top-of-page multi-control cluster** (high impact)
+   - Demote tertiary controls until after first decision action.
+2. **Repeated provenance/freshness/posture framing across routes** (high impact)
+   - Consolidate into one reusable compact module.
+3. **Cross-functional copy before engineering-specific levers on operations surfaces** (medium-high impact)
+   - Front-load engineering controls; move broad narrative lower.
+4. **Unranked deep signal diagnostics on first view** (medium impact)
+   - Rank by decision impact first; expose full diagnostics progressively.
+5. **Method-route link density before trust verdict summary** (medium impact)
+   - Provide summary verdict first, depth second.
 
 ## Recommended UX improvements (prioritized)
 

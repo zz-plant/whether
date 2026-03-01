@@ -383,6 +383,7 @@ export default async function HomePage({
       }}
       sidebarVariant="hidden"
       hideHeroChrome={true}
+      pageNavVariant="compact"
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
       structuredData={structuredData}
