@@ -47,10 +47,12 @@
 - LCP (Largest Contentful Paint) < 2.5s.
 - Console is clean. No warnings. No "Key prop missing." No "Unrecognized attribute."
 
-## VIII. IA boundary checklist (Current Climate stack)
-- **Current Climate:** posture call only (label, confidence, timestamp, prioritize, avoid, trigger conditions).
-- **Playbook:** operating guardrails only (hiring, spend, payback, growth vs. efficiency, cadence).
-- **Signals:** evidence only (drivers, thresholds, timestamps, historical context).
-- **Method:** transparency only (formulas, sources, cadence, limitations).
-- **For Teams:** role translation only (founder, product, finance, strategy views).
+## VIII. IA boundary checklist (current navigation model)
+- **Command Center (`/start`):** posture call + weekly operating sequence only (label, confidence, timestamp, prioritize, avoid, trigger conditions).
+- **Signals (`/signals`):** evidence only (drivers, thresholds, timestamps, historical context).
+- **Operations (`/operations`):** operating guardrails only (hiring, spend, payback, growth vs. efficiency, cadence).
+- **Decide (`/decide`):** role translation only (founder, product, finance, strategy views).
+- **Toolkits (`/toolkits`):** runnable instruments/templates only; do not restate posture logic or evidence narrative.
+- **Learn (`/learn`):** diagnostic and conceptual references only; no new canonical guidance should originate here.
+- **Method (`/method`):** transparency only (formulas, sources, cadence, limitations).
 - Avoid overlap between layers; if copy fits two layers, keep it on the earliest layer and link out.
