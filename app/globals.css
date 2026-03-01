@@ -896,3 +896,39 @@ summary:focus-visible {
     transform: none;
   }
 }
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="light"] body {
+  background: #f3f6fb;
+  color: #0f172a;
+}
+
+:root[data-theme="light"] .weather-shell {
+  background-color: #f3f6fb;
+  background-image:
+    radial-gradient(920px 540px at 50% -12%, rgba(56, 189, 248, 0.16), transparent 65%),
+    radial-gradient(620px 360px at 12% 88%, rgba(99, 102, 241, 0.12), transparent 74%),
+    linear-gradient(180deg, #f8fbff 0%, #eef4fb 60%, #f8fbff 100%);
+}
+
+:root[data-theme="light"] .weather-panel,
+:root[data-theme="light"] .weather-surface,
+:root[data-theme="light"] .weather-appbar,
+:root[data-theme="light"] .weather-pill,
+:root[data-theme="light"] .weather-input,
+:root[data-theme="light"] .weather-button {
+  color: #0f172a;
+  border-color: rgba(100, 116, 139, 0.45);
+  background-color: rgba(255, 255, 255, 0.9);
+  background-image: none;
+}
+
+:root[data-theme="light"] .text-slate-100,
+:root[data-theme="light"] .text-slate-200,
+:root[data-theme="light"] .text-slate-300,
+:root[data-theme="light"] .text-slate-400 {
+  color: #1e293b !important;
+}

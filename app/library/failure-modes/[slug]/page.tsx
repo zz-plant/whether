@@ -32,6 +32,9 @@ export default async function FailureModeDetailPage({ params }: { params: Promis
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+      <Link href="/library/failure-modes" className="weather-pill inline-flex w-fit min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
+        ← Back to failure modes overview
+      </Link>
       <section className="weather-panel space-y-3 px-6 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{titleCase(slug)}</h1>
         <p className="text-sm text-slate-300">Use this page to recognize the pattern, choose the right toolkit, and align your posture.</p>
