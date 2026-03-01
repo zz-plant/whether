@@ -12,6 +12,8 @@
     "build:pages": "bun run build:cloudflare",
     "build:pages:skip-next-build": "bun run build:cloudflare:skip-next-build",
     "start": "next start",
+    "clean": "node scripts/clean-build-artifacts.mjs",
+    "clean:build": "node scripts/clean-build-artifacts.mjs",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --fix",
     "check": "bun run lint && bun run typecheck && bun run test",
