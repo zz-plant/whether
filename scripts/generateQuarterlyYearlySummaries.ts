@@ -8,6 +8,7 @@ import { buildYearlySummary } from "../lib/summary/yearlySummary";
 import { evaluateRegime } from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
 import { resolveHistoricalDate } from "../lib/timeMachine/timeMachine";
+import { execFileSync } from "node:child_process";
 import { resolveYearRange } from "./summaryRange";
 
 const START_YEAR = 2010;
@@ -100,12 +101,27 @@ const getLatestValidDate = (points: SeriesPoint[]) => {
 };
 
 const fetchSeries = async (seriesId: string) => {
-  const response = await fetch(`${FRED_BASE_URL}${seriesId}`);
-  if (!response.ok) {
-    throw new Error(`FRED series fetch failed for ${seriesId}: ${response.status}`);
+  const sourceUrl = `${FRED_BASE_URL}${seriesId}`;
+
+  try {
+    const response = await fetch(sourceUrl);
+    if (!response.ok) {
+      throw new Error(`FRED series fetch failed for ${seriesId}: ${response.status}`);
+    }
+    const csv = await response.text();
+    return parseSeries(csv);
+  } catch (error) {
+    const csv = execFileSync("curl", ["-fsSL", sourceUrl], {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    if (error instanceof Error) {
+      console.warn(
+        `fetch() failed for ${seriesId}; retried with curl fallback (${error.message}).`
+      );
+    }
+    return parseSeries(csv);
   }
-  const csv = await response.text();
-  return parseSeries(csv);
 };
 
 const isSameQuarterAndYear = (value: string, asOf: string) => {

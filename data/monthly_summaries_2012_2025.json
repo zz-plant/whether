@@ -10374,10 +10374,13 @@
     "record_date": "2024-01-31",
     "summary": {
       "title": "Monthly action summary — Jan 31, 2024",
-      "summary": "Survival Mode posture: Capital is expensive and risk appetite is low. Prioritize survival over growth. Priority: lock discretionary spend, protect runway, and require short payback windows for new bets.",
+      "summary": "Survival Mode posture: Capital is expensive and risk appetite is low. Prioritize survival over growth. Priority: lock discretionary spend, protect runway, and require short payback windows for new bets. Confidence: high (standard signal).",
       "regime": "SCARCITY",
       "regimeLabel": "Survival Mode",
       "guidance": "lock discretionary spend, protect runway, and require short payback windows for new bets",
+      "confidence": "HIGH",
+      "transitionWatch": false,
+      "intensity": "STANDARD",
       "constraints": [
         "Shorten payback windows and preserve cash.",
         "Delay speculative hiring or large platform rewrites.",
@@ -10387,7 +10390,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Feb 25, 2026, 12:22 AM",
+        "timestampLabel": "Mar 1, 2026, 11:24 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -10400,7 +10403,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2024-01-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -10411,7 +10414,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2024-01-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "ten-year",
@@ -10421,7 +10424,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2024-01-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "curve-slope",
@@ -10431,12 +10434,24 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2024-01-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
       ],
-      "copy": "Monthly action summary — Jan 31, 2024\nSurvival Mode posture: Capital is expensive and risk appetite is low. Prioritize survival over growth. Priority: lock discretionary spend, protect runway, and require short payback windows for new bets.\n\nExecution constraints:\n• Shorten payback windows and preserve cash.\n• Delay speculative hiring or large platform rewrites.\n• Route roadmap bets through revenue certainty.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Feb 25, 2026, 12:22 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Feb 25, 2026, 12:22 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
+      "structured": {
+        "executionConstraints": [
+          "Shorten payback windows and preserve cash.",
+          "Delay speculative hiring or large platform rewrites.",
+          "Route roadmap bets through revenue certainty."
+        ],
+        "provenance": {
+          "source": "US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)",
+          "timestamp": "Mar 1, 2026, 11:24 PM",
+          "dataAge": "0h."
+        }
+      },
+      "copy": "Monthly action summary — Jan 31, 2024\nSurvival Mode posture: Capital is expensive and risk appetite is low. Prioritize survival over growth. Priority: lock discretionary spend, protect runway, and require short payback windows for new bets. Confidence: high (standard signal).\n\nExecution constraints:\n• Shorten payback windows and preserve cash.\n• Delay speculative hiring or large platform rewrites.\n• Route roadmap bets through revenue certainty.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 1, 2026, 11:24 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 1, 2026, 11:24 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
     }
   },
   {
@@ -10446,10 +10461,13 @@
     "record_date": "2024-02-29",
     "summary": {
       "title": "Monthly action summary — Feb 29, 2024",
-      "summary": "Survival Mode posture: Capital is expensive and risk appetite is low. Prioritize survival over growth. Priority: lock discretionary spend, protect runway, and require short payback windows for new bets.",
+      "summary": "Survival Mode posture: Capital is expensive and risk appetite is low. Prioritize survival over growth. Priority: lock discretionary spend, protect runway, and require short payback windows for new bets. Confidence: high (strong signal).",
       "regime": "SCARCITY",
       "regimeLabel": "Survival Mode",
       "guidance": "lock discretionary spend, protect runway, and require short payback windows for new bets",
+      "confidence": "HIGH",
+      "transitionWatch": false,
+      "intensity": "STRONG",
       "constraints": [
         "Shorten payback windows and preserve cash.",
         "Delay speculative hiring or large platform rewrites.",
@@ -10459,7 +10477,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Feb 25, 2026, 12:22 AM",
+        "timestampLabel": "Mar 1, 2026, 11:24 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -10472,7 +10490,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2024-02-29",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -10483,7 +10501,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2024-02-29",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "ten-year",
@@ -10493,7 +10511,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2024-02-29",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "curve-slope",
@@ -10503,12 +10521,24 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2024-02-29",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
       ],
-      "copy": "Monthly action summary — Feb 29, 2024\nSurvival Mode posture: Capital is expensive and risk appetite is low. Prioritize survival over growth. Priority: lock discretionary spend, protect runway, and require short payback windows for new bets.\n\nExecution constraints:\n• Shorten payback windows and preserve cash.\n• Delay speculative hiring or large platform rewrites.\n• Route roadmap bets through revenue certainty.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Feb 25, 2026, 12:22 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Feb 25, 2026, 12:22 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
+      "structured": {
+        "executionConstraints": [
+          "Shorten payback windows and preserve cash.",
+          "Delay speculative hiring or large platform rewrites.",
+          "Route roadmap bets through revenue certainty."
+        ],
+        "provenance": {
+          "source": "US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)",
+          "timestamp": "Mar 1, 2026, 11:24 PM",
+          "dataAge": "0h."
+        }
+      },
+      "copy": "Monthly action summary — Feb 29, 2024\nSurvival Mode posture: Capital is expensive and risk appetite is low. Prioritize survival over growth. Priority: lock discretionary spend, protect runway, and require short payback windows for new bets. Confidence: high (strong signal).\n\nExecution constraints:\n• Shorten payback windows and preserve cash.\n• Delay speculative hiring or large platform rewrites.\n• Route roadmap bets through revenue certainty.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 1, 2026, 11:24 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 1, 2026, 11:24 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
     }
   },
   {
@@ -10518,10 +10548,13 @@
     "record_date": "2024-03-29",
     "summary": {
       "title": "Monthly action summary — Mar 29, 2024",
-      "summary": "Safety Mode posture: Capital is cheaper but risk appetite is weak. Build trust and resilience. Priority: balance experiments with guardrails, keep approvals reversible, and tighten cross-team handoffs.",
+      "summary": "Safety Mode posture: Capital is cheaper but risk appetite is weak. Build trust and resilience. Priority: balance experiments with guardrails, keep approvals reversible, and tighten cross-team handoffs. Confidence: medium (standard signal).",
       "regime": "VOLATILE",
       "regimeLabel": "Safety Mode",
       "guidance": "balance experiments with guardrails, keep approvals reversible, and tighten cross-team handoffs",
+      "confidence": "MEDIUM",
+      "transitionWatch": false,
+      "intensity": "STANDARD",
       "constraints": [
         "Ship reliability and security before novelty.",
         "Avoid disruptive pivots that spook buyers.",
@@ -10531,7 +10564,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Feb 25, 2026, 12:22 AM",
+        "timestampLabel": "Mar 1, 2026, 11:24 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -10544,7 +10577,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2024-03-29",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -10555,7 +10588,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2024-03-29",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "ten-year",
@@ -10565,7 +10598,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2024-03-29",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "curve-slope",
@@ -10575,12 +10608,24 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2024-03-29",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
       ],
-      "copy": "Monthly action summary — Mar 29, 2024\nSafety Mode posture: Capital is cheaper but risk appetite is weak. Build trust and resilience. Priority: balance experiments with guardrails, keep approvals reversible, and tighten cross-team handoffs.\n\nExecution constraints:\n• Ship reliability and security before novelty.\n• Avoid disruptive pivots that spook buyers.\n• Lean into proof, references, and guarantees.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Feb 25, 2026, 12:22 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Feb 25, 2026, 12:22 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
+      "structured": {
+        "executionConstraints": [
+          "Ship reliability and security before novelty.",
+          "Avoid disruptive pivots that spook buyers.",
+          "Lean into proof, references, and guarantees."
+        ],
+        "provenance": {
+          "source": "US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)",
+          "timestamp": "Mar 1, 2026, 11:24 PM",
+          "dataAge": "0h."
+        }
+      },
+      "copy": "Monthly action summary — Mar 29, 2024\nSafety Mode posture: Capital is cheaper but risk appetite is weak. Build trust and resilience. Priority: balance experiments with guardrails, keep approvals reversible, and tighten cross-team handoffs. Confidence: medium (standard signal).\n\nExecution constraints:\n• Ship reliability and security before novelty.\n• Avoid disruptive pivots that spook buyers.\n• Lean into proof, references, and guarantees.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 1, 2026, 11:24 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 1, 2026, 11:24 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
     }
   },
   {
@@ -10590,10 +10635,13 @@
     "record_date": "2024-04-30",
     "summary": {
       "title": "Monthly action summary — Apr 30, 2024",
-      "summary": "Survival Mode posture: Capital is expensive and risk appetite is low. Prioritize survival over growth. Priority: lock discretionary spend, protect runway, and require short payback windows for new bets.",
+      "summary": "Survival Mode posture: Capital is expensive and risk appetite is low. Prioritize survival over growth. Priority: lock discretionary spend, protect runway, and require short payback windows for new bets. Confidence: high (standard signal).",
       "regime": "SCARCITY",
       "regimeLabel": "Survival Mode",
       "guidance": "lock discretionary spend, protect runway, and require short payback windows for new bets",
+      "confidence": "HIGH",
+      "transitionWatch": false,
+      "intensity": "STANDARD",
       "constraints": [
         "Shorten payback windows and preserve cash.",
         "Delay speculative hiring or large platform rewrites.",
@@ -10603,7 +10651,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Feb 25, 2026, 12:22 AM",
+        "timestampLabel": "Mar 1, 2026, 11:24 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -10616,7 +10664,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2024-04-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -10627,7 +10675,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2024-04-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "ten-year",
@@ -10637,7 +10685,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2024-04-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "curve-slope",
@@ -10647,12 +10695,24 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2024-04-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
       ],
-      "copy": "Monthly action summary — Apr 30, 2024\nSurvival Mode posture: Capital is expensive and risk appetite is low. Prioritize survival over growth. Priority: lock discretionary spend, protect runway, and require short payback windows for new bets.\n\nExecution constraints:\n• Shorten payback windows and preserve cash.\n• Delay speculative hiring or large platform rewrites.\n• Route roadmap bets through revenue certainty.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Feb 25, 2026, 12:22 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Feb 25, 2026, 12:22 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
+      "structured": {
+        "executionConstraints": [
+          "Shorten payback windows and preserve cash.",
+          "Delay speculative hiring or large platform rewrites.",
+          "Route roadmap bets through revenue certainty."
+        ],
+        "provenance": {
+          "source": "US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)",
+          "timestamp": "Mar 1, 2026, 11:24 PM",
+          "dataAge": "0h."
+        }
+      },
+      "copy": "Monthly action summary — Apr 30, 2024\nSurvival Mode posture: Capital is expensive and risk appetite is low. Prioritize survival over growth. Priority: lock discretionary spend, protect runway, and require short payback windows for new bets. Confidence: high (standard signal).\n\nExecution constraints:\n• Shorten payback windows and preserve cash.\n• Delay speculative hiring or large platform rewrites.\n• Route roadmap bets through revenue certainty.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 1, 2026, 11:24 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 1, 2026, 11:24 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
     }
   },
   {
@@ -10662,10 +10722,13 @@
     "record_date": "2024-05-31",
     "summary": {
       "title": "Monthly action summary — May 31, 2024",
-      "summary": "Survival Mode posture: Capital is expensive and risk appetite is low. Prioritize survival over growth. Priority: lock discretionary spend, protect runway, and require short payback windows for new bets.",
+      "summary": "Survival Mode posture: Capital is expensive and risk appetite is low. Prioritize survival over growth. Priority: lock discretionary spend, protect runway, and require short payback windows for new bets. Confidence: high (strong signal).",
       "regime": "SCARCITY",
       "regimeLabel": "Survival Mode",
       "guidance": "lock discretionary spend, protect runway, and require short payback windows for new bets",
+      "confidence": "HIGH",
+      "transitionWatch": false,
+      "intensity": "STRONG",
       "constraints": [
         "Shorten payback windows and preserve cash.",
         "Delay speculative hiring or large platform rewrites.",
@@ -10675,7 +10738,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Feb 25, 2026, 12:22 AM",
+        "timestampLabel": "Mar 1, 2026, 11:24 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -10688,7 +10751,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2024-05-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -10699,7 +10762,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2024-05-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "ten-year",
@@ -10709,7 +10772,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2024-05-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "curve-slope",
@@ -10719,12 +10782,24 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2024-05-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
       ],
-      "copy": "Monthly action summary — May 31, 2024\nSurvival Mode posture: Capital is expensive and risk appetite is low. Prioritize survival over growth. Priority: lock discretionary spend, protect runway, and require short payback windows for new bets.\n\nExecution constraints:\n• Shorten payback windows and preserve cash.\n• Delay speculative hiring or large platform rewrites.\n• Route roadmap bets through revenue certainty.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Feb 25, 2026, 12:22 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Feb 25, 2026, 12:22 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
+      "structured": {
+        "executionConstraints": [
+          "Shorten payback windows and preserve cash.",
+          "Delay speculative hiring or large platform rewrites.",
+          "Route roadmap bets through revenue certainty."
+        ],
+        "provenance": {
+          "source": "US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)",
+          "timestamp": "Mar 1, 2026, 11:24 PM",
+          "dataAge": "0h."
+        }
+      },
+      "copy": "Monthly action summary — May 31, 2024\nSurvival Mode posture: Capital is expensive and risk appetite is low. Prioritize survival over growth. Priority: lock discretionary spend, protect runway, and require short payback windows for new bets. Confidence: high (strong signal).\n\nExecution constraints:\n• Shorten payback windows and preserve cash.\n• Delay speculative hiring or large platform rewrites.\n• Route roadmap bets through revenue certainty.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 1, 2026, 11:24 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 1, 2026, 11:24 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
     }
   },
   {
@@ -10734,10 +10809,13 @@
     "record_date": "2024-06-28",
     "summary": {
       "title": "Monthly action summary — Jun 28, 2024",
-      "summary": "Survival Mode posture: Capital is expensive and risk appetite is low. Prioritize survival over growth. Priority: lock discretionary spend, protect runway, and require short payback windows for new bets.",
+      "summary": "Survival Mode posture: Capital is expensive and risk appetite is low. Prioritize survival over growth. Priority: lock discretionary spend, protect runway, and require short payback windows for new bets. Confidence: high (standard signal).",
       "regime": "SCARCITY",
       "regimeLabel": "Survival Mode",
       "guidance": "lock discretionary spend, protect runway, and require short payback windows for new bets",
+      "confidence": "HIGH",
+      "transitionWatch": false,
+      "intensity": "STANDARD",
       "constraints": [
         "Shorten payback windows and preserve cash.",
         "Delay speculative hiring or large platform rewrites.",
@@ -10747,7 +10825,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Feb 25, 2026, 12:22 AM",
+        "timestampLabel": "Mar 1, 2026, 11:24 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -10760,7 +10838,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2024-06-28",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -10771,7 +10849,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2024-06-28",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "ten-year",
@@ -10781,7 +10859,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2024-06-28",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "curve-slope",
@@ -10791,12 +10869,24 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2024-06-28",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
       ],
-      "copy": "Monthly action summary — Jun 28, 2024\nSurvival Mode posture: Capital is expensive and risk appetite is low. Prioritize survival over growth. Priority: lock discretionary spend, protect runway, and require short payback windows for new bets.\n\nExecution constraints:\n• Shorten payback windows and preserve cash.\n• Delay speculative hiring or large platform rewrites.\n• Route roadmap bets through revenue certainty.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Feb 25, 2026, 12:22 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Feb 25, 2026, 12:22 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
+      "structured": {
+        "executionConstraints": [
+          "Shorten payback windows and preserve cash.",
+          "Delay speculative hiring or large platform rewrites.",
+          "Route roadmap bets through revenue certainty."
+        ],
+        "provenance": {
+          "source": "US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)",
+          "timestamp": "Mar 1, 2026, 11:24 PM",
+          "dataAge": "0h."
+        }
+      },
+      "copy": "Monthly action summary — Jun 28, 2024\nSurvival Mode posture: Capital is expensive and risk appetite is low. Prioritize survival over growth. Priority: lock discretionary spend, protect runway, and require short payback windows for new bets. Confidence: high (standard signal).\n\nExecution constraints:\n• Shorten payback windows and preserve cash.\n• Delay speculative hiring or large platform rewrites.\n• Route roadmap bets through revenue certainty.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 1, 2026, 11:24 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 1, 2026, 11:24 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
     }
   },
   {
@@ -10806,10 +10896,13 @@
     "record_date": "2024-07-31",
     "summary": {
       "title": "Monthly action summary — Jul 31, 2024",
-      "summary": "Survival Mode posture: Capital is expensive and risk appetite is low. Prioritize survival over growth. Priority: lock discretionary spend, protect runway, and require short payback windows for new bets.",
+      "summary": "Survival Mode posture: Capital is expensive and risk appetite is low. Prioritize survival over growth. Priority: lock discretionary spend, protect runway, and require short payback windows for new bets. Confidence: medium (standard signal).",
       "regime": "SCARCITY",
       "regimeLabel": "Survival Mode",
       "guidance": "lock discretionary spend, protect runway, and require short payback windows for new bets",
+      "confidence": "MEDIUM",
+      "transitionWatch": false,
+      "intensity": "STANDARD",
       "constraints": [
         "Shorten payback windows and preserve cash.",
         "Delay speculative hiring or large platform rewrites.",
@@ -10819,7 +10912,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Feb 25, 2026, 12:22 AM",
+        "timestampLabel": "Mar 1, 2026, 11:24 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -10832,7 +10925,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2024-07-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -10843,7 +10936,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2024-07-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "ten-year",
@@ -10853,7 +10946,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2024-07-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "curve-slope",
@@ -10863,12 +10956,24 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2024-07-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
       ],
-      "copy": "Monthly action summary — Jul 31, 2024\nSurvival Mode posture: Capital is expensive and risk appetite is low. Prioritize survival over growth. Priority: lock discretionary spend, protect runway, and require short payback windows for new bets.\n\nExecution constraints:\n• Shorten payback windows and preserve cash.\n• Delay speculative hiring or large platform rewrites.\n• Route roadmap bets through revenue certainty.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Feb 25, 2026, 12:22 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Feb 25, 2026, 12:22 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
+      "structured": {
+        "executionConstraints": [
+          "Shorten payback windows and preserve cash.",
+          "Delay speculative hiring or large platform rewrites.",
+          "Route roadmap bets through revenue certainty."
+        ],
+        "provenance": {
+          "source": "US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)",
+          "timestamp": "Mar 1, 2026, 11:24 PM",
+          "dataAge": "0h."
+        }
+      },
+      "copy": "Monthly action summary — Jul 31, 2024\nSurvival Mode posture: Capital is expensive and risk appetite is low. Prioritize survival over growth. Priority: lock discretionary spend, protect runway, and require short payback windows for new bets. Confidence: medium (standard signal).\n\nExecution constraints:\n• Shorten payback windows and preserve cash.\n• Delay speculative hiring or large platform rewrites.\n• Route roadmap bets through revenue certainty.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 1, 2026, 11:24 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 1, 2026, 11:24 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
     }
   },
   {
@@ -10878,10 +10983,13 @@
     "record_date": "2024-08-30",
     "summary": {
       "title": "Monthly action summary — Aug 30, 2024",
-      "summary": "Survival Mode posture: Capital is expensive and risk appetite is low. Prioritize survival over growth. Priority: lock discretionary spend, protect runway, and require short payback windows for new bets.",
+      "summary": "Survival Mode posture: Capital is expensive and risk appetite is low. Prioritize survival over growth. Priority: lock discretionary spend, protect runway, and require short payback windows for new bets. Confidence: low (mild signal). Signals are near a regime boundary; hold major scope changes until the next read.",
       "regime": "SCARCITY",
       "regimeLabel": "Survival Mode",
       "guidance": "lock discretionary spend, protect runway, and require short payback windows for new bets",
+      "confidence": "LOW",
+      "transitionWatch": true,
+      "intensity": "MILD",
       "constraints": [
         "Shorten payback windows and preserve cash.",
         "Delay speculative hiring or large platform rewrites.",
@@ -10891,7 +10999,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Feb 25, 2026, 12:22 AM",
+        "timestampLabel": "Mar 1, 2026, 11:24 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -10904,7 +11012,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2024-08-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -10915,7 +11023,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2024-08-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "ten-year",
@@ -10925,7 +11033,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2024-08-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "curve-slope",
@@ -10935,12 +11043,24 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2024-08-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
       ],
-      "copy": "Monthly action summary — Aug 30, 2024\nSurvival Mode posture: Capital is expensive and risk appetite is low. Prioritize survival over growth. Priority: lock discretionary spend, protect runway, and require short payback windows for new bets.\n\nExecution constraints:\n• Shorten payback windows and preserve cash.\n• Delay speculative hiring or large platform rewrites.\n• Route roadmap bets through revenue certainty.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Feb 25, 2026, 12:22 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Feb 25, 2026, 12:22 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
+      "structured": {
+        "executionConstraints": [
+          "Shorten payback windows and preserve cash.",
+          "Delay speculative hiring or large platform rewrites.",
+          "Route roadmap bets through revenue certainty."
+        ],
+        "provenance": {
+          "source": "US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)",
+          "timestamp": "Mar 1, 2026, 11:24 PM",
+          "dataAge": "0h."
+        }
+      },
+      "copy": "Monthly action summary — Aug 30, 2024\nSurvival Mode posture: Capital is expensive and risk appetite is low. Prioritize survival over growth. Priority: lock discretionary spend, protect runway, and require short payback windows for new bets. Confidence: low (mild signal). Signals are near a regime boundary; hold major scope changes until the next read.\n\nExecution constraints:\n• Shorten payback windows and preserve cash.\n• Delay speculative hiring or large platform rewrites.\n• Route roadmap bets through revenue certainty.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 1, 2026, 11:24 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 1, 2026, 11:24 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
     }
   },
   {
@@ -10950,10 +11070,13 @@
     "record_date": "2024-09-30",
     "summary": {
       "title": "Monthly action summary — Sep 30, 2024",
-      "summary": "Safety Mode posture: Capital is cheaper but risk appetite is weak. Build trust and resilience. Priority: balance experiments with guardrails, keep approvals reversible, and tighten cross-team handoffs.",
+      "summary": "Safety Mode posture: Capital is cheaper but risk appetite is weak. Build trust and resilience. Priority: balance experiments with guardrails, keep approvals reversible, and tighten cross-team handoffs. Confidence: low (mild signal). Signals are near a regime boundary; hold major scope changes until the next read.",
       "regime": "VOLATILE",
       "regimeLabel": "Safety Mode",
       "guidance": "balance experiments with guardrails, keep approvals reversible, and tighten cross-team handoffs",
+      "confidence": "LOW",
+      "transitionWatch": true,
+      "intensity": "MILD",
       "constraints": [
         "Ship reliability and security before novelty.",
         "Avoid disruptive pivots that spook buyers.",
@@ -10963,7 +11086,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Feb 25, 2026, 12:22 AM",
+        "timestampLabel": "Mar 1, 2026, 11:24 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -10976,7 +11099,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2024-09-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -10987,7 +11110,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2024-09-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "ten-year",
@@ -10997,7 +11120,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2024-09-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "curve-slope",
@@ -11007,12 +11130,24 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2024-09-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
       ],
-      "copy": "Monthly action summary — Sep 30, 2024\nSafety Mode posture: Capital is cheaper but risk appetite is weak. Build trust and resilience. Priority: balance experiments with guardrails, keep approvals reversible, and tighten cross-team handoffs.\n\nExecution constraints:\n• Ship reliability and security before novelty.\n• Avoid disruptive pivots that spook buyers.\n• Lean into proof, references, and guarantees.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Feb 25, 2026, 12:22 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Feb 25, 2026, 12:22 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
+      "structured": {
+        "executionConstraints": [
+          "Ship reliability and security before novelty.",
+          "Avoid disruptive pivots that spook buyers.",
+          "Lean into proof, references, and guarantees."
+        ],
+        "provenance": {
+          "source": "US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)",
+          "timestamp": "Mar 1, 2026, 11:24 PM",
+          "dataAge": "0h."
+        }
+      },
+      "copy": "Monthly action summary — Sep 30, 2024\nSafety Mode posture: Capital is cheaper but risk appetite is weak. Build trust and resilience. Priority: balance experiments with guardrails, keep approvals reversible, and tighten cross-team handoffs. Confidence: low (mild signal). Signals are near a regime boundary; hold major scope changes until the next read.\n\nExecution constraints:\n• Ship reliability and security before novelty.\n• Avoid disruptive pivots that spook buyers.\n• Lean into proof, references, and guarantees.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 1, 2026, 11:24 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 1, 2026, 11:24 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
     }
   },
   {
@@ -11022,10 +11157,13 @@
     "record_date": "2024-10-31",
     "summary": {
       "title": "Monthly action summary — Oct 31, 2024",
-      "summary": "Safety Mode posture: Capital is cheaper but risk appetite is weak. Build trust and resilience. Priority: balance experiments with guardrails, keep approvals reversible, and tighten cross-team handoffs.",
+      "summary": "Safety Mode posture: Capital is cheaper but risk appetite is weak. Build trust and resilience. Priority: balance experiments with guardrails, keep approvals reversible, and tighten cross-team handoffs. Confidence: low (mild signal). Signals are near a regime boundary; hold major scope changes until the next read.",
       "regime": "VOLATILE",
       "regimeLabel": "Safety Mode",
       "guidance": "balance experiments with guardrails, keep approvals reversible, and tighten cross-team handoffs",
+      "confidence": "LOW",
+      "transitionWatch": true,
+      "intensity": "MILD",
       "constraints": [
         "Ship reliability and security before novelty.",
         "Avoid disruptive pivots that spook buyers.",
@@ -11035,7 +11173,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Feb 25, 2026, 12:22 AM",
+        "timestampLabel": "Mar 1, 2026, 11:24 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -11048,7 +11186,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2024-10-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -11059,7 +11197,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2024-10-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "ten-year",
@@ -11069,7 +11207,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2024-10-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "curve-slope",
@@ -11079,12 +11217,24 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2024-10-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
       ],
-      "copy": "Monthly action summary — Oct 31, 2024\nSafety Mode posture: Capital is cheaper but risk appetite is weak. Build trust and resilience. Priority: balance experiments with guardrails, keep approvals reversible, and tighten cross-team handoffs.\n\nExecution constraints:\n• Ship reliability and security before novelty.\n• Avoid disruptive pivots that spook buyers.\n• Lean into proof, references, and guarantees.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Feb 25, 2026, 12:22 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Feb 25, 2026, 12:22 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
+      "structured": {
+        "executionConstraints": [
+          "Ship reliability and security before novelty.",
+          "Avoid disruptive pivots that spook buyers.",
+          "Lean into proof, references, and guarantees."
+        ],
+        "provenance": {
+          "source": "US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)",
+          "timestamp": "Mar 1, 2026, 11:24 PM",
+          "dataAge": "0h."
+        }
+      },
+      "copy": "Monthly action summary — Oct 31, 2024\nSafety Mode posture: Capital is cheaper but risk appetite is weak. Build trust and resilience. Priority: balance experiments with guardrails, keep approvals reversible, and tighten cross-team handoffs. Confidence: low (mild signal). Signals are near a regime boundary; hold major scope changes until the next read.\n\nExecution constraints:\n• Ship reliability and security before novelty.\n• Avoid disruptive pivots that spook buyers.\n• Lean into proof, references, and guarantees.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 1, 2026, 11:24 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 1, 2026, 11:24 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
     }
   },
   {
@@ -11094,10 +11244,13 @@
     "record_date": "2024-11-29",
     "summary": {
       "title": "Monthly action summary — Nov 29, 2024",
-      "summary": "Safety Mode posture: Capital is cheaper but risk appetite is weak. Build trust and resilience. Priority: balance experiments with guardrails, keep approvals reversible, and tighten cross-team handoffs.",
+      "summary": "Safety Mode posture: Capital is cheaper but risk appetite is weak. Build trust and resilience. Priority: balance experiments with guardrails, keep approvals reversible, and tighten cross-team handoffs. Confidence: low (mild signal).",
       "regime": "VOLATILE",
       "regimeLabel": "Safety Mode",
       "guidance": "balance experiments with guardrails, keep approvals reversible, and tighten cross-team handoffs",
+      "confidence": "LOW",
+      "transitionWatch": false,
+      "intensity": "MILD",
       "constraints": [
         "Ship reliability and security before novelty.",
         "Avoid disruptive pivots that spook buyers.",
@@ -11107,7 +11260,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Feb 25, 2026, 12:22 AM",
+        "timestampLabel": "Mar 1, 2026, 11:24 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -11120,7 +11273,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2024-11-29",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -11131,7 +11284,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2024-11-29",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "ten-year",
@@ -11141,7 +11294,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2024-11-29",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "curve-slope",
@@ -11151,12 +11304,24 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2024-11-29",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
       ],
-      "copy": "Monthly action summary — Nov 29, 2024\nSafety Mode posture: Capital is cheaper but risk appetite is weak. Build trust and resilience. Priority: balance experiments with guardrails, keep approvals reversible, and tighten cross-team handoffs.\n\nExecution constraints:\n• Ship reliability and security before novelty.\n• Avoid disruptive pivots that spook buyers.\n• Lean into proof, references, and guarantees.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Feb 25, 2026, 12:22 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Feb 25, 2026, 12:22 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
+      "structured": {
+        "executionConstraints": [
+          "Ship reliability and security before novelty.",
+          "Avoid disruptive pivots that spook buyers.",
+          "Lean into proof, references, and guarantees."
+        ],
+        "provenance": {
+          "source": "US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)",
+          "timestamp": "Mar 1, 2026, 11:24 PM",
+          "dataAge": "0h."
+        }
+      },
+      "copy": "Monthly action summary — Nov 29, 2024\nSafety Mode posture: Capital is cheaper but risk appetite is weak. Build trust and resilience. Priority: balance experiments with guardrails, keep approvals reversible, and tighten cross-team handoffs. Confidence: low (mild signal).\n\nExecution constraints:\n• Ship reliability and security before novelty.\n• Avoid disruptive pivots that spook buyers.\n• Lean into proof, references, and guarantees.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 1, 2026, 11:24 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 1, 2026, 11:24 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
     }
   },
   {
@@ -11166,10 +11331,13 @@
     "record_date": "2024-12-31",
     "summary": {
       "title": "Monthly action summary — Dec 31, 2024",
-      "summary": "Growth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline.",
+      "summary": "Growth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline. Confidence: low (mild signal). Signals are near a regime boundary; hold major scope changes until the next read.",
       "regime": "EXPANSION",
       "regimeLabel": "Growth Mode",
       "guidance": "scale proven bets, invest in durable growth channels, and keep payback discipline",
+      "confidence": "LOW",
+      "transitionWatch": true,
+      "intensity": "MILD",
       "constraints": [
         "Prioritize speed and distribution over polish.",
         "Accept controlled waste to win market share.",
@@ -11179,7 +11347,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Feb 25, 2026, 12:22 AM",
+        "timestampLabel": "Mar 1, 2026, 11:24 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -11192,7 +11360,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2024-12-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -11203,7 +11371,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2024-12-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "ten-year",
@@ -11213,7 +11381,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2024-12-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "curve-slope",
@@ -11223,12 +11391,24 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2024-12-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
       ],
-      "copy": "Monthly action summary — Dec 31, 2024\nGrowth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline.\n\nExecution constraints:\n• Prioritize speed and distribution over polish.\n• Accept controlled waste to win market share.\n• Invest ahead of demand where signals are strong.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Feb 25, 2026, 12:22 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Feb 25, 2026, 12:22 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
+      "structured": {
+        "executionConstraints": [
+          "Prioritize speed and distribution over polish.",
+          "Accept controlled waste to win market share.",
+          "Invest ahead of demand where signals are strong."
+        ],
+        "provenance": {
+          "source": "US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)",
+          "timestamp": "Mar 1, 2026, 11:24 PM",
+          "dataAge": "0h."
+        }
+      },
+      "copy": "Monthly action summary — Dec 31, 2024\nGrowth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline. Confidence: low (mild signal). Signals are near a regime boundary; hold major scope changes until the next read.\n\nExecution constraints:\n• Prioritize speed and distribution over polish.\n• Accept controlled waste to win market share.\n• Invest ahead of demand where signals are strong.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 1, 2026, 11:24 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 1, 2026, 11:24 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
     }
   },
   {
@@ -11238,10 +11418,13 @@
     "record_date": "2025-01-31",
     "summary": {
       "title": "Monthly action summary — Jan 31, 2025",
-      "summary": "Growth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline.",
+      "summary": "Growth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline. Confidence: low (mild signal). Signals are near a regime boundary; hold major scope changes until the next read.",
       "regime": "EXPANSION",
       "regimeLabel": "Growth Mode",
       "guidance": "scale proven bets, invest in durable growth channels, and keep payback discipline",
+      "confidence": "LOW",
+      "transitionWatch": true,
+      "intensity": "MILD",
       "constraints": [
         "Prioritize speed and distribution over polish.",
         "Accept controlled waste to win market share.",
@@ -11251,7 +11434,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Feb 25, 2026, 12:22 AM",
+        "timestampLabel": "Mar 1, 2026, 11:24 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -11264,7 +11447,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2025-01-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -11275,7 +11458,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2025-01-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "ten-year",
@@ -11285,7 +11468,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2025-01-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "curve-slope",
@@ -11295,12 +11478,24 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2025-01-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
       ],
-      "copy": "Monthly action summary — Jan 31, 2025\nGrowth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline.\n\nExecution constraints:\n• Prioritize speed and distribution over polish.\n• Accept controlled waste to win market share.\n• Invest ahead of demand where signals are strong.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Feb 25, 2026, 12:22 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Feb 25, 2026, 12:22 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
+      "structured": {
+        "executionConstraints": [
+          "Prioritize speed and distribution over polish.",
+          "Accept controlled waste to win market share.",
+          "Invest ahead of demand where signals are strong."
+        ],
+        "provenance": {
+          "source": "US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)",
+          "timestamp": "Mar 1, 2026, 11:24 PM",
+          "dataAge": "0h."
+        }
+      },
+      "copy": "Monthly action summary — Jan 31, 2025\nGrowth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline. Confidence: low (mild signal). Signals are near a regime boundary; hold major scope changes until the next read.\n\nExecution constraints:\n• Prioritize speed and distribution over polish.\n• Accept controlled waste to win market share.\n• Invest ahead of demand where signals are strong.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 1, 2026, 11:24 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 1, 2026, 11:24 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
     }
   },
   {
@@ -11310,10 +11505,13 @@
     "record_date": "2025-02-28",
     "summary": {
       "title": "Monthly action summary — Feb 28, 2025",
-      "summary": "Safety Mode posture: Capital is cheaper but risk appetite is weak. Build trust and resilience. Priority: balance experiments with guardrails, keep approvals reversible, and tighten cross-team handoffs.",
+      "summary": "Safety Mode posture: Capital is cheaper but risk appetite is weak. Build trust and resilience. Priority: balance experiments with guardrails, keep approvals reversible, and tighten cross-team handoffs. Confidence: low (mild signal). Signals are near a regime boundary; hold major scope changes until the next read.",
       "regime": "VOLATILE",
       "regimeLabel": "Safety Mode",
       "guidance": "balance experiments with guardrails, keep approvals reversible, and tighten cross-team handoffs",
+      "confidence": "LOW",
+      "transitionWatch": true,
+      "intensity": "MILD",
       "constraints": [
         "Ship reliability and security before novelty.",
         "Avoid disruptive pivots that spook buyers.",
@@ -11323,7 +11521,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Feb 25, 2026, 12:22 AM",
+        "timestampLabel": "Mar 1, 2026, 11:24 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -11336,7 +11534,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2025-02-28",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -11347,7 +11545,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2025-02-28",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "ten-year",
@@ -11357,7 +11555,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2025-02-28",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "curve-slope",
@@ -11367,12 +11565,24 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2025-02-28",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
       ],
-      "copy": "Monthly action summary — Feb 28, 2025\nSafety Mode posture: Capital is cheaper but risk appetite is weak. Build trust and resilience. Priority: balance experiments with guardrails, keep approvals reversible, and tighten cross-team handoffs.\n\nExecution constraints:\n• Ship reliability and security before novelty.\n• Avoid disruptive pivots that spook buyers.\n• Lean into proof, references, and guarantees.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Feb 25, 2026, 12:22 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Feb 25, 2026, 12:22 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
+      "structured": {
+        "executionConstraints": [
+          "Ship reliability and security before novelty.",
+          "Avoid disruptive pivots that spook buyers.",
+          "Lean into proof, references, and guarantees."
+        ],
+        "provenance": {
+          "source": "US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)",
+          "timestamp": "Mar 1, 2026, 11:24 PM",
+          "dataAge": "0h."
+        }
+      },
+      "copy": "Monthly action summary — Feb 28, 2025\nSafety Mode posture: Capital is cheaper but risk appetite is weak. Build trust and resilience. Priority: balance experiments with guardrails, keep approvals reversible, and tighten cross-team handoffs. Confidence: low (mild signal). Signals are near a regime boundary; hold major scope changes until the next read.\n\nExecution constraints:\n• Ship reliability and security before novelty.\n• Avoid disruptive pivots that spook buyers.\n• Lean into proof, references, and guarantees.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 1, 2026, 11:24 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 1, 2026, 11:24 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
     }
   },
   {
@@ -11382,10 +11592,13 @@
     "record_date": "2025-03-31",
     "summary": {
       "title": "Monthly action summary — Mar 31, 2025",
-      "summary": "Growth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline.",
+      "summary": "Growth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline. Confidence: low (mild signal). Signals are near a regime boundary; hold major scope changes until the next read.",
       "regime": "EXPANSION",
       "regimeLabel": "Growth Mode",
       "guidance": "scale proven bets, invest in durable growth channels, and keep payback discipline",
+      "confidence": "LOW",
+      "transitionWatch": true,
+      "intensity": "MILD",
       "constraints": [
         "Prioritize speed and distribution over polish.",
         "Accept controlled waste to win market share.",
@@ -11395,7 +11608,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Feb 25, 2026, 12:22 AM",
+        "timestampLabel": "Mar 1, 2026, 11:24 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -11408,7 +11621,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2025-03-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -11419,7 +11632,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2025-03-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "ten-year",
@@ -11429,7 +11642,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2025-03-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "curve-slope",
@@ -11439,12 +11652,24 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2025-03-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
       ],
-      "copy": "Monthly action summary — Mar 31, 2025\nGrowth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline.\n\nExecution constraints:\n• Prioritize speed and distribution over polish.\n• Accept controlled waste to win market share.\n• Invest ahead of demand where signals are strong.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Feb 25, 2026, 12:22 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Feb 25, 2026, 12:22 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
+      "structured": {
+        "executionConstraints": [
+          "Prioritize speed and distribution over polish.",
+          "Accept controlled waste to win market share.",
+          "Invest ahead of demand where signals are strong."
+        ],
+        "provenance": {
+          "source": "US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)",
+          "timestamp": "Mar 1, 2026, 11:24 PM",
+          "dataAge": "0h."
+        }
+      },
+      "copy": "Monthly action summary — Mar 31, 2025\nGrowth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline. Confidence: low (mild signal). Signals are near a regime boundary; hold major scope changes until the next read.\n\nExecution constraints:\n• Prioritize speed and distribution over polish.\n• Accept controlled waste to win market share.\n• Invest ahead of demand where signals are strong.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 1, 2026, 11:24 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 1, 2026, 11:24 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
     }
   },
   {
@@ -11454,10 +11679,13 @@
     "record_date": "2025-04-30",
     "summary": {
       "title": "Monthly action summary — Apr 30, 2025",
-      "summary": "Growth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline.",
+      "summary": "Growth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline. Confidence: medium (standard signal).",
       "regime": "EXPANSION",
       "regimeLabel": "Growth Mode",
       "guidance": "scale proven bets, invest in durable growth channels, and keep payback discipline",
+      "confidence": "MEDIUM",
+      "transitionWatch": false,
+      "intensity": "STANDARD",
       "constraints": [
         "Prioritize speed and distribution over polish.",
         "Accept controlled waste to win market share.",
@@ -11467,7 +11695,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Feb 25, 2026, 12:22 AM",
+        "timestampLabel": "Mar 1, 2026, 11:24 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -11480,7 +11708,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2025-04-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -11491,7 +11719,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2025-04-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "ten-year",
@@ -11501,7 +11729,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2025-04-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "curve-slope",
@@ -11511,12 +11739,24 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2025-04-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
       ],
-      "copy": "Monthly action summary — Apr 30, 2025\nGrowth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline.\n\nExecution constraints:\n• Prioritize speed and distribution over polish.\n• Accept controlled waste to win market share.\n• Invest ahead of demand where signals are strong.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Feb 25, 2026, 12:22 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Feb 25, 2026, 12:22 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
+      "structured": {
+        "executionConstraints": [
+          "Prioritize speed and distribution over polish.",
+          "Accept controlled waste to win market share.",
+          "Invest ahead of demand where signals are strong."
+        ],
+        "provenance": {
+          "source": "US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)",
+          "timestamp": "Mar 1, 2026, 11:24 PM",
+          "dataAge": "0h."
+        }
+      },
+      "copy": "Monthly action summary — Apr 30, 2025\nGrowth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline. Confidence: medium (standard signal).\n\nExecution constraints:\n• Prioritize speed and distribution over polish.\n• Accept controlled waste to win market share.\n• Invest ahead of demand where signals are strong.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 1, 2026, 11:24 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 1, 2026, 11:24 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
     }
   },
   {
@@ -11526,10 +11766,13 @@
     "record_date": "2025-05-30",
     "summary": {
       "title": "Monthly action summary — May 30, 2025",
-      "summary": "Growth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline.",
+      "summary": "Growth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline. Confidence: medium (standard signal).",
       "regime": "EXPANSION",
       "regimeLabel": "Growth Mode",
       "guidance": "scale proven bets, invest in durable growth channels, and keep payback discipline",
+      "confidence": "MEDIUM",
+      "transitionWatch": false,
+      "intensity": "STANDARD",
       "constraints": [
         "Prioritize speed and distribution over polish.",
         "Accept controlled waste to win market share.",
@@ -11539,7 +11782,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Feb 25, 2026, 12:22 AM",
+        "timestampLabel": "Mar 1, 2026, 11:24 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -11552,7 +11795,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2025-05-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -11563,7 +11806,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2025-05-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "ten-year",
@@ -11573,7 +11816,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2025-05-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "curve-slope",
@@ -11583,12 +11826,24 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2025-05-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
       ],
-      "copy": "Monthly action summary — May 30, 2025\nGrowth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline.\n\nExecution constraints:\n• Prioritize speed and distribution over polish.\n• Accept controlled waste to win market share.\n• Invest ahead of demand where signals are strong.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Feb 25, 2026, 12:22 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Feb 25, 2026, 12:22 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
+      "structured": {
+        "executionConstraints": [
+          "Prioritize speed and distribution over polish.",
+          "Accept controlled waste to win market share.",
+          "Invest ahead of demand where signals are strong."
+        ],
+        "provenance": {
+          "source": "US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)",
+          "timestamp": "Mar 1, 2026, 11:24 PM",
+          "dataAge": "0h."
+        }
+      },
+      "copy": "Monthly action summary — May 30, 2025\nGrowth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline. Confidence: medium (standard signal).\n\nExecution constraints:\n• Prioritize speed and distribution over polish.\n• Accept controlled waste to win market share.\n• Invest ahead of demand where signals are strong.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 1, 2026, 11:24 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 1, 2026, 11:24 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
     }
   },
   {
@@ -11598,10 +11853,13 @@
     "record_date": "2025-06-30",
     "summary": {
       "title": "Monthly action summary — Jun 30, 2025",
-      "summary": "Growth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline.",
+      "summary": "Growth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline. Confidence: medium (standard signal).",
       "regime": "EXPANSION",
       "regimeLabel": "Growth Mode",
       "guidance": "scale proven bets, invest in durable growth channels, and keep payback discipline",
+      "confidence": "MEDIUM",
+      "transitionWatch": false,
+      "intensity": "STANDARD",
       "constraints": [
         "Prioritize speed and distribution over polish.",
         "Accept controlled waste to win market share.",
@@ -11611,7 +11869,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Feb 25, 2026, 12:22 AM",
+        "timestampLabel": "Mar 1, 2026, 11:24 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -11624,7 +11882,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2025-06-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -11635,7 +11893,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2025-06-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "ten-year",
@@ -11645,7 +11903,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2025-06-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "curve-slope",
@@ -11655,12 +11913,24 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2025-06-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
       ],
-      "copy": "Monthly action summary — Jun 30, 2025\nGrowth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline.\n\nExecution constraints:\n• Prioritize speed and distribution over polish.\n• Accept controlled waste to win market share.\n• Invest ahead of demand where signals are strong.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Feb 25, 2026, 12:22 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Feb 25, 2026, 12:22 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
+      "structured": {
+        "executionConstraints": [
+          "Prioritize speed and distribution over polish.",
+          "Accept controlled waste to win market share.",
+          "Invest ahead of demand where signals are strong."
+        ],
+        "provenance": {
+          "source": "US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)",
+          "timestamp": "Mar 1, 2026, 11:24 PM",
+          "dataAge": "0h."
+        }
+      },
+      "copy": "Monthly action summary — Jun 30, 2025\nGrowth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline. Confidence: medium (standard signal).\n\nExecution constraints:\n• Prioritize speed and distribution over polish.\n• Accept controlled waste to win market share.\n• Invest ahead of demand where signals are strong.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 1, 2026, 11:24 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 1, 2026, 11:24 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
     }
   },
   {
@@ -11670,10 +11940,13 @@
     "record_date": "2025-07-31",
     "summary": {
       "title": "Monthly action summary — Jul 31, 2025",
-      "summary": "Growth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline.",
+      "summary": "Growth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline. Confidence: low (mild signal).",
       "regime": "EXPANSION",
       "regimeLabel": "Growth Mode",
       "guidance": "scale proven bets, invest in durable growth channels, and keep payback discipline",
+      "confidence": "LOW",
+      "transitionWatch": false,
+      "intensity": "MILD",
       "constraints": [
         "Prioritize speed and distribution over polish.",
         "Accept controlled waste to win market share.",
@@ -11683,7 +11956,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Feb 25, 2026, 12:22 AM",
+        "timestampLabel": "Mar 1, 2026, 11:24 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -11696,7 +11969,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2025-07-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -11707,7 +11980,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2025-07-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "ten-year",
@@ -11717,7 +11990,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2025-07-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "curve-slope",
@@ -11727,12 +12000,24 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2025-07-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
       ],
-      "copy": "Monthly action summary — Jul 31, 2025\nGrowth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline.\n\nExecution constraints:\n• Prioritize speed and distribution over polish.\n• Accept controlled waste to win market share.\n• Invest ahead of demand where signals are strong.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Feb 25, 2026, 12:22 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Feb 25, 2026, 12:22 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
+      "structured": {
+        "executionConstraints": [
+          "Prioritize speed and distribution over polish.",
+          "Accept controlled waste to win market share.",
+          "Invest ahead of demand where signals are strong."
+        ],
+        "provenance": {
+          "source": "US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)",
+          "timestamp": "Mar 1, 2026, 11:24 PM",
+          "dataAge": "0h."
+        }
+      },
+      "copy": "Monthly action summary — Jul 31, 2025\nGrowth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline. Confidence: low (mild signal).\n\nExecution constraints:\n• Prioritize speed and distribution over polish.\n• Accept controlled waste to win market share.\n• Invest ahead of demand where signals are strong.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 1, 2026, 11:24 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 1, 2026, 11:24 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
     }
   },
   {
@@ -11742,10 +12027,13 @@
     "record_date": "2025-08-29",
     "summary": {
       "title": "Monthly action summary — Aug 29, 2025",
-      "summary": "Growth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline.",
+      "summary": "Growth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline. Confidence: medium (standard signal).",
       "regime": "EXPANSION",
       "regimeLabel": "Growth Mode",
       "guidance": "scale proven bets, invest in durable growth channels, and keep payback discipline",
+      "confidence": "MEDIUM",
+      "transitionWatch": false,
+      "intensity": "STANDARD",
       "constraints": [
         "Prioritize speed and distribution over polish.",
         "Accept controlled waste to win market share.",
@@ -11755,7 +12043,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Feb 25, 2026, 12:22 AM",
+        "timestampLabel": "Mar 1, 2026, 11:24 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -11768,7 +12056,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2025-08-29",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -11779,7 +12067,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2025-08-29",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "ten-year",
@@ -11789,7 +12077,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2025-08-29",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "curve-slope",
@@ -11799,12 +12087,24 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2025-08-29",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
       ],
-      "copy": "Monthly action summary — Aug 29, 2025\nGrowth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline.\n\nExecution constraints:\n• Prioritize speed and distribution over polish.\n• Accept controlled waste to win market share.\n• Invest ahead of demand where signals are strong.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Feb 25, 2026, 12:22 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Feb 25, 2026, 12:22 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
+      "structured": {
+        "executionConstraints": [
+          "Prioritize speed and distribution over polish.",
+          "Accept controlled waste to win market share.",
+          "Invest ahead of demand where signals are strong."
+        ],
+        "provenance": {
+          "source": "US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)",
+          "timestamp": "Mar 1, 2026, 11:24 PM",
+          "dataAge": "0h."
+        }
+      },
+      "copy": "Monthly action summary — Aug 29, 2025\nGrowth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline. Confidence: medium (standard signal).\n\nExecution constraints:\n• Prioritize speed and distribution over polish.\n• Accept controlled waste to win market share.\n• Invest ahead of demand where signals are strong.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 1, 2026, 11:24 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 1, 2026, 11:24 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
     }
   },
   {
@@ -11814,10 +12114,13 @@
     "record_date": "2025-09-30",
     "summary": {
       "title": "Monthly action summary — Sep 30, 2025",
-      "summary": "Growth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline.",
+      "summary": "Growth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline. Confidence: medium (standard signal).",
       "regime": "EXPANSION",
       "regimeLabel": "Growth Mode",
       "guidance": "scale proven bets, invest in durable growth channels, and keep payback discipline",
+      "confidence": "MEDIUM",
+      "transitionWatch": false,
+      "intensity": "STANDARD",
       "constraints": [
         "Prioritize speed and distribution over polish.",
         "Accept controlled waste to win market share.",
@@ -11827,7 +12130,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Feb 25, 2026, 12:22 AM",
+        "timestampLabel": "Mar 1, 2026, 11:24 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -11840,7 +12143,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2025-09-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -11851,7 +12154,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2025-09-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "ten-year",
@@ -11861,7 +12164,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2025-09-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "curve-slope",
@@ -11871,12 +12174,24 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2025-09-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
       ],
-      "copy": "Monthly action summary — Sep 30, 2025\nGrowth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline.\n\nExecution constraints:\n• Prioritize speed and distribution over polish.\n• Accept controlled waste to win market share.\n• Invest ahead of demand where signals are strong.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Feb 25, 2026, 12:22 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Feb 25, 2026, 12:22 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
+      "structured": {
+        "executionConstraints": [
+          "Prioritize speed and distribution over polish.",
+          "Accept controlled waste to win market share.",
+          "Invest ahead of demand where signals are strong."
+        ],
+        "provenance": {
+          "source": "US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)",
+          "timestamp": "Mar 1, 2026, 11:24 PM",
+          "dataAge": "0h."
+        }
+      },
+      "copy": "Monthly action summary — Sep 30, 2025\nGrowth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline. Confidence: medium (standard signal).\n\nExecution constraints:\n• Prioritize speed and distribution over polish.\n• Accept controlled waste to win market share.\n• Invest ahead of demand where signals are strong.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 1, 2026, 11:24 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 1, 2026, 11:24 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
     }
   },
   {
@@ -11886,10 +12201,13 @@
     "record_date": "2025-10-31",
     "summary": {
       "title": "Monthly action summary — Oct 31, 2025",
-      "summary": "Growth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline.",
+      "summary": "Growth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline. Confidence: medium (standard signal).",
       "regime": "EXPANSION",
       "regimeLabel": "Growth Mode",
       "guidance": "scale proven bets, invest in durable growth channels, and keep payback discipline",
+      "confidence": "MEDIUM",
+      "transitionWatch": false,
+      "intensity": "STANDARD",
       "constraints": [
         "Prioritize speed and distribution over polish.",
         "Accept controlled waste to win market share.",
@@ -11899,7 +12217,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Feb 25, 2026, 12:22 AM",
+        "timestampLabel": "Mar 1, 2026, 11:24 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -11912,7 +12230,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2025-10-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -11923,7 +12241,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2025-10-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "ten-year",
@@ -11933,7 +12251,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2025-10-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "curve-slope",
@@ -11943,12 +12261,24 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2025-10-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
       ],
-      "copy": "Monthly action summary — Oct 31, 2025\nGrowth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline.\n\nExecution constraints:\n• Prioritize speed and distribution over polish.\n• Accept controlled waste to win market share.\n• Invest ahead of demand where signals are strong.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Feb 25, 2026, 12:22 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Feb 25, 2026, 12:22 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
+      "structured": {
+        "executionConstraints": [
+          "Prioritize speed and distribution over polish.",
+          "Accept controlled waste to win market share.",
+          "Invest ahead of demand where signals are strong."
+        ],
+        "provenance": {
+          "source": "US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)",
+          "timestamp": "Mar 1, 2026, 11:24 PM",
+          "dataAge": "0h."
+        }
+      },
+      "copy": "Monthly action summary — Oct 31, 2025\nGrowth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline. Confidence: medium (standard signal).\n\nExecution constraints:\n• Prioritize speed and distribution over polish.\n• Accept controlled waste to win market share.\n• Invest ahead of demand where signals are strong.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 1, 2026, 11:24 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 1, 2026, 11:24 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
     }
   },
   {
@@ -11958,10 +12288,13 @@
     "record_date": "2025-11-28",
     "summary": {
       "title": "Monthly action summary — Nov 28, 2025",
-      "summary": "Growth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline.",
+      "summary": "Growth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline. Confidence: medium (standard signal).",
       "regime": "EXPANSION",
       "regimeLabel": "Growth Mode",
       "guidance": "scale proven bets, invest in durable growth channels, and keep payback discipline",
+      "confidence": "MEDIUM",
+      "transitionWatch": false,
+      "intensity": "STANDARD",
       "constraints": [
         "Prioritize speed and distribution over polish.",
         "Accept controlled waste to win market share.",
@@ -11971,7 +12304,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Feb 25, 2026, 12:22 AM",
+        "timestampLabel": "Mar 1, 2026, 11:24 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -11984,7 +12317,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2025-11-28",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -11995,7 +12328,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2025-11-28",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "ten-year",
@@ -12005,7 +12338,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2025-11-28",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "curve-slope",
@@ -12015,12 +12348,24 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2025-11-28",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
       ],
-      "copy": "Monthly action summary — Nov 28, 2025\nGrowth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline.\n\nExecution constraints:\n• Prioritize speed and distribution over polish.\n• Accept controlled waste to win market share.\n• Invest ahead of demand where signals are strong.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Feb 25, 2026, 12:22 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Feb 25, 2026, 12:22 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
+      "structured": {
+        "executionConstraints": [
+          "Prioritize speed and distribution over polish.",
+          "Accept controlled waste to win market share.",
+          "Invest ahead of demand where signals are strong."
+        ],
+        "provenance": {
+          "source": "US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)",
+          "timestamp": "Mar 1, 2026, 11:24 PM",
+          "dataAge": "0h."
+        }
+      },
+      "copy": "Monthly action summary — Nov 28, 2025\nGrowth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline. Confidence: medium (standard signal).\n\nExecution constraints:\n• Prioritize speed and distribution over polish.\n• Accept controlled waste to win market share.\n• Invest ahead of demand where signals are strong.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 1, 2026, 11:24 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 1, 2026, 11:24 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
     }
   },
   {
@@ -12030,10 +12375,13 @@
     "record_date": "2025-12-31",
     "summary": {
       "title": "Monthly action summary — Dec 31, 2025",
-      "summary": "Growth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline.",
+      "summary": "Growth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline. Confidence: medium (standard signal).",
       "regime": "EXPANSION",
       "regimeLabel": "Growth Mode",
       "guidance": "scale proven bets, invest in durable growth channels, and keep payback discipline",
+      "confidence": "MEDIUM",
+      "transitionWatch": false,
+      "intensity": "STANDARD",
       "constraints": [
         "Prioritize speed and distribution over polish.",
         "Accept controlled waste to win market share.",
@@ -12043,7 +12391,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Feb 25, 2026, 12:22 AM",
+        "timestampLabel": "Mar 1, 2026, 11:24 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -12056,7 +12404,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2025-12-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -12067,7 +12415,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2025-12-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "ten-year",
@@ -12077,7 +12425,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2025-12-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "curve-slope",
@@ -12087,12 +12435,24 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2025-12-31",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
       ],
-      "copy": "Monthly action summary — Dec 31, 2025\nGrowth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline.\n\nExecution constraints:\n• Prioritize speed and distribution over polish.\n• Accept controlled waste to win market share.\n• Invest ahead of demand where signals are strong.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Feb 25, 2026, 12:22 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Feb 25, 2026, 12:22 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
+      "structured": {
+        "executionConstraints": [
+          "Prioritize speed and distribution over polish.",
+          "Accept controlled waste to win market share.",
+          "Invest ahead of demand where signals are strong."
+        ],
+        "provenance": {
+          "source": "US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)",
+          "timestamp": "Mar 1, 2026, 11:24 PM",
+          "dataAge": "0h."
+        }
+      },
+      "copy": "Monthly action summary — Dec 31, 2025\nGrowth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline. Confidence: medium (standard signal).\n\nExecution constraints:\n• Prioritize speed and distribution over polish.\n• Accept controlled waste to win market share.\n• Invest ahead of demand where signals are strong.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 1, 2026, 11:24 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 1, 2026, 11:24 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
     }
   },
   {
@@ -12102,10 +12462,13 @@
     "record_date": "2026-01-30",
     "summary": {
       "title": "Monthly action summary — Jan 30, 2026",
-      "summary": "Growth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline.",
+      "summary": "Growth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline. Confidence: high (standard signal).",
       "regime": "EXPANSION",
       "regimeLabel": "Growth Mode",
       "guidance": "scale proven bets, invest in durable growth channels, and keep payback discipline",
+      "confidence": "HIGH",
+      "transitionWatch": false,
+      "intensity": "STANDARD",
       "constraints": [
         "Prioritize speed and distribution over polish.",
         "Accept controlled waste to win market share.",
@@ -12115,7 +12478,7 @@
       "provenance": {
         "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
         "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-        "timestampLabel": "Feb 25, 2026, 12:22 AM",
+        "timestampLabel": "Mar 1, 2026, 11:24 PM",
         "ageLabel": "0h.",
         "statusLabel": "Historical (simulated)"
       },
@@ -12128,7 +12491,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
           "recordDate": "2026-01-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
         {
@@ -12139,7 +12502,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
           "recordDate": "2026-01-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "ten-year",
@@ -12149,7 +12512,7 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2026-01-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z"
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
           "id": "curve-slope",
@@ -12159,12 +12522,24 @@
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
           "recordDate": "2026-01-30",
-          "fetchedAt": "2026-02-25T00:22:22.626Z",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
         }
       ],
-      "copy": "Monthly action summary — Jan 30, 2026\nGrowth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline.\n\nExecution constraints:\n• Prioritize speed and distribution over polish.\n• Accept controlled waste to win market share.\n• Invest ahead of demand where signals are strong.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Feb 25, 2026, 12:22 AM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Feb 25, 2026, 12:22 AM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
+      "structured": {
+        "executionConstraints": [
+          "Prioritize speed and distribution over polish.",
+          "Accept controlled waste to win market share.",
+          "Invest ahead of demand where signals are strong."
+        ],
+        "provenance": {
+          "source": "US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)",
+          "timestamp": "Mar 1, 2026, 11:24 PM",
+          "dataAge": "0h."
+        }
+      },
+      "copy": "Monthly action summary — Jan 30, 2026\nGrowth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline. Confidence: high (standard signal).\n\nExecution constraints:\n• Prioritize speed and distribution over polish.\n• Accept controlled waste to win market share.\n• Invest ahead of demand where signals are strong.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 1, 2026, 11:24 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 1, 2026, 11:24 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
     }
   }
 ]
