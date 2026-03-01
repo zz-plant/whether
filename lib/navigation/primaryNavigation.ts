@@ -32,7 +32,7 @@ export const primaryNavigation: PrimaryNavigationItem[] = [
   },
   {
     href: "/toolkits",
-    label: "Plan",
+    label: "Toolkits",
     description: "Runnable instruments and templates by decision surface.",
   },
   {

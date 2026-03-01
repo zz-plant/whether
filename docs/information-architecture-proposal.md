@@ -8,21 +8,22 @@ Align primary navigation labels with task intent so leaders can move from contex
 - **Signals** (`/signals`) for macro state and confidence context.
 - **Operations** (`/operations`) for execution guardrails by posture.
 - **Decide** (`/decide`) for role/situation decision pathways.
-- **Plan** (`/plan`) for implementation surfaces and toolkits.
+- **Toolkits** (`/toolkits`) for implementation surfaces and runnable instruments.
 - **Learn** (`/learn`) for diagnostics and conceptual references.
 - **Method** (`/method`) for model transparency and trust context.
 
 ## Legacy route compatibility
 To preserve inbound links and historical references, legacy entrypoints should redirect:
 - `/guides` → `/learn`
-- `/solutions` → `/plan`
-- `/brief/stage` → `/plan`
+- `/solutions` → `/toolkits`
+- `/brief/stage` → `/toolkits`
 - `/brief` → `/start`
 - `/method` should act as a hub that links to both `/methodology` and `/about` to align trust expectations with user intent.
 
 ## Migration notes
-- Provide IA-consistent bridge paths (`/decide/use-cases`, `/plan/toolkits`, `/learn/failure-modes`, `/learn/concepts`) that redirect to legacy surfaces while preserving old information depth.
-- Extend bridge-path coverage to detail routes (`/decide/[slug]`, `/plan/[slug]`, `/learn/failure-modes/[slug]`, `/learn/concepts/[slug]`) to keep URL semantics consistent beyond hub pages.
+- Keep `/decide/use-cases` and `/decide/[slug]` as entry-point bridge paths because they support intent-based routing.
+- Consolidate concept discovery on `/concepts` (and `/concepts/[slug]`) and failure-mode diagnostics on `/library/failure-modes` (and `/library/failure-modes/[slug]`).
+- Preserve `/learn/concepts*` and `/learn/failure-modes*` only as redirect compatibility paths; do not prioritize them as canonical discovery URLs.
 - Keep legacy destination pages available during transition windows for backlink continuity.
-- Update sitemap priorities to reflect new IA anchors while retaining discoverability for legacy paths.
-- Ensure report shell navigation highlights new labels when users land on legacy URLs.
+- Update sitemap priorities to favor canonical hubs and detail pages while excluding redirect-only bridge paths.
+- Ensure report shell navigation highlights current labels when users land on compatibility URLs.
