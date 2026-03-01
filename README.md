@@ -63,6 +63,18 @@ The progression is: **macro awareness → operating posture → portfolio choice
 - Tests only: `bun run test`
 - Clean generated build/dependency artifacts: `bun run clean`
 
+## Time Machine summary refresh
+- Refresh weekly/monthly/quarterly/yearly Time Machine summary archives from 2024 onward:
+  - `bun run time-machine:update-summaries`
+- Override the range when needed:
+  - `bun run time-machine:update-summaries -- --start-year 2024 --end-year 2025`
+- Preview commands without mutating files:
+  - `bun run time-machine:update-summaries -- --dry-run`
+
+This command runs all summary generators with `HISTORY_START_YEAR` (and optional
+`HISTORY_END_YEAR`) so only the selected years are merged into `data/summary_archive.json`
+instead of regenerating the full historical dataset.
+
 ## Project map (high signal)
 - `app/` — Next.js App Router pages and UI features.
 - `lib/` — Market-climate logic, data clients, thresholds, and shared utilities.

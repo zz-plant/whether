@@ -20,6 +20,7 @@
     "typecheck": "tsc --noEmit",
     "test": "node scripts/run-tests.mjs",
     "test:watch": "node scripts/run-tests.mjs --watch",
+    "time-machine:update-summaries": "node scripts/updateTimeMachineSummariesSince.mjs",
     "mcp:whether": "tsx scripts/mcp/whether-mcp-server.ts",
     "audit:cloudflare-warnings": "node scripts/cloudflare-warning-audit.mjs",
     "deploy:cloudflare": "node scripts/cloudflare-build-and-upload.mjs"
