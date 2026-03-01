@@ -1,15 +1,16 @@
 "use client";
 
 import Link from "next/link";
+import type { Route } from "next";
 import { useEffect, useMemo, useState } from "react";
 
 type LegacyRouteBridgeProps = {
   eyebrow: string;
   title: string;
   description: string;
-  primaryHref: string;
+  primaryHref: Route;
   primaryLabel: string;
-  secondaryHref: string;
+  secondaryHref: Route;
   secondaryLabel: string;
   autoForwardSeconds?: number;
 };
