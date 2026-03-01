@@ -1,5 +1,6 @@
 "use client";
 
+import type { Route } from "next";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -85,9 +86,25 @@ export function GlobalHeader() {
               );
             })}
           </nav>
-          <button type="button" onClick={toggleTheme} className="weather-button text-sm" aria-label="Toggle light mode">
-            {theme === "dark" ? "Light mode" : "Dark mode"}
-          </button>
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <nav aria-label="Quick actions" className="flex flex-wrap items-center gap-2">
+              <Link
+                href="/operations/plan"
+                className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.06em] text-sky-100 hover:border-sky-400/70"
+              >
+                Weekly sequence
+              </Link>
+              <Link
+                href="/briefing"
+                className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.06em] text-slate-100 hover:border-sky-400/70"
+              >
+                Leadership brief
+              </Link>
+            </nav>
+            <button type="button" onClick={toggleTheme} className="weather-button text-sm" aria-label="Toggle light mode">
+              {theme === "dark" ? "Light mode" : "Dark mode"}
+            </button>
+          </div>
         </div>
 
         <nav aria-label="Breadcrumb" className="mt-4 overflow-x-auto">
@@ -100,7 +117,7 @@ export function GlobalHeader() {
                   {isCurrent ? (
                     <span aria-current="page" className="font-semibold text-slate-100">{crumb.label}</span>
                   ) : (
-                    <Link href={crumb.href} className="text-slate-300 hover:text-sky-200">
+                    <Link href={crumb.href as Route} className="text-slate-300 hover:text-sky-200">
                       {crumb.label}
                     </Link>
                   )}
