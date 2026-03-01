@@ -117,17 +117,17 @@ export default async function OperationsPage({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Action playbook"
       currentPath="/operations"
-      pageSummary="Review the monthly summary and align the execution playbook for this cycle."
+      pageSummary="Run weekly execution decisions and align the monthly playbook for this cycle."
       pageSummaryLink={{ href: "#ops-playbook", label: "Jump to playbook section ↓" }}
       primaryCta={{
         href: "#ops-monthly-action-summary",
-        label: "Review monthly summary",
+        label: "Review weekly + monthly summary",
       }}
       secondaryCta={{ href: "#ops-playbook", label: "Open execution playbook" }}
       decisionBanner={{
         label: "Align now",
-        decision: "Translate the regime into an execution-ready monthly plan.",
-        horizon: "This month",
+        decision: "Translate the regime into weekly execution calls and a monthly plan.",
+        horizon: "This week + month",
         confidence: trustStatusLabel,
         effectiveDate: recordDateLabel,
         evidenceHref: "#ops-monthly-action-summary",
@@ -136,8 +136,8 @@ export default async function OperationsPage({
         title: "Planning sequence",
         items: [
           {
-            title: "Review monthly summary",
-            detail: "Confirm posture and priorities for this cycle.",
+            title: "Review weekly + monthly summary",
+            detail: "Confirm this week's execution posture and monthly priorities.",
             href: "#ops-monthly-action-summary",
             cta: "Open summary",
           },

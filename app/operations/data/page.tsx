@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { buildPageMetadata } from "../../../lib/seo";
 import { siteUrl } from "../../../lib/siteUrl";
+import { loadReportData } from "../../../lib/report/reportData";
+import { PlanningSnippetsPanel } from "../components/planningSnippetsPanel";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Whether Report — Weekly data access",
@@ -26,7 +28,9 @@ const responseExample = `{
   }
 }`;
 
-export default function OperationsDataPage() {
+export default async function OperationsDataPage() {
+  const { statusLabel, recordDateLabel } = await loadReportData();
+
   return (
     <main className="min-h-screen bg-slate-950 px-6 py-12 text-slate-100">
       <section className="mx-auto max-w-4xl space-y-6">
@@ -73,6 +77,8 @@ export default function OperationsDataPage() {
             {responseExample}
           </pre>
         </section>
+
+        <PlanningSnippetsPanel statusLabel={statusLabel} recordDateLabel={recordDateLabel} />
       </section>
     </main>
   );
