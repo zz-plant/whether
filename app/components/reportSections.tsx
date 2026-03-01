@@ -218,33 +218,16 @@ export const WeeklyActionSummaryPanel = ({
   ];
   const decisionChecklist = [
     {
-      title: "Anchor on posture",
+      title: "Posture",
       detail: `Operate in ${regimeLabel} mode: ${actionGuidance}.`,
     },
     {
-      title: "Name the constraint",
-      detail: `Cash availability ${assessment.scores.tightness}/100 · Risk appetite ${assessment.scores.riskAppetite}/100 (0–100 scores).`,
+      title: "Constraint",
+      detail: `Cash ${assessment.scores.tightness}/100 · Risk ${assessment.scores.riskAppetite}/100.`,
     },
     {
-      title: "Lock the one-week bet",
-      detail: "Pick the smallest scope that protects retention or reliability.",
-    },
-  ];
-  const decisionFlow = [
-    {
-      title: "Posture",
-      value: regimeLabel,
-      detail: actionGuidance,
-    },
-    {
-      title: "Constraints",
-      value: `${assessment.scores.tightness}/100 · ${assessment.scores.riskAppetite}/100`,
-      detail: "Cash availability · Risk appetite",
-    },
-    {
-      title: "One-week bet",
-      value: "Smallest scope",
-      detail: "Protect retention or reliability.",
+      title: "Mandate",
+      detail: "Keep weekly bets short-cycle and reversible.",
     },
   ];
   const weeklyQuickLinks = [
@@ -318,26 +301,6 @@ export const WeeklyActionSummaryPanel = ({
           : "Midweek once role-to-revenue linkage is clear.",
     },
   ];
-  const primaryActionConfidence = Math.round(
-    (assessment.scores.riskAppetite + (100 - assessment.scores.tightness)) / 2,
-  );
-  const decisionCards = [
-    {
-      label: "Primary action",
-      action:
-        assessment.regime === "EXPANSION"
-          ? "Commit bounded roadmap scope this week and assign clear owners."
-          : "Prioritize retention and reliability bets with short payback windows.",
-      fallback: "Avoid irreversible headcount or spend expansion until confidence improves.",
-      confidence: primaryActionConfidence,
-    },
-    {
-      label: "Secondary action",
-      action: "Keep experiments reversible with explicit rollback paths.",
-      fallback: "Delay scope growth and stage approvals behind next data refresh.",
-      confidence: Math.max(primaryActionConfidence - 12, 15),
-    },
-  ];
   const [showMetricDefinitions, setShowMetricDefinitions] = useState(false);
 
   return (
@@ -352,7 +315,7 @@ export const WeeklyActionSummaryPanel = ({
                   Weekly action map
                 </h2>
                 <p className="mt-3 text-sm text-slate-200">
-                  Set posture fast, then skim the{" "}
+                  This week: do X, avoid Y. Skim the{" "}
                   <a
                     href="#executive-snapshot"
                     className="touch-target inline-flex min-h-[44px] items-center text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-slate-50 touch-manipulation"
@@ -361,63 +324,28 @@ export const WeeklyActionSummaryPanel = ({
                   </a>{" "}
                   for sources.
                 </p>
-                <div className="mt-4">
-                  <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">
-                    Decision flow
-                  </p>
-                  <ol className="mt-3 grid gap-3 sm:grid-cols-3">
-                    {decisionFlow.map((step, index) => (
-                      <li
-                        key={step.title}
-                        className="relative rounded-xl border border-slate-800/80 bg-slate-950/60 p-4"
-                      >
-                        <span className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-700/70 text-xs font-semibold text-slate-200">
-                          {index + 1}
-                        </span>
-                        <p className="mt-3 text-xs font-semibold tracking-[0.14em] text-slate-400">
-                          {step.title}
-                        </p>
-                        <p className="mt-2 text-sm font-semibold text-slate-100">{step.value}</p>
-                        <p className="mt-1 text-xs text-slate-400">{step.detail}</p>
-                        {index < decisionFlow.length - 1 ? (
-                          <span
-                            className="absolute -right-3 top-1/2 hidden -translate-y-1/2 text-slate-600 sm:block"
-                            aria-hidden="true"
-                          >
-                            →
-                          </span>
-                        ) : null}
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              </div>
-              <div className="rounded-2xl border border-sky-400/40 bg-slate-950/60 p-4">
-                <p className="text-xs font-semibold tracking-[0.18em] text-sky-200">
-                  Current stance
-                </p>
-                <p className="mt-2 text-lg font-semibold text-slate-100">
-                  Operate in {regimeLabel} mode.
-                </p>
-                <p className="mt-2 text-sm text-slate-200">{actionGuidance}</p>
-                <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  {decisionCards.map((card) => (
-                    <div key={card.label} className="rounded-xl border border-slate-700/70 bg-slate-950/65 p-3">
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">{card.label}</p>
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        <span className="weather-pill inline-flex min-h-[32px] items-center px-3 py-1 text-[10px] font-semibold tracking-[0.12em] text-slate-100">Primary</span>
-                        <span className="weather-pill-muted inline-flex min-h-[32px] items-center px-3 py-1 text-[10px] font-semibold tracking-[0.12em] text-slate-200">Fallback</span>
-                      </div>
-                      <p className="mt-2 text-xs text-slate-100">{card.action}</p>
-                      <p className="mt-1 text-xs text-slate-400">Alternative: {card.fallback}</p>
-                      <div className="mt-3">
-                        <p className="text-[10px] uppercase tracking-[0.12em] text-slate-400">Confidence {card.confidence}%</p>
-                        <div className="mt-1 h-2 rounded-full border border-slate-700/80 bg-slate-900">
-                          <span className="block h-full rounded-full bg-sky-300/70" style={{ width: `${card.confidence}%` }} aria-hidden="true" />
-                        </div>
-                      </div>
+                <div className="mt-4 rounded-2xl border border-sky-400/40 bg-slate-950/60 p-4">
+                  <p className="text-xs font-semibold tracking-[0.18em] text-sky-200">Mandate</p>
+                  <p className="mt-2 text-lg font-semibold text-slate-100">Operate in {regimeLabel} mode.</p>
+                  <p className="mt-1 text-sm text-slate-200">{actionGuidance}</p>
+                  <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <p className="text-xs font-semibold tracking-[0.14em] text-emerald-200">DO</p>
+                      <ul className="mt-2 space-y-1 text-sm text-slate-200">
+                        {assessment.constraints.slice(0, 3).map((item) => (
+                          <li key={`do-${item}`}>• {item}</li>
+                        ))}
+                      </ul>
                     </div>
-                  ))}
+                    <div>
+                      <p className="text-xs font-semibold tracking-[0.14em] text-rose-200">AVOID</p>
+                      <ul className="mt-2 space-y-1 text-sm text-slate-200">
+                        <li>• New fixed-cost commitments without ROI gates.</li>
+                        <li>• Multi-quarter bets without milestone reversibility.</li>
+                        <li>• Hiring expansion ahead of threshold confirmation.</li>
+                      </ul>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-4">
@@ -575,7 +503,7 @@ export const WeeklyActionSummaryPanel = ({
               </div>
             </div>
             <aside className="weather-surface weather-surface-amber p-4" aria-label="Weekly decision points">
-              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Decision points</p>
+              <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Reference only (expand if needed)</p>
               <ol className="mt-3 space-y-4 text-sm text-slate-300">
                 {decisionChecklist.map((item, index) => (
                   <li key={item.title} className="flex gap-3">
@@ -1354,6 +1282,20 @@ export const SignalMatrixPanel = ({
       chipClassName: "border-emerald-300/40 bg-emerald-500/20 text-emerald-100",
     },
   ];
+  const quadrantBiasById: Record<string, string> = {
+    "tight-cautious": "Contraction + caution",
+    "tight-bold": "Selective offense under constraint",
+    "loose-cautious": "Durability over expansion",
+    "loose-bold": "Expansion with controls",
+  };
+  const failureModeById: Record<string, string> = {
+    "tight-cautious": "Overcommitment during fragile credit conditions.",
+    "tight-bold": "Assuming risk appetite will absorb execution misses.",
+    "loose-cautious": "Over-defensiveness that misses compounding gains.",
+    "loose-bold": "Runaway scope and burn ahead of confirmation.",
+  };
+  const currentQuadrant = quadrants.find((quadrant) => quadrant.id === currentQuadrantId);
+
 
   return (
     <section
@@ -1369,9 +1311,7 @@ export const SignalMatrixPanel = ({
             Risk posture matrix
           </h3>
           <p className="mt-2 text-sm text-slate-300">
-            Read the balance of cash tightness and market risk appetite to anchor staffing and
-            roadmap approvals. Tightness tracks funding friction; risk appetite tracks how willing
-            markets are to fund growth bets.
+            Scan: where you are, what to do, what to avoid.
           </p>
         </div>
         <div className="w-full max-w-md space-y-2 text-xs font-semibold tracking-[0.12em] text-slate-300 lg:w-auto">
@@ -1380,21 +1320,15 @@ export const SignalMatrixPanel = ({
         </div>
       </div>
       <div className="mt-4 weather-surface border-slate-700/80 bg-gradient-to-br from-slate-900/85 via-slate-950/70 to-slate-900/60 p-4 shadow-none">
-        <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Executive summary</p>
-        <p className="mt-2 text-sm text-slate-200">
-          <span className="font-semibold text-slate-50">Posture: {quadrantLabel}.</span> Bias
-          approval velocity using tightness <span className="mono">{assessment.scores.tightness}</span>
-          /100 and risk appetite <span className="mono">{assessment.scores.riskAppetite}</span>/100.
-          In this regime, prioritize fast growth decisions with burn-rate guardrails.
+        <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">You are here</p>
+        <p className="mt-2 text-sm text-slate-100">
+          Quadrant: <span className="font-semibold">{quadrantLabel}</span>
         </p>
-        <div className="mt-4 grid gap-2 sm:grid-cols-2 text-xs font-medium tracking-[0.1em] text-slate-300">
-          <span className="inline-flex min-h-[44px] items-center rounded-xl border border-slate-700/80 bg-slate-900/75 px-3 py-2 text-xs font-medium tracking-[0.1em]">
-            Recommended mode: Move fast, protect runway
-          </span>
-          <span className="inline-flex min-h-[44px] items-center rounded-xl border border-slate-700/80 bg-slate-900/75 px-3 py-2 text-xs font-medium tracking-[0.1em]">
-            Next step: View recommended actions ↓
-          </span>
-        </div>
+        <ul className="mt-3 space-y-1 text-xs text-slate-200">
+          <li>• Historical bias: {quadrantBiasById[currentQuadrantId]}</li>
+          <li>• Failure mode: {failureModeById[currentQuadrantId]}</li>
+          <li>• Warning: {currentQuadrant?.action.replace("Default action: ", "") ?? "Review actions below."}</li>
+        </ul>
       </div>
       <Collapsible.Root className="mt-4">
         <Collapsible.Trigger
@@ -1694,7 +1628,7 @@ export const ExecutiveSnapshotPanel = ({
               Operating constraints
             </h3>
             <p className="mt-2 text-sm text-slate-300">
-              Decision guardrails for what to fund now, which roles to open, and how to sequence approvals under current macro conditions.
+              What is binding right now.
             </p>
           </div>
           <DataProvenanceStrip provenance={provenance} />
@@ -1737,12 +1671,14 @@ export const ExecutiveSnapshotPanel = ({
               </Tooltip.Root>
             </div>
             <p className="mt-3 text-lg font-semibold text-slate-100">
-              The current macro posture requires clear ROI gates before approving new spend.
+              Binding now: apply strict ROI gates before new spend.
             </p>
-            <p className="mt-2 text-sm text-slate-300">{assessment.description}</p>
-            <p className="mt-2 text-xs text-slate-500">
-              Regime posture blends cash tightness and market risk appetite from Treasury signals.
-            </p>
+            <ul className="mt-3 space-y-1 text-sm text-slate-300">
+              {constraintHighlights.map((constraint) => (
+                <li key={constraint}>• {constraint}</li>
+              ))}
+            </ul>
+            <p className="mt-2 text-xs text-slate-500">{assessment.description}</p>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <div className="rounded-xl border border-slate-800/80 bg-slate-950/70 p-4 flex items-center justify-between">
                 <div className="space-y-1">

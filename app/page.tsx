@@ -28,9 +28,9 @@ export const runtime = "edge";
 export const revalidate = 900;
 
 const homeSectionSequence = [
+  { href: "#weekly-action-summary", label: "Weekly actions" },
   { href: "#executive-snapshot", label: "Operating constraints" },
   { href: "#signal-matrix", label: "Risk posture" },
-  { href: "#weekly-action-summary", label: "Weekly actions" },
 ] as const;
 
 const regimeLabelMap = {
@@ -61,21 +61,59 @@ const regimeShiftTargets = {
 
 const postureForecastHorizons = ["Now", "+1 week", "+2 weeks", "+4 weeks"] as const;
 
-const clampPercentage = (value: number) => Math.min(100, Math.max(0, value));
-
-const describeProbabilityBand = (value: number) => {
-  if (value >= 75) {
-    return "High";
-  }
-  if (value >= 50) {
-    return "Elevated";
-  }
-  if (value >= 25) {
-    return "Moderate";
-  }
-
-  return "Low";
+const regimeSeverityRank: Record<keyof typeof regimeLabelMap, number> = {
+  EXPANSION: 0,
+  VOLATILE: 1,
+  DEFENSIVE: 2,
+  SCARCITY: 3,
 };
+
+const operatingCallsByRegime: Record<keyof typeof regimeLabelMap, { hiring: string; roadmap: string; spend: string }> = {
+  SCARCITY: {
+    hiring: "Maintain freeze",
+    roadmap: "Cut to must-win commitments",
+    spend: "Require immediate payback",
+  },
+  DEFENSIVE: {
+    hiring: "Backfill critical roles only",
+    roadmap: "Favor retention and reliability",
+    spend: "Gate discretionary programs",
+  },
+  VOLATILE: {
+    hiring: "Stay selective by role",
+    roadmap: "Prioritize near-term ROI",
+    spend: "Fund only measurable returns",
+  },
+  EXPANSION: {
+    hiring: "Add targeted growth capacity",
+    roadmap: "Scale validated bets",
+    spend: "Increase with guardrails",
+  },
+};
+
+const netStanceByRegime: Record<keyof typeof regimeLabelMap, string> = {
+  SCARCITY: "Net operating stance: Maintain constraint discipline. No expansion moves.",
+  DEFENSIVE: "Net operating stance: Protect core delivery. Expand only with hard ROI proof.",
+  VOLATILE: "Net operating stance: Keep optionality high. Stage commitments behind milestones.",
+  EXPANSION: "Net operating stance: Expand selectively. Keep burn and payback guardrails active.",
+};
+
+
+const expansionWindowByRegime: Record<keyof typeof regimeLabelMap, string> = {
+  SCARCITY: "Closed",
+  DEFENSIVE: "Mostly closed",
+  VOLATILE: "Selective",
+  EXPANSION: "Open with guardrails",
+};
+
+const longCycleBetByRegime: Record<keyof typeof regimeLabelMap, string> = {
+  SCARCITY: "Constrained",
+  DEFENSIVE: "Constrained",
+  VOLATILE: "Caution",
+  EXPANSION: "Permitted with milestones",
+};
+
+const clampPercentage = (value: number) => Math.min(100, Math.max(0, value));
 
 type PostureForecastItem = {
   horizon: (typeof postureForecastHorizons)[number];
@@ -268,6 +306,18 @@ export default async function HomePage({
   const postureDelta = regimeAlert
     ? `Shifted from ${regimeLabelMap[regimeAlert.previousRegime]}.`
     : "No change since last week.";
+  const previousRegime = regimeAlert?.previousRegime;
+  const changeLabel = regimeAlert
+    ? `${statusLabel} ↑ (changed from ${regimeLabelMap[regimeAlert.previousRegime]})`
+    : `${statusLabel} (unchanged vs last week)`;
+  const severityDelta = previousRegime
+    ? regimeSeverityRank[assessment.regime] - regimeSeverityRank[previousRegime]
+    : 0;
+  const worseLabel = severityDelta > 0 ? "Worse than last week" : severityDelta < 0 ? "Better than last week" : "No worse than last week";
+  const operatingCalls = operatingCallsByRegime[assessment.regime];
+  const netStance = netStanceByRegime[assessment.regime];
+  const expansionWindow = expansionWindowByRegime[assessment.regime];
+  const longCycleBetStance = longCycleBetByRegime[assessment.regime];
   const tightnessThreshold = assessment.thresholds.tightnessRegime;
   const riskThreshold = assessment.thresholds.riskAppetiteRegime;
   const tightnessGap = Math.abs(assessment.scores.tightness - tightnessThreshold);
@@ -383,29 +433,39 @@ export default async function HomePage({
         <header className="space-y-3 border-b border-slate-700/70 pb-5">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-200">Executive summary</p>
           <h1 id="decision-surface-title" className="text-3xl font-semibold text-slate-50 sm:text-4xl">
-            Macro posture: {statusLabel}
+            {changeLabel}
           </h1>
-          <p className="max-w-3xl text-base text-slate-200">{postureDelta}</p>
+          <div className="grid gap-3 md:grid-cols-2">
+            <p className="max-w-3xl text-base text-slate-200">{worseLabel}</p>
+            <p className="max-w-3xl text-base text-slate-200">Approval velocity: {assessment.regime === "SCARCITY" || assessment.regime === "DEFENSIVE" ? "-1 notch" : "+0 notch"}</p>
+          </div>
+          <p className="text-sm font-semibold text-slate-100">{netStance}</p>
+          <ul className="space-y-1 text-sm text-slate-200" aria-label="Immediate operating calls">
+            <li>• Expansion window: {expansionWindow}</li>
+            <li>• Hiring: {operatingCalls.hiring}</li>
+            <li>• Long-cycle bets: {longCycleBetStance}</li>
+          </ul>
           <div className="grid gap-3 md:grid-cols-3" aria-label="Primary posture metrics">
             <article className="rounded-xl border border-slate-700/70 bg-slate-900/60 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">Stay likely</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">Short-cycle experiment safety</p>
               <p className="mt-2 text-3xl font-semibold text-slate-50">{probabilityStay}%</p>
-              <p className="mt-1 text-sm text-slate-300">{describeProbabilityBand(probabilityStay)} confidence in holding this posture.</p>
+              <p className="mt-1 text-sm text-slate-300">Stance: CAUTION — short-cycle experiments viable.</p>
             </article>
             <article className="rounded-xl border border-amber-500/40 bg-slate-900/60 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-200">Defensive shift risk</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-200">Hiring expansion window</p>
               <p className="mt-2 text-3xl font-semibold text-amber-100">{probabilityShiftDefensive}%</p>
-              <p className="mt-1 text-sm text-slate-300">Pressure toward {primaryShiftRegimeLabel} if constraints tighten.</p>
+              <p className="mt-1 text-sm text-slate-300">Stance: NO-GO when below safe expansion band toward {primaryShiftRegimeLabel}.</p>
             </article>
             <article className="rounded-xl border border-emerald-500/40 bg-slate-900/60 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-200">Expansion shift risk</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-200">Long-payback tolerance</p>
               <p className="mt-2 text-3xl font-semibold text-emerald-100">{probabilityShiftExpansion}%</p>
-              <p className="mt-1 text-sm text-slate-300">Chance of rotating toward {adjacentShiftRegimeLabel}.</p>
+              <p className="mt-1 text-sm text-slate-300">Stance: CAUTION — long-payback risk elevated unless rotation toward {adjacentShiftRegimeLabel}.</p>
             </article>
           </div>
         </header>
 
         <div className="grid gap-4 lg:grid-cols-3">
+          <p className="lg:col-span-3 text-xs text-slate-400">Percentages are model probabilities for next-cycle posture paths; they are not confidence intervals or score percentiles.</p>
           <article className="rounded-xl border border-slate-700/70 bg-slate-900/50 p-4 lg:col-span-2" aria-label="What changed">
             <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">What changed</h2>
             <ul className="mt-3 space-y-2 text-sm text-slate-200">
@@ -421,13 +481,13 @@ export default async function HomePage({
           </article>
 
           <article className="rounded-xl border border-slate-700/70 bg-slate-900/50 p-4" aria-label="Decision implications">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">Decision implications</h2>
+            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">DO / AVOID</h2>
             <ul className="mt-3 space-y-2 text-sm text-slate-200">
               {startItems.slice(0, 3).map((item) => (
-                <li key={item}>• Prioritize: {item}</li>
+                <li key={item}>• DO: {item}</li>
               ))}
               {stopItems.slice(0, 2).map((item) => (
-                <li key={item}>• Avoid: {item}</li>
+                <li key={item}>• AVOID: {item}</li>
               ))}
             </ul>
           </article>
@@ -455,6 +515,18 @@ export default async function HomePage({
         </details>
       </section>
 
+      <section
+        id="weekly-action-summary"
+        aria-label="Weekly action summary"
+        className="space-y-8"
+      >
+        <WeeklyActionSummaryPanel
+          assessment={assessment}
+          provenance={treasuryProvenance}
+          recordDateLabel={recordDateLabel}
+        />
+      </section>
+
       <section id="executive-snapshot" aria-label="Leadership summary" className="space-y-8">
         <ExecutiveSnapshotPanel
           treasury={treasury}
@@ -467,18 +539,6 @@ export default async function HomePage({
         <SignalMatrixPanel
           assessment={assessment}
           provenance={treasuryProvenance}
-        />
-      </section>
-
-      <section
-        id="weekly-action-summary"
-        aria-label="Weekly action summary"
-        className="space-y-8"
-      >
-        <WeeklyActionSummaryPanel
-          assessment={assessment}
-          provenance={treasuryProvenance}
-          recordDateLabel={recordDateLabel}
         />
       </section>
     </ReportShell>
