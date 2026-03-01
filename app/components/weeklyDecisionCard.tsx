@@ -85,19 +85,19 @@ export function WeeklyDecisionCard({
 }: WeeklyDecisionCardProps) {
   const topActions = startItems.slice(0, 3);
 
-  const inferActionOwner = (action: string) => {
+  const ownerKeywords: Record<string, string[]> = {
+    Engineering: ["hire", "engineering", "platform", "reliability"],
+    Finance: ["budget", "cash", "spend"],
+    GTM: ["sales", "pipeline", "gtm", "marketing"],
+  };
+
+  const inferActionOwner = (action: string): string => {
     const normalized = action.toLowerCase();
-
-    if (normalized.includes("hire") || normalized.includes("engineering") || normalized.includes("platform") || normalized.includes("reliability")) {
-      return "Engineering";
+    for (const [owner, keywords] of Object.entries(ownerKeywords)) {
+      if (keywords.some((keyword) => normalized.includes(keyword))) {
+        return owner;
+      }
     }
-    if (normalized.includes("budget") || normalized.includes("cash") || normalized.includes("spend")) {
-      return "Finance";
-    }
-    if (normalized.includes("sales") || normalized.includes("pipeline") || normalized.includes("gtm") || normalized.includes("marketing")) {
-      return "GTM";
-    }
-
     return "Product";
   };
   const guardrail = stopItems[0] ?? "Avoid irreversible commitments until confidence improves.";
