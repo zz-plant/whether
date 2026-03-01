@@ -85,9 +85,25 @@ export function GlobalHeader() {
               );
             })}
           </nav>
-          <button type="button" onClick={toggleTheme} className="weather-button text-sm" aria-label="Toggle light mode">
-            {theme === "dark" ? "Light mode" : "Dark mode"}
-          </button>
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <nav aria-label="Quick actions" className="flex flex-wrap items-center gap-2">
+              <Link
+                href="/operations/plan"
+                className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.06em] text-sky-100 hover:border-sky-400/70"
+              >
+                Weekly sequence
+              </Link>
+              <Link
+                href="/briefing"
+                className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.06em] text-slate-100 hover:border-sky-400/70"
+              >
+                Leadership brief
+              </Link>
+            </nav>
+            <button type="button" onClick={toggleTheme} className="weather-button text-sm" aria-label="Toggle light mode">
+              {theme === "dark" ? "Light mode" : "Dark mode"}
+            </button>
+          </div>
         </div>
 
         <nav aria-label="Breadcrumb" className="mt-4 overflow-x-auto">
