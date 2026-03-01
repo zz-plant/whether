@@ -25,53 +25,53 @@ const engineeringPostureByRegime: Record<Regime, EngineeringPosture> = {
     posture: "Accelerate",
     confidence: "Medium-high",
     levers: [
-      { label: "Delivery scope", guidance: "Increase scope selectively on validated growth bets." },
-      { label: "Reliability strictness", guidance: "Hold baseline SLOs while expanding capacity where load is rising." },
-      { label: "Hiring pace", guidance: "Backfill critical roles and add targeted product-engineering capacity." },
-      { label: "Platform investment", guidance: "Fund enabling platform work that shortens cycle time next quarter." },
+      { label: "Delivery scope", guidance: "Scale validated growth bets." },
+      { label: "Reliability strictness", guidance: "Keep baseline SLOs; add capacity where load rises." },
+      { label: "Hiring pace", guidance: "Backfill critical roles; add targeted product-engineering capacity." },
+      { label: "Platform investment", guidance: "Fund platform work that cuts next-quarter cycle time." },
     ],
-    overApplyRisk: "Over-scaling spend and scope before demand durability is confirmed.",
-    underApplyRisk: "Missing growth windows and forcing reactive scaling later.",
-    mitigationTrigger: "If two consecutive reads weaken, switch to Stabilize posture.",
+    overApplyRisk: "Spend and scope outrun durable demand.",
+    underApplyRisk: "Miss growth windows; force reactive scaling.",
+    mitigationTrigger: "Trigger: two weaker reads in a row → switch to Stabilize.",
   },
   VOLATILE: {
     posture: "Optimize",
     confidence: "Medium",
     levers: [
-      { label: "Delivery scope", guidance: "Prioritize near-term revenue and retention work; gate speculative bets." },
-      { label: "Reliability strictness", guidance: "Protect core paths; avoid costly reliability overreach on low-criticality areas." },
-      { label: "Hiring pace", guidance: "Keep hiring selective and role-critical only." },
-      { label: "Platform investment", guidance: "Favor efficiency and instrumentation over broad platform rewrites." },
+      { label: "Delivery scope", guidance: "Prioritize near-term revenue and retention; gate speculation." },
+      { label: "Reliability strictness", guidance: "Protect core paths; avoid over-investing low-criticality reliability." },
+      { label: "Hiring pace", guidance: "Keep hiring selective and role-critical." },
+      { label: "Platform investment", guidance: "Favor efficiency and instrumentation over broad rewrites." },
     ],
-    overApplyRisk: "Over-tightening can stall meaningful customer-facing progress.",
-    underApplyRisk: "Too much optional work increases burn without measurable return.",
-    mitigationTrigger: "If confidence rises for two updates, move to Accelerate; if it falls, move to Stabilize.",
+    overApplyRisk: "Over-tightening stalls customer progress.",
+    underApplyRisk: "Optional work raises burn without return.",
+    mitigationTrigger: "Trigger: confidence up 2 updates → Accelerate; down → Stabilize.",
   },
   DEFENSIVE: {
     posture: "Stabilize",
     confidence: "High",
     levers: [
-      { label: "Delivery scope", guidance: "Focus on commitments tied to revenue durability and churn prevention." },
+      { label: "Delivery scope", guidance: "Focus commitments on revenue durability and churn prevention." },
       { label: "Reliability strictness", guidance: "Raise guardrails for incidents, defects, and release risk." },
-      { label: "Hiring pace", guidance: "Pause discretionary adds; prioritize backfills for critical ownership gaps." },
-      { label: "Platform investment", guidance: "Shift to resilience, cost control, and operational simplification." },
+      { label: "Hiring pace", guidance: "Pause discretionary adds; backfill critical ownership gaps." },
+      { label: "Platform investment", guidance: "Shift to resilience, cost control, and simplification." },
     ],
-    overApplyRisk: "Excessive caution can delay needed product improvements.",
-    underApplyRisk: "Execution risk rises if reliability and spend controls lag conditions.",
-    mitigationTrigger: "If risk signals recover for two updates, test an Optimize posture on non-critical lanes.",
+    overApplyRisk: "Excess caution delays needed product gains.",
+    underApplyRisk: "Reliability and spend controls lag conditions.",
+    mitigationTrigger: "Trigger: risk recovery for 2 updates → test Optimize on non-critical lanes.",
   },
   SCARCITY: {
     posture: "Stabilize",
     confidence: "High",
     levers: [
-      { label: "Delivery scope", guidance: "Constrain to must-win roadmap commitments only." },
-      { label: "Reliability strictness", guidance: "Enforce strict error-budget policy and release controls." },
-      { label: "Hiring pace", guidance: "Hold net-new hiring; preserve critical incident and platform coverage." },
+      { label: "Delivery scope", guidance: "Constrain to must-win commitments." },
+      { label: "Reliability strictness", guidance: "Enforce strict error-budget and release controls." },
+      { label: "Hiring pace", guidance: "Hold net-new hiring; preserve critical coverage." },
       { label: "Platform investment", guidance: "Prioritize cost-down, reliability hardening, and run-cost visibility." },
     ],
-    overApplyRisk: "Deep cuts can erode morale and long-term velocity foundations.",
-    underApplyRisk: "Insufficient tightening can create forced cuts under worse conditions later.",
-    mitigationTrigger: "If tightness and risk appetite recover sustainably, step up to Optimize posture.",
+    overApplyRisk: "Deep cuts erode morale and long-term velocity.",
+    underApplyRisk: "Insufficient tightening can force harsher cuts later.",
+    mitigationTrigger: "Trigger: sustained tightness + risk recovery → step up to Optimize.",
   },
 };
 
@@ -109,8 +109,8 @@ export function WeeklyDecisionCard({
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-200">This week&apos;s decision card</p>
           <h2 className="text-2xl font-semibold tracking-tight text-slate-50">{statusLabel} posture</h2>
-          <p className="text-sm text-slate-300">Updated with signals through {recordDateLabel} · Last refresh {fetchedAtLabel}</p>
-          <p className="text-xs text-slate-400">Weekly execution decision · monthly rollup in Action playbook</p>
+          <p className="text-sm text-slate-300">Signals through {recordDateLabel} · Refresh {fetchedAtLabel}</p>
+          <p className="text-xs text-slate-400">Weekly call · monthly rollup in Action playbook</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Link href="#weekly-action-summary" className="weather-button-primary inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]">Run weekly operating sequence</Link>
@@ -140,11 +140,11 @@ export function WeeklyDecisionCard({
         </article>
 
         <article className="rounded-2xl border border-slate-700/70 bg-slate-950/45 p-4">
-          <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-sky-200">Why this is credible</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-sky-200">Decision basis</h3>
           <ul className="mt-3 space-y-2 text-sm text-slate-200">
-            <li>Inputs: Treasury curve signals and regime thresholds.</li>
-            <li>Rules: Deterministic score-based posture mapping.</li>
-            <li>Cadence: Weekly decision cycle with frequent feed refresh.</li>
+            <li>Inputs: Treasury curve + regime thresholds.</li>
+            <li>Rules: Deterministic score mapping.</li>
+            <li>Cadence: Weekly decision cycle.</li>
           </ul>
         </article>
       </div>
