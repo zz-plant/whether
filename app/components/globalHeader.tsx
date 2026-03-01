@@ -109,6 +109,22 @@ export function GlobalHeader() {
             })}
           </ol>
         </nav>
+
+        <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-slate-700/70 pt-4">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-300">Primary actions</p>
+          <Link
+            href="/operations/plan"
+            className="weather-button-primary inline-flex min-h-[44px] items-center justify-center"
+          >
+            Run weekly operating sequence
+          </Link>
+          <Link
+            href="/briefing"
+            className="weather-button inline-flex min-h-[44px] items-center justify-center"
+          >
+            Generate leadership brief
+          </Link>
+        </div>
       </div>
     </header>
   );
