@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import { ToastProviderRoot } from "./components/toastProviderRoot";
+import { GlobalHeader } from "./components/globalHeader";
 import { siteUrl } from "../lib/siteUrl";
 import { buildSocialImageUrl } from "../lib/seo";
 
@@ -88,7 +89,10 @@ export default function RootLayout({
         <a className="skip-link" href="#main-content">
           Skip to content
         </a>
-        <ToastProviderRoot>{children}</ToastProviderRoot>
+        <ToastProviderRoot>
+          <GlobalHeader />
+          {children}
+        </ToastProviderRoot>
       </body>
     </html>
   );
