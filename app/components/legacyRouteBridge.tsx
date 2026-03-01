@@ -28,16 +28,25 @@ export function LegacyRouteBridge({
     () => `whether.bridge.auto-forward-seen:${primaryHref}`,
     [primaryHref],
   );
+  const [isClient, setIsClient] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(autoForwardSeconds);
   const [autoForwardEnabled, setAutoForwardEnabled] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isClient) {
+      return;
+    }
+
     const hasSeenBridge = window.localStorage.getItem(preferenceKey) === "1";
     setAutoForwardEnabled(hasSeenBridge);
     if (!hasSeenBridge) {
       window.localStorage.setItem(preferenceKey, "1");
     }
-  }, [preferenceKey]);
+  }, [isClient, preferenceKey]);
 
   useEffect(() => {
     if (!autoForwardEnabled || secondsLeft <= 0) {
@@ -66,7 +75,9 @@ export function LegacyRouteBridge({
         <h1 className="text-3xl font-semibold tracking-tight text-slate-50 sm:text-4xl">{title}</h1>
         <p className="text-sm leading-7 text-slate-300 sm:text-base">{description}</p>
         <p className="text-xs text-slate-400">
-          {autoForwardEnabled
+          {!isClient
+            ? "Checking redirect preference..."
+            : autoForwardEnabled
             ? `Auto-forwarding to the primary destination in ${secondsLeft}s.`
             : "Auto-forward is off for first-time visitors. Choose your next destination below."}
         </p>
@@ -83,7 +94,7 @@ export function LegacyRouteBridge({
           >
             {secondaryLabel}
           </Link>
-          {autoForwardEnabled ? (
+          {!isClient ? null : autoForwardEnabled ? (
             <button
               type="button"
               onClick={() => setAutoForwardEnabled(false)}
