@@ -3,6 +3,8 @@ import Link from "next/link";
 import { buildPageMetadata } from "../../../lib/seo";
 import { failureModes } from "../../../lib/informationArchitecture";
 
+export const runtime = "edge";
+
 export const metadata: Metadata = buildPageMetadata({
   title: "Failure Modes library",
   description: "Diagnostic pages that show what's going wrong and where to go next.",
