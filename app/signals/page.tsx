@@ -298,6 +298,10 @@ export default async function SignalsPage({
       heroVariant="compact"
       pageNavVariant="compact"
       primaryCta={{ href: "#macro-signals", label: "Review evidence" }}
+      nextStep={{
+        href: "/operations",
+        description: "Apply this posture in Operations",
+      }}
       decisionBanner={{
         label: "Decision",
         decision: `${regimeLabel} regime matches the current macro diagnostics.`,

@@ -416,6 +416,10 @@ export default async function HomePage({
         href: "/onboarding",
         label: "Start onboarding (3 min)",
       }}
+      nextStep={{
+        href: "/signals",
+        description: "Review evidence in Signals",
+      }}
       sidebarVariant="hidden"
       hideHeroChrome={true}
       pageNavVariant="compact"

@@ -448,21 +448,33 @@ export const ReportShell = ({
                           {secondaryCta.label}
                         </a>
                       ) : null}
-                      {exportCta ? (
-                        <a
-                          href={exportCta.href}
-                          className="weather-pill inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-slate-700/80 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto"
-                        >
-                          {exportCta.label}
-                        </a>
-                      ) : null}
-                      <a
-                        href="/about#subscribe"
-                        className="inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-slate-700/80 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto"
-                      >
-                        More updates
-                      </a>
+                      <details className="group w-full sm:w-auto">
+                        <summary className="weather-pill inline-flex min-h-[44px] w-full cursor-pointer list-none items-center justify-center rounded-full border border-slate-700/80 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto">
+                          More actions
+                        </summary>
+                        <div className="mt-2 grid gap-2 sm:min-w-[18rem]">
+                          {exportCta ? (
+                            <a
+                              href={exportCta.href}
+                              className="weather-pill inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-700/80 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                            >
+                              {exportCta.label}
+                            </a>
+                          ) : null}
+                          <a
+                            href="/about#subscribe"
+                            className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-700/80 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                          >
+                            More updates
+                          </a>
+                        </div>
+                      </details>
                     </div>
+                    {nextStep ? (
+                      <p className="text-xs font-semibold tracking-[0.1em] text-slate-300">
+                        Next step: <a href={nextStep.href} className="text-sky-200 underline decoration-slate-500/80 underline-offset-4 hover:text-slate-100">{nextStep.description}</a>
+                      </p>
+                    ) : null}
                     <p className="weather-surface inline-flex min-h-[44px] flex-wrap items-center gap-x-2 px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100">
                       <span>{trustStatusTone === "stable" ? "Stable" : "Caution"}</span>
                       <span className="text-slate-400">·</span>
