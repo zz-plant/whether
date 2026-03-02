@@ -37,6 +37,7 @@ Use this index to find the **current** source of truth quickly.
 - `research/2026-03-01-target-persona-frontend-critique.md` — persona-based constructive critique of the current frontend.
 - `research/2026-03-01-target-persona-frontend-critique-vp-engineering.md` — persona-based frontend critique from a VP Engineering perspective.
 - `research/2026-03-01-prioritized-frontend-change-list.md` — consolidated prioritized implementation backlog from persona critiques.
+- `research/2026-03-02-persona-click-route-walkthrough.md` — three-route persona walkthrough focused on streamlining and distraction audit.
 - `one-screen-weekly-brief-spec.md` — decision-first one-screen weekly leadership brief specification.
 - `information-architecture-proposal.md` — proposed navigation model and route-transition plan.
 - `implementation-status.md` — consolidated implementation checklist across roadmap, summary follow-ups, and modernization work.

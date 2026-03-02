@@ -137,6 +137,10 @@ export default async function OperationsPage({
         label: "Review weekly + monthly summary",
       }}
       secondaryCta={{ href: "#ops-playbook", label: "Open execution playbook" }}
+      nextStep={{
+        href: "/decide",
+        description: "Translate this into role-specific guidance",
+      }}
       pageNavVariant="compact"
       decisionBanner={{
         label: "Align now",
