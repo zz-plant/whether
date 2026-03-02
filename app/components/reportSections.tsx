@@ -371,11 +371,13 @@ export const WeeklyActionSummaryPanel = ({
   } as const;
 
   useEffect(() => {
+    if (!weeklySummary.transitionWatch) {
+      return;
+    }
+
     add({
-      title: weeklySummary.transitionWatch ? "Macro regime watch" : "Macro state unchanged",
-      description: weeklySummary.transitionWatch
-        ? "Signals are near a boundary. Tighten review cadence this week."
-        : "No material change since last weekly update. Continue current posture.",
+      title: "Macro regime watch",
+      description: "Signals are near a boundary. Tighten review cadence this week.",
     });
   }, [add, weeklySummary.transitionWatch]);
 
