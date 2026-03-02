@@ -50,6 +50,17 @@ export type LastYearComparison = {
   };
 };
 
+export type ReportDynamics = {
+  changedSignals: Array<{
+    key: "tightness" | "riskAppetite" | "baseRate" | "curveSlope";
+    label: string;
+    delta: number;
+  }>;
+  totalSignalChanges: number;
+  regimeChanged: boolean;
+  directionLabel: "improving" | "deteriorating" | "mixed" | "stable";
+};
+
 const regimeStatusLabelMap = {
   SCARCITY: "Scarcity",
   DEFENSIVE: "Defensive",
@@ -85,6 +96,79 @@ export const buildLastYearComparison = ({
     baseRate: prior.scores.baseRate,
   },
 });
+
+const signalLabels: Record<ReportDynamics["changedSignals"][number]["key"], string> = {
+  tightness: "Cash availability",
+  riskAppetite: "Risk appetite",
+  baseRate: "Base rate",
+  curveSlope: "Curve slope",
+};
+
+export const buildReportDynamics = ({
+  current,
+  previous,
+}: {
+  current: ReturnType<typeof evaluateRegime>;
+  previous: ReturnType<typeof evaluateRegime> | null;
+}): ReportDynamics => {
+  if (!previous) {
+    return {
+      changedSignals: [],
+      totalSignalChanges: 0,
+      regimeChanged: false,
+      directionLabel: "stable",
+    };
+  }
+
+  const comparisons = [
+    {
+      key: "tightness" as const,
+      label: signalLabels.tightness,
+      delta: current.scores.tightness - previous.scores.tightness,
+    },
+    {
+      key: "riskAppetite" as const,
+      label: signalLabels.riskAppetite,
+      delta: current.scores.riskAppetite - previous.scores.riskAppetite,
+    },
+    {
+      key: "baseRate" as const,
+      label: signalLabels.baseRate,
+      delta: current.scores.baseRate - previous.scores.baseRate,
+    },
+    {
+      key: "curveSlope" as const,
+      label: signalLabels.curveSlope,
+      delta: (current.scores.curveSlope ?? 0) - (previous.scores.curveSlope ?? 0),
+    },
+  ].filter((item) => Math.abs(item.delta) >= 0.01);
+
+  const improvingMoves = comparisons.filter(
+    (item) =>
+      ((item.key === "riskAppetite" || item.key === "curveSlope") && item.delta > 0) ||
+      ((item.key === "tightness" || item.key === "baseRate") && item.delta < 0),
+  ).length;
+  const deterioratingMoves = comparisons.filter(
+    (item) =>
+      ((item.key === "riskAppetite" || item.key === "curveSlope") && item.delta < 0) ||
+      ((item.key === "tightness" || item.key === "baseRate") && item.delta > 0),
+  ).length;
+  const directionLabel: ReportDynamics["directionLabel"] =
+    comparisons.length === 0
+      ? "stable"
+      : improvingMoves > 0 && deterioratingMoves > 0
+        ? "mixed"
+        : improvingMoves > 0
+          ? "improving"
+          : "deteriorating";
+
+  return {
+    changedSignals: comparisons,
+    totalSignalChanges: comparisons.length,
+    regimeChanged: current.regime !== previous.regime,
+    directionLabel,
+  };
+};
 
 const REPORT_DATA_REVALIDATE_SECONDS = 900;
 
@@ -209,6 +293,10 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
           previousSnapshot.record_date
         )
       : null;
+  const reportDynamics = buildReportDynamics({
+    current: assessment,
+    previous: previousAssessment,
+  });
   const regimeTrend = deriveRegimeTrend(previousAssessment, assessment);
   const lastYearComparison =
     lastYearSnapshot && lastYearAssessment
@@ -237,6 +325,7 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
     macroSeries,
     playbook,
     recordDateLabel,
+    reportDynamics,
     requestedSelection,
     regimeSeries,
     regimeAlert,

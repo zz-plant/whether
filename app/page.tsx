@@ -25,6 +25,8 @@ import { ReportShell } from "./components/reportShell";
 import { reportPageLinks } from "../lib/report/reportNavigation";
 import { buildTrustStatus } from "../lib/report/trustStatus";
 import { WeeklyDecisionCard } from "./components/weeklyDecisionCard";
+import { LiveCommandDeck } from "./components/liveCommandDeck";
+import { RevealOnView } from "./components/revealOnView";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -286,6 +288,7 @@ export default async function HomePage({
     statusLabel,
     stopItems,
     treasury,
+    reportDynamics,
     treasuryProvenance,
   } = await loadReportData(resolvedSearchParams);
   const previousHistoricalSelection = historicalSelection
@@ -534,33 +537,45 @@ export default async function HomePage({
           </div>
         </details>
       </section>
+      <LiveCommandDeck
+        fetchedAtLabel={fetchedAtLabel}
+        changedSignalCount={reportDynamics.totalSignalChanges}
+        regimeChanged={reportDynamics.regimeChanged}
+        signalDirection={reportDynamics.directionLabel}
+      />
 
-      <section
-        id="weekly-action-summary"
-        aria-label="Weekly action summary"
-        className="space-y-8"
-      >
-        <WeeklyActionSummaryPanel
-          assessment={assessment}
-          provenance={treasuryProvenance}
-          recordDateLabel={recordDateLabel}
-        />
-      </section>
+      <RevealOnView>
+        <section
+          id="weekly-action-summary"
+          aria-label="Weekly action summary"
+          className="space-y-8"
+        >
+          <WeeklyActionSummaryPanel
+            assessment={assessment}
+            provenance={treasuryProvenance}
+            recordDateLabel={recordDateLabel}
+          />
+        </section>
+      </RevealOnView>
 
-      <section id="executive-snapshot" aria-label="Leadership summary" className="space-y-8">
-        <ExecutiveSnapshotPanel
-          treasury={treasury}
-          assessment={assessment}
-          provenance={treasuryProvenance}
-        />
-      </section>
+      <RevealOnView>
+        <section id="executive-snapshot" aria-label="Leadership summary" className="space-y-8">
+          <ExecutiveSnapshotPanel
+            treasury={treasury}
+            assessment={assessment}
+            provenance={treasuryProvenance}
+          />
+        </section>
+      </RevealOnView>
 
-      <section id="signal-matrix" aria-label="Signal breakdown" className="space-y-8">
-        <SignalMatrixPanel
-          assessment={assessment}
-          provenance={treasuryProvenance}
-        />
-      </section>
+      <RevealOnView>
+        <section id="signal-matrix" aria-label="Signal breakdown" className="space-y-8">
+          <SignalMatrixPanel
+            assessment={assessment}
+            provenance={treasuryProvenance}
+          />
+        </section>
+      </RevealOnView>
     </ReportShell>
   );
 }

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { evaluateRegime } from "../lib/regimeEngine";
-import { buildLastYearComparison } from "../lib/report/reportData";
+import { buildLastYearComparison, buildReportDynamics } from "../lib/report/reportData";
 import type { TreasuryData } from "../lib/types";
 
 const makeTreasury = (
@@ -39,5 +39,53 @@ describe("buildLastYearComparison", () => {
     assert.equal(comparison.current.regime, currentAssessment.regime);
     assert.equal(comparison.prior.tightness, priorAssessment.scores.tightness);
     assert.equal(comparison.current.riskAppetite, currentAssessment.scores.riskAppetite);
+  });
+});
+
+
+describe("buildReportDynamics", () => {
+  const makeAssessment = ({
+    tightness,
+    riskAppetite,
+    baseRate,
+    curveSlope,
+    regime = "VOLATILE",
+  }: {
+    tightness: number;
+    riskAppetite: number;
+    baseRate: number;
+    curveSlope: number;
+    regime?: "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
+  }) =>
+    ({
+      regime,
+      scores: { tightness, riskAppetite, baseRate, curveSlope },
+    }) as ReturnType<typeof evaluateRegime>;
+
+  it("marks improving when favorable signal directions dominate", () => {
+    const previous = makeAssessment({ tightness: 60, riskAppetite: 45, baseRate: 5, curveSlope: -0.5 });
+    const current = makeAssessment({ tightness: 50, riskAppetite: 55, baseRate: 4, curveSlope: -0.2 });
+
+    const dynamics = buildReportDynamics({ current, previous });
+
+    assert.equal(dynamics.directionLabel, "improving");
+  });
+
+  it("marks deteriorating when unfavorable signal directions dominate", () => {
+    const previous = makeAssessment({ tightness: 40, riskAppetite: 55, baseRate: 4, curveSlope: 0.2 });
+    const current = makeAssessment({ tightness: 55, riskAppetite: 40, baseRate: 5, curveSlope: -0.4 });
+
+    const dynamics = buildReportDynamics({ current, previous });
+
+    assert.equal(dynamics.directionLabel, "deteriorating");
+  });
+
+  it("marks mixed when improvements and deteriorations are both present", () => {
+    const previous = makeAssessment({ tightness: 50, riskAppetite: 50, baseRate: 4, curveSlope: 0.1 });
+    const current = makeAssessment({ tightness: 45, riskAppetite: 40, baseRate: 4.5, curveSlope: 0.2 });
+
+    const dynamics = buildReportDynamics({ current, previous });
+
+    assert.equal(dynamics.directionLabel, "mixed");
   });
 });
