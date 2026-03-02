@@ -3,6 +3,7 @@
  * Mirrors monthly summary structure with quarter-specific framing.
  */
 import type { RegimeAssessment } from "../regimeEngine";
+import { getRegimeOperatorLabel } from "../regimeLabels";
 import { buildComplianceStamp } from "../exportNotices";
 
 export type QuarterlySummaryProvenance = {
@@ -37,20 +38,6 @@ const quarterlyActionGuidance: Record<RegimeAssessment["regime"], string> = {
     "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
 };
 
-const getRegimeLabel = (regime: RegimeAssessment["regime"]) => {
-  switch (regime) {
-    case "SCARCITY":
-      return "Survival Mode";
-    case "DEFENSIVE":
-      return "Efficiency Mode";
-    case "VOLATILE":
-      return "Safety Mode";
-    case "EXPANSION":
-      return "Growth Mode";
-    default:
-      return regime;
-  }
-};
 
 export const getQuarterlyActionGuidance = (regime: RegimeAssessment["regime"]) =>
   quarterlyActionGuidance[regime];
@@ -66,7 +53,7 @@ export const buildQuarterlySummary = ({
   recordDateLabel?: string;
   periodLabel?: string;
 }): QuarterlySummary => {
-  const regimeLabel = getRegimeLabel(assessment.regime);
+  const regimeLabel = getRegimeOperatorLabel(assessment.regime);
   const guidance = getQuarterlyActionGuidance(assessment.regime);
   const summary = `This quarter, operate in ${regimeLabel} mode: ${guidance}. ${assessment.description}`;
   const title = periodLabel

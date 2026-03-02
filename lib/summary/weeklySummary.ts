@@ -3,6 +3,7 @@
  * Keeps weekly action copy consistent across UI and shared endpoints.
  */
 import type { RegimeAssessment } from "../regimeEngine";
+import { getRegimeOperatorLabel } from "../regimeLabels";
 import { renderWeeklySummaryCopy } from "./summaryCopyRenderer";
 
 import type { SummaryProvenance, WeeklyStructured } from "./summaryTypes";
@@ -142,21 +143,6 @@ const weeklyOutputTemplates: Record<RegimeAssessment["regime"], WeeklyOutputTemp
   },
 };
 
-const getRegimeLabel = (regime: RegimeAssessment["regime"]) => {
-  switch (regime) {
-    case "SCARCITY":
-      return "Survival Mode";
-    case "DEFENSIVE":
-      return "Efficiency Mode";
-    case "VOLATILE":
-      return "Safety Mode";
-    case "EXPANSION":
-      return "Growth Mode";
-    default:
-      return regime;
-  }
-};
-
 export const getWeeklyActionGuidance = (regime: RegimeAssessment["regime"]) =>
   weeklyActionGuidance[regime];
 
@@ -192,7 +178,7 @@ export const buildWeeklySummary = ({
   provenance: WeeklySummaryProvenance;
   recordDateLabel?: string;
 }): WeeklySummary => {
-  const regimeLabel = getRegimeLabel(assessment.regime);
+  const regimeLabel = getRegimeOperatorLabel(assessment.regime);
   const guidance = getWeeklyActionGuidance(assessment.regime);
   const transitionCue = assessment.diagnostics.transitionWatch
     ? " Signals are near a regime boundary; tighten review cadence before expanding commitments."
