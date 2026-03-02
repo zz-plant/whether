@@ -8,9 +8,14 @@ import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { Accordion } from "@base-ui/react/accordion";
 import { Collapsible } from "@base-ui/react/collapsible";
+import { Dialog } from "@base-ui/react/dialog";
 import { Field } from "@base-ui/react/field";
 import { Input } from "@base-ui/react/input";
+import { Popover } from "@base-ui/react/popover";
+import { ScrollArea } from "@base-ui/react/scroll-area";
 import { Select } from "@base-ui/react/select";
+import { Tabs } from "@base-ui/react/tabs";
+import { Toast } from "@base-ui/react/toast";
 import { Toggle } from "@base-ui/react/toggle";
 import { ToggleGroup } from "@base-ui/react/toggle-group";
 import { Tooltip } from "@base-ui/react/tooltip";
@@ -302,6 +307,77 @@ export const WeeklyActionSummaryPanel = ({
     },
   ];
   const [showMetricDefinitions, setShowMetricDefinitions] = useState(false);
+  const [stakeholderLens, setStakeholderLens] = useState("product");
+  const [profile, setProfile] = useState("saas-growth-plg");
+  const { add } = Toast.useToastManager();
+
+  const profileOptions = [
+    { value: "saas-growth-plg", label: "SaaS · Growth · PLG" },
+    { value: "fintech-a-enterprise", label: "Fintech · Series A · Enterprise" },
+    { value: "marketplace-seed-mixed", label: "Marketplace · Seed · Mixed" },
+    { value: "hardware-growth-enterprise", label: "Hardware · Growth · Enterprise" },
+  ] as const;
+
+  const profileGuidance = {
+    "saas-growth-plg": {
+      mandateLine: "Profile overlay: favor activation, retention, and payback-positive funnel improvements.",
+      doLine: "Bias for self-serve wins with measurable payback inside one to two quarters.",
+      avoidLine: "Avoid broad platform rewrites that slow near-term shipping velocity.",
+      lensPrefix: "PLG",
+    },
+    "fintech-a-enterprise": {
+      mandateLine: "Profile overlay: prioritize compliance, enterprise proof points, and procurement-ready packaging.",
+      doLine: "Bundle reliability and auditability upgrades with expansion requests.",
+      avoidLine: "Avoid growth motions that create regulatory or counterparty risk.",
+      lensPrefix: "Enterprise fintech",
+    },
+    "marketplace-seed-mixed": {
+      mandateLine: "Profile overlay: keep liquidity loops healthy and preserve two-sided trust metrics.",
+      doLine: "Stage supply and demand bets in small increments with explicit rollback triggers.",
+      avoidLine: "Avoid heavy fixed-cost GTM until marketplace liquidity stabilizes.",
+      lensPrefix: "Marketplace",
+    },
+    "hardware-growth-enterprise": {
+      mandateLine: "Profile overlay: protect cash conversion by gating inventory and long-cycle commitments.",
+      doLine: "Anchor roadmap to margin, fulfillment reliability, and contracted demand.",
+      avoidLine: "Avoid speculative capacity expansion before demand durability is proven.",
+      lensPrefix: "Hardware enterprise",
+    },
+  } as const;
+
+  const selectedProfileGuidance = profileGuidance[profile as keyof typeof profileGuidance] ?? profileGuidance["saas-growth-plg"];
+
+  const lensMandates = {
+    product: [
+      "Sequence roadmap to protect reliability and retention before net-new expansion.",
+      "Require milestone-based rollback points on every cross-team initiative.",
+      "Keep experiments short-cycle until risk appetite recovers.",
+    ],
+    gtm: [
+      "Bias pipeline toward renewals and expansion in proven ICP segments.",
+      "Gate campaign spend behind measured payback thresholds.",
+      "Tighten qualification criteria to avoid low-conviction deals.",
+    ],
+    finance: [
+      "Hold discretionary programs unless they show near-term cash conversion.",
+      "Use weekly variance checks for hiring, burn, and payback windows.",
+      "Require downside cases for all fixed-cost approvals.",
+    ],
+    people: [
+      "Approve headcount only for roles tied to core delivery and retention.",
+      "Bundle role requests with explicit revenue or risk reduction linkage.",
+      "Add trigger criteria for pause/continue on all hiring plans.",
+    ],
+  } as const;
+
+  useEffect(() => {
+    add({
+      title: weeklySummary.transitionWatch ? "Macro regime watch" : "Macro state unchanged",
+      description: weeklySummary.transitionWatch
+        ? "Signals are near a boundary. Tighten review cadence this week."
+        : "No material change since last weekly update. Continue current posture.",
+    });
+  }, [add, weeklySummary.transitionWatch]);
 
   return (
     <section id="weekly-action-summary" aria-labelledby="weekly-action-summary-title" className="mt-8">
@@ -328,6 +404,7 @@ export const WeeklyActionSummaryPanel = ({
                   <p className="text-xs font-semibold tracking-[0.18em] text-sky-200">Mandate</p>
                   <p className="mt-2 text-lg font-semibold text-slate-100">Operate in {regimeLabel} mode.</p>
                   <p className="mt-1 text-sm text-slate-200">{actionGuidance}</p>
+                  <p className="mt-2 text-xs text-slate-300">{selectedProfileGuidance.mandateLine}</p>
                   <div className="mt-4 grid gap-4 sm:grid-cols-2">
                     <div>
                       <p className="text-xs font-semibold tracking-[0.14em] text-emerald-200">DO</p>
@@ -335,6 +412,7 @@ export const WeeklyActionSummaryPanel = ({
                         {assessment.constraints.slice(0, 3).map((item) => (
                           <li key={`do-${item}`}>• {item}</li>
                         ))}
+                        <li key="do-profile">• {selectedProfileGuidance.doLine}</li>
                       </ul>
                     </div>
                     <div>
@@ -343,6 +421,7 @@ export const WeeklyActionSummaryPanel = ({
                         <li>• New fixed-cost commitments without ROI gates.</li>
                         <li>• Multi-quarter bets without milestone reversibility.</li>
                         <li>• Hiring expansion ahead of threshold confirmation.</li>
+                        <li>• {selectedProfileGuidance.avoidLine}</li>
                       </ul>
                     </div>
                   </div>
@@ -372,6 +451,35 @@ export const WeeklyActionSummaryPanel = ({
                   Macro: cash + risk appetite
                 </span>
               </div>
+              <div className="weather-surface weather-surface-indigo rounded-xl p-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Operator profile</p>
+                    <p className="mt-1 text-xs text-slate-300">Adjust guidance translation without changing macro regime.</p>
+                  </div>
+                  <Select.Root value={profile} onValueChange={(value) => setProfile(value ?? "saas-growth-plg")}>
+                    <Select.Trigger className="weather-input inline-flex min-h-[44px] min-w-[260px] items-center justify-between gap-3 rounded-xl px-3 py-2 text-left text-sm text-slate-100 touch-manipulation">
+                      <Select.Value />
+                      <Select.Icon className="text-slate-400" />
+                    </Select.Trigger>
+                    <Select.Portal>
+                      <Select.Positioner sideOffset={8}>
+                        <Select.Popup className="w-[320px] rounded-xl border border-slate-800/80 bg-slate-950/95 p-1 text-sm text-slate-200 shadow-xl">
+                          {profileOptions.map((option) => (
+                            <Select.Item
+                              key={option.value}
+                              value={option.value}
+                              className="flex min-h-[44px] cursor-pointer items-center rounded-lg px-3 py-2 text-sm data-[highlighted]:bg-slate-800/80"
+                            >
+                              <Select.ItemText>{option.label}</Select.ItemText>
+                            </Select.Item>
+                          ))}
+                        </Select.Popup>
+                      </Select.Positioner>
+                    </Select.Portal>
+                  </Select.Root>
+                </div>
+              </div>
               <div className="grid gap-3 sm:grid-cols-3">
                 {weeklySignalTiles.map((tile) => (
                   <div key={tile.label} className={`weather-surface ${tile.tone} space-y-3 p-4`}>
@@ -396,6 +504,94 @@ export const WeeklyActionSummaryPanel = ({
                   </div>
                 ))}
               </div>
+              <div className="flex flex-wrap gap-2">
+                <Popover.Root>
+                  <Popover.Trigger className="weather-button inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] touch-manipulation">
+                    View drivers
+                  </Popover.Trigger>
+                  <Popover.Portal>
+                    <Popover.Positioner side="bottom" align="start" sideOffset={8}>
+                      <Popover.Popup className="weather-panel w-[min(560px,92vw)] border border-slate-800/80 bg-slate-950/95 p-4 text-xs text-slate-200 shadow-2xl">
+                        <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">Signal contributors</p>
+                        <ScrollArea.Root className="mt-3 max-h-56 overflow-hidden rounded-lg border border-slate-800/80">
+                          <ScrollArea.Viewport className="max-h-56">
+                            <div className="min-w-[460px]">
+                              <div className="grid grid-cols-[1.4fr,0.9fr,0.9fr,0.9fr] gap-2 border-b border-slate-800/80 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                                <span>Indicator</span>
+                                <span>Direction</span>
+                                <span>Contribution</span>
+                                <span>Lag type</span>
+                              </div>
+                              {weeklySignalTiles.map((tile) => (
+                                <div key={`driver-${tile.label}`} className="grid grid-cols-[1.4fr,0.9fr,0.9fr,0.9fr] gap-2 border-b border-slate-900/80 px-3 py-2 text-xs text-slate-300">
+                                  <span>{tile.label}</span>
+                                  <span>{tile.status.includes("below") || tile.status.includes("inverted") ? "↓" : "↑"}</span>
+                                  <span>{Math.round(tile.progressValue / 10)}/10</span>
+                                  <span>{tile.label === "Curve slope" ? "Leading" : "Coincident"}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </ScrollArea.Viewport>
+                          <ScrollArea.Scrollbar orientation="vertical" className="flex w-2.5 bg-slate-900/80">
+                            <ScrollArea.Thumb className="flex-1 rounded-full bg-slate-700" />
+                          </ScrollArea.Scrollbar>
+                        </ScrollArea.Root>
+                      </Popover.Popup>
+                    </Popover.Positioner>
+                  </Popover.Portal>
+                </Popover.Root>
+                <Dialog.Root>
+                  <Dialog.Trigger className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] touch-manipulation">
+                    Share snapshot
+                  </Dialog.Trigger>
+                  <Dialog.Portal>
+                    <Dialog.Backdrop className="fixed inset-0 z-40 bg-slate-950/80" />
+                    <Dialog.Popup className="fixed left-1/2 top-1/2 z-50 w-[min(640px,92vw)] -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-slate-800 bg-slate-950 p-5 text-slate-200 shadow-2xl">
+                      <Dialog.Title className="text-sm font-semibold tracking-[0.12em]">Slack screenshot mode</Dialog.Title>
+                      <Dialog.Description className="mt-2 text-xs text-slate-400">Copy this panel into weekly leadership updates.</Dialog.Description>
+                      <div className="mt-4 rounded-xl border border-slate-800/80 bg-slate-900/70 p-4">
+                        <p className="text-xs text-slate-400">Decision Delta Panel</p>
+                        <p className="mt-2 text-base font-semibold text-slate-100">Risk {assessment.scores.riskAppetite}/100 · Tightness {assessment.scores.tightness}/100 · Curve {curveSlopeDisplay}</p>
+                        <p className="mt-2 text-sm text-slate-300">{weeklySummary.summary}</p>
+                      </div>
+                      <div className="mt-4 flex justify-end">
+                        <Dialog.Close className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">Close</Dialog.Close>
+                      </div>
+                    </Dialog.Popup>
+                  </Dialog.Portal>
+                </Dialog.Root>
+              </div>
+              <Tabs.Root value={stakeholderLens} onValueChange={setStakeholderLens} className="weather-surface weather-surface-sky rounded-xl p-4">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Stakeholder lenses</p>
+                <Tabs.List className="mt-3 flex flex-wrap gap-2">
+                  {[
+                    { value: "product", label: "Product" },
+                    { value: "gtm", label: "GTM" },
+                    { value: "finance", label: "Finance" },
+                    { value: "people", label: "People" },
+                  ].map((tab) => (
+                    <Tabs.Tab
+                      key={tab.value}
+                      value={tab.value}
+                      className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 data-[selected]:border-sky-300/80 data-[selected]:text-slate-50 touch-manipulation"
+                    >
+                      {tab.label}
+                    </Tabs.Tab>
+                  ))}
+                </Tabs.List>
+                {(Object.keys(lensMandates) as Array<keyof typeof lensMandates>).map((lens) => (
+                  <Tabs.Panel key={lens} value={lens} className="mt-3">
+                    <ul className="space-y-2 text-sm text-slate-200">
+                      {lensMandates[lens].map((mandate) => (
+                        <li key={`${lens}-${mandate}`} className="flex gap-2">
+                          <span className="text-slate-500">•</span>
+                          <span>{selectedProfileGuidance.lensPrefix}: {mandate}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </Tabs.Panel>
+                ))}
+              </Tabs.Root>
               <div className="weather-surface weather-surface-indigo rounded-xl px-4 py-3">
                 <button
                   type="button"
