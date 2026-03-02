@@ -58,7 +58,7 @@ export const ReportShell = ({
   secondaryCta,
   exportCta = {
     href: "/operations#ops-export-briefs",
-    label: "Copy-ready leadership brief",
+    label: "Generate executive brief",
   },
   structuredData,
   historicalBanner,
@@ -476,13 +476,13 @@ export const ReportShell = ({
                       </p>
                     ) : null}
                     <p className="weather-surface inline-flex min-h-[44px] flex-wrap items-center gap-x-2 px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100">
-                      <span>{trustStatusTone === "stable" ? "Stable" : "Caution"}</span>
+                      <span>Posture {statusLabel}</span>
                       <span className="text-slate-400">·</span>
-                      <span>{trustStatusLabel}</span>
+                      <span>Confidence {trustStatusLabel}</span>
                       <span className="text-slate-400">·</span>
-                      <span>Signals {recordDateLabel}</span>
+                      <span>Updated {fetchedAtLabel}</span>
                       <span className="text-slate-400">·</span>
-                      <span>Refresh {fetchedAtLabel}</span>
+                      <span>Next refresh 15m cadence</span>
                     </p>
                     <p className="text-sm text-slate-200">{trustStatusAction}</p>
                     {showOfflineBadge ? (
