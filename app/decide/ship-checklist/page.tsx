@@ -4,6 +4,8 @@ import { loadReportData } from "../../../lib/report/reportData";
 import { buildPageMetadata } from "../../../lib/seo";
 import { scoreWhetherToShipChecklist, type ChecklistInput } from "../../../lib/whetherToShipChecklist";
 
+export const runtime = "edge";
+
 export const metadata: Metadata = buildPageMetadata({
   title: "Whether to ship checklist",
   description: "Quick go / wait / kill recommendation calibrated to the current macro regime.",
