@@ -285,6 +285,7 @@ export default async function HomePage({
     startItems,
     statusLabel,
     stopItems,
+    roleCopy,
     treasury,
     treasuryProvenance,
   } = await loadReportData(resolvedSearchParams);
@@ -407,7 +408,7 @@ export default async function HomePage({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Current Climate"
       currentPath="/"
-      pageSummary="Verdict and immediate decision call for this planning cycle."
+      pageSummary={roleCopy.home.pageSummary}
       primaryCta={{
         href: "/operations#ops-export-briefs",
         label: "Generate executive brief",
