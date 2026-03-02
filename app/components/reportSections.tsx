@@ -318,6 +318,35 @@ export const WeeklyActionSummaryPanel = ({
     { value: "hardware-growth-enterprise", label: "Hardware · Growth · Enterprise" },
   ] as const;
 
+  const profileGuidance = {
+    "saas-growth-plg": {
+      mandateLine: "Profile overlay: favor activation, retention, and payback-positive funnel improvements.",
+      doLine: "Bias for self-serve wins with measurable payback inside one to two quarters.",
+      avoidLine: "Avoid broad platform rewrites that slow near-term shipping velocity.",
+      lensPrefix: "PLG",
+    },
+    "fintech-a-enterprise": {
+      mandateLine: "Profile overlay: prioritize compliance, enterprise proof points, and procurement-ready packaging.",
+      doLine: "Bundle reliability and auditability upgrades with expansion requests.",
+      avoidLine: "Avoid growth motions that create regulatory or counterparty risk.",
+      lensPrefix: "Enterprise fintech",
+    },
+    "marketplace-seed-mixed": {
+      mandateLine: "Profile overlay: keep liquidity loops healthy and preserve two-sided trust metrics.",
+      doLine: "Stage supply and demand bets in small increments with explicit rollback triggers.",
+      avoidLine: "Avoid heavy fixed-cost GTM until marketplace liquidity stabilizes.",
+      lensPrefix: "Marketplace",
+    },
+    "hardware-growth-enterprise": {
+      mandateLine: "Profile overlay: protect cash conversion by gating inventory and long-cycle commitments.",
+      doLine: "Anchor roadmap to margin, fulfillment reliability, and contracted demand.",
+      avoidLine: "Avoid speculative capacity expansion before demand durability is proven.",
+      lensPrefix: "Hardware enterprise",
+    },
+  } as const;
+
+  const selectedProfileGuidance = profileGuidance[profile as keyof typeof profileGuidance] ?? profileGuidance["saas-growth-plg"];
+
   const lensMandates = {
     product: [
       "Sequence roadmap to protect reliability and retention before net-new expansion.",
@@ -375,6 +404,7 @@ export const WeeklyActionSummaryPanel = ({
                   <p className="text-xs font-semibold tracking-[0.18em] text-sky-200">Mandate</p>
                   <p className="mt-2 text-lg font-semibold text-slate-100">Operate in {regimeLabel} mode.</p>
                   <p className="mt-1 text-sm text-slate-200">{actionGuidance}</p>
+                  <p className="mt-2 text-xs text-slate-300">{selectedProfileGuidance.mandateLine}</p>
                   <div className="mt-4 grid gap-4 sm:grid-cols-2">
                     <div>
                       <p className="text-xs font-semibold tracking-[0.14em] text-emerald-200">DO</p>
@@ -382,6 +412,7 @@ export const WeeklyActionSummaryPanel = ({
                         {assessment.constraints.slice(0, 3).map((item) => (
                           <li key={`do-${item}`}>• {item}</li>
                         ))}
+                        <li key="do-profile">• {selectedProfileGuidance.doLine}</li>
                       </ul>
                     </div>
                     <div>
@@ -390,6 +421,7 @@ export const WeeklyActionSummaryPanel = ({
                         <li>• New fixed-cost commitments without ROI gates.</li>
                         <li>• Multi-quarter bets without milestone reversibility.</li>
                         <li>• Hiring expansion ahead of threshold confirmation.</li>
+                        <li>• {selectedProfileGuidance.avoidLine}</li>
                       </ul>
                     </div>
                   </div>
@@ -553,7 +585,7 @@ export const WeeklyActionSummaryPanel = ({
                       {lensMandates[lens].map((mandate) => (
                         <li key={`${lens}-${mandate}`} className="flex gap-2">
                           <span className="text-slate-500">•</span>
-                          <span>{mandate}</span>
+                          <span>{selectedProfileGuidance.lensPrefix}: {mandate}</span>
                         </li>
                       ))}
                     </ul>
