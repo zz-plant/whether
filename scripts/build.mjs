@@ -80,11 +80,16 @@ const shouldSkipNextOnPagesBuild =
   (skipNextOnPagesBuild || hasReusableBuildOutput || shouldAutoSkipInCi);
 
 const command = useNextOnPages ? "next-on-pages" : "next";
-const args = useNextOnPages
-  ? shouldSkipNextOnPagesBuild
-    ? ["--skip-build"]
-    : []
-  : ["build", "--webpack"];
+const disableWorkerMinification =
+  useNextOnPages && !isTruthyEnv(process.env.NEXT_ON_PAGES_ENABLE_WORKER_MINIFICATION);
+
+const nextOnPagesArgs = shouldSkipNextOnPagesBuild ? ["--skip-build"] : [];
+
+if (disableWorkerMinification) {
+  nextOnPagesArgs.push("--disable-worker-minification");
+}
+
+const args = useNextOnPages ? nextOnPagesArgs : ["build", "--webpack"];
 
 const result = spawnSync(command, args, {
   stdio: "inherit",
