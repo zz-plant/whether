@@ -69,6 +69,7 @@ export const ReportShell = ({
   roleSwitcher,
   decisionDiffs,
   nextStep,
+  nextRefreshLabel,
 }: {
   children: ReactNode;
   statusLabel: string;
@@ -124,7 +125,10 @@ export const ReportShell = ({
     tone?: "neutral" | "positive" | "warning";
   }>;
   nextStep?: { description: string; href: string };
+  nextRefreshLabel?: string;
 }) => {
+  const resolvedNextRefreshLabel =
+    nextRefreshLabel ?? (trustStatusTone === "historical" ? "Fixed historical snapshot" : "15m cadence");
   const contentSections = Children.toArray(children);
   const summaryLink = pageSummaryLink ? (
     <a
@@ -171,7 +175,7 @@ export const ReportShell = ({
           </div>
           <div className="flex items-center justify-between gap-3">
             <dt className="text-slate-400">Next refresh</dt>
-            <dd className="text-slate-200">15m cadence</dd>
+            <dd className="text-slate-200">{resolvedNextRefreshLabel}</dd>
           </div>
           <div className="flex items-center justify-between gap-3">
             <dt className="text-slate-400">Source</dt>
@@ -482,7 +486,7 @@ export const ReportShell = ({
                       <span className="text-slate-400">·</span>
                       <span>Updated {fetchedAtLabel}</span>
                       <span className="text-slate-400">·</span>
-                      <span>Next refresh 15m cadence</span>
+                      <span>Next refresh {resolvedNextRefreshLabel}</span>
                     </p>
                     <p className="text-sm text-slate-200">{trustStatusAction}</p>
                     {showOfflineBadge ? (
