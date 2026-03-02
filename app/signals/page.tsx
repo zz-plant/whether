@@ -153,6 +153,9 @@ export default async function SignalsPage({
       "Hold major decisions until live signals return or you validate the cache.",
     stableAction: "Signals are live with current thresholds and timestamps.",
   });
+  const nextRefreshLabel = historicalSelection
+    ? "Fixed historical snapshot"
+    : "15m cadence";
   const showAdvanced = resolvedSearchParams?.advanced === "1";
   const timeMachineHref = showAdvanced ? "#time-machine" : "#advanced-controls";
   const regimeTimelineHref = showAdvanced ? "#regime-timeline" : "#advanced-controls";
@@ -354,7 +357,7 @@ export default async function SignalsPage({
           </div>
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-200">Next refresh</p>
-            <p className="mt-1 text-sm font-semibold text-slate-100">15m cadence</p>
+            <p className="mt-1 text-sm font-semibold text-slate-100">{nextRefreshLabel}</p>
           </div>
         </div>
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]">
