@@ -3,6 +3,10 @@ import { SectionedReportPanel } from "./components/sectionedReportPanel";
 import { loadReportData } from "../../lib/report/reportData";
 import { siteUrl } from "../../lib/siteUrl";
 import { buildPageMetadata } from "../../lib/seo";
+import {
+  buildTimeMachineHref,
+  getAdjacentTimeMachineRequest,
+} from "../../lib/timeMachine/timeMachineSelection";
 import { ReportShell } from "../components/reportShell";
 import {
   FinanceStrategyPanel,
@@ -81,6 +85,15 @@ export default async function OperationsPage({
     treasury,
     treasuryProvenance,
   } = await loadReportData(resolvedSearchParams);
+  const previousHistoricalSelection = historicalSelection
+    ? getAdjacentTimeMachineRequest(historicalSelection, "previous")
+    : null;
+  const previousHistoricalHref = previousHistoricalSelection
+    ? buildTimeMachineHref("/operations", previousHistoricalSelection)
+    : undefined;
+  const historicalTimeMachineHref = historicalSelection
+    ? buildTimeMachineHref("/signals?advanced=1#time-machine", historicalSelection)
+    : "/signals?advanced=1#time-machine";
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
   const trustStatusLabel = historicalSelection
     ? "Historical snapshot"
@@ -164,6 +177,8 @@ export default async function OperationsPage({
           <HistoricalBanner
             banner={historicalSelection.banner}
             liveHref="/operations"
+            previousHref={previousHistoricalHref}
+            timeMachineHref={historicalTimeMachineHref}
           />
         ) : null
       }

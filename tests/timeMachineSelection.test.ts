@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   buildTimeMachineHref,
+  getAdjacentTimeMachineRequest,
   parseTimeMachineRequest,
 } from "../lib/timeMachine/timeMachineSelection";
 
@@ -35,4 +36,9 @@ describe("time machine selection helpers", () => {
       "/operations/plan?tab=checklist&month=7&year=2025#ops-playbook"
     );
   });
+
+  it("returns null when no older snapshot exists", () => {
+    assert.equal(getAdjacentTimeMachineRequest({ month: 10, year: 2024 }, "previous"), null);
+  });
+
 });

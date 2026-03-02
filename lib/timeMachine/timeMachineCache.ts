@@ -74,6 +74,15 @@ const timeMachineEntryKeys = new Set(
   sortedSnapshots.map((snapshot) => `${snapshot.year}-${snapshot.month}`)
 );
 
+const timeMachineEntries = sortedSnapshots.map((snapshot) => ({
+  year: snapshot.year,
+  month: snapshot.month,
+}));
+
+const timeMachineEntryIndex = new Map(
+  timeMachineEntries.map((entry, index) => [`${entry.year}-${entry.month}`, index])
+);
+
 const timeMachineCoverage = (() => {
   const earliest = sortedSnapshots[0];
   const latest = sortedSnapshots.at(-1);
@@ -119,6 +128,24 @@ export const getTimeMachineMonthsByYear = () => {
 
 export const hasTimeMachineEntry = (year: number, month: number) => {
   return timeMachineEntryKeys.has(`${year}-${month}`);
+};
+
+export const getAdjacentTimeMachineEntry = (
+  year: number,
+  month: number,
+  direction: "previous" | "next"
+) => {
+  const index = timeMachineEntryIndex.get(`${year}-${month}`);
+  if (index === undefined) {
+    return null;
+  }
+
+  const adjacentIndex = direction === "previous" ? index - 1 : index + 1;
+  if (adjacentIndex < 0 || adjacentIndex >= timeMachineEntries.length) {
+    return null;
+  }
+
+  return timeMachineEntries[adjacentIndex] ?? null;
 };
 
 export const getLatestTimeMachineSnapshot = () => {

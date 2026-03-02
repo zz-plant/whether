@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import {
-  resolveTimeMachineSelection,
+  buildTimeMachineHref,
+  getAdjacentTimeMachineRequest,
   parseTimeMachineRequest,
+  resolveTimeMachineSelection,
 } from "../lib/timeMachine/timeMachineSelection";
 import { loadReportData } from "../lib/report/reportData";
 import { siteUrl } from "../lib/siteUrl";
@@ -286,6 +288,15 @@ export default async function HomePage({
     treasury,
     treasuryProvenance,
   } = await loadReportData(resolvedSearchParams);
+  const previousHistoricalSelection = historicalSelection
+    ? getAdjacentTimeMachineRequest(historicalSelection, "previous")
+    : null;
+  const previousHistoricalHref = previousHistoricalSelection
+    ? buildTimeMachineHref("/", previousHistoricalSelection)
+    : undefined;
+  const historicalTimeMachineHref = historicalSelection
+    ? buildTimeMachineHref("/signals?advanced=1#time-machine", historicalSelection)
+    : "/signals?advanced=1#time-machine";
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
   const {
     trustStatusLabel,
@@ -413,7 +424,12 @@ export default async function HomePage({
       structuredData={structuredData}
       historicalBanner={
         historicalSelection ? (
-          <HistoricalBanner banner={historicalSelection.banner} liveHref="/" />
+          <HistoricalBanner
+            banner={historicalSelection.banner}
+            liveHref="/"
+            previousHref={previousHistoricalHref}
+            timeMachineHref={historicalTimeMachineHref}
+          />
         ) : null
       }
     >
