@@ -180,14 +180,17 @@ const roleLensCopyMap: Record<RoleLensKey, RoleLensCopy> = {
   },
 };
 
-export const parseRoleLens = (searchParams?: Record<string, string | undefined>): RoleLensKey => {
+export const parseRoleLens = (
+  searchParams?: Record<string, string | string[] | undefined>
+): RoleLensKey => {
   const candidate = searchParams?.[ROLE_LENS_PARAM_KEY];
+  const normalizedCandidate = Array.isArray(candidate) ? candidate[0] : candidate;
 
-  if (!candidate) {
+  if (!normalizedCandidate || typeof normalizedCandidate !== "string") {
     return defaultRoleLens;
   }
 
-  const normalized = candidate.toLowerCase();
+  const normalized = normalizedCandidate.toLowerCase();
   if (roleLensOptions.some((lens) => lens.key === normalized)) {
     return normalized as RoleLensKey;
   }

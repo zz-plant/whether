@@ -29,7 +29,7 @@ import { getRoleLensCopy, parseRoleLens } from "./roleLens";
 export type ReportSearchParams = {
   month?: string;
   year?: string;
-  [key: string]: string | undefined;
+  [key: string]: string | string[] | undefined;
 };
 
 export type LastYearComparison = {
