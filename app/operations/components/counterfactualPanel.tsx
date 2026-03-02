@@ -16,6 +16,7 @@ import {
   type RegimeAssessment,
 } from "../../../lib/regimeEngine";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
+import { SectionPanelHeader } from "../../components/sectionPanelHeader";
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
@@ -142,30 +143,31 @@ export const CounterfactualPanel = ({
   return (
     <section id="counterfactuals" aria-labelledby="counterfactuals-title" className="mt-10">
       <div className="weather-panel p-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="type-label text-slate-400">Counterfactual view</p>
-            <h3 id="counterfactuals-title" className="type-section text-slate-100">
-              Test narratives before committing to them
-            </h3>
-            <p className="mt-2 type-data text-slate-300">
+        <SectionPanelHeader
+          label="Counterfactual view"
+          title="Test narratives before committing to them"
+          titleId="counterfactuals-title"
+          description={
+            <>
               Adjust the base rate and curve slope to preview how the regime and constraints would
               respond.
-            </p>
-          </div>
-          <div className="flex flex-col items-end gap-2">
-            <span
-              className={`weather-chip rounded-full border px-2 py-1 text-[10px] font-semibold tracking-[0.18em] ${
-                hasScenarioShift
-                  ? "border-amber-500/60 text-amber-200"
-                  : "border-slate-700 text-slate-300"
-              }`}
-            >
-              {hasScenarioShift ? "SIMULATED" : "BASELINE"}
-            </span>
-            <DataProvenanceStrip provenance={provenance} />
-          </div>
-        </div>
+            </>
+          }
+          aside={
+            <>
+              <span
+                className={`weather-chip rounded-full border px-2 py-1 text-[10px] font-semibold tracking-[0.18em] ${
+                  hasScenarioShift
+                    ? "border-amber-500/60 text-amber-200"
+                    : "border-slate-700 text-slate-300"
+                }`}
+              >
+                {hasScenarioShift ? "SIMULATED" : "BASELINE"}
+              </span>
+              <DataProvenanceStrip provenance={provenance} />
+            </>
+          }
+        />
         {hasScenarioShift ? (
           <div className="mt-4 rounded-2xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-200">
@@ -183,7 +185,7 @@ export const CounterfactualPanel = ({
             <p className="type-label text-slate-400">Scenario sliders</p>
             <div className="mt-4 space-y-5">
               <div>
-                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                <p className="type-kicker">
                   Base rate shift (bps)
                 </p>
                 <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -229,7 +231,7 @@ export const CounterfactualPanel = ({
                 </p>
               </div>
               <div>
-                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                <p className="type-kicker">
                   Curve slope shift (bps)
                 </p>
                 <div className="mt-3 flex flex-wrap items-center gap-3">

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { buildPageMetadata } from "../../lib/seo";
+import { LegalPageShell } from "../components/legalPageShell";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Acceptable Use Policy — Whether",
@@ -11,17 +12,7 @@ export const metadata: Metadata = buildPageMetadata({
 
 export default function AcceptableUsePolicyPage() {
   return (
-    <main className="min-h-screen bg-slate-950 px-6 py-12 text-slate-100">
-      <div className="mx-auto max-w-4xl space-y-8">
-        <header className="space-y-3 border-b border-slate-800/80 pb-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-300">
-            Whether Legal
-          </p>
-          <h1 className="text-3xl font-semibold tracking-tight text-slate-50 sm:text-4xl">
-            Acceptable Use Policy
-          </h1>
-          <p className="text-sm text-slate-300">Effective Date: 2/23/2026</p>
-        </header>
+    <LegalPageShell title="Acceptable Use Policy">
 
         <section className="space-y-4 text-sm leading-7 text-slate-200 sm:text-base">
           <p>
@@ -167,7 +158,6 @@ export default function AcceptableUsePolicyPage() {
             the governing agreement controls.
           </p>
         </section>
-      </div>
-    </main>
+    </LegalPageShell>
   );
 }

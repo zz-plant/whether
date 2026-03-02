@@ -14,6 +14,7 @@ import type { Route } from "next";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
+import { SectionPanelHeader } from "../../components/sectionPanelHeader";
 import type { RegimeKey } from "../../../lib/regimeEngine";
 import type { SummaryArchiveEntry } from "../../../lib/summary/summaryArchive";
 import { MonthlySummaryCard } from "../../components/monthlySummaryCard";
@@ -388,29 +389,30 @@ export const TimeMachinePanel = ({
   return (
     <section id="time-machine" aria-labelledby="time-machine-title" className="mt-10">
       <div className="weather-panel p-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="type-label text-slate-400">Time Machine</p>
-            <h3 id="time-machine-title" className="type-section text-slate-100">
-              Replay a prior market climate
-            </h3>
-            <p className="mt-2 type-data text-slate-300">
+        <SectionPanelHeader
+          label="Time Machine"
+          title="Replay a prior market climate"
+          titleId="time-machine-title"
+          description={
+            <>
               Pull the latest available Treasury record on or before a chosen month to see the
               historical climate read.
-            </p>
-          </div>
-          <div className="flex flex-col items-end gap-3">
-            {isHistorical ? (
-              <Link
-                href="/"
-                className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
-              >
-                Exit historical view
-              </Link>
-            ) : null}
-            <DataProvenanceStrip provenance={provenance} />
-          </div>
-        </div>
+            </>
+          }
+          aside={
+            <>
+              {isHistorical ? (
+                <Link
+                  href="/"
+                  className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                >
+                  Exit historical view
+                </Link>
+              ) : null}
+              <DataProvenanceStrip provenance={provenance} />
+            </>
+          }
+        />
 
         <div className="mt-6 grid gap-4 lg:grid-cols-[1.2fr,1fr]">
           <div className="weather-surface p-4">
@@ -493,14 +495,14 @@ export const TimeMachinePanel = ({
             </div>
             <div className="mt-3 grid gap-3 md:grid-cols-2">
               <div className="weather-surface rounded-lg p-3">
-                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Market climate</p>
+                <p className="type-kicker">Market climate</p>
                 <p className="mt-2 text-sm text-slate-100">
                   {comparison.then.regime.toLowerCase()} →{" "}
                   {comparison.now.regime.toLowerCase()}
                 </p>
               </div>
               <div className="weather-surface rounded-lg p-3">
-                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Base rate</p>
+                <p className="type-kicker">Base rate</p>
                 <p className="mt-2 text-sm text-slate-100">
                   {formatPercent(comparison.then.baseRate)} →{" "}
                   {formatPercent(comparison.now.baseRate)} (
@@ -513,7 +515,7 @@ export const TimeMachinePanel = ({
                 </p>
               </div>
               <div className="weather-surface rounded-lg p-3">
-                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Curve slope</p>
+                <p className="type-kicker">Curve slope</p>
                 <p className="mt-2 text-sm text-slate-100">
                   {formatCurve(comparison.then.curveSlope)} →{" "}
                   {formatCurve(comparison.now.curveSlope)}
@@ -523,7 +525,7 @@ export const TimeMachinePanel = ({
                 </p>
               </div>
               <div className="weather-surface rounded-lg p-3">
-                <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+                <p className="type-kicker">
                   Tightness vs risk
                 </p>
                 <p className="mt-2 text-sm text-slate-100">

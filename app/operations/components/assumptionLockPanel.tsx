@@ -9,6 +9,7 @@ import { Select } from "@base-ui/react/select";
 import type { Route } from "next";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { formatDateUTC } from "../../../lib/formatters";
+import { SectionPanelHeader } from "../../components/sectionPanelHeader";
 
 type AssumptionOption<T extends string> = {
   value: T;
@@ -235,22 +236,27 @@ export const AssumptionLockPanel = () => {
   return (
     <section id="assumption-locking" aria-labelledby="assumption-locking-title" className="mt-10">
       <div className="weather-panel p-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="min-w-0">
-            <p className="type-label text-slate-400">Assumption locking</p>
-            <h3 id="assumption-locking-title" className="type-section text-slate-100">
-              Freeze the posture your team is operating under
-            </h3>
-            <p className="mt-2 type-data text-slate-300">
+        <SectionPanelHeader
+          label="Assumption locking"
+          title="Freeze the posture your team is operating under"
+          titleId="assumption-locking-title"
+          description={
+            <>
               Lock the posture assumptions to keep debate explicit and prevent silent drift between
               teams.
-            </p>
-          </div>
-          <div className="flex flex-col items-end gap-2 text-right text-xs text-slate-400">
-            <p>Risk posture, threshold tolerance, and stance are stored in the URL.</p>
-            <p>Use the banner to confirm the lock during reviews.</p>
-          </div>
-        </div>
+            </>
+          }
+          aside={
+            <>
+              <p className="text-right text-xs text-slate-400">
+                Risk posture, threshold tolerance, and stance are stored in the URL.
+              </p>
+              <p className="text-right text-xs text-slate-400">
+                Use the banner to confirm the lock during reviews.
+              </p>
+            </>
+          }
+        />
 
         {lockedBanner ? (
           <div className="mt-4 rounded-2xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">
