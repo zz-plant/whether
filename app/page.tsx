@@ -25,6 +25,7 @@ import { ReportShell } from "./components/reportShell";
 import { reportPageLinks } from "../lib/report/reportNavigation";
 import { buildTrustStatus } from "../lib/report/trustStatus";
 import { WeeklyDecisionCard } from "./components/weeklyDecisionCard";
+import { RegimeAlertCenterRail } from "./components/regimeAlertCenterRail";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -446,6 +447,9 @@ export default async function HomePage({
         fetchedAtLabel={fetchedAtLabel}
       />
 
+      <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
+        <div className="space-y-8">
+
       <section
         aria-labelledby="decision-surface-title"
         className="weather-panel space-y-6 px-5 py-6 sm:px-7 sm:py-8"
@@ -561,6 +565,12 @@ export default async function HomePage({
           provenance={treasuryProvenance}
         />
       </section>
+        </div>
+
+        <div className="xl:sticky xl:top-24">
+          <RegimeAlertCenterRail />
+        </div>
+      </div>
     </ReportShell>
   );
 }
