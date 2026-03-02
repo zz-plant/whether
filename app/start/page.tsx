@@ -6,7 +6,7 @@ import { postureDefinitions, situationRouting, startSituations, toolkitDefinitio
 export const metadata: Metadata = buildPageMetadata({
   title: "Start Here — Whether onboarding",
   description:
-    "Learn the posture → instrument loop: pick posture, pick situation, then run the right toolkit.",
+    "Command Center for the weekly operating sequence: confirm posture, choose your situation, and run one toolkit.",
   path: "/start",
   imageAlt: "Whether Start Here",
 });
@@ -21,10 +21,10 @@ export default function StartHerePage() {
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
       <section className="weather-panel space-y-4 px-6 py-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Onboarding overview</p>
-        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Posture, situation, and toolkit at a glance.</h1>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Command center</p>
+        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Run this week&apos;s operating sequence.</h1>
         <p className="text-base text-slate-200">
-          Start with your current posture, choose the situation you need to solve, then run one toolkit end-to-end. Example journey: <span className="font-semibold">Safety Mode → Hiring → Commitment &amp; Rollback Toolkit</span>.
+          Use this page when you need a single path: confirm posture, choose the situation to solve now, then run one toolkit end-to-end. Example journey: <span className="font-semibold">Safety Mode → Hiring → Commitment &amp; Rollback Toolkit</span>.
         </p>
         <div className="grid gap-3 rounded-2xl border border-slate-700/85 bg-slate-950/55 p-3 sm:grid-cols-3">
           {onboardingSteps.map((step, index) => (
@@ -48,7 +48,7 @@ export default function StartHerePage() {
         </div>
         <div className="flex flex-wrap gap-3">
           <Link href="/operations/plan" className="weather-button-primary inline-flex items-center justify-center">Run weekly operating sequence</Link>
-          <Link href="/briefing" className="weather-button inline-flex items-center justify-center">Generate leadership brief</Link>
+          <Link href="/decide" className="weather-button inline-flex items-center justify-center">Need role-specific guidance?</Link>
         </div>
       </section>
 
