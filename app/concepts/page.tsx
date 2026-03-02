@@ -4,7 +4,11 @@ import { buildCanonicalUrl, buildPageMetadata, serializeJsonLd } from "../../lib
 import {
   conceptAudiences,
   conceptFocuses,
+  getConstraintRegimeLabel,
   getMacroContextForArticle,
+  getMacroInstrumentReadout,
+  getConceptVolatility,
+  getOperatingLensLabel,
   productConceptArticles,
   productConceptEras,
   regimeToneByKey,
@@ -54,6 +58,16 @@ const eraIntro: Record<(typeof productConceptEras)[number], string> = {
     "Pieces focused on translating strategy into execution inside real organizational constraints.",
 };
 
+const whySpreadByEra: Record<(typeof productConceptEras)[number], string> = {
+  "Foundational classics": "Role scope was still fluid, so teams needed shared PM definitions to coordinate execution.",
+  "Process & strategy shifters": "Coordination load rose with scale, making output-heavy planning too expensive to sustain.",
+  "Modern AI era": "Assumption half-lives shortened and model risk increased, so principle-led operating systems outpaced static roadmaps.",
+  "Career & identity frameworks": "PM orgs matured and required explicit ladders, hiring signals, and role boundaries across levels.",
+  "Behavioral psychology & user growth": "Acquisition got pricier, so retention and behavior design became a higher-leverage growth system.",
+  "Tactical masterclasses": "Execution pressure stayed high, so teams adopted reusable playbooks for PMF and decision quality.",
+  "Institutional friction": "Cross-functional complexity increased, forcing clearer mechanisms for turning strategy into shipped outcomes.",
+};
+
 const toEraId = (era: (typeof productConceptEras)[number]) =>
   era.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
@@ -63,13 +77,14 @@ type ProductConceptTimelinePageProps = {
     era?: string;
     audience?: string;
     regime?: string;
+    volatility?: string;
   }>;
 };
 
 export default async function ProductConceptTimelinePage({
   searchParams,
 }: ProductConceptTimelinePageProps) {
-  const { q = "", era = "all", audience = "all", regime = "all" } = await searchParams;
+  const { q = "", era = "all", audience = "all", regime = "all", volatility = "all" } = await searchParams;
 
   const searchQuery = q.trim().toLowerCase();
   const currentRegime = getCurrentRegimeContext();
@@ -91,11 +106,35 @@ export default async function ProductConceptTimelinePage({
     const matchesAudience = audience === "all" || article.audience === audience;
     const matchesRegime =
       regime === "all" || articleMacroContext?.primary.summary.regimeLabel === regime;
+    const articleVolatility = getConceptVolatility(article);
+    const matchesVolatility = volatility === "all" || articleVolatility === volatility;
 
-    return matchesSearch && matchesEra && matchesAudience && matchesRegime;
+    return matchesSearch && matchesEra && matchesAudience && matchesRegime && matchesVolatility;
   });
 
   const totalMatches = filteredArticles.length;
+
+  const canonicalDistribution = productConceptArticles.reduce(
+    (acc, article) => {
+      const macroContext = getMacroContextForArticle(article);
+      if (!macroContext) {
+        return acc;
+      }
+
+      acc.total += 1;
+      acc.byRegime[macroContext.primary.summary.regime] += 1;
+      return acc;
+    },
+    {
+      total: 0,
+      byRegime: {
+        SCARCITY: 0,
+        DEFENSIVE: 0,
+        VOLATILE: 0,
+        EXPANSION: 0,
+      },
+    },
+  );
 
 
   const conceptCollectionStructuredData = {
@@ -146,9 +185,28 @@ export default async function ProductConceptTimelinePage({
         ) : null}
       </section>
 
+      <section className="weather-panel space-y-3 px-6 py-5">
+        <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-300">Canon distribution by regime</h2>
+        <div className="grid gap-2 text-sm text-slate-200 sm:grid-cols-2">
+          {(["EXPANSION", "VOLATILE", "DEFENSIVE", "SCARCITY"] as const).map((regimeKey) => {
+            const count = canonicalDistribution.byRegime[regimeKey];
+            const share = canonicalDistribution.total > 0 ? Math.round((count / canonicalDistribution.total) * 100) : 0;
+
+            return (
+              <p key={regimeKey}>
+                {getConstraintRegimeLabel(regimeKey)}: {share}%
+              </p>
+            );
+          })}
+        </div>
+        <p className="text-xs text-slate-300">
+          Most PM frameworks in this canon emerged under looser-capital conditions, which can over-index the default playbook toward expansion assumptions.
+        </p>
+      </section>
+
       <section className="weather-panel space-y-4 px-6 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Find relevant concepts faster</h2>
-        <form className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" action="/concepts" method="get">
+        <form className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5" action="/concepts" method="get">
           <label className="space-y-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">
             Search
             <input
@@ -207,7 +265,20 @@ export default async function ProductConceptTimelinePage({
             </select>
           </label>
 
-          <div className="sm:col-span-2 lg:col-span-4 flex flex-wrap gap-3">
+          <label className="space-y-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">
+            Volatility lens
+            <select
+              name="volatility"
+              defaultValue={volatility}
+              className="weather-control rounded-md border-slate-700 bg-slate-900"
+            >
+              <option value="all">All volatility states</option>
+              <option value="stable">Stable assumptions</option>
+              <option value="volatile">Volatile assumptions</option>
+            </select>
+          </label>
+
+          <div className="sm:col-span-2 lg:col-span-5 flex flex-wrap gap-3">
             <button
               type="submit"
               className="weather-button-primary inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.12em]"
@@ -298,42 +369,42 @@ export default async function ProductConceptTimelinePage({
             <ol className="space-y-3">
               {articles.map((article) => {
                 const macroContext = getMacroContextForArticle(article);
+                const macroReadout = getMacroInstrumentReadout(article);
+                const volatilityClass = getConceptVolatility(article);
                 const publicationRegime = getConceptPublicationRegime(article);
                 const regimeStatus = getConceptRegimeStatus(article, currentRegime?.regime ?? null);
 
                 return (
                   <li key={article.slug} className="weather-surface space-y-3 px-4 py-4">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <p className="text-xs uppercase tracking-[0.15em] text-slate-400">
-                        {formatPublishedLabel(article.publishedYear, article.publishedMonth)}
-                      </p>
-                      {macroContext ? (
-                        <span
-                          className={`rounded-full border px-2 py-1 text-xs font-semibold ${regimeToneByKey[macroContext.primary.summary.regime]}`}
-                        >
-                          {macroContext.primary.summary.regimeLabel}
-                        </span>
+                    <div className="space-y-2">
+                      <h3 className="text-base font-semibold text-slate-100">{article.title}</h3>
+                      <p className="text-sm text-slate-300">{article.author} · {formatPublishedLabel(article.publishedYear, article.publishedMonth)}</p>
+                      {macroContext && macroReadout ? (
+                        <div className="flex flex-wrap gap-2">
+                          <span className="rounded-full border border-slate-500/70 bg-slate-800 px-2 py-1 text-xs font-semibold text-slate-200">Capital: {macroReadout.capital}</span>
+                          <span className="rounded-full border border-slate-500/70 bg-slate-800 px-2 py-1 text-xs font-semibold text-slate-200">Risk: {macroReadout.risk}</span>
+                          <span className="rounded-full border border-slate-500/70 bg-slate-800 px-2 py-1 text-xs font-semibold text-slate-200">Distance to boundary: {macroReadout.boundaryDistance}</span>
+                          <span className="rounded-full border border-violet-400/60 bg-violet-900/30 px-2 py-1 text-xs font-semibold text-violet-100">
+                            {volatilityClass === "volatile" ? "Assumption half-life: Short" : "Assumption half-life: Long"}
+                          </span>
+                          <span className="rounded-full border border-slate-500/70 bg-slate-800 px-2 py-1 text-xs font-semibold text-slate-200">
+                            {getOperatingLensLabel(macroContext.primary.summary.regime, volatilityClass)}
+                          </span>
+                        </div>
                       ) : (
                         <span className="rounded-full border border-slate-500/80 bg-slate-800 px-2 py-1 text-xs font-semibold text-slate-200">
                           Macro snapshot unavailable
                         </span>
                       )}
-                    </div>
-                    <div className="space-y-2">
-                      <h3 className="text-base font-semibold text-slate-100">{article.title}</h3>
-                      <p className="text-sm text-slate-300">
-                        {article.author} · Focus: {article.focus} · {article.sourceType} · ~
-                        {article.readMins} min read
-                      </p>
-                      <p className="text-sm text-slate-200">{article.summary}</p>
+                      <p className="text-sm text-slate-200">Why this idea spread: {whySpreadByEra[article.era]}</p>
                       {regimeStatus === "mismatch" && publicationRegime && currentRegime ? (
-                        <p className="rounded-md border border-amber-400/40 bg-amber-900/30 px-3 py-2 text-xs text-amber-100">
-                          Macro-mismatch warning: written for {publicationRegime.regimeLabel}, while the current regime is {currentRegime.regimeLabel}.
+                        <p className="rounded-md border border-amber-300/80 bg-amber-900/40 px-3 py-2 text-xs font-semibold text-amber-100">
+                          ⚠ Written for {getConstraintRegimeLabel(publicationRegime.regime)} conditions. You are currently in {getConstraintRegimeLabel(currentRegime.regime)}.
                         </p>
                       ) : null}
                       {macroContext ? (
                         <p className="text-xs text-slate-300">
-                          Guidance signal at publication: {macroContext.primary.summary.guidance}
+                          ↗ Publication guidance: {macroContext.primary.summary.guidance}
                         </p>
                       ) : (
                         <p className="text-xs text-slate-300">

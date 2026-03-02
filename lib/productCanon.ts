@@ -1,5 +1,6 @@
 import monthlySummaries from "../data/monthly_summaries_2012_2025.json";
 import type { RegimeKey } from "./regimeEngine";
+import { computeRiskAppetiteScore, computeTightnessScore, resolveThresholds } from "./regimeEngine";
 
 type MonthlySummaryEntry = {
   year: number;
@@ -526,4 +527,90 @@ export const getMacroContextForArticle = (article: ProductConceptArticle) => {
     primary: entry,
     surrounding: surroundingEntries,
   };
+};
+
+export type ConceptVolatility = "stable" | "volatile";
+
+export const getConceptVolatility = (article: ProductConceptArticle): ConceptVolatility => {
+  if (article.era === "Modern AI era") {
+    return "volatile";
+  }
+
+  return article.publishedYear >= 2023 ? "volatile" : "stable";
+};
+
+export const getOperatingLensLabel = (regime: RegimeKey, volatility: ConceptVolatility): string => {
+  switch (regime) {
+    case "SCARCITY":
+      return "Defend";
+    case "DEFENSIVE":
+      return "Conserve";
+    case "VOLATILE":
+      return "Guarded expand";
+    case "EXPANSION":
+      return volatility === "volatile" ? "Expand (volatile)" : "Expand (stable)";
+    default:
+      return regime;
+  }
+};
+
+type MacroSummaryInput = {
+  id: string;
+  value: number;
+};
+
+type MacroInstrumentReadout = {
+  capital: "Loose" | "Tight";
+  risk: "High" | "Low";
+  boundaryDistance: number | null;
+};
+
+const findNumericInput = (inputs: MonthlySummaryEntry["summary"]["inputs"], id: string): number | null => {
+  const input = inputs.find((candidate) => candidate.id === id) as MacroSummaryInput | undefined;
+  return typeof input?.value === "number" ? input.value : null;
+};
+
+export const getMacroInstrumentReadout = (article: ProductConceptArticle): MacroInstrumentReadout | null => {
+  const macroContext = getMacroContextForArticle(article);
+  if (!macroContext) {
+    return null;
+  }
+
+  const thresholds = resolveThresholds();
+  const baseRate = findNumericInput(macroContext.primary.summary.inputs, "base-rate");
+  const curveSlope = findNumericInput(macroContext.primary.summary.inputs, "curve-slope");
+
+  if (baseRate === null || curveSlope === null) {
+    return null;
+  }
+
+  const tightness = computeTightnessScore(baseRate, curveSlope, thresholds.baseRateTightness);
+  const riskAppetite = computeRiskAppetiteScore(curveSlope);
+  const boundaryDistance = Math.round(
+    Math.min(
+      Math.abs(tightness - thresholds.tightnessRegime),
+      Math.abs(riskAppetite - thresholds.riskAppetiteRegime),
+    ),
+  );
+
+  return {
+    capital: tightness > thresholds.tightnessRegime ? "Tight" : "Loose",
+    risk: riskAppetite > thresholds.riskAppetiteRegime ? "High" : "Low",
+    boundaryDistance,
+  };
+};
+
+export const getConstraintRegimeLabel = (regime: RegimeKey): string => {
+  switch (regime) {
+    case "SCARCITY":
+      return "Defend";
+    case "DEFENSIVE":
+      return "Conserve";
+    case "VOLATILE":
+      return "Guarded Expand";
+    case "EXPANSION":
+      return "Expansion";
+    default:
+      return regime;
+  }
 };
