@@ -80,7 +80,9 @@ export function GlobalHeader() {
 
     const params = new URLSearchParams(searchParams.toString());
     params.set(ROLE_LENS_PARAM_KEY, fallbackLens);
-    router.replace(`${pathname}?${params.toString()}` as Route, { scroll: false });
+    const hash = window.location.hash;
+    const nextHref = `${pathname}?${params.toString()}${hash}`;
+    router.replace(nextHref as Route, { scroll: false });
   }, [pathname, router, searchParams]);
 
   const toggleTheme = () => {
