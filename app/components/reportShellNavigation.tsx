@@ -40,6 +40,50 @@ const isLinkActiveForPath = (linkHref: string, currentPath?: string) => {
   return pathMatchesLink(linkHref, currentPath);
 };
 
+const basePageLinkClassName =
+  "weather-tab inline-flex min-h-[46px] w-full items-center justify-center rounded-xl border px-4 py-2 text-center text-sm font-semibold tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:px-4 sm:text-xs";
+
+const getPageLinkStateClassName = ({
+  isActive,
+  isCommandCenter,
+}: {
+  isActive: boolean;
+  isCommandCenter: boolean;
+}) => {
+  if (isActive) {
+    return "border-sky-300/90 bg-sky-500/25 text-sky-50 shadow-sm shadow-sky-900/40";
+  }
+
+  if (isCommandCenter) {
+    return "border-slate-600/90 bg-slate-900/70 text-slate-100 hover:border-sky-400/70 hover:text-slate-100";
+  }
+
+  return "border-slate-700/80 bg-slate-900/45 text-slate-200 hover:border-sky-400/70 hover:text-slate-100";
+};
+
+const getPageLinkClassName = ({
+  isActive,
+  isCommandCenter,
+  isOddTail,
+}: {
+  isActive: boolean;
+  isCommandCenter: boolean;
+  isOddTail?: boolean;
+}) =>
+  `${basePageLinkClassName} ${getPageLinkStateClassName({ isActive, isCommandCenter })} ${
+    isOddTail ? "mx-auto max-w-[240px]" : ""
+  }`;
+
+const isActivePageLink = ({
+  link,
+  currentPath,
+  pageTitle,
+}: {
+  link: ReportPageLink;
+  currentPath?: string;
+  pageTitle: string;
+}) => (currentPath ? isLinkActiveForPath(link.href, currentPath) : link.label === pageTitle);
+
 const pageLinkIcons: Record<string, ReactNode> = {
   "Command Center": (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
@@ -198,9 +242,7 @@ export const ReportPageNavigation = ({
       <div className="space-y-2">
         <NavigationMenu.List className="grid grid-cols-2 gap-2 rounded-2xl border border-slate-800/80 bg-slate-950/45 p-2 sm:flex sm:flex-wrap sm:gap-2">
           {visibleLinks.map((link, index) => {
-            const isActive = currentPath
-              ? isLinkActiveForPath(link.href, currentPath)
-              : link.label === pageTitle;
+            const isActive = isActivePageLink({ link, currentPath, pageTitle });
             const isOddTail =
               visibleLinks.length % 2 === 1 && index === visibleLinks.length - 1;
             return (
@@ -212,13 +254,11 @@ export const ReportPageNavigation = ({
                   href={link.href}
                   active={isActive}
                   aria-current={isActive ? "page" : undefined}
-                  className={`weather-tab inline-flex min-h-[46px] w-full items-center justify-center rounded-xl border px-4 py-2 text-center text-sm font-semibold tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:px-4 sm:text-xs ${
-                    isActive
-                      ? "border-sky-300/90 bg-sky-500/25 text-sky-50 shadow-sm shadow-sky-900/40"
-                  : link.label === "Command Center"
-                        ? "border-slate-600/90 bg-slate-900/70 text-slate-100 hover:border-sky-400/70 hover:text-slate-100"
-                        : "border-slate-700/80 bg-slate-900/45 text-slate-200 hover:border-sky-400/70 hover:text-slate-100"
-                  } ${isOddTail ? "mx-auto max-w-[240px]" : ""}`}
+                  className={getPageLinkClassName({
+                    isActive,
+                    isCommandCenter: link.label === "Command Center",
+                    isOddTail,
+                  })}
                 >
                   {link.label}
                 </NavigationMenu.Link>
@@ -250,20 +290,17 @@ export const ReportPageNavigation = ({
             <Collapsible.Panel className="pt-2">
               <NavigationMenu.List className="grid grid-cols-2 gap-2 rounded-2xl border border-slate-800/70 bg-slate-950/35 p-2 sm:flex sm:flex-wrap sm:gap-2">
                 {secondaryLinks.map((link) => {
-                  const isActive = currentPath
-                    ? isLinkActiveForPath(link.href, currentPath)
-                    : link.label === pageTitle;
+                  const isActive = isActivePageLink({ link, currentPath, pageTitle });
                   return (
                     <NavigationMenu.Item key={link.href} className="flex sm:flex-shrink-0">
                       <NavigationMenu.Link
                         href={link.href}
                         active={isActive}
                         aria-current={isActive ? "page" : undefined}
-                        className={`weather-tab inline-flex min-h-[46px] w-full items-center justify-center rounded-xl border px-4 py-2 text-center text-sm font-semibold tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:px-4 sm:text-xs ${
-                          isActive
-                            ? "border-sky-300/90 bg-sky-500/25 text-sky-50 shadow-sm shadow-sky-900/40"
-                            : "border-slate-700/80 bg-slate-900/45 text-slate-200 hover:border-sky-400/70 hover:text-slate-100"
-                        }`}
+                        className={getPageLinkClassName({
+                          isActive,
+                          isCommandCenter: false,
+                        })}
                       >
                         {link.label}
                       </NavigationMenu.Link>
