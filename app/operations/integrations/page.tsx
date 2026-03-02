@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { loadReportData } from "../../../lib/report/reportData";
 import { buildPageMetadata } from "../../../lib/seo";
-import { buildWeeklyMandatePayload, type IntegrationTarget } from "../../../lib/integrationBriefs";
+import { buildWeeklyMandatePayload, integrationTargets } from "../../../lib/integrationBriefs";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Planning integrations — Whether",
@@ -10,8 +10,6 @@ export const metadata: Metadata = buildPageMetadata({
   path: "/operations/integrations",
   imageAlt: "Planning integrations",
 });
-
-const targets: IntegrationTarget[] = ["slack", "notion", "linear"];
 
 export default async function OperationsIntegrationsPage() {
   const { assessment, treasury } = await loadReportData();
@@ -24,7 +22,7 @@ export default async function OperationsIntegrationsPage() {
       </section>
 
       <section className="grid gap-4 lg:grid-cols-3">
-        {targets.map((target) => (
+        {integrationTargets.map((target) => (
           <article key={target} className="weather-panel space-y-3 px-6 py-6">
             <h2 className="text-lg font-semibold text-slate-100 capitalize">{target}</h2>
             <p className="text-xs text-slate-300">Endpoint: <code>/api/integrations/weekly-mandate?target={target}</code></p>
@@ -33,6 +31,17 @@ export default async function OperationsIntegrationsPage() {
             </pre>
           </article>
         ))}
+      </section>
+
+      <section className="weather-panel space-y-3 px-6 py-6">
+        <h2 className="text-lg font-semibold text-slate-100">API usage</h2>
+        <pre className="overflow-x-auto rounded-lg border border-slate-700/70 bg-slate-950/60 p-3 text-xs text-slate-200">
+curl /api/integrations/weekly-mandate?target=slack
+
+curl /api/integrations/weekly-mandate?target=notion
+
+curl /api/integrations/weekly-mandate?target=linear
+        </pre>
       </section>
 
       <div className="flex flex-wrap gap-3">

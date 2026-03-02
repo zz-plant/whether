@@ -3,27 +3,70 @@ import type { TreasuryData } from "./types";
 
 export type IntegrationTarget = "slack" | "notion" | "linear";
 
+export const integrationTargets: IntegrationTarget[] = ["slack", "notion", "linear"];
+
+export const parseIntegrationTarget = (value: string | null): IntegrationTarget | null => {
+  if (!value) {
+    return null;
+  }
+  return integrationTargets.find((target) => target === value) ?? null;
+};
+
+export type WeeklyMandateEnvelope = {
+  title: string;
+  summary: string;
+  recordDate: string;
+  regime: RegimeAssessment["regime"];
+  markdown: string;
+  constraints: string[];
+};
+
+export const buildWeeklyMandateEnvelope = (
+  assessment: RegimeAssessment,
+  treasury: TreasuryData,
+): WeeklyMandateEnvelope => {
+  const title = `Whether weekly mandate — ${treasury.record_date}`;
+  const summary = `${assessment.regime}: Tightness ${assessment.scores.tightness}/100, Risk appetite ${assessment.scores.riskAppetite}/100.`;
+  const constraints = assessment.constraints.slice(0, 3);
+
+  return {
+    title,
+    summary,
+    recordDate: treasury.record_date,
+    regime: assessment.regime,
+    constraints,
+    markdown: [
+      `## ${title}`,
+      summary,
+      "",
+      "### Constraints",
+      ...constraints.map((item) => `- ${item}`),
+      "",
+      `Source: ${treasury.source}`,
+    ].join("\n"),
+  };
+};
+
 export const buildWeeklyMandatePayload = (
   target: IntegrationTarget,
   assessment: RegimeAssessment,
   treasury: TreasuryData,
 ) => {
-  const title = `Whether weekly mandate — ${treasury.record_date}`;
-  const summary = `${assessment.regime}: Tightness ${assessment.scores.tightness}/100, Risk appetite ${assessment.scores.riskAppetite}/100.`;
-  const constraints = assessment.constraints.slice(0, 3);
+  const envelope = buildWeeklyMandateEnvelope(assessment, treasury);
 
   if (target === "slack") {
     return {
       channel: "#planning",
-      text: `${title}\n${summary}`,
+      text: `${envelope.title}\n${envelope.summary}`,
       blocks: [
-        { type: "header", text: { type: "plain_text", text: title } },
-        { type: "section", text: { type: "mrkdwn", text: summary } },
+        { type: "header", text: { type: "plain_text", text: envelope.title } },
+        { type: "section", text: { type: "mrkdwn", text: envelope.summary } },
         {
           type: "section",
-          text: { type: "mrkdwn", text: constraints.map((item) => `• ${item}`).join("\n") },
+          text: { type: "mrkdwn", text: envelope.constraints.map((item) => `• ${item}`).join("\n") },
         },
       ],
+      metadata: envelope,
     };
   }
 
@@ -31,21 +74,24 @@ export const buildWeeklyMandatePayload = (
     return {
       parent: { type: "database_id", database_id: "weekly-mandates" },
       properties: {
-        Name: { title: [{ text: { content: title } }] },
+        Name: { title: [{ text: { content: envelope.title } }] },
         Regime: { select: { name: assessment.regime } },
-        Summary: { rich_text: [{ text: { content: summary } }] },
+        Summary: { rich_text: [{ text: { content: envelope.summary } }] },
+        RecordDate: { rich_text: [{ text: { content: envelope.recordDate } }] },
       },
-      children: constraints.map((item) => ({
+      children: envelope.constraints.map((item) => ({
         object: "block",
         type: "bulleted_list_item",
         bulleted_list_item: { rich_text: [{ type: "text", text: { content: item } }] },
       })),
+      metadata: envelope,
     };
   }
 
   return {
-    title,
-    description: [summary, "", ...constraints.map((item) => `- ${item}`)].join("\n"),
+    title: envelope.title,
+    description: envelope.markdown,
     labels: ["whether", assessment.regime.toLowerCase()],
+    metadata: envelope,
   };
 };

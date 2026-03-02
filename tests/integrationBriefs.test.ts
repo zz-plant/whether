@@ -1,6 +1,11 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { buildWeeklyMandatePayload } from "../lib/integrationBriefs";
+import {
+  buildWeeklyMandateEnvelope,
+  buildWeeklyMandatePayload,
+  integrationTargets,
+  parseIntegrationTarget,
+} from "../lib/integrationBriefs";
 import type { RegimeAssessment } from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
 
@@ -26,9 +31,22 @@ const treasury = {
 } as TreasuryData;
 
 describe("integration briefs", () => {
+  it("parses only supported targets", () => {
+    assert.equal(parseIntegrationTarget("slack"), "slack");
+    assert.equal(parseIntegrationTarget("foo"), null);
+    assert.deepEqual(integrationTargets, ["slack", "notion", "linear"]);
+  });
+
+  it("builds reusable envelope", () => {
+    const envelope = buildWeeklyMandateEnvelope(assessment, treasury);
+    assert.match(envelope.title, /weekly mandate/i);
+    assert.match(envelope.markdown, /## Whether weekly mandate/);
+  });
+
   it("builds slack payload", () => {
-    const payload = buildWeeklyMandatePayload("slack", assessment, treasury) as { text: string };
+    const payload = buildWeeklyMandatePayload("slack", assessment, treasury) as { text: string; metadata: { regime: string } };
     assert.match(payload.text, /Whether weekly mandate/);
+    assert.equal(payload.metadata.regime, "DEFENSIVE");
   });
 
   it("builds notion payload", () => {
