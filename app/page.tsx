@@ -409,12 +409,12 @@ export default async function HomePage({
       currentPath="/"
       pageSummary="Verdict and immediate decision call for this planning cycle."
       primaryCta={{
-        href: "#weekly-action-summary",
-        label: "Start weekly decision sequence",
+        href: "/operations#ops-export-briefs",
+        label: "Generate executive brief",
       }}
       secondaryCta={{
-        href: "/onboarding",
-        label: "Start onboarding (3 min)",
+        href: "#weekly-action-summary",
+        label: "Run weekly operating sequence",
       }}
       nextStep={{
         href: "/signals",

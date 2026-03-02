@@ -158,19 +158,19 @@ export const ReportShell = ({
       sourceDetails={
         <dl className="grid gap-2 text-xs text-slate-300">
           <div className="flex items-center justify-between gap-3">
-            <dt className="text-slate-400">Status</dt>
+            <dt className="text-slate-400">Posture</dt>
             <dd className="font-semibold text-slate-100">{statusLabel}</dd>
           </div>
           <div className="flex items-center justify-between gap-3">
-            <dt className="text-slate-400">Signals stamped</dt>
-            <dd className="text-slate-200">{recordDateLabel}</dd>
+            <dt className="text-slate-400">Confidence</dt>
+            <dd className="text-slate-200">{trustStatusLabel}</dd>
           </div>
           <div className="flex items-center justify-between gap-3">
-            <dt className="text-slate-400">Last refresh</dt>
+            <dt className="text-slate-400">Updated</dt>
             <dd className="text-slate-200">{fetchedAtLabel}</dd>
           </div>
           <div className="flex items-center justify-between gap-3">
-            <dt className="text-slate-400">Next expected update</dt>
+            <dt className="text-slate-400">Next refresh</dt>
             <dd className="text-slate-200">15m cadence</dd>
           </div>
           <div className="flex items-center justify-between gap-3">
