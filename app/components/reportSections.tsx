@@ -5,7 +5,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Accordion } from "@base-ui/react/accordion";
 import { Collapsible } from "@base-ui/react/collapsible";
 import { Dialog } from "@base-ui/react/dialog";
@@ -77,6 +77,7 @@ import {
   sortClimateKeys,
 } from "./reportSectionUtils";
 import { DataGauge } from "./dataGauge";
+import { useClipboardCopy, type ClipboardCopyState } from "./useClipboardCopy";
 
 type SeriesFreshnessProps = {
   label?: string;
@@ -326,6 +327,8 @@ export const WeeklyActionSummaryPanel = ({
   const playbookStorageKey = "whether-weekly-playbook-selections";
   const pinnedStorageKey = "whether-weekly-pinned-mandates";
   const { add } = Toast.useToastManager();
+  const { status: clipboardStatus, errorReason, copyToClipboard } = useClipboardCopy();
+  const lastClipboardStatusRef = useRef<ClipboardCopyState["status"]>("idle");
 
   const profileOptions = [
     { value: "saas-growth-plg", label: "SaaS · Growth · PLG" },
@@ -428,6 +431,22 @@ export const WeeklyActionSummaryPanel = ({
   }, [pinnedMandates, pinnedStorageKey]);
 
   useEffect(() => {
+    if (clipboardStatus === lastClipboardStatusRef.current) {
+      return;
+    }
+    if (clipboardStatus === "copied") {
+      add({ title: "Copied", description: "Copied to clipboard." });
+    }
+    if (clipboardStatus === "error") {
+      add({
+        title: errorReason === "unavailable" ? "Clipboard blocked" : "Copy failed",
+        description: "Use manual copy in your browser.",
+      });
+    }
+    lastClipboardStatusRef.current = clipboardStatus;
+  }, [add, clipboardStatus, errorReason]);
+
+  useEffect(() => {
     if (!weeklySummary.transitionWatch) {
       return;
     }
@@ -526,12 +545,7 @@ export const WeeklyActionSummaryPanel = ({
       : null;
 
   const copyText = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      add({ title: "Copied", description: "Copied to clipboard." });
-    } catch {
-      add({ title: "Clipboard blocked", description: "Use manual copy in your browser." });
-    }
+    await copyToClipboard(text);
   };
 
   const togglePin = (mandate: string) => {

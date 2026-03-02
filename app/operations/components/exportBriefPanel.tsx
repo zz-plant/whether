@@ -240,10 +240,9 @@ export const ExportBriefPanel = ({
   provenance: DataProvenance;
   showProvenance?: boolean;
 }) => {
-  const { status, error, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy();
+  const { status, error, errorReason, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy();
   const lastStatusRef = useRef<ClipboardCopyState["status"]>("idle");
   const lastLabelRef = useRef<string | null>(null);
-  const blockedRef = useRef(false);
   const { add } = Toast.useToastManager();
   const isCopying = status === "copying";
   const copyError = error;
@@ -258,20 +257,18 @@ export const ExportBriefPanel = ({
         description: `${copiedTarget} is ready to paste.`,
         type: "success",
       });
-      blockedRef.current = false;
     }
     if (status === "error") {
       const label = lastLabelRef.current ?? "brief";
-      const isBlocked = blockedRef.current;
+      const isBlocked = errorReason === "unavailable";
       add({
         title: isBlocked ? "Clipboard blocked" : "Copy failed",
         description: `Copy the ${label.toLowerCase()} manually.`,
         type: "error",
       });
-      blockedRef.current = false;
     }
     lastStatusRef.current = status;
-  }, [add, copiedTarget, status]);
+  }, [add, copiedTarget, errorReason, status]);
 
   const briefing = useMemo(
     () => buildBrief(assessment, treasury, sensors, macroSeries),
@@ -318,7 +315,6 @@ export const ExportBriefPanel = ({
       return;
     }
     lastLabelRef.current = label;
-    blockedRef.current = !navigator.clipboard?.writeText;
     await copyToClipboard(text, label);
   };
 

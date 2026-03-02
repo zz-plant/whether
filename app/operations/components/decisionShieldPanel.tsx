@@ -21,6 +21,7 @@ import {
 } from "../../../lib/decisionShield";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
+import { useClipboardCopy, type ClipboardCopyState } from "../../components/useClipboardCopy";
 import { createClientId } from "./clientId";
 import {
   actionOptions,
@@ -42,11 +43,6 @@ export const DecisionShieldPanel = ({
   const [lifecycle, setLifecycle] = useState<LifecycleStage>("GROWTH");
   const [category, setCategory] = useState<DecisionCategory>("HIRING");
   const [action, setAction] = useState<DecisionAction>("HIRE");
-  const [copied, setCopied] = useState(false);
-  const [isCopying, setIsCopying] = useState(false);
-  const [copyError, setCopyError] = useState(false);
-  const [linkCopied, setLinkCopied] = useState(false);
-  const [linkCopyError, setLinkCopyError] = useState(false);
   const [presets, setPresets] = useState<
     Array<{
       id: string;
@@ -70,6 +66,9 @@ export const DecisionShieldPanel = ({
   const searchParams = useSearchParams();
   const restoredFromStorage = useRef(false);
   const presetInputRef = useRef<HTMLInputElement | null>(null);
+  const { status, error, errorReason, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy();
+  const lastClipboardStatusRef = useRef<ClipboardCopyState["status"]>("idle");
+  const lastAttemptedTargetRef = useRef<"verdict" | "link" | null>(null);
 
   const clientId = useMemo(() => createClientId(), []);
 
@@ -210,12 +209,6 @@ export const DecisionShieldPanel = ({
   }, [action, category, lifecycle, pathname, router, searchParams]);
 
   useEffect(() => {
-    setCopyError(false);
-    setLinkCopyError(false);
-    setLinkCopied(false);
-  }, [lifecycle, category, action]);
-
-  useEffect(() => {
     if (!presetStatus) {
       return;
     }
@@ -268,81 +261,22 @@ export const DecisionShieldPanel = ({
   };
 
   const handleCopy = async () => {
-    if (isCopying) {
+    if (status === "copying") {
       return;
     }
-    if (!navigator.clipboard?.writeText) {
-      setCopyError(true);
-      setCopied(false);
-      add({
-        title: "Clipboard blocked",
-        description: "Select the verdict text to share it manually.",
-        type: "error",
-      });
-      return;
-    }
-    setIsCopying(true);
-    try {
-      await navigator.clipboard.writeText(shareText);
-      setCopied(true);
-      setCopyError(false);
-      add({
-        title: "Decision Shield copied",
-        description: "The verdict is ready to paste.",
-        type: "success",
-      });
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      setCopied(false);
-      setCopyError(true);
-      add({
-        title: "Copy failed",
-        description: "Clipboard access failed. Try copying manually.",
-        type: "error",
-      });
-    } finally {
-      setIsCopying(false);
-    }
+    lastAttemptedTargetRef.current = "verdict";
+    await copyToClipboard(shareText, "verdict");
   };
 
   const handleCopyLink = async () => {
-    if (isCopying) {
+    if (status === "copying") {
       return;
     }
-    if (!navigator.clipboard?.writeText) {
-      setLinkCopyError(true);
-      setLinkCopied(false);
-      add({
-        title: "Clipboard blocked",
-        description: "Copy the URL from your browser address bar.",
-        type: "error",
-      });
-      return;
-    }
-    setIsCopying(true);
-    try {
-      const link = `${window.location.origin}${pathname}?${searchParams.toString()}`;
-      await navigator.clipboard.writeText(link);
-      setLinkCopied(true);
-      setLinkCopyError(false);
-      add({
-        title: "Link copied",
-        description: "Share this Decision Shield URL with your team.",
-        type: "success",
-      });
-      setTimeout(() => setLinkCopied(false), 2000);
-    } catch {
-      setLinkCopied(false);
-      setLinkCopyError(true);
-      add({
-        title: "Copy failed",
-        description: "Clipboard access failed. Try copying the URL manually.",
-        type: "error",
-      });
-    } finally {
-      setIsCopying(false);
-    }
+    const link = `${window.location.origin}${pathname}?${searchParams.toString()}`;
+    lastAttemptedTargetRef.current = "link";
+    await copyToClipboard(link, "link");
   };
+
 
 
   const handleSaveToDecisionMemory = () => {
@@ -385,6 +319,44 @@ export const DecisionShieldPanel = ({
   };
 
   useEffect(() => {
+    if (status === lastClipboardStatusRef.current) {
+      return;
+    }
+    if (status === "copied") {
+      if (copiedTarget === "verdict") {
+        add({
+          title: "Decision Shield copied",
+          description: "The verdict is ready to paste.",
+          type: "success",
+        });
+      }
+      if (copiedTarget === "link") {
+        add({
+          title: "Link copied",
+          description: "Share this Decision Shield URL with your team.",
+          type: "success",
+        });
+      }
+    }
+    if (status === "error") {
+      const isBlocked = errorReason === "unavailable";
+      const onLink = lastAttemptedTargetRef.current === "link";
+      add({
+        title: isBlocked ? "Clipboard blocked" : "Copy failed",
+        description: onLink
+          ? isBlocked
+            ? "Copy the URL from your browser address bar."
+            : "Clipboard access failed. Try copying the URL manually."
+          : isBlocked
+            ? "Select the verdict text to share it manually."
+            : "Clipboard access failed. Try copying manually.",
+        type: "error",
+      });
+    }
+    lastClipboardStatusRef.current = status;
+  }, [add, copiedTarget, errorReason, status]);
+
+  useEffect(() => {
     const timeout = window.setTimeout(() => setMemoryStatus(null), 2600);
     return () => window.clearTimeout(timeout);
   }, [memoryStatus]);
@@ -408,23 +380,23 @@ export const DecisionShieldPanel = ({
             <button
               type="button"
               onClick={handleCopy}
-              disabled={isCopying}
-              aria-busy={isCopying}
+              disabled={status === "copying"}
+              aria-busy={status === "copying"}
               className="weather-pill inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
             >
-              {isCopying ? (
+              {status === "copying" && activeTarget === "verdict" ? (
                 <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />
               ) : null}
-              {copied ? "Copied" : isCopying ? "Copying" : "Copy verdict"}
+              {copiedTarget === "verdict" ? "Copied" : status === "copying" && activeTarget === "verdict" ? "Copying" : "Copy verdict"}
             </button>
             <button
               type="button"
               onClick={handleCopyLink}
-              disabled={isCopying}
-              aria-busy={isCopying}
+              disabled={status === "copying"}
+              aria-busy={status === "copying"}
               className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
             >
-              {linkCopied ? "Link copied" : isCopying ? "Copying" : "Copy link"}
+              {copiedTarget === "link" ? "Link copied" : status === "copying" && activeTarget === "link" ? "Copying" : "Copy link"}
             </button>
             <button
               type="button"
@@ -439,22 +411,22 @@ export const DecisionShieldPanel = ({
           </div>
         </div>
         <p className="sr-only" role="status" aria-live="polite">
-          {copied
+          {copiedTarget === "verdict"
             ? "Verdict copied to clipboard."
-            : linkCopied
+            : copiedTarget === "link"
               ? "Decision Shield link copied to clipboard."
-              : copyError || linkCopyError
-                ? "Clipboard blocked."
+              : error
+                ? "Clipboard unavailable."
                 : ""}
         </p>
         <div className="mt-2 min-h-[20px] text-xs text-amber-200" role="status" aria-live="polite">
-          {linkCopyError ? "Clipboard blocked. Copy the URL from your browser address bar." : ""}
+          {error && lastAttemptedTargetRef.current === "link" ? "Clipboard blocked. Copy the URL from your browser address bar." : ""}
         </div>
         <div className="mt-1 min-h-[20px] text-xs text-slate-300" role="status" aria-live="polite">
           {memoryStatus ?? ""}
         </div>
         <div className="mt-4 min-h-[260px]">
-          {copyError ? (
+          {error && lastAttemptedTargetRef.current === "verdict" ? (
             <div className="rounded-xl border border-amber-400/40 bg-amber-500/10 p-4 text-xs text-amber-100">
               <p className="text-xs font-semibold tracking-[0.12em] text-amber-200">
                 Clipboard blocked

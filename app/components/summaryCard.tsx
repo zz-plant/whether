@@ -28,9 +28,8 @@ export const SummaryCard = ({
   companionHref,
   structuredSections = [],
 }: SummaryCardProps) => {
-  const { status, error, copyToClipboard } = useClipboardCopy();
+  const { status, error, errorReason, copyToClipboard } = useClipboardCopy();
   const lastStatusRef = useRef<ClipboardCopyState["status"]>("idle");
-  const lastErrorRef = useRef<"blocked" | "failed" | null>(null);
   const { add } = Toast.useToastManager();
 
   useEffect(() => {
@@ -42,10 +41,9 @@ export const SummaryCard = ({
         title: "Summary copied",
         description: "Paste the posture card wherever you need it.",
       });
-      lastErrorRef.current = null;
     }
     if (status === "error") {
-      const isBlocked = lastErrorRef.current === "blocked";
+      const isBlocked = errorReason === "unavailable";
       add({
         title: isBlocked ? "Clipboard blocked" : "Copy failed",
         description: isBlocked
@@ -53,18 +51,13 @@ export const SummaryCard = ({
           : "Select the summary text and copy it manually.",
       });
     }
-    if (status === "idle") {
-      lastErrorRef.current = null;
-    }
     lastStatusRef.current = status;
-  }, [add, status]);
+  }, [add, errorReason, status]);
 
   const handleCopy = async () => {
     if (status === "copying") {
       return;
     }
-    const clipboard = (navigator as Navigator & { clipboard?: Clipboard }).clipboard;
-    lastErrorRef.current = clipboard ? "failed" : "blocked";
     await copyToClipboard(summaryCopy);
   };
 
@@ -72,7 +65,7 @@ export const SummaryCard = ({
   const copied = status === "copied";
   const copyError = error;
   const errorMessage =
-    lastErrorRef.current === "blocked"
+    errorReason === "unavailable"
       ? "Clipboard blocked. Select and copy the text above manually."
       : "Copy failed. Select and copy the text above manually.";
   const visibleStructuredSections = structuredSections.filter((section) => section.items.length > 0);
