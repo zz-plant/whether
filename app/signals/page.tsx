@@ -341,7 +341,7 @@ export default async function SignalsPage({
       <section id="decision-summary" className="weather-panel space-y-6 px-6 py-5" aria-label="Decision summary">
         <div className="weather-surface grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-200">Regime now</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-200">Posture</p>
             <p className="mt-1 text-sm font-semibold text-slate-100">{regimeLabel}</p>
           </div>
           <div>
@@ -349,12 +349,12 @@ export default async function SignalsPage({
             <p className="mt-1 text-sm font-semibold text-slate-100">{trustStatusLabel}</p>
           </div>
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-200">Signals stamped</p>
-            <p className="mt-1 text-sm font-semibold text-slate-100">{recordDateLabel}</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-200">Updated</p>
+            <p className="mt-1 text-sm font-semibold text-slate-100">{fetchedAtLabel}</p>
           </div>
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-200">Last refresh</p>
-            <p className="mt-1 text-sm font-semibold text-slate-100">{fetchedAtLabel}</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-200">Next refresh</p>
+            <p className="mt-1 text-sm font-semibold text-slate-100">15m cadence</p>
           </div>
         </div>
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]">
@@ -364,14 +364,12 @@ export default async function SignalsPage({
               {regimeLabel} regime is the active operating climate.
             </h2>
             <p className="text-sm leading-relaxed text-slate-200 sm:text-base">
-              Confidence is <span className="font-semibold text-slate-100">{trustStatusLabel}</span>. Signals are stamped {" "}
-              <span className="font-semibold text-slate-100">{recordDateLabel}</span> with last refresh at {" "}
-                <span className="font-semibold text-slate-100">{fetchedAtLabel}</span>.
+              Use this page to validate confidence, inspect the highest-impact movers, and verify threshold-level evidence before changing posture.
             </p>
             <dl className="grid gap-3 rounded-xl border border-slate-800/80 bg-slate-950/40 p-3 sm:grid-cols-3">
               <div>
                 <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">Recommended action</dt>
-                <dd className="mt-1 text-xs text-slate-100">Continue current operating posture and monitor top diagnostics daily.</dd>
+                <dd className="mt-1 text-xs text-slate-100">Continue current operating posture and monitor the top movers daily.</dd>
               </div>
               <div>
                 <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">Impact if wrong</dt>
@@ -398,13 +396,19 @@ export default async function SignalsPage({
             </div>
           </article>
           <article className="weather-surface space-y-3 p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-200">Top diagnostics</p>
-            <ul className="space-y-3" aria-label="Top evidence callouts">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-200">Top 3 movers</p>
+            <ul className="space-y-3" aria-label="Top mover callouts">
               {topDiagnosticCallouts.map((item, index) => (
                 <li key={item.label} className="rounded-xl border border-slate-800/80 bg-slate-950/40 p-3">
-                  <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">Signal {index + 1}</p>
+                  <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">Mover {index + 1}</p>
                   <p className="mt-1 text-sm font-semibold text-slate-100">{item.label}</p>
                   <p className="mt-1 text-sm text-slate-200">{item.why}</p>
+                  <a
+                    href={item.href}
+                    className="mt-2 inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                  >
+                    Open {item.label.toLowerCase()} →
+                  </a>
                 </li>
               ))}
             </ul>
