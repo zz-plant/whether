@@ -9,16 +9,25 @@ import { useEffect, useMemo, useState } from "react";
 import { Accordion } from "@base-ui/react/accordion";
 import { Collapsible } from "@base-ui/react/collapsible";
 import { Dialog } from "@base-ui/react/dialog";
+import { Fieldset } from "@base-ui/react/fieldset";
 import { Field } from "@base-ui/react/field";
 import { Input } from "@base-ui/react/input";
+import { Menu } from "@base-ui/react/menu";
+import { Meter } from "@base-ui/react/meter";
+import { NumberField } from "@base-ui/react/number-field";
 import { Popover } from "@base-ui/react/popover";
+import { PreviewCard } from "@base-ui/react/preview-card";
 import { ScrollArea } from "@base-ui/react/scroll-area";
 import { Select } from "@base-ui/react/select";
+import { Separator } from "@base-ui/react/separator";
 import { Tabs } from "@base-ui/react/tabs";
 import { Toast } from "@base-ui/react/toast";
 import { Toggle } from "@base-ui/react/toggle";
 import { ToggleGroup } from "@base-ui/react/toggle-group";
 import { Tooltip } from "@base-ui/react/tooltip";
+import { Toolbar } from "@base-ui/react/toolbar";
+import { Checkbox } from "@base-ui/react/checkbox";
+import { CheckboxGroup } from "@base-ui/react/checkbox-group";
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import type { PlaybookEntry } from "../../lib/playbook";
 import type {
@@ -309,6 +318,13 @@ export const WeeklyActionSummaryPanel = ({
   const [showMetricDefinitions, setShowMetricDefinitions] = useState(false);
   const [stakeholderLens, setStakeholderLens] = useState("product");
   const [profile, setProfile] = useState("saas-growth-plg");
+  const [runwayMonths, setRunwayMonths] = useState(12);
+  const [motion, setMotion] = useState("plg");
+  const [sensitivity, setSensitivity] = useState("default");
+  const [playbookSelections, setPlaybookSelections] = useState<string[]>([]);
+  const [pinnedMandates, setPinnedMandates] = useState<string[]>([]);
+  const playbookStorageKey = "whether-weekly-playbook-selections";
+  const pinnedStorageKey = "whether-weekly-pinned-mandates";
   const { add } = Toast.useToastManager();
 
   const profileOptions = [
@@ -371,6 +387,47 @@ export const WeeklyActionSummaryPanel = ({
   } as const;
 
   useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const storedSelections = window.localStorage.getItem(playbookStorageKey);
+    const storedPins = window.localStorage.getItem(pinnedStorageKey);
+
+    if (storedSelections) {
+      try {
+        setPlaybookSelections(JSON.parse(storedSelections) as string[]);
+      } catch {
+        window.localStorage.removeItem(playbookStorageKey);
+      }
+    }
+
+    if (storedPins) {
+      try {
+        setPinnedMandates(JSON.parse(storedPins) as string[]);
+      } catch {
+        window.localStorage.removeItem(pinnedStorageKey);
+      }
+    }
+  }, [playbookStorageKey, pinnedStorageKey]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    window.localStorage.setItem(playbookStorageKey, JSON.stringify(playbookSelections));
+  }, [playbookSelections, playbookStorageKey]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    window.localStorage.setItem(pinnedStorageKey, JSON.stringify(pinnedMandates));
+  }, [pinnedMandates, pinnedStorageKey]);
+
+  useEffect(() => {
     if (!weeklySummary.transitionWatch) {
       return;
     }
@@ -380,6 +437,110 @@ export const WeeklyActionSummaryPanel = ({
       description: "Signals are near a boundary. Tighten review cadence this week.",
     });
   }, [add, weeklySummary.transitionWatch]);
+
+  const operatorWeightedDoMandates = [
+    ...assessment.constraints.slice(0, 3),
+    selectedProfileGuidance.doLine,
+    runwayMonths <= 9
+      ? "Tight runway: require <= 2 quarter payback before committing additional scope."
+      : "Runway permits selective medium-cycle bets with explicit checkpoint gates.",
+    motion === "enterprise"
+      ? "Enterprise motion: prioritize procurement-ready reliability and referenceable outcomes."
+      : motion === "mixed"
+        ? "Mixed motion: balance self-serve conversion improvements with enterprise proof points."
+        : "PLG motion: prioritize activation and expansion loops with measured CAC payback.",
+  ];
+
+  const operatorWeightedAvoidMandates = [
+    "New fixed-cost commitments without ROI gates.",
+    "Multi-quarter bets without milestone reversibility.",
+    "Hiring expansion ahead of threshold confirmation.",
+    selectedProfileGuidance.avoidLine,
+    sensitivity === "aggressive"
+      ? "Do not remove downside guardrails while operating aggressively."
+      : sensitivity === "conservative"
+        ? "Avoid making defensive posture permanent when signal conditions improve."
+        : "Avoid drifting from baseline controls during mixed-signal periods.",
+  ];
+
+  const mandateActions = [
+    `Operate in ${regimeLabel} mode: ${actionGuidance}`,
+    ...operatorWeightedDoMandates.slice(0, 3),
+    ...operatorWeightedAvoidMandates.slice(0, 2),
+  ];
+
+  const freshnessByTileLabel: Record<string, { sourceLabel: string; fetchedAt: string; recordDate: string }> = {
+    "Cash availability": {
+      sourceLabel: assessment.inputs[0]?.sourceLabel ?? "US Treasury Fiscal Data API",
+      fetchedAt: assessment.inputs[0]?.fetchedAt ?? "",
+      recordDate: assessment.inputs[0]?.recordDate ?? "",
+    },
+    "Risk appetite": {
+      sourceLabel: assessment.inputs[3]?.sourceLabel ?? "US Treasury Fiscal Data API",
+      fetchedAt: assessment.inputs[3]?.fetchedAt ?? "",
+      recordDate: assessment.inputs[3]?.recordDate ?? "",
+    },
+    "Curve slope": {
+      sourceLabel: assessment.inputs[3]?.sourceLabel ?? "US Treasury Fiscal Data API",
+      fetchedAt: assessment.inputs[3]?.fetchedAt ?? "",
+      recordDate: assessment.inputs[3]?.recordDate ?? "",
+    },
+  };
+
+  const topContributors = [
+    {
+      key: "tightness-delta",
+      label: "Cash availability (weekly delta)",
+      delta: Math.abs(assessment.diagnostics.tightnessDelta),
+    },
+    {
+      key: "risk-delta",
+      label: "Risk appetite (weekly delta)",
+      delta: Math.abs(assessment.diagnostics.riskAppetiteDelta),
+    },
+    {
+      key: "tightness-distance",
+      label: "Distance to tightness threshold",
+      delta: Math.abs(assessment.scores.tightness - assessment.thresholds.tightnessRegime),
+    },
+    {
+      key: "risk-distance",
+      label: "Distance to risk threshold",
+      delta: Math.abs(assessment.scores.riskAppetite - assessment.thresholds.riskAppetiteRegime),
+    },
+    {
+      key: "boundary-distance",
+      label: "Nearest boundary distance",
+      delta: Math.abs(assessment.diagnostics.nearestThresholdDelta),
+    },
+  ]
+    .sort((a, b) => b.delta - a.delta)
+    .slice(0, 5);
+
+  const playbookOutput = playbookSelections.length > 0
+    ? playbookSelections.map((selection) => `• ${selection}`).join("\n")
+    : "Pick 3-7 mandates to build a weekly playbook snippet.";
+  const playbookSelectionWarning =
+    playbookSelections.length > 0 && (playbookSelections.length < 3 || playbookSelections.length > 7)
+      ? "Pick between 3 and 7 mandates for a usable playbook export."
+      : null;
+
+  const copyText = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      add({ title: "Copied", description: "Copied to clipboard." });
+    } catch {
+      add({ title: "Clipboard blocked", description: "Use manual copy in your browser." });
+    }
+  };
+
+  const togglePin = (mandate: string) => {
+    setPinnedMandates((current) =>
+      current.includes(mandate)
+        ? current.filter((item) => item !== mandate)
+        : [...current, mandate],
+    );
+  };
 
   return (
     <section id="weekly-action-summary" aria-labelledby="weekly-action-summary-title" className="mt-8">
@@ -410,20 +571,48 @@ export const WeeklyActionSummaryPanel = ({
                   <div className="mt-4 grid gap-4 sm:grid-cols-2">
                     <div>
                       <p className="text-xs font-semibold tracking-[0.14em] text-emerald-200">DO</p>
-                      <ul className="mt-2 space-y-1 text-sm text-slate-200">
-                        {assessment.constraints.slice(0, 3).map((item) => (
-                          <li key={`do-${item}`}>• {item}</li>
+                      <ul className="mt-2 space-y-2 text-sm text-slate-200">
+                        {operatorWeightedDoMandates.map((item) => (
+                          <li key={`do-${item}`} className="flex items-start justify-between gap-2">
+                            <span className="flex-1">• {item}</span>
+                            <Menu.Root>
+                              <Menu.Trigger className="rounded-md border border-slate-700 px-2 py-1 text-xs text-slate-300">⋯</Menu.Trigger>
+                              <Menu.Portal>
+                                <Menu.Positioner sideOffset={6}>
+                                  <Menu.Popup className="min-w-44 rounded-lg border border-slate-700 bg-slate-950 p-1 text-xs text-slate-100">
+                                    <Menu.Item className="cursor-pointer rounded px-2 py-2 hover:bg-slate-800" onClick={() => copyText(item)}>Copy line</Menu.Item>
+                                    <Menu.Item className="cursor-pointer rounded px-2 py-2 hover:bg-slate-800" onClick={() => copyText(operatorWeightedDoMandates.join("\n"))}>Copy section</Menu.Item>
+                                    <Menu.Item className="cursor-pointer rounded px-2 py-2 hover:bg-slate-800" onClick={() => copyText("#weekly-action-summary")}>Copy permalink</Menu.Item>
+                                    <Menu.Item className="cursor-pointer rounded px-2 py-2 hover:bg-slate-800" onClick={() => togglePin(item)}>{pinnedMandates.includes(item) ? "Unpin" : "Pin to my playbook"}</Menu.Item>
+                                  </Menu.Popup>
+                                </Menu.Positioner>
+                              </Menu.Portal>
+                            </Menu.Root>
+                          </li>
                         ))}
-                        <li key="do-profile">• {selectedProfileGuidance.doLine}</li>
                       </ul>
                     </div>
                     <div>
                       <p className="text-xs font-semibold tracking-[0.14em] text-rose-200">AVOID</p>
-                      <ul className="mt-2 space-y-1 text-sm text-slate-200">
-                        <li>• New fixed-cost commitments without ROI gates.</li>
-                        <li>• Multi-quarter bets without milestone reversibility.</li>
-                        <li>• Hiring expansion ahead of threshold confirmation.</li>
-                        <li>• {selectedProfileGuidance.avoidLine}</li>
+                      <ul className="mt-2 space-y-2 text-sm text-slate-200">
+                        {operatorWeightedAvoidMandates.map((item) => (
+                          <li key={`avoid-${item}`} className="flex items-start justify-between gap-2">
+                            <span className="flex-1">• {item}</span>
+                            <Menu.Root>
+                              <Menu.Trigger className="rounded-md border border-slate-700 px-2 py-1 text-xs text-slate-300">⋯</Menu.Trigger>
+                              <Menu.Portal>
+                                <Menu.Positioner sideOffset={6}>
+                                  <Menu.Popup className="min-w-44 rounded-lg border border-slate-700 bg-slate-950 p-1 text-xs text-slate-100">
+                                    <Menu.Item className="cursor-pointer rounded px-2 py-2 hover:bg-slate-800" onClick={() => copyText(item)}>Copy line</Menu.Item>
+                                    <Menu.Item className="cursor-pointer rounded px-2 py-2 hover:bg-slate-800" onClick={() => copyText(operatorWeightedAvoidMandates.join("\n"))}>Copy section</Menu.Item>
+                                    <Menu.Item className="cursor-pointer rounded px-2 py-2 hover:bg-slate-800" onClick={() => copyText("#weekly-action-summary")}>Copy permalink</Menu.Item>
+                                    <Menu.Item className="cursor-pointer rounded px-2 py-2 hover:bg-slate-800" onClick={() => togglePin(item)}>{pinnedMandates.includes(item) ? "Unpin" : "Pin to my playbook"}</Menu.Item>
+                                  </Menu.Popup>
+                                </Menu.Positioner>
+                              </Menu.Portal>
+                            </Menu.Root>
+                          </li>
+                        ))}
                       </ul>
                     </div>
                   </div>
@@ -482,25 +671,112 @@ export const WeeklyActionSummaryPanel = ({
                   </Select.Root>
                 </div>
               </div>
+              <Toolbar.Root
+                aria-label="Operator profile control strip"
+                className="weather-surface weather-surface-amber rounded-xl p-4"
+              >
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">Operator profile strip</p>
+                <div className="mt-3 grid gap-3 lg:grid-cols-[1fr_auto_1fr_auto_1fr]">
+                  <div>
+                    <p className="text-[11px] uppercase tracking-[0.12em] text-slate-400">Runway (months)</p>
+                    <NumberField.Root min={3} max={24} step={1} value={runwayMonths} onValueChange={(value) => setRunwayMonths(value ?? 12)}>
+                      <NumberField.Group>
+                        <NumberField.Input className="weather-input mt-2 min-h-[44px] w-full px-3 py-2 text-sm text-slate-100" />
+                      </NumberField.Group>
+                    </NumberField.Root>
+                  </div>
+                  <Separator orientation="vertical" className="hidden w-px bg-slate-700 lg:block" />
+                  <div>
+                    <p className="text-[11px] uppercase tracking-[0.12em] text-slate-400">Motion</p>
+                    <ToggleGroup
+                      value={[motion]}
+                      onValueChange={(next) => setMotion(next[0] ?? "plg")}
+                      className="mt-2 flex flex-wrap gap-2"
+                    >
+                      {[
+                        { value: "plg", label: "PLG" },
+                        { value: "enterprise", label: "Ent" },
+                        { value: "mixed", label: "Mixed" },
+                      ].map((item) => (
+                        <Toggle key={item.value} value={item.value} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs text-slate-100 data-[pressed]:border-sky-300/80">
+                          {item.label}
+                        </Toggle>
+                      ))}
+                    </ToggleGroup>
+                  </div>
+                  <Separator orientation="vertical" className="hidden w-px bg-slate-700 lg:block" />
+                  <div>
+                    <p className="text-[11px] uppercase tracking-[0.12em] text-slate-400">Sensitivity</p>
+                    <ToggleGroup
+                      value={[sensitivity]}
+                      onValueChange={(next) => setSensitivity(next[0] ?? "default")}
+                      className="mt-2 flex flex-wrap gap-2"
+                    >
+                      {[
+                        { value: "conservative", label: "Conservative" },
+                        { value: "default", label: "Default" },
+                        { value: "aggressive", label: "Aggressive" },
+                      ].map((item) => (
+                        <Toggle key={item.value} value={item.value} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs text-slate-100 data-[pressed]:border-sky-300/80">
+                          {item.label}
+                        </Toggle>
+                      ))}
+                    </ToggleGroup>
+                  </div>
+                </div>
+              </Toolbar.Root>
+              <Accordion.Root className="weather-surface rounded-xl p-4" defaultValue={["weekly-diff"]}>
+                <Accordion.Item value="weekly-diff" className="rounded-lg border border-slate-800/80 bg-slate-950/60">
+                  <Accordion.Header>
+                    <Accordion.Trigger className="flex min-h-[48px] w-full items-center justify-between px-3 py-2 text-left text-sm font-semibold text-slate-100">
+                      Diff since last week
+                    </Accordion.Trigger>
+                  </Accordion.Header>
+                  <Accordion.Panel className="space-y-2 px-3 pb-3">
+                    {topContributors.map((contributor) => (
+                      <div key={contributor.key} className="rounded-lg border border-slate-800/70 bg-slate-950/65 p-3">
+                        <div className="flex items-center justify-between text-xs text-slate-300">
+                          <span>{contributor.label}</span>
+                          <span>{contributor.delta.toFixed(1)}</span>
+                        </div>
+                        <Meter.Root value={Math.min(100, Math.max(0, contributor.delta * 20))} className="mt-2">
+                          <Meter.Track className="h-2 rounded-full bg-slate-800">
+                            <Meter.Indicator className="h-full rounded-full bg-sky-300/80" />
+                          </Meter.Track>
+                        </Meter.Root>
+                      </div>
+                    ))}
+                  </Accordion.Panel>
+                </Accordion.Item>
+              </Accordion.Root>
               <div className="grid gap-3 sm:grid-cols-3">
                 {weeklySignalTiles.map((tile) => (
                   <div key={tile.label} className={`weather-surface ${tile.tone} space-y-3 p-4`}>
                     <div className="flex items-start justify-between gap-2">
                       <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">{tile.label}</p>
-                      <span className="rounded-full border border-slate-600/70 bg-slate-900/70 px-2 py-1 text-[10px] font-semibold tracking-[0.12em] text-slate-300">
-                        Live
-                      </span>
+                      <Tooltip.Root>
+                        <Tooltip.Trigger className="rounded-full border border-slate-600/70 bg-slate-900/70 px-2 py-1 text-[10px] font-semibold tracking-[0.12em] text-slate-300">
+                          Freshness
+                        </Tooltip.Trigger>
+                        <Tooltip.Portal>
+                          <Tooltip.Positioner sideOffset={8}>
+                            <Tooltip.Popup className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-slate-200">
+                              <p>{freshnessByTileLabel[tile.label]?.sourceLabel ?? "US Treasury Fiscal Data API"}</p>
+                              <p className="mt-1">Record: {freshnessByTileLabel[tile.label]?.recordDate ? formatDateUTC(freshnessByTileLabel[tile.label].recordDate) : "Unknown"}</p>
+                              <p className="mt-1">Updated: {freshnessByTileLabel[tile.label]?.fetchedAt ? formatTimestampUTC(freshnessByTileLabel[tile.label].fetchedAt) : "Unknown"}</p>
+                            </Tooltip.Popup>
+                          </Tooltip.Positioner>
+                        </Tooltip.Portal>
+                      </Tooltip.Root>
                     </div>
                     <p className="mono text-3xl leading-none text-slate-100">{tile.value}</p>
                     <div>
                       <p className="text-xs text-slate-300">{tile.status}</p>
-                      <div className="mt-2 h-1.5 rounded-full bg-slate-900/80">
-                        <span
-                          className={`block h-full rounded-full ${tile.accent}`}
-                          style={{ width: `${tile.progressValue}%` }}
-                          aria-hidden="true"
-                        />
-                      </div>
+                      <Meter.Root value={tile.progressValue} className="mt-2">
+                        <Meter.Track className="h-1.5 rounded-full bg-slate-900/80">
+                          <Meter.Indicator className={`h-full rounded-full ${tile.accent}`} />
+                        </Meter.Track>
+                      </Meter.Root>
                     </div>
                     <p className="text-xs text-slate-400">{tile.detail}</p>
                   </div>
@@ -594,6 +870,46 @@ export const WeeklyActionSummaryPanel = ({
                   </Tabs.Panel>
                 ))}
               </Tabs.Root>
+              <Fieldset.Root className="weather-surface rounded-xl p-4">
+                <Fieldset.Legend className="text-xs font-semibold tracking-[0.12em] text-slate-300">Playbook builder</Fieldset.Legend>
+                <p className="mt-2 text-xs text-slate-400">Pick 3–7 mandates to generate a Slack/Notion-ready block.</p>
+                <CheckboxGroup
+                  value={playbookSelections}
+                  onValueChange={(next) => {
+                    if (next.length > 7) {
+                      add({ title: "Selection limit", description: "Choose up to 7 mandates for export." });
+                      return;
+                    }
+                    setPlaybookSelections(next);
+                  }}
+                  className="mt-3 space-y-2"
+                >
+                  {mandateActions.map((mandate) => (
+                    <label key={mandate} className="flex min-h-[44px] items-start gap-3 rounded-lg border border-slate-800/70 bg-slate-950/60 px-3 py-2 text-xs text-slate-200">
+                      <Checkbox.Root value={mandate} className="mt-0.5 flex h-4 w-4 items-center justify-center rounded border border-slate-500 data-[checked]:bg-sky-400 data-[checked]:text-slate-950">
+                        <Checkbox.Indicator>✓</Checkbox.Indicator>
+                      </Checkbox.Root>
+                      <span>{mandate}</span>
+                    </label>
+                  ))}
+                </CheckboxGroup>
+                {playbookSelectionWarning ? <p className="mt-2 text-xs text-amber-300">{playbookSelectionWarning}</p> : null}
+                {pinnedMandates.length > 0 ? <p className="mt-2 text-xs text-slate-400">Pinned mandates: {pinnedMandates.length}</p> : null}
+                <pre className="mt-3 whitespace-pre-wrap rounded-lg border border-slate-800/80 bg-slate-950/70 p-3 text-xs text-slate-300">{playbookOutput}</pre>
+              </Fieldset.Root>
+              <div className="weather-surface rounded-xl p-4">
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">Method & sources preview</p>
+                <PreviewCard.Root>
+                  <PreviewCard.Trigger className="mt-3 inline-flex min-h-[44px] items-center text-sm text-sky-200 underline underline-offset-4">US Treasury Yield Curve source</PreviewCard.Trigger>
+                  <PreviewCard.Portal>
+                    <PreviewCard.Positioner sideOffset={8}>
+                      <PreviewCard.Popup className="max-w-sm rounded-lg border border-slate-700 bg-slate-950 p-3 text-xs text-slate-200">
+                        Treasury daily rates are ingested weekly to compute curve slope, tightness proxy, and risk appetite translation.
+                      </PreviewCard.Popup>
+                    </PreviewCard.Positioner>
+                  </PreviewCard.Portal>
+                </PreviewCard.Root>
+              </div>
               <div className="weather-surface weather-surface-indigo rounded-xl px-4 py-3">
                 <button
                   type="button"
