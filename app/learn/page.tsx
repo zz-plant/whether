@@ -5,7 +5,7 @@ import { StaticHubNav } from "../components/staticHubNav";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Learn — concepts and diagnostics",
-  description: "Deepen your operating judgment with concept references and failure mode diagnostics.",
+  description: "Diagnostics and concept references only; use this hub to audit reasoning, not to generate new operating calls.",
   path: "/learn",
   imageAlt: "Whether learn hub",
 });
@@ -16,7 +16,10 @@ export default function LearnPage() {
       <StaticHubNav currentPath="/learn" />
       <section className="weather-panel space-y-3 px-6 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Learn</h1>
-        <p className="text-sm text-slate-300">Use Learn when you need to validate reasoning depth: diagnose failure patterns or inspect concepts that shape guidance.</p>
+        <p className="text-sm text-slate-300">Use Learn as a reference layer: diagnose failure patterns and inspect concepts behind guidance. For active decisions, return to Decide or Command Center.</p>
+        <div>
+          <Link href="/decide" className="weather-button inline-flex items-center justify-center">Back to Decide</Link>
+        </div>
       </section>
       <section className="grid gap-3 sm:grid-cols-2">
         <Link href="/library/failure-modes" className="weather-panel space-y-2 px-4 py-4">

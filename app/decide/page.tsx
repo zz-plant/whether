@@ -4,7 +4,7 @@ import { buildPageMetadata } from "../../lib/seo";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Decide — role and situation paths",
-  description: "Start from your role or the decision in front of you to get the right guidance path.",
+  description: "Role translation hub: convert the current posture into role-specific calls for product, engineering, and leadership.",
   path: "/decide",
   imageAlt: "Whether decide hub",
 });
@@ -14,7 +14,10 @@ export default function DecidePage() {
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
       <section className="weather-panel space-y-3 px-6 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Decide</h1>
-        <p className="text-sm text-slate-300">Choose the entry point that matches your situation, then move into concrete guidance.</p>
+        <p className="text-sm text-slate-300">Use this hub to translate the current climate into role-specific decisions. If you still need posture setup, start in Command Center.</p>
+        <div>
+          <Link href="/start" className="weather-button inline-flex items-center justify-center">Open Command Center</Link>
+        </div>
       </section>
       <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Link href="/decide/use-cases" className="weather-panel space-y-2 px-4 py-4">
