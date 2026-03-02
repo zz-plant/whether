@@ -24,6 +24,26 @@ const nextConfig = {
         destination: '/operations',
         permanent: false,
       },
+      {
+        source: '/learn/concepts/:slug',
+        destination: '/concepts/:slug',
+        permanent: true,
+      },
+      {
+        source: '/learn/failure-modes/:slug',
+        destination: '/library/failure-modes/:slug',
+        permanent: true,
+      },
+      {
+        source: '/library/canon/:slug',
+        destination: '/concepts/:slug',
+        permanent: true,
+      },
+      {
+        source: '/use-cases/:slug',
+        destination: '/decide/:slug',
+        permanent: true,
+      },
     ];
   },
 };
