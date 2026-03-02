@@ -21,6 +21,12 @@ const TimeMachineCacheSchema = z.array(TimeMachineSnapshotSchema);
 export const DEFAULT_REGIME_SERIES_MONTHS = 24;
 export const DEFAULT_ROLLING_YIELD_MONTHS = 12;
 const MIN_ROLLING_YIELD_MONTHS = 1;
+const TIME_MACHINE_STRICT_CACHE_VALIDATION_ENV =
+  process.env.TIME_MACHINE_STRICT_CACHE_VALIDATION;
+const STRICT_CACHE_VALIDATION_ENABLED =
+  TIME_MACHINE_STRICT_CACHE_VALIDATION_ENV === "1" ||
+  TIME_MACHINE_STRICT_CACHE_VALIDATION_ENV === "true";
+const MAX_REGIME_SERIES_CACHE_ENTRIES = 50;
 
 const deriveYearMonth = (recordDate: string) => {
   const parsedDate = new Date(recordDate);
@@ -51,8 +57,17 @@ export const parseTimeMachineCache = (input: unknown): TimeMachineSnapshot[] => 
     return parsedCache.data;
   }
 
+  if (STRICT_CACHE_VALIDATION_ENABLED) {
+    throw new Error(
+      `Time Machine cache failed validation: ${parsedCache.error.message}`
+    );
+  }
+
   const fallback = [buildValidationFallbackSnapshot()];
-  console.error("Time Machine cache failed validation.", parsedCache.error.format());
+  console.error(
+    "Time Machine cache failed validation. Falling back to latest snapshot.",
+    parsedCache.error.format()
+  );
   return fallback;
 };
 
@@ -178,6 +193,23 @@ export type TimeMachineRegimeEntry = {
 
 const timeMachineRegimeSeriesCache = new Map<string, TimeMachineRegimeEntry[]>();
 
+const setRegimeSeriesCache = (key: string, value: TimeMachineRegimeEntry[]) => {
+  if (timeMachineRegimeSeriesCache.has(key)) {
+    timeMachineRegimeSeriesCache.delete(key);
+  }
+
+  timeMachineRegimeSeriesCache.set(key, value);
+
+  if (timeMachineRegimeSeriesCache.size <= MAX_REGIME_SERIES_CACHE_ENTRIES) {
+    return;
+  }
+
+  const oldestKey = timeMachineRegimeSeriesCache.keys().next().value;
+  if (oldestKey) {
+    timeMachineRegimeSeriesCache.delete(oldestKey);
+  }
+};
+
 const buildRegimeSeriesCacheKey = (
   months: number,
   overrides?: Partial<RegimeThresholds>
@@ -214,9 +246,11 @@ export const getTimeMachineRegimeSeries = (
       summary: assessment.description,
     };
   });
-  timeMachineRegimeSeriesCache.set(cacheKey, series);
+  setRegimeSeriesCache(cacheKey, series);
   return series;
 };
+
+export const getRegimeSeriesCacheSize = () => timeMachineRegimeSeriesCache.size;
 
 export const getPreviousTimeMachineSnapshot = (asOf: string): TreasuryData | null => {
   const target = new Date(asOf);
