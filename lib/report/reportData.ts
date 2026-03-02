@@ -172,7 +172,7 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
         : "Cached (medium)",
   };
   const internalProvenance = {
-    sourceLabel: "Whether internal backlog",
+    sourceLabel: "Whether curated playbook catalog",
     recordDateLabel: "Static",
     timestampLabel: "Static catalog",
     ageLabel: "Static.",
