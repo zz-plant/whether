@@ -210,8 +210,8 @@ export function WeeklyDecisionCard({
               </Select.Positioner>
             </Select.Portal>
           </Select.Root>
-          <Link href="#weekly-action-summary" className="weather-button-primary inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]">Run weekly operating sequence</Link>
-          <Link href="/operations#ops-export-briefs" className="weather-button inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]">Generate leadership brief</Link>
+          <Link href="/operations#ops-export-briefs" className="weather-button-primary inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]">Generate executive brief</Link>
+          <Link href="#weekly-action-summary" className="weather-button inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]">Run weekly operating sequence</Link>
           <Dialog.Root>
             <Dialog.Trigger className="weather-button inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]">
               Share snapshot

@@ -394,13 +394,19 @@ export default async function SignalsPage({
             </div>
           </article>
           <article className="weather-surface space-y-3 p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-200">Top diagnostics</p>
-            <ul className="space-y-3" aria-label="Top evidence callouts">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-200">Top 3 movers</p>
+            <ul className="space-y-3" aria-label="Top 3 signal movers">
               {topDiagnosticCallouts.map((item, index) => (
                 <li key={item.label} className="rounded-xl border border-slate-800/80 bg-slate-950/40 p-3">
-                  <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">Signal {index + 1}</p>
+                  <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">Mover {index + 1}</p>
                   <p className="mt-1 text-sm font-semibold text-slate-100">{item.label}</p>
                   <p className="mt-1 text-sm text-slate-200">{item.why}</p>
+                  <a
+                    href={item.href}
+                    className="mt-2 inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                  >
+                    Open {item.label.toLowerCase()} →
+                  </a>
                 </li>
               ))}
             </ul>

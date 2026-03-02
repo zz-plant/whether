@@ -451,26 +451,41 @@ export const ReportShell = ({
                       {exportCta ? (
                         <a
                           href={exportCta.href}
-                          className="weather-pill inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-slate-700/80 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto"
+                          className="weather-pill inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-sky-500/60 bg-sky-500/10 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-sky-100 transition-colors hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto"
                         >
                           {exportCta.label}
                         </a>
                       ) : null}
-                      <a
-                        href="/about#subscribe"
-                        className="inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-slate-700/80 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto"
-                      >
-                        More updates
-                      </a>
+                      <details className="w-full sm:w-auto">
+                        <summary className="weather-pill inline-flex min-h-[44px] w-full cursor-pointer items-center justify-center rounded-full border border-slate-700/80 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto">
+                          More actions
+                        </summary>
+                        <div className="mt-2 grid gap-2 rounded-2xl border border-slate-800/80 bg-slate-950/90 p-3 sm:min-w-[15rem]">
+                          <a
+                            href="/about#subscribe"
+                            className="weather-pill inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-700/80 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                          >
+                            Email updates
+                          </a>
+                          <a
+                            href="#operator-command-center"
+                            className="weather-pill inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-700/80 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                          >
+                            Open command center
+                          </a>
+                        </div>
+                      </details>
                     </div>
                     <p className="weather-surface inline-flex min-h-[44px] flex-wrap items-center gap-x-2 px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100">
-                      <span>{trustStatusTone === "stable" ? "Stable" : "Caution"}</span>
+                      <span>Posture {statusLabel}</span>
                       <span className="text-slate-400">·</span>
-                      <span>{trustStatusLabel}</span>
+                      <span>Confidence {trustStatusLabel}</span>
                       <span className="text-slate-400">·</span>
-                      <span>Signals {recordDateLabel}</span>
+                      <span>Updated {recordDateLabel}</span>
                       <span className="text-slate-400">·</span>
                       <span>Refresh {fetchedAtLabel}</span>
+                      <span className="text-slate-400">·</span>
+                      <span>Next update 15m cadence</span>
                     </p>
                     <p className="text-sm text-slate-200">{trustStatusAction}</p>
                     {showOfflineBadge ? (
