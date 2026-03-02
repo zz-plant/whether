@@ -230,6 +230,12 @@ export default async function ProductConceptTimelinePage({
 
       <section className="weather-panel space-y-3 px-6 py-5">
         <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-300">Explore concept maps</h2>
+        <Link
+          href="/concepts/conflicts"
+          className="weather-button inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.12em]"
+        >
+          Open conflict map
+        </Link>
         <div className="space-y-3">
           <div>
             <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">By focus</p>
