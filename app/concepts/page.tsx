@@ -126,7 +126,7 @@ export default async function ProductConceptTimelinePage({
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(conceptCollectionStructuredData) }}
       />
       <section className="weather-panel space-y-4 px-6 py-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+        <p className="type-kicker uppercase tracking-[0.2em]">
           Product canon in context
         </p>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
@@ -150,7 +150,7 @@ export default async function ProductConceptTimelinePage({
               name="q"
               defaultValue={q}
               placeholder="Title, author, focus"
-              className="min-h-[44px] w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm font-normal normal-case tracking-normal text-slate-100"
+              className="weather-control rounded-md border-slate-700 bg-slate-900"
             />
           </label>
 
@@ -159,7 +159,7 @@ export default async function ProductConceptTimelinePage({
             <select
               name="era"
               defaultValue={era}
-              className="min-h-[44px] w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm font-normal normal-case tracking-normal text-slate-100"
+              className="weather-control rounded-md border-slate-700 bg-slate-900"
             >
               <option value="all">All eras</option>
               {productConceptEras.map((eraOption) => (
@@ -175,7 +175,7 @@ export default async function ProductConceptTimelinePage({
             <select
               name="audience"
               defaultValue={audience}
-              className="min-h-[44px] w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm font-normal normal-case tracking-normal text-slate-100"
+              className="weather-control rounded-md border-slate-700 bg-slate-900"
             >
               <option value="all">All audiences</option>
               {audienceOptions.map((audienceOption) => (
@@ -191,7 +191,7 @@ export default async function ProductConceptTimelinePage({
             <select
               name="regime"
               defaultValue={regime}
-              className="min-h-[44px] w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm font-normal normal-case tracking-normal text-slate-100"
+              className="weather-control rounded-md border-slate-700 bg-slate-900"
             >
               <option value="all">All regime labels</option>
               {regimeOptions.map((regimeOption) => (
@@ -211,7 +211,7 @@ export default async function ProductConceptTimelinePage({
             </button>
             <Link
               href="/concepts"
-              className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100"
+              className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 type-kicker text-slate-100 tracking-[0.1em]"
             >
               Reset
             </Link>

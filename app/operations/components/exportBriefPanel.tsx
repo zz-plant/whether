@@ -14,6 +14,7 @@ import { buildAgentPayloadJson, buildAgentPrompt } from "../../../lib/agentHando
 import { buildComplianceStamp } from "../../../lib/exportNotices";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 import { useClipboardCopy, type ClipboardCopyState } from "../../components/useClipboardCopy";
+import { SectionPanelHeader } from "../../components/sectionPanelHeader";
 
 const formatNumber = (value: number | null, unit: string) => {
   const formatted = formatNumberValue(value);
@@ -348,31 +349,32 @@ export const ExportBriefPanel = ({
   return (
     <section id="export-briefs" aria-labelledby="export-briefs-title" className="mt-10">
       <div className="weather-panel p-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="type-label text-slate-400">Export briefs</p>
-            <h3 id="export-briefs-title" className="type-section text-slate-100">
-              Share the report
-            </h3>
-            <p className="mt-2 type-data text-slate-300">
+        <SectionPanelHeader
+          label="Export briefs"
+          title="Share the report"
+          titleId="export-briefs-title"
+          description={
+            <>
               Copy ready-made summaries for Slack, email, or slide decks, or print to PDF.
-            </p>
-          </div>
-          <div className="flex flex-col items-end gap-3">
-            <Button
-              type="button"
-              onClick={handlePrint}
-              className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
-            >
-              Print / Save PDF
-            </Button>
-            {showProvenance ? <DataProvenanceStrip provenance={provenance} /> : null}
-          </div>
-        </div>
+            </>
+          }
+          aside={
+            <>
+              <Button
+                type="button"
+                onClick={handlePrint}
+                className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+              >
+                Print / Save PDF
+              </Button>
+              {showProvenance ? <DataProvenanceStrip provenance={provenance} /> : null}
+            </>
+          }
+        />
 
         <div className="mt-6 grid gap-4 lg:grid-cols-[1.4fr,1fr]">
           <div className="weather-surface p-4">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Slack-ready brief</p>
+            <p className="type-kicker">Slack-ready brief</p>
             <p className="mt-3 text-sm text-slate-300">
               One pasteable block tuned for status updates.
             </p>
@@ -416,7 +418,7 @@ export const ExportBriefPanel = ({
             </div>
           </div>
           <div className="weather-surface p-4">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Slide bullets</p>
+            <p className="type-kicker">Slide bullets</p>
             <p className="mt-3 text-sm text-slate-300">
               Compact bullets sized for quarterly planning decks.
             </p>
@@ -445,7 +447,7 @@ export const ExportBriefPanel = ({
         </div>
         <div className="mt-4 grid gap-4 lg:grid-cols-[1.4fr,1fr]">
           <div className="weather-surface p-4">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+            <p className="type-kicker">
               Constraint headlines
             </p>
             <p className="mt-3 text-sm text-slate-300">
@@ -474,7 +476,7 @@ export const ExportBriefPanel = ({
             </Button>
           </div>
           <div className="weather-surface p-4">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+            <p className="type-kicker">
               Headline preview
             </p>
             <p className="mt-3 text-sm text-slate-300">
@@ -490,7 +492,7 @@ export const ExportBriefPanel = ({
         </div>
         <div className="mt-4 grid gap-4 lg:grid-cols-[1.4fr,1fr]">
           <div className="weather-surface p-4">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+            <p className="type-kicker">
               Autonomous agent handoff
             </p>
             <p className="mt-3 text-sm text-slate-300">
@@ -544,7 +546,7 @@ export const ExportBriefPanel = ({
             </div>
           </div>
           <div className="weather-surface p-4">
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+            <p className="type-kicker">
               Agent payload preview
             </p>
             <p className="mt-3 text-sm text-slate-300">
@@ -559,7 +561,7 @@ export const ExportBriefPanel = ({
           </div>
         </div>
         <div className="mt-4 weather-surface p-4">
-          <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
+          <p className="type-kicker">
             Jira, Confluence, and Linear
           </p>
           <p className="mt-3 text-sm text-slate-300">

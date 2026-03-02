@@ -282,6 +282,13 @@ body {
   box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.45);
 }
 
+.weather-control {
+  @apply weather-input w-full px-3 py-2 text-sm;
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
 .weather-input::placeholder {
   color: rgba(203, 213, 225, 0.8);
 }
@@ -415,6 +422,10 @@ body {
 
 .type-label {
   @apply text-[0.72rem] font-semibold tracking-[0.12em] leading-none uppercase sm:text-xs;
+}
+
+.type-kicker {
+  @apply text-xs font-semibold tracking-[0.12em] text-slate-400;
 }
 
 .type-data {
