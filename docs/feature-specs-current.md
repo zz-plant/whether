@@ -57,7 +57,7 @@ signals and navigate the report pages.
 
 ### 1.6 Formula reference (/methodology)
 The formulas page documents the sensor methodology and links directly to public data sources used
-in the report (Treasury API, BLS CPI, BLS labor, FRED credit spreads).
+in the report (Treasury API, BLS CPI, BLS labor, FRED credit spreads, FRED VIX, and Chicago Fed NFCI).
 
 ## 2) Data sourcing & provenance
 
@@ -69,8 +69,8 @@ in the report (Treasury API, BLS CPI, BLS labor, FRED credit spreads).
   response as cached with a fallback reason.
 
 ### 2.2 Macro snapshot
-- CPI, unemployment, and BBB credit spreads are loaded from
-  `data/macro_snapshot.json` as a static snapshot until live fetchers are added.
+- Core series now include CPI, unemployment, BBB OAS, HY OAS, Chicago Fed NFCI, and VIX with live fetch support where available.
+- Startup/operator overlays (VC funding velocity, tech layoff trend, SaaS multiples) and structural overlays (earnings revisions, AI compute cost trend, regulatory risk tracker) are shipped via snapshot-backed series for deterministic fallback.
 - Each series carries a source URL, record date, and freshness metadata.
 
 ### 2.3 Time Machine cache
@@ -83,6 +83,7 @@ in the report (Treasury API, BLS CPI, BLS labor, FRED credit spreads).
 ### 3.1 Inputs
 - **Base rate**: 1‑month Treasury yield (fallback to 3‑month if missing).
 - **Curve slope**: 10Y − 2Y yield spread.
+- **Macro overlays (boundary calibration)**: HY OAS, Chicago Fed NFCI, VIX, VC funding velocity, and tech layoff trend adjust tightness/risk appetite near threshold zones and trigger multi-weak-read warnings.
 
 ### 3.2 Scores
 - **Tightness score (0–100)**: adds 90 points if base rate > threshold and 25 points if the curve

@@ -1,9 +1,18 @@
 import type { MacroSeriesReading, MacroSeriesId } from "./types";
 
 const impactWeights: Record<MacroSeriesId, number> = {
-  BBB_CREDIT_SPREAD: 1,
-  UNEMPLOYMENT_RATE: 0.75,
-  CPI_YOY: 0.6,
+  HY_CREDIT_SPREAD: 1,
+  VIX_INDEX: 0.98,
+  CHICAGO_FCI: 0.96,
+  BBB_CREDIT_SPREAD: 0.94,
+  TECH_LAYOFF_TREND: 0.9,
+  VC_FUNDING_VELOCITY: 0.88,
+  SAAS_VALUATION_MULTIPLE: 0.84,
+  EARNINGS_REVISION_INDEX: 0.8,
+  AI_COMPUTE_COST_TREND: 0.68,
+  REGULATORY_RISK_TRACKER: 0.65,
+  UNEMPLOYMENT_RATE: 0.62,
+  CPI_YOY: 0.58,
 };
 
 const DAY_IN_MS = 24 * 60 * 60 * 1000;

@@ -38,13 +38,18 @@ describe("rankMacroSignalsByPriority", () => {
         baseSignal({ id: "CPI_YOY", record_date: "2026-01-28" }),
         baseSignal({ id: "UNEMPLOYMENT_RATE", record_date: "2026-01-15" }),
         baseSignal({ id: "BBB_CREDIT_SPREAD", record_date: "2026-01-20" }),
+        baseSignal({ id: "HY_CREDIT_SPREAD", record_date: "2026-01-16" }),
+        baseSignal({ id: "VIX_INDEX", record_date: "2026-01-17" }),
       ],
       now
     );
 
-    assert.deepEqual(
-      ordered.map((item) => item.id),
-      ["BBB_CREDIT_SPREAD", "UNEMPLOYMENT_RATE", "CPI_YOY"]
-    );
+    assert.deepEqual(ordered.map((item) => item.id), [
+      "HY_CREDIT_SPREAD",
+      "VIX_INDEX",
+      "BBB_CREDIT_SPREAD",
+      "CPI_YOY",
+      "UNEMPLOYMENT_RATE",
+    ]);
   });
 });

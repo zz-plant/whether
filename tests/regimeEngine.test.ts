@@ -131,3 +131,68 @@ describe("regime trend", () => {
     assert.equal(deriveRegimeTrend(previous, current), "IMPROVING");
   });
 });
+
+
+describe("regime macro overlays", () => {
+  const treasury: TreasuryData = {
+    source: "US Treasury",
+    record_date: "2024-10-01",
+    fetched_at: "2024-10-02T00:00:00Z",
+    isLive: true,
+    yields: {
+      oneMonth: 4.3,
+      twoYear: 4.0,
+      tenYear: 4.2,
+    },
+  };
+
+  it("tightens and lowers risk appetite when stress overlays are weak", () => {
+    const baseline = evaluateRegime(treasury);
+    const stressed = evaluateRegime(treasury, undefined, [
+      {
+        id: "HY_CREDIT_SPREAD",
+        label: "HY",
+        value: 6.2,
+        unit: "%",
+        explanation: "",
+        sourceLabel: "FRED",
+        sourceUrl: "https://fred.stlouisfed.org/",
+        formulaUrl: "/methodology",
+        record_date: "2024-10-01",
+        fetched_at: "2024-10-02T00:00:00Z",
+        isLive: true,
+      },
+      {
+        id: "VIX_INDEX",
+        label: "VIX",
+        value: 28,
+        unit: "index",
+        explanation: "",
+        sourceLabel: "FRED",
+        sourceUrl: "https://fred.stlouisfed.org/",
+        formulaUrl: "/methodology",
+        record_date: "2024-10-01",
+        fetched_at: "2024-10-02T00:00:00Z",
+        isLive: true,
+      },
+      {
+        id: "CHICAGO_FCI",
+        label: "NFCI",
+        value: 0.35,
+        unit: "index",
+        explanation: "",
+        sourceLabel: "FRED",
+        sourceUrl: "https://fred.stlouisfed.org/",
+        formulaUrl: "/methodology",
+        record_date: "2024-10-01",
+        fetched_at: "2024-10-02T00:00:00Z",
+        isLive: true,
+      },
+    ]);
+
+    assert.ok(stressed.scores.tightness > baseline.scores.tightness);
+    assert.ok(stressed.scores.riskAppetite < baseline.scores.riskAppetite);
+    assert.equal(stressed.diagnostics.twoWeakReadsWarning, true);
+    assert.ok(stressed.diagnostics.boundaryContributors.length >= 2);
+  });
+});
