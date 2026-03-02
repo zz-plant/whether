@@ -22,8 +22,13 @@ export const ViewportReveal = ({
       return;
     }
 
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (mediaQuery.matches) {
+    if (typeof window.IntersectionObserver === "undefined") {
+      setRevealed(true);
+      return;
+    }
+
+    const supportsMatchMedia = typeof window.matchMedia === "function";
+    if (supportsMatchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setRevealed(true);
       return;
     }
