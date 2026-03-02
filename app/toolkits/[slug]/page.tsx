@@ -38,6 +38,37 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{toolkit.title}</h1>
         <p className="text-base text-slate-200"><span className="font-semibold">When to use:</span> {toolkit.whenToUse}</p>
         <p className="text-base text-slate-200"><span className="font-semibold">Posture split:</span> {toolkit.byPosture}</p>
+        <p className="text-base text-slate-200"><span className="font-semibold">Operating outcome:</span> {toolkit.operatingOutcome}</p>
+        <p className="text-base text-slate-200"><span className="font-semibold">Typical runtime:</span> {toolkit.timeToRun}</p>
+        <p className="text-base text-slate-200"><span className="font-semibold">Who should run it:</span> {toolkit.recommendedParticipants}</p>
+      </section>
+      <section className="weather-panel space-y-4 px-6 py-6">
+        <h2 className="text-lg font-semibold text-slate-100">Prep checklist</h2>
+        <ul className="space-y-1 text-sm text-slate-200">
+          {toolkit.prepChecklist.map((item) => <li key={item}>• {item}</li>)}
+        </ul>
+      </section>
+      <section className="weather-panel space-y-3 px-6 py-6">
+        <h2 className="text-lg font-semibold text-slate-100">Run sequence</h2>
+        <ol className="space-y-3 text-sm text-slate-200">
+          {toolkit.runSequence.map((step) => (
+            <li key={step.phase} className="weather-surface space-y-2 px-4 py-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">{step.phase}</p>
+              <p><span className="font-semibold text-slate-100">Objective:</span> {step.objective}</p>
+              <p className="font-semibold text-slate-100">Prompts</p>
+              <ul className="space-y-1">
+                {step.prompts.map((prompt) => <li key={prompt}>• {prompt}</li>)}
+              </ul>
+              <p><span className="font-semibold text-slate-100">Deliverable:</span> {step.deliverable}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+      <section className="weather-panel space-y-3 px-6 py-6">
+        <h2 className="text-lg font-semibold text-slate-100">Success signals</h2>
+        <ul className="space-y-1 text-sm text-slate-200">
+          {toolkit.successSignals.map((item) => <li key={item}>• {item}</li>)}
+        </ul>
       </section>
       <section className="weather-panel space-y-3 px-6 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Included instruments</h2>
