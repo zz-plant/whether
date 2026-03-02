@@ -41,7 +41,7 @@ export default async function ToolkitsPage({
             aria-label="Search toolkits"
           />
           <button type="submit" className="weather-button">Search</button>
-          <Link href="/toolkits" className="weather-button inline-flex items-center justify-center">Clear</Link>
+          {query ? (<Link href="/toolkits" className="weather-button inline-flex items-center justify-center">Clear</Link>) : null}
         </form>
       </section>
 

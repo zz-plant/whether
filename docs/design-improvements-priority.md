@@ -85,3 +85,27 @@ The current UI still relies on explanatory copy in several places where structur
 5. **Workflow status communication**
    - Current text role: workflow and checklist modules rely on labels like "Step 1", "In progress", and completion instructions.
    - Alternative: timeline rail + completion rings + state transitions (empty → active → complete) with less explanatory text.
+
+## Button simplification recommendations (unnecessary or redundant controls)
+
+These are the highest-confidence candidates to remove, merge, or conditionally render to reduce CTA clutter:
+
+1. **Global header: "Run weekly sequence" (all pages)**
+   - Why it is likely unnecessary: this CTA appears globally and competes with primary wayfinding on every route.
+   - Recommendation: keep it only on pages where the weekly sequence is the primary next action, or demote it into contextual cards.
+
+2. **Global header: "Leadership brief" versus in-flow "Generate leadership brief"**
+   - Why it is likely redundant: both controls route users toward leadership brief generation/consumption from different surfaces.
+   - Recommendation: consolidate to one canonical brief CTA per view (header _or_ in-flow) and keep one wording pattern.
+
+3. **Toolkits search: always-visible "Clear"**
+   - Why it is likely unnecessary: when no `q` query exists, the clear action is a no-op and adds visual noise.
+   - Recommendation: only render "Clear" when a non-empty search query is present.
+
+4. **Weekly decision card: "Share snapshot" without direct share action**
+   - Why it is likely low-value in current form: modal opens a snapshot and close button but no explicit copy/download/share affordance.
+   - Recommendation: either add direct actions (copy Markdown, copy plain text, export image) or remove the trigger until share is complete.
+
+5. **Cross-page CTA density in top regions**
+   - Why it is likely excessive: header + card-level controls can stack multiple primary-looking buttons before core content.
+   - Recommendation: enforce a "one primary CTA per viewport region" rule and downgrade secondary actions to links or menu items.

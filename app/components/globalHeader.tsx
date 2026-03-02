@@ -92,15 +92,6 @@ export function GlobalHeader() {
           </button>
         </div>
 
-        <div className="mt-3">
-          <Link
-            href="/operations/plan"
-            className="weather-button-primary inline-flex min-h-[44px] w-full items-center justify-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]"
-          >
-            Run weekly sequence
-          </Link>
-        </div>
-
         <nav
           aria-label="Global navigation"
           className="mt-3 -mx-1 flex snap-x gap-2 overflow-x-auto px-1 pb-1"
@@ -124,7 +115,7 @@ export function GlobalHeader() {
           })}
         </nav>
 
-        <div className="mt-3 hidden items-center justify-between border-t border-slate-800/70 pt-3 sm:flex">
+        <div className="mt-3 hidden border-t border-slate-800/70 pt-3 sm:block">
           <p className="text-xs tracking-[0.12em] text-slate-400">
             {breadcrumbs.length > 1 ? (
               <>
@@ -138,12 +129,6 @@ export function GlobalHeader() {
               <span>Weekly briefing</span>
             )}
           </p>
-          <Link
-            href="/briefing"
-            className="weather-button inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]"
-          >
-            Leadership brief
-          </Link>
         </div>
       </div>
     </header>
