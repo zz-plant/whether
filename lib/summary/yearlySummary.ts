@@ -3,6 +3,7 @@
  * Mirrors monthly summary structure with year-specific framing.
  */
 import type { RegimeAssessment } from "../regimeEngine";
+import { getRegimeOperatorLabel } from "../regimeLabels";
 import { buildComplianceStamp } from "../exportNotices";
 
 export type YearlySummaryProvenance = {
@@ -37,20 +38,6 @@ const yearlyActionGuidance: Record<RegimeAssessment["regime"], string> = {
     "commit to growth investments, scale core winners, and maintain payback discipline",
 };
 
-const getRegimeLabel = (regime: RegimeAssessment["regime"]) => {
-  switch (regime) {
-    case "SCARCITY":
-      return "Survival Mode";
-    case "DEFENSIVE":
-      return "Efficiency Mode";
-    case "VOLATILE":
-      return "Safety Mode";
-    case "EXPANSION":
-      return "Growth Mode";
-    default:
-      return regime;
-  }
-};
 
 export const getYearlyActionGuidance = (regime: RegimeAssessment["regime"]) =>
   yearlyActionGuidance[regime];
@@ -66,7 +53,7 @@ export const buildYearlySummary = ({
   recordDateLabel?: string;
   periodLabel?: string;
 }): YearlySummary => {
-  const regimeLabel = getRegimeLabel(assessment.regime);
+  const regimeLabel = getRegimeOperatorLabel(assessment.regime);
   const guidance = getYearlyActionGuidance(assessment.regime);
   const summary = `This year, operate in ${regimeLabel} mode: ${guidance}. ${assessment.description}`;
   const title = periodLabel ? `Yearly action summary — ${periodLabel}` : "Yearly action summary";

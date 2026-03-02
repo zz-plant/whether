@@ -3,6 +3,7 @@
  * Powers copy-ready cards and API responses with traceable provenance metadata.
  */
 import type { RegimeAssessment } from "../regimeEngine";
+import { getRegimeOperatorLabel } from "../regimeLabels";
 import { renderMonthlySummaryCopy } from "./summaryCopyRenderer";
 
 import type { MonthlyStructured, SummaryProvenance } from "./summaryTypes";
@@ -38,20 +39,6 @@ const monthlyActionGuidance: Record<RegimeAssessment["regime"], string> = {
     "scale proven bets, invest in durable growth channels, and keep payback discipline",
 };
 
-const getRegimeLabel = (regime: RegimeAssessment["regime"]) => {
-  switch (regime) {
-    case "SCARCITY":
-      return "Survival Mode";
-    case "DEFENSIVE":
-      return "Efficiency Mode";
-    case "VOLATILE":
-      return "Safety Mode";
-    case "EXPANSION":
-      return "Growth Mode";
-    default:
-      return regime;
-  }
-};
 
 export const getMonthlyActionGuidance = (regime: RegimeAssessment["regime"]) =>
   monthlyActionGuidance[regime];
@@ -86,7 +73,7 @@ export const buildMonthlySummary = ({
   provenance: MonthlySummaryProvenance;
   recordDateLabel?: string;
 }): MonthlySummary => {
-  const regimeLabel = getRegimeLabel(assessment.regime);
+  const regimeLabel = getRegimeOperatorLabel(assessment.regime);
   const guidance = getMonthlyActionGuidance(assessment.regime);
   const transitionCue = assessment.diagnostics.transitionWatch
     ? " Signals are near a regime boundary; hold major scope changes until the next read."

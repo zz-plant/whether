@@ -4,22 +4,8 @@
  */
 import type { RegimeAssessment } from "./regimeEngine";
 import { agentSkills } from "./agentSkills";
+import { getRegimeOperatorLabel } from "./regimeLabels";
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "./types";
-
-const getRegimeLabel = (regime: RegimeAssessment["regime"]) => {
-  switch (regime) {
-    case "SCARCITY":
-      return "Survival Mode";
-    case "DEFENSIVE":
-      return "Safety Mode";
-    case "VOLATILE":
-      return "Stability Mode";
-    case "EXPANSION":
-      return "Growth Mode";
-    default:
-      return regime;
-  }
-};
 
 const buildSignals = (
   treasury: TreasuryData,
@@ -56,7 +42,7 @@ export const buildAgentPayload = (
   sensors: SensorReading[],
   macros: MacroSeriesReading[]
 ) => {
-  const regimeLabel = getRegimeLabel(assessment.regime);
+  const regimeLabel = getRegimeOperatorLabel(assessment.regime);
 
   return {
     report_date: treasury.record_date,
