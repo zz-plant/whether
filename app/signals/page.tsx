@@ -27,6 +27,8 @@ import { reportPageLinks } from "../../lib/report/reportNavigation";
 import { ReturningVisitorDeltaStrip } from "../components/changeSinceLastReadPanel";
 import { buildTrustStatus } from "../../lib/report/trustStatus";
 import { SIGNALS_RELATED_LINKS } from "../../lib/report/reportCopy";
+import { indicatorTypeByScoreLabel, indicatorTypeLabel } from "../../lib/indicatorClassification";
+import { HistoricalReplayDatePicker } from "./components/historicalReplayDatePicker";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -235,7 +237,13 @@ export default async function SignalsPage({
   const essentialPriorityQueue = priorityQueue.slice(0, 2);
   const additionalPriorityQueue = priorityQueue.slice(2);
   const topDiagnosticCallouts = priorityQueue.slice(0, 3);
-  const scoreCards = [
+  const scoreCards: Array<{
+    label: keyof typeof indicatorTypeByScoreLabel;
+    value: string;
+    threshold: string;
+    description: string;
+    href: string;
+  }> = [
     {
       label: "Tightness",
       value: `${assessment.scores.tightness}/100`,
@@ -261,6 +269,11 @@ export default async function SignalsPage({
       href: "#sensor-array",
     },
   ];
+
+  const scoreCardsByType = {
+    leading: scoreCards.filter((card) => indicatorTypeByScoreLabel[card.label] === "leading"),
+    lagging: scoreCards.filter((card) => indicatorTypeByScoreLabel[card.label] === "lagging"),
+  } as const;
 
   return (
     <ReportShell
@@ -395,6 +408,19 @@ export default async function SignalsPage({
         </div>
       </section>
 
+      <section id="historical-replay" className="weather-panel space-y-4 px-6 py-5">
+        <header className="space-y-2">
+          <p className="text-sm font-semibold tracking-[0.18em] text-slate-300">Historical regime replay</p>
+          <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
+            Pick any date to replay the mandate card context.
+          </h2>
+          <p className="text-sm text-slate-300">
+            We snap your selection to the closest available monthly snapshot and label the replay timestamp.
+          </p>
+        </header>
+        <HistoricalReplayDatePicker initialDate={`${selectedYear}-${String(selectedMonth).padStart(2, "0")}-01`} />
+      </section>
+
       <section id="current-scores" className="weather-panel space-y-4 px-6 py-5">
         <header className="space-y-2">
           <p className="text-sm font-semibold tracking-[0.18em] text-slate-300">Current scores</p>
@@ -402,22 +428,29 @@ export default async function SignalsPage({
             Real-time scorecard for the three regime drivers.
           </h2>
         </header>
-        <div className="grid gap-3 lg:grid-cols-3">
-          {scoreCards.map((card) => (
-            <article key={card.label} className="weather-surface space-y-3 p-4">
-              <dl>
-                <dt className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">{card.label}</dt>
-                <dd className="mono mt-2 text-3xl leading-none text-slate-100">{card.value}</dd>
-              </dl>
-              <p className="text-sm font-semibold text-slate-200">Threshold: {card.threshold}</p>
-              <p className="text-sm text-slate-300">{card.description}</p>
-              <a
-                href={card.href}
-                className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-              >
-                Open source signals →
-              </a>
-            </article>
+        <div className="space-y-4">
+          {(["leading", "lagging"] as const).map((type) => (
+            <section key={type} className="space-y-2">
+              <h3 className="text-sm font-semibold tracking-[0.14em] text-slate-300">{indicatorTypeLabel[type]}</h3>
+              <div className="grid gap-3 lg:grid-cols-3">
+                {scoreCardsByType[type].map((card) => (
+                  <article key={card.label} className="weather-surface space-y-3 p-4">
+                    <dl>
+                      <dt className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">{card.label}</dt>
+                      <dd className="mono mt-2 text-3xl leading-none text-slate-100">{card.value}</dd>
+                    </dl>
+                    <p className="text-sm font-semibold text-slate-200">Threshold: {card.threshold}</p>
+                    <p className="text-sm text-slate-300">{card.description}</p>
+                    <a
+                      href={card.href}
+                      className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                    >
+                      Open source signals →
+                    </a>
+                  </article>
+                ))}
+              </div>
+            </section>
           ))}
         </div>
       </section>

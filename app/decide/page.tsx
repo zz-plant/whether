@@ -16,7 +16,7 @@ export default function DecidePage() {
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Decide</h1>
         <p className="text-sm text-slate-300">Choose the entry point that matches your situation, then move into concrete guidance.</p>
       </section>
-      <section className="grid gap-3 sm:grid-cols-2">
+      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <Link href="/decide/use-cases" className="weather-panel space-y-2 px-4 py-4">
           <h2 className="text-lg font-semibold text-slate-100">Role and situation paths</h2>
           <p className="text-sm text-slate-300">Choose by role or scenario to reach the right guidance quickly.</p>
@@ -24,6 +24,10 @@ export default function DecidePage() {
         <Link href="/signals" className="weather-panel space-y-2 px-4 py-4">
           <h2 className="text-lg font-semibold text-slate-100">Signals</h2>
           <p className="text-sm text-slate-300">Check the latest climate inputs before committing to a plan.</p>
+        </Link>
+        <Link href="/decide/ship-checklist" className="weather-panel space-y-2 px-4 py-4">
+          <h2 className="text-lg font-semibold text-slate-100">Whether to ship checklist</h2>
+          <p className="text-sm text-slate-300">Get a go/wait/kill recommendation tied to the current regime.</p>
         </Link>
       </section>
     </main>
