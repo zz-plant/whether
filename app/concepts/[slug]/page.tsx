@@ -14,6 +14,7 @@ import {
   productConceptArticles,
   regimeToneByKey,
 } from "../../../lib/productCanon";
+import { getConceptPublicationRegime, getConceptRegimeStatus, getCurrentRegimeContext } from "../../../lib/conceptRegime";
 
 type ConceptArticlePageProps = {
   params: Promise<{ slug: string }>;
@@ -83,6 +84,9 @@ export default async function ConceptArticlePage({ params }: ConceptArticlePageP
   }
 
   const macroContext = getMacroContextForArticle(article);
+  const currentRegime = getCurrentRegimeContext();
+  const publicationRegime = getConceptPublicationRegime(article);
+  const regimeStatus = getConceptRegimeStatus(article, currentRegime?.regime ?? null);
   const publishedLabel = formatPublishedLabel(article.publishedYear, article.publishedMonth);
   const canonicalArticleUrl = buildCanonicalUrl(`/concepts/${article.slug}`);
   const conceptArticleStructuredData = {
@@ -131,6 +135,11 @@ export default async function ConceptArticlePage({ params }: ConceptArticlePageP
           {article.author} · {publishedLabel} · Focus: {article.focus} · {article.sourceType} · ~{article.readMins} min read · Most relevant to {article.audience}
         </p>
         <p className="text-sm text-slate-200">{article.summary}</p>
+        {regimeStatus === "mismatch" && publicationRegime && currentRegime ? (
+          <p className="rounded-md border border-amber-400/40 bg-amber-900/30 px-3 py-2 text-xs text-amber-100">
+            Macro-mismatch warning: this concept was written for {publicationRegime.regimeLabel}. Current regime is {currentRegime.regimeLabel}.
+          </p>
+        ) : null}
       </section>
 
       <section className="weather-panel space-y-4 px-6 py-6">

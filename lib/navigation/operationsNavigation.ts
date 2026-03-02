@@ -28,6 +28,12 @@ export const operationsWorkstreamLinks: OperationsWorkstreamLink[] = [
     description: "Export aligned narratives, leadership briefs, and CXO-ready deliverables.",
   },
   {
+    href: "/operations/integrations" as Route,
+    label: "Integrations",
+    description: "Push weekly mandate payloads into Slack, Notion, and Linear.",
+  },
+
+  {
     href: "/operations/data",
     label: "Data",
     description: "Access weekly API usage guidance and handoff references for operators.",

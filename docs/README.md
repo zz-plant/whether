@@ -33,6 +33,7 @@ Use this index to find the **current** source of truth quickly.
 - `concepts-enhancements.md` — enhancement opportunities for `/concepts` experiences.
 - `solutions-enhancements.md` — enhancement opportunities for `/solutions` and career-path flows.
 - `design-improvements-priority.md` — prioritized design/UX improvement backlog.
+- `agent-accelerated-prioritization-spec.md` — prioritized implementation spec for the next feature wave under coding-agent execution assumptions.
 - `research/2026-03-01-target-persona-frontend-critique.md` — persona-based constructive critique of the current frontend.
 - `research/2026-03-01-target-persona-frontend-critique-vp-engineering.md` — persona-based frontend critique from a VP Engineering perspective.
 - `research/2026-03-01-prioritized-frontend-change-list.md` — consolidated prioritized implementation backlog from persona critiques.

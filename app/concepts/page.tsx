@@ -10,6 +10,7 @@ import {
   regimeToneByKey,
   toConceptTaxonomySlug,
 } from "../../lib/productCanon";
+import { getConceptPublicationRegime, getConceptRegimeStatus, getCurrentRegimeContext } from "../../lib/conceptRegime";
 
 export const dynamic = "force-static";
 
@@ -71,6 +72,7 @@ export default async function ProductConceptTimelinePage({
   const { q = "", era = "all", audience = "all", regime = "all" } = await searchParams;
 
   const searchQuery = q.trim().toLowerCase();
+  const currentRegime = getCurrentRegimeContext();
   const audienceOptions = [...new Set(productConceptArticles.map((article) => article.audience))].sort();
   const regimeOptions = [
     ...new Set(
@@ -139,6 +141,9 @@ export default async function ProductConceptTimelinePage({
           explains what was said, why teams adopted it, and which market conditions likely
           reinforced the idea.
         </p>
+        {currentRegime ? (
+          <p className="text-xs text-slate-300">Current regime baseline: {currentRegime.regimeLabel}.</p>
+        ) : null}
       </section>
 
       <section className="weather-panel space-y-4 px-6 py-6">
@@ -225,6 +230,12 @@ export default async function ProductConceptTimelinePage({
 
       <section className="weather-panel space-y-3 px-6 py-5">
         <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-300">Explore concept maps</h2>
+        <Link
+          href="/concepts/conflicts"
+          className="weather-button inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.12em]"
+        >
+          Open conflict map
+        </Link>
         <div className="space-y-3">
           <div>
             <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">By focus</p>
@@ -287,6 +298,8 @@ export default async function ProductConceptTimelinePage({
             <ol className="space-y-3">
               {articles.map((article) => {
                 const macroContext = getMacroContextForArticle(article);
+                const publicationRegime = getConceptPublicationRegime(article);
+                const regimeStatus = getConceptRegimeStatus(article, currentRegime?.regime ?? null);
 
                 return (
                   <li key={article.slug} className="weather-surface space-y-3 px-4 py-4">
@@ -313,6 +326,11 @@ export default async function ProductConceptTimelinePage({
                         {article.readMins} min read
                       </p>
                       <p className="text-sm text-slate-200">{article.summary}</p>
+                      {regimeStatus === "mismatch" && publicationRegime && currentRegime ? (
+                        <p className="rounded-md border border-amber-400/40 bg-amber-900/30 px-3 py-2 text-xs text-amber-100">
+                          Macro-mismatch warning: written for {publicationRegime.regimeLabel}, while the current regime is {currentRegime.regimeLabel}.
+                        </p>
+                      ) : null}
                       {macroContext ? (
                         <p className="text-xs text-slate-300">
                           Guidance signal at publication: {macroContext.primary.summary.guidance}

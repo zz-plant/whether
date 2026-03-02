@@ -1,0 +1,26 @@
+[
+  {
+    "id": "strategy-no-vs-roadmaps-out",
+    "leftSlug": "product-strategy-means-saying-no",
+    "rightSlug": "roadmaps-out-principles-and-ai-prototypes-in",
+    "conflict": "Constraint-first prioritization vs principle-led rapid exploration.",
+    "winnerByRegime": {
+      "SCARCITY": "product-strategy-means-saying-no",
+      "DEFENSIVE": "product-strategy-means-saying-no",
+      "VOLATILE": "roadmaps-out-principles-and-ai-prototypes-in",
+      "EXPANSION": "roadmaps-out-principles-and-ai-prototypes-in"
+    }
+  },
+  {
+    "id": "retention-vs-momentum",
+    "leftSlug": "retention-is-king",
+    "rightSlug": "the-product-momentum-gap",
+    "conflict": "Retention durability bias vs momentum recapture through focused acceleration.",
+    "winnerByRegime": {
+      "SCARCITY": "retention-is-king",
+      "DEFENSIVE": "retention-is-king",
+      "VOLATILE": "retention-is-king",
+      "EXPANSION": "the-product-momentum-gap"
+    }
+  }
+]
