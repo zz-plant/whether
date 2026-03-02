@@ -1,7 +1,25 @@
 Build not running on Vercel. System environment variables will not be available.
-Invalid prerender config for /concepts/[slug]
-Invalid prerender config for /guides/[stakeholder]
-Invalid prerender config for /guides/stage/[stage]
-Invalid prerender config for /solutions/career-paths/[role]
+Bun is used as a package manager at build time only, not at runtime with Functions
+You should not upload the `.next` directory.
 Using edge runtime on a page currently disables static generation for that page
 Duplicate key "options" in object literal [duplicate-object-key]
+Invalid prerender config for /concepts/[slug]
+Invalid prerender config for /concepts/[slug].rsc
+Invalid prerender config for /concepts/audience/[audience]
+Invalid prerender config for /concepts/audience/[audience].rsc
+Invalid prerender config for /concepts/focus/[focus]
+Invalid prerender config for /concepts/focus/[focus].rsc
+Invalid prerender config for /decide/[slug]
+Invalid prerender config for /decide/[slug].rsc
+Invalid prerender config for /guides/[stakeholder]
+Invalid prerender config for /guides/[stakeholder].rsc
+Invalid prerender config for /guides/stage/[stage]
+Invalid prerender config for /guides/stage/[stage].rsc
+Invalid prerender config for /library/failure-modes/[slug]
+Invalid prerender config for /library/failure-modes/[slug].rsc
+Invalid prerender config for /posture/[slug]
+Invalid prerender config for /posture/[slug].rsc
+Invalid prerender config for /solutions/career-paths/[role]
+Invalid prerender config for /solutions/career-paths/[role].rsc
+Invalid prerender config for /toolkits/[slug]
+Invalid prerender config for /toolkits/[slug].rsc

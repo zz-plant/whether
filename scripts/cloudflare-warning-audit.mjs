@@ -78,17 +78,32 @@ const ensureParentDirectory = (filePath) => {
 };
 
 const warningPattern = /warn(?:ing)?(?:\s*[-:\]])?\s*(.+)$/i;
+const invalidPrerenderPattern = /Invalid prerender config for .+/i;
+const edgeRuntimePattern = /Using edge runtime on a page currently disables static generation for that page/i;
+
+const normalizeWarningMessage = (value) =>
+  value
+    .replace(/^[!:\-\]\[]+\s*/, "")
+    .replace(/\s+/g, " ")
+    .trim();
 
 const collectWarnings = (logContents) => {
   const warningCounts = new Map();
 
   for (const line of logContents.split(/\r?\n/)) {
-    if (!/\bwarn(?:ing)?\b/i.test(line)) {
+    const isWarningLine = /\bwarn(?:ing)?\b/i.test(line);
+    const invalidPrerenderMatch = line.match(invalidPrerenderPattern);
+    const edgeRuntimeMatch = line.match(edgeRuntimePattern);
+
+    if (!isWarningLine && !invalidPrerenderMatch && !edgeRuntimeMatch) {
       continue;
     }
 
-    const match = line.match(warningPattern);
-    const warningMessage = (match?.[1] ?? line).replace(/\s+/g, " ").trim();
+    const warningMatch = isWarningLine ? line.match(warningPattern) : null;
+    const rawWarningMessage = isWarningLine
+      ? warningMatch?.[1] ?? line
+      : invalidPrerenderMatch?.[0] ?? edgeRuntimeMatch?.[0] ?? line;
+    const warningMessage = normalizeWarningMessage(rawWarningMessage);
 
     if (!warningMessage) {
       continue;
