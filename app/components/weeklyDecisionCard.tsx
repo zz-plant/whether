@@ -6,7 +6,7 @@ import { Select } from "@base-ui/react/select";
 import { Tabs } from "@base-ui/react/tabs";
 import { Tooltip } from "@base-ui/react/tooltip";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 type Regime = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
 
@@ -18,6 +18,8 @@ type WeeklyDecisionCardProps = {
   recordDateLabel: string;
   fetchedAtLabel: string;
 };
+
+type OperatorProfile = "saas-growth-plg" | "fintech-a-enterprise" | "marketplace-seed-mixed" | "hardware-growth-enterprise";
 
 type EngineeringPosture = {
   posture: "Accelerate" | "Stabilize" | "Optimize";
@@ -91,8 +93,7 @@ export function WeeklyDecisionCard({
   recordDateLabel,
   fetchedAtLabel,
 }: WeeklyDecisionCardProps) {
-  const [profile, setProfile] = useState("saas-growth-plg");
-  const topActions = startItems.slice(0, 3);
+  const [profile, setProfile] = useState<OperatorProfile>("saas-growth-plg");
 
   const ownerKeywords: Record<string, string[]> = {
     Engineering: ["hire", "engineering", "platform", "reliability"],
@@ -109,20 +110,46 @@ export function WeeklyDecisionCard({
     }
     return "Product";
   };
+  const profileGuidance: Record<
+    OperatorProfile,
+    {
+      label: string;
+      actionOverlay: string;
+      guardrailOverlay: string;
+      summaryOverlay: string;
+    }
+  > = {
+    "saas-growth-plg": {
+      label: "SaaS · Growth · PLG",
+      actionOverlay: "Prioritize activation and retention improvements that recover payback inside two quarters.",
+      guardrailOverlay: "Avoid broad rewrites that delay near-term product shipping.",
+      summaryOverlay: "Translate guidance toward self-serve funnel efficiency and retention momentum.",
+    },
+    "fintech-a-enterprise": {
+      label: "Fintech · Series A · Enterprise",
+      actionOverlay: "Pair roadmap commitments with compliance readiness and enterprise-proof reliability narratives.",
+      guardrailOverlay: "Avoid growth moves that increase regulatory or counterparty exposure.",
+      summaryOverlay: "Translate guidance toward auditability, procurement readiness, and trust signals.",
+    },
+    "marketplace-seed-mixed": {
+      label: "Marketplace · Seed · Mixed",
+      actionOverlay: "Sequence supply and demand bets in small increments to protect marketplace liquidity.",
+      guardrailOverlay: "Avoid fixed-cost GTM expansion before two-sided liquidity stabilizes.",
+      summaryOverlay: "Translate guidance toward liquidity loop health and trust preservation.",
+    },
+    "hardware-growth-enterprise": {
+      label: "Hardware · Growth · Enterprise",
+      actionOverlay: "Gate long-cycle roadmap and inventory exposure behind contracted demand signals.",
+      guardrailOverlay: "Avoid speculative capacity expansion before demand durability is proven.",
+      summaryOverlay: "Translate guidance toward cash conversion discipline and fulfillment reliability.",
+    },
+  };
+
+  const selectedProfileGuidance = profileGuidance[profile];
+  const topActions = [...startItems.slice(0, 2), selectedProfileGuidance.actionOverlay];
   const guardrail = stopItems[0] ?? "Avoid irreversible commitments until confidence improves.";
   const engineeringPosture = engineeringPostureByRegime[regime];
-  const profileLabel = useMemo(() => {
-    switch (profile) {
-      case "fintech-a-enterprise":
-        return "Fintech · Series A · Enterprise";
-      case "marketplace-seed-mixed":
-        return "Marketplace · Seed · Mixed";
-      case "hardware-growth-enterprise":
-        return "Hardware · Growth · Enterprise";
-      default:
-        return "SaaS · Growth · PLG";
-    }
-  }, [profile]);
+  const profileLabel = selectedProfileGuidance.label;
 
   const stakeholderActionSets = {
     product: topActions,
@@ -139,9 +166,10 @@ export function WeeklyDecisionCard({
           <h2 className="text-2xl font-semibold tracking-tight text-slate-50">{statusLabel} posture</h2>
           <p className="text-sm text-slate-300">Signals through {recordDateLabel} · Refresh {fetchedAtLabel}</p>
           <p className="text-xs text-slate-400">Weekly call · monthly rollup in Action playbook</p>
+          <p className="text-xs text-slate-300">{selectedProfileGuidance.summaryOverlay}</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Select.Root value={profile} onValueChange={(value) => setProfile(value ?? "saas-growth-plg")}>
+          <Select.Root value={profile} onValueChange={(value) => setProfile((value as OperatorProfile | null) ?? "saas-growth-plg")}>
             <Select.Trigger className="weather-button inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em]">
               <span className="sr-only">Operator profile</span>
               <Select.Value>
@@ -234,6 +262,7 @@ export function WeeklyDecisionCard({
         <article className="rounded-2xl border border-slate-700/70 bg-slate-950/45 p-4">
           <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-amber-200">Guardrail (do not do)</h3>
           <p className="mt-3 text-sm text-slate-100">{guardrail}</p>
+          <p className="mt-2 text-sm text-slate-300">{selectedProfileGuidance.guardrailOverlay}</p>
         </article>
 
         <article className="rounded-2xl border border-slate-700/70 bg-slate-950/45 p-4">
