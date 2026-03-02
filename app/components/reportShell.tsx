@@ -452,19 +452,19 @@ export const ReportShell = ({
                           {secondaryCta.label}
                         </a>
                       ) : null}
+                      {exportCta ? (
+                        <a
+                          href={exportCta.href}
+                          className="weather-pill inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-sky-400/70 bg-sky-500/10 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-sky-100 transition-colors hover:border-sky-300 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto"
+                        >
+                          {exportCta.label}
+                        </a>
+                      ) : null}
                       <details className="group w-full sm:w-auto">
                         <summary className="weather-pill inline-flex min-h-[44px] w-full cursor-pointer list-none items-center justify-center rounded-full border border-slate-700/80 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto">
                           More actions
                         </summary>
                         <div className="mt-2 grid gap-2 sm:min-w-[18rem]">
-                          {exportCta ? (
-                            <a
-                              href={exportCta.href}
-                              className="weather-pill inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-700/80 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                            >
-                              {exportCta.label}
-                            </a>
-                          ) : null}
                           <a
                             href="/about#subscribe"
                             className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-700/80 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
