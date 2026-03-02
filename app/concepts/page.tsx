@@ -117,11 +117,13 @@ export default async function ProductConceptTimelinePage({
   const canonicalDistribution = productConceptArticles.reduce(
     (acc, article) => {
       const macroContext = getMacroContextForArticle(article);
+      acc.total += 1;
+
       if (!macroContext) {
+        acc.unmapped += 1;
         return acc;
       }
 
-      acc.total += 1;
       acc.byRegime[macroContext.primary.summary.regime] += 1;
       return acc;
     },
@@ -133,6 +135,7 @@ export default async function ProductConceptTimelinePage({
         VOLATILE: 0,
         EXPANSION: 0,
       },
+      unmapped: 0,
     },
   );
 
@@ -198,6 +201,11 @@ export default async function ProductConceptTimelinePage({
               </p>
             );
           })}
+          {canonicalDistribution.unmapped > 0 ? (
+            <p>
+              Outside coverage window: {Math.round((canonicalDistribution.unmapped / canonicalDistribution.total) * 100)}%
+            </p>
+          ) : null}
         </div>
         <p className="text-xs text-slate-300">
           Most PM frameworks in this canon emerged under looser-capital conditions, which can over-index the default playbook toward expansion assumptions.
