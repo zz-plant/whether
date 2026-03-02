@@ -104,6 +104,16 @@ const signalLabels: Record<ReportDynamics["changedSignals"][number]["key"], stri
   curveSlope: "Curve slope",
 };
 
+const signalDeteriorationPolarity: Record<
+  ReportDynamics["changedSignals"][number]["key"],
+  1 | -1
+> = {
+  tightness: 1,
+  riskAppetite: -1,
+  baseRate: 1,
+  curveSlope: -1,
+};
+
 export const buildReportDynamics = ({
   current,
   previous,
@@ -143,14 +153,18 @@ export const buildReportDynamics = ({
     },
   ].filter((item) => Math.abs(item.delta) >= 0.01);
 
-  const positiveMoves = comparisons.filter((item) => item.delta > 0).length;
-  const negativeMoves = comparisons.filter((item) => item.delta < 0).length;
+  const deteriorationMoves = comparisons.filter(
+    (item) => item.delta * signalDeteriorationPolarity[item.key] > 0
+  ).length;
+  const improvementMoves = comparisons.filter(
+    (item) => item.delta * signalDeteriorationPolarity[item.key] < 0
+  ).length;
   const directionLabel: ReportDynamics["directionLabel"] =
     comparisons.length === 0
       ? "stable"
-      : positiveMoves > 0 && negativeMoves > 0
+      : deteriorationMoves > 0 && improvementMoves > 0
         ? "mixed"
-        : positiveMoves > 0
+        : deteriorationMoves > 0
           ? "deteriorating"
           : "improving";
 
