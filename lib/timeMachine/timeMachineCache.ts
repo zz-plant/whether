@@ -74,10 +74,26 @@ const timeMachineEntryKeys = new Set(
   sortedSnapshots.map((snapshot) => `${snapshot.year}-${snapshot.month}`)
 );
 
-const timeMachineEntries = sortedSnapshots.map((snapshot) => ({
-  year: snapshot.year,
-  month: snapshot.month,
-}));
+export const buildUniqueMonthEntries = (
+  snapshots: Pick<TimeMachineSnapshot, "year" | "month">[]
+) => {
+  const entries: { year: number; month: number }[] = [];
+  const seen = new Set<string>();
+
+  snapshots.forEach((snapshot) => {
+    const key = `${snapshot.year}-${snapshot.month}`;
+    if (seen.has(key)) {
+      return;
+    }
+
+    entries.push({ year: snapshot.year, month: snapshot.month });
+    seen.add(key);
+  });
+
+  return entries;
+};
+
+const timeMachineEntries = buildUniqueMonthEntries(sortedSnapshots);
 
 const timeMachineEntryIndex = new Map(
   timeMachineEntries.map((entry, index) => [`${entry.year}-${entry.month}`, index])
