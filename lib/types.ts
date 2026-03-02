@@ -63,13 +63,25 @@ export interface SensorReading {
   timeWindows?: SensorWindowAggregation[];
 }
 
-export type MacroSeriesId = "CPI_YOY" | "UNEMPLOYMENT_RATE" | "BBB_CREDIT_SPREAD";
+export type MacroSeriesId =
+  | "CPI_YOY"
+  | "UNEMPLOYMENT_RATE"
+  | "BBB_CREDIT_SPREAD"
+  | "HY_CREDIT_SPREAD"
+  | "CHICAGO_FCI"
+  | "VIX_INDEX"
+  | "VC_FUNDING_VELOCITY"
+  | "TECH_LAYOFF_TREND"
+  | "SAAS_VALUATION_MULTIPLE"
+  | "EARNINGS_REVISION_INDEX"
+  | "AI_COMPUTE_COST_TREND"
+  | "REGULATORY_RISK_TRACKER";
 
 export interface MacroSeriesReading {
   id: MacroSeriesId;
   label: string;
   value: number | null;
-  unit: "%" | "bps";
+  unit: "%" | "bps" | "x" | "index";
   explanation: string;
   sourceLabel: string;
   sourceUrl: string;

@@ -3,7 +3,7 @@
  * Prefers live series fetches and falls back to checked-in snapshot data.
  */
 import macroSnapshot from "../data/macro_snapshot.json";
-import type { MacroSeriesReading } from "./types";
+import type { MacroSeriesId, MacroSeriesReading } from "./types";
 
 type MacroSnapshotPayload = {
   fetched_at: string;
@@ -14,6 +14,13 @@ type MacroSnapshotPayload = {
       isLive?: boolean;
     }
   >;
+};
+
+type LiveSeriesValue = {
+  value: number;
+  recordDate: string;
+  sourceLabel: string;
+  sourceUrl: string;
 };
 
 const payload = macroSnapshot as MacroSnapshotPayload;
@@ -132,52 +139,74 @@ const readBlsLatestYearOverYear = async (seriesId: string, fetcher: typeof fetch
   const month = latest.period.replace("M", "");
   return {
     recordDate: `${latest.year}-${month}-01`,
-    value:
-      ((latestValue - previousYearValue) / previousYearValue) *
-      YEAR_OVER_YEAR_PERCENT_MULTIPLIER,
+    value: ((latestValue - previousYearValue) / previousYearValue) * YEAR_OVER_YEAR_PERCENT_MULTIPLIER,
   };
 };
 
 const buildLiveSeries = async (fetcher: typeof fetch): Promise<MacroSeriesReading[]> => {
-  const [cpi, unemployment, bbbSpread] = await Promise.all([
+  const [cpi, unemployment, bbbSpread, hySpread, chicagoFci, vix] = await Promise.all([
     readBlsLatestYearOverYear("CUUR0000SA0", fetcher),
     readBlsLatestValue("LNS14000000", fetcher),
     readFredLatestValue("BAA10Y", fetcher),
+    readFredLatestValue("BAMLH0A0HYM2", fetcher),
+    readFredLatestValue("NFCI", fetcher),
+    readFredLatestValue("VIXCLS", fetcher),
   ]);
 
-  return snapshotSeries.map((series) => {
-    if (series.id === "CPI_YOY") {
-      return {
-        ...series,
-        value: cpi.value,
-        record_date: cpi.recordDate,
-        fetched_at: new Date().toISOString(),
-        isLive: true,
-        sourceLabel: "BLS public API",
-        sourceUrl: "https://api.bls.gov/publicAPI/v2/timeseries/data/",
-      };
-    }
+  const nowIso = new Date().toISOString();
+  const liveById: Partial<Record<MacroSeriesId, LiveSeriesValue>> = {
+    CPI_YOY: {
+      value: cpi.value,
+      recordDate: cpi.recordDate,
+      sourceLabel: "BLS public API",
+      sourceUrl: "https://api.bls.gov/publicAPI/v2/timeseries/data/",
+    },
+    UNEMPLOYMENT_RATE: {
+      value: unemployment.value,
+      recordDate: unemployment.recordDate,
+      sourceLabel: "BLS public API",
+      sourceUrl: "https://api.bls.gov/publicAPI/v2/timeseries/data/",
+    },
+    BBB_CREDIT_SPREAD: {
+      value: bbbSpread.value,
+      recordDate: bbbSpread.recordDate,
+      sourceLabel: "FRED",
+      sourceUrl: "https://fred.stlouisfed.org/series/BAA10Y",
+    },
+    HY_CREDIT_SPREAD: {
+      value: hySpread.value,
+      recordDate: hySpread.recordDate,
+      sourceLabel: "FRED",
+      sourceUrl: "https://fred.stlouisfed.org/series/BAMLH0A0HYM2",
+    },
+    CHICAGO_FCI: {
+      value: chicagoFci.value,
+      recordDate: chicagoFci.recordDate,
+      sourceLabel: "FRED",
+      sourceUrl: "https://fred.stlouisfed.org/series/NFCI",
+    },
+    VIX_INDEX: {
+      value: vix.value,
+      recordDate: vix.recordDate,
+      sourceLabel: "FRED",
+      sourceUrl: "https://fred.stlouisfed.org/series/VIXCLS",
+    },
+  };
 
-    if (series.id === "UNEMPLOYMENT_RATE") {
-      return {
-        ...series,
-        value: unemployment.value,
-        record_date: unemployment.recordDate,
-        fetched_at: new Date().toISOString(),
-        isLive: true,
-        sourceLabel: "BLS public API",
-        sourceUrl: "https://api.bls.gov/publicAPI/v2/timeseries/data/",
-      };
+  return snapshotSeries.map((series) => {
+    const live = liveById[series.id];
+    if (!live) {
+      return series;
     }
 
     return {
       ...series,
-      value: bbbSpread.value,
-      record_date: bbbSpread.recordDate,
-      fetched_at: new Date().toISOString(),
+      value: live.value,
+      record_date: live.recordDate,
+      fetched_at: nowIso,
       isLive: true,
-      sourceLabel: "FRED",
-      sourceUrl: "https://fred.stlouisfed.org/series/BAA10Y",
+      sourceLabel: live.sourceLabel,
+      sourceUrl: live.sourceUrl,
     };
   });
 };

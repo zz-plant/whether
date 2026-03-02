@@ -2,7 +2,7 @@
  * Regime Engine core logic for scoring and classifying macro regimes.
  * Keeps deterministic, explainable rules close to their types.
  */
-import type { TreasuryData, TreasuryYields } from "./types";
+import type { MacroSeriesReading, TreasuryData, TreasuryYields } from "./types";
 
 export type RegimeKey = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
 
@@ -49,6 +49,9 @@ export type RegimeDiagnostics = {
   confidence: "LOW" | "MEDIUM" | "HIGH";
   transitionWatch: boolean;
   intensity: "MILD" | "STANDARD" | "STRONG";
+  boundaryContributors: string[];
+  weakReadCount: number;
+  twoWeakReadsWarning: boolean;
 };
 
 export type RegimeChangeReason = {
@@ -258,10 +261,70 @@ export const classifyRegime = (
   return "EXPANSION";
 };
 
+
+
+const getMacroValue = (series: MacroSeriesReading[], id: MacroSeriesReading["id"]) =>
+  series.find((entry) => entry.id === id)?.value ?? null;
+
+const applyMacroAdjustments = (
+  tightness: number,
+  riskAppetite: number,
+  macroSeries: MacroSeriesReading[]
+) => {
+  let adjustedTightness = tightness;
+  let adjustedRiskAppetite = riskAppetite;
+  const contributors: string[] = [];
+  let weakReadCount = 0;
+
+  const hySpread = getMacroValue(macroSeries, "HY_CREDIT_SPREAD");
+  if (typeof hySpread === "number" && hySpread >= 4.5) {
+    adjustedTightness = clamp(adjustedTightness + Math.min(15, Math.round((hySpread - 4.5) * 6)), 0, 100);
+    contributors.push("HY OAS stress");
+    weakReadCount += 1;
+  }
+
+  const chicagoFci = getMacroValue(macroSeries, "CHICAGO_FCI");
+  if (typeof chicagoFci === "number" && chicagoFci >= 0) {
+    adjustedTightness = clamp(adjustedTightness + Math.min(10, Math.round(chicagoFci * 10)), 0, 100);
+    contributors.push("Financial conditions tightening");
+    weakReadCount += 1;
+  }
+
+  const vix = getMacroValue(macroSeries, "VIX_INDEX");
+  if (typeof vix === "number" && vix >= 20) {
+    adjustedRiskAppetite = clamp(adjustedRiskAppetite - Math.min(20, Math.round((vix - 20) * 1.5)), 0, 100);
+    contributors.push("Equity volatility shock");
+    weakReadCount += 1;
+  }
+
+  const vcVelocity = getMacroValue(macroSeries, "VC_FUNDING_VELOCITY");
+  if (typeof vcVelocity === "number" && vcVelocity <= -5) {
+    adjustedRiskAppetite = clamp(adjustedRiskAppetite - Math.min(10, Math.round(Math.abs(vcVelocity + 5) * 1.5)), 0, 100);
+    contributors.push("VC funding slowdown");
+    weakReadCount += 1;
+  }
+
+  const layoffs = getMacroValue(macroSeries, "TECH_LAYOFF_TREND");
+  if (typeof layoffs === "number" && layoffs >= 65) {
+    adjustedRiskAppetite = clamp(adjustedRiskAppetite - Math.min(12, Math.round((layoffs - 65) * 0.6)), 0, 100);
+    contributors.push("Tech layoff pressure");
+    weakReadCount += 1;
+  }
+
+  return {
+    tightness: adjustedTightness,
+    riskAppetite: adjustedRiskAppetite,
+    boundaryContributors: contributors,
+    weakReadCount,
+  };
+};
+
 const computeDiagnostics = (
   tightness: number,
   riskAppetite: number,
-  thresholds: RegimeThresholds
+  thresholds: RegimeThresholds,
+  boundaryContributors: string[] = [],
+  weakReadCount = 0
 ): RegimeDiagnostics => {
   const tightnessDelta = Math.round(tightness - thresholds.tightnessRegime);
   const riskAppetiteDelta = Math.round(riskAppetite - thresholds.riskAppetiteRegime);
@@ -279,6 +342,9 @@ const computeDiagnostics = (
     confidence,
     transitionWatch,
     intensity,
+    boundaryContributors,
+    weakReadCount,
+    twoWeakReadsWarning: weakReadCount >= 2,
   };
 };
 
@@ -427,7 +493,8 @@ export const buildRegimeChangeReasons = (
 
 export const evaluateRegime = (
   treasury: TreasuryData,
-  overrides?: Partial<RegimeThresholds>
+  overrides?: Partial<RegimeThresholds>,
+  macroSeries: MacroSeriesReading[] = []
 ): RegimeAssessment => {
   const dataWarnings: string[] = [];
   const baseRate = getBaseRate(treasury.yields);
@@ -446,14 +513,23 @@ export const evaluateRegime = (
     baseRate.used === "MISSING" ? thresholds.baseRateTightness : baseRate.value;
   const curveSlopeForScore = curveSlope ?? RISK_APPETITE_MIN_SLOPE;
 
-  const tightness = computeTightnessScore(
+  const baselineTightness = computeTightnessScore(
     baseRateForScore,
     curveSlopeForScore,
     thresholds.baseRateTightness
   );
-  const riskAppetite = computeRiskAppetiteScore(curveSlopeForScore);
+  const baselineRiskAppetite = computeRiskAppetiteScore(curveSlopeForScore);
+  const macroAdjusted = applyMacroAdjustments(baselineTightness, baselineRiskAppetite, macroSeries);
+  const tightness = macroAdjusted.tightness;
+  const riskAppetite = macroAdjusted.riskAppetite;
   const regime = classifyRegime(tightness, riskAppetite, thresholds);
-  const diagnostics = computeDiagnostics(tightness, riskAppetite, thresholds);
+  const diagnostics = computeDiagnostics(
+    tightness,
+    riskAppetite,
+    thresholds,
+    macroAdjusted.boundaryContributors,
+    macroAdjusted.weakReadCount
+  );
   const profile = REGIME_PROFILES[regime];
 
   return {

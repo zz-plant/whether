@@ -127,8 +127,9 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
   const fetchedAtLabel = formatTimestampUTC(treasury.fetched_at);
   const treasuryAgeLabel = formatAgeHours(treasury.fetched_at, now);
   const sensors = buildSensorReadings(treasury);
-  const assessment = evaluateRegime(treasury, thresholds);
-  const liveAssessment = historicalSelection ? evaluateRegime(liveTreasury, thresholds) : null;
+  const assessmentMacroSeries = historicalSelection ? [] : macroSeries;
+  const assessment = evaluateRegime(treasury, thresholds, assessmentMacroSeries);
+  const liveAssessment = historicalSelection ? evaluateRegime(liveTreasury, thresholds, macroSeries) : null;
   const { playbook, startItems, stopItems } = getPlaybookGuidance(assessment.regime);
   const fenceItems = assessment.constraints;
   const previousSnapshot = historicalSelection
