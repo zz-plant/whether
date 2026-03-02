@@ -86,6 +86,14 @@ const VC_VELOCITY_RISK_APPETITE_CAP = 10;
 const LAYOFF_PRESSURE_THRESHOLD = 65;
 const LAYOFF_RISK_APPETITE_MULTIPLIER = 0.6;
 const LAYOFF_RISK_APPETITE_CAP = 12;
+const BASE_RATE_TIGHTNESS_MULTIPLIER = 180;
+const CURVE_INVERSION_TIGHTNESS_MULTIPLIER = 50;
+const DIAGNOSTIC_CONFIDENCE_HIGH_DELTA = 20;
+const DIAGNOSTIC_CONFIDENCE_MEDIUM_DELTA = 10;
+const DIAGNOSTIC_TRANSITION_WATCH_DELTA = 5;
+const DIAGNOSTIC_INTENSITY_STRONG_DELTA = 25;
+const DIAGNOSTIC_INTENSITY_STANDARD_DELTA = 10;
+const TWO_WEAK_READS_WARNING_COUNT = 2;
 
 export interface RegimeThresholds {
   baseRateTightness: number;
@@ -244,15 +252,21 @@ export const computeTightnessScore = (
   baseRateThreshold: number
 ) => {
   const baseRatePoints = clamp(
-    Math.round((baseRate - baseRateThreshold) * 180),
-    0,
+    Math.round((baseRate - baseRateThreshold) * BASE_RATE_TIGHTNESS_MULTIPLIER),
+    SCORE_MIN,
     TIGHTNESS_BASE_RATE_POINTS
   );
   const inversionPoints =
-    curveSlope < 0 ? clamp(Math.round(Math.abs(curveSlope) * 50), 0, TIGHTNESS_INVERSION_POINTS) : 0;
+    curveSlope < SCORE_MIN
+      ? clamp(
+          Math.round(Math.abs(curveSlope) * CURVE_INVERSION_TIGHTNESS_MULTIPLIER),
+          SCORE_MIN,
+          TIGHTNESS_INVERSION_POINTS
+        )
+      : SCORE_MIN;
   const score = baseRatePoints + inversionPoints;
 
-  return clamp(score, 0, TIGHTNESS_CAP);
+  return clamp(score, SCORE_MIN, TIGHTNESS_CAP);
 };
 
 export const computeRiskAppetiteScore = (curveSlope: number) => {
@@ -390,10 +404,18 @@ const computeDiagnostics = (
   const riskAppetiteDelta = Math.round(riskAppetite - thresholds.riskAppetiteRegime);
   const nearestThresholdDelta = Math.min(Math.abs(tightnessDelta), Math.abs(riskAppetiteDelta));
   const confidence =
-    nearestThresholdDelta >= 20 ? "HIGH" : nearestThresholdDelta >= 10 ? "MEDIUM" : "LOW";
-  const transitionWatch = nearestThresholdDelta <= 5;
+    nearestThresholdDelta >= DIAGNOSTIC_CONFIDENCE_HIGH_DELTA
+      ? "HIGH"
+      : nearestThresholdDelta >= DIAGNOSTIC_CONFIDENCE_MEDIUM_DELTA
+        ? "MEDIUM"
+        : "LOW";
+  const transitionWatch = nearestThresholdDelta <= DIAGNOSTIC_TRANSITION_WATCH_DELTA;
   const intensity =
-    nearestThresholdDelta >= 25 ? "STRONG" : nearestThresholdDelta >= 10 ? "STANDARD" : "MILD";
+    nearestThresholdDelta >= DIAGNOSTIC_INTENSITY_STRONG_DELTA
+      ? "STRONG"
+      : nearestThresholdDelta >= DIAGNOSTIC_INTENSITY_STANDARD_DELTA
+        ? "STANDARD"
+        : "MILD";
 
   return {
     tightnessDelta,
@@ -404,7 +426,7 @@ const computeDiagnostics = (
     intensity,
     boundaryContributors,
     weakReadCount,
-    twoWeakReadsWarning: weakReadCount >= 2,
+    twoWeakReadsWarning: weakReadCount >= TWO_WEAK_READS_WARNING_COUNT,
   };
 };
 
