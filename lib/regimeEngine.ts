@@ -69,6 +69,31 @@ export const TIGHTNESS_REGIME_THRESHOLD = 70;
 export const RISK_APPETITE_REGIME_THRESHOLD = 50;
 export const REGIME_REVERSAL_DAYS = 30;
 export const TREASURY_SOURCE_LABEL = "US Treasury Fiscal Data API";
+const SCORE_MIN = 0;
+const SCORE_MAX = 100;
+const HY_SPREAD_STRESS_THRESHOLD = 4.5;
+const HY_SPREAD_TIGHTNESS_MULTIPLIER = 6;
+const HY_SPREAD_TIGHTNESS_CAP = 15;
+const CHICAGO_FCI_TIGHTENING_THRESHOLD = 0;
+const CHICAGO_FCI_TIGHTNESS_MULTIPLIER = 10;
+const CHICAGO_FCI_TIGHTNESS_CAP = 10;
+const VIX_SHOCK_THRESHOLD = 20;
+const VIX_RISK_APPETITE_MULTIPLIER = 1.5;
+const VIX_RISK_APPETITE_CAP = 20;
+const VC_VELOCITY_SLOWDOWN_THRESHOLD = -5;
+const VC_VELOCITY_RISK_APPETITE_MULTIPLIER = 1.5;
+const VC_VELOCITY_RISK_APPETITE_CAP = 10;
+const LAYOFF_PRESSURE_THRESHOLD = 65;
+const LAYOFF_RISK_APPETITE_MULTIPLIER = 0.6;
+const LAYOFF_RISK_APPETITE_CAP = 12;
+const BASE_RATE_TIGHTNESS_MULTIPLIER = 180;
+const CURVE_INVERSION_TIGHTNESS_MULTIPLIER = 50;
+const DIAGNOSTIC_CONFIDENCE_HIGH_DELTA = 20;
+const DIAGNOSTIC_CONFIDENCE_MEDIUM_DELTA = 10;
+const DIAGNOSTIC_TRANSITION_WATCH_DELTA = 5;
+const DIAGNOSTIC_INTENSITY_STRONG_DELTA = 25;
+const DIAGNOSTIC_INTENSITY_STANDARD_DELTA = 10;
+const TWO_WEAK_READS_WARNING_COUNT = 2;
 
 export interface RegimeThresholds {
   baseRateTightness: number;
@@ -227,21 +252,27 @@ export const computeTightnessScore = (
   baseRateThreshold: number
 ) => {
   const baseRatePoints = clamp(
-    Math.round((baseRate - baseRateThreshold) * 180),
-    0,
+    Math.round((baseRate - baseRateThreshold) * BASE_RATE_TIGHTNESS_MULTIPLIER),
+    SCORE_MIN,
     TIGHTNESS_BASE_RATE_POINTS
   );
   const inversionPoints =
-    curveSlope < 0 ? clamp(Math.round(Math.abs(curveSlope) * 50), 0, TIGHTNESS_INVERSION_POINTS) : 0;
+    curveSlope < SCORE_MIN
+      ? clamp(
+          Math.round(Math.abs(curveSlope) * CURVE_INVERSION_TIGHTNESS_MULTIPLIER),
+          SCORE_MIN,
+          TIGHTNESS_INVERSION_POINTS
+        )
+      : SCORE_MIN;
   const score = baseRatePoints + inversionPoints;
 
-  return clamp(score, 0, TIGHTNESS_CAP);
+  return clamp(score, SCORE_MIN, TIGHTNESS_CAP);
 };
 
 export const computeRiskAppetiteScore = (curveSlope: number) => {
   const normalized =
     (curveSlope - RISK_APPETITE_MIN_SLOPE) / (RISK_APPETITE_MAX_SLOPE - RISK_APPETITE_MIN_SLOPE);
-  return clamp(Math.round(normalized * 100), 0, 100);
+  return clamp(Math.round(normalized * SCORE_MAX), SCORE_MIN, SCORE_MAX);
 };
 
 export const classifyRegime = (
@@ -277,36 +308,79 @@ const applyMacroAdjustments = (
   let weakReadCount = 0;
 
   const hySpread = getMacroValue(macroSeries, "HY_CREDIT_SPREAD");
-  if (typeof hySpread === "number" && hySpread >= 4.5) {
-    adjustedTightness = clamp(adjustedTightness + Math.min(15, Math.round((hySpread - 4.5) * 6)), 0, 100);
+  if (typeof hySpread === "number" && hySpread >= HY_SPREAD_STRESS_THRESHOLD) {
+    adjustedTightness = clamp(
+      adjustedTightness +
+        Math.min(
+          HY_SPREAD_TIGHTNESS_CAP,
+          Math.round((hySpread - HY_SPREAD_STRESS_THRESHOLD) * HY_SPREAD_TIGHTNESS_MULTIPLIER)
+        ),
+      SCORE_MIN,
+      SCORE_MAX
+    );
     contributors.push("HY OAS stress");
     weakReadCount += 1;
   }
 
   const chicagoFci = getMacroValue(macroSeries, "CHICAGO_FCI");
-  if (typeof chicagoFci === "number" && chicagoFci >= 0) {
-    adjustedTightness = clamp(adjustedTightness + Math.min(10, Math.round(chicagoFci * 10)), 0, 100);
+  if (typeof chicagoFci === "number" && chicagoFci >= CHICAGO_FCI_TIGHTENING_THRESHOLD) {
+    adjustedTightness = clamp(
+      adjustedTightness +
+        Math.min(
+          CHICAGO_FCI_TIGHTNESS_CAP,
+          Math.round(chicagoFci * CHICAGO_FCI_TIGHTNESS_MULTIPLIER)
+        ),
+      SCORE_MIN,
+      SCORE_MAX
+    );
     contributors.push("Financial conditions tightening");
     weakReadCount += 1;
   }
 
   const vix = getMacroValue(macroSeries, "VIX_INDEX");
-  if (typeof vix === "number" && vix >= 20) {
-    adjustedRiskAppetite = clamp(adjustedRiskAppetite - Math.min(20, Math.round((vix - 20) * 1.5)), 0, 100);
+  if (typeof vix === "number" && vix >= VIX_SHOCK_THRESHOLD) {
+    adjustedRiskAppetite = clamp(
+      adjustedRiskAppetite -
+        Math.min(
+          VIX_RISK_APPETITE_CAP,
+          Math.round((vix - VIX_SHOCK_THRESHOLD) * VIX_RISK_APPETITE_MULTIPLIER)
+        ),
+      SCORE_MIN,
+      SCORE_MAX
+    );
     contributors.push("Equity volatility shock");
     weakReadCount += 1;
   }
 
   const vcVelocity = getMacroValue(macroSeries, "VC_FUNDING_VELOCITY");
-  if (typeof vcVelocity === "number" && vcVelocity <= -5) {
-    adjustedRiskAppetite = clamp(adjustedRiskAppetite - Math.min(10, Math.round(Math.abs(vcVelocity + 5) * 1.5)), 0, 100);
+  if (typeof vcVelocity === "number" && vcVelocity <= VC_VELOCITY_SLOWDOWN_THRESHOLD) {
+    adjustedRiskAppetite = clamp(
+      adjustedRiskAppetite -
+        Math.min(
+          VC_VELOCITY_RISK_APPETITE_CAP,
+          Math.round(
+            Math.abs(vcVelocity - VC_VELOCITY_SLOWDOWN_THRESHOLD) *
+              VC_VELOCITY_RISK_APPETITE_MULTIPLIER
+          )
+        ),
+      SCORE_MIN,
+      SCORE_MAX
+    );
     contributors.push("VC funding slowdown");
     weakReadCount += 1;
   }
 
   const layoffs = getMacroValue(macroSeries, "TECH_LAYOFF_TREND");
-  if (typeof layoffs === "number" && layoffs >= 65) {
-    adjustedRiskAppetite = clamp(adjustedRiskAppetite - Math.min(12, Math.round((layoffs - 65) * 0.6)), 0, 100);
+  if (typeof layoffs === "number" && layoffs >= LAYOFF_PRESSURE_THRESHOLD) {
+    adjustedRiskAppetite = clamp(
+      adjustedRiskAppetite -
+        Math.min(
+          LAYOFF_RISK_APPETITE_CAP,
+          Math.round((layoffs - LAYOFF_PRESSURE_THRESHOLD) * LAYOFF_RISK_APPETITE_MULTIPLIER)
+        ),
+      SCORE_MIN,
+      SCORE_MAX
+    );
     contributors.push("Tech layoff pressure");
     weakReadCount += 1;
   }
@@ -330,10 +404,18 @@ const computeDiagnostics = (
   const riskAppetiteDelta = Math.round(riskAppetite - thresholds.riskAppetiteRegime);
   const nearestThresholdDelta = Math.min(Math.abs(tightnessDelta), Math.abs(riskAppetiteDelta));
   const confidence =
-    nearestThresholdDelta >= 20 ? "HIGH" : nearestThresholdDelta >= 10 ? "MEDIUM" : "LOW";
-  const transitionWatch = nearestThresholdDelta <= 5;
+    nearestThresholdDelta >= DIAGNOSTIC_CONFIDENCE_HIGH_DELTA
+      ? "HIGH"
+      : nearestThresholdDelta >= DIAGNOSTIC_CONFIDENCE_MEDIUM_DELTA
+        ? "MEDIUM"
+        : "LOW";
+  const transitionWatch = nearestThresholdDelta <= DIAGNOSTIC_TRANSITION_WATCH_DELTA;
   const intensity =
-    nearestThresholdDelta >= 25 ? "STRONG" : nearestThresholdDelta >= 10 ? "STANDARD" : "MILD";
+    nearestThresholdDelta >= DIAGNOSTIC_INTENSITY_STRONG_DELTA
+      ? "STRONG"
+      : nearestThresholdDelta >= DIAGNOSTIC_INTENSITY_STANDARD_DELTA
+        ? "STANDARD"
+        : "MILD";
 
   return {
     tightnessDelta,
@@ -344,7 +426,7 @@ const computeDiagnostics = (
     intensity,
     boundaryContributors,
     weakReadCount,
-    twoWeakReadsWarning: weakReadCount >= 2,
+    twoWeakReadsWarning: weakReadCount >= TWO_WEAK_READS_WARNING_COUNT,
   };
 };
 
