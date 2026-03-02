@@ -13,9 +13,30 @@ export const metadata: Metadata = buildPageMetadata({
 
 export default function StartHerePage() {
   const onboardingSteps = [
-    { id: "posture", label: "Posture", href: "#start-posture", state: "Now", icon: "🧭" },
-    { id: "situation", label: "Situation", href: "#start-situation", state: "Next", icon: "🧩" },
-    { id: "toolkit", label: "Toolkit", href: "#start-toolkit", state: "Then", icon: "🧰" },
+    {
+      id: "posture",
+      label: "Posture",
+      href: "#start-posture",
+      state: "Now",
+      icon: "🧭",
+      description: "Choose your risk stance for this week.",
+    },
+    {
+      id: "situation",
+      label: "Situation",
+      href: "#start-situation",
+      state: "Next",
+      icon: "🧩",
+      description: "Pick the bottleneck worth solving first.",
+    },
+    {
+      id: "toolkit",
+      label: "Toolkit",
+      href: "#start-toolkit",
+      state: "Then",
+      icon: "🧰",
+      description: "Run one operating playbook end-to-end.",
+    },
   ] as const;
 
   return (
@@ -26,19 +47,27 @@ export default function StartHerePage() {
         <p className="text-base text-slate-200">
           Use this page when you need a single path: confirm posture, choose the situation to solve now, then run one toolkit end-to-end. Example journey: <span className="font-semibold">Safety Mode → Hiring → Commitment &amp; Rollback Toolkit</span>.
         </p>
+        <div className="flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">
+          <span className="rounded-full border border-slate-700/70 px-3 py-2">3-step weekly workflow</span>
+          <span className="rounded-full border border-slate-700/70 px-3 py-2">~5 minutes to decide</span>
+          <span className="rounded-full border border-slate-700/70 px-3 py-2">Linked to live macro posture</span>
+        </div>
         <div className="grid gap-3 rounded-2xl border border-slate-700/85 bg-slate-950/55 p-3 sm:grid-cols-3">
           {onboardingSteps.map((step, index) => (
             <a
               key={step.id}
               href={step.href}
-              className="weather-surface flex min-h-[44px] items-center justify-between gap-3 px-3 py-3 text-sm text-slate-100"
+              className="weather-surface flex min-h-[44px] items-center justify-between gap-3 px-3 py-3 text-sm text-slate-100 transition hover:border-sky-300/40 hover:bg-slate-900/75"
             >
-              <span className="inline-flex items-center gap-2">
-                <span aria-hidden="true" className="text-lg">{step.icon}</span>
-                <span className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-600/80 text-xs font-semibold text-slate-100">
-                  {index + 1}
+              <span className="space-y-1">
+                <span className="inline-flex items-center gap-2">
+                  <span aria-hidden="true" className="text-lg">{step.icon}</span>
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full border border-slate-600/80 text-xs font-semibold text-slate-100">
+                    {index + 1}
+                  </span>
+                  <span className="font-semibold">{step.label}</span>
                 </span>
-                <span className="font-semibold">{step.label}</span>
+                <span className="block text-xs text-slate-300">{step.description}</span>
               </span>
               <span className="rounded-full border border-slate-600/75 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-200">
                 {step.state}
@@ -46,32 +75,39 @@ export default function StartHerePage() {
             </a>
           ))}
         </div>
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <Link href="/operations/plan" className="weather-button-primary inline-flex items-center justify-center">Run weekly operating sequence</Link>
-          <Link href="/decide" className="weather-button inline-flex items-center justify-center">Need role-specific guidance?</Link>
+          <Link href="/decide" className="text-sm font-semibold text-sky-300 underline-offset-2 hover:text-sky-200 hover:underline">Or jump straight to role-specific guidance</Link>
         </div>
       </section>
 
       <section id="start-posture" className="weather-panel space-y-4 px-6 py-6">
-        <h2 className="text-xl font-semibold text-slate-100">🧭 Posture</h2>
+        <div className="space-y-1">
+          <h2 className="text-xl font-semibold text-slate-100">🧭 Posture</h2>
+          <p className="text-sm text-slate-300">Pick the risk stance that should shape every major decision this week.</p>
+        </div>
         <div className="grid gap-3 sm:grid-cols-3">
           {postureDefinitions.map((posture) => (
-            <Link key={posture.slug} href={`/posture/${posture.slug}`} className="weather-surface min-h-[44px] space-y-2 px-4 py-4">
+            <Link key={posture.slug} href={`/posture/${posture.slug}`} className="weather-surface min-h-[44px] space-y-2 px-4 py-4 transition hover:border-sky-300/40 hover:bg-slate-900/75">
               <p className="text-sm font-semibold text-slate-100">{posture.title}</p>
               <p className="text-sm text-slate-200">{posture.summary}</p>
+              <p className="pt-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Open posture guide →</p>
             </Link>
           ))}
         </div>
       </section>
 
       <section id="start-situation" className="weather-panel space-y-4 px-6 py-6">
-        <h2 className="text-xl font-semibold text-slate-100">🧩 Situation</h2>
+        <div className="space-y-1">
+          <h2 className="text-xl font-semibold text-slate-100">🧩 Situation</h2>
+          <p className="text-sm text-slate-300">Choose the highest-leverage problem; keep everything else parked for later.</p>
+        </div>
         <div className="flex flex-wrap gap-2">
           {startSituations.map((situation) => (
             <Link
               key={situation}
               href={`/decide/${situationRouting[situation]}`}
-              className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100"
+              className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100 transition hover:border-sky-300/45"
             >
               {situation}
             </Link>
@@ -80,12 +116,16 @@ export default function StartHerePage() {
       </section>
 
       <section id="start-toolkit" className="weather-panel space-y-4 px-6 py-6">
-        <h2 className="text-xl font-semibold text-slate-100">🧰 Toolkit</h2>
+        <div className="space-y-1">
+          <h2 className="text-xl font-semibold text-slate-100">🧰 Toolkit</h2>
+          <p className="text-sm text-slate-300">Run one toolkit deeply to move from diagnosis to decision in the same session.</p>
+        </div>
         <div className="grid gap-3 sm:grid-cols-2">
           {toolkitDefinitions.map((toolkit) => (
-            <Link key={toolkit.slug} href={`/toolkits/${toolkit.slug}`} className="weather-surface min-h-[44px] px-4 py-4 text-sm text-slate-200">
+            <Link key={toolkit.slug} href={`/toolkits/${toolkit.slug}`} className="weather-surface min-h-[44px] space-y-2 px-4 py-4 text-sm text-slate-200 transition hover:border-sky-300/40 hover:bg-slate-900/75">
               <span className="font-semibold text-slate-100">{toolkit.title}</span>
-              <p className="mt-2 text-sm text-slate-200">{toolkit.whenToUse}</p>
+              <p className="text-sm text-slate-200">{toolkit.whenToUse}</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Run toolkit →</p>
             </Link>
           ))}
         </div>
