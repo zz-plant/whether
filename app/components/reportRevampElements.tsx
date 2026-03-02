@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { ArrowRightIcon } from "./uiIcons";
 
 export type ReportStageItem = {
   id: string;
@@ -86,7 +87,8 @@ export const DecisionBanner = ({
         href={evidenceHref}
         className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
       >
-        Review evidence trail →
+        Review evidence trail
+      <ArrowRightIcon className="ml-1 h-3.5 w-3.5" />
       </a>
     ) : null}
   </section>
@@ -112,7 +114,8 @@ export const ActionSequence = ({
             href={item.href}
             className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.16em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
           >
-            {item.cta} →
+            {item.cta}
+          <ArrowRightIcon className="ml-1 h-3.5 w-3.5" />
           </a>
         </li>
       ))}

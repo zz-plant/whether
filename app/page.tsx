@@ -223,7 +223,7 @@ export default async function HomePage({
         "@id": `${siteUrl}#organization`,
         name: organizationName,
         url: siteUrl,
-        logo: `${siteUrl}/icon.png`,
+        logo: `${siteUrl}/icon.svg`,
       },
       {
         "@type": "WebSite",

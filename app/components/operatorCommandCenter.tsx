@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { handleDirectionalFocus } from "./directionalFocus";
+import { ArrowRightIcon, BoltIcon, CircleTargetIcon, LayoutGridIcon, SectionJumpIcon } from "./uiIcons";
 
 export type OperatorCommandAction = {
   href: string;
@@ -33,11 +34,11 @@ const filterDescriptions: Record<CommandFilter, string> = {
   Sections: "Section-level jumps within the current page.",
 };
 
-const filterIcons: Record<CommandFilter, string> = {
-  All: "◉",
-  Playbook: "⚡",
-  Pages: "▣",
-  Sections: "↳",
+const filterIcons = {
+  All: CircleTargetIcon,
+  Playbook: BoltIcon,
+  Pages: LayoutGridIcon,
+  Sections: SectionJumpIcon,
 };
 
 const hotkeyHints = [
@@ -47,10 +48,10 @@ const hotkeyHints = [
   { keys: "Esc", action: "Reset" },
 ] as const;
 
-const groupGlyph: Record<OperatorCommandAction["group"], string> = {
-  Playbook: "⚡",
-  Pages: "◉",
-  Sections: "↳",
+const groupGlyph = {
+  Playbook: BoltIcon,
+  Pages: CircleTargetIcon,
+  Sections: SectionJumpIcon,
 };
 
 const normalize = (value: string) => value.toLowerCase().trim();
@@ -285,12 +286,12 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
         <div className="weather-surface space-y-3 p-4">
           {isFirstSession ? (
             <p className="inline-flex items-center gap-2 text-sm text-slate-200">
-              <span aria-hidden="true" className="text-sky-300">◉</span>
+              <span aria-hidden="true" className="text-sky-300"><CircleTargetIcon className="h-3.5 w-3.5" /></span>
               Content remains visible below; command center stays available for quick jumps.
             </p>
           ) : (
             <p className="inline-flex items-center gap-2 text-sm text-slate-200">
-              <span aria-hidden="true" className="text-slate-400">▸</span>
+              <span aria-hidden="true" className="text-slate-400"><ArrowRightIcon className="h-3.5 w-3.5" /></span>
               Panel hidden; quick-jump controls return when expanded.
             </p>
           )}
@@ -323,6 +324,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
               <div className="flex flex-wrap gap-2">
                 {filterOrder.map((item) => {
                   const isActive = item === filter;
+                  const Icon = filterIcons[item];
                   return (
                     <button
                       key={item}
@@ -335,26 +337,30 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
                       }`}
                       aria-pressed={isActive}
                     >
-                      {filterIcons[item]} {item}
+                      <span aria-hidden="true"><Icon className="h-3.5 w-3.5" /></span>
+                      <span>{item}</span>
                     </button>
                   );
                 })}
               </div>
               <p className="text-xs text-slate-300">{filterDescriptions[filter]}</p>
               <div className="flex flex-wrap gap-2 text-[10px] font-semibold tracking-[0.12em] text-slate-300">
-                {filterOrder.map((item) => (
-                  <span key={`legend-${item}`} className="inline-flex items-center gap-1 rounded-full border border-slate-700/70 px-2 py-1">
-                    <span aria-hidden="true">{filterIcons[item]}</span>
-                    <span>{item}</span>
-                  </span>
-                ))}
+                {filterOrder.map((item) => {
+                  const Icon = filterIcons[item];
+                  return (
+                    <span key={`legend-${item}`} className="inline-flex items-center gap-1 rounded-full border border-slate-700/70 px-2 py-1">
+                      <span aria-hidden="true"><Icon className="h-3.5 w-3.5" /></span>
+                      <span>{item}</span>
+                    </span>
+                  );
+                })}
               </div>
               {isMobile ? (
                 <details className="weather-surface p-3">
                   <summary className="cursor-pointer list-none text-xs font-semibold tracking-[0.12em] text-slate-300 focus-visible:rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
                     Input map
                   </summary>
-                  <p className="mt-2 text-xs text-slate-400">Mobile default: ⚡ Playbook view.</p>
+                  <p className="mt-2 text-xs text-slate-400">Mobile default: Playbook view.</p>
                   <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-200">
                     {hotkeyHints.map((hint) => (
                       <span key={`mobile-${hint.keys}`} className="inline-flex items-center gap-2 rounded-full border border-slate-700/70 px-2 py-1">
@@ -402,7 +408,9 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
                   <section key={group} className="weather-surface relative z-10 space-y-2 p-3">
                     <p className="text-[10px] font-semibold tracking-[0.18em] text-slate-400">{group}</p>
                     <ul className="space-y-2">
-                      {groupedActions[group].map((action) => (
+                      {groupedActions[group].map((action) => {
+                        const GroupIcon = groupGlyph[action.group];
+                        return (
                         <li key={`${group}-${action.href}`}>
                           <a
                             href={action.href}
@@ -412,7 +420,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
                           >
                             <span className="inline-flex min-w-0 items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-100">
                               <span aria-hidden="true" className="text-slate-400">
-                                {groupGlyph[action.group]}
+                                <GroupIcon className="h-3.5 w-3.5" />
                               </span>
                               {action.label}
                             </span>
@@ -427,11 +435,12 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
                                   </span>
                                 ))}
                               </span>
-                              <span aria-hidden="true" className="text-xs text-slate-500">→</span>
+                              <ArrowRightIcon className="h-3.5 w-3.5 text-slate-500" />
                             </span>
                           </a>
                         </li>
-                      ))}
+                        );
+                      })}
                     </ul>
                   </section>
                 );

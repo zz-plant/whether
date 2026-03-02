@@ -7,6 +7,7 @@ import {
   TIGHTNESS_INVERSION_POINTS,
 } from "../../../lib/regimeEngine";
 import { sensorTimeWindows } from "../../../lib/sensors";
+import { ChevronDownIcon } from "../../components/uiIcons";
 
 type SignalVisualizationSuiteProps = {
   assessment: RegimeAssessment;
@@ -141,7 +142,7 @@ export const SignalVisualizationSuite = ({
       <details className="weather-surface group p-4">
         <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.14em] text-slate-100">
           <span>Open visual diagnostics</span>
-          <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-400 transition-transform group-open:rotate-180">⌄</span>
+          <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-400 transition-transform group-open:rotate-180"><ChevronDownIcon className="h-3.5 w-3.5" /></span>
         </summary>
         <p className="mt-2 text-xs text-slate-300">
           Use this section when you need chart-level context. Keep it closed for faster executive scans.

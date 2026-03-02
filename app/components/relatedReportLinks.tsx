@@ -1,5 +1,6 @@
 import type { Route } from "next";
 import Link from "next/link";
+import { ArrowRightIcon } from "./uiIcons";
 
 type RelatedReportLink = {
   href: Route | string;
@@ -48,7 +49,7 @@ export const RelatedReportLinks = ({
           >
             <p className="text-sm font-semibold text-slate-100">{link.label}</p>
             {link.description ? <p className="text-sm text-slate-300">{link.description}</p> : null}
-            <p className="text-xs font-semibold tracking-[0.14em] text-sky-200">Open {link.label} →</p>
+            <p className="inline-flex items-center text-xs font-semibold tracking-[0.14em] text-sky-200">Open {link.label}<ArrowRightIcon className="ml-1 h-3.5 w-3.5" /></p>
           </Link>
         ))}
       </div>

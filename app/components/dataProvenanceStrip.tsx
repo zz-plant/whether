@@ -5,6 +5,7 @@
 "use client";
 
 import { Tooltip } from "@base-ui/react/tooltip";
+import { StatusLiveIcon, StatusStaticIcon } from "./uiIcons";
 
 export type DataProvenance = {
   sourceLabel: string;
@@ -36,17 +37,17 @@ const statusConfidence = {
 const statusDataMode = {
   "Live (high confidence)": {
     label: "Dynamic · live feed",
-    icon: "●",
+    icon: "live",
     className: "weather-data-mode weather-data-mode-dynamic",
   },
   "Cached (medium)": {
     label: "Static · cached snapshot",
-    icon: "◼",
+    icon: "static",
     className: "weather-data-mode weather-data-mode-static",
   },
   "Simulated (low)": {
     label: "Static · simulated model",
-    icon: "◼",
+    icon: "static",
     className: "weather-data-mode weather-data-mode-static",
   },
 } as const;
@@ -68,9 +69,13 @@ export const DataProvenanceStrip = ({
   const dataMode =
     statusDataMode[provenance.statusLabel as keyof typeof statusDataMode] ?? {
       label: "Static · snapshot",
-      icon: "◼",
+      icon: "static",
       className: "weather-data-mode weather-data-mode-static",
     };
+
+  const dataModeIcon = dataMode.icon === "live"
+    ? <StatusLiveIcon className="h-2.5 w-2.5" />
+    : <StatusStaticIcon className="h-2.5 w-2.5" />;
 
   const provenanceRows = [
     {
@@ -107,7 +112,7 @@ export const DataProvenanceStrip = ({
       <div className="weather-surface space-y-3 border-slate-800/80 bg-slate-950/55 p-3 text-xs font-medium tracking-[0.08em] text-slate-200 shadow-none">
         <div className="flex flex-wrap items-center gap-2 text-[11px]">
           <span className={`${dataMode.className} font-medium uppercase tracking-[0.12em]`}>
-            <span aria-hidden="true">{dataMode.icon}</span>
+            <span aria-hidden="true">{dataModeIcon}</span>
             <span>{dataMode.label}</span>
           </span>
           <span className="h-1 w-1 rounded-full bg-slate-600" aria-hidden="true" />
@@ -153,7 +158,7 @@ export const DataProvenanceStrip = ({
         <span className="text-slate-500 uppercase tracking-[0.14em]">{label}</span>
         <span className="h-1 w-1 rounded-full bg-slate-600" aria-hidden="true" />
         <span className={`${dataMode.className} font-medium uppercase tracking-[0.12em]`}>
-          <span aria-hidden="true">{dataMode.icon}</span>
+          <span aria-hidden="true">{dataModeIcon}</span>
           <span>{dataMode.label}</span>
         </span>
         <span className="h-1 w-1 rounded-full bg-slate-600" aria-hidden="true" />
