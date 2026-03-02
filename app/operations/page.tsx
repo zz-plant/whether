@@ -82,6 +82,7 @@ export default async function OperationsPage({
     startItems,
     statusLabel,
     stopItems,
+    roleCopy,
     treasury,
     treasuryProvenance,
   } = await loadReportData(resolvedSearchParams);
@@ -130,7 +131,7 @@ export default async function OperationsPage({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Action playbook"
       currentPath="/operations"
-      pageSummary="Run weekly execution decisions and align the monthly playbook for this cycle."
+      pageSummary={roleCopy.operations.pageSummary}
       pageSummaryLink={{ href: "#ops-playbook", label: "Jump to playbook section ↓" }}
       primaryCta={{
         href: "#ops-monthly-action-summary",
@@ -144,7 +145,7 @@ export default async function OperationsPage({
       pageNavVariant="compact"
       decisionBanner={{
         label: "Align now",
-        decision: "Translate the regime into weekly execution calls and a monthly plan.",
+        decision: roleCopy.operations.decision,
         horizon: "This week + month",
         confidence: trustStatusLabel,
         effectiveDate: recordDateLabel,
@@ -154,20 +155,24 @@ export default async function OperationsPage({
         title: "Planning sequence",
         items: [
           {
-            title: "Review weekly + monthly summary",
-            detail: "Confirm this week's execution posture and monthly priorities.",
+            title: roleCopy.operations.sequence[0]?.title ?? "Review weekly + monthly summary",
+            detail:
+              roleCopy.operations.sequence[0]?.detail ??
+              "Confirm this week's execution posture and monthly priorities.",
             href: "#ops-monthly-action-summary",
             cta: "Open summary",
           },
           {
-            title: "Apply playbook moves",
-            detail: "Choose start, stop, and fence actions.",
+            title: roleCopy.operations.sequence[1]?.title ?? "Apply playbook moves",
+            detail: roleCopy.operations.sequence[1]?.detail ?? "Choose start, stop, and fence actions.",
             href: "#ops-playbook",
             cta: "Open playbook",
           },
           {
-            title: "Sync finance strategy",
-            detail: "Check funding signals before commitments.",
+            title: roleCopy.operations.sequence[2]?.title ?? "Sync finance strategy",
+            detail:
+              roleCopy.operations.sequence[2]?.detail ??
+              "Check funding signals before commitments.",
             href: "#ops-finance-strategy",
             cta: "Open finance strategy",
           },

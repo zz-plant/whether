@@ -24,11 +24,12 @@ import { loadMacroSeries } from "../macroSnapshot";
 import { parseThresholdsFromSearchParams } from "../thresholds";
 import { formatAgeHours, formatDateUTC, formatTimestampUTC } from "../formatters";
 import { buildRegimeAlert } from "./reportFormatting";
+import { getRoleLensCopy, parseRoleLens } from "./roleLens";
 
 export type ReportSearchParams = {
   month?: string;
   year?: string;
-  [key: string]: string | undefined;
+  [key: string]: string | string[] | undefined;
 };
 
 export type LastYearComparison = {
@@ -89,6 +90,8 @@ export const buildLastYearComparison = ({
 const REPORT_DATA_REVALIDATE_SECONDS = 900;
 
 export const loadReportData = async (searchParams?: ReportSearchParams) => {
+  const roleLens = parseRoleLens(searchParams);
+  const roleCopy = getRoleLensCopy(roleLens);
   const liveFetcher: typeof fetch = (input, init) =>
     fetch(input, {
       ...init,
@@ -238,6 +241,8 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
     playbook,
     recordDateLabel,
     requestedSelection,
+    roleCopy,
+    roleLens,
     regimeSeries,
     regimeAlert,
     regimeTrend,
