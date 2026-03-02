@@ -4,9 +4,10 @@
  */
 "use client";
 
+import { Accordion } from "@base-ui/react/accordion";
 import { Button } from "@base-ui/react/button";
 import { Toast } from "@base-ui/react/toast";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useClipboardCopy, type ClipboardCopyState } from "./useClipboardCopy";
 
 type SummaryCardProps = {
@@ -76,7 +77,6 @@ export const SummaryCard = ({
       : "Copy failed. Select and copy the text above manually.";
   const visibleStructuredSections = structuredSections.filter((section) => section.items.length > 0);
   const hasStructuredSections = visibleStructuredSections.length > 0;
-  const [showRawCopy, setShowRawCopy] = useState(!hasStructuredSections);
 
   return (
     <div className="weather-surface mt-4 p-4">
@@ -131,18 +131,26 @@ export const SummaryCard = ({
         </div>
       ) : null}
       {hasStructuredSections ? (
-        <div className="mt-4">
-          <Button
-            type="button"
-            onClick={() => setShowRawCopy((current) => !current)}
-            className="weather-button inline-flex min-h-[40px] items-center justify-center px-3 py-2 text-[11px] font-semibold tracking-[0.12em]"
-            aria-expanded={showRawCopy}
-          >
-            {showRawCopy ? "Hide raw summary text" : "Show raw summary text"}
-          </Button>
-        </div>
-      ) : null}
-      {showRawCopy ? (
+        <Accordion.Root defaultValue={[]} className="mt-4">
+          <Accordion.Item value="raw-summary" className="rounded-2xl border border-slate-800/80 bg-slate-950/55 px-3 py-2">
+            <Accordion.Header>
+              <Accordion.Trigger className="flex min-h-[44px] w-full items-center justify-between gap-3 text-left text-[11px] font-semibold tracking-[0.12em] text-slate-200 touch-manipulation">
+                <span>Raw summary text</span>
+                <span aria-hidden="true" className="text-slate-400">⌄</span>
+              </Accordion.Trigger>
+            </Accordion.Header>
+            <Accordion.Panel>
+              <pre
+                tabIndex={0}
+                aria-label="Summary card text"
+                className="mt-2 whitespace-pre-wrap rounded-2xl border border-slate-800/80 bg-slate-950/80 p-4 text-xs text-slate-100"
+              >
+                {summaryCopy}
+              </pre>
+            </Accordion.Panel>
+          </Accordion.Item>
+        </Accordion.Root>
+      ) : (
         <pre
           tabIndex={0}
           aria-label="Summary card text"
@@ -150,7 +158,7 @@ export const SummaryCard = ({
         >
           {summaryCopy}
         </pre>
-      ) : null}
+      )}
       <div className="mt-2 min-h-[20px] text-xs text-slate-400" role="status" aria-live="polite">
         {copyError ? errorMessage : copied ? "Summary copied to clipboard." : ""}
       </div>
