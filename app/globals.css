@@ -900,7 +900,87 @@ summary:focus-visible {
   }
 }
 
+.section-entry {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 180ms ease-out,
+    transform 180ms ease-out;
+  transition-delay: var(--section-reveal-delay, 0ms);
+  will-change: transform, opacity;
+}
+
+.section-entry[data-revealed="true"] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.section-entry-metric-priority .weather-surface,
+.section-entry[data-priority="true"] .weather-surface {
+  transition:
+    transform 160ms ease-out,
+    border-color 160ms ease-out,
+    background-color 160ms ease-out;
+}
+
+.section-entry-metric-priority .weather-surface:hover,
+.section-entry-metric-priority .weather-surface:focus-within,
+.section-entry[data-priority="true"] .weather-surface:hover,
+.section-entry[data-priority="true"] .weather-surface:focus-within {
+  transform: translateY(-2px);
+  border-color: rgba(56, 189, 248, 0.45);
+}
+
+.summary-interactive-card {
+  transition:
+    transform 170ms ease-out,
+    border-color 170ms ease-out,
+    background-color 170ms ease-out;
+}
+
+.summary-interactive-card .summary-card-detail {
+  opacity: 0.7;
+  max-height: 0;
+  overflow: hidden;
+  transform: translateY(-2px);
+  transition:
+    opacity 160ms ease-out,
+    transform 160ms ease-out,
+    max-height 160ms ease-out;
+}
+
+.summary-interactive-card:hover,
+.summary-interactive-card:focus-within {
+  transform: translateY(-2px);
+  border-color: rgba(56, 189, 248, 0.42);
+}
+
+.summary-interactive-card:hover .summary-card-detail,
+.summary-interactive-card:focus-within .summary-card-detail {
+  opacity: 1;
+  max-height: 80px;
+  transform: translateY(0);
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .section-entry,
+  .summary-interactive-card,
+  .summary-interactive-card .summary-card-detail,
+  .section-entry-metric-priority .weather-surface,
+  .section-entry[data-priority="true"] .weather-surface {
+    transition: none;
+    transform: none;
+  }
+
+  .section-entry {
+    opacity: 1;
+  }
+
+  .summary-interactive-card .summary-card-detail {
+    opacity: 1;
+    max-height: none;
+  }
+
   .anchor-feedback-active,
   .anchor-feedback-active > header h2,
   .anchor-feedback-active > h2,

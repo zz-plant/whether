@@ -7,6 +7,7 @@
 import { Accordion } from "@base-ui/react/accordion";
 import { Button } from "@base-ui/react/button";
 import { Toast } from "@base-ui/react/toast";
+import { Tooltip } from "@base-ui/react/tooltip";
 import { useEffect, useRef } from "react";
 import { useClipboardCopy, type ClipboardCopyState } from "./useClipboardCopy";
 
@@ -72,10 +73,32 @@ export const SummaryCard = ({
   const hasStructuredSections = visibleStructuredSections.length > 0;
 
   return (
-    <div className="weather-surface mt-4 p-4">
+    <div className="summary-interactive-card weather-surface mt-4 p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Summary card</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Summary card</p>
+            <Tooltip.Provider delay={120} closeDelay={50}>
+              <Tooltip.Root>
+                <Tooltip.Trigger
+                  aria-label="Why this summary matters"
+                  className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/80 bg-slate-900/80 px-2 py-1 text-[10px] font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-sky-300/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                >
+                  Why this matters
+                </Tooltip.Trigger>
+                <Tooltip.Portal>
+                  <Tooltip.Positioner sideOffset={8}>
+                    <Tooltip.Popup className="max-w-[260px] rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-slate-200 shadow-lg">
+                      Quick-share in standups: this card spotlights what changed in the latest cadence so teams act before drift compounds.
+                    </Tooltip.Popup>
+                  </Tooltip.Positioner>
+                </Tooltip.Portal>
+              </Tooltip.Root>
+            </Tooltip.Provider>
+          </div>
+          <p className="summary-card-detail mt-2 max-w-2xl text-xs text-slate-400">
+            Includes copy-ready guidance plus structured output for downstream workflows.
+          </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button
