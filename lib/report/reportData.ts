@@ -127,7 +127,8 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
   const fetchedAtLabel = formatTimestampUTC(treasury.fetched_at);
   const treasuryAgeLabel = formatAgeHours(treasury.fetched_at, now);
   const sensors = buildSensorReadings(treasury);
-  const assessment = evaluateRegime(treasury, thresholds, macroSeries);
+  const assessmentMacroSeries = historicalSelection ? [] : macroSeries;
+  const assessment = evaluateRegime(treasury, thresholds, assessmentMacroSeries);
   const liveAssessment = historicalSelection ? evaluateRegime(liveTreasury, thresholds, macroSeries) : null;
   const { playbook, startItems, stopItems } = getPlaybookGuidance(assessment.regime);
   const fenceItems = assessment.constraints;
@@ -139,9 +140,9 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
   comparisonDate.setUTCFullYear(recordDate.getUTCFullYear() - 1);
   const lastYearSnapshot = findTimeMachineSnapshot(comparisonDate.toISOString());
   const previousAssessment = previousSnapshot
-    ? evaluateRegime(previousSnapshot, thresholds, macroSeries)
+    ? evaluateRegime(previousSnapshot, thresholds)
     : null;
-  const lastYearAssessment = lastYearSnapshot ? evaluateRegime(lastYearSnapshot, thresholds, macroSeries) : null;
+  const lastYearAssessment = lastYearSnapshot ? evaluateRegime(lastYearSnapshot, thresholds) : null;
   const confidenceLabel = historicalSelection
     ? "Simulated (low)"
     : treasury.isLive
