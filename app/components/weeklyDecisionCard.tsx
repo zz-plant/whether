@@ -7,6 +7,7 @@ import { Tabs } from "@base-ui/react/tabs";
 import { Tooltip } from "@base-ui/react/tooltip";
 import Link from "next/link";
 import { useState } from "react";
+import { useClipboardCopy } from "./useClipboardCopy";
 
 type Regime = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
 
@@ -94,6 +95,7 @@ export function WeeklyDecisionCard({
   fetchedAtLabel,
 }: WeeklyDecisionCardProps) {
   const [profile, setProfile] = useState<OperatorProfile>("saas-growth-plg");
+  const { copyToClipboard, status, activeTarget, copiedTarget } = useClipboardCopy();
 
   const ownerKeywords: Record<string, string[]> = {
     Engineering: ["hire", "engineering", "platform", "reliability"],
@@ -158,6 +160,18 @@ export function WeeklyDecisionCard({
     people: topActions.filter((item) => item.toLowerCase().includes("hire")),
   } as const;
 
+  const snapshotTitle = `${statusLabel} posture · ${recordDateLabel}`;
+  const snapshotBullets = topActions.map((item) => `• ${item}`).join("\n");
+  const snapshotPlainText = `${snapshotTitle}\n${snapshotBullets}`;
+  const snapshotMarkdown = [`**${snapshotTitle}**`, "", ...topActions.map((item) => `- ${item}`)].join("\n");
+
+  const renderCopyLabel = (target: "plain" | "markdown", idleLabel: string) => {
+    if (activeTarget === target && status === "copying") return "Copying…";
+    if (copiedTarget === target && status === "copied") return "Copied";
+    if (activeTarget === target && status === "error") return "Copy failed";
+    return idleLabel;
+  };
+
   return (
     <section id="weekly-decision-card" className="weather-panel space-y-6 p-5 sm:p-6" aria-label="This week's decision card">
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -215,7 +229,21 @@ export function WeeklyDecisionCard({
                     ))}
                   </ul>
                 </div>
-                <div className="mt-4 flex justify-end">
+                <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => copyToClipboard(snapshotPlainText, "plain")}
+                    className="weather-button inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]"
+                  >
+                    {renderCopyLabel("plain", "Copy plain text")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => copyToClipboard(snapshotMarkdown, "markdown")}
+                    className="weather-button inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]"
+                  >
+                    {renderCopyLabel("markdown", "Copy Markdown")}
+                  </button>
                   <Dialog.Close className="weather-button inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]">Close</Dialog.Close>
                 </div>
               </Dialog.Popup>
