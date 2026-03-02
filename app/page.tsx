@@ -28,7 +28,6 @@ import { WeeklyDecisionCard } from "./components/weeklyDecisionCard";
 import { LiveCommandDeck } from "./components/liveCommandDeck";
 import { RevealOnView } from "./components/revealOnView";
 
-export const runtime = "edge";
 export const revalidate = 900;
 
 const homeSectionSequence = [
