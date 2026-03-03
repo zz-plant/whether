@@ -85,7 +85,7 @@ const isActivePageLink = ({
 }) => (currentPath ? isLinkActiveForPath(link.href, currentPath) : link.label === pageTitle);
 
 const pageLinkIcons: Record<string, ReactNode> = {
-  "Command Center": (
+  "Weekly Brief": (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
       <path
         d="M12 4.5V2.75M12 21.25v-1.75M4.5 12H2.75M21.25 12h-1.75M6.75 6.75l-1.3-1.3M18.55 18.55l-1.3-1.3M6.75 17.25l-1.3 1.3M18.55 5.45l-1.3 1.3"
@@ -177,7 +177,7 @@ const pageLinkIcons: Record<string, ReactNode> = {
       <circle cx="12" cy="18" r="1.8" fill="currentColor" />
     </svg>
   ),
-  Learn: (
+  Reference: (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
       <path
         d="M6 4.75h9.25a2 2 0 0 1 2 2v10.5a2 2 0 0 1-2 2H6"
@@ -231,7 +231,7 @@ export const ReportPageNavigation = ({
   className?: string;
   variant?: "full" | "compact";
 }) => {
-  const coreReportHrefs = new Set(["/start", "/signals", "/operations"]);
+  const coreReportHrefs = new Set(["/", "/signals", "/operations"]);
   const primaryLinks = pageLinks.filter((link) => coreReportHrefs.has(link.href));
   const secondaryLinks = pageLinks.filter((link) => !coreReportHrefs.has(link.href));
   const visibleLinks = primaryLinks.length > 0 ? primaryLinks : pageLinks;
@@ -256,7 +256,7 @@ export const ReportPageNavigation = ({
                   aria-current={isActive ? "page" : undefined}
                   className={getPageLinkClassName({
                     isActive,
-                    isCommandCenter: link.label === "Command Center",
+                    isCommandCenter: link.label === "Weekly Brief",
                     isOddTail,
                   })}
                 >
