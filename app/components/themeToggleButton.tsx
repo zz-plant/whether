@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useHapticFeedback } from "./useHapticFeedback";
 
 export function ThemeToggleButton() {
   const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const triggerHaptic = useHapticFeedback();
 
   useEffect(() => {
     const savedTheme = window.localStorage.getItem("whether-theme");
@@ -17,6 +19,7 @@ export function ThemeToggleButton() {
     setTheme(nextTheme);
     document.documentElement.dataset.theme = nextTheme;
     window.localStorage.setItem("whether-theme", nextTheme);
+    triggerHaptic("selection");
   };
 
   return (
