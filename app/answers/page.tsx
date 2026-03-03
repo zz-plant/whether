@@ -28,7 +28,7 @@ export default function AnswersHubPage() {
     itemListElement: tierOneDecisionPages.map((page, index) => ({
       "@type": "ListItem",
       position: index + 1,
-      url: `/answers/${page.slug}`,
+      url: buildCanonicalUrl(`/answers/${page.slug}`),
       name: page.title,
     })),
   };
