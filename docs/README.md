@@ -19,6 +19,7 @@ Use this index to find the **current** source of truth quickly.
 ## Core engineering docs
 - `development-playbook.md` — practical engineering workflow and PR readiness checks.
 - `cloudflare-deployment-runbook.md` — Cloudflare deployment expectations and CI artifact workflow.
+- `developer/README.md` — external developer-docs entrypoint (quickstart, API reference, integrations).
 - `architecture.md` — modules, runtime flow, and extension points.
 - `stack-compatibility-matrix.md` — platform/runtime support constraints.
 - `stack-modernization-inventory.md` — modernization baseline.
