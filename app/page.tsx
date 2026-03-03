@@ -539,7 +539,9 @@ export default async function HomePage({
       </section>
       <LiveCommandDeck
         fetchedAtLabel={fetchedAtLabel}
+        fetchedAtIso={treasury.fetched_at}
         changedSignalCount={reportDynamics.totalSignalChanges}
+        changedSignals={reportDynamics.changedSignals}
         regimeChanged={reportDynamics.regimeChanged}
         signalDirection={reportDynamics.directionLabel}
       />
