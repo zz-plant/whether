@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { WebHaptics } from "web-haptics";
 
 type ClipboardCopyStatus = "idle" | "copying" | "copied" | "error";
 type ClipboardCopyErrorReason = "unavailable" | "write-failed";
@@ -28,6 +29,23 @@ export const useClipboardCopy = (
   const [activeTarget, setActiveTarget] = useState<string | null>(null);
   const [copiedTarget, setCopiedTarget] = useState<string | null>(null);
   const timeoutRef = useRef<number | null>(null);
+  const hapticsRef = useRef<WebHaptics | null>(null);
+
+  const triggerHaptic = useCallback(async (preset: "success" | "warning") => {
+    if (!WebHaptics.isSupported) {
+      return;
+    }
+
+    if (!hapticsRef.current) {
+      hapticsRef.current = new WebHaptics();
+    }
+
+    try {
+      await hapticsRef.current.trigger(preset);
+    } catch {
+      // noop: haptics should never interrupt clipboard behavior.
+    }
+  }, []);
 
   const clearResetTimer = useCallback(() => {
     if (timeoutRef.current !== null) {
@@ -39,6 +57,8 @@ export const useClipboardCopy = (
   useEffect(() => {
     return () => {
       clearResetTimer();
+      hapticsRef.current?.destroy();
+      hapticsRef.current = null;
     };
   }, [clearResetTimer]);
 
@@ -51,6 +71,7 @@ export const useClipboardCopy = (
         setError(true);
         setErrorReason("unavailable");
         setStatus("error");
+        void triggerHaptic("warning");
         return;
       }
       setStatus("copying");
@@ -61,6 +82,7 @@ export const useClipboardCopy = (
         setErrorReason(null);
         setStatus("copied");
         setCopiedTarget(target ?? null);
+        void triggerHaptic("success");
         clearResetTimer();
         timeoutRef.current = window.setTimeout(() => {
           setStatus("idle");
@@ -70,11 +92,12 @@ export const useClipboardCopy = (
         setError(true);
         setErrorReason("write-failed");
         setStatus("error");
+        void triggerHaptic("warning");
       } finally {
         setActiveTarget(null);
       }
     },
-    [clearResetTimer, resetDelay, status]
+    [clearResetTimer, resetDelay, status, triggerHaptic]
   );
 
   return {
