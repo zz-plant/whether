@@ -30,7 +30,7 @@ export function RevealOnView({ children }: { children: ReactNode }) {
         visible ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
       }`}
     >
-      {children}
+      {visible ? children : null}
     </div>
   );
 }
