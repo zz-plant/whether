@@ -30,7 +30,6 @@ import { RevealOnView } from "./components/revealOnView";
 import { ScenarioGuidanceBlock } from "./components/scenarioGuidanceBlock";
 import { operatingCallsByRegime } from "../lib/report/operatingCalls";
 
-export const runtime = "edge";
 export const revalidate = 900;
 
 const homeSectionSequence = [
