@@ -27,13 +27,15 @@ export const primaryNavigation: PrimaryNavigationItem[] = [
   },
   {
     href: "/decide",
-    label: "Decide",
-    description: "Curated role and situation entry points into operational guidance.",
+    label: "Role Lenses",
+    description: "Role-specific decision lenses and situation references.",
+    staticHub: false,
   },
   {
     href: "/toolkits",
     label: "Toolkits",
     description: "Runnable instruments and templates by decision surface.",
+    staticHub: false,
   },
   {
     href: "/learn",

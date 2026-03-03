@@ -5,8 +5,6 @@ export type OperationsWorkstreamLink = {
   href: Route;
   label: string;
   description: string;
-  availability?: "available" | "coming-soon";
-  tier?: "standard" | "premium";
 };
 
 export const operationsWorkstreamLinks: OperationsWorkstreamLink[] = [
@@ -14,13 +12,6 @@ export const operationsWorkstreamLinks: OperationsWorkstreamLink[] = [
     href: "/operations",
     label: "Plan",
     description: "Translate the regime into quarterly posture, playbook moves, and operator asks.",
-  },
-  {
-    href: "/operations/decisions",
-    label: "Decisions",
-    description: "Lock assumptions, validate guardrails, and pressure-test bets before committing.",
-    availability: "coming-soon",
-    tier: "premium",
   },
   {
     href: "/operations/briefings",
