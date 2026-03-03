@@ -172,7 +172,7 @@ export const buildReportDynamics = ({
 
 const REPORT_DATA_REVALIDATE_SECONDS = 900;
 
-export const loadReportData = async (searchParams?: ReportSearchParams) => {
+const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
   const liveFetcher: typeof fetch = (input, init) =>
     fetch(input, {
       ...init,
@@ -340,4 +340,18 @@ export const loadReportData = async (searchParams?: ReportSearchParams) => {
     treasury,
     treasuryProvenance,
   };
+};
+
+let defaultReportDataPromise: Promise<Awaited<ReturnType<typeof loadReportDataUncached>>> | null = null;
+
+export const loadReportData = (searchParams?: ReportSearchParams) => {
+  if (searchParams) {
+    return loadReportDataUncached(searchParams);
+  }
+
+  if (!defaultReportDataPromise) {
+    defaultReportDataPromise = loadReportDataUncached();
+  }
+
+  return defaultReportDataPromise;
 };
