@@ -151,6 +151,77 @@ describe("regime assessment", () => {
     assert.equal(typeof assessment.policyAssessment.governanceParameters.hiringThreshold, "string");
   });
 
+
+  it("maps aligned policy signals to risk-on and safety postures", () => {
+    const riskOnTreasury: TreasuryData = {
+      source: "US Treasury",
+      record_date: "2024-10-01",
+      fetched_at: "2024-10-02T00:00:00Z",
+      isLive: true,
+      yields: {
+        oneMonth: 3.2,
+        twoYear: 3.5,
+        tenYear: 4.5,
+      },
+    };
+
+    const riskOnAssessment = evaluateRegime(riskOnTreasury, undefined, [
+      {
+        id: "BBB_CREDIT_SPREAD",
+        label: "BBB",
+        value: 1.2,
+        unit: "%",
+        explanation: "",
+        sourceLabel: "FRED",
+        sourceUrl: "https://fred.stlouisfed.org/",
+        formulaUrl: "/methodology",
+        record_date: "2024-10-01",
+        fetched_at: "2024-10-02T00:00:00Z",
+        isLive: true,
+        history: [
+          { date: "2024-09-01", value: 2.5 },
+          { date: "2024-08-01", value: 2.6 },
+        ],
+      },
+    ]);
+
+    assert.equal(riskOnAssessment.policyAssessment.posture, "RISK_ON");
+
+    const safetyTreasury: TreasuryData = {
+      source: "US Treasury",
+      record_date: "2024-10-01",
+      fetched_at: "2024-10-02T00:00:00Z",
+      isLive: true,
+      yields: {
+        oneMonth: 5.8,
+        twoYear: 5.0,
+        tenYear: 4.0,
+      },
+    };
+
+    const safetyAssessment = evaluateRegime(safetyTreasury, undefined, [
+      {
+        id: "BBB_CREDIT_SPREAD",
+        label: "BBB",
+        value: 3.0,
+        unit: "%",
+        explanation: "",
+        sourceLabel: "FRED",
+        sourceUrl: "https://fred.stlouisfed.org/",
+        formulaUrl: "/methodology",
+        record_date: "2024-10-01",
+        fetched_at: "2024-10-02T00:00:00Z",
+        isLive: true,
+        history: [
+          { date: "2024-09-01", value: 2.0 },
+          { date: "2024-08-01", value: 2.1 },
+        ],
+      },
+    ]);
+
+    assert.equal(safetyAssessment.policyAssessment.posture, "SAFETY_MODE");
+  });
+
   it("refuses posture change when policy signal gaps are too large", () => {
     const treasury: TreasuryData = {
       source: "US Treasury",
