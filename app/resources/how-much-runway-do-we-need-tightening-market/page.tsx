@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
-import { findPainArticleBySlug } from "../../../lib/painArticles";
-import { buildPainArticleMetadata, PainArticlePage } from "../components/painArticlePage";
+import { findResourceArticleBySlug } from "../../../lib/resourceArticles";
+import { buildResourceArticleMetadata, ResourceArticlePage } from "../components/resourceArticlePage";
 
-const article = findPainArticleBySlug("how-much-runway-do-we-need-tightening-market");
+const article = findResourceArticleBySlug("how-much-runway-do-we-need-tightening-market");
 
-export const metadata = article ? buildPainArticleMetadata(article) : {};
+export const metadata = article ? buildResourceArticleMetadata(article) : {};
 
 export default function Page() {
   if (!article) notFound();
-  return <PainArticlePage article={article} />;
+  return <ResourceArticlePage article={article} />;
 }
