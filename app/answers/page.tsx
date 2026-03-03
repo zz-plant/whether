@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata, Route } from "next";
-import { buildPageMetadata, serializeJsonLd } from "../../lib/seo";
+import { buildCanonicalUrl, buildPageMetadata, serializeJsonLd } from "../../lib/seo";
 import { tierOneDecisionPages, tierThreeKeywords, tierTwoKeywords } from "./decisionPages";
 
 export const revalidate = 900;

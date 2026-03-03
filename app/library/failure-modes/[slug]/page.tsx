@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Route } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../../lib/seo";
@@ -77,12 +77,12 @@ export default async function FailureModeDetailPage({ params }: { params: Promis
         <h2 className="text-lg font-semibold text-slate-100">What to do next</h2>
         <div className="flex flex-wrap gap-2">
           {failureMode.linkedToolkits.map((toolkit) => (
-            <Link key={toolkit.href} href={toolkit.href} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
+            <Link key={toolkit.href} href={toolkit.href as Route} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
               {toolkit.label}
             </Link>
           ))}
           {failureMode.linkedConcepts.map((concept) => (
-            <Link key={concept.href} href={concept.href} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
+            <Link key={concept.href} href={concept.href as Route} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
               {concept.label}
             </Link>
           ))}
