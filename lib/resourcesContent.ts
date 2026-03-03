@@ -661,6 +661,14 @@ export const resourceSupportingPages = {
     path: "/resources/capital-posture-template",
     title: "Capital Posture Template",
   },
+  reversalTriggerChecklist: {
+    path: "/resources/reversal-trigger-checklist",
+    title: "Reversal Trigger Checklist",
+  },
+  quarterlyCapitalPostureMemoExample: {
+    path: "/resources/quarterly-capital-posture-memo-example",
+    title: "Quarterly Capital Posture Memo Example",
+  },
 };
 
 export const findResourcePillarBySlug = (slug: string) => resourcePillarPages.find((page) => page.slug === slug);
