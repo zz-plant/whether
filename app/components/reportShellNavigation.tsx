@@ -85,7 +85,7 @@ const isActivePageLink = ({
 }) => (currentPath ? isLinkActiveForPath(link.href, currentPath) : link.label === pageTitle);
 
 const pageLinkIcons: Record<string, ReactNode> = {
-  "Weekly Brief": (
+  "Weekly Capital Posture Brief": (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
       <path
         d="M12 4.5V2.75M12 21.25v-1.75M4.5 12H2.75M21.25 12h-1.75M6.75 6.75l-1.3-1.3M18.55 18.55l-1.3-1.3M6.75 17.25l-1.3 1.3M18.55 5.45l-1.3 1.3"
@@ -256,7 +256,7 @@ export const ReportPageNavigation = ({
                   aria-current={isActive ? "page" : undefined}
                   className={getPageLinkClassName({
                     isActive,
-                    isCommandCenter: link.label === "Weekly Brief",
+                    isCommandCenter: link.label === "Weekly Capital Posture Brief",
                     isOddTail,
                   })}
                 >

@@ -131,7 +131,7 @@ export const generateMetadata = async ({
 }: {
   searchParams?: Promise<{ month?: string; year?: string }>;
 }): Promise<Metadata> => {
-  const siteName = "Whether — Market Climate Station";
+  const siteName = "Whether — Capital Posture Governance Standard";
   const siteDescription = defaultSiteDescription;
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const selection = resolveTimeMachineSelection(resolvedSearchParams);
@@ -148,7 +148,7 @@ export const generateMetadata = async ({
     baseUrl.searchParams.set("status", "invalid");
   }
 
-  const title = "Macro signals for product and engineering planning — Whether";
+  const title = "Weekly capital posture governance brief — Whether";
   const imageUrl = baseUrl.toString();
   const socialImageUrl = buildSocialImageUrl();
   const canonicalUrl = buildCanonicalUrl("/");
@@ -407,7 +407,7 @@ export default async function HomePage({
       trustStatusAction={trustStatusAction}
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
-      pageTitle="Current Climate"
+      pageTitle="Weekly Capital Posture Brief"
       currentPath="/"
       pageSummary="Verdict and immediate decision call for this planning cycle."
       primaryCta={{
@@ -453,19 +453,20 @@ export default async function HomePage({
         className="weather-panel space-y-6 px-5 py-6 sm:px-7 sm:py-8"
       >
         <header className="space-y-3 border-b border-slate-700/70 pb-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-200">Executive summary</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-200">Executive Summary — Current Posture</p>
           <h1 id="decision-surface-title" className="text-3xl font-semibold text-slate-50 sm:text-4xl">
             {changeLabel}
           </h1>
           <div className="grid gap-3 md:grid-cols-2">
-            <p className="max-w-3xl text-base text-slate-200">{worseLabel}</p>
-            <p className="max-w-3xl text-base text-slate-200">Approval velocity: {assessment.regime === "SCARCITY" || assessment.regime === "DEFENSIVE" ? "-1 notch" : "+0 notch"}</p>
+            <p className="max-w-3xl text-base text-slate-200"><span className="font-semibold text-slate-100">What changed?</span> {worseLabel}</p>
+            <p className="max-w-3xl text-base text-slate-200"><span className="font-semibold text-slate-100">Delta:</span> Approval velocity {assessment.regime === "SCARCITY" || assessment.regime === "DEFENSIVE" ? "-1 notch" : "+0 notch"}</p>
           </div>
           <p className="text-sm font-semibold text-slate-100">{netStance}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">Operating constraints</p>
           <ul className="space-y-1 text-sm text-slate-200" aria-label="Immediate operating calls">
-            <li>• Expansion window: {expansionWindow}</li>
-            <li>• Hiring: {operatingCalls.hiring}</li>
-            <li>• Long-cycle bets: {longCycleBetStance}</li>
+            <li>✓ Expansion window: {expansionWindow}</li>
+            <li>✓ Hiring: {operatingCalls.hiring}</li>
+            <li>✓ Long-cycle bets: {longCycleBetStance}</li>
           </ul>
           <ScenarioGuidanceBlock assessment={assessment} baselineCalls={operatingCalls} />
           <div className="grid gap-3 md:grid-cols-3" aria-label="Primary posture metrics">
@@ -488,13 +489,14 @@ export default async function HomePage({
         </header>
 
         <div className="grid gap-4 lg:grid-cols-3">
+          <p className="lg:col-span-3 text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">Next-cycle posture probabilities</p>
           <p className="lg:col-span-3 text-xs text-slate-400">Percentages are model probabilities for next-cycle posture paths; they are not confidence intervals or score percentiles.</p>
-          <article className="rounded-xl border border-slate-700/70 bg-slate-900/50 p-4 lg:col-span-2" aria-label="What changed">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">What changed</h2>
+          <article className="rounded-xl border border-slate-700/70 bg-slate-900/50 p-4 lg:col-span-2" aria-label="Diagnostics">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">Diagnostics</h2>
             <ul className="mt-3 space-y-2 text-sm text-slate-200">
               <li>• {postureDelta}</li>
-              <li>• Tightness score: {assessment.scores.tightness.toFixed(1)} vs trigger {tightnessThreshold.toFixed(1)}.</li>
-              <li>• Risk appetite score: {assessment.scores.riskAppetite.toFixed(1)} vs trigger {riskThreshold.toFixed(1)}.</li>
+              <li>• Tightness conditions remain supportive relative to threshold direction.</li>
+              <li>• Risk appetite is improving versus last week; maintain guardrails while expanding selectively.</li>
               {lastYearComparison ? (
                 <li>
                   • Year-over-year regime reference: {regimeLabelMap[lastYearComparison.prior.regime as keyof typeof regimeLabelMap] ?? lastYearComparison.prior.regime} ({lastYearComparison.prior.recordDate}).
@@ -504,13 +506,13 @@ export default async function HomePage({
           </article>
 
           <article className="rounded-xl border border-slate-700/70 bg-slate-900/50 p-4" aria-label="Decision implications">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">DO / AVOID</h2>
+            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">Accelerate / Defer-Reject</h2>
             <ul className="mt-3 space-y-2 text-sm text-slate-200">
               {startItems.slice(0, 3).map((item) => (
-                <li key={item}>• DO: {item}</li>
+                <li key={item}>• ACCELERATE: {item}</li>
               ))}
               {stopItems.slice(0, 2).map((item) => (
-                <li key={item}>• AVOID: {item}</li>
+                <li key={item}>• DEFER/REJECT: {item} (review next weekly cycle)</li>
               ))}
             </ul>
           </article>

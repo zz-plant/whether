@@ -5,7 +5,7 @@ import { GlobalHeader } from "./components/globalHeader";
 import { siteUrl } from "../lib/siteUrl";
 import { buildSocialImageUrl } from "../lib/seo";
 
-const siteName = "Whether — Market Climate Station";
+const siteName = "Whether — Capital Posture Governance Standard";
 const siteDescription =
   "Translate Treasury macro signals into plain-English operational constraints for product and engineering leaders.";
 const socialImageUrl = buildSocialImageUrl();
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     template: "%s | Whether"
   },
   description: siteDescription,
-  applicationName: "Whether Market Climate Station",
+  applicationName: "Whether Capital Posture Governance Standard",
   keywords: [
     "macroeconomic signals",
     "Treasury yield curve",
