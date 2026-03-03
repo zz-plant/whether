@@ -7,7 +7,7 @@ import { buildLiveShortAnswer, isExpansionRegime } from "../liveShortAnswers";
 import { findDecisionPage, tierOneDecisionPages } from "../decisionPages";
 
 type DecisionPageProps = {
-params: { slug: string };
+  params: Promise<{ slug: string }>;
 };
 
 export const dynamicParams = false;
@@ -18,7 +18,7 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: DecisionPageProps): Promise<Metadata> {
-  const { slug } = params;
+  const { slug } = await params;
   const page = findDecisionPage(slug);
 
   if (!page) {
@@ -55,7 +55,7 @@ const buildApprovalVelocityGuidance = (directionLabel: "improving" | "deteriorat
 };
 
 export default async function DecisionAnswerPage({ params }: DecisionPageProps) {
-  const { slug } = params;
+  const { slug } = await params;
   const page = findDecisionPage(slug);
 
   if (!page) {
