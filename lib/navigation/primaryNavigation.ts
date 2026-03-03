@@ -24,6 +24,11 @@ export const primaryNavigation: PrimaryNavigationItem[] = [
     description: "Deep playbook guardrails for hiring, spend, and pacing.",
   },
   {
+    href: "/resources",
+    label: "Resources",
+    description: "Board-facing SEO pillars, governance templates, and Decision Shield overview.",
+  },
+  {
     href: "/learn",
     label: "Reference",
     description: "Reference library: toolkits, diagnostics, and methodology.",

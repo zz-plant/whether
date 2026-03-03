@@ -9,6 +9,7 @@ import {
   useCaseRoles,
 } from "../lib/informationArchitecture";
 import { productConceptArticles } from "../lib/productCanon";
+import { resourcePillarPages, resourceSupportingPages } from "../lib/resourcesContent";
 import { tierOneDecisionPages } from "./answers/decisionPages";
 import { regimePages } from "./startup-macro-posture/clusterData";
 
@@ -62,6 +63,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/posture", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.8 },
     { path: "/decide", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.82 },
     { path: "/learn", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.78 },
+    { path: "/resources", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.8 },
     { path: "/method", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.62 },
     { path: "/methodology", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.56 },
     { path: "/decide/use-cases", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.55 },
@@ -119,6 +121,23 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
+  const resourcePillarEntries: SitemapEntryDescriptor[] = resourcePillarPages.map((page) => ({
+    path: `/resources/${page.slug}`,
+    lastModified: staticContentLastModified,
+    changeFrequency: "monthly",
+    priority: 0.79,
+  }));
+
+  const resourceSupportEntries: SitemapEntryDescriptor[] = [
+    resourceSupportingPages.decisionShieldOverview.path,
+    resourceSupportingPages.capitalPostureTemplate.path,
+  ].map((path) => ({
+    path: path as `/${string}`,
+    lastModified: staticContentLastModified,
+    changeFrequency: "monthly",
+    priority: 0.68,
+  }));
+
   const decisionAnswerEntries: SitemapEntryDescriptor[] = tierOneDecisionPages.map((page) => ({
     path: `/answers/${page.slug}`,
     lastModified: staticContentLastModified,
@@ -141,6 +160,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...toolkitEntries,
     ...failureModeEntries,
     ...canonEntries,
+    ...resourcePillarEntries,
+    ...resourceSupportEntries,
     ...decisionAnswerEntries,
     ...regimeDeepEntries,
   ].map(buildEntry);

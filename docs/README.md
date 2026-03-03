@@ -42,6 +42,7 @@ Use this index to find the **current** source of truth quickly.
 - `one-screen-weekly-brief-spec.md` — decision-first one-screen weekly leadership brief specification.
 - `information-architecture-proposal.md` — proposed navigation model and route-transition plan.
 - `implementation-status.md` — consolidated implementation checklist across roadmap, summary follow-ups, and modernization work.
+- `editorial-guardrails.md` — tone, claim boundaries, and CTA/SEO rules for board-facing long-form resources.
 
 ## Agent docs
 - `agents/setup.md` — install/run/check commands and MCP baseline.
