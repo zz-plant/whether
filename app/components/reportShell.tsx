@@ -23,6 +23,7 @@ import { type ReportStageItem } from "./reportRevampElements";
 import { INFORMATIONAL_NOTICE } from "../../lib/exportNotices";
 import { serializeJsonLd } from "../../lib/seo";
 import { AnchorFeedback } from "./anchorFeedback";
+import { ViewportReveal } from "./viewportReveal";
 
 import { ClimateBackdrop } from "./climateBackdrop";
 import { RegimeIconType } from "./regimeIcons";
@@ -618,13 +619,22 @@ export const ReportShell = ({
                     isValidElement(section) && section.key != null
                       ? section.key
                       : `section-${index}`;
+                  const sectionId =
+                    isValidElement(section) && typeof section.props === "object" && section.props !== null
+                      ? (section.props as { id?: unknown }).id
+                      : undefined;
+                  const isPrioritySection =
+                    typeof sectionId === "string" &&
+                    ["weekly-action-summary", "monthly-action-summary", "executive-snapshot"].includes(sectionId);
                   return (
-                    <div
+                    <ViewportReveal
                       key={sectionKey}
+                      priority={isPrioritySection || index === 0}
+                      delayMs={isPrioritySection ? 0 : Math.min(140, index * 28)}
                       className={index === 0 ? "" : "border-t border-slate-800/70 pt-10"}
                     >
                       {section}
-                    </div>
+                    </ViewportReveal>
                   );
                 })}
               </div>

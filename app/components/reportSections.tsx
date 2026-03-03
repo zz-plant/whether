@@ -169,7 +169,7 @@ const ActionSummaryPanel = ({
   blocks,
   footer,
 }: ActionSummaryPanelProps) => (
-  <section id={id} aria-labelledby={`${id}-title`} className="mt-8">
+  <section id={id} aria-labelledby={`${id}-title`} className="section-entry-metric-priority mt-8">
     <div className="weather-panel flex flex-col gap-4 px-5 py-4">
       <p className="type-label text-slate-400">{label}</p>
       <h2 id={`${id}-title`} className="type-section text-slate-100">
@@ -557,7 +557,11 @@ export const WeeklyActionSummaryPanel = ({
   };
 
   return (
-    <section id="weekly-action-summary" aria-labelledby="weekly-action-summary-title" className="mt-8">
+    <section
+      id="weekly-action-summary"
+      aria-labelledby="weekly-action-summary-title"
+      className="section-entry-metric-priority mt-8"
+    >
       <div className="weather-panel flex flex-col gap-6 px-6 py-5">
         <Tooltip.Provider delay={200} closeDelay={50}>
           <div className="grid gap-6 lg:grid-cols-[1.35fr,0.65fr]">
