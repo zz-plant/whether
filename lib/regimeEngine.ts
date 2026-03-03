@@ -509,9 +509,9 @@ const computePolicyAssessment = (
   const ras = computeCompositeScore(slopeZ ?? 0, POLICY_SPEC_V1.weights.curveSlope, bbbZ ?? 0, POLICY_BBB_WEIGHT_FOR_RAS);
 
   const posture: PolicyPosture =
-    cts >= POLICY_SPEC_V1.bands.neutralMax && ras <= -POLICY_SPEC_V1.bands.neutralMax
+    cts >= POLICY_SPEC_V1.bands.neutralMax && ras >= POLICY_SPEC_V1.bands.neutralMax
       ? "SAFETY_MODE"
-      : cts <= -POLICY_SPEC_V1.bands.neutralMax && ras >= POLICY_SPEC_V1.bands.neutralMax
+      : cts <= -POLICY_SPEC_V1.bands.neutralMax && ras <= -POLICY_SPEC_V1.bands.neutralMax
         ? "RISK_ON"
         : "TRANSITION";
 
