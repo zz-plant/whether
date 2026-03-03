@@ -17,7 +17,7 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: DecisionPageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug } = params;
   const page = findDecisionPage(slug);
 
   if (!page) {
