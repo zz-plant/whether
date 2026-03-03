@@ -10,6 +10,7 @@ import {
 } from "../lib/informationArchitecture";
 import { productConceptArticles } from "../lib/productCanon";
 import { resourcePillarPages, resourceSupportingPages } from "../lib/resourcesContent";
+import { resourceArticles } from "../lib/resourceArticles";
 import { tierOneDecisionPages } from "./answers/decisionPages";
 import { regimePages } from "./startup-macro-posture/clusterData";
 
@@ -138,6 +139,22 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.68,
   }));
 
+  const resourceArticleEntries: SitemapEntryDescriptor[] = resourceArticles.map((article) => ({
+    path: `/resources/${article.slug}`,
+    lastModified: staticContentLastModified,
+    changeFrequency: "monthly",
+    priority: 0.73,
+  }));
+
+  const vcAuthorityEntries: SitemapEntryDescriptor[] = [
+    {
+      path: "/resources/how-vc-firms-can-enforce-capital-discipline-across-portfolios",
+      lastModified: staticContentLastModified,
+      changeFrequency: "monthly",
+      priority: 0.78,
+    },
+  ];
+
   const decisionAnswerEntries: SitemapEntryDescriptor[] = tierOneDecisionPages.map((page) => ({
     path: `/answers/${page.slug}`,
     lastModified: staticContentLastModified,
@@ -162,6 +179,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...canonEntries,
     ...resourcePillarEntries,
     ...resourceSupportEntries,
+    ...resourceArticleEntries,
+    ...vcAuthorityEntries,
     ...decisionAnswerEntries,
     ...regimeDeepEntries,
   ].map(buildEntry);

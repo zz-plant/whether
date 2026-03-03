@@ -43,6 +43,10 @@ Use this index to find the **current** source of truth quickly.
 - `information-architecture-proposal.md` — proposed navigation model and route-transition plan.
 - `implementation-status.md` — consolidated implementation checklist across roadmap, summary follow-ups, and modernization work.
 - `editorial-guardrails.md` — tone, claim boundaries, and CTA/SEO rules for board-facing long-form resources.
+- `seo/roadmap.md` — 12–18 month editorial calendar by quarter and content objective.
+- `seo/quality-gates.md` — mandatory publish checklist for future SEO content.
+- `seo/measurement-model.md` — analytics model for cluster/CTA/assisted conversion reporting with intent tags.
+- `seo/refresh-loop.md` — monthly refresh and changelog loop for high-performing pages.
 
 ## Agent docs
 - `agents/setup.md` — install/run/check commands and MCP baseline.

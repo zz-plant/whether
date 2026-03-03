@@ -256,12 +256,12 @@ export function LiveCommandDeck({
 
       <div className="mt-3 grid gap-3 lg:grid-cols-2">
         <article className="rounded-xl border border-slate-700/70 bg-slate-900/60 p-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Time horizon</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Operating cadence</p>
           <select
             className="mt-2 min-h-[44px] w-full touch-manipulation rounded-lg border border-slate-700 bg-slate-950 px-2 py-2 text-base text-slate-100 sm:text-sm"
             value={horizon}
             onChange={(event) => setQueryState("horizon", event.target.value)}
-            aria-label="Time horizon selector"
+            aria-label="Operating cadence selector"
           >
             <option value="now">Now</option>
             <option value="week-1">+1 week</option>
@@ -272,12 +272,12 @@ export function LiveCommandDeck({
         </article>
 
         <article className="rounded-xl border border-slate-700/70 bg-slate-900/60 p-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Risk mode</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Risk posture</p>
           <select
             className="mt-2 min-h-[44px] w-full touch-manipulation rounded-lg border border-slate-700 bg-slate-950 px-2 py-2 text-base text-slate-100 sm:text-sm"
             value={riskMode}
             onChange={(event) => setQueryState("risk", event.target.value)}
-            aria-label="Risk mode selector"
+            aria-label="Risk posture selector"
           >
             <option value="defensive">Defensive</option>
             <option value="balanced">Balanced</option>
@@ -289,7 +289,7 @@ export function LiveCommandDeck({
 
       <div className="mt-3 grid gap-3 lg:grid-cols-2">
         <article className="rounded-xl border border-slate-700/70 bg-slate-900/60 p-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Perspective synthesis</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Operating cadence & risk posture</p>
           <p className="mt-2 text-sm text-slate-100">{perspectiveSummary}</p>
           <p className="mt-2 text-xs text-slate-400">
             Active filters: {roleLens}, {horizon.replace("week-", "+")}, {riskMode}, {scenarioDelta.label}.
@@ -297,7 +297,7 @@ export function LiveCommandDeck({
         </article>
 
         <article className="rounded-xl border border-amber-300/40 bg-amber-500/10 p-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-100">What would flip this call</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-100">Automatic reversal trigger</p>
           {flipCondition ? (
             <>
               <p className="mt-2 text-sm font-semibold text-amber-50">{flipCondition.title}</p>
@@ -311,14 +311,14 @@ export function LiveCommandDeck({
 
       <div className="mt-3 grid gap-3 lg:grid-cols-2">
         <article className="rounded-xl border border-slate-700/70 bg-slate-900/60 p-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Scenario impact</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Scenario impact (current posture)</p>
           <ul className="mt-2 space-y-1 text-sm text-slate-200">
             <li>• Hiring: {scenarioDelta.hiring}</li><li>• Roadmap: {scenarioDelta.roadmap}</li><li>• Spend: {scenarioDelta.spend}</li>
           </ul>
         </article>
 
         <article className="rounded-xl border border-slate-700/70 bg-slate-900/60 p-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Alert center</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Alert status</p>
           <div className="mt-2 flex flex-wrap gap-2">
             {(["slack", "email", "webhook"] as AlertChannel[]).map((channel) => (
               <label key={channel} className="inline-flex min-h-[44px] items-center gap-2 text-sm text-slate-200">
@@ -329,7 +329,7 @@ export function LiveCommandDeck({
           </div>
           <ul className="mt-2 space-y-1 text-xs text-slate-300">
             {alerts.slice(0, 3).map((alert) => (<li key={alert.id}>• {alert.payload.currentAssessment.regime} · {alert.payload.currentRecordDate}</li>))}
-            {alerts.length === 0 ? <li>• No alerts yet. Monitoring active.</li> : null}
+            {alerts.length === 0 ? <li>• Alert status: no active alerts; monitoring.</li> : null}
           </ul>
         </article>
       </div>

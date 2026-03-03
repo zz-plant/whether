@@ -253,7 +253,7 @@ export function WeeklyDecisionCard({
       </div>
 
       <Tabs.Root defaultValue="product" className="rounded-2xl border border-slate-700/70 bg-slate-950/45 p-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.15em] text-slate-300">Stakeholder lenses</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.15em] text-slate-300">Focus areas by function</p>
         <Tabs.List className="mt-3 flex flex-wrap gap-2">
           <Tabs.Tab value="product" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-200 data-[selected]:border-sky-300/80">Product</Tabs.Tab>
           <Tabs.Tab value="gtm" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-200 data-[selected]:border-sky-300/80">GTM</Tabs.Tab>
@@ -273,7 +273,7 @@ export function WeeklyDecisionCard({
 
       <div className="grid gap-4 lg:grid-cols-3">
         <article className="rounded-2xl border border-slate-700/70 bg-slate-950/45 p-4">
-          <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-emerald-200">Top 3 actions</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-emerald-200">High-leverage actions</h3>
           <ul className="mt-3 space-y-2 text-sm text-slate-100">
             {topActions.map((item) => (
               <li key={item} className="flex items-start gap-2">
@@ -288,7 +288,7 @@ export function WeeklyDecisionCard({
         </article>
 
         <article className="rounded-2xl border border-slate-700/70 bg-slate-950/45 p-4">
-          <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-amber-200">Guardrail (do not do)</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-[0.15em] text-amber-200">Guardrail (Do not do)</h3>
           <p className="mt-3 text-sm text-slate-100">{guardrail}</p>
           <p className="mt-2 text-sm text-slate-300">{selectedProfileGuidance.guardrailOverlay}</p>
         </article>
@@ -298,18 +298,18 @@ export function WeeklyDecisionCard({
           <ul className="mt-3 space-y-2 text-sm text-slate-200">
             <li>
               <Tooltip.Root>
-                <Tooltip.Trigger className="underline decoration-dotted underline-offset-4">Inputs: Treasury curve + regime thresholds.</Tooltip.Trigger>
+                <Tooltip.Trigger className="underline decoration-dotted underline-offset-4">Same inputs → same outputs (deterministic).</Tooltip.Trigger>
                 <Tooltip.Portal>
                   <Tooltip.Positioner side="top" sideOffset={8}>
                     <Tooltip.Popup className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-slate-200">
-                      Inputs are refreshed from current Treasury-linked series and deterministic thresholds.
+                      Thresholds and guardrails are explicit and documented. Technical model details live in the appendix.
                     </Tooltip.Popup>
                   </Tooltip.Positioner>
                 </Tooltip.Portal>
               </Tooltip.Root>
             </li>
-            <li>Rules: Deterministic score mapping.</li>
-            <li>Cadence: Weekly decision cycle.</li>
+            <li>Thresholds and guardrails are explicit and documented.</li>
+            <li>Cadence: Weekly.</li>
           </ul>
         </article>
       </div>
@@ -333,7 +333,7 @@ export function WeeklyDecisionCard({
         <Accordion.Item value="risk" className="border-b border-slate-800/80 pb-3">
           <Accordion.Header>
             <Accordion.Trigger className="flex min-h-[44px] w-full items-center justify-between gap-3 text-left text-xs font-semibold uppercase tracking-[0.15em] text-rose-200">
-              Risk framing
+              Risk of mis-application
               <span className="text-slate-400">⌄</span>
             </Accordion.Trigger>
           </Accordion.Header>
@@ -341,7 +341,7 @@ export function WeeklyDecisionCard({
             <ul className="space-y-2 text-sm text-slate-200">
               <li><span className="font-semibold text-slate-100">Risk if over-applied:</span> {engineeringPosture.overApplyRisk}</li>
               <li><span className="font-semibold text-slate-100">Risk if under-applied:</span> {engineeringPosture.underApplyRisk}</li>
-              <li><span className="font-semibold text-slate-100">Mitigation trigger:</span> {engineeringPosture.mitigationTrigger}</li>
+              <li><span className="font-semibold text-slate-100">Automatic reversal rule:</span> {engineeringPosture.mitigationTrigger}</li>
             </ul>
           </Accordion.Panel>
         </Accordion.Item>

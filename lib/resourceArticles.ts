@@ -5,10 +5,15 @@ export type ResourceArticle = {
     | "should-we-freeze-hiring-high-interest-rate-environment"
     | "how-much-runway-do-we-need-tightening-market"
     | "platform-rewrites-during-capital-tightening-risk-analysis"
-    | "how-venture-capital-cycles-affect-startup-operating-strategy";
+    | "how-venture-capital-cycles-affect-startup-operating-strategy"
+    | "vc-portfolio-governance-case-example-burn-multiple-normalization"
+    | "operator-posture-standardization-case-example-product-finance";
   title: string;
   description: string;
   keyword: string;
+  cluster: "pain" | "vc";
+  intent: "cfo" | "board" | "vp-product" | "vc-partner";
+  format: "guide" | "case-example";
   boardSummary: string[];
   sections: Array<{ heading: string; paragraphs: string[] }>;
   faqs: Array<{ question: string; answer: string }>;
@@ -22,6 +27,9 @@ export const resourceArticles: ResourceArticle[] = [
     description:
       "A problem-first operating guide for startup leaders deciding when hiring freezes protect runway and when they quietly damage execution.",
     keyword: "hiring freeze high rates",
+    cluster: "pain",
+    intent: "cfo",
+    format: "guide",
     boardSummary: [
       "Base case: do not run a blanket freeze. Classify open and planned roles by reversibility and by direct cash impact within two quarters.",
       "Escalate to freeze mode when cash conversion worsens for 30 days, sales cycle friction rises, and confidence in near-term financing drops.",
@@ -97,6 +105,9 @@ export const resourceArticles: ResourceArticle[] = [
     description:
       "A problem-first framework for setting runway targets that reflect risk exposure, reversal speed, and financing uncertainty.",
     keyword: "runway target recession",
+    cluster: "pain",
+    intent: "board",
+    format: "guide",
     boardSummary: [
       "Target runway should be tied to volatility and reversal latency, not a generic month count.",
       "Base recommendation: maintain 18–24 months in tightening regimes, with upper bound required if commitments are slow to reverse.",
@@ -173,6 +184,9 @@ export const resourceArticles: ResourceArticle[] = [
     description:
       "A practical risk analysis for deciding if a platform rewrite is prudent, premature, or dangerous when capital is constrained.",
     keyword: "platform rewrite risk recession",
+    cluster: "pain",
+    intent: "vp-product",
+    format: "guide",
     boardSummary: [
       "Default posture in tightening markets is preserve-core, not rewrite-core, unless reliability or security risk forces change.",
       "Use a SAFE / RISKY / DANGEROUS filter that combines customer impact, reversibility, and cash exposure.",
@@ -248,6 +262,9 @@ export const resourceArticles: ResourceArticle[] = [
     description:
       "A leadership operating guide for translating venture cycle shifts into hiring, roadmap, and capital posture decisions.",
     keyword: "venture capital cycles startup strategy",
+    cluster: "vc",
+    intent: "vc-partner",
+    format: "guide",
     boardSummary: [
       "Operating strategy should track financing conditions with a lag-aware posture model, not with narrative sentiment.",
       "Use SAFE / RISKY / DANGEROUS classes across hiring, roadmap, and market bets to keep decision rights consistent.",
@@ -313,6 +330,121 @@ export const resourceArticles: ResourceArticle[] = [
         question: "How often should we revisit operating posture during cycle shifts?",
         answer:
           "Review signals weekly, but make posture changes on monthly confirmation unless emergency thresholds require immediate action.",
+      },
+    ],
+    toolLink: {
+      href: "/resources/quarterly-capital-posture-memo-example",
+      label: "Copy the Quarterly Capital Posture Memo Example",
+    },
+  },
+  {
+    slug: "vc-portfolio-governance-case-example-burn-multiple-normalization",
+    title: "VC portfolio governance case example: burn-multiple normalization playbook",
+    description:
+      "Case example for VC and operating partners: standardize portfolio governance when burn multiple variance and board packet quality drift across companies.",
+    keyword: "vc portfolio governance case example",
+    cluster: "vc",
+    intent: "vc-partner",
+    format: "case-example",
+    boardSummary: [
+      "Case setup: five portfolio companies ran inconsistent threshold definitions, creating late board escalations and noisy capital asks.",
+      "Intervention: introduce one portfolio operating rubric with shared SAFE / RISKY / DANGEROUS classes, monthly checkpoint language, and reversal triggers.",
+      "Result pattern: board packets became comparable in six weeks, and unnecessary tranche requests dropped as teams corrected earlier.",
+      "Forward action: keep shared rubric fixed for two quarters, then recalibrate thresholds only with cross-portfolio evidence.",
+    ],
+    sections: [
+      {
+        heading: "Case baseline: governance drift hides risk concentration",
+        paragraphs: [
+          "A growth-stage VC platform observed that company-level dashboards looked healthy while board confidence kept falling. The issue was governance drift: every company used different threshold words for similar risk patterns. Some flagged concern after one weak month; others waited until covenant pressure appeared.",
+          "Without a common posture standard, partners could not compare commitment quality across the portfolio. Capital decisions became narrative-driven and escalation timing became inconsistent. The practical risk was delayed correction, not simply reporting noise.",
+          "The portfolio team reframed the problem as taxonomy standardization: one definition set for reversibility classes, one escalation clock, and one board-forwardable summary block template per company.",
+        ],
+      },
+      {
+        heading: "Intervention model: 45-day portfolio standardization sprint",
+        paragraphs: [
+          "Week 1 established a portfolio governance charter with non-negotiable definitions for SAFE / RISKY / DANGEROUS commitments. Week 2 required each company to map active bets to that taxonomy, including rollback windows and owner authority.",
+          "Weeks 3 and 4 introduced one board artifact format: posture state, breach indicators, actions taken, and reversibility readiness. Companies could keep local metrics, but summary language and escalation formatting stayed fixed.",
+          "By week 6, portfolio reviews shifted from debating terms to comparing operating quality. This raised intervention speed without adding more meetings.",
+        ],
+      },
+      {
+        heading: "Board-forwardable artifact language",
+        paragraphs: [
+          "Portfolio posture update: commitment quality variance is narrowing as all companies now report under one threshold taxonomy and one reversal standard.",
+          "Governance control: any metric breach persisting for two checkpoints requires a board addendum with action owner and rollback timeline.",
+          "Capital discipline effect: tranche approvals now depend on comparable evidence packets rather than narrative confidence.",
+          "Next review ask: maintain the standard for one additional quarter to verify persistence before any taxonomy changes.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        question: "Why do VC portfolios need a shared governance taxonomy?",
+        answer:
+          "It makes board packets comparable, speeds escalation timing, and reduces avoidable capital allocation errors caused by inconsistent language.",
+      },
+      {
+        question: "How quickly can portfolio governance standardization show impact?",
+        answer:
+          "Most firms can see cleaner board packet comparability and faster intervention decisions within one to two operating cycles.",
+      },
+    ],
+    toolLink: { href: "/resources/capital-posture-template", label: "Use the Capital Posture Template" },
+  },
+  {
+    slug: "operator-posture-standardization-case-example-product-finance",
+    title: "Operator case example: product-finance posture standardization under board pressure",
+    description:
+      "Case example for CFO and VP Product leaders aligning roadmap, hiring, and board messaging to one capital posture standard.",
+    keyword: "operator posture standardization case example",
+    cluster: "vc",
+    intent: "vp-product",
+    format: "case-example",
+    boardSummary: [
+      "Case setup: product and finance teams used conflicting confidence criteria, creating approval latency and exception creep.",
+      "Intervention: one shared posture memo, one exception log, and explicit reversibility language attached to every roadmap commitment.",
+      "Result pattern: approval cycle-time dropped and board discussions shifted from metric disputes to sequencing decisions.",
+      "Forward action: monthly posture drills and a strict 30-day confirmation rule before expanding irreversible commitments.",
+    ],
+    sections: [
+      {
+        heading: "Case baseline: conflicting evidence standards slowed execution",
+        paragraphs: [
+          "A portfolio company entered a tightening cycle with solid demand but weak governance consistency. Product teams argued from delivery momentum while finance teams argued from cash exposure. Both were right locally, but they lacked one shared decision system.",
+          "Board meetings consumed time reconciling definitions rather than selecting actions. Exception approvals increased because each function used different proof thresholds for the same type of commitment.",
+          "Leadership diagnosed the issue as posture fragmentation and moved to a single governance artifact for every material decision.",
+        ],
+      },
+      {
+        heading: "Implementation model: shared memo + exception log + reversal language",
+        paragraphs: [
+          "The team adopted a monthly posture memo with fixed sections: regime read, commitment class, confidence score, reversal path, and escalation trigger. No decision entered planning review without all five fields completed.",
+          "A shared exception log replaced ad hoc approvals. Each exception needed an expiry date, owner, and board-forwardable rationale. This reduced policy drift while preserving flexibility for true edge cases.",
+          "Within two cycles, product and finance teams reported fewer rework loops because the approval grammar became predictable across functions.",
+        ],
+      },
+      {
+        heading: "Board-forwardable artifact language",
+        paragraphs: [
+          "Current posture: standardized governance language is now applied across roadmap, hiring, and vendor commitments.",
+          "Control status: exceptions remain permitted but are time-bounded, owner-assigned, and auditable against reversal readiness.",
+          "Operating impact: decision latency has declined while escalation quality improved due to common evidence definitions.",
+          "Board ask: continue monthly confirmation cadence and require rollback drills for all new irreversible commitments.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        question: "What does posture standardization change for operators?",
+        answer:
+          "It aligns product, finance, and board decision language so approvals move faster and reversibility controls remain consistent.",
+      },
+      {
+        question: "How do we avoid exception creep after standardization?",
+        answer:
+          "Require a central exception log with expiry dates, owners, and mandatory board-ready rationale for every exception.",
       },
     ],
     toolLink: {
