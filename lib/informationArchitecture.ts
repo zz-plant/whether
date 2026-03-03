@@ -142,7 +142,18 @@ export type ToolkitDefinition = {
   title: string;
   whenToUse: string;
   byPosture: string;
+  operatingOutcome: string;
+  timeToRun: string;
+  recommendedParticipants: string;
+  prepChecklist: string[];
+  successSignals: string[];
   instruments: string[];
+  runSequence: {
+    phase: string;
+    objective: string;
+    prompts: string[];
+    deliverable: string;
+  }[];
   misuseCases: string[];
   canonLinks: { label: string; href: string }[];
 };
@@ -153,7 +164,49 @@ export const toolkitDefinitions: ToolkitDefinition[] = [
     title: "PMF Toolkit",
     whenToUse: "Use this when you need demand proof before adding cost or complexity.",
     byPosture: "In Safety Mode, focus on retention proof; in Risk-On, push for repeatable growth.",
+    operatingOutcome: "A go/hold decision backed by retention quality, not just topline excitement.",
+    timeToRun: "60-90 minutes with Product + Growth + Finance.",
+    recommendedParticipants: "Product lead, Growth lead, Finance partner, and the team owning activation/retention.",
+    prepChecklist: [
+      "Bring the latest 2-3 cohorts with activation and retention broken out by segment.",
+      "Pull paid vs organic acquisition split so the room can separate demand from spend effects.",
+      "Collect 5 recent churn and 5 retained-user interviews for qualitative context.",
+    ],
+    successSignals: [
+      "Leadership exits with one PMF gate (invest / hold / narrow) and a date to re-evaluate.",
+      "At least one low-quality segment is deprioritized to protect focus.",
+      "Next-cycle budget is tied to an explicit retention threshold rather than top-line growth alone.",
+    ],
     instruments: ["PMF evidence checklist", "Cohort quality rubric", "Retention interview template"],
+    runSequence: [
+      {
+        phase: "Collect",
+        objective: "Ground the discussion in observable behavior from the last 2-3 cohorts.",
+        prompts: [
+          "What percentage of users return in the behavior window that maps to core value?",
+          "Which cohort improved naturally versus through one-off interventions?",
+        ],
+        deliverable: "One-page PMF evidence sheet with cohort trend highlights.",
+      },
+      {
+        phase: "Stress-test",
+        objective: "Separate demand quality from channel spend or novelty effects.",
+        prompts: [
+          "If acquisition spend stopped this week, where would active usage settle?",
+          "Which segments show repeat behavior without high-touch support?",
+        ],
+        deliverable: "Cohort quality score with confidence notes and known blind spots.",
+      },
+      {
+        phase: "Decide",
+        objective: "Convert evidence into a specific investment gate.",
+        prompts: [
+          "What threshold upgrades this from hold to scale?",
+          "What do we stop funding until that threshold is met?",
+        ],
+        deliverable: "30-day PMF action memo: invest, hold, or narrow segment.",
+      },
+    ],
     misuseCases: ["Treating top-line growth as PMF", "Scaling channels before cohort quality is stable"],
     canonLinks: [{ label: "PMF concepts", href: "/concepts" }],
   },
@@ -162,7 +215,49 @@ export const toolkitDefinitions: ToolkitDefinition[] = [
     title: "Roadmap Focus Toolkit",
     whenToUse: "Use this when your team is overcommitted and priorities are blurred.",
     byPosture: "In Safety Mode, narrow scope; in Risk-On, re-open adjacent options with guardrails.",
+    operatingOutcome: "A capacity-matched roadmap with explicit trade-offs and paused work.",
+    timeToRun: "45-75 minutes with Product + Engineering + Design.",
+    recommendedParticipants: "Product manager, engineering manager, design lead, and one operations/program partner.",
+    prepChecklist: [
+      "List all in-flight initiatives with owner, stage, and expected customer impact.",
+      "Bring current team capacity assumptions (headcount, PTO, support/on-call load).",
+      "Identify any date commitments that cannot move without external impact.",
+    ],
+    successSignals: [
+      "The quarter has a published \"not doing\" list that teams can reference.",
+      "Critical path dependencies are reduced or given explicit escalation owners.",
+      "Team-level WIP limits are set and reviewed weekly.",
+    ],
     instruments: ["Keep/pause/accelerate board", "Dependency heatmap", "Focus memo template"],
+    runSequence: [
+      {
+        phase: "Map",
+        objective: "Make current commitments and hidden dependencies visible.",
+        prompts: [
+          "Which initiatives consume the most critical path capacity?",
+          "Where does one delayed team block multiple outcomes?",
+        ],
+        deliverable: "Dependency heatmap across current quarter initiatives.",
+      },
+      {
+        phase: "Prioritize",
+        objective: "Choose what to keep, pause, or accelerate against posture constraints.",
+        prompts: [
+          "Which item drives the biggest posture-aligned outcome in <90 days?",
+          "What can be paused with the smallest customer/regret impact?",
+        ],
+        deliverable: "Keep/Pause/Accelerate board with named owners.",
+      },
+      {
+        phase: "Commit",
+        objective: "Lock scope and communicate what will not happen this cycle.",
+        prompts: [
+          "What are we explicitly saying no to this quarter?",
+          "Which trigger would cause us to re-open a paused stream?",
+        ],
+        deliverable: "Focus memo shared with leadership and execution teams.",
+      },
+    ],
     misuseCases: ["Adding projects without explicit trade-offs"],
     canonLinks: [{ label: "Roadmap canon", href: "/concepts" }],
   },
@@ -171,7 +266,49 @@ export const toolkitDefinitions: ToolkitDefinition[] = [
     title: "Commitment & Rollback Toolkit",
     whenToUse: "Use this before hiring, pricing, or architecture moves that are hard to undo.",
     byPosture: "In Safety Mode, tighten rollback triggers; in Risk-On, widen experiment boundaries.",
+    operatingOutcome: "Decision packages that define rollback triggers before irreversible spend begins.",
+    timeToRun: "45-60 minutes per major commitment.",
+    recommendedParticipants: "Decision owner, finance owner, delivery owner, and communications counterpart.",
+    prepChecklist: [
+      "Quantify sunk cost exposure at day 7, day 30, and day 90.",
+      "Pre-identify the metric dashboard that will be used to trigger rollback.",
+      "Draft customer and internal rollback messaging before the decision is approved.",
+    ],
+    successSignals: [
+      "Rollback threshold and owner are written into the launch/commitment note.",
+      "A dry-run confirms teams can unwind within the stated window.",
+      "Review cadence is scheduled before resources are committed.",
+    ],
     instruments: ["Reversibility test", "Rollback trigger register", "Pre-mortem checklist"],
+    runSequence: [
+      {
+        phase: "Classify",
+        objective: "Determine whether the commitment is reversible, partially reversible, or locked-in.",
+        prompts: [
+          "What is the fastest path to unwind this decision within 30 days?",
+          "Which costs become sunk immediately after launch?",
+        ],
+        deliverable: "Reversibility classification with unwind cost estimate.",
+      },
+      {
+        phase: "Pre-wire",
+        objective: "Define observable signals that trigger rollback.",
+        prompts: [
+          "Which two leading indicators tell us this move is failing early?",
+          "Who has the authority to trigger rollback in real time?",
+        ],
+        deliverable: "Rollback trigger register with thresholds and owners.",
+      },
+      {
+        phase: "Rehearse",
+        objective: "Validate that rollback can be executed without organizational confusion.",
+        prompts: [
+          "What sequence would we run in the first 24 hours of rollback?",
+          "Which customers, teams, or vendors must be informed first?",
+        ],
+        deliverable: "Pre-mortem and rollback communication plan.",
+      },
+    ],
     misuseCases: ["Making irreversible bets without contingency paths"],
     canonLinks: [{ label: "Irreversibility failure mode", href: "/library/failure-modes/irreversibility" }],
   },
@@ -180,7 +317,49 @@ export const toolkitDefinitions: ToolkitDefinition[] = [
     title: "Decision Rights Toolkit",
     whenToUse: "Use this when unclear ownership is slowing decisions or increasing risk.",
     byPosture: "In Safety Mode, increase escalation rigor; in Risk-On, increase delegated speed.",
+    operatingOutcome: "Named decision owners, escalation paths, and review cadence for critical calls.",
+    timeToRun: "60 minutes to map rights, plus 15-minute weekly operating review.",
+    recommendedParticipants: "Exec sponsor, function leads, and program/operations owner who tracks decision cycle time.",
+    prepChecklist: [
+      "Gather 5-10 recent decisions that slipped, escalated late, or bounced between teams.",
+      "Document current (implicit) approvers so hidden bottlenecks are visible.",
+      "Agree a single source of truth where decision rights will live after the session.",
+    ],
+    successSignals: [
+      "Every critical decision has one accountable DRI and known escalation path.",
+      "Decision cycle time reduces within the next two operating reviews.",
+      "Escalations happen against predefined triggers instead of ad hoc urgency.",
+    ],
     instruments: ["Decision rights matrix", "Escalation ladder", "Governance cadence checklist"],
+    runSequence: [
+      {
+        phase: "Inventory",
+        objective: "List recurring decisions where ownership ambiguity creates delay or risk.",
+        prompts: [
+          "Which decisions repeatedly stall in cross-functional meetings?",
+          "Where do we currently rely on consensus with no accountable owner?",
+        ],
+        deliverable: "Top decision inventory with cycle-time pain points.",
+      },
+      {
+        phase: "Assign",
+        objective: "Set accountable owner, required contributors, and escalation boundaries.",
+        prompts: [
+          "Who is DRI for this call and what input is mandatory versus optional?",
+          "At what risk threshold does this escalate to exec or board?",
+        ],
+        deliverable: "Decision rights matrix and escalation ladder.",
+      },
+      {
+        phase: "Operate",
+        objective: "Enforce rhythm so rights do not decay back into ad hoc governance.",
+        prompts: [
+          "What weekly checkpoint confirms decisions are executed and reviewed?",
+          "What anti-patterns signal governance theater returning?",
+        ],
+        deliverable: "Governance cadence checklist integrated into leadership routine.",
+      },
+    ],
     misuseCases: ["Confusing consensus with accountability"],
     canonLinks: [{ label: "Governance canon", href: "/concepts" }],
   },
@@ -189,7 +368,49 @@ export const toolkitDefinitions: ToolkitDefinition[] = [
     title: "Launch Gates Toolkit",
     whenToUse: "Use this when launches need objective go/no-go thresholds.",
     byPosture: "In Safety Mode, raise quality gates; in Risk-On, raise learning velocity.",
+    operatingOutcome: "Launch decisions tied to threshold evidence, with clear rollback ownership.",
+    timeToRun: "30-45 minutes per launch gate review.",
+    recommendedParticipants: "Release owner, engineering lead, product lead, support lead, and incident commander/backstop.",
+    prepChecklist: [
+      "Pre-fill the gate scorecard with current values 24 hours before review.",
+      "List unresolved launch risks with severity and mitigation owner.",
+      "Prepare rollback communication drafts for customer-facing and internal channels.",
+    ],
+    successSignals: [
+      "Go/no-go is recorded with rationale and ownership in the same meeting.",
+      "Any deferred risk has a named mitigation owner and review date.",
+      "Rollback communications can be sent within minutes, not hours.",
+    ],
     instruments: ["Launch gate scorecard", "Risk register", "Rollback comms template"],
+    runSequence: [
+      {
+        phase: "Define gates",
+        objective: "Set measurable go/no-go criteria before final launch week.",
+        prompts: [
+          "Which reliability, adoption, and support thresholds must be met?",
+          "Which gate is a hard blocker versus a mitigatable risk?",
+        ],
+        deliverable: "Launch gate scorecard with pass/fail criteria.",
+      },
+      {
+        phase: "Assess risk",
+        objective: "Capture residual risks with owner, severity, and mitigation plan.",
+        prompts: [
+          "What could break in first 72 hours and how quickly can we detect it?",
+          "Which dependencies outside our team threaten launch confidence?",
+        ],
+        deliverable: "Risk register linked to monitoring and response owners.",
+      },
+      {
+        phase: "Call the launch",
+        objective: "Make an explicit call with fallback communication ready.",
+        prompts: [
+          "Who gives final launch approval and who can halt if signal degrades?",
+          "What customer/internal message is pre-approved for rollback?",
+        ],
+        deliverable: "Signed go/no-go note and rollback communications packet.",
+      },
+    ],
     misuseCases: ["Launching on optimism without threshold evidence"],
     canonLinks: [{ label: "Launch failures", href: "/library/failure-modes/premature-scaling" }],
   },
@@ -198,7 +419,49 @@ export const toolkitDefinitions: ToolkitDefinition[] = [
     title: "Ops Capacity Toolkit",
     whenToUse: "Use this when team load is running ahead of resilience.",
     byPosture: "In Safety Mode, protect resilience capacity; in Risk-On, redeploy surplus into growth loops.",
+    operatingOutcome: "Capacity plan that protects reliability and prevents silent overload.",
+    timeToRun: "60 minutes monthly plus weekly stress signal review.",
+    recommendedParticipants: "Engineering manager, support/on-call owner, product counterpart, and operations/finance partner.",
+    prepChecklist: [
+      "Compile on-call load, incident trend, and delivery throughput for the last 4-6 weeks.",
+      "List planned work that assumes additional capacity not yet staffed.",
+      "Define non-negotiable reliability guardrails for the next planning window.",
+    ],
+    successSignals: [
+      "At least one overload source is removed or re-sequenced each cycle.",
+      "Guardrail breaches trigger automatic roadmap triage within the same week.",
+      "Leadership can see forward-looking capacity risk two sprints out.",
+    ],
     instruments: ["Capacity stress test", "Service-level guardrail checklist", "Escalation dashboard"],
+    runSequence: [
+      {
+        phase: "Measure load",
+        objective: "Quantify demand on people/systems versus sustainable throughput.",
+        prompts: [
+          "Which teams are consistently above healthy on-call or delivery load?",
+          "Which commitments assume best-case capacity?",
+        ],
+        deliverable: "Capacity stress test by team with red/yellow/green status.",
+      },
+      {
+        phase: "Protect guardrails",
+        objective: "Lock service and reliability floors before adding new scope.",
+        prompts: [
+          "Which SLOs cannot be traded away this quarter?",
+          "What planned work should pause when guardrails are breached?",
+        ],
+        deliverable: "Service-level guardrail checklist tied to roadmap rules.",
+      },
+      {
+        phase: "Escalate early",
+        objective: "Create visibility loops before capacity issues become incidents.",
+        prompts: [
+          "What weekly indicator predicts stress two sprints ahead?",
+          "Who receives escalation when overload persists for two cycles?",
+        ],
+        deliverable: "Escalation dashboard used in leadership review.",
+      },
+    ],
     misuseCases: ["Assuming normal capacity under stress"],
     canonLinks: [{ label: "Complexity debt", href: "/library/failure-modes/complexity-debt" }],
   },
@@ -207,7 +470,49 @@ export const toolkitDefinitions: ToolkitDefinition[] = [
     title: "Claims & Positioning Toolkit",
     whenToUse: "Use this when messaging may outrun what the product can reliably deliver.",
     byPosture: "In Safety Mode, tighten claim defensibility; in Risk-On, expand differentiated positioning responsibly.",
+    operatingOutcome: "Public claims that are evidence-backed, monitorable, and low-regret.",
+    timeToRun: "45 minutes for campaign reviews; 20 minutes for incremental claim changes.",
+    recommendedParticipants: "Marketing lead, product lead, legal/risk reviewer, and support/reliability representative.",
+    prepChecklist: [
+      "Bring current external claims and map each one to measurable product behavior.",
+      "Review recent support tickets for expectation mismatch patterns.",
+      "Collect legal/compliance constraints tied to market or vertical-specific language.",
+    ],
+    successSignals: [
+      "Every published claim has a named evidence source and update owner.",
+      "Expectation-gap support tickets trend down after copy updates.",
+      "Claim changes can be rolled back quickly when reliability drifts.",
+    ],
     instruments: ["Claims evidence table", "Positioning sanity check", "Review checklist"],
+    runSequence: [
+      {
+        phase: "Evidence claims",
+        objective: "Map each external claim to product behavior and proof source.",
+        prompts: [
+          "What observable proof supports each headline claim today?",
+          "Which claim depends on roadmap promises instead of current capability?",
+        ],
+        deliverable: "Claims evidence table with confidence grade.",
+      },
+      {
+        phase: "Challenge positioning",
+        objective: "Pressure-test language against customer interpretation and risk exposure.",
+        prompts: [
+          "How could a skeptical buyer interpret this claim literally?",
+          "Which phrasing increases legal, trust, or support risk unnecessarily?",
+        ],
+        deliverable: "Positioning sanity check with approved language edits.",
+      },
+      {
+        phase: "Ship with controls",
+        objective: "Publish with monitoring and rapid correction path.",
+        prompts: [
+          "Which signals indicate this claim is creating expectation debt?",
+          "Who owns takedown/update decisions if reliability drifts?",
+        ],
+        deliverable: "Final review checklist including rollback owner and SLA.",
+      },
+    ],
     misuseCases: ["Publishing AI claims without operational proof"],
     canonLinks: [{ label: "Claims and trust", href: "/library/failure-modes/risk-externalization" }],
   },
