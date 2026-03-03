@@ -1,3 +1,4 @@
+import { NextResponse } from "next/server";
 import { resolveSiteUrl } from "../../../lib/siteUrl";
 import { supportedAgentCadences } from "../../../lib/agentInterface";
 
@@ -7,31 +8,29 @@ export const revalidate = 3600;
 export async function GET() {
   const baseUrl = resolveSiteUrl();
 
-  return Response.json(
-    {
-      name: "whether-agent-interface",
-      description:
-        "Machine-readable discovery metadata for agents integrating with whether.work.",
-      defaultCadence: "weekly",
-      supportedCadences: [...supportedAgentCadences],
-      endpoints: {
-        brief: `${baseUrl}/api/agent?cadence={cadence}`,
-        llms: `${baseUrl}/llms.txt`,
-      },
-      mcp: {
-        command: "bun run mcp:whether",
-        tools: ["get_agent_brief", "list_agent_skills", "pull_recent_site_info"],
-      },
-      examples: {
-        weekly: `${baseUrl}/api/agent?cadence=weekly`,
-        monthly: `${baseUrl}/api/agent?cadence=monthly`,
-      },
-      version: "v1",
+  return NextResponse.json({
+    service: "whether",
+    version: "v1",
+    generatedAt: new Date().toISOString(),
+    baseUrl,
+    defaultCadence: "weekly",
+    supportedCadences: [...supportedAgentCadences],
+    endpoints: {
+      agent: `${baseUrl}/api/agent`,
+      llms: `${baseUrl}/llms.txt`,
+      weekly: `${baseUrl}/api/weekly`,
+      monthly: `${baseUrl}/api/monthly`,
+      quarterly: `${baseUrl}/api/quarterly`,
+      yearly: `${baseUrl}/api/yearly`,
+      cadence: `${baseUrl}/api/cadence`,
+      treasury: `${baseUrl}/api/treasury`,
+      health: `${baseUrl}/api/health`,
     },
-    {
-      headers: {
-        "cache-control": "public, max-age=3600",
-      },
-    }
-  );
+    examples: {
+      weekly: `${baseUrl}/api/agent?cadence=weekly`,
+    },
+    agent: {
+      invalidCadenceStatus: 400,
+    },
+  });
 }

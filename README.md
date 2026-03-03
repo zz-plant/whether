@@ -86,6 +86,7 @@ instead of regenerating the full historical dataset.
 ## Contributor entry points
 - Human contributors: `CONTRIBUTING.md`
 - Engineering workflow deep-dive: `docs/development-playbook.md`
+- Developer integration docs: `docs/developer/README.md`
 - Agent contributors: `AGENTS.md` and `docs/agents/`
 - Documentation index: `docs/README.md`
 - Domain launch guidance: `docs/domain-and-deployment.md`
