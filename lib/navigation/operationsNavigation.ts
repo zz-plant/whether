@@ -40,7 +40,6 @@ export const operationsSectionLinks: Record<string, ReportSectionLink[]> = {
     { href: "#ops-monthly-action-summary", label: "Monthly summary" },
     { href: "#ops-playbook", label: "Playbook" },
     { href: "#ops-finance-strategy", label: "Finance strategy" },
-    { href: "#ops-insight-database", label: "Insight database" },
     { href: "#ops-export-briefs", label: "Export briefs" },
     { href: "#ops-operator-requests", label: "Operator requests" },
   ],

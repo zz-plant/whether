@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { Route } from "next";
 import Link from "next/link";
 import { StaticHubNav } from "../components/staticHubNav";
 import { buildPageMetadata } from "../../lib/pageMetadata";
@@ -16,7 +17,11 @@ export const metadata: Metadata = buildPageMetadata({
   },
 });
 
-const authorityPages = [
+const authorityPages: Array<{
+  path: Route;
+  title: string;
+  description: string;
+}> = [
   {
     path: "/resources/how-vc-firms-can-enforce-capital-discipline-across-portfolios",
     title: "How VC firms can enforce capital discipline across portfolios",

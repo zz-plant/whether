@@ -11,7 +11,6 @@ import { ReportShell } from "../components/reportShell";
 import {
   FinanceStrategyPanel,
   HistoricalBanner,
-  InsightDatabasePanel,
   MonthlyActionSummaryPanel,
   OperatorRequestsPanel,
   PlaybookPanel,
@@ -223,18 +222,6 @@ export default async function OperationsPage({
         description="Budget posture and cash timing guidance for the quarter."
       >
         <FinanceStrategyPanel
-          regime={assessment.regime}
-          provenance={treasuryProvenance}
-          showProvenance={false}
-        />
-      </SectionedReportPanel>
-
-      <SectionedReportPanel
-        id="ops-insight-database"
-        title="Insight database"
-        description="Capture what the regime implies for product signals and experiments."
-      >
-        <InsightDatabasePanel
           regime={assessment.regime}
           provenance={treasuryProvenance}
           showProvenance={false}

@@ -1,24 +1,14 @@
-import type { AlertChannel, AlertDeliveryEvent, RegimeAlertEvent } from "./signalOps";
+import type { AlertDeliveryEvent, RegimeAlertEvent } from "./signalOps";
 import type { DecisionMemoryEntry } from "./decisionMemory";
-
-export type AlertDeliveryPreferences = Record<AlertChannel, boolean>;
 
 type Store = {
   regimeAlerts: RegimeAlertEvent[];
-  alertPreferencesByClient: Record<string, AlertDeliveryPreferences>;
   alertDeliveries: AlertDeliveryEvent[];
   decisionMemory: DecisionMemoryEntry[];
 };
 
-const defaultPreferences: AlertDeliveryPreferences = {
-  slack: true,
-  email: true,
-  webhook: false,
-};
-
 const createStore = (): Store => ({
   regimeAlerts: [],
-  alertPreferencesByClient: {},
   alertDeliveries: [],
   decisionMemory: [],
 });
@@ -39,25 +29,5 @@ export const serverStore = {
   },
   save(nextStore: Store) {
     globalThis.__whetherServerStore = nextStore;
-  },
-  getPreferences(clientId: string): AlertDeliveryPreferences {
-    const current = this.snapshot;
-    return current.alertPreferencesByClient[clientId] ?? defaultPreferences;
-  },
-  setPreferences(clientId: string, next: Partial<AlertDeliveryPreferences>): AlertDeliveryPreferences {
-    const current = this.snapshot;
-    const merged = {
-      ...defaultPreferences,
-      ...this.getPreferences(clientId),
-      ...next,
-    };
-    this.save({
-      ...current,
-      alertPreferencesByClient: {
-        ...current.alertPreferencesByClient,
-        [clientId]: merged,
-      },
-    });
-    return merged;
   },
 };

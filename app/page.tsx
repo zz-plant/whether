@@ -23,10 +23,9 @@ import { ReportShell } from "./components/reportShell";
 import { reportPageLinks } from "../lib/report/reportNavigation";
 import { buildTrustStatus } from "../lib/report/trustStatus";
 import { WeeklyDecisionCard } from "./components/weeklyDecisionCard";
-import { LiveCommandDeck } from "./components/liveCommandDeck";
 import { RevealOnView } from "./components/revealOnView";
-import { ScenarioGuidanceBlock } from "./components/scenarioGuidanceBlock";
 import { operatingCallsByRegime } from "../lib/report/operatingCalls";
+import { DataProvenanceStrip } from "./components/dataProvenanceStrip";
 
 const WeeklyActionSummaryPanel = dynamic(
   () =>
@@ -42,20 +41,12 @@ const ExecutiveSnapshotPanel = dynamic(
     ),
 );
 
-const SignalMatrixPanel = dynamic(
-  () =>
-    import("./components/reportSections").then(
-      (module) => module.SignalMatrixPanel,
-    ),
-);
-
 export const revalidate = 900;
 export const runtime = "edge";
 
 const homeSectionSequence = [
   { href: "#weekly-action-summary", label: "Weekly actions" },
-  { href: "#executive-snapshot", label: "Operating constraints" },
-  { href: "#signal-matrix", label: "Risk posture" },
+  { href: "#executive-snapshot", label: "Evidence" },
 ] as const;
 
 const regimeLabelMap = {
@@ -84,23 +75,12 @@ const regimeShiftTargets = {
   },
 } as const;
 
-const postureForecastHorizons = ["Now", "+1 week", "+2 weeks", "+4 weeks"] as const;
-
 const regimeSeverityRank: Record<keyof typeof regimeLabelMap, number> = {
   EXPANSION: 0,
   VOLATILE: 1,
   DEFENSIVE: 2,
   SCARCITY: 3,
 };
-
-
-const netStanceByRegime: Record<keyof typeof regimeLabelMap, string> = {
-  SCARCITY: "Net operating stance: Maintain constraint discipline. No expansion moves.",
-  DEFENSIVE: "Net operating stance: Protect core delivery. Expand only with hard ROI proof.",
-  VOLATILE: "Net operating stance: Keep optionality high. Stage commitments behind milestones.",
-  EXPANSION: "Net operating stance: Expand selectively. Keep burn and payback guardrails active.",
-};
-
 
 const expansionWindowByRegime: Record<keyof typeof regimeLabelMap, string> = {
   SCARCITY: "Closed",
@@ -115,16 +95,6 @@ const longCycleBetByRegime: Record<keyof typeof regimeLabelMap, string> = {
   VOLATILE: "Caution",
   EXPANSION: "Permitted with milestones",
 };
-
-const clampPercentage = (value: number) => Math.min(100, Math.max(0, value));
-
-type PostureForecastItem = {
-  horizon: (typeof postureForecastHorizons)[number];
-  label: "Stable" | "Watch" | "Likely shift" | "Projection unavailable";
-  rationale: string;
-  confidence: "High confidence" | "Medium confidence" | "Low confidence";
-};
-
 
 export const generateMetadata = async ({
   searchParams,
@@ -282,12 +252,9 @@ export default async function HomePage({
     historicalSelection,
     recordDateLabel,
     regimeAlert,
-    lastYearComparison,
-    startItems,
     statusLabel,
     stopItems,
     treasury,
-    reportDynamics,
     treasuryProvenance,
   } = await loadReportData(resolvedSearchParams);
   const previousHistoricalSelection = historicalSelection
@@ -316,19 +283,12 @@ export default async function HomePage({
     stableAction:
       "Safe to use for near-term planning; proceed with normal approval flow.",
   });
-  const postureDelta = regimeAlert
-    ? `Shifted from ${regimeLabelMap[regimeAlert.previousRegime]}.`
-    : "No change since last week.";
   const previousRegime = regimeAlert?.previousRegime;
-  const changeLabel = regimeAlert
-    ? `${statusLabel} ↑ (changed from ${regimeLabelMap[regimeAlert.previousRegime]})`
-    : `${statusLabel} (unchanged vs last week)`;
   const severityDelta = previousRegime
     ? regimeSeverityRank[assessment.regime] - regimeSeverityRank[previousRegime]
     : 0;
-  const worseLabel = severityDelta > 0 ? "Worse than last week" : severityDelta < 0 ? "Better than last week" : "No worse than last week";
+  const postureDeltaLabel = severityDelta > 0 ? "Worse than last week" : severityDelta < 0 ? "Better than last week" : "No worse than last week";
   const operatingCalls = operatingCallsByRegime[assessment.regime];
-  const netStance = netStanceByRegime[assessment.regime];
   const expansionWindow = expansionWindowByRegime[assessment.regime];
   const longCycleBetStance = longCycleBetByRegime[assessment.regime];
   const tightnessThreshold = assessment.thresholds.tightnessRegime;
@@ -338,63 +298,23 @@ export default async function HomePage({
   const nearestThresholdGap = Math.min(tightnessGap, riskGap);
   const shiftTargets = regimeShiftTargets[assessment.regime];
   const primaryShiftRegimeLabel = regimeLabelMap[shiftTargets.defensive];
-  const adjacentShiftRegimeLabel = regimeLabelMap[shiftTargets.adjacent];
-  const normalizedTightnessGap = clampPercentage((tightnessGap / 40) * 100);
-  const normalizedRiskGap = clampPercentage((riskGap / 40) * 100);
-  const defensivePressure = clampPercentage(100 - normalizedRiskGap);
-  const expansionPressure = clampPercentage(100 - normalizedTightnessGap);
-  const shiftPressure = clampPercentage((defensivePressure + expansionPressure) / 2);
-  const probabilityStay = Math.round(clampPercentage(100 - shiftPressure));
-  const shiftAllocationWeight =
+  const confidenceLabel = nearestThresholdGap <= 5 ? "LOW" : nearestThresholdGap <= 12 ? "MED" : "HIGH";
+  const transitionWatch = nearestThresholdGap <= 8 || Boolean(regimeAlert) ? "ON" : "OFF";
+  const reversalTrigger = tightnessGap <= riskGap
+    ? `Flip to ${primaryShiftRegimeLabel} if tightness crosses ${tightnessThreshold.toFixed(1)} (now ${assessment.scores.tightness.toFixed(1)}).`
+    : `Flip to ${primaryShiftRegimeLabel} if risk appetite crosses ${riskThreshold.toFixed(1)} (now ${assessment.scores.riskAppetite.toFixed(1)}).`;
+  const dangerousCategory =
     assessment.regime === "EXPANSION"
-      ? 0.7
-      : assessment.regime === "SCARCITY"
-        ? 0.55
-        : assessment.regime === "DEFENSIVE"
-          ? 0.6
-          : 0.65;
-  const probabilityShiftPool = 100 - probabilityStay;
-  const probabilityShiftDefensive = Math.round(
-    clampPercentage(probabilityShiftPool * shiftAllocationWeight),
-  );
-  const probabilityShiftExpansion = Math.max(0, 100 - probabilityStay - probabilityShiftDefensive);
-  const hasProjectionData =
-    Number.isFinite(assessment.scores.tightness) &&
-    Number.isFinite(assessment.scores.riskAppetite) &&
-    Number.isFinite(tightnessThreshold) &&
-    Number.isFinite(riskThreshold);
-  const horizonForecast: PostureForecastItem[] = hasProjectionData
-    ? postureForecastHorizons.map((horizon, index) => {
-      const alertBias = regimeAlert ? 8 : 0;
-      const projectedGap = nearestThresholdGap - index * 5 - alertBias;
-      const label: PostureForecastItem["label"] =
-        projectedGap <= 2 ? "Likely shift" : projectedGap <= 8 ? "Watch" : "Stable";
-      const rationale =
-        label === "Likely shift"
-          ? `Risk appetite and tightness are near regime boundaries (${riskThreshold}/${tightnessThreshold}); trigger conditions are close.`
-          : label === "Watch"
-            ? `Risk appetite or tightness is within monitoring range of thresholds (${riskThreshold}/${tightnessThreshold}).`
-            : `Risk appetite and tightness remain comfortably away from thresholds (${riskThreshold}/${tightnessThreshold}).`;
-      const confidence: PostureForecastItem["confidence"] =
-        horizon === "Now"
-          ? "High confidence"
-          : horizon === "+1 week"
-            ? "Medium confidence"
-            : "Low confidence";
-
-      return {
-        horizon,
-        label,
-        rationale,
-        confidence,
-      };
-    })
-    : postureForecastHorizons.map((horizon) => ({
-      horizon,
-      label: "Projection unavailable",
-      rationale: "Projection unavailable: missing score inputs for this horizon.",
-      confidence: "Low confidence",
-    }));
+      ? "Unchecked spend growth without payback controls"
+      : assessment.regime === "VOLATILE"
+        ? "Irreversible multi-quarter commitments"
+        : "Net-new hiring and long-payback expansion bets";
+  const constraints = [
+    `Expansion window: ${expansionWindow}`,
+    `Hiring: ${operatingCalls.hiring}`,
+    `Long-cycle bets: ${longCycleBetStance}`,
+  ];
+  const guardrail = stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
   return (
     <ReportShell
       regime={assessment.regime}
@@ -412,11 +332,11 @@ export default async function HomePage({
       pageSummary="Verdict and immediate decision call for this planning cycle."
       primaryCta={{
         href: "/operations#ops-export-briefs",
-        label: "Generate executive brief",
+        label: "Export board brief",
       }}
       secondaryCta={{
         href: "#weekly-action-summary",
-        label: "Run weekly operating sequence",
+        label: "Review evidence",
       }}
       nextStep={{
         href: "/signals",
@@ -442,111 +362,18 @@ export default async function HomePage({
       <WeeklyDecisionCard
         regime={assessment.regime}
         statusLabel={statusLabel}
-        startItems={startItems}
-        stopItems={stopItems}
+        postureDelta={postureDeltaLabel}
+        confidenceLabel={confidenceLabel}
+        transitionWatch={transitionWatch}
+        constraints={constraints}
+        guardrail={guardrail}
+        reversalTrigger={reversalTrigger}
+        dangerousCategory={dangerousCategory}
         recordDateLabel={recordDateLabel}
         fetchedAtLabel={fetchedAtLabel}
       />
 
-      <section
-        aria-labelledby="decision-surface-title"
-        className="weather-panel space-y-6 px-5 py-6 sm:px-7 sm:py-8"
-      >
-        <header className="space-y-3 border-b border-slate-700/70 pb-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-200">Executive Summary — Current Posture</p>
-          <h1 id="decision-surface-title" className="text-3xl font-semibold text-slate-50 sm:text-4xl">
-            {changeLabel}
-          </h1>
-          <div className="grid gap-3 md:grid-cols-2">
-            <p className="max-w-3xl text-base text-slate-200"><span className="font-semibold text-slate-100">What changed?</span> {worseLabel}</p>
-            <p className="max-w-3xl text-base text-slate-200"><span className="font-semibold text-slate-100">Delta:</span> Approval velocity {assessment.regime === "SCARCITY" || assessment.regime === "DEFENSIVE" ? "-1 notch" : "+0 notch"}</p>
-          </div>
-          <p className="text-sm font-semibold text-slate-100">{netStance}</p>
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">Operating constraints</p>
-          <ul className="space-y-1 text-sm text-slate-200" aria-label="Immediate operating calls">
-            <li>✓ Expansion window: {expansionWindow}</li>
-            <li>✓ Hiring: {operatingCalls.hiring}</li>
-            <li>✓ Long-cycle bets: {longCycleBetStance}</li>
-          </ul>
-          <ScenarioGuidanceBlock assessment={assessment} baselineCalls={operatingCalls} />
-          <div className="grid gap-3 md:grid-cols-3" aria-label="Primary posture metrics">
-            <article className="rounded-xl border border-slate-700/70 bg-slate-900/60 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">Short-cycle experiment safety</p>
-              <p className="mt-2 text-3xl font-semibold text-slate-50">{probabilityStay}%</p>
-              <p className="mt-1 text-sm text-slate-300">Stance: CAUTION — short-cycle experiments viable.</p>
-            </article>
-            <article className="rounded-xl border border-amber-500/40 bg-slate-900/60 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-200">Hiring expansion window</p>
-              <p className="mt-2 text-3xl font-semibold text-amber-100">{probabilityShiftDefensive}%</p>
-              <p className="mt-1 text-sm text-slate-300">Stance: NO-GO when below safe expansion band toward {primaryShiftRegimeLabel}.</p>
-            </article>
-            <article className="rounded-xl border border-emerald-500/40 bg-slate-900/60 p-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-200">Long-payback tolerance</p>
-              <p className="mt-2 text-3xl font-semibold text-emerald-100">{probabilityShiftExpansion}%</p>
-              <p className="mt-1 text-sm text-slate-300">Stance: CAUTION — long-payback risk elevated unless rotation toward {adjacentShiftRegimeLabel}.</p>
-            </article>
-          </div>
-        </header>
-
-        <div className="grid gap-4 lg:grid-cols-3">
-          <p className="lg:col-span-3 text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">Next-cycle posture probabilities</p>
-          <p className="lg:col-span-3 text-xs text-slate-400">Percentages are model probabilities for next-cycle posture paths; they are not confidence intervals or score percentiles.</p>
-          <article className="rounded-xl border border-slate-700/70 bg-slate-900/50 p-4 lg:col-span-2" aria-label="Diagnostics">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">Diagnostics</h2>
-            <ul className="mt-3 space-y-2 text-sm text-slate-200">
-              <li>• {postureDelta}</li>
-              <li>• Tightness conditions remain supportive relative to threshold direction.</li>
-              <li>• Risk appetite is improving versus last week; maintain guardrails while expanding selectively.</li>
-              {lastYearComparison ? (
-                <li>
-                  • Year-over-year regime reference: {regimeLabelMap[lastYearComparison.prior.regime as keyof typeof regimeLabelMap] ?? lastYearComparison.prior.regime} ({lastYearComparison.prior.recordDate}).
-                </li>
-              ) : null}
-            </ul>
-          </article>
-
-          <article className="rounded-xl border border-slate-700/70 bg-slate-900/50 p-4" aria-label="Decision implications">
-            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">Accelerate / Defer-Reject</h2>
-            <ul className="mt-3 space-y-2 text-sm text-slate-200">
-              {startItems.slice(0, 3).map((item) => (
-                <li key={item}>• ACCELERATE: {item}</li>
-              ))}
-              {stopItems.slice(0, 2).map((item) => (
-                <li key={item}>• DEFER/REJECT: {item} (review next weekly cycle)</li>
-              ))}
-            </ul>
-          </article>
-        </div>
-
-        <details className="rounded-xl border border-slate-700/70 bg-slate-950/40 p-4" aria-label="Trigger outlook details">
-          <summary className="flex min-h-[48px] cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold tracking-[0.08em] text-slate-200 focus-visible:rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation">
-            <span>Trigger outlook (expand)</span>
-            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-400">⌄</span>
-          </summary>
-          <div id="posture-forecast" className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-4" role="list" aria-label="Posture forecast timeline">
-            {horizonForecast.map((item) => (
-              <article
-                key={item.horizon}
-                className="rounded-lg border border-slate-700/60 bg-slate-900/70 p-3"
-                role="listitem"
-                aria-label={`Posture forecast ${item.horizon}: ${item.label}`}
-              >
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">{item.horizon}</p>
-                <p className="mt-1 text-sm font-semibold text-slate-50">{item.label}</p>
-                <p className="mt-1 text-sm text-slate-300">{item.rationale}</p>
-              </article>
-            ))}
-          </div>
-        </details>
-      </section>
-      <LiveCommandDeck
-        fetchedAtLabel={fetchedAtLabel}
-        fetchedAtIso={treasury.fetched_at}
-        changedSignalCount={reportDynamics.totalSignalChanges}
-        changedSignals={reportDynamics.changedSignals}
-        regimeChanged={reportDynamics.regimeChanged}
-        signalDirection={reportDynamics.directionLabel}
-      />
+      <DataProvenanceStrip provenance={treasuryProvenance} variant="compact" />
 
       <RevealOnView>
         <section
@@ -572,14 +399,6 @@ export default async function HomePage({
         </section>
       </RevealOnView>
 
-      <RevealOnView>
-        <section id="signal-matrix" aria-label="Signal breakdown" className="space-y-8">
-          <SignalMatrixPanel
-            assessment={assessment}
-            provenance={treasuryProvenance}
-          />
-        </section>
-      </RevealOnView>
     </ReportShell>
   );
 }
