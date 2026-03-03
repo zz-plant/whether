@@ -342,16 +342,31 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
   };
 };
 
-let defaultReportDataPromise: Promise<Awaited<ReturnType<typeof loadReportDataUncached>>> | null = null;
+let defaultReportDataCache:
+  | {
+      promise: Promise<Awaited<ReturnType<typeof loadReportDataUncached>>>;
+      expiresAtMs: number;
+    }
+  | null = null;
 
 export const loadReportData = (searchParams?: ReportSearchParams) => {
   if (searchParams) {
     return loadReportDataUncached(searchParams);
   }
 
-  if (!defaultReportDataPromise) {
-    defaultReportDataPromise = loadReportDataUncached();
+  const now = Date.now();
+  if (!defaultReportDataCache || now >= defaultReportDataCache.expiresAtMs) {
+    const promise = loadReportDataUncached();
+    defaultReportDataCache = {
+      promise,
+      expiresAtMs: now + REPORT_DATA_REVALIDATE_SECONDS * 1000,
+    };
+    promise.catch(() => {
+      if (defaultReportDataCache?.promise === promise) {
+        defaultReportDataCache = null;
+      }
+    });
   }
 
-  return defaultReportDataPromise;
+  return defaultReportDataCache.promise;
 };
