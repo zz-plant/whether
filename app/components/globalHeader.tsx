@@ -16,7 +16,7 @@ const segmentLabelMap: Record<string, string> = {
   start: "Command Center",
   decide: "Role lenses",
   toolkits: "Toolkits",
-  learn: "Learn",
+  learn: "Reference",
   method: "Method",
   posture: "Posture",
   onboarding: "Onboarding",
@@ -44,7 +44,7 @@ export function GlobalHeader() {
 
   const breadcrumbs = useMemo(() => {
     if (!pathname || pathname === "/") {
-      return [{ href: "/", label: "Weekly briefing" }];
+      return [{ href: "/", label: "Weekly Brief" }];
     }
 
     const segments = pathname.split("/").filter(Boolean);
@@ -63,7 +63,7 @@ export function GlobalHeader() {
   }, [pathname]);
 
   const currentPageLabel =
-    breadcrumbs[breadcrumbs.length - 1]?.label ?? "Weekly briefing";
+    breadcrumbs[breadcrumbs.length - 1]?.label ?? "Weekly Brief";
 
   const navLinks = primaryNavigation.filter((link) => link.staticHub !== false);
 
@@ -126,7 +126,7 @@ export function GlobalHeader() {
                 <span aria-current="page">{currentPageLabel}</span>
               </>
             ) : (
-              <span>Weekly briefing</span>
+              <span>Weekly Brief</span>
             )}
           </p>
         </div>

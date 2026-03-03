@@ -9,42 +9,23 @@ export type PrimaryNavigationItem = {
 
 export const primaryNavigation: PrimaryNavigationItem[] = [
   {
-    href: "/start",
-    label: "Command Center",
-    description: "Posture-first onboarding and situation routing.",
+    href: "/",
+    label: "Weekly Brief",
+    description: "Weekly mandate: posture call, changes, and top actions.",
   },
   {
     href: "/signals",
     label: "Signals",
     description: "Live macro inputs, thresholds, and confidence context.",
-    staticHub: false,
   },
   {
     href: "/operations",
     label: "Operations",
-    description: "Execution playbooks and operational guardrails by posture.",
-    staticHub: false,
-  },
-  {
-    href: "/decide",
-    label: "Role Lenses",
-    description: "Role-specific decision lenses and situation references.",
-    staticHub: false,
-  },
-  {
-    href: "/toolkits",
-    label: "Toolkits",
-    description: "Runnable instruments and templates by decision surface.",
-    staticHub: false,
+    description: "Deep playbook guardrails for hiring, spend, and pacing.",
   },
   {
     href: "/learn",
-    label: "Learn",
-    description: "Failure modes diagnostics and canon depth.",
-  },
-  {
-    href: "/method",
-    label: "Method",
-    description: "How the model works, what sources power it, and where to get help.",
+    label: "Reference",
+    description: "Reference library: toolkits, diagnostics, and methodology.",
   },
 ];

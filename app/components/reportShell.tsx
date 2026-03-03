@@ -48,7 +48,7 @@ export const ReportShell = ({
   offlineBadgeLabel = "Cached snapshot",
   heroVariant = "full",
   pageNavVariant = "full",
-  showPageNavigation = true,
+  showPageNavigation = false,
   sidebarVariant = "full",
   hideHeroChrome = false,
   primaryCta = {
@@ -669,17 +669,19 @@ export const ReportShell = ({
                 </a>
               </div>
             </section>
-          </div>
+            </div>
         ) : null}
 
-        <div className="sm:hidden">
+        {showPageNavigation ? (
+          <div className="sm:hidden">
           <ReportMobileNavigation
             pageLinks={pageLinks}
             pageTitle={pageTitle}
             currentPath={currentPath}
             className="mt-3 px-4 pb-6"
           />
-        </div>
+          </div>
+        ) : null}
 
         <aside className="tv-action-rail" aria-label="TV quick actions">
           <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">
