@@ -9,12 +9,10 @@ import { Slider } from "@base-ui/react/slider";
 import type { Route } from "next";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
-  classifyRegime,
-  computeRiskAppetiteScore,
-  computeTightnessScore,
   getRegimeProfile,
   type RegimeAssessment,
 } from "../../../lib/regimeEngine";
+import { computeScenarioOutcome, parseNumericParam } from "../../../lib/counterfactual/scenario";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 import { SectionPanelHeader } from "../../components/sectionPanelHeader";
 
@@ -22,14 +20,6 @@ const clamp = (value: number, min: number, max: number) => Math.min(max, Math.ma
 
 const formatSigned = (value: number, suffix = "") =>
   `${value >= 0 ? "+" : ""}${value}${suffix}`;
-
-const parseNumericParam = (value: string | null) => {
-  if (!value) {
-    return null;
-  }
-  const parsed = Number(value);
-  return Number.isNaN(parsed) ? null : parsed;
-};
 
 export const CounterfactualPanel = ({
   assessment,
@@ -119,21 +109,15 @@ export const CounterfactualPanel = ({
     router.push(`${pathname}?${nextSearch}` as Route, { scroll: false });
   }, [pathname, rateShiftBps, router, searchParams, slopeShiftBps]);
 
-  const baseRate = assessment.scores.baseRate;
-  const curveSlope = assessment.scores.curveSlope ?? 0;
-  const adjustedBaseRate = clamp(baseRate + rateShiftBps / 100, 0, 15);
-  const adjustedSlope = clamp(curveSlope + slopeShiftBps / 100, -5, 5);
-  const adjustedTightness = computeTightnessScore(
+  const {
+    baseRate,
+    curveSlope,
     adjustedBaseRate,
     adjustedSlope,
-    assessment.thresholds.baseRateTightness
-  );
-  const adjustedRiskAppetite = computeRiskAppetiteScore(adjustedSlope);
-  const adjustedRegime = classifyRegime(
     adjustedTightness,
     adjustedRiskAppetite,
-    assessment.thresholds
-  );
+    adjustedRegime,
+  } = computeScenarioOutcome(assessment, { rateShiftBps, slopeShiftBps });
   const adjustedProfile = getRegimeProfile(adjustedRegime);
   const currentProfile = getRegimeProfile(assessment.regime);
   const hasScenarioShift = rateShiftBps !== 0 || slopeShiftBps !== 0;
