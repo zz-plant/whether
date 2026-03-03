@@ -16,8 +16,6 @@ import { ReportShell } from "../components/reportShell";
 import { RelatedReportLinks } from "../components/relatedReportLinks";
 import {
   HistoricalBanner,
-  MacroSignalsPanel,
-  SensorArray,
 } from "../components/reportSections";
 import { AdvancedThresholdsSection } from "./components/advancedThresholdsSection";
 import { TimeMachinePanel } from "./components/timeMachinePanel";
@@ -205,16 +203,16 @@ export default async function SignalsPage({
   const prioritizedSignalsByFocus: Record<FocusTab, Array<{ label: string; why: string; href: string }>> = {
     all: [
       { label: "Tightness", why: "Primary liquidity constraint for near-term execution", href: "#current-scores" },
-      { label: "Risk appetite", why: "Market risk-on/off posture changes funding and launch tolerance", href: "#macro-signals" },
-      { label: "Curve slope", why: "Forward growth signal to validate regime durability", href: "#sensor-array" },
+      { label: "Risk appetite", why: "Market risk-on/off posture changes funding and launch tolerance", href: "#current-scores" },
+      { label: "Curve slope", why: "Forward growth signal to validate regime durability", href: "#current-scores" },
     ],
     growth: [
       { label: "Curve slope", why: "Best early growth stress read in current framework", href: "#current-scores" },
       { label: "Regime timeline", why: "Compare current growth posture against prior transitions", href: regimeTimelineHref },
-      { label: "Macro source series", why: "Validate growth-sensitive inputs directly from sources", href: "#macro-signals" },
+      { label: "Macro source series", why: "Validate growth-sensitive inputs directly from sources", href: "#current-scores" },
     ],
     inflation: [
-      { label: "Base rate", why: "Rate level is the strongest inflation pressure proxy in this report", href: "#sensor-array" },
+      { label: "Base rate", why: "Rate level is the strongest inflation pressure proxy in this report", href: "#current-scores" },
       { label: "Tightness", why: "Liquidity stress compounds inflation pass-through risk", href: "#current-scores" },
       { label: "Threshold logic", why: "Check if inflation-sensitive trigger bands need adjustment", href: "#advanced-controls" },
     ],
@@ -225,8 +223,8 @@ export default async function SignalsPage({
     ],
     financial: [
       { label: "Tightness", why: "Funding conditions drive immediate financial operating constraints", href: "#current-scores" },
-      { label: "Risk appetite", why: "Credit and valuation tolerance shift with risk-on/off posture", href: "#macro-signals" },
-      { label: "Macro source series", why: "Trace inputs before finalizing treasury-sensitive moves", href: "#macro-signals" },
+      { label: "Risk appetite", why: "Credit and valuation tolerance shift with risk-on/off posture", href: "#current-scores" },
+      { label: "Macro source series", why: "Trace inputs before finalizing treasury-sensitive moves", href: "#current-scores" },
     ],
   };
   const focusLabelByTab: Record<FocusTab, string> = {
@@ -252,14 +250,14 @@ export default async function SignalsPage({
       value: `${assessment.scores.tightness}/100`,
       threshold: `${assessment.thresholds.tightnessRegime}/100`,
       description: "Higher values indicate tighter funding conditions.",
-      href: "#sensor-array",
+      href: "#current-scores",
     },
     {
       label: "Risk appetite",
       value: `${assessment.scores.riskAppetite}/100`,
       threshold: `${assessment.thresholds.riskAppetiteRegime}/100`,
       description: "Higher values indicate more risk-on market behavior.",
-      href: "#macro-signals",
+      href: "#current-scores",
     },
     {
       label: "Curve slope",
@@ -269,7 +267,7 @@ export default async function SignalsPage({
           : `${assessment.scores.curveSlope.toFixed(2)}%`,
       threshold: "0.00%",
       description: "10Y minus 2Y Treasury yield spread.",
-      href: "#sensor-array",
+      href: "#current-scores",
     },
   ];
 
@@ -300,7 +298,7 @@ export default async function SignalsPage({
       sectionLinks={sectionLinks}
       heroVariant="compact"
       pageNavVariant="compact"
-      primaryCta={{ href: "#macro-signals", label: "Review evidence" }}
+      primaryCta={{ href: "#current-scores", label: "Review evidence" }}
       nextStep={{
         href: "/operations",
         description: "Apply this posture in Operations",
@@ -311,7 +309,7 @@ export default async function SignalsPage({
         horizon: "Current cycle",
         confidence: trustStatusLabel,
         effectiveDate: recordDateLabel,
-        evidenceHref: "#macro-signals",
+        evidenceHref: "#current-scores",
       }}
       decisionDiffs={[{ label: `Regime: ${regimeLabel}`, tone: "neutral" }]}
       structuredData={structuredData}
@@ -333,10 +331,10 @@ export default async function SignalsPage({
           { label: "Tightness", href: regimeTimelineHref, metric: "tightness" },
           {
             label: "Risk appetite",
-            href: "#macro-signals",
+            href: "#current-scores",
             metric: "riskAppetite",
           },
-          { label: "Base rate", href: "#sensor-array", metric: "baseRate" },
+          { label: "Base rate", href: "#current-scores", metric: "baseRate" },
         ]}
         openPanelHref={timeMachineHref}
       />
@@ -539,10 +537,6 @@ export default async function SignalsPage({
         sensors={sensors}
         regimeSeries={regimeSeries}
       />
-
-      <SensorArray sensors={sensors} provenance={treasuryProvenance} />
-
-      <MacroSignalsPanel series={macroSeries} provenance={macroProvenance} />
 
       <section className="weather-panel space-y-4 px-6 py-5" id="advanced-controls">
         <div className="grid gap-4 rounded-2xl border border-slate-800/80 bg-slate-950/50 p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
