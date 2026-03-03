@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useHapticFeedback } from "./useHapticFeedback";
 
 const STORAGE_KEY = "whether-display-mode";
 
@@ -26,6 +27,7 @@ const getInitialToggleMode = (): "auto" | "tv" => {
 
 export const DisplayModeToggle = () => {
   const [mode, setMode] = useState<"auto" | "tv">("auto");
+  const triggerHaptic = useHapticFeedback();
 
   useEffect(() => {
     const syncFromLocation = () => {
@@ -56,6 +58,7 @@ export const DisplayModeToggle = () => {
     }
 
     window.history.replaceState({}, "", nextUrl);
+    triggerHaptic("selection");
   };
 
   const isTv = mode === "tv";
