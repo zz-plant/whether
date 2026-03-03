@@ -53,6 +53,57 @@ const buildApprovalVelocityGuidance = (directionLabel: "improving" | "deteriorat
   return "0 notch vs last week";
 };
 
+const liveAnswerBySlug: Record<string, { expansion: string; safety: string }> = {
+  "should-we-hire-engineers-right-now": {
+    expansion: "Yes — but selectively and with ROI gates.",
+    safety: "Slow net-new hiring; keep only mission-critical and ROI-proven roles open.",
+  },
+  "is-it-a-good-time-to-hire-engineers": {
+    expansion: "Yes for targeted roles; no for blanket growth hiring.",
+    safety: "Not for broad growth hiring — prioritize only critical delivery roles.",
+  },
+  "should-startups-hire-right-now": {
+    expansion: "Selective hiring is supported when demand proof is real.",
+    safety: "Only maintain hiring tied to immediate revenue or reliability outcomes.",
+  },
+  "should-we-expand-our-team-in-2026": {
+    expansion: "Expand in controlled increments with explicit rollback triggers.",
+    safety: "Delay broad expansion and preserve flexibility until expansion signals return.",
+  },
+  "is-now-a-good-time-to-raise-venture-capital": {
+    expansion: "Conditions are supportive, but raise from leverage — not urgency.",
+    safety: "Prioritize runway protection and begin fundraising early with tighter terms expectations.",
+  },
+  "should-we-raise-funding-right-now": {
+    expansion: "Raise if it extends strategic optionality and preserves execution speed.",
+    safety: "Raise sooner to secure optionality before financing conditions tighten further.",
+  },
+  "startup-funding-climate-2026": {
+    expansion: "Capital access is open with guardrails; quality signals still matter most.",
+    safety: "Capital access is selective; durable traction and capital efficiency are required.",
+  },
+  "is-the-market-risk-on-or-risk-off-right-now": {
+    expansion: "Current posture is expansion with guardrails.",
+    safety: "Current posture is safety mode.",
+  },
+  "capital-tightness-right-now": {
+    expansion: "Tightness is currently low, so near-term liquidity pressure is contained.",
+    safety: "Tightness is elevated, so preserve liquidity and tighten discretionary spend.",
+  },
+  "should-we-slow-hiring-in-a-risk-off-market": {
+    expansion: "No — maintain selective hiring while keeping trigger-based controls in place.",
+    safety: "Yes — shift to critical backfills and ROI-proven roles when risk turns off.",
+  },
+};
+
+const buildLiveShortAnswer = (slug: string, isExpansion: boolean, fallback: string) => {
+  const liveAnswer = liveAnswerBySlug[slug];
+
+  if (!liveAnswer) return fallback;
+
+  return isExpansion ? liveAnswer.expansion : liveAnswer.safety;
+};
+
 export default async function DecisionAnswerPage({ params }: DecisionPageProps) {
   const { slug } = await params;
   const page = findDecisionPage(slug);
@@ -68,6 +119,7 @@ export default async function DecisionAnswerPage({ params }: DecisionPageProps) 
     assessment.scores.riskAppetite >= riskThreshold &&
     assessment.scores.tightness < tightnessThreshold &&
     (assessment.scores.curveSlope ?? 0) > 0;
+  const liveShortAnswer = buildLiveShortAnswer(page.slug, isExpansion, page.shortAnswer);
 
   const approvalVelocity = buildApprovalVelocityGuidance(reportDynamics.directionLabel);
 
@@ -80,7 +132,7 @@ export default async function DecisionAnswerPage({ params }: DecisionPageProps) 
         name: page.title,
         acceptedAnswer: {
           "@type": "Answer",
-          text: `${page.shortAnswer} Current posture is ${toSignalLabel(isExpansion)} with risk appetite ${assessment.scores.riskAppetite.toFixed(0)}, tightness ${assessment.scores.tightness.toFixed(0)}, and yield curve slope ${(assessment.scores.curveSlope ?? 0).toFixed(2)}%.`,
+          text: `${liveShortAnswer} Current posture is ${toSignalLabel(isExpansion)} with risk appetite ${assessment.scores.riskAppetite.toFixed(0)}, tightness ${assessment.scores.tightness.toFixed(0)}, and yield curve slope ${(assessment.scores.curveSlope ?? 0).toFixed(2)}%.`,
         },
       },
       {
@@ -101,7 +153,7 @@ export default async function DecisionAnswerPage({ params }: DecisionPageProps) 
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Tier 1 operator answer</p>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{page.title}</h1>
         <p className="text-sm text-slate-300">Keyword target: <span className="font-semibold text-slate-100">{page.keyword}</span></p>
-        <p className="text-base text-sky-200">Short answer: {page.shortAnswer}</p>
+        <p className="text-base text-sky-200">Short answer: {liveShortAnswer}</p>
         <p className="text-sm text-slate-300">Current posture: {toSignalLabel(isExpansion)}</p>
       </section>
 
