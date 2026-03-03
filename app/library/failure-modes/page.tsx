@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { buildPageMetadata } from "../../../lib/seo";
-import { failureModes } from "../../../lib/informationArchitecture";
+import { failureModeDefinitions } from "../../../lib/informationArchitecture";
 
 export const runtime = "edge";
 
@@ -12,8 +12,6 @@ export const metadata: Metadata = buildPageMetadata({
   imageAlt: "Failure modes library",
 });
 
-const titleCase = (value: string) => value.split("-").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(" ");
-
 export default async function FailureModesPage({
   searchParams,
 }: {
@@ -21,7 +19,12 @@ export default async function FailureModesPage({
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const query = resolvedSearchParams?.q?.trim().toLowerCase() ?? "";
-  const filteredFailureModes = failureModes.filter((slug) => titleCase(slug).toLowerCase().includes(query));
+  const filteredFailureModes = failureModeDefinitions.filter(
+    (failureMode) =>
+      failureMode.title.toLowerCase().includes(query) ||
+      failureMode.summary.toLowerCase().includes(query) ||
+      failureMode.trigger.toLowerCase().includes(query),
+  );
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
@@ -43,11 +46,17 @@ export default async function FailureModesPage({
       </section>
       <section className="grid gap-3 sm:grid-cols-2">
         {filteredFailureModes.map((slug) => (
-          <Link key={slug} href={`/library/failure-modes/${slug}`} className="weather-panel space-y-2 px-4 py-4 text-sm text-slate-100">
+          <Link
+            key={slug.slug}
+            href={`/library/failure-modes/${slug.slug}`}
+            className="weather-panel space-y-2 px-4 py-4 text-sm text-slate-100"
+          >
             <span className="inline-flex w-fit items-center rounded-full border border-rose-400/45 bg-rose-500/10 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-rose-200">
               Failure mode
             </span>
-            <p className="font-semibold text-slate-100">{titleCase(slug)}</p>
+            <p className="font-semibold text-slate-100">{slug.title}</p>
+            <p className="text-sm text-slate-300">{slug.summary}</p>
+            <p className="text-xs text-slate-400">Trigger pattern: {slug.trigger}</p>
           </Link>
         ))}
       </section>

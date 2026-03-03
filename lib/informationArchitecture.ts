@@ -530,3 +530,227 @@ export const failureModes = [
   "complexity-debt",
   "risk-externalization",
 ] as const;
+
+export type FailureModeDefinition = {
+  slug: (typeof failureModes)[number];
+  title: string;
+  summary: string;
+  trigger: string;
+  symptoms: string[];
+  firstMoves: string[];
+  linkedToolkits: { label: string; href: string }[];
+  linkedConcepts: { label: string; href: string }[];
+};
+
+export const failureModeDefinitions: FailureModeDefinition[] = [
+  {
+    slug: "regime-mismatch",
+    title: "Regime mismatch",
+    summary: "Operating as if conditions are stable while demand, capital, or risk posture has already shifted.",
+    trigger: "Metrics conflict because teams are following stale assumptions from the prior quarter.",
+    symptoms: [
+      "Roadmap and spend plans still optimize for growth while confidence signals are deteriorating.",
+      "Leadership narratives sound optimistic, but execution teams quietly de-scope to protect reliability.",
+      "Teams debate goals weekly because no explicit posture call anchors trade-offs.",
+    ],
+    firstMoves: [
+      "Run a posture reset and publish one operating mode with confidence level and review date.",
+      "Align hiring, roadmap scope, and spend approvals to that posture before launching new initiatives.",
+      "Define trigger conditions that would change posture so teams know what evidence matters next.",
+    ],
+    linkedToolkits: [
+      { label: "Decision Rights Toolkit", href: "/toolkits/decision-rights" },
+      { label: "Roadmap Focus Toolkit", href: "/toolkits/focus" },
+    ],
+    linkedConcepts: [{ label: "Posture concepts", href: "/concepts" }],
+  },
+  {
+    slug: "premature-scaling",
+    title: "Premature scaling",
+    summary: "Expanding headcount, channel spend, or platform complexity before demand quality is proven.",
+    trigger: "Top-line signals look exciting, but retention and payback quality are still fragile.",
+    symptoms: [
+      "Hiring plans assume growth continuation despite weak cohort durability.",
+      "Channel budgets increase faster than evidence of repeatable conversion quality.",
+      "Teams add process layers to coordinate growth that has not yet stabilized.",
+    ],
+    firstMoves: [
+      "Gate expansion decisions behind explicit retention or payback thresholds.",
+      "Pause non-critical hiring and concentrate resources on proving repeat behavior.",
+      "Reframe weekly reporting around quality of demand, not gross volume.",
+    ],
+    linkedToolkits: [
+      { label: "PMF Toolkit", href: "/toolkits/pmf" },
+      { label: "Launch Gates Toolkit", href: "/toolkits/launch-gates" },
+    ],
+    linkedConcepts: [{ label: "PMF concepts", href: "/concepts" }],
+  },
+  {
+    slug: "irreversibility",
+    title: "Irreversibility",
+    summary: "Committing to decisions that are expensive to unwind before uncertainty has been reduced.",
+    trigger: "A high-cost commitment is framed as urgent even though its assumptions are untested.",
+    symptoms: [
+      "Long-cycle vendor, hiring, or architecture commitments happen before pilot evidence is complete.",
+      "Teams cannot describe a rollback path without major disruption.",
+      "Decision forums prioritize confidence theater over option preservation.",
+    ],
+    firstMoves: [
+      "Classify active decisions by reversibility and pause irreversible bets missing proof.",
+      "Add explicit rollback owners and trigger conditions to each major launch.",
+      "Shift near-term work toward reversible experiments that reduce uncertainty quickly.",
+    ],
+    linkedToolkits: [
+      { label: "Rollback Planner Toolkit", href: "/toolkits/rollback" },
+      { label: "Launch Gates Toolkit", href: "/toolkits/launch-gates" },
+    ],
+    linkedConcepts: [{ label: "Decision quality concepts", href: "/concepts" }],
+  },
+  {
+    slug: "proxy-lock-in",
+    title: "Proxy lock-in",
+    summary: "Optimizing for easy-to-measure proxy metrics that drift away from real customer outcomes.",
+    trigger: "Teams ship rapidly against internal KPIs while external value signals flatten.",
+    symptoms: [
+      "Success criteria emphasize activity metrics over retained customer behavior.",
+      "Product discussions focus on dashboard wins with little user-level evidence.",
+      "Roadmap prioritization resists correction because the proxy metric still rises.",
+    ],
+    firstMoves: [
+      "Replace proxy-only scorecards with one core value metric tied to repeat usage.",
+      "Require every roadmap bet to state the customer behavior it should change.",
+      "Audit the top dashboard metrics and retire those without outcome linkage.",
+    ],
+    linkedToolkits: [
+      { label: "Roadmap Focus Toolkit", href: "/toolkits/focus" },
+      { label: "PMF Toolkit", href: "/toolkits/pmf" },
+    ],
+    linkedConcepts: [{ label: "Measurement concepts", href: "/concepts" }],
+  },
+  {
+    slug: "feedback-latency",
+    title: "Feedback latency",
+    summary: "Learning loops are too slow, so teams repeat mistakes before evidence reaches decision makers.",
+    trigger: "Critical product and market signals arrive after planning and budget decisions are locked.",
+    symptoms: [
+      "Incident, churn, or adoption insights surface weeks after release decisions.",
+      "Different teams keep their own dashboards and review cadences with no shared cycle.",
+      "Executives review lagging snapshots instead of current trend movement.",
+    ],
+    firstMoves: [
+      "Tighten review cadence on leading indicators for adoption, retention, and reliability.",
+      "Create one cross-functional decision brief with timestamped evidence each week.",
+      "Assign owners for stale data and set freshness expectations for every critical signal.",
+    ],
+    linkedToolkits: [
+      { label: "Ops Capacity Toolkit", href: "/toolkits/ops-capacity" },
+      { label: "Roadmap Focus Toolkit", href: "/toolkits/focus" },
+    ],
+    linkedConcepts: [{ label: "Signal interpretation concepts", href: "/concepts" }],
+  },
+  {
+    slug: "portfolio-thrash",
+    title: "Portfolio thrash",
+    summary: "Constantly reshuffling priorities creates motion without accumulating meaningful progress.",
+    trigger: "Leadership changes priorities every cycle without explicit stop/start criteria.",
+    symptoms: [
+      "Initiatives frequently restart with new framing but identical unresolved dependencies.",
+      "Teams carry too many in-flight bets and finish very few.",
+      "Roadmaps are rewritten as reactions rather than intentional posture-aligned choices.",
+    ],
+    firstMoves: [
+      "Set WIP limits for strategic initiatives and enforce finish-before-new-start discipline.",
+      "Publish a keep/pause/accelerate decision with ownership and next review date.",
+      "Require clear trigger evidence for introducing net-new priority streams.",
+    ],
+    linkedToolkits: [
+      { label: "Roadmap Focus Toolkit", href: "/toolkits/focus" },
+      { label: "Decision Rights Toolkit", href: "/toolkits/decision-rights" },
+    ],
+    linkedConcepts: [{ label: "Execution concepts", href: "/concepts" }],
+  },
+  {
+    slug: "governance-theater",
+    title: "Governance theater",
+    summary: "Creating rituals that signal control without improving decision quality or risk outcomes.",
+    trigger: "Review meetings multiply, yet accountability and decision rights remain ambiguous.",
+    symptoms: [
+      "Approvals occur in many forums, but nobody owns final calls or follow-through.",
+      "Status updates dominate governance time while risk decisions are deferred.",
+      "Teams escalate for visibility rather than for concrete unblock decisions.",
+    ],
+    firstMoves: [
+      "Map decision rights by domain and document who decides, advises, and executes.",
+      "Redesign governance meetings around explicit decisions, owners, and deadlines.",
+      "Track unresolved decisions as operational risk, not administrative backlog.",
+    ],
+    linkedToolkits: [
+      { label: "Decision Rights Toolkit", href: "/toolkits/decision-rights" },
+      { label: "Ops Capacity Toolkit", href: "/toolkits/ops-capacity" },
+    ],
+    linkedConcepts: [{ label: "Governance concepts", href: "/concepts" }],
+  },
+  {
+    slug: "fragility-under-stress",
+    title: "Fragility under stress",
+    summary: "Systems and teams operate well in normal conditions but fail when load or volatility spikes.",
+    trigger: "Small shocks produce outsized outages, delivery delays, or decision paralysis.",
+    symptoms: [
+      "Reliability incidents repeatedly consume roadmap capacity.",
+      "On-call and support teams become the hidden bottleneck for product delivery.",
+      "Leadership confidence drops because operational surprises are frequent and severe.",
+    ],
+    firstMoves: [
+      "Reserve explicit reliability capacity and protect it from roadmap encroachment.",
+      "Run stress scenarios for people, systems, and vendor dependencies.",
+      "Define minimum operating standards that must hold before new launches proceed.",
+    ],
+    linkedToolkits: [
+      { label: "Ops Capacity Toolkit", href: "/toolkits/ops-capacity" },
+      { label: "Rollback Planner Toolkit", href: "/toolkits/rollback" },
+    ],
+    linkedConcepts: [{ label: "Reliability concepts", href: "/concepts" }],
+  },
+  {
+    slug: "complexity-debt",
+    title: "Complexity debt",
+    summary: "Accumulated process, architecture, and coordination overhead slows execution below market needs.",
+    trigger: "Simple changes require too many teams, approvals, or brittle system touchpoints.",
+    symptoms: [
+      "Cycle time rises despite no corresponding increase in outcome quality.",
+      "Teams duplicate solutions because shared platforms are too hard to use or evolve.",
+      "Operational work expands as hidden coupling increases.",
+    ],
+    firstMoves: [
+      "Inventory recurring coordination hotspots and remove one layer each cycle.",
+      "Prioritize simplification work tied to the highest throughput constraint.",
+      "Set architecture guardrails that prevent adding net-new complexity without sunset plans.",
+    ],
+    linkedToolkits: [
+      { label: "Roadmap Focus Toolkit", href: "/toolkits/focus" },
+      { label: "Ops Capacity Toolkit", href: "/toolkits/ops-capacity" },
+    ],
+    linkedConcepts: [{ label: "Architecture and execution concepts", href: "/concepts" }],
+  },
+  {
+    slug: "risk-externalization",
+    title: "Risk externalization",
+    summary: "Short-term internal gains are created by shifting risk onto customers, partners, or frontline teams.",
+    trigger: "Messaging or launch pace outstrips operational capability, creating expectation debt.",
+    symptoms: [
+      "Claims are marketed before delivery confidence is validated.",
+      "Support and legal teams absorb recurring fallout from avoidable promise gaps.",
+      "Escalations are handled case-by-case instead of resolving root causes in planning.",
+    ],
+    firstMoves: [
+      "Audit top public claims against current delivery reality and remove overstatements quickly.",
+      "Require launch readiness checks that include support, trust, and rollback coverage.",
+      "Track expectation debt as a first-class operating risk in weekly reviews.",
+    ],
+    linkedToolkits: [
+      { label: "Claims Integrity Toolkit", href: "/toolkits/claims" },
+      { label: "Launch Gates Toolkit", href: "/toolkits/launch-gates" },
+    ],
+    linkedConcepts: [{ label: "Trust and risk concepts", href: "/concepts" }],
+  },
+];
