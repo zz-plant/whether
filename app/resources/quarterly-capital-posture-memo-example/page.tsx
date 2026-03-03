@@ -23,7 +23,7 @@ export default function QuarterlyMemoExamplePage() {
           <li>• Requested board approvals</li>
         </ul>
         <div className="flex flex-wrap gap-3 print:hidden">
-          <Link href="/downloads/quarterly-capital-posture-memo-example.md" className="weather-button inline-flex items-center justify-center" download data-conversion-event="download">Download memo artifact</Link>
+          <a href="/downloads/quarterly-capital-posture-memo-example.md" className="weather-button inline-flex items-center justify-center" download data-conversion-event="download">Download memo artifact</a>
           <Link href="/resources/capital-posture-template" className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-sm font-semibold text-slate-100" data-conversion-event="download">Open template</Link>
         </div>
       </section>

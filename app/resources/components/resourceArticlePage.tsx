@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Route } from "next";
 import Link from "next/link";
 import {
   buildCanonicalUrl,
@@ -127,7 +127,7 @@ export function ResourceArticlePage({ article }: { article: ResourceArticle }) {
       <aside className="hidden lg:block">
         <div className="weather-panel sticky top-24 space-y-3 px-5 py-5 print:hidden">
           <h2 className="text-sm font-semibold uppercase tracking-[0.12em] text-slate-300">Next action</h2>
-          <Link href={article.toolLink.href} className="weather-button inline-flex w-full items-center justify-center" data-conversion-event="download">
+          <Link href={article.toolLink.href as Route} className="weather-button inline-flex w-full items-center justify-center" data-conversion-event="download">
             {article.toolLink.label}
           </Link>
           <Link href="/resources/decision-shield-overview" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold text-slate-100" data-conversion-event="request">
@@ -137,7 +137,7 @@ export function ResourceArticlePage({ article }: { article: ResourceArticle }) {
             <p className="font-semibold text-slate-100">Internal links</p>
             <Link href={canonicalPillarPath} className="block text-sky-200 underline underline-offset-4">Capital Discipline pillar</Link>
             <Link href={boardFrameworkPath} className="block text-sky-200 underline underline-offset-4">Board-level Capital Posture Framework</Link>
-            <Link href={article.toolLink.href} className="block text-sky-200 underline underline-offset-4">Tool page</Link>
+            <Link href={article.toolLink.href as Route} className="block text-sky-200 underline underline-offset-4">Tool page</Link>
           </div>
         </div>
       </aside>
