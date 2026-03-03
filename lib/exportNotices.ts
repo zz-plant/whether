@@ -1,7 +1,7 @@
 export const INTERNAL_USE_LABEL = "Internal use only";
 
 export const INFORMATIONAL_NOTICE =
-  "Informational output only; not investment, legal, tax, accounting, or employment advice.";
+  "Governance artifact; not investment advice.";
 
 export const UNCERTAINTY_NOTICE =
   "Interpretive and probabilistic guidance; verify assumptions before acting.";

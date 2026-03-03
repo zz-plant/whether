@@ -10,8 +10,8 @@ export type PrimaryNavigationItem = {
 export const primaryNavigation: PrimaryNavigationItem[] = [
   {
     href: "/",
-    label: "Weekly Brief",
-    description: "Weekly mandate: posture call, changes, and top actions.",
+    label: "Weekly Capital Posture Brief",
+    description: "Weekly governance artifact: posture call, constraints, and top actions.",
   },
   {
     href: "/signals",

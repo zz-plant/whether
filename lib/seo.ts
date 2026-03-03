@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { siteUrl } from "./siteUrl";
 
 export const organizationName = "Whether";
-export const websiteName = "Whether — Market Climate Station";
+export const websiteName = "Whether — Capital Posture Governance Standard";
 export const defaultSiteDescription =
   "Translate Treasury macro signals into plain-English operational constraints for product and engineering leaders.";
 export const defaultSocialImagePath = "/twitter-image";

@@ -17,7 +17,7 @@ export function GlobalHeader() {
               Whether
             </Link>
             <p className="mt-1 truncate text-base font-semibold tracking-tight text-slate-100 sm:text-lg">
-              Weekly Brief
+              Weekly Capital Posture Brief
             </p>
           </div>
           <ThemeToggleButton />
