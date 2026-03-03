@@ -27,6 +27,8 @@ import { buildTrustStatus } from "../lib/report/trustStatus";
 import { WeeklyDecisionCard } from "./components/weeklyDecisionCard";
 import { LiveCommandDeck } from "./components/liveCommandDeck";
 import { RevealOnView } from "./components/revealOnView";
+import { ScenarioGuidanceBlock } from "./components/scenarioGuidanceBlock";
+import { operatingCallsByRegime } from "../lib/report/operatingCalls";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -72,28 +74,6 @@ const regimeSeverityRank: Record<keyof typeof regimeLabelMap, number> = {
   SCARCITY: 3,
 };
 
-const operatingCallsByRegime: Record<keyof typeof regimeLabelMap, { hiring: string; roadmap: string; spend: string }> = {
-  SCARCITY: {
-    hiring: "Maintain freeze",
-    roadmap: "Cut to must-win commitments",
-    spend: "Require immediate payback",
-  },
-  DEFENSIVE: {
-    hiring: "Backfill critical roles only",
-    roadmap: "Favor retention and reliability",
-    spend: "Gate discretionary programs",
-  },
-  VOLATILE: {
-    hiring: "Stay selective by role",
-    roadmap: "Prioritize near-term ROI",
-    spend: "Fund only measurable returns",
-  },
-  EXPANSION: {
-    hiring: "Add targeted growth capacity",
-    roadmap: "Scale validated bets",
-    spend: "Increase with guardrails",
-  },
-};
 
 const netStanceByRegime: Record<keyof typeof regimeLabelMap, string> = {
   SCARCITY: "Net operating stance: Maintain constraint discipline. No expansion moves.",
@@ -468,6 +448,7 @@ export default async function HomePage({
             <li>• Hiring: {operatingCalls.hiring}</li>
             <li>• Long-cycle bets: {longCycleBetStance}</li>
           </ul>
+          <ScenarioGuidanceBlock assessment={assessment} baselineCalls={operatingCalls} />
           <div className="grid gap-3 md:grid-cols-3" aria-label="Primary posture metrics">
             <article className="rounded-xl border border-slate-700/70 bg-slate-900/60 p-4">
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">Short-cycle experiment safety</p>
