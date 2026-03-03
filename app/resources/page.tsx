@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { StaticHubNav } from "../components/staticHubNav";
 import { buildPageMetadata } from "../../lib/pageMetadata";
-import { painArticles } from "../../lib/painArticles";
+import { resourceArticles } from "../../lib/resourceArticles";
 import { resourcePillarPages, resourceSupportingPages } from "../../lib/resourcesContent";
 
 export const metadata: Metadata = buildPageMetadata({
@@ -47,7 +47,7 @@ export default function ResourcesPage() {
       </section>
 
       <section className="grid gap-3 sm:grid-cols-2">
-        {painArticles.map((article) => (
+        {resourceArticles.map((article) => (
           <Link key={article.slug} href={`/resources/${article.slug}`} className="weather-panel space-y-2 px-4 py-4">
             <span className="inline-flex w-fit items-center rounded-full border border-rose-300/45 bg-rose-500/10 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-rose-100">
               Pain-driven brief

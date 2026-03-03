@@ -6,7 +6,7 @@ import {
   organizationName,
   serializeJsonLd,
 } from "../../../lib/pageMetadata";
-import type { PainArticle } from "../../../lib/painArticles";
+import type { ResourceArticle } from "../../../lib/resourceArticles";
 import { CopyAnchorButton } from "./copyAnchorButton";
 
 const boardFrameworkPath = "/resources/board-level-capital-posture-framework";
@@ -40,7 +40,7 @@ const buildAnchor = (heading: string) =>
     .trim()
     .replace(/\s+/g, "-");
 
-export const buildPainArticleMetadata = (article: PainArticle): Metadata =>
+export const buildResourceArticleMetadata = (article: ResourceArticle): Metadata =>
   buildPageMetadata({
     title: article.title,
     description: article.description,
@@ -52,7 +52,7 @@ export const buildPainArticleMetadata = (article: PainArticle): Metadata =>
     },
   });
 
-export function PainArticlePage({ article }: { article: PainArticle }) {
+export function ResourceArticlePage({ article }: { article: ResourceArticle }) {
   const canonicalUrl = buildCanonicalUrl(`/resources/${article.slug}`);
   const faqSchema = {
     "@context": "https://schema.org",
