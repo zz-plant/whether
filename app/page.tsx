@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import {
   buildTimeMachineHref,
   getAdjacentTimeMachineRequest,
@@ -16,9 +17,6 @@ import {
   buildSocialImageUrl,
 } from "../lib/seo";
 import {
-  ExecutiveSnapshotPanel,
-  WeeklyActionSummaryPanel,
-  SignalMatrixPanel,
   HistoricalBanner,
 } from "./components/reportSections";
 import { ReportShell } from "./components/reportShell";
@@ -30,7 +28,27 @@ import { RevealOnView } from "./components/revealOnView";
 import { ScenarioGuidanceBlock } from "./components/scenarioGuidanceBlock";
 import { operatingCallsByRegime } from "../lib/report/operatingCalls";
 
-export const runtime = "edge";
+const WeeklyActionSummaryPanel = dynamic(
+  () =>
+    import("./components/reportSections").then(
+      (module) => module.WeeklyActionSummaryPanel,
+    ),
+);
+
+const ExecutiveSnapshotPanel = dynamic(
+  () =>
+    import("./components/reportSections").then(
+      (module) => module.ExecutiveSnapshotPanel,
+    ),
+);
+
+const SignalMatrixPanel = dynamic(
+  () =>
+    import("./components/reportSections").then(
+      (module) => module.SignalMatrixPanel,
+    ),
+);
+
 export const revalidate = 900;
 
 const homeSectionSequence = [
