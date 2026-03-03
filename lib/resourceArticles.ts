@@ -1,3 +1,5 @@
+import type { Route } from "next";
+
 export type ResourceArticle = {
   slug:
     | "should-we-freeze-hiring-high-interest-rate-environment"
@@ -15,7 +17,7 @@ export type ResourceArticle = {
   boardSummary: string[];
   sections: Array<{ heading: string; paragraphs: string[] }>;
   faqs: Array<{ question: string; answer: string }>;
-  toolLink: { href: string; label: string };
+  toolLink: { href: Route; label: string };
 };
 
 export const resourceArticles: ResourceArticle[] = [

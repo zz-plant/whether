@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Route } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -128,8 +128,8 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
         <ul className="space-y-2 text-sm text-slate-200">
           <li><Link href={canonicalCapitalDisciplinePath} className="text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100">Capital Discipline pillar (canonical)</Link></li>
           <li><Link href="/resources/board-level-capital-posture-framework" className="text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100">Board Framework page{page.slug === "board-level-capital-posture-framework" ? " (current page)" : ""}</Link></li>
-          <li><Link href={resourceSupportingPages.decisionShieldOverview.path} className="text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100">Decision Shield overview page</Link></li>
-          <li><Link href={resourceSupportingPages.capitalPostureTemplate.path} className="text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100">Capital Posture Template page</Link></li>
+          <li><Link href={resourceSupportingPages.decisionShieldOverview.path as Route} className="text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100">Decision Shield overview page</Link></li>
+          <li><Link href={resourceSupportingPages.capitalPostureTemplate.path as Route} className="text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100">Capital Posture Template page</Link></li>
         </ul>
       </section>
 

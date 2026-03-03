@@ -1,3 +1,5 @@
+import type { Route } from "next";
+
 export type GovernanceLexiconTerm = {
   slug: "reversibility" | "escalation-thresholds" | "30-day-confirmation-logic" | "capital-regime";
   term: string;
@@ -652,7 +654,7 @@ export const resourcePillarPages: ResourcePillarPage[] = [
   },
 ];
 
-export const resourceSupportingPages = {
+export const resourceSupportingPages: Record<string, { path: Route; title: string }> = {
   decisionShieldOverview: {
     path: "/resources/decision-shield-overview",
     title: "Decision Shield Overview",

@@ -24,7 +24,7 @@ export default function ReversalTriggerChecklistPage() {
           <li>5. Add board notification trigger language.</li>
         </ol>
         <div className="flex flex-wrap gap-3">
-          <Link href="/downloads/reversal-trigger-checklist.md" className="weather-button inline-flex items-center justify-center" download data-conversion-event="download">Download checklist artifact</Link>
+          <a href="/downloads/reversal-trigger-checklist.md" className="weather-button inline-flex items-center justify-center" download data-conversion-event="download">Download checklist artifact</a>
           <Link href="/resources/decision-shield-overview" className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-sm font-semibold text-slate-100" data-conversion-event="request">Apply in Decision Shield</Link>
         </div>
       </section>

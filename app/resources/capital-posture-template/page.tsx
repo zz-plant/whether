@@ -22,7 +22,7 @@ export default function CapitalPostureTemplatePage() {
           <li>• Reversal triggers with owners and escalation windows</li>
         </ul>
         <div className="flex flex-wrap gap-3 print:hidden">
-          <Link href="/downloads/capital-posture-template.md" className="weather-button inline-flex items-center justify-center" download data-conversion-event="download">Download template artifact</Link>
+          <a href="/downloads/capital-posture-template.md" className="weather-button inline-flex items-center justify-center" download data-conversion-event="download">Download template artifact</a>
           <Link href="/start?intent=capital-posture-template-gated" className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-sm font-semibold text-slate-100" data-conversion-event="download">Get guided version (Decision Shield)</Link>
         </div>
       </section>
