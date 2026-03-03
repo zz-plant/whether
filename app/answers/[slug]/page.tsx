@@ -6,7 +6,7 @@ import { buildPageMetadata, serializeJsonLd } from "../../../lib/seo";
 import { findDecisionPage, tierOneDecisionPages } from "../decisionPages";
 
 type DecisionPageProps = {
-  params: Promise<{ slug: string }>;
+params: { slug: string };
 };
 
 export const dynamicParams = false;
