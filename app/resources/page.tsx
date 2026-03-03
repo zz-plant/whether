@@ -16,6 +16,14 @@ export const metadata: Metadata = buildPageMetadata({
   },
 });
 
+const authorityPages = [
+  {
+    path: "/resources/how-vc-firms-can-enforce-capital-discipline-across-portfolios",
+    title: "How VC firms can enforce capital discipline across portfolios",
+    description: "Portfolio-wide framework + implementation model + board-forwardable artifact language.",
+  },
+];
+
 const toolPages = [
   resourceSupportingPages.capitalPostureTemplate,
   resourceSupportingPages.reversalTriggerChecklist,
@@ -47,10 +55,22 @@ export default function ResourcesPage() {
       </section>
 
       <section className="grid gap-3 sm:grid-cols-2">
+        {authorityPages.map((page) => (
+          <Link key={page.path} href={page.path} className="weather-panel space-y-2 px-4 py-4">
+            <span className="inline-flex w-fit items-center rounded-full border border-cyan-300/45 bg-cyan-500/10 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-cyan-100">
+              VC authority
+            </span>
+            <h2 className="text-base font-semibold text-slate-100">{page.title}</h2>
+            <p className="text-sm text-slate-200">{page.description}</p>
+          </Link>
+        ))}
+      </section>
+
+      <section className="grid gap-3 sm:grid-cols-2">
         {resourceArticles.map((article) => (
-          <Link key={article.slug} href={`/resources/${article.slug}`} className="weather-panel space-y-2 px-4 py-4">
+          <Link key={article.slug} href={`/resources/${article.slug}`} className="weather-panel space-y-2 px-4 py-4" data-page-cluster={article.cluster} data-page-intent={article.intent}>
             <span className="inline-flex w-fit items-center rounded-full border border-rose-300/45 bg-rose-500/10 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-rose-100">
-              Pain-driven brief
+              {article.format === "case-example" ? "Case example" : article.cluster === "vc" ? "VC brief" : "Pain-driven brief"}
             </span>
             <h2 className="text-base font-semibold text-slate-100">{article.title}</h2>
             <p className="text-sm text-slate-200">{article.description}</p>
