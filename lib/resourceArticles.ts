@@ -1,4 +1,4 @@
-export type PainArticle = {
+export type ResourceArticle = {
   slug:
     | "should-we-freeze-hiring-high-interest-rate-environment"
     | "how-much-runway-do-we-need-tightening-market"
@@ -13,7 +13,7 @@ export type PainArticle = {
   toolLink: { href: string; label: string };
 };
 
-export const painArticles: PainArticle[] = [
+export const resourceArticles: ResourceArticle[] = [
   {
     slug: "should-we-freeze-hiring-high-interest-rate-environment",
     title: "Should we freeze hiring in a high-interest-rate environment?",
@@ -30,8 +30,8 @@ export const painArticles: PainArticle[] = [
       {
         heading: "The real problem is not headcount. It is commitment quality under expensive capital.",
         paragraphs: [
-          "When leaders ask whether to freeze hiring, they are usually asking a deeper question: do we still trust our assumptions enough to convert cash into fixed obligations. In a high-interest-rate environment, uncertainty is expensive because the cost of being wrong compounds through payroll commitments, onboarding drag, and delayed correction cycles.",
-          "A blanket hiring freeze feels decisive because it creates immediate control. But blanket decisions often mix unlike risks together. A reliability engineer replacing a known bottleneck is not the same risk as adding a speculative growth pod. Treating both as identical can lower optionality at the exact moment optionality is most valuable.",
+          "When leaders ask whether to freeze hiring, they are usually asking a deeper question: do we trust our assumptions enough to turn cash into fixed obligations? In a high-interest-rate environment, uncertainty is expensive because the cost of being wrong compounds through payroll commitments, onboarding drag, and slower correction cycles.",
+          "A blanket hiring freeze feels decisive because it creates immediate control. But blanket decisions often collapse very different risks into one call. A reliability engineer replacing a known bottleneck is not the same risk as adding a speculative growth pod. Treating both as identical reduces optionality when optionality matters most.",
           "The board-level issue is governance consistency. If hiring stays open without threshold discipline, spend drifts. If hiring freezes without role segmentation, execution debt builds. The right question is: which roles reduce downside now, which roles can wait, and which roles become dangerous commitments if demand softens further.",
         ],
       },
@@ -39,8 +39,8 @@ export const painArticles: PainArticle[] = [
         heading: "SAFE / RISKY / DANGEROUS framework for hiring decisions",
         paragraphs: [
           "SAFE roles are those that preserve operating integrity or immediate revenue continuity. Examples include production reliability, customer renewals support, and finance controls tied to cash visibility. These roles should continue through a constrained approval path because they reduce downside and often improve learning velocity.",
-          "RISKY roles are roles with plausible value but delayed evidence. Typical examples are expansion hires for initiatives that have not yet shown repeatability. In a tightening market, these hires should move to tranche gates: approve one role, define a 30-day evidence target, and only then release the next tranche.",
-          "DANGEROUS roles are roles justified mostly by optimistic scenarios, ambiguous ownership, or vanity throughput metrics. Hiring into unvalidated adjacent markets, adding management layers without bottleneck evidence, or staffing long-range programs with weak milestone logic all fit this class. Pause these immediately until trigger conditions improve.",
+          "RISKY roles have plausible value but delayed evidence. Typical examples are expansion hires for initiatives that have not yet shown repeatability. In a tightening market, these hires should move to tranche gates: approve one role, define a 30-day evidence target, and only then release the next tranche.",
+          "DANGEROUS roles are justified mostly by optimistic scenarios, ambiguous ownership, or vanity throughput metrics. Hiring into unvalidated adjacent markets, adding management layers without bottleneck evidence, or staffing long-range programs with weak milestone logic all fit this class. Pause these immediately until trigger conditions improve.",
           "The value of this framework is not semantics. It allows finance, product, and functional leaders to use one decision language in weekly and monthly reviews so hiring pressure does not bypass posture discipline.",
         ],
       },
@@ -256,7 +256,7 @@ export const painArticles: PainArticle[] = [
       {
         heading: "Cycle shifts are governance events, not branding events",
         paragraphs: [
-          "Venture cycles influence more than valuation multiples. They change the practical cost of mistakes, the speed of financing options, and the tolerance for long-duration bets. Treating cycle shifts as external noise is a governance error.",
+          "Venture cycles shape more than valuation multiples. They change the real cost of mistakes, the speed of financing options, and the tolerance for long-duration bets. Treating cycle shifts as external noise is a governance error.",
           "When capital is abundant, teams can survive more false positives because financing can absorb correction costs. In tightening cycles, those same false positives become existential because correction windows shrink and replacement capital arrives slower.",
           "Operating strategy must therefore translate market cycle signals into internal commitment policy: what gets funded, at what pace, and with what reversal guarantees.",
         ],
@@ -264,7 +264,7 @@ export const painArticles: PainArticle[] = [
       {
         heading: "SAFE / RISKY / DANGEROUS strategy map by cycle",
         paragraphs: [
-          "SAFE in a tightening cycle means investments that protect retention, preserve reliability, and improve decision quality. These moves may look less exciting, but they maintain strategic freedom.",
+          "SAFE in a tightening cycle means investments that protect retention, preserve reliability, and improve decision quality. These moves may look less exciting, but they preserve strategic freedom.",
           "RISKY means expansions with conditional upside where evidence is improving but not yet durable. These require milestone-gated capital release and executive-level monitoring.",
           "DANGEROUS means commitments that assume easy follow-on funding, rapid market recovery, or flawless execution across multiple uncertain dependencies. In a tight cycle, this class should be paused or redesigned.",
           "Publish this map in planning artifacts so each function can align operating choices to the same posture language.",
@@ -275,7 +275,7 @@ export const painArticles: PainArticle[] = [
         paragraphs: [
           "Cycle-aware strategy needs explicit trigger logic for hiring, roadmap, and go-to-market spend. Each layer should define what confirms expansion and what forces contraction.",
           "For example, roadmap expansion may require retention stability plus on-time delivery confidence. Hiring expansion may require runway floor compliance plus pipeline quality persistence. Marketing expansion may require payback improvements with forecast error constraints.",
-          "Run these triggers on a weekly check, but only alter posture after 30-day persistence unless emergency thresholds are breached. This balances responsiveness with noise resistance.",
+          "Review these triggers weekly, but change posture only after 30-day persistence unless emergency thresholds are breached. This balances responsiveness with resistance to noise.",
         ],
       },
       {
@@ -292,7 +292,7 @@ export const painArticles: PainArticle[] = [
         paragraphs: [
           "Run a commitment audit across teams and label each initiative by reversibility and dependency complexity. Remove low-evidence work first, not merely low-visibility work.",
           "Align compensation and planning incentives to correction quality, not just launch volume. Teams should be rewarded for disciplined stops as much as for wins.",
-          "Use one canonical board memo format each month so cycle interpretation, posture changes, and trigger outcomes are visible without reinvention.",
+          "Use one canonical board memo format each month so cycle interpretation, posture changes, and trigger outcomes are easy to compare over time.",
         ],
       },
     ],
@@ -320,4 +320,4 @@ export const painArticles: PainArticle[] = [
   },
 ];
 
-export const findPainArticleBySlug = (slug: string) => painArticles.find((article) => article.slug === slug);
+export const findResourceArticleBySlug = (slug: string) => resourceArticles.find((article) => article.slug === slug);
