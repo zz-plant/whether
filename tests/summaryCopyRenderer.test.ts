@@ -23,12 +23,21 @@ describe("summaryCopyRenderer", () => {
         watchouts: ["Delaying launches while waiting for perfect data"],
         planningLanguage: "Move quickly on growth bets.",
         executionConstraints: ["Keep payback discipline"],
+        governanceParameters: {
+          hiringThreshold: "MODERATE",
+          paybackWindowTolerance: "LONGER",
+          rollbackRequirement: "STANDARD",
+          approvalVelocity: "FASTER",
+          expansionScope: "BROAD",
+          experimentationTolerance: "HIGH",
+        },
       },
     });
 
     assert.match(copy, /Source: US Treasury Daily Treasury Yield Curve Rates/);
     assert.doesNotMatch(copy, /\(https?:\/\//);
     assert.match(copy, /RECOMMENDED MOVES FOR PRODUCT TEAMS \(NOW\)\n\n• /);
+    assert.match(copy, /GOVERNANCE PARAMETER ADJUSTMENTS/);
   });
 
   it("renders monthly copy with bulleted constraints and provenance", () => {

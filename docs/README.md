@@ -28,6 +28,7 @@ Use this index to find the **current** source of truth quickly.
 
 ## Product direction docs
 - `feature-specs-current.md` — current shipped feature intent.
+- `policy-spec-alignment-plan.md` — scoped implementation plan to align the current engine with the formal policy specification.
 - `frontend-v2-spec.md` — frontend workflow/IA specification for the v2 experience.
 - `prd-next-level.md` / `specs-next-level.md` — next-level product and specification direction.
 - `concepts-enhancements.md` — enhancement opportunities for `/concepts` experiences.

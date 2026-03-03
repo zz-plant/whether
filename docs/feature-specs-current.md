@@ -103,6 +103,16 @@ The regime assessment includes:
 - Data warnings when inputs are missing
 - Input metadata for provenance display
 
+
+### 3.5 Policy-spec pilot layer (new)
+A policy-alignment pilot now runs **alongside** the legacy regime engine in the assessment payload:
+- Versioned policy metadata (`policy-v1`) is emitted for traceability.
+- Signal normalization fields include z-score, directional transform, and clipped z-score for base rate, slope, BBB spread, CPI YoY, and unemployment.
+- Composite outputs expose `cts` and `ras` values without replacing legacy tightness/risk-appetite outputs yet.
+- A refusal state is included when disagreement/volatility/data-gap guards trigger, returning explicit fallback directives (`NO_POSTURE_CHANGE_RECOMMENDED`, `REVERSIBLE_BETS_ONLY`).
+
+This pilot is additive and backward-compatible: existing regime labels and threshold behavior remain active while policy outputs are validated.
+
 ## 4) Decision support tooling
 
 ### 4.1 Decisions workstream status

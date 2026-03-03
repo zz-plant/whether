@@ -78,6 +78,22 @@ export const MethodologyContent = () => {
             </article>
           ))}
         </section>
+
+        <section className="mt-8 rounded-2xl border border-slate-700 bg-slate-900/50 p-6" aria-label="Policy pilot details">
+          <h2 className="text-lg font-semibold text-slate-100">Policy pilot (v1) details</h2>
+          <p className="mt-2 text-sm text-slate-300">
+            The policy pilot publishes normalized signal traces and composite scores alongside the legacy model.
+          </p>
+          <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-slate-200">
+            <li>Normalization: rolling-window z-score with directional transforms and ±3σ clipping.</li>
+            <li>Composites: CTS = 0.5·BaseRate + 0.5·BBB, RAS = 0.7·Slope + 0.3·BBB.</li>
+            <li>Banding: neutral (&lt;0.5), elevated (&lt;1.5), extreme (≥1.5) by absolute composite distance.</li>
+            <li>
+              Refusal guards: when disagreement, volatility, or missing-signal limits breach policy thresholds,
+              outputs include <code>NO_POSTURE_CHANGE_RECOMMENDED</code> and <code>REVERSIBLE_BETS_ONLY</code>.
+            </li>
+          </ul>
+        </section>
       </div>
     </main>
   );

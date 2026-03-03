@@ -16,6 +16,14 @@ export type WeeklyStructured = {
   watchouts: string[];
   planningLanguage: string;
   executionConstraints: string[];
+  governanceParameters?: {
+    hiringThreshold: string;
+    paybackWindowTolerance: string;
+    rollbackRequirement: string;
+    approvalVelocity: string;
+    expansionScope: string;
+    experimentationTolerance: string;
+  };
 };
 
 export type MonthlyStructured = {

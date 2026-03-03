@@ -81,6 +81,96 @@ describe("regime assessment", () => {
     assert.equal(assessment.diagnostics.transitionWatch, false);
   });
 
+
+
+  it("returns policy assessment composites and refusal state", () => {
+    const treasury: TreasuryData = {
+      source: "US Treasury",
+      record_date: "2024-10-01",
+      fetched_at: "2024-10-02T00:00:00Z",
+      isLive: true,
+      yields: {
+        oneMonth: 5.2,
+        twoYear: 4.8,
+        tenYear: 4.5,
+      },
+    };
+
+    const assessment = evaluateRegime(treasury, undefined, [
+      {
+        id: "BBB_CREDIT_SPREAD",
+        label: "BBB",
+        value: 1.8,
+        unit: "%",
+        explanation: "",
+        sourceLabel: "FRED",
+        sourceUrl: "https://fred.stlouisfed.org/",
+        formulaUrl: "/methodology",
+        record_date: "2024-10-01",
+        fetched_at: "2024-10-02T00:00:00Z",
+        isLive: true,
+        history: [
+          { date: "2024-09-01", value: 1.7 },
+          { date: "2024-08-01", value: 1.6 },
+        ],
+      },
+      {
+        id: "CPI_YOY",
+        label: "CPI",
+        value: 3.1,
+        unit: "%",
+        explanation: "",
+        sourceLabel: "BLS",
+        sourceUrl: "https://bls.gov/",
+        formulaUrl: "/methodology",
+        record_date: "2024-10-01",
+        fetched_at: "2024-10-02T00:00:00Z",
+        isLive: true,
+      },
+      {
+        id: "UNEMPLOYMENT_RATE",
+        label: "Unemployment",
+        value: 4.2,
+        unit: "%",
+        explanation: "",
+        sourceLabel: "BLS",
+        sourceUrl: "https://bls.gov/",
+        formulaUrl: "/methodology",
+        record_date: "2024-10-01",
+        fetched_at: "2024-10-02T00:00:00Z",
+        isLive: true,
+      },
+    ]);
+
+    assert.equal(assessment.policyAssessment.version, "policy-v1");
+    assert.equal(assessment.policyAssessment.normalizations.length, 5);
+    assert.equal(typeof assessment.policyAssessment.composites.cts, "number");
+    assert.equal(typeof assessment.policyAssessment.composites.ras, "number");
+    assert.equal(assessment.policyAssessment.refusal.refused, false);
+    assert.equal(assessment.policyAssessment.band === "NEUTRAL" || assessment.policyAssessment.band === "ELEVATED" || assessment.policyAssessment.band === "EXTREME", true);
+    assert.equal(typeof assessment.policyAssessment.governanceParameters.hiringThreshold, "string");
+  });
+
+  it("refuses posture change when policy signal gaps are too large", () => {
+    const treasury: TreasuryData = {
+      source: "US Treasury",
+      record_date: "2024-10-01",
+      fetched_at: "2024-10-02T00:00:00Z",
+      isLive: false,
+      yields: {
+        oneMonth: null,
+        threeMonth: null,
+        twoYear: null,
+        tenYear: null,
+      },
+    };
+
+    const assessment = evaluateRegime(treasury);
+    assert.equal(assessment.policyAssessment.refusal.refused, true);
+    assert.equal(assessment.policyAssessment.refusal.fallbackMessage, "NO_POSTURE_CHANGE_RECOMMENDED");
+    assert.equal(assessment.policyAssessment.refusal.executionMode, "REVERSIBLE_BETS_ONLY");
+    assert.equal(assessment.policyAssessment.governanceParameters.rollbackRequirement, "REVERSIBLE_ONLY");
+  });
   it("flags missing inputs with warnings", () => {
     const treasury: TreasuryData = {
       source: "US Treasury",

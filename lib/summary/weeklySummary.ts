@@ -150,9 +150,11 @@ export const getWeeklyActionGuidance = (regime: RegimeAssessment["regime"]) =>
 export const buildWeeklyStructured = ({
   regime,
   constraints,
+  governanceParameters,
 }: {
   regime: RegimeAssessment["regime"];
   constraints: string[];
+  governanceParameters: RegimeAssessment["policyAssessment"]["governanceParameters"];
 }): WeeklyStructured => {
   const template = weeklyOutputTemplates[regime];
 
@@ -166,6 +168,14 @@ export const buildWeeklyStructured = ({
     watchouts: template.failureModes,
     planningLanguage: template.planningQuote,
     executionConstraints: constraints,
+    governanceParameters: {
+      hiringThreshold: governanceParameters.hiringThreshold,
+      paybackWindowTolerance: governanceParameters.paybackWindowTolerance,
+      rollbackRequirement: governanceParameters.rollbackRequirement,
+      approvalVelocity: governanceParameters.approvalVelocity,
+      expansionScope: governanceParameters.expansionScope,
+      experimentationTolerance: governanceParameters.experimentationTolerance,
+    },
   };
 };
 
@@ -190,6 +200,7 @@ export const buildWeeklySummary = ({
   const structured = buildWeeklyStructured({
     regime: assessment.regime,
     constraints: assessment.constraints,
+    governanceParameters: assessment.policyAssessment.governanceParameters,
   });
   const copy = renderWeeklySummaryCopy({
     title,
