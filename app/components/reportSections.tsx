@@ -490,17 +490,17 @@ export const WeeklyActionSummaryPanel = ({
 
   const freshnessByTileLabel: Record<string, { sourceLabel: string; fetchedAt: string; recordDate: string }> = {
     "Cash availability": {
-      sourceLabel: assessment.inputs[0]?.sourceLabel ?? "US Treasury Fiscal Data API",
+      sourceLabel: assessment.inputs[0]?.sourceLabel ?? "FRED CSV Treasury series (DGS1MO/DGS3MO/DGS2/DGS10)",
       fetchedAt: assessment.inputs[0]?.fetchedAt ?? "",
       recordDate: assessment.inputs[0]?.recordDate ?? "",
     },
     "Risk appetite": {
-      sourceLabel: assessment.inputs[3]?.sourceLabel ?? "US Treasury Fiscal Data API",
+      sourceLabel: assessment.inputs[3]?.sourceLabel ?? "FRED CSV Treasury series (DGS1MO/DGS3MO/DGS2/DGS10)",
       fetchedAt: assessment.inputs[3]?.fetchedAt ?? "",
       recordDate: assessment.inputs[3]?.recordDate ?? "",
     },
     "Curve slope": {
-      sourceLabel: assessment.inputs[3]?.sourceLabel ?? "US Treasury Fiscal Data API",
+      sourceLabel: assessment.inputs[3]?.sourceLabel ?? "FRED CSV Treasury series (DGS1MO/DGS3MO/DGS2/DGS10)",
       fetchedAt: assessment.inputs[3]?.fetchedAt ?? "",
       recordDate: assessment.inputs[3]?.recordDate ?? "",
     },
@@ -775,7 +775,7 @@ export const WeeklyActionSummaryPanel = ({
                         <Tooltip.Portal>
                           <Tooltip.Positioner sideOffset={8}>
                             <Tooltip.Popup className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-slate-200">
-                              <p>{freshnessByTileLabel[tile.label]?.sourceLabel ?? "US Treasury Fiscal Data API"}</p>
+                              <p>{freshnessByTileLabel[tile.label]?.sourceLabel ?? "FRED CSV Treasury series (DGS1MO/DGS3MO/DGS2/DGS10)"}</p>
                               <p className="mt-1">Record: {freshnessByTileLabel[tile.label]?.recordDate ? formatDateUTC(freshnessByTileLabel[tile.label].recordDate) : "Unknown"}</p>
                               <p className="mt-1">Updated: {freshnessByTileLabel[tile.label]?.fetchedAt ? formatTimestampUTC(freshnessByTileLabel[tile.label].fetchedAt) : "Unknown"}</p>
                             </Tooltip.Popup>

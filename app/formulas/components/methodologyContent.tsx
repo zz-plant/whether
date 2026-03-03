@@ -6,8 +6,8 @@ const formulaSections = [
     description:
       "Uses the 1-month Treasury yield; falls back to 3-month if missing. This anchors the cost of capital in the current policy environment.",
     application: "Model input for capital tightness scoring.",
-    sourceHref: "https://fiscaldata.treasury.gov/api-documentation/",
-    sourceLabel: "US Treasury Fiscal Data API",
+    sourceHref: "https://fred.stlouisfed.org/series/DGS1MO",
+    sourceLabel: "FRED CSV Series: DGS1MO",
     accentClass: "border-sky-400/50 bg-sky-500/10 text-sky-100",
   },
   {
@@ -16,8 +16,8 @@ const formulaSections = [
     description:
       "10-year Treasury yield minus 2-year Treasury yield. A negative slope signals risk aversion in credit markets.",
     application: "Model input for risk appetite scoring.",
-    sourceHref: "https://fiscaldata.treasury.gov/api-documentation/",
-    sourceLabel: "US Treasury Fiscal Data API",
+    sourceHref: "https://fred.stlouisfed.org/series/T10Y2Y",
+    sourceLabel: "FRED Derived Series: T10Y2Y (from DGS10 and DGS2)",
     accentClass: "border-indigo-400/50 bg-indigo-500/10 text-indigo-100",
   },
   {
@@ -65,6 +65,8 @@ export const MethodologyContent = () => {
           <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Method notes</p>
           <h1 className="text-3xl font-semibold text-slate-100">Methodology</h1>
           <p className="text-sm text-slate-300">Each signal includes a plain-English formula and its direct source.</p>
+          <p className="mt-4 text-xs text-slate-400">Canonical Treasury feed: FRED CSV Treasury series. Secondary validation source: US Treasury Fiscal Data API when running provenance checks.</p>
+
         </header>
 
 

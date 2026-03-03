@@ -361,7 +361,7 @@ export async function GET(request: Request) {
     ${escapeText(`Base rate: ${baseRateLabel} · 10Y-2Y slope: ${slopeLabel}`)}
   </text>
   <text x="120" y="530" fill="#94a3b8" font-family="Inter, system-ui, sans-serif" font-size="16">
-    ${escapeText("Source: US Treasury Fiscal Data API")}
+    ${escapeText("Source: FRED CSV Treasury series (DGS1MO/DGS3MO/DGS2/DGS10)")}
   </text>
 </svg>`;
 

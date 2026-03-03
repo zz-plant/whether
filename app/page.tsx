@@ -267,8 +267,8 @@ export default async function HomePage({
           license: `${siteUrl}/terms-of-service`,
           isBasedOn: {
             "@type": "CreativeWork",
-            name: "US Treasury Fiscal Data API",
-            url: "https://fiscaldata.treasury.gov/api-documentation/",
+            name: "FRED CSV Treasury series (DGS1MO/DGS3MO/DGS2/DGS10)",
+            url: "https://fred.stlouisfed.org/",
           },
         },
       },
