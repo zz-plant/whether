@@ -33,9 +33,6 @@ export const OperationsWorkstreamNav = ({ currentPath }: { currentPath: Route })
           const isActive = link.href === currentPath;
           const labelTone = isActive ? "text-sky-200" : "text-slate-400";
           const descriptionTone = isActive ? "text-sky-100" : "text-slate-100";
-          const badgeTone = isActive
-            ? "border-sky-300/70 bg-sky-400/15 text-sky-100"
-            : "border-amber-300/50 bg-amber-400/15 text-amber-100";
           const href = currentSearch ? `${link.href}?${currentSearch}` : link.href;
           return (
             <li key={link.href}>
@@ -48,21 +45,6 @@ export const OperationsWorkstreamNav = ({ currentPath }: { currentPath: Route })
                   <span className={`text-[11px] uppercase tracking-[0.22em] ${labelTone}`}>
                     {link.label}
                   </span>
-                  {link.tier === "premium" ? (
-                    <span
-                      className={`inline-flex min-h-[22px] items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] ${badgeTone}`}
-                    >
-                      <span aria-hidden="true">👑</span>
-                      Premium
-                    </span>
-                  ) : null}
-                  {link.availability === "coming-soon" ? (
-                    <span
-                      className={`inline-flex min-h-[22px] items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] ${badgeTone}`}
-                    >
-                      Coming soon
-                    </span>
-                  ) : null}
                 </div>
                 <span className={`text-sm font-semibold tracking-[0.08em] ${descriptionTone}`}>
                   {link.description}

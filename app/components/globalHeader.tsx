@@ -14,7 +14,7 @@ const toTitleCase = (value: string) =>
 
 const segmentLabelMap: Record<string, string> = {
   start: "Command Center",
-  decide: "Decide",
+  decide: "Role lenses",
   toolkits: "Toolkits",
   learn: "Learn",
   method: "Method",

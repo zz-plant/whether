@@ -14,10 +14,10 @@ export default function MethodPage() {
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
       <section className="weather-panel space-y-3 px-6 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Method</h1>
-        <p className="text-sm text-slate-300">Use Method for transparency only: formulas, source provenance, and limitations. For operating decisions, return to Signals or Decide.</p>
+        <p className="text-sm text-slate-300">Use Method as the audit layer only: formulas, definitions, source provenance, cadence, and limitations. It should explain how the system works, not what to do.</p>
         <div className="flex flex-wrap gap-3">
           <Link href="/signals" className="weather-button inline-flex items-center justify-center">Review Signals</Link>
-          <Link href="/decide" className="weather-button inline-flex items-center justify-center">Open Decide</Link>
+          <Link href="/start" className="weather-button inline-flex items-center justify-center">Open Command Center</Link>
         </div>
       </section>
       <section className="grid gap-3 sm:grid-cols-2">

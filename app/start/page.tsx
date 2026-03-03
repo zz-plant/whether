@@ -77,7 +77,24 @@ export default function StartHerePage() {
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <Link href="/operations/plan" className="weather-button-primary inline-flex items-center justify-center">Run weekly operating sequence</Link>
-          <Link href="/decide" className="text-sm font-semibold text-sky-300 underline-offset-2 hover:text-sky-200 hover:underline">Or jump straight to role-specific guidance</Link>
+          <Link href="#start-role-path" className="text-sm font-semibold text-sky-300 underline-offset-2 hover:text-sky-200 hover:underline">Choose a role-specific path</Link>
+        </div>
+      </section>
+
+      <section id="start-role-path" className="weather-panel space-y-4 px-6 py-6">
+        <div className="space-y-1">
+          <h2 className="text-xl font-semibold text-slate-100">Choose your path</h2>
+          <p className="text-sm text-slate-300">Use this as the role lens picker inside Command Center, not a second homepage.</p>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Link href="/decide/use-cases" className="weather-surface min-h-[44px] space-y-2 px-4 py-4 transition hover:border-sky-400/65">
+            <h3 className="text-base font-semibold text-slate-100">Role and situation paths</h3>
+            <p className="text-sm text-slate-300">Route by role or bottleneck to open the right guidance quickly.</p>
+          </Link>
+          <Link href="/decide" className="weather-surface min-h-[44px] space-y-2 px-4 py-4 transition hover:border-sky-400/65">
+            <h3 className="text-base font-semibold text-slate-100">Open role lens library</h3>
+            <p className="text-sm text-slate-300">Browse role-specific references, team context, and ship checklists.</p>
+          </Link>
         </div>
       </section>
 
