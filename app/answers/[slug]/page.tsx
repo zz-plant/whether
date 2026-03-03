@@ -105,7 +105,7 @@ const buildLiveShortAnswer = (slug: string, isExpansion: boolean, fallback: stri
 };
 
 export default async function DecisionAnswerPage({ params }: DecisionPageProps) {
-  const { slug } = await params;
+  const { slug } = params;
   const page = findDecisionPage(slug);
 
   if (!page) {
