@@ -73,12 +73,17 @@ export const ScenarioGuidanceBlock = ({
 
   useEffect(() => {
     const nextParams = new URLSearchParams(searchParams.toString());
-    nextParams.set("scenario", selectedScenario);
+    if (selectedScenario === "baseline") {
+      nextParams.delete("scenario");
+    } else {
+      nextParams.set("scenario", selectedScenario);
+    }
     const nextSearch = nextParams.toString();
     if (nextSearch === searchParams.toString()) {
       return;
     }
-    router.push(`${pathname}?${nextSearch}` as Route, { scroll: false });
+    const nextUrl = nextSearch ? `${pathname}?${nextSearch}` : pathname;
+    router.push(nextUrl as Route, { scroll: false });
   }, [pathname, router, searchParams, selectedScenario]);
 
   const activeScenario = useMemo(
