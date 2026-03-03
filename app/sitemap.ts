@@ -9,6 +9,8 @@ import {
   useCaseRoles,
 } from "../lib/informationArchitecture";
 import { productConceptArticles } from "../lib/productCanon";
+import { tierOneDecisionPages } from "./answers/decisionPages";
+import { regimePages } from "./startup-macro-posture/clusterData";
 
 type ChangeFrequency = NonNullable<MetadataRoute.Sitemap[number]["changeFrequency"]>;
 
@@ -64,6 +66,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/methodology", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.56 },
     { path: "/decide/use-cases", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.55 },
     { path: "/toolkits", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.52 },
+    { path: "/answers", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.74 },
+    { path: "/startup-macro-posture", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.84 },
+    { path: "/startup-macro-posture/index", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.8 },
     { path: "/library", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
     { path: "/library/failure-modes", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.75 },
     { path: "/concepts", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.75 },
@@ -114,6 +119,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
+  const decisionAnswerEntries: SitemapEntryDescriptor[] = tierOneDecisionPages.map((page) => ({
+    path: `/answers/${page.slug}`,
+    lastModified: staticContentLastModified,
+    changeFrequency: "weekly",
+    priority: 0.72,
+  }));
+
+  const regimeDeepEntries: SitemapEntryDescriptor[] = regimePages.map((regime) => ({
+    path: `/startup-macro-posture/${regime.slug}`,
+    lastModified: staticContentLastModified,
+    changeFrequency: "weekly",
+    priority: 0.76,
+  }));
+
   return [
     ...coreEntries,
     ...postureEntries,
@@ -122,5 +141,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...toolkitEntries,
     ...failureModeEntries,
     ...canonEntries,
+    ...decisionAnswerEntries,
+    ...regimeDeepEntries,
   ].map(buildEntry);
 }
