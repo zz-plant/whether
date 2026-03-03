@@ -5,24 +5,24 @@ Each milestone is tied to the core loop: ingest Treasury data → compute regime
 plain‑English operational constraints with traceable sources.
 Audit notes for Milestones 5–8 live in `docs/roadmap-audit.md`.
 
-## Immediate priority backlog (lowest-hanging fruit)
-These items are sequenced for maximum operator impact with minimal net-new system design.
+## Immediate priority backlog (live-gap focused)
+These items track the highest-value deltas between current shipped behavior and desired operator workflow quality.
 
 1. **Promote export/share to the Overview header**
    - Move leadership brief actions to the top-level report header as a primary CTA.
    - Success signal: operators can copy or share a briefing from the first screen without scrolling.
-2. **Ship weekly digest output from existing summary primitives**
-   - Reuse weekly/monthly summary + delta generation to produce a lightweight digest payload.
-   - Success signal: recurring digest can be consumed in Slack/email workflows with citations.
-3. **Add regime alert reason codes + Time Machine deep links**
-   - Enrich alert payloads with explicit trigger reason(s) and historical context links.
-   - Success signal: every alert is actionable and auditable in one click.
-4. **Replace static macro snapshot with live fetchers (CPI, unemployment, BBB spreads)**
-   - Preserve fallback behavior and provenance metadata while moving macro data to live pulls.
-   - Success signal: macro cards show current record dates without manual snapshot refreshes.
-5. **Add source health panel (stale/failed feed visibility)**
+2. **Ship source health panel (stale/failed feed visibility)**
    - Surface per-source freshness, fallback reasons, and last successful fetch metadata.
    - Success signal: operators can immediately see whether guidance is live, stale, or degraded.
+3. **Harden API contracts for summary and Signal Ops payloads**
+   - Add contract tests for `/api/weekly`, `/api/monthly`, `/api/regime-alerts`, and `/api/weekly-digest`.
+   - Success signal: schema drift is caught pre-merge for operator and integration consumers.
+4. **Finish historical structured archive materialization**
+   - Persist structured summary fields in archives instead of relying on runtime hydration.
+   - Success signal: historical playback works without dynamic backfill and remains deterministic.
+5. **Consolidate operations IA around live routes**
+   - Remove stale references to non-shipped workstream paths and keep route/docs parity.
+   - Success signal: every nav or roadmap link resolves to a currently shipped page.
 
 ## Milestone 0 — Repo scaffolding (Week 0)
 - [x] Establish Next.js 14 + TypeScript strict + Tailwind baseline.
@@ -33,7 +33,8 @@ These items are sequenced for maximum operator impact with minimal net-new syste
 
 ## Milestone 1 — Live Sensor Array (Week 1)
 - [x] Implement `/api/treasury` route:
-  - [x] Fetch from US Treasury Fiscal Data API.
+  - [x] Fetch from FRED Treasury constant-maturity series.
+  - [x] Keep US Treasury Fiscal Data API for validation/provenance cross-checks.
   - [x] Normalize to `TreasuryData` shape.
   - [x] Cache daily (`revalidate: 86400`).
   - [x] Fallback to snapshot with `isLive: false`.
@@ -86,12 +87,13 @@ These items are sequenced for maximum operator impact with minimal net-new syste
 ## Milestone 7 — Operator Demand Expansion (Week 7)
 - [x] Broaden macro inputs beyond the yield curve (inflation, unemployment, credit spreads) with explicit source links.
 - [x] Add adjustable regime thresholds with audit trails for custom tuning.
-- [x] Expand Decision Shield to cover additional decision types (M&A, infra spend, geographic expansion).
+- [ ] Decision Shield expansion logic exists in code but is not exposed as a primary live route.
 - [x] Add export/share flows (PDF, slide-ready summary, scheduled email or Slack brief).
 - [x] Build an Insight Database with citations to evidence and historical precedents.
 - [x] Add time-series comparisons (“then vs now”) with regime change diffs.
 - [x] Add alerts/notifications on regime changes.
-- [x] Support saved Decision Shield scenarios and team presets.
+- [ ] Saved Decision Shield scenarios/presets exist in component logic but are not surfaced in the
+  primary route map.
 - [x] Surface deep data provenance per sensor (direct source URLs, formulas, timestamps).
 - [x] Introduce an API/export endpoint for embedding regimes in internal dashboards.
 
@@ -111,20 +113,20 @@ These items are sequenced for maximum operator impact with minimal net-new syste
 
 ## Milestone 9 — Signal Ops + Briefing Pack (Week 9)
 - [ ] Promote export/share actions (copy-ready leadership brief) to the Overview header.
-- [ ] Launch executive briefing pack (Slack/email/slide-ready) with citations and regime summary.
-- [ ] Add regime-shift alerting with reason codes and Time Machine deep links.
-- [ ] Add weekly digest output with “what changed” delta summary.
+- [x] Launch executive briefing pack (Slack/email/slide-ready) with citations and regime summary.
+- [x] Add regime-shift alerting with reason codes and Time Machine deep links.
+- [x] Add weekly digest output with “what changed” delta summary.
 - [ ] Allow role-specific alert routing (CFO/COO/CTO/CPO presets).
 
 ## Milestone 10 — Decision Memory + Scenario Studio (Week 10)
 - [ ] Decision Memory log with immutable records (regime, sensors, thresholds, sources).
-- [ ] Scenario presets library with shareable templates.
-- [ ] Counterfactual slider view with explicit “Simulated” labeling.
+- [ ] Scenario presets library with shareable templates on a shipped route.
+- [ ] Counterfactual slider view with explicit “Simulated” labeling on a shipped route.
 - [ ] Then-vs-now comparisons baked into the Scenario Studio.
 - [ ] Assumption locking banner to keep posture choices explicit in reviews.
 
 ## Milestone 11 — Evidence + Data Reliability (Week 11)
-- [ ] Live macro fetchers for CPI, unemployment, and BBB spreads with source URLs.
+- [x] Live macro fetchers for CPI, unemployment, and BBB spreads with source URLs.
 - [ ] Evidence pack upgrades: Insight Database citations and Fossil Record view.
 - [ ] Data freshness health checks with explicit fallback reasons.
 - [ ] Add a “source health” panel that surfaces stale/failed data feeds.

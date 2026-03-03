@@ -44,12 +44,11 @@ Operations overview organizes execution guidance into workstreams and highlights
 summary data.
 
 ### 1.4 Operations workstreams
-- **Plan** (`/operations/plan`): playbook moves (start/stop/fence), finance strategy,
+- **Plan** (`/operations` and `/operations/plan`): playbook moves (start/stop/fence), finance strategy,
   insight database prompts, and operator requests.
-- **Decisions** (`/operations/decisions`): decision shield workflow, assumption locking,
-  decision shield templates, and counterfactual simulation controls.
-- **Briefings** (`/operations/briefings`): strategy brief, export brief tooling,
-  executive briefing, and CXO output catalog.
+- **Integrations** (`/operations/integrations`): preview weekly mandate payloads for Slack, Notion,
+  and Linear.
+- **Data** (`/operations/data`): API usage guidance and handoff references for operators.
 
 ### 1.5 Onboarding (/onboarding)
 Onboarding provides a first-time guide and a plain‑English glossary so new operators can decode
@@ -125,15 +124,18 @@ This pilot is additive and backward-compatible: existing regime labels and thres
 ## 4) Decision support tooling
 
 ### 4.1 Decisions workstream status
-The Decisions route remains visible as a premium coming-soon surface. In the current release,
-interactive decision inputs and per-client decision-memory tracking are sunset.
+The previous Decisions workstream route is not part of the primary shipped navigation in this
+release. Decision Shield logic and components are still present in the codebase, but they are
+not exposed as a first-class runtime route.
 
 ### 4.2 Decision templates
-Copy-ready decision templates remain available for async review notes and leadership discussion.
+Copy-ready decision templates remain available inside operations brief/export surfaces for async
+review notes and leadership discussion.
 
 ### 4.3 Export behavior
 Briefing/report exports remain available where they package current signal-driven guidance.
-Exports tied to persisted per-client decision memory are removed.
+Integration payload exports are also available through `/api/integrations/weekly-mandate` for
+Slack, Notion, and Linear targets.
 
 ## 5) Playbooks, summaries, and briefings
 
@@ -193,6 +195,13 @@ $$
 Operations briefings support copy-ready briefs and executive narratives with sensor data and
 macro context embedded for leadership consumption.
 
+### 5.6 Signal Ops (live)
+- Regime alerts are persisted and retrievable through API (`/api/regime-alerts`).
+- Alert payloads include reason codes, source URLs, and Time Machine deep links.
+- Alert creation enforces trigger filtering and a 24-hour cooldown unless the regime flips again.
+- Weekly digest output is available via `/api/weekly-digest`, including score deltas and dominant
+  reason messages.
+
 ## 6) APIs (server routes)
 
 ### 6.1 Data APIs
@@ -206,7 +215,18 @@ macro context embedded for leadership consumption.
 - `GET /api/summary-delta` — difference between weekly and monthly summaries.
 - `GET /api/cadence` — alignment check between weekly and monthly constraints.
 
-### 6.3 Open Graph
+### 6.3 Signal Ops APIs
+- `GET /api/regime-alerts` — list logged regime alerts.
+- `POST /api/regime-alerts` — create an alert when trigger/cooldown rules pass.
+- `GET /api/weekly-digest` — digest summary generated from logged alerts.
+- `GET /api/alert-preferences` / `POST /api/alert-preferences` — per-client delivery preferences.
+- `GET /api/alert-deliveries` / `POST /api/alert-deliveries` — delivery logs and send attempts.
+
+### 6.4 Integration APIs
+- `GET /api/integrations/weekly-mandate?target=slack|notion|linear` — target-specific weekly
+  mandate export payload.
+
+### 6.5 Open Graph
 - `GET /api/og` — SVG Open Graph image with regime metadata (supports Time Machine selection).
 
 ## 7) Non-goals (as enforced in UI copy)
