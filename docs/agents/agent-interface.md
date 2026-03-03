@@ -81,3 +81,11 @@ The returned payload includes `skills` from `lib/agentSkills.ts`, so agent runti
 2. Call `get_agent_brief` per cadence needed.
 3. Generate outputs in the order declared by `skills`.
 4. Keep provenance and source URLs attached in any user-facing response.
+
+## Production monitoring endpoints
+
+- `GET /api/health` exposes monitor-friendly service status for synthetic probes.
+  - Returns `200` for `ok` and `503` for `degraded`/`down`.
+  - Includes treasury data freshness metadata (`fetchedAt`, `ageHours`, `staleAfterHours`).
+- `scripts/prod-synthetic-smoke.mjs` runs baseline route + schema assertions against a deployed site.
+  - CI schedule: `.github/workflows/prod-synthetic-smoke.yml` (every 10 minutes + manual dispatch).
