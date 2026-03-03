@@ -3,6 +3,27 @@ import type { MonthlyStructured, SummaryProvenance, WeeklyStructured } from "./s
 
 const toBullets = (items: string[]) => items.map((item) => `• ${item}`);
 
+const renderGovernanceLines = (governance: WeeklyStructured["governanceParameters"]) => {
+  if (!governance) {
+    return [] as string[];
+  }
+
+  return [
+    "",
+    "---",
+    "",
+    "GOVERNANCE PARAMETER ADJUSTMENTS",
+    "",
+    `• Hiring threshold: ${governance.hiringThreshold}`,
+    `• Payback window tolerance: ${governance.paybackWindowTolerance}`,
+    `• Rollback requirement: ${governance.rollbackRequirement}`,
+    `• Approval velocity: ${governance.approvalVelocity}`,
+    `• Expansion scope: ${governance.expansionScope}`,
+    `• Experimentation tolerance: ${governance.experimentationTolerance}`,
+    "",
+  ];
+};
+
 export const renderWeeklySummaryCopy = ({
   title,
   summary,
@@ -83,7 +104,7 @@ export const renderWeeklySummaryCopy = ({
     ...toBullets(structured.executionConstraints),
     "",
     "",
-    "",
+    ...renderGovernanceLines(structured.governanceParameters),
     "---",
     "",
     "RECOMMENDATION CONFIDENCE",

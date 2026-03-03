@@ -7,6 +7,7 @@ import { buildMonthlyStructured, type MonthlySummary } from "./monthlySummary";
 import type { QuarterlySummary } from "./quarterlySummary";
 import type { RegimeKey } from "../regimeEngine";
 import { buildWeeklyStructured, type WeeklySummary } from "./weeklySummary";
+import { getGovernanceParametersForPosture } from "../policy/governance";
 import type { YearlySummary } from "./yearlySummary";
 import rawArchive from "../../data/summary_archive.json";
 
@@ -90,6 +91,16 @@ const WeeklyStructuredSchema = z.object({
   watchouts: z.array(z.string()),
   planningLanguage: z.string(),
   executionConstraints: z.array(z.string()),
+  governanceParameters: z
+    .object({
+      hiringThreshold: z.string(),
+      paybackWindowTolerance: z.string(),
+      rollbackRequirement: z.string(),
+      approvalVelocity: z.string(),
+      expansionScope: z.string(),
+      experimentationTolerance: z.string(),
+    })
+    .optional(),
 });
 
 const MonthlyStructuredSchema = z.object({
@@ -110,6 +121,14 @@ const WeeklySummaryArchiveSchema = BaseSummarySchema.extend({
     buildWeeklyStructured({
       regime: summary.regime,
       constraints: summary.constraints,
+      governanceParameters: getGovernanceParametersForPosture(
+        summary.regime === "EXPANSION"
+          ? "RISK_ON"
+          : summary.regime === "SCARCITY"
+            ? "SAFETY_MODE"
+            : "TRANSITION",
+        false
+      ),
     }),
 }));
 
