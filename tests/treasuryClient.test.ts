@@ -85,7 +85,7 @@ describe("treasury client", () => {
 
     assert.equal(data.record_date, "2024-09-30");
     assert.equal(data.isLive, false);
-    assert.equal(data.fallback_reason, "Treasury API error: 500");
+    assert.equal(data.fallback_reason, "FRED Treasury fetch error: 500");
     assert.ok(data.fallback_at);
   });
 
@@ -117,7 +117,7 @@ describe("treasury client", () => {
 
     assert.equal(data.record_date, "2024-09-30");
     assert.equal(data.isLive, false);
-    assert.equal(data.fallback_reason, "Treasury API returned no data or invalid payload.");
+    assert.equal(data.fallback_reason, "FRED Treasury series returned no data or invalid payload.");
     assert.ok(data.fallback_at);
   });
 

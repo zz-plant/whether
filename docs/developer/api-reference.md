@@ -3,9 +3,11 @@
 Whether exposes read-first JSON endpoints for summary generation, cadence checks, treasury data, and integration workflows.
 
 ## Conventions
+- Lifecycle: developer preview for internal integrations; contracts may evolve while v1 stabilizes.
 - Format: JSON.
 - Runtime: edge handlers.
-- Auth: currently no authentication layer.
+- Auth: currently no authentication layer (do not expose write endpoints publicly without an auth proxy).
+- Rate limiting: platform-default protections apply; explicit per-endpoint quotas are not yet published.
 - Versioning: most payloads include `version: "v1"`.
 
 ## Core summary and data endpoints
@@ -65,3 +67,8 @@ curl -s "http://localhost:3000/api/integrations/weekly-mandate?target=slack" | j
 
 ## Data durability note
 Alert preferences, alerts, and delivery events currently use process-memory server store semantics. For production-grade durable history, persist these events in external storage.
+
+
+## Regime and posture taxonomy
+- Canonical regime keys for API consumers: `SCARCITY`, `DEFENSIVE`, `VOLATILE`, `EXPANSION`.
+- Policy posture values (`RISK_ON`, `SAFETY_MODE`, `TRANSITION`) are additive diagnostics and should not be used as replacements for regime keys in matrix routing, alert grouping, or Decision Shield mapping.

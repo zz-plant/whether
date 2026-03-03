@@ -57,15 +57,16 @@ signals and navigate the report pages.
 
 ### 1.6 Formula reference (/methodology)
 The formulas page documents the sensor methodology and links directly to public data sources used
-in the report (Treasury API, BLS CPI, BLS labor, FRED credit spreads, FRED VIX, and Chicago Fed NFCI).
+in the report (FRED Treasury series, BLS CPI, BLS labor, FRED credit spreads, FRED VIX, and Chicago Fed NFCI).
 
 ## 2) Data sourcing & provenance
 
 ### 2.1 Treasury yields (live + fallback)
-- Primary data source: US Treasury Fiscal Data API yield curve endpoint.
+- Canonical in-product source: FRED CSV Treasury constant-maturity series (`DGS1MO`, `DGS3MO`, `DGS2`, `DGS10`).
+- Secondary/provenance source: US Treasury Fiscal Data API is used only for validation workflows and source cross-checking, not for runtime scoring.
 - Data is normalized into a `TreasuryData` shape and stamped with `record_date`, `fetched_at`,
   and source metadata.
-- If the API is unavailable, the report falls back to `data/snapshot_fallback.json` and marks the
+- If live fetch is unavailable, the report falls back to `data/snapshot_fallback.json` and marks the
   response as cached with a fallback reason.
 
 ### 2.2 Macro snapshot
@@ -83,7 +84,7 @@ in the report (Treasury API, BLS CPI, BLS labor, FRED credit spreads, FRED VIX, 
 ### 3.1 Inputs
 - **Base rate**: 1‑month Treasury yield (fallback to 3‑month if missing).
 - **Curve slope**: 10Y − 2Y yield spread.
-- **Macro overlays (boundary calibration)**: HY OAS, Chicago Fed NFCI, VIX, VC funding velocity, and tech layoff trend adjust tightness/risk appetite near threshold zones and trigger multi-weak-read warnings.
+- **Macro overlays (boundary calibration)**: HY OAS, Chicago Fed NFCI, VIX, VC funding velocity, and tech layoff trend adjust tightness/risk appetite before final classification and trigger multi-weak-read warnings.
 
 ### 3.2 Scores
 - **Tightness score (0–100)**: adds 90 points if base rate > threshold and 25 points if the curve
@@ -95,7 +96,15 @@ Regime is determined by tightness vs. risk appetite thresholds (defaults are 70 
 respectively). Thresholds can be overridden via URL parameters, and the UI maintains an audit log
 of operator changes.
 
+Canonical taxonomy is the four-quadrant set only: `SCARCITY`, `DEFENSIVE`, `VOLATILE`, `EXPANSION`.
+Policy pilot outputs (`RISK_ON`, `SAFETY_MODE`, `TRANSITION`) are a separate posture layer and do not replace regime keys used by Decision Shield, alerts, or UI matrix logic.
+
 ### 3.4 Outputs
+Adjustment semantics:
+- Macro overlays modify tightness/risk-appetite scores before classification, so they can change the resulting regime when signals are near boundaries.
+- Diagnostics (`boundaryContributors`, weak-read warnings, confidence) explain *why* adjustments applied.
+- Recommendations and constraints always derive from the final classified regime.
+
 The regime assessment includes:
 - Current regime label + description
 - Tightness and risk appetite scores

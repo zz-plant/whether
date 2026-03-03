@@ -11,7 +11,7 @@ import type {
   SeriesHistoryPoint,
   TreasuryData,
 } from "./types";
-import { computeCurveSlope, getBaseRate } from "./regimeEngine";
+import { computeCurveSlope, getBaseRate, TREASURY_SOURCE_LABEL } from "./regimeEngine";
 import { getTimeMachineRollingYieldSeries } from "./timeMachine/timeMachineCache";
 
 const BASE_RATE_EXPLANATION =
@@ -198,7 +198,7 @@ export const buildSensorReadings = (treasury: TreasuryData): SensorReading[] => 
       category: "Rates",
       group: sensorGroupLookup.Rates,
       availableTimeWindows,
-      sourceLabel: "US Treasury Fiscal Data API",
+      sourceLabel: TREASURY_SOURCE_LABEL,
       sourceUrl: treasury.source,
       formulaUrl: "/methodology#base-rate",
       record_date: treasury.record_date,
@@ -217,7 +217,7 @@ export const buildSensorReadings = (treasury: TreasuryData): SensorReading[] => 
       category: "Rates",
       group: sensorGroupLookup.Rates,
       availableTimeWindows,
-      sourceLabel: "US Treasury Fiscal Data API",
+      sourceLabel: TREASURY_SOURCE_LABEL,
       sourceUrl: treasury.source,
       formulaUrl: "/methodology#curve-slope",
       record_date: treasury.record_date,

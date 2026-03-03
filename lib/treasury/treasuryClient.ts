@@ -124,7 +124,7 @@ export const fetchTreasuryData = async (
     const responses = [oneMonthResponse, threeMonthResponse, twoYearResponse, tenYearResponse];
     const badResponse = responses.find((response) => !response.ok);
     if (badResponse) {
-      throw new Error(`Treasury API error: ${badResponse.status}`);
+      throw new Error(`FRED Treasury fetch error: ${badResponse.status}`);
     }
 
     const [oneMonthCsv, threeMonthCsv, twoYearCsv, tenYearCsv] = await Promise.all(
@@ -144,7 +144,7 @@ export const fetchTreasuryData = async (
     ]);
 
     if (!recordDate) {
-      throw new Error("Treasury API returned no data or invalid payload.");
+      throw new Error("FRED Treasury series returned no data or invalid payload.");
     }
 
     return {
