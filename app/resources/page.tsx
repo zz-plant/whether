@@ -2,18 +2,26 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { StaticHubNav } from "../components/staticHubNav";
 import { buildPageMetadata } from "../../lib/pageMetadata";
+import { painArticles } from "../../lib/painArticles";
 import { resourcePillarPages, resourceSupportingPages } from "../../lib/resourcesContent";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Resources — board governance pillars",
   description:
-    "Board-facing long-form resources on capital discipline, capital posture frameworks, and reversibility governance.",
+    "Board-facing long-form resources on capital discipline, posture frameworks, pain-driven operating decisions, and practical templates.",
   path: "/resources",
   imageAlt: "Whether resources hub",
   imageParams: {
     template: "guides",
   },
 });
+
+const toolPages = [
+  resourceSupportingPages.capitalPostureTemplate,
+  resourceSupportingPages.reversalTriggerChecklist,
+  resourceSupportingPages.quarterlyCapitalPostureMemoExample,
+  resourceSupportingPages.decisionShieldOverview,
+];
 
 export default function ResourcesPage() {
   return (
@@ -22,7 +30,7 @@ export default function ResourcesPage() {
       <section className="weather-panel space-y-3 px-6 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Resources</h1>
         <p className="text-sm text-slate-300">
-          Board-ready governance resources for capital allocation, escalation controls, and reversibility discipline.
+          Board-ready governance resources for capital allocation, escalation controls, reversibility discipline, and operating strategy under pressure.
         </p>
       </section>
 
@@ -38,19 +46,28 @@ export default function ResourcesPage() {
         ))}
       </section>
 
+      <section className="grid gap-3 sm:grid-cols-2">
+        {painArticles.map((article) => (
+          <Link key={article.slug} href={`/resources/${article.slug}`} className="weather-panel space-y-2 px-4 py-4">
+            <span className="inline-flex w-fit items-center rounded-full border border-rose-300/45 bg-rose-500/10 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-rose-100">
+              Pain-driven brief
+            </span>
+            <h2 className="text-base font-semibold text-slate-100">{article.title}</h2>
+            <p className="text-sm text-slate-200">{article.description}</p>
+          </Link>
+        ))}
+      </section>
+
       <section className="weather-panel space-y-3 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Supporting pages</h2>
+        <h2 className="text-lg font-semibold text-slate-100">Tools and supporting pages</h2>
         <ul className="space-y-2 text-sm text-slate-200">
-          <li>
-            <Link href={resourceSupportingPages.decisionShieldOverview.path} className="text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100">
-              {resourceSupportingPages.decisionShieldOverview.title}
-            </Link>
-          </li>
-          <li>
-            <Link href={resourceSupportingPages.capitalPostureTemplate.path} className="text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100">
-              {resourceSupportingPages.capitalPostureTemplate.title}
-            </Link>
-          </li>
+          {toolPages.map((page) => (
+            <li key={page.path}>
+              <Link href={page.path} className="text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100">
+                {page.title}
+              </Link>
+            </li>
+          ))}
         </ul>
       </section>
     </main>
