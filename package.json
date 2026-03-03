@@ -23,7 +23,8 @@
     "time-machine:update-summaries": "node scripts/updateTimeMachineSummariesSince.mjs",
     "mcp:whether": "tsx scripts/mcp/whether-mcp-server.ts",
     "audit:cloudflare-warnings": "node scripts/cloudflare-warning-audit.mjs",
-    "deploy:cloudflare": "node scripts/cloudflare-build-and-upload.mjs"
+    "deploy:cloudflare": "node scripts/cloudflare-build-and-upload.mjs",
+    "smoke:prod": "node scripts/prod-synthetic-smoke.mjs https://whether.work"
   },
   "engines": {
     "node": "20.16.x"
