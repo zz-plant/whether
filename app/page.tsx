@@ -70,7 +70,7 @@ const homeSectionSequence = [
 const regimeLabelMap = {
   SCARCITY: "Scarcity",
   DEFENSIVE: "Defensive",
-  VOLATILE: "Neutral",
+  VOLATILE: "Mixed",
   EXPANSION: "Expansion",
 } as const;
 
@@ -119,7 +119,7 @@ export const generateMetadata = async ({
 }: {
   searchParams?: Promise<{ month?: string; year?: string }>;
 }): Promise<Metadata> => {
-  const siteName = "Whether — Capital Posture Governance Standard";
+  const siteName = "Whether — Weekly Operating Posture (Hiring, Spend, Roadmap)";
   const siteDescription = defaultSiteDescription;
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const selection = resolveTimeMachineSelection(resolvedSearchParams);
@@ -136,7 +136,7 @@ export const generateMetadata = async ({
     baseUrl.searchParams.set("status", "invalid");
   }
 
-  const title = "Weekly capital posture governance brief — Whether";
+  const title = "Weekly operating posture brief — Whether";
   const imageUrl = baseUrl.toString();
   const socialImageUrl = buildSocialImageUrl();
   const canonicalUrl = buildCanonicalUrl("/");
@@ -357,13 +357,13 @@ export default async function HomePage({
       pageSummary="Verdict and immediate decision call for this planning cycle."
       primaryCta={{
         href: "#weekly-posture-brief-title",
-        label: "Copy Slack brief",
+        label: "Copy leadership Slack brief",
         copyText: slackBrief,
         copyTarget: "Slack",
       }}
       secondaryCta={{
         href: "#weekly-action-summary",
-        label: "Review evidence",
+        label: "See evidence behind the call",
       }}
       nextStep={{
         href: "/evidence",

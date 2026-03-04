@@ -59,13 +59,16 @@ export function WeeklyDecisionCard({
   return (
     <section className="weather-panel space-y-6 px-5 py-6 sm:px-7 sm:py-8" aria-labelledby="weekly-posture-brief-title">
       <header className="space-y-3 border-b border-slate-700/70 pb-5">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-200">Weekly Capital Posture Brief</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-200">Weekly Operating Posture Brief</p>
         <h1 id="weekly-posture-brief-title" className="text-3xl font-semibold text-slate-50 sm:text-4xl">
           {statusLabel}
         </h1>
+        <p className="max-w-3xl text-sm text-slate-300">
+          A weekly read on how strict to be right now: hiring pace, approval bar, and long-bet tolerance — based on public macro signals.
+        </p>
         <p className="max-w-3xl text-base text-slate-200">{postureHeadlineByRegime[regime]}</p>
         <div className="flex flex-wrap items-center gap-3">
-          <p className="text-sm text-slate-300">Posture delta: {postureDelta}</p>
+          <p className="text-sm text-slate-300">Change vs last week: {postureDelta}</p>
           {actions}
         </div>
       </header>
@@ -75,24 +78,26 @@ export function WeeklyDecisionCard({
         <ul className="mt-3 grid gap-2 text-sm text-slate-100 sm:grid-cols-2">
           {deltaSignalOrder.map((item) => {
             const delta = deltasByKey.get(item.key) ?? 0;
+            const directionLabel = delta === 0 ? "→" : delta > 0 ? "↑" : "↓";
             return (
               <li key={item.key}>
-                {item.label} Δ {delta > 0 ? "+" : ""}
+                {item.label} {directionLabel} {delta > 0 ? "+" : ""}
                 {delta.toFixed(1)}
               </li>
             );
           })}
         </ul>
+        <p className="mt-3 text-xs text-slate-300">These deltas drive the dial changes below.</p>
       </article>
 
       <article className="rounded-xl border border-slate-700/70 bg-slate-900/50 p-4">
-        <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">Decision knobs</h2>
+        <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">Operating dials (0–3)</h2>
         <div className="mt-3 grid gap-2 text-sm text-slate-100 sm:grid-cols-2">
           {decisionKnobs.map((knob) => {
-            const deltaLabel = knob.delta === 0 ? "•" : knob.delta > 0 ? "↑" : "↓";
+            const deltaLabel = knob.delta === 0 ? "unchanged" : knob.delta > 0 ? "raised" : "lowered";
             return (
               <p key={knob.key}>
-                {knob.label}: {knob.value}/3 {deltaLabel}
+                {knob.label}: {knob.value}/3 ({deltaLabel})
               </p>
             );
           })}
@@ -105,12 +110,13 @@ export function WeeklyDecisionCard({
           <p className="mt-2 text-2xl font-semibold text-slate-50">{confidenceLabel}</p>
         </article>
         <article className="rounded-xl border border-slate-700/70 bg-slate-900/60 p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">Transition watch</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">Regime shift watch</p>
           <p className="mt-2 text-2xl font-semibold text-slate-50">{transitionWatch}</p>
+          <p className="mt-2 text-xs text-slate-300">ON = you’re near a threshold; expect a flip if the next print moves.</p>
         </article>
         <article className="rounded-xl border border-rose-500/40 bg-slate-900/60 p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-rose-200">High-risk decisions</p>
-          <p className="mt-2 text-sm font-semibold text-rose-100">{dangerousCategory}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-rose-200">Avoid this week</p>
+          <p className="mt-2 text-sm font-semibold text-rose-100">Avoid: {dangerousCategory}</p>
         </article>
       </div>
 

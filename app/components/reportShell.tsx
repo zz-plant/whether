@@ -171,7 +171,8 @@ export const ReportShell = ({
   const heroSectionSpacingClassName =
     "weather-panel-static min-w-0 space-y-4 px-4 py-4 sm:space-y-5 sm:px-5";
   const provenancePanel = (
-    <CanonicalTrustModule
+    <>
+      <CanonicalTrustModule
       tone={trustStatusTone}
       label={trustStatusLabel}
       detail={trustStatusDetail}
@@ -212,7 +213,9 @@ export const ReportShell = ({
           </div>
         </dl>
       }
-    />
+      />
+      <p className="mt-3 text-xs text-slate-300">Use this for near-term planning decisions, not long-range forecasting.</p>
+    </>
   );
   const commandActionCandidates: OperatorCommandAction[] = [];
 
@@ -349,7 +352,7 @@ export const ReportShell = ({
               <div className="flex items-center gap-3">
                 <Image
                   src="/whether-logo.svg"
-                  alt="Whether Capital Posture Governance"
+                  alt="Whether — Weekly Operating Posture (Hiring, Spend, Roadmap)"
                   width={156}
                   height={36}
                   className="h-9 w-auto"
@@ -480,16 +483,34 @@ export const ReportShell = ({
                           {exportCta.label}
                         </a>
                       ) : null}
+                      <a
+                        href="/about#what-this-is"
+                        className="weather-pill inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-slate-700/80 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto"
+                      >
+                        What this is
+                      </a>
                       <details className="group w-full sm:w-auto">
                         <summary className="weather-pill inline-flex min-h-[44px] w-full cursor-pointer list-none items-center justify-center rounded-full border border-slate-700/80 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto">
                           More actions
                         </summary>
                         <div className="mt-2 grid gap-2 sm:min-w-[18rem]">
                           <a
-                            href="/about#subscribe"
+                            href="/about#what-this-is"
                             className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-700/80 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
                           >
-                            More updates
+                            What this is
+                          </a>
+                          <a
+                            href="/about#monday-planning"
+                            className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-700/80 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                          >
+                            How to use this in Monday planning
+                          </a>
+                          <a
+                            href="/about#limitations"
+                            className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-700/80 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                          >
+                            Limitations
                           </a>
                         </div>
                       </details>
