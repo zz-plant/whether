@@ -1,6 +1,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { buildPageMetadata } from "../../lib/seo";
+import { ReturningVisitorDeltaStrip } from "../components/changeSinceLastReadPanel";
+import { loadReportData } from "../../lib/report/reportData";
 import { postureDefinitions, situationRouting, startSituations, toolkitDefinitions } from "../../lib/informationArchitecture";
 
 export const metadata: Metadata = buildPageMetadata({
@@ -11,7 +13,9 @@ export const metadata: Metadata = buildPageMetadata({
   imageAlt: "Whether Start Here",
 });
 
-export default function StartHerePage() {
+export default async function StartHerePage() {
+  const { assessment, treasury } = await loadReportData();
+
   const onboardingSteps = [
     {
       id: "posture",
@@ -41,6 +45,17 @@ export default function StartHerePage() {
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+      <ReturningVisitorDeltaStrip
+        assessment={assessment}
+        recordDate={treasury.record_date}
+        impactLinks={[
+          { label: "Posture shift", href: "/signals#signal-matrix", metric: "tightness" },
+          { label: "Top drivers", href: "/signals#signals-overview", metric: "baseRate" },
+          { label: "Action guardrails", href: "/operations#ops-playbook", metric: "riskAppetite" },
+        ]}
+        openPanelHref="/signals#change-since-last-read"
+      />
+
       <section className="weather-panel space-y-4 px-6 py-6">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Command center</p>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Run this week&apos;s operating sequence.</h1>
@@ -77,7 +92,15 @@ export default function StartHerePage() {
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <Link href="/operations/plan" className="weather-button-primary inline-flex items-center justify-center">Run weekly operating sequence</Link>
-          <Link href="#start-role-path" className="text-sm font-semibold text-sky-300 underline-offset-2 hover:text-sky-200 hover:underline">Choose a role-specific path</Link>
+          <Link href="/operations#ops-export-briefs" className="weather-pill inline-flex min-h-[44px] items-center justify-center rounded-full border border-sky-400/70 bg-sky-500/10 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-sky-100 transition-colors hover:border-sky-300 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation">Copy weekly brief</Link>
+          <details className="group">
+            <summary className="weather-pill inline-flex min-h-[44px] cursor-pointer list-none items-center justify-center rounded-full border border-slate-700/80 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation">
+              More actions
+            </summary>
+            <div className="mt-2 grid gap-2 rounded-xl border border-slate-800/80 bg-slate-950/90 p-3">
+              <Link href="#start-role-path" className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100">Choose a role-specific path</Link>
+            </div>
+          </details>
         </div>
       </section>
 
