@@ -97,7 +97,7 @@ const pageLinkIcons: Record<string, ReactNode> = {
       <circle cx="12" cy="12" r="4.25" fill="currentColor" />
     </svg>
   ),
-  "Evidence appendix": (
+  "Signals": (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
       <path
         d="M4 16.5 8.5 12l3 2.75L16 9l4 3.5"
@@ -253,7 +253,7 @@ export const ReportPageNavigation = ({
   className?: string;
   variant?: "full" | "compact";
 }) => {
-  const coreReportHrefs = new Set(["/", "/evidence", "/operations"]);
+  const coreReportHrefs = new Set(["/start", "/signals", "/operations"]);
   const primaryLinks = pageLinks.filter((link) => coreReportHrefs.has(link.href));
   const secondaryLinks = pageLinks.filter((link) => !coreReportHrefs.has(link.href));
   const visibleLinks = primaryLinks.length > 0 ? primaryLinks : pageLinks;
@@ -278,7 +278,7 @@ export const ReportPageNavigation = ({
                   aria-current={isActive ? "page" : undefined}
                   className={getPageLinkClassName({
                     isActive,
-                    isCommandCenter: link.label === "Weekly Capital Posture Brief",
+                    isCommandCenter: link.href === "/start",
                     isOddTail,
                   })}
                 >
