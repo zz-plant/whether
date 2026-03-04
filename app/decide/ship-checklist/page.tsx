@@ -4,7 +4,7 @@ import { loadReportData } from "../../../lib/report/reportData";
 import { buildPageMetadata } from "../../../lib/seo";
 import { scoreWhetherToShipChecklist, type ChecklistInput } from "../../../lib/whetherToShipChecklist";
 
-export const runtime = "edge";
+export { edgeRuntime as runtime } from "../../../lib/next-runtime";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Whether to ship checklist",

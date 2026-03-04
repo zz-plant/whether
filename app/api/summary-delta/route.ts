@@ -4,7 +4,7 @@ import { buildMonthlySummary } from "../../../lib/summary/monthlySummary";
 import { buildSummaryDelta } from "../../../lib/summary/summaryDelta";
 import { buildWeeklySummary } from "../../../lib/summary/weeklySummary";
 
-export const runtime = "edge";
+export { edgeRuntime as runtime } from "../../../lib/next-runtime";
 export const revalidate = 3600;
 
 export async function GET() {

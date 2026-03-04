@@ -4,7 +4,7 @@ import { loadReportData } from "../../../lib/report/reportData";
 import { buildPageMetadata } from "../../../lib/seo";
 import { buildPersonalizedMandate, type TeamContextProfile } from "../../../lib/personalizedMandates";
 
-export const runtime = "edge";
+export { edgeRuntime as runtime } from "../../../lib/next-runtime";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Team context profile and personalized mandates",

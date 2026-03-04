@@ -3,7 +3,7 @@ import Link from "next/link";
 import { buildPageMetadata } from "../../lib/seo";
 import { toolkitDefinitions } from "../../lib/informationArchitecture";
 
-export const runtime = "edge";
+export { edgeRuntime as runtime } from "../../lib/next-runtime";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Toolkits — runnable instruments",

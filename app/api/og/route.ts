@@ -206,7 +206,7 @@ const renderStaticTemplate = ({
 </svg>`;
 };
 
-export const runtime = "edge";
+export { edgeRuntime as runtime } from "../../../lib/next-runtime";
 export const revalidate = 300;
 
 export async function GET(request: Request) {

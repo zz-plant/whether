@@ -4,7 +4,7 @@ import { buildAgentPayload, buildAgentPrompt } from "../../../lib/agentHandoff";
 import { buildSummaryHash } from "../../../lib/summary/summaryHash";
 import { buildWeeklySummary } from "../../../lib/summary/weeklySummary";
 
-export const runtime = "edge";
+export { edgeRuntime as runtime } from "../../../lib/next-runtime";
 export const revalidate = 0;
 export const dynamic = "force-dynamic";
 

@@ -26,7 +26,7 @@ import { SIGNALS_RELATED_LINKS } from "../../lib/report/reportCopy";
 import { indicatorTypeByScoreLabel, indicatorTypeLabel } from "../../lib/indicatorClassification";
 import { HistoricalReplayDatePicker } from "./components/historicalReplayDatePicker";
 
-export const runtime = "edge";
+export { edgeRuntime as runtime } from "../../lib/next-runtime";
 export const revalidate = 900;
 
 export const metadata: Metadata = buildPageMetadata({

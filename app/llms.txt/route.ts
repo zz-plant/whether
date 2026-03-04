@@ -1,6 +1,6 @@
 import { resolveSiteUrl } from "../../lib/siteUrl";
 
-export const runtime = "edge";
+export { edgeRuntime as runtime } from "../../lib/next-runtime";
 export const revalidate = 3600;
 
 export async function GET() {

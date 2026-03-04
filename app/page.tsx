@@ -54,7 +54,7 @@ const ExecutiveSnapshotPanel = dynamic(
 );
 
 export const revalidate = 900;
-export const runtime = "edge";
+export { edgeRuntime as runtime } from "../lib/next-runtime";
 
 const homeSectionSequence = [
   { href: "#weekly-action-summary", label: "Weekly actions" },

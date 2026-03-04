@@ -6,7 +6,7 @@ import {
   parseIntegrationTarget,
 } from "../../../../lib/integrationBriefs";
 
-export const runtime = "edge";
+export { edgeRuntime as runtime } from "../../../../lib/next-runtime";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);

@@ -1,0 +1,1 @@
+export const edgeRuntime = "edge";
