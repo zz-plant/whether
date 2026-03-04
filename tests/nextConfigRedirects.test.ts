@@ -21,6 +21,18 @@ describe("next.config redirects", () => {
       permanent: true,
     });
 
+    assert.deepEqual(findRedirect("/learn/concepts/:slug"), {
+      source: "/learn/concepts/:slug",
+      destination: "/concepts/:slug",
+      permanent: true,
+    });
+
+    assert.deepEqual(findRedirect("/learn/failure-modes/:slug"), {
+      source: "/learn/failure-modes/:slug",
+      destination: "/library/failure-modes/:slug",
+      permanent: true,
+    });
+
     assert.deepEqual(findRedirect("/reference/concepts/:slug"), {
       source: "/reference/concepts/:slug",
       destination: "/concepts/:slug",
