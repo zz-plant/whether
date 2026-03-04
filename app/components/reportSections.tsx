@@ -1384,7 +1384,7 @@ export const ExecutiveSnapshotPanel = ({
           <DataProvenanceStrip provenance={provenance} />
         </div>
         <div className="mt-5 weather-bento-grid">
-          <div className="weather-tile col-span-1 sm:col-span-2 lg:col-span-2 lg:row-span-2 p-5 bg-gradient-to-br from-slate-950 via-slate-900/70 to-slate-950">
+          <div className="weather-tile col-span-1 p-5 sm:col-span-2 lg:col-span-2 lg:row-span-2">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex flex-wrap items-center gap-2">
                 <span

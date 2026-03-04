@@ -29,7 +29,7 @@ const toneConfig: Record<
     ),
     panelClassName: "border-emerald-400/60 bg-emerald-500/10 text-emerald-100",
     badgeClassName: "border-emerald-300/70 bg-emerald-400/20 text-emerald-100",
-    detailClassName: "text-emerald-100/85",
+    detailClassName: "text-emerald-200",
   },
   warning: {
     label: "Caution",
@@ -53,7 +53,7 @@ const toneConfig: Record<
     ),
     panelClassName: "border-amber-400/60 bg-amber-500/10 text-amber-100",
     badgeClassName: "border-amber-300/80 bg-amber-400/20 text-amber-100",
-    detailClassName: "text-amber-100/85",
+    detailClassName: "text-amber-200",
   },
   historical: {
     label: "Retrospective",
@@ -79,7 +79,7 @@ const toneConfig: Record<
     ),
     panelClassName: "border-slate-500/60 bg-slate-900/70 text-slate-200",
     badgeClassName: "border-slate-400/70 bg-slate-700/50 text-slate-100",
-    detailClassName: "text-slate-200/85",
+    detailClassName: "text-slate-200",
   },
 };
 

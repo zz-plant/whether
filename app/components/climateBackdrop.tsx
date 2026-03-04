@@ -110,7 +110,7 @@ export const ClimateBackdrop = ({ regime }: { regime: RegimeIconType | "NEUTRAL"
         />
       ) : null}
 
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/20 to-slate-950" />
+      <div className="weather-climate-backdrop-shade absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/20 to-slate-950" />
     </div>
   );
 };
