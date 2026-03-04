@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { SectionedReportPanel } from "./components/sectionedReportPanel";
 import { loadReportData } from "../../lib/report/reportData";
 import { siteUrl } from "../../lib/siteUrl";
-import { buildPageMetadata } from "../../lib/seo";
+import { buildPageMetadata, websiteName } from "../../lib/seo";
 import {
   buildTimeMachineHref,
   getAdjacentTimeMachineRequest,
@@ -59,7 +59,7 @@ export default async function OperationsPage({
     inLanguage: "en",
     isPartOf: {
       "@type": "WebSite",
-      name: "Whether — Capital Posture Governance Standard",
+      name: websiteName,
       url: siteUrl,
     },
     publisher: {
@@ -109,7 +109,7 @@ export default async function OperationsPage({
     ? "Use historical data for retrospectives; avoid approving new bets until live signals return."
     : isFallback
       ? "Hold irreversible decisions until live signals return or you validate the cache."
-      : "Signals are live; use them to confirm playbook moves and decision shields.";
+      : "Evidence feed is live; use it to confirm playbook moves and decision shields.";
   const trustStatusTone = historicalSelection
     ? "historical"
     : isFallback

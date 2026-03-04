@@ -15,8 +15,9 @@ export const primaryNavigation: PrimaryNavigationItem[] = [
   },
   {
     href: "/signals",
-    label: "Evidence",
-    description: "Evidence appendix for the weekly brief: diagnostics, thresholds, and timestamps.",
+    label: "Evidence appendix",
+    description:
+      "Diagnostics behind the weekly brief: thresholds, timestamped inputs, and historical context.",
   },
   {
     href: "/operations",
