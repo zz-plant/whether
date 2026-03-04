@@ -1,5 +1,5 @@
 /**
- * Insight Database for Market Climate Station.
+ * Insight Database for Regime Station.
  * Translates macro signals into plain-English product and engineering constraints.
  */
 export const insightDatabase = {

@@ -1,4 +1,4 @@
-# Whether — Market Climate Station
+# Whether — Regime Station
 
 Whether translates public macro signals into operational guidance for product and engineering leaders.
 
