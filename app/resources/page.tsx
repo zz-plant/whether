@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import type { Route } from "next";
 import Link from "next/link";
 import { StaticHubNav } from "../components/staticHubNav";
-import { buildPageMetadata } from "../../lib/pageMetadata";
+import { buildBreadcrumbList, buildPageMetadata, serializeJsonLd } from "../../lib/pageMetadata";
 import { resourceArticles } from "../../lib/resourceArticles";
 import { resourcePillarPages, resourceSupportingPages } from "../../lib/resourcesContent";
+import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
+import { BreadcrumbTrail } from "../components/breadcrumbTrail";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Resources — board governance pillars",
@@ -37,8 +39,20 @@ const toolPages = [
 ];
 
 export default function ResourcesPage() {
+  const breadcrumbStructuredData = {
+    "@context": "https://schema.org",
+    ...buildBreadcrumbList(
+      createBreadcrumbTrail([
+        { path: "/" },
+        { path: "/resources" },
+      ]),
+    ),
+  };
+
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }} />
+      <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Resources" }]} />
       <StaticHubNav currentPath="/resources" />
       <section className="weather-panel space-y-3 px-6 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Resources</h1>

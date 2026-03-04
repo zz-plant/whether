@@ -15,6 +15,8 @@ import {
   regimeToneByKey,
 } from "../../../lib/productCanon";
 import { getConceptPublicationRegime, getConceptRegimeStatus, getCurrentRegimeContext } from "../../../lib/conceptRegime";
+import { createBreadcrumbTrail } from "../../../lib/navigation/breadcrumbs";
+import { BreadcrumbTrail } from "../../components/breadcrumbTrail";
 
 type ConceptArticlePageProps = {
   params: Promise<{ slug: string }>;
@@ -111,11 +113,13 @@ export default async function ConceptArticlePage({ params }: ConceptArticlePageP
 
   const breadcrumbStructuredData = {
     "@context": "https://schema.org",
-    ...buildBreadcrumbList([
-      { name: "Home", path: "/" },
-      { name: "Concepts", path: "/concepts" },
-      { name: article.title, path: `/concepts/${article.slug}` },
-    ]),
+    ...buildBreadcrumbList(
+      createBreadcrumbTrail([
+        { path: "/" },
+        { path: "/concepts" },
+        { path: `/concepts/${article.slug}`, label: article.title },
+      ]),
+    ),
   };
 
   return (
@@ -127,6 +131,13 @@ export default async function ConceptArticlePage({ params }: ConceptArticlePageP
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }}
+      />
+      <BreadcrumbTrail
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Concepts", href: "/concepts" },
+          { label: article.title },
+        ]}
       />
       <section className="weather-panel space-y-4 px-6 py-6">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">PM canon article</p>

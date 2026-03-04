@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { buildCanonicalUrl, buildPageMetadata, serializeJsonLd } from "../../lib/seo";
+import { buildBreadcrumbList, buildCanonicalUrl, buildPageMetadata, serializeJsonLd } from "../../lib/seo";
 import {
   conceptAudiences,
   conceptFocuses,
@@ -15,6 +15,8 @@ import {
   toConceptTaxonomySlug,
 } from "../../lib/productCanon";
 import { getConceptPublicationRegime, getConceptRegimeStatus, getCurrentRegimeContext } from "../../lib/conceptRegime";
+import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
+import { BreadcrumbTrail } from "../components/breadcrumbTrail";
 
 export const dynamic = "force-static";
 
@@ -140,6 +142,16 @@ export default async function ProductConceptTimelinePage({
   );
 
 
+  const breadcrumbStructuredData = {
+    "@context": "https://schema.org",
+    ...buildBreadcrumbList(
+      createBreadcrumbTrail([
+        { path: "/" },
+        { path: "/concepts" },
+      ]),
+    ),
+  };
+
   const conceptCollectionStructuredData = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
@@ -169,6 +181,11 @@ export default async function ProductConceptTimelinePage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(conceptCollectionStructuredData) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }}
+      />
+      <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Concepts" }]} />
       <section className="weather-panel space-y-4 px-6 py-6">
         <p className="type-kicker uppercase tracking-[0.2em]">
           Product canon in context

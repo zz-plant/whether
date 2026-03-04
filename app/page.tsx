@@ -28,6 +28,7 @@ import { deriveDecisionKnobs } from "../lib/report/decisionKnobs";
 import { ActionStrip } from "./components/actionStrip";
 import { buildSlackBrief } from "../lib/export/briefBuilders";
 import { CopySlackBriefButton } from "./components/copySlackBriefButton";
+import { createBreadcrumbTrail } from "../lib/navigation/breadcrumbs";
 
 const WeeklyActionSummaryPanel = dynamic(
   () =>
@@ -259,7 +260,7 @@ export default async function HomePage({
           },
         },
       },
-      buildBreadcrumbList([{ name: "Weekly briefing", path: "/" }]),
+      buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }])),
     ],
   };
 

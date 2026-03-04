@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Collapsible } from "@base-ui/react/collapsible";
 import { NavigationMenu } from "@base-ui/react/navigation-menu";
 import { pathMatchesLink } from "../../lib/navigation/pathMatching";
@@ -381,17 +382,85 @@ export const ReportMobileNavigation = ({
   pageTitle,
   currentPath,
   className,
+  sectionLinks = [],
 }: {
   pageLinks: ReportPageLink[];
   pageTitle: string;
   currentPath?: string;
   className?: string;
+  sectionLinks?: ReportSectionLink[];
 }) => {
   const { currentLink, adjacentLinks } = getPageNavigationState(
     pageLinks,
     pageTitle,
     currentPath,
   );
+
+  const [activeSectionHref, setActiveSectionHref] = useState(sectionLinks[0]?.href);
+
+  const sectionIdByHref = useMemo(
+    () =>
+      sectionLinks.reduce<Record<string, string>>((accumulator, section) => {
+        const id = section.href.startsWith("#") ? section.href.slice(1) : "";
+        if (id) {
+          accumulator[section.href] = id;
+        }
+        return accumulator;
+      }, {}),
+    [sectionLinks],
+  );
+
+  useEffect(() => {
+    if (!sectionLinks.length) {
+      return;
+    }
+
+    const updateFromHash = () => {
+      const hashHref = window.location.hash;
+      if (hashHref && sectionLinks.some((section) => section.href === hashHref)) {
+        setActiveSectionHref(hashHref);
+      }
+    };
+
+    updateFromHash();
+    window.addEventListener("hashchange", updateFromHash);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleEntry = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((left, right) => left.boundingClientRect.top - right.boundingClientRect.top)[0];
+
+        if (!visibleEntry) {
+          return;
+        }
+
+        const matchingHref = Object.entries(sectionIdByHref).find(([, sectionId]) => sectionId === visibleEntry.target.id)?.[0];
+
+        if (matchingHref) {
+          setActiveSectionHref(matchingHref);
+        }
+      },
+      { rootMargin: "-45% 0px -45% 0px", threshold: [0, 0.2, 0.4, 0.6, 0.8, 1] },
+    );
+
+    Object.values(sectionIdByHref).forEach((sectionId) => {
+      const sectionElement = document.getElementById(sectionId);
+      if (sectionElement) {
+        observer.observe(sectionElement);
+      }
+    });
+
+    return () => {
+      window.removeEventListener("hashchange", updateFromHash);
+      observer.disconnect();
+    };
+  }, [sectionIdByHref, sectionLinks]);
+
+  const activeSectionIndex = sectionLinks.findIndex((section) => section.href === activeSectionHref);
+  const resolvedActiveSectionIndex = activeSectionIndex >= 0 ? activeSectionIndex : 0;
+  const activeSectionLabel = sectionLinks[resolvedActiveSectionIndex]?.label;
+
   const pageCountLabel =
     pageLinks.length === 1 ? "1 page" : `${pageLinks.length} pages`;
 
@@ -399,6 +468,14 @@ export const ReportMobileNavigation = ({
     <NavigationMenu.Root aria-label="Mobile report navigation" className={className}>
       <div className="relative">
         <div className="weather-mobile-nav flex flex-col gap-2 px-3 py-3">
+          {sectionLinks.length ? (
+            <div className="rounded-2xl border border-slate-800/80 bg-slate-950/70 px-3 py-2">
+              <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-300">
+                {`${resolvedActiveSectionIndex + 1}/${sectionLinks.length} · ${activeSectionLabel ?? "Overview"}`}
+              </p>
+              <p className="mt-1 truncate text-xs text-slate-400">{`${currentLink.label} / ${activeSectionLabel ?? "Overview"}`}</p>
+            </div>
+          ) : null}
           <div className="flex min-w-0 items-center justify-between gap-3 rounded-2xl border border-slate-800/80 bg-slate-950/70 px-3 py-2">
             <div className="flex min-w-0 items-center gap-3">
             <span className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl border border-slate-800/80 bg-slate-950/80 text-slate-100">

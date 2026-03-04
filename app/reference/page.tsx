@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { buildPageMetadata } from "../../lib/seo";
+import { buildBreadcrumbList, buildPageMetadata, serializeJsonLd } from "../../lib/seo";
 import { StaticHubNav } from "../components/staticHubNav";
+import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
+import { BreadcrumbTrail } from "../components/breadcrumbTrail";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Reference — methods, formulas, and source map",
@@ -12,8 +14,20 @@ export const metadata: Metadata = buildPageMetadata({
 });
 
 export default function ReferencePage() {
+  const breadcrumbStructuredData = {
+    "@context": "https://schema.org",
+    ...buildBreadcrumbList(
+      createBreadcrumbTrail([
+        { path: "/" },
+        { path: "/reference" },
+      ]),
+    ),
+  };
+
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }} />
+      <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Reference" }]} />
       <StaticHubNav currentPath="/reference" />
       <section className="weather-panel space-y-3 px-6 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Reference</h1>

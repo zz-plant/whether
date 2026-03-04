@@ -702,6 +702,7 @@ export const ReportShell = ({
             pageTitle={pageTitle}
             currentPath={currentPath}
             className="mt-3 px-4 pb-6"
+            sectionLinks={sectionLinks}
           />
           </div>
         ) : null}

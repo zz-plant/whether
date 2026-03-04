@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildBreadcrumbList, buildCanonicalUrl, buildPageMetadata, serializeJsonLd } from "../../../../lib/seo";
 import { roleLandingBySlug, roleLandings } from "../roleLandingData";
+import { createBreadcrumbTrail } from "../../../../lib/navigation/breadcrumbs";
+import { BreadcrumbTrail } from "../../../components/breadcrumbTrail";
 
 const rolePageTitleSuffix = "career growth playbook";
 
@@ -73,12 +75,14 @@ export default async function CareerPathRolePage({
 
   const breadcrumbStructuredData = {
     "@context": "https://schema.org",
-    ...buildBreadcrumbList([
-      { name: "Home", path: "/" },
-      { name: "Solutions", path: "/solutions" },
-      { name: "Career paths", path: "/solutions/career-paths" },
-      { name: roleLanding.roleTitle, path: `/solutions/career-paths/${roleLanding.slug}` },
-    ]),
+    ...buildBreadcrumbList(
+      createBreadcrumbTrail([
+        { path: "/" },
+        { path: "/solutions" },
+        { path: "/solutions/career-paths" },
+        { path: `/solutions/career-paths/${roleLanding.slug}`, label: roleLanding.roleTitle },
+      ]),
+    ),
   };
 
   const connectedWorkflow = [
@@ -111,6 +115,14 @@ export default async function CareerPathRolePage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }}
+      />
+      <BreadcrumbTrail
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Solutions", href: "/solutions" },
+          { label: "Career paths", href: "/solutions/career-paths" },
+          { label: roleLanding.roleTitle },
+        ]}
       />
       <section className="weather-panel space-y-4 px-6 py-6">
         <Link
