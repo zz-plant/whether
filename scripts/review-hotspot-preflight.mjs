@@ -18,8 +18,22 @@ function sh(cmd, cmdArgs) {
   return execFileSync(cmd, cmdArgs, { encoding: "utf8" }).trim();
 }
 
+function isAllZeroSha(value) {
+  return /^0{40}$/.test(value);
+}
+
+function sanitizeBaseRef(base) {
+  if (!base || isAllZeroSha(base)) return "";
+
+  try {
+    return sh("git", ["rev-parse", "--verify", base]) ? base : "";
+  } catch {
+    return "";
+  }
+}
+
 function getDiffRange() {
-  const base = readArg("--base", process.env.REVIEW_HOTSPOT_BASE || "");
+  const base = sanitizeBaseRef(readArg("--base", process.env.REVIEW_HOTSPOT_BASE || ""));
   const head = readArg("--head", process.env.REVIEW_HOTSPOT_HEAD || "HEAD");
 
   if (base) {
