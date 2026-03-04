@@ -46,6 +46,22 @@ const deltaSignalOrder: Array<{
   { key: "curveSlope", label: "Curve slope" },
 ];
 
+const dialLevelLabels = ["0 · Open", "1 · Cautious", "2 · Strict", "3 · Maximum strictness"];
+
+function getDeltaMagnitudeLabel(delta: number): string {
+  const absoluteDelta = Math.abs(delta);
+  if (absoluteDelta === 0) {
+    return "no";
+  }
+  if (absoluteDelta < 0.5) {
+    return "minor";
+  }
+  if (absoluteDelta < 2) {
+    return "moderate";
+  }
+  return "major";
+}
+
 export function WeeklyDecisionCard({
   regime,
   statusLabel,
@@ -92,6 +108,7 @@ export function WeeklyDecisionCard({
 
       <article className="rounded-xl border border-slate-700/70 bg-slate-900/50 p-4">
         <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">What changed since last week</h2>
+        <p className="mt-2 text-xs text-slate-300">Each line shows direction (improving/weakening) and impact (minor/moderate/major).</p>
         <ul className="mt-3 grid gap-3 text-sm text-slate-100 sm:grid-cols-2">
           {deltaSignalOrder.map((item) => {
             const delta = deltasByKey.get(item.key) ?? 0;
@@ -102,15 +119,23 @@ export function WeeklyDecisionCard({
               : isImproving
                 ? "text-emerald-200"
                 : "text-rose-200";
-            const barWidth = Math.max(8, Math.min(100, Math.round(Math.abs(delta) * 55)));
+            const deltaMagnitudeLabel = getDeltaMagnitudeLabel(delta);
+            const directionIcon = delta === 0 ? "→" : isImproving ? "↑" : "↓";
             return (
               <li key={item.key} className="rounded-lg border border-slate-700/60 bg-slate-950/60 p-3">
-                <p className={`mt-1 text-base font-semibold ${trendClassName}`}>
-                  {item.label}: {interpretationLabel} ({delta > 0 ? "+" : ""}{delta.toFixed(1)})
-                </p>
-                <span className="mt-2 block h-1.5 rounded-full bg-slate-800" aria-hidden="true">
-                  <span className={`block h-full rounded-full ${delta === 0 ? "bg-slate-500" : isImproving ? "bg-emerald-400" : "bg-rose-400"}`} style={{ width: `${barWidth}%` }} />
-                </span>
+                <p className="mt-1 text-base font-semibold text-slate-50">{item.label}</p>
+                <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+                  <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-1 font-semibold uppercase tracking-[0.08em] ${delta === 0
+                    ? "border-slate-600 text-slate-300"
+                    : isImproving
+                      ? "border-emerald-400/60 text-emerald-200"
+                      : "border-rose-400/60 text-rose-200"}`}>
+                    <span aria-hidden="true">{directionIcon}</span>
+                    {interpretationLabel}
+                  </span>
+                  <span className="rounded-full border border-slate-700 px-2 py-1 text-slate-300">{deltaMagnitudeLabel} move</span>
+                  <span className={`font-semibold ${trendClassName}`}>{delta > 0 ? "+" : ""}{delta.toFixed(1)}</span>
+                </div>
               </li>
             );
           })}
@@ -126,13 +151,16 @@ export function WeeklyDecisionCard({
             const deltaLabel = knob.delta === 0 ? "unchanged" : knob.delta > 0 ? "raised" : "lowered";
             return (
               <div key={knob.key} className="rounded-lg border border-slate-700/60 bg-slate-950/60 p-3">
-                <p className="text-xs uppercase tracking-[0.12em] text-slate-300">{knob.label}: {knob.value}/3 <span className="normal-case">({deltaLabel})</span></p>
-                <div className="mt-2 flex items-center gap-2" aria-hidden="true">
-                  {[1, 2, 3].map((level) => (
+                <p className="text-xs uppercase tracking-[0.12em] text-slate-300">{knob.label}</p>
+                <p className="mt-1 text-sm font-semibold text-slate-100">{dialLevelLabels[knob.value]} <span className="text-slate-300">({deltaLabel})</span></p>
+                <div className="mt-2 flex items-center gap-1.5" aria-hidden="true">
+                  {[0, 1, 2, 3].map((level) => (
                     <span
                       key={level}
-                      className={`h-2.5 flex-1 rounded-full ${level <= knob.value ? "bg-sky-300" : "bg-slate-800"}`}
-                    />
+                      className={`flex h-7 min-w-0 flex-1 items-center justify-center rounded-md text-[11px] font-semibold ${level <= knob.value ? "bg-sky-300 text-slate-950" : "bg-slate-800 text-slate-400"}`}
+                    >
+                      {level}
+                    </span>
                   ))}
                 </div>
               </div>
