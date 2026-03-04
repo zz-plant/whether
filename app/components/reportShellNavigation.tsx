@@ -240,6 +240,15 @@ const pageLinkIcons: Record<string, ReactNode> = {
   ),
 };
 
+const iconLabelAliases: Record<string, keyof typeof pageLinkIcons> = {
+  "Start Here": "Plan",
+  "Role Guides": "Decide",
+  Playbook: "Operations",
+  Templates: "Reference",
+  "How it works": "Method",
+  Concepts: "Method",
+};
+
 export const ReportPageNavigation = ({
   pageLinks,
   pageTitle,
@@ -479,7 +488,7 @@ export const ReportMobileNavigation = ({
           <div className="flex min-w-0 items-center justify-between gap-3 rounded-2xl border border-slate-800/80 bg-slate-950/70 px-3 py-2">
             <div className="flex min-w-0 items-center gap-3">
             <span className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl border border-slate-800/80 bg-slate-950/80 text-slate-100">
-              {pageLinkIcons[currentLink.label] ?? pageLinkIcons.Method}
+              {pageLinkIcons[iconLabelAliases[currentLink.label] ?? currentLink.label] ?? pageLinkIcons.Method}
             </span>
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold tracking-[0.08em] text-slate-100">
