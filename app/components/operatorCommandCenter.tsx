@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { handleDirectionalFocus } from "./directionalFocus";
+import { useHapticFeedback } from "./useHapticFeedback";
 import { ArrowRightIcon, BoltIcon, CircleTargetIcon, LayoutGridIcon, SectionJumpIcon } from "./uiIcons";
 
 export type OperatorCommandAction = {
@@ -92,6 +93,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
   const [isExpanded, setIsExpanded] = useState(true);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const commandCenterRef = useRef<HTMLElement | null>(null);
+  const triggerHaptic = useHapticFeedback();
 
   const onDirectionalKeyDown = (event: ReactKeyboardEvent<HTMLElement>) => {
     if (!commandCenterRef.current) {
@@ -228,6 +230,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
 
   const handleExpand = () => {
     setIsExpanded(true);
+    triggerHaptic("light");
     if (isFirstSession) {
       setIsFirstSession(false);
       window.localStorage.setItem(VISITED_KEY, "1");
@@ -237,12 +240,14 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
 
   const handleCollapse = () => {
     setIsExpanded(false);
+    triggerHaptic("selection");
   };
 
   const handleReset = () => {
     setQuery("");
     setFilter(isMobile ? "Playbook" : "All");
     searchInputRef.current?.focus();
+    triggerHaptic("selection");
   };
 
   const defaultFilter = isMobile ? "Playbook" : "All";
@@ -329,7 +334,10 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
                     <button
                       key={item}
                       type="button"
-                      onClick={() => setFilter(item)}
+                      onClick={() => {
+                        setFilter(item);
+                        triggerHaptic("selection");
+                      }}
                       className={`${filterClassName} ${
                         isActive
                           ? "border-sky-400/70 bg-sky-500/15 text-sky-100"
@@ -417,6 +425,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
                             className="weather-pill inline-flex min-h-[44px] w-full items-center justify-between gap-3 px-3 py-2 text-left transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
                             title={action.description}
                             aria-label={`${action.label} (${isInPageLink(action.href) ? "section jump" : "page navigation"})`}
+                            onClick={() => triggerHaptic("light")}
                           >
                             <span className="inline-flex min-w-0 items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-100">
                               <span aria-hidden="true" className="text-slate-400">
