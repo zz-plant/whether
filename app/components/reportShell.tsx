@@ -150,6 +150,22 @@ export const ReportShell = ({
   const sourceHref = treasurySource.startsWith("http")
     ? treasurySource
     : undefined;
+  const sourceLabel = sourceHref
+    ? (() => {
+        try {
+          const hostname = new URL(sourceHref).hostname.replace(/^www\./, "");
+          if (hostname.includes("stlouisfed.org")) {
+            return "FRED";
+          }
+          if (hostname.includes("fiscaldata.treasury.gov")) {
+            return "Treasury Fiscal Data";
+          }
+          return hostname;
+        } catch {
+          return treasurySource;
+        }
+      })()
+    : treasurySource;
   const missionGridClassName = "grid gap-3 lg:grid-cols-[1.6fr,1.4fr]";
   const heroHeaderSpacingClassName = "space-y-3 sm:space-y-4";
   const heroSectionSpacingClassName =
@@ -181,7 +197,7 @@ export const ReportShell = ({
           <div className="flex items-center justify-between gap-3">
             <dt className="text-slate-400">Source</dt>
             <dd className="text-right text-slate-200">
-              <span>Treasury fiscal API</span>
+              <span>{sourceLabel}</span>
               {sourceHref ? (
                 <a
                   href={sourceHref}
@@ -288,7 +304,7 @@ export const ReportShell = ({
         href="/"
         className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-[11px] font-semibold tracking-[0.14em]"
       >
-        View full evidence
+        Open weekly brief
       </Link>
     </div>
   ) : null;
