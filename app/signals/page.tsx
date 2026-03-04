@@ -358,8 +358,8 @@ export default async function SignalsPage({
         openPanelHref={timeMachineHref}
       />
 
-      <section id="decision-summary" className="weather-panel space-y-6 px-6 py-5" aria-label="Decision summary">
-        <div className="weather-surface grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4">
+      <section id="decision-summary" className="weather-panel space-y-6 px-6 py-4" aria-label="Decision summary">
+        <div className="weather-surface grid gap-3 px-4 py-3 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-200">Posture</p>
             <p className="mt-1 text-sm font-semibold text-slate-100">{regimeLabel}</p>
@@ -378,26 +378,26 @@ export default async function SignalsPage({
           </div>
         </div>
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]">
-          <article className="weather-surface space-y-3 p-5">
+          <article className="weather-surface space-y-3 px-5 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-200">Current posture</p>
             <h2 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
               {regimeLabel} regime is the active operating posture.
             </h2>
-            <p className="text-sm leading-relaxed text-slate-200 sm:text-base">
+            <p className="text-[15px] leading-relaxed text-slate-200 sm:text-base">
               Use this page to validate confidence, inspect the highest-impact movers, and verify threshold-level evidence before changing posture.
             </p>
             <dl className="grid gap-3 rounded-xl border border-slate-800/80 bg-slate-950/40 p-3 sm:grid-cols-3">
               <div>
                 <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">Recommended action</dt>
-                <dd className="mt-1 text-xs text-slate-100">Continue current operating posture and monitor the top movers daily.</dd>
+                <dd className="mt-1 text-[13px] leading-relaxed text-slate-100">Continue current operating posture and monitor the top movers daily.</dd>
               </div>
               <div>
                 <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">Impact if wrong</dt>
-                <dd className="mt-1 text-xs text-slate-100">Execution pacing can drift if liquidity conditions shift before the next review.</dd>
+                <dd className="mt-1 text-[13px] leading-relaxed text-slate-100">Execution pacing can drift if liquidity conditions shift before the next review.</dd>
               </div>
               <div>
                 <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">Next checkpoint</dt>
-                <dd className="mt-1 text-xs text-slate-100">Re-check after the next data refresh and threshold confirmation.</dd>
+                <dd className="mt-1 text-[13px] leading-relaxed text-slate-100">Re-check after the next data refresh and threshold confirmation.</dd>
               </div>
             </dl>
             <div className="flex flex-wrap gap-2 pt-1">
@@ -415,14 +415,14 @@ export default async function SignalsPage({
               </a>
             </div>
           </article>
-          <article className="weather-surface space-y-3 p-5">
+          <article className="weather-surface space-y-3 px-5 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-200">Top 3 movers</p>
             <ul className="space-y-3" aria-label="Top mover callouts">
               {topDiagnosticCallouts.map((item, index) => (
-                <li key={item.label} className="rounded-xl border border-slate-800/80 bg-slate-950/40 p-3">
+                <li key={item.label} className="rounded-xl border border-slate-800/80 bg-slate-950/40 px-3 py-2.5">
                   <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">Mover {index + 1}</p>
                   <p className="mt-1 text-sm font-semibold text-slate-100">{item.label}</p>
-                  <p className="mt-1 text-sm text-slate-200">{item.why}</p>
+                  <p className="mt-1 text-[15px] text-slate-200 sm:text-base">{item.why}</p>
                   <a
                     href={item.href}
                     className="mt-2 inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
@@ -436,20 +436,30 @@ export default async function SignalsPage({
         </div>
       </section>
 
-      <section id="historical-replay" className="weather-panel space-y-4 px-6 py-5">
-        <header className="space-y-2">
-          <p className="text-sm font-semibold tracking-[0.18em] text-slate-300">Historical regime replay</p>
-          <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
-            Pick any date to replay the mandate card context.
-          </h2>
-          <p className="text-sm text-slate-300">
-            We snap your selection to the closest available monthly snapshot and label the replay timestamp.
-          </p>
-        </header>
-        <HistoricalReplayDatePicker initialDate={`${selectedYear}-${String(selectedMonth).padStart(2, "0")}-01`} />
+      <section id="historical-replay" className="weather-panel space-y-4 px-6 py-4">
+        <details className="weather-surface group px-4 py-3" open={Boolean(historicalSelection)}>
+          <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 text-left">
+            <span className="space-y-1">
+              <span className="text-sm font-semibold tracking-[0.18em] text-slate-300">Historical regime replay</span>
+              <span className="block text-[15px] text-slate-300 sm:text-base">Open only when you need retrospective context or regime backtesting.</span>
+            </span>
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-slate-700/70 text-slate-400 transition-transform group-open:rotate-180">⌄</span>
+          </summary>
+          <header className="mt-4 space-y-2">
+            <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
+              Pick any date to replay the mandate card context.
+            </h2>
+            <p className="text-[15px] text-slate-300 sm:text-base">
+              We snap your selection to the closest available monthly snapshot and label the replay timestamp.
+            </p>
+          </header>
+          <div className="mt-4">
+            <HistoricalReplayDatePicker initialDate={`${selectedYear}-${String(selectedMonth).padStart(2, "0")}-01`} />
+          </div>
+        </details>
       </section>
 
-      <section id="current-scores" className="weather-panel space-y-4 px-6 py-5">
+      <section id="current-scores" className="weather-panel space-y-4 px-6 py-4">
         <header className="space-y-2">
           <p className="text-sm font-semibold tracking-[0.18em] text-slate-300">Current scores</p>
           <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
@@ -462,13 +472,13 @@ export default async function SignalsPage({
               <h3 className="text-sm font-semibold tracking-[0.14em] text-slate-300">{indicatorTypeLabel[type]}</h3>
               <div className="grid gap-3 lg:grid-cols-3">
                 {scoreCardsByType[type].map((card) => (
-                  <article key={card.label} className="weather-surface space-y-3 p-4">
+                  <article key={card.label} className="weather-surface space-y-3 px-4 py-3">
                     <dl>
                       <dt className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">{card.label}</dt>
                       <dd className="mono mt-2 text-3xl leading-none text-slate-100">{card.value}</dd>
                     </dl>
                     <p className="text-sm font-semibold text-slate-200">Threshold: {card.threshold}</p>
-                    <p className="text-sm text-slate-300">{card.description}</p>
+                    <p className="text-[15px] text-slate-300 sm:text-base">{card.description}</p>
                     <a
                       href={card.href}
                       className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
@@ -483,7 +493,7 @@ export default async function SignalsPage({
         </div>
       </section>
 
-      <section id="evidence-priorities" className="weather-panel space-y-4 px-6 py-5" aria-label="Signal diagnostics queue">
+      <section id="evidence-priorities" className="weather-panel space-y-4 px-6 py-4" aria-label="Signal diagnostics queue">
         <header className="space-y-2">
           <p className="text-sm font-semibold tracking-[0.18em] text-slate-300">Evidence priorities</p>
           <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
@@ -511,10 +521,10 @@ export default async function SignalsPage({
         </div>
         <ol className="grid gap-3 md:grid-cols-2" aria-label="Prioritized signal queue">
           {essentialPriorityQueue.map((item, index) => (
-            <li key={item.label} className="weather-surface space-y-2 p-4">
+            <li key={item.label} className="weather-surface space-y-2 px-4 py-3">
               <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">Priority {index + 1}</p>
               <p className="text-sm font-semibold text-slate-100">{item.label}</p>
-              <p className="text-sm text-slate-200">{item.why}</p>
+              <p className="text-[15px] text-slate-200 sm:text-base">{item.why}</p>
               <a
                 href={item.href}
                 className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
@@ -525,17 +535,17 @@ export default async function SignalsPage({
           ))}
         </ol>
         {additionalPriorityQueue.length ? (
-          <details className="weather-surface group p-4">
+          <details className="weather-surface group px-4 py-3">
             <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.14em] text-slate-200">
               <span>Show full priority queue</span>
               <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-400 transition-transform group-open:rotate-180">⌄</span>
             </summary>
             <ol className="mt-3 grid gap-3" aria-label="Additional prioritized signal queue">
               {additionalPriorityQueue.map((item, index) => (
-                <li key={item.label} className="rounded-xl border border-slate-800/80 bg-slate-950/50 p-4">
+                <li key={item.label} className="rounded-xl border border-slate-800/80 bg-slate-950/50 px-4 py-3">
                   <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">Priority {index + essentialPriorityQueue.length + 1}</p>
                   <p className="mt-2 text-sm font-semibold text-slate-100">{item.label}</p>
-                  <p className="mt-1 text-sm text-slate-200">{item.why}</p>
+                  <p className="mt-1 text-[15px] text-slate-200 sm:text-base">{item.why}</p>
                   <a
                     href={item.href}
                     className="mt-2 inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
@@ -549,14 +559,14 @@ export default async function SignalsPage({
         ) : null}
       </section>
 
-      <section id="signal-diagnostics" className="weather-panel space-y-4 px-6 py-5" aria-label="Signal diagnostics">
+      <section id="signal-diagnostics" className="weather-panel space-y-4 px-6 py-4" aria-label="Signal diagnostics">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Diagnostics</p>
             <h2 className="text-xl font-semibold text-slate-100">
               {showFullDiagnostics ? "Full diagnostics" : "Top drivers"}
             </h2>
-            <p className="text-sm text-slate-300">
+            <p className="text-[15px] text-slate-300 sm:text-base">
               {showFullDiagnostics
                 ? "Showing the full diagnostic set for deep validation and audits."
                 : "Start with the top 3 drivers. Expand only when you need full diagnostic depth."}
@@ -573,10 +583,10 @@ export default async function SignalsPage({
         {!showFullDiagnostics ? (
           <ol className="grid gap-3 md:grid-cols-3" aria-label="Top 3 signal drivers">
             {topDiagnosticCallouts.map((item, index) => (
-              <li key={item.label} className="weather-surface space-y-2 p-4">
+              <li key={item.label} className="weather-surface space-y-2 px-4 py-3">
                 <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">Driver {index + 1}</p>
                 <p className="text-sm font-semibold text-slate-100">{item.label}</p>
-                <p className="text-sm text-slate-200">{item.why}</p>
+                <p className="text-[15px] text-slate-200 sm:text-base">{item.why}</p>
                 <a
                   href={item.href}
                   className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
@@ -597,8 +607,8 @@ export default async function SignalsPage({
         )}
       </section>
 
-      <section className="weather-panel space-y-4 px-6 py-5" id="advanced-controls">
-        <div className="grid gap-4 rounded-2xl border border-slate-800/80 bg-slate-950/50 p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+      <section className="weather-panel space-y-4 px-6 py-4" id="advanced-controls">
+        <div className="grid gap-4 rounded-2xl border border-slate-800/80 bg-slate-950/50 px-5 py-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
           <div className="space-y-3">
             <div className="flex min-h-[44px] items-center gap-3 text-sm font-semibold text-slate-100">
               <span>Advanced filters and historical tools</span>
@@ -606,7 +616,7 @@ export default async function SignalsPage({
                 {showAdvanced ? "Open" : "Closed"}
               </span>
             </div>
-            <p className="text-sm leading-relaxed text-slate-300">
+            <p className="text-[15px] leading-relaxed text-slate-300 sm:text-base">
               Use advanced controls when you need threshold tuning, historical snapshots, or regime
               timeline diagnostics. Keep this closed for the default executive scan.
             </p>

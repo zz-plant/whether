@@ -436,7 +436,7 @@ export const ReportShell = ({
                           <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
                             {pageTitle}
                           </h1>
-                          <p className="flex max-w-2xl flex-wrap items-center gap-x-2 gap-y-1 text-sm leading-relaxed text-slate-200 sm:text-base">
+                          <p className="flex max-w-2xl flex-wrap items-center gap-x-2 gap-y-1 text-[15px] leading-relaxed text-slate-200 sm:text-base">
                             <span>{pageSummary}</span>
                             {summaryLink}
                           </p>
@@ -449,7 +449,7 @@ export const ReportShell = ({
                           <h1 className="type-headline text-slate-100">
                             {pageTitle}
                           </h1>
-                          <p className="flex max-w-2xl flex-wrap items-center gap-x-2 gap-y-1 text-sm leading-relaxed text-slate-200 sm:text-base">
+                          <p className="flex max-w-2xl flex-wrap items-center gap-x-2 gap-y-1 text-[15px] leading-relaxed text-slate-200 sm:text-base">
                             <span>{pageSummary}</span>
                             {summaryLink}
                           </p>
@@ -468,7 +468,7 @@ export const ReportShell = ({
                         copyText={primaryCta.copyText}
                         copyTarget={primaryCta.copyTarget}
                         label={primaryCta.label}
-                        className="weather-button-primary inline-flex min-h-[44px] w-full max-w-full items-center justify-center px-4 py-2 text-center text-xs font-semibold leading-tight tracking-[0.12em] shadow-lg shadow-sky-500/30 ring-1 ring-sky-200/30 transition-colors hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:text-xs sm:tracking-[0.2em]"
+                        className="weather-button-primary inline-flex min-h-[44px] w-full max-w-full items-center justify-center px-4 py-2 text-center text-xs font-semibold leading-tight tracking-[0.12em] ring-1 ring-sky-200/20 transition-colors hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:text-xs sm:tracking-[0.2em]"
                       >
                         <span className="max-w-full break-words text-center">{primaryCta.label}</span>
                       </ReportCta>
@@ -483,7 +483,7 @@ export const ReportShell = ({
                       {exportCta ? (
                         <a
                           href={exportCta.href}
-                          className="weather-pill inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-sky-400/70 bg-sky-500/10 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-sky-100 transition-colors hover:border-sky-300 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto"
+                          className="weather-button inline-flex min-h-[44px] w-full items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto"
                         >
                           {exportCta.label}
                         </a>
@@ -534,7 +534,7 @@ export const ReportShell = ({
                       <span className="text-slate-400">·</span>
                       <span>Next refresh {resolvedNextRefreshLabel}</span>
                     </p>
-                    <p className="text-sm text-slate-200">{trustStatusAction}</p>
+                    <p className="text-[15px] text-slate-200 sm:text-base">{trustStatusAction}</p>
                     {showOfflineBadge ? (
                       <p className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.14em] text-amber-100">
                         {offlineBadgeLabel}
@@ -547,14 +547,14 @@ export const ReportShell = ({
                     aria-label="Mission control"
                   >
                     <div className={missionGridClassName}>
-                      <article className="weather-surface space-y-3 p-4">
+                      <article className="weather-surface space-y-3 px-4 py-3">
                         <p className="text-sm font-semibold tracking-[0.12em] text-slate-400">
                           {decisionBanner?.label ?? "Decide now"}
                         </p>
                         <h2 className="text-lg font-semibold text-slate-100 sm:text-xl">
                           {primaryDecisionText}
                         </h2>
-                        <p className="text-sm text-slate-300">
+                        <p className="text-[15px] text-slate-300 sm:text-base">
                           {missionSupportText}
                         </p>
                         {decisionDiffs && decisionDiffs.length > 0 ? (
@@ -591,7 +591,7 @@ export const ReportShell = ({
                         ) : null}
                       </article>
 
-                      <article className="weather-surface space-y-3 p-4">
+                      <article className="weather-surface space-y-3 px-4 py-3">
                         <p className="text-sm font-semibold tracking-[0.12em] text-slate-400">
                           {actionSequence?.title ?? "Plan"}
                         </p>
@@ -599,7 +599,7 @@ export const ReportShell = ({
                           {missionSequenceItems.map((item) => (
                             <li
                               key={item.title}
-                              className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-3"
+                              className="rounded-xl border border-slate-800/80 bg-slate-950/60 px-3 py-2.5"
                             >
                               <p className="text-xs font-semibold tracking-[0.1em] text-slate-400">
                                 {item.phase}
@@ -607,7 +607,7 @@ export const ReportShell = ({
                               <p className="mt-1 text-sm font-semibold text-slate-100">
                                 {item.title}
                               </p>
-                              <p className="mt-1 text-xs text-slate-300">
+                              <p className="mt-1 text-[13px] leading-relaxed text-slate-300">
                                 {item.detail}
                               </p>
                             </li>

@@ -23,19 +23,46 @@ export default function ReferencePage() {
       ]),
     ),
   };
+  const referenceDestinations = [
+    {
+      href: "/method",
+      title: "Method",
+      description: "How the model is constructed, what it includes, and where confidence limits apply.",
+      accentClass: "weather-card-accent-sky",
+    },
+    {
+      href: "/formulas",
+      title: "Formulas",
+      description: "Formula-level definitions, thresholds, and interpretation notes for key indicators.",
+      accentClass: "weather-card-accent-violet",
+    },
+    {
+      href: "/operations/data",
+      title: "Data operations",
+      description: "Data source cadence, handoff conventions, and operational data usage guidance.",
+      accentClass: "weather-card-accent-teal",
+    },
+    {
+      href: "/learn",
+      title: "Learn",
+      description: "Concepts and diagnostic failure modes for operator education and pattern recognition.",
+      accentClass: "weather-card-accent-amber",
+    },
+  ] as const;
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }} />
       <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Reference" }]} />
       <StaticHubNav currentPath="/reference" />
-      <section className="weather-panel space-y-3 px-6 py-6">
-        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Reference</h1>
-        <p className="text-sm text-slate-300">
+      <section className="weather-panel-hero space-y-3 px-6 py-5">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">Canonical trust surfaces</p>
+        <h1 className="type-section text-slate-100">Reference</h1>
+        <p className="text-[15px] text-slate-300 sm:text-base">
           Use Reference for canonical trust surfaces only: methods, formulas, and source transparency. For long-form board artifacts and templates, use Resources.
         </p>
         <div className="flex flex-wrap gap-3">
-          <Link href="/method" className="weather-button inline-flex items-center justify-center">
+          <Link href="/method" className="weather-button-primary inline-flex items-center justify-center">
             Open Method
           </Link>
           <Link href="/resources" className="weather-button inline-flex items-center justify-center">
@@ -45,22 +72,12 @@ export default function ReferencePage() {
       </section>
 
       <section className="grid gap-3 sm:grid-cols-2">
-        <Link href="/method" className="weather-panel space-y-2 px-4 py-4">
-          <h2 className="text-lg font-semibold text-slate-100">Method</h2>
-          <p className="text-sm text-slate-300">How the model is constructed, what it includes, and where confidence limits apply.</p>
-        </Link>
-        <Link href="/formulas" className="weather-panel space-y-2 px-4 py-4">
-          <h2 className="text-lg font-semibold text-slate-100">Formulas</h2>
-          <p className="text-sm text-slate-300">Formula-level definitions, thresholds, and interpretation notes for key indicators.</p>
-        </Link>
-        <Link href="/operations/data" className="weather-panel space-y-2 px-4 py-4">
-          <h2 className="text-lg font-semibold text-slate-100">Data operations</h2>
-          <p className="text-sm text-slate-300">Data source cadence, handoff conventions, and operational data usage guidance.</p>
-        </Link>
-        <Link href="/learn" className="weather-panel space-y-2 px-4 py-4">
-          <h2 className="text-lg font-semibold text-slate-100">Learn</h2>
-          <p className="text-sm text-slate-300">Concepts and diagnostic failure modes for operator education and pattern recognition.</p>
-        </Link>
+        {referenceDestinations.map((destination) => (
+          <Link key={destination.href} href={destination.href} className={`weather-panel weather-card-accent ${destination.accentClass} space-y-2 px-4 py-3`}>
+            <h2 className="text-lg font-semibold text-slate-100">{destination.title}</h2>
+            <p className="text-[15px] text-slate-300 sm:text-base">{destination.description}</p>
+          </Link>
+        ))}
       </section>
     </main>
   );

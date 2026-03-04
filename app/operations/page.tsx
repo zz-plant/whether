@@ -205,6 +205,7 @@ export default async function OperationsPage({
         id="ops-monthly-action-summary"
         title="Monthly action summary"
         description="The moves the regime recommends this month."
+        tone="sky"
       >
         <MonthlyActionSummaryPanel
           assessment={assessment}
@@ -213,10 +214,12 @@ export default async function OperationsPage({
         />
       </SectionedReportPanel>
 
+      <div className="weather-section-divider" aria-hidden="true" />
       <SectionedReportPanel
         id="ops-playbook"
         title="Playbook"
         description="Start, stop, and fence actions tuned to the current regime."
+        tone="amber"
       >
         <PlaybookPanel
           playbook={playbook}
@@ -228,10 +231,12 @@ export default async function OperationsPage({
         />
       </SectionedReportPanel>
 
+      <div className="weather-section-divider" aria-hidden="true" />
       <SectionedReportPanel
         id="ops-finance-strategy"
         title="Finance strategy"
         description="Budget posture and cash timing guidance for the quarter."
+        tone="violet"
       >
         <FinanceStrategyPanel
           regime={assessment.regime}
@@ -240,10 +245,12 @@ export default async function OperationsPage({
         />
       </SectionedReportPanel>
 
+      <div className="weather-section-divider" aria-hidden="true" />
       <SectionedReportPanel
         id="ops-export-briefs"
         title="Export briefs"
         description="Copy-ready narratives for leadership updates and stakeholder syncs."
+        tone="teal"
       >
         <ExportBriefPanel
           assessment={assessment}
@@ -255,10 +262,12 @@ export default async function OperationsPage({
         />
       </SectionedReportPanel>
 
+      <div className="weather-section-divider" aria-hidden="true" />
       <SectionedReportPanel
         id="ops-operator-requests"
         title="Operator requests"
         description="Current asks for operators driving execution."
+        tone="sky"
       >
         <OperatorRequestsPanel provenance={internalProvenance} showProvenance={false} />
       </SectionedReportPanel>

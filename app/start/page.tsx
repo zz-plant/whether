@@ -59,9 +59,9 @@ export default async function StartHerePage() {
         openPanelHref="/evidence#signal-diagnostics"
       />
 
-      <section className="weather-panel space-y-4 px-6 py-6">
+      <section className="weather-panel-hero space-y-4 px-6 py-5">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Command center</p>
-        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Run this week&apos;s operating sequence.</h1>
+        <h1 className="type-section text-slate-100">Run this week&apos;s operating sequence.</h1>
         <p className="text-base text-slate-200">
           Use this page when you need a single path: confirm posture, choose the situation to solve now, then run one toolkit end-to-end. Example journey: <span className="font-semibold">Safety Mode → Hiring → Commitment &amp; Rollback Toolkit</span>.
         </p>
@@ -70,12 +70,12 @@ export default async function StartHerePage() {
           <span className="rounded-full border border-slate-700/70 px-3 py-2">~5 minutes to decide</span>
           <span className="rounded-full border border-slate-700/70 px-3 py-2">Linked to live macro posture</span>
         </div>
-        <div className="grid overflow-hidden rounded-2xl border border-slate-700/70 bg-slate-950/40 sm:grid-cols-3 sm:divide-x sm:divide-slate-800/70">
+        <div className="weather-surface weather-surface-sky grid overflow-hidden rounded-2xl sm:grid-cols-3 sm:divide-x sm:divide-slate-800/70">
           {onboardingSteps.map((step, index) => (
             <a
               key={step.id}
               href={step.href}
-              className="flex min-h-[44px] items-start justify-between gap-3 px-4 py-4 text-sm text-slate-100 transition hover:bg-slate-900/55"
+              className="flex min-h-[44px] items-start justify-between gap-3 px-4 py-3 text-sm text-slate-100 transition hover:bg-slate-900/55"
             >
               <span className="space-y-1">
                 <span className="inline-flex items-center gap-2">
@@ -95,7 +95,7 @@ export default async function StartHerePage() {
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <Link href="/operations/plan" className="weather-button-primary inline-flex items-center justify-center">Run weekly operating sequence</Link>
-          <Link href="/operations#ops-export-briefs" className="weather-pill inline-flex min-h-[44px] items-center justify-center rounded-full border border-sky-400/70 bg-sky-500/10 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-sky-100 transition-colors hover:border-sky-300 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation">Copy weekly brief</Link>
+          <Link href="/operations#ops-export-briefs" className="weather-button inline-flex items-center justify-center">Copy weekly brief</Link>
           <details className="group">
             <summary className="weather-pill inline-flex min-h-[44px] cursor-pointer list-none items-center justify-center rounded-full border border-slate-700/80 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation">
               More actions
@@ -107,44 +107,45 @@ export default async function StartHerePage() {
         </div>
       </section>
 
-      <section id="start-role-path" className="weather-panel space-y-4 px-6 py-6">
+      <section id="start-role-path" className="weather-panel-quiet space-y-4 px-6 py-5">
         <div className="space-y-1">
           <h2 className="text-xl font-semibold text-slate-100">Choose your path</h2>
-          <p className="text-sm text-slate-300">Use this as the role lens picker inside Command Center, not a second homepage.</p>
+          <p className="text-[15px] text-slate-300 sm:text-base">Use this as the role lens picker inside Command Center, not a second homepage.</p>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
-          <Link href="/decide/use-cases" className="weather-surface min-h-[44px] space-y-2 px-4 py-4 transition hover:border-sky-400/65">
+          <Link href="/decide/use-cases" className="weather-surface min-h-[44px] space-y-2 px-4 py-3 transition hover:border-sky-400/65">
             <h3 className="text-base font-semibold text-slate-100">Role and situation paths</h3>
-            <p className="text-sm text-slate-300">Route by role or bottleneck to open the right guidance quickly.</p>
+            <p className="text-[15px] text-slate-300 sm:text-base">Route by role or bottleneck to open the right guidance quickly.</p>
           </Link>
-          <Link href="/decide" className="weather-surface min-h-[44px] space-y-2 px-4 py-4 transition hover:border-sky-400/65">
+          <Link href="/decide" className="weather-surface min-h-[44px] space-y-2 px-4 py-3 transition hover:border-sky-400/65">
             <h3 className="text-base font-semibold text-slate-100">Open role lens library</h3>
-            <p className="text-sm text-slate-300">Browse role-specific references, team context, and ship checklists.</p>
+            <p className="text-[15px] text-slate-300 sm:text-base">Browse role-specific references, team context, and ship checklists.</p>
           </Link>
         </div>
       </section>
 
-      <section className="weather-panel px-6 py-6">
+      <section className="weather-panel px-6 py-5">
         <div id="start-posture" className="space-y-4">
           <div className="space-y-1">
             <h2 className="text-xl font-semibold text-slate-100">🧭 Posture</h2>
-            <p className="text-sm text-slate-300">Pick the risk stance that should shape every major decision this week.</p>
+            <p className="text-[15px] text-slate-300 sm:text-base">Pick the risk stance that should shape every major decision this week.</p>
           </div>
           <div className="grid gap-3 sm:grid-cols-3">
             {postureDefinitions.map((posture) => (
-              <Link key={posture.slug} href={`/posture/${posture.slug}`} className="weather-surface min-h-[44px] space-y-2 px-4 py-4 transition hover:border-sky-300/40 hover:bg-slate-900/75">
+              <Link key={posture.slug} href={`/posture/${posture.slug}`} className="weather-surface min-h-[44px] space-y-2 px-4 py-3 transition hover:border-sky-300/40 hover:bg-slate-900/75">
                 <p className="text-sm font-semibold text-slate-100">{posture.title}</p>
-                <p className="text-sm text-slate-200">{posture.summary}</p>
+                <p className="text-[15px] text-slate-200 sm:text-base">{posture.summary}</p>
                 <p className="pt-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Open posture guide →</p>
               </Link>
             ))}
           </div>
         </div>
 
-        <div id="start-situation" className="mt-6 space-y-4 border-t border-slate-800/75 pt-6">
+        <div className="weather-section-divider mt-6" aria-hidden="true" />
+        <div id="start-situation" className="mt-6 space-y-4 pt-6">
           <div className="space-y-1">
             <h2 className="text-xl font-semibold text-slate-100">🧩 Situation</h2>
-            <p className="text-sm text-slate-300">Choose the highest-leverage problem; keep everything else parked for later.</p>
+            <p className="text-[15px] text-slate-300 sm:text-base">Choose the highest-leverage problem; keep everything else parked for later.</p>
           </div>
           <div className="flex flex-wrap gap-2">
             {startSituations.map((situation) => (
@@ -159,16 +160,17 @@ export default async function StartHerePage() {
           </div>
         </div>
 
-        <div id="start-toolkit" className="mt-6 space-y-4 border-t border-slate-800/75 pt-6">
+        <div className="weather-section-divider mt-6" aria-hidden="true" />
+        <div id="start-toolkit" className="mt-6 space-y-4 pt-6">
           <div className="space-y-1">
             <h2 className="text-xl font-semibold text-slate-100">🧰 Toolkit</h2>
-            <p className="text-sm text-slate-300">Run one toolkit deeply to move from diagnosis to decision in the same session.</p>
+            <p className="text-[15px] text-slate-300 sm:text-base">Run one toolkit deeply to move from diagnosis to decision in the same session.</p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             {featuredToolkitDefinitions.map((toolkit) => (
-              <Link key={toolkit.slug} href={`/toolkits/${toolkit.slug}`} className="weather-surface min-h-[44px] space-y-2 px-4 py-4 text-sm text-slate-200 transition hover:border-sky-300/40 hover:bg-slate-900/75">
+              <Link key={toolkit.slug} href={`/toolkits/${toolkit.slug}`} className="weather-surface min-h-[44px] space-y-2 px-4 py-3 text-sm text-slate-200 transition hover:border-sky-300/40 hover:bg-slate-900/75">
                 <span className="font-semibold text-slate-100">{toolkit.title}</span>
-                <p className="text-sm text-slate-200">{toolkit.whenToUse}</p>
+                <p className="text-[15px] text-slate-200 sm:text-base">{toolkit.whenToUse}</p>
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Run toolkit →</p>
               </Link>
             ))}
@@ -180,9 +182,9 @@ export default async function StartHerePage() {
               </summary>
               <div className="mt-3 grid gap-3 sm:grid-cols-2">
                 {additionalToolkitDefinitions.map((toolkit) => (
-                  <Link key={toolkit.slug} href={`/toolkits/${toolkit.slug}`} className="weather-surface min-h-[44px] space-y-2 px-4 py-4 text-sm text-slate-200 transition hover:border-sky-300/40 hover:bg-slate-900/75">
+                  <Link key={toolkit.slug} href={`/toolkits/${toolkit.slug}`} className="weather-surface min-h-[44px] space-y-2 px-4 py-3 text-sm text-slate-200 transition hover:border-sky-300/40 hover:bg-slate-900/75">
                     <span className="font-semibold text-slate-100">{toolkit.title}</span>
-                    <p className="text-sm text-slate-200">{toolkit.whenToUse}</p>
+                    <p className="text-[15px] text-slate-200 sm:text-base">{toolkit.whenToUse}</p>
                     <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Run toolkit →</p>
                   </Link>
                 ))}
