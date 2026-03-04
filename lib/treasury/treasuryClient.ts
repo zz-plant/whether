@@ -6,6 +6,9 @@ import type { TreasuryData } from "../types";
 import { findTimeMachineSnapshot } from "../timeMachine/timeMachineCache";
 import { fetchWithTimeout } from "../fetchWithTimeout";
 
+const PRIMARY_FETCH_TIMEOUT_MS = 12_000;
+const RETRY_FETCH_TIMEOUT_MS = 20_000;
+
 export const TREASURY_ENDPOINTS = {
   oneMonth: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS1MO",
   threeMonth: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS3MO",
@@ -84,6 +87,43 @@ const buildSeriesEndpoint = (baseEndpoint: string | undefined, seriesId: string,
   return url.toString();
 };
 
+const isAbortLikeError = (error: unknown) => {
+  if (!error) {
+    return false;
+  }
+
+  const name =
+    typeof error === "object" && "name" in error && typeof error.name === "string"
+      ? error.name.toLowerCase()
+      : "";
+  const message =
+    typeof error === "object" && "message" in error && typeof error.message === "string"
+      ? error.message.toLowerCase()
+      : String(error).toLowerCase();
+
+  return name.includes("abort") || message.includes("aborted") || message.includes("timeout");
+};
+
+const formatFetchError = (error: unknown) => {
+  if (isAbortLikeError(error)) {
+    return `Treasury live fetch timed out after ${PRIMARY_FETCH_TIMEOUT_MS / 1_000}s (retried once).`;
+  }
+
+  return error instanceof Error ? error.message : "Unknown Treasury fetch error";
+};
+
+const fetchSeriesWithRetry = async (fetcher: typeof fetch, endpoint: string) => {
+  try {
+    return await fetchWithTimeout(fetcher, endpoint, undefined, PRIMARY_FETCH_TIMEOUT_MS);
+  } catch (error) {
+    if (!isAbortLikeError(error)) {
+      throw error;
+    }
+
+    return fetchWithTimeout(fetcher, endpoint, undefined, RETRY_FETCH_TIMEOUT_MS);
+  }
+};
+
 export const fetchTreasuryData = async (
   options: TreasuryFetchOptions = {}
 ): Promise<TreasuryData> => {
@@ -116,10 +156,10 @@ export const fetchTreasuryData = async (
   try {
     const [oneMonthResponse, threeMonthResponse, twoYearResponse, tenYearResponse] =
       await Promise.all([
-        fetchWithTimeout(fetcher, endpoints.oneMonth),
-        fetchWithTimeout(fetcher, endpoints.threeMonth),
-        fetchWithTimeout(fetcher, endpoints.twoYear),
-        fetchWithTimeout(fetcher, endpoints.tenYear),
+        fetchSeriesWithRetry(fetcher, endpoints.oneMonth),
+        fetchSeriesWithRetry(fetcher, endpoints.threeMonth),
+        fetchSeriesWithRetry(fetcher, endpoints.twoYear),
+        fetchSeriesWithRetry(fetcher, endpoints.tenYear),
       ]);
 
     const responses = [oneMonthResponse, threeMonthResponse, twoYearResponse, tenYearResponse];
@@ -162,12 +202,11 @@ export const fetchTreasuryData = async (
     };
   } catch (error) {
     if (options.snapshotFallback) {
-      const message =
-        error instanceof Error ? error.message : "Unknown Treasury fetch error";
+      const message = formatFetchError(error);
       return buildFallbackSnapshot(options.snapshotFallback, message);
     }
 
-    const message = error instanceof Error ? error.message : "Unknown Treasury fetch error";
+    const message = formatFetchError(error);
     throw new Error(message);
   }
 };

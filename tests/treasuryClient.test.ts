@@ -206,4 +206,62 @@ describe("treasury client", () => {
       assert.ok(["DGS1MO", "DGS3MO", "DGS2", "DGS10"].includes(parsed.searchParams.get("id") ?? ""));
     }
   });
+
+  it("retries once when series requests abort", async () => {
+    const attempts = new Map<string, number>();
+    const fetcher: typeof fetch = async (input) => {
+      const url = input.toString();
+      const count = attempts.get(url) ?? 0;
+      attempts.set(url, count + 1);
+
+      if (count === 0) {
+        const error = new Error("The operation was aborted");
+        error.name = "AbortError";
+        throw error;
+      }
+
+      return new Response(
+        buildCsv("DGS", [
+          { date: "2024-10-01", value: "5.2" },
+          { date: "2024-10-02", value: "5.1" },
+        ])
+      );
+    };
+
+    const data = await fetchTreasuryData({ fetcher });
+    assert.equal(data.isLive, true);
+    for (const count of attempts.values()) {
+      assert.equal(count, 2);
+    }
+  });
+
+  it("uses a clearer fallback reason after repeated timeout aborts", async () => {
+    const fetcher: typeof fetch = async () => {
+      const error = new Error("The operation was aborted");
+      error.name = "AbortError";
+      throw error;
+    };
+
+    const snapshot: TreasuryData = {
+      source: "snapshot",
+      record_date: "2024-09-30",
+      fetched_at: "2024-10-01T00:00:00Z",
+      isLive: false,
+      yields: {
+        oneMonth: 5.1,
+        twoYear: 4.7,
+        tenYear: 4.5,
+      },
+    };
+
+    const data = await fetchTreasuryData({
+      fetcher,
+      snapshotFallback: snapshot,
+    });
+
+    assert.equal(
+      data.fallback_reason,
+      "Treasury live fetch timed out after 12s (retried once)."
+    );
+  });
 });
