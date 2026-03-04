@@ -14,9 +14,7 @@ import {
 } from "../../lib/seo";
 import { ReportShell } from "../components/reportShell";
 import { RelatedReportLinks } from "../components/relatedReportLinks";
-import {
-  HistoricalBanner,
-} from "../components/reportSections";
+import { HistoricalBanner } from "../components/boardBriefSections";
 import { AdvancedThresholdsSection } from "./components/advancedThresholdsSection";
 import { TimeMachinePanel } from "./components/timeMachinePanel";
 import { RegimeTimelinePanel } from "./components/regimeTimelinePanel";
@@ -34,7 +32,7 @@ export const revalidate = 900;
 export const metadata: Metadata = buildPageMetadata({
   title: "Whether Report — Signal evidence",
   description:
-    "Macro signals, sensor detail, thresholds, and historical context for Whether Market Climate Station.",
+    "Evidence appendix: macro signals, thresholds, and historical context supporting the weekly posture brief.",
   path: "/signals",
   imageAlt: "Whether Report signal evidence overview",
   imageParams: {
@@ -72,7 +70,7 @@ export default async function SignalsPage({
         name: "Whether Report — Signal evidence",
         url: `${siteUrl}/signals`,
         description:
-          "Macro signals, sensor detail, thresholds, and historical context for Whether Market Climate Station.",
+          "Evidence appendix: macro signals, thresholds, and historical context supporting the weekly posture brief.",
         inLanguage: "en",
         isPartOf: {
           "@type": "WebSite",
