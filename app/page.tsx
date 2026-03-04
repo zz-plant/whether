@@ -32,6 +32,13 @@ const WeeklyActionSummaryPanel = dynamic(
     import("./components/reportSections").then(
       (module) => module.WeeklyActionSummaryPanel,
     ),
+  {
+    loading: () => (
+      <section id="weekly-action-summary" aria-label="Weekly action summary" className="space-y-8">
+        <div className="weather-panel px-5 py-5 text-sm text-slate-300">Loading weekly action summary…</div>
+      </section>
+    ),
+  },
 );
 
 const ExecutiveSnapshotPanel = dynamic(
@@ -39,6 +46,13 @@ const ExecutiveSnapshotPanel = dynamic(
     import("./components/reportSections").then(
       (module) => module.ExecutiveSnapshotPanel,
     ),
+  {
+    loading: () => (
+      <section id="executive-snapshot" aria-label="Leadership summary" className="space-y-8">
+        <div className="weather-panel px-5 py-5 text-sm text-slate-300">Loading evidence snapshot…</div>
+      </section>
+    ),
+  },
 );
 
 export const revalidate = 900;
