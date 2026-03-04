@@ -1,0 +1,45 @@
+name: PR Review Hotspot Checklist Guard
+
+on:
+  pull_request_target:
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  enforce-checklist:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+
+    steps:
+      - name: Validate required review-hotspot checklist items are checked
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.pull_request?.body || "";
+            const requiredItems = [
+              "**Type safety**",
+              "**Edge cases**",
+              "**Separation of concerns**",
+              "**Duplication**",
+              "**Readability**",
+            ];
+
+            if (!body.includes("## Review hotspot checklist (required)")) {
+              core.setFailed("PR body is missing the required 'Review hotspot checklist (required)' section from the PR template.");
+              return;
+            }
+
+            const missing = requiredItems.filter((label) => {
+              const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+              const checkedPattern = new RegExp(`- \\[x\\]\\s+${escaped}`, "i");
+              return !checkedPattern.test(body);
+            });
+
+            if (missing.length > 0) {
+              core.setFailed(
+                `Please check all required review-hotspot checklist items in the PR description. Missing: ${missing.join(", ")}`,
+              );
+              return;
+            }
+
+            core.info("All required review-hotspot checklist items are checked.");

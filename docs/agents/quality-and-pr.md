@@ -13,6 +13,7 @@ Additional requirements:
 - Add/update tests when changing scoring, classification, or decision behavior.
 - Validate deterministic fallback behavior for data-path changes.
 - Capture command outcomes in your PR summary.
+- `bun run review:hotspot-preflight` now runs inside `bun run check` and should be run early while developing logic changes.
 
 ## Commit quality
 - Keep commits coherent, reviewable, and intentionally scoped.
@@ -30,6 +31,10 @@ Recommended PR section headings:
 - **Why this matters**
 - **Validation**
 - **Risks / follow-ups**
+
+Automation notes:
+- `.github/workflows/review-hotspot-preflight.yml` runs on push and pull requests to catch risky decision-logic edits without tests and newly added unsafe type assertions before review.
+- `.github/workflows/pr-review-hotspot-checklist.yml` enforces that all required items in the PR template's **Review hotspot checklist** are explicitly checked before merge.
 
 ## Pre-merge quick checklist
 - [ ] Scope is focused and aligned with the user request.
