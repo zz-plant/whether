@@ -50,6 +50,9 @@ const dialLevelLabels = ["0 · Open", "1 · Cautious", "2 · Strict", "3 · Maxi
 
 function getDeltaMagnitudeLabel(delta: number): string {
   const absoluteDelta = Math.abs(delta);
+  if (absoluteDelta === 0) {
+    return "no";
+  }
   if (absoluteDelta < 0.5) {
     return "minor";
   }
