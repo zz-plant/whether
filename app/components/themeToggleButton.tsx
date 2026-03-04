@@ -6,6 +6,7 @@ import { useHapticFeedback } from "./useHapticFeedback";
 export function ThemeToggleButton() {
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const triggerHaptic = useHapticFeedback();
+  const isDark = theme === "dark";
 
   useEffect(() => {
     const savedTheme = window.localStorage.getItem("whether-theme");
@@ -27,9 +28,10 @@ export function ThemeToggleButton() {
       type="button"
       onClick={toggleTheme}
       className="weather-button inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em]"
-      aria-label="Toggle light mode"
+      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      aria-pressed={!isDark}
     >
-      {theme === "dark" ? "Light" : "Dark"}
+      {isDark ? "Light" : "Dark"}
     </button>
   );
 }
