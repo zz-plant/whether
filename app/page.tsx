@@ -23,7 +23,6 @@ import { buildTrustStatus } from "../lib/report/trustStatus";
 import { WeeklyDecisionCard } from "./components/weeklyDecisionCard";
 import { RevealOnView } from "./components/revealOnView";
 import { operatingCallsByRegime } from "../lib/report/operatingCalls";
-import { DataProvenanceStrip } from "./components/dataProvenanceStrip";
 import { deriveDecisionKnobs } from "../lib/report/decisionKnobs";
 import { ActionStrip } from "./components/actionStrip";
 import { buildSlackBrief } from "../lib/export/briefBuilders";
@@ -380,8 +379,6 @@ export default async function HomePage({
         dontItems={stopItems.slice(0, 3)}
         fenceItems={fenceItems.slice(0, 2)}
       />
-
-      <DataProvenanceStrip provenance={treasuryProvenance} variant="compact" />
 
       <RevealOnView>
         <section

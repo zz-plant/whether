@@ -293,25 +293,12 @@ export const ReportShell = ({
   }, []);
   const primaryDecisionText =
     decisionBanner?.decision ?? `${primaryCta.label}.`;
-  const missionSupportText = trustStatusDetail;
+  const missionSupportText = decisionBanner?.horizon
+    ? `Planning horizon: ${decisionBanner.horizon}.`
+    : "Use the current posture to sequence near-term execution decisions.";
 
-  const showPostureRibbon = currentPath !== "/";
   const isPrimaryActionInSectionLinks = sectionLinks.some((section) => section.href === primaryCta.href);
   const showMobileActionCard = !isPrimaryActionInSectionLinks;
-  const postureRibbon = showPostureRibbon ? (
-    <div className="weather-panel-static mb-4 hidden flex-wrap items-center justify-between gap-2 border border-slate-700/70 px-4 py-2 text-xs sm:flex">
-      <p className="text-slate-300">
-        Current Posture: <span className="font-semibold text-slate-100">{statusLabel}</span>
-        <span className="ml-2 text-slate-400">Updated {recordDateLabel}</span>
-      </p>
-      <Link
-        href="/"
-        className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-[11px] font-semibold tracking-[0.14em]"
-      >
-        Open weekly brief
-      </Link>
-    </div>
-  ) : null;
 
   return (
     <>
@@ -359,11 +346,6 @@ export const ReportShell = ({
                   className="h-9 w-auto"
                   priority
                 />
-                <div>
-                  <p className="text-xs text-slate-300 sm:hidden">
-                    Signals updated {fetchedAtLabel}
-                  </p>
-                </div>
               </div>
               <div className="hidden items-center gap-3 sm:flex">
                 <Link
@@ -372,7 +354,6 @@ export const ReportShell = ({
                 >
                   What is this?
                 </Link>
-                <p className="text-xs text-slate-300">Signals updated {fetchedAtLabel}</p>
               </div>
             </div>
             {showPageNavigation ? (
@@ -386,7 +367,6 @@ export const ReportShell = ({
             ) : null}
           </header>
 
-          {postureRibbon}
           {historicalBanner}
 
           <div
@@ -500,12 +480,6 @@ export const ReportShell = ({
                         </summary>
                         <div className="mt-2 grid gap-2 sm:min-w-[18rem]">
                           <a
-                            href="/about#what-this-is"
-                            className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-700/80 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                          >
-                            What this is
-                          </a>
-                          <a
                             href="/about#monday-planning"
                             className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-700/80 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
                           >
@@ -525,16 +499,6 @@ export const ReportShell = ({
                         Next step: <a href={nextStep.href} className="text-sky-200 underline decoration-slate-500/80 underline-offset-4 hover:text-slate-100">{nextStep.description}</a>
                       </p>
                     ) : null}
-                    <p className="weather-surface inline-flex min-h-[44px] flex-wrap items-center gap-x-2 px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100">
-                      <span>Posture {statusLabel}</span>
-                      <span className="text-slate-400">·</span>
-                      <span>Confidence {trustStatusLabel}</span>
-                      <span className="text-slate-400">·</span>
-                      <span>Updated {fetchedAtLabel}</span>
-                      <span className="text-slate-400">·</span>
-                      <span>Next refresh {resolvedNextRefreshLabel}</span>
-                    </p>
-                    <p className="text-[15px] text-slate-200 sm:text-base">{trustStatusAction}</p>
                     {showOfflineBadge ? (
                       <p className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.14em] text-amber-100">
                         {offlineBadgeLabel}
