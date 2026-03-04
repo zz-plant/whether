@@ -96,7 +96,28 @@ const pageLinkIcons: Record<string, ReactNode> = {
       <circle cx="12" cy="12" r="4.25" fill="currentColor" />
     </svg>
   ),
-  Signals: (
+  "Evidence appendix": (
+    <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
+      <path
+        d="M4 16.5 8.5 12l3 2.75L16 9l4 3.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="8.5" cy="12" r="1.4" fill="currentColor" />
+      <circle cx="16" cy="9" r="1.4" fill="currentColor" />
+      <path
+        d="M4 19.25h16"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  ),
+  Evidence: (
     <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true">
       <path
         d="M4 16.5 8.5 12l3 2.75L16 9l4 3.5"
