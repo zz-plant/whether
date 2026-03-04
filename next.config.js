@@ -2,6 +2,11 @@
 const nextConfig = {
   reactStrictMode: true,
   typedRoutes: true,
+  // Build pipelines run typecheck separately (`bun run check`),
+  // so we skip duplicated TypeScript validation during `next build` to reduce deploy time.
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   async redirects() {
     return [
       {
