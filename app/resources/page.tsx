@@ -44,6 +44,7 @@ export default function ResourcesPage() {
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Resources</h1>
         <p className="text-sm text-slate-300">
           Board-ready governance resources for capital allocation, escalation controls, reversibility discipline, and operating strategy under pressure.
+          For formulas, source transparency, and model mechanics, use Reference.
         </p>
       </section>
 

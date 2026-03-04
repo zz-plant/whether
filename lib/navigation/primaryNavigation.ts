@@ -32,6 +32,6 @@ export const primaryNavigation: PrimaryNavigationItem[] = [
   {
     href: "/reference",
     label: "Reference",
-    description: "Reference library: toolkits, diagnostics, and methodology.",
+    description: "Canonical methods and diagnostics; distinct from board-facing Resources content.",
   },
 ];

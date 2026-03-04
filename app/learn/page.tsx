@@ -4,21 +4,21 @@ import { buildPageMetadata } from "../../lib/seo";
 import { StaticHubNav } from "../components/staticHubNav";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Reference — concepts and diagnostics",
+  title: "Learn — concepts and diagnostics",
   description: "Diagnostics and concept references only; use this hub to audit reasoning, not to generate new operating calls.",
-  path: "/reference",
-  imageAlt: "Whether reference hub",
+  path: "/learn",
+  imageAlt: "Whether learn hub",
 });
 
 export default function LearnPage() {
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
-      <StaticHubNav currentPath="/reference" />
+      <StaticHubNav currentPath="/learn" />
       <section className="weather-panel space-y-3 px-6 py-6">
-        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Reference</h1>
-        <p className="text-sm text-slate-300">Use Reference for operator education only: failure modes, interpretation patterns, and worked examples. For canonical formulas or source definitions, use Method.</p>
+        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Learn</h1>
+        <p className="text-sm text-slate-300">Use Learn for operator education only: failure modes, interpretation patterns, and worked examples. For canonical formulas, source definitions, and trust surfaces, use Reference.</p>
         <div>
-          <Link href="/start" className="weather-button inline-flex items-center justify-center">Back to Command Center</Link>
+          <Link href="/reference" className="weather-button inline-flex items-center justify-center">Open Reference</Link>
         </div>
       </section>
       <section className="grid gap-3 sm:grid-cols-2">
