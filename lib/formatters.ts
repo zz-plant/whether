@@ -18,7 +18,9 @@ const numberFormatter = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 2,
 });
 
-const MS_PER_HOUR = 60 * 60 * 1000;
+const MS_PER_SECOND = 1000;
+const MS_PER_MINUTE = 60 * MS_PER_SECOND;
+const MS_PER_HOUR = 60 * MS_PER_MINUTE;
 
 const parseDateValue = (value: string) => {
   const date = new Date(value);
@@ -43,7 +45,16 @@ export const formatAgeHours = (value: string | null, now: Date) => {
   if (!timestamp) {
     return "—";
   }
-  const hours = Math.max(0, Math.round((now.getTime() - timestamp.getTime()) / MS_PER_HOUR));
+  const ageMs = Math.max(0, now.getTime() - timestamp.getTime());
+  if (ageMs < MS_PER_MINUTE) {
+    const seconds = Math.round(ageMs / MS_PER_SECOND);
+    return `${seconds}s.`;
+  }
+  if (ageMs < MS_PER_HOUR) {
+    const minutes = Math.round(ageMs / MS_PER_MINUTE);
+    return `${minutes}m.`;
+  }
+  const hours = Math.round(ageMs / MS_PER_HOUR);
   return `${hours}h.`;
 };
 
