@@ -43,6 +43,9 @@ export default async function StartHerePage() {
     },
   ] as const;
 
+  const featuredToolkitDefinitions = toolkitDefinitions.slice(0, 3);
+  const additionalToolkitDefinitions = toolkitDefinitions.slice(3);
+
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
       <ReturningVisitorDeltaStrip
@@ -162,7 +165,7 @@ export default async function StartHerePage() {
             <p className="text-sm text-slate-300">Run one toolkit deeply to move from diagnosis to decision in the same session.</p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
-            {toolkitDefinitions.map((toolkit) => (
+            {featuredToolkitDefinitions.map((toolkit) => (
               <Link key={toolkit.slug} href={`/toolkits/${toolkit.slug}`} className="weather-surface min-h-[44px] space-y-2 px-4 py-4 text-sm text-slate-200 transition hover:border-sky-300/40 hover:bg-slate-900/75">
                 <span className="font-semibold text-slate-100">{toolkit.title}</span>
                 <p className="text-sm text-slate-200">{toolkit.whenToUse}</p>
@@ -170,6 +173,25 @@ export default async function StartHerePage() {
               </Link>
             ))}
           </div>
+          {additionalToolkitDefinitions.length > 0 ? (
+            <details className="group rounded-xl border border-slate-800/80 bg-slate-950/40 p-3">
+              <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">
+                Show all toolkits ({additionalToolkitDefinitions.length} more)
+              </summary>
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                {additionalToolkitDefinitions.map((toolkit) => (
+                  <Link key={toolkit.slug} href={`/toolkits/${toolkit.slug}`} className="weather-surface min-h-[44px] space-y-2 px-4 py-4 text-sm text-slate-200 transition hover:border-sky-300/40 hover:bg-slate-900/75">
+                    <span className="font-semibold text-slate-100">{toolkit.title}</span>
+                    <p className="text-sm text-slate-200">{toolkit.whenToUse}</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Run toolkit →</p>
+                  </Link>
+                ))}
+              </div>
+              <Link href="/toolkits" className="mt-3 inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100">
+                Open full toolkit library
+              </Link>
+            </details>
+          ) : null}
         </div>
       </section>
     </main>

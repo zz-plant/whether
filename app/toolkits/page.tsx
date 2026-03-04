@@ -19,6 +19,7 @@ export default async function ToolkitsPage({
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const query = resolvedSearchParams?.q?.trim().toLowerCase() ?? "";
+  const suggestedIntents = ["rollback", "roadmap", "pmf", "pricing", "capacity"] as const;
   const filteredToolkits = toolkitDefinitions.filter((toolkit) => {
     if (!query) return true;
     return `${toolkit.title} ${toolkit.whenToUse}`.toLowerCase().includes(query);
@@ -43,6 +44,20 @@ export default async function ToolkitsPage({
           <button type="submit" className="weather-button">Search</button>
           {query ? (<Link href="/toolkits" className="weather-button inline-flex items-center justify-center">Clear</Link>) : null}
         </form>
+        <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
+          <span className="rounded-full border border-slate-700/70 px-3 py-1 font-semibold tracking-[0.1em]">
+            {filteredToolkits.length} result{filteredToolkits.length === 1 ? "" : "s"}
+          </span>
+          {suggestedIntents.map((intent) => (
+            <Link
+              key={intent}
+              href={`/toolkits?q=${intent}`}
+              className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold uppercase tracking-[0.1em] text-slate-200 hover:border-sky-400/70"
+            >
+              {intent}
+            </Link>
+          ))}
+        </div>
       </section>
 
       <section className="grid gap-3 sm:grid-cols-2">

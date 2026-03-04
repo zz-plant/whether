@@ -9,15 +9,14 @@ export type PrimaryNavigationItem = {
 
 export const primaryNavigation: PrimaryNavigationItem[] = [
   {
-    href: "/",
-    label: "Weekly Capital Posture Brief",
-    description: "Weekly governance artifact: posture call, constraints, and top actions.",
+    href: "/start",
+    label: "Command Center",
+    description: "Default start path: posture, situation, and toolkit sequence.",
   },
   {
-    href: "/evidence",
-    label: "Evidence appendix",
-    description:
-      "Diagnostics behind the weekly brief: thresholds, timestamped inputs, and historical context.",
+    href: "/signals",
+    label: "Signals",
+    description: "Evidence layer with thresholds, timestamps, and historical context.",
   },
   {
     href: "/operations",
@@ -25,13 +24,41 @@ export const primaryNavigation: PrimaryNavigationItem[] = [
     description: "Deep playbook guardrails for hiring, spend, and pacing.",
   },
   {
+    href: "/decide",
+    label: "Decide",
+    description: "Role-based translation for founder, product, finance, and strategy decisions.",
+  },
+  {
+    href: "/toolkits",
+    label: "Toolkits",
+    description: "Runnable instruments, templates, and checklists for operating decisions.",
+  },
+  {
+    href: "/learn",
+    label: "Learn",
+    description: "Diagnostic and conceptual references for decision quality.",
+  },
+  {
+    href: "/method",
+    label: "Method",
+    description: "Transparency layer for formulas, sources, cadence, and limitations.",
+  },
+  {
+    href: "/",
+    label: "Weekly Brief",
+    description: "Posture call and constraints snapshot for this week.",
+    staticHub: false,
+  },
+  {
     href: "/resources",
     label: "Resources",
-    description: "Board-facing SEO pillars, governance templates, and Decision Shield overview.",
+    description: "Board-facing templates and case examples.",
+    staticHub: false,
   },
   {
     href: "/reference",
     label: "Reference",
-    description: "Canonical methods and diagnostics; distinct from board-facing Resources content.",
+    description: "Canonical methods and diagnostics archive.",
+    staticHub: false,
   },
 ];
