@@ -34294,5 +34294,110 @@
       },
       "copy": "Weekly action summary — Feb 20, 2026\nGrowth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale the highest-ROI bets, hire deliberately, and keep payback discipline. Confidence: medium (standard signal).\n\n---\nWHETHER · Market Climate Station\n\nUpdated Feb 20, 2026\n\n---\n\nMARKET CLIMATE\n\n✅ RISK-ON / CAPITAL-LOOSE\n\nCapital is accessible and risk appetite is healthy.\nExpect faster approvals and higher tolerance for bold bets.\n\n\nContextual, not moral: this is what the environment is rewarding right now.\n\n\n---\n\nRECOMMENDED MOVES FOR PRODUCT TEAMS (NOW)\n\n• Prioritize speed and distribution over perfection\n• Scale proven growth channels and widen market coverage\n• Move decisively while enforcing payback guardrails\n\n\n---\n\nEXECUTION PRIORITIES THAT TRAVEL WELL\n\n• Growth experiments with clear scaling paths\n• New market expansion backed by demand signals\n• Product investments that amplify acquisition\n\n\n---\n\nWATCHOUTS THAT BREAK EXECUTION\n\n• Over-optimizing cost at the expense of momentum\n• Delaying launches while waiting for perfect data\n• Under-investing in capacity while demand is strong\n\n\n---\n\nPLANNING LANGUAGE TO USE\n\n> “Move quickly on growth bets, maintain payback discipline, and set clear exit criteria before scaling spend.”\n\n\n\n---\n\nEXECUTION CONSTRAINTS\n\n• Prioritize speed and distribution over polish.\n• Accept controlled waste to win market share.\n• Invest ahead of demand where signals are strong.\n\n\n\n---\n\nRECOMMENDATION CONFIDENCE\n\nConfidence: Historical (simulated)\nUncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n\n---\n\nDATA PROVENANCE & QUALITY\n\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 1, 2026, 11:24 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 1, 2026, 11:24 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n---\n\nActions:\nCopy for roadmap review Check a decision Why this verdict"
     }
+  },
+  {
+    "year": 2026,
+    "week": 9,
+    "asOf": "2026-02-27",
+    "record_date": "2026-02-27",
+    "summary": {
+      "title": "Weekly action summary — Feb 27, 2026",
+      "summary": "Growth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale the highest-ROI bets, hire deliberately, and keep payback discipline. Confidence: medium (standard signal).",
+      "regime": "EXPANSION",
+      "regimeLabel": "Growth Mode",
+      "guidance": "scale the highest-ROI bets, hire deliberately, and keep payback discipline",
+      "confidence": "MEDIUM",
+      "transitionWatch": false,
+      "intensity": "STANDARD",
+      "constraints": [
+        "Prioritize speed and distribution over polish.",
+        "Accept controlled waste to win market share.",
+        "Invest ahead of demand where signals are strong."
+      ],
+      "recordDateLabel": "Feb 27, 2026",
+      "provenance": {
+        "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
+        "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
+        "timestampLabel": "Mar 1, 2026, 11:24 PM",
+        "ageLabel": "0h.",
+        "statusLabel": "Historical (simulated)"
+      },
+      "inputs": [
+        {
+          "id": "base-rate",
+          "label": "Policy base rate (1M)",
+          "value": 3.72,
+          "unit": "%",
+          "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
+          "recordDate": "2026-02-27",
+          "fetchedAt": "2026-03-01T23:24:25.889Z",
+          "notes": "Used as the cost-of-money anchor for tightness scoring."
+        },
+        {
+          "id": "two-year",
+          "label": "US Treasury 2Y",
+          "value": 3.48,
+          "unit": "%",
+          "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
+          "recordDate": "2026-02-27",
+          "fetchedAt": "2026-03-01T23:24:25.889Z"
+        },
+        {
+          "id": "ten-year",
+          "label": "US Treasury 10Y",
+          "value": 4.08,
+          "unit": "%",
+          "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
+          "recordDate": "2026-02-27",
+          "fetchedAt": "2026-03-01T23:24:25.889Z"
+        },
+        {
+          "id": "curve-slope",
+          "label": "Yield curve slope (10Y - 2Y)",
+          "value": 0.6000000000000001,
+          "unit": "%",
+          "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
+          "recordDate": "2026-02-27",
+          "fetchedAt": "2026-03-01T23:24:25.889Z",
+          "derivedFrom": "US Treasury 10Y and 2Y yields",
+          "notes": "Derived metric used to score risk appetite."
+        }
+      ],
+      "structured": {
+        "climate": {
+          "label": "✅ RISK-ON / CAPITAL-LOOSE",
+          "summary": [
+            "Capital is accessible and risk appetite is healthy.",
+            "Expect faster approvals and higher tolerance for bold bets."
+          ]
+        },
+        "recommendedMoves": [
+          "Prioritize speed and distribution over perfection",
+          "Scale proven growth channels and widen market coverage",
+          "Move decisively while enforcing payback guardrails"
+        ],
+        "executionPriorities": [
+          "Growth experiments with clear scaling paths",
+          "New market expansion backed by demand signals",
+          "Product investments that amplify acquisition"
+        ],
+        "watchouts": [
+          "Over-optimizing cost at the expense of momentum",
+          "Delaying launches while waiting for perfect data",
+          "Under-investing in capacity while demand is strong"
+        ],
+        "planningLanguage": "“Move quickly on growth bets, maintain payback discipline, and set clear exit criteria before scaling spend.”",
+        "executionConstraints": [
+          "Prioritize speed and distribution over polish.",
+          "Accept controlled waste to win market share.",
+          "Invest ahead of demand where signals are strong."
+        ]
+      },
+      "copy": "Weekly action summary — Feb 27, 2026\nGrowth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale the highest-ROI bets, hire deliberately, and keep payback discipline. Confidence: medium (standard signal).\n\n---\nWHETHER · Market Climate Station\n\nUpdated Feb 27, 2026\n\n---\n\nMARKET CLIMATE\n\n✅ RISK-ON / CAPITAL-LOOSE\n\nCapital is accessible and risk appetite is healthy.\nExpect faster approvals and higher tolerance for bold bets.\n\n\nContextual, not moral: this is what the environment is rewarding right now.\n\n\n---\n\nRECOMMENDED MOVES FOR PRODUCT TEAMS (NOW)\n\n• Prioritize speed and distribution over perfection\n• Scale proven growth channels and widen market coverage\n• Move decisively while enforcing payback guardrails\n\n\n---\n\nEXECUTION PRIORITIES THAT TRAVEL WELL\n\n• Growth experiments with clear scaling paths\n• New market expansion backed by demand signals\n• Product investments that amplify acquisition\n\n\n---\n\nWATCHOUTS THAT BREAK EXECUTION\n\n• Over-optimizing cost at the expense of momentum\n• Delaying launches while waiting for perfect data\n• Under-investing in capacity while demand is strong\n\n\n---\n\nPLANNING LANGUAGE TO USE\n\n> “Move quickly on growth bets, maintain payback discipline, and set clear exit criteria before scaling spend.”\n\n\n\n---\n\nEXECUTION CONSTRAINTS\n\n• Prioritize speed and distribution over polish.\n• Accept controlled waste to win market share.\n• Invest ahead of demand where signals are strong.\n\n\n\n---\n\nRECOMMENDATION CONFIDENCE\n\nConfidence: Historical (simulated)\nUncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n\n---\n\nDATA PROVENANCE & QUALITY\n\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 1, 2026, 11:24 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 1, 2026, 11:24 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.\n\n---\n\nActions:\nCopy for roadmap review Check a decision Why this verdict"
+    }
   }
 ]
