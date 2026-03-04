@@ -150,7 +150,7 @@ export default async function DecisionAnswerPage({ params }: DecisionPageProps) 
       <section className="weather-panel space-y-4 px-6 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Internal link cluster</h2>
         <div className="flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">
-          <Link href="/signals" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Signals evidence</Link>
+          <Link href="/evidence" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Signals evidence</Link>
           <Link href="/toolkits" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Operator toolkits</Link>
           <Link href="/start" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Command center</Link>
           <Link href="/answers" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">All Tier 1 answers</Link>

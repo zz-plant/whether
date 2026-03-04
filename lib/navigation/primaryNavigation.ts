@@ -14,7 +14,7 @@ export const primaryNavigation: PrimaryNavigationItem[] = [
     description: "Weekly governance artifact: posture call, constraints, and top actions.",
   },
   {
-    href: "/signals",
+    href: "/evidence",
     label: "Evidence appendix",
     description:
       "Diagnostics behind the weekly brief: thresholds, timestamped inputs, and historical context.",
@@ -30,7 +30,7 @@ export const primaryNavigation: PrimaryNavigationItem[] = [
     description: "Board-facing SEO pillars, governance templates, and Decision Shield overview.",
   },
   {
-    href: "/learn",
+    href: "/reference",
     label: "Reference",
     description: "Reference library: toolkits, diagnostics, and methodology.",
   },

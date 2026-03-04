@@ -285,7 +285,7 @@ export const ReportShell = ({
         href="/"
         className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-[11px] font-semibold tracking-[0.14em]"
       >
-        View Full Climate
+        View full evidence
       </Link>
     </div>
   ) : null;
@@ -330,7 +330,7 @@ export const ReportShell = ({
               <div className="flex items-center gap-3">
                 <Image
                   src="/whether-logo.svg"
-                  alt="Whether Market Climate Station"
+                  alt="Whether Capital Posture Governance"
                   width={156}
                   height={36}
                   className="h-9 w-auto"

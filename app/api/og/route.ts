@@ -1,5 +1,5 @@
 /**
- * Open Graph SVG generator for shareable Market Climate Station pages.
+ * Open Graph SVG generator for shareable Capital Posture Governance pages.
  * Supports specialized templates for report, operations, signals, solutions, and guides.
  */
 import { evaluateRegime } from "../../../lib/regimeEngine";
@@ -214,14 +214,14 @@ export async function GET(request: Request) {
   const template = readTemplate(searchParams);
 
   if (template !== "report") {
-    const title = readParam(searchParams, "title", "Whether — Market Climate Station", 72);
+    const title = readParam(searchParams, "title", "Whether — Capital Posture Governance", 72);
     const subtitle = readParam(
       searchParams,
       "subtitle",
       "Translate macro signals into operational guidance for product and engineering leaders.",
       170,
     );
-    const eyebrow = readParam(searchParams, "eyebrow", "Market Climate Station", 42);
+    const eyebrow = readParam(searchParams, "eyebrow", "Capital Posture Governance", 42);
     const kicker = readParam(
       searchParams,
       "kicker",
@@ -332,7 +332,7 @@ export async function GET(request: Request) {
     ${escapeText("Whether Report")}
   </text>
   <text x="120" y="190" fill="#94a3b8" font-family="Inter, system-ui, sans-serif" font-size="18" letter-spacing="2">
-    ${escapeText("MARKET CLIMATE STATION")}
+    ${escapeText("CAPITAL POSTURE GOVERNANCE")}
   </text>
   ${statusLines
     .map(
@@ -342,7 +342,7 @@ export async function GET(request: Request) {
     )
     .join("\n")}
   <text x="120" y="${300 + (statusLines.length - 1) * 20}" fill="#f8fafc" font-family="Inter, system-ui, sans-serif" font-size="32" font-weight="600">
-    ${escapeText(`Market climate: ${assessment.regime}`)}
+    ${escapeText(`Capital posture: ${assessment.regime}`)}
   </text>
   ${descriptionLines
     .map(

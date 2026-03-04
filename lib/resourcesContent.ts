@@ -36,7 +36,7 @@ export const governanceLexicon: GovernanceLexiconTerm[] = [
     slug: "capital-regime",
     term: "Capital regime",
     definition:
-      "The current operating climate for capital allocation defined by cost of capital, demand reliability, and financing optionality rather than optimism bias.",
+      "The current operating posture for capital allocation defined by cost of capital, demand reliability, and financing optionality rather than optimism bias.",
     boardPrompt:
       "Given this capital regime, which commitments are mandatory, optional, deferred, or prohibited this quarter?",
   },

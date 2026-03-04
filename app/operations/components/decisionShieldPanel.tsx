@@ -1,5 +1,5 @@
 /**
- * Decision Shield panel for validating operator actions against the current market climate.
+ * Decision Shield panel for validating operator actions against the current capital posture.
  * Keeps verdict output shareable and grounded in sensor-driven signals.
  */
 "use client";
@@ -373,7 +373,7 @@ export const DecisionShieldPanel = ({
               Commit to the next move
             </h3>
             <p className="mt-2 type-data text-slate-300">
-              Take a decisive, evidence-backed call for this market climate, then circulate the readout as an operator recommendation—not a guarantee.
+              Take a decisive, evidence-backed call for this capital posture, then circulate the readout as an operator recommendation—not a guarantee.
             </p>
           </div>
           <div className="flex flex-col items-end gap-3">

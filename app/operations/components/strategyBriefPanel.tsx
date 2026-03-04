@@ -15,12 +15,12 @@ const buildStrategyBrief = (
   );
 
   if (!template) {
-    return "Strategy Brief unavailable for current market climate.";
+    return "Strategy Brief unavailable for current capital posture.";
   }
 
   return [
     `Strategy Brief — ${recordDateLabel}`,
-    `Market climate: ${assessment.regime}`,
+    `Capital posture: ${assessment.regime}`,
     "",
     `Headline: ${template.headline}`,
     `Narrative: ${template.narrative}`,
@@ -172,7 +172,7 @@ export const StrategyBriefPanel = ({
             ) : (
               <div className="weather-surface p-4">
                 <p className="text-sm text-slate-300">
-                  Strategy Brief unavailable for current market climate.
+                  Strategy Brief unavailable for current capital posture.
                 </p>
               </div>
             )}

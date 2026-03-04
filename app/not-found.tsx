@@ -20,7 +20,7 @@ export default function NotFound() {
             Open command center
           </Link>
           <Link
-            href="/signals"
+            href="/evidence"
             className="weather-button inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em]"
           >
             Review signals

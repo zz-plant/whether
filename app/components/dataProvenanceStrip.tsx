@@ -1,6 +1,6 @@
 /**
  * Data provenance strip for surfacing source, freshness, and live status inline.
- * Keeps each Market Climate Station section traceable at the point of interpretation.
+ * Keeps each Capital Posture Governance section traceable at the point of interpretation.
  */
 "use client";
 

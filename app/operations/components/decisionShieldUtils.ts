@@ -57,7 +57,7 @@ export const buildShareText = (
 ) => {
   const lines = [
     "Decision Shield — Whether Report",
-    `Market climate: ${assessment.regime}`,
+    `Capital posture: ${assessment.regime}`,
     `Lifecycle: ${formatOptionLabel(lifecycle, lifecycleOptions)}`,
     `Category: ${formatOptionLabel(category, categoryOptions)}`,
     `Action: ${formatDecisionAction(action)}`,

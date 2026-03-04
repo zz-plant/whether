@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     "product strategy",
     "engineering strategy",
     "capital markets",
-    "market climate classification",
+    "capital posture classification",
     "operational constraints"
   ],
   authors: [{ name: "Whether" }],
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
         url: socialImageUrl,
         width: 1200,
         height: 630,
-        alt: "Whether market climate social preview",
+        alt: "Whether capital posture social preview",
       },
     ],
   },

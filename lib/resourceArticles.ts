@@ -118,7 +118,7 @@ export const resourceArticles: ResourceArticle[] = [
       {
         heading: "The dangerous shortcut: treating runway as a single number",
         paragraphs: [
-          "Teams frequently ask for the ‘right’ runway target as though one number works across all operating climates. In practice, runway is a portfolio of timing risks: demand uncertainty, fixed-cost rigidity, and time-to-correct when assumptions break.",
+          "Teams frequently ask for the ‘right’ runway target as though one number works across all operating postures. In practice, runway is a portfolio of timing risks: demand uncertainty, fixed-cost rigidity, and time-to-correct when assumptions break.",
           "In tightening markets, the cost of delayed correction rises. If your organization cannot reverse commitments quickly, a nominal 18-month runway can behave like 12 months because you spend multiple cycles discovering problems you cannot unwind fast enough.",
           "A board-ready runway policy should therefore separate survivability from strategic optionality. Survivability answers whether you can endure downside without emergency financing. Optionality answers whether you can still fund controlled bets while protecting that floor.",
         ],

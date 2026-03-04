@@ -11,7 +11,7 @@ export const metadata: Metadata = buildPageMetadata({
   imageParams: {
     template: "solutions",
     eyebrow: "Solution · Engineering capacity",
-    title: "Align capacity plans to market climate",
+    title: "Align capacity plans to capital posture",
     subtitle:
       "Tune hiring velocity, staffing risk, and delivery commitments with a shared macro baseline.",
     kicker: "Whether solutions for engineering leaders.",
@@ -80,7 +80,7 @@ export default function EngineeringCapacityPage() {
         </p>
         <div className="flex flex-wrap gap-3">
           <Link
-            href="/signals"
+            href="/evidence"
             className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
           >
             Open signals dashboard

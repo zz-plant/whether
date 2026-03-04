@@ -276,8 +276,8 @@ export default async function HomePage({
     ? buildTimeMachineHref("/", previousHistoricalSelection)
     : undefined;
   const historicalTimeMachineHref = historicalSelection
-    ? buildTimeMachineHref("/signals?advanced=1#time-machine", historicalSelection)
-    : "/signals?advanced=1#time-machine";
+    ? buildTimeMachineHref("/evidence?advanced=1#time-machine", historicalSelection)
+    : "/evidence?advanced=1#time-machine";
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
   const {
     trustStatusLabel,
@@ -351,7 +351,7 @@ export default async function HomePage({
         label: "Review evidence",
       }}
       nextStep={{
-        href: "/signals",
+        href: "/evidence",
         description: "Review evidence in Signals",
       }}
       sidebarVariant="hidden"

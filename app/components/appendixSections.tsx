@@ -398,25 +398,25 @@ export const RegimeAssessmentCard = ({
     {
       id: "curve-slope",
       label: curveSlopeLabel,
-      href: "/signals#sensor-array",
+      href: "/evidence#sensor-array",
       linkLabel: "View curve slope",
     },
     {
       id: "base-rate",
       label: baseRateLabel,
-      href: "/signals#sensor-array",
+      href: "/evidence#sensor-array",
       linkLabel: "View base rate",
     },
     {
       id: "tightness",
       label: tightnessLabel,
-      href: "/signals#thresholds",
+      href: "/evidence#thresholds",
       linkLabel: "View thresholds",
     },
     {
       id: "risk-appetite",
       label: riskLabel,
-      href: "/signals#thresholds",
+      href: "/evidence#thresholds",
       linkLabel: "View thresholds",
     },
   ];
@@ -431,7 +431,7 @@ export const RegimeAssessmentCard = ({
       <div className={`absolute inset-0 bg-gradient-to-br ${regimeAccent.panel} opacity-40`} />
       <div className="relative flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
-          <p className="type-label text-slate-400">Current market climate</p>
+          <p className="type-label text-slate-400">Current capital posture</p>
           <h2 id="regime-assessment-title" className="type-section text-slate-100">
             {regimeLabel}
           </h2>
@@ -757,7 +757,7 @@ export const FirstTimeGuidePanel = ({
       </div>
       <p className="mt-4 text-xs text-slate-300">
         Share the URL when you lock thresholds or time machine selections so every stakeholder sees
-        the same climate assumptions.
+        the same posture assumptions.
       </p>
     </div>
   </section>
@@ -927,7 +927,7 @@ export const CxoFunctionPanel = ({
       {showProvenance ? <DataProvenanceStrip provenance={provenance} /> : null}
     </div>
     <p className="mt-3 max-w-3xl type-data text-slate-300">
-      Each module below translates market climate signals into CXO-ready artifacts. Use them to align
+      Each module below translates capital posture signals into CXO-ready artifacts. Use them to align
       finance, operations, and product leadership on a shared macro posture.
     </p>
     <div className="mt-6 grid gap-4 md:grid-cols-2">
@@ -1751,7 +1751,7 @@ export const ExecutiveSnapshotPanel = ({
             <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Quick actions</p>
             <div className="mt-4 flex flex-wrap gap-3">
               <a
-                href="/signals#thresholds"
+                href="/evidence#thresholds"
                 className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
               >
                 Review thresholds
@@ -1792,7 +1792,7 @@ export const RegimeSummaryPanel = ({
     <section id="regime-summary" aria-labelledby="regime-summary-title" className="mt-10">
       <div className="weather-panel p-6">
         <div>
-          <p className="type-label text-slate-400">Market climate summary</p>
+          <p className="type-label text-slate-400">Capital posture summary</p>
           <h3 id="regime-summary-title" className="type-section text-slate-100">
             Plain-English market readout
           </h3>
@@ -1943,7 +1943,7 @@ export const RegimeChangeAlertPanel = ({
       <div className="weather-panel p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="type-label text-slate-400">Market climate change alerts</p>
+            <p className="type-label text-slate-400">Capital posture change alerts</p>
             <h3 id="regime-alerts-title" className="type-section text-slate-100">
               Alert preview and response plan
             </h3>
@@ -2030,7 +2030,7 @@ export const RegimeChangeAlertPanel = ({
                   </li>
                 </ul>
                 <a
-                  href="/signals#time-machine"
+                  href="/evidence#time-machine"
                   className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-xl border border-sky-500/40 bg-slate-950/70 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                 >
                   Open Time Machine
@@ -2749,7 +2749,7 @@ export const InsightDatabasePanel = ({
                       aria-labelledby="evidence-climate-label"
                       className="mt-2 flex min-h-[44px] w-full items-center justify-between rounded-lg border border-slate-800/70 bg-slate-950 px-3 py-2 text-sm text-slate-100"
                     >
-                      <Select.Value placeholder="All climates" />
+                      <Select.Value placeholder="All postures" />
                       <Select.Icon className="text-slate-400">
                         <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
                           <path
@@ -2771,7 +2771,7 @@ export const InsightDatabasePanel = ({
                               value="all"
                               className="flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm text-slate-200 outline-none transition-colors data-[highlighted]:bg-slate-800/70 data-[selected]:text-sky-200"
                             >
-                              <Select.ItemText>All climates</Select.ItemText>
+                              <Select.ItemText>All postures</Select.ItemText>
                             </Select.Item>
                             {climateOptions.map((option) => (
                               <Select.Item

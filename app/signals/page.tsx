@@ -33,7 +33,7 @@ export const metadata: Metadata = buildPageMetadata({
   title: "Whether Report — Signal evidence",
   description:
     "Evidence appendix: macro signals, thresholds, and historical context supporting the weekly posture brief.",
-  path: "/signals",
+  path: "/evidence",
   imageAlt: "Whether Report signal evidence overview",
   imageParams: {
     template: "signals",
@@ -66,9 +66,9 @@ export default async function SignalsPage({
     "@graph": [
       {
         "@type": "WebPage",
-        "@id": `${siteUrl}/signals#webpage`,
+        "@id": `${siteUrl}/evidence#webpage`,
         name: "Whether Report — Signal evidence",
-        url: `${siteUrl}/signals`,
+        url: `${siteUrl}/evidence`,
         description:
           "Evidence appendix: macro signals, thresholds, and historical context supporting the weekly posture brief.",
         inLanguage: "en",
@@ -99,7 +99,7 @@ export default async function SignalsPage({
       },
       buildBreadcrumbList([
         { name: "Weekly briefing", path: "/" },
-        { name: "Signal evidence", path: "/signals" },
+        { name: "Signal evidence", path: "/evidence" },
       ]),
     ],
   };
@@ -126,11 +126,11 @@ export default async function SignalsPage({
     ? getAdjacentTimeMachineRequest(historicalSelection, "previous")
     : null;
   const previousHistoricalHref = previousHistoricalSelection
-    ? buildTimeMachineHref("/signals", previousHistoricalSelection)
+    ? buildTimeMachineHref("/evidence", previousHistoricalSelection)
     : undefined;
   const historicalTimeMachineHref = historicalSelection
-    ? buildTimeMachineHref("/signals?advanced=1#time-machine", historicalSelection)
-    : "/signals?advanced=1#time-machine";
+    ? buildTimeMachineHref("/evidence?advanced=1#time-machine", historicalSelection)
+    : "/evidence?advanced=1#time-machine";
   const summaryArchive = getSummaryArchive();
   const regimeLabel = regimeLabels[assessment.regime];
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
@@ -182,7 +182,7 @@ export default async function SignalsPage({
       params.set("advanced", "1");
     }
     const query = params.toString();
-    return query ? `/signals?${query}` : "/signals";
+    return query ? `/evidence?${query}` : "/evidence";
   };
 
   const buildDiagnosticsHref = (showAll: boolean) => {
@@ -198,7 +198,7 @@ export default async function SignalsPage({
       params.set("diagnostics", "all");
     }
     const query = params.toString();
-    return query ? `/signals?${query}#signal-diagnostics` : "/signals#signal-diagnostics";
+    return query ? `/evidence?${query}#signal-diagnostics` : "/evidence#signal-diagnostics";
   };
 
   const buildFocusHref = (focus: FocusTab) => {
@@ -214,12 +214,12 @@ export default async function SignalsPage({
       params.set("focus", focus);
     }
     const query = params.toString();
-    return query ? `/signals?${query}` : "/signals";
+    return query ? `/evidence?${query}` : "/evidence";
   };
   const prioritizedSignalsByFocus: Record<FocusTab, Array<{ label: string; why: string; href: string }>> = {
     all: [
       { label: "Tightness", why: "Primary liquidity constraint for near-term execution", href: "#current-scores" },
-      { label: "Risk appetite", why: "Market risk-on/off posture changes funding and launch tolerance", href: "#current-scores" },
+      { label: "Risk appetite", why: "Capital posture changes funding and launch tolerance", href: "#current-scores" },
       { label: "Curve slope", why: "Forward growth signal to validate regime durability", href: "#current-scores" },
     ],
     growth: [
@@ -239,7 +239,7 @@ export default async function SignalsPage({
     ],
     financial: [
       { label: "Tightness", why: "Funding conditions drive immediate financial operating constraints", href: "#current-scores" },
-      { label: "Risk appetite", why: "Credit and valuation tolerance shift with risk-on/off posture", href: "#current-scores" },
+      { label: "Risk appetite", why: "Credit and valuation tolerance shift with capital-posture shifts", href: "#current-scores" },
       { label: "Macro source series", why: "Trace inputs before finalizing treasury-sensitive moves", href: "#current-scores" },
     ],
   };
@@ -304,7 +304,7 @@ export default async function SignalsPage({
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Evidence appendix"
-      currentPath="/signals"
+      currentPath="/evidence"
       pageSummary="Evidence and raw diagnostics only: drivers, thresholds, and timestamps behind posture."
       pageSummaryLink={{
         href: "#thresholds",
@@ -333,7 +333,7 @@ export default async function SignalsPage({
         historicalSelection ? (
           <HistoricalBanner
             banner={historicalSelection.banner}
-            liveHref="/signals"
+            liveHref="/evidence"
             previousHref={previousHistoricalHref}
             timeMachineHref={historicalTimeMachineHref}
           />
@@ -378,7 +378,7 @@ export default async function SignalsPage({
           <article className="weather-surface space-y-3 p-5">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-200">Current posture</p>
             <h2 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
-              {regimeLabel} regime is the active operating climate.
+              {regimeLabel} regime is the active operating posture.
             </h2>
             <p className="text-sm leading-relaxed text-slate-200 sm:text-base">
               Use this page to validate confidence, inspect the highest-impact movers, and verify threshold-level evidence before changing posture.
