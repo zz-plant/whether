@@ -2,6 +2,8 @@ import { formatNumberValue } from "../formatters";
 import type { RegimeAssessment } from "../regimeEngine";
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../types";
 import { buildComplianceStamp } from "../exportNotices";
+import type { DecisionKnob } from "../report/decisionKnobs";
+import type { buildWeeklyCall } from "../report/weeklyCall";
 
 const formatNumber = (value: number | null, unit: string) => {
   const formatted = formatNumberValue(value);
@@ -56,6 +58,10 @@ export const buildSlackBrief = (
   treasury: TreasuryData,
   sensors: SensorReading[],
   macros: MacroSeriesReading[],
+  options?: {
+    decisionKnobs?: DecisionKnob[];
+    weeklyCall?: ReturnType<typeof buildWeeklyCall>;
+  },
 ) => {
   const baseRate = sensors.find((sensor) => sensor.id === "BASE_RATE");
   const curveSlope = sensors.find((sensor) => sensor.id === "CURVE_SLOPE");
@@ -64,10 +70,15 @@ export const buildSlackBrief = (
   );
   const decisionHighlights = buildDecisionHighlights(assessment);
   const citations = buildCitationLines(treasury, macros);
+  const dialLines = options?.decisionKnobs?.map(
+    (dial) =>
+      `• ${dial.label}: ${dial.value}/3 (${dial.delta === 0 ? "unchanged" : dial.delta > 0 ? "raised" : "lowered"})`,
+  ) ?? [];
 
   return [
     `Whether Report Brief — ${treasury.record_date}`,
     `Capital posture: ${assessment.regime}`,
+    options?.weeklyCall ? `Directive: ${options.weeklyCall.rulesOfEngagement[0]}` : null,
     `Tightness: ${assessment.scores.tightness} | Risk appetite: ${assessment.scores.riskAppetite}`,
     `Base rate: ${formatNumber(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
     `Curve slope: ${formatNumber(curveSlope?.value ?? null, "%")}`,
@@ -77,6 +88,10 @@ export const buildSlackBrief = (
     "",
     "Decision Shield highlights (top 3):",
     ...decisionHighlights,
+    ...(dialLines.length > 0 ? ["", "Operating dials (0–3):", ...dialLines] : []),
+    ...(options?.weeklyCall
+      ? ["", `Avoid this week: ${options.weeklyCall.avoidThisWeek.headline}`, `Flip trigger: ${options.weeklyCall.flipTrigger}`]
+      : []),
     "",
     "Constraints:",
     ...assessment.constraints.map((item) => `• ${item}`),
@@ -85,7 +100,7 @@ export const buildSlackBrief = (
     ...citations,
     "",
     ...buildExportStamp(treasury, "Score-based posture confidence"),
-  ].join("\n");
+  ].filter(Boolean).join("\n");
 };
 
 export const buildBoardBrief = (

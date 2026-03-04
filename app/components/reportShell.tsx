@@ -28,6 +28,7 @@ import { ReportCta } from "./reportCta";
 import { ClimateBackdrop } from "./climateBackdrop";
 import { RegimeIconType } from "./regimeIcons";
 import { ArrowRightIcon } from "./uiIcons";
+import { productCopy } from "../../lib/copy/productCopy";
 
 export const ReportShell = ({
   children,
@@ -214,7 +215,7 @@ export const ReportShell = ({
         </dl>
       }
       />
-      <p className="mt-3 text-xs text-slate-300">Use this for near-term planning decisions, not long-range forecasting.</p>
+      <p className="mt-3 text-xs text-slate-300">{productCopy.notForecastingDisclaimer}</p>
     </>
   );
   const commandActionCandidates: OperatorCommandAction[] = [];
@@ -364,10 +365,14 @@ export const ReportShell = ({
                   </p>
                 </div>
               </div>
-              <div className="hidden items-center sm:flex">
-                <p className="text-xs text-slate-300">
-                  Signals updated {fetchedAtLabel}
-                </p>
+              <div className="hidden items-center gap-3 sm:flex">
+                <Link
+                  href="/about#what-this-is"
+                  className="text-xs font-semibold text-sky-200 underline decoration-slate-500/80 underline-offset-4 hover:text-slate-100"
+                >
+                  What is this?
+                </Link>
+                <p className="text-xs text-slate-300">Signals updated {fetchedAtLabel}</p>
               </div>
             </div>
             {showPageNavigation ? (

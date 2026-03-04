@@ -7,6 +7,8 @@ export type DecisionKnob = {
   delta: number;
 };
 
+export type DecisionKnobDeltaDirection = "raised" | "lowered" | "unchanged";
+
 export const knobsByRegime: Record<RegimeKey, Record<DecisionKnob["key"], number>> = {
   SCARCITY: {
     approvalVelocity: 0,
@@ -42,6 +44,11 @@ const knobLabels: Record<DecisionKnob["key"], string> = {
 };
 
 const clampKnobValue = (value: number) => Math.min(3, Math.max(0, value));
+
+export const getDecisionKnobDeltaDirection = (delta: number): DecisionKnobDeltaDirection =>
+  delta === 0 ? "unchanged" : delta > 0 ? "raised" : "lowered";
+
+export const getDecisionKnobDeltaLabel = (delta: number) => getDecisionKnobDeltaDirection(delta);
 
 export const deriveDecisionKnobs = (
   regime: RegimeKey,

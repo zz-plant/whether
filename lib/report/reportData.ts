@@ -24,6 +24,7 @@ import { loadMacroSeries } from "../macroSnapshot";
 import { parseThresholdsFromSearchParams } from "../thresholds";
 import { formatAgeHours, formatDateUTC, formatTimestampUTC } from "../formatters";
 import { buildRegimeAlert } from "./reportFormatting";
+import { getRegimeStatusLabel } from "./regimeLabels";
 
 export type ReportSearchParams = {
   month?: string;
@@ -72,13 +73,6 @@ export const isImprovingSignalDelta = (
   key: ReportDynamics["changedSignals"][number]["key"],
   delta: number,
 ): boolean => (signalDeltaImprovesWhen[key] === "positive" ? delta > 0 : delta < 0);
-
-const regimeStatusLabelMap = {
-  SCARCITY: "Scarcity",
-  DEFENSIVE: "Defensive",
-  VOLATILE: "Neutral",
-  EXPANSION: "Expansion",
-} as const;
 
 export const buildLastYearComparison = ({
   current,
@@ -266,7 +260,7 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
     ageLabel: "Static.",
     statusLabel: "Simulated (low)",
   };
-  const statusLabel = regimeStatusLabelMap[assessment.regime];
+  const statusLabel = getRegimeStatusLabel(assessment.regime);
   const historicalComparison =
     historicalSelection && liveAssessment
       ? {
@@ -344,6 +338,94 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
     treasury,
     treasuryProvenance,
   };
+};
+
+const buildFallbackReportData = async (searchParams?: ReportSearchParams) => {
+  const historicalSelection = resolveTimeMachineSelection(searchParams);
+  const requestedSelection = parseTimeMachineRequest(searchParams);
+  const now = new Date();
+  const thresholds = parseThresholdsFromSearchParams(searchParams);
+  const treasury = {
+    ...snapshotData,
+    isLive: false,
+    fallback_at: now.toISOString(),
+    fallback_reason: "Home loader timeout — serving cached snapshot.",
+  };
+  const assessment = evaluateRegime(treasury, thresholds, []);
+  const playbook = getPlaybookGuidance(assessment.regime);
+
+  return {
+    assessment,
+    cacheCoverage: getTimeMachineCoverage(),
+    cacheMonthsByYear: getTimeMachineMonthsByYear(),
+    fetchedAtLabel: formatTimestampUTC(treasury.fetched_at),
+    fenceItems: assessment.constraints,
+    historicalComparison: null,
+    historicalSelection,
+    internalProvenance: {
+      sourceLabel: "Whether curated playbook catalog",
+      recordDateLabel: "Static",
+      timestampLabel: "Static catalog",
+      ageLabel: "Static.",
+      statusLabel: "Simulated (low)",
+    },
+    invalidHistoricalSelection: Boolean(requestedSelection && !historicalSelection),
+    lastYearComparison: null,
+    liveAssessment: null,
+    liveTreasury: treasury,
+    macroProvenance: {
+      sourceLabel: "FRED & US Treasury",
+      sourceUrl: treasury.source,
+      recordDateLabel: formatDateUTC(treasury.record_date),
+      timestampLabel: formatTimestampUTC(treasury.fetched_at),
+      ageLabel: formatAgeHours(treasury.fetched_at, now),
+      statusLabel: "Cached (medium)",
+    },
+    macroSeries: [],
+    playbook: playbook.playbook,
+    recordDateLabel: formatDateUTC(treasury.record_date),
+    reportDynamics: {
+      changedSignals: [],
+      totalSignalChanges: 0,
+      regimeChanged: false,
+      directionLabel: "stable" as const,
+    },
+    requestedSelection,
+    regimeSeries: getTimeMachineRegimeSeries(DEFAULT_REGIME_SERIES_MONTHS, thresholds),
+    regimeAlert: null,
+    regimeTrend: deriveRegimeTrend(null, assessment),
+    selectedMonth: requestedSelection?.month ?? now.getUTCMonth() + 1,
+    selectedYear: requestedSelection?.year ?? now.getUTCFullYear(),
+    sensors: buildSensorReadings(treasury),
+    startItems: playbook.startItems,
+    statusLabel: getRegimeStatusLabel(assessment.regime),
+    stopItems: playbook.stopItems,
+    thresholds,
+    treasury,
+    treasuryProvenance: {
+      sourceLabel: "Federal Reserve Economic Data (FRED)",
+      sourceUrl: treasury.source,
+      recordDateLabel: formatDateUTC(treasury.record_date),
+      timestampLabel: formatTimestampUTC(treasury.fetched_at),
+      ageLabel: formatAgeHours(treasury.fetched_at, now),
+      statusLabel: "Cached snapshot",
+    },
+  };
+};
+
+export const loadReportDataWithTimeout = async (
+  searchParams?: ReportSearchParams,
+  timeoutMs = 1_000,
+) => {
+  const timed = new Promise<Awaited<ReturnType<typeof loadReportDataUncached>> | null>((resolve) => {
+    setTimeout(() => resolve(null), timeoutMs);
+  });
+  const liveData = await Promise.race([loadReportData(searchParams), timed]);
+  if (liveData) {
+    return { ...liveData, usedTimeoutFallback: false as const };
+  }
+  const fallback = await buildFallbackReportData(searchParams);
+  return { ...fallback, usedTimeoutFallback: true as const };
 };
 
 let defaultReportDataPromise: Promise<Awaited<ReturnType<typeof loadReportDataUncached>>> | null = null;

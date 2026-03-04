@@ -16,7 +16,7 @@ export const primaryNavigation: PrimaryNavigationItem[] = [
   },
   {
     href: "/start",
-    label: "Start Here",
+    label: "Start here",
     description: "Default starting point for this week’s posture, situation, and next action.",
   },
   {

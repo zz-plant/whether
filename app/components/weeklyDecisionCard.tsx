@@ -1,20 +1,24 @@
 import type { ReactNode } from "react";
-import type { DecisionKnob } from "../../lib/report/decisionKnobs";
+import {
+  getDecisionKnobDeltaLabel,
+  type DecisionKnob,
+} from "../../lib/report/decisionKnobs";
 import { isImprovingSignalDelta } from "../../lib/report/reportData";
 import type { ReportDynamics } from "../../lib/report/reportData";
+import { productCopy } from "../../lib/copy/productCopy";
 
 type Regime = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
 
 type WeeklyDecisionCardProps = {
   regime: Regime;
   statusLabel: string;
-  postureDelta: string;
+  changeVsLastWeek: string;
   confidenceLabel: "HIGH" | "MED" | "LOW";
   transitionWatch: "ON" | "OFF";
   constraints: string[];
   guardrail: string;
   reversalTrigger: string;
-  dangerousCategory: string;
+  avoidThisWeek: { headline: string; rationale?: string };
   recordDateLabel: string;
   fetchedAtLabel: string;
   reportDynamics: ReportDynamics;
@@ -65,13 +69,13 @@ function getDeltaMagnitudeLabel(delta: number): string {
 export function WeeklyDecisionCard({
   regime,
   statusLabel,
-  postureDelta,
+  changeVsLastWeek,
   confidenceLabel,
   transitionWatch,
   constraints,
   guardrail,
   reversalTrigger,
-  dangerousCategory,
+  avoidThisWeek,
   recordDateLabel,
   fetchedAtLabel,
   reportDynamics,
@@ -89,10 +93,10 @@ export function WeeklyDecisionCard({
         <h1 id="weekly-posture-brief-title" className="text-3xl font-semibold text-slate-50 sm:text-4xl">
           Current environment: {statusLabel} ({regimeEnvironmentByRegime[regime]})
         </h1>
-        <p className="max-w-3xl text-sm text-slate-300">A weekly operating posture for hiring, roadmap, and spend decisions — based on macro signals.</p>
+        <p className="max-w-3xl text-sm text-slate-300">{productCopy.weeklyPostureDefinition}</p>
                 <p className="max-w-3xl text-base text-slate-200">{postureHeadlineByRegime[regime]}</p>
         <div className="flex flex-wrap items-center gap-3">
-          <p className="text-sm text-slate-300">Change vs last week: {postureDelta}</p>
+          <p className="text-sm text-slate-300">Change vs last week: {changeVsLastWeek}</p>
           {actions}
         </div>
       </header>
@@ -100,9 +104,9 @@ export function WeeklyDecisionCard({
       <article className="rounded-xl border border-slate-700/70 bg-slate-900/50 p-4">
         <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">How to use this</h2>
         <ol className="mt-2 space-y-1 text-sm text-slate-200">
-          <li>1. Read the weekly environment call.</li>
-          <li>2. Apply the operating dials to hiring, roadmap, and spend.</li>
-          <li>3. Avoid the highlighted high-risk decisions.</li>
+          {productCopy.howToUseSteps.map((step, index) => (
+            <li key={step}>{index + 1}. {step}</li>
+          ))}
         </ol>
       </article>
 
@@ -148,7 +152,7 @@ export function WeeklyDecisionCard({
         <p className="mt-2 text-xs text-slate-300">How strict leadership decisions should be right now.</p>
         <div className="mt-3 grid gap-3 text-sm text-slate-100 sm:grid-cols-2">
           {decisionKnobs.map((knob) => {
-            const deltaLabel = knob.delta === 0 ? "unchanged" : knob.delta > 0 ? "raised" : "lowered";
+            const deltaLabel = getDecisionKnobDeltaLabel(knob.delta);
             return (
               <div key={knob.key} className="rounded-lg border border-slate-700/60 bg-slate-950/60 p-3">
                 <p className="text-xs uppercase tracking-[0.12em] text-slate-300">{knob.label}</p>
@@ -193,9 +197,9 @@ export function WeeklyDecisionCard({
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-rose-200">Avoid this week</p>
           <p className="mt-2 flex items-start gap-2 text-sm font-semibold text-rose-100">
             <span aria-hidden="true" className="mt-0.5">⚠</span>
-            <span>{dangerousCategory}</span>
+            <span>{avoidThisWeek.headline}</span>
           </p>
-          <p className="mt-2 text-xs text-rose-100/90">Delay large hiring or expansion commitments until conditions improve.</p>
+          <p className="mt-2 text-xs text-rose-100/90">{avoidThisWeek.rationale ?? "Delay large hiring or expansion commitments until conditions improve."}</p>
         </article>
       </div>
 
@@ -221,7 +225,7 @@ export function WeeklyDecisionCard({
         </article>
       </div>
 
-      <p className="text-xs text-slate-400">Effective date: {recordDateLabel} · Data freshness: {fetchedAtLabel}</p>
+      <p className="text-xs text-slate-400">Effective date: {recordDateLabel} · Data freshness: {fetchedAtLabel} · {productCopy.notForecastingDisclaimer}</p>
     </section>
   );
 }

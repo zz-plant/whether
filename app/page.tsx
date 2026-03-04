@@ -6,7 +6,7 @@ import {
   parseTimeMachineRequest,
   resolveTimeMachineSelection,
 } from "../lib/timeMachine/timeMachineSelection";
-import { loadReportData } from "../lib/report/reportData";
+import { loadReportDataWithTimeout } from "../lib/report/reportData";
 import { siteUrl } from "../lib/siteUrl";
 import {
   buildBreadcrumbList,
@@ -29,6 +29,7 @@ import { ActionStrip } from "./components/actionStrip";
 import { buildSlackBrief } from "../lib/export/briefBuilders";
 import { CopySlackBriefButton } from "./components/copySlackBriefButton";
 import { createBreadcrumbTrail } from "../lib/navigation/breadcrumbs";
+import { buildWeeklyCall } from "../lib/report/weeklyCall";
 
 const WeeklyActionSummaryPanel = dynamic(
   () =>
@@ -67,58 +68,25 @@ const homeSectionSequence = [
   { href: "#executive-snapshot", label: "Evidence" },
 ] as const;
 
-const regimeLabelMap = {
-  SCARCITY: "Scarcity",
-  DEFENSIVE: "Defensive",
-  VOLATILE: "Mixed",
-  EXPANSION: "Expansion",
-} as const;
-
-const regimeShiftTargets = {
-  SCARCITY: {
-    defensive: "DEFENSIVE",
-    adjacent: "VOLATILE",
-  },
-  DEFENSIVE: {
-    defensive: "SCARCITY",
-    adjacent: "EXPANSION",
-  },
-  VOLATILE: {
-    defensive: "SCARCITY",
-    adjacent: "EXPANSION",
-  },
-  EXPANSION: {
-    defensive: "DEFENSIVE",
-    adjacent: "VOLATILE",
-  },
-} as const;
-
-const regimeSeverityRank: Record<keyof typeof regimeLabelMap, number> = {
+const regimeSeverityRank = {
   EXPANSION: 0,
   VOLATILE: 1,
   DEFENSIVE: 2,
   SCARCITY: 3,
 };
 
-const expansionWindowByRegime: Record<keyof typeof regimeLabelMap, string> = {
+const expansionWindowByRegime = {
   SCARCITY: "Closed",
   DEFENSIVE: "Mostly closed",
   VOLATILE: "Selective",
   EXPANSION: "Open with guardrails",
 };
 
-const longCycleBetByRegime: Record<keyof typeof regimeLabelMap, string> = {
+const longCycleBetByRegime = {
   SCARCITY: "Constrained",
   DEFENSIVE: "Constrained",
   VOLATILE: "Caution",
   EXPANSION: "Permitted with milestones",
-};
-
-const expansionConstraintByRegime: Record<keyof typeof regimeLabelMap, string> = {
-  SCARCITY: "avoid new expansion initiatives",
-  DEFENSIVE: "avoid new expansion initiatives",
-  VOLATILE: "stage expansion initiatives",
-  EXPANSION: "pursue expansion initiatives selectively",
 };
 
 export const generateMetadata = async ({
@@ -286,7 +254,7 @@ export default async function HomePage({
     stopItems,
     treasury,
     treasuryProvenance,
-  } = await loadReportData(resolvedSearchParams);
+  } = await loadReportDataWithTimeout(resolvedSearchParams, 900);
   const previousHistoricalSelection = historicalSelection
     ? getAdjacentTimeMachineRequest(historicalSelection, "previous")
     : null;
@@ -317,7 +285,7 @@ export default async function HomePage({
   const severityDelta = previousRegime
     ? regimeSeverityRank[assessment.regime] - regimeSeverityRank[previousRegime]
     : 0;
-  const postureDeltaLabel = severityDelta > 0 ? "Worse than last week" : severityDelta < 0 ? "Better than last week" : "No worse than last week";
+  const changeVsLastWeek = severityDelta > 0 ? "Worse than last week" : severityDelta < 0 ? "Better than last week" : "No material change";
   const operatingCalls = operatingCallsByRegime[assessment.regime];
   const expansionWindow = expansionWindowByRegime[assessment.regime];
   const longCycleBetStance = longCycleBetByRegime[assessment.regime];
@@ -326,27 +294,24 @@ export default async function HomePage({
   const tightnessGap = Math.abs(assessment.scores.tightness - tightnessThreshold);
   const riskGap = Math.abs(assessment.scores.riskAppetite - riskThreshold);
   const nearestThresholdGap = Math.min(tightnessGap, riskGap);
-  const shiftTargets = regimeShiftTargets[assessment.regime];
-  const primaryShiftRegimeLabel = regimeLabelMap[shiftTargets.defensive];
   const confidenceLabel = nearestThresholdGap <= 5 ? "LOW" : nearestThresholdGap <= 12 ? "MED" : "HIGH";
   const transitionWatch = nearestThresholdGap <= 8 || Boolean(regimeAlert) ? "ON" : "OFF";
-  const reversalTrigger = tightnessGap <= riskGap
-    ? `Flip to ${primaryShiftRegimeLabel} if tightness crosses ${tightnessThreshold.toFixed(1)} (now ${assessment.scores.tightness.toFixed(1)}).`
-    : `Flip to ${primaryShiftRegimeLabel} if risk appetite crosses ${riskThreshold.toFixed(1)} (now ${assessment.scores.riskAppetite.toFixed(1)}).`;
-  const dangerousCategory =
-    assessment.regime === "EXPANSION"
-      ? "Unchecked spend growth without payback controls"
-      : assessment.regime === "VOLATILE"
-        ? "Irreversible multi-quarter commitments"
-        : "Net-new hiring and long-payback expansion bets";
-  const constraints = [
-    `Expansion: ${expansionConstraintByRegime[assessment.regime]} (${expansionWindow.toLowerCase()})`,
-    `Hiring: restrict to critical roles (${operatingCalls.hiring.toLowerCase()})`,
-    `Long bets: defer unless reversible (${longCycleBetStance.toLowerCase()})`,
-  ];
-  const guardrail = stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
+  const weeklyCall = buildWeeklyCall({
+    regime: assessment.regime,
+    stopItems,
+    expansionWindow,
+    hiringConstraint: operatingCalls.hiring,
+    longCycleBetStance,
+    tightnessThreshold,
+    riskThreshold,
+    tightnessScore: assessment.scores.tightness,
+    riskAppetiteScore: assessment.scores.riskAppetite,
+  });
   const decisionKnobs = deriveDecisionKnobs(assessment.regime, severityDelta);
-  const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries);
+  const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries, {
+    decisionKnobs,
+    weeklyCall,
+  });
   return (
     <ReportShell
       regime={assessment.regime}
@@ -396,13 +361,13 @@ export default async function HomePage({
       <WeeklyDecisionCard
         regime={assessment.regime}
         statusLabel={statusLabel}
-        postureDelta={postureDeltaLabel}
+        changeVsLastWeek={changeVsLastWeek}
         confidenceLabel={confidenceLabel}
         transitionWatch={transitionWatch}
-        constraints={constraints}
-        guardrail={guardrail}
-        reversalTrigger={reversalTrigger}
-        dangerousCategory={dangerousCategory}
+        constraints={weeklyCall.rulesOfEngagement}
+        guardrail={weeklyCall.guardrail}
+        reversalTrigger={weeklyCall.flipTrigger}
+        avoidThisWeek={weeklyCall.avoidThisWeek}
         recordDateLabel={recordDateLabel}
         fetchedAtLabel={fetchedAtLabel}
         reportDynamics={reportDynamics}

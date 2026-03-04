@@ -51,7 +51,7 @@ The progression is: **macro awareness → operating posture → portfolio choice
 - **Product Strategy / Chief of Staff:** Translate external signals into company-level planning guidance.
 
 ## Local development
-1. Use Node.js 20+ (`.nvmrc`) and Bun 1.3.x.
+1. Use Node.js 20.16.x (`.nvmrc`) and Bun 1.3.x.
 2. Install dependencies: `bun install`
 3. Start development server: `bun run dev` (or `bun run dev:turbo`)
 4. Open `http://localhost:3000`
@@ -98,7 +98,7 @@ instead of regenerating the full historical dataset.
 - Architecture: `docs/architecture.md`
 - Current feature scope: `docs/feature-specs-current.md`
 - Next-level direction: `docs/prd-next-level.md`, `docs/specs-next-level.md`
-- Stack modernization status: `docs/stack-modernization-*.md`
+- Stack modernization status: `docs/stack-modernization-inventory.md`, `docs/stack-modernization-plan.md`
 
 ## Notes
 - Whether provides operational strategy guidance, not investment advice.
