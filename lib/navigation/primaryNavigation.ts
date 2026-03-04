@@ -15,8 +15,8 @@ export const primaryNavigation: PrimaryNavigationItem[] = [
   },
   {
     href: "/signals",
-    label: "Signals",
-    description: "Live macro inputs, thresholds, and confidence context.",
+    label: "Evidence",
+    description: "Evidence appendix for the weekly brief: diagnostics, thresholds, and timestamps.",
   },
   {
     href: "/operations",
