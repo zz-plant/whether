@@ -114,6 +114,13 @@ const longCycleBetByRegime: Record<keyof typeof regimeLabelMap, string> = {
   EXPANSION: "Permitted with milestones",
 };
 
+const expansionConstraintByRegime: Record<keyof typeof regimeLabelMap, string> = {
+  SCARCITY: "avoid new expansion initiatives",
+  DEFENSIVE: "avoid new expansion initiatives",
+  VOLATILE: "stage expansion initiatives",
+  EXPANSION: "pursue expansion initiatives selectively",
+};
+
 export const generateMetadata = async ({
   searchParams,
 }: {
@@ -333,7 +340,7 @@ export default async function HomePage({
         ? "Irreversible multi-quarter commitments"
         : "Net-new hiring and long-payback expansion bets";
   const constraints = [
-    `Expansion: avoid new expansion initiatives (${expansionWindow.toLowerCase()})`,
+    `Expansion: ${expansionConstraintByRegime[assessment.regime]} (${expansionWindow.toLowerCase()})`,
     `Hiring: restrict to critical roles (${operatingCalls.hiring.toLowerCase()})`,
     `Long bets: defer unless reversible (${longCycleBetStance.toLowerCase()})`,
   ];

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { DecisionKnob } from "../../lib/report/decisionKnobs";
+import { isImprovingSignalDelta } from "../../lib/report/reportData";
 import type { ReportDynamics } from "../../lib/report/reportData";
 
 type Regime = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
@@ -94,10 +95,11 @@ export function WeeklyDecisionCard({
         <ul className="mt-3 grid gap-3 text-sm text-slate-100 sm:grid-cols-2">
           {deltaSignalOrder.map((item) => {
             const delta = deltasByKey.get(item.key) ?? 0;
-            const interpretationLabel = delta === 0 ? "unchanged" : delta > 0 ? "improving" : "weakening";
+            const isImproving = isImprovingSignalDelta(item.key, delta);
+            const interpretationLabel = delta === 0 ? "unchanged" : isImproving ? "improving" : "weakening";
             const trendClassName = delta === 0
               ? "text-slate-300"
-              : delta > 0
+              : isImproving
                 ? "text-emerald-200"
                 : "text-rose-200";
             const barWidth = Math.max(8, Math.min(100, Math.round(Math.abs(delta) * 55)));
@@ -107,7 +109,7 @@ export function WeeklyDecisionCard({
                   {item.label}: {interpretationLabel} ({delta > 0 ? "+" : ""}{delta.toFixed(1)})
                 </p>
                 <span className="mt-2 block h-1.5 rounded-full bg-slate-800" aria-hidden="true">
-                  <span className={`block h-full rounded-full ${delta === 0 ? "bg-slate-500" : delta > 0 ? "bg-emerald-400" : "bg-rose-400"}`} style={{ width: `${barWidth}%` }} />
+                  <span className={`block h-full rounded-full ${delta === 0 ? "bg-slate-500" : isImproving ? "bg-emerald-400" : "bg-rose-400"}`} style={{ width: `${barWidth}%` }} />
                 </span>
               </li>
             );
