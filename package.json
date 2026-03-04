@@ -16,7 +16,7 @@
     "clean:build": "node scripts/clean-build-artifacts.mjs",
     "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --fix",
-    "check": "bun run lint && bun run typecheck && bun run test",
+    "check": "bun run review:hotspot-preflight && bun run lint && bun run typecheck && bun run test",
     "typecheck": "tsc --noEmit",
     "test": "node scripts/run-tests.mjs",
     "test:watch": "node scripts/run-tests.mjs --watch",
@@ -26,7 +26,8 @@
     "deploy:cloudflare": "node scripts/cloudflare-build-and-upload.mjs",
     "smoke:prod": "node scripts/prod-synthetic-smoke.mjs https://whether.work",
     "review:comment-trends": "node scripts/review-comment-trends.mjs --repo zz-plant/whether --limit 200",
-    "review:comment-trends:update": "node scripts/review-comment-trends.mjs --repo zz-plant/whether --limit 200 --out docs/research/review-comment-trends.latest.json --summary-out docs/research/review-comment-trends.latest.md"
+    "review:comment-trends:update": "node scripts/review-comment-trends.mjs --repo zz-plant/whether --limit 200 --out docs/research/review-comment-trends.latest.json --summary-out docs/research/review-comment-trends.latest.md",
+    "review:hotspot-preflight": "node scripts/review-hotspot-preflight.mjs"
   },
   "engines": {
     "node": "20.16.x"
