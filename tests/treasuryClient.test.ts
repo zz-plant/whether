@@ -315,4 +315,45 @@ describe("treasury client", () => {
       tenYear: 4.56,
     });
   });
+
+  it("uses the next newest FiscalData row when the latest row has placeholder tenor values", async () => {
+    const fetcher: typeof fetch = async (input) => {
+      const url = input.toString();
+      if (url.includes("api.fiscaldata.treasury.gov")) {
+        return new Response(
+          JSON.stringify({
+            data: [
+              {
+                record_date: "2026-01-10",
+                bc_1month: ".",
+                bc_3month: "4.25",
+                bc_2year: "4.34",
+                bc_10year: "4.58",
+              },
+              {
+                record_date: "2026-01-09",
+                bc_1month: "4.12",
+                bc_3month: "4.23",
+                bc_2year: "4.31",
+                bc_10year: "4.56",
+              },
+            ],
+          })
+        );
+      }
+
+      return new Response("{}", { status: 500 });
+    };
+
+    const data = await fetchTreasuryData({ fetcher });
+    assert.equal(data.isLive, true);
+    assert.equal(data.record_date, "2026-01-09");
+    assert.equal(data.source, "https://api.fiscaldata.treasury.gov");
+    assert.deepEqual(data.yields, {
+      oneMonth: 4.12,
+      threeMonth: 4.23,
+      twoYear: 4.31,
+      tenYear: 4.56,
+    });
+  });
 });

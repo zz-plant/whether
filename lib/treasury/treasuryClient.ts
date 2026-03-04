@@ -82,31 +82,40 @@ const fetchTreasuryFromFiscalData = async (fetcher: typeof fetch, fetchedAt: str
   }
 
   const payload = (await response.json()) as { data?: Array<Record<string, unknown>> };
-  const latest = payload.data?.find((row) => typeof row.record_date === "string");
-  if (!latest || typeof latest.record_date !== "string") {
+  const rows = payload.data?.filter((row) => typeof row.record_date === "string") ?? [];
+  if (!rows.length) {
     throw new Error("FiscalData Treasury series returned no data or invalid payload.");
   }
 
-  const oneMonth = parseFiscalDataNumber(latest.bc_1month);
-  const threeMonth = parseFiscalDataNumber(latest.bc_3month);
-  const twoYear = parseFiscalDataNumber(latest.bc_2year);
-  const tenYear = parseFiscalDataNumber(latest.bc_10year);
-  if ([oneMonth, threeMonth, twoYear, tenYear].some((value) => value === null)) {
-    throw new Error("FiscalData Treasury series missing one or more required tenors.");
+  for (const row of rows) {
+    const recordDate = row.record_date;
+    if (typeof recordDate !== "string") {
+      continue;
+    }
+
+    const oneMonth = parseFiscalDataNumber(row.bc_1month);
+    const threeMonth = parseFiscalDataNumber(row.bc_3month);
+    const twoYear = parseFiscalDataNumber(row.bc_2year);
+    const tenYear = parseFiscalDataNumber(row.bc_10year);
+    if ([oneMonth, threeMonth, twoYear, tenYear].some((value) => value === null)) {
+      continue;
+    }
+
+    return {
+      source: "https://api.fiscaldata.treasury.gov",
+      record_date: recordDate,
+      fetched_at: fetchedAt,
+      isLive: true,
+      yields: {
+        oneMonth,
+        threeMonth,
+        twoYear,
+        tenYear,
+      },
+    } satisfies TreasuryData;
   }
 
-  return {
-    source: "https://api.fiscaldata.treasury.gov",
-    record_date: latest.record_date,
-    fetched_at: fetchedAt,
-    isLive: true,
-    yields: {
-      oneMonth,
-      threeMonth,
-      twoYear,
-      tenYear,
-    },
-  } satisfies TreasuryData;
+  throw new Error("FiscalData Treasury series missing one or more required tenors.");
 };
 
 const findLatestCommonDate = (seriesMaps: Map<string, number | null>[]) => {
