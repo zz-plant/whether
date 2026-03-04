@@ -21,8 +21,8 @@ describe("treasury client", () => {
       if (url.includes("DGS1MO")) {
         return new Response(
           buildCsv("DGS1MO", [
-            { date: "2024-10-01", value: "5.2" },
-            { date: "2024-10-02", value: "5.1" },
+            { date: "2026-02-01", value: "5.2" },
+            { date: "2026-02-02", value: "5.1" },
           ])
         );
       }
@@ -30,8 +30,8 @@ describe("treasury client", () => {
       if (url.includes("DGS3MO")) {
         return new Response(
           buildCsv("DGS3MO", [
-            { date: "2024-10-01", value: "5.0" },
-            { date: "2024-10-02", value: "4.9" },
+            { date: "2026-02-01", value: "5.0" },
+            { date: "2026-02-02", value: "4.9" },
           ])
         );
       }
@@ -39,22 +39,22 @@ describe("treasury client", () => {
       if (url.includes("DGS2")) {
         return new Response(
           buildCsv("DGS2", [
-            { date: "2024-10-01", value: "4.8" },
-            { date: "2024-10-02", value: "4.7" },
+            { date: "2026-02-01", value: "4.8" },
+            { date: "2026-02-02", value: "4.7" },
           ])
         );
       }
 
       return new Response(
         buildCsv("DGS10", [
-          { date: "2024-10-01", value: "4.6" },
-          { date: "2024-10-02", value: "4.5" },
+          { date: "2026-02-01", value: "4.6" },
+          { date: "2026-02-02", value: "4.5" },
         ])
       );
     };
 
     const data = await fetchTreasuryData({ fetcher });
-    assert.equal(data.record_date, "2024-10-02");
+    assert.equal(data.record_date, "2026-02-02");
     assert.equal(data.isLive, true);
     assert.equal(requestedUrls.length, 4);
     assert.ok(requestedUrls.some((url) => url.includes("DGS1MO")));
@@ -76,7 +76,7 @@ describe("treasury client", () => {
     const snapshot: TreasuryData = {
       source: "snapshot",
       record_date: "2024-09-30",
-      fetched_at: "2024-10-01T00:00:00Z",
+      fetched_at: "2026-02-01T00:00:00Z",
       isLive: false,
       yields: {
         oneMonth: 5.1,
@@ -105,8 +105,8 @@ describe("treasury client", () => {
 
       return new Response(
         buildCsv("DGS1MO", [
-          { date: "2024-10-01", value: "." },
-          { date: "2024-10-02", value: "." },
+          { date: "2026-02-01", value: "." },
+          { date: "2026-02-02", value: "." },
         ])
       );
     };
@@ -114,7 +114,7 @@ describe("treasury client", () => {
     const snapshot: TreasuryData = {
       source: "snapshot",
       record_date: "2024-09-30",
-      fetched_at: "2024-10-01T00:00:00Z",
+      fetched_at: "2026-02-01T00:00:00Z",
       isLive: false,
       yields: {
         oneMonth: 5.1,
@@ -165,8 +165,8 @@ describe("treasury client", () => {
       requestedUrls.push(input.toString());
       return new Response(
         buildCsv("DGS", [
-          { date: "2024-10-01", value: "5.2" },
-          { date: "2024-10-02", value: "5.1" },
+          { date: "2026-02-01", value: "5.2" },
+          { date: "2026-02-02", value: "5.1" },
         ])
       );
     };
@@ -199,8 +199,8 @@ describe("treasury client", () => {
       requestedUrls.push(input.toString());
       return new Response(
         buildCsv("DGS", [
-          { date: "2024-10-01", value: "5.2" },
-          { date: "2024-10-02", value: "5.1" },
+          { date: "2026-02-01", value: "5.2" },
+          { date: "2026-02-02", value: "5.1" },
         ])
       );
     };
@@ -235,8 +235,8 @@ describe("treasury client", () => {
 
       return new Response(
         buildCsv("DGS", [
-          { date: "2024-10-01", value: "5.2" },
-          { date: "2024-10-02", value: "5.1" },
+          { date: "2026-02-01", value: "5.2" },
+          { date: "2026-02-02", value: "5.1" },
         ])
       );
     };
@@ -262,7 +262,7 @@ describe("treasury client", () => {
     const snapshot: TreasuryData = {
       source: "snapshot",
       record_date: "2024-09-30",
-      fetched_at: "2024-10-01T00:00:00Z",
+      fetched_at: "2026-02-01T00:00:00Z",
       isLive: false,
       yields: {
         oneMonth: 5.1,

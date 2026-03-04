@@ -1,5 +1,5 @@
 {
-  "fetched_at": "2024-10-02T00:00:00Z",
+  "fetched_at": "2026-02-02T00:00:00Z",
   "isLive": false,
   "series": [
     {
@@ -47,13 +47,13 @@
       "sourceLabel": "ICE BofA BBB OAS (FRED)",
       "sourceUrl": "https://fred.stlouisfed.org/series/BAMLC0A4CBBB",
       "formulaUrl": "/formulas#credit-spread",
-      "record_date": "2024-10-01",
+      "record_date": "2026-02-01",
       "history": [
         { "date": "2024-06-01", "value": 1.55 },
         { "date": "2024-07-01", "value": 1.62 },
         { "date": "2024-08-01", "value": 1.7 },
         { "date": "2024-09-01", "value": 1.58 },
-        { "date": "2024-10-01", "value": 1.65 }
+        { "date": "2026-02-01", "value": 1.65 }
       ]
     },
     {
@@ -65,13 +65,13 @@
       "sourceLabel": "ICE BofA High Yield OAS (FRED)",
       "sourceUrl": "https://fred.stlouisfed.org/series/BAMLH0A0HYM2",
       "formulaUrl": "/formulas#high-yield-spread",
-      "record_date": "2024-10-01",
+      "record_date": "2026-02-01",
       "history": [
         { "date": "2024-06-01", "value": 3.82 },
         { "date": "2024-07-01", "value": 3.64 },
         { "date": "2024-08-01", "value": 3.7 },
         { "date": "2024-09-01", "value": 3.48 },
-        { "date": "2024-10-01", "value": 3.55 }
+        { "date": "2026-02-01", "value": 3.55 }
       ]
     },
     {
@@ -83,13 +83,13 @@
       "sourceLabel": "Chicago Fed NFCI (FRED)",
       "sourceUrl": "https://fred.stlouisfed.org/series/NFCI",
       "formulaUrl": "/formulas#financial-conditions",
-      "record_date": "2024-10-01",
+      "record_date": "2026-02-01",
       "history": [
         { "date": "2024-06-01", "value": -0.21 },
         { "date": "2024-07-01", "value": -0.18 },
         { "date": "2024-08-01", "value": -0.15 },
         { "date": "2024-09-01", "value": -0.1 },
-        { "date": "2024-10-01", "value": -0.12 }
+        { "date": "2026-02-01", "value": -0.12 }
       ]
     },
     {
@@ -101,13 +101,13 @@
       "sourceLabel": "CBOE VIX (FRED)",
       "sourceUrl": "https://fred.stlouisfed.org/series/VIXCLS",
       "formulaUrl": "/formulas#vix",
-      "record_date": "2024-10-01",
+      "record_date": "2026-02-01",
       "history": [
         { "date": "2024-06-01", "value": 13.2 },
         { "date": "2024-07-01", "value": 14.8 },
         { "date": "2024-08-01", "value": 18.9 },
         { "date": "2024-09-01", "value": 16.7 },
-        { "date": "2024-10-01", "value": 17.4 }
+        { "date": "2026-02-01", "value": 17.4 }
       ]
     },
     {
@@ -119,12 +119,12 @@
       "sourceLabel": "Whether startup capital snapshot",
       "sourceUrl": "https://www.crunchbase.com/",
       "formulaUrl": "/formulas#vc-funding-velocity",
-      "record_date": "2024-10-01",
+      "record_date": "2026-02-01",
       "history": [
         { "date": "2024-01-01", "value": -12.4 },
         { "date": "2024-04-01", "value": -8.1 },
         { "date": "2024-07-01", "value": -6.2 },
-        { "date": "2024-10-01", "value": -4.5 }
+        { "date": "2026-02-01", "value": -4.5 }
       ]
     },
     {
@@ -136,13 +136,13 @@
       "sourceLabel": "Whether labor stress snapshot",
       "sourceUrl": "https://layoffs.fyi/",
       "formulaUrl": "/formulas#tech-layoff-trend",
-      "record_date": "2024-10-01",
+      "record_date": "2026-02-01",
       "history": [
         { "date": "2024-06-01", "value": 74 },
         { "date": "2024-07-01", "value": 71 },
         { "date": "2024-08-01", "value": 68 },
         { "date": "2024-09-01", "value": 64 },
-        { "date": "2024-10-01", "value": 62 }
+        { "date": "2026-02-01", "value": 62 }
       ]
     },
     {
@@ -154,13 +154,13 @@
       "sourceLabel": "Whether valuation snapshot",
       "sourceUrl": "https://www.meritechcapital.com/software-public-comps",
       "formulaUrl": "/formulas#saas-valuation-multiple",
-      "record_date": "2024-10-01",
+      "record_date": "2026-02-01",
       "history": [
         { "date": "2024-06-01", "value": 5.2 },
         { "date": "2024-07-01", "value": 5.4 },
         { "date": "2024-08-01", "value": 5.6 },
         { "date": "2024-09-01", "value": 5.8 },
-        { "date": "2024-10-01", "value": 5.9 }
+        { "date": "2026-02-01", "value": 5.9 }
       ]
     },
     {
@@ -172,13 +172,13 @@
       "sourceLabel": "Whether earnings revisions snapshot",
       "sourceUrl": "https://www.spglobal.com/spdji/",
       "formulaUrl": "/formulas#earnings-revisions",
-      "record_date": "2024-10-01",
+      "record_date": "2026-02-01",
       "history": [
         { "date": "2024-06-01", "value": 44 },
         { "date": "2024-07-01", "value": 46 },
         { "date": "2024-08-01", "value": 45 },
         { "date": "2024-09-01", "value": 47 },
-        { "date": "2024-10-01", "value": 48 }
+        { "date": "2026-02-01", "value": 48 }
       ]
     },
     {
@@ -190,13 +190,13 @@
       "sourceLabel": "Whether compute-cost snapshot",
       "sourceUrl": "https://cloud.google.com/compute/gpus-pricing",
       "formulaUrl": "/formulas#ai-compute-cost",
-      "record_date": "2024-10-01",
+      "record_date": "2026-02-01",
       "history": [
         { "date": "2024-06-01", "value": -4.1 },
         { "date": "2024-07-01", "value": -6.2 },
         { "date": "2024-08-01", "value": -7.8 },
         { "date": "2024-09-01", "value": -8.6 },
-        { "date": "2024-10-01", "value": -9.2 }
+        { "date": "2026-02-01", "value": -9.2 }
       ]
     },
     {
@@ -208,13 +208,13 @@
       "sourceLabel": "Whether policy-risk snapshot",
       "sourceUrl": "https://artificialintelligenceact.eu/",
       "formulaUrl": "/formulas#regulatory-risk",
-      "record_date": "2024-10-01",
+      "record_date": "2026-02-01",
       "history": [
         { "date": "2024-06-01", "value": 36 },
         { "date": "2024-07-01", "value": 38 },
         { "date": "2024-08-01", "value": 42 },
         { "date": "2024-09-01", "value": 39 },
-        { "date": "2024-10-01", "value": 41 }
+        { "date": "2026-02-01", "value": 41 }
       ]
     }
   ]

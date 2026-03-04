@@ -10,7 +10,7 @@ describe("treasury normalizer", () => {
     const payload = {
       data: [
         {
-          record_date: "2024-10-01",
+          record_date: "2026-02-01",
           bc_1month: "5.12",
           bc_2year: "4.8",
           bc_10year: "4.6",
@@ -19,13 +19,13 @@ describe("treasury normalizer", () => {
     };
 
     const normalized = normalizeTreasuryResponse(payload, {
-      fetched_at: "2024-10-02T00:00:00Z",
+      fetched_at: "2026-02-02T00:00:00Z",
       source: "Treasury",
       isLive: true,
     });
 
     assert.ok(normalized);
-    assert.equal(normalized?.record_date, "2024-10-01");
+    assert.equal(normalized?.record_date, "2026-02-01");
     assert.equal(normalized?.yields.oneMonth, 5.12);
     assert.equal(normalized?.isLive, true);
   });
@@ -34,7 +34,7 @@ describe("treasury normalizer", () => {
     const normalized = normalizeTreasuryResponse(
       { data: "not-an-array" },
       {
-        fetched_at: "2024-10-02T00:00:00Z",
+        fetched_at: "2026-02-02T00:00:00Z",
         source: "Treasury",
         isLive: true,
       }

@@ -1,7 +1,7 @@
 {
   "source": "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v2/accounting/od/daily_treasury_yield_curve",
-  "record_date": "2024-10-01",
-  "fetched_at": "2024-10-02T00:00:00Z",
+  "record_date": "2026-02-01",
+  "fetched_at": "2026-02-02T00:00:00Z",
   "isLive": false,
   "yields": {
     "oneMonth": 5.42,
