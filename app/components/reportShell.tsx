@@ -23,6 +23,7 @@ import { type ReportStageItem } from "./reportRevampElements";
 import { INFORMATIONAL_NOTICE } from "../../lib/exportNotices";
 import { serializeJsonLd } from "../../lib/seo";
 import { AnchorFeedback } from "./anchorFeedback";
+import { ReportCta } from "./reportCta";
 
 import { ClimateBackdrop } from "./climateBackdrop";
 import { RegimeIconType } from "./regimeIcons";
@@ -93,7 +94,7 @@ export const ReportShell = ({
   showPageNavigation?: boolean;
   sidebarVariant?: "full" | "hidden";
   hideHeroChrome?: boolean;
-  primaryCta?: { href: string; label: string };
+  primaryCta?: { href: string; label: string; copyText?: string; copyTarget?: string };
   secondaryCta?: { href: string; label: string };
   exportCta?: { href: string; label: string } | null;
   structuredData?: unknown;
@@ -203,6 +204,8 @@ export const ReportShell = ({
     commandActionCandidates.push({
       href: primaryCta.href,
       label: primaryCta.label,
+      copyText: primaryCta.copyText,
+      copyTarget: primaryCta.copyTarget,
       description: "Primary action",
       keywords: ["start", "weekly", "plan", "priorities"],
       group: "Playbook",
@@ -436,14 +439,15 @@ export const ReportShell = ({
                       id="report-primary-actions"
                       className="flex w-full min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3"
                     >
-                      <a
+                      <ReportCta
                         href={primaryCta.href}
+                        copyText={primaryCta.copyText}
+                        copyTarget={primaryCta.copyTarget}
+                        label={primaryCta.label}
                         className="weather-button-primary inline-flex min-h-[44px] w-full max-w-full items-center justify-center px-4 py-2 text-center text-xs font-semibold leading-tight tracking-[0.12em] shadow-lg shadow-sky-500/30 ring-1 ring-sky-200/30 transition-colors hover:border-sky-300/80 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:text-xs sm:tracking-[0.2em]"
                       >
-                        <span className="max-w-full break-words text-center">
-                          {primaryCta.label}
-                        </span>
-                      </a>
+                        <span className="max-w-full break-words text-center">{primaryCta.label}</span>
+                      </ReportCta>
                       {secondaryCta ? (
                         <a
                           href={secondaryCta.href}
@@ -661,12 +665,15 @@ export const ReportShell = ({
                 <p className="max-w-[16rem] text-xs font-semibold text-slate-100">
                   {primaryDecisionText}
                 </p>
-                <a
+                <ReportCta
                   href={primaryCta.href}
+                  copyText={primaryCta.copyText}
+                  copyTarget={primaryCta.copyTarget}
+                  label={primaryCta.label}
                   className="weather-button-primary inline-flex min-h-[44px] flex-shrink-0 items-center justify-center rounded-full px-3 py-2 text-xs font-semibold tracking-[0.14em]"
                 >
                   {primaryCta.label}
-                </a>
+                </ReportCta>
               </div>
             </section>
             </div>
@@ -688,12 +695,15 @@ export const ReportShell = ({
             Quick actions
           </p>
           <div className="mt-2 grid gap-2">
-            <a
+            <ReportCta
               href={primaryCta.href}
+              copyText={primaryCta.copyText}
+              copyTarget={primaryCta.copyTarget}
+              label={primaryCta.label}
               className="weather-button-primary inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
             >
               {primaryCta.label}
-            </a>
+            </ReportCta>
             {secondaryCta ? (
               <a
                 href={secondaryCta.href}

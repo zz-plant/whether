@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { handleDirectionalFocus } from "./directionalFocus";
 import { useHapticFeedback } from "./useHapticFeedback";
+import { useClipboardCopy } from "./useClipboardCopy";
 import { ArrowRightIcon, BoltIcon, CircleTargetIcon, LayoutGridIcon, SectionJumpIcon } from "./uiIcons";
 
 export type OperatorCommandAction = {
@@ -12,6 +13,8 @@ export type OperatorCommandAction = {
   group: "Playbook" | "Pages" | "Sections";
   tags?: Array<"Playbook" | "Pages" | "Sections">;
   keywords?: string[];
+  copyText?: string;
+  copyTarget?: string;
 };
 
 type CommandFilter = "All" | OperatorCommandAction["group"];
@@ -94,6 +97,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const commandCenterRef = useRef<HTMLElement | null>(null);
   const triggerHaptic = useHapticFeedback();
+  const { copyToClipboard } = useClipboardCopy();
 
   const onDirectionalKeyDown = (event: ReactKeyboardEvent<HTMLElement>) => {
     if (!commandCenterRef.current) {
@@ -419,34 +423,67 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
                       {groupedActions[group].map((action) => {
                         const GroupIcon = groupGlyph[action.group];
                         return (
-                        <li key={`${group}-${action.href}`}>
-                          <a
-                            href={action.href}
-                            className="weather-pill inline-flex min-h-[44px] w-full items-center justify-between gap-3 px-3 py-2 text-left transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                            title={action.description}
-                            aria-label={`${action.label} (${isInPageLink(action.href) ? "section jump" : "page navigation"})`}
-                            onClick={() => triggerHaptic("light")}
-                          >
-                            <span className="inline-flex min-w-0 items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-100">
-                              <span aria-hidden="true" className="text-slate-400">
-                                <GroupIcon className="h-3.5 w-3.5" />
+                        <li key={`${group}-${action.href}-${action.label}`}>
+                          {action.copyText ? (
+                            <button
+                              type="button"
+                              className="weather-pill inline-flex min-h-[44px] w-full items-center justify-between gap-3 px-3 py-2 text-left transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                              title={action.description}
+                              aria-label={`${action.label} (copy action)`}
+                              onClick={() => {
+                                void copyToClipboard(action.copyText!, action.copyTarget ?? action.label);
+                                triggerHaptic("light");
+                              }}
+                            >
+                              <span className="inline-flex min-w-0 items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-100">
+                                <span aria-hidden="true" className="text-slate-400">
+                                  <GroupIcon className="h-3.5 w-3.5" />
+                                </span>
+                                {action.label}
                               </span>
-                              {action.label}
-                            </span>
-                            <span className="inline-flex items-center gap-2">
-                              <span className="flex flex-wrap justify-end gap-1">
-                                {(action.tags ?? [action.group]).map((tag) => (
-                                  <span
-                                    key={`${action.href}-${tag}`}
-                                    className="rounded-full border border-slate-700/70 px-2 py-0.5 text-[9px] font-semibold tracking-[0.12em] text-slate-400"
-                                  >
-                                    {getTagLabel(tag)}
-                                  </span>
-                                ))}
+                              <span className="inline-flex items-center gap-2">
+                                <span className="flex flex-wrap justify-end gap-1">
+                                  {(action.tags ?? [action.group]).map((tag) => (
+                                    <span
+                                      key={`${action.href}-${tag}`}
+                                      className="rounded-full border border-slate-700/70 px-2 py-0.5 text-[9px] font-semibold tracking-[0.12em] text-slate-400"
+                                    >
+                                      {getTagLabel(tag)}
+                                    </span>
+                                  ))}
+                                </span>
+                                <ArrowRightIcon className="h-3.5 w-3.5 text-slate-500" />
                               </span>
-                              <ArrowRightIcon className="h-3.5 w-3.5 text-slate-500" />
-                            </span>
-                          </a>
+                            </button>
+                          ) : (
+                            <a
+                              href={action.href}
+                              className="weather-pill inline-flex min-h-[44px] w-full items-center justify-between gap-3 px-3 py-2 text-left transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                              title={action.description}
+                              aria-label={`${action.label} (${isInPageLink(action.href) ? "section jump" : "page navigation"})`}
+                              onClick={() => triggerHaptic("light")}
+                            >
+                              <span className="inline-flex min-w-0 items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-100">
+                                <span aria-hidden="true" className="text-slate-400">
+                                  <GroupIcon className="h-3.5 w-3.5" />
+                                </span>
+                                {action.label}
+                              </span>
+                              <span className="inline-flex items-center gap-2">
+                                <span className="flex flex-wrap justify-end gap-1">
+                                  {(action.tags ?? [action.group]).map((tag) => (
+                                    <span
+                                      key={`${action.href}-${tag}`}
+                                      className="rounded-full border border-slate-700/70 px-2 py-0.5 text-[9px] font-semibold tracking-[0.12em] text-slate-400"
+                                    >
+                                      {getTagLabel(tag)}
+                                    </span>
+                                  ))}
+                                </span>
+                                <ArrowRightIcon className="h-3.5 w-3.5 text-slate-500" />
+                              </span>
+                            </a>
+                          )}
                         </li>
                         );
                       })}
