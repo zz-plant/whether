@@ -3,6 +3,7 @@
  * Prefers live series fetches and falls back to checked-in snapshot data.
  */
 import macroSnapshot from "../data/macro_snapshot.json";
+import { fetchWithTimeout } from "./fetchWithTimeout";
 import type { MacroSeriesId, MacroSeriesReading } from "./types";
 
 type MacroSnapshotPayload = {
@@ -38,7 +39,8 @@ const snapshotSeries: MacroSeriesReading[] = payload.series.map((series) => ({
 export const macroSeries: MacroSeriesReading[] = snapshotSeries;
 
 const readFredLatestValue = async (seriesId: string, fetcher: typeof fetch) => {
-  const response = await fetcher(
+  const response = await fetchWithTimeout(
+    fetcher,
     `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${encodeURIComponent(seriesId)}`,
     { next: { revalidate: MACRO_SERIES_REVALIDATE_SECONDS } },
   );
@@ -65,7 +67,7 @@ const readFredLatestValue = async (seriesId: string, fetcher: typeof fetch) => {
 };
 
 const readBlsLatestValue = async (seriesId: string, fetcher: typeof fetch) => {
-  const response = await fetcher("https://api.bls.gov/publicAPI/v2/timeseries/data/", {
+  const response = await fetchWithTimeout(fetcher, "https://api.bls.gov/publicAPI/v2/timeseries/data/", {
     method: "POST",
     headers: { "content-type": "application/json" },
     next: { revalidate: MACRO_SERIES_REVALIDATE_SECONDS },
@@ -94,7 +96,7 @@ const readBlsLatestValue = async (seriesId: string, fetcher: typeof fetch) => {
 
 const readBlsLatestYearOverYear = async (seriesId: string, fetcher: typeof fetch) => {
   const currentYear = new Date().getUTCFullYear();
-  const response = await fetcher("https://api.bls.gov/publicAPI/v2/timeseries/data/", {
+  const response = await fetchWithTimeout(fetcher, "https://api.bls.gov/publicAPI/v2/timeseries/data/", {
     method: "POST",
     headers: { "content-type": "application/json" },
     next: { revalidate: MACRO_SERIES_REVALIDATE_SECONDS },
