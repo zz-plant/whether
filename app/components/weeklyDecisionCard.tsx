@@ -61,13 +61,11 @@ export function WeeklyDecisionCard({
   return (
     <section className="weather-panel space-y-6 px-5 py-6 sm:px-7 sm:py-8" aria-labelledby="weekly-posture-brief-title">
       <header className="space-y-3 border-b border-slate-700/70 pb-5">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-200">Weekly Operating Posture Brief</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-200">Weekly Operating Posture (Hiring • Spend • Roadmap)</p>
         <h1 id="weekly-posture-brief-title" className="text-3xl font-semibold text-slate-50 sm:text-4xl">
           {statusLabel}
         </h1>
-        <p className="max-w-3xl text-sm text-slate-300">
-          A weekly read on how strict to be right now: hiring pace, approval bar, and long-bet tolerance — based on public macro signals.
-        </p>
+        <p className="max-w-3xl text-sm text-slate-300">What this is: A weekly call on how strict to operate right now—approval bar, hiring pace, and long-bet tolerance—based on public macro signals.</p>
         <p className="max-w-3xl text-base text-slate-200">{postureHeadlineByRegime[regime]}</p>
         <div className="flex flex-wrap items-center gap-3">
           <p className="text-sm text-slate-300">Change vs last week: {postureDelta}</p>
@@ -101,7 +99,7 @@ export function WeeklyDecisionCard({
             );
           })}
         </ul>
-        <p className="mt-3 text-xs text-slate-300">These deltas drive the dial changes below.</p>
+        <p className="mt-3 text-xs text-slate-300">These changes drive the dial adjustments below.</p>
       </article>
 
       <article className="rounded-xl border border-slate-700/70 bg-slate-900/50 p-4">
@@ -174,7 +172,7 @@ export function WeeklyDecisionCard({
         </article>
         <article className="rounded-xl border border-sky-500/40 bg-slate-900/50 p-4">
           <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-sky-200">What would flip this call</h2>
-          <p className="mt-2 text-sm text-slate-100">{reversalTrigger}</p>
+          <p className="mt-2 text-sm text-slate-100">{reversalTrigger} If this triggers, update approval velocity and hiring stance immediately.</p>
         </article>
       </div>
 

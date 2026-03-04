@@ -147,7 +147,7 @@ export const generateMetadata = async ({
   return {
     title,
     description:
-      "Weekly capital posture governance brief with constraints, guardrails, and reversal triggers.",
+      "A weekly operating posture call for product/engineering/finance—based on public macro signals (with constraints + guardrails).",
     alternates: {
       canonical: "/",
     },
@@ -156,7 +156,7 @@ export const generateMetadata = async ({
       url: canonicalUrl,
       title,
       description:
-        "Weekly capital posture governance brief with constraints, guardrails, and reversal triggers.",
+        "A weekly operating posture call for product/engineering/finance—based on public macro signals (with constraints + guardrails).",
       siteName,
       images: [
         {
@@ -177,7 +177,7 @@ export const generateMetadata = async ({
       card: "summary_large_image",
       title,
       description:
-        "Weekly capital posture governance brief with constraints, guardrails, and reversal triggers.",
+        "A weekly operating posture call for product/engineering/finance—based on public macro signals (with constraints + guardrails).",
       images: [imageUrl, socialImageUrl],
     },
     robots: hasTimeMachineParams
@@ -333,9 +333,9 @@ export default async function HomePage({
         ? "Irreversible multi-quarter commitments"
         : "Net-new hiring and long-payback expansion bets";
   const constraints = [
-    `Expansion window: ${expansionWindow}`,
-    `Hiring: ${operatingCalls.hiring}`,
-    `Long-cycle bets: ${longCycleBetStance}`,
+    `Limit expansion to: ${expansionWindow}`,
+    `Hiring posture: ${operatingCalls.hiring}`,
+    `Long bets: ${longCycleBetStance}`,
   ];
   const guardrail = stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
   const decisionKnobs = deriveDecisionKnobs(assessment.regime, severityDelta);
@@ -352,12 +352,12 @@ export default async function HomePage({
       trustStatusAction={trustStatusAction}
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
-      pageTitle="Weekly Capital Posture Brief"
+      pageTitle="Weekly Operating Posture Brief"
       currentPath="/"
       pageSummary="Verdict and immediate decision call for this planning cycle."
       primaryCta={{
         href: "#weekly-posture-brief-title",
-        label: "Copy leadership Slack brief",
+        label: "Copy leadership brief (Slack)",
         copyText: slackBrief,
         copyTarget: "Slack",
       }}
