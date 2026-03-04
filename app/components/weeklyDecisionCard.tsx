@@ -111,7 +111,7 @@ export function WeeklyDecisionCard({
               <div key={knob.key} className="rounded-lg border border-slate-700/60 bg-slate-950/60 p-3">
                 <p className="text-xs uppercase tracking-[0.12em] text-slate-300">{knob.label}</p>
                 <div className="mt-2 flex items-center gap-2" aria-hidden="true">
-                  {[0, 1, 2, 3].map((level) => (
+                  {[1, 2, 3].map((level) => (
                     <span
                       key={level}
                       className={`h-2.5 flex-1 rounded-full ${level <= knob.value ? "bg-sky-300" : "bg-slate-800"}`}
