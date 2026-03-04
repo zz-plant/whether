@@ -61,6 +61,18 @@ export type ReportDynamics = {
   directionLabel: "improving" | "deteriorating" | "mixed" | "stable";
 };
 
+export const signalDeltaImprovesWhen: Record<ReportDynamics["changedSignals"][number]["key"], "positive" | "negative"> = {
+  tightness: "negative",
+  riskAppetite: "positive",
+  baseRate: "negative",
+  curveSlope: "positive",
+};
+
+export const isImprovingSignalDelta = (
+  key: ReportDynamics["changedSignals"][number]["key"],
+  delta: number,
+): boolean => (signalDeltaImprovesWhen[key] === "positive" ? delta > 0 : delta < 0);
+
 const regimeStatusLabelMap = {
   SCARCITY: "Scarcity",
   DEFENSIVE: "Defensive",
@@ -143,16 +155,8 @@ export const buildReportDynamics = ({
     },
   ].filter((item) => Math.abs(item.delta) >= 0.01);
 
-  const improvingMoves = comparisons.filter(
-    (item) =>
-      ((item.key === "riskAppetite" || item.key === "curveSlope") && item.delta > 0) ||
-      ((item.key === "tightness" || item.key === "baseRate") && item.delta < 0),
-  ).length;
-  const deterioratingMoves = comparisons.filter(
-    (item) =>
-      ((item.key === "riskAppetite" || item.key === "curveSlope") && item.delta < 0) ||
-      ((item.key === "tightness" || item.key === "baseRate") && item.delta > 0),
-  ).length;
+  const improvingMoves = comparisons.filter((item) => isImprovingSignalDelta(item.key, item.delta)).length;
+  const deterioratingMoves = comparisons.filter((item) => !isImprovingSignalDelta(item.key, item.delta)).length;
   const directionLabel: ReportDynamics["directionLabel"] =
     comparisons.length === 0
       ? "stable"
