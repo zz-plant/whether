@@ -4,6 +4,7 @@
  */
 import type { TreasuryData } from "../types";
 import { findTimeMachineSnapshot } from "../timeMachine/timeMachineCache";
+import { fetchWithTimeout } from "../fetchWithTimeout";
 
 export const TREASURY_ENDPOINTS = {
   oneMonth: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS1MO",
@@ -115,10 +116,10 @@ export const fetchTreasuryData = async (
   try {
     const [oneMonthResponse, threeMonthResponse, twoYearResponse, tenYearResponse] =
       await Promise.all([
-        fetcher(endpoints.oneMonth),
-        fetcher(endpoints.threeMonth),
-        fetcher(endpoints.twoYear),
-        fetcher(endpoints.tenYear),
+        fetchWithTimeout(fetcher, endpoints.oneMonth),
+        fetchWithTimeout(fetcher, endpoints.threeMonth),
+        fetchWithTimeout(fetcher, endpoints.twoYear),
+        fetchWithTimeout(fetcher, endpoints.tenYear),
       ]);
 
     const responses = [oneMonthResponse, threeMonthResponse, twoYearResponse, tenYearResponse];
