@@ -5,23 +5,45 @@ import { RegimeIconType } from "./regimeIcons";
 
 export const ClimateBackdrop = ({ regime }: { regime: RegimeIconType | "NEUTRAL" }) => {
   const [allowAnimation, setAllowAnimation] = useState(false);
+  const [allowTextureLayer, setAllowTextureLayer] = useState(false);
 
   useEffect(() => {
     const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     const desktopQuery = window.matchMedia("(min-width: 768px)");
+    const reducedDataQuery = window.matchMedia("(prefers-reduced-data: reduce)");
+
+    const nav = navigator as Navigator & {
+      connection?: {
+        saveData?: boolean;
+      };
+      deviceMemory?: number;
+    };
+
+    const isConstrainedDevice =
+      (typeof nav.deviceMemory === "number" && nav.deviceMemory <= 4) ||
+      navigator.hardwareConcurrency <= 4 ||
+      nav.connection?.saveData === true;
 
     const syncAnimationState = () => {
       setAllowAnimation(!reducedMotionQuery.matches && desktopQuery.matches);
+      setAllowTextureLayer(
+        !reducedMotionQuery.matches &&
+        !reducedDataQuery.matches &&
+        desktopQuery.matches &&
+        !isConstrainedDevice,
+      );
     };
 
     syncAnimationState();
 
     reducedMotionQuery.addEventListener("change", syncAnimationState);
     desktopQuery.addEventListener("change", syncAnimationState);
+    reducedDataQuery.addEventListener("change", syncAnimationState);
 
     return () => {
       reducedMotionQuery.removeEventListener("change", syncAnimationState);
       desktopQuery.removeEventListener("change", syncAnimationState);
+      reducedDataQuery.removeEventListener("change", syncAnimationState);
     };
   }, []);
 
@@ -78,14 +100,15 @@ export const ClimateBackdrop = ({ regime }: { regime: RegimeIconType | "NEUTRAL"
         }}
       />
 
-      <div
-        className={`absolute inset-0 opacity-30 mix-blend-overlay ${animationClassName}`}
-        style={{
-          backgroundImage:
-            "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E\")",
-          filter: "contrast(120%) brightness(100%)",
-        }}
-      />
+      {allowTextureLayer ? (
+        <div
+          className={`absolute inset-0 opacity-20 mix-blend-overlay ${animationClassName}`}
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E\")",
+          }}
+        />
+      ) : null}
 
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/20 to-slate-950" />
     </div>
