@@ -16,9 +16,7 @@ import {
   websiteName,
   buildSocialImageUrl,
 } from "../lib/seo";
-import {
-  HistoricalBanner,
-} from "./components/reportSections";
+import { HistoricalBanner } from "./components/boardBriefSections";
 import { ReportShell } from "./components/reportShell";
 import { reportPageLinks } from "../lib/report/reportNavigation";
 import { buildTrustStatus } from "../lib/report/trustStatus";
@@ -29,7 +27,7 @@ import { DataProvenanceStrip } from "./components/dataProvenanceStrip";
 
 const WeeklyActionSummaryPanel = dynamic(
   () =>
-    import("./components/reportSections").then(
+    import("./components/boardBriefSections").then(
       (module) => module.WeeklyActionSummaryPanel,
     ),
   {
@@ -43,7 +41,7 @@ const WeeklyActionSummaryPanel = dynamic(
 
 const ExecutiveSnapshotPanel = dynamic(
   () =>
-    import("./components/reportSections").then(
+    import("./components/boardBriefSections").then(
       (module) => module.ExecutiveSnapshotPanel,
     ),
   {
@@ -143,7 +141,7 @@ export const generateMetadata = async ({
   return {
     title,
     description:
-      "Track Treasury yield curve regime shifts and turn macro signals into clear product, engineering, and operating priorities.",
+      "Weekly capital posture governance brief with constraints, guardrails, and reversal triggers.",
     alternates: {
       canonical: "/",
     },
@@ -152,7 +150,7 @@ export const generateMetadata = async ({
       url: canonicalUrl,
       title,
       description:
-        "Track Treasury yield curve regime shifts and turn macro signals into clear product, engineering, and operating priorities.",
+        "Weekly capital posture governance brief with constraints, guardrails, and reversal triggers.",
       siteName,
       images: [
         {
@@ -173,7 +171,7 @@ export const generateMetadata = async ({
       card: "summary_large_image",
       title,
       description:
-        "Track Treasury yield curve regime shifts and turn macro signals into clear product, engineering, and operating priorities.",
+        "Weekly capital posture governance brief with constraints, guardrails, and reversal triggers.",
       images: [imageUrl, socialImageUrl],
     },
     robots: hasTimeMachineParams
