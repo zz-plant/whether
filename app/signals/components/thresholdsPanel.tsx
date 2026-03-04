@@ -1,5 +1,5 @@
 /**
- * Thresholds panel to tune market climate classification and log overrides.
+ * Thresholds panel to tune capital posture classification and log overrides.
  * Keeps URL-driven state and audit trail visible for operators.
  */
 "use client";
@@ -118,7 +118,7 @@ export const ThresholdsPanel = ({
     {
       id: "strict",
       label: "Strict",
-      detail: "Require stronger moves before the climate label flips.",
+      detail: "Require stronger moves before the posture label flips.",
       thresholds: {
         baseRateTightness: 6,
         tightnessRegime: 56,
@@ -254,7 +254,7 @@ export const ThresholdsPanel = ({
       <div className="weather-panel p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="type-label text-slate-400">Market climate thresholds</p>
+            <p className="type-label text-slate-400">Capital posture thresholds</p>
             <h3 id="thresholds-title" className="type-section text-slate-100">
               Tune classification guardrails
             </h3>
@@ -499,7 +499,7 @@ export const ThresholdsPanel = ({
                           How these thresholds work
                         </Popover.Title>
                         <Popover.Description className="mt-2 text-xs text-slate-400">
-                          Thresholds define when a score flips the climate label. Adjust them to
+                          Thresholds define when a score flips the posture label. Adjust them to
                           reflect your risk tolerance, then share the URL for audit-ready review.
                         </Popover.Description>
                         <ul className="mt-3 space-y-2 text-xs text-slate-300">

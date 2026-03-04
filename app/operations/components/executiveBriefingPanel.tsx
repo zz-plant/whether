@@ -17,12 +17,12 @@ const buildExecutiveMemo = (
 ) => {
 
   if (!template) {
-    return "Executive memo unavailable for current market climate.";
+    return "Executive memo unavailable for current capital posture.";
   }
 
   return [
     `Executive Brief — ${recordDateLabel}`,
-    `Market climate: ${assessment.regime}`,
+    `Capital posture: ${assessment.regime}`,
     "",
     `Summary: ${template.executiveSummary}`,
     "",
@@ -226,7 +226,7 @@ export const ExecutiveBriefingPanel = ({
           ) : (
             <div className="weather-surface p-4">
               <p className="text-sm text-slate-300">
-                Executive memo unavailable for current market climate.
+                Executive memo unavailable for current capital posture.
               </p>
             </div>
           )}

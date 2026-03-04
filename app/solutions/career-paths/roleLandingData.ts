@@ -67,7 +67,7 @@ export const roleLandings: readonly RoleLanding[] = [
     scopeType: "Multi-team",
     outcomes: [
       "Create aligned portfolio pacing across teams, not isolated feature plans.",
-      "Reduce strategic drift by tying initiatives to the same climate assumptions.",
+      "Reduce strategic drift by tying initiatives to the same posture assumptions.",
       "Improve escalation quality when trade-offs need executive input.",
     ],
     proofPoints: [

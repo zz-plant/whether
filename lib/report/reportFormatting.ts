@@ -33,7 +33,7 @@ export const buildRegimeAlert = (
   }
   if (reasons.length === 0) {
     reasons.push(
-      `Market climate shifted as tightness (${formatScoreValue(previous.scores.tightness)} → ${formatScoreValue(current.scores.tightness)}) ` +
+      `Capital posture shifted as tightness (${formatScoreValue(previous.scores.tightness)} → ${formatScoreValue(current.scores.tightness)}) ` +
         `and risk appetite (${formatScoreValue(previous.scores.riskAppetite)} → ${formatScoreValue(current.scores.riskAppetite)}) moved across boundaries.`
     );
   }
@@ -45,6 +45,6 @@ export const buildRegimeAlert = (
     currentRecordDate,
     previousRecordDate,
     reasons,
-    summary: `Market climate moved from ${previous.regime} to ${current.regime}.`,
+    summary: `Capital posture moved from ${previous.regime} to ${current.regime}.`,
   };
 };

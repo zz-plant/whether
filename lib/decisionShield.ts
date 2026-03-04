@@ -1,5 +1,5 @@
 /**
- * Decision Shield logic for translating market climates into operator-safe verdicts.
+ * Decision Shield logic for translating capital postures into operator-safe verdicts.
  * Produces shareable, plain-English guidance tied to sensor conditions.
  */
 import type { RegimeAssessment } from "./regimeEngine";

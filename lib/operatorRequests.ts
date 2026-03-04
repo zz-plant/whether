@@ -1,5 +1,5 @@
 /**
- * Curated list of post-MVP operator requests for the Market Climate Station flow.
+ * Curated list of post-MVP operator requests for the Capital Posture Governance flow.
  * Captures expected expansion demand while preserving traceability and plain-English framing.
  */
 
@@ -17,7 +17,7 @@ export const operatorRequests: Array<{
     status: "DELIVERED",
   },
   {
-    title: "Adjustable market climate thresholds",
+    title: "Adjustable capital posture thresholds",
     description:
       "Let operators tune thresholds with an audit trail and defaults for transparent overrides.",
     status: "DELIVERED",
@@ -47,12 +47,12 @@ export const operatorRequests: Array<{
   },
   {
     title: "Historical comparisons",
-    description: "Show then-vs-now market climate diffs with clear deltas and context.",
+    description: "Show then-vs-now capital posture diffs with clear deltas and context.",
     status: "BACKLOG",
   },
   {
-    title: "Market climate change alerts",
-    description: "Notify teams with reason codes when the market climate flips.",
+    title: "Capital posture change alerts",
+    description: "Notify teams with reason codes when the capital posture flips.",
     status: "DELIVERED",
   },
   {

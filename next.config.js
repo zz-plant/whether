@@ -10,6 +10,16 @@ const nextConfig = {
   async redirects() {
     return [
       {
+        source: '/signals/:path*',
+        destination: '/evidence/:path*',
+        permanent: true,
+      },
+      {
+        source: '/learn',
+        destination: '/reference',
+        permanent: true,
+      },
+      {
         source: '/brief/:stakeholder',
         destination: '/guides/:stakeholder',
         permanent: true,
@@ -30,12 +40,12 @@ const nextConfig = {
         permanent: false,
       },
       {
-        source: '/learn/concepts/:slug',
+        source: '/reference/concepts/:slug',
         destination: '/concepts/:slug',
         permanent: true,
       },
       {
-        source: '/learn/failure-modes/:slug',
+        source: '/reference/failure-modes/:slug',
         destination: '/library/failure-modes/:slug',
         permanent: true,
       },

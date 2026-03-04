@@ -91,8 +91,8 @@ export default async function OperationsPage({
     ? buildTimeMachineHref("/operations", previousHistoricalSelection)
     : undefined;
   const historicalTimeMachineHref = historicalSelection
-    ? buildTimeMachineHref("/signals?advanced=1#time-machine", historicalSelection)
-    : "/signals?advanced=1#time-machine";
+    ? buildTimeMachineHref("/evidence?advanced=1#time-machine", historicalSelection)
+    : "/evidence?advanced=1#time-machine";
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
   const trustStatusLabel = historicalSelection
     ? "Historical snapshot"

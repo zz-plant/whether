@@ -94,7 +94,7 @@ export const buildAgentPrompt = (
     "You are an autonomous PM assistant.",
     "Follow the skills list in the JSON payload and deliver outputs in the same order.",
     "Use the JSON payload to draft:",
-    "1) A 3-bullet summary of the market climate.",
+    "1) A 3-bullet summary of the capital posture.",
     "2) The top 3 constraints that should shape roadmap decisions.",
     "3) A short list of questions to confirm with the PM before acting.",
     "",

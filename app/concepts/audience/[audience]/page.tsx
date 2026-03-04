@@ -48,7 +48,7 @@ export async function generateMetadata({ params }: AudiencePageProps): Promise<M
       template: "guides",
       eyebrow: "PM concept audience",
       title: `For ${resolvedAudience}`,
-      subtitle: "Curated PM essays mapped to market climate data.",
+      subtitle: "Curated PM essays mapped to capital posture data.",
       kicker: "Whether concept maps",
     },
   });

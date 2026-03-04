@@ -252,7 +252,7 @@ export const ReportPageNavigation = ({
   className?: string;
   variant?: "full" | "compact";
 }) => {
-  const coreReportHrefs = new Set(["/", "/signals", "/operations"]);
+  const coreReportHrefs = new Set(["/", "/evidence", "/operations"]);
   const primaryLinks = pageLinks.filter((link) => coreReportHrefs.has(link.href));
   const secondaryLinks = pageLinks.filter((link) => !coreReportHrefs.has(link.href));
   const visibleLinks = primaryLinks.length > 0 ? primaryLinks : pageLinks;

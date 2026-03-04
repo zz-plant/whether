@@ -49,11 +49,11 @@ export default async function StartHerePage() {
         assessment={assessment}
         recordDate={treasury.record_date}
         impactLinks={[
-          { label: "Posture shift", href: "/signals#current-scores", metric: "tightness" },
-          { label: "Top drivers", href: "/signals#signal-diagnostics", metric: "baseRate" },
+          { label: "Posture shift", href: "/evidence#current-scores", metric: "tightness" },
+          { label: "Top drivers", href: "/evidence#signal-diagnostics", metric: "baseRate" },
           { label: "Action guardrails", href: "/operations#ops-playbook", metric: "riskAppetite" },
         ]}
-        openPanelHref="/signals#signal-diagnostics"
+        openPanelHref="/evidence#signal-diagnostics"
       />
 
       <section className="weather-panel space-y-4 px-6 py-6">

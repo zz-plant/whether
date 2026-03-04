@@ -59,7 +59,7 @@ export default function TwitterImage() {
           />
           <div style={{ display: "flex", flexDirection: "column", gap: "22px", width: "63%" }}>
             <div style={{ fontSize: "20px", letterSpacing: "2px", color: "#93c5fd", fontWeight: 600 }}>
-              MARKET CLIMATE STATION
+              CAPITAL POSTURE GOVERNANCE
             </div>
             <div style={{ fontSize: "62px", fontWeight: 700, lineHeight: 1.04 }}>Whether Report</div>
             <div style={{ fontSize: "31px", color: "#cbd5e1", lineHeight: 1.24 }}>

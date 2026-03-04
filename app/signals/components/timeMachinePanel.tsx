@@ -1,5 +1,5 @@
 /**
- * Time Machine panel for replaying historical market climates with client-side validation.
+ * Time Machine panel for replaying historical capital postures with client-side validation.
  * Keeps URL-driven state consistent while providing immediate feedback on availability.
  */
 "use client";
@@ -391,12 +391,12 @@ export const TimeMachinePanel = ({
       <div className="weather-panel p-6">
         <SectionPanelHeader
           label="Time Machine"
-          title="Replay a prior market climate"
+          title="Replay a prior capital posture"
           titleId="time-machine-title"
           description={
             <>
               Pull the latest available Treasury record on or before a chosen month to see the
-              historical climate read.
+              historical posture read.
             </>
           }
           aside={
@@ -418,7 +418,7 @@ export const TimeMachinePanel = ({
           <div className="weather-surface p-4">
             <p className="type-label text-slate-400">Historical mode</p>
             <p className="mt-3 type-data text-slate-300">
-              You are replaying the macro climate from{" "}
+              You are replaying the macro posture from{" "}
               <span className="font-semibold text-slate-100">{selectedLabel}</span>. Treat the
               constraints as if those market conditions were active today.
             </p>
@@ -495,7 +495,7 @@ export const TimeMachinePanel = ({
             </div>
             <div className="mt-3 grid gap-3 md:grid-cols-2">
               <div className="weather-surface rounded-lg p-3">
-                <p className="type-kicker">Market climate</p>
+                <p className="type-kicker">Capital posture</p>
                 <p className="mt-2 text-sm text-slate-100">
                   {comparison.then.regime.toLowerCase()} →{" "}
                   {comparison.now.regime.toLowerCase()}

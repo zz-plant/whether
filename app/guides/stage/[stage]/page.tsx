@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: StagePageProps): Promise<Meta
         template: "guides",
         eyebrow: "Company stage guide",
         title: "Stage-specific macro guidance",
-        subtitle: "Map market climate posture to planning expectations at your company stage.",
+        subtitle: "Map capital posture posture to planning expectations at your company stage.",
         kicker: "Whether stage playbooks.",
       },
     });

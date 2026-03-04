@@ -52,7 +52,7 @@ export const renderWeeklySummaryCopy = ({
     summary,
     "",
     "---",
-    "WHETHER · Market Climate Station",
+    "WHETHER · Capital Posture Governance",
     "",
     updatedLabel,
     "",

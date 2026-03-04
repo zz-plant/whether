@@ -16,7 +16,7 @@ export default function MethodPage() {
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Method</h1>
         <p className="text-sm text-slate-300">Use Method as the audit layer only: formulas, definitions, source provenance, cadence, and limitations. It should explain how the system works, not what to do.</p>
         <div className="flex flex-wrap gap-3">
-          <Link href="/signals" className="weather-button inline-flex items-center justify-center">Review Signals</Link>
+          <Link href="/evidence" className="weather-button inline-flex items-center justify-center">Review Signals</Link>
           <Link href="/start" className="weather-button inline-flex items-center justify-center">Open Command Center</Link>
         </div>
       </section>

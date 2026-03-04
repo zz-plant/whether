@@ -14,7 +14,7 @@ export const agentSkills: AgentSkill[] = [
   {
     id: "regime-summary",
     label: "Regime summary",
-    purpose: "Explain the market climate in plain English with the top macro signals.",
+    purpose: "Explain the capital posture in plain English with the top macro signals.",
     inputs: ["regime", "scores", "macro_signals", "data_warnings"],
     outputs: ["summary_bullets"],
   },
