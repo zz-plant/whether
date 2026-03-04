@@ -24,6 +24,12 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Validate summary archive
+        run: bun run validate:summary-archive
+
+      - name: Validate time machine cache
+        run: bun run validate:time-machine-cache
+
       - name: Lint
         run: bun run lint
 

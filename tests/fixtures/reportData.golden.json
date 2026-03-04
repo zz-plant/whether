@@ -1,0 +1,996 @@
+{
+  "defaultSnapshot": {
+    "assessment": {
+      "regime": "SCARCITY",
+      "scores": {
+        "tightness": 94,
+        "riskAppetite": 26,
+        "baseRateUsed": "1M",
+        "baseRate": 5.42,
+        "curveSlope": -0.35000000000000053
+      },
+      "diagnostics": {
+        "tightnessDelta": 24,
+        "riskAppetiteDelta": -24,
+        "nearestThresholdDelta": 24,
+        "confidence": "HIGH",
+        "transitionWatch": false,
+        "intensity": "STANDARD",
+        "boundaryContributors": [],
+        "weakReadCount": 0,
+        "twoWeakReadsWarning": false
+      },
+      "constraints": [
+        "Shorten payback windows and preserve cash.",
+        "Delay speculative hiring or large platform rewrites.",
+        "Route roadmap bets through revenue certainty."
+      ],
+      "policyAssessment": {
+        "posture": "SAFETY_MODE",
+        "band": "ELEVATED",
+        "composites": {
+          "cts": 0.7855201203600809,
+          "ras": 0.8713120722160486
+        },
+        "refusal": {
+          "refused": false,
+          "reasons": []
+        }
+      }
+    },
+    "selection": {
+      "historicalSelection": null,
+      "requestedSelection": null,
+      "invalidHistoricalSelection": false,
+      "selectedMonth": 3,
+      "selectedYear": 2026
+    },
+    "treasury": {
+      "source": "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v2/accounting/od/daily_treasury_yield_curve",
+      "record_date": "2026-02-01",
+      "isLive": false,
+      "yields": {
+        "oneMonth": 5.42,
+        "threeMonth": 5.39,
+        "twoYear": 4.95,
+        "tenYear": 4.6
+      },
+      "fallback_reason": "Network disabled for reportData golden tests"
+    },
+    "macroSeries": [
+      {
+        "id": "CPI_YOY",
+        "value": 3.7,
+        "record_date": "2024-08-01",
+        "isLive": false,
+        "sourceLabel": "BLS Consumer Price Index"
+      },
+      {
+        "id": "UNEMPLOYMENT_RATE",
+        "value": 4.1,
+        "record_date": "2024-09-01",
+        "isLive": false,
+        "sourceLabel": "BLS Employment Situation"
+      },
+      {
+        "id": "BBB_CREDIT_SPREAD",
+        "value": 1.65,
+        "record_date": "2026-02-01",
+        "isLive": false,
+        "sourceLabel": "ICE BofA BBB OAS (FRED)"
+      },
+      {
+        "id": "HY_CREDIT_SPREAD",
+        "value": 3.55,
+        "record_date": "2026-02-01",
+        "isLive": false,
+        "sourceLabel": "ICE BofA High Yield OAS (FRED)"
+      },
+      {
+        "id": "CHICAGO_FCI",
+        "value": -0.12,
+        "record_date": "2026-02-01",
+        "isLive": false,
+        "sourceLabel": "Chicago Fed NFCI (FRED)"
+      },
+      {
+        "id": "VIX_INDEX",
+        "value": 17.4,
+        "record_date": "2026-02-01",
+        "isLive": false,
+        "sourceLabel": "CBOE VIX (FRED)"
+      },
+      {
+        "id": "VC_FUNDING_VELOCITY",
+        "value": -4.5,
+        "record_date": "2026-02-01",
+        "isLive": false,
+        "sourceLabel": "Whether startup capital snapshot"
+      },
+      {
+        "id": "TECH_LAYOFF_TREND",
+        "value": 62,
+        "record_date": "2026-02-01",
+        "isLive": false,
+        "sourceLabel": "Whether labor stress snapshot"
+      },
+      {
+        "id": "SAAS_VALUATION_MULTIPLE",
+        "value": 5.9,
+        "record_date": "2026-02-01",
+        "isLive": false,
+        "sourceLabel": "Whether valuation snapshot"
+      },
+      {
+        "id": "EARNINGS_REVISION_INDEX",
+        "value": 48,
+        "record_date": "2026-02-01",
+        "isLive": false,
+        "sourceLabel": "Whether earnings revisions snapshot"
+      },
+      {
+        "id": "AI_COMPUTE_COST_TREND",
+        "value": -9.2,
+        "record_date": "2026-02-01",
+        "isLive": false,
+        "sourceLabel": "Whether compute-cost snapshot"
+      },
+      {
+        "id": "REGULATORY_RISK_TRACKER",
+        "value": 41,
+        "record_date": "2026-02-01",
+        "isLive": false,
+        "sourceLabel": "Whether policy-risk snapshot"
+      }
+    ],
+    "playbook": {
+      "startItems": [
+        "Founder-led sales and customer recovery",
+        "Annual prepay discounts for immediate cash",
+        "Manual onboarding that avoids new build costs"
+      ],
+      "stopItems": [
+        "Hiring ahead of revenue",
+        "Brand-only marketing",
+        "Platform rewrites or migrations"
+      ],
+      "fenceItems": [
+        "Shorten payback windows and preserve cash.",
+        "Delay speculative hiring or large platform rewrites.",
+        "Route roadmap bets through revenue certainty."
+      ]
+    },
+    "reportDynamics": {
+      "changedSignals": [
+        {
+          "key": "tightness",
+          "label": "Cash availability",
+          "delta": 94
+        },
+        {
+          "key": "riskAppetite",
+          "label": "Risk appetite",
+          "delta": -44
+        },
+        {
+          "key": "baseRate",
+          "label": "Base rate",
+          "delta": 1.6999999999999997
+        },
+        {
+          "key": "curveSlope",
+          "label": "Curve slope",
+          "delta": -1.0900000000000003
+        }
+      ],
+      "totalSignalChanges": 4,
+      "regimeChanged": true,
+      "directionLabel": "deteriorating"
+    },
+    "regimeTrend": "DETERIORATING",
+    "statusLabel": "Scarcity",
+    "flags": {
+      "hasHistoricalComparison": false,
+      "hasRegimeAlert": true,
+      "hasLastYearComparison": true,
+      "hasLiveAssessment": false
+    },
+    "cache": {
+      "coverage": {
+        "earliest": "2018-01-31",
+        "latest": "2026-03-03"
+      },
+      "monthsByYear": {
+        "2018": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "2019": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "2020": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "2021": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "2022": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "2023": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "2024": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "2025": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "2026": [
+          1,
+          2,
+          3
+        ]
+      },
+      "regimeSeries": {
+        "count": 24,
+        "first": {
+          "year": 2024,
+          "month": 4,
+          "recordDate": "2024-04-30",
+          "regime": "SCARCITY"
+        },
+        "last": {
+          "year": 2026,
+          "month": 3,
+          "recordDate": "2026-03-03",
+          "regime": "EXPANSION"
+        }
+      }
+    }
+  },
+  "historicalSnapshot": {
+    "assessment": {
+      "regime": "VOLATILE",
+      "scores": {
+        "tightness": 0,
+        "riskAppetite": 45,
+        "baseRateUsed": "1M",
+        "baseRate": 4.76,
+        "curveSlope": 0.1200000000000001
+      },
+      "diagnostics": {
+        "tightnessDelta": -70,
+        "riskAppetiteDelta": -5,
+        "nearestThresholdDelta": 5,
+        "confidence": "LOW",
+        "transitionWatch": true,
+        "intensity": "MILD",
+        "boundaryContributors": [],
+        "weakReadCount": 0,
+        "twoWeakReadsWarning": false
+      },
+      "constraints": [
+        "Ship reliability and security before novelty.",
+        "Avoid disruptive pivots that spook buyers.",
+        "Lean into proof, references, and guarantees."
+      ],
+      "policyAssessment": {
+        "posture": "RISK_ON",
+        "band": "ELEVATED",
+        "composites": {
+          "cts": -0.5,
+          "ras": -0.7
+        },
+        "refusal": {
+          "refused": true,
+          "reasons": [
+            "Data gaps exceed allowed signal count."
+          ],
+          "fallbackMessage": "NO_POSTURE_CHANGE_RECOMMENDED",
+          "executionMode": "REVERSIBLE_BETS_ONLY"
+        }
+      }
+    },
+    "selection": {
+      "historicalSelection": {
+        "month": 10,
+        "year": 2024,
+        "asOf": "2024-10-31",
+        "banner": "Historical mode active · 2024-10"
+      },
+      "requestedSelection": {
+        "month": 10,
+        "year": 2024
+      },
+      "invalidHistoricalSelection": false,
+      "selectedMonth": 10,
+      "selectedYear": 2024
+    },
+    "treasury": {
+      "source": "https://fred.stlouisfed.org",
+      "record_date": "2024-10-31",
+      "isLive": false,
+      "yields": {
+        "oneMonth": 4.76,
+        "threeMonth": 4.64,
+        "twoYear": 4.16,
+        "tenYear": 4.28
+      },
+      "fallback_reason": null
+    },
+    "macroSeries": [
+      {
+        "id": "CPI_YOY",
+        "value": 3.7,
+        "record_date": "2024-08-01",
+        "isLive": false,
+        "sourceLabel": "BLS Consumer Price Index"
+      },
+      {
+        "id": "UNEMPLOYMENT_RATE",
+        "value": 4.1,
+        "record_date": "2024-09-01",
+        "isLive": false,
+        "sourceLabel": "BLS Employment Situation"
+      },
+      {
+        "id": "BBB_CREDIT_SPREAD",
+        "value": 1.65,
+        "record_date": "2026-02-01",
+        "isLive": false,
+        "sourceLabel": "ICE BofA BBB OAS (FRED)"
+      },
+      {
+        "id": "HY_CREDIT_SPREAD",
+        "value": 3.55,
+        "record_date": "2026-02-01",
+        "isLive": false,
+        "sourceLabel": "ICE BofA High Yield OAS (FRED)"
+      },
+      {
+        "id": "CHICAGO_FCI",
+        "value": -0.12,
+        "record_date": "2026-02-01",
+        "isLive": false,
+        "sourceLabel": "Chicago Fed NFCI (FRED)"
+      },
+      {
+        "id": "VIX_INDEX",
+        "value": 17.4,
+        "record_date": "2026-02-01",
+        "isLive": false,
+        "sourceLabel": "CBOE VIX (FRED)"
+      },
+      {
+        "id": "VC_FUNDING_VELOCITY",
+        "value": -4.5,
+        "record_date": "2026-02-01",
+        "isLive": false,
+        "sourceLabel": "Whether startup capital snapshot"
+      },
+      {
+        "id": "TECH_LAYOFF_TREND",
+        "value": 62,
+        "record_date": "2026-02-01",
+        "isLive": false,
+        "sourceLabel": "Whether labor stress snapshot"
+      },
+      {
+        "id": "SAAS_VALUATION_MULTIPLE",
+        "value": 5.9,
+        "record_date": "2026-02-01",
+        "isLive": false,
+        "sourceLabel": "Whether valuation snapshot"
+      },
+      {
+        "id": "EARNINGS_REVISION_INDEX",
+        "value": 48,
+        "record_date": "2026-02-01",
+        "isLive": false,
+        "sourceLabel": "Whether earnings revisions snapshot"
+      },
+      {
+        "id": "AI_COMPUTE_COST_TREND",
+        "value": -9.2,
+        "record_date": "2026-02-01",
+        "isLive": false,
+        "sourceLabel": "Whether compute-cost snapshot"
+      },
+      {
+        "id": "REGULATORY_RISK_TRACKER",
+        "value": 41,
+        "record_date": "2026-02-01",
+        "isLive": false,
+        "sourceLabel": "Whether policy-risk snapshot"
+      }
+    ],
+    "playbook": {
+      "startItems": [
+        "Security features and compliance (SOC 2)",
+        "Reliability SLAs",
+        "Trust signals in every funnel step"
+      ],
+      "stopItems": [
+        "Rebrands or identity pivots",
+        "Complex pricing experiments",
+        "Radical UI changes"
+      ],
+      "fenceItems": [
+        "Ship reliability and security before novelty.",
+        "Avoid disruptive pivots that spook buyers.",
+        "Lean into proof, references, and guarantees."
+      ]
+    },
+    "reportDynamics": {
+      "changedSignals": [],
+      "totalSignalChanges": 0,
+      "regimeChanged": false,
+      "directionLabel": "stable"
+    },
+    "regimeTrend": "STABLE",
+    "statusLabel": "Volatile",
+    "flags": {
+      "hasHistoricalComparison": true,
+      "hasRegimeAlert": false,
+      "hasLastYearComparison": true,
+      "hasLiveAssessment": true
+    },
+    "cache": {
+      "coverage": {
+        "earliest": "2018-01-31",
+        "latest": "2026-03-03"
+      },
+      "monthsByYear": {
+        "2018": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "2019": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "2020": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "2021": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "2022": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "2023": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "2024": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "2025": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "2026": [
+          1,
+          2,
+          3
+        ]
+      },
+      "regimeSeries": {
+        "count": 24,
+        "first": {
+          "year": 2024,
+          "month": 4,
+          "recordDate": "2024-04-30",
+          "regime": "SCARCITY"
+        },
+        "last": {
+          "year": 2026,
+          "month": 3,
+          "recordDate": "2026-03-03",
+          "regime": "EXPANSION"
+        }
+      }
+    }
+  },
+  "missingHistoricalSelection": {
+    "assessment": {
+      "regime": "EXPANSION",
+      "scores": {
+        "tightness": 0,
+        "riskAppetite": 54,
+        "baseRateUsed": "1M",
+        "baseRate": 4.37,
+        "curveSlope": 0.3600000000000003
+      },
+      "diagnostics": {
+        "tightnessDelta": -70,
+        "riskAppetiteDelta": 4,
+        "nearestThresholdDelta": 4,
+        "confidence": "LOW",
+        "transitionWatch": true,
+        "intensity": "MILD",
+        "boundaryContributors": [],
+        "weakReadCount": 0,
+        "twoWeakReadsWarning": false
+      },
+      "constraints": [
+        "Prioritize reach and learning velocity over perfect finish.",
+        "Spend with clear guardrails, even if some experiments fail.",
+        "Scale capacity ahead of demand only where leading signals stay strong."
+      ],
+      "policyAssessment": {
+        "posture": "RISK_ON",
+        "band": "ELEVATED",
+        "composites": {
+          "cts": -0.5000000000000007,
+          "ras": -0.7
+        },
+        "refusal": {
+          "refused": true,
+          "reasons": [
+            "Data gaps exceed allowed signal count."
+          ],
+          "fallbackMessage": "NO_POSTURE_CHANGE_RECOMMENDED",
+          "executionMode": "REVERSIBLE_BETS_ONLY"
+        }
+      }
+    },
+    "selection": {
+      "historicalSelection": {
+        "month": 1,
+        "year": 2025,
+        "asOf": "2025-01-31",
+        "banner": "Historical mode active · 2025-01"
+      },
+      "requestedSelection": {
+        "month": 1,
+        "year": 2025
+      },
+      "invalidHistoricalSelection": false,
+      "selectedMonth": 1,
+      "selectedYear": 2025
+    },
+    "treasury": {
+      "source": "https://fred.stlouisfed.org",
+      "record_date": "2025-01-31",
+      "isLive": false,
+      "yields": {
+        "oneMonth": 4.37,
+        "threeMonth": 4.31,
+        "twoYear": 4.22,
+        "tenYear": 4.58
+      },
+      "fallback_reason": null
+    },
+    "macroSeries": [
+      {
+        "id": "CPI_YOY",
+        "value": 3.7,
+        "record_date": "2024-08-01",
+        "isLive": false,
+        "sourceLabel": "BLS Consumer Price Index"
+      },
+      {
+        "id": "UNEMPLOYMENT_RATE",
+        "value": 4.1,
+        "record_date": "2024-09-01",
+        "isLive": false,
+        "sourceLabel": "BLS Employment Situation"
+      },
+      {
+        "id": "BBB_CREDIT_SPREAD",
+        "value": 1.65,
+        "record_date": "2026-02-01",
+        "isLive": false,
+        "sourceLabel": "ICE BofA BBB OAS (FRED)"
+      },
+      {
+        "id": "HY_CREDIT_SPREAD",
+        "value": 3.55,
+        "record_date": "2026-02-01",
+        "isLive": false,
+        "sourceLabel": "ICE BofA High Yield OAS (FRED)"
+      },
+      {
+        "id": "CHICAGO_FCI",
+        "value": -0.12,
+        "record_date": "2026-02-01",
+        "isLive": false,
+        "sourceLabel": "Chicago Fed NFCI (FRED)"
+      },
+      {
+        "id": "VIX_INDEX",
+        "value": 17.4,
+        "record_date": "2026-02-01",
+        "isLive": false,
+        "sourceLabel": "CBOE VIX (FRED)"
+      },
+      {
+        "id": "VC_FUNDING_VELOCITY",
+        "value": -4.5,
+        "record_date": "2026-02-01",
+        "isLive": false,
+        "sourceLabel": "Whether startup capital snapshot"
+      },
+      {
+        "id": "TECH_LAYOFF_TREND",
+        "value": 62,
+        "record_date": "2026-02-01",
+        "isLive": false,
+        "sourceLabel": "Whether labor stress snapshot"
+      },
+      {
+        "id": "SAAS_VALUATION_MULTIPLE",
+        "value": 5.9,
+        "record_date": "2026-02-01",
+        "isLive": false,
+        "sourceLabel": "Whether valuation snapshot"
+      },
+      {
+        "id": "EARNINGS_REVISION_INDEX",
+        "value": 48,
+        "record_date": "2026-02-01",
+        "isLive": false,
+        "sourceLabel": "Whether earnings revisions snapshot"
+      },
+      {
+        "id": "AI_COMPUTE_COST_TREND",
+        "value": -9.2,
+        "record_date": "2026-02-01",
+        "isLive": false,
+        "sourceLabel": "Whether compute-cost snapshot"
+      },
+      {
+        "id": "REGULATORY_RISK_TRACKER",
+        "value": 41,
+        "record_date": "2026-02-01",
+        "isLive": false,
+        "sourceLabel": "Whether policy-risk snapshot"
+      }
+    ],
+    "playbook": {
+      "startItems": [
+        "Compounding referral loops and share mechanics",
+        "Friction-light freemium paths or extended trials",
+        "Fast, bounded product bets in adjacent wedges",
+        "Measured geo expansion where demand signal is clear"
+      ],
+      "stopItems": [
+        "Over-engineering before demand proves out",
+        "Cost cuts that choke product velocity",
+        "Cautious hiring cycles that miss timing windows"
+      ],
+      "fenceItems": [
+        "Prioritize reach and learning velocity over perfect finish.",
+        "Spend with clear guardrails, even if some experiments fail.",
+        "Scale capacity ahead of demand only where leading signals stay strong."
+      ]
+    },
+    "reportDynamics": {
+      "changedSignals": [],
+      "totalSignalChanges": 0,
+      "regimeChanged": false,
+      "directionLabel": "stable"
+    },
+    "regimeTrend": "STABLE",
+    "statusLabel": "Expansion",
+    "flags": {
+      "hasHistoricalComparison": true,
+      "hasRegimeAlert": false,
+      "hasLastYearComparison": true,
+      "hasLiveAssessment": true
+    },
+    "cache": {
+      "coverage": {
+        "earliest": "2018-01-31",
+        "latest": "2026-03-03"
+      },
+      "monthsByYear": {
+        "2018": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "2019": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "2020": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "2021": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "2022": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "2023": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "2024": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "2025": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "2026": [
+          1,
+          2,
+          3
+        ]
+      },
+      "regimeSeries": {
+        "count": 24,
+        "first": {
+          "year": 2024,
+          "month": 4,
+          "recordDate": "2024-04-30",
+          "regime": "SCARCITY"
+        },
+        "last": {
+          "year": 2026,
+          "month": 3,
+          "recordDate": "2026-03-03",
+          "regime": "EXPANSION"
+        }
+      }
+    }
+  }
+}

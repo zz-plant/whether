@@ -36,5 +36,6 @@ Preferred pull sequence:
 - Use `GET /api/summary-delta` to explain drift when mismatches exist.
 
 ## Deployment notes
-- Current alert store is process memory (`lib/serverStore.ts`), so state resets across cold starts or new isolates.
-- If you need durable operational history, pair these APIs with a persistent datastore and idempotent write semantics.
+- Signal ops state is routed through `lib/serverStore.ts` adapter contracts.
+- Default behavior uses file-backed persistence where Node file APIs are available (configurable via `WHETHER_SERVER_STORE_FILE`).
+- If file APIs are unavailable or `WHETHER_SERVER_STORE_BACKEND=memory` is set, routes fall back to in-memory state.

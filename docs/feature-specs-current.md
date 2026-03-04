@@ -196,7 +196,7 @@ Operations briefings support copy-ready briefs and executive narratives with sen
 macro context embedded for leadership consumption.
 
 ### 5.6 Signal Ops (live)
-- Regime alerts are persisted and retrievable through API (`/api/regime-alerts`).
+- Regime alerts are persisted and retrievable through API (`/api/regime-alerts`) using adapter-backed server storage.
 - Alert payloads include reason codes, source URLs, and Time Machine deep links.
 - Alert creation enforces trigger filtering and a 24-hour cooldown unless the regime flips again.
 - Weekly digest output is available via `/api/weekly-digest`, including score deltas and dominant

@@ -21,6 +21,7 @@ Use this index to find the **current** source of truth quickly.
 - `cloudflare-deployment-runbook.md` — Cloudflare deployment expectations and CI artifact workflow.
 - `developer/README.md` — external developer-docs entrypoint (quickstart, API reference, integrations).
 - `architecture.md` — modules, runtime flow, and extension points.
+- `adr/0001-refactor-boundaries-and-seams.md` — accepted boundary decisions and guardrails for the architecture refactor.
 - `stack-compatibility-matrix.md` — platform/runtime support constraints.
 - `stack-modernization-inventory.md` — modernization baseline.
 - `stack-modernization-plan.md` — modernization implementation plan.

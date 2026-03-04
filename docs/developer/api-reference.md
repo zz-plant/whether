@@ -66,7 +66,8 @@ curl -s "http://localhost:3000/api/integrations/weekly-mandate?target=slack" | j
 ```
 
 ## Data durability note
-Alert preferences, alerts, and delivery events currently use process-memory server store semantics. For production-grade durable history, persist these events in external storage.
+Signal ops state (`/api/regime-alerts`, `/api/weekly-digest`) now uses adapter-based storage in `lib/serverStore.ts`.
+Default behavior uses file-backed persistence where Node file APIs are available (`WHETHER_SERVER_STORE_FILE`, default `/tmp/whether-server-store.json`), with explicit in-memory fallback via `WHETHER_SERVER_STORE_BACKEND=memory` or when file APIs are unavailable.
 
 
 ## Regime and posture taxonomy

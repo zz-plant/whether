@@ -1,16 +1,1388 @@
 [
   {
-    "year": 2024,
-    "month": 10,
-    "source": "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v2/accounting/od/daily_treasury_yield_curve",
-    "record_date": "2024-10-01",
-    "fetched_at": "2026-02-02T00:00:00Z",
+    "year": 2018,
+    "month": 1,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2018-01-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
     "isLive": false,
     "yields": {
-      "oneMonth": 5.42,
-      "threeMonth": 5.39,
-      "twoYear": 4.95,
-      "tenYear": 4.6
+      "oneMonth": 1.43,
+      "threeMonth": 1.46,
+      "twoYear": 2.14,
+      "tenYear": 2.72
+    }
+  },
+  {
+    "year": 2018,
+    "month": 2,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2018-02-28",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 1.5,
+      "threeMonth": 1.65,
+      "twoYear": 2.25,
+      "tenYear": 2.87
+    }
+  },
+  {
+    "year": 2018,
+    "month": 3,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2018-03-29",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 1.63,
+      "threeMonth": 1.73,
+      "twoYear": 2.27,
+      "tenYear": 2.74
+    }
+  },
+  {
+    "year": 2018,
+    "month": 4,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2018-04-30",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 1.65,
+      "threeMonth": 1.87,
+      "twoYear": 2.49,
+      "tenYear": 2.95
+    }
+  },
+  {
+    "year": 2018,
+    "month": 5,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2018-05-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 1.76,
+      "threeMonth": 1.93,
+      "twoYear": 2.4,
+      "tenYear": 2.83
+    }
+  },
+  {
+    "year": 2018,
+    "month": 6,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2018-06-29",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 1.77,
+      "threeMonth": 1.93,
+      "twoYear": 2.52,
+      "tenYear": 2.85
+    }
+  },
+  {
+    "year": 2018,
+    "month": 7,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2018-07-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 1.94,
+      "threeMonth": 2.03,
+      "twoYear": 2.67,
+      "tenYear": 2.96
+    }
+  },
+  {
+    "year": 2018,
+    "month": 8,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2018-08-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 1.95,
+      "threeMonth": 2.11,
+      "twoYear": 2.62,
+      "tenYear": 2.86
+    }
+  },
+  {
+    "year": 2018,
+    "month": 9,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2018-09-28",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 2.12,
+      "threeMonth": 2.19,
+      "twoYear": 2.81,
+      "tenYear": 3.05
+    }
+  },
+  {
+    "year": 2018,
+    "month": 10,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2018-10-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 2.2,
+      "threeMonth": 2.34,
+      "twoYear": 2.87,
+      "tenYear": 3.15
+    }
+  },
+  {
+    "year": 2018,
+    "month": 11,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2018-11-30",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 2.31,
+      "threeMonth": 2.37,
+      "twoYear": 2.8,
+      "tenYear": 3.01
+    }
+  },
+  {
+    "year": 2018,
+    "month": 12,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2018-12-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 2.44,
+      "threeMonth": 2.45,
+      "twoYear": 2.48,
+      "tenYear": 2.69
+    }
+  },
+  {
+    "year": 2019,
+    "month": 1,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2019-01-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 2.42,
+      "threeMonth": 2.41,
+      "twoYear": 2.45,
+      "tenYear": 2.63
+    }
+  },
+  {
+    "year": 2019,
+    "month": 2,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2019-02-28",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 2.44,
+      "threeMonth": 2.45,
+      "twoYear": 2.52,
+      "tenYear": 2.73
+    }
+  },
+  {
+    "year": 2019,
+    "month": 3,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2019-03-29",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 2.43,
+      "threeMonth": 2.4,
+      "twoYear": 2.27,
+      "tenYear": 2.41
+    }
+  },
+  {
+    "year": 2019,
+    "month": 4,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2019-04-30",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 2.43,
+      "threeMonth": 2.43,
+      "twoYear": 2.27,
+      "tenYear": 2.51
+    }
+  },
+  {
+    "year": 2019,
+    "month": 5,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2019-05-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 2.35,
+      "threeMonth": 2.35,
+      "twoYear": 1.95,
+      "tenYear": 2.14
+    }
+  },
+  {
+    "year": 2019,
+    "month": 6,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2019-06-28",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 2.18,
+      "threeMonth": 2.12,
+      "twoYear": 1.75,
+      "tenYear": 2
+    }
+  },
+  {
+    "year": 2019,
+    "month": 7,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2019-07-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 2.01,
+      "threeMonth": 2.08,
+      "twoYear": 1.89,
+      "tenYear": 2.02
+    }
+  },
+  {
+    "year": 2019,
+    "month": 8,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2019-08-30",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 2.1,
+      "threeMonth": 1.99,
+      "twoYear": 1.5,
+      "tenYear": 1.5
+    }
+  },
+  {
+    "year": 2019,
+    "month": 9,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2019-09-30",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 1.91,
+      "threeMonth": 1.88,
+      "twoYear": 1.63,
+      "tenYear": 1.68
+    }
+  },
+  {
+    "year": 2019,
+    "month": 10,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2019-10-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 1.59,
+      "threeMonth": 1.54,
+      "twoYear": 1.52,
+      "tenYear": 1.69
+    }
+  },
+  {
+    "year": 2019,
+    "month": 11,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2019-11-29",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 1.62,
+      "threeMonth": 1.59,
+      "twoYear": 1.61,
+      "tenYear": 1.78
+    }
+  },
+  {
+    "year": 2019,
+    "month": 12,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2019-12-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 1.48,
+      "threeMonth": 1.55,
+      "twoYear": 1.58,
+      "tenYear": 1.92
+    }
+  },
+  {
+    "year": 2020,
+    "month": 1,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2020-01-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 1.56,
+      "threeMonth": 1.55,
+      "twoYear": 1.33,
+      "tenYear": 1.51
+    }
+  },
+  {
+    "year": 2020,
+    "month": 2,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2020-02-28",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 1.45,
+      "threeMonth": 1.27,
+      "twoYear": 0.86,
+      "tenYear": 1.13
+    }
+  },
+  {
+    "year": 2020,
+    "month": 3,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2020-03-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 0.05,
+      "threeMonth": 0.11,
+      "twoYear": 0.23,
+      "tenYear": 0.7
+    }
+  },
+  {
+    "year": 2020,
+    "month": 4,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2020-04-30",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 0.1,
+      "threeMonth": 0.09,
+      "twoYear": 0.2,
+      "tenYear": 0.64
+    }
+  },
+  {
+    "year": 2020,
+    "month": 5,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2020-05-29",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 0.13,
+      "threeMonth": 0.14,
+      "twoYear": 0.16,
+      "tenYear": 0.65
+    }
+  },
+  {
+    "year": 2020,
+    "month": 6,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2020-06-30",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 0.13,
+      "threeMonth": 0.16,
+      "twoYear": 0.16,
+      "tenYear": 0.66
+    }
+  },
+  {
+    "year": 2020,
+    "month": 7,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2020-07-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 0.09,
+      "threeMonth": 0.09,
+      "twoYear": 0.11,
+      "tenYear": 0.55
+    }
+  },
+  {
+    "year": 2020,
+    "month": 8,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2020-08-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 0.08,
+      "threeMonth": 0.11,
+      "twoYear": 0.14,
+      "tenYear": 0.72
+    }
+  },
+  {
+    "year": 2020,
+    "month": 9,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2020-09-30",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 0.08,
+      "threeMonth": 0.1,
+      "twoYear": 0.13,
+      "tenYear": 0.69
+    }
+  },
+  {
+    "year": 2020,
+    "month": 10,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2020-10-30",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 0.08,
+      "threeMonth": 0.09,
+      "twoYear": 0.14,
+      "tenYear": 0.88
+    }
+  },
+  {
+    "year": 2020,
+    "month": 11,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2020-11-30",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 0.08,
+      "threeMonth": 0.08,
+      "twoYear": 0.16,
+      "tenYear": 0.84
+    }
+  },
+  {
+    "year": 2020,
+    "month": 12,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2020-12-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 0.08,
+      "threeMonth": 0.09,
+      "twoYear": 0.13,
+      "tenYear": 0.93
+    }
+  },
+  {
+    "year": 2021,
+    "month": 1,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2021-01-29",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 0.07,
+      "threeMonth": 0.06,
+      "twoYear": 0.11,
+      "tenYear": 1.11
+    }
+  },
+  {
+    "year": 2021,
+    "month": 2,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2021-02-26",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 0.04,
+      "threeMonth": 0.04,
+      "twoYear": 0.14,
+      "tenYear": 1.44
+    }
+  },
+  {
+    "year": 2021,
+    "month": 3,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2021-03-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 0.01,
+      "threeMonth": 0.03,
+      "twoYear": 0.16,
+      "tenYear": 1.74
+    }
+  },
+  {
+    "year": 2021,
+    "month": 4,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2021-04-30",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 0.01,
+      "threeMonth": 0.01,
+      "twoYear": 0.16,
+      "tenYear": 1.65
+    }
+  },
+  {
+    "year": 2021,
+    "month": 5,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2021-05-28",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 0.01,
+      "threeMonth": 0.01,
+      "twoYear": 0.14,
+      "tenYear": 1.58
+    }
+  },
+  {
+    "year": 2021,
+    "month": 6,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2021-06-30",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 0.05,
+      "threeMonth": 0.05,
+      "twoYear": 0.25,
+      "tenYear": 1.45
+    }
+  },
+  {
+    "year": 2021,
+    "month": 7,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2021-07-30",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 0.05,
+      "threeMonth": 0.06,
+      "twoYear": 0.19,
+      "tenYear": 1.24
+    }
+  },
+  {
+    "year": 2021,
+    "month": 8,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2021-08-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 0.03,
+      "threeMonth": 0.04,
+      "twoYear": 0.2,
+      "tenYear": 1.3
+    }
+  },
+  {
+    "year": 2021,
+    "month": 9,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2021-09-30",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 0.07,
+      "threeMonth": 0.04,
+      "twoYear": 0.28,
+      "tenYear": 1.52
+    }
+  },
+  {
+    "year": 2021,
+    "month": 10,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2021-10-29",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 0.06,
+      "threeMonth": 0.05,
+      "twoYear": 0.48,
+      "tenYear": 1.55
+    }
+  },
+  {
+    "year": 2021,
+    "month": 11,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2021-11-30",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 0.11,
+      "threeMonth": 0.05,
+      "twoYear": 0.52,
+      "tenYear": 1.43
+    }
+  },
+  {
+    "year": 2021,
+    "month": 12,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2021-12-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 0.06,
+      "threeMonth": 0.06,
+      "twoYear": 0.73,
+      "tenYear": 1.52
+    }
+  },
+  {
+    "year": 2022,
+    "month": 1,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2022-01-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 0.03,
+      "threeMonth": 0.22,
+      "twoYear": 1.18,
+      "tenYear": 1.79
+    }
+  },
+  {
+    "year": 2022,
+    "month": 2,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2022-02-28",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 0.06,
+      "threeMonth": 0.35,
+      "twoYear": 1.44,
+      "tenYear": 1.83
+    }
+  },
+  {
+    "year": 2022,
+    "month": 3,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2022-03-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 0.17,
+      "threeMonth": 0.52,
+      "twoYear": 2.28,
+      "tenYear": 2.32
+    }
+  },
+  {
+    "year": 2022,
+    "month": 4,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2022-04-29",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 0.37,
+      "threeMonth": 0.85,
+      "twoYear": 2.7,
+      "tenYear": 2.89
+    }
+  },
+  {
+    "year": 2022,
+    "month": 5,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2022-05-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 0.73,
+      "threeMonth": 1.16,
+      "twoYear": 2.53,
+      "tenYear": 2.85
+    }
+  },
+  {
+    "year": 2022,
+    "month": 6,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2022-06-30",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 1.28,
+      "threeMonth": 1.72,
+      "twoYear": 2.92,
+      "tenYear": 2.98
+    }
+  },
+  {
+    "year": 2022,
+    "month": 7,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2022-07-29",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 2.22,
+      "threeMonth": 2.41,
+      "twoYear": 2.89,
+      "tenYear": 2.67
+    }
+  },
+  {
+    "year": 2022,
+    "month": 8,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2022-08-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 2.4,
+      "threeMonth": 2.96,
+      "twoYear": 3.45,
+      "tenYear": 3.15
+    }
+  },
+  {
+    "year": 2022,
+    "month": 9,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2022-09-30",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 2.79,
+      "threeMonth": 3.33,
+      "twoYear": 4.22,
+      "tenYear": 3.83
+    }
+  },
+  {
+    "year": 2022,
+    "month": 10,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2022-10-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 3.73,
+      "threeMonth": 4.22,
+      "twoYear": 4.51,
+      "tenYear": 4.1
+    }
+  },
+  {
+    "year": 2022,
+    "month": 11,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2022-11-30",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 4.07,
+      "threeMonth": 4.37,
+      "twoYear": 4.38,
+      "tenYear": 3.68
+    }
+  },
+  {
+    "year": 2022,
+    "month": 12,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2022-12-30",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 4.12,
+      "threeMonth": 4.42,
+      "twoYear": 4.41,
+      "tenYear": 3.88
+    }
+  },
+  {
+    "year": 2023,
+    "month": 1,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2023-01-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 4.58,
+      "threeMonth": 4.7,
+      "twoYear": 4.21,
+      "tenYear": 3.52
+    }
+  },
+  {
+    "year": 2023,
+    "month": 2,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2023-02-28",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 4.65,
+      "threeMonth": 4.88,
+      "twoYear": 4.81,
+      "tenYear": 3.92
+    }
+  },
+  {
+    "year": 2023,
+    "month": 3,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2023-03-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 4.74,
+      "threeMonth": 4.85,
+      "twoYear": 4.06,
+      "tenYear": 3.48
+    }
+  },
+  {
+    "year": 2023,
+    "month": 4,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2023-04-28",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 4.35,
+      "threeMonth": 5.1,
+      "twoYear": 4.04,
+      "tenYear": 3.44
+    }
+  },
+  {
+    "year": 2023,
+    "month": 5,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2023-05-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 5.28,
+      "threeMonth": 5.52,
+      "twoYear": 4.4,
+      "tenYear": 3.64
+    }
+  },
+  {
+    "year": 2023,
+    "month": 6,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2023-06-30",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 5.24,
+      "threeMonth": 5.43,
+      "twoYear": 4.87,
+      "tenYear": 3.81
+    }
+  },
+  {
+    "year": 2023,
+    "month": 7,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2023-07-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 5.48,
+      "threeMonth": 5.55,
+      "twoYear": 4.88,
+      "tenYear": 3.97
+    }
+  },
+  {
+    "year": 2023,
+    "month": 8,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2023-08-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 5.52,
+      "threeMonth": 5.56,
+      "twoYear": 4.85,
+      "tenYear": 4.09
+    }
+  },
+  {
+    "year": 2023,
+    "month": 9,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2023-09-29",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 5.55,
+      "threeMonth": 5.55,
+      "twoYear": 5.03,
+      "tenYear": 4.59
+    }
+  },
+  {
+    "year": 2023,
+    "month": 10,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2023-10-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 5.56,
+      "threeMonth": 5.59,
+      "twoYear": 5.07,
+      "tenYear": 4.88
+    }
+  },
+  {
+    "year": 2023,
+    "month": 11,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2023-11-30",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 5.56,
+      "threeMonth": 5.45,
+      "twoYear": 4.73,
+      "tenYear": 4.37
+    }
+  },
+  {
+    "year": 2023,
+    "month": 12,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2023-12-29",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 5.6,
+      "threeMonth": 5.4,
+      "twoYear": 4.23,
+      "tenYear": 3.88
+    }
+  },
+  {
+    "year": 2024,
+    "month": 1,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2024-01-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 5.53,
+      "threeMonth": 5.42,
+      "twoYear": 4.27,
+      "tenYear": 3.99
+    }
+  },
+  {
+    "year": 2024,
+    "month": 2,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2024-02-29",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 5.53,
+      "threeMonth": 5.45,
+      "twoYear": 4.64,
+      "tenYear": 4.25
+    }
+  },
+  {
+    "year": 2024,
+    "month": 3,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2024-03-28",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 5.49,
+      "threeMonth": 5.46,
+      "twoYear": 4.59,
+      "tenYear": 4.2
+    }
+  },
+  {
+    "year": 2024,
+    "month": 4,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2024-04-30",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 5.48,
+      "threeMonth": 5.46,
+      "twoYear": 5.04,
+      "tenYear": 4.69
+    }
+  },
+  {
+    "year": 2024,
+    "month": 5,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2024-05-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 5.48,
+      "threeMonth": 5.46,
+      "twoYear": 4.89,
+      "tenYear": 4.51
+    }
+  },
+  {
+    "year": 2024,
+    "month": 6,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2024-06-28",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 5.47,
+      "threeMonth": 5.48,
+      "twoYear": 4.71,
+      "tenYear": 4.36
+    }
+  },
+  {
+    "year": 2024,
+    "month": 7,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2024-07-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 5.49,
+      "threeMonth": 5.41,
+      "twoYear": 4.29,
+      "tenYear": 4.09
+    }
+  },
+  {
+    "year": 2024,
+    "month": 8,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2024-08-30",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 5.41,
+      "threeMonth": 5.21,
+      "twoYear": 3.91,
+      "tenYear": 3.91
+    }
+  },
+  {
+    "year": 2024,
+    "month": 9,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2024-09-30",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 4.93,
+      "threeMonth": 4.73,
+      "twoYear": 3.66,
+      "tenYear": 3.81
+    }
+  },
+  {
+    "year": 2024,
+    "month": 10,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2024-10-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 4.76,
+      "threeMonth": 4.64,
+      "twoYear": 4.16,
+      "tenYear": 4.28
+    }
+  },
+  {
+    "year": 2024,
+    "month": 11,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2024-11-29",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 4.76,
+      "threeMonth": 4.58,
+      "twoYear": 4.13,
+      "tenYear": 4.18
+    }
+  },
+  {
+    "year": 2024,
+    "month": 12,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2024-12-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 4.4,
+      "threeMonth": 4.37,
+      "twoYear": 4.25,
+      "tenYear": 4.58
+    }
+  },
+  {
+    "year": 2025,
+    "month": 1,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2025-01-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 4.37,
+      "threeMonth": 4.31,
+      "twoYear": 4.22,
+      "tenYear": 4.58
+    }
+  },
+  {
+    "year": 2025,
+    "month": 2,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2025-02-28",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 4.38,
+      "threeMonth": 4.32,
+      "twoYear": 3.99,
+      "tenYear": 4.24
+    }
+  },
+  {
+    "year": 2025,
+    "month": 3,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2025-03-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 4.38,
+      "threeMonth": 4.32,
+      "twoYear": 3.89,
+      "tenYear": 4.23
+    }
+  },
+  {
+    "year": 2025,
+    "month": 4,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2025-04-30",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 4.35,
+      "threeMonth": 4.31,
+      "twoYear": 3.6,
+      "tenYear": 4.17
+    }
+  },
+  {
+    "year": 2025,
+    "month": 5,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2025-05-30",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 4.33,
+      "threeMonth": 4.36,
+      "twoYear": 3.89,
+      "tenYear": 4.41
+    }
+  },
+  {
+    "year": 2025,
+    "month": 6,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2025-06-30",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 4.28,
+      "threeMonth": 4.41,
+      "twoYear": 3.72,
+      "tenYear": 4.24
+    }
+  },
+  {
+    "year": 2025,
+    "month": 7,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2025-07-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 4.49,
+      "threeMonth": 4.41,
+      "twoYear": 3.94,
+      "tenYear": 4.37
+    }
+  },
+  {
+    "year": 2025,
+    "month": 8,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2025-08-29",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 4.41,
+      "threeMonth": 4.23,
+      "twoYear": 3.59,
+      "tenYear": 4.23
+    }
+  },
+  {
+    "year": 2025,
+    "month": 9,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2025-09-30",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 4.2,
+      "threeMonth": 4.02,
+      "twoYear": 3.6,
+      "tenYear": 4.16
+    }
+  },
+  {
+    "year": 2025,
+    "month": 10,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2025-10-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 4.06,
+      "threeMonth": 3.89,
+      "twoYear": 3.6,
+      "tenYear": 4.11
+    }
+  },
+  {
+    "year": 2025,
+    "month": 11,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2025-11-28",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 4.05,
+      "threeMonth": 3.88,
+      "twoYear": 3.47,
+      "tenYear": 4.02
+    }
+  },
+  {
+    "year": 2025,
+    "month": 12,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2025-12-31",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 3.74,
+      "threeMonth": 3.67,
+      "twoYear": 3.47,
+      "tenYear": 4.18
+    }
+  },
+  {
+    "year": 2026,
+    "month": 1,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2026-01-30",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 3.72,
+      "threeMonth": 3.67,
+      "twoYear": 3.52,
+      "tenYear": 4.26
+    }
+  },
+  {
+    "year": 2026,
+    "month": 2,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2026-02-27",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 3.74,
+      "threeMonth": 3.67,
+      "twoYear": 3.38,
+      "tenYear": 3.97
+    }
+  },
+  {
+    "year": 2026,
+    "month": 3,
+    "source": "https://fred.stlouisfed.org",
+    "record_date": "2026-03-03",
+    "fetched_at": "2026-03-04T22:19:34.379Z",
+    "isLive": false,
+    "yields": {
+      "oneMonth": 3.75,
+      "threeMonth": 3.71,
+      "twoYear": 3.51,
+      "tenYear": 4.06
     }
   }
 ]
