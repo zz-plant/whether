@@ -27,6 +27,6 @@ jobs:
 
       - name: Run review-hotspot preflight
         env:
-          REVIEW_HOTSPOT_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          REVIEW_HOTSPOT_BASE: ${{ github.event.pull_request.base.sha || (github.event.created && '' || github.event.before) }}
           REVIEW_HOTSPOT_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
         run: bun run review:hotspot-preflight
