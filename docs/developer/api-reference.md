@@ -28,6 +28,8 @@ Whether exposes read-first JSON endpoints for summary generation, cadence checks
 | Endpoint | Method(s) | Purpose |
 | --- | --- | --- |
 | `/api/regime-alerts` | GET, POST | Read/create regime alert events. |
+| `/api/alert-preferences?clientId=<id>` | GET, POST | Read/update per-client alert channel preferences. |
+| `/api/alert-deliveries` | GET, POST | Read delivery history and emit channel delivery events for an alert. |
 | `/api/weekly-digest` | GET | Build digest summary from stored alert events. |
 
 ## Integration and operations endpoints
@@ -117,8 +119,22 @@ curl -s -X POST "http://localhost:3000/api/regime-alerts" \
     },
     "reasons": [{ "code": "regime-change", "message": "Regime shifted from DEFENSIVE to SCARCITY." }],
     "sourceUrls": ["https://fred.stlouisfed.org/"],
-    "timeMachineHref": "/evidence?month=2&year=2026"
+    "timeMachineHref": "/signals?month=2&year=2026"
   }' | jq
+```
+
+### Alert preferences and delivery
+
+```bash
+curl -s "http://localhost:3000/api/alert-preferences?clientId=exec-team" | jq
+
+curl -s -X POST "http://localhost:3000/api/alert-preferences" \
+  -H "content-type: application/json" \
+  -d '{"clientId":"exec-team","preferences":{"slack":true,"email":false,"webhook":true}}' | jq
+
+curl -s -X POST "http://localhost:3000/api/alert-deliveries" \
+  -H "content-type: application/json" \
+  -d '{"clientId":"exec-team","alertId":"<alert-id>"}' | jq
 ```
 
 ### Weekly mandate integration payload

@@ -29,6 +29,7 @@ import { ClimateBackdrop } from "./climateBackdrop";
 import { RegimeIconType } from "./regimeIcons";
 import { ArrowRightIcon } from "./uiIcons";
 import { productCopy } from "../../lib/copy/productCopy";
+import { SourceHealthPanel } from "./sourceHealthPanel";
 
 export const ReportShell = ({
   children,
@@ -60,7 +61,7 @@ export const ReportShell = ({
   secondaryCta,
   exportCta = {
     href: "/operations#ops-export-briefs",
-    label: "Generate executive brief",
+    label: "Copy weekly brief",
   },
   structuredData,
   historicalBanner,
@@ -215,6 +216,9 @@ export const ReportShell = ({
         </dl>
       }
       />
+      <div className="mt-3">
+        <SourceHealthPanel />
+      </div>
       <p className="mt-3 text-xs text-slate-300">{productCopy.notForecastingDisclaimer}</p>
     </>
   );

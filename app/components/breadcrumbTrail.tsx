@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Route } from "next";
 
 type BreadcrumbTrailItem = {
   label: string;
@@ -35,7 +36,7 @@ export function BreadcrumbTrail({
                 </span>
               ) : (
                 <Link
-                  href={item.href}
+                  href={item.href as Route}
                   className="truncate underline decoration-slate-500/80 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
                 >
                   {item.label}

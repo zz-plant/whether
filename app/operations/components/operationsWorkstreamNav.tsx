@@ -11,12 +11,22 @@ import {
 const navItemStyles =
   "weather-pill flex min-h-[56px] flex-col items-start gap-1.5 rounded-2xl border px-4 py-3 text-left text-xs font-semibold tracking-[0.12em] transition-colors";
 
-const getItemClasses = (link: OperationsWorkstreamLink, currentPath: Route) =>
-  link.href === currentPath
+const getBasePath = (href: string) => href.split("#")[0];
+const withSearchParams = (href: string, search: string) => {
+  if (!search) {
+    return href;
+  }
+  const [path, hash] = href.split("#");
+  const joined = `${path}?${search}`;
+  return hash ? `${joined}#${hash}` : joined;
+};
+
+const getItemClasses = (link: OperationsWorkstreamLink, currentPath: string) =>
+  getBasePath(link.href) === currentPath
     ? `${navItemStyles} border-sky-400/70 bg-sky-500/15 text-sky-100`
     : `${navItemStyles} border-slate-800/80 text-slate-200 hover:border-sky-400/70 hover:text-slate-100`;
 
-export const OperationsWorkstreamNav = ({ currentPath }: { currentPath: Route }) => {
+export const OperationsWorkstreamNav = ({ currentPath }: { currentPath: string }) => {
   const searchParams = useSearchParams();
   const currentSearch = searchParams.toString();
 
@@ -30,10 +40,10 @@ export const OperationsWorkstreamNav = ({ currentPath }: { currentPath: Route })
       </div>
       <ul className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {operationsWorkstreamLinks.map((link) => {
-          const isActive = link.href === currentPath;
+          const isActive = getBasePath(link.href) === currentPath;
           const labelTone = isActive ? "text-sky-200" : "text-slate-400";
           const descriptionTone = isActive ? "text-sky-100" : "text-slate-100";
-          const href = currentSearch ? `${link.href}?${currentSearch}` : link.href;
+          const href = withSearchParams(link.href, currentSearch);
           return (
             <li key={link.href}>
               <Link

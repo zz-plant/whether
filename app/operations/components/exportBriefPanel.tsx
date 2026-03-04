@@ -20,6 +20,7 @@ import {
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 import { useClipboardCopy, type ClipboardCopyState } from "../../components/useClipboardCopy";
 import { SectionPanelHeader } from "../../components/sectionPanelHeader";
+import { trackProductEvent } from "../../../lib/analytics";
 
 const formatNumber = (value: number | null, unit: string) => {
   const formatted = formatNumberValue(value);
@@ -192,6 +193,11 @@ export const ExportBriefPanel = ({
       return;
     }
     if (status === "copied" && copiedTarget) {
+      trackProductEvent("brief_export_succeeded", {
+        route: "/operations",
+        target: copiedTarget,
+        recordDate: treasury.record_date,
+      });
       add({
         title: "Copied to clipboard",
         description: `${copiedTarget} is ready to paste.`,
@@ -201,6 +207,12 @@ export const ExportBriefPanel = ({
     if (status === "error") {
       const label = lastLabelRef.current ?? "brief";
       const isBlocked = errorReason === "unavailable";
+      trackProductEvent("brief_export_failed", {
+        route: "/operations",
+        target: label,
+        recordDate: treasury.record_date,
+        reason: errorReason ?? "unknown",
+      });
       add({
         title: isBlocked ? "Clipboard blocked" : "Copy failed",
         description: `Copy the ${label.toLowerCase()} manually.`,
@@ -208,7 +220,7 @@ export const ExportBriefPanel = ({
       });
     }
     lastStatusRef.current = status;
-  }, [add, copiedTarget, errorReason, status]);
+  }, [add, copiedTarget, errorReason, status, treasury.record_date]);
 
   const briefing = useMemo(
     () => buildSlackBrief(assessment, treasury, sensors, macroSeries),
@@ -254,12 +266,27 @@ export const ExportBriefPanel = ({
     if (status === "copying") {
       return;
     }
+    trackProductEvent("brief_export_started", {
+      route: "/operations",
+      target: label,
+      recordDate: treasury.record_date,
+    });
     lastLabelRef.current = label;
     await copyToClipboard(text, label);
   };
 
   const handlePrint = () => {
+    trackProductEvent("brief_export_started", {
+      route: "/operations",
+      target: "Print / Save PDF",
+      recordDate: treasury.record_date,
+    });
     window.print();
+    trackProductEvent("brief_export_succeeded", {
+      route: "/operations",
+      target: "Print / Save PDF",
+      recordDate: treasury.record_date,
+    });
     add({
       title: "Print dialog opened",
       description: "Save to PDF or choose a printer.",
@@ -268,6 +295,11 @@ export const ExportBriefPanel = ({
   };
 
   const handleDownload = (content: string, filename: string) => {
+    trackProductEvent("brief_export_started", {
+      route: "/operations",
+      target: filename,
+      recordDate: treasury.record_date,
+    });
     const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
@@ -275,6 +307,11 @@ export const ExportBriefPanel = ({
     anchor.download = filename;
     anchor.click();
     window.setTimeout(() => URL.revokeObjectURL(url), 0);
+    trackProductEvent("brief_export_succeeded", {
+      route: "/operations",
+      target: filename,
+      recordDate: treasury.record_date,
+    });
     add({
       title: "Download started",
       description: `${filename} is downloading.`,
@@ -381,230 +418,243 @@ export const ExportBriefPanel = ({
             </Button>
           </div>
         </div>
-        <div className="mt-4 grid gap-4 lg:grid-cols-[1.4fr,1fr]">
-          <div className="weather-surface p-4">
-            <p className="type-kicker">
-              Constraint headlines
-            </p>
-            <p className="mt-3 text-sm text-slate-300">
-              Plain-English summary lines that can drop into status updates or exec briefings.
-            </p>
-            <Button
-              type="button"
-              onClick={() => handleCopy(constraintHeadlines, "Headlines")}
-              disabled={isCopying}
-              aria-busy={isCopying}
-              className="weather-button mt-4 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
-            >
-              {isCopying && activeTarget === "Headlines" ? "Copying" : "Copy constraint headlines"}
-            </Button>
-            <Button
-              type="button"
-              onClick={() =>
-                handleDownload(
-                  constraintHeadlines,
-                  `whether-headlines-${treasury.record_date}.txt`
-                )
-              }
-              className="weather-button mt-3 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
-            >
-              Download headlines
-            </Button>
-          </div>
-          <div className="weather-surface p-4">
-            <p className="type-kicker">
-              Headline preview
-            </p>
-            <p className="mt-3 text-sm text-slate-300">
-              Keep the text intact when sharing to preserve sourcing.
-            </p>
-            <textarea
-              readOnly
-              value={constraintHeadlines}
-              rows={6}
-              className="mt-3 w-full rounded-lg border border-slate-800 bg-slate-950/80 p-3 font-mono text-base text-slate-200 touch-manipulation"
-            />
-          </div>
-        </div>
-        <div className="mt-4 grid gap-4 lg:grid-cols-[1.4fr,1fr]">
-          <div className="weather-surface p-4">
-            <p className="type-kicker">
-              Autonomous agent handoff
-            </p>
-            <p className="mt-3 text-sm text-slate-300">
-              Structured JSON plus a ready-to-use prompt for PM assistants and copilots.
-            </p>
-            <div className="mt-4 flex flex-wrap gap-3">
-              <Button
-                type="button"
-                onClick={() => handleCopy(agentPayload, "Agent JSON payload")}
-                disabled={isCopying}
-                aria-busy={isCopying}
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
-              >
-                {isCopying && activeTarget === "Agent JSON payload"
-                  ? "Copying"
-                  : "Copy JSON payload"}
-              </Button>
-              <Button
-                type="button"
-                onClick={() =>
-                  handleDownload(
-                    agentPayload,
-                    `whether-agent-payload-${treasury.record_date}.json`
-                  )
-                }
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
-              >
-                Download JSON
-              </Button>
-              <Button
-                type="button"
-                onClick={() => handleCopy(agentPrompt, "Agent prompt")}
-                disabled={isCopying}
-                aria-busy={isCopying}
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
-              >
-                {isCopying && activeTarget === "Agent prompt" ? "Copying" : "Copy agent prompt"}
-              </Button>
-              <Button
-                type="button"
-                onClick={() =>
-                  handleDownload(
-                    agentPrompt,
-                    `whether-agent-prompt-${treasury.record_date}.txt`
-                  )
-                }
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
-              >
-                Download prompt
-              </Button>
-            </div>
-          </div>
-          <div className="weather-surface p-4">
-            <p className="type-kicker">
-              Agent payload preview
-            </p>
-            <p className="mt-3 text-sm text-slate-300">
-              Keep the JSON intact to preserve provenance and timestamps.
-            </p>
-            <textarea
-              readOnly
-              value={agentPayload}
-              rows={10}
-              className="mt-3 w-full rounded-lg border border-slate-800 bg-slate-950/80 p-3 font-mono text-base text-slate-200 touch-manipulation"
-            />
-          </div>
-        </div>
-        <div className="mt-4 weather-surface p-4">
-          <p className="type-kicker">
-            Jira, Confluence, and Linear
+        <details className="mt-4 weather-surface p-4">
+          <summary className="cursor-pointer list-none text-sm font-semibold tracking-[0.08em] text-slate-100">
+            Advanced exports
+          </summary>
+          <p className="mt-2 text-xs text-slate-300">
+            Long-tail exports for tools and agent handoffs.
           </p>
-          <p className="mt-3 text-sm text-slate-300">
-            Paste tool-optimized summaries into your issue trackers or documentation.
-          </p>
-          <div className="mt-4 grid gap-4">
-            <div className="rounded-lg border border-slate-800/80 bg-slate-950/60 p-3">
-              <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
-                Jira description
-              </p>
-              <p className="mt-2 text-sm text-slate-400">
-                Paste into the Jira issue description field.
-              </p>
-              <div className="mt-3 flex flex-wrap gap-3">
+
+          <div className="mt-4 space-y-4">
+            <div className="grid gap-4 lg:grid-cols-[1.4fr,1fr]">
+              <div className="weather-surface p-4">
+                <p className="type-kicker">
+                  Constraint headlines
+                </p>
+                <p className="mt-3 text-sm text-slate-300">
+                  Plain-English summary lines that can drop into status updates or exec briefings.
+                </p>
                 <Button
                   type="button"
-                  onClick={() => handleCopy(jiraMarkdownBrief, "Jira description")}
+                  onClick={() => handleCopy(constraintHeadlines, "Headlines")}
                   disabled={isCopying}
                   aria-busy={isCopying}
-                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+                  className="weather-button mt-4 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
                 >
-                  {isCopying && activeTarget === "Jira description"
-                    ? "Copying"
-                    : "Copy Jira description"}
+                  {isCopying && activeTarget === "Headlines" ? "Copying" : "Copy constraint headlines"}
                 </Button>
                 <Button
                   type="button"
                   onClick={() =>
                     handleDownload(
-                      jiraMarkdownBrief,
-                      `whether-jira-description-${treasury.record_date}.md`
+                      constraintHeadlines,
+                      `whether-headlines-${treasury.record_date}.txt`
                     )
                   }
-                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                  className="weather-button mt-3 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                 >
-                  Download Jira description
+                  Download headlines
                 </Button>
               </div>
-            </div>
-            <div className="rounded-lg border border-slate-800/80 bg-slate-950/60 p-3">
-              <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
-                Confluence page snippet
-              </p>
-              <p className="mt-2 text-sm text-slate-400">
-                Paste into the Confluence page body.
-              </p>
-              <div className="mt-3 flex flex-wrap gap-3">
-                <Button
-                  type="button"
-                  onClick={() => handleCopy(confluenceWikiBrief, "Confluence page snippet")}
-                  disabled={isCopying}
-                  aria-busy={isCopying}
-                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
-                >
-                  {isCopying && activeTarget === "Confluence page snippet"
-                    ? "Copying"
-                    : "Copy Confluence page snippet"}
-                </Button>
-                <Button
-                  type="button"
-                  onClick={() =>
-                    handleDownload(
-                      confluenceWikiBrief,
-                      `whether-confluence-snippet-${treasury.record_date}.txt`
-                    )
-                  }
-                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
-                >
-                  Download Confluence page snippet
-                </Button>
+              <div className="weather-surface p-4">
+                <p className="type-kicker">
+                  Headline preview
+                </p>
+                <p className="mt-3 text-sm text-slate-300">
+                  Keep the text intact when sharing to preserve sourcing.
+                </p>
+                <textarea
+                  readOnly
+                  value={constraintHeadlines}
+                  rows={6}
+                  className="mt-3 w-full rounded-lg border border-slate-800 bg-slate-950/80 p-3 font-mono text-base text-slate-200 touch-manipulation"
+                />
               </div>
             </div>
-            <div className="rounded-lg border border-slate-800/80 bg-slate-950/60 p-3">
-              <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
-                Linear issue description
+
+            <div className="grid gap-4 lg:grid-cols-[1.4fr,1fr]">
+              <div className="weather-surface p-4">
+                <p className="type-kicker">
+                  Autonomous agent handoff
+                </p>
+                <p className="mt-3 text-sm text-slate-300">
+                  Structured JSON plus a ready-to-use prompt for PM assistants and copilots.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <Button
+                    type="button"
+                    onClick={() => handleCopy(agentPayload, "Agent JSON payload")}
+                    disabled={isCopying}
+                    aria-busy={isCopying}
+                    className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+                  >
+                    {isCopying && activeTarget === "Agent JSON payload"
+                      ? "Copying"
+                      : "Copy JSON payload"}
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() =>
+                      handleDownload(
+                        agentPayload,
+                        `whether-agent-payload-${treasury.record_date}.json`
+                      )
+                    }
+                    className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                  >
+                    Download JSON
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => handleCopy(agentPrompt, "Agent prompt")}
+                    disabled={isCopying}
+                    aria-busy={isCopying}
+                    className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+                  >
+                    {isCopying && activeTarget === "Agent prompt" ? "Copying" : "Copy agent prompt"}
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() =>
+                      handleDownload(
+                        agentPrompt,
+                        `whether-agent-prompt-${treasury.record_date}.txt`
+                      )
+                    }
+                    className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                  >
+                    Download prompt
+                  </Button>
+                </div>
+              </div>
+              <div className="weather-surface p-4">
+                <p className="type-kicker">
+                  Agent payload preview
+                </p>
+                <p className="mt-3 text-sm text-slate-300">
+                  Keep the JSON intact to preserve provenance and timestamps.
+                </p>
+                <textarea
+                  readOnly
+                  value={agentPayload}
+                  rows={10}
+                  className="mt-3 w-full rounded-lg border border-slate-800 bg-slate-950/80 p-3 font-mono text-base text-slate-200 touch-manipulation"
+                />
+              </div>
+            </div>
+
+            <div className="weather-surface p-4">
+              <p className="type-kicker">
+                Jira, Confluence, and Linear
               </p>
-              <p className="mt-2 text-sm text-slate-400">
-                Paste into the Linear issue description field.
+              <p className="mt-3 text-sm text-slate-300">
+                Paste tool-optimized summaries into your issue trackers or documentation.
               </p>
-              <div className="mt-3 flex flex-wrap gap-3">
-                <Button
-                  type="button"
-                  onClick={() => handleCopy(linearMarkdownBrief, "Linear issue description")}
-                  disabled={isCopying}
-                  aria-busy={isCopying}
-                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
-                >
-                  {isCopying && activeTarget === "Linear issue description"
-                    ? "Copying"
-                    : "Copy Linear issue description"}
-                </Button>
-                <Button
-                  type="button"
-                  onClick={() =>
-                    handleDownload(
-                      linearMarkdownBrief,
-                      `whether-linear-description-${treasury.record_date}.md`
-                    )
-                  }
-                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
-                >
-                  Download Linear issue description
-                </Button>
+              <div className="mt-4 grid gap-4">
+                <div className="rounded-lg border border-slate-800/80 bg-slate-950/60 p-3">
+                  <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
+                    Jira description
+                  </p>
+                  <p className="mt-2 text-sm text-slate-400">
+                    Paste into the Jira issue description field.
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-3">
+                    <Button
+                      type="button"
+                      onClick={() => handleCopy(jiraMarkdownBrief, "Jira description")}
+                      disabled={isCopying}
+                      aria-busy={isCopying}
+                      className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+                    >
+                      {isCopying && activeTarget === "Jira description"
+                        ? "Copying"
+                        : "Copy Jira description"}
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={() =>
+                        handleDownload(
+                          jiraMarkdownBrief,
+                          `whether-jira-description-${treasury.record_date}.md`
+                        )
+                      }
+                      className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                    >
+                      Download Jira description
+                    </Button>
+                  </div>
+                </div>
+                <div className="rounded-lg border border-slate-800/80 bg-slate-950/60 p-3">
+                  <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
+                    Confluence page snippet
+                  </p>
+                  <p className="mt-2 text-sm text-slate-400">
+                    Paste into the Confluence page body.
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-3">
+                    <Button
+                      type="button"
+                      onClick={() => handleCopy(confluenceWikiBrief, "Confluence page snippet")}
+                      disabled={isCopying}
+                      aria-busy={isCopying}
+                      className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+                    >
+                      {isCopying && activeTarget === "Confluence page snippet"
+                        ? "Copying"
+                        : "Copy Confluence page snippet"}
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={() =>
+                        handleDownload(
+                          confluenceWikiBrief,
+                          `whether-confluence-snippet-${treasury.record_date}.txt`
+                        )
+                      }
+                      className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                    >
+                      Download Confluence page snippet
+                    </Button>
+                  </div>
+                </div>
+                <div className="rounded-lg border border-slate-800/80 bg-slate-950/60 p-3">
+                  <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
+                    Linear issue description
+                  </p>
+                  <p className="mt-2 text-sm text-slate-400">
+                    Paste into the Linear issue description field.
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-3">
+                    <Button
+                      type="button"
+                      onClick={() => handleCopy(linearMarkdownBrief, "Linear issue description")}
+                      disabled={isCopying}
+                      aria-busy={isCopying}
+                      className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+                    >
+                      {isCopying && activeTarget === "Linear issue description"
+                        ? "Copying"
+                        : "Copy Linear issue description"}
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={() =>
+                        handleDownload(
+                          linearMarkdownBrief,
+                          `whether-linear-description-${treasury.record_date}.md`
+                        )
+                      }
+                      className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                    >
+                      Download Linear issue description
+                    </Button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </details>
         <div className="mt-4 min-h-[260px]">
           {copyError ? (
             <div className="rounded-xl border border-amber-400/40 bg-amber-500/10 p-4 text-xs text-amber-100">

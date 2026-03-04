@@ -17,7 +17,6 @@ import {
 } from "../components/appendixSections";
 import { reportPageLinks } from "../../lib/report/reportNavigation";
 import { operationsSectionLinks } from "../../lib/navigation/operationsNavigation";
-import { OperationsWorkstreamNav } from "./components/operationsWorkstreamNav";
 import { OperationsWorkflowProgress } from "./components/operationsWorkflowProgress";
 import { ExportBriefPanel } from "./components/exportBriefPanel";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
@@ -102,8 +101,8 @@ export default async function OperationsPage({
     ? buildTimeMachineHref("/operations", previousHistoricalSelection)
     : undefined;
   const historicalTimeMachineHref = historicalSelection
-    ? buildTimeMachineHref("/evidence?advanced=1#time-machine", historicalSelection)
-    : "/evidence?advanced=1#time-machine";
+    ? buildTimeMachineHref("/signals?advanced=1#time-machine", historicalSelection)
+    : "/signals?advanced=1#time-machine";
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
   const trustStatusLabel = historicalSelection
     ? "Historical snapshot"
@@ -199,7 +198,6 @@ export default async function OperationsPage({
       }
     >
       <OperationsWorkflowProgress currentPath="/operations" />
-      <OperationsWorkstreamNav currentPath="/operations" />
 
       <SectionedReportPanel
         id="ops-monthly-action-summary"

@@ -52,11 +52,11 @@ export default async function StartHerePage() {
         assessment={assessment}
         recordDate={treasury.record_date}
         impactLinks={[
-          { label: "Posture shift", href: "/evidence#current-scores", metric: "tightness" },
-          { label: "Top drivers", href: "/evidence#signal-diagnostics", metric: "baseRate" },
+          { label: "Posture shift", href: "/signals#current-scores", metric: "tightness" },
+          { label: "Top drivers", href: "/signals#signal-diagnostics", metric: "baseRate" },
           { label: "Action guardrails", href: "/operations#ops-playbook", metric: "riskAppetite" },
         ]}
-        openPanelHref="/evidence#signal-diagnostics"
+        openPanelHref="/signals#signal-diagnostics"
       />
 
       <section className="weather-panel-hero space-y-4 px-6 py-5">
@@ -94,7 +94,7 @@ export default async function StartHerePage() {
           ))}
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <Link href="/operations/plan" className="weather-button-primary inline-flex items-center justify-center">Run weekly operating sequence</Link>
+          <Link href="/operations" className="weather-button-primary inline-flex items-center justify-center">Run weekly operating sequence</Link>
           <Link href="/operations#ops-export-briefs" className="weather-button inline-flex items-center justify-center">Copy weekly brief</Link>
           <details className="group">
             <summary className="weather-pill inline-flex min-h-[44px] cursor-pointer list-none items-center justify-center rounded-full border border-slate-700/80 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation">
@@ -107,12 +107,12 @@ export default async function StartHerePage() {
         </div>
       </section>
 
-      <section id="start-role-path" className="weather-panel-quiet space-y-4 px-6 py-5">
-        <div className="space-y-1">
-          <h2 className="text-xl font-semibold text-slate-100">Choose your path</h2>
-          <p className="text-[15px] text-slate-300 sm:text-base">Use this as the role lens picker inside Command Center, not a second homepage.</p>
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2">
+      <details id="start-role-path" className="weather-panel-quiet px-6 py-5">
+        <summary className="cursor-pointer list-none text-base font-semibold text-slate-100">
+          Choose your path
+        </summary>
+        <p className="mt-2 text-[15px] text-slate-300 sm:text-base">Use this as the role lens picker inside Command Center, not a second homepage.</p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
           <Link href="/decide/use-cases" className="weather-surface min-h-[44px] space-y-2 px-4 py-3 transition hover:border-sky-400/65">
             <h3 className="text-base font-semibold text-slate-100">Role and situation paths</h3>
             <p className="text-[15px] text-slate-300 sm:text-base">Route by role or bottleneck to open the right guidance quickly.</p>
@@ -122,7 +122,7 @@ export default async function StartHerePage() {
             <p className="text-[15px] text-slate-300 sm:text-base">Browse role-specific references, team context, and ship checklists.</p>
           </Link>
         </div>
-      </section>
+      </details>
 
       <section className="weather-panel px-6 py-5">
         <div id="start-posture" className="space-y-4">

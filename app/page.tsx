@@ -20,15 +20,20 @@ import { HistoricalBanner } from "./components/boardBriefSections";
 import { ReportShell } from "./components/reportShell";
 import { reportPageLinks } from "../lib/report/reportNavigation";
 import { buildTrustStatus } from "../lib/report/trustStatus";
-import { WeeklyDecisionCard } from "./components/weeklyDecisionCard";
 import { RevealOnView } from "./components/revealOnView";
 import { operatingCallsByRegime } from "../lib/report/operatingCalls";
 import { deriveDecisionKnobs } from "../lib/report/decisionKnobs";
-import { ActionStrip } from "./components/actionStrip";
 import { buildSlackBrief } from "../lib/export/briefBuilders";
 import { CopySlackBriefButton } from "./components/copySlackBriefButton";
 import { createBreadcrumbTrail } from "../lib/navigation/breadcrumbs";
 import { buildWeeklyCall } from "../lib/report/weeklyCall";
+import { evaluateRegime } from "../lib/regimeEngine";
+import {
+  buildBoldnessScore,
+  buildWeeklyLeadershipBriefModel,
+} from "../lib/report/weeklyLeadershipBrief";
+import { getPreviousTimeMachineSnapshot } from "../lib/timeMachine/timeMachineCache";
+import { ViewEventBeacon } from "./components/viewEventBeacon";
 
 const WeeklyActionSummaryPanel = dynamic(
   () =>
@@ -62,7 +67,7 @@ export const revalidate = 900;
 export const runtime = "edge";
 
 const homeSectionSequence = [
-  { href: "#action-strip", label: "Actions" },
+  { href: "#one-screen-weekly-brief", label: "This week" },
   { href: "#weekly-action-summary", label: "Weekly actions" },
   { href: "#executive-snapshot", label: "Evidence" },
 ] as const;
@@ -241,14 +246,13 @@ export default async function HomePage({
   const {
     assessment,
     fetchedAtLabel,
+    regimeSeries,
     historicalSelection,
     recordDateLabel,
     regimeAlert,
     reportDynamics,
     sensors,
     macroSeries,
-    startItems,
-    fenceItems,
     statusLabel,
     stopItems,
     treasury,
@@ -261,8 +265,8 @@ export default async function HomePage({
     ? buildTimeMachineHref("/", previousHistoricalSelection)
     : undefined;
   const historicalTimeMachineHref = historicalSelection
-    ? buildTimeMachineHref("/evidence?advanced=1#time-machine", historicalSelection)
-    : "/evidence?advanced=1#time-machine";
+    ? buildTimeMachineHref("/signals?advanced=1#time-machine", historicalSelection)
+    : "/signals?advanced=1#time-machine";
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
   const {
     trustStatusLabel,
@@ -284,7 +288,6 @@ export default async function HomePage({
   const severityDelta = previousRegime
     ? regimeSeverityRank[assessment.regime] - regimeSeverityRank[previousRegime]
     : 0;
-  const changeVsLastWeek = severityDelta > 0 ? "Worse than last week" : severityDelta < 0 ? "Better than last week" : "No material change";
   const operatingCalls = operatingCallsByRegime[assessment.regime];
   const expansionWindow = expansionWindowByRegime[assessment.regime];
   const longCycleBetStance = longCycleBetByRegime[assessment.regime];
@@ -293,8 +296,6 @@ export default async function HomePage({
   const tightnessGap = Math.abs(assessment.scores.tightness - tightnessThreshold);
   const riskGap = Math.abs(assessment.scores.riskAppetite - riskThreshold);
   const nearestThresholdGap = Math.min(tightnessGap, riskGap);
-  const confidenceLabel = nearestThresholdGap <= 5 ? "LOW" : nearestThresholdGap <= 12 ? "MED" : "HIGH";
-  const transitionWatch = nearestThresholdGap <= 8 || Boolean(regimeAlert) ? "ON" : "OFF";
   const weeklyCall = buildWeeklyCall({
     regime: assessment.regime,
     stopItems,
@@ -310,6 +311,47 @@ export default async function HomePage({
   const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries, {
     decisionKnobs,
     weeklyCall,
+  });
+  const previousSnapshot = getPreviousTimeMachineSnapshot(treasury.record_date);
+  const previousAssessment = previousSnapshot ? evaluateRegime(previousSnapshot) : null;
+  const latestRegimeSeries = regimeSeries.slice(-8);
+  let stabilityWeeks = 0;
+  for (let index = latestRegimeSeries.length - 1; index >= 0; index -= 1) {
+    if (latestRegimeSeries[index]?.regime === assessment.regime) {
+      stabilityWeeks += 1;
+      continue;
+    }
+    break;
+  }
+  const snapshots = [treasury];
+  while (snapshots.length < 4) {
+    const previous = getPreviousTimeMachineSnapshot(snapshots[0].record_date);
+    if (!previous) {
+      break;
+    }
+    snapshots.unshift(previous);
+  }
+  const assessedSnapshots = snapshots.map((snapshot) => evaluateRegime(snapshot));
+  const last4Boldness = assessedSnapshots.map((snapshotAssessment) =>
+    buildBoldnessScore(
+      snapshotAssessment.scores.tightness,
+      snapshotAssessment.scores.riskAppetite,
+    ),
+  );
+  const hiringTrendDelta = assessedSnapshots.reduce((accumulator, snapshotAssessment, index) => {
+    if (index === 0) {
+      return accumulator;
+    }
+    return accumulator +
+      (assessedSnapshots[index - 1].scores.tightness - snapshotAssessment.scores.tightness);
+  }, 0);
+  const leadershipBriefModel = buildWeeklyLeadershipBriefModel({
+    assessment,
+    previousAssessment,
+    treasury,
+    last4Boldness,
+    hiringTrendDelta,
+    stabilityWeeks,
   });
   return (
     <ReportShell
@@ -327,8 +369,8 @@ export default async function HomePage({
       currentPath="/"
       pageSummary="Verdict and immediate decision call for this planning cycle."
       primaryCta={{
-        href: "#weekly-posture-brief-title",
-        label: "Copy leadership brief (Slack)",
+        href: "#one-screen-weekly-brief",
+        label: "Copy weekly brief",
         copyText: slackBrief,
         copyTarget: "Slack",
       }}
@@ -337,7 +379,7 @@ export default async function HomePage({
         label: "See evidence behind the call",
       }}
       nextStep={{
-        href: "/evidence",
+        href: "/signals",
         description: "Review evidence in Signals",
       }}
       sidebarVariant="hidden"
@@ -357,28 +399,84 @@ export default async function HomePage({
         ) : null
       }
     >
-      <WeeklyDecisionCard
-        regime={assessment.regime}
-        statusLabel={statusLabel}
-        changeVsLastWeek={changeVsLastWeek}
-        confidenceLabel={confidenceLabel}
-        transitionWatch={transitionWatch}
-        constraints={weeklyCall.rulesOfEngagement}
-        guardrail={weeklyCall.guardrail}
-        reversalTrigger={weeklyCall.flipTrigger}
-        avoidThisWeek={weeklyCall.avoidThisWeek}
-        recordDateLabel={recordDateLabel}
-        fetchedAtLabel={fetchedAtLabel}
-        reportDynamics={reportDynamics}
-        decisionKnobs={decisionKnobs}
-        actions={<CopySlackBriefButton brief={slackBrief} />}
+      <ViewEventBeacon
+        name="briefing_view_loaded"
+        payload={{
+          route: "/",
+          posture: assessment.regime,
+          freshness: trustStatusLabel,
+          recordDate: treasury.record_date,
+        }}
       />
 
-      <ActionStrip
-        doItems={startItems.slice(0, 3)}
-        dontItems={stopItems.slice(0, 3)}
-        fenceItems={fenceItems.slice(0, 2)}
-      />
+      <section id="one-screen-weekly-brief" className="weather-panel space-y-3 px-5 py-4 sm:px-6 sm:py-5">
+        <header className="flex flex-wrap items-start justify-between gap-3">
+          <div className="space-y-1">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">This week</p>
+            <p className="text-sm text-slate-100">Boldness budget: {leadershipBriefModel.notchShiftLabel}</p>
+            <p className="text-sm text-slate-100">Hiring window: {leadershipBriefModel.hiringWindow}</p>
+            <p className="text-sm text-slate-100">Expansion window: {leadershipBriefModel.expansionWindow}</p>
+            <p className="text-sm text-slate-100">Raise window: {leadershipBriefModel.raiseWindow}</p>
+            <p className="text-sm text-slate-100">Stability: Moderate (Week {leadershipBriefModel.stabilityWeeks})</p>
+            <p className="text-sm text-slate-100">Net delta: {leadershipBriefModel.netDeltaLabel}</p>
+          </div>
+          <CopySlackBriefButton brief={slackBrief} />
+        </header>
+
+        <section className="weather-surface space-y-1 px-4 py-3">
+          <p className="text-base font-semibold text-slate-100">
+            We&apos;re {leadershipBriefModel.boldnessDelta >= 0 ? `+${leadershipBriefModel.boldnessDelta}` : leadershipBriefModel.boldnessDelta} bold this week.
+          </p>
+          <p className="text-xs text-slate-400">Baseline posture: {assessment.regime}.</p>
+        </section>
+
+        <section className="weather-surface space-y-2 px-4 py-3">
+          <p className="text-sm font-semibold text-slate-100">Boldness Budget: {leadershipBriefModel.boldnessScore} / 100</p>
+          <p className="text-sm text-slate-200">Change: {leadershipBriefModel.boldnessDelta >= 0 ? `+${leadershipBriefModel.boldnessDelta}` : leadershipBriefModel.boldnessDelta}</p>
+          <div className="flex flex-wrap gap-2 text-xs">
+            <span className="weather-pill">Risk appetite {leadershipBriefModel.riskDelta >= 0 ? `+${leadershipBriefModel.riskDelta}` : leadershipBriefModel.riskDelta}</span>
+            <span className="weather-pill">
+              Tightness {leadershipBriefModel.tightnessDelta === 0 ? "unchanged" : leadershipBriefModel.tightnessDelta > 0 ? `+${leadershipBriefModel.tightnessDelta}` : leadershipBriefModel.tightnessDelta}
+            </span>
+            <span className="weather-pill">
+              Curve {Math.abs(leadershipBriefModel.curveDelta) < 0.05 ? "stable" : leadershipBriefModel.curveDelta > 0 ? "steeper" : "flatter"}
+            </span>
+          </div>
+        </section>
+
+        <section className="weather-surface space-y-2 px-4 py-3">
+          <p className="text-sm font-semibold text-slate-100">Revisit last week&apos;s roadmap/hiring decisions?</p>
+          <p className="text-sm text-slate-100">
+            {leadershipBriefModel.revisitYes ? "YES — Regime shift detected." : "NO — Hold posture."}
+          </p>
+          {leadershipBriefModel.revisitYes ? (
+            <p className="text-xs text-slate-300">Cause: boldness moved outside the hold band or hiring window changed.</p>
+          ) : null}
+        </section>
+
+        <section className="weather-surface space-y-1 px-4 py-3 text-sm text-slate-100">
+          <p>If tightness rises 20 points → Hiring window closes → Boldness budget drops 12 points</p>
+          <p>If curve inverts below 0.00% → Payback tolerance tightens to ≤ 9 months</p>
+        </section>
+
+        <section className="weather-surface space-y-1 px-4 py-3 text-sm text-slate-100">
+          <p>Expansion window: {leadershipBriefModel.expansionWindow}</p>
+          <p>Trend: {leadershipBriefModel.expansionTrend}</p>
+        </section>
+
+        <section className="weather-surface space-y-1 px-4 py-3 text-sm text-slate-100">
+          <p>Last 4 weeks: Boldness {last4Boldness.join(" → ")}</p>
+          <p>Hiring window trend: {leadershipBriefModel.hiringTrend}</p>
+        </section>
+
+        <section className="weather-surface px-4 py-3 text-xs text-slate-200">
+          <div className="flex flex-wrap gap-x-6 gap-y-2">
+            <p>Data freshness: {treasuryProvenance.ageLabel.replace(".", "")}</p>
+            <p>Confidence: {leadershipBriefModel.confidenceLabel}</p>
+            <p>Inputs complete: {leadershipBriefModel.inputsComplete ? "Yes" : "No"}</p>
+          </div>
+        </section>
+      </section>
 
       <section
         id="weekly-action-summary"

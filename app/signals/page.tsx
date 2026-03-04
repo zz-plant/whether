@@ -26,6 +26,8 @@ import { SIGNALS_RELATED_LINKS } from "../../lib/report/reportCopy";
 import { indicatorTypeByScoreLabel, indicatorTypeLabel } from "../../lib/indicatorClassification";
 import { HistoricalReplayDatePicker } from "./components/historicalReplayDatePicker";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
+import { ViewEventBeacon } from "../components/viewEventBeacon";
+import { EvidenceAnchorTracker } from "../components/evidenceAnchorTracker";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -34,7 +36,7 @@ export const metadata: Metadata = buildPageMetadata({
   title: "Whether Report — Signal evidence",
   description:
     "Evidence appendix: macro signals, thresholds, and historical context supporting the weekly posture brief.",
-  path: "/evidence",
+  path: "/signals",
   imageAlt: "Whether Report signal evidence overview",
   imageParams: {
     template: "signals",
@@ -67,9 +69,9 @@ export default async function SignalsPage({
     "@graph": [
       {
         "@type": "WebPage",
-        "@id": `${siteUrl}/evidence#webpage`,
+        "@id": `${siteUrl}/signals#webpage`,
         name: "Whether Report — Signal evidence",
-        url: `${siteUrl}/evidence`,
+        url: `${siteUrl}/signals`,
         description:
           "Evidence appendix: macro signals, thresholds, and historical context supporting the weekly posture brief.",
         inLanguage: "en",
@@ -101,7 +103,7 @@ export default async function SignalsPage({
       buildBreadcrumbList(
         createBreadcrumbTrail([
           { path: "/" },
-          { path: "/evidence" },
+          { path: "/signals" },
         ]),
       ),
     ],
@@ -129,11 +131,11 @@ export default async function SignalsPage({
     ? getAdjacentTimeMachineRequest(historicalSelection, "previous")
     : null;
   const previousHistoricalHref = previousHistoricalSelection
-    ? buildTimeMachineHref("/evidence", previousHistoricalSelection)
+    ? buildTimeMachineHref("/signals", previousHistoricalSelection)
     : undefined;
   const historicalTimeMachineHref = historicalSelection
-    ? buildTimeMachineHref("/evidence?advanced=1#time-machine", historicalSelection)
-    : "/evidence?advanced=1#time-machine";
+    ? buildTimeMachineHref("/signals?advanced=1#time-machine", historicalSelection)
+    : "/signals?advanced=1#time-machine";
   const summaryArchive = getSummaryArchive();
   const regimeLabel = regimeLabels[assessment.regime];
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
@@ -183,7 +185,7 @@ export default async function SignalsPage({
       params.set("advanced", "1");
     }
     const query = params.toString();
-    return query ? `/evidence?${query}` : "/evidence";
+    return query ? `/signals?${query}` : "/signals";
   };
 
   const buildDiagnosticsHref = (showAll: boolean) => {
@@ -199,7 +201,7 @@ export default async function SignalsPage({
       params.set("diagnostics", "all");
     }
     const query = params.toString();
-    return query ? `/evidence?${query}#signal-diagnostics` : "/evidence#signal-diagnostics";
+    return query ? `/signals?${query}#signal-diagnostics` : "/signals#signal-diagnostics";
   };
 
   const buildFocusHref = (focus: FocusTab) => {
@@ -215,7 +217,7 @@ export default async function SignalsPage({
       params.set("focus", focus);
     }
     const query = params.toString();
-    return query ? `/evidence?${query}` : "/evidence";
+    return query ? `/signals?${query}` : "/signals";
   };
   const prioritizedSignalsByFocus: Record<FocusTab, Array<{ label: string; why: string; href: string }>> = {
     all: [
@@ -334,13 +336,24 @@ export default async function SignalsPage({
         historicalSelection ? (
           <HistoricalBanner
             banner={historicalSelection.banner}
-            liveHref="/evidence"
+            liveHref="/signals"
             previousHref={previousHistoricalHref}
             timeMachineHref={historicalTimeMachineHref}
           />
         ) : null
       }
     >
+      <ViewEventBeacon
+        name="briefing_view_loaded"
+        payload={{
+          route: "/signals",
+          posture: assessment.regime,
+          freshness: trustStatusLabel,
+          recordDate: treasury.record_date,
+        }}
+      />
+      <EvidenceAnchorTracker />
+
       <ReturningVisitorDeltaStrip
         assessment={assessment}
         recordDate={treasury.record_date}

@@ -1,7 +1,7 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import { ToastProviderRoot } from "./components/toastProviderRoot";
-import { GlobalHeader } from "./components/globalHeader";
+import { GlobalHeaderGate } from "./components/globalHeaderGate";
 import { siteUrl } from "../lib/siteUrl";
 import { buildSocialImageUrl } from "../lib/seo";
 
@@ -90,7 +90,7 @@ export default function RootLayout({
           Skip to content
         </a>
         <ToastProviderRoot>
-          <GlobalHeader />
+          <GlobalHeaderGate />
           <div id="site-content-start" tabIndex={-1}>
             {children}
           </div>

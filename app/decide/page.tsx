@@ -19,7 +19,7 @@ export default function DecidePage() {
       accentClass: "weather-card-accent-sky",
     },
     {
-      href: "/evidence",
+      href: "/signals",
       title: "Signals evidence",
       description: "Check live evidence before committing to irreversible moves.",
       eyebrow: "Validation",

@@ -52,8 +52,8 @@ export const regimePages: StartupRegimePage[] = [
 export const findRegimePage = (slug: string) => regimePages.find((page) => page.slug === slug);
 
 export const signalTranslationPages = [
-  { slug: "yield-curve-and-startups", title: "Yield curve and startups", href: "/evidence" },
-  { slug: "bbb-spread-and-startup-risk", title: "BBB spread and startup risk", href: "/evidence" },
-  { slug: "treasury-rates-and-saas-valuations", title: "Treasury rates and SaaS valuations", href: "/evidence" },
-  { slug: "venture-capital-risk-appetite-indicator", title: "VC risk appetite indicator", href: "/evidence" },
+  { slug: "yield-curve-and-startups", title: "Yield curve and startups", href: "/signals" },
+  { slug: "bbb-spread-and-startup-risk", title: "BBB spread and startup risk", href: "/signals" },
+  { slug: "treasury-rates-and-saas-valuations", title: "Treasury rates and SaaS valuations", href: "/signals" },
+  { slug: "venture-capital-risk-appetite-indicator", title: "VC risk appetite indicator", href: "/signals" },
 ];

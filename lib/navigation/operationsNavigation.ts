@@ -1,8 +1,7 @@
-import type { Route } from "next";
 import type { ReportSectionLink } from "../../app/components/reportShellNavigation";
 
 export type OperationsWorkstreamLink = {
-  href: Route;
+  href: string;
   label: string;
   description: string;
 };
@@ -14,12 +13,12 @@ export const operationsWorkstreamLinks: OperationsWorkstreamLink[] = [
     description: "Translate the regime into quarterly posture, playbook moves, and operator asks.",
   },
   {
-    href: "/operations/briefings",
+    href: "/operations#ops-export-briefs",
     label: "Briefings",
     description: "Export aligned narratives, leadership briefs, and CXO-ready deliverables.",
   },
   {
-    href: "/operations/integrations" as Route,
+    href: "/operations/integrations",
     label: "Integrations",
     description: "Push weekly mandate payloads into Slack, Notion, and Linear.",
   },

@@ -82,7 +82,7 @@ export default function AnswersHubPage() {
         <div className="grid gap-4 md:grid-cols-3">
           <div className="weather-surface space-y-2 px-4 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-sky-300">Tier 1 (decision)</p>
-            <p className="text-sm text-slate-200">Each Tier 1 page links to /evidence, /toolkits, /start, and this hub.</p>
+            <p className="text-sm text-slate-200">Each Tier 1 page links to /signals, /toolkits, /start, and this hub.</p>
           </div>
           <div className="weather-surface space-y-2 px-4 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-300">Tier 2 (strategy)</p>

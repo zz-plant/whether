@@ -15,5 +15,7 @@ describe("/api/health", () => {
     const checks = body.checks as { treasuryData?: Record<string, unknown> };
     assert.ok(checks && checks.treasuryData, "checks.treasuryData should be present");
     assert.ok(typeof checks.treasuryData?.status === "string");
+    assert.ok(typeof checks.treasuryData?.stale === "boolean");
+    assert.ok(typeof checks.treasuryData?.fetchedAt === "string");
   });
 });

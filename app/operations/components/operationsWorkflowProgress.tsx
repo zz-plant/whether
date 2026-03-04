@@ -6,30 +6,42 @@ import { useSearchParams } from "next/navigation";
 
 const steps = [
   {
-    href: "/operations",
+    href: "/operations#ops-monthly-action-summary",
+    route: "/operations",
     label: "Stage 1",
     title: "Plan",
     description: "Translate the regime into quarterly posture.",
   },
   {
-    href: "/operations/decisions",
+    href: "/decide",
+    route: "/decide",
     label: "Stage 2",
     title: "Decisions",
     description: "Validate assumptions and guardrails before committing.",
   },
   {
     href: "/operations#ops-export-briefs",
+    route: "/operations",
     label: "Stage 3",
     title: "Briefings",
     description: "Export aligned narratives and leadership-ready kits.",
   },
 ] as const;
 
+const withSearchParams = (href: string, search: string) => {
+  if (!search) {
+    return href;
+  }
+  const [path, hash] = href.split("#");
+  const joined = `${path}?${search}`;
+  return hash ? `${joined}#${hash}` : joined;
+};
+
 export const OperationsWorkflowProgress = ({ currentPath }: { currentPath: Route }) => {
   const searchParams = useSearchParams();
   const currentSearch = searchParams.toString();
   const activeIndex = Math.max(
-    steps.findIndex((step) => step.href === currentPath),
+    steps.findIndex((step) => step.route === currentPath),
     0,
   );
 
@@ -41,10 +53,10 @@ export const OperationsWorkflowProgress = ({ currentPath }: { currentPath: Route
       </div>
       <ol className="grid gap-3 md:grid-cols-3">
         {steps.map((step, index) => {
-          const isActive = step.href === currentPath;
+          const isActive = step.route === currentPath && index === activeIndex;
           const isCompleted = index < activeIndex;
           const stepState = isCompleted ? "Complete" : isActive ? "Active" : "Upcoming";
-          const href = currentSearch ? `${step.href}?${currentSearch}` : step.href;
+          const href = withSearchParams(step.href, currentSearch);
           return (
             <li key={step.href}>
               <Link

@@ -349,25 +349,25 @@ export const RegimeAssessmentCard = ({
     {
       id: "curve-slope",
       label: curveSlopeLabel,
-      href: "/evidence#sensor-array",
+      href: "/signals#sensor-array",
       linkLabel: "View curve slope",
     },
     {
       id: "base-rate",
       label: baseRateLabel,
-      href: "/evidence#sensor-array",
+      href: "/signals#sensor-array",
       linkLabel: "View base rate",
     },
     {
       id: "tightness",
       label: tightnessLabel,
-      href: "/evidence#thresholds",
+      href: "/signals#thresholds",
       linkLabel: "View thresholds",
     },
     {
       id: "risk-appetite",
       label: riskLabel,
-      href: "/evidence#thresholds",
+      href: "/signals#thresholds",
       linkLabel: "View thresholds",
     },
   ];
@@ -1469,7 +1469,7 @@ export const RegimeChangeAlertPanel = ({
                   </li>
                 </ul>
                 <a
-                  href="/evidence#time-machine"
+                  href="/signals#time-machine"
                   className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-xl border border-sky-500/40 bg-slate-950/70 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                 >
                   Open Time Machine

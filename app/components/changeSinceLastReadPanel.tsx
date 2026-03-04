@@ -11,6 +11,7 @@ import { buildRegimeChangeReasons } from "../../lib/regimeEngine";
 import { formatDateUTC } from "../../lib/formatters";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
 import { regimeAlertsStorageKey, type RegimeAlertLogEntry } from "./regimeAlertsStorage";
+import { trackProductEvent } from "../../lib/analytics";
 
 type LastReadSnapshot = {
   recordDate: string;
@@ -142,7 +143,7 @@ export const ChangeSinceLastReadPanel = ({
                   ].filter(Boolean),
                 ),
               ),
-              timeMachineHref: `/evidence#time-machine`,
+              timeMachineHref: `/signals#time-machine`,
             }),
           }).catch(() => {
             // Ignore network failures and keep local alerting as fallback.
@@ -162,11 +163,11 @@ export const ChangeSinceLastReadPanel = ({
 
   const timeMachineLink = useMemo(() => {
     if (!previous) {
-      return "/evidence#time-machine";
+      return "/signals#time-machine";
     }
     const date = new Date(previous.recordDate);
     if (Number.isNaN(date.valueOf())) {
-      return "/evidence#time-machine";
+      return "/signals#time-machine";
     }
     const month = date.getUTCMonth() + 1;
     const year = date.getUTCFullYear();
@@ -470,6 +471,12 @@ export const ReturningVisitorDeltaStrip = ({
         </div>
         <a
           href={openPanelHref}
+          onClick={() =>
+            trackProductEvent("posture_delta_opened", {
+              route: window.location.pathname,
+              source: "delta-strip",
+            })
+          }
           className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
         >
           Open full delta panel
@@ -480,6 +487,12 @@ export const ReturningVisitorDeltaStrip = ({
           <li key={item.label}>
             <a
               href={item.href}
+              onClick={() =>
+                trackProductEvent("posture_delta_opened", {
+                  route: window.location.pathname,
+                  source: item.label,
+                })
+              }
               className={`inline-flex min-h-[44px] items-center rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.12em] touch-manipulation ${item.tone.className}`}
             >
               {item.label} · {item.tone.label}
