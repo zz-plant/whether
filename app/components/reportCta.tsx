@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { MouseEvent, ReactNode } from "react";
 import { useClipboardCopy } from "./useClipboardCopy";
 
 type ReportCtaProps = {
@@ -17,23 +17,30 @@ export function ReportCta({ href, label, className, copyText, copyTarget, childr
   const resolvedCopyTarget = copyTarget ?? label;
   const isCopying = status === "copying" && activeTarget === resolvedCopyTarget;
 
-  if (!copyText) {
-    return (
-      <a href={href} className={className}>
-        {children ?? label}
-      </a>
-    );
-  }
+  const handleCopyClick = async (event: MouseEvent<HTMLAnchorElement>) => {
+    if (!copyText) {
+      return;
+    }
+
+    if (!navigator.clipboard?.writeText) {
+      return;
+    }
+
+    event.preventDefault();
+    const copied = await copyToClipboard(copyText, resolvedCopyTarget);
+    if (!copied) {
+      window.location.assign(href);
+    }
+  };
 
   return (
-    <button
-      type="button"
-      onClick={() => copyToClipboard(copyText, resolvedCopyTarget)}
-      disabled={isCopying}
-      aria-busy={isCopying}
+    <a
+      href={href}
+      onClick={copyText ? handleCopyClick : undefined}
+      aria-busy={copyText ? isCopying : undefined}
       className={className}
     >
       {isCopying ? "Copying" : (children ?? label)}
-    </button>
+    </a>
   );
 }

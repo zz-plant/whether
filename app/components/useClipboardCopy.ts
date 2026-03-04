@@ -16,7 +16,7 @@ export type ClipboardCopyState = {
   errorReason: ClipboardCopyErrorReason | null;
   activeTarget: string | null;
   copiedTarget: string | null;
-  copyToClipboard: (text: string, target?: string) => Promise<void>;
+  copyToClipboard: (text: string, target?: string) => Promise<boolean>;
 };
 
 export const useClipboardCopy = (
@@ -47,14 +47,14 @@ export const useClipboardCopy = (
   const copyToClipboard = useCallback(
     async (text: string, target?: string) => {
       if (status === "copying") {
-        return;
+        return false;
       }
       if (!navigator.clipboard?.writeText) {
         setError(true);
         setErrorReason("unavailable");
         setStatus("error");
         triggerHaptic("warning");
-        return;
+        return false;
       }
       setStatus("copying");
       setActiveTarget(target ?? null);
@@ -70,11 +70,13 @@ export const useClipboardCopy = (
           setStatus("idle");
           setCopiedTarget(null);
         }, resetDelay);
+        return true;
       } catch {
         setError(true);
         setErrorReason("write-failed");
         setStatus("error");
         triggerHaptic("error");
+        return false;
       } finally {
         setActiveTarget(null);
       }

@@ -431,7 +431,12 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
                               title={action.description}
                               aria-label={`${action.label} (copy action)`}
                               onClick={() => {
-                                void copyToClipboard(action.copyText!, action.copyTarget ?? action.label);
+                                void (async () => {
+                                  const copied = await copyToClipboard(action.copyText!, action.copyTarget ?? action.label);
+                                  if (!copied) {
+                                    window.location.assign(action.href);
+                                  }
+                                })();
                                 triggerHaptic("light");
                               }}
                             >
