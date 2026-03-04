@@ -153,6 +153,7 @@ export default async function SignalsPage({
     ? "Fixed historical snapshot"
     : "15m cadence";
   const showAdvanced = resolvedSearchParams?.advanced === "1";
+  const showFullDiagnostics = resolvedSearchParams?.diagnostics === "all";
   const timeMachineHref = showAdvanced ? "#time-machine" : "#advanced-controls";
   const regimeTimelineHref = showAdvanced ? "#regime-timeline" : "#advanced-controls";
   const focusTabs = ["all", "growth", "inflation", "labor", "financial"] as const;
@@ -183,6 +184,23 @@ export default async function SignalsPage({
     const query = params.toString();
     return query ? `/signals?${query}` : "/signals";
   };
+
+  const buildDiagnosticsHref = (showAll: boolean) => {
+    const params = new URLSearchParams();
+    if (resolvedSearchParams) {
+      Object.entries(resolvedSearchParams).forEach(([key, value]) => {
+        if (value && key !== "diagnostics") {
+          params.set(key, value);
+        }
+      });
+    }
+    if (showAll) {
+      params.set("diagnostics", "all");
+    }
+    const query = params.toString();
+    return query ? `/signals?${query}#signal-diagnostics` : "/signals#signal-diagnostics";
+  };
+
   const buildFocusHref = (focus: FocusTab) => {
     const params = new URLSearchParams();
     if (resolvedSearchParams) {
@@ -528,13 +546,53 @@ export default async function SignalsPage({
         ) : null}
       </section>
 
-      <SignalVisualizationSuite
-        assessment={assessment}
-        treasury={treasury}
-        macroSeries={macroSeries}
-        sensors={sensors}
-        regimeSeries={regimeSeries}
-      />
+      <section id="signal-diagnostics" className="weather-panel space-y-4 px-6 py-5" aria-label="Signal diagnostics">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="space-y-1">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Diagnostics</p>
+            <h2 className="text-xl font-semibold text-slate-100">
+              {showFullDiagnostics ? "Full diagnostics" : "Top drivers"}
+            </h2>
+            <p className="text-sm text-slate-300">
+              {showFullDiagnostics
+                ? "Showing the full diagnostic set for deep validation and audits."
+                : "Start with the top 3 drivers. Expand only when you need full diagnostic depth."}
+            </p>
+          </div>
+          <a
+            href={buildDiagnosticsHref(!showFullDiagnostics)}
+            className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
+          >
+            {showFullDiagnostics ? "Show top 3 only" : "Show full diagnostics"}
+          </a>
+        </div>
+
+        {!showFullDiagnostics ? (
+          <ol className="grid gap-3 md:grid-cols-3" aria-label="Top 3 signal drivers">
+            {topDiagnosticCallouts.map((item, index) => (
+              <li key={item.label} className="weather-surface space-y-2 p-4">
+                <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">Driver {index + 1}</p>
+                <p className="text-sm font-semibold text-slate-100">{item.label}</p>
+                <p className="text-sm text-slate-200">{item.why}</p>
+                <a
+                  href={item.href}
+                  className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+                >
+                  Open {item.label.toLowerCase()} →
+                </a>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <SignalVisualizationSuite
+            assessment={assessment}
+            treasury={treasury}
+            macroSeries={macroSeries}
+            sensors={sensors}
+            regimeSeries={regimeSeries}
+          />
+        )}
+      </section>
 
       <section className="weather-panel space-y-4 px-6 py-5" id="advanced-controls">
         <div className="grid gap-4 rounded-2xl border border-slate-800/80 bg-slate-950/50 p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
