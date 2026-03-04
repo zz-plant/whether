@@ -25,6 +25,7 @@ import { buildTrustStatus } from "../../lib/report/trustStatus";
 import { SIGNALS_RELATED_LINKS } from "../../lib/report/reportCopy";
 import { indicatorTypeByScoreLabel, indicatorTypeLabel } from "../../lib/indicatorClassification";
 import { HistoricalReplayDatePicker } from "./components/historicalReplayDatePicker";
+import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -97,10 +98,12 @@ export default async function SignalsPage({
         name: organizationName,
         url: siteUrl,
       },
-      buildBreadcrumbList([
-        { name: "Weekly briefing", path: "/" },
-        { name: "Signal evidence", path: "/evidence" },
-      ]),
+      buildBreadcrumbList(
+        createBreadcrumbTrail([
+          { path: "/" },
+          { path: "/evidence" },
+        ]),
+      ),
     ],
   };
   const {

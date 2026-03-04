@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { SectionedReportPanel } from "./components/sectionedReportPanel";
 import { loadReportData } from "../../lib/report/reportData";
 import { siteUrl } from "../../lib/siteUrl";
-import { buildPageMetadata, websiteName } from "../../lib/seo";
+import { buildBreadcrumbList, buildPageMetadata, websiteName } from "../../lib/seo";
 import {
   buildTimeMachineHref,
   getAdjacentTimeMachineRequest,
@@ -20,6 +20,7 @@ import { operationsSectionLinks } from "../../lib/navigation/operationsNavigatio
 import { OperationsWorkstreamNav } from "./components/operationsWorkstreamNav";
 import { OperationsWorkflowProgress } from "./components/operationsWorkflowProgress";
 import { ExportBriefPanel } from "./components/exportBriefPanel";
+import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 
 export const runtime = "edge";
 
@@ -51,21 +52,31 @@ export default async function OperationsPage({
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": "WebPage",
-    name: "Whether Report — Action playbook",
-    url: `${siteUrl}/operations`,
-    description:
-      "Playbook moves, finance posture, and operator requests tuned to the current regime.",
-    inLanguage: "en",
-    isPartOf: {
-      "@type": "WebSite",
-      name: websiteName,
-      url: siteUrl,
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "Whether",
-    },
+    "@graph": [
+      {
+        "@type": "WebPage",
+        name: "Whether Report — Action playbook",
+        url: `${siteUrl}/operations`,
+        description:
+          "Playbook moves, finance posture, and operator requests tuned to the current regime.",
+        inLanguage: "en",
+        isPartOf: {
+          "@type": "WebSite",
+          name: websiteName,
+          url: siteUrl,
+        },
+        publisher: {
+          "@type": "Organization",
+          name: "Whether",
+        },
+      },
+      buildBreadcrumbList(
+        createBreadcrumbTrail([
+          { path: "/" },
+          { path: "/operations" },
+        ]),
+      ),
+    ],
   };
 
   const {
