@@ -306,8 +306,8 @@ export default async function SignalsPage({
       trustStatusAction={trustStatusAction}
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
-      pageTitle="Evidence appendix"
-      currentPath="/evidence"
+      pageTitle="Signals"
+      currentPath="/signals"
       pageSummary="Evidence and raw diagnostics only: drivers, thresholds, and timestamps behind posture."
       pageSummaryLink={{
         href: "#thresholds",
