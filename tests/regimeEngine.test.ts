@@ -57,8 +57,8 @@ describe("regime assessment", () => {
   it("returns explainable outputs", () => {
     const treasury: TreasuryData = {
       source: "US Treasury",
-      record_date: "2024-10-01",
-      fetched_at: "2024-10-02T00:00:00Z",
+      record_date: "2026-02-01",
+      fetched_at: "2026-02-02T00:00:00Z",
       isLive: true,
       yields: {
         oneMonth: 5.2,
@@ -86,8 +86,8 @@ describe("regime assessment", () => {
   it("returns policy assessment composites and refusal state", () => {
     const treasury: TreasuryData = {
       source: "US Treasury",
-      record_date: "2024-10-01",
-      fetched_at: "2024-10-02T00:00:00Z",
+      record_date: "2026-02-01",
+      fetched_at: "2026-02-02T00:00:00Z",
       isLive: true,
       yields: {
         oneMonth: 5.2,
@@ -106,8 +106,8 @@ describe("regime assessment", () => {
         sourceLabel: "FRED",
         sourceUrl: "https://fred.stlouisfed.org/",
         formulaUrl: "/methodology",
-        record_date: "2024-10-01",
-        fetched_at: "2024-10-02T00:00:00Z",
+        record_date: "2026-02-01",
+        fetched_at: "2026-02-02T00:00:00Z",
         isLive: true,
         history: [
           { date: "2024-09-01", value: 1.7 },
@@ -123,8 +123,8 @@ describe("regime assessment", () => {
         sourceLabel: "BLS",
         sourceUrl: "https://bls.gov/",
         formulaUrl: "/methodology",
-        record_date: "2024-10-01",
-        fetched_at: "2024-10-02T00:00:00Z",
+        record_date: "2026-02-01",
+        fetched_at: "2026-02-02T00:00:00Z",
         isLive: true,
       },
       {
@@ -136,8 +136,8 @@ describe("regime assessment", () => {
         sourceLabel: "BLS",
         sourceUrl: "https://bls.gov/",
         formulaUrl: "/methodology",
-        record_date: "2024-10-01",
-        fetched_at: "2024-10-02T00:00:00Z",
+        record_date: "2026-02-01",
+        fetched_at: "2026-02-02T00:00:00Z",
         isLive: true,
       },
     ]);
@@ -155,8 +155,8 @@ describe("regime assessment", () => {
   it("maps aligned policy signals to risk-on and safety postures", () => {
     const riskOnTreasury: TreasuryData = {
       source: "US Treasury",
-      record_date: "2024-10-01",
-      fetched_at: "2024-10-02T00:00:00Z",
+      record_date: "2026-02-01",
+      fetched_at: "2026-02-02T00:00:00Z",
       isLive: true,
       yields: {
         oneMonth: 3.2,
@@ -175,8 +175,8 @@ describe("regime assessment", () => {
         sourceLabel: "FRED",
         sourceUrl: "https://fred.stlouisfed.org/",
         formulaUrl: "/methodology",
-        record_date: "2024-10-01",
-        fetched_at: "2024-10-02T00:00:00Z",
+        record_date: "2026-02-01",
+        fetched_at: "2026-02-02T00:00:00Z",
         isLive: true,
         history: [
           { date: "2024-09-01", value: 2.5 },
@@ -189,8 +189,8 @@ describe("regime assessment", () => {
 
     const safetyTreasury: TreasuryData = {
       source: "US Treasury",
-      record_date: "2024-10-01",
-      fetched_at: "2024-10-02T00:00:00Z",
+      record_date: "2026-02-01",
+      fetched_at: "2026-02-02T00:00:00Z",
       isLive: true,
       yields: {
         oneMonth: 5.8,
@@ -209,8 +209,8 @@ describe("regime assessment", () => {
         sourceLabel: "FRED",
         sourceUrl: "https://fred.stlouisfed.org/",
         formulaUrl: "/methodology",
-        record_date: "2024-10-01",
-        fetched_at: "2024-10-02T00:00:00Z",
+        record_date: "2026-02-01",
+        fetched_at: "2026-02-02T00:00:00Z",
         isLive: true,
         history: [
           { date: "2024-09-01", value: 2.0 },
@@ -225,8 +225,8 @@ describe("regime assessment", () => {
   it("refuses posture change when policy signal gaps are too large", () => {
     const treasury: TreasuryData = {
       source: "US Treasury",
-      record_date: "2024-10-01",
-      fetched_at: "2024-10-02T00:00:00Z",
+      record_date: "2026-02-01",
+      fetched_at: "2026-02-02T00:00:00Z",
       isLive: false,
       yields: {
         oneMonth: null,
@@ -245,8 +245,8 @@ describe("regime assessment", () => {
   it("flags missing inputs with warnings", () => {
     const treasury: TreasuryData = {
       source: "US Treasury",
-      record_date: "2024-10-01",
-      fetched_at: "2024-10-02T00:00:00Z",
+      record_date: "2026-02-01",
+      fetched_at: "2026-02-02T00:00:00Z",
       isLive: false,
       yields: {
         oneMonth: null,
@@ -268,8 +268,8 @@ describe("regime trend", () => {
   it("derives improving trend when tightness eases across the threshold", () => {
     const previous = evaluateRegime({
       source: "US Treasury",
-      record_date: "2024-10-01",
-      fetched_at: "2024-10-02T00:00:00Z",
+      record_date: "2026-02-01",
+      fetched_at: "2026-02-02T00:00:00Z",
       isLive: true,
       yields: {
         oneMonth: 5.8,
@@ -297,8 +297,8 @@ describe("regime trend", () => {
 describe("regime macro overlays", () => {
   const treasury: TreasuryData = {
     source: "US Treasury",
-    record_date: "2024-10-01",
-    fetched_at: "2024-10-02T00:00:00Z",
+    record_date: "2026-02-01",
+    fetched_at: "2026-02-02T00:00:00Z",
     isLive: true,
     yields: {
       oneMonth: 4.3,
@@ -319,8 +319,8 @@ describe("regime macro overlays", () => {
         sourceLabel: "FRED",
         sourceUrl: "https://fred.stlouisfed.org/",
         formulaUrl: "/methodology",
-        record_date: "2024-10-01",
-        fetched_at: "2024-10-02T00:00:00Z",
+        record_date: "2026-02-01",
+        fetched_at: "2026-02-02T00:00:00Z",
         isLive: true,
       },
       {
@@ -332,8 +332,8 @@ describe("regime macro overlays", () => {
         sourceLabel: "FRED",
         sourceUrl: "https://fred.stlouisfed.org/",
         formulaUrl: "/methodology",
-        record_date: "2024-10-01",
-        fetched_at: "2024-10-02T00:00:00Z",
+        record_date: "2026-02-01",
+        fetched_at: "2026-02-02T00:00:00Z",
         isLive: true,
       },
       {
@@ -345,8 +345,8 @@ describe("regime macro overlays", () => {
         sourceLabel: "FRED",
         sourceUrl: "https://fred.stlouisfed.org/",
         formulaUrl: "/methodology",
-        record_date: "2024-10-01",
-        fetched_at: "2024-10-02T00:00:00Z",
+        record_date: "2026-02-01",
+        fetched_at: "2026-02-02T00:00:00Z",
         isLive: true,
       },
     ]);

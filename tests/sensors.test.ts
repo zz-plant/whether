@@ -10,8 +10,8 @@ describe("sensor readings", () => {
   it("builds base rate and curve slope sensors", () => {
     const treasury: TreasuryData = {
       source: "Treasury",
-      record_date: "2024-10-01",
-      fetched_at: "2024-10-02T00:00:00Z",
+      record_date: "2026-02-01",
+      fetched_at: "2026-02-02T00:00:00Z",
       isLive: true,
       yields: {
         oneMonth: 5.2,

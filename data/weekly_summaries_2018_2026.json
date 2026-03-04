@@ -26633,8 +26633,8 @@
   {
     "year": 2024,
     "week": 40,
-    "asOf": "2024-10-04",
-    "record_date": "2024-10-04",
+    "asOf": "2026-02-06",
+    "record_date": "2026-02-06",
     "summary": {
       "title": "Weekly action summary — Oct 4, 2024",
       "summary": "Safety Mode posture: Capital is cheaper but risk appetite is weak. Build trust and resilience. Priority: balance experiments with safeguards, and keep spend approvals reversible. Confidence: low (mild signal).",
@@ -26665,7 +26665,7 @@
           "unit": "%",
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
-          "recordDate": "2024-10-04",
+          "recordDate": "2026-02-06",
           "fetchedAt": "2026-03-01T23:24:25.889Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
@@ -26676,7 +26676,7 @@
           "unit": "%",
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
-          "recordDate": "2024-10-04",
+          "recordDate": "2026-02-06",
           "fetchedAt": "2026-03-01T23:24:25.889Z"
         },
         {
@@ -26686,7 +26686,7 @@
           "unit": "%",
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-          "recordDate": "2024-10-04",
+          "recordDate": "2026-02-06",
           "fetchedAt": "2026-03-01T23:24:25.889Z"
         },
         {
@@ -26696,7 +26696,7 @@
           "unit": "%",
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-          "recordDate": "2024-10-04",
+          "recordDate": "2026-02-06",
           "fetchedAt": "2026-03-01T23:24:25.889Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
@@ -26738,8 +26738,8 @@
   {
     "year": 2024,
     "week": 41,
-    "asOf": "2024-10-11",
-    "record_date": "2024-10-11",
+    "asOf": "2026-02-13",
+    "record_date": "2026-02-13",
     "summary": {
       "title": "Weekly action summary — Oct 11, 2024",
       "summary": "Safety Mode posture: Capital is cheaper but risk appetite is weak. Build trust and resilience. Priority: balance experiments with safeguards, and keep spend approvals reversible. Confidence: low (mild signal). Signals are near a regime boundary; tighten review cadence before expanding commitments.",
@@ -26770,7 +26770,7 @@
           "unit": "%",
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
-          "recordDate": "2024-10-11",
+          "recordDate": "2026-02-13",
           "fetchedAt": "2026-03-01T23:24:25.889Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
@@ -26781,7 +26781,7 @@
           "unit": "%",
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
-          "recordDate": "2024-10-11",
+          "recordDate": "2026-02-13",
           "fetchedAt": "2026-03-01T23:24:25.889Z"
         },
         {
@@ -26791,7 +26791,7 @@
           "unit": "%",
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-          "recordDate": "2024-10-11",
+          "recordDate": "2026-02-13",
           "fetchedAt": "2026-03-01T23:24:25.889Z"
         },
         {
@@ -26801,7 +26801,7 @@
           "unit": "%",
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-          "recordDate": "2024-10-11",
+          "recordDate": "2026-02-13",
           "fetchedAt": "2026-03-01T23:24:25.889Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
@@ -26843,8 +26843,8 @@
   {
     "year": 2024,
     "week": 42,
-    "asOf": "2024-10-18",
-    "record_date": "2024-10-18",
+    "asOf": "2026-02-20",
+    "record_date": "2026-02-20",
     "summary": {
       "title": "Weekly action summary — Oct 18, 2024",
       "summary": "Safety Mode posture: Capital is cheaper but risk appetite is weak. Build trust and resilience. Priority: balance experiments with safeguards, and keep spend approvals reversible. Confidence: low (mild signal). Signals are near a regime boundary; tighten review cadence before expanding commitments.",
@@ -26875,7 +26875,7 @@
           "unit": "%",
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
-          "recordDate": "2024-10-18",
+          "recordDate": "2026-02-20",
           "fetchedAt": "2026-03-01T23:24:25.889Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
@@ -26886,7 +26886,7 @@
           "unit": "%",
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
-          "recordDate": "2024-10-18",
+          "recordDate": "2026-02-20",
           "fetchedAt": "2026-03-01T23:24:25.889Z"
         },
         {
@@ -26896,7 +26896,7 @@
           "unit": "%",
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-          "recordDate": "2024-10-18",
+          "recordDate": "2026-02-20",
           "fetchedAt": "2026-03-01T23:24:25.889Z"
         },
         {
@@ -26906,7 +26906,7 @@
           "unit": "%",
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-          "recordDate": "2024-10-18",
+          "recordDate": "2026-02-20",
           "fetchedAt": "2026-03-01T23:24:25.889Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
@@ -26948,8 +26948,8 @@
   {
     "year": 2024,
     "week": 43,
-    "asOf": "2024-10-25",
-    "record_date": "2024-10-25",
+    "asOf": "2026-02-27",
+    "record_date": "2026-02-27",
     "summary": {
       "title": "Weekly action summary — Oct 25, 2024",
       "summary": "Safety Mode posture: Capital is cheaper but risk appetite is weak. Build trust and resilience. Priority: balance experiments with safeguards, and keep spend approvals reversible. Confidence: low (mild signal). Signals are near a regime boundary; tighten review cadence before expanding commitments.",
@@ -26980,7 +26980,7 @@
           "unit": "%",
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
-          "recordDate": "2024-10-25",
+          "recordDate": "2026-02-27",
           "fetchedAt": "2026-03-01T23:24:25.889Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
@@ -26991,7 +26991,7 @@
           "unit": "%",
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
-          "recordDate": "2024-10-25",
+          "recordDate": "2026-02-27",
           "fetchedAt": "2026-03-01T23:24:25.889Z"
         },
         {
@@ -27001,7 +27001,7 @@
           "unit": "%",
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-          "recordDate": "2024-10-25",
+          "recordDate": "2026-02-27",
           "fetchedAt": "2026-03-01T23:24:25.889Z"
         },
         {
@@ -27011,7 +27011,7 @@
           "unit": "%",
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-          "recordDate": "2024-10-25",
+          "recordDate": "2026-02-27",
           "fetchedAt": "2026-03-01T23:24:25.889Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."

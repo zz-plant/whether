@@ -11153,8 +11153,8 @@
   {
     "year": 2024,
     "month": 10,
-    "asOf": "2024-10-31",
-    "record_date": "2024-10-31",
+    "asOf": "2026-02-28",
+    "record_date": "2026-02-28",
     "summary": {
       "title": "Monthly action summary — Oct 31, 2024",
       "summary": "Safety Mode posture: Capital is cheaper but risk appetite is weak. Build trust and resilience. Priority: balance experiments with guardrails, keep approvals reversible, and tighten cross-team handoffs. Confidence: low (mild signal). Signals are near a regime boundary; hold major scope changes until the next read.",
@@ -11185,7 +11185,7 @@
           "unit": "%",
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
-          "recordDate": "2024-10-31",
+          "recordDate": "2026-02-28",
           "fetchedAt": "2026-03-01T23:24:30.177Z",
           "notes": "Used as the cost-of-money anchor for tightness scoring."
         },
@@ -11196,7 +11196,7 @@
           "unit": "%",
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
-          "recordDate": "2024-10-31",
+          "recordDate": "2026-02-28",
           "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
@@ -11206,7 +11206,7 @@
           "unit": "%",
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-          "recordDate": "2024-10-31",
+          "recordDate": "2026-02-28",
           "fetchedAt": "2026-03-01T23:24:30.177Z"
         },
         {
@@ -11216,7 +11216,7 @@
           "unit": "%",
           "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
           "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-          "recordDate": "2024-10-31",
+          "recordDate": "2026-02-28",
           "fetchedAt": "2026-03-01T23:24:30.177Z",
           "derivedFrom": "US Treasury 10Y and 2Y yields",
           "notes": "Derived metric used to score risk appetite."
