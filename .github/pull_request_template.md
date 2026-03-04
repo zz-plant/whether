@@ -1,6 +1,13 @@
 ## Summary
 - 
 
+## Review hotspot checklist (required)
+- [ ] **Type safety**: no unsafe assertions (`as SomeType`) where runtime validation is possible; null/undefined states handled.
+- [ ] **Edge cases**: empty, missing, and fallback paths are explicitly tested or documented.
+- [ ] **Separation of concerns**: data fetching/derivation/UI responsibilities are split when a component grows beyond one concern.
+- [ ] **Duplication**: constants, threshold logic, and derived helpers are centralized (avoid copy/paste logic).
+- [ ] **Readability**: variable names and copy are explicit; abbreviations/magic numbers are explained.
+
 ## Compatibility evidence (required for stack/dependency upgrades)
 - Release notes or changelogs reviewed:
   - 

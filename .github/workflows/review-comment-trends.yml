@@ -1,0 +1,59 @@
+name: Review Comment Trends
+
+on:
+  schedule:
+    - cron: "0 13 * * 1"
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "Max review comments to analyze"
+        required: false
+        default: "200"
+      humans_only:
+        description: "Exclude bot-authored comments"
+        required: false
+        default: "false"
+
+jobs:
+  analyze-review-comments:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.9"
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Generate review-comment trend artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+          LIMIT: ${{ github.event.inputs.limit || '200' }}
+          HUMANS_ONLY: ${{ github.event.inputs.humans_only || 'false' }}
+        run: |
+          mkdir -p artifacts
+
+          HUMAN_FLAG=""
+          if [ "$HUMANS_ONLY" = "true" ]; then
+            HUMAN_FLAG="--humans-only"
+          fi
+
+          node scripts/review-comment-trends.mjs \
+            --repo zz-plant/whether \
+            --limit "$LIMIT" \
+            $HUMAN_FLAG \
+            --out artifacts/review-comment-trends.json \
+            --summary-out artifacts/review-comment-trends.md
+
+      - name: Upload review-comment trend artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: review-comment-trends
+          path: artifacts/

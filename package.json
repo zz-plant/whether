@@ -24,7 +24,9 @@
     "mcp:whether": "tsx scripts/mcp/whether-mcp-server.ts",
     "audit:cloudflare-warnings": "node scripts/cloudflare-warning-audit.mjs",
     "deploy:cloudflare": "node scripts/cloudflare-build-and-upload.mjs",
-    "smoke:prod": "node scripts/prod-synthetic-smoke.mjs https://whether.work"
+    "smoke:prod": "node scripts/prod-synthetic-smoke.mjs https://whether.work",
+    "review:comment-trends": "node scripts/review-comment-trends.mjs --repo zz-plant/whether --limit 200",
+    "review:comment-trends:update": "node scripts/review-comment-trends.mjs --repo zz-plant/whether --limit 200 --out docs/research/review-comment-trends.latest.json --summary-out docs/research/review-comment-trends.latest.md"
   },
   "engines": {
     "node": "20.16.x"
