@@ -3,7 +3,7 @@
 import { Tooltip } from "@base-ui/react/tooltip";
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import type { TreasuryData } from "../../lib/types";
-import { buildWeeklySummary, getWeeklyActionGuidance } from "../../lib/summary/weeklySummary";
+import { getWeeklyActionGuidance } from "../../lib/summary/weeklySummary";
 import { formatTimestampUTC } from "../../lib/formatters";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
 import {
@@ -69,6 +69,29 @@ export const HistoricalBanner = ({
   );
 };
 
+const postureBlocksByRegime: Record<RegimeAssessment["regime"], Array<{ title: string; bullets: string[] }>> = {
+  SCARCITY: [
+    { title: "Hiring posture", bullets: ["Restrict hiring to revenue-supporting or reliability-critical roles.", "Delay speculative team expansion until signals improve."] },
+    { title: "Roadmap posture", bullets: ["Prioritize reliability, retention, and near-term payback work.", "Defer long-cycle bets unless they are reversible."] },
+    { title: "Capital posture", bullets: ["Maintain burn discipline and tighten approval gates.", "Require short payback windows for incremental spend."] },
+  ],
+  DEFENSIVE: [
+    { title: "Hiring posture", bullets: ["Backfill only essential execution gaps.", "Gate net-new hires behind explicit ROI proof."] },
+    { title: "Roadmap posture", bullets: ["Protect core delivery and customer commitments.", "Stage expansionary initiatives behind milestones."] },
+    { title: "Capital posture", bullets: ["Preserve cash durability with measured spend.", "Keep optionality for downside scenarios."] },
+  ],
+  VOLATILE: [
+    { title: "Hiring posture", bullets: ["Keep hiring selective and reversible.", "Use short planning cycles before adding fixed costs."] },
+    { title: "Roadmap posture", bullets: ["Prioritize adaptable work that can be re-sequenced quickly.", "Avoid irreversible scope commitments."] },
+    { title: "Capital posture", bullets: ["Sequence spend in tranches tied to checkpoints.", "Protect downside while preserving upside options."] },
+  ],
+  EXPANSION: [
+    { title: "Hiring posture", bullets: ["Expand in proven demand areas first.", "Maintain quality bar and ramp discipline."] },
+    { title: "Roadmap posture", bullets: ["Advance growth initiatives with milestone gates.", "Preserve reliability and margin guardrails."] },
+    { title: "Capital posture", bullets: ["Deploy capital selectively with clear payback targets.", "Monitor burn as growth spend increases."] },
+  ],
+};
+
 export const WeeklyActionSummaryPanel = ({
   assessment,
   provenance,
@@ -80,12 +103,6 @@ export const WeeklyActionSummaryPanel = ({
 }) => {
   const regimeLabel = getRegimeLabel(assessment.regime);
   const actionGuidance = getWeeklyActionGuidance(assessment.regime);
-  const weeklySummary = buildWeeklySummary({
-    assessment,
-    provenance,
-    recordDateLabel,
-  });
-
   const constraints = [
     `Cash availability: ${assessment.scores.tightness}/100`,
     `Risk appetite: ${assessment.scores.riskAppetite}/100`,
@@ -118,9 +135,20 @@ export const WeeklyActionSummaryPanel = ({
 
         <article className="weather-surface p-4">
           <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">
-            Weekly summary copy
+            Weekly operating guide
           </h3>
-          <p className="mt-2 whitespace-pre-line text-sm text-slate-200">{weeklySummary.copy}</p>
+          <div className="mt-3 grid gap-3 md:grid-cols-3">
+            {postureBlocksByRegime[assessment.regime].map((block) => (
+              <section key={block.title} className="rounded-xl border border-slate-700/70 bg-slate-950/40 p-3">
+                <h4 className="text-sm font-semibold text-slate-100">{block.title}</h4>
+                <ul className="mt-2 space-y-1 text-sm text-slate-300">
+                  {block.bullets.map((bullet) => (
+                    <li key={bullet}>• {bullet}</li>
+                  ))}
+                </ul>
+              </section>
+            ))}
+          </div>
         </article>
 
         <DataProvenanceStrip
@@ -176,9 +204,9 @@ export const ExecutiveSnapshotPanel = ({
           <div>
             <p className="type-label text-slate-400">Executive snapshot</p>
             <h3 id="executive-snapshot-title" className="type-section text-slate-100">
-              Operating constraints
+              Rules of engagement this week
             </h3>
-            <p className="mt-2 text-sm text-slate-300">What is binding right now.</p>
+            <p className="mt-2 text-sm text-slate-300">Directive view for this planning cycle.</p>
           </div>
           <DataProvenanceStrip provenance={provenance} />
         </div>

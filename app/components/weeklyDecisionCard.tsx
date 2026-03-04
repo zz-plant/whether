@@ -28,6 +28,13 @@ const postureHeadlineByRegime: Record<Regime, string> = {
   EXPANSION: "Expand selectively while enforcing burn and payback guardrails.",
 };
 
+const regimeEnvironmentByRegime: Record<Regime, string> = {
+  SCARCITY: "capital is tight",
+  DEFENSIVE: "risk is elevated",
+  VOLATILE: "conditions are mixed",
+  EXPANSION: "capital is more available",
+};
+
 const deltaSignalOrder: Array<{
   key: ReportDynamics["changedSignals"][number]["key"];
   label: string;
@@ -63,10 +70,10 @@ export function WeeklyDecisionCard({
       <header className="space-y-3 border-b border-slate-700/70 pb-5">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-200">Weekly Operating Posture (Hiring • Spend • Roadmap)</p>
         <h1 id="weekly-posture-brief-title" className="text-3xl font-semibold text-slate-50 sm:text-4xl">
-          {statusLabel}
+          Current environment: {statusLabel} ({regimeEnvironmentByRegime[regime]})
         </h1>
-        <p className="max-w-3xl text-sm text-slate-300">What this is: A weekly call on how strict to operate right now—approval bar, hiring pace, and long-bet tolerance—based on public macro signals.</p>
-        <p className="max-w-3xl text-base text-slate-200">{postureHeadlineByRegime[regime]}</p>
+        <p className="max-w-3xl text-sm text-slate-300">A weekly operating posture for hiring, roadmap, and spend decisions — based on macro signals.</p>
+                <p className="max-w-3xl text-base text-slate-200">{postureHeadlineByRegime[regime]}</p>
         <div className="flex flex-wrap items-center gap-3">
           <p className="text-sm text-slate-300">Change vs last week: {postureDelta}</p>
           {actions}
@@ -74,11 +81,20 @@ export function WeeklyDecisionCard({
       </header>
 
       <article className="rounded-xl border border-slate-700/70 bg-slate-900/50 p-4">
+        <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">How to use this</h2>
+        <ol className="mt-2 space-y-1 text-sm text-slate-200">
+          <li>1. Read the weekly environment call.</li>
+          <li>2. Apply the operating dials to hiring, roadmap, and spend.</li>
+          <li>3. Avoid the highlighted high-risk decisions.</li>
+        </ol>
+      </article>
+
+      <article className="rounded-xl border border-slate-700/70 bg-slate-900/50 p-4">
         <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">What changed since last week</h2>
         <ul className="mt-3 grid gap-3 text-sm text-slate-100 sm:grid-cols-2">
           {deltaSignalOrder.map((item) => {
             const delta = deltasByKey.get(item.key) ?? 0;
-            const directionLabel = delta === 0 ? "→" : delta > 0 ? "↗" : "↘";
+            const interpretationLabel = delta === 0 ? "unchanged" : delta > 0 ? "improving" : "weakening";
             const trendClassName = delta === 0
               ? "text-slate-300"
               : delta > 0
@@ -87,10 +103,8 @@ export function WeeklyDecisionCard({
             const barWidth = Math.max(8, Math.min(100, Math.round(Math.abs(delta) * 55)));
             return (
               <li key={item.key} className="rounded-lg border border-slate-700/60 bg-slate-950/60 p-3">
-                <p className="text-[11px] uppercase tracking-[0.14em] text-slate-300">{item.label}</p>
-                <p className={`mt-2 text-lg font-semibold ${trendClassName}`}>
-                  <span aria-hidden="true" className="mr-1">{directionLabel}</span>
-                  {delta > 0 ? "+" : ""}{delta.toFixed(1)}
+                <p className={`mt-1 text-base font-semibold ${trendClassName}`}>
+                  {item.label}: {interpretationLabel} ({delta > 0 ? "+" : ""}{delta.toFixed(1)})
                 </p>
                 <span className="mt-2 block h-1.5 rounded-full bg-slate-800" aria-hidden="true">
                   <span className={`block h-full rounded-full ${delta === 0 ? "bg-slate-500" : delta > 0 ? "bg-emerald-400" : "bg-rose-400"}`} style={{ width: `${barWidth}%` }} />
@@ -99,17 +113,18 @@ export function WeeklyDecisionCard({
             );
           })}
         </ul>
-        <p className="mt-3 text-xs text-slate-300">These changes drive the dial adjustments below.</p>
+        <p className="mt-3 text-xs text-slate-300">These shifts determine the operating posture below.</p>
       </article>
 
       <article className="rounded-xl border border-slate-700/70 bg-slate-900/50 p-4">
         <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">Operating dials (0–3)</h2>
+        <p className="mt-2 text-xs text-slate-300">How strict leadership decisions should be right now.</p>
         <div className="mt-3 grid gap-3 text-sm text-slate-100 sm:grid-cols-2">
           {decisionKnobs.map((knob) => {
             const deltaLabel = knob.delta === 0 ? "unchanged" : knob.delta > 0 ? "raised" : "lowered";
             return (
               <div key={knob.key} className="rounded-lg border border-slate-700/60 bg-slate-950/60 p-3">
-                <p className="text-xs uppercase tracking-[0.12em] text-slate-300">{knob.label}</p>
+                <p className="text-xs uppercase tracking-[0.12em] text-slate-300">{knob.label}: {knob.value}/3 <span className="normal-case">({deltaLabel})</span></p>
                 <div className="mt-2 flex items-center gap-2" aria-hidden="true">
                   {[1, 2, 3].map((level) => (
                     <span
@@ -118,7 +133,6 @@ export function WeeklyDecisionCard({
                     />
                   ))}
                 </div>
-                <p className="mt-2 text-sm text-slate-100">{knob.value}/3 <span className="text-slate-300">({deltaLabel})</span></p>
               </div>
             );
           })}
@@ -149,13 +163,14 @@ export function WeeklyDecisionCard({
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-rose-200">Avoid this week</p>
           <p className="mt-2 flex items-start gap-2 text-sm font-semibold text-rose-100">
             <span aria-hidden="true" className="mt-0.5">⚠</span>
-            <span>Avoid: {dangerousCategory}</span>
+            <span>{dangerousCategory}</span>
           </p>
+          <p className="mt-2 text-xs text-rose-100/90">Delay large hiring or expansion commitments until conditions improve.</p>
         </article>
       </div>
 
       <article className="rounded-xl border border-slate-700/70 bg-slate-900/50 p-4">
-        <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">Operating constraints (this week)</h2>
+        <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">Rules of engagement this week</h2>
         <ul className="mt-3 flex flex-wrap gap-2 text-sm text-slate-200">
           {constraints.slice(0, 3).map((item) => (
             <li key={item} className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/80 bg-slate-950/60 px-3 py-2">
