@@ -357,6 +357,8 @@ export default async function HomePage({
       primaryCta={{
         href: "#weekly-posture-brief-title",
         label: "Copy Slack brief",
+        copyText: slackBrief,
+        copyTarget: "Slack",
       }}
       secondaryCta={{
         href: "#weekly-action-summary",
