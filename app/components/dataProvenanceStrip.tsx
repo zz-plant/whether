@@ -110,6 +110,7 @@ export const DataProvenanceStrip = ({
   if (variant === "compact") {
     return (
       <div className="weather-surface space-y-3 border-slate-800/80 bg-slate-950/55 p-3 text-xs font-medium tracking-[0.08em] text-slate-200 shadow-none">
+        <p className="text-xs text-slate-300">Derived from U.S. Treasury yield data and macro indicators updated every 15 minutes.</p>
         <div className="flex flex-wrap items-center gap-2 text-[11px]">
           <span className={`${dataMode.className} font-medium uppercase tracking-[0.12em]`}>
             <span aria-hidden="true">{dataModeIcon}</span>
@@ -154,6 +155,7 @@ export const DataProvenanceStrip = ({
 
   return (
     <div className="weather-surface space-y-2 rounded-2xl border-slate-800/80 bg-slate-950/50 px-4 py-3 text-[0.65rem] font-semibold text-slate-300 shadow-none">
+      <p className="text-xs font-medium normal-case tracking-normal text-slate-300">Derived from U.S. Treasury yield data and macro indicators updated every 15 minutes.</p>
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-slate-500 uppercase tracking-[0.14em]">{label}</span>
         <span className="h-1 w-1 rounded-full bg-slate-600" aria-hidden="true" />

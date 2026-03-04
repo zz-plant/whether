@@ -333,9 +333,9 @@ export default async function HomePage({
         ? "Irreversible multi-quarter commitments"
         : "Net-new hiring and long-payback expansion bets";
   const constraints = [
-    `Limit expansion to: ${expansionWindow}`,
-    `Hiring posture: ${operatingCalls.hiring}`,
-    `Long bets: ${longCycleBetStance}`,
+    `Expansion: avoid new expansion initiatives (${expansionWindow.toLowerCase()})`,
+    `Hiring: restrict to critical roles (${operatingCalls.hiring.toLowerCase()})`,
+    `Long bets: defer unless reversible (${longCycleBetStance.toLowerCase()})`,
   ];
   const guardrail = stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
   const decisionKnobs = deriveDecisionKnobs(assessment.regime, severityDelta);
