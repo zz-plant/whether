@@ -1,6 +1,6 @@
 /**
- * Report section components for the Whether Report dashboard.
- * Keeps layout blocks focused and reusable across the Market Climate Station UI.
+ * Appendix section components for supporting evidence and operations diagnostics.
+ * Keeps layout blocks focused and reusable outside the weekly governance brief core.
  */
 "use client";
 

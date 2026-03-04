@@ -8,13 +8,13 @@ import {
   getAdjacentTimeMachineRequest,
 } from "../../lib/timeMachine/timeMachineSelection";
 import { ReportShell } from "../components/reportShell";
+import { HistoricalBanner } from "../components/boardBriefSections";
 import {
   FinanceStrategyPanel,
-  HistoricalBanner,
   MonthlyActionSummaryPanel,
   OperatorRequestsPanel,
   PlaybookPanel,
-} from "../components/reportSections";
+} from "../components/appendixSections";
 import { reportPageLinks } from "../../lib/report/reportNavigation";
 import { operationsSectionLinks } from "../../lib/navigation/operationsNavigation";
 import { OperationsWorkstreamNav } from "./components/operationsWorkstreamNav";
@@ -59,7 +59,7 @@ export default async function OperationsPage({
     inLanguage: "en",
     isPartOf: {
       "@type": "WebSite",
-      name: "Whether — Market Climate Station",
+      name: "Whether — Capital Posture Governance Standard",
       url: siteUrl,
     },
     publisher: {
