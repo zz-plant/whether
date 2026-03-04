@@ -1,0 +1,347 @@
+{
+  "baseline": {
+    "regime": "VOLATILE",
+    "scores": {
+      "tightness": 51,
+      "riskAppetite": 28,
+      "baseRateUsed": "1M",
+      "baseRate": 5.2,
+      "curveSlope": -0.2999999999999998
+    },
+    "diagnostics": {
+      "tightnessDelta": -19,
+      "riskAppetiteDelta": -22,
+      "nearestThresholdDelta": 19,
+      "confidence": "MEDIUM",
+      "transitionWatch": false,
+      "intensity": "STANDARD",
+      "boundaryContributors": [],
+      "weakReadCount": 0,
+      "twoWeakReadsWarning": false
+    },
+    "constraints": [
+      "Ship reliability and security before novelty.",
+      "Avoid disruptive pivots that spook buyers.",
+      "Lean into proof, references, and guarantees."
+    ],
+    "dataWarnings": [],
+    "thresholds": {
+      "baseRateTightness": 5,
+      "tightnessRegime": 70,
+      "riskAppetiteRegime": 50
+    },
+    "inputs": [
+      {
+        "id": "base-rate",
+        "value": 5.2,
+        "sourceUrl": "US Treasury",
+        "derivedFrom": null,
+        "notes": "Used as the cost-of-money anchor for tightness scoring."
+      },
+      {
+        "id": "two-year",
+        "value": 4.8,
+        "sourceUrl": "US Treasury",
+        "derivedFrom": null,
+        "notes": null
+      },
+      {
+        "id": "ten-year",
+        "value": 4.5,
+        "sourceUrl": "US Treasury",
+        "derivedFrom": null,
+        "notes": null
+      },
+      {
+        "id": "curve-slope",
+        "value": -0.2999999999999998,
+        "sourceUrl": "US Treasury",
+        "derivedFrom": "US Treasury 10Y and 2Y yields",
+        "notes": "Derived metric used to score risk appetite."
+      }
+    ],
+    "policyAssessment": {
+      "version": "policy-v1",
+      "posture": "SAFETY_MODE",
+      "band": "EXTREME",
+      "composites": {
+        "cts": 2.000000000000002,
+        "ras": 1.6
+      },
+      "confidenceIndex": {
+        "agreement": 0.40000000000000213,
+        "distanceFromNeutral": 1.6,
+        "volatility30d": 0.7211925887029074
+      },
+      "refusal": {
+        "refused": false,
+        "reasons": []
+      },
+      "governanceParameters": {
+        "hiringThreshold": "VERY_HIGH",
+        "paybackWindowTolerance": "SHORTER",
+        "rollbackRequirement": "REVERSIBLE_ONLY",
+        "approvalVelocity": "SLOWER_STRUCTURED",
+        "expansionScope": "CONSTRAINED",
+        "experimentationTolerance": "LOW"
+      },
+      "normalizations": [
+        {
+          "id": "BASE_RATE",
+          "clippedZ": 1.0000000000000044
+        },
+        {
+          "id": "CURVE_SLOPE",
+          "clippedZ": 1
+        },
+        {
+          "id": "BBB_CREDIT_SPREAD",
+          "clippedZ": 3
+        },
+        {
+          "id": "CPI_YOY",
+          "clippedZ": 1.0000000000000007
+        },
+        {
+          "id": "UNEMPLOYMENT_RATE",
+          "clippedZ": 1.0000000000000044
+        }
+      ]
+    }
+  },
+  "stressOverlay": {
+    "regime": "VOLATILE",
+    "scores": {
+      "tightness": 14,
+      "riskAppetite": 36,
+      "baseRateUsed": "1M",
+      "baseRate": 4.3,
+      "curveSlope": 0.20000000000000018
+    },
+    "diagnostics": {
+      "tightnessDelta": -56,
+      "riskAppetiteDelta": -14,
+      "nearestThresholdDelta": 14,
+      "confidence": "MEDIUM",
+      "transitionWatch": false,
+      "intensity": "STANDARD",
+      "boundaryContributors": [
+        "HY OAS stress",
+        "Financial conditions tightening",
+        "Equity volatility shock"
+      ],
+      "weakReadCount": 3,
+      "twoWeakReadsWarning": true
+    },
+    "constraints": [
+      "Ship reliability and security before novelty.",
+      "Avoid disruptive pivots that spook buyers.",
+      "Lean into proof, references, and guarantees."
+    ],
+    "dataWarnings": [],
+    "thresholds": {
+      "baseRateTightness": 5,
+      "tightnessRegime": 70,
+      "riskAppetiteRegime": 50
+    },
+    "inputs": [
+      {
+        "id": "base-rate",
+        "value": 4.3,
+        "sourceUrl": "US Treasury",
+        "derivedFrom": null,
+        "notes": "Used as the cost-of-money anchor for tightness scoring."
+      },
+      {
+        "id": "two-year",
+        "value": 4,
+        "sourceUrl": "US Treasury",
+        "derivedFrom": null,
+        "notes": null
+      },
+      {
+        "id": "ten-year",
+        "value": 4.2,
+        "sourceUrl": "US Treasury",
+        "derivedFrom": null,
+        "notes": null
+      },
+      {
+        "id": "curve-slope",
+        "value": 0.20000000000000018,
+        "sourceUrl": "US Treasury",
+        "derivedFrom": "US Treasury 10Y and 2Y yields",
+        "notes": "Derived metric used to score risk appetite."
+      }
+    ],
+    "policyAssessment": {
+      "version": "policy-v1",
+      "posture": "RISK_ON",
+      "band": "ELEVATED",
+      "composites": {
+        "cts": -0.5000000000000007,
+        "ras": -0.7
+      },
+      "confidenceIndex": {
+        "agreement": 0.1999999999999993,
+        "distanceFromNeutral": 0.5000000000000007,
+        "volatility30d": 0.4378070351193549
+      },
+      "refusal": {
+        "refused": true,
+        "reasons": [
+          "Data gaps exceed allowed signal count."
+        ],
+        "fallbackMessage": "NO_POSTURE_CHANGE_RECOMMENDED",
+        "executionMode": "REVERSIBLE_BETS_ONLY"
+      },
+      "governanceParameters": {
+        "hiringThreshold": "MODERATE",
+        "paybackWindowTolerance": "LONGER",
+        "rollbackRequirement": "REVERSIBLE_ONLY",
+        "approvalVelocity": "SLOWER_STRUCTURED",
+        "expansionScope": "BROAD",
+        "experimentationTolerance": "LOW"
+      },
+      "normalizations": [
+        {
+          "id": "BASE_RATE",
+          "clippedZ": -1.0000000000000013
+        },
+        {
+          "id": "CURVE_SLOPE",
+          "clippedZ": -1
+        },
+        {
+          "id": "BBB_CREDIT_SPREAD",
+          "clippedZ": null
+        },
+        {
+          "id": "CPI_YOY",
+          "clippedZ": null
+        },
+        {
+          "id": "UNEMPLOYMENT_RATE",
+          "clippedZ": null
+        }
+      ]
+    }
+  },
+  "missingInputs": {
+    "regime": "VOLATILE",
+    "scores": {
+      "tightness": 25,
+      "riskAppetite": 0,
+      "baseRateUsed": "MISSING",
+      "baseRate": 0,
+      "curveSlope": null
+    },
+    "diagnostics": {
+      "tightnessDelta": -45,
+      "riskAppetiteDelta": -50,
+      "nearestThresholdDelta": 45,
+      "confidence": "HIGH",
+      "transitionWatch": false,
+      "intensity": "STRONG",
+      "boundaryContributors": [],
+      "weakReadCount": 0,
+      "twoWeakReadsWarning": false
+    },
+    "constraints": [
+      "Ship reliability and security before novelty.",
+      "Avoid disruptive pivots that spook buyers.",
+      "Lean into proof, references, and guarantees."
+    ],
+    "dataWarnings": [
+      "Base rate missing; defaulted to threshold for conservative scoring.",
+      "Curve slope missing; defaulted to cautious floor for scoring."
+    ],
+    "thresholds": {
+      "baseRateTightness": 5,
+      "tightnessRegime": 70,
+      "riskAppetiteRegime": 50
+    },
+    "inputs": [
+      {
+        "id": "base-rate",
+        "value": null,
+        "sourceUrl": "US Treasury",
+        "derivedFrom": null,
+        "notes": "No 1M or 3M Treasury rate available; defaulted to 0% for scoring."
+      },
+      {
+        "id": "two-year",
+        "value": null,
+        "sourceUrl": "US Treasury",
+        "derivedFrom": null,
+        "notes": null
+      },
+      {
+        "id": "ten-year",
+        "value": null,
+        "sourceUrl": "US Treasury",
+        "derivedFrom": null,
+        "notes": null
+      },
+      {
+        "id": "curve-slope",
+        "value": null,
+        "sourceUrl": "US Treasury",
+        "derivedFrom": "US Treasury 10Y and 2Y yields",
+        "notes": "Derived metric used to score risk appetite."
+      }
+    ],
+    "policyAssessment": {
+      "version": "policy-v1",
+      "posture": "TRANSITION",
+      "band": "NEUTRAL",
+      "composites": {
+        "cts": 0,
+        "ras": 0
+      },
+      "confidenceIndex": {
+        "agreement": 0,
+        "distanceFromNeutral": 0,
+        "volatility30d": 0.10825317547305482
+      },
+      "refusal": {
+        "refused": true,
+        "reasons": [
+          "Data gaps exceed allowed signal count."
+        ],
+        "fallbackMessage": "NO_POSTURE_CHANGE_RECOMMENDED",
+        "executionMode": "REVERSIBLE_BETS_ONLY"
+      },
+      "governanceParameters": {
+        "hiringThreshold": "HIGH",
+        "paybackWindowTolerance": "STANDARD",
+        "rollbackRequirement": "REVERSIBLE_ONLY",
+        "approvalVelocity": "SLOWER_STRUCTURED",
+        "expansionScope": "BALANCED",
+        "experimentationTolerance": "LOW"
+      },
+      "normalizations": [
+        {
+          "id": "BASE_RATE",
+          "clippedZ": null
+        },
+        {
+          "id": "CURVE_SLOPE",
+          "clippedZ": null
+        },
+        {
+          "id": "BBB_CREDIT_SPREAD",
+          "clippedZ": null
+        },
+        {
+          "id": "CPI_YOY",
+          "clippedZ": null
+        },
+        {
+          "id": "UNEMPLOYMENT_RATE",
+          "clippedZ": null
+        }
+      ]
+    }
+  }
+}

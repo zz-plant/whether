@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "incremental": false,
+    "plugins": []
+  },
+  "include": [
+    "lib/regimeEngine.ts",
+    "lib/regimeEngine/**/*.ts",
+    "lib/policy/**/*.ts",
+    "lib/types.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

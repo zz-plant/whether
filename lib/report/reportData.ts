@@ -12,6 +12,7 @@ import { buildGuidanceContext } from "./services/guidanceAssembler";
 import { loadReportInputs, resolveReportSelectionContext } from "./services/inputLoader";
 import { buildReportProvenance } from "./services/provenanceBuilder";
 import { buildRegimeContext } from "./services/regimeAssembler";
+import { buildReportViewModelBundle } from "./services/viewModels";
 import { assembleReportViewModel } from "./services/viewModelAssembler";
 import type { ReportSearchParams } from "./services/reportDataTypes";
 
@@ -40,6 +41,36 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
     macroSeries: loadedInputs.macroSeries,
     now,
     treasury: loadedInputs.treasury,
+  });
+  const viewModels = buildReportViewModelBundle({
+    assessment: regimeContext.assessment,
+    cacheCoverage: loadedInputs.cacheCoverage,
+    cacheMonthsByYear: loadedInputs.cacheMonthsByYear,
+    fetchedAtLabel: provenanceContext.fetchedAtLabel,
+    fenceItems: guidanceContext.fenceItems,
+    historicalComparison: regimeContext.historicalComparison,
+    historicalSelection: loadedInputs.historicalSelection,
+    internalProvenance: provenanceContext.internalProvenance,
+    invalidHistoricalSelection: loadedInputs.invalidHistoricalSelection,
+    lastYearComparison: regimeContext.lastYearComparison,
+    liveTreasury: loadedInputs.liveTreasury,
+    macroProvenance: provenanceContext.macroProvenance,
+    macroSeries: loadedInputs.macroSeries,
+    playbook: guidanceContext.playbook,
+    recordDateLabel: provenanceContext.recordDateLabel,
+    reportDynamics: regimeContext.reportDynamics,
+    requestedSelection: loadedInputs.requestedSelection,
+    regimeSeries: loadedInputs.regimeSeries,
+    regimeTrend: regimeContext.regimeTrend,
+    selectedMonth: loadedInputs.selectedMonth,
+    selectedYear: loadedInputs.selectedYear,
+    sensors: regimeContext.sensors,
+    startItems: guidanceContext.startItems,
+    statusLabel: guidanceContext.statusLabel,
+    stopItems: guidanceContext.stopItems,
+    thresholds: loadedInputs.thresholds,
+    treasury: loadedInputs.treasury,
+    treasuryProvenance: provenanceContext.treasuryProvenance,
   });
 
   return assembleReportViewModel({
@@ -73,6 +104,7 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
     thresholds: loadedInputs.thresholds,
     treasury: loadedInputs.treasury,
     treasuryProvenance: provenanceContext.treasuryProvenance,
+    viewModels,
   });
 };
 
@@ -89,37 +121,84 @@ const buildFallbackReportData = async (searchParams?: ReportSearchParams) => {
   };
   const assessment = evaluateRegime(treasury, selectionContext.thresholds, []);
   const guidanceContext = buildGuidanceContext(assessment);
+  const fetchedAtLabel = formatTimestampUTC(treasury.fetched_at);
+  const recordDateLabel = formatDateUTC(treasury.record_date);
+  const treasuryProvenance = {
+    sourceLabel: "Federal Reserve Economic Data (FRED)",
+    sourceUrl: treasury.source,
+    recordDateLabel,
+    timestampLabel: fetchedAtLabel,
+    ageLabel: formatAgeHours(treasury.fetched_at, now),
+    statusLabel: "Cached snapshot",
+  };
+  const macroProvenance = {
+    sourceLabel: "FRED & US Treasury",
+    sourceUrl: treasury.source,
+    recordDateLabel,
+    timestampLabel: fetchedAtLabel,
+    ageLabel: formatAgeHours(treasury.fetched_at, now),
+    statusLabel: "Cached (medium)",
+  };
+  const internalProvenance = {
+    sourceLabel: "Whether curated playbook catalog",
+    recordDateLabel: "Static",
+    timestampLabel: "Static catalog",
+    ageLabel: "Static.",
+    statusLabel: "Simulated (low)",
+  };
+  const viewModels = buildReportViewModelBundle({
+    assessment,
+    cacheCoverage: getTimeMachineCoverage(),
+    cacheMonthsByYear: getTimeMachineMonthsByYear(),
+    fetchedAtLabel,
+    fenceItems: guidanceContext.fenceItems,
+    historicalComparison: null,
+    historicalSelection,
+    internalProvenance,
+    invalidHistoricalSelection: Boolean(requestedSelection && !historicalSelection),
+    lastYearComparison: null,
+    liveTreasury: treasury,
+    macroProvenance,
+    macroSeries: [],
+    playbook: guidanceContext.playbook,
+    recordDateLabel,
+    reportDynamics: {
+      changedSignals: [],
+      totalSignalChanges: 0,
+      regimeChanged: false,
+      directionLabel: "stable" as const,
+    },
+    requestedSelection,
+    regimeSeries: selectionContext.regimeSeries,
+    regimeTrend: deriveRegimeTrend(null, assessment),
+    selectedMonth: requestedSelection?.month ?? now.getUTCMonth() + 1,
+    selectedYear: requestedSelection?.year ?? now.getUTCFullYear(),
+    sensors: buildSensorReadings(treasury),
+    startItems: guidanceContext.startItems,
+    statusLabel: guidanceContext.statusLabel,
+    stopItems: guidanceContext.stopItems,
+    thresholds: selectionContext.thresholds,
+    treasury,
+    treasuryProvenance,
+  });
 
   return assembleReportViewModel({
     assessment,
     cacheCoverage: getTimeMachineCoverage(),
     cacheMonthsByYear: getTimeMachineMonthsByYear(),
-    fetchedAtLabel: formatTimestampUTC(treasury.fetched_at),
+    fetchedAtLabel,
     fenceItems: guidanceContext.fenceItems,
     historicalComparison: null,
     historicalSelection,
-    internalProvenance: {
-      sourceLabel: "Whether curated playbook catalog",
-      recordDateLabel: "Static",
-      timestampLabel: "Static catalog",
-      ageLabel: "Static.",
-      statusLabel: "Simulated (low)",
-    },
+    internalProvenance,
     invalidHistoricalSelection: Boolean(requestedSelection && !historicalSelection),
     lastYearComparison: null,
     liveAssessment: null,
     liveTreasury: treasury,
-    macroProvenance: {
-      sourceLabel: "FRED & US Treasury",
-      sourceUrl: treasury.source,
-      recordDateLabel: formatDateUTC(treasury.record_date),
-      timestampLabel: formatTimestampUTC(treasury.fetched_at),
-      ageLabel: formatAgeHours(treasury.fetched_at, now),
-      statusLabel: "Cached (medium)",
-    },
+    macroProvenance,
     macroSeries: [],
     playbook: guidanceContext.playbook,
-    recordDateLabel: formatDateUTC(treasury.record_date),
+    recordDateLabel,
     reportDynamics: {
       changedSignals: [],
       totalSignalChanges: 0,
@@ -138,14 +217,8 @@ const buildFallbackReportData = async (searchParams?: ReportSearchParams) => {
     stopItems: guidanceContext.stopItems,
     thresholds: selectionContext.thresholds,
     treasury,
-    treasuryProvenance: {
-      sourceLabel: "Federal Reserve Economic Data (FRED)",
-      sourceUrl: treasury.source,
-      recordDateLabel: formatDateUTC(treasury.record_date),
-      timestampLabel: formatTimestampUTC(treasury.fetched_at),
-      ageLabel: formatAgeHours(treasury.fetched_at, now),
-      statusLabel: "Cached snapshot",
-    },
+    treasuryProvenance,
+    viewModels,
   });
 };
 

@@ -4,6 +4,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { fetchTreasuryData } from "../lib/treasury/treasuryClient";
+import type { TreasuryProvider } from "../lib/treasury/treasuryClient";
 import type { TreasuryData } from "../lib/types";
 
 const buildCsv = (seriesId: string, values: Array<{ date: string; value: string }>) => {
@@ -93,6 +94,7 @@ describe("treasury client", () => {
     assert.equal(data.record_date, "2024-09-30");
     assert.equal(data.isLive, false);
     assert.equal(data.fallback_reason, "FRED Treasury fetch error: 500");
+    assert.equal(data.fallback_status, "SNAPSHOT");
     assert.ok(data.fallback_at);
   });
 
@@ -131,6 +133,7 @@ describe("treasury client", () => {
     assert.equal(data.record_date, "2024-09-30");
     assert.equal(data.isLive, false);
     assert.equal(data.fallback_reason, "FRED Treasury series returned no data or invalid payload.");
+    assert.equal(data.fallback_status, "SNAPSHOT");
     assert.ok(data.fallback_at);
   });
 
@@ -155,6 +158,7 @@ describe("treasury client", () => {
     assert.equal(data.record_date, "2024-08-31");
     assert.equal(data.isLive, false);
     assert.equal(data.fallback_reason, "Time Machine cache miss for historical selection.");
+    assert.equal(data.fallback_status, "HISTORICAL_CACHE_MISS");
     assert.ok(data.fallback_at);
   });
 
@@ -280,6 +284,7 @@ describe("treasury client", () => {
       data.fallback_reason,
       "Treasury live fetch timed out after 12s (retried once)."
     );
+    assert.equal(data.fallback_status, "SNAPSHOT");
   });
 
   it("uses FiscalData as a live backup when FRED is unavailable", async () => {
@@ -355,5 +360,49 @@ describe("treasury client", () => {
       twoYear: 4.31,
       tenYear: 4.56,
     });
+  });
+
+  it("allows provider overrides for primary and backup clients", async () => {
+    let primaryCalls = 0;
+    let backupCalls = 0;
+
+    const primaryProvider: TreasuryProvider = {
+      id: "primary-mock",
+      fetchLatest: async () => {
+        primaryCalls += 1;
+        throw new Error("primary unavailable");
+      },
+    };
+    const backupProvider: TreasuryProvider = {
+      id: "backup-mock",
+      fetchLatest: async ({ fetchedAt }) => {
+        backupCalls += 1;
+        return {
+          source: "mock://backup",
+          record_date: "2026-02-11",
+          fetched_at: fetchedAt,
+          isLive: true,
+          yields: {
+            oneMonth: 4.1,
+            threeMonth: 4.2,
+            twoYear: 4.3,
+            tenYear: 4.4,
+          },
+        };
+      },
+    };
+
+    const data = await fetchTreasuryData({
+      providers: {
+        primary: primaryProvider,
+        backup: backupProvider,
+      },
+    });
+
+    assert.equal(primaryCalls, 1);
+    assert.equal(backupCalls, 1);
+    assert.equal(data.source, "mock://backup");
+    assert.equal(data.isLive, true);
+    assert.equal(data.record_date, "2026-02-11");
   });
 });

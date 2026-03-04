@@ -9,13 +9,19 @@ export interface TreasuryYields {
   tenYear: number | null;
 }
 
-export interface TreasuryMetadata {
+export type FallbackStatus = "SNAPSHOT" | "HISTORICAL_CACHE_MISS";
+
+export interface FallbackMetadata {
+  fallback_at?: string | null;
+  fallback_reason?: string | null;
+  fallback_status?: FallbackStatus | null;
+}
+
+export interface TreasuryMetadata extends FallbackMetadata {
   source: string;
   record_date: string;
   fetched_at: string;
   isLive: boolean;
-  fallback_at?: string | null;
-  fallback_reason?: string | null;
 }
 
 export interface TreasuryData extends TreasuryMetadata {
@@ -77,7 +83,7 @@ export type MacroSeriesId =
   | "AI_COMPUTE_COST_TREND"
   | "REGULATORY_RISK_TRACKER";
 
-export interface MacroSeriesReading {
+export interface MacroSeriesReading extends FallbackMetadata {
   id: MacroSeriesId;
   label: string;
   value: number | null;

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { loadMacroSeries } from "../lib/macroSnapshot";
+import type { MacroSeriesProviders } from "../lib/macroSnapshot";
 
 describe("loadMacroSeries", () => {
   it("computes CPI as year-over-year percentage and loads Tier 1 live data", async () => {
@@ -69,5 +70,45 @@ describe("loadMacroSeries", () => {
     assert.ok(series.length >= 10);
     assert.equal(series.some((entry) => entry.id === "VIX_INDEX"), true);
     assert.equal(series.every((entry) => typeof entry.id === "string"), true);
+    assert.equal(series.every((entry) => entry.fallback_status === "SNAPSHOT"), true);
+    assert.equal(series.every((entry) => typeof entry.fallback_reason === "string"), true);
+  });
+
+  it("supports provider overrides for macro upstream clients", async () => {
+    const providers: MacroSeriesProviders = {
+      bls: {
+        id: "bls-mock",
+        readLatest: async () => ({ recordDate: "2026-02-01", value: 4.4 }),
+        readLatestYearOverYear: async () => ({ recordDate: "2026-02-01", value: 2.5 }),
+      },
+      fred: {
+        id: "fred-mock",
+        readLatest: async (seriesId) => {
+          const valueBySeries: Record<string, number> = {
+            BAA10Y: 1.9,
+            BAMLH0A0HYM2: 3.6,
+            NFCI: -0.08,
+            VIXCLS: 17.4,
+          };
+          return {
+            recordDate: "2026-02-01",
+            value: valueBySeries[seriesId] ?? 0,
+          };
+        },
+      },
+    };
+
+    const series = await loadMacroSeries(fetch, providers);
+    const cpi = series.find((entry) => entry.id === "CPI_YOY");
+    const unemployment = series.find((entry) => entry.id === "UNEMPLOYMENT_RATE");
+    const hy = series.find((entry) => entry.id === "HY_CREDIT_SPREAD");
+    if (!cpi || !unemployment || !hy) {
+      throw new Error("Expected macro ids not found");
+    }
+
+    assert.equal(cpi.value, 2.5);
+    assert.equal(unemployment.value, 4.4);
+    assert.equal(hy.value, 3.6);
+    assert.equal(cpi.isLive, true);
   });
 });

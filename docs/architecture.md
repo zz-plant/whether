@@ -1,320 +1,421 @@
-# Architecture Overview (Current State)
+# Architecture Overview (Refactor Baseline)
 
-This document reflects the codebase as implemented on **March 4, 2026**. It is an implementation map, not a target-state design.
+This document reflects the implementation in the repository as traversed on **March 4, 2026**.
+It is the baseline for planning a major architectural refactor.
 
 ## 1) System Snapshot
 
-- Framework: **Next.js 16 App Router** (`app/`) on React 19.
-- Runtime mix: mostly server components + edge route handlers.
-- Package manager: **Bun**.
-- Deployment target: Vercel build output adapted for **Cloudflare Pages/Workers** (`next-on-pages` path in `scripts/build.mjs`).
-- Source inventory:
-  - `app/`: 173 files, including 70 `page.tsx` routes and 13 API route handlers.
-  - `lib/`: 75 files (domain logic + shared utilities).
-  - `scripts/`: 18 files (build, summary generation, CI tooling).
-  - `tests/`: 49 test files (`node --test` + `tsx`).
+- Framework: **Next.js 16 App Router** + **React 19**.
+- Runtime posture: edge-first routes/pages (`runtime = "edge"` in key surfaces).
+- Package/runtime toolchain: **Bun** scripts, Node 20.16.x.
+- Deploy target: Vercel output adapted for **Cloudflare Pages/Workers** via `next-on-pages` in [`scripts/build.mjs`](../scripts/build.mjs).
 
-## 2) Runtime Topology
+Current inventory:
+
+- `app/`: 173 TS/TSX files.
+  - `70` page routes (`page.tsx`).
+  - `13` API handlers (`app/api/*/route.ts`).
+- `lib/`: 89 TypeScript modules.
+- `scripts/`: 19 TS/MJS scripts.
+- `tests/`: 52 Node test files.
+
+Largest files (refactor pressure hotspots):
+
+1. `app/components/appendixSections.tsx` (2595 LOC)
+2. `app/signals/components/timeMachinePanel.tsx` (824 LOC)
+3. `lib/informationArchitecture.ts` (756 LOC)
+4. `app/components/reportShell.tsx` (734 LOC)
+5. `app/operations/components/decisionShieldPanel.tsx` (708 LOC)
+
+## 2) Layered Architecture
 
 ```mermaid
-flowchart LR
-  Browser --> AppRoutes["App Router routes (app/)"]
-  Browser --> ApiRoutes["Edge API routes (app/api/*)"]
+flowchart TD
+  subgraph UI["Presentation Layer (app/*)"]
+    P1["Primary report pages\n/ , /evidence, /operations"]
+    P2["Decision + onboarding pages\n/start, /decide/*, /posture/*"]
+    P3["Content hubs\n/resources/*, /concepts/*, /solutions/*"]
+  end
 
-  AppRoutes --> ReportData["loadReportData (lib/report/reportData.ts)"]
-  ApiRoutes --> ReportData
+  subgraph API["HTTP API Layer (app/api/*)"]
+    A1["Cadence summaries\nweekly/monthly/quarterly/yearly"]
+    A2["Ops and alert APIs\nregime-alerts, weekly-digest, integrations"]
+    A3["Infra and discovery\nhealth, treasury, agent, og"]
+  end
 
-  ReportData --> Treasury["Treasury fetch (lib/treasury/treasuryClient.ts)"]
-  ReportData --> Macro["Macro fetch (lib/macroSnapshot.ts)"]
-  ReportData --> TimeMachine["Historical cache (lib/timeMachine/*)"]
-  ReportData --> Engine["Regime engine (lib/regimeEngine.ts)"]
+  subgraph APP["Application Orchestration (lib/report/*, lib/agentInterface.ts)"]
+    O1["loadReportData / loadReportDataWithTimeout"]
+    O2["report services\ninput, regime, guidance, provenance, view model"]
+  end
 
-  Treasury --> FRED["FRED CSV endpoints"]
-  Treasury --> FiscalData["FiscalData API fallback"]
-  Treasury --> SnapshotFallback["data/snapshot_fallback.json fallback"]
-  Macro --> BLS["BLS public API"]
-  Macro --> MacroSnapshot["data/macro_snapshot.json fallback"]
+  subgraph DOMAIN["Domain Core (lib/regimeEngine/*, lib/policy/*, lib/summary/*, lib/decision*)"]
+    D1["Regime scoring + classification"]
+    D2["Policy composites + governance params"]
+    D3["Summary builders + deltas + hashes"]
+  end
 
-  Engine --> Summaries["Summary builders (lib/summary/*)"]
-  Engine --> Playbook["Playbook + decisions (lib/playbook.ts, lib/decisionShield.ts)"]
+  subgraph DATA["Data + Persistence (lib/treasury, lib/macroSnapshot, lib/timeMachine, lib/serverStore)"]
+    S1["External providers\nFRED, FiscalData, BLS"]
+    S2["Local snapshots\ndata/*.json"]
+    S3["Alert/decision storage\nfile adapter or memory adapter"]
+  end
 
-  Summaries --> ApiRoutes
-  Summaries --> AppRoutes
+  UI --> APP
+  API --> APP
+  APP --> DOMAIN
+  APP --> DATA
+  DATA --> S1
+  DATA --> S2
+  API --> S3
 ```
 
-## 3) Route and Surface Map
+## 3) Core Runtime Flows
 
-### Primary report surfaces
+### A. Weekly report flow (`/`)
 
-- `/` (weekly operating brief): orchestrates regime + action framing via `loadReportDataWithTimeout`.
-- `/signals` and `/evidence` (alias): diagnostics, thresholds, historical replay, regime timeline.
-- `/operations`: playbook-oriented action panels and export utilities.
-- `/briefing`: one-screen weekly leadership summary model.
+Entry:
+- [`app/page.tsx`](../app/page.tsx) calls `loadReportDataWithTimeout(...)`.
 
-### Supporting product surfaces
+Orchestration:
+- [`lib/report/reportData.ts`](../lib/report/reportData.ts)
+  - `loadReportInputs` (treasury + macro + time machine context)
+  - `buildRegimeContext` (assessment + trend + comparisons)
+  - `buildGuidanceContext` (playbook/start/stop/fence)
+  - `buildReportProvenance` (source/freshness labels)
+  - `assembleReportViewModel` (contract assembly)
 
-- `/start`, `/decide/*`, `/posture/*`, `/toolkits/*`, `/reference`, `/resources/*`, `/concepts/*`, `/solutions/*`, `/answers/*`, `/startup-macro-posture/*`.
-- Many of these are content-heavy pages driven by large typed content modules rather than live data.
+Fallback behavior:
+- Timeout race returns snapshot-derived report from `data/snapshot_fallback.json`.
+- Default no-param load memoizes in-process promise.
 
-### Agent/discovery surfaces
+### B. Historical replay flow (`month` + `year` params)
+
+- Selection parsing in [`lib/timeMachine/timeMachineSelection.ts`](../lib/timeMachine/timeMachineSelection.ts).
+- Snapshot retrieval in [`lib/timeMachine/timeMachineCache.ts`](../lib/timeMachine/timeMachineCache.ts).
+- In historical mode, macro adjustments are intentionally disabled for assessment path (`assessmentMacroSeries = []`).
+- Adjacent month navigation is resolved from cache index, not live provider calls.
+
+### C. Alert state flow
+
+- Read/write endpoints:
+  - [`app/api/regime-alerts/route.ts`](../app/api/regime-alerts/route.ts)
+  - [`app/api/weekly-digest/route.ts`](../app/api/weekly-digest/route.ts)
+- Persistence adapter boundary in [`lib/serverStore.ts`](../lib/serverStore.ts):
+  - `file` adapter when Node FS APIs are available.
+  - `memory` adapter fallback or explicit `WHETHER_SERVER_STORE_BACKEND=memory`.
+
+## 4) Route Architecture
+
+### 4.1 Report and decision surfaces (live data consumers)
+
+`loadReportData*` is used by:
+
+- Pages: `/`, `/signals` (`/evidence` alias), `/operations`, `/start`, `/briefing`, selected `/decide/*`, `/answers/[slug]`, startup posture routes.
+- APIs: cadence endpoints, health, integrations.
+
+`loadReportData` currently has **24 importers** across `app/` + `lib/`, making it the main application fan-in point.
+
+### 4.2 API surface map (implemented)
 
 - `/api/agent`
+- `/api/weekly`
+- `/api/monthly`
+- `/api/quarterly`
+- `/api/yearly`
+- `/api/cadence`
+- `/api/summary-delta`
+- `/api/treasury`
+- `/api/health`
+- `/api/integrations/weekly-mandate`
+- `/api/regime-alerts`
+- `/api/weekly-digest`
+- `/api/og`
+
+Discovery endpoints:
+
 - `/llms.txt`
 - `/.well-known/whether-agent.json`
-- MCP server wrapper in `scripts/mcp/whether-mcp-server.ts` exposes cadence summaries and skill metadata over stdio.
+- MCP wrapper: [`scripts/mcp/whether-mcp-server.ts`](../scripts/mcp/whether-mcp-server.ts)
 
-## 4) Request Lifecycle (Core Flow)
+### 4.3 Content-heavy route families
 
-`lib/report/reportData.ts` is the orchestration entrypoint, now decomposed into service modules under `lib/report/services/*`.
+Largest page families by count:
 
-1. Parse URL controls:
-   - historical selection (`month`, `year`) via `lib/timeMachine/timeMachineSelection.ts`
-   - threshold overrides via `lib/thresholds.ts`
-2. Fetch inputs in parallel:
-   - `InputLoader`: treasury + macro loading + cache/selection context (`lib/report/services/inputLoader.ts`)
-3. Build derived signals:
-   - `RegimeAssembler`: sensor readings + regime assessment + comparisons (`lib/report/services/regimeAssembler.ts`)
-4. Build decision framing:
-   - `GuidanceAssembler`: playbook start/stop/fence + status labels (`lib/report/services/guidanceAssembler.ts`)
-   - `Dynamics` helpers: trend and signal-change projections (`lib/report/services/dynamics.ts`)
-5. Build provenance/status labels used in both UI and APIs.
-   - `ProvenanceBuilder`: treasury/macro/internal provenance shaping (`lib/report/services/provenanceBuilder.ts`)
-6. Return one large aggregate payload consumed by page routes and route handlers.
-   - `ViewModelAssembler`: final contract assembly (`lib/report/services/viewModelAssembler.ts`)
+- `resources/*` (13 pages)
+- `solutions/*` (6 pages)
+- `decide/*` (5 pages)
+- `concepts/*` (5 pages)
 
-### Important runtime behavior
+These are primarily static content layers backed by large registries in `lib/informationArchitecture.ts`, `lib/productCanon.ts`, `lib/resourcesContent.ts`, and `lib/resourceArticles.ts`.
 
-- `loadReportData()` memoizes a default in-process promise when called without search params.
-- `loadReportDataWithTimeout()` falls back to snapshot-based data if orchestration exceeds timeout.
-- Historical mode disables macro adjustments in some paths and runs off time-machine snapshots.
+## 5) Domain Modules and Boundaries
 
-## 5) Domain Module Boundaries
+### 5.1 Data acquisition boundary
 
-### A. Data ingestion and normalization
+Treasury:
+- [`lib/treasury/treasuryClient.ts`](../lib/treasury/treasuryClient.ts)
+  - Primary: FRED CSV (`DGS1MO`, `DGS3MO`, `DGS2`, `DGS10`)
+  - Secondary fallback: FiscalData Treasury API
+  - Final fallback: `data/snapshot_fallback.json`
 
-- `lib/treasury/treasuryClient.ts`
-  - Primary source: FRED CSV series (`DGS1MO`, `DGS3MO`, `DGS2`, `DGS10`)
-  - Secondary source fallback: FiscalData Treasury API
-  - Final fallback: checked-in snapshot
-- `lib/macroSnapshot.ts`
-  - Live fetch for CPI, unemployment, spreads, FCI, VIX
-  - Falls back to checked-in macro snapshot payload
-- Shared transport behavior: `lib/fetchWithTimeout.ts`.
+Macro:
+- [`lib/macroSnapshot.ts`](../lib/macroSnapshot.ts)
+  - Live fetch from BLS/FRED for core series
+  - Fallback: `data/macro_snapshot.json`
 
-### B. Regime and policy evaluation
+Transport utility:
+- [`lib/fetchWithTimeout.ts`](../lib/fetchWithTimeout.ts)
 
-- `lib/regimeEngine.ts` (public facade):
-  - Preserves legacy import path and exports.
-  - Delegates to extracted modules under `lib/regimeEngine/*`.
-- `lib/regimeEngine/scoring.ts`:
-  - Computes base-rate and curve-slope derived scores.
-  - Applies macro adjustments to tightness/risk appetite.
-  - Classifies regime (`SCARCITY | DEFENSIVE | VOLATILE | EXPANSION`).
-- `lib/regimeEngine/diagnostics.ts` + `lib/regimeEngine/transitions.ts`:
-  - Computes diagnostics and regime trend/reasoning helpers.
-- `lib/regimeEngine/policy.ts`:
-  - Computes policy composites, posture, confidence index, and refusal state.
-- `lib/regimeEngine/evaluate.ts`:
-  - Assembles final `RegimeAssessment` payload from extracted modules.
-- `lib/policy/*`:
-  - `config.ts`: normalization spec and thresholds.
-  - `transforms.ts`: z-score/directional transforms/composites.
-  - `governance.ts`: governance parameter mapping by posture.
+### 5.2 Regime core boundary
 
-### C. Summary and report outputs
+Public facade:
+- [`lib/regimeEngine.ts`](../lib/regimeEngine.ts)
 
-- `lib/summary/*`: weekly/monthly/quarterly/yearly structured summaries, copy renderers, deltas, hashing, archive parsing.
-- `lib/report/*`: route-facing composition logic, trust labels, narrative helpers, weekly leadership model.
-- `lib/export/*` + `lib/exportNotices.ts`: Slack/board/constraint export text.
+Core modules:
+- `scoring.ts`: base-rate/slope scoring + macro adjustments + classification
+- `evaluate.ts`: composition of scoring + diagnostics + policy assessment
+- `policy.ts`: policy composites, refusal logic, governance parameter output
+- `transitions.ts`: trend and change reasons
+- `types.ts`: canonical regime/policy contracts
 
-### D. Decision utilities
+The regime engine is imported by **54 files**, so this boundary is broad and high risk for breaking changes.
 
-- `lib/decisionShield.ts` + `lib/decisionShieldConfig.ts`: deterministic verdict matrix + guardrails.
-- `lib/whetherToShipChecklist.ts`, `lib/personalizedMandates.ts`: lightweight decision tools used in `/decide/*`.
+### 5.3 Report composition boundary
 
-### E. Navigation/content systems
+- [`lib/report/reportData.ts`](../lib/report/reportData.ts)
+- Service decomposition under `lib/report/services/*` exists, but external consumers still depend on one large aggregate payload.
 
-- Navigation and route helpers in `lib/navigation/*`.
-- Large static content registries:
-  - `lib/informationArchitecture.ts`
-  - `lib/productCanon.ts`
-  - `lib/resourcesContent.ts`
-  - `lib/resourceArticles.ts`
-  - `app/answers/decisionPages.ts`
-  - `app/startup-macro-posture/clusterData.ts`
+### 5.4 Summary contract boundary
 
-## 6) API Architecture
+Summary builders:
+- weekly/monthly/quarterly/yearly in `lib/summary/*`
 
-All API handlers are in `app/api/*` and mostly `runtime = "edge"`.
+Contract consumers:
+- cadence APIs (`/api/weekly`, `/api/monthly`, `/api/cadence`, `/api/summary-delta`)
+- selected UI cards and agent payload surfaces
 
-| Route | Role | Core dependencies |
-| --- | --- | --- |
-| `/api/weekly` | Weekly summary + agent handoff + hash | `loadReportData`, `buildWeeklySummary`, `agentHandoff` |
-| `/api/monthly` | Monthly summary + agent handoff + hash | `loadReportData`, `buildMonthlySummary`, `agentHandoff` |
-| `/api/quarterly` | Quarterly summary | `loadReportData`, `buildQuarterlySummary` |
-| `/api/yearly` | Yearly summary | `loadReportData`, `buildYearlySummary` |
-| `/api/cadence` | Weekly vs monthly alignment status | `buildCadenceAlignment` |
-| `/api/summary-delta` | Weekly/monthly constraint deltas | `buildSummaryDelta` |
-| `/api/treasury` | Raw treasury payload | `fetchTreasuryData` |
-| `/api/health` | service + data freshness health check | `loadReportData` |
-| `/api/agent` | cadence-specific agent payload | `buildAgentInterfaceResponse` |
-| `/api/integrations/weekly-mandate` | Slack/Notion/Linear payload rendering | `buildWeeklyMandatePayload` |
-| `/api/regime-alerts` | alert store read/write via persistence adapter | `serverStore`, `signalOps` |
-| `/api/weekly-digest` | digest from stored alert history | `serverStore`, `signalOps` |
-| `/api/og` | dynamic SVG OG image generation | `fetchTreasuryData`, `evaluateRegime` |
+Archive parser:
+- [`lib/summary/summaryArchive.ts`](../lib/summary/summaryArchive.ts) with strict zod validation.
 
-## 7) State and Persistence Model
+### 5.5 State boundary
 
-### Server-side state
+- [`lib/serverStore.ts`](../lib/serverStore.ts) is the server-state seam.
+- Snapshot model includes `regimeAlerts`, `alertDeliveries`, and `decisionMemory`.
+- Only alerts + weekly digest routes are currently wired to HTTP endpoints.
 
-- `lib/serverStore.ts` now provides a pluggable persistence boundary for:
-  - `regimeAlerts`
-  - `alertDeliveries`
-  - `decisionMemory`
-- Adapter behavior:
-  - default: file-backed adapter when Node file APIs are available (path from `WHETHER_SERVER_STORE_FILE`, default `/tmp/whether-server-store.json`)
-  - fallback: in-memory adapter when file persistence is unavailable or explicitly selected via `WHETHER_SERVER_STORE_BACKEND=memory`
-- Route behavior for `/api/regime-alerts` and `/api/weekly-digest` is unchanged at the contract level; durability now depends on adapter selection/runtime capabilities.
+### 5.6 Content boundary
 
-### Client-side state
+Large in-repo registries hold long-form and catalog content:
 
-- Multiple feature-specific local/session storage keys are used (`whether-theme`, `whether-display-mode`, `whether.lastReadSnapshot`, `whether.regimeAlerts`, decision-shield and assumptions keys, command-center keys).
-- Query params are used as a state channel for thresholds, time machine selection, decision-shield selections, and assumption locks.
+- `lib/informationArchitecture.ts`
+- `lib/productCanon.ts`
+- `lib/resourcesContent.ts`
+- `lib/resourceArticles.ts`
+- `app/answers/decisionPages.ts`
 
-## 8) Data Artifacts and Offline Inputs
+Content and runtime decision logic are colocated in the same runtime package (`lib/`), which increases coupling during refactors.
 
-| File | Purpose | Current observed state (2026-03-04) |
-| --- | --- | --- |
-| `data/snapshot_fallback.json` | emergency treasury fallback | single latest fallback object |
-| `data/macro_snapshot.json` | macro signal fallback source | 12 series |
-| `data/time_machine_cache.json` | historical treasury snapshots | 99 monthly snapshots (`2018-01-31` to `2026-03-03`) |
-| `data/weekly_summaries_2018_2026.json` | generated weekly summary history | 426 entries |
-| `data/monthly_summaries_2012_2025.json` | generated monthly summary history | 170 entries |
-| `data/summary_archive.json` | merged multi-cadence summary archive | 676 entries (426 weekly, 170 monthly, 64 quarterly, 16 yearly) |
+## 6) Data Artifacts (checked-in)
 
-## 9) Build, Deploy, and Generation Pipelines
+As of March 4, 2026:
 
-### Runtime build/deploy
+- `data/time_machine_cache.json`: 99 monthly snapshots (`2018-01-31` to `2026-03-03`)
+- `data/weekly_summaries_2018_2026.json`: 426 entries
+- `data/monthly_summaries_2012_2025.json`: 170 entries
+- `data/summary_archive.json`: 676 entries
+  - weekly 426, monthly 170, quarterly 64, yearly 16
 
-- `scripts/build.mjs` switches between:
-  - standard `next build --webpack`
-  - `next-on-pages` flow for Cloudflare target
-- `scripts/cloudflare-build-and-upload.mjs` reuses cached build output when commit SHA matches, then uploads worker versions with Wrangler.
+Validation scripts:
 
-### Historical summary generation
+- [`scripts/validate-time-machine-cache.mjs`](../scripts/validate-time-machine-cache.mjs)
+- [`scripts/validate-summary-archive.mjs`](../scripts/validate-summary-archive.mjs)
 
-- `scripts/generateWeeklySummaries.ts`
-- `scripts/generateMonthlySummaries.ts`
-- `scripts/generateQuarterlyYearlySummaries.ts`
-- `scripts/updateTimeMachineSummariesSince.mjs` orchestrates all three with year-range env controls.
-- Archive writes happen through `scripts/summaryArchive.ts`.
+Both are part of CI guardrails and `bun run check`.
 
-## 10) Test Architecture
+## 7) Build, Deploy, and Quality Pipeline
 
-- Test runner: Node built-in test runner (`node --test`) via `scripts/run-tests.mjs`.
-- Coverage emphasis:
-  - domain logic (`regimeEngine`, treasury client, summary builders, policy transforms)
-  - route contract tests (summary APIs, integration endpoint validation)
-  - utility behavior and data quality checks
-- Current gap: no browser E2E/system tests for key user flows.
+Build/deploy:
 
-## 11) Coupling and Hotspots (Refactor-Relevant)
+- `bun run build` -> [`scripts/build.mjs`](../scripts/build.mjs)
+- Cloudflare path uses `next-on-pages`, writes build metadata, and rewrites worker imports.
+- Wrangler configuration in [`wrangler.toml`](../wrangler.toml)
 
-1. **Central contract concentration**
-   - `lib/report/reportData.ts` remains a high fan-in entrypoint used by many pages and APIs.
-   - Core logic is now split into service modules (`inputLoader`, `regimeAssembler`, `guidanceAssembler`, `provenanceBuilder`, `viewModelAssembler`), but output-contract coupling remains high.
+Testing:
 
-2. **Large UI monoliths**
-   - `app/components/appendixSections.tsx` (~2.6k LOC), `app/components/reportShell.tsx` (~734 LOC), `app/signals/page.tsx` (~652 LOC).
-   - High coupling between UI composition and domain transforms increases refactor blast radius.
+- Node test runner via [`scripts/run-tests.mjs`](../scripts/run-tests.mjs)
+- 52 targeted suites covering regime logic, data clients, APIs, SEO, and summaries.
 
-3. **Inactive or partially integrated UI features**
-   - Several client components exist but are not currently mounted by active routes (`DecisionShieldPanel`, `DecisionMemoryPanel`, `AssumptionLockPanel`, `ExecutiveBriefingPanel`, `StrategyBriefPanel`, `RegimeAlertsPanel`, etc.).
-   - Some of these depend on API routes not present in `app/api/*` (`/api/decision-memory`, `/api/alert-deliveries`, `/api/alert-preferences`).
+CI workflows include:
 
-4. **Archive contract protection relies on CI guardrails**
-   - `lib/summary/summaryArchive.ts` performs strict zod validation over the full archive.
-   - Archive validation is now enforced with `scripts/validate-summary-archive.mjs` in CI; bypassing this guard reintroduces parse-failure risk.
+- `upgrade-guardrails.yml` (lint, typecheck, tests, cache/archive validation, Cloudflare warning audit)
+- `review-hotspot-preflight.yml`
+- production synthetic smoke every 10 minutes.
 
-5. **Historical replay freshness requires active maintenance**
-   - Time-machine coverage now spans 99 monthly snapshots, with freshness/backfill validation via `scripts/validate-time-machine-cache.mjs`.
-   - If cache backfill is not run regularly, historical mode quality can degrade silently.
+## 8) Coupling Hotspots and Drift
 
-6. **State durability variability**
-   - Signal ops state now uses an adapter boundary with file-backed durability where available.
-   - Environments without file persistence still fall back to in-memory behavior.
+### 8.1 High-coupling modules
 
-7. **Content and app logic co-location**
-   - Product content system and runtime decision system are tightly co-located in `app/` and `lib/`, making targeted refactors harder.
+- `loadReportData` contract is central (24 importers).
+- `regimeEngine` boundary is broad (54 importers).
+- Large UI composition files mix view and transformation logic:
+  - `appendixSections.tsx`
+  - `reportShell.tsx`
+  - `signals/page.tsx`
 
-## 12) Refactor Seams to Preserve
+### 8.2 Orphaned feature islands
 
-For a major refactor, these seams are good candidates:
+Several large components are defined but not imported by active routes:
 
-- `Data acquisition boundary`: treasury + macro fetch + fallback contracts.
-- `Regime core boundary`: scoring/classification/policy pure domain package.
-- `Report composition boundary`: `loadReportData` decomposition into smaller composable services.
-- `Summary contract boundary`: stable typed API contracts (`weekly/monthly/...`) decoupled from rendering copy.
-- `State boundary`: explicit persistence adapter replacing process-memory store.
-- `Content boundary`: isolate static content registries from runtime scoring stack.
+- `DecisionShieldPanel`
+- `DecisionMemoryPanel`
+- `AssumptionLockPanel`
+- `ExecutiveBriefingPanel`
+- `StrategyBriefPanel`
+- `RegimeAlertsPanel`
 
-These boundaries map closely to current hotspots and can reduce blast radius while preserving current external behavior.
+Some of these call non-existent APIs (`/api/decision-memory`, `/api/alert-preferences`, `/api/alert-deliveries`).
 
-## 13) Phased Refactor Plan (Bounded Milestones)
+### 8.3 Doc/runtime contract drift
 
-Planning assumptions:
+[`docs/developer/api-reference.md`](../docs/developer/api-reference.md) still documents `/api/alert-preferences` and `/api/alert-deliveries`, but those handlers are not present under `app/api/*`.
 
-- Schedule uses 1-week and 2-week milestones to keep review and rollback manageable.
-- Product delivery continues during the refactor (no long-lived freeze branch).
-- Each milestone must meet its exit gate before the next dependent milestone starts.
+## 9) Refactor Seams to Preserve (Hard Boundaries)
 
-### Milestone plan
+These seams should remain stable while restructuring internals:
 
-| Milestone | Duration | Objective | Scope (in) | Scope (out) | Exit gate | Depends on | Status |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| M0: Contract baseline and safety rails | 1 week | Freeze current external contracts and establish regression visibility. | Add/expand contract tests for `/api/weekly`, `/api/monthly`, `/api/cadence`, `/api/summary-delta`; create golden snapshots for key `loadReportData` outputs; add architecture decision record (ADR) for target module boundaries. | UI redesign or route reorganization. | CI passes with new contract tests; baseline outputs committed and documented. | None | Complete (2026-03-04) |
-| M1: Data integrity hardening | 1 week | Remove known data-path fragility before structural moves. | Migrate `data/summary_archive.json` to valid schema, add archive validator script in CI, define time-machine cache freshness/backfill rule and regenerate minimum viable history set. | Rewriting summary builder semantics. | `getSummaryArchive()` loads non-empty valid records; time-machine checks pass with explicit freshness threshold. | M0 | Complete (2026-03-04) |
-| M2: Regime core extraction | 2 weeks | Isolate regime/policy logic into pure domain modules with stable interfaces. | Split `lib/regimeEngine.ts` into focused modules (scoring, classification, diagnostics, policy overlays); keep adapters for legacy call sites; add parity tests for regime outputs. | Changing regime formulas or product thresholds. | Parity test suite passes; old and new paths return identical outputs for fixture set. | M0, M1 | Complete (2026-03-04) |
-| M3: Report orchestrator decomposition | 2 weeks | Break `loadReportData` into composable services. | Introduce explicit services: `InputLoader`, `RegimeAssembler`, `GuidanceAssembler`, `ProvenanceBuilder`, `ViewModelAssembler`; move provenance shaping to dedicated unit; reduce route coupling to orchestration internals. | New user-facing features. | `loadReportData` becomes thin composition layer; all report/API routes pass contract tests unchanged. | M2 | Complete (2026-03-04) |
-| M4: Persistence boundary and signal ops durability | 1 week | Replace process-memory assumptions with pluggable persistence contracts. | Create storage adapter interface for alerts/deliveries/decision memory; implement default durable adapter (plus in-memory fallback for local dev); wire `/api/regime-alerts` and `/api/weekly-digest` to adapter. | Notification channel expansion. | Restart-safe persistence verified in integration tests; API behavior unchanged at contract level. | M3 | Complete (2026-03-04) |
-| M5: UI and route-level modularization | 2 weeks | Reduce blast radius in monolithic UI files and align dead/inactive surfaces. | Split `appendixSections`/`reportShell` into smaller domain-scoped components; create route-level data-view model boundaries; remove or explicitly park inactive panels behind feature flags. | Visual redesign and copy refresh. | Largest UI files reduced to agreed size budget; routes maintain parity screenshots and interaction checks. | M3 | Pending |
-| M6: Content/runtime separation and cleanup | 1 week | Decouple static content systems from runtime decision engine and finalize migration. | Move large static registries behind a dedicated content boundary (`content/` or `lib/content/*`); remove deprecated shims; update docs (`docs/architecture.md`, `docs/feature-specs-current.md`, `docs/implementation-status.md`). | New content taxonomy project. | No runtime imports from deprecated paths; docs and ownership map updated; final refactor checklist closed. | M4, M5 | Pending |
+1. Data acquisition seam
+- input/output contracts around treasury and macro fetch + fallback metadata.
 
-### Dependency order and critical path
+2. Regime core seam
+- pure domain evaluation contract (`evaluateRegime`, typed outputs).
 
-```mermaid
-flowchart LR
-  M0["M0 Contract baseline"] --> M1["M1 Data integrity"]
-  M0 --> M2["M2 Regime extraction"]
-  M1 --> M2
-  M2 --> M3["M3 Orchestrator decomposition"]
-  M3 --> M4["M4 Persistence boundary"]
-  M3 --> M5["M5 UI modularization"]
-  M4 --> M6["M6 Content/runtime separation"]
-  M5 --> M6
-```
+3. Report composition seam
+- external payload shape for existing pages/APIs while internals are split.
 
-Critical path (minimum elapsed time): **M0 -> M1 -> M2 -> M3 -> M4 -> M6** (8 weeks).  
-UI modularization (`M5`) can run in parallel with `M4` after `M3`, keeping total plan at ~9 weeks including buffer.
+4. Summary contract seam
+- stable API payloads for cadence endpoints and agent outputs.
 
-### Milestone-level verification matrix
+5. State seam
+- server persistence adapter contract, independent of storage backend.
 
-| Milestone | Required validation |
-| --- | --- |
-| M0 | `bun run lint`, `bun run test`, route contract tests for summary APIs |
-| M1 | Archive validator script, time-machine cache integrity test, targeted summary archive tests |
-| M2 | Regime parity fixtures, policy transform tests, threshold override regression tests |
-| M3 | Full summary API suite, `loadReportData` fixture parity, health endpoint checks |
-| M4 | Persistence adapter integration tests, alert/digest API regression tests |
-| M5 | Component-level tests, route smoke tests, parity screenshots for `/`, `/signals`, `/operations` |
-| M6 | `bun run check`, docs-link verification, dead-code/import path checks |
+6. Content seam
+- static content catalogs isolated from runtime scoring/orchestration.
 
-### Risks and controls by phase
+## 10) Highest-to-Lowest Priority Refactor Backlog
 
-| Risk | Most exposed milestones | Control |
-| --- | --- | --- |
-| Silent contract drift on summaries | M2, M3 | Golden fixtures + API contract tests gated in CI |
-| Data quality regressions from archive/cache cleanup | M1 | Pre-merge validator + regenerate scripts + freshness checks |
-| Runtime instability from persistence changes | M4 | Adapter abstraction, dual-write cutover window, rollback to in-memory adapter |
-| UI regressions during decomposition | M5 | Screenshot parity and route smoke checks before merge |
-| Scope creep into product redesign | M3, M5 | Explicit out-of-scope list per milestone + PR template gate |
+Use this order as the execution sequence. Do not start a lower-priority package until exit criteria for all higher packages are met.
+
+### Priority 1 (highest): Contract freeze + safety rails (R0)
+
+- Status: In progress (contract fixtures/tests added for `loadReportData`, `evaluateRegime`, and summary APIs).
+- Scope:
+  - Freeze external contracts for `loadReportData`, cadence APIs, and `evaluateRegime`.
+  - Add/refresh golden fixtures and contract tests for those boundaries.
+- Why first:
+  - Every later change touches these seams.
+  - Without frozen contracts, refactor work has no stable regression target.
+- Exit criteria:
+  - Contract snapshots committed.
+  - CI includes deterministic checks for all frozen contracts.
+  - No behavior drift in `/api/weekly`, `/api/monthly`, `/api/cadence`, `/api/summary-delta`.
+
+### Priority 2: Report composition decomposition (R1)
+
+- Status: In progress (typed compatibility `viewModels` bundle added under `loadReportData`).
+- Scope:
+  - Split `loadReportData` output into typed sub-viewmodels:
+    - posture/evidence
+    - operations
+    - historical context
+    - provenance
+  - Keep a compatibility adapter at the current `loadReportData` boundary.
+- Why second:
+  - `loadReportData` is the highest fan-in application seam (24 importers).
+  - Decomposition reduces blast radius for UI and API refactors that follow.
+- Exit criteria:
+  - New internal viewmodels are used by routes/APIs with compatibility shim.
+  - No contract changes visible to current consumers.
+
+### Priority 3: Regime core packaging (R2)
+
+- Status: Complete (domain boundary import test and independent `typecheck:regime-domain` path added with passing validation).
+- Scope:
+  - Enforce a pure-domain package boundary for `lib/regimeEngine/*` and `lib/policy/*`.
+  - Disallow framework/runtime imports in domain core.
+- Why third:
+  - `regimeEngine` has broad dependency fan-out (54 importers).
+  - Stabilizing pure-domain logic unblocks safe reuse and targeted optimization.
+- Exit criteria:
+  - Domain core compiles independently of Next.js/runtime concerns.
+  - Existing regime and policy tests remain green with unchanged outputs.
+
+### Priority 4: Data client hardening (R3)
+
+- Status: Complete (treasury/macro provider interfaces are injectable and tested; fallback metadata normalized with `fallback_status` + `fallback_reason`).
+- Scope:
+  - Isolate FRED/BLS/FiscalData access behind explicit provider interfaces.
+  - Standardize fallback reason/status metadata across treasury and macro loaders.
+- Why fourth:
+  - Data-path reliability is critical, but safest after contract and domain stabilization.
+- Exit criteria:
+  - Provider clients are replaceable and independently testable.
+  - Fallback metadata is normalized and exposed consistently.
+
+### Priority 5: UI shell/section extraction (R4)
+
+- Status: Pending.
+- Scope:
+  - Split `reportShell.tsx` and `appendixSections.tsx` into smaller composable modules.
+  - Move transformation/derivation logic out of client components and into `lib/report/*`.
+- Why fifth:
+  - UI restructuring is lower risk once upstream contracts are stable.
+  - This reduces maintenance cost in the largest presentation hotspots.
+- Exit criteria:
+  - Large shell components reduced in size and responsibility.
+  - Rendering behavior is unchanged for primary report surfaces.
+
+### Priority 6: Feature island reconciliation (R5)
+
+- Status: Pending.
+- Scope:
+  - Resolve orphaned components: integrate, deprecate, or delete.
+  - If integrating, implement missing APIs (`decision-memory`, `alert-preferences`, `alert-deliveries`) through the server-store seam.
+- Why sixth:
+  - Prevents dead-code drag and API confusion.
+  - Should follow core architecture stabilization to avoid rework.
+- Exit criteria:
+  - No orphaned major panels remain in active code paths.
+  - Implemented APIs and docs are aligned.
+
+### Priority 7: Content/runtime decoupling (R6)
+
+- Status: Pending.
+- Scope:
+  - Separate static editorial registries from live runtime decision modules.
+  - Make route-level content imports explicit by surface.
+- Why seventh:
+  - Important for long-term modularity, but not on critical execution path for correctness.
+- Exit criteria:
+  - Clear boundary between static content packages and runtime decision stack.
+  - No incidental imports from large content registries in live decision-critical paths.
+
+### Priority 8 (lowest): Documentation and contract sync (R7)
+
+- Status: In progress (API reference drift corrected; route-to-doc parity test added).
+- Scope:
+  - Align `docs/developer/api-reference.md` with implemented endpoints.
+  - Keep `docs/architecture.md` and `docs/feature-specs-current.md` synchronized per milestone.
+- Why last:
+  - This is continuous throughout, but final sync is only meaningful after structural changes land.
+- Exit criteria:
+  - No documented endpoint without an implementation.
+  - Architecture/spec docs reflect shipped state at merge time.
+
+## 11) Immediate Planning Anchors
+
+- Highest-risk nodes: `loadReportData`, `evaluateRegime`, `reportShell`, `appendixSections`.
+- Existing safety rails: summary/time-machine validators, broad unit contract coverage, CI warning audits.
+- Earliest practical wins:
+  - freeze `loadReportData` output contract snapshots
+  - resolve API-doc drift for alert endpoints
+  - decide integrate/deprecate/delete for orphaned operations panels

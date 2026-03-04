@@ -28,8 +28,6 @@ Whether exposes read-first JSON endpoints for summary generation, cadence checks
 | Endpoint | Method(s) | Purpose |
 | --- | --- | --- |
 | `/api/regime-alerts` | GET, POST | Read/create regime alert events. |
-| `/api/alert-preferences` | GET, POST | Read/update per-client channel preferences. |
-| `/api/alert-deliveries` | GET, POST | Read/simulate alert deliveries by channel. |
 | `/api/weekly-digest` | GET | Build digest summary from stored alert events. |
 
 ## Integration and operations endpoints
@@ -51,12 +49,76 @@ curl -s "http://localhost:3000/api/agent?cadence=weekly" | jq '{cadence, support
 
 Invalid cadence returns `400` with an `allowedCadences` field.
 
-### Alert preference update
+### Regime alert create
 
 ```bash
-curl -s -X POST "http://localhost:3000/api/alert-preferences" \
+curl -s -X POST "http://localhost:3000/api/regime-alerts" \
   -H "content-type: application/json" \
-  -d '{"clientId":"ops-demo","preferences":{"slack":true,"email":false,"webhook":true}}' | jq
+  -d '{
+    "previousRecordDate": "2026-02-01",
+    "currentRecordDate": "2026-02-08",
+    "previousAssessment": {
+      "regime": "DEFENSIVE",
+      "scores": { "tightness": 78, "riskAppetite": 56, "baseRateUsed": "1M", "baseRate": 5.2, "curveSlope": 0.12 },
+      "diagnostics": { "tightnessDelta": 8, "riskAppetiteDelta": 6, "nearestThresholdDelta": 8, "confidence": "MEDIUM", "transitionWatch": true, "intensity": "STANDARD", "boundaryContributors": [], "weakReadCount": 0, "twoWeakReadsWarning": false },
+      "description": "",
+      "constraints": [],
+      "tightnessExplanation": "",
+      "riskAppetiteExplanation": "",
+      "dataWarnings": [],
+      "thresholds": { "baseRateTightness": 5, "tightnessRegime": 70, "riskAppetiteRegime": 50 },
+      "inputs": [],
+      "policyAssessment": {
+        "version": "policy-v1",
+        "normalizations": [],
+        "composites": { "cts": 0, "ras": 0 },
+        "posture": "TRANSITION",
+        "band": "NEUTRAL",
+        "confidenceIndex": { "agreement": 0, "distanceFromNeutral": 0, "volatility30d": 0 },
+        "refusal": { "refused": false, "reasons": [] },
+        "governanceParameters": {
+          "hiringThreshold": "HIGH",
+          "paybackWindowTolerance": "STANDARD",
+          "rollbackRequirement": "EXPLICIT_KILL_CRITERIA",
+          "approvalVelocity": "BALANCED",
+          "expansionScope": "BALANCED",
+          "experimentationTolerance": "MEDIUM"
+        }
+      }
+    },
+    "currentAssessment": {
+      "regime": "SCARCITY",
+      "scores": { "tightness": 86, "riskAppetite": 42, "baseRateUsed": "1M", "baseRate": 5.4, "curveSlope": -0.1 },
+      "diagnostics": { "tightnessDelta": 16, "riskAppetiteDelta": -8, "nearestThresholdDelta": 16, "confidence": "HIGH", "transitionWatch": false, "intensity": "STRONG", "boundaryContributors": [], "weakReadCount": 0, "twoWeakReadsWarning": false },
+      "description": "",
+      "constraints": [],
+      "tightnessExplanation": "",
+      "riskAppetiteExplanation": "",
+      "dataWarnings": [],
+      "thresholds": { "baseRateTightness": 5, "tightnessRegime": 70, "riskAppetiteRegime": 50 },
+      "inputs": [],
+      "policyAssessment": {
+        "version": "policy-v1",
+        "normalizations": [],
+        "composites": { "cts": 0, "ras": 0 },
+        "posture": "SAFETY_MODE",
+        "band": "ELEVATED",
+        "confidenceIndex": { "agreement": 0, "distanceFromNeutral": 0, "volatility30d": 0 },
+        "refusal": { "refused": false, "reasons": [] },
+        "governanceParameters": {
+          "hiringThreshold": "VERY_HIGH",
+          "paybackWindowTolerance": "SHORTER",
+          "rollbackRequirement": "REVERSIBLE_ONLY",
+          "approvalVelocity": "SLOWER_STRUCTURED",
+          "expansionScope": "CONSTRAINED",
+          "experimentationTolerance": "LOW"
+        }
+      }
+    },
+    "reasons": [{ "code": "regime-change", "message": "Regime shifted from DEFENSIVE to SCARCITY." }],
+    "sourceUrls": ["https://fred.stlouisfed.org/"],
+    "timeMachineHref": "/evidence?month=2&year=2026"
+  }' | jq
 ```
 
 ### Weekly mandate integration payload

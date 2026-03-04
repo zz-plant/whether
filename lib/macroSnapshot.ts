@@ -24,6 +24,23 @@ type LiveSeriesValue = {
   sourceUrl: string;
 };
 
+type LivePoint = {
+  value: number;
+  recordDate: string;
+};
+
+export interface MacroSeriesProviders {
+  fred: {
+    id: string;
+    readLatest: (seriesId: string, fetcher: typeof fetch) => Promise<LivePoint>;
+  };
+  bls: {
+    id: string;
+    readLatest: (seriesId: string, fetcher: typeof fetch) => Promise<LivePoint>;
+    readLatestYearOverYear: (seriesId: string, fetcher: typeof fetch) => Promise<LivePoint>;
+  };
+}
+
 const payload = macroSnapshot as MacroSnapshotPayload;
 
 const MACRO_SERIES_REVALIDATE_SECONDS = 900;
@@ -145,14 +162,29 @@ const readBlsLatestYearOverYear = async (seriesId: string, fetcher: typeof fetch
   };
 };
 
-const buildLiveSeries = async (fetcher: typeof fetch): Promise<MacroSeriesReading[]> => {
+export const DEFAULT_MACRO_SERIES_PROVIDERS: MacroSeriesProviders = {
+  fred: {
+    id: "fred",
+    readLatest: readFredLatestValue,
+  },
+  bls: {
+    id: "bls",
+    readLatest: readBlsLatestValue,
+    readLatestYearOverYear: readBlsLatestYearOverYear,
+  },
+};
+
+const buildLiveSeries = async (
+  fetcher: typeof fetch,
+  providers: MacroSeriesProviders,
+): Promise<MacroSeriesReading[]> => {
   const [cpi, unemployment, bbbSpread, hySpread, chicagoFci, vix] = await Promise.all([
-    readBlsLatestYearOverYear("CUUR0000SA0", fetcher),
-    readBlsLatestValue("LNS14000000", fetcher),
-    readFredLatestValue("BAA10Y", fetcher),
-    readFredLatestValue("BAMLH0A0HYM2", fetcher),
-    readFredLatestValue("NFCI", fetcher),
-    readFredLatestValue("VIXCLS", fetcher),
+    providers.bls.readLatestYearOverYear("CUUR0000SA0", fetcher),
+    providers.bls.readLatest("LNS14000000", fetcher),
+    providers.fred.readLatest("BAA10Y", fetcher),
+    providers.fred.readLatest("BAMLH0A0HYM2", fetcher),
+    providers.fred.readLatest("NFCI", fetcher),
+    providers.fred.readLatest("VIXCLS", fetcher),
   ]);
 
   const nowIso = new Date().toISOString();
@@ -209,14 +241,34 @@ const buildLiveSeries = async (fetcher: typeof fetch): Promise<MacroSeriesReadin
       isLive: true,
       sourceLabel: live.sourceLabel,
       sourceUrl: live.sourceUrl,
+      fallback_at: null,
+      fallback_reason: null,
+      fallback_status: null,
     };
   });
 };
 
-export const loadMacroSeries = async (fetcher: typeof fetch = fetch): Promise<MacroSeriesReading[]> => {
+const toFallbackReason = (error: unknown) =>
+  error instanceof Error && error.message ? error.message : "Unknown macro fetch error";
+
+const buildSnapshotFallbackSeries = (reason: string): MacroSeriesReading[] => {
+  const fallbackAt = new Date().toISOString();
+  return snapshotSeries.map((series) => ({
+    ...series,
+    isLive: false,
+    fallback_at: fallbackAt,
+    fallback_reason: reason,
+    fallback_status: "SNAPSHOT",
+  }));
+};
+
+export const loadMacroSeries = async (
+  fetcher: typeof fetch = fetch,
+  providers: MacroSeriesProviders = DEFAULT_MACRO_SERIES_PROVIDERS,
+): Promise<MacroSeriesReading[]> => {
   try {
-    return await buildLiveSeries(fetcher);
-  } catch {
-    return snapshotSeries;
+    return await buildLiveSeries(fetcher, providers);
+  } catch (error) {
+    return buildSnapshotFallbackSeries(toFallbackReason(error));
   }
 };

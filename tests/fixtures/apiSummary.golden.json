@@ -1,0 +1,185 @@
+{
+  "weekly": {
+    "version": "v1",
+    "summary": {
+      "title": "Weekly action summary — Feb 1, 2026",
+      "regime": "SCARCITY",
+      "confidence": "HIGH",
+      "transitionWatch": false,
+      "intensity": "STANDARD",
+      "constraints": [
+        "Shorten payback windows and preserve cash.",
+        "Delay speculative hiring or large platform rewrites.",
+        "Route roadmap bets through revenue certainty."
+      ],
+      "recordDateLabel": "Feb 1, 2026",
+      "structured": {
+        "climate": {
+          "label": "⚠️ RISK-OFF / CAPITAL-TIGHT",
+          "summary": [
+            "Capital is expensive and risk tolerance is down.",
+            "Assume slower approvals, tighter scrutiny, and low patience for long-horizon bets."
+          ]
+        },
+        "recommendedMoves": [
+          "Anchor the roadmap to runway protection and near-term ROI",
+          "Cut bets that depend on external sentiment improving",
+          "Use reversible releases and staged commitments by default"
+        ],
+        "executionPriorities": [
+          "Retention, expansion, and monetization for existing users",
+          "Reliability, trust, and cost-to-serve improvements",
+          "Features with payback in under 6 months"
+        ],
+        "watchouts": [
+          "Adding headcount before revenue is committed",
+          "Starting long-horizon platform rewrites",
+          "Running experiments that weaken short-term cash flow"
+        ],
+        "planningLanguage": "“Prioritize short-payback, reversible work and stop expansion bets that raise burn or depend on a rebound in risk appetite.”",
+        "executionConstraints": [
+          "Shorten payback windows and preserve cash.",
+          "Delay speculative hiring or large platform rewrites.",
+          "Route roadmap bets through revenue certainty."
+        ],
+        "governanceParameters": {
+          "hiringThreshold": "VERY_HIGH",
+          "paybackWindowTolerance": "SHORTER",
+          "rollbackRequirement": "REVERSIBLE_ONLY",
+          "approvalVelocity": "SLOWER_STRUCTURED",
+          "expansionScope": "CONSTRAINED",
+          "experimentationTolerance": "LOW"
+        }
+      }
+    },
+    "provenance": {
+      "sourceLabel": "Federal Reserve Economic Data (FRED)",
+      "sourceUrl": "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v2/accounting/od/daily_treasury_yield_curve",
+      "statusLabel": "Cached (medium)",
+      "recordDateLabel": "Feb 1, 2026"
+    },
+    "recordDateLabel": "Feb 1, 2026",
+    "summaryHash": "7b603429",
+    "agentHandoff": {
+      "promptPrefix": "You are an autonomous PM assistant.",
+      "skills": [
+        "regime-summary",
+        "constraint-translation",
+        "pm-questions"
+      ],
+      "regimeKey": "SCARCITY"
+    }
+  },
+  "monthly": {
+    "version": "v1",
+    "summary": {
+      "title": "Monthly action summary — Feb 1, 2026",
+      "regime": "SCARCITY",
+      "confidence": "HIGH",
+      "transitionWatch": false,
+      "intensity": "STANDARD",
+      "constraints": [
+        "Shorten payback windows and preserve cash.",
+        "Delay speculative hiring or large platform rewrites.",
+        "Route roadmap bets through revenue certainty."
+      ],
+      "recordDateLabel": "Feb 1, 2026",
+      "structured": {
+        "executionConstraints": [
+          "Shorten payback windows and preserve cash.",
+          "Delay speculative hiring or large platform rewrites.",
+          "Route roadmap bets through revenue certainty."
+        ],
+        "provenance": {
+          "source": "Federal Reserve Economic Data (FRED) (https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v2/accounting/od/daily_treasury_yield_curve)"
+        }
+      }
+    },
+    "provenance": {
+      "sourceLabel": "Federal Reserve Economic Data (FRED)",
+      "sourceUrl": "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v2/accounting/od/daily_treasury_yield_curve",
+      "statusLabel": "Cached (medium)",
+      "recordDateLabel": "Feb 1, 2026"
+    },
+    "recordDateLabel": "Feb 1, 2026",
+    "summaryHash": "858a6679",
+    "agentHandoff": {
+      "promptPrefix": "You are an autonomous PM assistant.",
+      "skills": [
+        "regime-summary",
+        "constraint-translation",
+        "pm-questions"
+      ],
+      "regimeKey": "SCARCITY"
+    }
+  },
+  "cadence": {
+    "version": "v1",
+    "alignmentStatus": "aligned",
+    "mismatchedConstraints": [],
+    "weekly": {
+      "regime": "SCARCITY",
+      "constraints": [
+        "Shorten payback windows and preserve cash.",
+        "Delay speculative hiring or large platform rewrites.",
+        "Route roadmap bets through revenue certainty."
+      ],
+      "recordDateLabel": "Feb 1, 2026"
+    },
+    "monthly": {
+      "regime": "SCARCITY",
+      "constraints": [
+        "Shorten payback windows and preserve cash.",
+        "Delay speculative hiring or large platform rewrites.",
+        "Route roadmap bets through revenue certainty."
+      ],
+      "recordDateLabel": "Feb 1, 2026"
+    }
+  },
+  "summaryDelta": {
+    "version": "v1",
+    "delta": {
+      "regime": {
+        "from": "SCARCITY",
+        "to": "SCARCITY",
+        "fromLabel": "Defend",
+        "toLabel": "Defend",
+        "changed": false
+      },
+      "constraints": {
+        "added": [],
+        "removed": [],
+        "unchanged": [
+          "Shorten payback windows and preserve cash.",
+          "Delay speculative hiring or large platform rewrites.",
+          "Route roadmap bets through revenue certainty."
+        ]
+      },
+      "provenance": {
+        "weeklyStatusLabel": "Cached (medium)",
+        "monthlyStatusLabel": "Cached (medium)",
+        "statusChanged": false
+      }
+    },
+    "summaries": {
+      "weekly": {
+        "regime": "SCARCITY",
+        "constraints": [
+          "Shorten payback windows and preserve cash.",
+          "Delay speculative hiring or large platform rewrites.",
+          "Route roadmap bets through revenue certainty."
+        ],
+        "recordDateLabel": "Feb 1, 2026"
+      },
+      "monthly": {
+        "regime": "SCARCITY",
+        "constraints": [
+          "Shorten payback windows and preserve cash.",
+          "Delay speculative hiring or large platform rewrites.",
+          "Route roadmap bets through revenue certainty."
+        ],
+        "recordDateLabel": "Feb 1, 2026"
+      }
+    }
+  }
+}
