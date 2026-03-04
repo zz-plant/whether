@@ -181,9 +181,9 @@ const REGIME_PROFILES: Record<RegimeKey, { description: string; constraints: str
   EXPANSION: {
     description: "Capital is cheap and risk appetite is healthy. Move quickly to capture share.",
     constraints: [
-      "Prioritize speed and distribution over polish.",
-      "Accept controlled waste to win market share.",
-      "Invest ahead of demand where signals are strong.",
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong.",
     ],
   },
 };
