@@ -1,4 +1,6 @@
-"use client";
+import type { ReactNode } from "react";
+import type { DecisionKnob } from "../../lib/report/decisionKnobs";
+import type { ReportDynamics } from "../../lib/report/reportData";
 
 type Regime = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
 
@@ -14,6 +16,9 @@ type WeeklyDecisionCardProps = {
   dangerousCategory: string;
   recordDateLabel: string;
   fetchedAtLabel: string;
+  reportDynamics: ReportDynamics;
+  decisionKnobs: DecisionKnob[];
+  actions?: ReactNode;
 };
 
 const postureHeadlineByRegime: Record<Regime, string> = {
@@ -22,6 +27,16 @@ const postureHeadlineByRegime: Record<Regime, string> = {
   VOLATILE: "Preserve optionality. Stage commitments behind concrete milestones.",
   EXPANSION: "Expand selectively while enforcing burn and payback guardrails.",
 };
+
+const deltaSignalOrder: Array<{
+  key: ReportDynamics["changedSignals"][number]["key"];
+  label: string;
+}> = [
+  { key: "tightness", label: "Cash availability" },
+  { key: "riskAppetite", label: "Risk appetite" },
+  { key: "baseRate", label: "Base rate" },
+  { key: "curveSlope", label: "Curve slope" },
+];
 
 export function WeeklyDecisionCard({
   regime,
@@ -35,7 +50,12 @@ export function WeeklyDecisionCard({
   dangerousCategory,
   recordDateLabel,
   fetchedAtLabel,
+  reportDynamics,
+  decisionKnobs,
+  actions,
 }: WeeklyDecisionCardProps) {
+  const deltasByKey = new Map(reportDynamics.changedSignals.map((item) => [item.key, item.delta]));
+
   return (
     <section className="weather-panel space-y-6 px-5 py-6 sm:px-7 sm:py-8" aria-labelledby="weekly-posture-brief-title">
       <header className="space-y-3 border-b border-slate-700/70 pb-5">
@@ -44,8 +64,40 @@ export function WeeklyDecisionCard({
           {statusLabel}
         </h1>
         <p className="max-w-3xl text-base text-slate-200">{postureHeadlineByRegime[regime]}</p>
-        <p className="text-sm text-slate-300">Regime delta: {postureDelta}</p>
+        <div className="flex flex-wrap items-center gap-3">
+          <p className="text-sm text-slate-300">Posture delta: {postureDelta}</p>
+          {actions}
+        </div>
       </header>
+
+      <article className="rounded-xl border border-slate-700/70 bg-slate-900/50 p-4">
+        <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">What changed since last week</h2>
+        <ul className="mt-3 grid gap-2 text-sm text-slate-100 sm:grid-cols-2">
+          {deltaSignalOrder.map((item) => {
+            const delta = deltasByKey.get(item.key) ?? 0;
+            return (
+              <li key={item.key}>
+                {item.label} Δ {delta > 0 ? "+" : ""}
+                {delta.toFixed(1)}
+              </li>
+            );
+          })}
+        </ul>
+      </article>
+
+      <article className="rounded-xl border border-slate-700/70 bg-slate-900/50 p-4">
+        <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">Decision knobs</h2>
+        <div className="mt-3 grid gap-2 text-sm text-slate-100 sm:grid-cols-2">
+          {decisionKnobs.map((knob) => {
+            const deltaLabel = knob.delta === 0 ? "•" : knob.delta > 0 ? "↑" : "↓";
+            return (
+              <p key={knob.key}>
+                {knob.label}: {knob.value}/3 {deltaLabel}
+              </p>
+            );
+          })}
+        </div>
+      </article>
 
       <div className="grid gap-3 sm:grid-cols-3" aria-label="Posture confidence and watch state">
         <article className="rounded-xl border border-slate-700/70 bg-slate-900/60 p-4">

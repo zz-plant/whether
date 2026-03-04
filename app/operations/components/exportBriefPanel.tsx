@@ -12,6 +12,11 @@ import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import { formatNumberValue } from "../../../lib/formatters";
 import { buildAgentPayloadJson, buildAgentPrompt } from "../../../lib/agentHandoff";
 import { buildComplianceStamp } from "../../../lib/exportNotices";
+import {
+  buildBoardBrief,
+  buildConstraintHeadlines,
+  buildSlackBrief,
+} from "../../../lib/export/briefBuilders";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 import { useClipboardCopy, type ClipboardCopyState } from "../../components/useClipboardCopy";
 import { SectionPanelHeader } from "../../components/sectionPanelHeader";
@@ -20,53 +25,6 @@ const formatNumber = (value: number | null, unit: string) => {
   const formatted = formatNumberValue(value);
   return formatted === "—" ? formatted : `${formatted}${unit}`;
 };
-
-const buildBrief = (
-  assessment: RegimeAssessment,
-  treasury: TreasuryData,
-  sensors: SensorReading[],
-  macros: MacroSeriesReading[]
-) => {
-  const baseRate = sensors.find((sensor) => sensor.id === "BASE_RATE");
-  const curveSlope = sensors.find((sensor) => sensor.id === "CURVE_SLOPE");
-  const macroLines = macros.map(
-    (macro) => `• ${macro.label}: ${formatNumber(macro.value, macro.unit)} · refreshed ${macro.record_date}`
-  );
-  const decisionHighlights = buildDecisionHighlights(assessment);
-  const citations = buildCitationLines(treasury, macros);
-
-  return [
-    `Whether Report Brief — ${treasury.record_date}`,
-    `Capital posture: ${assessment.regime}`,
-    `Tightness: ${assessment.scores.tightness} | Risk appetite: ${assessment.scores.riskAppetite}`,
-    `Base rate: ${formatNumber(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
-    `Curve slope: ${formatNumber(curveSlope?.value ?? null, "%")}`,
-    "",
-    "Macro signals:",
-    ...macroLines,
-    "",
-    "Decision Shield highlights (top 3):",
-    ...decisionHighlights,
-    "",
-    "Constraints:",
-    ...assessment.constraints.map((item) => `• ${item}`),
-    "",
-    "Citations:",
-    ...citations,
-    "",
-    ...buildExportStamp(treasury, "Score-based posture confidence"),
-  ].join("\n");
-};
-
-
-
-const buildDecisionHighlights = (assessment: RegimeAssessment) =>
-  assessment.constraints.slice(0, 3).map((constraint) => `• ${constraint}`);
-
-const buildCitationLines = (treasury: TreasuryData, macros: MacroSeriesReading[]) => [
-  `Treasury source: ${treasury.source} (${treasury.record_date})`,
-  ...macros.map((macro) => `${macro.label}: ${macro.sourceUrl} (${macro.record_date})`),
-];
 
 const buildExportStamp = (
   treasury: TreasuryData,
@@ -77,6 +35,21 @@ const buildExportStamp = (
     timestamp: treasury.record_date,
     confidence,
   });
+
+const getRegimeLabel = (regime: RegimeAssessment["regime"]) => {
+  switch (regime) {
+    case "SCARCITY":
+      return "Scarcity";
+    case "DEFENSIVE":
+      return "Safety Mode";
+    case "VOLATILE":
+      return "Stability Mode";
+    case "EXPANSION":
+      return "Growth Mode";
+    default:
+      return regime;
+  }
+};
 
 const buildJiraMarkdownBrief = (
   assessment: RegimeAssessment,
@@ -192,39 +165,6 @@ const buildSlideBullets = (
   ].join("\n");
 };
 
-const getRegimeLabel = (regime: RegimeAssessment["regime"]) => {
-  switch (regime) {
-    case "SCARCITY":
-      return "Scarcity";
-    case "DEFENSIVE":
-      return "Safety Mode";
-    case "VOLATILE":
-      return "Stability Mode";
-    case "EXPANSION":
-      return "Growth Mode";
-    default:
-      return regime;
-  }
-};
-
-const buildConstraintHeadlines = (assessment: RegimeAssessment, treasury: TreasuryData) => {
-  const regimeLabel = getRegimeLabel(assessment.regime);
-  const headline = `${regimeLabel}: capital tightness ${assessment.scores.tightness}/100 with bravery ${assessment.scores.riskAppetite}/100.`;
-  const constraints = assessment.constraints.map((item) => `• ${item}`);
-
-  return [
-    `Whether Report Headlines — ${treasury.record_date}`,
-    headline,
-    "",
-    "Execution constraints:",
-    ...constraints,
-    "",
-    `Source: ${treasury.source}`,
-    "",
-    ...buildExportStamp(treasury, "Score-based posture confidence"),
-  ].join("\n");
-};
-
 export const ExportBriefPanel = ({
   assessment,
   treasury,
@@ -271,7 +211,7 @@ export const ExportBriefPanel = ({
   }, [add, copiedTarget, errorReason, status]);
 
   const briefing = useMemo(
-    () => buildBrief(assessment, treasury, sensors, macroSeries),
+    () => buildSlackBrief(assessment, treasury, sensors, macroSeries),
     [assessment, treasury, sensors, macroSeries]
   );
   const jiraMarkdownBrief = useMemo(
@@ -291,8 +231,8 @@ export const ExportBriefPanel = ({
     [assessment, treasury, macroSeries]
   );
   const boardBrief = useMemo(
-    () => [briefing, "", "---", "", slideBullets].join("\n"),
-    [briefing, slideBullets],
+    () => buildBoardBrief(assessment, treasury, sensors, macroSeries),
+    [assessment, treasury, sensors, macroSeries],
   );
 
   const constraintHeadlines = useMemo(

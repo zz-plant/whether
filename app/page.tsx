@@ -24,6 +24,10 @@ import { WeeklyDecisionCard } from "./components/weeklyDecisionCard";
 import { RevealOnView } from "./components/revealOnView";
 import { operatingCallsByRegime } from "../lib/report/operatingCalls";
 import { DataProvenanceStrip } from "./components/dataProvenanceStrip";
+import { deriveDecisionKnobs } from "../lib/report/decisionKnobs";
+import { ActionStrip } from "./components/actionStrip";
+import { buildSlackBrief } from "../lib/export/briefBuilders";
+import { CopySlackBriefButton } from "./components/copySlackBriefButton";
 
 const WeeklyActionSummaryPanel = dynamic(
   () =>
@@ -57,6 +61,7 @@ export const revalidate = 900;
 export const runtime = "edge";
 
 const homeSectionSequence = [
+  { href: "#action-strip", label: "Actions" },
   { href: "#weekly-action-summary", label: "Weekly actions" },
   { href: "#executive-snapshot", label: "Evidence" },
 ] as const;
@@ -264,6 +269,11 @@ export default async function HomePage({
     historicalSelection,
     recordDateLabel,
     regimeAlert,
+    reportDynamics,
+    sensors,
+    macroSeries,
+    startItems,
+    fenceItems,
     statusLabel,
     stopItems,
     treasury,
@@ -327,6 +337,8 @@ export default async function HomePage({
     `Long-cycle bets: ${longCycleBetStance}`,
   ];
   const guardrail = stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
+  const decisionKnobs = deriveDecisionKnobs(assessment.regime, severityDelta);
+  const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries);
   return (
     <ReportShell
       regime={assessment.regime}
@@ -343,8 +355,8 @@ export default async function HomePage({
       currentPath="/"
       pageSummary="Verdict and immediate decision call for this planning cycle."
       primaryCta={{
-        href: "/operations#ops-export-briefs",
-        label: "Export board brief",
+        href: "#weekly-posture-brief-title",
+        label: "Copy Slack brief",
       }}
       secondaryCta={{
         href: "#weekly-action-summary",
@@ -383,6 +395,15 @@ export default async function HomePage({
         dangerousCategory={dangerousCategory}
         recordDateLabel={recordDateLabel}
         fetchedAtLabel={fetchedAtLabel}
+        reportDynamics={reportDynamics}
+        decisionKnobs={decisionKnobs}
+        actions={<CopySlackBriefButton brief={slackBrief} />}
+      />
+
+      <ActionStrip
+        doItems={startItems.slice(0, 3)}
+        dontItems={stopItems.slice(0, 3)}
+        fenceItems={fenceItems.slice(0, 2)}
       />
 
       <DataProvenanceStrip provenance={treasuryProvenance} variant="compact" />
