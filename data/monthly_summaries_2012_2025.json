@@ -12541,5 +12541,92 @@
       },
       "copy": "Monthly action summary — Jan 30, 2026\nGrowth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline. Confidence: high (standard signal).\n\nExecution constraints:\n• Prioritize speed and distribution over polish.\n• Accept controlled waste to win market share.\n• Invest ahead of demand where signals are strong.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 1, 2026, 11:24 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 1, 2026, 11:24 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
     }
+  },
+  {
+    "year": 2026,
+    "month": 2,
+    "asOf": "2026-02-28",
+    "record_date": "2026-02-27",
+    "summary": {
+      "title": "Monthly action summary — Feb 27, 2026",
+      "summary": "Growth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline. Confidence: high (standard signal).",
+      "regime": "EXPANSION",
+      "regimeLabel": "Growth Mode",
+      "guidance": "scale proven bets, invest in durable growth channels, and keep payback discipline",
+      "confidence": "HIGH",
+      "transitionWatch": false,
+      "intensity": "STANDARD",
+      "constraints": [
+        "Prioritize speed and distribution over polish.",
+        "Accept controlled waste to win market share.",
+        "Invest ahead of demand where signals are strong."
+      ],
+      "recordDateLabel": "Feb 27, 2026",
+      "provenance": {
+        "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
+        "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
+        "timestampLabel": "Mar 1, 2026, 11:24 PM",
+        "ageLabel": "0h.",
+        "statusLabel": "Historical (simulated)"
+      },
+      "inputs": [
+        {
+          "id": "base-rate",
+          "label": "Policy base rate (1M)",
+          "value": 3.72,
+          "unit": "%",
+          "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO",
+          "recordDate": "2026-02-27",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
+          "notes": "Used as the cost-of-money anchor for tightness scoring."
+        },
+        {
+          "id": "two-year",
+          "label": "US Treasury 2Y",
+          "value": 3.52,
+          "unit": "%",
+          "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/DGS2",
+          "recordDate": "2026-02-27",
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
+        },
+        {
+          "id": "ten-year",
+          "label": "US Treasury 10Y",
+          "value": 4.26,
+          "unit": "%",
+          "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
+          "recordDate": "2026-02-27",
+          "fetchedAt": "2026-03-01T23:24:30.177Z"
+        },
+        {
+          "id": "curve-slope",
+          "label": "Yield curve slope (10Y - 2Y)",
+          "value": 0.7399999999999998,
+          "unit": "%",
+          "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
+          "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
+          "recordDate": "2026-02-27",
+          "fetchedAt": "2026-03-01T23:24:30.177Z",
+          "derivedFrom": "US Treasury 10Y and 2Y yields",
+          "notes": "Derived metric used to score risk appetite."
+        }
+      ],
+      "structured": {
+        "executionConstraints": [
+          "Prioritize speed and distribution over polish.",
+          "Accept controlled waste to win market share.",
+          "Invest ahead of demand where signals are strong."
+        ],
+        "provenance": {
+          "source": "US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)",
+          "timestamp": "Mar 1, 2026, 11:24 PM",
+          "dataAge": "0h."
+        }
+      },
+      "copy": "Monthly action summary — Feb 27, 2026\nGrowth Mode posture: Capital is cheap and risk appetite is healthy. Move quickly to capture share. Priority: scale proven bets, invest in durable growth channels, and keep payback discipline. Confidence: high (standard signal).\n\nExecution constraints:\n• Prioritize speed and distribution over polish.\n• Accept controlled waste to win market share.\n• Invest ahead of demand where signals are strong.\n\nProvenance:\nSource: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\nTimestamp: Mar 1, 2026, 11:24 PM\nData age: 0h.\n\nCompliance stamp:\n- Internal use only\n- Informational output only; not investment, legal, tax, accounting, or employment advice.\n- Source: US Treasury Daily Treasury Yield Curve Rates (via FRED) (https://fred.stlouisfed.org/series/DGS10)\n- Timestamp: Mar 1, 2026, 11:24 PM\n- Confidence: Historical (simulated)\n- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting."
+    }
   }
 ]
