@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export { edgeRuntime as runtime } from "../lib/next-runtime";
+export const runtime = "edge";
 export const size = {
   width: 1200,
   height: 630,

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { serverStore } from "../../../lib/serverStore";
 import { buildWeeklyDigest } from "../../../lib/signalOps";
 
-export { edgeRuntime as runtime } from "../../../lib/next-runtime";
+export const runtime = "edge";
 
 export async function GET() {
   const digest = buildWeeklyDigest(serverStore.snapshot.regimeAlerts);

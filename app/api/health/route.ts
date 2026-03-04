@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { loadReportData } from "../../../lib/report/reportData";
 
-export { edgeRuntime as runtime } from "../../../lib/next-runtime";
+export const runtime = "edge";
 export const revalidate = 0;
 export const dynamic = "force-dynamic";
 

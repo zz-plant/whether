@@ -3,7 +3,7 @@ import Link from "next/link";
 import { buildPageMetadata } from "../../../lib/seo";
 import { failureModeDefinitions } from "../../../lib/informationArchitecture";
 
-export { edgeRuntime as runtime } from "../../../lib/next-runtime";
+export const runtime = "edge";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Failure Modes library",

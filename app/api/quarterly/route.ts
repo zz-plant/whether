@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { loadReportData } from "../../../lib/report/reportData";
 import { buildQuarterlySummary, getQuarterLabel } from "../../../lib/summary/quarterlySummary";
 
-export { edgeRuntime as runtime } from "../../../lib/next-runtime";
+export const runtime = "edge";
 export const revalidate = 3600;
 
 export async function GET() {

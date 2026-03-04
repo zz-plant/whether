@@ -6,7 +6,7 @@ import {
   type SignalAlertPayload,
 } from "../../../lib/signalOps";
 
-export { edgeRuntime as runtime } from "../../../lib/next-runtime";
+export const runtime = "edge";
 
 export async function GET() {
   return NextResponse.json({ alerts: serverStore.snapshot.regimeAlerts });

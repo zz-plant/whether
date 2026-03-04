@@ -21,7 +21,7 @@ import { OperationsWorkstreamNav } from "./components/operationsWorkstreamNav";
 import { OperationsWorkflowProgress } from "./components/operationsWorkflowProgress";
 import { ExportBriefPanel } from "./components/exportBriefPanel";
 
-export { edgeRuntime as runtime } from "../../lib/next-runtime";
+export const runtime = "edge";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Whether Report — Action playbook",

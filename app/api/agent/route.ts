@@ -6,7 +6,7 @@ import {
 } from "../../../lib/agentInterface";
 import { agentApiCorsHeaders } from "../../../lib/agentApiCors";
 
-export { edgeRuntime as runtime } from "../../../lib/next-runtime";
+export const runtime = "edge";
 export const revalidate = 0;
 export const dynamic = "force-dynamic";
 
