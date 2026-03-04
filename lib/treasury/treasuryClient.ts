@@ -8,6 +8,8 @@ import { fetchWithTimeout } from "../fetchWithTimeout";
 
 const PRIMARY_FETCH_TIMEOUT_MS = 12_000;
 const RETRY_FETCH_TIMEOUT_MS = 20_000;
+const FISCAL_DATA_ENDPOINT =
+  "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v2/accounting/od/daily_treasury_yield_curve?sort=-record_date&page%5Bsize%5D=5";
 
 export const TREASURY_ENDPOINTS = {
   oneMonth: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS1MO",
@@ -53,6 +55,58 @@ const parseFredCsv = (csv: string) => {
   }
 
   return values;
+};
+
+const parseFiscalDataNumber = (value: unknown): number | null => {
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : null;
+  }
+
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const trimmed = value.trim();
+  if (!trimmed || trimmed === ".") {
+    return null;
+  }
+
+  const parsed = Number(trimmed);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const fetchTreasuryFromFiscalData = async (fetcher: typeof fetch, fetchedAt: string) => {
+  const response = await fetchWithTimeout(fetcher, FISCAL_DATA_ENDPOINT, undefined, PRIMARY_FETCH_TIMEOUT_MS);
+  if (!response.ok) {
+    throw new Error(`FiscalData Treasury fetch error: ${response.status}`);
+  }
+
+  const payload = (await response.json()) as { data?: Array<Record<string, unknown>> };
+  const latest = payload.data?.find((row) => typeof row.record_date === "string");
+  if (!latest || typeof latest.record_date !== "string") {
+    throw new Error("FiscalData Treasury series returned no data or invalid payload.");
+  }
+
+  const oneMonth = parseFiscalDataNumber(latest.bc_1month);
+  const threeMonth = parseFiscalDataNumber(latest.bc_3month);
+  const twoYear = parseFiscalDataNumber(latest.bc_2year);
+  const tenYear = parseFiscalDataNumber(latest.bc_10year);
+  if ([oneMonth, threeMonth, twoYear, tenYear].some((value) => value === null)) {
+    throw new Error("FiscalData Treasury series missing one or more required tenors.");
+  }
+
+  return {
+    source: "https://api.fiscaldata.treasury.gov",
+    record_date: latest.record_date,
+    fetched_at: fetchedAt,
+    isLive: true,
+    yields: {
+      oneMonth,
+      threeMonth,
+      twoYear,
+      tenYear,
+    },
+  } satisfies TreasuryData;
 };
 
 const findLatestCommonDate = (seriesMaps: Map<string, number | null>[]) => {
@@ -201,6 +255,12 @@ export const fetchTreasuryData = async (
       },
     };
   } catch (error) {
+    try {
+      return await fetchTreasuryFromFiscalData(fetcher, fetched_at);
+    } catch {
+      // If FiscalData also fails, preserve the primary FRED failure reason for clearer diagnostics.
+    }
+
     if (options.snapshotFallback) {
       const message = formatFetchError(error);
       return buildFallbackSnapshot(options.snapshotFallback, message);
