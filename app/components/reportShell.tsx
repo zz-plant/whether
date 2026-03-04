@@ -204,7 +204,7 @@ export const ReportShell = ({
                 <a
                   href={sourceHref}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="ml-2 text-sky-200 underline decoration-slate-500/80 underline-offset-2 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
                 >
                   View source
@@ -318,6 +318,11 @@ export const ReportShell = ({
         tabIndex={-1}
         className="weather-shell relative min-h-screen overflow-x-clip text-slate-100"
       >
+        {hideHeroChrome ? (
+          <span id="report-primary-actions" className="sr-only">
+            Report primary actions
+          </span>
+        ) : null}
         <ClimateBackdrop regime={regime || "NEUTRAL"} />
         {structuredData ? (
           <script
@@ -638,6 +643,8 @@ export const ReportShell = ({
                   );
                 })}
               </div>
+
+              <OperatorCommandCenter actions={commandActions} />
 
               <footer className="mt-12 border-t border-slate-800/70 pt-6 text-xs font-semibold tracking-[0.18em] text-slate-300">
                 <p>{INFORMATIONAL_NOTICE}</p>

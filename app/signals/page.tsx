@@ -154,6 +154,7 @@ export default async function SignalsPage({
   });
   const showAdvanced = resolvedSearchParams?.advanced === "1";
   const showFullDiagnostics = resolvedSearchParams?.diagnostics === "all";
+  const thresholdSectionHref = showAdvanced ? "#thresholds" : "#advanced-controls";
   const timeMachineHref = showAdvanced ? "#time-machine" : "#advanced-controls";
   const regimeTimelineHref = showAdvanced ? "#regime-timeline" : "#advanced-controls";
   const focusTabs = ["all", "growth", "inflation", "labor", "financial"] as const;
@@ -167,7 +168,7 @@ export default async function SignalsPage({
     { href: "#decision-summary", label: "Decision summary" },
     { href: "#evidence-priorities", label: "Evidence priorities" },
     { href: "#current-scores", label: "Current scores" },
-    { href: "#thresholds", label: "Thresholds" },
+    { href: thresholdSectionHref, label: "Thresholds" },
   ];
   const buildAdvancedHref = (advanced: boolean) => {
     const params = new URLSearchParams();
@@ -307,7 +308,7 @@ export default async function SignalsPage({
       currentPath="/signals"
       pageSummary="Evidence and raw diagnostics only: drivers, thresholds, and timestamps behind posture."
       pageSummaryLink={{
-        href: "#thresholds",
+        href: thresholdSectionHref,
         label: "See thresholds",
       }}
       pageLinks={reportPageLinks}
@@ -387,7 +388,7 @@ export default async function SignalsPage({
                 Review raw evidence
               </a>
               <a
-                href="#thresholds"
+                href={thresholdSectionHref}
                 className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100"
               >
                 Inspect threshold logic

@@ -86,12 +86,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <a className="skip-link" href="#main-content">
+        <a className="skip-link" href="#site-content-start">
           Skip to content
         </a>
         <ToastProviderRoot>
           <GlobalHeader />
-          {children}
+          <div id="site-content-start" tabIndex={-1}>
+            {children}
+          </div>
         </ToastProviderRoot>
       </body>
     </html>

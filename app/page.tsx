@@ -380,29 +380,29 @@ export default async function HomePage({
         fenceItems={fenceItems.slice(0, 2)}
       />
 
-      <RevealOnView>
-        <section
-          id="weekly-action-summary"
-          aria-label="Weekly action summary"
-          className="space-y-8"
-        >
+      <section
+        id="weekly-action-summary"
+        aria-label="Weekly action summary"
+        className="space-y-8"
+      >
+        <RevealOnView>
           <WeeklyActionSummaryPanel
             assessment={assessment}
             provenance={treasuryProvenance}
             recordDateLabel={recordDateLabel}
           />
-        </section>
-      </RevealOnView>
+        </RevealOnView>
+      </section>
 
-      <RevealOnView>
-        <section id="executive-snapshot" aria-label="Leadership summary" className="space-y-8">
+      <section id="executive-snapshot" aria-label="Leadership summary" className="space-y-8">
+        <RevealOnView>
           <ExecutiveSnapshotPanel
             treasury={treasury}
             assessment={assessment}
             provenance={treasuryProvenance}
           />
-        </section>
-      </RevealOnView>
+        </RevealOnView>
+      </section>
 
     </ReportShell>
   );
