@@ -1,329 +1,256 @@
-import type { MacroSeriesReading, SensorReading, TreasuryData } from "../../../lib/types";
-import type { RegimeAssessment, RegimeKey } from "../../../lib/regimeEngine";
-import type { TimeMachineRegimeEntry } from "../../../lib/timeMachine/timeMachineCache";
-import {
-  RISK_APPETITE_REGIME_THRESHOLD,
-  TIGHTNESS_BASE_RATE_POINTS,
-  TIGHTNESS_INVERSION_POINTS,
-} from "../../../lib/regimeEngine";
-import { sensorTimeWindows } from "../../../lib/sensors";
+"use client";
+
+import { useMemo, useState } from "react";
+import type { TreasuryData } from "../../../lib/types";
 import { ChevronDownIcon } from "../../components/uiIcons";
 
-type SignalVisualizationSuiteProps = {
-  assessment: RegimeAssessment;
-  treasury: TreasuryData;
-  macroSeries: MacroSeriesReading[];
-  sensors: SensorReading[];
-  regimeSeries: TimeMachineRegimeEntry[];
+type Cadence = "weekly" | "monthly" | "yearly";
+
+type YieldCurvePoint = {
+  year: number;
+  month: number;
+  recordDate: string;
+  oneMonth: number | null;
+  threeMonth: number | null;
+  twoYear: number | null;
+  tenYear: number | null;
+  spread10Y2Y: number | null;
+  spread2Y3M: number | null;
+  curveSignal: number | null;
 };
 
-const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+type SignalVisualizationSuiteProps = {
+  treasury: TreasuryData;
+  yieldCurveSeries: YieldCurvePoint[];
+};
 
-const buildSparklinePath = (values: Array<number | null>, width: number, height: number) => {
-  const points = values
-    .map((value, index) => ({ value, index }))
-    .filter((point): point is { value: number; index: number } => typeof point.value === "number");
+type ChartPoint = {
+  label: string;
+  oneMonth: number | null;
+  threeMonth: number | null;
+  twoYear: number | null;
+  tenYear: number | null;
+  spread10Y2Y: number | null;
+  spread2Y3M: number | null;
+  curveSignal: number | null;
+};
 
-  if (points.length < 2) {
-    return "";
+const formatPercent = (value: number | null) => (typeof value === "number" ? `${value.toFixed(2)}%` : "n/a");
+const formatBp = (value: number | null) => (typeof value === "number" ? `${value >= 0 ? "+" : ""}${value.toFixed(1)} bp` : "n/a");
+const toBp = (value: number | null) => (typeof value === "number" ? value * 100 : null);
+
+const getLabel = (recordDate: string, cadence: Cadence) => {
+  const date = new Date(recordDate);
+  if (Number.isNaN(date.valueOf())) return recordDate;
+  if (cadence === "yearly") return `${date.getUTCFullYear()}`;
+
+  const month = date.toLocaleString("en-US", { month: "short", timeZone: "UTC" });
+  if (cadence === "monthly") return `${month} ${date.getUTCFullYear()}`;
+  return `${month} ${date.getUTCDate()}, ${date.getUTCFullYear()}`;
+};
+
+const mean = (values: Array<number | null>) => {
+  const numeric = values.filter((value): value is number => typeof value === "number");
+  if (!numeric.length) return null;
+  return numeric.reduce((sum, value) => sum + value, 0) / numeric.length;
+};
+
+const byCadence = (series: YieldCurvePoint[], cadence: Cadence): ChartPoint[] => {
+  if (cadence === "weekly") {
+    return series.map((point) => ({
+      label: getLabel(point.recordDate, cadence),
+      oneMonth: point.oneMonth,
+      threeMonth: point.threeMonth,
+      twoYear: point.twoYear,
+      tenYear: point.tenYear,
+      spread10Y2Y: point.spread10Y2Y,
+      spread2Y3M: point.spread2Y3M,
+      curveSignal: point.curveSignal,
+    }));
   }
 
-  const min = Math.min(...points.map((point) => point.value));
-  const max = Math.max(...points.map((point) => point.value));
+  const grouped = new Map<string, YieldCurvePoint[]>();
+  series.forEach((point) => {
+    const date = new Date(point.recordDate);
+    if (Number.isNaN(date.valueOf())) return;
+    const key = cadence === "yearly" ? `${date.getUTCFullYear()}` : `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}`;
+    grouped.set(key, [...(grouped.get(key) ?? []), point]);
+  });
+
+  return Array.from(grouped.entries()).map(([key, points]) => ({
+    label: cadence === "yearly" ? key : getLabel(points[0].recordDate, cadence),
+    oneMonth: mean(points.map((point) => point.oneMonth)),
+    threeMonth: mean(points.map((point) => point.threeMonth)),
+    twoYear: mean(points.map((point) => point.twoYear)),
+    tenYear: mean(points.map((point) => point.tenYear)),
+    spread10Y2Y: mean(points.map((point) => point.spread10Y2Y)),
+    spread2Y3M: mean(points.map((point) => point.spread2Y3M)),
+    curveSignal: mean(points.map((point) => point.curveSignal)),
+  }));
+};
+
+const linePath = (values: Array<number | null>, width: number, height: number, min: number, max: number) => {
+  const valid = values
+    .map((value, index) => ({ value, index }))
+    .filter((point): point is { value: number; index: number } => typeof point.value === "number");
+  if (valid.length < 2) return "";
+
   const range = max - min || 1;
   const step = width / Math.max(values.length - 1, 1);
-
-  return points
-    .map((point, pointIndex) => {
+  return valid
+    .map((point, i) => {
       const x = point.index * step;
       const y = height - ((point.value - min) / range) * height;
-      return `${pointIndex === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`;
+      return `${i === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`;
     })
     .join(" ");
 };
 
-const formatNumber = (value: number | null, decimals = 2) => {
-  if (value === null) {
-    return "N/A";
-  }
-  return value.toFixed(decimals);
+const ribbonTone = (value: number | null) => {
+  if (value === null) return "bg-slate-700/70";
+  if (value < -0.25) return "bg-rose-500/75";
+  if (value <= 0.25) return "bg-amber-500/75";
+  return "bg-emerald-500/75";
 };
 
-const getSensorDeltaTone = (sensorId: SensorReading["id"], value: number | null) => {
-  if (value === null) {
-    return "bg-slate-800/80 text-slate-400";
-  }
+const PanelTitle = ({ title, subtitle }: { title: string; subtitle: string }) => (
+  <header className="space-y-1">
+    <p className="text-xs font-semibold tracking-[0.14em] text-slate-300">{title}</p>
+    <p className="text-[11px] text-slate-500">{subtitle}</p>
+  </header>
+);
 
-  if (value === 0) {
-    return "bg-slate-700/70 text-slate-100";
-  }
+const FlatPanel = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
+  <article className={`space-y-2 border border-slate-800/70 bg-slate-950/40 p-3 ${className}`}>{children}</article>
+);
 
-  const isAdverse = sensorId === "CURVE_SLOPE" ? value < 0 : value > 0;
-  return isAdverse ? "bg-rose-500/25 text-rose-200" : "bg-emerald-500/25 text-emerald-200";
-};
+export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalVisualizationSuiteProps) => {
+  const [cadence, setCadence] = useState<Cadence>("monthly");
+  const points = useMemo(() => byCadence(yieldCurveSeries, cadence), [yieldCurveSeries, cadence]);
+  const latest = points.at(-1) ?? null;
 
-const regimeTone: Record<RegimeKey, string> = {
-  SCARCITY: "bg-rose-400/80",
-  DEFENSIVE: "bg-amber-400/80",
-  VOLATILE: "bg-indigo-400/80",
-  EXPANSION: "bg-emerald-400/80",
-};
+  const rateValues = points.flatMap((point) => [point.oneMonth, point.threeMonth, point.twoYear, point.tenYear]);
+  const numericRates = rateValues.filter((value): value is number => typeof value === "number");
+  const rateMin = numericRates.length ? Math.min(...numericRates) - 0.2 : 0;
+  const rateMax = numericRates.length ? Math.max(...numericRates) + 0.2 : 1;
 
-const regimeLabel: Record<RegimeKey, string> = {
-  SCARCITY: "Scarcity",
-  DEFENSIVE: "Defensive",
-  VOLATILE: "Volatile",
-  EXPANSION: "Expansion",
-};
+  const spreadValues = points.flatMap((point) => [point.spread10Y2Y, point.spread2Y3M]);
+  const numericSpreads = spreadValues.filter((value): value is number => typeof value === "number");
+  const spreadMin = numericSpreads.length ? Math.min(...numericSpreads, 0) - 0.1 : -0.5;
+  const spreadMax = numericSpreads.length ? Math.max(...numericSpreads, 0) + 0.1 : 0.5;
 
-const slopeTone = (value: number | null) => {
-  if (value === null) {
-    return "bg-slate-500";
-  }
-  if (value < 0) {
-    return "bg-rose-400";
-  }
-  if (value < 0.5) {
-    return "bg-amber-400";
-  }
-  return "bg-emerald-400";
-};
+  const monthlyScatter = byCadence(yieldCurveSeries, "monthly")
+    .map((point) => ({ x: point.twoYear, y: point.spread10Y2Y, key: point.label }))
+    .filter((point): point is { x: number; y: number; key: string } => typeof point.x === "number" && typeof point.y === "number");
 
-export const SignalVisualizationSuite = ({
-  assessment,
-  treasury,
-  macroSeries,
-  sensors,
-  regimeSeries,
-}: SignalVisualizationSuiteProps) => {
-  const quadrantX = clamp(assessment.scores.riskAppetite, 0, 100);
-  const quadrantY = clamp(assessment.scores.tightness, 0, 100);
-  const riskThreshold = clamp(assessment.thresholds.riskAppetiteRegime, 0, 100);
-  const tightThreshold = clamp(assessment.thresholds.tightnessRegime, 0, 100);
-
-  const baseRatePoints = clamp(
-    Math.round((assessment.scores.baseRate - assessment.thresholds.baseRateTightness) * 180),
-    0,
-    TIGHTNESS_BASE_RATE_POINTS,
-  );
-  const inversionPoints =
-    assessment.scores.curveSlope !== null && assessment.scores.curveSlope < 0
-      ? clamp(Math.round(Math.abs(assessment.scores.curveSlope) * 50), 0, TIGHTNESS_INVERSION_POINTS)
-      : 0;
-  const decompositionTotalPoints = baseRatePoints + inversionPoints;
-  const decompositionBaseRateWidth = decompositionTotalPoints ? (baseRatePoints / decompositionTotalPoints) * 100 : 0;
-  const decompositionInversionWidth = decompositionTotalPoints
-    ? (inversionPoints / decompositionTotalPoints) * 100
-    : 0;
-
-  const yieldPoints = [
-    { label: "1M", value: treasury.yields.oneMonth },
-    { label: "3M", value: treasury.yields.threeMonth ?? null },
-    { label: "2Y", value: treasury.yields.twoYear },
-    { label: "10Y", value: treasury.yields.tenYear },
-  ];
-  const numericYieldValues = yieldPoints
-    .map((point) => point.value)
-    .filter((value): value is number => typeof value === "number");
-  const yieldMin = numericYieldValues.length ? Math.min(...numericYieldValues) : 0;
-  const yieldMax = numericYieldValues.length ? Math.max(...numericYieldValues) : 1;
-  const yieldRange = yieldMax - yieldMin || 1;
-
-  const timelineSeries = regimeSeries.slice(-12);
+  const topShocks = yieldCurveSeries
+    .map((point, index) => {
+      if (index === 0) return null;
+      const previous = yieldCurveSeries[index - 1];
+      const delta2Y = typeof point.twoYear === "number" && typeof previous.twoYear === "number" ? (point.twoYear - previous.twoYear) * 100 : null;
+      const delta10Y = typeof point.tenYear === "number" && typeof previous.tenYear === "number" ? (point.tenYear - previous.tenYear) * 100 : null;
+      return {
+        label: getLabel(point.recordDate, "weekly"),
+        delta2Y,
+        delta10Y,
+        rank: Math.max(Math.abs(delta2Y ?? 0), Math.abs(delta10Y ?? 0)),
+      };
+    })
+    .filter((point): point is { label: string; delta2Y: number | null; delta10Y: number | null; rank: number } => Boolean(point))
+    .sort((a, b) => b.rank - a.rank)
+    .slice(0, 10);
 
   return (
-    <section id="visual-diagnostics" className="weather-panel space-y-5 px-6 py-5" aria-labelledby="visual-diagnostics-title">
+    <section id="visual-diagnostics" className="weather-panel space-y-4 px-6 py-5" aria-labelledby="visual-diagnostics-title">
       <header className="space-y-2">
         <p className="text-xs font-semibold tracking-[0.22em] text-slate-300">Visual diagnostics</p>
-        <h2 id="visual-diagnostics-title" className="text-xl font-semibold text-slate-100 sm:text-2xl">
-          Six visualizations for rapid signal interpretation.
-        </h2>
+        <h2 id="visual-diagnostics-title" className="text-xl font-semibold text-slate-100 sm:text-2xl">Yield-curve terminal</h2>
+        <p className="text-sm text-slate-300">Cleaner one-screen view: 5 panels, minimal framing.</p>
       </header>
-      <details className="weather-surface group p-4">
+
+      <details className="group rounded-xl border border-slate-800/80 bg-slate-950/30 p-4" open>
         <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-2 text-xs font-semibold tracking-[0.14em] text-slate-100">
-          <span>Open visual diagnostics</span>
+          <span>Open one-screen terminal</span>
           <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-400 transition-transform group-open:rotate-180"><ChevronDownIcon className="h-3.5 w-3.5" /></span>
         </summary>
-        <p className="mt-2 text-xs text-slate-300">
-          Use this section when you need chart-level context. Keep it closed for faster executive scans.
-        </p>
 
-      <div className="mt-4 grid gap-4 xl:grid-cols-2">
-        <article className="weather-surface p-4">
-          <p className="text-xs font-semibold tracking-[0.14em] text-slate-400">1) Regime quadrant</p>
-          <div className="mt-3 rounded-xl border border-slate-800/80 bg-slate-950/70 p-3">
-            <svg viewBox="0 0 100 100" className="h-56 w-full" role="img" aria-label="Regime quadrant by risk appetite and tightness">
-              <rect x="0" y="0" width="100" height="100" fill="rgb(2 6 23)" />
-              <line x1={riskThreshold} y1="0" x2={riskThreshold} y2="100" stroke="rgb(148 163 184 / 0.6)" strokeDasharray="2 2" />
-              <line x1="0" y1={100 - tightThreshold} x2="100" y2={100 - tightThreshold} stroke="rgb(148 163 184 / 0.6)" strokeDasharray="2 2" />
-              <circle cx={quadrantX} cy={100 - quadrantY} r="3" fill="rgb(125 211 252)" />
-              <text x="2" y="8" fontSize="5" fill="rgb(226 232 240)">SCARCITY</text>
-              <text x="62" y="8" fontSize="5" fill="rgb(226 232 240)">DEFENSIVE</text>
-              <text x="2" y="98" fontSize="5" fill="rgb(226 232 240)">VOLATILE</text>
-              <text x="64" y="98" fontSize="5" fill="rgb(226 232 240)">EXPANSION</text>
-            </svg>
-          </div>
-          <p className="mt-2 text-xs text-slate-300">
-            Current point: Tightness {assessment.scores.tightness}/100 · Risk appetite {assessment.scores.riskAppetite}/100.
-          </p>
-        </article>
+        <div className="mt-3 border-b border-slate-800/80 pb-3 text-xs text-slate-300">
+          YCURVE | Last: {treasury.record_date} | Live/Cache: {treasury.isLive ? "Live" : "Cache"}
+        </div>
 
-        <article className="weather-surface p-4">
-          <p className="text-xs font-semibold tracking-[0.14em] text-slate-400">2) Yield curve + slope indicator</p>
-          <div className="mt-3 rounded-xl border border-slate-800/80 bg-slate-950/70 p-3">
-            <div className="h-36 w-full">
-              <svg viewBox="0 0 100 40" className="h-full w-full" role="img" aria-label="Yield curve snapshot">
-                {yieldPoints.map((point, index) => {
-                  if (point.value === null) {
-                    return null;
-                  }
-                  const x = (index / Math.max(yieldPoints.length - 1, 1)) * 100;
-                  const y = 35 - ((point.value - yieldMin) / yieldRange) * 30;
-                  const next = yieldPoints[index + 1];
-                  const nextValue = next?.value ?? null;
-                  const nextX = ((index + 1) / Math.max(yieldPoints.length - 1, 1)) * 100;
-                  const nextY =
-                    typeof nextValue === "number" ? 35 - ((nextValue - yieldMin) / yieldRange) * 30 : null;
-                  return (
-                    <g key={point.label}>
-                      {nextY !== null ? <line x1={x} y1={y} x2={nextX} y2={nextY} stroke="rgb(56 189 248)" strokeWidth="1.5" /> : null}
-                      <circle cx={x} cy={y} r="1.7" fill="rgb(125 211 252)" />
-                      <text x={x} y="39" textAnchor="middle" fontSize="3.8" fill="rgb(148 163 184)">{point.label}</text>
-                    </g>
-                  );
-                })}
-              </svg>
+        <div className="mt-3 grid gap-2 lg:grid-cols-12">
+          <FlatPanel className="lg:col-span-12">
+            <PanelTitle title="1) Curve signal ribbon" subtitle="Green = steep/normal, Amber = flat, Red = inversion." />
+            <div className="flex min-h-[44px] overflow-hidden rounded-sm bg-slate-900/60">
+              {points.length ? points.map((point) => <div key={point.label} className={`flex-1 ${ribbonTone(point.curveSignal)}`} title={`${point.label}: ${formatPercent(point.curveSignal)}`} />) : <div className="flex-1 bg-slate-700/70" />}
             </div>
-            <div className="mt-3 flex items-center gap-2">
-              <span className="text-xs text-slate-400">Curve slope (10Y−2Y):</span>
-              <span className="mono text-sm text-slate-100">{formatNumber(assessment.scores.curveSlope)}%</span>
-              <span className={`inline-flex h-2.5 w-2.5 rounded-full ${slopeTone(assessment.scores.curveSlope)}`} aria-hidden="true" />
-            </div>
-          </div>
-        </article>
+            <p className="mono text-xs text-slate-300">Latest curve signal: {formatPercent(latest?.curveSignal ?? null)}</p>
+          </FlatPanel>
 
-        <article className="weather-surface p-4">
-          <p className="text-xs font-semibold tracking-[0.14em] text-slate-400">3) Tightness decomposition</p>
-          <div className="mt-3 space-y-3 rounded-xl border border-slate-800/80 bg-slate-950/70 p-3">
-            <div className="h-4 w-full overflow-hidden rounded-full bg-slate-900">
-              <div className="flex h-full">
-                <div
-                  className="bg-indigo-400"
-                  style={{ width: `${decompositionBaseRateWidth}%` }}
-                  aria-label="Base rate contribution"
-                />
-                <div
-                  className="bg-rose-400"
-                  style={{ width: `${decompositionInversionWidth}%` }}
-                  aria-label="Inversion contribution"
-                />
-              </div>
-            </div>
-            <dl className="grid gap-2 text-xs text-slate-300 sm:grid-cols-3">
-              <div>
-                <dt className="text-slate-500">Base rate points</dt>
-                <dd className="mono text-slate-100">{baseRatePoints}/90</dd>
-              </div>
-              <div>
-                <dt className="text-slate-500">Inversion points</dt>
-                <dd className="mono text-slate-100">{inversionPoints}/25</dd>
-              </div>
-              <div>
-                <dt className="text-slate-500">Total tightness</dt>
-                <dd className="mono text-slate-100">{assessment.scores.tightness}/100</dd>
-              </div>
-            </dl>
-            <p className="text-[11px] text-slate-400">
-              Segment widths are normalized to active points so composition remains accurate at high tightness.
-            </p>
-          </div>
-        </article>
-
-        <article className="weather-surface p-4">
-          <p className="text-xs font-semibold tracking-[0.14em] text-slate-400">4) Macro signal sparklines</p>
-          <div className="mt-3 grid gap-3 sm:grid-cols-3">
-            {macroSeries.map((series) => {
-              const values = (series.history ?? []).map((point) => point.value);
-              const path = buildSparklinePath(values, 100, 28);
-              const latest = series.history?.at(-1)?.value ?? series.value;
-              return (
-                <div key={series.id} className="rounded-xl border border-slate-800/80 bg-slate-950/70 p-3">
-                  <p className="text-[11px] font-semibold tracking-[0.08em] text-slate-300">{series.label}</p>
-                  <p className="mono mt-1 text-sm text-slate-100">{formatNumber(latest)}{series.unit}</p>
-                  <svg viewBox="0 0 100 28" className="mt-2 h-12 w-full" role="img" aria-label={`${series.label} trend`}>
-                    {path ? <path d={path} fill="none" stroke="rgb(56 189 248)" strokeWidth="1.8" /> : null}
-                  </svg>
-                </div>
-              );
-            })}
-          </div>
-        </article>
-      </div>
-
-      <div className="mt-4 grid gap-4 xl:grid-cols-2">
-        <article className="weather-surface p-4">
-          <p className="text-xs font-semibold tracking-[0.14em] text-slate-400">5) Sensor delta heatmap</p>
-          <div className="mt-3 overflow-x-auto rounded-xl border border-slate-800/80 bg-slate-950/70 p-3">
-            <table className="w-full border-collapse text-xs">
-              <thead>
-                <tr className="text-left text-slate-400">
-                  <th className="pb-2 pr-3">Sensor</th>
-                  {sensorTimeWindows.map((window) => (
-                    <th key={window.id} className="pb-2 pr-3">{window.label}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {sensors.map((sensor) => (
-                  <tr key={sensor.id} className="border-t border-slate-800/80">
-                    <th className="py-2 pr-3 text-left font-medium text-slate-200">{sensor.label}</th>
-                    {sensorTimeWindows.map((window) => {
-                      const value = sensor.timeWindows?.find((entry) => entry.window === window.id)?.change ?? null;
-                      const tone = getSensorDeltaTone(sensor.id, value);
-                      return (
-                        <td key={window.id} className="py-2 pr-3">
-                          <span className={`inline-flex min-h-[32px] min-w-[56px] items-center justify-center rounded-md px-2 ${tone}`}>
-                            {value === null ? "n/a" : `${value > 0 ? "+" : ""}${value.toFixed(2)}`}
-                          </span>
-                        </td>
-                      );
-                    })}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </article>
-
-        <article className="weather-surface p-4">
-          <p className="text-xs font-semibold tracking-[0.14em] text-slate-400">6) Time Machine regime timeline</p>
-          <div className="mt-3 rounded-xl border border-slate-800/80 bg-slate-950/70 p-3">
-            <div className="flex min-h-[44px] items-stretch overflow-hidden rounded-lg border border-slate-800/80">
-              {timelineSeries.length ? (
-                timelineSeries.map((entry) => (
-                  <div
-                    key={`${entry.year}-${entry.month}`}
-                    className={`group relative flex-1 ${regimeTone[entry.regime]}`}
-                    title={`${entry.month}/${entry.year}: ${regimeLabel[entry.regime]}`}
-                    aria-label={`${entry.month}/${entry.year}: ${regimeLabel[entry.regime]}`}
+          <FlatPanel className="lg:col-span-8 lg:row-span-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <PanelTitle title="2) Rate stack" subtitle="1M, 3M, 2Y, 10Y in one panel." />
+              <div className="inline-flex rounded-md bg-slate-900/70 p-1">
+                {(["weekly", "monthly", "yearly"] as Cadence[]).map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => setCadence(option)}
+                    className={`min-h-[44px] rounded px-3 text-xs font-semibold uppercase tracking-[0.12em] ${cadence === option ? "bg-sky-500/30 text-sky-100" : "text-slate-300"}`}
                   >
-                    <span className="sr-only">{entry.month}/{entry.year} {regimeLabel[entry.regime]}</span>
-                  </div>
+                    {option}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <svg viewBox="0 0 100 36" className="h-48 w-full" role="img" aria-label="1M, 3M, 2Y and 10Y rate stack">
+              <path d={linePath(points.map((point) => point.oneMonth), 100, 36, rateMin, rateMax)} fill="none" stroke="rgb(148 163 184)" strokeWidth="1.4" />
+              <path d={linePath(points.map((point) => point.threeMonth), 100, 36, rateMin, rateMax)} fill="none" stroke="rgb(125 211 252)" strokeWidth="1.4" />
+              <path d={linePath(points.map((point) => point.twoYear), 100, 36, rateMin, rateMax)} fill="none" stroke="rgb(45 212 191)" strokeWidth="1.4" />
+              <path d={linePath(points.map((point) => point.tenYear), 100, 36, rateMin, rateMax)} fill="none" stroke="rgb(165 180 252)" strokeWidth="1.4" />
+            </svg>
+            <p className="text-xs text-slate-300">1M {formatPercent(latest?.oneMonth ?? null)} · 3M {formatPercent(latest?.threeMonth ?? null)} · 2Y {formatPercent(latest?.twoYear ?? null)} · 10Y {formatPercent(latest?.tenYear ?? null)}</p>
+          </FlatPanel>
+
+          <FlatPanel className="lg:col-span-4">
+            <PanelTitle title="4) Steepness vs level" subtitle="X = 2Y level, Y = 10Y−2Y spread (monthly)." />
+            <svg viewBox="0 0 100 72" className="h-48 w-full" role="img" aria-label="Monthly steepness vs level scatter">
+              <rect x="0" y="0" width="100" height="72" fill="rgb(2 6 23)" />
+              <line x1="50" y1="0" x2="50" y2="72" stroke="rgb(100 116 139 / 0.6)" strokeDasharray="2 2" />
+              <line x1="0" y1="36" x2="100" y2="36" stroke="rgb(100 116 139 / 0.6)" strokeDasharray="2 2" />
+              {monthlyScatter.map((point) => {
+                const x = ((point.x - rateMin) / (rateMax - rateMin || 1)) * 100;
+                const y = 72 - ((point.y - spreadMin) / (spreadMax - spreadMin || 1)) * 72;
+                return <circle key={point.key} cx={x} cy={y} r="1.8" fill="rgb(56 189 248 / 0.75)" />;
+              })}
+            </svg>
+          </FlatPanel>
+
+          <FlatPanel className="lg:col-span-8">
+            <PanelTitle title="3) Inversion timeline" subtitle="Spreads vs zero-line; below zero means inversion." />
+            <svg viewBox="0 0 100 36" className="h-40 w-full" role="img" aria-label="10Y-2Y and 2Y-3M inversion timeline">
+              <line x1="0" y1={36 - ((0 - spreadMin) / (spreadMax - spreadMin || 1)) * 36} x2="100" y2={36 - ((0 - spreadMin) / (spreadMax - spreadMin || 1)) * 36} stroke="rgb(148 163 184 / 0.6)" strokeDasharray="2 2" />
+              <path d={linePath(points.map((point) => point.spread10Y2Y), 100, 36, spreadMin, spreadMax)} fill="none" stroke="rgb(74 222 128)" strokeWidth="1.4" />
+              <path d={linePath(points.map((point) => point.spread2Y3M), 100, 36, spreadMin, spreadMax)} fill="none" stroke="rgb(250 204 21)" strokeWidth="1.4" />
+            </svg>
+            <p className="text-xs text-slate-300">10Y−2Y {formatBp(toBp(latest?.spread10Y2Y ?? null))} · 2Y−3M {formatBp(toBp(latest?.spread2Y3M ?? null))}</p>
+          </FlatPanel>
+
+          <FlatPanel className="lg:col-span-4">
+            <PanelTitle title="5) Shock ladder" subtitle="Largest weekly moves in 2Y and 10Y." />
+            <ul className="space-y-1 text-xs text-slate-200">
+              {topShocks.length ? (
+                topShocks.map((shock) => (
+                  <li key={shock.label} className="px-1 py-0.5">
+                    <span className="mono text-slate-400">{shock.label}</span> · 2Y {formatBp(shock.delta2Y)} · 10Y {formatBp(shock.delta10Y)}
+                  </li>
                 ))
               ) : (
-                <div className="flex-1 bg-slate-800/80" />
+                <li className="text-slate-400">No historical deltas available.</li>
               )}
-            </div>
-            <p className="mt-2 text-xs text-slate-300">
-              Last {timelineSeries.length || 0} cached months with monthly regime color encoding.
-            </p>
-          </div>
-        </article>
-      </div>
-
-      <p className="mt-4 text-xs text-slate-300">
-        Risk threshold default: {RISK_APPETITE_REGIME_THRESHOLD}/100. Active threshold: {assessment.thresholds.riskAppetiteRegime}/100.
-      </p>
+            </ul>
+          </FlatPanel>
+        </div>
       </details>
     </section>
   );

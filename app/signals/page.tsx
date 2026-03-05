@@ -118,6 +118,7 @@ export default async function SignalsPage({
     macroSeries,
     recordDateLabel,
     regimeSeries,
+    yieldCurveSeries,
     selectedMonth,
     selectedYear,
     sensors,
@@ -588,11 +589,8 @@ export default async function SignalsPage({
           </ol>
         ) : (
           <SignalVisualizationSuite
-            assessment={assessment}
             treasury={treasury}
-            macroSeries={macroSeries}
-            sensors={sensors}
-            regimeSeries={regimeSeries}
+            yieldCurveSeries={yieldCurveSeries}
           />
         )}
       </section>

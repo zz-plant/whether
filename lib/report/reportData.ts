@@ -13,6 +13,7 @@ import {
   getTimeMachineMonthsByYear,
   getPreviousTimeMachineSnapshot,
   getTimeMachineRegimeSeries,
+  getTimeMachineYieldCurveSeries,
   findTimeMachineSnapshot,
   DEFAULT_REGIME_SERIES_MONTHS,
 } from "../timeMachine/timeMachineCache";
@@ -206,6 +207,7 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
   const selectedYear = requestedSelection?.year ?? defaultYear;
   const thresholds = parseThresholdsFromSearchParams(searchParams);
   const regimeSeries = getTimeMachineRegimeSeries(DEFAULT_REGIME_SERIES_MONTHS, thresholds);
+  const yieldCurveSeries = getTimeMachineYieldCurveSeries(240, historicalSelection?.asOf);
   const [treasury, liveTreasury, macroSeries] = await Promise.all([
     treasuryPromise,
     liveTreasuryPromise ?? treasuryPromise,
@@ -333,6 +335,7 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
     requestedSelection,
     regimeSeries,
     regimeAlert,
+    yieldCurveSeries,
     regimeTrend,
     selectedMonth,
     selectedYear,
