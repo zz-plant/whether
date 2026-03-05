@@ -62,7 +62,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "", lastModified: reportLastModified, changeFrequency: "weekly", priority: 1 },
     { path: "/start", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.9 },
     { path: "/posture", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.8 },
-    { path: "/evidence", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.9 },
+    { path: "/signals", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.9 },
     { path: "/decide", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.82 },
     { path: "/reference", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.78 },
     { path: "/resources", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.8 },
