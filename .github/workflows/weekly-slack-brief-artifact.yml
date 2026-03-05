@@ -5,6 +5,10 @@ on:
     - cron: "0 13 * * 1"
   workflow_dispatch:
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   generate-brief:
     runs-on: ubuntu-latest
@@ -22,6 +26,35 @@ jobs:
 
       - name: Generate weekly Slack brief artifact
         run: bunx tsx scripts/generateWeeklySlackBrief.ts --out artifacts/weekly-slack-brief.txt
+
+      - name: Generate latest weekly Slack brief markdown
+        run: bunx tsx scripts/generateWeeklySlackBrief.ts --out docs/briefs/latest-weekly-slack-brief.md --format markdown
+
+      - name: Open pull request with latest weekly brief
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: automation/weekly-slack-brief
+          delete-branch: true
+          title: "chore: refresh latest weekly Slack brief"
+          commit-message: "chore: refresh latest weekly Slack brief"
+          body: |
+            ## Summary
+            - Regenerates `docs/briefs/latest-weekly-slack-brief.md` from the latest weekly report data.
+            - Keeps the downloadable artifact workflow intact for operational handoff.
+
+            ## Why this matters
+            - Makes the weekly brief linkable and reviewable directly in-repo.
+
+            ## Validation
+            - Generated via `scripts/generateWeeklySlackBrief.ts` in this workflow.
+
+            ## Risks / follow-ups
+            - If report data schema changes, this automation may require script updates.
+          labels: |
+            automation
+            briefs
+          add-paths: |
+            docs/briefs/latest-weekly-slack-brief.md
 
       - name: Upload weekly Slack brief artifact
         uses: actions/upload-artifact@v4
