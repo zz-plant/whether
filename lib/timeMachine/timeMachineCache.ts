@@ -252,6 +252,68 @@ export const getTimeMachineRegimeSeries = (
 
 export const getRegimeSeriesCacheSize = () => timeMachineRegimeSeriesCache.size;
 
+export type TimeMachineYieldCurveEntry = {
+  year: number;
+  month: number;
+  recordDate: string;
+  oneMonth: number | null;
+  threeMonth: number | null;
+  twoYear: number | null;
+  tenYear: number | null;
+  spread10Y2Y: number | null;
+  spread2Y3M: number | null;
+  curveSignal: number | null;
+};
+
+export const getTimeMachineYieldCurveSeries = (
+  months = DEFAULT_REGIME_SERIES_MONTHS,
+  asOf?: string
+): TimeMachineYieldCurveEntry[] => {
+  const resolvedMonths = Math.max(months, MIN_ROLLING_YIELD_MONTHS);
+  const asOfTime = asOf ? new Date(asOf).getTime() : Number.NaN;
+  const asOfIndex =
+    asOf && Number.isFinite(asOfTime)
+      ? findSnapshotIndexAtOrBefore(asOfTime)
+      : sortedSnapshots.length - 1;
+  const lastIndex =
+    typeof asOfIndex === "number" && asOfIndex >= 0
+      ? asOfIndex
+      : sortedSnapshots.length - 1;
+  const sliceStart = Math.max(lastIndex + 1 - resolvedMonths, 0);
+
+  return sortedSnapshots.slice(sliceStart, lastIndex + 1).map((snapshot) => {
+    const oneMonth = snapshot.yields.oneMonth ?? null;
+    const threeMonth = snapshot.yields.threeMonth ?? null;
+    const twoYear = snapshot.yields.twoYear ?? null;
+    const tenYear = snapshot.yields.tenYear ?? null;
+    const spread10Y2Y =
+      typeof tenYear === "number" && typeof twoYear === "number"
+        ? tenYear - twoYear
+        : null;
+    const spread2Y3M =
+      typeof twoYear === "number" && typeof threeMonth === "number"
+        ? twoYear - threeMonth
+        : null;
+    const curveSignal =
+      typeof spread10Y2Y === "number" && typeof spread2Y3M === "number"
+        ? 0.7 * spread10Y2Y - 0.3 * spread2Y3M
+        : null;
+
+    return {
+      year: snapshot.year,
+      month: snapshot.month,
+      recordDate: snapshot.record_date,
+      oneMonth,
+      threeMonth,
+      twoYear,
+      tenYear,
+      spread10Y2Y,
+      spread2Y3M,
+      curveSignal,
+    };
+  });
+};
+
 export const getPreviousTimeMachineSnapshot = (asOf: string): TreasuryData | null => {
   const target = new Date(asOf);
   if (Number.isNaN(target.valueOf())) {
