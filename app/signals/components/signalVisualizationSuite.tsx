@@ -106,6 +106,12 @@ const linePath = (values: Array<number | null>, width: number, height: number, m
     .join(" ");
 };
 
+const toChartX = (value: number, min: number, max: number, width: number) => ((value - min) / (max - min || 1)) * width;
+
+const toChartY = (value: number, min: number, max: number, height: number) => height - ((value - min) / (max - min || 1)) * height;
+
+const inDomain = (value: number, min: number, max: number) => value >= min && value <= max;
+
 const ribbonTone = (value: number | null) => {
   if (value === null) return "bg-slate-700/70";
   if (value < -0.25) return "bg-rose-500/75";
@@ -216,11 +222,11 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
             <PanelTitle title="4) Steepness vs level" subtitle="X = 2Y level, Y = 10Y−2Y spread (monthly)." />
             <svg viewBox="0 0 100 72" className="h-48 w-full" role="img" aria-label="Monthly steepness vs level scatter">
               <rect x="0" y="0" width="100" height="72" fill="rgb(2 6 23)" />
-              <line x1="50" y1="0" x2="50" y2="72" stroke="rgb(100 116 139 / 0.6)" strokeDasharray="2 2" />
-              <line x1="0" y1="36" x2="100" y2="36" stroke="rgb(100 116 139 / 0.6)" strokeDasharray="2 2" />
+              {inDomain(0, rateMin, rateMax) ? <line x1={toChartX(0, rateMin, rateMax, 100)} y1="0" x2={toChartX(0, rateMin, rateMax, 100)} y2="72" stroke="rgb(100 116 139 / 0.6)" strokeDasharray="2 2" /> : null}
+              {inDomain(0, spreadMin, spreadMax) ? <line x1="0" y1={toChartY(0, spreadMin, spreadMax, 72)} x2="100" y2={toChartY(0, spreadMin, spreadMax, 72)} stroke="rgb(100 116 139 / 0.6)" strokeDasharray="2 2" /> : null}
               {monthlyScatter.map((point) => {
-                const x = ((point.x - rateMin) / (rateMax - rateMin || 1)) * 100;
-                const y = 72 - ((point.y - spreadMin) / (spreadMax - spreadMin || 1)) * 72;
+                const x = toChartX(point.x, rateMin, rateMax, 100);
+                const y = toChartY(point.y, spreadMin, spreadMax, 72);
                 return <circle key={point.key} cx={x} cy={y} r="1.8" fill="rgb(56 189 248 / 0.75)" />;
               })}
             </svg>
