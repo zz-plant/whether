@@ -14,27 +14,37 @@ export const primaryNavigation: PrimaryNavigationItem[] = [
   },
   {
     href: "/start",
-    label: "Start",
-    description: "Run the guided weekly sequence: posture, situation, and toolkit.",
-  },
-  {
-    href: "/operations",
-    label: "Operate",
-    description: "Translate posture into planning, integrations, and operator actions.",
+    label: "Command Center",
+    description: "Start the weekly sequence: posture, situation, and next-step toolkit.",
   },
   {
     href: "/signals",
-    label: "Evidence",
-    description: "Inspect the data behind the call, including thresholds and timing.",
+    label: "Signals",
+    description: "Inspect the evidence behind the posture call and confidence shifts.",
+  },
+  {
+    href: "/operations",
+    label: "Operations",
+    description: "Apply operating guardrails to planning, cadence, and team execution.",
+  },
+  {
+    href: "/decide",
+    label: "Decide",
+    description: "Translate guidance by role and situation before committing.",
   },
   {
     href: "/toolkits",
-    label: "Templates",
-    description: "Runnable toolkits and checklists for recurring operating decisions.",
+    label: "Toolkits",
+    description: "Run decision templates and checklists for recurring operating choices.",
   },
   {
-    href: "/reference",
-    label: "Reference",
-    description: "Canonical methods, formulas, sources, and learning pathways.",
+    href: "/learn",
+    label: "Learn",
+    description: "Use diagnostic references and concepts to sharpen interpretation.",
+  },
+  {
+    href: "/method",
+    label: "Method",
+    description: "Review formulas, source coverage, and model transparency surfaces.",
   },
 ];
