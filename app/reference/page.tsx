@@ -49,7 +49,7 @@ export default function ReferencePage() {
           <h2 className="text-lg font-semibold text-slate-100">Method</h2>
           <p className="text-sm text-slate-300">How the model is constructed, what it includes, and where confidence limits apply.</p>
         </Link>
-        <Link href="/formulas" className="weather-panel space-y-2 px-4 py-4">
+        <Link href="/methodology" className="weather-panel space-y-2 px-4 py-4">
           <h2 className="text-lg font-semibold text-slate-100">Formulas</h2>
           <p className="text-sm text-slate-300">Formula-level definitions, thresholds, and interpretation notes for key indicators.</p>
         </Link>

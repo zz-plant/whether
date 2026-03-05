@@ -318,6 +318,7 @@ export default async function SignalsPage({
       sectionLinks={sectionLinks}
       heroVariant="compact"
       pageNavVariant="compact"
+      showPageNavigation={true}
       primaryCta={{ href: "#current-scores", label: "Review evidence" }}
       nextStep={{
         href: "/operations",
