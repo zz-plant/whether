@@ -153,6 +153,7 @@ export default async function OperationsPage({
         description: "Translate this into role-specific guidance",
       }}
       pageNavVariant="compact"
+      showPageNavigation={true}
       decisionBanner={{
         label: "Align now",
         decision: "Translate the regime into weekly execution calls and a monthly plan.",

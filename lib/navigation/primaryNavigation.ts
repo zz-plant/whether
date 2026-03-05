@@ -53,12 +53,10 @@ export const primaryNavigation: PrimaryNavigationItem[] = [
     href: "/resources",
     label: "Resources",
     description: "Board-facing templates and case examples.",
-    staticHub: false,
   },
   {
     href: "/reference",
     label: "Reference",
     description: "Canonical methods and diagnostics archive.",
-    staticHub: false,
   },
 ];
