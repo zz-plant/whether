@@ -6,6 +6,7 @@ export type BreadcrumbItem = {
 import { navigationLabelByPath } from "./informationArchitecture";
 
 const canonicalBreadcrumbLabels: Record<string, string> = {
+  ...navigationLabelByPath,
   "/": "Home",
   "/resources": "Resources",
   "/reference": "Reference",
@@ -13,7 +14,6 @@ const canonicalBreadcrumbLabels: Record<string, string> = {
   "/solutions": "Solutions",
   "/solutions/career-paths": "Career paths",
   "/formulas": "Formulas",
-  ...navigationLabelByPath,
 };
 
 const toTitleCase = (value: string) =>
