@@ -27,7 +27,10 @@
     "smoke:prod": "node scripts/prod-synthetic-smoke.mjs https://whether.work",
     "review:comment-trends": "node scripts/review-comment-trends.mjs --repo zz-plant/whether --limit 200",
     "review:comment-trends:update": "node scripts/review-comment-trends.mjs --repo zz-plant/whether --limit 200 --out docs/research/review-comment-trends.latest.json --summary-out docs/research/review-comment-trends.latest.md",
-    "review:hotspot-preflight": "node scripts/review-hotspot-preflight.mjs"
+    "review:hotspot-preflight": "node scripts/review-hotspot-preflight.mjs",
+    "summary-archive:migrate-structured": "bunx tsx scripts/migrateSummaryArchiveStructured.ts --write",
+    "summary-archive:check-structured": "bunx tsx scripts/migrateSummaryArchiveStructured.ts",
+    "brief:weekly:artifact": "bunx tsx scripts/generateWeeklySlackBrief.ts --out artifacts/weekly-slack-brief.txt"
   },
   "engines": {
     "node": "20.16.x"
@@ -44,7 +47,6 @@
   "devDependencies": {
     "@cloudflare/next-on-pages": "1.13.16",
     "@modelcontextprotocol/sdk": "1.27.1",
-    "@tailwindcss/postcss": "^4.2.1",
     "@types/node": "24.4.0",
     "@types/react": "19.2.14",
     "autoprefixer": "10.4.24",
