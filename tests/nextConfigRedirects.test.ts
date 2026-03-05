@@ -56,5 +56,11 @@ describe("next.config redirects", () => {
       destination: "/decide/:slug",
       permanent: true,
     });
+
+    assert.deepEqual(findRedirect("/decide/use-cases"), {
+      source: "/decide/use-cases",
+      destination: "/decide",
+      permanent: true,
+    });
   });
 });
