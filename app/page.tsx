@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import {
   buildTimeMachineHref,
   getAdjacentTimeMachineRequest,
@@ -93,6 +94,18 @@ const longCycleBetByRegime = {
   EXPANSION: "Permitted with milestones",
 };
 
+const horizonOptions = [
+  { key: "now", label: "Now" },
+  { key: "next", label: "Next 2 weeks" },
+  { key: "quarter", label: "Quarter" },
+] as const;
+
+const horizonSummaryByKey = {
+  now: "Immediate execution posture and gating rules.",
+  next: "Near-term pacing posture for the next two operating weeks.",
+  quarter: "Quarter-level commitment posture and reversal boundaries.",
+} as const;
+
 export const generateMetadata = async ({
   searchParams,
 }: {
@@ -179,6 +192,31 @@ export default async function HomePage({
   }>;
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const requestedHorizon = resolvedSearchParams?.horizon;
+  const activeHorizon = horizonOptions.some((option) => option.key === requestedHorizon)
+    ? (requestedHorizon as (typeof horizonOptions)[number]["key"])
+    : "now";
+  const requestedMode = resolvedSearchParams?.mode;
+  const shiftFocusMode = requestedMode === "shift";
+  const buildHomeHref = (overrides: Record<string, string | null>) => {
+    const params = new URLSearchParams();
+    if (resolvedSearchParams) {
+      Object.entries(resolvedSearchParams).forEach(([key, value]) => {
+        if (value) {
+          params.set(key, value);
+        }
+      });
+    }
+    Object.entries(overrides).forEach(([key, value]) => {
+      if (value === null || value === "") {
+        params.delete(key);
+        return;
+      }
+      params.set(key, value);
+    });
+    const query = params.toString();
+    return query ? `/?${query}` : "/";
+  };
   const sectionLinks = homeSectionSequence.map((section) => ({
     href: section.href,
     label: section.label,
@@ -296,6 +334,16 @@ export default async function HomePage({
   const tightnessGap = Math.abs(assessment.scores.tightness - tightnessThreshold);
   const riskGap = Math.abs(assessment.scores.riskAppetite - riskThreshold);
   const nearestThresholdGap = Math.min(tightnessGap, riskGap);
+  const flipLikelihoodLabel = nearestThresholdGap <= 3
+    ? "High"
+    : nearestThresholdGap <= 8
+      ? "Medium"
+      : "Low";
+  const flipLikelihoodClassName = nearestThresholdGap <= 3
+    ? "border-rose-400/70 bg-rose-500/15 text-rose-100"
+    : nearestThresholdGap <= 8
+      ? "border-amber-400/70 bg-amber-500/15 text-amber-100"
+      : "border-emerald-400/70 bg-emerald-500/15 text-emerald-100";
   const weeklyCall = buildWeeklyCall({
     regime: assessment.regime,
     stopItems,
@@ -410,6 +458,56 @@ export default async function HomePage({
       />
 
       <section id="one-screen-weekly-brief" className="weather-panel space-y-3 px-5 py-4 sm:px-6 sm:py-5">
+        <div className="flex flex-wrap items-center gap-2">
+          {horizonOptions.map((option) => {
+            const isActive = option.key === activeHorizon;
+            return (
+              <a
+                key={option.key}
+                href={buildHomeHref({ horizon: option.key })}
+                aria-current={isActive ? "page" : undefined}
+                className={`weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] ${
+                  isActive
+                    ? "border-sky-300/80 text-slate-100"
+                    : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
+                }`}
+              >
+                {option.label}
+              </a>
+            );
+          })}
+          <a
+            href={buildHomeHref({ mode: shiftFocusMode ? null : "shift" })}
+            className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-300 hover:border-rose-400/60 hover:text-slate-100"
+          >
+            {shiftFocusMode ? "Exit shift mode" : "Regime shift mode"}
+          </a>
+        </div>
+        <p className="text-xs text-slate-300">{horizonSummaryByKey[activeHorizon]}</p>
+
+        {regimeAlert ? (
+          <section className="weather-surface space-y-2 border border-rose-400/45 bg-rose-500/10 px-4 py-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-rose-100">Regime shift mode</p>
+            <p className="text-sm text-slate-100">
+              Regime moved from {regimeAlert.previousRegime} to {assessment.regime}. Pause irreversible decisions until owners re-brief.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <Link
+                href="/signals#signal-diagnostics"
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em]"
+              >
+                Open shift diagnostics
+              </Link>
+              <a
+                href={historicalTimeMachineHref}
+                className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200"
+              >
+                Open Time Machine context
+              </a>
+            </div>
+          </section>
+        ) : null}
+
         <header className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">This week</p>
@@ -470,37 +568,47 @@ export default async function HomePage({
         </section>
 
         <section className="weather-surface px-4 py-3 text-xs text-slate-200">
-          <div className="flex flex-wrap gap-x-6 gap-y-2">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
             <p>Data freshness: {treasuryProvenance.ageLabel.replace(".", "")}</p>
             <p>Confidence: {leadershipBriefModel.confidenceLabel}</p>
             <p>Inputs complete: {leadershipBriefModel.inputsComplete ? "Yes" : "No"}</p>
+            <span className={`inline-flex min-h-[32px] items-center rounded-full border px-2.5 py-1 ${flipLikelihoodClassName}`}>
+              Flip likelihood: {flipLikelihoodLabel}
+            </span>
+            <span className="inline-flex min-h-[32px] items-center rounded-full border border-slate-700/70 bg-slate-900/70 px-2.5 py-1 text-slate-100">
+              Threshold distance: {nearestThresholdGap.toFixed(1)}
+            </span>
           </div>
         </section>
       </section>
 
-      <section
-        id="weekly-action-summary"
-        aria-label="Weekly action summary"
-        className="space-y-8"
-      >
-        <RevealOnView>
-          <WeeklyActionSummaryPanel
-            assessment={assessment}
-            provenance={treasuryProvenance}
-            recordDateLabel={recordDateLabel}
-          />
-        </RevealOnView>
-      </section>
+      {!shiftFocusMode ? (
+        <>
+          <section
+            id="weekly-action-summary"
+            aria-label="Weekly action summary"
+            className="space-y-8"
+          >
+            <RevealOnView>
+              <WeeklyActionSummaryPanel
+                assessment={assessment}
+                provenance={treasuryProvenance}
+                recordDateLabel={recordDateLabel}
+              />
+            </RevealOnView>
+          </section>
 
-      <section id="executive-snapshot" aria-label="Leadership summary" className="space-y-8">
-        <RevealOnView>
-          <ExecutiveSnapshotPanel
-            treasury={treasury}
-            assessment={assessment}
-            provenance={treasuryProvenance}
-          />
-        </RevealOnView>
-      </section>
+          <section id="executive-snapshot" aria-label="Leadership summary" className="space-y-8">
+            <RevealOnView>
+              <ExecutiveSnapshotPanel
+                treasury={treasury}
+                assessment={assessment}
+                provenance={treasuryProvenance}
+              />
+            </RevealOnView>
+          </section>
+        </>
+      ) : null}
 
     </ReportShell>
   );

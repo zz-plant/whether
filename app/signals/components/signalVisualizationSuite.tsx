@@ -8,6 +8,9 @@ import {
 } from "../../../lib/regimeEngine";
 import { sensorTimeWindows } from "../../../lib/sensors";
 import { ChevronDownIcon } from "../../components/uiIcons";
+import { RegimePlaybackScrubber } from "./regimePlaybackScrubber";
+
+export type SignalMetricFocus = "tightness" | "risk" | "curve";
 
 type SignalVisualizationSuiteProps = {
   assessment: RegimeAssessment;
@@ -15,6 +18,8 @@ type SignalVisualizationSuiteProps = {
   macroSeries: MacroSeriesReading[];
   sensors: SensorReading[];
   regimeSeries: TimeMachineRegimeEntry[];
+  activeMetric: SignalMetricFocus;
+  playbackIndex: number;
 };
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
@@ -95,6 +100,8 @@ export const SignalVisualizationSuite = ({
   macroSeries,
   sensors,
   regimeSeries,
+  activeMetric,
+  playbackIndex,
 }: SignalVisualizationSuiteProps) => {
   const quadrantX = clamp(assessment.scores.riskAppetite, 0, 100);
   const quadrantY = clamp(assessment.scores.tightness, 0, 100);
@@ -129,7 +136,47 @@ export const SignalVisualizationSuite = ({
   const yieldMax = numericYieldValues.length ? Math.max(...numericYieldValues) : 1;
   const yieldRange = yieldMax - yieldMin || 1;
 
-  const timelineSeries = regimeSeries.slice(-12);
+  const playbackSeries = regimeSeries.slice(-24);
+  const safePlaybackIndex = playbackSeries.length
+    ? clamp(playbackIndex, 0, playbackSeries.length - 1)
+    : 0;
+  const selectedPlayback = playbackSeries[safePlaybackIndex] ?? null;
+  const timelineSeries = playbackSeries.slice(-12);
+  const activeMetricValue = activeMetric === "tightness"
+    ? assessment.scores.tightness
+    : activeMetric === "risk"
+      ? assessment.scores.riskAppetite
+      : assessment.scores.curveSlope;
+  const activeMetricThreshold = activeMetric === "tightness"
+    ? assessment.thresholds.tightnessRegime
+    : activeMetric === "risk"
+      ? assessment.thresholds.riskAppetiteRegime
+      : 0;
+  const activeMetricUnit = activeMetric === "curve" ? "%" : "/100";
+  const activeMetricLabel = activeMetric === "tightness"
+    ? "Tightness"
+    : activeMetric === "risk"
+      ? "Risk appetite"
+      : "Curve slope";
+  const thresholdDistance = activeMetricValue === null
+    ? null
+    : Math.abs(activeMetricValue - activeMetricThreshold);
+  const proximityBand = activeMetric === "curve" ? 0.5 : 8;
+  const uncertaintyScore = thresholdDistance === null
+    ? 50
+    : clamp(Math.round((1 - Math.min(thresholdDistance / proximityBand, 1)) * 100), 0, 100);
+  const uncertaintyLabel = uncertaintyScore >= 70
+    ? "High"
+    : uncertaintyScore >= 40
+      ? "Medium"
+      : "Low";
+  const selectedPlaybackLabel = selectedPlayback
+    ? `${String(selectedPlayback.month).padStart(2, "0")}/${selectedPlayback.year}`
+    : "latest month";
+  const playbackEntries = playbackSeries.map((entry) => ({
+    label: `${String(entry.month).padStart(2, "0")}/${entry.year}`,
+    regime: regimeLabel[entry.regime],
+  }));
 
   return (
     <section id="visual-diagnostics" className="weather-panel space-y-5 px-6 py-5" aria-labelledby="visual-diagnostics-title">
@@ -147,6 +194,31 @@ export const SignalVisualizationSuite = ({
         <p className="mt-2 text-xs text-slate-300">
           Use this section when you need chart-level context. Keep it closed for faster executive scans.
         </p>
+        <div className="mt-4 grid gap-4 xl:grid-cols-2">
+          <article className="weather-surface space-y-3 p-4">
+            <p className="text-xs font-semibold tracking-[0.14em] text-slate-400">Playback scrubber</p>
+            <p className="text-sm text-slate-300">
+              Scrub historical snapshots to replay how regime posture changed over time.
+            </p>
+            <RegimePlaybackScrubber entries={playbackEntries} activeIndex={safePlaybackIndex} />
+          </article>
+          <article className="weather-surface space-y-3 p-4">
+            <p className="text-xs font-semibold tracking-[0.14em] text-slate-400">Threshold uncertainty band</p>
+            <p className="text-sm text-slate-300">
+              Focus metric: {activeMetricLabel} ({activeMetricValue === null ? "N/A" : formatNumber(activeMetricValue)}{activeMetricUnit}) vs threshold {formatNumber(activeMetricThreshold)}{activeMetricUnit}.
+            </p>
+            <div className="h-3 w-full overflow-hidden rounded-full bg-slate-900">
+              <div
+                className="h-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-400"
+                style={{ width: `${uncertaintyScore}%` }}
+                aria-label={`Uncertainty score ${uncertaintyScore}%`}
+              />
+            </div>
+            <p className="text-xs text-slate-300">
+              Uncertainty: {uncertaintyLabel} · Replay point: {selectedPlaybackLabel}
+            </p>
+          </article>
+        </div>
 
       <div className="mt-4 grid gap-4 xl:grid-cols-2">
         <article className="weather-surface p-4">
@@ -315,7 +387,7 @@ export const SignalVisualizationSuite = ({
               )}
             </div>
             <p className="mt-2 text-xs text-slate-300">
-              Last {timelineSeries.length || 0} cached months with monthly regime color encoding.
+              Last {timelineSeries.length || 0} cached months with monthly regime color encoding. Selected replay: {selectedPlaybackLabel}.
             </p>
           </div>
         </article>

@@ -18,7 +18,10 @@ import { HistoricalBanner } from "../components/boardBriefSections";
 import { AdvancedThresholdsSection } from "./components/advancedThresholdsSection";
 import { TimeMachinePanel } from "./components/timeMachinePanel";
 import { RegimeTimelinePanel } from "./components/regimeTimelinePanel";
-import { SignalVisualizationSuite } from "./components/signalVisualizationSuite";
+import {
+  SignalVisualizationSuite,
+  type SignalMetricFocus,
+} from "./components/signalVisualizationSuite";
 import { reportPageLinks } from "../../lib/report/reportNavigation";
 import { ReturningVisitorDeltaStrip } from "../components/changeSinceLastReadPanel";
 import { buildTrustStatus } from "../../lib/report/trustStatus";
@@ -161,11 +164,26 @@ export default async function SignalsPage({
   const regimeTimelineHref = showAdvanced ? "#regime-timeline" : "#advanced-controls";
   const focusTabs = ["all", "growth", "inflation", "labor", "financial"] as const;
   type FocusTab = (typeof focusTabs)[number];
+  const metricTabs = [
+    { key: "tightness", label: "Tightness" },
+    { key: "risk", label: "Risk appetite" },
+    { key: "curve", label: "Curve slope" },
+  ] as const;
   const requestedFocus = resolvedSearchParams?.focus;
   const activeFocus: FocusTab =
     requestedFocus && focusTabs.includes(requestedFocus as FocusTab)
       ? (requestedFocus as FocusTab)
       : "all";
+  const requestedMetric = resolvedSearchParams?.metric;
+  const activeMetric: SignalMetricFocus = metricTabs.some((tab) => tab.key === requestedMetric)
+    ? (requestedMetric as SignalMetricFocus)
+    : "tightness";
+  const playbackWindow = regimeSeries.slice(-24);
+  const maxPlaybackIndex = Math.max(playbackWindow.length - 1, 0);
+  const requestedPlayback = Number.parseInt(resolvedSearchParams?.playback ?? String(maxPlaybackIndex), 10);
+  const playbackIndex = Number.isFinite(requestedPlayback)
+    ? Math.max(0, Math.min(requestedPlayback, maxPlaybackIndex))
+    : maxPlaybackIndex;
   const sectionLinks = [
     { href: "#decision-summary", label: "Decision summary" },
     { href: "#evidence-priorities", label: "Evidence priorities" },
@@ -219,6 +237,21 @@ export default async function SignalsPage({
     const query = params.toString();
     return query ? `/signals?${query}` : "/signals";
   };
+  const buildMetricHref = (metric: SignalMetricFocus) => {
+    const params = new URLSearchParams();
+    if (resolvedSearchParams) {
+      Object.entries(resolvedSearchParams).forEach(([key, value]) => {
+        if (value && key !== "metric") {
+          params.set(key, value);
+        }
+      });
+    }
+    if (metric !== "tightness") {
+      params.set("metric", metric);
+    }
+    const query = params.toString();
+    return query ? `/signals?${query}#current-scores` : "/signals#current-scores";
+  };
   const prioritizedSignalsByFocus: Record<FocusTab, Array<{ label: string; why: string; href: string }>> = {
     all: [
       { label: "Tightness", why: "Primary liquidity constraint for near-term execution", href: "#current-scores" },
@@ -263,6 +296,7 @@ export default async function SignalsPage({
     threshold: string;
     description: string;
     href: string;
+    metric: SignalMetricFocus;
   }> = [
     {
       label: "Tightness",
@@ -270,6 +304,7 @@ export default async function SignalsPage({
       threshold: `${assessment.thresholds.tightnessRegime}/100`,
       description: "Higher values indicate tighter funding conditions.",
       href: "#current-scores",
+      metric: "tightness",
     },
     {
       label: "Risk appetite",
@@ -277,6 +312,7 @@ export default async function SignalsPage({
       threshold: `${assessment.thresholds.riskAppetiteRegime}/100`,
       description: "Higher values indicate more risk-on market behavior.",
       href: "#current-scores",
+      metric: "risk",
     },
     {
       label: "Curve slope",
@@ -287,6 +323,7 @@ export default async function SignalsPage({
       threshold: "0.00%",
       description: "10Y minus 2Y Treasury yield spread.",
       href: "#current-scores",
+      metric: "curve",
     },
   ];
 
@@ -459,13 +496,39 @@ export default async function SignalsPage({
             Real-time scorecard for the three regime drivers.
           </h2>
         </header>
+        <div className="flex flex-wrap gap-2">
+          {metricTabs.map((metric) => {
+            const isActive = metric.key === activeMetric;
+            return (
+              <a
+                key={metric.key}
+                href={buildMetricHref(metric.key)}
+                aria-current={isActive ? "page" : undefined}
+                className={`weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] ${
+                  isActive
+                    ? "border-sky-300/80 text-slate-100"
+                    : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
+                }`}
+              >
+                {metric.label}
+              </a>
+            );
+          })}
+        </div>
         <div className="space-y-4">
           {(["leading", "lagging"] as const).map((type) => (
             <section key={type} className="space-y-2">
               <h3 className="text-sm font-semibold tracking-[0.14em] text-slate-300">{indicatorTypeLabel[type]}</h3>
               <div className="grid gap-3 lg:grid-cols-3">
                 {scoreCardsByType[type].map((card) => (
-                  <article key={card.label} className="weather-surface space-y-3 px-4 py-3">
+                  <article
+                    key={card.label}
+                    className={`weather-surface space-y-3 px-4 py-3 ${
+                      card.metric === activeMetric
+                        ? "border-sky-300/70 bg-sky-500/10"
+                        : ""
+                    }`}
+                  >
                     <dl>
                       <dt className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">{card.label}</dt>
                       <dd className="mono mt-2 text-3xl leading-none text-slate-100">{card.value}</dd>
@@ -596,6 +659,8 @@ export default async function SignalsPage({
             macroSeries={macroSeries}
             sensors={sensors}
             regimeSeries={regimeSeries}
+            activeMetric={activeMetric}
+            playbackIndex={playbackIndex}
           />
         )}
       </section>

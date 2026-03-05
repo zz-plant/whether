@@ -23,6 +23,22 @@ import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 
 export const runtime = "edge";
 
+const roleLensOptions = [
+  { key: "founder", label: "Founder" },
+  { key: "product", label: "Product" },
+  { key: "engineering", label: "Engineering" },
+  { key: "finance", label: "Finance" },
+] as const;
+
+type RoleLensKey = (typeof roleLensOptions)[number]["key"];
+
+const roleSummaryByKey: Record<RoleLensKey, string> = {
+  founder: "Sequence cross-functional commitments and remove low-confidence bets.",
+  product: "Translate posture into roadmap, launch cadence, and scope discipline.",
+  engineering: "Protect reliability and capacity while preserving reversible options.",
+  finance: "Set spend cadence and downside guardrails before approvals.",
+};
+
 export const metadata: Metadata = buildPageMetadata({
   title: "Whether Report — Action playbook",
   description:
@@ -49,6 +65,29 @@ export default async function OperationsPage({
   }>;
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const requestedRole = resolvedSearchParams?.role;
+  const activeRole: RoleLensKey = roleLensOptions.some((option) => option.key === requestedRole)
+    ? (requestedRole as RoleLensKey)
+    : "founder";
+  const buildOperationsHref = (overrides: Record<string, string | null>) => {
+    const params = new URLSearchParams();
+    if (resolvedSearchParams) {
+      Object.entries(resolvedSearchParams).forEach(([key, value]) => {
+        if (value) {
+          params.set(key, value);
+        }
+      });
+    }
+    Object.entries(overrides).forEach(([key, value]) => {
+      if (value === null || value === "") {
+        params.delete(key);
+        return;
+      }
+      params.set(key, value);
+    });
+    const query = params.toString();
+    return query ? `/operations?${query}` : "/operations";
+  };
   const structuredData = {
     "@context": "https://schema.org",
     "@graph": [
@@ -125,6 +164,47 @@ export default async function OperationsPage({
     : isFallback
       ? "warning"
       : "stable";
+  const roleExposureCards: Array<{
+    key: RoleLensKey;
+    title: string;
+    exposure: string;
+    monitor: string;
+    move: string;
+    decideHref: string;
+  }> = [
+    {
+      key: "founder",
+      title: "Founder exposure",
+      exposure: "Portfolio sprawl can outpace conviction when posture shifts.",
+      monitor: `Track tightness vs threshold gap (${Math.abs(assessment.scores.tightness - assessment.thresholds.tightnessRegime).toFixed(1)} pts).`,
+      move: "Pause one long-cycle initiative until this month’s top 3 priorities are fully staffed.",
+      decideHref: "/decide?role=ceo",
+    },
+    {
+      key: "product",
+      title: "Product exposure",
+      exposure: "Roadmap breadth can exceed proof quality during volatile weeks.",
+      monitor: `Risk appetite at ${assessment.scores.riskAppetite}/100 should gate launch count and discovery scope.`,
+      move: "Convert one roadmap stream into a reversible experiment with explicit rollback trigger.",
+      decideHref: "/decide?role=product",
+    },
+    {
+      key: "engineering",
+      title: "Engineering exposure",
+      exposure: "Reliability debt compounds when commitments rise faster than capacity.",
+      monitor: `Regime is ${assessment.regime}; watch deployment risk and incident recovery cadence.`,
+      move: "Reserve fixed capacity for reliability and defer architecture bets without 90-day payback proof.",
+      decideHref: "/decide?role=engineering",
+    },
+    {
+      key: "finance",
+      title: "Finance exposure",
+      exposure: "Spend acceleration can outrun signal durability.",
+      monitor: `Curve slope at ${assessment.scores.curveSlope === null ? "N/A" : `${assessment.scores.curveSlope.toFixed(2)}%`} should frame commit horizons.`,
+      move: "Require staged release gates for any spend increase above current monthly baseline.",
+      decideHref: "/decide?role=board",
+    },
+  ];
 
   return (
     <ReportShell
@@ -139,7 +219,7 @@ export default async function OperationsPage({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Action playbook"
       currentPath="/operations"
-      pageSummary="Run weekly execution decisions and align the monthly playbook for this cycle."
+      pageSummary={`Run weekly execution decisions and align the monthly playbook for this cycle. ${roleSummaryByKey[activeRole]}`}
       pageSummaryLink={{ href: "#ops-playbook", label: "Jump to playbook section ↓" }}
       primaryCta={{
         href: "#ops-monthly-action-summary",
@@ -183,6 +263,16 @@ export default async function OperationsPage({
           },
         ],
       }}
+      roleSwitcher={{
+        active: activeRole,
+        options: roleLensOptions.map((option) => ({
+          key: option.key,
+          label: option.label,
+          href: buildOperationsHref({
+            role: option.key === "founder" ? null : option.key,
+          }),
+        })),
+      }}
       pageLinks={reportPageLinks}
       sectionLinks={operationsSectionLinks.plan}
       structuredData={structuredData}
@@ -198,6 +288,45 @@ export default async function OperationsPage({
       }
     >
       <OperationsWorkflowProgress currentPath="/operations" />
+
+      <section id="ops-role-exposure" className="weather-panel space-y-4 px-5 py-4">
+        <header className="space-y-1">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-300">
+            Team exposure scan
+          </p>
+          <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
+            Role-specific risk and next moves for this regime.
+          </h2>
+        </header>
+        <div className="grid gap-3 lg:grid-cols-2">
+          {roleExposureCards.map((card) => {
+            const isActive = card.key === activeRole;
+            return (
+              <article
+                key={card.key}
+                className={`weather-surface space-y-2 px-4 py-3 ${
+                  isActive
+                    ? "border-sky-300/70 bg-sky-500/10"
+                    : "border-slate-800/80 bg-slate-950/40"
+                }`}
+              >
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">
+                  {card.title}
+                </p>
+                <p className="text-sm text-slate-100">{card.exposure}</p>
+                <p className="text-sm text-slate-300">{card.monitor}</p>
+                <p className="text-sm font-semibold text-slate-100">{card.move}</p>
+                <a
+                  href={card.decideHref}
+                  className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
+                >
+                  Open role translation →
+                </a>
+              </article>
+            );
+          })}
+        </div>
+      </section>
 
       <SectionedReportPanel
         id="ops-monthly-action-summary"

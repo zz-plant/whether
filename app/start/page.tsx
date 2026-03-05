@@ -45,6 +45,29 @@ export default async function StartHerePage() {
 
   const featuredToolkitDefinitions = toolkitDefinitions.slice(0, 3);
   const additionalToolkitDefinitions = toolkitDefinitions.slice(3);
+  const ritualWidgets = [
+    {
+      title: "Monday 5-min stance check",
+      cadence: "Weekly kickoff",
+      detail: "Confirm posture, freeze one non-critical commitment, and assign one ownership gap.",
+      href: "/operations#ops-monthly-action-summary",
+      cta: "Run Monday check",
+    },
+    {
+      title: "Midweek signal pulse",
+      cadence: "Wednesday",
+      detail: "Re-check top movers and only reopen decisions if threshold distance narrows materially.",
+      href: "/signals#signal-diagnostics",
+      cta: "Open signal pulse",
+    },
+    {
+      title: "Friday brief export",
+      cadence: "End of week",
+      detail: "Publish one aligned narrative to leadership with keep, pause, and accelerate calls.",
+      href: "/operations#ops-export-briefs",
+      cta: "Copy weekly brief",
+    },
+  ] as const;
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
@@ -104,6 +127,28 @@ export default async function StartHerePage() {
               <Link href="#start-role-path" className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100">Choose a role-specific path</Link>
             </div>
           </details>
+        </div>
+      </section>
+
+      <section className="weather-panel space-y-4 px-6 py-5" aria-label="Operating ritual widgets">
+        <header className="space-y-1">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">Ritual widgets</p>
+          <h2 className="text-xl font-semibold text-slate-100">Compact weekly operating cadence</h2>
+        </header>
+        <div className="grid gap-3 sm:grid-cols-3">
+          {ritualWidgets.map((widget) => (
+            <article key={widget.title} className="weather-surface space-y-2 px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">{widget.cadence}</p>
+              <h3 className="text-base font-semibold text-slate-100">{widget.title}</h3>
+              <p className="text-sm text-slate-300">{widget.detail}</p>
+              <Link
+                href={widget.href}
+                className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.12em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100"
+              >
+                {widget.cta} →
+              </Link>
+            </article>
+          ))}
         </div>
       </section>
 
