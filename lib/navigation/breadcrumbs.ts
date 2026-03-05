@@ -5,7 +5,7 @@ export type BreadcrumbItem = {
 
 const canonicalBreadcrumbLabels: Record<string, string> = {
   "/": "Home",
-  "/evidence": "Signal evidence",
+  "/signals": "Signal evidence",
   "/operations": "Operations",
   "/resources": "Resources",
   "/reference": "Reference",

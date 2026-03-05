@@ -24,7 +24,7 @@ export default function DecidePage() {
           <h2 className="text-lg font-semibold text-slate-100">Role and situation paths</h2>
           <p className="text-sm text-slate-300">Choose by role or scenario to reach the right guidance quickly.</p>
         </Link>
-        <Link href="/evidence" className="weather-panel space-y-2 px-4 py-4">
+        <Link href="/signals" className="weather-panel space-y-2 px-4 py-4">
           <h2 className="text-lg font-semibold text-slate-100">Signals evidence</h2>
           <p className="text-sm text-slate-300">Check live evidence before committing to irreversible moves.</p>
         </Link>
