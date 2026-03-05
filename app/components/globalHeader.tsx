@@ -3,7 +3,7 @@ import { primaryNavigation } from "../../lib/navigation/primaryNavigation";
 import { ThemeToggleButton } from "./themeToggleButton";
 
 export function GlobalHeader() {
-  const navLinks = primaryNavigation.filter((link) => link.staticHub !== false);
+  const navLinks = primaryNavigation;
 
   return (
     <header className="mx-auto w-full max-w-6xl px-4 pt-4 sm:px-6">

@@ -12,16 +12,16 @@ const steps = [
     description: "Set this quarter's operating plan.",
   },
   {
-    href: "/operations/decisions",
+    href: "/operations/integrations",
     label: "Stage 2",
-    title: "Decisions",
-    description: "Review assumptions and finalize key decisions.",
+    title: "Integrations",
+    description: "Distribute weekly mandate payloads into operating systems.",
   },
   {
-    href: "/operations#ops-export-briefs",
+    href: "/operations/data",
     label: "Stage 3",
-    title: "Briefings",
-    description: "Export updates ready to share with leadership.",
+    title: "Data",
+    description: "Use endpoint guidance for dashboards and internal automation.",
   },
 ] as const;
 
@@ -37,7 +37,7 @@ export const OperationsWorkflowProgress = ({ currentPath }: { currentPath: Route
     <section className="weather-panel space-y-3 px-4 py-4" aria-label="Operations workflow progress">
       <div>
         <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Workflow progress</p>
-        <h2 className="text-sm font-semibold text-slate-100">Plan · decisions · briefings</h2>
+        <h2 className="text-sm font-semibold text-slate-100">Plan · integrations · data</h2>
       </div>
       <ol className="grid gap-3 md:grid-cols-3">
         {steps.map((step, index) => {

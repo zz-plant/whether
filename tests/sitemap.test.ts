@@ -25,7 +25,7 @@ describe("sitemap", () => {
     assert.ok(urls.has(siteUrl));
     assert.ok(urls.has(`${siteUrl}/start`));
     assert.ok(urls.has(`${siteUrl}/posture`));
-    assert.ok(urls.has(`${siteUrl}/decide/use-cases`));
+    assert.ok(urls.has(`${siteUrl}/decide`));
     assert.ok(urls.has(`${siteUrl}/toolkits`));
     assert.ok(urls.has(`${siteUrl}/library`));
 

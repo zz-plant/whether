@@ -113,13 +113,13 @@ export default async function StartHerePage() {
           <p className="text-sm text-slate-300">Use this as the role lens picker inside Command Center, not a second homepage.</p>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
-          <Link href="/decide/use-cases" className="weather-surface min-h-[44px] space-y-2 px-4 py-4 transition hover:border-sky-400/65">
+          <Link href="/decide" className="weather-surface min-h-[44px] space-y-2 px-4 py-4 transition hover:border-sky-400/65">
             <h3 className="text-base font-semibold text-slate-100">Role and situation paths</h3>
             <p className="text-sm text-slate-300">Route by role or bottleneck to open the right guidance quickly.</p>
           </Link>
-          <Link href="/decide" className="weather-surface min-h-[44px] space-y-2 px-4 py-4 transition hover:border-sky-400/65">
-            <h3 className="text-base font-semibold text-slate-100">Open role lens library</h3>
-            <p className="text-sm text-slate-300">Browse role-specific references, team context, and ship checklists.</p>
+          <Link href="/decide/ship-checklist" className="weather-surface min-h-[44px] space-y-2 px-4 py-4 transition hover:border-sky-400/65">
+            <h3 className="text-base font-semibold text-slate-100">Run ship decision checklist</h3>
+            <p className="text-sm text-slate-300">Move from guidance to a go/wait/kill call tied to current posture.</p>
           </Link>
         </div>
       </section>

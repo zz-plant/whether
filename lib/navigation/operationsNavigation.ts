@@ -14,11 +14,6 @@ export const operationsWorkstreamLinks: OperationsWorkstreamLink[] = [
     description: "Translate the regime into quarterly posture, playbook moves, and operator asks.",
   },
   {
-    href: "/operations/briefings",
-    label: "Briefings",
-    description: "Export aligned narratives, leadership briefs, and CXO-ready deliverables.",
-  },
-  {
     href: "/operations/integrations" as Route,
     label: "Integrations",
     description: "Push weekly mandate payloads into Slack, Notion, and Linear.",
@@ -31,26 +26,12 @@ export const operationsWorkstreamLinks: OperationsWorkstreamLink[] = [
   },
 ];
 
-export const operationsSectionLinks: Record<string, ReportSectionLink[]> = {
-  overview: [
-    { href: "#ops-monthly-action-summary", label: "Monthly summary" },
-    { href: "#ops-horizon-plan", label: "Horizon plan" },
-  ],
+export const operationsSectionLinks: { plan: ReportSectionLink[] } = {
   plan: [
     { href: "#ops-monthly-action-summary", label: "Monthly summary" },
     { href: "#ops-playbook", label: "Playbook" },
     { href: "#ops-finance-strategy", label: "Finance strategy" },
     { href: "#ops-export-briefs", label: "Export briefs" },
     { href: "#ops-operator-requests", label: "Operator requests" },
-  ],
-  decisions: [
-    { href: "#ops-decisions-availability", label: "Availability" },
-    { href: "#ops-decision-templates", label: "Decision templates" },
-  ],
-  briefings: [
-    { href: "#ops-strategy-brief", label: "Strategy brief" },
-    { href: "#ops-export-briefs", label: "Export briefs" },
-    { href: "#ops-executive-briefing", label: "Executive briefing" },
-    { href: "#ops-cxo-functions", label: "CXO outputs" },
   ],
 };
