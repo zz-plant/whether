@@ -64,7 +64,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/posture", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.8 },
     { path: "/signals", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.9 },
     { path: "/decide", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.82 },
-    { path: "/reference", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.78 },
+    { path: "/method", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.78 },
     { path: "/resources", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.8 },
     { path: "/methodology", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.56 },
     { path: "/toolkits", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.52 },
