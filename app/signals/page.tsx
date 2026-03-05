@@ -125,7 +125,6 @@ export default async function SignalsPage({
     regimeSeries,
     selectedMonth,
     selectedYear,
-    sensors,
     statusLabel,
     treasury,
     treasuryProvenance,
@@ -221,6 +220,19 @@ export default async function SignalsPage({
     const query = params.toString();
     return query ? `/signals?${query}#signal-diagnostics` : "/signals#signal-diagnostics";
   };
+  const buildDiagnosticChartHref = (chartId: string) => {
+    const params = new URLSearchParams();
+    if (resolvedSearchParams) {
+      Object.entries(resolvedSearchParams).forEach(([key, value]) => {
+        if (value && key !== "diagnostics") {
+          params.set(key, value);
+        }
+      });
+    }
+    params.set("diagnostics", "all");
+    const query = params.toString();
+    return `/signals?${query}#${chartId}`;
+  };
 
   const buildFocusHref = (focus: FocusTab) => {
     const params = new URLSearchParams();
@@ -286,7 +298,33 @@ export default async function SignalsPage({
     labor: "Labor",
     financial: "Financial conditions",
   };
-  const priorityQueue = prioritizedSignalsByFocus[activeFocus];
+  const chartHrefByLabel: Record<string, string> = {
+    Tightness: buildDiagnosticChartHref("viz-threshold-band-timeline"),
+    "Risk appetite": buildDiagnosticChartHref("viz-transition-matrix"),
+    "Curve slope": buildDiagnosticChartHref("viz-phase-space-scatter"),
+    "Base rate": buildDiagnosticChartHref("viz-threshold-band-timeline"),
+    "Regime timeline": buildDiagnosticChartHref("viz-regime-run-length"),
+    "Macro source series": buildDiagnosticChartHref("viz-macro-small-multiples"),
+    "Threshold logic": buildDiagnosticChartHref("viz-threshold-band-timeline"),
+  };
+  const resolvePriorityHref = (label: string, fallbackHref: string) =>
+    chartHrefByLabel[label] ?? fallbackHref;
+  const getDestinationCtaLabel = (href: string) => {
+    if (href.includes("#viz-")) {
+      return "Open related chart →";
+    }
+    if (href.includes("#time-machine")) {
+      return "Open time machine →";
+    }
+    if (href.startsWith("#")) {
+      return "Open section →";
+    }
+    return "Open link →";
+  };
+  const priorityQueue = prioritizedSignalsByFocus[activeFocus].map((item) => ({
+    ...item,
+    href: resolvePriorityHref(item.label, item.href),
+  }));
   const essentialPriorityQueue = priorityQueue.slice(0, 2);
   const additionalPriorityQueue = priorityQueue.slice(2);
   const topDiagnosticCallouts = priorityQueue.slice(0, 3);
@@ -303,7 +341,7 @@ export default async function SignalsPage({
       value: `${assessment.scores.tightness}/100`,
       threshold: `${assessment.thresholds.tightnessRegime}/100`,
       description: "Higher values indicate tighter funding conditions.",
-      href: "#current-scores",
+      href: resolvePriorityHref("Tightness", "#current-scores"),
       metric: "tightness",
     },
     {
@@ -311,7 +349,7 @@ export default async function SignalsPage({
       value: `${assessment.scores.riskAppetite}/100`,
       threshold: `${assessment.thresholds.riskAppetiteRegime}/100`,
       description: "Higher values indicate more risk-on market behavior.",
-      href: "#current-scores",
+      href: resolvePriorityHref("Risk appetite", "#current-scores"),
       metric: "risk",
     },
     {
@@ -322,7 +360,7 @@ export default async function SignalsPage({
           : `${assessment.scores.curveSlope.toFixed(2)}%`,
       threshold: "0.00%",
       description: "10Y minus 2Y Treasury yield spread.",
-      href: "#current-scores",
+      href: resolvePriorityHref("Curve slope", "#current-scores"),
       metric: "curve",
     },
   ];
@@ -539,7 +577,7 @@ export default async function SignalsPage({
                       href={card.href}
                       className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
                     >
-                      Open source signals →
+                      {getDestinationCtaLabel(card.href)}
                     </a>
                   </article>
                 ))}
@@ -585,7 +623,7 @@ export default async function SignalsPage({
                 href={item.href}
                 className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
               >
-                Open {item.label.toLowerCase()} →
+                {getDestinationCtaLabel(item.href)}
               </a>
             </li>
           ))}
@@ -606,7 +644,7 @@ export default async function SignalsPage({
                     href={item.href}
                     className="mt-2 inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
                   >
-                    Open {item.label.toLowerCase()} →
+                    {getDestinationCtaLabel(item.href)}
                   </a>
                 </li>
               ))}
@@ -625,7 +663,7 @@ export default async function SignalsPage({
             <p className="text-[15px] text-slate-300 sm:text-base">
               {showFullDiagnostics
                 ? "Showing the full diagnostic set for deep validation and audits."
-                : "Start with the top 3 drivers. Expand only when you need full diagnostic depth."}
+                : "Start with the top 3 drivers. Each link opens full diagnostics at the relevant chart."}
             </p>
           </div>
           <a
@@ -647,7 +685,7 @@ export default async function SignalsPage({
                   href={item.href}
                   className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
                 >
-                  Open {item.label.toLowerCase()} →
+                  {getDestinationCtaLabel(item.href)}
                 </a>
               </li>
             ))}
@@ -657,8 +695,8 @@ export default async function SignalsPage({
             assessment={assessment}
             treasury={treasury}
             macroSeries={macroSeries}
-            sensors={sensors}
             regimeSeries={regimeSeries}
+            summaryArchive={summaryArchive}
             activeMetric={activeMetric}
             playbackIndex={playbackIndex}
           />
