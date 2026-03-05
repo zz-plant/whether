@@ -2,13 +2,13 @@
 
 ## Runtime & tooling versions
 - **Package manager:** Bun 1.3.9 (`packageManager`).
-- **Node engine:** >=20.16.0.
-- **Next.js:** 15.5.12.
+- **Node engine:** 20.16.x (`engines.node`).
+- **Next.js:** 16.1.6.
 - **React / React DOM:** 19.2.4.
 - **TypeScript:** 5.9.3.
-- **Tailwind CSS:** 3.4.6.
+- **Tailwind CSS:** 3.4.17.
 - **Cloudflare adapter:** @cloudflare/next-on-pages 1.13.16.
-- **Testing:** `node --test` via `bun test`.
+- **Testing:** Node test runner via `bun run test` (`scripts/run-tests.mjs`).
 - **Linting:** `eslint` CLI via `bun run lint`.
 
 ## Newer capabilities snapshot (research baseline)
@@ -18,12 +18,12 @@ This section maps the currently pinned stack to newer stable versions and highli
 | Element | Current in repo | Newer stable (observed) | Notable newer capabilities to evaluate |
 | --- | --- | --- | --- |
 | Bun | 1.3.9 | 1.3.9 | Runtime and package manager performance improvements, plus continued Node compatibility expansion for tooling/scripts. |
-| Next.js | 15.5.12 | 16.1.6 | Turbopack maturity improvements, Cache Components/PPR-oriented caching model, and `proxy.ts` replacing `middleware.ts` naming for network boundary clarity. |
+| Next.js | 16.1.6 | 16.1.6 | Current production pin includes Cache Components/PPR-oriented caching model and `proxy.ts` naming; keep release-note checks for minor updates. |
 | React / React DOM | 19.2.4 | 19.2.4 | React 19 Actions for async mutations, `useOptimistic`, form-centric hooks (`useFormStatus`, `useActionState`), improved Suspense behavior, and static React DOM APIs. |
 | TypeScript | 5.9.3 | 5.9.3 | Language service and type-checking improvements, faster editor workflows, and newer type-system ergonomics from 5.6–5.9 releases. |
-| Tailwind CSS | 3.4.6 | 4.1.18 | Tailwind v4 CSS-first setup, streamlined content/source detection, and reduced PostCSS plugin surface for common setups. |
-| Zod | 3.25.76 | 4.3.6 | Zod 4 API/performance updates and schema ergonomics improvements for large validation surfaces. |
-| ESLint | 8.57.0 | 9.39.2 | Flat config-first ecosystem direction and updated rule/tooling compatibility expectations. |
+| Tailwind CSS | 3.4.17 | 4.1.18 | Tailwind v4 CSS-first setup, streamlined content/source detection, and reduced PostCSS plugin surface for common setups. |
+| Zod | 4.3.6 | 4.3.6 | Current pin includes Zod 4 API/performance updates; watch minor upgrades for validator/test compatibility. |
+| ESLint | 9.38.0 | 9.39.2 | Flat config-first ecosystem direction and updated rule/tooling compatibility expectations. |
 
 ### Research sources used for this snapshot
 - `npm view <package> version` for version baselining.
