@@ -77,10 +77,10 @@ export function LegacyRouteBridge({
         <p className="text-sm leading-7 text-slate-300 sm:text-base">{description}</p>
         <p className="text-xs text-slate-400">
           {!isClient
-            ? "Checking redirect preference..."
+            ? "Just a moment—we're checking your redirect preference."
             : autoForwardEnabled
-            ? `Auto-forwarding to the primary destination in ${secondsLeft}s.`
-            : "Auto-forward is off for first-time visitors. Choose your next destination below."}
+            ? `Taking you to your main destination in ${secondsLeft}s.`
+            : "Automatic redirect is off right now. Choose where you'd like to go next."}
         </p>
         <div className="flex flex-wrap gap-3">
           <Link
@@ -101,7 +101,7 @@ export function LegacyRouteBridge({
               onClick={() => setAutoForwardEnabled(false)}
               className="inline-flex min-h-[44px] items-center rounded-full border border-slate-600 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-200"
             >
-              Stay on this page
+              Keep me here
             </button>
           ) : (
             <button
@@ -112,7 +112,7 @@ export function LegacyRouteBridge({
               }}
               className="inline-flex min-h-[44px] items-center rounded-full border border-slate-600 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-200"
             >
-              Enable auto-forward
+              Turn on automatic redirect
             </button>
           )}
         </div>

@@ -331,7 +331,7 @@ export const ExportBriefPanel = ({
                 aria-busy={isCopying}
                 className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
               >
-                {isCopying && activeTarget === "Board" ? "Copying" : "Copy board brief (1-click)"}
+                {isCopying && activeTarget === "Board" ? "Copying" : "Copy board summary"}
               </Button>
               <Button
                 type="button"
@@ -384,7 +384,7 @@ export const ExportBriefPanel = ({
         <div className="mt-4 grid gap-4 lg:grid-cols-[1.4fr,1fr]">
           <div className="weather-surface p-4">
             <p className="type-kicker">
-              Constraint headlines
+              Key recommendations
             </p>
             <p className="mt-3 text-sm text-slate-300">
               Plain-English summary lines that can drop into status updates or exec briefings.
