@@ -330,11 +330,11 @@ export const insightDatabase = {
   },
   decisionShield: {
     title: "Decision Shield",
-    subtitle: "Operational constraints by weather",
+    subtitle: "Decision guidance by market condition",
     columns: {
       requestType: "Request type",
-      tight: "If weather is tight",
-      loose: "If weather is loose",
+      tight: "In constrained markets",
+      loose: "In growth markets",
     },
     rows: [
       {
@@ -345,15 +345,15 @@ export const insightDatabase = {
       },
       {
         requestType: "Can we rewrite?",
-        tight: "No. Maintenance only. Do not stop the factory.",
+        tight: "No. Prioritize maintenance and reliability work only.",
         loose:
-          "Yes, if it buys at least two years of increased shipping velocity.",
+          "Yes, if it materially improves delivery speed for the next two years.",
       },
       {
         requestType: "Can we launch X?",
         tight:
           "Maybe, only if it reduces churn or meaningfully upsells current users.",
-        loose: "Yes. Try it—failure is cheap learning.",
+        loose: "Yes. Test quickly and use results to guide the next investment.",
       },
       {
         requestType: "Can we discount?",

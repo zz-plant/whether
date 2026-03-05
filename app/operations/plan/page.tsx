@@ -14,12 +14,12 @@ export default function OperationsPlanPage() {
   return (
     <LegacyRouteBridge
       eyebrow="Planning route update"
-      title="The planning flow now lives in Action playbook"
-      description="You followed a legacy planning link. We kept this bridge so you can continue without losing context. Use the primary path for execution planning, or the secondary path for weekly data access."
+      title="Planning has moved to the Action playbook"
+      description="You're on an older planning link. Continue to the Action playbook to plan execution, or open the weekly data companion for the latest signal details."
       primaryHref="/operations"
-      primaryLabel="Open action playbook"
+      primaryLabel="Go to Action playbook"
       secondaryHref="/operations/data"
-      secondaryLabel="Open weekly data companion"
+      secondaryLabel="Go to weekly data companion"
     />
   );
 }
