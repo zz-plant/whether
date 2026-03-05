@@ -9,19 +9,19 @@ const steps = [
     href: "/operations",
     label: "Stage 1",
     title: "Plan",
-    description: "Translate the regime into quarterly posture.",
+    description: "Set this quarter's operating plan.",
   },
   {
     href: "/operations/decisions",
     label: "Stage 2",
     title: "Decisions",
-    description: "Validate assumptions and guardrails before committing.",
+    description: "Review assumptions and finalize key decisions.",
   },
   {
     href: "/operations#ops-export-briefs",
     label: "Stage 3",
     title: "Briefings",
-    description: "Export aligned narratives and leadership-ready kits.",
+    description: "Export updates ready to share with leadership.",
   },
 ] as const;
 
