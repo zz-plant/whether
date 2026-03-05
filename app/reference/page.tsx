@@ -32,11 +32,11 @@ export default function ReferencePage() {
       <section className="weather-panel space-y-3 px-6 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Reference</h1>
         <p className="text-sm text-slate-300">
-          Use Reference for canonical trust surfaces only: methods, formulas, and source transparency. For long-form board artifacts and templates, use Resources.
+          Use Reference for canonical trust surfaces only: methods, formulas, and source transparency. Method now routes here; open Methodology below for formula-level detail. For long-form board artifacts and templates, use Resources.
         </p>
         <div className="flex flex-wrap gap-3">
-          <Link href="/method" className="weather-button inline-flex items-center justify-center">
-            Open Method
+          <Link href="/methodology" className="weather-button inline-flex items-center justify-center">
+            Open Methodology
           </Link>
           <Link href="/resources" className="weather-button inline-flex items-center justify-center">
             Open Resources
@@ -45,21 +45,21 @@ export default function ReferencePage() {
       </section>
 
       <section className="grid gap-3 sm:grid-cols-2">
-        <Link href="/method" className="weather-panel space-y-2 px-4 py-4">
-          <h2 className="text-lg font-semibold text-slate-100">Method</h2>
+        <Link href="/methodology" className="weather-panel space-y-2 px-4 py-4">
+          <h2 className="text-lg font-semibold text-slate-100">Methodology</h2>
           <p className="text-sm text-slate-300">How the model is constructed, what it includes, and where confidence limits apply.</p>
         </Link>
-        <Link href="/methodology" className="weather-panel space-y-2 px-4 py-4">
-          <h2 className="text-lg font-semibold text-slate-100">Formulas</h2>
-          <p className="text-sm text-slate-300">Formula-level definitions, thresholds, and interpretation notes for key indicators.</p>
+        <Link href="/learn" className="weather-panel space-y-2 px-4 py-4">
+          <h2 className="text-lg font-semibold text-slate-100">Learn hub</h2>
+          <p className="text-sm text-slate-300">Operator education on interpretation patterns, failure modes, and worked examples.</p>
         </Link>
         <Link href="/operations/data" className="weather-panel space-y-2 px-4 py-4">
           <h2 className="text-lg font-semibold text-slate-100">Data operations</h2>
           <p className="text-sm text-slate-300">Data source cadence, handoff conventions, and operational data usage guidance.</p>
         </Link>
-        <Link href="/learn" className="weather-panel space-y-2 px-4 py-4">
-          <h2 className="text-lg font-semibold text-slate-100">Learn</h2>
-          <p className="text-sm text-slate-300">Concepts and diagnostic failure modes for operator education and pattern recognition.</p>
+        <Link href="/concepts" className="weather-panel space-y-2 px-4 py-4">
+          <h2 className="text-lg font-semibold text-slate-100">Concepts library</h2>
+          <p className="text-sm text-slate-300">Browse canonical concept articles used across decision guidance.</p>
         </Link>
       </section>
     </main>

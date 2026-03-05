@@ -3,7 +3,7 @@ import { primaryNavigation } from "../../lib/navigation/primaryNavigation";
 import { pathMatchesLink } from "../../lib/navigation/pathMatching";
 
 export function StaticHubNav({ currentPath }: { currentPath: string }) {
-  const hubLinks = primaryNavigation.filter((link) => link.staticHub !== false);
+  const hubLinks = primaryNavigation.filter((link) => link.href !== "/");
 
   return (
     <nav className="weather-panel px-4 py-4" aria-label="Static content hubs">
