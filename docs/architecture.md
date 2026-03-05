@@ -74,17 +74,19 @@ Summary APIs live under `app/api/*` and mirror the time horizon they serve:
 - `/api/summary-delta` for change detection
 - `/api/treasury` for direct Treasury-derived data access
 
-Historical summary playback uses `lib/summary/summaryArchive.ts`, which validates archive entries and
-hydrates missing weekly/monthly structured fields for legacy records.
+Historical summary playback uses `lib/summary/summaryArchive.ts`, which validates archive entries and only falls back to hydration when legacy records are encountered.
+
+Use `bun run summary-archive:migrate-structured` to materialize `structured` blocks into the checked-in archive and keep runtime hydration as fallback-only behavior.
 
 ## Prioritized refactor backlog (structured summaries)
 1. **P0 — Centralize copy rendering contracts** ✅ Implemented
    - Weekly/monthly copy assembly now routes through shared renderer helpers keyed by structured sections.
    - Implemented in `lib/summary/summaryCopyRenderer.ts` with shared contracts in `lib/summary/summaryTypes.ts`.
    - Goal: remove formatting drift risk between builders and UI/export surfaces.
-2. **P1 — Formalize archive migration step**
-   - Add a script to materialize `structured` into historical weekly/monthly archive records.
-   - Goal: reduce runtime hydration work and simplify validation paths.
+2. **P1 — Formalize archive migration step** ✅ Implemented
+   - Added `scripts/migrateSummaryArchiveStructured.ts` and npm scripts to materialize `structured` into historical weekly/monthly archive records.
+   - Added `tests/summaryArchiveMigration.test.ts` to prevent regressions where archive entries lose `summary.structured`.
+   - Goal: keep runtime hydration fallback-only and simplify validation paths.
 3. **P1 — Strengthen contract tests at API boundary**
    - Add route-level tests that assert `/api/weekly` and `/api/monthly` include structured/copy/provenance invariants.
    - Goal: catch schema regressions before UI consumers break.

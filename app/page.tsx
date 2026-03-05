@@ -22,13 +22,12 @@ import { reportPageLinks } from "../lib/report/reportNavigation";
 import { buildTrustStatus } from "../lib/report/trustStatus";
 import { WeeklyDecisionCard } from "./components/weeklyDecisionCard";
 import { RevealOnView } from "./components/revealOnView";
-import { operatingCallsByRegime } from "../lib/report/operatingCalls";
 import { DataProvenanceStrip } from "./components/dataProvenanceStrip";
-import { deriveDecisionKnobs } from "../lib/report/decisionKnobs";
 import { ActionStrip } from "./components/actionStrip";
 import { buildSlackBrief } from "../lib/export/briefBuilders";
 import { CopySlackBriefButton } from "./components/copySlackBriefButton";
 import { createBreadcrumbTrail } from "../lib/navigation/breadcrumbs";
+import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
 
 const WeeklyActionSummaryPanel = dynamic(
   () =>
@@ -67,59 +66,6 @@ const homeSectionSequence = [
   { href: "#executive-snapshot", label: "Evidence" },
 ] as const;
 
-const regimeLabelMap = {
-  SCARCITY: "Scarcity",
-  DEFENSIVE: "Defensive",
-  VOLATILE: "Mixed",
-  EXPANSION: "Expansion",
-} as const;
-
-const regimeShiftTargets = {
-  SCARCITY: {
-    defensive: "DEFENSIVE",
-    adjacent: "VOLATILE",
-  },
-  DEFENSIVE: {
-    defensive: "SCARCITY",
-    adjacent: "EXPANSION",
-  },
-  VOLATILE: {
-    defensive: "SCARCITY",
-    adjacent: "EXPANSION",
-  },
-  EXPANSION: {
-    defensive: "DEFENSIVE",
-    adjacent: "VOLATILE",
-  },
-} as const;
-
-const regimeSeverityRank: Record<keyof typeof regimeLabelMap, number> = {
-  EXPANSION: 0,
-  VOLATILE: 1,
-  DEFENSIVE: 2,
-  SCARCITY: 3,
-};
-
-const expansionWindowByRegime: Record<keyof typeof regimeLabelMap, string> = {
-  SCARCITY: "Closed",
-  DEFENSIVE: "Mostly closed",
-  VOLATILE: "Selective",
-  EXPANSION: "Open with guardrails",
-};
-
-const longCycleBetByRegime: Record<keyof typeof regimeLabelMap, string> = {
-  SCARCITY: "Constrained",
-  DEFENSIVE: "Constrained",
-  VOLATILE: "Caution",
-  EXPANSION: "Permitted with milestones",
-};
-
-const expansionConstraintByRegime: Record<keyof typeof regimeLabelMap, string> = {
-  SCARCITY: "avoid new expansion initiatives",
-  DEFENSIVE: "avoid new expansion initiatives",
-  VOLATILE: "stage expansion initiatives",
-  EXPANSION: "pursue expansion initiatives selectively",
-};
 
 export const generateMetadata = async ({
   searchParams,
@@ -313,39 +259,22 @@ export default async function HomePage({
     stableAction:
       "Safe to use for near-term planning; proceed with normal approval flow.",
   });
-  const previousRegime = regimeAlert?.previousRegime;
-  const severityDelta = previousRegime
-    ? regimeSeverityRank[assessment.regime] - regimeSeverityRank[previousRegime]
-    : 0;
-  const postureDeltaLabel = severityDelta > 0 ? "Worse than last week" : severityDelta < 0 ? "Better than last week" : "No worse than last week";
-  const operatingCalls = operatingCallsByRegime[assessment.regime];
-  const expansionWindow = expansionWindowByRegime[assessment.regime];
-  const longCycleBetStance = longCycleBetByRegime[assessment.regime];
-  const tightnessThreshold = assessment.thresholds.tightnessRegime;
-  const riskThreshold = assessment.thresholds.riskAppetiteRegime;
-  const tightnessGap = Math.abs(assessment.scores.tightness - tightnessThreshold);
-  const riskGap = Math.abs(assessment.scores.riskAppetite - riskThreshold);
-  const nearestThresholdGap = Math.min(tightnessGap, riskGap);
-  const shiftTargets = regimeShiftTargets[assessment.regime];
-  const primaryShiftRegimeLabel = regimeLabelMap[shiftTargets.defensive];
-  const confidenceLabel = nearestThresholdGap <= 5 ? "LOW" : nearestThresholdGap <= 12 ? "MED" : "HIGH";
-  const transitionWatch = nearestThresholdGap <= 8 || Boolean(regimeAlert) ? "ON" : "OFF";
-  const reversalTrigger = tightnessGap <= riskGap
-    ? `Flip to ${primaryShiftRegimeLabel} if tightness crosses ${tightnessThreshold.toFixed(1)} (now ${assessment.scores.tightness.toFixed(1)}).`
-    : `Flip to ${primaryShiftRegimeLabel} if risk appetite crosses ${riskThreshold.toFixed(1)} (now ${assessment.scores.riskAppetite.toFixed(1)}).`;
-  const dangerousCategory =
-    assessment.regime === "EXPANSION"
-      ? "Unchecked spend growth without payback controls"
-      : assessment.regime === "VOLATILE"
-        ? "Irreversible multi-quarter commitments"
-        : "Net-new hiring and long-payback expansion bets";
-  const constraints = [
-    `Expansion: ${expansionConstraintByRegime[assessment.regime]} (${expansionWindow.toLowerCase()})`,
-    `Hiring: restrict to critical roles (${operatingCalls.hiring.toLowerCase()})`,
-    `Long bets: defer unless reversible (${longCycleBetStance.toLowerCase()})`,
-  ];
-  const guardrail = stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
-  const decisionKnobs = deriveDecisionKnobs(assessment.regime, severityDelta);
+  const homeBriefModel = buildHomeBriefModel({
+    assessment,
+    fetchedAtLabel,
+    historicalSelection,
+    recordDateLabel,
+    regimeAlert,
+    reportDynamics,
+    sensors,
+    macroSeries,
+    startItems,
+    fenceItems,
+    statusLabel,
+    stopItems,
+    treasury,
+    treasuryProvenance,
+  });
   const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries);
   return (
     <ReportShell
@@ -396,17 +325,17 @@ export default async function HomePage({
       <WeeklyDecisionCard
         regime={assessment.regime}
         statusLabel={statusLabel}
-        postureDelta={postureDeltaLabel}
-        confidenceLabel={confidenceLabel}
-        transitionWatch={transitionWatch}
-        constraints={constraints}
-        guardrail={guardrail}
-        reversalTrigger={reversalTrigger}
-        dangerousCategory={dangerousCategory}
+        postureDelta={homeBriefModel.postureDeltaLabel}
+        confidenceLabel={homeBriefModel.confidenceLabel}
+        transitionWatch={homeBriefModel.transitionWatch}
+        constraints={homeBriefModel.constraints}
+        guardrail={homeBriefModel.guardrail}
+        reversalTrigger={homeBriefModel.reversalTrigger}
+        dangerousCategory={homeBriefModel.dangerousCategory}
         recordDateLabel={recordDateLabel}
         fetchedAtLabel={fetchedAtLabel}
         reportDynamics={reportDynamics}
-        decisionKnobs={decisionKnobs}
+        decisionKnobs={homeBriefModel.decisionKnobs}
         actions={<CopySlackBriefButton brief={slackBrief} />}
       />
 

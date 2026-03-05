@@ -28,8 +28,6 @@ Whether exposes read-first JSON endpoints for summary generation, cadence checks
 | Endpoint | Method(s) | Purpose |
 | --- | --- | --- |
 | `/api/regime-alerts` | GET, POST | Read/create regime alert events. |
-| `/api/alert-preferences` | GET, POST | Read/update per-client channel preferences. |
-| `/api/alert-deliveries` | GET, POST | Read/simulate alert deliveries by channel. |
 | `/api/weekly-digest` | GET | Build digest summary from stored alert events. |
 
 ## Integration and operations endpoints
@@ -37,6 +35,7 @@ Whether exposes read-first JSON endpoints for summary generation, cadence checks
 | Endpoint | Method | Purpose |
 | --- | --- | --- |
 | `/api/integrations/weekly-mandate?target=<slack|email|...>` | GET | Destination-specific weekly mandate payload. |
+| `/api/brief/slack` | GET | Slack-ready plain-text weekly brief payload for automation. |
 | `/api/health` | GET | Monitor-friendly service + treasury freshness status. |
 | `/llms.txt` | GET | Plain-text machine onboarding and endpoint discovery. |
 | `/.well-known/whether-agent.json` | GET | JSON discovery manifest for agent/tool clients. |
@@ -50,14 +49,6 @@ curl -s "http://localhost:3000/api/agent?cadence=weekly" | jq '{cadence, support
 ```
 
 Invalid cadence returns `400` with an `allowedCadences` field.
-
-### Alert preference update
-
-```bash
-curl -s -X POST "http://localhost:3000/api/alert-preferences" \
-  -H "content-type: application/json" \
-  -d '{"clientId":"ops-demo","preferences":{"slack":true,"email":false,"webhook":true}}' | jq
-```
 
 ### Weekly mandate integration payload
 
