@@ -57,7 +57,7 @@ export function WeeklyDecisionCard({
   return (
     <section className="weather-panel space-y-6 px-5 py-6 sm:px-7 sm:py-8" aria-labelledby="weekly-posture-brief-title">
       <header className="space-y-2 border-b border-slate-700/60 pb-5">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-200">This-week posture</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-200">This week&apos;s posture</p>
         <h1 id="weekly-posture-brief-title" className="text-3xl font-semibold text-slate-50 sm:text-4xl">{statusLabel}</h1>
         <p className="text-sm text-slate-300">{netConstraintSummary}</p>
       </header>
@@ -79,21 +79,21 @@ export function WeeklyDecisionCard({
       </article>
 
       <article className="rounded-xl border border-slate-700/70 bg-slate-900/50 p-4">
-        <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">Revisit last week’s decisions?</h2>
-        <p className="mt-2 text-sm font-semibold text-slate-100">{revisitDecisions ? "YES — Update hiring/roadmap calls." : "NO — Hold current posture."}</p>
-        <p className="mt-1 text-xs text-slate-300">Posture delta: {postureDelta} · Confidence: {confidenceLabel} · Shift watch: {transitionWatch}</p>
+        <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">Should we revisit last week&apos;s decisions?</h2>
+        <p className="mt-2 text-sm font-semibold text-slate-100">{revisitDecisions ? "Yes — update hiring and roadmap calls." : "No — keep the current posture."}</p>
+        <p className="mt-1 text-xs text-slate-300">Posture change: {postureDelta} · Confidence: {confidenceLabel} · Shift watch: {transitionWatch}</p>
       </article>
 
       <article className="rounded-xl border border-slate-700/70 bg-slate-900/50 p-4">
-        <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">Bounded decision rules</h2>
+        <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">Decision rules for this week</h2>
         <ul className="mt-3 grid gap-3 sm:grid-cols-2">
           {decisionRules.slice(0, 4).map((rule) => (
             <li key={rule.area} className="rounded-lg border border-slate-700/60 bg-slate-950/60 p-3 text-sm text-slate-200">
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">{decisionAreaLabel(rule.area)}</p>
               <p className="mt-1 font-semibold text-slate-100">{rule.recommendation}</p>
-              <p className="mt-2 text-xs text-slate-300">Scope: {rule.scope}</p>
-              <p className="mt-1 text-xs text-rose-200">Pause: {rule.pauseTrigger}</p>
-              <p className="mt-1 text-xs text-emerald-200">Resume: {rule.resumeTrigger}</p>
+              <p className="mt-2 text-xs text-slate-300">Applies to: {rule.scope}</p>
+              <p className="mt-1 text-xs text-rose-200">Pause when: {rule.pauseTrigger}</p>
+              <p className="mt-1 text-xs text-emerald-200">Resume when: {rule.resumeTrigger}</p>
             </li>
           ))}
         </ul>
@@ -101,7 +101,7 @@ export function WeeklyDecisionCard({
 
       <div className="grid gap-4 md:grid-cols-2">
         <article className="rounded-xl border border-amber-500/40 bg-slate-900/50 p-4">
-          <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-amber-200">Guardrail</h2>
+          <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-amber-200">Main guardrail</h2>
           <p className="mt-2 text-sm text-slate-100">{guardrail}</p>
         </article>
         <article className="rounded-xl border border-sky-500/40 bg-slate-900/50 p-4">
@@ -111,7 +111,7 @@ export function WeeklyDecisionCard({
       </div>
 
       <article className="rounded-xl border border-slate-700/70 bg-slate-900/50 p-4">
-        <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">Memory rail (last 4 weeks)</h2>
+        <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">Past 4 weeks at a glance</h2>
         <ul className="mt-2 grid gap-2 sm:grid-cols-4">
           {memoryRail.map((item) => (
             <li key={`${item.label}-${item.posture}`} className="rounded-md border border-slate-700/60 bg-slate-950/60 px-2 py-2 text-xs text-slate-200">

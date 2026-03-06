@@ -30,14 +30,14 @@ export const HistoricalBanner = ({
   return (
     <div className="mt-6 rounded-2xl border border-slate-600 bg-slate-900/70 px-4 py-3 text-sm text-slate-200">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <span className="type-label text-slate-400">Historical mode</span>
+        <span className="type-label text-slate-400">Viewing past data</span>
         <div className="flex flex-wrap gap-2">
           {backwardHref ? (
             <a
               href={backwardHref}
               className="inline-flex min-h-[44px] items-center rounded-full border border-cyan-400/60 bg-cyan-500/10 px-3 py-1 text-xs font-semibold tracking-[0.12em] text-cyan-100 transition hover:border-cyan-300 hover:text-cyan-50"
             >
-              ← Go further back
+              ← View older snapshot
             </a>
           ) : null}
           {timeMachineHref ? (
@@ -45,7 +45,7 @@ export const HistoricalBanner = ({
               href={timeMachineHref}
               className="inline-flex min-h-[44px] items-center rounded-full border border-slate-500/70 px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-100 transition hover:border-slate-300/80 hover:text-white"
             >
-              Open Time Machine
+              Choose another date
             </a>
           ) : null}
           {liveHref ? (
@@ -53,17 +53,17 @@ export const HistoricalBanner = ({
               href={liveHref}
               className="inline-flex min-h-[44px] items-center rounded-full border border-slate-500/70 px-3 py-1 text-xs font-semibold tracking-[0.12em] text-slate-100 transition hover:border-slate-300/80 hover:text-white"
             >
-              Return to live
+              Back to current week
             </a>
           ) : null}
         </div>
       </div>
       <p className="mt-1 font-semibold text-slate-100">{banner}</p>
       <p className="mt-2 text-xs text-slate-400">
-        You are viewing archived Treasury data; live signals are temporarily hidden.
+        You are viewing archived Treasury data, so live signals are hidden for now.
         {previousHref
-          ? " Use Go further back to step to an older snapshot."
-          : " Use Go further back to open Time Machine and pick an older snapshot."}
+          ? " Use “View older snapshot” to step to an earlier week."
+          : " Use “View older snapshot” to open Time Machine and pick an earlier week."}
       </p>
     </div>
   );
@@ -116,15 +116,15 @@ export const WeeklyActionSummaryPanel = ({
       className="mt-8"
     >
       <div className="weather-panel space-y-5 px-5 py-5">
-        <p className="type-label text-slate-400">Weekly mandate</p>
+        <p className="type-label text-slate-400">Weekly plan</p>
         <h2 id="weekly-action-summary-title" className="type-section text-slate-100">
-          {regimeLabel} operating posture
+          {regimeLabel} plan for this week
         </h2>
         <p className="text-sm text-slate-200">{actionGuidance}</p>
 
         <article className="weather-surface p-4">
           <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">
-            Constraints this week
+            What’s limiting us this week
           </h3>
           <ul className="mt-3 space-y-2 text-sm text-slate-200">
             {constraints.map((item) => (
@@ -135,7 +135,7 @@ export const WeeklyActionSummaryPanel = ({
 
         <article className="weather-surface p-4">
           <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">
-            Weekly operating guide
+            How to operate this week
           </h3>
           <div className="mt-3 grid gap-3 md:grid-cols-3">
             {postureBlocksByRegime[assessment.regime].map((block) => (
@@ -153,7 +153,7 @@ export const WeeklyActionSummaryPanel = ({
 
         <DataProvenanceStrip
           provenance={provenance}
-          label={`Weekly mandate derived from ${regimeLabel} regime on ${recordDateLabel}`}
+          label={`Weekly plan derived from ${regimeLabel} regime on ${recordDateLabel}`}
           variant="compact"
         />
       </div>
@@ -206,7 +206,7 @@ export const ExecutiveSnapshotPanel = ({
             <h3 id="executive-snapshot-title" className="type-section text-slate-100">
               Rules of engagement this week
             </h3>
-            <p className="mt-2 text-sm text-slate-300">Directive view for this planning cycle.</p>
+            <p className="mt-2 text-sm text-slate-300">A quick decision view for this planning cycle.</p>
           </div>
           <DataProvenanceStrip provenance={provenance} />
         </div>
@@ -249,7 +249,7 @@ export const ExecutiveSnapshotPanel = ({
             </div>
 
             <p className="mt-3 text-lg font-semibold text-slate-100">
-              Binding now: apply strict ROI gates before new spend.
+              Right now: require clear ROI before approving new spend.
             </p>
             <ul className="mt-3 space-y-1 text-sm text-slate-300">
               {constraintHighlights.map((constraint) => (
@@ -278,7 +278,7 @@ export const ExecutiveSnapshotPanel = ({
               </div>
             </div>
             <p className="mt-3 text-xs text-slate-500">
-              Curve slope = 10Y minus 2Y; negative values indicate inversion risk.
+              Curve slope = 10Y minus 2Y. Negative values can signal inversion risk.
             </p>
             <div className="mt-3">
               <svg
@@ -330,7 +330,7 @@ export const ExecutiveSnapshotPanel = ({
                   markerEnd={`url(#${curveMarkerId})`}
                 />
               </svg>
-              <p className="mt-2 text-xs text-slate-500">Slope is {curveLabel}</p>
+              <p className="mt-2 text-xs text-slate-500">Curve status: {curveLabel}</p>
             </div>
           </div>
 
