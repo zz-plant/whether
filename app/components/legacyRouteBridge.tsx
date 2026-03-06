@@ -43,7 +43,7 @@ export function LegacyRouteBridge({
     }
 
     const hasSeenBridge = window.localStorage.getItem(preferenceKey) === "1";
-    setAutoForwardEnabled(hasSeenBridge);
+    setAutoForwardEnabled(true);
     if (!hasSeenBridge) {
       window.localStorage.setItem(preferenceKey, "1");
     }
