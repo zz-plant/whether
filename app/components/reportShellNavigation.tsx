@@ -46,32 +46,25 @@ const basePageLinkClassName =
 
 const getPageLinkStateClassName = ({
   isActive,
-  isCommandCenter,
 }: {
   isActive: boolean;
-  isCommandCenter: boolean;
 }) => {
   if (isActive) {
     return "border-sky-300/90 bg-sky-500/25 text-sky-50 shadow-sm shadow-sky-900/40";
   }
 
-  if (isCommandCenter) {
-    return "border-slate-600/90 bg-slate-900/70 text-slate-100 hover:border-sky-400/70 hover:text-slate-100";
-  }
 
   return "border-slate-700/80 bg-slate-900/45 text-slate-200 hover:border-sky-400/70 hover:text-slate-100";
 };
 
 const getPageLinkClassName = ({
   isActive,
-  isCommandCenter,
   isOddTail,
 }: {
   isActive: boolean;
-  isCommandCenter: boolean;
   isOddTail?: boolean;
 }) =>
-  `${basePageLinkClassName} ${getPageLinkStateClassName({ isActive, isCommandCenter })} ${
+  `${basePageLinkClassName} ${getPageLinkStateClassName({ isActive })} ${
     isOddTail ? "mx-auto max-w-[240px]" : ""
   }`;
 
@@ -284,7 +277,6 @@ export const ReportPageNavigation = ({
                   aria-current={isActive ? "page" : undefined}
                   className={getPageLinkClassName({
                     isActive,
-                    isCommandCenter: link.href === "/start",
                     isOddTail,
                   })}
                 >

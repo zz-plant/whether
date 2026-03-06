@@ -63,7 +63,11 @@ export default async function StartupMacroPosturePage() {
       </section>
 
       <section className="weather-panel space-y-4 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Pillar 3: Decision cluster</h2>
+        <div className="space-y-2">
+          <h2 className="text-lg font-semibold text-slate-100">Pillar 3: Decision cluster</h2>
+          <p className="text-sm text-slate-300">Use the dedicated Answers hub as the canonical list of operator question pages.</p>
+          <Link href="/answers" className="weather-surface inline-flex min-h-[44px] items-center px-4 py-3 text-sm font-semibold text-slate-100">Open operator answers hub →</Link>
+        </div>
         <div className="grid gap-3 sm:grid-cols-2">
           {tierOneDecisionPages.map((page) => (
             <Link key={page.slug} href={`/answers/${page.slug}`} className="weather-surface min-h-[44px] px-4 py-3 text-sm text-slate-100">{page.keyword}</Link>

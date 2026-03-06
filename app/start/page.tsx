@@ -6,9 +6,9 @@ import { loadReportDataSafe } from "../../lib/report/reportData";
 import { postureDefinitions, situationRouting, startSituations, toolkitDefinitions } from "../../lib/informationArchitecture";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Start Here — Whether onboarding",
+  title: "Start Here — Weekly brief routing",
   description:
-    "Optional orientation path for the weekly operating sequence: confirm posture, choose your situation, and run one toolkit.",
+    "Optional routing from the weekly brief: choose your situation, then run one toolkit.",
   path: "/start",
   imageAlt: "Whether Start Here",
 });
@@ -62,9 +62,9 @@ export default async function StartHerePage() {
 
       <section className="weather-panel space-y-4 px-6 py-6">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Start here</p>
-        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Run this week&apos;s operating sequence.</h1>
+        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Need help routing from the weekly brief?</h1>
         <p className="text-base text-slate-200">
-          Use this page when you need a single path: confirm posture, choose the situation to solve now, then run one toolkit end-to-end. Example journey: <span className="font-semibold">Safety Mode → Hiring → Commitment &amp; Rollback Toolkit</span>.
+          Start on <span className="font-semibold">Weekly Brief</span> for the canonical posture call. Use this page only when you need help routing that call into one situation and one toolkit. Example journey: <span className="font-semibold">Safety Mode → Hiring → Commitment &amp; Rollback Toolkit</span>.
         </p>
         <div className="flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">
           <span className="rounded-full border border-slate-700/70 px-3 py-2">3-step weekly workflow</span>
@@ -95,8 +95,8 @@ export default async function StartHerePage() {
           ))}
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <Link href="/operations/plan" className="weather-button-primary inline-flex items-center justify-center">Run weekly operating sequence</Link>
-          <Link href="/operations#ops-export-briefs" className="weather-pill inline-flex min-h-[44px] items-center justify-center rounded-full border border-sky-400/70 bg-sky-500/10 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-sky-100 transition-colors hover:border-sky-300 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation">Copy weekly brief</Link>
+          <Link href="/" className="weather-button-primary inline-flex items-center justify-center">Open weekly brief</Link>
+          <Link href="/operations" className="weather-pill inline-flex min-h-[44px] items-center justify-center rounded-full border border-sky-400/70 bg-sky-500/10 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-sky-100 transition-colors hover:border-sky-300 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation">Open action playbook</Link>
           <details className="group">
             <summary className="weather-pill inline-flex min-h-[44px] cursor-pointer list-none items-center justify-center rounded-full border border-slate-700/80 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation">
               More actions
@@ -111,7 +111,7 @@ export default async function StartHerePage() {
       <section id="start-role-path" className="weather-panel space-y-4 px-6 py-6">
         <div className="space-y-1">
           <h2 className="text-xl font-semibold text-slate-100">Choose your path</h2>
-          <p className="text-sm text-slate-300">Use this as a role lens picker from the weekly brief, not a second homepage.</p>
+          <p className="text-sm text-slate-300">This is an optional router from Weekly Brief, not a second homepage.</p>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
           <Link href="/decide" className="weather-surface min-h-[44px] space-y-2 px-4 py-4 transition hover:border-sky-400/65">
