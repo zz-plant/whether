@@ -85,6 +85,8 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.ok(deltaIndex > postureIndex);
     assert.ok(revisitIndex > deltaIndex);
     assert.ok(rulesSummaryIndex > revisitIndex);
+    assert.match(html, /Confidence MED · Freshness Mar 6, 2026 09:12 UTC · Shift watch ON/);
+    assert.match(html, /Revisit implications[\s\S]*Delta \+2/);
   });
 
   it("uses responsive classes to protect screenshot readability and keeps citation actions", () => {
@@ -119,6 +121,38 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /lg:col-span-6/);
     assert.match(html, /lg:grid-cols-4/);
     assert.match(html, /Cite this call/);
+    assert.match(html, /Posture BALANCED · Confidence HIGH · Effective Mar 5, 2026 · Freshness Mar 6, 2026 09:12 UTC/);
+    assert.match(html, /Whether weekly brief citation/);
     assert.match(html, /Copy board summary/);
+  });
+
+  it("renders fallback trust freshness label when freshness text is empty", () => {
+    const html = renderToStaticMarkup(
+      <WeeklyDecisionCard
+        statusLabel="DEFENSIVE"
+        postureDelta="No worse than last week"
+        confidenceLabel="LOW"
+        transitionWatch="ON"
+        netConstraintSummary="Fallback snapshot is currently in use."
+        guardrail="Hold non-core hiring."
+        reversalTrigger="If risk appetite improves, reopen selective requests."
+        recordDateLabel="Mar 5, 2026"
+        fetchedAtLabel=""
+        reportDynamics={{ directionLabel: "stable", changedSignals: [] }}
+        decisionShiftSummary="Decision delta: no material shift. Keep last week’s operating calls."
+        decisionRules={decisionRules}
+        revisitDecisions={false}
+        memoryRail={[
+          { label: "W-3", posture: "Defensive" },
+          { label: "W-2", posture: "Defensive" },
+          { label: "W-1", posture: "Defensive" },
+          { label: "Now", posture: "Defensive" },
+        ]}
+        citation="Whether weekly brief citation"
+      />,
+    );
+
+    assert.match(html, /Confidence LOW · Freshness Unavailable · Shift watch ON/);
+    assert.match(html, /Posture DEFENSIVE · Confidence LOW · Effective Mar 5, 2026 · Freshness Unavailable/);
   });
 });
