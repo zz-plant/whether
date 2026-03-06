@@ -68,17 +68,22 @@ export function WeeklyDecisionCard({
   citation,
   actions,
 }: WeeklyDecisionCardProps) {
+  const freshnessLabel = fetchedAtLabel.trim().length > 0 ? fetchedAtLabel : "Unavailable";
   const trustCueLine = buildWeeklyTrustCueLine({
     confidenceLabel,
-    freshnessLabel: fetchedAtLabel,
+    freshnessLabel,
     transitionWatch,
   });
   const citationMetaLine = buildWeeklyCitationMetaLine({
     statusLabel,
     confidenceLabel,
     recordDateLabel,
-    freshnessLabel: fetchedAtLabel,
+    freshnessLabel,
   });
+  const meetingShorthand = revisitDecisions
+    ? "Weekly call: revise hiring and roadmap decisions this week."
+    : "Weekly call: hold last week’s hiring and roadmap decisions.";
+  const topDecisionRules = decisionRules.slice(0, 4);
 
   return (
     <section className="weather-panel space-y-5 px-5 py-6 sm:space-y-6 sm:px-7 sm:py-8" aria-labelledby="weekly-posture-brief-title">
@@ -87,6 +92,12 @@ export function WeeklyDecisionCard({
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-200">This week&apos;s posture</p>
           <h1 id="weekly-posture-brief-title" className="text-3xl font-semibold text-slate-50 sm:text-4xl">{statusLabel}</h1>
           <p className="text-sm text-slate-300">{netConstraintSummary}</p>
+          <p className="text-sm font-semibold text-slate-100">{meetingShorthand}</p>
+          <div className="flex flex-wrap gap-2" aria-label="Weekly trust signals">
+            <span className="inline-flex min-h-11 items-center rounded-full border border-slate-600/80 bg-slate-950/70 px-3 py-1 text-xs text-slate-200">Confidence {confidenceLabel}</span>
+            <span className="inline-flex min-h-11 items-center rounded-full border border-slate-600/80 bg-slate-950/70 px-3 py-1 text-xs text-slate-200">Freshness {freshnessLabel}</span>
+            <span className="inline-flex min-h-11 items-center rounded-full border border-slate-600/80 bg-slate-950/70 px-3 py-1 text-xs text-slate-200">Shift watch {transitionWatch}</span>
+          </div>
           <p className="text-xs text-slate-300">{trustCueLine}</p>
         </header>
 
@@ -121,7 +132,7 @@ export function WeeklyDecisionCard({
         <article className={`${secondaryPanel} ${sectionSpacing} lg:col-span-12`}>
           <h2 className={primaryHeading}>Decision rules summary</h2>
           <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {decisionRules.slice(0, 4).map((rule) => (
+            {topDecisionRules.map((rule) => (
               <li key={rule.area} className="rounded-lg border border-slate-700/60 bg-slate-950/60 p-3 text-sm text-slate-200">
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">{decisionAreaLabel(rule.area)}</p>
                 <p className="mt-1 text-xs text-slate-300"><span className="font-semibold text-slate-100">Action:</span> {rule.recommendation}</p>
@@ -145,18 +156,31 @@ export function WeeklyDecisionCard({
       </div>
 
       <article className={`${secondaryPanel} ${sectionSpacing}`}>
-        <h2 className={primaryHeading}>Operating rules this week</h2>
-        <ul className="mt-3 grid gap-3 sm:grid-cols-2">
-          {decisionRules.slice(0, 4).map((rule) => (
-            <li key={rule.area} className="rounded-lg border border-slate-700/60 bg-slate-950/60 p-3 text-sm text-slate-200">
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">{decisionAreaLabel(rule.area)}</p>
-              <p className="mt-1 text-xs text-slate-300"><span className="font-semibold text-slate-100">Action:</span> {rule.recommendation}</p>
-              <p className="mt-1 text-xs text-slate-300"><span className="font-semibold text-slate-100">Scope:</span> {rule.scope}</p>
-              <p className="mt-1 text-xs text-semantic-caution-fg"><span className="font-semibold text-slate-100">Pause:</span> {rule.pauseTrigger}</p>
-              <p className="mt-1 text-xs text-semantic-reversal-fg"><span className="font-semibold text-slate-100">Resume:</span> {rule.resumeTrigger}</p>
-            </li>
-          ))}
-        </ul>
+        <h2 className={primaryHeading}>Decision matrix this week</h2>
+        <div className="mt-3 overflow-x-auto">
+          <table className="min-w-full border-separate border-spacing-y-2 text-xs text-slate-200" aria-label="Weekly decision matrix">
+            <thead>
+              <tr>
+                <th scope="col" className="px-2 py-1 text-left font-semibold uppercase tracking-[0.12em] text-slate-300">Area</th>
+                <th scope="col" className="px-2 py-1 text-left font-semibold uppercase tracking-[0.12em] text-slate-300">Action</th>
+                <th scope="col" className="px-2 py-1 text-left font-semibold uppercase tracking-[0.12em] text-slate-300">Scope</th>
+                <th scope="col" className="px-2 py-1 text-left font-semibold uppercase tracking-[0.12em] text-semantic-caution-fg">Pause</th>
+                <th scope="col" className="px-2 py-1 text-left font-semibold uppercase tracking-[0.12em] text-semantic-reversal-fg">Resume</th>
+              </tr>
+            </thead>
+            <tbody>
+              {topDecisionRules.map((rule) => (
+                <tr key={rule.area} className="rounded-lg border border-slate-700/60 bg-slate-950/60 align-top">
+                  <th scope="row" className="px-2 py-2 text-left font-semibold uppercase tracking-[0.12em] text-sky-200">{decisionAreaLabel(rule.area)}</th>
+                  <td className="px-2 py-2 text-slate-200">{rule.recommendation}</td>
+                  <td className="px-2 py-2 text-slate-300">{rule.scope}</td>
+                  <td className="px-2 py-2 text-semantic-caution-fg">{rule.pauseTrigger}</td>
+                  <td className="px-2 py-2 text-semantic-reversal-fg">{rule.resumeTrigger}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </article>
 
       <article className={`${supportingPanel} ${sectionSpacing}`}>
