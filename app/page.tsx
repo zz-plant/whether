@@ -343,6 +343,9 @@ export default async function HomePage({
         actions={<CopyLeadershipArtifactsButtons slackBrief={slackBrief} boardSummary={boardSummary} citation={callCitation} />}
       />
 
+
+      <DataProvenanceStrip provenance={treasuryProvenance} variant="compact" />
+
       <section className="weather-panel space-y-4 px-5 py-5" aria-label="Decision concept links">
         <div className="space-y-1">
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Decision references</p>
@@ -369,8 +372,6 @@ export default async function HomePage({
           <p className="mt-1">Last cached update: {reportResult.fallback.lastCachedTimestamp}. Review <a href="/signals" className="underline">Signals</a> to retry live evidence.</p>
         </section>
       ) : null}
-
-      <DataProvenanceStrip provenance={treasuryProvenance} variant="compact" />
 
       <RevealOnView>
         <section
