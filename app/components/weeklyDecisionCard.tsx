@@ -36,6 +36,12 @@ const deltaLabel: Record<ReportDynamics["changedSignals"][number]["key"], string
 
 const directionHint = (delta: number) => (delta > 0 ? "tightening" : delta < 0 ? "easing" : "unchanged");
 
+const signalDeltaTone: Record<"tightening" | "easing" | "unchanged", string> = {
+  tightening: "border-semantic-tightening-border/70 bg-semantic-tightening-bg/70 text-semantic-tightening-fg",
+  easing: "border-semantic-easing-border/70 bg-semantic-easing-bg/70 text-semantic-easing-fg",
+  unchanged: "border-semantic-unchanged-border/70 bg-semantic-unchanged-bg/70 text-semantic-unchanged-fg",
+};
+
 const sectionSpacing = "space-y-3";
 const primaryHeading = "text-sm font-semibold uppercase tracking-[0.14em] text-slate-100";
 const secondaryHeading = "text-xs font-semibold uppercase tracking-[0.12em] text-slate-300";
@@ -76,11 +82,17 @@ export function WeeklyDecisionCard({
           <p className="rounded-md border border-slate-700/80 bg-slate-950/60 px-3 py-2 text-xs text-slate-300">No material signal deltas this week.</p>
         ) : (
           <div className="flex flex-wrap gap-2">
-            {reportDynamics.changedSignals.slice(0, 3).map((signal) => (
-              <span key={signal.key} className="inline-flex items-center rounded-full border border-slate-600 bg-slate-950/60 px-3 py-1 text-xs text-slate-200">
-                {deltaLabel[signal.key]}: {signal.delta > 0 ? "↑" : signal.delta < 0 ? "↓" : "→"} {directionHint(signal.delta)}
-              </span>
-            ))}
+            {reportDynamics.changedSignals.slice(0, 3).map((signal) => {
+              const deltaDirection = directionHint(signal.delta);
+              return (
+                <span
+                  key={signal.key}
+                  className={`inline-flex items-center rounded-full border px-3 py-1 text-xs ${signalDeltaTone[deltaDirection]}`}
+                >
+                  {deltaLabel[signal.key]}: {signal.delta > 0 ? "↑" : signal.delta < 0 ? "↓" : "→"} {deltaDirection}
+                </span>
+              );
+            })}
           </div>
         )}
       </article>
@@ -110,8 +122,8 @@ export function WeeklyDecisionCard({
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">{decisionAreaLabel(rule.area)}</p>
               <p className="mt-1 font-semibold text-slate-100">{rule.recommendation}</p>
               <p className="mt-2 text-xs text-slate-300">Applies to: {rule.scope}</p>
-              <p className="mt-1 text-xs text-rose-200">Pause when: {rule.pauseTrigger}</p>
-              <p className="mt-1 text-xs text-emerald-200">Resume when: {rule.resumeTrigger}</p>
+              <p className="mt-1 text-xs text-semantic-caution-fg">Pause when: {rule.pauseTrigger}</p>
+              <p className="mt-1 text-xs text-semantic-reversal-fg">Resume when: {rule.resumeTrigger}</p>
             </li>
           ))}
         </ul>
