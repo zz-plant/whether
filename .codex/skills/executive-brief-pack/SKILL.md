@@ -1,6 +1,6 @@
 ---
 name: executive-brief-pack
-description: Build or QA Whether executive briefing outputs (strategy brief, export brief, CXO narrative) when users need share-ready, citation-backed leadership communication.
+description: Build or QA share-ready, citation-backed executive briefing outputs from current Whether signals with explicit actions, risks, and trigger conditions.
 allowed-tools:
   - Read
   - Grep
@@ -11,49 +11,47 @@ allowed-tools:
 
 ## Use this skill when
 
-- Asked to create/QA an executive brief from current regime signals.
-- Preparing slide/email/Slack-ready summary content for leadership review.
-- Verifying brief outputs are concise, actionable, and source-grounded.
+- Creating/QAing executive brief outputs from current signals.
+- Preparing memo/slide/Slack-ready leadership communication.
+- Verifying a brief is concise, actionable, and source-grounded.
 
-## Inputs expected
+## Do not use this skill when
 
-- Audience (board, C-suite, product+engineering leads).
-- Delivery format (memo, slide bullets, Slack/email).
-- Time horizon (now, 30 days, next quarter).
+- The task asks for full methodology exposition over decision transmission.
+- Evidence for core claims is unavailable.
 
 ## Workflow
 
-1. Gather current regime and supporting signal evidence.
-2. Select the minimum narrative needed: posture, reasons, actions, risks.
-3. Build format-specific output (memo vs bullets) without changing underlying claims.
-4. Attach source references and freshness notes.
-5. Run a clarity pass: one headline + one support sentence per section before details.
+1. Gather posture, signal evidence, and freshness markers.
+2. Compress to minimum narrative: call, reasons, actions, risks.
+3. Produce format-specific variants without changing core claims.
+4. Attach citations and confidence/freshness notes.
+5. Run a clarity pass for fast executive consumption.
 
-## Output contract
+## Output contract (required order)
 
-Return in this order:
+1. **Skill used + why**
+2. **Executive headline**
+3. **Posture + rationale** (concise)
+4. **Actions by function** (Product, Engineering, Finance)
+5. **Risk watchlist + triggers**
+6. **Citations and freshness notes**
+7. **Optional format variants** (slide bullets / Slack version)
+8. **Fallback note** (only if evidence gaps reduce confidence)
 
-1. **Executive headline**
-2. **Posture + rationale** (concise)
-3. **Actions by function** (Product, Engineering, Finance)
-4. **Risk watchlist + triggers**
-5. **Citations and freshness notes**
-6. **Optional format variants** (slide bullets / Slack version)
+## Quality checks before finalizing
+
+- Every core claim is traceable to repo evidence.
+- Actions are bounded (owner, threshold, or trigger where possible).
+- Format variants preserve semantic equivalence.
+- Uncertainty is explicit (confidence + reversal trigger).
 
 ## Guardrails
 
-- Keep statements auditable to current repo evidence.
 - Avoid jargon-heavy prose; optimize for decision speed.
-- Do not hide uncertainty—state confidence and trigger conditions.
-- Preserve semantic equivalence across format variants.
+- Do not fabricate evidence to fill gaps.
 
-## Non-goals
+## Maintenance
 
-- Generating investor/legal advice.
-- Creating fictional data to fill missing evidence.
-- Producing broad market commentary with no operational implications.
-
-## Maintenance notes
-
-- Last reviewed: 2026-02-23
+- Last reviewed: 2026-03-06
 - Internal anchors: `docs/feature-specs-current.md`, `docs/prd-next-level.md`.
