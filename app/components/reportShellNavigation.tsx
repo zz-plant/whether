@@ -28,7 +28,7 @@ const getPageNavigationState = (
   const currentIndexByLabel = pageLinks.findIndex((link) => link.label === pageTitle);
   const currentIndex = currentIndexByPath >= 0 ? currentIndexByPath : currentIndexByLabel;
   const currentLink = currentIndex >= 0 ? pageLinks[currentIndex] : pageLinks[0];
-  const adjacentLinks = pageLinks.filter((link) => link.href !== currentLink.href).slice(0, 2);
+  const adjacentLinks = pageLinks.filter((link) => link.href !== currentLink.href);
 
   return { currentLink, adjacentLinks };
 };
@@ -247,6 +247,9 @@ const iconLabelAliases: Record<string, keyof typeof pageLinkIcons> = {
   Templates: "Reference",
   "How it works": "Method",
   Concepts: "Method",
+  "Weekly Brief": "Plan",
+  "Weekly Operating Posture Brief": "Plan",
+  Resources: "Reference",
 };
 
 export const ReportPageNavigation = ({
@@ -254,7 +257,7 @@ export const ReportPageNavigation = ({
   pageTitle,
   currentPath,
   className,
-  variant = "full",
+  variant: _variant = "full",
 }: {
   pageLinks: ReportPageLink[];
   pageTitle: string;
@@ -262,20 +265,14 @@ export const ReportPageNavigation = ({
   className?: string;
   variant?: "full" | "compact";
 }) => {
-  const coreReportHrefs = new Set(["/start", "/signals", "/operations"]);
-  const primaryLinks = pageLinks.filter((link) => coreReportHrefs.has(link.href));
-  const secondaryLinks = pageLinks.filter((link) => !coreReportHrefs.has(link.href));
-  const visibleLinks = primaryLinks.length > 0 ? primaryLinks : pageLinks;
-  const shouldShowSecondaryLinks = variant === "full" && secondaryLinks.length > 0;
-
   return (
     <NavigationMenu.Root aria-label="Report paths" className={className}>
       <div className="space-y-2">
         <NavigationMenu.List className="grid grid-cols-2 gap-2 rounded-2xl border border-slate-800/80 bg-slate-950/45 p-2 sm:flex sm:flex-wrap sm:gap-2">
-          {visibleLinks.map((link, index) => {
+          {pageLinks.map((link, index) => {
             const isActive = isActivePageLink({ link, currentPath, pageTitle });
             const isOddTail =
-              visibleLinks.length % 2 === 1 && index === visibleLinks.length - 1;
+              pageLinks.length % 2 === 1 && index === pageLinks.length - 1;
             return (
               <NavigationMenu.Item
                 key={link.href}
@@ -298,50 +295,6 @@ export const ReportPageNavigation = ({
           })}
         </NavigationMenu.List>
 
-        {shouldShowSecondaryLinks ? (
-          <Collapsible.Root>
-            <Collapsible.Trigger
-              type="button"
-              className="group inline-flex min-h-[44px] w-full items-center justify-between gap-2 rounded-xl border border-slate-800/70 bg-slate-950/20 px-3 py-2 text-left text-xs font-semibold tracking-[0.08em] text-slate-300 transition-colors hover:border-sky-400/50 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-            >
-              <span>More destinations ({secondaryLinks.length})</span>
-              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-300 transition-transform duration-200 group-data-[panel-open]:rotate-180">
-                <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
-                  <path
-                    d="M7 10l5 5 5-5"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </span>
-            </Collapsible.Trigger>
-            <Collapsible.Panel className="pt-2">
-              <NavigationMenu.List className="grid grid-cols-2 gap-2 rounded-2xl border border-slate-800/70 bg-slate-950/35 p-2 sm:flex sm:flex-wrap sm:gap-2">
-                {secondaryLinks.map((link) => {
-                  const isActive = isActivePageLink({ link, currentPath, pageTitle });
-                  return (
-                    <NavigationMenu.Item key={link.href} className="flex sm:flex-shrink-0">
-                      <NavigationMenu.Link
-                        href={link.href}
-                        active={isActive}
-                        aria-current={isActive ? "page" : undefined}
-                        className={getPageLinkClassName({
-                          isActive,
-                          isCommandCenter: false,
-                        })}
-                      >
-                        {link.label}
-                      </NavigationMenu.Link>
-                    </NavigationMenu.Item>
-                  );
-                })}
-              </NavigationMenu.List>
-            </Collapsible.Panel>
-          </Collapsible.Root>
-        ) : null}
       </div>
     </NavigationMenu.Root>
   );

@@ -16,21 +16,9 @@ describe("next.config redirects", () => {
       permanent: true,
     });
 
-    assert.deepEqual(findRedirect("/learn"), {
-      source: "/learn",
-      destination: "/reference",
-      permanent: true,
-    });
-
-    assert.deepEqual(findRedirect("/learn/concepts/:slug"), {
-      source: "/learn/concepts/:slug",
-      destination: "/concepts/:slug",
-      permanent: true,
-    });
-
-    assert.deepEqual(findRedirect("/learn/failure-modes/:slug"), {
-      source: "/learn/failure-modes/:slug",
-      destination: "/library/failure-modes/:slug",
+    assert.deepEqual(findRedirect("/reference/:path*"), {
+      source: "/reference/:path*",
+      destination: "/method/:path*",
       permanent: true,
     });
 
@@ -42,6 +30,18 @@ describe("next.config redirects", () => {
 
     assert.deepEqual(findRedirect("/reference/failure-modes/:slug"), {
       source: "/reference/failure-modes/:slug",
+      destination: "/library/failure-modes/:slug",
+      permanent: true,
+    });
+
+    assert.deepEqual(findRedirect("/learn/concepts/:slug"), {
+      source: "/learn/concepts/:slug",
+      destination: "/concepts/:slug",
+      permanent: true,
+    });
+
+    assert.deepEqual(findRedirect("/learn/failure-modes/:slug"), {
+      source: "/learn/failure-modes/:slug",
       destination: "/library/failure-modes/:slug",
       permanent: true,
     });

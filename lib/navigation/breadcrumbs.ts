@@ -3,18 +3,16 @@ export type BreadcrumbItem = {
   path: string;
 };
 
+import { navigationLabelByPath } from "./informationArchitecture";
+
 const canonicalBreadcrumbLabels: Record<string, string> = {
+  ...navigationLabelByPath,
   "/": "Home",
-  "/signals": "Signal evidence",
-  "/operations": "Operations",
   "/resources": "Resources",
   "/reference": "Reference",
   "/concepts": "Concepts",
   "/solutions": "Solutions",
   "/solutions/career-paths": "Career paths",
-  "/toolkits": "Toolkits",
-  "/learn": "Learn",
-  "/method": "Method",
   "/formulas": "Formulas",
 };
 

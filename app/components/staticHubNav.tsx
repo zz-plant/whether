@@ -3,12 +3,12 @@ import { primaryNavigation } from "../../lib/navigation/primaryNavigation";
 import { pathMatchesLink } from "../../lib/navigation/pathMatching";
 
 export function StaticHubNav({ currentPath }: { currentPath: string }) {
-  const hubLinks = primaryNavigation.filter((link) => link.staticHub !== false);
+  const hubLinks = primaryNavigation.filter((link) => link.href !== "/");
 
   return (
     <nav className="weather-panel-quiet px-4 py-3" aria-label="Static content hubs">
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Navigate hubs</p>
-      <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+      <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
         {hubLinks.map((link) => {
           const isActive = pathMatchesLink(link.href, currentPath);
           return (

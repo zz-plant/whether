@@ -15,8 +15,18 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: '/learn',
-        destination: '/reference',
+        source: '/reference/concepts/:slug',
+        destination: '/concepts/:slug',
+        permanent: true,
+      },
+      {
+        source: '/reference/failure-modes/:slug',
+        destination: '/library/failure-modes/:slug',
+        permanent: true,
+      },
+      {
+        source: '/reference/:path*',
+        destination: '/method/:path*',
         permanent: true,
       },
       {
@@ -48,16 +58,6 @@ const nextConfig = {
         source: '/operations/decisions',
         destination: '/operations',
         permanent: false,
-      },
-      {
-        source: '/reference/concepts/:slug',
-        destination: '/concepts/:slug',
-        permanent: true,
-      },
-      {
-        source: '/reference/failure-modes/:slug',
-        destination: '/library/failure-modes/:slug',
-        permanent: true,
       },
       {
         source: '/library/canon/:slug',
