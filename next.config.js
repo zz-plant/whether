@@ -84,6 +84,11 @@ const nextConfig = {
         destination: '/decide/:slug',
         permanent: true,
       },
+      {
+        source: '/decide/use-cases',
+        destination: '/decide',
+        permanent: true,
+      },
     ];
   },
 };
