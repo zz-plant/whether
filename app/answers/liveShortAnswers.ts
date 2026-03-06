@@ -5,6 +5,10 @@ const safetyOverrides: Partial<Record<string, string>> = {
   "should-startups-hire-engineers-right-now": "In safety mode, limit hiring to mission-critical roles with immediate payoff.",
   "is-it-risk-on-or-risk-off-for-startups": "Current posture is safety mode; tighten approval velocity.",
   "when-should-startups-cut-burn": "Cut burn now if your liquidity runway depends on discretionary spend expansion.",
+  "product-strategy-during-expansion": "In safety mode, protect core retention and pause expansion roadmap work until thresholds recover.",
+  "when-to-expand-startup-hiring": "In safety mode, hold hiring expansion and fill only roles tied to reliability or near-term revenue.",
+  "should-startups-slow-product-development": "In safety mode, keep core delivery moving while pausing speculative product scope.",
+  "should-startups-raise-capital-now": "In safety mode, raise only to protect runway certainty and avoid negotiating from weakness.",
 };
 
 export const isExpansionRegime = (regime: RegimeKey) => regime === "EXPANSION";

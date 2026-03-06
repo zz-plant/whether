@@ -23,9 +23,22 @@ describe("live short answers", () => {
     assert.equal(buildLiveShortAnswer("unknown", "SCARCITY", "fallback"), "fallback");
   });
 
-  it("uses generic safety-mode copy for non-expansion pages without overrides", () => {
+  it("uses slug-specific safety-mode copy for expansion-phrased decision pages", () => {
     const scarcity = buildLiveShortAnswer(
       "product-strategy-during-expansion",
+      "SCARCITY",
+      "fallback"
+    );
+
+    assert.equal(
+      scarcity,
+      "In safety mode, protect core retention and pause expansion roadmap work until thresholds recover."
+    );
+  });
+
+  it("keeps category fallback for non-overridden pages in safety mode", () => {
+    const scarcity = buildLiveShortAnswer(
+      "startup-strategy-in-uncertain-markets",
       "SCARCITY",
       "fallback"
     );
