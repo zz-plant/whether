@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { loadReportData } from "../../lib/report/reportData";
+import { loadReportDataSafe } from "../../lib/report/reportData";
 import { getSummaryArchive } from "../../lib/summary/summaryArchive";
 import { siteUrl } from "../../lib/siteUrl";
 import {
@@ -106,6 +106,8 @@ export default async function SignalsPage({
       ),
     ],
   };
+  const reportResult = await loadReportDataSafe(resolvedSearchParams, { route: "/signals" });
+  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
   const {
     assessment,
     cacheCoverage,
@@ -125,7 +127,7 @@ export default async function SignalsPage({
     statusLabel,
     treasury,
     treasuryProvenance,
-  } = await loadReportData(resolvedSearchParams);
+  } = reportData;
   const previousHistoricalSelection = historicalSelection
     ? getAdjacentTimeMachineRequest(historicalSelection, "previous")
     : null;

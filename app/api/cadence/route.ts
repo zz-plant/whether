@@ -1,14 +1,15 @@
 import { NextResponse } from "next/server";
 import { buildCadenceAlignment } from "../../../lib/cadenceAlignment";
 import { buildMonthlySummary } from "../../../lib/summary/monthlySummary";
-import { loadReportData } from "../../../lib/report/reportData";
+import { loadReportDataSafe } from "../../../lib/report/reportData";
 import { buildWeeklySummary } from "../../../lib/summary/weeklySummary";
 
 export const runtime = "edge";
 export const revalidate = 3600;
 
 export async function GET() {
-  const { assessment, treasuryProvenance, recordDateLabel } = await loadReportData();
+  const reportResult = await loadReportDataSafe(undefined, { route: "/api/cadence" });
+  const { assessment, treasuryProvenance, recordDateLabel } = reportResult.ok ? reportResult.data : reportResult.fallback;
   const weeklySummary = buildWeeklySummary({
     assessment,
     provenance: treasuryProvenance,
@@ -28,5 +29,6 @@ export async function GET() {
     mismatchedConstraints: alignment.mismatchedConstraints,
     generatedAt: new Date().toISOString(),
     version: "v1",
+    degraded: !reportResult.ok,
   });
 }

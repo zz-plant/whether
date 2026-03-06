@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { loadReportData } from "../../../../lib/report/reportData";
+import { loadReportDataSafe } from "../../../../lib/report/reportData";
 import {
   buildWeeklyMandatePayload,
   integrationTargets,
@@ -23,11 +23,13 @@ export async function GET(request: Request) {
     );
   }
 
-  const { assessment, treasury } = await loadReportData();
+  const reportResult = await loadReportDataSafe(undefined, { route: "/api/integrations/weekly-mandate" });
+  const { assessment, treasury } = reportResult.ok ? reportResult.data : reportResult.fallback;
 
   return NextResponse.json({
     target,
     recordDate: treasury.record_date,
     payload: buildWeeklyMandatePayload(target, assessment, treasury),
+    degraded: !reportResult.ok,
   });
 }

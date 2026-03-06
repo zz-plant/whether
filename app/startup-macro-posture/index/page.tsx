@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { loadReportData } from "../../../lib/report/reportData";
+import { loadReportDataSafe } from "../../../lib/report/reportData";
 import { buildPageMetadata, serializeJsonLd } from "../../../lib/seo";
 import { startupMacroPostureIndexName } from "../clusterData";
 
@@ -14,7 +14,8 @@ export const metadata: Metadata = buildPageMetadata({
 });
 
 export default async function StartupMacroPostureIndexPage() {
-  const { assessment, thresholds, recordDateLabel } = await loadReportData();
+  const reportResult = await loadReportDataSafe(undefined, { route: "/startup-macro-posture/index" });
+  const { assessment, thresholds, recordDateLabel } = reportResult.ok ? reportResult.data : reportResult.fallback;
 
   const datasetSchema = {
     "@context": "https://schema.org",

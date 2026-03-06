@@ -4,12 +4,19 @@ const baseUrl = (process.argv[2] ?? "https://whether.work").replace(/\/$/, "");
 
 const pageChecks = [
   { path: "/", required: ["weekly-action-summary", "executive-snapshot", "signal-matrix"] },
-  { path: "/learn", required: ["learn"] },
   { path: "/signals", required: ["signal"] },
   { path: "/operations", required: ["operations"] },
+  { path: "/toolkits", required: ["toolkits"] },
+  { path: "/decide", required: ["decide"] },
+  { path: "/learn", required: ["learn"] },
   { path: "/operations/data", required: ["data"] },
   { path: "/acceptable-use-policy", required: ["acceptable use"] },
   { path: "/terms-of-service", required: ["terms of service"] },
+];
+
+const redirectChecks = [
+  { from: "/operate", to: "/operations" },
+  { from: "/templates", to: "/toolkits" },
 ];
 
 const weeklyRequiredKeys = [
@@ -71,6 +78,25 @@ const run = async () => {
     }
 
     console.log(`✅ ${check.path} content checks passed`);
+  }
+
+
+  for (const redirectCheck of redirectChecks) {
+    const response = curl(`${baseUrl}${redirectCheck.from}`);
+    if (response.status !== 200) {
+      fail(`${redirectCheck.from} should resolve to 200 via redirect chain, got ${response.status}`);
+    }
+
+    const canonicalResponse = curl(`${baseUrl}${redirectCheck.to}`);
+    if (canonicalResponse.status !== 200) {
+      fail(`${redirectCheck.to} returned ${canonicalResponse.status} (expected 200)`);
+    }
+
+    if (response.body !== canonicalResponse.body) {
+      fail(`${redirectCheck.from} did not resolve to canonical content at ${redirectCheck.to}`);
+    }
+
+    console.log(`✅ ${redirectCheck.from} redirect checks passed`);
   }
 
   const weeklyResponse = curl(`${baseUrl}/api/weekly`);
