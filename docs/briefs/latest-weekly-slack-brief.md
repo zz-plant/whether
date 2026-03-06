@@ -2,6 +2,14 @@
 
 Generated from Whether data snapshot: **2026-02-01**.
 
+> **Point-in-time artifact:** this file will drift unless refreshed as part of a recurring docs cadence.
+>
+> Refresh command (markdown output to this file):
+>
+> `bunx tsx scripts/generateWeeklySlackBrief.ts --format markdown --out docs/briefs/latest-weekly-slack-brief.md`
+>
+> Automation: `.github/workflows/weekly-slack-brief-artifact.yml` refreshes this file weekly and can also be invoked from release workflows via `workflow_call`.
+
 ```text
 Whether Report Brief — 2026-02-01
 Capital posture: SCARCITY
