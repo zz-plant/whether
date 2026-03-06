@@ -17,7 +17,7 @@ export default function NotFound() {
             href="/start"
             className="weather-button-primary inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em]"
           >
-            Open command center
+            Open start guide
           </Link>
           <Link
             href="/signals"

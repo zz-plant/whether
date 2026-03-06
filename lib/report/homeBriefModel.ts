@@ -1,6 +1,3 @@
-import { deriveDecisionKnobs } from "./decisionKnobs";
-import { isImprovingSignalDelta } from "./reportData";
-import { operatingCallsByRegime } from "./operatingCalls";
 import { buildCanonicalBoundedDecisionRules } from "./boundedDecisionRules";
 import { getSummaryArchive } from "../summary/summaryArchive";
 
@@ -51,27 +48,6 @@ const regimeSeverityRank: Record<Regime, number> = {
   SCARCITY: 3,
 };
 
-const expansionWindowByRegime: Record<Regime, string> = {
-  SCARCITY: "Closed",
-  DEFENSIVE: "Mostly closed",
-  VOLATILE: "Selective",
-  EXPANSION: "Open with guardrails",
-};
-
-const longCycleBetByRegime: Record<Regime, string> = {
-  SCARCITY: "Constrained",
-  DEFENSIVE: "Constrained",
-  VOLATILE: "Caution",
-  EXPANSION: "Permitted with milestones",
-};
-
-const expansionConstraintByRegime: Record<Regime, string> = {
-  SCARCITY: "avoid new expansion initiatives",
-  DEFENSIVE: "avoid new expansion initiatives",
-  VOLATILE: "stage expansion initiatives",
-  EXPANSION: "pursue expansion initiatives selectively",
-};
-
 const buildDecisionShiftSummary = ({
   severityDelta,
   directionLabel,
@@ -91,28 +67,6 @@ const buildDecisionShiftSummary = ({
     return "Net decision shift: approval velocity ↓, experiment tolerance ↓, payback discipline tighter.";
   }
   return "Net decision shift: hold approval velocity, keep reversible experiments active, maintain payback discipline.";
-};
-
-const buildLeadershipImplications = (regime: Regime): string[] => {
-  if (regime === "EXPANSION") {
-    return [
-      "Move faster on reversible bets.",
-      "Keep payback guardrails in place.",
-      "Delay irreversible headcount commitments.",
-    ];
-  }
-  if (regime === "VOLATILE") {
-    return [
-      "Sequence commitments by milestone gates.",
-      "Prioritize fast-feedback experiments.",
-      "Defer long-payback expansion bets.",
-    ];
-  }
-  return [
-    "Protect core roadmap and delivery capacity.",
-    "Limit approvals to high-confidence return work.",
-    "Pause large hiring/expansion commitments.",
-  ];
 };
 
 const buildMemoryRail = (recordDateLabel: string | undefined, currentRegime: Regime): MemoryRailItem[] => {
@@ -149,9 +103,6 @@ export const buildHomeBriefModel = (data: HomeReportData) => {
         ? "Better than last week"
         : "No worse than last week";
 
-  const operatingCalls = operatingCallsByRegime[assessment.regime];
-  const expansionWindow = expansionWindowByRegime[assessment.regime];
-  const longCycleBetStance = longCycleBetByRegime[assessment.regime];
   const tightnessThreshold = assessment.thresholds.tightnessRegime;
   const riskThreshold = assessment.thresholds.riskAppetiteRegime;
   const tightnessGap = Math.abs(assessment.scores.tightness - tightnessThreshold);
@@ -168,22 +119,7 @@ export const buildHomeBriefModel = (data: HomeReportData) => {
       ? `Flip to ${primaryShiftRegimeLabel} if tightness crosses ${tightnessThreshold.toFixed(1)} (now ${assessment.scores.tightness.toFixed(1)}).`
       : `Flip to ${primaryShiftRegimeLabel} if risk appetite crosses ${riskThreshold.toFixed(1)} (now ${assessment.scores.riskAppetite.toFixed(1)}).`;
 
-  const dangerousCategory =
-    assessment.regime === "EXPANSION"
-      ? "Unchecked spend growth without payback controls"
-      : assessment.regime === "VOLATILE"
-        ? "Irreversible multi-quarter commitments"
-        : "Net-new hiring and long-payback expansion bets";
-
-  const constraints = [
-    `Expansion: ${expansionConstraintByRegime[assessment.regime]} (${expansionWindow.toLowerCase()})`,
-    `Hiring: restrict to critical roles (${operatingCalls.hiring.toLowerCase()})`,
-    `Long bets: defer unless reversible (${longCycleBetStance.toLowerCase()})`,
-  ];
-
   const guardrail = stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
-  const weakSignalCount = reportDynamics?.changedSignals.filter((item) => !isImprovingSignalDelta(item.key, item.delta)).length ?? 0;
-
   const netConstraintSummary =
     severityDelta > 0
       ? `${regimeLabelMap[assessment.regime]} with tighter controls: threshold proximity and weakening signals require slower approvals and stricter reversibility.`
@@ -193,12 +129,6 @@ export const buildHomeBriefModel = (data: HomeReportData) => {
 
   return {
     confidenceLabel,
-    constraints,
-    dangerousCategory,
-    decisionKnobs: deriveDecisionKnobs(assessment.regime, severityDelta, {
-      nearestThresholdGap,
-      weakSignalCount,
-    }),
     decisionShiftSummary: buildDecisionShiftSummary({
       severityDelta,
       directionLabel: reportDynamics?.directionLabel,
@@ -211,7 +141,6 @@ export const buildHomeBriefModel = (data: HomeReportData) => {
     }),
     revisitDecisions: (reportDynamics?.changedSignals.length ?? 0) > 0 && reportDynamics?.directionLabel !== "stable",
     guardrail,
-    leadershipImplications: buildLeadershipImplications(assessment.regime),
     memoryRail: buildMemoryRail(recordDateLabel, assessment.regime),
     netConstraintSummary,
     postureDeltaLabel,

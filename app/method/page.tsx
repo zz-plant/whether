@@ -33,7 +33,7 @@ export default function MethodPage() {
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Method</h1>
         <p className="text-sm text-slate-300">
           Use Method for transparency only: formulas, assumptions, data provenance, and confidence boundaries.
-          For operator education, use Learn. For action guidance, return to Command Center, Signals, or Operations.
+          For operator education, use Learn. For action guidance, return to Weekly Brief, Signals, or Operations.
         </p>
         <div className="flex flex-wrap gap-3">
           <Link href="/methodology" className="weather-button inline-flex items-center justify-center">

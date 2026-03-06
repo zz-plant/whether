@@ -23,7 +23,6 @@ import { buildTrustStatus } from "../lib/report/trustStatus";
 import { WeeklyDecisionCard } from "./components/weeklyDecisionCard";
 import { RevealOnView } from "./components/revealOnView";
 import { DataProvenanceStrip } from "./components/dataProvenanceStrip";
-import { ActionStrip } from "./components/actionStrip";
 import { buildBoardBrief, buildCallCitation, buildSlackBrief } from "../lib/export/briefBuilders";
 import { CopyLeadershipArtifactsButtons } from "./components/copyLeadershipArtifactsButtons";
 import { createBreadcrumbTrail } from "../lib/navigation/breadcrumbs";
@@ -61,7 +60,6 @@ export const revalidate = 900;
 export const runtime = "edge";
 
 const homeSectionSequence = [
-  { href: "#action-strip", label: "Actions" },
   { href: "#weekly-action-summary", label: "Weekly actions" },
   { href: "#executive-snapshot", label: "Evidence" },
 ] as const;
@@ -228,8 +226,6 @@ export default async function HomePage({
     reportDynamics,
     sensors,
     macroSeries,
-    startItems,
-    fenceItems,
     statusLabel,
     stopItems,
     treasury,
@@ -270,8 +266,6 @@ export default async function HomePage({
     reportDynamics,
     sensors,
     macroSeries,
-    startItems,
-    fenceItems,
     statusLabel,
     stopItems,
     treasury,
@@ -312,7 +306,7 @@ export default async function HomePage({
       sidebarVariant="hidden"
       hideHeroChrome={true}
       pageNavVariant="compact"
-      showPageNavigation={true}
+      showPageNavigation={false}
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
       structuredData={structuredData}
@@ -352,12 +346,6 @@ export default async function HomePage({
           <p className="mt-1">Last cached update: {reportResult.fallback.lastCachedTimestamp}. Review <a href="/signals" className="underline">Signals</a> to retry live evidence.</p>
         </section>
       ) : null}
-
-      <ActionStrip
-        doItems={startItems.slice(0, 3)}
-        dontItems={stopItems.slice(0, 3)}
-        fenceItems={fenceItems.slice(0, 2)}
-      />
 
       <DataProvenanceStrip provenance={treasuryProvenance} variant="compact" />
 

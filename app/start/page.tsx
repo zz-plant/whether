@@ -8,7 +8,7 @@ import { postureDefinitions, situationRouting, startSituations, toolkitDefinitio
 export const metadata: Metadata = buildPageMetadata({
   title: "Start Here — Whether onboarding",
   description:
-    "Command Center for the weekly operating sequence: confirm posture, choose your situation, and run one toolkit.",
+    "Optional orientation path for the weekly operating sequence: confirm posture, choose your situation, and run one toolkit.",
   path: "/start",
   imageAlt: "Whether Start Here",
 });
@@ -61,7 +61,7 @@ export default async function StartHerePage() {
       />
 
       <section className="weather-panel space-y-4 px-6 py-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Command center</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Start here</p>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Run this week&apos;s operating sequence.</h1>
         <p className="text-base text-slate-200">
           Use this page when you need a single path: confirm posture, choose the situation to solve now, then run one toolkit end-to-end. Example journey: <span className="font-semibold">Safety Mode → Hiring → Commitment &amp; Rollback Toolkit</span>.
@@ -111,7 +111,7 @@ export default async function StartHerePage() {
       <section id="start-role-path" className="weather-panel space-y-4 px-6 py-6">
         <div className="space-y-1">
           <h2 className="text-xl font-semibold text-slate-100">Choose your path</h2>
-          <p className="text-sm text-slate-300">Use this as the role lens picker inside Command Center, not a second homepage.</p>
+          <p className="text-sm text-slate-300">Use this as a role lens picker from the weekly brief, not a second homepage.</p>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
           <Link href="/decide" className="weather-surface min-h-[44px] space-y-2 px-4 py-4 transition hover:border-sky-400/65">
