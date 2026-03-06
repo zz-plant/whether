@@ -124,7 +124,9 @@ export default async function SignalsPage({
     selectedMonth,
     selectedYear,
     sensors,
+    startItems,
     statusLabel,
+    stopItems,
     treasury,
     treasuryProvenance,
   } = reportData;
@@ -388,12 +390,15 @@ export default async function SignalsPage({
               {regimeLabel} regime is the active operating posture.
             </h2>
             <p className="text-sm leading-relaxed text-slate-200 sm:text-base">
-              Use this page to validate confidence, inspect the highest-impact movers, and verify threshold-level evidence before changing posture.
+              Start with the decision delta below, then use diagnostics and thresholds to validate
+              the call before changing operating posture.
             </p>
             <dl className="grid gap-3 rounded-xl border border-slate-800/80 bg-slate-950/40 p-3 sm:grid-cols-3">
               <div>
                 <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">Recommended action</dt>
-                <dd className="mt-1 text-xs text-slate-100">Continue current operating posture and monitor the top movers daily.</dd>
+                <dd className="mt-1 text-xs text-slate-100">
+                  Keep posture aligned with the highest-priority start and stop rules listed in the founder playbook.
+                </dd>
               </div>
               <div>
                 <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">Impact if wrong</dt>
@@ -418,6 +423,29 @@ export default async function SignalsPage({
                 Inspect threshold logic
               </a>
             </div>
+          </article>
+          <article className="weather-surface space-y-3 p-5" aria-label="Founder decision playbook">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-200">Founder operating moves</p>
+            <h3 className="text-lg font-semibold text-slate-100">Convert {regimeLabel} into execution rules this week</h3>
+            <div className="rounded-xl border border-emerald-800/60 bg-emerald-950/20 p-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-emerald-200">Start now</p>
+              <ul className="mt-2 space-y-1 text-sm text-slate-100" aria-label="Start rules">
+                {startItems.slice(0, 3).map((item) => (
+                  <li key={item}>• {item}</li>
+                ))}
+              </ul>
+            </div>
+            <div className="rounded-xl border border-rose-800/60 bg-rose-950/20 p-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-rose-200">Avoid now</p>
+              <ul className="mt-2 space-y-1 text-sm text-slate-100" aria-label="Stop rules">
+                {stopItems.slice(0, 3).map((item) => (
+                  <li key={item}>• {item}</li>
+                ))}
+              </ul>
+            </div>
+            <p className="text-xs text-slate-300">
+              Model shorthand: Posture = f(risk appetite, funding tightness, yield-curve slope).
+            </p>
           </article>
           <article className="weather-surface space-y-3 p-5">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-200">Top 3 movers</p>
