@@ -16,4 +16,28 @@ describe("buildHomeBriefModel", () => {
     assert.equal(typeof model.dangerousCategory, "string");
     assert.ok(model.decisionKnobs.length > 0);
   });
+
+
+  it("counts weak signals using signal-specific improving semantics", () => {
+    const model = buildHomeBriefModel({
+      assessment: {
+        regime: "EXPANSION",
+        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
+        scores: { tightness: 45, riskAppetite: 55 },
+      },
+      regimeAlert: null,
+      stopItems: ["Stop irreversible spend"],
+      reportDynamics: {
+        directionLabel: "mixed",
+        changedSignals: [
+          { key: "tightness", delta: -2 },
+          { key: "riskAppetite", delta: -1 },
+        ],
+      },
+    });
+
+    const approvalVelocity = model.decisionKnobs.find((knob) => knob.key === "approvalVelocity");
+    assert.ok(approvalVelocity);
+    assert.match(approvalVelocity.rationale, /1 weak signal/);
+  });
 });

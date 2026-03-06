@@ -1,4 +1,5 @@
 import { deriveDecisionKnobs } from "./decisionKnobs";
+import { isImprovingSignalDelta } from "./reportData";
 import { operatingCallsByRegime } from "./operatingCalls";
 type HomeReportData = {
   assessment: {
@@ -10,7 +11,10 @@ type HomeReportData = {
   stopItems: string[];
   reportDynamics?: {
     directionLabel: "improving" | "deteriorating" | "mixed" | "stable";
-    changedSignals: Array<{ delta: number }>;
+    changedSignals: Array<{
+      key: "tightness" | "riskAppetite" | "baseRate" | "curveSlope";
+      delta: number;
+    }>;
   };
   [key: string]: unknown;
 };
@@ -107,7 +111,8 @@ export const buildHomeBriefModel = (data: HomeReportData) => {
   ];
   const guardrail = stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
 
-  const weakSignalCount = reportDynamics?.changedSignals.filter((item) => item.delta < 0).length ?? 0;
+  const weakSignalCount =
+    reportDynamics?.changedSignals.filter((item) => !isImprovingSignalDelta(item.key, item.delta)).length ?? 0;
   const netConstraintSummary =
     severityDelta > 0
       ? `${regimeLabelMap[assessment.regime]} with tighter controls: threshold proximity and weakening signals require slower approvals and stricter reversibility.`
