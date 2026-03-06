@@ -1,13 +1,8 @@
-import { formatNumberValue } from "../formatters";
+import { formatNumberWithUnit } from "../formatters";
 import type { RegimeAssessment } from "../regimeEngine";
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../types";
 import { buildComplianceStamp } from "../exportNotices";
 import { formatRegimeLabel } from "../regimeFormat";
-
-const formatNumber = (value: number | null, unit: string) => {
-  const formatted = formatNumberValue(value);
-  return formatted === "—" ? formatted : `${formatted}${unit}`;
-};
 
 const buildExportStamp = (treasury: TreasuryData, confidence: string) =>
   buildComplianceStamp({
@@ -31,7 +26,7 @@ const buildSlideBullets = (
 ) => [
   `Capital posture: ${assessment.regime}`,
   `Tightness ${assessment.scores.tightness} / Risk ${assessment.scores.riskAppetite}`,
-  ...macros.map((macro) => `${macro.label}: ${formatNumber(macro.value, macro.unit)}`),
+  ...macros.map((macro) => `${macro.label}: ${formatNumberWithUnit(macro.value, macro.unit)}`),
   ...assessment.constraints.map((item) => `Guardrail: ${item}`),
   "",
   ...buildExportStamp(treasury, "Score-based posture confidence"),
@@ -46,7 +41,7 @@ export const buildSlackBrief = (
   const baseRate = sensors.find((sensor) => sensor.id === "BASE_RATE");
   const curveSlope = sensors.find((sensor) => sensor.id === "CURVE_SLOPE");
   const macroLines = macros.map(
-    (macro) => `• ${macro.label}: ${formatNumber(macro.value, macro.unit)} · refreshed ${macro.record_date}`,
+    (macro) => `• ${macro.label}: ${formatNumberWithUnit(macro.value, macro.unit)} · refreshed ${macro.record_date}`,
   );
   const decisionHighlights = buildDecisionHighlights(assessment);
   const citations = buildCitationLines(treasury, macros);
@@ -55,8 +50,8 @@ export const buildSlackBrief = (
     `Whether Report Brief — ${treasury.record_date}`,
     `Capital posture: ${assessment.regime}`,
     `Tightness: ${assessment.scores.tightness} | Risk appetite: ${assessment.scores.riskAppetite}`,
-    `Base rate: ${formatNumber(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
-    `Curve slope: ${formatNumber(curveSlope?.value ?? null, "%")}`,
+    `Base rate: ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
+    `Curve slope: ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,
     "",
     "Macro signals:",
     ...macroLines,
