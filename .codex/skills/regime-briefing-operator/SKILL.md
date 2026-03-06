@@ -1,6 +1,6 @@
 ---
 name: regime-briefing-operator
-description: Produce a decision-ready Whether weekly/regime briefing from repo data and docs when users ask what changed, what to do now, and what risks to watch.
+description: Produce a decision-ready weekly/regime briefing from Whether artifacts, focused on what changed, what actions to take now, and what would flip the call.
 allowed-tools:
   - Read
   - Grep
@@ -11,51 +11,51 @@ allowed-tools:
 
 ## Use this skill when
 
-- Asked for a weekly operator brief or "what changed since last read" summary.
-- Asked to translate macro regime signals into product/engineering actions.
-- Preparing leadership-ready guidance from existing Whether artifacts.
+- Asked for a weekly operating brief or “what changed” summary.
+- Asked to translate signals into product/engineering operating actions.
+- Preparing leadership-ready decision posture from existing repo artifacts.
 
-## Inputs expected
+## Do not use this skill when
 
-- Time window/cadence (daily, weekly, monthly).
-- Audience (CPO/CTO/CFO/COO).
-- Optional constraints (hiring freeze, runway target, launch date).
+- The task is deep macro education without operational decisions.
+- Required signal data is unavailable and cannot be verified.
 
 ## Workflow
 
-1. Pull current regime/signal context from source-of-truth repo files.
-2. Extract factual state first (scores, thresholds, detected changes, timestamps).
-3. Map facts to actions using existing playbook/recommendation artifacts.
-4. Add confidence and assumptions.
-5. Flag unknowns and what would change the recommendation.
+1. Collect current regime snapshot and freshness markers.
+2. Identify delta vs prior state (what changed materially).
+3. Translate delta into bounded actions (`start`/`stop`/`fence`).
+4. Name top risks and flip conditions.
+5. Summarize assumptions, confidence, and unknowns.
 
-## Output contract
+## Output contract (required order)
 
-Return in this order:
+1. **Skill used + why**
+2. **Regime snapshot** (regime, scores, timestamp)
+3. **What changed** (3–6 bullets)
+4. **Recommended actions now**
+   - `start` / `stop` / `fence`
+   - owner + time horizon
+5. **Decision risks** (top 3)
+6. **Flip conditions** (what would change the recommendation)
+7. **Assumptions + confidence**
+8. **Unknowns / next data needed**
+9. **Fallback note** (only if freshness/provenance gaps constrain confidence)
 
-1. **Regime snapshot** (regime, tightness score, risk appetite score, timestamp)
-2. **What changed** (3-6 bullets)
-3. **Recommended actions now**
-   - `start`, `stop`, `fence` moves
-   - owner + time horizon for each
-4. **Decision risks** (top 3)
-5. **Assumptions + confidence**
-6. **Unknowns / next data needed**
+## Quality checks before finalizing
+
+- “What changed” is explicit, not generic posture explanation.
+- Every recommended action has owner + horizon.
+- Risks and flip conditions are concrete and testable.
+- Freshness uncertainty is called out explicitly when present.
 
 ## Guardrails
 
 - Separate extracted facts from interpretation.
 - Prefer canonical repo data/docs over inferred values.
-- If data freshness is unclear, state that explicitly.
-- Keep language executive and action-first.
+- Keep language concise and operator-facing.
 
-## Non-goals
+## Maintenance
 
-- Forecasting unsupported macro outcomes.
-- Inventing metrics not present in repo sources.
-- Producing long narrative when a concise decision brief is requested.
-
-## Maintenance notes
-
-- Last reviewed: 2026-02-23
+- Last reviewed: 2026-03-06
 - Primary internal references: `docs/feature-specs-current.md`, `data/recommendations.ts`, report section components.

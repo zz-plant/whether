@@ -55,12 +55,15 @@ Available starter skills:
 - `regime-briefing-operator` → decision-ready weekly/regime briefings
 - `signal-provenance-audit` → source URL/timestamp/formula provenance audits
 - `executive-brief-pack` → leadership-ready strategy/export brief outputs
+- `system-skill-router` → routes skill-management tasks with deterministic sequencing and standardized output sections
 
 Repository path convention:
 - `.codex/skills/<skill-name>/SKILL.md`
 
 Usage (tool/runtime dependent):
 - invoke by skill name (for example `research-brief`) when the task matches the skill description
-- if direct slash invocation is supported by your runtime, use `/research-brief`, `/feature-audit`, `/pr-hygiene`, `/regime-briefing-operator`, `/signal-provenance-audit`, or `/executive-brief-pack`
+- if direct slash invocation is supported by your runtime, use `/research-brief`, `/feature-audit`, `/pr-hygiene`, `/regime-briefing-operator`, `/signal-provenance-audit`, `/executive-brief-pack`, or `/system-skill-router`
 
 When using skill outputs in a deliverable, preserve each skill's output-contract sections so reviewers can verify completeness quickly.
+
+For skill-management requests, start with `system-skill-router` to enforce intent classification, explicit skill declaration, and consistent follow-up guidance.

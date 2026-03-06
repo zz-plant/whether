@@ -113,6 +113,25 @@ This helps agents answer product strategy questions without drifting from intern
 - **Rework rate**: % of agent-generated work requiring major rewrite.
 - **Onboarding speed**: time for new contributor agents to reach “first good PR.”
 
+## 2026 skill-design best-practice refresh
+
+Based on current MCP/skills guidance, keep repo-local skills high-signal and reviewable:
+
+1. **Deterministic trigger boundaries**
+   - Define explicit should-use / should-not-use intent patterns to reduce accidental over-triggering.
+2. **Opinionated output contracts**
+   - Require fixed output sections (actions taken, result, follow-up, fallback) so reviews can be fast and comparable.
+3. **Sequenced multi-skill orchestration**
+   - When two skills are needed, encode execution order in the skill itself (for example install/discover before authoring).
+4. **Least-privilege and fallback-first behavior**
+   - Prefer existing helper scripts/tools and document blocked-path fallback behavior without silent failures.
+5. **Maintenance metadata**
+   - Add `last reviewed` and refresh cadence to prevent stale process guidance.
+
+Applied in this repo:
+- `.codex/skills/system-skill-router/SKILL.md` now encodes deterministic routing, output contract, quality checks, and maintenance notes for skill-management tasks.
+- Core repo-local skills (`research-brief`, `feature-audit`, `pr-hygiene`, `regime-briefing-operator`, `signal-provenance-audit`, `executive-brief-pack`) now follow the same pattern: explicit use/non-use boundaries, required output sections, pre-finalization checks, and maintenance metadata.
+
 ## Risks and mitigations
 
 - **Tool sprawl** → keep MCP catalog intentionally small and reviewed monthly.

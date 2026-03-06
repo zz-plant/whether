@@ -1,6 +1,6 @@
 ---
 name: feature-audit
-description: Audit product features against repo UX/content standards and return a prioritized remove-move-modify plan.
+description: Audit product features against Whether UX/content standards and return a prioritized remove-move-modify plan with concrete next actions.
 allowed-tools:
   - Read
   - Grep
@@ -9,39 +9,52 @@ allowed-tools:
 
 # Feature audit skill (Whether)
 
-Use this skill for UX/content/behavior audits of existing product surfaces.
+## Use this skill when
 
-## Inputs expected
+- Auditing existing UX/content/behavior on a page, flow, or component.
+- A reviewer asks for structured improvement recommendations.
+- A task needs a severity/effort triage matrix.
 
-- Target surface (page/flow/component)
-- Audit scope (mobile, desktop, copy, IA, accessibility, performance)
-- Reference standards (from `docs/agents/ui-ux-standards.md` and related docs)
+## Do not use this skill when
+
+- Building a new feature from scratch.
+- Debugging a narrow implementation bug without product/UX evaluation.
 
 ## Workflow
 
-1. Define audit scope and constraints in 3-5 bullets.
-2. Capture current behavior from source files and available docs.
-3. Compare observed behavior with repo standards.
-4. Propose changes in a remove/move/modify matrix.
-5. Prioritize with severity and implementation effort.
+1. Define target surface and audit scope.
+2. Capture observed behavior from source files/docs.
+3. Compare behavior to repo standards.
+4. Produce remove/move/modify recommendations.
+5. Prioritize by severity and effort.
 
-## Output contract
+## Output contract (required order)
 
-Return sections in this order:
-
-1. **Audit target + scope**
-2. **Observed issues** (grouped by area)
-3. **Remove / Move / Modify matrix** with columns:
+1. **Skill used + why**
+2. **Audit target + scope**
+3. **Observed issues** (grouped by area)
+4. **Remove / Move / Modify matrix**
    - Item
    - Recommendation (`remove` / `move` / `modify`)
    - Why
    - Severity (`high` / `medium` / `low`)
    - Effort (`S` / `M` / `L`)
-4. **Top 3 next actions**
-5. **Risks / regressions to watch**
+5. **Top 3 next actions**
+6. **Risks / regressions to watch**
+7. **Fallback note** (only if scope/evidence limits block complete audit)
+
+## Quality checks before finalizing
+
+- Every recommendation maps to an observed issue.
+- High-severity items include a specific next action.
+- Findings cite relevant files or artifacts.
+- Proposed changes reduce cognitive load instead of adding complexity.
 
 ## Guardrails
 
-- Prefer improvements that reduce cognitive load and visual clutter.
-- Avoid introducing recommendations that conflict with established repo standards.
-- Cite relevant source files used for observations.
+- Align recommendations with existing repo standards.
+- Prefer smallest viable changes over broad redesign proposals.
+
+## Maintenance
+
+- Last reviewed: 2026-03-06

@@ -1,6 +1,6 @@
 ---
 name: research-brief
-description: Produce a source-grounded research brief for macro/product/engineering questions with explicit confidence and staleness notes.
+description: Produce a source-grounded research brief for macro/product/engineering questions with explicit confidence, staleness notes, and decision-oriented implications.
 allowed-tools:
   - Read
   - Grep
@@ -9,41 +9,54 @@ allowed-tools:
 
 # Research brief skill (Whether)
 
-Use this skill when a task asks for external research, trend synthesis, or recommendations based on web/document sources.
+## Use this skill when
 
-## Objectives
+- A task asks for external research synthesis.
+- A decision needs evidence from web/docs sources.
+- A request explicitly asks for citations, confidence, or freshness.
 
-1. Gather findings from high-quality primary sources.
-2. Separate factual extraction from interpretation.
-3. Produce an actionable brief for Whether contributors.
+## Do not use this skill when
+
+- The task is purely implementation with no research dependency.
+- The user asks for opinion-only brainstorming without evidence requirements.
 
 ## Workflow
 
-1. Clarify scope in one sentence (question + audience + decision owner).
-2. Collect 3–8 sources, prioritizing official docs/specs/repos over commentary.
-3. Extract facts first (quotes, metrics, dates, capabilities).
-4. Add interpretation only after evidence is captured.
-5. Summarize implications and open questions.
+1. State the decision question and audience in one sentence.
+2. Gather 3–8 high-quality sources (primary docs/specs first).
+3. Extract verifiable facts before interpretation.
+4. Separate evidence from implications.
+5. End with bounded recommendations and remaining unknowns.
 
-## Output contract
+## Output contract (required order)
 
-Return sections in this order:
-
-1. **Question**
-2. **Executive summary** (3–6 bullets)
-3. **Evidence table** with columns:
+1. **Skill used + why**
+2. **Question + decision owner**
+3. **Executive summary** (3–6 bullets)
+4. **Evidence table**
    - Claim
    - Source URL
    - Retrieved date
    - Confidence (`high`/`medium`/`low`)
    - Staleness risk (`low`/`medium`/`high`)
-4. **Implications for Whether**
-5. **Recommended next actions**
-6. **Open questions / unknowns**
+5. **Implications for Whether**
+6. **Recommended next actions**
+7. **Open questions / unknowns**
+8. **Fallback note** (only if blocked by source/tool limits)
 
-## Quality guardrails
+## Quality checks before finalizing
 
-- Prefer primary sources. If using secondary analysis, label it explicitly.
-- Avoid presenting speculation as fact.
-- When docs are rapidly changing, mention likely drift points.
-- If evidence conflicts, present both sides and explain uncertainty.
+- At least one primary source backs each major claim.
+- Any secondary source is explicitly labeled as secondary.
+- Conflicting evidence is surfaced, not smoothed over.
+- Recommendations are action-oriented, not generic commentary.
+
+## Guardrails
+
+- Do not present speculation as fact.
+- Include staleness/drift risk for fast-moving docs.
+- Keep synthesis compact and decision-first.
+
+## Maintenance
+
+- Last reviewed: 2026-03-06
