@@ -1,5 +1,36 @@
 type TrustStatusTone = "stable" | "warning" | "historical";
 
+const FALLBACK_FRESHNESS_LABEL = "Unavailable";
+
+const normalizeFreshnessLabel = (freshnessLabel: string) => {
+  const trimmedLabel = freshnessLabel.trim();
+  return trimmedLabel.length > 0 ? trimmedLabel : FALLBACK_FRESHNESS_LABEL;
+};
+
+export const buildWeeklyTrustCueLine = ({
+  confidenceLabel,
+  freshnessLabel,
+  transitionWatch,
+}: {
+  confidenceLabel: "HIGH" | "MED" | "LOW";
+  freshnessLabel: string;
+  transitionWatch: "ON" | "OFF";
+}) =>
+  `Confidence ${confidenceLabel} · Freshness ${normalizeFreshnessLabel(freshnessLabel)} · Shift watch ${transitionWatch}`;
+
+export const buildWeeklyCitationMetaLine = ({
+  statusLabel,
+  confidenceLabel,
+  recordDateLabel,
+  freshnessLabel,
+}: {
+  statusLabel: string;
+  confidenceLabel: "HIGH" | "MED" | "LOW";
+  recordDateLabel: string;
+  freshnessLabel: string;
+}) =>
+  `Posture ${statusLabel} · Confidence ${confidenceLabel} · Effective ${recordDateLabel} · Freshness ${normalizeFreshnessLabel(freshnessLabel)}`;
+
 export const buildTrustStatus = ({
   historicalSelection,
   isFallback,

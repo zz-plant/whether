@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import type { ReportDynamics } from "../../lib/report/reportData";
 import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
 import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
+import { buildWeeklyCitationMetaLine, buildWeeklyTrustCueLine } from "../../lib/report/trustStatus";
 
 type MemoryRailItem = {
   label: string;
@@ -67,6 +68,18 @@ export function WeeklyDecisionCard({
   citation,
   actions,
 }: WeeklyDecisionCardProps) {
+  const trustCueLine = buildWeeklyTrustCueLine({
+    confidenceLabel,
+    freshnessLabel: fetchedAtLabel,
+    transitionWatch,
+  });
+  const citationMetaLine = buildWeeklyCitationMetaLine({
+    statusLabel,
+    confidenceLabel,
+    recordDateLabel,
+    freshnessLabel: fetchedAtLabel,
+  });
+
   return (
     <section className="weather-panel space-y-5 px-5 py-6 sm:space-y-6 sm:px-7 sm:py-8" aria-labelledby="weekly-posture-brief-title">
       <div className="space-y-3 lg:grid lg:grid-cols-12 lg:gap-4 lg:space-y-0" data-testid="weekly-top-fold">
@@ -74,6 +87,7 @@ export function WeeklyDecisionCard({
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-200">This week&apos;s posture</p>
           <h1 id="weekly-posture-brief-title" className="text-3xl font-semibold text-slate-50 sm:text-4xl">{statusLabel}</h1>
           <p className="text-sm text-slate-300">{netConstraintSummary}</p>
+          <p className="text-xs text-slate-300">{trustCueLine}</p>
         </header>
 
         <article className={`${primaryPanel} ${sectionSpacing} lg:col-span-6`}>
@@ -101,7 +115,7 @@ export function WeeklyDecisionCard({
         <article className={`${primaryPanel} ${sectionSpacing} lg:col-span-6`}>
           <h2 className={primaryHeading}>Revisit implications</h2>
           <p className="mt-2 text-sm font-semibold text-slate-100">{revisitDecisions ? "Revise hiring and roadmap calls now." : "Keep last week&apos;s calls in place."}</p>
-          <p className="mt-1 text-xs text-slate-300">Delta {postureDelta} · Confidence {confidenceLabel} · Shift watch {transitionWatch}</p>
+          <p className="mt-1 text-xs text-slate-300">Delta {postureDelta}</p>
         </article>
 
         <article className={`${secondaryPanel} ${sectionSpacing} lg:col-span-12`}>
@@ -159,7 +173,7 @@ export function WeeklyDecisionCard({
 
       <article className={`${supportingPanel} ${sectionSpacing}`}>
         <h2 className={secondaryHeading}>Cite this call</h2>
-        <p className="mt-2 text-xs text-slate-300">Posture {statusLabel} · Confidence {confidenceLabel} · Effective {recordDateLabel} · Freshness {fetchedAtLabel}</p>
+        <p className="mt-2 text-xs text-slate-300">{citationMetaLine}</p>
         <pre className="mt-2 overflow-x-auto whitespace-pre-wrap text-xs text-slate-300">{citation}</pre>
         <div className="mt-3">{actions}</div>
       </article>
