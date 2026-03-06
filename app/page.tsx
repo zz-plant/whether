@@ -339,6 +339,7 @@ export default async function HomePage({
         decisionRules={homeBriefModel.decisionRules}
         revisitDecisions={homeBriefModel.revisitDecisions}
         memoryRail={homeBriefModel.memoryRail}
+        whyThisCall={homeBriefModel.whyThisCall}
         citation={callCitation}
         actions={<CopyLeadershipArtifactsButtons slackBrief={slackBrief} boardSummary={boardSummary} citation={callCitation} />}
       />

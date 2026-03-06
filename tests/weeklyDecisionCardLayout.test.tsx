@@ -71,6 +71,11 @@ describe("WeeklyDecisionCard top-fold composition", () => {
           { label: "W-1", posture: "Balanced" },
           { label: "Now", posture: "Defensive" },
         ]}
+        whyThisCall={[
+          { label: "Boundary distance", detail: "Nearest boundary is 4.0 points away." },
+          { label: "Momentum", detail: "Capital tightness tightened this week." },
+          { label: "Reliability", detail: "Transition watch is ON." },
+        ]}
         citation="Whether weekly brief citation"
         actions={<button type="button">Copy weekly brief</button>}
       />,
@@ -91,6 +96,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /What to do now[\s\S]*What changed: \+2/);
     assert.match(html, /Decision matrix this week/);
     assert.match(html, /Bounded rules \(do now \/ stop \/ restart\)/);
+    assert.match(html, /Why this posture call/);
     assert.match(html, /Stop if:/);
     assert.match(html, /Restart when:/);
     assert.match(html, /aria-label="Weekly decision matrix"/);
@@ -117,6 +123,11 @@ describe("WeeklyDecisionCard top-fold composition", () => {
           { label: "W-2", posture: "Balanced" },
           { label: "W-1", posture: "Balanced" },
           { label: "Now", posture: "Balanced" },
+        ]}
+        whyThisCall={[
+          { label: "Boundary distance", detail: "Nearest boundary is 15.0 points away." },
+          { label: "Momentum", detail: "No material deltas this week." },
+          { label: "Reliability", detail: "Transition watch is OFF." },
         ]}
         citation="Whether weekly brief citation"
         actions={<button type="button">Copy board summary</button>}
@@ -154,6 +165,11 @@ describe("WeeklyDecisionCard top-fold composition", () => {
           { label: "W-2", posture: "Defensive" },
           { label: "W-1", posture: "Defensive" },
           { label: "Now", posture: "Defensive" },
+        ]}
+        whyThisCall={[
+          { label: "Boundary distance", detail: "Nearest boundary is 2.0 points away." },
+          { label: "Momentum", detail: "No material deltas this week." },
+          { label: "Reliability", detail: "Transition watch is ON." },
         ]}
         citation="Whether weekly brief citation"
       />,

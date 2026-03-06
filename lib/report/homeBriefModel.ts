@@ -27,6 +27,11 @@ type MemoryRailItem = {
   posture: string;
 };
 
+type WhyThisCallItem = {
+  label: string;
+  detail: string;
+};
+
 const regimeLabelMap = {
   SCARCITY: "Scarcity",
   DEFENSIVE: "Defensive",
@@ -91,6 +96,47 @@ const buildMemoryRail = (recordDateLabel: string | undefined, currentRegime: Reg
   ].slice(-4);
 };
 
+const signalReasonLabel: Record<"tightness" | "riskAppetite" | "baseRate" | "curveSlope", string> = {
+  tightness: "Capital tightness",
+  riskAppetite: "Risk appetite",
+  baseRate: "Base rate",
+  curveSlope: "Yield curve slope",
+};
+
+const buildWhyThisCall = ({
+  tightnessGap,
+  riskGap,
+  reportDynamics,
+  transitionWatch,
+}: {
+  tightnessGap: number;
+  riskGap: number;
+  reportDynamics: HomeReportData["reportDynamics"];
+  transitionWatch: "ON" | "OFF";
+}): WhyThisCallItem[] => {
+  const nearestGap = Math.min(tightnessGap, riskGap);
+  const boundaryLabel = nearestGap <= 5 ? "near threshold" : nearestGap <= 12 ? "within monitor range" : "well outside threshold";
+  const changedSignal = reportDynamics?.changedSignals[0];
+
+  return [
+    {
+      label: "Boundary distance",
+      detail: `Nearest regime boundary is ${nearestGap.toFixed(1)} points away (${boundaryLabel}).`,
+    },
+    {
+      label: "Momentum",
+      detail:
+        reportDynamics?.changedSignals.length
+          ? `${signalReasonLabel[changedSignal?.key ?? "tightness"]} ${changedSignal && changedSignal.delta > 0 ? "tightened" : changedSignal && changedSignal.delta < 0 ? "eased" : "held"} this week; ${reportDynamics.directionLabel} overall.`
+          : "No material signal deltas this week; call is carried by level and threshold distance.",
+    },
+    {
+      label: "Reliability",
+      detail: transitionWatch === "ON" ? "Transition watch is ON; re-check next read before irreversible commitments." : "Transition watch is OFF; current posture is stable for near-term planning.",
+    },
+  ];
+};
+
 export const buildHomeBriefModel = (data: HomeReportData) => {
   const { assessment, regimeAlert, stopItems, reportDynamics, recordDateLabel } = data;
   const previousRegime = regimeAlert?.previousRegime;
@@ -149,5 +195,11 @@ export const buildHomeBriefModel = (data: HomeReportData) => {
     postureDeltaLabel,
     reversalTrigger,
     transitionWatch,
+    whyThisCall: buildWhyThisCall({
+      tightnessGap,
+      riskGap,
+      reportDynamics,
+      transitionWatch,
+    }),
   };
 };
