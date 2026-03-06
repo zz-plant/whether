@@ -24,8 +24,8 @@ import { WeeklyDecisionCard } from "./components/weeklyDecisionCard";
 import { RevealOnView } from "./components/revealOnView";
 import { DataProvenanceStrip } from "./components/dataProvenanceStrip";
 import { ActionStrip } from "./components/actionStrip";
-import { buildSlackBrief } from "../lib/export/briefBuilders";
-import { CopySlackBriefButton } from "./components/copySlackBriefButton";
+import { buildBoardBrief, buildCallCitation, buildSlackBrief } from "../lib/export/briefBuilders";
+import { CopyLeadershipArtifactsButtons } from "./components/copyLeadershipArtifactsButtons";
 import { createBreadcrumbTrail } from "../lib/navigation/breadcrumbs";
 import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
 
@@ -278,6 +278,8 @@ export default async function HomePage({
     treasuryProvenance,
   });
   const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries);
+  const boardSummary = buildBoardBrief(assessment, treasury, sensors, macroSeries);
+  const callCitation = buildCallCitation(assessment, treasury);
   return (
     <ReportShell
       regime={assessment.regime}
@@ -340,7 +342,10 @@ export default async function HomePage({
         fetchedAtLabel={fetchedAtLabel}
         reportDynamics={reportDynamics}
         decisionKnobs={homeBriefModel.decisionKnobs}
-        actions={<CopySlackBriefButton brief={slackBrief} />}
+        decisionShiftSummary={homeBriefModel.decisionShiftSummary}
+        leadershipImplications={homeBriefModel.leadershipImplications}
+        boundedDecisions={homeBriefModel.boundedDecisions}
+        actions={<CopyLeadershipArtifactsButtons slackBrief={slackBrief} boardSummary={boardSummary} citation={callCitation} />}
       />
 
       {!reportResult.ok ? (

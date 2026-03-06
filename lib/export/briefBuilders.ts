@@ -105,3 +105,14 @@ export const buildConstraintHeadlines = (
     ...buildExportStamp(treasury, "Score-based posture confidence"),
   ].join("\n");
 };
+
+export const buildCallCitation = (
+  assessment: RegimeAssessment,
+  treasury: TreasuryData,
+) => [
+  `Whether call — ${treasury.record_date}`,
+  `Posture: ${formatRegimeLabel(assessment.regime)} (${assessment.regime})`,
+  `Confidence: Score-based posture confidence`,
+  `Signal refresh cadence: 15m`,
+  `Source: ${treasury.source}`,
+].join("\n");
