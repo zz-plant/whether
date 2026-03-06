@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import {
   buildTimeMachineHref,
   getAdjacentTimeMachineRequest,
@@ -27,6 +28,7 @@ import { buildBoardBrief, buildCallCitation, buildSlackBrief } from "../lib/expo
 import { CopyLeadershipArtifactsButtons } from "./components/copyLeadershipArtifactsButtons";
 import { createBreadcrumbTrail } from "../lib/navigation/breadcrumbs";
 import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
+import { getFeaturedConceptArticles } from "../lib/productCanon";
 
 const WeeklyActionSummaryPanel = dynamic(
   () =>
@@ -274,6 +276,7 @@ export default async function HomePage({
   const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries);
   const boardSummary = buildBoardBrief(assessment, treasury, sensors, macroSeries);
   const callCitation = buildCallCitation(assessment, treasury);
+  const featuredConcepts = getFeaturedConceptArticles().slice(0, 3);
   return (
     <ReportShell
       regime={assessment.regime}
@@ -339,6 +342,26 @@ export default async function HomePage({
         citation={callCitation}
         actions={<CopyLeadershipArtifactsButtons slackBrief={slackBrief} boardSummary={boardSummary} citation={callCitation} />}
       />
+
+      <section className="weather-panel space-y-4 px-5 py-5" aria-label="Decision concept links">
+        <div className="space-y-1">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Decision references</p>
+          <h2 className="text-base font-semibold text-slate-100">Revisit these concept playbooks before finalizing this week&apos;s plan</h2>
+        </div>
+        <div className="grid gap-3 md:grid-cols-3">
+          {featuredConcepts.map((concept) => (
+            <Link
+              key={concept.slug}
+              href={`/concepts/${concept.slug}`}
+              className="weather-surface block space-y-2 px-4 py-3 transition-colors hover:border-sky-400/70"
+            >
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">{concept.focus}</p>
+              <p className="text-sm font-semibold text-slate-100">{concept.title}</p>
+              <p className="text-xs text-slate-300">{concept.audience}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
 
       {!reportResult.ok ? (
         <section className="weather-panel border border-amber-500/50 bg-amber-500/10 px-5 py-4 text-sm text-amber-100" aria-live="polite">

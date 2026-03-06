@@ -22,6 +22,12 @@ type ConceptArticlePageProps = {
   params: Promise<{ slug: string }>;
 };
 
+type DecisionDelta = {
+  action: string;
+  threshold: string;
+  reversal: string;
+};
+
 const monthFormatter = new Intl.DateTimeFormat("en-US", {
   month: "short",
   year: "numeric",
@@ -43,6 +49,91 @@ const formatRecordDate = (isoDate: string) => {
   return recordDateFormatter.format(new Date(`${isoDate}T00:00:00Z`));
 };
 
+const ensureNonEmptyCopy = (value: string, fallback: string) => {
+  const normalized = value.trim();
+  return normalized.length > 0 ? normalized : fallback;
+};
+
+const buildUniqueConceptSummary = (
+  title: string,
+  summary: string,
+  audience: string,
+  focus: string,
+  whyItMattered: string,
+) => {
+  return ensureNonEmptyCopy(
+    `${summary} For ${audience}, ${title} still matters as a ${focus.toLowerCase()} call because ${whyItMattered.toLowerCase()}`,
+    summary,
+  );
+};
+
+const buildDecisionDelta = ({
+  title,
+  focus,
+  publicationRegimeLabel,
+  currentRegimeLabel,
+  regimeStatus,
+}: {
+  title: string;
+  focus: string;
+  publicationRegimeLabel?: string;
+  currentRegimeLabel?: string;
+  regimeStatus: "aligned" | "mismatch" | "unknown";
+}): DecisionDelta => {
+  if (regimeStatus === "unknown") {
+    const currentLabel = currentRegimeLabel ?? "the current macro regime";
+    return {
+      action:
+        `Use ${title} as a reference pattern only; set this week's decision in the weekly brief before reusing the playbook directly.`,
+      threshold:
+        `No publication-regime match is available yet, so tighten only after confirming the call in ${currentLabel} evidence (signals + thresholds).`,
+      reversal:
+        "Reverse only when live regime evidence and your current guardrails both support the change; do not use this article date alone as a trigger.",
+    };
+  }
+
+  const alignment = regimeStatus === "mismatch" ? "mismatch" : "aligned";
+
+  const focusActionMap: Record<string, string> = {
+    Identity:
+      alignment === "mismatch"
+        ? `Use ${title} to tighten role boundaries before adding scope, headcount, or new product lines.`
+        : `Use ${title} to speed role clarity and delegation on active roadmap bets.`,
+    Execution:
+      alignment === "mismatch"
+        ? `Use ${title} as a sequencing filter: demand evidence before full build commitments.`
+        : `Use ${title} to increase experiment cadence and convert learning into shipment decisions.`,
+    Strategy:
+      alignment === "mismatch"
+        ? `Use ${title} to narrow active priorities and cut low-conviction roadmap branches.`
+        : `Use ${title} to support selective expansion where evidence and capacity both hold.`,
+    "Future-proofing":
+      alignment === "mismatch"
+        ? `Use ${title} to gate AI/platform expansion behind reliability and cost controls.`
+        : `Use ${title} to run controlled expansion bets with explicit model-risk limits.`,
+  };
+
+  const defaultAction =
+    alignment === "mismatch"
+      ? `Use ${title} as a risk-control lens before committing irreversible roadmap choices.`
+      : `Use ${title} as an acceleration lens for near-term execution decisions.`;
+
+  const publicationLabel = publicationRegimeLabel ?? "its original macro regime";
+  const currentLabel = currentRegimeLabel ?? "the current macro regime";
+
+  return {
+    action: focusActionMap[focus] ?? defaultAction,
+    threshold:
+      regimeStatus === "mismatch"
+        ? `Tighten this call when Whether posture remains in ${currentLabel} for 2 consecutive updates; treat this framework as constraint-first until then.`
+        : `Keep this call active while Whether posture stays in or near ${publicationLabel}; tighten if posture shifts away for 2 consecutive updates.`,
+    reversal:
+      regimeStatus === "mismatch"
+        ? `Reverse to expansion mode only after posture re-enters ${publicationLabel} for 2 consecutive updates.`
+        : `Reverse to defense mode if posture leaves ${publicationLabel} for 2 consecutive updates.`,
+  };
+};
+
 export const dynamicParams = false;
 
 export async function generateStaticParams() {
@@ -62,9 +153,17 @@ export async function generateMetadata({ params }: ConceptArticlePageProps): Pro
     });
   }
 
+  const metadataDescription = buildUniqueConceptSummary(
+    article.title,
+    article.summary,
+    article.audience,
+    article.focus,
+    article.whyItMattered,
+  );
+
   return buildPageMetadata({
     title: `${article.title} in macro context — Whether`,
-    description: article.summary,
+    description: metadataDescription,
     path: `/concepts/${article.slug}`,
     imageAlt: `${article.title} macro context breakdown`,
     imageParams: {
@@ -90,6 +189,20 @@ export default async function ConceptArticlePage({ params }: ConceptArticlePageP
   const publicationRegime = getConceptPublicationRegime(article);
   const regimeStatus = getConceptRegimeStatus(article, currentRegime?.regime ?? null);
   const publishedLabel = formatPublishedLabel(article.publishedYear, article.publishedMonth);
+  const uniqueConceptSummary = buildUniqueConceptSummary(
+    article.title,
+    article.summary,
+    article.audience,
+    article.focus,
+    article.whyItMattered,
+  );
+  const decisionDelta = buildDecisionDelta({
+    title: article.title,
+    focus: article.focus,
+    publicationRegimeLabel: publicationRegime?.regimeLabel,
+    currentRegimeLabel: currentRegime?.regimeLabel,
+    regimeStatus,
+  });
   const canonicalArticleUrl = buildCanonicalUrl(`/concepts/${article.slug}`);
   const conceptArticleStructuredData = {
     "@context": "https://schema.org",
@@ -104,7 +217,7 @@ export default async function ConceptArticlePage({ params }: ConceptArticlePageP
       "@type": "Organization",
       name: organizationName,
     },
-    description: article.summary,
+    description: uniqueConceptSummary,
     mainEntityOfPage: canonicalArticleUrl,
     url: canonicalArticleUrl,
     sameAs: article.sourceUrl,
@@ -145,7 +258,7 @@ export default async function ConceptArticlePage({ params }: ConceptArticlePageP
         <p className="text-sm text-slate-300">
           {article.author} · {publishedLabel} · Focus: {article.focus} · {article.sourceType} · ~{article.readMins} min read · Most relevant to {article.audience}
         </p>
-        <p className="text-sm text-slate-200">{article.summary}</p>
+        <p className="text-sm text-slate-200">{uniqueConceptSummary}</p>
         {regimeStatus === "mismatch" && publicationRegime && currentRegime ? (
           <p className="rounded-md border border-amber-400/40 bg-amber-900/30 px-3 py-2 text-xs text-amber-100">
             Macro-mismatch warning: this concept was written for {publicationRegime.regimeLabel}. Current regime is {currentRegime.regimeLabel}.
@@ -154,9 +267,35 @@ export default async function ConceptArticlePage({ params }: ConceptArticlePageP
       </section>
 
       <section className="weather-panel space-y-4 px-6 py-6">
+        <h2 className="text-lg font-semibold text-slate-100">Decision delta this week</h2>
+        <p className="text-sm text-slate-300">
+          Translate this concept into bounded execution rules for the current posture before planning your next cycle.
+        </p>
+        <dl className="space-y-3 text-sm">
+          <div className="weather-surface space-y-1 px-4 py-3">
+            <dt className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Action now</dt>
+            <dd className="text-slate-100">{decisionDelta.action}</dd>
+          </div>
+          <div className="weather-surface space-y-1 px-4 py-3">
+            <dt className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Tighten when</dt>
+            <dd className="text-slate-100">{decisionDelta.threshold}</dd>
+          </div>
+          <div className="weather-surface space-y-1 px-4 py-3">
+            <dt className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Reverse when</dt>
+            <dd className="text-slate-100">{decisionDelta.reversal}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section className="weather-panel space-y-4 px-6 py-6">
         <h2 className="text-lg font-semibold text-slate-100">What this article argued</h2>
-        <p className="text-sm text-slate-200">{article.whyItMattered}</p>
-        <p className="text-sm text-slate-300">{article.demystificationPrompt}</p>
+        <p className="text-sm text-slate-200">{ensureNonEmptyCopy(article.whyItMattered, article.summary)}</p>
+        <p className="text-sm text-slate-300">
+          {ensureNonEmptyCopy(
+            article.demystificationPrompt,
+            "Use this piece to challenge assumptions before scaling scope.",
+          )}
+        </p>
         <a
           href={article.sourceUrl}
           target="_blank"

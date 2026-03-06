@@ -450,6 +450,19 @@ export const productConceptArticles: ProductConceptArticle[] = baseProductConcep
   ...conceptMetadataOverrides[article.slug],
 }));
 
+export const featuredConceptSlugs = [
+  "product-strategy-means-saying-no",
+  "continuous-discovery",
+  "product-strategy-vs-product-plan",
+  "the-product-momentum-gap",
+] as const;
+
+export const getFeaturedConceptArticles = () => {
+  return featuredConceptSlugs
+    .map((slug) => productConceptArticles.find((article) => article.slug === slug))
+    .filter((article): article is ProductConceptArticle => Boolean(article));
+};
+
 export const productConceptEras: ProductConceptEra[] = [
   "Foundational classics",
   "Process & strategy shifters",

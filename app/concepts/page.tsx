@@ -4,6 +4,7 @@ import { buildBreadcrumbList, buildCanonicalUrl, buildPageMetadata, serializeJso
 import {
   conceptAudiences,
   conceptFocuses,
+  getFeaturedConceptArticles,
   getConstraintRegimeLabel,
   getMacroContextForArticle,
   getMacroInstrumentReadout,
@@ -115,6 +116,7 @@ export default async function ProductConceptTimelinePage({
   });
 
   const totalMatches = filteredArticles.length;
+  const featuredArticles = getFeaturedConceptArticles().slice(0, 3);
 
   const canonicalDistribution = productConceptArticles.reduce(
     (acc, article) => {
@@ -203,6 +205,26 @@ export default async function ProductConceptTimelinePage({
         {currentRegime ? (
           <p className="text-xs text-slate-300">Current regime baseline: {currentRegime.regimeLabel}.</p>
         ) : null}
+      </section>
+
+      <section className="weather-panel space-y-4 px-6 py-6">
+        <h2 className="text-lg font-semibold text-slate-100">High-signal concepts to revisit first</h2>
+        <p className="text-sm text-slate-300">
+          Use these pages for quick decision translation, then expand into the full canon.
+        </p>
+        <div className="grid gap-3 md:grid-cols-3">
+          {featuredArticles.map((article) => (
+            <Link
+              key={article.slug}
+              href={`/concepts/${article.slug}`}
+              className="weather-surface block space-y-2 px-4 py-4 transition-colors hover:border-sky-400/70"
+            >
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">{article.focus}</p>
+              <p className="text-sm font-semibold text-slate-100">{article.title}</p>
+              <p className="text-xs text-slate-300">{article.audience}</p>
+            </Link>
+          ))}
+        </div>
       </section>
 
       <section className="weather-panel space-y-3 px-6 py-5">
