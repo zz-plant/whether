@@ -80,6 +80,18 @@ const buildDecisionDelta = ({
   currentRegimeLabel?: string;
   regimeStatus: "aligned" | "mismatch" | "unknown";
 }): DecisionDelta => {
+  if (regimeStatus === "unknown") {
+    const currentLabel = currentRegimeLabel ?? "the current macro regime";
+    return {
+      action:
+        `Use ${title} as a reference pattern only; set this week's decision in the weekly brief before reusing the playbook directly.`,
+      threshold:
+        `No publication-regime match is available yet, so tighten only after confirming the call in ${currentLabel} evidence (signals + thresholds).`,
+      reversal:
+        "Reverse only when live regime evidence and your current guardrails both support the change; do not use this article date alone as a trigger.",
+    };
+  }
+
   const alignment = regimeStatus === "mismatch" ? "mismatch" : "aligned";
 
   const focusActionMap: Record<string, string> = {
