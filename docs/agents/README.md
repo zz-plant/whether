@@ -17,6 +17,7 @@ Task-focused guidance for AI agents and code assistants working in this reposito
 - `quality-and-pr.md` — validation depth, commit hygiene, and PR quality bar.
 - `ui-ux-standards.md` — accessibility, visual consistency, and interaction standards.
 - `mcp-and-skills-playbook.md` — practical MCP + repo-skill workflows.
+- `system-skill-router` — deterministic router for skill-management requests with explicit sequencing (`skill-installer` → `skill-creator`) and a required output contract.
 - `agent-interface.md` — concrete HTTP + MCP entrypoints for agentic integrations.
 
 ## Decision checklist for every task

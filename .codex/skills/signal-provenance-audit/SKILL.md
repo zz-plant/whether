@@ -1,6 +1,6 @@
 ---
 name: signal-provenance-audit
-description: Audit Whether macro/sensor outputs for provenance and freshness when users ask to verify source URLs, timestamps, formulas, or data-quality readiness.
+description: Audit Whether signal outputs for provenance and freshness by verifying source URLs, retrieval timestamps, and method/formula transparency.
 allowed-tools:
   - Read
   - Grep
@@ -11,54 +11,52 @@ allowed-tools:
 
 ## Use this skill when
 
-- Asked to verify where a signal came from.
-- Reviewing trust/readiness of macro snapshots or sensor cards.
-- Checking whether outputs meet provenance requirements before release.
+- Verifying where a signal came from.
+- Auditing trust/readiness of macro snapshots or signal cards.
+- Running provenance checks before release decisions.
 
-## Inputs expected
+## Do not use this skill when
 
-- Scope (route, component, dataset, or document).
-- Audit depth (quick check vs release gate).
-- Optional release target date.
+- The request is strategic interpretation only (no provenance validation).
+- Source artifacts are out of scope and inaccessible.
 
 ## Workflow
 
-1. Locate data source, transform path, and render surface.
-2. Verify each surfaced signal includes source URL, retrieval timestamp, and method/formula notes where applicable.
-3. Identify stale/implicit/missing provenance fields.
-4. Rate risk and propose smallest corrective changes.
-5. Produce a release-go/no-go summary for the requested scope.
+1. Map source → transform → render path.
+2. Verify URL, timestamp, and method/formula presence for each surfaced signal.
+3. Mark pass/warn/fail with explicit rationale.
+4. Rank gaps by release risk.
+5. Propose smallest viable patch plan and go/no-go recommendation.
 
-## Output contract
+## Output contract (required order)
 
-Return in this order:
-
-1. **Audit scope**
-2. **Provenance matrix** with columns:
+1. **Skill used + why**
+2. **Audit scope**
+3. **Provenance matrix**
    - Signal
    - Source artifact/path
    - URL present (`yes/no`)
    - Timestamp present (`yes/no`)
    - Method/formula present (`yes/no`)
    - Status (`pass/warn/fail`)
-3. **Top gaps** (ranked)
-4. **Fix plan** (smallest viable patches)
-5. **Release recommendation** (`go` / `go with conditions` / `no-go`)
+4. **Top gaps** (ranked)
+5. **Fix plan** (smallest viable patches)
+6. **Release recommendation** (`go` / `go with conditions` / `no-go`)
+7. **Fallback note** (only if audit coverage is blocked)
+
+## Quality checks before finalizing
+
+- No `pass` rating when required fields are missing.
+- Findings cite exact files/artifacts.
+- Missing data is distinguished from missing display logic.
+- Fixes are scoped to practical one-PR increments where possible.
 
 ## Guardrails
 
-- Do not mark "pass" if any required provenance field is missing.
-- Cite exact files for each finding.
-- Distinguish missing data from missing display logic.
-- Keep recommendations implementable in one PR where possible.
+- Do not redesign the full pipeline during audit.
+- Do not assess macro correctness beyond documented formulas.
 
-## Non-goals
+## Maintenance
 
-- Replacing the full data pipeline architecture.
-- Validating macro economics correctness beyond documented formulas.
-- Writing speculative policy recommendations.
-
-## Maintenance notes
-
-- Last reviewed: 2026-02-23
+- Last reviewed: 2026-03-06
 - Canonical policy reference: `docs/agents/data-and-platform.md`.
