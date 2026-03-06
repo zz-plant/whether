@@ -15,8 +15,8 @@ describe("buildHomeBriefModel", () => {
     assert.equal(typeof model.reversalTrigger, "string");
     assert.equal(typeof model.dangerousCategory, "string");
     assert.ok(model.decisionKnobs.length > 0);
+    assert.equal(model.boundedDecisions.length, 3);
   });
-
 
   it("counts weak signals using signal-specific improving semantics", () => {
     const model = buildHomeBriefModel({
@@ -39,5 +39,25 @@ describe("buildHomeBriefModel", () => {
     const approvalVelocity = model.decisionKnobs.find((knob) => knob.key === "approvalVelocity");
     assert.ok(approvalVelocity);
     assert.match(approvalVelocity.rationale, /1 weak signal/);
+  });
+
+  it("returns no-change decision summary when there are no deltas", () => {
+    const model = buildHomeBriefModel({
+      assessment: {
+        regime: "DEFENSIVE",
+        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
+        scores: { tightness: 50, riskAppetite: 50 },
+      },
+      regimeAlert: null,
+      stopItems: ["Guardrail"],
+      reportDynamics: {
+        directionLabel: "stable",
+        changedSignals: [],
+      },
+    });
+
+    assert.match(model.decisionShiftSummary, /No macro change this week/);
+    assert.equal(model.boundedDecisions.length, 3);
+    assert.match(model.boundedDecisions[0].pauseIf, /Pause|Stop/);
   });
 });

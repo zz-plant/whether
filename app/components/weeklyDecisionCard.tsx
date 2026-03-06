@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import type { DecisionKnob } from "../../lib/report/decisionKnobs";
 import { isImprovingSignalDelta } from "../../lib/report/reportData";
 import type { ReportDynamics } from "../../lib/report/reportData";
+import type { BoundedDecision } from "../../lib/report/homeBriefModel";
 
 type Regime = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
 
@@ -20,6 +21,9 @@ type WeeklyDecisionCardProps = {
   fetchedAtLabel: string;
   reportDynamics: ReportDynamics;
   decisionKnobs: DecisionKnob[];
+  decisionShiftSummary: string;
+  leadershipImplications: string[];
+  boundedDecisions: BoundedDecision[];
   actions?: ReactNode;
 };
 
@@ -47,18 +51,11 @@ const deltaSignalOrder: Array<{
   { key: "curveSlope", label: "Curve slope" },
 ];
 
-
 function getDeltaMagnitudeLabel(delta: number): string {
   const absoluteDelta = Math.abs(delta);
-  if (absoluteDelta === 0) {
-    return "no";
-  }
-  if (absoluteDelta < 0.5) {
-    return "minor";
-  }
-  if (absoluteDelta < 2) {
-    return "moderate";
-  }
+  if (absoluteDelta === 0) return "no";
+  if (absoluteDelta < 0.5) return "minor";
+  if (absoluteDelta < 2) return "moderate";
   return "major";
 }
 
@@ -77,6 +74,9 @@ export function WeeklyDecisionCard({
   fetchedAtLabel,
   reportDynamics,
   decisionKnobs,
+  decisionShiftSummary,
+  leadershipImplications,
+  boundedDecisions,
   actions,
 }: WeeklyDecisionCardProps) {
   const deltasByKey = new Map(reportDynamics.changedSignals.map((item) => [item.key, item.delta]));
@@ -91,46 +91,49 @@ export function WeeklyDecisionCard({
           Current environment: {statusLabel} ({regimeEnvironmentByRegime[regime]})
         </h1>
         <p className="max-w-3xl text-sm text-slate-300">A weekly operating posture for hiring, roadmap, and spend decisions — based on macro signals.</p>
-                <p className="max-w-3xl text-base text-slate-200">{postureHeadlineByRegime[regime]}</p>
-        <div className="flex flex-wrap items-center gap-3">
-          <p className="text-sm text-slate-300">Change vs last week: {postureDelta}</p>
-          {actions}
-        </div>
+        <p className="max-w-3xl text-base text-slate-200">{postureHeadlineByRegime[regime]}</p>
+        <p className="text-sm text-slate-300">Change vs last week: {postureDelta}</p>
       </header>
 
-      <article className="rounded-xl border border-slate-700/70 bg-slate-900/50 p-4">
-        <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">How to use this</h2>
-        <ol className="mt-2 space-y-1 text-sm text-slate-200">
-          <li>1. Read the weekly environment call.</li>
-          <li>2. Apply the operating dials to hiring, roadmap, and spend.</li>
-          <li>3. Avoid the highlighted high-risk decisions.</li>
-        </ol>
+      <article className="rounded-xl border border-sky-500/40 bg-slate-900/50 p-4">
+        <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-sky-100">Leadership brief (one-screen)</h2>
+        <p className="mt-2 text-sm text-slate-100">Environment: {statusLabel} · Confidence: {confidenceLabel} · Shift watch: {transitionWatch}</p>
+        <ul className="mt-3 grid gap-2 text-sm text-slate-200 sm:grid-cols-3">
+          {leadershipImplications.slice(0, 3).map((line) => (
+            <li key={line} className="rounded-lg border border-slate-700/60 bg-slate-950/60 px-3 py-2">{line}</li>
+          ))}
+        </ul>
       </article>
 
       <article className="rounded-xl border border-slate-700/70 bg-slate-900/50 p-4">
         <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">What changed since last week</h2>
         <p className="mt-2 text-xs text-slate-300">Each line shows direction (improving/weakening) and impact (minor/moderate/major).</p>
+        <p className="mt-2 text-sm font-semibold text-sky-100">{decisionShiftSummary}</p>
+        {reportDynamics.changedSignals.length === 0 ? (
+          <p className="mt-3 rounded-lg border border-slate-700/60 bg-slate-950/60 p-3 text-sm text-slate-200">No tracked signal moved meaningfully this week.</p>
+        ) : null}
         <ul className="mt-3 grid gap-3 text-sm text-slate-100 sm:grid-cols-2">
           {deltaSignalOrder.map((item) => {
             const delta = deltasByKey.get(item.key) ?? 0;
             const isImproving = isImprovingSignalDelta(item.key, delta);
             const interpretationLabel = delta === 0 ? "unchanged" : isImproving ? "improving" : "weakening";
-            const trendClassName = delta === 0
-              ? "text-slate-300"
-              : isImproving
-                ? "text-emerald-200"
-                : "text-rose-200";
+            const trendClassName = delta === 0 ? "text-slate-300" : isImproving ? "text-emerald-200" : "text-rose-200";
             const deltaMagnitudeLabel = getDeltaMagnitudeLabel(delta);
             const directionIcon = delta === 0 ? "→" : isImproving ? "↑" : "↓";
+
             return (
               <li key={item.key} className="rounded-lg border border-slate-700/60 bg-slate-950/60 p-3">
                 <p className="mt-1 text-base font-semibold text-slate-50">{item.label}</p>
                 <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
-                  <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-1 font-semibold uppercase tracking-[0.08em] ${delta === 0
-                    ? "border-slate-600 text-slate-300"
-                    : isImproving
-                      ? "border-emerald-400/60 text-emerald-200"
-                      : "border-rose-400/60 text-rose-200"}`}>
+                  <span
+                    className={`inline-flex items-center gap-1 rounded-full border px-2 py-1 font-semibold uppercase tracking-[0.08em] ${
+                      delta === 0
+                        ? "border-slate-600 text-slate-300"
+                        : isImproving
+                          ? "border-emerald-400/60 text-emerald-200"
+                          : "border-rose-400/60 text-rose-200"
+                    }`}
+                  >
                     <span aria-hidden="true">{directionIcon}</span>
                     {interpretationLabel}
                   </span>
@@ -144,6 +147,21 @@ export function WeeklyDecisionCard({
         <p className="mt-3 text-xs text-slate-300">These shifts determine the operating posture below.</p>
       </article>
 
+      <article className="rounded-xl border border-violet-500/40 bg-slate-900/50 p-4">
+        <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-violet-100">Bounded decisions this week</h2>
+        <p className="mt-2 text-xs text-slate-300">Each line is action + pause trigger + resume condition.</p>
+        <ul className="mt-3 space-y-3 text-sm text-slate-100">
+          {boundedDecisions.map((decision) => (
+            <li key={decision.title} className="rounded-lg border border-slate-700/60 bg-slate-950/60 p-3">
+              <p className="text-xs uppercase tracking-[0.12em] text-violet-200">{decision.title}</p>
+              <p className="mt-1">{decision.action}</p>
+              <p className="mt-1 text-amber-100">Stop: {decision.pauseIf}</p>
+              <p className="mt-1 text-emerald-100">Resume: {decision.resumeWhen}</p>
+            </li>
+          ))}
+        </ul>
+      </article>
+
       <article className="rounded-xl border border-slate-700/70 bg-slate-900/50 p-4">
         <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">Operating dials (0–3)</h2>
         <p className="mt-2 text-xs text-slate-300">How strict leadership decisions should be right now.</p>
@@ -154,13 +172,17 @@ export function WeeklyDecisionCard({
             return (
               <div key={knob.key} className="rounded-lg border border-slate-700/60 bg-slate-950/60 p-3">
                 <p className="text-xs uppercase tracking-[0.12em] text-slate-300">{knob.label}</p>
-                <p className="mt-1 text-sm font-semibold text-slate-100">{knob.levelLabels[knob.value]} <span className="text-slate-300">({deltaLabel})</span></p>
+                <p className="mt-1 text-sm font-semibold text-slate-100">
+                  {knob.levelLabels[knob.value]} <span className="text-slate-300">({deltaLabel})</span>
+                </p>
                 <p className="mt-1 text-xs text-slate-300">{knob.rationale}</p>
                 <div className="mt-2 flex items-center gap-1.5" aria-hidden="true">
                   {[0, 1, 2, 3].map((level) => (
                     <span
                       key={level}
-                      className={`flex h-7 min-w-0 flex-1 items-center justify-center rounded-md text-[11px] font-semibold ${level <= knob.value ? "bg-sky-300 text-slate-950" : "bg-slate-800 text-slate-400"}`}
+                      className={`flex h-7 min-w-0 flex-1 items-center justify-center rounded-md text-[11px] font-semibold ${
+                        level <= knob.value ? "bg-sky-300 text-slate-950" : "bg-slate-800 text-slate-400"
+                      }`}
                     >
                       {level}
                     </span>
@@ -207,7 +229,8 @@ export function WeeklyDecisionCard({
         <ul className="mt-3 flex flex-wrap gap-2 text-sm text-slate-200">
           {constraints.slice(0, 3).map((item) => (
             <li key={item} className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/80 bg-slate-950/60 px-3 py-2">
-              <span aria-hidden="true" className="mr-2 text-sky-300">◆</span>{item}
+              <span aria-hidden="true" className="mr-2 text-sky-300">◆</span>
+              {item}
             </li>
           ))}
         </ul>
@@ -223,6 +246,12 @@ export function WeeklyDecisionCard({
           <p className="mt-2 text-sm text-slate-100">{reversalTrigger} If this triggers, update approval velocity and hiring stance immediately.</p>
         </article>
       </div>
+
+      <article className="rounded-xl border border-slate-700/70 bg-slate-900/50 p-4">
+        <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">Share this call</h2>
+        <p className="mt-2 text-xs text-slate-300">Copy Slack/board artifacts or export a PDF for leadership and board packets.</p>
+        <div className="mt-3">{actions}</div>
+      </article>
 
       <p className="text-xs text-slate-400">Effective date: {recordDateLabel} · Data freshness: {fetchedAtLabel}</p>
     </section>

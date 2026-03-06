@@ -2,6 +2,114 @@
 
 This document converts the requested backlog into an implementation sequence that assumes coding-agent support for delivery speed.
 
+## Re-baseline (post home-brief hardening)
+
+The current repo trajectory has improved materially with:
+- `homeBriefModel` + `decisionKnobs` semantics (homepage reads more like an operator instrument).
+- `loadReportDataSafe` and normalized fallback markers (reliability under partial data failure).
+- centralized regime label formatting (cross-surface language consistency).
+
+That progress changes execution priority: the next cycle should optimize for **weekly ritual behavior and shareable artifacts**, not broad surface expansion.
+
+### Product North Star for the next cycle
+
+Ship toward a single transmission loop:
+
+`signals → posture → decision delta → bounded action → shareable artifact`
+
+If a work item does not improve this loop, treat it as secondary.
+
+### Primary success metrics (decision-product metrics)
+
+1. Monday returning-user rate on briefing surfaces.
+2. Share/export actions per briefing session (Slack/board/citation copy).
+3. Time-to-decision statement (first actionable line visible without scroll).
+4. % of sessions where users can answer “what changed this week?” in one screen.
+
+---
+
+## Immediate execution stack (value-unlocking order)
+
+## Tier 1 — Core product loop (ship first)
+
+### A) Decision Delta Panel (highest leverage)
+**Goal**
+- Convert macro updates into explicit week-over-week operating change calls.
+
+**Required output shape**
+- `What changed` (per key driver with up/down/flat state).
+- `Net decision shift` (what operating stance should change now).
+- Explicit no-change path: `No macro change this week. Hold posture.`
+
+**Implementation notes**
+- Compute with existing delta/snapshot paths before adding new systems.
+- Keep language action-first and Monday-routine friendly.
+
+**Why now**
+- Without an explicit delta layer, the product still reads as analysis instead of a decision instrument.
+
+### B) One-screen leadership brief
+**Goal**
+- Produce a first-viewport artifact leaders can reuse in meetings and Slack.
+
+**Required output shape**
+- Weekly operating posture summary.
+- Confidence + shift-watch status.
+- This-week changes + 2–3 implication lines.
+- Actions: `Copy Slack brief`, `Copy board summary`, `Export PDF`.
+
+**Implementation notes**
+- Align content contract with `docs/one-screen-weekly-brief-spec.md`.
+- Keep scroll-free for standard desktop viewport in the first shipped version.
+
+### C) Bounded playbook decisions
+**Goal**
+- Replace generic guidance with enforceable action + trigger + reversal rules.
+
+**Required output shape**
+- `Do X`.
+- `Pause/stop if Y threshold`.
+- `Re-enable when Z condition recovers`.
+
+**Why now**
+- This is the bridge from “briefing” to “operating policy.”
+
+## Tier 2 — Distribution + authority (ship after Tier 1)
+
+### D) Programmatic decision pages
+**Goal**
+- Capture high-intent search/LLM traffic with direct operator questions.
+
+**Page contract**
+- Current posture.
+- Decision implication.
+- Link back to current weekly brief.
+- Clear “last updated” and provenance markers.
+
+### E) “Cite this call” block
+**Goal**
+- Make Whether references portable into docs, decks, and meeting notes.
+
+**Required fields**
+- Call date, posture, confidence, cadence, and source notes.
+- One-click copy.
+
+## Tier 3 — Trust reinforcement
+
+### F) Regime history strip
+- Compact recent regime history for continuity and anti-whiplash trust.
+
+### G) Signal contribution weights
+- Show per-signal contribution toward current posture to improve interpretability.
+
+## Tier 4 — UX polish (do last)
+
+- Rename “Command Center” style labels where needed.
+- Move methodology deeper in learn flows.
+- Collapse long sections in operations surfaces.
+
+These are valuable, but they should not outrank weekly-loop mechanics.
+
 ## Prioritization principles
 
 1. **Core-thesis reinforcement first:** ship features that make “macro regime should change operating decisions” tangible in the core product loop.
