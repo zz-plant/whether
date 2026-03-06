@@ -48,7 +48,7 @@
 - Console is clean. No warnings. No "Key prop missing." No "Unrecognized attribute."
 
 ## VIII. IA boundary checklist (current navigation model)
-- **Command Center (`/start`):** posture call + weekly operating sequence only (label, confidence, timestamp, prioritize, avoid, trigger conditions).
+- **Start Here (`/start`):** optional onboarding/routing from the weekly brief (posture handoff, situation selection, toolkit routing).
 - **Signals (`/signals`):** evidence only (drivers, thresholds, timestamps, historical context).
 - **Operations (`/operations`):** operating guardrails only (hiring, spend, payback, growth vs. efficiency, cadence).
 - **Decide (`/decide`):** role translation only (founder, product, finance, strategy views).
