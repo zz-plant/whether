@@ -1,6 +1,22 @@
 ## Summary
 - 
 
+## Decision delta (required for product-facing changes)
+- **What changed this week for operators?**
+  -
+- **What decision should tighten or loosen because of this change?**
+  -
+- **What should be revisited now?**
+  -
+- **What would flip/reverse this call?**
+  -
+
+## Surface + owner (required)
+- **Primary surface touched** (`/`, weekly brief model, playbook, export, navigation, build/deploy, etc.):
+  -
+- **Requested reviewer/owner for this hotspot**:
+  -
+
 ## Review hotspot checklist (required)
 - [ ] **Type safety**: no unsafe assertions (`as SomeType`) where runtime validation is possible; null/undefined states handled.
 - [ ] **Edge cases**: empty, missing, and fallback paths are explicitly tested or documented.
