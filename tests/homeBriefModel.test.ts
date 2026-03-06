@@ -55,4 +55,28 @@ describe("buildHomeBriefModel", () => {
     assert.match(model.whyThisCall[0].detail, /threshold|range|outside/i);
     assert.match(model.decisionRules[0].pauseTrigger, /\d/);
   });
+
+  it("describes momentum using signal-improvement semantics and strongest move", () => {
+    const model = buildHomeBriefModel({
+      assessment: {
+        regime: "DEFENSIVE",
+        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
+        scores: { tightness: 54, riskAppetite: 55 },
+      },
+      regimeAlert: null,
+      stopItems: ["Guardrail"],
+      reportDynamics: {
+        directionLabel: "improving",
+        changedSignals: [
+          { key: "riskAppetite", delta: 6 },
+          { key: "tightness", delta: 0.2 },
+        ],
+      },
+    });
+
+    const momentumReason = model.whyThisCall.find((reason) => reason.label === "Momentum")?.detail ?? "";
+    assert.match(momentumReason, /Risk appetite eased this week; improving overall\./);
+    assert.doesNotMatch(momentumReason, /tightness/i);
+  });
+
 });

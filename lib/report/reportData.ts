@@ -151,7 +151,9 @@ export const buildReportDynamics = ({
       label: signalLabels.curveSlope,
       delta: (current.scores.curveSlope ?? 0) - (previous.scores.curveSlope ?? 0),
     },
-  ].filter((item) => Math.abs(item.delta) >= 0.01);
+  ]
+    .filter((item) => Math.abs(item.delta) >= 0.01)
+    .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
 
   const improvingMoves = comparisons.filter((item) => isImprovingSignalDelta(item.key, item.delta)).length;
   const deterioratingMoves = comparisons.filter((item) => !isImprovingSignalDelta(item.key, item.delta)).length;
