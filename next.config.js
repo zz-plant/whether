@@ -10,6 +10,21 @@ const nextConfig = {
   async redirects() {
     return [
       {
+        source: '/operate',
+        destination: '/operations',
+        permanent: true,
+      },
+      {
+        source: '/templates',
+        destination: '/toolkits',
+        permanent: true,
+      },
+      {
+        source: '/toolkit',
+        destination: '/toolkits',
+        permanent: true,
+      },
+      {
         source: '/evidence/:path*',
         destination: '/signals/:path*',
         permanent: true,

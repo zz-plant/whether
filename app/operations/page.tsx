@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { SectionedReportPanel } from "./components/sectionedReportPanel";
-import { loadReportData } from "../../lib/report/reportData";
+import { loadReportDataSafe } from "../../lib/report/reportData";
 import { siteUrl } from "../../lib/siteUrl";
 import { buildBreadcrumbList, buildPageMetadata, websiteName } from "../../lib/seo";
 import {
@@ -79,6 +79,8 @@ export default async function OperationsPage({
     ],
   };
 
+  const reportResult = await loadReportDataSafe(resolvedSearchParams, { route: "/operations" });
+  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
   const {
     assessment,
     fenceItems,
@@ -94,7 +96,7 @@ export default async function OperationsPage({
     stopItems,
     treasury,
     treasuryProvenance,
-  } = await loadReportData(resolvedSearchParams);
+  } = reportData;
   const previousHistoricalSelection = historicalSelection
     ? getAdjacentTimeMachineRequest(historicalSelection, "previous")
     : null;
@@ -199,6 +201,13 @@ export default async function OperationsPage({
         ) : null
       }
     >
+      {!reportResult.ok ? (
+        <section className="weather-panel border border-amber-500/50 bg-amber-500/10 px-5 py-4 text-sm text-amber-100" aria-live="polite">
+          <p className="font-semibold">Live data unavailable — showing cached snapshot.</p>
+          <p className="mt-1">Last cached update: {reportResult.fallback.lastCachedTimestamp}. Validate live status in <a href="/signals" className="underline">Signals</a>.</p>
+        </section>
+      ) : null}
+
       <OperationsWorkflowProgress currentPath="/operations" />
       <OperationsWorkstreamNav currentPath="/operations" />
 

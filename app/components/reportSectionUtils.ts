@@ -1,6 +1,7 @@
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import type { SeriesHistoryPoint } from "../../lib/types";
 import { formatNumberValue } from "../../lib/formatters";
+import { formatRegimeLabel } from "../../lib/regimeFormat";
 
 export const formatNumber = (value: number | null, unit: string) => {
   const formatted = formatNumberValue(value);
@@ -79,20 +80,7 @@ export const buildSparkline = (history?: SeriesHistoryPoint[]) => {
   return { path, area };
 };
 
-export const getRegimeLabel = (regime: RegimeAssessment["regime"]) => {
-  switch (regime) {
-    case "SCARCITY":
-      return "Scarcity";
-    case "DEFENSIVE":
-      return "Safety Mode";
-    case "VOLATILE":
-      return "Stability Mode";
-    case "EXPANSION":
-      return "Growth Mode";
-    default:
-      return regime;
-  }
-};
+export const getRegimeLabel = (regime: RegimeAssessment["regime"]) => formatRegimeLabel(regime);
 
 export const regimeBadges = [
   {
@@ -104,21 +92,21 @@ export const regimeBadges = [
   },
   {
     key: "DEFENSIVE",
-    label: "Safety",
+    label: "Defensive",
     icon: "lock",
     description: "Capital is cautious; prioritize durability and retention.",
     classes: "border-amber-400/60 bg-amber-400/15 text-amber-100",
   },
   {
     key: "VOLATILE",
-    label: "Stability",
+    label: "Volatile",
     icon: "balance",
     description: "Signals are mixed; balance experimentation with controls.",
     classes: "border-sky-400/60 bg-sky-400/15 text-sky-100",
   },
   {
     key: "EXPANSION",
-    label: "Growth",
+    label: "Expansion",
     icon: "rocket",
     description: "Risk appetite is open; scale initiatives responsibly.",
     classes: "border-emerald-400/60 bg-emerald-400/15 text-emerald-100",

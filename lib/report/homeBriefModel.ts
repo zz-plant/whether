@@ -8,6 +8,11 @@ type HomeReportData = {
   };
   regimeAlert: { previousRegime: "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION" } | null;
   stopItems: string[];
+  reportDynamics?: {
+    directionLabel: "improving" | "deteriorating" | "mixed" | "stable";
+    changedSignals: Array<{ delta: number }>;
+  };
+  [key: string]: unknown;
 };
 
 const regimeLabelMap = {
@@ -61,7 +66,7 @@ const expansionConstraintByRegime: Record<keyof typeof regimeLabelMap, string> =
 };
 
 export const buildHomeBriefModel = (data: HomeReportData) => {
-  const { assessment, regimeAlert, stopItems } = data;
+  const { assessment, regimeAlert, stopItems, reportDynamics } = data;
   const previousRegime = regimeAlert?.previousRegime;
   const severityDelta = previousRegime
     ? regimeSeverityRank[assessment.regime] - regimeSeverityRank[previousRegime]
@@ -102,12 +107,24 @@ export const buildHomeBriefModel = (data: HomeReportData) => {
   ];
   const guardrail = stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
 
+  const weakSignalCount = reportDynamics?.changedSignals.filter((item) => item.delta < 0).length ?? 0;
+  const netConstraintSummary =
+    severityDelta > 0
+      ? `${regimeLabelMap[assessment.regime]} with tighter controls: threshold proximity and weakening signals require slower approvals and stricter reversibility.`
+      : severityDelta < 0
+        ? `${regimeLabelMap[assessment.regime]} with selective release: improving momentum supports faster execution while guardrails remain active.`
+        : `${regimeLabelMap[assessment.regime]} with caution: keep execution balanced because threshold proximity and mixed signals still constrain irreversible bets.`;
+
   return {
     confidenceLabel,
     constraints,
     dangerousCategory,
-    decisionKnobs: deriveDecisionKnobs(assessment.regime, severityDelta),
+    decisionKnobs: deriveDecisionKnobs(assessment.regime, severityDelta, {
+      nearestThresholdGap,
+      weakSignalCount,
+    }),
     guardrail,
+    netConstraintSummary,
     postureDeltaLabel,
     reversalTrigger,
     transitionWatch,

@@ -9,7 +9,7 @@ const canonicalBreadcrumbLabels: Record<string, string> = {
   ...navigationLabelByPath,
   "/": "Home",
   "/resources": "Resources",
-  "/reference": "Reference",
+  "/method": "Method",
   "/concepts": "Concepts",
   "/solutions": "Solutions",
   "/solutions/career-paths": "Career paths",

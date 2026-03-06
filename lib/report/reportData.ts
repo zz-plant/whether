@@ -25,6 +25,8 @@ import { loadMacroSeries } from "../macroSnapshot";
 import { parseThresholdsFromSearchParams } from "../thresholds";
 import { formatAgeHours, formatDateUTC, formatTimestampUTC } from "../formatters";
 import { buildRegimeAlert } from "./reportFormatting";
+import { formatRegimeLabel } from "../regimeFormat";
+import { logReportDependencyFailure } from "./reportError";
 
 export type ReportSearchParams = {
   month?: string;
@@ -74,12 +76,6 @@ export const isImprovingSignalDelta = (
   delta: number,
 ): boolean => (signalDeltaImprovesWhen[key] === "positive" ? delta > 0 : delta < 0);
 
-const regimeStatusLabelMap = {
-  SCARCITY: "Scarcity",
-  DEFENSIVE: "Defensive",
-  VOLATILE: "Neutral",
-  EXPANSION: "Expansion",
-} as const;
 
 export const buildLastYearComparison = ({
   current,
@@ -268,7 +264,7 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
     ageLabel: "Static.",
     statusLabel: "Simulated (low)",
   };
-  const statusLabel = regimeStatusLabelMap[assessment.regime];
+  const statusLabel = formatRegimeLabel(assessment.regime);
   const historicalComparison =
     historicalSelection && liveAssessment
       ? {
@@ -349,7 +345,21 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
   };
 };
 
-let defaultReportDataPromise: Promise<Awaited<ReturnType<typeof loadReportDataUncached>>> | null = null;
+export type ReportData = Awaited<ReturnType<typeof loadReportDataUncached>>;
+
+export type ReportDataFallback = Pick<
+  ReportData,
+  "assessment" | "fetchedAtLabel" | "recordDateLabel" | "statusLabel" | "treasury" | "treasuryProvenance" | "macroProvenance" | "internalProvenance" | "historicalSelection" | "reportDynamics" | "startItems" | "stopItems" | "fenceItems" | "playbook" | "sensors" | "macroSeries" | "regimeAlert" | "thresholds" | "regimeTrend"
+> & {
+  stale: true;
+  lastCachedTimestamp: string;
+};
+
+export type LoadReportDataSafeResult =
+  | { ok: true; data: ReportData }
+  | { ok: false; error: Error; fallback: ReportDataFallback };
+
+let defaultReportDataPromise: Promise<ReportData> | null = null;
 
 export const loadReportData = (searchParams?: ReportSearchParams) => {
   if (searchParams) {
@@ -361,4 +371,96 @@ export const loadReportData = (searchParams?: ReportSearchParams) => {
   }
 
   return defaultReportDataPromise;
+};
+
+
+const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataFallback => {
+  const now = new Date();
+  const thresholds = parseThresholdsFromSearchParams(searchParams);
+  const assessment = evaluateRegime(snapshotData, thresholds, []);
+  const sensors = buildSensorReadings(snapshotData);
+  const recordDateLabel = formatDateUTC(snapshotData.record_date);
+  const fetchedAtLabel = formatTimestampUTC(snapshotData.fetched_at);
+  const ageLabel = formatAgeHours(snapshotData.fetched_at, now);
+
+  return {
+    assessment,
+    fetchedAtLabel,
+    recordDateLabel,
+    statusLabel: formatRegimeLabel(assessment.regime),
+    treasury: snapshotData,
+    treasuryProvenance: {
+      sourceLabel: "Federal Reserve Economic Data (FRED)",
+      sourceUrl: snapshotData.source,
+      recordDateLabel,
+      timestampLabel: fetchedAtLabel,
+      ageLabel,
+      statusLabel: "Cached (fallback)",
+    },
+    macroProvenance: {
+      sourceLabel: "FRED & US Treasury",
+      sourceUrl: snapshotData.source,
+      recordDateLabel,
+      timestampLabel: fetchedAtLabel,
+      ageLabel,
+      statusLabel: "Unavailable (fallback)",
+    },
+    internalProvenance: {
+      sourceLabel: "Whether curated playbook catalog",
+      recordDateLabel: "Static",
+      timestampLabel: "Static catalog",
+      ageLabel: "Static.",
+      statusLabel: "Simulated (low)",
+    },
+    historicalSelection: null,
+    reportDynamics: {
+      changedSignals: [],
+      totalSignalChanges: 0,
+      regimeChanged: false,
+      directionLabel: "stable",
+    },
+    startItems: [],
+    stopItems: [],
+    fenceItems: assessment.constraints,
+    playbook: null,
+    sensors,
+    macroSeries: [],
+    regimeAlert: null,
+    thresholds,
+    regimeTrend: "STABLE",
+    stale: true,
+    lastCachedTimestamp: snapshotData.fetched_at,
+  };
+};
+
+export const loadReportDataSafe = async (
+  searchParams?: ReportSearchParams,
+  context?: { route?: string; requestId?: string },
+): Promise<LoadReportDataSafeResult> => {
+  try {
+    const data = await loadReportData(searchParams);
+    return { ok: true, data };
+  } catch (error) {
+    const resolvedError = error instanceof Error ? error : new Error(String(error));
+    const dependency = /macro/i.test(resolvedError.message)
+      ? "macro"
+      : /treasury|fred|fiscal/i.test(resolvedError.message)
+        ? "treasury"
+        : "report";
+    logReportDependencyFailure({
+      route: context?.route ?? "unknown",
+      requestId: context?.requestId ?? "n/a",
+      dependency,
+      status: "degraded",
+      message: resolvedError.message,
+      fallbackUsed: true,
+      timestamp: new Date().toISOString(),
+    });
+
+    return {
+      ok: false,
+      error: resolvedError,
+      fallback: buildFallbackReportData(searchParams),
+    };
+  }
 };
