@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 import type { ReportDynamics } from "../../lib/report/reportData";
 import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
 import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
@@ -14,10 +15,17 @@ type WhyThisCallItem = {
   detail: string;
 };
 
+type PrimaryDriverItem = {
+  label: string;
+  detail: string;
+};
+
 type WeeklyDecisionCardProps = {
   statusLabel: string;
   postureDelta: string;
   confidenceLabel: "HIGH" | "MED" | "LOW";
+  confidencePercent: number;
+  trendLabel: "Improving" | "Deteriorating" | "Mixed" | "Stable";
   transitionWatch: "ON" | "OFF";
   netConstraintSummary: string;
   guardrail: string;
@@ -30,6 +38,12 @@ type WeeklyDecisionCardProps = {
   revisitDecisions: boolean;
   memoryRail: MemoryRailItem[];
   whyThisCall: WhyThisCallItem[];
+  primaryDrivers: PrimaryDriverItem[];
+  startupClimateIndex: {
+    score: number;
+    status: "Improving" | "Stable" | "Deteriorating";
+    breakdown: Array<{ label: string; score: number }>;
+  };
   citation: string;
   actions?: ReactNode;
 };
@@ -60,6 +74,8 @@ export function WeeklyDecisionCard({
   statusLabel,
   postureDelta,
   confidenceLabel,
+  confidencePercent,
+  trendLabel,
   transitionWatch,
   netConstraintSummary,
   guardrail,
@@ -72,6 +88,8 @@ export function WeeklyDecisionCard({
   revisitDecisions,
   memoryRail,
   whyThisCall,
+  primaryDrivers,
+  startupClimateIndex,
   citation,
   actions,
 }: WeeklyDecisionCardProps) {
@@ -101,7 +119,8 @@ export function WeeklyDecisionCard({
           <p className="text-sm text-slate-300">{netConstraintSummary}</p>
           <p className="text-sm font-semibold text-slate-100">{meetingShorthand}</p>
           <div className="flex flex-wrap gap-2" aria-label="Weekly trust signals">
-            <span className="inline-flex min-h-11 items-center rounded-full border border-slate-600/80 bg-slate-950/70 px-3 py-1 text-xs text-slate-200">Confidence {confidenceLabel}</span>
+            <span className="inline-flex min-h-11 items-center rounded-full border border-slate-600/80 bg-slate-950/70 px-3 py-1 text-xs text-slate-200">Confidence {confidencePercent}% ({confidenceLabel})</span>
+            <span className="inline-flex min-h-11 items-center rounded-full border border-slate-600/80 bg-slate-950/70 px-3 py-1 text-xs text-slate-200">Trend {trendLabel}</span>
             <span className="inline-flex min-h-11 items-center rounded-full border border-slate-600/80 bg-slate-950/70 px-3 py-1 text-xs text-slate-200">Freshness {freshnessLabel}</span>
             <span className="inline-flex min-h-11 items-center rounded-full border border-slate-600/80 bg-slate-950/70 px-3 py-1 text-xs text-slate-200">Shift watch {transitionWatch}</span>
           </div>
@@ -192,6 +211,30 @@ export function WeeklyDecisionCard({
 
 
       <article className={`${supportingPanel} ${sectionSpacing}`}>
+        <h2 className={secondaryHeading}>Startup Climate Index</h2>
+        <div className="mt-2 rounded-lg border border-slate-700/60 bg-slate-950/60 px-3 py-3">
+          <p className="text-sm font-semibold text-slate-100">Score {startupClimateIndex.score} / 100 · {startupClimateIndex.status}</p>
+          <ul className="mt-2 grid gap-1 text-xs text-slate-300 sm:grid-cols-2">
+            {startupClimateIndex.breakdown.map((item) => (
+              <li key={item.label}>{item.label}: {item.score}</li>
+            ))}
+          </ul>
+        </div>
+      </article>
+
+      <article className={`${supportingPanel} ${sectionSpacing}`}>
+        <h2 className={secondaryHeading}>Primary drivers this week</h2>
+        <ul className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {primaryDrivers.map((driver) => (
+            <li key={driver.label} className="rounded-md border border-slate-700/60 bg-slate-950/60 px-3 py-3 text-xs text-slate-200">
+              <p className="font-semibold uppercase tracking-[0.12em] text-sky-200">{driver.label}</p>
+              <p className="mt-1 text-slate-300">{driver.detail}</p>
+            </li>
+          ))}
+        </ul>
+      </article>
+
+      <article className={`${supportingPanel} ${sectionSpacing}`}>
         <h2 className={secondaryHeading}>Why this posture call</h2>
         <ul className="mt-2 grid gap-2 sm:grid-cols-3">
           {whyThisCall.map((reason) => (
@@ -204,7 +247,7 @@ export function WeeklyDecisionCard({
       </article>
 
       <article className={`${supportingPanel} ${sectionSpacing}`}>
-        <h2 className={secondaryHeading}>Past 4 weeks at a glance</h2>
+        <h2 className={secondaryHeading}>Historical posture timeline</h2>
         <ul className="mt-2 grid gap-2 sm:grid-cols-4">
           {memoryRail.map((item) => (
             <li key={`${item.label}-${item.posture}`} className="rounded-md border border-slate-700/60 bg-slate-950/60 px-2 py-2 text-xs text-slate-200">
@@ -219,6 +262,13 @@ export function WeeklyDecisionCard({
         <h2 className={secondaryHeading}>Cite this call</h2>
         <p className="mt-2 text-xs text-slate-300">{citationMetaLine}</p>
         <pre className="mt-2 overflow-x-auto whitespace-pre-wrap text-xs text-slate-300">{citation}</pre>
+        <div className="mt-3 rounded-md border border-slate-700/60 bg-slate-950/60 px-3 py-3 text-xs text-slate-300">
+          <p className="font-semibold uppercase tracking-[0.12em] text-slate-100">Founder risk check</p>
+          <p className="mt-1">Run your team context profile to compare macro posture against your current operating setup.</p>
+          <Link href="/decide/team-context" className="mt-2 inline-flex min-h-[44px] items-center rounded-md border border-sky-400/60 px-3 py-2 font-semibold text-sky-200 hover:bg-sky-500/10">
+            Run risk check
+          </Link>
+        </div>
         <div className="mt-3">{actions}</div>
       </article>
     </section>

@@ -9,6 +9,8 @@ describe("buildHomeBriefModel", () => {
     const model = buildHomeBriefModel(data);
 
     assert.match(model.confidenceLabel, /LOW|MED|HIGH/);
+    assert.equal(typeof model.confidencePercent, "number");
+    assert.match(model.trendLabel, /Improving|Deteriorating|Mixed|Stable/);
     assert.match(model.transitionWatch, /ON|OFF/);
     assert.equal(typeof model.guardrail, "string");
     assert.equal(typeof model.reversalTrigger, "string");
@@ -16,6 +18,9 @@ describe("buildHomeBriefModel", () => {
     assert.equal(typeof model.revisitDecisions, "boolean");
     assert.ok(model.memoryRail.length > 0);
     assert.equal(model.whyThisCall.length, 3);
+    assert.ok(model.primaryDrivers.length >= 2);
+    assert.ok(model.startupClimateIndex.score >= 0 && model.startupClimateIndex.score <= 100);
+    assert.equal(model.startupClimateIndex.breakdown.length, 4);
     assert.match(model.whyThisCall[0].detail, /threshold|range|outside/i);
     assert.match(model.decisionRules[0].pauseTrigger, /\d/);
   });
@@ -39,9 +44,14 @@ describe("buildHomeBriefModel", () => {
     assert.match(model.decisionShiftSummary, /Do now:/);
     assert.match(model.decisionShiftSummary, /Flip:/);
     assert.equal(model.decisionRules.length, 5);
+    assert.equal(typeof model.confidencePercent, "number");
+    assert.match(model.trendLabel, /Improving|Deteriorating|Mixed|Stable/);
     assert.equal(typeof model.revisitDecisions, "boolean");
     assert.ok(model.memoryRail.length > 0);
     assert.equal(model.whyThisCall.length, 3);
+    assert.ok(model.primaryDrivers.length >= 2);
+    assert.ok(model.startupClimateIndex.score >= 0 && model.startupClimateIndex.score <= 100);
+    assert.equal(model.startupClimateIndex.breakdown.length, 4);
     assert.match(model.whyThisCall[0].detail, /threshold|range|outside/i);
     assert.match(model.decisionRules[0].pauseTrigger, /\d/);
   });

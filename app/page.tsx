@@ -328,6 +328,8 @@ export default async function HomePage({
         statusLabel={statusLabel}
         postureDelta={homeBriefModel.postureDeltaLabel}
         confidenceLabel={homeBriefModel.confidenceLabel}
+        confidencePercent={homeBriefModel.confidencePercent}
+        trendLabel={homeBriefModel.trendLabel}
         transitionWatch={homeBriefModel.transitionWatch}
         netConstraintSummary={homeBriefModel.netConstraintSummary}
         guardrail={homeBriefModel.guardrail}
@@ -340,6 +342,8 @@ export default async function HomePage({
         revisitDecisions={homeBriefModel.revisitDecisions}
         memoryRail={homeBriefModel.memoryRail}
         whyThisCall={homeBriefModel.whyThisCall}
+        primaryDrivers={homeBriefModel.primaryDrivers}
+        startupClimateIndex={homeBriefModel.startupClimateIndex}
         citation={callCitation}
         actions={<CopyLeadershipArtifactsButtons slackBrief={slackBrief} boardSummary={boardSummary} citation={callCitation} />}
       />

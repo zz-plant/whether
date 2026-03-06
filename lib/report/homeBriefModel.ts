@@ -1,5 +1,6 @@
 import { buildCanonicalBoundedDecisionRules } from "./boundedDecisionRules";
 import { getSummaryArchive } from "../summary/summaryArchive";
+import type { MacroSeriesReading } from "../types";
 
 type Regime = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
 
@@ -19,6 +20,7 @@ type HomeReportData = {
       delta: number;
     }>;
   };
+  macroSeries?: MacroSeriesReading[];
   [key: string]: unknown;
 };
 
@@ -27,9 +29,20 @@ type MemoryRailItem = {
   posture: string;
 };
 
+type PrimaryDriverItem = {
+  label: string;
+  detail: string;
+};
+
 type WhyThisCallItem = {
   label: string;
   detail: string;
+};
+
+type StartupClimateIndex = {
+  score: number;
+  status: "Improving" | "Stable" | "Deteriorating";
+  breakdown: Array<{ label: string; score: number }>;
 };
 
 const regimeLabelMap = {
@@ -96,6 +109,45 @@ const buildMemoryRail = (recordDateLabel: string | undefined, currentRegime: Reg
   ].slice(-4);
 };
 
+const buildPrimaryDrivers = ({
+  reportDynamics,
+  confidenceLabel,
+  transitionWatch,
+}: {
+  reportDynamics: HomeReportData["reportDynamics"];
+  confidenceLabel: "LOW" | "MED" | "HIGH";
+  transitionWatch: "ON" | "OFF";
+}): PrimaryDriverItem[] => {
+  const directionalDrivers = (reportDynamics?.changedSignals ?? []).slice(0, 3).map((signal) => {
+    const direction = signal.delta > 0 ? "tightened" : signal.delta < 0 ? "eased" : "held";
+    const directionArrow = signal.delta > 0 ? "↑" : signal.delta < 0 ? "↓" : "→";
+    return {
+      label: signalReasonLabel[signal.key],
+      detail: `${directionArrow} ${direction} this week`,
+    };
+  });
+
+  const reliabilityDriver: PrimaryDriverItem = {
+    label: "Signal reliability",
+    detail:
+      confidenceLabel === "LOW"
+        ? "Low confidence near regime boundaries; keep irreversible bets paused."
+        : confidenceLabel === "MED"
+          ? "Medium confidence; ship reversible actions with explicit stop triggers."
+          : "High confidence; increase execution speed while preserving guardrails.",
+  };
+
+  const watchDriver: PrimaryDriverItem = {
+    label: "Transition watch",
+    detail:
+      transitionWatch === "ON"
+        ? "ON — reassess next read before escalating fixed-cost commitments."
+        : "OFF — current posture is stable for near-term planning cadence.",
+  };
+
+  return [...directionalDrivers, reliabilityDriver, watchDriver].slice(0, 5);
+};
+
 const signalReasonLabel: Record<"tightness" | "riskAppetite" | "baseRate" | "curveSlope", string> = {
   tightness: "Capital tightness",
   riskAppetite: "Risk appetite",
@@ -137,8 +189,45 @@ const buildWhyThisCall = ({
   ];
 };
 
+const clampScore = (value: number) => Math.max(0, Math.min(100, Math.round(value)));
+
+const findMacroValue = (macroSeries: MacroSeriesReading[] | undefined, id: MacroSeriesReading["id"]): number | null =>
+  macroSeries?.find((series) => series.id === id)?.value ?? null;
+
+const buildStartupClimateIndex = ({
+  assessment,
+  macroSeries,
+  trendLabel,
+}: {
+  assessment: HomeReportData["assessment"];
+  macroSeries: MacroSeriesReading[] | undefined;
+  trendLabel: "Improving" | "Deteriorating" | "Mixed" | "Stable";
+}): StartupClimateIndex => {
+  const capitalAvailability = clampScore((100 - assessment.scores.tightness) * 0.6 + assessment.scores.riskAppetite * 0.4);
+  const unemployment = findMacroValue(macroSeries, "UNEMPLOYMENT_RATE");
+  const hiringMarket = clampScore(unemployment === null ? 55 : 100 - unemployment * 10);
+  const saasMultiple = findMacroValue(macroSeries, "SAAS_VALUATION_MULTIPLE");
+  const valuations = clampScore(saasMultiple === null ? 55 : Math.min(100, saasMultiple * 8));
+  const vix = findMacroValue(macroSeries, "VIX_INDEX");
+  const ipoWindow = clampScore(vix === null ? 50 : 100 - vix * 2);
+
+  const breakdown = [
+    { label: "Capital availability", score: capitalAvailability },
+    { label: "Hiring market", score: hiringMarket },
+    { label: "SaaS valuations", score: valuations },
+    { label: "IPO window", score: ipoWindow },
+  ];
+
+  const score = clampScore(breakdown.reduce((sum, item) => sum + item.score, 0) / breakdown.length);
+  return {
+    score,
+    status: trendLabel === "Mixed" ? "Stable" : trendLabel,
+    breakdown,
+  };
+};
+
 export const buildHomeBriefModel = (data: HomeReportData) => {
-  const { assessment, regimeAlert, stopItems, reportDynamics, recordDateLabel } = data;
+  const { assessment, regimeAlert, stopItems, reportDynamics, recordDateLabel, macroSeries } = data;
   const previousRegime = regimeAlert?.previousRegime;
   const severityDelta = previousRegime
     ? regimeSeverityRank[assessment.regime] - regimeSeverityRank[previousRegime]
@@ -161,6 +250,16 @@ export const buildHomeBriefModel = (data: HomeReportData) => {
 
   const confidenceLabel: "LOW" | "MED" | "HIGH" = nearestThresholdGap <= 5 ? "LOW" : nearestThresholdGap <= 12 ? "MED" : "HIGH";
   const transitionWatch: "ON" | "OFF" = nearestThresholdGap <= 8 || Boolean(regimeAlert) ? "ON" : "OFF";
+  const confidencePercent = Math.max(35, Math.min(92, Math.round(55 + nearestThresholdGap * 3)));
+  const trendLabel =
+    reportDynamics?.directionLabel === "improving"
+      ? "Improving"
+      : reportDynamics?.directionLabel === "deteriorating"
+        ? "Deteriorating"
+        : reportDynamics?.directionLabel === "mixed"
+          ? "Mixed"
+          : "Stable";
+  const startupClimateIndex = buildStartupClimateIndex({ assessment, macroSeries, trendLabel });
 
   const reversalTrigger =
     tightnessGap <= riskGap
@@ -177,6 +276,9 @@ export const buildHomeBriefModel = (data: HomeReportData) => {
 
   return {
     confidenceLabel,
+    confidencePercent,
+    trendLabel,
+    startupClimateIndex,
     decisionShiftSummary: buildDecisionShiftSummary({
       severityDelta,
       directionLabel: reportDynamics?.directionLabel,
@@ -191,6 +293,7 @@ export const buildHomeBriefModel = (data: HomeReportData) => {
     revisitDecisions: (reportDynamics?.changedSignals.length ?? 0) > 0 && reportDynamics?.directionLabel !== "stable",
     guardrail,
     memoryRail: buildMemoryRail(recordDateLabel, assessment.regime),
+    primaryDrivers: buildPrimaryDrivers({ reportDynamics, confidenceLabel, transitionWatch }),
     netConstraintSummary,
     postureDeltaLabel,
     reversalTrigger,
