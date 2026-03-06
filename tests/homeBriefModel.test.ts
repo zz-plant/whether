@@ -15,7 +15,8 @@ describe("buildHomeBriefModel", () => {
     assert.equal(typeof model.reversalTrigger, "string");
     assert.equal(typeof model.dangerousCategory, "string");
     assert.ok(model.decisionKnobs.length > 0);
-    assert.equal(model.boundedDecisions.length, 3);
+    assert.equal(model.boundedDecisions.length, 4);
+    assert.equal(model.decisionRules.length, 5);
   });
 
   it("counts weak signals using signal-specific improving semantics", () => {
@@ -57,7 +58,8 @@ describe("buildHomeBriefModel", () => {
     });
 
     assert.match(model.decisionShiftSummary, /No macro change this week/);
-    assert.equal(model.boundedDecisions.length, 3);
+    assert.equal(model.boundedDecisions.length, 4);
+    assert.equal(model.decisionRules.length, 5);
     assert.match(model.boundedDecisions[0].pauseIf, /Pause|Stop/);
   });
 });

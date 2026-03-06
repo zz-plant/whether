@@ -1,6 +1,7 @@
 import { deriveDecisionKnobs } from "./decisionKnobs";
 import { isImprovingSignalDelta } from "./reportData";
 import { operatingCallsByRegime } from "./operatingCalls";
+import { buildBoundedDecisionRules, type BoundedDecisionRule } from "./boundedDecisionRules";
 
 type Regime = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
 
@@ -114,63 +115,13 @@ const buildLeadershipImplications = (regime: Regime): string[] => {
   ];
 };
 
-const buildBoundedDecisions = ({
-  regime,
-  riskScore,
-  riskThreshold,
-  tightnessScore,
-  tightnessThreshold,
-}: {
-  regime: Regime;
-  riskScore: number;
-  riskThreshold: number;
-  tightnessScore: number;
-  tightnessThreshold: number;
-}): BoundedDecision[] => {
-  if (regime === "EXPANSION") {
-    return [
-      {
-        title: "Growth experiments",
-        action: "Run incremental growth experiments this week.",
-        pauseIf: "Pause if CAC payback exceeds 12 months.",
-        resumeWhen: "Resume once CAC payback returns to ≤ 10 months.",
-      },
-      {
-        title: "GTM hiring",
-        action: "Expand GTM hiring for approved critical roles.",
-        pauseIf: `Pause if risk appetite drops below ${riskThreshold.toFixed(1)} (now ${riskScore.toFixed(1)}).`,
-        resumeWhen: `Resume when risk appetite rebounds above ${Math.max(riskThreshold + 2, riskScore - 1).toFixed(1)}.`,
-      },
-      {
-        title: "Roadmap bets",
-        action: "Advance reversible roadmap bets with milestone gates.",
-        pauseIf: `Pause if tightness rises above ${tightnessThreshold.toFixed(1)} (now ${tightnessScore.toFixed(1)}).`,
-        resumeWhen: `Resume when tightness normalizes below ${Math.max(tightnessThreshold - 3, 0).toFixed(1)}.`,
-      },
-    ];
-  }
-
-  return [
-    {
-      title: "Headcount approvals",
-      action: "Approve only backfill or revenue-critical hiring.",
-      pauseIf: `Pause all net-new hiring if tightness rises above ${tightnessThreshold.toFixed(1)}.`,
-      resumeWhen: `Resume selective net-new hiring when tightness falls below ${Math.max(tightnessThreshold - 4, 0).toFixed(1)}.`,
-    },
-    {
-      title: "Experiment portfolio",
-      action: "Keep only experiments with measurable near-term revenue signals.",
-      pauseIf: "Pause experiments if payback projection exceeds 9 months.",
-      resumeWhen: "Resume staged tests once payback projection is ≤ 7 months.",
-    },
-    {
-      title: "Expansion commitments",
-      action: "Keep expansion initiatives milestone-gated and reversible.",
-      pauseIf: `Pause expansion if risk appetite falls below ${riskThreshold.toFixed(1)}.`,
-      resumeWhen: `Resume when risk appetite recovers above ${Math.max(riskThreshold + 3, 0).toFixed(1)} and milestones are met.`,
-    },
-  ];
-};
+const toBoundedDecisions = (rules: BoundedDecisionRule[]): BoundedDecision[] =>
+  rules.slice(0, 4).map((rule) => ({
+    title: rule.title,
+    action: rule.recommendation,
+    pauseIf: rule.pauseTrigger,
+    resumeWhen: rule.resumeTrigger,
+  }));
 
 export const buildHomeBriefModel = (data: HomeReportData) => {
   const { assessment, regimeAlert, stopItems, reportDynamics } = data;
@@ -233,25 +184,27 @@ export const buildHomeBriefModel = (data: HomeReportData) => {
     directionLabel: reportDynamics?.directionLabel,
     changeCount: reportDynamics?.changedSignals.length ?? 0,
   });
+  const decisionKnobs = deriveDecisionKnobs(assessment.regime, severityDelta, {
+    nearestThresholdGap,
+    weakSignalCount,
+  });
+  const decisionRules = buildBoundedDecisionRules({
+    assessment,
+    decisionKnobs,
+    directionLabel: reportDynamics?.directionLabel,
+  });
 
   return {
     confidenceLabel,
     constraints,
     dangerousCategory,
-    decisionKnobs: deriveDecisionKnobs(assessment.regime, severityDelta, {
-      nearestThresholdGap,
-      weakSignalCount,
-    }),
+    decisionKnobs,
+    decisionRules,
+    revisitDecisions: reportDynamics?.directionLabel !== "stable" || Boolean(regimeAlert),
     decisionShiftSummary,
     guardrail,
     leadershipImplications: buildLeadershipImplications(assessment.regime),
-    boundedDecisions: buildBoundedDecisions({
-      regime: assessment.regime,
-      riskScore: assessment.scores.riskAppetite,
-      riskThreshold,
-      tightnessScore: assessment.scores.tightness,
-      tightnessThreshold,
-    }),
+    boundedDecisions: toBoundedDecisions(decisionRules),
     netConstraintSummary,
     postureDeltaLabel,
     reversalTrigger,

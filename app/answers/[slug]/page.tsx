@@ -1,10 +1,12 @@
-import type { Metadata, Route } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { loadReportDataSafe } from "../../../lib/report/reportData";
 import { buildPageMetadata, serializeJsonLd } from "../../../lib/seo";
-import { buildLiveShortAnswer, isExpansionRegime } from "../liveShortAnswers";
 import { findDecisionPage, tierOneDecisionPages } from "../decisionPages";
+import { deriveDecisionKnobs } from "../../../lib/report/decisionKnobs";
+import { buildBoundedDecisionRules } from "../../../lib/report/boundedDecisionRules";
+import { buildCallCitation } from "../../../lib/export/briefBuilders";
 
 type DecisionPageProps = {
   params: Promise<{ slug: string }>;
@@ -31,28 +33,12 @@ export async function generateMetadata({ params }: DecisionPageProps): Promise<M
   }
 
   return buildPageMetadata({
-    title: `${page.title} (Live macro answer)`,
-    description: `${page.shortAnswer} Deterministic answer powered by risk appetite, capital tightness, and yield curve signals.`,
+    title: `${page.title} (live operator answer)`,
+    description: `${page.directAnswer} Bounded operating policy with threshold-based stop/resume triggers.`,
     path: `/answers/${page.slug}`,
     imageAlt: page.title,
-    imageParams: {
-      template: "guides",
-      eyebrow: "Operator answer",
-      title: page.title,
-      subtitle: page.shortAnswer,
-      kicker: "Live thresholds + trigger reversals",
-    },
   });
 }
-
-const toSignalLabel = (isExpansion: boolean) => (isExpansion ? "Expansion with guardrails" : "Safety mode");
-
-const buildApprovalVelocityGuidance = (directionLabel: "improving" | "deteriorating" | "mixed" | "stable") => {
-  if (directionLabel === "improving") return "+1 notch vs last week";
-  if (directionLabel === "deteriorating") return "-1 notch vs last week";
-  if (directionLabel === "mixed") return "0 notch vs last week";
-  return "0 notch vs last week";
-};
 
 export default async function DecisionAnswerPage({ params }: DecisionPageProps) {
   const { slug } = await params;
@@ -63,13 +49,22 @@ export default async function DecisionAnswerPage({ params }: DecisionPageProps) 
   }
 
   const reportResult = await loadReportDataSafe(undefined, { route: "/answers/[slug]" });
-  const { assessment, recordDateLabel, reportDynamics } = reportResult.ok ? reportResult.data : reportResult.fallback;
-  const riskThreshold = assessment.thresholds.riskAppetiteRegime;
-  const tightnessThreshold = assessment.thresholds.tightnessRegime;
-  const isExpansion = isExpansionRegime(assessment.regime);
-  const liveShortAnswer = buildLiveShortAnswer(page.slug, assessment.regime, page.shortAnswer);
-
-  const approvalVelocity = buildApprovalVelocityGuidance(reportDynamics.directionLabel);
+  const data = reportResult.ok ? reportResult.data : reportResult.fallback;
+  const { assessment, recordDateLabel, reportDynamics, treasury, treasuryProvenance, regimeSeries } = data;
+  const decisionKnobs = deriveDecisionKnobs(assessment.regime, 0, {
+    nearestThresholdGap: Math.min(
+      Math.abs(assessment.scores.tightness - assessment.thresholds.tightnessRegime),
+      Math.abs(assessment.scores.riskAppetite - assessment.thresholds.riskAppetiteRegime),
+    ),
+    weakSignalCount: reportDynamics.changedSignals.filter((item) => item.delta !== 0).length,
+  });
+  const rules = buildBoundedDecisionRules({
+    assessment,
+    decisionKnobs,
+    directionLabel: reportDynamics.directionLabel,
+  }).filter((rule) => page.decisionAreas.includes(rule.area));
+  const citation = buildCallCitation(assessment, treasury);
+  const memoryRail = regimeSeries.slice(-4).map((entry) => `${entry.month}/${String(entry.year).slice(-2)} ${entry.regime}`);
 
   const faqData = {
     "@context": "https://schema.org",
@@ -80,15 +75,7 @@ export default async function DecisionAnswerPage({ params }: DecisionPageProps) 
         name: page.title,
         acceptedAnswer: {
           "@type": "Answer",
-          text: `${liveShortAnswer} Current posture is ${toSignalLabel(isExpansion)} with risk appetite ${assessment.scores.riskAppetite.toFixed(0)}, tightness ${assessment.scores.tightness.toFixed(0)}, and yield curve slope ${(assessment.scores.curveSlope ?? 0).toFixed(2)}%.`,
-        },
-      },
-      {
-        "@type": "Question",
-        name: "When does this answer flip?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: `Flip to constraint mode if risk appetite falls below ${riskThreshold.toFixed(0)}, tightness rises above ${tightnessThreshold.toFixed(0)}, or if two weaker weekly reads occur consecutively.`,
+          text: `${page.directAnswer} Current posture ${assessment.regime} with risk appetite ${assessment.scores.riskAppetite.toFixed(0)} and tightness ${assessment.scores.tightness.toFixed(0)}.`,
         },
       },
     ],
@@ -97,67 +84,69 @@ export default async function DecisionAnswerPage({ params }: DecisionPageProps) 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqData) }} />
-      <section className="weather-panel space-y-4 px-6 py-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Tier 1 operator answer</p>
+
+      <section className="weather-panel space-y-3 px-6 py-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{page.category} query</p>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{page.title}</h1>
-        <p className="text-sm text-slate-300">Keyword target: <span className="font-semibold text-slate-100">{page.keyword}</span></p>
-        <p className="text-base text-sky-200">Short answer: {liveShortAnswer}</p>
-        <p className="text-sm text-slate-300">Current posture: {toSignalLabel(isExpansion)}</p>
+        <p className="text-base font-semibold text-sky-200">{page.directAnswer}</p>
+        <p className="text-sm text-slate-300">Current posture: {assessment.regime} · Updated {recordDateLabel}</p>
       </section>
 
-      <section className="weather-panel space-y-4 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Why this answer</h2>
-        <ol className="space-y-3 text-sm text-slate-200">
-          <li className="weather-surface px-4 py-3">1. Risk appetite: <span className="font-semibold text-slate-100">{assessment.scores.riskAppetite.toFixed(0)} / 100</span> (threshold {riskThreshold.toFixed(0)}).</li>
-          <li className="weather-surface px-4 py-3">2. Tightness: <span className="font-semibold text-slate-100">{assessment.scores.tightness.toFixed(0)} / 100</span> (constraint trigger {tightnessThreshold.toFixed(0)}).</li>
-          <li className="weather-surface px-4 py-3">3. Yield curve slope: <span className="font-semibold text-slate-100">{(assessment.scores.curveSlope ?? 0).toFixed(2)}%</span>.</li>
-        </ol>
-      </section>
-
-      <section className="weather-panel space-y-4 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">What this means for operators</h2>
-        <p className="text-sm text-slate-300">Primary audience: {page.audience}</p>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="weather-surface space-y-2 px-4 py-4">
-            <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-emerald-300">Recommended</h3>
-            <ul className="space-y-2 text-sm text-slate-200">
-              {page.recommendedActions.map((item) => <li key={item}>• {item}</li>)}
-            </ul>
-          </div>
-          <div className="weather-surface space-y-2 px-4 py-4">
-            <h3 className="text-sm font-semibold uppercase tracking-[0.14em] text-rose-300">Avoid</h3>
-            <ul className="space-y-2 text-sm text-slate-200">
-              {page.avoidActions.map((item) => <li key={item}>• {item}</li>)}
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      <section className="weather-panel space-y-4 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Approval velocity guidance</h2>
-        <p className="weather-surface px-4 py-3 text-sm text-slate-200">Approval pace: <span className="font-semibold text-slate-100">{approvalVelocity}</span>. No acceleration required — no freeze warranted.</p>
-      </section>
-
-      <section className="weather-panel space-y-4 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">When this answer flips</h2>
-        <ul className="space-y-2 text-sm text-slate-200">
-          <li>• Risk appetite falls below {riskThreshold.toFixed(0)}.</li>
-          <li>• Tightness rises above {tightnessThreshold.toFixed(0)}.</li>
-          <li>• Two weaker weekly reads occur consecutively.</li>
+      <section className="weather-panel space-y-3 px-6 py-6">
+        <h2 className="text-lg font-semibold text-slate-100">Bounded recommendations</h2>
+        <ul className="space-y-3 text-sm text-slate-200">
+          {rules.map((rule) => (
+            <li key={rule.area} className="weather-surface space-y-1 px-4 py-3">
+              <p className="font-semibold text-slate-100">{rule.title}</p>
+              <p>{rule.recommendation}</p>
+              <p>Scope: {rule.scope}</p>
+              <p className="text-amber-200">Stop: {rule.pauseTrigger}</p>
+              <p className="text-emerald-200">Resume: {rule.resumeTrigger}</p>
+              <p className="text-xs text-slate-400">Why: {rule.rationale}</p>
+            </li>
+          ))}
         </ul>
-        <p className="text-sm text-slate-300">Monitor weekly and re-run operating plans after each threshold check.</p>
       </section>
 
-      <section className="weather-panel space-y-4 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Internal link cluster</h2>
-        <div className="flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">
-          <Link href="/signals" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Signals evidence</Link>
-          <Link href="/toolkits" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Operator toolkits</Link>
-          <Link href="/start" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Command center</Link>
-          <Link href="/answers" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">All Tier 1 answers</Link>
-          <Link href={"/startup-macro-posture" as Route} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Startup macro posture</Link>
+      <section className="weather-panel space-y-3 px-6 py-6">
+        <h2 className="text-lg font-semibold text-slate-100">Threshold context</h2>
+        <p className="text-sm text-slate-200">Risk appetite {assessment.scores.riskAppetite.toFixed(0)} (threshold {assessment.thresholds.riskAppetiteRegime.toFixed(0)}).</p>
+        <p className="text-sm text-slate-200">Capital tightness {assessment.scores.tightness.toFixed(0)} (threshold {assessment.thresholds.tightnessRegime.toFixed(0)}).</p>
+        <p className="text-sm text-slate-300">Decision delta: {reportDynamics.directionLabel}.</p>
+      </section>
+
+      <section className="weather-panel space-y-3 px-6 py-6">
+        <h2 className="text-lg font-semibold text-slate-100">What to debate this week</h2>
+        <ul className="space-y-2 text-sm text-slate-200">
+          {page.supportPoints.map((point) => (
+            <li key={point}>• {point}</li>
+          ))}
+        </ul>
+        <p className="text-sm text-slate-300">Audience: {page.audience}</p>
+      </section>
+
+      <section className="weather-panel space-y-3 px-6 py-6">
+        <h2 className="text-lg font-semibold text-slate-100">Cite this call</h2>
+        <p className="whitespace-pre-line text-xs text-slate-300">{citation}</p>
+        <p className="text-xs text-slate-400">Freshness: {treasuryProvenance.ageLabel} · Source basis: {treasury.source}</p>
+      </section>
+
+      <section className="weather-panel space-y-3 px-6 py-6">
+        <h2 className="text-lg font-semibold text-slate-100">Continuity</h2>
+        <p className="text-sm text-slate-300">Last 4 weeks:</p>
+        <div className="flex flex-wrap gap-2">
+          {memoryRail.map((item) => (
+            <span key={item} className="weather-pill inline-flex min-h-[36px] items-center px-3 py-1 text-xs text-slate-200">{item}</span>
+          ))}
         </div>
-        <p className="text-xs text-slate-400">Last updated: {recordDateLabel}. Source: US Treasury + FRED + BLS live feeds. Next refresh: 15 minutes.</p>
+      </section>
+
+      <section className="weather-panel space-y-3 px-6 py-6">
+        <h2 className="text-lg font-semibold text-slate-100">Go to weekly brief</h2>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">Weekly operating brief</Link>
+          <Link href="/answers" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">All answer pages</Link>
+        </div>
       </section>
     </main>
   );

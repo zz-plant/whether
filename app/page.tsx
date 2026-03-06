@@ -280,6 +280,9 @@ export default async function HomePage({
   const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries);
   const boardSummary = buildBoardBrief(assessment, treasury, sensors, macroSeries);
   const callCitation = buildCallCitation(assessment, treasury);
+  const memoryRail = (reportData.regimeSeries ?? [])
+    .slice(-4)
+    .map((entry) => `${entry.month}/${String(entry.year).slice(-2)} ${entry.regime}`);
   return (
     <ReportShell
       regime={assessment.regime}
@@ -333,18 +336,19 @@ export default async function HomePage({
         postureDelta={homeBriefModel.postureDeltaLabel}
         confidenceLabel={homeBriefModel.confidenceLabel}
         transitionWatch={homeBriefModel.transitionWatch}
-        constraints={homeBriefModel.constraints}
         netConstraintSummary={homeBriefModel.netConstraintSummary}
         guardrail={homeBriefModel.guardrail}
         reversalTrigger={homeBriefModel.reversalTrigger}
-        dangerousCategory={homeBriefModel.dangerousCategory}
         recordDateLabel={recordDateLabel}
         fetchedAtLabel={fetchedAtLabel}
         reportDynamics={reportDynamics}
         decisionKnobs={homeBriefModel.decisionKnobs}
         decisionShiftSummary={homeBriefModel.decisionShiftSummary}
-        leadershipImplications={homeBriefModel.leadershipImplications}
         boundedDecisions={homeBriefModel.boundedDecisions}
+        decisionRules={homeBriefModel.decisionRules}
+        revisitDecisions={homeBriefModel.revisitDecisions}
+        memoryRail={memoryRail}
+        citation={callCitation}
         actions={<CopyLeadershipArtifactsButtons slackBrief={slackBrief} boardSummary={boardSummary} citation={callCitation} />}
       />
 

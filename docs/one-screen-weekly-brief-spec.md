@@ -203,3 +203,9 @@ Track adoption signals tied to ritualization:
 - Teaching macro frameworks on this surface.
 - Replicating deep evidence/method pages in-line.
 - Adding new upstream datasets before improving compression and legibility.
+
+## Implementation note (current contract in `/` and `/answers`)
+- Canonical bounded decision rule model lives in `lib/report/boundedDecisionRules.ts` and provides deterministic fields: area, recommendation, scope, pause trigger, resume trigger, and rationale.
+- Homepage surfaces (in order): this-week header, decision delta, binary revisit flag, bounded rules, conditional guardrails, memory rail, and citation/action blocks.
+- Artifact transmission on `/` includes direct copy actions for Slack brief, board summary, and citation.
+- `/answers/[slug]` pages are template-driven from `app/answers/decisionPages.ts` and now resolve direct answer + bounded recommendations + threshold context + citation + link back to weekly brief.
