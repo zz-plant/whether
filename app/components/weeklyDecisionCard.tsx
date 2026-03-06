@@ -92,7 +92,23 @@ export function WeeklyDecisionCard({
         </h1>
         <p className="max-w-3xl text-sm text-slate-300">A weekly operating posture for hiring, roadmap, and spend decisions — based on macro signals.</p>
         <p className="max-w-3xl text-base text-slate-200">{postureHeadlineByRegime[regime]}</p>
-        <p className="text-sm text-slate-300">Change vs last week: {postureDelta}</p>
+        <div className="flex flex-wrap gap-2 text-xs">
+          <span className="inline-flex items-center rounded-full border border-slate-600 bg-slate-950/60 px-2.5 py-1 text-slate-200">
+            Change vs last week: <span className="ml-1 font-semibold text-sky-100">{postureDelta}</span>
+          </span>
+          <span className="inline-flex items-center rounded-full border border-slate-600 bg-slate-950/60 px-2.5 py-1 text-slate-200">
+            Confidence: <span className="ml-1 font-semibold text-slate-50">{confidenceLabel}</span>
+          </span>
+          <span
+            className={`inline-flex items-center rounded-full border px-2.5 py-1 ${
+              transitionWatch === "ON"
+                ? "border-amber-400/70 bg-amber-500/10 text-amber-100"
+                : "border-emerald-400/60 bg-emerald-500/10 text-emerald-100"
+            }`}
+          >
+            Shift watch: <span className="ml-1 font-semibold">{transitionWatch}</span>
+          </span>
+        </div>
       </header>
 
       <article className="rounded-xl border border-sky-500/40 bg-slate-900/50 p-4">
@@ -154,9 +170,20 @@ export function WeeklyDecisionCard({
           {boundedDecisions.map((decision) => (
             <li key={decision.title} className="rounded-lg border border-slate-700/60 bg-slate-950/60 p-3">
               <p className="text-xs uppercase tracking-[0.12em] text-violet-200">{decision.title}</p>
-              <p className="mt-1">{decision.action}</p>
-              <p className="mt-1 text-amber-100">Stop: {decision.pauseIf}</p>
-              <p className="mt-1 text-emerald-100">Resume: {decision.resumeWhen}</p>
+              <dl className="mt-2 space-y-2">
+                <div>
+                  <dt className="text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-300">Action</dt>
+                  <dd className="mt-0.5 text-slate-100">{decision.action}</dd>
+                </div>
+                <div>
+                  <dt className="text-[11px] font-semibold uppercase tracking-[0.1em] text-amber-200">Pause trigger</dt>
+                  <dd className="mt-0.5 text-amber-100">{decision.pauseIf}</dd>
+                </div>
+                <div>
+                  <dt className="text-[11px] font-semibold uppercase tracking-[0.1em] text-emerald-200">Resume when</dt>
+                  <dd className="mt-0.5 text-emerald-100">{decision.resumeWhen}</dd>
+                </div>
+              </dl>
             </li>
           ))}
         </ul>
