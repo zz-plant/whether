@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 
 const TEST_DIRECTORY = "tests";
-const TEST_SUFFIX = ".test.ts";
+const TEST_SUFFIXES = [".test.ts", ".test.tsx"];
 
 const collectTestFiles = (directory) => {
   const entries = readdirSync(directory, { withFileTypes: true });
@@ -17,7 +17,7 @@ const collectTestFiles = (directory) => {
       continue;
     }
 
-    if (entry.isFile() && entry.name.endsWith(TEST_SUFFIX)) {
+    if (entry.isFile() && TEST_SUFFIXES.some((suffix) => entry.name.endsWith(suffix))) {
       testFiles.push(fullPath);
     }
   }
