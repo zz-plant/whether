@@ -143,6 +143,13 @@ export type ToolkitDefinition = {
   whenToUse: string;
   byPosture: string;
   operatingOutcome: string;
+  decisionThisSession: string;
+  tightenNow: string;
+  loosenNow: string;
+  proceedThreshold: string;
+  stopTrigger: string;
+  reversalTrigger: string;
+  decisionArtifact: string;
   timeToRun: string;
   recommendedParticipants: string;
   prepChecklist: string[];
@@ -165,6 +172,13 @@ export const toolkitDefinitions: ToolkitDefinition[] = [
     whenToUse: "Use this when you need demand proof before adding cost or complexity.",
     byPosture: "In Safety Mode, focus on retention proof; in Risk-On, push for repeatable growth.",
     operatingOutcome: "A go/hold decision backed by retention quality, not just topline excitement.",
+    decisionThisSession: "Choose one gate now: invest, hold, or narrow to one segment.",
+    tightenNow: "In Safety Mode, tighten spend until retention quality is proven by segment.",
+    loosenNow: "In Risk-On, loosen channel expansion only for segments with repeat usage.",
+    proceedThreshold: "Proceed when core-value retention crosses your agreed PMF threshold for two cohorts.",
+    stopTrigger: "Stop incremental acquisition spend when repeat usage drops below the agreed floor.",
+    reversalTrigger: "Reverse from invest back to hold if two consecutive cohorts lose retention quality.",
+    decisionArtifact: "30-day PMF action memo with gate, threshold, and next review date.",
     timeToRun: "60-90 minutes with Product + Growth + Finance.",
     recommendedParticipants: "Product lead, Growth lead, Finance partner, and the team owning activation/retention.",
     prepChecklist: [
@@ -216,6 +230,13 @@ export const toolkitDefinitions: ToolkitDefinition[] = [
     whenToUse: "Use this when your team is overcommitted and priorities are blurred.",
     byPosture: "In Safety Mode, narrow scope; in Risk-On, re-open adjacent options with guardrails.",
     operatingOutcome: "A capacity-matched roadmap with explicit trade-offs and paused work.",
+    decisionThisSession: "Commit to keep, pause, and accelerate decisions for this cycle.",
+    tightenNow: "In Safety Mode, tighten WIP and pause lower-leverage streams quickly.",
+    loosenNow: "In Risk-On, loosen constraints only on bets with <90 day impact.",
+    proceedThreshold: "Proceed when capacity load and critical dependencies are both within plan.",
+    stopTrigger: "Stop adding scope when any team breaches agreed WIP or dependency limits.",
+    reversalTrigger: "Re-open a paused stream only when a named trigger condition is met.",
+    decisionArtifact: "Published focus memo with not-doing list and escalation owners.",
     timeToRun: "45-75 minutes with Product + Engineering + Design.",
     recommendedParticipants: "Product manager, engineering manager, design lead, and one operations/program partner.",
     prepChecklist: [
@@ -267,6 +288,13 @@ export const toolkitDefinitions: ToolkitDefinition[] = [
     whenToUse: "Use this before hiring, pricing, or architecture moves that are hard to undo.",
     byPosture: "In Safety Mode, tighten rollback triggers; in Risk-On, widen experiment boundaries.",
     operatingOutcome: "Decision packages that define rollback triggers before irreversible spend begins.",
+    decisionThisSession: "Approve or reject the commitment with rollback ownership assigned now.",
+    tightenNow: "In Safety Mode, tighten rollback windows and require earlier trigger thresholds.",
+    loosenNow: "In Risk-On, loosen experiment scope while keeping rollback authority explicit.",
+    proceedThreshold: "Proceed only when unwind cost, owner, and trigger thresholds are documented.",
+    stopTrigger: "Stop commitment expansion when a leading indicator breaches the trigger register.",
+    reversalTrigger: "Reverse to rollback mode immediately when trigger owner calls degradation.",
+    decisionArtifact: "Signed commitment note with rollback trigger register and comms packet.",
     timeToRun: "45-60 minutes per major commitment.",
     recommendedParticipants: "Decision owner, finance owner, delivery owner, and communications counterpart.",
     prepChecklist: [
@@ -318,6 +346,13 @@ export const toolkitDefinitions: ToolkitDefinition[] = [
     whenToUse: "Use this when unclear ownership is slowing decisions or increasing risk.",
     byPosture: "In Safety Mode, increase escalation rigor; in Risk-On, increase delegated speed.",
     operatingOutcome: "Named decision owners, escalation paths, and review cadence for critical calls.",
+    decisionThisSession: "Assign one accountable DRI and escalation boundary for each critical call.",
+    tightenNow: "In Safety Mode, tighten escalation triggers and approval checks for risk-heavy calls.",
+    loosenNow: "In Risk-On, loosen decision latency by increasing delegated authority.",
+    proceedThreshold: "Proceed when every critical decision has a DRI, reviewer set, and SLA.",
+    stopTrigger: "Stop meeting-based consensus loops when no accountable owner is named.",
+    reversalTrigger: "Revert to tighter approval paths if delegated calls repeatedly miss risk bounds.",
+    decisionArtifact: "Decision rights matrix with escalation ladder and weekly governance cadence.",
     timeToRun: "60 minutes to map rights, plus 15-minute weekly operating review.",
     recommendedParticipants: "Exec sponsor, function leads, and program/operations owner who tracks decision cycle time.",
     prepChecklist: [
@@ -369,6 +404,13 @@ export const toolkitDefinitions: ToolkitDefinition[] = [
     whenToUse: "Use this when launches need objective go/no-go thresholds.",
     byPosture: "In Safety Mode, raise quality gates; in Risk-On, raise learning velocity.",
     operatingOutcome: "Launch decisions tied to threshold evidence, with clear rollback ownership.",
+    decisionThisSession: "Make a go/no-go call with owners for deferred risks and rollback.",
+    tightenNow: "In Safety Mode, tighten hard blockers around reliability and support readiness.",
+    loosenNow: "In Risk-On, loosen non-critical gates only when learning value is high.",
+    proceedThreshold: "Proceed only when scorecard gates pass and residual risks have named mitigations.",
+    stopTrigger: "Stop launch when any hard blocker falls below pass criteria.",
+    reversalTrigger: "Revert to rollback communications when early-launch signals degrade beyond limits.",
+    decisionArtifact: "Signed go/no-go note linked to gate scorecard and rollback owner.",
     timeToRun: "30-45 minutes per launch gate review.",
     recommendedParticipants: "Release owner, engineering lead, product lead, support lead, and incident commander/backstop.",
     prepChecklist: [
@@ -420,6 +462,13 @@ export const toolkitDefinitions: ToolkitDefinition[] = [
     whenToUse: "Use this when team load is running ahead of resilience.",
     byPosture: "In Safety Mode, protect resilience capacity; in Risk-On, redeploy surplus into growth loops.",
     operatingOutcome: "Capacity plan that protects reliability and prevents silent overload.",
+    decisionThisSession: "Cut, sequence, or re-staff work to keep reliability guardrails intact.",
+    tightenNow: "In Safety Mode, tighten capacity buffers and protect non-negotiable SLO floors.",
+    loosenNow: "In Risk-On, loosen buffers only where stress indicators stay green for two cycles.",
+    proceedThreshold: "Proceed with added scope only when capacity stress remains within agreed bands.",
+    stopTrigger: "Stop roadmap expansion when overload persists for two operating cycles.",
+    reversalTrigger: "Reverse to protective mode when SLO or on-call load breaches guardrail limits.",
+    decisionArtifact: "Capacity plan with guardrail checklist and escalation dashboard.",
     timeToRun: "60 minutes monthly plus weekly stress signal review.",
     recommendedParticipants: "Engineering manager, support/on-call owner, product counterpart, and operations/finance partner.",
     prepChecklist: [
@@ -471,6 +520,13 @@ export const toolkitDefinitions: ToolkitDefinition[] = [
     whenToUse: "Use this when messaging may outrun what the product can reliably deliver.",
     byPosture: "In Safety Mode, tighten claim defensibility; in Risk-On, expand differentiated positioning responsibly.",
     operatingOutcome: "Public claims that are evidence-backed, monitorable, and low-regret.",
+    decisionThisSession: "Approve, revise, or pull claims based on current operational proof.",
+    tightenNow: "In Safety Mode, tighten claim language to what is demonstrably reliable now.",
+    loosenNow: "In Risk-On, loosen positioning scope only for claims with strong monitoring coverage.",
+    proceedThreshold: "Proceed when each claim has evidence source, owner, and monitoring trigger.",
+    stopTrigger: "Stop publishing or promoting claims that lack verifiable product evidence.",
+    reversalTrigger: "Reverse published copy when expectation-gap indicators cross agreed thresholds.",
+    decisionArtifact: "Claims evidence table with approved language and rollback SLA.",
     timeToRun: "45 minutes for campaign reviews; 20 minutes for incremental claim changes.",
     recommendedParticipants: "Marketing lead, product lead, legal/risk reviewer, and support/reliability representative.",
     prepChecklist: [

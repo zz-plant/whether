@@ -36,11 +36,23 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
       </Link>
       <section className="weather-panel space-y-3 px-6 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{toolkit.title}</h1>
+        <p className="text-base text-slate-200"><span className="font-semibold">Decide now:</span> {toolkit.decisionThisSession}</p>
         <p className="text-base text-slate-200"><span className="font-semibold">When to use:</span> {toolkit.whenToUse}</p>
-        <p className="text-base text-slate-200"><span className="font-semibold">Posture split:</span> {toolkit.byPosture}</p>
         <p className="text-base text-slate-200"><span className="font-semibold">Operating outcome:</span> {toolkit.operatingOutcome}</p>
         <p className="text-base text-slate-200"><span className="font-semibold">Typical runtime:</span> {toolkit.timeToRun}</p>
-        <p className="text-base text-slate-200"><span className="font-semibold">Who should run it:</span> {toolkit.recommendedParticipants}</p>
+        <p className="text-base text-slate-200"><span className="font-semibold">Artifact you leave with:</span> {toolkit.decisionArtifact}</p>
+      </section>
+      <section className="weather-panel space-y-3 px-6 py-6">
+        <h2 className="text-lg font-semibold text-slate-100">Bounded operating rules</h2>
+        <ul className="space-y-2 text-sm text-slate-200">
+          <li>• <span className="font-semibold text-slate-100">Tighten:</span> {toolkit.tightenNow}</li>
+          <li>• <span className="font-semibold text-slate-100">Loosen:</span> {toolkit.loosenNow}</li>
+          <li>• <span className="font-semibold text-slate-100">Proceed threshold:</span> {toolkit.proceedThreshold}</li>
+          <li>• <span className="font-semibold text-slate-100">Stop trigger:</span> {toolkit.stopTrigger}</li>
+          <li>• <span className="font-semibold text-slate-100">Reversal trigger:</span> {toolkit.reversalTrigger}</li>
+        </ul>
+        <p className="text-sm text-slate-300"><span className="font-semibold">Posture split:</span> {toolkit.byPosture}</p>
+        <p className="text-sm text-slate-300"><span className="font-semibold">Who should run it:</span> {toolkit.recommendedParticipants}</p>
       </section>
       <section className="weather-panel space-y-4 px-6 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Prep checklist</h2>

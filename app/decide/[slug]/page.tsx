@@ -71,7 +71,13 @@ export default async function DecideDetailPage({
             {role.recommendedToolkits.map((slugItem) => {
               const toolkit = toolkitDefinitions.find((entry) => entry.slug === slugItem);
               if (!toolkit) return null;
-              return <Link key={slugItem} href={`/toolkits/${slugItem}`} className="weather-surface px-4 py-4 text-sm text-slate-100">{toolkit.title}</Link>;
+              return (
+                <Link key={slugItem} href={`/toolkits/${slugItem}`} className="weather-surface space-y-2 px-4 py-4 text-sm text-slate-100">
+                  <p className="font-semibold">{toolkit.title}</p>
+                  <p className="text-xs text-slate-300">Recommended now: {toolkit.decisionThisSession}</p>
+                  <p className="text-xs text-slate-300">Output: {toolkit.decisionArtifact}</p>
+                </Link>
+              );
             })}
           </div>
         </section>
@@ -93,7 +99,11 @@ export default async function DecideDetailPage({
             if (!toolkit) return null;
 
             return (
-              <Link key={toolkit.slug} href={`/toolkits/${toolkit.slug}`} className="weather-surface px-4 py-4 text-sm text-slate-100">{toolkit.title}</Link>
+              <Link key={toolkit.slug} href={`/toolkits/${toolkit.slug}`} className="weather-surface space-y-2 px-4 py-4 text-sm text-slate-100">
+                <p className="font-semibold">{toolkit.title}</p>
+                <p className="text-xs text-slate-300">Recommended now: {toolkit.decisionThisSession}</p>
+                <p className="text-xs text-slate-300">Output: {toolkit.decisionArtifact}</p>
+              </Link>
             );
           })}
         </div>
