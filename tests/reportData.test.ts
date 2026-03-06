@@ -92,6 +92,18 @@ describe("buildReportDynamics", () => {
 
     assert.equal(dynamics.directionLabel, "mixed");
   });
+
+  it("orders changed signals by largest absolute movement", () => {
+    const previous = makeAssessment({ tightness: 50, riskAppetite: 50, baseRate: 4, curveSlope: 0.1 });
+    const current = makeAssessment({ tightness: 50.2, riskAppetite: 60, baseRate: 4.5, curveSlope: 0.15 });
+
+    const dynamics = buildReportDynamics({ current, previous });
+
+    assert.deepEqual(
+      dynamics.changedSignals.map((signal) => signal.key),
+      ["riskAppetite", "baseRate", "tightness", "curveSlope"],
+    );
+  });
 });
 
 describe("buildSnapshotFallbackTreasury", () => {
