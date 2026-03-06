@@ -85,8 +85,12 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.ok(deltaIndex > postureIndex);
     assert.ok(revisitIndex > deltaIndex);
     assert.ok(rulesSummaryIndex > revisitIndex);
+    assert.match(html, /Weekly call: revise hiring and roadmap decisions this week\./);
+    assert.match(html, /aria-label="Weekly trust signals"/);
     assert.match(html, /Confidence MED · Freshness Mar 6, 2026 09:12 UTC · Shift watch ON/);
     assert.match(html, /Revisit implications[\s\S]*Delta \+2/);
+    assert.match(html, /Decision matrix this week/);
+    assert.match(html, /aria-label="Weekly decision matrix"/);
   });
 
   it("uses responsive classes to protect screenshot readability and keeps citation actions", () => {
