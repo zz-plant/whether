@@ -170,6 +170,8 @@ export default async function StartHerePage() {
               <Link key={toolkit.slug} href={`/toolkits/${toolkit.slug}`} className="weather-surface min-h-[44px] space-y-2 px-4 py-4 text-sm text-slate-200 transition hover:border-sky-300/40 hover:bg-slate-900/75">
                 <span className="font-semibold text-slate-100">{toolkit.title}</span>
                 <p className="text-sm text-slate-200">{toolkit.whenToUse}</p>
+                <p className="text-xs text-slate-300">{toolkit.timeToRun}</p>
+                <p className="text-xs text-slate-300">Output: {toolkit.decisionArtifact}</p>
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Run toolkit →</p>
               </Link>
             ))}
@@ -184,6 +186,8 @@ export default async function StartHerePage() {
                   <Link key={toolkit.slug} href={`/toolkits/${toolkit.slug}`} className="weather-surface min-h-[44px] space-y-2 px-4 py-4 text-sm text-slate-200 transition hover:border-sky-300/40 hover:bg-slate-900/75">
                     <span className="font-semibold text-slate-100">{toolkit.title}</span>
                     <p className="text-sm text-slate-200">{toolkit.whenToUse}</p>
+                    <p className="text-xs text-slate-300">{toolkit.timeToRun}</p>
+                    <p className="text-xs text-slate-300">Output: {toolkit.decisionArtifact}</p>
                     <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Run toolkit →</p>
                   </Link>
                 ))}
