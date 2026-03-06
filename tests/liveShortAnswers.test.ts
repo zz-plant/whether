@@ -23,6 +23,19 @@ describe("live short answers", () => {
     assert.equal(buildLiveShortAnswer("unknown", "SCARCITY", "fallback"), "fallback");
   });
 
+  it("uses generic safety-mode copy for non-expansion pages without overrides", () => {
+    const scarcity = buildLiveShortAnswer(
+      "product-strategy-during-expansion",
+      "SCARCITY",
+      "fallback"
+    );
+
+    assert.equal(
+      scarcity,
+      "In safety mode, keep decisions reversible and enforce stricter spend and hiring gates."
+    );
+  });
+
   it("derives expansion state from regime key", () => {
     assert.equal(isExpansionRegime("EXPANSION"), true);
     assert.equal(isExpansionRegime("DEFENSIVE"), false);

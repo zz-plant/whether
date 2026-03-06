@@ -232,4 +232,24 @@ export const answerCategories: Array<{ key: AnswerCategory; label: string }> = [
   { key: "explanation", label: "Explanation" },
 ];
 
+// Backward-compatible aliases for existing consumers while answer pages migrate
+// to the canonical category model.
+export const tierOneDecisionPages = answerPages;
+
+export const tierTwoKeywords = [
+  "product strategy in a risk off market",
+  "how to operate in expansion mode startup",
+  "startup strategy during capital scarcity",
+  "engineering hiring during recession",
+  "how does yield curve affect startups",
+];
+
+export const tierThreeKeywords = [
+  "yield curve inversion startup impact",
+  "bbb credit spread impact on startups",
+  "treasury rates and saas valuations",
+  "venture capital risk appetite indicator",
+  "best time to hire engineers macro conditions",
+];
+
 export const findDecisionPage = (slug: string) => answerPages.find((page) => page.slug === slug);
