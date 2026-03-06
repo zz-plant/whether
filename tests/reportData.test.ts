@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { evaluateRegime } from "../lib/regimeEngine";
-import { buildLastYearComparison, buildReportDynamics } from "../lib/report/reportData";
+import {
+  buildLastYearComparison,
+  buildReportDynamics,
+  buildSnapshotFallbackTreasury,
+} from "../lib/report/reportData";
 import type { TreasuryData } from "../lib/types";
 
 const makeTreasury = (
@@ -87,5 +91,33 @@ describe("buildReportDynamics", () => {
     const dynamics = buildReportDynamics({ current, previous });
 
     assert.equal(dynamics.directionLabel, "mixed");
+  });
+});
+
+describe("buildSnapshotFallbackTreasury", () => {
+  it("adds fallback markers when snapshot payload has none", () => {
+    const snapshot = makeTreasury("2025-01-31", 4.4, 4.2, 4.1);
+    const now = new Date("2026-01-15T12:00:00.000Z");
+
+    const fallback = buildSnapshotFallbackTreasury(snapshot, now);
+
+    assert.equal(fallback.fallback_at, "2026-01-15T12:00:00.000Z");
+    assert.equal(
+      fallback.fallback_reason,
+      "Report dependency outage: serving cached treasury snapshot.",
+    );
+  });
+
+  it("preserves existing fallback markers from upstream payload", () => {
+    const snapshot: TreasuryData = {
+      ...makeTreasury("2025-01-31", 4.4, 4.2, 4.1),
+      fallback_at: "2025-01-31T13:00:00.000Z",
+      fallback_reason: "Upstream treasury timeout.",
+    };
+
+    const fallback = buildSnapshotFallbackTreasury(snapshot, new Date("2026-01-15T12:00:00.000Z"));
+
+    assert.equal(fallback.fallback_at, "2025-01-31T13:00:00.000Z");
+    assert.equal(fallback.fallback_reason, "Upstream treasury timeout.");
   });
 });

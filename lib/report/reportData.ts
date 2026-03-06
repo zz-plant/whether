@@ -27,6 +27,7 @@ import { formatAgeHours, formatDateUTC, formatTimestampUTC } from "../formatters
 import { buildRegimeAlert } from "./reportFormatting";
 import { formatRegimeLabel } from "../regimeFormat";
 import { logReportDependencyFailure } from "./reportError";
+import type { TreasuryData } from "../types";
 
 export type ReportSearchParams = {
   month?: string;
@@ -172,6 +173,7 @@ export const buildReportDynamics = ({
 };
 
 const REPORT_DATA_REVALIDATE_SECONDS = 900;
+const REPORT_FALLBACK_REASON = "Report dependency outage: serving cached treasury snapshot.";
 
 type ReportDependency = "treasury" | "macro" | "report";
 
@@ -181,6 +183,12 @@ const withDependencyContext = (dependency: ReportDependency, error: unknown): Er
   const resolvedError = toError(error);
   return new Error(`[dependency:${dependency}] ${resolvedError.message}`);
 };
+
+export const buildSnapshotFallbackTreasury = (snapshot: TreasuryData, now = new Date()): TreasuryData => ({
+  ...snapshot,
+  fallback_at: snapshot.fallback_at ?? now.toISOString(),
+  fallback_reason: snapshot.fallback_reason ?? REPORT_FALLBACK_REASON,
+});
 
 const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
   const liveFetcher: typeof fetch = (input, init) =>
@@ -398,6 +406,7 @@ export const loadReportData = (searchParams?: ReportSearchParams) => {
 
 const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataFallback => {
   const now = new Date();
+  const fallbackTreasury = buildSnapshotFallbackTreasury(snapshotData, now);
   const historicalSelection = resolveTimeMachineSelection(searchParams);
   const requestedSelection = parseTimeMachineRequest(searchParams);
   const latestCache = getLatestTimeMachineSnapshot();
@@ -411,12 +420,12 @@ const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataF
   const cacheMonthsByYear = getTimeMachineMonthsByYear();
   const regimeSeries = getTimeMachineRegimeSeries(DEFAULT_REGIME_SERIES_MONTHS, thresholds);
   const yieldCurveSeries = getTimeMachineYieldCurveSeries(240, historicalSelection?.asOf);
-  const assessment = evaluateRegime(snapshotData, thresholds, []);
-  const liveAssessment = evaluateRegime(snapshotData, thresholds, []);
-  const sensors = buildSensorReadings(snapshotData);
-  const recordDateLabel = formatDateUTC(snapshotData.record_date);
-  const fetchedAtLabel = formatTimestampUTC(snapshotData.fetched_at);
-  const ageLabel = formatAgeHours(snapshotData.fetched_at, now);
+  const assessment = evaluateRegime(fallbackTreasury, thresholds, []);
+  const liveAssessment = evaluateRegime(fallbackTreasury, thresholds, []);
+  const sensors = buildSensorReadings(fallbackTreasury);
+  const recordDateLabel = formatDateUTC(fallbackTreasury.record_date);
+  const fetchedAtLabel = formatTimestampUTC(fallbackTreasury.fetched_at);
+  const ageLabel = formatAgeHours(fallbackTreasury.fetched_at, now);
   const { playbook, startItems, stopItems } = getPlaybookGuidance(assessment.regime);
 
   return {
@@ -437,10 +446,10 @@ const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataF
     invalidHistoricalSelection,
     lastYearComparison: null,
     liveAssessment,
-    liveTreasury: snapshotData,
+    liveTreasury: fallbackTreasury,
     macroProvenance: {
       sourceLabel: "FRED & US Treasury",
-      sourceUrl: snapshotData.source,
+      sourceUrl: fallbackTreasury.source,
       recordDateLabel,
       timestampLabel: fetchedAtLabel,
       ageLabel,
@@ -467,17 +476,17 @@ const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataF
     statusLabel: formatRegimeLabel(assessment.regime),
     stopItems,
     thresholds,
-    treasury: snapshotData,
+    treasury: fallbackTreasury,
     treasuryProvenance: {
       sourceLabel: "Federal Reserve Economic Data (FRED)",
-      sourceUrl: snapshotData.source,
+      sourceUrl: fallbackTreasury.source,
       recordDateLabel,
       timestampLabel: fetchedAtLabel,
       ageLabel,
       statusLabel: "Cached (fallback)",
     },
     stale: true,
-    lastCachedTimestamp: snapshotData.fetched_at,
+    lastCachedTimestamp: fallbackTreasury.fetched_at,
   };
 };
 
