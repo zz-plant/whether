@@ -189,7 +189,7 @@ $$
   - Coverage: `tests/summaryCopyRenderer.test.ts`
 - **P1 (implemented):** Offline archive materialization for historical `structured` fields, with guardrail coverage ensuring weekly/monthly entries are materialized.
 - **P1 (implemented):** API contract tests for `/api/weekly` and `/api/monthly` structured payload guarantees.
-- **P2:** Monthly section expansion toward weekly parity where operator value is clear.
+- **P2 (open):** Monthly section expansion toward weekly parity where operator value is clear. Re-review during roadmap grooming so status remains current and does not drift in this “as built” audit.
 
 ### 5.3 Briefing exports
 Operations briefings support copy-ready briefs and executive narratives with sensor data and
