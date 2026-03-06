@@ -6,7 +6,7 @@ import type { ReportDynamics } from "../lib/report/reportData";
 import type { BoundedDecisionRule } from "../lib/report/boundedDecisionRules";
 
 const reportDynamics: ReportDynamics = {
-  directionLabel: "tightening",
+  directionLabel: "deteriorating",
   changedSignals: [
     { key: "tightness", delta: 3 },
     { key: "riskAppetite", delta: -2 },
@@ -55,6 +55,8 @@ describe("WeeklyDecisionCard top-fold composition", () => {
         statusLabel="DEFENSIVE"
         postureDelta="+2"
         confidenceLabel="MED"
+        confidencePercent={68}
+        trendLabel="Improving"
         transitionWatch="ON"
         netConstraintSummary="Pressure remains elevated but stabilizing."
         guardrail="Hold irreversible hiring unless direct revenue impact is clear."
@@ -76,6 +78,21 @@ describe("WeeklyDecisionCard top-fold composition", () => {
           { label: "Momentum", detail: "Capital tightness tightened this week." },
           { label: "Reliability", detail: "Transition watch is ON." },
         ]}
+        primaryDrivers={[
+          { label: "Capital tightness", detail: "↑ tightened this week" },
+          { label: "Risk appetite", detail: "↓ eased this week" },
+          { label: "Signal reliability", detail: "Medium confidence" },
+        ]}
+        startupClimateIndex={{
+          score: 63,
+          status: "Improving",
+          breakdown: [
+            { label: "Capital availability", score: 71 },
+            { label: "Hiring market", score: 56 },
+            { label: "SaaS valuations", score: 60 },
+            { label: "IPO window", score: 47 },
+          ],
+        }}
         citation="Whether weekly brief citation"
         actions={<button type="button">Copy weekly brief</button>}
       />,
@@ -92,14 +109,21 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.ok(rulesSummaryIndex > revisitIndex);
     assert.match(html, /Do now: revise hiring and roadmap decisions this week\./);
     assert.match(html, /aria-label="Weekly trust signals"/);
+    assert.match(html, /Confidence 68% \(MED\)/);
+    assert.match(html, /Trend Improving/);
     assert.match(html, /Confidence MED · Freshness Mar 6, 2026 09:12 UTC · Shift watch ON/);
     assert.match(html, /What to do now[\s\S]*What changed: \+2/);
     assert.match(html, /Decision matrix this week/);
     assert.match(html, /Bounded rules \(do now \/ stop \/ restart\)/);
+    assert.match(html, /Primary drivers this week/);
+    assert.match(html, /Startup Climate Index/);
+    assert.match(html, /Score 63 \/ 100 · Improving/);
     assert.match(html, /Why this posture call/);
     assert.match(html, /Stop if:/);
     assert.match(html, /Restart when:/);
     assert.match(html, /aria-label="Weekly decision matrix"/);
+    assert.match(html, /Founder risk check/);
+    assert.match(html, /Run risk check/);
   });
 
   it("uses responsive classes to protect screenshot readability and keeps citation actions", () => {
@@ -108,6 +132,8 @@ describe("WeeklyDecisionCard top-fold composition", () => {
         statusLabel="BALANCED"
         postureDelta="+0"
         confidenceLabel="HIGH"
+        confidencePercent={82}
+        trendLabel="Stable"
         transitionWatch="OFF"
         netConstraintSummary="No material operating change this week."
         guardrail="Keep fixed-cost expansion on hold."
@@ -129,6 +155,20 @@ describe("WeeklyDecisionCard top-fold composition", () => {
           { label: "Momentum", detail: "No material deltas this week." },
           { label: "Reliability", detail: "Transition watch is OFF." },
         ]}
+        primaryDrivers={[
+          { label: "Signal reliability", detail: "High confidence" },
+          { label: "Transition watch", detail: "OFF" },
+        ]}
+        startupClimateIndex={{
+          score: 74,
+          status: "Stable",
+          breakdown: [
+            { label: "Capital availability", score: 72 },
+            { label: "Hiring market", score: 69 },
+            { label: "SaaS valuations", score: 77 },
+            { label: "IPO window", score: 78 },
+          ],
+        }}
         citation="Whether weekly brief citation"
         actions={<button type="button">Copy board summary</button>}
       />,
@@ -138,6 +178,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /lg:grid-cols-12/);
     assert.match(html, /lg:col-span-6/);
     assert.match(html, /lg:grid-cols-4/);
+    assert.match(html, /Historical posture timeline/);
     assert.match(html, /Cite this call/);
     assert.match(html, /Posture BALANCED · Confidence HIGH · Effective Mar 5, 2026 · Freshness Mar 6, 2026 09:12 UTC/);
     assert.match(html, /Whether weekly brief citation/);
@@ -150,6 +191,8 @@ describe("WeeklyDecisionCard top-fold composition", () => {
         statusLabel="DEFENSIVE"
         postureDelta="No worse than last week"
         confidenceLabel="LOW"
+        confidencePercent={44}
+        trendLabel="Mixed"
         transitionWatch="ON"
         netConstraintSummary="Fallback snapshot is currently in use."
         guardrail="Hold non-core hiring."
@@ -171,6 +214,20 @@ describe("WeeklyDecisionCard top-fold composition", () => {
           { label: "Momentum", detail: "No material deltas this week." },
           { label: "Reliability", detail: "Transition watch is ON." },
         ]}
+        primaryDrivers={[
+          { label: "Signal reliability", detail: "Low confidence" },
+          { label: "Transition watch", detail: "ON" },
+        ]}
+        startupClimateIndex={{
+          score: 42,
+          status: "Deteriorating",
+          breakdown: [
+            { label: "Capital availability", score: 39 },
+            { label: "Hiring market", score: 45 },
+            { label: "SaaS valuations", score: 43 },
+            { label: "IPO window", score: 41 },
+          ],
+        }}
         citation="Whether weekly brief citation"
       />,
     );
