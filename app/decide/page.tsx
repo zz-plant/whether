@@ -23,7 +23,7 @@ export default function DecidePage() {
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Decision paths</h1>
         <p className="text-sm text-slate-300">Choose one entrypoint: role for a full decision map, or situation for the fastest route to next action.</p>
         <div className="flex flex-wrap gap-3">
-          <Link href="/start" className="weather-button inline-flex items-center justify-center">Back to Command Center</Link>
+          <Link href="/start" className="weather-button inline-flex items-center justify-center">Back to Start Here</Link>
           <Link href="/decide/ship-checklist" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100">Next: run ship checklist</Link>
         </div>
       </section>

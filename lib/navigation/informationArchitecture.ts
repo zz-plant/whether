@@ -2,7 +2,7 @@ import type { Route } from "next";
 
 export type NavigationLayerKey =
   | "weekly-brief"
-  | "command-center"
+  | "start-here"
   | "signals"
   | "operations"
   | "decide"
@@ -29,11 +29,11 @@ export const navigationLayers: NavigationLayer[] = [
     group: "core",
   },
   {
-    key: "command-center",
+    key: "start-here",
     href: "/start",
-    label: "Command Center",
-    description: "Run the weekly sequence: posture, situation, and next-step toolkit.",
-    boundary: "Posture call plus weekly sequence only; no deep evidence or methodology narratives.",
+    label: "Start Here",
+    description: "Optional orientation path: posture, situation, and toolkit routing.",
+    boundary: "Orientation and routing only; the canonical weekly artifact lives in Weekly Brief.",
     group: "workflow",
   },
   {

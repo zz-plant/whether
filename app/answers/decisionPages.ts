@@ -93,6 +93,17 @@ export const answerPages: DecisionPageDefinition[] = [
     thresholdFocus: "both",
   },
   {
+    slug: "should-startups-slow-roadmap-expansion",
+    keyword: "should startups slow roadmap expansion",
+    title: "Should Startups Slow Roadmap Expansion?",
+    category: "decision",
+    shortAnswer: "Yes—slow expansion scope, not core delivery commitments.",
+    directAnswer: "Keep roadmap work tied to near-term retention or revenue; pause platform expansion bets until thresholds strengthen.",
+    audience: "Product and engineering leadership",
+    mappedDecisionAreas: ["product-tempo", "expansion-bets", "burn-discipline"],
+    thresholdFocus: "both",
+  },
+  {
     slug: "should-startups-slow-product-development",
     keyword: "should startups slow product development",
     title: "Should Startups Slow Product Development?",
