@@ -328,23 +328,21 @@ export default async function HomePage({
       }
     >
       <WeeklyDecisionCard
-        regime={assessment.regime}
         statusLabel={statusLabel}
         postureDelta={homeBriefModel.postureDeltaLabel}
         confidenceLabel={homeBriefModel.confidenceLabel}
         transitionWatch={homeBriefModel.transitionWatch}
-        constraints={homeBriefModel.constraints}
         netConstraintSummary={homeBriefModel.netConstraintSummary}
         guardrail={homeBriefModel.guardrail}
         reversalTrigger={homeBriefModel.reversalTrigger}
-        dangerousCategory={homeBriefModel.dangerousCategory}
         recordDateLabel={recordDateLabel}
         fetchedAtLabel={fetchedAtLabel}
         reportDynamics={reportDynamics}
-        decisionKnobs={homeBriefModel.decisionKnobs}
         decisionShiftSummary={homeBriefModel.decisionShiftSummary}
-        leadershipImplications={homeBriefModel.leadershipImplications}
-        boundedDecisions={homeBriefModel.boundedDecisions}
+        decisionRules={homeBriefModel.decisionRules}
+        revisitDecisions={homeBriefModel.revisitDecisions}
+        memoryRail={homeBriefModel.memoryRail}
+        citation={callCitation}
         actions={<CopyLeadershipArtifactsButtons slackBrief={slackBrief} boardSummary={boardSummary} citation={callCitation} />}
       />
 

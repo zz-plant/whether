@@ -5,18 +5,18 @@ import { buildLiveShortAnswer, isExpansionRegime } from "../app/answers/liveShor
 describe("live short answers", () => {
   it("uses expansion headline only in expansion regime", () => {
     const expansion = buildLiveShortAnswer(
-      "is-the-market-risk-on-or-risk-off-right-now",
+      "is-it-risk-on-or-risk-off-for-startups",
       "EXPANSION",
       "fallback"
     );
     const volatile = buildLiveShortAnswer(
-      "is-the-market-risk-on-or-risk-off-right-now",
+      "is-it-risk-on-or-risk-off-for-startups",
       "VOLATILE",
       "fallback"
     );
 
-    assert.equal(expansion, "Current posture is expansion with guardrails.");
-    assert.equal(volatile, "Current posture is safety mode.");
+    assert.equal(expansion, "Current read is expansion with guardrails.");
+    assert.equal(volatile, "Current posture is safety mode; tighten approval velocity.");
   });
 
   it("falls back to static copy for unknown slugs", () => {

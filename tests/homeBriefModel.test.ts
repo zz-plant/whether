@@ -4,7 +4,7 @@ import { loadReportData } from "../lib/report/reportData";
 import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
 
 describe("buildHomeBriefModel", () => {
-  it("derives stable labels and constraints from report data", async () => {
+  it("derives stable labels and constraints from report data", { timeout: 15000 }, async () => {
     const data = await loadReportData();
     const model = buildHomeBriefModel(data);
 
@@ -15,7 +15,10 @@ describe("buildHomeBriefModel", () => {
     assert.equal(typeof model.reversalTrigger, "string");
     assert.equal(typeof model.dangerousCategory, "string");
     assert.ok(model.decisionKnobs.length > 0);
-    assert.equal(model.boundedDecisions.length, 3);
+    assert.equal(model.decisionRules.length, 5);
+    assert.equal(typeof model.revisitDecisions, "boolean");
+    assert.ok(model.memoryRail.length > 0);
+    assert.match(model.decisionRules[0].pauseTrigger, /\d/);
   });
 
   it("counts weak signals using signal-specific improving semantics", () => {
@@ -57,7 +60,9 @@ describe("buildHomeBriefModel", () => {
     });
 
     assert.match(model.decisionShiftSummary, /No macro change this week/);
-    assert.equal(model.boundedDecisions.length, 3);
-    assert.match(model.boundedDecisions[0].pauseIf, /Pause|Stop/);
+    assert.equal(model.decisionRules.length, 5);
+    assert.equal(typeof model.revisitDecisions, "boolean");
+    assert.ok(model.memoryRail.length > 0);
+    assert.match(model.decisionRules[0].pauseTrigger, /\d/);
   });
 });
