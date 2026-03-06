@@ -37,7 +37,6 @@ Use this index to find the **current** source of truth quickly.
 - `design-improvements-priority.md` — prioritized design/UX improvement backlog.
 - `agent-accelerated-prioritization-spec.md` — prioritized implementation spec for the next feature wave under coding-agent execution assumptions.
 - `research/2026-03-01-target-persona-frontend-critique.md` — persona-based constructive critique of the current frontend.
-- `research/2026-03-01-prioritized-frontend-change-list.md` — consolidated prioritized implementation backlog from persona critiques.
 - `research/2026-03-02-persona-click-route-walkthrough.md` — three-route persona walkthrough focused on streamlining and distraction audit.
 - `research/2026-03-04-review-comment-patterns.md` — recurring PR review-feedback themes and prevention controls.
 - `research/review-comment-trends.latest.md` — latest generated review-comment trend snapshot summary.

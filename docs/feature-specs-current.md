@@ -124,9 +124,9 @@ This pilot is additive and backward-compatible: existing regime labels and thres
 ## 4) Decision support tooling
 
 ### 4.1 Decisions workstream status
-The previous Decisions workstream route is not part of the primary shipped navigation in this
-release. Decision Shield logic and components are still present in the codebase, but they are
-not exposed as a first-class runtime route.
+Decisions is an active first-class workflow surface in shipped navigation (`/decide`) with role and
+situation paths plus supporting tools (for example ship checklist and team-context profiling).
+Decision Shield logic/components remain integrated through decision and operations surfaces.
 
 ### 4.2 Decision templates
 Copy-ready decision templates remain available inside operations brief/export surfaces for async
@@ -187,8 +187,8 @@ $$
   - Renderer module: `lib/summary/summaryCopyRenderer.ts`
   - Shared contracts: `lib/summary/summaryTypes.ts`
   - Coverage: `tests/summaryCopyRenderer.test.ts`
-- **P1:** Offline archive materialization for historical `structured` fields (instead of runtime-only hydration).
-- **P1:** API contract tests for `/api/weekly` and `/api/monthly` structured payload guarantees.
+- **P1 (implemented):** Offline archive materialization for historical `structured` fields, with guardrail coverage ensuring weekly/monthly entries are materialized.
+- **P1 (implemented):** API contract tests for `/api/weekly` and `/api/monthly` structured payload guarantees.
 - **P2:** Monthly section expansion toward weekly parity where operator value is clear.
 
 ### 5.3 Briefing exports
