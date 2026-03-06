@@ -5,22 +5,35 @@ import { buildLiveShortAnswer, isExpansionRegime } from "../app/answers/liveShor
 describe("live short answers", () => {
   it("uses expansion headline only in expansion regime", () => {
     const expansion = buildLiveShortAnswer(
-      "is-the-market-risk-on-or-risk-off-right-now",
+      "is-it-risk-on-or-risk-off-for-startups",
       "EXPANSION",
       "fallback"
     );
     const volatile = buildLiveShortAnswer(
-      "is-the-market-risk-on-or-risk-off-right-now",
+      "is-it-risk-on-or-risk-off-for-startups",
       "VOLATILE",
       "fallback"
     );
 
-    assert.equal(expansion, "Current posture is expansion with guardrails.");
-    assert.equal(volatile, "Current posture is safety mode.");
+    assert.equal(expansion, "Current read is expansion with guardrails.");
+    assert.equal(volatile, "Current posture is safety mode; tighten approval velocity.");
   });
 
   it("falls back to static copy for unknown slugs", () => {
     assert.equal(buildLiveShortAnswer("unknown", "SCARCITY", "fallback"), "fallback");
+  });
+
+  it("uses generic safety-mode copy for non-expansion pages without overrides", () => {
+    const scarcity = buildLiveShortAnswer(
+      "product-strategy-during-expansion",
+      "SCARCITY",
+      "fallback"
+    );
+
+    assert.equal(
+      scarcity,
+      "In safety mode, keep decisions reversible and enforce stricter spend and hiring gates."
+    );
   });
 
   it("derives expansion state from regime key", () => {

@@ -1,6 +1,8 @@
 import { deriveDecisionKnobs } from "./decisionKnobs";
 import { isImprovingSignalDelta } from "./reportData";
 import { operatingCallsByRegime } from "./operatingCalls";
+import { buildCanonicalBoundedDecisionRules } from "./boundedDecisionRules";
+import { getSummaryArchive } from "../summary/summaryArchive";
 
 type Regime = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
 
@@ -12,6 +14,7 @@ type HomeReportData = {
   };
   regimeAlert: { previousRegime: Regime } | null;
   stopItems: string[];
+  recordDateLabel?: string;
   reportDynamics?: {
     directionLabel: "improving" | "deteriorating" | "mixed" | "stable";
     changedSignals: Array<{
@@ -22,11 +25,9 @@ type HomeReportData = {
   [key: string]: unknown;
 };
 
-export type BoundedDecision = {
-  title: string;
-  action: string;
-  pauseIf: string;
-  resumeWhen: string;
+type MemoryRailItem = {
+  label: string;
+  posture: string;
 };
 
 const regimeLabelMap = {
@@ -114,66 +115,28 @@ const buildLeadershipImplications = (regime: Regime): string[] => {
   ];
 };
 
-const buildBoundedDecisions = ({
-  regime,
-  riskScore,
-  riskThreshold,
-  tightnessScore,
-  tightnessThreshold,
-}: {
-  regime: Regime;
-  riskScore: number;
-  riskThreshold: number;
-  tightnessScore: number;
-  tightnessThreshold: number;
-}): BoundedDecision[] => {
-  if (regime === "EXPANSION") {
-    return [
-      {
-        title: "Growth experiments",
-        action: "Run incremental growth experiments this week.",
-        pauseIf: "Pause if CAC payback exceeds 12 months.",
-        resumeWhen: "Resume once CAC payback returns to ≤ 10 months.",
-      },
-      {
-        title: "GTM hiring",
-        action: "Expand GTM hiring for approved critical roles.",
-        pauseIf: `Pause if risk appetite drops below ${riskThreshold.toFixed(1)} (now ${riskScore.toFixed(1)}).`,
-        resumeWhen: `Resume when risk appetite rebounds above ${Math.max(riskThreshold + 2, riskScore - 1).toFixed(1)}.`,
-      },
-      {
-        title: "Roadmap bets",
-        action: "Advance reversible roadmap bets with milestone gates.",
-        pauseIf: `Pause if tightness rises above ${tightnessThreshold.toFixed(1)} (now ${tightnessScore.toFixed(1)}).`,
-        resumeWhen: `Resume when tightness normalizes below ${Math.max(tightnessThreshold - 3, 0).toFixed(1)}.`,
-      },
-    ];
-  }
+const buildMemoryRail = (recordDateLabel: string | undefined, currentRegime: Regime): MemoryRailItem[] => {
+  const weeklyEntries = getSummaryArchive().filter((entry) => entry.cadence === "weekly");
+
+  const priorEntries = weeklyEntries
+    .filter((entry) => (recordDateLabel ? entry.record_date !== recordDateLabel : true))
+    .slice(-3)
+    .map((entry) => ({
+      label: entry.record_date,
+      posture: regimeLabelMap[entry.summary.regime],
+    }));
 
   return [
+    ...priorEntries,
     {
-      title: "Headcount approvals",
-      action: "Approve only backfill or revenue-critical hiring.",
-      pauseIf: `Pause all net-new hiring if tightness rises above ${tightnessThreshold.toFixed(1)}.`,
-      resumeWhen: `Resume selective net-new hiring when tightness falls below ${Math.max(tightnessThreshold - 4, 0).toFixed(1)}.`,
+      label: recordDateLabel ?? "Current",
+      posture: regimeLabelMap[currentRegime],
     },
-    {
-      title: "Experiment portfolio",
-      action: "Keep only experiments with measurable near-term revenue signals.",
-      pauseIf: "Pause experiments if payback projection exceeds 9 months.",
-      resumeWhen: "Resume staged tests once payback projection is ≤ 7 months.",
-    },
-    {
-      title: "Expansion commitments",
-      action: "Keep expansion initiatives milestone-gated and reversible.",
-      pauseIf: `Pause expansion if risk appetite falls below ${riskThreshold.toFixed(1)}.`,
-      resumeWhen: `Resume when risk appetite recovers above ${Math.max(riskThreshold + 3, 0).toFixed(1)} and milestones are met.`,
-    },
-  ];
+  ].slice(-4);
 };
 
 export const buildHomeBriefModel = (data: HomeReportData) => {
-  const { assessment, regimeAlert, stopItems, reportDynamics } = data;
+  const { assessment, regimeAlert, stopItems, reportDynamics, recordDateLabel } = data;
   const previousRegime = regimeAlert?.previousRegime;
   const severityDelta = previousRegime
     ? regimeSeverityRank[assessment.regime] - regimeSeverityRank[previousRegime]
@@ -228,12 +191,6 @@ export const buildHomeBriefModel = (data: HomeReportData) => {
         ? `${regimeLabelMap[assessment.regime]} with selective release: improving momentum supports faster execution while guardrails remain active.`
         : `${regimeLabelMap[assessment.regime]} with caution: keep execution balanced because threshold proximity and mixed signals still constrain irreversible bets.`;
 
-  const decisionShiftSummary = buildDecisionShiftSummary({
-    severityDelta,
-    directionLabel: reportDynamics?.directionLabel,
-    changeCount: reportDynamics?.changedSignals.length ?? 0,
-  });
-
   return {
     confidenceLabel,
     constraints,
@@ -242,16 +199,20 @@ export const buildHomeBriefModel = (data: HomeReportData) => {
       nearestThresholdGap,
       weakSignalCount,
     }),
-    decisionShiftSummary,
+    decisionShiftSummary: buildDecisionShiftSummary({
+      severityDelta,
+      directionLabel: reportDynamics?.directionLabel,
+      changeCount: reportDynamics?.changedSignals.length ?? 0,
+    }),
+    decisionRules: buildCanonicalBoundedDecisionRules({
+      regime: assessment.regime,
+      thresholds: assessment.thresholds,
+      scores: assessment.scores,
+    }),
+    revisitDecisions: (reportDynamics?.changedSignals.length ?? 0) > 0 && reportDynamics?.directionLabel !== "stable",
     guardrail,
     leadershipImplications: buildLeadershipImplications(assessment.regime),
-    boundedDecisions: buildBoundedDecisions({
-      regime: assessment.regime,
-      riskScore: assessment.scores.riskAppetite,
-      riskThreshold,
-      tightnessScore: assessment.scores.tightness,
-      tightnessThreshold,
-    }),
+    memoryRail: buildMemoryRail(recordDateLabel, assessment.regime),
     netConstraintSummary,
     postureDeltaLabel,
     reversalTrigger,

@@ -203,3 +203,9 @@ Track adoption signals tied to ritualization:
 - Teaching macro frameworks on this surface.
 - Replicating deep evidence/method pages in-line.
 - Adding new upstream datasets before improving compression and legibility.
+
+## Contract note: `/` ↔ canonical rules ↔ `/answers`
+
+Homepage weekly brief and answer pages now share one canonical bounded-rule policy model (`lib/report/boundedDecisionRules.ts`). `buildHomeBriefModel` exposes `decisionRules` and `revisitDecisions`; `/` renders the weekly artifact view, and `/answers/[slug]` maps relevant decision areas into direct-answer pages with shared pause/resume triggers and citation continuity.
+
+- Canonical bounded rules now include threshold-aware pause/resume triggers (risk appetite + tightness) and power both homepage cards and /answers page recommendations.
