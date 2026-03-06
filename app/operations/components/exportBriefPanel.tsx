@@ -9,7 +9,7 @@ import { Button } from "@base-ui/react/button";
 import { Toast } from "@base-ui/react/toast";
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../../../lib/types";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
-import { formatNumberValue } from "../../../lib/formatters";
+import { formatNumberWithUnit } from "../../../lib/formatters";
 import { buildAgentPayloadJson, buildAgentPrompt } from "../../../lib/agentHandoff";
 import { buildComplianceStamp } from "../../../lib/exportNotices";
 import { formatRegimeLabel } from "../../../lib/regimeFormat";
@@ -21,11 +21,6 @@ import {
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 import { useClipboardCopy, type ClipboardCopyState } from "../../components/useClipboardCopy";
 import { SectionPanelHeader } from "../../components/sectionPanelHeader";
-
-const formatNumber = (value: number | null, unit: string) => {
-  const formatted = formatNumberValue(value);
-  return formatted === "—" ? formatted : `${formatted}${unit}`;
-};
 
 const buildExportStamp = (
   treasury: TreasuryData,
@@ -47,7 +42,7 @@ const buildJiraMarkdownBrief = (
   const curveSlope = sensors.find((sensor) => sensor.id === "CURVE_SLOPE");
   const regimeLabel = formatRegimeLabel(assessment.regime);
   const macroLines = macros.map(
-    (macro) => `- ${macro.label}: ${formatNumber(macro.value, macro.unit)}`
+    (macro) => `- ${macro.label}: ${formatNumberWithUnit(macro.value, macro.unit)}`
   );
   const constraintLines = assessment.constraints.map((item) => `- ${item}`);
 
@@ -55,8 +50,8 @@ const buildJiraMarkdownBrief = (
     `## Whether Report — ${treasury.record_date}`,
     `**Regime:** ${regimeLabel} (${assessment.regime})`,
     `**Tightness:** ${assessment.scores.tightness} / **Risk appetite:** ${assessment.scores.riskAppetite}`,
-    `**Base rate:** ${formatNumber(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
-    `**Curve slope:** ${formatNumber(curveSlope?.value ?? null, "%")}`,
+    `**Base rate:** ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
+    `**Curve slope:** ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,
     "",
     "### Macro signals",
     ...macroLines,
@@ -80,7 +75,7 @@ const buildConfluenceWikiBrief = (
   const curveSlope = sensors.find((sensor) => sensor.id === "CURVE_SLOPE");
   const regimeLabel = formatRegimeLabel(assessment.regime);
   const macroLines = macros.map(
-    (macro) => `* ${macro.label}: ${formatNumber(macro.value, macro.unit)}`
+    (macro) => `* ${macro.label}: ${formatNumberWithUnit(macro.value, macro.unit)}`
   );
   const constraintLines = assessment.constraints.map((item) => `* ${item}`);
 
@@ -88,8 +83,8 @@ const buildConfluenceWikiBrief = (
     `h2. Whether Report — ${treasury.record_date}`,
     `*Regime:* ${regimeLabel} (${assessment.regime})`,
     `*Tightness:* ${assessment.scores.tightness} / *Risk appetite:* ${assessment.scores.riskAppetite}`,
-    `*Base rate:* ${formatNumber(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
-    `*Curve slope:* ${formatNumber(curveSlope?.value ?? null, "%")}`,
+    `*Base rate:* ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
+    `*Curve slope:* ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,
     "",
     "h3. Macro signals",
     ...macroLines,
@@ -113,7 +108,7 @@ const buildLinearMarkdownBrief = (
   const curveSlope = sensors.find((sensor) => sensor.id === "CURVE_SLOPE");
   const regimeLabel = formatRegimeLabel(assessment.regime);
   const macroLines = macros.map(
-    (macro) => `- ${macro.label}: ${formatNumber(macro.value, macro.unit)}`
+    (macro) => `- ${macro.label}: ${formatNumberWithUnit(macro.value, macro.unit)}`
   );
   const constraintLines = assessment.constraints.map((item) => `- ${item}`);
 
@@ -121,8 +116,8 @@ const buildLinearMarkdownBrief = (
     `## Whether Report — ${treasury.record_date}`,
     `**Regime:** ${regimeLabel} (${assessment.regime})`,
     `**Tightness:** ${assessment.scores.tightness} / **Risk appetite:** ${assessment.scores.riskAppetite}`,
-    `**Base rate:** ${formatNumber(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
-    `**Curve slope:** ${formatNumber(curveSlope?.value ?? null, "%")}`,
+    `**Base rate:** ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
+    `**Curve slope:** ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,
     "",
     "### Macro signals",
     ...macroLines,
@@ -144,7 +139,7 @@ const buildSlideBullets = (
   return [
     `Capital posture: ${assessment.regime}`,
     `Tightness ${assessment.scores.tightness} / Risk ${assessment.scores.riskAppetite}`,
-    ...macros.map((macro) => `${macro.label}: ${formatNumber(macro.value, macro.unit)}`),
+    ...macros.map((macro) => `${macro.label}: ${formatNumberWithUnit(macro.value, macro.unit)}`),
     ...assessment.constraints.map((item) => `Guardrail: ${item}`),
     "",
     ...buildExportStamp(treasury, "Score-based posture confidence"),

@@ -22,6 +22,12 @@ const MS_PER_SECOND = 1000;
 const MS_PER_MINUTE = 60 * MS_PER_SECOND;
 const MS_PER_HOUR = 60 * MS_PER_MINUTE;
 
+const formatUnitSuffix = (unit: string) => {
+  if (unit === "bps") return " bps";
+  if (unit === "index") return "";
+  return unit;
+};
+
 const parseDateValue = (value: string) => {
   const date = new Date(value);
   return Number.isNaN(date.valueOf()) ? null : date;
@@ -66,3 +72,9 @@ export const formatNumberValue = (value: number | null) => {
 };
 
 export const formatScoreValue = (value: number) => value.toFixed(0);
+
+
+export const formatNumberWithUnit = (value: number | null, unit: string) => {
+  const formatted = formatNumberValue(value);
+  return formatted === "—" ? formatted : `${formatted}${formatUnitSuffix(unit)}`;
+};
