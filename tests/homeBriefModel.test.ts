@@ -15,6 +15,8 @@ describe("buildHomeBriefModel", () => {
     assert.equal(model.decisionRules.length, 5);
     assert.equal(typeof model.revisitDecisions, "boolean");
     assert.ok(model.memoryRail.length > 0);
+    assert.equal(model.whyThisCall.length, 3);
+    assert.match(model.whyThisCall[0].detail, /threshold|range|outside/i);
     assert.match(model.decisionRules[0].pauseTrigger, /\d/);
   });
 
@@ -39,6 +41,8 @@ describe("buildHomeBriefModel", () => {
     assert.equal(model.decisionRules.length, 5);
     assert.equal(typeof model.revisitDecisions, "boolean");
     assert.ok(model.memoryRail.length > 0);
+    assert.equal(model.whyThisCall.length, 3);
+    assert.match(model.whyThisCall[0].detail, /threshold|range|outside/i);
     assert.match(model.decisionRules[0].pauseTrigger, /\d/);
   });
 });

@@ -9,6 +9,11 @@ type MemoryRailItem = {
   posture: string;
 };
 
+type WhyThisCallItem = {
+  label: string;
+  detail: string;
+};
+
 type WeeklyDecisionCardProps = {
   statusLabel: string;
   postureDelta: string;
@@ -24,6 +29,7 @@ type WeeklyDecisionCardProps = {
   decisionRules: BoundedDecisionRule[];
   revisitDecisions: boolean;
   memoryRail: MemoryRailItem[];
+  whyThisCall: WhyThisCallItem[];
   citation: string;
   actions?: ReactNode;
 };
@@ -65,6 +71,7 @@ export function WeeklyDecisionCard({
   decisionRules,
   revisitDecisions,
   memoryRail,
+  whyThisCall,
   citation,
   actions,
 }: WeeklyDecisionCardProps) {
@@ -181,6 +188,19 @@ export function WeeklyDecisionCard({
             </tbody>
           </table>
         </div>
+      </article>
+
+
+      <article className={`${supportingPanel} ${sectionSpacing}`}>
+        <h2 className={secondaryHeading}>Why this posture call</h2>
+        <ul className="mt-2 grid gap-2 sm:grid-cols-3">
+          {whyThisCall.map((reason) => (
+            <li key={reason.label} className="rounded-md border border-slate-700/60 bg-slate-950/60 px-3 py-3 text-xs text-slate-200">
+              <p className="font-semibold uppercase tracking-[0.12em] text-sky-200">{reason.label}</p>
+              <p className="mt-1 text-slate-300">{reason.detail}</p>
+            </li>
+          ))}
+        </ul>
       </article>
 
       <article className={`${supportingPanel} ${sectionSpacing}`}>
