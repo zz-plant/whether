@@ -40,7 +40,8 @@ export const buildBoundedDecisionRules = ({ assessment, decisionKnobs, direction
   const paybackKnob = getKnob(decisionKnobs, "payback");
   const experimentKnob = getKnob(decisionKnobs, "experimentTolerance");
 
-  const paybackMonths = paybackKnob?.value === 0 ? 18 : paybackKnob?.value === 1 ? 14 : paybackKnob?.value === 2 ? 10 : 8;
+  const paybackMap = [18, 14, 10, 8];
+  const paybackMonths = paybackMap[paybackKnob?.value ?? 3];
   const improvementBias = directionLabel === "improving" ? "Momentum is improving, but keep triggers active." : "Signals remain mixed enough to require explicit stop/resume conditions.";
 
   const tighterHiringThreshold = Math.min(95, Math.round(tightnessRegime + 6));
