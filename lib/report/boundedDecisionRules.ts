@@ -39,7 +39,7 @@ const fmt = (value: number) => value.toFixed(0);
 
 export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores }: RuleContext): BoundedDecisionRule[] => {
   const isExpansion = regime === "EXPANSION";
-  const tightnessPause = Math.max(thresholds.tightnessRegime + 6, thresholds.tightnessRegime);
+  const tightnessPause = thresholds.tightnessRegime + 6;
   const tightnessResume = Math.max(thresholds.tightnessRegime - 4, 0);
   const riskPause = Math.max(thresholds.riskAppetiteRegime - 6, 0);
   const riskResume = Math.min(thresholds.riskAppetiteRegime + 4, 100);
