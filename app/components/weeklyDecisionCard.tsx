@@ -1,9 +1,8 @@
 import type { ReactNode } from "react";
 import type { DecisionKnob } from "../../lib/report/decisionKnobs";
+import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
 import { isImprovingSignalDelta } from "../../lib/report/reportData";
 import type { ReportDynamics } from "../../lib/report/reportData";
-import type { BoundedDecision } from "../../lib/report/homeBriefModel";
-import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
 
 type Regime = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
 
@@ -21,7 +20,6 @@ type WeeklyDecisionCardProps = {
   reportDynamics: ReportDynamics;
   decisionKnobs: DecisionKnob[];
   decisionShiftSummary: string;
-  boundedDecisions: BoundedDecision[];
   decisionRules: BoundedDecisionRule[];
   revisitDecisions: boolean;
   memoryRail: string[];
@@ -36,6 +34,14 @@ const regimeEnvironmentByRegime: Record<Regime, string> = {
   EXPANSION: "window open with guardrails",
 };
 
+const decisionAreaLabels: Record<BoundedDecisionRule["area"], string> = {
+  hiring: "Hiring",
+  "product-tempo": "Product tempo",
+  "capital-raising": "Capital raising",
+  "burn-discipline": "Burn discipline",
+  "expansion-bets": "Expansion bets",
+};
+
 const deltaSignalOrder: Array<{
   key: ReportDynamics["changedSignals"][number]["key"];
   label: string;
@@ -45,6 +51,15 @@ const deltaSignalOrder: Array<{
   { key: "baseRate", label: "Base rate" },
   { key: "curveSlope", label: "Curve slope" },
 ];
+
+const summarizeDelta = (key: ReportDynamics["changedSignals"][number]["key"], delta: number) => {
+  if (delta === 0) {
+    return "unchanged";
+  }
+
+  const improving = isImprovingSignalDelta(key, delta);
+  return improving ? "easing" : "tightening";
+};
 
 export function WeeklyDecisionCard({
   regime,
@@ -60,7 +75,6 @@ export function WeeklyDecisionCard({
   reportDynamics,
   decisionKnobs,
   decisionShiftSummary,
-  boundedDecisions,
   decisionRules,
   revisitDecisions,
   memoryRail,
@@ -68,6 +82,7 @@ export function WeeklyDecisionCard({
   actions,
 }: WeeklyDecisionCardProps) {
   const deltasByKey = new Map(reportDynamics.changedSignals.map((item) => [item.key, item.delta]));
+  const visibleRules = decisionRules.slice(0, 4);
 
   return (
     <section className="weather-panel space-y-5 px-5 py-6 sm:px-7 sm:py-7" aria-labelledby="weekly-posture-brief-title">
@@ -80,7 +95,7 @@ export function WeeklyDecisionCard({
       </header>
 
       <article className="rounded-xl border border-sky-500/40 bg-slate-900/60 p-4">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-sky-100">Decision delta</h2>
+        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-sky-100">What changed this week</h2>
         <p className="mt-2 text-sm font-semibold text-slate-50">{decisionShiftSummary}</p>
         {reportDynamics.changedSignals.length === 0 ? (
           <p className="mt-2 text-sm text-slate-300">No macro change this week. Continue last week’s posture.</p>
@@ -93,10 +108,12 @@ export function WeeklyDecisionCard({
                 const delta = deltasByKey.get(signal.key) ?? 0;
                 const improving = delta !== 0 && isImprovingSignalDelta(signal.key, delta);
                 const icon = delta === 0 ? "→" : improving ? "↑" : "↓";
+
                 return (
                   <li key={signal.key} className="rounded-lg border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-sm text-slate-200">
                     <p className="text-xs uppercase tracking-[0.12em] text-slate-400">{signal.label}</p>
                     <p className="mt-1 font-semibold text-slate-100">{icon} {Math.abs(delta).toFixed(2)}</p>
+                    <p className="text-xs text-slate-400">{summarizeDelta(signal.key, delta)}</p>
                   </li>
                 );
               })}
@@ -105,35 +122,36 @@ export function WeeklyDecisionCard({
       </article>
 
       <article className="rounded-xl border border-slate-700/70 bg-slate-900/60 p-4">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-200">Revisit decisions?</h2>
+        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-200">Revisit last week&apos;s decisions?</h2>
         <p className={`mt-2 text-xl font-semibold ${revisitDecisions ? "text-amber-200" : "text-emerald-200"}`}>
-          {revisitDecisions ? "YES" : "NO"}
+          {revisitDecisions ? "YES — Update hiring/roadmap calls." : "NO — Hold current posture."}
         </p>
         <p className="mt-1 text-sm text-slate-300">{netConstraintSummary}</p>
       </article>
 
       <article className="rounded-xl border border-slate-700/70 bg-slate-900/60 p-4">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-200">Bounded rules</h2>
+        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-200">Bounded decision rules</h2>
         <ul className="mt-3 grid gap-3 md:grid-cols-2">
-          {boundedDecisions.map((decision) => (
-            <li key={decision.title} className="rounded-lg border border-violet-500/30 bg-slate-950/60 p-3 text-sm text-slate-100">
-              <p className="font-semibold text-violet-100">{decision.title}</p>
-              <p className="mt-1">{decision.action}</p>
-              <p className="mt-1 text-amber-100">Stop: {decision.pauseIf}</p>
-              <p className="mt-1 text-emerald-100">Resume: {decision.resumeWhen}</p>
+          {visibleRules.map((rule) => (
+            <li key={rule.area} className="rounded-lg border border-violet-500/30 bg-slate-950/60 p-3 text-sm text-slate-100">
+              <p className="text-xs uppercase tracking-[0.12em] text-violet-200">{decisionAreaLabels[rule.area]}</p>
+              <p className="mt-1 font-semibold text-violet-100">{rule.title}</p>
+              <p className="mt-1">{rule.recommendation}</p>
+              <p className="mt-1 text-amber-100">Pause trigger: {rule.pauseTrigger}</p>
+              <p className="mt-1 text-emerald-100">Resume trigger: {rule.resumeTrigger}</p>
             </li>
           ))}
         </ul>
       </article>
 
       <article className="rounded-xl border border-slate-700/70 bg-slate-900/60 p-4">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-200">What changes if wrong?</h2>
+        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-200">What changes if we&apos;re wrong?</h2>
         <p className="mt-2 text-sm text-slate-100">{guardrail}</p>
         <p className="mt-2 text-sm text-slate-100">{reversalTrigger}</p>
       </article>
 
       <article className="rounded-xl border border-slate-700/70 bg-slate-900/50 p-4">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-200">Memory rail (last 4 weeks)</h2>
+        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-200">Last 4 weeks</h2>
         <div className="mt-2 flex flex-wrap gap-2">
           {memoryRail.map((entry) => (
             <span key={entry} className="weather-pill inline-flex min-h-[36px] items-center px-3 py-1 text-xs text-slate-200">{entry}</span>
@@ -148,26 +166,11 @@ export function WeeklyDecisionCard({
       </article>
 
       <article className="rounded-xl border border-slate-700/70 bg-slate-900/50 p-4">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-200">Artifact actions</h2>
+        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-200">Share artifact</h2>
         <div className="mt-3">{actions}</div>
       </article>
 
-      <details className="rounded-xl border border-slate-700/70 bg-slate-900/40 p-4">
-        <summary className="cursor-pointer text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Canonical rule model</summary>
-        <ul className="mt-3 space-y-2 text-xs text-slate-300">
-          {decisionRules.map((rule) => (
-            <li key={rule.area} className="rounded border border-slate-700/70 bg-slate-950/60 p-3">
-              <p className="font-semibold text-slate-100">{rule.area}</p>
-              <p>{rule.recommendation}</p>
-              <p>Scope: {rule.scope}</p>
-              <p>Stop: {rule.pauseTrigger}</p>
-              <p>Resume: {rule.resumeTrigger}</p>
-            </li>
-          ))}
-        </ul>
-      </details>
-
-      <div className="hidden">{decisionKnobs.length}</div>
+      <div className="hidden" aria-hidden="true">{decisionKnobs.length}</div>
     </section>
   );
 }

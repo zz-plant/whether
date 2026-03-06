@@ -344,7 +344,6 @@ export default async function HomePage({
         reportDynamics={reportDynamics}
         decisionKnobs={homeBriefModel.decisionKnobs}
         decisionShiftSummary={homeBriefModel.decisionShiftSummary}
-        boundedDecisions={homeBriefModel.boundedDecisions}
         decisionRules={homeBriefModel.decisionRules}
         revisitDecisions={homeBriefModel.revisitDecisions}
         memoryRail={memoryRail}
