@@ -561,6 +561,19 @@ html {
   }
 }
 
+
+.weather-button:focus-visible,
+.weather-button-primary:focus-visible,
+.weather-pill:focus-visible,
+.weather-tab:focus-visible {
+  outline: 3px solid rgba(165, 243, 252, 0.98);
+  outline-offset: 3px;
+  box-shadow:
+    0 0 0 6px rgba(8, 145, 178, 0.42),
+    inset 0 0 0 1px rgba(15, 23, 42, 0.5),
+    0 14px 26px -18px rgba(2, 6, 23, 0.85);
+}
+
 button:focus-visible,
 a:focus-visible,
 select:focus-visible,
