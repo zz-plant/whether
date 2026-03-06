@@ -139,6 +139,19 @@ Top-to-bottom order is fixed. The first four blocks must fit above the fold on d
 
 ---
 
+
+### Current implementation contract (`/`, `WeeklyDecisionCard`)
+Canonical top-fold order on homepage must remain:
+1. **Posture** (`This week's posture` header + status label + net constraint summary)
+2. **Decision delta** (`Decision delta this week`)
+3. **Revisit verdict** (`Revisit implications`, explicit revise/hold verdict)
+4. **Decision rules summary** (`Decision rules summary`, max 4 bounded-rule cards with Action/Pause/Resume)
+
+Implementation guardrails:
+- Top fold uses responsive grid composition at `lg` breakpoints to preserve scan hierarchy around common screenshot widths (~1200px desktop browser).
+- Citation + provenance belong near the lower fold: `Cite this call` retains actionable copy/export controls via the existing `actions` slot, and compact provenance remains immediately after the weekly card on `/`.
+- Rendering tests should verify hierarchy order and responsive class hooks (`data-testid="weekly-top-fold"`, `lg:grid-cols-12`, `lg:grid-cols-4`) to prevent drift.
+
 ## Slack screenshot card contract
 This card is the dissemination mechanism and must stand alone when pasted into Slack.
 

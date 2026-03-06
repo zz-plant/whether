@@ -69,39 +69,55 @@ export function WeeklyDecisionCard({
 }: WeeklyDecisionCardProps) {
   return (
     <section className="weather-panel space-y-5 px-5 py-6 sm:space-y-6 sm:px-7 sm:py-8" aria-labelledby="weekly-posture-brief-title">
-      <header className="space-y-2 border-b border-slate-600/70 pb-4 sm:pb-5">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-200">This week&apos;s posture</p>
-        <h1 id="weekly-posture-brief-title" className="text-3xl font-semibold text-slate-50 sm:text-4xl">{statusLabel}</h1>
-        <p className="text-sm text-slate-300">{netConstraintSummary}</p>
-      </header>
+      <div className="space-y-3 lg:grid lg:grid-cols-12 lg:gap-4 lg:space-y-0" data-testid="weekly-top-fold">
+        <header className="space-y-2 border-b border-slate-600/70 pb-4 sm:pb-5 lg:col-span-12">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-200">This week&apos;s posture</p>
+          <h1 id="weekly-posture-brief-title" className="text-3xl font-semibold text-slate-50 sm:text-4xl">{statusLabel}</h1>
+          <p className="text-sm text-slate-300">{netConstraintSummary}</p>
+        </header>
 
-      <article className={`${primaryPanel} ${sectionSpacing}`}>
-        <h2 className={primaryHeading}>Decision delta this week</h2>
-        <p className="text-sm text-sky-100">{decisionShiftSummary}</p>
-        {reportDynamics.changedSignals.length === 0 ? (
-          <p className="rounded-md border border-slate-700/80 bg-slate-950/60 px-3 py-2 text-xs text-slate-300">No material signal deltas this week.</p>
-        ) : (
-          <div className="flex flex-wrap gap-2">
-            {reportDynamics.changedSignals.slice(0, 3).map((signal) => {
-              const deltaDirection = directionHint(signal.delta);
-              return (
-                <span
-                  key={signal.key}
-                  className={`inline-flex items-center rounded-full border px-3 py-1 text-xs ${signalDeltaTone[deltaDirection]}`}
-                >
-                  {deltaLabel[signal.key]}: {signal.delta > 0 ? "↑" : signal.delta < 0 ? "↓" : "→"} {deltaDirection}
-                </span>
-              );
-            })}
-          </div>
-        )}
-      </article>
+        <article className={`${primaryPanel} ${sectionSpacing} lg:col-span-6`}>
+          <h2 className={primaryHeading}>Decision delta this week</h2>
+          <p className="text-sm text-sky-100">{decisionShiftSummary}</p>
+          {reportDynamics.changedSignals.length === 0 ? (
+            <p className="rounded-md border border-slate-700/80 bg-slate-950/60 px-3 py-2 text-xs text-slate-300">No material signal deltas this week.</p>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {reportDynamics.changedSignals.slice(0, 3).map((signal) => {
+                const deltaDirection = directionHint(signal.delta);
+                return (
+                  <span
+                    key={signal.key}
+                    className={`inline-flex items-center rounded-full border px-3 py-1 text-xs ${signalDeltaTone[deltaDirection]}`}
+                  >
+                    {deltaLabel[signal.key]}: {signal.delta > 0 ? "↑" : signal.delta < 0 ? "↓" : "→"} {deltaDirection}
+                  </span>
+                );
+              })}
+            </div>
+          )}
+        </article>
 
-      <article className={`${primaryPanel} ${sectionSpacing}`}>
-        <h2 className={primaryHeading}>Revisit implications</h2>
-        <p className="mt-2 text-sm font-semibold text-slate-100">{revisitDecisions ? "Revise hiring and roadmap calls now." : "Keep last week&apos;s calls in place."}</p>
-        <p className="mt-1 text-xs text-slate-300">Delta {postureDelta} · Confidence {confidenceLabel} · Shift watch {transitionWatch}</p>
-      </article>
+        <article className={`${primaryPanel} ${sectionSpacing} lg:col-span-6`}>
+          <h2 className={primaryHeading}>Revisit implications</h2>
+          <p className="mt-2 text-sm font-semibold text-slate-100">{revisitDecisions ? "Revise hiring and roadmap calls now." : "Keep last week&apos;s calls in place."}</p>
+          <p className="mt-1 text-xs text-slate-300">Delta {postureDelta} · Confidence {confidenceLabel} · Shift watch {transitionWatch}</p>
+        </article>
+
+        <article className={`${secondaryPanel} ${sectionSpacing} lg:col-span-12`}>
+          <h2 className={primaryHeading}>Decision rules summary</h2>
+          <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {decisionRules.slice(0, 4).map((rule) => (
+              <li key={rule.area} className="rounded-lg border border-slate-700/60 bg-slate-950/60 p-3 text-sm text-slate-200">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">{decisionAreaLabel(rule.area)}</p>
+                <p className="mt-1 text-xs text-slate-300"><span className="font-semibold text-slate-100">Action:</span> {rule.recommendation}</p>
+                <p className="mt-1 text-xs text-semantic-caution-fg"><span className="font-semibold text-slate-100">Pause:</span> {rule.pauseTrigger}</p>
+                <p className="mt-1 text-xs text-semantic-reversal-fg"><span className="font-semibold text-slate-100">Resume:</span> {rule.resumeTrigger}</p>
+              </li>
+            ))}
+          </ul>
+        </article>
+      </div>
 
       <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
         <article className={`${primaryPanel} ${sectionSpacing} border-amber-500/50`}>
