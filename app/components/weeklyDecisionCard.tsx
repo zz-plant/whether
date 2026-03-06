@@ -81,8 +81,8 @@ export function WeeklyDecisionCard({
     freshnessLabel,
   });
   const meetingShorthand = revisitDecisions
-    ? "Weekly call: revise hiring and roadmap decisions this week."
-    : "Weekly call: hold last week’s hiring and roadmap decisions.";
+    ? "Do now: revise hiring and roadmap decisions this week. Flip: return to hold mode if next read is stable."
+    : "Do now: hold hiring and roadmap decisions from last week. Flip: revise if next read shows material deterioration.";
   const topDecisionRules = decisionRules.slice(0, 4);
 
   return (
@@ -124,20 +124,20 @@ export function WeeklyDecisionCard({
         </article>
 
         <article className={`${primaryPanel} ${sectionSpacing} lg:col-span-6`}>
-          <h2 className={primaryHeading}>Revisit implications</h2>
+          <h2 className={primaryHeading}>What to do now</h2>
           <p className="mt-2 text-sm font-semibold text-slate-100">{revisitDecisions ? "Revise hiring and roadmap calls now." : "Keep last week&apos;s calls in place."}</p>
-          <p className="mt-1 text-xs text-slate-300">Delta {postureDelta}</p>
+          <p className="mt-1 text-xs text-slate-300">What changed: {postureDelta}</p>
         </article>
 
         <article className={`${secondaryPanel} ${sectionSpacing} lg:col-span-12`}>
-          <h2 className={primaryHeading}>Decision rules summary</h2>
+          <h2 className={primaryHeading}>Bounded rules (do now / stop / restart)</h2>
           <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {topDecisionRules.map((rule) => (
               <li key={rule.area} className="rounded-lg border border-slate-700/60 bg-slate-950/60 p-3 text-sm text-slate-200">
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">{decisionAreaLabel(rule.area)}</p>
                 <p className="mt-1 text-xs text-slate-300"><span className="font-semibold text-slate-100">Action:</span> {rule.recommendation}</p>
-                <p className="mt-1 text-xs text-semantic-caution-fg"><span className="font-semibold text-slate-100">Pause:</span> {rule.pauseTrigger}</p>
-                <p className="mt-1 text-xs text-semantic-reversal-fg"><span className="font-semibold text-slate-100">Resume:</span> {rule.resumeTrigger}</p>
+                <p className="mt-1 text-xs text-semantic-caution-fg"><span className="font-semibold text-slate-100">Stop if:</span> {rule.pauseTrigger}</p>
+                <p className="mt-1 text-xs text-semantic-reversal-fg"><span className="font-semibold text-slate-100">Restart when:</span> {rule.resumeTrigger}</p>
               </li>
             ))}
           </ul>
@@ -150,7 +150,7 @@ export function WeeklyDecisionCard({
           <p className="text-sm text-slate-100">{guardrail}</p>
         </article>
         <article className={`${primaryPanel} ${sectionSpacing} border-sky-500/50`}>
-          <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-sky-200">What changes if we’re wrong?</h2>
+          <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-sky-200">Flip trigger</h2>
           <p className="text-sm text-slate-100">{reversalTrigger}</p>
         </article>
       </div>
@@ -164,8 +164,8 @@ export function WeeklyDecisionCard({
                 <th scope="col" className="px-2 py-1 text-left font-semibold uppercase tracking-[0.12em] text-slate-300">Area</th>
                 <th scope="col" className="px-2 py-1 text-left font-semibold uppercase tracking-[0.12em] text-slate-300">Action</th>
                 <th scope="col" className="px-2 py-1 text-left font-semibold uppercase tracking-[0.12em] text-slate-300">Scope</th>
-                <th scope="col" className="px-2 py-1 text-left font-semibold uppercase tracking-[0.12em] text-semantic-caution-fg">Pause</th>
-                <th scope="col" className="px-2 py-1 text-left font-semibold uppercase tracking-[0.12em] text-semantic-reversal-fg">Resume</th>
+                <th scope="col" className="px-2 py-1 text-left font-semibold uppercase tracking-[0.12em] text-semantic-caution-fg">Stop if</th>
+                <th scope="col" className="px-2 py-1 text-left font-semibold uppercase tracking-[0.12em] text-semantic-reversal-fg">Restart when</th>
               </tr>
             </thead>
             <tbody>

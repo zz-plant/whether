@@ -33,7 +33,9 @@ describe("buildHomeBriefModel", () => {
       },
     });
 
-    assert.match(model.decisionShiftSummary, /Decision delta: no material shift/);
+    assert.match(model.decisionShiftSummary, /Changed: no material signal shift\./);
+    assert.match(model.decisionShiftSummary, /Do now:/);
+    assert.match(model.decisionShiftSummary, /Flip:/);
     assert.equal(model.decisionRules.length, 5);
     assert.equal(typeof model.revisitDecisions, "boolean");
     assert.ok(model.memoryRail.length > 0);

@@ -78,18 +78,21 @@ describe("WeeklyDecisionCard top-fold composition", () => {
 
     const postureIndex = html.indexOf("This week&#x27;s posture");
     const deltaIndex = html.indexOf("Decision delta this week");
-    const revisitIndex = html.indexOf("Revisit implications");
-    const rulesSummaryIndex = html.indexOf("Decision rules summary");
+    const revisitIndex = html.indexOf("What to do now");
+    const rulesSummaryIndex = html.indexOf("Bounded rules (do now / stop / restart)");
 
     assert.ok(postureIndex >= 0);
     assert.ok(deltaIndex > postureIndex);
     assert.ok(revisitIndex > deltaIndex);
     assert.ok(rulesSummaryIndex > revisitIndex);
-    assert.match(html, /Weekly call: revise hiring and roadmap decisions this week\./);
+    assert.match(html, /Do now: revise hiring and roadmap decisions this week\./);
     assert.match(html, /aria-label="Weekly trust signals"/);
     assert.match(html, /Confidence MED · Freshness Mar 6, 2026 09:12 UTC · Shift watch ON/);
-    assert.match(html, /Revisit implications[\s\S]*Delta \+2/);
+    assert.match(html, /What to do now[\s\S]*What changed: \+2/);
     assert.match(html, /Decision matrix this week/);
+    assert.match(html, /Bounded rules \(do now \/ stop \/ restart\)/);
+    assert.match(html, /Stop if:/);
+    assert.match(html, /Restart when:/);
     assert.match(html, /aria-label="Weekly decision matrix"/);
   });
 

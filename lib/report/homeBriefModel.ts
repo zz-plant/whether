@@ -52,21 +52,23 @@ const buildDecisionShiftSummary = ({
   severityDelta,
   directionLabel,
   changeCount,
+  reversalTrigger,
 }: {
   severityDelta: number;
   directionLabel: "improving" | "deteriorating" | "mixed" | "stable" | undefined;
   changeCount: number;
+  reversalTrigger: string;
 }) => {
   if (changeCount === 0 || directionLabel === "stable") {
-    return "Decision delta: no material shift. Keep last week’s operating calls.";
+    return `Changed: no material signal shift. Do now: keep approval pace and ship only commitments with clear payback windows. Flip: ${reversalTrigger}`;
   }
   if (severityDelta < 0 || directionLabel === "improving") {
-    return "Decision delta: speed approvals up, run more reversible tests, keep payback discipline steady.";
+    return `Changed: pressure eased versus last week. Do now: speed approvals for reversible bets and keep payback discipline explicit. Flip: ${reversalTrigger}`;
   }
   if (severityDelta > 0 || directionLabel === "deteriorating") {
-    return "Decision delta: slow approvals, narrow experiments, and tighten payback discipline.";
+    return `Changed: pressure rose versus last week. Do now: slow approvals, narrow experiments, and require tighter payback windows. Flip: ${reversalTrigger}`;
   }
-  return "Decision delta: hold approval pace, keep reversible experiments on, maintain payback discipline.";
+  return `Changed: signals moved in opposite directions. Do now: hold approval pace and keep experiments reversible with explicit stop triggers. Flip: ${reversalTrigger}`;
 };
 
 const buildMemoryRail = (recordDateLabel: string | undefined, currentRegime: Regime): MemoryRailItem[] => {
@@ -122,10 +124,10 @@ export const buildHomeBriefModel = (data: HomeReportData) => {
   const guardrail = stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
   const netConstraintSummary =
     severityDelta > 0
-      ? `${regimeLabelMap[assessment.regime]} with tighter controls: threshold proximity and weakening signals require slower approvals and stricter reversibility.`
+      ? `${regimeLabelMap[assessment.regime]}. Changed: constraints tightened. Do now: slow non-core approvals and keep irreversible spend frozen. Flip: ${reversalTrigger}`
       : severityDelta < 0
-        ? `${regimeLabelMap[assessment.regime]} with selective release: improving momentum supports faster execution while guardrails remain active.`
-        : `${regimeLabelMap[assessment.regime]} with balanced controls: keep execution measured because threshold proximity and mixed signals still constrain irreversible bets.`;
+        ? `${regimeLabelMap[assessment.regime]}. Changed: constraints eased. Do now: release selective hires and experiments that stay reversible. Flip: ${reversalTrigger}`
+        : `${regimeLabelMap[assessment.regime]}. Changed: constraints held near prior week. Do now: keep execution measured and irreversible bets capped. Flip: ${reversalTrigger}`;
 
   return {
     confidenceLabel,
@@ -133,6 +135,7 @@ export const buildHomeBriefModel = (data: HomeReportData) => {
       severityDelta,
       directionLabel: reportDynamics?.directionLabel,
       changeCount: reportDynamics?.changedSignals.length ?? 0,
+      reversalTrigger,
     }),
     decisionRules: buildCanonicalBoundedDecisionRules({
       regime: assessment.regime,
