@@ -58,15 +58,15 @@ const buildDecisionShiftSummary = ({
   changeCount: number;
 }) => {
   if (changeCount === 0 || directionLabel === "stable") {
-    return "No macro change this week. Continue last week’s posture.";
+    return "Decision delta: no material shift. Keep last week’s operating calls.";
   }
   if (severityDelta < 0 || directionLabel === "improving") {
-    return "Net decision shift: approval velocity ↑, experiment tolerance ↑, payback discipline unchanged.";
+    return "Decision delta: speed approvals up, run more reversible tests, keep payback discipline steady.";
   }
   if (severityDelta > 0 || directionLabel === "deteriorating") {
-    return "Net decision shift: approval velocity ↓, experiment tolerance ↓, payback discipline tighter.";
+    return "Decision delta: slow approvals, narrow experiments, and tighten payback discipline.";
   }
-  return "Net decision shift: hold approval velocity, keep reversible experiments active, maintain payback discipline.";
+  return "Decision delta: hold approval pace, keep reversible experiments on, maintain payback discipline.";
 };
 
 const buildMemoryRail = (recordDateLabel: string | undefined, currentRegime: Regime): MemoryRailItem[] => {
@@ -125,7 +125,7 @@ export const buildHomeBriefModel = (data: HomeReportData) => {
       ? `${regimeLabelMap[assessment.regime]} with tighter controls: threshold proximity and weakening signals require slower approvals and stricter reversibility.`
       : severityDelta < 0
         ? `${regimeLabelMap[assessment.regime]} with selective release: improving momentum supports faster execution while guardrails remain active.`
-        : `${regimeLabelMap[assessment.regime]} with caution: keep execution balanced because threshold proximity and mixed signals still constrain irreversible bets.`;
+        : `${regimeLabelMap[assessment.regime]} with balanced controls: keep execution measured because threshold proximity and mixed signals still constrain irreversible bets.`;
 
   return {
     confidenceLabel,

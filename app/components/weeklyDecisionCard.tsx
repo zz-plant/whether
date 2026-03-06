@@ -76,7 +76,7 @@ export function WeeklyDecisionCard({
       </header>
 
       <article className={`${primaryPanel} ${sectionSpacing}`}>
-        <h2 className={primaryHeading}>What changed this week</h2>
+        <h2 className={primaryHeading}>Decision delta this week</h2>
         <p className="text-sm text-sky-100">{decisionShiftSummary}</p>
         {reportDynamics.changedSignals.length === 0 ? (
           <p className="rounded-md border border-slate-700/80 bg-slate-950/60 px-3 py-2 text-xs text-slate-300">No material signal deltas this week.</p>
@@ -98,14 +98,14 @@ export function WeeklyDecisionCard({
       </article>
 
       <article className={`${primaryPanel} ${sectionSpacing}`}>
-        <h2 className={primaryHeading}>Should we revisit last week&apos;s decisions?</h2>
-        <p className="mt-2 text-sm font-semibold text-slate-100">{revisitDecisions ? "Yes — update hiring and roadmap calls." : "No — keep the current posture."}</p>
-        <p className="mt-1 text-xs text-slate-300">Posture change: {postureDelta} · Confidence: {confidenceLabel} · Shift watch: {transitionWatch}</p>
+        <h2 className={primaryHeading}>Revisit implications</h2>
+        <p className="mt-2 text-sm font-semibold text-slate-100">{revisitDecisions ? "Revise hiring and roadmap calls now." : "Keep last week&apos;s calls in place."}</p>
+        <p className="mt-1 text-xs text-slate-300">Delta {postureDelta} · Confidence {confidenceLabel} · Shift watch {transitionWatch}</p>
       </article>
 
       <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
         <article className={`${primaryPanel} ${sectionSpacing} border-amber-500/50`}>
-          <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-amber-200">Main guardrail</h2>
+          <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-amber-200">Primary guardrail</h2>
           <p className="text-sm text-slate-100">{guardrail}</p>
         </article>
         <article className={`${primaryPanel} ${sectionSpacing} border-sky-500/50`}>
@@ -115,15 +115,15 @@ export function WeeklyDecisionCard({
       </div>
 
       <article className={`${secondaryPanel} ${sectionSpacing}`}>
-        <h2 className={primaryHeading}>Decision rules for this week</h2>
+        <h2 className={primaryHeading}>Operating rules this week</h2>
         <ul className="mt-3 grid gap-3 sm:grid-cols-2">
           {decisionRules.slice(0, 4).map((rule) => (
             <li key={rule.area} className="rounded-lg border border-slate-700/60 bg-slate-950/60 p-3 text-sm text-slate-200">
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">{decisionAreaLabel(rule.area)}</p>
-              <p className="mt-1 font-semibold text-slate-100">{rule.recommendation}</p>
-              <p className="mt-2 text-xs text-slate-300">Applies to: {rule.scope}</p>
-              <p className="mt-1 text-xs text-semantic-caution-fg">Pause when: {rule.pauseTrigger}</p>
-              <p className="mt-1 text-xs text-semantic-reversal-fg">Resume when: {rule.resumeTrigger}</p>
+              <p className="mt-1 text-xs text-slate-300"><span className="font-semibold text-slate-100">Action:</span> {rule.recommendation}</p>
+              <p className="mt-1 text-xs text-slate-300"><span className="font-semibold text-slate-100">Scope:</span> {rule.scope}</p>
+              <p className="mt-1 text-xs text-semantic-caution-fg"><span className="font-semibold text-slate-100">Pause:</span> {rule.pauseTrigger}</p>
+              <p className="mt-1 text-xs text-semantic-reversal-fg"><span className="font-semibold text-slate-100">Resume:</span> {rule.resumeTrigger}</p>
             </li>
           ))}
         </ul>
