@@ -1,40 +1,53 @@
 # Integrations and operations
 
-This page explains practical integration patterns for agent workflows and signal operations.
+Practical integration patterns for agent workflows, delivery systems, and reliability gates.
 
-## Agent integrations
+## 1) Agent integration baseline
 
-Preferred pull sequence:
-1. Read `/.well-known/whether-agent.json` for endpoint and cadence discovery.
-2. Pull `/api/agent?cadence=weekly` for default near-term operating posture.
-3. Pull monthly/quarterly/yearly cadence only when planning horizon expands.
-4. Preserve `provenance`, `recordDateLabel`, and `generatedAt` in downstream outputs.
+Recommended pull sequence:
+1. Discover capabilities via `/.well-known/whether-agent.json`.
+2. Pull `/api/agent?cadence=weekly` for the default operating horizon.
+3. Pull monthly/quarterly/yearly only when planning horizon expands.
+4. Preserve `provenance`, `recordDateLabel`, and `generatedAt` in downstream artifacts.
 
-### CORS behavior
-`/api/agent` supports browser-based tool clients with permissive read-only CORS and `OPTIONS` preflight.
+### Browser clients and CORS
 
-## Signal operations integrations
+`/api/agent` supports read-only browser tool clients with permissive CORS and `OPTIONS` preflight.
+
+## 2) Alert-driven signal operations
 
 ### Alert generation flow
-- Use `POST /api/regime-alerts` with signal payloads.
-- The endpoint de-duplicates repeated no-change events via `shouldCreateSignalAlert` checks.
-- Read active stream with `GET /api/regime-alerts`.
 
-### Delivery simulation and audit flow
-- Configure destination toggles per consumer via `POST /api/alert-preferences`.
-- Request delivery runs via `POST /api/alert-deliveries`.
-- Pull historical events via `GET /api/alert-deliveries`.
+- Write signal events with `POST /api/regime-alerts`.
+- Repeated no-change events are de-duplicated via `shouldCreateSignalAlert` checks.
+- Read current stream with `GET /api/regime-alerts`.
 
-## Reliability checks
+### Delivery simulation + audit flow
 
-### Health endpoint
+- Configure destination toggles per consumer: `POST /api/alert-preferences`.
+- Trigger delivery runs: `POST /api/alert-deliveries`.
+- Inspect run history: `GET /api/alert-deliveries`.
+
+## 3) Reliability and publish gates
+
+### Health gate
+
 - `GET /api/health` emits `ok`, `degraded`, or `down`.
 - Treasury freshness drives status via `checks.treasuryData.ageHours` and `staleAfterHours`.
 
-### Summary consistency
-- Use `GET /api/cadence` to verify weekly/monthly alignment.
-- Use `GET /api/summary-delta` to explain drift when mismatches exist.
+### Consistency gate
 
-## Deployment notes
-- Current alert store is process memory (`lib/serverStore.ts`), so state resets across cold starts or new isolates.
-- If you need durable operational history, pair these APIs with a persistent datastore and idempotent write semantics.
+- `GET /api/cadence` verifies weekly/monthly alignment.
+- `GET /api/summary-delta` explains mismatches when they occur.
+
+### Suggested outbound policy
+
+Before posting to Slack/email/webhooks:
+1. Require `health.status === "ok"`.
+2. Require healthy cadence alignment/no mismatched constraints.
+3. Include `recordDateLabel`, `generatedAt`, and provenance in the outgoing payload.
+
+## 4) Deployment notes
+
+- Current alert store is process memory (`lib/serverStore.ts`), so state resets across cold starts/new isolates.
+- For durable operational history, pair these APIs with persistent storage and idempotent writes.
