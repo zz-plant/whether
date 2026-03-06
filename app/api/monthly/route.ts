@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { loadReportData } from "../../../lib/report/reportData";
+import { loadReportDataSafe } from "../../../lib/report/reportData";
 import { buildAgentPayload, buildAgentPrompt } from "../../../lib/agentHandoff";
 import { buildMonthlySummary } from "../../../lib/summary/monthlySummary";
 import { buildSummaryHash } from "../../../lib/summary/summaryHash";
@@ -8,8 +8,9 @@ export const runtime = "edge";
 export const revalidate = 3600;
 
 export async function GET() {
+  const reportResult = await loadReportDataSafe(undefined, { route: "/api/monthly" });
   const { assessment, macroSeries, sensors, treasury, treasuryProvenance, recordDateLabel } =
-    await loadReportData();
+    reportResult.ok ? reportResult.data : reportResult.fallback;
   const summary = buildMonthlySummary({
     assessment,
     provenance: treasuryProvenance,
@@ -31,5 +32,6 @@ export async function GET() {
     summaryHash: buildSummaryHash(summary),
     generatedAt: new Date().toISOString(),
     version: "v1",
+    degraded: !reportResult.ok,
   });
 }

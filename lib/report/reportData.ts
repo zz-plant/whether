@@ -25,6 +25,8 @@ import { loadMacroSeries } from "../macroSnapshot";
 import { parseThresholdsFromSearchParams } from "../thresholds";
 import { formatAgeHours, formatDateUTC, formatTimestampUTC } from "../formatters";
 import { buildRegimeAlert } from "./reportFormatting";
+import { formatRegimeLabel } from "../regimeFormat";
+import { logReportDependencyFailure } from "./reportError";
 
 export type ReportSearchParams = {
   month?: string;
@@ -74,12 +76,6 @@ export const isImprovingSignalDelta = (
   delta: number,
 ): boolean => (signalDeltaImprovesWhen[key] === "positive" ? delta > 0 : delta < 0);
 
-const regimeStatusLabelMap = {
-  SCARCITY: "Scarcity",
-  DEFENSIVE: "Defensive",
-  VOLATILE: "Neutral",
-  EXPANSION: "Expansion",
-} as const;
 
 export const buildLastYearComparison = ({
   current,
@@ -177,6 +173,15 @@ export const buildReportDynamics = ({
 
 const REPORT_DATA_REVALIDATE_SECONDS = 900;
 
+type ReportDependency = "treasury" | "macro" | "report";
+
+const toError = (value: unknown): Error => (value instanceof Error ? value : new Error(String(value)));
+
+const withDependencyContext = (dependency: ReportDependency, error: unknown): Error => {
+  const resolvedError = toError(error);
+  return new Error(`[dependency:${dependency}] ${resolvedError.message}`);
+};
+
 const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
   const liveFetcher: typeof fetch = (input, init) =>
     fetch(input, {
@@ -208,11 +213,27 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
   const thresholds = parseThresholdsFromSearchParams(searchParams);
   const regimeSeries = getTimeMachineRegimeSeries(DEFAULT_REGIME_SERIES_MONTHS, thresholds);
   const yieldCurveSeries = getTimeMachineYieldCurveSeries(240, historicalSelection?.asOf);
-  const [treasury, liveTreasury, macroSeries] = await Promise.all([
+  const [treasuryResult, liveTreasuryResult, macroResult] = await Promise.allSettled([
     treasuryPromise,
     liveTreasuryPromise ?? treasuryPromise,
     loadMacroSeries(liveFetcher),
   ]);
+
+  if (treasuryResult.status === "rejected") {
+    throw withDependencyContext("treasury", treasuryResult.reason);
+  }
+
+  if (liveTreasuryResult.status === "rejected") {
+    throw withDependencyContext("treasury", liveTreasuryResult.reason);
+  }
+
+  if (macroResult.status === "rejected") {
+    throw withDependencyContext("macro", macroResult.reason);
+  }
+
+  const treasury = treasuryResult.value;
+  const liveTreasury = liveTreasuryResult.value;
+  const macroSeries = macroResult.value;
   const recordDateLabel = formatDateUTC(treasury.record_date);
   const fetchedAtLabel = formatTimestampUTC(treasury.fetched_at);
   const treasuryAgeLabel = formatAgeHours(treasury.fetched_at, now);
@@ -268,7 +289,7 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
     ageLabel: "Static.",
     statusLabel: "Simulated (low)",
   };
-  const statusLabel = regimeStatusLabelMap[assessment.regime];
+  const statusLabel = formatRegimeLabel(assessment.regime);
   const historicalComparison =
     historicalSelection && liveAssessment
       ? {
@@ -349,7 +370,18 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
   };
 };
 
-let defaultReportDataPromise: Promise<Awaited<ReturnType<typeof loadReportDataUncached>>> | null = null;
+export type ReportData = Awaited<ReturnType<typeof loadReportDataUncached>>;
+
+export type ReportDataFallback = ReportData & {
+  stale: true;
+  lastCachedTimestamp: string;
+};
+
+export type LoadReportDataSafeResult =
+  | { ok: true; data: ReportData }
+  | { ok: false; error: Error; fallback: ReportDataFallback };
+
+let defaultReportDataPromise: Promise<ReportData> | null = null;
 
 export const loadReportData = (searchParams?: ReportSearchParams) => {
   if (searchParams) {
@@ -361,4 +393,127 @@ export const loadReportData = (searchParams?: ReportSearchParams) => {
   }
 
   return defaultReportDataPromise;
+};
+
+
+const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataFallback => {
+  const now = new Date();
+  const historicalSelection = resolveTimeMachineSelection(searchParams);
+  const requestedSelection = parseTimeMachineRequest(searchParams);
+  const latestCache = getLatestTimeMachineSnapshot();
+  const defaultMonth = latestCache?.month ?? now.getUTCMonth() + 1;
+  const defaultYear = latestCache?.year ?? now.getUTCFullYear();
+  const selectedMonth = requestedSelection?.month ?? defaultMonth;
+  const selectedYear = requestedSelection?.year ?? defaultYear;
+  const invalidHistoricalSelection = Boolean(requestedSelection && !historicalSelection);
+  const thresholds = parseThresholdsFromSearchParams(searchParams);
+  const cacheCoverage = getTimeMachineCoverage();
+  const cacheMonthsByYear = getTimeMachineMonthsByYear();
+  const regimeSeries = getTimeMachineRegimeSeries(DEFAULT_REGIME_SERIES_MONTHS, thresholds);
+  const yieldCurveSeries = getTimeMachineYieldCurveSeries(240, historicalSelection?.asOf);
+  const assessment = evaluateRegime(snapshotData, thresholds, []);
+  const liveAssessment = evaluateRegime(snapshotData, thresholds, []);
+  const sensors = buildSensorReadings(snapshotData);
+  const recordDateLabel = formatDateUTC(snapshotData.record_date);
+  const fetchedAtLabel = formatTimestampUTC(snapshotData.fetched_at);
+  const ageLabel = formatAgeHours(snapshotData.fetched_at, now);
+  const { playbook, startItems, stopItems } = getPlaybookGuidance(assessment.regime);
+
+  return {
+    assessment,
+    cacheCoverage,
+    cacheMonthsByYear,
+    fetchedAtLabel,
+    fenceItems: assessment.constraints,
+    historicalComparison: null,
+    historicalSelection,
+    internalProvenance: {
+      sourceLabel: "Whether curated playbook catalog",
+      recordDateLabel: "Static",
+      timestampLabel: "Static catalog",
+      ageLabel: "Static.",
+      statusLabel: "Simulated (low)",
+    },
+    invalidHistoricalSelection,
+    lastYearComparison: null,
+    liveAssessment,
+    liveTreasury: snapshotData,
+    macroProvenance: {
+      sourceLabel: "FRED & US Treasury",
+      sourceUrl: snapshotData.source,
+      recordDateLabel,
+      timestampLabel: fetchedAtLabel,
+      ageLabel,
+      statusLabel: "Unavailable (fallback)",
+    },
+    macroSeries: [],
+    playbook,
+    recordDateLabel,
+    reportDynamics: {
+      changedSignals: [],
+      totalSignalChanges: 0,
+      regimeChanged: false,
+      directionLabel: "stable",
+    },
+    requestedSelection,
+    regimeSeries,
+    regimeAlert: null,
+    yieldCurveSeries,
+    regimeTrend: "STABLE",
+    selectedMonth,
+    selectedYear,
+    sensors,
+    startItems,
+    statusLabel: formatRegimeLabel(assessment.regime),
+    stopItems,
+    thresholds,
+    treasury: snapshotData,
+    treasuryProvenance: {
+      sourceLabel: "Federal Reserve Economic Data (FRED)",
+      sourceUrl: snapshotData.source,
+      recordDateLabel,
+      timestampLabel: fetchedAtLabel,
+      ageLabel,
+      statusLabel: "Cached (fallback)",
+    },
+    stale: true,
+    lastCachedTimestamp: snapshotData.fetched_at,
+  };
+};
+
+export const loadReportDataSafe = async (
+  searchParams?: ReportSearchParams,
+  context?: { route?: string; requestId?: string },
+): Promise<LoadReportDataSafeResult> => {
+  try {
+    const data = await loadReportData(searchParams);
+    return { ok: true, data };
+  } catch (error) {
+    const resolvedError = toError(error);
+    const dependencyMatch = resolvedError.message.match(/\[dependency:(treasury|macro|report)\]/i);
+    const dependencyLabel = dependencyMatch?.[1]?.toLowerCase();
+    const dependency =
+      dependencyLabel === "treasury" || dependencyLabel === "macro" || dependencyLabel === "report"
+        ? dependencyLabel
+        : /macro/i.test(resolvedError.message)
+          ? "macro"
+          : /treasury|fred|fiscal/i.test(resolvedError.message)
+            ? "treasury"
+            : "report";
+    logReportDependencyFailure({
+      route: context?.route ?? "unknown",
+      requestId: context?.requestId ?? "n/a",
+      dependency,
+      status: "degraded",
+      message: resolvedError.message,
+      fallbackUsed: true,
+      timestamp: new Date().toISOString(),
+    });
+
+    return {
+      ok: false,
+      error: resolvedError,
+      fallback: buildFallbackReportData(searchParams),
+    };
+  }
 };

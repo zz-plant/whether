@@ -12,6 +12,7 @@ type WeeklyDecisionCardProps = {
   confidenceLabel: "HIGH" | "MED" | "LOW";
   transitionWatch: "ON" | "OFF";
   constraints: string[];
+  netConstraintSummary: string;
   guardrail: string;
   reversalTrigger: string;
   dangerousCategory: string;
@@ -46,7 +47,6 @@ const deltaSignalOrder: Array<{
   { key: "curveSlope", label: "Curve slope" },
 ];
 
-const dialLevelLabels = ["0 · Open", "1 · Cautious", "2 · Strict", "3 · Maximum strictness"];
 
 function getDeltaMagnitudeLabel(delta: number): string {
   const absoluteDelta = Math.abs(delta);
@@ -69,6 +69,7 @@ export function WeeklyDecisionCard({
   confidenceLabel,
   transitionWatch,
   constraints,
+  netConstraintSummary,
   guardrail,
   reversalTrigger,
   dangerousCategory,
@@ -146,13 +147,15 @@ export function WeeklyDecisionCard({
       <article className="rounded-xl border border-slate-700/70 bg-slate-900/50 p-4">
         <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-slate-100">Operating dials (0–3)</h2>
         <p className="mt-2 text-xs text-slate-300">How strict leadership decisions should be right now.</p>
+        <p className="mt-2 text-sm text-slate-200">{netConstraintSummary}</p>
         <div className="mt-3 grid gap-3 text-sm text-slate-100 sm:grid-cols-2">
           {decisionKnobs.map((knob) => {
             const deltaLabel = knob.delta === 0 ? "unchanged" : knob.delta > 0 ? "raised" : "lowered";
             return (
               <div key={knob.key} className="rounded-lg border border-slate-700/60 bg-slate-950/60 p-3">
                 <p className="text-xs uppercase tracking-[0.12em] text-slate-300">{knob.label}</p>
-                <p className="mt-1 text-sm font-semibold text-slate-100">{dialLevelLabels[knob.value]} <span className="text-slate-300">({deltaLabel})</span></p>
+                <p className="mt-1 text-sm font-semibold text-slate-100">{knob.levelLabels[knob.value]} <span className="text-slate-300">({deltaLabel})</span></p>
+                <p className="mt-1 text-xs text-slate-300">{knob.rationale}</p>
                 <div className="mt-2 flex items-center gap-1.5" aria-hidden="true">
                   {[0, 1, 2, 3].map((level) => (
                     <span

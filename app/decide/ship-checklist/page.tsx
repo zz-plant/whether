@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { loadReportData } from "../../../lib/report/reportData";
+import { loadReportDataSafe } from "../../../lib/report/reportData";
 import { buildPageMetadata } from "../../../lib/seo";
 import { scoreWhetherToShipChecklist, type ChecklistInput } from "../../../lib/whetherToShipChecklist";
 
@@ -27,7 +27,8 @@ export default async function ShipChecklistPage({
 }) {
   const resolved = (searchParams ? await searchParams : {}) ?? {};
   const input = parseInput(resolved);
-  const { assessment } = await loadReportData();
+  const reportResult = await loadReportDataSafe(undefined, { route: "/decide/ship-checklist" });
+  const { assessment } = reportResult.ok ? reportResult.data : reportResult.fallback;
   const result = scoreWhetherToShipChecklist(input, assessment);
 
   return (

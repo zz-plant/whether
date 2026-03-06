@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { evaluateRegime } from "../../lib/regimeEngine";
-import { loadReportData } from "../../lib/report/reportData";
+import { loadReportDataSafe } from "../../lib/report/reportData";
 import { buildBoldnessScore, buildWeeklyLeadershipBriefModel } from "../../lib/report/weeklyLeadershipBrief";
 import { getPreviousTimeMachineSnapshot } from "../../lib/timeMachine/timeMachineCache";
 
@@ -11,8 +11,9 @@ export const metadata: Metadata = {
 };
 
 export default async function BriefingPage() {
+  const reportResult = await loadReportDataSafe(undefined, { route: "/briefing" });
   const { assessment, recordDateLabel, treasury, treasuryProvenance, regimeSeries } =
-    await loadReportData();
+    reportResult.ok ? reportResult.data : reportResult.fallback;
   const previousSnapshot = getPreviousTimeMachineSnapshot(treasury.record_date);
   const previousAssessment = previousSnapshot ? evaluateRegime(previousSnapshot) : null;
 

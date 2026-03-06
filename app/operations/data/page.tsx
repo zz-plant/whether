@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { buildPageMetadata } from "../../../lib/seo";
 import { siteUrl } from "../../../lib/siteUrl";
-import { loadReportData } from "../../../lib/report/reportData";
+import { loadReportDataSafe } from "../../../lib/report/reportData";
 import { PlanningSnippetsPanel } from "../components/planningSnippetsPanel";
 
 export const metadata: Metadata = buildPageMetadata({
@@ -29,7 +29,8 @@ const responseExample = `{
 }`;
 
 export default async function OperationsDataPage() {
-  const { statusLabel, recordDateLabel } = await loadReportData();
+  const reportResult = await loadReportDataSafe(undefined, { route: "/operations/data" });
+  const { statusLabel, recordDateLabel } = reportResult.ok ? reportResult.data : reportResult.fallback;
 
   return (
     <main className="min-h-screen bg-slate-950 px-6 py-12 text-slate-100">

@@ -1,6 +1,6 @@
 import type { Metadata, Route } from "next";
 import Link from "next/link";
-import { loadReportData } from "../../lib/report/reportData";
+import { loadReportDataSafe } from "../../lib/report/reportData";
 import { buildPageMetadata, serializeJsonLd } from "../../lib/seo";
 import { tierOneDecisionPages, tierThreeKeywords, tierTwoKeywords } from "../answers/decisionPages";
 import { regimePages, signalTranslationPages, startupMacroPostureIndexName } from "./clusterData";
@@ -23,7 +23,8 @@ export const metadata: Metadata = buildPageMetadata({
 });
 
 export default async function StartupMacroPosturePage() {
-  const { assessment, recordDateLabel } = await loadReportData();
+  const reportResult = await loadReportDataSafe(undefined, { route: "/startup-macro-posture" });
+  const { assessment, recordDateLabel } = reportResult.ok ? reportResult.data : reportResult.fallback;
   const pageSchema = {
     "@context": "https://schema.org",
     "@type": "DefinedTerm",

@@ -12,6 +12,7 @@ import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import { formatNumberValue } from "../../../lib/formatters";
 import { buildAgentPayloadJson, buildAgentPrompt } from "../../../lib/agentHandoff";
 import { buildComplianceStamp } from "../../../lib/exportNotices";
+import { formatRegimeLabel } from "../../../lib/regimeFormat";
 import {
   buildBoardBrief,
   buildConstraintHeadlines,
@@ -36,21 +37,6 @@ const buildExportStamp = (
     confidence,
   });
 
-const getRegimeLabel = (regime: RegimeAssessment["regime"]) => {
-  switch (regime) {
-    case "SCARCITY":
-      return "Scarcity";
-    case "DEFENSIVE":
-      return "Safety Mode";
-    case "VOLATILE":
-      return "Stability Mode";
-    case "EXPANSION":
-      return "Growth Mode";
-    default:
-      return regime;
-  }
-};
-
 const buildJiraMarkdownBrief = (
   assessment: RegimeAssessment,
   treasury: TreasuryData,
@@ -59,7 +45,7 @@ const buildJiraMarkdownBrief = (
 ) => {
   const baseRate = sensors.find((sensor) => sensor.id === "BASE_RATE");
   const curveSlope = sensors.find((sensor) => sensor.id === "CURVE_SLOPE");
-  const regimeLabel = getRegimeLabel(assessment.regime);
+  const regimeLabel = formatRegimeLabel(assessment.regime);
   const macroLines = macros.map(
     (macro) => `- ${macro.label}: ${formatNumber(macro.value, macro.unit)}`
   );
@@ -92,7 +78,7 @@ const buildConfluenceWikiBrief = (
 ) => {
   const baseRate = sensors.find((sensor) => sensor.id === "BASE_RATE");
   const curveSlope = sensors.find((sensor) => sensor.id === "CURVE_SLOPE");
-  const regimeLabel = getRegimeLabel(assessment.regime);
+  const regimeLabel = formatRegimeLabel(assessment.regime);
   const macroLines = macros.map(
     (macro) => `* ${macro.label}: ${formatNumber(macro.value, macro.unit)}`
   );
@@ -125,7 +111,7 @@ const buildLinearMarkdownBrief = (
 ) => {
   const baseRate = sensors.find((sensor) => sensor.id === "BASE_RATE");
   const curveSlope = sensors.find((sensor) => sensor.id === "CURVE_SLOPE");
-  const regimeLabel = getRegimeLabel(assessment.regime);
+  const regimeLabel = formatRegimeLabel(assessment.regime);
   const macroLines = macros.map(
     (macro) => `- ${macro.label}: ${formatNumber(macro.value, macro.unit)}`
   );

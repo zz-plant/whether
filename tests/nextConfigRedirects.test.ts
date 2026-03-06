@@ -9,6 +9,25 @@ describe("next.config redirects", () => {
 
     const findRedirect = (source: string) => redirects.find((entry) => entry.source === source);
 
+
+    assert.deepEqual(findRedirect("/operate"), {
+      source: "/operate",
+      destination: "/operations",
+      permanent: true,
+    });
+
+    assert.deepEqual(findRedirect("/templates"), {
+      source: "/templates",
+      destination: "/toolkits",
+      permanent: true,
+    });
+
+    assert.deepEqual(findRedirect("/toolkit"), {
+      source: "/toolkit",
+      destination: "/toolkits",
+      permanent: true,
+    });
+
     assert.deepEqual(findRedirect("/evidence/:path*"), {
       source: "/evidence/:path*",
       destination: "/signals/:path*",

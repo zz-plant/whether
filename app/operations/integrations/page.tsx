@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { loadReportData } from "../../../lib/report/reportData";
+import { loadReportDataSafe } from "../../../lib/report/reportData";
 import { buildPageMetadata } from "../../../lib/seo";
 import { buildWeeklyMandatePayload, integrationTargets } from "../../../lib/integrationBriefs";
 
@@ -12,7 +12,8 @@ export const metadata: Metadata = buildPageMetadata({
 });
 
 export default async function OperationsIntegrationsPage() {
-  const { assessment, treasury } = await loadReportData();
+  const reportResult = await loadReportDataSafe(undefined, { route: "/operations/integrations" });
+  const { assessment, treasury } = reportResult.ok ? reportResult.data : reportResult.fallback;
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">

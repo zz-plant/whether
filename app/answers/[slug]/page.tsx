@@ -1,7 +1,7 @@
 import type { Metadata, Route } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { loadReportData } from "../../../lib/report/reportData";
+import { loadReportDataSafe } from "../../../lib/report/reportData";
 import { buildPageMetadata, serializeJsonLd } from "../../../lib/seo";
 import { buildLiveShortAnswer, isExpansionRegime } from "../liveShortAnswers";
 import { findDecisionPage, tierOneDecisionPages } from "../decisionPages";
@@ -62,7 +62,8 @@ export default async function DecisionAnswerPage({ params }: DecisionPageProps) 
     notFound();
   }
 
-  const { assessment, recordDateLabel, reportDynamics } = await loadReportData();
+  const reportResult = await loadReportDataSafe(undefined, { route: "/answers/[slug]" });
+  const { assessment, recordDateLabel, reportDynamics } = reportResult.ok ? reportResult.data : reportResult.fallback;
   const riskThreshold = assessment.thresholds.riskAppetiteRegime;
   const tightnessThreshold = assessment.thresholds.tightnessRegime;
   const isExpansion = isExpansionRegime(assessment.regime);

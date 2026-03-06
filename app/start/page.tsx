@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { buildPageMetadata } from "../../lib/seo";
 import { ReturningVisitorDeltaStrip } from "../components/changeSinceLastReadPanel";
-import { loadReportData } from "../../lib/report/reportData";
+import { loadReportDataSafe } from "../../lib/report/reportData";
 import { postureDefinitions, situationRouting, startSituations, toolkitDefinitions } from "../../lib/informationArchitecture";
 
 export const metadata: Metadata = buildPageMetadata({
@@ -14,7 +14,8 @@ export const metadata: Metadata = buildPageMetadata({
 });
 
 export default async function StartHerePage() {
-  const { assessment, treasury } = await loadReportData();
+  const reportResult = await loadReportDataSafe(undefined, { route: "/start" });
+  const { assessment, treasury } = reportResult.ok ? reportResult.data : reportResult.fallback;
 
   const onboardingSteps = [
     {

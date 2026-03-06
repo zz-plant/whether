@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { loadReportData } from "../../../lib/report/reportData";
+import { loadReportDataSafe } from "../../../lib/report/reportData";
 import { buildPageMetadata } from "../../../lib/seo";
 import { buildPersonalizedMandate, type TeamContextProfile } from "../../../lib/personalizedMandates";
 
@@ -26,7 +26,8 @@ export default async function TeamContextPage({
 }) {
   const resolved = (searchParams ? await searchParams : {}) ?? {};
   const profile = parseProfile(resolved);
-  const { assessment } = await loadReportData();
+  const reportResult = await loadReportDataSafe(undefined, { route: "/decide/team-context" });
+  const { assessment } = reportResult.ok ? reportResult.data : reportResult.fallback;
   const mandate = buildPersonalizedMandate(assessment, profile);
 
   return (

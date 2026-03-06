@@ -6,7 +6,7 @@ import {
   parseTimeMachineRequest,
   resolveTimeMachineSelection,
 } from "../lib/timeMachine/timeMachineSelection";
-import { loadReportData } from "../lib/report/reportData";
+import { loadReportDataSafe } from "../lib/report/reportData";
 import { siteUrl } from "../lib/siteUrl";
 import {
   buildBreadcrumbList,
@@ -217,6 +217,8 @@ export default async function HomePage({
     ],
   };
 
+  const reportResult = await loadReportDataSafe(resolvedSearchParams, { route: "/" });
+  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
   const {
     assessment,
     fetchedAtLabel,
@@ -232,7 +234,7 @@ export default async function HomePage({
     stopItems,
     treasury,
     treasuryProvenance,
-  } = await loadReportData(resolvedSearchParams);
+  } = reportData;
   const previousHistoricalSelection = historicalSelection
     ? getAdjacentTimeMachineRequest(historicalSelection, "previous")
     : null;
@@ -330,6 +332,7 @@ export default async function HomePage({
         confidenceLabel={homeBriefModel.confidenceLabel}
         transitionWatch={homeBriefModel.transitionWatch}
         constraints={homeBriefModel.constraints}
+        netConstraintSummary={homeBriefModel.netConstraintSummary}
         guardrail={homeBriefModel.guardrail}
         reversalTrigger={homeBriefModel.reversalTrigger}
         dangerousCategory={homeBriefModel.dangerousCategory}
@@ -339,6 +342,13 @@ export default async function HomePage({
         decisionKnobs={homeBriefModel.decisionKnobs}
         actions={<CopySlackBriefButton brief={slackBrief} />}
       />
+
+      {!reportResult.ok ? (
+        <section className="weather-panel border border-amber-500/50 bg-amber-500/10 px-5 py-4 text-sm text-amber-100" aria-live="polite">
+          <p className="font-semibold">Live data unavailable — showing cached snapshot.</p>
+          <p className="mt-1">Last cached update: {reportResult.fallback.lastCachedTimestamp}. Review <a href="/signals" className="underline">Signals</a> to retry live evidence.</p>
+        </section>
+      ) : null}
 
       <ActionStrip
         doItems={startItems.slice(0, 3)}

@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { buildSlackBrief } from "../../../../lib/export/briefBuilders";
-import { loadReportData } from "../../../../lib/report/reportData";
+import { loadReportDataSafe } from "../../../../lib/report/reportData";
 
 export const runtime = "edge";
 export const revalidate = 0;
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const { assessment, treasury, sensors, macroSeries } = await loadReportData();
+  const reportResult = await loadReportDataSafe(undefined, { route: "/api/brief/slack" });
+  const { assessment, treasury, sensors, macroSeries } = reportResult.ok ? reportResult.data : reportResult.fallback;
   const brief = buildSlackBrief(assessment, treasury, sensors, macroSeries);
 
   return NextResponse.json({
@@ -15,5 +16,6 @@ export async function GET() {
     recordDate: treasury.record_date,
     generatedAt: new Date().toISOString(),
     version: "v1",
+    degraded: !reportResult.ok,
   });
 }

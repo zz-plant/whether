@@ -114,3 +114,18 @@ When behavior or workflows change, update docs in the same PR:
 - Optimize for **clarity over cleverness**.
 - Prefer explicit assumptions and visible validation over implicit behavior.
 - Bias toward changes that are easy to reason about six months later.
+
+
+## 10) Route canonicalization checklist (required for route renames)
+
+Whenever a route is renamed or reorganized, complete all of the following in the same PR:
+
+- [ ] Add redirect(s) in `next.config.js` from legacy path(s) to canonical path(s).
+- [ ] Update first-party navigation and CTA links to canonical routes (no internal link leakage).
+- [ ] Update sitemap entries (`app/sitemap.ts`) to canonical routes only.
+- [ ] Update breadcrumb mappings (`lib/navigation/*`) for the canonical route labels.
+- [ ] Update metadata/canonical URL references for affected route files.
+- [ ] Update route smoke checks (`scripts/prod-synthetic-smoke.mjs`) for both canonical and legacy redirect expectations.
+
+Rule of thumb: redirects exist for bookmarked/external traffic only. Product-owned links must always point to canonical routes.
+

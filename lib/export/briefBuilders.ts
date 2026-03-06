@@ -2,6 +2,7 @@ import { formatNumberValue } from "../formatters";
 import type { RegimeAssessment } from "../regimeEngine";
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../types";
 import { buildComplianceStamp } from "../exportNotices";
+import { formatRegimeLabel } from "../regimeFormat";
 
 const formatNumber = (value: number | null, unit: string) => {
   const formatted = formatNumberValue(value);
@@ -22,21 +23,6 @@ const buildCitationLines = (treasury: TreasuryData, macros: MacroSeriesReading[]
   `Treasury source: ${treasury.source} (${treasury.record_date})`,
   ...macros.map((macro) => `${macro.label}: ${macro.sourceUrl} (${macro.record_date})`),
 ];
-
-const getRegimeLabel = (regime: RegimeAssessment["regime"]) => {
-  switch (regime) {
-    case "SCARCITY":
-      return "Scarcity";
-    case "DEFENSIVE":
-      return "Safety Mode";
-    case "VOLATILE":
-      return "Stability Mode";
-    case "EXPANSION":
-      return "Growth Mode";
-    default:
-      return regime;
-  }
-};
 
 const buildSlideBullets = (
   assessment: RegimeAssessment,
@@ -103,7 +89,7 @@ export const buildConstraintHeadlines = (
   assessment: RegimeAssessment,
   treasury: TreasuryData,
 ) => {
-  const regimeLabel = getRegimeLabel(assessment.regime);
+  const regimeLabel = formatRegimeLabel(assessment.regime);
   const headline = `${regimeLabel}: capital tightness ${assessment.scores.tightness}/100 with bravery ${assessment.scores.riskAppetite}/100.`;
   const constraints = assessment.constraints.map((item) => `• ${item}`);
 
