@@ -55,4 +55,29 @@ describe("buildHomeBriefModel", () => {
     assert.match(model.whyThisCall[0].detail, /threshold|range|outside/i);
     assert.match(model.decisionRules[0].pauseTrigger, /\d/);
   });
+
+  it("uses signal-specific direction language for primary drivers", () => {
+    const model = buildHomeBriefModel({
+      assessment: {
+        regime: "DEFENSIVE",
+        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
+        scores: { tightness: 52, riskAppetite: 56 },
+      },
+      regimeAlert: null,
+      stopItems: ["Guardrail"],
+      reportDynamics: {
+        directionLabel: "improving",
+        changedSignals: [
+          { key: "riskAppetite", delta: 2.5 },
+          { key: "curveSlope", delta: 1.1 },
+          { key: "tightness", delta: 0.8 },
+        ],
+      },
+    });
+
+    assert.equal(model.primaryDrivers[0]?.detail, "↑ improved this week");
+    assert.equal(model.primaryDrivers[1]?.detail, "↑ improved this week");
+    assert.equal(model.primaryDrivers[2]?.detail, "↑ tightened this week");
+    assert.match(model.whyThisCall[1]?.detail ?? "", /Risk appetite improved this week; improving overall\./);
+  });
 });

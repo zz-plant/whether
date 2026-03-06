@@ -1,5 +1,6 @@
 import { buildCanonicalBoundedDecisionRules } from "./boundedDecisionRules";
 import { getSummaryArchive } from "../summary/summaryArchive";
+import { isImprovingSignalDelta } from "./reportData";
 import type { MacroSeriesReading } from "../types";
 
 type Regime = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
@@ -119,7 +120,7 @@ const buildPrimaryDrivers = ({
   transitionWatch: "ON" | "OFF";
 }): PrimaryDriverItem[] => {
   const directionalDrivers = (reportDynamics?.changedSignals ?? []).slice(0, 3).map((signal) => {
-    const direction = signal.delta > 0 ? "tightened" : signal.delta < 0 ? "eased" : "held";
+    const direction = signalDirectionLabel(signal.key, signal.delta);
     const directionArrow = signal.delta > 0 ? "↑" : signal.delta < 0 ? "↓" : "→";
     return {
       label: signalReasonLabel[signal.key],
@@ -155,6 +156,21 @@ const signalReasonLabel: Record<"tightness" | "riskAppetite" | "baseRate" | "cur
   curveSlope: "Yield curve slope",
 };
 
+const signalDirectionLabel = (
+  key: "tightness" | "riskAppetite" | "baseRate" | "curveSlope",
+  delta: number,
+): string => {
+  if (delta === 0) {
+    return "held";
+  }
+
+  if (key === "tightness" || key === "baseRate") {
+    return delta > 0 ? "tightened" : "eased";
+  }
+
+  return isImprovingSignalDelta(key, delta) ? "improved" : "weakened";
+};
+
 const buildWhyThisCall = ({
   tightnessGap,
   riskGap,
@@ -179,7 +195,7 @@ const buildWhyThisCall = ({
       label: "Momentum",
       detail:
         reportDynamics?.changedSignals.length
-          ? `${signalReasonLabel[changedSignal?.key ?? "tightness"]} ${changedSignal && changedSignal.delta > 0 ? "tightened" : changedSignal && changedSignal.delta < 0 ? "eased" : "held"} this week; ${reportDynamics.directionLabel} overall.`
+          ? `${signalReasonLabel[changedSignal?.key ?? "tightness"]} ${signalDirectionLabel(changedSignal?.key ?? "tightness", changedSignal?.delta ?? 0)} this week; ${reportDynamics.directionLabel} overall.`
           : "No material signal deltas this week; call is carried by level and threshold distance.",
     },
     {
