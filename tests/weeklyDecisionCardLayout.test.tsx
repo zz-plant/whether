@@ -24,7 +24,7 @@ const decisionRules: BoundedDecisionRule[] = [
   },
   {
     area: "burn-discipline",
-    recommendation: "Prioritize retention and reliability spend.",
+    recommendation: "Keep discretionary spend gated to retention and reliability initiatives.",
     scope: "Cap non-core experiments to 10%.",
     pauseTrigger: "Pause expansion experiments if risk appetite drops below 44.",
     resumeTrigger: "Resume when risk appetite reaches 52.",
@@ -137,6 +137,9 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /Regime distance meter/);
     assert.match(html, /Decision pressure/);
     assert.match(html, /Decision matrix this week/);
+    assert.match(html, /<p class="font-semibold text-rose-200">High<\/p>/);
+    assert.match(html, /<p class="font-semibold text-amber-200">Controlled<\/p>/);
+    assert.match(html, /<p class="font-semibold text-emerald-200">Low<\/p>/);
     assert.match(html, /Bounded rule cards \(quick scan\)/);
     assert.match(html, /Primary drivers this week/);
     assert.match(html, /Startup Climate Index/);

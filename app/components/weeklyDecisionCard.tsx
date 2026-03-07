@@ -96,11 +96,11 @@ const normalizeMeter = (value: number, max: number) => {
 };
 
 const decisionRiskLabel = (rule: BoundedDecisionRule): "Low" | "Controlled" | "High" => {
-  const text = `${rule.recommendation} ${rule.pauseTrigger}`.toLowerCase();
-  if (text.includes("hold") || text.includes("pause") || text.includes("backfills")) {
+  const recommendation = rule.recommendation.toLowerCase();
+  if (recommendation.includes("hold") || recommendation.includes("backfills") || recommendation.includes("mission-critical")) {
     return "High";
   }
-  if (text.includes("selective") || text.includes("gated") || text.includes("staged")) {
+  if (recommendation.includes("selective") || recommendation.includes("gated") || recommendation.includes("staged")) {
     return "Controlled";
   }
   return "Low";
