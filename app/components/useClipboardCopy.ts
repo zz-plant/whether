@@ -3,8 +3,17 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useHapticFeedback } from "./useHapticFeedback";
 
-type ClipboardCopyStatus = "idle" | "copying" | "copied" | "error";
+export type ClipboardCopyStatus = "idle" | "copying" | "copied" | "error";
 type ClipboardCopyErrorReason = "unavailable" | "write-failed";
+type ClipboardUiStateTarget = Pick<
+  ClipboardCopyState,
+  "status" | "error" | "activeTarget" | "copiedTarget"
+>;
+
+type ClipboardUiStateOptions = {
+  includeError?: boolean;
+  requireCopiedStatus?: boolean;
+};
 
 type UseClipboardCopyOptions = {
   resetDelay?: number;
@@ -18,6 +27,33 @@ export type ClipboardCopyState = {
   copiedTarget: string | null;
   copyToClipboard: (text: string, target?: string) => Promise<boolean>;
 };
+
+export const getClipboardUiState = (
+  target: string,
+  state: ClipboardUiStateTarget,
+  options: ClipboardUiStateOptions = {}
+): ClipboardCopyStatus => {
+  const { includeError = true, requireCopiedStatus = false } = options;
+
+  if (state.status === "copying" && state.activeTarget === target) {
+    return "copying";
+  }
+
+  if (state.copiedTarget === target && (!requireCopiedStatus || state.status === "copied")) {
+    return "copied";
+  }
+
+  if (includeError && state.error) {
+    return "error";
+  }
+
+  return "idle";
+};
+
+export const isClipboardTargetDisabled = (
+  target: string,
+  state: Pick<ClipboardCopyState, "status" | "activeTarget">
+) => state.status === "copying" && state.activeTarget !== target;
 
 export const useClipboardCopy = (
   options: UseClipboardCopyOptions = {}

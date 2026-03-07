@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { ClipboardActionRow } from "../../components/clipboardActionRow";
-import { useClipboardCopy } from "../../components/useClipboardCopy";
+import { getClipboardUiState, useClipboardCopy } from "../../components/useClipboardCopy";
 import { WorkAppLabel } from "../../components/workAppIcon";
 
 type PlanningSnippetsPanelProps = {
@@ -48,8 +48,12 @@ export function PlanningSnippetsPanel({
       </p>
       <div className="space-y-3">
         {snippets.map((snippet) => {
-          const isCopying = status === "copying" && activeTarget === snippet.id;
-          const copied = copiedTarget === snippet.id;
+          const clipboardState = getClipboardUiState(snippet.id, {
+            status,
+            error,
+            activeTarget,
+            copiedTarget,
+          });
 
           return (
             <article key={snippet.id} className="rounded-2xl border border-slate-800/80 bg-slate-950/80 p-4">
@@ -60,7 +64,7 @@ export function PlanningSnippetsPanel({
                 </div>
                 <ClipboardActionRow
                   label="Copy"
-                  state={isCopying ? "copying" : copied ? "copied" : error ? "error" : "idle"}
+                  state={clipboardState}
                   compact
                   onClick={() => void copyToClipboard(snippet.text, snippet.id)}
                   buttonLabels={{ copying: "Copying…" }}

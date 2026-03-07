@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { formatDateUTC, formatTimestampUTC } from "../../../lib/formatters";
 import type { DecisionMemoryEntry } from "../../../lib/decisionMemory";
 import { ClipboardActionRow } from "../../components/clipboardActionRow";
-import { useClipboardCopy } from "../../components/useClipboardCopy";
+import { getClipboardUiState, useClipboardCopy } from "../../components/useClipboardCopy";
 
 type DecisionMemoryResponse = {
   entries: DecisionMemoryEntry[];
@@ -86,7 +86,7 @@ export const DecisionMemoryPanel = () => {
             {latestEntry ? (
               <ClipboardActionRow
                 label="Copy latest JSON"
-                state={status === "copying" && activeTarget === "json" ? "copying" : status === "copied" && copiedTarget === "json" ? "copied" : "idle"}
+                state={getClipboardUiState("json", { status, error: false, activeTarget, copiedTarget }, { includeError: false, requireCopiedStatus: true })}
                 buttonVariant="pill"
                 buttonLabels={{ copied: "JSON copied" }}
                 onClick={() => void copyToClipboard(JSON.stringify(latestEntry, null, 2), "json")}
@@ -121,7 +121,7 @@ export const DecisionMemoryPanel = () => {
                   </div>
                   <ClipboardActionRow
                     label="Copy entry"
-                    state={status === "copying" && activeTarget === entry.id ? "copying" : status === "copied" && copiedTarget === entry.id ? "copied" : "idle"}
+                    state={getClipboardUiState(entry.id, { status, error: false, activeTarget, copiedTarget }, { includeError: false, requireCopiedStatus: true })}
                     buttonVariant="pill"
                     compact
                     onClick={() => void copyToClipboard(buildEntryCopyText(entry), entry.id)}

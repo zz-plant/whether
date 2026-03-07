@@ -5,7 +5,7 @@ import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import { insightDatabase } from "../../../data/recommendations";
 import { ClipboardActionRow } from "../../components/clipboardActionRow";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
-import { useClipboardCopy } from "../../components/useClipboardCopy";
+import { getClipboardUiState, useClipboardCopy } from "../../components/useClipboardCopy";
 
 type ExecutiveTemplate =
   (typeof insightDatabase.executiveBriefingSuite.regimes)[number];
@@ -110,7 +110,6 @@ export const ExecutiveBriefingPanel = ({
     [assessment, template]
   );
 
-  const isCopying = status === "copying";
 
   return (
     <section
@@ -146,7 +145,7 @@ export const ExecutiveBriefingPanel = ({
                   </div>
                   <ClipboardActionRow
                     label="Copy memo"
-                    state={isCopying && activeTarget === "Memo" ? "copying" : copiedTarget === "Memo" ? "copied" : error ? "error" : "idle"}
+                    state={getClipboardUiState("Memo", { status, error, activeTarget, copiedTarget })}
                     onClick={() => void copyToClipboard(executiveMemo, "Memo")}
                   />
                 </div>
@@ -191,7 +190,7 @@ export const ExecutiveBriefingPanel = ({
                   </p>
                   <ClipboardActionRow
                     label="Copy checklist"
-                    state={isCopying && activeTarget === "Checklist" ? "copying" : copiedTarget === "Checklist" ? "copied" : error ? "error" : "idle"}
+                    state={getClipboardUiState("Checklist", { status, error, activeTarget, copiedTarget })}
                     onClick={() => void copyToClipboard(guardrailChecklist, "Checklist")}
                   />
                 </div>
