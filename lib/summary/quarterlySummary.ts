@@ -7,6 +7,7 @@ import {
   buildCadenceSummary,
   type CadenceSummaryProvenance,
 } from "./cadenceSummaryBuilder";
+import { formatQuarterLabel } from "./summaryFormatting";
 
 export type QuarterlySummaryProvenance = CadenceSummaryProvenance;
 
@@ -57,12 +58,4 @@ export const buildQuarterlySummary = ({
     periodLabel,
   });
 
-export const getQuarterLabel = (value: string) => {
-  const date = new Date(`${value}T00:00:00Z`);
-  if (Number.isNaN(date.valueOf())) {
-    return null;
-  }
-  const year = date.getUTCFullYear();
-  const quarter = Math.floor(date.getUTCMonth() / 3) + 1;
-  return `Q${quarter} ${year}`;
-};
+export const getQuarterLabel = formatQuarterLabel;
