@@ -406,23 +406,23 @@ export const buildHomeBriefModel = (data: HomeReportData) => {
       });
 
   const regimeDistance =
-    tightnessGap <= riskGap
+    reversalDimension === "tightness"
       ? {
-        dimensionLabel: "Tightness",
-        dimensionKey: "tightness",
-        currentValue: assessment.scores.tightness,
-        thresholdValue: tightnessThreshold,
-        pointsToFlip: Math.abs(tightnessThreshold - assessment.scores.tightness),
-        thresholdDirection: boundaryDirectionForRegime(assessment.regime, "tightness"),
-      }
+          dimensionLabel: "Tightness",
+          dimensionKey: "tightness",
+          currentValue: assessment.scores.tightness,
+          thresholdValue: tightnessThreshold,
+          pointsToFlip: Math.abs(tightnessThreshold - assessment.scores.tightness),
+          thresholdDirection: boundaryDirectionForRegime(assessment.regime, "tightness"),
+        }
       : {
-        dimensionLabel: "Risk appetite",
-        dimensionKey: "riskAppetite",
-        currentValue: assessment.scores.riskAppetite,
-        thresholdValue: riskThreshold,
-        pointsToFlip: Math.abs(assessment.scores.riskAppetite - riskThreshold),
-        thresholdDirection: boundaryDirectionForRegime(assessment.regime, "riskAppetite"),
-      };
+          dimensionLabel: "Risk appetite",
+          dimensionKey: "riskAppetite",
+          currentValue: assessment.scores.riskAppetite,
+          thresholdValue: riskThreshold,
+          pointsToFlip: Math.abs(assessment.scores.riskAppetite - riskThreshold),
+          thresholdDirection: boundaryDirectionForRegime(assessment.regime, "riskAppetite"),
+        };
 
   const guardrail = stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
   const netConstraintSummary =
