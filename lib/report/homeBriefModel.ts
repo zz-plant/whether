@@ -2,6 +2,7 @@ import { buildCanonicalBoundedDecisionRules } from "./boundedDecisionRules";
 import { getSummaryArchive } from "../summary/summaryArchive";
 import type { MacroSeriesReading } from "../types";
 import { isImprovingSignalDelta } from "./reportData";
+import { REGIME_SEVERITY_RANK, REGIME_SHORT_LABELS } from "../regimePresentation";
 
 type Regime = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
 
@@ -56,26 +57,12 @@ type MacroOverlayItem = {
   detail: string;
 };
 
-const regimeLabelMap = {
-  SCARCITY: "Scarcity",
-  DEFENSIVE: "Defensive",
-  VOLATILE: "Mixed",
-  EXPANSION: "Expansion",
-} as const;
-
 const regimeShiftTargets = {
   SCARCITY: { defensive: "DEFENSIVE" },
   DEFENSIVE: { defensive: "SCARCITY" },
   VOLATILE: { defensive: "SCARCITY" },
   EXPANSION: { defensive: "DEFENSIVE" },
 } as const;
-
-const regimeSeverityRank: Record<Regime, number> = {
-  EXPANSION: 0,
-  VOLATILE: 1,
-  DEFENSIVE: 2,
-  SCARCITY: 3,
-};
 
 const buildDecisionShiftSummary = ({
   severityDelta,
@@ -108,14 +95,14 @@ const buildMemoryRail = (recordDateLabel: string | undefined, currentRegime: Reg
     .slice(-3)
     .map((entry) => ({
       label: entry.record_date,
-      posture: regimeLabelMap[entry.summary.regime],
+      posture: REGIME_SHORT_LABELS[entry.summary.regime],
     }));
 
   return [
     ...priorEntries,
     {
       label: recordDateLabel ?? "Current",
-      posture: regimeLabelMap[currentRegime],
+      posture: REGIME_SHORT_LABELS[currentRegime],
     },
   ].slice(-4);
 };
@@ -134,7 +121,7 @@ const buildHistoricalTimeline = (currentRegime: Regime, anchorYear: number): Mem
     .slice(-6)
     .map((entry) => ({
       label: String(entry.year),
-      posture: regimeLabelMap[entry.summary.regime],
+      posture: REGIME_SHORT_LABELS[entry.summary.regime],
     }));
 
   const latestYear = yearlyEntries[yearlyEntries.length - 1]?.label;
@@ -144,7 +131,7 @@ const buildHistoricalTimeline = (currentRegime: Regime, anchorYear: number): Mem
     ...yearlyEntries,
     {
       label: currentEntryLabel,
-      posture: regimeLabelMap[currentRegime],
+      posture: REGIME_SHORT_LABELS[currentRegime],
     },
   ].slice(-7);
 };
@@ -335,7 +322,7 @@ export const buildHomeBriefModel = (data: HomeReportData) => {
   const timelineAnchorYear = resolveTimelineAnchorYear(recordDateLabel);
   const previousRegime = regimeAlert?.previousRegime;
   const severityDelta = previousRegime
-    ? regimeSeverityRank[assessment.regime] - regimeSeverityRank[previousRegime]
+    ? REGIME_SEVERITY_RANK[assessment.regime] - REGIME_SEVERITY_RANK[previousRegime]
     : 0;
 
   const postureDeltaLabel =
@@ -351,7 +338,7 @@ export const buildHomeBriefModel = (data: HomeReportData) => {
   const riskGap = Math.abs(assessment.scores.riskAppetite - riskThreshold);
   const nearestThresholdGap = Math.min(tightnessGap, riskGap);
   const shiftTargets = regimeShiftTargets[assessment.regime];
-  const primaryShiftRegimeLabel = regimeLabelMap[shiftTargets.defensive];
+  const primaryShiftRegimeLabel = REGIME_SHORT_LABELS[shiftTargets.defensive];
 
   const confidenceLabel: "LOW" | "MED" | "HIGH" = nearestThresholdGap <= 5 ? "LOW" : nearestThresholdGap <= 12 ? "MED" : "HIGH";
   const transitionWatch: "ON" | "OFF" = nearestThresholdGap <= 8 || Boolean(regimeAlert) ? "ON" : "OFF";
@@ -389,10 +376,10 @@ export const buildHomeBriefModel = (data: HomeReportData) => {
   const guardrail = stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
   const netConstraintSummary =
     severityDelta > 0
-      ? `${regimeLabelMap[assessment.regime]}. Changed: constraints tightened. Do now: slow non-core approvals and keep irreversible spend frozen. Flip: ${reversalTrigger}`
+      ? `${REGIME_SHORT_LABELS[assessment.regime]}. Changed: constraints tightened. Do now: slow non-core approvals and keep irreversible spend frozen. Flip: ${reversalTrigger}`
       : severityDelta < 0
-        ? `${regimeLabelMap[assessment.regime]}. Changed: constraints eased. Do now: release selective hires and experiments that stay reversible. Flip: ${reversalTrigger}`
-        : `${regimeLabelMap[assessment.regime]}. Changed: constraints held near prior week. Do now: keep execution measured and irreversible bets capped. Flip: ${reversalTrigger}`;
+        ? `${REGIME_SHORT_LABELS[assessment.regime]}. Changed: constraints eased. Do now: release selective hires and experiments that stay reversible. Flip: ${reversalTrigger}`
+        : `${REGIME_SHORT_LABELS[assessment.regime]}. Changed: constraints held near prior week. Do now: keep execution measured and irreversible bets capped. Flip: ${reversalTrigger}`;
 
   return {
     confidenceLabel,
