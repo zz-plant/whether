@@ -4,23 +4,8 @@
  */
 
 import type { MonthlySummary } from "../../lib/summary/monthlySummary";
-import { SummaryCard } from "./summaryCard";
+import { CadenceSummaryCardAdapter } from "./cadenceSummaryCardAdapter";
 
 export const MonthlySummaryCard = ({ summary }: { summary: MonthlySummary }) => (
-  <SummaryCard
-    summaryCopy={summary.copy}
-    cadenceLabel="monthly"
-    apiHref="/api/monthly"
-    structuredSections={[
-      { title: "Execution constraints", items: summary.structured.executionConstraints },
-      {
-        title: "Provenance",
-        items: [
-          `Source: ${summary.structured.provenance.source}`,
-          `Timestamp: ${summary.structured.provenance.timestamp}`,
-          `Data age: ${summary.structured.provenance.dataAge}`,
-        ],
-      },
-    ]}
-  />
+  <CadenceSummaryCardAdapter cadence="monthly" summary={summary} />
 );
