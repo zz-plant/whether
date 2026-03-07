@@ -1,6 +1,7 @@
 import { formatDateLabel, formatDelta } from "../../../lib/report/signalFormatting";
+import { formatMonthInput, parseMonthInput } from "../../../lib/timeMachine/monthFormatting";
 
-export { formatDateLabel, formatDelta };
+export { formatDateLabel, formatDelta, formatMonthInput, parseMonthInput };
 
 export const monthOptions = [
   { value: 1, label: "January" },
@@ -17,39 +18,6 @@ export const monthOptions = [
   { value: 12, label: "December" },
 ];
 
-
-export const formatMonthInput = (value: string) => {
-  const date = new Date(value);
-  if (Number.isNaN(date.valueOf())) {
-    return undefined;
-  }
-  const year = date.getUTCFullYear();
-  const month = date.getUTCMonth() + 1;
-  return `${year}-${String(month).padStart(2, "0")}`;
-};
-
-export const parseMonthInput = (value: string) => {
-  if (!/^\d{4}-\d{2}$/.test(value)) {
-    return null;
-  }
-
-  const [yearPart, monthPart] = value.split("-");
-  const year = Number(yearPart);
-  const month = Number(monthPart);
-  if (
-    !yearPart ||
-    !monthPart ||
-    Number.isNaN(year) ||
-    Number.isNaN(month) ||
-    !Number.isInteger(year) ||
-    !Number.isInteger(month) ||
-    month < 1 ||
-    month > 12
-  ) {
-    return null;
-  }
-  return { year, month };
-};
 
 export const formatPercent = (value: number) => `${value.toFixed(2)}%`;
 

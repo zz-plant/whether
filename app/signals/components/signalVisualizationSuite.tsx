@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { TreasuryData } from "../../../lib/types";
 import { ChevronDownIcon } from "../../components/uiIcons";
+import { formatMonthLabel, formatMonthShortLabel, toMonthInput } from "../../../lib/timeMachine/monthFormatting";
 
 type Cadence = "weekly" | "monthly" | "yearly";
 
@@ -42,11 +43,14 @@ const toBp = (value: number | null) => (typeof value === "number" ? value * 100 
 const getLabel = (recordDate: string, cadence: Cadence) => {
   const date = new Date(recordDate);
   if (Number.isNaN(date.valueOf())) return recordDate;
-  if (cadence === "yearly") return `${date.getUTCFullYear()}`;
 
-  const month = date.toLocaleString("en-US", { month: "short", timeZone: "UTC" });
-  if (cadence === "monthly") return `${month} ${date.getUTCFullYear()}`;
-  return `${month} ${date.getUTCDate()}, ${date.getUTCFullYear()}`;
+  const year = date.getUTCFullYear();
+  if (cadence === "yearly") return `${year}`;
+
+  const month = date.getUTCMonth() + 1;
+  if (cadence === "monthly") return formatMonthLabel(year, month);
+
+  return `${formatMonthShortLabel(year, month)} ${date.getUTCDate()}, ${year}`;
 };
 
 const mean = (values: Array<number | null>) => {
@@ -73,7 +77,7 @@ const byCadence = (series: YieldCurvePoint[], cadence: Cadence): ChartPoint[] =>
   series.forEach((point) => {
     const date = new Date(point.recordDate);
     if (Number.isNaN(date.valueOf())) return;
-    const key = cadence === "yearly" ? `${date.getUTCFullYear()}` : `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}`;
+    const key = cadence === "yearly" ? `${date.getUTCFullYear()}` : toMonthInput(date.getUTCFullYear(), date.getUTCMonth() + 1);
     grouped.set(key, [...(grouped.get(key) ?? []), point]);
   });
 
