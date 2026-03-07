@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { ClipboardActionRow } from "../../components/clipboardActionRow";
 import { useClipboardCopy } from "../../components/useClipboardCopy";
 import { WorkAppLabel } from "../../components/workAppIcon";
 
@@ -57,13 +58,13 @@ export function PlanningSnippetsPanel({
                   <h3 className="text-sm font-semibold text-slate-100">{snippet.label}</h3>
                   <p className="text-xs text-slate-400">{snippet.bestUse}</p>
                 </div>
-                <button
-                  type="button"
+                <ClipboardActionRow
+                  label="Copy"
+                  state={isCopying ? "copying" : copied ? "copied" : error ? "error" : "idle"}
+                  compact
                   onClick={() => void copyToClipboard(snippet.text, snippet.id)}
-                  className="weather-button inline-flex min-h-[40px] items-center px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em]"
-                >
-                  {isCopying ? "Copying…" : copied ? "Copied" : "Copy"}
-                </button>
+                  buttonLabels={{ copying: "Copying…" }}
+                />
               </div>
               <pre className="mt-3 whitespace-pre-wrap text-xs text-slate-200">{snippet.text}</pre>
             </article>

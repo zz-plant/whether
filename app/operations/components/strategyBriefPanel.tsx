@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import { insightDatabase } from "../../../data/recommendations";
+import { ClipboardActionRow } from "../../components/clipboardActionRow";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 import { useClipboardCopy } from "../../components/useClipboardCopy";
 
@@ -110,15 +111,11 @@ export const StrategyBriefPanel = ({
             </p>
           </div>
           <div className="flex flex-col items-end gap-3">
-            <button
-              type="button"
+            <ClipboardActionRow
+              label="Copy strategy brief"
+              state={status}
               onClick={handleCopy}
-              disabled={isCopying}
-              aria-busy={isCopying}
-              className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
-            >
-              {isCopying ? "Copying" : "Copy strategy brief"}
-            </button>
+            />
             {showProvenance ? <DataProvenanceStrip provenance={provenance} /> : null}
           </div>
         </div>
