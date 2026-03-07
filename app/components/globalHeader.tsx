@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { navigationLayers } from "../../lib/navigation/informationArchitecture";
 import { pathMatchesLink } from "../../lib/navigation/pathMatching";
+import { reportShellCorePaths } from "../../lib/report/reportNavigation";
 import { ThemeToggleButton } from "./themeToggleButton";
 
 const groupBadgeStyles = {
@@ -20,7 +21,15 @@ const groupLabels = {
 
 export function GlobalHeader() {
   const pathname = usePathname();
+  const normalizedPathname = pathname !== "/" && pathname.endsWith("/")
+    ? pathname.slice(0, -1)
+    : pathname;
   const isHome = pathMatchesLink("/", pathname);
+  const isReportShellRoute = reportShellCorePaths.some((route) => route === normalizedPathname);
+
+  if (isReportShellRoute) {
+    return null;
+  }
 
   return (
     <header className="mx-auto w-full max-w-6xl px-4 pt-4 sm:px-6">
