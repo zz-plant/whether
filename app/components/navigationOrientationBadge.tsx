@@ -18,6 +18,12 @@ const zoneBadgeStyles: Record<NavigationZone, string> = {
 
 const zoneOrder: NavigationZone[] = ["core", "workflow", "reference"];
 
+const zoneDefaultHref: Record<NavigationZone, string> = zoneOrder.reduce((acc, zone) => {
+  const layer = navigationLayers.find((item) => item.group === zone);
+  acc[zone] = layer?.href ?? "/";
+  return acc;
+}, {} as Record<NavigationZone, string>);
+
 const normalizePath = (path: string) =>
   path !== "/" && path.endsWith("/") ? path.slice(0, -1) : path;
 
@@ -51,12 +57,14 @@ export function NavigationOrientationBadge({
         const isActive = zone === activeZone;
 
         return (
-          <span
+          <a
             key={zone}
-            className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] ${isActive ? zoneBadgeStyles[zone] : "border-slate-700/70 text-slate-400"}`}
+            href={zoneDefaultHref[zone]}
+            aria-current={isActive ? "true" : undefined}
+            className={`inline-flex min-h-[32px] items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] transition-colors hover:border-sky-300/60 hover:text-sky-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/70 ${isActive ? zoneBadgeStyles[zone] : "border-slate-700/70 text-slate-400"}`}
           >
             {zoneLabels[zone]}
-          </span>
+          </a>
         );
       })}
     </div>

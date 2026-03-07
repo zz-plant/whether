@@ -1,0 +1,24 @@
+import assert from "node:assert/strict";
+import { describe, it } from "node:test";
+import { renderToStaticMarkup } from "react-dom/server";
+import { NavigationOrientationBadge } from "../app/components/navigationOrientationBadge";
+
+describe("NavigationOrientationBadge", () => {
+  it("renders each zone as a link to its canonical landing route", () => {
+    const html = renderToStaticMarkup(
+      <NavigationOrientationBadge currentPath="/operations" />,
+    );
+
+    assert.match(html, /href="\/"[^>]*>Now section</);
+    assert.match(html, /href="\/signals"[^>]*>Operate section</);
+    assert.match(html, /href="\/learn"[^>]*>Reference section</);
+  });
+
+  it("marks the active zone", () => {
+    const html = renderToStaticMarkup(
+      <NavigationOrientationBadge currentPath="/method" />,
+    );
+
+    assert.match(html, /href="\/learn"[^>]*aria-current="true"[^>]*>Reference section</);
+  });
+});
