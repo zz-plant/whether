@@ -22,7 +22,11 @@ import {
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import { ClipboardActionRow } from "../../components/clipboardActionRow";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
-import { useClipboardCopy, type ClipboardCopyState } from "../../components/useClipboardCopy";
+import {
+  getClipboardUiState,
+  useClipboardCopy,
+  type ClipboardCopyState,
+} from "../../components/useClipboardCopy";
 import { createClientId } from "./clientId";
 import {
   actionOptions,
@@ -380,7 +384,7 @@ export const DecisionShieldPanel = ({
           <div className="flex flex-col items-end gap-3">
             <ClipboardActionRow
               label="Copy verdict"
-              state={status === "copying" && activeTarget === "verdict" ? "copying" : copiedTarget === "verdict" ? "copied" : error ? "error" : "idle"}
+              state={getClipboardUiState("verdict", { status, error, activeTarget, copiedTarget })}
               buttonVariant="pill"
               buttonLabels={{
                 copying: (
@@ -395,7 +399,7 @@ export const DecisionShieldPanel = ({
             />
             <ClipboardActionRow
               label="Copy link"
-              state={status === "copying" && activeTarget === "link" ? "copying" : copiedTarget === "link" ? "copied" : error ? "error" : "idle"}
+              state={getClipboardUiState("link", { status, error, activeTarget, copiedTarget })}
               buttonVariant="pill"
               buttonLabels={{ copied: "Link copied" }}
               onClick={handleCopyLink}

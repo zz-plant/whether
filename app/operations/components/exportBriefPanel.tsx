@@ -20,7 +20,12 @@ import {
 } from "../../../lib/export/briefBuilders";
 import { ClipboardActionRow } from "../../components/clipboardActionRow";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
-import { useClipboardCopy, type ClipboardCopyState } from "../../components/useClipboardCopy";
+import {
+  getClipboardUiState,
+  isClipboardTargetDisabled,
+  useClipboardCopy,
+  type ClipboardCopyState,
+} from "../../components/useClipboardCopy";
 import { SectionPanelHeader } from "../../components/sectionPanelHeader";
 import { WorkAppLabel } from "../../components/workAppIcon";
 
@@ -167,7 +172,6 @@ export const ExportBriefPanel = ({
   const lastStatusRef = useRef<ClipboardCopyState["status"]>("idle");
   const lastLabelRef = useRef<string | null>(null);
   const { add } = Toast.useToastManager();
-  const isCopying = status === "copying";
   const copyError = error;
 
   useEffect(() => {
@@ -242,15 +246,10 @@ export const ExportBriefPanel = ({
   };
 
   const clipboardState = (target: string) =>
-    isCopying && activeTarget === target
-      ? "copying"
-      : copiedTarget === target
-        ? "copied"
-        : copyError
-          ? "error"
-          : "idle";
+    getClipboardUiState(target, { status, error: copyError, activeTarget, copiedTarget });
 
-  const isCopyDisabled = (target: string) => isCopying && activeTarget !== target;
+  const isCopyDisabled = (target: string) =>
+    isClipboardTargetDisabled(target, { status, activeTarget });
 
   const handlePrint = () => {
     window.print();
