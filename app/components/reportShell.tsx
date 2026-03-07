@@ -24,6 +24,7 @@ import { INFORMATIONAL_NOTICE } from "../../lib/exportNotices";
 import { serializeJsonLd } from "../../lib/seo";
 import { AnchorFeedback } from "./anchorFeedback";
 import { ReportCta } from "./reportCta";
+import { NavigationOrientationBadge } from "./navigationOrientationBadge";
 
 import { ClimateBackdrop } from "./climateBackdrop";
 import { RegimeIconType } from "./regimeIcons";
@@ -370,6 +371,7 @@ export const ReportShell = ({
                 </p>
               </div>
             </div>
+            <NavigationOrientationBadge currentPath={currentPath} className="mt-4" />
             {showPageNavigation ? (
               <ReportPageNavigation
                 pageLinks={pageLinks}
