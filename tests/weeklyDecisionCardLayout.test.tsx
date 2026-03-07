@@ -121,7 +121,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
 
     const postureIndex = html.indexOf("Weekly posture call");
     const decisionCallIndex = html.indexOf("Decision delta this week");
-    const rulesSummaryIndex = html.indexOf("Bounded rule cards (quick scan)");
+    const rulesSummaryIndex = html.indexOf("Operating rules (quick scan)");
 
     assert.ok(postureIndex >= 0);
     assert.ok(decisionCallIndex > postureIndex);
@@ -130,25 +130,25 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /aria-label="Weekly trust signals"/);
     assert.match(html, /Confidence 68% \(MED\)/);
     assert.match(html, /Trend Improving/);
-    assert.match(html, /Confidence MED · Freshness Mar 6, 2026 09:12 UTC · Shift watch ON/);
+    assert.match(html, /Confidence MED · Freshness Mar 6, 2026 09:12 UTC · Regime shift watch ON/);
     assert.match(html, /Decision delta this week[\s\S]*What changed: \+2/);
     assert.match(html, /What to do now[\s\S]*Revise hiring and roadmap calls now\./);
     assert.match(html, /Macro drift this week/);
-    assert.match(html, /Regime distance meter/);
-    assert.match(html, /Decision pressure/);
+    assert.match(html, /Distance to regime flip/);
+    assert.match(html, /Decision change pressure/);
     assert.match(html, /Decision matrix this week/);
     assert.match(html, /<p class="font-semibold text-rose-200">High<\/p>/);
     assert.match(html, /<p class="font-semibold text-amber-200">Controlled<\/p>/);
     assert.match(html, /<p class="font-semibold text-emerald-200">Low<\/p>/);
-    assert.match(html, /Bounded rule cards \(quick scan\)/);
+    assert.match(html, /Operating rules \(quick scan\)/);
     assert.match(html, /Primary drivers this week/);
     assert.match(html, /Startup Climate Index/);
     assert.match(html, /Score 63 \/ 100 · Improving/);
     assert.match(html, /Why this posture call/);
     assert.match(html, /Stop if:/);
     assert.match(html, /Restart when:/);
-    assert.match(html, /Team fit check/);
-    assert.match(html, /Run risk check/);
+    assert.match(html, /Team context check/);
+    assert.match(html, /Open team context check/);
   });
 
   it("uses responsive classes to protect screenshot readability and keeps citation actions", () => {
@@ -299,7 +299,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
       />,
     );
 
-    assert.match(html, /Confidence LOW · Freshness Unavailable · Shift watch ON/);
+    assert.match(html, /Confidence LOW · Freshness Unavailable · Regime shift watch ON/);
     assert.match(html, /Posture DEFENSIVE · Confidence LOW · Effective Mar 5, 2026 · Freshness Unavailable/);
   });
 });

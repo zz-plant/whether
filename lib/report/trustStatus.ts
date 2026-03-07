@@ -16,7 +16,7 @@ export const buildWeeklyTrustCueLine = ({
   freshnessLabel: string;
   transitionWatch: "ON" | "OFF";
 }) =>
-  `Confidence ${confidenceLabel} · Freshness ${normalizeFreshnessLabel(freshnessLabel)} · Shift watch ${transitionWatch}`;
+  `Confidence ${confidenceLabel} · Freshness ${normalizeFreshnessLabel(freshnessLabel)} · Regime shift watch ${transitionWatch}`;
 
 export const buildWeeklyCitationMetaLine = ({
   statusLabel,
