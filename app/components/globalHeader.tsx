@@ -35,7 +35,7 @@ export function GlobalHeader() {
             </Link>
             {isHome ? (
               <p className="mt-1 text-base font-semibold tracking-tight text-slate-100 sm:text-lg">
-                Weekly operating posture for product, hiring, and spend decisions.
+                Weekly operating brief for product, hiring, and spend decisions.
               </p>
             ) : (
               <p className="mt-1 text-sm font-medium text-slate-300 sm:text-base">
