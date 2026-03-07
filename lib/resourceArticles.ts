@@ -17,6 +17,7 @@ export type ResourceArticle = {
   format: "guide" | "case-example";
   boardSummary: string[];
   sections: Array<{ heading: string; paragraphs: string[] }>;
+  includeSharedDeepDive?: boolean;
   faqs: Array<{ question: string; answer: string }>;
   toolLink: { href: Route; label: string };
 };
