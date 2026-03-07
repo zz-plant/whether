@@ -82,6 +82,10 @@ export const formatSignedDeltaValue = (value: number | null) => {
 
 export const formatScoreValue = (value: number) => value.toFixed(0);
 
+export const formatPublishedLabel = (year: number, month: number) =>
+  new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric", timeZone: "UTC" }).format(
+    new Date(Date.UTC(year, month - 1, 1)),
+  );
 
 export const formatNumberWithUnit = (value: number | null, unit: string) => {
   const formatted = formatNumberValue(value);
