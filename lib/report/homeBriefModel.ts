@@ -364,13 +364,13 @@ export const buildHomeBriefModel = (data: HomeReportData) => {
         dimensionLabel: "Tightness",
         currentValue: assessment.scores.tightness,
         thresholdValue: tightnessThreshold,
-        pointsToFlip: tightnessThreshold - assessment.scores.tightness,
+        pointsToFlip: Math.abs(tightnessThreshold - assessment.scores.tightness),
       }
       : {
         dimensionLabel: "Risk appetite",
         currentValue: assessment.scores.riskAppetite,
         thresholdValue: riskThreshold,
-        pointsToFlip: assessment.scores.riskAppetite - riskThreshold,
+        pointsToFlip: Math.abs(assessment.scores.riskAppetite - riskThreshold),
       };
 
   const guardrail = stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
