@@ -21,6 +21,7 @@ import { OperationsWorkstreamNav } from "./components/operationsWorkstreamNav";
 import { OperationsWorkflowProgress } from "./components/operationsWorkflowProgress";
 import { ExportBriefPanel } from "./components/exportBriefPanel";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
+import { LiveDataFallbackAlert } from "../components/liveDataFallbackAlert";
 
 export const runtime = "edge";
 
@@ -140,7 +141,7 @@ export default async function OperationsPage({
       trustStatusAction={trustStatusAction}
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
-      pageTitle="Action playbook"
+      pageTitle="Operations"
       currentPath="/operations"
       pageSummary="Run weekly execution decisions and align the monthly playbook for this cycle."
       pageSummaryLink={{ href: "#ops-playbook", label: "Jump to playbook section ↓" }}
@@ -202,17 +203,33 @@ export default async function OperationsPage({
       }
     >
       {!reportResult.ok ? (
-        <section className="weather-panel border border-amber-500/50 bg-amber-500/10 px-5 py-4 text-sm text-amber-100" aria-live="polite">
-          <p className="font-semibold">Live data unavailable — showing cached snapshot.</p>
-          <p className="mt-1">Last cached update: {reportResult.fallback.lastCachedTimestamp}. Validate live status in <a href="/signals" className="underline">Signals</a>.</p>
-        </section>
+        <LiveDataFallbackAlert lastCachedTimestamp={reportResult.fallback.lastCachedTimestamp} />
       ) : null}
+
+      <section className="weather-panel space-y-3 px-5 py-4" aria-label="Three execution moves this week">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">This week&apos;s 3 moves</p>
+        <ol className="grid gap-2 md:grid-cols-3">
+          <li className="weather-surface px-3 py-3 text-xs text-slate-200">
+            <p className="font-semibold uppercase tracking-[0.12em] text-sky-200">1 · Align posture</p>
+            <p className="mt-1">Confirm the monthly action summary before changing team pace.</p>
+          </li>
+          <li className="weather-surface px-3 py-3 text-xs text-slate-200">
+            <p className="font-semibold uppercase tracking-[0.12em] text-sky-200">2 · Apply guardrails</p>
+            <p className="mt-1">Run start/stop/fence moves from the playbook and pause if a stop trigger hits.</p>
+          </li>
+          <li className="weather-surface px-3 py-3 text-xs text-slate-200">
+            <p className="font-semibold uppercase tracking-[0.12em] text-sky-200">3 · Export artifact</p>
+            <p className="mt-1">Copy the stakeholder brief once finance guidance and operator asks are aligned.</p>
+          </li>
+        </ol>
+      </section>
 
       <OperationsWorkflowProgress currentPath="/operations" />
       <OperationsWorkstreamNav currentPath="/operations" />
 
       <SectionedReportPanel
         id="ops-monthly-action-summary"
+        label="Decide"
         title="Monthly action summary"
         description="The moves the regime recommends this month."
       >
@@ -225,6 +242,7 @@ export default async function OperationsPage({
 
       <SectionedReportPanel
         id="ops-playbook"
+        label="Execute"
         title="Playbook"
         description="Start, stop, and fence actions tuned to the current regime."
       >
@@ -240,6 +258,7 @@ export default async function OperationsPage({
 
       <SectionedReportPanel
         id="ops-finance-strategy"
+        label="Verify"
         title="Finance strategy"
         description="Budget posture and cash timing guidance for the quarter."
       >
@@ -252,6 +271,7 @@ export default async function OperationsPage({
 
       <SectionedReportPanel
         id="ops-export-briefs"
+        label="Export"
         title="Export briefs"
         description="Copy-ready narratives for leadership updates and stakeholder syncs."
       >
@@ -267,6 +287,7 @@ export default async function OperationsPage({
 
       <SectionedReportPanel
         id="ops-operator-requests"
+        label="Coordinate"
         title="Operator requests"
         description="Current asks for operators driving execution."
       >

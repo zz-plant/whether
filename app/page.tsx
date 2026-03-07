@@ -29,6 +29,7 @@ import { CopyLeadershipArtifactsButtons } from "./components/copyLeadershipArtif
 import { createBreadcrumbTrail } from "../lib/navigation/breadcrumbs";
 import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
 import { getFeaturedConceptArticles } from "../lib/productCanon";
+import { LiveDataFallbackAlert } from "./components/liveDataFallbackAlert";
 
 const WeeklyActionSummaryPanel = dynamic(
   () =>
@@ -374,10 +375,10 @@ export default async function HomePage({
       </section>
 
       {!reportResult.ok ? (
-        <section className="weather-panel border border-amber-500/50 bg-amber-500/10 px-5 py-4 text-sm text-amber-100" aria-live="polite">
-          <p className="font-semibold">Live data unavailable — showing cached snapshot.</p>
-          <p className="mt-1">Last cached update: {reportResult.fallback.lastCachedTimestamp}. Review <a href="/signals" className="underline">Signals</a> to retry live evidence.</p>
-        </section>
+        <LiveDataFallbackAlert
+          lastCachedTimestamp={reportResult.fallback.lastCachedTimestamp}
+          followUpLabel="Review live evidence"
+        />
       ) : null}
 
       <RevealOnView>
