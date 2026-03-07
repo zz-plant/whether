@@ -5,9 +5,9 @@ import { reportShellCorePaths } from "../../lib/report/reportNavigation";
 type NavigationZone = "core" | "workflow" | "reference";
 
 const zoneLabels: Record<NavigationZone, string> = {
-  core: "Now",
-  workflow: "Operate",
-  reference: "Reference",
+  core: "Now section",
+  workflow: "Operate section",
+  reference: "Reference section",
 };
 
 const zoneBadgeStyles: Record<NavigationZone, string> = {
@@ -45,7 +45,7 @@ export function NavigationOrientationBadge({
   return (
     <div
       className={`inline-flex items-center gap-1 rounded-full border border-slate-700/80 bg-slate-950/70 p-1 ${className ?? ""}`}
-      aria-label="Product zone orientation"
+      aria-label="Navigation zone orientation (not macro posture)"
     >
       {zoneOrder.map((zone) => {
         const isActive = zone === activeZone;

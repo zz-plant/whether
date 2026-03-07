@@ -52,6 +52,10 @@ type StartupClimateIndex = {
   breakdown: Array<{ label: string; score: number }>;
 };
 
+type BoundaryDimension = "tightness" | "riskAppetite";
+
+type BoundaryDirection = "riseAbove" | "fallToOrBelow";
+
 type MacroOverlayItem = {
   label: string;
   detail: string;
@@ -160,8 +164,47 @@ const formatDelta = (value: number | null, positiveIsImproving: boolean) => {
 
   const improving = positiveIsImproving ? value > 0 : value < 0;
   const arrow = improving ? "↑" : "↓";
-  const direction = improving ? "improving" : "tightening";
+  const direction = improving ? "improving" : "deteriorating";
   return `${arrow} ${direction}`;
+};
+
+const describeSignalDirection = (
+  signal: SignalChange,
+): "improving" | "deteriorating" | "held" => {
+  if (signal.delta === 0) {
+    return "held";
+  }
+
+  return isImprovingSignalDelta(signal.key, signal.delta) ? "improving" : "deteriorating";
+};
+
+const boundaryDirectionForRegime = (
+  regime: Regime,
+  dimension: BoundaryDimension,
+): BoundaryDirection => {
+  if (dimension === "tightness") {
+    return regime === "SCARCITY" || regime === "DEFENSIVE" ? "fallToOrBelow" : "riseAbove";
+  }
+
+  return regime === "EXPANSION" || regime === "DEFENSIVE" ? "fallToOrBelow" : "riseAbove";
+};
+
+const buildBoundaryTriggerText = ({
+  targetRegimeLabel,
+  dimension,
+  threshold,
+  current,
+  direction,
+}: {
+  targetRegimeLabel: string;
+  dimension: BoundaryDimension;
+  threshold: number;
+  current: number;
+  direction: BoundaryDirection;
+}) => {
+  const dimensionLabel = dimension === "tightness" ? "tightness" : "risk appetite";
+  const condition = direction === "riseAbove" ? "rises above" : "falls to or below";
+  return `Flip to ${targetRegimeLabel} if ${dimensionLabel} ${condition} ${threshold.toFixed(1)} (now ${current.toFixed(1)}).`;
 };
 
 const buildMacroOverlay = (macroSeries: MacroSeriesReading[] | undefined): MacroOverlayItem[] => {
@@ -200,7 +243,7 @@ const buildPrimaryDrivers = ({
   transitionWatch: "ON" | "OFF";
 }): PrimaryDriverItem[] => {
   const directionalDrivers = (reportDynamics?.changedSignals ?? []).slice(0, 3).map((signal) => {
-    const direction = describeSignalMomentum(signal);
+    const direction = describeSignalDirection(signal);
     const directionArrow = signal.delta > 0 ? "↑" : signal.delta < 0 ? "↓" : "→";
     return {
       label: signalReasonLabel[signal.key],
@@ -236,16 +279,6 @@ const signalReasonLabel: Record<"tightness" | "riskAppetite" | "baseRate" | "cur
   curveSlope: "Yield curve slope",
 };
 
-const describeSignalMomentum = (
-  signal: SignalChange,
-): "tightened" | "eased" | "held" => {
-  if (signal.delta === 0) {
-    return "held";
-  }
-
-  return isImprovingSignalDelta(signal.key, signal.delta) ? "eased" : "tightened";
-};
-
 const buildWhyThisCall = ({
   tightnessGap,
   riskGap,
@@ -270,7 +303,7 @@ const buildWhyThisCall = ({
       label: "Momentum",
       detail:
         reportDynamics?.changedSignals.length
-          ? `${signalReasonLabel[changedSignal?.key ?? "tightness"]} ${changedSignal ? describeSignalMomentum(changedSignal) : "held"} this week; ${reportDynamics.directionLabel} overall.`
+          ? `${signalReasonLabel[changedSignal?.key ?? "tightness"]} ${changedSignal ? describeSignalDirection(changedSignal) : "held"} this week; ${reportDynamics.directionLabel} overall.`
           : "No material signal deltas this week; call is carried by level and threshold distance.",
     },
     {
@@ -353,25 +386,43 @@ export const buildHomeBriefModel = (data: HomeReportData) => {
           : "Stable";
   const startupClimateIndex = buildStartupClimateIndex({ assessment, macroSeries, trendLabel });
 
+  const reversalDimension: BoundaryDimension = tightnessGap <= riskGap ? "tightness" : "riskAppetite";
+  const reversalDirection = boundaryDirectionForRegime(assessment.regime, reversalDimension);
   const reversalTrigger =
-    tightnessGap <= riskGap
-      ? `Flip to ${primaryShiftRegimeLabel} if tightness crosses ${tightnessThreshold.toFixed(1)} (now ${assessment.scores.tightness.toFixed(1)}).`
-      : `Flip to ${primaryShiftRegimeLabel} if risk appetite crosses ${riskThreshold.toFixed(1)} (now ${assessment.scores.riskAppetite.toFixed(1)}).`;
+    reversalDimension === "tightness"
+      ? buildBoundaryTriggerText({
+        targetRegimeLabel: primaryShiftRegimeLabel,
+        dimension: "tightness",
+        threshold: tightnessThreshold,
+        current: assessment.scores.tightness,
+        direction: reversalDirection,
+      })
+      : buildBoundaryTriggerText({
+        targetRegimeLabel: primaryShiftRegimeLabel,
+        dimension: "riskAppetite",
+        threshold: riskThreshold,
+        current: assessment.scores.riskAppetite,
+        direction: reversalDirection,
+      });
 
   const regimeDistance =
-    tightnessGap <= riskGap
+    reversalDimension === "tightness"
       ? {
-        dimensionLabel: "Tightness",
-        currentValue: assessment.scores.tightness,
-        thresholdValue: tightnessThreshold,
-        pointsToFlip: Math.abs(tightnessThreshold - assessment.scores.tightness),
-      }
+          dimensionLabel: "Tightness",
+          dimensionKey: "tightness",
+          currentValue: assessment.scores.tightness,
+          thresholdValue: tightnessThreshold,
+          pointsToFlip: Math.abs(tightnessThreshold - assessment.scores.tightness),
+          thresholdDirection: boundaryDirectionForRegime(assessment.regime, "tightness"),
+        }
       : {
-        dimensionLabel: "Risk appetite",
-        currentValue: assessment.scores.riskAppetite,
-        thresholdValue: riskThreshold,
-        pointsToFlip: Math.abs(assessment.scores.riskAppetite - riskThreshold),
-      };
+          dimensionLabel: "Risk appetite",
+          dimensionKey: "riskAppetite",
+          currentValue: assessment.scores.riskAppetite,
+          thresholdValue: riskThreshold,
+          pointsToFlip: Math.abs(assessment.scores.riskAppetite - riskThreshold),
+          thresholdDirection: boundaryDirectionForRegime(assessment.regime, "riskAppetite"),
+        };
 
   const guardrail = stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
   const netConstraintSummary =

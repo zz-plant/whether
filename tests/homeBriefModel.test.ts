@@ -79,8 +79,28 @@ describe("buildHomeBriefModel", () => {
     });
 
     const momentumReason = model.whyThisCall.find((reason) => reason.label === "Momentum")?.detail ?? "";
-    assert.match(momentumReason, /Risk appetite eased this week; improving overall\./);
+    assert.match(momentumReason, /Risk appetite improving this week; improving overall\./);
     assert.doesNotMatch(momentumReason, /tightness/i);
+  });
+
+  it("uses direction-aware reversal trigger language for expansion risk-appetite boundaries", () => {
+    const model = buildHomeBriefModel({
+      assessment: {
+        regime: "EXPANSION",
+        thresholds: { tightnessRegime: 40, riskAppetiteRegime: 50 },
+        scores: { tightness: 10, riskAppetite: 56 },
+      },
+      regimeAlert: null,
+      stopItems: ["Guardrail"],
+      reportDynamics: {
+        directionLabel: "stable",
+        changedSignals: [],
+      },
+    });
+
+    assert.match(model.reversalTrigger, /risk appetite falls to or below 50\.0 \(now 56\.0\)/i);
+    assert.equal(model.regimeDistance.dimensionKey, "riskAppetite");
+    assert.equal(model.regimeDistance.thresholdDirection, "fallToOrBelow");
   });
 
   it("anchors historical timeline to record year for time-machine snapshots", () => {

@@ -31,6 +31,8 @@ describe("WeeklyDecisionCard extracted sections", () => {
           currentValue: 64,
           thresholdValue: 70,
           pointsToFlip: 6,
+          dimensionKey: "tightness",
+          thresholdDirection: "riseAbove",
         }}
         movementVelocity="Low"
       />,
@@ -40,6 +42,38 @@ describe("WeeklyDecisionCard extracted sections", () => {
     assert.match(html, /Macro operating state/);
     assert.match(html, /⚠ Operating guardrail/);
     assert.match(html, /Defensive trigger/);
+  });
+
+  it("marks risk-appetite defensive trigger as breached only when value is at or below threshold", () => {
+    const html = renderToStaticMarkup(
+      <DecisionCallHeader
+        statusLabel="EXPANSION"
+        netConstraintSummary="Constraints eased."
+        meetingShorthand="Do now: speed reversible bets."
+        postureDelta="Better than last week"
+        immediateDecision="Hold expansion posture"
+        guardrail="Keep irreversible spend capped"
+        confidencePercent={74}
+        confidenceLabel="MED"
+        trendLabel="Mixed"
+        transitionWatch="ON"
+        freshnessLabel="Mar 6, 2026"
+        trustCueLine="Confidence MED · Freshness Mar 6, 2026 · Regime shift watch ON"
+        needsTrustWarning={false}
+        trustWarningCopy=""
+        regimeDistance={{
+          dimensionLabel: "Risk appetite",
+          dimensionKey: "riskAppetite",
+          currentValue: 49,
+          thresholdValue: 50,
+          pointsToFlip: 1,
+          thresholdDirection: "fallToOrBelow",
+        }}
+        movementVelocity="Medium"
+      />,
+    );
+
+    assert.match(html, /Threshold breached\./);
   });
 
   it("renders bounded rules matrix hierarchy", () => {

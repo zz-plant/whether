@@ -50,9 +50,11 @@ export type WeeklyDecisionCardProps = {
   };
   regimeDistance: {
     dimensionLabel: string;
+    dimensionKey: "tightness" | "riskAppetite";
     currentValue: number;
     thresholdValue: number;
     pointsToFlip: number;
+    thresholdDirection: "riseAbove" | "fallToOrBelow";
   };
   citation: string;
   isFallbackSnapshot?: boolean;
@@ -125,11 +127,12 @@ export function DecisionCallHeader({
 }: DecisionCallHeaderProps) {
   const postureLabel = postureDisplayLabel(statusLabel);
   const gaugePercent = regimeGaugePercentByLabel[statusLabel] ?? 50;
-  const thresholdBreached = regimeDistance.currentValue >= regimeDistance.thresholdValue;
-  const thresholdRatio = Math.max(
-    8,
-    Math.min(100, Math.round((regimeDistance.currentValue / Math.max(regimeDistance.thresholdValue, 1)) * 100)),
-  );
+  const thresholdBreached =
+    regimeDistance.thresholdDirection === "riseAbove"
+      ? regimeDistance.currentValue > regimeDistance.thresholdValue
+      : regimeDistance.currentValue <= regimeDistance.thresholdValue;
+  const thresholdDistance = Math.abs(regimeDistance.currentValue - regimeDistance.thresholdValue);
+  const thresholdRatio = Math.max(8, Math.min(100, Math.round((thresholdDistance / 20) * 100)));
 
   return (
     <header className="space-y-4 border-b border-slate-600/70 pb-5" data-testid="weekly-top-fold">
@@ -190,7 +193,7 @@ export function DecisionCallHeader({
             <div className={`h-3 rounded-full ${thresholdBreached ? "bg-rose-300/85" : "bg-amber-300/80"}`} style={{ width: `${thresholdRatio}%` }} />
           </div>
           <p className={`mt-2 text-xs ${thresholdBreached ? "text-rose-100" : "text-amber-100"}`}>
-            {thresholdBreached ? "Threshold breached." : `${Math.abs(regimeDistance.pointsToFlip).toFixed(1)} points away.`}
+            {thresholdBreached ? "Threshold breached." : `${Math.abs(regimeDistance.pointsToFlip).toFixed(1)} points away from trigger.`}
           </p>
         </article>
 
