@@ -15,6 +15,11 @@ import {
 } from "../../../lib/resourcesContent";
 import { GovernanceLexiconCallout } from "../components/governanceLexiconCallout";
 import { PillarCtaBlock } from "../components/pillarCtaBlock";
+import { buildResourceArticleMetadata, ResourceArticlePage } from "../components/resourceArticlePage";
+import {
+  findResourceArticleBySlug,
+  generateStaticParams as generateResourceArticleStaticParams,
+} from "../../../lib/resourceArticles";
 
 type Params = { slug: string };
 
@@ -39,11 +44,21 @@ const splitParagraphForReadability = (paragraph: string) => {
 };
 
 export function generateStaticParams() {
-  return resourcePillarPages.map((entry) => ({ slug: entry.slug }));
+  const slugs = new Set<string>([
+    ...resourcePillarPages.map((entry) => entry.slug),
+    ...generateResourceArticleStaticParams().map((entry) => entry.slug),
+  ]);
+
+  return Array.from(slugs, (slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug } = await params;
+  const article = findResourceArticleBySlug(slug);
+  if (article) {
+    return buildResourceArticleMetadata(article);
+  }
+
   const page = findResourcePillarBySlug(slug);
   if (!page) return {};
 
@@ -61,6 +76,11 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
 export default async function ResourcePillarPage({ params }: { params: Promise<Params> }) {
   const { slug } = await params;
+  const article = findResourceArticleBySlug(slug);
+  if (article) {
+    return <ResourceArticlePage article={article} />;
+  }
+
   const page = findResourcePillarBySlug(slug);
   if (!page) notFound();
 
