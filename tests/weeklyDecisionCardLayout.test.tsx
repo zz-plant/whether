@@ -73,6 +73,21 @@ describe("WeeklyDecisionCard top-fold composition", () => {
           { label: "W-1", posture: "Balanced" },
           { label: "Now", posture: "Defensive" },
         ]}
+        historicalTimeline={[
+          { label: "2020", posture: "Defensive" },
+          { label: "2021", posture: "Expansion" },
+          { label: "2022", posture: "Defensive" },
+          { label: "2023", posture: "Mixed" },
+          { label: "2024", posture: "Mixed" },
+          { label: "2025", posture: "Expansion" },
+          { label: "2026", posture: "Defensive" },
+        ]}
+        macroOverlay={[
+          { label: "VC funding", detail: "-4.5 · ↑ improving" },
+          { label: "Startup layoffs", detail: "62.0 · ↑ improving" },
+          { label: "IPO window (VIX)", detail: "17.4 · ↓ tightening" },
+          { label: "SaaS multiples", detail: "5.9 · ↑ improving" },
+        ]}
         whyThisCall={[
           { label: "Boundary distance", detail: "Nearest boundary is 4.0 points away." },
           { label: "Momentum", detail: "Capital tightness tightened this week." },
@@ -150,6 +165,21 @@ describe("WeeklyDecisionCard top-fold composition", () => {
           { label: "W-1", posture: "Balanced" },
           { label: "Now", posture: "Balanced" },
         ]}
+        historicalTimeline={[
+          { label: "2020", posture: "Defensive" },
+          { label: "2021", posture: "Expansion" },
+          { label: "2022", posture: "Defensive" },
+          { label: "2023", posture: "Mixed" },
+          { label: "2024", posture: "Mixed" },
+          { label: "2025", posture: "Expansion" },
+          { label: "2026", posture: "Balanced" },
+        ]}
+        macroOverlay={[
+          { label: "VC funding", detail: "-4.5 · ↑ improving" },
+          { label: "Startup layoffs", detail: "62.0 · ↑ improving" },
+          { label: "IPO window (VIX)", detail: "17.4 · ↓ tightening" },
+          { label: "SaaS multiples", detail: "5.9 · ↑ improving" },
+        ]}
         whyThisCall={[
           { label: "Boundary distance", detail: "Nearest boundary is 15.0 points away." },
           { label: "Momentum", detail: "No material deltas this week." },
@@ -208,6 +238,21 @@ describe("WeeklyDecisionCard top-fold composition", () => {
           { label: "W-2", posture: "Defensive" },
           { label: "W-1", posture: "Defensive" },
           { label: "Now", posture: "Defensive" },
+        ]}
+        historicalTimeline={[
+          { label: "2020", posture: "Defensive" },
+          { label: "2021", posture: "Expansion" },
+          { label: "2022", posture: "Defensive" },
+          { label: "2023", posture: "Mixed" },
+          { label: "2024", posture: "Mixed" },
+          { label: "2025", posture: "Expansion" },
+          { label: "2026", posture: "Defensive" },
+        ]}
+        macroOverlay={[
+          { label: "VC funding", detail: "-4.5 · ↑ improving" },
+          { label: "Startup layoffs", detail: "62.0 · ↑ improving" },
+          { label: "IPO window (VIX)", detail: "17.4 · ↓ tightening" },
+          { label: "SaaS multiples", detail: "5.9 · ↑ improving" },
         ]}
         whyThisCall={[
           { label: "Boundary distance", detail: "Nearest boundary is 2.0 points away." },
