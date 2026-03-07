@@ -35,7 +35,13 @@ const areaLabels: Record<DecisionArea, string> = {
 
 export const decisionAreaLabel = (area: DecisionArea) => areaLabels[area];
 
-const fmt = (value: number) => value.toFixed(0);
+const fmt = (value: number) => {
+  if (Math.abs(value) < 10 || !Number.isInteger(value)) {
+    return value.toFixed(1);
+  }
+
+  return value.toFixed(0);
+};
 
 export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores }: RuleContext): BoundedDecisionRule[] => {
   const isExpansion = regime === "EXPANSION";

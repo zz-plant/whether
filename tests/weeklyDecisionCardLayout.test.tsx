@@ -56,6 +56,8 @@ describe("WeeklyDecisionCard top-fold composition", () => {
           currentValue: 64,
           thresholdValue: 70,
           pointsToFlip: 6,
+          dimensionKey: "tightness",
+          thresholdDirection: "riseAbove",
         }}
         citation="Whether weekly brief citation"
         actions={<button type="button">Copy weekly brief</button>}
@@ -99,6 +101,8 @@ describe("WeeklyDecisionCard top-fold composition", () => {
           currentValue: 64,
           thresholdValue: 70,
           pointsToFlip: 6,
+          dimensionKey: "tightness",
+          thresholdDirection: "riseAbove",
         }}
         citation="Whether weekly brief citation"
         isFallbackSnapshot={true}
