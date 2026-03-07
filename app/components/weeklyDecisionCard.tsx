@@ -197,7 +197,7 @@ export function WeeklyDecisionCard({
       ? 0
       : Math.round((regimeDistance.currentValue / regimeDistance.thresholdValue) * 100);
   const thresholdRatio = Math.max(0, Math.min(100, thresholdRawPercent));
-  const thresholdBreached = regimeDistance.currentValue >= regimeDistance.thresholdValue;
+  const thresholdBreached = regimeDistance.pointsToFlip <= 0;
   const decisionPressurePercent = Math.max(10, Math.min(95, reportDynamics.changedSignals.length * 22 + (revisitDecisions ? 25 : 8)));
   const decisionStabilityPercent = Math.max(8, Math.min(100, 100 - reportDynamics.changedSignals.length * 25 - (revisitDecisions ? 25 : 0)));
   const postureLabel = postureDisplay(statusLabel);
