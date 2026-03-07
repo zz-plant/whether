@@ -118,6 +118,22 @@ const riskColorByLabel: Record<"Low" | "Controlled" | "High", string> = {
   High: "text-rose-200",
 };
 
+const postureOrder = ["Expansion", "Mixed", "Scarcity", "Defensive"] as const;
+
+const movementMeterTone: Record<"tightening" | "easing" | "unchanged", string> = {
+  tightening: "bg-amber-300/80",
+  easing: "bg-emerald-300/80",
+  unchanged: "bg-slate-500/80",
+};
+
+const postureDisplay = (value: string) => {
+  const normalized = value.trim().toLowerCase();
+  if (normalized.includes("defensive")) return "Defensive";
+  if (normalized.includes("scarcity")) return "Scarcity";
+  if (normalized.includes("mixed") || normalized.includes("balanced")) return "Mixed";
+  return "Expansion";
+};
+
 export function WeeklyDecisionCard({
   statusLabel,
   postureDelta,
@@ -176,11 +192,21 @@ export function WeeklyDecisionCard({
       meter: normalizeMeter(delta, maxSignalDelta),
     };
   });
-  const thresholdRatio =
+  const thresholdRawPercent =
     regimeDistance.thresholdValue <= 0
       ? 0
-      : Math.max(0, Math.min(100, Math.round((regimeDistance.currentValue / regimeDistance.thresholdValue) * 100)));
+      : Math.round((regimeDistance.currentValue / regimeDistance.thresholdValue) * 100);
+  const thresholdRatio = Math.max(0, Math.min(100, thresholdRawPercent));
+  const thresholdBreached = regimeDistance.currentValue >= regimeDistance.thresholdValue;
   const decisionPressurePercent = Math.max(10, Math.min(95, reportDynamics.changedSignals.length * 22 + (revisitDecisions ? 25 : 8)));
+  const decisionStabilityPercent = Math.max(8, Math.min(100, 100 - reportDynamics.changedSignals.length * 25 - (revisitDecisions ? 25 : 0)));
+  const postureLabel = postureDisplay(statusLabel);
+  const postureIndex = postureOrder.indexOf(postureLabel);
+  const postureDialPercent = postureIndex <= 0 ? 8 : Math.round((postureIndex / (postureOrder.length - 1)) * 100);
+  const regimeDistanceToFlip = Math.abs(regimeDistance.pointsToFlip).toFixed(1);
+  const regimeDistanceMessage = thresholdBreached
+    ? `${regimeDistanceToFlip} points past the flip threshold.`
+    : `${regimeDistanceToFlip} points until the flip threshold.`;
 
   return (
     <section className="weather-panel space-y-5 px-5 py-6 sm:space-y-6 sm:px-7 sm:py-8" aria-labelledby="weekly-posture-brief-title">
@@ -192,6 +218,20 @@ export function WeeklyDecisionCard({
 
         <article className={`${primaryPanel} ${sectionSpacing} border-sky-400/50`} aria-label="In 15 seconds">
           <h2 className={primaryHeading}>In 15 seconds</h2>
+          <article className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-3" aria-label="Macro posture dial">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Macro posture dial</p>
+            <div className="mt-2 space-y-2">
+              <div className="relative h-2 rounded-full bg-slate-800">
+                <div className="absolute -top-1 h-4 w-4 -translate-x-1/2 rounded-full border border-sky-100 bg-sky-300" style={{ left: `${postureDialPercent}%` }} />
+              </div>
+              <ul className="grid grid-cols-4 gap-1 text-[11px] text-slate-300">
+                {postureOrder.map((posture) => (
+                  <li key={posture} className={posture === postureLabel ? "font-semibold text-slate-100" : undefined}>{posture}</li>
+                ))}
+              </ul>
+              <p className="text-xs text-slate-200">Current regime: <span className="font-semibold text-slate-100">{postureLabel}</span></p>
+            </div>
+          </article>
           <ul className="grid gap-2 text-xs sm:grid-cols-2 lg:grid-cols-4" aria-label="Weekly decision summary">
             <li className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-3">
               <p className="font-semibold uppercase tracking-[0.12em] text-sky-200">What changed</p>
@@ -214,8 +254,15 @@ export function WeeklyDecisionCard({
             <span className="inline-flex min-h-11 items-center rounded-full border border-slate-600/80 bg-slate-950/70 px-3 py-1 text-xs text-slate-200">Confidence {confidencePercent}% ({confidenceLabel})</span>
             <span className="inline-flex min-h-11 items-center rounded-full border border-slate-600/80 bg-slate-950/70 px-3 py-1 text-xs text-slate-200">Trend {trendLabel}</span>
             <span className="inline-flex min-h-11 items-center rounded-full border border-slate-600/80 bg-slate-950/70 px-3 py-1 text-xs text-slate-200">Freshness {freshnessLabel}</span>
-            <span className="inline-flex min-h-11 items-center rounded-full border border-slate-600/80 bg-slate-950/70 px-3 py-1 text-xs text-slate-200">Shift watch {transitionWatch}</span>
+            <span className="inline-flex min-h-11 items-center rounded-full border border-slate-600/80 bg-slate-950/70 px-3 py-1 text-xs text-slate-200">Regime shift watch {transitionWatch}</span>
           </div>
+          <article className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-3" aria-label="Signal confidence meter">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Signal confidence</p>
+            <div className="mt-2 h-2 rounded-full bg-slate-800">
+              <div className="h-2 rounded-full bg-emerald-300/80" style={{ width: `${Math.max(8, Math.min(100, confidencePercent))}%` }} />
+            </div>
+            <p className="mt-2 text-xs text-slate-200">Reliability: {confidenceLabel} · Data freshness: {freshnessLabel}</p>
+          </article>
           <p className="text-xs text-slate-300">{trustCueLine}</p>
         </article>
       </header>
@@ -248,7 +295,7 @@ export function WeeklyDecisionCard({
                     <span className="font-semibold text-slate-100">{signal.direction} {signal.delta > 0 ? `+${signal.delta.toFixed(1)}` : signal.delta.toFixed(1)}</span>
                   </div>
                   <div className="h-2 rounded-full bg-slate-800">
-                    <div className="h-2 rounded-full bg-sky-300/80" style={{ width: `${signal.meter}%` }} />
+                    <div className={`h-2 rounded-full ${movementMeterTone[directionHint(signal.delta)]}`} style={{ width: `${signal.meter}%` }} />
                   </div>
                 </li>
               ))}
@@ -256,13 +303,13 @@ export function WeeklyDecisionCard({
           </article>
 
           <article className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Regime distance meter</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Distance to regime flip</p>
             <p className="mt-1 text-xs text-slate-300">{reversalTrigger}</p>
             <p className="mt-2 text-xs text-slate-200">{regimeDistance.dimensionLabel}: {regimeDistance.currentValue.toFixed(1)} / {regimeDistance.thresholdValue.toFixed(1)}</p>
             <div className="mt-2 h-3 rounded-full bg-slate-800">
-              <div className="h-3 rounded-full bg-amber-300/80" style={{ width: `${thresholdRatio}%` }} />
+              <div className={`h-3 rounded-full ${thresholdBreached ? "bg-rose-300/85" : "bg-amber-300/80"}`} style={{ width: `${thresholdRatio}%` }} />
             </div>
-            <p className="mt-2 text-xs text-amber-100">{Math.abs(regimeDistance.pointsToFlip).toFixed(1)} points from the flip boundary.</p>
+            <p className={`mt-2 text-xs ${thresholdBreached ? "text-rose-100" : "text-amber-100"}`}>{regimeDistanceMessage}</p>
           </article>
         </div>
         {reportDynamics.changedSignals.length === 0 ? (
@@ -283,11 +330,18 @@ export function WeeklyDecisionCard({
           </div>
         )}
         <article className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Decision pressure</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Decision change pressure</p>
           <div className="mt-2 h-3 rounded-full bg-slate-800">
             <div className="h-3 rounded-full bg-violet-300/80" style={{ width: `${decisionPressurePercent}%` }} />
           </div>
           <p className="mt-2 text-xs text-slate-200">{decisionPressurePercent >= 65 ? "High" : decisionPressurePercent >= 40 ? "Moderate" : "Low"} pressure — {revisitDecisions ? "revisit major commitments this week." : "hold major commitments unless new evidence appears."}</p>
+        </article>
+        <article className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Plan stability</p>
+          <div className="mt-2 h-2 rounded-full bg-slate-800">
+            <div className="h-2 rounded-full bg-sky-300/80" style={{ width: `${decisionStabilityPercent}%` }} />
+          </div>
+          <p className="mt-2 text-xs text-slate-200">{revisitDecisions ? "Material change versus last week." : "No material change versus last week."}</p>
         </article>
       </article>
 
@@ -315,7 +369,7 @@ export function WeeklyDecisionCard({
       </article>
 
       <article className={`${secondaryPanel} ${sectionSpacing}`} aria-label="Bounded rule cards">
-        <h2 className={secondaryHeading}>Bounded rule cards (quick scan)</h2>
+        <h2 className={secondaryHeading}>Operating rules (quick scan)</h2>
         <ul className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {topDecisionRules.map((rule) => (
             <li key={rule.area} className="rounded-lg border border-slate-700/60 bg-slate-950/60 p-3 text-sm text-slate-200">
@@ -334,9 +388,17 @@ export function WeeklyDecisionCard({
           <article className="rounded-lg border border-slate-700/60 bg-slate-950/60 px-3 py-3">
             <h2 className={secondaryHeading}>Startup Climate Index</h2>
             <p className="mt-1 text-xs text-slate-300">Score {startupClimateIndex.score} / 100 · {startupClimateIndex.status}</p>
-            <ul className="mt-2 grid gap-1 text-xs text-slate-300 sm:grid-cols-2">
+            <ul className="mt-2 grid gap-2 text-xs text-slate-300 sm:grid-cols-2">
               {startupClimateIndex.breakdown.map((item) => (
-                <li key={item.label}>{item.label}: {item.score}</li>
+                <li key={item.label} className="space-y-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <span>{item.label}</span>
+                    <span className="font-semibold text-slate-100">{item.score}</span>
+                  </div>
+                  <div className="h-2 rounded-full bg-slate-800">
+                    <div className="h-2 rounded-full bg-sky-300/70" style={{ width: `${Math.max(5, Math.min(100, item.score))}%` }} />
+                  </div>
+                </li>
               ))}
             </ul>
           </article>
@@ -380,6 +442,21 @@ export function WeeklyDecisionCard({
             </div>
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Historical timeline</p>
+              <div className="mt-2 flex flex-wrap items-center gap-2" aria-label="Macro regime timeline">
+                {historicalTimeline.map((item, index) => {
+                  const timelinePosture = postureDisplay(item.posture);
+                  const timelineLevel = postureOrder.indexOf(timelinePosture) + 1;
+                  return (
+                    <div key={`${item.label}-${item.posture}-bar`} className="flex items-center gap-2">
+                      <div className="min-w-12 text-[11px] text-slate-400">{item.label}</div>
+                      <div className="h-2 w-10 rounded-full bg-slate-800">
+                        <div className="h-2 rounded-full bg-sky-300/75" style={{ width: `${Math.round((timelineLevel / postureOrder.length) * 100)}%` }} />
+                      </div>
+                      {index < historicalTimeline.length - 1 ? <span className="text-slate-500">→</span> : null}
+                    </div>
+                  );
+                })}
+              </div>
               <ul className="mt-2 grid gap-2 sm:grid-cols-4 lg:grid-cols-7">
                 {historicalTimeline.map((item) => (
                   <li key={`${item.label}-${item.posture}`} className="rounded-md border border-slate-700/60 bg-slate-950/60 px-2 py-2 text-xs text-slate-200">
@@ -407,11 +484,11 @@ export function WeeklyDecisionCard({
         <pre className="mt-2 overflow-x-auto whitespace-pre-wrap text-xs text-slate-300">{citation}</pre>
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-md border border-slate-700/60 bg-slate-950/60 px-3 py-3 text-xs text-slate-300">
           <div>
-            <p className="font-semibold uppercase tracking-[0.12em] text-slate-100">Team fit check</p>
+            <p className="font-semibold uppercase tracking-[0.12em] text-slate-100">Team context check</p>
             <p className="mt-1">Compare this macro call with your team context before locking irreversible moves.</p>
           </div>
           <Link href="/decide/team-context" className="inline-flex min-h-[44px] items-center rounded-md border border-sky-400/60 px-3 py-2 font-semibold text-sky-200 hover:bg-sky-500/10">
-            Run risk check
+            Open team context check
           </Link>
         </div>
         <div className="mt-3">{actions}</div>
