@@ -9,12 +9,14 @@ export const SectionedReportPanel = ({
   description,
   children,
   defaultOpen = true,
+  label = "Section",
 }: {
   id: string;
   title: string;
   description?: string;
   children: ReactNode;
   defaultOpen?: boolean;
+  label?: string;
 }) => (
   <section id={id} className="space-y-4">
     <Collapsible.Root defaultOpen={defaultOpen}>
@@ -24,7 +26,7 @@ export const SectionedReportPanel = ({
       >
         <span>
           <span className="text-xs font-semibold tracking-[0.2em] text-slate-400">
-            Section
+            {label}
           </span>
           <span className="mt-1 block text-base font-semibold text-slate-100 sm:text-lg">
             {title}

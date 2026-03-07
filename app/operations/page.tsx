@@ -206,11 +206,30 @@ export default async function OperationsPage({
         <LiveDataFallbackAlert lastCachedTimestamp={reportResult.fallback.lastCachedTimestamp} />
       ) : null}
 
+      <section className="weather-panel space-y-3 px-5 py-4" aria-label="Three execution moves this week">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">This week&apos;s 3 moves</p>
+        <ol className="grid gap-2 md:grid-cols-3">
+          <li className="weather-surface px-3 py-3 text-xs text-slate-200">
+            <p className="font-semibold uppercase tracking-[0.12em] text-sky-200">1 · Align posture</p>
+            <p className="mt-1">Confirm the monthly action summary before changing operating cadence.</p>
+          </li>
+          <li className="weather-surface px-3 py-3 text-xs text-slate-200">
+            <p className="font-semibold uppercase tracking-[0.12em] text-sky-200">2 · Apply guardrails</p>
+            <p className="mt-1">Execute start/stop/fence moves in the playbook and pause on stop triggers.</p>
+          </li>
+          <li className="weather-surface px-3 py-3 text-xs text-slate-200">
+            <p className="font-semibold uppercase tracking-[0.12em] text-sky-200">3 · Export artifact</p>
+            <p className="mt-1">Copy stakeholder-ready briefs after finance strategy and operator requests are aligned.</p>
+          </li>
+        </ol>
+      </section>
+
       <OperationsWorkflowProgress currentPath="/operations" />
       <OperationsWorkstreamNav currentPath="/operations" />
 
       <SectionedReportPanel
         id="ops-monthly-action-summary"
+        label="Decide"
         title="Monthly action summary"
         description="The moves the regime recommends this month."
       >
@@ -223,6 +242,7 @@ export default async function OperationsPage({
 
       <SectionedReportPanel
         id="ops-playbook"
+        label="Execute"
         title="Playbook"
         description="Start, stop, and fence actions tuned to the current regime."
       >
@@ -238,6 +258,7 @@ export default async function OperationsPage({
 
       <SectionedReportPanel
         id="ops-finance-strategy"
+        label="Verify"
         title="Finance strategy"
         description="Budget posture and cash timing guidance for the quarter."
       >
@@ -250,6 +271,7 @@ export default async function OperationsPage({
 
       <SectionedReportPanel
         id="ops-export-briefs"
+        label="Export"
         title="Export briefs"
         description="Copy-ready narratives for leadership updates and stakeholder syncs."
       >
@@ -265,6 +287,7 @@ export default async function OperationsPage({
 
       <SectionedReportPanel
         id="ops-operator-requests"
+        label="Coordinate"
         title="Operator requests"
         description="Current asks for operators driving execution."
       >

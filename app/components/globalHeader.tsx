@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { navigationLayers } from "../../lib/navigation/informationArchitecture";
 import { pathMatchesLink } from "../../lib/navigation/pathMatching";
+import { reportShellCorePaths } from "../../lib/report/reportNavigation";
 import { ThemeToggleButton } from "./themeToggleButton";
 
 const groupBadgeStyles = {
@@ -21,8 +22,7 @@ const groupLabels = {
 export function GlobalHeader() {
   const pathname = usePathname();
   const isHome = pathMatchesLink("/", pathname);
-  const reportShellRoutes = ["/", "/signals", "/operations"];
-  const isReportShellRoute = reportShellRoutes.some((route) => pathMatchesLink(route, pathname));
+  const isReportShellRoute = reportShellCorePaths.some((route) => pathMatchesLink(route, pathname));
 
   if (isReportShellRoute) {
     return null;

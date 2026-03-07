@@ -160,6 +160,11 @@ export default async function SignalsPage({
   const nextRefreshLabel = historicalSelection
     ? "Fixed historical snapshot"
     : "15m cadence";
+  const decisionDeltaLabel = historicalSelection
+    ? "Retrospective mode — do not approve new bets from this snapshot."
+    : isFallback
+      ? "Live feed degraded — hold irreversible decisions until signals recover."
+      : "Decision check — confirm or revise this week's operating call with these deltas.";
   const showAdvanced = resolvedSearchParams?.advanced === "1";
   const showFullDiagnostics = resolvedSearchParams?.diagnostics === "all";
   const timeMachineHref = showAdvanced ? "#time-machine" : "#advanced-controls";
@@ -365,6 +370,9 @@ export default async function SignalsPage({
       />
 
       <section id="decision-summary" className="weather-panel space-y-6 px-6 py-5" aria-label="Decision summary">
+        <p className="weather-surface inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100">
+          {decisionDeltaLabel}
+        </p>
         <div className="weather-surface grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-200">Posture</p>
