@@ -1,25 +1,7 @@
 import type { TimeMachineRegimeEntry } from "../../../lib/timeMachine/timeMachineCache";
 import type { RegimeKey } from "../../../lib/regimeEngine";
 import { REGIME_LABELS, REGIME_STYLE_TOKENS } from "../../../lib/regimePresentation";
-
-const monthFormatter = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  year: "numeric",
-  timeZone: "UTC",
-});
-
-const monthShortFormatter = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  timeZone: "UTC",
-});
-
-const formatMonthLabel = (year: number, month: number) => {
-  return monthFormatter.format(new Date(Date.UTC(year, month - 1, 1)));
-};
-
-const formatMonthShort = (year: number, month: number) => {
-  return monthShortFormatter.format(new Date(Date.UTC(year, month - 1, 1)));
-};
+import { formatMonthLabel, formatMonthShortLabel } from "../../../lib/timeMachine/monthFormatting";
 
 
 type RegimeRun = {
@@ -84,7 +66,7 @@ const formatRunSpan = (run: RegimeRun) => {
   }
 
   if (run.start.year === run.end.year) {
-    return `${formatMonthShort(run.start.year, run.start.month)}–${formatMonthShort(run.end.year, run.end.month)} ${run.start.year}`;
+    return `${formatMonthShortLabel(run.start.year, run.start.month)}–${formatMonthShortLabel(run.end.year, run.end.month)} ${run.start.year}`;
   }
 
   return `${formatMonthLabel(run.start.year, run.start.month)}–${formatMonthLabel(run.end.year, run.end.month)}`;
