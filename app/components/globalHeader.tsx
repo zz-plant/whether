@@ -5,19 +5,8 @@ import { usePathname } from "next/navigation";
 import { navigationLayers } from "../../lib/navigation/informationArchitecture";
 import { pathMatchesLink } from "../../lib/navigation/pathMatching";
 import { reportShellCorePaths } from "../../lib/report/reportNavigation";
+import { NavigationOrientationBadge } from "./navigationOrientationBadge";
 import { ThemeToggleButton } from "./themeToggleButton";
-
-const groupBadgeStyles = {
-  core: "border-emerald-300/30 bg-emerald-400/10 text-emerald-100",
-  workflow: "border-sky-300/30 bg-sky-400/10 text-sky-100",
-  reference: "border-violet-300/30 bg-violet-400/10 text-violet-100",
-} as const;
-
-const groupLabels = {
-  core: "Now",
-  workflow: "Operate",
-  reference: "Reference",
-} as const;
 
 export function GlobalHeader() {
   const pathname = usePathname();
@@ -51,6 +40,7 @@ export function GlobalHeader() {
                 Operating posture navigation
               </p>
             )}
+            <NavigationOrientationBadge currentPath={pathname} className="mt-3" />
           </div>
           <ThemeToggleButton />
         </div>
@@ -72,11 +62,6 @@ export function GlobalHeader() {
                         : "text-slate-100 hover:border-sky-400/70"
                     }`}
                   >
-                    <span
-                      className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] ${groupBadgeStyles[link.group]}`}
-                    >
-                      {groupLabels[link.group]}
-                    </span>
                     <span className="mt-1 text-xs font-semibold tracking-[0.08em] sm:text-sm">
                       {link.label}
                     </span>
