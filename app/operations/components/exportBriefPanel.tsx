@@ -280,7 +280,7 @@ export const ExportBriefPanel = ({
       <div className="weather-panel p-6">
         <SectionPanelHeader
           label="Export briefs"
-          title="Share the report"
+          title="Send to team"
           titleId="export-briefs-title"
           description={
             <>
@@ -292,14 +292,41 @@ export const ExportBriefPanel = ({
               <Button
                 type="button"
                 onClick={handlePrint}
-                className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+                className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:text-white touch-manipulation"
               >
-                Print / Save PDF
+                Export PDF
               </Button>
               {showProvenance ? <DataProvenanceStrip provenance={provenance} /> : null}
             </>
           }
         />
+
+        <div className="mt-4 rounded-lg border border-sky-400/40 bg-slate-950/70 p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Send to team</p>
+          <div className="mt-3 flex flex-wrap gap-3">
+            <ClipboardActionRow
+              label="Copy Slack Brief"
+              state={clipboardState("Slack")}
+              disabled={isCopyDisabled("Slack")}
+              onClick={() => void handleCopy(briefing, "Slack")}
+              className="weather-button-primary"
+            />
+            <ClipboardActionRow
+              label="Copy Board Summary"
+              state={clipboardState("Board")}
+              disabled={isCopyDisabled("Board")}
+              onClick={() => void handleCopy(boardBrief, "Board")}
+              className="weather-button-primary"
+            />
+            <Button
+              type="button"
+              onClick={handlePrint}
+              className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:text-white touch-manipulation"
+            >
+              Export PDF
+            </Button>
+          </div>
+        </div>
 
         <div className="mt-6 grid gap-4 lg:grid-cols-[1.4fr,1fr]">
           <div className="weather-surface p-4">
