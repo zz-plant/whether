@@ -125,20 +125,20 @@ export function WeeklyDecisionCard({
   return (
     <section className="weather-panel space-y-5 px-5 py-6 sm:space-y-6 sm:px-7 sm:py-8" aria-labelledby="weekly-posture-brief-title">
       <header className="space-y-3 border-b border-slate-600/70 pb-5" data-testid="weekly-top-fold">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-200">This week&apos;s posture</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-200">Weekly posture call</p>
         <h1 id="weekly-posture-brief-title" className="text-3xl font-semibold text-slate-50 sm:text-4xl">{statusLabel}</h1>
         <p className="text-sm text-slate-300">{netConstraintSummary}</p>
         <p className="text-sm font-semibold text-slate-100">{meetingShorthand}</p>
 
-        <article className={`${primaryPanel} ${sectionSpacing} border-sky-400/50`} aria-label="This week in 15 seconds">
-          <h2 className={primaryHeading}>This week in 15 seconds</h2>
+        <article className={`${primaryPanel} ${sectionSpacing} border-sky-400/50`} aria-label="In 15 seconds">
+          <h2 className={primaryHeading}>In 15 seconds</h2>
           <ul className="grid gap-2 text-xs sm:grid-cols-2 lg:grid-cols-4" aria-label="Weekly decision summary">
             <li className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-3">
               <p className="font-semibold uppercase tracking-[0.12em] text-sky-200">What changed</p>
               <p className="mt-1 text-slate-200">{postureDelta}</p>
             </li>
             <li className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-3">
-              <p className="font-semibold uppercase tracking-[0.12em] text-sky-200">Decision now</p>
+              <p className="font-semibold uppercase tracking-[0.12em] text-sky-200">What to do now</p>
               <p className="mt-1 text-slate-200">{immediateDecision}</p>
             </li>
             <li className="rounded-lg border border-amber-500/50 bg-slate-950/60 px-3 py-3">
@@ -161,19 +161,19 @@ export function WeeklyDecisionCard({
       </header>
 
       <article className={`${primaryPanel} ${sectionSpacing}`}>
-        <h2 className={primaryHeading}>Decision call this week</h2>
+        <h2 className={primaryHeading}>Decision delta this week</h2>
         <div className="grid gap-3 sm:grid-cols-3">
           <div className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-3">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Change this week</p>
             <p className="mt-1 text-xs text-slate-200">{decisionShiftSummary}</p>
           </div>
           <div className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Decision now</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">What to do now</p>
             <p className="mt-1 text-xs font-semibold text-slate-100">{immediateDecision}</p>
             <p className="mt-1 text-xs text-slate-300">What changed: {postureDelta}</p>
           </div>
           <div className="rounded-lg border border-sky-500/40 bg-slate-950/60 px-3 py-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Flip if</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Flip trigger</p>
             <p className="mt-1 text-xs text-slate-200">{reversalTrigger}</p>
           </div>
         </div>
@@ -276,7 +276,7 @@ export function WeeklyDecisionCard({
       </article>
 
       <details className={`${supportingPanel} ${sectionSpacing}`}>
-        <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Supporting context (history + market overlay)</summary>
+        <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Supporting context (timeline + market overlay)</summary>
         <div className="mt-3 space-y-3">
           <div>
             <h2 className={secondaryHeading}>Historical memory rail</h2>
@@ -290,7 +290,7 @@ export function WeeklyDecisionCard({
             </ul>
           </div>
           <div>
-            <h2 className={secondaryHeading}>Historical posture timeline</h2>
+            <h2 className={secondaryHeading}>Historical timeline</h2>
             <ul className="mt-2 grid gap-2 sm:grid-cols-4 lg:grid-cols-7">
               {historicalTimeline.map((item) => (
                 <li key={`${item.label}-${item.posture}`} className="rounded-md border border-slate-700/60 bg-slate-950/60 px-2 py-2 text-xs text-slate-200">

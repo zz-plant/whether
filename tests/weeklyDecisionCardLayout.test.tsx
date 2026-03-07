@@ -113,8 +113,8 @@ describe("WeeklyDecisionCard top-fold composition", () => {
       />,
     );
 
-    const postureIndex = html.indexOf("This week&#x27;s posture");
-    const decisionCallIndex = html.indexOf("Decision call this week");
+    const postureIndex = html.indexOf("Weekly posture call");
+    const decisionCallIndex = html.indexOf("Decision delta this week");
     const rulesSummaryIndex = html.indexOf("Bounded rules (do now / stop / restart)");
 
     assert.ok(postureIndex >= 0);
@@ -125,8 +125,8 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /Confidence 68% \(MED\)/);
     assert.match(html, /Trend Improving/);
     assert.match(html, /Confidence MED · Freshness Mar 6, 2026 09:12 UTC · Shift watch ON/);
-    assert.match(html, /Decision call this week[\s\S]*What changed: \+2/);
-    assert.match(html, /Decision now[\s\S]*Revise hiring and roadmap calls now\./);
+    assert.match(html, /Decision delta this week[\s\S]*What changed: \+2/);
+    assert.match(html, /What to do now[\s\S]*Revise hiring and roadmap calls now\./);
     assert.match(html, /Decision matrix this week/);
     assert.match(html, /Bounded rules \(do now \/ stop \/ restart\)/);
     assert.match(html, /Primary drivers this week/);
@@ -206,8 +206,8 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /data-testid="weekly-top-fold"/);
     assert.match(html, /sm:grid-cols-3/);
     assert.match(html, /lg:grid-cols-4/);
-    assert.match(html, /Historical posture timeline/);
-    assert.match(html, /Supporting context \(history \+ market overlay\)/);
+    assert.match(html, /Historical memory rail/);
+    assert.match(html, /Supporting context \(timeline \+ market overlay\)/);
     assert.match(html, /Cite this call/);
     assert.match(html, /Posture BALANCED · Confidence HIGH · Effective Mar 5, 2026 · Freshness Mar 6, 2026 09:12 UTC/);
     assert.match(html, /Whether weekly brief citation/);

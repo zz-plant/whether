@@ -355,7 +355,7 @@ export default async function HomePage({
 
       <section className="weather-panel space-y-4 px-5 py-5" aria-label="Decision concept links">
         <div className="space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Decision references</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Decision playbooks</p>
           <h2 className="text-base font-semibold text-slate-100">Revisit these concept playbooks before finalizing this week&apos;s plan</h2>
         </div>
         <div className="grid gap-3 md:grid-cols-3">
