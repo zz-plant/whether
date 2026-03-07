@@ -136,7 +136,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /Stop if:/);
     assert.match(html, /Restart when:/);
     assert.match(html, /aria-label="Weekly decision matrix"/);
-    assert.match(html, /Founder risk check/);
+    assert.match(html, /Team fit check/);
     assert.match(html, /Run risk check/);
   });
 
@@ -207,7 +207,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /sm:grid-cols-3/);
     assert.match(html, /lg:grid-cols-4/);
     assert.match(html, /Historical memory rail/);
-    assert.match(html, /Context appendix \(drivers, confidence, timeline\)/);
+    assert.match(html, /More context \(why this call \+ timeline\)/);
     assert.match(html, /Cite this call/);
     assert.match(html, /Posture BALANCED · Confidence HIGH · Effective Mar 5, 2026 · Freshness Mar 6, 2026 09:12 UTC/);
     assert.match(html, /Whether weekly brief citation/);

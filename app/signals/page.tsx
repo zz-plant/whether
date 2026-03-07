@@ -161,10 +161,10 @@ export default async function SignalsPage({
     ? "Fixed historical snapshot"
     : "15m cadence";
   const decisionDeltaLabel = historicalSelection
-    ? "Retrospective mode — do not approve new bets from this snapshot."
+    ? "Historical snapshot for review only — switch to live data before approving new bets."
     : isFallback
-      ? "Live feed degraded — hold irreversible decisions until signals recover."
-      : "Decision check — confirm or revise this week's operating call with these deltas.";
+      ? "Live update delayed — avoid irreversible decisions until signals refresh."
+      : "Decision check: use these deltas to confirm this week's call or revise it now.";
   const showAdvanced = resolvedSearchParams?.advanced === "1";
   const showFullDiagnostics = resolvedSearchParams?.diagnostics === "all";
   const timeMachineHref = showAdvanced ? "#time-machine" : "#advanced-controls";

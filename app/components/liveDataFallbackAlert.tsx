@@ -3,7 +3,7 @@ import Link from "next/link";
 export function LiveDataFallbackAlert({
   lastCachedTimestamp,
   signalsHref = "/signals",
-  followUpLabel = "Validate live status",
+  followUpLabel = "Check live status",
 }: {
   lastCachedTimestamp: string;
   signalsHref?: string;

@@ -211,15 +211,15 @@ export default async function OperationsPage({
         <ol className="grid gap-2 md:grid-cols-3">
           <li className="weather-surface px-3 py-3 text-xs text-slate-200">
             <p className="font-semibold uppercase tracking-[0.12em] text-sky-200">1 · Align posture</p>
-            <p className="mt-1">Confirm the monthly action summary before changing operating cadence.</p>
+            <p className="mt-1">Confirm the monthly action summary before changing team pace.</p>
           </li>
           <li className="weather-surface px-3 py-3 text-xs text-slate-200">
             <p className="font-semibold uppercase tracking-[0.12em] text-sky-200">2 · Apply guardrails</p>
-            <p className="mt-1">Execute start/stop/fence moves in the playbook and pause on stop triggers.</p>
+            <p className="mt-1">Run start/stop/fence moves from the playbook and pause if a stop trigger hits.</p>
           </li>
           <li className="weather-surface px-3 py-3 text-xs text-slate-200">
             <p className="font-semibold uppercase tracking-[0.12em] text-sky-200">3 · Export artifact</p>
-            <p className="mt-1">Copy stakeholder-ready briefs after finance strategy and operator requests are aligned.</p>
+            <p className="mt-1">Copy the stakeholder brief once finance guidance and operator asks are aligned.</p>
           </li>
         </ol>
       </section>

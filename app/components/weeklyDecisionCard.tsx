@@ -240,7 +240,7 @@ export function WeeklyDecisionCard({
       </article>
 
       <details className={`${supportingPanel} ${sectionSpacing}`}>
-        <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Context appendix (drivers, confidence, timeline)</summary>
+        <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">More context (why this call + timeline)</summary>
         <div className="space-y-4 pt-2">
           <article className="rounded-lg border border-slate-700/60 bg-slate-950/60 px-3 py-3">
             <h2 className={secondaryHeading}>Startup Climate Index</h2>
@@ -318,8 +318,8 @@ export function WeeklyDecisionCard({
         <pre className="mt-2 overflow-x-auto whitespace-pre-wrap text-xs text-slate-300">{citation}</pre>
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-md border border-slate-700/60 bg-slate-950/60 px-3 py-3 text-xs text-slate-300">
           <div>
-            <p className="font-semibold uppercase tracking-[0.12em] text-slate-100">Founder risk check</p>
-            <p className="mt-1">Compare this macro call against your team context before approving irreversible moves.</p>
+            <p className="font-semibold uppercase tracking-[0.12em] text-slate-100">Team fit check</p>
+            <p className="mt-1">Compare this macro call with your team context before locking irreversible moves.</p>
           </div>
           <Link href="/decide/team-context" className="inline-flex min-h-[44px] items-center rounded-md border border-sky-400/60 px-3 py-2 font-semibold text-sky-200 hover:bg-sky-500/10">
             Run risk check
