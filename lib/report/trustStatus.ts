@@ -55,13 +55,13 @@ export const buildTrustStatus = ({
   const detail = historicalSelection
     ? "Viewing archived Treasury data for the selected month."
     : isFallback
-      ? (fallbackReason ?? "Live refresh pending. Using last verified snapshot.")
+      ? (fallbackReason ?? "Live refresh pending. Using last verified snapshot for near-term pacing only.")
       : "Live refresh healthy. Next expected update: 15m.";
 
   const action = historicalSelection
     ? historicalAction
     : isFallback
-      ? fallbackAction
+      ? `${fallbackAction} Pause irreversible decisions until live refresh returns.`
       : stableAction;
 
   const tone: TrustStatusTone = historicalSelection
