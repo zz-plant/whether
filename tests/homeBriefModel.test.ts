@@ -83,4 +83,25 @@ describe("buildHomeBriefModel", () => {
     assert.doesNotMatch(momentumReason, /tightness/i);
   });
 
+  it("anchors historical timeline to record year for time-machine snapshots", () => {
+    const model = buildHomeBriefModel({
+      assessment: {
+        regime: "DEFENSIVE",
+        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
+        scores: { tightness: 54, riskAppetite: 55 },
+      },
+      regimeAlert: null,
+      stopItems: ["Guardrail"],
+      recordDateLabel: "2022-09-30",
+      reportDynamics: {
+        directionLabel: "stable",
+        changedSignals: [],
+      },
+    });
+
+    const timelineLabels = model.historicalTimeline.map((entry) => entry.label);
+    assert.equal(timelineLabels[timelineLabels.length - 1], "2022");
+    assert.ok(timelineLabels.every((label) => Number.parseInt(label, 10) <= 2022));
+  });
+
 });

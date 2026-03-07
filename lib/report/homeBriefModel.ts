@@ -120,9 +120,17 @@ const buildMemoryRail = (recordDateLabel: string | undefined, currentRegime: Reg
   ].slice(-4);
 };
 
-const buildHistoricalTimeline = (currentRegime: Regime): MemoryRailItem[] => {
+const resolveTimelineAnchorYear = (recordDateLabel: string | undefined): number => {
+  const matchedYear = recordDateLabel?.match(/^(\d{4})/)?.[1];
+  const parsedYear = matchedYear ? Number.parseInt(matchedYear, 10) : Number.NaN;
+
+  return Number.isFinite(parsedYear) ? parsedYear : new Date().getUTCFullYear();
+};
+
+const buildHistoricalTimeline = (currentRegime: Regime, anchorYear: number): MemoryRailItem[] => {
   const yearlyEntries = getSummaryArchive()
     .filter((entry): entry is Extract<typeof entry, { cadence: "yearly" }> => entry.cadence === "yearly")
+    .filter((entry) => entry.year <= anchorYear)
     .slice(-6)
     .map((entry) => ({
       label: String(entry.year),
@@ -130,8 +138,7 @@ const buildHistoricalTimeline = (currentRegime: Regime): MemoryRailItem[] => {
     }));
 
   const latestYear = yearlyEntries[yearlyEntries.length - 1]?.label;
-  const currentYear = new Date().getUTCFullYear();
-  const currentEntryLabel = latestYear === String(currentYear) ? latestYear : String(currentYear);
+  const currentEntryLabel = latestYear === String(anchorYear) ? latestYear : String(anchorYear);
 
   return [
     ...yearlyEntries,
@@ -325,6 +332,7 @@ const buildStartupClimateIndex = ({
 
 export const buildHomeBriefModel = (data: HomeReportData) => {
   const { assessment, regimeAlert, stopItems, reportDynamics, recordDateLabel, macroSeries } = data;
+  const timelineAnchorYear = resolveTimelineAnchorYear(recordDateLabel);
   const previousRegime = regimeAlert?.previousRegime;
   const severityDelta = previousRegime
     ? regimeSeverityRank[assessment.regime] - regimeSeverityRank[previousRegime]
@@ -390,7 +398,7 @@ export const buildHomeBriefModel = (data: HomeReportData) => {
     revisitDecisions: (reportDynamics?.changedSignals.length ?? 0) > 0 && reportDynamics?.directionLabel !== "stable",
     guardrail,
     memoryRail: buildMemoryRail(recordDateLabel, assessment.regime),
-    historicalTimeline: buildHistoricalTimeline(assessment.regime),
+    historicalTimeline: buildHistoricalTimeline(assessment.regime, timelineAnchorYear),
     macroOverlay: buildMacroOverlay(macroSeries),
     primaryDrivers: buildPrimaryDrivers({ reportDynamics, confidenceLabel, transitionWatch }),
     netConstraintSummary,
