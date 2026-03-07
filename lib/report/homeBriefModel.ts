@@ -371,6 +371,21 @@ export const buildHomeBriefModel = (data: HomeReportData) => {
       ? `Flip to ${primaryShiftRegimeLabel} if tightness crosses ${tightnessThreshold.toFixed(1)} (now ${assessment.scores.tightness.toFixed(1)}).`
       : `Flip to ${primaryShiftRegimeLabel} if risk appetite crosses ${riskThreshold.toFixed(1)} (now ${assessment.scores.riskAppetite.toFixed(1)}).`;
 
+  const regimeDistance =
+    tightnessGap <= riskGap
+      ? {
+        dimensionLabel: "Tightness",
+        currentValue: assessment.scores.tightness,
+        thresholdValue: tightnessThreshold,
+        pointsToFlip: tightnessThreshold - assessment.scores.tightness,
+      }
+      : {
+        dimensionLabel: "Risk appetite",
+        currentValue: assessment.scores.riskAppetite,
+        thresholdValue: riskThreshold,
+        pointsToFlip: assessment.scores.riskAppetite - riskThreshold,
+      };
+
   const guardrail = stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
   const netConstraintSummary =
     severityDelta > 0
@@ -384,6 +399,7 @@ export const buildHomeBriefModel = (data: HomeReportData) => {
     confidencePercent,
     trendLabel,
     startupClimateIndex,
+    regimeDistance,
     decisionShiftSummary: buildDecisionShiftSummary({
       severityDelta,
       directionLabel: reportDynamics?.directionLabel,

@@ -347,6 +347,7 @@ export default async function HomePage({
         whyThisCall={homeBriefModel.whyThisCall}
         primaryDrivers={homeBriefModel.primaryDrivers}
         startupClimateIndex={homeBriefModel.startupClimateIndex}
+        regimeDistance={homeBriefModel.regimeDistance}
         citation={callCitation}
         actions={<CopyLeadershipArtifactsButtons slackBrief={slackBrief} boardSummary={boardSummary} citation={callCitation} />}
       />

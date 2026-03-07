@@ -51,6 +51,12 @@ type WeeklyDecisionCardProps = {
     status: "Improving" | "Stable" | "Deteriorating" | "Mixed";
     breakdown: Array<{ label: string; score: number }>;
   };
+  regimeDistance: {
+    dimensionLabel: string;
+    currentValue: number;
+    thresholdValue: number;
+    pointsToFlip: number;
+  };
   citation: string;
   actions?: ReactNode;
 };
@@ -77,6 +83,41 @@ const primaryPanel = "rounded-xl border border-slate-600/80 bg-slate-900/70 p-4"
 const secondaryPanel = "rounded-xl border border-slate-700/70 bg-slate-900/50 p-4";
 const supportingPanel = "rounded-xl border border-slate-800/70 bg-slate-900/35 p-4";
 
+const signalOrder: Array<ReportDynamics["changedSignals"][number]["key"]> = [
+  "tightness",
+  "riskAppetite",
+  "baseRate",
+  "curveSlope",
+];
+
+const normalizeMeter = (value: number, max: number) => {
+  if (max <= 0) return 0;
+  return Math.max(0, Math.min(100, Math.round((Math.abs(value) / max) * 100)));
+};
+
+const decisionRiskLabel = (rule: BoundedDecisionRule): "Low" | "Controlled" | "High" => {
+  const recommendation = rule.recommendation.toLowerCase();
+  if (recommendation.includes("hold") || recommendation.includes("backfills") || recommendation.includes("mission-critical")) {
+    return "High";
+  }
+  if (recommendation.includes("selective") || recommendation.includes("gated") || recommendation.includes("staged")) {
+    return "Controlled";
+  }
+  return "Low";
+};
+
+const riskMeterByLabel: Record<"Low" | "Controlled" | "High", number> = {
+  Low: 28,
+  Controlled: 55,
+  High: 82,
+};
+
+const riskColorByLabel: Record<"Low" | "Controlled" | "High", string> = {
+  Low: "text-emerald-200",
+  Controlled: "text-amber-200",
+  High: "text-rose-200",
+};
+
 export function WeeklyDecisionCard({
   statusLabel,
   postureDelta,
@@ -99,6 +140,7 @@ export function WeeklyDecisionCard({
   whyThisCall,
   primaryDrivers,
   startupClimateIndex,
+  regimeDistance,
   citation,
   actions,
 }: WeeklyDecisionCardProps) {
@@ -121,6 +163,24 @@ export function WeeklyDecisionCard({
   const immediateDecision = revisitDecisions
     ? "Revise hiring and roadmap calls now."
     : "Keep last week's calls in place.";
+  const changeBySignal = new Map(reportDynamics.changedSignals.map((signal) => [signal.key, signal.delta]));
+  const maxSignalDelta = Math.max(...reportDynamics.changedSignals.map((signal) => Math.abs(signal.delta)), 1);
+  const macroMovementRows = signalOrder.map((key) => {
+    const delta = changeBySignal.get(key) ?? 0;
+    const direction = delta > 0 ? "↑" : delta < 0 ? "↓" : "→";
+    return {
+      key,
+      label: deltaLabel[key],
+      delta,
+      direction,
+      meter: normalizeMeter(delta, maxSignalDelta),
+    };
+  });
+  const thresholdRatio =
+    regimeDistance.thresholdValue <= 0
+      ? 0
+      : Math.max(0, Math.min(100, Math.round((regimeDistance.currentValue / regimeDistance.thresholdValue) * 100)));
+  const decisionPressurePercent = Math.max(10, Math.min(95, reportDynamics.changedSignals.length * 22 + (revisitDecisions ? 25 : 8)));
 
   return (
     <section className="weather-panel space-y-5 px-5 py-6 sm:space-y-6 sm:px-7 sm:py-8" aria-labelledby="weekly-posture-brief-title">
@@ -177,6 +237,34 @@ export function WeeklyDecisionCard({
             <p className="mt-1 text-xs text-slate-200">{reversalTrigger}</p>
           </div>
         </div>
+        <div className="grid gap-3 lg:grid-cols-2">
+          <article className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Macro drift this week</p>
+            <ul className="mt-2 space-y-2 text-xs text-slate-200">
+              {macroMovementRows.map((signal) => (
+                <li key={signal.key} className="space-y-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <span>{signal.label}</span>
+                    <span className="font-semibold text-slate-100">{signal.direction} {signal.delta > 0 ? `+${signal.delta.toFixed(1)}` : signal.delta.toFixed(1)}</span>
+                  </div>
+                  <div className="h-2 rounded-full bg-slate-800">
+                    <div className="h-2 rounded-full bg-sky-300/80" style={{ width: `${signal.meter}%` }} />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </article>
+
+          <article className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Regime distance meter</p>
+            <p className="mt-1 text-xs text-slate-300">{reversalTrigger}</p>
+            <p className="mt-2 text-xs text-slate-200">{regimeDistance.dimensionLabel}: {regimeDistance.currentValue.toFixed(1)} / {regimeDistance.thresholdValue.toFixed(1)}</p>
+            <div className="mt-2 h-3 rounded-full bg-slate-800">
+              <div className="h-3 rounded-full bg-amber-300/80" style={{ width: `${thresholdRatio}%` }} />
+            </div>
+            <p className="mt-2 text-xs text-amber-100">{Math.abs(regimeDistance.pointsToFlip).toFixed(1)} points from the flip boundary.</p>
+          </article>
+        </div>
         {reportDynamics.changedSignals.length === 0 ? (
           <p className="rounded-md border border-slate-700/80 bg-slate-950/60 px-3 py-2 text-xs text-slate-300">No material signal deltas this week.</p>
         ) : (
@@ -194,35 +282,36 @@ export function WeeklyDecisionCard({
             })}
           </div>
         )}
+        <article className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Decision pressure</p>
+          <div className="mt-2 h-3 rounded-full bg-slate-800">
+            <div className="h-3 rounded-full bg-violet-300/80" style={{ width: `${decisionPressurePercent}%` }} />
+          </div>
+          <p className="mt-2 text-xs text-slate-200">{decisionPressurePercent >= 65 ? "High" : decisionPressurePercent >= 40 ? "Moderate" : "Low"} pressure — {revisitDecisions ? "revisit major commitments this week." : "hold major commitments unless new evidence appears."}</p>
+        </article>
       </article>
 
       <article className={`${secondaryPanel} ${sectionSpacing}`}>
         <h2 className={primaryHeading}>Decision matrix this week</h2>
-        <p className="text-xs text-slate-300">Canonical weekly call: action, threshold, and reversal in one table.</p>
-        <div className="mt-3 overflow-x-auto">
-          <table className="min-w-full border-separate border-spacing-y-2 text-xs text-slate-200" aria-label="Weekly decision matrix">
-            <thead>
-              <tr>
-                <th scope="col" className="px-2 py-1 text-left font-semibold uppercase tracking-[0.12em] text-slate-300">Area</th>
-                <th scope="col" className="px-2 py-1 text-left font-semibold uppercase tracking-[0.12em] text-slate-300">Action now</th>
-                <th scope="col" className="px-2 py-1 text-left font-semibold uppercase tracking-[0.12em] text-slate-300">Scope</th>
-                <th scope="col" className="px-2 py-1 text-left font-semibold uppercase tracking-[0.12em] text-semantic-caution-fg">Stop if</th>
-                <th scope="col" className="px-2 py-1 text-left font-semibold uppercase tracking-[0.12em] text-semantic-reversal-fg">Restart when</th>
-              </tr>
-            </thead>
-            <tbody>
-              {topDecisionRules.map((rule) => (
-                <tr key={rule.area} className="rounded-lg border border-slate-700/60 bg-slate-950/60 align-top">
-                  <th scope="row" className="px-2 py-2 text-left font-semibold uppercase tracking-[0.12em] text-sky-200">{decisionAreaLabel(rule.area)}</th>
-                  <td className="px-2 py-2 text-slate-200">{rule.recommendation}</td>
-                  <td className="px-2 py-2 text-slate-300">{rule.scope}</td>
-                  <td className="px-2 py-2 text-semantic-caution-fg">{rule.pauseTrigger}</td>
-                  <td className="px-2 py-2 text-semantic-reversal-fg">{rule.resumeTrigger}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <p className="text-xs text-slate-300">Risk bands for where to tighten first this week.</p>
+        <ul className="mt-2 grid gap-2 sm:grid-cols-2">
+          {topDecisionRules.map((rule) => {
+            const riskLevel = decisionRiskLabel(rule);
+            const riskMeter = riskMeterByLabel[riskLevel];
+            return (
+              <li key={rule.area} className="rounded-lg border border-slate-700/60 bg-slate-950/60 px-3 py-3 text-xs text-slate-200">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="font-semibold uppercase tracking-[0.12em] text-sky-200">{decisionAreaLabel(rule.area)}</p>
+                  <p className={`font-semibold ${riskColorByLabel[riskLevel]}`}>{riskLevel}</p>
+                </div>
+                <div className="mt-2 h-2 rounded-full bg-slate-800">
+                  <div className="h-2 rounded-full bg-sky-300/70" style={{ width: `${riskMeter}%` }} />
+                </div>
+                <p className="mt-2 text-slate-300">{rule.recommendation}</p>
+              </li>
+            );
+          })}
+        </ul>
       </article>
 
       <article className={`${secondaryPanel} ${sectionSpacing}`} aria-label="Bounded rule cards">

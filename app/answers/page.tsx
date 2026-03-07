@@ -38,14 +38,14 @@ export default function AnswersHubPage() {
         <h2 className="text-lg font-semibold text-slate-100">Distribution-ready direct pages</h2>
         <p className="text-sm text-slate-300">Answer exact operator queries and route back to the weekly brief artifact.</p>
         <div className="grid gap-3 sm:grid-cols-2">
-          <Link href="/should-we-hire-engineers-right-now" className="weather-surface min-h-[44px] px-4 py-3 text-sm font-semibold text-slate-100">Should we hire engineers right now?</Link>
-          <Link href="/should-startups-slow-roadmap-expansion" className="weather-surface min-h-[44px] px-4 py-3 text-sm font-semibold text-slate-100">Should startups slow roadmap expansion?</Link>
-          <Link href="/is-it-risk-on-or-risk-off-for-startups" className="weather-surface min-h-[44px] px-4 py-3 text-sm font-semibold text-slate-100">Is it risk-on or risk-off for startups?</Link>
-          <Link href="/startup-funding-climate-this-week" className="weather-surface min-h-[44px] px-4 py-3 text-sm font-semibold text-slate-100">Startup funding climate this week</Link>
-          <Link href="/should-startups-raise-capital-now" className="weather-surface min-h-[44px] px-4 py-3 text-sm font-semibold text-slate-100">Should startups raise capital now?</Link>
-          <Link href="/when-should-startups-cut-burn" className="weather-surface min-h-[44px] px-4 py-3 text-sm font-semibold text-slate-100">When should startups cut burn?</Link>
-          <Link href="/should-startups-slow-product-development" className="weather-surface min-h-[44px] px-4 py-3 text-sm font-semibold text-slate-100">Should startups slow product development?</Link>
-          <Link href="/startup-market-outlook" className="weather-surface min-h-[44px] px-4 py-3 text-sm font-semibold text-slate-100">Startup market outlook</Link>
+          <Link href="/answers/should-startups-hire-engineers-right-now" className="weather-surface min-h-[44px] px-4 py-3 text-sm font-semibold text-slate-100">Should we hire engineers right now?</Link>
+          <Link href="/answers/should-startups-slow-roadmap-expansion" className="weather-surface min-h-[44px] px-4 py-3 text-sm font-semibold text-slate-100">Should startups slow roadmap expansion?</Link>
+          <Link href="/answers/is-it-risk-on-or-risk-off-for-startups" className="weather-surface min-h-[44px] px-4 py-3 text-sm font-semibold text-slate-100">Is it risk-on or risk-off for startups?</Link>
+          <Link href="/answers/startup-funding-climate-this-week" className="weather-surface min-h-[44px] px-4 py-3 text-sm font-semibold text-slate-100">Startup funding climate this week</Link>
+          <Link href="/answers/should-startups-raise-capital-now" className="weather-surface min-h-[44px] px-4 py-3 text-sm font-semibold text-slate-100">Should startups raise capital now?</Link>
+          <Link href="/answers/when-should-startups-cut-burn" className="weather-surface min-h-[44px] px-4 py-3 text-sm font-semibold text-slate-100">When should startups cut burn?</Link>
+          <Link href="/answers/should-startups-slow-product-development" className="weather-surface min-h-[44px] px-4 py-3 text-sm font-semibold text-slate-100">Should startups slow product development?</Link>
+          <Link href="/answers/startup-market-outlook" className="weather-surface min-h-[44px] px-4 py-3 text-sm font-semibold text-slate-100">Startup market outlook</Link>
         </div>
       </section>
 

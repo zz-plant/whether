@@ -24,7 +24,7 @@ const decisionRules: BoundedDecisionRule[] = [
   },
   {
     area: "burn-discipline",
-    recommendation: "Prioritize retention and reliability spend.",
+    recommendation: "Keep discretionary spend gated to retention and reliability initiatives.",
     scope: "Cap non-core experiments to 10%.",
     pauseTrigger: "Pause expansion experiments if risk appetite drops below 44.",
     resumeTrigger: "Resume when risk appetite reaches 52.",
@@ -108,6 +108,12 @@ describe("WeeklyDecisionCard top-fold composition", () => {
             { label: "IPO window", score: 47 },
           ],
         }}
+        regimeDistance={{
+          dimensionLabel: "Tightness",
+          currentValue: 64,
+          thresholdValue: 70,
+          pointsToFlip: 6,
+        }}
         citation="Whether weekly brief citation"
         actions={<button type="button">Copy weekly brief</button>}
       />,
@@ -127,7 +133,13 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /Confidence MED · Freshness Mar 6, 2026 09:12 UTC · Shift watch ON/);
     assert.match(html, /Decision delta this week[\s\S]*What changed: \+2/);
     assert.match(html, /What to do now[\s\S]*Revise hiring and roadmap calls now\./);
+    assert.match(html, /Macro drift this week/);
+    assert.match(html, /Regime distance meter/);
+    assert.match(html, /Decision pressure/);
     assert.match(html, /Decision matrix this week/);
+    assert.match(html, /<p class="font-semibold text-rose-200">High<\/p>/);
+    assert.match(html, /<p class="font-semibold text-amber-200">Controlled<\/p>/);
+    assert.match(html, /<p class="font-semibold text-emerald-200">Low<\/p>/);
     assert.match(html, /Bounded rule cards \(quick scan\)/);
     assert.match(html, /Primary drivers this week/);
     assert.match(html, /Startup Climate Index/);
@@ -135,7 +147,6 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /Why this posture call/);
     assert.match(html, /Stop if:/);
     assert.match(html, /Restart when:/);
-    assert.match(html, /aria-label="Weekly decision matrix"/);
     assert.match(html, /Team fit check/);
     assert.match(html, /Run risk check/);
   });
@@ -197,6 +208,12 @@ describe("WeeklyDecisionCard top-fold composition", () => {
             { label: "SaaS valuations", score: 77 },
             { label: "IPO window", score: 78 },
           ],
+        }}
+        regimeDistance={{
+          dimensionLabel: "Risk appetite",
+          currentValue: 48,
+          thresholdValue: 52,
+          pointsToFlip: -4,
         }}
         citation="Whether weekly brief citation"
         actions={<button type="button">Copy board summary</button>}
@@ -271,6 +288,12 @@ describe("WeeklyDecisionCard top-fold composition", () => {
             { label: "SaaS valuations", score: 43 },
             { label: "IPO window", score: 41 },
           ],
+        }}
+        regimeDistance={{
+          dimensionLabel: "Tightness",
+          currentValue: 68,
+          thresholdValue: 70,
+          pointsToFlip: 2,
         }}
         citation="Whether weekly brief citation"
       />,

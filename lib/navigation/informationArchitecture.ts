@@ -2,7 +2,6 @@ import type { Route } from "next";
 
 export type NavigationLayerKey =
   | "weekly-brief"
-  | "start-here"
   | "signals"
   | "operations"
   | "decide"
@@ -58,14 +57,6 @@ export const navigationLayers: NavigationLayer[] = [
     label: "Toolkits",
     description: "Run templates and checklists for recurring decision workflows.",
     boundary: "Runnable instruments only; no duplicate posture logic or evidence summaries.",
-    group: "workflow",
-  },
-  {
-    key: "start-here",
-    href: "/start",
-    label: "Start Here",
-    description: "Optional routing path from the weekly brief into role and toolkit choices.",
-    boundary: "Routing and onboarding only; canonical posture call remains on Weekly Brief.",
     group: "workflow",
   },
   {
