@@ -6,6 +6,7 @@ export type ResourceArticle = {
     | "how-much-runway-do-we-need-tightening-market"
     | "platform-rewrites-during-capital-tightening-risk-analysis"
     | "how-venture-capital-cycles-affect-startup-operating-strategy"
+    | "from-freeze-to-selective-offense-case-study"
     | "vc-portfolio-governance-case-example-burn-multiple-normalization"
     | "operator-posture-standardization-case-example-product-finance";
   title: string;
@@ -335,6 +336,73 @@ export const resourceArticles: ResourceArticle[] = [
     toolLink: {
       href: "/resources/quarterly-capital-posture-memo-example",
       label: "Copy the Quarterly Capital Posture Memo Example",
+    },
+  },
+  {
+    slug: "from-freeze-to-selective-offense-case-study",
+    title: "From freeze to selective offense: structured startup case study",
+    description:
+      "Structured case study showing how one leadership team moved from blanket controls to tranche-based selective offense without losing runway discipline.",
+    keyword: "from freeze to selective offense case study",
+    cluster: "pain",
+    intent: "board",
+    format: "case-example",
+    boardSummary: [
+      "Case setup: the company imposed broad freezes after tightening but saw execution drag in reliability and revenue-critical work.",
+      "Intervention: shift from blanket controls to SAFE / RISKY / DANGEROUS tranches with explicit pause and resume thresholds.",
+      "Result pattern: cycle-time recovered in core lanes while burn discipline held within board-approved limits.",
+      "Forward action: retain monthly confirmation cadence and immediate pause triggers for demand or financing deterioration.",
+    ],
+    sections: [
+      {
+        heading: "Context and triggering problem",
+        paragraphs: [
+          "The leadership team entered a tighter regime and reacted with broad hiring and roadmap freezes. The response reduced near-term variance but quickly created a second problem: core delivery reliability degraded while customer-facing bottlenecks remained unresolved.",
+          "Board reviews surfaced a pattern of delayed decisions and exception churn. Every urgent request required a one-off override because the freeze policy lacked role and initiative segmentation. The operating issue was no longer only spend control; it was declining commitment quality.",
+          "The team reframed the objective from \"freeze spending\" to \"protect runway while restoring decision quality\" and adopted threshold-based posture rules to guide selective re-openings.",
+        ],
+      },
+      {
+        heading: "Decision framework and implementation sequence",
+        paragraphs: [
+          "Week 1 created a full commitment inventory across open roles, roadmap initiatives, and vendor obligations. Each item was tagged SAFE, RISKY, or DANGEROUS using reversibility, near-term revenue effect, and correction latency.",
+          "Weeks 2 through 4 implemented tranche gates. SAFE items reopened first through lighter approval. RISKY items required one measurable evidence target and 30-day confirmation before the next tranche. DANGEROUS items remained paused with explicit re-entry conditions.",
+          "The cadence shifted to weekly posture checks and monthly board summaries using one artifact template: what changed, what was reopened, what was paused, and what would flip the call. This removed narrative drift across finance, product, and hiring stakeholders.",
+        ],
+      },
+      {
+        heading: "Outcome and transfer pattern",
+        paragraphs: [
+          "Within two operating cycles, the company reduced exception volume and recovered cycle-time in reliability and revenue-adjacent delivery lanes. Burn remained controlled because reopenings were bounded by tranche size and explicit stop conditions.",
+          "The key transfer lesson was not optimism timing; it was governance clarity. Selective offense worked only because pause/resume triggers were agreed before pressure returned. Without pre-committed triggers, the organization would have drifted back to ad hoc approvals.",
+          "Teams adopting this pattern should start with one-screen decision artifacts and retain a hard rule: no tranche expansion without persistence evidence from the prior tranche.",
+        ],
+      },
+      {
+        heading: "Board-forwardable artifact language",
+        paragraphs: [
+          "Posture transition: we moved from blanket freeze to selective offense using tranche-gated approvals and explicit reversal triggers.",
+          "Control state: SAFE commitments reopened; RISKY commitments remain evidence-gated; DANGEROUS commitments stay paused pending threshold improvement.",
+          "Risk controls: any two-checkpoint deterioration in demand quality or financing confidence triggers immediate pause and board addendum.",
+          "Next review decision: assess whether tranche outcomes persist for one more month before widening scope.",
+        ],
+      },
+    ],
+    faqs: [
+      {
+        question: "When should a company move from freeze to selective offense?",
+        answer:
+          "Only after core demand and execution signals stabilize for at least one operating month and pause/resume triggers are agreed in advance.",
+      },
+      {
+        question: "What prevents selective offense from becoming uncontrolled re-expansion?",
+        answer:
+          "Tranche gates with measurable evidence targets, strict DANGEROUS holds, and automatic pause rules when thresholds deteriorate.",
+      },
+    ],
+    toolLink: {
+      href: "/resources/reversal-trigger-checklist",
+      label: "Run the Reversal Trigger Checklist",
     },
   },
   {
