@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { formatDateUTC, formatTimestampUTC } from "../../../lib/formatters";
 import type { DecisionMemoryEntry } from "../../../lib/decisionMemory";
+import { ClipboardActionRow } from "../../components/clipboardActionRow";
 import { useClipboardCopy } from "../../components/useClipboardCopy";
 
 type DecisionMemoryResponse = {
@@ -83,17 +84,13 @@ export const DecisionMemoryPanel = () => {
               </a>
             ) : null}
             {latestEntry ? (
-              <button
-                type="button"
-                onClick={() => copyToClipboard(JSON.stringify(latestEntry, null, 2), "json")}
-                className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200"
-              >
-                {status === "copying" && activeTarget === "json"
-                  ? "Copying"
-                  : status === "copied" && copiedTarget === "json"
-                    ? "JSON copied"
-                    : "Copy latest JSON"}
-              </button>
+              <ClipboardActionRow
+                label="Copy latest JSON"
+                state={status === "copying" && activeTarget === "json" ? "copying" : status === "copied" && copiedTarget === "json" ? "copied" : "idle"}
+                buttonVariant="pill"
+                buttonLabels={{ copied: "JSON copied" }}
+                onClick={() => void copyToClipboard(JSON.stringify(latestEntry, null, 2), "json")}
+              />
             ) : null}
           </div>
         </div>
@@ -122,17 +119,13 @@ export const DecisionMemoryPanel = () => {
                       {entry.regime.label} regime · verdict {entry.outcome.verdict}
                     </p>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => copyToClipboard(buildEntryCopyText(entry), entry.id)}
-                    className="weather-pill inline-flex min-h-[40px] items-center justify-center px-3 py-1 text-[11px] font-semibold tracking-[0.12em] text-slate-200"
-                  >
-                    {status === "copying" && activeTarget === entry.id
-                      ? "Copying"
-                      : status === "copied" && copiedTarget === entry.id
-                        ? "Copied"
-                        : "Copy entry"}
-                  </button>
+                  <ClipboardActionRow
+                    label="Copy entry"
+                    state={status === "copying" && activeTarget === entry.id ? "copying" : status === "copied" && copiedTarget === entry.id ? "copied" : "idle"}
+                    buttonVariant="pill"
+                    compact
+                    onClick={() => void copyToClipboard(buildEntryCopyText(entry), entry.id)}
+                  />
                 </div>
                 <p className="mt-3 text-sm text-slate-300">{entry.outcome.summary}</p>
                 <p className="mt-2 text-xs text-slate-400">Guardrail: {entry.outcome.guardrail}</p>

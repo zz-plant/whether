@@ -20,6 +20,7 @@ import {
   type LifecycleStage,
 } from "../../../lib/decisionShield";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
+import { ClipboardActionRow } from "../../components/clipboardActionRow";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 import { useClipboardCopy, type ClipboardCopyState } from "../../components/useClipboardCopy";
 import { createClientId } from "./clientId";
@@ -377,27 +378,28 @@ export const DecisionShieldPanel = ({
             </p>
           </div>
           <div className="flex flex-col items-end gap-3">
-            <button
-              type="button"
+            <ClipboardActionRow
+              label="Copy verdict"
+              state={status === "copying" && activeTarget === "verdict" ? "copying" : copiedTarget === "verdict" ? "copied" : error ? "error" : "idle"}
+              buttonVariant="pill"
+              buttonLabels={{
+                copying: (
+                  <>
+                    <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />
+                    <span>Copying</span>
+                  </>
+                ),
+              }}
+              buttonClassName="gap-2"
               onClick={handleCopy}
-              disabled={status === "copying"}
-              aria-busy={status === "copying"}
-              className="weather-pill inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
-            >
-              {status === "copying" && activeTarget === "verdict" ? (
-                <span className="inline-flex h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />
-              ) : null}
-              {copiedTarget === "verdict" ? "Copied" : status === "copying" && activeTarget === "verdict" ? "Copying" : "Copy verdict"}
-            </button>
-            <button
-              type="button"
+            />
+            <ClipboardActionRow
+              label="Copy link"
+              state={status === "copying" && activeTarget === "link" ? "copying" : copiedTarget === "link" ? "copied" : error ? "error" : "idle"}
+              buttonVariant="pill"
+              buttonLabels={{ copied: "Link copied" }}
               onClick={handleCopyLink}
-              disabled={status === "copying"}
-              aria-busy={status === "copying"}
-              className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
-            >
-              {copiedTarget === "link" ? "Link copied" : status === "copying" && activeTarget === "link" ? "Copying" : "Copy link"}
-            </button>
+            />
             <button
               type="button"
               onClick={handleSaveToDecisionMemory}

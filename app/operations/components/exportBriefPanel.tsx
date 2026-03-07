@@ -18,6 +18,7 @@ import {
   buildConstraintHeadlines,
   buildSlackBrief,
 } from "../../../lib/export/briefBuilders";
+import { ClipboardActionRow } from "../../components/clipboardActionRow";
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 import { useClipboardCopy, type ClipboardCopyState } from "../../components/useClipboardCopy";
 import { SectionPanelHeader } from "../../components/sectionPanelHeader";
@@ -240,6 +241,15 @@ export const ExportBriefPanel = ({
     await copyToClipboard(text, label);
   };
 
+  const clipboardState = (target: string) =>
+    isCopying && activeTarget === target
+      ? "copying"
+      : copiedTarget === target
+        ? "copied"
+        : copyError
+          ? "error"
+          : "idle";
+
   const handlePrint = () => {
     window.print();
     add({
@@ -297,30 +307,16 @@ export const ExportBriefPanel = ({
               One pasteable block tuned for status updates.
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
-              <Button
-                type="button"
-                onClick={() => handleCopy(briefing, "Slack")}
-                disabled={isCopying}
-                aria-busy={isCopying}
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
-              >
-                {isCopying && activeTarget === "Slack" ? (
-                  "Copying"
-                ) : (
-                  <>
-                    Copy <WorkAppLabel app="slack" label="brief" className="inline-flex items-center gap-2" />
-                  </>
-                )}
-              </Button>
-              <Button
-                type="button"
-                onClick={() => handleCopy(boardBrief, "Board")}
-                disabled={isCopying}
-                aria-busy={isCopying}
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
-              >
-                {isCopying && activeTarget === "Board" ? "Copying" : "Copy board summary"}
-              </Button>
+              <ClipboardActionRow
+                label={<><span>Copy</span> <WorkAppLabel app="slack" label="brief" className="inline-flex items-center gap-2" /></>}
+                state={clipboardState("Slack")}
+                onClick={() => void handleCopy(briefing, "Slack")}
+              />
+              <ClipboardActionRow
+                label="Copy board summary"
+                state={clipboardState("Board")}
+                onClick={() => void handleCopy(boardBrief, "Board")}
+              />
               <Button
                 type="button"
                 onClick={() =>
@@ -346,15 +342,12 @@ export const ExportBriefPanel = ({
             <p className="mt-3 text-sm text-slate-300">
               Compact bullets sized for quarterly planning decks.
             </p>
-            <Button
-              type="button"
-              onClick={() => handleCopy(slideBullets, "Slides")}
-              disabled={isCopying}
-              aria-busy={isCopying}
-              className="weather-button mt-4 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
-            >
-              {isCopying && activeTarget === "Slides" ? "Copying" : "Copy slide bullets"}
-            </Button>
+            <ClipboardActionRow
+              label="Copy slide bullets"
+              state={clipboardState("Slides")}
+              onClick={() => void handleCopy(slideBullets, "Slides")}
+              className="mt-4"
+            />
             <Button
               type="button"
               onClick={() =>
@@ -377,15 +370,12 @@ export const ExportBriefPanel = ({
             <p className="mt-3 text-sm text-slate-300">
               Plain-English summary lines that can drop into status updates or exec briefings.
             </p>
-            <Button
-              type="button"
-              onClick={() => handleCopy(constraintHeadlines, "Headlines")}
-              disabled={isCopying}
-              aria-busy={isCopying}
-              className="weather-button mt-4 inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
-            >
-              {isCopying && activeTarget === "Headlines" ? "Copying" : "Copy constraint headlines"}
-            </Button>
+            <ClipboardActionRow
+              label="Copy constraint headlines"
+              state={clipboardState("Headlines")}
+              onClick={() => void handleCopy(constraintHeadlines, "Headlines")}
+              className="mt-4"
+            />
             <Button
               type="button"
               onClick={() =>
@@ -423,17 +413,11 @@ export const ExportBriefPanel = ({
               Structured JSON plus a ready-to-use prompt for PM assistants and copilots.
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
-              <Button
-                type="button"
-                onClick={() => handleCopy(agentPayload, "Agent JSON payload")}
-                disabled={isCopying}
-                aria-busy={isCopying}
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
-              >
-                {isCopying && activeTarget === "Agent JSON payload"
-                  ? "Copying"
-                  : "Copy JSON payload"}
-              </Button>
+              <ClipboardActionRow
+                label="Copy JSON payload"
+                state={clipboardState("Agent JSON payload")}
+                onClick={() => void handleCopy(agentPayload, "Agent JSON payload")}
+              />
               <Button
                 type="button"
                 onClick={() =>
@@ -446,15 +430,11 @@ export const ExportBriefPanel = ({
               >
                 Download JSON
               </Button>
-              <Button
-                type="button"
-                onClick={() => handleCopy(agentPrompt, "Agent prompt")}
-                disabled={isCopying}
-                aria-busy={isCopying}
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
-              >
-                {isCopying && activeTarget === "Agent prompt" ? "Copying" : "Copy agent prompt"}
-              </Button>
+              <ClipboardActionRow
+                label="Copy agent prompt"
+                state={clipboardState("Agent prompt")}
+                onClick={() => void handleCopy(agentPrompt, "Agent prompt")}
+              />
               <Button
                 type="button"
                 onClick={() =>
@@ -500,17 +480,11 @@ export const ExportBriefPanel = ({
                 Paste into the Jira issue description field.
               </p>
               <div className="mt-3 flex flex-wrap gap-3">
-                <Button
-                  type="button"
-                  onClick={() => handleCopy(jiraMarkdownBrief, "Jira description")}
-                  disabled={isCopying}
-                  aria-busy={isCopying}
-                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
-                >
-                  {isCopying && activeTarget === "Jira description"
-                    ? "Copying"
-                    : "Copy"} <WorkAppLabel app="jira" label="description" className="inline-flex items-center gap-2" />
-                </Button>
+                <ClipboardActionRow
+                  label={<><span>Copy</span> <WorkAppLabel app="jira" label="description" className="inline-flex items-center gap-2" /></>}
+                  state={clipboardState("Jira description")}
+                  onClick={() => void handleCopy(jiraMarkdownBrief, "Jira description")}
+                />
                 <Button
                   type="button"
                   onClick={() =>
@@ -533,17 +507,11 @@ export const ExportBriefPanel = ({
                 Paste into the Confluence page body.
               </p>
               <div className="mt-3 flex flex-wrap gap-3">
-                <Button
-                  type="button"
-                  onClick={() => handleCopy(confluenceWikiBrief, "Confluence page snippet")}
-                  disabled={isCopying}
-                  aria-busy={isCopying}
-                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
-                >
-                  {isCopying && activeTarget === "Confluence page snippet"
-                    ? "Copying"
-                    : "Copy"} <WorkAppLabel app="confluence" label="page snippet" className="inline-flex items-center gap-2" />
-                </Button>
+                <ClipboardActionRow
+                  label={<><span>Copy</span> <WorkAppLabel app="confluence" label="page snippet" className="inline-flex items-center gap-2" /></>}
+                  state={clipboardState("Confluence page snippet")}
+                  onClick={() => void handleCopy(confluenceWikiBrief, "Confluence page snippet")}
+                />
                 <Button
                   type="button"
                   onClick={() =>
@@ -566,17 +534,11 @@ export const ExportBriefPanel = ({
                 Paste into the Linear issue description field.
               </p>
               <div className="mt-3 flex flex-wrap gap-3">
-                <Button
-                  type="button"
-                  onClick={() => handleCopy(linearMarkdownBrief, "Linear issue description")}
-                  disabled={isCopying}
-                  aria-busy={isCopying}
-                  className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
-                >
-                  {isCopying && activeTarget === "Linear issue description"
-                    ? "Copying"
-                    : "Copy"} <WorkAppLabel app="linear" label="issue description" className="inline-flex items-center gap-2" />
-                </Button>
+                <ClipboardActionRow
+                  label={<><span>Copy</span> <WorkAppLabel app="linear" label="issue description" className="inline-flex items-center gap-2" /></>}
+                  state={clipboardState("Linear issue description")}
+                  onClick={() => void handleCopy(linearMarkdownBrief, "Linear issue description")}
+                />
                 <Button
                   type="button"
                   onClick={() =>
