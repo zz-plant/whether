@@ -126,6 +126,39 @@ export const answerPages: DecisionPageDefinition[] = [
     thresholdFocus: "both",
   },
   {
+    slug: "product-strategy-in-a-risk-off-market",
+    keyword: "product strategy in a risk off market",
+    title: "Product Strategy in a Risk-Off Market",
+    category: "decision",
+    shortAnswer: "Protect core roadmap value and cut speculative scope quickly.",
+    directAnswer: "Keep only initiatives with near-term retention or conversion evidence; pause long-payback expansion tracks.",
+    audience: "VP Product, CTO, founders",
+    mappedDecisionAreas: ["product-tempo", "expansion-bets", "burn-discipline"],
+    thresholdFocus: "both",
+  },
+  {
+    slug: "how-to-operate-in-expansion-mode-startup",
+    keyword: "how to operate in expansion mode startup",
+    title: "How to Operate in Expansion Mode as a Startup",
+    category: "decision",
+    shortAnswer: "Accelerate reversible bets while preserving explicit rollback triggers.",
+    directAnswer: "Increase pace only through tranche-gated initiatives tied to activation, retention, and payback milestones.",
+    audience: "Founders and cross-functional leadership",
+    mappedDecisionAreas: ["product-tempo", "expansion-bets", "hiring"],
+    thresholdFocus: "both",
+  },
+  {
+    slug: "startup-strategy-during-capital-scarcity",
+    keyword: "startup strategy during capital scarcity",
+    title: "Startup Strategy During Capital Scarcity",
+    category: "decision",
+    shortAnswer: "Preserve runway with threshold-gated commitments and narrower execution scope.",
+    directAnswer: "Shift to survivability floor controls: protect core revenue paths, gate all discretionary spend, and pre-commit reversal triggers.",
+    audience: "CEO, CFO, board operators",
+    mappedDecisionAreas: ["burn-discipline", "capital-raising", "hiring"],
+    thresholdFocus: "tightness",
+  },
+  {
     slug: "when-should-startups-cut-burn",
     keyword: "when should startups cut burn",
     title: "When Should Startups Cut Burn?",
@@ -167,6 +200,17 @@ export const answerPages: DecisionPageDefinition[] = [
     directAnswer: "Move from selective to expanded hiring once both risk and tightness remain supportive.",
     audience: "Founders and HR/Finance",
     mappedDecisionAreas: ["hiring", "burn-discipline"],
+    thresholdFocus: "both",
+  },
+  {
+    slug: "from-hiring-freeze-to-selective-offense",
+    keyword: "from freeze posture to selective offense",
+    title: "From Hiring Freeze to Selective Offense",
+    category: "decision",
+    shortAnswer: "Reopen in tranches only after confirmation-quality signals stabilize.",
+    directAnswer: "Release SAFE roles first, keep RISKY roles milestone-gated, and retain immediate pause triggers for demand or financing deterioration.",
+    audience: "CFO, HR leaders, founders",
+    mappedDecisionAreas: ["hiring", "burn-discipline", "product-tempo"],
     thresholdFocus: "both",
   },
   {
@@ -248,9 +292,6 @@ export const answerCategories: Array<{ key: AnswerCategory; label: string }> = [
 export const tierOneDecisionPages = answerPages;
 
 export const tierTwoKeywords = [
-  "product strategy in a risk off market",
-  "how to operate in expansion mode startup",
-  "startup strategy during capital scarcity",
   "engineering hiring during recession",
   "how does yield curve affect startups",
 ];
