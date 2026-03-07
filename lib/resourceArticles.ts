@@ -455,3 +455,5 @@ export const resourceArticles: ResourceArticle[] = [
 ];
 
 export const findResourceArticleBySlug = (slug: string) => resourceArticles.find((article) => article.slug === slug);
+
+export const generateStaticParams = () => resourceArticles.map((article) => ({ slug: article.slug }));
