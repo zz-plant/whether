@@ -7,6 +7,7 @@ import {
   buildCadenceSummary,
   type CadenceSummaryProvenance,
 } from "./cadenceSummaryBuilder";
+import { formatYearLabel } from "./summaryFormatting";
 
 export type YearlySummaryProvenance = CadenceSummaryProvenance;
 
@@ -57,10 +58,4 @@ export const buildYearlySummary = ({
     periodLabel,
   });
 
-export const getYearLabel = (value: string) => {
-  const date = new Date(`${value}T00:00:00Z`);
-  if (Number.isNaN(date.valueOf())) {
-    return null;
-  }
-  return String(date.getUTCFullYear());
-};
+export const getYearLabel = formatYearLabel;

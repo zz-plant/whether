@@ -1,4 +1,5 @@
 import { buildComplianceStamp } from "../exportNotices";
+import { formatSourceLine } from "./summaryFormatting";
 import type { MonthlyStructured, SummaryProvenance, WeeklyStructured } from "./summaryTypes";
 
 const toBullets = (items: string[]) => items.map((item) => `• ${item}`);
@@ -38,9 +39,7 @@ export const renderWeeklySummaryCopy = ({
   structured: WeeklyStructured;
 }) => {
   const updatedLabel = recordDateLabel ? `Updated ${recordDateLabel}` : "Updated —";
-  const sourceLine = provenance.sourceUrl
-    ? `${provenance.sourceLabel} (${provenance.sourceUrl})`
-    : provenance.sourceLabel;
+  const sourceLine = formatSourceLine(provenance);
   const complianceStamp = buildComplianceStamp({
     sourceLine,
     timestamp: provenance.timestampLabel,

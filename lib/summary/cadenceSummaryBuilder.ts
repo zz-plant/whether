@@ -1,6 +1,7 @@
 import { buildComplianceStamp } from "../exportNotices";
 import type { RegimeAssessment } from "../regimeEngine";
 import { getRegimeOperatorLabel } from "../regimeLabels";
+import { formatSourceLine } from "./summaryFormatting";
 
 export type CadenceSummaryProvenance = {
   sourceLabel: string;
@@ -58,9 +59,7 @@ export const buildCadenceSummary = ({
   const title = periodLabel
     ? `${cadenceTitle[cadence]} — ${periodLabel}`
     : cadenceTitle[cadence];
-  const sourceLine = provenance.sourceUrl
-    ? `${provenance.sourceLabel} (${provenance.sourceUrl})`
-    : provenance.sourceLabel;
+  const sourceLine = formatSourceLine(provenance);
   const complianceStamp = buildComplianceStamp({
     sourceLine,
     timestamp: provenance.timestampLabel,
