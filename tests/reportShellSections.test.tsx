@@ -46,6 +46,7 @@ describe("ReportShell extracted sections", () => {
         showOfflineBadge={false}
         offlineBadgeLabel="Cached"
         missionSupportText="Stable feed"
+        missionSequenceTitle="Planning sequence"
         missionSequenceItems={[{ title: "Now", detail: "Act", href: "#", cta: "Do", phase: "Now" }]}
       />,
     );
@@ -53,7 +54,7 @@ describe("ReportShell extracted sections", () => {
     assert.match(html, /Whether report/);
     assert.match(html, /Mission control/);
     assert.match(html, /Start/);
-    assert.match(html, /Plan/);
+    assert.match(html, /Planning sequence/);
   });
 
   it("renders sidebar sequence rail", () => {

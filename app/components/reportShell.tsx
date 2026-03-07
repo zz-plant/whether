@@ -165,6 +165,7 @@ export function CommandCenterNavBlock({
   decisionBanner,
   missionSupportText,
   decisionDiffs,
+  missionSequenceTitle,
   missionSequenceItems,
 }: {
   heroVariant: "full" | "compact";
@@ -187,6 +188,7 @@ export function CommandCenterNavBlock({
   decisionBanner?: DecisionBanner;
   missionSupportText: string;
   decisionDiffs?: DecisionDiff[];
+  missionSequenceTitle: string;
   missionSequenceItems: Array<{ title: string; detail: string; href: string; cta: string; phase: string }>;
 }) {
   const primaryDecisionText = decisionBanner?.decision ?? `${primaryCta.label}.`;
@@ -232,7 +234,7 @@ export function CommandCenterNavBlock({
             {decisionBanner?.evidenceHref ? <a href={decisionBanner.evidenceHref} className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline">Review evidence trail<ArrowRightIcon className="ml-1 h-3.5 w-3.5" /></a> : null}
           </article>
           <article className="weather-surface space-y-3 p-4">
-            <p className="text-sm font-semibold tracking-[0.12em] text-slate-400">Plan</p>
+            <p className="text-sm font-semibold tracking-[0.12em] text-slate-400">{missionSequenceTitle}</p>
             <ol className="space-y-2">{missionSequenceItems.map((item) => <li key={item.title} className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-3"><p className="text-xs font-semibold tracking-[0.1em] text-slate-400">{item.phase}</p><p className="mt-1 text-sm font-semibold text-slate-100">{item.title}</p><p className="mt-1 text-xs text-slate-300">{item.detail}</p></li>)}</ol>
           </article>
         </div>
@@ -302,6 +304,7 @@ export const ReportShell = ({
   const summaryLink = pageSummaryLink ? <a href={pageSummaryLink.href} className="inline-flex min-h-[44px] items-center text-xs font-semibold text-sky-200 underline decoration-slate-500/80 underline-offset-4">{pageSummaryLink.label}</a> : null;
   const hasSidebar = sidebarVariant === "full";
   const missionSequenceLabels = ["Now", "Next", "Later"];
+  const missionSequenceTitle = actionSequence?.title ?? "Plan";
   const missionSequenceItems = (actionSequence?.items ?? []).slice(0, 3).map((item, index) => ({ ...item, phase: missionSequenceLabels[index] ?? `Step ${index + 1}` }));
   const sourceHref = treasurySource.startsWith("http") ? treasurySource : undefined;
   const sourceLabel = sourceHref ? (() => { try { const hostname = new URL(sourceHref).hostname.replace(/^www\./, ""); if (hostname.includes("stlouisfed.org")) return "FRED"; if (hostname.includes("fiscaldata.treasury.gov")) return "Treasury Fiscal Data"; return hostname; } catch { return treasurySource; } })() : treasurySource;
@@ -342,7 +345,7 @@ export const ReportShell = ({
             {hasSidebar ? <aside className="order-2 space-y-4 lg:order-none lg:col-start-2 lg:row-start-1 lg:sticky lg:top-28 lg:self-start"><HeroTrustProvenanceBlock trustStatusTone={trustStatusTone} trustStatusLabel={trustStatusLabel} trustStatusDetail={trustStatusDetail} trustStatusAction={trustStatusAction} statusLabel={statusLabel} fetchedAtLabel={fetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} /></aside> : null}
 
             <div className="order-1 min-w-0 space-y-8 lg:order-none lg:col-start-1 lg:row-start-1 lg:space-y-10">
-              {!hideHeroChrome ? <CommandCenterNavBlock heroVariant={heroVariant} pageTitle={pageTitle} pageSummary={pageSummary} summaryLink={summaryLink} recordDateLabel={recordDateLabel} roleSwitcher={roleSwitcher} primaryCta={primaryCta} secondaryCta={secondaryCta} exportCta={exportCta} nextStep={nextStep} statusLabel={statusLabel} trustStatusLabel={trustStatusLabel} fetchedAtLabel={fetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={trustStatusAction} showOfflineBadge={showOfflineBadge} offlineBadgeLabel={offlineBadgeLabel} decisionBanner={decisionBanner} missionSupportText={trustStatusDetail} decisionDiffs={decisionDiffs} missionSequenceItems={missionSequenceItems} /> : null}
+              {!hideHeroChrome ? <CommandCenterNavBlock heroVariant={heroVariant} pageTitle={pageTitle} pageSummary={pageSummary} summaryLink={summaryLink} recordDateLabel={recordDateLabel} roleSwitcher={roleSwitcher} primaryCta={primaryCta} secondaryCta={secondaryCta} exportCta={exportCta} nextStep={nextStep} statusLabel={statusLabel} trustStatusLabel={trustStatusLabel} fetchedAtLabel={fetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={trustStatusAction} showOfflineBadge={showOfflineBadge} offlineBadgeLabel={offlineBadgeLabel} decisionBanner={decisionBanner} missionSupportText={trustStatusDetail} decisionDiffs={decisionDiffs} missionSequenceTitle={missionSequenceTitle} missionSequenceItems={missionSequenceItems} /> : null}
 
               <SidebarSequenceBlock stageRail={stageRail} />
 
