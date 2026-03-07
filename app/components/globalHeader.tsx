@@ -21,8 +21,11 @@ const groupLabels = {
 
 export function GlobalHeader() {
   const pathname = usePathname();
+  const normalizedPathname = pathname !== "/" && pathname.endsWith("/")
+    ? pathname.slice(0, -1)
+    : pathname;
   const isHome = pathMatchesLink("/", pathname);
-  const isReportShellRoute = reportShellCorePaths.some((route) => pathMatchesLink(route, pathname));
+  const isReportShellRoute = reportShellCorePaths.some((route) => route === normalizedPathname);
 
   if (isReportShellRoute) {
     return null;
