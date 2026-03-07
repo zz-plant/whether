@@ -120,8 +120,8 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     );
 
     const postureIndex = html.indexOf("Weekly posture call");
-    const decisionCallIndex = html.indexOf("Decision delta this week");
-    const rulesSummaryIndex = html.indexOf("Operating rules (quick scan)");
+    const decisionCallIndex = html.indexOf("Decision call this week");
+    const rulesSummaryIndex = html.indexOf("Bounded rules (do now / stop / restart)");
 
     assert.ok(postureIndex >= 0);
     assert.ok(decisionCallIndex > postureIndex);
@@ -131,8 +131,11 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /Confidence 68% \(MED\)/);
     assert.match(html, /Trend Improving/);
     assert.match(html, /Confidence MED · Freshness Mar 6, 2026 09:12 UTC · Regime shift watch ON/);
-    assert.match(html, /Decision delta this week[\s\S]*What changed: \+2/);
-    assert.match(html, /What to do now[\s\S]*Revise hiring and roadmap calls now\./);
+    assert.match(html, /Decision call this week/);
+    assert.match(html, /What changed/);
+    assert.match(html, /Decision now[\s\S]*Revise hiring and roadmap calls now\./);
+    assert.match(html, /Flip if/);
+    assert.match(html, /Restart when/);
     assert.match(html, /Macro drift this week/);
     assert.match(html, /Distance to regime flip/);
     assert.match(html, /Decision change pressure/);
@@ -140,7 +143,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /<p class="font-semibold text-rose-200">High<\/p>/);
     assert.match(html, /<p class="font-semibold text-amber-200">Controlled<\/p>/);
     assert.match(html, /<p class="font-semibold text-emerald-200">Low<\/p>/);
-    assert.match(html, /Operating rules \(quick scan\)/);
+    assert.match(html, /Bounded rules \(do now \/ stop \/ restart\)/);
     assert.match(html, /Primary drivers this week/);
     assert.match(html, /Startup Climate Index/);
     assert.match(html, /Score 63 \/ 100 · Improving/);
@@ -148,7 +151,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /Stop if:/);
     assert.match(html, /Restart when:/);
     assert.match(html, /Team context check/);
-    assert.match(html, /Open team context check/);
+    assert.match(html, /Run risk check/);
   });
 
   it("uses responsive classes to protect screenshot readability and keeps citation actions", () => {
@@ -221,8 +224,8 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     );
 
     assert.match(html, /data-testid="weekly-top-fold"/);
-    assert.match(html, /sm:grid-cols-3/);
-    assert.match(html, /lg:grid-cols-4/);
+    assert.match(html, /sm:grid-cols-4/);
+    assert.match(html, /lg:grid-cols-5/);
     assert.match(html, /Historical memory rail/);
     assert.match(html, /More context \(why this call \+ timeline\)/);
     assert.match(html, /Cite this call/);
