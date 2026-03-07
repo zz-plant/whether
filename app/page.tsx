@@ -349,6 +349,7 @@ export default async function HomePage({
         startupClimateIndex={homeBriefModel.startupClimateIndex}
         regimeDistance={homeBriefModel.regimeDistance}
         citation={callCitation}
+        isFallbackSnapshot={isFallback && !historicalSelection}
         actions={<CopyLeadershipArtifactsButtons slackBrief={slackBrief} boardSummary={boardSummary} citation={callCitation} />}
       />
 

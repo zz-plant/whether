@@ -58,6 +58,7 @@ type WeeklyDecisionCardProps = {
     pointsToFlip: number;
   };
   citation: string;
+  isFallbackSnapshot?: boolean;
   actions?: ReactNode;
 };
 
@@ -158,6 +159,7 @@ export function WeeklyDecisionCard({
   startupClimateIndex,
   regimeDistance,
   citation,
+  isFallbackSnapshot = false,
   actions,
 }: WeeklyDecisionCardProps) {
   const freshnessLabel = fetchedAtLabel.trim().length > 0 ? fetchedAtLabel : "Unavailable";
@@ -206,7 +208,10 @@ export function WeeklyDecisionCard({
   const regimeDistanceMessage = thresholdBreached
     ? `${regimeDistanceToFlip} points past the flip threshold.`
     : `${regimeDistanceToFlip} points until the flip threshold.`;
-  const needsTrustWarning = confidenceLabel !== "HIGH" || freshnessLabel === "Unavailable";
+  const needsTrustWarning = isFallbackSnapshot || confidenceLabel !== "HIGH" || freshnessLabel === "Unavailable";
+  const trustWarningCopy = isFallbackSnapshot
+    ? "Using a cached snapshot. Use this call for near-term pacing only and pause irreversible decisions until live refresh returns."
+    : "Use this call for near-term pacing only until confidence returns to HIGH with fresh data.";
 
   return (
     <section className="weather-panel space-y-5 px-5 py-6 sm:space-y-6 sm:px-7 sm:py-8" aria-labelledby="weekly-posture-brief-title">
@@ -260,7 +265,7 @@ export function WeeklyDecisionCard({
           <p className="text-xs text-slate-300">Trust check: {trustCueLine}</p>
           {needsTrustWarning ? (
             <p className="rounded-md border border-amber-500/50 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
-              Use this call for near-term pacing only until confidence returns to HIGH with fresh data.
+              {trustWarningCopy}
             </p>
           ) : null}
         </article>
