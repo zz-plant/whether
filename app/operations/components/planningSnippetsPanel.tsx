@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { useClipboardCopy } from "../../components/useClipboardCopy";
+import { WorkAppLabel } from "../../components/workAppIcon";
 
 type PlanningSnippetsPanelProps = {
   statusLabel: string;
@@ -42,7 +43,7 @@ export function PlanningSnippetsPanel({
     <section className="weather-panel-static space-y-4 px-6 py-6" aria-label="Planning snippets">
       <h2 className="text-xl font-semibold text-slate-50">Copy-ready planning snippets</h2>
       <p className="text-sm text-slate-300">
-        Reuse these snippets in Jira, Notion, or weekly leadership updates.
+        Reuse these snippets in <WorkAppLabel app="jira" label="Jira" />, <WorkAppLabel app="notion" label="Notion" />, or weekly leadership updates.
       </p>
       <div className="space-y-3">
         {snippets.map((snippet) => {

@@ -21,6 +21,7 @@ import {
 import { DataProvenanceStrip, type DataProvenance } from "../../components/dataProvenanceStrip";
 import { useClipboardCopy, type ClipboardCopyState } from "../../components/useClipboardCopy";
 import { SectionPanelHeader } from "../../components/sectionPanelHeader";
+import { WorkAppLabel } from "../../components/workAppIcon";
 
 const buildExportStamp = (
   treasury: TreasuryData,
@@ -291,7 +292,7 @@ export const ExportBriefPanel = ({
 
         <div className="mt-6 grid gap-4 lg:grid-cols-[1.4fr,1fr]">
           <div className="weather-surface p-4">
-            <p className="type-kicker">Slack-ready brief</p>
+            <p className="type-kicker"><WorkAppLabel app="slack" label="Slack-ready brief" /></p>
             <p className="mt-3 text-sm text-slate-300">
               One pasteable block tuned for status updates.
             </p>
@@ -303,7 +304,13 @@ export const ExportBriefPanel = ({
                 aria-busy={isCopying}
                 className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
               >
-                {isCopying && activeTarget === "Slack" ? "Copying" : "Copy Slack brief"}
+                {isCopying && activeTarget === "Slack" ? (
+                  "Copying"
+                ) : (
+                  <>
+                    Copy <WorkAppLabel app="slack" label="brief" className="inline-flex items-center gap-2" />
+                  </>
+                )}
               </Button>
               <Button
                 type="button"
@@ -479,7 +486,7 @@ export const ExportBriefPanel = ({
         </div>
         <div className="mt-4 weather-surface p-4">
           <p className="type-kicker">
-            Jira, Confluence, and Linear
+            <WorkAppLabel app="jira" label="Jira" className="inline-flex items-center gap-2" />, <WorkAppLabel app="confluence" label="Confluence" className="inline-flex items-center gap-2" />, and <WorkAppLabel app="linear" label="Linear" className="inline-flex items-center gap-2" />
           </p>
           <p className="mt-3 text-sm text-slate-300">
             Paste tool-optimized summaries into your issue trackers or documentation.
@@ -487,7 +494,7 @@ export const ExportBriefPanel = ({
           <div className="mt-4 grid gap-4">
             <div className="rounded-lg border border-slate-800/80 bg-slate-950/60 p-3">
               <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
-                Jira description
+                <WorkAppLabel app="jira" label="Jira description" />
               </p>
               <p className="mt-2 text-sm text-slate-400">
                 Paste into the Jira issue description field.
@@ -502,7 +509,7 @@ export const ExportBriefPanel = ({
                 >
                   {isCopying && activeTarget === "Jira description"
                     ? "Copying"
-                    : "Copy Jira description"}
+                    : "Copy"} <WorkAppLabel app="jira" label="description" className="inline-flex items-center gap-2" />
                 </Button>
                 <Button
                   type="button"
@@ -514,13 +521,13 @@ export const ExportBriefPanel = ({
                   }
                   className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                 >
-                  Download Jira description
+                  Download <WorkAppLabel app="jira" label="description" className="inline-flex items-center gap-2" />
                 </Button>
               </div>
             </div>
             <div className="rounded-lg border border-slate-800/80 bg-slate-950/60 p-3">
               <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
-                Confluence page snippet
+                <WorkAppLabel app="confluence" label="Confluence page snippet" />
               </p>
               <p className="mt-2 text-sm text-slate-400">
                 Paste into the Confluence page body.
@@ -535,7 +542,7 @@ export const ExportBriefPanel = ({
                 >
                   {isCopying && activeTarget === "Confluence page snippet"
                     ? "Copying"
-                    : "Copy Confluence page snippet"}
+                    : "Copy"} <WorkAppLabel app="confluence" label="page snippet" className="inline-flex items-center gap-2" />
                 </Button>
                 <Button
                   type="button"
@@ -547,13 +554,13 @@ export const ExportBriefPanel = ({
                   }
                   className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                 >
-                  Download Confluence page snippet
+                  Download <WorkAppLabel app="confluence" label="page snippet" className="inline-flex items-center gap-2" />
                 </Button>
               </div>
             </div>
             <div className="rounded-lg border border-slate-800/80 bg-slate-950/60 p-3">
               <p className="text-xs font-semibold tracking-[0.12em] text-slate-300">
-                Linear issue description
+                <WorkAppLabel app="linear" label="Linear issue description" />
               </p>
               <p className="mt-2 text-sm text-slate-400">
                 Paste into the Linear issue description field.
@@ -568,7 +575,7 @@ export const ExportBriefPanel = ({
                 >
                   {isCopying && activeTarget === "Linear issue description"
                     ? "Copying"
-                    : "Copy Linear issue description"}
+                    : "Copy"} <WorkAppLabel app="linear" label="issue description" className="inline-flex items-center gap-2" />
                 </Button>
                 <Button
                   type="button"
@@ -580,7 +587,7 @@ export const ExportBriefPanel = ({
                   }
                   className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                 >
-                  Download Linear issue description
+                  Download <WorkAppLabel app="linear" label="issue description" className="inline-flex items-center gap-2" />
                 </Button>
               </div>
             </div>
