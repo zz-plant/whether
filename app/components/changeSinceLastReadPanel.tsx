@@ -8,7 +8,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import type { LastYearComparison } from "../../lib/report/reportData";
 import { buildRegimeChangeReasons } from "../../lib/regimeEngine";
-import { formatDateUTC } from "../../lib/formatters";
+import { formatDateLabel, formatDelta, formatOptionalDelta } from "../../lib/report/signalFormatting";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
 import { regimeAlertsStorageKey, type RegimeAlertLogEntry } from "./regimeAlertsStorage";
 
@@ -19,17 +19,6 @@ type LastReadSnapshot = {
 };
 
 export const LAST_READ_SNAPSHOT_STORAGE_KEY = "whether.lastReadSnapshot";
-
-const formatDate = (value: string) => formatDateUTC(value);
-
-const formatDelta = (thenValue: number, nowValue: number, unit = "") => {
-  const delta = nowValue - thenValue;
-  const sign = delta > 0 ? "+" : "";
-  return `${sign}${delta.toFixed(2)}${unit}`;
-};
-
-const formatOptionalDelta = (thenValue: number | null, nowValue: number | null, unit = "") =>
-  thenValue === null || nowValue === null ? "—" : formatDelta(thenValue, nowValue, unit);
 
 const getImpactTone = (value: number) => {
   if (value >= 1.5) {
@@ -240,7 +229,7 @@ export const ChangeSinceLastReadPanel = ({
             <p className="mt-2 text-sm text-slate-200">
               Previous read:{" "}
               <span className="mono text-slate-100">
-                {previous ? formatDate(previous.recordDate) : "—"}
+                {previous ? formatDateLabel(previous.recordDate) : "—"}
               </span>
             </p>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -302,7 +291,7 @@ export const ChangeSinceLastReadPanel = ({
             </div>
             <p className="mt-4 text-xs text-slate-400">
               {previous
-                ? `Last read logged ${formatDate(previous.readAt)}.`
+                ? `Last read logged ${formatDateLabel(previous.readAt)}.`
                 : "No previous read captured yet. Open the report again to view a delta snapshot."}
             </p>
             {previous ? (
@@ -353,7 +342,7 @@ export const ChangeSinceLastReadPanel = ({
               {lastYearComparison ? (
                 <>
                   <p className="mt-2 text-sm text-slate-200">
-                    {formatDate(lastYearComparison.prior.recordDate)}: {lastYearComparison.prior.regime}
+                    {formatDateLabel(lastYearComparison.prior.recordDate)}: {lastYearComparison.prior.regime}
                     {" "}→ now: {lastYearComparison.current.regime}
                   </p>
                   <p className="mt-2 text-xs text-slate-400">
@@ -465,7 +454,7 @@ export const ReturningVisitorDeltaStrip = ({
             What changed and where to act first.
           </h2>
           <p className="text-xs text-slate-300">
-            Previous snapshot {formatDate(previous.recordDate)} · now {formatDate(recordDate)}
+            Previous snapshot {formatDateLabel(previous.recordDate)} · now {formatDateLabel(recordDate)}
           </p>
         </div>
         <a

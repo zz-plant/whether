@@ -1,4 +1,6 @@
-import { formatDateUTC } from "../../../lib/formatters";
+import { formatDateLabel, formatDelta } from "../../../lib/report/signalFormatting";
+
+export { formatDateLabel, formatDelta };
 
 export const monthOptions = [
   { value: 1, label: "January" },
@@ -15,7 +17,6 @@ export const monthOptions = [
   { value: 12, label: "December" },
 ];
 
-export const formatDateLabel = (value: string) => formatDateUTC(value);
 
 export const formatMonthInput = (value: string) => {
   const date = new Date(value);
@@ -54,11 +55,6 @@ export const formatPercent = (value: number) => `${value.toFixed(2)}%`;
 
 export const formatScore = (value: number) => value.toFixed(0);
 
-export const formatDelta = (thenValue: number, nowValue: number, unit = "") => {
-  const delta = nowValue - thenValue;
-  const sign = delta > 0 ? "+" : "";
-  return `${sign}${delta.toFixed(2)}${unit}`;
-};
 
 export const formatCurve = (value: number | null) =>
   value === null ? "—" : `${value.toFixed(2)}%`;
