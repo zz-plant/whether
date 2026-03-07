@@ -18,6 +18,7 @@ import {
 import { getConceptPublicationRegime, getConceptRegimeStatus, getCurrentRegimeContext } from "../../lib/conceptRegime";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { BreadcrumbTrail } from "../components/breadcrumbTrail";
+import { formatConceptPublishedLabel } from "../../lib/formatters";
 
 export const dynamic = "force-static";
 
@@ -35,14 +36,6 @@ export const metadata: Metadata = buildPageMetadata({
     kicker: "From feature shipping to outcome and AI-native strategy.",
   },
 });
-
-const formatPublishedLabel = (year: number, month: number) => {
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    year: "numeric",
-    timeZone: "UTC",
-  }).format(new Date(Date.UTC(year, month - 1, 1)));
-};
 
 const eraIntro: Record<(typeof productConceptEras)[number], string> = {
   "Foundational classics":
@@ -425,7 +418,7 @@ export default async function ProductConceptTimelinePage({
                   <li key={article.slug} className="weather-surface space-y-3 px-4 py-4">
                     <div className="space-y-2">
                       <h3 className="text-base font-semibold text-slate-100">{article.title}</h3>
-                      <p className="text-sm text-slate-300">{article.author} · {formatPublishedLabel(article.publishedYear, article.publishedMonth)}</p>
+                      <p className="text-sm text-slate-300">{article.author} · {formatConceptPublishedLabel(article.publishedYear, article.publishedMonth)}</p>
                       {macroContext && macroReadout ? (
                         <div className="flex flex-wrap gap-2">
                           <span className="rounded-full border border-slate-500/70 bg-slate-800 px-2 py-1 text-xs font-semibold text-slate-200">Capital: {macroReadout.capital}</span>
