@@ -58,6 +58,7 @@ type WeeklyDecisionCardProps = {
     pointsToFlip: number;
   };
   citation: string;
+  isFallbackSnapshot?: boolean;
   actions?: ReactNode;
 };
 
@@ -158,6 +159,7 @@ export function WeeklyDecisionCard({
   startupClimateIndex,
   regimeDistance,
   citation,
+  isFallbackSnapshot = false,
   actions,
 }: WeeklyDecisionCardProps) {
   const freshnessLabel = fetchedAtLabel.trim().length > 0 ? fetchedAtLabel : "Unavailable";
@@ -176,6 +178,7 @@ export function WeeklyDecisionCard({
     ? "Do now: revise hiring and roadmap decisions this week. Flip: return to hold mode if next read is stable."
     : "Do now: hold hiring and roadmap decisions from last week. Flip: revise if next read shows material deterioration.";
   const topDecisionRules = decisionRules.slice(0, 4);
+  const primaryResumeTrigger = topDecisionRules[0]?.resumeTrigger ?? "Resume staged approvals when core thresholds stabilize.";
   const immediateDecision = revisitDecisions
     ? "Revise hiring and roadmap calls now."
     : "Keep last week's calls in place.";
@@ -201,12 +204,14 @@ export function WeeklyDecisionCard({
   const decisionPressurePercent = Math.max(10, Math.min(95, reportDynamics.changedSignals.length * 22 + (revisitDecisions ? 25 : 8)));
   const decisionStabilityPercent = Math.max(8, Math.min(100, 100 - reportDynamics.changedSignals.length * 25 - (revisitDecisions ? 25 : 0)));
   const postureLabel = postureDisplay(statusLabel);
-  const postureIndex = postureOrder.indexOf(postureLabel);
-  const postureDialPercent = postureIndex <= 0 ? 8 : Math.round((postureIndex / (postureOrder.length - 1)) * 100);
   const regimeDistanceToFlip = Math.abs(regimeDistance.pointsToFlip).toFixed(1);
   const regimeDistanceMessage = thresholdBreached
     ? `${regimeDistanceToFlip} points past the flip threshold.`
     : `${regimeDistanceToFlip} points until the flip threshold.`;
+  const needsTrustWarning = isFallbackSnapshot || confidenceLabel !== "HIGH" || freshnessLabel === "Unavailable";
+  const trustWarningCopy = isFallbackSnapshot
+    ? "Using a cached snapshot. Use this call for near-term pacing only and pause irreversible decisions until live refresh returns."
+    : "Use this call for near-term pacing only until confidence returns to HIGH with fresh data.";
 
   return (
     <section className="weather-panel space-y-5 px-5 py-6 sm:space-y-6 sm:px-7 sm:py-8" aria-labelledby="weekly-posture-brief-title">
@@ -218,27 +223,17 @@ export function WeeklyDecisionCard({
 
         <article className={`${primaryPanel} ${sectionSpacing} border-sky-400/50`} aria-label="In 15 seconds">
           <h2 className={primaryHeading}>In 15 seconds</h2>
-          <article className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-3" aria-label="Macro posture dial">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Macro posture dial</p>
-            <div className="mt-2 space-y-2">
-              <div className="relative h-2 rounded-full bg-slate-800">
-                <div className="absolute -top-1 h-4 w-4 -translate-x-1/2 rounded-full border border-sky-100 bg-sky-300" style={{ left: `${postureDialPercent}%` }} />
-              </div>
-              <ul className="grid grid-cols-4 gap-1 text-[11px] text-slate-300">
-                {postureOrder.map((posture) => (
-                  <li key={posture} className={posture === postureLabel ? "font-semibold text-slate-100" : undefined}>{posture}</li>
-                ))}
-              </ul>
-              <p className="text-xs text-slate-200">Current regime: <span className="font-semibold text-slate-100">{postureLabel}</span></p>
-            </div>
-          </article>
-          <ul className="grid gap-2 text-xs sm:grid-cols-2 lg:grid-cols-4" aria-label="Weekly decision summary">
+          <ul className="grid gap-2 text-xs sm:grid-cols-2 lg:grid-cols-5" aria-label="Weekly decision summary">
+            <li className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-3">
+              <p className="font-semibold uppercase tracking-[0.12em] text-sky-200">Posture</p>
+              <p className="mt-1 text-slate-200">{postureLabel}</p>
+            </li>
             <li className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-3">
               <p className="font-semibold uppercase tracking-[0.12em] text-sky-200">What changed</p>
               <p className="mt-1 text-slate-200">{postureDelta}</p>
             </li>
             <li className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-3">
-              <p className="font-semibold uppercase tracking-[0.12em] text-sky-200">What to do now</p>
+              <p className="font-semibold uppercase tracking-[0.12em] text-sky-200">Decision now</p>
               <p className="mt-1 text-slate-200">{immediateDecision}</p>
             </li>
             <li className="rounded-lg border border-amber-500/50 bg-slate-950/60 px-3 py-3">
@@ -246,8 +241,12 @@ export function WeeklyDecisionCard({
               <p className="mt-1 text-slate-200">{guardrail}</p>
             </li>
             <li className="rounded-lg border border-sky-500/50 bg-slate-950/60 px-3 py-3">
-              <p className="font-semibold uppercase tracking-[0.12em] text-sky-200">Flip trigger</p>
+              <p className="font-semibold uppercase tracking-[0.12em] text-sky-200">Flip if</p>
               <p className="mt-1 text-slate-200">{reversalTrigger}</p>
+            </li>
+            <li className="rounded-lg border border-violet-500/50 bg-slate-950/60 px-3 py-3 sm:col-span-2 lg:col-span-1">
+              <p className="font-semibold uppercase tracking-[0.12em] text-violet-200">Restart when</p>
+              <p className="mt-1 text-slate-200">{primaryResumeTrigger}</p>
             </li>
           </ul>
           <div className="flex flex-wrap gap-2" aria-label="Weekly trust signals">
@@ -263,25 +262,33 @@ export function WeeklyDecisionCard({
             </div>
             <p className="mt-2 text-xs text-slate-200">Reliability: {confidenceLabel} · Data freshness: {freshnessLabel}</p>
           </article>
-          <p className="text-xs text-slate-300">{trustCueLine}</p>
+          <p className="text-xs text-slate-300">Trust check: {trustCueLine}</p>
+          {needsTrustWarning ? (
+            <p className="rounded-md border border-amber-500/50 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
+              {trustWarningCopy}
+            </p>
+          ) : null}
         </article>
       </header>
 
       <article className={`${primaryPanel} ${sectionSpacing}`}>
-        <h2 className={primaryHeading}>Decision delta this week</h2>
-        <div className="grid gap-3 sm:grid-cols-3">
+        <h2 className={primaryHeading}>Decision call this week</h2>
+        <div className="grid gap-3 sm:grid-cols-4">
           <div className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-3">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Change this week</p>
             <p className="mt-1 text-xs text-slate-200">{decisionShiftSummary}</p>
           </div>
           <div className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">What to do now</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Decision now</p>
             <p className="mt-1 text-xs font-semibold text-slate-100">{immediateDecision}</p>
-            <p className="mt-1 text-xs text-slate-300">What changed: {postureDelta}</p>
           </div>
           <div className="rounded-lg border border-sky-500/40 bg-slate-950/60 px-3 py-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Flip trigger</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Flip if</p>
             <p className="mt-1 text-xs text-slate-200">{reversalTrigger}</p>
+          </div>
+          <div className="rounded-lg border border-violet-500/40 bg-slate-950/60 px-3 py-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-200">Restart when</p>
+            <p className="mt-1 text-xs text-slate-200">{primaryResumeTrigger}</p>
           </div>
         </div>
         <div className="grid gap-3 lg:grid-cols-2">
@@ -369,7 +376,7 @@ export function WeeklyDecisionCard({
       </article>
 
       <article className={`${secondaryPanel} ${sectionSpacing}`} aria-label="Bounded rule cards">
-        <h2 className={secondaryHeading}>Operating rules (quick scan)</h2>
+        <h2 className={secondaryHeading}>Bounded rules (do now / stop / restart)</h2>
         <ul className="mt-2 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {topDecisionRules.map((rule) => (
             <li key={rule.area} className="rounded-lg border border-slate-700/60 bg-slate-950/60 p-3 text-sm text-slate-200">
@@ -488,7 +495,7 @@ export function WeeklyDecisionCard({
             <p className="mt-1">Compare this macro call with your team context before locking irreversible moves.</p>
           </div>
           <Link href="/decide/team-context" className="inline-flex min-h-[44px] items-center rounded-md border border-sky-400/60 px-3 py-2 font-semibold text-sky-200 hover:bg-sky-500/10">
-            Open team context check
+            Run risk check
           </Link>
         </div>
         <div className="mt-3">{actions}</div>

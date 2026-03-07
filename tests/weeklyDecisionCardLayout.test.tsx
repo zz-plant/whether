@@ -120,8 +120,8 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     );
 
     const postureIndex = html.indexOf("Weekly posture call");
-    const decisionCallIndex = html.indexOf("Decision delta this week");
-    const rulesSummaryIndex = html.indexOf("Operating rules (quick scan)");
+    const decisionCallIndex = html.indexOf("Decision call this week");
+    const rulesSummaryIndex = html.indexOf("Bounded rules (do now / stop / restart)");
 
     assert.ok(postureIndex >= 0);
     assert.ok(decisionCallIndex > postureIndex);
@@ -131,8 +131,11 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /Confidence 68% \(MED\)/);
     assert.match(html, /Trend Improving/);
     assert.match(html, /Confidence MED · Freshness Mar 6, 2026 09:12 UTC · Regime shift watch ON/);
-    assert.match(html, /Decision delta this week[\s\S]*What changed: \+2/);
-    assert.match(html, /What to do now[\s\S]*Revise hiring and roadmap calls now\./);
+    assert.match(html, /Decision call this week/);
+    assert.match(html, /What changed/);
+    assert.match(html, /Decision now[\s\S]*Revise hiring and roadmap calls now\./);
+    assert.match(html, /Flip if/);
+    assert.match(html, /Restart when/);
     assert.match(html, /Macro drift this week/);
     assert.match(html, /Distance to regime flip/);
     assert.match(html, /Decision change pressure/);
@@ -140,7 +143,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /<p class="font-semibold text-rose-200">High<\/p>/);
     assert.match(html, /<p class="font-semibold text-amber-200">Controlled<\/p>/);
     assert.match(html, /<p class="font-semibold text-emerald-200">Low<\/p>/);
-    assert.match(html, /Operating rules \(quick scan\)/);
+    assert.match(html, /Bounded rules \(do now \/ stop \/ restart\)/);
     assert.match(html, /Primary drivers this week/);
     assert.match(html, /Startup Climate Index/);
     assert.match(html, /Score 63 \/ 100 · Improving/);
@@ -148,7 +151,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /Stop if:/);
     assert.match(html, /Restart when:/);
     assert.match(html, /Team context check/);
-    assert.match(html, /Open team context check/);
+    assert.match(html, /Run risk check/);
   });
 
   it("uses responsive classes to protect screenshot readability and keeps citation actions", () => {
@@ -221,8 +224,8 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     );
 
     assert.match(html, /data-testid="weekly-top-fold"/);
-    assert.match(html, /sm:grid-cols-3/);
-    assert.match(html, /lg:grid-cols-4/);
+    assert.match(html, /sm:grid-cols-4/);
+    assert.match(html, /lg:grid-cols-5/);
     assert.match(html, /Historical memory rail/);
     assert.match(html, /More context \(why this call \+ timeline\)/);
     assert.match(html, /Cite this call/);
@@ -301,5 +304,80 @@ describe("WeeklyDecisionCard top-fold composition", () => {
 
     assert.match(html, /Confidence LOW · Freshness Unavailable · Regime shift watch ON/);
     assert.match(html, /Posture DEFENSIVE · Confidence LOW · Effective Mar 5, 2026 · Freshness Unavailable/);
+    assert.match(html, /Use this call for near-term pacing only until confidence returns to HIGH with fresh data\./);
+  });
+
+  it("shows pacing warning for cached fallback snapshots even with high confidence and a timestamp", () => {
+    const html = renderToStaticMarkup(
+      <WeeklyDecisionCard
+        statusLabel="DEFENSIVE"
+        postureDelta="No worse than last week"
+        confidenceLabel="HIGH"
+        confidencePercent={92}
+        trendLabel="Stable"
+        transitionWatch="OFF"
+        netConstraintSummary="Fallback snapshot is stable for near-term pacing."
+        guardrail="Hold irreversible hiring unless demand proves durable."
+        reversalTrigger="If tightness drops below 60, reopen selective hiring."
+        recordDateLabel="Mar 5, 2026"
+        fetchedAtLabel="Mar 6, 2026 09:12 UTC"
+        reportDynamics={{ directionLabel: "stable", changedSignals: [] }}
+        decisionShiftSummary="No material signal shift in fallback mode."
+        decisionRules={decisionRules}
+        revisitDecisions={false}
+        memoryRail={[
+          { label: "W-3", posture: "Defensive" },
+          { label: "W-2", posture: "Defensive" },
+          { label: "W-1", posture: "Defensive" },
+          { label: "Now", posture: "Defensive" },
+        ]}
+        historicalTimeline={[
+          { label: "2020", posture: "Defensive" },
+          { label: "2021", posture: "Expansion" },
+          { label: "2022", posture: "Defensive" },
+          { label: "2023", posture: "Mixed" },
+          { label: "2024", posture: "Mixed" },
+          { label: "2025", posture: "Expansion" },
+          { label: "2026", posture: "Defensive" },
+        ]}
+        macroOverlay={[
+          { label: "VC funding", detail: "-4.5 · ↑ improving" },
+          { label: "Startup layoffs", detail: "62.0 · ↑ improving" },
+          { label: "IPO window (VIX)", detail: "17.4 · ↓ tightening" },
+          { label: "SaaS multiples", detail: "5.9 · ↑ improving" },
+        ]}
+        whyThisCall={[
+          { label: "Boundary distance", detail: "Nearest boundary is 6.0 points away." },
+          { label: "Momentum", detail: "No material deltas this week." },
+          { label: "Reliability", detail: "Fallback snapshot in use." },
+        ]}
+        primaryDrivers={[
+          { label: "Signal reliability", detail: "High confidence (cached snapshot)" },
+          { label: "Transition watch", detail: "OFF" },
+        ]}
+        startupClimateIndex={{
+          score: 61,
+          status: "Stable",
+          breakdown: [
+            { label: "Capital availability", score: 64 },
+            { label: "Hiring market", score: 57 },
+            { label: "SaaS valuations", score: 62 },
+            { label: "IPO window", score: 54 },
+          ],
+        }}
+        regimeDistance={{
+          dimensionLabel: "Tightness",
+          currentValue: 64,
+          thresholdValue: 70,
+          pointsToFlip: 6,
+        }}
+        citation="Whether weekly brief citation"
+        isFallbackSnapshot={true}
+      />,
+    );
+
+    assert.match(html, /Confidence 92% \(HIGH\)/);
+    assert.match(html, /Freshness Mar 6, 2026 09:12 UTC/);
+    assert.match(html, /Using a cached snapshot\. Use this call for near-term pacing only and pause irreversible decisions until live refresh returns\./);
   });
 });
