@@ -71,10 +71,24 @@ export const formatNumberValue = (value: number | null) => {
   return numberFormatter.format(value);
 };
 
+export const formatSignedDeltaValue = (value: number | null) => {
+  const formatted = formatNumberValue(value);
+  if (formatted === "—") {
+    return formatted;
+  }
+  const sign = value !== null && value > 0 ? "+" : "";
+  return `${sign}${formatted}`;
+};
+
 export const formatScoreValue = (value: number) => value.toFixed(0);
 
 
 export const formatNumberWithUnit = (value: number | null, unit: string) => {
   const formatted = formatNumberValue(value);
+  return formatted === "—" ? formatted : `${formatted}${formatUnitSuffix(unit)}`;
+};
+
+export const formatSignedDeltaWithUnit = (value: number | null, unit: string) => {
+  const formatted = formatSignedDeltaValue(value);
   return formatted === "—" ? formatted : `${formatted}${formatUnitSuffix(unit)}`;
 };
