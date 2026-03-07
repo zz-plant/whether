@@ -20,6 +20,8 @@ import { INFORMATIONAL_NOTICE } from "../../lib/exportNotices";
 import { serializeJsonLd } from "../../lib/seo";
 import { AnchorFeedback } from "./anchorFeedback";
 import { ReportCta } from "./reportCta";
+import { NavigationOrientationBadge } from "./navigationOrientationBadge";
+
 import { ClimateBackdrop } from "./climateBackdrop";
 import { RegimeIconType } from "./regimeIcons";
 import { ArrowRightIcon } from "./uiIcons";
@@ -321,7 +323,16 @@ export const ReportShell = ({
               <div className="flex items-center gap-3"><Image src="/whether-logo.svg" alt="Whether — Weekly Operating Posture (Hiring, Spend, Roadmap)" width={156} height={36} className="h-9 w-auto" priority /><p className="text-xs text-slate-300 sm:hidden">Signals updated {fetchedAtLabel}</p></div>
               <div className="hidden items-center sm:flex"><p className="text-xs text-slate-300">Signals updated {fetchedAtLabel}</p></div>
             </div>
-            {showPageNavigation ? <ReportPageNavigation pageLinks={pageLinks} pageTitle={pageTitle} currentPath={currentPath} variant={pageNavVariant} className="mt-4 -mx-4 hidden px-4 sm:mx-0 sm:block sm:px-0" /> : null}
+            <NavigationOrientationBadge currentPath={currentPath} className="mt-4" />
+            {showPageNavigation ? (
+              <ReportPageNavigation
+                pageLinks={pageLinks}
+                pageTitle={pageTitle}
+                currentPath={currentPath}
+                variant={pageNavVariant}
+                className="mt-4 -mx-4 hidden px-4 sm:mx-0 sm:block sm:px-0"
+              />
+            ) : null}
           </header>
 
           {showPostureRibbon ? <div className="weather-panel-static mb-4 hidden flex-wrap items-center justify-between gap-2 border border-slate-700/70 px-4 py-2 text-xs sm:flex"><p className="text-slate-300">Current Posture: <span className="font-semibold text-slate-100">{statusLabel}</span><span className="ml-2 text-slate-400">Updated {recordDateLabel}</span></p><Link href="/" className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-[11px] font-semibold tracking-[0.14em]">Open weekly brief</Link></div> : null}

@@ -30,7 +30,6 @@ const sharedDeepDiveSections = [
   },
 ];
 
-
 const canonicalPillarPath = "/resources/capital-discipline-venture-backed-companies";
 
 const buildAnchor = (heading: string) =>
@@ -51,6 +50,9 @@ export const buildResourceArticleMetadata = (article: ResourceArticle): Metadata
       title: article.title,
     },
   });
+
+export const composeArticleSections = (article: ResourceArticle) =>
+  article.includeSharedDeepDive ? [...article.sections, ...sharedDeepDiveSections] : article.sections;
 
 export function ResourceArticlePage({ article }: { article: ResourceArticle }) {
   const canonicalUrl = buildCanonicalUrl(`/resources/${article.slug}`);
@@ -100,7 +102,7 @@ export function ResourceArticlePage({ article }: { article: ResourceArticle }) {
           </ul>
         </section>
 
-        {[...article.sections, ...sharedDeepDiveSections].map((section) => {
+        {composeArticleSections(article).map((section) => {
           const anchor = buildAnchor(section.heading);
           return (
             <section id={anchor} key={section.heading} className="weather-panel space-y-3 px-6 py-6 scroll-mt-24 print:border print:border-slate-300 print:bg-white">
