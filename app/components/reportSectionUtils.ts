@@ -1,20 +1,11 @@
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import type { SeriesHistoryPoint } from "../../lib/types";
-import { formatNumberValue } from "../../lib/formatters";
+import { formatNumberWithUnit, formatSignedDeltaWithUnit } from "../../lib/formatters";
 import { REGIME_LABELS, REGIME_ORDER, REGIME_STYLE_TOKENS } from "../../lib/regimePresentation";
 
-export const formatNumber = (value: number | null, unit: string) => {
-  const formatted = formatNumberValue(value);
-  return formatted === "—" ? formatted : `${formatted}${unit}`;
-};
+export const formatNumber = formatNumberWithUnit;
 
-export const formatDelta = (value: number | null, unit: string) => {
-  if (value === null || Number.isNaN(value)) {
-    return "—";
-  }
-  const sign = value > 0 ? "+" : "";
-  return `${sign}${formatNumberValue(value)}${unit}`;
-};
+export const formatDelta = formatSignedDeltaWithUnit;
 
 export const CLIMATE_ORDER = REGIME_ORDER;
 
