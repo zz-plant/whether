@@ -13,6 +13,19 @@ const timestampFormatter = new Intl.DateTimeFormat("en-US", {
   timeZoneName: "short",
 });
 
+const monthYearShortUtcFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  year: "numeric",
+  timeZone: "UTC",
+});
+
+const monthDayYearUtcFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+  timeZone: "UTC",
+});
+
 const numberFormatter = new Intl.NumberFormat("en-US", {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
@@ -82,10 +95,14 @@ export const formatSignedDeltaValue = (value: number | null) => {
 
 export const formatScoreValue = (value: number) => value.toFixed(0);
 
-export const formatPublishedLabel = (year: number, month: number) =>
-  new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric", timeZone: "UTC" }).format(
-    new Date(Date.UTC(year, month - 1, 1)),
-  );
+export const formatMonthYearShortUtc = (date: Date) => monthYearShortUtcFormatter.format(date);
+
+export const formatMonthDayYearUtc = (date: Date) => monthDayYearUtcFormatter.format(date);
+
+export const formatConceptPublishedLabel = (year: number, month: number) =>
+  formatMonthYearShortUtc(new Date(Date.UTC(year, month - 1, 1)));
+
+export const formatPublishedLabel = formatConceptPublishedLabel;
 
 export const formatNumberWithUnit = (value: number | null, unit: string) => {
   const formatted = formatNumberValue(value);
