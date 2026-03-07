@@ -1,5 +1,6 @@
 import type { TimeMachineRegimeEntry } from "../../../lib/timeMachine/timeMachineCache";
 import type { RegimeKey } from "../../../lib/regimeEngine";
+import { REGIME_LABELS, REGIME_STYLE_TOKENS } from "../../../lib/regimePresentation";
 
 const monthFormatter = new Intl.DateTimeFormat("en-US", {
   month: "short",
@@ -20,19 +21,6 @@ const formatMonthShort = (year: number, month: number) => {
   return monthShortFormatter.format(new Date(Date.UTC(year, month - 1, 1)));
 };
 
-const regimeLabels: Record<RegimeKey, string> = {
-  SCARCITY: "Scarcity",
-  DEFENSIVE: "Defensive",
-  VOLATILE: "Volatile",
-  EXPANSION: "Expansion",
-};
-
-const regimeMarkerStyles: Record<RegimeKey, string> = {
-  SCARCITY: "bg-rose-400",
-  DEFENSIVE: "bg-amber-400",
-  VOLATILE: "bg-indigo-400",
-  EXPANSION: "bg-emerald-400",
-};
 
 type RegimeRun = {
   regime: RegimeKey;
@@ -168,7 +156,7 @@ export const RegimeTimelinePanel = ({
             <div className="flex min-h-20 items-stretch">
               {runs.map((run) => {
                 const spanLabel = formatRunSpan(run);
-                const runLabel = regimeLabels[run.regime];
+                const runLabel = REGIME_LABELS[run.regime];
 
                 return (
                   <div
@@ -177,7 +165,7 @@ export const RegimeTimelinePanel = ({
                     style={{ flexGrow: run.count }}
                   >
                     <div
-                      className={`absolute inset-0 opacity-85 transition-opacity group-hover:opacity-100 ${regimeMarkerStyles[run.regime]}`}
+                      className={`absolute inset-0 opacity-85 transition-opacity group-hover:opacity-100 ${REGIME_STYLE_TOKENS[run.regime].marker}`}
                       aria-hidden="true"
                     />
                     <div className="relative z-10 w-full bg-gradient-to-t from-slate-950/80 via-slate-950/35 to-transparent px-2 pb-2 pt-8 sm:px-3">
@@ -215,12 +203,12 @@ export const RegimeTimelinePanel = ({
                     key={`${entry.year}-${entry.month}`}
                     href={href}
                     aria-current={isCurrent ? "date" : undefined}
-                    aria-label={`${monthLabel}: ${regimeLabels[entry.regime]}`}
+                    aria-label={`${monthLabel}: ${REGIME_LABELS[entry.regime]}`}
                     className="h-full min-h-[44px] flex-1 focus-visible:z-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/90 focus-visible:ring-offset-1 focus-visible:ring-offset-slate-950"
                     style={{ touchAction: "manipulation" }}
                   >
                     <span className="sr-only">
-                      {monthLabel} — {regimeLabels[entry.regime]}
+                      {monthLabel} — {REGIME_LABELS[entry.regime]}
                     </span>
                   </a>
                 );
@@ -230,7 +218,7 @@ export const RegimeTimelinePanel = ({
 
           <p className="mt-3 text-xs text-slate-400" aria-live="polite">
             Last {series.length} months: {changeCount} regime changes, longest run:{" "}
-            {longestRun ? `${regimeLabels[longestRun.regime]} (${longestRun.count} months)` : "n/a"}.
+            {longestRun ? `${REGIME_LABELS[longestRun.regime]} (${longestRun.count} months)` : "n/a"}.
           </p>
         </div>
       </div>

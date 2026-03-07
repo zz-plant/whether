@@ -26,6 +26,7 @@ import { SIGNALS_RELATED_LINKS } from "../../lib/report/reportCopy";
 import { indicatorTypeByScoreLabel, indicatorTypeLabel } from "../../lib/indicatorClassification";
 import { HistoricalReplayDatePicker } from "./components/historicalReplayDatePicker";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
+import { REGIME_LABELS } from "../../lib/regimePresentation";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -56,12 +57,6 @@ export default async function SignalsPage({
   }>;
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const regimeLabels = {
-    SCARCITY: "Scarcity",
-    DEFENSIVE: "Defensive",
-    VOLATILE: "Volatile",
-    EXPANSION: "Expansion",
-  } as const;
   const structuredData = {
     "@context": "https://schema.org",
     "@graph": [
@@ -140,7 +135,7 @@ export default async function SignalsPage({
     ? buildTimeMachineHref("/signals?advanced=1#time-machine", historicalSelection)
     : "/signals?advanced=1#time-machine";
   const summaryArchive = getSummaryArchive();
-  const regimeLabel = regimeLabels[assessment.regime];
+  const regimeLabel = REGIME_LABELS[assessment.regime];
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
   const {
     trustStatusLabel,

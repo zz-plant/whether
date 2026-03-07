@@ -1,7 +1,7 @@
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import type { SeriesHistoryPoint } from "../../lib/types";
 import { formatNumberValue } from "../../lib/formatters";
-import { formatRegimeLabel } from "../../lib/regimeFormat";
+import { REGIME_LABELS, REGIME_ORDER, REGIME_STYLE_TOKENS } from "../../lib/regimePresentation";
 
 export const formatNumber = (value: number | null, unit: string) => {
   const formatted = formatNumberValue(value);
@@ -16,7 +16,7 @@ export const formatDelta = (value: number | null, unit: string) => {
   return `${sign}${formatNumberValue(value)}${unit}`;
 };
 
-export const CLIMATE_ORDER = ["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"] as const;
+export const CLIMATE_ORDER = REGIME_ORDER;
 
 export const sortClimateKeys = (first: string, second: string) => {
   const climateOrder = CLIMATE_ORDER as readonly string[];
@@ -80,7 +80,7 @@ export const buildSparkline = (history?: SeriesHistoryPoint[]) => {
   return { path, area };
 };
 
-export const getRegimeLabel = (regime: RegimeAssessment["regime"]) => formatRegimeLabel(regime);
+export const getRegimeLabel = (regime: RegimeAssessment["regime"]) => REGIME_LABELS[regime];
 
 export const regimeBadges = [
   {
@@ -88,28 +88,28 @@ export const regimeBadges = [
     label: "Scarcity",
     icon: "shield",
     description: "Cash is scarce; protect runway and defer bets.",
-    classes: "border-rose-500/60 bg-rose-500/15 text-rose-100",
+    classes: REGIME_STYLE_TOKENS.SCARCITY.badge,
   },
   {
     key: "DEFENSIVE",
     label: "Defensive",
     icon: "lock",
     description: "Capital is cautious; prioritize durability and retention.",
-    classes: "border-amber-400/60 bg-amber-400/15 text-amber-100",
+    classes: REGIME_STYLE_TOKENS.DEFENSIVE.badge,
   },
   {
     key: "VOLATILE",
     label: "Volatile",
     icon: "balance",
     description: "Signals are mixed; balance experimentation with controls.",
-    classes: "border-sky-400/60 bg-sky-400/15 text-sky-100",
+    classes: REGIME_STYLE_TOKENS.VOLATILE.badge,
   },
   {
     key: "EXPANSION",
     label: "Expansion",
     icon: "rocket",
     description: "Risk appetite is open; scale initiatives responsibly.",
-    classes: "border-emerald-400/60 bg-emerald-400/15 text-emerald-100",
+    classes: REGIME_STYLE_TOKENS.EXPANSION.badge,
   },
 ] as const;
 
@@ -117,36 +117,5 @@ export const getRegimeBadge = (regime: RegimeAssessment["regime"]) =>
   regimeBadges.find((badge) => badge.key === regime);
 
 export const getRegimeAccent = (regime: RegimeAssessment["regime"]) => {
-  switch (regime) {
-    case "SCARCITY":
-      return {
-        panel: "from-rose-600/20 via-rose-500/10 to-transparent border-rose-500/40",
-        dot: "bg-rose-500",
-        text: "text-rose-200",
-      };
-    case "DEFENSIVE":
-      return {
-        panel: "from-amber-500/20 via-amber-400/10 to-transparent border-amber-400/40",
-        dot: "bg-amber-400",
-        text: "text-amber-200",
-      };
-    case "VOLATILE":
-      return {
-        panel: "from-sky-500/20 via-sky-400/10 to-transparent border-sky-400/40",
-        dot: "bg-sky-400",
-        text: "text-sky-200",
-      };
-    case "EXPANSION":
-      return {
-        panel: "from-emerald-500/20 via-emerald-400/10 to-transparent border-emerald-400/40",
-        dot: "bg-emerald-400",
-        text: "text-emerald-200",
-      };
-    default:
-      return {
-        panel: "from-slate-700/20 via-slate-600/10 to-transparent border-slate-600/40",
-        dot: "bg-slate-500",
-        text: "text-slate-200",
-      };
-  }
+  return REGIME_STYLE_TOKENS[regime].accent;
 };
