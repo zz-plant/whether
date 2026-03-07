@@ -3,16 +3,12 @@
  * Mirrors monthly summary structure with quarter-specific framing.
  */
 import type { RegimeAssessment } from "../regimeEngine";
-import { getRegimeOperatorLabel } from "../regimeLabels";
-import { buildComplianceStamp } from "../exportNotices";
+import {
+  buildCadenceSummary,
+  type CadenceSummaryProvenance,
+} from "./cadenceSummaryBuilder";
 
-export type QuarterlySummaryProvenance = {
-  sourceLabel: string;
-  sourceUrl?: string;
-  timestampLabel: string;
-  ageLabel: string;
-  statusLabel: string;
-};
+export type QuarterlySummaryProvenance = CadenceSummaryProvenance;
 
 export type QuarterlySummary = {
   title: string;
@@ -38,7 +34,6 @@ const quarterlyActionGuidance: Record<RegimeAssessment["regime"], string> = {
     "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
 };
 
-
 export const getQuarterlyActionGuidance = (regime: RegimeAssessment["regime"]) =>
   quarterlyActionGuidance[regime];
 
@@ -52,49 +47,15 @@ export const buildQuarterlySummary = ({
   provenance: QuarterlySummaryProvenance;
   recordDateLabel?: string;
   periodLabel?: string;
-}): QuarterlySummary => {
-  const regimeLabel = getRegimeOperatorLabel(assessment.regime);
-  const guidance = getQuarterlyActionGuidance(assessment.regime);
-  const summary = `This quarter, operate in ${regimeLabel} mode: ${guidance}. ${assessment.description}`;
-  const title = periodLabel
-    ? `Quarterly action summary — ${periodLabel}`
-    : "Quarterly action summary";
-  const sourceLine = provenance.sourceUrl
-    ? `${provenance.sourceLabel} (${provenance.sourceUrl})`
-    : provenance.sourceLabel;
-  const complianceStamp = buildComplianceStamp({
-    sourceLine,
-    timestamp: provenance.timestampLabel,
-    confidence: provenance.statusLabel,
-  });
-  const copy = [
-    title,
-    summary,
-    "",
-    "Execution constraints:",
-    ...assessment.constraints.map((item) => `• ${item}`),
-    "",
-    "Provenance:",
-    `Source: ${sourceLine}`,
-    `Timestamp: ${provenance.timestampLabel}`,
-    `Data age: ${provenance.ageLabel}`,
-    "",
-    ...complianceStamp,
-  ].join("\n");
-
-  return {
-    title,
-    summary,
-    regime: assessment.regime,
-    regimeLabel,
-    guidance,
-    constraints: assessment.constraints,
-    recordDateLabel: recordDateLabel ?? null,
+}): QuarterlySummary =>
+  buildCadenceSummary({
+    cadence: "quarterly",
+    guidanceMap: quarterlyActionGuidance,
+    assessment,
     provenance,
-    inputs: assessment.inputs,
-    copy,
-  };
-};
+    recordDateLabel,
+    periodLabel,
+  });
 
 export const getQuarterLabel = (value: string) => {
   const date = new Date(`${value}T00:00:00Z`);
