@@ -15,11 +15,19 @@ import {
 } from "../../../lib/resourcesContent";
 import { GovernanceLexiconCallout } from "../components/governanceLexiconCallout";
 import { PillarCtaBlock } from "../components/pillarCtaBlock";
+import {
+  buildDownloadableResourceMetadata,
+  DownloadableResourcePage,
+} from "../components/downloadableResourcePage";
 import { buildResourceArticleMetadata, ResourceArticlePage } from "../components/resourceArticlePage";
 import {
   findResourceArticleBySlug,
   generateStaticParams as generateResourceArticleStaticParams,
 } from "../../../lib/resourceArticles";
+import {
+  downloadableResourceSlugs,
+  findDownloadableResourceBySlug,
+} from "../../../lib/downloadableResources";
 
 type Params = { slug: string };
 
@@ -47,6 +55,7 @@ export function generateStaticParams() {
   const slugs = new Set<string>([
     ...resourcePillarPages.map((entry) => entry.slug),
     ...generateResourceArticleStaticParams().map((entry) => entry.slug),
+    ...downloadableResourceSlugs,
   ]);
 
   return Array.from(slugs, (slug) => ({ slug }));
@@ -54,6 +63,11 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug } = await params;
+  const downloadableResource = findDownloadableResourceBySlug(slug);
+  if (downloadableResource) {
+    return buildDownloadableResourceMetadata(downloadableResource.metadata);
+  }
+
   const article = findResourceArticleBySlug(slug);
   if (article) {
     return buildResourceArticleMetadata(article);
@@ -76,6 +90,11 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
 export default async function ResourcePillarPage({ params }: { params: Promise<Params> }) {
   const { slug } = await params;
+  const downloadableResource = findDownloadableResourceBySlug(slug);
+  if (downloadableResource) {
+    return <DownloadableResourcePage config={downloadableResource} />;
+  }
+
   const article = findResourceArticleBySlug(slug);
   if (article) {
     return <ResourceArticlePage article={article} />;

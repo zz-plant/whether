@@ -1,38 +1,46 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
-import CapitalPostureTemplatePage from "../app/resources/capital-posture-template/page";
-import QuarterlyMemoExamplePage from "../app/resources/quarterly-capital-posture-memo-example/page";
-import ReversalTriggerChecklistPage from "../app/resources/reversal-trigger-checklist/page";
+import ResourceRoutePage, { generateMetadata, generateStaticParams } from "../app/resources/[slug]/page";
+import { downloadableResourceSlugs, downloadableResources } from "../lib/downloadableResources";
 
 describe("downloadable resource pages", () => {
-  it("renders title, CTAs, and shared internal links for capital posture template", () => {
-    const html = renderToStaticMarkup(<CapitalPostureTemplatePage />);
+  it("includes all downloadable resource slugs in static params", () => {
+    const params = generateStaticParams();
 
-    assert.match(html, /Capital Posture Template/);
-    assert.match(html, /href="\/downloads\/capital-posture-template.md"/);
-    assert.match(html, /href="\/start\?intent=capital-posture-template-gated"/);
-    assert.match(html, /Canonical pillar: Capital Discipline/);
-    assert.match(html, /Board Framework page/);
+    for (const slug of downloadableResourceSlugs) {
+      assert.ok(params.some((entry) => entry.slug === slug));
+    }
   });
 
-  it("renders title, CTAs, and shared internal links for reversal trigger checklist", () => {
-    const html = renderToStaticMarkup(<ReversalTriggerChecklistPage />);
+  it("renders all configured downloadable resource slugs", async () => {
+    for (const slug of downloadableResourceSlugs) {
+      const page = await ResourceRoutePage({
+        params: Promise.resolve({ slug }),
+      });
+      const html = renderToStaticMarkup(page);
+      const config = downloadableResources[slug];
 
-    assert.match(html, /Reversal Trigger Checklist/);
-    assert.match(html, /href="\/downloads\/reversal-trigger-checklist.md"/);
-    assert.match(html, /href="\/resources\/decision-shield-overview"/);
-    assert.match(html, /Canonical pillar: Capital Discipline/);
-    assert.match(html, /Board Framework page/);
+      assert.match(html, new RegExp(config.metadata.title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+      assert.match(html, new RegExp(`href=\"${config.downloadCta.href.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\"`));
+      assert.match(html, new RegExp(`href=\"${config.secondaryCta.href.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\"`));
+      assert.match(html, /Canonical pillar: Capital Discipline/);
+      assert.match(html, /Board Framework page/);
+    }
   });
 
-  it("renders title, CTAs, and shared internal links for quarterly memo example", () => {
-    const html = renderToStaticMarkup(<QuarterlyMemoExamplePage />);
+  it("builds stable metadata for all configured downloadable resources", async () => {
+    for (const slug of downloadableResourceSlugs) {
+      const config = downloadableResources[slug];
+      const metadata = await generateMetadata({
+        params: Promise.resolve({ slug }),
+      });
 
-    assert.match(html, /Quarterly Capital Posture Memo Example/);
-    assert.match(html, /href="\/downloads\/quarterly-capital-posture-memo-example.md"/);
-    assert.match(html, /href="\/resources\/capital-posture-template"/);
-    assert.match(html, /Canonical pillar: Capital Discipline/);
-    assert.match(html, /Board Framework page/);
+      assert.equal(metadata.title, config.metadata.title);
+      assert.equal(metadata.description, config.metadata.description);
+      assert.equal(metadata.alternates?.canonical, config.metadata.path);
+      assert.equal(metadata.openGraph?.title, config.metadata.title);
+      assert.equal(metadata.openGraph?.description, config.metadata.description);
+    }
   });
 });
