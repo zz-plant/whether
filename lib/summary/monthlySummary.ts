@@ -5,6 +5,7 @@
 import type { RegimeAssessment } from "../regimeEngine";
 import { getRegimeOperatorLabel } from "../regimeLabels";
 import { renderMonthlySummaryCopy } from "./summaryCopyRenderer";
+import { formatSourceLine } from "./summaryFormatting";
 
 import type { MonthlyStructured, SummaryProvenance } from "./summaryTypes";
 
@@ -50,9 +51,7 @@ export const buildMonthlyStructured = ({
   constraints: string[];
   provenance: MonthlySummaryProvenance;
 }): MonthlyStructured => {
-  const source = provenance.sourceUrl
-    ? `${provenance.sourceLabel} (${provenance.sourceUrl})`
-    : provenance.sourceLabel;
+  const source = formatSourceLine(provenance);
 
   return {
     executionConstraints: constraints,
