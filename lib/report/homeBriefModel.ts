@@ -51,6 +51,11 @@ type StartupClimateIndex = {
   breakdown: Array<{ label: string; score: number }>;
 };
 
+type MacroOverlayItem = {
+  label: string;
+  detail: string;
+};
+
 const regimeLabelMap = {
   SCARCITY: "Scarcity",
   DEFENSIVE: "Defensive",
@@ -113,6 +118,82 @@ const buildMemoryRail = (recordDateLabel: string | undefined, currentRegime: Reg
       posture: regimeLabelMap[currentRegime],
     },
   ].slice(-4);
+};
+
+const buildHistoricalTimeline = (currentRegime: Regime): MemoryRailItem[] => {
+  const yearlyEntries = getSummaryArchive()
+    .filter((entry): entry is Extract<typeof entry, { cadence: "yearly" }> => entry.cadence === "yearly")
+    .slice(-6)
+    .map((entry) => ({
+      label: String(entry.year),
+      posture: regimeLabelMap[entry.summary.regime],
+    }));
+
+  const latestYear = yearlyEntries[yearlyEntries.length - 1]?.label;
+  const currentYear = new Date().getUTCFullYear();
+  const currentEntryLabel = latestYear === String(currentYear) ? latestYear : String(currentYear);
+
+  return [
+    ...yearlyEntries,
+    {
+      label: currentEntryLabel,
+      posture: regimeLabelMap[currentRegime],
+    },
+  ].slice(-7);
+};
+
+const getMacroSeriesDelta = (macroSeries: MacroSeriesReading[] | undefined, id: MacroSeriesReading["id"]) => {
+  const series = macroSeries?.find((reading) => reading.id === id);
+  const latest = series?.value;
+  const history = series?.history ?? [];
+  const previous = history.length >= 2 ? history[history.length - 2]?.value : null;
+  const delta =
+    typeof latest === "number" && typeof previous === "number"
+      ? latest - previous
+      : null;
+
+  return { latest, delta };
+};
+
+const formatDelta = (value: number | null, positiveIsImproving: boolean) => {
+  if (value === null || Number.isNaN(value)) {
+    return "→ unchanged";
+  }
+
+  if (value === 0) {
+    return "→ unchanged";
+  }
+
+  const improving = positiveIsImproving ? value > 0 : value < 0;
+  const arrow = improving ? "↑" : "↓";
+  const direction = improving ? "improving" : "tightening";
+  return `${arrow} ${direction}`;
+};
+
+const buildMacroOverlay = (macroSeries: MacroSeriesReading[] | undefined): MacroOverlayItem[] => {
+  const vcFunding = getMacroSeriesDelta(macroSeries, "VC_FUNDING_VELOCITY");
+  const layoffs = getMacroSeriesDelta(macroSeries, "TECH_LAYOFF_TREND");
+  const ipoWindow = getMacroSeriesDelta(macroSeries, "VIX_INDEX");
+  const saasValuations = getMacroSeriesDelta(macroSeries, "SAAS_VALUATION_MULTIPLE");
+
+  return [
+    {
+      label: "VC funding",
+      detail: `${typeof vcFunding.latest === "number" ? vcFunding.latest.toFixed(1) : "n/a"} · ${formatDelta(vcFunding.delta, true)}`,
+    },
+    {
+      label: "Startup layoffs",
+      detail: `${typeof layoffs.latest === "number" ? layoffs.latest.toFixed(1) : "n/a"} · ${formatDelta(layoffs.delta, false)}`,
+    },
+    {
+      label: "IPO window (VIX)",
+      detail: `${typeof ipoWindow.latest === "number" ? ipoWindow.latest.toFixed(1) : "n/a"} · ${formatDelta(ipoWindow.delta, false)}`,
+    },
+    {
+      label: "SaaS multiples",
+      detail: `${typeof saasValuations.latest === "number" ? saasValuations.latest.toFixed(1) : "n/a"} · ${formatDelta(saasValuations.delta, true)}`,
+    },
+  ];
 };
 
 const buildPrimaryDrivers = ({
@@ -309,6 +390,8 @@ export const buildHomeBriefModel = (data: HomeReportData) => {
     revisitDecisions: (reportDynamics?.changedSignals.length ?? 0) > 0 && reportDynamics?.directionLabel !== "stable",
     guardrail,
     memoryRail: buildMemoryRail(recordDateLabel, assessment.regime),
+    historicalTimeline: buildHistoricalTimeline(assessment.regime),
+    macroOverlay: buildMacroOverlay(macroSeries),
     primaryDrivers: buildPrimaryDrivers({ reportDynamics, confidenceLabel, transitionWatch }),
     netConstraintSummary,
     postureDeltaLabel,

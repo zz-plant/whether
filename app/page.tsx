@@ -341,6 +341,8 @@ export default async function HomePage({
         decisionRules={homeBriefModel.decisionRules}
         revisitDecisions={homeBriefModel.revisitDecisions}
         memoryRail={homeBriefModel.memoryRail}
+        historicalTimeline={homeBriefModel.historicalTimeline}
+        macroOverlay={homeBriefModel.macroOverlay}
         whyThisCall={homeBriefModel.whyThisCall}
         primaryDrivers={homeBriefModel.primaryDrivers}
         startupClimateIndex={homeBriefModel.startupClimateIndex}

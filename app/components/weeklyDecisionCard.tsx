@@ -20,6 +20,11 @@ type PrimaryDriverItem = {
   detail: string;
 };
 
+type MacroOverlayItem = {
+  label: string;
+  detail: string;
+};
+
 type WeeklyDecisionCardProps = {
   statusLabel: string;
   postureDelta: string;
@@ -37,6 +42,8 @@ type WeeklyDecisionCardProps = {
   decisionRules: BoundedDecisionRule[];
   revisitDecisions: boolean;
   memoryRail: MemoryRailItem[];
+  historicalTimeline: MemoryRailItem[];
+  macroOverlay: MacroOverlayItem[];
   whyThisCall: WhyThisCallItem[];
   primaryDrivers: PrimaryDriverItem[];
   startupClimateIndex: {
@@ -87,6 +94,8 @@ export function WeeklyDecisionCard({
   decisionRules,
   revisitDecisions,
   memoryRail,
+  historicalTimeline,
+  macroOverlay,
   whyThisCall,
   primaryDrivers,
   startupClimateIndex,
@@ -248,11 +257,19 @@ export function WeeklyDecisionCard({
 
       <article className={`${supportingPanel} ${sectionSpacing}`}>
         <h2 className={secondaryHeading}>Historical posture timeline</h2>
-        <ul className="mt-2 grid gap-2 sm:grid-cols-4">
-          {memoryRail.map((item) => (
+        <ul className="mt-2 grid gap-2 sm:grid-cols-4 lg:grid-cols-7">
+          {historicalTimeline.map((item) => (
             <li key={`${item.label}-${item.posture}`} className="rounded-md border border-slate-700/60 bg-slate-950/60 px-2 py-2 text-xs text-slate-200">
               <p className="text-slate-400">{item.label}</p>
               <p className="font-semibold text-slate-100">{item.posture}</p>
+            </li>
+          ))}
+        </ul>
+        <ul className="mt-3 grid gap-2 text-xs text-slate-300 sm:grid-cols-2 lg:grid-cols-4">
+          {macroOverlay.map((item) => (
+            <li key={item.label} className="rounded-md border border-slate-700/60 bg-slate-950/60 px-3 py-3">
+              <p className="font-semibold uppercase tracking-[0.12em] text-slate-200">{item.label}</p>
+              <p className="mt-1 text-slate-300">{item.detail}</p>
             </li>
           ))}
         </ul>
