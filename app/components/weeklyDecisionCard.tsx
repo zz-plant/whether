@@ -61,12 +61,12 @@ export type WeeklyDecisionCardProps = {
   actions?: ReactNode;
 };
 
-const sectionSpacing = "space-y-3";
+const sectionSpacing = "space-y-4";
 const primaryHeading = "text-sm font-semibold uppercase tracking-[0.14em] text-slate-100";
 const secondaryHeading = "text-xs font-semibold uppercase tracking-[0.12em] text-slate-300";
-const primaryPanel = "rounded-xl border border-slate-600/80 bg-slate-900/70 p-4";
-const secondaryPanel = "rounded-xl border border-slate-700/70 bg-slate-900/50 p-4";
-const supportingPanel = "rounded-xl border border-slate-800/70 bg-slate-900/35 p-4";
+const primaryPanel = "rounded-xl border border-slate-700/80 bg-slate-950/72 p-4";
+const secondaryPanel = "rounded-xl border border-slate-700/70 bg-slate-950/64 p-4";
+const supportingPanel = "rounded-xl border border-slate-800/75 bg-slate-950/56 p-4";
 
 const regimeGaugeStops = ["Expansion", "Mixed", "Scarcity", "Defensive"] as const;
 const regimeGaugePercentByLabel: Record<string, number> = {
@@ -135,59 +135,59 @@ export function DecisionCallHeader({
   const thresholdRatio = Math.max(8, Math.min(100, Math.round((thresholdDistance / 20) * 100)));
 
   return (
-    <header className="space-y-4 border-b border-slate-600/70 pb-5" data-testid="weekly-top-fold">
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-200">Operating call</p>
+    <header className="space-y-5 border-b border-slate-700/80 pb-6" data-testid="weekly-top-fold">
+      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Weekly posture call</p>
       <h1 id="weekly-posture-brief-title" className="text-3xl font-semibold text-slate-50 sm:text-4xl">
         {statusLabel}
       </h1>
 
-      <article className={`${primaryPanel} ${sectionSpacing} border-sky-400/50`} aria-label="Operating call panel">
+      <article className={`${primaryPanel} ${sectionSpacing}`} aria-label="Operating call panel">
         <h2 className={primaryHeading}>This week in 15 seconds</h2>
-        <p className="text-sm text-slate-200">{meetingShorthand}</p>
+        <p className="text-sm leading-relaxed text-slate-200">{meetingShorthand}</p>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" aria-label="Operating call summary">
-          <div className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Posture</p>
+          <div className="rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Posture</p>
             <p className="mt-1 text-lg font-semibold text-slate-100">{postureLabel}</p>
           </div>
-          <div className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Movement</p>
+          <div className="rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Movement</p>
             <p className="mt-1 text-lg font-semibold text-slate-100">{movementVelocity}</p>
             <p className="text-xs text-slate-300">{postureDelta}</p>
           </div>
-          <div className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Confidence</p>
+          <div className="rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Confidence</p>
             <p className="mt-1 text-lg font-semibold text-slate-100">{confidenceLabel}</p>
             <div className="mt-2 h-2 rounded-full bg-slate-800">
               <div className="h-2 rounded-full bg-emerald-300/80" style={{ width: `${Math.max(8, Math.min(100, confidencePercent))}%` }} />
             </div>
           </div>
-          <div className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Instruction</p>
+          <div className="rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Instruction</p>
             <p className="mt-1 text-sm font-semibold text-slate-100">{immediateDecision}</p>
           </div>
         </div>
 
-        <article className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Macro operating state</p>
+        <article className="rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Macro posture dial</p>
           <div className="mt-2">
             <div className="mb-2 grid grid-cols-4 text-[11px] uppercase tracking-[0.1em] text-slate-400">
               {regimeGaugeStops.map((item) => <span key={item}>{item}</span>)}
             </div>
             <div className="relative h-2 rounded-full bg-slate-800">
-              <div className="absolute -top-1 h-4 w-4 -translate-x-1/2 rounded-full border-2 border-slate-100 bg-sky-300" style={{ left: `${gaugePercent}%` }} />
+              <div className="absolute -top-1 h-4 w-4 -translate-x-1/2 rounded-full border-2 border-slate-100 bg-sky-200" style={{ left: `${gaugePercent}%` }} />
             </div>
           </div>
           <p className="mt-2 text-xs text-slate-300">Trend: {trendLabel} · Regime shift watch {transitionWatch}</p>
         </article>
 
-        <article className="rounded-lg border border-amber-500/50 bg-amber-500/10 px-3 py-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-200">⚠ Operating guardrail</p>
+        <article className="rounded-lg border border-amber-500/45 bg-amber-500/10 px-3 py-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-100">Primary guardrail</p>
           <p className="mt-1 text-sm font-semibold text-amber-50">{guardrail}</p>
         </article>
 
-        <article className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Defensive trigger</p>
+        <article className="rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Flip trigger</p>
           <p className="mt-1 text-xs text-slate-300">Current: {regimeDistance.currentValue.toFixed(1)} · Trigger: {regimeDistance.thresholdValue.toFixed(1)}</p>
           <div className="mt-2 h-3 rounded-full bg-slate-800">
             <div className={`h-3 rounded-full ${thresholdBreached ? "bg-rose-300/85" : "bg-amber-300/80"}`} style={{ width: `${thresholdRatio}%` }} />
@@ -471,29 +471,29 @@ export function WeeklyDecisionCard({
       />
 
       <article className={`${primaryPanel} ${sectionSpacing}`}>
-        <h2 className={primaryHeading}>Decision call this week</h2>
+        <h2 className={primaryHeading}>Decision delta this week</h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Change this week</p>
+          <div className="rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Change this week</p>
             <p className="mt-1 text-xs text-slate-200">{decisionShiftSummary}</p>
           </div>
-          <div className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Decision now</p>
+          <div className="rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">What to do now</p>
             <p className="mt-1 text-xs font-semibold text-slate-100">{immediateDecision}</p>
           </div>
-          <div className="rounded-lg border border-amber-500/50 bg-slate-950/60 px-3 py-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-200">⚠ Guardrail</p>
+          <div className="rounded-lg border border-amber-500/45 bg-slate-950/72 px-3 py-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-100">Primary guardrail</p>
             <p className="mt-1 text-xs text-slate-200">{guardrail}</p>
           </div>
-          <div className="rounded-lg border border-sky-500/40 bg-slate-950/60 px-3 py-3">
+          <div className="rounded-lg border border-sky-500/35 bg-slate-950/72 px-3 py-3">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Flip trigger</p>
             <p className="mt-1 text-xs text-slate-200">{reversalTrigger}</p>
           </div>
         </div>
 
         <div className="grid gap-3 lg:grid-cols-2">
-          <article className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Movement</p>
+          <article className="rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Macro drift this week</p>
             <p className="mt-1 text-xs text-slate-300">Velocity: {movementVelocity}</p>
             <ul className="mt-2 space-y-2 text-xs text-slate-200">
               {macroMovementRows.map((signal) => (
@@ -515,8 +515,8 @@ export function WeeklyDecisionCard({
             </ul>
           </article>
 
-          <article className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Plan stability</p>
+          <article className="rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Plan stability</p>
             <div className="mt-2 h-2 rounded-full bg-slate-800">
               <div className="h-2 rounded-full bg-sky-300/80" style={{ width: `${decisionStabilityPercent}%` }} />
             </div>
