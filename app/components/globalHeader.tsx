@@ -21,6 +21,12 @@ const groupLabels = {
 export function GlobalHeader() {
   const pathname = usePathname();
   const isHome = pathMatchesLink("/", pathname);
+  const reportShellRoutes = ["/", "/signals", "/operations"];
+  const isReportShellRoute = reportShellRoutes.some((route) => pathMatchesLink(route, pathname));
+
+  if (isReportShellRoute) {
+    return null;
+  }
 
   return (
     <header className="mx-auto w-full max-w-6xl px-4 pt-4 sm:px-6">

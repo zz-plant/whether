@@ -21,6 +21,7 @@ import { OperationsWorkstreamNav } from "./components/operationsWorkstreamNav";
 import { OperationsWorkflowProgress } from "./components/operationsWorkflowProgress";
 import { ExportBriefPanel } from "./components/exportBriefPanel";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
+import { LiveDataFallbackAlert } from "../components/liveDataFallbackAlert";
 
 export const runtime = "edge";
 
@@ -140,7 +141,7 @@ export default async function OperationsPage({
       trustStatusAction={trustStatusAction}
       trustStatusTone={trustStatusTone}
       showOfflineBadge={isFallback && !historicalSelection}
-      pageTitle="Action playbook"
+      pageTitle="Operations"
       currentPath="/operations"
       pageSummary="Run weekly execution decisions and align the monthly playbook for this cycle."
       pageSummaryLink={{ href: "#ops-playbook", label: "Jump to playbook section ↓" }}
@@ -202,10 +203,7 @@ export default async function OperationsPage({
       }
     >
       {!reportResult.ok ? (
-        <section className="weather-panel border border-amber-500/50 bg-amber-500/10 px-5 py-4 text-sm text-amber-100" aria-live="polite">
-          <p className="font-semibold">Live data unavailable — showing cached snapshot.</p>
-          <p className="mt-1">Last cached update: {reportResult.fallback.lastCachedTimestamp}. Validate live status in <a href="/signals" className="underline">Signals</a>.</p>
-        </section>
+        <LiveDataFallbackAlert lastCachedTimestamp={reportResult.fallback.lastCachedTimestamp} />
       ) : null}
 
       <OperationsWorkflowProgress currentPath="/operations" />
