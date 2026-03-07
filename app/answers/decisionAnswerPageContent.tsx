@@ -22,7 +22,7 @@ export async function DecisionAnswerPageContent({
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
   const { assessment, recordDateLabel, reportDynamics, treasury, fetchedAtLabel } = reportData;
   const homeBriefModel = buildHomeBriefModel(reportData);
-  const liveShortAnswer = buildLiveShortAnswer(page.slug, assessment.regime, page.shortAnswer);
+  const liveShortAnswer = buildLiveShortAnswer(page.slug, assessment, page.shortAnswer);
   const mappedRules = homeBriefModel.decisionRules.filter((rule) => page.mappedDecisionAreas.includes(rule.area));
   const callCitation = buildCallCitation(assessment, treasury);
   const relatedPages = answerPages.filter((candidate) => candidate.slug !== page.slug && candidate.category !== page.category).slice(0, 3);

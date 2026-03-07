@@ -19,6 +19,7 @@ export default function PlanBridgePage() {
       primaryLabel="Go to action playbook"
       secondaryHref="/operations#ops-export-briefs"
       secondaryLabel="Open export briefs"
+      autoForwardSeconds={3}
     />
   );
 }
