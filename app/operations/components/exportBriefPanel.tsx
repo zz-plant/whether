@@ -250,6 +250,8 @@ export const ExportBriefPanel = ({
           ? "error"
           : "idle";
 
+  const isCopyDisabled = (target: string) => isCopying && activeTarget !== target;
+
   const handlePrint = () => {
     window.print();
     add({
@@ -310,11 +312,13 @@ export const ExportBriefPanel = ({
               <ClipboardActionRow
                 label={<><span>Copy</span> <WorkAppLabel app="slack" label="brief" className="inline-flex items-center gap-2" /></>}
                 state={clipboardState("Slack")}
+                disabled={isCopyDisabled("Slack")}
                 onClick={() => void handleCopy(briefing, "Slack")}
               />
               <ClipboardActionRow
                 label="Copy board summary"
                 state={clipboardState("Board")}
+                disabled={isCopyDisabled("Board")}
                 onClick={() => void handleCopy(boardBrief, "Board")}
               />
               <Button
@@ -345,6 +349,7 @@ export const ExportBriefPanel = ({
             <ClipboardActionRow
               label="Copy slide bullets"
               state={clipboardState("Slides")}
+              disabled={isCopyDisabled("Slides")}
               onClick={() => void handleCopy(slideBullets, "Slides")}
               className="mt-4"
             />
@@ -373,6 +378,7 @@ export const ExportBriefPanel = ({
             <ClipboardActionRow
               label="Copy constraint headlines"
               state={clipboardState("Headlines")}
+              disabled={isCopyDisabled("Headlines")}
               onClick={() => void handleCopy(constraintHeadlines, "Headlines")}
               className="mt-4"
             />
@@ -416,6 +422,7 @@ export const ExportBriefPanel = ({
               <ClipboardActionRow
                 label="Copy JSON payload"
                 state={clipboardState("Agent JSON payload")}
+                disabled={isCopyDisabled("Agent JSON payload")}
                 onClick={() => void handleCopy(agentPayload, "Agent JSON payload")}
               />
               <Button
@@ -433,6 +440,7 @@ export const ExportBriefPanel = ({
               <ClipboardActionRow
                 label="Copy agent prompt"
                 state={clipboardState("Agent prompt")}
+                disabled={isCopyDisabled("Agent prompt")}
                 onClick={() => void handleCopy(agentPrompt, "Agent prompt")}
               />
               <Button
@@ -483,6 +491,7 @@ export const ExportBriefPanel = ({
                 <ClipboardActionRow
                   label={<><span>Copy</span> <WorkAppLabel app="jira" label="description" className="inline-flex items-center gap-2" /></>}
                   state={clipboardState("Jira description")}
+                  disabled={isCopyDisabled("Jira description")}
                   onClick={() => void handleCopy(jiraMarkdownBrief, "Jira description")}
                 />
                 <Button
@@ -510,6 +519,7 @@ export const ExportBriefPanel = ({
                 <ClipboardActionRow
                   label={<><span>Copy</span> <WorkAppLabel app="confluence" label="page snippet" className="inline-flex items-center gap-2" /></>}
                   state={clipboardState("Confluence page snippet")}
+                  disabled={isCopyDisabled("Confluence page snippet")}
                   onClick={() => void handleCopy(confluenceWikiBrief, "Confluence page snippet")}
                 />
                 <Button
@@ -537,6 +547,7 @@ export const ExportBriefPanel = ({
                 <ClipboardActionRow
                   label={<><span>Copy</span> <WorkAppLabel app="linear" label="issue description" className="inline-flex items-center gap-2" /></>}
                   state={clipboardState("Linear issue description")}
+                  disabled={isCopyDisabled("Linear issue description")}
                   onClick={() => void handleCopy(linearMarkdownBrief, "Linear issue description")}
                 />
                 <Button
