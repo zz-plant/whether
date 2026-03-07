@@ -17,6 +17,7 @@ import {
 import { getConceptPublicationRegime, getConceptRegimeStatus, getCurrentRegimeContext } from "../../../lib/conceptRegime";
 import { createBreadcrumbTrail } from "../../../lib/navigation/breadcrumbs";
 import { BreadcrumbTrail } from "../../components/breadcrumbTrail";
+import { formatConceptPublishedLabel, formatMonthDayYearUtc } from "../../../lib/formatters";
 
 type ConceptArticlePageProps = {
   params: Promise<{ slug: string }>;
@@ -28,25 +29,8 @@ type DecisionDelta = {
   reversal: string;
 };
 
-const monthFormatter = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  year: "numeric",
-  timeZone: "UTC",
-});
-
-const recordDateFormatter = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  day: "numeric",
-  year: "numeric",
-  timeZone: "UTC",
-});
-
-const formatPublishedLabel = (year: number, month: number) => {
-  return monthFormatter.format(new Date(Date.UTC(year, month - 1, 1)));
-};
-
 const formatRecordDate = (isoDate: string) => {
-  return recordDateFormatter.format(new Date(`${isoDate}T00:00:00Z`));
+  return formatMonthDayYearUtc(new Date(`${isoDate}T00:00:00Z`));
 };
 
 const ensureNonEmptyCopy = (value: string, fallback: string) => {
@@ -188,7 +172,7 @@ export default async function ConceptArticlePage({ params }: ConceptArticlePageP
   const currentRegime = getCurrentRegimeContext();
   const publicationRegime = getConceptPublicationRegime(article);
   const regimeStatus = getConceptRegimeStatus(article, currentRegime?.regime ?? null);
-  const publishedLabel = formatPublishedLabel(article.publishedYear, article.publishedMonth);
+  const publishedLabel = formatConceptPublishedLabel(article.publishedYear, article.publishedMonth);
   const uniqueConceptSummary = buildUniqueConceptSummary(
     article.title,
     article.summary,
