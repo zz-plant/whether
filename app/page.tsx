@@ -63,6 +63,7 @@ export const revalidate = 900;
 export const runtime = "edge";
 
 const homeSectionSequence = [
+  { href: "#weekly-posture-brief-title", label: "This week" },
   { href: "#weekly-action-summary", label: "Weekly actions" },
   { href: "#executive-snapshot", label: "Evidence" },
 ] as const;
@@ -313,6 +314,7 @@ export default async function HomePage({
       hideHeroChrome={true}
       pageNavVariant="compact"
       showPageNavigation={false}
+      inlineTrustPlacement="after-first-section"
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
       structuredData={structuredData}
