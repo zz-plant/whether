@@ -37,6 +37,52 @@ describe("/api/billing/webhook", () => {
     assert.equal(response.status, 400);
   });
 
+  it("rejects signatures with stale timestamps", async () => {
+    process.env.STRIPE_WEBHOOK_SECRET = "whsec_test";
+
+    const payload = JSON.stringify({ type: "checkout.session.completed" });
+    const timestampSeconds = String(Math.floor(Date.now() / 1000) - 301);
+
+    const response = await postBillingWebhookRoute(
+      new Request("http://localhost/api/billing/webhook", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "stripe-signature": buildStripeSignature(payload, process.env.STRIPE_WEBHOOK_SECRET, timestampSeconds),
+        },
+        body: payload,
+      }),
+    );
+
+    assert.equal(response.status, 400);
+  });
+
+  it("accepts headers where a later v1 signature matches the active secret", async () => {
+    process.env.STRIPE_WEBHOOK_SECRET = "whsec_active";
+
+    const payload = JSON.stringify({ type: "checkout.session.completed" });
+    const timestampSeconds = String(Math.floor(Date.now() / 1000));
+    const wrongSignature = createHmac("sha256", "whsec_old")
+      .update(`${timestampSeconds}.${payload}`)
+      .digest("hex");
+    const validSignature = createHmac("sha256", process.env.STRIPE_WEBHOOK_SECRET)
+      .update(`${timestampSeconds}.${payload}`)
+      .digest("hex");
+
+    const response = await postBillingWebhookRoute(
+      new Request("http://localhost/api/billing/webhook", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "stripe-signature": `t=${timestampSeconds},v1=${wrongSignature},v1=${validSignature}`,
+        },
+        body: payload,
+      }),
+    );
+
+    assert.equal(response.status, 200);
+  });
+
   it("accepts signed checkout completion events and forwards telemetry", async () => {
     process.env.STRIPE_WEBHOOK_SECRET = "whsec_test";
     process.env.PREMIUM_FUNNEL_WEBHOOK_URL = "https://example.test/premium";
@@ -64,7 +110,7 @@ describe("/api/billing/webhook", () => {
         method: "POST",
         headers: {
           "content-type": "application/json",
-          "stripe-signature": buildStripeSignature(payload, process.env.STRIPE_WEBHOOK_SECRET),
+          "stripe-signature": buildStripeSignature(payload, process.env.STRIPE_WEBHOOK_SECRET, String(Math.floor(Date.now() / 1000))),
         },
         body: payload,
       }),
@@ -99,7 +145,7 @@ describe("/api/billing/webhook", () => {
         method: "POST",
         headers: {
           "content-type": "application/json",
-          "stripe-signature": buildStripeSignature(payload, process.env.STRIPE_WEBHOOK_SECRET),
+          "stripe-signature": buildStripeSignature(payload, process.env.STRIPE_WEBHOOK_SECRET, String(Math.floor(Date.now() / 1000))),
         },
         body: payload,
       }),

@@ -7,6 +7,8 @@ import {
   isPremiumSeatBand,
 } from "../../../../lib/premiumFunnel";
 
+const STRIPE_SIGNATURE_TOLERANCE_SECONDS = 300;
+
 const parseStripeSignature = (header: string | null) => {
   if (!header) {
     return null;
@@ -14,19 +16,26 @@ const parseStripeSignature = (header: string | null) => {
 
   const parts = header.split(",").map((part) => part.trim());
   const timestampPart = parts.find((part) => part.startsWith("t="));
-  const signaturePart = parts.find((part) => part.startsWith("v1="));
+  const signatureParts = parts.filter((part) => part.startsWith("v1="));
 
-  if (!timestampPart || !signaturePart) {
+  if (!timestampPart || signatureParts.length === 0) {
     return null;
   }
 
-  const timestamp = timestampPart.slice(2);
-  const signature = signaturePart.slice(3);
-  if (!timestamp || !signature) {
+  const timestamp = Number.parseInt(timestampPart.slice(2), 10);
+  if (!Number.isFinite(timestamp)) {
     return null;
   }
 
-  return { timestamp, signature };
+  const signatures = signatureParts
+    .map((part) => part.slice(3))
+    .filter((signature) => signature.length > 0);
+
+  if (signatures.length === 0) {
+    return null;
+  }
+
+  return { timestamp, signatures };
 };
 
 const isStripeSignatureValid = ({
@@ -47,17 +56,23 @@ const isStripeSignatureValid = ({
     return false;
   }
 
-  const signedPayload = `${parsedSignature.timestamp}.${payload}`;
-  const expectedSignature = createHmac("sha256", secret).update(signedPayload).digest("hex");
-
-  const expectedBuffer = Buffer.from(expectedSignature, "hex");
-  const receivedBuffer = Buffer.from(parsedSignature.signature, "hex");
-
-  if (expectedBuffer.length !== receivedBuffer.length) {
+  const nowInSeconds = Math.floor(Date.now() / 1000);
+  if (nowInSeconds - parsedSignature.timestamp > STRIPE_SIGNATURE_TOLERANCE_SECONDS) {
     return false;
   }
 
-  return timingSafeEqual(expectedBuffer, receivedBuffer);
+  const signedPayload = `${parsedSignature.timestamp}.${payload}`;
+  const expectedSignature = createHmac("sha256", secret).update(signedPayload).digest("hex");
+  const expectedBuffer = Buffer.from(expectedSignature, "hex");
+
+  return parsedSignature.signatures.some((signature) => {
+    const receivedBuffer = Buffer.from(signature, "hex");
+    if (expectedBuffer.length !== receivedBuffer.length) {
+      return false;
+    }
+
+    return timingSafeEqual(expectedBuffer, receivedBuffer);
+  });
 };
 
 type StripeCheckoutCompletedEvent = {
