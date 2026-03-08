@@ -9,6 +9,8 @@ import {
   type PremiumSeatBand,
 } from "../../../../lib/premiumFunnel";
 
+export const runtime = "edge";
+
 const requestSchema = z.object({
   plan: z.enum(["pro", "team"]),
   source: z.enum(PREMIUM_INTENT_SOURCES),
