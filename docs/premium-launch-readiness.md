@@ -22,9 +22,9 @@ This checklist covers the minimum instrumentation and product plumbing to put in
 Source of truth: `lib/billingStripe.ts`, `app/api/billing/checkout/route.ts`.
 
 ### 1) Premium intent telemetry event contract
-- Shared event types: `premium_intent`, `premium_gate_view`, `premium_checkout_start`.
+- Shared event types: `premium_intent`, `premium_gate_view`, `premium_checkout_start`, `premium_checkout_complete`.
 - Shared intent sources: `export_brief`, `runway_planner`, `integrations`, `api_access`, `team_workflow`.
-- Shared payload fields: `type`, `source`, `path`, `ctaId`, `detail`, `occurredAt`.
+- Shared payload fields: `type`, `source`, `path`, `ctaId`, `detail`, `planCandidate`, `seatBand`, `occurredAt`.
 
 Source of truth: `lib/premiumFunnel.ts`.
 
@@ -42,6 +42,12 @@ Source of truth: `lib/premiumFunnel.ts`.
 - Forwards accepted events to `PREMIUM_FUNNEL_WEBHOOK_URL` when configured.
 - Falls back to structured server logs when webhook is not configured.
 
+### 3b) Stripe webhook conversion capture
+- `POST /api/billing/webhook`
+- Verifies Stripe signatures with `STRIPE_WEBHOOK_SECRET`.
+- On `checkout.session.completed`, emits `premium_checkout_complete` when metadata includes valid `source` attribution.
+- Carries optional `planCandidate` and `seatBand` metadata through conversion telemetry.
+
 ### 4) Initial premium-intent instrumentation on high-value surfaces
 - Export brief actions (copy Slack/board, export PDF).
 - Runway planner copy action.
@@ -58,6 +64,5 @@ Source of truth: `lib/premiumFunnel.ts`.
 
 ## Recommended next steps before public premium reveal
 - Add explicit `premium_gate_view` events on prototype gate modals or locked actions.
-- Emit `premium_checkout_start` when checkout sessions are created and include the same `source` taxonomy.
-- Add pricing/plan attribution fields (`planCandidate`, `seatBand`) at checkout start.
+- Add explicit checkout entry CTAs from gated product actions into `/api/billing/checkout`.
 - Set dashboard alerts for funnel-drop regressions week-over-week.

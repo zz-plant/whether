@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { PremiumPlanCandidate, PremiumSeatBand } from "./premiumFunnel";
 
 export type PremiumPlan = "pro" | "team";
 
@@ -67,12 +68,16 @@ export const createStripeCheckoutSession = async ({
   path = "/pricing",
   customerEmail,
   source,
+  planCandidate,
+  seatBand,
   idempotencyKey,
 }: {
   plan: PremiumPlan;
   path?: string;
   customerEmail?: string;
   source?: string;
+  planCandidate?: PremiumPlanCandidate;
+  seatBand?: PremiumSeatBand;
   idempotencyKey?: string;
 }) => {
   const config = getStripeBillingConfig();
@@ -96,6 +101,15 @@ export const createStripeCheckoutSession = async ({
   params.set("line_items[0][quantity]", "1");
   params.set("allow_promotion_codes", "true");
   params.set("metadata[plan]", plan);
+
+  if (planCandidate) {
+    params.set("metadata[planCandidate]", planCandidate);
+  }
+
+  if (seatBand) {
+    params.set("metadata[seatBand]", seatBand);
+  }
+
   if (source) {
     params.set("metadata[source]", source);
   }

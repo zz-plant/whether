@@ -5,6 +5,8 @@ import {
   PREMIUM_INTENT_SOURCES,
   dispatchPremiumFunnelEvent,
   type PremiumFunnelEvent,
+  type PremiumPlanCandidate,
+  type PremiumSeatBand,
 } from "../../../../lib/premiumFunnel";
 
 const requestSchema = z.object({
@@ -12,21 +14,29 @@ const requestSchema = z.object({
   source: z.enum(PREMIUM_INTENT_SOURCES),
   customerEmail: z.string().email().optional(),
   returnPath: z.string().trim().startsWith("/").max(120).optional(),
+  planCandidate: z.enum(["pro", "team"]).optional(),
+  seatBand: z.enum(["1", "2-5", "6-20", "21+"]).optional(),
 });
 
 const buildCheckoutStartEvent = ({
   source,
   ctaId,
   path,
+  planCandidate,
+  seatBand,
 }: {
   source: (typeof PREMIUM_INTENT_SOURCES)[number];
   ctaId?: string;
   path: string;
+  planCandidate?: PremiumPlanCandidate;
+  seatBand?: PremiumSeatBand;
 }): PremiumFunnelEvent => ({
   type: "premium_checkout_start",
   source,
   path,
   ctaId,
+  planCandidate,
+  seatBand,
   occurredAt: new Date().toISOString(),
 });
 
@@ -44,7 +54,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "invalid_payload" }, { status: 400 });
   }
 
-  const { plan, customerEmail, returnPath, source } = parsed.data;
+  const { plan, customerEmail, returnPath, source, planCandidate, seatBand } = parsed.data;
   const idempotencyKey = request.headers.get("Idempotency-Key") ?? undefined;
 
   try {
@@ -53,6 +63,8 @@ export async function POST(request: Request) {
       customerEmail,
       path: returnPath,
       source,
+      planCandidate,
+      seatBand,
       idempotencyKey,
     });
 
@@ -62,6 +74,8 @@ export async function POST(request: Request) {
           source,
           path: returnPath ?? "/pricing",
           ctaId: `checkout_${plan}`,
+          planCandidate,
+          seatBand,
         }),
       );
     } catch {

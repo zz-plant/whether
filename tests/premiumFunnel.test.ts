@@ -30,9 +30,11 @@ describe("premium funnel helpers", () => {
   it("validates premium funnel payload shape", () => {
     assert.equal(
       isValidPremiumFunnelEvent({
-        type: "premium_intent",
+        type: "premium_checkout_complete",
         source: "export_brief",
         path: "/operations",
+        planCandidate: "pro",
+        seatBand: "2-5",
         occurredAt: new Date().toISOString(),
       }),
       true,
@@ -42,6 +44,16 @@ describe("premium funnel helpers", () => {
         type: "premium_intent",
         source: "pricing",
         path: "/operations",
+        occurredAt: new Date().toISOString(),
+      }),
+      false,
+    );
+    assert.equal(
+      isValidPremiumFunnelEvent({
+        type: "premium_checkout_start",
+        source: "export_brief",
+        path: "/operations",
+        planCandidate: "enterprise",
         occurredAt: new Date().toISOString(),
       }),
       false,
