@@ -6,7 +6,7 @@ import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
 describe("buildHomeBriefModel", () => {
   it("derives stable labels and decision rules from report data", { timeout: 15000 }, async () => {
     const data = await loadReportData();
-    const model = buildHomeBriefModel(data);
+    const model = buildHomeBriefModel(data, { overlaySector: "consumer" });
 
     assert.match(model.confidenceLabel, /LOW|MED|HIGH/);
     assert.equal(typeof model.confidencePercent, "number");
@@ -18,7 +18,8 @@ describe("buildHomeBriefModel", () => {
     assert.equal(typeof model.revisitDecisions, "boolean");
     assert.ok(model.memoryRail.length > 0);
     assert.ok(model.historicalTimeline.length > 0);
-    assert.equal(model.macroOverlay.length, 4);
+    assert.equal(model.macroOverlay.length, 5);
+    assert.ok(model.macroOverlay.some((item) => item.label.includes("Sector sensitivity (Consumer)")));
     assert.equal(model.whyThisCall.length, 3);
     assert.ok(model.primaryDrivers.length >= 2);
     assert.ok(model.startupClimateIndex.score >= 0 && model.startupClimateIndex.score <= 100);
@@ -51,7 +52,7 @@ describe("buildHomeBriefModel", () => {
     assert.equal(typeof model.revisitDecisions, "boolean");
     assert.ok(model.memoryRail.length > 0);
     assert.ok(model.historicalTimeline.length > 0);
-    assert.equal(model.macroOverlay.length, 4);
+    assert.equal(model.macroOverlay.length, 5);
     assert.equal(model.whyThisCall.length, 3);
     assert.ok(model.primaryDrivers.length >= 2);
     assert.ok(model.startupClimateIndex.score >= 0 && model.startupClimateIndex.score <= 100);
@@ -101,6 +102,26 @@ describe("buildHomeBriefModel", () => {
     assert.match(model.reversalTrigger, /risk appetite falls to or below 50\.0 \(now 56\.0\)/i);
     assert.equal(model.regimeDistance.dimensionKey, "riskAppetite");
     assert.equal(model.regimeDistance.thresholdDirection, "fallToOrBelow");
+  });
+
+  it("renders selected homepage overlay sector in macro overlay label", () => {
+    const model = buildHomeBriefModel({
+      assessment: {
+        regime: "EXPANSION",
+        thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
+        scores: { tightness: 40, riskAppetite: 64 },
+      },
+      regimeAlert: null,
+      stopItems: ["Guardrail"],
+      reportDynamics: {
+        directionLabel: "stable",
+        changedSignals: [],
+      },
+    }, { overlaySector: "infrastructure" });
+
+    const overlayRow = model.macroOverlay.find((item) => item.label.includes("Sector sensitivity"));
+    assert.ok(overlayRow);
+    assert.match(overlayRow?.label ?? "", /Infrastructure/);
   });
 
   it("anchors historical timeline to record year for time-machine snapshots", () => {

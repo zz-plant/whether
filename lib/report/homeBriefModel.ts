@@ -3,6 +3,7 @@ import { getSummaryArchive } from "../summary/summaryArchive";
 import type { MacroSeriesReading } from "../types";
 import { isImprovingSignalDelta } from "./reportData";
 import { REGIME_SEVERITY_RANK, REGIME_SHORT_LABELS } from "../regimePresentation";
+import { deriveSectorAdjustedPosture, SECTOR_TAXONOMY, type SectorKey } from "./sectorSensitivity";
 
 type Regime = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
 
@@ -207,11 +208,18 @@ const buildBoundaryTriggerText = ({
   return `Flip to ${targetRegimeLabel} if ${dimensionLabel} ${condition} ${threshold.toFixed(1)} (now ${current.toFixed(1)}).`;
 };
 
-const buildMacroOverlay = (macroSeries: MacroSeriesReading[] | undefined): MacroOverlayItem[] => {
+const buildMacroOverlay = (
+  macroSeries: MacroSeriesReading[] | undefined,
+  assessment: HomeReportData["assessment"],
+  overlaySector: SectorKey,
+): MacroOverlayItem[] => {
   const vcFunding = getMacroSeriesDelta(macroSeries, "VC_FUNDING_VELOCITY");
   const layoffs = getMacroSeriesDelta(macroSeries, "TECH_LAYOFF_TREND");
   const ipoWindow = getMacroSeriesDelta(macroSeries, "VIX_INDEX");
   const saasValuations = getMacroSeriesDelta(macroSeries, "SAAS_VALUATION_MULTIPLE");
+
+  const sectorOverlay = deriveSectorAdjustedPosture(assessment, overlaySector);
+  const sectorLabel = SECTOR_TAXONOMY[overlaySector].label;
 
   return [
     {
@@ -229,6 +237,13 @@ const buildMacroOverlay = (macroSeries: MacroSeriesReading[] | undefined): Macro
     {
       label: "SaaS multiples",
       detail: `${typeof saasValuations.latest === "number" ? saasValuations.latest.toFixed(1) : "n/a"} · ${formatDelta(saasValuations.delta, true)}`,
+    },
+    {
+      label: `Sector sensitivity (${sectorLabel})`,
+      detail:
+        sectorOverlay.adjustmentStrength === "none"
+          ? `Aligned with base posture ${sectorOverlay.basePostureLabel}; keep base cadence.`
+          : `${sectorOverlay.adjustedPostureLabel} (${sectorOverlay.adjustmentStrength} ${sectorOverlay.adjustmentDelta > 0 ? "upside" : "downside"} tilt). Bias: ${sectorOverlay.actionBias}.`,
     },
   ];
 };
@@ -350,8 +365,12 @@ const buildStartupClimateIndex = ({
   };
 };
 
-export const buildHomeBriefModel = (data: HomeReportData) => {
+export const buildHomeBriefModel = (
+  data: HomeReportData,
+  options?: { overlaySector?: SectorKey },
+) => {
   const { assessment, regimeAlert, stopItems, reportDynamics, recordDateLabel, macroSeries } = data;
+  const overlaySector = options?.overlaySector ?? "b2b-saas";
   const timelineAnchorYear = resolveTimelineAnchorYear(recordDateLabel);
   const previousRegime = regimeAlert?.previousRegime;
   const severityDelta = previousRegime
@@ -453,7 +472,7 @@ export const buildHomeBriefModel = (data: HomeReportData) => {
     guardrail,
     memoryRail: buildMemoryRail(recordDateLabel, assessment.regime),
     historicalTimeline: buildHistoricalTimeline(assessment.regime, timelineAnchorYear),
-    macroOverlay: buildMacroOverlay(macroSeries),
+    macroOverlay: buildMacroOverlay(macroSeries, assessment, overlaySector),
     primaryDrivers: buildPrimaryDrivers({ reportDynamics, confidenceLabel, transitionWatch }),
     netConstraintSummary,
     postureDeltaLabel,

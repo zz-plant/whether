@@ -3,6 +3,7 @@ import Link from "next/link";
 import { loadReportDataSafe } from "../../../lib/report/reportData";
 import { buildPageMetadata } from "../../../lib/seo";
 import { buildPersonalizedMandate, type TeamContextProfile } from "../../../lib/personalizedMandates";
+import { SECTOR_TAXONOMY, type SectorKey } from "../../../lib/report/sectorSensitivity";
 
 export const runtime = "edge";
 
@@ -13,10 +14,20 @@ export const metadata: Metadata = buildPageMetadata({
   imageAlt: "Team context profile",
 });
 
+const STAGES: TeamContextProfile["stage"][] = ["seed", "series-a", "growth", "public"];
+const SECTORS: SectorKey[] = ["b2b-saas", "consumer", "infrastructure"];
+const TEAM_SIZES: TeamContextProfile["teamSize"][] = ["small", "mid", "large"];
+
+const pickValue = <T extends string>(
+  candidate: string | undefined,
+  options: readonly T[],
+  fallback: T,
+): T => (candidate && options.includes(candidate as T) ? (candidate as T) : fallback);
+
 const parseProfile = (searchParams: Record<string, string | undefined>): TeamContextProfile => ({
-  stage: (searchParams.stage as TeamContextProfile["stage"]) ?? "growth",
-  sector: (searchParams.sector as TeamContextProfile["sector"]) ?? "b2b-saas",
-  teamSize: (searchParams.teamSize as TeamContextProfile["teamSize"]) ?? "mid",
+  stage: pickValue(searchParams.stage, STAGES, "growth"),
+  sector: pickValue(searchParams.sector, SECTORS, "b2b-saas"),
+  teamSize: pickValue(searchParams.teamSize, TEAM_SIZES, "mid"),
 });
 
 export default async function TeamContextPage({
@@ -40,9 +51,9 @@ export default async function TeamContextPage({
       <section className="weather-panel space-y-4 px-6 py-6">
         <form action="/decide/team-context" method="get" className="grid gap-3 sm:grid-cols-3">
           {([
-            ["stage", "Stage", ["seed", "series-a", "growth", "public"]],
-            ["sector", "Sector", ["b2b-saas", "consumer", "infrastructure"]],
-            ["teamSize", "Team size", ["small", "mid", "large"]],
+            ["stage", "Stage", STAGES],
+            ["sector", "Sector", SECTORS],
+            ["teamSize", "Team size", TEAM_SIZES],
           ] as const).map(([key, label, options]) => (
             <label key={key} className="space-y-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">
               {label}
@@ -64,6 +75,21 @@ export default async function TeamContextPage({
       <section className="weather-panel space-y-3 px-6 py-6">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Personalized output</p>
         <h2 className="text-xl font-semibold text-slate-100">{mandate.headline}</h2>
+        <div className="rounded-lg border border-slate-700/70 bg-slate-950/80 px-4 py-3 text-xs text-slate-200">
+          <p>
+            Base posture <span className="font-semibold text-slate-100">{mandate.sectorOverlay.basePostureLabel}</span>
+            {" · "}
+            Sector-adjusted <span className="font-semibold text-slate-100">{mandate.sectorOverlay.adjustedPostureLabel}</span>
+            {" · "}
+            Strength <span className="font-semibold text-slate-100">{mandate.sectorOverlay.adjustmentStrength}</span>
+          </p>
+          <p className="mt-1 text-slate-300">{SECTOR_TAXONOMY[profile.sector].rationale}</p>
+          <p className="mt-1 text-slate-300">
+            Action bias: <span className="font-semibold text-slate-100">{mandate.sectorOverlay.actionBias}</span>
+            {" · "}
+            Flip condition: {mandate.sectorOverlay.reversalCondition}
+          </p>
+        </div>
         <p className="text-sm text-slate-300">{mandate.recommendation}</p>
         <ul className="space-y-2 text-sm text-slate-200">
           {mandate.tailoredActions.map((item) => <li key={item}>• {item}</li>)}
