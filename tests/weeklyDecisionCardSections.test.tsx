@@ -35,13 +35,16 @@ describe("WeeklyDecisionCard extracted sections", () => {
           thresholdDirection: "riseAbove",
         }}
         movementVelocity="Low"
+        actions={<button type="button">Copy Slack brief</button>}
       />,
     );
 
     assert.match(html, /Weekly posture call/);
     assert.match(html, /Macro posture dial/);
+    assert.match(html, /Meeting shorthand/);
     assert.match(html, /Primary guardrail/);
     assert.match(html, /Flip trigger/);
+    assert.match(html, /Copy Slack brief/);
   });
 
   it("marks risk-appetite defensive trigger as breached only when value is at or below threshold", () => {
@@ -109,7 +112,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
       />,
     );
     const footerHtml = renderToStaticMarkup(
-      <CitationActionFooter citationMetaLine="Posture DEFENSIVE" citation="Whether weekly brief citation" actions={<button type="button">Copy</button>} />,
+      <CitationActionFooter citationMetaLine="Posture DEFENSIVE" citation="Whether weekly brief citation" />,
     );
 
     assert.match(detailsHtml, /Why this call ▼/);

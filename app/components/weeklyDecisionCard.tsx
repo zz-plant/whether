@@ -105,6 +105,7 @@ type DecisionCallHeaderProps = {
   trustWarningCopy: string;
   regimeDistance: WeeklyDecisionCardProps["regimeDistance"];
   movementVelocity: "Low" | "Medium" | "High";
+  actions?: ReactNode;
 };
 
 export function DecisionCallHeader({
@@ -124,6 +125,7 @@ export function DecisionCallHeader({
   trustWarningCopy,
   regimeDistance,
   movementVelocity,
+  actions,
 }: DecisionCallHeaderProps) {
   const postureLabel = postureDisplayLabel(statusLabel);
   const gaugePercent = regimeGaugePercentByLabel[statusLabel] ?? 50;
@@ -135,58 +137,48 @@ export function DecisionCallHeader({
   const thresholdRatio = Math.max(8, Math.min(100, Math.round((thresholdDistance / 20) * 100)));
 
   return (
-    <header className="space-y-5 border-b border-slate-700/80 pb-6" data-testid="weekly-top-fold">
+    <header className="space-y-4 border-b border-slate-700/80 pb-5 sm:space-y-5 sm:pb-6" data-testid="weekly-top-fold">
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Weekly posture call</p>
       <h1 id="weekly-posture-brief-title" className="text-3xl font-semibold text-slate-50 sm:text-4xl">
         {statusLabel}
       </h1>
 
-      <article className={`${primaryPanel} ${sectionSpacing}`} aria-label="Operating call panel">
+      <article className={`${primaryPanel} space-y-3 sm:${sectionSpacing}`} aria-label="Operating call panel">
         <h2 className={primaryHeading}>This week in 15 seconds</h2>
-        <p className="text-sm leading-relaxed text-slate-200">{meetingShorthand}</p>
+        <div className="rounded-lg border border-sky-400/35 bg-sky-500/10 px-3 py-2.5">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-100">Meeting shorthand</p>
+          <p className="mt-1 max-w-[64ch] text-sm font-semibold leading-relaxed text-slate-50">{meetingShorthand}</p>
+        </div>
 
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" aria-label="Operating call summary">
+        <div className="grid gap-2.5 sm:grid-cols-2" aria-label="Operating call summary">
           <div className="rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Posture</p>
-            <p className="mt-1 text-lg font-semibold text-slate-100">{postureLabel}</p>
+            <p className="mt-1 text-base font-semibold text-slate-100 sm:text-lg">{postureLabel}</p>
           </div>
           <div className="rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Movement</p>
-            <p className="mt-1 text-lg font-semibold text-slate-100">{movementVelocity}</p>
-            <p className="text-xs text-slate-300">{postureDelta}</p>
+            <p className="mt-1 text-base font-semibold text-slate-100 sm:text-lg">{movementVelocity}</p>
+            <p className="mt-0.5 max-w-[40ch] text-xs text-slate-300">{postureDelta}</p>
           </div>
           <div className="rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Confidence</p>
-            <p className="mt-1 text-lg font-semibold text-slate-100">{confidenceLabel}</p>
+            <p className="mt-1 text-base font-semibold text-slate-100 sm:text-lg">{confidenceLabel}</p>
             <div className="mt-2 h-2 rounded-full bg-slate-800">
               <div className="h-2 rounded-full bg-emerald-300/80" style={{ width: `${Math.max(8, Math.min(100, confidencePercent))}%` }} />
             </div>
           </div>
           <div className="rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Instruction</p>
-            <p className="mt-1 text-sm font-semibold text-slate-100">{immediateDecision}</p>
+            <p className="mt-1 max-w-[34ch] text-sm font-semibold text-slate-100">{immediateDecision}</p>
           </div>
         </div>
 
-        <article className="rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Macro posture dial</p>
-          <div className="mt-2">
-            <div className="mb-2 grid grid-cols-4 text-[11px] uppercase tracking-[0.1em] text-slate-400">
-              {regimeGaugeStops.map((item) => <span key={item}>{item}</span>)}
-            </div>
-            <div className="relative h-2 rounded-full bg-slate-800">
-              <div className="absolute -top-1 h-4 w-4 -translate-x-1/2 rounded-full border-2 border-slate-100 bg-sky-200" style={{ left: `${gaugePercent}%` }} />
-            </div>
-          </div>
-          <p className="mt-2 text-xs text-slate-300">Trend: {trendLabel} · Regime shift watch {transitionWatch}</p>
-        </article>
-
         <article className="rounded-lg border border-amber-500/45 bg-amber-500/10 px-3 py-3">
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-100">Primary guardrail</p>
-          <p className="mt-1 text-sm font-semibold text-amber-50">{guardrail}</p>
+          <p className="mt-1 max-w-[52ch] text-sm font-semibold text-amber-50">{guardrail}</p>
         </article>
 
-        <article className="rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3">
+        <article className="rounded-lg border border-sky-500/40 bg-slate-950/72 px-3 py-3">
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Flip trigger</p>
           <p className="mt-1 text-xs text-slate-300">Current: {regimeDistance.currentValue.toFixed(1)} · Trigger: {regimeDistance.thresholdValue.toFixed(1)}</p>
           <div className="mt-2 h-3 rounded-full bg-slate-800">
@@ -197,11 +189,32 @@ export function DecisionCallHeader({
           </p>
         </article>
 
-        <p className="text-xs text-slate-300">{netConstraintSummary}</p>
-        <p className="text-xs text-slate-300">Trust check: {trustCueLine} · Freshness {freshnessLabel}</p>
-        {needsTrustWarning ? (
-          <p className="rounded-md border border-amber-500/50 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">{trustWarningCopy}</p>
-        ) : null}
+        <div className="flex flex-wrap gap-2.5">
+          {actions}
+        </div>
+
+        <details className="rounded-lg border border-slate-700/75 bg-slate-950/60 px-3 py-2.5">
+          <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.12em] text-slate-200">Dial + trust details ▼</summary>
+          <div className="mt-3 space-y-3">
+            <article>
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Macro posture dial</p>
+              <div className="mt-2">
+                <div className="mb-2 grid grid-cols-4 text-[11px] uppercase tracking-[0.1em] text-slate-400">
+                  {regimeGaugeStops.map((item) => <span key={item}>{item}</span>)}
+                </div>
+                <div className="relative h-2 rounded-full bg-slate-800">
+                  <div className="absolute -top-1 h-4 w-4 -translate-x-1/2 rounded-full border-2 border-slate-100 bg-sky-200" style={{ left: `${gaugePercent}%` }} />
+                </div>
+              </div>
+              <p className="mt-2 max-w-[56ch] text-xs text-slate-300">Trend: {trendLabel} · Regime shift watch {transitionWatch}</p>
+            </article>
+            <p className="max-w-[56ch] text-xs text-slate-300">{netConstraintSummary}</p>
+            <p className="max-w-[56ch] text-xs text-slate-300">Trust check: {trustCueLine} · Freshness {freshnessLabel}</p>
+            {needsTrustWarning ? (
+              <p className="max-w-[56ch] rounded-md border border-amber-500/50 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">{trustWarningCopy}</p>
+            ) : null}
+          </div>
+        </details>
       </article>
     </header>
   );
@@ -350,10 +363,9 @@ export function MoreContextDisclosureBody({
 type CitationActionFooterProps = {
   citationMetaLine: string;
   citation: string;
-  actions?: ReactNode;
 };
 
-export function CitationActionFooter({ citationMetaLine, citation, actions }: CitationActionFooterProps) {
+export function CitationActionFooter({ citationMetaLine, citation }: CitationActionFooterProps) {
   return (
     <article className={`${supportingPanel} ${sectionSpacing}`}>
       <h2 className={secondaryHeading}>Cite this call</h2>
@@ -364,7 +376,6 @@ export function CitationActionFooter({ citationMetaLine, citation, actions }: Ci
         <span className="font-semibold uppercase tracking-[0.12em] text-slate-200">Send to team</span>
       </div>
       <div className="mt-3 flex flex-wrap gap-3">
-        {actions}
         <Link
           href="/toolkits/whether-to-ship"
           className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100"
@@ -468,6 +479,7 @@ export function WeeklyDecisionCard({
         trustWarningCopy={trustWarningCopy}
         regimeDistance={regimeDistance}
         movementVelocity={movementVelocity}
+        actions={actions}
       />
 
       <article className={`${primaryPanel} ${sectionSpacing}`}>
@@ -540,7 +552,7 @@ export function WeeklyDecisionCard({
         historicalTimeline={historicalTimeline}
         macroOverlay={macroOverlay}
       />
-      <CitationActionFooter citationMetaLine={citationMetaLine} citation={citation} actions={actions} />
+      <CitationActionFooter citationMetaLine={citationMetaLine} citation={citation} />
     </section>
   );
 }
