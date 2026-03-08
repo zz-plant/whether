@@ -2,35 +2,50 @@
  * Posture-transition forecasting model (regime boundary movement),
  * not a macro growth forecasting model.
  */
-import { classifyRegime, type RegimeAssessment, type RegimeKey } from "../regimeEngine";
+import {
+  classifyRegime,
+  type RegimeAssessment,
+  type RegimeKey,
+} from "../regimeEngine";
 import type { MacroSeriesId, MacroSeriesReading } from "../types";
 import type { ReportDynamics } from "./reportData";
 
-export type ForecastRegimeLabel = "Expansion" | "Mixed" | "Scarcity" | "Defensive";
+export type ForecastRegimeLabel =
+  | "Expansion"
+  | "Mixed"
+  | "Scarcity"
+  | "Defensive";
 export type SignalDirection = "up" | "down" | "flat";
+export type SignalTrajectoryLabel = "improving" | "deteriorating" | "stable";
 export type CrossingRiskLabel = "low" | "medium" | "high";
-export type BoundaryMomentum = "toward-threshold" | "away-from-threshold" | "mixed" | "stable";
+export type BoundaryMomentum =
+  | "toward-threshold"
+  | "away-from-threshold"
+  | "mixed"
+  | "stable";
 
 export interface ForecastModel {
-  regimeProbabilities: Record<ForecastRegimeLabel, number>;
+  next90DayProbabilities: Record<ForecastRegimeLabel, number>;
   boundaryPressure: {
-    tightnessDistance: number;
-    riskAppetiteDistance: number;
-    nearestDistance: number;
+    distance: number;
     momentum: BoundaryMomentum;
     crossingRisk: CrossingRiskLabel;
   };
   signalTrajectory: {
-    riskAppetite: SignalDirection;
-    tightness: SignalDirection;
-    yieldCurveProxy: SignalDirection;
+    riskAppetite: SignalTrajectoryLabel;
+    tightness: SignalTrajectoryLabel;
+    yieldCurveProxy: SignalTrajectoryLabel;
   };
 }
 
 const DIRECTION_EPSILON = 0.01;
-const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(max, Math.max(min, value));
 
-const toDirection = (delta: number, epsilon = DIRECTION_EPSILON): SignalDirection => {
+const toDirection = (
+  delta: number,
+  epsilon = DIRECTION_EPSILON,
+): SignalDirection => {
   if (delta > epsilon) {
     return "up";
   }
@@ -40,8 +55,35 @@ const toDirection = (delta: number, epsilon = DIRECTION_EPSILON): SignalDirectio
   return "flat";
 };
 
-const normalizeProbabilities = (probabilities: Record<ForecastRegimeLabel, number>) => {
-  const total = Object.values(probabilities).reduce((sum, value) => sum + value, 0);
+const toTrajectory = ({
+  key,
+  delta,
+}: {
+  key: "tightness" | "riskAppetite" | "curveSlope";
+  delta: number;
+}): SignalTrajectoryLabel => {
+  const direction = toDirection(
+    delta,
+    key === "curveSlope" ? 0.001 : DIRECTION_EPSILON,
+  );
+  if (direction === "flat") {
+    return "stable";
+  }
+
+  if (key === "tightness") {
+    return direction === "down" ? "improving" : "deteriorating";
+  }
+
+  return direction === "up" ? "improving" : "deteriorating";
+};
+
+const normalizeProbabilities = (
+  probabilities: Record<ForecastRegimeLabel, number>,
+) => {
+  const total = Object.values(probabilities).reduce(
+    (sum, value) => sum + value,
+    0,
+  );
   if (total <= 0) {
     return {
       Expansion: 25,
@@ -51,27 +93,39 @@ const normalizeProbabilities = (probabilities: Record<ForecastRegimeLabel, numbe
     } satisfies Record<ForecastRegimeLabel, number>;
   }
 
-  const labels: ForecastRegimeLabel[] = ["Expansion", "Mixed", "Scarcity", "Defensive"];
+  const labels: ForecastRegimeLabel[] = [
+    "Expansion",
+    "Mixed",
+    "Scarcity",
+    "Defensive",
+  ];
   const normalized = labels.reduce<Record<ForecastRegimeLabel, number>>(
     (acc, label) => {
       acc[label] = Math.round((probabilities[label] / total) * 100);
       return acc;
     },
-    { Expansion: 0, Mixed: 0, Scarcity: 0, Defensive: 0 }
+    { Expansion: 0, Mixed: 0, Scarcity: 0, Defensive: 0 },
   );
 
-  const normalizedTotal = Object.values(normalized).reduce((sum, value) => sum + value, 0);
+  const normalizedTotal = Object.values(normalized).reduce(
+    (sum, value) => sum + value,
+    0,
+  );
   const diff = 100 - normalizedTotal;
   if (diff !== 0) {
-    const dominantLabel = labels.sort((a, b) => normalized[b] - normalized[a])[0];
+    const dominantLabel = labels.sort(
+      (a, b) => normalized[b] - normalized[a],
+    )[0];
     normalized[dominantLabel] += diff;
   }
 
   return normalized;
 };
 
-const findSignalDelta = (dynamics: ReportDynamics, key: ReportDynamics["changedSignals"][number]["key"]) =>
-  dynamics.changedSignals.find((signal) => signal.key === key)?.delta ?? 0;
+const findSignalDelta = (
+  dynamics: ReportDynamics,
+  key: ReportDynamics["changedSignals"][number]["key"],
+) => dynamics.changedSignals.find((signal) => signal.key === key)?.delta ?? 0;
 
 const stressUpIsWorseSeries = new Set<MacroSeriesId>([
   "HY_CREDIT_SPREAD",
@@ -89,7 +143,9 @@ const reliefUpIsBetterSeries = new Set<MacroSeriesId>([
   "AI_COMPUTE_COST_TREND",
 ]);
 
-const computeMacroDownsideBias = (macroSeries: MacroSeriesReading[]): number => {
+const computeMacroDownsideBias = (
+  macroSeries: MacroSeriesReading[],
+): number => {
   let score = 0;
   let weightTotal = 0;
 
@@ -128,7 +184,10 @@ const toForecastLabel = (regime: RegimeKey): ForecastRegimeLabel => {
   return "Mixed";
 };
 
-const classifyGapMotion = (gap: number, drift: number): "toward" | "away" | "flat" => {
+const classifyGapMotion = (
+  gap: number,
+  drift: number,
+): "toward" | "away" | "flat" => {
   if (Math.abs(drift) <= DIRECTION_EPSILON) {
     return "flat";
   }
@@ -151,7 +210,7 @@ const classifyGapMotion = (gap: number, drift: number): "toward" | "away" | "fla
   return "flat";
 };
 
-const classifyMomentum = ({
+export const classifyBoundaryMomentum = ({
   tightnessGap,
   riskGap,
   tightnessDrift,
@@ -173,7 +232,10 @@ const classifyMomentum = ({
     return "toward-threshold";
   }
 
-  if ((tightnessMotion === "away" || tightnessMotion === "flat") && (riskMotion === "away" || riskMotion === "flat")) {
+  if (
+    (tightnessMotion === "away" || tightnessMotion === "flat") &&
+    (riskMotion === "away" || riskMotion === "flat")
+  ) {
     return "away-from-threshold";
   }
 
@@ -182,6 +244,30 @@ const classifyMomentum = ({
 
 const SCENARIO_SHOCKS = [-1, 0, 1] as const;
 const SCENARIO_WEIGHTS = [0.2, 0.6, 0.2] as const;
+
+export const classifyCrossingRisk = ({
+  crossingProbability,
+  distance,
+  momentum,
+}: {
+  crossingProbability: number;
+  distance: number;
+  momentum: BoundaryMomentum;
+}): CrossingRiskLabel => {
+  if (
+    crossingProbability >= 0.45 ||
+    (distance <= 3 && momentum !== "away-from-threshold")
+  ) {
+    return "high";
+  }
+  if (
+    crossingProbability >= 0.2 ||
+    (distance <= 8 && momentum !== "away-from-threshold")
+  ) {
+    return "medium";
+  }
+  return "low";
+};
 
 export const buildForecastModel = ({
   assessment,
@@ -200,13 +286,25 @@ export const buildForecastModel = ({
   const projectedTightnessDrift = tightnessDelta + macroDownsideBias * 7;
   const projectedRiskDrift = riskDelta - macroDownsideBias * 8;
 
-  const tightnessGap = assessment.scores.tightness - assessment.thresholds.tightnessRegime;
-  const riskGap = assessment.scores.riskAppetite - assessment.thresholds.riskAppetiteRegime;
-  const nearestDistance = Math.round(Math.min(Math.abs(tightnessGap), Math.abs(riskGap)));
+  const tightnessGap =
+    assessment.scores.tightness - assessment.thresholds.tightnessRegime;
+  const riskGap =
+    assessment.scores.riskAppetite - assessment.thresholds.riskAppetiteRegime;
+  const nearestDistance = Math.round(
+    Math.min(Math.abs(tightnessGap), Math.abs(riskGap)),
+  );
 
-  const volatilityScale = clamp(1 + reportDynamics.totalSignalChanges * 0.25 + Math.abs(macroDownsideBias) * 1.5, 1, 3);
-  const tightnessUncertainty = clamp(3 + Math.abs(projectedTightnessDrift) * 0.7, 3, 14) * volatilityScale;
-  const riskUncertainty = clamp(3 + Math.abs(projectedRiskDrift) * 0.7, 3, 14) * volatilityScale;
+  const volatilityScale = clamp(
+    1 +
+      reportDynamics.totalSignalChanges * 0.25 +
+      Math.abs(macroDownsideBias) * 1.5,
+    1,
+    3,
+  );
+  const tightnessUncertainty =
+    clamp(3 + Math.abs(projectedTightnessDrift) * 0.7, 3, 14) * volatilityScale;
+  const riskUncertainty =
+    clamp(3 + Math.abs(projectedRiskDrift) * 0.7, 3, 14) * volatilityScale;
 
   const regimeWeights: Record<ForecastRegimeLabel, number> = {
     Expansion: 0,
@@ -219,26 +317,38 @@ export const buildForecastModel = ({
 
   SCENARIO_SHOCKS.forEach((tightnessShock, tightnessIndex) => {
     SCENARIO_SHOCKS.forEach((riskShock, riskIndex) => {
-      const scenarioWeight = SCENARIO_WEIGHTS[tightnessIndex] * SCENARIO_WEIGHTS[riskIndex];
+      const scenarioWeight =
+        SCENARIO_WEIGHTS[tightnessIndex] * SCENARIO_WEIGHTS[riskIndex];
       const scenarioTightness = clamp(
-        assessment.scores.tightness + projectedTightnessDrift + tightnessShock * tightnessUncertainty,
+        assessment.scores.tightness +
+          projectedTightnessDrift +
+          tightnessShock * tightnessUncertainty,
         0,
-        100
+        100,
       );
       const scenarioRisk = clamp(
-        assessment.scores.riskAppetite + projectedRiskDrift + riskShock * riskUncertainty,
+        assessment.scores.riskAppetite +
+          projectedRiskDrift +
+          riskShock * riskUncertainty,
         0,
-        100
+        100,
       );
 
-      const scenarioRegime = classifyRegime(scenarioTightness, scenarioRisk, assessment.thresholds);
+      const scenarioRegime = classifyRegime(
+        scenarioTightness,
+        scenarioRisk,
+        assessment.thresholds,
+      );
       const forecastLabel = toForecastLabel(scenarioRegime);
       regimeWeights[forecastLabel] += scenarioWeight;
 
-      const tightnessCrossed = (assessment.scores.tightness > assessment.thresholds.tightnessRegime) !==
-        (scenarioTightness > assessment.thresholds.tightnessRegime);
-      const riskCrossed = (assessment.scores.riskAppetite > assessment.thresholds.riskAppetiteRegime) !==
-        (scenarioRisk > assessment.thresholds.riskAppetiteRegime);
+      const tightnessCrossed =
+        assessment.scores.tightness > assessment.thresholds.tightnessRegime !==
+        scenarioTightness > assessment.thresholds.tightnessRegime;
+      const riskCrossed =
+        assessment.scores.riskAppetite >
+          assessment.thresholds.riskAppetiteRegime !==
+        scenarioRisk > assessment.thresholds.riskAppetiteRegime;
 
       if (tightnessCrossed || riskCrossed) {
         crossingProbability += scenarioWeight;
@@ -246,54 +356,49 @@ export const buildForecastModel = ({
     });
   });
 
-  const momentum = classifyMomentum({
+  const momentum = classifyBoundaryMomentum({
     tightnessGap,
     riskGap,
     tightnessDrift: projectedTightnessDrift,
     riskDrift: projectedRiskDrift,
   });
 
-  const crossingRisk: CrossingRiskLabel =
-    crossingProbability >= 0.45 || (nearestDistance <= 3 && momentum !== "away-from-threshold")
-      ? "high"
-      : crossingProbability >= 0.2 || (nearestDistance <= 8 && momentum !== "away-from-threshold")
-        ? "medium"
-        : "low";
+  const crossingRisk = classifyCrossingRisk({
+    crossingProbability,
+    distance: nearestDistance,
+    momentum,
+  });
 
   return {
-    regimeProbabilities: normalizeProbabilities(regimeWeights),
+    next90DayProbabilities: normalizeProbabilities(regimeWeights),
     boundaryPressure: {
-      tightnessDistance: Math.round(Math.abs(tightnessGap)),
-      riskAppetiteDistance: Math.round(Math.abs(riskGap)),
-      nearestDistance,
+      distance: nearestDistance,
       momentum,
       crossingRisk,
     },
     signalTrajectory: {
-      riskAppetite: toDirection(riskDelta),
-      tightness: toDirection(tightnessDelta),
-      yieldCurveProxy: toDirection(curveDelta, 0.001),
+      riskAppetite: toTrajectory({ key: "riskAppetite", delta: riskDelta }),
+      tightness: toTrajectory({ key: "tightness", delta: tightnessDelta }),
+      yieldCurveProxy: toTrajectory({ key: "curveSlope", delta: curveDelta }),
     },
   };
 };
 
 export const buildFallbackForecastModel = (): ForecastModel => ({
-  regimeProbabilities: {
+  next90DayProbabilities: {
     Expansion: 25,
     Mixed: 25,
     Scarcity: 25,
     Defensive: 25,
   },
   boundaryPressure: {
-    tightnessDistance: 0,
-    riskAppetiteDistance: 0,
-    nearestDistance: 0,
+    distance: 0,
     momentum: "stable",
     crossingRisk: "medium",
   },
   signalTrajectory: {
-    riskAppetite: "flat",
-    tightness: "flat",
-    yieldCurveProxy: "flat",
+    riskAppetite: "stable",
+    tightness: "stable",
+    yieldCurveProxy: "stable",
   },
 });

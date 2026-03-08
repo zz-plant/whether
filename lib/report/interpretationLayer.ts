@@ -2,7 +2,13 @@ import type { RegimeAssessment } from "../regimeEngine";
 import type { ForecastModel } from "./forecastModel";
 import type { BoundedDecisionRule } from "./boundedDecisionRules";
 
-export const interpretationViews = ["default", "sector", "company", "financial", "forecast"] as const;
+export const interpretationViews = [
+  "default",
+  "sector",
+  "company",
+  "financial",
+  "forecast",
+] as const;
 
 export type InterpretationView = (typeof interpretationViews)[number];
 
@@ -13,10 +19,15 @@ export type InterpretationLayer = {
   bullets: string[];
 };
 
-export const isInterpretationView = (value: string | undefined): value is InterpretationView =>
+export const isInterpretationView = (
+  value: string | undefined,
+): value is InterpretationView =>
   Boolean(value && interpretationViews.includes(value as InterpretationView));
 
-const crossingRiskLabel: Record<ForecastModel["boundaryPressure"]["crossingRisk"], string> = {
+const crossingRiskLabel: Record<
+  ForecastModel["boundaryPressure"]["crossingRisk"],
+  string
+> = {
   low: "Low",
   medium: "Medium",
   high: "High",
@@ -30,7 +41,9 @@ export const buildInterpretationLayer = ({
   decisionRules,
 }: {
   view: InterpretationView;
-  homeBriefModel: ReturnType<typeof import("./homeBriefModel").buildHomeBriefModel>;
+  homeBriefModel: ReturnType<
+    typeof import("./homeBriefModel").buildHomeBriefModel
+  >;
   assessment: RegimeAssessment;
   forecast: ForecastModel;
   decisionRules: BoundedDecisionRule[];
@@ -39,8 +52,11 @@ export const buildInterpretationLayer = ({
     return {
       view,
       label: "Sector view",
-      summary: "Apply the macro call through sector sensitivity before changing pace.",
-      bullets: homeBriefModel.macroOverlay.map((item) => `${item.label}: ${item.detail}`),
+      summary:
+        "Apply the macro call through sector sensitivity before changing pace.",
+      bullets: homeBriefModel.macroOverlay.map(
+        (item) => `${item.label}: ${item.detail}`,
+      ),
     };
   }
 
@@ -48,10 +64,14 @@ export const buildInterpretationLayer = ({
     return {
       view,
       label: "Company view",
-      summary: "Use bounded operator rules so teams know what to tighten now and when to reverse.",
-      bullets: decisionRules.slice(0, 3).map(
-        (rule) => `${rule.recommendation} Stop if ${rule.pauseTrigger} Restart when ${rule.resumeTrigger}`,
-      ),
+      summary:
+        "Use bounded operator rules so teams know what to tighten now and when to reverse.",
+      bullets: decisionRules
+        .slice(0, 3)
+        .map(
+          (rule) =>
+            `${rule.recommendation} Stop if ${rule.pauseTrigger} Restart when ${rule.resumeTrigger}`,
+        ),
     };
   }
 
@@ -68,15 +88,30 @@ export const buildInterpretationLayer = ({
   }
 
   if (view === "forecast") {
-    const topRegime = Object.entries(forecast.regimeProbabilities).sort((a, b) => b[1] - a[1])[0];
+    const topRegime = Object.entries(forecast.next90DayProbabilities).sort(
+      (a, b) => b[1] - a[1],
+    )[0];
+    const momentumCopy: Record<
+      ForecastModel["boundaryPressure"]["momentum"],
+      string
+    > = {
+      "toward-threshold": "Momentum is moving toward a posture boundary.",
+      "away-from-threshold":
+        "Momentum is moving away from the nearest posture boundary.",
+      mixed: "Momentum is mixed across boundary signals.",
+      stable: "Momentum is stable with no directional boundary drift.",
+    };
+
     return {
       view,
       label: "Forecast view",
-      summary: "Boundary pressure indicates how likely this call is to flip if signal momentum persists.",
+      summary:
+        "Boundary pressure indicates how likely this call is to flip if signal momentum persists.",
       bullets: [
         `Highest likelihood next posture: ${topRegime[0]} (${topRegime[1]}%).`,
-        `Crossing risk: ${crossingRiskLabel[forecast.boundaryPressure.crossingRisk]} with ${forecast.boundaryPressure.nearestDistance} points to threshold.`,
-        `Momentum: ${forecast.boundaryPressure.momentum.replaceAll("-", " ")}.`,
+        `Threshold distance: ${forecast.boundaryPressure.distance} points to the nearest posture boundary.`,
+        `Crossing risk: ${crossingRiskLabel[forecast.boundaryPressure.crossingRisk]}.`,
+        momentumCopy[forecast.boundaryPressure.momentum],
       ],
     };
   }
