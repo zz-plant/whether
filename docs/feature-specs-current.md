@@ -122,11 +122,15 @@ The regime assessment includes:
 - Sector overlays are **secondary interpretations only** and do not mutate base regime classification.
 - Canonical sector taxonomy:
   - `b2b-saas` → higher upside sensitivity (`Expansion+`, `Mixed+` when warranted)
-  - `consumer` → neutral calibration (`Expansion`, `Mixed`, etc.)
+  - `consumer` → neutral calibration (`Expansion (neutral)`, `Mixed (neutral)`, etc.)
   - `infrastructure` → higher downside sensitivity (`Mixed-`, `Defensive-` when warranted)
+  - `fintech` → mixed calibration with tighter downside checks and selective upside (`Mixed (neutral)|Mixed-` in boundary weeks)
+  - `healthcare` → conservative calibration favoring hold/tighten near thresholds (`Defensive (neutral)|Defensive-` as warranted)
+  - `ai-platforms` → aggressive upside calibration (`Expansion+`, `Mixed+` with stronger loosen bias when warranted)
 - Overlay output contract (`deriveSectorAdjustedPosture`):
   - `basePostureLabel`
-  - `adjustedPostureLabel` (suffix: `+`, `-`, or none)
+  - `adjustedPostureLabel` (`+`, `-`, or `(neutral)` variant formatting)
+  - `postureVariant` (`plus|neutral|minus`)
   - `adjustmentStrength` (`none|light|moderate|strong`)
   - `adjustmentDelta` (signed scalar, damped near regime boundaries)
   - `actionBias` (`tighten|hold|loosen`) and `reversalCondition` for bounded decision translation

@@ -82,7 +82,7 @@ Top-to-bottom order is fixed. The first four blocks must fit above the fold on d
 **States:**
 - `YES — Regime shift detected.`
 - `NO — Hold posture.`
-- Detail panel includes a sector-sensitivity overlay (`?sector=b2b-saas|consumer|infrastructure`) to show `base posture + sector sensitivity` without altering the canonical weekly posture call; fallback is `b2b-saas`.
+- Detail panel includes a sector-sensitivity overlay (`?sector=b2b-saas|consumer|infrastructure|fintech|healthcare|ai-platforms`) to show `base posture + sector sensitivity` without altering the canonical weekly posture call; fallback is `b2b-saas`.
 
 **Rules:**
 - Exactly two states: YES / NO.
