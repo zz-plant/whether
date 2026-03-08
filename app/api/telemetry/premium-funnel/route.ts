@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { dispatchPremiumFunnelEvent, isValidPremiumFunnelEvent } from "../../../../lib/premiumFunnel";
 
+export const runtime = "edge";
+
 export async function POST(request: Request) {
   let payload: unknown;
 
