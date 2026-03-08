@@ -69,12 +69,12 @@ describe("interpretation view panel", () => {
     );
 
     assert.match(html, /Default view/);
-    assert.match(html, /Changed: pressure rose versus last week\./);
+    assert.match(html, /Action: Changed: pressure rose versus last week\./);
     assert.match(html, /\/?month=3&amp;year=2026&amp;view=forecast/);
   });
 
 
-  it("renders top-priority adjusted company rules with explicit stop/reversal text", () => {
+  it("renders top-priority adjusted company rules with explicit trigger/reverse text", () => {
     const layeredRules: BoundedDecisionRule[] = [
       {
         area: "capital-raising",
@@ -122,8 +122,8 @@ describe("interpretation view panel", () => {
     assert.match(company.bullets[0], /Rule 1 first\./);
     assert.match(company.bullets[1], /Rule 2 second\./);
     assert.match(company.bullets[2], /Rule 3 third\./);
-    assert.ok(company.bullets.every((bullet) => bullet.includes("Stop:")));
-    assert.ok(company.bullets.every((bullet) => bullet.includes("Reversal:")));
+    assert.ok(company.bullets.every((bullet) => bullet.includes("Trigger:")));
+    assert.ok(company.bullets.every((bullet) => bullet.includes("Reverse:")));
     assert.ok(company.bullets.every((bullet) => !bullet.includes("Rule 4 hidden.")));
   });
 
@@ -154,13 +154,33 @@ describe("interpretation view panel", () => {
     const financialHtml = renderToStaticMarkup(<HomeInterpretationPanel layer={financial} searchParams={{}} />);
 
     assert.match(sectorHtml, /Sector view/);
-    assert.match(sectorHtml, /Consumer teams should stage expansions\./);
+    assert.match(sectorHtml, /Action: Sector sensitivity: Consumer teams should stage expansions\./);
     assert.match(financialHtml, /Financial view/);
     assert.match(financialHtml, /Runway risk/);
-    assert.match(financialHtml, /Raise window/);
-    assert.match(financialHtml, /Burn adjustment/);
+    assert.match(financialHtml, /Trigger: Raise window/);
+    assert.match(financialHtml, /Reverse: Burn delta/);
     assert.match(financialHtml, /Financial action summary/);
+    assert.match(sectorHtml, /Trigger: Tighten one notch if sector demand weakens faster than the base posture\./);
+    assert.match(sectorHtml, /Reverse: Return to base once sector drag normalizes for two updates\./);
     assert.match(sectorHtml, /Default/);
     assert.match(financialHtml, /Default/);
   });
+  it("keeps interpretation bullets compact for screenshot-safe handoff", () => {
+    const views = ["default", "sector", "company", "financial", "forecast"] as const;
+
+    for (const view of views) {
+      const layer = buildInterpretationLayer({
+        view,
+        homeBriefModel,
+        assessment,
+        forecast,
+        decisionRules,
+      });
+
+      assert.ok(layer.bullets.length >= 1 && layer.bullets.length <= 3);
+      assert.ok(layer.bullets.every((bullet) => bullet.includes("Action:") || bullet.includes("Trigger:") || bullet.includes("Reverse:")));
+      assert.ok(layer.bullets.every((bullet) => bullet.length <= 340));
+    }
+  });
+
 });

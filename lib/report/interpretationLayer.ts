@@ -34,6 +34,33 @@ export type InterpretationLayer = {
   };
 };
 
+const compactClause = (value: string, max = 96) => {
+  const normalized = value.replace(/\s+/g, " ").trim();
+  if (normalized.length <= max) {
+    return normalized;
+  }
+
+  return `${normalized.slice(0, max - 1).trimEnd()}…`;
+};
+
+const boundedLine = (label: "Action" | "Trigger" | "Reverse", value: string) =>
+  `${label}: ${compactClause(value)}`;
+
+const boundedTriplet = ({
+  action,
+  trigger,
+  reverse,
+}: {
+  action: string;
+  trigger: string;
+  reverse: string;
+}) =>
+  [
+    boundedLine("Action", action),
+    boundedLine("Trigger", trigger),
+    boundedLine("Reverse", reverse),
+  ].join(" | ");
+
 type FinancialViewInput = {
   runway: number;
   burn: number;
@@ -103,14 +130,20 @@ export const buildInterpretationLayer = ({
   companyProfile?: Partial<CompanyProfile>;
 }): InterpretationLayer => {
   if (view === "sector") {
+    const primaryOverlay = homeBriefModel.macroOverlay.slice(0, 1);
+    const sectorShift = primaryOverlay[0]
+      ? `${primaryOverlay[0].label}: ${primaryOverlay[0].detail}`
+      : "Apply sector sensitivity only when sector demand diverges from the base call.";
     return {
       view,
       label: "Sector view",
       summary:
         "Apply the macro call through sector sensitivity before changing pace.",
-      bullets: homeBriefModel.macroOverlay.map(
-        (item) => `${item.label}: ${item.detail}`,
-      ),
+      bullets: [
+        boundedLine("Action", sectorShift),
+        boundedLine("Trigger", "Tighten one notch if sector demand weakens faster than the base posture."),
+        boundedLine("Reverse", "Return to base once sector drag normalizes for two updates."),
+      ],
     };
   }
 
@@ -128,9 +161,12 @@ export const buildInterpretationLayer = ({
         "Use bounded operator rules so teams know what to tighten now, what to stop, and when to reverse.",
       bullets: adjustedRules
         .slice(0, 3)
-        .map(
-          (rule) =>
-            `${rule.recommendation} Stop: ${rule.pauseTrigger} Reversal: ${rule.resumeTrigger}`,
+        .map((rule) =>
+          boundedTriplet({
+            action: rule.recommendation,
+            trigger: rule.pauseTrigger,
+            reverse: rule.resumeTrigger,
+          }),
         ),
     };
   }
@@ -150,9 +186,18 @@ export const buildInterpretationLayer = ({
       summary:
         "Translate this week into bounded runway decisions: risk now vs downside, raise window, and burn delta.",
       bullets: [
-        `Runway risk ${plan.runwayRisk.level.toUpperCase()} (${plan.runwayRisk.score}/100); downside flip ${plan.runwayRisk.macroRiskDownsideFlip}/100.`,
-        `Raise window ${plan.raiseTimingRecommendation.startMonth}-${plan.raiseTimingRecommendation.endMonth} months; safe-runway target in ${plan.raiseTimingRecommendation.timeToSafeRunwayTargetMonths} months.`,
-        `Burn adjustment ${plan.burnAdjustment.recommendedDeltaPercent}% (range ${plan.burnAdjustment.floorPercent}% to ${plan.burnAdjustment.ceilingPercent}%).`,
+        boundedLine(
+          "Action",
+          `Runway risk ${plan.runwayRisk.level.toUpperCase()} at ${plan.runwayRisk.score}/100; protect downside now.`,
+        ),
+        boundedLine(
+          "Trigger",
+          `Raise window ${plan.raiseTimingRecommendation.startMonth}-${plan.raiseTimingRecommendation.endMonth} months; safe target in ${plan.raiseTimingRecommendation.timeToSafeRunwayTargetMonths} months.`,
+        ),
+        boundedLine(
+          "Reverse",
+          `Burn delta ${plan.burnAdjustment.recommendedDeltaPercent}% (range ${plan.burnAdjustment.floorPercent}% to ${plan.burnAdjustment.ceilingPercent}%).`,
+        ),
       ],
       financialAction: {
         runwayRisk: plan.runwayRisk.summary,
@@ -183,10 +228,12 @@ export const buildInterpretationLayer = ({
       summary:
         "Boundary pressure indicates how likely this call is to flip if signal momentum persists.",
       bullets: [
-        `Highest likelihood next posture: ${topRegime[0]} (${topRegime[1]}%).`,
-        `Threshold distance: ${forecast.boundaryPressure.distance} points to the nearest posture boundary.`,
-        `Crossing risk: ${crossingRiskLabel[forecast.boundaryPressure.crossingRisk]}.`,
-        momentumCopy[forecast.boundaryPressure.momentum],
+        boundedLine("Action", `Operate for ${topRegime[0]} (${topRegime[1]}%) while current posture holds.`),
+        boundedLine(
+          "Trigger",
+          `${forecast.boundaryPressure.distance} points to boundary; crossing risk ${crossingRiskLabel[forecast.boundaryPressure.crossingRisk]}.`,
+        ),
+        boundedLine("Reverse", momentumCopy[forecast.boundaryPressure.momentum]),
       ],
     };
   }
@@ -196,9 +243,9 @@ export const buildInterpretationLayer = ({
     label: "Default view",
     summary: "Core weekly interpretation for operators.",
     bullets: [
-      homeBriefModel.decisionShiftSummary,
-      homeBriefModel.guardrail,
-      homeBriefModel.reversalTrigger,
+      boundedLine("Action", homeBriefModel.decisionShiftSummary),
+      boundedLine("Trigger", homeBriefModel.guardrail),
+      boundedLine("Reverse", homeBriefModel.reversalTrigger),
     ],
   };
 };

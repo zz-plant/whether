@@ -231,6 +231,12 @@ $$
 Operations briefings support copy-ready briefs and executive narratives with sensor data and
 macro context embedded for leadership consumption.
 
+Interpretation-context transmission contract (homepage-selected `?view=` only):
+- Slack/board/call-citation builders include an optional interpretation context block when the selected layer is non-default.
+- Context block includes: selected layer label + key (`default|sector|company|financial|forecast`), interpretation summary, compact bounded bullets (max 3), and an explicit trust line: translation-layer only (canonical posture/confidence/thresholds unchanged).
+- Financial view may append compact runway action lines (runway risk, raise timing, burn adjustment) so the selected lens is transmissible in copy/paste artifacts.
+- Fallback behavior: default view omits interpretation context entirely; invalid/missing view resolves to default and exports remain canonical.
+
 ### 5.6 Signal Ops (live)
 - Regime alerts are persisted and retrievable through API (`/api/regime-alerts`).
 - Alert payloads include reason codes, source URLs, and Time Machine deep links.

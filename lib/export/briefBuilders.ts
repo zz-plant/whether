@@ -30,10 +30,23 @@ const buildInterpretationLayerBlock = (options?: ExportLayerOptions) => {
     return [];
   }
 
+  const layer = options.interpretationLayer;
+  const boundedBullets = layer.bullets.slice(0, 3);
+  const financialSummary = layer.financialAction
+    ? [
+      `Runway risk: ${layer.financialAction.runwayRisk}`,
+      `Raise timing: ${layer.financialAction.raiseTiming}`,
+      `Burn adjustment: ${layer.financialAction.burnAdjustment}`,
+    ]
+    : [];
+
   return [
     "",
-    `Interpretation layer (${options.interpretationLayer.label}):`,
-    ...options.interpretationLayer.bullets.map((bullet) => `• ${bullet}`),
+    `Interpretation context: ${layer.label} (${layer.view})`,
+    `Interpretation summary: ${layer.summary}`,
+    "Interpretation trust: translation layer only; canonical posture/confidence/thresholds unchanged.",
+    ...boundedBullets.map((bullet) => `• ${bullet}`),
+    ...financialSummary.map((line) => `• ${line}`),
   ];
 };
 
@@ -61,11 +74,13 @@ const buildSlideBullets = (
   assessment: RegimeAssessment,
   treasury: TreasuryData,
   macros: MacroSeriesReading[],
+  options?: ExportLayerOptions,
 ) => [
   `Capital posture: ${assessment.regime}`,
   `Tightness ${assessment.scores.tightness} / Risk ${assessment.scores.riskAppetite}`,
   ...macros.map((macro) => `${macro.label}: ${formatNumberWithUnit(macro.value, macro.unit)}`),
   ...assessment.constraints.map((item) => `Guardrail: ${item}`),
+  ...buildInterpretationLayerBlock(options),
   "",
   ...buildExportStamp(treasury, "Score-based posture confidence"),
 ].join("\n");
@@ -120,7 +135,7 @@ export const buildBoardBrief = (
   options?: ExportLayerOptions,
 ) => {
   const briefing = buildSlackBrief(assessment, treasury, sensors, macros, options);
-  const slideBullets = buildSlideBullets(assessment, treasury, macros);
+  const slideBullets = buildSlideBullets(assessment, treasury, macros, options);
   return [briefing, "", "---", "", slideBullets].join("\n");
 };
 

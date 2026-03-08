@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { buildSlackBrief } from "../lib/export/briefBuilders";
+import { buildBoardBrief, buildCallCitation, buildSlackBrief } from "../lib/export/briefBuilders";
 import type { RegimeAssessment } from "../lib/regimeEngine";
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../lib/types";
 
@@ -144,18 +144,53 @@ describe("buildSlackBrief", () => {
       interpretationLayer: {
         view: "financial",
         label: "Financial view",
-        summary: "",
-        bullets: ["Tighten non-core spend.", "Reopen when risk appetite improves."],
+        summary: "Runway translation for near-term operating cadence.",
+        bullets: ["Action: Tighten non-core spend.", "Trigger: Reopen when risk appetite improves.", "Reverse: Restore burn only after two stable updates."],
       },
     });
 
-    assert.match(brief, /Interpretation layer \(Financial view\):/);
-    assert.match(brief, /• Tighten non-core spend\./);
+    assert.match(brief, /Interpretation context: Financial view \(financial\)/);
+    assert.match(brief, /Interpretation summary: Runway translation for near-term operating cadence\./);
+    assert.match(brief, /Interpretation trust: translation layer only; canonical posture\/confidence\/thresholds unchanged\./);
+    assert.match(brief, /• Action: Tighten non-core spend\./);
   });
 
   it("formats bps values with readable spacing", () => {
     const brief = buildSlackBrief(assessment, treasury, sensors, macros);
 
     assert.match(brief, /BBB credit spread \(OAS\): 174\.00 bps · refreshed 2026-03-04/);
+  });
+
+  it("carries interpretation context into board and citation artifacts", () => {
+    const interpretationLayer = {
+      view: "forecast" as const,
+      label: "Forecast view",
+      summary: "Boundary pressure translation for planning windows.",
+      bullets: [
+        "Action: Operate for Defensive (31%) while posture holds.",
+        "Trigger: 3 points to boundary; crossing risk High.",
+        "Reverse: Momentum mixed across boundary signals.",
+      ],
+    };
+
+    const board = buildBoardBrief(assessment, treasury, sensors, macros, { interpretationLayer });
+    const citation = buildCallCitation(assessment, treasury, { interpretationLayer });
+
+    assert.match(board, /Interpretation context: Forecast view \(forecast\)/);
+    assert.match(board, /Interpretation summary: Boundary pressure translation for planning windows\./);
+    assert.match(citation, /Interpretation context: Forecast view \(forecast\)/);
+  });
+
+  it("omits interpretation context when default layer is selected", () => {
+    const citation = buildCallCitation(assessment, treasury, {
+      interpretationLayer: {
+        view: "default",
+        label: "Default view",
+        summary: "Core weekly interpretation.",
+        bullets: ["Action: Hold core posture."],
+      },
+    });
+
+    assert.doesNotMatch(citation, /Interpretation context:/);
   });
 });
