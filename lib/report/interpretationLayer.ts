@@ -2,6 +2,10 @@ import type { RegimeAssessment } from "../regimeEngine";
 import type { ForecastModel } from "./forecastModel";
 import type { BoundedDecisionRule } from "./boundedDecisionRules";
 import {
+  buildCompanyAdjustedRules,
+  type CompanyProfile,
+} from "./companyProfile";
+import {
   buildRunwayPlanFromRequest,
   type PlannerPosture,
   type PlannerSector,
@@ -86,6 +90,7 @@ export const buildInterpretationLayer = ({
   forecast,
   decisionRules,
   financialInput,
+  companyProfile,
 }: {
   view: InterpretationView;
   homeBriefModel: ReturnType<
@@ -95,6 +100,7 @@ export const buildInterpretationLayer = ({
   forecast: ForecastModel;
   decisionRules: BoundedDecisionRule[];
   financialInput?: FinancialViewInput;
+  companyProfile?: Partial<CompanyProfile>;
 }): InterpretationLayer => {
   if (view === "sector") {
     return {
@@ -109,16 +115,22 @@ export const buildInterpretationLayer = ({
   }
 
   if (view === "company") {
+    const adjustedRules = buildCompanyAdjustedRules({
+      assessment,
+      postureRules: decisionRules,
+      profile: companyProfile,
+    });
+
     return {
       view,
       label: "Company view",
       summary:
-        "Use bounded operator rules so teams know what to tighten now and when to reverse.",
-      bullets: decisionRules
+        "Use bounded operator rules so teams know what to tighten now, what to stop, and when to reverse.",
+      bullets: adjustedRules
         .slice(0, 3)
         .map(
           (rule) =>
-            `${rule.recommendation} Stop if ${rule.pauseTrigger} Restart when ${rule.resumeTrigger}`,
+            `${rule.recommendation} Stop: ${rule.pauseTrigger} Reversal: ${rule.resumeTrigger}`,
         ),
     };
   }
