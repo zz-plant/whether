@@ -64,4 +64,18 @@ describe("company-profile adjusted rules", () => {
     assert.ok(lateBurn?.pauseTrigger.includes("quarterly margin trajectory weakens"));
     assert.ok(lateBurn?.resumeTrigger.includes("Reverse when margin trajectory stabilizes"));
   });
+
+  it("falls back to defaults when profile fields are explicitly undefined", () => {
+    const rules = buildCompanyAdjustedRules({
+      assessment,
+      postureRules,
+      profile: { stage: undefined, sector: undefined, runwayBand: undefined },
+    });
+
+    const capitalRule = rules.find((rule) => rule.area === "capital-raising");
+
+    assert.ok(capitalRule);
+    assert.ok(capitalRule?.recommendation.includes("Runway constraint:"));
+  });
+
 });
