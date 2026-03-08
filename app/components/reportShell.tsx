@@ -9,6 +9,7 @@ import { DisplayGuardian } from "./displayGuardian";
 import { DisplayModeManager } from "./displayModeManager";
 import { DisplayModeToggle } from "./displayModeToggle";
 import { CanonicalTrustModule } from "./canonicalTrustModule";
+import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
 import {
   ReportMobileNavigation,
   ReportPageNavigation,
@@ -92,6 +93,7 @@ type ReportShellProps = {
   nextStep?: { description: string; href: string };
   nextRefreshLabel?: string;
   inlineTrustPlacement?: "before-content" | "after-first-section";
+  provenance?: DataProvenance;
 };
 
 export function HeroTrustProvenanceBlock({
@@ -104,6 +106,7 @@ export function HeroTrustProvenanceBlock({
   resolvedNextRefreshLabel,
   sourceLabel,
   sourceHref,
+  provenance,
 }: {
   trustStatusTone: "stable" | "warning" | "historical";
   trustStatusLabel: string;
@@ -114,6 +117,7 @@ export function HeroTrustProvenanceBlock({
   resolvedNextRefreshLabel: string;
   sourceLabel: string;
   sourceHref?: string;
+  provenance?: DataProvenance;
 }) {
   return (
     <>
@@ -123,21 +127,25 @@ export function HeroTrustProvenanceBlock({
         detail={trustStatusDetail}
         action={trustStatusAction}
         sourceDetails={
-          <dl className="grid gap-2 text-xs text-slate-300">
-            <div className="flex items-center justify-between gap-3"><dt className="text-slate-400">Posture</dt><dd className="font-semibold text-slate-100">{statusLabel}</dd></div>
-            <div className="flex items-center justify-between gap-3"><dt className="text-slate-400">Confidence</dt><dd className="text-slate-200">{trustStatusLabel}</dd></div>
-            <div className="flex items-center justify-between gap-3"><dt className="text-slate-400">Updated</dt><dd className="text-slate-200">{fetchedAtLabel}</dd></div>
-            <div className="flex items-center justify-between gap-3"><dt className="text-slate-400">Next refresh</dt><dd className="text-slate-200">{resolvedNextRefreshLabel}</dd></div>
-            <div className="flex items-center justify-between gap-3">
-              <dt className="text-slate-400">Source</dt>
-              <dd className="text-right text-slate-200">
-                <span>{sourceLabel}</span>
-                {sourceHref ? (
-                  <a href={sourceHref} target="_blank" rel="noreferrer" className="ml-2 text-sky-200 underline decoration-slate-500/80 underline-offset-2 hover:text-slate-100">View source</a>
-                ) : null}
-              </dd>
-            </div>
-          </dl>
+          provenance ? (
+            <DataProvenanceStrip provenance={provenance} variant="compact" />
+          ) : (
+            <dl className="grid gap-2 text-xs text-slate-300">
+              <div className="flex items-center justify-between gap-3"><dt className="text-slate-400">Posture</dt><dd className="font-semibold text-slate-100">{statusLabel}</dd></div>
+              <div className="flex items-center justify-between gap-3"><dt className="text-slate-400">Confidence</dt><dd className="text-slate-200">{trustStatusLabel}</dd></div>
+              <div className="flex items-center justify-between gap-3"><dt className="text-slate-400">Updated</dt><dd className="text-slate-200">{fetchedAtLabel}</dd></div>
+              <div className="flex items-center justify-between gap-3"><dt className="text-slate-400">Next refresh</dt><dd className="text-slate-200">{resolvedNextRefreshLabel}</dd></div>
+              <div className="flex items-center justify-between gap-3">
+                <dt className="text-slate-400">Source</dt>
+                <dd className="text-right text-slate-200">
+                  <span>{sourceLabel}</span>
+                  {sourceHref ? (
+                    <a href={sourceHref} target="_blank" rel="noreferrer" className="ml-2 text-sky-200 underline decoration-slate-500/80 underline-offset-2 hover:text-slate-100">View source</a>
+                  ) : null}
+                </dd>
+              </div>
+            </dl>
+          )
         }
       />
       <p className="mt-3 text-xs text-slate-300">Use this for near-term planning decisions, not long-range forecasting.</p>
@@ -300,6 +308,7 @@ export const ReportShell = ({
   nextStep,
   nextRefreshLabel,
   inlineTrustPlacement = "before-content",
+  provenance,
 }: ReportShellProps) => {
   const resolvedNextRefreshLabel = nextRefreshLabel ?? (trustStatusTone === "historical" ? "Fixed historical snapshot" : "15m cadence");
   const contentSections = Children.toArray(children);
@@ -348,16 +357,16 @@ export const ReportShell = ({
           {historicalBanner}
 
           <div className={`mt-5 grid min-w-0 gap-5 ${hasSidebar ? "lg:grid-cols-[minmax(0,1fr),260px] lg:items-start" : ""}`}>
-            {hasSidebar ? <aside className="order-2 space-y-4 lg:order-none lg:col-start-2 lg:row-start-1 lg:sticky lg:top-28 lg:self-start"><HeroTrustProvenanceBlock trustStatusTone={trustStatusTone} trustStatusLabel={trustStatusLabel} trustStatusDetail={trustStatusDetail} trustStatusAction={trustStatusAction} statusLabel={statusLabel} fetchedAtLabel={fetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} /></aside> : null}
+            {hasSidebar ? <aside className="order-2 space-y-4 lg:order-none lg:col-start-2 lg:row-start-1 lg:sticky lg:top-28 lg:self-start"><HeroTrustProvenanceBlock trustStatusTone={trustStatusTone} trustStatusLabel={trustStatusLabel} trustStatusDetail={trustStatusDetail} trustStatusAction={trustStatusAction} statusLabel={statusLabel} fetchedAtLabel={fetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} provenance={provenance} /></aside> : null}
 
             <div className="order-1 min-w-0 space-y-8 lg:order-none lg:col-start-1 lg:row-start-1 lg:space-y-10">
               {!hideHeroChrome ? <CommandCenterNavBlock heroVariant={heroVariant} pageTitle={pageTitle} pageSummary={pageSummary} summaryLink={summaryLink} recordDateLabel={recordDateLabel} roleSwitcher={roleSwitcher} primaryCta={primaryCta} secondaryCta={secondaryCta} exportCta={exportCta} nextStep={nextStep} statusLabel={statusLabel} trustStatusLabel={trustStatusLabel} fetchedAtLabel={fetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={trustStatusAction} showOfflineBadge={showOfflineBadge} offlineBadgeLabel={offlineBadgeLabel} decisionBanner={decisionBanner} missionSupportText={trustStatusDetail} decisionDiffs={decisionDiffs} missionSequenceTitle={missionSequenceTitle} missionSequenceItems={missionSequenceItems} /> : null}
 
               <SidebarSequenceBlock stageRail={stageRail} />
 
-              {renderTrustBeforeContent ? <section className="space-y-4"><div className="grid gap-4 lg:grid-cols-2"><HeroTrustProvenanceBlock trustStatusTone={trustStatusTone} trustStatusLabel={trustStatusLabel} trustStatusDetail={trustStatusDetail} trustStatusAction={trustStatusAction} statusLabel={statusLabel} fetchedAtLabel={fetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} /></div></section> : null}
+              {renderTrustBeforeContent ? <section className="space-y-4"><div className="grid gap-4 lg:grid-cols-2"><HeroTrustProvenanceBlock trustStatusTone={trustStatusTone} trustStatusLabel={trustStatusLabel} trustStatusDetail={trustStatusDetail} trustStatusAction={trustStatusAction} statusLabel={statusLabel} fetchedAtLabel={fetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} provenance={provenance} /></div></section> : null}
 
-              <div className="space-y-10">{contentSections.map((section, index) => { const sectionKey = isValidElement(section) && section.key != null ? section.key : `section-${index}`; return <div key={sectionKey} className={index === 0 ? "" : "border-t border-slate-800/70 pt-10"}>{section}{renderTrustAfterFirstSection && index === 0 ? <section className="mt-4 space-y-4"><div className="grid gap-4 lg:grid-cols-2"><HeroTrustProvenanceBlock trustStatusTone={trustStatusTone} trustStatusLabel={trustStatusLabel} trustStatusDetail={trustStatusDetail} trustStatusAction={trustStatusAction} statusLabel={statusLabel} fetchedAtLabel={fetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} /></div></section> : null}</div>; })}</div>
+              <div className="space-y-10">{contentSections.map((section, index) => { const sectionKey = isValidElement(section) && section.key != null ? section.key : `section-${index}`; return <div key={sectionKey} className={index === 0 ? "" : "border-t border-slate-800/70 pt-10"}>{section}{renderTrustAfterFirstSection && index === 0 ? <section className="mt-4 space-y-4"><div className="grid gap-4 lg:grid-cols-2"><HeroTrustProvenanceBlock trustStatusTone={trustStatusTone} trustStatusLabel={trustStatusLabel} trustStatusDetail={trustStatusDetail} trustStatusAction={trustStatusAction} statusLabel={statusLabel} fetchedAtLabel={fetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} provenance={provenance} /></div></section> : null}</div>; })}</div>
 
               <footer className="mt-12 border-t border-slate-800/70 pt-6 text-xs font-semibold tracking-[0.18em] text-slate-300">
                 <p>{INFORMATIONAL_NOTICE}</p>
