@@ -147,12 +147,16 @@ The homepage supports optional interpretation layers without changing the canoni
 - Query param: `?view=default|sector|company|financial|forecast`
 - Default behavior: missing/invalid `view` resolves to `default`.
 - Layer scope: interpretation layers change only explanatory bullets and do **not** change regime classification, confidence labels, or bounded-rule thresholds.
-- Expected layer semantics:
-  - `default`: decision delta + guardrail + reversal trigger
-  - `sector`: sector sensitivity translation using `?sector=` overlay
-  - `company`: top-priority bounded operator rules (max 3 bullets, input-order precedence)
-  - `financial`: tightness/risk appetite + top constraints
-  - `forecast`: highest-likelihood next posture + crossing-risk + momentum
+- Expected layer semantics (screenshot-safe bullets; bounded action framing):
+  - `default`: `Action` (decision delta) + `Trigger` (guardrail) + `Reverse` (reversal condition)
+  - `sector`: one sector-adjusted action line plus explicit tighten/reverse conditions; still translation-only
+  - `company`: top-priority bounded operator rules (max 3 bullets, input-order precedence), each compressed as `Action` + `Trigger` + `Reverse`
+  - `financial`: bounded runway translation as `Action` (risk now), `Trigger` (raise window), `Reverse` (burn delta range)
+  - `forecast`: `Action` (most likely scenario), `Trigger` (distance + crossing risk), `Reverse` (momentum condition)
+- Trust/fallback semantics:
+  - Unknown/missing `view` falls back to `default` without altering canonical weekly-card semantics.
+  - Missing sector/company enrichment falls back to available baseline bullets (or available top rules) without blocking render.
+  - Interpretation panels never mutate posture classification, confidence labels, or top-fold instruction semantics.
 
 ### Current implementation contract (`/`, `WeeklyDecisionCard`)
 Canonical top-fold order on homepage must remain:

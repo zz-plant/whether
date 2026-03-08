@@ -32,7 +32,8 @@ const buildInterpretationLayerBlock = (options?: ExportLayerOptions) => {
 
   return [
     "",
-    `Interpretation layer (${options.interpretationLayer.label}):`,
+    `Interpretation context: ${options.interpretationLayer.label} (${options.interpretationLayer.view})`,
+    "Interpretation trust: translation layer only; canonical posture/confidence/thresholds unchanged.",
     ...options.interpretationLayer.bullets.map((bullet) => `• ${bullet}`),
   ];
 };
