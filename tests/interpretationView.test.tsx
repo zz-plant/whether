@@ -74,7 +74,7 @@ describe("interpretation view panel", () => {
   });
 
 
-  it("uses company-rule input order as precedence and caps output to top three rules", () => {
+  it("renders top-priority adjusted company rules with explicit stop/reversal text", () => {
     const layeredRules: BoundedDecisionRule[] = [
       {
         area: "capital-raising",
@@ -122,6 +122,8 @@ describe("interpretation view panel", () => {
     assert.match(company.bullets[0], /Rule 1 first\./);
     assert.match(company.bullets[1], /Rule 2 second\./);
     assert.match(company.bullets[2], /Rule 3 third\./);
+    assert.ok(company.bullets.every((bullet) => bullet.includes("Stop:")));
+    assert.ok(company.bullets.every((bullet) => bullet.includes("Reversal:")));
     assert.ok(company.bullets.every((bullet) => !bullet.includes("Rule 4 hidden.")));
   });
 
