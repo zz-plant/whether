@@ -70,6 +70,8 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /Decision matrix this week/);
     assert.match(html, /Movement/);
     assert.match(html, /Velocity:/);
+    assert.match(html, /id="primary-artifact-actions"/);
+    assert.match(html, /Jump to copy actions/);
   });
 
   it("shows fallback warning copy when snapshot mode is active", () => {
