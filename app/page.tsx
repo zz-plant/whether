@@ -308,7 +308,7 @@ export default async function HomePage({
       statusLabel={statusLabel}
       recordDateLabel={recordDateLabel}
       fetchedAtLabel={fetchedAtLabel}
-      treasurySource={treasury.source}
+      dataProvenance={treasuryProvenance}
       trustStatusLabel={trustStatusLabel}
       trustStatusDetail={trustStatusDetail}
       trustStatusAction={trustStatusAction}
