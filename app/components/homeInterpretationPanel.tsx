@@ -80,7 +80,7 @@ export const HomeInterpretationPanel = ({
     ) : null}
     <ul className="grid gap-2" aria-label={`${layer.label} details`}>
       {layer.bullets.map((bullet) => (
-        <li key={bullet} className="weather-surface px-4 py-3 text-sm text-slate-200">
+        <li key={bullet} className="weather-surface px-4 py-3 text-xs text-slate-200">
           <p className="leading-snug">• {bullet}</p>
         </li>
       ))}

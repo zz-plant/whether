@@ -157,6 +157,8 @@ The homepage supports optional interpretation layers without changing the canoni
   - Unknown/missing `view` falls back to `default` without altering canonical weekly-card semantics.
   - Missing sector/company enrichment falls back to available baseline bullets (or available top rules) without blocking render.
   - Interpretation panels never mutate posture classification, confidence labels, or top-fold instruction semantics.
+  - Bullets are compact, screenshot-safe directives (short bounded clauses; no long-form methodology text).
+  - Export/citation outputs include interpretation context only when the selected view is non-default, always with translation-only trust language.
 
 ### Current implementation contract (`/`, `WeeklyDecisionCard`)
 Canonical top-fold order on homepage must remain:

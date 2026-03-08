@@ -34,7 +34,7 @@ export type InterpretationLayer = {
   };
 };
 
-const compactClause = (value: string, max = 118) => {
+const compactClause = (value: string, max = 96) => {
   const normalized = value.replace(/\s+/g, " ").trim();
   if (normalized.length <= max) {
     return normalized;
@@ -45,6 +45,21 @@ const compactClause = (value: string, max = 118) => {
 
 const boundedLine = (label: "Action" | "Trigger" | "Reverse", value: string) =>
   `${label}: ${compactClause(value)}`;
+
+const boundedTriplet = ({
+  action,
+  trigger,
+  reverse,
+}: {
+  action: string;
+  trigger: string;
+  reverse: string;
+}) =>
+  [
+    boundedLine("Action", action),
+    boundedLine("Trigger", trigger),
+    boundedLine("Reverse", reverse),
+  ].join(" | ");
 
 type FinancialViewInput = {
   runway: number;
@@ -126,8 +141,8 @@ export const buildInterpretationLayer = ({
         "Apply the macro call through sector sensitivity before changing pace.",
       bullets: [
         boundedLine("Action", sectorShift),
-        boundedLine("Trigger", "Tighten one notch if sector demand weakens faster than the base posture implies."),
-        boundedLine("Reverse", "Return to the base posture once sector drag normalizes for two consecutive updates."),
+        boundedLine("Trigger", "Tighten one notch if sector demand weakens faster than the base posture."),
+        boundedLine("Reverse", "Return to base once sector drag normalizes for two updates."),
       ],
     };
   }
@@ -146,9 +161,12 @@ export const buildInterpretationLayer = ({
         "Use bounded operator rules so teams know what to tighten now, what to stop, and when to reverse.",
       bullets: adjustedRules
         .slice(0, 3)
-        .map(
-          (rule) =>
-            `${boundedLine("Action", rule.recommendation)} ${boundedLine("Trigger", rule.pauseTrigger)} ${boundedLine("Reverse", rule.resumeTrigger)}`,
+        .map((rule) =>
+          boundedTriplet({
+            action: rule.recommendation,
+            trigger: rule.pauseTrigger,
+            reverse: rule.resumeTrigger,
+          }),
         ),
     };
   }
@@ -210,7 +228,7 @@ export const buildInterpretationLayer = ({
       summary:
         "Boundary pressure indicates how likely this call is to flip if signal momentum persists.",
       bullets: [
-        boundedLine("Action", `Operate for ${topRegime[0]} scenario (${topRegime[1]}%) while current posture holds.`),
+        boundedLine("Action", `Operate for ${topRegime[0]} (${topRegime[1]}%) while current posture holds.`),
         boundedLine(
           "Trigger",
           `${forecast.boundaryPressure.distance} points to boundary; crossing risk ${crossingRiskLabel[forecast.boundaryPressure.crossingRisk]}.`,

@@ -111,4 +111,64 @@ describe("weekly card and interpretation panel composition", () => {
     assert.match(html, /Trigger:/);
     assert.match(html, /Reverse:/);
   });
+  it("renders weekly card before interpretation panel and preserves top-fold hierarchy", () => {
+    const layer = buildInterpretationLayer({
+      view: "forecast",
+      homeBriefModel,
+      assessment,
+      forecast,
+      decisionRules,
+    });
+
+    const html = renderToStaticMarkup(
+      <>
+        <WeeklyDecisionCard
+          statusLabel="DEFENSIVE"
+          postureDelta="Worse than last week"
+          confidenceLabel="MED"
+          confidencePercent={68}
+          trendLabel="Stable"
+          transitionWatch="ON"
+          netConstraintSummary="Pressure remains elevated."
+          guardrail="Hold irreversible hiring unless direct revenue impact is clear."
+          reversalTrigger="If risk appetite rises above 55, reopen selective hiring."
+          recordDateLabel="Mar 5, 2026"
+          fetchedAtLabel="Mar 6, 2026 09:12 UTC"
+          reportDynamics={reportDynamics}
+          decisionShiftSummary="Decision delta: tighten roadmap optionality while protecting core delivery."
+          decisionRules={decisionRules}
+          revisitDecisions={true}
+          memoryRail={[{ label: "Now", posture: "Defensive" }]}
+          historicalTimeline={[{ label: "2026", posture: "Defensive" }]}
+          macroOverlay={[{ label: "VC funding", detail: "-4.5 · ↑ improving" }]}
+          whyThisCall={[{ label: "Momentum", detail: "Capital tightness tightened this week." }]}
+          primaryDrivers={[{ label: "Capital tightness", detail: "↑ tightened this week" }]}
+          startupClimateIndex={{ score: 63, status: "Improving", breakdown: [{ label: "Capital availability", score: 71 }] }}
+          regimeDistance={{
+            dimensionLabel: "Tightness",
+            currentValue: 64,
+            thresholdValue: 70,
+            pointsToFlip: 6,
+            dimensionKey: "tightness",
+            thresholdDirection: "riseAbove",
+          }}
+          citation="Whether weekly brief citation"
+        />
+        <HomeInterpretationPanel layer={layer} searchParams={{ view: "forecast" }} />
+      </>,
+    );
+
+    const postureIndex = html.indexOf("Posture");
+    const movementIndex = html.indexOf("Movement");
+    const confidenceIndex = html.indexOf("Confidence");
+    const instructionIndex = html.indexOf("Instruction");
+    const interpretationIndex = html.indexOf("Interpretation layer");
+
+    assert.ok(postureIndex > -1);
+    assert.ok(movementIndex > postureIndex);
+    assert.ok(confidenceIndex > movementIndex);
+    assert.ok(instructionIndex > confidenceIndex);
+    assert.ok(interpretationIndex > instructionIndex);
+  });
+
 });

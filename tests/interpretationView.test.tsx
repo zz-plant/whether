@@ -160,7 +160,27 @@ describe("interpretation view panel", () => {
     assert.match(financialHtml, /Trigger: Raise window/);
     assert.match(financialHtml, /Reverse: Burn delta/);
     assert.match(financialHtml, /Financial action summary/);
+    assert.match(sectorHtml, /Trigger: Tighten one notch if sector demand weakens faster than the base posture\./);
+    assert.match(sectorHtml, /Reverse: Return to base once sector drag normalizes for two updates\./);
     assert.match(sectorHtml, /Default/);
     assert.match(financialHtml, /Default/);
   });
+  it("keeps interpretation bullets compact for screenshot-safe handoff", () => {
+    const views = ["default", "sector", "company", "financial", "forecast"] as const;
+
+    for (const view of views) {
+      const layer = buildInterpretationLayer({
+        view,
+        homeBriefModel,
+        assessment,
+        forecast,
+        decisionRules,
+      });
+
+      assert.ok(layer.bullets.length >= 1 && layer.bullets.length <= 3);
+      assert.ok(layer.bullets.every((bullet) => bullet.includes("Action:") || bullet.includes("Trigger:") || bullet.includes("Reverse:")));
+      assert.ok(layer.bullets.every((bullet) => bullet.length <= 340));
+    }
+  });
+
 });
