@@ -70,6 +70,8 @@ describe("/api/billing/checkout", () => {
           plan: "pro",
           returnPath: "/pricing",
           source: "export_brief",
+          planCandidate: "team",
+          seatBand: "6-20",
         }),
       }),
     );
@@ -83,5 +85,8 @@ describe("/api/billing/checkout", () => {
     assert.equal(stripeCalls.length, 1);
     const [, stripeInit] = stripeCalls[0].arguments as [string, RequestInit];
     assert.equal((stripeInit.headers as Record<string, string>)["Idempotency-Key"], "idem-123");
+    const stripeParams = new URLSearchParams(String(stripeInit.body));
+    assert.equal(stripeParams.get("metadata[planCandidate]"), "team");
+    assert.equal(stripeParams.get("metadata[seatBand]"), "6-20");
   });
 });

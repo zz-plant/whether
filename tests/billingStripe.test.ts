@@ -42,7 +42,9 @@ describe("stripe billing helpers", () => {
     const checkout = await createStripeCheckoutSession({
       plan: "pro",
       path: "/pricing",
-      source: "ops_export",
+      source: "export_brief",
+      planCandidate: "team",
+      seatBand: "6-20",
       idempotencyKey: "idem-456",
     });
 
@@ -51,6 +53,10 @@ describe("stripe billing helpers", () => {
 
     const [, init] = fetchMock.mock.calls[0].arguments as [string, RequestInit];
     assert.equal((init.headers as Record<string, string>)["Idempotency-Key"], "idem-456");
+    const params = new URLSearchParams(String(init.body));
+    assert.equal(params.get("metadata[source]"), "export_brief");
+    assert.equal(params.get("metadata[planCandidate]"), "team");
+    assert.equal(params.get("metadata[seatBand]"), "6-20");
   });
 
   it("throws a typed error when billing config is missing", async () => {

@@ -48,6 +48,7 @@ Whether exposes read-first JSON endpoints for weekly posture transmission, caden
 | Endpoint | Method(s) | Purpose |
 | --- | --- | --- |
 | `/api/billing/checkout` | POST | Creates Stripe Checkout sessions for premium plans (`pro`, `team`) before paywall reveal; requires an attributed premium `source` and supports `Idempotency-Key`. |
+| `/api/billing/webhook` | POST | Stripe webhook receiver for `checkout.session.completed`; verifies `stripe-signature` via `STRIPE_WEBHOOK_SECRET` and emits `premium_checkout_complete` telemetry when attribution metadata is valid. |
 
 ### E) Discover capabilities for tools/agents
 

@@ -63,7 +63,10 @@ export function PremiumFunnelTracker() {
       }
 
       const eventTypeValue = trackedElement.getAttribute(PREMIUM_EVENT_TYPE_ATTRIBUTE);
-      const eventType: PremiumFunnelEventType = eventTypeValue === "premium_gate_view" || eventTypeValue === "premium_checkout_start"
+      const eventType: PremiumFunnelEventType =
+        eventTypeValue === "premium_gate_view" ||
+          eventTypeValue === "premium_checkout_start" ||
+          eventTypeValue === "premium_checkout_complete"
         ? eventTypeValue
         : "premium_intent";
       const payload = buildPayload(trackedElement, eventType);

@@ -1,4 +1,12 @@
-export type PremiumFunnelEventType = "premium_intent" | "premium_gate_view" | "premium_checkout_start";
+export type PremiumFunnelEventType =
+  | "premium_intent"
+  | "premium_gate_view"
+  | "premium_checkout_start"
+  | "premium_checkout_complete";
+
+export type PremiumPlanCandidate = "pro" | "team";
+
+export type PremiumSeatBand = "1" | "2-5" | "6-20" | "21+";
 
 export const PREMIUM_INTENT_SOURCES = [
   "export_brief",
@@ -16,6 +24,8 @@ export type PremiumFunnelEvent = {
   path: string;
   ctaId?: string;
   detail?: string;
+  planCandidate?: PremiumPlanCandidate;
+  seatBand?: PremiumSeatBand;
   occurredAt: string;
 };
 
@@ -25,7 +35,16 @@ export const isPremiumIntentSource = (value: string): value is PremiumIntentSour
   PREMIUM_INTENT_SOURCES.includes(value as PremiumIntentSource);
 
 export const isPremiumFunnelEventType = (value: string): value is PremiumFunnelEventType =>
-  value === "premium_intent" || value === "premium_gate_view" || value === "premium_checkout_start";
+  value === "premium_intent" ||
+  value === "premium_gate_view" ||
+  value === "premium_checkout_start" ||
+  value === "premium_checkout_complete";
+
+export const isPremiumPlanCandidate = (value: string): value is PremiumPlanCandidate =>
+  value === "pro" || value === "team";
+
+export const isPremiumSeatBand = (value: string): value is PremiumSeatBand =>
+  value === "1" || value === "2-5" || value === "6-20" || value === "21+";
 
 export const isValidPremiumFunnelEvent = (input: unknown): input is PremiumFunnelEvent => {
   if (!input || typeof input !== "object") {
@@ -33,6 +52,17 @@ export const isValidPremiumFunnelEvent = (input: unknown): input is PremiumFunne
   }
 
   const payload = input as Record<string, unknown>;
+
+  const planCandidate = payload.planCandidate;
+  if (planCandidate !== undefined && !isPremiumPlanCandidate(String(planCandidate))) {
+    return false;
+  }
+
+  const seatBand = payload.seatBand;
+  if (seatBand !== undefined && !isPremiumSeatBand(String(seatBand))) {
+    return false;
+  }
+
   return (
     typeof payload.path === "string" &&
     payload.path.length > 0 &&
