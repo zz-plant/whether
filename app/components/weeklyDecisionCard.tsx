@@ -93,6 +93,9 @@ const resolveVelocityLabel = (rows: Array<{ delta: number }>): "Low" | "Medium" 
   return "Low";
 };
 
+const meterTrackBase = "relative h-2 rounded-full";
+const meterFillBase = "h-2 rounded-full";
+
 type DecisionCallHeaderProps = {
   statusLabel: string;
   netConstraintSummary: string;
@@ -138,6 +141,7 @@ export function DecisionCallHeader({
       : regimeDistance.currentValue <= regimeDistance.thresholdValue;
   const thresholdDistance = Math.abs(regimeDistance.currentValue - regimeDistance.thresholdValue);
   const thresholdRatio = Math.max(8, Math.min(100, Math.round((thresholdDistance / 20) * 100)));
+  const confidenceMeterPercent = Math.max(8, Math.min(100, confidencePercent));
 
   return (
     <header className="space-y-5 border-b border-slate-700/80 pb-6" data-testid="weekly-top-fold">
@@ -163,8 +167,10 @@ export function DecisionCallHeader({
           <div className={tierOneInset}>
             <p className={`text-xs ${neutralLabel}`}>Confidence</p>
             <p className="mt-1 text-lg font-semibold text-slate-100">{confidenceLabel}</p>
-            <div className="mt-2 h-2 rounded-full bg-slate-800">
-              <div className="h-2 rounded-full bg-emerald-300/80" style={{ width: `${Math.max(8, Math.min(100, confidencePercent))}%` }} />
+            <p className="mt-2 text-[11px] uppercase tracking-[0.1em] text-slate-400">quality</p>
+            <div className={`mt-1 ${meterTrackBase} bg-slate-800/80`}>
+              <div className={`${meterFillBase} bg-gradient-to-r from-slate-300/75 to-emerald-300/85`} style={{ width: `${confidenceMeterPercent}%` }} />
+              <div className="absolute top-1/2 h-3 w-3 -translate-y-1/2 rounded-full border border-emerald-100/80 bg-slate-950" style={{ left: `calc(${confidenceMeterPercent}% - 6px)` }} />
             </div>
           </div>
           <div className={tierOneInset}>
@@ -194,8 +200,14 @@ export function DecisionCallHeader({
         <article className={tierOneInset}>
           <p className={`text-xs ${neutralLabel}`}>Flip trigger</p>
           <p className="mt-1 text-xs text-slate-300">Current: {regimeDistance.currentValue.toFixed(1)} · Trigger: {regimeDistance.thresholdValue.toFixed(1)}</p>
-          <div className="mt-2 h-3 rounded-full bg-slate-800">
-            <div className={`h-3 rounded-full ${thresholdBreached ? "bg-rose-300/85" : "bg-amber-300/80"}`} style={{ width: `${thresholdRatio}%` }} />
+          <p className="mt-2 inline-flex rounded-full border border-slate-600/70 bg-slate-900/80 px-2 py-0.5 text-[11px] uppercase tracking-[0.1em] text-slate-300">
+            distance to trigger
+          </p>
+          <div className={`mt-1 ${meterTrackBase} bg-slate-800/90`}>
+            <div
+              className={`${meterFillBase} ${thresholdBreached ? "bg-rose-300/85" : "bg-amber-300/80"}`}
+              style={{ width: `${thresholdRatio}%` }}
+            />
           </div>
           <p className={`mt-2 text-xs ${thresholdBreached ? "text-rose-100" : "text-amber-100"}`}>
             {thresholdBreached ? "Threshold breached." : `${Math.abs(regimeDistance.pointsToFlip).toFixed(1)} points away from trigger.`}
@@ -500,18 +512,19 @@ export function WeeklyDecisionCard({
           <article className={tierOneInset}>
             <p className={`text-xs ${neutralLabel}`}>Macro drift this week</p>
             <p className="mt-1 text-xs text-slate-300">Velocity: {movementVelocity}</p>
+            <p className="mt-2 text-[11px] uppercase tracking-[0.1em] text-slate-400">weekly movement</p>
             <ul className="mt-2 space-y-2 text-xs text-slate-200">
               {macroMovementRows.map((signal) => (
                 <li key={signal.key} className="space-y-1">
                   <div className="flex items-center justify-between gap-2">
                     <span>{signal.label}</span>
-                    <span className="font-semibold text-slate-100">
+                    <span className={`font-semibold ${signal.delta > 0 ? "text-amber-100" : signal.delta < 0 ? "text-emerald-100" : "text-slate-100"}`}>
                       {signal.arrow} {signal.delta > 0 ? `+${signal.delta.toFixed(1)}` : signal.delta.toFixed(1)}
                     </span>
                   </div>
-                  <div className="h-2 rounded-full bg-slate-800">
+                  <div className={`${meterTrackBase} border border-slate-700/70 bg-slate-900/80`}>
                     <div
-                      className={`h-2 rounded-full ${movementMeterToneByDirection[resolveSignalDirection(signal.delta)]}`}
+                      className={`${meterFillBase} ${movementMeterToneByDirection[resolveSignalDirection(signal.delta)]}`}
                       style={{ width: `${signal.meter}%` }}
                     />
                   </div>
