@@ -189,6 +189,10 @@ export function DecisionCallHeader({
           </p>
         </article>
 
+        {needsTrustWarning ? (
+          <p className="max-w-[56ch] rounded-md border border-amber-500/50 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">{trustWarningCopy}</p>
+        ) : null}
+
         <div className="flex flex-wrap gap-2.5">
           {actions}
         </div>
@@ -210,9 +214,6 @@ export function DecisionCallHeader({
             </article>
             <p className="max-w-[56ch] text-xs text-slate-300">{netConstraintSummary}</p>
             <p className="max-w-[56ch] text-xs text-slate-300">Trust check: {trustCueLine} · Freshness {freshnessLabel}</p>
-            {needsTrustWarning ? (
-              <p className="max-w-[56ch] rounded-md border border-amber-500/50 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">{trustWarningCopy}</p>
-            ) : null}
           </div>
         </details>
       </article>

@@ -45,6 +45,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
     assert.match(html, /Primary guardrail/);
     assert.match(html, /Flip trigger/);
     assert.match(html, /Copy Slack brief/);
+    assert.match(html, /near-term pacing only until confidence returns to HIGH with fresh data/);
   });
 
   it("marks risk-appetite defensive trigger as breached only when value is at or below threshold", () => {
