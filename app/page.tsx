@@ -23,7 +23,6 @@ import { reportPageLinks } from "../lib/report/reportNavigation";
 import { buildTrustStatus } from "../lib/report/trustStatus";
 import { WeeklyDecisionCard } from "./components/weeklyDecisionCard";
 import { RevealOnView } from "./components/revealOnView";
-import { DataProvenanceStrip } from "./components/dataProvenanceStrip";
 import { buildBoardBrief, buildCallCitation, buildSlackBrief } from "../lib/export/briefBuilders";
 import {
   buildInterpretationLayer,
@@ -313,6 +312,7 @@ export default async function HomePage({
       trustStatusDetail={trustStatusDetail}
       trustStatusAction={trustStatusAction}
       trustStatusTone={trustStatusTone}
+      provenance={treasuryProvenance}
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Weekly Operating Posture Brief"
       currentPath="/"
@@ -384,7 +384,6 @@ export default async function HomePage({
         searchParams={resolvedSearchParams}
       />
 
-      <DataProvenanceStrip provenance={treasuryProvenance} variant="compact" />
 
       <section className="weather-panel space-y-4 px-5 py-5" aria-label="Decision concept links">
         <div className="space-y-1">
