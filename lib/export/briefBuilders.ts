@@ -3,6 +3,7 @@ import type { RegimeAssessment } from "../regimeEngine";
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../types";
 import { buildComplianceStamp } from "../exportNotices";
 import { formatRegimeLabel } from "../regimeFormat";
+import type { InterpretationLayer } from "../report/interpretationLayer";
 import {
   buildRunwayPlan,
   formatRunwayPlanCompactBlock,
@@ -20,6 +21,21 @@ const buildExportStamp = (treasury: TreasuryData, confidence: string) =>
 const buildDecisionHighlights = (assessment: RegimeAssessment) =>
   assessment.constraints.slice(0, 3).map((constraint) => `• ${constraint}`);
 
+type ExportLayerOptions = {
+  interpretationLayer?: InterpretationLayer;
+};
+
+const buildInterpretationLayerBlock = (options?: ExportLayerOptions) => {
+  if (!options?.interpretationLayer || options.interpretationLayer.view === "default") {
+    return [];
+  }
+
+  return [
+    "",
+    `Interpretation layer (${options.interpretationLayer.label}):`,
+    ...options.interpretationLayer.bullets.map((bullet) => `• ${bullet}`),
+  ];
+};
 
 const mapPolicyPostureToPlannerPosture = (posture: RegimeAssessment["policyAssessment"]["posture"]): PlannerPosture => {
   if (posture === "RISK_ON") return "RISK_ON";
@@ -59,6 +75,7 @@ export const buildSlackBrief = (
   treasury: TreasuryData,
   sensors: SensorReading[],
   macros: MacroSeriesReading[],
+  options?: ExportLayerOptions,
 ) => {
   const baseRate = sensors.find((sensor) => sensor.id === "BASE_RATE");
   const curveSlope = sensors.find((sensor) => sensor.id === "CURVE_SLOPE");
@@ -86,6 +103,7 @@ export const buildSlackBrief = (
     ...assessment.constraints.map((item) => `• ${item}`),
     "",
     financialImplications,
+    ...buildInterpretationLayerBlock(options),
     "",
     "Citations:",
     ...citations,
@@ -99,8 +117,9 @@ export const buildBoardBrief = (
   treasury: TreasuryData,
   sensors: SensorReading[],
   macros: MacroSeriesReading[],
+  options?: ExportLayerOptions,
 ) => {
-  const briefing = buildSlackBrief(assessment, treasury, sensors, macros);
+  const briefing = buildSlackBrief(assessment, treasury, sensors, macros, options);
   const slideBullets = buildSlideBullets(assessment, treasury, macros);
   return [briefing, "", "---", "", slideBullets].join("\n");
 };
@@ -129,10 +148,12 @@ export const buildConstraintHeadlines = (
 export const buildCallCitation = (
   assessment: RegimeAssessment,
   treasury: TreasuryData,
+  options?: ExportLayerOptions,
 ) => [
   `Whether call — ${treasury.record_date}`,
   `Posture: ${formatRegimeLabel(assessment.regime)} (${assessment.regime})`,
   `Confidence: Score-based posture confidence`,
   `Signal refresh cadence: 15m`,
   `Source: ${treasury.source}`,
+  ...buildInterpretationLayerBlock(options),
 ].join("\n");

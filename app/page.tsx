@@ -25,12 +25,18 @@ import { WeeklyDecisionCard } from "./components/weeklyDecisionCard";
 import { RevealOnView } from "./components/revealOnView";
 import { DataProvenanceStrip } from "./components/dataProvenanceStrip";
 import { buildBoardBrief, buildCallCitation, buildSlackBrief } from "../lib/export/briefBuilders";
+import {
+  buildInterpretationLayer,
+  isInterpretationView,
+  type InterpretationView,
+} from "../lib/report/interpretationLayer";
 import { CopyLeadershipArtifactsButtons } from "./components/copyLeadershipArtifactsButtons";
 import { createBreadcrumbTrail } from "../lib/navigation/breadcrumbs";
 import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
 import type { SectorKey } from "../lib/report/sectorSensitivity";
 import { getFeaturedConceptArticles } from "../lib/productCanon";
 import { LiveDataFallbackAlert } from "./components/liveDataFallbackAlert";
+import { HomeInterpretationPanel } from "./components/homeInterpretationPanel";
 
 const WeeklyActionSummaryPanel = dynamic(
   () =>
@@ -222,6 +228,9 @@ export default async function HomePage({
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const homepageOverlaySector = resolveHomepageOverlaySector(resolvedSearchParams?.sector);
+  const interpretationView: InterpretationView = isInterpretationView(resolvedSearchParams?.view)
+    ? resolvedSearchParams.view
+    : "default";
   const sectionLinks = homeSectionSequence.map((section) => ({
     href: section.href,
     label: section.label,
@@ -284,9 +293,16 @@ export default async function HomePage({
     treasury,
     treasuryProvenance,
   }, { overlaySector: homepageOverlaySector });
-  const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries);
-  const boardSummary = buildBoardBrief(assessment, treasury, sensors, macroSeries);
-  const callCitation = buildCallCitation(assessment, treasury);
+  const interpretationLayer = buildInterpretationLayer({
+    view: interpretationView,
+    homeBriefModel,
+    assessment,
+    forecast: reportData.forecast,
+    decisionRules: homeBriefModel.decisionRules,
+  });
+  const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries, { interpretationLayer });
+  const boardSummary = buildBoardBrief(assessment, treasury, sensors, macroSeries, { interpretationLayer });
+  const callCitation = buildCallCitation(assessment, treasury, { interpretationLayer });
   const featuredConcepts = getFeaturedConceptArticles().slice(0, 3);
   return (
     <ReportShell
@@ -364,6 +380,11 @@ export default async function HomePage({
         actions={<CopyLeadershipArtifactsButtons slackBrief={slackBrief} boardSummary={boardSummary} citation={callCitation} />}
       />
 
+
+      <HomeInterpretationPanel
+        layer={interpretationLayer}
+        searchParams={resolvedSearchParams}
+      />
 
       <DataProvenanceStrip provenance={treasuryProvenance} variant="compact" />
 
