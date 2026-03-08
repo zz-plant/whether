@@ -1,4 +1,3 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import {
   dispatchPremiumFunnelEvent,
@@ -8,6 +7,41 @@ import {
 } from "../../../../lib/premiumFunnel";
 
 const STRIPE_SIGNATURE_TOLERANCE_SECONDS = 300;
+
+export const runtime = "edge";
+
+const encoder = new TextEncoder();
+
+const toHex = (bytes: Uint8Array) =>
+  Array.from(bytes)
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+
+const constantTimeEqual = (left: string, right: string) => {
+  if (left.length !== right.length) {
+    return false;
+  }
+
+  let mismatch = 0;
+  for (let index = 0; index < left.length; index += 1) {
+    mismatch |= left.charCodeAt(index) ^ right.charCodeAt(index);
+  }
+
+  return mismatch === 0;
+};
+
+const createStripeSignature = async ({ payload, timestamp, secret }: { payload: string; timestamp: number; secret: string }) => {
+  const signedPayload = `${timestamp}.${payload}`;
+  const key = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(signedPayload));
+  return toHex(new Uint8Array(signature));
+};
 
 const parseStripeSignature = (header: string | null) => {
   if (!header) {
@@ -38,7 +72,7 @@ const parseStripeSignature = (header: string | null) => {
   return { timestamp, signatures };
 };
 
-const isStripeSignatureValid = ({
+const isStripeSignatureValid = async ({
   payload,
   header,
   secret,
@@ -61,18 +95,13 @@ const isStripeSignatureValid = ({
     return false;
   }
 
-  const signedPayload = `${parsedSignature.timestamp}.${payload}`;
-  const expectedSignature = createHmac("sha256", secret).update(signedPayload).digest("hex");
-  const expectedBuffer = Buffer.from(expectedSignature, "hex");
-
-  return parsedSignature.signatures.some((signature) => {
-    const receivedBuffer = Buffer.from(signature, "hex");
-    if (expectedBuffer.length !== receivedBuffer.length) {
-      return false;
-    }
-
-    return timingSafeEqual(expectedBuffer, receivedBuffer);
+  const expectedSignature = await createStripeSignature({
+    payload,
+    timestamp: parsedSignature.timestamp,
+    secret,
   });
+
+  return parsedSignature.signatures.some((signature) => constantTimeEqual(expectedSignature, signature));
 };
 
 type StripeCheckoutCompletedEvent = {
@@ -113,7 +142,7 @@ export async function POST(request: Request) {
   const signatureHeader = request.headers.get("stripe-signature");
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-  if (!isStripeSignatureValid({ payload, header: signatureHeader, secret: webhookSecret })) {
+  if (!(await isStripeSignatureValid({ payload, header: signatureHeader, secret: webhookSecret }))) {
     return NextResponse.json({ ok: false, error: "invalid_signature" }, { status: 400 });
   }
 
