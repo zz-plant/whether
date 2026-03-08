@@ -61,6 +61,23 @@ export const HomeInterpretationPanel = ({
       ))}
     </nav>
 
+
+    {layer.financialAction ? (
+      <div className="grid gap-3 md:grid-cols-3" aria-label="Financial action summary">
+        <article className="weather-surface px-4 py-3 text-sm text-slate-200">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Runway risk</p>
+          <p className="mt-2">{layer.financialAction.runwayRisk}</p>
+        </article>
+        <article className="weather-surface px-4 py-3 text-sm text-slate-200">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Raise timing</p>
+          <p className="mt-2">{layer.financialAction.raiseTiming}</p>
+        </article>
+        <article className="weather-surface px-4 py-3 text-sm text-slate-200">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Burn adjustment</p>
+          <p className="mt-2">{layer.financialAction.burnAdjustment}</p>
+        </article>
+      </div>
+    ) : null}
     <ul className="grid gap-3 md:grid-cols-3" aria-label={`${layer.label} details`}>
       {layer.bullets.map((bullet) => (
         <li key={bullet} className="weather-surface px-4 py-3 text-sm text-slate-200">
