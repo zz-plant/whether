@@ -1,9 +1,9 @@
 import type { RegimeAssessment, RegimeKey } from "../regimeEngine";
 import { REGIME_SHORT_LABELS } from "../regimePresentation";
 
-export type SectorKey = "b2b-saas" | "consumer" | "infrastructure";
+export type SectorKey = "b2b-saas" | "consumer" | "infrastructure" | "fintech" | "healthcare" | "ai-platforms";
 
-const sectorKeys = ["b2b-saas", "consumer", "infrastructure"] as const;
+const sectorKeys = ["b2b-saas", "consumer", "infrastructure", "fintech", "healthcare", "ai-platforms"] as const;
 
 export const resolveSectorKey = (
   value: string | undefined,
@@ -23,7 +23,7 @@ export const SECTOR_TAXONOMY: Record<SectorKey, SectorSensitivityConfig> = {
     label: "B2B SaaS",
     tightnessMultiplier: 0.78,
     riskAppetiteMultiplier: 1.28,
-    biasOffset: 0.08,
+    biasOffset: 0.16,
     rationale: "Captures upside faster when demand confidence improves, while remaining less penalized by short-lived tightening spikes.",
   },
   consumer: {
@@ -37,14 +37,36 @@ export const SECTOR_TAXONOMY: Record<SectorKey, SectorSensitivityConfig> = {
     label: "Infrastructure",
     tightnessMultiplier: 1.28,
     riskAppetiteMultiplier: 0.72,
-    biasOffset: -0.1,
+    biasOffset: -0.18,
     rationale: "Feels financing stress earlier and rewards risk appetite later due to reliability and migration burdens.",
+  },
+  fintech: {
+    label: "Fintech",
+    tightnessMultiplier: 1.2,
+    riskAppetiteMultiplier: 1.16,
+    biasOffset: -0.04,
+    rationale: "Benefits from risk-on demand but remains directly exposed to cost-of-capital and compliance-cycle drag.",
+  },
+  healthcare: {
+    label: "Healthcare",
+    tightnessMultiplier: 1.12,
+    riskAppetiteMultiplier: 0.84,
+    biasOffset: -0.02,
+    rationale: "Procurement and reimbursement cycles smooth upside and downside, producing conservative posture translation.",
+  },
+  "ai-platforms": {
+    label: "AI Platforms",
+    tightnessMultiplier: 0.74,
+    riskAppetiteMultiplier: 1.34,
+    biasOffset: 0.1,
+    rationale: "Captures risk-appetite expansion quickly while maintaining resilience to moderate tightening due to demand pull.",
   },
 };
 
 export type SectorAdjustedPosture = {
   basePostureLabel: string;
   adjustedPostureLabel: string;
+  postureVariant: "minus" | "neutral" | "plus";
   adjustmentStrength: "none" | "light" | "moderate" | "strong";
   adjustmentDelta: number;
   boundaryGap: number;
@@ -78,15 +100,24 @@ const resolveStrength = (absDelta: number): SectorAdjustedPosture["adjustmentStr
   return "strong";
 };
 
-const resolvePostureSuffix = (delta: number) => {
-  if (delta >= 0.05) return "+";
-  if (delta <= -0.05) return "-";
-  return "";
+const resolvePostureVariant = (delta: number): SectorAdjustedPosture["postureVariant"] => {
+  if (delta >= 0.05) return "plus";
+  if (delta <= -0.05) return "minus";
+  return "neutral";
+};
+
+const formatAdjustedPostureLabel = (
+  basePostureLabel: string,
+  variant: SectorAdjustedPosture["postureVariant"],
+) => {
+  if (variant === "plus") return `${basePostureLabel}+`;
+  if (variant === "minus") return `${basePostureLabel}-`;
+  return `${basePostureLabel} (neutral)`;
 };
 
 const resolveActionBias = (delta: number): SectorAdjustedPosture["actionBias"] => {
-  if (delta >= 0.1) return "loosen";
-  if (delta <= -0.1) return "tighten";
+  if (delta >= 0.08) return "loosen";
+  if (delta <= -0.08) return "tighten";
   return "hold";
 };
 
@@ -124,12 +155,15 @@ export const deriveSectorAdjustedPosture = (
   const boundaryGap = resolveBoundaryGap(baseAssessment);
   const dampingFactor = resolveBoundaryDamping(boundaryGap);
   const adjustmentDelta = clamp((sectorSignal - baseSignal) * dampingFactor, -0.4, 0.4);
+  const postureVariant = resolvePostureVariant(adjustmentDelta);
   const adjustmentStrength = resolveStrength(Math.abs(adjustmentDelta));
   const actionBias = resolveActionBias(adjustmentDelta);
+  const basePostureLabel = resolveBasePostureLabel(baseAssessment.regime);
 
   return {
-    basePostureLabel: resolveBasePostureLabel(baseAssessment.regime),
-    adjustedPostureLabel: `${resolveBasePostureLabel(baseAssessment.regime)}${resolvePostureSuffix(adjustmentDelta)}`,
+    basePostureLabel,
+    adjustedPostureLabel: formatAdjustedPostureLabel(basePostureLabel, postureVariant),
+    postureVariant,
     adjustmentStrength,
     adjustmentDelta,
     boundaryGap,

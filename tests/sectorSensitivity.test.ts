@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { deriveSectorAdjustedPosture } from "../lib/report/sectorSensitivity";
+import { deriveSectorAdjustedPosture, resolveSectorKey } from "../lib/report/sectorSensitivity";
 
 describe("deriveSectorAdjustedPosture", () => {
   it("adds upside tilt for high-sensitivity upside sectors", () => {
@@ -61,6 +61,37 @@ describe("deriveSectorAdjustedPosture", () => {
     assert.ok(Math.abs(nearBoundary.adjustmentDelta) < Math.abs(farFromBoundary.adjustmentDelta));
   });
 
+
+  it("resolves unknown sectors to canonical fallback", () => {
+    assert.equal(resolveSectorKey("fintech"), "fintech");
+    assert.equal(resolveSectorKey("healthcare"), "healthcare");
+    assert.equal(resolveSectorKey("ai-platforms"), "ai-platforms");
+    assert.equal(resolveSectorKey("unknown-sector"), "b2b-saas");
+  });
+
+  it("keeps damping stable across tiny near-threshold moves", () => {
+    const first = deriveSectorAdjustedPosture(
+      {
+        regime: "VOLATILE",
+        scores: { tightness: 69.9, riskAppetite: 49.9 },
+        thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
+      },
+      "ai-platforms",
+    );
+
+    const second = deriveSectorAdjustedPosture(
+      {
+        regime: "VOLATILE",
+        scores: { tightness: 69.8, riskAppetite: 49.8 },
+        thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
+      },
+      "ai-platforms",
+    );
+
+    assert.ok(Math.abs(first.adjustmentDelta - second.adjustmentDelta) < 0.03);
+    assert.equal(first.actionBias, "hold");
+    assert.equal(second.actionBias, "hold");
+  });
   it("keeps neutral sector in hold mode at thresholds", () => {
     const output = deriveSectorAdjustedPosture(
       {
@@ -71,8 +102,9 @@ describe("deriveSectorAdjustedPosture", () => {
       "consumer",
     );
 
-    assert.equal(output.adjustedPostureLabel, "Mixed");
+    assert.equal(output.adjustedPostureLabel, "Mixed (neutral)");
     assert.equal(output.adjustmentStrength, "none");
     assert.equal(output.actionBias, "hold");
+    assert.equal(output.postureVariant, "neutral");
   });
 });

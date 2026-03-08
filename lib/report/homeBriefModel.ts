@@ -242,8 +242,8 @@ const buildMacroOverlay = (
       label: `Sector sensitivity (${sectorLabel})`,
       detail:
         sectorOverlay.adjustmentStrength === "none"
-          ? `Aligned with base posture ${sectorOverlay.basePostureLabel}; keep base cadence.`
-          : `${sectorOverlay.adjustedPostureLabel} (${sectorOverlay.adjustmentStrength} ${sectorOverlay.adjustmentDelta > 0 ? "upside" : "downside"} tilt). Bias: ${sectorOverlay.actionBias}.`,
+          ? `${sectorOverlay.adjustedPostureLabel} (${sectorOverlay.postureVariant}); action bias: ${sectorOverlay.actionBias}.`
+          : `${sectorOverlay.adjustedPostureLabel} (${sectorOverlay.adjustmentStrength} ${sectorOverlay.adjustmentDelta > 0 ? "upside" : "downside"} tilt, ${sectorOverlay.postureVariant}); action bias: ${sectorOverlay.actionBias}.`,
     },
   ];
 };

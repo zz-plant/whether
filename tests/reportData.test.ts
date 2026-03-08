@@ -141,11 +141,14 @@ describe("sector overlay key resolution", () => {
     assert.equal(resolveSectorKey("b2b-saas"), "b2b-saas");
     assert.equal(resolveSectorKey("consumer"), "consumer");
     assert.equal(resolveSectorKey("infrastructure"), "infrastructure");
+    assert.equal(resolveSectorKey("fintech"), "fintech");
+    assert.equal(resolveSectorKey("healthcare"), "healthcare");
+    assert.equal(resolveSectorKey("ai-platforms"), "ai-platforms");
   });
 
   it("falls back to b2b-saas for unknown or empty sector values", () => {
     assert.equal(resolveSectorKey(undefined), "b2b-saas");
     assert.equal(resolveSectorKey(""), "b2b-saas");
-    assert.equal(resolveSectorKey("healthcare"), "b2b-saas");
+    assert.equal(resolveSectorKey("unknown-sector"), "b2b-saas");
   });
 });
