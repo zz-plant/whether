@@ -25,6 +25,7 @@ import { loadMacroSeries } from "../macroSnapshot";
 import { parseThresholdsFromSearchParams } from "../thresholds";
 import { formatAgeHours, formatDateUTC, formatTimestampUTC } from "../formatters";
 import { buildRegimeAlert } from "./reportFormatting";
+import { buildFallbackForecastModel, buildForecastModel } from "./forecastModel";
 import { formatRegimeLabel } from "../regimeFormat";
 import { logReportDependencyFailure } from "./reportError";
 import type { TreasuryData } from "../types";
@@ -335,6 +336,11 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
     previous: previousAssessment,
   });
   const regimeTrend = deriveRegimeTrend(previousAssessment, assessment);
+  const forecast = buildForecastModel({
+    assessment,
+    reportDynamics,
+    macroSeries,
+  });
   const lastYearComparison =
     lastYearSnapshot && lastYearAssessment
       ? buildLastYearComparison({
@@ -351,6 +357,7 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
     cacheMonthsByYear,
     fetchedAtLabel,
     fenceItems,
+    forecast,
     historicalComparison,
     historicalSelection,
     internalProvenance,
@@ -436,6 +443,7 @@ const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataF
     cacheMonthsByYear,
     fetchedAtLabel,
     fenceItems: assessment.constraints,
+    forecast: buildFallbackForecastModel(),
     historicalComparison: null,
     historicalSelection,
     internalProvenance: {

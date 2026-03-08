@@ -1,3 +1,4 @@
+import type { CrossingRiskLabel } from "./forecastModel";
 import type { RegimeAssessment } from "../regimeEngine";
 import { formatScoreValue } from "../formatters";
 
@@ -48,3 +49,16 @@ export const buildRegimeAlert = (
     summary: `Capital posture moved from ${previous.regime} to ${current.regime}.`,
   };
 };
+
+const crossingRiskLabels: Record<CrossingRiskLabel, string> = {
+  low: "Low",
+  medium: "Medium",
+  high: "High",
+};
+
+export const formatRegimeProbability = (probability: number): string => {
+  const bounded = Math.min(100, Math.max(0, Math.round(probability)));
+  return `${bounded}%`;
+};
+
+export const formatCrossingRiskLabel = (risk: CrossingRiskLabel): string => crossingRiskLabels[risk];
