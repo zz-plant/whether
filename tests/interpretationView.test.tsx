@@ -72,6 +72,77 @@ describe("interpretation view panel", () => {
     assert.match(html, /\/?month=3&amp;year=2026&amp;view=forecast/);
   });
 
+
+  it("uses company-rule input order as precedence and caps output to top three rules", () => {
+    const layeredRules: BoundedDecisionRule[] = [
+      {
+        area: "capital-raising",
+        recommendation: "Rule 1 first.",
+        scope: "",
+        pauseTrigger: "pause-1",
+        resumeTrigger: "resume-1",
+        rationale: "",
+      },
+      {
+        area: "burn-discipline",
+        recommendation: "Rule 2 second.",
+        scope: "",
+        pauseTrigger: "pause-2",
+        resumeTrigger: "resume-2",
+        rationale: "",
+      },
+      {
+        area: "hiring",
+        recommendation: "Rule 3 third.",
+        scope: "",
+        pauseTrigger: "pause-3",
+        resumeTrigger: "resume-3",
+        rationale: "",
+      },
+      {
+        area: "product-tempo",
+        recommendation: "Rule 4 hidden.",
+        scope: "",
+        pauseTrigger: "pause-4",
+        resumeTrigger: "resume-4",
+        rationale: "",
+      },
+    ];
+
+    const company = buildInterpretationLayer({
+      view: "company",
+      homeBriefModel,
+      assessment,
+      forecast,
+      decisionRules: layeredRules,
+    });
+
+    assert.equal(company.bullets.length, 3);
+    assert.match(company.bullets[0], /Rule 1 first\./);
+    assert.match(company.bullets[1], /Rule 2 second\./);
+    assert.match(company.bullets[2], /Rule 3 third\./);
+    assert.ok(company.bullets.every((bullet) => !bullet.includes("Rule 4 hidden.")));
+  });
+
+
+  it("keeps interpretation toggle links query-stable and marks active view", () => {
+    const layer = buildInterpretationLayer({
+      view: "forecast",
+      homeBriefModel,
+      assessment,
+      forecast,
+      decisionRules,
+    });
+
+    const html = renderToStaticMarkup(
+      <HomeInterpretationPanel layer={layer} searchParams={{ month: "3", year: "2026", sector: "consumer" }} />,
+    );
+
+    assert.match(html, /aria-current="page"[^>]*>Forecast</);
+    assert.match(html, /\/?month=3&amp;year=2026&amp;sector=consumer/);
+    assert.doesNotMatch(html, /view=default/);
+  });
+
   it("swaps interpretation content without changing toggle shell", () => {
     const sector = buildInterpretationLayer({ view: "sector", homeBriefModel, assessment, forecast, decisionRules });
     const financial = buildInterpretationLayer({ view: "financial", homeBriefModel, assessment, forecast, decisionRules });

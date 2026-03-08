@@ -33,7 +33,7 @@ import {
 import { CopyLeadershipArtifactsButtons } from "./components/copyLeadershipArtifactsButtons";
 import { createBreadcrumbTrail } from "../lib/navigation/breadcrumbs";
 import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
-import type { SectorKey } from "../lib/report/sectorSensitivity";
+import { resolveSectorKey } from "../lib/report/sectorSensitivity";
 import { getFeaturedConceptArticles } from "../lib/productCanon";
 import { LiveDataFallbackAlert } from "./components/liveDataFallbackAlert";
 import { HomeInterpretationPanel } from "./components/homeInterpretationPanel";
@@ -153,9 +153,7 @@ export const generateMetadata = async ({
 };
 
 
-const HOMEPAGE_SECTORS: SectorKey[] = ["b2b-saas", "consumer", "infrastructure"];
-const resolveHomepageOverlaySector = (value: string | undefined): SectorKey =>
-  value && HOMEPAGE_SECTORS.includes(value as SectorKey) ? (value as SectorKey) : "b2b-saas";
+const resolveHomepageOverlaySector = (value: string | undefined) => resolveSectorKey(value);
 
 const buildHomeStructuredData = () => ({
   "@context": "https://schema.org",
