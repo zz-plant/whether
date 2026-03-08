@@ -28,6 +28,7 @@ import { buildBoardBrief, buildCallCitation, buildSlackBrief } from "../lib/expo
 import { CopyLeadershipArtifactsButtons } from "./components/copyLeadershipArtifactsButtons";
 import { createBreadcrumbTrail } from "../lib/navigation/breadcrumbs";
 import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
+import type { SectorKey } from "../lib/report/sectorSensitivity";
 import { getFeaturedConceptArticles } from "../lib/productCanon";
 import { LiveDataFallbackAlert } from "./components/liveDataFallbackAlert";
 
@@ -145,6 +146,11 @@ export const generateMetadata = async ({
   };
 };
 
+
+const HOMEPAGE_SECTORS: SectorKey[] = ["b2b-saas", "consumer", "infrastructure"];
+const resolveHomepageOverlaySector = (value: string | undefined): SectorKey =>
+  value && HOMEPAGE_SECTORS.includes(value as SectorKey) ? (value as SectorKey) : "b2b-saas";
+
 const buildHomeStructuredData = () => ({
   "@context": "https://schema.org",
   "@graph": [
@@ -215,6 +221,7 @@ export default async function HomePage({
   }>;
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const homepageOverlaySector = resolveHomepageOverlaySector(resolvedSearchParams?.sector);
   const sectionLinks = homeSectionSequence.map((section) => ({
     href: section.href,
     label: section.label,
@@ -276,7 +283,7 @@ export default async function HomePage({
     stopItems,
     treasury,
     treasuryProvenance,
-  });
+  }, { overlaySector: homepageOverlaySector });
   const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries);
   const boardSummary = buildBoardBrief(assessment, treasury, sensors, macroSeries);
   const callCitation = buildCallCitation(assessment, treasury);

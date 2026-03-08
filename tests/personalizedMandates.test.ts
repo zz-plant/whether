@@ -26,5 +26,9 @@ describe("personalized mandates", () => {
 
     assert.match(output.headline, /VOLATILE mandate/);
     assert.equal(output.tailoredActions.length, 3);
+    assert.match(output.sectorOverlay.adjustedPostureLabel, /Mixed-|Mixed|Mixed\+/);
+    assert.match(output.recommendation, /Sector overlay:/);
+    assert.match(output.tailoredActions[1], /Overlay posture:/);
+    assert.match(output.tailoredActions[2], /Reversal condition:/);
   });
 });

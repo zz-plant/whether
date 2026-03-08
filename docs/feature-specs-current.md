@@ -112,6 +112,22 @@ The regime assessment includes:
 - Input metadata for provenance display
 
 
+
+### 3.4.1 Sector sensitivity overlay (decision translation layer)
+- Sector overlays are **secondary interpretations only** and do not mutate base regime classification.
+- Canonical sector taxonomy:
+  - `b2b-saas` → higher upside sensitivity (`Expansion+`, `Mixed+` when warranted)
+  - `consumer` → neutral calibration (`Expansion`, `Mixed`, etc.)
+  - `infrastructure` → higher downside sensitivity (`Mixed-`, `Defensive-` when warranted)
+- Overlay output contract (`deriveSectorAdjustedPosture`):
+  - `basePostureLabel`
+  - `adjustedPostureLabel` (suffix: `+`, `-`, or none)
+  - `adjustmentStrength` (`none|light|moderate|strong`)
+  - `adjustmentDelta` (signed scalar, damped near regime boundaries)
+  - `actionBias` (`tighten|hold|loosen`) and `reversalCondition` for bounded decision translation
+- Calculation semantics: normalize tightness and risk-appetite distance from thresholds, apply sector multipliers + offset, then damp the resulting delta by nearest-threshold distance so overlays do not oscillate during boundary weeks.
+- Boundary rule: overlays are damped as scores approach regime thresholds so route-to-route language remains stable during transition weeks.
+
 ### 3.5 Policy-spec pilot layer (new)
 A policy-alignment pilot now runs **alongside** the legacy regime engine in the assessment payload:
 - Versioned policy metadata (`policy-v1`) is emitted for traceability.
