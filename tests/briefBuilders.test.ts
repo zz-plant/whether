@@ -139,6 +139,20 @@ describe("buildSlackBrief", () => {
     assert.match(brief, /Suggested burn adjustment:/);
   });
 
+  it("optionally appends interpretation layer content for handoff", () => {
+    const brief = buildSlackBrief(assessment, treasury, sensors, macros, {
+      interpretationLayer: {
+        view: "financial",
+        label: "Financial view",
+        summary: "",
+        bullets: ["Tighten non-core spend.", "Reopen when risk appetite improves."],
+      },
+    });
+
+    assert.match(brief, /Interpretation layer \(Financial view\):/);
+    assert.match(brief, /• Tighten non-core spend\./);
+  });
+
   it("formats bps values with readable spacing", () => {
     const brief = buildSlackBrief(assessment, treasury, sensors, macros);
 

@@ -68,6 +68,10 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /This week in 15 seconds/);
     assert.match(html, /Macro posture dial/);
     assert.match(html, /Decision matrix this week/);
+    assert.match(html, /Posture/);
+    assert.match(html, /Movement/);
+    assert.match(html, /Confidence/);
+    assert.match(html, /Instruction/);
     assert.match(html, /Movement/);
     assert.match(html, /Velocity:/);
     assert.match(html, /id="primary-artifact-actions"/);
