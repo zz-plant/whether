@@ -5,6 +5,7 @@ import {
   CommandCenterNavBlock,
   HeroTrustProvenanceBlock,
   SidebarSequenceBlock,
+  resolveTrustProvenance,
 } from "../app/components/reportShell";
 
 describe("ReportShell extracted sections", () => {
@@ -25,6 +26,25 @@ describe("ReportShell extracted sections", () => {
 
     assert.match(html, /Data provenance/);
     assert.match(html, /Data source details/);
+  });
+
+  it("prefers canonical treasury source attribution when provenance is present", () => {
+    const resolved = resolveTrustProvenance({
+      sourceLabel: "Treasury Fiscal Data",
+      sourceHref: "https://fiscaldata.treasury.gov",
+      provenance: {
+        sourceLabel: "Federal Reserve Economic Data (FRED)",
+        sourceUrl: "https://fred.stlouisfed.org",
+        recordDateLabel: "Mar 5, 2026",
+        timestampLabel: "Mar 6, 2026 10:15 UTC",
+        ageLabel: "2h ago",
+        statusLabel: "Cached (medium)",
+      },
+    });
+
+    assert.ok(resolved);
+    assert.equal(resolved.sourceLabel, "Treasury Fiscal Data");
+    assert.equal(resolved.sourceUrl, "https://fiscaldata.treasury.gov");
   });
 
   it("renders command center/nav block", () => {

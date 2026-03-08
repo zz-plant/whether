@@ -96,6 +96,26 @@ type ReportShellProps = {
   provenance?: DataProvenance;
 };
 
+export const resolveTrustProvenance = ({
+  provenance,
+  sourceLabel,
+  sourceHref,
+}: {
+  provenance?: DataProvenance;
+  sourceLabel: string;
+  sourceHref?: string;
+}): DataProvenance | undefined => {
+  if (!provenance) {
+    return undefined;
+  }
+
+  return {
+    ...provenance,
+    sourceLabel,
+    sourceUrl: sourceHref ?? provenance.sourceUrl,
+  };
+};
+
 export function HeroTrustProvenanceBlock({
   trustStatusTone,
   trustStatusLabel,
@@ -119,6 +139,8 @@ export function HeroTrustProvenanceBlock({
   sourceHref?: string;
   provenance?: DataProvenance;
 }) {
+  const trustProvenance = resolveTrustProvenance({ provenance, sourceLabel, sourceHref });
+
   return (
     <>
       <CanonicalTrustModule
@@ -127,8 +149,8 @@ export function HeroTrustProvenanceBlock({
         detail={trustStatusDetail}
         action={trustStatusAction}
         sourceDetails={
-          provenance ? (
-            <DataProvenanceStrip provenance={provenance} variant="compact" />
+          trustProvenance ? (
+            <DataProvenanceStrip provenance={trustProvenance} variant="compact" />
           ) : (
             <dl className="grid gap-2 text-xs text-slate-300">
               <div className="flex items-center justify-between gap-3"><dt className="text-slate-400">Posture</dt><dd className="font-semibold text-slate-100">{statusLabel}</dd></div>
