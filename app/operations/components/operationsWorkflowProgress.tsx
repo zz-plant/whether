@@ -50,6 +50,20 @@ export const OperationsWorkflowProgress = ({ currentPath }: { currentPath: Route
               <Link
                 href={href as Route}
                 aria-current={isActive ? "step" : undefined}
+                data-premium-intent={
+                  step.href === "/operations/integrations"
+                    ? "integrations"
+                    : step.href === "/operations/data"
+                      ? "api_access"
+                      : undefined
+                }
+                data-premium-cta={
+                  step.href === "/operations/integrations"
+                    ? "open_integrations_stage"
+                    : step.href === "/operations/data"
+                      ? "open_data_stage"
+                      : undefined
+                }
                 className={`weather-surface flex min-h-[100px] flex-col gap-2 rounded-xl border p-3 transition-colors ${
                   isActive
                     ? "border-sky-400/70 bg-sky-500/15 text-sky-100"

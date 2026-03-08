@@ -310,6 +310,10 @@ export const ExportBriefPanel = ({
               disabled={isCopyDisabled("Slack")}
               onClick={() => void handleCopy(briefing, "Slack")}
               className="weather-button-primary"
+              buttonProps={{
+                "data-premium-intent": "export_brief",
+                "data-premium-cta": "copy_slack_brief",
+              }}
             />
             <ClipboardActionRow
               label="Copy Board Summary"
@@ -317,10 +321,16 @@ export const ExportBriefPanel = ({
               disabled={isCopyDisabled("Board")}
               onClick={() => void handleCopy(boardBrief, "Board")}
               className="weather-button-primary"
+              buttonProps={{
+                "data-premium-intent": "export_brief",
+                "data-premium-cta": "copy_board_summary",
+              }}
             />
             <Button
               type="button"
               onClick={handlePrint}
+              data-premium-intent="export_brief"
+              data-premium-cta="export_pdf"
               className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:text-white touch-manipulation"
             >
               Export PDF

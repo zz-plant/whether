@@ -132,6 +132,10 @@ export function RunwayPlannerPanel({ assessment }: { assessment: RegimeAssessmen
           onClick={() => {
             void copyToClipboard(shareBlock, "runway-plan");
           }}
+          buttonProps={{
+            "data-premium-intent": "runway_planner",
+            "data-premium-cta": "copy_financial_block",
+          }}
           compact
         />
       </div>

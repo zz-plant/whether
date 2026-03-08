@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 type ClipboardUiState = "idle" | "copying" | "copied" | "error";
 
@@ -15,6 +15,7 @@ type ClipboardActionRowProps = {
   showStatus?: boolean;
   statusMessages?: Partial<Record<ClipboardUiState, ReactNode>>;
   buttonLabels?: Partial<Record<ClipboardUiState, ReactNode>>;
+  buttonProps?: ButtonHTMLAttributes<HTMLButtonElement>;
 };
 
 const BUTTON_VARIANT_CLASS: Record<"button" | "pill", string> = {
@@ -38,6 +39,7 @@ export function ClipboardActionRow({
   showStatus = false,
   statusMessages,
   buttonLabels,
+  buttonProps,
 }: ClipboardActionRowProps) {
   const isCopying = state === "copying";
   const isDisabled = isCopying || disabled;
@@ -50,6 +52,7 @@ export function ClipboardActionRow({
   return (
     <div className={className}>
       <button
+        {...buttonProps}
         type="button"
         onClick={onClick}
         disabled={isDisabled}
