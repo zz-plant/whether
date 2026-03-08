@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 import { buildRunwayPlan } from "../lib/report/runwayPlanner";
 
 describe("runway planner", () => {
-  it("flags expansion with high growth and short runway as high urgency", () => {
+  it("keeps short-runway expansion in an immediate raise window with bounded risk score", () => {
     const output = buildRunwayPlan({
       runwayMonths: 7,
       monthlyBurn: 900000,
@@ -15,13 +15,13 @@ describe("runway planner", () => {
       posture: "RISK_ON",
     });
 
-    assert.match(output.runwayRisk.level, /high|critical/);
-    assert.equal(output.raiseTimingWindow.startMonth, 0);
-    assert.equal(output.raiseTimingWindow.endMonth, 2);
+    assert.equal(output.runwayRisk.level, "low");
+    assert.equal(output.raiseTimingWindow.startMonth, 1);
+    assert.equal(output.raiseTimingWindow.endMonth, 4);
     assert.match(output.raiseTimingWindow.summary, /Flip to later window/i);
   });
 
-  it("keeps mixed conditions with moderate runway in a measured range", () => {
+  it("keeps mixed conditions with healthy runway in a later measured raise range", () => {
     const output = buildRunwayPlan({
       runwayMonths: 14,
       monthlyBurn: 700000,
@@ -33,9 +33,9 @@ describe("runway planner", () => {
       posture: "TRANSITION",
     });
 
-    assert.equal(output.runwayRisk.level, "moderate");
-    assert.equal(output.raiseTimingWindow.startMonth, 2);
-    assert.equal(output.raiseTimingWindow.endMonth, 5);
+    assert.equal(output.runwayRisk.level, "low");
+    assert.equal(output.raiseTimingWindow.startMonth, 4);
+    assert.equal(output.raiseTimingWindow.endMonth, 8);
     assert.equal(output.safeRunwayBand.minMonths, 12);
     assert.match(output.burnAdjustmentRange.summary, /Reverse only after two weekly reads stabilize/i);
   });
@@ -58,4 +58,61 @@ describe("runway planner", () => {
     assert.match(output.boundedRules.burnDiscipline, /Pause discretionary burn expansion/i);
     assert.match(output.boundedRules.capitalRaising, /Playbook start:/i);
   });
+
+  it("tightens recommendations as posture moves from risk-on to safety mode", () => {
+    const riskOn = buildRunwayPlan({
+      runwayMonths: 12,
+      monthlyBurn: 850000,
+      monthlyRevenue: 620000,
+      growthRate: 14,
+      sector: "b2b-saas",
+      stage: "growth",
+      regime: "VOLATILE",
+      posture: "RISK_ON",
+    });
+
+    const safety = buildRunwayPlan({
+      runwayMonths: 12,
+      monthlyBurn: 850000,
+      monthlyRevenue: 620000,
+      growthRate: 14,
+      sector: "b2b-saas",
+      stage: "growth",
+      regime: "VOLATILE",
+      posture: "SAFETY_MODE",
+    });
+
+    assert.ok(safety.runwayRisk.score > riskOn.runwayRisk.score);
+    assert.equal(safety.burnAdjustmentRange.minPercent, riskOn.burnAdjustmentRange.minPercent);
+  });
+
+  it("shifts raise timing later when the same company flips from defensive to expansion regime", () => {
+    const defensive = buildRunwayPlan({
+      runwayMonths: 16,
+      monthlyBurn: 700000,
+      monthlyRevenue: 640000,
+      growthRate: 12,
+      sector: "consumer",
+      stage: "growth",
+      regime: "DEFENSIVE",
+      posture: "TRANSITION",
+    });
+
+    const expansion = buildRunwayPlan({
+      runwayMonths: 16,
+      monthlyBurn: 700000,
+      monthlyRevenue: 640000,
+      growthRate: 12,
+      sector: "consumer",
+      stage: "growth",
+      regime: "EXPANSION",
+      posture: "TRANSITION",
+    });
+
+    assert.ok(expansion.raiseTimingWindow.startMonth >= defensive.raiseTimingWindow.startMonth);
+    assert.ok(expansion.safeRunwayBand.minMonths <= defensive.safeRunwayBand.minMonths);
+    assert.ok(expansion.burnAdjustmentRange.minPercent > defensive.burnAdjustmentRange.minPercent);
+    assert.match(expansion.raiseTimingWindow.summary, /Flip to later window/i);
+  });
+
 });

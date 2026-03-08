@@ -3,6 +3,13 @@ import { REGIME_SHORT_LABELS } from "../regimePresentation";
 
 export type SectorKey = "b2b-saas" | "consumer" | "infrastructure";
 
+const sectorKeys = ["b2b-saas", "consumer", "infrastructure"] as const;
+
+export const resolveSectorKey = (
+  value: string | undefined,
+  fallback: SectorKey = "b2b-saas",
+): SectorKey => (value && sectorKeys.includes(value as SectorKey) ? (value as SectorKey) : fallback);
+
 export type SectorSensitivityConfig = {
   label: string;
   tightnessMultiplier: number;

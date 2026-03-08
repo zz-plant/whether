@@ -141,6 +141,19 @@ Top-to-bottom order is fixed. The first four blocks must fit above the fold on d
 ---
 
 
+### Interpretation-layer contract (optional, URL-driven)
+The homepage supports optional interpretation layers without changing the canonical weekly posture call.
+
+- Query param: `?view=default|sector|company|financial|forecast`
+- Default behavior: missing/invalid `view` resolves to `default`.
+- Layer scope: interpretation layers change only explanatory bullets and do **not** change regime classification, confidence labels, or bounded-rule thresholds.
+- Expected layer semantics:
+  - `default`: decision delta + guardrail + reversal trigger
+  - `sector`: sector sensitivity translation using `?sector=` overlay
+  - `company`: top-priority bounded operator rules (max 3 bullets, input-order precedence)
+  - `financial`: tightness/risk appetite + top constraints
+  - `forecast`: highest-likelihood next posture + crossing-risk + momentum
+
 ### Current implementation contract (`/`, `WeeklyDecisionCard`)
 Canonical top-fold order on homepage must remain:
 1. **Posture** (`This week's posture` header + status label + net constraint summary)

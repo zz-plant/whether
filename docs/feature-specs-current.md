@@ -114,6 +114,11 @@ The regime assessment includes:
 
 
 ### 3.4.1 Sector sensitivity overlay (decision translation layer)
+### 3.4.2 Trust and fallback behavior for missing sector/company context
+- Sector query fallback: unknown or empty `?sector` values resolve to canonical fallback `b2b-saas`.
+- Missing company-rule payload fallback (interpretation `company` view): render available bounded rules in provided priority order and cap to the top three; if fewer than three exist, render only available rules without blocking the page.
+- Trust posture: these fallbacks are translation-layer only and never mutate base regime classification, canonical confidence label, or trigger thresholds.
+
 - Sector overlays are **secondary interpretations only** and do not mutate base regime classification.
 - Canonical sector taxonomy:
   - `b2b-saas` → higher upside sensitivity (`Expansion+`, `Mixed+` when warranted)
@@ -152,6 +157,17 @@ review notes and leadership discussion.
 Briefing/report exports remain available where they package current signal-driven guidance.
 Integration payload exports are also available through `/api/integrations/weekly-mandate` for
 Slack, Notion, and Linear targets.
+
+### 4.4 Forecast confidence + runway-risk semantics
+- Forecast confidence messaging is anchored to **boundary distance + crossing risk**, not long-horizon macro prediction.
+- `forecast` interpretation copy must include:
+  - highest-likelihood next posture (`regimeProbabilities` top value),
+  - crossing-risk label (`low|medium|high`),
+  - points-to-threshold distance + momentum direction.
+- Runway planner risk messaging uses bounded bands:
+  - risk score is clamped to 0–100 with labels `low|moderate|high|critical`,
+  - recommendations include explicit raise window, burn adjustment range, and reversal language,
+  - posture/regime flips should change urgency and guardrail strictness, not just copy tone.
 
 ## 5) Playbooks, summaries, and briefings
 
