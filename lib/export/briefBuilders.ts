@@ -3,6 +3,12 @@ import type { RegimeAssessment } from "../regimeEngine";
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../types";
 import { buildComplianceStamp } from "../exportNotices";
 import { formatRegimeLabel } from "../regimeFormat";
+import {
+  buildRunwayPlan,
+  formatRunwayPlanCompactBlock,
+  getRunwayPlannerBaselineInput,
+  type PlannerPosture,
+} from "../report/runwayPlanner";
 
 const buildExportStamp = (treasury: TreasuryData, confidence: string) =>
   buildComplianceStamp({
@@ -13,6 +19,22 @@ const buildExportStamp = (treasury: TreasuryData, confidence: string) =>
 
 const buildDecisionHighlights = (assessment: RegimeAssessment) =>
   assessment.constraints.slice(0, 3).map((constraint) => `• ${constraint}`);
+
+
+const mapPolicyPostureToPlannerPosture = (posture: RegimeAssessment["policyAssessment"]["posture"]): PlannerPosture => {
+  if (posture === "RISK_ON") return "RISK_ON";
+  if (posture === "TRANSITION") return "TRANSITION";
+  return "SAFETY_MODE";
+};
+
+const buildFinancialImplicationsBlock = (assessment: RegimeAssessment) => {
+  const baseline = getRunwayPlannerBaselineInput(
+    assessment.regime,
+    mapPolicyPostureToPlannerPosture(assessment.policyAssessment.posture),
+  );
+  const plan = buildRunwayPlan(baseline);
+  return formatRunwayPlanCompactBlock(plan);
+};
 
 const buildCitationLines = (treasury: TreasuryData, macros: MacroSeriesReading[]) => [
   `Treasury source: ${treasury.source} (${treasury.record_date})`,
@@ -45,6 +67,7 @@ export const buildSlackBrief = (
   );
   const decisionHighlights = buildDecisionHighlights(assessment);
   const citations = buildCitationLines(treasury, macros);
+  const financialImplications = buildFinancialImplicationsBlock(assessment);
 
   return [
     `Whether Report Brief — ${treasury.record_date}`,
@@ -61,6 +84,8 @@ export const buildSlackBrief = (
     "",
     "Constraints:",
     ...assessment.constraints.map((item) => `• ${item}`),
+    "",
+    financialImplications,
     "",
     "Citations:",
     ...citations,

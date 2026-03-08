@@ -20,6 +20,7 @@ import { operationsSectionLinks } from "../../lib/navigation/operationsNavigatio
 import { OperationsWorkstreamNav } from "./components/operationsWorkstreamNav";
 import { OperationsWorkflowProgress } from "./components/operationsWorkflowProgress";
 import { ExportBriefPanel } from "./components/exportBriefPanel";
+import { RunwayPlannerPanel } from "./components/runwayPlannerPanel";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { LiveDataFallbackAlert } from "../components/liveDataFallbackAlert";
 
@@ -267,6 +268,7 @@ export default async function OperationsPage({
           provenance={treasuryProvenance}
           showProvenance={false}
         />
+        <RunwayPlannerPanel assessment={assessment} />
       </SectionedReportPanel>
 
       <SectionedReportPanel

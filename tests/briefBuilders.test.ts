@@ -131,6 +131,14 @@ describe("buildSlackBrief", () => {
     assert.doesNotMatch(brief, /-0\.52index/);
   });
 
+  it("includes compact financial implications aligned to posture", () => {
+    const brief = buildSlackBrief(assessment, treasury, sensors, macros);
+
+    assert.match(brief, /Financial implications:/);
+    assert.match(brief, /Runway risk:/);
+    assert.match(brief, /Suggested burn adjustment:/);
+  });
+
   it("formats bps values with readable spacing", () => {
     const brief = buildSlackBrief(assessment, treasury, sensors, macros);
 
