@@ -10,6 +10,12 @@ const zoneLabels: Record<NavigationZone, string> = {
   reference: "Reference section",
 };
 
+const zoneCompactLabels: Record<NavigationZone, string> = {
+  core: "Now",
+  workflow: "Operate",
+  reference: "Reference",
+};
+
 const zoneBadgeStyles: Record<NavigationZone, string> = {
   core: "border-emerald-300/30 bg-emerald-400/10 text-emerald-100",
   workflow: "border-sky-300/30 bg-sky-400/10 text-sky-100",
@@ -50,7 +56,7 @@ export function NavigationOrientationBadge({
 
   return (
     <div
-      className={`inline-flex items-center gap-1 rounded-full border border-slate-700/80 bg-slate-950/70 p-1 ${className ?? ""}`}
+      className={`flex max-w-full flex-wrap items-center gap-1 rounded-2xl border border-slate-700/80 bg-slate-950/70 p-1 sm:rounded-full ${className ?? ""}`}
       aria-label="Navigation zone orientation (not macro posture)"
     >
       {zoneOrder.map((zone) => {
@@ -60,10 +66,12 @@ export function NavigationOrientationBadge({
           <a
             key={zone}
             href={zoneDefaultHref[zone]}
+            aria-label={zoneLabels[zone]}
             aria-current={isActive ? "true" : undefined}
-            className={`inline-flex min-h-[32px] items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] transition-colors hover:border-sky-300/60 hover:text-sky-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/70 ${isActive ? zoneBadgeStyles[zone] : "border-slate-700/70 text-slate-400"}`}
+            className={`inline-flex min-h-[32px] items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] transition-colors hover:border-sky-300/60 hover:text-sky-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/70 ${isActive ? zoneBadgeStyles[zone] : "border-slate-700/70 text-slate-400"}`}
           >
-            {zoneLabels[zone]}
+            <span className="sm:hidden">{zoneCompactLabels[zone]}</span>
+            <span className="hidden sm:inline">{zoneLabels[zone]}</span>
           </a>
         );
       })}

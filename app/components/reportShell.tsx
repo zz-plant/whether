@@ -91,6 +91,7 @@ type ReportShellProps = {
   decisionDiffs?: DecisionDiff[];
   nextStep?: { description: string; href: string };
   nextRefreshLabel?: string;
+  inlineTrustPlacement?: "before-content" | "after-first-section";
 };
 
 export function HeroTrustProvenanceBlock({
@@ -298,6 +299,7 @@ export const ReportShell = ({
   decisionDiffs,
   nextStep,
   nextRefreshLabel,
+  inlineTrustPlacement = "before-content",
 }: ReportShellProps) => {
   const resolvedNextRefreshLabel = nextRefreshLabel ?? (trustStatusTone === "historical" ? "Fixed historical snapshot" : "15m cadence");
   const contentSections = Children.toArray(children);
@@ -311,6 +313,9 @@ export const ReportShell = ({
   const showPostureRibbon = currentPath !== "/";
   const isPrimaryActionInSectionLinks = sectionLinks.some((section) => section.href === primaryCta.href);
   const showMobileActionCard = !isPrimaryActionInSectionLinks;
+  const showInlineTrustBlock = !hasSidebar;
+  const renderTrustBeforeContent = showInlineTrustBlock && inlineTrustPlacement === "before-content";
+  const renderTrustAfterFirstSection = showInlineTrustBlock && inlineTrustPlacement === "after-first-section";
 
   return (
     <>
@@ -350,9 +355,9 @@ export const ReportShell = ({
 
               <SidebarSequenceBlock stageRail={stageRail} />
 
-              {!hasSidebar ? <section className="space-y-4"><div className="grid gap-4 lg:grid-cols-2"><HeroTrustProvenanceBlock trustStatusTone={trustStatusTone} trustStatusLabel={trustStatusLabel} trustStatusDetail={trustStatusDetail} trustStatusAction={trustStatusAction} statusLabel={statusLabel} fetchedAtLabel={fetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} /></div></section> : null}
+              {renderTrustBeforeContent ? <section className="space-y-4"><div className="grid gap-4 lg:grid-cols-2"><HeroTrustProvenanceBlock trustStatusTone={trustStatusTone} trustStatusLabel={trustStatusLabel} trustStatusDetail={trustStatusDetail} trustStatusAction={trustStatusAction} statusLabel={statusLabel} fetchedAtLabel={fetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} /></div></section> : null}
 
-              <div className="space-y-10">{contentSections.map((section, index) => { const sectionKey = isValidElement(section) && section.key != null ? section.key : `section-${index}`; return <div key={sectionKey} className={index === 0 ? "" : "border-t border-slate-800/70 pt-10"}>{section}</div>; })}</div>
+              <div className="space-y-10">{contentSections.map((section, index) => { const sectionKey = isValidElement(section) && section.key != null ? section.key : `section-${index}`; return <div key={sectionKey} className={index === 0 ? "" : "border-t border-slate-800/70 pt-10"}>{section}{renderTrustAfterFirstSection && index === 0 ? <section className="mt-4 space-y-4"><div className="grid gap-4 lg:grid-cols-2"><HeroTrustProvenanceBlock trustStatusTone={trustStatusTone} trustStatusLabel={trustStatusLabel} trustStatusDetail={trustStatusDetail} trustStatusAction={trustStatusAction} statusLabel={statusLabel} fetchedAtLabel={fetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} /></div></section> : null}</div>; })}</div>
 
               <footer className="mt-12 border-t border-slate-800/70 pt-6 text-xs font-semibold tracking-[0.18em] text-slate-300">
                 <p>{INFORMATIONAL_NOTICE}</p>

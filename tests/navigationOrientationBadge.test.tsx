@@ -9,9 +9,9 @@ describe("NavigationOrientationBadge", () => {
       <NavigationOrientationBadge currentPath="/operations" />,
     );
 
-    assert.match(html, /href="\/"[^>]*>Now section</);
-    assert.match(html, /href="\/signals"[^>]*>Operate section</);
-    assert.match(html, /href="\/learn"[^>]*>Reference section</);
+    assert.match(html, /href="\/"[^>]*aria-label="Now section"/);
+    assert.match(html, /href="\/signals"[^>]*aria-label="Operate section"/);
+    assert.match(html, /href="\/learn"[^>]*aria-label="Reference section"/);
   });
 
   it("marks the active zone", () => {
@@ -19,6 +19,6 @@ describe("NavigationOrientationBadge", () => {
       <NavigationOrientationBadge currentPath="/method" />,
     );
 
-    assert.match(html, /href="\/learn"[^>]*aria-current="true"[^>]*>Reference section</);
+    assert.match(html, /href="\/learn"[^>]*aria-current="true"/);
   });
 });
