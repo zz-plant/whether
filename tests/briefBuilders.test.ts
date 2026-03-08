@@ -149,7 +149,8 @@ describe("buildSlackBrief", () => {
       },
     });
 
-    assert.match(brief, /Interpretation layer \(Financial view\):/);
+    assert.match(brief, /Interpretation context: Financial view \(financial\)/);
+    assert.match(brief, /Interpretation trust: translation layer only; canonical posture\/confidence\/thresholds unchanged\./);
     assert.match(brief, /• Tighten non-core spend\./);
   });
 
