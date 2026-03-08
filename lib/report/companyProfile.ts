@@ -147,10 +147,16 @@ const baseAreaPriority: Record<DecisionArea, number> = {
   "expansion-bets": 80,
 };
 
-export const resolveCompanyProfile = (profile?: Partial<CompanyProfile>): CompanyProfile => ({
-  ...defaultProfile,
-  ...profile,
-});
+export const resolveCompanyProfile = (profile?: Partial<CompanyProfile>): CompanyProfile => {
+  const definedOverrides = Object.fromEntries(Object.entries(profile ?? {}).filter(([, value]) => value !== undefined)) as Partial<
+    CompanyProfile
+  >;
+
+  return {
+    ...defaultProfile,
+    ...definedOverrides,
+  };
+};
 
 export const buildCompanyAdjustedRules = ({
   assessment,
