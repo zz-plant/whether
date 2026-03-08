@@ -22,9 +22,9 @@ const postureForPolicyPosture = (posture: RegimeAssessment["policyAssessment"]["
 };
 
 export function RunwayPlannerPanel({ assessment }: { assessment: RegimeAssessment }) {
-  const [runwayMonths, setRunwayMonths] = useState(12);
-  const [monthlyBurn, setMonthlyBurn] = useState(700000);
-  const [monthlyRevenue, setMonthlyRevenue] = useState(450000);
+  const [runway, setRunway] = useState(12);
+  const [burn, setBurn] = useState(700000);
+  const [revenue, setRevenue] = useState(450000);
   const [growthRate, setGrowthRate] = useState(12);
   const [sector, setSector] = useState<PlannerSector>("b2b-saas");
   const [stage, setStage] = useState<PlannerStage>("growth");
@@ -32,16 +32,16 @@ export function RunwayPlannerPanel({ assessment }: { assessment: RegimeAssessmen
   const output = useMemo(
     () =>
       buildRunwayPlan({
-        runwayMonths,
-        monthlyBurn,
-        monthlyRevenue,
+        runway,
+        burn,
+        revenue,
         growthRate,
         sector,
         stage,
         regime: assessment.regime,
         posture: postureForPolicyPosture(assessment.policyAssessment.posture),
       }),
-    [assessment.policyAssessment.posture, assessment.regime, growthRate, monthlyBurn, monthlyRevenue, runwayMonths, sector, stage],
+    [assessment.policyAssessment.posture, assessment.regime, burn, growthRate, revenue, runway, sector, stage],
   );
 
   const shareBlock = useMemo(() => formatRunwayPlanCompactBlock(output), [output]);
@@ -61,15 +61,15 @@ export function RunwayPlannerPanel({ assessment }: { assessment: RegimeAssessmen
       <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
         <label className="weather-surface p-3 text-sm text-slate-200">
           Runway (months)
-          <input className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950/80 px-3 py-2" type="number" min={1} value={runwayMonths} onChange={(event) => setRunwayMonths(Number(event.target.value))} />
+          <input className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950/80 px-3 py-2" type="number" min={1} value={runway} onChange={(event) => setRunway(Number(event.target.value))} />
         </label>
         <label className="weather-surface p-3 text-sm text-slate-200">
           Monthly burn ($)
-          <input className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950/80 px-3 py-2" type="number" min={0} step={50000} value={monthlyBurn} onChange={(event) => setMonthlyBurn(Number(event.target.value))} />
+          <input className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950/80 px-3 py-2" type="number" min={0} step={50000} value={burn} onChange={(event) => setBurn(Number(event.target.value))} />
         </label>
         <label className="weather-surface p-3 text-sm text-slate-200">
           Monthly revenue ($)
-          <input className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950/80 px-3 py-2" type="number" min={0} step={50000} value={monthlyRevenue} onChange={(event) => setMonthlyRevenue(Number(event.target.value))} />
+          <input className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950/80 px-3 py-2" type="number" min={0} step={50000} value={revenue} onChange={(event) => setRevenue(Number(event.target.value))} />
         </label>
         <label className="weather-surface p-3 text-sm text-slate-200">
           Monthly growth rate (%)

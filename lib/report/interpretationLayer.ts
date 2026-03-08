@@ -1,6 +1,12 @@
 import type { RegimeAssessment } from "../regimeEngine";
 import type { ForecastModel } from "./forecastModel";
 import type { BoundedDecisionRule } from "./boundedDecisionRules";
+import {
+  buildRunwayPlanFromRequest,
+  type PlannerPosture,
+  type PlannerSector,
+  type PlannerStage,
+} from "./runwayPlanner";
 
 export const interpretationViews = [
   "default",
@@ -17,7 +23,47 @@ export type InterpretationLayer = {
   label: string;
   summary: string;
   bullets: string[];
+  financialAction?: {
+    runwayRisk: string;
+    raiseTiming: string;
+    burnAdjustment: string;
+  };
 };
+
+type FinancialViewInput = {
+  runway: number;
+  burn: number;
+  revenue: number;
+  growthRate: number;
+  sector: PlannerSector;
+  stage: PlannerStage;
+};
+
+const postureForPolicyPosture = (
+  posture: RegimeAssessment["policyAssessment"]["posture"],
+): PlannerPosture => {
+  if (posture === "RISK_ON") return "RISK_ON";
+  if (posture === "TRANSITION") return "TRANSITION";
+  return "SAFETY_MODE";
+};
+
+const getDefaultFinancialInput = (
+  assessment: RegimeAssessment,
+): FinancialViewInput => ({
+  runway:
+    assessment.regime === "SCARCITY"
+      ? 11
+      : assessment.regime === "DEFENSIVE"
+        ? 13
+        : assessment.regime === "VOLATILE"
+          ? 14
+          : 16,
+  burn: assessment.regime === "EXPANSION" ? 900_000 : 700_000,
+  revenue: assessment.regime === "SCARCITY" ? 420_000 : 500_000,
+  growthRate: assessment.regime === "EXPANSION" ? 18 : assessment.regime === "VOLATILE" ? 10 : 7,
+  sector: "b2b-saas",
+  stage: "growth",
+});
 
 export const isInterpretationView = (
   value: string | undefined,
@@ -39,6 +85,7 @@ export const buildInterpretationLayer = ({
   assessment,
   forecast,
   decisionRules,
+  financialInput,
 }: {
   view: InterpretationView;
   homeBriefModel: ReturnType<
@@ -47,6 +94,7 @@ export const buildInterpretationLayer = ({
   assessment: RegimeAssessment;
   forecast: ForecastModel;
   decisionRules: BoundedDecisionRule[];
+  financialInput?: FinancialViewInput;
 }): InterpretationLayer => {
   if (view === "sector") {
     return {
@@ -76,14 +124,29 @@ export const buildInterpretationLayer = ({
   }
 
   if (view === "financial") {
+    const plan = buildRunwayPlanFromRequest(
+      financialInput ?? getDefaultFinancialInput(assessment),
+      {
+        regime: assessment.regime,
+        posture: postureForPolicyPosture(assessment.policyAssessment.posture),
+      },
+    );
+
     return {
       view,
       label: "Financial view",
-      summary: "Translate this week into capital pacing and approvals.",
+      summary:
+        "Translate this week into bounded runway decisions: risk now vs downside, raise window, and burn delta.",
       bullets: [
-        `Tightness ${assessment.scores.tightness}/100, risk appetite ${assessment.scores.riskAppetite}/100.`,
-        ...assessment.constraints.slice(0, 2),
+        `Runway risk ${plan.runwayRisk.level.toUpperCase()} (${plan.runwayRisk.score}/100); downside flip ${plan.runwayRisk.macroRiskDownsideFlip}/100.`,
+        `Raise window ${plan.raiseTimingRecommendation.startMonth}-${plan.raiseTimingRecommendation.endMonth} months; safe-runway target in ${plan.raiseTimingRecommendation.timeToSafeRunwayTargetMonths} months.`,
+        `Burn adjustment ${plan.burnAdjustment.recommendedDeltaPercent}% (range ${plan.burnAdjustment.floorPercent}% to ${plan.burnAdjustment.ceilingPercent}%).`,
       ],
+      financialAction: {
+        runwayRisk: plan.runwayRisk.summary,
+        raiseTiming: plan.raiseTimingRecommendation.summary,
+        burnAdjustment: plan.burnAdjustment.summary,
+      },
     };
   }
 

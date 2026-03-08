@@ -7,38 +7,51 @@ export type PlannerSector = "b2b-saas" | "consumer" | "infrastructure";
 export type PlannerStage = "seed" | "series-a" | "growth" | "public";
 export type PlannerPosture = "RISK_ON" | "TRANSITION" | "SAFETY_MODE";
 
-export type RunwayPlannerInput = {
-  runwayMonths: number;
-  monthlyBurn: number;
-  monthlyRevenue: number;
+export type RunwayPlannerRequest = {
+  runway: number;
+  burn: number;
+  revenue: number;
   growthRate: number;
   sector: PlannerSector;
   stage: PlannerStage;
+};
+
+export type RunwayPlannerActionOutput = {
+  runwayRisk: {
+    level: "low" | "moderate" | "high" | "critical";
+    score: number;
+    macroRiskBase: number;
+    macroRiskDownsideFlip: number;
+    summary: string;
+  };
+  raiseTimingRecommendation: {
+    startMonth: number;
+    endMonth: number;
+    timeToSafeRunwayTargetMonths: number;
+    summary: string;
+  };
+  burnAdjustment: {
+    recommendedDeltaPercent: number;
+    floorPercent: number;
+    ceilingPercent: number;
+    summary: string;
+  };
+};
+
+export type RunwayPlannerInput = RunwayPlannerRequest & {
   regime: RegimeKey;
   posture: PlannerPosture;
 };
 
 export type RunwayPlannerOutput = {
-  runwayRisk: {
-    score: number;
-    level: "low" | "moderate" | "high" | "critical";
-    summary: string;
-  };
+  runwayRisk: RunwayPlannerActionOutput["runwayRisk"];
   safeRunwayBand: {
     minMonths: number;
     maxMonths: number;
     summary: string;
   };
-  raiseTimingWindow: {
-    startMonth: number;
-    endMonth: number;
-    summary: string;
-  };
-  burnAdjustmentRange: {
-    minPercent: number;
-    maxPercent: number;
-    summary: string;
-  };
+  raiseTimingWindow: RunwayPlannerActionOutput["raiseTimingRecommendation"];
+  burnAdjustmentRange: RunwayPlannerActionOutput["burnAdjustment"];
   boundedRules: {
     burnDiscipline: string;
     capitalRaising: string;
@@ -85,9 +98,9 @@ const growthToDecimal = (growthRate: number) => growthRate / 100;
 
 const sanitize = (input: RunwayPlannerInput): RunwayPlannerInput => ({
   ...input,
-  runwayMonths: clamp(Number.isFinite(input.runwayMonths) ? input.runwayMonths : 0, 1, 60),
-  monthlyBurn: clamp(Number.isFinite(input.monthlyBurn) ? input.monthlyBurn : 0, 0, 100_000_000),
-  monthlyRevenue: clamp(Number.isFinite(input.monthlyRevenue) ? input.monthlyRevenue : 0, 0, 100_000_000),
+  runway: clamp(Number.isFinite(input.runway) ? input.runway : 0, 1, 60),
+  burn: clamp(Number.isFinite(input.burn) ? input.burn : 0, 0, 100_000_000),
+  revenue: clamp(Number.isFinite(input.revenue) ? input.revenue : 0, 0, 100_000_000),
   growthRate: clamp(Number.isFinite(input.growthRate) ? input.growthRate : 0, -40, 80),
 });
 
@@ -108,9 +121,9 @@ const buildSafeBand = (input: RunwayPlannerInput) => {
 
 const projectRunwayTrajectory = (input: RunwayPlannerInput) => {
   const growth = growthToDecimal(input.growthRate);
-  const projectedRevenueInSixMonths = input.monthlyRevenue * Math.pow(1 + growth, 6);
-  const netBurnNow = Math.max(input.monthlyBurn - input.monthlyRevenue, 0);
-  const netBurnInSixMonths = Math.max(input.monthlyBurn - projectedRevenueInSixMonths, 0);
+  const projectedRevenueInSixMonths = input.revenue * Math.pow(1 + growth, 6);
+  const netBurnNow = Math.max(input.burn - input.revenue, 0);
+  const netBurnInSixMonths = Math.max(input.burn - projectedRevenueInSixMonths, 0);
   const burnImprovementPct =
     netBurnNow === 0 ? 0 : ((netBurnNow - netBurnInSixMonths) / netBurnNow) * 100;
 
@@ -118,7 +131,7 @@ const projectRunwayTrajectory = (input: RunwayPlannerInput) => {
     netBurnNow,
     netBurnInSixMonths,
     burnImprovementPct,
-    burnMultiple: input.monthlyRevenue > 0 ? input.monthlyBurn / input.monthlyRevenue : 4,
+    burnMultiple: input.revenue > 0 ? input.burn / input.revenue : 4,
   };
 };
 
@@ -159,13 +172,18 @@ const deriveRaiseWindow = (
   return { startMonth: 4, endMonth: 8 };
 };
 
+const deriveDownsidePosture = (posture: PlannerPosture): PlannerPosture => {
+  if (posture === "RISK_ON") return "TRANSITION";
+  return "SAFETY_MODE";
+};
+
 export const getRunwayPlannerBaselineInput = (
   regime: RegimeKey,
   posture: PlannerPosture,
 ): RunwayPlannerInput => ({
-  runwayMonths: regime === "SCARCITY" ? 11 : regime === "DEFENSIVE" ? 13 : regime === "VOLATILE" ? 14 : 16,
-  monthlyBurn: regime === "EXPANSION" ? 900_000 : 700_000,
-  monthlyRevenue: regime === "SCARCITY" ? 420_000 : 500_000,
+  runway: regime === "SCARCITY" ? 11 : regime === "DEFENSIVE" ? 13 : regime === "VOLATILE" ? 14 : 16,
+  burn: regime === "EXPANSION" ? 900_000 : 700_000,
+  revenue: regime === "SCARCITY" ? 420_000 : 500_000,
   growthRate: regime === "EXPANSION" ? 18 : regime === "VOLATILE" ? 10 : 7,
   sector: "b2b-saas",
   stage: "growth",
@@ -176,7 +194,7 @@ export const getRunwayPlannerBaselineInput = (
 export const buildRunwayPlan = (rawInput: RunwayPlannerInput): RunwayPlannerOutput => {
   const input = sanitize(rawInput);
   const safeBand = buildSafeBand(input);
-  const runwayGap = safeBand.minMonths - input.runwayMonths;
+  const runwayGap = safeBand.minMonths - input.runway;
   const trajectory = projectRunwayTrajectory(input);
 
   const runwayGapPenalty = runwayGap > 0 ? runwayGap * 5.5 : runwayGap * 1.5;
@@ -184,20 +202,27 @@ export const buildRunwayPlan = (rawInput: RunwayPlannerInput): RunwayPlannerOutp
   const trajectoryRelief = clamp(trajectory.burnImprovementPct, -20, 35) * -0.35;
   const growthPenalty = input.growthRate < 4 ? 4 : 0;
 
-  const riskScore = clamp(
+  const macroRiskBase = clamp(
     44 + runwayGapPenalty + burnMultiplePenalty + POSTURE_RISK_DELTA[input.posture] + trajectoryRelief + growthPenalty,
     0,
     100,
   );
-  const riskLevel = inferRiskLevel(riskScore);
+  const macroRiskDownsideFlip = clamp(macroRiskBase + 8 + (input.regime === "EXPANSION" ? 4 : 0), 0, 100);
+  const riskLevel = inferRiskLevel(macroRiskBase);
 
-  const raiseWindow = deriveRaiseWindow(riskLevel, runwayGap, input.runwayMonths, safeBand.minMonths);
+  const raiseWindow = deriveRaiseWindow(riskLevel, runwayGap, input.runway, safeBand.minMonths);
+  const netBurnForTarget = Math.max(input.burn - input.revenue, 0);
+  const timeToSafeRunwayTargetMonths =
+    netBurnForTarget === 0
+      ? 0
+      : round(Math.max(0, ((safeBand.minMonths - input.runway) * netBurnForTarget) / Math.max(input.burn, 1)));
 
   const baseBurnRange = BURN_RANGE_BY_REGIME[input.regime];
   const riskTightening = riskLevel === "critical" ? -8 : riskLevel === "high" ? -5 : riskLevel === "moderate" ? -2 : 0;
   const growthOffset = input.growthRate >= 20 && input.regime === "EXPANSION" ? 4 : 0;
   const burnMinPercent = clamp(baseBurnRange.min + riskTightening, -45, 10);
   const burnMaxPercent = clamp(baseBurnRange.max + growthOffset, burnMinPercent + 4, 20);
+  const recommendedDeltaPercent = round((burnMinPercent + burnMaxPercent) / 2);
 
   const rules = buildCanonicalBoundedDecisionRules({
     regime: input.regime,
@@ -216,12 +241,15 @@ export const buildRunwayPlan = (rawInput: RunwayPlannerInput): RunwayPlannerOutp
   const playbook = getPlaybookGuidance(input.regime);
   const approvalVelocity = getKnobLevel(input, runwayGap, "approvalVelocity");
   const paybackStrictness = getKnobLevel(input, runwayGap, "payback");
+  const downsidePosture = deriveDownsidePosture(input.posture);
 
   return {
     runwayRisk: {
-      score: round(riskScore),
+      score: round(macroRiskBase),
       level: riskLevel,
-      summary: `${riskLevel.toUpperCase()} runway risk: ${Math.round(trajectory.netBurnNow).toLocaleString()} net burn/mo vs ${round(safeBand.minMonths)}-${round(safeBand.maxMonths)} safe-month band.`,
+      macroRiskBase: round(macroRiskBase),
+      macroRiskDownsideFlip: round(macroRiskDownsideFlip),
+      summary: `${riskLevel.toUpperCase()} runway risk now (${round(macroRiskBase)}/100), downside flip ${round(macroRiskDownsideFlip)}/100 if posture shifts to ${downsidePosture}.`,
     },
     safeRunwayBand: {
       minMonths: round(safeBand.minMonths),
@@ -230,12 +258,14 @@ export const buildRunwayPlan = (rawInput: RunwayPlannerInput): RunwayPlannerOutp
     },
     raiseTimingWindow: {
       ...raiseWindow,
-      summary: `Run raise in ${raiseWindow.startMonth}-${raiseWindow.endMonth} months; approval velocity ${approvalVelocity}. Flip to later window after runway exceeds ${round(safeBand.minMonths)} months.` ,
+      timeToSafeRunwayTargetMonths,
+      summary: `Run raise in ${raiseWindow.startMonth}-${raiseWindow.endMonth} months; target safe runway in ${timeToSafeRunwayTargetMonths} months with approval velocity ${approvalVelocity}.`,
     },
     burnAdjustmentRange: {
-      minPercent: burnMinPercent,
-      maxPercent: burnMaxPercent,
-      summary: `Adjust burn ${burnMinPercent}% to ${burnMaxPercent}% with payback strictness ${paybackStrictness}. Reverse only after two weekly reads stabilize and runway clears ${round(safeBand.minMonths)} months.`,
+      recommendedDeltaPercent,
+      floorPercent: burnMinPercent,
+      ceilingPercent: burnMaxPercent,
+      summary: `Adjust burn by ${recommendedDeltaPercent}% (range ${burnMinPercent}% to ${burnMaxPercent}%) with payback strictness ${paybackStrictness}. Reverse after two stable weekly reads and runway above ${round(safeBand.minMonths)} months.`,
     },
     boundedRules: {
       burnDiscipline: burnRule
@@ -248,13 +278,26 @@ export const buildRunwayPlan = (rawInput: RunwayPlannerInput): RunwayPlannerOutp
   };
 };
 
+export const buildRunwayPlanFromRequest = (
+  request: RunwayPlannerRequest,
+  context: { regime: RegimeKey; posture: PlannerPosture },
+): RunwayPlannerActionOutput => {
+  const plan = buildRunwayPlan({ ...request, ...context });
+
+  return {
+    runwayRisk: plan.runwayRisk,
+    raiseTimingRecommendation: plan.raiseTimingWindow,
+    burnAdjustment: plan.burnAdjustmentRange,
+  };
+};
+
 export const formatRunwayPlanCompactBlock = (plan: RunwayPlannerOutput) =>
   [
     "Financial implications:",
-    `• Runway risk: ${plan.runwayRisk.level.toUpperCase()} (${plan.runwayRisk.score}/100).`,
+    `• Runway risk: ${plan.runwayRisk.level.toUpperCase()} (${plan.runwayRisk.score}/100), downside flip ${plan.runwayRisk.macroRiskDownsideFlip}/100.`,
     `• Safe runway band: ${plan.safeRunwayBand.minMonths}-${plan.safeRunwayBand.maxMonths} months.`,
-    `• Raise timing window: ${plan.raiseTimingWindow.startMonth}-${plan.raiseTimingWindow.endMonth} months.`,
-    `• Suggested burn adjustment: ${plan.burnAdjustmentRange.minPercent}% to ${plan.burnAdjustmentRange.maxPercent}%.`,
+    `• Raise timing window: ${plan.raiseTimingWindow.startMonth}-${plan.raiseTimingWindow.endMonth} months (safe target in ${plan.raiseTimingWindow.timeToSafeRunwayTargetMonths} months).`,
+    `• Suggested burn adjustment: ${plan.burnAdjustmentRange.recommendedDeltaPercent}% (range ${plan.burnAdjustmentRange.floorPercent}% to ${plan.burnAdjustmentRange.ceilingPercent}%).`,
     `• Capital-raising guardrail: ${plan.boundedRules.capitalRaising}`,
     `• Burn-discipline guardrail: ${plan.boundedRules.burnDiscipline}`,
   ].join("\n");

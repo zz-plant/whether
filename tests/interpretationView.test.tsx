@@ -9,6 +9,7 @@ import type { BoundedDecisionRule } from "../lib/report/boundedDecisionRules";
 
 const assessment = {
   regime: "DEFENSIVE",
+  policyAssessment: { posture: "TRANSITION" },
   scores: {
     tightness: 74,
     riskAppetite: 41,
@@ -20,18 +21,18 @@ const assessment = {
 } as unknown as RegimeAssessment;
 
 const forecast: ForecastModel = {
-  regimeProbabilities: { Expansion: 8, Mixed: 24, Scarcity: 38, Defensive: 30 },
+  next90DayProbabilities: { Expansion: 8, Mixed: 24, Scarcity: 38, Defensive: 30 },
   boundaryPressure: {
     tightnessDistance: 4,
     riskAppetiteDistance: 9,
-    nearestDistance: 4,
+    distance: 4,
     momentum: "toward-threshold",
     crossingRisk: "high",
   },
   signalTrajectory: {
-    riskAppetite: "down",
-    tightness: "up",
-    yieldCurveProxy: "flat",
+    riskAppetite: "deteriorating",
+    tightness: "improving",
+    yieldCurveProxy: "stable",
   },
 };
 
@@ -153,7 +154,10 @@ describe("interpretation view panel", () => {
     assert.match(sectorHtml, /Sector view/);
     assert.match(sectorHtml, /Consumer teams should stage expansions\./);
     assert.match(financialHtml, /Financial view/);
-    assert.match(financialHtml, /Tightness 74\/100, risk appetite 41\/100\./);
+    assert.match(financialHtml, /Runway risk/);
+    assert.match(financialHtml, /Raise window/);
+    assert.match(financialHtml, /Burn adjustment/);
+    assert.match(financialHtml, /Financial action summary/);
     assert.match(sectorHtml, /Default/);
     assert.match(financialHtml, /Default/);
   });
