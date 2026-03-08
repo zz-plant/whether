@@ -38,10 +38,10 @@ describe("WeeklyDecisionCard extracted sections", () => {
       />,
     );
 
-    assert.match(html, /Operating call/);
-    assert.match(html, /Macro operating state/);
-    assert.match(html, /⚠ Operating guardrail/);
-    assert.match(html, /Defensive trigger/);
+    assert.match(html, /Weekly posture call/);
+    assert.match(html, /Macro posture dial/);
+    assert.match(html, /Primary guardrail/);
+    assert.match(html, /Flip trigger/);
   });
 
   it("marks risk-appetite defensive trigger as breached only when value is at or below threshold", () => {

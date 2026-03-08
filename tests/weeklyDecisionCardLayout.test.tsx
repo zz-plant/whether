@@ -64,9 +64,9 @@ describe("WeeklyDecisionCard top-fold composition", () => {
       />,
     );
 
-    assert.match(html, /Operating call/);
+    assert.match(html, /Weekly posture call/);
     assert.match(html, /This week in 15 seconds/);
-    assert.match(html, /Macro operating state/);
+    assert.match(html, /Macro posture dial/);
     assert.match(html, /Decision matrix this week/);
     assert.match(html, /Movement/);
     assert.match(html, /Velocity:/);
@@ -110,6 +110,6 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     );
 
     assert.match(html, /Using a cached snapshot/);
-    assert.match(html, /Defensive trigger/);
+    assert.match(html, /Flip trigger/);
   });
 });
