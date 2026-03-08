@@ -115,6 +115,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
     assert.match(detailsHtml, /Why this call ▼/);
     assert.match(detailsHtml, /Posture history/);
     assert.match(footerHtml, /Send to team/);
+    assert.match(footerHtml, /hidden sm:flex sm:flex-wrap sm:gap-3/);
     assert.match(footerHtml, /Run risk check/);
   });
 });
