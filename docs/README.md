@@ -48,6 +48,7 @@ Use this index to find the **current** source of truth quickly.
 - `seo/quality-gates.md` — mandatory publish checklist for future SEO content.
 - `seo/measurement-model.md` — analytics model for cluster/CTA/assisted conversion reporting with intent tags.
 - `seo/refresh-loop.md` — monthly refresh and changelog loop for high-performing pages.
+- `premium-launch-readiness.md` — pre-reveal telemetry and go/no-go checklist for premium rollout.
 
 ## Agent docs
 - `agents/setup.md` — install/run/check commands and MCP baseline.

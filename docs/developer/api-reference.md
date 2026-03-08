@@ -43,6 +43,12 @@ Whether exposes read-first JSON endpoints for weekly posture transmission, caden
 | `/api/weekly-digest` | GET | Build digest summary from stored alert events. |
 | `/api/integrations/weekly-mandate?target=<slack|email|...>` | GET | Destination-specific weekly mandate payload. |
 
+### D2) Premium billing readiness
+
+| Endpoint | Method(s) | Purpose |
+| --- | --- | --- |
+| `/api/billing/checkout` | POST | Creates Stripe Checkout sessions for premium plans (`pro`, `team`) before paywall reveal; requires an attributed premium `source` and supports `Idempotency-Key`. |
+
 ### E) Discover capabilities for tools/agents
 
 | Endpoint | Method | Purpose |
