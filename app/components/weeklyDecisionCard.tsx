@@ -62,11 +62,16 @@ export type WeeklyDecisionCardProps = {
 };
 
 const sectionSpacing = "space-y-4";
-const primaryHeading = "text-sm font-semibold uppercase tracking-[0.14em] text-slate-100";
-const secondaryHeading = "text-xs font-semibold uppercase tracking-[0.12em] text-slate-300";
-const primaryPanel = "rounded-xl border border-slate-700/80 bg-slate-950/72 p-4";
-const secondaryPanel = "rounded-xl border border-slate-700/70 bg-slate-950/64 p-4";
-const supportingPanel = "rounded-xl border border-slate-800/75 bg-slate-950/56 p-4";
+const tierOneHeading = "text-sm font-bold uppercase tracking-[0.14em] text-slate-50";
+const tierTwoHeading = "text-xs font-semibold uppercase tracking-[0.12em] text-slate-300";
+const tierThreeHeading = "text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400";
+const tierOnePanel = "rounded-xl border border-slate-600/85 bg-slate-950/82 p-5";
+const tierTwoPanel = "rounded-xl border border-slate-700/55 bg-slate-950/62 p-4";
+const tierThreePanel = "rounded-xl border border-slate-800/55 bg-slate-950/50 p-4";
+const tierOneInset = "rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3";
+const tierTwoInset = "rounded-md border border-slate-700/55 bg-slate-950/58 px-3 py-3";
+const tierThreeInset = "rounded-md border border-slate-800/50 bg-slate-950/48 px-3 py-3";
+const neutralLabel = "font-semibold uppercase tracking-[0.12em] text-slate-300";
 
 const regimeGaugeStops = ["Expansion", "Mixed", "Scarcity", "Defensive"] as const;
 const regimeGaugePercentByLabel: Record<string, number> = {
@@ -141,35 +146,35 @@ export function DecisionCallHeader({
         {statusLabel}
       </h1>
 
-      <article className={`${primaryPanel} ${sectionSpacing}`} aria-label="Operating call panel">
-        <h2 className={primaryHeading}>This week in 15 seconds</h2>
+      <article className={`${tierOnePanel} ${sectionSpacing}`} aria-label="Operating call panel">
+        <h2 className={tierOneHeading}>This week in 15 seconds</h2>
         <p className="text-sm leading-relaxed text-slate-200">{meetingShorthand}</p>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" aria-label="Operating call summary">
-          <div className="rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Posture</p>
+          <div className={tierOneInset}>
+            <p className={`text-xs ${neutralLabel}`}>Posture</p>
             <p className="mt-1 text-lg font-semibold text-slate-100">{postureLabel}</p>
           </div>
-          <div className="rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Movement</p>
+          <div className={tierOneInset}>
+            <p className={`text-xs ${neutralLabel}`}>Movement</p>
             <p className="mt-1 text-lg font-semibold text-slate-100">{movementVelocity}</p>
             <p className="text-xs text-slate-300">{postureDelta}</p>
           </div>
-          <div className="rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Confidence</p>
+          <div className={tierOneInset}>
+            <p className={`text-xs ${neutralLabel}`}>Confidence</p>
             <p className="mt-1 text-lg font-semibold text-slate-100">{confidenceLabel}</p>
             <div className="mt-2 h-2 rounded-full bg-slate-800">
               <div className="h-2 rounded-full bg-emerald-300/80" style={{ width: `${Math.max(8, Math.min(100, confidencePercent))}%` }} />
             </div>
           </div>
-          <div className="rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Instruction</p>
+          <div className={tierOneInset}>
+            <p className={`text-xs ${neutralLabel}`}>Instruction</p>
             <p className="mt-1 text-sm font-semibold text-slate-100">{immediateDecision}</p>
           </div>
         </div>
 
-        <article className="rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Macro posture dial</p>
+        <article className={tierOneInset}>
+          <p className={`text-xs ${neutralLabel}`}>Macro posture dial</p>
           <div className="mt-2">
             <div className="mb-2 grid grid-cols-4 text-[11px] uppercase tracking-[0.1em] text-slate-400">
               {regimeGaugeStops.map((item) => <span key={item}>{item}</span>)}
@@ -186,8 +191,8 @@ export function DecisionCallHeader({
           <p className="mt-1 text-sm font-semibold text-amber-50">{guardrail}</p>
         </article>
 
-        <article className="rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Flip trigger</p>
+        <article className={tierOneInset}>
+          <p className={`text-xs ${neutralLabel}`}>Flip trigger</p>
           <p className="mt-1 text-xs text-slate-300">Current: {regimeDistance.currentValue.toFixed(1)} · Trigger: {regimeDistance.thresholdValue.toFixed(1)}</p>
           <div className="mt-2 h-3 rounded-full bg-slate-800">
             <div className={`h-3 rounded-full ${thresholdBreached ? "bg-rose-300/85" : "bg-amber-300/80"}`} style={{ width: `${thresholdRatio}%` }} />
@@ -215,13 +220,13 @@ export function BoundedRulesMatrix({ decisionRules }: BoundedRulesMatrixProps) {
   const topDecisionRules = decisionRules.slice(0, 4);
 
   return (
-    <article className={`${secondaryPanel} ${sectionSpacing}`}>
-      <h2 className={primaryHeading}>Decision matrix this week</h2>
+    <article className={`${tierOnePanel} ${sectionSpacing}`}>
+      <h2 className={tierOneHeading}>Decision matrix this week</h2>
       <p className="text-xs text-slate-300">Action now, then stop/restart thresholds.</p>
       <ul className="mt-2 grid gap-3 sm:grid-cols-2">
         {topDecisionRules.map((rule) => (
-          <li key={rule.area} className="rounded-lg border border-slate-700/60 bg-slate-950/60 px-3 py-3 text-xs text-slate-200">
-            <p className="font-semibold uppercase tracking-[0.12em] text-sky-200">{decisionAreaLabel(rule.area)}</p>
+          <li key={rule.area} className={`${tierOneInset} text-xs text-slate-200`}>
+            <p className="font-semibold uppercase tracking-[0.12em] text-slate-200">{decisionAreaLabel(rule.area)}</p>
             <p className="mt-2 text-base font-semibold text-slate-100">{rule.recommendation}</p>
             <p className="mt-3 rounded-md border border-rose-500/50 bg-rose-500/10 px-2 py-2 text-rose-100">
               <span className="font-semibold uppercase tracking-[0.12em]">Stop if</span> {rule.pauseTrigger}
@@ -255,13 +260,13 @@ export function MoreContextDisclosureBody({
   macroOverlay,
 }: MoreContextDisclosureProps) {
   return (
-    <details className={`${secondaryPanel} ${sectionSpacing}`}>
+    <details className={`${tierTwoPanel} ${sectionSpacing}`}>
       <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.14em] text-slate-200">
         Why this call ▼
       </summary>
       <div className="mt-3 space-y-4">
         <article className="space-y-2">
-          <h2 className={secondaryHeading}>Startup Climate Index</h2>
+          <h2 className={tierTwoHeading}>Startup Climate Index</h2>
           <p className="text-xs text-slate-300">Score {startupClimateIndex.score} / 100 · {startupClimateIndex.status}</p>
           <ul className="mt-2 grid gap-2 sm:grid-cols-2">
             {startupClimateIndex.breakdown.map((item) => (
@@ -279,11 +284,11 @@ export function MoreContextDisclosureBody({
         </article>
 
         <article className="space-y-2">
-          <h2 className={secondaryHeading}>Supporting evidence</h2>
+          <h2 className={tierTwoHeading}>Supporting evidence</h2>
           <ul className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {primaryDrivers.map((driver) => (
-              <li key={driver.label} className="rounded-md border border-slate-700/60 bg-slate-950/60 px-3 py-3 text-xs text-slate-200">
-                <p className="font-semibold uppercase tracking-[0.12em] text-sky-200">{driver.label}</p>
+              <li key={driver.label} className={`${tierTwoInset} text-xs text-slate-200`}>
+                <p className="font-semibold uppercase tracking-[0.12em] text-slate-300">{driver.label}</p>
                 <p className="mt-1 text-slate-300">{driver.detail}</p>
               </li>
             ))}
@@ -291,11 +296,11 @@ export function MoreContextDisclosureBody({
         </article>
 
         <article className="space-y-2">
-          <h2 className={secondaryHeading}>Why this posture call</h2>
+          <h2 className={tierTwoHeading}>Why this posture call</h2>
           <ul className="mt-2 grid gap-2 sm:grid-cols-3">
             {whyThisCall.map((reason) => (
-              <li key={reason.label} className="rounded-md border border-slate-700/60 bg-slate-950/60 px-3 py-3 text-xs text-slate-200">
-                <p className="font-semibold uppercase tracking-[0.12em] text-sky-200">{reason.label}</p>
+              <li key={reason.label} className={`${tierTwoInset} text-xs text-slate-200`}>
+                <p className="font-semibold uppercase tracking-[0.12em] text-slate-300">{reason.label}</p>
                 <p className="mt-1 text-slate-300">{reason.detail}</p>
               </li>
             ))}
@@ -303,20 +308,20 @@ export function MoreContextDisclosureBody({
         </article>
 
         <article className="space-y-3">
-          <h2 className={secondaryHeading}>Posture history</h2>
+          <h2 className={tierThreeHeading}>Posture history</h2>
           <div className="flex flex-wrap items-center gap-2" aria-label="Macro regime timeline">
             {historicalTimeline.map((item) => (
-              <div key={`${item.label}-${item.posture}`} className="rounded-md border border-slate-700/60 bg-slate-950/60 px-3 py-2 text-xs text-slate-200">
+              <div key={`${item.label}-${item.posture}`} className={`${tierThreeInset} py-2 text-xs text-slate-200`}>
                 <p className="text-slate-400">{item.label}</p>
                 <p className="font-semibold text-slate-100">{item.posture}</p>
               </div>
             ))}
           </div>
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Historical memory rail</p>
+            <p className={tierThreeHeading}>Historical memory rail</p>
             <ul className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
               {memoryRail.map((item) => (
-                <li key={`${item.label}-${item.posture}`} className="rounded-md border border-slate-700/60 bg-slate-950/60 px-3 py-3 text-xs text-slate-200">
+                <li key={`${item.label}-${item.posture}`} className={`${tierThreeInset} text-xs text-slate-200`}>
                   <p className="text-slate-400">{item.label}</p>
                   <p className="mt-1 font-semibold text-slate-100">{item.posture}</p>
                 </li>
@@ -335,7 +340,7 @@ export function MoreContextDisclosureBody({
           </div>
           <ul className="grid gap-2 text-xs text-slate-300 sm:grid-cols-2 lg:grid-cols-4">
             {macroOverlay.map((item) => (
-              <li key={item.label} className="rounded-md border border-slate-700/60 bg-slate-950/60 px-3 py-3">
+              <li key={item.label} className={tierThreeInset}>
                 <p className="font-semibold uppercase tracking-[0.12em] text-slate-200">{item.label}</p>
                 <p className="mt-1 text-slate-300">{item.detail}</p>
               </li>
@@ -355,8 +360,8 @@ type CitationActionFooterProps = {
 
 export function CitationActionFooter({ citationMetaLine, citation, actions }: CitationActionFooterProps) {
   return (
-    <article className={`${supportingPanel} ${sectionSpacing}`}>
-      <h2 className={secondaryHeading}>Cite this call</h2>
+    <article className={`${tierThreePanel} ${sectionSpacing}`}>
+      <h2 className={tierThreeHeading}>Cite this call</h2>
       <p className="mt-2 text-xs text-slate-300">{citationMetaLine}</p>
       <pre className="mt-2 overflow-x-auto whitespace-pre-wrap text-xs text-slate-300">{citation}</pre>
       <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-md border border-slate-700/60 bg-slate-950/60 px-3 py-3 text-xs text-slate-300">
@@ -470,15 +475,15 @@ export function WeeklyDecisionCard({
         movementVelocity={movementVelocity}
       />
 
-      <article className={`${primaryPanel} ${sectionSpacing}`}>
-        <h2 className={primaryHeading}>Decision delta this week</h2>
+      <article className={`${tierOnePanel} ${sectionSpacing}`}>
+        <h2 className={tierOneHeading}>Decision delta this week</h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Change this week</p>
+          <div className={tierOneInset}>
+            <p className={`text-xs ${neutralLabel}`}>Change this week</p>
             <p className="mt-1 text-xs text-slate-200">{decisionShiftSummary}</p>
           </div>
-          <div className="rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">What to do now</p>
+          <div className={tierOneInset}>
+            <p className={`text-xs ${neutralLabel}`}>What to do now</p>
             <p className="mt-1 text-xs font-semibold text-slate-100">{immediateDecision}</p>
           </div>
           <div className="rounded-lg border border-amber-500/45 bg-slate-950/72 px-3 py-3">
@@ -492,8 +497,8 @@ export function WeeklyDecisionCard({
         </div>
 
         <div className="grid gap-3 lg:grid-cols-2">
-          <article className="rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Macro drift this week</p>
+          <article className={tierOneInset}>
+            <p className={`text-xs ${neutralLabel}`}>Macro drift this week</p>
             <p className="mt-1 text-xs text-slate-300">Velocity: {movementVelocity}</p>
             <ul className="mt-2 space-y-2 text-xs text-slate-200">
               {macroMovementRows.map((signal) => (
@@ -515,8 +520,8 @@ export function WeeklyDecisionCard({
             </ul>
           </article>
 
-          <article className="rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Plan stability</p>
+          <article className={tierOneInset}>
+            <p className={`text-xs ${neutralLabel}`}>Plan stability</p>
             <div className="mt-2 h-2 rounded-full bg-slate-800">
               <div className="h-2 rounded-full bg-sky-300/80" style={{ width: `${decisionStabilityPercent}%` }} />
             </div>
