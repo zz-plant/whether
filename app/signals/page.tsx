@@ -22,6 +22,7 @@ import { indicatorTypeByScoreLabel, indicatorTypeLabel } from "../../lib/indicat
 import { HistoricalReplayDatePicker } from "./components/historicalReplayDatePicker";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { REGIME_LABELS } from "../../lib/regimePresentation";
+import { NextStepRail } from "../components/nextStepRail";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -713,6 +714,7 @@ export default async function SignalsPage({
         links={SIGNALS_RELATED_LINKS}
         variant="compact"
       />
+      <NextStepRail currentPath="/signals" />
     </ReportShell>
   );
 }

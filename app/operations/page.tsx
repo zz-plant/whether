@@ -23,6 +23,7 @@ import { ExportBriefPanel } from "./components/exportBriefPanel";
 import { RunwayPlannerPanel } from "./components/runwayPlannerPanel";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { LiveDataFallbackAlert } from "../components/liveDataFallbackAlert";
+import { NextStepRail } from "../components/nextStepRail";
 
 
 export const runtime = "edge";
@@ -295,6 +296,7 @@ export default async function OperationsPage({
       >
         <OperatorRequestsPanel provenance={internalProvenance} showProvenance={false} />
       </SectionedReportPanel>
+      <NextStepRail currentPath="/operations" />
     </ReportShell>
   );
 }
