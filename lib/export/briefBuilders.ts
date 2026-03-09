@@ -23,6 +23,7 @@ const buildDecisionHighlights = (assessment: RegimeAssessment) =>
 
 type ExportLayerOptions = {
   interpretationLayer?: InterpretationLayer;
+  postureWithStageLabel?: string;
 };
 
 const buildInterpretationLayerBlock = (options?: ExportLayerOptions) => {
@@ -76,7 +77,7 @@ const buildSlideBullets = (
   macros: MacroSeriesReading[],
   options?: ExportLayerOptions,
 ) => [
-  `Capital posture: ${assessment.regime}`,
+  `Capital posture: ${options?.postureWithStageLabel ?? assessment.regime}`,
   `Tightness ${assessment.scores.tightness} / Risk ${assessment.scores.riskAppetite}`,
   ...macros.map((macro) => `${macro.label}: ${formatNumberWithUnit(macro.value, macro.unit)}`),
   ...assessment.constraints.map((item) => `Guardrail: ${item}`),
@@ -103,7 +104,7 @@ export const buildSlackBrief = (
 
   return [
     `Whether Report Brief — ${treasury.record_date}`,
-    `Capital posture: ${assessment.regime}`,
+    `Capital posture: ${options?.postureWithStageLabel ?? assessment.regime}`,
     `Tightness: ${assessment.scores.tightness} | Risk appetite: ${assessment.scores.riskAppetite}`,
     `Base rate: ${formatNumberWithUnit(baseRate?.value ?? null, "%")} (${assessment.scores.baseRateUsed})`,
     `Curve slope: ${formatNumberWithUnit(curveSlope?.value ?? null, "%")}`,
@@ -166,7 +167,7 @@ export const buildCallCitation = (
   options?: ExportLayerOptions,
 ) => [
   `Whether call — ${treasury.record_date}`,
-  `Posture: ${formatRegimeLabel(assessment.regime)} (${assessment.regime})`,
+  `Posture: ${options?.postureWithStageLabel ?? formatRegimeLabel(assessment.regime)} (${assessment.regime})`,
   `Confidence: Score-based posture confidence`,
   `Signal refresh cadence: 15m`,
   `Source: ${treasury.source}`,

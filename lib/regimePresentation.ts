@@ -77,3 +77,43 @@ export const REGIME_STYLE_TOKENS: Record<
     },
   },
 };
+
+export type RegimeMomentum = "improving" | "deteriorating" | "mixed" | "stable";
+export type RegimeStageLabel = "Early" | "Mid" | "Late";
+export type RegimeConfidenceLabel = "LOW" | "MED" | "HIGH";
+
+export const deriveRegimeStage = ({
+  regime,
+  momentum,
+  confidence,
+  distanceToFlip,
+}: {
+  regime: RegimeKey;
+  momentum: RegimeMomentum;
+  confidence: RegimeConfidenceLabel;
+  distanceToFlip: number;
+}) => {
+  const normalizedDistance = Number.isFinite(distanceToFlip) ? Math.max(0, distanceToFlip) : 0;
+
+  let label: RegimeStageLabel = "Mid";
+  if (momentum === "improving") {
+    if (regime === "SCARCITY" || regime === "DEFENSIVE") {
+      label = "Early";
+    } else if (normalizedDistance >= 12 && confidence === "HIGH") {
+      label = "Late";
+    }
+  } else if (momentum === "deteriorating") {
+    label = regime === "EXPANSION" ? "Late" : "Mid";
+  } else if (momentum === "stable" || momentum === "mixed") {
+    label = normalizedDistance <= 8 ? "Late" : "Mid";
+  }
+
+  const fragile = confidence === "LOW" || normalizedDistance <= 4;
+  const displayLabel = fragile ? `${label} (Fragile)` : label;
+
+  return {
+    label,
+    fragile,
+    displayLabel,
+  };
+};

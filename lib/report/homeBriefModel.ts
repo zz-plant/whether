@@ -2,7 +2,13 @@ import { buildCanonicalBoundedDecisionRules } from "./boundedDecisionRules";
 import { getSummaryArchive } from "../summary/summaryArchive";
 import type { MacroSeriesReading } from "../types";
 import { isImprovingSignalDelta } from "./reportData";
-import { REGIME_SEVERITY_RANK, REGIME_SHORT_LABELS } from "../regimePresentation";
+import {
+  REGIME_SEVERITY_RANK,
+  REGIME_SHORT_LABELS,
+  deriveRegimeStage,
+  type RegimeConfidenceLabel,
+  type RegimeMomentum,
+} from "../regimePresentation";
 import { deriveSectorAdjustedPosture, SECTOR_TAXONOMY, type SectorKey } from "./sectorSensitivity";
 
 type Regime = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
@@ -392,7 +398,7 @@ export const buildHomeBriefModel = (
   const shiftTargets = regimeShiftTargets[assessment.regime];
   const primaryShiftRegimeLabel = REGIME_SHORT_LABELS[shiftTargets.defensive];
 
-  const confidenceLabel: "LOW" | "MED" | "HIGH" = nearestThresholdGap <= 5 ? "LOW" : nearestThresholdGap <= 12 ? "MED" : "HIGH";
+  const confidenceLabel: RegimeConfidenceLabel = nearestThresholdGap <= 5 ? "LOW" : nearestThresholdGap <= 12 ? "MED" : "HIGH";
   const transitionWatch: "ON" | "OFF" = nearestThresholdGap <= 8 || Boolean(regimeAlert) ? "ON" : "OFF";
   const confidencePercent = Math.max(35, Math.min(92, Math.round(55 + nearestThresholdGap * 3)));
   const trendLabel =
@@ -404,6 +410,13 @@ export const buildHomeBriefModel = (
           ? "Mixed"
           : "Stable";
   const startupClimateIndex = buildStartupClimateIndex({ assessment, macroSeries, trendLabel });
+
+  const stage = deriveRegimeStage({
+    regime: assessment.regime,
+    momentum: (reportDynamics?.directionLabel ?? "stable") as RegimeMomentum,
+    confidence: confidenceLabel,
+    distanceToFlip: nearestThresholdGap,
+  });
 
   const reversalDimension: BoundaryDimension = tightnessGap <= riskGap ? "tightness" : "riskAppetite";
   const reversalDirection = boundaryDirectionForRegime(assessment.regime, reversalDimension);
@@ -459,6 +472,10 @@ export const buildHomeBriefModel = (
         : `${REGIME_SHORT_LABELS[assessment.regime]}. Changed: constraints held near prior week. Do now: keep execution measured and irreversible bets capped. Flip: ${reversalTrigger}`;
 
   return {
+    postureLabel: REGIME_SHORT_LABELS[assessment.regime],
+    stageLabel: stage.label,
+    stageFragile: stage.fragile,
+    postureWithStageLabel: `${REGIME_SHORT_LABELS[assessment.regime]} — ${stage.displayLabel}`,
     confidenceLabel,
     confidencePercent,
     trendLabel,

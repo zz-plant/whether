@@ -10,7 +10,6 @@ import {
 import {
   deltaLabelBySignal,
   movementMeterToneByDirection,
-  postureDisplayLabel,
   resolveSignalDirection,
   signalOrder,
 } from "../../lib/report/briefFormatting";
@@ -22,6 +21,7 @@ type MacroOverlayItem = { label: string; detail: string };
 
 export type WeeklyDecisionCardProps = {
   statusLabel: string;
+  postureWithStageLabel: string;
   postureDelta: string;
   confidenceLabel: "HIGH" | "MED" | "LOW";
   confidencePercent: number;
@@ -172,6 +172,7 @@ const PostureHistoryTimeline = ({ historicalTimeline }: { historicalTimeline: We
 
 type DecisionCallHeaderProps = {
   statusLabel: string;
+  postureWithStageLabel: string;
   netConstraintSummary: string;
   meetingShorthand: string;
   postureDelta: string;
@@ -191,6 +192,7 @@ type DecisionCallHeaderProps = {
 
 export function DecisionCallHeader({
   statusLabel,
+  postureWithStageLabel,
   netConstraintSummary,
   meetingShorthand,
   postureDelta,
@@ -207,7 +209,6 @@ export function DecisionCallHeader({
   regimeDistance,
   movementVelocity,
 }: DecisionCallHeaderProps) {
-  const postureLabel = postureDisplayLabel(statusLabel);
   const gaugePercent = regimeGaugePercentByLabel[statusLabel] ?? 50;
   const thresholdBreached =
     regimeDistance.thresholdDirection === "riseAbove"
@@ -221,7 +222,7 @@ export function DecisionCallHeader({
     <header className="space-y-5 border-b border-slate-700/80 pb-6" data-testid="weekly-top-fold">
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Weekly operating call</p>
       <h1 id="weekly-posture-brief-title" className="text-3xl font-semibold text-slate-50 sm:text-4xl">
-        {statusLabel}
+        {postureWithStageLabel}
       </h1>
 
       <article className={`${tierOnePanel} ${sectionSpacing}`} aria-label="Operating call panel">
@@ -235,7 +236,7 @@ export function DecisionCallHeader({
               label="Posture"
               icon={<svg viewBox="0 0 16 16" className="h-3.5 w-3.5"><circle cx="8" cy="8" r="5" fill="none" stroke="currentColor" strokeWidth="1.5" /><circle cx="8" cy="8" r="1.5" fill="currentColor" /></svg>}
             />
-            <p className="mt-1 text-lg font-semibold text-slate-100">{postureLabel}</p>
+            <p className="mt-1 text-lg font-semibold text-slate-100">{postureWithStageLabel}</p>
           </div>
           <div className={tierOneInset}>
             <SummaryLabel
@@ -469,6 +470,7 @@ export function CitationActionFooter({ citationMetaLine, citation, actions }: Ci
 
 export function WeeklyDecisionCard({
   statusLabel,
+  postureWithStageLabel,
   postureDelta,
   confidenceLabel,
   confidencePercent,
@@ -541,6 +543,7 @@ export function WeeklyDecisionCard({
     <section className="weather-panel space-y-5 px-5 py-6 sm:space-y-6 sm:px-7 sm:py-8" aria-labelledby="weekly-posture-brief-title">
       <DecisionCallHeader
         statusLabel={statusLabel}
+        postureWithStageLabel={postureWithStageLabel}
         netConstraintSummary={netConstraintSummary}
         meetingShorthand={meetingShorthand}
         postureDelta={postureDelta}

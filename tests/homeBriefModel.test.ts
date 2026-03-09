@@ -1,14 +1,28 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { loadReportData } from "../lib/report/reportData";
 import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
 
 describe("buildHomeBriefModel", () => {
-  it("derives stable labels and decision rules from report data", { timeout: 15000 }, async () => {
-    const data = await loadReportData();
-    const model = buildHomeBriefModel(data, { overlaySector: "consumer" });
+  it("derives stable labels and decision rules from brief inputs", () => {
+    const model = buildHomeBriefModel({
+      assessment: {
+        regime: "DEFENSIVE",
+        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
+        scores: { tightness: 57, riskAppetite: 54 },
+      },
+      regimeAlert: { previousRegime: "VOLATILE" },
+      stopItems: ["Guardrail"],
+      reportDynamics: {
+        directionLabel: "deteriorating",
+        changedSignals: [{ key: "tightness", delta: 2 }],
+        anomalySignals: [],
+      },
+    }, { overlaySector: "consumer" });
 
     assert.match(model.confidenceLabel, /LOW|MED|HIGH/);
+    assert.match(model.stageLabel, /Early|Mid|Late/);
+    assert.equal(typeof model.stageFragile, "boolean");
+    assert.match(model.postureWithStageLabel, /—/);
     assert.equal(typeof model.confidencePercent, "number");
     assert.match(model.trendLabel, /Improving|Deteriorating|Mixed|Stable/);
     assert.match(model.transitionWatch, /ON|OFF/);
@@ -148,6 +162,75 @@ describe("buildHomeBriefModel", () => {
     const timelineLabels = model.historicalTimeline.map((entry) => entry.label);
     assert.equal(timelineLabels[timelineLabels.length - 1], "2022");
     assert.ok(timelineLabels.every((label) => Number.parseInt(label, 10) <= 2022));
+  });
+
+  it("derives stage labels for regime edge cases", () => {
+    const strongExpansion = buildHomeBriefModel({
+      assessment: {
+        regime: "EXPANSION",
+        thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
+        scores: { tightness: 30, riskAppetite: 80 },
+      },
+      regimeAlert: null,
+      stopItems: ["Guardrail"],
+      reportDynamics: {
+        directionLabel: "improving",
+        changedSignals: [{ key: "riskAppetite", delta: 4 }],
+        anomalySignals: [],
+      },
+    });
+    assert.equal(strongExpansion.stageLabel, "Late");
+    assert.equal(strongExpansion.stageFragile, false);
+
+    const weakExpansionNearFlip = buildHomeBriefModel({
+      assessment: {
+        regime: "EXPANSION",
+        thresholds: { tightnessRegime: 40, riskAppetiteRegime: 50 },
+        scores: { tightness: 39, riskAppetite: 52 },
+      },
+      regimeAlert: null,
+      stopItems: ["Guardrail"],
+      reportDynamics: {
+        directionLabel: "stable",
+        changedSignals: [],
+        anomalySignals: [],
+      },
+    });
+    assert.equal(weakExpansionNearFlip.stageLabel, "Late");
+    assert.equal(weakExpansionNearFlip.stageFragile, true);
+    assert.match(weakExpansionNearFlip.postureWithStageLabel, /Late \(Fragile\)/);
+
+    const mixedStabilization = buildHomeBriefModel({
+      assessment: {
+        regime: "VOLATILE",
+        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
+        scores: { tightness: 66, riskAppetite: 68 },
+      },
+      regimeAlert: null,
+      stopItems: ["Guardrail"],
+      reportDynamics: {
+        directionLabel: "mixed",
+        changedSignals: [{ key: "tightness", delta: -1.5 }, { key: "riskAppetite", delta: 1 }],
+        anomalySignals: [],
+      },
+    });
+    assert.equal(mixedStabilization.stageLabel, "Mid");
+
+    const scarcityRecovery = buildHomeBriefModel({
+      assessment: {
+        regime: "SCARCITY",
+        thresholds: { tightnessRegime: 55, riskAppetiteRegime: 45 },
+        scores: { tightness: 75, riskAppetite: 30 },
+      },
+      regimeAlert: null,
+      stopItems: ["Guardrail"],
+      reportDynamics: {
+        directionLabel: "improving",
+        changedSignals: [{ key: "tightness", delta: -4 }],
+        anomalySignals: [],
+      },
+    });
+    assert.equal(scarcityRecovery.stageLabel, "Early");
   });
 
 });
