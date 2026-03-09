@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { buildContentMeasurementReport, type ContentMeasurementEvent } from "../lib/contentMeasurement";
+import { buildContentMeasurementReport, isContentMeasurementEvent, type ContentMeasurementEvent } from "../lib/contentMeasurement";
 
 describe("buildContentMeasurementReport", () => {
   it("aggregates entrances, CTA conversions, assisted paths, and intent counts", () => {
@@ -27,4 +27,29 @@ describe("buildContentMeasurementReport", () => {
     assert.equal(report.eventsByIntent["vc-partner"], 2);
     assert.equal(report.eventsByIntent.cfo, 2);
   });
+
+
+  it("validates content measurement telemetry payloads", () => {
+    assert.equal(
+      isContentMeasurementEvent({
+        pagePath: "/",
+        cluster: "tool",
+        intent: "board",
+        type: "cta_conversion",
+        ctaId: "homepage_top_fold_copy_weekly_brief",
+      }),
+      true,
+    );
+
+    assert.equal(
+      isContentMeasurementEvent({
+        pagePath: "",
+        cluster: "tool",
+        intent: "board",
+        type: "cta_conversion",
+      }),
+      false,
+    );
+  });
+
 });

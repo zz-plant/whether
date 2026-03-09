@@ -11,6 +11,54 @@ export type ContentMeasurementEvent = {
   internalPath?: string;
 };
 
+export const CONTENT_MEASUREMENT_ENDPOINT = "/api/telemetry/content-measurement";
+
+export const isContentCluster = (value: string): value is ContentCluster =>
+  value === "authority" || value === "pain" || value === "tool" || value === "vc";
+
+export const isContentIntent = (value: string): value is ContentIntent =>
+  value === "cfo" || value === "board" || value === "vp-product" || value === "vc-partner";
+
+export const isContentEventType = (value: string): value is ContentEventType =>
+  value === "organic_entrance" || value === "cta_conversion" || value === "assisted_conversion";
+
+export const isContentMeasurementEvent = (input: unknown): input is ContentMeasurementEvent => {
+  if (!input || typeof input !== "object") {
+    return false;
+  }
+
+  const payload = input as Record<string, unknown>;
+
+  return (
+    typeof payload.pagePath === "string" &&
+    payload.pagePath.length > 0 &&
+    isContentCluster(String(payload.cluster)) &&
+    isContentIntent(String(payload.intent)) &&
+    isContentEventType(String(payload.type))
+  );
+};
+
+export const trackContentCtaConversion = (event: Omit<ContentMeasurementEvent, "type"> & { type?: "cta_conversion" }) => {
+  const payload: ContentMeasurementEvent = {
+    ...event,
+    type: "cta_conversion",
+  };
+  const body = JSON.stringify(payload);
+
+  if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function") {
+    const beaconBody = new Blob([body], { type: "application/json" });
+    navigator.sendBeacon(CONTENT_MEASUREMENT_ENDPOINT, beaconBody);
+    return;
+  }
+
+  void fetch(CONTENT_MEASUREMENT_ENDPOINT, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body,
+    keepalive: true,
+  });
+};
+
 export type ContentMeasurementReport = {
   organicEntrancesByCluster: Record<ContentCluster, number>;
   ctaConversionsByPage: Record<string, number>;

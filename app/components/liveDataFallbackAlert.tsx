@@ -14,9 +14,12 @@ export function LiveDataFallbackAlert({
       className="weather-panel border border-amber-500/50 bg-amber-500/10 px-5 py-4 text-sm text-amber-100"
       aria-live="polite"
     >
-      <p className="font-semibold">Live data unavailable — showing cached snapshot.</p>
+      <p className="font-semibold">Data state: cached snapshot active.</p>
       <p className="mt-1">
-        Last cached update: {lastCachedTimestamp}. {followUpLabel} in{" "}
+        Decision impact: keep today&apos;s do now / hold / revisit path, but pause irreversible approvals until live data returns.
+      </p>
+      <p className="mt-1">
+        Low confidence action: stage commitments and verify the next live refresh. Last cached update: {lastCachedTimestamp}. {followUpLabel} in{" "}
         <Link href={signalsHref} className="underline">
           Signals
         </Link>

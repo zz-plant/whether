@@ -559,12 +559,6 @@ export function CitationActionFooter({ citationMetaLine, citation, actions }: Ci
       </div>
       <div className="mt-3 flex flex-wrap gap-3">
         <div className="hidden sm:flex sm:flex-wrap sm:gap-3">{actions}</div>
-        <HapticAnchor
-          href="/toolkits/whether-to-ship"
-          className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100"
-        >
-          Run risk check
-        </HapticAnchor>
       </div>
     </article>
   );
@@ -709,7 +703,7 @@ export function WeeklyDecisionCard({
           href="#primary-artifact-actions"
           className="weather-button-primary fixed inset-x-4 bottom-[calc(env(safe-area-inset-bottom)+0.75rem)] z-20 inline-flex min-h-[44px] items-center justify-center rounded-full px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100 shadow-[0_10px_24px_rgba(2,6,23,0.65)] sm:hidden"
         >
-          Jump to copy actions
+          Jump to weekly actions
         </HapticAnchor>
       ) : null}
 
