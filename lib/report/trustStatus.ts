@@ -152,22 +152,22 @@ export const buildTrustStatus = ({
   stableAction: string;
 }) => {
   const label = historicalSelection
-    ? "Historical snapshot"
+    ? "Data state: historical snapshot"
     : isFallback
-      ? "Using last verified snapshot"
-      : "Live • Treasury verified";
+      ? "Data state: cached snapshot"
+      : "Data state: live Treasury feed";
 
   const detail = historicalSelection
-    ? "Viewing archived Treasury data for the selected month."
+    ? "Decision impact: keep today’s do now / hold / revisit path, but treat this view as retrospective only."
     : isFallback
-      ? (fallbackReason ?? "Live refresh pending. Using last verified snapshot for near-term pacing only.")
-      : "Live refresh healthy. Next expected update: 15m.";
+      ? `Decision impact: keep today’s do now / hold / revisit path, but pause irreversible approvals until live data resumes.${fallbackReason ? ` ${fallbackReason}` : ""}`
+      : "Decision impact: proceed with today’s do now / hold / revisit path under normal approval cadence.";
 
   const action = historicalSelection
-    ? historicalAction
+    ? `${historicalAction} If confidence is low, switch to current data before changing pace.`
     : isFallback
-      ? `${fallbackAction} Pause irreversible decisions until live refresh returns.`
-      : stableAction;
+      ? `${fallbackAction} If confidence is low, stage commitments and confirm one live refresh before escalating.`
+      : `${stableAction} If confidence drops, tighten approvals to staged checks until reliability recovers.`;
 
   const tone: TrustStatusTone = historicalSelection
     ? "historical"

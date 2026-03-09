@@ -26,6 +26,7 @@ describe("ReportShell extracted sections", () => {
 
     assert.match(html, /Data provenance/);
     assert.match(html, /Data source details/);
+    assert.match(html, /\/method/);
   });
 
   it("prefers canonical treasury source attribution when provenance is present", () => {

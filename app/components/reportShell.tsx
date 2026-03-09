@@ -171,7 +171,7 @@ export function HeroTrustProvenanceBlock({
           )
         }
       />
-      <p className="mt-3 text-xs text-slate-300">Use this for near-term planning decisions, not long-range forecasting.</p>
+      <p className="mt-3 text-xs text-slate-300">Keep the decision path moving; for methodology details, see <Link href="/method" className="underline decoration-slate-500/80 underline-offset-2">/method</Link>.</p>
     </>
   );
 }
