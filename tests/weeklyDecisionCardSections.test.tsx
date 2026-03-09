@@ -104,6 +104,8 @@ describe("WeeklyDecisionCard extracted sections", () => {
           {
             area: "hiring",
             recommendation: "Keep backfills only.",
+            doNow: ["Keep backfills only."],
+            avoidNow: ["Avoid speculative hiring."],
             scope: "CFO review",
             pauseTrigger: "Tightness above 74",
             resumeTrigger: "Tightness below 65",
@@ -114,6 +116,8 @@ describe("WeeklyDecisionCard extracted sections", () => {
     );
 
     assert.match(html, /Decision matrix this week/);
+    assert.match(html, /Do now/);
+    assert.match(html, /Avoid now/);
     assert.match(html, /Guardrail/);
     assert.match(html, /Flip condition/);
   });
