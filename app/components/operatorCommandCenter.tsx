@@ -98,6 +98,9 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
   const commandCenterRef = useRef<HTMLElement | null>(null);
   const triggerHaptic = useHapticFeedback();
   const { copyToClipboard } = useClipboardCopy();
+  // Haptics should reinforce decision delta and artifact completion, not decorative interaction.
+  const triggerNavigationHaptic = () => triggerHaptic("light");
+  const triggerDecisionCommitHaptic = () => triggerHaptic("success");
 
   const onDirectionalKeyDown = (event: ReactKeyboardEvent<HTMLElement>) => {
     if (!commandCenterRef.current) {
@@ -234,7 +237,6 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
 
   const handleExpand = () => {
     setIsExpanded(true);
-    triggerHaptic("light");
     if (isFirstSession) {
       setIsFirstSession(false);
       window.localStorage.setItem(VISITED_KEY, "1");
@@ -244,14 +246,12 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
 
   const handleCollapse = () => {
     setIsExpanded(false);
-    triggerHaptic("selection");
   };
 
   const handleReset = () => {
     setQuery("");
     setFilter(isMobile ? "Playbook" : "All");
     searchInputRef.current?.focus();
-    triggerHaptic("selection");
   };
 
   const defaultFilter = isMobile ? "Playbook" : "All";
@@ -283,6 +283,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
           {topMatch ? (
             <a
               href={topMatch.href}
+              onClick={triggerNavigationHaptic}
               className="weather-pill hidden min-h-[44px] items-center px-3 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:inline-flex"
             >
               {isInPageLink(topMatch.href) ? "Top section" : "Top page"}
@@ -340,7 +341,6 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
                       type="button"
                       onClick={() => {
                         setFilter(item);
-                        triggerHaptic("selection");
                       }}
                       className={`${filterClassName} ${
                         isActive
@@ -434,10 +434,14 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
                                 void (async () => {
                                   const copied = await copyToClipboard(action.copyText!, action.copyTarget ?? action.label);
                                   if (!copied) {
+                                    if (action.group === "Playbook") {
+                                      triggerDecisionCommitHaptic();
+                                    } else {
+                                      triggerNavigationHaptic();
+                                    }
                                     window.location.assign(action.href);
                                   }
                                 })();
-                                triggerHaptic("light");
                               }}
                             >
                               <span className="inline-flex min-w-0 items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-100">
@@ -466,7 +470,13 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
                               className="weather-pill inline-flex min-h-[44px] w-full items-center justify-between gap-3 px-3 py-2 text-left transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
                               title={action.description}
                               aria-label={`${action.label} (${isInPageLink(action.href) ? "section jump" : "page navigation"})`}
-                              onClick={() => triggerHaptic("light")}
+                              onClick={() => {
+                                if (action.group === "Playbook") {
+                                  triggerDecisionCommitHaptic();
+                                  return;
+                                }
+                                triggerNavigationHaptic();
+                              }}
                             >
                               <span className="inline-flex min-w-0 items-center gap-2 text-xs font-semibold tracking-[0.12em] text-slate-100">
                                 <span aria-hidden="true" className="text-slate-400">
