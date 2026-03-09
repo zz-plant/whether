@@ -62,9 +62,22 @@ export type ReportDynamics = {
     label: string;
     delta: number;
   }>;
+  anomalySignals: Array<{
+    key: "tightness" | "riskAppetite" | "baseRate" | "curveSlope";
+    label: string;
+    delta: number;
+    reason: string;
+  }>;
   totalSignalChanges: number;
   regimeChanged: boolean;
   directionLabel: "improving" | "deteriorating" | "mixed" | "stable";
+};
+
+const signalAnomalyThresholds: Record<ReportDynamics["changedSignals"][number]["key"], number> = {
+  tightness: 50,
+  riskAppetite: 50,
+  baseRate: 1.5,
+  curveSlope: 1,
 };
 
 export const signalDeltaImprovesWhen: Record<ReportDynamics["changedSignals"][number]["key"], "positive" | "negative"> = {
@@ -110,7 +123,7 @@ export const buildLastYearComparison = ({
 });
 
 const signalLabels: Record<ReportDynamics["changedSignals"][number]["key"], string> = {
-  tightness: "Cash availability",
+  tightness: "Cash tightness",
   riskAppetite: "Risk appetite",
   baseRate: "Base rate",
   curveSlope: "Curve slope",
@@ -126,6 +139,7 @@ export const buildReportDynamics = ({
   if (!previous) {
     return {
       changedSignals: [],
+      anomalySignals: [],
       totalSignalChanges: 0,
       regimeChanged: false,
       directionLabel: "stable",
@@ -153,14 +167,39 @@ export const buildReportDynamics = ({
       label: signalLabels.curveSlope,
       delta: (current.scores.curveSlope ?? 0) - (previous.scores.curveSlope ?? 0),
     },
-  ]
-    .filter((item) => Math.abs(item.delta) >= 0.01)
-    .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
+  ].filter((item) => Math.abs(item.delta) >= 0.01);
 
-  const improvingMoves = comparisons.filter((item) => isImprovingSignalDelta(item.key, item.delta)).length;
-  const deterioratingMoves = comparisons.filter((item) => !isImprovingSignalDelta(item.key, item.delta)).length;
+  const { anomalies, changes } = comparisons.reduce(
+    (accumulator, item) => {
+      const maxExpectedDelta = signalAnomalyThresholds[item.key];
+      if (Math.abs(item.delta) > maxExpectedDelta) {
+        accumulator.anomalies.push({
+          ...item,
+          reason: `Exceeded weekly sanity threshold of ±${maxExpectedDelta}.`,
+        });
+        return accumulator;
+      }
+
+      accumulator.changes.push(item);
+      return accumulator;
+    },
+    {
+      anomalies: [] as Array<{
+        key: "tightness" | "riskAppetite" | "baseRate" | "curveSlope";
+        label: string;
+        delta: number;
+        reason: string;
+      }>,
+      changes: [] as typeof comparisons,
+    }
+  );
+
+  const sortedChanges = changes.sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
+
+  const improvingMoves = sortedChanges.filter((item) => isImprovingSignalDelta(item.key, item.delta)).length;
+  const deterioratingMoves = sortedChanges.filter((item) => !isImprovingSignalDelta(item.key, item.delta)).length;
   const directionLabel: ReportDynamics["directionLabel"] =
-    comparisons.length === 0
+    sortedChanges.length === 0
       ? "stable"
       : improvingMoves > 0 && deterioratingMoves > 0
         ? "mixed"
@@ -169,8 +208,9 @@ export const buildReportDynamics = ({
           : "deteriorating";
 
   return {
-    changedSignals: comparisons,
-    totalSignalChanges: comparisons.length,
+    changedSignals: sortedChanges,
+    anomalySignals: anomalies,
+    totalSignalChanges: sortedChanges.length,
     regimeChanged: current.regime !== previous.regime,
     directionLabel,
   };
@@ -474,6 +514,7 @@ const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataF
     recordDateLabel,
     reportDynamics: {
       changedSignals: [],
+      anomalySignals: [],
       totalSignalChanges: 0,
       regimeChanged: false,
       directionLabel: "stable",

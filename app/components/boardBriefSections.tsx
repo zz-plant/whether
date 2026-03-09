@@ -105,7 +105,7 @@ export const WeeklyActionSummaryPanel = ({
   const regimeLabel = getRegimeLabel(assessment.regime);
   const actionGuidance = getWeeklyActionGuidance(assessment.regime);
   const constraints = [
-    `Cash availability: ${assessment.scores.tightness}/100`,
+    `Cash tightness: ${assessment.scores.tightness}/100`,
     `Risk appetite: ${assessment.scores.riskAppetite}/100`,
     `Execution mandate: Keep bets short-cycle and reversible.`,
   ];

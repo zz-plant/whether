@@ -40,6 +40,7 @@ describe("buildHomeBriefModel", () => {
       reportDynamics: {
         directionLabel: "stable",
         changedSignals: [],
+        anomalySignals: [],
       },
     });
 
@@ -76,6 +77,7 @@ describe("buildHomeBriefModel", () => {
           { key: "riskAppetite", delta: 6 },
           { key: "tightness", delta: 0.2 },
         ],
+        anomalySignals: [],
       },
     });
 
@@ -96,6 +98,7 @@ describe("buildHomeBriefModel", () => {
       reportDynamics: {
         directionLabel: "stable",
         changedSignals: [],
+        anomalySignals: [],
       },
     });
 
@@ -116,6 +119,7 @@ describe("buildHomeBriefModel", () => {
       reportDynamics: {
         directionLabel: "stable",
         changedSignals: [],
+        anomalySignals: [],
       },
     }, { overlaySector: "infrastructure" });
 
@@ -137,6 +141,7 @@ describe("buildHomeBriefModel", () => {
       reportDynamics: {
         directionLabel: "stable",
         changedSignals: [],
+        anomalySignals: [],
       },
     });
 

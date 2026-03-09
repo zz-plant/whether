@@ -13,7 +13,8 @@ const reportDynamics: ReportDynamics = {
   directionLabel: "stable",
   totalSignalChanges: 1,
   regimeChanged: false,
-  changedSignals: [{ key: "tightness", label: "Cash availability", delta: 1 }],
+  changedSignals: [{ key: "tightness", label: "Cash tightness", delta: 1 }],
+  anomalySignals: [],
 };
 
 const decisionRules: BoundedDecisionRule[] = [
