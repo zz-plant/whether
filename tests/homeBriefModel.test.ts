@@ -31,6 +31,11 @@ describe("buildHomeBriefModel", () => {
     assert.equal(typeof model.reversalTrigger, "string");
     assert.equal(model.decisionRules.length, 5);
     assert.equal(model.roleAwareTemplates.length, 2);
+    assert.ok(model.executiveOperationalStance.expand.length >= 2);
+    assert.ok(model.executiveOperationalStance.avoid.length >= 2);
+    assert.ok(model.executiveOperationalStance.expand.length <= 4);
+    assert.ok(model.executiveOperationalStance.avoid.length >= 2);
+    assert.ok(model.executiveOperationalStance.avoid.length <= 4);
     assert.match(model.roleAwareTemplates[0]?.doNow ?? "", /hiring|tempo|spend|reversible/i);
     assert.equal(typeof model.revisitDecisions, "boolean");
     assert.ok(model.memoryRail.length > 0);

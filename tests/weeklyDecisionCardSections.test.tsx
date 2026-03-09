@@ -37,6 +37,10 @@ describe("WeeklyDecisionCard extracted sections", () => {
         }}
         movementVelocity="Low"
         startupClimateIndex={{ score: 62, status: "Stable" }}
+        executiveOperationalStance={{
+          expand: ["Increase product tempo for reversible bets", "Selective hiring for revenue-linked roles"],
+          avoid: ["net-new hiring if tightness > 74", "long-payback bets if risk appetite < 44"],
+        }}
       />,
     );
 
@@ -91,6 +95,10 @@ describe("WeeklyDecisionCard extracted sections", () => {
         }}
         movementVelocity="Medium"
         startupClimateIndex={{ score: 58, status: "Stable" }}
+        executiveOperationalStance={{
+          expand: ["Increase product tempo for reversible bets", "Selective hiring for revenue-linked roles"],
+          avoid: ["net-new hiring if tightness > 74", "long-payback bets if risk appetite < 44"],
+        }}
       />,
     );
 

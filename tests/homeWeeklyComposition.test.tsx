@@ -84,7 +84,7 @@ describe("weekly card and interpretation panel composition", () => {
           decisionShiftSummary="Decision delta: tighten roadmap optionality while protecting core delivery."
           transitionProbabilities={{ Expansion: 10, Mixed: 35, Scarcity: 40, Defensive: 15 }}
           decisionRules={decisionRules}
-        roleAwareTemplates={[
+          roleAwareTemplates={[
           {
             role: "startup-leadership",
             roleLabel: "Startup leadership",
@@ -100,6 +100,10 @@ describe("weekly card and interpretation panel composition", () => {
             flipTrigger: "Reopen growth pacing after two improving reads.",
           },
         ]}
+          executiveOperationalStance={{
+            expand: ["Increase product tempo for reversible bets", "Selective hiring for revenue-linked roles"],
+            avoid: ["net-new hiring if tightness > 74", "long-payback bets if risk appetite < 44"],
+          }}
           revisitDecisions={true}
           memoryRail={[{ label: "Now", posture: "Defensive" }]}
           historicalTimeline={[{ label: "2026", posture: "Defensive" }]}
@@ -175,7 +179,7 @@ describe("weekly card and interpretation panel composition", () => {
           decisionShiftSummary="Decision delta: tighten roadmap optionality while protecting core delivery."
           transitionProbabilities={{ Expansion: 10, Mixed: 35, Scarcity: 40, Defensive: 15 }}
           decisionRules={decisionRules}
-        roleAwareTemplates={[
+          roleAwareTemplates={[
           {
             role: "startup-leadership",
             roleLabel: "Startup leadership",
@@ -191,6 +195,10 @@ describe("weekly card and interpretation panel composition", () => {
             flipTrigger: "Reopen growth pacing after two improving reads.",
           },
         ]}
+          executiveOperationalStance={{
+            expand: ["Increase product tempo for reversible bets", "Selective hiring for revenue-linked roles"],
+            avoid: ["net-new hiring if tightness > 74", "long-payback bets if risk appetite < 44"],
+          }}
           revisitDecisions={true}
           memoryRail={[{ label: "Now", posture: "Defensive" }]}
           historicalTimeline={[{ label: "2026", posture: "Defensive" }]}

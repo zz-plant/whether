@@ -65,6 +65,10 @@ describe("WeeklyDecisionCard top-fold composition", () => {
             flipTrigger: "Reopen growth pacing after two improving reads.",
           },
         ]}
+        executiveOperationalStance={{
+          expand: ["Increase product tempo for reversible bets", "Selective hiring for revenue-linked roles"],
+          avoid: ["net-new hiring if tightness > 74", "long-payback bets if risk appetite < 44"],
+        }}
         revisitDecisions={true}
         memoryRail={[{ label: "Now", posture: "Defensive" }]}
         historicalTimeline={[{ label: "2026", posture: "Defensive" }]}
@@ -98,6 +102,9 @@ describe("WeeklyDecisionCard top-fold composition", () => {
 
     assert.match(html, /Weekly operating call/);
     assert.match(html, /This week in 15 seconds/);
+    assert.match(html, /Key operational stance this week/);
+    assert.match(html, /Expand:/);
+    assert.match(html, /Avoid:/);
     assert.match(html, /Macro posture band/);
     assert.match(html, /points to flip/);
     assert.match(html, /Decision matrix this week/);
@@ -160,6 +167,10 @@ describe("WeeklyDecisionCard top-fold composition", () => {
             flipTrigger: "Reopen growth pacing after two improving reads.",
           },
         ]}
+        executiveOperationalStance={{
+          expand: ["Increase product tempo for reversible bets", "Selective hiring for revenue-linked roles"],
+          avoid: ["net-new hiring if tightness > 74", "long-payback bets if risk appetite < 44"],
+        }}
         revisitDecisions={false}
         memoryRail={[{ label: "Now", posture: "Defensive" }]}
         historicalTimeline={[{ label: "2026", posture: "Defensive" }]}
