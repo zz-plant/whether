@@ -23,6 +23,7 @@ import { HistoricalReplayDatePicker } from "./components/historicalReplayDatePic
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { REGIME_LABELS } from "../../lib/regimePresentation";
 
+export const runtime = "edge";
 export const revalidate = 900;
 
 export const metadata: Metadata = buildPageMetadata({

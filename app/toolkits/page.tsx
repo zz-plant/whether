@@ -4,6 +4,7 @@ import { buildPageMetadata } from "../../lib/seo";
 import { toolkitDefinitions } from "../../lib/informationArchitecture";
 
 
+export const runtime = "edge";
 export const metadata: Metadata = buildPageMetadata({
   title: "Toolkits — runnable instruments",
   description: "Use practical toolkits with checklists, templates, and misuse warnings.",
