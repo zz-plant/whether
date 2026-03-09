@@ -39,7 +39,8 @@ describe("WeeklyDecisionCard extracted sections", () => {
     );
 
     assert.match(html, /Weekly posture call/);
-    assert.match(html, /Macro posture dial/);
+    assert.match(html, /Macro posture band/);
+    assert.match(html, /points to flip/);
     assert.match(html, /Primary guardrail/);
     assert.match(html, /Flip trigger/);
   });
