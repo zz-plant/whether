@@ -14,6 +14,7 @@ export function RevealOnView({
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
     const node = ref.current;
     if (!node) return;
     const observer = new IntersectionObserver(
@@ -21,12 +22,31 @@ export function RevealOnView({
         if (entry?.isIntersecting) {
           setVisible(true);
           observer.disconnect();
+          if (timeoutId) {
+            clearTimeout(timeoutId);
+            timeoutId = null;
+          }
         }
       },
-      { threshold: 0.12 },
+      {
+        threshold: 0.01,
+        rootMargin: "420px 0px",
+      },
     );
+
+    timeoutId = setTimeout(() => {
+      setVisible(true);
+      observer.disconnect();
+    }, 1800);
+
     observer.observe(node);
-    return () => observer.disconnect();
+
+    return () => {
+      observer.disconnect();
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, []);
 
   return (
