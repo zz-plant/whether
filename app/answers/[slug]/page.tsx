@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { buildPageMetadata } from "../../../lib/seo";
 import { answerPages, findDecisionPage } from "../decisionPages";
+import { uniqueSortedStaticSlugs } from "../../../lib/staticParams";
 import { DecisionAnswerPageContent } from "../decisionAnswerPageContent";
 
 type DecisionPageProps = {
@@ -11,7 +12,7 @@ export const dynamicParams = false;
 export const revalidate = 900;
 
 export function generateStaticParams() {
-  return answerPages.map((page) => ({ slug: page.slug }));
+  return uniqueSortedStaticSlugs(answerPages.map((page) => page.slug));
 }
 
 export async function generateMetadata({ params }: DecisionPageProps): Promise<Metadata> {

@@ -30,7 +30,8 @@
     "review:hotspot-preflight": "node scripts/review-hotspot-preflight.mjs",
     "summary-archive:migrate-structured": "bunx tsx scripts/migrateSummaryArchiveStructured.ts --write",
     "summary-archive:check-structured": "bunx tsx scripts/migrateSummaryArchiveStructured.ts",
-    "brief:weekly:artifact": "bunx tsx scripts/generateWeeklySlackBrief.ts --out artifacts/weekly-slack-brief.txt"
+    "brief:weekly:artifact": "bunx tsx scripts/generateWeeklySlackBrief.ts --out artifacts/weekly-slack-brief.txt",
+    "metrics:static-assets": "node scripts/static-asset-diff-metric.mjs"
   },
   "engines": {
     "node": "20.16.x"

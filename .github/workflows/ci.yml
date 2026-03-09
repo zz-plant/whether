@@ -41,3 +41,14 @@ jobs:
           NEXT_ON_PAGES_SKIP_BUILD: ${{ matrix.target == 'build:cloudflare' && '1' || '' }}
           NEXT_ON_PAGES_REUSE_PREBUILT: ${{ matrix.target == 'build:cloudflare' && '1' || '' }}
         run: bun run ${{ matrix.target }}
+
+      - name: Static asset diff metric
+        if: matrix.target == 'build'
+        run: bun run metrics:static-assets
+
+      - name: Upload static asset diff artifact
+        if: matrix.target == 'build'
+        uses: actions/upload-artifact@v4
+        with:
+          name: static-asset-diff-metric
+          path: artifacts/static-asset-diff-metric.json

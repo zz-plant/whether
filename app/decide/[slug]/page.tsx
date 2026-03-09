@@ -8,6 +8,7 @@ import {
   toolkitDefinitions,
   useCaseRoles,
 } from "../../../lib/informationArchitecture";
+import { sortStaticParamsBySlug } from "../../../lib/staticParams";
 
 type Params = { slug: string };
 
@@ -19,10 +20,10 @@ const titleCase = (value: string) => value
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return [
+  return sortStaticParamsBySlug([
     ...useCaseRoles.map((entry) => ({ slug: entry.slug })),
     ...situationUseCases.map((slug) => ({ slug })),
-  ];
+  ]);
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {

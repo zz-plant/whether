@@ -190,5 +190,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...vcAuthorityEntries,
     ...decisionAnswerEntries,
     ...regimeDeepEntries,
-  ].map(buildEntry);
+  ]
+    .sort((left, right) => left.path.localeCompare(right.path))
+    .map(buildEntry);
 }

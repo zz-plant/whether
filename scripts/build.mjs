@@ -139,7 +139,7 @@ if (useNextOnPages) {
         args,
         commandSucceeded,
         workerIndexExists: existsSync(workerIndexPath),
-        generatedAt: new Date().toISOString(),
+        generatedAt: currentCommitSha ? `commit:${currentCommitSha}` : null,
       },
       null,
       2,

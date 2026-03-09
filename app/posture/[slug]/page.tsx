@@ -3,12 +3,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../lib/seo";
 import { postureDefinitions } from "../../../lib/informationArchitecture";
+import { sortStaticParamsBySlug } from "../../../lib/staticParams";
 type Params = { slug: string };
 
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return postureDefinitions.map((entry) => ({ slug: entry.slug }));
+  return sortStaticParamsBySlug(postureDefinitions.map((entry) => ({ slug: entry.slug })));
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {

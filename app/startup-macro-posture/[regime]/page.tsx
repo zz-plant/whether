@@ -13,7 +13,9 @@ export const dynamicParams = false;
 export const revalidate = 900;
 
 export function generateStaticParams() {
-  return regimePages.map((regime) => ({ regime: regime.slug }));
+  return [...regimePages]
+    .sort((left, right) => left.slug.localeCompare(right.slug))
+    .map((regime) => ({ regime: regime.slug }));
 }
 
 export async function generateMetadata({ params }: RegimePageProps): Promise<Metadata> {
