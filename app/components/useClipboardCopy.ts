@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useHapticFeedback } from "./useHapticFeedback";
+import { useSemanticHaptics } from "./useSemanticHaptics";
 
 export type ClipboardCopyStatus = "idle" | "copying" | "copied" | "error";
 type ClipboardCopyErrorReason = "unavailable" | "write-failed";
@@ -65,7 +65,7 @@ export const useClipboardCopy = (
   const [activeTarget, setActiveTarget] = useState<string | null>(null);
   const [copiedTarget, setCopiedTarget] = useState<string | null>(null);
   const timeoutRef = useRef<number | null>(null);
-  const triggerHaptic = useHapticFeedback();
+  const triggerHaptic = useSemanticHaptics();
 
   const clearResetTimer = useCallback(() => {
     if (timeoutRef.current !== null) {
@@ -89,7 +89,7 @@ export const useClipboardCopy = (
         setError(true);
         setErrorReason("unavailable");
         setStatus("error");
-        triggerHaptic("warning");
+        triggerHaptic("copyUnavailable");
         return false;
       }
       setStatus("copying");
@@ -100,7 +100,7 @@ export const useClipboardCopy = (
         setErrorReason(null);
         setStatus("copied");
         setCopiedTarget(target ?? null);
-        triggerHaptic("success");
+        triggerHaptic("copySucceeded");
         clearResetTimer();
         timeoutRef.current = window.setTimeout(() => {
           setStatus("idle");
@@ -111,7 +111,7 @@ export const useClipboardCopy = (
         setError(true);
         setErrorReason("write-failed");
         setStatus("error");
-        triggerHaptic("error");
+        triggerHaptic("copyFailed");
         return false;
       } finally {
         setActiveTarget(null);

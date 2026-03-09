@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { navigationGroupLabels, navigationLayers } from "../../lib/navigation/informationArchitecture";
 import { pathMatchesLink } from "../../lib/navigation/pathMatching";
 import { reportShellCorePaths } from "../../lib/report/reportNavigation";
+import { HapticsToggleButton } from "./hapticsToggleButton";
 import { ThemeToggleButton } from "./themeToggleButton";
 
 export function GlobalHeader() {
@@ -40,7 +41,10 @@ export function GlobalHeader() {
               </p>
             )}
           </div>
-          <ThemeToggleButton />
+          <div className="flex items-center gap-2">
+            <HapticsToggleButton />
+            <ThemeToggleButton />
+          </div>
         </div>
 
         <nav aria-label="Global navigation" className="mt-4">

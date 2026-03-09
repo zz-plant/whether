@@ -2,7 +2,7 @@
 
 import { Dialog } from "@base-ui/react/dialog";
 import { useRef, useState } from "react";
-import { useHapticFeedback } from "./useHapticFeedback";
+import { useSemanticHaptics } from "./useSemanticHaptics";
 
 type MobileAction = {
   href: string;
@@ -20,7 +20,7 @@ export const MobileActionSheet = ({
 }) => {
   const [open, setOpen] = useState(false);
   const suppressCloseAutoFocusRef = useRef(false);
-  const triggerHaptic = useHapticFeedback();
+  const triggerHaptic = useSemanticHaptics();
 
   return (
     <Dialog.Root
@@ -31,7 +31,7 @@ export const MobileActionSheet = ({
         }
 
         setOpen(nextOpen);
-        triggerHaptic(nextOpen ? "light" : "selection");
+        triggerHaptic(nextOpen ? "panelOpened" : "panelClosed");
       }}
     >
       <Dialog.Trigger
@@ -89,7 +89,7 @@ export const MobileActionSheet = ({
                     onClick={() => {
                       suppressCloseAutoFocusRef.current = true;
                       setOpen(false);
-                      triggerHaptic("selection");
+                      triggerHaptic("selectionChanged");
                     }}
                   >
                     {action.label}

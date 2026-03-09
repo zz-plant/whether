@@ -8,6 +8,7 @@ import { Children, type ReactNode, isValidElement } from "react";
 import { DisplayGuardian } from "./displayGuardian";
 import { DisplayModeManager } from "./displayModeManager";
 import { DisplayModeToggle } from "./displayModeToggle";
+import { HapticsToggleButton } from "./hapticsToggleButton";
 import { CanonicalTrustModule } from "./canonicalTrustModule";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
 import {
@@ -402,7 +403,7 @@ export const ReportShell = ({
 
         {showPageNavigation ? <div className="sm:hidden"><ReportMobileNavigation pageLinks={pageLinks} pageTitle={pageTitle} currentPath={currentPath} className="mt-3 px-4 pb-6" sectionLinks={sectionLinks} /></div> : null}
 
-        <aside className="tv-action-rail" aria-label="TV quick actions"><p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Quick actions</p><div className="mt-2 grid gap-2"><ReportCta href={primaryCta.href} copyText={primaryCta.copyText} copyTarget={primaryCta.copyTarget} label={primaryCta.label} className="weather-button-primary inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-100">{primaryCta.label}</ReportCta>{secondaryCta ? <a href={secondaryCta.href} className="weather-pill inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-200">{secondaryCta.label}</a> : null}<DisplayModeToggle /></div></aside>
+        <aside className="tv-action-rail" aria-label="TV quick actions"><p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Quick actions</p><div className="mt-2 grid gap-2"><ReportCta href={primaryCta.href} copyText={primaryCta.copyText} copyTarget={primaryCta.copyTarget} label={primaryCta.label} className="weather-button-primary inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-100">{primaryCta.label}</ReportCta>{secondaryCta ? <a href={secondaryCta.href} className="weather-pill inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-200">{secondaryCta.label}</a> : null}<DisplayModeToggle /><HapticsToggleButton /></div></aside>
       </main>
     </>
   );
