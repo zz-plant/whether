@@ -257,7 +257,12 @@ export const ReportPageNavigation = ({
                     isOddTail,
                   })}
                 >
-                  {link.label}
+                  <span className="inline-flex items-center gap-2">
+                    <span className="inline-flex h-5 w-5 items-center justify-center [&_svg]:h-4 [&_svg]:w-4" aria-hidden="true">
+                      {pageLinkIcons[link.id] ?? defaultPageLinkIcon}
+                    </span>
+                    <span>{link.label}</span>
+                  </span>
                 </NavigationMenu.Link>
               </NavigationMenu.Item>
             );

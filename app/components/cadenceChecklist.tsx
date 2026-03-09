@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { ArrowRightIcon, CheckIcon } from "./uiIcons";
 
 type CadenceChecklistProps = {
   cadence: "weekly" | "monthly";
@@ -127,8 +128,8 @@ export const CadenceChecklist = ({
                   href={item.href}
                   className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 transition-colors hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
                 >
-                  Open step →
-                </a>
+                  Open step
+                <ArrowRightIcon className="ml-1 h-3.5 w-3.5" aria-hidden="true" /></a>
                 <button
                   type="button"
                   className="cadence-toggle inline-flex min-h-[44px] items-center rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.14em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
@@ -140,7 +141,7 @@ export const CadenceChecklist = ({
                   }}
                   aria-pressed={done}
                 >
-                  {done ? "Completed" : "Mark complete"}
+                  {done ? <span className="inline-flex items-center gap-1"><CheckIcon className="h-3.5 w-3.5" aria-hidden="true" />Completed</span> : "Mark complete"}
                 </button>
               </div>
             </li>
