@@ -81,6 +81,47 @@ export const REGIME_STYLE_TOKENS: Record<
 export type RegimeMomentum = "improving" | "deteriorating" | "mixed" | "stable";
 export type RegimeStageLabel = "Early" | "Mid" | "Late";
 export type RegimeConfidenceLabel = "LOW" | "MED" | "HIGH";
+export type RegimeDisplayModifier = "Guarded" | "Transitional" | null;
+
+export const getRegimeDisplayLabel = ({
+  regime,
+  momentum,
+  confidence,
+  transitionWatch,
+}: {
+  regime: RegimeKey;
+  momentum?: RegimeMomentum;
+  confidence?: RegimeConfidenceLabel | "MEDIUM";
+  transitionWatch?: boolean;
+}) => {
+  if (regime === "VOLATILE") {
+    return {
+      canonicalRegime: regime,
+      modifier: "Transitional" as const,
+      label: "Transitional Mixed",
+    };
+  }
+
+  if (regime === "DEFENSIVE" || regime === "SCARCITY") {
+    return {
+      canonicalRegime: regime,
+      modifier: null,
+      label: "Contraction",
+    };
+  }
+
+  const guardedExpansion =
+    transitionWatch ||
+    confidence === "LOW" ||
+    momentum === "deteriorating" ||
+    momentum === "mixed";
+
+  return {
+    canonicalRegime: regime,
+    modifier: guardedExpansion ? ("Guarded" as const) : null,
+    label: guardedExpansion ? "Guarded Expansion" : "Expansion",
+  };
+};
 
 export const deriveRegimeStage = ({
   regime,

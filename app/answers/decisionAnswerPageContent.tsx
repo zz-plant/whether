@@ -7,6 +7,7 @@ import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
 import { buildCallCitation } from "../../lib/export/briefBuilders";
 import { buildLiveShortAnswer } from "./liveShortAnswers";
 import { answerPages, findDecisionPage } from "./decisionPages";
+import { getRegimeDisplayLabel } from "../../lib/regimePresentation";
 
 export async function DecisionAnswerPageContent({
   slug,
@@ -42,6 +43,13 @@ export async function DecisionAnswerPageContent({
     ],
   };
 
+  const displayRegime = getRegimeDisplayLabel({
+    regime: assessment.regime,
+    momentum: reportDynamics.directionLabel,
+    confidence: homeBriefModel.confidenceLabel,
+    transitionWatch: homeBriefModel.transitionWatch === "ON",
+  });
+
   const thresholdTrigger =
     page.thresholdFocus === "tightness"
       ? `Trigger tighter mode if capital tightness rises above ${assessment.thresholds.tightnessRegime.toFixed(0)}.`
@@ -62,7 +70,7 @@ export async function DecisionAnswerPageContent({
 
       <section className="weather-panel space-y-4 px-6 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Current posture context</h2>
-        <p className="text-sm text-slate-200">Posture: {assessment.regime} · Weekly momentum: {reportDynamics.directionLabel} · Revisit decisions: {homeBriefModel.revisitDecisions ? "YES" : "NO"}</p>
+        <p className="text-sm text-slate-200">Posture: {displayRegime.label} ({displayRegime.canonicalRegime}) · Weekly momentum: {reportDynamics.directionLabel} · Revisit decisions: {homeBriefModel.revisitDecisions ? "YES" : "NO"}</p>
       </section>
 
       <section className="weather-panel space-y-4 px-6 py-6">

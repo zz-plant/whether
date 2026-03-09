@@ -23,6 +23,7 @@ describe("buildHomeBriefModel", () => {
     assert.match(model.stageLabel, /Early|Mid|Late/);
     assert.equal(typeof model.stageFragile, "boolean");
     assert.match(model.postureWithStageLabel, /—/);
+    assert.equal(model.postureLabel, "Contraction");
     assert.equal(typeof model.confidencePercent, "number");
     assert.match(model.trendLabel, /Improving|Deteriorating|Mixed|Stable/);
     assert.match(model.transitionWatch, /ON|OFF/);
@@ -215,6 +216,7 @@ describe("buildHomeBriefModel", () => {
       },
     });
     assert.equal(mixedStabilization.stageLabel, "Mid");
+    assert.equal(mixedStabilization.postureLabel, "Transitional Mixed");
 
     const scarcityRecovery = buildHomeBriefModel({
       assessment: {

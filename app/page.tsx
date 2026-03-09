@@ -38,6 +38,7 @@ import { LiveDataFallbackAlert } from "./components/liveDataFallbackAlert";
 import { HomeInterpretationPanel } from "./components/homeInterpretationPanel";
 import { DeferredSection } from "./components/deferredSection";
 import { NextStepRail } from "./components/nextStepRail";
+import { getRegimeDisplayLabel } from "../lib/regimePresentation";
 
 const WeeklyActionSummaryPanel = dynamic(
   () => import("./components/boardBriefSections").then((module) => module.WeeklyActionSummaryPanel),
@@ -335,6 +336,13 @@ const HomePageReportContent = async ({
     treasury,
     treasuryProvenance,
   }, { overlaySector: homepageOverlaySector });
+  const displayRegime = getRegimeDisplayLabel({
+    regime: assessment.regime,
+    momentum: reportDynamics.directionLabel,
+    confidence: homeBriefModel.confidenceLabel,
+    transitionWatch: homeBriefModel.transitionWatch === "ON",
+  });
+
   const interpretationLayer = buildInterpretationLayer({
     view: interpretationView,
     homeBriefModel,
@@ -396,7 +404,7 @@ const HomePageReportContent = async ({
       }
     >
       <WeeklyDecisionCard
-        statusLabel={statusLabel}
+        statusLabel={displayRegime.label}
         postureWithStageLabel={homeBriefModel.postureWithStageLabel}
         postureDelta={homeBriefModel.postureDeltaLabel}
         confidenceLabel={homeBriefModel.confidenceLabel}
