@@ -5,7 +5,7 @@ import { useHapticFeedback } from "./useHapticFeedback";
 
 export function ThemeToggleButton() {
   const [theme, setTheme] = useState<"dark" | "light">("dark");
-  const triggerHaptic = useHapticFeedback();
+  const haptic = useHapticFeedback();
   const isDark = theme === "dark";
 
   useEffect(() => {
@@ -20,7 +20,7 @@ export function ThemeToggleButton() {
     setTheme(nextTheme);
     document.documentElement.dataset.theme = nextTheme;
     window.localStorage.setItem("whether-theme", nextTheme);
-    triggerHaptic("selection");
+    haptic.toggle();
   };
 
   return (

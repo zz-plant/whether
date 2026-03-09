@@ -14,12 +14,12 @@ export function CopyLeadershipArtifactsButtons({
   citation: string;
 }) {
   const { status, activeTarget, copyToClipboard } = useClipboardCopy();
-  const triggerHaptic = useHapticFeedback();
+  const haptic = useHapticFeedback();
   const isCopying = status === "copying";
 
   const handleExportPdf = () => {
     // Haptics should reinforce decision delta and artifact completion, not decorative interaction.
-    triggerHaptic("success");
+    haptic.confirm();
     window.print();
   };
 

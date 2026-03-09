@@ -10,11 +10,15 @@ type HapticAnchorProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
 };
 
 export function HapticAnchor({ tone = "navigation", onClick, ...props }: HapticAnchorProps) {
-  const triggerHaptic = useHapticFeedback();
+  const haptic = useHapticFeedback();
 
   const handleClick: AnchorHTMLAttributes<HTMLAnchorElement>["onClick"] = (event) => {
     // Haptics should reinforce decision delta and artifact completion, not decorative interaction.
-    triggerHaptic(tone === "confirm" ? "success" : "light");
+    if (tone === "confirm") {
+      haptic.confirm();
+    } else {
+      haptic.navigate();
+    }
     onClick?.(event);
   };
 
