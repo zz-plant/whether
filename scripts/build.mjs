@@ -51,6 +51,9 @@ const isCloudflarePages = isTruthyEnv(process.env.CF_PAGES);
 const isCloudflareDeploy = Boolean(process.env.CLOUDFLARE_ACCOUNT_ID);
 const isCi = isTruthyEnv(process.env.CI);
 const skipNextOnPagesBuild = isTruthyEnv(process.env.NEXT_ON_PAGES_SKIP_BUILD);
+const reusePrebuiltOutput = isTruthyEnv(
+  process.env.NEXT_ON_PAGES_REUSE_PREBUILT,
+);
 const hasVercelBuildOutput = existsSync(vercelOutputConfigPath);
 const hasWorkerBuildOutput = existsSync(workerIndexPath);
 const priorBuildMeta = readBuildMeta();
@@ -77,7 +80,10 @@ const shouldAutoSkipInCi =
   (isCi || isCloudflarePages || isCloudflareDeploy);
 const shouldSkipNextOnPagesBuild =
   useNextOnPages &&
-  (skipNextOnPagesBuild || hasReusableBuildOutput || shouldAutoSkipInCi);
+  (skipNextOnPagesBuild ||
+    hasReusableBuildOutput ||
+    (reusePrebuiltOutput && (hasVercelBuildOutput || hasWorkerBuildOutput)) ||
+    shouldAutoSkipInCi);
 
 const command = useNextOnPages ? "next-on-pages" : "next";
 const disableWorkerMinification =
@@ -123,6 +129,9 @@ if (useNextOnPages) {
             ? "NEXT_ON_PAGES_SKIP_BUILD"
             : hasReusableBuildOutput
               ? "cache-hit-same-commit"
+              : reusePrebuiltOutput &&
+                  (hasVercelBuildOutput || hasWorkerBuildOutput)
+                ? "NEXT_ON_PAGES_REUSE_PREBUILT"
               : "ci-prebuilt-vercel-output"
           : null,
         commitSha: currentCommitSha,
