@@ -182,11 +182,21 @@ const HomePageStreamingFallback = () => (
       <p className="text-sm text-slate-200">
         Pulling live signals and preparing bounded decisions, reversal triggers, and share-ready artifacts.
       </p>
-      <div className="h-20 rounded-lg border border-slate-700/70 bg-slate-900/40" />
+      <div className="space-y-3 rounded-xl border border-slate-700/80 bg-slate-900/70 p-3">
+        <div className="h-3 w-36 animate-pulse rounded-full bg-slate-600/80" />
+        <div className="h-4 w-full animate-pulse rounded-full bg-slate-500/80" />
+        <div className="h-4 w-10/12 animate-pulse rounded-full bg-slate-500/70" />
+        <div className="h-3 w-44 animate-pulse rounded-full bg-slate-600/80" />
+      </div>
     </section>
     <section className="weather-panel space-y-4 px-5 py-5" aria-label="Loading evidence">
       <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Loading evidence snapshot</p>
-      <div className="h-24 rounded-lg border border-slate-700/70 bg-slate-900/40" />
+      <div className="space-y-2 rounded-xl border border-slate-700/80 bg-slate-900/70 p-3">
+        <div className="h-3 w-full animate-pulse rounded-full bg-slate-600/70" />
+        <div className="h-3 w-full animate-pulse rounded-full bg-slate-600/70" />
+        <div className="h-3 w-11/12 animate-pulse rounded-full bg-slate-600/60" />
+        <div className="h-3 w-7/12 animate-pulse rounded-full bg-slate-600/60" />
+      </div>
     </section>
   </section>
 );
