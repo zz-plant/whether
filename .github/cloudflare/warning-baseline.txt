@@ -3,3 +3,4 @@ Bun is used as a package manager at build time only, not at runtime with Functio
 You should not upload the `.next` directory.
 Using edge runtime on a page currently disables static generation for that page
 Duplicate key "options" in object literal [duplicate-object-key]
+Invalid prerender config

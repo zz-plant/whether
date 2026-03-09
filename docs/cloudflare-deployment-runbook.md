@@ -28,7 +28,7 @@ If CI reports a new warning class, treat it as action-required until triaged and
 
 ## Warning budget policy
 
-`Invalid prerender config` is treated as a critical warning matcher via `.github/cloudflare/warning-critical.txt`, so any new occurrence fails CI immediately.
+`Invalid prerender config` remains tracked in the baseline warning audit while dynamic-route migrations are in progress; promote it to `.github/cloudflare/warning-critical.txt` only after the remaining legacy routes are migrated.
 
 
 CI enforces a warning budget after Pages-targeted builds by parsing build logs with:

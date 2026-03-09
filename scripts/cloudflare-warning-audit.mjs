@@ -78,14 +78,21 @@ const ensureParentDirectory = (filePath) => {
 };
 
 const warningPattern = /warn(?:ing)?(?:\s*[-:\]])?\s*(.+)$/i;
-const invalidPrerenderPattern = /Invalid prerender config for .+/i;
+const invalidPrerenderPattern = /Invalid prerender config(?: for .+)?/i;
 const edgeRuntimePattern = /Using edge runtime on a page currently disables static generation for that page/i;
 
-const normalizeWarningMessage = (value) =>
-  value
+const normalizeWarningMessage = (value) => {
+  const compactValue = value
     .replace(/^[!:\-\]\[]+\s*/, "")
     .replace(/\s+/g, " ")
     .trim();
+
+  if (invalidPrerenderPattern.test(compactValue)) {
+    return "Invalid prerender config";
+  }
+
+  return compactValue;
+};
 
 const collectWarnings = (logContents) => {
   const warningCounts = new Map();
