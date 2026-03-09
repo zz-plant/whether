@@ -129,6 +129,43 @@ const buildDecisionShiftSummary = ({
   return `Changed: signals moved in opposite directions. Do now: hold approval pace and keep experiments reversible with explicit stop triggers. Flip: ${reversalTrigger}`;
 };
 
+const buildSignalConfidenceReason = ({
+  confidenceLabel,
+  nearestThresholdGap,
+  changedSignals,
+}: {
+  confidenceLabel: "LOW" | "MED" | "HIGH";
+  nearestThresholdGap: number;
+  changedSignals: Array<{ delta: number }>;
+}) => {
+  const boundaryDescriptor =
+    nearestThresholdGap <= 5
+      ? "regime boundary proximity"
+      : nearestThresholdGap <= 12
+        ? "moderate boundary distance"
+        : "wide boundary distance";
+
+  const hasPositiveMoves = changedSignals.some((signal) => signal.delta > 0);
+  const hasNegativeMoves = changedSignals.some((signal) => signal.delta < 0);
+  const directionalSplit = hasPositiveMoves && hasNegativeMoves;
+  const volatilityDescriptor =
+    changedSignals.length === 0
+      ? "stable signal readings"
+      : directionalSplit || changedSignals.length >= 3
+        ? "volatile macro signals"
+        : "broad agreement across signals";
+
+  if (confidenceLabel === "LOW") {
+    return `Reason: ${boundaryDescriptor} + ${volatilityDescriptor}`;
+  }
+
+  if (confidenceLabel === "MED") {
+    return `Reason: ${boundaryDescriptor} with ${volatilityDescriptor}`;
+  }
+
+  return `Reason: ${volatilityDescriptor}; ${boundaryDescriptor}`;
+};
+
 const buildMemoryRail = (recordDateLabel: string | undefined, currentRegime: Regime): MemoryRailItem[] => {
   const weeklyEntries = getSummaryArchive().filter((entry) => entry.cadence === "weekly");
 
@@ -445,6 +482,11 @@ export const buildHomeBriefModel = (
   const confidenceLabel: RegimeConfidenceLabel = nearestThresholdGap <= 5 ? "LOW" : nearestThresholdGap <= 12 ? "MED" : "HIGH";
   const transitionWatch: "ON" | "OFF" = nearestThresholdGap <= 8 || Boolean(regimeAlert) ? "ON" : "OFF";
   const confidencePercent = Math.max(35, Math.min(92, Math.round(55 + nearestThresholdGap * 3)));
+  const signalConfidenceReason = buildSignalConfidenceReason({
+    confidenceLabel,
+    nearestThresholdGap,
+    changedSignals: reportDynamics?.changedSignals ?? [],
+  });
   const trendLabel =
     reportDynamics?.directionLabel === "improving"
       ? "Improving"
@@ -560,6 +602,7 @@ export const buildHomeBriefModel = (
     postureWithStageLabel: `${displayRegime.label} — ${stage.displayLabel}`,
     confidenceLabel,
     confidencePercent,
+    signalConfidenceReason,
     trendLabel,
     startupClimateIndex,
     regimeDistance,

@@ -421,6 +421,7 @@ const HomePageReportContent = async ({
         postureDelta={homeBriefModel.postureDeltaLabel}
         confidenceLabel={homeBriefModel.confidenceLabel}
         confidencePercent={homeBriefModel.confidencePercent}
+        signalConfidenceReason={homeBriefModel.signalConfidenceReason}
         trendLabel={homeBriefModel.trendLabel}
         transitionWatch={homeBriefModel.transitionWatch}
         netConstraintSummary={homeBriefModel.netConstraintSummary}

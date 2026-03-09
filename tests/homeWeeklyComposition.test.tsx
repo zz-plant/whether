@@ -70,6 +70,7 @@ describe("weekly card and interpretation panel composition", () => {
           postureDelta="Worse than last week"
           confidenceLabel="MED"
           confidencePercent={68}
+          signalConfidenceReason="Reason: regime boundary proximity + volatile macro signals"
           trendLabel="Stable"
           transitionWatch="ON"
           netConstraintSummary="Pressure remains elevated."
@@ -131,7 +132,7 @@ describe("weekly card and interpretation panel composition", () => {
 
     assert.match(html, /Posture/);
     assert.match(html, /Movement/);
-    assert.match(html, /Confidence/);
+    assert.match(html, /Signal confidence/);
     assert.match(html, /Action/);
     assert.match(html, /Interpretation layer/);
     assert.match(html, /Company view/);
@@ -158,6 +159,7 @@ describe("weekly card and interpretation panel composition", () => {
           postureDelta="Worse than last week"
           confidenceLabel="MED"
           confidencePercent={68}
+          signalConfidenceReason="Reason: regime boundary proximity + volatile macro signals"
           trendLabel="Stable"
           transitionWatch="ON"
           netConstraintSummary="Pressure remains elevated."

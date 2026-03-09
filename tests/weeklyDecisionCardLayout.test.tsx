@@ -35,6 +35,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
         postureDelta="Worse than last week"
         confidenceLabel="MED"
         confidencePercent={68}
+        signalConfidenceReason="Reason: regime boundary proximity + volatile macro signals"
         trendLabel="Improving"
         transitionWatch="ON"
         netConstraintSummary="Pressure remains elevated but stabilizing."
@@ -100,7 +101,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /Decision matrix this week/);
     assert.match(html, /Posture/);
     assert.match(html, /Movement/);
-    assert.match(html, /Confidence/);
+    assert.match(html, /Signal confidence/);
     assert.match(html, /Action/);
     assert.match(html, /Movement/);
     assert.match(html, /Velocity:/);
@@ -127,6 +128,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
         postureDelta="No worse than last week"
         confidenceLabel="HIGH"
         confidencePercent={92}
+        signalConfidenceReason="Reason: broad agreement across signals; boundary distance is wide"
         trendLabel="Stable"
         transitionWatch="OFF"
         netConstraintSummary="Fallback snapshot is stable for near-term pacing."

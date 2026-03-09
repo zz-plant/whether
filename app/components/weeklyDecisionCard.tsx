@@ -32,6 +32,7 @@ export type WeeklyDecisionCardProps = {
   postureDelta: string;
   confidenceLabel: "HIGH" | "MED" | "LOW";
   confidencePercent: number;
+  signalConfidenceReason: string;
   trendLabel: string;
   transitionWatch: "ON" | "OFF";
   netConstraintSummary: string;
@@ -192,6 +193,7 @@ type DecisionCallHeaderProps = {
   guardrail: string;
   confidencePercent: number;
   confidenceLabel: WeeklyDecisionCardProps["confidenceLabel"];
+  signalConfidenceReason: string;
   trendLabel: WeeklyDecisionCardProps["trendLabel"];
   transitionWatch: WeeklyDecisionCardProps["transitionWatch"];
   freshnessLabel: string;
@@ -215,6 +217,7 @@ export function DecisionCallHeader({
   guardrail,
   confidencePercent,
   confidenceLabel,
+  signalConfidenceReason,
   trendLabel,
   transitionWatch,
   freshnessLabel,
@@ -267,7 +270,7 @@ export function DecisionCallHeader({
           </div>
           <div className={tierOneInset}>
             <SummaryLabel
-              label="Confidence"
+              label="Signal confidence"
               icon={<svg viewBox="0 0 16 16" className="h-3.5 w-3.5"><path d="M8 2.5 12 4v3.6c0 2.5-1.6 4.8-4 5.9-2.4-1.1-4-3.4-4-5.9V4l4-1.5Z" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" /></svg>}
             />
             <p className="mt-1 text-lg font-semibold text-slate-100">{confidenceLabel}</p>
@@ -276,6 +279,7 @@ export function DecisionCallHeader({
               <div className={`${meterFillBase} bg-gradient-to-r from-slate-300/75 to-emerald-300/85`} style={{ width: `${confidenceMeterPercent}%` }} />
               <div className="absolute top-1/2 h-3 w-3 -translate-y-1/2 rounded-full border border-emerald-100/80 bg-slate-950" style={{ left: `calc(${confidenceMeterPercent}% - 6px)` }} />
             </div>
+            <p className="mt-2 text-xs text-slate-300">{signalConfidenceReason}</p>
           </div>
           <div className={tierOneInset}>
             <SummaryLabel
@@ -512,6 +516,7 @@ export function WeeklyDecisionCard({
   postureDelta,
   confidenceLabel,
   confidencePercent,
+  signalConfidenceReason,
   trendLabel,
   transitionWatch,
   netConstraintSummary,
@@ -610,6 +615,7 @@ export function WeeklyDecisionCard({
         guardrail={guardrail}
         confidencePercent={confidencePercent}
         confidenceLabel={confidenceLabel}
+        signalConfidenceReason={signalConfidenceReason}
         trendLabel={trendLabel}
         transitionWatch={transitionWatch}
         freshnessLabel={freshnessLabel}
