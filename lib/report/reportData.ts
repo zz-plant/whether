@@ -74,7 +74,7 @@ export type ReportDynamics = {
 };
 
 const signalAnomalyThresholds: Record<ReportDynamics["changedSignals"][number]["key"], number> = {
-  tightness: 50,
+  tightness: 90,
   riskAppetite: 50,
   baseRate: 1.5,
   curveSlope: 1,
