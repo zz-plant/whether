@@ -443,7 +443,7 @@ const HomePageReportContent = async ({
         />
       ) : null}
 
-      <RevealOnView>
+      <RevealOnView placeholder={<WeeklyActionSummaryFallback />}>
         <Suspense fallback={<WeeklyActionSummaryFallback />}>
           <section
             id="weekly-action-summary"
@@ -459,7 +459,7 @@ const HomePageReportContent = async ({
         </Suspense>
       </RevealOnView>
 
-      <RevealOnView>
+      <RevealOnView placeholder={<ExecutiveSnapshotFallback />}>
         <Suspense fallback={<ExecutiveSnapshotFallback />}>
           <section id="executive-snapshot" aria-label="Leadership summary" className="space-y-8">
             <ExecutiveSnapshotPanel
