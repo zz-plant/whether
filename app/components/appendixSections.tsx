@@ -1681,6 +1681,7 @@ export const SensorArray = ({
                       </linearGradient>
                     </defs>
                     <path d={sparkline.area} fill={`url(#${sparklineId})`} pathLength={100} />
+                    <line x1={0} x2={SPARKLINE_WIDTH} y1={sparkline.medianY} y2={sparkline.medianY} stroke="#334155" strokeDasharray="2 2" strokeWidth="1" />
                     <path
                       d={sparkline.path}
                       fill="none"
@@ -1689,6 +1690,7 @@ export const SensorArray = ({
                       vectorEffect="non-scaling-stroke"
                       pathLength={100}
                     />
+                    <circle cx={sparkline.latest.x} cy={sparkline.latest.y} r="1.8" fill="#e2e8f0" />
                   </svg>
                 ) : (
                   <div
@@ -1700,6 +1702,11 @@ export const SensorArray = ({
                   {hasTrend ? (
                     <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
                       12-month trend (cache)
+                    </p>
+                  ) : null}
+                  {sparkline ? (
+                    <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                      {sparkline.direction === "up" ? "Direction up" : sparkline.direction === "down" ? "Direction down" : "Direction flat"} · Δ {formatDelta(sparkline.delta, sensor.unit)}
                     </p>
                   ) : null}
                   <p className="break-words">{sensor.explanation}</p>
@@ -1812,6 +1819,7 @@ export const MacroSignalsPanel = ({
                           </linearGradient>
                         </defs>
                         <path d={sparkline.area} fill={`url(#${sparklineId})`} pathLength={100} />
+                        <line x1={0} x2={SPARKLINE_WIDTH} y1={sparkline.medianY} y2={sparkline.medianY} stroke="#334155" strokeDasharray="2 2" strokeWidth="1" />
                         <path
                           d={sparkline.path}
                           fill="none"
@@ -1820,6 +1828,7 @@ export const MacroSignalsPanel = ({
                           vectorEffect="non-scaling-stroke"
                           pathLength={100}
                         />
+                        <circle cx={sparkline.latest.x} cy={sparkline.latest.y} r="1.8" fill="#fde68a" />
                       </svg>
                     ) : (
                       <div
@@ -1827,8 +1836,13 @@ export const MacroSignalsPanel = ({
                         aria-hidden="true"
                       />
                     )}
-                    <figcaption className="mt-2 text-xs text-slate-500">
-                      {signal.explanation}
+                    <figcaption className="mt-2 space-y-1 text-xs text-slate-500">
+                      {sparkline ? (
+                        <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-500">
+                          {sparkline.direction === "up" ? "Direction up" : sparkline.direction === "down" ? "Direction down" : "Direction flat"} · Δ {formatDelta(sparkline.delta, signal.unit)}
+                        </p>
+                      ) : null}
+                      <p>{signal.explanation}</p>
                     </figcaption>
                   </figure>
                   <div className="mt-3 text-xs text-slate-500">
