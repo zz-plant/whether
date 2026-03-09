@@ -66,6 +66,7 @@ export const runtime = "edge";
 
 const homeSectionSequence = [
   { href: "#weekly-posture-brief-title", label: "This week" },
+  { href: "#why-whether", label: "Why Whether" },
   { href: "#weekly-action-summary", label: "Weekly actions" },
   { href: "#executive-snapshot", label: "Evidence" },
 ] as const;
@@ -361,13 +362,13 @@ const HomePageReportContent = async ({
       pageSummary="Verdict and immediate decision call for this planning cycle."
       primaryCta={{
         href: "#weekly-posture-brief-title",
-        label: "Copy leadership brief (Slack)",
+        label: "Prepare Monday leadership sync brief",
         copyText: slackBrief,
         copyTarget: "Slack",
       }}
       secondaryCta={{
-        href: "#weekly-action-summary",
-        label: "See evidence behind the call",
+        href: "#why-whether",
+        label: "Why this over dashboards or research",
       }}
       nextStep={{
         href: "/signals",
@@ -425,6 +426,41 @@ const HomePageReportContent = async ({
         layer={interpretationLayer}
         searchParams={resolvedSearchParams}
       />
+
+      <section id="why-whether" className="weather-panel space-y-4 px-5 py-5" aria-label="Why Whether versus alternatives">
+        <div className="space-y-1">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Why Whether</p>
+          <h2 className="text-base font-semibold text-slate-100">Built for a weekly operating call, not just analysis</h2>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-left text-xs text-slate-200">
+            <thead>
+              <tr className="border-b border-slate-700/70 text-[11px] uppercase tracking-[0.1em] text-slate-400">
+                <th className="px-2 py-2">Category</th>
+                <th className="px-2 py-2">Dashboards / research stack</th>
+                <th className="px-2 py-2">Whether</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="border-b border-slate-800/80">
+                <th className="px-2 py-2 font-semibold text-slate-100">Output</th>
+                <td className="px-2 py-2 text-slate-300">Evidence and commentary to interpret.</td>
+                <td className="px-2 py-2 font-medium text-sky-100">One bounded weekly operating call leadership can act on.</td>
+              </tr>
+              <tr className="border-b border-slate-800/80">
+                <th className="px-2 py-2 font-semibold text-slate-100">Cadence</th>
+                <td className="px-2 py-2 text-slate-300">Ad hoc review during planning debates.</td>
+                <td className="px-2 py-2 font-medium text-sky-100">Weekly ritual for Monday sync preparation.</td>
+              </tr>
+              <tr>
+                <th className="px-2 py-2 font-semibold text-slate-100">Decision quality</th>
+                <td className="px-2 py-2 text-slate-300">Generic guidance with uneven follow-through.</td>
+                <td className="px-2 py-2 font-medium text-sky-100">Action + threshold + reversal condition in one artifact.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
 
       <section className="weather-panel space-y-4 px-5 py-5" aria-label="Decision concept links">

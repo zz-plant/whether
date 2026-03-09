@@ -219,13 +219,14 @@ export function DecisionCallHeader({
 
   return (
     <header className="space-y-5 border-b border-slate-700/80 pb-6" data-testid="weekly-top-fold">
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Weekly posture call</p>
+      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Weekly operating call</p>
       <h1 id="weekly-posture-brief-title" className="text-3xl font-semibold text-slate-50 sm:text-4xl">
         {statusLabel}
       </h1>
 
       <article className={`${tierOnePanel} ${sectionSpacing}`} aria-label="Operating call panel">
         <h2 className={tierOneHeading}>This week in 15 seconds</h2>
+        <p className="text-xs text-slate-300">From macro signals to one shareable leadership call.</p>
         <p className="text-sm leading-relaxed text-slate-200">{meetingShorthand}</p>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" aria-label="Operating call summary">
