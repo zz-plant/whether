@@ -31,7 +31,6 @@ import { resourceArticles } from "../../../lib/resourceArticles";
 
 type Params = { slug: string };
 
-export const runtime = "edge";
 export const revalidate = 21600;
 
 export function generateStaticParams(): Array<{ slug: string }> {
