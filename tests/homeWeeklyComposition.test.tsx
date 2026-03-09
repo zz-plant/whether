@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { WeeklyDecisionCard } from "../app/components/weeklyDecisionCard";
 import { HomeInterpretationPanel } from "../app/components/homeInterpretationPanel";
+import { HomeFirstRunOrientation } from "../app/components/homeFirstRunOrientation";
 import { buildInterpretationLayer } from "../lib/report/interpretationLayer";
 import type { ReportDynamics } from "../lib/report/reportData";
 import type { BoundedDecisionRule } from "../lib/report/boundedDecisionRules";
@@ -251,6 +252,86 @@ describe("weekly card and interpretation panel composition", () => {
     assert.ok(confidenceIndex > playbookIndex);
     assert.ok(instructionIndex > confidenceIndex);
     assert.ok(interpretationIndex > instructionIndex);
+  });
+
+
+  it("renders orientation strip before the weekly decision card without replacing core card content", () => {
+    const html = renderToStaticMarkup(
+      <>
+        <HomeFirstRunOrientation
+          changeSummary="Decision delta: tighten optional spend this week."
+          decisionNow="Stage decisions and protect runway while transition watch is on."
+          destinations={[
+            { href: "/signals", label: "Signals", description: "Inspect drivers, thresholds, and historical signal context." },
+            { href: "/operations", label: "Operations", description: "Apply hiring, spend, and cadence guardrails to execution." },
+            { href: "/decide", label: "Decide", description: "Translate posture guidance into role-specific choices." },
+          ]}
+        />
+        <WeeklyDecisionCard
+          statusLabel="DEFENSIVE"
+          postureLabel="Defensive"
+          stageLabel="Watchful"
+          postureWithStageLabel="Defensive — Watchful"
+          postureDelta="Worse than last week"
+          confidenceLabel="MED"
+          confidencePercent={68}
+          signalConfidenceReason="Reason: regime boundary proximity + volatile macro signals"
+          trendLabel="Stable"
+          transitionWatch="ON"
+          operatingStanceLine="Stage decisions. Avoid irreversible spend."
+          weeklyMemoLines={["Market conditions tightened this week.", "Stage decisions. Avoid irreversible spend.", "Regime shift watch is on: stage approvals and preserve runway."]}
+          netConstraintSummary="Pressure remains elevated."
+          guardrail="Hold irreversible hiring unless direct revenue impact is clear."
+          reversalTrigger="If risk appetite rises above 55, reopen selective hiring."
+          recordDateLabel="Mar 5, 2026"
+          fetchedAtLabel="Mar 6, 2026 09:12 UTC"
+          reportDynamics={reportDynamics}
+          decisionShiftSummary="Decision delta: tighten roadmap optionality while protecting core delivery."
+          transitionProbabilities={{ Expansion: 10, Mixed: 35, Scarcity: 40, Defensive: 15 }}
+          decisionRules={decisionRules}
+          roleAwareTemplates={[]}
+          executiveOperationalStance={{
+            expand: ["Increase product tempo for reversible bets", "Selective hiring for revenue-linked roles"],
+            avoid: ["net-new hiring if tightness > 74", "long-payback bets if risk appetite < 44"],
+          }}
+          revisitDecisions={true}
+          memoryRail={[{ label: "Now", posture: "Defensive" }]}
+          historicalTimeline={[{ label: "2026", posture: "Defensive" }]}
+          historicalAnalogs={[]}
+          macroOverlay={[{ label: "VC funding", detail: "-4.5 · ↑ improving" }]}
+          whyThisCall={[{ label: "Momentum", detail: "Capital tightness tightened this week." }]}
+          primaryDrivers={[{ label: "Capital tightness", detail: "↑ tightened this week" }]}
+          startupClimateIndex={{ score: 63, status: "Improving", breakdown: [{ label: "Capital availability", score: 71 }] }}
+          regimeDistance={{
+            dimensionLabel: "Tightness",
+            currentValue: 64,
+            thresholdValue: 70,
+            pointsToFlip: 6,
+            dimensionKey: "tightness",
+            thresholdDirection: "riseAbove",
+          }}
+          regimeVelocity={{
+            status: "ok",
+            from: "Expansion",
+            to: "Mixed",
+            sampleSize: 4,
+            lowerBoundMonths: 3,
+            upperBoundMonths: 6,
+            typicalRangeLabel: "3–6 months",
+            displayLabel: "Expansion→Mixed typically 3–6 months",
+          }}
+          citation="Whether weekly brief citation"
+        />
+      </>,
+    );
+
+    const orientationIndex = html.indexOf("Fast orientation for this week");
+    const cardIndex = html.indexOf("Startup Climate — Weekly Call");
+
+    assert.ok(orientationIndex > -1);
+    assert.ok(cardIndex > orientationIndex);
+    assert.match(html, /Decision delta: tighten optional spend this week\./);
+    assert.match(html, /Skip intro/);
   });
 
 });

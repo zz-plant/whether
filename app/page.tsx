@@ -40,6 +40,8 @@ import { HomeInterpretationPanel } from "./components/homeInterpretationPanel";
 import { DeferredSection } from "./components/deferredSection";
 import { NextStepRail } from "./components/nextStepRail";
 import { getRegimeDisplayLabel } from "../lib/regimePresentation";
+import { navigationLayers } from "../lib/navigation/informationArchitecture";
+import { HomeFirstRunOrientation } from "./components/homeFirstRunOrientation";
 
 const WeeklyActionSummaryPanel = dynamic(
   () => import("./components/boardBriefSections").then((module) => module.WeeklyActionSummaryPanel),
@@ -72,6 +74,8 @@ const homeSectionSequence = [
   { href: "#weekly-action-summary", label: "Weekly actions" },
   { href: "#executive-snapshot", label: "Evidence" },
 ] as const;
+
+const firstRunDestinationKeys = ["signals", "operations", "decide"] as const;
 
 
 export const generateMetadata = async ({
@@ -275,6 +279,9 @@ const HomePageReportContent = async ({
     label: section.label,
   }));
   const structuredData = buildHomeStructuredData();
+  const firstRunDestinations = firstRunDestinationKeys
+    .map((key) => navigationLayers.find((layer) => layer.key === key))
+    .filter((layer): layer is (typeof navigationLayers)[number] => layer !== undefined);
 
   const reportResult = await loadReportDataSafe(resolvedSearchParams, { route: "/" });
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
@@ -421,6 +428,12 @@ const HomePageReportContent = async ({
         ) : null
       }
     >
+      <HomeFirstRunOrientation
+        changeSummary={homeBriefModel.decisionShiftSummary}
+        decisionNow={homeBriefModel.operatingStanceLine}
+        destinations={firstRunDestinations}
+      />
+
       <WeeklyDecisionCard
         statusLabel={displayRegime.label}
         postureLabel={homeBriefModel.postureLabel}
