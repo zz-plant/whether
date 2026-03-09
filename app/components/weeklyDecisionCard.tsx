@@ -28,9 +28,9 @@ type FailureModeWarningItem = { id: string; warning: string; mitigationCheck: st
 
 export type WeeklyDecisionCardProps = {
   statusLabel: string;
-  postureLabel: string;
-  stageLabel: string;
-  postureWithStageLabel: string;
+  postureLabel?: string;
+  stageLabel?: string;
+  postureWithStageLabel?: string;
   postureDelta: string;
   confidenceLabel: "HIGH" | "MED" | "LOW";
   confidencePercent: number;
@@ -222,9 +222,9 @@ const PostureHistoryTimeline = ({ historicalTimeline }: { historicalTimeline: We
 
 type DecisionCallHeaderProps = {
   statusLabel: string;
-  postureLabel: string;
-  stageLabel: string;
-  postureWithStageLabel: string;
+  postureLabel?: string;
+  stageLabel?: string;
+  postureWithStageLabel?: string;
   netConstraintSummary: string;
   meetingShorthand: string;
   postureDelta: string;
@@ -242,7 +242,7 @@ type DecisionCallHeaderProps = {
   failureModes: FailureModeWarningItem[];
   regimeDistance: WeeklyDecisionCardProps["regimeDistance"];
   movementVelocity: "Low" | "Medium" | "High";
-  topContributorInline: string;
+  topContributorInline?: string;
   startupClimateIndex: Pick<WeeklyDecisionCardProps["startupClimateIndex"], "score" | "status">;
   executiveOperationalStance: WeeklyDecisionCardProps["executiveOperationalStance"];
 };
@@ -273,6 +273,10 @@ export function DecisionCallHeader({
   startupClimateIndex,
   executiveOperationalStance,
 }: DecisionCallHeaderProps) {
+  const resolvedPostureLabel = postureLabel ?? statusLabel;
+  const resolvedStageLabel = stageLabel ?? trendLabel;
+  const resolvedPostureWithStageLabel = postureWithStageLabel ?? `${resolvedPostureLabel} · ${resolvedStageLabel}`;
+  const resolvedTopContributorInline = topContributorInline ?? "Signal contribution details available below.";
   const {
     markerPercent,
     zoneStart,
@@ -307,7 +311,7 @@ export function DecisionCallHeader({
         <h2 className={tierOneHeading}>This week in 15 seconds</h2>
         <p className="text-xs text-slate-300">{TOP_FOLD_DECISION_PRIORITY_COPY}</p>
         <p className="text-sm leading-relaxed text-slate-200">{meetingShorthand}</p>
-        <p className="text-xs text-slate-300">Top contributors: {topContributorInline}</p>
+        <p className="text-xs text-slate-300">Top contributors: {resolvedTopContributorInline}</p>
 
 
         <article className={tierOneInset} aria-label="Key operational stance this week">
@@ -337,7 +341,7 @@ export function DecisionCallHeader({
               label="Posture"
               icon={<svg viewBox="0 0 16 16" className="h-3.5 w-3.5"><circle cx="8" cy="8" r="5" fill="none" stroke="currentColor" strokeWidth="1.5" /><circle cx="8" cy="8" r="1.5" fill="currentColor" /></svg>}
             />
-            <p className="mt-1 text-lg font-semibold text-slate-100">{postureWithStageLabel}</p>
+            <p className="mt-1 text-lg font-semibold text-slate-100">{resolvedPostureWithStageLabel}</p>
           </div>
           <div className={tierOneInset}>
             <SummaryLabel
@@ -452,7 +456,6 @@ export function DecisionCallHeader({
 
 type BoundedRulesMatrixProps = {
   decisionRules: BoundedDecisionRule[];
-  roleAwareTemplates: RoleAwareOperatingTemplate[];
 };
 
 export function BoundedRulesMatrix({ decisionRules }: BoundedRulesMatrixProps) {
@@ -504,6 +507,7 @@ type MoreContextDisclosureProps = {
   whyThisCall: WeeklyDecisionCardProps["whyThisCall"];
   memoryRail: WeeklyDecisionCardProps["memoryRail"];
   historicalTimeline: WeeklyDecisionCardProps["historicalTimeline"];
+  historicalAnalogs?: WeeklyDecisionCardProps["historicalAnalogs"];
   macroOverlay: WeeklyDecisionCardProps["macroOverlay"];
 };
 
@@ -513,7 +517,7 @@ export function MoreContextDisclosureBody({
   whyThisCall,
   memoryRail,
   historicalTimeline,
-  historicalAnalogs,
+  historicalAnalogs = [],
   macroOverlay,
 }: MoreContextDisclosureProps) {
   return (
@@ -646,7 +650,7 @@ export function WeeklyDecisionCard({
   revisitDecisions,
   memoryRail,
   historicalTimeline,
-  historicalAnalogs,
+  historicalAnalogs = [],
   macroOverlay,
   whyThisCall,
   primaryDrivers,
@@ -901,6 +905,7 @@ export function WeeklyDecisionCard({
         memoryRail={memoryRail}
         historicalTimeline={historicalTimeline}
         macroOverlay={macroOverlay}
+        historicalAnalogs={historicalAnalogs}
       />
 
       {historicalAnalogs.length > 0 ? (

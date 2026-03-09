@@ -22,8 +22,10 @@ import {
 import { buildResourceArticleMetadata, ResourceArticlePage } from "../components/resourceArticlePage";
 import {
   findResourceArticleBySlug,
+  resourceArticles,
 } from "../../../lib/resourceArticles";
 import {
+  downloadableResources,
   findDownloadableResourceBySlug,
 } from "../../../lib/downloadableResources";
 
@@ -31,6 +33,13 @@ type Params = { slug: string };
 
 export const runtime = "edge";
 export const revalidate = 21600;
+
+export const generateStaticParams = (): Array<{ slug: string }> => [
+  ...resourcePillarPages.map((page) => ({ slug: page.slug })),
+  ...Object.keys(resourceSupportingPages).map((slug) => ({ slug })),
+  ...Object.keys(downloadableResources).map((slug) => ({ slug })),
+  ...resourceArticles.map((article) => ({ slug: article.slug })),
+];
 
 const buildSectionAnchor = (heading: string) =>
   heading

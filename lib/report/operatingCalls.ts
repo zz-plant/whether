@@ -62,7 +62,7 @@ export const buildRoleAwareOperatingTemplates = (rules: BoundedDecisionRule[]): 
         .filter(Boolean)
         .join(" "),
       avoidNow: [hiringRule?.pauseTrigger, productRule?.pauseTrigger]
-        .filter(Boolean)
+        .filter((pauseTrigger): pauseTrigger is string => Boolean(pauseTrigger))
         .map(sanitizeGuardrail)
         .join(" "),
       flipTrigger: sanitizeFlip(expansionRule?.resumeTrigger ?? hiringRule?.resumeTrigger ?? ""),
@@ -74,7 +74,7 @@ export const buildRoleAwareOperatingTemplates = (rules: BoundedDecisionRule[]): 
         .filter(Boolean)
         .join(" "),
       avoidNow: [capitalRule?.pauseTrigger, expansionRule?.pauseTrigger]
-        .filter(Boolean)
+        .filter((pauseTrigger): pauseTrigger is string => Boolean(pauseTrigger))
         .map(sanitizeGuardrail)
         .join(" "),
       flipTrigger: sanitizeFlip(capitalRule?.resumeTrigger ?? expansionRule?.resumeTrigger ?? ""),

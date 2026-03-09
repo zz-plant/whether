@@ -54,7 +54,7 @@ const regimePageBySlug = new Map<StartupRegimePage["slug"], StartupRegimePage>(
 );
 export const regimeStaticParams = regimePages.map((regime) => ({ regime: regime.slug }));
 
-export const findRegimePage = (slug: string) => regimePageBySlug.get(slug);
+export const findRegimePage = (slug: string) => regimePageBySlug.get(slug as StartupRegimePage["slug"]);
 
 export const signalTranslationPages = [
   { slug: "yield-curve-and-startups", title: "Yield curve and startups", href: "/signals" },

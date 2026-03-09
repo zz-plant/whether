@@ -137,9 +137,11 @@ export const situationRouting = {
   Governance: "decision-rights",
 } as const satisfies Record<(typeof startSituations)[number], (typeof situationUseCases)[number]>;
 
-export const recommendedSituationToolkits = Object.fromEntries(
-  situationUseCaseDefinitions.map((entry) => [entry.slug, entry.recommendedToolkitSlugs]),
-) as Record<(typeof situationUseCases)[number], ToolkitDefinition["slug"][]>;
+export const recommendedSituationToolkits: Record<(typeof situationUseCases)[number], ToolkitDefinition["slug"][]> =
+  situationUseCaseDefinitions.reduce((accumulator, entry) => {
+    accumulator[entry.slug] = [...entry.recommendedToolkitSlugs];
+    return accumulator;
+  }, {} as Record<(typeof situationUseCases)[number], ToolkitDefinition["slug"][]>);
 
 export type ToolkitDefinition = {
   slug: string;
@@ -607,18 +609,21 @@ export const useCaseRoleStaticParams = useCaseRoles.map((entry) => ({ slug: entr
 export const situationUseCaseStaticParams = situationUseCases.map((slug) => ({ slug }));
 export const decideStaticParams = [...useCaseRoleStaticParams, ...situationUseCaseStaticParams];
 
-const useCaseRoleBySlug = new Map(useCaseRoles.map((entry) => [entry.slug, entry]));
-const situationUseCaseBySlug = new Map(situationUseCaseDefinitions.map((entry) => [entry.slug, entry]));
-const toolkitDefinitionBySlug = new Map(toolkitDefinitions.map((entry) => [entry.slug, entry]));
+const useCaseRoleBySlug = new Map<string, UseCaseRole>(useCaseRoles.map((entry) => [entry.slug, entry]));
+const situationUseCaseBySlug = new Map<(typeof situationUseCases)[number], (typeof situationUseCaseDefinitions)[number]>(
+  situationUseCaseDefinitions.map((entry) => [entry.slug, entry]),
+);
+const toolkitDefinitionBySlug = new Map<string, ToolkitDefinition>(toolkitDefinitions.map((entry) => [entry.slug, entry]));
 
 export const findUseCaseRole = (slug: string) => useCaseRoleBySlug.get(slug);
-export const findSituationUseCase = (slug: string) => situationUseCaseBySlug.get(slug);
+export const findSituationUseCase = (slug: string) =>
+  isSituationUseCaseSlug(slug) ? situationUseCaseBySlug.get(slug) : undefined;
 export const isSituationUseCaseSlug = (slug: string): slug is (typeof situationUseCases)[number] =>
   situationUseCases.includes(slug as (typeof situationUseCases)[number]);
 export const findToolkitDefinition = (slug: string) => toolkitDefinitionBySlug.get(slug);
 export const toolkitStaticParams = toolkitDefinitions.map((entry) => ({ slug: entry.slug }));
 
-export const decideHomeRecommendedToolkitSlugs = Array.from(new Set([
+export const decideHomeRecommendedToolkitSlugs: ToolkitDefinition["slug"][] = Array.from(new Set([
   ...useCaseRoles.flatMap((role) => role.recommendedToolkitSlugs),
   ...situationUseCaseDefinitions.flatMap((entry) => entry.recommendedToolkitSlugs),
 ]));
@@ -628,7 +633,7 @@ export const findDecisionPathsForToolkit = (toolkitSlug: ToolkitDefinition["slug
     .filter((role) => role.recommendedToolkitSlugs.includes(toolkitSlug))
     .map((role) => ({ slug: role.slug, title: role.title, href: `/decide/${role.slug}` })),
   situations: situationUseCaseDefinitions
-    .filter((situation) => situation.recommendedToolkitSlugs.includes(toolkitSlug))
+    .filter((situation) => (situation.recommendedToolkitSlugs as ToolkitDefinition["slug"][]).includes(toolkitSlug))
     .map((situation) => ({ slug: situation.slug, title: situation.title, href: `/decide/${situation.slug}` })),
 });
 

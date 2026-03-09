@@ -7,6 +7,7 @@ import {
   findToolkitDefinition,
   situationUseCaseDefinitions,
   useCaseRoles,
+  type ToolkitDefinition,
 } from "../../lib/informationArchitecture";
 import { BreadcrumbTrail } from "../components/breadcrumbTrail";
 import { NextStepRail } from "../components/nextStepRail";
@@ -60,7 +61,7 @@ export default function DecidePage() {
       <section className="weather-panel space-y-3 px-6 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Explore by situation</h2>
         <div className="grid gap-3 sm:grid-cols-2">
-          {situationUseCaseDefinitions.map((situation) => (
+          {(situationUseCaseDefinitions as ReadonlyArray<{ slug: string; title: string }>).map((situation) => (
             <Link key={situation.slug} href={`/decide/${situation.slug}`} className="weather-surface px-4 py-4 text-sm text-slate-100">{situation.title || titleCase(situation.slug)}</Link>
           ))}
         </div>
@@ -70,7 +71,7 @@ export default function DecidePage() {
         <h2 className="text-lg font-semibold text-slate-100">Run this now</h2>
         <p className="text-sm text-slate-300">Jump straight into a toolkit if you already know the decision workflow you need today.</p>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {decideHomeRecommendedToolkitSlugs.map((toolkitSlug) => {
+          {decideHomeRecommendedToolkitSlugs.map((toolkitSlug: ToolkitDefinition["slug"]) => {
             const toolkit = findToolkitDefinition(toolkitSlug);
             if (!toolkit) return null;
 
