@@ -8,8 +8,8 @@ import { fetchWithTimeout } from "../fetchWithTimeout";
 
 const PRIMARY_FETCH_TIMEOUT_MS = 12_000;
 const RETRY_FETCH_TIMEOUT_MS = 20_000;
-const FISCAL_DATA_ENDPOINT =
-  "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v2/accounting/od/daily_treasury_yield_curve?sort=-record_date&page%5Bsize%5D=5";
+const TREASURY_RATES_ENDPOINT =
+  "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/current/all?type=daily_treasury_yield_curve&_format=csv";
 
 export const TREASURY_ENDPOINTS = {
   oneMonth: "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS1MO",
@@ -57,12 +57,8 @@ const parseFredCsv = (csv: string) => {
   return values;
 };
 
-const parseFiscalDataNumber = (value: unknown): number | null => {
-  if (typeof value === "number") {
-    return Number.isFinite(value) ? value : null;
-  }
-
-  if (typeof value !== "string") {
+const parseTreasuryCsvNumber = (value: string | undefined): number | null => {
+  if (!value) {
     return null;
   }
 
@@ -75,34 +71,88 @@ const parseFiscalDataNumber = (value: unknown): number | null => {
   return Number.isFinite(parsed) ? parsed : null;
 };
 
-const fetchTreasuryFromFiscalData = async (fetcher: typeof fetch, fetchedAt: string) => {
-  const response = await fetchWithTimeout(fetcher, FISCAL_DATA_ENDPOINT, undefined, PRIMARY_FETCH_TIMEOUT_MS);
-  if (!response.ok) {
-    throw new Error(`FiscalData Treasury fetch error: ${response.status}`);
+const parseTreasuryCsvDate = (value: string | undefined): string | null => {
+  if (!value) {
+    return null;
   }
 
-  const payload = (await response.json()) as { data?: Array<Record<string, unknown>> };
-  const rows = payload.data?.filter((row) => typeof row.record_date === "string") ?? [];
-  if (!rows.length) {
-    throw new Error("FiscalData Treasury series returned no data or invalid payload.");
+  const trimmed = value.trim();
+  const match = trimmed.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (!match) {
+    return null;
   }
 
-  for (const row of rows) {
-    const recordDate = row.record_date;
-    if (typeof recordDate !== "string") {
+  const [, month, day, year] = match;
+  return `${year}-${month}-${day}`;
+};
+
+const parseCsvRow = (row: string) => {
+  const values: string[] = [];
+  let currentValue = "";
+  let inQuotes = false;
+
+  for (let index = 0; index < row.length; index += 1) {
+    const character = row[index];
+
+    if (character === '"') {
+      if (inQuotes && row[index + 1] === '"') {
+        currentValue += '"';
+        index += 1;
+      } else {
+        inQuotes = !inQuotes;
+      }
       continue;
     }
 
-    const oneMonth = parseFiscalDataNumber(row.bc_1month);
-    const threeMonth = parseFiscalDataNumber(row.bc_3month);
-    const twoYear = parseFiscalDataNumber(row.bc_2year);
-    const tenYear = parseFiscalDataNumber(row.bc_10year);
-    if ([oneMonth, threeMonth, twoYear, tenYear].some((value) => value === null)) {
+    if (character === "," && !inQuotes) {
+      values.push(currentValue);
+      currentValue = "";
+      continue;
+    }
+
+    currentValue += character;
+  }
+
+  values.push(currentValue);
+  return values;
+};
+
+const fetchTreasuryFromDailyRatesCsv = async (fetcher: typeof fetch, fetchedAt: string) => {
+  const response = await fetchWithTimeout(fetcher, TREASURY_RATES_ENDPOINT, undefined, PRIMARY_FETCH_TIMEOUT_MS);
+  if (!response.ok) {
+    throw new Error(`Treasury daily rates CSV fetch error: ${response.status}`);
+  }
+
+  const csv = await response.text();
+  const [header, ...rows] = csv.trim().split(/\r?\n/);
+  if (!header || !rows.length) {
+    throw new Error("Treasury daily rates CSV returned no data.");
+  }
+
+  const columns = parseCsvRow(header).map((column) => column.trim());
+  const getColumnValue = (rowValues: string[], column: string) => {
+    const index = columns.indexOf(column);
+    if (index === -1) {
+      return undefined;
+    }
+
+    return rowValues[index];
+  };
+
+  for (const row of rows) {
+    const rowValues = parseCsvRow(row);
+    const recordDate = parseTreasuryCsvDate(getColumnValue(rowValues, "Date"));
+    const oneMonth = parseTreasuryCsvNumber(getColumnValue(rowValues, "1 Mo"));
+    const threeMonth = parseTreasuryCsvNumber(getColumnValue(rowValues, "3 Mo"));
+    const twoYear = parseTreasuryCsvNumber(getColumnValue(rowValues, "2 Yr"));
+    const tenYear = parseTreasuryCsvNumber(getColumnValue(rowValues, "10 Yr"));
+
+    if (!recordDate || [oneMonth, threeMonth, twoYear, tenYear].some((value) => value === null)) {
       continue;
     }
 
     return {
-      source: "https://api.fiscaldata.treasury.gov",
+      source: "https://home.treasury.gov",
       record_date: recordDate,
       fetched_at: fetchedAt,
       isLive: true,
@@ -115,7 +165,7 @@ const fetchTreasuryFromFiscalData = async (fetcher: typeof fetch, fetchedAt: str
     } satisfies TreasuryData;
   }
 
-  throw new Error("FiscalData Treasury series missing one or more required tenors.");
+  throw new Error("Treasury daily rates CSV missing one or more required tenors.");
 };
 
 const findLatestCommonDate = (seriesMaps: Map<string, number | null>[]) => {
@@ -265,9 +315,9 @@ export const fetchTreasuryData = async (
     };
   } catch (error) {
     try {
-      return await fetchTreasuryFromFiscalData(fetcher, fetched_at);
+      return await fetchTreasuryFromDailyRatesCsv(fetcher, fetched_at);
     } catch {
-      // If FiscalData also fails, preserve the primary FRED failure reason for clearer diagnostics.
+      // If the secondary source also fails, preserve the primary FRED failure reason for clearer diagnostics.
     }
 
     if (options.snapshotFallback) {

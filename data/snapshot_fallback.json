@@ -1,12 +1,12 @@
 {
   "source": "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v2/accounting/od/daily_treasury_yield_curve",
-  "record_date": "2026-02-01",
-  "fetched_at": "2026-02-02T00:00:00Z",
+  "record_date": "2026-03-06",
+  "fetched_at": "2026-03-09T00:00:00Z",
   "isLive": false,
   "yields": {
-    "oneMonth": 5.42,
-    "threeMonth": 5.39,
-    "twoYear": 4.95,
-    "tenYear": 4.6
+    "oneMonth": 3.75,
+    "threeMonth": 3.69,
+    "twoYear": 3.56,
+    "tenYear": 4.15
   }
 }
