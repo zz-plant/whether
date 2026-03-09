@@ -22,7 +22,7 @@ describe("report narrative signs", () => {
     const signs = buildSignsToWatch(assessment);
 
     assert.deepEqual(signs, [
-      "No additional caution signs this cycle; maintain baseline monitoring.",
+      "No additional caution signs this cycle; maintain baseline monitoring unless the posture modifier shifts.",
     ]);
   });
 

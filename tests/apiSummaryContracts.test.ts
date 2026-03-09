@@ -5,6 +5,9 @@ import { GET as getMonthlyRoute } from "../app/api/monthly/route";
 import { GET as getQuarterlyRoute } from "../app/api/quarterly/route";
 import { GET as getYearlyRoute } from "../app/api/yearly/route";
 
+
+const CANONICAL_REGIMES = ["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"] as const;
+
 const assertIsoTimestamp = (value: unknown, label: string) => {
   if (typeof value !== "string") {
     assert.fail(`${label} should be a string`);
@@ -23,6 +26,9 @@ const assertBaseSummaryContract = (body: Record<string, unknown>) => {
     (body.summary as { recordDateLabel?: unknown }).recordDateLabel,
   );
   assertIsoTimestamp(body.generatedAt, "generatedAt");
+
+  const summaryRegime = (body.summary as { regime?: unknown }).regime;
+  assert.ok(CANONICAL_REGIMES.includes(summaryRegime as (typeof CANONICAL_REGIMES)[number]));
 };
 
 const assertWeeklyMonthlyExtras = (body: Record<string, unknown>) => {

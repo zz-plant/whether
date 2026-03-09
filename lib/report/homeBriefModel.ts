@@ -7,6 +7,7 @@ import {
   REGIME_SEVERITY_RANK,
   REGIME_SHORT_LABELS,
   deriveRegimeStage,
+  getRegimeDisplayLabel,
   type RegimeConfidenceLabel,
   type RegimeMomentum,
 } from "../regimePresentation";
@@ -414,6 +415,13 @@ export const buildHomeBriefModel = (
           : "Stable";
   const startupClimateIndex = buildStartupClimateIndex({ assessment, macroSeries, trendLabel });
 
+  const displayRegime = getRegimeDisplayLabel({
+    regime: assessment.regime,
+    momentum: (reportDynamics?.directionLabel ?? "stable") as RegimeMomentum,
+    confidence: confidenceLabel,
+    transitionWatch: transitionWatch === "ON",
+  });
+
   const stage = deriveRegimeStage({
     regime: assessment.regime,
     momentum: (reportDynamics?.directionLabel ?? "stable") as RegimeMomentum,
@@ -476,16 +484,16 @@ export const buildHomeBriefModel = (
 
   const netConstraintSummary =
     severityDelta > 0
-      ? `${REGIME_SHORT_LABELS[assessment.regime]}. Changed: constraints tightened. Do now: slow non-core approvals and keep irreversible spend frozen. Flip: ${reversalTrigger}`
+      ? `${displayRegime.label}. Changed: constraints tightened. Do now: slow non-core approvals and keep irreversible spend frozen. Flip: ${reversalTrigger}`
       : severityDelta < 0
-        ? `${REGIME_SHORT_LABELS[assessment.regime]}. Changed: constraints eased. Do now: release selective hires and experiments that stay reversible. Flip: ${reversalTrigger}`
-        : `${REGIME_SHORT_LABELS[assessment.regime]}. Changed: constraints held near prior week. Do now: keep execution measured and irreversible bets capped. Flip: ${reversalTrigger}`;
+        ? `${displayRegime.label}. Changed: constraints eased. Do now: release selective hires and experiments that stay reversible. Flip: ${reversalTrigger}`
+        : `${displayRegime.label}. Changed: constraints held near prior week. Do now: keep execution measured and irreversible bets capped. Flip: ${reversalTrigger}`;
 
   return {
-    postureLabel: REGIME_SHORT_LABELS[assessment.regime],
+    postureLabel: displayRegime.label,
     stageLabel: stage.label,
     stageFragile: stage.fragile,
-    postureWithStageLabel: `${REGIME_SHORT_LABELS[assessment.regime]} — ${stage.displayLabel}`,
+    postureWithStageLabel: `${displayRegime.label} — ${stage.displayLabel}`,
     confidenceLabel,
     confidencePercent,
     trendLabel,
