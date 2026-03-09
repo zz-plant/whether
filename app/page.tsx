@@ -37,6 +37,7 @@ import { getFeaturedConceptArticles } from "../lib/productCanon";
 import { LiveDataFallbackAlert } from "./components/liveDataFallbackAlert";
 import { HomeInterpretationPanel } from "./components/homeInterpretationPanel";
 import { DeferredSection } from "./components/deferredSection";
+import { useCaseRoles } from "../lib/informationArchitecture";
 
 const WeeklyActionSummaryPanel = dynamic(
   () => import("./components/boardBriefSections").then((module) => module.WeeklyActionSummaryPanel),
@@ -68,6 +69,11 @@ const homeSectionSequence = [
   { href: "#weekly-action-summary", label: "Weekly actions" },
   { href: "#executive-snapshot", label: "Evidence" },
 ] as const;
+
+const featuredRoleSlugs = ["ceo", "board", "product", "engineering", "growth-gtm", "ops-risk"] as const;
+const featuredRoleLinks = featuredRoleSlugs
+  .map((slug) => useCaseRoles.find((role) => role.slug === slug))
+  .filter((role): role is (typeof useCaseRoles)[number] => Boolean(role));
 
 
 export const generateMetadata = async ({
@@ -420,11 +426,26 @@ const HomePageReportContent = async ({
       />
 
 
+      <section className="weather-panel space-y-3 px-5 py-4" aria-label="Choose by role">
+        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Choose by role</p>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+          {featuredRoleLinks.map((role) => (
+            <Link
+              key={role.slug}
+              href={`/decide/${role.slug}`}
+              className="weather-surface flex items-center justify-center rounded-md px-2 py-2 text-center text-xs font-semibold text-slate-100 transition-colors hover:border-sky-400/70"
+            >
+              {role.title}
+            </Link>
+          ))}
+        </div>
+      </section>
+
+
       <HomeInterpretationPanel
         layer={interpretationLayer}
         searchParams={resolvedSearchParams}
       />
-
 
       <section className="weather-panel space-y-4 px-5 py-5" aria-label="Decision concept links">
         <div className="space-y-1">
