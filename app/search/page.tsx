@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { buildPageMetadata } from "../../lib/seo";
 import { groupSearchResultsByType, searchEntityTypeLabels, searchIndex } from "../../lib/search/searchIndex";
 
+export const runtime = "edge";
+
 export const metadata: Metadata = buildPageMetadata({
   title: "Search — find toolkits, failure modes, concepts, and method docs",
   description:

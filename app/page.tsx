@@ -442,6 +442,7 @@ const HomePageReportContent = async ({
         primaryDrivers={homeBriefModel.primaryDrivers}
         startupClimateIndex={homeBriefModel.startupClimateIndex}
         regimeDistance={homeBriefModel.regimeDistance}
+        regimeVelocity={homeBriefModel.regimeVelocity}
         citation={callCitation}
         isFallbackSnapshot={isFallback && !historicalSelection}
         failureModes={homeBriefModel.failureModes}

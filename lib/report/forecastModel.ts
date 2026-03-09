@@ -7,6 +7,8 @@ import {
   type RegimeAssessment,
   type RegimeKey,
 } from "../regimeEngine";
+import { getSummaryArchive } from "../summary/summaryArchive";
+import { getTimeMachineRegimeSeries } from "../timeMachine/timeMachineCache";
 import type { MacroSeriesId, MacroSeriesReading } from "../types";
 import type { ReportDynamics } from "./reportData";
 
@@ -24,6 +26,25 @@ export type BoundaryMomentum =
   | "mixed"
   | "stable";
 
+export type TransitionVelocityEstimate =
+  | {
+      status: "ok";
+      from: ForecastRegimeLabel;
+      to: ForecastRegimeLabel;
+      sampleSize: number;
+      lowerBoundMonths: number;
+      upperBoundMonths: number;
+      typicalRangeLabel: string;
+      displayLabel: string;
+    }
+  | {
+      status: "insufficient_history";
+      from: ForecastRegimeLabel;
+      to: ForecastRegimeLabel;
+      sampleSize: number;
+      displayLabel: string;
+    };
+
 export interface ForecastModel {
   next4WeekProbabilities: Record<ForecastRegimeLabel, number>;
   next90DayProbabilities: Record<ForecastRegimeLabel, number>;
@@ -40,8 +61,171 @@ export interface ForecastModel {
 }
 
 const DIRECTION_EPSILON = 0.01;
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+const MIN_SAMPLES_FOR_RANGE = 2;
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
+
+type TransitionDurationSample = {
+  from: ForecastRegimeLabel;
+  to: ForecastRegimeLabel;
+  durationDays: number;
+};
+
+const regimeKeyToForecastLabel: Record<RegimeKey, ForecastRegimeLabel> = {
+  EXPANSION: "Expansion",
+  VOLATILE: "Mixed",
+  SCARCITY: "Scarcity",
+  DEFENSIVE: "Defensive",
+};
+
+const parseDate = (value: string) => {
+  const timestamp = new Date(value).getTime();
+  return Number.isFinite(timestamp) ? timestamp : null;
+};
+
+const toMonthlyRegimePoints = () => {
+  const archivePoints = getSummaryArchive()
+    .filter((entry): entry is Extract<typeof entry, { cadence: "monthly" }> => entry.cadence === "monthly")
+    .map((entry) => ({
+      timestamp: parseDate(entry.record_date),
+      regime: regimeKeyToForecastLabel[entry.summary.regime],
+    }))
+    .filter((point): point is { timestamp: number; regime: ForecastRegimeLabel } => point.timestamp !== null);
+
+  const timeMachinePoints = getTimeMachineRegimeSeries(240)
+    .map((entry) => ({
+      timestamp: parseDate(entry.recordDate),
+      regime: regimeKeyToForecastLabel[entry.regime],
+    }))
+    .filter((point): point is { timestamp: number; regime: ForecastRegimeLabel } => point.timestamp !== null);
+
+  const byMonth = new Map<string, { timestamp: number; regime: ForecastRegimeLabel }>();
+  [...archivePoints, ...timeMachinePoints].forEach((point) => {
+    const monthKey = new Date(point.timestamp).toISOString().slice(0, 7);
+    const existing = byMonth.get(monthKey);
+    if (!existing || point.timestamp > existing.timestamp) {
+      byMonth.set(monthKey, point);
+    }
+  });
+
+  return Array.from(byMonth.values()).sort((a, b) => a.timestamp - b.timestamp);
+};
+
+const buildTransitionDurationSamples = (): TransitionDurationSample[] => {
+  const points = toMonthlyRegimePoints();
+  if (points.length < 2) {
+    return [];
+  }
+
+  const samples: TransitionDurationSample[] = [];
+  let runRegime = points[0]?.regime;
+  let runStart = points[0]?.timestamp;
+
+  for (let index = 1; index < points.length; index += 1) {
+    const point = points[index];
+    if (!point || !runRegime || !runStart) {
+      continue;
+    }
+    if (point.regime === runRegime) {
+      continue;
+    }
+
+    const durationDays = Math.max(1, Math.round((point.timestamp - runStart) / MS_PER_DAY));
+    samples.push({
+      from: runRegime,
+      to: point.regime,
+      durationDays,
+    });
+
+    runRegime = point.regime;
+    runStart = point.timestamp;
+  }
+
+  return samples;
+};
+
+const quantile = (sortedValues: number[], q: number) => {
+  if (sortedValues.length === 0) {
+    return 0;
+  }
+  const position = (sortedValues.length - 1) * q;
+  const lowerIndex = Math.floor(position);
+  const upperIndex = Math.ceil(position);
+  if (lowerIndex === upperIndex) {
+    return sortedValues[lowerIndex] ?? 0;
+  }
+  const lower = sortedValues[lowerIndex] ?? 0;
+  const upper = sortedValues[upperIndex] ?? lower;
+  const weight = position - lowerIndex;
+  return lower + (upper - lower) * weight;
+};
+
+const toMonths = (days: number) => Math.max(1, Math.round(days / 30.44));
+
+export const buildTransitionVelocityEstimateFromDurations = ({
+  from,
+  to,
+  durationsDays,
+}: {
+  from: ForecastRegimeLabel;
+  to: ForecastRegimeLabel;
+  durationsDays: number[];
+}): TransitionVelocityEstimate => {
+  if (durationsDays.length < MIN_SAMPLES_FOR_RANGE) {
+    return {
+      status: "insufficient_history",
+      from,
+      to,
+      sampleSize: durationsDays.length,
+      displayLabel: `${from}→${to}: insufficient history`,
+    };
+  }
+
+  const sorted = [...durationsDays].sort((a, b) => a - b);
+  const lowerBoundMonths = toMonths(quantile(sorted, 0.25));
+  const upperBoundMonths = Math.max(lowerBoundMonths, toMonths(quantile(sorted, 0.75)));
+  const typicalRangeLabel = `${lowerBoundMonths}–${upperBoundMonths} months`;
+
+  return {
+    status: "ok",
+    from,
+    to,
+    sampleSize: durationsDays.length,
+    lowerBoundMonths,
+    upperBoundMonths,
+    typicalRangeLabel,
+    displayLabel: `${from}→${to} typically ${typicalRangeLabel}`,
+  };
+};
+
+const transitionVelocityEstimateCache = new Map<string, TransitionVelocityEstimate>();
+
+export const getTransitionVelocityEstimate = ({
+  from,
+  to,
+}: {
+  from: ForecastRegimeLabel;
+  to: ForecastRegimeLabel;
+}): TransitionVelocityEstimate => {
+  const key = `${from}->${to}`;
+  const cached = transitionVelocityEstimateCache.get(key);
+  if (cached) {
+    return cached;
+  }
+
+  const durationsDays = buildTransitionDurationSamples()
+    .filter((sample) => sample.from === from && sample.to === to)
+    .map((sample) => sample.durationDays);
+
+  const estimate = buildTransitionVelocityEstimateFromDurations({
+    from,
+    to,
+    durationsDays,
+  });
+  transitionVelocityEstimateCache.set(key, estimate);
+  return estimate;
+};
 
 const toDirection = (
   delta: number,
@@ -178,7 +362,7 @@ const computeMacroDownsideBias = (
   return clamp(score / weightTotal, -1, 1);
 };
 
-const toForecastLabel = (regime: RegimeKey): ForecastRegimeLabel => {
+export const toForecastLabel = (regime: RegimeKey): ForecastRegimeLabel => {
   if (regime === "EXPANSION") return "Expansion";
   if (regime === "SCARCITY") return "Scarcity";
   if (regime === "DEFENSIVE") return "Defensive";

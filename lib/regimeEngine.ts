@@ -42,7 +42,17 @@ export interface RegimeAssessment {
   thresholds: RegimeThresholds;
   inputs: RegimeInput[];
   policyAssessment: PolicyAssessment;
+  signalInfluence: RegimeSignalInfluence[];
 }
+
+export type RegimeSignalInfluenceKey = "tightness" | "riskAppetite" | "baseRate" | "curveSlope";
+
+export type RegimeSignalInfluence = {
+  key: RegimeSignalInfluenceKey;
+  label: string;
+  influence: number | null;
+  unavailable: boolean;
+};
 
 export type RegimeTrend = "IMPROVING" | "DETERIORATING" | "MIXED" | "STABLE";
 
@@ -590,6 +600,46 @@ const computeDiagnostics = (
   };
 };
 
+export const buildSignalInfluence = ({
+  tightness,
+  riskAppetite,
+  baseRate,
+  curveSlope,
+  thresholds,
+}: {
+  tightness: number;
+  riskAppetite: number;
+  baseRate: number | null;
+  curveSlope: number | null;
+  thresholds: RegimeThresholds;
+}): RegimeSignalInfluence[] => [
+  {
+    key: "tightness",
+    label: "Cash tightness",
+    influence: Math.abs(tightness - thresholds.tightnessRegime),
+    unavailable: false,
+  },
+  {
+    key: "riskAppetite",
+    label: "Risk appetite",
+    influence: Math.abs(riskAppetite - thresholds.riskAppetiteRegime),
+    unavailable: false,
+  },
+  {
+    key: "baseRate",
+    label: "Base rate",
+    influence:
+      typeof baseRate === "number" ? Math.abs(baseRate - thresholds.baseRateTightness) : null,
+    unavailable: typeof baseRate !== "number",
+  },
+  {
+    key: "curveSlope",
+    label: "Curve slope",
+    influence: typeof curveSlope === "number" ? Math.abs(curveSlope) : null,
+    unavailable: typeof curveSlope !== "number",
+  },
+];
+
 export const deriveRegimeTrend = (
   previous: RegimeAssessment | null,
   current: RegimeAssessment
@@ -799,5 +849,12 @@ export const evaluateRegime = (
     thresholds,
     inputs,
     policyAssessment,
+    signalInfluence: buildSignalInfluence({
+      tightness,
+      riskAppetite,
+      baseRate: baseRate.used === "MISSING" ? null : baseRate.value,
+      curveSlope,
+      thresholds,
+    }),
   };
 };

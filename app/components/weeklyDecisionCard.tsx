@@ -4,7 +4,7 @@ import type { ReportDynamics } from "../../lib/report/reportData";
 import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
 import type { RoleAwareOperatingTemplate } from "../../lib/report/operatingCalls";
 import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
-import type { ForecastRegimeLabel } from "../../lib/report/forecastModel";
+import type { ForecastRegimeLabel, TransitionVelocityEstimate } from "../../lib/report/forecastModel";
 import { formatProbabilityPercent } from "../../lib/report/reportFormatting";
 import {
   buildWeeklyCitationMetaLine,
@@ -62,6 +62,7 @@ export type WeeklyDecisionCardProps = {
     pointsToFlip: number;
     thresholdDirection: "riseAbove" | "fallToOrBelow";
   };
+  regimeVelocity: TransitionVelocityEstimate;
   citation: string;
   isFallbackSnapshot?: boolean;
   failureModes?: FailureModeWarningItem[];
@@ -198,6 +199,7 @@ type DecisionCallHeaderProps = {
   failureModes: FailureModeWarningItem[];
   regimeDistance: WeeklyDecisionCardProps["regimeDistance"];
   movementVelocity: "Low" | "Medium" | "High";
+  topContributorInline: string;
 };
 
 export function DecisionCallHeader({
@@ -219,6 +221,7 @@ export function DecisionCallHeader({
   failureModes,
   regimeDistance,
   movementVelocity,
+  topContributorInline,
 }: DecisionCallHeaderProps) {
   const gaugePercent = regimeGaugePercentByLabel[statusLabel] ?? 50;
   const thresholdBreached =
@@ -240,6 +243,7 @@ export function DecisionCallHeader({
         <h2 className={tierOneHeading}>This week in 15 seconds</h2>
         <p className="text-xs text-slate-300">From macro signals to one shareable leadership call.</p>
         <p className="text-sm leading-relaxed text-slate-200">{meetingShorthand}</p>
+        <p className="text-xs text-slate-300">Top contributors: {topContributorInline}</p>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" aria-label="Operating call summary">
           <div className={tierOneInset}>
@@ -522,6 +526,7 @@ export function WeeklyDecisionCard({
   primaryDrivers,
   startupClimateIndex,
   regimeDistance,
+  regimeVelocity,
   citation,
   isFallbackSnapshot = false,
   failureModes = [],
@@ -562,6 +567,15 @@ export function WeeklyDecisionCard({
     };
   });
 
+  const allSignalContributions = reportDynamics.signalContributions ?? [];
+  const topContributors = allSignalContributions.slice(0, 3);
+  const topContributorInline =
+    topContributors.length > 0
+      ? topContributors
+          .map((item) => `${item.label} (${item.normalizedPercentLabel})`)
+          .join(" · ")
+      : "No active contributors this week.";
+
   const movementVelocity = resolveVelocityLabel(macroMovementRows);
   const decisionPressurePercent = Math.max(10, Math.min(95, reportDynamics.changedSignals.length * 22 + (revisitDecisions ? 25 : 8)));
   const decisionStabilityPercent = Math.max(8, Math.min(100, 100 - reportDynamics.changedSignals.length * 25 - (revisitDecisions ? 25 : 0)));
@@ -598,6 +612,7 @@ export function WeeklyDecisionCard({
         failureModes={failureModes}
         regimeDistance={regimeDistance}
         movementVelocity={movementVelocity}
+        topContributorInline={topContributorInline}
       />
 
       {actions ? (
@@ -658,7 +673,39 @@ export function WeeklyDecisionCard({
           <article className={tierOneInset}>
             <p className={`text-xs ${neutralLabel}`}>Macro drift this week</p>
             <p className="mt-1 text-xs text-slate-300">Velocity: {movementVelocity}</p>
+            <p className="mt-1 text-xs text-slate-300">Regime transition pace: {regimeVelocity.displayLabel}</p>
             <p className="mt-2 text-[11px] uppercase tracking-[0.1em] text-slate-400">weekly movement</p>
+            <div className="mt-3 rounded-md border border-slate-700/70 bg-slate-950/60 px-2.5 py-2">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-300">Contribution weight</p>
+                <HapticAnchor href="/methodology" className="text-[11px] text-sky-200 underline underline-offset-2">Methodology</HapticAnchor>
+              </div>
+              <ul className="mt-2 space-y-1.5 text-xs text-slate-200" aria-label="Top signal contributors">
+                {topContributors.map((item) => (
+                  <li key={`top-${item.key}`} className="space-y-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <span>{item.label}</span>
+                      <span className="font-semibold text-slate-100">{item.unavailable ? "Unavailable" : item.normalizedPercentLabel}</span>
+                    </div>
+                    <div className={`${meterTrackBase} border border-slate-700/60 bg-slate-900/70`}>
+                      <div className="h-2 rounded-full bg-sky-300/75" style={{ width: `${Math.round(item.normalized * 100)}%` }} />
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              <details className="mt-2 text-[11px] text-slate-300">
+                <summary className="cursor-pointer text-slate-200">Full contribution diagnostics</summary>
+                <ul className="mt-2 space-y-1.5">
+                  {allSignalContributions.map((item) => (
+                    <li key={`full-${item.key}`} className="flex items-center justify-between gap-2 rounded border border-slate-700/50 px-2 py-1">
+                      <span>{item.label}</span>
+                      <span className="font-semibold text-slate-100">{item.unavailable ? "Unavailable" : item.normalizedPercentLabel}</span>
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            </div>
+
             <ul className="mt-2 space-y-2 text-xs text-slate-200">
               {macroMovementRows.map((signal) => (
                 <li key={signal.key} className="space-y-1">

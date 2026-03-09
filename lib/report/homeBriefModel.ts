@@ -13,8 +13,12 @@ import {
   type RegimeMomentum,
 } from "../regimePresentation";
 import { deriveSectorAdjustedPosture, SECTOR_TAXONOMY, type SectorKey } from "./sectorSensitivity";
-import type { ForecastModel } from "./forecastModel";
-import { buildFailureModeWarnings, type FailureModeWarning } from "./trustStatus";
+import {
+  getTransitionVelocityEstimate,
+  toForecastLabel,
+  type ForecastModel,
+  type TransitionVelocityEstimate,
+} from "./forecastModel";
 
 type Regime = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
 
@@ -516,6 +520,11 @@ export const buildHomeBriefModel = (
           thresholdDirection: boundaryDirectionForRegime(assessment.regime, "riskAppetite"),
         };
 
+  const likelyTransitionTarget = toForecastLabel(shiftTargets.defensive);
+  const regimeVelocity: TransitionVelocityEstimate = getTransitionVelocityEstimate({
+    from: toForecastLabel(assessment.regime),
+    to: likelyTransitionTarget,
+  });
 
   const normalizedHistoricalAnalogs: HomeBriefHistoricalAnalog[] = (historicalAnalogs ?? [])
     .slice(0, 3)
@@ -550,6 +559,7 @@ export const buildHomeBriefModel = (
     trendLabel,
     startupClimateIndex,
     regimeDistance,
+    regimeVelocity,
     decisionShiftSummary: buildDecisionShiftSummary({
       severityDelta,
       directionLabel: reportDynamics?.directionLabel,
