@@ -412,6 +412,7 @@ const HomePageReportContent = async ({
         decisionShiftSummary={homeBriefModel.decisionShiftSummary}
         transitionProbabilities={homeBriefModel.transitionProbabilities}
         decisionRules={homeBriefModel.decisionRules}
+        roleAwareTemplates={homeBriefModel.roleAwareTemplates}
         revisitDecisions={homeBriefModel.revisitDecisions}
         memoryRail={homeBriefModel.memoryRail}
         historicalTimeline={homeBriefModel.historicalTimeline}

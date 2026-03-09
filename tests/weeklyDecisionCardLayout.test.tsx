@@ -46,6 +46,22 @@ describe("WeeklyDecisionCard top-fold composition", () => {
         decisionShiftSummary="Decision delta: tighten roadmap optionality while protecting core delivery."
         transitionProbabilities={{ Expansion: 10, Mixed: 35, Scarcity: 40, Defensive: 15 }}
         decisionRules={decisionRules}
+        roleAwareTemplates={[
+          {
+            role: "startup-leadership",
+            roleLabel: "Startup leadership",
+            doNow: "Keep delivery focused.",
+            avoidNow: "Do not add fixed costs without proof.",
+            flipTrigger: "Resume staged expansion when tightness and risk appetite recover.",
+          },
+          {
+            role: "vc-partner",
+            roleLabel: "VC partner",
+            doNow: "Push portfolio pacing discipline.",
+            avoidNow: "Avoid encouraging irreversible expansion.",
+            flipTrigger: "Reopen growth pacing after two improving reads.",
+          },
+        ]}
         revisitDecisions={true}
         memoryRail={[{ label: "Now", posture: "Defensive" }]}
         historicalTimeline={[{ label: "2026", posture: "Defensive" }]}
@@ -66,7 +82,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
       />,
     );
 
-    assert.match(html, /Weekly posture call/);
+    assert.match(html, /Weekly operating call/);
     assert.match(html, /This week in 15 seconds/);
     assert.match(html, /Macro posture band/);
     assert.match(html, /points to flip/);
@@ -99,6 +115,22 @@ describe("WeeklyDecisionCard top-fold composition", () => {
         decisionShiftSummary="No material signal shift in fallback mode."
         transitionProbabilities={{ Expansion: 15, Mixed: 45, Scarcity: 25, Defensive: 15 }}
         decisionRules={decisionRules}
+        roleAwareTemplates={[
+          {
+            role: "startup-leadership",
+            roleLabel: "Startup leadership",
+            doNow: "Keep delivery focused.",
+            avoidNow: "Do not add fixed costs without proof.",
+            flipTrigger: "Resume staged expansion when tightness and risk appetite recover.",
+          },
+          {
+            role: "vc-partner",
+            roleLabel: "VC partner",
+            doNow: "Push portfolio pacing discipline.",
+            avoidNow: "Avoid encouraging irreversible expansion.",
+            flipTrigger: "Reopen growth pacing after two improving reads.",
+          },
+        ]}
         revisitDecisions={false}
         memoryRail={[{ label: "Now", posture: "Defensive" }]}
         historicalTimeline={[{ label: "2026", posture: "Defensive" }]}
