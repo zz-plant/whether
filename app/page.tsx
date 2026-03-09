@@ -242,11 +242,9 @@ export default async function HomePage({
 }: {
   searchParams?: Promise<HomePageSearchParams>;
 }) {
-  const resolvedSearchParams = searchParams ? await searchParams : undefined;
-
   return (
     <Suspense fallback={<HomePageStreamingFallback />}>
-      <HomePageReportContent searchParams={resolvedSearchParams} />
+      <HomePageReportContent searchParams={searchParams} />
     </Suspense>
   );
 }
@@ -254,11 +252,12 @@ export default async function HomePage({
 const HomePageReportContent = async ({
   searchParams,
 }: {
-  searchParams?: HomePageSearchParams;
+  searchParams?: HomePageSearchParams | Promise<HomePageSearchParams>;
 }) => {
-  const homepageOverlaySector = resolveHomepageOverlaySector(searchParams?.sector);
-  const interpretationView: InterpretationView = isInterpretationView(searchParams?.view)
-    ? searchParams.view
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const homepageOverlaySector = resolveHomepageOverlaySector(resolvedSearchParams?.sector);
+  const interpretationView: InterpretationView = isInterpretationView(resolvedSearchParams?.view)
+    ? resolvedSearchParams.view
     : "default";
   const sectionLinks = homeSectionSequence.map((section) => ({
     href: section.href,
@@ -266,7 +265,7 @@ const HomePageReportContent = async ({
   }));
   const structuredData = buildHomeStructuredData();
 
-  const reportResult = await loadReportDataSafe(searchParams, { route: "/" });
+  const reportResult = await loadReportDataSafe(resolvedSearchParams, { route: "/" });
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
   const {
     assessment,
@@ -413,7 +412,7 @@ const HomePageReportContent = async ({
 
       <HomeInterpretationPanel
         layer={interpretationLayer}
-        searchParams={searchParams}
+        searchParams={resolvedSearchParams}
       />
 
 
