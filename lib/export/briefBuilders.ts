@@ -24,8 +24,28 @@ const buildDecisionHighlights = (assessment: RegimeAssessment) =>
 type ExportLayerOptions = {
   interpretationLayer?: InterpretationLayer;
   postureWithStageLabel?: string;
+  operatingStanceLine?: string;
+  trendLabel?: string;
+  transitionWatch?: "ON" | "OFF";
+  regimeDistancePoints?: number;
   historicalAnalogs?: Array<{ date: string; similarityScore: number; implication: string }>;
   failureModes?: Array<{ warning: string; mitigationCheck: string }>;
+};
+
+const buildViralArtifactBlock = (options?: ExportLayerOptions) => {
+  if (!options?.operatingStanceLine) {
+    return [];
+  }
+
+  return [
+    "",
+    "Startup climate — weekly call:",
+    `• Posture: ${options.postureWithStageLabel ?? "Current posture"}`,
+    `• Trend: ${(options.trendLabel ?? "Stable").toUpperCase()}`,
+    `• Distance to regime change: ${(options.regimeDistancePoints ?? 0).toFixed(1)} points`,
+    `• Regime shift watch: ${options.transitionWatch ?? "OFF"}`,
+    `• Operating stance: ${options.operatingStanceLine}`,
+  ];
 };
 
 const buildInterpretationLayerBlock = (options?: ExportLayerOptions) => {
@@ -148,6 +168,7 @@ export const buildSlackBrief = (
     ...assessment.constraints.map((item) => `• ${item}`),
     "",
     financialImplications,
+    ...buildViralArtifactBlock(options),
     ...buildFailureModeBlock(options),
     ...buildHistoricalAnalogsBlock(options),
     ...buildInterpretationLayerBlock(options),

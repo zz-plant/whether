@@ -176,6 +176,25 @@ Implementation guardrails:
 ## Slack screenshot card contract
 This card is the dissemination mechanism and must stand alone when pasted into Slack.
 
+### 5-second viral artifact contract (top-half)
+The first visible card block should be enough for a founder to answer, in one glance:
+
+- what regime we are in,
+- how stable/confident the call is,
+- what to do differently now.
+
+Required top-half fields:
+- `STARTUP CLIMATE — WEEKLY CALL`
+- `{REGIME} — {STAGE}`
+- `Confidence: [LOW|MED|HIGH]`
+- `Trend: [IMPROVING|STABLE|MIXED|DETERIORATING]`
+- `Operating stance: [single imperative sentence]`
+
+Required compression rules:
+- No explanatory paragraph above the operating stance sentence.
+- Operating stance sentence should be compact and quoteable in chat.
+- Top-half screenshot must remain decision-complete without scroll.
+
 ### Required fields (exact)
 - `Macro: Risk-On / Capital-Loose`
 - `Boldness: 63 (+4)`

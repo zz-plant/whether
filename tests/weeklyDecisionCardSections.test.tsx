@@ -13,16 +13,18 @@ describe("WeeklyDecisionCard extracted sections", () => {
     const html = renderToStaticMarkup(
       <DecisionCallHeader
         statusLabel="DEFENSIVE"
+        postureLabel="Defensive"
+        stageLabel="Watchful"
         netConstraintSummary="Pressure remains elevated."
         meetingShorthand="Do now: revise decisions this week."
-        postureDelta="+2"
         immediateDecision="Revise now"
         guardrail="Hold irreversible hiring"
         confidencePercent={70}
         confidenceLabel="MED"
-        signalConfidenceReason="Reason: regime boundary proximity + volatile macro signals"
         trendLabel="Mixed"
         transitionWatch="ON"
+        operatingStanceLine="Stage decisions. Avoid irreversible spend."
+        weeklyMemoLines={["Market conditions tightened this week.", "Stage decisions. Avoid irreversible spend.", "Regime shift watch is on: stage approvals and preserve runway."]}
         freshnessLabel="Mar 6, 2026"
         trustCueLine="Cached snapshot (Mar 6, 2026): use for pacing and defer irreversible commitments."
         needsTrustWarning={true}
@@ -36,8 +38,8 @@ describe("WeeklyDecisionCard extracted sections", () => {
           dimensionKey: "tightness",
           thresholdDirection: "riseAbove",
         }}
-        movementVelocity="Low"
         startupClimateIndex={{ score: 62, status: "Stable" }}
+        topContributorInline="Risk appetite (44%)"
         executiveOperationalStance={{
           expand: ["Increase product tempo for reversible bets", "Selective hiring for revenue-linked roles"],
           avoid: ["net-new hiring if tightness > 74", "long-payback bets if risk appetite < 44"],
@@ -45,43 +47,41 @@ describe("WeeklyDecisionCard extracted sections", () => {
       />,
     );
 
-    assert.match(html, /Weekly operating call/);
-    assert.match(html, /Lead with action, guardrail, and flip condition; treat scores as context for continuity\./);
-    assert.match(html, /Macro posture band/);
-    assert.match(html, /points to flip/);
+    assert.match(html, /Startup Climate — Weekly Call/);
+    assert.match(html, /Operating stance:/);
+    assert.match(html, /Startup capital cycle/);
+    assert.match(html, /Distance to regime change:/);
+    assert.match(html, /Founder playbook/);
+    assert.match(html, /Weekly memo \(shareable\)/);
     assert.match(html, /Guardrail/);
     assert.match(html, /Flip condition/);
     assert.match(html, /Context metric: Startup Climate Index/);
     assert.match(html, /False-signal warnings/);
 
-    const actionIndex = html.indexOf("Action");
-    const guardrailIndex = html.indexOf("Guardrail");
-    const flipConditionIndex = html.indexOf("Flip condition");
-    const confidenceIndex = html.indexOf("Signal confidence");
-    const trendIndex = html.indexOf("Trend:");
-    const scoreMetadataIndex = html.indexOf("Context metric: Startup Climate Index");
-
-    assert.ok(guardrailIndex > actionIndex);
-    assert.ok(flipConditionIndex > guardrailIndex);
-    assert.ok(scoreMetadataIndex > flipConditionIndex);
-    assert.ok(scoreMetadataIndex > confidenceIndex);
-    assert.ok(scoreMetadataIndex > trendIndex);
+    const heroIndex = html.indexOf("Startup Climate — Weekly Call");
+    const playbookIndex = html.indexOf("Founder playbook");
+    const memoIndex = html.indexOf("Weekly memo (shareable)");
+    assert.ok(playbookIndex > heroIndex);
+    assert.ok(memoIndex > playbookIndex);
   });
 
 
-  it("orients flip zone toward contraction for tightness rise-above triggers", () => {
+  it("renders the explicit you-are-here and distance copy", () => {
     const html = renderToStaticMarkup(
       <DecisionCallHeader
         statusLabel="EXPANSION"
+        postureLabel="Expansion"
+        stageLabel="Late"
         netConstraintSummary="Constraints eased."
         meetingShorthand="Do now: speed reversible bets."
-        postureDelta="Better than last week"
         immediateDecision="Hold expansion posture"
         guardrail="Keep irreversible spend capped"
         confidencePercent={74}
         confidenceLabel="MED"
         trendLabel="Mixed"
         transitionWatch="ON"
+        operatingStanceLine="Stage decisions. Avoid irreversible spend."
+        weeklyMemoLines={["Market conditions tightened this week.", "Stage decisions. Avoid irreversible spend.", "Regime shift watch is on: stage approvals and preserve runway."]}
         freshnessLabel="Mar 6, 2026"
         trustCueLine="Cached snapshot (Mar 6, 2026): use for pacing and defer irreversible commitments."
         needsTrustWarning={false}
@@ -95,8 +95,8 @@ describe("WeeklyDecisionCard extracted sections", () => {
           pointsToFlip: 6,
           thresholdDirection: "riseAbove",
         }}
-        movementVelocity="Medium"
         startupClimateIndex={{ score: 58, status: "Stable" }}
+        topContributorInline="Risk appetite (44%)"
         executiveOperationalStance={{
           expand: ["Increase product tempo for reversible bets", "Selective hiring for revenue-linked roles"],
           avoid: ["net-new hiring if tightness > 74", "long-payback bets if risk appetite < 44"],
@@ -104,23 +104,26 @@ describe("WeeklyDecisionCard extracted sections", () => {
       />,
     );
 
-    assert.match(html, /left:64\.2%;width:10\.8%/);
+    assert.match(html, /You are here: Expansion/);
+    assert.match(html, /Distance to regime change: 6\.0 points/);
   });
 
-  it("marks risk-appetite defensive trigger as breached only when value is at or below threshold", () => {
+  it("renders compact flip-condition distance", () => {
     const html = renderToStaticMarkup(
       <DecisionCallHeader
         statusLabel="EXPANSION"
+        postureLabel="Expansion"
+        stageLabel="Late"
         netConstraintSummary="Constraints eased."
         meetingShorthand="Do now: speed reversible bets."
-        postureDelta="Better than last week"
         immediateDecision="Hold expansion posture"
         guardrail="Keep irreversible spend capped"
         confidencePercent={74}
         confidenceLabel="MED"
-        signalConfidenceReason="Reason: regime boundary proximity + volatile macro signals"
         trendLabel="Mixed"
         transitionWatch="ON"
+        operatingStanceLine="Stage decisions. Avoid irreversible spend."
+        weeklyMemoLines={["Market conditions tightened this week.", "Stage decisions. Avoid irreversible spend.", "Regime shift watch is on: stage approvals and preserve runway."]}
         freshnessLabel="Mar 6, 2026"
         trustCueLine="Cached snapshot (Mar 6, 2026): use for pacing and defer irreversible commitments."
         needsTrustWarning={false}
@@ -134,8 +137,8 @@ describe("WeeklyDecisionCard extracted sections", () => {
           pointsToFlip: 1,
           thresholdDirection: "fallToOrBelow",
         }}
-        movementVelocity="Medium"
         startupClimateIndex={{ score: 58, status: "Stable" }}
+        topContributorInline="Risk appetite (44%)"
         executiveOperationalStance={{
           expand: ["Increase product tempo for reversible bets", "Selective hiring for revenue-linked roles"],
           avoid: ["net-new hiring if tightness > 74", "long-payback bets if risk appetite < 44"],
@@ -143,7 +146,8 @@ describe("WeeklyDecisionCard extracted sections", () => {
       />,
     );
 
-    assert.match(html, /Threshold breached\./);
+    assert.match(html, /Current: 49\.0 · Trigger: 50\.0/);
+    assert.match(html, /1\.0 points away from trigger\./);
   });
 
   it("renders bounded rules matrix hierarchy", () => {
@@ -179,6 +183,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
         whyThisCall={[{ label: "Momentum", detail: "No material change" }]}
         memoryRail={[{ label: "W-1", posture: "Defensive" }]}
         historicalTimeline={[{ label: "2026", posture: "Defensive" }]}
+        historicalAnalogs={[]}
         macroOverlay={[{ label: "VC", detail: "Muted" }]}
       />,
     );

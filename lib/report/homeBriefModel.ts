@@ -222,6 +222,38 @@ const buildSignalConfidenceReason = ({
   return `Reason: ${volatilityDescriptor}; ${boundaryDescriptor}`;
 };
 
+const buildOperatingStanceLine = ({
+  severityDelta,
+  directionLabel,
+}: {
+  severityDelta: number;
+  directionLabel: "improving" | "deteriorating" | "mixed" | "stable" | undefined;
+}) => {
+  if (severityDelta > 0 || directionLabel === "deteriorating") {
+    return "Stage decisions. Avoid irreversible spend.";
+  }
+  if (severityDelta < 0 || directionLabel === "improving") {
+    return "Stage expansion. Keep approvals reversible.";
+  }
+  return "Hold approvals steady. Keep irreversible spend capped.";
+};
+
+const buildWeeklyMemoLines = ({
+  operatingStanceLine,
+  trendLabel,
+  transitionWatch,
+}: {
+  operatingStanceLine: string;
+  trendLabel: string;
+  transitionWatch: "ON" | "OFF";
+}) => [
+  `Market conditions are ${trendLabel.toLowerCase()} this week.`,
+  operatingStanceLine,
+  transitionWatch === "ON"
+    ? "Regime shift watch is on: stage approvals and preserve runway."
+    : "Regime shift watch is off: hold current pace with bounded approvals.",
+];
+
 const buildMemoryRail = (recordDateLabel: string | undefined, currentRegime: Regime): MemoryRailItem[] => {
   const weeklyEntries = getSummaryArchive().filter((entry) => entry.cadence === "weekly");
 
@@ -555,6 +587,10 @@ export const buildHomeBriefModel = (
           ? "Mixed"
           : "Stable";
   const startupClimateIndex = buildStartupClimateIndex({ assessment, macroSeries, trendLabel });
+  const operatingStanceLine = buildOperatingStanceLine({
+    severityDelta,
+    directionLabel: reportDynamics?.directionLabel,
+  });
 
   const failureModes: HomeBriefFailureMode[] = buildFailureModeWarnings({
     confidenceLabel,
@@ -664,6 +700,12 @@ export const buildHomeBriefModel = (
     confidencePercent,
     signalConfidenceReason,
     trendLabel,
+    operatingStanceLine,
+    weeklyMemoLines: buildWeeklyMemoLines({
+      operatingStanceLine,
+      trendLabel,
+      transitionWatch,
+    }),
     startupClimateIndex,
     regimeDistance,
     regimeVelocity,

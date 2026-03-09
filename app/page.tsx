@@ -353,12 +353,20 @@ const HomePageReportContent = async ({
   const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries, {
     interpretationLayer,
     postureWithStageLabel: homeBriefModel.postureWithStageLabel,
+    operatingStanceLine: homeBriefModel.operatingStanceLine,
+    trendLabel: homeBriefModel.trendLabel,
+    transitionWatch: homeBriefModel.transitionWatch,
+    regimeDistancePoints: homeBriefModel.regimeDistance.pointsToFlip,
     historicalAnalogs: homeBriefModel.historicalAnalogs,
     failureModes: homeBriefModel.failureModes,
   });
   const boardSummary = buildBoardBrief(assessment, treasury, sensors, macroSeries, {
     interpretationLayer,
     postureWithStageLabel: homeBriefModel.postureWithStageLabel,
+    operatingStanceLine: homeBriefModel.operatingStanceLine,
+    trendLabel: homeBriefModel.trendLabel,
+    transitionWatch: homeBriefModel.transitionWatch,
+    regimeDistancePoints: homeBriefModel.regimeDistance.pointsToFlip,
     historicalAnalogs: homeBriefModel.historicalAnalogs,
     failureModes: homeBriefModel.failureModes,
   });
@@ -424,6 +432,8 @@ const HomePageReportContent = async ({
         signalConfidenceReason={homeBriefModel.signalConfidenceReason}
         trendLabel={homeBriefModel.trendLabel}
         transitionWatch={homeBriefModel.transitionWatch}
+        operatingStanceLine={homeBriefModel.operatingStanceLine}
+        weeklyMemoLines={homeBriefModel.weeklyMemoLines}
         netConstraintSummary={homeBriefModel.netConstraintSummary}
         guardrail={homeBriefModel.guardrail}
         reversalTrigger={homeBriefModel.reversalTrigger}
