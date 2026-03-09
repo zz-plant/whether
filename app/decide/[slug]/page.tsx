@@ -3,10 +3,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../lib/seo";
 import {
+  decideStaticParams,
+  findToolkitDefinition,
+  findUseCaseRole,
+  isSituationUseCaseSlug,
   recommendedSituationToolkits,
-  situationUseCases,
-  toolkitDefinitions,
-  useCaseRoles,
 } from "../../../lib/informationArchitecture";
 
 type Params = { slug: string };
@@ -17,12 +18,10 @@ const titleCase = (value: string) => value
   .join(" ");
 
 export const dynamicParams = false;
+export const revalidate = 900;
 
 export function generateStaticParams() {
-  return [
-    ...useCaseRoles.map((entry) => ({ slug: entry.slug })),
-    ...situationUseCases.map((slug) => ({ slug })),
-  ];
+  return decideStaticParams;
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
@@ -41,11 +40,9 @@ export default async function DecideDetailPage({
   params: Promise<Params>;
 }) {
   const { slug } = await params;
-  const role = useCaseRoles.find((entry) => entry.slug === slug);
-  const isSituation = situationUseCases.includes(slug as (typeof situationUseCases)[number]);
-  const recommendedToolkits = isSituation
-    ? recommendedSituationToolkits[slug as (typeof situationUseCases)[number]]
-    : [];
+  const role = findUseCaseRole(slug);
+  const isSituation = isSituationUseCaseSlug(slug);
+  const recommendedToolkits = isSituation ? recommendedSituationToolkits[slug] : [];
 
   if (!role && !isSituation) {
     notFound();
@@ -69,7 +66,7 @@ export default async function DecideDetailPage({
           <h2 className="text-lg font-semibold text-slate-100">Recommended toolkits</h2>
           <div className="grid gap-3 sm:grid-cols-2">
             {role.recommendedToolkits.map((slugItem) => {
-              const toolkit = toolkitDefinitions.find((entry) => entry.slug === slugItem);
+              const toolkit = findToolkitDefinition(slugItem);
               if (!toolkit) return null;
               return (
                 <Link key={slugItem} href={`/toolkits/${slugItem}`} className="weather-surface space-y-2 px-4 py-4 text-sm text-slate-100">
@@ -95,7 +92,7 @@ export default async function DecideDetailPage({
         <h2 className="text-lg font-semibold text-slate-100">Start here</h2>
         <div className="grid gap-3 sm:grid-cols-2">
           {recommendedToolkits.map((toolkitSlug) => {
-            const toolkit = toolkitDefinitions.find((entry) => entry.slug === toolkitSlug);
+            const toolkit = findToolkitDefinition(toolkitSlug);
             if (!toolkit) return null;
 
             return (

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../lib/seo";
 import { tierOneDecisionPages } from "../../answers/decisionPages";
-import { findRegimePage, regimePages } from "../clusterData";
+import { findRegimePage, regimePages, regimeStaticParams } from "../clusterData";
 
 type RegimePageProps = {
   params: Promise<{ regime: string }>;
@@ -13,7 +13,7 @@ export const dynamicParams = false;
 export const revalidate = 900;
 
 export function generateStaticParams() {
-  return regimePages.map((regime) => ({ regime: regime.slug }));
+  return regimeStaticParams;
 }
 
 export async function generateMetadata({ params }: RegimePageProps): Promise<Metadata> {
