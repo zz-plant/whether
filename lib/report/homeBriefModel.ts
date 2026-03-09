@@ -1,4 +1,5 @@
 import { buildCanonicalBoundedDecisionRules } from "./boundedDecisionRules";
+import { buildRoleAwareOperatingTemplates } from "./operatingCalls";
 import { getSummaryArchive } from "../summary/summaryArchive";
 import type { MacroSeriesReading } from "../types";
 import { isImprovingSignalDelta } from "./reportData";
@@ -466,6 +467,13 @@ export const buildHomeBriefModel = (
         };
 
   const guardrail = stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
+  const decisionRules = buildCanonicalBoundedDecisionRules({
+    regime: assessment.regime,
+    thresholds: assessment.thresholds,
+    scores: assessment.scores,
+  });
+  const roleAwareTemplates = buildRoleAwareOperatingTemplates(decisionRules);
+
   const netConstraintSummary =
     severityDelta > 0
       ? `${REGIME_SHORT_LABELS[assessment.regime]}. Changed: constraints tightened. Do now: slow non-core approvals and keep irreversible spend frozen. Flip: ${reversalTrigger}`
@@ -495,11 +503,8 @@ export const buildHomeBriefModel = (
       Scarcity: 25,
       Defensive: 25,
     },
-    decisionRules: buildCanonicalBoundedDecisionRules({
-      regime: assessment.regime,
-      thresholds: assessment.thresholds,
-      scores: assessment.scores,
-    }),
+    decisionRules,
+    roleAwareTemplates,
     revisitDecisions: (reportDynamics?.changedSignals.length ?? 0) > 0 && reportDynamics?.directionLabel !== "stable",
     guardrail,
     memoryRail: buildMemoryRail(recordDateLabel, assessment.regime),
