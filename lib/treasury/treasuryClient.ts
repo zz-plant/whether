@@ -139,6 +139,8 @@ const fetchTreasuryFromDailyRatesCsv = async (fetcher: typeof fetch, fetchedAt: 
     return rowValues[index];
   };
 
+  let latestValidRow: TreasuryData | null = null;
+
   for (const row of rows) {
     const rowValues = parseCsvRow(row);
     const recordDate = parseTreasuryCsvDate(getColumnValue(rowValues, "Date"));
@@ -151,7 +153,7 @@ const fetchTreasuryFromDailyRatesCsv = async (fetcher: typeof fetch, fetchedAt: 
       continue;
     }
 
-    return {
+    const parsedRow = {
       source: "https://home.treasury.gov",
       record_date: recordDate,
       fetched_at: fetchedAt,
@@ -163,6 +165,14 @@ const fetchTreasuryFromDailyRatesCsv = async (fetcher: typeof fetch, fetchedAt: 
         tenYear,
       },
     } satisfies TreasuryData;
+
+    if (!latestValidRow || parsedRow.record_date > latestValidRow.record_date) {
+      latestValidRow = parsedRow;
+    }
+  }
+
+  if (latestValidRow) {
+    return latestValidRow;
   }
 
   throw new Error("Treasury daily rates CSV missing one or more required tenors.");

@@ -66,7 +66,7 @@ describe("treasury client", () => {
   it("falls back to snapshot on fetch failure", async () => {
     const fetcher: typeof fetch = async (input) => {
       const url = input.toString();
-      if (url.includes("api.fiscaldata.treasury.gov")) {
+      if (url.includes("home.treasury.gov")) {
         return new Response("{}", { status: 500 });
       }
 
@@ -99,7 +99,7 @@ describe("treasury client", () => {
   it("falls back to snapshot when payload shape is invalid", async () => {
     const fetcher: typeof fetch = async (input) => {
       const url = input.toString();
-      if (url.includes("api.fiscaldata.treasury.gov")) {
+      if (url.includes("home.treasury.gov")) {
         return new Response("{}", { status: 500 });
       }
 
@@ -282,23 +282,11 @@ describe("treasury client", () => {
     );
   });
 
-  it("uses FiscalData as a live backup when FRED is unavailable", async () => {
+  it("uses Treasury daily rates CSV as a live backup when FRED is unavailable", async () => {
     const fetcher: typeof fetch = async (input) => {
       const url = input.toString();
-      if (url.includes("api.fiscaldata.treasury.gov")) {
-        return new Response(
-          JSON.stringify({
-            data: [
-              {
-                record_date: "2026-01-09",
-                bc_1month: "4.12",
-                bc_3month: "4.23",
-                bc_2year: "4.31",
-                bc_10year: "4.56",
-              },
-            ],
-          })
-        );
+      if (url.includes("home.treasury.gov")) {
+        return new Response(["Date,1 Mo,3 Mo,2 Yr,10 Yr", "01/09/2026,4.12,4.23,4.31,4.56"].join("\n"));
       }
 
       return new Response("{}", { status: 500 });
@@ -307,7 +295,7 @@ describe("treasury client", () => {
     const data = await fetchTreasuryData({ fetcher });
     assert.equal(data.isLive, true);
     assert.equal(data.record_date, "2026-01-09");
-    assert.equal(data.source, "https://api.fiscaldata.treasury.gov");
+    assert.equal(data.source, "https://home.treasury.gov");
     assert.deepEqual(data.yields, {
       oneMonth: 4.12,
       threeMonth: 4.23,
@@ -316,29 +304,16 @@ describe("treasury client", () => {
     });
   });
 
-  it("uses the next newest FiscalData row when the latest row has placeholder tenor values", async () => {
+  it("uses the next newest Treasury CSV row when the latest row has placeholder tenor values", async () => {
     const fetcher: typeof fetch = async (input) => {
       const url = input.toString();
-      if (url.includes("api.fiscaldata.treasury.gov")) {
+      if (url.includes("home.treasury.gov")) {
         return new Response(
-          JSON.stringify({
-            data: [
-              {
-                record_date: "2026-01-10",
-                bc_1month: ".",
-                bc_3month: "4.25",
-                bc_2year: "4.34",
-                bc_10year: "4.58",
-              },
-              {
-                record_date: "2026-01-09",
-                bc_1month: "4.12",
-                bc_3month: "4.23",
-                bc_2year: "4.31",
-                bc_10year: "4.56",
-              },
-            ],
-          })
+          [
+            "Date,1 Mo,3 Mo,2 Yr,10 Yr",
+            "01/10/2026,.,4.25,4.34,4.58",
+            "01/09/2026,4.12,4.23,4.31,4.56",
+          ].join("\n")
         );
       }
 
@@ -348,12 +323,41 @@ describe("treasury client", () => {
     const data = await fetchTreasuryData({ fetcher });
     assert.equal(data.isLive, true);
     assert.equal(data.record_date, "2026-01-09");
-    assert.equal(data.source, "https://api.fiscaldata.treasury.gov");
+    assert.equal(data.source, "https://home.treasury.gov");
     assert.deepEqual(data.yields, {
       oneMonth: 4.12,
       threeMonth: 4.23,
       twoYear: 4.31,
       tenYear: 4.56,
+    });
+  });
+
+  it("chooses the latest valid Treasury CSV row regardless of response ordering", async () => {
+    const fetcher: typeof fetch = async (input) => {
+      const url = input.toString();
+      if (url.includes("home.treasury.gov")) {
+        return new Response(
+          [
+            "Date,1 Mo,3 Mo,2 Yr,10 Yr",
+            "01/08/2026,4.10,4.20,4.30,4.50",
+            "01/09/2026,4.12,4.23,4.31,4.56",
+            "01/10/2026,4.14,4.25,4.34,4.58",
+          ].join("\n")
+        );
+      }
+
+      return new Response("{}", { status: 500 });
+    };
+
+    const data = await fetchTreasuryData({ fetcher });
+    assert.equal(data.isLive, true);
+    assert.equal(data.record_date, "2026-01-10");
+    assert.equal(data.source, "https://home.treasury.gov");
+    assert.deepEqual(data.yields, {
+      oneMonth: 4.14,
+      threeMonth: 4.25,
+      twoYear: 4.34,
+      tenYear: 4.58,
     });
   });
 });
