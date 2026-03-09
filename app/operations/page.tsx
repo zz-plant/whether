@@ -225,7 +225,7 @@ export default async function OperationsPage({
         </ol>
       </section>
 
-      <OperationsWorkflowProgress currentPath="/operations" />
+      <OperationsWorkflowProgress />
       <OperationsWorkstreamNav currentPath="/operations" />
 
       <SectionedReportPanel

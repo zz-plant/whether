@@ -3,11 +3,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../lib/seo";
 import {
+  findSituationUseCase,
   decideStaticParams,
   findToolkitDefinition,
   findUseCaseRole,
   isSituationUseCaseSlug,
-  recommendedSituationToolkits,
 } from "../../../lib/informationArchitecture";
 
 type Params = { slug: string };
@@ -42,7 +42,8 @@ export default async function DecideDetailPage({
   const { slug } = await params;
   const role = findUseCaseRole(slug);
   const isSituation = isSituationUseCaseSlug(slug);
-  const recommendedToolkits = isSituation ? recommendedSituationToolkits[slug] : [];
+  const situationUseCase = isSituation ? findSituationUseCase(slug) : undefined;
+  const recommendedToolkitSlugs = role?.recommendedToolkitSlugs ?? situationUseCase?.recommendedToolkitSlugs ?? [];
 
   if (!role && !isSituation) {
     notFound();
@@ -65,7 +66,7 @@ export default async function DecideDetailPage({
         <section className="weather-panel space-y-3 px-6 py-6">
           <h2 className="text-lg font-semibold text-slate-100">Recommended toolkits</h2>
           <div className="grid gap-3 sm:grid-cols-2">
-            {role.recommendedToolkits.map((slugItem) => {
+            {recommendedToolkitSlugs.map((slugItem) => {
               const toolkit = findToolkitDefinition(slugItem);
               if (!toolkit) return null;
               return (
@@ -78,6 +79,22 @@ export default async function DecideDetailPage({
             })}
           </div>
         </section>
+        <section className="weather-panel space-y-3 px-6 py-6">
+          <h2 className="text-lg font-semibold text-slate-100">Run this now</h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {recommendedToolkitSlugs.map((slugItem) => {
+              const toolkit = findToolkitDefinition(slugItem);
+              if (!toolkit) return null;
+
+              return (
+                <Link key={`run-now-${slugItem}`} href={`/toolkits/${slugItem}`} className="weather-surface space-y-2 px-4 py-4 text-sm text-slate-100">
+                  <p className="font-semibold">{toolkit.title}</p>
+                  <p className="text-xs text-slate-300">Run this now: {toolkit.decisionThisSession}</p>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
       </main>
     );
   }
@@ -85,13 +102,13 @@ export default async function DecideDetailPage({
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
       <section className="weather-panel space-y-3 px-6 py-6">
-        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{titleCase(slug)}</h1>
+        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{situationUseCase?.title || titleCase(slug)}</h1>
         <p className="text-sm text-slate-300">Use this page as your fast path to the right toolkit, then go deeper in the library when needed.</p>
       </section>
       <section className="weather-panel space-y-3 px-6 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Start here</h2>
         <div className="grid gap-3 sm:grid-cols-2">
-          {recommendedToolkits.map((toolkitSlug) => {
+          {recommendedToolkitSlugs.map((toolkitSlug) => {
             const toolkit = findToolkitDefinition(toolkitSlug);
             if (!toolkit) return null;
 
@@ -100,6 +117,22 @@ export default async function DecideDetailPage({
                 <p className="font-semibold">{toolkit.title}</p>
                 <p className="text-xs text-slate-300">Recommended now: {toolkit.decisionThisSession}</p>
                 <p className="text-xs text-slate-300">Output: {toolkit.decisionArtifact}</p>
+              </Link>
+            );
+          })}
+        </div>
+      </section>
+      <section className="weather-panel space-y-3 px-6 py-6">
+        <h2 className="text-lg font-semibold text-slate-100">Run this now</h2>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {recommendedToolkitSlugs.map((toolkitSlug) => {
+            const toolkit = findToolkitDefinition(toolkitSlug);
+            if (!toolkit) return null;
+
+            return (
+              <Link key={`run-now-${toolkitSlug}`} href={`/toolkits/${toolkitSlug}`} className="weather-surface space-y-2 px-4 py-4 text-sm text-slate-100">
+                <p className="font-semibold">{toolkit.title}</p>
+                <p className="text-xs text-slate-300">Run this now: {toolkit.decisionThisSession}</p>
               </Link>
             );
           })}

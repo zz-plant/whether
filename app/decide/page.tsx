@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { buildPageMetadata } from "../../lib/seo";
-import { situationUseCases, useCaseRoles } from "../../lib/informationArchitecture";
+import {
+  decideHomeRecommendedToolkitSlugs,
+  findToolkitDefinition,
+  situationUseCaseDefinitions,
+  useCaseRoles,
+} from "../../lib/informationArchitecture";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Decide — role and situation paths",
@@ -40,9 +45,27 @@ export default function DecidePage() {
       <section className="weather-panel space-y-3 px-6 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Explore by situation</h2>
         <div className="grid gap-3 sm:grid-cols-2">
-          {situationUseCases.map((slug) => (
-            <Link key={slug} href={`/decide/${slug}`} className="weather-surface px-4 py-4 text-sm text-slate-100">{titleCase(slug)}</Link>
+          {situationUseCaseDefinitions.map((situation) => (
+            <Link key={situation.slug} href={`/decide/${situation.slug}`} className="weather-surface px-4 py-4 text-sm text-slate-100">{situation.title || titleCase(situation.slug)}</Link>
           ))}
+        </div>
+      </section>
+
+      <section className="weather-panel space-y-3 px-6 py-6">
+        <h2 className="text-lg font-semibold text-slate-100">Run this now</h2>
+        <p className="text-sm text-slate-300">Jump straight into a toolkit if you already know the decision workflow you need today.</p>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {decideHomeRecommendedToolkitSlugs.map((toolkitSlug) => {
+            const toolkit = findToolkitDefinition(toolkitSlug);
+            if (!toolkit) return null;
+
+            return (
+              <Link key={toolkit.slug} href={`/toolkits/${toolkit.slug}`} className="weather-surface space-y-2 px-4 py-4 text-sm text-slate-100">
+                <p className="font-semibold">{toolkit.title}</p>
+                <p className="text-xs text-slate-300">Decide now: {toolkit.decisionThisSession}</p>
+              </Link>
+            );
+          })}
         </div>
       </section>
 

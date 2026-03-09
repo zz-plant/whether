@@ -52,7 +52,7 @@ export type UseCaseRole = {
   decisions: string[];
   failureModes: string[];
   postureShifts: string[];
-  recommendedToolkits: string[];
+  recommendedToolkitSlugs: ToolkitDefinition["slug"][];
 };
 
 export const useCaseRoles: UseCaseRole[] = [
@@ -62,7 +62,7 @@ export const useCaseRoles: UseCaseRole[] = [
     decisions: ["Where to place the next dollar", "How fast to hire", "What to sequence first"],
     failureModes: ["Premature scaling", "Portfolio thrash"],
     postureShifts: ["Shift to Safety Mode when payback stretches", "Re-open Risk-On when demand proves durable"],
-    recommendedToolkits: ["pmf", "focus", "rollback"],
+    recommendedToolkitSlugs: ["pmf", "focus", "rollback"],
   },
   {
     slug: "board",
@@ -70,7 +70,7 @@ export const useCaseRoles: UseCaseRole[] = [
     decisions: ["Risk appetite", "Governance cadence", "Investment gates"],
     failureModes: ["Governance theater", "Risk externalization"],
     postureShifts: ["Tighten oversight in Safety Mode", "Expand delegation in Risk-On"],
-    recommendedToolkits: ["decision-rights", "launch-gates"],
+    recommendedToolkitSlugs: ["decision-rights", "launch-gates"],
   },
   {
     slug: "product",
@@ -78,7 +78,7 @@ export const useCaseRoles: UseCaseRole[] = [
     decisions: ["What gets on the roadmap", "How much discovery to fund", "When to adjust pricing"],
     failureModes: ["Proxy lock-in", "Feedback latency"],
     postureShifts: ["Bias toward proof in Safety Mode", "Increase option velocity in Risk-On"],
-    recommendedToolkits: ["focus", "pmf", "claims"],
+    recommendedToolkitSlugs: ["focus", "pmf", "claims"],
   },
   {
     slug: "engineering",
@@ -86,7 +86,7 @@ export const useCaseRoles: UseCaseRole[] = [
     decisions: ["Capacity allocation", "Reliability posture", "Architecture commitments"],
     failureModes: ["Complexity debt", "Fragility under stress"],
     postureShifts: ["Protect reliability budget in Safety Mode", "Scale platform bets in Risk-On"],
-    recommendedToolkits: ["ops-capacity", "rollback", "launch-gates"],
+    recommendedToolkitSlugs: ["ops-capacity", "rollback", "launch-gates"],
   },
   {
     slug: "growth-gtm",
@@ -94,7 +94,7 @@ export const useCaseRoles: UseCaseRole[] = [
     decisions: ["Channel mix", "Campaign pace", "Claims confidence"],
     failureModes: ["AI claims overreach", "Premature scaling"],
     postureShifts: ["Emphasize efficiency in Safety Mode", "Expand acquisition in Risk-On"],
-    recommendedToolkits: ["claims", "pmf", "launch-gates"],
+    recommendedToolkitSlugs: ["claims", "pmf", "launch-gates"],
   },
   {
     slug: "ops-risk",
@@ -102,20 +102,31 @@ export const useCaseRoles: UseCaseRole[] = [
     decisions: ["Decision rights", "Compliance scope", "Stress readiness"],
     failureModes: ["Governance theater", "Risk externalization"],
     postureShifts: ["Increase checkpoints in Transition", "De-escalate controls when stability returns"],
-    recommendedToolkits: ["decision-rights", "ops-capacity"],
+    recommendedToolkitSlugs: ["decision-rights", "ops-capacity"],
   },
 ];
 
-export const situationUseCases = [
-  "measure-pmf",
-  "avoid-premature-scaling",
-  "roadmap-focus",
-  "pricing-change",
-  "launch-gates",
-  "decision-rights",
-  "ops-capacity",
-  "ai-claims",
-] as const;
+export type SituationUseCase = {
+  slug: string;
+  title: string;
+  recommendedToolkitSlugs: ToolkitDefinition["slug"][];
+};
+
+export const situationUseCaseDefinitions = [
+  { slug: "measure-pmf", title: "Measure PMF", recommendedToolkitSlugs: ["pmf", "focus"] },
+  { slug: "avoid-premature-scaling", title: "Avoid Premature Scaling", recommendedToolkitSlugs: ["rollback", "launch-gates"] },
+  { slug: "roadmap-focus", title: "Roadmap Focus", recommendedToolkitSlugs: ["focus", "ops-capacity"] },
+  { slug: "pricing-change", title: "Pricing Change", recommendedToolkitSlugs: ["claims", "rollback"] },
+  { slug: "launch-gates", title: "Launch Gates", recommendedToolkitSlugs: ["launch-gates", "rollback"] },
+  { slug: "decision-rights", title: "Decision Rights", recommendedToolkitSlugs: ["decision-rights", "ops-capacity"] },
+  { slug: "ops-capacity", title: "Ops Capacity", recommendedToolkitSlugs: ["ops-capacity", "decision-rights"] },
+  { slug: "ai-claims", title: "AI Claims", recommendedToolkitSlugs: ["claims", "launch-gates"] },
+] as const satisfies readonly SituationUseCase[];
+
+export const situationUseCases = situationUseCaseDefinitions.map((entry) => entry.slug) as [
+  (typeof situationUseCaseDefinitions)[number]["slug"],
+  ...(typeof situationUseCaseDefinitions)[number]["slug"][],
+];
 
 export const situationRouting = {
   Hiring: "avoid-premature-scaling",
@@ -126,16 +137,9 @@ export const situationRouting = {
   Governance: "decision-rights",
 } as const satisfies Record<(typeof startSituations)[number], (typeof situationUseCases)[number]>;
 
-export const recommendedSituationToolkits = {
-  "measure-pmf": ["pmf", "focus"],
-  "avoid-premature-scaling": ["rollback", "launch-gates"],
-  "roadmap-focus": ["focus", "ops-capacity"],
-  "pricing-change": ["claims", "rollback"],
-  "launch-gates": ["launch-gates", "rollback"],
-  "decision-rights": ["decision-rights", "ops-capacity"],
-  "ops-capacity": ["ops-capacity", "decision-rights"],
-  "ai-claims": ["claims", "launch-gates"],
-} as const satisfies Record<(typeof situationUseCases)[number], readonly ToolkitDefinition["slug"][]>;
+export const recommendedSituationToolkits = Object.fromEntries(
+  situationUseCaseDefinitions.map((entry) => [entry.slug, entry.recommendedToolkitSlugs]),
+) as Record<(typeof situationUseCases)[number], ToolkitDefinition["slug"][]>;
 
 export type ToolkitDefinition = {
   slug: string;
@@ -604,13 +608,29 @@ export const situationUseCaseStaticParams = situationUseCases.map((slug) => ({ s
 export const decideStaticParams = [...useCaseRoleStaticParams, ...situationUseCaseStaticParams];
 
 const useCaseRoleBySlug = new Map(useCaseRoles.map((entry) => [entry.slug, entry]));
+const situationUseCaseBySlug = new Map(situationUseCaseDefinitions.map((entry) => [entry.slug, entry]));
 const toolkitDefinitionBySlug = new Map(toolkitDefinitions.map((entry) => [entry.slug, entry]));
 
 export const findUseCaseRole = (slug: string) => useCaseRoleBySlug.get(slug);
+export const findSituationUseCase = (slug: string) => situationUseCaseBySlug.get(slug);
 export const isSituationUseCaseSlug = (slug: string): slug is (typeof situationUseCases)[number] =>
   situationUseCases.includes(slug as (typeof situationUseCases)[number]);
 export const findToolkitDefinition = (slug: string) => toolkitDefinitionBySlug.get(slug);
 export const toolkitStaticParams = toolkitDefinitions.map((entry) => ({ slug: entry.slug }));
+
+export const decideHomeRecommendedToolkitSlugs = Array.from(new Set([
+  ...useCaseRoles.flatMap((role) => role.recommendedToolkitSlugs),
+  ...situationUseCaseDefinitions.flatMap((entry) => entry.recommendedToolkitSlugs),
+]));
+
+export const findDecisionPathsForToolkit = (toolkitSlug: ToolkitDefinition["slug"]) => ({
+  roles: useCaseRoles
+    .filter((role) => role.recommendedToolkitSlugs.includes(toolkitSlug))
+    .map((role) => ({ slug: role.slug, title: role.title, href: `/decide/${role.slug}` })),
+  situations: situationUseCaseDefinitions
+    .filter((situation) => situation.recommendedToolkitSlugs.includes(toolkitSlug))
+    .map((situation) => ({ slug: situation.slug, title: situation.title, href: `/decide/${situation.slug}` })),
+});
 
 export const failureModeDefinitions: FailureModeDefinition[] = [
   {
