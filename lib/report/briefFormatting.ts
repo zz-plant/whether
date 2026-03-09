@@ -32,6 +32,12 @@ export const movementMeterToneByDirection: Record<ReportSignalDirection, string>
   unchanged: "bg-slate-500/80",
 };
 
+
+export const TOP_FOLD_DECISION_PRIORITY_COPY =
+  "Lead with action, guardrail, and flip condition; treat scores as context for continuity.";
+
+export const STARTUP_INDEX_CONTEXT_LABEL = "Context metric: Startup Climate Index";
+
 export const signalDeltaToneByDirection: Record<ReportSignalDirection, string> = {
   tightening: "border-semantic-tightening-border/70 bg-semantic-tightening-bg/70 text-semantic-tightening-fg",
   easing: "border-semantic-easing-border/70 bg-semantic-easing-bg/70 text-semantic-easing-fg",

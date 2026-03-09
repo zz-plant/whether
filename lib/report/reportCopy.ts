@@ -29,7 +29,7 @@ export type HighlightBullet = { text: string };
 export const FIRST_TIME_GUIDE_STEPS: FirstTimeGuideStep[] = [
   {
     label: "Summary",
-    detail: "Confirm the weekly posture modifier (for example Guarded Expansion or Transitional Mixed) and top constraints before you open deeper diagnostics.",
+    detail: "Start with Action, Guardrail, and Flip condition, then use posture and score context to pressure-test the call.",
     example: "Example decision: defer expansion hires when cash is tight.",
   },
   {
@@ -45,9 +45,9 @@ export const FIRST_TIME_GUIDE_STEPS: FirstTimeGuideStep[] = [
 ];
 
 export const FIRST_TIME_GUIDE_HIGHLIGHTS: HighlightBullet[] = [
-  { text: "Climate badge with modifier-aware posture label and weekly action summary." },
-  { text: "Source freshness and capture timestamp." },
-  { text: "Playbook links for constraint and action context." },
+  { text: "Top fold leads with Action + Guardrail + Flip condition for fast operating decisions." },
+  { text: "Confidence and trend indicate pacing quality before score context." },
+  { text: "Startup Climate Index remains available as contextual continuity metadata." },
 ];
 
 export const FIRST_TIME_GUIDE_NEXT_LINKS: ReportLinkCopy[] = [

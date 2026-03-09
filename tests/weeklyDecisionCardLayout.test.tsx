@@ -107,6 +107,17 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /Regime transition pace: Expansion→Mixed typically 3–6 months/);
     assert.match(html, /id="primary-artifact-actions"/);
     assert.match(html, /Jump to copy actions/);
+
+    const actionIndex = html.indexOf("Action");
+    const guardrailIndex = html.indexOf("Guardrail");
+    const flipConditionIndex = html.indexOf("Flip condition");
+    const trendIndex = html.indexOf("Trend:");
+    const scoreMetadataIndex = html.indexOf("Context metric: Startup Climate Index");
+
+    assert.ok(guardrailIndex > actionIndex);
+    assert.ok(flipConditionIndex > guardrailIndex);
+    assert.ok(scoreMetadataIndex > flipConditionIndex);
+    assert.ok(scoreMetadataIndex > trendIndex);
   });
 
   it("shows fallback warning copy when snapshot mode is active", () => {
