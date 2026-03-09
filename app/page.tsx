@@ -465,17 +465,36 @@ const HomePageReportContent = async ({
         />
       </DeferredSection>
 
-      <DeferredSection
-        id="executive-snapshot"
-        ariaLabel="Leadership summary"
-        fallback={<ExecutiveSnapshotFallback />}
-      >
-        <ExecutiveSnapshotPanel
-          treasury={treasury}
-          assessment={assessment}
-          provenance={treasuryProvenance}
-        />
-      </DeferredSection>
+      <details className="weather-panel px-5 py-4 sm:hidden">
+        <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">Evidence appendix (tap to expand)</summary>
+        <DeferredSection
+          id="executive-snapshot-mobile"
+          ariaLabel="Leadership summary"
+          fallback={<ExecutiveSnapshotFallback />}
+        >
+          <ExecutiveSnapshotPanel
+            treasury={treasury}
+            assessment={assessment}
+            provenance={treasuryProvenance}
+            sectionId="executive-snapshot-evidence"
+          />
+        </DeferredSection>
+      </details>
+
+      <div className="hidden sm:block">
+        <DeferredSection
+          id="executive-snapshot"
+          ariaLabel="Leadership summary"
+          fallback={<ExecutiveSnapshotFallback />}
+        >
+          <ExecutiveSnapshotPanel
+            treasury={treasury}
+            assessment={assessment}
+            provenance={treasuryProvenance}
+            sectionId="executive-snapshot-evidence"
+          />
+        </DeferredSection>
+      </div>
 
     </ReportShell>
   );

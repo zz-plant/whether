@@ -1918,8 +1918,8 @@ export const PlaybookPanel = ({
         <CollapsibleDeepDive label="Deep dive: playbook snapshot and action lanes" panelClassName="mt-4 space-y-6">
             <div className="grid gap-6 lg:grid-cols-[1.25fr,0.75fr]">
               <div className="grid gap-4 lg:grid-cols-3 lg:col-span-2">
-                <div className="weather-surface border-l-4 border-rose-500/50 p-4">
-                  <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Stop</p>
+                <div className="weather-surface border-l-4 border-rose-500/50 bg-rose-500/10 p-4">
+                  <p className="text-xs font-semibold tracking-[0.12em] text-rose-100">Don&apos;t (stop)</p>
                   <ul className="mt-3 space-y-2 text-sm text-slate-300">
                     {stopItems.map((item) => (
                       <li key={item} className="break-words">
@@ -1928,8 +1928,8 @@ export const PlaybookPanel = ({
                     ))}
                   </ul>
                 </div>
-                <div className="weather-surface border-l-4 border-emerald-400/50 p-4">
-                  <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Start</p>
+                <div className="weather-surface border-l-4 border-emerald-400/50 bg-emerald-500/10 p-4">
+                  <p className="text-xs font-semibold tracking-[0.12em] text-emerald-100">Do (start)</p>
                   <ul className="mt-3 space-y-2 text-sm text-slate-300">
                     {startItems.map((item) => (
                       <li key={item} className="break-words">

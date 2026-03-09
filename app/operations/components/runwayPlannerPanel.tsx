@@ -15,6 +15,14 @@ import type { RegimeAssessment } from "../../../lib/regimeEngine";
 const stageOptions: PlannerStage[] = ["seed", "series-a", "growth", "public"];
 const sectorOptions: PlannerSector[] = ["b2b-saas", "consumer", "infrastructure"];
 
+
+const strictnessLabel = (value: number) => {
+  if (value <= 0) return { label: "Relaxed", tone: "border-emerald-400/40 bg-emerald-500/10 text-emerald-100" };
+  if (value === 1) return { label: "Cautious", tone: "border-sky-400/40 bg-sky-500/10 text-sky-100" };
+  if (value === 2) return { label: "Strict", tone: "border-amber-400/40 bg-amber-500/10 text-amber-100" };
+  return { label: "Maximum strictness", tone: "border-rose-400/40 bg-rose-500/10 text-rose-100" };
+};
+
 const postureForPolicyPosture = (posture: RegimeAssessment["policyAssessment"]["posture"]): PlannerPosture => {
   if (posture === "RISK_ON") return "RISK_ON";
   if (posture === "TRANSITION") return "TRANSITION";
@@ -28,6 +36,7 @@ export function RunwayPlannerPanel({ assessment }: { assessment: RegimeAssessmen
   const [growthRate, setGrowthRate] = useState(12);
   const [sector, setSector] = useState<PlannerSector>("b2b-saas");
   const [stage, setStage] = useState<PlannerStage>("growth");
+  const [showMethodology, setShowMethodology] = useState(false);
 
   const output = useMemo(
     () =>
@@ -47,6 +56,8 @@ export function RunwayPlannerPanel({ assessment }: { assessment: RegimeAssessmen
   const shareBlock = useMemo(() => formatRunwayPlanCompactBlock(output), [output]);
   const { status, error, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy();
   const clipboardState = getClipboardUiState("runway-plan", { status, error, activeTarget, copiedTarget });
+  const paybackStrictnessLevel = Number.parseInt(output.decisionKnobs.paybackStrictnessLabel, 10) || 0;
+  const paybackStrictnessState = strictnessLabel(paybackStrictnessLevel);
 
   return (
     <section className="weather-panel-static mt-6 space-y-4 p-6" aria-label="Runway planner">
@@ -56,6 +67,18 @@ export function RunwayPlannerPanel({ assessment }: { assessment: RegimeAssessmen
         <p className="mt-2 text-sm text-slate-300">
           Model runway decisions against current posture so burn, raise timing, and reversal triggers stay aligned.
         </p>
+        <button
+          type="button"
+          onClick={() => setShowMethodology((current) => !current)}
+          className="mt-3 inline-flex min-h-[44px] items-center rounded-full border border-slate-600/70 px-3 py-1.5 text-xs font-semibold tracking-[0.12em] text-slate-200 hover:border-sky-400/70"
+        >
+          How is this calculated?
+        </button>
+        {showMethodology ? (
+          <div className="mt-3 rounded-xl border border-slate-700/70 bg-slate-950/70 p-3 text-xs text-slate-300">
+            Runway risk blends runway gap, burn multiple, growth, and regime posture. Decision knobs are derived from runway pressure + regime context (tightness and risk appetite) to set approval velocity, payback strictness, and reversibility requirements.
+          </div>
+        ) : null}
       </div>
 
       <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
@@ -113,6 +136,9 @@ export function RunwayPlannerPanel({ assessment }: { assessment: RegimeAssessmen
         <article className="weather-surface p-4">
           <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Burn adjustment range</p>
           <p className="mt-2 text-sm text-slate-100">{output.burnAdjustmentRange.summary}</p>
+          <p className={`mt-3 inline-flex rounded-full border px-2 py-1 text-xs font-semibold tracking-[0.08em] ${paybackStrictnessState.tone}`}>
+            Payback strictness: {paybackStrictnessState.label} ({paybackStrictnessLevel}/3)
+          </p>
         </article>
       </div>
 

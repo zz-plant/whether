@@ -43,6 +43,26 @@ const hasAssessmentChanged = (
   previous.assessment.scores.baseRate !== current.scores.baseRate ||
   previous.assessment.scores.curveSlope !== current.scores.curveSlope;
 
+
+const DeltaSparkline = ({ previous, current }: { previous: number | null; current: number | null }) => {
+  if (previous === null || current === null) {
+    return <p className="mt-2 text-[11px] text-slate-500">No history captured yet.</p>;
+  }
+  const min = Math.min(previous, current);
+  const max = Math.max(previous, current);
+  const range = Math.max(1, max - min);
+  const yFor = (value: number) => 14 - ((value - min) / range) * 10;
+  const directionLabel = current > previous ? "up" : current < previous ? "down" : "flat";
+  return (
+    <div className="mt-2">
+      <svg viewBox="0 0 48 16" className="h-4 w-16" aria-label={`Trend ${directionLabel}`}>
+        <polyline points={`4,${yFor(previous)} 24,${yFor((previous + current) / 2)} 44,${yFor(current)}`} fill="none" stroke="#7dd3fc" strokeWidth="1.5" />
+      </svg>
+      <p className="text-[10px] uppercase tracking-[0.1em] text-slate-500">{directionLabel} trend</p>
+    </div>
+  );
+};
+
 export const ChangeSinceLastReadPanel = ({
   assessment,
   lastYearComparison,
@@ -241,6 +261,7 @@ export const ChangeSinceLastReadPanel = ({
                 <p className="mt-2 text-sm text-slate-100">
                   {previous ? `${previous.assessment.regime} → ${assessment.regime}` : "—"}
                 </p>
+                {previous ? <p className="mt-1 text-xs text-slate-400">Previous posture ghost: <span className="font-semibold text-slate-300">{previous.assessment.regime}</span></p> : null}
               </div>
               <div className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-3">
                 <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
@@ -264,6 +285,7 @@ export const ChangeSinceLastReadPanel = ({
                       )
                     : "—"}
                 </p>
+                <DeltaSparkline previous={previous ? previous.assessment.scores.riskAppetite : null} current={assessment.scores.riskAppetite} />
               </div>
               <div className="rounded-xl border border-slate-800/80 bg-slate-950/60 p-3">
                 <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
@@ -288,6 +310,7 @@ export const ChangeSinceLastReadPanel = ({
                       )
                     : "—"}
                 </p>
+                <DeltaSparkline previous={previous ? previous.assessment.scores.curveSlope : null} current={assessment.scores.curveSlope} />
               </div>
             </div>
             <p className="mt-4 text-xs text-slate-400">

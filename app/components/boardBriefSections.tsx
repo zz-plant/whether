@@ -166,10 +166,12 @@ export const ExecutiveSnapshotPanel = ({
   treasury,
   assessment,
   provenance,
+  sectionId = "executive-snapshot",
 }: {
   treasury: TreasuryData;
   assessment: RegimeAssessment;
   provenance: DataProvenance;
+  sectionId?: string;
 }) => {
   const curveSlope = assessment.scores.curveSlope;
   const regimeLabel = getRegimeLabel(assessment.regime);
@@ -199,7 +201,7 @@ export const ExecutiveSnapshotPanel = ({
   const constraintHighlights = assessment.constraints.slice(0, 3);
 
   return (
-    <section id="executive-snapshot" aria-labelledby="executive-snapshot-title" className="mt-8">
+    <section id={sectionId} aria-labelledby="executive-snapshot-title" className="mt-8">
       <div className="weather-panel p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -280,6 +282,9 @@ export const ExecutiveSnapshotPanel = ({
             </div>
             <p className="mt-3 text-xs text-slate-500">
               Curve slope = 10Y minus 2Y. Negative values can signal inversion risk.
+            </p>
+            <p className="mt-2 text-xs text-slate-500">
+              Higher 10Y levels usually imply more expensive long-term borrowing, which can pressure fixed-cost expansion plans.
             </p>
             <div className="mt-3">
               <svg

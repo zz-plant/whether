@@ -72,17 +72,18 @@ const tierThreeInset = "rounded-md border border-slate-800/50 bg-slate-950/48 px
 const neutralLabel = "font-semibold uppercase tracking-[0.12em] text-slate-300";
 
 const regimeSegments = [
-  { key: "EXPANSION", label: "Expansion", shortLabel: "EX", classes: "bg-emerald-400/30 text-emerald-100" },
-  { key: "VOLATILE", label: "Volatile", shortLabel: "VO", classes: "bg-amber-300/30 text-amber-100" },
-  { key: "SCARCITY", label: "Scarcity", shortLabel: "SC", classes: "bg-rose-300/30 text-rose-100" },
-  { key: "DEFENSIVE", label: "Defensive", shortLabel: "DE", classes: "bg-violet-300/30 text-violet-100" },
+  { key: "DEFENSIVE", label: "Defensive", classes: "bg-violet-300/30 text-violet-100" },
+  { key: "CAUTIOUS", label: "Cautious", classes: "bg-rose-300/30 text-rose-100" },
+  { key: "NEUTRAL", label: "Neutral", classes: "bg-slate-400/30 text-slate-100" },
+  { key: "EXPANSION", label: "Expansion", classes: "bg-emerald-400/30 text-emerald-100" },
+  { key: "AGGRESSIVE", label: "Aggressive", classes: "bg-cyan-300/30 text-cyan-100" },
 ] as const;
 const regimeGaugePercentByLabel: Record<string, number> = {
-  EXPANSION: 12.5,
-  BALANCED: 37.5,
-  VOLATILE: 37.5,
-  SCARCITY: 62.5,
-  DEFENSIVE: 87.5,
+  DEFENSIVE: 10,
+  SCARCITY: 30,
+  BALANCED: 50,
+  VOLATILE: 50,
+  EXPANSION: 75,
 };
 
 const resolveVelocityLabel = (rows: Array<{ delta: number }>): "Low" | "Medium" | "High" => {
@@ -127,6 +128,18 @@ const signalActionRuleText: Record<(typeof signalOrder)[number], string> = {
   riskAppetite: "If risk appetite falls to 50 or below, freeze discretionary expansion approvals.",
   baseRate: "If base rate rises >0.5 this week, tighten payback windows before approving new spend.",
   curveSlope: "If curve slope turns negative by 0.25 or more, bias toward reversible roadmap bets.",
+};
+
+
+const termTooltipBySignal: Partial<Record<(typeof signalOrder)[number], string>> = {
+  riskAppetite: "Risk appetite: how willing markets are to fund risk. Lower values usually tighten growth financing.",
+  curveSlope: "Curve slope: 10Y minus 2Y Treasury yields. Negative readings can indicate recession risk.",
+};
+
+const renderSignalLabel = (signalKey: (typeof signalOrder)[number], label: string) => {
+  const tooltip = termTooltipBySignal[signalKey];
+  if (!tooltip) return <span>{label}</span>;
+  return <abbr title={tooltip} className="cursor-help no-underline border-b border-dotted border-slate-400/80">{label}</abbr>;
 };
 
 const SummaryLabel = ({
@@ -255,10 +268,10 @@ export function DecisionCallHeader({
         <article className={tierOneInset}>
           <p className={`text-xs ${neutralLabel}`}>Macro posture band</p>
           <div className="mt-2">
-            <div className="mb-2 grid grid-cols-4 text-[11px] uppercase tracking-[0.1em]">
-              {regimeSegments.map((segment) => <span key={segment.key} className="text-slate-400" title={segment.label}>{segment.shortLabel}</span>)}
+            <div className="mb-2 grid grid-cols-5 text-[10px] uppercase tracking-[0.1em]">
+              {regimeSegments.map((segment) => <span key={segment.key} className="text-slate-400" title={segment.label}>{segment.label}</span>)}
             </div>
-            <div className="relative grid h-3 grid-cols-4 overflow-hidden rounded-full border border-slate-700/70 bg-slate-900/80">
+            <div className="relative grid h-3 grid-cols-5 overflow-hidden rounded-full border border-slate-700/70 bg-slate-900/80">
               {regimeSegments.map((segment) => (
                 <div key={segment.key} className={segment.classes} aria-label={segment.label} />
               ))}
@@ -593,7 +606,7 @@ export function WeeklyDecisionCard({
               {macroMovementRows.map((signal) => (
                 <li key={signal.key} className="space-y-1">
                   <div className="flex items-center justify-between gap-2">
-                    <span>{signal.label}</span>
+                    <span>{renderSignalLabel(signal.key, signal.label)}</span>
                     <span className={`font-semibold ${signal.delta > 0 ? "text-amber-100" : signal.delta < 0 ? "text-emerald-100" : "text-slate-100"}`}>
                       {signal.arrow} {signal.delta > 0 ? `+${signal.delta.toFixed(1)}` : signal.delta.toFixed(1)}
                     </span>
