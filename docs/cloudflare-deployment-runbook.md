@@ -6,10 +6,12 @@ Use this command sequence in CI to keep Cloudflare Pages/Workers deploys determi
 
 ```bash
 bun install --frozen-lockfile
-bun run deploy:cloudflare
+bunx vercel build
+NEXT_ON_PAGES_SKIP_BUILD=1 NEXT_ON_PAGES_REUSE_PREBUILT=1 bun run build:pages
+bunx wrangler versions upload
 ```
 
-`bun run deploy:cloudflare` reuses an existing `.vercel/output` build for the same commit when available and falls back to a full `build:pages` + upload when not.
+This flow keeps dependency installation to a single explicit `bun install --frozen-lockfile` step, then reuses prebuilt `.vercel/output` for the Cloudflare conversion/upload stage.
 
 ## Expected warnings (non-blocking)
 
@@ -61,7 +63,7 @@ When CI already has a fresh `.vercel/output` from `vercel build`, you can skip t
 bun run build:cloudflare:skip-next-build
 ```
 
-This uses `NEXT_ON_PAGES_SKIP_BUILD=1` and forwards `--skip-build` to `next-on-pages`, reducing redundant work in multi-phase pipelines.
+This uses `NEXT_ON_PAGES_SKIP_BUILD=1` and forwards `--skip-build` to `next-on-pages`, while `NEXT_ON_PAGES_REUSE_PREBUILT=1` allows explicit reuse of restored/prebuilt output.
 
 `scripts/build.mjs` also auto-enables this skip behavior when all of the following are true:
 - target is Cloudflare Pages (`build:cloudflare` / `build:pages`),
