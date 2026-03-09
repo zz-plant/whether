@@ -11,7 +11,7 @@ import type {
   SeriesHistoryPoint,
   TreasuryData,
 } from "./types";
-import { computeCurveSlope, getBaseRate, TREASURY_SOURCE_LABEL } from "./regimeEngine";
+import { buildSignalInfluence, computeCurveSlope, DEFAULT_THRESHOLDS, getBaseRate, TREASURY_SOURCE_LABEL } from "./regimeEngine";
 import { getTimeMachineRollingYieldSeries } from "./timeMachine/timeMachineCache";
 
 const BASE_RATE_EXPLANATION =
@@ -181,6 +181,17 @@ export const buildSensorReadings = (treasury: TreasuryData): SensorReading[] => 
       : baseRateValue === null
         ? []
         : [{ date: treasury.record_date, value: baseRateValue }];
+  const influenceBySignal = buildSignalInfluence({
+    tightness: 0,
+    riskAppetite: 0,
+    baseRate: baseRateValue,
+    curveSlope,
+    thresholds: DEFAULT_THRESHOLDS,
+  }).reduce<Record<string, number | null>>((accumulator, entry) => {
+    accumulator[entry.key] = entry.influence;
+    return accumulator;
+  }, {});
+
   const curveSlopeSeries =
     curveSlopeTrend.length > 0
       ? curveSlopeTrend
@@ -193,6 +204,7 @@ export const buildSensorReadings = (treasury: TreasuryData): SensorReading[] => 
       id: "BASE_RATE",
       label: `Base rate (${baseRate.used})`,
       value: baseRateValue,
+      currentInfluence: influenceBySignal.baseRate ?? null,
       unit: "%",
       explanation: BASE_RATE_EXPLANATION,
       category: "Rates",
@@ -212,6 +224,7 @@ export const buildSensorReadings = (treasury: TreasuryData): SensorReading[] => 
       id: "CURVE_SLOPE",
       label: "Curve slope (10Y - 2Y)",
       value: curveSlope,
+      currentInfluence: influenceBySignal.curveSlope ?? null,
       unit: "%",
       explanation: CURVE_SLOPE_EXPLANATION,
       category: "Rates",
