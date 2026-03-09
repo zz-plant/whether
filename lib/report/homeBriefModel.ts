@@ -225,16 +225,22 @@ const buildSignalConfidenceReason = ({
 const buildOperatingStanceLine = ({
   severityDelta,
   directionLabel,
+  currentRegime,
 }: {
   severityDelta: number;
   directionLabel: "improving" | "deteriorating" | "mixed" | "stable" | undefined;
+  currentRegime: Regime;
 }) => {
+  const isExpansionRegime = currentRegime === "EXPANSION";
+
   if (severityDelta > 0 || directionLabel === "deteriorating") {
     return "Stage decisions. Avoid irreversible spend.";
   }
-  if (severityDelta < 0 || directionLabel === "improving") {
+
+  if ((severityDelta < 0 || directionLabel === "improving") && isExpansionRegime) {
     return "Stage expansion. Keep approvals reversible.";
   }
+
   return "Hold approvals steady. Keep irreversible spend capped.";
 };
 
@@ -590,6 +596,7 @@ export const buildHomeBriefModel = (
   const operatingStanceLine = buildOperatingStanceLine({
     severityDelta,
     directionLabel: reportDynamics?.directionLabel,
+    currentRegime: assessment.regime,
   });
 
   const failureModes: HomeBriefFailureMode[] = buildFailureModeWarnings({

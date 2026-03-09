@@ -152,10 +152,10 @@ export const buildTrustStatus = ({
   stableAction: string;
 }) => {
   const label = historicalSelection
-    ? "Data state: historical snapshot"
+    ? "Historical snapshot"
     : isFallback
-      ? "Data state: cached snapshot"
-      : "Data state: live Treasury feed";
+      ? "Using last verified snapshot"
+      : "Live • Treasury verified";
 
   const detail = historicalSelection
     ? "Decision impact: keep today’s do now / hold / revisit path, but treat this view as retrospective only."

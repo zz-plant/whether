@@ -396,7 +396,7 @@ const HomePageReportContent = async ({
       currentPath="/"
       pageSummary="Action, guardrail, and flip condition for this planning cycle; scores stay contextual."
       primaryCta={{
-        href: "#primary-artifact-actions",
+        href: "#citation-actions",
         label: "Copy weekly brief",
         copyText: slackBrief,
         copyTarget: "Slack",
