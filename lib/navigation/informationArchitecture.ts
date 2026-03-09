@@ -68,7 +68,7 @@ export const navigationLayers: NavigationLayer[] = [
   {
     key: "learn",
     href: "/learn",
-    label: "Learn",
+    label: "Concepts & Diagnostics",
     description: "Use failure modes and concept references for operator education.",
     boundary: "Diagnostic and conceptual references only; no new canonical guidance.",
     group: "reference",
@@ -76,7 +76,7 @@ export const navigationLayers: NavigationLayer[] = [
   {
     key: "method",
     href: "/method",
-    label: "Method",
+    label: "Methodology & Data",
     description: "Review formulas, sources, cadence, and confidence limits.",
     boundary: "Transparency surfaces only.",
     group: "reference",

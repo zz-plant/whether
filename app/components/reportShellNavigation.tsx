@@ -18,6 +18,17 @@ export type ReportSectionLink = {
   label: string;
 };
 
+const sectionCompactLabelByHref: Record<string, string> = {
+  "#evidence-priorities": "Top drivers",
+  "#ops-monthly-action-summary": "Monthly",
+  "#ops-playbook": "Playbook",
+  "#ops-finance-strategy": "Finance",
+  "#ops-export-briefs": "Export",
+};
+
+const getCompactSectionLabel = (sectionLink: ReportSectionLink) =>
+  sectionCompactLabelByHref[sectionLink.href] ?? sectionLink.label;
+
 const getPageNavigationState = (
   pageLinks: ReportPageLink[],
   pageTitle: string,
@@ -222,6 +233,71 @@ const pageLinkIcons: Record<string, ReactNode> = {
 
 const defaultPageLinkIcon = pageLinkIcons.method;
 
+const useReportActiveSectionHref = (sectionLinks: ReportSectionLink[]) => {
+  const [activeSectionHref, setActiveSectionHref] = useState(sectionLinks[0]?.href);
+
+  const sectionIdByHref = useMemo(
+    () =>
+      sectionLinks.reduce<Record<string, string>>((accumulator, section) => {
+        const id = section.href.startsWith("#") ? section.href.slice(1) : "";
+        if (id) {
+          accumulator[section.href] = id;
+        }
+        return accumulator;
+      }, {}),
+    [sectionLinks],
+  );
+
+  useEffect(() => {
+    if (!sectionLinks.length) {
+      return;
+    }
+
+    const updateFromHash = () => {
+      const hashHref = window.location.hash;
+      if (hashHref && sectionLinks.some((section) => section.href === hashHref)) {
+        setActiveSectionHref(hashHref);
+      }
+    };
+
+    updateFromHash();
+    window.addEventListener("hashchange", updateFromHash);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleEntry = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((left, right) => left.boundingClientRect.top - right.boundingClientRect.top)[0];
+
+        if (!visibleEntry) {
+          return;
+        }
+
+        const matchingHref = Object.entries(sectionIdByHref).find(([, sectionId]) => sectionId === visibleEntry.target.id)?.[0];
+
+        if (matchingHref) {
+          setActiveSectionHref(matchingHref);
+        }
+      },
+      { rootMargin: "-45% 0px -45% 0px", threshold: [0, 0.2, 0.4, 0.6, 0.8, 1] },
+    );
+
+    Object.values(sectionIdByHref).forEach((sectionId) => {
+      const sectionElement = document.getElementById(sectionId);
+      if (sectionElement) {
+        observer.observe(sectionElement);
+      }
+    });
+
+    return () => {
+      window.removeEventListener("hashchange", updateFromHash);
+      observer.disconnect();
+    };
+  }, [sectionIdByHref, sectionLinks]);
+
+  return activeSectionHref;
+};
+
 export const ReportPageNavigation = ({
   pageLinks,
   pageTitle,
@@ -313,6 +389,46 @@ export const ReportInterpretationNotes = () => (
   </Collapsible.Root>
 );
 
+export const ReportSectionNavigation = ({
+  sectionLinks,
+  className,
+}: {
+  sectionLinks: ReportSectionLink[];
+  className?: string;
+}) => {
+  const activeSectionHref = useReportActiveSectionHref(sectionLinks);
+
+  if (!sectionLinks.length) {
+    return null;
+  }
+
+  return (
+    <nav aria-label="Section index" className={className}>
+      <ol className="space-y-2 rounded-2xl border border-slate-800/70 bg-slate-950/60 p-3">
+        {sectionLinks.map((section, index) => {
+          const isActive = section.href === activeSectionHref;
+          return (
+            <li key={section.href}>
+              <a
+                href={section.href}
+                aria-current={isActive ? "location" : undefined}
+                className={`inline-flex min-h-[42px] w-full items-center justify-between rounded-xl border px-3 py-2 text-left text-xs font-semibold tracking-[0.12em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${
+                  isActive
+                    ? "border-sky-300/90 bg-sky-500/20 text-sky-50"
+                    : "border-slate-800/80 bg-slate-950/50 text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
+                }`}
+              >
+                <span>{getCompactSectionLabel(section)}</span>
+                <span className="text-[10px] text-slate-400">{index + 1}</span>
+              </a>
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
+  );
+};
+
 export const ReportMobileNavigation = ({
   pageLinks,
   pageTitle,
@@ -331,67 +447,7 @@ export const ReportMobileNavigation = ({
     pageTitle,
     currentPath,
   );
-
-  const [activeSectionHref, setActiveSectionHref] = useState(sectionLinks[0]?.href);
-
-  const sectionIdByHref = useMemo(
-    () =>
-      sectionLinks.reduce<Record<string, string>>((accumulator, section) => {
-        const id = section.href.startsWith("#") ? section.href.slice(1) : "";
-        if (id) {
-          accumulator[section.href] = id;
-        }
-        return accumulator;
-      }, {}),
-    [sectionLinks],
-  );
-
-  useEffect(() => {
-    if (!sectionLinks.length) {
-      return;
-    }
-
-    const updateFromHash = () => {
-      const hashHref = window.location.hash;
-      if (hashHref && sectionLinks.some((section) => section.href === hashHref)) {
-        setActiveSectionHref(hashHref);
-      }
-    };
-
-    updateFromHash();
-    window.addEventListener("hashchange", updateFromHash);
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visibleEntry = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((left, right) => left.boundingClientRect.top - right.boundingClientRect.top)[0];
-
-        if (!visibleEntry) {
-          return;
-        }
-
-        const matchingHref = Object.entries(sectionIdByHref).find(([, sectionId]) => sectionId === visibleEntry.target.id)?.[0];
-
-        if (matchingHref) {
-          setActiveSectionHref(matchingHref);
-        }
-      },
-      { rootMargin: "-45% 0px -45% 0px", threshold: [0, 0.2, 0.4, 0.6, 0.8, 1] },
-    );
-
-    Object.values(sectionIdByHref).forEach((sectionId) => {
-      const sectionElement = document.getElementById(sectionId);
-      if (sectionElement) {
-        observer.observe(sectionElement);
-      }
-    });
-
-    return () => {
-      window.removeEventListener("hashchange", updateFromHash);
-      observer.disconnect();
-    };
-  }, [sectionIdByHref, sectionLinks]);
+  const activeSectionHref = useReportActiveSectionHref(sectionLinks);
 
   const activeSectionIndex = sectionLinks.findIndex((section) => section.href === activeSectionHref);
   const resolvedActiveSectionIndex = activeSectionIndex >= 0 ? activeSectionIndex : 0;
