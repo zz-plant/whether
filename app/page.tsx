@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { Suspense } from "react";
 import {
   buildTimeMachineHref,
   getAdjacentTimeMachineRequest,
@@ -154,6 +155,28 @@ export const generateMetadata = async ({
 
 const resolveHomepageOverlaySector = (value: string | undefined) => resolveSectorKey(value);
 
+type HomePageSearchParams = {
+  month?: string;
+  year?: string;
+  [key: string]: string | undefined;
+};
+
+const HomePageStreamingFallback = () => (
+  <section aria-label="Loading weekly operating posture" className="space-y-6">
+    <section className="weather-panel space-y-4 px-5 py-5" aria-live="polite" aria-busy="true">
+      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Loading this week&apos;s call</p>
+      <p className="text-sm text-slate-200">
+        Pulling live signals and preparing bounded decisions, reversal triggers, and share-ready artifacts.
+      </p>
+      <div className="h-20 rounded-lg border border-slate-700/70 bg-slate-900/40" />
+    </section>
+    <section className="weather-panel space-y-4 px-5 py-5" aria-label="Loading evidence">
+      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Loading evidence snapshot</p>
+      <div className="h-24 rounded-lg border border-slate-700/70 bg-slate-900/40" />
+    </section>
+  </section>
+);
+
 const buildHomeStructuredData = () => ({
   "@context": "https://schema.org",
   "@graph": [
@@ -217,16 +240,25 @@ const buildHomeStructuredData = () => ({
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams?: Promise<{
-    month?: string;
-    year?: string;
-    [key: string]: string | undefined;
-  }>;
+  searchParams?: Promise<HomePageSearchParams>;
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const homepageOverlaySector = resolveHomepageOverlaySector(resolvedSearchParams?.sector);
-  const interpretationView: InterpretationView = isInterpretationView(resolvedSearchParams?.view)
-    ? resolvedSearchParams.view
+
+  return (
+    <Suspense fallback={<HomePageStreamingFallback />}>
+      <HomePageReportContent searchParams={resolvedSearchParams} />
+    </Suspense>
+  );
+}
+
+const HomePageReportContent = async ({
+  searchParams,
+}: {
+  searchParams?: HomePageSearchParams;
+}) => {
+  const homepageOverlaySector = resolveHomepageOverlaySector(searchParams?.sector);
+  const interpretationView: InterpretationView = isInterpretationView(searchParams?.view)
+    ? searchParams.view
     : "default";
   const sectionLinks = homeSectionSequence.map((section) => ({
     href: section.href,
@@ -234,7 +266,7 @@ export default async function HomePage({
   }));
   const structuredData = buildHomeStructuredData();
 
-  const reportResult = await loadReportDataSafe(resolvedSearchParams, { route: "/" });
+  const reportResult = await loadReportDataSafe(searchParams, { route: "/" });
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
   const {
     assessment,
@@ -381,7 +413,7 @@ export default async function HomePage({
 
       <HomeInterpretationPanel
         layer={interpretationLayer}
-        searchParams={resolvedSearchParams}
+        searchParams={searchParams}
       />
 
 
@@ -438,4 +470,4 @@ export default async function HomePage({
 
     </ReportShell>
   );
-}
+};
