@@ -93,7 +93,7 @@ export const buildWeeklyTrustCueLine = ({
   freshnessLabel: string;
   transitionWatch: "ON" | "OFF";
 }) =>
-  `Confidence ${confidenceLabel} · Freshness ${normalizeFreshnessLabel(freshnessLabel)} · Regime shift watch ${transitionWatch}`;
+  `Signal reliability ${confidenceLabel} · Freshness ${normalizeFreshnessLabel(freshnessLabel)} · Regime shift watch ${transitionWatch}`;
 
 export const buildCompactTrustSummary = ({
   confidenceLabel,
@@ -117,10 +117,10 @@ export const buildCompactTrustSummary = ({
   }
 
   if (confidenceLabel !== "HIGH") {
-    return `Confidence ${confidenceLabel} (${normalizedFreshness}): keep approvals staged until confidence returns to HIGH.`;
+    return `Signal reliability ${confidenceLabel} (${normalizedFreshness}): keep approvals staged until reliability returns to HIGH.`;
   }
 
-  return `Live confidence ${confidenceLabel} (${normalizedFreshness}): safe for near-term operating decisions.`;
+  return `Live signal reliability ${confidenceLabel} (${normalizedFreshness}): safe for near-term operating decisions.`;
 };
 
 export const buildWeeklyCitationMetaLine = ({
@@ -134,7 +134,7 @@ export const buildWeeklyCitationMetaLine = ({
   recordDateLabel: string;
   freshnessLabel: string;
 }) =>
-  `Posture ${statusLabel} · Confidence ${confidenceLabel} · Effective ${recordDateLabel} · Freshness ${normalizeFreshnessLabel(freshnessLabel)}`;
+  `Posture ${statusLabel} · Signal reliability ${confidenceLabel} · Effective ${recordDateLabel} · Freshness ${normalizeFreshnessLabel(freshnessLabel)}`;
 
 export const buildTrustStatus = ({
   historicalSelection,
