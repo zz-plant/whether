@@ -96,11 +96,11 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
   const [isExpanded, setIsExpanded] = useState(true);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const commandCenterRef = useRef<HTMLElement | null>(null);
-  const triggerHaptic = useHapticFeedback();
+  const haptic = useHapticFeedback();
   const { copyToClipboard } = useClipboardCopy();
   // Haptics should reinforce decision delta and artifact completion, not decorative interaction.
-  const triggerNavigationHaptic = () => triggerHaptic("light");
-  const triggerDecisionCommitHaptic = () => triggerHaptic("success");
+  const triggerNavigationHaptic = () => haptic.navigate();
+  const triggerDecisionCommitHaptic = () => haptic.confirm();
 
   const onDirectionalKeyDown = (event: ReactKeyboardEvent<HTMLElement>) => {
     if (!commandCenterRef.current) {

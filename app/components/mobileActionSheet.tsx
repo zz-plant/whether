@@ -20,7 +20,7 @@ export const MobileActionSheet = ({
 }) => {
   const [open, setOpen] = useState(false);
   const suppressCloseAutoFocusRef = useRef(false);
-  const triggerHaptic = useHapticFeedback();
+  const haptic = useHapticFeedback();
 
   return (
     <Dialog.Root
@@ -31,7 +31,11 @@ export const MobileActionSheet = ({
         }
 
         setOpen(nextOpen);
-        triggerHaptic(nextOpen ? "light" : "selection");
+        if (nextOpen) {
+          haptic.open();
+        } else {
+          haptic.close();
+        }
       }}
     >
       <Dialog.Trigger
@@ -89,7 +93,7 @@ export const MobileActionSheet = ({
                     onClick={() => {
                       suppressCloseAutoFocusRef.current = true;
                       setOpen(false);
-                      triggerHaptic("selection");
+                      haptic.navigate();
                     }}
                   >
                     {action.label}

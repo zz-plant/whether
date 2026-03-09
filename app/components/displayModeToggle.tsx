@@ -27,7 +27,7 @@ const getInitialToggleMode = (): "auto" | "tv" => {
 
 export const DisplayModeToggle = () => {
   const [mode, setMode] = useState<"auto" | "tv">("auto");
-  const triggerHaptic = useHapticFeedback();
+  const haptic = useHapticFeedback();
 
   useEffect(() => {
     const syncFromLocation = () => {
@@ -58,7 +58,7 @@ export const DisplayModeToggle = () => {
     }
 
     window.history.replaceState({}, "", nextUrl);
-    triggerHaptic("selection");
+    haptic.toggle();
   };
 
   const isTv = mode === "tv";

@@ -65,7 +65,7 @@ export const useClipboardCopy = (
   const [activeTarget, setActiveTarget] = useState<string | null>(null);
   const [copiedTarget, setCopiedTarget] = useState<string | null>(null);
   const timeoutRef = useRef<number | null>(null);
-  const triggerHaptic = useHapticFeedback();
+  const haptic = useHapticFeedback();
 
   const clearResetTimer = useCallback(() => {
     if (timeoutRef.current !== null) {
@@ -89,7 +89,7 @@ export const useClipboardCopy = (
         setError(true);
         setErrorReason("unavailable");
         setStatus("error");
-        triggerHaptic("warning");
+        haptic.copyError();
         return false;
       }
       setStatus("copying");
@@ -100,7 +100,7 @@ export const useClipboardCopy = (
         setErrorReason(null);
         setStatus("copied");
         setCopiedTarget(target ?? null);
-        triggerHaptic("success");
+        haptic.copySuccess();
         clearResetTimer();
         timeoutRef.current = window.setTimeout(() => {
           setStatus("idle");
@@ -111,13 +111,13 @@ export const useClipboardCopy = (
         setError(true);
         setErrorReason("write-failed");
         setStatus("error");
-        triggerHaptic("error");
+        haptic.copyError();
         return false;
       } finally {
         setActiveTarget(null);
       }
     },
-    [clearResetTimer, resetDelay, status, triggerHaptic]
+    [clearResetTimer, haptic, resetDelay, status]
   );
 
   return {
