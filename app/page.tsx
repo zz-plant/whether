@@ -43,12 +43,12 @@ import { getRegimeDisplayLabel } from "../lib/regimePresentation";
 
 const WeeklyActionSummaryPanel = dynamic(
   () => import("./components/boardBriefSections").then((module) => module.WeeklyActionSummaryPanel),
-  { suspense: true },
+  {},
 );
 
 const ExecutiveSnapshotPanel = dynamic(
   () => import("./components/boardBriefSections").then((module) => module.ExecutiveSnapshotPanel),
-  { suspense: true },
+  {},
 );
 
 const WeeklyActionSummaryFallback = () => (

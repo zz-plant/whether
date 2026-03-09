@@ -25,12 +25,22 @@ import {
 } from "../../../lib/resourceArticles";
 import {
   findDownloadableResourceBySlug,
+  downloadableResources,
 } from "../../../lib/downloadableResources";
+import { resourceArticles } from "../../../lib/resourceArticles";
 
 type Params = { slug: string };
 
-export const runtime = "edge";
 export const revalidate = 21600;
+
+export function generateStaticParams(): Array<{ slug: string }> {
+  return [
+    ...resourcePillarPages.map((page) => ({ slug: page.slug })),
+    ...Object.values(resourceSupportingPages).map((page) => ({ slug: page.path.split("/").pop() ?? "" })),
+    ...Object.keys(downloadableResources).map((slug) => ({ slug })),
+    ...resourceArticles.map((article) => ({ slug: article.slug })),
+  ].filter((entry): entry is { slug: string } => entry.slug.length > 0);
+}
 
 const buildSectionAnchor = (heading: string) =>
   heading

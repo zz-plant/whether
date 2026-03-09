@@ -18,11 +18,6 @@ export const metadata: Metadata = buildPageMetadata({
   imageAlt: "Whether decision paths",
 });
 
-const titleCase = (value: string) => value
-  .split("-")
-  .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-  .join(" ");
-
 export default function DecidePage() {
   const breadcrumbStructuredData = {
     "@context": "https://schema.org",
@@ -61,7 +56,7 @@ export default function DecidePage() {
         <h2 className="text-lg font-semibold text-slate-100">Explore by situation</h2>
         <div className="grid gap-3 sm:grid-cols-2">
           {situationUseCaseDefinitions.map((situation) => (
-            <Link key={situation.slug} href={`/decide/${situation.slug}`} className="weather-surface px-4 py-4 text-sm text-slate-100">{situation.title || titleCase(situation.slug)}</Link>
+            <Link key={situation.slug} href={`/decide/${situation.slug}`} className="weather-surface px-4 py-4 text-sm text-slate-100">{situation.title}</Link>
           ))}
         </div>
       </section>

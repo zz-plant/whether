@@ -105,6 +105,11 @@ const strictnessLabel = (level: number) => {
   return "Maximum strictness";
 };
 
+const parseKnobLevelLabel = (value: string): number => {
+  const parsed = Number.parseInt(value, 10);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
 const growthToDecimal = (growthRate: number) => growthRate / 100;
 
 const sanitize = (input: RunwayPlannerInput): RunwayPlannerInput => ({
@@ -252,6 +257,7 @@ export const buildRunwayPlan = (rawInput: RunwayPlannerInput): RunwayPlannerOutp
   const playbook = getPlaybookGuidance(input.regime);
   const approvalVelocity = getKnobLevel(input, runwayGap, "approvalVelocity");
   const paybackStrictness = getKnobLevel(input, runwayGap, "payback");
+  const paybackStrictnessLevel = parseKnobLevelLabel(paybackStrictness);
   const downsidePosture = deriveDownsidePosture(input.posture);
 
   return {
@@ -276,7 +282,7 @@ export const buildRunwayPlan = (rawInput: RunwayPlannerInput): RunwayPlannerOutp
       recommendedDeltaPercent,
       floorPercent: burnMinPercent,
       ceilingPercent: burnMaxPercent,
-      summary: `Adjust burn by ${recommendedDeltaPercent}% (range ${burnMinPercent}% to ${burnMaxPercent}%) with payback strictness ${paybackStrictness} (${strictnessLabel(paybackStrictness)}). Reverse after two stable weekly reads and runway above ${round(safeBand.minMonths)} months.`,
+      summary: `Adjust burn by ${recommendedDeltaPercent}% (range ${burnMinPercent}% to ${burnMaxPercent}%) with payback strictness ${paybackStrictness} (${strictnessLabel(paybackStrictnessLevel)}). Reverse after two stable weekly reads and runway above ${round(safeBand.minMonths)} months.`,
     },
     decisionKnobs: {
       paybackStrictnessLabel: paybackStrictness,
