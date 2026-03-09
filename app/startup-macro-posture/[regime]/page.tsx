@@ -2,6 +2,7 @@ import type { Metadata, Route } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../lib/seo";
+import type { StartupRegimePage } from "../clusterData";
 import { tierOneDecisionPages } from "../../answers/decisionPages";
 import { findRegimePage, regimePages, regimeStaticParams } from "../clusterData";
 
@@ -18,7 +19,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: RegimePageProps): Promise<Metadata> {
   const { regime } = await params;
-  const page = findRegimePage(regime);
+  const page = findRegimePage(regime as StartupRegimePage["slug"]);
 
   if (!page) {
     return buildPageMetadata({
@@ -39,7 +40,7 @@ export async function generateMetadata({ params }: RegimePageProps): Promise<Met
 
 export default async function RegimeDeepPage({ params }: RegimePageProps) {
   const { regime } = await params;
-  const page = findRegimePage(regime);
+  const page = findRegimePage(regime as StartupRegimePage["slug"]);
 
   if (!page) notFound();
 
