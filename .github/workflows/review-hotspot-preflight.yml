@@ -3,9 +3,6 @@ name: Review Hotspot Preflight
 on:
   pull_request:
     types: [opened, synchronize, reopened, edited]
-  push:
-    branches-ignore:
-      - main
 
 jobs:
   preflight:

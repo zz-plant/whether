@@ -40,7 +40,7 @@ Decision-delta prompts to include when relevant:
 - What would flip/reverse the call?
 
 Automation notes:
-- `.github/workflows/review-hotspot-preflight.yml` runs on push and pull requests to catch risky decision-logic edits without tests and newly added unsafe type assertions before review.
+- `.github/workflows/review-hotspot-preflight.yml` runs on pull requests to catch risky decision-logic edits without tests and newly added unsafe type assertions before review.
 - `.github/workflows/pr-review-hotspot-checklist.yml` enforces that all required items in the PR template's **Review hotspot checklist** are explicitly checked before merge.
 
 Recent trend context:
