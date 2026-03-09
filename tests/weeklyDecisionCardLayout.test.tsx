@@ -49,6 +49,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
         revisitDecisions={true}
         memoryRail={[{ label: "Now", posture: "Defensive" }]}
         historicalTimeline={[{ label: "2026", posture: "Defensive" }]}
+        historicalAnalogs={[]}
         macroOverlay={[{ label: "VC funding", detail: "-4.5 · ↑ improving" }]}
         whyThisCall={[{ label: "Momentum", detail: "Capital tightness tightened this week." }]}
         primaryDrivers={[{ label: "Capital tightness", detail: "↑ tightened this week" }]}
@@ -66,7 +67,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
       />,
     );
 
-    assert.match(html, /Weekly posture call/);
+    assert.match(html, /Weekly operating call/);
     assert.match(html, /This week in 15 seconds/);
     assert.match(html, /Macro posture band/);
     assert.match(html, /points to flip/);
@@ -102,6 +103,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
         revisitDecisions={false}
         memoryRail={[{ label: "Now", posture: "Defensive" }]}
         historicalTimeline={[{ label: "2026", posture: "Defensive" }]}
+        historicalAnalogs={[]}
         macroOverlay={[{ label: "VC funding", detail: "-4.5 · ↑ improving" }]}
         whyThisCall={[{ label: "Reliability", detail: "Fallback snapshot in use." }]}
         primaryDrivers={[{ label: "Signal reliability", detail: "High confidence (cached snapshot)" }]}

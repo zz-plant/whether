@@ -15,7 +15,7 @@ const TimeMachineSnapshotSchema = TreasuryDataSchema.extend({
   month: z.number(),
 });
 
-type TimeMachineSnapshot = z.infer<typeof TimeMachineSnapshotSchema>;
+export type TimeMachineSnapshot = z.infer<typeof TimeMachineSnapshotSchema>;
 
 const TimeMachineCacheSchema = z.array(TimeMachineSnapshotSchema);
 export const DEFAULT_REGIME_SERIES_MONTHS = 24;
@@ -357,6 +357,10 @@ export const findTimeMachineSnapshot = (asOf: string): TreasuryData | null => {
 
   const { year: _year, month: _month, ...data } = candidate;
   return data;
+};
+
+export const getTimeMachineSnapshots = (): TimeMachineSnapshot[] => {
+  return sortedSnapshots.map((snapshot) => ({ ...snapshot }));
 };
 
 export const getTimeMachineRollingYieldSeries = (

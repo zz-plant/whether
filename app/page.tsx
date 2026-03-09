@@ -283,6 +283,7 @@ const HomePageReportContent = async ({
     assessment,
     fetchedAtLabel,
     historicalSelection,
+    historicalAnalogs,
     recordDateLabel,
     regimeAlert,
     reportDynamics,
@@ -324,6 +325,7 @@ const HomePageReportContent = async ({
     assessment,
     fetchedAtLabel,
     historicalSelection,
+    historicalAnalogs,
     recordDateLabel,
     regimeAlert,
     reportDynamics,
@@ -342,8 +344,8 @@ const HomePageReportContent = async ({
     forecast,
     decisionRules: homeBriefModel.decisionRules,
   });
-  const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries, { interpretationLayer, postureWithStageLabel: homeBriefModel.postureWithStageLabel });
-  const boardSummary = buildBoardBrief(assessment, treasury, sensors, macroSeries, { interpretationLayer, postureWithStageLabel: homeBriefModel.postureWithStageLabel });
+  const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries, { interpretationLayer, postureWithStageLabel: homeBriefModel.postureWithStageLabel, historicalAnalogs: homeBriefModel.historicalAnalogs });
+  const boardSummary = buildBoardBrief(assessment, treasury, sensors, macroSeries, { interpretationLayer, postureWithStageLabel: homeBriefModel.postureWithStageLabel, historicalAnalogs: homeBriefModel.historicalAnalogs });
   const callCitation = buildCallCitation(assessment, treasury, { interpretationLayer, postureWithStageLabel: homeBriefModel.postureWithStageLabel });
   const featuredConcepts = getFeaturedConceptArticles().slice(0, 3);
   return (
@@ -415,6 +417,7 @@ const HomePageReportContent = async ({
         revisitDecisions={homeBriefModel.revisitDecisions}
         memoryRail={homeBriefModel.memoryRail}
         historicalTimeline={homeBriefModel.historicalTimeline}
+        historicalAnalogs={homeBriefModel.historicalAnalogs}
         macroOverlay={homeBriefModel.macroOverlay}
         whyThisCall={homeBriefModel.whyThisCall}
         primaryDrivers={homeBriefModel.primaryDrivers}

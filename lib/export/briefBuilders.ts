@@ -24,6 +24,7 @@ const buildDecisionHighlights = (assessment: RegimeAssessment) =>
 type ExportLayerOptions = {
   interpretationLayer?: InterpretationLayer;
   postureWithStageLabel?: string;
+  historicalAnalogs?: Array<{ date: string; similarityScore: number; implication: string }>;
 };
 
 const buildInterpretationLayerBlock = (options?: ExportLayerOptions) => {
@@ -48,6 +49,20 @@ const buildInterpretationLayerBlock = (options?: ExportLayerOptions) => {
     "Interpretation trust: translation layer only; canonical posture/confidence/thresholds unchanged.",
     ...boundedBullets.map((bullet) => `• ${bullet}`),
     ...financialSummary.map((line) => `• ${line}`),
+  ];
+};
+
+
+const buildHistoricalAnalogsBlock = (options?: ExportLayerOptions) => {
+  const analogs = options?.historicalAnalogs ?? [];
+  if (analogs.length === 0) return [];
+
+  return [
+    "",
+    "Historical analogs:",
+    ...analogs.slice(0, 3).map((analog) =>
+      `• ${analog.date} · ${(analog.similarityScore * 100).toFixed(0)}% match · ${analog.implication}`
+    ),
   ];
 };
 
@@ -119,6 +134,7 @@ export const buildSlackBrief = (
     ...assessment.constraints.map((item) => `• ${item}`),
     "",
     financialImplications,
+    ...buildHistoricalAnalogsBlock(options),
     ...buildInterpretationLayerBlock(options),
     "",
     "Citations:",

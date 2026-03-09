@@ -5,6 +5,7 @@ import {
   buildLastYearComparison,
   buildReportDynamics,
   buildSnapshotFallbackTreasury,
+  buildHistoricalAnalogs,
 } from "../lib/report/reportData";
 import type { TreasuryData } from "../lib/types";
 import { resolveSectorKey } from "../lib/report/sectorSensitivity";
@@ -162,5 +163,76 @@ describe("sector overlay key resolution", () => {
     assert.equal(resolveSectorKey(undefined), "b2b-saas");
     assert.equal(resolveSectorKey(""), "b2b-saas");
     assert.equal(resolveSectorKey("unknown-sector"), "b2b-saas");
+  });
+});
+
+
+describe("buildHistoricalAnalogs", () => {
+  const makeSnapshot = (recordDate: string, oneMonth: number, twoYear: number, tenYear: number): TreasuryData => ({
+    source: "US Treasury",
+    record_date: recordDate,
+    fetched_at: `${recordDate}T12:00:00Z`,
+    isLive: false,
+    yields: { oneMonth, twoYear, tenYear },
+  });
+
+  it("returns empty list when there is no historical window", () => {
+    const thresholds = { baseRateTightness: 5, tightnessRegime: 70, riskAppetiteRegime: 50 };
+    const current = evaluateRegime(makeSnapshot("2026-03-01", 4.2, 4.0, 4.3), thresholds);
+
+    const analogs = buildHistoricalAnalogs({
+      current,
+      snapshots: [makeSnapshot("2026-03-01", 4.2, 4.0, 4.3)],
+      thresholds,
+      currentTrendDirection: "stable",
+    });
+
+    assert.deepEqual(analogs, []);
+  });
+
+  it("breaks score ties by most recent record date", () => {
+    const thresholds = { baseRateTightness: 5, tightnessRegime: 70, riskAppetiteRegime: 50 };
+    const snapshots = [
+      makeSnapshot("2025-01-31", 4.3, 4.2, 4.4),
+      makeSnapshot("2025-02-28", 4.3, 4.2, 4.4),
+      makeSnapshot("2025-03-31", 4.3, 4.2, 4.4),
+    ];
+    const current = evaluateRegime(snapshots[2], thresholds);
+
+    const analogs = buildHistoricalAnalogs({
+      current,
+      snapshots,
+      thresholds,
+      currentTrendDirection: "stable",
+    });
+
+    assert.equal(analogs[0]?.recordDate, "2025-02-28");
+    assert.equal(analogs[1]?.recordDate, "2025-01-31");
+  });
+
+  it("keeps deterministic ordering across equivalent runs", () => {
+    const thresholds = { baseRateTightness: 5, tightnessRegime: 70, riskAppetiteRegime: 50 };
+    const snapshots = [
+      makeSnapshot("2024-12-31", 4.5, 4.3, 4.5),
+      makeSnapshot("2025-01-31", 4.4, 4.2, 4.4),
+      makeSnapshot("2025-02-28", 4.3, 4.1, 4.3),
+      makeSnapshot("2025-03-31", 4.2, 4.0, 4.2),
+    ];
+    const current = evaluateRegime(snapshots[3], thresholds);
+
+    const first = buildHistoricalAnalogs({
+      current,
+      snapshots,
+      thresholds,
+      currentTrendDirection: "stable",
+    }).map((item) => item.recordDate);
+    const second = buildHistoricalAnalogs({
+      current,
+      snapshots,
+      thresholds,
+      currentTrendDirection: "stable",
+    }).map((item) => item.recordDate);
+
+    assert.deepEqual(first, second);
   });
 });
