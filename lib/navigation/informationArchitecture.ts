@@ -18,6 +18,12 @@ export type NavigationLayer = {
   group: "core" | "workflow" | "reference";
 };
 
+export const navigationGroupLabels = {
+  core: "Now",
+  workflow: "Operate",
+  reference: "Reference",
+} as const;
+
 export const navigationLayers: NavigationLayer[] = [
   {
     key: "weekly-brief",

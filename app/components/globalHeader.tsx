@@ -2,10 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { navigationLayers } from "../../lib/navigation/informationArchitecture";
+import { navigationGroupLabels, navigationLayers } from "../../lib/navigation/informationArchitecture";
 import { pathMatchesLink } from "../../lib/navigation/pathMatching";
 import { reportShellCorePaths } from "../../lib/report/reportNavigation";
-import { NavigationOrientationBadge } from "./navigationOrientationBadge";
 import { ThemeToggleButton } from "./themeToggleButton";
 
 export function GlobalHeader() {
@@ -40,7 +39,6 @@ export function GlobalHeader() {
                 Operating posture navigation
               </p>
             )}
-            <NavigationOrientationBadge currentPath={pathname} className="mt-3" />
           </div>
           <ThemeToggleButton />
         </div>
@@ -62,6 +60,9 @@ export function GlobalHeader() {
                         : "text-slate-100 hover:border-sky-400/70"
                     }`}
                   >
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-300/90">
+                      {navigationGroupLabels[link.group]}
+                    </span>
                     <span className="mt-1 text-xs font-semibold tracking-[0.08em] sm:text-sm">
                       {link.label}
                     </span>
