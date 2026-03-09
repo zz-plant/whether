@@ -211,6 +211,40 @@ const SummaryLabel = ({
   </p>
 );
 
+const buildFounderDecisionRows = ({
+  postureLabel,
+  guardrail,
+  reversalTrigger,
+}: {
+  postureLabel: string;
+  guardrail: string;
+  reversalTrigger: string;
+}) => {
+  const normalizedLabel = postureLabel.toLowerCase();
+
+  if (normalizedLabel.includes("scarcity") || normalizedLabel.includes("contraction")) {
+    return [
+      { area: "Hiring", action: "Tighten to backfills and revenue-critical roles", cue: guardrail },
+      { area: "Fundraising", action: "Prioritize raise readiness now; avoid timing risk", cue: reversalTrigger },
+      { area: "Runway", action: "Extend runway and freeze irreversible spend", cue: "Review weekly until trigger clears" },
+    ];
+  }
+
+  if (normalizedLabel.includes("defensive") || normalizedLabel.includes("mixed") || normalizedLabel.includes("transitional")) {
+    return [
+      { area: "Hiring", action: "Hold net-new hiring to highest-payback roles", cue: guardrail },
+      { area: "Fundraising", action: "Prepare raise narrative and move when window improves", cue: reversalTrigger },
+      { area: "Runway", action: "Maintain runway floor with tranche-based releases", cue: "Require explicit stop triggers" },
+    ];
+  }
+
+  return [
+    { area: "Hiring", action: "Accelerate selectively in proven demand lanes", cue: guardrail },
+    { area: "Fundraising", action: "Run a planned process while market weather is supportive", cue: reversalTrigger },
+    { area: "Runway", action: "Deploy on reversible bets and protect downside bands", cue: "Pause if threshold trigger fires" },
+  ];
+};
+
 const PostureHistoryTimeline = ({ historicalTimeline }: { historicalTimeline: WeeklyDecisionCardProps["historicalTimeline"] }) => (
   <ol className="mt-2 grid gap-2 lg:grid-cols-4" aria-label="Posture change timeline">
     {historicalTimeline.map((item, index) => {
@@ -302,6 +336,11 @@ export function DecisionCallHeader({
   const resolvedPostureLabel = postureLabel ?? derivedPostureLabel ?? statusLabel;
   const resolvedStageLabel = stageLabel ?? derivedStageLabel ?? "Unspecified";
   const resolvedPostureWithStageLabel = postureWithStageLabel ?? `${resolvedPostureLabel} — ${resolvedStageLabel}`;
+  const founderDecisionRows = buildFounderDecisionRows({
+    postureLabel: resolvedPostureLabel,
+    guardrail,
+    reversalTrigger: `Flip: ${regimeDistance.dimensionLabel} ${regimeDistance.thresholdDirection === "riseAbove" ? "rises above" : "falls to or below"} ${regimeDistance.thresholdValue.toFixed(1)}`,
+  });
 
   return (
     <header className="space-y-5 border-b border-slate-700/80 pb-6" data-testid="weekly-top-fold">
@@ -319,6 +358,19 @@ export function DecisionCallHeader({
         <p className="text-xs text-slate-300">{TOP_FOLD_DECISION_PRIORITY_COPY}</p>
         <p className="text-sm leading-relaxed text-slate-200">{meetingShorthand}</p>
         <p className="text-xs text-slate-300">Top contributors: {topContributorInline}</p>
+
+        <article className={tierOneInset} aria-label="Founders decision triad this week">
+          <h3 className={tierTwoHeading}>This week&apos;s founder decisions</h3>
+          <ul className="mt-2 space-y-2 text-xs text-slate-200">
+            {founderDecisionRows.map((row) => (
+              <li key={row.area} className="rounded-md border border-slate-700/70 bg-slate-950/70 px-2 py-2">
+                <p className="font-semibold uppercase tracking-[0.1em] text-slate-100">{row.area}</p>
+                <p className="mt-1 text-slate-200">{row.action}</p>
+                <p className="mt-1 text-slate-400">{row.cue}</p>
+              </li>
+            ))}
+          </ul>
+        </article>
 
 
         <article className={tierOneInset} aria-label="Key operational stance this week">
@@ -463,7 +515,6 @@ export function DecisionCallHeader({
 
 type BoundedRulesMatrixProps = {
   decisionRules: BoundedDecisionRule[];
-  roleAwareTemplates: RoleAwareOperatingTemplate[];
 };
 
 export function BoundedRulesMatrix({ decisionRules }: BoundedRulesMatrixProps) {
@@ -734,7 +785,7 @@ export function WeeklyDecisionCard({
         statusLabel={statusLabel}
         postureLabel={postureLabel}
         stageLabel={stageLabel}
-        postureWithStageLabel={resolvedPostureWithStageLabel}
+        postureWithStageLabel={postureWithStageLabel}
         netConstraintSummary={netConstraintSummary}
         meetingShorthand={meetingShorthand}
         postureDelta={postureDelta}

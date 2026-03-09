@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import { siteUrl } from "./siteUrl";
 
 export const organizationName = "Whether";
-export const websiteName = "Whether — Capital Posture Governance Standard";
+export const websiteName = "Whether — Weekly Startup Market Weather & Operating Posture";
+export const canonicalPositioningLine =
+  "Whether translates macro market signals into a weekly operating posture for startups.";
 export const defaultSiteDescription =
-  "Translate Treasury macro signals into plain-English operational constraints for product and engineering leaders.";
+  "Whether translates macro market signals into a weekly operating posture for startups: when to hire, when to raise, and when to conserve runway.";
 export const defaultSocialImagePath = "/api/og?template=report";
 
 export const buildCanonicalUrl = (path: string) => new URL(path, siteUrl).toString();

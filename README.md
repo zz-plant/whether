@@ -1,12 +1,12 @@
 # Whether — Regime Station
 
-Whether translates public macro signals into operational guidance for product and engineering leaders.
+Whether translates macro market signals into a weekly operating posture for startups.
 
-In practical terms, it helps leadership teams answer: **"Given today's funding and risk environment, how aggressively should we operate right now?"**
+In practical terms, it gives founders a weekly answer for the decisions they obsess over: **hiring pace, fundraising timing, and runway discipline.**
 
 ## What Whether does
-- Detects the current market climate from Treasury yield data and companion macro signals.
-- Converts that climate read into concrete operating constraints (pace, hiring posture, roadmap bias).
+- Detects the current startup market weather from Treasury yield data and companion macro signals.
+- Converts that weather read into concrete operating constraints (hiring posture, fundraising readiness, runway discipline).
 - Provides decision support tools (Decision Shield, assumption locks, scenario previews, brief exports).
 - Keeps outputs auditable with explicit source metadata and freshness timestamps.
 

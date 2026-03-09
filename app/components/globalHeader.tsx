@@ -32,7 +32,7 @@ export function GlobalHeader() {
             </Link>
             {isHome ? (
               <p className="mt-1 text-base font-semibold tracking-tight text-slate-100 sm:text-lg">
-                Weekly operating brief for product, hiring, and spend decisions.
+                Startup market weather: weekly posture for hiring, fundraising, and runway.
               </p>
             ) : (
               <p className="mt-1 text-sm font-medium text-slate-300 sm:text-base">

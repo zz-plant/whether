@@ -14,6 +14,7 @@ import {
   buildBreadcrumbList,
   buildCanonicalUrl,
   defaultSiteDescription,
+  canonicalPositioningLine,
   organizationName,
   websiteName,
   buildSocialImageUrl,
@@ -78,7 +79,7 @@ export const generateMetadata = async ({
 }: {
   searchParams?: Promise<{ month?: string; year?: string }>;
 }): Promise<Metadata> => {
-  const siteName = "Whether — Weekly Operating Posture (Hiring, Spend, Roadmap)";
+  const siteName = "Whether — Startup Market Weather & Weekly Operating Posture";
   const siteDescription = defaultSiteDescription;
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const selection = resolveTimeMachineSelection(resolvedSearchParams);
@@ -95,7 +96,7 @@ export const generateMetadata = async ({
     baseUrl.searchParams.set("status", "invalid");
   }
 
-  const title = "Weekly operating posture brief — Whether";
+  const title = "Startup market weather, weekly posture, and founder decisions — Whether";
   const imageUrl = baseUrl.toString();
   const socialImageUrl = buildSocialImageUrl();
   const canonicalUrl = buildCanonicalUrl("/");
@@ -105,8 +106,7 @@ export const generateMetadata = async ({
 
   return {
     title,
-    description:
-      "A weekly operating posture call for product/engineering/finance—based on public macro signals (with constraints + guardrails).",
+    description: `${canonicalPositioningLine} Weekly answer: what to change now across hiring, fundraising, and runway.`,
     alternates: {
       canonical: "/",
     },
@@ -114,8 +114,7 @@ export const generateMetadata = async ({
       type: "website",
       url: canonicalUrl,
       title,
-      description:
-        "A weekly operating posture call for product/engineering/finance—based on public macro signals (with constraints + guardrails).",
+      description: `${canonicalPositioningLine} Weekly answer: what to change now across hiring, fundraising, and runway.`,
       siteName,
       images: [
         {
@@ -135,8 +134,7 @@ export const generateMetadata = async ({
     twitter: {
       card: "summary_large_image",
       title,
-      description:
-        "A weekly operating posture call for product/engineering/finance—based on public macro signals (with constraints + guardrails).",
+      description: `${canonicalPositioningLine} Weekly answer: what to change now across hiring, fundraising, and runway.`,
       images: [imageUrl, socialImageUrl],
     },
     robots: hasTimeMachineParams

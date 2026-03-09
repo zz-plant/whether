@@ -17,6 +17,23 @@ Use this guide for long-form governance resources, pillar pages, and board-facin
 - Prefer framing that emphasizes controllable process quality.
 - Prefer artifact-centric language (decision packets, board packs, threshold logs, rollback plans).
 
+## Primary product-surface positioning guardrails
+
+For first-touch product surfaces (homepage hero copy, metadata descriptions, exported brief headers),
+lead with founder decisions before methodology.
+
+- Preferred framing:
+  - "weekly answer for hiring, fundraising, and runway"
+  - "startup market weather"
+  - "weekly operating posture for founders"
+- Disallowed framing on primary surfaces:
+  - "macro dashboard"
+  - "startup data platform"
+  - "economic forecasting tool"
+  - "market analysis"
+
+Primary-surface copy should follow: weather/context → weekly posture → concrete decision action.
+
 ## Claims policy
 - Do not claim that any framework “prevents failure.”
 - Do not imply legal, compliance, or fiduciary advice.
