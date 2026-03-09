@@ -5,6 +5,8 @@ Using edge runtime on a page currently disables static generation for that page
 Duplicate key "options" in object literal [duplicate-object-key]
 Invalid prerender config for /concepts/[slug]
 Invalid prerender config for /concepts/[slug].rsc
+Invalid prerender config for /answers/[slug]
+Invalid prerender config for /answers/[slug].rsc
 Invalid prerender config for /concepts/audience/[audience]
 Invalid prerender config for /concepts/audience/[audience].rsc
 Invalid prerender config for /concepts/focus/[focus]
@@ -19,7 +21,11 @@ Invalid prerender config for /library/failure-modes/[slug]
 Invalid prerender config for /library/failure-modes/[slug].rsc
 Invalid prerender config for /posture/[slug]
 Invalid prerender config for /posture/[slug].rsc
+Invalid prerender config for /resources/[slug]
+Invalid prerender config for /resources/[slug].rsc
 Invalid prerender config for /solutions/career-paths/[role]
 Invalid prerender config for /solutions/career-paths/[role].rsc
+Invalid prerender config for /startup-macro-posture/[regime]
+Invalid prerender config for /startup-macro-posture/[regime].rsc
 Invalid prerender config for /toolkits/[slug]
 Invalid prerender config for /toolkits/[slug].rsc
