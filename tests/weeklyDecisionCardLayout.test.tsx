@@ -118,5 +118,6 @@ describe("WeeklyDecisionCard top-fold composition", () => {
 
     assert.match(html, /Using a cached snapshot/);
     assert.match(html, /Flip trigger/);
+    assert.equal((html.match(/style="width:0%"/g) ?? []).length, 4);
   });
 });

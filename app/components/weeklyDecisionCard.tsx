@@ -107,6 +107,9 @@ const movementDomainBySignal: Record<(typeof signalOrder)[number], number> = {
 };
 
 const toMovementPercent = (signalKey: (typeof signalOrder)[number], delta: number) => {
+  if (delta === 0) {
+    return 0;
+  }
   const domain = movementDomainBySignal[signalKey] ?? 1.5;
   return Math.max(6, Math.min(100, Math.round((Math.abs(delta) / domain) * 100)));
 };
