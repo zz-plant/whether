@@ -52,4 +52,4 @@ if (hasReusableOutput) {
   run('bun', ['run', 'build:pages']);
 }
 
-run('bunx', ['wrangler', 'versions', 'upload']);
+run('bun', ['run', 'wrangler:upload']);

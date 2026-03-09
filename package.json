@@ -9,6 +9,8 @@
     "build": "node scripts/build.mjs",
     "build:cloudflare": "BUILD_TARGET=cloudflare NEXT_ON_PAGES_REUSE_PREBUILT=1 node scripts/build.mjs",
     "build:cloudflare:skip-next-build": "BUILD_TARGET=cloudflare NEXT_ON_PAGES_SKIP_BUILD=1 NEXT_ON_PAGES_REUSE_PREBUILT=1 node scripts/build.mjs",
+    "vercel:build": "vercel build --yes",
+    "wrangler:upload": "wrangler versions upload",
     "build:pages": "bun run build:cloudflare",
     "build:pages:skip-next-build": "bun run build:cloudflare:skip-next-build",
     "start": "next start",
@@ -57,6 +59,8 @@
     "postcss": "8.5.6",
     "tailwindcss": "3.4.17",
     "tsx": "^4.21.0",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vercel": "^50.28.0",
+    "wrangler": "^4.71.0"
   }
 }

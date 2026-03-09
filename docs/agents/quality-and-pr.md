@@ -51,3 +51,8 @@ Recent trend context:
 - [ ] Validation depth matches risk profile.
 - [ ] Tests/docs updated where behavior/workflows changed.
 - [ ] Known limitations and follow-ups are explicit.
+
+## CI dependency-install contract
+- CI jobs must run `bun install --frozen-lockfile` exactly once before any build/package/upload steps.
+- Build and deploy steps must use repo-local CLIs via Bun scripts (for example `bun run vercel:build`, `bun run build:pages`, and `bun run wrangler:upload`) instead of `bunx` to avoid implicit re-install and lockfile rewrites (look for `Saved lockfile` in logs).
+- For Cloudflare flows, build Vercel output once, then run `next-on-pages` with `--skip-build` reuse (`NEXT_ON_PAGES_SKIP_BUILD=1`) when prebuilt output is present.
