@@ -1,8 +1,10 @@
 "use client";
 
 import type { Route } from "next";
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { CircleTargetIcon, LayoutGridIcon, SectionJumpIcon } from "../../components/uiIcons";
 
 const steps = [
   {
@@ -24,6 +26,12 @@ const steps = [
     description: "Use endpoint guidance for dashboards and internal automation.",
   },
 ] as const;
+
+const stepIconByTitle: Record<(typeof steps)[number]["title"], ReactNode> = {
+  Plan: <CircleTargetIcon className="h-3.5 w-3.5" />,
+  Integrations: <SectionJumpIcon className="h-3.5 w-3.5" />,
+  Data: <LayoutGridIcon className="h-3.5 w-3.5" />,
+};
 
 export const OperationsWorkflowProgress = ({ currentPath }: { currentPath: Route }) => {
   const searchParams = useSearchParams();
@@ -86,6 +94,7 @@ export const OperationsWorkflowProgress = ({ currentPath }: { currentPath: Route
                     >
                       {isCompleted ? "✓" : index + 1}
                     </span>
+                    <span aria-hidden="true" className="text-slate-300">{stepIconByTitle[step.title]}</span>
                     {step.label}
                   </span>
                   <span className="rounded-full border border-slate-700/70 px-2 py-1 text-[10px]">{stepState}</span>

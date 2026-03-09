@@ -1,8 +1,10 @@
 "use client";
 
 import type { Route } from "next";
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { CircleTargetIcon, LayoutGridIcon, SectionJumpIcon } from "../../components/uiIcons";
 import {
   operationsWorkstreamLinks,
   type OperationsWorkstreamLink,
@@ -10,6 +12,12 @@ import {
 
 const navItemStyles =
   "weather-pill flex min-h-[56px] flex-col items-start gap-1.5 rounded-2xl border px-4 py-3 text-left text-xs font-semibold tracking-[0.12em] transition-colors";
+
+const workstreamIconByLabel: Record<OperationsWorkstreamLink["label"], ReactNode> = {
+  Plan: <CircleTargetIcon className="h-3.5 w-3.5" />,
+  Integrations: <SectionJumpIcon className="h-3.5 w-3.5" />,
+  Data: <LayoutGridIcon className="h-3.5 w-3.5" />,
+};
 
 const getItemClasses = (link: OperationsWorkstreamLink, currentPath: Route) =>
   link.href === currentPath
@@ -42,6 +50,7 @@ export const OperationsWorkstreamNav = ({ currentPath }: { currentPath: Route })
                 className={getItemClasses(link, currentPath)}
               >
                 <div className="flex w-full flex-wrap items-center gap-2">
+                  <span className="text-slate-300" aria-hidden="true">{workstreamIconByLabel[link.label]}</span>
                   <span className={`text-[11px] uppercase tracking-[0.22em] ${labelTone}`}>
                     {link.label}
                   </span>

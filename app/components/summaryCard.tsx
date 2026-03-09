@@ -9,6 +9,7 @@ import { Button } from "@base-ui/react/button";
 import { Toast } from "@base-ui/react/toast";
 import { useEffect, useRef } from "react";
 import { useClipboardCopy, type ClipboardCopyState } from "./useClipboardCopy";
+import { ChevronDownIcon } from "./uiIcons";
 
 type SummaryCardProps = {
   summaryCopy: string;
@@ -127,9 +128,9 @@ export const SummaryCard = ({
         <Accordion.Root defaultValue={[]} className="mt-4">
           <Accordion.Item value="raw-summary" className="rounded-2xl border border-slate-800/80 bg-slate-950/55 px-3 py-2">
             <Accordion.Header>
-              <Accordion.Trigger className="flex min-h-[44px] w-full items-center justify-between gap-3 text-left text-[11px] font-semibold tracking-[0.12em] text-slate-200 touch-manipulation">
+              <Accordion.Trigger className="group flex min-h-[44px] w-full items-center justify-between gap-3 text-left text-[11px] font-semibold tracking-[0.12em] text-slate-200 touch-manipulation">
                 <span>Raw summary text</span>
-                <span aria-hidden="true" className="text-slate-400">⌄</span>
+                <span aria-hidden="true" className="text-slate-400 transition-transform group-data-[panel-open]:rotate-180"><ChevronDownIcon className="h-4 w-4" /></span>
               </Accordion.Trigger>
             </Accordion.Header>
             <Accordion.Panel>

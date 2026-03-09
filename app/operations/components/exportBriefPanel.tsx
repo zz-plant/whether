@@ -28,6 +28,7 @@ import {
 } from "../../components/useClipboardCopy";
 import { SectionPanelHeader } from "../../components/sectionPanelHeader";
 import { WorkAppLabel } from "../../components/workAppIcon";
+import { CopyIcon, DocumentIcon, DownloadIcon } from "../../components/uiIcons";
 
 const buildExportStamp = (
   treasury: TreasuryData,
@@ -294,7 +295,7 @@ export const ExportBriefPanel = ({
                 onClick={handlePrint}
                 className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:text-white touch-manipulation"
               >
-                Export PDF
+                <span className="inline-flex items-center gap-1.5"><DownloadIcon className="h-3.5 w-3.5" aria-hidden="true" />Export PDF</span>
               </Button>
               {showProvenance ? <DataProvenanceStrip provenance={provenance} /> : null}
             </>
@@ -305,7 +306,7 @@ export const ExportBriefPanel = ({
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Send to team</p>
           <div className="mt-3 flex flex-wrap gap-3">
             <ClipboardActionRow
-              label="Copy Slack Brief"
+              label={<span className="inline-flex items-center gap-1.5"><CopyIcon className="h-3.5 w-3.5" aria-hidden="true" />Copy Slack Brief</span>}
               state={clipboardState("Slack")}
               disabled={isCopyDisabled("Slack")}
               onClick={() => void handleCopy(briefing, "Slack")}
@@ -316,7 +317,7 @@ export const ExportBriefPanel = ({
               }}
             />
             <ClipboardActionRow
-              label="Copy Board Summary"
+              label={<span className="inline-flex items-center gap-1.5"><DocumentIcon className="h-3.5 w-3.5" aria-hidden="true" />Copy Board Summary</span>}
               state={clipboardState("Board")}
               disabled={isCopyDisabled("Board")}
               onClick={() => void handleCopy(boardBrief, "Board")}
@@ -333,7 +334,7 @@ export const ExportBriefPanel = ({
               data-premium-cta="export_pdf"
               className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:text-white touch-manipulation"
             >
-              Export PDF
+              <span className="inline-flex items-center gap-1.5"><DownloadIcon className="h-3.5 w-3.5" aria-hidden="true" />Export PDF</span>
             </Button>
           </div>
         </div>

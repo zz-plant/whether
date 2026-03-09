@@ -129,6 +129,19 @@ const signalActionRuleText: Record<(typeof signalOrder)[number], string> = {
   curveSlope: "If curve slope turns negative by 0.25 or more, bias toward reversible roadmap bets.",
 };
 
+const SummaryLabel = ({
+  label,
+  icon,
+}: {
+  label: string;
+  icon: ReactNode;
+}) => (
+  <p className={`inline-flex items-center gap-1.5 text-xs ${neutralLabel}`}>
+    <span className="text-slate-400" aria-hidden="true">{icon}</span>
+    <span>{label}</span>
+  </p>
+);
+
 const PostureHistoryTimeline = ({ historicalTimeline }: { historicalTimeline: WeeklyDecisionCardProps["historicalTimeline"] }) => (
   <ol className="mt-2 grid gap-2 lg:grid-cols-4" aria-label="Posture change timeline">
     {historicalTimeline.map((item, index) => {
@@ -204,16 +217,25 @@ export function DecisionCallHeader({
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" aria-label="Operating call summary">
           <div className={tierOneInset}>
-            <p className={`text-xs ${neutralLabel}`}>Posture</p>
+            <SummaryLabel
+              label="Posture"
+              icon={<svg viewBox="0 0 16 16" className="h-3.5 w-3.5"><circle cx="8" cy="8" r="5" fill="none" stroke="currentColor" strokeWidth="1.5" /><circle cx="8" cy="8" r="1.5" fill="currentColor" /></svg>}
+            />
             <p className="mt-1 text-lg font-semibold text-slate-100">{postureLabel}</p>
           </div>
           <div className={tierOneInset}>
-            <p className={`text-xs ${neutralLabel}`}>Movement</p>
+            <SummaryLabel
+              label="Movement"
+              icon={<svg viewBox="0 0 16 16" className="h-3.5 w-3.5"><path d="M2.5 11 6 7.5l2.3 2.2L13.5 4.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+            />
             <p className="mt-1 text-lg font-semibold text-slate-100">{movementVelocity}</p>
             <p className="text-xs text-slate-300">{postureDelta}</p>
           </div>
           <div className={tierOneInset}>
-            <p className={`text-xs ${neutralLabel}`}>Confidence</p>
+            <SummaryLabel
+              label="Confidence"
+              icon={<svg viewBox="0 0 16 16" className="h-3.5 w-3.5"><path d="M8 2.5 12 4v3.6c0 2.5-1.6 4.8-4 5.9-2.4-1.1-4-3.4-4-5.9V4l4-1.5Z" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" /></svg>}
+            />
             <p className="mt-1 text-lg font-semibold text-slate-100">{confidenceLabel}</p>
             <p className="mt-2 text-[11px] uppercase tracking-[0.1em] text-slate-400">quality</p>
             <div className={`mt-1 ${meterTrackBase} bg-slate-800/80`}>
@@ -222,7 +244,10 @@ export function DecisionCallHeader({
             </div>
           </div>
           <div className={tierOneInset}>
-            <p className={`text-xs ${neutralLabel}`}>Action</p>
+            <SummaryLabel
+              label="Action"
+              icon={<svg viewBox="0 0 16 16" className="h-3.5 w-3.5"><path d="M2.5 8h11" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /><path d="m9.5 4.8 3.2 3.2-3.2 3.2" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+            />
             <p className="mt-1 text-sm font-semibold text-slate-100">{immediateDecision}</p>
           </div>
         </div>
@@ -267,7 +292,7 @@ export function DecisionCallHeader({
         </article>
 
         <p className="text-xs text-slate-300">{netConstraintSummary}</p>
-        <p className="text-xs text-slate-300">Trust status: {trustCueLine}</p>
+        <p className="inline-flex items-center gap-1.5 text-xs text-slate-300"><span aria-hidden="true" className="text-slate-400"><svg viewBox="0 0 12 12" className="h-3 w-3"><path d="M6 1.6 9 2.8v2.9c0 2-1.2 3.8-3 4.7-1.8-.9-3-2.7-3-4.7V2.8l3-1.2Z" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" /></svg></span>Trust status: {trustCueLine}</p>
         {needsTrustWarning ? (
           <p className="rounded-md border border-amber-500/50 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">{trustWarningCopy}</p>
         ) : null}
