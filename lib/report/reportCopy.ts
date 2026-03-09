@@ -53,7 +53,7 @@ export const FIRST_TIME_GUIDE_HIGHLIGHTS: HighlightBullet[] = [
 export const FIRST_TIME_GUIDE_NEXT_LINKS: ReportLinkCopy[] = [
   { href: "#executive-snapshot", label: "Leadership summary" },
   { href: "/operations#ops-playbook", label: "Actions playbook" },
-  { href: "/signals#time-machine", label: "Time machine" },
+  { href: "/signals?advanced=1#time-machine", label: "Time machine" },
 ];
 
 export const BEGINNER_GLOSSARY_ENTRIES: GlossaryEntry[] = [

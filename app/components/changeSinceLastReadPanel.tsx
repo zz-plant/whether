@@ -11,6 +11,7 @@ import { buildRegimeChangeReasons } from "../../lib/regimeEngine";
 import { formatDateLabel, formatDelta, formatOptionalDelta } from "../../lib/report/signalFormatting";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
 import { regimeAlertsStorageKey, type RegimeAlertLogEntry } from "./regimeAlertsStorage";
+import { buildTimeMachineHref } from "../../lib/timeMachine/timeMachineSelection";
 
 type LastReadSnapshot = {
   recordDate: string;
@@ -131,7 +132,7 @@ export const ChangeSinceLastReadPanel = ({
                   ].filter(Boolean),
                 ),
               ),
-              timeMachineHref: `/signals#time-machine`,
+              timeMachineHref: `/signals?advanced=1#time-machine`,
             }),
           }).catch(() => {
             // Ignore network failures and keep local alerting as fallback.
@@ -151,15 +152,15 @@ export const ChangeSinceLastReadPanel = ({
 
   const timeMachineLink = useMemo(() => {
     if (!previous) {
-      return "/signals#time-machine";
+      return "/signals?advanced=1#time-machine";
     }
     const date = new Date(previous.recordDate);
     if (Number.isNaN(date.valueOf())) {
-      return "/signals#time-machine";
+      return "/signals?advanced=1#time-machine";
     }
     const month = date.getUTCMonth() + 1;
     const year = date.getUTCFullYear();
-    return `/?month=${month}&year=${year}`;
+    return buildTimeMachineHref("/signals?advanced=1#time-machine", { month, year });
   }, [previous]);
 
   const hasChange =
