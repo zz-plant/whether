@@ -18,12 +18,24 @@ This flow keeps dependency installation to a single explicit `bun install --froz
 The warning classes below are currently expected in this project and are tracked by CI baseline:
 
 - `Build not running on Vercel. System environment variables will not be available.`
+- `Bun is used as a package manager at build time only, not at runtime with Functions`
 - `Using edge runtime on a page currently disables static generation for that page`
-- `Invalid prerender config for /concepts/[slug]`
-- `Invalid prerender config for /guides/[stakeholder]`
-- `Invalid prerender config for /guides/stage/[stage]`
-- `Invalid prerender config for /solutions/career-paths/[role]`
 - `Duplicate key "options" in object literal [duplicate-object-key]`
+- `Invalid prerender config for /answers/[slug]` (and `.rsc`)
+- `Invalid prerender config for /concepts/[slug]` (and `.rsc`)
+- `Invalid prerender config for /concepts/audience/[audience]` (and `.rsc`)
+- `Invalid prerender config for /concepts/focus/[focus]` (and `.rsc`)
+- `Invalid prerender config for /decide/[slug]` (and `.rsc`)
+- `Invalid prerender config for /guides/[stakeholder]` (and `.rsc`)
+- `Invalid prerender config for /guides/stage/[stage]` (and `.rsc`)
+- `Invalid prerender config for /library/failure-modes/[slug]` (and `.rsc`)
+- `Invalid prerender config for /posture/[slug]` (and `.rsc`)
+- `Invalid prerender config for /resources/[slug]` (and `.rsc`)
+- `Invalid prerender config for /solutions/career-paths/[role]` (and `.rsc`)
+- `Invalid prerender config for /startup-macro-posture/[regime]` (and `.rsc`)
+- `Invalid prerender config for /toolkits/[slug]` (and `.rsc`)
+
+As of `next@16.1.6`, the latest published `@cloudflare/next-on-pages` is `1.13.16`; no newer adapter release is available yet to remove this warning class at source.
 
 If CI reports a new warning class, treat it as action-required until triaged and either:
 1. fixed in code/dependencies, or
