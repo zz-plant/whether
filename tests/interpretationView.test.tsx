@@ -21,6 +21,7 @@ const assessment = {
 } as unknown as RegimeAssessment;
 
 const forecast: ForecastModel = {
+  next4WeekProbabilities: { Expansion: 8, Mixed: 24, Scarcity: 38, Defensive: 30 },
   next90DayProbabilities: { Expansion: 8, Mixed: 24, Scarcity: 38, Defensive: 30 },
   boundaryPressure: {
     distance: 4,

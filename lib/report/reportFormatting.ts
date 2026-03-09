@@ -56,9 +56,12 @@ const crossingRiskLabels: Record<CrossingRiskLabel, string> = {
   high: "High",
 };
 
-export const formatRegimeProbability = (probability: number): string => {
-  const bounded = Math.min(100, Math.max(0, Math.round(probability)));
-  return `${bounded}%`;
+export const formatProbabilityPercent = (probability: number, fractionDigits = 0): string => {
+  const bounded = Math.min(100, Math.max(0, probability));
+  return `${bounded.toFixed(fractionDigits)}%`;
 };
+
+export const formatRegimeProbability = (probability: number): string =>
+  formatProbabilityPercent(probability, 0);
 
 export const formatCrossingRiskLabel = (risk: CrossingRiskLabel): string => crossingRiskLabels[risk];

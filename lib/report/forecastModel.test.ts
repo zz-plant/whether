@@ -32,11 +32,8 @@ const buildTreasury = ({
   },
 });
 
-const sumProbabilities = (model: ReturnType<typeof buildForecastModel>) =>
-  Object.values(model.next90DayProbabilities).reduce(
-    (sum, value) => sum + value,
-    0,
-  );
+const sumProbabilities = (values: Record<string, number>) =>
+  Object.values(values).reduce((sum, value) => sum + value, 0);
 
 describe("buildForecastModel", () => {
   it("returns stable boundary pressure with low crossing risk for a stable regime", () => {
@@ -62,7 +59,8 @@ describe("buildForecastModel", () => {
       macroSeries: [],
     });
 
-    assert.equal(sumProbabilities(model), 100);
+    assert.equal(sumProbabilities(model.next90DayProbabilities), 100);
+    assert.equal(sumProbabilities(model.next4WeekProbabilities), 100);
     assert.equal(model.boundaryPressure.crossingRisk, "low");
     assert.equal(model.boundaryPressure.momentum, "stable");
     assert.equal(model.signalTrajectory.tightness, "stable");
@@ -91,7 +89,8 @@ describe("buildForecastModel", () => {
       macroSeries: [],
     });
 
-    assert.equal(sumProbabilities(model), 100);
+    assert.equal(sumProbabilities(model.next90DayProbabilities), 100);
+    assert.equal(sumProbabilities(model.next4WeekProbabilities), 100);
     assert.equal(dynamics.directionLabel, "mixed");
     assert.ok(
       model.boundaryPressure.crossingRisk === "medium" ||
@@ -115,6 +114,7 @@ describe("buildForecastModel", () => {
         { key: "riskAppetite" as const, label: "Risk appetite", delta: 5.2 },
         { key: "curveSlope" as const, label: "Curve slope", delta: 0.08 },
       ],
+      anomalySignals: [],
       totalSignalChanges: 3,
       regimeChanged: false,
       directionLabel: "mixed" as const,
@@ -126,7 +126,8 @@ describe("buildForecastModel", () => {
       macroSeries: [],
     });
 
-    assert.equal(sumProbabilities(model), 100);
+    assert.equal(sumProbabilities(model.next90DayProbabilities), 100);
+    assert.equal(sumProbabilities(model.next4WeekProbabilities), 100);
     assert.equal(model.boundaryPressure.momentum, "toward-threshold");
     assert.equal(model.signalTrajectory.tightness, "improving");
     assert.equal(model.signalTrajectory.riskAppetite, "improving");
@@ -199,12 +200,76 @@ describe("buildForecastModel", () => {
       model.next90DayProbabilities.Expansion +
       model.next90DayProbabilities.Mixed;
 
-    assert.equal(sumProbabilities(model), 100);
+    assert.equal(sumProbabilities(model.next90DayProbabilities), 100);
+    assert.equal(sumProbabilities(model.next4WeekProbabilities), 100);
     assert.equal(dynamics.directionLabel, "deteriorating");
     assert.ok(downsideProbability > upsideProbability);
     assert.equal(model.signalTrajectory.tightness, "deteriorating");
     assert.equal(model.signalTrajectory.riskAppetite, "deteriorating");
   });
+
+  it("returns deterministic probabilities for identical inputs", () => {
+    const current = evaluateRegime(
+      buildTreasury({
+        baseRate: 5.1,
+        curveSlope: 0.4,
+        recordDate: "2026-05-01",
+      }),
+    );
+    const previous = evaluateRegime(
+      buildTreasury({
+        baseRate: 5.0,
+        curveSlope: 0.45,
+        recordDate: "2026-04-01",
+      }),
+    );
+    const dynamics = buildReportDynamics({ current, previous });
+
+    const first = buildForecastModel({
+      assessment: current,
+      reportDynamics: dynamics,
+      macroSeries: [],
+    });
+    const second = buildForecastModel({
+      assessment: current,
+      reportDynamics: dynamics,
+      macroSeries: [],
+    });
+
+    assert.deepEqual(first.next4WeekProbabilities, second.next4WeekProbabilities);
+    assert.deepEqual(first.next90DayProbabilities, second.next90DayProbabilities);
+  });
+
+  it("keeps bounded distributions when the regime sits near thresholds", () => {
+    const current = evaluateRegime(
+      buildTreasury({
+        baseRate: 5.35,
+        curveSlope: 0.21,
+        recordDate: "2026-06-01",
+      }),
+    );
+    const previous = evaluateRegime(
+      buildTreasury({
+        baseRate: 5.34,
+        curveSlope: 0.22,
+        recordDate: "2026-05-01",
+      }),
+    );
+    const dynamics = buildReportDynamics({ current, previous });
+
+    const model = buildForecastModel({
+      assessment: current,
+      reportDynamics: dynamics,
+      macroSeries: [],
+    });
+
+    assert.equal(sumProbabilities(model.next4WeekProbabilities), 100);
+    assert.ok(model.next4WeekProbabilities.Scarcity >= 0);
+    assert.ok(model.next4WeekProbabilities.Mixed >= 0);
+    assert.ok(model.next4WeekProbabilities.Defensive >= 0);
+    assert.ok(model.next4WeekProbabilities.Expansion >= 0);
+  });
+
 });
 
 describe("forecast classification helpers", () => {
@@ -278,6 +343,16 @@ describe("buildFallbackForecastModel", () => {
   it("returns canonical fallback shape", () => {
     const fallback = buildFallbackForecastModel();
 
+    assert.deepEqual(Object.keys(fallback.next4WeekProbabilities).sort(), [
+      "Defensive",
+      "Expansion",
+      "Mixed",
+      "Scarcity",
+    ]);
+    assert.equal(
+      sumProbabilities(fallback.next4WeekProbabilities),
+      100,
+    );
     assert.deepEqual(Object.keys(fallback.next90DayProbabilities).sort(), [
       "Defensive",
       "Expansion",
@@ -285,10 +360,7 @@ describe("buildFallbackForecastModel", () => {
       "Scarcity",
     ]);
     assert.equal(
-      Object.values(fallback.next90DayProbabilities).reduce(
-        (sum, value) => sum + value,
-        0,
-      ),
+      sumProbabilities(fallback.next90DayProbabilities),
       100,
     );
     assert.deepEqual(fallback.boundaryPressure, {
