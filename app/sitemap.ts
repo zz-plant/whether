@@ -68,6 +68,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/resources", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.8 },
     { path: "/methodology", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.56 },
     { path: "/toolkits", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.52 },
+    { path: "/search", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.62 },
     { path: "/answers", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.74 },
     { path: "/should-we-hire-engineers-right-now", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.8 },
     { path: "/should-startups-slow-roadmap-expansion", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.78 },
