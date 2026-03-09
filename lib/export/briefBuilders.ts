@@ -25,6 +25,7 @@ type ExportLayerOptions = {
   interpretationLayer?: InterpretationLayer;
   postureWithStageLabel?: string;
   historicalAnalogs?: Array<{ date: string; similarityScore: number; implication: string }>;
+  failureModes?: Array<{ warning: string; mitigationCheck: string }>;
 };
 
 const buildInterpretationLayerBlock = (options?: ExportLayerOptions) => {
@@ -52,6 +53,19 @@ const buildInterpretationLayerBlock = (options?: ExportLayerOptions) => {
   ];
 };
 
+
+
+const buildFailureModeBlock = (options?: ExportLayerOptions) => {
+  const mode = options?.failureModes?.[0];
+  if (!mode) return [];
+
+  return [
+    "",
+    "False-signal warning:",
+    `• ${mode.warning}`,
+    `• ${mode.mitigationCheck}`,
+  ];
+};
 
 const buildHistoricalAnalogsBlock = (options?: ExportLayerOptions) => {
   const analogs = options?.historicalAnalogs ?? [];
@@ -134,6 +148,7 @@ export const buildSlackBrief = (
     ...assessment.constraints.map((item) => `• ${item}`),
     "",
     financialImplications,
+    ...buildFailureModeBlock(options),
     ...buildHistoricalAnalogsBlock(options),
     ...buildInterpretationLayerBlock(options),
     "",

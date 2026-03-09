@@ -26,6 +26,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
         trustCueLine="Cached snapshot (Mar 6, 2026): use for pacing and defer irreversible commitments."
         needsTrustWarning={true}
         trustWarningCopy="Use this call for near-term pacing only until confidence returns to HIGH with fresh data."
+        failureModes={[{ id: "boundary-whipsaw", warning: "Boundary whipsaw risk", mitigationCheck: "Mitigation check" }]}
         regimeDistance={{
           dimensionLabel: "Tightness",
           currentValue: 64,
@@ -44,6 +45,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
     assert.match(html, /points to flip/);
     assert.match(html, /Guardrail/);
     assert.match(html, /Flip condition/);
+    assert.match(html, /False-signal warnings/);
   });
 
   it("marks risk-appetite defensive trigger as breached only when value is at or below threshold", () => {
@@ -63,6 +65,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
         trustCueLine="Cached snapshot (Mar 6, 2026): use for pacing and defer irreversible commitments."
         needsTrustWarning={false}
         trustWarningCopy=""
+        failureModes={[]}
         regimeDistance={{
           dimensionLabel: "Risk appetite",
           dimensionKey: "riskAppetite",

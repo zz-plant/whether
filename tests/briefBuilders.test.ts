@@ -191,6 +191,22 @@ describe("buildSlackBrief", () => {
 
 
 
+
+  it("includes at least one false-signal warning line when active", () => {
+    const brief = buildSlackBrief(assessment, treasury, sensors, macros, {
+      failureModes: [
+        {
+          warning: "Boundary whipsaw risk: call is near a flip threshold with unstable weekly motion.",
+          mitigationCheck: "Mitigation check: require one confirming read before escalating fixed-cost commitments.",
+        },
+      ],
+    });
+
+    assert.match(brief, /False-signal warning:/);
+    assert.match(brief, /Boundary whipsaw risk:/);
+    assert.match(brief, /Mitigation check:/);
+  });
+
   it("adds compact historical analog references when provided", () => {
     const brief = buildSlackBrief(assessment, treasury, sensors, macros, {
       historicalAnalogs: [
