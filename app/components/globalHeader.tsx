@@ -40,7 +40,16 @@ export function GlobalHeader() {
               </p>
             )}
           </div>
-          <ThemeToggleButton />
+          <div className="flex items-center gap-2">
+            <Link
+              href="/search"
+              className="weather-button inline-flex min-h-[44px] items-center justify-center px-3 text-xs font-semibold uppercase tracking-[0.08em]"
+              aria-label="Open global search"
+            >
+              Search
+            </Link>
+            <ThemeToggleButton />
+          </div>
         </div>
 
         <nav aria-label="Global navigation" className="mt-4">
