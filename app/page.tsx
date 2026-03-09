@@ -70,7 +70,6 @@ export const runtime = "edge";
 
 const homeSectionSequence = [
   { href: "#weekly-posture-brief-title", label: "This week" },
-  { href: "#why-whether", label: "Why Whether" },
   { href: "#weekly-action-summary", label: "Weekly actions" },
   { href: "#executive-snapshot", label: "Evidence" },
 ] as const;
@@ -480,62 +479,6 @@ const HomePageReportContent = async ({
         searchParams={resolvedSearchParams}
       />
 
-      <section id="why-whether" className="weather-panel space-y-4 px-5 py-5" aria-label="Why Whether versus alternatives">
-        <div className="space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Why Whether</p>
-          <h2 className="text-base font-semibold text-slate-100">Built for a weekly operating call, not just analysis</h2>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-left text-xs text-slate-200">
-            <thead>
-              <tr className="border-b border-slate-700/70 text-[11px] uppercase tracking-[0.1em] text-slate-400">
-                <th className="px-2 py-2">Category</th>
-                <th className="px-2 py-2">Dashboards / research stack</th>
-                <th className="px-2 py-2">Whether</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="border-b border-slate-800/80">
-                <th className="px-2 py-2 font-semibold text-slate-100">Output</th>
-                <td className="px-2 py-2 text-slate-300">Evidence and commentary to interpret.</td>
-                <td className="px-2 py-2 font-medium text-sky-100">One bounded weekly operating call leadership can act on.</td>
-              </tr>
-              <tr className="border-b border-slate-800/80">
-                <th className="px-2 py-2 font-semibold text-slate-100">Cadence</th>
-                <td className="px-2 py-2 text-slate-300">Ad hoc review during planning debates.</td>
-                <td className="px-2 py-2 font-medium text-sky-100">Weekly ritual for Monday sync preparation.</td>
-              </tr>
-              <tr>
-                <th className="px-2 py-2 font-semibold text-slate-100">Decision quality</th>
-                <td className="px-2 py-2 text-slate-300">Generic guidance with uneven follow-through.</td>
-                <td className="px-2 py-2 font-medium text-sky-100">Action + threshold + reversal condition in one artifact.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-
-      <section className="weather-panel space-y-4 px-5 py-5" aria-label="Decision concept links">
-        <div className="space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Decision playbooks</p>
-          <h2 className="text-base font-semibold text-slate-100">Revisit these concept playbooks before finalizing this week&apos;s plan</h2>
-        </div>
-        <div className="grid gap-3 md:grid-cols-3">
-          {featuredConcepts.map((concept) => (
-            <Link
-              key={concept.slug}
-              href={`/concepts/${concept.slug}`}
-              className="weather-surface block space-y-2 px-4 py-3 transition-colors hover:border-sky-400/70"
-            >
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">{concept.focus}</p>
-              <p className="text-sm font-semibold text-slate-100">{concept.title}</p>
-              <p className="text-xs text-slate-300">{concept.audience}</p>
-            </Link>
-          ))}
-        </div>
-      </section>
-
       {!reportResult.ok ? (
         <LiveDataFallbackAlert
           lastCachedTimestamp={reportResult.fallback.lastCachedTimestamp}
@@ -585,6 +528,68 @@ const HomePageReportContent = async ({
           />
         </DeferredSection>
       </div>
+
+      <details className="weather-panel space-y-4 px-5 py-4" id="why-whether">
+        <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">
+          Optional context and playbooks
+        </summary>
+        <div className="space-y-5 pt-4">
+          <section className="space-y-4" aria-label="Why Whether versus alternatives">
+            <div className="space-y-1">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Why Whether</p>
+              <h2 className="text-base font-semibold text-slate-100">Built for a weekly operating call, not just analysis</h2>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-left text-xs text-slate-200">
+                <thead>
+                  <tr className="border-b border-slate-700/70 text-[11px] uppercase tracking-[0.1em] text-slate-400">
+                    <th className="px-2 py-2">Category</th>
+                    <th className="px-2 py-2">Dashboards / research stack</th>
+                    <th className="px-2 py-2">Whether</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-slate-800/80">
+                    <th className="px-2 py-2 font-semibold text-slate-100">Output</th>
+                    <td className="px-2 py-2 text-slate-300">Evidence and commentary to interpret.</td>
+                    <td className="px-2 py-2 font-medium text-sky-100">One bounded weekly operating call leadership can act on.</td>
+                  </tr>
+                  <tr className="border-b border-slate-800/80">
+                    <th className="px-2 py-2 font-semibold text-slate-100">Cadence</th>
+                    <td className="px-2 py-2 text-slate-300">Ad hoc review during planning debates.</td>
+                    <td className="px-2 py-2 font-medium text-sky-100">Weekly ritual for Monday sync preparation.</td>
+                  </tr>
+                  <tr>
+                    <th className="px-2 py-2 font-semibold text-slate-100">Decision quality</th>
+                    <td className="px-2 py-2 text-slate-300">Generic guidance with uneven follow-through.</td>
+                    <td className="px-2 py-2 font-medium text-sky-100">Action + threshold + reversal condition in one artifact.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section className="space-y-4" aria-label="Decision concept links">
+            <div className="space-y-1">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Decision playbooks</p>
+              <h2 className="text-base font-semibold text-slate-100">Revisit these concept playbooks before finalizing this week&apos;s plan</h2>
+            </div>
+            <div className="grid gap-3 md:grid-cols-3">
+              {featuredConcepts.map((concept) => (
+                <Link
+                  key={concept.slug}
+                  href={`/concepts/${concept.slug}`}
+                  className="weather-surface block space-y-2 px-4 py-3 transition-colors hover:border-sky-400/70"
+                >
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">{concept.focus}</p>
+                  <p className="text-sm font-semibold text-slate-100">{concept.title}</p>
+                  <p className="text-xs text-slate-300">{concept.audience}</p>
+                </Link>
+              ))}
+            </div>
+          </section>
+        </div>
+      </details>
       <NextStepRail currentPath="/" />
     </ReportShell>
   );
