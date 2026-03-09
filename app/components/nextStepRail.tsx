@@ -1,6 +1,8 @@
 import Link from "next/link";
 
 const CANONICAL_ACTIONS = [
+  { label: "Weekly brief", href: "/" },
+  { label: "Learn", href: "/learn" },
   { label: "Review evidence", href: "/signals" },
   { label: "Apply operations", href: "/operations" },
   { label: "Choose decision path", href: "/decide" },
