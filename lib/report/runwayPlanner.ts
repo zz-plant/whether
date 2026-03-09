@@ -56,6 +56,10 @@ export type RunwayPlannerOutput = {
     burnDiscipline: string;
     capitalRaising: string;
   };
+  decisionKnobs: {
+    paybackStrictnessLabel: string;
+    approvalVelocityLabel: string;
+  };
 };
 
 const SAFE_RUNWAY_BAND_BY_REGIME: Record<RegimeKey, { min: number; max: number }> = {
@@ -93,6 +97,13 @@ const BURN_RANGE_BY_REGIME: Record<RegimeKey, { min: number; max: number }> = {
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 const round = (value: number) => Math.round(value * 10) / 10;
+
+const strictnessLabel = (level: number) => {
+  if (level <= 0) return "Relaxed";
+  if (level === 1) return "Cautious";
+  if (level === 2) return "Strict";
+  return "Maximum strictness";
+};
 
 const growthToDecimal = (growthRate: number) => growthRate / 100;
 
@@ -265,7 +276,11 @@ export const buildRunwayPlan = (rawInput: RunwayPlannerInput): RunwayPlannerOutp
       recommendedDeltaPercent,
       floorPercent: burnMinPercent,
       ceilingPercent: burnMaxPercent,
-      summary: `Adjust burn by ${recommendedDeltaPercent}% (range ${burnMinPercent}% to ${burnMaxPercent}%) with payback strictness ${paybackStrictness}. Reverse after two stable weekly reads and runway above ${round(safeBand.minMonths)} months.`,
+      summary: `Adjust burn by ${recommendedDeltaPercent}% (range ${burnMinPercent}% to ${burnMaxPercent}%) with payback strictness ${paybackStrictness} (${strictnessLabel(paybackStrictness)}). Reverse after two stable weekly reads and runway above ${round(safeBand.minMonths)} months.`,
+    },
+    decisionKnobs: {
+      paybackStrictnessLabel: paybackStrictness,
+      approvalVelocityLabel: approvalVelocity,
     },
     boundedRules: {
       burnDiscipline: burnRule
