@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { Suspense, type ReactNode } from "react";
+import { Suspense } from "react";
 import {
   buildTimeMachineHref,
   getAdjacentTimeMachineRequest,
@@ -23,7 +23,6 @@ import { ReportShell } from "./components/reportShell";
 import { reportPageLinks } from "../lib/report/reportNavigation";
 import { buildTrustStatus } from "../lib/report/trustStatus";
 import { WeeklyDecisionCard } from "./components/weeklyDecisionCard";
-import { RevealOnView } from "./components/revealOnView";
 import { buildBoardBrief, buildCallCitation, buildSlackBrief } from "../lib/export/briefBuilders";
 import {
   buildInterpretationLayer,
@@ -37,6 +36,7 @@ import { resolveSectorKey } from "../lib/report/sectorSensitivity";
 import { getFeaturedConceptArticles } from "../lib/productCanon";
 import { LiveDataFallbackAlert } from "./components/liveDataFallbackAlert";
 import { HomeInterpretationPanel } from "./components/homeInterpretationPanel";
+import { DeferredSection } from "./components/deferredSection";
 
 const WeeklyActionSummaryPanel = dynamic(
   () => import("./components/boardBriefSections").then((module) => module.WeeklyActionSummaryPanel),
@@ -58,26 +58,6 @@ const ExecutiveSnapshotFallback = () => (
   <section id="executive-snapshot" aria-label="Leadership summary" className="space-y-8">
     <div className="weather-panel px-5 py-5 text-sm text-slate-300">Loading evidence snapshot…</div>
   </section>
-);
-
-const DeferredSection = ({
-  id,
-  ariaLabel,
-  fallback,
-  children,
-}: {
-  id: string;
-  ariaLabel: string;
-  fallback: ReactNode;
-  children: ReactNode;
-}) => (
-  <RevealOnView placeholder={fallback}>
-    <Suspense fallback={fallback}>
-      <section id={id} aria-label={ariaLabel} className="space-y-8">
-        {children}
-      </section>
-    </Suspense>
-  </RevealOnView>
 );
 
 export const revalidate = 900;
