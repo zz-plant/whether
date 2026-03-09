@@ -23,7 +23,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
         trendLabel="Mixed"
         transitionWatch="ON"
         freshnessLabel="Mar 6, 2026"
-        trustCueLine="Confidence MED · Freshness Mar 6, 2026 · Regime shift watch ON"
+        trustCueLine="Cached snapshot (Mar 6, 2026): use for pacing and defer irreversible commitments."
         needsTrustWarning={true}
         trustWarningCopy="Use this call for near-term pacing only until confidence returns to HIGH with fresh data."
         regimeDistance={{
@@ -41,8 +41,8 @@ describe("WeeklyDecisionCard extracted sections", () => {
     assert.match(html, /Weekly posture call/);
     assert.match(html, /Macro posture band/);
     assert.match(html, /points to flip/);
-    assert.match(html, /Primary guardrail/);
-    assert.match(html, /Flip trigger/);
+    assert.match(html, /Guardrail/);
+    assert.match(html, /Flip condition/);
   });
 
   it("marks risk-appetite defensive trigger as breached only when value is at or below threshold", () => {
@@ -59,7 +59,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
         trendLabel="Mixed"
         transitionWatch="ON"
         freshnessLabel="Mar 6, 2026"
-        trustCueLine="Confidence MED · Freshness Mar 6, 2026 · Regime shift watch ON"
+        trustCueLine="Cached snapshot (Mar 6, 2026): use for pacing and defer irreversible commitments."
         needsTrustWarning={false}
         trustWarningCopy=""
         regimeDistance={{
@@ -94,8 +94,8 @@ describe("WeeklyDecisionCard extracted sections", () => {
     );
 
     assert.match(html, /Decision matrix this week/);
-    assert.match(html, /Stop if/);
-    assert.match(html, /Restart when/);
+    assert.match(html, /Guardrail/);
+    assert.match(html, /Flip condition/);
   });
 
   it("renders collapsed context and citation footer", () => {

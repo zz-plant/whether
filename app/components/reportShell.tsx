@@ -363,7 +363,7 @@ export const ReportShell = ({
               <div className="hidden items-center sm:flex"><p className="text-xs text-slate-300">Signals updated {fetchedAtLabel}</p></div>
             </div>
             <NavigationOrientationBadge currentPath={currentPath} className="mt-4" />
-            <p className="mt-2 text-[11px] text-slate-400">Navigation zones only — posture call is shown below.</p>
+            <p className="mt-2 text-[11px] text-slate-400">Choose view: Now (decision), Operate (execution), Reference (evidence).</p>
             {showPageNavigation ? (
               <ReportPageNavigation
                 pageLinks={pageLinks}

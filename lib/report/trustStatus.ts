@@ -18,6 +18,34 @@ export const buildWeeklyTrustCueLine = ({
 }) =>
   `Confidence ${confidenceLabel} · Freshness ${normalizeFreshnessLabel(freshnessLabel)} · Regime shift watch ${transitionWatch}`;
 
+export const buildCompactTrustSummary = ({
+  confidenceLabel,
+  freshnessLabel,
+  isFallbackSnapshot,
+  isHistoricalSelection,
+}: {
+  confidenceLabel: "HIGH" | "MED" | "LOW";
+  freshnessLabel: string;
+  isFallbackSnapshot: boolean;
+  isHistoricalSelection?: boolean;
+}) => {
+  const normalizedFreshness = normalizeFreshnessLabel(freshnessLabel);
+
+  if (isHistoricalSelection) {
+    return `Historical snapshot (${normalizedFreshness}): use for retrospectives, not live approvals.`;
+  }
+
+  if (isFallbackSnapshot) {
+    return `Cached snapshot (${normalizedFreshness}): use for pacing and defer irreversible commitments.`;
+  }
+
+  if (confidenceLabel !== "HIGH") {
+    return `Confidence ${confidenceLabel} (${normalizedFreshness}): keep approvals staged until confidence returns to HIGH.`;
+  }
+
+  return `Live confidence ${confidenceLabel} (${normalizedFreshness}): safe for near-term operating decisions.`;
+};
+
 export const buildWeeklyCitationMetaLine = ({
   statusLabel,
   confidenceLabel,

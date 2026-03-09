@@ -12,6 +12,7 @@ describe("NavigationOrientationBadge", () => {
     assert.match(html, /href="\/"[^>]*aria-label="Now section"/);
     assert.match(html, /href="\/signals"[^>]*aria-label="Operate section"/);
     assert.match(html, /href="\/learn"[^>]*aria-label="Reference section"/);
+    assert.match(html, /title="Decision call and bounded actions for this week"/);
   });
 
   it("marks the active zone", () => {

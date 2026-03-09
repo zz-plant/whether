@@ -162,14 +162,15 @@ The homepage supports optional interpretation layers without changing the canoni
 
 ### Current implementation contract (`/`, `WeeklyDecisionCard`)
 Canonical top-fold order on homepage must remain:
-1. **Posture** (`This week's posture` header + status label + net constraint summary)
-2. **Decision delta** (`Decision delta this week`)
-3. **Revisit verdict** (`Revisit implications`, explicit revise/hold verdict)
-4. **Decision rules summary** (`Decision rules summary`, max 4 bounded-rule cards with Action/Pause/Resume)
+1. **This week in 15 seconds** (single canonical decision block with `Action`, `Guardrail`, `Flip condition`)
+2. **Decision support details** (delta + evidence helpers that reference the canonical decision)
+3. **Decision matrix** (bounded rules with `Action`, `Guardrail`, `Flip condition`)
+4. **Why this call** disclosure (supporting evidence hidden behind details/summary)
 
 Implementation guardrails:
 - Top fold uses responsive grid composition at `lg` breakpoints to preserve scan hierarchy around common screenshot widths (~1200px desktop browser).
 - Citation + provenance belong near the lower fold: `Cite this call` retains actionable copy/export controls via the existing `actions` slot, and compact provenance remains immediately after the weekly card on `/`.
+- Trust copy should be a single compact sentence near the top fold: `state + freshness + operating implication`.
 - Rendering tests should verify hierarchy order and responsive class hooks (`data-testid="weekly-top-fold"`, `lg:grid-cols-12`, `lg:grid-cols-4`) to prevent drift.
 
 ## Slack screenshot card contract

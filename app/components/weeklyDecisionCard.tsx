@@ -5,7 +5,7 @@ import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules"
 import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
 import {
   buildWeeklyCitationMetaLine,
-  buildWeeklyTrustCueLine,
+  buildCompactTrustSummary,
 } from "../../lib/report/trustStatus";
 import {
   deltaLabelBySignal,
@@ -122,6 +122,13 @@ const movementSignificance = (signalKey: (typeof signalOrder)[number], delta: nu
   return "Low";
 };
 
+const signalActionRuleText: Record<(typeof signalOrder)[number], string> = {
+  tightness: "If tightness rises another 4+ points, hold net-new fixed-cost approvals.",
+  riskAppetite: "If risk appetite falls to 50 or below, freeze discretionary expansion approvals.",
+  baseRate: "If base rate rises >0.5 this week, tighten payback windows before approving new spend.",
+  curveSlope: "If curve slope turns negative by 0.25 or more, bias toward reversible roadmap bets.",
+};
+
 const PostureHistoryTimeline = ({ historicalTimeline }: { historicalTimeline: WeeklyDecisionCardProps["historicalTimeline"] }) => (
   <ol className="mt-2 grid gap-2 lg:grid-cols-4" aria-label="Posture change timeline">
     {historicalTimeline.map((item, index) => {
@@ -215,7 +222,7 @@ export function DecisionCallHeader({
             </div>
           </div>
           <div className={tierOneInset}>
-            <p className={`text-xs ${neutralLabel}`}>Instruction</p>
+            <p className={`text-xs ${neutralLabel}`}>Action</p>
             <p className="mt-1 text-sm font-semibold text-slate-100">{immediateDecision}</p>
           </div>
         </div>
@@ -238,12 +245,12 @@ export function DecisionCallHeader({
         </article>
 
         <article className="rounded-lg border border-amber-500/45 bg-amber-500/10 px-3 py-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-100">Primary guardrail</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-100">Guardrail</p>
           <p className="mt-1 text-sm font-semibold text-amber-50">{guardrail}</p>
         </article>
 
         <article className={tierOneInset}>
-          <p className={`text-xs ${neutralLabel}`}>Flip trigger</p>
+          <p className={`text-xs ${neutralLabel}`}>Flip condition</p>
           <p className="mt-1 text-xs text-slate-300">Current: {regimeDistance.currentValue.toFixed(1)} · Trigger: {regimeDistance.thresholdValue.toFixed(1)}</p>
           <p className="mt-2 inline-flex rounded-full border border-slate-600/70 bg-slate-900/80 px-2 py-0.5 text-[11px] uppercase tracking-[0.1em] text-slate-300">
             distance to trigger
@@ -260,7 +267,7 @@ export function DecisionCallHeader({
         </article>
 
         <p className="text-xs text-slate-300">{netConstraintSummary}</p>
-        <p className="text-xs text-slate-300">Trust check: {trustCueLine} · Freshness {freshnessLabel}</p>
+        <p className="text-xs text-slate-300">Trust status: {trustCueLine}</p>
         {needsTrustWarning ? (
           <p className="rounded-md border border-amber-500/50 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">{trustWarningCopy}</p>
         ) : null}
@@ -279,17 +286,17 @@ export function BoundedRulesMatrix({ decisionRules }: BoundedRulesMatrixProps) {
   return (
     <article className={`${tierOnePanel} ${sectionSpacing}`}>
       <h2 className={tierOneHeading}>Decision matrix this week</h2>
-      <p className="text-xs text-slate-300">Action now, then stop/restart thresholds.</p>
+      <p className="text-xs text-slate-300">Action now, then guardrail + flip conditions.</p>
       <ul className="mt-2 grid gap-3 sm:grid-cols-2">
         {topDecisionRules.map((rule) => (
           <li key={rule.area} className={`${tierOneInset} text-xs text-slate-200`}>
             <p className="font-semibold uppercase tracking-[0.12em] text-slate-200">{decisionAreaLabel(rule.area)}</p>
             <p className="mt-2 text-base font-semibold text-slate-100">{rule.recommendation}</p>
             <p className="mt-3 rounded-md border border-rose-500/50 bg-rose-500/10 px-2 py-2 text-rose-100">
-              <span className="font-semibold uppercase tracking-[0.12em]">Stop if</span> {rule.pauseTrigger}
+              <span className="font-semibold uppercase tracking-[0.12em]">Guardrail</span> {rule.pauseTrigger}
             </p>
             <p className="mt-2 rounded-md border border-emerald-500/50 bg-emerald-500/10 px-2 py-2 text-emerald-100">
-              <span className="font-semibold uppercase tracking-[0.12em]">Restart when</span> {rule.resumeTrigger}
+              <span className="font-semibold uppercase tracking-[0.12em]">Flip condition</span> {rule.resumeTrigger}
             </p>
             <p className="mt-2 text-slate-400">Scope: {rule.scope}</p>
           </li>
@@ -449,7 +456,11 @@ export function WeeklyDecisionCard({
   actions,
 }: WeeklyDecisionCardProps) {
   const freshnessLabel = fetchedAtLabel.trim().length > 0 ? fetchedAtLabel : "Unavailable";
-  const trustCueLine = buildWeeklyTrustCueLine({ confidenceLabel, freshnessLabel, transitionWatch });
+  const trustCueLine = buildCompactTrustSummary({
+    confidenceLabel,
+    freshnessLabel,
+    isFallbackSnapshot,
+  });
   const citationMetaLine = buildWeeklyCitationMetaLine({
     statusLabel,
     confidenceLabel,
@@ -528,22 +539,22 @@ export function WeeklyDecisionCard({
       ) : null}
 
       <article className={`${tierOnePanel} ${sectionSpacing}`}>
-        <h2 className={tierOneHeading}>Decision delta this week</h2>
+        <h2 className={tierOneHeading}>Decision support details</h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <div className={tierOneInset}>
             <p className={`text-xs ${neutralLabel}`}>Change this week</p>
             <p className="mt-1 text-xs text-slate-200">{decisionShiftSummary}</p>
           </div>
           <div className={tierOneInset}>
-            <p className={`text-xs ${neutralLabel}`}>What to do now</p>
-            <p className="mt-1 text-xs font-semibold text-slate-100">{immediateDecision}</p>
+            <p className={`text-xs ${neutralLabel}`}>Canonical decision</p>
+            <p className="mt-1 text-xs text-slate-300">Use the top call above for action, guardrail, and flip condition.</p>
           </div>
           <div className="rounded-lg border border-amber-500/45 bg-slate-950/72 px-3 py-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-100">Primary guardrail</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-100">Guardrail reference</p>
             <p className="mt-1 text-xs text-slate-200">{guardrail}</p>
           </div>
           <div className="rounded-lg border border-sky-500/35 bg-slate-950/72 px-3 py-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Flip trigger</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Flip condition reference</p>
             <p className="mt-1 text-xs text-slate-200">{reversalTrigger}</p>
           </div>
         </div>
@@ -571,6 +582,7 @@ export function WeeklyDecisionCard({
                       style={{ width: `${signal.meter}%` }}
                     />
                   </div>
+                  <p className="text-[11px] text-slate-300">{signalActionRuleText[signal.key]}</p>
                 </li>
               ))}
             </ul>

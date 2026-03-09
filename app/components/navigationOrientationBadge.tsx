@@ -10,6 +10,12 @@ const zoneLabels: Record<NavigationZone, string> = {
   reference: "Reference section",
 };
 
+const zoneDescriptors: Record<NavigationZone, string> = {
+  core: "Decision call and bounded actions for this week",
+  workflow: "Execution posture and operating rules",
+  reference: "Evidence, provenance, and supporting context",
+};
+
 const zoneCompactLabels: Record<NavigationZone, string> = {
   core: "Now",
   workflow: "Operate",
@@ -69,6 +75,7 @@ export function NavigationOrientationBadge({
             aria-label={zoneLabels[zone]}
             aria-current={isActive ? "true" : undefined}
             className={`inline-flex min-h-[32px] items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] transition-colors hover:border-sky-300/60 hover:text-sky-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/70 ${isActive ? zoneBadgeStyles[zone] : "border-slate-700/70 text-slate-400"}`}
+            title={zoneDescriptors[zone]}
           >
             <span className="sm:hidden">{zoneCompactLabels[zone]}</span>
             <span className="hidden sm:inline">{zoneLabels[zone]}</span>
