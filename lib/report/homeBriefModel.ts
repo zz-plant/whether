@@ -403,19 +403,19 @@ const buildWhyThisCall = ({
 
   return [
     {
-      label: "Boundary distance",
-      detail: `Nearest regime boundary is ${nearestGap.toFixed(1)} points away (${boundaryLabel}).`,
+      label: "Distance to regime change",
+      detail: `Nearest regime change trigger is ${nearestGap.toFixed(1)} points away (${boundaryLabel}).`,
     },
     {
-      label: "Momentum",
+      label: "What moved this week",
       detail:
         reportDynamics?.changedSignals.length
           ? `${signalReasonLabel[changedSignal?.key ?? "tightness"]} ${changedSignal ? describeSignalDirection(changedSignal) : "held"} this week; ${reportDynamics.directionLabel} overall.`
-          : "No material signal deltas this week; call is carried by level and threshold distance.",
+          : "No material signal move this week; posture is driven by current levels and threshold distance.",
     },
     {
-      label: "Reliability",
-      detail: transitionWatch === "ON" ? "Transition watch is ON; re-check next read before irreversible commitments." : "Transition watch is OFF; current posture is stable for near-term planning.",
+      label: "Signal reliability",
+      detail: transitionWatch === "ON" ? "Transition watch is ON; check next release before irreversible commitments." : "Transition watch is OFF; signal set is stable for near-term planning.",
     },
   ];
 };
