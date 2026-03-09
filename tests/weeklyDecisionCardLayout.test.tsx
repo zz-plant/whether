@@ -72,7 +72,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /Posture/);
     assert.match(html, /Movement/);
     assert.match(html, /Confidence/);
-    assert.match(html, /Instruction/);
+    assert.match(html, /Action/);
     assert.match(html, /Movement/);
     assert.match(html, /Velocity:/);
     assert.match(html, /id="primary-artifact-actions"/);
@@ -117,7 +117,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     );
 
     assert.match(html, /Using a cached snapshot/);
-    assert.match(html, /Flip trigger/);
+    assert.match(html, /Flip condition/);
     assert.equal((html.match(/style="width:0%"/g) ?? []).length, 4);
   });
 });

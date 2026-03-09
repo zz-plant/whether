@@ -38,11 +38,12 @@ export const HomeInterpretationPanel = ({
   layer: InterpretationLayer;
   searchParams?: Record<string, string | undefined>;
 }) => (
-  <section className="weather-panel space-y-4 px-5 py-5" aria-label="Interpretation layer">
+  <section id="interpretation-layer" className="weather-panel space-y-4 px-5 py-5" aria-label="Interpretation layer">
     <div className="space-y-1">
       <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Interpretation layer</p>
       <h2 className="text-base font-semibold text-slate-100">{layer.label}</h2>
       <p className="text-xs text-slate-300">{layer.summary}</p>
+      <p className="text-xs text-slate-400">Canonical decision lives above: action, guardrail, and flip condition.</p>
     </div>
 
     <nav className="flex flex-wrap gap-2" aria-label="Interpretation view">
@@ -79,7 +80,7 @@ export const HomeInterpretationPanel = ({
       </div>
     ) : null}
     <ul className="grid gap-2" aria-label={`${layer.label} details`}>
-      {layer.bullets.map((bullet) => (
+      {layer.bullets.slice(0, 3).map((bullet) => (
         <li key={bullet} className="weather-surface px-4 py-3 text-xs text-slate-200">
           <p className="leading-snug">• {bullet}</p>
         </li>

@@ -67,6 +67,7 @@ describe("interpretation view panel", () => {
     );
 
     assert.match(html, /Default view/);
+    assert.match(html, /Canonical decision lives above/);
     assert.match(html, /Action: Changed: pressure rose versus last week\./);
     assert.match(html, /\/?month=3&amp;year=2026&amp;view=forecast/);
   });

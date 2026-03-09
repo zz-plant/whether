@@ -102,7 +102,7 @@ describe("weekly card and interpretation panel composition", () => {
     assert.match(html, /Posture/);
     assert.match(html, /Movement/);
     assert.match(html, /Confidence/);
-    assert.match(html, /Instruction/);
+    assert.match(html, /Action/);
     assert.match(html, /Interpretation layer/);
     assert.match(html, /Company view/);
     assert.match(html, /• Action:/);
@@ -159,7 +159,7 @@ describe("weekly card and interpretation panel composition", () => {
     const postureIndex = html.indexOf("Posture");
     const movementIndex = html.indexOf("Movement");
     const confidenceIndex = html.indexOf("Confidence");
-    const instructionIndex = html.indexOf("Instruction");
+    const instructionIndex = html.indexOf("Action");
     const interpretationIndex = html.indexOf("Interpretation layer");
 
     assert.ok(postureIndex > -1);
