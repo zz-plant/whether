@@ -39,6 +39,8 @@ const decisionRules: BoundedDecisionRule[] = [
   {
     area: "hiring",
     recommendation: "Backfills only.",
+    doNow: ["Backfills only."],
+    avoidNow: ["Avoid speculative hiring."],
     scope: "Only critical replacements.",
     pauseTrigger: "Pause when tightness rises above 74.",
     resumeTrigger: "Resume when tightness falls below 65.",
@@ -79,6 +81,8 @@ describe("interpretation view panel", () => {
       {
         area: "capital-raising",
         recommendation: "Rule 1 first.",
+        doNow: ["Rule 1 do-now."],
+        avoidNow: ["Rule 1 avoid-now."],
         scope: "",
         pauseTrigger: "pause-1",
         resumeTrigger: "resume-1",
@@ -87,6 +91,8 @@ describe("interpretation view panel", () => {
       {
         area: "burn-discipline",
         recommendation: "Rule 2 second.",
+        doNow: ["Rule 2 do-now."],
+        avoidNow: ["Rule 2 avoid-now."],
         scope: "",
         pauseTrigger: "pause-2",
         resumeTrigger: "resume-2",
@@ -95,6 +101,8 @@ describe("interpretation view panel", () => {
       {
         area: "hiring",
         recommendation: "Rule 3 third.",
+        doNow: ["Rule 3 do-now."],
+        avoidNow: ["Rule 3 avoid-now."],
         scope: "",
         pauseTrigger: "pause-3",
         resumeTrigger: "resume-3",
@@ -103,6 +111,8 @@ describe("interpretation view panel", () => {
       {
         area: "product-tempo",
         recommendation: "Rule 4 hidden.",
+        doNow: ["Rule 4 do-now."],
+        avoidNow: ["Rule 4 avoid-now."],
         scope: "",
         pauseTrigger: "pause-4",
         resumeTrigger: "resume-4",

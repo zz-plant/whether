@@ -13,6 +13,8 @@ const postureRules: BoundedDecisionRule[] = [
   {
     area: "capital-raising",
     recommendation: "Base capital rule.",
+    doNow: ["Base capital do-now."],
+    avoidNow: ["Base capital avoid-now."],
     scope: "",
     pauseTrigger: "Pause base capital.",
     resumeTrigger: "Resume base capital.",
@@ -21,6 +23,8 @@ const postureRules: BoundedDecisionRule[] = [
   {
     area: "burn-discipline",
     recommendation: "Base burn rule.",
+    doNow: ["Base burn do-now."],
+    avoidNow: ["Base burn avoid-now."],
     scope: "",
     pauseTrigger: "Pause base burn.",
     resumeTrigger: "Resume base burn.",
@@ -29,6 +33,8 @@ const postureRules: BoundedDecisionRule[] = [
   {
     area: "hiring",
     recommendation: "Base hiring rule.",
+    doNow: ["Base hiring do-now."],
+    avoidNow: ["Base hiring avoid-now."],
     scope: "",
     pauseTrigger: "Pause base hiring.",
     resumeTrigger: "Resume base hiring.",

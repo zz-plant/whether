@@ -466,7 +466,24 @@ export function BoundedRulesMatrix({ decisionRules }: BoundedRulesMatrixProps) {
         {topDecisionRules.map((rule) => (
           <li key={rule.area} className={`${tierOneInset} text-xs text-slate-200`}>
             <p className="font-semibold uppercase tracking-[0.12em] text-slate-200">{decisionAreaLabel(rule.area)}</p>
-            <p className="mt-2 text-base font-semibold text-slate-100">{rule.recommendation}</p>
+            <div className="mt-3 space-y-2">
+              <div>
+                <p className="font-semibold uppercase tracking-[0.12em] text-emerald-100">Do now</p>
+                <ul className="mt-1 list-disc space-y-1 pl-4 text-emerald-50">
+                  {rule.doNow.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <p className="font-semibold uppercase tracking-[0.12em] text-rose-100">Avoid now</p>
+                <ul className="mt-1 list-disc space-y-1 pl-4 text-rose-50">
+                  {rule.avoidNow.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
             <p className="mt-3 rounded-md border border-rose-500/50 bg-rose-500/10 px-2 py-2 text-rose-100">
               <span className="font-semibold uppercase tracking-[0.12em]">Guardrail</span> {rule.pauseTrigger}
             </p>

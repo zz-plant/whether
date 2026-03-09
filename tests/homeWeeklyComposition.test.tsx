@@ -21,6 +21,8 @@ const decisionRules: BoundedDecisionRule[] = [
   {
     area: "hiring",
     recommendation: "Backfills only.",
+    doNow: ["Backfills only."],
+    avoidNow: ["Avoid speculative hiring."],
     scope: "",
     pauseTrigger: "Pause if tightness rises above 72.",
     resumeTrigger: "Resume if tightness falls below 64.",

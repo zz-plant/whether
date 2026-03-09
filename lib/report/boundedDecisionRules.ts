@@ -5,6 +5,8 @@ export type DecisionArea = "hiring" | "product-tempo" | "capital-raising" | "bur
 export type BoundedDecisionRule = {
   area: DecisionArea;
   recommendation: string;
+  doNow: string[];
+  avoidNow: string[];
   scope: string;
   pauseTrigger: string;
   resumeTrigger: string;
@@ -56,6 +58,12 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
       recommendation: isExpansion
         ? "Selective hiring for revenue-linked and reliability roles."
         : "Backfills + mission-critical hiring only.",
+      doNow: isExpansion
+        ? ["Prioritize revenue-linked and reliability roles with staged approvals."]
+        : ["Limit hiring to backfills and mission-critical roles tied to delivery risk."],
+      avoidNow: isExpansion
+        ? ["Avoid broad hiring classes without clear revenue or reliability linkage."]
+        : ["Avoid net-new hiring for speculative capacity or long-payback initiatives."],
       scope: `Applies to all net-new headcount; current tightness ${fmt(scores.tightness)} and risk appetite ${fmt(scores.riskAppetite)}.`,
       pauseTrigger: `Pause net-new hiring if tightness > ${fmt(tightnessPause)} or risk appetite < ${fmt(riskPause)}.`,
       resumeTrigger: `Resume staged approvals when tightness < ${fmt(tightnessResume)} and risk appetite > ${fmt(riskResume)}.`,
@@ -66,6 +74,12 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
       recommendation: isExpansion
         ? "Increase product tempo for reversible bets tied to activation/retention milestones."
         : "Protect core roadmap; slow long-payback roadmap expansions.",
+      doNow: isExpansion
+        ? ["Increase tempo on reversible bets tied to activation and retention milestones."]
+        : ["Protect core roadmap tempo and prioritize near-term customer value slices."],
+      avoidNow: isExpansion
+        ? ["Avoid irreversible scope expansion before milestone evidence confirms traction."]
+        : ["Avoid long-payback roadmap expansions with weak near-term proof."],
       scope: "Roadmap sequencing, release scope, and experimentation cadence.",
       pauseTrigger: `Pause long-payback bets if risk appetite < ${fmt(riskPause)} or two consecutive weaker weekly reads print.`,
       resumeTrigger: `Resume tempo on deferred bets when risk appetite > ${fmt(riskResume)} and weekly direction stabilizes/improves.`,
@@ -76,6 +90,12 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
       recommendation: isExpansion
         ? "Raise proactively from leverage while window quality is favorable."
         : "Begin raise planning early and optimize for durability over speed.",
+      doNow: isExpansion
+        ? ["Run an active fundraising process while window quality remains favorable."]
+        : ["Prepare raise materials and launch planning early to preserve process control."],
+      avoidNow: isExpansion
+        ? ["Avoid waiting for urgency before engaging investors while leverage is strong."]
+        : ["Avoid speed-first terms that reduce durability under tighter conditions."],
       scope: "Fundraising launch timing, process pacing, and minimum term quality.",
       pauseTrigger: `Pause acceleration if risk appetite falls below ${fmt(riskPause)} or tightness rises above ${fmt(tightnessPause)}.`,
       resumeTrigger: `Resume full process when risk appetite > ${fmt(riskResume)} and tightness < ${fmt(tightnessResume)}.`,
@@ -84,6 +104,8 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
     "burn-discipline": {
       area: "burn-discipline",
       recommendation: "Keep discretionary spend gated by measurable short-cycle payback.",
+      doNow: ["Gate discretionary spend by measurable short-cycle payback proof."],
+      avoidNow: ["Avoid multi-quarter spend commitments without clear payback evidence."],
       scope: "Hiring, vendor, and GTM program spend with multi-quarter commitments.",
       pauseTrigger: `Pause discretionary burn expansion if tightness > ${fmt(tightnessPause)}.`,
       resumeTrigger: `Resume controlled burn expansion when tightness < ${fmt(tightnessResume)} and budget payback proof is intact.`,
@@ -94,6 +116,12 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
       recommendation: isExpansion
         ? "Run reversible expansion bets with explicit rollback criteria and stage gates."
         : "Hold irreversible expansion bets; keep only reversible experiments active.",
+      doNow: isExpansion
+        ? ["Run expansion in staged tranches with explicit rollback criteria."]
+        : ["Keep only reversible expansion experiments active with clear checkpoints."],
+      avoidNow: isExpansion
+        ? ["Avoid one-way expansion commitments without stage-gate evidence."]
+        : ["Avoid irreversible expansion bets until window strength improves."],
       scope: "New market launches, major platform rewrites, and long-cycle initiatives.",
       pauseTrigger: `Pause expansion bets if risk appetite < ${fmt(riskPause)} or tightness > ${fmt(tightnessPause)}.`,
       resumeTrigger: `Resume in tranches when risk appetite > ${fmt(riskResume)} and tightness < ${fmt(tightnessResume)}.`,
