@@ -58,6 +58,15 @@ const hasVercelBuildOutput = existsSync(vercelOutputConfigPath);
 const hasWorkerBuildOutput = existsSync(workerIndexPath);
 const priorBuildMeta = readBuildMeta();
 
+const hasInstalledDependencies = existsSync("node_modules");
+
+if (isCi && !hasInstalledDependencies) {
+  console.error(
+    "Missing node_modules in CI. Run `bun install --frozen-lockfile` once before invoking build commands.",
+  );
+  process.exit(1);
+}
+
 const hasReusableBuildOutput =
   hasVercelBuildOutput &&
   hasWorkerBuildOutput &&

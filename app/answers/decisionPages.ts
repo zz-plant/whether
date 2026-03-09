@@ -287,6 +287,15 @@ export const answerCategories: Array<{ key: AnswerCategory; label: string }> = [
   { key: "explanation", label: "Explanation" },
 ];
 
+const HIGH_VALUE_STATIC_CATEGORIES: readonly AnswerCategory[] = ["decision", "climate"] as const;
+
+export const highValueStaticAnswerPages = answerPages.filter((page) => HIGH_VALUE_STATIC_CATEGORIES.includes(page.category));
+export const highValueStaticAnswerSlugs = highValueStaticAnswerPages.map((page) => page.slug);
+export const allAnswerStaticParams = answerPages.map((page) => ({ slug: page.slug }));
+export const highValueAnswerStaticParams = highValueStaticAnswerPages.map((page) => ({ slug: page.slug }));
+
+const answerPageBySlug = new Map(answerPages.map((page) => [page.slug, page]));
+
 // Backward-compatible aliases for existing consumers while answer pages migrate
 // to the canonical category model.
 export const tierOneDecisionPages = answerPages;
@@ -304,4 +313,4 @@ export const tierThreeKeywords = [
   "best time to hire engineers macro conditions",
 ];
 
-export const findDecisionPage = (slug: string) => answerPages.find((page) => page.slug === slug);
+export const findDecisionPage = (slug: string) => answerPageBySlug.get(slug);

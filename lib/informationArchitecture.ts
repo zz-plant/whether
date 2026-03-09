@@ -598,6 +598,20 @@ export type FailureModeDefinition = {
   linkedConcepts: { label: string; href: string }[];
 };
 
+
+export const useCaseRoleStaticParams = useCaseRoles.map((entry) => ({ slug: entry.slug }));
+export const situationUseCaseStaticParams = situationUseCases.map((slug) => ({ slug }));
+export const decideStaticParams = [...useCaseRoleStaticParams, ...situationUseCaseStaticParams];
+
+const useCaseRoleBySlug = new Map(useCaseRoles.map((entry) => [entry.slug, entry]));
+const toolkitDefinitionBySlug = new Map(toolkitDefinitions.map((entry) => [entry.slug, entry]));
+
+export const findUseCaseRole = (slug: string) => useCaseRoleBySlug.get(slug);
+export const isSituationUseCaseSlug = (slug: string): slug is (typeof situationUseCases)[number] =>
+  situationUseCases.includes(slug as (typeof situationUseCases)[number]);
+export const findToolkitDefinition = (slug: string) => toolkitDefinitionBySlug.get(slug);
+export const toolkitStaticParams = toolkitDefinitions.map((entry) => ({ slug: entry.slug }));
+
 export const failureModeDefinitions: FailureModeDefinition[] = [
   {
     slug: "regime-mismatch",

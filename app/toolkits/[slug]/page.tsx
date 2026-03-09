@@ -2,18 +2,19 @@ import type { Metadata, Route } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../lib/seo";
-import { toolkitDefinitions } from "../../../lib/informationArchitecture";
+import { findToolkitDefinition, toolkitStaticParams } from "../../../lib/informationArchitecture";
 type Params = { slug: string };
 
-export const dynamicParams = false;
+export const dynamicParams = true;
+export const revalidate = 900;
 
 export function generateStaticParams() {
-  return toolkitDefinitions.map((entry) => ({ slug: entry.slug }));
+  return toolkitStaticParams;
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug } = await params;
-  const toolkit = toolkitDefinitions.find((entry) => entry.slug === slug);
+  const toolkit = findToolkitDefinition(slug);
   if (!toolkit) return {};
 
   return buildPageMetadata({
@@ -26,7 +27,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
 export default async function ToolkitDetailPage({ params }: { params: Promise<Params> }) {
   const { slug } = await params;
-  const toolkit = toolkitDefinitions.find((entry) => entry.slug === slug);
+  const toolkit = findToolkitDefinition(slug);
   if (!toolkit) notFound();
 
   return (

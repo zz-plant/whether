@@ -28,6 +28,7 @@ import { buildRegimeAlert } from "./reportFormatting";
 import { buildFallbackForecastModel, buildForecastModel } from "./forecastModel";
 import { formatRegimeLabel } from "../regimeFormat";
 import { logReportDependencyFailure } from "./reportError";
+import { cache } from "react";
 import type { TreasuryData } from "../types";
 
 export type ReportSearchParams = {
@@ -398,18 +399,21 @@ export type LoadReportDataSafeResult =
   | { ok: true; data: ReportData }
   | { ok: false; error: Error; fallback: ReportDataFallback };
 
-let defaultReportDataPromise: Promise<ReportData> | null = null;
+const loadReportDataMemoized = cache(async (cacheKey?: string) => {
+  if (!cacheKey) {
+    return loadReportDataUncached();
+  }
+
+  return loadReportDataUncached(JSON.parse(cacheKey) as ReportSearchParams);
+});
 
 export const loadReportData = (searchParams?: ReportSearchParams) => {
-  if (searchParams) {
-    return loadReportDataUncached(searchParams);
+  if (!searchParams) {
+    return loadReportDataMemoized();
   }
 
-  if (!defaultReportDataPromise) {
-    defaultReportDataPromise = loadReportDataUncached();
-  }
-
-  return defaultReportDataPromise;
+  const cacheKey = JSON.stringify(searchParams);
+  return loadReportDataMemoized(cacheKey);
 };
 
 
