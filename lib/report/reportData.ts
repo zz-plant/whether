@@ -5,7 +5,7 @@
 import { fetchTreasuryData } from "../treasury/treasuryClient";
 import { snapshotData } from "../snapshot";
 import { buildSensorReadings } from "../sensors";
-import { deriveRegimeTrend, evaluateRegime } from "../regimeEngine";
+import { DEFAULT_THRESHOLDS, buildSignalInfluence, deriveRegimeTrend, evaluateRegime } from "../regimeEngine";
 import { getPlaybookGuidance } from "../playbook";
 import {
   getLatestTimeMachineSnapshot,
@@ -26,6 +26,7 @@ import { loadMacroSeries } from "../macroSnapshot";
 import { parseThresholdsFromSearchParams } from "../thresholds";
 import { formatAgeHours, formatDateUTC, formatTimestampUTC } from "../formatters";
 import { buildRegimeAlert } from "./reportFormatting";
+import { normalizeSignalContributions } from "./signalFormatting";
 import { buildFallbackForecastModel, buildForecastModel } from "./forecastModel";
 import { formatRegimeLabel } from "../regimeFormat";
 import { logReportDependencyFailure } from "./reportError";
@@ -87,6 +88,7 @@ export type ReportDynamics = {
   totalSignalChanges: number;
   regimeChanged: boolean;
   directionLabel: "improving" | "deteriorating" | "mixed" | "stable";
+  signalContributions?: ReturnType<typeof normalizeSignalContributions>;
 };
 
 
@@ -249,6 +251,18 @@ export const buildLastYearComparison = ({
   },
 });
 
+const resolveSignalInfluence = (assessment: ReturnType<typeof evaluateRegime>) =>
+  normalizeSignalContributions(
+    assessment.signalInfluence ??
+      buildSignalInfluence({
+        tightness: assessment.scores.tightness,
+        riskAppetite: assessment.scores.riskAppetite,
+        baseRate: assessment.scores.baseRate,
+        curveSlope: assessment.scores.curveSlope,
+        thresholds: (assessment as { thresholds?: typeof DEFAULT_THRESHOLDS }).thresholds ?? DEFAULT_THRESHOLDS,
+      })
+  );
+
 const signalLabels: Record<ReportDynamics["changedSignals"][number]["key"], string> = {
   tightness: "Cash tightness",
   riskAppetite: "Risk appetite",
@@ -270,6 +284,7 @@ export const buildReportDynamics = ({
       totalSignalChanges: 0,
       regimeChanged: false,
       directionLabel: "stable",
+      signalContributions: resolveSignalInfluence(current),
     };
   }
 
@@ -340,6 +355,7 @@ export const buildReportDynamics = ({
     totalSignalChanges: sortedChanges.length,
     regimeChanged: current.regime !== previous.regime,
     directionLabel,
+    signalContributions: resolveSignalInfluence(current),
   };
 };
 

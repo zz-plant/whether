@@ -47,6 +47,7 @@ export interface SensorReading {
   id: "BASE_RATE" | "CURVE_SLOPE";
   label: string;
   value: number | null;
+  currentInfluence?: number | null;
   unit: "%" | "bps";
   explanation: string;
   category: SensorCategory;
