@@ -38,19 +38,15 @@ import { getFeaturedConceptArticles } from "../lib/productCanon";
 import { LiveDataFallbackAlert } from "./components/liveDataFallbackAlert";
 import { HomeInterpretationPanel } from "./components/homeInterpretationPanel";
 
+const loadBoardBriefSections = () => import("./components/boardBriefSections");
+
 const WeeklyActionSummaryPanel = dynamic(
-  () =>
-    import("./components/boardBriefSections").then(
-      (module) => module.WeeklyActionSummaryPanel,
-    ),
+  () => loadBoardBriefSections().then((module) => module.WeeklyActionSummaryPanel),
   { suspense: true },
 );
 
 const ExecutiveSnapshotPanel = dynamic(
-  () =>
-    import("./components/boardBriefSections").then(
-      (module) => module.ExecutiveSnapshotPanel,
-    ),
+  () => loadBoardBriefSections().then((module) => module.ExecutiveSnapshotPanel),
   { suspense: true },
 );
 
