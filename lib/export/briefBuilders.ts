@@ -4,6 +4,7 @@ import type { MacroSeriesReading, SensorReading, TreasuryData } from "../types";
 import { buildComplianceStamp } from "../exportNotices";
 import { formatRegimeLabel } from "../regimeFormat";
 import type { InterpretationLayer } from "../report/interpretationLayer";
+import { getRoleScopedTemplate, stakeholderRoleLabel, type StakeholderRole } from "../playbook";
 import {
   buildRunwayPlan,
   formatRunwayPlanCompactBlock,
@@ -23,6 +24,7 @@ const buildDecisionHighlights = (assessment: RegimeAssessment) =>
 
 type ExportLayerOptions = {
   interpretationLayer?: InterpretationLayer;
+  stakeholderRole?: StakeholderRole;
 };
 
 const buildInterpretationLayerBlock = (options?: ExportLayerOptions) => {
@@ -50,6 +52,20 @@ const buildInterpretationLayerBlock = (options?: ExportLayerOptions) => {
   ];
 };
 
+
+
+const buildRoleTemplateBlock = (assessment: RegimeAssessment, options?: ExportLayerOptions) => {
+  const role = options?.stakeholderRole ?? "founder-ceo";
+  const template = getRoleScopedTemplate(assessment.regime, role);
+
+  return [
+    "",
+    `Role template (${stakeholderRoleLabel[role]}):`,
+    `• Do now: ${template.doNow}`,
+    `• Avoid now: ${template.avoidNow}`,
+    `• Reversal trigger: ${template.reversalTrigger}`,
+  ];
+};
 const mapPolicyPostureToPlannerPosture = (posture: RegimeAssessment["policyAssessment"]["posture"]): PlannerPosture => {
   if (posture === "RISK_ON") return "RISK_ON";
   if (posture === "TRANSITION") return "TRANSITION";
@@ -80,6 +96,7 @@ const buildSlideBullets = (
   `Tightness ${assessment.scores.tightness} / Risk ${assessment.scores.riskAppetite}`,
   ...macros.map((macro) => `${macro.label}: ${formatNumberWithUnit(macro.value, macro.unit)}`),
   ...assessment.constraints.map((item) => `Guardrail: ${item}`),
+  ...buildRoleTemplateBlock(assessment, options),
   ...buildInterpretationLayerBlock(options),
   "",
   ...buildExportStamp(treasury, "Score-based posture confidence"),
@@ -116,6 +133,7 @@ export const buildSlackBrief = (
     "",
     "Constraints:",
     ...assessment.constraints.map((item) => `• ${item}`),
+    ...buildRoleTemplateBlock(assessment, options),
     "",
     financialImplications,
     ...buildInterpretationLayerBlock(options),

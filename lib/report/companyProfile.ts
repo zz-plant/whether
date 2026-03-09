@@ -1,4 +1,5 @@
 import { getPlaybookGuidance } from "../playbook";
+import type { StakeholderRole } from "../playbook";
 import type { RegimeAssessment } from "../regimeEngine";
 import type { BoundedDecisionRule, DecisionArea } from "./boundedDecisionRules";
 import {
@@ -24,6 +25,7 @@ export type CompanyProfile = {
   teamSizeBand: CompanyTeamSizeBand;
   sector: CompanySector;
   businessModel: CompanyBusinessModel;
+  stakeholderRole?: StakeholderRole;
 };
 
 export type CompanyAdjustedRule = BoundedDecisionRule & {
@@ -38,6 +40,13 @@ const defaultProfile: CompanyProfile = {
   teamSizeBand: "21-100",
   sector: "b2b-saas",
   businessModel: "b2b",
+  stakeholderRole: "founder-ceo",
+};
+
+export const roleDefaultByStage: Record<CompanyStage, StakeholderRole> = {
+  seed: "founder-ceo",
+  "series-b": "product-engineering",
+  "late-stage": "finance",
 };
 
 const stagePriorityDelta: Record<CompanyStage, Partial<Record<DecisionArea, number>>> = {
@@ -152,9 +161,17 @@ export const resolveCompanyProfile = (profile?: Partial<CompanyProfile>): Compan
     CompanyProfile
   >;
 
-  return {
+  const resolved = {
     ...defaultProfile,
     ...definedOverrides,
+  };
+  const hasExplicitRole = Object.prototype.hasOwnProperty.call(definedOverrides, "stakeholderRole");
+
+  return {
+    ...resolved,
+    stakeholderRole: hasExplicitRole
+      ? resolved.stakeholderRole
+      : roleDefaultByStage[resolved.stage],
   };
 };
 

@@ -30,6 +30,13 @@ export type WeeklyDecisionCardProps = {
   netConstraintSummary: string;
   guardrail: string;
   reversalTrigger: string;
+  roleScopedTemplate: {
+    role: "founder-ceo" | "product-engineering" | "finance";
+    roleLabel: string;
+    doNow: string;
+    avoidNow: string;
+    reversalTrigger: string;
+  };
   recordDateLabel: string;
   fetchedAtLabel: string;
   reportDynamics: ReportDynamics;
@@ -477,6 +484,7 @@ export function WeeklyDecisionCard({
   netConstraintSummary,
   guardrail,
   reversalTrigger,
+  roleScopedTemplate,
   recordDateLabel,
   fetchedAtLabel,
   reportDynamics,
@@ -597,6 +605,15 @@ export function WeeklyDecisionCard({
             <p className="mt-1 text-xs text-slate-200">{reversalTrigger}</p>
           </div>
         </div>
+
+        <article className="rounded-lg border border-violet-500/45 bg-violet-500/10 px-3 py-3">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-violet-100">Role template · {roleScopedTemplate.roleLabel}</p>
+          <ul className="mt-2 space-y-1 text-xs text-slate-100">
+            <li><span className="font-semibold text-violet-100">Do now:</span> {roleScopedTemplate.doNow}</li>
+            <li><span className="font-semibold text-rose-100">Avoid now:</span> {roleScopedTemplate.avoidNow}</li>
+            <li><span className="font-semibold text-emerald-100">Reversal trigger:</span> {roleScopedTemplate.reversalTrigger}</li>
+          </ul>
+        </article>
 
         <div className="grid gap-3 lg:grid-cols-2">
           <article className={tierOneInset}>

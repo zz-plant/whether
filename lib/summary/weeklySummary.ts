@@ -208,6 +208,7 @@ export const buildWeeklySummary = ({
     recordDateLabel,
     provenance,
     structured,
+    regime: assessment.regime,
   });
 
   return {

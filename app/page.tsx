@@ -32,6 +32,7 @@ import {
 import { CopyLeadershipArtifactsButtons } from "./components/copyLeadershipArtifactsButtons";
 import { createBreadcrumbTrail } from "../lib/navigation/breadcrumbs";
 import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
+import { stakeholderRoles, type StakeholderRole } from "../lib/playbook";
 import { resolveSectorKey } from "../lib/report/sectorSensitivity";
 import { getFeaturedConceptArticles } from "../lib/productCanon";
 import { LiveDataFallbackAlert } from "./components/liveDataFallbackAlert";
@@ -154,8 +155,13 @@ const resolveHomepageOverlaySector = (value: string | undefined) => resolveSecto
 type HomePageSearchParams = {
   month?: string;
   year?: string;
+  role?: string;
+  stage?: string;
   [key: string]: string | undefined;
 };
+
+const resolveStakeholderRole = (value: string | undefined): StakeholderRole | undefined =>
+  value && stakeholderRoles.includes(value as StakeholderRole) ? (value as StakeholderRole) : undefined;
 
 const HomePageStreamingFallback = () => (
   <section aria-label="Loading weekly operating posture" className="space-y-6">
@@ -271,6 +277,7 @@ const HomePageReportContent = async ({
   const interpretationView: InterpretationView = isInterpretationView(resolvedSearchParams?.view)
     ? resolvedSearchParams.view
     : "default";
+  const stakeholderRole = resolveStakeholderRole(resolvedSearchParams?.role);
   const sectionLinks = homeSectionSequence.map((section) => ({
     href: section.href,
     label: section.label,
@@ -332,7 +339,15 @@ const HomePageReportContent = async ({
     stopItems,
     treasury,
     treasuryProvenance,
-  }, { overlaySector: homepageOverlaySector });
+  }, {
+    overlaySector: homepageOverlaySector,
+    stakeholderRole,
+    companyProfile: {
+      stage: resolvedSearchParams?.stage === "seed" || resolvedSearchParams?.stage === "series-b" || resolvedSearchParams?.stage === "late-stage"
+        ? resolvedSearchParams.stage
+        : undefined,
+    },
+  });
   const interpretationLayer = buildInterpretationLayer({
     view: interpretationView,
     homeBriefModel,
@@ -340,8 +355,8 @@ const HomePageReportContent = async ({
     forecast: reportData.forecast,
     decisionRules: homeBriefModel.decisionRules,
   });
-  const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries, { interpretationLayer });
-  const boardSummary = buildBoardBrief(assessment, treasury, sensors, macroSeries, { interpretationLayer });
+  const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries, { interpretationLayer, stakeholderRole: homeBriefModel.roleScopedTemplate.role });
+  const boardSummary = buildBoardBrief(assessment, treasury, sensors, macroSeries, { interpretationLayer, stakeholderRole: homeBriefModel.roleScopedTemplate.role });
   const callCitation = buildCallCitation(assessment, treasury, { interpretationLayer });
   const featuredConcepts = getFeaturedConceptArticles().slice(0, 3);
   return (
@@ -403,6 +418,7 @@ const HomePageReportContent = async ({
         netConstraintSummary={homeBriefModel.netConstraintSummary}
         guardrail={homeBriefModel.guardrail}
         reversalTrigger={homeBriefModel.reversalTrigger}
+        roleScopedTemplate={homeBriefModel.roleScopedTemplate}
         recordDateLabel={recordDateLabel}
         fetchedAtLabel={fetchedAtLabel}
         reportDynamics={reportDynamics}

@@ -13,6 +13,7 @@ describe("summaryCopyRenderer", () => {
         ageLabel: "1h",
         statusLabel: "Live",
       },
+      regime: "EXPANSION",
       structured: {
         climate: {
           label: "✅ RISK-ON / CAPITAL-LOOSE",
@@ -38,6 +39,8 @@ describe("summaryCopyRenderer", () => {
     assert.doesNotMatch(copy, /\(https?:\/\//);
     assert.match(copy, /RECOMMENDED MOVES FOR PRODUCT TEAMS \(NOW\)\n\n• /);
     assert.match(copy, /GOVERNANCE PARAMETER ADJUSTMENTS/);
+    assert.match(copy, /ROLE TEMPLATE \(FOUNDER \/ CEO\)/);
+    assert.match(copy, /Reversal trigger:/);
   });
 
   it("renders monthly copy with bulleted constraints and provenance", () => {
@@ -51,6 +54,7 @@ describe("summaryCopyRenderer", () => {
         ageLabel: "2h",
         statusLabel: "Live",
       },
+      regime: "EXPANSION",
       structured: {
         executionConstraints: ["Sequence delivery around revenue durability"],
         provenance: {

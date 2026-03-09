@@ -1,6 +1,8 @@
 import { buildComplianceStamp } from "../exportNotices";
 import { formatSourceLine } from "./summaryFormatting";
 import type { MonthlyStructured, SummaryProvenance, WeeklyStructured } from "./summaryTypes";
+import { getRoleScopedTemplate, stakeholderRoleLabel, type StakeholderRole } from "../playbook";
+import type { RegimeKey } from "../regimeEngine";
 
 const toBullets = (items: string[]) => items.map((item) => `• ${item}`);
 
@@ -25,20 +27,47 @@ const renderGovernanceLines = (governance: WeeklyStructured["governanceParameter
   ];
 };
 
+
+
+const renderRoleTemplateLines = ({
+  regime,
+  role,
+}: {
+  regime: RegimeKey;
+  role: StakeholderRole;
+}) => {
+  const template = getRoleScopedTemplate(regime, role);
+
+  return [
+    "---",
+    "",
+    `ROLE TEMPLATE (${stakeholderRoleLabel[role].toUpperCase()})`,
+    "",
+    `• Do now: ${template.doNow}`,
+    `• Avoid now: ${template.avoidNow}`,
+    `• Reversal trigger: ${template.reversalTrigger}`,
+    "",
+  ];
+};
 export const renderWeeklySummaryCopy = ({
   title,
   summary,
   recordDateLabel,
   provenance,
   structured,
+  regime,
+  role,
 }: {
   title: string;
   summary: string;
   recordDateLabel?: string;
   provenance: SummaryProvenance;
   structured: WeeklyStructured;
+  regime: RegimeKey;
+  role?: StakeholderRole;
 }) => {
   const updatedLabel = recordDateLabel ? `Updated ${recordDateLabel}` : "Updated —";
+  const resolvedRole = role ?? "founder-ceo";
   const sourceLine = formatSourceLine(provenance);
   const complianceStamp = buildComplianceStamp({
     sourceLine,
@@ -104,6 +133,7 @@ export const renderWeeklySummaryCopy = ({
     "",
     "",
     ...renderGovernanceLines(structured.governanceParameters),
+    ...renderRoleTemplateLines({ regime, role: resolvedRole }),
     "---",
     "",
     "RECOMMENDATION CONFIDENCE",
@@ -134,6 +164,8 @@ export const renderMonthlySummaryCopy = ({
   summary,
   provenance,
   structured,
+  regime,
+  role,
 }: {
   title: string;
   summary: string;

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { buildCompanyAdjustedRules } from "../lib/report/companyProfile";
+import { buildCompanyAdjustedRules, resolveCompanyProfile } from "../lib/report/companyProfile";
 import type { BoundedDecisionRule } from "../lib/report/boundedDecisionRules";
 import type { RegimeAssessment } from "../lib/regimeEngine";
 
@@ -76,6 +76,12 @@ describe("company-profile adjusted rules", () => {
 
     assert.ok(capitalRule);
     assert.ok(capitalRule?.recommendation.includes("Runway constraint:"));
+  });
+
+  it("defaults stakeholder role from company stage when explicit role is missing", () => {
+    assert.equal(resolveCompanyProfile({ stage: "seed", stakeholderRole: undefined }).stakeholderRole, "founder-ceo");
+    assert.equal(resolveCompanyProfile({ stage: "series-b", stakeholderRole: undefined }).stakeholderRole, "product-engineering");
+    assert.equal(resolveCompanyProfile({ stage: "late-stage", stakeholderRole: undefined }).stakeholderRole, "finance");
   });
 
 });

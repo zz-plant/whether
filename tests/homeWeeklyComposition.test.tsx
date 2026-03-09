@@ -74,6 +74,13 @@ describe("weekly card and interpretation panel composition", () => {
           netConstraintSummary="Pressure remains elevated."
           guardrail="Hold irreversible hiring unless direct revenue impact is clear."
           reversalTrigger="If risk appetite rises above 55, reopen selective hiring."
+          roleScopedTemplate={{
+            role: "founder-ceo",
+            roleLabel: "Founder / CEO",
+            doNow: "Trim to core moves.",
+            avoidNow: "Avoid unbounded bets.",
+            reversalTrigger: "Reopen when risk appetite improves.",
+          }}
           recordDateLabel="Mar 5, 2026"
           fetchedAtLabel="Mar 6, 2026 09:12 UTC"
           reportDynamics={reportDynamics}
@@ -131,6 +138,13 @@ describe("weekly card and interpretation panel composition", () => {
           netConstraintSummary="Pressure remains elevated."
           guardrail="Hold irreversible hiring unless direct revenue impact is clear."
           reversalTrigger="If risk appetite rises above 55, reopen selective hiring."
+          roleScopedTemplate={{
+            role: "founder-ceo",
+            roleLabel: "Founder / CEO",
+            doNow: "Trim to core moves.",
+            avoidNow: "Avoid unbounded bets.",
+            reversalTrigger: "Reopen when risk appetite improves.",
+          }}
           recordDateLabel="Mar 5, 2026"
           fetchedAtLabel="Mar 6, 2026 09:12 UTC"
           reportDynamics={reportDynamics}

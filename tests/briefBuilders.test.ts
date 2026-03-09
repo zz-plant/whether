@@ -136,10 +136,13 @@ describe("buildSlackBrief", () => {
     assert.match(brief, /Financial implications:/);
     assert.match(brief, /Runway risk:/);
     assert.match(brief, /Suggested burn adjustment:/);
+    assert.match(brief, /Role template \(Founder \/ CEO\):/);
+    assert.match(brief, /• Do now:/);
   });
 
   it("optionally appends interpretation layer content for handoff", () => {
     const brief = buildSlackBrief(assessment, treasury, sensors, macros, {
+      stakeholderRole: "finance",
       interpretationLayer: {
         view: "financial",
         label: "Financial view",
@@ -152,6 +155,7 @@ describe("buildSlackBrief", () => {
     assert.match(brief, /Interpretation summary: Runway translation for near-term operating cadence\./);
     assert.match(brief, /Interpretation trust: translation layer only; canonical posture\/confidence\/thresholds unchanged\./);
     assert.match(brief, /• Action: Tighten non-core spend\./);
+    assert.match(brief, /Role template \(Finance\):/);
   });
 
   it("formats bps values with readable spacing", () => {

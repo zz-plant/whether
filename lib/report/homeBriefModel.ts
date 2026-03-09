@@ -4,6 +4,8 @@ import type { MacroSeriesReading } from "../types";
 import { isImprovingSignalDelta } from "./reportData";
 import { REGIME_SEVERITY_RANK, REGIME_SHORT_LABELS } from "../regimePresentation";
 import { deriveSectorAdjustedPosture, SECTOR_TAXONOMY, type SectorKey } from "./sectorSensitivity";
+import { getRoleScopedTemplate, stakeholderRoleLabel, type StakeholderRole } from "../playbook";
+import { resolveCompanyProfile, type CompanyProfile } from "./companyProfile";
 
 type Regime = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
 
@@ -60,6 +62,14 @@ type BoundaryDirection = "riseAbove" | "fallToOrBelow";
 type MacroOverlayItem = {
   label: string;
   detail: string;
+};
+
+type RoleScopedTemplateView = {
+  role: StakeholderRole;
+  roleLabel: string;
+  doNow: string;
+  avoidNow: string;
+  reversalTrigger: string;
 };
 
 const regimeShiftTargets = {
@@ -367,10 +377,12 @@ const buildStartupClimateIndex = ({
 
 export const buildHomeBriefModel = (
   data: HomeReportData,
-  options?: { overlaySector?: SectorKey },
+  options?: { overlaySector?: SectorKey; stakeholderRole?: StakeholderRole; companyProfile?: Partial<CompanyProfile> },
 ) => {
   const { assessment, regimeAlert, stopItems, reportDynamics, recordDateLabel, macroSeries } = data;
   const overlaySector = options?.overlaySector ?? "b2b-saas";
+  const resolvedCompanyProfile = resolveCompanyProfile(options?.companyProfile);
+  const activeRole = options?.stakeholderRole ?? resolvedCompanyProfile.stakeholderRole ?? "founder-ceo";
   const timelineAnchorYear = resolveTimelineAnchorYear(recordDateLabel);
   const previousRegime = regimeAlert?.previousRegime;
   const severityDelta = previousRegime
@@ -450,6 +462,8 @@ export const buildHomeBriefModel = (
           thresholdDirection: boundaryDirectionForRegime(assessment.regime, "riskAppetite"),
         };
 
+  const roleScopedTemplate = getRoleScopedTemplate(assessment.regime, activeRole);
+
   const guardrail = stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
   const netConstraintSummary =
     severityDelta > 0
@@ -483,6 +497,13 @@ export const buildHomeBriefModel = (
     primaryDrivers: buildPrimaryDrivers({ reportDynamics, confidenceLabel, transitionWatch }),
     netConstraintSummary,
     postureDeltaLabel,
+    roleScopedTemplate: {
+      role: activeRole,
+      roleLabel: stakeholderRoleLabel[activeRole],
+      doNow: roleScopedTemplate.doNow,
+      avoidNow: roleScopedTemplate.avoidNow,
+      reversalTrigger: roleScopedTemplate.reversalTrigger,
+    } satisfies RoleScopedTemplateView,
     reversalTrigger,
     transitionWatch,
     whyThisCall: buildWhyThisCall({
