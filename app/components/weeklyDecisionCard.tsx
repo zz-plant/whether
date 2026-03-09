@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { HapticAnchor } from "./hapticAnchor";
 import type { ReportDynamics } from "../../lib/report/reportData";
 import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
+import type { RoleAwareOperatingTemplate } from "../../lib/report/operatingCalls";
 import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
 import type { ForecastRegimeLabel } from "../../lib/report/forecastModel";
 import { formatProbabilityPercent } from "../../lib/report/reportFormatting";
@@ -39,6 +40,7 @@ export type WeeklyDecisionCardProps = {
   decisionShiftSummary: string;
   transitionProbabilities: Record<ForecastRegimeLabel, number>;
   decisionRules: BoundedDecisionRule[];
+  roleAwareTemplates: RoleAwareOperatingTemplate[];
   revisitDecisions: boolean;
   memoryRail: MemoryRailItem[];
   historicalTimeline: Array<{ label: string; posture: string }>;
@@ -323,6 +325,7 @@ export function DecisionCallHeader({
 
 type BoundedRulesMatrixProps = {
   decisionRules: BoundedDecisionRule[];
+  roleAwareTemplates: RoleAwareOperatingTemplate[];
 };
 
 export function BoundedRulesMatrix({ decisionRules }: BoundedRulesMatrixProps) {
@@ -491,6 +494,7 @@ export function WeeklyDecisionCard({
   decisionShiftSummary,
   transitionProbabilities,
   decisionRules,
+  roleAwareTemplates,
   revisitDecisions,
   memoryRail,
   historicalTimeline,
@@ -672,6 +676,22 @@ export function WeeklyDecisionCard({
               <div className="h-3 rounded-full bg-violet-300/80" style={{ width: `${decisionPressurePercent}%` }} />
             </div>
           </article>
+        </div>
+      </article>
+
+
+      <article className={`${tierOnePanel} ${sectionSpacing}`}>
+        <h2 className={tierOneHeading}>Role-aware operating templates</h2>
+        <p className="text-xs text-slate-300">Bounded templates by role: do now, avoid now, and reversal trigger.</p>
+        <div className="mt-2 grid gap-3 sm:grid-cols-2">
+          {roleAwareTemplates.map((template) => (
+            <article key={template.role} className={tierOneInset}>
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-200">{template.roleLabel}</p>
+              <p className="mt-2 text-xs text-emerald-100"><span className="font-semibold uppercase tracking-[0.1em]">Do now</span> {template.doNow}</p>
+              <p className="mt-2 text-xs text-rose-100"><span className="font-semibold uppercase tracking-[0.1em]">Avoid now</span> {template.avoidNow}</p>
+              <p className="mt-2 text-xs text-sky-100"><span className="font-semibold uppercase tracking-[0.1em]">Flip/reversal trigger</span> {template.flipTrigger}</p>
+            </article>
+          ))}
         </div>
       </article>
 

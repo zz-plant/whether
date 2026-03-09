@@ -23,12 +23,15 @@ describe("buildHomeBriefModel", () => {
     assert.match(model.stageLabel, /Early|Mid|Late/);
     assert.equal(typeof model.stageFragile, "boolean");
     assert.match(model.postureWithStageLabel, /—/);
+    assert.equal(model.postureLabel, "Contraction");
     assert.equal(typeof model.confidencePercent, "number");
     assert.match(model.trendLabel, /Improving|Deteriorating|Mixed|Stable/);
     assert.match(model.transitionWatch, /ON|OFF/);
     assert.equal(typeof model.guardrail, "string");
     assert.equal(typeof model.reversalTrigger, "string");
     assert.equal(model.decisionRules.length, 5);
+    assert.equal(model.roleAwareTemplates.length, 2);
+    assert.match(model.roleAwareTemplates[0]?.doNow ?? "", /hiring|tempo|spend|reversible/i);
     assert.equal(typeof model.revisitDecisions, "boolean");
     assert.ok(model.memoryRail.length > 0);
     assert.ok(model.historicalTimeline.length > 0);
@@ -63,6 +66,8 @@ describe("buildHomeBriefModel", () => {
     assert.match(model.decisionShiftSummary, /Do now:/);
     assert.match(model.decisionShiftSummary, /Flip:/);
     assert.equal(model.decisionRules.length, 5);
+    assert.equal(model.roleAwareTemplates.length, 2);
+    assert.match(model.roleAwareTemplates[0]?.doNow ?? "", /hiring|tempo|spend|reversible/i);
     assert.equal(typeof model.confidencePercent, "number");
     assert.match(model.trendLabel, /Improving|Deteriorating|Mixed|Stable/);
     assert.equal(typeof model.revisitDecisions, "boolean");
@@ -217,6 +222,7 @@ describe("buildHomeBriefModel", () => {
       },
     });
     assert.equal(mixedStabilization.stageLabel, "Mid");
+    assert.equal(mixedStabilization.postureLabel, "Transitional Mixed");
 
     const scarcityRecovery = buildHomeBriefModel({
       assessment: {

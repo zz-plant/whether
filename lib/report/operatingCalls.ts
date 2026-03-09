@@ -1,9 +1,18 @@
 import type { RegimeKey } from "../regimeEngine";
+import type { BoundedDecisionRule, DecisionArea } from "./boundedDecisionRules";
 
 export type OperatingCall = {
   hiring: string;
   roadmap: string;
   spend: string;
+};
+
+export type RoleAwareOperatingTemplate = {
+  role: "startup-leadership" | "vc-partner";
+  roleLabel: string;
+  doNow: string;
+  avoidNow: string;
+  flipTrigger: string;
 };
 
 export const operatingCallsByRegime: Record<RegimeKey, OperatingCall> = {
@@ -27,4 +36,48 @@ export const operatingCallsByRegime: Record<RegimeKey, OperatingCall> = {
     roadmap: "Scale validated bets",
     spend: "Increase with guardrails",
   },
+};
+
+const findRule = (rules: BoundedDecisionRule[], area: DecisionArea) =>
+  rules.find((rule) => rule.area === area);
+
+const sanitizeGuardrail = (pauseTrigger: string) =>
+  pauseTrigger.replace(/^Pause\s+/i, "").replace(/\.$/, "");
+
+const sanitizeFlip = (resumeTrigger: string) =>
+  resumeTrigger.replace(/^Resume\s+/i, "").replace(/\.$/, "");
+
+export const buildRoleAwareOperatingTemplates = (rules: BoundedDecisionRule[]): RoleAwareOperatingTemplate[] => {
+  const hiringRule = findRule(rules, "hiring");
+  const productRule = findRule(rules, "product-tempo");
+  const capitalRule = findRule(rules, "capital-raising");
+  const burnRule = findRule(rules, "burn-discipline");
+  const expansionRule = findRule(rules, "expansion-bets");
+
+  return [
+    {
+      role: "startup-leadership",
+      roleLabel: "Startup leadership",
+      doNow: [hiringRule?.recommendation, productRule?.recommendation, burnRule?.recommendation]
+        .filter(Boolean)
+        .join(" "),
+      avoidNow: [hiringRule?.pauseTrigger, productRule?.pauseTrigger]
+        .filter(Boolean)
+        .map(sanitizeGuardrail)
+        .join(" "),
+      flipTrigger: sanitizeFlip(expansionRule?.resumeTrigger ?? hiringRule?.resumeTrigger ?? ""),
+    },
+    {
+      role: "vc-partner",
+      roleLabel: "VC partner",
+      doNow: [capitalRule?.recommendation, burnRule?.recommendation]
+        .filter(Boolean)
+        .join(" "),
+      avoidNow: [capitalRule?.pauseTrigger, expansionRule?.pauseTrigger]
+        .filter(Boolean)
+        .map(sanitizeGuardrail)
+        .join(" "),
+      flipTrigger: sanitizeFlip(capitalRule?.resumeTrigger ?? expansionRule?.resumeTrigger ?? ""),
+    },
+  ];
 };

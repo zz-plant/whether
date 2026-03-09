@@ -29,7 +29,7 @@ export type HighlightBullet = { text: string };
 export const FIRST_TIME_GUIDE_STEPS: FirstTimeGuideStep[] = [
   {
     label: "Summary",
-    detail: "Confirm the weekly posture and top constraints before you open deeper diagnostics.",
+    detail: "Confirm the weekly posture modifier (for example Guarded Expansion or Transitional Mixed) and top constraints before you open deeper diagnostics.",
     example: "Example decision: defer expansion hires when cash is tight.",
   },
   {
@@ -45,7 +45,7 @@ export const FIRST_TIME_GUIDE_STEPS: FirstTimeGuideStep[] = [
 ];
 
 export const FIRST_TIME_GUIDE_HIGHLIGHTS: HighlightBullet[] = [
-  { text: "Climate badge and weekly action summary." },
+  { text: "Climate badge with modifier-aware posture label and weekly action summary." },
   { text: "Source freshness and capture timestamp." },
   { text: "Playbook links for constraint and action context." },
 ];

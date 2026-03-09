@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { buildPageMetadata } from "../../lib/seo";
 import { postureDefinitions } from "../../lib/informationArchitecture";
+import { loadReportDataSafe } from "../../lib/report/reportData";
+import { buildHomeBriefModel } from "../../lib/report/homeBriefModel";
+import { getRegimeDisplayLabel } from "../../lib/regimePresentation";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Posture guides — routed from Weekly Brief",
@@ -10,12 +13,22 @@ export const metadata: Metadata = buildPageMetadata({
   imageAlt: "Whether posture",
 });
 
-export default function PosturePage() {
+export default async function PosturePage() {
+  const reportResult = await loadReportDataSafe(undefined, { route: "/posture" });
+  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
+  const homeBriefModel = buildHomeBriefModel(reportData);
+  const displayRegime = getRegimeDisplayLabel({
+    regime: reportData.assessment.regime,
+    momentum: reportData.reportDynamics.directionLabel,
+    confidence: homeBriefModel.confidenceLabel,
+    transitionWatch: homeBriefModel.transitionWatch === "ON",
+  });
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
       <section className="weather-panel space-y-3 px-6 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Posture guides</h1>
         <p className="text-sm text-slate-300">For weekly posture selection, start from Weekly Brief and route through Start Here. Use this page when you need direct access to posture detail pages.</p>
+        <p className="text-xs text-sky-200">Current weekly brief posture: {displayRegime.label} <span className="text-slate-400">({displayRegime.canonicalRegime})</span></p>
         <div className="flex flex-wrap items-center gap-3">
           <Link href="/" className="weather-button-primary inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]">Open Weekly Brief</Link>
           <Link href="/start" className="weather-button inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]">Open Start Here routing</Link>

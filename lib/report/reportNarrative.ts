@@ -7,7 +7,7 @@ const narrativeSigns = {
     "When cash availability tightens and approvals slow, expect roadmap compression before demand recovers.",
   risk:
     "When risk appetite softens, keep launches reversible and measure retention before scaling scope.",
-  fallback: "No additional caution signs this cycle; maintain baseline monitoring.",
+  fallback: "No additional caution signs this cycle; maintain baseline monitoring unless the posture modifier shifts.",
 } as const;
 
 export const buildSignsToWatch = (assessment: RegimeAssessment) => {

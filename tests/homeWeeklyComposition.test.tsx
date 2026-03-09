@@ -81,6 +81,22 @@ describe("weekly card and interpretation panel composition", () => {
           decisionShiftSummary="Decision delta: tighten roadmap optionality while protecting core delivery."
           transitionProbabilities={{ Expansion: 10, Mixed: 35, Scarcity: 40, Defensive: 15 }}
           decisionRules={decisionRules}
+        roleAwareTemplates={[
+          {
+            role: "startup-leadership",
+            roleLabel: "Startup leadership",
+            doNow: "Keep delivery focused.",
+            avoidNow: "Do not add fixed costs without proof.",
+            flipTrigger: "Resume staged expansion when tightness and risk appetite recover.",
+          },
+          {
+            role: "vc-partner",
+            roleLabel: "VC partner",
+            doNow: "Push portfolio pacing discipline.",
+            avoidNow: "Avoid encouraging irreversible expansion.",
+            flipTrigger: "Reopen growth pacing after two improving reads.",
+          },
+        ]}
           revisitDecisions={true}
           memoryRail={[{ label: "Now", posture: "Defensive" }]}
           historicalTimeline={[{ label: "2026", posture: "Defensive" }]}
@@ -112,6 +128,9 @@ describe("weekly card and interpretation panel composition", () => {
     assert.match(html, /• Action:/);
     assert.match(html, /Trigger:/);
     assert.match(html, /Reverse:/);
+    assert.match(html, /Role-aware operating templates/);
+    assert.match(html, /Do now/);
+    assert.match(html, /Avoid now/);
   });
   it("renders weekly card before interpretation panel and preserves top-fold hierarchy", () => {
     const layer = buildInterpretationLayer({
@@ -140,6 +159,22 @@ describe("weekly card and interpretation panel composition", () => {
           decisionShiftSummary="Decision delta: tighten roadmap optionality while protecting core delivery."
           transitionProbabilities={{ Expansion: 10, Mixed: 35, Scarcity: 40, Defensive: 15 }}
           decisionRules={decisionRules}
+        roleAwareTemplates={[
+          {
+            role: "startup-leadership",
+            roleLabel: "Startup leadership",
+            doNow: "Keep delivery focused.",
+            avoidNow: "Do not add fixed costs without proof.",
+            flipTrigger: "Resume staged expansion when tightness and risk appetite recover.",
+          },
+          {
+            role: "vc-partner",
+            roleLabel: "VC partner",
+            doNow: "Push portfolio pacing discipline.",
+            avoidNow: "Avoid encouraging irreversible expansion.",
+            flipTrigger: "Reopen growth pacing after two improving reads.",
+          },
+        ]}
           revisitDecisions={true}
           memoryRail={[{ label: "Now", posture: "Defensive" }]}
           historicalTimeline={[{ label: "2026", posture: "Defensive" }]}
