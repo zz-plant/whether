@@ -3,6 +3,7 @@ import Link from "next/link";
 import { buildBreadcrumbList, buildPageMetadata, serializeJsonLd } from "../../lib/seo";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { BreadcrumbTrail } from "../components/breadcrumbTrail";
+import { NextStepRail } from "../components/nextStepRail";
 import { StaticHubNav } from "../components/staticHubNav";
 
 export const metadata: Metadata = buildPageMetadata({
@@ -61,6 +62,7 @@ export default function MethodPage() {
           <p className="text-sm text-slate-300">Use operator-facing diagnostics, concepts, and failure modes.</p>
         </Link>
       </section>
+      <NextStepRail currentPath="/method" />
     </main>
   );
 }

@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { buildPageMetadata } from "../../lib/seo";
+import { buildBreadcrumbList, buildPageMetadata, serializeJsonLd } from "../../lib/seo";
+import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { toolkitDefinitions } from "../../lib/informationArchitecture";
-
+import { BreadcrumbTrail } from "../components/breadcrumbTrail";
+import { NextStepRail } from "../components/nextStepRail";
 
 export const runtime = "edge";
 export const metadata: Metadata = buildPageMetadata({
@@ -27,9 +29,20 @@ export default async function ToolkitsPage({
   const closestToolkits = query
     ? toolkitDefinitions.filter((toolkit) => toolkit.whenToUse.toLowerCase().includes(query.split(" ")[0] ?? "")).slice(0, 3)
     : [];
+  const breadcrumbStructuredData = {
+    "@context": "https://schema.org",
+    ...buildBreadcrumbList(
+      createBreadcrumbTrail([
+        { path: "/" },
+        { path: "/toolkits" },
+      ]),
+    ),
+  };
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }} />
+      <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Toolkits" }]} />
       <section className="weather-panel space-y-4 px-6 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Toolkits</h1>
         <p className="text-base text-slate-200">
@@ -95,6 +108,7 @@ export default async function ToolkitsPage({
           ) : null}
         </section>
       ) : null}
+      <NextStepRail currentPath="/toolkits" />
     </main>
   );
 }

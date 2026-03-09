@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { buildPageMetadata } from "../../lib/seo";
+import { buildBreadcrumbList, buildPageMetadata, serializeJsonLd } from "../../lib/seo";
+import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import {
   decideHomeRecommendedToolkitSlugs,
   findToolkitDefinition,
   situationUseCaseDefinitions,
   useCaseRoles,
 } from "../../lib/informationArchitecture";
+import { BreadcrumbTrail } from "../components/breadcrumbTrail";
+import { NextStepRail } from "../components/nextStepRail";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Decide — role and situation paths",
@@ -21,8 +24,20 @@ const titleCase = (value: string) => value
   .join(" ");
 
 export default function DecidePage() {
+  const breadcrumbStructuredData = {
+    "@context": "https://schema.org",
+    ...buildBreadcrumbList(
+      createBreadcrumbTrail([
+        { path: "/" },
+        { path: "/decide" },
+      ]),
+    ),
+  };
+
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }} />
+      <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Decide" }]} />
       <section className="weather-panel space-y-3 px-6 py-6">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-300">Step 2 of 3 · choose path</p>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Decision paths</h1>
@@ -87,6 +102,7 @@ export default function DecidePage() {
           </Link>
         </div>
       </section>
+      <NextStepRail currentPath="/decide" />
     </main>
   );
 }

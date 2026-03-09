@@ -37,6 +37,7 @@ import { getFeaturedConceptArticles } from "../lib/productCanon";
 import { LiveDataFallbackAlert } from "./components/liveDataFallbackAlert";
 import { HomeInterpretationPanel } from "./components/homeInterpretationPanel";
 import { DeferredSection } from "./components/deferredSection";
+import { NextStepRail } from "./components/nextStepRail";
 
 const WeeklyActionSummaryPanel = dynamic(
   () => import("./components/boardBriefSections").then((module) => module.WeeklyActionSummaryPanel),
@@ -495,7 +496,7 @@ const HomePageReportContent = async ({
           />
         </DeferredSection>
       </div>
-
+      <NextStepRail currentPath="/" />
     </ReportShell>
   );
 };
