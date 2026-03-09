@@ -34,7 +34,7 @@ jobs:
 
       - name: Build Vercel output for Cloudflare reuse
         if: matrix.target == 'build:cloudflare'
-        run: bunx vercel build
+        run: bun run vercel:build
 
       - name: Run ${{ matrix.target }}
         env:
