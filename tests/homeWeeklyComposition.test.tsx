@@ -36,6 +36,7 @@ const assessment = {
 } as unknown as RegimeAssessment;
 
 const forecast: ForecastModel = {
+  next4WeekProbabilities: { Expansion: 7, Mixed: 19, Scarcity: 43, Defensive: 31 },
   next90DayProbabilities: { Expansion: 7, Mixed: 19, Scarcity: 43, Defensive: 31 },
   boundaryPressure: {
     distance: 3,
@@ -78,6 +79,7 @@ describe("weekly card and interpretation panel composition", () => {
           fetchedAtLabel="Mar 6, 2026 09:12 UTC"
           reportDynamics={reportDynamics}
           decisionShiftSummary="Decision delta: tighten roadmap optionality while protecting core delivery."
+          transitionProbabilities={{ Expansion: 10, Mixed: 35, Scarcity: 40, Defensive: 15 }}
           decisionRules={decisionRules}
           revisitDecisions={true}
           memoryRail={[{ label: "Now", posture: "Defensive" }]}
@@ -135,6 +137,7 @@ describe("weekly card and interpretation panel composition", () => {
           fetchedAtLabel="Mar 6, 2026 09:12 UTC"
           reportDynamics={reportDynamics}
           decisionShiftSummary="Decision delta: tighten roadmap optionality while protecting core delivery."
+          transitionProbabilities={{ Expansion: 10, Mixed: 35, Scarcity: 40, Defensive: 15 }}
           decisionRules={decisionRules}
           revisitDecisions={true}
           memoryRail={[{ label: "Now", posture: "Defensive" }]}

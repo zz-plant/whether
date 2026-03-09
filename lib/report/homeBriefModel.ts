@@ -10,6 +10,7 @@ import {
   type RegimeMomentum,
 } from "../regimePresentation";
 import { deriveSectorAdjustedPosture, SECTOR_TAXONOMY, type SectorKey } from "./sectorSensitivity";
+import type { ForecastModel } from "./forecastModel";
 
 type Regime = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
 
@@ -30,6 +31,7 @@ type HomeReportData = {
     }>;
   };
   macroSeries?: MacroSeriesReading[];
+  forecast?: ForecastModel;
   [key: string]: unknown;
 };
 
@@ -375,7 +377,7 @@ export const buildHomeBriefModel = (
   data: HomeReportData,
   options?: { overlaySector?: SectorKey },
 ) => {
-  const { assessment, regimeAlert, stopItems, reportDynamics, recordDateLabel, macroSeries } = data;
+  const { assessment, regimeAlert, stopItems, reportDynamics, recordDateLabel, macroSeries, forecast } = data;
   const overlaySector = options?.overlaySector ?? "b2b-saas";
   const timelineAnchorYear = resolveTimelineAnchorYear(recordDateLabel);
   const previousRegime = regimeAlert?.previousRegime;
@@ -487,6 +489,12 @@ export const buildHomeBriefModel = (
       changeCount: reportDynamics?.changedSignals.length ?? 0,
       reversalTrigger,
     }),
+    transitionProbabilities: forecast?.next4WeekProbabilities ?? {
+      Expansion: 25,
+      Mixed: 25,
+      Scarcity: 25,
+      Defensive: 25,
+    },
     decisionRules: buildCanonicalBoundedDecisionRules({
       regime: assessment.regime,
       thresholds: assessment.thresholds,

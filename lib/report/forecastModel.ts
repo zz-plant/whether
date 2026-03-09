@@ -25,6 +25,7 @@ export type BoundaryMomentum =
   | "stable";
 
 export interface ForecastModel {
+  next4WeekProbabilities: Record<ForecastRegimeLabel, number>;
   next90DayProbabilities: Record<ForecastRegimeLabel, number>;
   boundaryPressure: {
     distance: number;
@@ -370,6 +371,7 @@ export const buildForecastModel = ({
   });
 
   return {
+    next4WeekProbabilities: normalizeProbabilities(regimeWeights),
     next90DayProbabilities: normalizeProbabilities(regimeWeights),
     boundaryPressure: {
       distance: nearestDistance,
@@ -385,6 +387,12 @@ export const buildForecastModel = ({
 };
 
 export const buildFallbackForecastModel = (): ForecastModel => ({
+  next4WeekProbabilities: {
+    Expansion: 25,
+    Mixed: 25,
+    Scarcity: 25,
+    Defensive: 25,
+  },
   next90DayProbabilities: {
     Expansion: 25,
     Mixed: 25,

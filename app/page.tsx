@@ -288,6 +288,7 @@ const HomePageReportContent = async ({
     reportDynamics,
     sensors,
     macroSeries,
+    forecast,
     statusLabel,
     stopItems,
     treasury,
@@ -328,6 +329,7 @@ const HomePageReportContent = async ({
     reportDynamics,
     sensors,
     macroSeries,
+    forecast,
     statusLabel,
     stopItems,
     treasury,
@@ -337,7 +339,7 @@ const HomePageReportContent = async ({
     view: interpretationView,
     homeBriefModel,
     assessment,
-    forecast: reportData.forecast,
+    forecast,
     decisionRules: homeBriefModel.decisionRules,
   });
   const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries, { interpretationLayer, postureWithStageLabel: homeBriefModel.postureWithStageLabel });
@@ -408,6 +410,7 @@ const HomePageReportContent = async ({
         fetchedAtLabel={fetchedAtLabel}
         reportDynamics={reportDynamics}
         decisionShiftSummary={homeBriefModel.decisionShiftSummary}
+        transitionProbabilities={homeBriefModel.transitionProbabilities}
         decisionRules={homeBriefModel.decisionRules}
         revisitDecisions={homeBriefModel.revisitDecisions}
         memoryRail={homeBriefModel.memoryRail}

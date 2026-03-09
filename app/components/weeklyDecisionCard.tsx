@@ -3,6 +3,8 @@ import { HapticAnchor } from "./hapticAnchor";
 import type { ReportDynamics } from "../../lib/report/reportData";
 import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
 import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
+import type { ForecastRegimeLabel } from "../../lib/report/forecastModel";
+import { formatProbabilityPercent } from "../../lib/report/reportFormatting";
 import {
   buildWeeklyCitationMetaLine,
   buildCompactTrustSummary,
@@ -34,6 +36,7 @@ export type WeeklyDecisionCardProps = {
   fetchedAtLabel: string;
   reportDynamics: ReportDynamics;
   decisionShiftSummary: string;
+  transitionProbabilities: Record<ForecastRegimeLabel, number>;
   decisionRules: BoundedDecisionRule[];
   revisitDecisions: boolean;
   memoryRail: MemoryRailItem[];
@@ -483,6 +486,7 @@ export function WeeklyDecisionCard({
   fetchedAtLabel,
   reportDynamics,
   decisionShiftSummary,
+  transitionProbabilities,
   decisionRules,
   revisitDecisions,
   memoryRail,
@@ -539,6 +543,13 @@ export function WeeklyDecisionCard({
     ? "Using a cached snapshot. Use this call for near-term pacing only and pause irreversible decisions until live refresh returns."
     : "Use this call for near-term pacing only until confidence returns to HIGH with fresh data.";
 
+  const transitionStrip = [
+    { label: "Expansion", value: transitionProbabilities.Expansion, tone: "bg-emerald-300/70" },
+    { label: "Mixed", value: transitionProbabilities.Mixed, tone: "bg-sky-300/75" },
+    { label: "Scarcity", value: transitionProbabilities.Scarcity, tone: "bg-amber-300/80" },
+    { label: "Defensive", value: transitionProbabilities.Defensive, tone: "bg-violet-300/80" },
+  ] as const;
+
   return (
     <section className="weather-panel space-y-5 px-5 py-6 sm:space-y-6 sm:px-7 sm:py-8" aria-labelledby="weekly-posture-brief-title">
       <DecisionCallHeader
@@ -582,7 +593,7 @@ export function WeeklyDecisionCard({
 
       <article className={`${tierOnePanel} ${sectionSpacing}`}>
         <h2 className={tierOneHeading}>Decision support details</h2>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <div className={tierOneInset}>
             <p className={`text-xs ${neutralLabel}`}>Change this week</p>
             <p className="mt-1 text-xs text-slate-200">{decisionShiftSummary}</p>
@@ -590,6 +601,20 @@ export function WeeklyDecisionCard({
           <div className={tierOneInset}>
             <p className={`text-xs ${neutralLabel}`}>Canonical decision</p>
             <p className="mt-1 text-xs text-slate-300">Use the top call above for action, guardrail, and flip condition.</p>
+          </div>
+          <div className={tierOneInset}>
+            <p className={`text-xs ${neutralLabel}`}>4-week transition watch</p>
+            <p className="mt-1 text-xs text-slate-200">P(flip to Scarcity): <span className="font-semibold text-amber-100">{formatProbabilityPercent(transitionProbabilities.Scarcity)}</span> · P(stabilize in Mixed): <span className="font-semibold text-sky-100">{formatProbabilityPercent(transitionProbabilities.Mixed)}</span></p>
+            <div className="mt-2 flex h-2 overflow-hidden rounded-full bg-slate-800">
+              {transitionStrip.map((segment) => (
+                <div key={segment.label} className={segment.tone} style={{ width: `${segment.value}%` }} aria-label={`${segment.label} ${formatProbabilityPercent(segment.value)}`} />
+              ))}
+            </div>
+            <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[10px] uppercase tracking-[0.08em] text-slate-300">
+              {transitionStrip.map((segment) => (
+                <span key={`${segment.label}-label`}>{segment.label} {formatProbabilityPercent(segment.value)}</span>
+              ))}
+            </div>
           </div>
           <div className="rounded-lg border border-amber-500/45 bg-slate-950/72 px-3 py-3">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-100">Guardrail reference</p>
