@@ -385,6 +385,8 @@ export const TimeMachinePanel = ({
 
   const previousSnapshotHref = buildSnapshotHref(previousSnapshot);
   const nextSnapshotHref = buildSnapshotHref(nextSnapshot);
+  const nowDecisionHref = `${nowHref}#decision-summary`;
+  const replayPreviousHref = !isHistorical ? previousSnapshotHref : null;
 
   return (
     <section id="time-machine" aria-labelledby="time-machine-title" className="mt-10">
@@ -403,7 +405,7 @@ export const TimeMachinePanel = ({
             <>
               {isHistorical ? (
                 <Link
-                  href="/"
+                  href={nowDecisionHref as Route}
                   className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                 >
                   Exit historical view
@@ -418,9 +420,18 @@ export const TimeMachinePanel = ({
           <div className="weather-surface p-4">
             <p className="type-label text-slate-400">Historical mode</p>
             <p className="mt-3 type-data text-slate-300">
-              You are replaying the macro posture from{" "}
-              <span className="font-semibold text-slate-100">{selectedLabel}</span>. Treat the
-              constraints as if those market conditions were active today.
+              {isHistorical ? (
+                <>
+                  You are replaying the macro posture from{" "}
+                  <span className="font-semibold text-slate-100">{selectedLabel}</span>. Compare
+                  against now ({latestRecordLabel}) before changing operating posture.
+                </>
+              ) : (
+                <>
+                  You are in the live now view ({latestRecordLabel}). Use Time Machine to replay
+                  the prior month before approving irreversible decisions.
+                </>
+              )}
             </p>
             {showHistoricalCallout ? (
               <div className="weather-surface mt-4 rounded-lg p-3">
@@ -435,6 +446,14 @@ export const TimeMachinePanel = ({
             <p className="type-label text-slate-400">Snapshot</p>
             <p className="mt-3 text-lg font-semibold text-slate-100">{selectedLabel}</p>
             <p className="mt-2 text-xs text-slate-500">Highlights the month loaded into the report.</p>
+            {!isHistorical && replayPreviousHref ? (
+              <Link
+                href={replayPreviousHref as Route}
+                className="mt-3 weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+              >
+                Replay previous month
+              </Link>
+            ) : null}
           </div>
         </div>
 

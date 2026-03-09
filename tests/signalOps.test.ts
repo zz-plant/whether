@@ -48,7 +48,7 @@ const payload: SignalAlertPayload = {
   currentAssessment: assessment("SCARCITY", 82, 44),
   reasons: [{ code: "regime-change", message: "Regime shifted." }],
   sourceUrls: ["https://example.com"],
-  timeMachineHref: "/signals#time-machine",
+  timeMachineHref: "/signals?advanced=1#time-machine",
 };
 
 describe("signalOps", () => {

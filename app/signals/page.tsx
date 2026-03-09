@@ -643,12 +643,22 @@ export default async function SignalsPage({
               timeline diagnostics. Keep this closed for the default executive scan.
             </p>
           </div>
-          <a
-            href={buildAdvancedHref(!showAdvanced)}
-            className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
-          >
-            {showAdvanced ? "Hide advanced filters" : "Show advanced filters"}
-          </a>
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            {!showAdvanced ? (
+              <a
+                href={buildAdvancedHref(true) + "#time-machine"}
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
+              >
+                Open Time Machine
+              </a>
+            ) : null}
+            <a
+              href={buildAdvancedHref(!showAdvanced)}
+              className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
+            >
+              {showAdvanced ? "Hide advanced filters" : "Show advanced filters"}
+            </a>
+          </div>
         </div>
       </section>
 
