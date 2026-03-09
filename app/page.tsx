@@ -340,9 +340,9 @@ const HomePageReportContent = async ({
     forecast: reportData.forecast,
     decisionRules: homeBriefModel.decisionRules,
   });
-  const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries, { interpretationLayer });
-  const boardSummary = buildBoardBrief(assessment, treasury, sensors, macroSeries, { interpretationLayer });
-  const callCitation = buildCallCitation(assessment, treasury, { interpretationLayer });
+  const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries, { interpretationLayer, postureWithStageLabel: homeBriefModel.postureWithStageLabel });
+  const boardSummary = buildBoardBrief(assessment, treasury, sensors, macroSeries, { interpretationLayer, postureWithStageLabel: homeBriefModel.postureWithStageLabel });
+  const callCitation = buildCallCitation(assessment, treasury, { interpretationLayer, postureWithStageLabel: homeBriefModel.postureWithStageLabel });
   const featuredConcepts = getFeaturedConceptArticles().slice(0, 3);
   return (
     <ReportShell
@@ -395,6 +395,7 @@ const HomePageReportContent = async ({
     >
       <WeeklyDecisionCard
         statusLabel={statusLabel}
+        postureWithStageLabel={homeBriefModel.postureWithStageLabel}
         postureDelta={homeBriefModel.postureDeltaLabel}
         confidenceLabel={homeBriefModel.confidenceLabel}
         confidencePercent={homeBriefModel.confidencePercent}

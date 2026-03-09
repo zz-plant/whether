@@ -16,6 +16,7 @@ export type WeeklySummary = {
   summary: string;
   regime: RegimeAssessment["regime"];
   regimeLabel: string;
+  stageLabel?: string;
   guidance: string;
   confidence: RegimeAssessment["diagnostics"]["confidence"];
   transitionWatch: boolean;
@@ -183,17 +184,20 @@ export const buildWeeklySummary = ({
   assessment,
   provenance,
   recordDateLabel,
+  stageLabel,
 }: {
   assessment: RegimeAssessment;
   provenance: WeeklySummaryProvenance;
   recordDateLabel?: string;
+  stageLabel?: string;
 }): WeeklySummary => {
   const regimeLabel = getRegimeOperatorLabel(assessment.regime);
   const guidance = getWeeklyActionGuidance(assessment.regime);
   const transitionCue = assessment.diagnostics.transitionWatch
     ? " Signals are near a regime boundary; tighten review cadence before expanding commitments."
     : "";
-  const summary = `${regimeLabel} posture: ${assessment.description} Priority: ${guidance}. Confidence: ${assessment.diagnostics.confidence.toLowerCase()} (${assessment.diagnostics.intensity.toLowerCase()} signal).${transitionCue}`;
+  const stagedRegimeLabel = stageLabel ? `${regimeLabel} — ${stageLabel}` : regimeLabel;
+  const summary = `${stagedRegimeLabel} posture: ${assessment.description} Priority: ${guidance}. Confidence: ${assessment.diagnostics.confidence.toLowerCase()} (${assessment.diagnostics.intensity.toLowerCase()} signal).${transitionCue}`;
   const title = recordDateLabel
     ? `Weekly action summary — ${recordDateLabel}`
     : "Weekly action summary";
@@ -215,6 +219,7 @@ export const buildWeeklySummary = ({
     summary,
     regime: assessment.regime,
     regimeLabel,
+    stageLabel,
     guidance,
     confidence: assessment.diagnostics.confidence,
     transitionWatch: assessment.diagnostics.transitionWatch,

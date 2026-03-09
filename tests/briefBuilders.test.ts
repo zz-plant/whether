@@ -180,6 +180,15 @@ describe("buildSlackBrief", () => {
     assert.match(citation, /Interpretation context: Forecast view \(forecast\)/);
   });
 
+  it("includes posture stage label in export surfaces when provided", () => {
+    const stageLabel = "Expansion — Late (Fragile)";
+    const brief = buildSlackBrief(assessment, treasury, sensors, macros, { postureWithStageLabel: stageLabel });
+    const citation = buildCallCitation(assessment, treasury, { postureWithStageLabel: stageLabel });
+
+    assert.match(brief, /Capital posture: Expansion — Late \(Fragile\)/);
+    assert.match(citation, /Posture: Expansion — Late \(Fragile\) \(EXPANSION\)/);
+  });
+
   it("omits interpretation context when default layer is selected", () => {
     const citation = buildCallCitation(assessment, treasury, {
       interpretationLayer: {
