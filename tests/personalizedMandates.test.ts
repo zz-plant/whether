@@ -24,6 +24,23 @@ const assessment: RegimeAssessment = {
   dataWarnings: [],
   thresholds: { baseRateTightness: 5, tightnessRegime: 70, riskAppetiteRegime: 50 },
   inputs: [],
+  policyAssessment: {
+    version: "policy-v1",
+    normalizations: [],
+    composites: { cts: 0, ras: 0 },
+    posture: "TRANSITION",
+    band: "NEUTRAL",
+    confidenceIndex: { agreement: 0, distanceFromNeutral: 0, volatility30d: 0 },
+    refusal: { refused: false, reasons: [] },
+    governanceParameters: {
+      hiringThreshold: "HIGH",
+      paybackWindowTolerance: "STANDARD",
+      rollbackRequirement: "EXPLICIT_KILL_CRITERIA",
+      approvalVelocity: "BALANCED",
+      expansionScope: "BALANCED",
+      experimentationTolerance: "MEDIUM",
+    },
+  },
 };
 
 describe("personalized mandates", () => {

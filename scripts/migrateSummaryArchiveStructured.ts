@@ -57,7 +57,7 @@ const run = async () => {
             regime: normalizedEntry.summary?.regime ?? "VOLATILE",
             constraints: normalizedEntry.summary?.constraints ?? [],
             governanceParameters: getGovernanceParametersForPosture(
-              postureFromRegime(normalizedEntry.summary?.regime),
+              postureFromRegime(normalizedEntry.summary?.regime ?? "VOLATILE"),
               false,
             ),
           }),

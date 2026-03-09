@@ -6,7 +6,9 @@ import { GET as getQuarterlyRoute } from "../app/api/quarterly/route";
 import { GET as getYearlyRoute } from "../app/api/yearly/route";
 
 const assertIsoTimestamp = (value: unknown, label: string) => {
-  assert.equal(typeof value, "string", `${label} should be a string`);
+  if (typeof value !== "string") {
+    assert.fail(`${label} should be a string`);
+  }
   assert.ok(!Number.isNaN(Date.parse(value)), `${label} should be a valid ISO timestamp`);
 };
 

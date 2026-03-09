@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
+// @ts-expect-error next config is JavaScript module
 import nextConfig from "../next.config.js";
 
 describe("next.config redirects", () => {

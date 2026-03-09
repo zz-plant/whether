@@ -424,7 +424,14 @@ export const buildHomeBriefModel = (
         direction: reversalDirection,
       });
 
-  const regimeDistance =
+  const regimeDistance: {
+    dimensionLabel: string;
+    dimensionKey: "tightness" | "riskAppetite";
+    currentValue: number;
+    thresholdValue: number;
+    pointsToFlip: number;
+    thresholdDirection: BoundaryDirection;
+  } =
     reversalDimension === "tightness"
       ? {
           dimensionLabel: "Tightness",

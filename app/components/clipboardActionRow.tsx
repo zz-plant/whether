@@ -15,7 +15,9 @@ type ClipboardActionRowProps = {
   showStatus?: boolean;
   statusMessages?: Partial<Record<ClipboardUiState, ReactNode>>;
   buttonLabels?: Partial<Record<ClipboardUiState, ReactNode>>;
-  buttonProps?: ButtonHTMLAttributes<HTMLButtonElement>;
+  buttonProps?: ButtonHTMLAttributes<HTMLButtonElement> & {
+    [key: `data-${string}`]: string | undefined;
+  };
 };
 
 const BUTTON_VARIANT_CLASS: Record<"button" | "pill", string> = {

@@ -24,6 +24,9 @@ describe("decision shield verdicts", () => {
         confidence: "LOW",
         transitionWatch: false,
         intensity: "MILD",
+        boundaryContributors: [],
+        weakReadCount: 0,
+        twoWeakReadsWarning: false,
       },
       description: "",
       constraints: [],
@@ -36,6 +39,23 @@ describe("decision shield verdicts", () => {
         riskAppetiteRegime: 50,
       },
       inputs: [],
+      policyAssessment: {
+        version: "policy-v1",
+        normalizations: [],
+        composites: { cts: 0, ras: 0 },
+        posture: "TRANSITION",
+        band: "NEUTRAL",
+        confidenceIndex: { agreement: 0, distanceFromNeutral: 0, volatility30d: 0 },
+        refusal: { refused: false, reasons: [] },
+        governanceParameters: {
+          hiringThreshold: "HIGH",
+          paybackWindowTolerance: "STANDARD",
+          rollbackRequirement: "EXPLICIT_KILL_CRITERIA",
+          approvalVelocity: "BALANCED",
+          expansionScope: "BALANCED",
+          experimentationTolerance: "MEDIUM",
+        },
+      },
     };
 
     const output = evaluateDecision(assessment, {
@@ -65,6 +85,9 @@ describe("decision shield verdicts", () => {
         confidence: "LOW",
         transitionWatch: false,
         intensity: "MILD",
+        boundaryContributors: [],
+        weakReadCount: 0,
+        twoWeakReadsWarning: false,
       },
       description: "",
       constraints: [],
@@ -77,6 +100,23 @@ describe("decision shield verdicts", () => {
         riskAppetiteRegime: 50,
       },
       inputs: [],
+      policyAssessment: {
+        version: "policy-v1",
+        normalizations: [],
+        composites: { cts: 0, ras: 0 },
+        posture: "TRANSITION",
+        band: "NEUTRAL",
+        confidenceIndex: { agreement: 0, distanceFromNeutral: 0, volatility30d: 0 },
+        refusal: { refused: false, reasons: [] },
+        governanceParameters: {
+          hiringThreshold: "HIGH",
+          paybackWindowTolerance: "STANDARD",
+          rollbackRequirement: "EXPLICIT_KILL_CRITERIA",
+          approvalVelocity: "BALANCED",
+          expansionScope: "BALANCED",
+          experimentationTolerance: "MEDIUM",
+        },
+      },
     };
 
     const output = evaluateDecision(assessment, {
@@ -106,6 +146,9 @@ describe("decision shield verdicts", () => {
         confidence: "LOW",
         transitionWatch: false,
         intensity: "MILD",
+        boundaryContributors: [],
+        weakReadCount: 0,
+        twoWeakReadsWarning: false,
       },
       description: "",
       constraints: [],
@@ -118,6 +161,23 @@ describe("decision shield verdicts", () => {
         riskAppetiteRegime: 50,
       },
       inputs: [],
+      policyAssessment: {
+        version: "policy-v1",
+        normalizations: [],
+        composites: { cts: 0, ras: 0 },
+        posture: "TRANSITION",
+        band: "NEUTRAL",
+        confidenceIndex: { agreement: 0, distanceFromNeutral: 0, volatility30d: 0 },
+        refusal: { refused: false, reasons: [] },
+        governanceParameters: {
+          hiringThreshold: "HIGH",
+          paybackWindowTolerance: "STANDARD",
+          rollbackRequirement: "EXPLICIT_KILL_CRITERIA",
+          approvalVelocity: "BALANCED",
+          expansionScope: "BALANCED",
+          experimentationTolerance: "MEDIUM",
+        },
+      },
     };
 
     const output = evaluateDecision(assessment, {
@@ -149,6 +209,9 @@ describe("decision shield verdicts", () => {
         confidence: "LOW",
         transitionWatch: false,
         intensity: "MILD",
+        boundaryContributors: [],
+        weakReadCount: 0,
+        twoWeakReadsWarning: false,
       },
       description: "",
       constraints: [],
@@ -161,6 +224,23 @@ describe("decision shield verdicts", () => {
         riskAppetiteRegime: 50,
       },
       inputs: [],
+      policyAssessment: {
+        version: "policy-v1",
+        normalizations: [],
+        composites: { cts: 0, ras: 0 },
+        posture: "TRANSITION",
+        band: "NEUTRAL",
+        confidenceIndex: { agreement: 0, distanceFromNeutral: 0, volatility30d: 0 },
+        refusal: { refused: false, reasons: [] },
+        governanceParameters: {
+          hiringThreshold: "HIGH",
+          paybackWindowTolerance: "STANDARD",
+          rollbackRequirement: "EXPLICIT_KILL_CRITERIA",
+          approvalVelocity: "BALANCED",
+          expansionScope: "BALANCED",
+          experimentationTolerance: "MEDIUM",
+        },
+      },
     };
 
     const output = evaluateDecision(assessment, {
@@ -189,6 +269,9 @@ describe("decision shield verdicts", () => {
         confidence: "LOW",
         transitionWatch: false,
         intensity: "MILD",
+        boundaryContributors: [],
+        weakReadCount: 0,
+        twoWeakReadsWarning: false,
       },
       description: "",
       constraints: [],
@@ -201,6 +284,23 @@ describe("decision shield verdicts", () => {
         riskAppetiteRegime: 50,
       },
       inputs: [],
+      policyAssessment: {
+        version: "policy-v1",
+        normalizations: [],
+        composites: { cts: 0, ras: 0 },
+        posture: "TRANSITION",
+        band: "NEUTRAL",
+        confidenceIndex: { agreement: 0, distanceFromNeutral: 0, volatility30d: 0 },
+        refusal: { refused: false, reasons: [] },
+        governanceParameters: {
+          hiringThreshold: "HIGH",
+          paybackWindowTolerance: "STANDARD",
+          rollbackRequirement: "EXPLICIT_KILL_CRITERIA",
+          approvalVelocity: "BALANCED",
+          expansionScope: "BALANCED",
+          experimentationTolerance: "MEDIUM",
+        },
+      },
     };
 
     const output = evaluateDecision(assessment, {

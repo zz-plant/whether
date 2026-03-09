@@ -37,8 +37,11 @@ describe("time machine selection helpers", () => {
     );
   });
 
-  it("returns null when no older snapshot exists", () => {
-    assert.equal(getAdjacentTimeMachineRequest({ month: 10, year: 2024 }, "previous"), null);
+  it("returns previous snapshot when one exists", () => {
+    assert.deepEqual(getAdjacentTimeMachineRequest({ month: 10, year: 2024 }, "previous"), {
+      month: 9,
+      year: 2024,
+    });
   });
 
 });
