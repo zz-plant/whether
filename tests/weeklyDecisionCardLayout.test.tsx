@@ -43,6 +43,8 @@ describe("WeeklyDecisionCard top-fold composition", () => {
         signalConfidenceReason="Reason: regime boundary proximity + volatile macro signals"
         trendLabel="Improving"
         transitionWatch="ON"
+        operatingStanceLine="Stage decisions. Avoid irreversible spend."
+        weeklyMemoLines={["Market conditions tightened this week.", "Stage decisions. Avoid irreversible spend.", "Regime shift watch is on: stage approvals and preserve runway."]}
         netConstraintSummary="Pressure remains elevated but stabilizing."
         guardrail="Hold irreversible hiring unless direct revenue impact is clear."
         reversalTrigger="If risk appetite rises above 55, reopen selective hiring."
@@ -103,13 +105,15 @@ describe("WeeklyDecisionCard top-fold composition", () => {
       />,
     );
 
-    assert.match(html, /Weekly operating call/);
-    assert.match(html, /This week in 15 seconds/);
+    assert.match(html, /Startup Climate — Weekly Call/);
+    assert.match(html, /weekly-viral-hero/);
+    assert.match(html, /Startup capital cycle/);
     assert.match(html, /Key operational stance this week/);
     assert.match(html, /Expand:/);
     assert.match(html, /Avoid:/);
-    assert.match(html, /Macro posture band/);
-    assert.match(html, /points to flip/);
+    assert.match(html, /You are here:/);
+    assert.match(html, /Distance to regime change:/);
+    assert.match(html, /Weekly memo \(shareable\)/);
     assert.match(html, /Decision matrix this week/);
     assert.match(html, /Posture/);
     assert.match(html, /Movement/);
@@ -121,16 +125,14 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /id="primary-artifact-actions"/);
     assert.match(html, /Jump to copy actions/);
 
+    const heroIndex = html.indexOf("Startup Climate — Weekly Call");
     const actionIndex = html.indexOf("Action");
     const guardrailIndex = html.indexOf("Guardrail");
     const flipConditionIndex = html.indexOf("Flip condition");
-    const trendIndex = html.indexOf("Trend:");
-    const scoreMetadataIndex = html.indexOf("Context metric: Startup Climate Index");
 
+    assert.ok(actionIndex > heroIndex);
     assert.ok(guardrailIndex > actionIndex);
     assert.ok(flipConditionIndex > guardrailIndex);
-    assert.ok(scoreMetadataIndex > flipConditionIndex);
-    assert.ok(scoreMetadataIndex > trendIndex);
   });
 
   it("shows fallback warning copy when snapshot mode is active", () => {
@@ -146,6 +148,8 @@ describe("WeeklyDecisionCard top-fold composition", () => {
         signalConfidenceReason="Reason: broad agreement across signals; boundary distance is wide"
         trendLabel="Stable"
         transitionWatch="OFF"
+        operatingStanceLine="Hold approvals steady. Keep irreversible spend capped."
+        weeklyMemoLines={["Market conditions are stable this week.", "Hold approvals steady. Keep irreversible spend capped.", "Regime shift watch is off: hold current pace with bounded approvals."]}
         netConstraintSummary="Fallback snapshot is stable for near-term pacing."
         guardrail="Hold irreversible hiring unless demand proves durable."
         reversalTrigger="If tightness drops below 60, reopen selective hiring."
@@ -206,6 +210,6 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /Using a cached snapshot/);
     assert.match(html, /Regime transition pace: Expansion→Mixed: insufficient history/);
     assert.match(html, /Flip condition/);
-    assert.equal((html.match(/style="width:0%"/g) ?? []).length, 4);
+    assert.match(html, /weekly-viral-hero/);
   });
 });

@@ -78,6 +78,8 @@ describe("weekly card and interpretation panel composition", () => {
           signalConfidenceReason="Reason: regime boundary proximity + volatile macro signals"
           trendLabel="Stable"
           transitionWatch="ON"
+        operatingStanceLine="Stage decisions. Avoid irreversible spend."
+        weeklyMemoLines={["Market conditions tightened this week.", "Stage decisions. Avoid irreversible spend.", "Regime shift watch is on: stage approvals and preserve runway."]}
           netConstraintSummary="Pressure remains elevated."
           guardrail="Hold irreversible hiring unless direct revenue impact is clear."
           reversalTrigger="If risk appetite rises above 55, reopen selective hiring."
@@ -139,8 +141,9 @@ describe("weekly card and interpretation panel composition", () => {
       </>,
     );
 
-    assert.match(html, /Posture/);
-    assert.match(html, /Movement/);
+    assert.match(html, /Startup Climate — Weekly Call/);
+    assert.match(html, /Founder playbook/);
+    assert.match(html, /Weekly memo \(shareable\)/);
     assert.match(html, /Signal confidence/);
     assert.match(html, /Action/);
     assert.match(html, /Interpretation layer/);
@@ -174,6 +177,8 @@ describe("weekly card and interpretation panel composition", () => {
           signalConfidenceReason="Reason: regime boundary proximity + volatile macro signals"
           trendLabel="Stable"
           transitionWatch="ON"
+        operatingStanceLine="Stage decisions. Avoid irreversible spend."
+        weeklyMemoLines={["Market conditions tightened this week.", "Stage decisions. Avoid irreversible spend.", "Regime shift watch is on: stage approvals and preserve runway."]}
           netConstraintSummary="Pressure remains elevated."
           guardrail="Hold irreversible hiring unless direct revenue impact is clear."
           reversalTrigger="If risk appetite rises above 55, reopen selective hiring."
@@ -235,15 +240,15 @@ describe("weekly card and interpretation panel composition", () => {
       </>,
     );
 
-    const postureIndex = html.indexOf("Posture");
-    const movementIndex = html.indexOf("Movement");
+    const heroIndex = html.indexOf("Startup Climate — Weekly Call");
+    const playbookIndex = html.indexOf("Founder playbook");
     const confidenceIndex = html.indexOf("Confidence");
     const instructionIndex = html.indexOf("Action");
     const interpretationIndex = html.indexOf("Interpretation layer");
 
-    assert.ok(postureIndex > -1);
-    assert.ok(movementIndex > postureIndex);
-    assert.ok(confidenceIndex > movementIndex);
+    assert.ok(heroIndex > -1);
+    assert.ok(playbookIndex > heroIndex);
+    assert.ok(confidenceIndex > playbookIndex);
     assert.ok(instructionIndex > confidenceIndex);
     assert.ok(interpretationIndex > instructionIndex);
   });

@@ -189,6 +189,23 @@ describe("buildSlackBrief", () => {
     assert.match(citation, /Posture: Expansion — Late \(Fragile\) \(EXPANSION\)/);
   });
 
+  it("adds compact weekly call artifact lines when operating stance context is provided", () => {
+    const brief = buildSlackBrief(assessment, treasury, sensors, macros, {
+      postureWithStageLabel: "Guarded Expansion — Late",
+      operatingStanceLine: "Stage decisions. Avoid irreversible spend.",
+      trendLabel: "Deteriorating",
+      transitionWatch: "ON",
+      regimeDistancePoints: 2,
+    });
+
+    assert.match(brief, /Startup climate — weekly call:/);
+    assert.match(brief, /• Posture: Guarded Expansion — Late/);
+    assert.match(brief, /• Trend: DETERIORATING/);
+    assert.match(brief, /• Distance to regime change: 2\.0 points/);
+    assert.match(brief, /• Regime shift watch: ON/);
+    assert.match(brief, /• Operating stance: Stage decisions\. Avoid irreversible spend\./);
+  });
+
 
 
 
