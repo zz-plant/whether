@@ -106,14 +106,53 @@ if (disableWorkerMinification) {
 
 const args = useNextOnPages ? nextOnPagesArgs : ["build", "--webpack"];
 
+const suppressedCloudflareWarningPatterns = [
+  /^▲ \[WARNING\] Duplicate key "options" in object literal \[duplicate-object-key\]$/,
+  /^\s*<stdin>:\d+:\d+:/,
+  /^\s*The original key "options" is here:/,
+  /^\s*\d+ │/,
+  /^\s*╵/,
+];
+
+const shouldSuppressCloudflareWarningLine = (line) =>
+  suppressedCloudflareWarningPatterns.some((pattern) => pattern.test(line));
+
 const result = spawnSync(command, args, {
-  stdio: "inherit",
+  stdio: useNextOnPages ? "pipe" : "inherit",
+  encoding: "utf8",
   shell: true,
   env: {
     ...process.env,
     NEXT_TELEMETRY_DISABLED: "1",
   },
 });
+
+if (useNextOnPages) {
+  const outputChannels = [
+    { text: result.stdout ?? "", writer: process.stdout },
+    { text: result.stderr ?? "", writer: process.stderr },
+  ];
+
+
+  for (const channel of outputChannels) {
+    if (!channel.text) {
+      continue;
+    }
+
+    const filteredLines = [];
+
+    for (const line of channel.text.split(/\r?\n/)) {
+      if (shouldSuppressCloudflareWarningLine(line)) {
+        continue;
+      }
+
+      filteredLines.push(line);
+    }
+
+    channel.writer.write(filteredLines.join("\n"));
+  }
+
+}
 
 if (result.status !== 0) {
   process.exit(result.status ?? 1);

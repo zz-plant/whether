@@ -20,7 +20,6 @@ The warning classes below are currently expected in this project and are tracked
 - `Build not running on Vercel. System environment variables will not be available.`
 - `Bun is used as a package manager at build time only, not at runtime with Functions`
 - `Using edge runtime on a page currently disables static generation for that page`
-- `Duplicate key "options" in object literal [duplicate-object-key]`
 - `Invalid prerender config for /answers/[slug]` (and `.rsc`)
 - `Invalid prerender config for /concepts/[slug]` (and `.rsc`)
 - `Invalid prerender config for /concepts/audience/[audience]` (and `.rsc`)
@@ -35,11 +34,13 @@ The warning classes below are currently expected in this project and are tracked
 - `Invalid prerender config for /startup-macro-posture/[regime]` (and `.rsc`)
 - `Invalid prerender config for /toolkits/[slug]` (and `.rsc`)
 
-As of `next@16.1.6`, the latest published `@cloudflare/next-on-pages` is `1.13.16`; no newer adapter release is available yet to remove this warning class at source.
+As of `next@16.1.6`, the latest published `@cloudflare/next-on-pages` is `1.13.16`; no newer adapter release is available yet to remove these adapter warning classes at source.
+
+Known third-party minifier noise (`duplicate-object-key`) is intentionally suppressed at build-log emission time and tracked in `.github/cloudflare/warning-policy.md`.
 
 If CI reports a new warning class, treat it as action-required until triaged and either:
 1. fixed in code/dependencies, or
-2. intentionally accepted and added to `.github/cloudflare/warning-baseline.txt`.
+2. intentionally accepted and added to `.github/cloudflare/warning-baseline.txt` (or `.github/cloudflare/warning-policy.md` for explicit suppressions).
 
 ## Warning budget policy
 
