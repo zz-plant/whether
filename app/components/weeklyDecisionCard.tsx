@@ -44,6 +44,7 @@ export type WeeklyDecisionCardProps = {
   transitionProbabilities: Record<ForecastRegimeLabel, number>;
   decisionRules: BoundedDecisionRule[];
   roleAwareTemplates: RoleAwareOperatingTemplate[];
+  executiveOperationalStance: { expand: string[]; avoid: string[] };
   revisitDecisions: boolean;
   memoryRail: MemoryRailItem[];
   historicalTimeline: Array<{ label: string; posture: string }>;
@@ -203,6 +204,7 @@ type DecisionCallHeaderProps = {
   movementVelocity: "Low" | "Medium" | "High";
   topContributorInline: string;
   startupClimateIndex: Pick<WeeklyDecisionCardProps["startupClimateIndex"], "score" | "status">;
+  executiveOperationalStance: WeeklyDecisionCardProps["executiveOperationalStance"];
 };
 
 export function DecisionCallHeader({
@@ -226,6 +228,7 @@ export function DecisionCallHeader({
   movementVelocity,
   topContributorInline,
   startupClimateIndex,
+  executiveOperationalStance,
 }: DecisionCallHeaderProps) {
   const gaugePercent = regimeGaugePercentByLabel[statusLabel] ?? 50;
   const thresholdBreached =
@@ -249,6 +252,28 @@ export function DecisionCallHeader({
         <p className="text-sm leading-relaxed text-slate-200">{meetingShorthand}</p>
         <p className="text-xs text-slate-300">Top contributors: {topContributorInline}</p>
 
+
+        <article className={tierOneInset} aria-label="Key operational stance this week">
+          <h3 className={tierTwoHeading}>Key operational stance this week</h3>
+          <div className="mt-2 grid gap-3 sm:grid-cols-2">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-emerald-200">Expand:</p>
+              <ul className="mt-1 space-y-1 text-xs text-slate-200">
+                {executiveOperationalStance.expand.slice(0, 4).map((item) => (
+                  <li key={`expand-${item}`} className="leading-relaxed">• {item}</li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-rose-200">Avoid:</p>
+              <ul className="mt-1 space-y-1 text-xs text-slate-200">
+                {executiveOperationalStance.avoid.slice(0, 4).map((item) => (
+                  <li key={`avoid-${item}`} className="leading-relaxed">• {item}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </article>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" aria-label="Operating call summary">
           <div className={tierOneInset}>
             <SummaryLabel
@@ -524,6 +549,7 @@ export function WeeklyDecisionCard({
   transitionProbabilities,
   decisionRules,
   roleAwareTemplates,
+  executiveOperationalStance,
   revisitDecisions,
   memoryRail,
   historicalTimeline,
@@ -621,6 +647,7 @@ export function WeeklyDecisionCard({
         movementVelocity={movementVelocity}
         topContributorInline={topContributorInline}
         startupClimateIndex={startupClimateIndex}
+        executiveOperationalStance={executiveOperationalStance}
       />
 
       {actions ? (
