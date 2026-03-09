@@ -78,6 +78,16 @@ describe("WeeklyDecisionCard top-fold composition", () => {
           dimensionKey: "tightness",
           thresholdDirection: "riseAbove",
         }}
+        regimeVelocity={{
+          status: "ok",
+          from: "Expansion",
+          to: "Mixed",
+          sampleSize: 4,
+          lowerBoundMonths: 3,
+          upperBoundMonths: 6,
+          typicalRangeLabel: "3–6 months",
+          displayLabel: "Expansion→Mixed typically 3–6 months",
+        }}
         citation="Whether weekly brief citation"
         actions={<button type="button">Copy weekly brief</button>}
       />,
@@ -94,6 +104,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /Action/);
     assert.match(html, /Movement/);
     assert.match(html, /Velocity:/);
+    assert.match(html, /Regime transition pace: Expansion→Mixed typically 3–6 months/);
     assert.match(html, /id="primary-artifact-actions"/);
     assert.match(html, /Jump to copy actions/);
   });
@@ -148,12 +159,20 @@ describe("WeeklyDecisionCard top-fold composition", () => {
           dimensionKey: "tightness",
           thresholdDirection: "riseAbove",
         }}
+        regimeVelocity={{
+          status: "insufficient_history",
+          from: "Expansion",
+          to: "Mixed",
+          sampleSize: 1,
+          displayLabel: "Expansion→Mixed: insufficient history",
+        }}
         citation="Whether weekly brief citation"
         isFallbackSnapshot={true}
       />,
     );
 
     assert.match(html, /Using a cached snapshot/);
+    assert.match(html, /Regime transition pace: Expansion→Mixed: insufficient history/);
     assert.match(html, /Flip condition/);
     assert.equal((html.match(/style="width:0%"/g) ?? []).length, 4);
   });

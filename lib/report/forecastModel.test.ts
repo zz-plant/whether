@@ -7,6 +7,7 @@ import { buildReportDynamics } from "./reportData";
 import {
   buildFallbackForecastModel,
   buildForecastModel,
+  buildTransitionVelocityEstimateFromDurations,
   classifyBoundaryMomentum,
   classifyCrossingRisk,
 } from "./forecastModel";
@@ -373,5 +374,35 @@ describe("buildFallbackForecastModel", () => {
       tightness: "stable",
       yieldCurveProxy: "stable",
     });
+  });
+});
+
+
+describe("transition velocity estimates", () => {
+  it("bins durations into a typical month range", () => {
+    const estimate = buildTransitionVelocityEstimateFromDurations({
+      from: "Expansion",
+      to: "Mixed",
+      durationsDays: [72, 95, 130, 176],
+    });
+
+    assert.equal(estimate.status, "ok");
+    if (estimate.status === "ok") {
+      assert.equal(estimate.lowerBoundMonths, 3);
+      assert.equal(estimate.upperBoundMonths, 5);
+      assert.match(estimate.displayLabel, /typically 3–5 months/);
+    }
+  });
+
+  it("returns explicit insufficient history marker for low-sample transitions", () => {
+    const estimate = buildTransitionVelocityEstimateFromDurations({
+      from: "Defensive",
+      to: "Scarcity",
+      durationsDays: [88],
+    });
+
+    assert.equal(estimate.status, "insufficient_history");
+    assert.equal(estimate.sampleSize, 1);
+    assert.match(estimate.displayLabel, /insufficient history/i);
   });
 });

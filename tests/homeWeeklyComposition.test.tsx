@@ -113,6 +113,16 @@ describe("weekly card and interpretation panel composition", () => {
             dimensionKey: "tightness",
             thresholdDirection: "riseAbove",
           }}
+          regimeVelocity={{
+            status: "ok",
+            from: "Expansion",
+            to: "Mixed",
+            sampleSize: 4,
+            lowerBoundMonths: 3,
+            upperBoundMonths: 6,
+            typicalRangeLabel: "3–6 months",
+            displayLabel: "Expansion→Mixed typically 3–6 months",
+          }}
           citation="Whether weekly brief citation"
         />
         <HomeInterpretationPanel layer={layer} searchParams={{ view: "company", month: "3", year: "2026" }} />
@@ -190,6 +200,16 @@ describe("weekly card and interpretation panel composition", () => {
             pointsToFlip: 6,
             dimensionKey: "tightness",
             thresholdDirection: "riseAbove",
+          }}
+          regimeVelocity={{
+            status: "ok",
+            from: "Expansion",
+            to: "Mixed",
+            sampleSize: 4,
+            lowerBoundMonths: 3,
+            upperBoundMonths: 6,
+            typicalRangeLabel: "3–6 months",
+            displayLabel: "Expansion→Mixed typically 3–6 months",
           }}
           citation="Whether weekly brief citation"
         />

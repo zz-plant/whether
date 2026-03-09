@@ -44,6 +44,7 @@ describe("buildHomeBriefModel", () => {
     assert.equal(model.startupClimateIndex.breakdown.length, 4);
     assert.match(model.whyThisCall[0].detail, /threshold|range|outside/i);
     assert.match(model.decisionRules[0].pauseTrigger, /\d/);
+    assert.equal(typeof model.regimeVelocity.displayLabel, "string");
   });
 
   it("returns no-change decision summary when there are no deltas", () => {
