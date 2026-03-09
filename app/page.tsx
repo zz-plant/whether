@@ -43,13 +43,7 @@ const WeeklyActionSummaryPanel = dynamic(
     import("./components/boardBriefSections").then(
       (module) => module.WeeklyActionSummaryPanel,
     ),
-  {
-    loading: () => (
-      <section id="weekly-action-summary" aria-label="Weekly action summary" className="space-y-8">
-        <div className="weather-panel px-5 py-5 text-sm text-slate-300">Loading weekly action summary…</div>
-      </section>
-    ),
-  },
+  { suspense: true },
 );
 
 const ExecutiveSnapshotPanel = dynamic(
@@ -57,13 +51,19 @@ const ExecutiveSnapshotPanel = dynamic(
     import("./components/boardBriefSections").then(
       (module) => module.ExecutiveSnapshotPanel,
     ),
-  {
-    loading: () => (
-      <section id="executive-snapshot" aria-label="Leadership summary" className="space-y-8">
-        <div className="weather-panel px-5 py-5 text-sm text-slate-300">Loading evidence snapshot…</div>
-      </section>
-    ),
-  },
+  { suspense: true },
+);
+
+const WeeklyActionSummaryFallback = () => (
+  <section id="weekly-action-summary" aria-label="Weekly action summary" className="space-y-8">
+    <div className="weather-panel px-5 py-5 text-sm text-slate-300">Loading weekly action summary…</div>
+  </section>
+);
+
+const ExecutiveSnapshotFallback = () => (
+  <section id="executive-snapshot" aria-label="Leadership summary" className="space-y-8">
+    <div className="weather-panel px-5 py-5 text-sm text-slate-300">Loading evidence snapshot…</div>
+  </section>
 );
 
 export const revalidate = 900;
@@ -445,27 +445,31 @@ const HomePageReportContent = async ({
       ) : null}
 
       <RevealOnView>
-        <section
-          id="weekly-action-summary"
-          aria-label="Weekly action summary"
-          className="space-y-8"
-        >
-          <WeeklyActionSummaryPanel
-            assessment={assessment}
-            provenance={treasuryProvenance}
-            recordDateLabel={recordDateLabel}
-          />
-        </section>
+        <Suspense fallback={<WeeklyActionSummaryFallback />}>
+          <section
+            id="weekly-action-summary"
+            aria-label="Weekly action summary"
+            className="space-y-8"
+          >
+            <WeeklyActionSummaryPanel
+              assessment={assessment}
+              provenance={treasuryProvenance}
+              recordDateLabel={recordDateLabel}
+            />
+          </section>
+        </Suspense>
       </RevealOnView>
 
       <RevealOnView>
-        <section id="executive-snapshot" aria-label="Leadership summary" className="space-y-8">
-          <ExecutiveSnapshotPanel
-            treasury={treasury}
-            assessment={assessment}
-            provenance={treasuryProvenance}
-          />
-        </section>
+        <Suspense fallback={<ExecutiveSnapshotFallback />}>
+          <section id="executive-snapshot" aria-label="Leadership summary" className="space-y-8">
+            <ExecutiveSnapshotPanel
+              treasury={treasury}
+              assessment={assessment}
+              provenance={treasuryProvenance}
+            />
+          </section>
+        </Suspense>
       </RevealOnView>
 
     </ReportShell>
