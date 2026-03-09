@@ -68,6 +68,7 @@ type PrimaryDriverItem = {
 };
 
 type WhyThisCallItem = {
+  key?: "distance-to-regime-change" | "momentum" | "signal-reliability";
   label: string;
   detail: string;
 };
@@ -440,10 +441,12 @@ const buildWhyThisCall = ({
 
   return [
     {
+      key: "distance-to-regime-change",
       label: "Distance to regime change",
       detail: `Nearest regime change trigger is ${nearestGap.toFixed(1)} points away (${boundaryLabel}).`,
     },
     {
+      key: "momentum",
       label: "What moved this week",
       detail:
         reportDynamics?.changedSignals.length
@@ -451,6 +454,7 @@ const buildWhyThisCall = ({
           : "No material signal move this week; posture is driven by current levels and threshold distance.",
     },
     {
+      key: "signal-reliability",
       label: "Signal reliability",
       detail: transitionWatch === "ON" ? "Transition watch is ON; check next release before irreversible commitments." : "Transition watch is OFF; signal set is stable for near-term planning.",
     },

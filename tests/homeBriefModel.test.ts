@@ -108,7 +108,7 @@ describe("buildHomeBriefModel", () => {
       },
     });
 
-    const momentumReason = model.whyThisCall.find((reason) => reason.label === "Momentum")?.detail ?? "";
+    const momentumReason = model.whyThisCall.find((reason) => reason.key === "momentum" || reason.label === "Momentum" || reason.label === "What moved this week")?.detail ?? "";
     assert.match(momentumReason, /Risk appetite improving this week; improving overall\./);
     assert.doesNotMatch(momentumReason, /tightness/i);
   });

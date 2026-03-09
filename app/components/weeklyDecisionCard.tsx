@@ -30,7 +30,7 @@ export type WeeklyDecisionCardProps = {
   statusLabel: string;
   postureLabel: string;
   stageLabel: string;
-  postureWithStageLabel: string;
+  postureWithStageLabel?: string;
   postureDelta: string;
   confidenceLabel: "HIGH" | "MED" | "LOW";
   confidencePercent: number;
@@ -222,9 +222,9 @@ const PostureHistoryTimeline = ({ historicalTimeline }: { historicalTimeline: We
 
 type DecisionCallHeaderProps = {
   statusLabel: string;
-  postureLabel: string;
-  stageLabel: string;
-  postureWithStageLabel: string;
+  postureLabel?: string;
+  stageLabel?: string;
+  postureWithStageLabel?: string;
   netConstraintSummary: string;
   meetingShorthand: string;
   postureDelta: string;
@@ -291,6 +291,10 @@ export function DecisionCallHeader({
   const thresholdDistance = Math.abs(regimeDistance.currentValue - regimeDistance.thresholdValue);
   const thresholdRatio = Math.max(8, Math.min(100, Math.round((thresholdDistance / 20) * 100)));
   const confidenceMeterPercent = Math.max(8, Math.min(100, confidencePercent));
+  const [derivedPostureLabel, derivedStageLabel] = (postureWithStageLabel ?? "").split(" — ");
+  const resolvedPostureLabel = postureLabel ?? derivedPostureLabel ?? statusLabel;
+  const resolvedStageLabel = stageLabel ?? derivedStageLabel ?? "Unspecified";
+  const resolvedPostureWithStageLabel = postureWithStageLabel ?? `${resolvedPostureLabel} — ${resolvedStageLabel}`;
 
   return (
     <header className="space-y-5 border-b border-slate-700/80 pb-6" data-testid="weekly-top-fold">
@@ -299,8 +303,8 @@ export function DecisionCallHeader({
         This week&apos;s operating posture
       </h1>
       <div className="space-y-1 text-lg font-semibold text-slate-50 sm:text-xl">
-        <p>Regime: {postureLabel}</p>
-        <p>Stage: {stageLabel}</p>
+        <p>Regime: {resolvedPostureLabel}</p>
+        <p>Stage: {resolvedStageLabel}</p>
       </div>
 
       <article className={`${tierOnePanel} ${sectionSpacing}`} aria-label="Operating call panel">
@@ -337,7 +341,7 @@ export function DecisionCallHeader({
               label="Posture"
               icon={<svg viewBox="0 0 16 16" className="h-3.5 w-3.5"><circle cx="8" cy="8" r="5" fill="none" stroke="currentColor" strokeWidth="1.5" /><circle cx="8" cy="8" r="1.5" fill="currentColor" /></svg>}
             />
-            <p className="mt-1 text-lg font-semibold text-slate-100">{postureWithStageLabel}</p>
+            <p className="mt-1 text-lg font-semibold text-slate-100">{resolvedPostureWithStageLabel}</p>
           </div>
           <div className={tierOneInset}>
             <SummaryLabel
@@ -723,7 +727,7 @@ export function WeeklyDecisionCard({
         statusLabel={statusLabel}
         postureLabel={postureLabel}
         stageLabel={stageLabel}
-        postureWithStageLabel={postureWithStageLabel}
+        postureWithStageLabel={resolvedPostureWithStageLabel}
         netConstraintSummary={netConstraintSummary}
         meetingShorthand={meetingShorthand}
         postureDelta={postureDelta}
