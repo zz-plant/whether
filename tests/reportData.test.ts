@@ -105,6 +105,18 @@ describe("buildReportDynamics", () => {
       ["riskAppetite", "baseRate", "tightness", "curveSlope"],
     );
   });
+
+  it("flags extreme weekly shifts as anomalies instead of normal deltas", () => {
+    const previous = makeAssessment({ tightness: 94, riskAppetite: 61, baseRate: 4, curveSlope: 0.2 });
+    const current = makeAssessment({ tightness: 0, riskAppetite: 60, baseRate: 4.05, curveSlope: 0.21 });
+
+    const dynamics = buildReportDynamics({ current, previous });
+
+    assert.equal(dynamics.changedSignals.some((signal) => signal.key === "tightness"), false);
+    assert.equal(dynamics.anomalySignals.length, 1);
+    assert.equal(dynamics.anomalySignals[0]?.key, "tightness");
+    assert.match(dynamics.anomalySignals[0]?.reason ?? "", /sanity threshold/i);
+  });
 });
 
 describe("buildSnapshotFallbackTreasury", () => {

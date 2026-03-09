@@ -10,9 +10,10 @@ const reportDynamics: ReportDynamics = {
   totalSignalChanges: 2,
   regimeChanged: false,
   changedSignals: [
-    { key: "tightness", label: "Cash availability", delta: 3 },
+    { key: "tightness", label: "Cash tightness", delta: 3 },
     { key: "riskAppetite", label: "Risk appetite", delta: -2 },
   ],
+  anomalySignals: [],
 };
 
 const decisionRules: BoundedDecisionRule[] = [
@@ -93,7 +94,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
         reversalTrigger="If tightness drops below 60, reopen selective hiring."
         recordDateLabel="Mar 5, 2026"
         fetchedAtLabel="Mar 6, 2026 09:12 UTC"
-        reportDynamics={{ directionLabel: "stable", changedSignals: [], totalSignalChanges: 0, regimeChanged: false }}
+        reportDynamics={{ directionLabel: "stable", changedSignals: [], anomalySignals: [], totalSignalChanges: 0, regimeChanged: false }}
         decisionShiftSummary="No material signal shift in fallback mode."
         decisionRules={decisionRules}
         revisitDecisions={false}
