@@ -101,6 +101,40 @@ const regimeGaugePercentByLabel: Record<string, number> = {
   EXPANSION: 75,
 };
 
+const clampPercent = (value: number) => Math.max(0, Math.min(100, value));
+
+const resolveMacroBandUi = ({
+  regimeLabel,
+  pointsToFlip,
+  thresholdDirection,
+  thresholdValue,
+}: {
+  regimeLabel: string;
+  pointsToFlip: number;
+  thresholdDirection: WeeklyDecisionCardProps["regimeDistance"]["thresholdDirection"];
+  thresholdValue: number;
+}) => {
+  const markerPercent = clampPercent(regimeGaugePercentByLabel[regimeLabel] ?? 50);
+  const normalizedDistance = Math.max(0, Math.min(1, Math.abs(pointsToFlip) / 20));
+  const zoneWidth = Math.max(6, Math.min(22, 6 + normalizedDistance * 16));
+  const zoneStart =
+    thresholdDirection === "riseAbove"
+      ? clampPercent(markerPercent)
+      : clampPercent(markerPercent - zoneWidth);
+  const thresholdPercent = Number.isFinite(thresholdValue)
+    ? clampPercent(thresholdValue)
+    : clampPercent(
+      thresholdDirection === "riseAbove" ? markerPercent + zoneWidth : markerPercent - zoneWidth,
+    );
+
+  return {
+    markerPercent,
+    zoneStart,
+    zoneWidth,
+    thresholdPercent,
+  };
+};
+
 const resolveVelocityLabel = (rows: Array<{ delta: number }>): "Low" | "Medium" | "High" => {
   const totalMagnitude = rows.reduce((sum, row) => sum + Math.abs(row.delta), 0);
   if (totalMagnitude >= 6) {
@@ -236,7 +270,17 @@ export function DecisionCallHeader({
   startupClimateIndex,
   executiveOperationalStance,
 }: DecisionCallHeaderProps) {
-  const gaugePercent = regimeGaugePercentByLabel[statusLabel] ?? 50;
+  const {
+    markerPercent,
+    zoneStart,
+    zoneWidth,
+    thresholdPercent,
+  } = resolveMacroBandUi({
+    regimeLabel: statusLabel,
+    pointsToFlip: regimeDistance.pointsToFlip,
+    thresholdDirection: regimeDistance.thresholdDirection,
+    thresholdValue: regimeDistance.thresholdValue,
+  });
   const thresholdBreached =
     regimeDistance.thresholdDirection === "riseAbove"
       ? regimeDistance.currentValue > regimeDistance.thresholdValue
@@ -331,10 +375,25 @@ export function DecisionCallHeader({
               {regimeSegments.map((segment) => (
                 <div key={segment.key} className={segment.classes} aria-label={segment.label} />
               ))}
-              <div className="absolute -top-1 h-4 w-4 -translate-x-1/2 rounded-full border-2 border-slate-100 bg-sky-200" style={{ left: `${gaugePercent}%` }} />
+              <div
+                className="absolute inset-y-0 rounded-sm border border-amber-200/80 bg-amber-200/25"
+                style={{ left: `${zoneStart}%`, width: `${zoneWidth}%` }}
+                aria-hidden="true"
+              />
+              <div
+                className="absolute inset-y-[-1px] w-0.5 -translate-x-1/2 bg-amber-100"
+                style={{ left: `${thresholdPercent}%` }}
+                aria-label={`Threshold marker at ${regimeDistance.thresholdValue.toFixed(1)}`}
+              />
+              <div className="absolute -top-1 h-4 w-4 -translate-x-1/2 rounded-full border-2 border-slate-100 bg-sky-200" style={{ left: `${markerPercent}%` }} />
               {transitionWatch === "ON" ? <div className="absolute inset-y-[-2px] left-1/2 w-0.5 -translate-x-1/2 bg-amber-200/90" aria-hidden="true" /> : null}
             </div>
           </div>
+          <p className="mt-2 inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.1em] text-slate-300">
+            <span aria-hidden="true">◉ Current</span>
+            <span aria-hidden="true">│ Threshold {regimeDistance.thresholdValue.toFixed(1)}</span>
+            <span aria-hidden="true">▭ Flip zone</span>
+          </p>
           <p className="mt-2 text-xs text-slate-300">Trend: {trendLabel} · {Math.abs(regimeDistance.pointsToFlip).toFixed(1)} points to flip · Regime shift watch {transitionWatch}</p>
         </article>
 
