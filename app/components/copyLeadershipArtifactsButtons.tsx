@@ -2,6 +2,7 @@
 
 import { Button } from "@base-ui/react/button";
 import { useClipboardCopy } from "./useClipboardCopy";
+import { useHapticFeedback } from "./useHapticFeedback";
 
 export function CopyLeadershipArtifactsButtons({
   slackBrief,
@@ -13,7 +14,14 @@ export function CopyLeadershipArtifactsButtons({
   citation: string;
 }) {
   const { status, activeTarget, copyToClipboard } = useClipboardCopy();
+  const triggerHaptic = useHapticFeedback();
   const isCopying = status === "copying";
+
+  const handleExportPdf = () => {
+    // Haptics should reinforce decision delta and artifact completion, not decorative interaction.
+    triggerHaptic("success");
+    window.print();
+  };
 
   const copyLabel = (target: "Slack" | "Board" | "Citation", label: string) =>
     isCopying && activeTarget === target ? "Copying" : label;
@@ -53,7 +61,7 @@ export function CopyLeadershipArtifactsButtons({
         </Button>
         <Button
           type="button"
-          onClick={() => window.print()}
+          onClick={handleExportPdf}
           className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-200 touch-manipulation"
         >
           Export PDF
@@ -85,7 +93,7 @@ export function CopyLeadershipArtifactsButtons({
           </Button>
           <Button
             type="button"
-            onClick={() => window.print()}
+            onClick={handleExportPdf}
             className={secondaryActionClassName}
           >
             Export PDF
