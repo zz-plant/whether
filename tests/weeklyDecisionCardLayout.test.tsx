@@ -34,9 +34,13 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     const html = renderToStaticMarkup(
       <WeeklyDecisionCard
         statusLabel="DEFENSIVE"
+        postureLabel="Defensive"
+        stageLabel="Watchful"
+        postureWithStageLabel="Defensive — Watchful"
         postureDelta="Worse than last week"
         confidenceLabel="MED"
         confidencePercent={68}
+        signalConfidenceReason="Reason: regime boundary proximity + volatile macro signals"
         trendLabel="Improving"
         transitionWatch="ON"
         netConstraintSummary="Pressure remains elevated but stabilizing."
@@ -64,6 +68,10 @@ describe("WeeklyDecisionCard top-fold composition", () => {
             flipTrigger: "Reopen growth pacing after two improving reads.",
           },
         ]}
+        executiveOperationalStance={{
+          expand: ["Increase product tempo for reversible bets", "Selective hiring for revenue-linked roles"],
+          avoid: ["net-new hiring if tightness > 74", "long-payback bets if risk appetite < 44"],
+        }}
         revisitDecisions={true}
         memoryRail={[{ label: "Now", posture: "Defensive" }]}
         historicalTimeline={[{ label: "2026", posture: "Defensive" }]}
@@ -97,12 +105,15 @@ describe("WeeklyDecisionCard top-fold composition", () => {
 
     assert.match(html, /Weekly operating call/);
     assert.match(html, /This week in 15 seconds/);
+    assert.match(html, /Key operational stance this week/);
+    assert.match(html, /Expand:/);
+    assert.match(html, /Avoid:/);
     assert.match(html, /Macro posture band/);
     assert.match(html, /points to flip/);
     assert.match(html, /Decision matrix this week/);
     assert.match(html, /Posture/);
     assert.match(html, /Movement/);
-    assert.match(html, /Confidence/);
+    assert.match(html, /Signal confidence/);
     assert.match(html, /Action/);
     assert.match(html, /Movement/);
     assert.match(html, /Velocity:/);
@@ -126,9 +137,13 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     const html = renderToStaticMarkup(
       <WeeklyDecisionCard
         statusLabel="DEFENSIVE"
+        postureLabel="Defensive"
+        stageLabel="Watchful"
+        postureWithStageLabel="Defensive — Watchful"
         postureDelta="No worse than last week"
         confidenceLabel="HIGH"
         confidencePercent={92}
+        signalConfidenceReason="Reason: broad agreement across signals; boundary distance is wide"
         trendLabel="Stable"
         transitionWatch="OFF"
         netConstraintSummary="Fallback snapshot is stable for near-term pacing."
@@ -156,6 +171,10 @@ describe("WeeklyDecisionCard top-fold composition", () => {
             flipTrigger: "Reopen growth pacing after two improving reads.",
           },
         ]}
+        executiveOperationalStance={{
+          expand: ["Increase product tempo for reversible bets", "Selective hiring for revenue-linked roles"],
+          avoid: ["net-new hiring if tightness > 74", "long-payback bets if risk appetite < 44"],
+        }}
         revisitDecisions={false}
         memoryRail={[{ label: "Now", posture: "Defensive" }]}
         historicalTimeline={[{ label: "2026", posture: "Defensive" }]}

@@ -28,10 +28,13 @@ type FailureModeWarningItem = { id: string; warning: string; mitigationCheck: st
 
 export type WeeklyDecisionCardProps = {
   statusLabel: string;
+  postureLabel: string;
+  stageLabel: string;
   postureWithStageLabel: string;
   postureDelta: string;
   confidenceLabel: "HIGH" | "MED" | "LOW";
   confidencePercent: number;
+  signalConfidenceReason: string;
   trendLabel: string;
   transitionWatch: "ON" | "OFF";
   netConstraintSummary: string;
@@ -44,6 +47,7 @@ export type WeeklyDecisionCardProps = {
   transitionProbabilities: Record<ForecastRegimeLabel, number>;
   decisionRules: BoundedDecisionRule[];
   roleAwareTemplates: RoleAwareOperatingTemplate[];
+  executiveOperationalStance: { expand: string[]; avoid: string[] };
   revisitDecisions: boolean;
   memoryRail: MemoryRailItem[];
   historicalTimeline: Array<{ label: string; posture: string }>;
@@ -96,6 +100,40 @@ const regimeGaugePercentByLabel: Record<string, number> = {
   BALANCED: 50,
   VOLATILE: 50,
   EXPANSION: 75,
+};
+
+const clampPercent = (value: number) => Math.max(0, Math.min(100, value));
+
+const resolveMacroBandUi = ({
+  regimeLabel,
+  pointsToFlip,
+  thresholdDirection,
+  thresholdValue,
+}: {
+  regimeLabel: string;
+  pointsToFlip: number;
+  thresholdDirection: WeeklyDecisionCardProps["regimeDistance"]["thresholdDirection"];
+  thresholdValue: number;
+}) => {
+  const markerPercent = clampPercent(regimeGaugePercentByLabel[regimeLabel] ?? 50);
+  const normalizedDistance = Math.max(0, Math.min(1, Math.abs(pointsToFlip) / 20));
+  const zoneWidth = Math.max(6, Math.min(22, 6 + normalizedDistance * 16));
+  const zoneStart =
+    thresholdDirection === "riseAbove"
+      ? clampPercent(markerPercent)
+      : clampPercent(markerPercent - zoneWidth);
+  const thresholdPercent = Number.isFinite(thresholdValue)
+    ? clampPercent(thresholdValue)
+    : clampPercent(
+      thresholdDirection === "riseAbove" ? markerPercent + zoneWidth : markerPercent - zoneWidth,
+    );
+
+  return {
+    markerPercent,
+    zoneStart,
+    zoneWidth,
+    thresholdPercent,
+  };
 };
 
 const resolveVelocityLabel = (rows: Array<{ delta: number }>): "Low" | "Medium" | "High" => {
@@ -184,6 +222,8 @@ const PostureHistoryTimeline = ({ historicalTimeline }: { historicalTimeline: We
 
 type DecisionCallHeaderProps = {
   statusLabel: string;
+  postureLabel: string;
+  stageLabel: string;
   postureWithStageLabel: string;
   netConstraintSummary: string;
   meetingShorthand: string;
@@ -192,6 +232,7 @@ type DecisionCallHeaderProps = {
   guardrail: string;
   confidencePercent: number;
   confidenceLabel: WeeklyDecisionCardProps["confidenceLabel"];
+  signalConfidenceReason: string;
   trendLabel: WeeklyDecisionCardProps["trendLabel"];
   transitionWatch: WeeklyDecisionCardProps["transitionWatch"];
   freshnessLabel: string;
@@ -203,10 +244,13 @@ type DecisionCallHeaderProps = {
   movementVelocity: "Low" | "Medium" | "High";
   topContributorInline: string;
   startupClimateIndex: Pick<WeeklyDecisionCardProps["startupClimateIndex"], "score" | "status">;
+  executiveOperationalStance: WeeklyDecisionCardProps["executiveOperationalStance"];
 };
 
 export function DecisionCallHeader({
   statusLabel,
+  postureLabel,
+  stageLabel,
   postureWithStageLabel,
   netConstraintSummary,
   meetingShorthand,
@@ -215,6 +259,7 @@ export function DecisionCallHeader({
   guardrail,
   confidencePercent,
   confidenceLabel,
+  signalConfidenceReason,
   trendLabel,
   transitionWatch,
   freshnessLabel,
@@ -226,8 +271,19 @@ export function DecisionCallHeader({
   movementVelocity,
   topContributorInline,
   startupClimateIndex,
+  executiveOperationalStance,
 }: DecisionCallHeaderProps) {
-  const gaugePercent = regimeGaugePercentByLabel[statusLabel] ?? 50;
+  const {
+    markerPercent,
+    zoneStart,
+    zoneWidth,
+    thresholdPercent,
+  } = resolveMacroBandUi({
+    regimeLabel: statusLabel,
+    pointsToFlip: regimeDistance.pointsToFlip,
+    thresholdDirection: regimeDistance.thresholdDirection,
+    thresholdValue: regimeDistance.thresholdValue,
+  });
   const thresholdBreached =
     regimeDistance.thresholdDirection === "riseAbove"
       ? regimeDistance.currentValue > regimeDistance.thresholdValue
@@ -240,8 +296,12 @@ export function DecisionCallHeader({
     <header className="space-y-5 border-b border-slate-700/80 pb-6" data-testid="weekly-top-fold">
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Weekly operating call</p>
       <h1 id="weekly-posture-brief-title" className="text-3xl font-semibold text-slate-50 sm:text-4xl">
-        {postureWithStageLabel}
+        This week&apos;s operating posture
       </h1>
+      <div className="space-y-1 text-lg font-semibold text-slate-50 sm:text-xl">
+        <p>Regime: {postureLabel}</p>
+        <p>Stage: {stageLabel}</p>
+      </div>
 
       <article className={`${tierOnePanel} ${sectionSpacing}`} aria-label="Operating call panel">
         <h2 className={tierOneHeading}>This week in 15 seconds</h2>
@@ -249,6 +309,28 @@ export function DecisionCallHeader({
         <p className="text-sm leading-relaxed text-slate-200">{meetingShorthand}</p>
         <p className="text-xs text-slate-300">Top contributors: {topContributorInline}</p>
 
+
+        <article className={tierOneInset} aria-label="Key operational stance this week">
+          <h3 className={tierTwoHeading}>Key operational stance this week</h3>
+          <div className="mt-2 grid gap-3 sm:grid-cols-2">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-emerald-200">Expand:</p>
+              <ul className="mt-1 space-y-1 text-xs text-slate-200">
+                {executiveOperationalStance.expand.slice(0, 4).map((item) => (
+                  <li key={`expand-${item}`} className="leading-relaxed">• {item}</li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-rose-200">Avoid:</p>
+              <ul className="mt-1 space-y-1 text-xs text-slate-200">
+                {executiveOperationalStance.avoid.slice(0, 4).map((item) => (
+                  <li key={`avoid-${item}`} className="leading-relaxed">• {item}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </article>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4" aria-label="Operating call summary">
           <div className={tierOneInset}>
             <SummaryLabel
@@ -267,7 +349,7 @@ export function DecisionCallHeader({
           </div>
           <div className={tierOneInset}>
             <SummaryLabel
-              label="Confidence"
+              label="Signal confidence"
               icon={<svg viewBox="0 0 16 16" className="h-3.5 w-3.5"><path d="M8 2.5 12 4v3.6c0 2.5-1.6 4.8-4 5.9-2.4-1.1-4-3.4-4-5.9V4l4-1.5Z" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" /></svg>}
             />
             <p className="mt-1 text-lg font-semibold text-slate-100">{confidenceLabel}</p>
@@ -276,6 +358,7 @@ export function DecisionCallHeader({
               <div className={`${meterFillBase} bg-gradient-to-r from-slate-300/75 to-emerald-300/85`} style={{ width: `${confidenceMeterPercent}%` }} />
               <div className="absolute top-1/2 h-3 w-3 -translate-y-1/2 rounded-full border border-emerald-100/80 bg-slate-950" style={{ left: `calc(${confidenceMeterPercent}% - 6px)` }} />
             </div>
+            <p className="mt-2 text-xs text-slate-300">{signalConfidenceReason}</p>
           </div>
           <div className={tierOneInset}>
             <SummaryLabel
@@ -296,10 +379,25 @@ export function DecisionCallHeader({
               {regimeSegments.map((segment) => (
                 <div key={segment.key} className={segment.classes} aria-label={segment.label} />
               ))}
-              <div className="absolute -top-1 h-4 w-4 -translate-x-1/2 rounded-full border-2 border-slate-100 bg-sky-200" style={{ left: `${gaugePercent}%` }} />
+              <div
+                className="absolute inset-y-0 rounded-sm border border-amber-200/80 bg-amber-200/25"
+                style={{ left: `${zoneStart}%`, width: `${zoneWidth}%` }}
+                aria-hidden="true"
+              />
+              <div
+                className="absolute inset-y-[-1px] w-0.5 -translate-x-1/2 bg-amber-100"
+                style={{ left: `${thresholdPercent}%` }}
+                aria-label={`Threshold marker at ${regimeDistance.thresholdValue.toFixed(1)}`}
+              />
+              <div className="absolute -top-1 h-4 w-4 -translate-x-1/2 rounded-full border-2 border-slate-100 bg-sky-200" style={{ left: `${markerPercent}%` }} />
               {transitionWatch === "ON" ? <div className="absolute inset-y-[-2px] left-1/2 w-0.5 -translate-x-1/2 bg-amber-200/90" aria-hidden="true" /> : null}
             </div>
           </div>
+          <p className="mt-2 inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.1em] text-slate-300">
+            <span aria-hidden="true">◉ Current</span>
+            <span aria-hidden="true">│ Threshold {regimeDistance.thresholdValue.toFixed(1)}</span>
+            <span aria-hidden="true">▭ Flip zone</span>
+          </p>
           <p className="mt-2 text-xs text-slate-300">Trend: {trendLabel} · {Math.abs(regimeDistance.pointsToFlip).toFixed(1)} points to flip · Regime shift watch {transitionWatch}</p>
         </article>
 
@@ -525,10 +623,13 @@ export function CitationActionFooter({ citationMetaLine, citation, actions }: Ci
 
 export function WeeklyDecisionCard({
   statusLabel,
+  postureLabel,
+  stageLabel,
   postureWithStageLabel,
   postureDelta,
   confidenceLabel,
   confidencePercent,
+  signalConfidenceReason,
   trendLabel,
   transitionWatch,
   netConstraintSummary,
@@ -541,6 +642,7 @@ export function WeeklyDecisionCard({
   transitionProbabilities,
   decisionRules,
   roleAwareTemplates,
+  executiveOperationalStance,
   revisitDecisions,
   memoryRail,
   historicalTimeline,
@@ -619,6 +721,8 @@ export function WeeklyDecisionCard({
     <section className="weather-panel space-y-5 px-5 py-6 sm:space-y-6 sm:px-7 sm:py-8" aria-labelledby="weekly-posture-brief-title">
       <DecisionCallHeader
         statusLabel={statusLabel}
+        postureLabel={postureLabel}
+        stageLabel={stageLabel}
         postureWithStageLabel={postureWithStageLabel}
         netConstraintSummary={netConstraintSummary}
         meetingShorthand={meetingShorthand}
@@ -627,6 +731,7 @@ export function WeeklyDecisionCard({
         guardrail={guardrail}
         confidencePercent={confidencePercent}
         confidenceLabel={confidenceLabel}
+        signalConfidenceReason={signalConfidenceReason}
         trendLabel={trendLabel}
         transitionWatch={transitionWatch}
         freshnessLabel={freshnessLabel}
@@ -638,6 +743,7 @@ export function WeeklyDecisionCard({
         movementVelocity={movementVelocity}
         topContributorInline={topContributorInline}
         startupClimateIndex={startupClimateIndex}
+        executiveOperationalStance={executiveOperationalStance}
       />
 
       {actions ? (

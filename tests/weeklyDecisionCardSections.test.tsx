@@ -20,6 +20,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
         guardrail="Hold irreversible hiring"
         confidencePercent={70}
         confidenceLabel="MED"
+        signalConfidenceReason="Reason: regime boundary proximity + volatile macro signals"
         trendLabel="Mixed"
         transitionWatch="ON"
         freshnessLabel="Mar 6, 2026"
@@ -37,6 +38,10 @@ describe("WeeklyDecisionCard extracted sections", () => {
         }}
         movementVelocity="Low"
         startupClimateIndex={{ score: 62, status: "Stable" }}
+        executiveOperationalStance={{
+          expand: ["Increase product tempo for reversible bets", "Selective hiring for revenue-linked roles"],
+          avoid: ["net-new hiring if tightness > 74", "long-payback bets if risk appetite < 44"],
+        }}
       />,
     );
 
@@ -52,7 +57,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
     const actionIndex = html.indexOf("Action");
     const guardrailIndex = html.indexOf("Guardrail");
     const flipConditionIndex = html.indexOf("Flip condition");
-    const confidenceIndex = html.indexOf("Confidence");
+    const confidenceIndex = html.indexOf("Signal confidence");
     const trendIndex = html.indexOf("Trend:");
     const scoreMetadataIndex = html.indexOf("Context metric: Startup Climate Index");
 
@@ -74,6 +79,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
         guardrail="Keep irreversible spend capped"
         confidencePercent={74}
         confidenceLabel="MED"
+        signalConfidenceReason="Reason: regime boundary proximity + volatile macro signals"
         trendLabel="Mixed"
         transitionWatch="ON"
         freshnessLabel="Mar 6, 2026"
@@ -91,6 +97,10 @@ describe("WeeklyDecisionCard extracted sections", () => {
         }}
         movementVelocity="Medium"
         startupClimateIndex={{ score: 58, status: "Stable" }}
+        executiveOperationalStance={{
+          expand: ["Increase product tempo for reversible bets", "Selective hiring for revenue-linked roles"],
+          avoid: ["net-new hiring if tightness > 74", "long-payback bets if risk appetite < 44"],
+        }}
       />,
     );
 

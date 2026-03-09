@@ -417,10 +417,13 @@ const HomePageReportContent = async ({
     >
       <WeeklyDecisionCard
         statusLabel={displayRegime.label}
+        postureLabel={homeBriefModel.postureLabel}
+        stageLabel={homeBriefModel.stageLabel}
         postureWithStageLabel={homeBriefModel.postureWithStageLabel}
         postureDelta={homeBriefModel.postureDeltaLabel}
         confidenceLabel={homeBriefModel.confidenceLabel}
         confidencePercent={homeBriefModel.confidencePercent}
+        signalConfidenceReason={homeBriefModel.signalConfidenceReason}
         trendLabel={homeBriefModel.trendLabel}
         transitionWatch={homeBriefModel.transitionWatch}
         netConstraintSummary={homeBriefModel.netConstraintSummary}
@@ -433,6 +436,7 @@ const HomePageReportContent = async ({
         transitionProbabilities={homeBriefModel.transitionProbabilities}
         decisionRules={homeBriefModel.decisionRules}
         roleAwareTemplates={homeBriefModel.roleAwareTemplates}
+        executiveOperationalStance={homeBriefModel.executiveOperationalStance}
         revisitDecisions={homeBriefModel.revisitDecisions}
         memoryRail={homeBriefModel.memoryRail}
         historicalTimeline={homeBriefModel.historicalTimeline}

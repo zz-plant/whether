@@ -23,6 +23,8 @@ import {
   buildFailureModeWarnings,
   type FailureModeWarning,
 } from "./trustStatus";
+import type { BoundedDecisionRule } from "./boundedDecisionRules";
+import type { RoleAwareOperatingTemplate } from "./operatingCalls";
 
 type Regime = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
 
@@ -99,6 +101,59 @@ type MacroOverlayItem = {
 
 type HomeBriefFailureMode = FailureModeWarning;
 
+type ExecutiveOperationalStance = {
+  expand: string[];
+  avoid: string[];
+};
+
+const splitActionFragments = (value: string): string[] =>
+  value
+    .split(/(?<=[.;])\s+|\s+and\s+/gi)
+    .map((item) => item.trim())
+    .map((item) => item.replace(/[.;]+$/, "").trim())
+    .filter((item) => item.length > 0);
+
+const dedupeByStem = (items: string[]): string[] => {
+  const seen = new Set<string>();
+  return items.filter((item) => {
+    const stem = item.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+    if (!stem || seen.has(stem)) {
+      return false;
+    }
+    seen.add(stem);
+    return true;
+  });
+};
+
+export const extractExecutiveOperationalStance = ({
+  roleAwareTemplates,
+  decisionRules,
+  maxItemsPerList = 4,
+}: {
+  roleAwareTemplates: RoleAwareOperatingTemplate[];
+  decisionRules: BoundedDecisionRule[];
+  maxItemsPerList?: number;
+}): ExecutiveOperationalStance => {
+  const minItemsPerList = 2;
+  const expandCandidates = [
+    ...roleAwareTemplates.flatMap((template) => splitActionFragments(template.doNow)),
+    ...decisionRules.map((rule) => rule.recommendation.trim().replace(/[.;]+$/, "")),
+  ];
+  const avoidCandidates = [
+    ...roleAwareTemplates.flatMap((template) => splitActionFragments(template.avoidNow)),
+    ...decisionRules.map((rule) => rule.pauseTrigger.trim().replace(/^Pause\s+/i, "").replace(/[.;]+$/, "")),
+  ];
+
+  const clampMax = Math.max(minItemsPerList, maxItemsPerList);
+  const expand = dedupeByStem(expandCandidates).slice(0, clampMax);
+  const avoid = dedupeByStem(avoidCandidates).slice(0, clampMax);
+
+  return {
+    expand: expand.slice(0, Math.max(minItemsPerList, expand.length)),
+    avoid: avoid.slice(0, Math.max(minItemsPerList, avoid.length)),
+  };
+};
+
 const regimeShiftTargets = {
   SCARCITY: { defensive: "DEFENSIVE" },
   DEFENSIVE: { defensive: "SCARCITY" },
@@ -127,6 +182,43 @@ const buildDecisionShiftSummary = ({
     return `Changed: pressure rose versus last week. Do now: slow approvals, narrow experiments, and require tighter payback windows. Flip: ${reversalTrigger}`;
   }
   return `Changed: signals moved in opposite directions. Do now: hold approval pace and keep experiments reversible with explicit stop triggers. Flip: ${reversalTrigger}`;
+};
+
+const buildSignalConfidenceReason = ({
+  confidenceLabel,
+  nearestThresholdGap,
+  changedSignals,
+}: {
+  confidenceLabel: "LOW" | "MED" | "HIGH";
+  nearestThresholdGap: number;
+  changedSignals: Array<{ delta: number }>;
+}) => {
+  const boundaryDescriptor =
+    nearestThresholdGap <= 5
+      ? "regime boundary proximity"
+      : nearestThresholdGap <= 12
+        ? "moderate boundary distance"
+        : "wide boundary distance";
+
+  const hasPositiveMoves = changedSignals.some((signal) => signal.delta > 0);
+  const hasNegativeMoves = changedSignals.some((signal) => signal.delta < 0);
+  const directionalSplit = hasPositiveMoves && hasNegativeMoves;
+  const volatilityDescriptor =
+    changedSignals.length === 0
+      ? "stable signal readings"
+      : directionalSplit || changedSignals.length >= 3
+        ? "volatile macro signals"
+        : "broad agreement across signals";
+
+  if (confidenceLabel === "LOW") {
+    return `Reason: ${boundaryDescriptor} + ${volatilityDescriptor}`;
+  }
+
+  if (confidenceLabel === "MED") {
+    return `Reason: ${boundaryDescriptor} with ${volatilityDescriptor}`;
+  }
+
+  return `Reason: ${volatilityDescriptor}; ${boundaryDescriptor}`;
 };
 
 const buildMemoryRail = (recordDateLabel: string | undefined, currentRegime: Regime): MemoryRailItem[] => {
@@ -348,19 +440,19 @@ const buildWhyThisCall = ({
 
   return [
     {
-      label: "Boundary distance",
-      detail: `Nearest regime boundary is ${nearestGap.toFixed(1)} points away (${boundaryLabel}).`,
+      label: "Distance to regime change",
+      detail: `Nearest regime change trigger is ${nearestGap.toFixed(1)} points away (${boundaryLabel}).`,
     },
     {
-      label: "Momentum",
+      label: "What moved this week",
       detail:
         reportDynamics?.changedSignals.length
           ? `${signalReasonLabel[changedSignal?.key ?? "tightness"]} ${changedSignal ? describeSignalDirection(changedSignal) : "held"} this week; ${reportDynamics.directionLabel} overall.`
-          : "No material signal deltas this week; call is carried by level and threshold distance.",
+          : "No material signal move this week; posture is driven by current levels and threshold distance.",
     },
     {
-      label: "Reliability",
-      detail: transitionWatch === "ON" ? "Transition watch is ON; re-check next read before irreversible commitments." : "Transition watch is OFF; current posture is stable for near-term planning.",
+      label: "Signal reliability",
+      detail: transitionWatch === "ON" ? "Transition watch is ON; check next release before irreversible commitments." : "Transition watch is OFF; signal set is stable for near-term planning.",
     },
   ];
 };
@@ -445,6 +537,11 @@ export const buildHomeBriefModel = (
   const confidenceLabel: RegimeConfidenceLabel = nearestThresholdGap <= 5 ? "LOW" : nearestThresholdGap <= 12 ? "MED" : "HIGH";
   const transitionWatch: "ON" | "OFF" = nearestThresholdGap <= 8 || Boolean(regimeAlert) ? "ON" : "OFF";
   const confidencePercent = Math.max(35, Math.min(92, Math.round(55 + nearestThresholdGap * 3)));
+  const signalConfidenceReason = buildSignalConfidenceReason({
+    confidenceLabel,
+    nearestThresholdGap,
+    changedSignals: reportDynamics?.changedSignals ?? [],
+  });
   const trendLabel =
     reportDynamics?.directionLabel === "improving"
       ? "Improving"
@@ -545,6 +642,7 @@ export const buildHomeBriefModel = (
     scores: assessment.scores,
   });
   const roleAwareTemplates = buildRoleAwareOperatingTemplates(decisionRules);
+  const executiveOperationalStance = extractExecutiveOperationalStance({ roleAwareTemplates, decisionRules });
 
   const netConstraintSummary =
     severityDelta > 0
@@ -560,6 +658,7 @@ export const buildHomeBriefModel = (
     postureWithStageLabel: `${displayRegime.label} — ${stage.displayLabel}`,
     confidenceLabel,
     confidencePercent,
+    signalConfidenceReason,
     trendLabel,
     startupClimateIndex,
     regimeDistance,
@@ -578,6 +677,7 @@ export const buildHomeBriefModel = (
     },
     decisionRules,
     roleAwareTemplates,
+    executiveOperationalStance,
     revisitDecisions: (reportDynamics?.changedSignals.length ?? 0) > 0 && reportDynamics?.directionLabel !== "stable",
     guardrail,
     historicalAnalogs: normalizedHistoricalAnalogs,
