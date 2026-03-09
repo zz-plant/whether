@@ -389,18 +389,18 @@ const HomePageReportContent = async ({
       currentPath="/"
       pageSummary="Action, guardrail, and flip condition for this planning cycle; scores stay contextual."
       primaryCta={{
-        href: "#weekly-posture-brief-title",
-        label: "Prepare Monday leadership sync brief",
+        href: "#primary-artifact-actions",
+        label: "Copy weekly brief",
         copyText: slackBrief,
         copyTarget: "Slack",
       }}
       secondaryCta={{
-        href: "#why-whether",
-        label: "Why this over dashboards or research",
+        href: "/operations",
+        label: "View action playbook",
       }}
       nextStep={{
         href: "/signals",
-        description: "Review evidence in Signals",
+        description: "Inspect evidence in Signals",
       }}
       sidebarVariant="hidden"
       hideHeroChrome={true}
