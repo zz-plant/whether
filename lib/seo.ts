@@ -5,7 +5,7 @@ export const organizationName = "Whether";
 export const websiteName = "Whether — Capital Posture Governance Standard";
 export const defaultSiteDescription =
   "Translate Treasury macro signals into plain-English operational constraints for product and engineering leaders.";
-export const defaultSocialImagePath = "/twitter-image";
+export const defaultSocialImagePath = "/api/og?template=report";
 
 export const buildCanonicalUrl = (path: string) => new URL(path, siteUrl).toString();
 export const buildSocialImageUrl = (path = defaultSocialImagePath) =>
@@ -58,7 +58,6 @@ export const buildPageMetadata = ({
 }): Metadata => {
   const canonicalUrl = buildCanonicalUrl(path);
   const imageUrl = buildOgImageUrl(imageParams);
-  const socialImageUrl = buildSocialImageUrl();
 
   return {
     title,
@@ -72,26 +71,18 @@ export const buildPageMetadata = ({
       title,
       description,
       siteName: websiteName,
-      images: [
-        {
-          url: imageUrl,
-          width: 1200,
-          height: 630,
-          alt: imageAlt,
-        },
-        {
-          url: socialImageUrl,
-          width: 1200,
-          height: 630,
-          alt: imageAlt,
-        },
-      ],
+      images: [{
+        url: imageUrl,
+        width: 1200,
+        height: 630,
+        alt: imageAlt,
+      }],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: [imageUrl, socialImageUrl],
+      images: [imageUrl],
     },
   };
 };

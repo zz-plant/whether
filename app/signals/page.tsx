@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { loadReportDataSafe } from "../../lib/report/reportData";
-import { getSummaryArchive } from "../../lib/summary/summaryArchive";
 import { siteUrl } from "../../lib/siteUrl";
 import {
   buildTimeMachineHref,
@@ -15,10 +14,6 @@ import {
 import { ReportShell } from "../components/reportShell";
 import { RelatedReportLinks } from "../components/relatedReportLinks";
 import { HistoricalBanner } from "../components/boardBriefSections";
-import { AdvancedThresholdsSection } from "./components/advancedThresholdsSection";
-import { TimeMachinePanel } from "./components/timeMachinePanel";
-import { RegimeTimelinePanel } from "./components/regimeTimelinePanel";
-import { SignalVisualizationSuite } from "./components/signalVisualizationSuite";
 import { reportPageLinks } from "../../lib/report/reportNavigation";
 import { ReturningVisitorDeltaStrip } from "../components/changeSinceLastReadPanel";
 import { buildTrustStatus } from "../../lib/report/trustStatus";
@@ -134,7 +129,27 @@ export default async function SignalsPage({
   const historicalTimeMachineHref = historicalSelection
     ? buildTimeMachineHref("/signals?advanced=1#time-machine", historicalSelection)
     : "/signals?advanced=1#time-machine";
-  const summaryArchive = getSummaryArchive();
+  const showAdvanced = resolvedSearchParams?.advanced === "1";
+  const showFullDiagnostics = resolvedSearchParams?.diagnostics === "all";
+  const [summaryArchive, signalDiagnostics, advancedPanels] = await Promise.all([
+    showAdvanced
+      ? import("../../lib/summary/summaryArchive").then((module) => module.getSummaryArchive())
+      : Promise.resolve(null),
+    showFullDiagnostics
+      ? import("./components/signalVisualizationSuite").then((module) => module.SignalVisualizationSuite)
+      : Promise.resolve(null),
+    showAdvanced
+      ? Promise.all([
+          import("./components/advancedThresholdsSection").then((module) => module.AdvancedThresholdsSection),
+          import("./components/timeMachinePanel").then((module) => module.TimeMachinePanel),
+          import("./components/regimeTimelinePanel").then((module) => module.RegimeTimelinePanel),
+        ])
+      : Promise.resolve(null),
+  ]);
+  const AdvancedThresholdsSection = advancedPanels?.[0] ?? null;
+  const TimeMachinePanel = advancedPanels?.[1] ?? null;
+  const RegimeTimelinePanel = advancedPanels?.[2] ?? null;
+  const SignalVisualizationSuite = signalDiagnostics;
   const regimeLabel = REGIME_LABELS[assessment.regime];
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
   const {
@@ -160,8 +175,6 @@ export default async function SignalsPage({
     : isFallback
       ? "Live update delayed — avoid irreversible decisions until signals refresh."
       : "Decision check: use these deltas to confirm this week's call or revise it now.";
-  const showAdvanced = resolvedSearchParams?.advanced === "1";
-  const showFullDiagnostics = resolvedSearchParams?.diagnostics === "all";
   const timeMachineHref = showAdvanced ? "#time-machine" : "#advanced-controls";
   const regimeTimelineHref = showAdvanced ? "#regime-timeline" : "#advanced-controls";
   const focusTabs = ["all", "growth", "inflation", "labor", "financial"] as const;
@@ -621,12 +634,12 @@ export default async function SignalsPage({
               </li>
             ))}
           </ol>
-        ) : (
+        ) : SignalVisualizationSuite ? (
           <SignalVisualizationSuite
             treasury={treasury}
             yieldCurveSeries={yieldCurveSeries}
           />
-        )}
+        ) : null}
       </section>
 
       <section className="weather-panel space-y-4 px-6 py-5" id="advanced-controls">
@@ -662,7 +675,7 @@ export default async function SignalsPage({
         </div>
       </section>
 
-      {showAdvanced ? (
+      {showAdvanced && AdvancedThresholdsSection && TimeMachinePanel && RegimeTimelinePanel && summaryArchive ? (
         <>
           <AdvancedThresholdsSection
             currentThresholds={assessment.thresholds}
