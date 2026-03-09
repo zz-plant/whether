@@ -6,18 +6,14 @@ import { serializeJsonLd } from "../../../lib/seo";
 import { findStageGuide } from "../stageGuides";
 import {
   findStakeholderGuide,
-  stakeholderGuides,
 } from "../stakeholderGuides";
 
 type StakeholderPageProps = {
   params: Promise<{ stakeholder: string }>;
 };
 
-export const dynamicParams = false;
-
-export function generateStaticParams() {
-  return stakeholderGuides.map((guide) => ({ stakeholder: guide.slug }));
-}
+export const runtime = "edge";
+export const revalidate = 86400;
 
 export async function generateMetadata({
   params,

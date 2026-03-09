@@ -2,18 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../../lib/seo";
-import { stageGuides, findStageGuide } from "../../stageGuides";
+import { findStageGuide } from "../../stageGuides";
 import { stakeholderGuides } from "../../stakeholderGuides";
 
 type StagePageProps = {
   params: Promise<{ stage: string }>;
 };
 
-export const dynamicParams = false;
-
-export function generateStaticParams() {
-  return stageGuides.map((guide) => ({ stage: guide.slug }));
-}
+export const runtime = "edge";
+export const revalidate = 86400;
 
 export async function generateMetadata({ params }: StagePageProps): Promise<Metadata> {
   const { stage } = await params;

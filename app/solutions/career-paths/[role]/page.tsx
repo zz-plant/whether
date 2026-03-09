@@ -8,11 +8,8 @@ import { BreadcrumbTrail } from "../../../components/breadcrumbTrail";
 
 const rolePageTitleSuffix = "career growth playbook";
 
-export const dynamicParams = false;
-
-export function generateStaticParams() {
-  return roleLandings.map((role) => ({ role: role.slug }));
-}
+export const runtime = "edge";
+export const revalidate = 86400;
 
 export async function generateMetadata({
   params,

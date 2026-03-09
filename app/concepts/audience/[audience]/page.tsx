@@ -5,10 +5,8 @@ import {
   buildConceptTaxonomyMetadata,
 } from "../../components/conceptTaxonomyPage";
 import {
-  conceptAudiences,
   findConceptAudienceBySlug,
   getArticlesByAudience,
-  toConceptTaxonomySlug,
   type ProductConceptArticle,
 } from "../../../../lib/productCanon";
 
@@ -37,11 +35,8 @@ const audienceCopy: ConceptTaxonomyCopy<ProductConceptArticle["audience"]> = {
     `A focused collection of PM essays for ${resolvedAudience}, with publication-time regime context to improve planning interpretation.`,
 };
 
-export const dynamicParams = false;
-
-export function generateStaticParams() {
-  return conceptAudiences.map((audience) => ({ audience: toConceptTaxonomySlug(audience) }));
-}
+export const runtime = "edge";
+export const revalidate = 86400;
 
 export async function generateMetadata({ params }: AudiencePageProps): Promise<Metadata> {
   const { audience } = await params;

@@ -5,10 +5,8 @@ import {
   buildConceptTaxonomyMetadata,
 } from "../../components/conceptTaxonomyPage";
 import {
-  conceptFocuses,
   findConceptFocusBySlug,
   getArticlesByFocus,
-  toConceptTaxonomySlug,
   type ProductConceptArticle,
 } from "../../../../lib/productCanon";
 
@@ -37,11 +35,8 @@ const focusCopy: ConceptTaxonomyCopy<ProductConceptArticle["focus"]> = {
     `Explore high-signal essays tagged for ${resolvedFocus}, then review the macro posture around each publication date.`,
 };
 
-export const dynamicParams = false;
-
-export function generateStaticParams() {
-  return conceptFocuses.map((focus) => ({ focus: toConceptTaxonomySlug(focus) }));
-}
+export const runtime = "edge";
+export const revalidate = 86400;
 
 export async function generateMetadata({ params }: FocusPageProps): Promise<Metadata> {
   const { focus } = await params;

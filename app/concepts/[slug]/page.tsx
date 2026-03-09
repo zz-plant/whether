@@ -11,7 +11,6 @@ import {
 import {
   findProductConceptArticle,
   getMacroContextForArticle,
-  productConceptArticles,
   regimeToneByKey,
 } from "../../../lib/productCanon";
 import { getConceptPublicationRegime, getConceptRegimeStatus, getCurrentRegimeContext } from "../../../lib/conceptRegime";
@@ -118,11 +117,8 @@ const buildDecisionDelta = ({
   };
 };
 
-export const dynamicParams = false;
-
-export async function generateStaticParams() {
-  return productConceptArticles.map((article) => ({ slug: article.slug }));
-}
+export const runtime = "edge";
+export const revalidate = 43200;
 
 export async function generateMetadata({ params }: ConceptArticlePageProps): Promise<Metadata> {
   const { slug } = await params;
