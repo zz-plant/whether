@@ -13,6 +13,7 @@ import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip"
 import {
   ReportMobileNavigation,
   ReportPageNavigation,
+  ReportSectionNavigation,
   type ReportPageLink,
   type ReportSectionLink,
 } from "./reportShellNavigation";
@@ -379,7 +380,7 @@ export const ReportShell = ({
           {historicalBanner}
 
           <div className={`mt-5 grid min-w-0 gap-5 ${hasSidebar ? "lg:grid-cols-[minmax(0,1fr),260px] lg:items-start" : ""}`}>
-            {hasSidebar ? <aside className="order-2 space-y-4 lg:order-none lg:col-start-2 lg:row-start-1 lg:sticky lg:top-28 lg:self-start"><HeroTrustProvenanceBlock trustStatusTone={trustStatusTone} trustStatusLabel={trustStatusLabel} trustStatusDetail={trustStatusDetail} trustStatusAction={trustStatusAction} statusLabel={statusLabel} fetchedAtLabel={fetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} provenance={provenance} /></aside> : null}
+            {hasSidebar ? <aside className="order-2 space-y-4 lg:order-none lg:col-start-2 lg:row-start-1 lg:sticky lg:top-28 lg:self-start">{sectionLinks.length ? <ReportSectionNavigation sectionLinks={sectionLinks} className="hidden lg:block" /> : null}<HeroTrustProvenanceBlock trustStatusTone={trustStatusTone} trustStatusLabel={trustStatusLabel} trustStatusDetail={trustStatusDetail} trustStatusAction={trustStatusAction} statusLabel={statusLabel} fetchedAtLabel={fetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} provenance={provenance} /></aside> : null}
 
             <div className="order-1 min-w-0 space-y-8 lg:order-none lg:col-start-1 lg:row-start-1 lg:space-y-10">
               {!hideHeroChrome ? <CommandCenterNavBlock heroVariant={heroVariant} pageTitle={pageTitle} pageSummary={pageSummary} summaryLink={summaryLink} recordDateLabel={recordDateLabel} roleSwitcher={roleSwitcher} primaryCta={primaryCta} secondaryCta={secondaryCta} exportCta={exportCta} nextStep={nextStep} statusLabel={statusLabel} trustStatusLabel={trustStatusLabel} fetchedAtLabel={fetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={trustStatusAction} showOfflineBadge={showOfflineBadge} offlineBadgeLabel={offlineBadgeLabel} decisionBanner={decisionBanner} missionSupportText={trustStatusDetail} decisionDiffs={decisionDiffs} missionSequenceTitle={missionSequenceTitle} missionSequenceItems={missionSequenceItems} /> : null}
