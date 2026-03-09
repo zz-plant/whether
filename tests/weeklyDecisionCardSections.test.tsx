@@ -67,6 +67,45 @@ describe("WeeklyDecisionCard extracted sections", () => {
     assert.ok(scoreMetadataIndex > trendIndex);
   });
 
+
+  it("orients flip zone toward contraction for tightness rise-above triggers", () => {
+    const html = renderToStaticMarkup(
+      <DecisionCallHeader
+        statusLabel="EXPANSION"
+        netConstraintSummary="Constraints eased."
+        meetingShorthand="Do now: speed reversible bets."
+        postureDelta="Better than last week"
+        immediateDecision="Hold expansion posture"
+        guardrail="Keep irreversible spend capped"
+        confidencePercent={74}
+        confidenceLabel="MED"
+        trendLabel="Mixed"
+        transitionWatch="ON"
+        freshnessLabel="Mar 6, 2026"
+        trustCueLine="Cached snapshot (Mar 6, 2026): use for pacing and defer irreversible commitments."
+        needsTrustWarning={false}
+        trustWarningCopy=""
+        failureModes={[]}
+        regimeDistance={{
+          dimensionLabel: "Tightness",
+          dimensionKey: "tightness",
+          currentValue: 64,
+          thresholdValue: 70,
+          pointsToFlip: 6,
+          thresholdDirection: "riseAbove",
+        }}
+        movementVelocity="Medium"
+        startupClimateIndex={{ score: 58, status: "Stable" }}
+        executiveOperationalStance={{
+          expand: ["Increase product tempo for reversible bets", "Selective hiring for revenue-linked roles"],
+          avoid: ["net-new hiring if tightness > 74", "long-payback bets if risk appetite < 44"],
+        }}
+      />,
+    );
+
+    assert.match(html, /left:64\.2%;width:10\.8%/);
+  });
+
   it("marks risk-appetite defensive trigger as breached only when value is at or below threshold", () => {
     const html = renderToStaticMarkup(
       <DecisionCallHeader

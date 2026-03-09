@@ -106,25 +106,31 @@ const clampPercent = (value: number) => Math.max(0, Math.min(100, value));
 const resolveMacroBandUi = ({
   regimeLabel,
   pointsToFlip,
+  dimensionKey,
   thresholdDirection,
   thresholdValue,
 }: {
   regimeLabel: string;
   pointsToFlip: number;
+  dimensionKey: WeeklyDecisionCardProps["regimeDistance"]["dimensionKey"];
   thresholdDirection: WeeklyDecisionCardProps["regimeDistance"]["thresholdDirection"];
   thresholdValue: number;
 }) => {
   const markerPercent = clampPercent(regimeGaugePercentByLabel[regimeLabel] ?? 50);
   const normalizedDistance = Math.max(0, Math.min(1, Math.abs(pointsToFlip) / 20));
   const zoneWidth = Math.max(6, Math.min(22, 6 + normalizedDistance * 16));
+  const thresholdBreachesTowardRight =
+    dimensionKey === "riskAppetite"
+      ? thresholdDirection === "riseAbove"
+      : thresholdDirection === "fallToOrBelow";
   const zoneStart =
-    thresholdDirection === "riseAbove"
+    thresholdBreachesTowardRight
       ? clampPercent(markerPercent)
       : clampPercent(markerPercent - zoneWidth);
   const thresholdPercent = Number.isFinite(thresholdValue)
     ? clampPercent(thresholdValue)
     : clampPercent(
-      thresholdDirection === "riseAbove" ? markerPercent + zoneWidth : markerPercent - zoneWidth,
+      thresholdBreachesTowardRight ? markerPercent + zoneWidth : markerPercent - zoneWidth,
     );
 
   return {
@@ -278,6 +284,7 @@ export function DecisionCallHeader({
   } = resolveMacroBandUi({
     regimeLabel: statusLabel,
     pointsToFlip: regimeDistance.pointsToFlip,
+    dimensionKey: regimeDistance.dimensionKey,
     thresholdDirection: regimeDistance.thresholdDirection,
     thresholdValue: regimeDistance.thresholdValue,
   });
