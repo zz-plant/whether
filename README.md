@@ -50,6 +50,14 @@ The progression is: **macro awareness → operating posture → portfolio choice
 - **Head of Product / VP Product:** Align product narrative with CEO, board, and finance expectations.
 - **Product Strategy / Chief of Staff:** Translate external signals into company-level planning guidance.
 
+
+## Competitive positioning snapshot
+- **Category:** weekly operating posture brief for startup leadership teams.
+- **Primary alternatives:** macro terminals/research products, FP&A planning suites, BI dashboards, and manual chief-of-staff briefing workflows.
+- **Differentiation:** Whether is optimized for decision transmission—signals to bounded operating call to shareable artifact in one weekly ritual.
+
+For internal battlecards, objection handling, and segment talk tracks, see `docs/sales-competitive-messaging.md`.
+
 ## Local development
 1. Use Node.js 20+ (`.nvmrc`) and Bun 1.3.x.
 2. Install dependencies: `bun install`
