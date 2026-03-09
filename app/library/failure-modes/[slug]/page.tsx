@@ -2,15 +2,12 @@ import type { Metadata, Route } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../../lib/seo";
-import { failureModeDefinitions, failureModes } from "../../../../lib/informationArchitecture";
+import { failureModeDefinitions } from "../../../../lib/informationArchitecture";
 
 type Params = { slug: string };
 
-export const dynamicParams = false;
-
-export function generateStaticParams() {
-  return failureModes.map((slug) => ({ slug }));
-}
+export const runtime = "edge";
+export const revalidate = 86400;
 
 const getFailureMode = (slug: string) => failureModeDefinitions.find((failureMode) => failureMode.slug === slug);
 
