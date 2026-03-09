@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { Suspense } from "react";
+import { Suspense, type ReactNode } from "react";
 import {
   buildTimeMachineHref,
   getAdjacentTimeMachineRequest,
@@ -38,15 +38,13 @@ import { getFeaturedConceptArticles } from "../lib/productCanon";
 import { LiveDataFallbackAlert } from "./components/liveDataFallbackAlert";
 import { HomeInterpretationPanel } from "./components/homeInterpretationPanel";
 
-const loadBoardBriefSections = () => import("./components/boardBriefSections");
-
 const WeeklyActionSummaryPanel = dynamic(
-  () => loadBoardBriefSections().then((module) => module.WeeklyActionSummaryPanel),
+  () => import("./components/boardBriefSections").then((module) => module.WeeklyActionSummaryPanel),
   { suspense: true },
 );
 
 const ExecutiveSnapshotPanel = dynamic(
-  () => loadBoardBriefSections().then((module) => module.ExecutiveSnapshotPanel),
+  () => import("./components/boardBriefSections").then((module) => module.ExecutiveSnapshotPanel),
   { suspense: true },
 );
 
@@ -60,6 +58,26 @@ const ExecutiveSnapshotFallback = () => (
   <section id="executive-snapshot" aria-label="Leadership summary" className="space-y-8">
     <div className="weather-panel px-5 py-5 text-sm text-slate-300">Loading evidence snapshot…</div>
   </section>
+);
+
+const DeferredSection = ({
+  id,
+  ariaLabel,
+  fallback,
+  children,
+}: {
+  id: string;
+  ariaLabel: string;
+  fallback: ReactNode;
+  children: ReactNode;
+}) => (
+  <RevealOnView placeholder={fallback}>
+    <Suspense fallback={fallback}>
+      <section id={id} aria-label={ariaLabel} className="space-y-8">
+        {children}
+      </section>
+    </Suspense>
+  </RevealOnView>
 );
 
 export const revalidate = 900;
@@ -164,11 +182,21 @@ const HomePageStreamingFallback = () => (
       <p className="text-sm text-slate-200">
         Pulling live signals and preparing bounded decisions, reversal triggers, and share-ready artifacts.
       </p>
-      <div className="h-20 rounded-lg border border-slate-700/70 bg-slate-900/40" />
+      <div className="space-y-3 rounded-xl border border-slate-700/80 bg-slate-900/70 p-3">
+        <div className="h-3 w-36 animate-pulse rounded-full bg-slate-600/80" />
+        <div className="h-4 w-full animate-pulse rounded-full bg-slate-500/80" />
+        <div className="h-4 w-10/12 animate-pulse rounded-full bg-slate-500/70" />
+        <div className="h-3 w-44 animate-pulse rounded-full bg-slate-600/80" />
+      </div>
     </section>
     <section className="weather-panel space-y-4 px-5 py-5" aria-label="Loading evidence">
       <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Loading evidence snapshot</p>
-      <div className="h-24 rounded-lg border border-slate-700/70 bg-slate-900/40" />
+      <div className="space-y-2 rounded-xl border border-slate-700/80 bg-slate-900/70 p-3">
+        <div className="h-3 w-full animate-pulse rounded-full bg-slate-600/70" />
+        <div className="h-3 w-full animate-pulse rounded-full bg-slate-600/70" />
+        <div className="h-3 w-11/12 animate-pulse rounded-full bg-slate-600/60" />
+        <div className="h-3 w-7/12 animate-pulse rounded-full bg-slate-600/60" />
+      </div>
     </section>
   </section>
 );
@@ -439,33 +467,29 @@ const HomePageReportContent = async ({
         />
       ) : null}
 
-      <RevealOnView placeholder={<WeeklyActionSummaryFallback />}>
-        <Suspense fallback={<WeeklyActionSummaryFallback />}>
-          <section
-            id="weekly-action-summary"
-            aria-label="Weekly action summary"
-            className="space-y-8"
-          >
-            <WeeklyActionSummaryPanel
-              assessment={assessment}
-              provenance={treasuryProvenance}
-              recordDateLabel={recordDateLabel}
-            />
-          </section>
-        </Suspense>
-      </RevealOnView>
+      <DeferredSection
+        id="weekly-action-summary"
+        ariaLabel="Weekly action summary"
+        fallback={<WeeklyActionSummaryFallback />}
+      >
+        <WeeklyActionSummaryPanel
+          assessment={assessment}
+          provenance={treasuryProvenance}
+          recordDateLabel={recordDateLabel}
+        />
+      </DeferredSection>
 
-      <RevealOnView placeholder={<ExecutiveSnapshotFallback />}>
-        <Suspense fallback={<ExecutiveSnapshotFallback />}>
-          <section id="executive-snapshot" aria-label="Leadership summary" className="space-y-8">
-            <ExecutiveSnapshotPanel
-              treasury={treasury}
-              assessment={assessment}
-              provenance={treasuryProvenance}
-            />
-          </section>
-        </Suspense>
-      </RevealOnView>
+      <DeferredSection
+        id="executive-snapshot"
+        ariaLabel="Leadership summary"
+        fallback={<ExecutiveSnapshotFallback />}
+      >
+        <ExecutiveSnapshotPanel
+          treasury={treasury}
+          assessment={assessment}
+          provenance={treasuryProvenance}
+        />
+      </DeferredSection>
 
     </ReportShell>
   );
