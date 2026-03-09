@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { navigationLayers, navigationLabelByPath } from "../lib/navigation/informationArchitecture";
+import { navigationGroupLabels, navigationLayers, navigationLabelByPath } from "../lib/navigation/informationArchitecture";
 import { primaryNavigation } from "../lib/navigation/primaryNavigation";
 
 describe("navigation information architecture", () => {
@@ -12,6 +12,16 @@ describe("navigation information architecture", () => {
       assert.ok(link);
       assert.equal(link?.label, layer.label);
       assert.equal(link?.description, layer.description);
+    }
+  });
+
+  it("defines passive group labels from IA as single source of truth", () => {
+    assert.equal(navigationGroupLabels.core, "Now");
+    assert.equal(navigationGroupLabels.workflow, "Operate");
+    assert.equal(navigationGroupLabels.reference, "Reference");
+
+    for (const layer of navigationLayers) {
+      assert.ok(navigationGroupLabels[layer.group]);
     }
   });
 
