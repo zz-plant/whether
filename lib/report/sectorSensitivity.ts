@@ -79,13 +79,13 @@ const clamp = (value: number, min: number, max: number) => Math.max(min, Math.mi
 
 const resolveBasePostureLabel = (regime: RegimeKey) => REGIME_SHORT_LABELS[regime];
 
-const resolveSignalBias = (assessment: Pick<RegimeAssessment, "scores" | "thresholds">) => {
+const resolveSignalBias = (assessment: Pick<SectorAssessment, "scores" | "thresholds">) => {
   const tightnessBias = clamp((assessment.thresholds.tightnessRegime - assessment.scores.tightness) / 25, -1.5, 1.5);
   const riskBias = clamp((assessment.scores.riskAppetite - assessment.thresholds.riskAppetiteRegime) / 25, -1.5, 1.5);
   return { tightnessBias, riskBias };
 };
 
-const resolveBoundaryGap = (assessment: Pick<RegimeAssessment, "scores" | "thresholds">) => {
+const resolveBoundaryGap = (assessment: Pick<SectorAssessment, "scores" | "thresholds">) => {
   const tightnessGap = Math.abs(assessment.scores.tightness - assessment.thresholds.tightnessRegime);
   const riskGap = Math.abs(assessment.scores.riskAppetite - assessment.thresholds.riskAppetiteRegime);
   return Math.min(tightnessGap, riskGap);
@@ -121,8 +121,14 @@ const resolveActionBias = (delta: number): SectorAdjustedPosture["actionBias"] =
   return "hold";
 };
 
+type SectorAssessment = {
+  regime: RegimeAssessment["regime"];
+  scores: Pick<RegimeAssessment["scores"], "tightness" | "riskAppetite">;
+  thresholds: Pick<RegimeAssessment["thresholds"], "tightnessRegime" | "riskAppetiteRegime">;
+};
+
 const buildReversalCondition = (
-  assessment: Pick<RegimeAssessment, "scores" | "thresholds">,
+  assessment: Pick<SectorAssessment, "scores" | "thresholds">,
   actionBias: SectorAdjustedPosture["actionBias"],
 ) => {
   if (actionBias === "hold") {
@@ -143,7 +149,7 @@ const buildReversalCondition = (
 };
 
 export const deriveSectorAdjustedPosture = (
-  baseAssessment: Pick<RegimeAssessment, "regime" | "scores" | "thresholds">,
+  baseAssessment: SectorAssessment,
   sector: SectorKey,
 ): SectorAdjustedPosture => {
   const sensitivity = SECTOR_TAXONOMY[sector];

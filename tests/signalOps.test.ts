@@ -31,6 +31,9 @@ const assessment = (
     confidence: "MEDIUM",
     transitionWatch: false,
     intensity: "STANDARD",
+    boundaryContributors: [],
+    weakReadCount: 0,
+    twoWeakReadsWarning: false,
   },
   scores: {
     baseRate: 5,
@@ -38,6 +41,23 @@ const assessment = (
     curveSlope: -0.1,
     tightness,
     riskAppetite,
+  },
+  policyAssessment: {
+    version: "policy-v1",
+    normalizations: [],
+    composites: { cts: 0, ras: 0 },
+    posture: "TRANSITION",
+    band: "NEUTRAL",
+    confidenceIndex: { agreement: 0, distanceFromNeutral: 0, volatility30d: 0 },
+    refusal: { refused: false, reasons: [] },
+    governanceParameters: {
+      hiringThreshold: "HIGH",
+      paybackWindowTolerance: "STANDARD",
+      rollbackRequirement: "EXPLICIT_KILL_CRITERIA",
+      approvalVelocity: "BALANCED",
+      expansionScope: "BALANCED",
+      experimentationTolerance: "MEDIUM",
+    },
   },
 });
 

@@ -19,6 +19,9 @@ const assessment: RegimeAssessment = {
     confidence: "LOW",
     transitionWatch: false,
     intensity: "MILD",
+    boundaryContributors: [],
+    weakReadCount: 0,
+    twoWeakReadsWarning: false,
   },
   description: "",
   constraints: [],
@@ -31,6 +34,23 @@ const assessment: RegimeAssessment = {
     riskAppetiteRegime: 50,
   },
   inputs: [],
+  policyAssessment: {
+    version: "policy-v1",
+    normalizations: [],
+    composites: { cts: 0, ras: 0 },
+    posture: "SAFETY_MODE",
+    band: "ELEVATED",
+    confidenceIndex: { agreement: 0, distanceFromNeutral: 0, volatility30d: 0 },
+    refusal: { refused: false, reasons: [] },
+    governanceParameters: {
+      hiringThreshold: "VERY_HIGH",
+      paybackWindowTolerance: "SHORTER",
+      rollbackRequirement: "REVERSIBLE_ONLY",
+      approvalVelocity: "SLOWER_STRUCTURED",
+      expansionScope: "CONSTRAINED",
+      experimentationTolerance: "LOW",
+    },
+  },
 };
 
 describe("whether-to-ship checklist", () => {

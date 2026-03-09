@@ -37,8 +37,6 @@ const assessment = {
 const forecast: ForecastModel = {
   next90DayProbabilities: { Expansion: 7, Mixed: 19, Scarcity: 43, Defensive: 31 },
   boundaryPressure: {
-    tightnessDistance: 3,
-    riskAppetiteDistance: 8,
     distance: 3,
     momentum: "toward-threshold",
     crossingRisk: "high",

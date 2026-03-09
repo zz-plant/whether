@@ -12,7 +12,17 @@ import type { TreasuryData } from "../lib/types";
 const assessment: RegimeAssessment = {
   regime: "DEFENSIVE",
   scores: { tightness: 72, riskAppetite: 48, baseRateUsed: "1M", baseRate: 5.2, curveSlope: -0.1 },
-  diagnostics: { tightnessDelta: 0, riskAppetiteDelta: 0, nearestThresholdDelta: 0, confidence: "LOW", transitionWatch: false, intensity: "MILD" },
+  diagnostics: {
+    tightnessDelta: 0,
+    riskAppetiteDelta: 0,
+    nearestThresholdDelta: 0,
+    confidence: "LOW",
+    transitionWatch: false,
+    intensity: "MILD",
+    boundaryContributors: [],
+    weakReadCount: 0,
+    twoWeakReadsWarning: false,
+  },
   description: "",
   constraints: ["Cut low-leverage experiments."],
   tightnessExplanation: "",
@@ -20,6 +30,23 @@ const assessment: RegimeAssessment = {
   dataWarnings: [],
   thresholds: { baseRateTightness: 5, tightnessRegime: 70, riskAppetiteRegime: 50 },
   inputs: [],
+  policyAssessment: {
+    version: "policy-v1",
+    normalizations: [],
+    composites: { cts: 0, ras: 0 },
+    posture: "TRANSITION",
+    band: "NEUTRAL",
+    confidenceIndex: { agreement: 0, distanceFromNeutral: 0, volatility30d: 0 },
+    refusal: { refused: false, reasons: [] },
+    governanceParameters: {
+      hiringThreshold: "HIGH",
+      paybackWindowTolerance: "STANDARD",
+      rollbackRequirement: "EXPLICIT_KILL_CRITERIA",
+      approvalVelocity: "BALANCED",
+      expansionScope: "BALANCED",
+      experimentationTolerance: "MEDIUM",
+    },
+  },
 };
 
 const treasury = {

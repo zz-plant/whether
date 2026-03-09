@@ -27,10 +27,10 @@ const makeTreasury = ({
 });
 
 const probabilitySum = (model: ReturnType<typeof buildForecastModel>) =>
-  Object.values(model.regimeProbabilities).reduce((sum, value) => sum + value, 0);
+  Object.values(model.next90DayProbabilities).reduce((sum, value) => sum + value, 0);
 
 const topProbability = (model: ReturnType<typeof buildForecastModel>) =>
-  Object.entries(model.regimeProbabilities).sort((a, b) => b[1] - a[1])[0];
+  Object.entries(model.next90DayProbabilities).sort((a, b) => b[1] - a[1])[0];
 
 describe("forecast model probabilities and risk bounds", () => {
   it("normalizes regime probabilities to 100 and keeps each probability bounded", () => {
@@ -43,7 +43,7 @@ describe("forecast model probabilities and risk bounds", () => {
     });
 
     assert.equal(probabilitySum(model), 100);
-    for (const probability of Object.values(model.regimeProbabilities)) {
+    for (const probability of Object.values(model.next90DayProbabilities)) {
       assert.ok(probability >= 0 && probability <= 100);
     }
   });
@@ -59,8 +59,8 @@ describe("forecast model probabilities and risk bounds", () => {
 
     const [label, percent] = topProbability(model);
     assert.equal(label, "Expansion");
-    assert.ok(percent >= model.regimeProbabilities.Mixed);
-    assert.ok(percent >= model.regimeProbabilities.Defensive);
+    assert.ok(percent >= model.next90DayProbabilities.Mixed);
+    assert.ok(percent >= model.next90DayProbabilities.Defensive);
   });
 
   it("keeps crossing risk low when far from boundaries and motion is away", () => {
@@ -73,7 +73,7 @@ describe("forecast model probabilities and risk bounds", () => {
       macroSeries: [],
     });
 
-    assert.ok(model.boundaryPressure.nearestDistance > 8);
+    assert.ok(model.boundaryPressure.distance > 8);
     assert.equal(model.boundaryPressure.crossingRisk, "low");
   });
 
@@ -87,7 +87,7 @@ describe("forecast model probabilities and risk bounds", () => {
       macroSeries: [],
     });
 
-    assert.ok(model.boundaryPressure.nearestDistance <= 3);
+    assert.ok(model.boundaryPressure.distance <= 3);
     assert.equal(model.boundaryPressure.crossingRisk, "high");
   });
 });
