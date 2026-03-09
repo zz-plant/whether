@@ -117,9 +117,16 @@ const suppressedCloudflareWarningPatterns = [
 const shouldSuppressCloudflareWarningLine = (line) =>
   suppressedCloudflareWarningPatterns.some((pattern) => pattern.test(line));
 
+const nextOnPagesSpawnMaxBufferBytes = 64 * 1024 * 1024;
+
 const result = spawnSync(command, args, {
   stdio: useNextOnPages ? "pipe" : "inherit",
   encoding: "utf8",
+  ...(useNextOnPages
+    ? {
+        maxBuffer: nextOnPagesSpawnMaxBufferBytes,
+      }
+    : {}),
   shell: true,
   env: {
     ...process.env,
