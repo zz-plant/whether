@@ -23,6 +23,8 @@ import {
 type Regime = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
 
 type HomeReportData = {
+  fetchedAtLabel?: string;
+  historicalSelection?: { month: number; year: number; banner: string } | null;
   assessment: {
     regime: Regime;
     thresholds: { tightnessRegime: number; riskAppetiteRegime: number };
@@ -37,10 +39,15 @@ type HomeReportData = {
       key: "tightness" | "riskAppetite" | "baseRate" | "curveSlope";
       delta: number;
     }>;
+    anomalySignals?: Array<{
+      reason: string;
+    }>;
   };
   macroSeries?: MacroSeriesReading[];
   forecast?: ForecastModel;
   historicalAnalogs?: HistoricalAnalog[];
+  treasuryProvenance?: { statusLabel?: string };
+  treasury?: { fallback_at?: string | null; fallback_reason?: string | null };
   [key: string]: unknown;
 };
 
@@ -85,6 +92,8 @@ type MacroOverlayItem = {
   label: string;
   detail: string;
 };
+
+type HomeBriefFailureMode = FailureModeWarning;
 
 const regimeShiftTargets = {
   SCARCITY: { defensive: "DEFENSIVE" },
@@ -393,7 +402,20 @@ export const buildHomeBriefModel = (
   data: HomeReportData,
   options?: { overlaySector?: SectorKey },
 ) => {
-  const { assessment, regimeAlert, stopItems, reportDynamics, recordDateLabel, macroSeries, forecast, historicalAnalogs } = data;
+  const {
+    assessment,
+    regimeAlert,
+    stopItems,
+    reportDynamics,
+    recordDateLabel,
+    macroSeries,
+    forecast,
+    historicalAnalogs,
+    fetchedAtLabel,
+    historicalSelection,
+    treasuryProvenance,
+    treasury,
+  } = data;
   const overlaySector = options?.overlaySector ?? "b2b-saas";
   const timelineAnchorYear = resolveTimelineAnchorYear(recordDateLabel);
   const previousRegime = regimeAlert?.previousRegime;
@@ -428,6 +450,16 @@ export const buildHomeBriefModel = (
           ? "Mixed"
           : "Stable";
   const startupClimateIndex = buildStartupClimateIndex({ assessment, macroSeries, trendLabel });
+
+  const failureModes: HomeBriefFailureMode[] = buildFailureModeWarnings({
+    confidenceLabel,
+    transitionWatch,
+    freshnessLabel: fetchedAtLabel ?? "Unavailable",
+    isFallbackSnapshot: Boolean(treasury?.fallback_at || treasury?.fallback_reason) && !historicalSelection,
+    provenanceStatusLabel: treasuryProvenance?.statusLabel,
+    changedSignals: reportDynamics?.changedSignals ?? [],
+    anomalySignals: reportDynamics?.anomalySignals ?? [],
+  });
 
   const displayRegime = getRegimeDisplayLabel({
     regime: assessment.regime,
@@ -553,6 +585,7 @@ export const buildHomeBriefModel = (
     postureDeltaLabel,
     reversalTrigger,
     transitionWatch,
+    failureModes,
     whyThisCall: buildWhyThisCall({
       tightnessGap,
       riskGap,

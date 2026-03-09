@@ -22,6 +22,7 @@ type MemoryRailItem = { label: string; posture: string };
 type PrimaryDriverItem = { label: string; detail: string };
 type MacroOverlayItem = { label: string; detail: string };
 type HistoricalAnalogItem = { date: string; similarityScore: number; implication: string };
+type FailureModeWarningItem = { id: string; warning: string; mitigationCheck: string };
 
 export type WeeklyDecisionCardProps = {
   statusLabel: string;
@@ -64,6 +65,7 @@ export type WeeklyDecisionCardProps = {
   regimeVelocity: TransitionVelocityEstimate;
   citation: string;
   isFallbackSnapshot?: boolean;
+  failureModes?: FailureModeWarningItem[];
   actions?: ReactNode;
 };
 
@@ -194,6 +196,7 @@ type DecisionCallHeaderProps = {
   trustCueLine: string;
   needsTrustWarning: boolean;
   trustWarningCopy: string;
+  failureModes: FailureModeWarningItem[];
   regimeDistance: WeeklyDecisionCardProps["regimeDistance"];
   movementVelocity: "Low" | "Medium" | "High";
   topContributorInline: string;
@@ -215,6 +218,7 @@ export function DecisionCallHeader({
   trustCueLine,
   needsTrustWarning,
   trustWarningCopy,
+  failureModes,
   regimeDistance,
   movementVelocity,
   topContributorInline,
@@ -321,6 +325,20 @@ export function DecisionCallHeader({
         <p className="inline-flex items-center gap-1.5 text-xs text-slate-300"><span aria-hidden="true" className="text-slate-400"><svg viewBox="0 0 12 12" className="h-3 w-3"><path d="M6 1.6 9 2.8v2.9c0 2-1.2 3.8-3 4.7-1.8-.9-3-2.7-3-4.7V2.8l3-1.2Z" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" /></svg></span>Trust status: {trustCueLine}</p>
         {needsTrustWarning ? (
           <p className="rounded-md border border-amber-500/50 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">{trustWarningCopy}</p>
+        ) : null}
+
+        {failureModes.length > 0 ? (
+          <article className="space-y-2 rounded-md border border-amber-500/45 bg-amber-500/10 px-3 py-3" aria-label="False-signal warnings">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-100">False-signal warnings</p>
+            <ul className="space-y-1.5">
+              {failureModes.map((mode) => (
+                <li key={mode.id} className="text-xs text-amber-50">
+                  <p>{mode.warning}</p>
+                  <p className="text-amber-100/95">{mode.mitigationCheck}</p>
+                </li>
+              ))}
+            </ul>
+          </article>
         ) : null}
       </article>
     </header>
@@ -511,6 +529,7 @@ export function WeeklyDecisionCard({
   regimeVelocity,
   citation,
   isFallbackSnapshot = false,
+  failureModes = [],
   actions,
 }: WeeklyDecisionCardProps) {
   const freshnessLabel = fetchedAtLabel.trim().length > 0 ? fetchedAtLabel : "Unavailable";
@@ -590,6 +609,7 @@ export function WeeklyDecisionCard({
         trustCueLine={trustCueLine}
         needsTrustWarning={needsTrustWarning}
         trustWarningCopy={trustWarningCopy}
+        failureModes={failureModes}
         regimeDistance={regimeDistance}
         movementVelocity={movementVelocity}
         topContributorInline={topContributorInline}

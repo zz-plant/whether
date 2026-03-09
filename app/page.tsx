@@ -352,8 +352,18 @@ const HomePageReportContent = async ({
     forecast,
     decisionRules: homeBriefModel.decisionRules,
   });
-  const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries, { interpretationLayer, postureWithStageLabel: homeBriefModel.postureWithStageLabel, historicalAnalogs: homeBriefModel.historicalAnalogs });
-  const boardSummary = buildBoardBrief(assessment, treasury, sensors, macroSeries, { interpretationLayer, postureWithStageLabel: homeBriefModel.postureWithStageLabel, historicalAnalogs: homeBriefModel.historicalAnalogs });
+  const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries, {
+    interpretationLayer,
+    postureWithStageLabel: homeBriefModel.postureWithStageLabel,
+    historicalAnalogs: homeBriefModel.historicalAnalogs,
+    failureModes: homeBriefModel.failureModes,
+  });
+  const boardSummary = buildBoardBrief(assessment, treasury, sensors, macroSeries, {
+    interpretationLayer,
+    postureWithStageLabel: homeBriefModel.postureWithStageLabel,
+    historicalAnalogs: homeBriefModel.historicalAnalogs,
+    failureModes: homeBriefModel.failureModes,
+  });
   const callCitation = buildCallCitation(assessment, treasury, { interpretationLayer, postureWithStageLabel: homeBriefModel.postureWithStageLabel });
   const featuredConcepts = getFeaturedConceptArticles().slice(0, 3);
   return (
@@ -435,6 +445,7 @@ const HomePageReportContent = async ({
         regimeVelocity={homeBriefModel.regimeVelocity}
         citation={callCitation}
         isFallbackSnapshot={isFallback && !historicalSelection}
+        failureModes={homeBriefModel.failureModes}
         actions={<CopyLeadershipArtifactsButtons slackBrief={slackBrief} boardSummary={boardSummary} citation={callCitation} />}
       />
 
