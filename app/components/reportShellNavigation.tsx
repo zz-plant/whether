@@ -5,12 +5,14 @@ import { useEffect, useMemo, useState } from "react";
 import { Collapsible } from "@base-ui/react/collapsible";
 import { NavigationMenu } from "@base-ui/react/navigation-menu";
 import { pathMatchesLink } from "../../lib/navigation/pathMatching";
+import { navigationGroupLabels } from "../../lib/navigation/informationArchitecture";
 
 export type ReportPageLink = {
   id: string;
   href: string;
   label: string;
   description: string;
+  group: "core" | "workflow" | "reference";
 };
 
 export type ReportSectionLink = {
@@ -68,17 +70,6 @@ const getPageLinkStateClassName = ({
 
   return "border-slate-700/80 bg-slate-900/45 text-slate-200 hover:border-sky-400/70 hover:text-slate-100";
 };
-
-const getPageLinkClassName = ({
-  isActive,
-  isOddTail,
-}: {
-  isActive: boolean;
-  isOddTail?: boolean;
-}) =>
-  `${basePageLinkClassName} ${getPageLinkStateClassName({ isActive })} ${
-    isOddTail ? "mx-auto max-w-[240px]" : ""
-  }`;
 
 const isActivePageLink = ({
   link,
@@ -233,6 +224,17 @@ const pageLinkIcons: Record<string, ReactNode> = {
 
 const defaultPageLinkIcon = pageLinkIcons.method;
 
+const navigationGroupOrder: Array<keyof typeof navigationGroupLabels> = ["core", "workflow", "reference"];
+
+const groupPageLinks = (pageLinks: ReportPageLink[]) =>
+  navigationGroupOrder
+    .map((group) => ({
+      group,
+      label: navigationGroupLabels[group],
+      links: pageLinks.filter((link) => link.group === group),
+    }))
+    .filter((groupSection) => groupSection.links.length > 0);
+
 const useReportActiveSectionHref = (sectionLinks: ReportSectionLink[]) => {
   const [activeSectionHref, setActiveSectionHref] = useState(sectionLinks[0]?.href);
 
@@ -311,40 +313,43 @@ export const ReportPageNavigation = ({
   className?: string;
   variant?: "full" | "compact";
 }) => {
+  const groupedPageLinks = groupPageLinks(pageLinks);
+
   return (
     <NavigationMenu.Root aria-label="Report paths" className={className}>
-      <div className="space-y-2">
-        <NavigationMenu.List className="grid grid-cols-2 gap-2 rounded-2xl border border-slate-800/80 bg-slate-950/45 p-2 sm:flex sm:flex-wrap sm:gap-2">
-          {pageLinks.map((link, index) => {
-            const isActive = isActivePageLink({ link, currentPath, pageTitle });
-            const isOddTail =
-              pageLinks.length % 2 === 1 && index === pageLinks.length - 1;
-            return (
-              <NavigationMenu.Item
-                key={link.href}
-                className={`flex ${isOddTail ? "col-span-2 sm:col-auto" : ""} sm:flex-shrink-0`}
-              >
-                <NavigationMenu.Link
-                  href={link.href}
-                  active={isActive}
-                  aria-current={isActive ? "page" : undefined}
-                  className={getPageLinkClassName({
-                    isActive,
-                    isOddTail,
-                  })}
-                >
-                  <span className="inline-flex items-center gap-2">
-                    <span className="inline-flex h-5 w-5 items-center justify-center [&_svg]:h-4 [&_svg]:w-4" aria-hidden="true">
-                      {pageLinkIcons[link.id] ?? defaultPageLinkIcon}
-                    </span>
-                    <span>{link.label}</span>
-                  </span>
-                </NavigationMenu.Link>
-              </NavigationMenu.Item>
-            );
-          })}
-        </NavigationMenu.List>
-
+      <div className="space-y-2 rounded-2xl border border-slate-800/80 bg-slate-950/45 p-2">
+        {groupedPageLinks.map((groupSection) => (
+          <div key={groupSection.group} className="space-y-2">
+            <p className="px-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+              {groupSection.label}
+            </p>
+            <NavigationMenu.List className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {groupSection.links.map((link) => {
+                const isActive = isActivePageLink({ link, currentPath, pageTitle });
+                return (
+                  <NavigationMenu.Item key={link.href} className="flex">
+                    <NavigationMenu.Link
+                      href={link.href}
+                      active={isActive}
+                      aria-current={isActive ? "page" : undefined}
+                      className={`${basePageLinkClassName} h-full flex-col items-start justify-start gap-1 text-left sm:w-full sm:text-left ${getPageLinkStateClassName({ isActive })}`}
+                    >
+                      <span className="inline-flex items-center gap-2">
+                        <span className="inline-flex h-5 w-5 items-center justify-center [&_svg]:h-4 [&_svg]:w-4" aria-hidden="true">
+                          {pageLinkIcons[link.id] ?? defaultPageLinkIcon}
+                        </span>
+                        <span>{link.label}</span>
+                      </span>
+                      <span className="text-[11px] font-medium normal-case tracking-normal text-slate-300">
+                        {link.description}
+                      </span>
+                    </NavigationMenu.Link>
+                  </NavigationMenu.Item>
+                );
+              })}
+            </NavigationMenu.List>
+          </div>
+        ))}
       </div>
     </NavigationMenu.Root>
   );
@@ -477,15 +482,18 @@ export const ReportMobileNavigation = ({
               <p className="truncate text-sm font-semibold tracking-[0.08em] text-slate-100">
                 {currentLink.label}
               </p>
-              <p className="mt-1 truncate text-xs text-slate-300">{pageCountLabel}</p>
+              <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">{navigationGroupLabels[currentLink.group]}</p>
+              <p className="mt-1 line-clamp-2 text-xs text-slate-300">{currentLink.description}</p>
+              <p className="mt-1 truncate text-[11px] text-slate-400">{pageCountLabel}</p>
             </div>
             </div>
             {adjacentLinks[0] ? (
               <a
                 href={adjacentLinks[0].href}
-                className="weather-pill inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-700/80 px-3 py-2 text-[11px] font-semibold tracking-[0.12em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                className="weather-pill inline-flex min-h-[44px] max-w-[160px] flex-col items-start justify-center rounded-2xl border border-slate-700/80 px-3 py-2 text-left transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
               >
-                {adjacentLinks[0].label}
+                <span className="text-[11px] font-semibold tracking-[0.12em] text-slate-100">{adjacentLinks[0].label}</span>
+                <span className="mt-1 text-[10px] text-slate-300">{adjacentLinks[0].description}</span>
               </a>
             ) : null}
           </div>
@@ -496,9 +504,10 @@ export const ReportMobileNavigation = ({
                 <NavigationMenu.Item key={link.href}>
                   <NavigationMenu.Link
                     href={link.href}
-                    className="weather-pill inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-slate-800/80 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                    className="weather-pill inline-flex min-h-[44px] w-full flex-col items-start justify-center rounded-2xl border border-slate-800/80 px-3 py-2 text-left transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
                   >
-                    {link.label}
+                    <span className="text-xs font-semibold tracking-[0.12em] text-slate-200">{link.label}</span>
+                    <span className="mt-1 text-[11px] text-slate-400">{link.description}</span>
                   </NavigationMenu.Link>
                 </NavigationMenu.Item>
               ))}
