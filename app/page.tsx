@@ -381,7 +381,7 @@ const HomePageReportContent = async ({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Weekly Operating Posture Brief"
       currentPath="/"
-      pageSummary="Verdict and immediate decision call for this planning cycle."
+      pageSummary="Action, guardrail, and flip condition for this planning cycle; scores stay contextual."
       primaryCta={{
         href: "#weekly-posture-brief-title",
         label: "Prepare Monday leadership sync brief",

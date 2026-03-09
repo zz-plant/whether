@@ -19,6 +19,10 @@ import {
   type ForecastModel,
   type TransitionVelocityEstimate,
 } from "./forecastModel";
+import {
+  buildFailureModeWarnings,
+  type FailureModeWarning,
+} from "./trustStatus";
 
 type Regime = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
 

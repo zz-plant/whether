@@ -36,16 +36,31 @@ describe("WeeklyDecisionCard extracted sections", () => {
           thresholdDirection: "riseAbove",
         }}
         movementVelocity="Low"
+        startupClimateIndex={{ score: 62, status: "Stable" }}
       />,
     );
 
     assert.match(html, /Weekly operating call/);
-    assert.match(html, /From macro signals to one shareable leadership call\./);
+    assert.match(html, /Lead with action, guardrail, and flip condition; treat scores as context for continuity\./);
     assert.match(html, /Macro posture band/);
     assert.match(html, /points to flip/);
     assert.match(html, /Guardrail/);
     assert.match(html, /Flip condition/);
+    assert.match(html, /Context metric: Startup Climate Index/);
     assert.match(html, /False-signal warnings/);
+
+    const actionIndex = html.indexOf("Action");
+    const guardrailIndex = html.indexOf("Guardrail");
+    const flipConditionIndex = html.indexOf("Flip condition");
+    const confidenceIndex = html.indexOf("Confidence");
+    const trendIndex = html.indexOf("Trend:");
+    const scoreMetadataIndex = html.indexOf("Context metric: Startup Climate Index");
+
+    assert.ok(guardrailIndex > actionIndex);
+    assert.ok(flipConditionIndex > guardrailIndex);
+    assert.ok(scoreMetadataIndex > flipConditionIndex);
+    assert.ok(scoreMetadataIndex > confidenceIndex);
+    assert.ok(scoreMetadataIndex > trendIndex);
   });
 
   it("marks risk-appetite defensive trigger as breached only when value is at or below threshold", () => {
@@ -75,6 +90,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
           thresholdDirection: "fallToOrBelow",
         }}
         movementVelocity="Medium"
+        startupClimateIndex={{ score: 58, status: "Stable" }}
       />,
     );
 

@@ -15,6 +15,8 @@ import {
   movementMeterToneByDirection,
   resolveSignalDirection,
   signalOrder,
+  STARTUP_INDEX_CONTEXT_LABEL,
+  TOP_FOLD_DECISION_PRIORITY_COPY,
 } from "../../lib/report/briefFormatting";
 
 type WhyThisCallItem = { label: string; detail: string };
@@ -200,6 +202,7 @@ type DecisionCallHeaderProps = {
   regimeDistance: WeeklyDecisionCardProps["regimeDistance"];
   movementVelocity: "Low" | "Medium" | "High";
   topContributorInline: string;
+  startupClimateIndex: Pick<WeeklyDecisionCardProps["startupClimateIndex"], "score" | "status">;
 };
 
 export function DecisionCallHeader({
@@ -222,6 +225,7 @@ export function DecisionCallHeader({
   regimeDistance,
   movementVelocity,
   topContributorInline,
+  startupClimateIndex,
 }: DecisionCallHeaderProps) {
   const gaugePercent = regimeGaugePercentByLabel[statusLabel] ?? 50;
   const thresholdBreached =
@@ -241,7 +245,7 @@ export function DecisionCallHeader({
 
       <article className={`${tierOnePanel} ${sectionSpacing}`} aria-label="Operating call panel">
         <h2 className={tierOneHeading}>This week in 15 seconds</h2>
-        <p className="text-xs text-slate-300">From macro signals to one shareable leadership call.</p>
+        <p className="text-xs text-slate-300">{TOP_FOLD_DECISION_PRIORITY_COPY}</p>
         <p className="text-sm leading-relaxed text-slate-200">{meetingShorthand}</p>
         <p className="text-xs text-slate-300">Top contributors: {topContributorInline}</p>
 
@@ -322,6 +326,9 @@ export function DecisionCallHeader({
         </article>
 
         <p className="text-xs text-slate-300">{netConstraintSummary}</p>
+        <p className="text-[11px] uppercase tracking-[0.1em] text-slate-500">
+          {STARTUP_INDEX_CONTEXT_LABEL} {startupClimateIndex.score} / 100 ({startupClimateIndex.status})
+        </p>
         <p className="inline-flex items-center gap-1.5 text-xs text-slate-300"><span aria-hidden="true" className="text-slate-400"><svg viewBox="0 0 12 12" className="h-3 w-3"><path d="M6 1.6 9 2.8v2.9c0 2-1.2 3.8-3 4.7-1.8-.9-3-2.7-3-4.7V2.8l3-1.2Z" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" /></svg></span>Trust status: {trustCueLine}</p>
         {needsTrustWarning ? (
           <p className="rounded-md border border-amber-500/50 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">{trustWarningCopy}</p>
@@ -401,8 +408,8 @@ export function MoreContextDisclosureBody({
       </summary>
       <div className="mt-3 space-y-4">
         <article className="space-y-2">
-          <h2 className={tierTwoHeading}>Startup Climate Index</h2>
-          <p className="text-xs text-slate-300">Score {startupClimateIndex.score} / 100 · {startupClimateIndex.status}</p>
+          <h2 className={tierTwoHeading}>Startup Climate Index (context)</h2>
+          <p className="text-xs text-slate-300">Context metric for continuity: {startupClimateIndex.score} / 100 · {startupClimateIndex.status}</p>
           <ul className="mt-2 grid gap-2 sm:grid-cols-2">
             {startupClimateIndex.breakdown.map((item) => (
               <li key={item.label} className="space-y-1">
@@ -613,6 +620,7 @@ export function WeeklyDecisionCard({
         regimeDistance={regimeDistance}
         movementVelocity={movementVelocity}
         topContributorInline={topContributorInline}
+        startupClimateIndex={startupClimateIndex}
       />
 
       {actions ? (
