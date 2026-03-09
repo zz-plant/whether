@@ -24,7 +24,6 @@ import { RunwayPlannerPanel } from "./components/runwayPlannerPanel";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { LiveDataFallbackAlert } from "../components/liveDataFallbackAlert";
 
-export const runtime = "edge";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Whether Report — Action playbook",

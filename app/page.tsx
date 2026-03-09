@@ -61,7 +61,6 @@ const ExecutiveSnapshotFallback = () => (
 );
 
 export const revalidate = 900;
-export const runtime = "edge";
 
 const homeSectionSequence = [
   { href: "#weekly-posture-brief-title", label: "This week" },
