@@ -3,7 +3,13 @@
 import type { ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 
-export function RevealOnView({ children }: { children: ReactNode }) {
+export function RevealOnView({
+  children,
+  placeholder,
+}: {
+  children: ReactNode;
+  placeholder?: ReactNode;
+}) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [visible, setVisible] = useState(false);
 
@@ -27,10 +33,10 @@ export function RevealOnView({ children }: { children: ReactNode }) {
     <div
       ref={ref}
       className={`transition-[opacity,transform] duration-500 motion-reduce:transition-none ${
-        visible ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
+        visible || placeholder ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
       }`}
     >
-      {visible ? children : null}
+      {visible ? children : placeholder ?? null}
     </div>
   );
 }
