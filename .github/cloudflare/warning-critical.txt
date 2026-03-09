@@ -1,3 +1,4 @@
 Error:
 Failed to compile
 Unhandled Runtime Error
+Invalid prerender config

@@ -1,18 +1,14 @@
 import type { Metadata } from "next";
 import { buildPageMetadata } from "../../../lib/seo";
-import { findDecisionPage, highValueAnswerStaticParams, highValueStaticAnswerSlugs } from "../decisionPages";
+import { findDecisionPage, highValueStaticAnswerSlugs } from "../decisionPages";
 import { DecisionAnswerPageContent } from "../decisionAnswerPageContent";
 
 type DecisionPageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export const dynamicParams = true;
-export const revalidate = 900;
-
-export function generateStaticParams() {
-  return highValueAnswerStaticParams;
-}
+export const runtime = "edge";
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: DecisionPageProps): Promise<Metadata> {
   const { slug } = await params;

@@ -2,15 +2,12 @@ import type { Metadata, Route } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../lib/seo";
-import { findToolkitDefinition, toolkitStaticParams } from "../../../lib/informationArchitecture";
+import { findToolkitDefinition } from "../../../lib/informationArchitecture";
 type Params = { slug: string };
 
-export const dynamicParams = true;
-export const revalidate = 900;
+export const runtime = "edge";
+export const dynamic = "force-dynamic";
 
-export function generateStaticParams() {
-  return toolkitStaticParams;
-}
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug } = await params;

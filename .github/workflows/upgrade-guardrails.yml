@@ -38,6 +38,13 @@ jobs:
           mkdir -p artifacts
           bun run build:pages 2>&1 | tee artifacts/cloudflare-build.log
 
+      - name: Fail on invalid prerender config warnings
+        run: |
+          if rg -q "Invalid prerender config" artifacts/cloudflare-build.log; then
+            echo "Detected Invalid prerender config warnings in Cloudflare build log." >&2
+            exit 1
+          fi
+
       - name: Audit Cloudflare warning budget
         run: |
           node scripts/cloudflare-warning-audit.mjs \

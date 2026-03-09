@@ -3,7 +3,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../lib/seo";
 import {
-  decideStaticParams,
   findToolkitDefinition,
   findUseCaseRole,
   isSituationUseCaseSlug,
@@ -17,12 +16,9 @@ const titleCase = (value: string) => value
   .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
   .join(" ");
 
-export const dynamicParams = false;
-export const revalidate = 900;
+export const runtime = "edge";
+export const dynamic = "force-dynamic";
 
-export function generateStaticParams() {
-  return decideStaticParams;
-}
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug } = await params;

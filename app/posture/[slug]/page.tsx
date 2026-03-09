@@ -5,11 +5,9 @@ import { buildPageMetadata } from "../../../lib/seo";
 import { postureDefinitions } from "../../../lib/informationArchitecture";
 type Params = { slug: string };
 
-export const dynamicParams = false;
+export const runtime = "edge";
+export const dynamic = "force-dynamic";
 
-export function generateStaticParams() {
-  return postureDefinitions.map((entry) => ({ slug: entry.slug }));
-}
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug } = await params;
