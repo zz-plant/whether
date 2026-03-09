@@ -57,7 +57,7 @@ export const buildSparkline = (history?: SeriesHistoryPoint[]) => {
       SPARKLINE_HEIGHT -
       SPARKLINE_PADDING -
       ((point.value - minValue) / range) * innerHeight;
-    return { x, y };
+    return { x, y, value: point.value };
   });
 
   const path = coords
@@ -67,8 +67,27 @@ export const buildSparkline = (history?: SeriesHistoryPoint[]) => {
   const last = coords[coords.length - 1];
   const baseY = SPARKLINE_HEIGHT - SPARKLINE_PADDING;
   const area = `${path} L ${last.x} ${baseY} L ${first.x} ${baseY} Z`;
+  const latest = coords[coords.length - 1];
+  const previous = coords[coords.length - 2] ?? latest;
+  const delta = latest.value - previous.value;
+  const direction = delta > 0 ? "up" : delta < 0 ? "down" : "flat";
+  const medianValue = [...values].sort((a, b) => a - b)[Math.floor(values.length / 2)] ?? values[0];
+  const medianY =
+    SPARKLINE_HEIGHT -
+    SPARKLINE_PADDING -
+    ((medianValue - minValue) / range) * innerHeight;
 
-  return { path, area };
+  return {
+    path,
+    area,
+    latest,
+    previous,
+    delta,
+    direction,
+    medianY,
+    minValue,
+    maxValue,
+  };
 };
 
 export const getRegimeLabel = (regime: RegimeAssessment["regime"]) => REGIME_LABELS[regime];

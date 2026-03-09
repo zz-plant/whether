@@ -16,13 +16,14 @@ export type MiniSeriesRowProps = {
   thresholds: readonly RowThreshold[];
   updatedAt: string;
   insight: string;
+  sharedDomain?: { min: number; max: number };
 };
 
 const SPARK_WIDTH = 280;
 const SPARK_HEIGHT = 64;
 const PADDING = 8;
 
-const parseSeries = (series: SeriesHistoryPoint[]) => {
+const parseSeries = (series: SeriesHistoryPoint[], sharedDomain?: { min: number; max: number }) => {
   const valid = series.filter((point): point is SeriesHistoryPoint & { value: number } =>
     typeof point.value === "number",
   );
@@ -32,8 +33,10 @@ const parseSeries = (series: SeriesHistoryPoint[]) => {
   }
 
   const values = valid.map((point) => point.value);
-  const min = Math.min(...values);
-  const max = Math.max(...values);
+  const localMin = Math.min(...values);
+  const localMax = Math.max(...values);
+  const min = sharedDomain ? Math.min(sharedDomain.min, localMin) : localMin;
+  const max = sharedDomain ? Math.max(sharedDomain.max, localMax) : localMax;
   const median = [...values].sort((a, b) => a - b)[Math.floor(values.length / 2)] ?? values[0];
   const range = max - min || 1;
   const innerW = SPARK_WIDTH - PADDING * 2;
@@ -56,6 +59,8 @@ const parseSeries = (series: SeriesHistoryPoint[]) => {
     median,
     min,
     max,
+    latest: coords[coords.length - 1],
+    previous: coords[coords.length - 2] ?? coords[coords.length - 1],
   };
 };
 
@@ -67,11 +72,14 @@ export const MiniSeriesRow = ({
   thresholds,
   updatedAt,
   insight,
+  sharedDomain,
 }: MiniSeriesRowProps) => {
-  const parsed = parseSeries(series);
+  const parsed = parseSeries(series, sharedDomain);
   const isOutlier = zScore !== null && Math.abs(zScore) >= 1.5;
   const lineColor = isOutlier ? "#f43f5e" : "#94a3b8";
-  const rowSummary = `${name}. Latest ${latestValue}. Updated ${updatedAt}. ${insight}`;
+  const sparkDelta = parsed ? parsed.latest.value - parsed.previous.value : 0;
+  const directionLabel = sparkDelta > 0 ? "up" : sparkDelta < 0 ? "down" : "flat";
+  const rowSummary = `${name}. Latest ${latestValue}. Trend ${directionLabel}. Updated ${updatedAt}. ${insight}`;
 
   return (
     <article
@@ -92,6 +100,7 @@ export const MiniSeriesRow = ({
             <path d={parsed.path} fill="none" stroke={lineColor} strokeWidth="1.8" vectorEffect="non-scaling-stroke" />
             <line x1={PADDING} x2={SPARK_WIDTH - PADDING} y1={parsed.toY(parsed.median)} y2={parsed.toY(parsed.median)} stroke="#475569" strokeDasharray="3 3" strokeWidth="1" />
             <text x={SPARK_WIDTH - PADDING} y={parsed.toY(parsed.median) - 2} textAnchor="end" className="fill-slate-500 text-[9px]">Median</text>
+            <circle cx={parsed.latest.x} cy={parsed.latest.y} r="2" fill="#e2e8f0" />
             {thresholds.map((threshold) => {
               if (threshold.value < parsed.min || threshold.value > parsed.max) {
                 return null;
@@ -112,6 +121,7 @@ export const MiniSeriesRow = ({
 
       <div className="space-y-2 text-sm text-slate-200">
         <p>{insight}</p>
+        <p className="text-xs text-slate-400">Trend {directionLabel} · Δ {formatNumberValue(sparkDelta)}</p>
         <p className="text-xs text-slate-400">
           z-score:{" "}
           <span className={isOutlier ? "font-semibold text-rose-300" : "text-slate-300"}>

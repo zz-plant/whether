@@ -10,11 +10,9 @@ import {
 import {
   deltaLabelBySignal,
   movementMeterToneByDirection,
-  normalizeMeterToPercent,
   postureDisplayLabel,
   resolveSignalDirection,
   signalOrder,
-  timelinePosturePercent,
 } from "../../lib/report/briefFormatting";
 
 type WhyThisCallItem = { label: string; detail: string };
@@ -73,13 +71,18 @@ const tierTwoInset = "rounded-md border border-slate-700/55 bg-slate-950/58 px-3
 const tierThreeInset = "rounded-md border border-slate-800/50 bg-slate-950/48 px-3 py-3";
 const neutralLabel = "font-semibold uppercase tracking-[0.12em] text-slate-300";
 
-const regimeGaugeStops = ["Expansion", "Mixed", "Scarcity", "Defensive"] as const;
+const regimeSegments = [
+  { key: "EXPANSION", label: "Expansion", shortLabel: "EX", classes: "bg-emerald-400/30 text-emerald-100" },
+  { key: "VOLATILE", label: "Volatile", shortLabel: "VO", classes: "bg-amber-300/30 text-amber-100" },
+  { key: "SCARCITY", label: "Scarcity", shortLabel: "SC", classes: "bg-rose-300/30 text-rose-100" },
+  { key: "DEFENSIVE", label: "Defensive", shortLabel: "DE", classes: "bg-violet-300/30 text-violet-100" },
+] as const;
 const regimeGaugePercentByLabel: Record<string, number> = {
-  EXPANSION: 12,
-  BALANCED: 40,
-  VOLATILE: 40,
-  SCARCITY: 68,
-  DEFENSIVE: 92,
+  EXPANSION: 12.5,
+  BALANCED: 37.5,
+  VOLATILE: 37.5,
+  SCARCITY: 62.5,
+  DEFENSIVE: 87.5,
 };
 
 const resolveVelocityLabel = (rows: Array<{ delta: number }>): "Low" | "Medium" | "High" => {
@@ -95,6 +98,41 @@ const resolveVelocityLabel = (rows: Array<{ delta: number }>): "Low" | "Medium" 
 
 const meterTrackBase = "relative h-2 rounded-full";
 const meterFillBase = "h-2 rounded-full";
+
+const movementDomainBySignal: Record<(typeof signalOrder)[number], number> = {
+  tightness: 6,
+  riskAppetite: 6,
+  baseRate: 1.5,
+  curveSlope: 1.5,
+};
+
+const toMovementPercent = (signalKey: (typeof signalOrder)[number], delta: number) => {
+  const domain = movementDomainBySignal[signalKey] ?? 1.5;
+  return Math.max(6, Math.min(100, Math.round((Math.abs(delta) / domain) * 100)));
+};
+
+const movementSignificance = (signalKey: (typeof signalOrder)[number], delta: number) => {
+  const ratio = Math.abs(delta) / (movementDomainBySignal[signalKey] ?? 1.5);
+  if (ratio >= 1) return "Extreme";
+  if (ratio >= 0.66) return "Material";
+  if (ratio >= 0.33) return "Mild";
+  return "Low";
+};
+
+const PostureHistoryTimeline = ({ historicalTimeline }: { historicalTimeline: WeeklyDecisionCardProps["historicalTimeline"] }) => (
+  <ol className="mt-2 grid gap-2 lg:grid-cols-4" aria-label="Posture change timeline">
+    {historicalTimeline.map((item, index) => {
+      const isCurrent = index === historicalTimeline.length - 1;
+      return (
+        <li key={`${item.label}-${item.posture}`} className={`${tierThreeInset} text-xs ${isCurrent ? "border-sky-400/70 bg-sky-500/10" : ""}`}>
+          <p className="text-slate-400">{item.label}</p>
+          <p className="mt-1 font-semibold text-slate-100">{item.posture}</p>
+          {isCurrent ? <p className="mt-1 text-[10px] uppercase tracking-[0.1em] text-sky-200">Current week</p> : null}
+        </li>
+      );
+    })}
+  </ol>
+);
 
 type DecisionCallHeaderProps = {
   statusLabel: string;
@@ -180,16 +218,20 @@ export function DecisionCallHeader({
         </div>
 
         <article className={tierOneInset}>
-          <p className={`text-xs ${neutralLabel}`}>Macro posture dial</p>
+          <p className={`text-xs ${neutralLabel}`}>Macro posture band</p>
           <div className="mt-2">
-            <div className="mb-2 grid grid-cols-4 text-[11px] uppercase tracking-[0.1em] text-slate-400">
-              {regimeGaugeStops.map((item) => <span key={item}>{item}</span>)}
+            <div className="mb-2 grid grid-cols-4 text-[11px] uppercase tracking-[0.1em]">
+              {regimeSegments.map((segment) => <span key={segment.key} className="text-slate-400" title={segment.label}>{segment.shortLabel}</span>)}
             </div>
-            <div className="relative h-2 rounded-full bg-slate-800">
+            <div className="relative grid h-3 grid-cols-4 overflow-hidden rounded-full border border-slate-700/70 bg-slate-900/80">
+              {regimeSegments.map((segment) => (
+                <div key={segment.key} className={segment.classes} aria-label={segment.label} />
+              ))}
               <div className="absolute -top-1 h-4 w-4 -translate-x-1/2 rounded-full border-2 border-slate-100 bg-sky-200" style={{ left: `${gaugePercent}%` }} />
+              {transitionWatch === "ON" ? <div className="absolute inset-y-[-2px] left-1/2 w-0.5 -translate-x-1/2 bg-amber-200/90" aria-hidden="true" /> : null}
             </div>
           </div>
-          <p className="mt-2 text-xs text-slate-300">Trend: {trendLabel} · Regime shift watch {transitionWatch}</p>
+          <p className="mt-2 text-xs text-slate-300">Trend: {trendLabel} · {Math.abs(regimeDistance.pointsToFlip).toFixed(1)} points to flip · Regime shift watch {transitionWatch}</p>
         </article>
 
         <article className="rounded-lg border border-amber-500/45 bg-amber-500/10 px-3 py-3">
@@ -321,14 +363,7 @@ export function MoreContextDisclosureBody({
 
         <article className="space-y-3">
           <h2 className={tierThreeHeading}>Posture history</h2>
-          <div className="flex flex-wrap items-center gap-2" aria-label="Macro regime timeline">
-            {historicalTimeline.map((item) => (
-              <div key={`${item.label}-${item.posture}`} className={`${tierThreeInset} py-2 text-xs text-slate-200`}>
-                <p className="text-slate-400">{item.label}</p>
-                <p className="font-semibold text-slate-100">{item.posture}</p>
-              </div>
-            ))}
-          </div>
+          <PostureHistoryTimeline historicalTimeline={historicalTimeline} />
           <div>
             <p className={tierThreeHeading}>Historical memory rail</p>
             <ul className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
@@ -339,16 +374,6 @@ export function MoreContextDisclosureBody({
                 </li>
               ))}
             </ul>
-          </div>
-          <div className="mt-2 flex flex-wrap items-center gap-2">
-            {historicalTimeline.map((item, index) => (
-              <div key={`${item.label}-${item.posture}-bar`} className="flex items-center gap-2">
-                <div className="h-2 w-12 rounded-full bg-slate-800">
-                  <div className="h-2 rounded-full bg-sky-300/75" style={{ width: `${timelinePosturePercent(item.posture)}%` }} />
-                </div>
-                {index < historicalTimeline.length - 1 ? <span className="text-slate-500">→</span> : null}
-              </div>
-            ))}
           </div>
           <ul className="grid gap-2 text-xs text-slate-300 sm:grid-cols-2 lg:grid-cols-4">
             {macroOverlay.map((item) => (
@@ -435,14 +460,6 @@ export function WeeklyDecisionCard({
     ? "Revise hiring and roadmap calls now."
     : "Hold last week's operating rules.";
 
-  const signalMagnitude = Math.max(
-    ...signalOrder.map((key) => {
-      const signal = reportDynamics.changedSignals.find((item) => item.key === key);
-      return Math.abs(signal?.delta ?? 0);
-    }),
-    1,
-  );
-
   const macroMovementRows = signalOrder.map((key) => {
     const signal = reportDynamics.changedSignals.find((item) => item.key === key);
     const delta = signal?.delta ?? 0;
@@ -454,7 +471,8 @@ export function WeeklyDecisionCard({
       direction,
       delta,
       arrow,
-      meter: normalizeMeterToPercent(delta, signalMagnitude),
+      meter: toMovementPercent(key, delta),
+      significance: movementSignificance(key, delta),
     };
   });
 
@@ -541,7 +559,10 @@ export function WeeklyDecisionCard({
                       {signal.arrow} {signal.delta > 0 ? `+${signal.delta.toFixed(1)}` : signal.delta.toFixed(1)}
                     </span>
                   </div>
+                  <div className="text-[10px] uppercase tracking-[0.1em] text-slate-400">{signal.significance} move</div>
                   <div className={`${meterTrackBase} border border-slate-700/70 bg-slate-900/80`}>
+                    <div className="pointer-events-none absolute inset-y-0 left-1/3 w-px bg-slate-600/70" aria-hidden="true" />
+                    <div className="pointer-events-none absolute inset-y-0 left-2/3 w-px bg-slate-600/70" aria-hidden="true" />
                     <div
                       className={`${meterFillBase} ${movementMeterToneByDirection[resolveSignalDirection(signal.delta)]}`}
                       style={{ width: `${signal.meter}%` }}
