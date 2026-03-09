@@ -67,6 +67,9 @@ describe("weekly card and interpretation panel composition", () => {
       <>
         <WeeklyDecisionCard
           statusLabel="DEFENSIVE"
+        postureLabel="Defensive"
+        stageLabel="Watchful"
+        postureWithStageLabel="Defensive — Watchful"
           postureDelta="Worse than last week"
           confidenceLabel="MED"
           confidencePercent={68}
@@ -155,6 +158,9 @@ describe("weekly card and interpretation panel composition", () => {
       <>
         <WeeklyDecisionCard
           statusLabel="DEFENSIVE"
+        postureLabel="Defensive"
+        stageLabel="Watchful"
+        postureWithStageLabel="Defensive — Watchful"
           postureDelta="Worse than last week"
           confidenceLabel="MED"
           confidencePercent={68}

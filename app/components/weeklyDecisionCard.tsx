@@ -28,6 +28,8 @@ type FailureModeWarningItem = { id: string; warning: string; mitigationCheck: st
 
 export type WeeklyDecisionCardProps = {
   statusLabel: string;
+  postureLabel: string;
+  stageLabel: string;
   postureWithStageLabel: string;
   postureDelta: string;
   confidenceLabel: "HIGH" | "MED" | "LOW";
@@ -184,6 +186,8 @@ const PostureHistoryTimeline = ({ historicalTimeline }: { historicalTimeline: We
 
 type DecisionCallHeaderProps = {
   statusLabel: string;
+  postureLabel: string;
+  stageLabel: string;
   postureWithStageLabel: string;
   netConstraintSummary: string;
   meetingShorthand: string;
@@ -207,6 +211,8 @@ type DecisionCallHeaderProps = {
 
 export function DecisionCallHeader({
   statusLabel,
+  postureLabel,
+  stageLabel,
   postureWithStageLabel,
   netConstraintSummary,
   meetingShorthand,
@@ -240,8 +246,12 @@ export function DecisionCallHeader({
     <header className="space-y-5 border-b border-slate-700/80 pb-6" data-testid="weekly-top-fold">
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Weekly operating call</p>
       <h1 id="weekly-posture-brief-title" className="text-3xl font-semibold text-slate-50 sm:text-4xl">
-        {postureWithStageLabel}
+        This week&apos;s operating posture
       </h1>
+      <div className="space-y-1 text-lg font-semibold text-slate-50 sm:text-xl">
+        <p>Regime: {postureLabel}</p>
+        <p>Stage: {stageLabel}</p>
+      </div>
 
       <article className={`${tierOnePanel} ${sectionSpacing}`} aria-label="Operating call panel">
         <h2 className={tierOneHeading}>This week in 15 seconds</h2>
@@ -508,6 +518,8 @@ export function CitationActionFooter({ citationMetaLine, citation, actions }: Ci
 
 export function WeeklyDecisionCard({
   statusLabel,
+  postureLabel,
+  stageLabel,
   postureWithStageLabel,
   postureDelta,
   confidenceLabel,
@@ -602,6 +614,8 @@ export function WeeklyDecisionCard({
     <section className="weather-panel space-y-5 px-5 py-6 sm:space-y-6 sm:px-7 sm:py-8" aria-labelledby="weekly-posture-brief-title">
       <DecisionCallHeader
         statusLabel={statusLabel}
+        postureLabel={postureLabel}
+        stageLabel={stageLabel}
         postureWithStageLabel={postureWithStageLabel}
         netConstraintSummary={netConstraintSummary}
         meetingShorthand={meetingShorthand}

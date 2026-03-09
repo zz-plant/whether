@@ -417,6 +417,8 @@ const HomePageReportContent = async ({
     >
       <WeeklyDecisionCard
         statusLabel={displayRegime.label}
+        postureLabel={homeBriefModel.postureLabel}
+        stageLabel={homeBriefModel.stageLabel}
         postureWithStageLabel={homeBriefModel.postureWithStageLabel}
         postureDelta={homeBriefModel.postureDeltaLabel}
         confidenceLabel={homeBriefModel.confidenceLabel}
