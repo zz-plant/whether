@@ -16,13 +16,13 @@ export const operationsWorkstreamLinks: OperationsWorkstreamLink[] = [
   {
     href: "/operations/integrations" as Route,
     label: "Integrations",
-    description: "Push weekly mandate payloads into Slack, Notion, and Linear.",
+    description: "Optional handoff: push approved weekly mandate payloads into Slack, Notion, and Linear.",
   },
 
   {
     href: "/operations/data",
     label: "Data",
-    description: "Access weekly API usage guidance and handoff references for operators.",
+    description: "Optional handoff: share API guidance and data references with automation owners.",
   },
 ];
 

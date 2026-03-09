@@ -33,7 +33,7 @@ export const OperationsWorkstreamNav = ({ currentPath }: { currentPath: Route })
       <div className="flex flex-col gap-1">
         <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Workstreams</p>
         <p className="text-sm text-slate-300">
-          Split the operations guidance into focused workflows so you can move faster.
+          Use Plan as the default weekly workflow; open Integrations/Data when you need implementation handoff.
         </p>
       </div>
       <ul className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
