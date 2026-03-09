@@ -189,6 +189,18 @@ describe("buildSlackBrief", () => {
     assert.match(citation, /Posture: Expansion — Late \(Fragile\) \(EXPANSION\)/);
   });
 
+
+
+  it("adds compact historical analog references when provided", () => {
+    const brief = buildSlackBrief(assessment, treasury, sensors, macros, {
+      historicalAnalogs: [
+        { date: "2024-10-31", similarityScore: 0.91, implication: "Keep approvals reversible while trend remains mixed." },
+      ],
+    });
+
+    assert.match(brief, /Historical analogs:/);
+    assert.match(brief, /2024-10-31 · 91% match/);
+  });
   it("omits interpretation context when default layer is selected", () => {
     const citation = buildCallCitation(assessment, treasury, {
       interpretationLayer: {

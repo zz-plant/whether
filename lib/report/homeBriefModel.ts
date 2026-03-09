@@ -3,6 +3,7 @@ import { buildRoleAwareOperatingTemplates } from "./operatingCalls";
 import { getSummaryArchive } from "../summary/summaryArchive";
 import type { MacroSeriesReading } from "../types";
 import { isImprovingSignalDelta } from "./reportData";
+import type { HistoricalAnalog } from "./reportData";
 import {
   REGIME_SEVERITY_RANK,
   REGIME_SHORT_LABELS,
@@ -34,6 +35,7 @@ type HomeReportData = {
   };
   macroSeries?: MacroSeriesReading[];
   forecast?: ForecastModel;
+  historicalAnalogs?: HistoricalAnalog[];
   [key: string]: unknown;
 };
 
@@ -66,6 +68,13 @@ type StartupClimateIndex = {
 type BoundaryDimension = "tightness" | "riskAppetite";
 
 type BoundaryDirection = "riseAbove" | "fallToOrBelow";
+
+
+type HomeBriefHistoricalAnalog = {
+  date: string;
+  similarityScore: number;
+  implication: string;
+};
 
 type MacroOverlayItem = {
   label: string;
@@ -379,7 +388,7 @@ export const buildHomeBriefModel = (
   data: HomeReportData,
   options?: { overlaySector?: SectorKey },
 ) => {
-  const { assessment, regimeAlert, stopItems, reportDynamics, recordDateLabel, macroSeries, forecast } = data;
+  const { assessment, regimeAlert, stopItems, reportDynamics, recordDateLabel, macroSeries, forecast, historicalAnalogs } = data;
   const overlaySector = options?.overlaySector ?? "b2b-saas";
   const timelineAnchorYear = resolveTimelineAnchorYear(recordDateLabel);
   const previousRegime = regimeAlert?.previousRegime;
@@ -474,6 +483,15 @@ export const buildHomeBriefModel = (
           thresholdDirection: boundaryDirectionForRegime(assessment.regime, "riskAppetite"),
         };
 
+
+  const normalizedHistoricalAnalogs: HomeBriefHistoricalAnalog[] = (historicalAnalogs ?? [])
+    .slice(0, 3)
+    .map((analog) => ({
+      date: analog.recordDate,
+      similarityScore: analog.score,
+      implication: analog.implication,
+    }));
+
   const guardrail = stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
   const decisionRules = buildCanonicalBoundedDecisionRules({
     regime: assessment.regime,
@@ -515,6 +533,7 @@ export const buildHomeBriefModel = (
     roleAwareTemplates,
     revisitDecisions: (reportDynamics?.changedSignals.length ?? 0) > 0 && reportDynamics?.directionLabel !== "stable",
     guardrail,
+    historicalAnalogs: normalizedHistoricalAnalogs,
     memoryRail: buildMemoryRail(recordDateLabel, assessment.regime),
     historicalTimeline: buildHistoricalTimeline(assessment.regime, timelineAnchorYear),
     macroOverlay: buildMacroOverlay(macroSeries, assessment, overlaySector),

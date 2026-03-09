@@ -35,6 +35,7 @@ describe("buildHomeBriefModel", () => {
     assert.equal(typeof model.revisitDecisions, "boolean");
     assert.ok(model.memoryRail.length > 0);
     assert.ok(model.historicalTimeline.length > 0);
+    assert.equal(model.historicalAnalogs.length, 0);
     assert.equal(model.macroOverlay.length, 5);
     assert.ok(model.macroOverlay.some((item) => item.label.includes("Sector sensitivity (Consumer)")));
     assert.equal(model.whyThisCall.length, 3);
@@ -72,6 +73,7 @@ describe("buildHomeBriefModel", () => {
     assert.equal(typeof model.revisitDecisions, "boolean");
     assert.ok(model.memoryRail.length > 0);
     assert.ok(model.historicalTimeline.length > 0);
+    assert.equal(model.historicalAnalogs.length, 0);
     assert.equal(model.macroOverlay.length, 5);
     assert.equal(model.whyThisCall.length, 3);
     assert.ok(model.primaryDrivers.length >= 2);

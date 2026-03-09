@@ -21,6 +21,7 @@ type WhyThisCallItem = { label: string; detail: string };
 type MemoryRailItem = { label: string; posture: string };
 type PrimaryDriverItem = { label: string; detail: string };
 type MacroOverlayItem = { label: string; detail: string };
+type HistoricalAnalogItem = { date: string; similarityScore: number; implication: string };
 
 export type WeeklyDecisionCardProps = {
   statusLabel: string;
@@ -43,6 +44,7 @@ export type WeeklyDecisionCardProps = {
   revisitDecisions: boolean;
   memoryRail: MemoryRailItem[];
   historicalTimeline: Array<{ label: string; posture: string }>;
+  historicalAnalogs: HistoricalAnalogItem[];
   macroOverlay: MacroOverlayItem[];
   whyThisCall: WhyThisCallItem[];
   primaryDrivers: PrimaryDriverItem[];
@@ -367,6 +369,7 @@ export function MoreContextDisclosureBody({
   whyThisCall,
   memoryRail,
   historicalTimeline,
+  historicalAnalogs,
   macroOverlay,
 }: MoreContextDisclosureProps) {
   return (
@@ -495,6 +498,7 @@ export function WeeklyDecisionCard({
   revisitDecisions,
   memoryRail,
   historicalTimeline,
+  historicalAnalogs,
   macroOverlay,
   whyThisCall,
   primaryDrivers,
@@ -700,6 +704,20 @@ export function WeeklyDecisionCard({
         historicalTimeline={historicalTimeline}
         macroOverlay={macroOverlay}
       />
+
+      {historicalAnalogs.length > 0 ? (
+        <article className={`${tierThreePanel} ${sectionSpacing}`} aria-label="Historical analogs">
+          <h2 className={tierThreeHeading}>Compact analog references</h2>
+          <ul className="mt-2 space-y-2 text-xs text-slate-200">
+            {historicalAnalogs.map((analog) => (
+              <li key={`${analog.date}-${analog.similarityScore}`} className="rounded-md border border-slate-700/60 bg-slate-950/60 px-3 py-2">
+                <p className="font-semibold text-slate-100">{analog.date} · similarity {(analog.similarityScore * 100).toFixed(0)}%</p>
+                <p className="mt-1 text-slate-300">{analog.implication}</p>
+              </li>
+            ))}
+          </ul>
+        </article>
+      ) : null}
       <CitationActionFooter citationMetaLine={citationMetaLine} citation={citation} actions={actions} />
     </section>
   );
