@@ -549,7 +549,7 @@ type CitationActionFooterProps = {
 
 export function CitationActionFooter({ citationMetaLine, citation, actions }: CitationActionFooterProps) {
   return (
-    <article className={`${tierThreePanel} ${sectionSpacing}`}>
+    <article id="citation-actions" className={`${tierThreePanel} ${sectionSpacing}`}>
       <h2 className={tierThreeHeading}>Cite this call</h2>
       <p className="mt-2 text-xs text-slate-300">{citationMetaLine}</p>
       <pre className="mt-2 overflow-x-auto whitespace-pre-wrap text-xs text-slate-300">{citation}</pre>

@@ -247,4 +247,25 @@ describe("buildHomeBriefModel", () => {
     assert.equal(scarcityRecovery.stageLabel, "Early");
   });
 
+
+  it("does not emit expansion stance copy when regime improves within contraction states", () => {
+    const model = buildHomeBriefModel({
+      assessment: {
+        regime: "DEFENSIVE",
+        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
+        scores: { tightness: 60, riskAppetite: 62 },
+      },
+      regimeAlert: { previousRegime: "SCARCITY" },
+      stopItems: ["Guardrail"],
+      reportDynamics: {
+        directionLabel: "improving",
+        changedSignals: [{ key: "riskAppetite", delta: 2 }],
+        anomalySignals: [],
+      },
+    });
+
+    assert.doesNotMatch(model.operatingStanceLine, /Stage expansion/i);
+    assert.match(model.operatingStanceLine, /Hold approvals steady/i);
+  });
+
 });

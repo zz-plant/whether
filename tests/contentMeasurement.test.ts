@@ -1,6 +1,12 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { buildContentMeasurementReport, isContentMeasurementEvent, type ContentMeasurementEvent } from "../lib/contentMeasurement";
+import {
+  CONTENT_MEASUREMENT_ENDPOINT,
+  buildContentMeasurementReport,
+  isContentMeasurementEvent,
+  trackContentCtaConversion,
+  type ContentMeasurementEvent,
+} from "../lib/contentMeasurement";
 
 describe("buildContentMeasurementReport", () => {
   it("aggregates entrances, CTA conversions, assisted paths, and intent counts", () => {
@@ -52,4 +58,45 @@ describe("buildContentMeasurementReport", () => {
     );
   });
 
+});
+
+
+describe("trackContentCtaConversion", () => {
+  it("falls back to fetch when sendBeacon cannot queue payload", async () => {
+    const originalNavigator = globalThis.navigator;
+    const originalFetch = globalThis.fetch;
+
+    let fetchCalls = 0;
+
+    Object.defineProperty(globalThis, "navigator", {
+      configurable: true,
+      value: {
+        sendBeacon: () => false,
+      },
+    });
+
+    globalThis.fetch = (async (input: RequestInfo | URL) => {
+      fetchCalls += 1;
+      assert.equal(String(input), CONTENT_MEASUREMENT_ENDPOINT);
+      return new Response(null, { status: 204 });
+    }) as typeof fetch;
+
+    try {
+      trackContentCtaConversion({
+        pagePath: "/",
+        cluster: "tool",
+        intent: "board",
+        ctaId: "hero-copy",
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      assert.equal(fetchCalls, 1);
+    } finally {
+      Object.defineProperty(globalThis, "navigator", {
+        configurable: true,
+        value: originalNavigator,
+      });
+      globalThis.fetch = originalFetch;
+    }
+  });
 });

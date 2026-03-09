@@ -47,8 +47,10 @@ export const trackContentCtaConversion = (event: Omit<ContentMeasurementEvent, "
 
   if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function") {
     const beaconBody = new Blob([body], { type: "application/json" });
-    navigator.sendBeacon(CONTENT_MEASUREMENT_ENDPOINT, beaconBody);
-    return;
+    const queued = navigator.sendBeacon(CONTENT_MEASUREMENT_ENDPOINT, beaconBody);
+    if (queued) {
+      return;
+    }
   }
 
   void fetch(CONTENT_MEASUREMENT_ENDPOINT, {
