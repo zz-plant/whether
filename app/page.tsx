@@ -160,14 +160,20 @@ const HomePageStreamingFallback = () => (
     <section className="weather-panel space-y-4 px-5 py-5" aria-live="polite" aria-busy="true">
       <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Loading this week&apos;s call</p>
       <p className="text-sm text-slate-200">
-        Pulling live signals and preparing bounded decisions, reversal triggers, and share-ready artifacts.
+        Building your decision delta for this week.
       </p>
+      <ol className="grid gap-2 text-xs text-slate-300 sm:grid-cols-3">
+        <li className="rounded-lg border border-cyan-500/40 bg-cyan-500/10 px-2.5 py-2">1. Refresh signals</li>
+        <li className="rounded-lg border border-slate-700/90 bg-slate-900/60 px-2.5 py-2">2. Set posture + guardrails</li>
+        <li className="rounded-lg border border-slate-700/90 bg-slate-900/60 px-2.5 py-2">3. Prepare share-ready brief</li>
+      </ol>
       <div className="space-y-3 rounded-xl border border-slate-700/80 bg-slate-900/70 p-3">
-        <div className="h-3 w-36 animate-pulse rounded-full bg-slate-600/80" />
+        <div className="h-3 w-32 animate-pulse rounded-full bg-slate-600/80" />
         <div className="h-4 w-full animate-pulse rounded-full bg-slate-500/80" />
-        <div className="h-4 w-10/12 animate-pulse rounded-full bg-slate-500/70" />
-        <div className="h-3 w-44 animate-pulse rounded-full bg-slate-600/80" />
+        <div className="h-4 w-11/12 animate-pulse rounded-full bg-slate-500/70" />
+        <div className="h-3 w-40 animate-pulse rounded-full bg-slate-600/80" />
       </div>
+      <p className="text-xs text-slate-400">Usually ready in under 10 seconds.</p>
     </section>
     <section className="weather-panel space-y-4 px-5 py-5" aria-label="Loading evidence">
       <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Loading evidence snapshot</p>
