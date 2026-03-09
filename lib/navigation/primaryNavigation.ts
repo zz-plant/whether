@@ -6,6 +6,7 @@ export type PrimaryNavigationItem = {
   href: Route;
   label: string;
   description: string;
+  group: "core" | "workflow" | "reference";
 };
 
 export const primaryNavigation: PrimaryNavigationItem[] = navigationLayers.map((layer) => ({
@@ -13,4 +14,5 @@ export const primaryNavigation: PrimaryNavigationItem[] = navigationLayers.map((
   href: layer.href,
   label: layer.label,
   description: layer.description,
+  group: layer.group,
 }));
