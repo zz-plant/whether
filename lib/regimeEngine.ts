@@ -42,7 +42,7 @@ export interface RegimeAssessment {
   thresholds: RegimeThresholds;
   inputs: RegimeInput[];
   policyAssessment: PolicyAssessment;
-  signalInfluence: RegimeSignalInfluence[];
+  signalInfluence?: RegimeSignalInfluence[];
 }
 
 export type RegimeSignalInfluenceKey = "tightness" | "riskAppetite" | "baseRate" | "curveSlope";

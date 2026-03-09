@@ -47,6 +47,8 @@ const sanitizeGuardrail = (pauseTrigger: string) =>
 const sanitizeFlip = (resumeTrigger: string) =>
   resumeTrigger.replace(/^Resume\s+/i, "").replace(/\.$/, "");
 
+const isString = (value: string | undefined): value is string => typeof value === "string";
+
 export const buildRoleAwareOperatingTemplates = (rules: BoundedDecisionRule[]): RoleAwareOperatingTemplate[] => {
   const hiringRule = findRule(rules, "hiring");
   const productRule = findRule(rules, "product-tempo");
@@ -59,10 +61,10 @@ export const buildRoleAwareOperatingTemplates = (rules: BoundedDecisionRule[]): 
       role: "startup-leadership",
       roleLabel: "Startup leadership",
       doNow: [hiringRule?.recommendation, productRule?.recommendation, burnRule?.recommendation]
-        .filter(Boolean)
+        .filter(isString)
         .join(" "),
       avoidNow: [hiringRule?.pauseTrigger, productRule?.pauseTrigger]
-        .filter(Boolean)
+        .filter(isString)
         .map(sanitizeGuardrail)
         .join(" "),
       flipTrigger: sanitizeFlip(expansionRule?.resumeTrigger ?? hiringRule?.resumeTrigger ?? ""),
@@ -71,10 +73,10 @@ export const buildRoleAwareOperatingTemplates = (rules: BoundedDecisionRule[]): 
       role: "vc-partner",
       roleLabel: "VC partner",
       doNow: [capitalRule?.recommendation, burnRule?.recommendation]
-        .filter(Boolean)
+        .filter(isString)
         .join(" "),
       avoidNow: [capitalRule?.pauseTrigger, expansionRule?.pauseTrigger]
-        .filter(Boolean)
+        .filter(isString)
         .map(sanitizeGuardrail)
         .join(" "),
       flipTrigger: sanitizeFlip(capitalRule?.resumeTrigger ?? expansionRule?.resumeTrigger ?? ""),
