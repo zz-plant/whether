@@ -4,7 +4,7 @@ import type { ReportDynamics } from "../../lib/report/reportData";
 import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
 import type { RoleAwareOperatingTemplate } from "../../lib/report/operatingCalls";
 import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
-import type { ForecastRegimeLabel } from "../../lib/report/forecastModel";
+import type { ForecastRegimeLabel, TransitionVelocityEstimate } from "../../lib/report/forecastModel";
 import { formatProbabilityPercent } from "../../lib/report/reportFormatting";
 import {
   buildWeeklyCitationMetaLine,
@@ -61,6 +61,7 @@ export type WeeklyDecisionCardProps = {
     pointsToFlip: number;
     thresholdDirection: "riseAbove" | "fallToOrBelow";
   };
+  regimeVelocity: TransitionVelocityEstimate;
   citation: string;
   isFallbackSnapshot?: boolean;
   actions?: ReactNode;
@@ -507,6 +508,7 @@ export function WeeklyDecisionCard({
   primaryDrivers,
   startupClimateIndex,
   regimeDistance,
+  regimeVelocity,
   citation,
   isFallbackSnapshot = false,
   actions,
@@ -651,6 +653,7 @@ export function WeeklyDecisionCard({
           <article className={tierOneInset}>
             <p className={`text-xs ${neutralLabel}`}>Macro drift this week</p>
             <p className="mt-1 text-xs text-slate-300">Velocity: {movementVelocity}</p>
+            <p className="mt-1 text-xs text-slate-300">Regime transition pace: {regimeVelocity.displayLabel}</p>
             <p className="mt-2 text-[11px] uppercase tracking-[0.1em] text-slate-400">weekly movement</p>
             <div className="mt-3 rounded-md border border-slate-700/70 bg-slate-950/60 px-2.5 py-2">
               <div className="flex items-center justify-between gap-2">
