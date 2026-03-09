@@ -2145,7 +2145,7 @@
     "year": 2024,
     "month": 10,
     "source": "https://fred.stlouisfed.org/series/DGS10",
-    "record_date": "2026-02-28",
+    "record_date": "2024-10-31",
     "fetched_at": "2026-03-01T23:24:30.177Z",
     "isLive": false,
     "yields": {
