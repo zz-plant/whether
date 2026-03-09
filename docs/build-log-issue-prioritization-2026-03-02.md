@@ -61,3 +61,39 @@ These are generally informational in a Cloudflare + next-on-pages workflow.
 1. **Platform/infra owner:** investigate P1 adapter/prerender compatibility.
 2. **Frontend owner:** trace and validate P2 duplicate-key warning source.
 3. **Performance owner:** review P3 edge-runtime static-generation trade-offs.
+
+
+## 2026-03-09 follow-up (route config audit + compatibility check)
+
+### Scope audited
+Dynamic App Router routes exporting `dynamicParams`, `generateStaticParams`, and/or `revalidate` were re-audited, including:
+- `/answers/[slug]`
+- `/concepts/[slug]`
+- `/concepts/audience/[audience]`
+- `/concepts/focus/[focus]`
+- `/decide/[slug]`
+- `/guides/[stakeholder]`
+- `/guides/stage/[stage]`
+- `/library/failure-modes/[slug]`
+- `/posture/[slug]`
+- `/resources/[slug]`
+- `/solutions/career-paths/[role]`
+- `/startup-macro-posture/[regime]`
+- `/toolkits/[slug]`
+
+### Root cause (confirmed)
+`next@16.1.6` emits dynamic ISR prerender function metadata for these routes that does not match the stricter prerender-config shape expected by `@cloudflare/next-on-pages` v1.13.16 (`type: Prerender` + `fallback.type: FileFsRef` with a static fallback file). As a result, the adapter flags these dynamic ISR entries as `Invalid prerender config` while still completing the build.
+
+### Compatibility finding
+- Current published `@cloudflare/next-on-pages` latest is still `1.13.16`; no newer verified release is available to consume for `next@16.1.6`.
+- Attempted route-level option alignment (`dynamic = "force-static"` on affected dynamic routes) did **not** eliminate the warnings in this adapter version.
+
+### Accepted configuration pattern
+Until Cloudflare ships a compatible adapter update for this Next output shape:
+1. Keep current route exports (`dynamicParams = false`, `generateStaticParams`, and existing `revalidate` where product freshness requires ISR).
+2. Treat these `Invalid prerender config` entries as an **accepted known warning class** in CI warning baselines.
+3. Fail CI only on **new** warning classes or warning-count drift beyond the accepted list.
+
+### Verification snapshot
+- Local Cloudflare build (`bun run build:cloudflare`) still emits the same 27 warning classes (including these invalid-prerender lines).
+- Warning audit against updated baseline now reports `Unexpected warning classes: 0` and `Critical warning matches: 0`.
