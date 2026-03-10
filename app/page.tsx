@@ -40,6 +40,7 @@ import { DeferredSection } from "./components/deferredSection";
 import { getRegimeDisplayLabel } from "../lib/regimePresentation";
 import { navigationLayers } from "../lib/navigation/informationArchitecture";
 import { HomeFirstRunOrientation } from "./components/homeFirstRunOrientation";
+import { ResponsiveDetailsPanel } from "./components/responsiveDetailsPanel";
 
 const WeeklyActionSummaryPanel = dynamic(
   () => import("./components/boardBriefSections").then((module) => module.WeeklyActionSummaryPanel),
@@ -489,8 +490,11 @@ const HomePageReportContent = async ({
         />
       </DeferredSection>
 
-      <details className="weather-panel px-5 py-4" open>
-        <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.14em] text-slate-300 sm:hidden">Evidence appendix (tap to expand)</summary>
+      <ResponsiveDetailsPanel
+        className="weather-panel px-5 py-4"
+        summary="Evidence appendix (tap to expand)"
+        summaryClassName="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.14em] text-slate-300 sm:hidden"
+      >
         <DeferredSection
           id="executive-snapshot"
           ariaLabel="Leadership summary"
@@ -503,7 +507,7 @@ const HomePageReportContent = async ({
             sectionId="executive-snapshot-evidence"
           />
         </DeferredSection>
-      </details>
+      </ResponsiveDetailsPanel>
 
       <HomeInterpretationPanel
         layer={interpretationLayer}
