@@ -88,18 +88,18 @@ export type WeeklyDecisionCardProps = {
 };
 
 const sectionSpacing = "space-y-4";
-const tierOneHeading = "text-base font-extrabold uppercase tracking-[0.1em] text-slate-50";
-const tierTwoHeading = "text-xs font-semibold uppercase tracking-[0.08em] text-slate-300";
-const tierThreeHeading = "text-[11px] font-medium tracking-[0.04em] text-slate-500";
+const tierOneHeading = "text-base font-semibold tracking-[0.01em] text-slate-50";
+const tierTwoHeading = "text-sm font-semibold tracking-[0.01em] text-slate-200";
+const tierThreeHeading = "text-xs font-medium tracking-normal text-slate-400";
 const tierOnePanel = "rounded-xl border border-slate-500/90 bg-slate-950/90 p-6";
 const tierTwoPanel = "rounded-xl border border-slate-700/65 bg-slate-950/68 p-5";
 const tierThreePanel = "rounded-xl border border-slate-800/40 bg-slate-950/40 p-3";
 const tierOneInset = "rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3";
 const tierTwoInset = "rounded-md border border-slate-700/55 bg-slate-950/58 px-3 py-3";
 const tierThreeInset = "rounded-md border border-slate-800/35 bg-slate-950/34 px-2.5 py-2.5 text-slate-400";
-const neutralLabel = "font-semibold uppercase tracking-[0.12em] text-slate-300";
+const neutralLabel = "font-semibold tracking-[0.01em] text-slate-300";
 const disclosureSummaryClass =
-  "flex min-h-[44px] w-full items-center justify-between gap-3 rounded-md border border-slate-700/70 bg-slate-950/65 px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-100 transition hover:border-slate-500/70 hover:bg-slate-900/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300";
+  "flex min-h-[44px] w-full items-center justify-between gap-3 rounded-md border border-slate-700/70 bg-slate-950/65 px-3 py-2 text-left text-xs font-semibold tracking-[0.01em] text-slate-100 transition hover:border-slate-500/70 hover:bg-slate-900/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300";
 
 const meterTrackBase = "relative h-2 rounded-full";
 const meterFillBase = "h-2 rounded-full";
@@ -271,19 +271,19 @@ const ActionStrip = ({ items }: { items: ActionStripItem[] }) => (
   <section className={`${tierTwoPanel} ${sectionSpacing}`} aria-label="Action strip">
     <div className="flex flex-wrap items-end justify-between gap-2">
       <h3 className={tierTwoHeading}>Prioritize decisions by function</h3>
-      <p className="text-[11px] uppercase tracking-[0.12em] text-slate-400">Action · guardrail · flip</p>
+      <p className="text-[11px] text-slate-400">Action, guardrail, and flip threshold</p>
     </div>
     <ul className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
       {items.map((item) => (
         <li key={item.area} className={`${tierThreeInset} flex h-full flex-col gap-2`}>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">{decisionAreaLabel(item.area)}</p>
-          <p className="text-sm font-semibold text-slate-100">{item.action}</p>
+          <p className="text-[11px] font-semibold text-slate-300">{decisionAreaLabel(item.area)}</p>
+          <p className="text-sm leading-6 font-semibold text-slate-100">{item.action}</p>
           <div className="mt-auto space-y-1.5 text-[11px]">
             <p className="rounded-full border border-amber-500/45 bg-amber-500/10 px-2.5 py-1 text-amber-100">
-              <span className="font-semibold uppercase tracking-[0.1em]">Guardrail</span> {compactActionCue(item.threshold)}
+              {compactActionCue(item.threshold)}
             </p>
             <p className="rounded-full border border-sky-500/45 bg-sky-500/10 px-2.5 py-1 text-sky-100">
-              <span className="font-semibold uppercase tracking-[0.1em]">Flip</span> {compactActionCue(item.reversalCondition)}
+              {compactActionCue(item.reversalCondition)}
             </p>
           </div>
         </li>
@@ -300,7 +300,7 @@ const PostureHistoryTimeline = ({ historicalTimeline }: { historicalTimeline: We
         <li key={`${item.label}-${item.posture}`} className={`${tierThreeInset} text-xs ${isCurrent ? "border-sky-400/70 bg-sky-500/10" : ""}`}>
           <p className="text-slate-400">{item.label}</p>
           <p className="mt-1 font-semibold text-slate-100">{item.posture}</p>
-          {isCurrent ? <p className="mt-1 text-[10px] uppercase tracking-[0.1em] text-sky-200">Current week</p> : null}
+          {isCurrent ? <p className="mt-1 text-[10px] font-medium text-sky-200">Current week</p> : null}
         </li>
       );
     })}
@@ -360,12 +360,12 @@ export function DecisionCallHeader({
   return (
     <header className="space-y-4 border-b border-slate-700/80 pb-6" data-testid="weekly-top-fold">
       <article className={`${tierOnePanel} space-y-4`} data-testid="weekly-viral-hero" aria-label="Weekly posture strip">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Macro operating console</p>
+        <p className="text-xs font-semibold tracking-[0.08em] text-slate-300">Macro operating console</p>
         <h1 id="weekly-posture-brief-title" className="text-2xl font-semibold text-slate-50 sm:text-3xl">
-          {resolvedPostureLabel.toUpperCase()} — {resolvedStageLabel.toUpperCase()}
+          {resolvedPostureLabel} — {resolvedStageLabel}
         </h1>
         <p className="text-base font-semibold text-sky-100">{operatingStanceLine}</p>
-        <p className="text-sm text-slate-200">{immediateDecision}</p>
+        <p className="text-sm leading-6 text-slate-200">{immediateDecision}</p>
 
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4" aria-label="Quick weekly scan">
           <div className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">
@@ -373,12 +373,12 @@ export function DecisionCallHeader({
             <p className="mt-1 text-sm font-semibold text-slate-100">{resolvedPostureLabel} — {resolvedStageLabel}</p>
           </div>
           <div className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">What changed this week</p>
+            <p className="text-xs font-semibold text-slate-300">What changed this week</p>
             <p className="mt-1 text-sm font-semibold text-slate-100">{meetingShorthand}</p>
           </div>
           <div className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Net effect on decisions</p>
-            <p className="mt-1 text-sm font-semibold text-slate-100">{immediateDecision}</p>
+            <p className="text-xs font-semibold text-slate-300">Net effect on decisions</p>
+            <p className="mt-1 text-sm leading-6 font-semibold text-slate-100">{immediateDecision}</p>
           </div>
           <div className="rounded-md border border-violet-500/40 bg-violet-500/10 px-3 py-2 text-xs text-violet-100">
             <SummaryLabel label="Leadership call" icon={<ShieldIcon className="h-3.5 w-3.5" aria-hidden="true" />} />
@@ -391,7 +391,7 @@ export function DecisionCallHeader({
             Confidence: {confidenceLabel} ({Math.round(confidencePercent)}%)
           </p>
           <p className="rounded-full border border-slate-600/70 bg-slate-900/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-200">
-            Trend: {trendLabel.toUpperCase()} · Watch {transitionWatch}
+            Trend: {trendLabel} · Watch {transitionWatch}
           </p>
           <p className="rounded-full border border-slate-600/70 bg-slate-900/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-200">
             Freshness: {freshnessLabel}
@@ -429,7 +429,7 @@ export function BoundedRulesMatrix({ decisionRules }: BoundedRulesMatrixProps) {
   return (
     <article className={`${tierOnePanel} ${sectionSpacing}`}>
       <h2 className={tierOneHeading}>Decision snapshot for leadership this week</h2>
-      <p className="text-xs text-slate-300">Current posture, action, rationale, and flip trigger by operating area.</p>
+      <p className="text-xs leading-5 text-slate-300">Current posture, action, rationale, and flip trigger by operating area.</p>
       <ul className="mt-2 grid gap-3 sm:grid-cols-2 sm:auto-rows-fr">
         {topDecisionRules.map((rule) => {
           const doCues = compactRuleList(rule.doNow);
@@ -437,24 +437,24 @@ export function BoundedRulesMatrix({ decisionRules }: BoundedRulesMatrixProps) {
 
           return (
             <li key={rule.area} className={`${tierOneInset} flex h-full flex-col gap-2 text-xs text-slate-200`}>
-              <p className="font-semibold uppercase tracking-[0.12em] text-slate-200">{decisionAreaLabel(rule.area)}</p>
+              <p className="font-semibold text-slate-200">{decisionAreaLabel(rule.area)}</p>
               <div className="rounded-md border border-slate-700/70 bg-slate-950/70 px-2.5 py-2">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">Current posture</p>
-                <p className="mt-1 text-[11px] text-slate-100">{compactActionCue(rule.recommendation)}</p>
+                <p className="text-[10px] font-semibold text-slate-300">Current posture</p>
+                <p className="mt-1 text-[11px] leading-5 text-slate-100">{compactActionCue(rule.recommendation)}</p>
               </div>
               <div className="rounded-md border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-2">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald-100">What to do</p>
-                <p className="mt-1 text-[11px] text-emerald-50">{doCues[0] ?? "No immediate action"}</p>
-                <p className="mt-1 text-[11px] text-rose-100">Delay: {avoidCue}</p>
+                <p className="text-[10px] font-semibold text-emerald-100">What to do</p>
+                <p className="mt-1 text-[11px] leading-5 text-emerald-50">{doCues[0] ?? "No immediate action"}</p>
+                <p className="mt-1 text-[11px] leading-5 text-rose-100">Delay: {avoidCue}</p>
               </div>
               <p className="rounded-md border border-violet-500/45 bg-violet-500/10 px-2.5 py-2 text-[11px] text-violet-100">
-                <span className="font-semibold uppercase tracking-[0.1em]">Why</span> {compactActionCue(rule.rationale)}
+                <span className="font-semibold">Why:</span> {compactActionCue(rule.rationale)}
               </p>
               <p className="rounded-full border border-amber-500/45 bg-amber-500/10 px-2.5 py-1 text-[11px] text-amber-100">
-                <span className="font-semibold uppercase tracking-[0.1em]">Guardrail</span> {compactActionCue(rule.pauseTrigger)}
+                <span className="font-semibold">Guardrail:</span> {compactActionCue(rule.pauseTrigger)}
               </p>
               <p className="rounded-full border border-sky-500/45 bg-sky-500/10 px-2.5 py-1 text-[11px] text-sky-100">
-                <span className="font-semibold uppercase tracking-[0.1em]">What would change it</span> {compactActionCue(rule.resumeTrigger)}
+                <span className="font-semibold">Flip when:</span> {compactActionCue(rule.resumeTrigger)}
               </p>
             </li>
           );
@@ -508,8 +508,8 @@ export function MoreContextDisclosureBody({
         <ul className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {primaryDrivers.map((driver) => (
             <li key={driver.label} className={`${tierTwoInset} text-xs text-slate-200`}>
-              <p className="font-semibold uppercase tracking-[0.12em] text-slate-300">{driver.label}</p>
-              <p className="mt-1 text-slate-300">{driver.detail}</p>
+              <p className="font-semibold text-slate-300">{driver.label}</p>
+              <p className="mt-1 leading-5 text-slate-300">{driver.detail}</p>
             </li>
           ))}
         </ul>
@@ -520,8 +520,8 @@ export function MoreContextDisclosureBody({
         <ul className="mt-2 grid gap-2 sm:grid-cols-3">
           {whyThisCall.map((reason) => (
             <li key={reason.label} className={`${tierTwoInset} text-xs text-slate-200`}>
-              <p className="font-semibold uppercase tracking-[0.12em] text-slate-300">{reason.label}</p>
-              <p className="mt-1 text-slate-300">{reason.detail}</p>
+              <p className="font-semibold text-slate-300">{reason.label}</p>
+              <p className="mt-1 leading-5 text-slate-300">{reason.detail}</p>
             </li>
           ))}
         </ul>
@@ -544,8 +544,8 @@ export function MoreContextDisclosureBody({
         <ul className="grid gap-2 text-xs text-slate-300 sm:grid-cols-2 lg:grid-cols-4">
           {macroOverlay.map((item) => (
             <li key={item.label} className={tierThreeInset}>
-              <p className="font-semibold uppercase tracking-[0.12em] text-slate-200">{item.label}</p>
-              <p className="mt-1 text-slate-300">{item.detail}</p>
+              <p className="font-semibold text-slate-200">{item.label}</p>
+              <p className="mt-1 leading-5 text-slate-300">{item.detail}</p>
             </li>
           ))}
         </ul>
