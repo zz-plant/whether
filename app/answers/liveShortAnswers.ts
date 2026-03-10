@@ -1,82 +1,13 @@
-import type { RegimeAssessment, RegimeThresholds } from "../../lib/regimeEngine";
-import { decisionAreaLabel, type BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
-import { answerPages, type DecisionPageDefinition } from "./decisionPages";
-
-const safetyOverrides: Partial<Record<string, string>> = {
-  "should-startups-hire-engineers-right-now": "In safety mode, hire only mission-critical roles; pause expansion hiring until role payback is proven within one quarter.",
-  "is-it-risk-on-or-risk-off-for-startups": "Current posture is safety mode; tighten approval velocity and keep irreversible commitments paused until thresholds recover.",
-  "when-should-startups-cut-burn": "Cut burn now if runway depends on discretionary spend; restore only after two consecutive reads show tighter-risk thresholds have recovered.",
-  "product-strategy-during-expansion": "In safety mode, protect core retention and pause expansion roadmap work until both risk appetite and tightness recover.",
-  "when-to-expand-startup-hiring": "In safety mode, hold hiring expansion and fill only reliability or near-term revenue roles until thresholds hold for two consecutive reads.",
-  "should-startups-slow-product-development": "In safety mode, keep core delivery moving while pausing speculative scope; re-open only after threshold recovery persists.",
-  "should-startups-raise-capital-now": "In safety mode, raise only to protect runway certainty; revisit timing after two consecutive supportive threshold reads.",
-};
+import type { RegimeAssessment } from "../../lib/regimeEngine";
+import type { SeoDecisionPayload } from "../../lib/report/seoDecisionPayload";
 
 export const isExpansionRegime = (regime: RegimeAssessment["regime"]) => regime === "EXPANSION";
 
-const buildSafetyModeAnswer = (
-  page: DecisionPageDefinition,
-  thresholds?: Pick<RegimeThresholds, "riskAppetiteRegime" | "tightnessRegime">,
-): string => {
-  const thresholdGate = thresholds
-    ? `Tighten if risk appetite < ${thresholds.riskAppetiteRegime.toFixed(0)} or tightness > ${thresholds.tightnessRegime.toFixed(0)}.`
-    : "Tighten on weaker risk appetite or rising tightness.";
+export const buildLiveShortAnswer = ({ payload, fallback }: { payload: SeoDecisionPayload; fallback: string }) =>
+  payload.currentCall.trim() || fallback;
 
-  if (page.category === "climate") {
-    return `Current posture is safety mode. ${thresholdGate} Resume faster approvals only after two consecutive supportive reads.`;
-  }
+export const buildLiveDirectAnswer = ({ payload, fallback }: { payload: SeoDecisionPayload; fallback: string }) => {
+  const currentCall = payload.currentCall.trim() || fallback;
 
-  if (page.category === "explanation") {
-    return `In safety mode, favor reversible commitments and explicit stop rules. ${thresholdGate} Reverse only after two consecutive supportive reads.`;
-  }
-
-  return `In safety mode, keep decisions reversible with named pause and resume triggers. ${thresholdGate} Re-open expansion only after two consecutive supportive reads.`;
-};
-
-export const buildLiveShortAnswer = (
-  slug: string,
-  assessment: {
-    regime: RegimeAssessment["regime"];
-    thresholds: Pick<RegimeThresholds, "riskAppetiteRegime" | "tightnessRegime">;
-  },
-  fallback: string,
-) => {
-  const page = answerPages.find((item) => item.slug === slug);
-  if (!page) return fallback;
-  if (!isExpansionRegime(assessment.regime)) {
-    return (safetyOverrides[slug] as string | undefined) ?? buildSafetyModeAnswer(page, assessment.thresholds);
-  }
-
-  return page.shortAnswer;
-};
-
-export const buildLiveDirectAnswer = ({
-  page,
-  assessment,
-  mappedRules,
-  fallback,
-}: {
-  page: DecisionPageDefinition;
-  assessment: {
-    regime: RegimeAssessment["regime"];
-    thresholds: Pick<RegimeThresholds, "riskAppetiteRegime" | "tightnessRegime">;
-  };
-  mappedRules: BoundedDecisionRule[];
-  fallback: string;
-}) => {
-  const primaryRule = page.mappedDecisionAreas
-    .map((area) => mappedRules.find((rule) => rule.area === area))
-    .find((rule): rule is BoundedDecisionRule => Boolean(rule));
-  const thresholdClause = `Tighten if risk appetite < ${assessment.thresholds.riskAppetiteRegime.toFixed(0)} or tightness > ${assessment.thresholds.tightnessRegime.toFixed(0)}.`;
-
-  if (!primaryRule) {
-    return `${fallback} ${thresholdClause} Reverse after two consecutive supportive reads.`;
-  }
-
-  const areaLabel = decisionAreaLabel(primaryRule.area);
-  if (!isExpansionRegime(assessment.regime)) {
-    return `Safety-mode call for ${areaLabel}: ${primaryRule.recommendation} ${thresholdClause} Reverse by ${primaryRule.resumeTrigger}`;
-  }
-
-  return `Primary call for ${areaLabel}: ${primaryRule.recommendation} Trigger: ${primaryRule.pauseTrigger} Reverse: ${primaryRule.resumeTrigger}`;
+  return `${currentCall} Action: ${payload.immediateAction} Trigger: ${payload.triggerThreshold} Reverse: ${payload.reversalCondition}`;
 };

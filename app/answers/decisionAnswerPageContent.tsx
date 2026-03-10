@@ -8,6 +8,7 @@ import { buildCallCitation } from "../../lib/export/briefBuilders";
 import { buildLiveDirectAnswer, buildLiveShortAnswer } from "./liveShortAnswers";
 import { answerPages, findDecisionPage } from "./decisionPages";
 import { getRegimeDisplayLabel } from "../../lib/regimePresentation";
+import { buildSeoDecisionPayload } from "../../lib/report/seoDecisionPayload";
 
 export async function DecisionAnswerPageContent({
   slug,
@@ -23,14 +24,23 @@ export async function DecisionAnswerPageContent({
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
   const { assessment, recordDateLabel, reportDynamics, treasury, fetchedAtLabel } = reportData;
   const homeBriefModel = buildHomeBriefModel(reportData);
-  const liveShortAnswer = buildLiveShortAnswer(page.slug, assessment, page.shortAnswer);
   const mappedRules = homeBriefModel.decisionRules.filter((rule) => page.mappedDecisionAreas.includes(rule.area));
-  const liveDirectAnswer = buildLiveDirectAnswer({
-    page,
+  const payload = buildSeoDecisionPayload({
     assessment,
     mappedRules,
-    fallback: page.directAnswer,
+    mappedDecisionAreas: page.mappedDecisionAreas,
+    fallbackCurrentCall: page.shortAnswer,
+    fallbackImmediateAction: page.directAnswer,
+    reportEvidenceItems: reportData.reportEvidenceItems,
+    freshnessLabel: fetchedAtLabel,
+    recordDateLabel,
+    confidenceLabel: homeBriefModel.confidenceLabel,
+    transitionWatch: homeBriefModel.transitionWatch,
+    isFallbackSnapshot: !reportResult.ok,
+    provenanceStatusLabel: reportData.treasuryProvenance?.statusLabel,
   });
+  const liveShortAnswer = buildLiveShortAnswer({ payload, fallback: page.shortAnswer });
+  const liveDirectAnswer = buildLiveDirectAnswer({ payload, fallback: page.directAnswer });
   const callCitation = buildCallCitation(assessment, treasury);
   const relatedPages = answerPages.filter((candidate) => candidate.slug !== page.slug && candidate.category !== page.category).slice(0, 3);
 
@@ -104,6 +114,7 @@ export async function DecisionAnswerPageContent({
         <h2 className="text-lg font-semibold text-slate-100">Citation</h2>
         <p className="text-xs text-slate-300">{callCitation}</p>
         <p className="text-xs text-slate-400">Data date: {recordDateLabel} · freshness: {fetchedAtLabel}.</p>
+        {payload.degraded ? <p className="text-xs text-amber-200">Degraded data mode: cached/stale signals detected, so this answer is marked noindex.</p> : null}
       </section>
 
       <section className="weather-panel space-y-3 px-6 py-6">
