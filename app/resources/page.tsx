@@ -9,6 +9,7 @@ import { BreadcrumbTrail } from "../components/breadcrumbTrail";
 import { loadReportDataSafe } from "../../lib/report/reportData";
 import { buildHomeBriefModel } from "../../lib/report/homeBriefModel";
 import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
+import { featuredAnswerPages } from "../answers/selectors";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Resources — board governance pillars",
@@ -38,29 +39,6 @@ const toolPages = [
   resourceSupportingPages.reversalTriggerChecklist,
   resourceSupportingPages.quarterlyCapitalPostureMemoExample,
   resourceSupportingPages.decisionShieldOverview,
-];
-
-const decisionBriefPages: Array<{ path: Route; title: string; description: string }> = [
-  {
-    path: "/should-we-hire-engineers-right-now",
-    title: "Should we freeze hiring?",
-    description: "Operator-ready hiring constraint call with stop/restart thresholds.",
-  },
-  {
-    path: "/when-should-startups-cut-burn",
-    title: "How much runway do we need right now?",
-    description: "Runway discipline guidance tied to posture and escalation triggers.",
-  },
-  {
-    path: "/should-startups-slow-roadmap-expansion",
-    title: "Should we slow roadmap expansion?",
-    description: "Feature tempo guidance for tight, mixed, and easing cycles.",
-  },
-  {
-    path: "/should-startups-raise-capital-now",
-    title: "Should we raise capital now?",
-    description: "Timing playbook for raise/no-raise decisions under current macro pressure.",
-  },
 ];
 
 export default async function ResourcesPage() {
@@ -111,10 +89,10 @@ export default async function ResourcesPage() {
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Decision briefs</p>
         <h2 className="text-lg font-semibold text-slate-100">Start from the operating question</h2>
         <div className="grid gap-3 sm:grid-cols-2">
-          {decisionBriefPages.map((brief) => (
-            <Link key={brief.path} href={brief.path} className="weather-surface space-y-2 px-4 py-4">
-              <p className="text-base font-semibold text-slate-100">{brief.title}</p>
-              <p className="text-sm text-slate-300">{brief.description}</p>
+          {featuredAnswerPages.slice(0, 4).map((page) => (
+            <Link key={page.slug} href={`/answers/${page.slug}`} className="weather-surface space-y-2 px-4 py-4">
+              <p className="text-base font-semibold text-slate-100">{page.title}</p>
+              <p className="text-sm text-slate-300">{page.shortAnswer}</p>
             </Link>
           ))}
         </div>

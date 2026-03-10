@@ -6,6 +6,7 @@ import {
   organizationName,
   serializeJsonLd,
 } from "../../../lib/pageMetadata";
+import { decisionAreaLabel, type BoundedDecisionRule } from "../../../lib/report/boundedDecisionRules";
 import type { ResourceArticle } from "../../../lib/resourceArticles";
 import { CopyAnchorButton } from "./copyAnchorButton";
 
@@ -54,7 +55,15 @@ export const buildResourceArticleMetadata = (article: ResourceArticle): Metadata
 export const composeArticleSections = (article: ResourceArticle) =>
   article.includeSharedDeepDive ? [...article.sections, ...sharedDeepDiveSections] : article.sections;
 
-export function ResourceArticlePage({ article }: { article: ResourceArticle }) {
+type ResourceDecisionArtifact = {
+  decisionShiftSummary: string;
+  postureSummary: string;
+  mappedRules: BoundedDecisionRule[];
+  freshnessLabel: string;
+  citation: string;
+};
+
+export function ResourceArticlePage({ article, decisionArtifact }: { article: ResourceArticle; decisionArtifact?: ResourceDecisionArtifact }) {
   const canonicalUrl = buildCanonicalUrl(`/resources/${article.slug}`);
   const faqSchema = {
     "@context": "https://schema.org",
@@ -84,6 +93,26 @@ export function ResourceArticlePage({ article }: { article: ResourceArticle }) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(faqSchema) }} />
 
       <div className="space-y-6 print:text-black">
+        {decisionArtifact ? (
+          <section className="weather-panel space-y-3 px-6 py-6 print:border print:border-slate-300 print:bg-white">
+            <p className="text-xs uppercase tracking-[0.14em] text-slate-400">This week first (live Whether posture)</p>
+            <h2 className="text-lg font-semibold text-slate-100 print:text-slate-900">Decision delta before long-form reading</h2>
+            <p className="text-sm text-slate-200 print:text-slate-700">{decisionArtifact.postureSummary}</p>
+            <p className="text-sm text-slate-200 print:text-slate-700">{decisionArtifact.decisionShiftSummary}</p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {decisionArtifact.mappedRules.map((rule) => (
+                <article key={rule.area} className="weather-surface space-y-2 px-4 py-4 text-sm">
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Bounded rule · {decisionAreaLabel(rule.area)}</p>
+                  <p className="font-semibold text-slate-100">{rule.recommendation}</p>
+                  <p className="text-xs text-rose-200">Pause: {rule.pauseTrigger}</p>
+                  <p className="text-xs text-emerald-200">Resume: {rule.resumeTrigger}</p>
+                </article>
+              ))}
+            </div>
+            <p className="text-xs text-slate-400">{decisionArtifact.citation} · Freshness: {decisionArtifact.freshnessLabel}</p>
+          </section>
+        ) : null}
+
         <section className="weather-panel space-y-3 px-6 py-6 print:border print:border-slate-300 print:bg-white">
           <p className="text-xs uppercase tracking-[0.14em] text-slate-400">Problem-first operating brief</p>
           <h1 className="text-2xl font-semibold text-slate-100 print:text-slate-900 sm:text-3xl">{article.title}</h1>

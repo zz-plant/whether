@@ -12,6 +12,7 @@ export type DecisionPageDefinition = {
   audience: string;
   mappedDecisionAreas: DecisionArea[];
   thresholdFocus: "tightness" | "risk" | "both";
+  featuredOrder?: number;
 };
 
 export const answerPages: DecisionPageDefinition[] = [
@@ -25,6 +26,8 @@ export const answerPages: DecisionPageDefinition[] = [
     audience: "Founders, CFO, board operators",
     mappedDecisionAreas: ["capital-raising", "burn-discipline"],
     thresholdFocus: "both",
+
+    featuredOrder: 4,
   },
   {
     slug: "is-it-risk-on-or-risk-off-for-startups",
@@ -36,6 +39,8 @@ export const answerPages: DecisionPageDefinition[] = [
     audience: "Leadership teams",
     mappedDecisionAreas: ["expansion-bets", "product-tempo", "burn-discipline"],
     thresholdFocus: "both",
+
+    featuredOrder: 3,
   },
   {
     slug: "startup-market-outlook",
@@ -47,6 +52,8 @@ export const answerPages: DecisionPageDefinition[] = [
     audience: "Founders and operating staff",
     mappedDecisionAreas: ["product-tempo", "expansion-bets"],
     thresholdFocus: "both",
+
+    featuredOrder: 8,
   },
   {
     slug: "is-venture-funding-recovering",
@@ -91,6 +98,8 @@ export const answerPages: DecisionPageDefinition[] = [
     audience: "VP Engineering and founders",
     mappedDecisionAreas: ["hiring", "product-tempo", "burn-discipline"],
     thresholdFocus: "both",
+
+    featuredOrder: 1,
   },
   {
     slug: "should-startups-slow-roadmap-expansion",
@@ -102,6 +111,8 @@ export const answerPages: DecisionPageDefinition[] = [
     audience: "Product and engineering leadership",
     mappedDecisionAreas: ["product-tempo", "expansion-bets", "burn-discipline"],
     thresholdFocus: "both",
+
+    featuredOrder: 2,
   },
   {
     slug: "should-startups-slow-product-development",
@@ -113,6 +124,8 @@ export const answerPages: DecisionPageDefinition[] = [
     audience: "Product and engineering leaders",
     mappedDecisionAreas: ["product-tempo", "expansion-bets"],
     thresholdFocus: "risk",
+
+    featuredOrder: 7,
   },
   {
     slug: "should-startups-raise-capital-now",
@@ -124,6 +137,8 @@ export const answerPages: DecisionPageDefinition[] = [
     audience: "CEO/CFO",
     mappedDecisionAreas: ["capital-raising", "burn-discipline"],
     thresholdFocus: "both",
+
+    featuredOrder: 5,
   },
   {
     slug: "product-strategy-in-a-risk-off-market",
@@ -168,6 +183,8 @@ export const answerPages: DecisionPageDefinition[] = [
     audience: "Finance and operations leaders",
     mappedDecisionAreas: ["burn-discipline", "capital-raising"],
     thresholdFocus: "tightness",
+
+    featuredOrder: 6,
   },
   {
     slug: "product-strategy-during-downturn",

@@ -1,4 +1,5 @@
 import type { RegimeAssessment, RegimeThresholds } from "../../lib/regimeEngine";
+import { decisionAreaLabel, type BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
 import { answerPages, type DecisionPageDefinition } from "./decisionPages";
 
 const safetyOverrides: Partial<Record<string, string>> = {
@@ -47,4 +48,33 @@ export const buildLiveShortAnswer = (
   }
 
   return page.shortAnswer;
+};
+
+export const buildLiveDirectAnswer = ({
+  page,
+  assessment,
+  mappedRules,
+  fallback,
+}: {
+  page: DecisionPageDefinition;
+  assessment: {
+    regime: RegimeAssessment["regime"];
+    thresholds: Pick<RegimeThresholds, "riskAppetiteRegime" | "tightnessRegime">;
+  };
+  mappedRules: BoundedDecisionRule[];
+  fallback: string;
+}) => {
+  const primaryRule = mappedRules[0];
+  const thresholdClause = `Tighten if risk appetite < ${assessment.thresholds.riskAppetiteRegime.toFixed(0)} or tightness > ${assessment.thresholds.tightnessRegime.toFixed(0)}.`;
+
+  if (!primaryRule) {
+    return `${fallback} ${thresholdClause} Reverse after two consecutive supportive reads.`;
+  }
+
+  const areaLabel = decisionAreaLabel(primaryRule.area);
+  if (!isExpansionRegime(assessment.regime)) {
+    return `Safety-mode call for ${areaLabel}: ${primaryRule.recommendation} ${thresholdClause} Reverse by ${primaryRule.resumeTrigger}`;
+  }
+
+  return `Primary call for ${areaLabel}: ${primaryRule.recommendation} Trigger: ${primaryRule.pauseTrigger} Reverse: ${primaryRule.resumeTrigger}`;
 };
