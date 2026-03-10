@@ -9,9 +9,13 @@ import {
   useCaseRoles,
 } from "../lib/informationArchitecture";
 import { productConceptArticles } from "../lib/productCanon";
+import { conceptAudiences, conceptFocuses, toConceptTaxonomySlug } from "../lib/productCanon";
 import { resourcePillarPages, resourceSupportingPages } from "../lib/resourcesContent";
 import { resourceArticles } from "../lib/resourceArticles";
 import { tierOneDecisionPages } from "./answers/decisionPages";
+import { stageGuides } from "./guides/stageGuides";
+import { stakeholderGuides } from "./guides/stakeholderGuides";
+import { roleLandings } from "./solutions/career-paths/roleLandingData";
 import { regimePages } from "./startup-macro-posture/clusterData";
 
 type ChangeFrequency = NonNullable<MetadataRoute.Sitemap[number]["changeFrequency"]>;
@@ -70,6 +74,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/toolkits", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.52 },
     { path: "/search", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.62 },
     { path: "/answers", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.74 },
+    { path: "/operations", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.84 },
+    { path: "/operations/plan", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.72 },
+    { path: "/operations/data", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.68 },
+    { path: "/operations/integrations", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.62 },
+    { path: "/guides", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.78 },
+    { path: "/guides/stage", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.74 },
+    { path: "/solutions", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.72 },
+    { path: "/solutions/career-paths", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.74 },
+    { path: "/solutions/market-regime-playbook", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.7 },
+    { path: "/solutions/product-roadmapping", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.7 },
+    { path: "/solutions/engineering-capacity", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.7 },
+    { path: "/learn", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.72 },
+    { path: "/learn/concepts", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.66 },
+    { path: "/learn/failure-modes", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.66 },
     { path: "/should-we-hire-engineers-right-now", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.8 },
     { path: "/should-startups-slow-roadmap-expansion", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.78 },
     { path: "/is-it-risk-on-or-risk-off-for-startups", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.8 },
@@ -177,6 +195,41 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.76,
   }));
 
+  const stageGuideEntries: SitemapEntryDescriptor[] = stageGuides.map((stageGuide) => ({
+    path: `/guides/stage/${stageGuide.slug}`,
+    lastModified: staticContentLastModified,
+    changeFrequency: "weekly",
+    priority: 0.7,
+  }));
+
+  const stakeholderGuideEntries: SitemapEntryDescriptor[] = stakeholderGuides.map((stakeholderGuide) => ({
+    path: `/guides/${stakeholderGuide.slug}`,
+    lastModified: staticContentLastModified,
+    changeFrequency: "weekly",
+    priority: 0.72,
+  }));
+
+  const careerRoleEntries: SitemapEntryDescriptor[] = roleLandings.map((roleLanding) => ({
+    path: `/solutions/career-paths/${roleLanding.slug}`,
+    lastModified: staticContentLastModified,
+    changeFrequency: "weekly",
+    priority: 0.68,
+  }));
+
+  const conceptFocusEntries: SitemapEntryDescriptor[] = conceptFocuses.map((focus) => ({
+    path: `/concepts/focus/${toConceptTaxonomySlug(focus)}`,
+    lastModified: staticContentLastModified,
+    changeFrequency: "monthly",
+    priority: 0.64,
+  }));
+
+  const conceptAudienceEntries: SitemapEntryDescriptor[] = conceptAudiences.map((audience) => ({
+    path: `/concepts/audience/${toConceptTaxonomySlug(audience)}`,
+    lastModified: staticContentLastModified,
+    changeFrequency: "monthly",
+    priority: 0.64,
+  }));
+
   return [
     ...coreEntries,
     ...postureEntries,
@@ -191,5 +244,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...vcAuthorityEntries,
     ...decisionAnswerEntries,
     ...regimeDeepEntries,
+    ...stageGuideEntries,
+    ...stakeholderGuideEntries,
+    ...careerRoleEntries,
+    ...conceptFocusEntries,
+    ...conceptAudienceEntries,
   ].map(buildEntry);
 }

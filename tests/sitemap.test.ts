@@ -10,7 +10,15 @@ import {
   toolkitDefinitions,
   useCaseRoles,
 } from "../lib/informationArchitecture";
-import { productConceptArticles } from "../lib/productCanon";
+import {
+  conceptAudiences,
+  conceptFocuses,
+  productConceptArticles,
+  toConceptTaxonomySlug,
+} from "../lib/productCanon";
+import { stageGuides } from "../app/guides/stageGuides";
+import { stakeholderGuides } from "../app/guides/stakeholderGuides";
+import { roleLandings } from "../app/solutions/career-paths/roleLandingData";
 
 describe("sitemap", () => {
   it("returns canonical URLs and includes posture, decide, learn, toolkit, and library routes", () => {
@@ -51,6 +59,27 @@ describe("sitemap", () => {
 
     for (const article of productConceptArticles) {
       assert.ok(urls.has(`${siteUrl}/concepts/${article.slug}`));
+    }
+
+
+    for (const stageGuide of stageGuides) {
+      assert.ok(urls.has(`${siteUrl}/guides/stage/${stageGuide.slug}`));
+    }
+
+    for (const stakeholderGuide of stakeholderGuides) {
+      assert.ok(urls.has(`${siteUrl}/guides/${stakeholderGuide.slug}`));
+    }
+
+    for (const roleLanding of roleLandings) {
+      assert.ok(urls.has(`${siteUrl}/solutions/career-paths/${roleLanding.slug}`));
+    }
+
+    for (const focus of conceptFocuses) {
+      assert.ok(urls.has(`${siteUrl}/concepts/focus/${toConceptTaxonomySlug(focus)}`));
+    }
+
+    for (const audience of conceptAudiences) {
+      assert.ok(urls.has(`${siteUrl}/concepts/audience/${toConceptTaxonomySlug(audience)}`));
     }
   });
 
