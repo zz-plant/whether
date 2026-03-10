@@ -105,27 +105,27 @@ describe("WeeklyDecisionCard top-fold composition", () => {
       />,
     );
 
-    assert.match(html, /Startup Climate — Weekly Call/);
+    assert.match(html, /Weekly Posture — Decision Call/);
     assert.match(html, /weekly-viral-hero/);
     assert.match(html, /Startup capital cycle/);
-    assert.match(html, /Key operational stance this week/);
+    assert.match(html, /Key operating posture this week/);
     assert.match(html, /Expand:/);
     assert.match(html, /Avoid:/);
     assert.match(html, /You are here:/);
     assert.match(html, /Distance to regime change:/);
     assert.match(html, /Weekly memo \(shareable\)/);
     assert.match(html, /Decision matrix this week/);
-    assert.match(html, /Posture/);
-    assert.match(html, /Movement/);
+    assert.match(html, /posture/i);
+    assert.match(html, /movement/i);
     assert.match(html, /Signal confidence/);
     assert.match(html, /Action/);
-    assert.match(html, /Movement/);
+    assert.match(html, /movement/i);
     assert.match(html, /Velocity:/);
     assert.match(html, /Regime transition pace: Expansion→Mixed typically 3–6 months/);
     assert.match(html, /id="primary-artifact-actions"/);
-    assert.match(html, /Jump to copy actions/);
+    assert.match(html, /Jump to weekly actions/);
 
-    const heroIndex = html.indexOf("Startup Climate — Weekly Call");
+    const heroIndex = html.indexOf("Weekly Posture — Decision Call");
     const actionIndex = html.indexOf("Action");
     const guardrailIndex = html.indexOf("Guardrail");
     const flipConditionIndex = html.indexOf("Flip condition");

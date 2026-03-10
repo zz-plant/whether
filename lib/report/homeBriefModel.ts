@@ -1,5 +1,5 @@
 import { buildCanonicalBoundedDecisionRules } from "./boundedDecisionRules";
-import { buildRoleAwareOperatingTemplates } from "./operatingCalls";
+import { buildActionStripItems, buildRoleAwareOperatingTemplates } from "./operatingCalls";
 import { getSummaryArchive } from "../summary/summaryArchive";
 import type { MacroSeriesReading } from "../types";
 import { isImprovingSignalDelta } from "./reportData";
@@ -24,7 +24,7 @@ import {
   type FailureModeWarning,
 } from "./trustStatus";
 import type { BoundedDecisionRule } from "./boundedDecisionRules";
-import type { RoleAwareOperatingTemplate } from "./operatingCalls";
+import type { ActionStripItem, RoleAwareOperatingTemplate } from "./operatingCalls";
 
 type Regime = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
 
@@ -689,6 +689,7 @@ export const buildHomeBriefModel = (
     scores: assessment.scores,
   });
   const roleAwareTemplates = buildRoleAwareOperatingTemplates(decisionRules);
+  const actionStripItems: ActionStripItem[] = buildActionStripItems(decisionRules);
   const executiveOperationalStance = extractExecutiveOperationalStance({ roleAwareTemplates, decisionRules });
 
   const netConstraintSummary =
@@ -729,6 +730,7 @@ export const buildHomeBriefModel = (
       Defensive: 25,
     },
     decisionRules,
+    actionStripItems,
     roleAwareTemplates,
     executiveOperationalStance,
     revisitDecisions: (reportDynamics?.changedSignals.length ?? 0) > 0 && reportDynamics?.directionLabel !== "stable",

@@ -47,8 +47,8 @@ describe("WeeklyDecisionCard extracted sections", () => {
       />,
     );
 
-    assert.match(html, /Startup Climate — Weekly Call/);
-    assert.match(html, /Operating stance:/);
+    assert.match(html, /Weekly Posture — Decision Call/);
+    assert.match(html, /Operating posture:/);
     assert.match(html, /Startup capital cycle/);
     assert.match(html, /Distance to regime change:/);
     assert.match(html, /Founder playbook/);
@@ -58,7 +58,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
     assert.match(html, /Context metric: Startup Climate Index/);
     assert.match(html, /False-signal warnings/);
 
-    const heroIndex = html.indexOf("Startup Climate — Weekly Call");
+    const heroIndex = html.indexOf("Weekly Posture — Decision Call");
     const playbookIndex = html.indexOf("Founder playbook");
     const memoIndex = html.indexOf("Weekly memo (shareable)");
     assert.ok(playbookIndex > heroIndex);
@@ -195,6 +195,6 @@ describe("WeeklyDecisionCard extracted sections", () => {
     assert.match(detailsHtml, /Posture history/);
     assert.match(footerHtml, /Send to team/);
     assert.match(footerHtml, /hidden sm:flex sm:flex-wrap sm:gap-3/);
-    assert.match(footerHtml, /Run risk check/);
+    assert.match(footerHtml, />Copy<\/button>/);
   });
 });

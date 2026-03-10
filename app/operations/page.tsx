@@ -24,6 +24,8 @@ import { RunwayPlannerPanel } from "./components/runwayPlannerPanel";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { LiveDataFallbackAlert } from "../components/liveDataFallbackAlert";
 import { NextStepRail } from "../components/nextStepRail";
+import { buildCanonicalBoundedDecisionRules } from "../../lib/report/boundedDecisionRules";
+import { buildActionStripItems } from "../../lib/report/operatingCalls";
 
 
 export const runtime = "edge";
@@ -131,6 +133,14 @@ export default async function OperationsPage({
     : isFallback
       ? "warning"
       : "stable";
+
+  const actionStripItems = buildActionStripItems(
+    buildCanonicalBoundedDecisionRules({
+      regime: assessment.regime,
+      thresholds: assessment.thresholds,
+      scores: assessment.scores,
+    }),
+  );
 
   return (
     <ReportShell
@@ -255,6 +265,7 @@ export default async function OperationsPage({
           fenceItems={fenceItems}
           provenance={treasuryProvenance}
           showProvenance={false}
+          actionStripItems={actionStripItems}
         />
       </SectionedReportPanel>
 
@@ -268,6 +279,7 @@ export default async function OperationsPage({
           regime={assessment.regime}
           provenance={treasuryProvenance}
           showProvenance={false}
+          actionStripItems={actionStripItems}
         />
         <RunwayPlannerPanel assessment={assessment} />
       </SectionedReportPanel>
@@ -285,6 +297,7 @@ export default async function OperationsPage({
           macroSeries={macroSeries}
           provenance={treasuryProvenance}
           showProvenance={false}
+          actionStripItems={actionStripItems}
         />
       </SectionedReportPanel>
 

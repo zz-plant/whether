@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { buildCanonicalBoundedDecisionRules } from "../lib/report/boundedDecisionRules";
-import { buildRoleAwareOperatingTemplates } from "../lib/report/operatingCalls";
+import { buildActionStripItems, buildRoleAwareOperatingTemplates } from "../lib/report/operatingCalls";
 
 describe("bounded decision rule formatting", () => {
   it("preserves decimals for low-magnitude score displays", () => {
@@ -28,4 +28,21 @@ it("threads bounded decision rules into role templates", () => {
   assert.match(templates[0]?.doNow ?? "", /Selective hiring|Increase product tempo/i);
   assert.doesNotMatch(templates[0]?.avoidNow ?? "", /^Pause/i);
   assert.doesNotMatch(templates[0]?.flipTrigger ?? "", /^Resume/i);
+});
+
+
+it("ensures every action-strip item includes action, threshold, and reversal condition", () => {
+  const rules = buildCanonicalBoundedDecisionRules({
+    regime: "DEFENSIVE",
+    thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
+    scores: { tightness: 72, riskAppetite: 48 },
+  });
+
+  const items = buildActionStripItems(rules);
+  assert.ok(items.length > 0);
+  for (const item of items) {
+    assert.ok(item.action.trim().length > 0);
+    assert.ok(item.threshold.trim().length > 0);
+    assert.ok(item.reversalCondition.trim().length > 0);
+  }
 });

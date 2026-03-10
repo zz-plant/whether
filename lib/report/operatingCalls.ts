@@ -7,6 +7,13 @@ export type OperatingCall = {
   spend: string;
 };
 
+export type ActionStripItem = {
+  area: DecisionArea;
+  action: string;
+  threshold: string;
+  reversalCondition: string;
+};
+
 export type RoleAwareOperatingTemplate = {
   role: "startup-leadership" | "vc-partner";
   roleLabel: string;
@@ -48,6 +55,17 @@ const sanitizeFlip = (resumeTrigger: string) =>
   resumeTrigger.replace(/^Resume\s+/i, "").replace(/\.$/, "");
 
 const isString = (value: string | undefined): value is string => typeof value === "string";
+
+export const buildActionStripItems = (rules: BoundedDecisionRule[]): ActionStripItem[] =>
+  rules.map((rule) => ({
+    area: rule.area,
+    // TODO(plan-week): Action strip generator now enforces explicit action text from bounded decision rules.
+    action: rule.recommendation,
+    // TODO(plan-week): Threshold field is required and mapped from pause trigger guardrails.
+    threshold: rule.pauseTrigger,
+    // TODO(plan-week): Reversal field is required and mapped from resume trigger flip conditions.
+    reversalCondition: rule.resumeTrigger,
+  }));
 
 export const buildRoleAwareOperatingTemplates = (rules: BoundedDecisionRule[]): RoleAwareOperatingTemplate[] => {
   const hiringRule = findRule(rules, "hiring");

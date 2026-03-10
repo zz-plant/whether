@@ -365,6 +365,7 @@ const HomePageReportContent = async ({
     regimeDistancePoints: homeBriefModel.regimeDistance.pointsToFlip,
     historicalAnalogs: homeBriefModel.historicalAnalogs,
     failureModes: homeBriefModel.failureModes,
+    actionStripItems: homeBriefModel.actionStripItems,
   });
   const boardSummary = buildBoardBrief(assessment, treasury, sensors, macroSeries, {
     interpretationLayer,
@@ -375,6 +376,7 @@ const HomePageReportContent = async ({
     regimeDistancePoints: homeBriefModel.regimeDistance.pointsToFlip,
     historicalAnalogs: homeBriefModel.historicalAnalogs,
     failureModes: homeBriefModel.failureModes,
+    actionStripItems: homeBriefModel.actionStripItems,
   });
   const callCitation = buildCallCitation(assessment, treasury, { interpretationLayer, postureWithStageLabel: homeBriefModel.postureWithStageLabel });
   const featuredConcepts = getFeaturedConceptArticles().slice(0, 3);
@@ -455,6 +457,7 @@ const HomePageReportContent = async ({
         decisionShiftSummary={homeBriefModel.decisionShiftSummary}
         transitionProbabilities={homeBriefModel.transitionProbabilities}
         decisionRules={homeBriefModel.decisionRules}
+        actionStripItems={homeBriefModel.actionStripItems}
         roleAwareTemplates={homeBriefModel.roleAwareTemplates}
         executiveOperationalStance={homeBriefModel.executiveOperationalStance}
         revisitDecisions={homeBriefModel.revisitDecisions}

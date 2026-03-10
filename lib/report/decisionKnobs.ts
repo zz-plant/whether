@@ -78,18 +78,18 @@ const buildKnobRationale = (key: DecisionKnob["key"], context: DecisionKnobConte
 
   if (key === "approvalVelocity") {
     return thresholdCaution
-      ? `${severityShift}; near-threshold risk keeps approvals paced while ${weakSignalLabel}.`
+      ? `${severityShift}; near-threshold risk keeps approvals paced until flip conditions clear while ${weakSignalLabel}.`
       : `${severityShift}; approval speed follows ${context.regime.toLowerCase()} conditions while ${weakSignalLabel}.`;
   }
 
   if (key === "experimentTolerance") {
     return thresholdCaution
-      ? `${severityShift}; threshold proximity caps experimentation despite ${weakSignalLabel}.`
+      ? `${severityShift}; threshold proximity caps experimentation until reversal conditions clear despite ${weakSignalLabel}.`
       : `${severityShift}; experiment tolerance tracks current risk appetite and ${weakSignalLabel}.`;
   }
 
   return thresholdCaution
-    ? `${severityShift}; keep stronger controls until threshold risk eases and ${weakSignalLabel}.`
+    ? `${severityShift}; keep stronger controls until threshold triggers clear and ${weakSignalLabel}.`
     : `${severityShift}; controls align to current regime with ${weakSignalLabel}.`;
 };
 

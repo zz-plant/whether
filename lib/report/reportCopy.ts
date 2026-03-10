@@ -29,7 +29,7 @@ export type HighlightBullet = { text: string };
 export const FIRST_TIME_GUIDE_STEPS: FirstTimeGuideStep[] = [
   {
     label: "Summary",
-    detail: "Start with Action, Guardrail, and Flip condition, then use posture and score context to pressure-test the call.",
+    detail: "Start with Action, Guardrail, and Flip condition, then use posture and regime-score context to pressure-test the call.",
     example: "Example decision: defer expansion hires when cash is tight.",
   },
   {
@@ -97,7 +97,7 @@ export const GLOSSARY_USAGE_NOTES: GlossaryUsageNote[] = [
   {
     title: "How to use this glossary",
     bullets: [
-      { emphasis: "Start with current climate", detail: "to anchor this week's stance." },
+      { emphasis: "Start with current environment", detail: "to anchor this week's posture." },
       { emphasis: "Translate terms into constraints", detail: "before discussing bets." },
       { emphasis: "Use linked sections", detail: "to pull supporting evidence fast." },
     ],
@@ -105,7 +105,7 @@ export const GLOSSARY_USAGE_NOTES: GlossaryUsageNote[] = [
   {
     title: "Reading notes",
     bullets: [
-      { emphasis: "Climate badge", detail: "summarizes current macro stance." },
+      { emphasis: "Posture badge", detail: "summarizes current operating posture." },
       { emphasis: "Signals map to constraints", detail: "rather than forecasts." },
       { emphasis: "Exports support alignment", detail: "across teams." },
     ],
@@ -139,7 +139,7 @@ export const ONBOARDING_RELATED_LINKS: Array<Required<ReportLinkCopy>> = [
   {
     href: "/operations",
     label: "Action playbook",
-    description: "Turn the regime readout into concrete execution guidance.",
+    description: "Turn the regime readout into concrete posture and execution guidance.",
   },
   {
     href: "/methodology",
