@@ -424,39 +424,51 @@ type BoundedRulesMatrixProps = {
 export function BoundedRulesMatrix({ decisionRules }: BoundedRulesMatrixProps) {
   const topDecisionRules = decisionRules.slice(0, 4);
 
+  const renderActionLine = (items: string[], emptyLabel: string) => {
+    if (items.length === 0) {
+      return <p className="text-slate-400">{emptyLabel}</p>;
+    }
+
+    const [firstItem, ...remainingItems] = items;
+    return (
+      <div className="flex items-center gap-2">
+        <p className="min-w-0 flex-1 truncate">{firstItem}</p>
+        {remainingItems.length > 0 ? (
+          <span className="shrink-0 rounded-full border border-slate-600/80 bg-slate-900/90 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+            +{remainingItems.length}
+          </span>
+        ) : null}
+      </div>
+    );
+  };
+
   return (
     <article className={`${tierOnePanel} ${sectionSpacing}`}>
       <h2 className={tierOneHeading}>Decision matrix this week</h2>
       <p className="text-xs text-slate-300">Action now, then guardrail + flip conditions.</p>
-      <ul className="mt-2 grid gap-3 sm:grid-cols-2">
+      <ul className="mt-2 grid gap-3 sm:grid-cols-2 sm:auto-rows-fr">
         {topDecisionRules.map((rule) => (
-          <li key={rule.area} className={`${tierOneInset} text-xs text-slate-200`}>
+          <li key={rule.area} className={`${tierOneInset} flex h-full flex-col text-xs text-slate-200`}>
             <p className="font-semibold uppercase tracking-[0.12em] text-slate-200">{decisionAreaLabel(rule.area)}</p>
             <div className="mt-3 space-y-2">
               <div>
                 <p className="font-semibold uppercase tracking-[0.12em] text-emerald-100">Do now</p>
-                <ul className="mt-1 list-disc space-y-1 pl-4 text-emerald-50">
-                  {rule.doNow.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
+                <div className="mt-1 text-emerald-50">{renderActionLine(rule.doNow, "No immediate do-now action")}</div>
               </div>
               <div>
                 <p className="font-semibold uppercase tracking-[0.12em] text-rose-100">Avoid now</p>
-                <ul className="mt-1 list-disc space-y-1 pl-4 text-rose-50">
-                  {rule.avoidNow.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
+                <div className="mt-1 text-rose-50">{renderActionLine(rule.avoidNow, "No immediate avoid-now action")}</div>
               </div>
             </div>
-            <p className="mt-3 rounded-md border border-rose-500/50 bg-rose-500/10 px-2 py-2 text-rose-100">
+            <p className="mt-3 rounded-full border border-rose-500/50 bg-rose-500/10 px-2 py-1 text-rose-100">
               <span className="font-semibold uppercase tracking-[0.12em]">Guardrail</span> {rule.pauseTrigger}
             </p>
-            <p className="mt-2 rounded-md border border-emerald-500/50 bg-emerald-500/10 px-2 py-2 text-emerald-100">
+            <p className="mt-2 rounded-full border border-emerald-500/50 bg-emerald-500/10 px-2 py-1 text-emerald-100">
               <span className="font-semibold uppercase tracking-[0.12em]">Flip condition</span> {rule.resumeTrigger}
             </p>
-            <p className="mt-2 text-slate-400">Scope: {rule.scope}</p>
+            <p className="mt-2 inline-flex w-fit rounded-full border border-slate-700/85 bg-slate-900/80 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+              Scope: {rule.scope}
+            </p>
           </li>
         ))}
       </ul>
