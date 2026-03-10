@@ -7,6 +7,7 @@ import { getWeeklyActionGuidance } from "../../lib/summary/weeklySummary";
 import { formatTimestampUTC } from "../../lib/formatters";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
 import { ArrowRightIcon } from "./uiIcons";
+import { buildWeeklyLockCommitment } from "../../lib/report/decisionKnobs";
 import {
   clampToRange,
   formatNumber,
@@ -192,17 +193,21 @@ export const ExecutiveSnapshotPanel = ({
 
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
   const hasDataWarnings = assessment.dataWarnings.length > 0;
-  const confidenceLabel = isFallback || hasDataWarnings ? "Guarded" : "High";
+  const confidenceDegraded = isFallback || hasDataWarnings;
+  const freshnessDegraded = provenance.statusLabel !== "Live (high confidence)";
+  const confidenceLabel = confidenceDegraded ? "Guarded" : "High";
   const confidenceTone =
-    isFallback || hasDataWarnings
+    confidenceDegraded
       ? "border-amber-400/40 bg-amber-500/10 text-amber-100"
       : "border-emerald-400/40 bg-emerald-500/10 text-emerald-100";
 
-  const confidenceDetail = isFallback
-    ? "Live Treasury feed is degraded; this snapshot is running on cached inputs."
-    : hasDataWarnings
-      ? "Some Treasury inputs are missing; verify gaps before increasing commitment size."
-      : "Full Treasury coverage is healthy for this report window.";
+  const weeklyLockCommitment = buildWeeklyLockCommitment({
+    regime: assessment.regime,
+    tightnessRegime: assessment.thresholds.tightnessRegime,
+    riskAppetiteRegime: assessment.thresholds.riskAppetiteRegime,
+    confidenceDegraded,
+    freshnessDegraded,
+  });
 
   const constraintHighlights = assessment.constraints.slice(0, 3);
 
@@ -215,7 +220,7 @@ export const ExecutiveSnapshotPanel = ({
             <h3 id="executive-snapshot-title" className="type-section text-slate-100">
               Lock this week&apos;s operating posture
             </h3>
-            <p className="mt-2 text-sm text-slate-300">Use this strip to commit one operating posture, set the stop line, and define the exact trigger that reopens the decision.</p>
+            <p className="mt-2 text-sm text-slate-300">Lock the current call, track measurable flip conditions, and assign a re-check owner cadence.</p>
           </div>
           <DataProvenanceStrip provenance={provenance} />
         </div>
@@ -249,7 +254,7 @@ export const ExecutiveSnapshotPanel = ({
                       <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">
                         Signal confidence
                       </p>
-                      <p className="text-sm text-slate-200">{confidenceDetail}</p>
+                      <p className="text-sm text-slate-200">Use compact trust markers inline; pause irreversible commitments when confidence or freshness is degraded.</p>
                       <Tooltip.Arrow className="h-2.5 w-2.5 rotate-45 border border-slate-800/80 bg-slate-950/95" />
                     </Tooltip.Popup>
                   </Tooltip.Positioner>
@@ -259,18 +264,31 @@ export const ExecutiveSnapshotPanel = ({
 
             <div className="mt-3 grid gap-2 md:grid-cols-3">
               <article className="rounded-md border border-violet-500/45 bg-violet-500/10 px-3 py-2">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-violet-100">Decision now</p>
-                <p className="mt-1 text-sm font-semibold text-slate-100">Gate approvals to short-cycle ROI.</p>
-              </article>
-              <article className="rounded-md border border-amber-500/45 bg-amber-500/10 px-3 py-2">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-amber-100">Guardrail</p>
-                <p className="mt-1 text-xs text-slate-100">Pause commitments if tightness &gt; {assessment.thresholds.tightnessRegime + 6} or risk appetite &lt; {Math.max(assessment.thresholds.riskAppetiteRegime - 6, 0)}.</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-violet-100">Current call</p>
+                <p className="mt-1 text-xs font-semibold text-slate-100">{weeklyLockCommitment.currentCall}</p>
               </article>
               <article className="rounded-md border border-sky-500/45 bg-sky-500/10 px-3 py-2">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">Flip condition</p>
-                <p className="mt-1 text-xs text-slate-100">Re-open pace when tightness &lt; {Math.max(assessment.thresholds.tightnessRegime - 4, 0)} and risk appetite &gt; {Math.min(assessment.thresholds.riskAppetiteRegime + 4, 100)}.</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">Flip conditions</p>
+                <ul className="mt-1 list-disc space-y-1 pl-4 text-xs text-slate-100">
+                  {weeklyLockCommitment.flipConditions.map((condition) => (
+                    <li key={condition}>{condition}</li>
+                  ))}
+                </ul>
+              </article>
+              <article className="rounded-md border border-amber-500/45 bg-amber-500/10 px-3 py-2">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-amber-100">Owner cadence</p>
+                <p className="mt-1 text-xs text-slate-100">{weeklyLockCommitment.ownerCadence}</p>
               </article>
             </div>
+            {weeklyLockCommitment.trustMarkers.length > 0 ? (
+              <div className="mt-2 flex flex-wrap gap-2 text-[11px]">
+                {weeklyLockCommitment.trustMarkers.map((marker) => (
+                  <span key={marker} className="rounded-full border border-amber-400/45 bg-amber-500/10 px-2 py-0.5 font-semibold uppercase tracking-[0.1em] text-amber-100">
+                    {marker}
+                  </span>
+                ))}
+              </div>
+            ) : null}
             <ul className="mt-3 grid gap-2 text-xs text-slate-300 sm:grid-cols-2">
               {constraintHighlights.slice(0, 2).map((constraint) => (
                 <li key={constraint} className="rounded-md border border-slate-700/70 bg-slate-950/55 px-2.5 py-2">{constraint}</li>
