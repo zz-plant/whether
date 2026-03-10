@@ -496,78 +496,73 @@ export function MoreContextDisclosureBody({
   macroOverlay,
 }: MoreContextDisclosureProps) {
   return (
-    <details className={`${tierTwoPanel} ${sectionSpacing}`}>
-      <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.14em] text-slate-200">
-        Why this call ▼
-      </summary>
-      <div className="mt-3 space-y-4">
-        <article className="space-y-2">
-          <h2 className={tierTwoHeading}>Startup Climate Index (context)</h2>
-          <p className="text-xs text-slate-300">Context metric for continuity: {startupClimateIndex.score} / 100 · {startupClimateIndex.status}</p>
-          <ul className="mt-2 grid gap-2 sm:grid-cols-2">
-            {startupClimateIndex.breakdown.map((item) => (
-              <li key={item.label} className="space-y-1">
-                <div className="flex items-center justify-between gap-2">
-                  <span>{item.label}</span>
-                  <span className="font-semibold text-slate-100">{item.score}</span>
-                </div>
-                <div className="h-2 rounded-full bg-slate-800">
-                  <div className="h-2 rounded-full bg-sky-300/70" style={{ width: `${Math.max(5, Math.min(100, item.score))}%` }} />
-                </div>
-              </li>
-            ))}
-          </ul>
-        </article>
+    <div className="space-y-4">
+      <article className="space-y-2">
+        <h2 className={tierTwoHeading}>Startup Climate Index (context)</h2>
+        <p className="text-xs text-slate-300">Context metric for continuity: {startupClimateIndex.score} / 100 · {startupClimateIndex.status}</p>
+        <ul className="mt-2 grid gap-2 sm:grid-cols-2">
+          {startupClimateIndex.breakdown.map((item) => (
+            <li key={item.label} className="space-y-1">
+              <div className="flex items-center justify-between gap-2">
+                <span>{item.label}</span>
+                <span className="font-semibold text-slate-100">{item.score}</span>
+              </div>
+              <div className="h-2 rounded-full bg-slate-800">
+                <div className="h-2 rounded-full bg-sky-300/70" style={{ width: `${Math.max(5, Math.min(100, item.score))}%` }} />
+              </div>
+            </li>
+          ))}
+        </ul>
+      </article>
 
-        <article className="space-y-2">
-          <h2 className={tierTwoHeading}>Supporting evidence</h2>
-          <ul className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {primaryDrivers.map((driver) => (
-              <li key={driver.label} className={`${tierTwoInset} text-xs text-slate-200`}>
-                <p className="font-semibold uppercase tracking-[0.12em] text-slate-300">{driver.label}</p>
-                <p className="mt-1 text-slate-300">{driver.detail}</p>
-              </li>
-            ))}
-          </ul>
-        </article>
+      <article className="space-y-2">
+        <h2 className={tierTwoHeading}>Supporting evidence</h2>
+        <ul className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {primaryDrivers.map((driver) => (
+            <li key={driver.label} className={`${tierTwoInset} text-xs text-slate-200`}>
+              <p className="font-semibold uppercase tracking-[0.12em] text-slate-300">{driver.label}</p>
+              <p className="mt-1 text-slate-300">{driver.detail}</p>
+            </li>
+          ))}
+        </ul>
+      </article>
 
-        <article className="space-y-2">
-          <h2 className={tierTwoHeading}>Why this posture call</h2>
-          <ul className="mt-2 grid gap-2 sm:grid-cols-3">
-            {whyThisCall.map((reason) => (
-              <li key={reason.label} className={`${tierTwoInset} text-xs text-slate-200`}>
-                <p className="font-semibold uppercase tracking-[0.12em] text-slate-300">{reason.label}</p>
-                <p className="mt-1 text-slate-300">{reason.detail}</p>
-              </li>
-            ))}
-          </ul>
-        </article>
+      <article className="space-y-2">
+        <h2 className={tierTwoHeading}>Why this posture call</h2>
+        <ul className="mt-2 grid gap-2 sm:grid-cols-3">
+          {whyThisCall.map((reason) => (
+            <li key={reason.label} className={`${tierTwoInset} text-xs text-slate-200`}>
+              <p className="font-semibold uppercase tracking-[0.12em] text-slate-300">{reason.label}</p>
+              <p className="mt-1 text-slate-300">{reason.detail}</p>
+            </li>
+          ))}
+        </ul>
+      </article>
 
-        <article className="space-y-3">
-          <h2 className={tierThreeHeading}>Posture history</h2>
-          <PostureHistoryTimeline historicalTimeline={historicalTimeline} />
-          <div>
-            <p className={tierThreeHeading}>Historical memory rail</p>
-            <ul className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-              {memoryRail.map((item) => (
-                <li key={`${item.label}-${item.posture}`} className={`${tierThreeInset} text-xs text-slate-200`}>
-                  <p className="text-slate-400">{item.label}</p>
-                  <p className="mt-1 font-semibold text-slate-100">{item.posture}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <ul className="grid gap-2 text-xs text-slate-300 sm:grid-cols-2 lg:grid-cols-4">
-            {macroOverlay.map((item) => (
-              <li key={item.label} className={tierThreeInset}>
-                <p className="font-semibold uppercase tracking-[0.12em] text-slate-200">{item.label}</p>
-                <p className="mt-1 text-slate-300">{item.detail}</p>
+      <article className="space-y-3">
+        <h2 className={tierThreeHeading}>Posture history</h2>
+        <PostureHistoryTimeline historicalTimeline={historicalTimeline} />
+        <div>
+          <p className={tierThreeHeading}>Historical memory rail</p>
+          <ul className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+            {memoryRail.map((item) => (
+              <li key={`${item.label}-${item.posture}`} className={`${tierThreeInset} text-xs text-slate-200`}>
+                <p className="text-slate-400">{item.label}</p>
+                <p className="mt-1 font-semibold text-slate-100">{item.posture}</p>
               </li>
             ))}
           </ul>
-        </article>
-      </div>
-    </details>
+        </div>
+        <ul className="grid gap-2 text-xs text-slate-300 sm:grid-cols-2 lg:grid-cols-4">
+          {macroOverlay.map((item) => (
+            <li key={item.label} className={tierThreeInset}>
+              <p className="font-semibold uppercase tracking-[0.12em] text-slate-200">{item.label}</p>
+              <p className="mt-1 text-slate-300">{item.detail}</p>
+            </li>
+          ))}
+        </ul>
+      </article>
+    </div>
   );
 }
 
@@ -775,63 +770,10 @@ export function WeeklyDecisionCard({
 
         <div className="grid gap-3 lg:grid-cols-2">
           <article className={tierOneInset}>
-            <p className={`text-xs ${neutralLabel}`}>Macro drift this week</p>
-            <p className="mt-1 text-xs text-slate-300">Velocity: {movementVelocity}</p>
+            <p className={`text-xs ${neutralLabel}`}>Diagnostics at a glance</p>
+            <p className="mt-2 text-xs text-slate-200">Top contributors: {topContributorInline}</p>
+            <p className="mt-2 text-xs text-slate-300">Flip distance: {Math.abs(regimeDistance.pointsToFlip).toFixed(1)} points</p>
             <p className="mt-1 text-xs text-slate-300">Regime transition pace: {regimeVelocity.displayLabel}</p>
-            <p className="mt-2 text-[11px] uppercase tracking-[0.1em] text-slate-400">weekly movement</p>
-            <div className="mt-3 rounded-md border border-slate-700/70 bg-slate-950/60 px-2.5 py-2">
-              <div className="flex items-center justify-between gap-2">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-300">Contribution weight</p>
-                <HapticAnchor href="/methodology" className="text-[11px] text-sky-200 underline underline-offset-2">Methodology</HapticAnchor>
-              </div>
-              <ul className="mt-2 space-y-1.5 text-xs text-slate-200" aria-label="Top signal contributors">
-                {topContributors.map((item) => (
-                  <li key={`top-${item.key}`} className="space-y-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <span>{item.label}</span>
-                      <span className="font-semibold text-slate-100">{item.unavailable ? "Unavailable" : item.normalizedPercentLabel}</span>
-                    </div>
-                    <div className={`${meterTrackBase} border border-slate-700/60 bg-slate-900/70`}>
-                      <div className="h-2 rounded-full bg-sky-300/75" style={{ width: `${Math.round(item.normalized * 100)}%` }} />
-                    </div>
-                  </li>
-                ))}
-              </ul>
-              <details className="mt-2 text-[11px] text-slate-300">
-                <summary className="cursor-pointer text-slate-200">Full contribution diagnostics</summary>
-                <ul className="mt-2 space-y-1.5">
-                  {allSignalContributions.map((item) => (
-                    <li key={`full-${item.key}`} className="flex items-center justify-between gap-2 rounded border border-slate-700/50 px-2 py-1">
-                      <span>{item.label}</span>
-                      <span className="font-semibold text-slate-100">{item.unavailable ? "Unavailable" : item.normalizedPercentLabel}</span>
-                    </li>
-                  ))}
-                </ul>
-              </details>
-            </div>
-
-            <ul className="mt-2 space-y-2 text-xs text-slate-200">
-              {macroMovementRows.map((signal) => (
-                <li key={signal.key} className="space-y-1">
-                  <div className="flex items-center justify-between gap-2">
-                    <span>{renderSignalLabel(signal.key, signal.label)}</span>
-                    <span className={`font-semibold ${signal.delta > 0 ? "text-amber-100" : signal.delta < 0 ? "text-emerald-100" : "text-slate-100"}`}>
-                      {signal.arrow} {signal.delta > 0 ? `+${signal.delta.toFixed(1)}` : signal.delta.toFixed(1)}
-                    </span>
-                  </div>
-                  <div className="text-[10px] uppercase tracking-[0.1em] text-slate-400">{signal.significance} move</div>
-                  <div className={`${meterTrackBase} border border-slate-700/70 bg-slate-900/80`}>
-                    <div className="pointer-events-none absolute inset-y-0 left-1/3 w-px bg-slate-600/70" aria-hidden="true" />
-                    <div className="pointer-events-none absolute inset-y-0 left-2/3 w-px bg-slate-600/70" aria-hidden="true" />
-                    <div
-                      className={`${meterFillBase} ${movementMeterToneByDirection[resolveSignalDirection(signal.delta)]}`}
-                      style={{ width: `${signal.meter}%` }}
-                    />
-                  </div>
-                  <p className="text-[11px] text-slate-300">{signalActionRuleText[signal.key]}</p>
-                </li>
-              ))}
-            </ul>
           </article>
 
           <article className={tierOneInset}>
@@ -868,29 +810,92 @@ export function WeeklyDecisionCard({
 
       <ActionStrip items={actionStripItems} />
       <BoundedRulesMatrix decisionRules={decisionRules} />
-      <MoreContextDisclosureBody
-        startupClimateIndex={startupClimateIndex}
-        primaryDrivers={primaryDrivers}
-        whyThisCall={whyThisCall}
-        memoryRail={memoryRail}
-        historicalTimeline={historicalTimeline}
-        historicalAnalogs={historicalAnalogs}
-        macroOverlay={macroOverlay}
-      />
+      <details className={`${tierTwoPanel} ${sectionSpacing}`}>
+        <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.14em] text-slate-200">
+          Diagnostic appendix ▼
+        </summary>
+        <div className="mt-3 space-y-4">
+          <article className={tierOneInset}>
+            <p className={`text-xs ${neutralLabel}`}>Macro movement details</p>
+            <p className="mt-1 text-xs text-slate-300">Velocity: {movementVelocity}</p>
+            <div className="mt-3 rounded-md border border-slate-700/70 bg-slate-950/60 px-2.5 py-2">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-300">Contribution weight</p>
+                <HapticAnchor href="/methodology" className="text-[11px] text-sky-200 underline underline-offset-2">Methodology</HapticAnchor>
+              </div>
+              <ul className="mt-2 space-y-1.5 text-xs text-slate-200" aria-label="Top signal contributors">
+                {topContributors.map((item) => (
+                  <li key={`top-${item.key}`} className="space-y-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <span>{item.label}</span>
+                      <span className="font-semibold text-slate-100">{item.unavailable ? "Unavailable" : item.normalizedPercentLabel}</span>
+                    </div>
+                    <div className={`${meterTrackBase} border border-slate-700/60 bg-slate-900/70`}>
+                      <div className="h-2 rounded-full bg-sky-300/75" style={{ width: `${Math.round(item.normalized * 100)}%` }} />
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-2 text-[11px] text-slate-300">Full contribution diagnostics</p>
+              <ul className="mt-2 space-y-1.5">
+                {allSignalContributions.map((item) => (
+                  <li key={`full-${item.key}`} className="flex items-center justify-between gap-2 rounded border border-slate-700/50 px-2 py-1 text-xs text-slate-200">
+                    <span>{item.label}</span>
+                    <span className="font-semibold text-slate-100">{item.unavailable ? "Unavailable" : item.normalizedPercentLabel}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-      {historicalAnalogs.length > 0 ? (
-        <article className={`${tierThreePanel} ${sectionSpacing}`} aria-label="Historical analogs">
-          <h2 className={tierThreeHeading}>Compact analog references</h2>
-          <ul className="mt-2 space-y-2 text-xs text-slate-200">
-            {historicalAnalogs.map((analog) => (
-              <li key={`${analog.date}-${analog.similarityScore}`} className="rounded-md border border-slate-700/60 bg-slate-950/60 px-3 py-2">
-                <p className="font-semibold text-slate-100">{analog.date} · similarity {(analog.similarityScore * 100).toFixed(0)}%</p>
-                <p className="mt-1 text-slate-300">{analog.implication}</p>
-              </li>
-            ))}
-          </ul>
-        </article>
-      ) : null}
+            <ul className="mt-3 space-y-2 text-xs text-slate-200">
+              {macroMovementRows.map((signal) => (
+                <li key={signal.key} className="space-y-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <span>{renderSignalLabel(signal.key, signal.label)}</span>
+                    <span className={`font-semibold ${signal.delta > 0 ? "text-amber-100" : signal.delta < 0 ? "text-emerald-100" : "text-slate-100"}`}>
+                      {signal.arrow} {signal.delta > 0 ? `+${signal.delta.toFixed(1)}` : signal.delta.toFixed(1)}
+                    </span>
+                  </div>
+                  <div className="text-[10px] uppercase tracking-[0.1em] text-slate-400">{signal.significance} move</div>
+                  <div className={`${meterTrackBase} border border-slate-700/70 bg-slate-900/80`}>
+                    <div className="pointer-events-none absolute inset-y-0 left-1/3 w-px bg-slate-600/70" aria-hidden="true" />
+                    <div className="pointer-events-none absolute inset-y-0 left-2/3 w-px bg-slate-600/70" aria-hidden="true" />
+                    <div
+                      className={`${meterFillBase} ${movementMeterToneByDirection[resolveSignalDirection(signal.delta)]}`}
+                      style={{ width: `${signal.meter}%` }}
+                    />
+                  </div>
+                  <p className="text-[11px] text-slate-300">{signalActionRuleText[signal.key]}</p>
+                </li>
+              ))}
+            </ul>
+          </article>
+
+          <MoreContextDisclosureBody
+            startupClimateIndex={startupClimateIndex}
+            primaryDrivers={primaryDrivers}
+            whyThisCall={whyThisCall}
+            memoryRail={memoryRail}
+            historicalTimeline={historicalTimeline}
+            historicalAnalogs={historicalAnalogs}
+            macroOverlay={macroOverlay}
+          />
+
+          {historicalAnalogs.length > 0 ? (
+            <article className={`${tierThreePanel} ${sectionSpacing}`} aria-label="Historical analogs">
+              <h2 className={tierThreeHeading}>Compact analog references</h2>
+              <ul className="mt-2 space-y-2 text-xs text-slate-200">
+                {historicalAnalogs.map((analog) => (
+                  <li key={`${analog.date}-${analog.similarityScore}`} className="rounded-md border border-slate-700/60 bg-slate-950/60 px-3 py-2">
+                    <p className="font-semibold text-slate-100">{analog.date} · similarity {(analog.similarityScore * 100).toFixed(0)}%</p>
+                    <p className="mt-1 text-slate-300">{analog.implication}</p>
+                  </li>
+                ))}
+              </ul>
+            </article>
+          ) : null}
+        </div>
+      </details>
       <CitationActionFooter citationMetaLine={citationMetaLine} citation={citation} actions={actions} />
     </section>
   );
