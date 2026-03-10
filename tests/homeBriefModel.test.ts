@@ -25,6 +25,12 @@ describe("buildHomeBriefModel", () => {
     assert.match(model.postureWithStageLabel, /—/);
     assert.equal(model.postureLabel, "Contraction");
     assert.equal(typeof model.confidencePercent, "number");
+    assert.equal(typeof model.regimeHeader.regime, "string");
+    assert.equal(typeof model.regimeHeader.confidence, "string");
+    assert.equal(typeof model.regimeHeader.primaryRisk, "string");
+    assert.ok(model.regimeHeader.regime.length > 0);
+    assert.ok(model.regimeHeader.confidence.length > 0);
+    assert.ok(model.regimeHeader.primaryRisk.length > 0);
     assert.match(model.trendLabel, /Improving|Deteriorating|Mixed|Stable/);
     assert.match(model.transitionWatch, /ON|OFF/);
     assert.equal(typeof model.guardrail, "string");

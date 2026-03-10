@@ -196,6 +196,8 @@ describe("buildSlackBrief", () => {
       trendLabel: "Deteriorating",
       transitionWatch: "ON",
       regimeDistancePoints: 2,
+      confidenceLabel: "MED",
+      freshnessLabel: "Unavailable",
       actionStripItems: [
         {
           lever: "hiring-stance",
@@ -212,6 +214,10 @@ describe("buildSlackBrief", () => {
     assert.match(brief, /• Trend: DETERIORATING/);
     assert.match(brief, /• Distance to regime change: 2\.0 points/);
     assert.match(brief, /• Regime shift watch: ON/);
+    assert.match(brief, /• Current call:/);
+    assert.match(brief, /• Flip if: Tightness ≤/);
+    assert.match(brief, /• Re-check owner\/cadence: Owner: CEO \+ Finance lead/);
+    assert.match(brief, /• Trust markers: Confidence: Guarded · Freshness: Stale/);
     assert.match(brief, /• Operating posture: Stage decisions\. Avoid irreversible spend\./);
     assert.match(brief, /• Hiring stance/);
     assert.match(brief, /Action now: Backfills only/);

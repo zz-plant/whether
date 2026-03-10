@@ -21,6 +21,11 @@ describe("WeeklyDecisionCard extracted sections", () => {
         guardrail="Hold irreversible hiring"
         confidencePercent={70}
         confidenceLabel="MED"
+        regimeHeader={{
+          regime: "Defensive",
+          confidence: "Medium (mixed signal reliability)",
+          primaryRisk: "Downside: Capital tightness tightened (1.0).",
+        }}
         trendLabel="Mixed"
         transitionWatch="ON"
         operatingStanceLine="Stage decisions. Avoid irreversible spend."
@@ -49,10 +54,11 @@ describe("WeeklyDecisionCard extracted sections", () => {
 
     assert.match(html, /weekly-posture-brief-title/);
     assert.match(html, /Do now:/);
-    assert.match(html, /Current stance/);
+    assert.match(html, /Regime/);
     assert.match(html, /Flip watch:/);
     assert.match(html, /Leadership call/);
-    assert.match(html, /What changed this week/);
+    assert.match(html, /Confidence/);
+    assert.match(html, /Primary risk/);
 
 
     const heroIndex = html.indexOf("weekly-posture-brief-title");
@@ -75,6 +81,11 @@ describe("WeeklyDecisionCard extracted sections", () => {
         guardrail="Keep irreversible spend capped"
         confidencePercent={74}
         confidenceLabel="MED"
+        regimeHeader={{
+          regime: "Defensive",
+          confidence: "Medium (mixed signal reliability)",
+          primaryRisk: "Downside: Capital tightness tightened (1.0).",
+        }}
         trendLabel="Mixed"
         transitionWatch="ON"
         operatingStanceLine="Stage decisions. Avoid irreversible spend."
@@ -101,7 +112,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
       />,
     );
 
-    assert.match(html, /Current stance/);
+    assert.match(html, /Regime/);
     assert.match(html, /Flip watch: Tightness rises above 70\.0\./);
   });
 
@@ -117,6 +128,11 @@ describe("WeeklyDecisionCard extracted sections", () => {
         guardrail="Keep irreversible spend capped"
         confidencePercent={74}
         confidenceLabel="MED"
+        regimeHeader={{
+          regime: "Defensive",
+          confidence: "Medium (mixed signal reliability)",
+          primaryRisk: "Downside: Capital tightness tightened (1.0).",
+        }}
         trendLabel="Mixed"
         transitionWatch="ON"
         operatingStanceLine="Stage decisions. Avoid irreversible spend."

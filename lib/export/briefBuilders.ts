@@ -5,6 +5,7 @@ import { buildComplianceStamp } from "../exportNotices";
 import { formatRegimeLabel } from "../regimeFormat";
 import type { InterpretationLayer } from "../report/interpretationLayer";
 import type { ActionStripItem } from "../report/operatingCalls";
+import { buildWeeklyLockCommitment } from "../report/decisionKnobs";
 import {
   buildRunwayPlan,
   formatRunwayPlanCompactBlock,
@@ -32,12 +33,22 @@ type ExportLayerOptions = {
   historicalAnalogs?: Array<{ date: string; similarityScore: number; implication: string }>;
   failureModes?: Array<{ warning: string; mitigationCheck: string }>;
   actionStripItems?: ActionStripItem[];
+  confidenceLabel?: "HIGH" | "MED" | "LOW";
+  freshnessLabel?: string;
 };
 
-const buildViralArtifactBlock = (options?: ExportLayerOptions) => {
+const buildViralArtifactBlock = (assessment: RegimeAssessment, options?: ExportLayerOptions) => {
   if (!options?.operatingStanceLine) {
     return [];
   }
+
+  const lockCommitment = buildWeeklyLockCommitment({
+    regime: assessment.regime,
+    tightnessRegime: assessment.thresholds.tightnessRegime,
+    riskAppetiteRegime: assessment.thresholds.riskAppetiteRegime,
+    confidenceDegraded: options.confidenceLabel !== "HIGH",
+    freshnessDegraded: !options.freshnessLabel || options.freshnessLabel === "Unavailable",
+  });
 
   const actionStrip = (options.actionStripItems ?? []).slice(0, 2).flatMap((item) => [
     `• ${item.label}`,
@@ -53,6 +64,10 @@ const buildViralArtifactBlock = (options?: ExportLayerOptions) => {
     `• Trend: ${(options.trendLabel ?? "Stable").toUpperCase()}`,
     `• Distance to regime change: ${(options.regimeDistancePoints ?? 0).toFixed(1)} points`,
     `• Regime shift watch: ${options.transitionWatch ?? "OFF"}`,
+    `• Current call: ${lockCommitment.currentCall}`,
+    ...lockCommitment.flipConditions.map((condition) => `• Flip if: ${condition}`),
+    `• Re-check owner/cadence: ${lockCommitment.ownerCadence}`,
+    ...(lockCommitment.trustMarkers.length > 0 ? [`• Trust markers: ${lockCommitment.trustMarkers.join(" · ")}`] : []),
     `• Operating posture: ${options.operatingStanceLine}`,
     ...actionStrip,
   ];
@@ -178,7 +193,7 @@ export const buildSlackBrief = (
     ...assessment.constraints.map((item) => `• ${item}`),
     "",
     financialImplications,
-    ...buildViralArtifactBlock(options),
+    ...buildViralArtifactBlock(assessment, options),
     ...buildFailureModeBlock(options),
     ...buildHistoricalAnalogsBlock(options),
     ...buildInterpretationLayerBlock(options),

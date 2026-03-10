@@ -376,6 +376,8 @@ const HomePageReportContent = async ({
     historicalAnalogs: homeBriefModel.historicalAnalogs,
     failureModes: homeBriefModel.failureModes,
     actionStripItems: homeBriefModel.actionStripItems,
+    confidenceLabel: homeBriefModel.confidenceLabel,
+    freshnessLabel: fetchedAtLabel.trim().length > 0 ? fetchedAtLabel : "Unavailable",
   };
   const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries, exportLayerOptions);
   const boardSummary = buildBoardBrief(assessment, treasury, sensors, macroSeries, exportLayerOptions);
@@ -442,6 +444,7 @@ const HomePageReportContent = async ({
         confidenceLabel={homeBriefModel.confidenceLabel}
         confidencePercent={homeBriefModel.confidencePercent}
         signalConfidenceReason={homeBriefModel.signalConfidenceReason}
+        regimeHeader={homeBriefModel.regimeHeader}
         trendLabel={homeBriefModel.trendLabel}
         transitionWatch={homeBriefModel.transitionWatch}
         operatingStanceLine={homeBriefModel.operatingStanceLine}
