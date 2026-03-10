@@ -221,7 +221,7 @@ const resolveDecisionShift = (label: "unchanged" | "higher" | "lower") => {
 const ActionStrip = ({ items }: { items: ActionStripItem[] }) => (
   <section className={`${tierTwoPanel} ${sectionSpacing}`} aria-label="Action strip">
     <div className="flex flex-wrap items-end justify-between gap-2">
-      <h3 className={tierTwoHeading}>What leadership should do this week</h3>
+      <h3 className={tierTwoHeading}>Prioritize decisions by function</h3>
       <p className="text-[11px] uppercase tracking-[0.12em] text-slate-400">Action · guardrail · flip</p>
     </div>
     <ul className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -668,22 +668,22 @@ export function WeeklyDecisionCard({
       <div id="decision-snapshot-for-leadership-this-week"><BoundedRulesMatrix decisionRules={decisionRules} /></div>
 
       <article id="execution-guidance" className={`${tierOnePanel} ${sectionSpacing}`}>
-        <h2 className={tierOneHeading}>How to expand safely this week</h2>
+        <h2 className={tierOneHeading}>Approve, hold, or escalate by role</h2>
         <p className="text-xs text-slate-300">Because the stance is {postureWithStageLabel ?? statusLabel}, execute in a gated, reversible way this week.</p>
         <div className="mt-2 grid gap-3 sm:grid-cols-2">
           {roleAwareTemplates.map((template) => (
             <article key={template.role} className={`${tierOneInset} space-y-2`}>
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-200">{template.roleLabel}</p>
-              <p className="rounded-md border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-2 text-xs text-emerald-100"><span className="font-semibold uppercase tracking-[0.1em]">What is still safe to approve</span> {compactRoleCue(template.doNow)}</p>
-              <p className="rounded-md border border-rose-500/40 bg-rose-500/10 px-2.5 py-2 text-xs text-rose-100"><span className="font-semibold uppercase tracking-[0.1em]">What to delay</span> {compactRoleCue(template.avoidNow)}</p>
-              <p className="rounded-md border border-sky-500/40 bg-sky-500/10 px-2.5 py-2 text-xs text-sky-100"><span className="font-semibold uppercase tracking-[0.1em]">What would change the call</span> {compactActionCue(template.flipTrigger)}</p>
+              <p className="rounded-md border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-2 text-xs text-emerald-100"><span className="font-semibold uppercase tracking-[0.1em]">Approve now</span> {compactRoleCue(template.doNow)}</p>
+              <p className="rounded-md border border-rose-500/40 bg-rose-500/10 px-2.5 py-2 text-xs text-rose-100"><span className="font-semibold uppercase tracking-[0.1em]">Delay now</span> {compactRoleCue(template.avoidNow)}</p>
+              <p className="rounded-md border border-sky-500/40 bg-sky-500/10 px-2.5 py-2 text-xs text-sky-100"><span className="font-semibold uppercase tracking-[0.1em]">Flip when</span> {compactActionCue(template.flipTrigger)}</p>
             </article>
           ))}
         </div>
       </article>
 
       <article className={`${tierOnePanel} ${sectionSpacing}`}>
-        <h2 className={tierOneHeading}>Slack-ready leadership artifact</h2>
+        <h2 className={tierOneHeading}>Share the leadership brief</h2>
         <div className={`${tierOneInset} space-y-2 text-xs text-slate-200`}>
           <p><span className="font-semibold uppercase tracking-[0.1em] text-slate-300">Stance:</span> {postureWithStageLabel ?? statusLabel}</p>
           <p><span className="font-semibold uppercase tracking-[0.1em] text-slate-300">What changed:</span> {decisionShiftSummary}</p>
@@ -707,17 +707,17 @@ export function WeeklyDecisionCard({
 
       <details id="evidence-diagnostics" className={`${tierTwoPanel} ${sectionSpacing} group`}>
         <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
-          <span>Evidence and diagnostics (secondary)</span>
+          <span>Inspect call evidence and failure risks (secondary)</span>
           <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
         </summary>
         <div className="mt-3 space-y-4">
           <article className={tierOneInset}>
-            <p className={`text-xs ${neutralLabel}`}>Signals driving the stance</p>
+            <p className={`text-xs ${neutralLabel}`}>See the deltas that moved this call</p>
             <p className="mt-2 text-xs text-slate-200">Top contributors: {topContributorInline}</p>
             <p className="mt-2 text-xs text-slate-300">Transition pace: {regimeVelocity.displayLabel} · Velocity: {movementVelocity}</p>
           </article>
           <article className={tierOneInset}>
-            <p className={`text-xs ${neutralLabel}`}>What is easing vs tightening</p>
+            <p className={`text-xs ${neutralLabel}`}>See where pressure rose vs cooled</p>
             <ul className="mt-2 space-y-1.5 text-xs text-slate-200">
               {macroMovementRows.map((signal) => (
                 <li key={`evidence-${signal.key}`}>{renderSignalLabel(signal.key, signal.label)}: {signal.delta > 0 ? `+${signal.delta.toFixed(1)}` : signal.delta.toFixed(1)} ({signal.significance})</li>
@@ -725,7 +725,7 @@ export function WeeklyDecisionCard({
             </ul>
           </article>
           <article className={tierOneInset}>
-            <p className={`text-xs ${neutralLabel}`}>What would change the call</p>
+            <p className={`text-xs ${neutralLabel}`}>Flip when</p>
             <p className="text-xs text-slate-300">More expansionary: {compactActionCue(effectiveFlipThreshold)}</p>
             <p className="mt-1 text-xs text-slate-300">More defensive: {compactActionCue(effectiveGuardrail)}</p>
           </article>

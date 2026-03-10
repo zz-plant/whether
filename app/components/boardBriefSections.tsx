@@ -211,11 +211,11 @@ export const ExecutiveSnapshotPanel = ({
       <div className="weather-panel p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="type-label text-slate-400">Executive snapshot</p>
+            <p className="type-label text-slate-400">Decision commitment</p>
             <h3 id="executive-snapshot-title" className="type-section text-slate-100">
-              Decision snapshot for leadership this week
+              Lock this week&apos;s operating posture
             </h3>
-            <p className="mt-2 text-sm text-slate-300">Use this strip to brief decision now, guardrail, and flip condition in one pass.</p>
+            <p className="mt-2 text-sm text-slate-300">Use this strip to commit one operating posture, set the stop line, and define the exact trigger that reopens the decision.</p>
           </div>
           <DataProvenanceStrip provenance={provenance} />
         </div>
