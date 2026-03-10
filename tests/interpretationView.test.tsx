@@ -138,6 +138,40 @@ describe("interpretation view panel", () => {
   });
 
 
+
+  it("falls back to canonical bullets when company-adjusted rules are unavailable", () => {
+    const company = buildInterpretationLayer({
+      view: "company",
+      homeBriefModel,
+      assessment,
+      forecast,
+      decisionRules: [],
+    });
+
+    assert.match(company.summary, /unavailable this week/i);
+    assert.equal(company.bullets.length, 3);
+    assert.match(company.bullets[0], /Action: Changed: pressure rose versus last week\./);
+    assert.match(company.bullets[1], /Trigger: Hold irreversible hiring\./);
+    assert.match(company.bullets[2], /Reverse: Reopen if risk appetite rises above 55\./);
+  });
+
+  it("keeps forecast interpretation resilient when 90-day probabilities are missing", () => {
+    const sparseForecast = {
+      ...forecast,
+      next90DayProbabilities: {},
+    } as ForecastModel;
+
+    const layer = buildInterpretationLayer({
+      view: "forecast",
+      homeBriefModel,
+      assessment,
+      forecast: sparseForecast,
+      decisionRules,
+    });
+
+    assert.match(layer.bullets[0], /Action: Operate for DEFENSIVE \(0%\) while current posture holds\./);
+  });
+
   it("keeps interpretation toggle links query-stable and marks active view", () => {
     const layer = buildInterpretationLayer({
       view: "forecast",
@@ -151,7 +185,7 @@ describe("interpretation view panel", () => {
       <HomeInterpretationPanel layer={layer} searchParams={{ month: "3", year: "2026", sector: "consumer" }} />,
     );
 
-    assert.match(html, /aria-current="page"[^>]*>Forecast</);
+    assert.match(html, /aria-current="page"[^>]*><span>Forecast<\/span>/);
     assert.match(html, /\/?month=3&amp;year=2026&amp;sector=consumer/);
     assert.doesNotMatch(html, /view=default/);
   });
