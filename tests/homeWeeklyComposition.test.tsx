@@ -77,6 +77,11 @@ describe("weekly card and interpretation panel composition", () => {
           confidenceLabel="MED"
           confidencePercent={68}
           signalConfidenceReason="Reason: regime boundary proximity + volatile macro signals"
+          regimeHeader={{
+            regime: "Defensive",
+            confidence: "Medium (mixed signal reliability)",
+            primaryRisk: "Downside: Capital tightness tightened (1.0).",
+          }}
           trendLabel="Stable"
           transitionWatch="ON"
         operatingStanceLine="Stage decisions. Avoid irreversible spend."
@@ -177,6 +182,11 @@ describe("weekly card and interpretation panel composition", () => {
           confidenceLabel="MED"
           confidencePercent={68}
           signalConfidenceReason="Reason: regime boundary proximity + volatile macro signals"
+          regimeHeader={{
+            regime: "Defensive",
+            confidence: "Medium (mixed signal reliability)",
+            primaryRisk: "Downside: Capital tightness tightened (1.0).",
+          }}
           trendLabel="Stable"
           transitionWatch="ON"
         operatingStanceLine="Stage decisions. Avoid irreversible spend."
@@ -278,6 +288,11 @@ describe("weekly card and interpretation panel composition", () => {
           confidenceLabel="MED"
           confidencePercent={68}
           signalConfidenceReason="Reason: regime boundary proximity + volatile macro signals"
+          regimeHeader={{
+            regime: "Defensive",
+            confidence: "Medium (mixed signal reliability)",
+            primaryRisk: "Downside: Capital tightness tightened (1.0).",
+          }}
           trendLabel="Stable"
           transitionWatch="ON"
           operatingStanceLine="Stage decisions. Avoid irreversible spend."
