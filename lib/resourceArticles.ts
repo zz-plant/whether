@@ -1,4 +1,5 @@
 import type { Route } from "next";
+import type { DecisionArea } from "./report/boundedDecisionRules";
 
 export type ResourceArticle = {
   slug:
@@ -526,3 +527,16 @@ export const resourceArticles: ResourceArticle[] = [
 export const findResourceArticleBySlug = (slug: string) => resourceArticles.find((article) => article.slug === slug);
 
 export const generateStaticParams = () => resourceArticles.map((article) => ({ slug: article.slug }));
+
+const resourceDecisionAreasByIntent: Record<ResourceArticle["intent"], DecisionArea[]> = {
+  cfo: ["burn-discipline", "capital-raising", "hiring"],
+  board: ["capital-raising", "burn-discipline", "expansion-bets"],
+  "vp-product": ["product-tempo", "expansion-bets", "hiring"],
+  "vc-partner": ["capital-raising", "burn-discipline", "expansion-bets"],
+};
+
+export const getResourceArticleDecisionAreas = (article: ResourceArticle): DecisionArea[] => {
+  const byIntent = resourceDecisionAreasByIntent[article.intent] ?? [];
+  const byCluster = article.cluster === "vc" ? (["capital-raising", "burn-discipline"] as DecisionArea[]) : [];
+  return Array.from(new Set([...byIntent, ...byCluster]));
+};

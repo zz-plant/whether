@@ -5,7 +5,7 @@ import { serializeJsonLd } from "../../lib/seo";
 import { buildHomeBriefModel } from "../../lib/report/homeBriefModel";
 import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
 import { buildCallCitation } from "../../lib/export/briefBuilders";
-import { buildLiveShortAnswer } from "./liveShortAnswers";
+import { buildLiveDirectAnswer, buildLiveShortAnswer } from "./liveShortAnswers";
 import { answerPages, findDecisionPage } from "./decisionPages";
 import { getRegimeDisplayLabel } from "../../lib/regimePresentation";
 
@@ -25,6 +25,12 @@ export async function DecisionAnswerPageContent({
   const homeBriefModel = buildHomeBriefModel(reportData);
   const liveShortAnswer = buildLiveShortAnswer(page.slug, assessment, page.shortAnswer);
   const mappedRules = homeBriefModel.decisionRules.filter((rule) => page.mappedDecisionAreas.includes(rule.area));
+  const liveDirectAnswer = buildLiveDirectAnswer({
+    page,
+    assessment,
+    mappedRules,
+    fallback: page.directAnswer,
+  });
   const callCitation = buildCallCitation(assessment, treasury);
   const relatedPages = answerPages.filter((candidate) => candidate.slug !== page.slug && candidate.category !== page.category).slice(0, 3);
 
@@ -65,7 +71,7 @@ export async function DecisionAnswerPageContent({
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Direct answer</p>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{page.title}</h1>
         <p className="text-base text-sky-200">{liveShortAnswer}</p>
-        <p className="text-sm text-slate-300">{page.directAnswer}</p>
+        <p className="text-sm text-slate-300">{liveDirectAnswer}</p>
       </section>
 
       <section className="weather-panel space-y-4 px-6 py-6">

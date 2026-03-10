@@ -22,12 +22,17 @@ import {
 import { buildResourceArticleMetadata, ResourceArticlePage } from "../components/resourceArticlePage";
 import {
   findResourceArticleBySlug,
+  getResourceArticleDecisionAreas,
 } from "../../../lib/resourceArticles";
 import {
   findDownloadableResourceBySlug,
   downloadableResources,
 } from "../../../lib/downloadableResources";
 import { resourceArticles } from "../../../lib/resourceArticles";
+import { loadReportDataSafe } from "../../../lib/report/reportData";
+import { buildHomeBriefModel } from "../../../lib/report/homeBriefModel";
+import { getRegimeDisplayLabel } from "../../../lib/regimePresentation";
+import { buildCallCitation } from "../../../lib/export/briefBuilders";
 
 type Params = { slug: string };
 
@@ -96,7 +101,30 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
 
   const article = findResourceArticleBySlug(slug);
   if (article) {
-    return <ResourceArticlePage article={article} />;
+    const reportResult = await loadReportDataSafe(undefined, { route: `/resources/${article.slug}` });
+    const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
+    const homeBriefModel = buildHomeBriefModel(reportData);
+    const decisionAreas = getResourceArticleDecisionAreas(article);
+    const mappedRules = homeBriefModel.decisionRules.filter((rule) => decisionAreas.includes(rule.area)).slice(0, 3);
+    const displayRegime = getRegimeDisplayLabel({
+      regime: reportData.assessment.regime,
+      momentum: reportData.reportDynamics.directionLabel,
+      confidence: homeBriefModel.confidenceLabel,
+      transitionWatch: homeBriefModel.transitionWatch === "ON",
+    });
+
+    return (
+      <ResourceArticlePage
+        article={article}
+        decisionArtifact={{
+          decisionShiftSummary: homeBriefModel.decisionShiftSummary,
+          postureSummary: `Posture: ${displayRegime.label} (${displayRegime.canonicalRegime}) · Weekly momentum: ${reportData.reportDynamics.directionLabel} · Revisit decisions: ${homeBriefModel.revisitDecisions ? "YES" : "NO"}`,
+          mappedRules,
+          freshnessLabel: reportData.fetchedAtLabel,
+          citation: buildCallCitation(reportData.assessment, reportData.treasury),
+        }}
+      />
+    );
   }
 
   const page = findResourcePillarBySlug(slug);

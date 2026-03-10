@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { buildLiveShortAnswer, isExpansionRegime } from "../app/answers/liveShortAnswers";
+import { buildLiveDirectAnswer, buildLiveShortAnswer, isExpansionRegime } from "../app/answers/liveShortAnswers";
+import { findDecisionPage } from "../app/answers/decisionPages";
 
 const sampleAssessment = {
   regime: "SCARCITY" as const,
@@ -69,5 +70,35 @@ describe("live short answers", () => {
   it("derives expansion state from regime key", () => {
     assert.equal(isExpansionRegime("EXPANSION"), true);
     assert.equal(isExpansionRegime("DEFENSIVE"), false);
+  });
+
+  it("builds live direct answer from mapped rules", () => {
+    const page = findDecisionPage("should-startups-raise-capital-now");
+    assert.ok(page);
+
+    const directAnswer = buildLiveDirectAnswer({
+      page,
+      assessment: {
+        regime: "EXPANSION",
+        thresholds: sampleAssessment.thresholds,
+      },
+      mappedRules: [
+        {
+          area: "capital-raising",
+          recommendation: "Raise proactively from leverage while window quality is favorable.",
+          doNow: [],
+          avoidNow: [],
+          scope: "Fundraising launch timing",
+          pauseTrigger: "Pause acceleration if risk appetite falls below 44.",
+          resumeTrigger: "Resume full process when risk appetite > 54.",
+          rationale: "Preserves optionality",
+        },
+      ],
+      fallback: "fallback direct answer",
+    });
+
+    assert.match(directAnswer, /Primary call for Capital raising:/);
+    assert.match(directAnswer, /Trigger:/);
+    assert.match(directAnswer, /Reverse:/);
   });
 });
