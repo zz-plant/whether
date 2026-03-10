@@ -64,7 +64,9 @@ export const buildLiveDirectAnswer = ({
   mappedRules: BoundedDecisionRule[];
   fallback: string;
 }) => {
-  const primaryRule = mappedRules[0];
+  const primaryRule = page.mappedDecisionAreas
+    .map((area) => mappedRules.find((rule) => rule.area === area))
+    .find((rule): rule is BoundedDecisionRule => Boolean(rule));
   const thresholdClause = `Tighten if risk appetite < ${assessment.thresholds.riskAppetiteRegime.toFixed(0)} or tightness > ${assessment.thresholds.tightnessRegime.toFixed(0)}.`;
 
   if (!primaryRule) {
