@@ -93,6 +93,25 @@ export type ReportDynamics = {
   signalContributions?: ReturnType<typeof normalizeSignalContributions>;
 };
 
+const buildActionNowShort = ({
+  directionLabel,
+  regimeChanged,
+}: Pick<ReportDynamics, "directionLabel" | "regimeChanged">): string => {
+  if (regimeChanged || directionLabel === "deteriorating") {
+    return "Tighten approvals now; keep new spend reversible.";
+  }
+  if (directionLabel === "improving") {
+    return "Release selective bets now, but keep payback discipline.";
+  }
+  if (directionLabel === "mixed") {
+    return "Hold approval pace and gate decisions with explicit stop triggers.";
+  }
+  return "Hold last week's operating cadence; avoid irreversible commitments.";
+};
+
+const buildFlipThreshold = (assessment: ReturnType<typeof evaluateRegime>): string =>
+  `Flip watch: Tightness > ${assessment.thresholds.tightnessRegime.toFixed(1)} or Risk appetite <= ${assessment.thresholds.riskAppetiteRegime.toFixed(1)}.`;
+
 
 const ANALOG_DIMENSION_WEIGHTS: AnalogScoreDimensions = {
   postureMatch: 0.45,
@@ -547,6 +566,10 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
     currentTrendDirection: reportDynamics.directionLabel,
   });
 
+  const actionNowShort = buildActionNowShort(reportDynamics);
+  const guardrailThreshold = stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
+  const flipThreshold = buildFlipThreshold(assessment);
+
   return {
     assessment,
     cacheCoverage,
@@ -579,6 +602,9 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
     statusLabel,
     stopItems,
     actionStripItems,
+    actionNowShort,
+    guardrailThreshold,
+    flipThreshold,
     thresholds,
     treasury,
     treasuryProvenance,
@@ -639,6 +665,17 @@ const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataF
   const { playbook, startItems, stopItems } = getPlaybookGuidance(assessment.regime);
   const actionStripItems = buildActionStripItems(buildCanonicalBoundedDecisionRules({ regime: assessment.regime, thresholds: assessment.thresholds, scores: assessment.scores }));
 
+  const fallbackReportDynamics: ReportDynamics = {
+    changedSignals: [],
+    anomalySignals: [],
+    totalSignalChanges: 0,
+    regimeChanged: false,
+    directionLabel: "stable",
+  };
+  const actionNowShort = buildActionNowShort(fallbackReportDynamics);
+  const guardrailThreshold = stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
+  const flipThreshold = buildFlipThreshold(assessment);
+
   return {
     assessment,
     cacheCoverage,
@@ -671,13 +708,7 @@ const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataF
     macroSeries: [],
     playbook,
     recordDateLabel,
-    reportDynamics: {
-      changedSignals: [],
-      anomalySignals: [],
-      totalSignalChanges: 0,
-      regimeChanged: false,
-      directionLabel: "stable",
-    },
+    reportDynamics: fallbackReportDynamics,
     requestedSelection,
     regimeSeries,
     regimeAlert: null,
@@ -690,6 +721,9 @@ const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataF
     statusLabel: formatRegimeLabel(assessment.regime),
     stopItems,
     actionStripItems,
+    actionNowShort,
+    guardrailThreshold,
+    flipThreshold,
     thresholds,
     treasury: fallbackTreasury,
     treasuryProvenance: {

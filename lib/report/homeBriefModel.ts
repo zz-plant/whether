@@ -54,6 +54,9 @@ type HomeReportData = {
   historicalAnalogs?: HistoricalAnalog[];
   treasuryProvenance?: { statusLabel?: string };
   treasury?: { fallback_at?: string | null; fallback_reason?: string | null };
+  actionNowShort?: string;
+  guardrailThreshold?: string;
+  flipThreshold?: string;
   [key: string]: unknown;
 };
 
@@ -553,6 +556,9 @@ export const buildHomeBriefModel = (
     historicalSelection,
     treasuryProvenance,
     treasury,
+    actionNowShort,
+    guardrailThreshold,
+    flipThreshold,
   } = data;
   const overlaySector = options?.overlaySector ?? "b2b-saas";
   const timelineAnchorYear = resolveTimelineAnchorYear(recordDateLabel);
@@ -682,7 +688,7 @@ export const buildHomeBriefModel = (
       implication: analog.implication,
     }));
 
-  const guardrail = stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
+  const guardrail = guardrailThreshold ?? stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
   const decisionRules = buildCanonicalBoundedDecisionRules({
     regime: assessment.regime,
     thresholds: assessment.thresholds,
@@ -692,12 +698,15 @@ export const buildHomeBriefModel = (
   const actionStripItems: ActionStripItem[] = buildActionStripItems(decisionRules);
   const executiveOperationalStance = extractExecutiveOperationalStance({ roleAwareTemplates, decisionRules });
 
+  const conciseActionNow = actionNowShort?.trim();
+  const conciseFlipThreshold = flipThreshold?.trim() || reversalTrigger;
+
   const netConstraintSummary =
     severityDelta > 0
-      ? `${displayRegime.label}. Changed: constraints tightened. Do now: slow non-core approvals and keep irreversible spend frozen. Flip: ${reversalTrigger}`
+      ? `${displayRegime.label}. Changed: constraints tightened. Do now: ${conciseActionNow ?? "slow non-core approvals and keep irreversible spend frozen"}. Flip: ${conciseFlipThreshold}`
       : severityDelta < 0
-        ? `${displayRegime.label}. Changed: constraints eased. Do now: release selective hires and experiments that stay reversible. Flip: ${reversalTrigger}`
-        : `${displayRegime.label}. Changed: constraints held near prior week. Do now: keep execution measured and irreversible bets capped. Flip: ${reversalTrigger}`;
+        ? `${displayRegime.label}. Changed: constraints eased. Do now: ${conciseActionNow ?? "release selective hires and experiments that stay reversible"}. Flip: ${conciseFlipThreshold}`
+        : `${displayRegime.label}. Changed: constraints held near prior week. Do now: ${conciseActionNow ?? "keep execution measured and irreversible bets capped"}. Flip: ${conciseFlipThreshold}`;
 
   return {
     postureLabel: displayRegime.label,
@@ -721,7 +730,7 @@ export const buildHomeBriefModel = (
       severityDelta,
       directionLabel: reportDynamics?.directionLabel,
       changeCount: reportDynamics?.changedSignals.length ?? 0,
-      reversalTrigger,
+      reversalTrigger: conciseFlipThreshold,
     }),
     transitionProbabilities: forecast?.next4WeekProbabilities ?? {
       Expansion: 25,
@@ -735,6 +744,9 @@ export const buildHomeBriefModel = (
     executiveOperationalStance,
     revisitDecisions: (reportDynamics?.changedSignals.length ?? 0) > 0 && reportDynamics?.directionLabel !== "stable",
     guardrail,
+    actionNowShort: conciseActionNow,
+    guardrailThreshold: guardrail,
+    flipThreshold: conciseFlipThreshold,
     historicalAnalogs: normalizedHistoricalAnalogs,
     memoryRail: buildMemoryRail(recordDateLabel, assessment.regime),
     historicalTimeline: buildHistoricalTimeline(assessment.regime, timelineAnchorYear),
@@ -742,7 +754,7 @@ export const buildHomeBriefModel = (
     primaryDrivers: buildPrimaryDrivers({ reportDynamics, confidenceLabel, transitionWatch }),
     netConstraintSummary,
     postureDeltaLabel,
-    reversalTrigger,
+    reversalTrigger: conciseFlipThreshold,
     transitionWatch,
     failureModes,
     whyThisCall: buildWhyThisCall({

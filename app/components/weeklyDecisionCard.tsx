@@ -42,6 +42,9 @@ export type WeeklyDecisionCardProps = {
   netConstraintSummary: string;
   guardrail: string;
   reversalTrigger: string;
+  actionNowShort?: string;
+  guardrailThreshold?: string;
+  flipThreshold?: string;
   recordDateLabel: string;
   fetchedAtLabel: string;
   reportDynamics: ReportDynamics;
@@ -603,6 +606,9 @@ export function WeeklyDecisionCard({
   netConstraintSummary,
   guardrail,
   reversalTrigger,
+  actionNowShort,
+  guardrailThreshold,
+  flipThreshold,
   recordDateLabel,
   fetchedAtLabel,
   reportDynamics,
@@ -639,12 +645,15 @@ export function WeeklyDecisionCard({
     recordDateLabel,
     freshnessLabel,
   });
+  const effectiveGuardrail = guardrailThreshold?.trim() || guardrail;
+  const effectiveFlipThreshold = flipThreshold?.trim() || reversalTrigger;
   const meetingShorthand = revisitDecisions
     ? "Posture updated. Tighten decisions this week and avoid irreversible commitments."
     : "Posture held. Keep last week's operating rules and avoid irreversible commitments.";
-  const immediateDecision = revisitDecisions
-    ? "Revise hiring and roadmap calls now."
-    : "Hold last week's operating rules.";
+  const immediateDecision = actionNowShort?.trim()
+    || (revisitDecisions
+      ? "Revise hiring and roadmap calls now."
+      : "Hold last week's operating rules.");
 
   const macroMovementRows = signalOrder.map((key) => {
     const signal = reportDynamics.changedSignals.find((item) => item.key === key);
@@ -696,7 +705,7 @@ export function WeeklyDecisionCard({
         netConstraintSummary={netConstraintSummary}
         meetingShorthand={meetingShorthand}
         immediateDecision={immediateDecision}
-        guardrail={guardrail}
+        guardrail={effectiveGuardrail}
         confidencePercent={confidencePercent}
         confidenceLabel={confidenceLabel}
         trendLabel={trendLabel}
@@ -760,11 +769,11 @@ export function WeeklyDecisionCard({
           </div>
           <div className="rounded-lg border border-amber-500/45 bg-slate-950/72 px-3 py-3">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-100">Guardrail reference</p>
-            <p className="mt-1 text-xs text-slate-200">{guardrail}</p>
+            <p className="mt-1 text-xs text-slate-200">{effectiveGuardrail}</p>
           </div>
           <div className="rounded-lg border border-sky-500/35 bg-slate-950/72 px-3 py-3">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Flip condition reference</p>
-            <p className="mt-1 text-xs text-slate-200">{reversalTrigger}</p>
+            <p className="mt-1 text-xs text-slate-200">{effectiveFlipThreshold}</p>
           </div>
         </div>
 
