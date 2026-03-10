@@ -191,7 +191,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
     const detailsHtml = renderToStaticMarkup(
       <MoreContextDisclosureBody
         startupClimateIndex={{ score: 62, status: "Stable", breakdown: [{ label: "Capital", score: 60 }] }}
-        primaryDrivers={[{ label: "Capital tightness", detail: "Elevated" }]}
+        evidenceItems={[{ key: "tightness", title: "Capital conditions", supportingBullets: ["Weekly move: +1.0 vs. prior snapshot."], confidenceLabel: "Medium", directionLabel: "Tightening", immediateImplication: "Tighten approvals and protect runway for fixed-cost commitments." }]}
         whyThisCall={[{ label: "Momentum", detail: "No material change" }]}
         memoryRail={[{ label: "W-1", posture: "Defensive" }]}
         historicalTimeline={[{ label: "2026", posture: "Defensive" }]}

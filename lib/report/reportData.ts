@@ -25,13 +25,14 @@ import {
 import { loadMacroSeries } from "../macroSnapshot";
 import { parseThresholdsFromSearchParams } from "../thresholds";
 import { formatAgeHours, formatDateUTC, formatTimestampUTC } from "../formatters";
-import { buildRegimeAlert } from "./reportFormatting";
+import { buildRegimeAlert, formatConfidencePlainLabel } from "./reportFormatting";
 import { normalizeSignalContributions } from "./signalFormatting";
 import { buildFallbackForecastModel, buildForecastModel } from "./forecastModel";
 import { formatRegimeLabel } from "../regimeFormat";
 import { logReportDependencyFailure } from "./reportError";
 import { buildCanonicalBoundedDecisionRules } from "./boundedDecisionRules";
 import { buildActionStripItems } from "./operatingCalls";
+import { deltaLabelBySignal, resolveSignalDirection, signalOrder } from "./briefFormatting";
 import { cache } from "react";
 import type { TreasuryData } from "../types";
 
@@ -91,6 +92,15 @@ export type ReportDynamics = {
   regimeChanged: boolean;
   directionLabel: "improving" | "deteriorating" | "mixed" | "stable";
   signalContributions?: ReturnType<typeof normalizeSignalContributions>;
+};
+
+export type ReportEvidenceItem = {
+  key: ReportDynamics["changedSignals"][number]["key"];
+  title: string;
+  supportingBullets: string[];
+  confidenceLabel: string;
+  directionLabel: "Tightening" | "Easing" | "Unchanged";
+  immediateImplication: string;
 };
 
 const buildActionNowShort = ({
@@ -306,6 +316,87 @@ const signalLabels: Record<ReportDynamics["changedSignals"][number]["key"], stri
   baseRate: "Base rate",
   curveSlope: "Curve slope",
 };
+
+const evidenceTitleBySignal: Record<ReportDynamics["changedSignals"][number]["key"], string> = {
+  tightness: "Capital conditions",
+  riskAppetite: "Risk appetite",
+  baseRate: "Policy rate pressure",
+  curveSlope: "Yield-curve signal",
+};
+
+const toConfidenceLabel = (delta: number): "LOW" | "MED" | "HIGH" => {
+  const magnitude = Math.abs(delta);
+  if (magnitude >= 3) return "HIGH";
+  if (magnitude >= 1) return "MED";
+  return "LOW";
+};
+
+const signalImmediateImplication = (key: ReportDynamics["changedSignals"][number]["key"], delta: number) => {
+  if (delta === 0) {
+    return "No material operating change this week.";
+  }
+
+  if (key === "tightness") {
+    return delta > 0
+      ? "Tighten approvals and protect runway for fixed-cost commitments."
+      : "Release selective approvals while keeping commitments reversible.";
+  }
+
+  if (key === "riskAppetite") {
+    return delta > 0
+      ? "Increase reversible experiments where payback stays visible."
+      : "Bias toward proof-first launches and smaller bet sizes.";
+  }
+
+  if (key === "baseRate") {
+    return delta > 0
+      ? "Shorten payback windows before approving net-new spend."
+      : "Maintain discipline while testing selective long-payback upside.";
+  }
+
+  return delta > 0
+    ? "Keep commitments staged while macro risk remains elevated."
+    : "Longer-payback work becomes incrementally safer if guardrails hold.";
+};
+
+export const buildReportEvidenceItems = ({
+  reportDynamics,
+  assessment,
+}: {
+  reportDynamics: ReportDynamics;
+  assessment: ReturnType<typeof evaluateRegime>;
+}): ReportEvidenceItem[] =>
+  signalOrder.map((key) => {
+    const movedSignal = reportDynamics.changedSignals.find((item) => item.key === key);
+    const delta = movedSignal?.delta ?? 0;
+    const direction = resolveSignalDirection(delta);
+    const directionLabel =
+      direction === "tightening" ? "Tightening" : direction === "easing" ? "Easing" : "Unchanged";
+
+    const thresholdDistance =
+      key === "tightness"
+        ? Math.abs(assessment.scores.tightness - assessment.thresholds.tightnessRegime)
+        : key === "riskAppetite"
+          ? Math.abs(assessment.scores.riskAppetite - assessment.thresholds.riskAppetiteRegime)
+          : null;
+
+    const supportingBullets = [
+      `Weekly move: ${delta > 0 ? `+${delta.toFixed(1)}` : delta.toFixed(1)} vs. prior snapshot.`,
+      `Signal direction: ${directionLabel.toLowerCase()} (${deltaLabelBySignal[key]}).`,
+      thresholdDistance === null
+        ? `Current level: ${signalLabels[key]} contributes to this week's call.`
+        : `Distance to regime threshold: ${thresholdDistance.toFixed(1)} points.`,
+    ];
+
+    return {
+      key,
+      title: evidenceTitleBySignal[key],
+      supportingBullets,
+      confidenceLabel: formatConfidencePlainLabel(toConfidenceLabel(delta)),
+      directionLabel,
+      immediateImplication: signalImmediateImplication(key, delta),
+    };
+  });
 
 export const buildReportDynamics = ({
   current,
@@ -585,6 +676,7 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
   const actionNowShort = buildActionNowShort(reportDynamics);
   const guardrailThreshold = stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
   const flipThreshold = buildFlipThreshold(assessment);
+  const reportEvidenceItems = buildReportEvidenceItems({ reportDynamics, assessment });
 
   return {
     assessment,
@@ -619,6 +711,7 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
     stopItems,
     actionStripItems,
     actionNowShort,
+    reportEvidenceItems,
     guardrailThreshold,
     flipThreshold,
     thresholds,
@@ -691,6 +784,7 @@ const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataF
   const actionNowShort = buildActionNowShort(fallbackReportDynamics);
   const guardrailThreshold = stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
   const flipThreshold = buildFlipThreshold(assessment);
+  const reportEvidenceItems = buildReportEvidenceItems({ reportDynamics: fallbackReportDynamics, assessment });
 
   return {
     assessment,
@@ -738,6 +832,7 @@ const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataF
     stopItems,
     actionStripItems,
     actionNowShort,
+    reportEvidenceItems,
     guardrailThreshold,
     flipThreshold,
     thresholds,

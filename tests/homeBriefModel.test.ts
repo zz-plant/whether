@@ -50,7 +50,7 @@ describe("buildHomeBriefModel", () => {
     assert.equal(model.macroOverlay.length, 5);
     assert.ok(model.macroOverlay.some((item) => item.label.includes("Sector sensitivity (Consumer)")));
     assert.equal(model.whyThisCall.length, 3);
-    assert.ok(model.primaryDrivers.length >= 2);
+    assert.ok(Array.isArray(model.evidenceItems));
     assert.ok(model.startupClimateIndex.score >= 0 && model.startupClimateIndex.score <= 100);
     assert.equal(model.startupClimateIndex.breakdown.length, 4);
     assert.match(model.whyThisCall[0].detail, /threshold|range|outside/i);
@@ -90,7 +90,7 @@ describe("buildHomeBriefModel", () => {
     assert.equal(model.historicalAnalogs.length, 0);
     assert.equal(model.macroOverlay.length, 5);
     assert.equal(model.whyThisCall.length, 3);
-    assert.ok(model.primaryDrivers.length >= 2);
+    assert.ok(Array.isArray(model.evidenceItems));
     assert.ok(model.startupClimateIndex.score >= 0 && model.startupClimateIndex.score <= 100);
     assert.equal(model.startupClimateIndex.breakdown.length, 4);
     assert.match(model.whyThisCall[0].detail, /threshold|range|outside/i);

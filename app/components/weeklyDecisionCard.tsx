@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { CircleTargetIcon, ShieldIcon } from "./uiIcons";
-import type { ReportDynamics } from "../../lib/report/reportData";
+import type { ReportDynamics, ReportEvidenceItem } from "../../lib/report/reportData";
 import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
 import type { ActionStripItem, RoleAwareOperatingTemplate } from "../../lib/report/operatingCalls";
 import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
@@ -10,17 +10,9 @@ import {
   buildWeeklyCitationMetaLine,
   buildCompactTrustSummary,
 } from "../../lib/report/trustStatus";
-import {
-  deltaLabelBySignal,
-  movementMeterToneByDirection,
-  resolveSignalDirection,
-  signalOrder,
-  STARTUP_INDEX_CONTEXT_LABEL,
-} from "../../lib/report/briefFormatting";
 
 type WhyThisCallItem = { label: string; detail: string };
 type MemoryRailItem = { label: string; posture: string };
-type PrimaryDriverItem = { label: string; detail: string };
 type MacroOverlayItem = { label: string; detail: string };
 type HistoricalAnalogItem = { date: string; similarityScore: number; implication: string };
 type FailureModeWarningItem = { id: string; warning: string; mitigationCheck: string };
@@ -71,7 +63,7 @@ export type WeeklyDecisionCardProps = {
   historicalAnalogs: HistoricalAnalogItem[];
   macroOverlay: MacroOverlayItem[];
   whyThisCall: WhyThisCallItem[];
-  primaryDrivers: PrimaryDriverItem[];
+  evidenceItems: ReportEvidenceItem[];
   startupClimateIndex: {
     score: number;
     status: string;
@@ -107,62 +99,6 @@ const compactInset = "rounded-md border border-slate-800/45 bg-slate-950/48 px-2
 const neutralLabel = "font-semibold tracking-[0.01em] text-slate-300";
 const disclosureSummaryClass =
   "flex min-h-[44px] w-full items-center justify-between gap-3 rounded-md border border-slate-700/70 bg-slate-950/65 px-3 py-2 text-left text-xs font-semibold tracking-[0.01em] text-slate-100 transition hover:border-slate-500/70 hover:bg-slate-900/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300";
-
-const meterTrackBase = "relative h-2 rounded-full";
-const meterFillBase = "h-2 rounded-full";
-
-const resolveVelocityLabel = (rows: Array<{ delta: number }>): "Low" | "Medium" | "High" => {
-  const totalMagnitude = rows.reduce((sum, row) => sum + Math.abs(row.delta), 0);
-  if (totalMagnitude >= 6) {
-    return "High";
-  }
-  if (totalMagnitude >= 2.5) {
-    return "Medium";
-  }
-  return "Low";
-};
-
-const movementDomainBySignal: Record<(typeof signalOrder)[number], number> = {
-  tightness: 6,
-  riskAppetite: 6,
-  baseRate: 1.5,
-  curveSlope: 1.5,
-};
-
-const toMovementPercent = (signalKey: (typeof signalOrder)[number], delta: number) => {
-  if (delta === 0) {
-    return 0;
-  }
-  const domain = movementDomainBySignal[signalKey] ?? 1.5;
-  return Math.max(6, Math.min(100, Math.round((Math.abs(delta) / domain) * 100)));
-};
-
-const movementSignificance = (signalKey: (typeof signalOrder)[number], delta: number) => {
-  const ratio = Math.abs(delta) / (movementDomainBySignal[signalKey] ?? 1.5);
-  if (ratio >= 1) return "Extreme";
-  if (ratio >= 0.66) return "Material";
-  if (ratio >= 0.33) return "Mild";
-  return "Low";
-};
-
-const signalActionRuleText: Record<(typeof signalOrder)[number], string> = {
-  tightness: "If tightness rises another 4+ points, hold net-new fixed-cost approvals.",
-  riskAppetite: "If risk appetite falls to 50 or below, freeze discretionary expansion approvals.",
-  baseRate: "If base rate rises >0.5 this week, tighten payback windows before approving new spend.",
-  curveSlope: "If curve slope turns negative by 0.25 or more, bias toward reversible roadmap bets.",
-};
-
-
-const termTooltipBySignal: Partial<Record<(typeof signalOrder)[number], string>> = {
-  riskAppetite: "Risk appetite: how willing markets are to fund risk. Lower values usually tighten growth financing.",
-  curveSlope: "Curve slope: 10Y minus 2Y Treasury yields. Negative readings can indicate recession risk.",
-};
-
-const renderSignalLabel = (signalKey: (typeof signalOrder)[number], label: string) => {
-  const tooltip = termTooltipBySignal[signalKey];
-  if (!tooltip) return <span>{label}</span>;
-  return <abbr title={tooltip} className="cursor-help no-underline border-b border-dotted border-slate-400/80">{label}</abbr>;
-};
 
 const SummaryLabel = ({
   label,
@@ -231,39 +167,7 @@ const resolveDecisionShift = (label: "unchanged" | "higher" | "lower") => {
   return "unchanged";
 };
 
-const directionToken = (delta: number) => {
-  if (delta > 0) return `+${delta.toFixed(1)}`;
-  if (delta < 0) return delta.toFixed(1);
-  return "unchanged";
-};
 
-const signalOperationalMeaning = (key: (typeof signalOrder)[number], delta: number) => {
-  if (delta === 0) {
-    return "No material operating change.";
-  }
-
-  if (key === "tightness") {
-    return delta > 0
-      ? "Financing and hiring get tighter; preserve approval discipline."
-      : "Financing pressure eased; selective approvals become safer.";
-  }
-
-  if (key === "riskAppetite") {
-    return delta > 0
-      ? "Reversible experiments get safer this week."
-      : "Shift to proof-first launches and smaller bet sizes.";
-  }
-
-  if (key === "curveSlope") {
-    return delta > 0
-      ? "Long-payback bets are marginally safer."
-      : "Bias toward faster-payback execution.";
-  }
-
-  return delta > 0
-    ? "Cost of capital pressure rose; gate commitments tightly."
-    : "Rate pressure cooled; maintain discipline while testing upside.";
-};
 
 const resolvePosturePosition = (label: string) => {
   const normalized = label.toLowerCase();
@@ -473,7 +377,7 @@ export function BoundedRulesMatrix({ decisionRules }: BoundedRulesMatrixProps) {
 
 type MoreContextDisclosureProps = {
   startupClimateIndex: WeeklyDecisionCardProps["startupClimateIndex"];
-  primaryDrivers: WeeklyDecisionCardProps["primaryDrivers"];
+  evidenceItems: WeeklyDecisionCardProps["evidenceItems"];
   whyThisCall: WeeklyDecisionCardProps["whyThisCall"];
   memoryRail: WeeklyDecisionCardProps["memoryRail"];
   historicalTimeline: WeeklyDecisionCardProps["historicalTimeline"];
@@ -483,7 +387,7 @@ type MoreContextDisclosureProps = {
 
 export function MoreContextDisclosureBody({
   startupClimateIndex,
-  primaryDrivers,
+  evidenceItems,
   whyThisCall,
   memoryRail,
   historicalTimeline,
@@ -517,14 +421,21 @@ export function MoreContextDisclosureBody({
 
       <details className="group rounded-lg border border-slate-800/45 bg-slate-950/38 px-2.5 py-2">
         <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
-          <span>Supporting evidence</span>
+          <span>Evidence snapshot</span>
           <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
         </summary>
-        <ul className="mt-2 grid gap-1.5 sm:grid-cols-2 lg:grid-cols-3">
-          {primaryDrivers.map((driver) => (
-            <li key={driver.label} className={`${compactInset} text-xs text-slate-200`}>
-              <p className="font-semibold text-slate-300">{driver.label}</p>
-              <p className="mt-1 leading-5 text-slate-300">{driver.detail}</p>
+        <ul className="mt-2 grid gap-2 lg:grid-cols-3">
+          {evidenceItems.map((item) => (
+            <li key={item.key} className={`${compactInset} space-y-1.5 text-xs text-slate-200`}>
+              <p className="font-semibold text-slate-100">{item.title}</p>
+              <ul className="space-y-1 text-[11px] text-slate-300">
+                {item.supportingBullets.slice(0, 3).map((bullet) => (
+                  <li key={`${item.key}-${bullet}`}>• {bullet}</li>
+                ))}
+              </ul>
+              <p className="text-[11px] text-slate-300"><span className="font-semibold text-slate-200">Confidence:</span> {item.confidenceLabel}</p>
+              <p className="text-[11px] text-slate-300"><span className="font-semibold text-slate-200">Direction:</span> {item.directionLabel}</p>
+              <p className="text-[11px] text-slate-300"><span className="font-semibold text-slate-200">Immediate implication:</span> {item.immediateImplication}</p>
             </li>
           ))}
         </ul>
@@ -633,7 +544,7 @@ export function WeeklyDecisionCard({
   historicalAnalogs,
   macroOverlay,
   whyThisCall,
-  primaryDrivers,
+  evidenceItems,
   regimeDistance,
   regimeVelocity,
   citation,
@@ -660,22 +571,6 @@ export function WeeklyDecisionCard({
       ? "Revise hiring and roadmap calls now."
       : "Hold last week's operating rules.");
 
-  const macroMovementRows = signalOrder.map((key) => {
-    const signal = reportDynamics.changedSignals.find((item) => item.key === key);
-    const delta = signal?.delta ?? 0;
-    const direction = resolveSignalDirection(delta);
-    const arrow = delta > 0 ? "↑" : delta < 0 ? "↓" : "→";
-    return {
-      key,
-      label: deltaLabelBySignal[key],
-      direction,
-      delta,
-      arrow,
-      meter: toMovementPercent(key, delta),
-      significance: movementSignificance(key, delta),
-    };
-  });
-
   const topContributors = (reportDynamics.signalContributions ?? []).slice(0, 3);
   const topContributorInline =
     topContributors.length > 0
@@ -684,7 +579,6 @@ export function WeeklyDecisionCard({
           .join(" · ")
       : "No active contributors this week.";
 
-  const movementVelocity = resolveVelocityLabel(macroMovementRows);
   const needsTrustWarning = isFallbackSnapshot || confidenceLabel !== "HIGH" || freshnessLabel === "Unavailable";
   const trustWarningCopy = isFallbackSnapshot
     ? "Using a cached snapshot. Use this call for near-term pacing only and pause irreversible decisions until live refresh returns."
@@ -720,34 +614,25 @@ export function WeeklyDecisionCard({
       <div className="grid gap-4 lg:grid-cols-5">
         <article id="what-changed-this-week" className={`${tierOnePanel} ${sectionSpacing} lg:col-span-3 bg-gradient-to-b from-slate-950/95 to-slate-950/75`}>
           <div className="flex items-center justify-between gap-3">
-            <h2 className={tierOneHeading}>Decision delta</h2>
+            <h2 className={tierOneHeading}>Evidence snapshot</h2>
             <span className="rounded-full border border-sky-400/40 bg-sky-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-100">Live weekly move</span>
           </div>
-          <p className="text-xs text-slate-300">What changed, what it means, and what to do now.</p>
-          <div className="overflow-x-auto rounded-lg border border-slate-700/70 bg-slate-950/60">
-            <table className="min-w-full text-left text-xs text-slate-200">
-              <thead>
-                <tr className="border-b border-slate-700/70 text-[10px] uppercase tracking-[0.1em] text-slate-300">
-                  <th className="px-3 py-2">Signal</th>
-                  <th className="px-3 py-2">Change</th>
-                  <th className="px-3 py-2">Operational meaning</th>
-                </tr>
-              </thead>
-              <tbody>
-                {macroMovementRows.map((signal) => (
-                  <tr key={signal.key} className="border-b border-slate-800/60 last:border-b-0">
-                    <td className="px-3 py-2 font-semibold text-slate-100">{renderSignalLabel(signal.key, signal.label)}</td>
-                    <td className="px-3 py-2">
-                      <span className={`rounded-full px-2 py-0.5 font-semibold ${signal.delta > 0 ? "bg-amber-500/15 text-amber-100" : signal.delta < 0 ? "bg-emerald-500/15 text-emerald-100" : "bg-slate-700/60 text-slate-100"}`}>
-                        {directionToken(signal.delta)}
-                      </span>
-                    </td>
-                    <td className="px-3 py-2 text-slate-300">{signalOperationalMeaning(signal.key, signal.delta)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <p className="text-xs text-slate-300">Scan evidence, reliability, and immediate implication in one pass.</p>
+          <ul className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+            {evidenceItems.map((item) => (
+              <li key={item.key} className={`${tierOneInset} space-y-1.5 text-xs text-slate-200`}>
+                <p className="font-semibold text-slate-100">{item.title}</p>
+                <ul className="space-y-1 text-[11px] text-slate-300">
+                  {item.supportingBullets.slice(0, 3).map((bullet) => (
+                    <li key={`${item.key}-delta-${bullet}`}>• {bullet}</li>
+                  ))}
+                </ul>
+                <p className="text-[11px] text-slate-300"><span className="font-semibold text-slate-200">Confidence:</span> {item.confidenceLabel}</p>
+                <p className="text-[11px] text-slate-300"><span className="font-semibold text-slate-200">Direction:</span> {item.directionLabel}</p>
+                <p className="text-[11px] text-slate-300"><span className="font-semibold text-slate-200">Immediate implication:</span> {item.immediateImplication}</p>
+              </li>
+            ))}
+          </ul>
           <p className="rounded-md border border-sky-500/40 bg-sky-500/10 px-3 py-2 text-xs font-semibold text-sky-100">
             Net effect: {immediateDecision}
           </p>
@@ -800,8 +685,8 @@ export function WeeklyDecisionCard({
             <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
           </summary>
           <ul className="mt-1.5 space-y-1 text-xs text-slate-200">
-            {macroMovementRows.filter((signal) => signal.delta !== 0).slice(0, 3).map((signal) => (
-              <li key={`watch-${signal.key}`}>• {signalActionRuleText[signal.key]}</li>
+            {evidenceItems.slice(0, 3).map((item) => (
+              <li key={`watch-${item.key}`}>• {item.title}: {item.immediateImplication}</li>
             ))}
             <li>• Flip watch: {regimeDistance.dimensionLabel} {regimeDistance.thresholdDirection === "riseAbove" ? "rises above" : "falls to or below"} {regimeDistance.thresholdValue.toFixed(1)}.</li>
           </ul>
@@ -863,13 +748,13 @@ export function WeeklyDecisionCard({
           <article className={compactInset}>
             <p className={`text-xs ${neutralLabel}`}>See the deltas that moved this call</p>
             <p className="mt-1 text-xs text-slate-200">Top contributors: {topContributorInline}</p>
-            <p className="mt-1 text-xs text-slate-300">Transition pace: {regimeVelocity.displayLabel} · Velocity: {movementVelocity}</p>
+            <p className="mt-1 text-xs text-slate-300">Transition pace: {regimeVelocity.displayLabel}</p>
           </article>
           <article className={compactInset}>
             <p className={`text-xs ${neutralLabel}`}>See where pressure rose vs cooled</p>
             <ul className="mt-1 space-y-1 text-xs text-slate-200">
-              {macroMovementRows.map((signal) => (
-                <li key={`evidence-${signal.key}`}>{renderSignalLabel(signal.key, signal.label)}: {signal.delta > 0 ? `+${signal.delta.toFixed(1)}` : signal.delta.toFixed(1)} ({signal.significance})</li>
+              {evidenceItems.map((item) => (
+                <li key={`evidence-${item.key}`}>{item.title}: {item.directionLabel} · {item.immediateImplication}</li>
               ))}
             </ul>
           </article>

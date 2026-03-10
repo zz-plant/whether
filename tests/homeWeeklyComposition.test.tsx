@@ -122,7 +122,7 @@ describe("weekly card and interpretation panel composition", () => {
           historicalAnalogs={[]}
           macroOverlay={[{ label: "VC funding", detail: "-4.5 · ↑ improving" }]}
           whyThisCall={[{ label: "Momentum", detail: "Capital tightness tightened this week." }]}
-          primaryDrivers={[{ label: "Capital tightness", detail: "↑ tightened this week" }]}
+          evidenceItems={[{ key: "tightness", title: "Capital conditions", supportingBullets: ["Weekly move: +1.0 vs. prior snapshot."], confidenceLabel: "Medium", directionLabel: "Tightening", immediateImplication: "Tighten approvals and protect runway for fixed-cost commitments." }]}
           startupClimateIndex={{ score: 63, status: "Improving", breakdown: [{ label: "Capital availability", score: 71 }] }}
           regimeDistance={{
             dimensionLabel: "Tightness",
@@ -227,7 +227,7 @@ describe("weekly card and interpretation panel composition", () => {
           historicalAnalogs={[]}
           macroOverlay={[{ label: "VC funding", detail: "-4.5 · ↑ improving" }]}
           whyThisCall={[{ label: "Momentum", detail: "Capital tightness tightened this week." }]}
-          primaryDrivers={[{ label: "Capital tightness", detail: "↑ tightened this week" }]}
+          evidenceItems={[{ key: "tightness", title: "Capital conditions", supportingBullets: ["Weekly move: +1.0 vs. prior snapshot."], confidenceLabel: "Medium", directionLabel: "Tightening", immediateImplication: "Tighten approvals and protect runway for fixed-cost commitments." }]}
           startupClimateIndex={{ score: 63, status: "Improving", breakdown: [{ label: "Capital availability", score: 71 }] }}
           regimeDistance={{
             dimensionLabel: "Tightness",
@@ -318,7 +318,7 @@ describe("weekly card and interpretation panel composition", () => {
           historicalAnalogs={[]}
           macroOverlay={[{ label: "VC funding", detail: "-4.5 · ↑ improving" }]}
           whyThisCall={[{ label: "Momentum", detail: "Capital tightness tightened this week." }]}
-          primaryDrivers={[{ label: "Capital tightness", detail: "↑ tightened this week" }]}
+          evidenceItems={[{ key: "tightness", title: "Capital conditions", supportingBullets: ["Weekly move: +1.0 vs. prior snapshot."], confidenceLabel: "Medium", directionLabel: "Tightening", immediateImplication: "Tighten approvals and protect runway for fixed-cost commitments." }]}
           startupClimateIndex={{ score: 63, status: "Improving", breakdown: [{ label: "Capital availability", score: 71 }] }}
           regimeDistance={{
             dimensionLabel: "Tightness",
