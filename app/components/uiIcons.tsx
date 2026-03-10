@@ -6,6 +6,7 @@ import {
   Download,
   FileText,
   Grid2x2,
+  Shield,
   Target,
   Waypoints,
   Zap,
@@ -58,6 +59,10 @@ export const DocumentIcon = ({ className = "h-3.5 w-3.5", title: _title, ...prop
 
 export const DownloadIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (
   <Download className={className} {...baseProps} {...props} />
+);
+
+export const ShieldIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (
+  <Shield className={className} {...baseProps} {...props} />
 );
 
 export const StatusLiveIcon = ({ className = "h-2.5 w-2.5", title, ...props }: SVGProps<SVGSVGElement> & { title?: string }) => (

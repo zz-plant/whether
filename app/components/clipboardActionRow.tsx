@@ -6,6 +6,8 @@ type ClipboardActionRowProps = {
   label: ReactNode;
   state: ClipboardUiState;
   onClick: () => void;
+  leadingIcon?: ReactNode;
+  stateIcons?: Partial<Record<ClipboardUiState, ReactNode>>;
   disabled?: boolean;
   className?: string;
   buttonClassName?: string;
@@ -32,6 +34,8 @@ export function ClipboardActionRow({
   label,
   state,
   onClick,
+  leadingIcon,
+  stateIcons,
   disabled = false,
   className,
   buttonClassName,
@@ -49,6 +53,7 @@ export function ClipboardActionRow({
   const buttonLabel =
     buttonLabels?.[state] ??
     (state === "copying" ? "Copying" : state === "copied" ? "Copied" : label);
+  const buttonIcon = stateIcons?.[state] ?? leadingIcon;
   const statusMessage = statusMessages?.[state];
 
   return (
@@ -61,6 +66,7 @@ export function ClipboardActionRow({
         aria-busy={isCopying}
         className={`${BUTTON_VARIANT_CLASS[buttonVariant]} ${BUTTON_BASE_CLASS} ${compact ? "min-h-[40px] px-3 py-1 text-[11px]" : "min-h-[44px]"} ${buttonClassName ?? ""}`.trim()}
       >
+        {buttonIcon ? <span className="mr-1.5 inline-flex items-center">{buttonIcon}</span> : null}
         {buttonLabel}
       </button>
       {showStatus ? (
