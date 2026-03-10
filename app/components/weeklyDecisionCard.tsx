@@ -198,7 +198,7 @@ const buildFounderDecisionRows = ({
 
 const ActionStrip = ({ items }: { items: ActionStripItem[] }) => (
   <section className={`${tierTwoPanel} ${sectionSpacing}`} aria-label="Action strip">
-    <h3 className={tierTwoHeading}>Action strip (bounded)</h3>
+    <h3 className={tierTwoHeading}>This week&apos;s action strip</h3>
     <ul className="space-y-2">
       {items.map((item) => (
         <li key={item.area} className={tierThreeInset}>
@@ -294,7 +294,7 @@ export function DecisionCallHeader({
   return (
     <header className="space-y-4 border-b border-slate-700/80 pb-6" data-testid="weekly-top-fold">
       <article className={`${tierOnePanel} space-y-4`} data-testid="weekly-viral-hero" aria-label="Weekly posture strip">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Weekly Posture — Decision Call</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">This week&apos;s operating call</p>
         <h1 id="weekly-posture-brief-title" className="text-2xl font-semibold text-slate-50 sm:text-3xl">
           {resolvedPostureLabel.toUpperCase()} — {resolvedStageLabel.toUpperCase()}
         </h1>
@@ -328,18 +328,18 @@ export function DecisionCallHeader({
 
       <details className={`${tierTwoPanel} ${sectionSpacing}`}>
         <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.14em] text-slate-200">
-          Rationale and weekly memo ▼
+          Why this call and what to share ▼
         </summary>
 
         <article className="mt-3 space-y-4" aria-label="Operating call rationale">
-        <h2 className={tierOneHeading}>Startup capital cycle</h2>
+        <h2 className={tierOneHeading}>Where we are in the capital cycle</h2>
         <p className="text-xs text-slate-300">Scarcity → Mixed → Guarded Expansion → Aggressive Expansion</p>
         <p className="text-xs font-semibold uppercase tracking-[0.1em] text-sky-200">↑ You are here: {resolvedPostureLabel}</p>
         <p className="text-sm leading-relaxed text-slate-200">{meetingShorthand}</p>
         <p className="text-xs text-slate-300">Distance to regime change: {flipDistancePoints.toFixed(1)} points · Regime shift watch: {transitionWatch}</p>
 
         <article className={tierOneInset} aria-label="Founders decision triad this week">
-          <h3 className={tierTwoHeading}>Founder playbook</h3>
+          <h3 className={tierTwoHeading}>Founder decisions this week</h3>
           <ul className="mt-2 grid gap-2 text-xs text-slate-200 sm:grid-cols-3">
             {founderDecisionRows.map((row) => (
               <li key={row.area} className="rounded-md border border-slate-700/70 bg-slate-950/70 px-2 py-2">
@@ -358,7 +358,7 @@ export function DecisionCallHeader({
         </article>
 
         <article className={tierOneInset} aria-label="Weekly memo shareable">
-          <h3 className={tierTwoHeading}>Weekly memo (shareable)</h3>
+          <h3 className={tierTwoHeading}>Share-ready weekly memo</h3>
           <ul className="space-y-1 text-xs text-slate-200">
             {weeklyMemoLines.map((line) => (
               <li key={line}>• {line}</li>
@@ -367,7 +367,7 @@ export function DecisionCallHeader({
         </article>
 
         <article className={tierOneInset} aria-label="Key operating posture this week">
-          <h3 className={tierTwoHeading}>Key operating posture this week</h3>
+          <h3 className={tierTwoHeading}>Where to lean in vs hold back</h3>
           <div className="mt-2 grid gap-3 sm:grid-cols-2">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-emerald-200">Expand:</p>
@@ -754,7 +754,7 @@ export function WeeklyDecisionCard({
       ) : null}
 
       <article className={`${tierOnePanel} ${sectionSpacing}`}>
-        <h2 className={tierOneHeading}>Decision support details</h2>
+        <h2 className={tierOneHeading}>What changed and trigger points</h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <div className={tierOneInset}>
             <p className={`text-xs ${neutralLabel}`}>Change this week</p>
@@ -814,7 +814,7 @@ export function WeeklyDecisionCard({
 
 
       <article className={`${tierOnePanel} ${sectionSpacing}`}>
-        <h2 className={tierOneHeading}>Role-aware operating templates</h2>
+        <h2 className={tierOneHeading}>Role-based calls this week</h2>
         <div className="mt-2 grid gap-3 sm:grid-cols-2">
           {roleAwareTemplates.map((template) => (
             <article key={template.role} className={tierOneInset}>
@@ -839,11 +839,11 @@ export function WeeklyDecisionCard({
       <BoundedRulesMatrix decisionRules={decisionRules} />
       <details className={`${tierTwoPanel} ${sectionSpacing}`}>
         <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.14em] text-slate-200">
-          Diagnostic appendix ▼
+          Evidence behind this call ▼
         </summary>
         <div className="mt-3 space-y-4">
           <article className={tierOneInset}>
-            <p className={`text-xs ${neutralLabel}`}>Macro movement details</p>
+            <p className={`text-xs ${neutralLabel}`}>Signal changes this week</p>
             <p className="mt-1 text-xs text-slate-300">Velocity: {movementVelocity}</p>
             <div className="mt-3 rounded-md border border-slate-700/70 bg-slate-950/60 px-2.5 py-2">
               <div className="flex items-center justify-between gap-2">
@@ -910,7 +910,7 @@ export function WeeklyDecisionCard({
 
           {historicalAnalogs.length > 0 ? (
             <article className={`${tierThreePanel} ${sectionSpacing}`} aria-label="Historical analogs">
-              <h2 className={tierThreeHeading}>Compact analog references</h2>
+              <h2 className={tierThreeHeading}>Historical analogs</h2>
               <ul className="mt-2 space-y-2 text-xs text-slate-200">
                 {historicalAnalogs.map((analog) => (
                   <li key={`${analog.date}-${analog.similarityScore}`} className="rounded-md border border-slate-700/60 bg-slate-950/60 px-3 py-2">
