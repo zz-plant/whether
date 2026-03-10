@@ -4,7 +4,7 @@ import { getSummaryArchive } from "../summary/summaryArchive";
 import type { MacroSeriesReading } from "../types";
 import { isImprovingSignalDelta } from "./reportData";
 import { deltaLabelBySignal } from "./briefFormatting";
-import type { HistoricalAnalog } from "./reportData";
+import type { HistoricalAnalog, ReportEvidenceItem } from "./reportData";
 import {
   REGIME_SEVERITY_RANK,
   REGIME_SHORT_LABELS,
@@ -51,6 +51,7 @@ type HomeReportData = {
       reason: string;
     }>;
   };
+  reportEvidenceItems?: ReportEvidenceItem[];
   macroSeries?: MacroSeriesReading[];
   forecast?: ForecastModel;
   historicalAnalogs?: HistoricalAnalog[];
@@ -67,10 +68,6 @@ type MemoryRailItem = {
   posture: string;
 };
 
-type PrimaryDriverItem = {
-  label: string;
-  detail: string;
-};
 
 type WhyThisCallItem = {
   key?: "distance-to-regime-change" | "momentum" | "signal-reliability";
@@ -468,45 +465,6 @@ const buildMacroOverlay = (
   ];
 };
 
-const buildPrimaryDrivers = ({
-  reportDynamics,
-  confidenceLabel,
-  transitionWatch,
-}: {
-  reportDynamics: HomeReportData["reportDynamics"];
-  confidenceLabel: "LOW" | "MED" | "HIGH";
-  transitionWatch: "ON" | "OFF";
-}): PrimaryDriverItem[] => {
-  const directionalDrivers = (reportDynamics?.changedSignals ?? []).slice(0, 3).map((signal) => {
-    const direction = describeSignalDirection(signal);
-    const directionArrow = signal.delta > 0 ? "↑" : signal.delta < 0 ? "↓" : "→";
-    return {
-      label: signalReasonLabel[signal.key],
-      detail: `${directionArrow} ${direction} this week`,
-    };
-  });
-
-  const reliabilityDriver: PrimaryDriverItem = {
-    label: "Signal reliability",
-    detail:
-      confidenceLabel === "LOW"
-        ? "Low confidence near regime boundaries; keep irreversible bets paused."
-        : confidenceLabel === "MED"
-          ? "Medium confidence; ship reversible actions with explicit stop triggers."
-          : "High confidence; increase execution speed while preserving guardrails.",
-  };
-
-  const watchDriver: PrimaryDriverItem = {
-    label: "Transition watch",
-    detail:
-      transitionWatch === "ON"
-        ? "ON — reassess next read before escalating fixed-cost commitments."
-        : "OFF — current posture is stable for near-term planning cadence.",
-  };
-
-  return [...directionalDrivers, reliabilityDriver, watchDriver].slice(0, 5);
-};
-
 const signalReasonLabel: Record<"tightness" | "riskAppetite" | "baseRate" | "curveSlope", string> = {
   tightness: "Capital tightness",
   riskAppetite: "Risk appetite",
@@ -842,7 +800,7 @@ export const buildHomeBriefModel = (
     memoryRail: buildMemoryRail(recordDateLabel, assessment.regime),
     historicalTimeline: buildHistoricalTimeline(assessment.regime, timelineAnchorYear),
     macroOverlay: buildMacroOverlay(macroSeries, assessment, overlaySector),
-    primaryDrivers: buildPrimaryDrivers({ reportDynamics, confidenceLabel, transitionWatch }),
+    evidenceItems: (data.reportEvidenceItems ?? []).slice(0, 3),
     netConstraintSummary,
     postureDeltaLabel,
     reversalTrigger: conciseFlipThreshold,
