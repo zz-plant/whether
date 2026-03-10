@@ -88,15 +88,15 @@ export type WeeklyDecisionCardProps = {
 };
 
 const sectionSpacing = "space-y-4";
-const tierOneHeading = "text-sm font-bold uppercase tracking-[0.14em] text-slate-50";
-const tierTwoHeading = "text-xs font-semibold uppercase tracking-[0.12em] text-slate-300";
-const tierThreeHeading = "text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400";
-const tierOnePanel = "rounded-xl border border-slate-600/85 bg-slate-950/82 p-5";
-const tierTwoPanel = "rounded-xl border border-slate-700/55 bg-slate-950/62 p-4";
-const tierThreePanel = "rounded-xl border border-slate-800/55 bg-slate-950/50 p-4";
+const tierOneHeading = "text-base font-extrabold uppercase tracking-[0.1em] text-slate-50";
+const tierTwoHeading = "text-xs font-semibold uppercase tracking-[0.08em] text-slate-300";
+const tierThreeHeading = "text-[11px] font-medium tracking-[0.04em] text-slate-500";
+const tierOnePanel = "rounded-xl border border-slate-500/90 bg-slate-950/90 p-6";
+const tierTwoPanel = "rounded-xl border border-slate-700/65 bg-slate-950/68 p-5";
+const tierThreePanel = "rounded-xl border border-slate-800/40 bg-slate-950/40 p-3";
 const tierOneInset = "rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3";
 const tierTwoInset = "rounded-md border border-slate-700/55 bg-slate-950/58 px-3 py-3";
-const tierThreeInset = "rounded-md border border-slate-800/50 bg-slate-950/48 px-3 py-3";
+const tierThreeInset = "rounded-md border border-slate-800/35 bg-slate-950/34 px-2.5 py-2.5 text-slate-400";
 const neutralLabel = "font-semibold uppercase tracking-[0.12em] text-slate-300";
 const disclosureSummaryClass =
   "flex min-h-[44px] w-full items-center justify-between gap-3 rounded-md border border-slate-700/70 bg-slate-950/65 px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-100 transition hover:border-slate-500/70 hover:bg-slate-900/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300";
