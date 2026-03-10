@@ -66,6 +66,28 @@ type DecisionKnobContext = {
   weakSignalCount: number;
 };
 
+export type WeeklyLockCommitment = {
+  currentCall: string;
+  flipConditions: string[];
+  ownerCadence: string;
+  trustMarkers: string[];
+};
+
+type WeeklyLockCommitmentContext = {
+  regime: RegimeKey;
+  tightnessRegime: number;
+  riskAppetiteRegime: number;
+  confidenceDegraded: boolean;
+  freshnessDegraded: boolean;
+};
+
+const weeklyCallByRegime: Record<RegimeKey, string> = {
+  SCARCITY: "Freeze discretionary spend; protect cash-critical execution.",
+  DEFENSIVE: "Gate net-new commitments to short-payback work only.",
+  VOLATILE: "Approve only reversible bets with explicit checkpoint exits.",
+  EXPANSION: "Scale proven bets, but keep milestone-based approval gates.",
+};
+
 const buildKnobRationale = (key: DecisionKnob["key"], context: DecisionKnobContext) => {
   const thresholdCaution = context.nearestThresholdGap <= 8;
   const severityShift =
@@ -120,4 +142,33 @@ export const deriveDecisionKnobs = (
       rationale: buildKnobRationale(key, knobContext),
     };
   });
+};
+
+export const buildWeeklyLockCommitment = ({
+  regime,
+  tightnessRegime,
+  riskAppetiteRegime,
+  confidenceDegraded,
+  freshnessDegraded,
+}: WeeklyLockCommitmentContext): WeeklyLockCommitment => {
+  const tightenBy = 6;
+  const loosenBy = 4;
+
+  const trustMarkers = [
+    confidenceDegraded ? "Confidence: Guarded" : "",
+    freshnessDegraded ? "Freshness: Stale" : "",
+  ].filter((marker) => marker.length > 0);
+
+  return {
+    currentCall: weeklyCallByRegime[regime],
+    flipConditions: [
+      `Tightness ≤ ${Math.max(tightnessRegime - loosenBy, 0)} for 2 consecutive refreshes.`,
+      `Risk appetite ≥ ${Math.min(riskAppetiteRegime + loosenBy, 100)} for 2 consecutive refreshes.`,
+      `Re-tighten if tightness > ${Math.min(tightnessRegime + tightenBy, 100)} or risk appetite < ${Math.max(riskAppetiteRegime - tightenBy, 0)}.`,
+    ],
+    ownerCadence: confidenceDegraded || freshnessDegraded
+      ? "Owner: CEO + Finance lead · Checkpoint: daily 10:00 review until trust markers clear."
+      : "Owner: CEO + Finance lead · Checkpoint: Mon/Thu operating review.",
+    trustMarkers,
+  };
 };
