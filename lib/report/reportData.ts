@@ -109,8 +109,24 @@ const buildActionNowShort = ({
   return "Hold last week's operating cadence; avoid irreversible commitments.";
 };
 
-const buildFlipThreshold = (assessment: ReturnType<typeof evaluateRegime>): string =>
-  `Flip watch: Tightness > ${assessment.thresholds.tightnessRegime.toFixed(1)} or Risk appetite <= ${assessment.thresholds.riskAppetiteRegime.toFixed(1)}.`;
+export const buildFlipThreshold = (assessment: ReturnType<typeof evaluateRegime>): string => {
+  const tightnessThreshold = assessment.thresholds.tightnessRegime.toFixed(1);
+  const riskThreshold = assessment.thresholds.riskAppetiteRegime.toFixed(1);
+
+  if (assessment.regime === "SCARCITY") {
+    return `Flip watch: Tightness <= ${tightnessThreshold} or Risk appetite > ${riskThreshold}.`;
+  }
+
+  if (assessment.regime === "DEFENSIVE") {
+    return `Flip watch: Tightness <= ${tightnessThreshold} or Risk appetite <= ${riskThreshold}.`;
+  }
+
+  if (assessment.regime === "VOLATILE") {
+    return `Flip watch: Tightness > ${tightnessThreshold} or Risk appetite > ${riskThreshold}.`;
+  }
+
+  return `Flip watch: Tightness > ${tightnessThreshold} or Risk appetite <= ${riskThreshold}.`;
+};
 
 
 const ANALOG_DIMENSION_WEIGHTS: AnalogScoreDimensions = {
