@@ -123,6 +123,46 @@ describe("buildHomeBriefModel", () => {
     assert.doesNotMatch(momentumReason, /tightness/i);
   });
 
+  it("uses per-signal semantics when deriving primary risk from dominant move", () => {
+    const improvingRiskAppetite = buildHomeBriefModel({
+      fetchedAtLabel: "Updated 2h ago",
+      assessment: {
+        regime: "DEFENSIVE",
+        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
+        scores: { tightness: 25, riskAppetite: 80 },
+      },
+      regimeAlert: null,
+      stopItems: ["Guardrail"],
+      reportDynamics: {
+        directionLabel: "improving",
+        changedSignals: [
+          { key: "riskAppetite", delta: 3.2 },
+        ],
+        anomalySignals: [],
+      },
+    });
+
+    assert.match(improvingRiskAppetite.regimeHeader.primaryRisk, /^Upside: Risk appetite eased \(3\.2\)\.$/);
+
+    const worseningRiskAppetite = buildHomeBriefModel({
+      fetchedAtLabel: "Updated 2h ago",
+      assessment: {
+        regime: "DEFENSIVE",
+        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
+        scores: { tightness: 25, riskAppetite: 70 },
+      },
+      regimeAlert: null,
+      stopItems: ["Guardrail"],
+      reportDynamics: {
+        directionLabel: "deteriorating",
+        changedSignals: [{ key: "riskAppetite", delta: -2.4 }],
+        anomalySignals: [],
+      },
+    });
+
+    assert.match(worseningRiskAppetite.regimeHeader.primaryRisk, /^Downside: Risk appetite tightened \(-2\.4\)\.$/);
+  });
+
   it("uses direction-aware reversal trigger language for expansion risk-appetite boundaries", () => {
     const model = buildHomeBriefModel({
       assessment: {
