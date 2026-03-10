@@ -91,12 +91,14 @@ const sectionSpacing = "space-y-4";
 const tierOneHeading = "text-sm font-bold uppercase tracking-[0.14em] text-slate-50";
 const tierTwoHeading = "text-xs font-semibold uppercase tracking-[0.12em] text-slate-300";
 const tierThreeHeading = "text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400";
-const tierOnePanel = "rounded-xl border border-slate-600/85 bg-slate-950/82 p-5";
-const tierTwoPanel = "rounded-xl border border-slate-700/55 bg-slate-950/62 p-4";
-const tierThreePanel = "rounded-xl border border-slate-800/55 bg-slate-950/50 p-4";
-const tierOneInset = "rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3";
-const tierTwoInset = "rounded-md border border-slate-700/55 bg-slate-950/58 px-3 py-3";
-const tierThreeInset = "rounded-md border border-slate-800/50 bg-slate-950/48 px-3 py-3";
+// Canonical surface mapping keeps tier styling aligned with global tokens.
+// tierOnePanel -> primary, tierTwoPanel -> secondary, tierThreePanel -> callout, insets -> inset/callout.
+const tierOnePanel = "rounded-xl weather-surface-primary p-5";
+const tierTwoPanel = "rounded-xl weather-surface-secondary p-4";
+const tierThreePanel = "rounded-xl weather-surface-callout p-4";
+const tierOneInset = "rounded-lg weather-surface-inset px-3 py-3";
+const tierTwoInset = "rounded-md weather-surface-inset px-3 py-3";
+const tierThreeInset = "rounded-md weather-surface-callout px-3 py-3";
 const neutralLabel = "font-semibold uppercase tracking-[0.12em] text-slate-300";
 const disclosureSummaryClass =
   "flex min-h-[44px] w-full items-center justify-between gap-3 rounded-md border border-slate-700/70 bg-slate-950/65 px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-100 transition hover:border-slate-500/70 hover:bg-slate-900/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300";
@@ -697,7 +699,7 @@ export function WeeklyDecisionCard({
       />
 
       <div className="grid gap-4 lg:grid-cols-5">
-        <article id="what-changed-this-week" className={`${tierOnePanel} ${sectionSpacing} lg:col-span-3 bg-gradient-to-b from-slate-950/95 to-slate-950/75`}>
+        <article id="what-changed-this-week" className={`${tierOnePanel} ${sectionSpacing} lg:col-span-3`}>
           <div className="flex items-center justify-between gap-3">
             <h2 className={tierOneHeading}>Decision delta</h2>
             <span className="rounded-full border border-sky-400/40 bg-sky-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-100">Live weekly move</span>
@@ -732,7 +734,7 @@ export function WeeklyDecisionCard({
           </p>
         </article>
 
-        <article className={`${tierOnePanel} ${sectionSpacing} lg:col-span-2 bg-gradient-to-b from-slate-950/95 to-slate-950/75`}>
+        <article className={`${tierOnePanel} ${sectionSpacing} lg:col-span-2`}>
           <h2 className={tierOneHeading}>Operator posture</h2>
           <p className="text-sm font-semibold text-slate-100">{postureWithStageLabel ?? statusLabel}</p>
           <div className="rounded-lg border border-slate-700/70 bg-slate-950/65 p-3 space-y-2">
@@ -784,7 +786,7 @@ export function WeeklyDecisionCard({
         </article>
       </div>
 
-      <article className={`${tierOnePanel} ${sectionSpacing} bg-gradient-to-r from-slate-950/92 via-slate-900/85 to-slate-950/92`}>
+      <article className={`${tierOnePanel} ${sectionSpacing}`}>
         <h2 className={tierOneHeading}>Weekly change indicator</h2>
         <p className="text-sm font-semibold text-slate-100">Model-backed movement score: {weeklyMovement.score > 0 ? `+${weeklyMovement.score.toFixed(1)}` : weeklyMovement.score.toFixed(1)} ({weeklyMovement.direction})</p>
         <p className="text-xs text-slate-300">{weeklyMovement.summary}</p>
