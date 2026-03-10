@@ -92,6 +92,8 @@ const tierOneInset = "rounded-lg border border-slate-700/75 bg-slate-950/72 px-3
 const tierTwoInset = "rounded-md border border-slate-700/55 bg-slate-950/58 px-3 py-3";
 const tierThreeInset = "rounded-md border border-slate-800/50 bg-slate-950/48 px-3 py-3";
 const neutralLabel = "font-semibold uppercase tracking-[0.12em] text-slate-300";
+const disclosureSummaryClass =
+  "flex min-h-[44px] w-full items-center justify-between gap-3 rounded-md border border-slate-700/70 bg-slate-950/65 px-3 py-2 text-left text-xs font-semibold uppercase tracking-[0.14em] text-slate-100 transition hover:border-slate-500/70 hover:bg-slate-900/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300";
 
 const meterTrackBase = "relative h-2 rounded-full";
 const meterFillBase = "h-2 rounded-full";
@@ -324,6 +326,18 @@ export function DecisionCallHeader({
           {resolvedPostureLabel.toUpperCase()} — {resolvedStageLabel.toUpperCase()}
         </h1>
 
+        <div className="flex flex-wrap gap-2" aria-label="Quick weekly scan">
+          <p className="rounded-full border border-sky-500/45 bg-sky-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-sky-100">
+            Delta: {meetingShorthand}
+          </p>
+          <p className="rounded-full border border-slate-600/70 bg-slate-900/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-200">
+            Freshness: {freshnessLabel}
+          </p>
+          <p className="rounded-full border border-violet-500/45 bg-violet-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-violet-100">
+            Trust cue: {trustCueLine}
+          </p>
+        </div>
+
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">
             <SummaryLabel label="Where we are now" icon={<CircleTargetIcon className="h-3.5 w-3.5" aria-hidden="true" />} />
@@ -363,9 +377,10 @@ export function DecisionCallHeader({
         </div>
       </article>
 
-      <details className={`${tierTwoPanel} ${sectionSpacing}`}>
-        <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.14em] text-slate-200">
-          Why this call and what to share ▼
+      <details className={`${tierTwoPanel} ${sectionSpacing} group`}>
+        <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
+          <span>Why this call and what to share</span>
+          <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
         </summary>
 
         <article className="mt-3 space-y-4" aria-label="Operating call rationale">
@@ -623,7 +638,7 @@ export function CitationActionFooter({ citationMetaLine, citation, actions }: Ci
     <article id="citation-actions" className={`${tierThreePanel} ${sectionSpacing}`}>
       <h2 className={tierThreeHeading}>Cite this call</h2>
       <p className="mt-2 text-xs text-slate-300">{citationMetaLine}</p>
-      <pre className="mt-2 overflow-x-auto whitespace-pre-wrap text-xs text-slate-300">{citation}</pre>
+      <pre className="mt-2 overflow-x-auto rounded-md border border-slate-700/70 bg-slate-950/75 px-3 py-2 font-mono whitespace-pre-wrap text-xs text-slate-300">{citation}</pre>
       <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-md border border-slate-700/60 bg-slate-950/60 px-3 py-3 text-xs text-slate-300">
         <span>Use this citation in meeting notes, board updates, or operating memos.</span>
         <span className="font-semibold uppercase tracking-[0.12em] text-slate-200">Send to team</span>
@@ -799,7 +814,7 @@ export function WeeklyDecisionCard({
           <div className={tierOneInset}>
             <p className={`text-xs ${neutralLabel}`}>What may change next</p>
             <p className="mt-1 text-xs text-slate-200">P(flip to Scarcity): <span className="font-semibold text-amber-100">{formatProbabilityPercent(transitionProbabilities.Scarcity)}</span> · P(stabilize in Mixed): <span className="font-semibold text-sky-100">{formatProbabilityPercent(transitionProbabilities.Mixed)}</span></p>
-            <div className="mt-2 flex h-2 overflow-hidden rounded-full bg-slate-800">
+            <div className="mt-2 flex h-2 overflow-hidden rounded-full bg-slate-800" role="img" aria-label="Transition probability mix">
               {transitionStrip.map((segment) => (
                 <div key={segment.label} className={segment.tone} style={{ width: `${segment.value}%` }} aria-label={`${segment.label} ${formatProbabilityPercent(segment.value)}`} />
               ))}
@@ -872,9 +887,10 @@ export function WeeklyDecisionCard({
 
       <ActionStrip items={actionStripItems} />
       <BoundedRulesMatrix decisionRules={decisionRules} />
-      <details className={`${tierTwoPanel} ${sectionSpacing}`}>
-        <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.14em] text-slate-200">
-          Evidence ▼
+      <details className={`${tierTwoPanel} ${sectionSpacing} group`}>
+        <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
+          <span>Evidence</span>
+          <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
         </summary>
         <div className="mt-3 space-y-4">
           <article className={tierOneInset}>

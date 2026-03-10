@@ -47,20 +47,20 @@ describe("WeeklyDecisionCard extracted sections", () => {
       />,
     );
 
-    assert.match(html, /Weekly Posture — Decision Call/);
-    assert.match(html, /Immediate action:/);
-    assert.match(html, /Startup capital cycle/);
+    assert.match(html, /weekly-posture-brief-title/);
+    assert.match(html, /Do now/);
+    assert.match(html, /Where we are in the capital cycle/);
     assert.match(html, /Distance to regime change:/);
-    assert.match(html, /Founder playbook/);
-    assert.match(html, /Weekly memo \(shareable\)/);
+    assert.match(html, /Founder decisions this week/);
+    assert.match(html, /Share-ready weekly memo/);
     assert.match(html, /Guardrail/);
     assert.match(html, /Flip condition/);
     assert.match(html, /Context metric: Startup Climate Index/);
     assert.match(html, /False-signal warnings/);
 
-    const heroIndex = html.indexOf("Weekly Posture — Decision Call");
-    const playbookIndex = html.indexOf("Founder playbook");
-    const memoIndex = html.indexOf("Weekly memo (shareable)");
+    const heroIndex = html.indexOf("weekly-posture-brief-title");
+    const playbookIndex = html.indexOf("Founder decisions this week");
+    const memoIndex = html.indexOf("Share-ready weekly memo");
     assert.ok(playbookIndex > heroIndex);
     assert.ok(memoIndex > playbookIndex);
   });
