@@ -196,15 +196,40 @@ const buildFounderDecisionRows = ({
   ];
 };
 
+const compactActionCue = (text: string) =>
+  text
+    .replace(/^(Pause|Resume)\s+/i, "")
+    .replace(/\.$/, "")
+    .replace(/^when\s+/i, "")
+    .trim();
+
+const compactRoleCue = (text: string) =>
+  text
+    .replace(/\s+/g, " ")
+    .replace(/\.\s+/g, "; ")
+    .replace(/;\s*$/, "")
+    .trim();
+
+
 const ActionStrip = ({ items }: { items: ActionStripItem[] }) => (
   <section className={`${tierTwoPanel} ${sectionSpacing}`} aria-label="Action strip">
-    <h3 className={tierTwoHeading}>This week&apos;s action strip</h3>
-    <ul className="space-y-2">
+    <div className="flex flex-wrap items-end justify-between gap-2">
+      <h3 className={tierTwoHeading}>This week&apos;s action strip</h3>
+      <p className="text-[11px] uppercase tracking-[0.12em] text-slate-400">Action · guardrail · flip</p>
+    </div>
+    <ul className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
       {items.map((item) => (
-        <li key={item.area} className={tierThreeInset}>
-          <p className="text-xs font-semibold text-slate-100">{decisionAreaLabel(item.area)} · {item.action}</p>
-          <p className="mt-1 text-xs text-amber-100"><span className="font-semibold uppercase tracking-[0.12em]">Threshold</span> {item.threshold}</p>
-          <p className="mt-1 text-xs text-sky-100"><span className="font-semibold uppercase tracking-[0.12em]">Flip condition</span> {item.reversalCondition}</p>
+        <li key={item.area} className={`${tierThreeInset} flex h-full flex-col gap-2`}>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">{decisionAreaLabel(item.area)}</p>
+          <p className="text-sm font-semibold text-slate-100">{item.action}</p>
+          <div className="mt-auto space-y-1.5 text-[11px]">
+            <p className="rounded-full border border-amber-500/45 bg-amber-500/10 px-2.5 py-1 text-amber-100">
+              <span className="font-semibold uppercase tracking-[0.1em]">Guardrail</span> {compactActionCue(item.threshold)}
+            </p>
+            <p className="rounded-full border border-sky-500/45 bg-sky-500/10 px-2.5 py-1 text-sky-100">
+              <span className="font-semibold uppercase tracking-[0.1em]">Flip</span> {compactActionCue(item.reversalCondition)}
+            </p>
+          </div>
         </li>
       ))}
     </ul>
@@ -321,9 +346,21 @@ export function DecisionCallHeader({
           </div>
         </div>
 
-        <p className="rounded-lg border border-sky-500/45 bg-sky-500/10 px-3 py-3 text-sm text-sky-50">
-          <span className="font-semibold">Immediate action:</span> {immediateDecision} {operatingStanceLine}
-        </p>
+        <div className="grid gap-2 lg:grid-cols-3" aria-label="This week's operating call">
+          <article className="rounded-lg border border-violet-500/45 bg-violet-500/10 px-3 py-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-violet-100">Decision now</p>
+            <p className="mt-1 text-sm font-semibold text-slate-100">{immediateDecision}</p>
+            <p className="mt-1 text-xs text-slate-200">{operatingStanceLine}</p>
+          </article>
+          <article className="rounded-lg border border-amber-500/45 bg-amber-500/10 px-3 py-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-amber-100">Guardrail</p>
+            <p className="mt-1 text-sm text-slate-100">{guardrail}</p>
+          </article>
+          <article className="rounded-lg border border-sky-500/45 bg-sky-500/10 px-3 py-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">Flip condition</p>
+            <p className="mt-1 text-sm text-slate-100">{regimeDistance.dimensionLabel} {regimeDistance.thresholdDirection === "riseAbove" ? "rises above" : "falls to or below"} {regimeDistance.thresholdValue.toFixed(1)}</p>
+          </article>
+        </div>
       </article>
 
       <details className={`${tierTwoPanel} ${sectionSpacing}`}>
@@ -432,59 +469,54 @@ export function DecisionCallHeader({
 
 type BoundedRulesMatrixProps = {
   decisionRules: BoundedDecisionRule[];
-  actionStripItems: ActionStripItem[];
 };
 
 export function BoundedRulesMatrix({ decisionRules }: BoundedRulesMatrixProps) {
   const topDecisionRules = decisionRules.slice(0, 4);
 
-  const renderActionLine = (items: string[], emptyLabel: string) => {
+  const compactRuleList = (items: string[]) => {
     if (items.length === 0) {
-      return <p className="text-slate-400">{emptyLabel}</p>;
+      return [];
     }
 
-    const [firstItem, ...remainingItems] = items;
-    return (
-      <div className="flex items-center gap-2">
-        <p className="min-w-0 flex-1 truncate">{firstItem}</p>
-        {remainingItems.length > 0 ? (
-          <span className="shrink-0 rounded-full border border-slate-600/80 bg-slate-900/90 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-            +{remainingItems.length}
-          </span>
-        ) : null}
-      </div>
-    );
+    return items.slice(0, 2).map((item) => compactActionCue(item));
   };
 
   return (
     <article className={`${tierOnePanel} ${sectionSpacing}`}>
       <h2 className={tierOneHeading}>Decision matrix this week</h2>
-      <p className="text-xs text-slate-300">Action now, then guardrail + flip conditions.</p>
+      <p className="text-xs text-slate-300">Do, avoid, and trigger cues by operating area.</p>
       <ul className="mt-2 grid gap-3 sm:grid-cols-2 sm:auto-rows-fr">
-        {topDecisionRules.map((rule) => (
-          <li key={rule.area} className={`${tierOneInset} flex h-full flex-col text-xs text-slate-200`}>
-            <p className="font-semibold uppercase tracking-[0.12em] text-slate-200">{decisionAreaLabel(rule.area)}</p>
-            <div className="mt-3 space-y-2">
-              <div>
-                <p className="font-semibold uppercase tracking-[0.12em] text-emerald-100">Do now</p>
-                <div className="mt-1 text-emerald-50">{renderActionLine(rule.doNow, "No immediate do-now action")}</div>
+        {topDecisionRules.map((rule) => {
+          const doCues = compactRuleList(rule.doNow);
+          const avoidCues = compactRuleList(rule.avoidNow);
+
+          return (
+            <li key={rule.area} className={`${tierOneInset} flex h-full flex-col gap-2 text-xs text-slate-200`}>
+              <p className="font-semibold uppercase tracking-[0.12em] text-slate-200">{decisionAreaLabel(rule.area)}</p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                <div className="rounded-md border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-2">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald-100">Do now</p>
+                  <ul className="mt-1 space-y-1 text-[11px] text-emerald-50">
+                    {doCues.length > 0 ? doCues.map((cue) => <li key={cue}>• {cue}</li>) : <li>• No immediate action</li>}
+                  </ul>
+                </div>
+                <div className="rounded-md border border-rose-500/40 bg-rose-500/10 px-2.5 py-2">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-rose-100">Avoid now</p>
+                  <ul className="mt-1 space-y-1 text-[11px] text-rose-50">
+                    {avoidCues.length > 0 ? avoidCues.map((cue) => <li key={cue}>• {cue}</li>) : <li>• No avoid-now constraint</li>}
+                  </ul>
+                </div>
               </div>
-              <div>
-                <p className="font-semibold uppercase tracking-[0.12em] text-rose-100">Avoid now</p>
-                <div className="mt-1 text-rose-50">{renderActionLine(rule.avoidNow, "No immediate avoid-now action")}</div>
-              </div>
-            </div>
-            <p className="mt-3 rounded-full border border-rose-500/50 bg-rose-500/10 px-2 py-1 text-rose-100">
-              <span className="font-semibold uppercase tracking-[0.12em]">Guardrail</span> {rule.pauseTrigger}
-            </p>
-            <p className="mt-2 rounded-full border border-emerald-500/50 bg-emerald-500/10 px-2 py-1 text-emerald-100">
-              <span className="font-semibold uppercase tracking-[0.12em]">Flip condition</span> {rule.resumeTrigger}
-            </p>
-            <p className="mt-2 inline-flex w-fit rounded-full border border-slate-700/85 bg-slate-900/80 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-              Scope: {rule.scope}
-            </p>
-          </li>
-        ))}
+              <p className="rounded-full border border-amber-500/45 bg-amber-500/10 px-2.5 py-1 text-[11px] text-amber-100">
+                <span className="font-semibold uppercase tracking-[0.1em]">Guardrail</span> {compactActionCue(rule.pauseTrigger)}
+              </p>
+              <p className="rounded-full border border-sky-500/45 bg-sky-500/10 px-2.5 py-1 text-[11px] text-sky-100">
+                <span className="font-semibold uppercase tracking-[0.1em]">Flip condition</span> {compactActionCue(rule.resumeTrigger)}
+              </p>
+            </li>
+          );
+        })}
       </ul>
     </article>
   );
@@ -816,20 +848,23 @@ export function WeeklyDecisionCard({
       <article className={`${tierOnePanel} ${sectionSpacing}`}>
         <h2 className={tierOneHeading}>Role-based calls this week</h2>
         <div className="mt-2 grid gap-3 sm:grid-cols-2">
-          {roleAwareTemplates.map((template) => (
-            <article key={template.role} className={tierOneInset}>
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-200">{template.roleLabel}</p>
-              <ul className="mt-2 space-y-2 text-xs">
-                <li className="rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3 py-1 text-emerald-100">
-                  <span className="font-semibold uppercase tracking-[0.1em]">Do now</span> {template.doNow}
-                </li>
-                <li className="rounded-full border border-rose-500/40 bg-rose-500/10 px-3 py-1 text-rose-100">
-                  <span className="font-semibold uppercase tracking-[0.1em]">Avoid now</span> {template.avoidNow}
-                </li>
-                <li className="rounded-full border border-sky-500/40 bg-sky-500/10 px-3 py-1 text-sky-100">
-                  <span className="font-semibold uppercase tracking-[0.1em]">Flip trigger</span> {template.flipTrigger}
-                </li>
-              </ul>
+          {roleAwareTemplates.map((template, index) => (
+            <article key={template.role} className={`${tierOneInset} space-y-2`}>
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-200">{template.roleLabel}</p>
+                <span className="rounded-full border border-slate-600/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">{index + 1}</span>
+              </div>
+              <div className="grid gap-2">
+                <p className="rounded-md border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-2 text-xs text-emerald-100">
+                  <span className="font-semibold uppercase tracking-[0.1em]">Do now</span> {compactRoleCue(template.doNow)}
+                </p>
+                <p className="rounded-md border border-rose-500/40 bg-rose-500/10 px-2.5 py-2 text-xs text-rose-100">
+                  <span className="font-semibold uppercase tracking-[0.1em]">Avoid now</span> {compactRoleCue(template.avoidNow)}
+                </p>
+                <p className="rounded-md border border-sky-500/40 bg-sky-500/10 px-2.5 py-2 text-xs text-sky-100">
+                  <span className="font-semibold uppercase tracking-[0.1em]">Flip trigger</span> {compactActionCue(template.flipTrigger)}
+                </p>
+              </div>
             </article>
           ))}
         </div>
