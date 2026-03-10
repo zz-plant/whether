@@ -4,6 +4,7 @@ import type { MacroSeriesReading, SensorReading, TreasuryData } from "../types";
 import { buildComplianceStamp } from "../exportNotices";
 import { formatRegimeLabel } from "../regimeFormat";
 import type { InterpretationLayer } from "../report/interpretationLayer";
+import type { ActionStripItem } from "../report/operatingCalls";
 import {
   buildRunwayPlan,
   formatRunwayPlanCompactBlock,
@@ -30,6 +31,7 @@ type ExportLayerOptions = {
   regimeDistancePoints?: number;
   historicalAnalogs?: Array<{ date: string; similarityScore: number; implication: string }>;
   failureModes?: Array<{ warning: string; mitigationCheck: string }>;
+  actionStripItems?: ActionStripItem[];
 };
 
 const buildViralArtifactBlock = (options?: ExportLayerOptions) => {
@@ -37,14 +39,21 @@ const buildViralArtifactBlock = (options?: ExportLayerOptions) => {
     return [];
   }
 
+  const actionStrip = (options.actionStripItems ?? []).slice(0, 2).flatMap((item) => [
+    `• Action: ${item.action}`,
+    `  Threshold: ${item.threshold}`,
+    `  Flip: ${item.reversalCondition}`,
+  ]);
+
   return [
     "",
-    "Startup climate — weekly call:",
+    "Startup environment — weekly call:",
     `• Posture: ${options.postureWithStageLabel ?? "Current posture"}`,
     `• Trend: ${(options.trendLabel ?? "Stable").toUpperCase()}`,
     `• Distance to regime change: ${(options.regimeDistancePoints ?? 0).toFixed(1)} points`,
     `• Regime shift watch: ${options.transitionWatch ?? "OFF"}`,
-    `• Operating stance: ${options.operatingStanceLine}`,
+    `• Operating posture: ${options.operatingStanceLine}`,
+    ...actionStrip,
   ];
 };
 

@@ -268,4 +268,26 @@ describe("buildHomeBriefModel", () => {
     assert.match(model.operatingStanceLine, /Hold approvals steady/i);
   });
 
+
+  it("keeps noun discipline in top summary fields", () => {
+    const model = buildHomeBriefModel({
+      assessment: {
+        regime: "VOLATILE",
+        thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
+        scores: { tightness: 69, riskAppetite: 52 },
+      },
+      regimeAlert: null,
+      stopItems: ["Guardrail"],
+      reportDynamics: {
+        directionLabel: "mixed",
+        changedSignals: [{ key: "riskAppetite", delta: 1 }],
+        anomalySignals: [],
+      },
+    });
+
+    assert.match(model.postureLabel, /Contraction|Transition|Expansion/i);
+    assert.match(model.operatingStanceLine, /posture|operate|approval/i);
+    assert.doesNotMatch(model.netConstraintSummary, /climate stance/i);
+  });
+
 });

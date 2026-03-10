@@ -129,3 +129,16 @@ Whenever a route is renamed or reorganized, complete all of the following in the
 
 Rule of thumb: redirects exist for bookmarked/external traffic only. Product-owned links must always point to canonical routes.
 
+
+## 11) Noun discipline glossary (primary surfaces)
+
+Use these canon terms across `/` and `/operations` unless a section is explicitly documenting a different semantic layer.
+
+| Surface type | Preferred noun | Meaning | Avoid drift terms |
+| --- | --- | --- | --- |
+| Regime logic + score classification | `regime` | The score-derived classification (`SCARCITY`, `DEFENSIVE`, `VOLATILE`, `EXPANSION`) and boundary math. | climate state, mode bucket |
+| Weekly operator recommendation copy | `posture` | The operating stance leaders should apply this week based on the current regime. | stance (as primary label), weather mode |
+| Macro context and supporting evidence | `environment` | External market conditions that inform confidence and pacing, not the call itself. | backdrop climate (as primary label) |
+
+Rule: write `regime -> posture -> environment` in that order when all three appear together in one artifact.
+

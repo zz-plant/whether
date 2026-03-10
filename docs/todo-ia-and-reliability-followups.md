@@ -13,3 +13,10 @@ Completed in this patch:
 Remaining backlog from audit:
 - Enforce noun discipline copy pass (regime vs posture vs environment)
 - Bind action strip items to measurable stop/flip conditions
+
+## Plan-week execution status
+
+| Backlog item | Owner | Day | Status | Notes |
+| --- | --- | --- | --- | --- |
+| Enforce noun discipline copy pass (regime vs posture vs environment) | Product + Eng | Day 1 | Complete | Glossary contract added in `docs/development-playbook.md`; canonical usage applied to shared/home copy surfaces. |
+| Bind action strip items to measurable stop/flip conditions | Product + Eng | Day 1 | Complete | Action-strip contract added and propagated to homepage, operations, and export artifacts with coverage in regression tests. |

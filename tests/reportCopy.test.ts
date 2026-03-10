@@ -59,4 +59,16 @@ describe("reportCopy", () => {
       });
     });
   });
+
+  it("keeps canonical noun map in glossary usage copy", () => {
+    const serialized = JSON.stringify({
+      firstStep: FIRST_TIME_GUIDE_STEPS[0],
+      notes: GLOSSARY_USAGE_NOTES,
+    });
+
+    assert.match(serialized, /posture/i);
+    assert.match(serialized, /environment/i);
+    assert.doesNotMatch(serialized, /climate.*stance/i);
+  });
+
 });

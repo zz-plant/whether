@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { HapticAnchor } from "./hapticAnchor";
 import type { ReportDynamics } from "../../lib/report/reportData";
 import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
-import type { RoleAwareOperatingTemplate } from "../../lib/report/operatingCalls";
+import type { ActionStripItem, RoleAwareOperatingTemplate } from "../../lib/report/operatingCalls";
 import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
 import type { ForecastRegimeLabel, TransitionVelocityEstimate } from "../../lib/report/forecastModel";
 import { formatProbabilityPercent } from "../../lib/report/reportFormatting";
@@ -47,6 +47,7 @@ export type WeeklyDecisionCardProps = {
   decisionShiftSummary: string;
   transitionProbabilities: Record<ForecastRegimeLabel, number>;
   decisionRules: BoundedDecisionRule[];
+  actionStripItems: ActionStripItem[];
   roleAwareTemplates: RoleAwareOperatingTemplate[];
   executiveOperationalStance: { expand: string[]; avoid: string[] };
   revisitDecisions: boolean;
@@ -191,6 +192,21 @@ const buildFounderDecisionRows = ({
   ];
 };
 
+const ActionStrip = ({ items }: { items: ActionStripItem[] }) => (
+  <section className={`${tierTwoPanel} ${sectionSpacing}`} aria-label="Action strip">
+    <h3 className={tierTwoHeading}>Action strip (bounded)</h3>
+    <ul className="space-y-2">
+      {items.map((item) => (
+        <li key={item.area} className={tierThreeInset}>
+          <p className="text-xs font-semibold text-slate-100">{decisionAreaLabel(item.area)} · {item.action}</p>
+          <p className="mt-1 text-xs text-amber-100"><span className="font-semibold uppercase tracking-[0.12em]">Threshold</span> {item.threshold}</p>
+          <p className="mt-1 text-xs text-sky-100"><span className="font-semibold uppercase tracking-[0.12em]">Flip condition</span> {item.reversalCondition}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+);
+
 const PostureHistoryTimeline = ({ historicalTimeline }: { historicalTimeline: WeeklyDecisionCardProps["historicalTimeline"] }) => (
   <ol className="mt-2 grid gap-2 lg:grid-cols-4" aria-label="Posture change timeline">
     {historicalTimeline.map((item, index) => {
@@ -268,8 +284,8 @@ export function DecisionCallHeader({
 
   return (
     <header className="space-y-5 border-b border-slate-700/80 pb-6" data-testid="weekly-top-fold">
-      <article className={`${tierOnePanel} space-y-4`} data-testid="weekly-viral-hero" aria-label="Startup climate weekly call">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Startup Climate — Weekly Call</p>
+      <article className={`${tierOnePanel} space-y-4`} data-testid="weekly-viral-hero" aria-label="Weekly posture call">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Weekly Posture — Decision Call</p>
         <h1 id="weekly-posture-brief-title" className="text-3xl font-semibold text-slate-50 sm:text-4xl">
           {resolvedPostureLabel.toUpperCase()} — {resolvedStageLabel.toUpperCase()}
         </h1>
@@ -278,7 +294,7 @@ export function DecisionCallHeader({
           <p>Trend: {trendLabel.toUpperCase()}</p>
         </div>
         <p className="rounded-lg border border-amber-500/50 bg-amber-500/10 px-3 py-3 text-sm text-amber-50">
-          <span className="font-semibold">Operating stance:</span> {operatingStanceLine}
+          <span className="font-semibold">Operating posture:</span> {operatingStanceLine}
         </p>
       </article>
 
@@ -317,8 +333,8 @@ export function DecisionCallHeader({
           </ul>
         </article>
 
-        <article className={tierOneInset} aria-label="Key operational stance this week">
-          <h3 className={tierTwoHeading}>Key operational stance this week</h3>
+        <article className={tierOneInset} aria-label="Key operating posture this week">
+          <h3 className={tierTwoHeading}>Key operating posture this week</h3>
           <div className="mt-2 grid gap-3 sm:grid-cols-2">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-emerald-200">Expand:</p>
@@ -401,6 +417,7 @@ export function DecisionCallHeader({
 
 type BoundedRulesMatrixProps = {
   decisionRules: BoundedDecisionRule[];
+  actionStripItems: ActionStripItem[];
 };
 
 export function BoundedRulesMatrix({ decisionRules }: BoundedRulesMatrixProps) {
@@ -584,6 +601,7 @@ export function WeeklyDecisionCard({
   decisionShiftSummary,
   transitionProbabilities,
   decisionRules,
+  actionStripItems = [],
   roleAwareTemplates,
   executiveOperationalStance,
   revisitDecisions,
@@ -835,6 +853,7 @@ export function WeeklyDecisionCard({
         </div>
       </article>
 
+      <ActionStrip items={actionStripItems} />
       <BoundedRulesMatrix decisionRules={decisionRules} />
       <MoreContextDisclosureBody
         startupClimateIndex={startupClimateIndex}

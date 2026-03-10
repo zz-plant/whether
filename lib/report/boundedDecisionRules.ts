@@ -131,3 +131,7 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
 
   return areaOrder.map((area) => rulesByArea[area]);
 };
+
+export const formatActionStripThresholdText = (rule: Pick<BoundedDecisionRule, "pauseTrigger">) => rule.pauseTrigger;
+
+export const formatActionStripReversalText = (rule: Pick<BoundedDecisionRule, "resumeTrigger">) => rule.resumeTrigger;

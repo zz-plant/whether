@@ -30,6 +30,8 @@ import { normalizeSignalContributions } from "./signalFormatting";
 import { buildFallbackForecastModel, buildForecastModel } from "./forecastModel";
 import { formatRegimeLabel } from "../regimeFormat";
 import { logReportDependencyFailure } from "./reportError";
+import { buildCanonicalBoundedDecisionRules } from "./boundedDecisionRules";
+import { buildActionStripItems } from "./operatingCalls";
 import { cache } from "react";
 import type { TreasuryData } from "../types";
 
@@ -438,6 +440,7 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
   const assessment = evaluateRegime(treasury, thresholds, assessmentMacroSeries);
   const liveAssessment = historicalSelection ? evaluateRegime(liveTreasury, thresholds, macroSeries) : null;
   const { playbook, startItems, stopItems } = getPlaybookGuidance(assessment.regime);
+  const actionStripItems = buildActionStripItems(buildCanonicalBoundedDecisionRules({ regime: assessment.regime, thresholds: assessment.thresholds, scores: assessment.scores }));
   const fenceItems = assessment.constraints;
   const previousSnapshot = historicalSelection
     ? null
@@ -575,6 +578,7 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
     startItems,
     statusLabel,
     stopItems,
+    actionStripItems,
     thresholds,
     treasury,
     treasuryProvenance,
@@ -633,6 +637,7 @@ const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataF
   const fetchedAtLabel = formatTimestampUTC(fallbackTreasury.fetched_at);
   const ageLabel = formatAgeHours(fallbackTreasury.fetched_at, now);
   const { playbook, startItems, stopItems } = getPlaybookGuidance(assessment.regime);
+  const actionStripItems = buildActionStripItems(buildCanonicalBoundedDecisionRules({ regime: assessment.regime, thresholds: assessment.thresholds, scores: assessment.scores }));
 
   return {
     assessment,
@@ -684,6 +689,7 @@ const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataF
     startItems,
     statusLabel: formatRegimeLabel(assessment.regime),
     stopItems,
+    actionStripItems,
     thresholds,
     treasury: fallbackTreasury,
     treasuryProvenance: {
