@@ -795,14 +795,21 @@ export function WeeklyDecisionCard({
 
       <article className={`${tierOnePanel} ${sectionSpacing}`}>
         <h2 className={tierOneHeading}>Role-aware operating templates</h2>
-        <p className="text-xs text-slate-300">Bounded templates by role: do now, avoid now, and reversal trigger.</p>
         <div className="mt-2 grid gap-3 sm:grid-cols-2">
           {roleAwareTemplates.map((template) => (
             <article key={template.role} className={tierOneInset}>
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-200">{template.roleLabel}</p>
-              <p className="mt-2 text-xs text-emerald-100"><span className="font-semibold uppercase tracking-[0.1em]">Do now</span> {template.doNow}</p>
-              <p className="mt-2 text-xs text-rose-100"><span className="font-semibold uppercase tracking-[0.1em]">Avoid now</span> {template.avoidNow}</p>
-              <p className="mt-2 text-xs text-sky-100"><span className="font-semibold uppercase tracking-[0.1em]">Flip/reversal trigger</span> {template.flipTrigger}</p>
+              <ul className="mt-2 space-y-2 text-xs">
+                <li className="rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3 py-1 text-emerald-100">
+                  <span className="font-semibold uppercase tracking-[0.1em]">Do now</span> {template.doNow}
+                </li>
+                <li className="rounded-full border border-rose-500/40 bg-rose-500/10 px-3 py-1 text-rose-100">
+                  <span className="font-semibold uppercase tracking-[0.1em]">Avoid now</span> {template.avoidNow}
+                </li>
+                <li className="rounded-full border border-sky-500/40 bg-sky-500/10 px-3 py-1 text-sky-100">
+                  <span className="font-semibold uppercase tracking-[0.1em]">Flip trigger</span> {template.flipTrigger}
+                </li>
+              </ul>
             </article>
           ))}
         </div>
