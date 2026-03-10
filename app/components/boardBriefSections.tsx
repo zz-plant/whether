@@ -104,11 +104,8 @@ export const WeeklyActionSummaryPanel = ({
 }) => {
   const regimeLabel = getRegimeLabel(assessment.regime);
   const actionGuidance = getWeeklyActionGuidance(assessment.regime);
-  const constraints = [
-    `Cash tightness: ${assessment.scores.tightness}/100`,
-    `Risk appetite: ${assessment.scores.riskAppetite}/100`,
-    `Execution mandate: Keep bets short-cycle and reversible.`,
-  ];
+  const guardrail = `Pause net-new commitments if tightness > ${assessment.thresholds.tightnessRegime + 6} or risk appetite < ${Math.max(assessment.thresholds.riskAppetiteRegime - 6, 0)}.`;
+  const flipCondition = `Loosen pace when tightness < ${Math.max(assessment.thresholds.tightnessRegime - 4, 0)} and risk appetite > ${Math.min(assessment.thresholds.riskAppetiteRegime + 4, 100)}.`;
 
   return (
     <section
@@ -119,36 +116,45 @@ export const WeeklyActionSummaryPanel = ({
       <div className="weather-panel space-y-5 px-5 py-5">
         <p className="type-label text-slate-400">Weekly plan</p>
         <h2 id="weekly-action-summary-title" className="type-section text-slate-100">
-          {regimeLabel} plan for this week
+          {regimeLabel} execution plan
         </h2>
-        <p className="text-sm text-slate-200">{actionGuidance}</p>
+
+        <div className="grid gap-2 md:grid-cols-3">
+          <article className="weather-surface rounded-lg border border-violet-500/45 bg-violet-500/10 px-3 py-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-violet-100">Decision now</p>
+            <p className="mt-1 text-sm text-slate-100">{actionGuidance}</p>
+          </article>
+          <article className="weather-surface rounded-lg border border-amber-500/45 bg-amber-500/10 px-3 py-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-amber-100">Guardrail</p>
+            <p className="mt-1 text-sm text-slate-100">{guardrail}</p>
+          </article>
+          <article className="weather-surface rounded-lg border border-sky-500/45 bg-sky-500/10 px-3 py-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">Flip condition</p>
+            <p className="mt-1 text-sm text-slate-100">{flipCondition}</p>
+          </article>
+        </div>
 
         <article className="weather-surface p-4">
           <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">
-            What’s limiting us this week
-          </h3>
-          <ul className="mt-3 space-y-2 text-sm text-slate-200">
-            {constraints.map((item) => (
-              <li key={item}>• {item}</li>
-            ))}
-          </ul>
-        </article>
-
-        <article className="weather-surface p-4">
-          <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">
-            How to operate this week
+            Weekly plan by lane
           </h3>
           <div className="mt-3 grid gap-3 md:grid-cols-3">
-            {postureBlocksByRegime[assessment.regime].map((block) => (
-              <section key={block.title} className="rounded-xl border border-slate-700/70 bg-slate-950/40 p-3">
-                <h4 className="text-sm font-semibold text-slate-100">{block.title}</h4>
-                <ul className="mt-2 space-y-1 text-sm text-slate-300">
-                  {block.bullets.map((bullet) => (
-                    <li key={bullet}>• {bullet}</li>
-                  ))}
-                </ul>
-              </section>
-            ))}
+            {postureBlocksByRegime[assessment.regime].map((block, index) => {
+              const [actionCue, watchCue] = block.bullets;
+
+              return (
+                <section key={block.title} className="rounded-xl border border-slate-700/70 bg-slate-950/40 p-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <h4 className="text-sm font-semibold text-slate-100">{block.title}</h4>
+                    <span className="rounded-full border border-slate-600/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">{index + 1}</span>
+                  </div>
+                  <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald-200">Action</p>
+                  <p className="mt-1 text-sm text-slate-200">{actionCue}</p>
+                  <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-amber-200">Watch</p>
+                  <p className="mt-1 text-xs text-slate-300">{watchCue}</p>
+                </section>
+              );
+            })}
           </div>
         </article>
 
@@ -207,9 +213,9 @@ export const ExecutiveSnapshotPanel = ({
           <div>
             <p className="type-label text-slate-400">Executive snapshot</p>
             <h3 id="executive-snapshot-title" className="type-section text-slate-100">
-              Rules of engagement this week
+              Decision snapshot for leadership this week
             </h3>
-            <p className="mt-2 text-sm text-slate-300">A quick decision view for this planning cycle.</p>
+            <p className="mt-2 text-sm text-slate-300">Use this strip to brief decision now, guardrail, and flip condition in one pass.</p>
           </div>
           <DataProvenanceStrip provenance={provenance} />
         </div>
@@ -251,12 +257,23 @@ export const ExecutiveSnapshotPanel = ({
               </Tooltip.Root>
             </div>
 
-            <p className="mt-3 text-lg font-semibold text-slate-100">
-              Right now: require clear ROI before approving new spend.
-            </p>
-            <ul className="mt-3 space-y-1 text-sm text-slate-300">
-              {constraintHighlights.map((constraint) => (
-                <li key={constraint}>• {constraint}</li>
+            <div className="mt-3 grid gap-2 md:grid-cols-3">
+              <article className="rounded-md border border-violet-500/45 bg-violet-500/10 px-3 py-2">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-violet-100">Decision now</p>
+                <p className="mt-1 text-sm font-semibold text-slate-100">Gate approvals to short-cycle ROI.</p>
+              </article>
+              <article className="rounded-md border border-amber-500/45 bg-amber-500/10 px-3 py-2">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-amber-100">Guardrail</p>
+                <p className="mt-1 text-xs text-slate-100">Pause commitments if tightness &gt; {assessment.thresholds.tightnessRegime + 6} or risk appetite &lt; {Math.max(assessment.thresholds.riskAppetiteRegime - 6, 0)}.</p>
+              </article>
+              <article className="rounded-md border border-sky-500/45 bg-sky-500/10 px-3 py-2">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">Flip condition</p>
+                <p className="mt-1 text-xs text-slate-100">Re-open pace when tightness &lt; {Math.max(assessment.thresholds.tightnessRegime - 4, 0)} and risk appetite &gt; {Math.min(assessment.thresholds.riskAppetiteRegime + 4, 100)}.</p>
+              </article>
+            </div>
+            <ul className="mt-3 grid gap-2 text-xs text-slate-300 sm:grid-cols-2">
+              {constraintHighlights.slice(0, 2).map((constraint) => (
+                <li key={constraint} className="rounded-md border border-slate-700/70 bg-slate-950/55 px-2.5 py-2">{constraint}</li>
               ))}
             </ul>
             <p className="mt-2 text-xs text-slate-500">{assessment.description}</p>
