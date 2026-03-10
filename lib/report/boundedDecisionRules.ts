@@ -1,6 +1,12 @@
 import type { RegimeKey } from "../regimeEngine";
 
-export type DecisionArea = "hiring" | "product-tempo" | "capital-raising" | "burn-discipline" | "expansion-bets";
+export type DecisionArea =
+  | "hiring"
+  | "sales-execution"
+  | "product-tempo"
+  | "capital-raising"
+  | "burn-discipline"
+  | "expansion-bets";
 
 export type BoundedDecisionRule = {
   area: DecisionArea;
@@ -25,10 +31,11 @@ type RuleContext = {
   };
 };
 
-const areaOrder: DecisionArea[] = ["hiring", "product-tempo", "capital-raising", "burn-discipline", "expansion-bets"];
+const areaOrder: DecisionArea[] = ["hiring", "sales-execution", "product-tempo", "capital-raising", "burn-discipline", "expansion-bets"];
 
 const areaLabels: Record<DecisionArea, string> = {
   hiring: "Hiring",
+  "sales-execution": "Sales execution",
   "product-tempo": "Product tempo",
   "capital-raising": "Capital raising",
   "burn-discipline": "Burn discipline",
@@ -68,6 +75,22 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
       pauseTrigger: `Pause net-new hiring if tightness > ${fmt(tightnessPause)} or risk appetite < ${fmt(riskPause)}.`,
       resumeTrigger: `Resume staged approvals when tightness < ${fmt(tightnessResume)} and risk appetite > ${fmt(riskResume)}.`,
       rationale: "Protect delivery capacity without locking in irreversible fixed-cost growth.",
+    },
+    "sales-execution": {
+      area: "sales-execution",
+      recommendation: isExpansion
+        ? "Press GTM execution on high-conviction segments with disciplined pipeline hygiene."
+        : "Protect win-rate quality; focus GTM on proven segments and shorter-cycle deals.",
+      doNow: isExpansion
+        ? ["Increase seller capacity only where conversion and cycle-time evidence stays strong."]
+        : ["Concentrate GTM effort on high-probability segments and enforce weekly pipeline quality reviews."],
+      avoidNow: isExpansion
+        ? ["Avoid broad outbound expansion into low-signal segments without conversion proof."]
+        : ["Avoid top-of-funnel volume pushes that degrade win rates or lengthen cycle times."],
+      scope: "Pipeline quality, segment focus, quota pacing, and deal-cycle discipline.",
+      pauseTrigger: `Pause GTM expansion if risk appetite < ${fmt(riskPause)} or two consecutive weeks show weaker conversion quality.`,
+      resumeTrigger: `Resume broader GTM expansion when risk appetite > ${fmt(riskResume)} and conversion quality improves for two reads.`,
+      rationale: "Sustained GTM efficiency protects revenue durability while keeping execution reversible.",
     },
     "product-tempo": {
       area: "product-tempo",

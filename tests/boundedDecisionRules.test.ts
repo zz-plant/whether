@@ -40,6 +40,10 @@ it("ensures every operating lever item includes bounded decision fields", () => 
 
   const items = buildActionStripItems(rules);
   assert.equal(items.length, 5);
+  const salesItem = items.find((item) => item.lever === "sales-posture");
+  assert.ok(salesItem);
+  assert.match(salesItem?.actionNow ?? "", /GTM|pipeline|conversion|sales/i);
+  assert.doesNotMatch(salesItem?.actionNow ?? "", /raise|fundraising|investor/i);
   for (const item of items) {
     assert.ok(item.label.trim().length > 0);
     assert.ok(item.actionNow.trim().length > 0);

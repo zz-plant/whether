@@ -62,7 +62,7 @@ export const buildActionStripItems = (rules: BoundedDecisionRule[]): ActionStrip
   ([
     { lever: "hiring-stance", area: "hiring" },
     { lever: "investment-pace", area: "burn-discipline" },
-    { lever: "sales-posture", area: "capital-raising" },
+    { lever: "sales-posture", area: "sales-execution" },
     { lever: "product-priorities", area: "product-tempo" },
     { lever: "risk-tolerance", area: "expansion-bets" },
   ] as const).map(({ lever, area }) => {

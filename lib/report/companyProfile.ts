@@ -140,6 +140,7 @@ const postureForPolicyPosture = (
 };
 
 const baseAreaPriority: Record<DecisionArea, number> = {
+  "sales-execution": 98,
   "capital-raising": 100,
   "burn-discipline": 95,
   hiring: 90,
