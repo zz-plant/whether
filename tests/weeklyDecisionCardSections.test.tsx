@@ -48,7 +48,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
     );
 
     assert.match(html, /Weekly Posture — Decision Call/);
-    assert.match(html, /Operating posture:/);
+    assert.match(html, /Immediate action:/);
     assert.match(html, /Startup capital cycle/);
     assert.match(html, /Distance to regime change:/);
     assert.match(html, /Founder playbook/);
@@ -191,7 +191,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
       <CitationActionFooter citationMetaLine="Posture DEFENSIVE" citation="Whether weekly brief citation" actions={<button type="button">Copy</button>} />,
     );
 
-    assert.match(detailsHtml, /Why this call ▼/);
+    assert.match(detailsHtml, /Why this posture call/);
     assert.match(detailsHtml, /Posture history/);
     assert.match(footerHtml, /Send to team/);
     assert.match(footerHtml, /hidden sm:flex sm:flex-wrap sm:gap-3/);
