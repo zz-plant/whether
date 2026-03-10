@@ -38,6 +38,7 @@ export async function DecisionAnswerPageContent({
     transitionWatch: homeBriefModel.transitionWatch,
     isFallbackSnapshot: !reportResult.ok,
     provenanceStatusLabel: reportData.treasuryProvenance?.statusLabel,
+    fetchedAtIso: reportData.treasury.fetched_at,
   });
   const liveShortAnswer = buildLiveShortAnswer({ payload, fallback: page.shortAnswer });
   const liveDirectAnswer = buildLiveDirectAnswer({ payload, fallback: page.directAnswer });
@@ -82,6 +83,11 @@ export async function DecisionAnswerPageContent({
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{page.title}</h1>
         <p className="text-base text-sky-200">{liveShortAnswer}</p>
         <p className="text-sm text-slate-300">{liveDirectAnswer}</p>
+        {payload.noindex ? (
+          <p className="rounded-md border border-amber-400/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
+            Degraded signal quality: this answer is shown in fallback mode and marked noindex until freshness, completeness, and provenance checks pass.
+          </p>
+        ) : null}
       </section>
 
       <section className="weather-panel space-y-4 px-6 py-6">
@@ -114,7 +120,7 @@ export async function DecisionAnswerPageContent({
         <h2 className="text-lg font-semibold text-slate-100">Citation</h2>
         <p className="text-xs text-slate-300">{callCitation}</p>
         <p className="text-xs text-slate-400">Data date: {recordDateLabel} · freshness: {fetchedAtLabel}.</p>
-        {payload.degraded ? <p className="text-xs text-amber-200">Degraded data mode: cached/stale signals detected, so this answer is marked noindex.</p> : null}
+        {payload.degraded ? <p className="text-xs text-amber-200">Degraded data mode: {payload.noindexReasons.join(", ") || "cached/stale signals"}; this answer is marked noindex.</p> : null}
       </section>
 
       <section className="weather-panel space-y-3 px-6 py-6">

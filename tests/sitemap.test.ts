@@ -21,8 +21,8 @@ import { stakeholderGuides } from "../app/guides/stakeholderGuides";
 import { roleLandings } from "../app/solutions/career-paths/roleLandingData";
 
 describe("sitemap", () => {
-  it("returns canonical URLs and includes posture, decide, learn, toolkit, and library routes", () => {
-    const entries = sitemap();
+  it("returns canonical URLs and includes posture, decide, learn, toolkit, and library routes", async () => {
+    const entries = await sitemap({ programmaticEligible: true });
 
     assert.ok(entries.length > 0);
     assert.ok(entries.every((entry) => entry.url.startsWith(siteUrl)));
@@ -83,8 +83,8 @@ describe("sitemap", () => {
     }
   });
 
-  it("uses valid last modified dates for root, static pages, and canon article pages", () => {
-    const entries = sitemap();
+  it("uses valid last modified dates for root, static pages, and canon article pages", async () => {
+    const entries = await sitemap({ programmaticEligible: true });
 
     const root = entries.find((entry) => entry.url === siteUrl);
     assert.ok(root?.lastModified instanceof Date);
@@ -105,5 +105,13 @@ describe("sitemap", () => {
         Date.UTC(firstConceptArticle.publishedYear, firstConceptArticle.publishedMonth - 1, 1),
       ).toISOString(),
     );
+  });
+
+  it("omits programmatic answer/regime URLs when eligibility fails", async () => {
+    const entries = await sitemap({ programmaticEligible: false });
+    const urls = new Set(entries.map((entry) => entry.url));
+
+    assert.ok(!urls.has(`${siteUrl}/answers/should-we-hire-engineers-right-now`));
+    assert.ok(!urls.has(`${siteUrl}/startup-macro-posture/scarcity`));
   });
 });
