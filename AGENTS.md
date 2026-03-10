@@ -10,7 +10,7 @@ It is to help an operator answer, fast:
 - What decisions should we revisit?
 - What artifact can we share in a meeting or Slack?
 
-Agents working in this repo should optimize for **decision transmission**, not UI ornament or framework sprawl.
+Agents working in this repo should optimize for **decision transmission** (a user can scan the weekly brief, decide what to do, and share the artifact in under a minute), not UI ornament or framework sprawl.
 
 ---
 
@@ -96,10 +96,10 @@ A weak change often does the opposite:
 Whether should increasingly feel like:
 
 - a weekly operating brief
-- a pacing authority
+- a pacing authority (it sets weekly operating tempo and how aggressively to tighten or loosen)
 - a meeting shorthand
 - a Slack screenshot product
-- a citeable decision artifact
+- a citeable decision artifact (claims and recommendations can be traced to fresh sources)
 
 It should feel less like:
 
@@ -111,6 +111,17 @@ It should feel less like:
 Agents should preserve and reinforce this direction in code, copy, and IA decisions.
 
 ---
+
+
+## Operational definitions (use these terms consistently)
+
+When writing product copy, specs, or PR notes, use these definitions:
+
+- **Decision transmission**: the operator can scan the brief, choose a posture/action, and share a meeting-ready artifact in under 60 seconds.
+- **Bounded decision**: includes a clear action, threshold/trigger, and reversal condition.
+- **Trust should be compact**: show provenance/confidence/freshness/fallback in-line or one click away; avoid long method exposition on primary screens.
+- **New-system overhead**: added maintenance cost across code paths, mental model complexity, and docs/testing burden.
+- **Thin SEO page**: any page missing current posture, immediate implication, citeable summary, or link-back to the weekly brief.
 
 ## Hard product rules
 
@@ -218,7 +229,7 @@ Optimize for:
 - 30-second decisiveness
 - visible decision delta
 - explicit revisit/hold logic
-- screenshot-safe compression
+- screenshot-safe compression (one screen, readable hierarchy, and copyable decision bullets)
 
 ### If working on playbooks
 Optimize for:
@@ -236,7 +247,7 @@ Optimize for:
 - citeable summary
 - strong links back to the weekly brief
 
-Do not ship thin SEO pages that outpace the strength of the core artifact.
+Do not ship thin SEO pages that outpace the strength of the core artifact (each page should include current posture, immediate implication, a citeable summary, and a clear link back to the weekly brief).
 
 ### If working on trust / data plumbing
 Optimize for:
@@ -267,7 +278,7 @@ If the task reveals drift between code and spec, note that explicitly.
 
 ## Testing expectations
 
-Run the smallest useful verification set.
+Run the smallest useful verification set, and prefer targeted checks that validate changed behavior.
 
 Examples:
 - targeted unit tests for logic changes
