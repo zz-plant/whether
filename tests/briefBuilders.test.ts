@@ -197,7 +197,13 @@ describe("buildSlackBrief", () => {
       transitionWatch: "ON",
       regimeDistancePoints: 2,
       actionStripItems: [
-        { area: "hiring", action: "Backfills only", threshold: "Pause net-new hiring if tightness > 76", reversalCondition: "Resume staged approvals when tightness < 66" },
+        {
+          lever: "hiring-stance",
+          label: "Hiring stance",
+          actionNow: "Backfills only",
+          triggerThreshold: "Pause net-new hiring if tightness > 76",
+          reversalCondition: "Resume staged approvals when tightness < 66",
+        },
       ],
     });
 
@@ -207,9 +213,10 @@ describe("buildSlackBrief", () => {
     assert.match(brief, /• Distance to regime change: 2\.0 points/);
     assert.match(brief, /• Regime shift watch: ON/);
     assert.match(brief, /• Operating posture: Stage decisions\. Avoid irreversible spend\./);
-    assert.match(brief, /• Action: Backfills only/);
-    assert.match(brief, /Threshold: Pause net-new hiring if tightness > 76/);
-    assert.match(brief, /Flip: Resume staged approvals when tightness < 66/);
+    assert.match(brief, /• Hiring stance/);
+    assert.match(brief, /Action now: Backfills only/);
+    assert.match(brief, /Trigger\/threshold to tighten or loosen: Pause net-new hiring if tightness > 76/);
+    assert.match(brief, /Reversal condition: Resume staged approvals when tightness < 66/);
   });
 
 

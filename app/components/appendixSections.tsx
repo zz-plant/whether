@@ -1957,10 +1957,11 @@ export const PlaybookPanel = ({
                   <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Action strip contract</p>
                   <ul className="mt-3 space-y-2 text-xs text-slate-300">
                     {actionStripItems.slice(0, 3).map((item) => (
-                      <li key={item.area} className="rounded-md border border-slate-700/70 bg-slate-900/70 p-2">
-                        <p className="font-semibold text-slate-100">{item.action}</p>
-                        <p className="mt-1 text-amber-100">Threshold: {item.threshold}</p>
-                        <p className="mt-1 text-sky-100">Flip: {item.reversalCondition}</p>
+                      <li key={item.lever} className="rounded-md border border-slate-700/70 bg-slate-900/70 p-2">
+                        <p className="font-semibold text-slate-100">{item.label}</p>
+                        <p className="mt-1 text-emerald-100">Action now: {item.actionNow}</p>
+                        <p className="mt-1 text-amber-100">Trigger/threshold to tighten or loosen: {item.triggerThreshold}</p>
+                        <p className="mt-1 text-sky-100">Reversal condition: {item.reversalCondition}</p>
                       </li>
                     ))}
                   </ul>

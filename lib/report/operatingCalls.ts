@@ -1,5 +1,6 @@
 import type { RegimeKey } from "../regimeEngine";
 import type { BoundedDecisionRule, DecisionArea } from "./boundedDecisionRules";
+import { operatingLeverLabel, type OperatingLeverKey } from "./decisionKnobs";
 
 export type OperatingCall = {
   hiring: string;
@@ -8,9 +9,10 @@ export type OperatingCall = {
 };
 
 export type ActionStripItem = {
-  area: DecisionArea;
-  action: string;
-  threshold: string;
+  lever: OperatingLeverKey;
+  label: string;
+  actionNow: string;
+  triggerThreshold: string;
   reversalCondition: string;
 };
 
@@ -57,15 +59,22 @@ const sanitizeFlip = (resumeTrigger: string) =>
 const isString = (value: string | undefined): value is string => typeof value === "string";
 
 export const buildActionStripItems = (rules: BoundedDecisionRule[]): ActionStripItem[] =>
-  rules.map((rule) => ({
-    area: rule.area,
-    // TODO(plan-week): Action strip generator now enforces explicit action text from bounded decision rules.
-    action: rule.recommendation,
-    // TODO(plan-week): Threshold field is required and mapped from pause trigger guardrails.
-    threshold: rule.pauseTrigger,
-    // TODO(plan-week): Reversal field is required and mapped from resume trigger flip conditions.
-    reversalCondition: rule.resumeTrigger,
-  }));
+  ([
+    { lever: "hiring-stance", area: "hiring" },
+    { lever: "investment-pace", area: "burn-discipline" },
+    { lever: "sales-posture", area: "capital-raising" },
+    { lever: "product-priorities", area: "product-tempo" },
+    { lever: "risk-tolerance", area: "expansion-bets" },
+  ] as const).map(({ lever, area }) => {
+    const rule = findRule(rules, area);
+    return {
+      lever,
+      label: operatingLeverLabel[lever],
+      actionNow: rule?.recommendation ?? "Keep current operating posture until a rule refresh is available.",
+      triggerThreshold: rule?.pauseTrigger ?? "Tighten only if confidence and threshold signals worsen.",
+      reversalCondition: rule?.resumeTrigger ?? "Loosen only when threshold conditions recover and hold.",
+    };
+  });
 
 export const buildRoleAwareOperatingTemplates = (rules: BoundedDecisionRule[]): RoleAwareOperatingTemplate[] => {
   const hiringRule = findRule(rules, "hiring");
