@@ -355,8 +355,8 @@ const signalImmediateImplication = (key: ReportDynamics["changedSignals"][number
   }
 
   return delta > 0
-    ? "Keep commitments staged while macro risk remains elevated."
-    : "Longer-payback work becomes incrementally safer if guardrails hold.";
+    ? "Longer-payback work becomes incrementally safer if guardrails hold."
+    : "Keep commitments staged while macro risk remains elevated.";
 };
 
 export const buildReportEvidenceItems = ({

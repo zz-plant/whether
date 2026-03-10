@@ -60,6 +60,27 @@ describe("buildHomeBriefModel", () => {
     assert.match(model.weeklyMovement.direction, /defensive|expansionary|neutral/);
   });
 
+  it("preserves all normalized evidence items including curve-slope", () => {
+    const model = buildHomeBriefModel({
+      assessment: {
+        regime: "DEFENSIVE",
+        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
+        scores: { tightness: 48, riskAppetite: 52 },
+      },
+      regimeAlert: null,
+      stopItems: ["Guardrail"],
+      reportEvidenceItems: [
+        { key: "tightness", title: "Capital conditions", supportingBullets: ["A"], confidenceLabel: "High", directionLabel: "Tightening", immediateImplication: "A" },
+        { key: "riskAppetite", title: "Risk appetite", supportingBullets: ["B"], confidenceLabel: "High", directionLabel: "Easing", immediateImplication: "B" },
+        { key: "baseRate", title: "Policy rate pressure", supportingBullets: ["C"], confidenceLabel: "Medium", directionLabel: "Unchanged", immediateImplication: "C" },
+        { key: "curveSlope", title: "Yield-curve signal", supportingBullets: ["D"], confidenceLabel: "Low", directionLabel: "Easing", immediateImplication: "D" },
+      ],
+    });
+
+    assert.equal(model.evidenceItems.length, 4);
+    assert.equal(model.evidenceItems[3]?.key, "curveSlope");
+  });
+
   it("returns no-change decision summary when there are no deltas", () => {
     const model = buildHomeBriefModel({
       assessment: {
