@@ -282,10 +282,10 @@ const ActionStrip = ({ items }: { items: ActionStripItem[] }) => (
           <p className="text-sm leading-6 font-semibold text-slate-100">{item.action}</p>
           <div className="mt-auto space-y-1.5 text-[11px]">
             <p className="rounded-full border border-amber-500/45 bg-amber-500/10 px-2.5 py-1 text-amber-100">
-              {compactActionCue(item.threshold)}
+              <span className="font-semibold">Guardrail:</span> {compactActionCue(item.threshold)}
             </p>
             <p className="rounded-full border border-sky-500/45 bg-sky-500/10 px-2.5 py-1 text-sky-100">
-              {compactActionCue(item.reversalCondition)}
+              <span className="font-semibold">Flip:</span> {compactActionCue(item.reversalCondition)}
             </p>
           </div>
         </li>
