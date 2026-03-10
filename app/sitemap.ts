@@ -17,6 +17,9 @@ import { stageGuides } from "./guides/stageGuides";
 import { stakeholderGuides } from "./guides/stakeholderGuides";
 import { roleLandings } from "./solutions/career-paths/roleLandingData";
 import { regimePages } from "./startup-macro-posture/clusterData";
+import { indexableSignalsClusters } from "./signals/clusterRoutes";
+import { indexableDecideClusterRoutes } from "./decide/clusterRoutes";
+import { indexableToolkitClusters } from "./toolkits/clusterRoutes";
 
 type ChangeFrequency = NonNullable<MetadataRoute.Sitemap[number]["changeFrequency"]>;
 
@@ -230,6 +233,27 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.64,
   }));
 
+  const signalsClusterEntries: SitemapEntryDescriptor[] = indexableSignalsClusters.map((cluster) => ({
+    path: `/signals/${cluster.slug}`,
+    lastModified: reportLastModified,
+    changeFrequency: "weekly",
+    priority: 0.68,
+  }));
+
+  const decideClusterEntries: SitemapEntryDescriptor[] = indexableDecideClusterRoutes.map((clusterRoute) => ({
+    path: `/decide/${clusterRoute.slug}/${clusterRoute.cluster}`,
+    lastModified: staticContentLastModified,
+    changeFrequency: "monthly",
+    priority: 0.62,
+  }));
+
+  const toolkitClusterEntries: SitemapEntryDescriptor[] = indexableToolkitClusters.map((clusterRoute) => ({
+    path: `/toolkits/${clusterRoute.slug}/${clusterRoute.cluster}`,
+    lastModified: staticContentLastModified,
+    changeFrequency: "monthly",
+    priority: 0.62,
+  }));
+
   return [
     ...coreEntries,
     ...postureEntries,
@@ -249,5 +273,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...careerRoleEntries,
     ...conceptFocusEntries,
     ...conceptAudienceEntries,
+    ...signalsClusterEntries,
+    ...decideClusterEntries,
+    ...toolkitClusterEntries,
   ].map(buildEntry);
 }
