@@ -6,18 +6,18 @@
   color-scheme: dark;
   --display-drift-distance: 2px;
   --display-drift-duration: 45s;
-  --shell-glow: rgba(56, 189, 248, 0.18);
-  --shell-glow-secondary: rgba(99, 102, 241, 0.16);
-  --shell-glow-tertiary: rgba(45, 212, 191, 0.08);
-  --surface-edge: rgba(99, 102, 241, 0.1);
-  --surface-sheen: rgba(148, 163, 184, 0.08);
-  --surface-elevated: rgba(56, 189, 248, 0.05);
+  --shell-glow: rgba(244, 196, 120, 0.14);
+  --shell-glow-secondary: rgba(217, 164, 94, 0.12);
+  --shell-glow-tertiary: rgba(250, 204, 153, 0.08);
+  --surface-edge: rgba(148, 163, 184, 0.18);
+  --surface-sheen: rgba(255, 237, 213, 0.1);
+  --surface-elevated: rgba(245, 158, 11, 0.06);
 }
 
 html {
   scroll-behavior: smooth;
   color-scheme: dark;
-  background-color: #020617;
+  background-color: #0b1120;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
@@ -29,11 +29,11 @@ body {
 }
 
 .weather-shell {
-  background-color: #020617;
+  background-color: #0b1120;
   background-image:
-    radial-gradient(960px 480px at 50% -8%, rgba(56, 189, 248, 0.07), transparent 66%),
-    radial-gradient(640px 380px at 88% 96%, rgba(99, 102, 241, 0.05), transparent 74%),
-    linear-gradient(180deg, rgba(2, 6, 23, 1) 0%, rgba(4, 9, 20, 0.99) 46%, rgba(2, 6, 23, 1) 100%);
+    radial-gradient(960px 480px at 50% -8%, rgba(245, 158, 11, 0.08), transparent 66%),
+    radial-gradient(640px 380px at 88% 96%, rgba(251, 191, 36, 0.06), transparent 74%),
+    linear-gradient(180deg, rgb(5, 8, 18) 0%, rgb(9, 13, 26) 46%, rgb(4, 8, 19) 100%);
 }
 
 .weather-grid {
@@ -43,9 +43,9 @@ body {
 
 .weather-aurora {
   background-image:
-    radial-gradient(60% 50% at 15% 10%, rgba(14, 165, 233, 0.1), transparent 65%),
-    radial-gradient(54% 44% at 84% 14%, rgba(56, 189, 248, 0.08), transparent 62%),
-    radial-gradient(48% 42% at 58% 30%, rgba(99, 102, 241, 0.08), transparent 72%);
+    radial-gradient(60% 50% at 15% 10%, rgba(251, 191, 36, 0.1), transparent 65%),
+    radial-gradient(54% 44% at 84% 14%, rgba(125, 211, 252, 0.08), transparent 62%),
+    radial-gradient(48% 42% at 58% 30%, rgba(180, 83, 9, 0.08), transparent 72%);
   filter: blur(36px);
   opacity: 0.2;
   animation: none;
@@ -53,12 +53,12 @@ body {
 }
 
 .weather-haze {
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.32) 0%, rgba(2, 6, 23, 0.55) 70%);
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.34) 0%, rgba(2, 6, 23, 0.58) 70%);
 }
 
 .weather-panel {
   @apply rounded-[20px] border border-slate-700/55 bg-slate-950/90 backdrop-blur-sm;
-  background-image: linear-gradient(180deg, rgba(15, 23, 42, 0.62), rgba(2, 6, 23, 0.7));
+  background-image: linear-gradient(180deg, rgba(30, 24, 20, 0.64), rgba(3, 8, 20, 0.78));
   box-shadow:
     0 20px 30px -28px rgba(2, 6, 23, 0.9),
     inset 0 1px 0 rgba(148, 163, 184, 0.08),
@@ -66,8 +66,8 @@ body {
 }
 
 .weather-appbar {
-  @apply rounded-[20px] border border-slate-700/80 bg-slate-950/90 backdrop-blur-sm;
-  background-image: linear-gradient(180deg, rgba(15, 23, 42, 0.54), rgba(2, 6, 23, 0.78));
+  @apply rounded-[20px] border border-slate-700/75 bg-slate-950/90 backdrop-blur-sm;
+  background-image: linear-gradient(180deg, rgba(29, 24, 21, 0.62), rgba(3, 8, 20, 0.82));
   box-shadow:
     0 16px 28px -24px rgba(2, 6, 23, 0.84),
     inset 0 1px 0 rgba(148, 163, 184, 0.09),
@@ -75,8 +75,8 @@ body {
 }
 
 .weather-panel-static {
-  @apply rounded-[22px] border border-slate-700/65 bg-slate-950/65;
-  background-image: linear-gradient(156deg, rgba(56, 189, 248, 0.05), rgba(15, 23, 42, 0.18) 70%);
+  @apply rounded-[22px] border border-slate-700/60 bg-slate-950/65;
+  background-image: linear-gradient(156deg, rgba(245, 158, 11, 0.08), rgba(15, 23, 42, 0.22) 70%);
   box-shadow:
     0 16px 30px -24px rgba(2, 6, 23, 0.68),
     0 0 0 1px rgba(56, 189, 248, 0.05),
@@ -85,8 +85,8 @@ body {
 }
 
 .weather-tile {
-  @apply rounded-2xl border border-slate-800/75 bg-slate-950/75 backdrop-blur-xl;
-  background-image: linear-gradient(158deg, rgba(56, 189, 248, 0.08), rgba(99, 102, 241, 0.06) 50%, rgba(2, 6, 23, 0.18) 76%);
+  @apply rounded-2xl border border-slate-800/70 bg-slate-950/75 backdrop-blur-xl;
+  background-image: linear-gradient(158deg, rgba(245, 158, 11, 0.08), rgba(125, 211, 252, 0.04) 50%, rgba(2, 6, 23, 0.2) 76%);
   box-shadow:
     0 20px 34px -28px rgba(2, 6, 23, 0.76),
     0 0 0 1px rgba(99, 102, 241, 0.09),
@@ -107,13 +107,13 @@ body {
 }
 
 .weather-forecast-card {
-  @apply rounded-2xl border border-slate-700/75 bg-slate-950/70 p-3;
+  @apply rounded-2xl border border-slate-700/70 bg-slate-950/70 p-3;
   display: flex;
   gap: 0.75rem;
   align-items: flex-start;
   min-height: 8.5rem;
   padding: 0.95rem;
-  background-image: linear-gradient(150deg, rgba(56, 189, 248, 0.05), rgba(99, 102, 241, 0.04) 56%, rgba(2, 6, 23, 0.16));
+  background-image: linear-gradient(150deg, rgba(245, 158, 11, 0.08), rgba(99, 102, 241, 0.04) 56%, rgba(2, 6, 23, 0.16));
   box-shadow:
     0 16px 28px -22px rgba(2, 6, 23, 0.72),
     0 0 0 1px rgba(56, 189, 248, 0.05),
@@ -152,16 +152,16 @@ body {
 
 .weather-icon-chip {
   @apply inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-700/70 bg-slate-900/70;
-  background-image: linear-gradient(150deg, rgba(30, 41, 59, 0.6), rgba(2, 6, 23, 0.8));
+  background-image: linear-gradient(150deg, rgba(51, 40, 31, 0.56), rgba(2, 6, 23, 0.8));
   box-shadow:
     inset 0 0 0 1px rgba(15, 23, 42, 0.45),
-    0 10px 24px -18px rgba(56, 189, 248, 0.32),
-    0 0 12px rgba(56, 189, 248, 0.12);
+    0 10px 24px -18px rgba(245, 158, 11, 0.2),
+    0 0 12px rgba(245, 158, 11, 0.1);
 }
 
 .weather-surface {
   @apply rounded-2xl border border-slate-700/65 bg-slate-950/75 backdrop-blur;
-  background-image: linear-gradient(180deg, rgba(15, 23, 42, 0.55), rgba(2, 6, 23, 0.68));
+  background-image: linear-gradient(180deg, rgba(30, 24, 21, 0.58), rgba(2, 6, 23, 0.7));
   box-shadow:
     inset 0 1px 0 rgba(186, 230, 253, 0.06),
     inset 0 0 0 1px rgba(15, 23, 42, 0.45);
@@ -250,7 +250,7 @@ body {
 
 .weather-chip {
   @apply rounded-full border border-slate-700/70 bg-slate-900/70 text-slate-100;
-  background-image: linear-gradient(180deg, rgba(30, 41, 59, 0.62), rgba(2, 6, 23, 0.78));
+  background-image: linear-gradient(180deg, rgba(51, 40, 31, 0.58), rgba(2, 6, 23, 0.78));
   box-shadow: inset 0 1px 0 rgba(186, 230, 253, 0.09);
 }
 
@@ -258,7 +258,7 @@ body {
   @apply rounded-full border border-slate-700/70 bg-slate-950/75 backdrop-blur;
   min-height: 44px;
   padding-inline: 0.9rem;
-  background-image: linear-gradient(180deg, rgba(30, 41, 59, 0.58), rgba(2, 6, 23, 0.78));
+  background-image: linear-gradient(180deg, rgba(51, 40, 31, 0.5), rgba(2, 6, 23, 0.78));
 }
 
 .weather-pill-muted {
@@ -273,7 +273,7 @@ body {
   box-shadow:
     inset 0 0 0 1px rgba(15, 23, 42, 0.35),
     0 18px 30px -20px rgba(2, 6, 23, 0.66),
-    0 6px 14px -12px rgba(56, 189, 248, 0.24);
+    0 6px 14px -12px rgba(245, 158, 11, 0.16);
   transition:
     transform 200ms ease,
     border-color 200ms ease,

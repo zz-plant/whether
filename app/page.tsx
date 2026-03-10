@@ -55,13 +55,13 @@ const ExecutiveSnapshotPanel = dynamic(
 
 const WeeklyActionSummaryFallback = () => (
   <section id="weekly-action-summary" aria-label="Weekly action summary" className="space-y-8">
-    <div className="weather-panel px-5 py-5 text-sm text-slate-300">Loading weekly action summary…</div>
+    <div className="weather-panel px-5 py-5 text-sm text-slate-200">Putting together this week&apos;s action summary…</div>
   </section>
 );
 
 const ExecutiveSnapshotFallback = () => (
   <section id="executive-snapshot" aria-label="Leadership summary" className="space-y-8">
-    <div className="weather-panel px-5 py-5 text-sm text-slate-300">Loading evidence snapshot…</div>
+    <div className="weather-panel px-5 py-5 text-sm text-slate-200">Collecting the latest evidence snapshot…</div>
   </section>
 );
 
@@ -162,14 +162,14 @@ type HomePageSearchParams = {
 const HomePageStreamingFallback = () => (
   <section aria-label="Loading weekly operating posture" className="space-y-6">
     <section className="weather-panel space-y-4 px-5 py-5" aria-live="polite" aria-busy="true">
-      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Loading this week&apos;s call</p>
-      <p className="text-sm text-slate-200">
-        Building your decision delta for this week.
+      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Preparing this week&apos;s call</p>
+      <p className="text-sm text-slate-100">
+        We&apos;re assembling your weekly decision brief.
       </p>
       <ol className="grid gap-2 text-xs text-slate-300 sm:grid-cols-3">
-        <li className="rounded-lg border border-cyan-500/40 bg-cyan-500/10 px-2.5 py-2">1. Refresh signals</li>
+        <li className="rounded-lg border border-amber-300/30 bg-amber-300/10 px-2.5 py-2">1. Refresh signals</li>
         <li className="rounded-lg border border-slate-700/90 bg-slate-900/60 px-2.5 py-2">2. Set posture + guardrails</li>
-        <li className="rounded-lg border border-slate-700/90 bg-slate-900/60 px-2.5 py-2">3. Prepare share-ready brief</li>
+        <li className="rounded-lg border border-slate-700/90 bg-slate-900/60 px-2.5 py-2">3. Prepare a share-ready brief</li>
       </ol>
       <div className="space-y-3 rounded-xl border border-slate-700/80 bg-slate-900/70 p-3">
         <div className="h-3 w-32 animate-pulse rounded-full bg-slate-600/80" />
@@ -177,10 +177,10 @@ const HomePageStreamingFallback = () => (
         <div className="h-4 w-11/12 animate-pulse rounded-full bg-slate-500/70" />
         <div className="h-3 w-40 animate-pulse rounded-full bg-slate-600/80" />
       </div>
-      <p className="text-xs text-slate-400">Usually ready in under 10 seconds.</p>
+      <p className="text-xs text-slate-300">Usually ready in under 10 seconds.</p>
     </section>
     <section className="weather-panel space-y-4 px-5 py-5" aria-label="Loading evidence">
-      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Loading evidence snapshot</p>
+      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Loading evidence snapshot</p>
       <div className="space-y-2 rounded-xl border border-slate-700/80 bg-slate-900/70 p-3">
         <div className="h-3 w-full animate-pulse rounded-full bg-slate-600/70" />
         <div className="h-3 w-full animate-pulse rounded-full bg-slate-600/70" />
@@ -534,13 +534,13 @@ const HomePageReportContent = async ({
 
       <details className="weather-panel space-y-4 px-5 py-4" id="why-whether">
         <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">
-          Optional context and playbooks
+          Optional context and decision playbooks
         </summary>
         <div className="space-y-5 pt-4">
           <section className="space-y-4" aria-label="Why Whether versus alternatives">
             <div className="space-y-1">
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Why Whether</p>
-              <h2 className="text-base font-semibold text-slate-100">Built for a weekly operating call, not just analysis</h2>
+              <h2 className="text-base font-semibold text-slate-100">Built for a weekly operating call, not just macro analysis</h2>
             </div>
             <div className="overflow-x-auto">
               <table className="min-w-full text-left text-xs text-slate-200">
@@ -575,7 +575,7 @@ const HomePageReportContent = async ({
           <section className="space-y-4" aria-label="Decision concept links">
             <div className="space-y-1">
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Decision playbooks</p>
-              <h2 className="text-base font-semibold text-slate-100">Revisit these concept playbooks before finalizing this week&apos;s plan</h2>
+              <h2 className="text-base font-semibold text-slate-100">Use these quick playbooks before finalizing this week&apos;s plan</h2>
             </div>
             <div className="grid gap-3 md:grid-cols-3">
               {featuredConcepts.map((concept) => (
