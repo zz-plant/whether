@@ -101,4 +101,42 @@ describe("live short answers", () => {
     assert.match(directAnswer, /Trigger:/);
     assert.match(directAnswer, /Reverse:/);
   });
+
+  it("prioritizes page decision-area order when picking the primary direct-answer rule", () => {
+    const page = findDecisionPage("when-should-startups-cut-burn");
+    assert.ok(page);
+
+    const directAnswer = buildLiveDirectAnswer({
+      page,
+      assessment: {
+        regime: "EXPANSION",
+        thresholds: sampleAssessment.thresholds,
+      },
+      mappedRules: [
+        {
+          area: "capital-raising",
+          recommendation: "Run financing from quality and downside protections.",
+          doNow: [],
+          avoidNow: [],
+          scope: "Fundraising process",
+          pauseTrigger: "Pause if spread costs jump.",
+          resumeTrigger: "Resume when spread costs normalize.",
+          rationale: "Protects financing outcomes",
+        },
+        {
+          area: "burn-discipline",
+          recommendation: "Pre-commit burn cuts before crossing tightness thresholds.",
+          doNow: [],
+          avoidNow: [],
+          scope: "Runway and spend controls",
+          pauseTrigger: "Pause discretionary spend when net burn exceeds plan.",
+          resumeTrigger: "Resume selective spend after two clean months.",
+          rationale: "Protects runway",
+        },
+      ],
+      fallback: "fallback direct answer",
+    });
+
+    assert.match(directAnswer, /Primary call for Burn discipline:/);
+  });
 });
