@@ -97,6 +97,8 @@ const tierThreePanel = "rounded-xl border border-slate-800/40 bg-slate-950/40 p-
 const tierOneInset = "rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3";
 const tierTwoInset = "rounded-md border border-slate-700/55 bg-slate-950/58 px-3 py-3";
 const tierThreeInset = "rounded-md border border-slate-800/35 bg-slate-950/34 px-2.5 py-2.5 text-slate-400";
+const compactSectionSpacing = "space-y-2";
+const compactInset = "rounded-md border border-slate-800/45 bg-slate-950/48 px-2.5 py-2";
 const neutralLabel = "font-semibold tracking-[0.01em] text-slate-300";
 const disclosureSummaryClass =
   "flex min-h-[44px] w-full items-center justify-between gap-3 rounded-md border border-slate-700/70 bg-slate-950/65 px-3 py-2 text-left text-xs font-semibold tracking-[0.01em] text-slate-100 transition hover:border-slate-500/70 hover:bg-slate-900/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300";
@@ -480,76 +482,92 @@ export function MoreContextDisclosureBody({
   whyThisCall,
   memoryRail,
   historicalTimeline,
-  historicalAnalogs,
+  historicalAnalogs: _historicalAnalogs,
   macroOverlay,
 }: MoreContextDisclosureProps) {
   return (
-    <div className="space-y-4">
-      <article className="space-y-2">
-        <h2 className={tierTwoHeading}>Startup Climate Index (context)</h2>
-        <p className="text-xs text-slate-300">Context metric for continuity: {startupClimateIndex.score} / 100 · {startupClimateIndex.status}</p>
-        <ul className="mt-2 grid gap-2 sm:grid-cols-2">
-          {startupClimateIndex.breakdown.map((item) => (
-            <li key={item.label} className="space-y-1">
-              <div className="flex items-center justify-between gap-2">
-                <span>{item.label}</span>
-                <span className="font-semibold text-slate-100">{item.score}</span>
-              </div>
-              <div className="h-2 rounded-full bg-slate-800">
-                <div className="h-2 rounded-full bg-sky-300/70" style={{ width: `${Math.max(5, Math.min(100, item.score))}%` }} />
-              </div>
-            </li>
-          ))}
-        </ul>
-      </article>
+    <div className="space-y-2.5">
+      <details className="group rounded-lg border border-slate-800/45 bg-slate-950/38 px-2.5 py-2">
+        <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
+          <span>Startup Climate Index (context)</span>
+          <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
+        </summary>
+        <div className="mt-2 space-y-2">
+          <p className="text-xs text-slate-300">Context metric for continuity: {startupClimateIndex.score} / 100 · {startupClimateIndex.status}</p>
+          <ul className="grid gap-1.5 sm:grid-cols-2">
+            {startupClimateIndex.breakdown.map((item) => (
+              <li key={item.label} className="space-y-1 text-xs">
+                <div className="flex items-center justify-between gap-2">
+                  <span>{item.label}</span>
+                  <span className="font-semibold text-slate-100">{item.score}</span>
+                </div>
+                <div className="h-1.5 rounded-full bg-slate-800">
+                  <div className="h-1.5 rounded-full bg-sky-300/70" style={{ width: `${Math.max(5, Math.min(100, item.score))}%` }} />
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </details>
 
-      <article className="space-y-2">
-        <h2 className={tierTwoHeading}>Supporting evidence</h2>
-        <ul className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+      <details className="group rounded-lg border border-slate-800/45 bg-slate-950/38 px-2.5 py-2">
+        <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
+          <span>Supporting evidence</span>
+          <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
+        </summary>
+        <ul className="mt-2 grid gap-1.5 sm:grid-cols-2 lg:grid-cols-3">
           {primaryDrivers.map((driver) => (
-            <li key={driver.label} className={`${tierTwoInset} text-xs text-slate-200`}>
+            <li key={driver.label} className={`${compactInset} text-xs text-slate-200`}>
               <p className="font-semibold text-slate-300">{driver.label}</p>
               <p className="mt-1 leading-5 text-slate-300">{driver.detail}</p>
             </li>
           ))}
         </ul>
-      </article>
+      </details>
 
-      <article className="space-y-2">
-        <h2 className={tierTwoHeading}>Why this posture call</h2>
-        <ul className="mt-2 grid gap-2 sm:grid-cols-3">
+      <details className="group rounded-lg border border-slate-800/45 bg-slate-950/38 px-2.5 py-2">
+        <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
+          <span>Why this posture call</span>
+          <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
+        </summary>
+        <ul className="mt-2 grid gap-1.5 sm:grid-cols-3">
           {whyThisCall.map((reason) => (
-            <li key={reason.label} className={`${tierTwoInset} text-xs text-slate-200`}>
+            <li key={reason.label} className={`${compactInset} text-xs text-slate-200`}>
               <p className="font-semibold text-slate-300">{reason.label}</p>
               <p className="mt-1 leading-5 text-slate-300">{reason.detail}</p>
             </li>
           ))}
         </ul>
-      </article>
+      </details>
 
-      <article className="space-y-3">
-        <h2 className={tierThreeHeading}>Posture history</h2>
-        <PostureHistoryTimeline historicalTimeline={historicalTimeline} />
-        <div>
-          <p className={tierThreeHeading}>Historical memory rail</p>
-          <ul className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-            {memoryRail.map((item) => (
-              <li key={`${item.label}-${item.posture}`} className={`${tierThreeInset} text-xs text-slate-200`}>
-                <p className="text-slate-400">{item.label}</p>
-                <p className="mt-1 font-semibold text-slate-100">{item.posture}</p>
+      <details className="group rounded-lg border border-slate-800/45 bg-slate-950/38 px-2.5 py-2">
+        <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
+          <span>Posture history and overlays</span>
+          <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
+        </summary>
+        <div className="mt-2 space-y-2">
+          <PostureHistoryTimeline historicalTimeline={historicalTimeline} />
+          <div>
+            <p className={tierThreeHeading}>Historical memory rail</p>
+            <ul className="mt-1.5 grid gap-1.5 sm:grid-cols-2 lg:grid-cols-4">
+              {memoryRail.map((item) => (
+                <li key={`${item.label}-${item.posture}`} className={`${compactInset} text-xs text-slate-200`}>
+                  <p className="text-slate-400">{item.label}</p>
+                  <p className="mt-1 font-semibold text-slate-100">{item.posture}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <ul className="grid gap-1.5 text-xs text-slate-300 sm:grid-cols-2 lg:grid-cols-4">
+            {macroOverlay.map((item) => (
+              <li key={item.label} className={compactInset}>
+                <p className="font-semibold text-slate-200">{item.label}</p>
+                <p className="mt-1 leading-5 text-slate-300">{item.detail}</p>
               </li>
             ))}
           </ul>
         </div>
-        <ul className="grid gap-2 text-xs text-slate-300 sm:grid-cols-2 lg:grid-cols-4">
-          {macroOverlay.map((item) => (
-            <li key={item.label} className={tierThreeInset}>
-              <p className="font-semibold text-slate-200">{item.label}</p>
-              <p className="mt-1 leading-5 text-slate-300">{item.detail}</p>
-            </li>
-          ))}
-        </ul>
-      </article>
+      </details>
     </div>
   );
 }
@@ -773,15 +791,18 @@ export function WeeklyDecisionCard({
           </div>
         </article>
 
-        <article className={`${tierOnePanel} ${sectionSpacing}`}>
-          <h2 className={tierOneHeading}>Monitoring panel</h2>
-          <ul className="space-y-1.5 text-xs text-slate-200">
+        <details className={`${tierThreePanel} ${compactSectionSpacing} group`}>
+          <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
+            <span>Monitoring panel (secondary)</span>
+            <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
+          </summary>
+          <ul className="mt-1.5 space-y-1 text-xs text-slate-200">
             {macroMovementRows.filter((signal) => signal.delta !== 0).slice(0, 3).map((signal) => (
               <li key={`watch-${signal.key}`}>• {signalActionRuleText[signal.key]}</li>
             ))}
             <li>• Flip watch: {regimeDistance.dimensionLabel} {regimeDistance.thresholdDirection === "riseAbove" ? "rises above" : "falls to or below"} {regimeDistance.thresholdValue.toFixed(1)}.</li>
           </ul>
-        </article>
+        </details>
       </div>
 
       <article className={`${tierOnePanel} ${sectionSpacing} bg-gradient-to-r from-slate-950/92 via-slate-900/85 to-slate-950/92`}>
@@ -830,34 +851,34 @@ export function WeeklyDecisionCard({
         </div>
       </article>
 
-      <details id="evidence-diagnostics" className={`${tierTwoPanel} ${sectionSpacing} group`}>
+      <details id="evidence-diagnostics" className={`${tierThreePanel} ${compactSectionSpacing} group`}>
         <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
           <span>Inspect call evidence and failure risks (secondary)</span>
           <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
         </summary>
-        <div className="mt-3 space-y-4">
-          <article className={tierOneInset}>
+        <div className="mt-2 space-y-2">
+          <article className={compactInset}>
             <p className={`text-xs ${neutralLabel}`}>See the deltas that moved this call</p>
-            <p className="mt-2 text-xs text-slate-200">Top contributors: {topContributorInline}</p>
-            <p className="mt-2 text-xs text-slate-300">Transition pace: {regimeVelocity.displayLabel} · Velocity: {movementVelocity}</p>
+            <p className="mt-1 text-xs text-slate-200">Top contributors: {topContributorInline}</p>
+            <p className="mt-1 text-xs text-slate-300">Transition pace: {regimeVelocity.displayLabel} · Velocity: {movementVelocity}</p>
           </article>
-          <article className={tierOneInset}>
+          <article className={compactInset}>
             <p className={`text-xs ${neutralLabel}`}>See where pressure rose vs cooled</p>
-            <ul className="mt-2 space-y-1.5 text-xs text-slate-200">
+            <ul className="mt-1 space-y-1 text-xs text-slate-200">
               {macroMovementRows.map((signal) => (
                 <li key={`evidence-${signal.key}`}>{renderSignalLabel(signal.key, signal.label)}: {signal.delta > 0 ? `+${signal.delta.toFixed(1)}` : signal.delta.toFixed(1)} ({signal.significance})</li>
               ))}
             </ul>
           </article>
-          <article className={tierOneInset}>
+          <article className={compactInset}>
             <p className={`text-xs ${neutralLabel}`}>Flip when</p>
             <p className="text-xs text-slate-300">More expansionary: {compactActionCue(effectiveFlipThreshold)}</p>
             <p className="mt-1 text-xs text-slate-300">More defensive: {compactActionCue(effectiveGuardrail)}</p>
           </article>
           {failureModes.length > 0 ? (
-            <article className={tierOneInset}>
+            <article className={compactInset}>
               <p className={`text-xs ${neutralLabel}`}>False-signal warnings</p>
-              <ul className="mt-2 space-y-1 text-xs text-slate-300">
+              <ul className="mt-1 space-y-1 text-xs text-slate-300">
                 {failureModes.slice(0, 2).map((mode) => (
                   <li key={mode.id}>• {mode.warning}</li>
                 ))}
