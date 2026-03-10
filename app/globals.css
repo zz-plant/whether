@@ -340,6 +340,46 @@ body {
     background-position 200ms ease;
 }
 
+.weather-cta {
+  @apply inline-flex items-center justify-center rounded-full border text-xs font-semibold leading-tight tracking-[0.12em] no-underline;
+  min-height: 44px;
+  padding: 0.5rem 1rem;
+  transition:
+    transform 200ms ease,
+    border-color 200ms ease,
+    box-shadow 200ms ease,
+    color 200ms ease,
+    background-color 200ms ease;
+}
+
+.weather-cta-primary {
+  border-color: rgba(56, 189, 248, 0.72);
+  color: rgb(241 245 249);
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.72), rgba(56, 189, 248, 0.34));
+  box-shadow:
+    0 20px 36px -22px rgba(14, 165, 233, 0.75),
+    0 6px 16px -12px rgba(125, 211, 252, 0.4),
+    inset 0 0 0 1px rgba(2, 6, 23, 0.35);
+}
+
+.weather-cta-secondary {
+  border-color: rgba(51, 65, 85, 0.82);
+  color: rgb(241 245 249);
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.9), rgba(2, 6, 23, 0.75));
+  box-shadow:
+    inset 0 0 0 1px rgba(15, 23, 42, 0.42),
+    0 12px 20px -16px rgba(2, 6, 23, 0.82);
+}
+
+.weather-cta-export {
+  border-color: rgba(56, 189, 248, 0.62);
+  color: rgb(224 242 254);
+  background: linear-gradient(180deg, rgba(14, 116, 144, 0.32), rgba(2, 6, 23, 0.78));
+  box-shadow:
+    inset 0 0 0 1px rgba(14, 165, 233, 0.2),
+    0 12px 22px -18px rgba(14, 165, 233, 0.4);
+}
+
 .weather-pill,
 .weather-icon-chip,
 .weather-surface {
@@ -379,6 +419,36 @@ body {
       inset 0 0 0 1px rgba(2, 6, 23, 0.35);
   }
 
+  .weather-cta-primary:hover,
+  .weather-cta-secondary:hover,
+  .weather-cta-export:hover {
+    transform: translateY(-1px);
+  }
+
+  .weather-cta-primary:hover {
+    border-color: rgba(125, 211, 252, 0.9);
+    box-shadow:
+      0 20px 40px -24px rgba(14, 165, 233, 0.75),
+      0 8px 18px -14px rgba(125, 211, 252, 0.4),
+      inset 0 0 0 1px rgba(2, 6, 23, 0.35);
+  }
+
+  .weather-cta-secondary:hover {
+    border-color: rgba(129, 140, 248, 0.42);
+    box-shadow:
+      inset 0 0 0 1px rgba(15, 23, 42, 0.45),
+      0 20px 32px -22px rgba(2, 6, 23, 0.9),
+      0 8px 18px -14px rgba(99, 102, 241, 0.24);
+  }
+
+  .weather-cta-export:hover {
+    border-color: rgba(125, 211, 252, 0.74);
+    box-shadow:
+      inset 0 0 0 1px rgba(14, 165, 233, 0.24),
+      0 20px 32px -22px rgba(14, 165, 233, 0.45),
+      0 8px 18px -14px rgba(125, 211, 252, 0.28);
+  }
+
   .weather-icon-chip:hover {
     transform: translateY(-1px);
     border-color: rgba(125, 211, 252, 0.5);
@@ -393,6 +463,7 @@ body {
 .weather-pill:active,
 .weather-button:active,
 .weather-button-primary:active,
+.weather-cta:active,
 .weather-icon-chip:active {
   transform: translateY(1px);
 }
@@ -565,6 +636,7 @@ html {
 .weather-button:focus-visible,
 .weather-button-primary:focus-visible,
 .weather-pill:focus-visible,
+.weather-cta:focus-visible,
 .weather-tab:focus-visible {
   outline: 3px solid rgba(165, 243, 252, 0.98);
   outline-offset: 3px;
@@ -801,6 +873,7 @@ summary:focus-visible {
 :root[data-display-mode="tv"] .weather-pill,
 :root[data-display-mode="tv"] .weather-button,
 :root[data-display-mode="tv"] .weather-button-primary,
+:root[data-display-mode="tv"] .weather-cta,
 :root[data-display-mode="tv"] .weather-tab {
   min-height: 56px;
 }
@@ -1054,6 +1127,34 @@ summary:focus-visible {
   box-shadow:
     0 14px 24px -18px rgba(14, 116, 144, 0.36),
     inset 0 0 0 1px rgba(224, 242, 254, 0.58);
+}
+
+
+:root[data-theme="light"] .weather-cta-secondary {
+  border-color: rgba(100, 116, 139, 0.5);
+  color: #0f172a;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(241, 245, 249, 0.94));
+  box-shadow:
+    inset 0 0 0 1px rgba(148, 163, 184, 0.35),
+    0 14px 24px -20px rgba(15, 23, 42, 0.28);
+}
+
+:root[data-theme="light"] .weather-cta-primary {
+  border-color: rgba(14, 116, 144, 0.45);
+  color: #0b2538;
+  background: linear-gradient(135deg, rgba(125, 211, 252, 0.82), rgba(56, 189, 248, 0.62));
+  box-shadow:
+    0 14px 24px -18px rgba(14, 116, 144, 0.36),
+    inset 0 0 0 1px rgba(224, 242, 254, 0.58);
+}
+
+:root[data-theme="light"] .weather-cta-export {
+  border-color: rgba(14, 116, 144, 0.4);
+  color: #075985;
+  background: linear-gradient(180deg, rgba(224, 242, 254, 0.96), rgba(186, 230, 253, 0.68));
+  box-shadow:
+    inset 0 0 0 1px rgba(186, 230, 253, 0.65),
+    0 14px 24px -20px rgba(14, 116, 144, 0.28);
 }
 
 

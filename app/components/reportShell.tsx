@@ -246,9 +246,9 @@ export function CommandCenterNavBlock({
         </div>
 
         <div id="report-primary-actions" className="flex w-full min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
-          <ReportCta href={primaryCta.href} copyText={primaryCta.copyText} copyTarget={primaryCta.copyTarget} label={primaryCta.label} className="weather-button-primary inline-flex min-h-[44px] w-full max-w-full items-center justify-center px-4 py-2 text-center text-xs font-semibold leading-tight tracking-[0.12em] sm:w-auto"><span className="max-w-full break-words text-center">{primaryCta.label}</span></ReportCta>
-          {secondaryCta ? <a href={secondaryCta.href} className="weather-pill inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-slate-700/80 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100 sm:w-auto">{secondaryCta.label}</a> : null}
-          {exportCta ? <a href={exportCta.href} className="weather-pill inline-flex min-h-[44px] w-full items-center justify-center rounded-full border border-sky-400/70 bg-sky-500/10 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-sky-100 sm:w-auto">{exportCta.label}</a> : null}
+          <ReportCta href={primaryCta.href} copyText={primaryCta.copyText} copyTarget={primaryCta.copyTarget} label={primaryCta.label} className="weather-cta weather-cta-primary w-full max-w-full text-center sm:w-auto"><span className="max-w-full break-words text-center">{primaryCta.label}</span></ReportCta>
+          {secondaryCta ? <a href={secondaryCta.href} className="weather-cta weather-cta-secondary w-full sm:w-auto">{secondaryCta.label}</a> : null}
+          {exportCta ? <a href={exportCta.href} className="weather-cta weather-cta-export w-full sm:w-auto">{exportCta.label}</a> : null}
         </div>
         {nextStep ? <p className="text-xs font-semibold tracking-[0.1em] text-slate-300">Next step: <a href={nextStep.href} className="text-sky-200 underline decoration-slate-500/80 underline-offset-4">{nextStep.description}</a></p> : null}
         <p className="weather-surface inline-flex min-h-[44px] flex-wrap items-center gap-x-2 px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100"><span>Posture {statusLabel}</span><span className="text-slate-400">·</span><span>Confidence {trustStatusLabel}</span><span className="text-slate-400">·</span><span>Updated {fetchedAtLabel}</span><span className="text-slate-400">·</span><span>Next refresh {resolvedNextRefreshLabel}</span></p>
