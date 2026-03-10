@@ -277,20 +277,20 @@ const resolvePosturePosition = (label: string) => {
 const ActionStrip = ({ items }: { items: ActionStripItem[] }) => (
   <section className={`${tierTwoPanel} ${sectionSpacing}`} aria-label="Action strip">
     <div className="flex flex-wrap items-end justify-between gap-2">
-      <h3 className={tierTwoHeading}>Prioritize decisions by function</h3>
-      <p className="text-[11px] text-slate-400">Action, guardrail, and flip threshold</p>
+      <h3 className={tierTwoHeading}>Operating levers this week</h3>
+      <p className="text-[11px] text-slate-400">Action now · Trigger/threshold to tighten or loosen · Reversal condition</p>
     </div>
     <ul className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
       {items.map((item) => (
-        <li key={item.area} className={`${tierThreeInset} flex h-full flex-col gap-2`}>
-          <p className="text-[11px] font-semibold text-slate-300">{decisionAreaLabel(item.area)}</p>
-          <p className="text-sm leading-6 font-semibold text-slate-100">{item.action}</p>
+        <li key={item.lever} className={`${tierThreeInset} flex h-full flex-col gap-2`}>
+          <p className="text-[11px] font-semibold text-slate-300">{item.label}</p>
+          <p className="text-sm leading-6 font-semibold text-slate-100"><span className="font-semibold text-emerald-200">Action now:</span> {item.actionNow}</p>
           <div className="mt-auto space-y-1.5 text-[11px]">
             <p className="rounded-full border border-amber-500/45 bg-amber-500/10 px-2.5 py-1 text-amber-100">
-              <span className="font-semibold">Guardrail:</span> {compactActionCue(item.threshold)}
+              <span className="font-semibold">Trigger/threshold to tighten or loosen:</span> {compactActionCue(item.triggerThreshold)}
             </p>
             <p className="rounded-full border border-sky-500/45 bg-sky-500/10 px-2.5 py-1 text-sky-100">
-              <span className="font-semibold">Flip:</span> {compactActionCue(item.reversalCondition)}
+              <span className="font-semibold">Reversal condition:</span> {compactActionCue(item.reversalCondition)}
             </p>
           </div>
         </li>
@@ -842,7 +842,7 @@ export function WeeklyDecisionCard({
               <li key={line}>• {line}</li>
             ))}
             {actionStripItems.slice(0, 5).map((item) => (
-              <li key={item.area}>• {decisionAreaLabel(item.area)}: {compactActionCue(item.action)}</li>
+              <li key={item.lever}>• {item.label} — Action now: {compactActionCue(item.actionNow)}; Trigger/threshold to tighten or loosen: {compactActionCue(item.triggerThreshold)}; Reversal condition: {compactActionCue(item.reversalCondition)}.</li>
             ))}
           </ul>
           <p className="font-semibold uppercase tracking-[0.1em] text-slate-300">Flip conditions</p>
