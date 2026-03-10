@@ -528,10 +528,10 @@ const evidenceMacroBySignal: Record<SignalChange["key"], MacroSeriesReading["id"
   curveSlope: "HY_CREDIT_SPREAD",
 };
 
-const toEvidenceDirectionLabel = (delta: number): HomeSignalEvidenceBlock["directionLabel"] => {
-  if (delta > 0) return "Tightening";
-  if (delta < 0) return "Cooling";
-  return "Holding";
+const toEvidenceDirectionLabel = (signal: SignalChange): HomeSignalEvidenceBlock["directionLabel"] => {
+  if (signal.delta === 0) return "Holding";
+  if (isImprovingSignalDelta(signal.key, signal.delta)) return "Cooling";
+  return "Tightening";
 };
 
 const buildSignalImplication = (signal: SignalChange): string => {
@@ -600,7 +600,7 @@ const buildSignalEvidenceBlocks = ({
     return {
       key,
       signalLabel: signalReasonLabel[key],
-      directionLabel: toEvidenceDirectionLabel(signal.delta),
+      directionLabel: toEvidenceDirectionLabel(signal),
       confidenceLabel,
       evidenceBullets,
       implication: buildSignalImplication(signal),

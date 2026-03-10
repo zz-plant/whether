@@ -294,4 +294,32 @@ describe("buildHomeBriefModel", () => {
     assert.doesNotMatch(model.netConstraintSummary, /climate stance/i);
   });
 
+
+  it("maps signal evidence direction using per-signal polarity", () => {
+    const model = buildHomeBriefModel({
+      assessment: {
+        regime: "VOLATILE",
+        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
+        scores: { tightness: 58, riskAppetite: 60 },
+      },
+      regimeAlert: null,
+      stopItems: ["Guardrail"],
+      reportDynamics: {
+        directionLabel: "mixed",
+        changedSignals: [
+          { key: "riskAppetite", delta: 2 },
+          { key: "tightness", delta: 2 },
+        ],
+        anomalySignals: [],
+      },
+    });
+
+    const riskAppetite = model.signalEvidenceBlocks.find((signal) => signal.key === "riskAppetite");
+    const tightness = model.signalEvidenceBlocks.find((signal) => signal.key === "tightness");
+
+    assert.equal(riskAppetite?.directionLabel, "Cooling");
+    assert.equal(tightness?.directionLabel, "Tightening");
+  });
+
+
 });
