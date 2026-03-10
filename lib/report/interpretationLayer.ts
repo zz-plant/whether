@@ -129,6 +129,12 @@ export const buildInterpretationLayer = ({
   financialInput?: FinancialViewInput;
   companyProfile?: Partial<CompanyProfile>;
 }): InterpretationLayer => {
+  const canonicalBullets = [
+    boundedLine("Action", homeBriefModel.decisionShiftSummary),
+    boundedLine("Trigger", homeBriefModel.guardrail),
+    boundedLine("Reverse", homeBriefModel.reversalTrigger),
+  ];
+
   if (view === "sector") {
     const primaryOverlay = homeBriefModel.macroOverlay.slice(0, 1);
     const sectorShift = primaryOverlay[0]
@@ -153,6 +159,16 @@ export const buildInterpretationLayer = ({
       postureRules: decisionRules,
       profile: companyProfile,
     });
+
+    if (adjustedRules.length === 0) {
+      return {
+        view,
+        label: "Company view",
+        summary:
+          "Company-specific rules are unavailable this week; use canonical bounded decisions until profile rules return.",
+        bullets: canonicalBullets,
+      };
+    }
 
     return {
       view,
@@ -208,9 +224,9 @@ export const buildInterpretationLayer = ({
   }
 
   if (view === "forecast") {
-    const topRegime = Object.entries(forecast.next90DayProbabilities).sort(
-      (a, b) => b[1] - a[1],
-    )[0];
+    const topRegime =
+      Object.entries(forecast.next90DayProbabilities).sort((a, b) => b[1] - a[1])[0] ??
+      [assessment.regime, 0];
     const momentumCopy: Record<
       ForecastModel["boundaryPressure"]["momentum"],
       string
@@ -242,10 +258,6 @@ export const buildInterpretationLayer = ({
     view: "default",
     label: "Default view",
     summary: "Core weekly interpretation for operators.",
-    bullets: [
-      boundedLine("Action", homeBriefModel.decisionShiftSummary),
-      boundedLine("Trigger", homeBriefModel.guardrail),
-      boundedLine("Reverse", homeBriefModel.reversalTrigger),
-    ],
+    bullets: canonicalBullets,
   };
 };
