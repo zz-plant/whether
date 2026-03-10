@@ -210,6 +210,12 @@ const compactRoleCue = (text: string) =>
     .replace(/;\s*$/, "")
     .trim();
 
+const distanceUrgencyLabel = (points: number) => {
+  if (points <= 1) return "Immediate watch";
+  if (points <= 2.5) return "Close watch";
+  return "Buffer available";
+};
+
 
 const ActionStrip = ({ items }: { items: ActionStripItem[] }) => (
   <section className={`${tierTwoPanel} ${sectionSpacing}`} aria-label="Action strip">
@@ -315,6 +321,7 @@ export function DecisionCallHeader({
     8,
     Math.min(100, Math.round((flipDistancePoints / Math.max(Math.abs(regimeDistance.thresholdValue), 1)) * 100)),
   );
+  const flipUrgencyLabel = distanceUrgencyLabel(flipDistancePoints);
 
   return (
     <header className="space-y-4 border-b border-slate-700/80 pb-6" data-testid="weekly-top-fold">
@@ -323,6 +330,18 @@ export function DecisionCallHeader({
         <h1 id="weekly-posture-brief-title" className="text-2xl font-semibold text-slate-50 sm:text-3xl">
           {resolvedPostureLabel.toUpperCase()} — {resolvedStageLabel.toUpperCase()}
         </h1>
+
+        <div className="grid gap-2 sm:grid-cols-3" aria-label="Weekly quick-scan decisions">
+          <p className="rounded-md border border-emerald-500/45 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-50">
+            <span className="font-semibold uppercase tracking-[0.12em] text-emerald-200">Do now</span> {immediateDecision}
+          </p>
+          <p className="rounded-md border border-amber-500/45 bg-amber-500/10 px-3 py-2 text-xs text-amber-50">
+            <span className="font-semibold uppercase tracking-[0.12em] text-amber-200">Guardrail</span> {compactActionCue(guardrail)}
+          </p>
+          <p className="rounded-md border border-sky-500/45 bg-sky-500/10 px-3 py-2 text-xs text-sky-50">
+            <span className="font-semibold uppercase tracking-[0.12em] text-sky-200">Flip trigger</span> {regimeDistance.dimensionLabel} {regimeDistance.thresholdDirection === "riseAbove" ? "above" : "to or below"} {regimeDistance.thresholdValue.toFixed(1)}
+          </p>
+        </div>
 
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">
@@ -343,6 +362,7 @@ export function DecisionCallHeader({
             <div className="mt-2 h-1.5 rounded-full bg-amber-200/20">
               <div className="h-1.5 rounded-full bg-amber-300/90" style={{ width: `${flipDistanceGaugePercent}%` }} />
             </div>
+            <p className="mt-1 text-[10px] uppercase tracking-[0.1em] text-amber-100/90">{flipUrgencyLabel}</p>
           </div>
         </div>
 
@@ -786,7 +806,12 @@ export function WeeklyDecisionCard({
       ) : null}
 
       <article className={`${tierOnePanel} ${sectionSpacing}`}>
-        <h2 className={tierOneHeading}>Decisions</h2>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className={tierOneHeading}>Decisions</h2>
+          <span className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${revisitDecisions ? "border-amber-500/55 bg-amber-500/10 text-amber-100" : "border-emerald-500/45 bg-emerald-500/10 text-emerald-100"}`}>
+            Decision pulse · {revisitDecisions ? "Revisit now" : "Hold course"}
+          </span>
+        </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <div className={tierOneInset}>
             <p className={`text-xs ${neutralLabel}`}>What changed this week</p>
@@ -804,9 +829,12 @@ export function WeeklyDecisionCard({
                 <div key={segment.label} className={segment.tone} style={{ width: `${segment.value}%` }} aria-label={`${segment.label} ${formatProbabilityPercent(segment.value)}`} />
               ))}
             </div>
-            <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[10px] uppercase tracking-[0.08em] text-slate-300">
+            <div className="mt-2 flex flex-wrap gap-1.5 text-[10px] uppercase tracking-[0.08em] text-slate-200">
               {transitionStrip.map((segment) => (
-                <span key={`${segment.label}-label`}>{segment.label} {formatProbabilityPercent(segment.value)}</span>
+                <span key={`${segment.label}-label`} className="inline-flex items-center gap-1 rounded-full border border-slate-700/70 bg-slate-900/70 px-2 py-0.5">
+                  <span className={`h-1.5 w-1.5 rounded-full ${segment.tone}`} aria-hidden="true" />
+                  {segment.label} {formatProbabilityPercent(segment.value)}
+                </span>
               ))}
             </div>
           </div>
@@ -872,9 +900,10 @@ export function WeeklyDecisionCard({
 
       <ActionStrip items={actionStripItems} />
       <BoundedRulesMatrix decisionRules={decisionRules} />
-      <details className={`${tierTwoPanel} ${sectionSpacing}`}>
-        <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.14em] text-slate-200">
-          Evidence ▼
+      <details className={`${tierTwoPanel} ${sectionSpacing} group`}>
+        <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between rounded-md px-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-200 outline-none transition hover:bg-slate-900/60 focus-visible:ring-2 focus-visible:ring-sky-300/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950">
+          <span>Evidence</span>
+          <span className="transition group-open:rotate-180">▼</span>
         </summary>
         <div className="mt-3 space-y-4">
           <article className={tierOneInset}>
