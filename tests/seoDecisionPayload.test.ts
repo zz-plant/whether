@@ -8,6 +8,7 @@ const baseInput = {
     thresholds: {
       riskAppetiteRegime: 50,
       tightnessRegime: 70,
+      baseRateTightness: 5,
     },
     scores: {
       riskAppetite: 60,
@@ -48,6 +49,7 @@ const baseInput = {
   transitionWatch: "OFF" as const,
   isFallbackSnapshot: false,
   provenanceStatusLabel: "Live (high confidence)",
+  fetchedAtIso: new Date().toISOString(),
 };
 
 describe("seo decision payload", () => {
@@ -77,6 +79,7 @@ describe("seo decision payload", () => {
       freshnessLabel: "Unavailable",
       isFallbackSnapshot: true,
       provenanceStatusLabel: "Cached (medium)",
+      fetchedAtIso: "2025-12-20T10:00:00.000Z",
     });
 
     assert.equal(payload.degraded, true);

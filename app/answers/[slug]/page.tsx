@@ -17,6 +17,32 @@ export function generateStaticParams() {
   return highValueAnswerStaticParams;
 }
 
+export const buildDecisionAnswerMetadata = ({
+  title,
+  slug,
+  payload,
+}: {
+  title: string;
+  slug: string;
+  payload: ReturnType<typeof buildSeoDecisionPayload>;
+}): Metadata => {
+  const metadata = buildPageMetadata({
+    title: `${title} (Live operator answer)`,
+    description: `${payload.currentCall} Action: ${payload.immediateAction}`,
+    path: `/answers/${slug}`,
+    imageAlt: title,
+  });
+
+  if (payload.noindex) {
+    metadata.robots = {
+      index: false,
+      follow: true,
+    };
+  }
+
+  return metadata;
+};
+
 export async function generateMetadata({ params }: DecisionPageProps): Promise<Metadata> {
   const { slug } = await params;
   const page = findDecisionPage(slug);
@@ -47,23 +73,10 @@ export async function generateMetadata({ params }: DecisionPageProps): Promise<M
     transitionWatch: homeBriefModel.transitionWatch,
     isFallbackSnapshot: !reportResult.ok,
     provenanceStatusLabel: reportData.treasuryProvenance?.statusLabel,
+    fetchedAtIso: reportData.treasury.fetched_at,
   });
 
-  const metadata = buildPageMetadata({
-    title: `${page.title} (Live operator answer)`,
-    description: `${payload.currentCall} Action: ${payload.immediateAction}`,
-    path: `/answers/${page.slug}`,
-    imageAlt: page.title,
-  });
-
-  if (payload.noindex) {
-    metadata.robots = {
-      index: false,
-      follow: true,
-    };
-  }
-
-  return metadata;
+  return buildDecisionAnswerMetadata({ title: page.title, slug: page.slug, payload });
 }
 
 export default async function DecisionAnswerPage({ params }: DecisionPageProps) {

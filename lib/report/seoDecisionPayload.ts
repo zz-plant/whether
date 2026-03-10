@@ -3,6 +3,7 @@ import { getRegimeProfile } from "../regimeEngine";
 import type { BoundedDecisionRule, DecisionArea } from "./boundedDecisionRules";
 import type { ReportEvidenceItem } from "./reportData";
 import { buildCompactTrustSummary, buildFailureModeWarnings, buildWeeklyCitationMetaLine } from "./trustStatus";
+import { isSeoPageIndexEligible } from "./seoIndexEligibility";
 
 export type SeoDecisionEvidence = {
   title: string;
@@ -19,6 +20,7 @@ export type SeoDecisionPayload = {
   freshness: string;
   degraded: boolean;
   noindex: boolean;
+  noindexReasons?: string[];
   trustSummary: string;
   citationMeta: string;
 };
@@ -36,6 +38,7 @@ export const buildSeoDecisionPayload = ({
   transitionWatch,
   isFallbackSnapshot,
   provenanceStatusLabel,
+  fetchedAtIso,
 }: {
   assessment: Pick<RegimeAssessment, "regime" | "thresholds" | "scores">;
   mappedRules: BoundedDecisionRule[];
@@ -49,6 +52,7 @@ export const buildSeoDecisionPayload = ({
   transitionWatch: "ON" | "OFF";
   isFallbackSnapshot: boolean;
   provenanceStatusLabel?: string;
+  fetchedAtIso?: string;
 }): SeoDecisionPayload => {
   const primaryRule = mappedDecisionAreas
     .map((area) => mappedRules.find((rule) => rule.area === area))
@@ -73,19 +77,36 @@ export const buildSeoDecisionPayload = ({
   const degraded = failureWarnings.some((warning) => warning.id === "stale-cached");
   const profile = getRegimeProfile(assessment.regime);
 
+  const currentCall = primaryRule?.recommendation ?? `${fallbackCurrentCall} (${profile.description})`;
+  const immediateAction = primaryRule?.doNow[0] ?? fallbackImmediateAction;
+  const triggerThreshold =
+    primaryRule?.pauseTrigger ??
+    `Trigger tighter mode if risk appetite < ${assessment.thresholds.riskAppetiteRegime.toFixed(0)} or tightness > ${assessment.thresholds.tightnessRegime.toFixed(0)}.`;
+  const reversalCondition =
+    primaryRule?.resumeTrigger ??
+    "Reverse only after two consecutive supportive reads and improved threshold distance.";
+
+  const eligibility = isSeoPageIndexEligible({
+    currentCall,
+    immediateAction,
+    triggerThreshold,
+    reversalCondition,
+    evidenceCount: evidence.length,
+    fetchedAtIso,
+    isFallbackSnapshot,
+    provenanceStatusLabel,
+  });
+
   return {
-    currentCall: primaryRule?.recommendation ?? `${fallbackCurrentCall} (${profile.description})`,
-    immediateAction: primaryRule?.doNow[0] ?? fallbackImmediateAction,
-    triggerThreshold:
-      primaryRule?.pauseTrigger ??
-      `Trigger tighter mode if risk appetite < ${assessment.thresholds.riskAppetiteRegime.toFixed(0)} or tightness > ${assessment.thresholds.tightnessRegime.toFixed(0)}.`,
-    reversalCondition:
-      primaryRule?.resumeTrigger ??
-      "Reverse only after two consecutive supportive reads and improved threshold distance.",
+    currentCall,
+    immediateAction,
+    triggerThreshold,
+    reversalCondition,
     evidence,
     freshness: freshnessLabel,
-    degraded,
-    noindex: degraded,
+    degraded: degraded || !eligibility.eligible,
+    noindex: !eligibility.eligible,
+    noindexReasons: eligibility.reasons,
     trustSummary: buildCompactTrustSummary({
       confidenceLabel,
       freshnessLabel,

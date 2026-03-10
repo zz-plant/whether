@@ -2,6 +2,8 @@ import type { Metadata, Route } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../lib/seo";
+import { loadReportDataSafe } from "../../../lib/report/reportData";
+import { isSeoPageIndexEligible } from "../../../lib/report/seoIndexEligibility";
 import type { StartupRegimePage } from "../clusterData";
 import { tierOneDecisionPages } from "../../answers/decisionPages";
 import { findRegimePage, regimePages, regimeStaticParams } from "../clusterData";
@@ -30,12 +32,32 @@ export async function generateMetadata({ params }: RegimePageProps): Promise<Met
     });
   }
 
-  return buildPageMetadata({
+  const reportResult = await loadReportDataSafe(undefined, { route: "/startup-macro-posture/[regime]" });
+  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
+
+  const metadata = buildPageMetadata({
     title: `${page.title} for startups`,
     description: page.summary,
     path: `/startup-macro-posture/${page.slug}`,
     imageAlt: page.title,
   });
+
+  const eligibility = isSeoPageIndexEligible({
+    currentCall: page.summary,
+    immediateAction: page.hiring,
+    triggerThreshold: page.flipSignal,
+    reversalCondition: page.flipSignal,
+    evidenceCount: reportData.reportEvidenceItems.length,
+    fetchedAtIso: reportData.treasury.fetched_at,
+    isFallbackSnapshot: !reportResult.ok,
+    provenanceStatusLabel: reportData.treasuryProvenance?.statusLabel,
+  });
+
+  if (!eligibility.eligible) {
+    metadata.robots = { index: false, follow: true };
+  }
+
+  return metadata;
 }
 
 export default async function RegimeDeepPage({ params }: RegimePageProps) {
@@ -45,6 +67,18 @@ export default async function RegimeDeepPage({ params }: RegimePageProps) {
   if (!page) notFound();
 
   const siblingRegimes = regimePages.filter((entry) => entry.slug !== page.slug);
+  const reportResult = await loadReportDataSafe(undefined, { route: "/startup-macro-posture/[regime]" });
+  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
+  const eligibility = isSeoPageIndexEligible({
+    currentCall: page.summary,
+    immediateAction: page.hiring,
+    triggerThreshold: page.flipSignal,
+    reversalCondition: page.flipSignal,
+    evidenceCount: reportData.reportEvidenceItems.length,
+    fetchedAtIso: reportData.treasury.fetched_at,
+    isFallbackSnapshot: !reportResult.ok,
+    provenanceStatusLabel: reportData.treasuryProvenance?.statusLabel,
+  });
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
@@ -52,6 +86,11 @@ export default async function RegimeDeepPage({ params }: RegimePageProps) {
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Regime deep page</p>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{page.title}</h1>
         <p className="text-sm text-slate-200">{page.summary}</p>
+        {!eligibility.eligible ? (
+          <p className="rounded-md border border-amber-400/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
+            Degraded signal quality: this page is shown as fallback guidance and marked noindex until freshness and provenance recover.
+          </p>
+        ) : null}
       </section>
 
       <section className="weather-panel space-y-3 px-6 py-6">

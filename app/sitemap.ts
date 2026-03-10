@@ -20,6 +20,9 @@ import { regimePages } from "./startup-macro-posture/clusterData";
 import { indexableSignalsClusters } from "./signals/clusterRoutes";
 import { indexableDecideClusterRoutes } from "./decide/clusterRoutes";
 import { indexableToolkitClusters } from "./toolkits/clusterRoutes";
+import { loadReportDataSafe } from "../lib/report/reportData";
+import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
+import { isSeoPageIndexEligible } from "../lib/report/seoIndexEligibility";
 
 type ChangeFrequency = NonNullable<MetadataRoute.Sitemap[number]["changeFrequency"]>;
 
@@ -62,8 +65,27 @@ const buildEntry = ({
   priority,
 });
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export const isProgrammaticSitemapEligible = async (): Promise<boolean> => {
+  const reportResult = await loadReportDataSafe(undefined, { route: "/sitemap" });
+  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
+  const homeBriefModel = buildHomeBriefModel(reportData);
+  const primaryRule = homeBriefModel.decisionRules[0];
+
+  return isSeoPageIndexEligible({
+    currentCall: primaryRule?.recommendation,
+    immediateAction: primaryRule?.doNow[0],
+    triggerThreshold: primaryRule?.pauseTrigger,
+    reversalCondition: primaryRule?.resumeTrigger,
+    evidenceCount: reportData.reportEvidenceItems.length,
+    fetchedAtIso: reportData.treasury.fetched_at,
+    isFallbackSnapshot: !reportResult.ok,
+    provenanceStatusLabel: reportData.treasuryProvenance?.statusLabel,
+  }).eligible;
+};
+
+export default async function sitemap(options?: { programmaticEligible?: boolean }): Promise<MetadataRoute.Sitemap> {
   const reportLastModified = resolveLastModified(snapshotData.record_date, snapshotData.fetched_at);
+  const programmaticEligible = options?.programmaticEligible ?? (await isProgrammaticSitemapEligible());
 
   const coreEntries: SitemapEntryDescriptor[] = [
     { path: "", lastModified: reportLastModified, changeFrequency: "weekly", priority: 1 },
@@ -184,14 +206,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  const decisionAnswerEntries: SitemapEntryDescriptor[] = tierOneDecisionPages.map((page) => ({
+  const decisionAnswerEntries: SitemapEntryDescriptor[] = (programmaticEligible ? tierOneDecisionPages : []).map((page) => ({
     path: `/answers/${page.slug}`,
     lastModified: staticContentLastModified,
     changeFrequency: "weekly",
     priority: 0.72,
   }));
 
-  const regimeDeepEntries: SitemapEntryDescriptor[] = regimePages.map((regime) => ({
+  const regimeDeepEntries: SitemapEntryDescriptor[] = (programmaticEligible ? regimePages : []).map((regime) => ({
     path: `/startup-macro-posture/${regime.slug}`,
     lastModified: staticContentLastModified,
     changeFrequency: "weekly",
