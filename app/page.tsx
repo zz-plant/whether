@@ -68,8 +68,9 @@ export const runtime = "edge";
 
 const homeSectionSequence = [
   { href: "#weekly-posture-brief-title", label: "Call" },
-  { href: "#weekly-action-summary", label: "Decisions" },
-  { href: "#executive-snapshot", label: "Evidence" },
+  { href: "#decision-snapshot-for-leadership-this-week", label: "Decision snapshot" },
+  { href: "#execution-guidance", label: "Execution guidance" },
+  { href: "#evidence-diagnostics", label: "Evidence" },
 ] as const;
 
 const firstRunDestinationKeys = ["signals", "operations", "decide"] as const;
@@ -431,15 +432,6 @@ const HomePageReportContent = async ({
         ) : null
       }
     >
-      <HomeFirstRunOrientation
-        changeSummary={homeBriefModel.decisionShiftSummary}
-        decisionNow={homeBriefModel.operatingStanceLine}
-        destinations={firstRunDestinations}
-        quickActions={[...homeQuickActions]}
-        featuredConcepts={featuredConcepts}
-        currentPath="/"
-      />
-
       <WeeklyDecisionCard
         statusLabel={displayRegime.label}
         postureLabel={homeBriefModel.postureLabel}
@@ -497,7 +489,7 @@ const HomePageReportContent = async ({
         />
       </DeferredSection>
 
-      <details className="weather-panel px-5 py-4" open>
+      <details className="weather-panel px-5 py-4">
         <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.14em] text-slate-300 sm:hidden">Evidence appendix (tap to expand)</summary>
         <DeferredSection
           id="executive-snapshot"
@@ -516,6 +508,15 @@ const HomePageReportContent = async ({
       <HomeInterpretationPanel
         layer={interpretationLayer}
         searchParams={resolvedSearchParams}
+      />
+
+      <HomeFirstRunOrientation
+        changeSummary={homeBriefModel.decisionShiftSummary}
+        decisionNow={homeBriefModel.operatingStanceLine}
+        destinations={firstRunDestinations}
+        quickActions={[...homeQuickActions]}
+        featuredConcepts={featuredConcepts}
+        currentPath="/"
       />
 
       {!reportResult.ok ? (
