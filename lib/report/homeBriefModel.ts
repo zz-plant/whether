@@ -117,6 +117,13 @@ type ExecutiveOperationalStance = {
   avoid: string[];
 };
 
+type BriefingSummary = {
+  situation: string;
+  interpretation: string;
+  operatingInstruction: string;
+  paragraph: string;
+};
+
 const splitActionFragments = (value: string): string[] =>
   value
     .split(/(?<=[.;])\s+|\s+and\s+/gi)
@@ -171,6 +178,48 @@ const regimeShiftTargets = {
   VOLATILE: { defensive: "SCARCITY" },
   EXPANSION: { defensive: "DEFENSIVE" },
 } as const;
+
+const buildBriefingSummary = ({
+  displayRegimeLabel,
+  decisionShiftSummary,
+  operatingStanceLine,
+}: {
+  displayRegimeLabel: string;
+  decisionShiftSummary: string;
+  operatingStanceLine: string;
+}): BriefingSummary => {
+  const situation = decisionShiftSummary.replace(/^Changed:\s*/i, "").trim();
+  const interpretation = `Posture remains ${displayRegimeLabel} because signal pressure and boundary distance still support this operating stance.`;
+  const operatingInstruction = operatingStanceLine.trim().replace(/[.;]+$/, "") + ".";
+
+  return {
+    situation,
+    interpretation,
+    operatingInstruction,
+    paragraph: `${situation} ${interpretation} ${operatingInstruction}`,
+  };
+};
+
+const buildSituationSentence = ({
+  severityDelta,
+  directionLabel,
+  changeCount,
+}: {
+  severityDelta: number;
+  directionLabel: "improving" | "deteriorating" | "mixed" | "stable" | undefined;
+  changeCount: number;
+}) => {
+  if (changeCount === 0 || directionLabel === "stable") {
+    return "No material signal shift this week.";
+  }
+  if (severityDelta < 0 || directionLabel === "improving") {
+    return "Pressure eased versus last week.";
+  }
+  if (severityDelta > 0 || directionLabel === "deteriorating") {
+    return "Pressure increased versus last week.";
+  }
+  return "Signals moved in mixed directions this week.";
+};
 
 const buildDecisionShiftSummary = ({
   severityDelta,
@@ -759,6 +808,23 @@ export const buildHomeBriefModel = (
         ? `${displayRegime.label}. Changed: constraints eased. Do now: ${conciseActionNow ?? "release selective hires and experiments that stay reversible"}. Flip: ${conciseFlipThreshold}`
         : `${displayRegime.label}. Changed: constraints held near prior week. Do now: ${conciseActionNow ?? "keep execution measured and irreversible bets capped"}. Flip: ${conciseFlipThreshold}`;
 
+  const decisionShiftSummary = buildDecisionShiftSummary({
+    severityDelta,
+    directionLabel: reportDynamics?.directionLabel,
+    changeCount: reportDynamics?.changedSignals.length ?? 0,
+    reversalTrigger: conciseFlipThreshold,
+  });
+
+  const briefingSummary = buildBriefingSummary({
+    displayRegimeLabel: displayRegime.label,
+    decisionShiftSummary: buildSituationSentence({
+      severityDelta,
+      directionLabel: reportDynamics?.directionLabel,
+      changeCount: reportDynamics?.changedSignals.length ?? 0,
+    }),
+    operatingStanceLine,
+  });
+
   return {
     postureLabel: displayRegime.label,
     stageLabel: stage.label,
@@ -777,12 +843,8 @@ export const buildHomeBriefModel = (
     startupClimateIndex,
     regimeDistance,
     regimeVelocity,
-    decisionShiftSummary: buildDecisionShiftSummary({
-      severityDelta,
-      directionLabel: reportDynamics?.directionLabel,
-      changeCount: reportDynamics?.changedSignals.length ?? 0,
-      reversalTrigger: conciseFlipThreshold,
-    }),
+    decisionShiftSummary,
+    briefingSummary,
     weeklyMovement,
     transitionProbabilities: forecast?.next4WeekProbabilities ?? {
       Expansion: 25,

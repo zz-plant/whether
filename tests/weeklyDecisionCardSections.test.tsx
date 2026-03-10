@@ -16,6 +16,12 @@ describe("WeeklyDecisionCard extracted sections", () => {
         postureLabel="Defensive"
         stageLabel="Watchful"
         netConstraintSummary="Pressure remains elevated."
+        briefingSummary={{
+          situation: "Pressure increased versus last week.",
+          interpretation: "Posture remains Defensive because signal pressure and boundary distance still support this operating stance.",
+          operatingInstruction: "Stage decisions. Avoid irreversible spend.",
+          paragraph: "Pressure increased versus last week. Posture remains Defensive because signal pressure and boundary distance still support this operating stance. Stage decisions. Avoid irreversible spend.",
+        }}
         meetingShorthand="Do now: revise decisions this week."
         immediateDecision="Revise now"
         guardrail="Hold irreversible hiring"
@@ -70,6 +76,12 @@ describe("WeeklyDecisionCard extracted sections", () => {
         postureLabel="Expansion"
         stageLabel="Late"
         netConstraintSummary="Constraints eased."
+        briefingSummary={{
+          situation: "Pressure eased versus last week.",
+          interpretation: "Posture remains Expansion because signal pressure and boundary distance still support this operating stance.",
+          operatingInstruction: "Stage decisions. Avoid irreversible spend.",
+          paragraph: "Pressure eased versus last week. Posture remains Expansion because signal pressure and boundary distance still support this operating stance. Stage decisions. Avoid irreversible spend.",
+        }}
         meetingShorthand="Do now: speed reversible bets."
         immediateDecision="Hold expansion posture"
         guardrail="Keep irreversible spend capped"
@@ -112,6 +124,12 @@ describe("WeeklyDecisionCard extracted sections", () => {
         postureLabel="Expansion"
         stageLabel="Late"
         netConstraintSummary="Constraints eased."
+        briefingSummary={{
+          situation: "Pressure eased versus last week.",
+          interpretation: "Posture remains Expansion because signal pressure and boundary distance still support this operating stance.",
+          operatingInstruction: "Stage decisions. Avoid irreversible spend.",
+          paragraph: "Pressure eased versus last week. Posture remains Expansion because signal pressure and boundary distance still support this operating stance. Stage decisions. Avoid irreversible spend.",
+        }}
         meetingShorthand="Do now: speed reversible bets."
         immediateDecision="Hold expansion posture"
         guardrail="Keep irreversible spend capped"

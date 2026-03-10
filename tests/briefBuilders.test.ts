@@ -199,6 +199,7 @@ describe("buildSlackBrief", () => {
       actionStripItems: [
         { area: "hiring", action: "Backfills only", threshold: "Pause net-new hiring if tightness > 76", reversalCondition: "Resume staged approvals when tightness < 66" },
       ],
+      briefingSummaryParagraph: "Pressure increased versus last week. Posture remains Guarded Expansion — Late because signal pressure and boundary distance still support this operating stance. Stage decisions. Avoid irreversible spend.",
     });
 
     assert.match(brief, /Startup environment — weekly call:/);
@@ -207,6 +208,8 @@ describe("buildSlackBrief", () => {
     assert.match(brief, /• Distance to regime change: 2\.0 points/);
     assert.match(brief, /• Regime shift watch: ON/);
     assert.match(brief, /• Operating posture: Stage decisions\. Avoid irreversible spend\./);
+    assert.match(brief, /Briefing Summary:/);
+    assert.match(brief, /Pressure increased versus last week\. Posture remains Guarded Expansion — Late because signal pressure and boundary distance still support this operating stance\. Stage decisions\. Avoid irreversible spend\./);
     assert.match(brief, /• Action: Backfills only/);
     assert.match(brief, /Threshold: Pause net-new hiring if tightness > 76/);
     assert.match(brief, /Flip: Resume staged approvals when tightness < 66/);

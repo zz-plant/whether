@@ -82,6 +82,12 @@ describe("weekly card and interpretation panel composition", () => {
         operatingStanceLine="Stage decisions. Avoid irreversible spend."
         weeklyMemoLines={["Market conditions tightened this week.", "Stage decisions. Avoid irreversible spend.", "Regime shift watch is on: stage approvals and preserve runway."]}
           netConstraintSummary="Pressure remains elevated."
+          briefingSummary={{
+            situation: "Pressure increased versus last week.",
+            interpretation: "Posture remains Defensive — Watchful because signal pressure and boundary distance still support this operating stance.",
+            operatingInstruction: "Stage decisions. Avoid irreversible spend.",
+            paragraph: "Pressure increased versus last week. Posture remains Defensive — Watchful because signal pressure and boundary distance still support this operating stance. Stage decisions. Avoid irreversible spend.",
+          }}
           guardrail="Hold irreversible hiring unless direct revenue impact is clear."
           reversalTrigger="If risk appetite rises above 55, reopen selective hiring."
           recordDateLabel="Mar 5, 2026"
@@ -182,6 +188,12 @@ describe("weekly card and interpretation panel composition", () => {
         operatingStanceLine="Stage decisions. Avoid irreversible spend."
         weeklyMemoLines={["Market conditions tightened this week.", "Stage decisions. Avoid irreversible spend.", "Regime shift watch is on: stage approvals and preserve runway."]}
           netConstraintSummary="Pressure remains elevated."
+          briefingSummary={{
+            situation: "Pressure increased versus last week.",
+            interpretation: "Posture remains Defensive — Watchful because signal pressure and boundary distance still support this operating stance.",
+            operatingInstruction: "Stage decisions. Avoid irreversible spend.",
+            paragraph: "Pressure increased versus last week. Posture remains Defensive — Watchful because signal pressure and boundary distance still support this operating stance. Stage decisions. Avoid irreversible spend.",
+          }}
           guardrail="Hold irreversible hiring unless direct revenue impact is clear."
           reversalTrigger="If risk appetite rises above 55, reopen selective hiring."
           recordDateLabel="Mar 5, 2026"
@@ -283,6 +295,12 @@ describe("weekly card and interpretation panel composition", () => {
           operatingStanceLine="Stage decisions. Avoid irreversible spend."
           weeklyMemoLines={["Market conditions tightened this week.", "Stage decisions. Avoid irreversible spend.", "Regime shift watch is on: stage approvals and preserve runway."]}
           netConstraintSummary="Pressure remains elevated."
+          briefingSummary={{
+            situation: "Pressure increased versus last week.",
+            interpretation: "Posture remains Defensive — Watchful because signal pressure and boundary distance still support this operating stance.",
+            operatingInstruction: "Stage decisions. Avoid irreversible spend.",
+            paragraph: "Pressure increased versus last week. Posture remains Defensive — Watchful because signal pressure and boundary distance still support this operating stance. Stage decisions. Avoid irreversible spend.",
+          }}
           guardrail="Hold irreversible hiring unless direct revenue impact is clear."
           reversalTrigger="If risk appetite rises above 55, reopen selective hiring."
           recordDateLabel="Mar 5, 2026"

@@ -46,6 +46,12 @@ describe("WeeklyDecisionCard top-fold composition", () => {
         operatingStanceLine="Stage decisions. Avoid irreversible spend."
         weeklyMemoLines={["Market conditions tightened this week.", "Stage decisions. Avoid irreversible spend.", "Regime shift watch is on: stage approvals and preserve runway."]}
         netConstraintSummary="Pressure remains elevated but stabilizing."
+        briefingSummary={{
+          situation: "Pressure increased versus last week.",
+          interpretation: "Posture remains Defensive — Watchful because signal pressure and boundary distance still support this operating stance.",
+          operatingInstruction: "Stage decisions. Avoid irreversible spend.",
+          paragraph: "Pressure increased versus last week. Posture remains Defensive — Watchful because signal pressure and boundary distance still support this operating stance. Stage decisions. Avoid irreversible spend.",
+        }}
         guardrail="Hold irreversible hiring unless direct revenue impact is clear."
         reversalTrigger="If risk appetite rises above 55, reopen selective hiring."
         recordDateLabel="Mar 5, 2026"
@@ -109,6 +115,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /weekly-posture-brief-title/);
     assert.match(html, /weekly-viral-hero/);
     assert.match(html, /Macro operating console/);
+    assert.match(html, /Briefing Summary/);
     assert.match(html, /Decision delta/);
     assert.match(html, /Operational meaning/);
     assert.match(html, /Operator posture/);
@@ -121,11 +128,13 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /id="primary-artifact-actions"/);
 
     const heroIndex = html.indexOf("weekly-posture-brief-title");
+    const briefingIndex = html.indexOf("Briefing Summary");
     const deltaIndex = html.indexOf("Decision delta");
     const postureIndex = html.indexOf("Operator posture");
     const guidanceIndex = html.indexOf("Decision guidance");
 
-    assert.ok(deltaIndex > heroIndex);
+    assert.ok(briefingIndex > heroIndex);
+    assert.ok(deltaIndex > briefingIndex);
     assert.ok(postureIndex > deltaIndex);
     assert.ok(guidanceIndex > postureIndex);
   });
@@ -146,6 +155,12 @@ describe("WeeklyDecisionCard top-fold composition", () => {
         operatingStanceLine="Hold approvals steady. Keep irreversible spend capped."
         weeklyMemoLines={["Market conditions are stable this week.", "Hold approvals steady. Keep irreversible spend capped.", "Regime shift watch is off: hold current pace with bounded approvals."]}
         netConstraintSummary="Fallback snapshot is stable for near-term pacing."
+        briefingSummary={{
+          situation: "No material signal shift this week.",
+          interpretation: "Posture remains Defensive — Watchful because signal pressure and boundary distance still support this operating stance.",
+          operatingInstruction: "Hold approvals steady. Keep irreversible spend capped.",
+          paragraph: "No material signal shift this week. Posture remains Defensive — Watchful because signal pressure and boundary distance still support this operating stance. Hold approvals steady. Keep irreversible spend capped.",
+        }}
         guardrail="Hold irreversible hiring unless demand proves durable."
         reversalTrigger="If tightness drops below 60, reopen selective hiring."
         recordDateLabel="Mar 5, 2026"

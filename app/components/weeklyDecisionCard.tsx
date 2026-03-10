@@ -45,6 +45,12 @@ export type WeeklyDecisionCardProps = {
   operatingStanceLine: string;
   weeklyMemoLines: string[];
   netConstraintSummary: string;
+  briefingSummary: {
+    situation: string;
+    interpretation: string;
+    operatingInstruction: string;
+    paragraph: string;
+  };
   guardrail: string;
   reversalTrigger: string;
   actionNowShort?: string;
@@ -315,6 +321,7 @@ type DecisionCallHeaderProps = {
   stageLabel?: string;
   postureWithStageLabel?: string;
   netConstraintSummary: string;
+  briefingSummary: WeeklyDecisionCardProps["briefingSummary"];
   meetingShorthand: string;
   immediateDecision: string;
   guardrail: string;
@@ -341,6 +348,7 @@ export function DecisionCallHeader({
   stageLabel,
   postureWithStageLabel,
   netConstraintSummary,
+  briefingSummary,
   meetingShorthand,
   immediateDecision,
   guardrail,
@@ -368,6 +376,11 @@ export function DecisionCallHeader({
         </h1>
         <p className="text-base font-semibold text-sky-100">{operatingStanceLine}</p>
         <p className="text-sm leading-6 text-slate-200">{immediateDecision}</p>
+
+        <article className="rounded-lg border border-sky-500/35 bg-sky-500/10 px-4 py-3" aria-label="Briefing Summary">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-100">Briefing Summary</p>
+          <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-100">{briefingSummary.paragraph}</p>
+        </article>
 
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4" aria-label="Quick weekly scan">
           <div className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">
@@ -607,6 +620,7 @@ export function WeeklyDecisionCard({
   operatingStanceLine,
   weeklyMemoLines,
   netConstraintSummary,
+  briefingSummary,
   guardrail,
   reversalTrigger,
   actionNowShort,
@@ -699,6 +713,7 @@ export function WeeklyDecisionCard({
         stageLabel={stageLabel}
         postureWithStageLabel={postureWithStageLabel}
         netConstraintSummary={netConstraintSummary}
+        briefingSummary={briefingSummary}
         meetingShorthand={meetingShorthand}
         immediateDecision={immediateDecision}
         guardrail={effectiveGuardrail}

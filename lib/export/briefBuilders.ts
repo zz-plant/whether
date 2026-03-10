@@ -32,6 +32,7 @@ type ExportLayerOptions = {
   historicalAnalogs?: Array<{ date: string; similarityScore: number; implication: string }>;
   failureModes?: Array<{ warning: string; mitigationCheck: string }>;
   actionStripItems?: ActionStripItem[];
+  briefingSummaryParagraph?: string;
 };
 
 const buildViralArtifactBlock = (options?: ExportLayerOptions) => {
@@ -44,6 +45,9 @@ const buildViralArtifactBlock = (options?: ExportLayerOptions) => {
     `  Threshold: ${item.threshold}`,
     `  Flip: ${item.reversalCondition}`,
   ]);
+  const briefingSummary = options.briefingSummaryParagraph
+    ? ["", "Briefing Summary:", options.briefingSummaryParagraph]
+    : [];
 
   return [
     "",
@@ -53,6 +57,7 @@ const buildViralArtifactBlock = (options?: ExportLayerOptions) => {
     `• Distance to regime change: ${(options.regimeDistancePoints ?? 0).toFixed(1)} points`,
     `• Regime shift watch: ${options.transitionWatch ?? "OFF"}`,
     `• Operating posture: ${options.operatingStanceLine}`,
+    ...briefingSummary,
     ...actionStrip,
   ];
 };
