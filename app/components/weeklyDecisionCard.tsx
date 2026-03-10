@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { HapticAnchor } from "./hapticAnchor";
+import { ArrowRightIcon, CircleTargetIcon, ShieldIcon } from "./uiIcons";
 import type { ReportDynamics } from "../../lib/report/reportData";
 import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
 import type { ActionStripItem, RoleAwareOperatingTemplate } from "../../lib/report/operatingCalls";
@@ -359,14 +360,14 @@ export function DecisionCallHeader({
           <div className={tierOneInset}>
             <SummaryLabel
               label="Posture"
-              icon={<svg viewBox="0 0 16 16" className="h-3.5 w-3.5"><path d="M8 1.7 13 4v5.2L8 14.3 3 9.2V4l5-2.3Z" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" /></svg>}
+              icon={<CircleTargetIcon className="h-3.5 w-3.5" aria-hidden="true" />}
             />
             <p className="mt-1 text-sm font-semibold text-slate-100">{resolvedPostureLabel}</p>
           </div>
           <div className={tierOneInset}>
             <SummaryLabel
               label="Signal confidence"
-              icon={<svg viewBox="0 0 16 16" className="h-3.5 w-3.5"><path d="M8 2.2a4.8 4.8 0 0 1 4.8 4.8c0 2.6-2.1 4.8-4.8 4.8S3.2 9.6 3.2 7A4.8 4.8 0 0 1 8 2.2Z" fill="none" stroke="currentColor" strokeWidth="1.3" /><path d="M8 5.1v2.3" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" /><circle cx="8" cy="9.8" r=".8" fill="currentColor" /></svg>}
+              icon={<ShieldIcon className="h-3.5 w-3.5" aria-hidden="true" />}
             />
             <p className="mt-1 text-sm font-semibold text-slate-100">{confidenceLabel} ({Math.round(confidencePercent)}%)</p>
             <p className="mt-2 text-xs text-slate-300">Freshness: {freshnessLabel}</p>
@@ -374,7 +375,7 @@ export function DecisionCallHeader({
           <div className={tierOneInset}>
             <SummaryLabel
               label="Action"
-              icon={<svg viewBox="0 0 16 16" className="h-3.5 w-3.5"><path d="M2.5 8h11" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /><path d="m9.5 4.8 3.2 3.2-3.2 3.2" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+              icon={<ArrowRightIcon className="h-3.5 w-3.5" aria-hidden="true" />}
             />
             <p className="mt-1 text-sm font-semibold text-slate-100">{immediateDecision}</p>
           </div>
@@ -392,7 +393,7 @@ export function DecisionCallHeader({
         </article>
 
         <p className="text-xs text-slate-300">{netConstraintSummary}</p>
-        <p className="inline-flex items-center gap-1.5 text-xs text-slate-300"><span aria-hidden="true" className="text-slate-400"><svg viewBox="0 0 12 12" className="h-3 w-3"><path d="M6 1.6 9 2.8v2.9c0 2-1.2 3.8-3 4.7-1.8-.9-3-2.7-3-4.7V2.8l3-1.2Z" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" /></svg></span>Trust status: {trustCueLine}</p>
+        <p className="inline-flex items-center gap-1.5 text-xs text-slate-300"><span aria-hidden="true" className="text-slate-400"><ShieldIcon className="h-3 w-3" /></span>Trust status: {trustCueLine}</p>
         {needsTrustWarning ? (
           <p className="rounded-md border border-amber-500/50 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">{trustWarningCopy}</p>
         ) : null}

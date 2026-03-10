@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { formatDateUTC, formatTimestampUTC } from "../../../lib/formatters";
 import type { DecisionMemoryEntry } from "../../../lib/decisionMemory";
 import { ClipboardActionRow } from "../../components/clipboardActionRow";
+import { CopyIcon, DownloadIcon } from "../../components/uiIcons";
 import { getClipboardUiState, useClipboardCopy } from "../../components/useClipboardCopy";
 
 type DecisionMemoryResponse = {
@@ -80,15 +81,15 @@ export const DecisionMemoryPanel = () => {
                 href={csvDownloadHref}
                 className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200"
               >
-                Export CSV
+                <span className="inline-flex items-center gap-1.5"><DownloadIcon className="h-3.5 w-3.5" aria-hidden="true" />Export CSV</span>
               </a>
             ) : null}
             {latestEntry ? (
               <ClipboardActionRow
-                label="Copy latest JSON"
+                label={<span className="inline-flex items-center gap-1.5"><CopyIcon className="h-3.5 w-3.5" aria-hidden="true" />Copy latest JSON</span>}
                 state={getClipboardUiState("json", { status, error: false, activeTarget, copiedTarget }, { includeError: false, requireCopiedStatus: true })}
                 buttonVariant="pill"
-                buttonLabels={{ copied: "JSON copied" }}
+                buttonLabels={{ copied: <span className="inline-flex items-center gap-1.5"><CopyIcon className="h-3.5 w-3.5" aria-hidden="true" />JSON copied</span> }}
                 onClick={() => void copyToClipboard(JSON.stringify(latestEntry, null, 2), "json")}
               />
             ) : null}
@@ -120,7 +121,7 @@ export const DecisionMemoryPanel = () => {
                     </p>
                   </div>
                   <ClipboardActionRow
-                    label="Copy entry"
+                    label={<span className="inline-flex items-center gap-1"><CopyIcon className="h-3.5 w-3.5" aria-hidden="true" />Copy entry</span>}
                     state={getClipboardUiState(entry.id, { status, error: false, activeTarget, copiedTarget }, { includeError: false, requireCopiedStatus: true })}
                     buttonVariant="pill"
                     compact

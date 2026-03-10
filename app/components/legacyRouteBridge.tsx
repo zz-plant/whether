@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { Route } from "next";
 import { useEffect, useMemo, useState } from "react";
+import { ArrowRightIcon } from "./uiIcons";
 
 type LegacyRouteBridgeProps = {
   eyebrow: string;
@@ -85,9 +86,10 @@ export function LegacyRouteBridge({
         <div className="flex flex-wrap gap-3">
           <Link
             href={primaryHref}
-            className="weather-button-primary inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em]"
+            className="weather-button-primary inline-flex min-h-[44px] items-center gap-1.5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em]"
           >
             {primaryLabel}
+            <ArrowRightIcon className="h-3.5 w-3.5" aria-hidden="true" />
           </Link>
           <Link
             href={secondaryHref}
