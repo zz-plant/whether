@@ -277,6 +277,9 @@ type DecisionCallHeaderProps = {
   topContributorInline: string;
   startupClimateIndex: Pick<WeeklyDecisionCardProps["startupClimateIndex"], "score" | "status">;
   executiveOperationalStance: WeeklyDecisionCardProps["executiveOperationalStance"];
+  changeStrip: Array<{ label: string; movement: string }>;
+  netDecisionEffects: Array<{ label: string; value: string }>;
+  leadershipCallLine: string;
 };
 
 export function DecisionCallHeader({
@@ -303,6 +306,9 @@ export function DecisionCallHeader({
   topContributorInline,
   startupClimateIndex,
   executiveOperationalStance,
+  changeStrip,
+  netDecisionEffects,
+  leadershipCallLine,
 }: DecisionCallHeaderProps) {
   const [derivedPostureLabel, derivedStageLabel] = (postureWithStageLabel ?? "").split(" — ");
   const resolvedPostureLabel = postureLabel ?? derivedPostureLabel ?? statusLabel;
@@ -338,6 +344,12 @@ export function DecisionCallHeader({
           </p>
         </div>
 
+        <div className="rounded-xl border border-sky-400/45 bg-sky-500/10 p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-100">Leadership call this week</p>
+          <p className="mt-1 text-lg font-semibold text-slate-50">{leadershipCallLine}</p>
+          <p className="mt-1 text-sm text-slate-200">{operatingStanceLine}</p>
+        </div>
+
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">
             <SummaryLabel label="Where we are now" icon={<CircleTargetIcon className="h-3.5 w-3.5" aria-hidden="true" />} />
@@ -360,18 +372,36 @@ export function DecisionCallHeader({
           </div>
         </div>
 
-        <div className="grid gap-2 lg:grid-cols-3" aria-label="This week's operating call">
+        <article className={tierTwoInset} aria-label="What changed this week">
+          <h2 className={tierTwoHeading}>What changed this week</h2>
+          <ul className="mt-2 grid gap-2 md:grid-cols-2">
+            {changeStrip.map((item) => (
+              <li key={item.label} className="rounded-md border border-slate-700/70 bg-slate-950/65 px-3 py-2 text-xs text-slate-200">
+                <p className="font-semibold uppercase tracking-[0.12em] text-slate-300">{item.label}</p>
+                <p className="mt-1 text-slate-100">{item.movement}</p>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-2 grid gap-2 md:grid-cols-3">
+            {netDecisionEffects.map((item) => (
+              <p key={item.label} className="rounded-md border border-emerald-500/35 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-100">
+                <span className="font-semibold uppercase tracking-[0.1em]">{item.label}</span> {item.value}
+              </p>
+            ))}
+          </div>
+        </article>
+
+        <div className="grid gap-2 lg:grid-cols-3" aria-label="How to execute safely this week">
           <article className="rounded-lg border border-sky-500/45 bg-sky-500/10 px-3 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">Do now</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">How to expand safely this week</p>
             <p className="mt-1 text-sm font-semibold text-slate-100">{immediateDecision}</p>
-            <p className="mt-1 text-xs text-slate-200">{operatingStanceLine}</p>
           </article>
           <article className="rounded-lg border border-sky-500/45 bg-sky-500/10 px-3 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">Move cautiously here</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">Where leadership should move carefully</p>
             <p className="mt-1 text-sm text-slate-100">{guardrail}</p>
           </article>
           <article className="rounded-lg border border-sky-500/45 bg-sky-500/10 px-3 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">What would force a change</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">What would change this call</p>
             <p className="mt-1 text-sm text-slate-100">{regimeDistance.dimensionLabel} {regimeDistance.thresholdDirection === "riseAbove" ? "rises above" : "falls to or below"} {regimeDistance.thresholdValue.toFixed(1)}</p>
           </article>
         </div>
@@ -729,6 +759,33 @@ export function WeeklyDecisionCard({
     };
   });
 
+  const changeStrip = macroMovementRows.map((signal) => ({
+    label: renderSignalLabel(signal.key, signal.label),
+    movement: signal.delta === 0
+      ? "No material move"
+      : `${signal.arrow} ${signal.delta > 0 ? `+${signal.delta.toFixed(1)}` : signal.delta.toFixed(1)} (${signal.significance.toLowerCase()})`,
+  }));
+
+  const leadershipCallLine = postureWithStageLabel?.toLowerCase().includes("expansion")
+    ? "Expand cautiously; avoid locking in irreversible costs."
+    : "Protect downside first; only approve reversible moves.";
+
+  const netDecisionEffects = [
+    {
+      label: "Hiring bar",
+      value: revisitDecisions ? "higher" : "unchanged",
+    },
+    {
+      label: "Experiment tolerance",
+      value: trendLabel.toLowerCase().includes("improving") ? "up" : trendLabel.toLowerCase().includes("deteriorating") ? "down" : "flat",
+    },
+    {
+      label: "Long-payback bets",
+      value: effectiveGuardrail.toLowerCase().includes("pause") || effectiveGuardrail.toLowerCase().includes("tight") ? "more gated" : "less gated",
+    },
+  ];
+
+
   const allSignalContributions = reportDynamics.signalContributions ?? [];
   const topContributors = allSignalContributions.slice(0, 3);
   const topContributorInline =
@@ -779,6 +836,9 @@ export function WeeklyDecisionCard({
         topContributorInline={topContributorInline}
         startupClimateIndex={startupClimateIndex}
         executiveOperationalStance={executiveOperationalStance}
+        changeStrip={changeStrip}
+        netDecisionEffects={netDecisionEffects}
+        leadershipCallLine={leadershipCallLine}
       />
 
       {actions ? (
@@ -800,19 +860,39 @@ export function WeeklyDecisionCard({
         </HapticAnchor>
       ) : null}
 
+      <article className={`${tierOnePanel} ${sectionSpacing}`} aria-label="Screenshot-ready weekly artifact">
+        <h2 className={tierOneHeading}>Slack-ready weekly artifact</h2>
+        <div className={tierOneInset}>
+          <p className="text-xs text-slate-200"><span className={neutralLabel}>Stance:</span> {postureWithStageLabel ?? `${postureLabel} — ${stageLabel}`}</p>
+          <p className="mt-1 text-xs text-slate-200"><span className={neutralLabel}>What changed:</span> {decisionShiftSummary}</p>
+          <ul className="mt-2 grid gap-2 sm:grid-cols-2">
+            {actionStripItems.slice(0, 5).map((item) => (
+              <li key={`artifact-${item.area}`} className="rounded-md border border-slate-700/70 bg-slate-950/60 px-2.5 py-2 text-xs text-slate-200">
+                <p className="font-semibold text-slate-100">{decisionAreaLabel(item.area)}</p>
+                <p className="mt-1">{item.action}</p>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-2 grid gap-2 md:grid-cols-2">
+            <p className="rounded-md border border-emerald-500/35 bg-emerald-500/10 px-2.5 py-2 text-xs text-emerald-100"><span className="font-semibold uppercase tracking-[0.1em]">More expansionary when</span> {compactActionCue(effectiveFlipThreshold)}</p>
+            <p className="rounded-md border border-amber-500/35 bg-amber-500/10 px-2.5 py-2 text-xs text-amber-100"><span className="font-semibold uppercase tracking-[0.1em]">More defensive when</span> {compactActionCue(effectiveGuardrail)}</p>
+          </div>
+        </div>
+      </article>
+
       <article className={`${tierOnePanel} ${sectionSpacing}`}>
-        <h2 className={tierOneHeading}>Decisions</h2>
+        <h2 className={tierOneHeading}>Decision snapshot for leadership this week</h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <div className={tierOneInset}>
             <p className={`text-xs ${neutralLabel}`}>What changed this week</p>
             <p className="mt-1 text-xs text-slate-200">{decisionShiftSummary}</p>
           </div>
           <div className={tierOneInset}>
-            <p className={`text-xs ${neutralLabel}`}>How leadership should act</p>
-            <p className="mt-1 text-xs text-slate-300">Use the call above as your default decision for hiring, spend, and roadmap approvals.</p>
+            <p className={`text-xs ${neutralLabel}`}>What is still safe to approve</p>
+            <p className="mt-1 text-xs text-slate-300">Approve reversible bets with clear payback and explicit stop triggers.</p>
           </div>
           <div className={tierOneInset}>
-            <p className={`text-xs ${neutralLabel}`}>What may change next</p>
+            <p className={`text-xs ${neutralLabel}`}>What to delay</p>
             <p className="mt-1 text-xs text-slate-200">P(flip to Scarcity): <span className="font-semibold text-amber-100">{formatProbabilityPercent(transitionProbabilities.Scarcity)}</span> · P(stabilize in Mixed): <span className="font-semibold text-sky-100">{formatProbabilityPercent(transitionProbabilities.Mixed)}</span></p>
             <div className="mt-2 flex h-2 overflow-hidden rounded-full bg-slate-800" role="img" aria-label="Transition probability mix">
               {transitionStrip.map((segment) => (
@@ -835,33 +915,12 @@ export function WeeklyDecisionCard({
           </div>
         </div>
 
-        <div className="grid gap-3 lg:grid-cols-2">
-          <article className={tierOneInset}>
-            <p className={`text-xs ${neutralLabel}`}>Diagnostics at a glance</p>
-            <p className="mt-2 text-xs text-slate-200">Top contributors: {topContributorInline}</p>
-            <p className="mt-2 text-xs text-slate-300">Flip distance: {Math.abs(regimeDistance.pointsToFlip).toFixed(1)} points</p>
-            <p className="mt-1 text-xs text-slate-300">Regime transition pace: {regimeVelocity.displayLabel}</p>
-          </article>
 
-          <article className={tierOneInset}>
-            <p className={`text-xs ${neutralLabel}`}>Plan stability</p>
-            <div className="mt-2 h-2 rounded-full bg-slate-800">
-              <div className="h-2 rounded-full bg-sky-300/80" style={{ width: `${decisionStabilityPercent}%` }} />
-            </div>
-            <p className="mt-2 text-xs text-slate-200">
-              {revisitDecisions ? "Material change versus last week." : "No material change versus last week."}
-            </p>
-            <p className="mt-2 text-xs text-slate-300">Decision pressure</p>
-            <div className="mt-1 h-3 rounded-full bg-slate-800">
-              <div className="h-3 rounded-full bg-violet-300/80" style={{ width: `${decisionPressurePercent}%` }} />
-            </div>
-          </article>
-        </div>
       </article>
 
 
       <article className={`${tierOnePanel} ${sectionSpacing}`}>
-        <h2 className={tierOneHeading}>What each leader should do</h2>
+        <h2 className={tierOneHeading}>Execution guidance</h2>
         <div className="mt-2 grid gap-3 sm:grid-cols-2">
           {roleAwareTemplates.map((template, index) => (
             <article key={template.role} className={`${tierOneInset} space-y-2`}>
@@ -887,9 +946,16 @@ export function WeeklyDecisionCard({
 
       <ActionStrip items={actionStripItems} />
       <BoundedRulesMatrix decisionRules={decisionRules} />
+      <article className={`${tierTwoPanel} ${sectionSpacing}`} aria-label="Explicit flip conditions">
+        <h2 className={tierTwoHeading}>Explicit flip conditions</h2>
+        <div className="grid gap-2 md:grid-cols-2">
+          <p className="rounded-md border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-100"><span className="font-semibold uppercase tracking-[0.1em]">What would make us more expansionary</span> {effectiveFlipThreshold}</p>
+          <p className="rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-100"><span className="font-semibold uppercase tracking-[0.1em]">What would make us more defensive</span> {effectiveGuardrail}</p>
+        </div>
+      </article>
       <details className={`${tierTwoPanel} ${sectionSpacing} group`}>
         <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
-          <span>Evidence</span>
+          <span>Evidence and diagnostics</span>
           <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
         </summary>
         <div className="mt-3 space-y-4">
