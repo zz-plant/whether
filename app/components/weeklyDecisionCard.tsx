@@ -217,6 +217,48 @@ const resolveDecisionShift = (label: "unchanged" | "higher" | "lower") => {
   return "unchanged";
 };
 
+const directionToken = (delta: number) => {
+  if (delta > 0) return `+${delta.toFixed(1)}`;
+  if (delta < 0) return delta.toFixed(1);
+  return "unchanged";
+};
+
+const signalOperationalMeaning = (key: (typeof signalOrder)[number], delta: number) => {
+  if (delta === 0) {
+    return "No material operating change.";
+  }
+
+  if (key === "tightness") {
+    return delta > 0
+      ? "Financing and hiring get tighter; preserve approval discipline."
+      : "Financing pressure eased; selective approvals become safer.";
+  }
+
+  if (key === "riskAppetite") {
+    return delta > 0
+      ? "Reversible experiments get safer this week."
+      : "Shift to proof-first launches and smaller bet sizes.";
+  }
+
+  if (key === "curveSlope") {
+    return delta > 0
+      ? "Long-payback bets are marginally safer."
+      : "Bias toward faster-payback execution.";
+  }
+
+  return delta > 0
+    ? "Cost of capital pressure rose; gate commitments tightly."
+    : "Rate pressure cooled; maintain discipline while testing upside.";
+};
+
+const resolvePosturePosition = (label: string) => {
+  const normalized = label.toLowerCase();
+  if (normalized.includes("defensive") || normalized.includes("scarcity")) return 20;
+  if (normalized.includes("mixed") || normalized.includes("watch")) return 45;
+  if (normalized.includes("expansion") || normalized.includes("accelerat")) return 80;
+  return 50;
+};
+
 
 const ActionStrip = ({ items }: { items: ActionStripItem[] }) => (
   <section className={`${tierTwoPanel} ${sectionSpacing}`} aria-label="Action strip">
@@ -311,7 +353,7 @@ export function DecisionCallHeader({
   return (
     <header className="space-y-4 border-b border-slate-700/80 pb-6" data-testid="weekly-top-fold">
       <article className={`${tierOnePanel} space-y-4`} data-testid="weekly-viral-hero" aria-label="Weekly posture strip">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Call</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Macro operating console</p>
         <h1 id="weekly-posture-brief-title" className="text-2xl font-semibold text-slate-50 sm:text-3xl">
           {resolvedPostureLabel.toUpperCase()} — {resolvedStageLabel.toUpperCase()}
         </h1>
@@ -646,23 +688,98 @@ export function WeeklyDecisionCard({
         regimeDistance={regimeDistance}
       />
 
-      <article id="what-changed-this-week" className={`${tierOnePanel} ${sectionSpacing}`}>
-        <h2 className={tierOneHeading}>What changed this week</h2>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {macroMovementRows.map((signal) => (
-            <article key={signal.key} className={tierOneInset}>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">{renderSignalLabel(signal.key, signal.label)}</p>
-              <p className={`mt-1 text-sm font-semibold ${signal.delta > 0 ? "text-amber-100" : signal.delta < 0 ? "text-emerald-100" : "text-slate-100"}`}>
-                {signal.arrow} {signal.delta > 0 ? `+${signal.delta.toFixed(1)}` : signal.delta.toFixed(1)}
-              </p>
-            </article>
-          ))}
-        </div>
-        <div className="grid gap-2 sm:grid-cols-3">
-          <p className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">Hiring bar: <span className="font-semibold uppercase">{hiringShift}</span></p>
-          <p className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">Experiment tolerance: <span className="font-semibold uppercase">{experimentShift === "higher" ? "up" : experimentShift === "lower" ? "down" : "flat"}</span></p>
-          <p className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">Long-payback bets: <span className="font-semibold uppercase">{longPaybackShift === "higher" ? "more gated" : longPaybackShift === "lower" ? "less gated" : "unchanged"}</span></p>
-        </div>
+      <div className="grid gap-4 lg:grid-cols-5">
+        <article id="what-changed-this-week" className={`${tierOnePanel} ${sectionSpacing} lg:col-span-3 bg-gradient-to-b from-slate-950/95 to-slate-950/75`}>
+          <div className="flex items-center justify-between gap-3">
+            <h2 className={tierOneHeading}>Decision delta</h2>
+            <span className="rounded-full border border-sky-400/40 bg-sky-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-100">Live weekly move</span>
+          </div>
+          <p className="text-xs text-slate-300">What changed, what it means, and what to do now.</p>
+          <div className="overflow-x-auto rounded-lg border border-slate-700/70 bg-slate-950/60">
+            <table className="min-w-full text-left text-xs text-slate-200">
+              <thead>
+                <tr className="border-b border-slate-700/70 text-[10px] uppercase tracking-[0.1em] text-slate-300">
+                  <th className="px-3 py-2">Signal</th>
+                  <th className="px-3 py-2">Change</th>
+                  <th className="px-3 py-2">Operational meaning</th>
+                </tr>
+              </thead>
+              <tbody>
+                {macroMovementRows.map((signal) => (
+                  <tr key={signal.key} className="border-b border-slate-800/60 last:border-b-0">
+                    <td className="px-3 py-2 font-semibold text-slate-100">{renderSignalLabel(signal.key, signal.label)}</td>
+                    <td className="px-3 py-2">
+                      <span className={`rounded-full px-2 py-0.5 font-semibold ${signal.delta > 0 ? "bg-amber-500/15 text-amber-100" : signal.delta < 0 ? "bg-emerald-500/15 text-emerald-100" : "bg-slate-700/60 text-slate-100"}`}>
+                        {directionToken(signal.delta)}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2 text-slate-300">{signalOperationalMeaning(signal.key, signal.delta)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="rounded-md border border-sky-500/40 bg-sky-500/10 px-3 py-2 text-xs font-semibold text-sky-100">
+            Net effect: {immediateDecision}
+          </p>
+        </article>
+
+        <article className={`${tierOnePanel} ${sectionSpacing} lg:col-span-2 bg-gradient-to-b from-slate-950/95 to-slate-950/75`}>
+          <h2 className={tierOneHeading}>Operator posture</h2>
+          <p className="text-sm font-semibold text-slate-100">{postureWithStageLabel ?? statusLabel}</p>
+          <div className="rounded-lg border border-slate-700/70 bg-slate-950/65 p-3 space-y-2">
+            <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.1em] text-slate-400">
+              <span>Conservation</span>
+              <span>Expansion</span>
+            </div>
+            <div className="relative h-2 rounded-full bg-slate-800">
+              <div className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-violet-500/40 via-sky-500/40 to-emerald-500/40" />
+              <div className="absolute top-1/2 h-4 w-4 -translate-y-1/2 rounded-full border border-sky-200 bg-sky-400 shadow-[0_0_0_4px_rgba(14,165,233,0.2)]" style={{ left: `calc(${resolvePosturePosition(postureWithStageLabel ?? statusLabel)}% - 0.5rem)` }} />
+            </div>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <p className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">Hiring pace: <span className="font-semibold uppercase">{hiringShift}</span></p>
+            <p className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">Experiment tolerance: <span className="font-semibold uppercase">{experimentShift === "higher" ? "up" : experimentShift === "lower" ? "down" : "flat"}</span></p>
+            <p className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">Commitment threshold: <span className="font-semibold uppercase">{longPaybackShift === "higher" ? "elevated" : "normal"}</span></p>
+            <p className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">Payback tolerance: <span className="font-semibold uppercase">{longPaybackShift === "higher" ? "shorter" : "medium"}</span></p>
+          </div>
+        </article>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-3">
+        <article className={`${tierOnePanel} ${sectionSpacing} lg:col-span-2`}>
+          <h2 className={tierOneHeading}>Decision guidance</h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className={`${tierOneInset} space-y-1.5 border-emerald-500/35 bg-emerald-500/5`}>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald-200">Decisions favored</p>
+              <ul className="space-y-1 text-xs text-emerald-100">
+                {roleAwareTemplates.slice(0, 3).map((template) => <li key={`favor-${template.role}`}>• {compactRoleCue(template.doNow)}</li>)}
+              </ul>
+            </div>
+            <div className={`${tierOneInset} space-y-1.5 border-rose-500/35 bg-rose-500/5`}>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-rose-200">Decisions discouraged</p>
+              <ul className="space-y-1 text-xs text-rose-100">
+                {roleAwareTemplates.slice(0, 3).map((template) => <li key={`avoid-${template.role}`}>• {compactRoleCue(template.avoidNow)}</li>)}
+              </ul>
+            </div>
+          </div>
+        </article>
+
+        <article className={`${tierOnePanel} ${sectionSpacing}`}>
+          <h2 className={tierOneHeading}>Monitoring panel</h2>
+          <ul className="space-y-1.5 text-xs text-slate-200">
+            {macroMovementRows.filter((signal) => signal.delta !== 0).slice(0, 3).map((signal) => (
+              <li key={`watch-${signal.key}`}>• {signalActionRuleText[signal.key]}</li>
+            ))}
+            <li>• Flip watch: {regimeDistance.dimensionLabel} {regimeDistance.thresholdDirection === "riseAbove" ? "rises above" : "falls to or below"} {regimeDistance.thresholdValue.toFixed(1)}.</li>
+          </ul>
+        </article>
+      </div>
+
+      <article className={`${tierOnePanel} ${sectionSpacing} bg-gradient-to-r from-slate-950/92 via-slate-900/85 to-slate-950/92`}>
+        <h2 className={tierOneHeading}>Weekly change indicator</h2>
+        <p className="text-sm font-semibold text-slate-100">Posture movement this week: {revisitDecisions ? "+1 (slightly more defensive)" : "0 (maintain posture)"}</p>
+        <p className="text-xs text-slate-300">{revisitDecisions ? decisionShiftSummary : "No macro change this week. Maintain posture."}</p>
       </article>
 
       <div id="decision-snapshot-for-leadership-this-week"><BoundedRulesMatrix decisionRules={decisionRules} /></div>

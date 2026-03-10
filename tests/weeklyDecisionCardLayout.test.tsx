@@ -107,29 +107,26 @@ describe("WeeklyDecisionCard top-fold composition", () => {
 
     assert.match(html, /weekly-posture-brief-title/);
     assert.match(html, /weekly-viral-hero/);
-    assert.match(html, /Where we are in the capital cycle/);
-    assert.match(html, /Key operating posture this week/);
-    assert.match(html, /Expand:/);
-    assert.match(html, /Avoid:/);
-    assert.match(html, /You are here:/);
-    assert.match(html, /Distance to regime change:/);
-    assert.match(html, /Share-ready weekly memo/);
-    assert.match(html, /Decision matrix this week/);
-    assert.match(html, /posture/i);
-    assert.match(html, /Action/);
-    assert.match(html, /Velocity:/);
-    assert.match(html, /Regime transition pace: Expansion→Mixed typically 3–6 months/);
+    assert.match(html, /Macro operating console/);
+    assert.match(html, /Decision delta/);
+    assert.match(html, /Operational meaning/);
+    assert.match(html, /Operator posture/);
+    assert.match(html, /Conservation/);
+    assert.match(html, /Decision guidance/);
+    assert.match(html, /Decisions favored/);
+    assert.match(html, /Decisions discouraged/);
+    assert.match(html, /Monitoring panel/);
+    assert.match(html, /Weekly change indicator/);
     assert.match(html, /id="primary-artifact-actions"/);
-    assert.match(html, /Jump to weekly actions/);
 
     const heroIndex = html.indexOf("weekly-posture-brief-title");
-    const actionIndex = html.indexOf("Action");
-    const guardrailIndex = html.indexOf("Guardrail");
-    const flipConditionIndex = html.indexOf("Flip condition");
+    const deltaIndex = html.indexOf("Decision delta");
+    const postureIndex = html.indexOf("Operator posture");
+    const guidanceIndex = html.indexOf("Decision guidance");
 
-    assert.ok(actionIndex > heroIndex);
-    assert.ok(guardrailIndex > actionIndex);
-    assert.ok(flipConditionIndex > guardrailIndex);
+    assert.ok(deltaIndex > heroIndex);
+    assert.ok(postureIndex > deltaIndex);
+    assert.ok(guidanceIndex > postureIndex);
   });
 
   it("shows fallback warning copy when snapshot mode is active", () => {
@@ -205,8 +202,8 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     );
 
     assert.match(html, /Using a cached snapshot/);
-    assert.match(html, /Regime transition pace: Expansion→Mixed: insufficient history/);
-    assert.match(html, /Flip condition/);
+    assert.match(html, /Weekly change indicator/);
+    assert.match(html, /No macro change this week\. Maintain posture\./);
     assert.match(html, /weekly-viral-hero/);
   });
 });
