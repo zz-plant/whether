@@ -800,7 +800,7 @@ export const buildHomeBriefModel = (
     memoryRail: buildMemoryRail(recordDateLabel, assessment.regime),
     historicalTimeline: buildHistoricalTimeline(assessment.regime, timelineAnchorYear),
     macroOverlay: buildMacroOverlay(macroSeries, assessment, overlaySector),
-    evidenceItems: (data.reportEvidenceItems ?? []).slice(0, 3),
+    evidenceItems: data.reportEvidenceItems ?? [],
     netConstraintSummary,
     postureDeltaLabel,
     reversalTrigger: conciseFlipThreshold,

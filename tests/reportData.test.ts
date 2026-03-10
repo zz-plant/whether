@@ -7,6 +7,7 @@ import {
   buildSnapshotFallbackTreasury,
   buildHistoricalAnalogs,
   buildFlipThreshold,
+  buildReportEvidenceItems,
 } from "../lib/report/reportData";
 import type { TreasuryData } from "../lib/types";
 import { resolveSectorKey } from "../lib/report/sectorSensitivity";
@@ -120,6 +121,43 @@ describe("buildReportDynamics", () => {
     assert.match(dynamics.anomalySignals[0]?.reason ?? "", /sanity threshold/i);
   });
 });
+
+describe("buildReportEvidenceItems", () => {
+  const makeAssessment = ({
+    tightness,
+    riskAppetite,
+    baseRate,
+    curveSlope,
+    regime = "VOLATILE",
+  }: {
+    tightness: number;
+    riskAppetite: number;
+    baseRate: number;
+    curveSlope: number;
+    regime?: "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
+  }) =>
+    ({
+      regime,
+      thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
+      scores: { tightness, riskAppetite, baseRate, curveSlope },
+    }) as ReturnType<typeof evaluateRegime>;
+
+  it("uses improving polarity for positive curve-slope deltas", () => {
+    const reportDynamics = {
+      changedSignals: [{ key: "curveSlope" as const, label: "Curve slope", delta: 0.3 }],
+    } as ReturnType<typeof buildReportDynamics>;
+
+    const items = buildReportEvidenceItems({
+      reportDynamics,
+      assessment: makeAssessment({ tightness: 45, riskAppetite: 55, baseRate: 4.5, curveSlope: 0.2 }),
+    });
+
+    const curveSlopeItem = items.find((item) => item.key === "curveSlope");
+
+    assert.match(curveSlopeItem?.immediateImplication ?? "", /incrementally safer/i);
+  });
+});
+
 
 describe("buildSnapshotFallbackTreasury", () => {
   it("adds fallback markers when snapshot payload has none", () => {
