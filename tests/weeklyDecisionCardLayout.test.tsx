@@ -41,6 +41,11 @@ describe("WeeklyDecisionCard top-fold composition", () => {
         confidenceLabel="MED"
         confidencePercent={68}
         signalConfidenceReason="Reason: regime boundary proximity + volatile macro signals"
+          regimeHeader={{
+            regime: "Defensive",
+            confidence: "Medium (mixed signal reliability)",
+            primaryRisk: "Downside: Capital tightness tightened (1.0).",
+          }}
         trendLabel="Improving"
         transitionWatch="ON"
         operatingStanceLine="Stage decisions. Avoid irreversible spend."
@@ -141,6 +146,11 @@ describe("WeeklyDecisionCard top-fold composition", () => {
         confidenceLabel="HIGH"
         confidencePercent={92}
         signalConfidenceReason="Reason: broad agreement across signals; boundary distance is wide"
+        regimeHeader={{
+          regime: "Defensive",
+          confidence: "High (safe for near-term operating cadence)",
+          primaryRisk: "Downside: Potential stale snapshot bias: live signal freshness is degraded.",
+        }}
         trendLabel="Stable"
         transitionWatch="OFF"
         operatingStanceLine="Hold approvals steady. Keep irreversible spend capped."

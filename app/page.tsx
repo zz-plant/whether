@@ -444,6 +444,7 @@ const HomePageReportContent = async ({
         confidenceLabel={homeBriefModel.confidenceLabel}
         confidencePercent={homeBriefModel.confidencePercent}
         signalConfidenceReason={homeBriefModel.signalConfidenceReason}
+        regimeHeader={homeBriefModel.regimeHeader}
         trendLabel={homeBriefModel.trendLabel}
         transitionWatch={homeBriefModel.transitionWatch}
         operatingStanceLine={homeBriefModel.operatingStanceLine}

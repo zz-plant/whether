@@ -3,6 +3,7 @@ import { buildActionStripItems, buildRoleAwareOperatingTemplates } from "./opera
 import { getSummaryArchive } from "../summary/summaryArchive";
 import type { MacroSeriesReading } from "../types";
 import { isImprovingSignalDelta } from "./reportData";
+import { deltaLabelBySignal } from "./briefFormatting";
 import type { HistoricalAnalog } from "./reportData";
 import {
   REGIME_SEVERITY_RANK,
@@ -19,6 +20,7 @@ import {
   type ForecastModel,
   type TransitionVelocityEstimate,
 } from "./forecastModel";
+import { formatConfidencePlainLabel } from "./reportFormatting";
 import {
   buildFailureModeWarnings,
   type FailureModeWarning,
@@ -586,6 +588,33 @@ const buildStartupClimateIndex = ({
   };
 };
 
+const buildPrimaryRiskLabel = ({
+  failureModes,
+  changedSignals,
+}: {
+  failureModes: HomeBriefFailureMode[];
+  changedSignals: SignalChange[];
+}) => {
+  const dominantSignal = changedSignals
+    .slice()
+    .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta))[0];
+
+  if (failureModes[0]) {
+    return `Downside: ${failureModes[0].warning}`;
+  }
+
+  if (!dominantSignal || dominantSignal.delta === 0) {
+    return "Neutral: no dominant directional risk this week.";
+  }
+
+  const signalLabel = deltaLabelBySignal[dominantSignal.key];
+  if (dominantSignal.delta > 0) {
+    return `Downside: ${signalLabel} tightened (${dominantSignal.delta.toFixed(1)}).`;
+  }
+
+  return `Upside: ${signalLabel} eased (${Math.abs(dominantSignal.delta).toFixed(1)}).`;
+};
+
 export const buildHomeBriefModel = (
   data: HomeReportData,
   options?: { overlaySector?: SectorKey },
@@ -767,6 +796,14 @@ export const buildHomeBriefModel = (
     confidenceLabel,
     confidencePercent,
     signalConfidenceReason,
+    regimeHeader: {
+      regime: displayRegime.label,
+      confidence: formatConfidencePlainLabel(confidenceLabel),
+      primaryRisk: buildPrimaryRiskLabel({
+        failureModes,
+        changedSignals: reportDynamics?.changedSignals ?? [],
+      }),
+    },
     trendLabel,
     operatingStanceLine,
     weeklyMemoLines: buildWeeklyMemoLines({
