@@ -1,5 +1,23 @@
 import type { RegimeKey } from "../regimeEngine";
 
+export const operatingLeverOrder = [
+  "hiring-stance",
+  "investment-pace",
+  "sales-posture",
+  "product-priorities",
+  "risk-tolerance",
+] as const;
+
+export type OperatingLeverKey = (typeof operatingLeverOrder)[number];
+
+export const operatingLeverLabel: Record<OperatingLeverKey, string> = {
+  "hiring-stance": "Hiring stance",
+  "investment-pace": "Investment pace",
+  "sales-posture": "Sales posture",
+  "product-priorities": "Product priorities",
+  "risk-tolerance": "Risk tolerance",
+};
+
 export type DecisionKnob = {
   key: "approvalVelocity" | "reversibility" | "payback" | "experimentTolerance";
   label: string;

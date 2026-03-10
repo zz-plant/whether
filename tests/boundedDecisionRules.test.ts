@@ -31,7 +31,7 @@ it("threads bounded decision rules into role templates", () => {
 });
 
 
-it("ensures every action-strip item includes action, threshold, and reversal condition", () => {
+it("ensures every operating lever item includes bounded decision fields", () => {
   const rules = buildCanonicalBoundedDecisionRules({
     regime: "DEFENSIVE",
     thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
@@ -39,10 +39,11 @@ it("ensures every action-strip item includes action, threshold, and reversal con
   });
 
   const items = buildActionStripItems(rules);
-  assert.ok(items.length > 0);
+  assert.equal(items.length, 5);
   for (const item of items) {
-    assert.ok(item.action.trim().length > 0);
-    assert.ok(item.threshold.trim().length > 0);
+    assert.ok(item.label.trim().length > 0);
+    assert.ok(item.actionNow.trim().length > 0);
+    assert.ok(item.triggerThreshold.trim().length > 0);
     assert.ok(item.reversalCondition.trim().length > 0);
   }
 });
