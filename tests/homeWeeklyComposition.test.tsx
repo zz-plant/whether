@@ -142,7 +142,7 @@ describe("weekly card and interpretation panel composition", () => {
       </>,
     );
 
-    assert.match(html, /Startup Climate — Weekly Call/);
+    assert.match(html, /Weekly Posture — Decision Call/);
     assert.match(html, /Founder playbook/);
     assert.match(html, /Weekly memo \(shareable\)/);
     assert.match(html, /Signal confidence/);
@@ -241,16 +241,16 @@ describe("weekly card and interpretation panel composition", () => {
       </>,
     );
 
-    const heroIndex = html.indexOf("Startup Climate — Weekly Call");
+    const heroIndex = html.indexOf("Weekly Posture — Decision Call");
     const playbookIndex = html.indexOf("Founder playbook");
-    const confidenceIndex = html.indexOf("Confidence");
+    const confidenceIndex = html.indexOf("Signal confidence");
     const instructionIndex = html.indexOf("Action");
     const interpretationIndex = html.indexOf("Interpretation layer");
 
     assert.ok(heroIndex > -1);
-    assert.ok(playbookIndex > heroIndex);
-    assert.ok(confidenceIndex > playbookIndex);
-    assert.ok(instructionIndex > confidenceIndex);
+    assert.ok(confidenceIndex > heroIndex);
+    assert.ok(playbookIndex > confidenceIndex);
+    assert.ok(instructionIndex > playbookIndex);
     assert.ok(interpretationIndex > instructionIndex);
   });
 
@@ -326,7 +326,7 @@ describe("weekly card and interpretation panel composition", () => {
     );
 
     const orientationIndex = html.indexOf("Fast orientation for this week");
-    const cardIndex = html.indexOf("Startup Climate — Weekly Call");
+    const cardIndex = html.indexOf("Weekly Posture — Decision Call");
 
     assert.ok(orientationIndex > -1);
     assert.ok(cardIndex > orientationIndex);
