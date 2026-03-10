@@ -48,21 +48,18 @@ describe("WeeklyDecisionCard extracted sections", () => {
     );
 
     assert.match(html, /weekly-posture-brief-title/);
-    assert.match(html, /Do now/);
-    assert.match(html, /Where we are in the capital cycle/);
-    assert.match(html, /Distance to regime change:/);
-    assert.match(html, /Founder decisions this week/);
-    assert.match(html, /Share-ready weekly memo/);
-    assert.match(html, /Guardrail/);
-    assert.match(html, /Flip condition/);
-    assert.match(html, /Context metric: Startup Climate Index/);
-    assert.match(html, /False-signal warnings/);
+    assert.match(html, /Do now:/);
+    assert.match(html, /Current stance/);
+    assert.match(html, /Flip watch:/);
+    assert.match(html, /Leadership call/);
+    assert.match(html, /What changed this week/);
+
 
     const heroIndex = html.indexOf("weekly-posture-brief-title");
-    const playbookIndex = html.indexOf("Founder decisions this week");
-    const memoIndex = html.indexOf("Share-ready weekly memo");
-    assert.ok(playbookIndex > heroIndex);
-    assert.ok(memoIndex > playbookIndex);
+    const playbookIndex = html.indexOf("Leadership call");
+    const memoIndex = html.indexOf("What changed this week");
+    assert.ok(memoIndex > heroIndex);
+    assert.ok(playbookIndex > memoIndex);
   });
 
 
@@ -104,8 +101,8 @@ describe("WeeklyDecisionCard extracted sections", () => {
       />,
     );
 
-    assert.match(html, /You are here: Expansion/);
-    assert.match(html, /Distance to regime change: 6\.0 points/);
+    assert.match(html, /Current stance/);
+    assert.match(html, /Flip watch: Tightness rises above 70\.0\./);
   });
 
   it("renders compact flip-condition distance", () => {
@@ -146,8 +143,8 @@ describe("WeeklyDecisionCard extracted sections", () => {
       />,
     );
 
-    assert.match(html, /Current: 49\.0 · Trigger: 50\.0/);
-    assert.match(html, /1\.0 points away from trigger\./);
+    assert.match(html, /Flip watch: Risk appetite falls to or below 50\.0\./);
+    assert.match(html, /Constraints eased\./);
   });
 
   it("renders bounded rules matrix hierarchy", () => {
@@ -168,11 +165,10 @@ describe("WeeklyDecisionCard extracted sections", () => {
       />,
     );
 
-    assert.match(html, /Decision matrix this week/);
-    assert.match(html, /Do now/);
-    assert.match(html, /Avoid now/);
-    assert.match(html, /Guardrail/);
-    assert.match(html, /Flip condition/);
+    assert.match(html, /Decision snapshot for leadership this week/);
+    assert.match(html, /What to do/);
+    assert.match(html, /Delay:/);
+
   });
 
   it("renders collapsed context and citation footer", () => {

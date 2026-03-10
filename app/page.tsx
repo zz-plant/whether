@@ -69,9 +69,9 @@ export const runtime = "edge";
 
 const homeSectionSequence = [
   { href: "#weekly-posture-brief-title", label: "Call" },
-  { href: "#decision-snapshot-for-leadership-this-week", label: "Decision snapshot" },
-  { href: "#execution-guidance", label: "Execution guidance" },
-  { href: "#evidence-diagnostics", label: "Evidence" },
+  { href: "#decision-snapshot-for-leadership-this-week", label: "Decide the call" },
+  { href: "#execution-guidance", label: "Run the plan" },
+  { href: "#evidence-diagnostics", label: "Stress-test evidence" },
 ] as const;
 
 const firstRunDestinationKeys = ["signals", "operations", "decide"] as const;
@@ -190,7 +190,7 @@ const HomePageStreamingFallback = () => (
       <p className="text-xs text-slate-300">Usually ready in under 10 seconds.</p>
     </section>
     <section className="weather-panel space-y-4 px-5 py-5" aria-label="Loading evidence">
-      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Loading evidence snapshot</p>
+      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Checking live evidence</p>
       <div className="space-y-2 rounded-xl border border-slate-700/80 bg-slate-900/70 p-3">
         <div className="h-3 w-full animate-pulse rounded-full bg-slate-600/70" />
         <div className="h-3 w-full animate-pulse rounded-full bg-slate-600/70" />
