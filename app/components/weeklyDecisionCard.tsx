@@ -169,6 +169,87 @@ const resolveDecisionShift = (label: "unchanged" | "higher" | "lower") => {
 
 
 
+
+type LiveBandChip = {
+  id: string;
+  label: string;
+  tone: "neutral" | "positive" | "warning";
+};
+
+const resolveLiveBandChips = ({
+  confidenceLabel,
+  confidencePercent,
+  trendLabel,
+  transitionWatch,
+  regimeDistance,
+}: {
+  confidenceLabel: WeeklyDecisionCardProps["confidenceLabel"];
+  confidencePercent: number;
+  trendLabel: string;
+  transitionWatch: WeeklyDecisionCardProps["transitionWatch"];
+  regimeDistance: WeeklyDecisionCardProps["regimeDistance"];
+}): LiveBandChip[] => {
+  const trendLower = trendLabel.toLowerCase();
+  const confidenceTone = confidenceLabel === "HIGH" ? "positive" : confidenceLabel === "MED" ? "neutral" : "warning";
+  const trendTone = trendLower.includes("improv") ? "positive" : trendLower.includes("deterior") ? "warning" : "neutral";
+  const watchTone = transitionWatch === "ON" ? "warning" : "neutral";
+  const flipTone = regimeDistance.pointsToFlip <= 3 ? "warning" : "neutral";
+
+  return [
+    {
+      id: "confidence",
+      label: `Confidence ${confidenceLabel} ${Math.round(confidencePercent)}%`,
+      tone: confidenceTone,
+    },
+    {
+      id: "trend",
+      label: `Trend ${trendLabel}`,
+      tone: trendTone,
+    },
+    {
+      id: "watch",
+      label: transitionWatch === "ON" ? "Transition watch active" : "Transition watch stable",
+      tone: watchTone,
+    },
+    {
+      id: "flip",
+      label: `Flip risk in ${Math.max(1, Math.round(regimeDistance.pointsToFlip))} pts`,
+      tone: flipTone,
+    },
+  ];
+};
+
+const resolveHeroUrgency = ({
+  confidenceLabel,
+  transitionWatch,
+  pointsToFlip,
+}: {
+  confidenceLabel: WeeklyDecisionCardProps["confidenceLabel"];
+  transitionWatch: WeeklyDecisionCardProps["transitionWatch"];
+  pointsToFlip: number;
+}) => {
+  if (confidenceLabel === "LOW" || transitionWatch === "ON" || pointsToFlip <= 3) {
+    return "high";
+  }
+  if (confidenceLabel === "MED" || pointsToFlip <= 6) {
+    return "medium";
+  }
+  return "low";
+};
+
+
+
+const resolveEvidenceTone = (directionLabel: string): "positive" | "warning" | "neutral" => {
+  const normalized = directionLabel.toLowerCase();
+  if (normalized.includes("improv") || normalized.includes("ease") || normalized.includes("loos")) {
+    return "positive";
+  }
+  if (normalized.includes("tight") || normalized.includes("deterior") || normalized.includes("stress")) {
+    return "warning";
+  }
+  return "neutral";
+};
+
 const resolvePosturePosition = (label: string) => {
   const normalized = label.toLowerCase();
   if (normalized.includes("defensive") || normalized.includes("scarcity")) return 20;
@@ -225,6 +306,7 @@ type DecisionCallHeaderProps = {
   postureWithStageLabel?: string;
   netConstraintSummary: string;
   immediateDecision: string;
+  meetingShorthand?: string;
   guardrail: string;
   confidencePercent: number;
   confidenceLabel: WeeklyDecisionCardProps["confidenceLabel"];
@@ -232,12 +314,12 @@ type DecisionCallHeaderProps = {
   trendLabel: WeeklyDecisionCardProps["trendLabel"];
   transitionWatch: WeeklyDecisionCardProps["transitionWatch"];
   operatingStanceLine: string;
+  weeklyMemoLines?: string[];
   freshnessLabel: string;
   trustCueLine: string;
   needsTrustWarning: boolean;
   trustWarningCopy: string;
   regimeDistance: WeeklyDecisionCardProps["regimeDistance"];
-  weeklyMemoLines?: string[];
   failureModes?: FailureModeWarningItem[];
   topContributorInline?: string;
   startupClimateIndex?: Pick<WeeklyDecisionCardProps["startupClimateIndex"], "score" | "status">;
@@ -251,6 +333,7 @@ export function DecisionCallHeader({
   postureWithStageLabel,
   netConstraintSummary,
   immediateDecision,
+  meetingShorthand,
   guardrail,
   confidencePercent,
   confidenceLabel,
@@ -258,6 +341,7 @@ export function DecisionCallHeader({
   trendLabel,
   transitionWatch,
   operatingStanceLine,
+  weeklyMemoLines,
   freshnessLabel,
   trustCueLine,
   needsTrustWarning,
@@ -267,16 +351,40 @@ export function DecisionCallHeader({
   const [derivedPostureLabel, derivedStageLabel] = (postureWithStageLabel ?? "").split(" — ");
   const resolvedPostureLabel = postureLabel ?? derivedPostureLabel ?? statusLabel;
   const resolvedStageLabel = stageLabel ?? derivedStageLabel ?? "Unspecified";
+  const liveBandChips = resolveLiveBandChips({
+    confidenceLabel,
+    confidencePercent,
+    trendLabel,
+    transitionWatch,
+    regimeDistance,
+  });
+  const heroUrgency = resolveHeroUrgency({
+    confidenceLabel,
+    transitionWatch,
+    pointsToFlip: regimeDistance.pointsToFlip,
+  });
 
   return (
     <header className="space-y-4 border-b border-slate-700/80 pb-6" data-testid="weekly-top-fold">
-      <article className={`${tierOnePanel} space-y-4`} data-testid="weekly-viral-hero" aria-label="Weekly posture strip">
+      <article className={`${tierOnePanel} weather-live-hero weather-live-hero--${heroUrgency} space-y-4`} data-testid="weekly-viral-hero" aria-label="Weekly posture strip">
         <p className="text-xs font-semibold tracking-[0.08em] text-slate-300">Macro operating console</p>
         <h1 id="weekly-posture-brief-title" className="text-2xl font-semibold text-slate-50 sm:text-3xl">
           {resolvedPostureLabel} — {resolvedStageLabel}
         </h1>
+        <div className="weather-live-band" data-live-urgency={heroUrgency} aria-label="Live decision telemetry">
+          {liveBandChips.map((chip) => (
+            <span key={chip.id} className={`weather-live-band-chip weather-live-band-chip--${chip.tone}`}>{chip.label}</span>
+          ))}
+        </div>
         <p className="text-base font-semibold text-sky-100">{operatingStanceLine}</p>
         <p className="text-sm leading-6 text-slate-200">{immediateDecision}</p>
+        <p className="rounded-md border border-slate-700/75 bg-slate-950/68 px-3 py-2 text-xs text-slate-200"><span className="font-semibold text-slate-100">Decision delta:</span> {netConstraintSummary}</p>
+
+        <section className="rounded-md border border-slate-700/75 bg-slate-950/68 px-3 py-3">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">What changed this week</p>
+          <p className="mt-1 text-sm leading-6 text-slate-100">{weeklyMemoLines?.[0] ?? immediateDecision}</p>
+          {meetingShorthand ? <p className="mt-1 text-xs font-semibold text-sky-100">{meetingShorthand}</p> : null}
+        </section>
 
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4" aria-label="Quick weekly scan">
           <div className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">
@@ -298,16 +406,17 @@ export function DecisionCallHeader({
         </div>
 
         <div className="flex flex-wrap gap-2" aria-label="Trust and momentum">
-          <p className="rounded-full border border-slate-600/70 bg-slate-900/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-200">
+          <p className="weather-live-chip rounded-full border border-emerald-400/45 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-emerald-100">
+            <span className="mr-2 inline-flex items-center" aria-hidden="true"><span className="weather-live-dot" /></span>
             Confidence: {confidenceLabel} ({Math.round(confidencePercent)}%)
           </p>
-          <p className="rounded-full border border-slate-600/70 bg-slate-900/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-200">
+          <p className="weather-live-chip rounded-full border border-slate-600/70 bg-slate-900/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-200">
             Trend: {trendLabel} · Watch {transitionWatch}
           </p>
-          <p className="rounded-full border border-slate-600/70 bg-slate-900/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-200">
+          <p className="weather-live-chip rounded-full border border-slate-600/70 bg-slate-900/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-200">
             Freshness: {freshnessLabel}
           </p>
-          <p className="rounded-full border border-slate-600/70 bg-slate-900/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-200">
+          <p className="weather-live-chip rounded-full border border-slate-600/70 bg-slate-900/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-200">
             Trust cue: {trustCueLine}
           </p>
         </div>
@@ -587,6 +696,8 @@ export function WeeklyDecisionCard({
   const hiringShift = resolveDecisionShift(revisitDecisions ? "higher" : "unchanged");
   const experimentShift = resolveDecisionShift(revisitDecisions ? "lower" : "unchanged");
   const longPaybackShift = resolveDecisionShift(revisitDecisions ? "higher" : "unchanged");
+  const movementMagnitude = Math.min(100, Math.max(8, Math.round(Math.abs(weeklyMovement.score) * 16)));
+  const movementTone = weeklyMovement.direction === "expansionary" ? "positive" : weeklyMovement.direction === "defensive" ? "warning" : "neutral";
 
   return (
     <section className="weather-panel space-y-5 px-5 py-6 sm:space-y-6 sm:px-7 sm:py-8" aria-labelledby="weekly-posture-brief-title">
@@ -612,34 +723,38 @@ export function WeeklyDecisionCard({
       />
 
       <div className="grid gap-4 lg:grid-cols-5">
-        <article id="what-changed-this-week" className={`${tierOnePanel} ${sectionSpacing} lg:col-span-3 bg-gradient-to-b from-slate-950/95 to-slate-950/75`}>
+        <article id="what-changed-this-week" className={`${tierOnePanel} weather-motion-card ${sectionSpacing} lg:col-span-3 bg-gradient-to-b from-slate-950/95 to-slate-950/75`}>
           <div className="flex items-center justify-between gap-3">
             <h2 className={tierOneHeading}>Evidence snapshot</h2>
             <span className="rounded-full border border-sky-400/40 bg-sky-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-100">Live weekly move</span>
           </div>
           <p className="text-xs text-slate-300">Scan evidence, reliability, and immediate implication in one pass.</p>
           <ul className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
-            {evidenceItems.map((item) => (
-              <li key={item.key} className={`${tierOneInset} space-y-1.5 text-xs text-slate-200`}>
-                <p className="font-semibold text-slate-100">{item.title}</p>
-                <ul className="space-y-1 text-[11px] text-slate-300">
-                  {item.supportingBullets.slice(0, 3).map((bullet) => (
-                    <li key={`${item.key}-delta-${bullet}`}>• {bullet}</li>
-                  ))}
-                </ul>
-                <p className="text-[11px] text-slate-300"><span className="font-semibold text-slate-200">Confidence:</span> {item.confidenceLabel}</p>
-                <p className="text-[11px] text-slate-300"><span className="font-semibold text-slate-200">Direction:</span> {item.directionLabel}</p>
-                <p className="text-[11px] text-slate-300"><span className="font-semibold text-slate-200">Immediate implication:</span> {item.immediateImplication}</p>
-              </li>
-            ))}
+            {evidenceItems.map((item) => {
+              const evidenceTone = resolveEvidenceTone(item.directionLabel);
+              return (
+                <li key={item.key} className={`${tierOneInset} weather-signal-cell weather-signal-cell--${evidenceTone} space-y-1.5 text-xs text-slate-200`}>
+                  <p className="font-semibold text-slate-100">{item.title}</p>
+                  <ul className="space-y-1 text-[11px] text-slate-300">
+                    {item.supportingBullets.slice(0, 3).map((bullet) => (
+                      <li key={`${item.key}-delta-${bullet}`}>• {bullet}</li>
+                    ))}
+                  </ul>
+                  <p className="text-[11px] text-slate-300"><span className="font-semibold text-slate-200">Confidence:</span> {item.confidenceLabel}</p>
+                  <p className="text-[11px] text-slate-300"><span className="font-semibold text-slate-200">Direction:</span> {item.directionLabel}</p>
+                  <p className="text-[11px] text-slate-300"><span className="font-semibold text-slate-200">Immediate implication:</span> {item.immediateImplication}</p>
+                </li>
+              );
+            })}
           </ul>
           <p className="rounded-md border border-sky-500/40 bg-sky-500/10 px-3 py-2 text-xs font-semibold text-sky-100">
             Net effect: {immediateDecision}
           </p>
         </article>
 
-        <article className={`${tierOnePanel} ${sectionSpacing} lg:col-span-2 bg-gradient-to-b from-slate-950/95 to-slate-950/75`}>
+        <article className={`${tierOnePanel} weather-motion-card ${sectionSpacing} lg:col-span-2 bg-gradient-to-b from-slate-950/95 to-slate-950/75`}>
           <h2 className={tierOneHeading}>Operator posture</h2>
+          <p className="text-[11px] text-slate-300">Operational meaning</p>
           <p className="text-sm font-semibold text-slate-100">{postureWithStageLabel ?? statusLabel}</p>
           <div className="rounded-lg border border-slate-700/70 bg-slate-950/65 p-3 space-y-2">
             <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.1em] text-slate-400">
@@ -661,7 +776,7 @@ export function WeeklyDecisionCard({
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <article className={`${tierOnePanel} ${sectionSpacing} lg:col-span-2`}>
+        <article className={`${tierOnePanel} weather-motion-card ${sectionSpacing} lg:col-span-2`}>
           <h2 className={tierOneHeading}>Decision guidance</h2>
           <div className="grid gap-3 sm:grid-cols-2">
             <div className={`${tierOneInset} space-y-1.5 border-emerald-500/35 bg-emerald-500/5`}>
@@ -693,9 +808,12 @@ export function WeeklyDecisionCard({
         </details>
       </div>
 
-      <article className={`${tierOnePanel} ${sectionSpacing} bg-gradient-to-r from-slate-950/92 via-slate-900/85 to-slate-950/92`}>
+      <article className={`${tierOnePanel} weather-motion-card ${sectionSpacing} bg-gradient-to-r from-slate-950/92 via-slate-900/85 to-slate-950/92`}>
         <h2 className={tierOneHeading}>Weekly change indicator</h2>
         <p className="text-sm font-semibold text-slate-100">Model-backed movement score: {weeklyMovement.score > 0 ? `+${weeklyMovement.score.toFixed(1)}` : weeklyMovement.score.toFixed(1)} ({weeklyMovement.direction})</p>
+        <div className="weather-movement-track" aria-hidden="true">
+          <div className={`weather-movement-fill weather-movement-fill--${movementTone}`} style={{ width: `${movementMagnitude}%` }} />
+        </div>
         <p className="text-xs text-slate-300">{weeklyMovement.summary}</p>
       </article>
 
