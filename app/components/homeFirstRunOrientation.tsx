@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 type OrientationDestination = {
@@ -87,7 +88,7 @@ export function HomeFirstRunOrientation({
 
           <nav aria-label="Where to go next" className="grid gap-2 sm:grid-cols-3">
             {destinations.map((destination, index) => (
-              <a
+              <Link
                 key={destination.href}
                 href={destination.href}
                 className="weather-surface block min-h-11 rounded-lg border border-slate-700/70 px-3 py-2 transition-colors hover:border-sky-400/70"
@@ -97,7 +98,7 @@ export function HomeFirstRunOrientation({
                   <span className="rounded-full border border-slate-600/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">{index + 3}</span>
                 </div>
                 <p className="mt-1 text-[11px] text-slate-300">{destination.description}</p>
-              </a>
+              </Link>
             ))}
           </nav>
         </section>
@@ -121,13 +122,13 @@ export function HomeFirstRunOrientation({
             }
 
             return (
-              <a
+              <Link
                 key={action.href}
                 href={action.href}
                 className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100"
               >
                 {action.label}
-              </a>
+              </Link>
             );
           })}
         </div>
@@ -158,12 +159,12 @@ export function HomeFirstRunOrientation({
               </article>
             </div>
             <div className="flex flex-wrap gap-2 text-xs text-slate-300">
-              <a href="/operations" className="rounded-full border border-slate-700/80 px-3 py-1.5 transition-colors hover:border-sky-400/70 hover:text-sky-100">
+              <Link href="/operations" className="rounded-full border border-slate-700/80 px-3 py-1.5 transition-colors hover:border-sky-400/70 hover:text-sky-100">
                 Open full operating playbook
-              </a>
-              <a href="/signals" className="rounded-full border border-slate-700/80 px-3 py-1.5 transition-colors hover:border-sky-400/70 hover:text-sky-100">
+              </Link>
+              <Link href="/signals" className="rounded-full border border-slate-700/80 px-3 py-1.5 transition-colors hover:border-sky-400/70 hover:text-sky-100">
                 Inspect full evidence context
-              </a>
+              </Link>
             </div>
           </section>
 
@@ -174,7 +175,7 @@ export function HomeFirstRunOrientation({
             </div>
             <div className="grid gap-3 md:grid-cols-3">
               {featuredConcepts.map((concept) => (
-                <a
+                <Link
                   key={concept.slug}
                   href={`/concepts/${concept.slug}`}
                   className="weather-surface block space-y-2 px-4 py-3 transition-colors hover:border-sky-400/70"
@@ -182,7 +183,7 @@ export function HomeFirstRunOrientation({
                   <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">{concept.focus}</p>
                   <p className="text-sm font-semibold text-slate-100">{concept.title}</p>
                   <p className="text-xs text-slate-300">{concept.audience}</p>
-                </a>
+                </Link>
               ))}
             </div>
           </section>
