@@ -54,8 +54,8 @@ const ExecutiveSnapshotPanel = dynamic(
 );
 
 const WeeklyActionSummaryFallback = () => (
-  <section id="weekly-action-summary" aria-label="Weekly action summary" className="space-y-8">
-    <div className="weather-panel px-5 py-5 text-sm text-slate-200">Putting together this week&apos;s action summary…</div>
+  <section id="weekly-action-summary" aria-label="Weekly decisions" className="space-y-8">
+    <div className="weather-panel px-5 py-5 text-sm text-slate-200">Putting together this week&apos;s decisions…</div>
   </section>
 );
 
@@ -69,8 +69,8 @@ export const revalidate = 900;
 export const runtime = "edge";
 
 const homeSectionSequence = [
-  { href: "#weekly-posture-brief-title", label: "This week" },
-  { href: "#weekly-action-summary", label: "Weekly actions" },
+  { href: "#weekly-posture-brief-title", label: "Call" },
+  { href: "#weekly-action-summary", label: "Decisions" },
   { href: "#executive-snapshot", label: "Evidence" },
 ] as const;
 
@@ -480,21 +480,9 @@ const HomePageReportContent = async ({
       />
 
 
-      <HomeInterpretationPanel
-        layer={interpretationLayer}
-        searchParams={resolvedSearchParams}
-      />
-
-      {!reportResult.ok ? (
-        <LiveDataFallbackAlert
-          lastCachedTimestamp={reportResult.fallback.lastCachedTimestamp}
-          followUpLabel="Review live evidence"
-        />
-      ) : null}
-
       <DeferredSection
         id="weekly-action-summary"
-        ariaLabel="Weekly action summary"
+        ariaLabel="Decisions"
         fallback={<WeeklyActionSummaryFallback />}
       >
         <WeeklyActionSummaryPanel
@@ -534,6 +522,19 @@ const HomePageReportContent = async ({
           />
         </DeferredSection>
       </div>
+
+      <HomeInterpretationPanel
+        layer={interpretationLayer}
+        searchParams={resolvedSearchParams}
+      />
+
+      {!reportResult.ok ? (
+        <LiveDataFallbackAlert
+          lastCachedTimestamp={reportResult.fallback.lastCachedTimestamp}
+          followUpLabel="Review live evidence"
+        />
+      ) : null}
+
 
       <details className="weather-panel space-y-4 px-5 py-4" id="why-whether">
         <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">

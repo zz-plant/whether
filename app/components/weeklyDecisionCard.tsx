@@ -214,7 +214,7 @@ const compactRoleCue = (text: string) =>
 const ActionStrip = ({ items }: { items: ActionStripItem[] }) => (
   <section className={`${tierTwoPanel} ${sectionSpacing}`} aria-label="Action strip">
     <div className="flex flex-wrap items-end justify-between gap-2">
-      <h3 className={tierTwoHeading}>This week&apos;s action strip</h3>
+      <h3 className={tierTwoHeading}>What leadership should do this week</h3>
       <p className="text-[11px] uppercase tracking-[0.12em] text-slate-400">Action · guardrail · flip</p>
     </div>
     <ul className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -319,18 +319,18 @@ export function DecisionCallHeader({
   return (
     <header className="space-y-4 border-b border-slate-700/80 pb-6" data-testid="weekly-top-fold">
       <article className={`${tierOnePanel} space-y-4`} data-testid="weekly-viral-hero" aria-label="Weekly posture strip">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">This week&apos;s operating call</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Call</p>
         <h1 id="weekly-posture-brief-title" className="text-2xl font-semibold text-slate-50 sm:text-3xl">
           {resolvedPostureLabel.toUpperCase()} — {resolvedStageLabel.toUpperCase()}
         </h1>
 
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">
-            <SummaryLabel label="Posture + stage" icon={<CircleTargetIcon className="h-3.5 w-3.5" aria-hidden="true" />} />
+            <SummaryLabel label="Where we are now" icon={<CircleTargetIcon className="h-3.5 w-3.5" aria-hidden="true" />} />
             <p className="mt-1 text-sm font-semibold text-slate-100">{resolvedPostureLabel} — {resolvedStageLabel}</p>
           </div>
           <div className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">
-            <SummaryLabel label="Signal confidence" icon={<ShieldIcon className="h-3.5 w-3.5" aria-hidden="true" />} />
+            <SummaryLabel label="How much to trust this call" icon={<ShieldIcon className="h-3.5 w-3.5" aria-hidden="true" />} />
             <p className="mt-1 text-sm font-semibold text-slate-100">{confidenceLabel} ({Math.round(confidencePercent)}%)</p>
           </div>
           <div className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">
@@ -347,17 +347,17 @@ export function DecisionCallHeader({
         </div>
 
         <div className="grid gap-2 lg:grid-cols-3" aria-label="This week's operating call">
-          <article className="rounded-lg border border-violet-500/45 bg-violet-500/10 px-3 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-violet-100">Decision now</p>
+          <article className="rounded-lg border border-sky-500/45 bg-sky-500/10 px-3 py-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">Do now</p>
             <p className="mt-1 text-sm font-semibold text-slate-100">{immediateDecision}</p>
             <p className="mt-1 text-xs text-slate-200">{operatingStanceLine}</p>
           </article>
-          <article className="rounded-lg border border-amber-500/45 bg-amber-500/10 px-3 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-amber-100">Guardrail</p>
+          <article className="rounded-lg border border-sky-500/45 bg-sky-500/10 px-3 py-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">Move cautiously here</p>
             <p className="mt-1 text-sm text-slate-100">{guardrail}</p>
           </article>
           <article className="rounded-lg border border-sky-500/45 bg-sky-500/10 px-3 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">Flip condition</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">What would force a change</p>
             <p className="mt-1 text-sm text-slate-100">{regimeDistance.dimensionLabel} {regimeDistance.thresholdDirection === "riseAbove" ? "rises above" : "falls to or below"} {regimeDistance.thresholdValue.toFixed(1)}</p>
           </article>
         </div>
@@ -786,18 +786,18 @@ export function WeeklyDecisionCard({
       ) : null}
 
       <article className={`${tierOnePanel} ${sectionSpacing}`}>
-        <h2 className={tierOneHeading}>What changed and trigger points</h2>
+        <h2 className={tierOneHeading}>Decisions</h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <div className={tierOneInset}>
-            <p className={`text-xs ${neutralLabel}`}>Change this week</p>
+            <p className={`text-xs ${neutralLabel}`}>What changed this week</p>
             <p className="mt-1 text-xs text-slate-200">{decisionShiftSummary}</p>
           </div>
           <div className={tierOneInset}>
-            <p className={`text-xs ${neutralLabel}`}>Canonical decision</p>
-            <p className="mt-1 text-xs text-slate-300">Use the top call above for action, guardrail, and flip condition.</p>
+            <p className={`text-xs ${neutralLabel}`}>How leadership should act</p>
+            <p className="mt-1 text-xs text-slate-300">Use the call above as your default decision for hiring, spend, and roadmap approvals.</p>
           </div>
           <div className={tierOneInset}>
-            <p className={`text-xs ${neutralLabel}`}>4-week transition watch</p>
+            <p className={`text-xs ${neutralLabel}`}>What may change next</p>
             <p className="mt-1 text-xs text-slate-200">P(flip to Scarcity): <span className="font-semibold text-amber-100">{formatProbabilityPercent(transitionProbabilities.Scarcity)}</span> · P(stabilize in Mixed): <span className="font-semibold text-sky-100">{formatProbabilityPercent(transitionProbabilities.Mixed)}</span></p>
             <div className="mt-2 flex h-2 overflow-hidden rounded-full bg-slate-800">
               {transitionStrip.map((segment) => (
@@ -810,12 +810,12 @@ export function WeeklyDecisionCard({
               ))}
             </div>
           </div>
-          <div className="rounded-lg border border-amber-500/45 bg-slate-950/72 px-3 py-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-100">Guardrail reference</p>
+          <div className="rounded-lg border border-sky-500/35 bg-slate-950/72 px-3 py-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Where to move cautiously</p>
             <p className="mt-1 text-xs text-slate-200">{effectiveGuardrail}</p>
           </div>
           <div className="rounded-lg border border-sky-500/35 bg-slate-950/72 px-3 py-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Flip condition reference</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Where growth is still safe</p>
             <p className="mt-1 text-xs text-slate-200">{effectiveFlipThreshold}</p>
           </div>
         </div>
@@ -846,7 +846,7 @@ export function WeeklyDecisionCard({
 
 
       <article className={`${tierOnePanel} ${sectionSpacing}`}>
-        <h2 className={tierOneHeading}>Role-based calls this week</h2>
+        <h2 className={tierOneHeading}>What each leader should do</h2>
         <div className="mt-2 grid gap-3 sm:grid-cols-2">
           {roleAwareTemplates.map((template, index) => (
             <article key={template.role} className={`${tierOneInset} space-y-2`}>
@@ -874,7 +874,7 @@ export function WeeklyDecisionCard({
       <BoundedRulesMatrix decisionRules={decisionRules} />
       <details className={`${tierTwoPanel} ${sectionSpacing}`}>
         <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.14em] text-slate-200">
-          Evidence behind this call ▼
+          Evidence ▼
         </summary>
         <div className="mt-3 space-y-4">
           <article className={tierOneInset}>
