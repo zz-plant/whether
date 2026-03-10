@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { HapticAnchor } from "./hapticAnchor";
-import { ArrowRightIcon, CircleTargetIcon, ShieldIcon } from "./uiIcons";
+import { CircleTargetIcon, ShieldIcon } from "./uiIcons";
 import type { ReportDynamics } from "../../lib/report/reportData";
 import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
 import type { ActionStripItem, RoleAwareOperatingTemplate } from "../../lib/report/operatingCalls";
@@ -282,29 +282,58 @@ export function DecisionCallHeader({
     guardrail,
     reversalTrigger: `Flip: ${regimeDistance.dimensionLabel} ${regimeDistance.thresholdDirection === "riseAbove" ? "rises above" : "falls to or below"} ${regimeDistance.thresholdValue.toFixed(1)}`,
   });
+  const flipDistancePoints = Math.abs(regimeDistance.pointsToFlip);
+  const flipDistanceGaugePercent = Math.max(
+    8,
+    Math.min(100, Math.round((flipDistancePoints / Math.max(Math.abs(regimeDistance.thresholdValue), 1)) * 100)),
+  );
 
   return (
-    <header className="space-y-5 border-b border-slate-700/80 pb-6" data-testid="weekly-top-fold">
-      <article className={`${tierOnePanel} space-y-4`} data-testid="weekly-viral-hero" aria-label="Weekly posture call">
+    <header className="space-y-4 border-b border-slate-700/80 pb-6" data-testid="weekly-top-fold">
+      <article className={`${tierOnePanel} space-y-4`} data-testid="weekly-viral-hero" aria-label="Weekly posture strip">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">Weekly Posture — Decision Call</p>
-        <h1 id="weekly-posture-brief-title" className="text-3xl font-semibold text-slate-50 sm:text-4xl">
+        <h1 id="weekly-posture-brief-title" className="text-2xl font-semibold text-slate-50 sm:text-3xl">
           {resolvedPostureLabel.toUpperCase()} — {resolvedStageLabel.toUpperCase()}
         </h1>
-        <div className="grid gap-2 text-sm font-semibold text-slate-100 sm:grid-cols-2">
-          <p>Confidence: {confidenceLabel}</p>
-          <p>Trend: {trendLabel.toUpperCase()}</p>
+
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">
+            <SummaryLabel label="Posture + stage" icon={<CircleTargetIcon className="h-3.5 w-3.5" aria-hidden="true" />} />
+            <p className="mt-1 text-sm font-semibold text-slate-100">{resolvedPostureLabel} — {resolvedStageLabel}</p>
+          </div>
+          <div className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">
+            <SummaryLabel label="Signal confidence" icon={<ShieldIcon className="h-3.5 w-3.5" aria-hidden="true" />} />
+            <p className="mt-1 text-sm font-semibold text-slate-100">{confidenceLabel} ({Math.round(confidencePercent)}%)</p>
+          </div>
+          <div className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Trend</p>
+            <p className="mt-1 text-sm font-semibold text-slate-100">{trendLabel.toUpperCase()} · Watch {transitionWatch}</p>
+          </div>
+          <div className="rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em]">Flip distance</p>
+            <p className="mt-1 text-sm font-semibold">{flipDistancePoints.toFixed(1)} pts to trigger</p>
+            <div className="mt-2 h-1.5 rounded-full bg-amber-200/20">
+              <div className="h-1.5 rounded-full bg-amber-300/90" style={{ width: `${flipDistanceGaugePercent}%` }} />
+            </div>
+          </div>
         </div>
-        <p className="rounded-lg border border-amber-500/50 bg-amber-500/10 px-3 py-3 text-sm text-amber-50">
-          <span className="font-semibold">Operating posture:</span> {operatingStanceLine}
+
+        <p className="rounded-lg border border-sky-500/45 bg-sky-500/10 px-3 py-3 text-sm text-sky-50">
+          <span className="font-semibold">Immediate action:</span> {immediateDecision} {operatingStanceLine}
         </p>
       </article>
 
-      <article className={`${tierOnePanel} ${sectionSpacing}`} aria-label="Operating call panel">
+      <details className={`${tierTwoPanel} ${sectionSpacing}`}>
+        <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.14em] text-slate-200">
+          Rationale and weekly memo ▼
+        </summary>
+
+        <article className="mt-3 space-y-4" aria-label="Operating call rationale">
         <h2 className={tierOneHeading}>Startup capital cycle</h2>
         <p className="text-xs text-slate-300">Scarcity → Mixed → Guarded Expansion → Aggressive Expansion</p>
         <p className="text-xs font-semibold uppercase tracking-[0.1em] text-sky-200">↑ You are here: {resolvedPostureLabel}</p>
         <p className="text-sm leading-relaxed text-slate-200">{meetingShorthand}</p>
-        <p className="text-xs text-slate-300">Distance to regime change: {Math.abs(regimeDistance.pointsToFlip).toFixed(1)} points · Regime shift watch: {transitionWatch}</p>
+        <p className="text-xs text-slate-300">Distance to regime change: {flipDistancePoints.toFixed(1)} points · Regime shift watch: {transitionWatch}</p>
 
         <article className={tierOneInset} aria-label="Founders decision triad this week">
           <h3 className={tierTwoHeading}>Founder playbook</h3>
@@ -356,30 +385,11 @@ export function DecisionCallHeader({
           </div>
         </article>
 
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <div className={tierOneInset}>
-            <SummaryLabel
-              label="Posture"
-              icon={<CircleTargetIcon className="h-3.5 w-3.5" aria-hidden="true" />}
-            />
-            <p className="mt-1 text-sm font-semibold text-slate-100">{resolvedPostureLabel}</p>
-          </div>
-          <div className={tierOneInset}>
-            <SummaryLabel
-              label="Signal confidence"
-              icon={<ShieldIcon className="h-3.5 w-3.5" aria-hidden="true" />}
-            />
-            <p className="mt-1 text-sm font-semibold text-slate-100">{confidenceLabel} ({Math.round(confidencePercent)}%)</p>
-            <p className="mt-2 text-xs text-slate-300">Freshness: {freshnessLabel}</p>
-          </div>
-          <div className={tierOneInset}>
-            <SummaryLabel
-              label="Action"
-              icon={<ArrowRightIcon className="h-3.5 w-3.5" aria-hidden="true" />}
-            />
-            <p className="mt-1 text-sm font-semibold text-slate-100">{immediateDecision}</p>
-          </div>
-        </div>
+        <article className={tierOneInset} aria-label="Token notes">
+          <p className={`text-xs ${neutralLabel}`}>Token notes</p>
+          <p className="mt-1 text-xs text-slate-300">Freshness: {freshnessLabel}</p>
+          <p className="mt-1 text-xs text-slate-300">Current: {regimeDistance.currentValue.toFixed(1)} · Trigger: {regimeDistance.thresholdValue.toFixed(1)}</p>
+        </article>
 
         <article className="rounded-lg border border-amber-500/45 bg-amber-500/10 px-3 py-3">
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-100">Guardrail</p>
@@ -389,7 +399,7 @@ export function DecisionCallHeader({
         <article className={tierOneInset}>
           <p className={`text-xs ${neutralLabel}`}>Flip condition</p>
           <p className="mt-1 text-xs text-slate-300">Current: {regimeDistance.currentValue.toFixed(1)} · Trigger: {regimeDistance.thresholdValue.toFixed(1)}</p>
-          <p className="mt-2 text-xs text-amber-100">{Math.abs(regimeDistance.pointsToFlip).toFixed(1)} points away from trigger.</p>
+          <p className="mt-2 text-xs text-amber-100">{flipDistancePoints.toFixed(1)} points away from trigger.</p>
         </article>
 
         <p className="text-xs text-slate-300">{netConstraintSummary}</p>
@@ -411,7 +421,8 @@ export function DecisionCallHeader({
             </ul>
           </article>
         ) : null}
-      </article>
+        </article>
+      </details>
     </header>
   );
 }
