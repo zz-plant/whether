@@ -608,7 +608,9 @@ const buildPrimaryRiskLabel = ({
   }
 
   const signalLabel = deltaLabelBySignal[dominantSignal.key];
-  if (dominantSignal.delta > 0) {
+  const isImprovingMove = isImprovingSignalDelta(dominantSignal.key, dominantSignal.delta);
+
+  if (!isImprovingMove) {
     return `Downside: ${signalLabel} tightened (${dominantSignal.delta.toFixed(1)}).`;
   }
 
