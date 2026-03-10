@@ -6,6 +6,7 @@ import {
   buildReportDynamics,
   buildSnapshotFallbackTreasury,
   buildHistoricalAnalogs,
+  buildFlipThreshold,
 } from "../lib/report/reportData";
 import type { TreasuryData } from "../lib/types";
 import { resolveSectorKey } from "../lib/report/sectorSensitivity";
@@ -234,5 +235,46 @@ describe("buildHistoricalAnalogs", () => {
     }).map((item) => item.recordDate);
 
     assert.deepEqual(first, second);
+  });
+});
+
+describe("buildFlipThreshold", () => {
+  const makeAssessment = (
+    regime: "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION",
+  ) =>
+    ({
+      regime,
+      thresholds: {
+        tightnessRegime: 70,
+        riskAppetiteRegime: 50,
+      },
+    }) as ReturnType<typeof evaluateRegime>;
+
+  it("returns a future crossing for scarcity regimes", () => {
+    assert.equal(
+      buildFlipThreshold(makeAssessment("SCARCITY")),
+      "Flip watch: Tightness <= 70.0 or Risk appetite > 50.0.",
+    );
+  });
+
+  it("returns a future crossing for defensive regimes", () => {
+    assert.equal(
+      buildFlipThreshold(makeAssessment("DEFENSIVE")),
+      "Flip watch: Tightness <= 70.0 or Risk appetite <= 50.0.",
+    );
+  });
+
+  it("returns a future crossing for volatile regimes", () => {
+    assert.equal(
+      buildFlipThreshold(makeAssessment("VOLATILE")),
+      "Flip watch: Tightness > 70.0 or Risk appetite > 50.0.",
+    );
+  });
+
+  it("returns a future crossing for expansion regimes", () => {
+    assert.equal(
+      buildFlipThreshold(makeAssessment("EXPANSION")),
+      "Flip watch: Tightness > 70.0 or Risk appetite <= 50.0.",
+    );
   });
 });
