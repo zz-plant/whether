@@ -540,35 +540,29 @@ const HomePageReportContent = async ({
           <section className="space-y-4" aria-label="Why Whether versus alternatives">
             <div className="space-y-1">
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Why Whether</p>
-              <h2 className="text-base font-semibold text-slate-100">Built for a weekly operating call, not just macro analysis</h2>
+              <h2 className="text-base font-semibold text-slate-100">Secondary context for when the weekly call needs more detail</h2>
             </div>
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-left text-xs text-slate-200">
-                <thead>
-                  <tr className="border-b border-slate-700/70 text-[11px] uppercase tracking-[0.1em] text-slate-400">
-                    <th className="px-2 py-2">Category</th>
-                    <th className="px-2 py-2">Dashboards / research stack</th>
-                    <th className="px-2 py-2">Whether</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="border-b border-slate-800/80">
-                    <th className="px-2 py-2 font-semibold text-slate-100">Output</th>
-                    <td className="px-2 py-2 text-slate-300">Evidence and commentary to interpret.</td>
-                    <td className="px-2 py-2 font-medium text-sky-100">One bounded weekly operating call leadership can act on.</td>
-                  </tr>
-                  <tr className="border-b border-slate-800/80">
-                    <th className="px-2 py-2 font-semibold text-slate-100">Cadence</th>
-                    <td className="px-2 py-2 text-slate-300">Ad hoc review during planning debates.</td>
-                    <td className="px-2 py-2 font-medium text-sky-100">Weekly ritual for Monday sync preparation.</td>
-                  </tr>
-                  <tr>
-                    <th className="px-2 py-2 font-semibold text-slate-100">Decision quality</th>
-                    <td className="px-2 py-2 text-slate-300">Generic guidance with uneven follow-through.</td>
-                    <td className="px-2 py-2 font-medium text-sky-100">Action + threshold + reversal condition in one artifact.</td>
-                  </tr>
-                </tbody>
-              </table>
+            <div className="grid gap-3 md:grid-cols-3">
+              <article className="weather-surface space-y-2 px-4 py-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">What it changes this week</p>
+                <p className="text-sm text-slate-100">Translate the signal stack into one operating posture so team leads leave with the same call.</p>
+              </article>
+              <article className="weather-surface space-y-2 px-4 py-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">What to revisit</p>
+                <p className="text-sm text-slate-100">Pressure-test hiring pace, spend windows, and pipeline bets against the current guardrails before approvals.</p>
+              </article>
+              <article className="weather-surface space-y-2 px-4 py-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">What flips the call</p>
+                <p className="text-sm text-slate-100">Track threshold movement and reversal conditions in the weekly brief; if a stop item triggers, reset the plan immediately.</p>
+              </article>
+            </div>
+            <div className="flex flex-wrap gap-2 text-xs text-slate-300">
+              <Link href="/operations" className="rounded-full border border-slate-700/80 px-3 py-1.5 transition-colors hover:border-sky-400/70 hover:text-sky-100">
+                Open full operating playbook
+              </Link>
+              <Link href="/signals" className="rounded-full border border-slate-700/80 px-3 py-1.5 transition-colors hover:border-sky-400/70 hover:text-sky-100">
+                Inspect full evidence context
+              </Link>
             </div>
           </section>
 
