@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
-import Link from "next/link";
 import { Suspense } from "react";
 import {
   buildTimeMachineHref,
@@ -38,7 +37,6 @@ import { getFeaturedConceptArticles } from "../lib/productCanon";
 import { LiveDataFallbackAlert } from "./components/liveDataFallbackAlert";
 import { HomeInterpretationPanel } from "./components/homeInterpretationPanel";
 import { DeferredSection } from "./components/deferredSection";
-import { NextStepRail } from "./components/nextStepRail";
 import { getRegimeDisplayLabel } from "../lib/regimePresentation";
 import { navigationLayers } from "../lib/navigation/informationArchitecture";
 import { HomeFirstRunOrientation } from "./components/homeFirstRunOrientation";
@@ -75,6 +73,16 @@ const homeSectionSequence = [
 ] as const;
 
 const firstRunDestinationKeys = ["signals", "operations", "decide"] as const;
+
+const homeQuickActions = [
+  { label: "Weekly brief", href: "/" },
+  { label: "Learn", href: "/learn" },
+  { label: "Review evidence", href: "/signals" },
+  { label: "Apply operations", href: "/operations" },
+  { label: "Choose decision path", href: "/decide" },
+  { label: "Run toolkit", href: "/toolkits" },
+  { label: "Inspect methodology", href: "/method" },
+];
 
 
 export const generateMetadata = async ({
@@ -356,7 +364,7 @@ const HomePageReportContent = async ({
     forecast,
     decisionRules: homeBriefModel.decisionRules,
   });
-  const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries, {
+  const exportLayerOptions = {
     interpretationLayer,
     postureWithStageLabel: homeBriefModel.postureWithStageLabel,
     operatingStanceLine: homeBriefModel.operatingStanceLine,
@@ -366,19 +374,13 @@ const HomePageReportContent = async ({
     historicalAnalogs: homeBriefModel.historicalAnalogs,
     failureModes: homeBriefModel.failureModes,
     actionStripItems: homeBriefModel.actionStripItems,
-  });
-  const boardSummary = buildBoardBrief(assessment, treasury, sensors, macroSeries, {
+  };
+  const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries, exportLayerOptions);
+  const boardSummary = buildBoardBrief(assessment, treasury, sensors, macroSeries, exportLayerOptions);
+  const callCitation = buildCallCitation(assessment, treasury, {
     interpretationLayer,
     postureWithStageLabel: homeBriefModel.postureWithStageLabel,
-    operatingStanceLine: homeBriefModel.operatingStanceLine,
-    trendLabel: homeBriefModel.trendLabel,
-    transitionWatch: homeBriefModel.transitionWatch,
-    regimeDistancePoints: homeBriefModel.regimeDistance.pointsToFlip,
-    historicalAnalogs: homeBriefModel.historicalAnalogs,
-    failureModes: homeBriefModel.failureModes,
-    actionStripItems: homeBriefModel.actionStripItems,
   });
-  const callCitation = buildCallCitation(assessment, treasury, { interpretationLayer, postureWithStageLabel: homeBriefModel.postureWithStageLabel });
   const featuredConcepts = getFeaturedConceptArticles().slice(0, 3);
   return (
     <ReportShell
@@ -433,6 +435,9 @@ const HomePageReportContent = async ({
         changeSummary={homeBriefModel.decisionShiftSummary}
         decisionNow={homeBriefModel.operatingStanceLine}
         destinations={firstRunDestinations}
+        quickActions={[...homeQuickActions]}
+        featuredConcepts={featuredConcepts}
+        currentPath="/"
       />
 
       <WeeklyDecisionCard
@@ -492,23 +497,8 @@ const HomePageReportContent = async ({
         />
       </DeferredSection>
 
-      <details className="weather-panel px-5 py-4 sm:hidden">
-        <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">Evidence appendix (tap to expand)</summary>
-        <DeferredSection
-          id="executive-snapshot-mobile"
-          ariaLabel="Leadership summary"
-          fallback={<ExecutiveSnapshotFallback />}
-        >
-          <ExecutiveSnapshotPanel
-            treasury={treasury}
-            assessment={assessment}
-            provenance={treasuryProvenance}
-            sectionId="executive-snapshot-evidence"
-          />
-        </DeferredSection>
-      </details>
-
-      <div className="hidden sm:block">
+      <details className="weather-panel px-5 py-4" open>
+        <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.14em] text-slate-300 sm:hidden">Evidence appendix (tap to expand)</summary>
         <DeferredSection
           id="executive-snapshot"
           ariaLabel="Leadership summary"
@@ -521,7 +511,7 @@ const HomePageReportContent = async ({
             sectionId="executive-snapshot-evidence"
           />
         </DeferredSection>
-      </div>
+      </details>
 
       <HomeInterpretationPanel
         layer={interpretationLayer}
@@ -534,64 +524,6 @@ const HomePageReportContent = async ({
           followUpLabel="Review live evidence"
         />
       ) : null}
-
-
-      <details className="weather-panel space-y-4 px-5 py-4" id="why-whether">
-        <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">
-          Optional context and decision playbooks
-        </summary>
-        <div className="space-y-5 pt-4">
-          <section className="space-y-4" aria-label="Why Whether versus alternatives">
-            <div className="space-y-1">
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Why Whether</p>
-              <h2 className="text-base font-semibold text-slate-100">Secondary context for when the weekly call needs more detail</h2>
-            </div>
-            <div className="grid gap-3 md:grid-cols-3">
-              <article className="weather-surface space-y-2 px-4 py-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">What it changes this week</p>
-                <p className="text-sm text-slate-100">Translate the signal stack into one operating posture so team leads leave with the same call.</p>
-              </article>
-              <article className="weather-surface space-y-2 px-4 py-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">What to revisit</p>
-                <p className="text-sm text-slate-100">Pressure-test hiring pace, spend windows, and pipeline bets against the current guardrails before approvals.</p>
-              </article>
-              <article className="weather-surface space-y-2 px-4 py-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">What flips the call</p>
-                <p className="text-sm text-slate-100">Track threshold movement and reversal conditions in the weekly brief; if a stop item triggers, reset the plan immediately.</p>
-              </article>
-            </div>
-            <div className="flex flex-wrap gap-2 text-xs text-slate-300">
-              <Link href="/operations" className="rounded-full border border-slate-700/80 px-3 py-1.5 transition-colors hover:border-sky-400/70 hover:text-sky-100">
-                Open full operating playbook
-              </Link>
-              <Link href="/signals" className="rounded-full border border-slate-700/80 px-3 py-1.5 transition-colors hover:border-sky-400/70 hover:text-sky-100">
-                Inspect full evidence context
-              </Link>
-            </div>
-          </section>
-
-          <section className="space-y-4" aria-label="Decision concept links">
-            <div className="space-y-1">
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Decision playbooks</p>
-              <h2 className="text-base font-semibold text-slate-100">Use these quick playbooks before finalizing this week&apos;s plan</h2>
-            </div>
-            <div className="grid gap-3 md:grid-cols-3">
-              {featuredConcepts.map((concept) => (
-                <Link
-                  key={concept.slug}
-                  href={`/concepts/${concept.slug}`}
-                  className="weather-surface block space-y-2 px-4 py-3 transition-colors hover:border-sky-400/70"
-                >
-                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">{concept.focus}</p>
-                  <p className="text-sm font-semibold text-slate-100">{concept.title}</p>
-                  <p className="text-xs text-slate-300">{concept.audience}</p>
-                </Link>
-              ))}
-            </div>
-          </section>
-        </div>
-      </details>
-      <NextStepRail currentPath="/" />
     </ReportShell>
   );
 };
