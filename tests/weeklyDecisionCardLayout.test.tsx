@@ -75,6 +75,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
           avoid: ["net-new hiring if tightness > 74", "long-payback bets if risk appetite < 44"],
         }}
         revisitDecisions={true}
+        weeklyMovement={{ score: 1.2, direction: "defensive", summary: "Model pressure increased by +1.2 this week; tighten approvals until a reversal trigger prints." }}
         memoryRail={[{ label: "Now", posture: "Defensive" }]}
         historicalTimeline={[{ label: "2026", posture: "Defensive" }]}
         historicalAnalogs={[]}
@@ -174,6 +175,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
           avoid: ["net-new hiring if tightness > 74", "long-payback bets if risk appetite < 44"],
         }}
         revisitDecisions={false}
+        weeklyMovement={{ score: 0, direction: "neutral", summary: "Model pressure is flat this week; hold posture and keep existing guardrails in force." }}
         memoryRail={[{ label: "Now", posture: "Defensive" }]}
         historicalTimeline={[{ label: "2026", posture: "Defensive" }]}
         historicalAnalogs={[]}
@@ -203,7 +205,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
 
     assert.match(html, /Using a cached snapshot/);
     assert.match(html, /Weekly change indicator/);
-    assert.match(html, /No macro change this week\. Maintain posture\./);
+    assert.match(html, /Model pressure is flat this week; hold posture and keep existing guardrails in force\./);
     assert.match(html, /weekly-viral-hero/);
   });
 });

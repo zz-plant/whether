@@ -91,6 +91,13 @@ type BoundaryDimension = "tightness" | "riskAppetite";
 
 type BoundaryDirection = "riseAbove" | "fallToOrBelow";
 
+const movementDomainBySignal: Record<SignalChange["key"], number> = {
+  tightness: 6,
+  riskAppetite: 6,
+  baseRate: 1.5,
+  curveSlope: 1.5,
+};
+
 
 type HomeBriefHistoricalAnalog = {
   date: string;
@@ -186,6 +193,46 @@ const buildDecisionShiftSummary = ({
     return `Changed: pressure rose versus last week. Do now: slow approvals, narrow experiments, and require tighter payback windows. Flip: ${reversalTrigger}`;
   }
   return `Changed: signals moved in opposite directions. Do now: hold approval pace and keep experiments reversible with explicit stop triggers. Flip: ${reversalTrigger}`;
+};
+
+const buildWeeklyMovementMetric = ({
+  severityDelta,
+  changedSignals,
+}: {
+  severityDelta: number;
+  changedSignals: SignalChange[];
+}) => {
+  const directionalPressure = changedSignals.reduce((sum, signal) => {
+    const domain = movementDomainBySignal[signal.key] ?? 1;
+    const normalizedMagnitude = Math.min(1, Math.abs(signal.delta) / domain);
+    const direction = isImprovingSignalDelta(signal.key, signal.delta) ? -1 : 1;
+    return sum + (normalizedMagnitude * direction);
+  }, 0);
+
+  const rawScore = severityDelta + directionalPressure;
+  const score = Number(Math.max(-3, Math.min(3, rawScore)).toFixed(1));
+
+  if (score >= 0.25) {
+    return {
+      score,
+      direction: "defensive" as const,
+      summary: `Model pressure increased by +${score.toFixed(1)} this week; tighten approvals until a reversal trigger prints.`,
+    };
+  }
+
+  if (score <= -0.25) {
+    return {
+      score,
+      direction: "expansionary" as const,
+      summary: `Model pressure eased by ${score.toFixed(1)} this week; release only reversible bets while watching flip thresholds.`,
+    };
+  }
+
+  return {
+    score,
+    direction: "neutral" as const,
+    summary: "Model pressure is flat this week; hold posture and keep existing guardrails in force.",
+  };
 };
 
 const buildSignalConfidenceReason = ({
@@ -700,6 +747,10 @@ export const buildHomeBriefModel = (
 
   const conciseActionNow = actionNowShort?.trim();
   const conciseFlipThreshold = flipThreshold?.trim() || reversalTrigger;
+  const weeklyMovement = buildWeeklyMovementMetric({
+    severityDelta,
+    changedSignals: reportDynamics?.changedSignals ?? [],
+  });
 
   const netConstraintSummary =
     severityDelta > 0
@@ -732,6 +783,7 @@ export const buildHomeBriefModel = (
       changeCount: reportDynamics?.changedSignals.length ?? 0,
       reversalTrigger: conciseFlipThreshold,
     }),
+    weeklyMovement,
     transitionProbabilities: forecast?.next4WeekProbabilities ?? {
       Expansion: 25,
       Mixed: 25,

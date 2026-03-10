@@ -462,6 +462,7 @@ const HomePageReportContent = async ({
         roleAwareTemplates={homeBriefModel.roleAwareTemplates}
         executiveOperationalStance={homeBriefModel.executiveOperationalStance}
         revisitDecisions={homeBriefModel.revisitDecisions}
+        weeklyMovement={homeBriefModel.weeklyMovement}
         memoryRail={homeBriefModel.memoryRail}
         historicalTimeline={homeBriefModel.historicalTimeline}
         historicalAnalogs={homeBriefModel.historicalAnalogs}

@@ -50,6 +50,8 @@ describe("buildHomeBriefModel", () => {
     assert.match(model.whyThisCall[0].detail, /threshold|range|outside/i);
     assert.match(model.decisionRules[0].pauseTrigger, /\d/);
     assert.equal(typeof model.regimeVelocity.displayLabel, "string");
+    assert.equal(typeof model.weeklyMovement.score, "number");
+    assert.match(model.weeklyMovement.direction, /defensive|expansionary|neutral/);
   });
 
   it("returns no-change decision summary when there are no deltas", () => {
@@ -87,6 +89,8 @@ describe("buildHomeBriefModel", () => {
     assert.equal(model.startupClimateIndex.breakdown.length, 4);
     assert.match(model.whyThisCall[0].detail, /threshold|range|outside/i);
     assert.match(model.decisionRules[0].pauseTrigger, /\d/);
+    assert.equal(model.weeklyMovement.direction, "neutral");
+    assert.equal(model.weeklyMovement.score, 0);
   });
 
   it("describes momentum using signal-improvement semantics and strongest move", () => {

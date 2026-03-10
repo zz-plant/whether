@@ -25,6 +25,12 @@ type MacroOverlayItem = { label: string; detail: string };
 type HistoricalAnalogItem = { date: string; similarityScore: number; implication: string };
 type FailureModeWarningItem = { id: string; warning: string; mitigationCheck: string };
 
+type WeeklyMovement = {
+  score: number;
+  direction: "defensive" | "expansionary" | "neutral";
+  summary: string;
+};
+
 export type WeeklyDecisionCardProps = {
   statusLabel: string;
   postureLabel: string;
@@ -54,6 +60,7 @@ export type WeeklyDecisionCardProps = {
   roleAwareTemplates: RoleAwareOperatingTemplate[];
   executiveOperationalStance: { expand: string[]; avoid: string[] };
   revisitDecisions: boolean;
+  weeklyMovement: WeeklyMovement;
   memoryRail: MemoryRailItem[];
   historicalTimeline: Array<{ label: string; posture: string }>;
   historicalAnalogs: HistoricalAnalogItem[];
@@ -596,6 +603,7 @@ export function WeeklyDecisionCard({
   actionStripItems = [],
   roleAwareTemplates,
   revisitDecisions,
+  weeklyMovement,
   memoryRail,
   historicalTimeline,
   historicalAnalogs,
@@ -778,8 +786,8 @@ export function WeeklyDecisionCard({
 
       <article className={`${tierOnePanel} ${sectionSpacing} bg-gradient-to-r from-slate-950/92 via-slate-900/85 to-slate-950/92`}>
         <h2 className={tierOneHeading}>Weekly change indicator</h2>
-        <p className="text-sm font-semibold text-slate-100">Posture movement this week: {revisitDecisions ? "+1 (slightly more defensive)" : "0 (maintain posture)"}</p>
-        <p className="text-xs text-slate-300">{revisitDecisions ? decisionShiftSummary : "No macro change this week. Maintain posture."}</p>
+        <p className="text-sm font-semibold text-slate-100">Model-backed movement score: {weeklyMovement.score > 0 ? `+${weeklyMovement.score.toFixed(1)}` : weeklyMovement.score.toFixed(1)} ({weeklyMovement.direction})</p>
+        <p className="text-xs text-slate-300">{weeklyMovement.summary}</p>
       </article>
 
       <div id="decision-snapshot-for-leadership-this-week"><BoundedRulesMatrix decisionRules={decisionRules} /></div>

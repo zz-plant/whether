@@ -111,6 +111,7 @@ describe("weekly card and interpretation panel composition", () => {
             avoid: ["net-new hiring if tightness > 74", "long-payback bets if risk appetite < 44"],
           }}
           revisitDecisions={true}
+          weeklyMovement={{ score: 1.2, direction: "defensive", summary: "Model pressure increased by +1.2 this week; tighten approvals until a reversal trigger prints." }}
           memoryRail={[{ label: "Now", posture: "Defensive" }]}
           historicalTimeline={[{ label: "2026", posture: "Defensive" }]}
           historicalAnalogs={[]}
@@ -142,19 +143,19 @@ describe("weekly card and interpretation panel composition", () => {
       </>,
     );
 
-    assert.match(html, /Weekly Posture — Decision Call/);
-    assert.match(html, /Founder playbook/);
-    assert.match(html, /Weekly memo \(shareable\)/);
-    assert.match(html, /Signal confidence/);
+    assert.match(html, /Macro operating console/);
+    assert.match(html, /Decision guidance/);
+    assert.match(html, /Share the leadership brief/);
+    assert.match(html, /Confidence:/);
     assert.match(html, /Action/);
     assert.match(html, /Interpretation layer/);
     assert.match(html, /Company view/);
     assert.match(html, /• Action:/);
     assert.match(html, /Trigger:/);
     assert.match(html, /Reverse:/);
-    assert.match(html, /Role-aware operating templates/);
-    assert.match(html, /Do now/);
-    assert.match(html, /Avoid now/);
+    assert.match(html, /Approve, hold, or escalate by role/);
+    assert.match(html, /Approve now/);
+    assert.match(html, /Delay now/);
   });
   it("renders weekly card before interpretation panel and preserves top-fold hierarchy", () => {
     const layer = buildInterpretationLayer({
@@ -210,6 +211,7 @@ describe("weekly card and interpretation panel composition", () => {
             avoid: ["net-new hiring if tightness > 74", "long-payback bets if risk appetite < 44"],
           }}
           revisitDecisions={true}
+          weeklyMovement={{ score: 1.2, direction: "defensive", summary: "Model pressure increased by +1.2 this week; tighten approvals until a reversal trigger prints." }}
           memoryRail={[{ label: "Now", posture: "Defensive" }]}
           historicalTimeline={[{ label: "2026", posture: "Defensive" }]}
           historicalAnalogs={[]}
@@ -241,10 +243,10 @@ describe("weekly card and interpretation panel composition", () => {
       </>,
     );
 
-    const heroIndex = html.indexOf("Weekly Posture — Decision Call");
-    const playbookIndex = html.indexOf("Founder playbook");
-    const confidenceIndex = html.indexOf("Signal confidence");
-    const instructionIndex = html.indexOf("Action");
+    const heroIndex = html.indexOf("Macro operating console");
+    const playbookIndex = html.indexOf("Decision guidance");
+    const confidenceIndex = html.indexOf("Confidence:");
+    const instructionIndex = html.indexOf("Monitoring panel");
     const interpretationIndex = html.indexOf("Interpretation layer");
 
     assert.ok(heroIndex > -1);
@@ -295,6 +297,7 @@ describe("weekly card and interpretation panel composition", () => {
             avoid: ["net-new hiring if tightness > 74", "long-payback bets if risk appetite < 44"],
           }}
           revisitDecisions={true}
+          weeklyMovement={{ score: 1.2, direction: "defensive", summary: "Model pressure increased by +1.2 this week; tighten approvals until a reversal trigger prints." }}
           memoryRail={[{ label: "Now", posture: "Defensive" }]}
           historicalTimeline={[{ label: "2026", posture: "Defensive" }]}
           historicalAnalogs={[]}
@@ -326,7 +329,7 @@ describe("weekly card and interpretation panel composition", () => {
     );
 
     const orientationIndex = html.indexOf("Fast orientation for this week");
-    const cardIndex = html.indexOf("Weekly Posture — Decision Call");
+    const cardIndex = html.indexOf("Macro operating console");
 
     assert.ok(orientationIndex > -1);
     assert.ok(cardIndex > orientationIndex);
