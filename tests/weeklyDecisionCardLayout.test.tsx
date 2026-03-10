@@ -76,6 +76,16 @@ describe("WeeklyDecisionCard top-fold composition", () => {
         }}
         revisitDecisions={true}
         weeklyMovement={{ score: 1.2, direction: "defensive", summary: "Model pressure increased by +1.2 this week; tighten approvals until a reversal trigger prints." }}
+        signalEvidenceBlocks={[
+          {
+            key: "tightness",
+            signalLabel: "Capital tightness",
+            directionLabel: "Tightening",
+            confidenceLabel: "MED",
+            evidenceBullets: ["Weekly move: +3.0 versus last read.", "Current score 72.0 vs regime threshold 70.0.", "Chicago Fed National Financial Conditions Index: 0.2index (2026-03-05, Federal Reserve Bank of St. Louis)."],
+            implication: "Tighten hiring and spend approvals until financing pressure eases.",
+          },
+        ]}
         memoryRail={[{ label: "Now", posture: "Defensive" }]}
         historicalTimeline={[{ label: "2026", posture: "Defensive" }]}
         historicalAnalogs={[]}
@@ -110,7 +120,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /weekly-viral-hero/);
     assert.match(html, /Macro operating console/);
     assert.match(html, /Decision delta/);
-    assert.match(html, /Operational meaning/);
+    assert.match(html, /Signal evidence blocks/);
     assert.match(html, /Operator posture/);
     assert.match(html, /Conservation/);
     assert.match(html, /Decision guidance/);
@@ -176,6 +186,16 @@ describe("WeeklyDecisionCard top-fold composition", () => {
         }}
         revisitDecisions={false}
         weeklyMovement={{ score: 0, direction: "neutral", summary: "Model pressure is flat this week; hold posture and keep existing guardrails in force." }}
+        signalEvidenceBlocks={[
+          {
+            key: "tightness",
+            signalLabel: "Capital tightness",
+            directionLabel: "Holding",
+            confidenceLabel: "HIGH",
+            evidenceBullets: ["Weekly move: 0.0 versus last read.", "Current score 72.0 vs regime threshold 70.0.", "Chicago Fed National Financial Conditions Index: 0.2index (2026-03-05, Federal Reserve Bank of St. Louis)."],
+            implication: "Tighten hiring and spend approvals until financing pressure eases.",
+          },
+        ]}
         memoryRail={[{ label: "Now", posture: "Defensive" }]}
         historicalTimeline={[{ label: "2026", posture: "Defensive" }]}
         historicalAnalogs={[]}

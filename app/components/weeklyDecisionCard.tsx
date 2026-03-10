@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { CircleTargetIcon, ShieldIcon } from "./uiIcons";
 import type { ReportDynamics } from "../../lib/report/reportData";
+import type { HomeSignalEvidenceBlock } from "../../lib/report/homeBriefModel";
 import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
 import type { ActionStripItem, RoleAwareOperatingTemplate } from "../../lib/report/operatingCalls";
 import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
@@ -12,8 +13,6 @@ import {
 } from "../../lib/report/trustStatus";
 import {
   deltaLabelBySignal,
-  movementMeterToneByDirection,
-  resolveSignalDirection,
   signalOrder,
   STARTUP_INDEX_CONTEXT_LABEL,
 } from "../../lib/report/briefFormatting";
@@ -61,6 +60,7 @@ export type WeeklyDecisionCardProps = {
   executiveOperationalStance: { expand: string[]; avoid: string[] };
   revisitDecisions: boolean;
   weeklyMovement: WeeklyMovement;
+  signalEvidenceBlocks: HomeSignalEvidenceBlock[];
   memoryRail: MemoryRailItem[];
   historicalTimeline: Array<{ label: string; posture: string }>;
   historicalAnalogs: HistoricalAnalogItem[];
@@ -117,22 +117,13 @@ const resolveVelocityLabel = (rows: Array<{ delta: number }>): "Low" | "Medium" 
   return "Low";
 };
 
-const movementDomainBySignal: Record<(typeof signalOrder)[number], number> = {
-  tightness: 6,
-  riskAppetite: 6,
-  baseRate: 1.5,
-  curveSlope: 1.5,
-};
-
-const toMovementPercent = (signalKey: (typeof signalOrder)[number], delta: number) => {
-  if (delta === 0) {
-    return 0;
-  }
-  const domain = movementDomainBySignal[signalKey] ?? 1.5;
-  return Math.max(6, Math.min(100, Math.round((Math.abs(delta) / domain) * 100)));
-};
-
 const movementSignificance = (signalKey: (typeof signalOrder)[number], delta: number) => {
+  const movementDomainBySignal: Record<(typeof signalOrder)[number], number> = {
+    tightness: 6,
+    riskAppetite: 6,
+    baseRate: 1.5,
+    curveSlope: 1.5,
+  };
   const ratio = Math.abs(delta) / (movementDomainBySignal[signalKey] ?? 1.5);
   if (ratio >= 1) return "Extreme";
   if (ratio >= 0.66) return "Material";
@@ -224,40 +215,6 @@ const resolveDecisionShift = (label: "unchanged" | "higher" | "lower") => {
   if (label === "higher") return "higher";
   if (label === "lower") return "lower";
   return "unchanged";
-};
-
-const directionToken = (delta: number) => {
-  if (delta > 0) return `+${delta.toFixed(1)}`;
-  if (delta < 0) return delta.toFixed(1);
-  return "unchanged";
-};
-
-const signalOperationalMeaning = (key: (typeof signalOrder)[number], delta: number) => {
-  if (delta === 0) {
-    return "No material operating change.";
-  }
-
-  if (key === "tightness") {
-    return delta > 0
-      ? "Financing and hiring get tighter; preserve approval discipline."
-      : "Financing pressure eased; selective approvals become safer.";
-  }
-
-  if (key === "riskAppetite") {
-    return delta > 0
-      ? "Reversible experiments get safer this week."
-      : "Shift to proof-first launches and smaller bet sizes.";
-  }
-
-  if (key === "curveSlope") {
-    return delta > 0
-      ? "Long-payback bets are marginally safer."
-      : "Bias toward faster-payback execution.";
-  }
-
-  return delta > 0
-    ? "Cost of capital pressure rose; gate commitments tightly."
-    : "Rate pressure cooled; maintain discipline while testing upside.";
 };
 
 const resolvePosturePosition = (label: string) => {
@@ -622,6 +579,7 @@ export function WeeklyDecisionCard({
   roleAwareTemplates,
   revisitDecisions,
   weeklyMovement,
+  signalEvidenceBlocks,
   memoryRail,
   historicalTimeline,
   historicalAnalogs,
@@ -660,15 +618,10 @@ export function WeeklyDecisionCard({
   const macroMovementRows = signalOrder.map((key) => {
     const signal = reportDynamics.changedSignals.find((item) => item.key === key);
     const delta = signal?.delta ?? 0;
-    const direction = resolveSignalDirection(delta);
-    const arrow = delta > 0 ? "↑" : delta < 0 ? "↓" : "→";
     return {
       key,
       label: deltaLabelBySignal[key],
-      direction,
       delta,
-      arrow,
-      meter: toMovementPercent(key, delta),
       significance: movementSignificance(key, delta),
     };
   });
@@ -720,30 +673,27 @@ export function WeeklyDecisionCard({
             <h2 className={tierOneHeading}>Decision delta</h2>
             <span className="rounded-full border border-sky-400/40 bg-sky-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-100">Live weekly move</span>
           </div>
-          <p className="text-xs text-slate-300">What changed, what it means, and what to do now.</p>
-          <div className="overflow-x-auto rounded-lg border border-slate-700/70 bg-slate-950/60">
-            <table className="min-w-full text-left text-xs text-slate-200">
-              <thead>
-                <tr className="border-b border-slate-700/70 text-[10px] uppercase tracking-[0.1em] text-slate-300">
-                  <th className="px-3 py-2">Signal</th>
-                  <th className="px-3 py-2">Change</th>
-                  <th className="px-3 py-2">Operational meaning</th>
-                </tr>
-              </thead>
-              <tbody>
-                {macroMovementRows.map((signal) => (
-                  <tr key={signal.key} className="border-b border-slate-800/60 last:border-b-0">
-                    <td className="px-3 py-2 font-semibold text-slate-100">{renderSignalLabel(signal.key, signal.label)}</td>
-                    <td className="px-3 py-2">
-                      <span className={`rounded-full px-2 py-0.5 font-semibold ${signal.delta > 0 ? "bg-amber-500/15 text-amber-100" : signal.delta < 0 ? "bg-emerald-500/15 text-emerald-100" : "bg-slate-700/60 text-slate-100"}`}>
-                        {directionToken(signal.delta)}
-                      </span>
-                    </td>
-                    <td className="px-3 py-2 text-slate-300">{signalOperationalMeaning(signal.key, signal.delta)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <p className="text-xs text-slate-300">Signal evidence blocks for this week&apos;s call.</p>
+          <div className="grid gap-3">
+            {signalEvidenceBlocks.map((signal) => (
+              <article key={signal.key} className="rounded-lg border border-slate-700/70 bg-slate-950/60 px-3 py-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-sm font-semibold text-slate-100">{renderSignalLabel(signal.key, signal.signalLabel)}</p>
+                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] ${signal.directionLabel === "Tightening" ? "bg-amber-500/15 text-amber-100" : signal.directionLabel === "Cooling" ? "bg-emerald-500/15 text-emerald-100" : "bg-slate-700/60 text-slate-100"}`}>
+                    {signal.directionLabel}
+                  </span>
+                  <span className="rounded-full border border-slate-600/70 bg-slate-900/80 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-200">
+                    Confidence {signal.confidenceLabel}
+                  </span>
+                </div>
+                <ul className="mt-2 space-y-1 text-xs text-slate-200">
+                  {signal.evidenceBullets.map((bullet) => (
+                    <li key={`${signal.key}-${bullet}`}>• {bullet}</li>
+                  ))}
+                </ul>
+                <p className="mt-2 text-xs text-sky-100"><span className="font-semibold uppercase tracking-[0.1em] text-sky-200">Implication:</span> {signal.implication}</p>
+              </article>
+            ))}
           </div>
           <p className="rounded-md border border-sky-500/40 bg-sky-500/10 px-3 py-2 text-xs font-semibold text-sky-100">
             Net effect: {immediateDecision}

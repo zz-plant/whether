@@ -5,6 +5,7 @@ import { buildComplianceStamp } from "../exportNotices";
 import { formatRegimeLabel } from "../regimeFormat";
 import type { InterpretationLayer } from "../report/interpretationLayer";
 import type { ActionStripItem } from "../report/operatingCalls";
+import type { HomeSignalEvidenceBlock } from "../report/homeBriefModel";
 import {
   buildRunwayPlan,
   formatRunwayPlanCompactBlock,
@@ -32,6 +33,22 @@ type ExportLayerOptions = {
   historicalAnalogs?: Array<{ date: string; similarityScore: number; implication: string }>;
   failureModes?: Array<{ warning: string; mitigationCheck: string }>;
   actionStripItems?: ActionStripItem[];
+  signalEvidenceBlocks?: HomeSignalEvidenceBlock[];
+};
+
+const buildSignalEvidenceBlock = (options?: ExportLayerOptions) => {
+  const evidence = options?.signalEvidenceBlocks ?? [];
+  if (evidence.length === 0) return [];
+
+  return [
+    "",
+    "Signal evidence blocks:",
+    ...evidence.slice(0, 4).flatMap((signal) => [
+      `• ${signal.signalLabel} — ${signal.directionLabel} · Confidence ${signal.confidenceLabel}`,
+      ...signal.evidenceBullets.slice(0, 3).map((bullet) => `  - ${bullet}`),
+      `  - Implication: ${signal.implication}`,
+    ]),
+  ];
 };
 
 const buildViralArtifactBlock = (options?: ExportLayerOptions) => {
@@ -178,6 +195,7 @@ export const buildSlackBrief = (
     "",
     financialImplications,
     ...buildViralArtifactBlock(options),
+    ...buildSignalEvidenceBlock(options),
     ...buildFailureModeBlock(options),
     ...buildHistoricalAnalogsBlock(options),
     ...buildInterpretationLayerBlock(options),

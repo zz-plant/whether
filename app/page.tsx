@@ -376,6 +376,7 @@ const HomePageReportContent = async ({
     historicalAnalogs: homeBriefModel.historicalAnalogs,
     failureModes: homeBriefModel.failureModes,
     actionStripItems: homeBriefModel.actionStripItems,
+    signalEvidenceBlocks: homeBriefModel.signalEvidenceBlocks,
   };
   const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries, exportLayerOptions);
   const boardSummary = buildBoardBrief(assessment, treasury, sensors, macroSeries, exportLayerOptions);
@@ -463,6 +464,7 @@ const HomePageReportContent = async ({
         executiveOperationalStance={homeBriefModel.executiveOperationalStance}
         revisitDecisions={homeBriefModel.revisitDecisions}
         weeklyMovement={homeBriefModel.weeklyMovement}
+        signalEvidenceBlocks={homeBriefModel.signalEvidenceBlocks}
         memoryRail={homeBriefModel.memoryRail}
         historicalTimeline={homeBriefModel.historicalTimeline}
         historicalAnalogs={homeBriefModel.historicalAnalogs}

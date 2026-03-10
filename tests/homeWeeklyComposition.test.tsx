@@ -112,6 +112,16 @@ describe("weekly card and interpretation panel composition", () => {
           }}
           revisitDecisions={true}
           weeklyMovement={{ score: 1.2, direction: "defensive", summary: "Model pressure increased by +1.2 this week; tighten approvals until a reversal trigger prints." }}
+        signalEvidenceBlocks={[
+          {
+            key: "tightness",
+            signalLabel: "Capital tightness",
+            directionLabel: "Tightening",
+            confidenceLabel: "MED",
+            evidenceBullets: ["Weekly move: +3.0 versus last read.", "Current score 72.0 vs regime threshold 70.0.", "Chicago Fed National Financial Conditions Index: 0.2index (2026-03-05, Federal Reserve Bank of St. Louis)."],
+            implication: "Tighten hiring and spend approvals until financing pressure eases.",
+          },
+        ]}
           memoryRail={[{ label: "Now", posture: "Defensive" }]}
           historicalTimeline={[{ label: "2026", posture: "Defensive" }]}
           historicalAnalogs={[]}
@@ -212,6 +222,16 @@ describe("weekly card and interpretation panel composition", () => {
           }}
           revisitDecisions={true}
           weeklyMovement={{ score: 1.2, direction: "defensive", summary: "Model pressure increased by +1.2 this week; tighten approvals until a reversal trigger prints." }}
+        signalEvidenceBlocks={[
+          {
+            key: "tightness",
+            signalLabel: "Capital tightness",
+            directionLabel: "Tightening",
+            confidenceLabel: "MED",
+            evidenceBullets: ["Weekly move: +3.0 versus last read.", "Current score 72.0 vs regime threshold 70.0.", "Chicago Fed National Financial Conditions Index: 0.2index (2026-03-05, Federal Reserve Bank of St. Louis)."],
+            implication: "Tighten hiring and spend approvals until financing pressure eases.",
+          },
+        ]}
           memoryRail={[{ label: "Now", posture: "Defensive" }]}
           historicalTimeline={[{ label: "2026", posture: "Defensive" }]}
           historicalAnalogs={[]}
@@ -298,6 +318,16 @@ describe("weekly card and interpretation panel composition", () => {
           }}
           revisitDecisions={true}
           weeklyMovement={{ score: 1.2, direction: "defensive", summary: "Model pressure increased by +1.2 this week; tighten approvals until a reversal trigger prints." }}
+        signalEvidenceBlocks={[
+          {
+            key: "tightness",
+            signalLabel: "Capital tightness",
+            directionLabel: "Tightening",
+            confidenceLabel: "MED",
+            evidenceBullets: ["Weekly move: +3.0 versus last read.", "Current score 72.0 vs regime threshold 70.0.", "Chicago Fed National Financial Conditions Index: 0.2index (2026-03-05, Federal Reserve Bank of St. Louis)."],
+            implication: "Tighten hiring and spend approvals until financing pressure eases.",
+          },
+        ]}
           memoryRail={[{ label: "Now", posture: "Defensive" }]}
           historicalTimeline={[{ label: "2026", posture: "Defensive" }]}
           historicalAnalogs={[]}

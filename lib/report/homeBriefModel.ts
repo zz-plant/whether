@@ -81,6 +81,15 @@ type SignalChange = {
   delta: number;
 };
 
+export type HomeSignalEvidenceBlock = {
+  key: SignalChange["key"];
+  signalLabel: string;
+  directionLabel: "Tightening" | "Cooling" | "Holding";
+  confidenceLabel: "HIGH" | "MED" | "LOW";
+  evidenceBullets: string[];
+  implication: string;
+};
+
 type StartupClimateIndex = {
   score: number;
   status: "Improving" | "Stable" | "Deteriorating";
@@ -512,6 +521,93 @@ const signalReasonLabel: Record<"tightness" | "riskAppetite" | "baseRate" | "cur
   curveSlope: "Yield curve slope",
 };
 
+const evidenceMacroBySignal: Record<SignalChange["key"], MacroSeriesReading["id"]> = {
+  tightness: "CHICAGO_FCI",
+  riskAppetite: "VC_FUNDING_VELOCITY",
+  baseRate: "BBB_CREDIT_SPREAD",
+  curveSlope: "HY_CREDIT_SPREAD",
+};
+
+const toEvidenceDirectionLabel = (delta: number): HomeSignalEvidenceBlock["directionLabel"] => {
+  if (delta > 0) return "Tightening";
+  if (delta < 0) return "Cooling";
+  return "Holding";
+};
+
+const buildSignalImplication = (signal: SignalChange): string => {
+  if (signal.delta === 0) {
+    return "No operating change required; keep current approval gates in force.";
+  }
+
+  if (signal.key === "tightness") {
+    return signal.delta > 0
+      ? "Tighten hiring and spend approvals until financing pressure eases."
+      : "You can release selective approvals, but keep commitments reversible.";
+  }
+
+  if (signal.key === "riskAppetite") {
+    return signal.delta > 0
+      ? "Increase experiment velocity in reversible bets."
+      : "Bias toward proof-first launches and smaller tranche sizes.";
+  }
+
+  if (signal.key === "baseRate") {
+    return signal.delta > 0
+      ? "Extend payback hurdles before approving long-duration commitments."
+      : "Re-test deferred bets with explicit stop conditions.";
+  }
+
+  return signal.delta > 0
+    ? "Longer-payback bets get safer; still stage commitments in tranches."
+    : "Favor faster-payback execution until curve support returns.";
+};
+
+const buildSignalEvidenceBlocks = ({
+  changedSignals,
+  assessment,
+  macroSeries,
+  confidenceLabel,
+}: {
+  changedSignals: SignalChange[];
+  assessment: HomeReportData["assessment"];
+  macroSeries: MacroSeriesReading[] | undefined;
+  confidenceLabel: "LOW" | "MED" | "HIGH";
+}): HomeSignalEvidenceBlock[] => {
+  const changedByKey = new Map(changedSignals.map((signal) => [signal.key, signal]));
+
+  return (Object.keys(signalReasonLabel) as SignalChange["key"][]).map((key) => {
+    const signal = changedByKey.get(key) ?? { key, delta: 0 };
+    const macro = macroSeries?.find((item) => item.id === evidenceMacroBySignal[key]);
+    const score = key === "tightness" || key === "riskAppetite"
+      ? assessment.scores[key]
+      : null;
+    const threshold = key === "tightness"
+      ? assessment.thresholds.tightnessRegime
+      : key === "riskAppetite"
+        ? assessment.thresholds.riskAppetiteRegime
+        : null;
+
+    const evidenceBullets = [
+      `Weekly move: ${signal.delta > 0 ? "+" : ""}${signal.delta.toFixed(1)} versus last read.`,
+      score !== null && threshold !== null
+        ? `Current score ${score.toFixed(1)} vs regime threshold ${threshold.toFixed(1)}.`
+        : `${signalReasonLabel[key]} is stable enough to keep the current regime call.`,
+      macro
+        ? `${macro.label}: ${typeof macro.value === "number" ? macro.value.toFixed(1) : "n/a"}${macro.unit} (${macro.record_date}, ${macro.sourceLabel}).`
+        : "Macro cross-check unavailable; rely on current weekly model snapshot.",
+    ];
+
+    return {
+      key,
+      signalLabel: signalReasonLabel[key],
+      directionLabel: toEvidenceDirectionLabel(signal.delta),
+      confidenceLabel,
+      evidenceBullets,
+      implication: buildSignalImplication(signal),
+    };
+  });
+};
+
 const buildWhyThisCall = ({
   tightnessGap,
   riskGap,
@@ -751,6 +847,12 @@ export const buildHomeBriefModel = (
     severityDelta,
     changedSignals: reportDynamics?.changedSignals ?? [],
   });
+  const signalEvidenceBlocks = buildSignalEvidenceBlocks({
+    changedSignals: reportDynamics?.changedSignals ?? [],
+    assessment,
+    macroSeries,
+    confidenceLabel,
+  });
 
   const netConstraintSummary =
     severityDelta > 0
@@ -784,6 +886,7 @@ export const buildHomeBriefModel = (
       reversalTrigger: conciseFlipThreshold,
     }),
     weeklyMovement,
+    signalEvidenceBlocks,
     transitionProbabilities: forecast?.next4WeekProbabilities ?? {
       Expansion: 25,
       Mixed: 25,
