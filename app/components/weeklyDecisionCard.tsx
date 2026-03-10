@@ -315,8 +315,8 @@ export function DecisionCallHeader({
         <h1 id="weekly-posture-brief-title" className="text-2xl font-semibold text-slate-50 sm:text-3xl">
           {resolvedPostureLabel.toUpperCase()} — {resolvedStageLabel.toUpperCase()}
         </h1>
-        <p className="text-base font-semibold text-sky-100">Expand cautiously; avoid locking in irreversible costs.</p>
-        <p className="text-sm text-slate-200">{operatingStanceLine}</p>
+        <p className="text-base font-semibold text-sky-100">{operatingStanceLine}</p>
+        <p className="text-sm text-slate-200">{immediateDecision}</p>
 
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4" aria-label="Quick weekly scan">
           <div className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">

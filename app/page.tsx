@@ -489,7 +489,7 @@ const HomePageReportContent = async ({
         />
       </DeferredSection>
 
-      <details className="weather-panel px-5 py-4">
+      <details className="weather-panel px-5 py-4" open>
         <summary className="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.14em] text-slate-300 sm:hidden">Evidence appendix (tap to expand)</summary>
         <DeferredSection
           id="executive-snapshot"
