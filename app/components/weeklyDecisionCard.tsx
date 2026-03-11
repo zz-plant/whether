@@ -26,6 +26,14 @@ type WeeklyMovement = {
   summary: string;
 };
 
+type DecisionDeltaStripItem = {
+  id: "changed" | "revisit" | "flip";
+  label: string;
+  detail: string;
+  impact: "high" | "medium" | "low";
+  href: string;
+};
+
 export type WeeklyDecisionCardProps = {
   statusLabel: string;
   postureLabel: string;
@@ -182,6 +190,54 @@ const normalizeCueFragments = (text: string) =>
     .split(";")
     .map((fragment) => fragment.trim().replace(/[.;]+$/, ""))
     .filter(Boolean);
+
+const buildDecisionDeltaStripItems = ({
+  weeklyMemoLines,
+  immediateDecision,
+  revisitDecisions,
+  guardrail,
+  regimeDistance,
+}: {
+  weeklyMemoLines: string[];
+  immediateDecision: string;
+  revisitDecisions: boolean;
+  guardrail: string;
+  regimeDistance: WeeklyDecisionCardProps["regimeDistance"];
+}): DecisionDeltaStripItem[] => {
+  const firstDelta = weeklyMemoLines.find((line) => line.trim().length > 0) ?? immediateDecision;
+  const flipDirection = regimeDistance.thresholdDirection === "riseAbove" ? "rises above" : "falls to or below";
+  const flipDistance = Math.max(0, Math.round(regimeDistance.pointsToFlip));
+
+  return [
+    {
+      id: "changed",
+      label: "Changed",
+      detail: firstDelta,
+      impact: "high",
+      href: "#weekly-call-core",
+    },
+    {
+      id: "revisit",
+      label: "Revisit",
+      detail: revisitDecisions ? `YES — ${guardrail}` : "NO — Hold last week’s operating posture.",
+      impact: revisitDecisions ? "high" : "low",
+      href: "#decision-snapshot-for-leadership-this-week",
+    },
+    {
+      id: "flip",
+      label: "Flip",
+      detail: `${regimeDistance.dimensionLabel} ${flipDirection} ${regimeDistance.thresholdValue.toFixed(1)} (${flipDistance} pts away).`,
+      impact: flipDistance <= 3 ? "high" : "medium",
+      href: "#evidence-diagnostics",
+    },
+  ];
+};
+
+const impactToneClass: Record<DecisionDeltaStripItem["impact"], string> = {
+  high: "border-amber-400/45 bg-amber-500/10 text-amber-100",
+  medium: "border-sky-400/45 bg-sky-500/10 text-sky-100",
+  low: "border-emerald-400/45 bg-emerald-500/10 text-emerald-100",
+};
 
 const buildRoleTemplateBullets = ({
   roleAwareTemplates,
@@ -1067,6 +1123,13 @@ export function WeeklyDecisionCard({
   const doNowBullets = buildRoleTemplateBullets({ roleAwareTemplates, field: "doNow" });
   const avoidBullets = buildRoleTemplateBullets({ roleAwareTemplates, field: "avoidNow" });
   const watchBullets = buildWatchBullets({ regimeDistance, regimeVelocity });
+  const decisionDeltaStripItems = buildDecisionDeltaStripItems({
+    weeklyMemoLines,
+    immediateDecision,
+    revisitDecisions,
+    guardrail,
+    regimeDistance,
+  });
 
   return (
     <section className="weather-panel space-y-3 px-4 py-5 sm:space-y-4 sm:px-6 sm:py-6" aria-labelledby="weekly-posture-brief-title">
@@ -1081,6 +1144,23 @@ export function WeeklyDecisionCard({
         actionNowShort={actionNowShort}
         regimeDistance={regimeDistance}
       />
+
+      <article className={`${tierOnePanel} ${sectionSpacing}`} aria-label="Since last review">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className={tierOneHeading}>Since last review</h2>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-300">Decision delta</p>
+        </div>
+        <ul className="grid gap-2 sm:grid-cols-3">
+          {decisionDeltaStripItems.map((item) => (
+            <li key={item.id}>
+              <Link href={item.href} className={`block min-h-[44px] rounded-lg border px-3 py-2 text-xs transition hover:border-slate-300/45 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${impactToneClass[item.impact]}`}>
+                <p className="font-semibold uppercase tracking-[0.1em]">{item.label}</p>
+                <p className="mt-1 leading-5 text-slate-100">{item.detail}</p>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </article>
 
       <div className="grid gap-3 xl:grid-cols-12">
         <aside className="space-y-3 xl:col-span-3">
