@@ -357,11 +357,16 @@ const HomePageReportContent = async ({
   const weeklyOperatorBriefText = buildWeeklyOperatorBriefPlainText(weeklyOperatorBriefPayload);
   const weeklyCallSnapshotText = buildWeeklyCallSnapshotPlainText({
     regime: homeBriefModel.postureWithStageLabel ?? homeBriefModel.postureLabel,
+    call: homeBriefModel.operatingStanceLine,
     trend: homeBriefModel.trendLabel,
     confidence: `${Math.round(homeBriefModel.confidencePercent)}% (${homeBriefModel.confidenceLabel})`,
     doNow: homeBriefModel.actionNowShort ?? "Hold last week's bounded operating rules until thresholds move.",
     avoid: homeBriefModel.executiveOperationalStance.avoid[0] ?? homeBriefModel.guardrail,
     watch: homeBriefModel.flipThreshold ?? homeBriefModel.reversalTrigger,
+    flipConditions: homeBriefModel.decisionRules
+      .map((rule) => rule.resumeTrigger?.trim())
+      .filter((trigger): trigger is string => Boolean(trigger && trigger.length > 0))
+      .slice(0, 3),
   });
   const callCitation = buildCallCitation(assessment, treasury, {
     interpretationLayer,
