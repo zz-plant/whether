@@ -166,6 +166,14 @@ export type DecisionMatrixPayload = {
   rows: DecisionMatrixRow[];
 };
 
+export type CanonicalFlipCondition = {
+  area: BoundedDecisionRule["area"];
+  metric: "tightness" | "riskAppetite";
+  operator: ">" | ">=" | "<" | "<=";
+  value: number;
+  label: string;
+};
+
 export type StartupVariantOption = { mode: StartupVariantMode; label: string };
 
 export type StartupVariantPolicy = {
@@ -241,9 +249,10 @@ export const buildDecisionMatrixPayload = ({
     const rule = rulesByArea.get(area);
     const fallbackApprove = "Stage approvals on short-cycle proof";
     const fallbackDelay = "Delay irreversible commitments";
-    const flipCondition = lockCommitment.flipConditions[flipConditionIndex] ?? lockCommitment.flipConditions[0] ?? "Recheck thresholds on next refresh.";
-    const flipSummary = rule?.resumeTrigger ?? flipCondition;
-    const flipDetail = [rule?.resumeTrigger, !rule ? flipCondition : ""]
+    const structuredFlipCondition = rule?.flipConditions[0]?.label ?? "";
+    const fallbackFlipCondition = lockCommitment.flipConditions[flipConditionIndex] ?? lockCommitment.flipConditions[0] ?? "Recheck thresholds on next refresh.";
+    const flipSummary = structuredFlipCondition || rule?.resumeTrigger || fallbackFlipCondition;
+    const flipDetail = [rule?.resumeTrigger, structuredFlipCondition, !rule ? fallbackFlipCondition : ""]
       .filter((entry): entry is string => Boolean(entry && entry.trim().length > 0))
       .join(" ")
       .trim();
@@ -986,7 +995,21 @@ export const buildHomeBriefModel = (
   const executiveOperationalStance = extractExecutiveOperationalStance({ roleAwareTemplates, decisionRules });
 
   const conciseActionNow = actionNowShort?.trim();
-  const conciseFlipThreshold = flipThreshold?.trim() || reversalTrigger;
+  const canonicalFlipConditions: CanonicalFlipCondition[] = decisionRules.flatMap((rule) =>
+    rule.flipConditions.map((condition) => ({
+      area: rule.area,
+      metric: condition.metric,
+      operator: condition.operator,
+      value: condition.value,
+      label: condition.label,
+    })),
+  );
+  const compactFlipConditionLabels = canonicalFlipConditions
+    .map((condition) => condition.label.trim())
+    .filter((label) => label.length > 0)
+    .filter((label, index, labels) => labels.indexOf(label) === index)
+    .slice(0, 4);
+  const conciseFlipThreshold = flipThreshold?.trim() || compactFlipConditionLabels[0] || reversalTrigger;
   const decisionMatrix = buildDecisionMatrixPayload({
     regime: assessment.regime,
     thresholds: assessment.thresholds,
@@ -1063,6 +1086,8 @@ export const buildHomeBriefModel = (
     actionNowShort: conciseActionNow,
     guardrailThreshold: guardrail,
     flipThreshold: conciseFlipThreshold,
+    canonicalFlipConditions,
+    compactFlipConditionLabels,
     historicalAnalogs: normalizedHistoricalAnalogs,
     memoryRail: buildMemoryRail(recordDateLabel, assessment.regime),
     historicalTimeline: buildHistoricalTimeline({ currentRegime: assessment.regime, regimeSeries, historicalSelection }),

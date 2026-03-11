@@ -353,6 +353,7 @@ const HomePageReportContent = async ({
     postureWithStageLabel: homeBriefModel.postureWithStageLabel,
     confidenceLabel: homeBriefModel.confidenceLabel,
     actionStripItems: homeBriefModel.actionStripItems,
+    flipConditionLabels: homeBriefModel.compactFlipConditionLabels,
   });
   const weeklyOperatorBriefText = buildWeeklyOperatorBriefPlainText(weeklyOperatorBriefPayload);
   const weeklyCallSnapshotText = buildWeeklyCallSnapshotPlainText({
@@ -363,10 +364,12 @@ const HomePageReportContent = async ({
     doNow: homeBriefModel.actionNowShort ?? "Hold last week's bounded operating rules until thresholds move.",
     avoid: homeBriefModel.executiveOperationalStance.avoid[0] ?? homeBriefModel.guardrail,
     watch: homeBriefModel.flipThreshold ?? homeBriefModel.reversalTrigger,
-    flipConditions: homeBriefModel.decisionRules
-      .map((rule) => rule.resumeTrigger?.trim())
-      .filter((trigger): trigger is string => Boolean(trigger && trigger.length > 0))
-      .slice(0, 3),
+    flipConditions: homeBriefModel.compactFlipConditionLabels.length > 0
+      ? homeBriefModel.compactFlipConditionLabels
+      : homeBriefModel.decisionRules
+          .map((rule) => rule.resumeTrigger?.trim())
+          .filter((trigger): trigger is string => Boolean(trigger && trigger.length > 0))
+          .slice(0, 3),
   });
   const callCitation = buildCallCitation(assessment, treasury, {
     interpretationLayer,
@@ -455,6 +458,8 @@ const HomePageReportContent = async ({
         actionNowShort={homeBriefModel.actionNowShort}
         guardrailThreshold={homeBriefModel.guardrailThreshold}
         flipThreshold={homeBriefModel.flipThreshold}
+        compactFlipConditionLabels={homeBriefModel.compactFlipConditionLabels}
+        canonicalFlipConditions={homeBriefModel.canonicalFlipConditions}
         recordDateLabel={recordDateLabel}
         fetchedAtLabel={fetchedAtLabel}
         reportDynamics={reportDynamics}
