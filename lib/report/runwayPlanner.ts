@@ -156,8 +156,16 @@ const getKnobLevel = (
   runwayGap: number,
   key: "approvalVelocity" | "payback",
 ) => {
-  const knobs = deriveDecisionKnobs(input.regime, 0, {
+  const knobs = deriveDecisionKnobs({
+    committedState: input.regime,
+    transition: {
+      pending: false,
+      committed: false,
+      candidateState: input.regime,
+      transitionReason: "Runway planner uses committed baseline state.",
+    },
     nearestThresholdGap: Math.abs(runwayGap) * 3,
+    weakSignalCount: 0,
   });
   const knob = knobs.find((item) => item.key === key);
   if (!knob) {

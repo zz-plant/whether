@@ -1009,7 +1009,7 @@ export const buildHomeBriefModel = (
     .filter((label) => label.length > 0)
     .filter((label, index, labels) => labels.indexOf(label) === index)
     .slice(0, 4);
-  const conciseFlipThreshold = flipThreshold?.trim() || compactFlipConditionLabels[0] || reversalTrigger;
+  const conciseFlipThreshold = flipThreshold?.trim() || reversalTrigger || compactFlipConditionLabels[0];
   const decisionMatrix = buildDecisionMatrixPayload({
     regime: assessment.regime,
     thresholds: assessment.thresholds,
