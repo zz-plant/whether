@@ -4,7 +4,10 @@
  */
 import { insightDatabase } from "../data/recommendations";
 import type { RegimeKey } from "./regimeEngine";
-import { operatingLeverLabel, operatingLeverOrder, type OperatingLeverKey } from "./report/decisionKnobs";
+import { operatingLeverLabel, type OperatingLeverKey } from "./report/decisionKnobs";
+import { buildCanonicalBoundedDecisionRules } from "./report/boundedDecisionRules";
+import { buildActionStripItems } from "./report/operatingCalls";
+import { decisionAreaToOperatingLever } from "./report/operatingLeverMap";
 
 type PlaybookOperatingLever = {
   lever: OperatingLeverKey;
@@ -39,59 +42,67 @@ export interface PlaybookGuidance {
 const DEFAULT_STOP_ITEMS = ["Avoid unbudgeted bets."];
 const DEFAULT_START_ITEMS = ["Invest in margin-positive moves."];
 
-const defaultLeverFallbacks: Record<OperatingLeverKey, Omit<PlaybookOperatingLever, "lever" | "label">> = {
-  "hiring-stance": {
-    actionNow: "Keep approvals tied to delivery-critical roles.",
-    triggerThreshold: "Tighten if delivery confidence degrades or hiring risk rises.",
-    reversalCondition: "Loosen when signal confidence and delivery stability recover.",
+const CANONICAL_RULE_FALLBACK = {
+  actionNow: "Keep current operating posture until a rule refresh is available.",
+  triggerThreshold: "Tighten only if confidence and threshold signals worsen.",
+  reversalCondition: "Loosen only when threshold conditions recover and hold.",
+} satisfies Omit<PlaybookOperatingLever, "lever" | "label">;
+
+const DEFAULT_PLAYBOOK_RULE_CONTEXT = {
+  thresholds: {
+    tightnessRegime: 70,
+    riskAppetiteRegime: 50,
   },
-  "investment-pace": {
-    actionNow: "Sequence spend into short-cycle, measurable payback moves.",
-    triggerThreshold: "Tighten if payback slips or financing pressure rises.",
-    reversalCondition: "Loosen when payback proof improves for consecutive cycles.",
-  },
-  "sales-posture": {
-    actionNow: "Bias GTM toward pipeline quality and conversion resilience.",
-    triggerThreshold: "Tighten if conversion quality drops or cycle times lengthen.",
-    reversalCondition: "Loosen when conversion quality and win rates recover.",
-  },
-  "product-priorities": {
-    actionNow: "Prioritize roadmap work with clear near-term activation or retention impact.",
-    triggerThreshold: "Tighten if activation/retention evidence weakens.",
-    reversalCondition: "Loosen when milestone evidence improves and holds.",
-  },
-  "risk-tolerance": {
-    actionNow: "Keep irreversible bets gated behind staged checkpoints.",
-    triggerThreshold: "Tighten when threshold proximity or volatility risk increases.",
-    reversalCondition: "Loosen after improvement persists across confirmation reads.",
+  scores: {
+    tightness: 70,
+    riskAppetite: 50,
   },
 };
 
-const buildPlaybookOperatingLevers = (regime: RegimeKey): PlaybookOperatingLever[] =>
-  operatingLeverOrder.map((lever) => {
-    const fallback = defaultLeverFallbacks[lever];
-    const regimeAdjustment = regime === "EXPANSION" ? " while preserving reversal triggers." : ".";
+const buildPlaybookOperatingLevers = ({
+  regime,
+  thresholds = DEFAULT_PLAYBOOK_RULE_CONTEXT.thresholds,
+  scores = DEFAULT_PLAYBOOK_RULE_CONTEXT.scores,
+}: {
+  regime: RegimeKey;
+  thresholds?: { tightnessRegime: number; riskAppetiteRegime: number };
+  scores?: { tightness: number; riskAppetite: number };
+}): PlaybookOperatingLever[] => {
+  const canonicalRules = buildCanonicalBoundedDecisionRules({ regime, thresholds, scores });
+  const actionStripItems = buildActionStripItems(canonicalRules);
+  const actionStripByLever = new Map(actionStripItems.map((item) => [item.lever, item]));
+
+  return canonicalRules.map((rule) => {
+    const lever = decisionAreaToOperatingLever[rule.area];
+    const stripItem = actionStripByLever.get(lever);
 
     return {
       lever,
       label: operatingLeverLabel[lever],
-      actionNow: fallback.actionNow.replace(/\.$/, regimeAdjustment),
-      triggerThreshold: fallback.triggerThreshold,
-      reversalCondition: fallback.reversalCondition,
+      actionNow: stripItem?.actionNow ?? CANONICAL_RULE_FALLBACK.actionNow,
+      triggerThreshold: stripItem?.triggerThreshold ?? CANONICAL_RULE_FALLBACK.triggerThreshold,
+      reversalCondition: stripItem?.reversalCondition ?? CANONICAL_RULE_FALLBACK.reversalCondition,
     };
   });
+};
 
 export const getPlaybookForRegime = (regime: RegimeKey): PlaybookEntry | null => {
   const match = insightDatabase.regimePlaybooks.regimes.find((entry) => entry.key === regime);
   return match ?? null;
 };
 
-export const getPlaybookGuidance = (regime: RegimeKey): PlaybookGuidance => {
+export const getPlaybookGuidance = (
+  regime: RegimeKey,
+  ruleContext?: {
+    thresholds?: { tightnessRegime: number; riskAppetiteRegime: number };
+    scores?: { tightness: number; riskAppetite: number };
+  },
+): PlaybookGuidance => {
   const playbook = getPlaybookForRegime(regime);
   return {
     playbook,
     stopItems: playbook ? [...playbook.stop] : DEFAULT_STOP_ITEMS,
     startItems: playbook ? [...playbook.start] : DEFAULT_START_ITEMS,
-    operatingLevers: buildPlaybookOperatingLevers(regime),
+    operatingLevers: buildPlaybookOperatingLevers({ regime, ...ruleContext }),
   };
 };
