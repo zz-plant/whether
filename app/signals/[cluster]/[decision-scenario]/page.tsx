@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../../lib/seo";
-import { buildHomeBriefModel } from "../../../../lib/report/homeBriefModel";
-import { buildSeoDecisionPayload } from "../../../../lib/report/seoDecisionPayload";
-import { loadReportDataSafe } from "../../../../lib/report/reportData";
+import { readProgrammaticPayload } from "../../../../lib/seo/programmaticPayloadBuilder";
 import { findSignalsCluster } from "../../clusterRoutes";
 import { findDecisionScenario, signalScenarioRoutes } from "../../../seoRouteClusters";
 
@@ -38,25 +36,8 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
   const scenario = findDecisionScenario(decisionScenario);
   if (!signal || !scenario) notFound();
 
-  const reportResult = await loadReportDataSafe(undefined, { route: `/signals/${cluster}/${decisionScenario}` });
-  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
-  const homeBriefModel = buildHomeBriefModel(reportData);
-  const mappedRules = homeBriefModel.decisionRules.filter((rule) => rule.area === scenario.slug);
-  const payload = buildSeoDecisionPayload({
-    assessment: reportData.assessment,
-    mappedRules,
-    mappedDecisionAreas: [scenario.slug],
-    fallbackCurrentCall: reportData.statusLabel,
-    fallbackImmediateAction: reportData.actionNowShort,
-    reportEvidenceItems: reportData.reportEvidenceItems,
-    freshnessLabel: reportData.fetchedAtLabel,
-    recordDateLabel: reportData.recordDateLabel,
-    confidenceLabel: homeBriefModel.confidenceLabel,
-    transitionWatch: homeBriefModel.transitionWatch,
-    isFallbackSnapshot: !reportResult.ok,
-    provenanceStatusLabel: reportData.treasuryProvenance?.statusLabel,
-    fetchedAtIso: reportData.treasury.fetched_at,
-  });
+  const payloadRecord = await readProgrammaticPayload(`/signals/${cluster}/${decisionScenario}`);
+  const payload = payloadRecord.payload;
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">

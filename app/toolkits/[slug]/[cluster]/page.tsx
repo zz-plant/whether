@@ -2,10 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../../lib/seo";
-import { loadReportDataSafe } from "../../../../lib/report/reportData";
 import { findToolkitDefinition } from "../../../../lib/informationArchitecture";
-import { buildHomeBriefModel } from "../../../../lib/report/homeBriefModel";
-import { buildSeoDecisionPayload } from "../../../../lib/report/seoDecisionPayload";
+import { readProgrammaticPayload } from "../../../../lib/seo/programmaticPayloadBuilder";
 import { findSignalsCluster } from "../../../signals/clusterRoutes";
 import { findToolkitCluster, toolkitClusterStaticParams } from "../../clusterRoutes";
 
@@ -48,24 +46,8 @@ export default async function ToolkitClusterPage({ params }: { params: Promise<P
 
   if (!clusterDefinition || !toolkit || !context) notFound();
 
-  const reportResult = await loadReportDataSafe(undefined, { route: `/toolkits/${slug}/${cluster}` });
-  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
-  const homeBriefModel = buildHomeBriefModel(reportData);
-  const payload = buildSeoDecisionPayload({
-    assessment: reportData.assessment,
-    mappedRules: homeBriefModel.decisionRules,
-    mappedDecisionAreas: homeBriefModel.decisionRules.map((rule) => rule.area),
-    fallbackCurrentCall: reportData.statusLabel,
-    fallbackImmediateAction: toolkit.decisionThisSession,
-    reportEvidenceItems: reportData.reportEvidenceItems,
-    freshnessLabel: reportData.fetchedAtLabel,
-    recordDateLabel: reportData.recordDateLabel,
-    confidenceLabel: homeBriefModel.confidenceLabel,
-    transitionWatch: homeBriefModel.transitionWatch,
-    isFallbackSnapshot: !reportResult.ok,
-    provenanceStatusLabel: reportData.treasuryProvenance?.statusLabel,
-    fetchedAtIso: reportData.treasury.fetched_at,
-  });
+  const payloadRecord = await readProgrammaticPayload(`/toolkits/${slug}/${cluster}`);
+  const payload = payloadRecord.payload;
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
