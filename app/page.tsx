@@ -137,14 +137,14 @@ type HomePageSearchParams = {
 const HomePageStreamingFallback = () => (
   <section aria-label="Loading weekly operating posture" className="space-y-6">
     <section className="weather-panel space-y-4 px-5 py-5" aria-live="polite" aria-busy="true">
-      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Preparing this week&apos;s call</p>
+      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Building your weekly operator brief</p>
       <p className="text-sm text-slate-100">
-        We&apos;re assembling your weekly decision brief.
+        Pulling fresh signals so you can lock this week&apos;s operating call.
       </p>
       <ol className="grid gap-2 text-xs text-slate-300 sm:grid-cols-3">
-        <li className="rounded-lg border border-amber-300/30 bg-amber-300/10 px-2.5 py-2">1. Refresh signals</li>
-        <li className="rounded-lg border border-slate-700/90 bg-slate-900/60 px-2.5 py-2">2. Set posture + guardrails</li>
-        <li className="rounded-lg border border-slate-700/90 bg-slate-900/60 px-2.5 py-2">3. Prepare a share-ready brief</li>
+        <li className="rounded-lg border border-amber-300/30 bg-amber-300/10 px-2.5 py-2">1. Sync market + labor signals</li>
+        <li className="rounded-lg border border-slate-700/90 bg-slate-900/60 px-2.5 py-2">2. Set posture, guardrails, and flip triggers</li>
+        <li className="rounded-lg border border-slate-700/90 bg-slate-900/60 px-2.5 py-2">3. Generate a share-ready leadership brief</li>
       </ol>
       <div className="space-y-3 rounded-xl border border-slate-700/80 bg-slate-900/70 p-3">
         <div className="h-3 w-32 animate-pulse rounded-full bg-slate-600/80" />
@@ -152,7 +152,7 @@ const HomePageStreamingFallback = () => (
         <div className="h-4 w-11/12 animate-pulse rounded-full bg-slate-500/70" />
         <div className="h-3 w-40 animate-pulse rounded-full bg-slate-600/80" />
       </div>
-      <p className="text-xs text-slate-300">Usually ready in under 10 seconds.</p>
+      <p className="text-xs text-slate-300">Usually ready in under 10 seconds for weekly standup.</p>
     </section>
     <section className="weather-panel space-y-4 px-5 py-5" aria-label="Loading evidence">
       <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Checking live evidence</p>
