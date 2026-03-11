@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { CircleTargetIcon, ShieldIcon } from "./uiIcons";
+import { CompactDisclosure } from "./compactDisclosure";
 import type { ConfidenceTrendFraming, ReportDynamics, ReportEvidenceItem, WeeklyConfidencePoint } from "../../lib/report/reportData";
 import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
 import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
@@ -962,9 +963,13 @@ export function WeeklyDecisionCard({
   const topContributorInline =
     topContributors.length > 0
       ? topContributors
+          .slice(0, 2)
           .map((item) => `${item.label} (${item.normalizedPercentLabel})`)
           .join(" · ")
       : "No active contributors this week.";
+  const conciseWeeklyMovement = weeklyMovement.summary.replace(/\.$/, "");
+  const conciseGuardrail = compactActionCue(effectiveGuardrail);
+  const conciseFlipThreshold = compactActionCue(effectiveFlipThreshold);
 
   const needsTrustWarning = isFallbackSnapshot || confidenceLabel !== "HIGH" || freshnessLabel === "Unavailable";
   const trustWarningCopy = isFallbackSnapshot
@@ -1048,7 +1053,6 @@ export function WeeklyDecisionCard({
               <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
             </summary>
             <div className="mt-3">
-              <p className="text-xs text-slate-300">Because the stance is {postureWithStageLabel ?? statusLabel}, execute in a gated, reversible way this week.</p>
               <div className="mt-2 grid gap-3 sm:grid-cols-2">
                 {roleAwareTemplates.map((template) => (
                   <article key={template.role} className={`${tierOneInset} space-y-2`}>
@@ -1065,37 +1069,38 @@ export function WeeklyDecisionCard({
         </main>
 
         <aside className="space-y-3 xl:col-span-3">
-          <details id="evidence-diagnostics" className={`${tierThreePanel} ${compactSectionSpacing} group`}>
-            <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
-              <span>Inspect evidence →</span>
-              <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
-            </summary>
+          <CompactDisclosure
+            id="evidence-diagnostics"
+            className={`${tierThreePanel} ${compactSectionSpacing} group`}
+            summaryClassName={disclosureSummaryClass}
+            summary="Inspect evidence →"
+          >
             <ul className="mt-2 space-y-1 text-xs text-slate-200">
               {evidenceItems.map((item) => (
                 <li key={`evidence-${item.key}`}>• {item.title}: {item.immediateImplication}</li>
               ))}
             </ul>
-          </details>
+          </CompactDisclosure>
 
-          <details className={`${tierThreePanel} ${compactSectionSpacing} group`}>
-            <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
-              <span>Inspect drivers →</span>
-              <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
-            </summary>
+          <CompactDisclosure
+            className={`${tierThreePanel} ${compactSectionSpacing} group`}
+            summaryClassName={disclosureSummaryClass}
+            summary="Inspect drivers →"
+          >
             <article className={compactInset}>
               <p className={`text-xs ${neutralLabel}`}>Top contributors: {topContributorInline}</p>
-              <p className="mt-1 text-xs text-slate-300">Weekly movement: {weeklyMovement.summary}</p>
+              <p className="mt-1 text-xs text-slate-300">Weekly movement: {conciseWeeklyMovement}</p>
             </article>
-          </details>
+          </CompactDisclosure>
 
-          <details className={`${tierThreePanel} ${compactSectionSpacing} group`}>
-            <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
-              <span>Inspect model inputs →</span>
-              <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
-            </summary>
+          <CompactDisclosure
+            className={`${tierThreePanel} ${compactSectionSpacing} group`}
+            summaryClassName={disclosureSummaryClass}
+            summary="Inspect model inputs →"
+          >
             <article className={compactInset}>
-              <p className={`text-xs ${neutralLabel}`}>Guardrail: {compactActionCue(effectiveGuardrail)}</p>
-              <p className="mt-1 text-xs text-slate-300">Flip when: {compactActionCue(effectiveFlipThreshold)}</p>
+              <p className={`text-xs ${neutralLabel}`}>Guardrail: {conciseGuardrail}</p>
+              <p className="mt-1 text-xs text-slate-300">Flip when: {conciseFlipThreshold}</p>
               <p className="mt-1 text-xs text-slate-300">Defensive probability: {formatProbabilityPercent(transitionProbabilities.Defensive)}</p>
             </article>
             {failureModes.length > 0 ? (
@@ -1108,7 +1113,7 @@ export function WeeklyDecisionCard({
                 </ul>
               </article>
             ) : null}
-          </details>
+          </CompactDisclosure>
         </aside>
       </div>
 
