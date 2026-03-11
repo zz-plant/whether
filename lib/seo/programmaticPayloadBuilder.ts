@@ -34,6 +34,7 @@ const seoPayloadSchema = z.object({
   noindexReasons: z.array(z.string()).optional(),
   trustSummary: z.string().min(1),
   citationMeta: z.string().min(1),
+  sourceLinks: z.array(z.string().url()).default([]),
 });
 
 const programmaticRouteSchema = z.discriminatedUnion("kind", [

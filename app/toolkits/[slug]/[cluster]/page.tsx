@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../../lib/seo";
 import { findToolkitDefinition } from "../../../../lib/informationArchitecture";
 import { readProgrammaticPayload } from "../../../../lib/seo/programmaticPayloadBuilder";
+import { ProgrammaticEvidenceStrip } from "../../../components/programmaticEvidenceStrip";
 import { findSignalsCluster } from "../../../signals/clusterRoutes";
 import { findToolkitCluster, toolkitClusterStaticParams } from "../../clusterRoutes";
 
@@ -63,6 +64,7 @@ export default async function ToolkitClusterPage({ params }: { params: Promise<P
           <li>• <span className="font-semibold text-slate-100">Threshold:</span> {payload.triggerThreshold}</li>
           <li>• <span className="font-semibold text-slate-100">Reversal:</span> {payload.reversalCondition}</li>
         </ul>
+        <ProgrammaticEvidenceStrip record={payloadRecord} />
       </section>
       <section className="weather-panel space-y-3 px-6 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Continue decision flow</h2>

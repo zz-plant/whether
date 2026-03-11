@@ -25,6 +25,7 @@ export type SeoDecisionPayload = {
   qualityGates?: ReturnType<typeof evaluateSeoQualityGates>;
   trustSummary: string;
   citationMeta: string;
+  sourceLinks?: string[];
 };
 
 export const buildSeoDecisionPayload = ({
@@ -143,5 +144,6 @@ export const buildSeoDecisionPayload = ({
     qualityGates,
     trustSummary,
     citationMeta,
+    sourceLinks: (provenanceLinks ?? []).filter((link) => Boolean(link && link.trim())).slice(0, 3),
   };
 };

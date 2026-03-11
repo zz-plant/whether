@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../../lib/seo";
 import { readProgrammaticPayload } from "../../../../lib/seo/programmaticPayloadBuilder";
+import { ProgrammaticEvidenceStrip } from "../../../components/programmaticEvidenceStrip";
 import { findUseCaseRole } from "../../../../lib/informationArchitecture";
 import { decideClusterStaticParams, findDecideClusterRoute } from "../../clusterRoutes";
 import { findDecisionScenario } from "../../../seoRouteClusters";
@@ -63,6 +64,7 @@ export default async function DecideClusterPage({ params }: { params: Promise<Pa
           <li>• <span className="font-semibold text-slate-100">Threshold:</span> {payload.triggerThreshold}</li>
           <li>• <span className="font-semibold text-slate-100">Reversal:</span> {payload.reversalCondition}</li>
         </ul>
+        <ProgrammaticEvidenceStrip record={payloadRecord} />
       </section>
       <section className="weather-panel space-y-3 px-6 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Continue decision flow</h2>
