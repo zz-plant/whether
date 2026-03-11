@@ -50,6 +50,7 @@ const baseInput = {
   isFallbackSnapshot: false,
   provenanceStatusLabel: "Live (high confidence)",
   fetchedAtIso: new Date().toISOString(),
+  provenanceLinks: ["https://fred.stlouisfed.org/series/DGS10"],
 };
 
 describe("seo decision payload", () => {

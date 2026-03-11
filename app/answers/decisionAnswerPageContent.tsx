@@ -39,6 +39,8 @@ export async function DecisionAnswerPageContent({
     isFallbackSnapshot: !reportResult.ok,
     provenanceStatusLabel: reportData.treasuryProvenance?.statusLabel,
     fetchedAtIso: reportData.treasury.fetched_at,
+    pageKey: `/answers/${page.slug}`,
+    provenanceLinks: [reportData.treasury.source, reportData.macroSeries[0]?.sourceUrl].filter((link): link is string => Boolean(link)),
   });
   const liveShortAnswer = buildLiveShortAnswer({ payload, fallback: page.shortAnswer });
   const liveDirectAnswer = buildLiveDirectAnswer({ payload, fallback: page.directAnswer });
