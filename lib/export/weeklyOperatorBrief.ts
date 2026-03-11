@@ -12,6 +12,15 @@ export type WeeklyOperatorBriefPayload = {
   flipTrigger: string;
 };
 
+export type WeeklyCallSnapshotPayload = {
+  regime: string;
+  trend: string;
+  confidence: string;
+  doNow: string;
+  avoid: string;
+  watch: string;
+};
+
 export const buildWeeklyOperatorBriefPayload = ({
   assessment,
   treasury,
@@ -94,3 +103,13 @@ export const buildWeeklyOperatorBriefSlackBlocks = (payload: WeeklyOperatorBrief
 
 export const buildWeeklyOperatorBriefCardText = (payload: WeeklyOperatorBriefPayload) =>
   buildWeeklyOperatorBriefPlainText(payload);
+
+export const buildWeeklyCallSnapshotPlainText = (payload: WeeklyCallSnapshotPayload) => [
+  "Weekly call snapshot",
+  `Regime: ${payload.regime}`,
+  `Trend: ${payload.trend}`,
+  `Confidence: ${payload.confidence}`,
+  `DO NOW: ${payload.doNow}`,
+  `AVOID: ${payload.avoid}`,
+  `WATCH: ${payload.watch}`,
+].join("\n");
