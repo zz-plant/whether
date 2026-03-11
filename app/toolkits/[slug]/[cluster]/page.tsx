@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../../lib/seo";
 import { findToolkitDefinition } from "../../../../lib/informationArchitecture";
 import { readProgrammaticPayload } from "../../../../lib/seo/programmaticPayloadBuilder";
+import type { SeoDecisionPayload } from "../../../../lib/report/seoDecisionPayload";
 import { findSignalsCluster } from "../../../signals/clusterRoutes";
 import { findToolkitCluster, toolkitClusterStaticParams } from "../../clusterRoutes";
 
@@ -16,6 +17,44 @@ export function generateStaticParams() {
   return toolkitClusterStaticParams;
 }
 
+
+const shouldNoindexForPayload = (payload?: Pick<SeoDecisionPayload, "degraded" | "noindex" | "noindexReasons">) => {
+  if (!payload) return true;
+  if (payload.noindex || payload.degraded) return true;
+  return (payload.noindexReasons ?? []).some((reason) => reason.startsWith("freshness-") || reason.includes("provenance"));
+};
+
+export const buildToolkitClusterMetadata = ({
+  slug,
+  cluster,
+  toolkitTitle,
+  decisionThisSession,
+  contextTitle,
+  isCanonical,
+  payload,
+}: {
+  slug: string;
+  cluster: string;
+  toolkitTitle: string;
+  decisionThisSession: string;
+  contextTitle: string;
+  isCanonical: boolean;
+  payload?: Pick<SeoDecisionPayload, "degraded" | "noindex" | "noindexReasons">;
+}) => {
+  const metadata = buildPageMetadata({
+    title: `${toolkitTitle} in ${contextTitle}`,
+    description: decisionThisSession,
+    path: `/toolkits/${slug}/${cluster}`,
+    imageAlt: toolkitTitle,
+  });
+
+  if (!isCanonical || shouldNoindexForPayload(payload)) {
+    metadata.robots = { index: false, follow: true };
+  }
+
+  return metadata;
+};
+
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug, cluster } = await params;
   const clusterDefinition = findToolkitCluster(slug, cluster);
@@ -24,18 +63,17 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
   if (!clusterDefinition || !toolkit || !context) return {};
 
-  const metadata = buildPageMetadata({
-    title: `${toolkit.title} in ${context.title}`,
-    description: toolkit.decisionThisSession,
-    path: `/toolkits/${slug}/${cluster}`,
-    imageAlt: toolkit.title,
+  const payloadRecord = await readProgrammaticPayload(`/toolkits/${slug}/${cluster}`).catch(() => undefined);
+
+  return buildToolkitClusterMetadata({
+    slug,
+    cluster,
+    toolkitTitle: toolkit.title,
+    decisionThisSession: toolkit.decisionThisSession,
+    contextTitle: context.title,
+    isCanonical: clusterDefinition.isCanonical,
+    payload: payloadRecord?.payload,
   });
-
-  if (!clusterDefinition.isCanonical) {
-    metadata.robots = { index: false, follow: true };
-  }
-
-  return metadata;
 }
 
 export default async function ToolkitClusterPage({ params }: { params: Promise<Params> }) {
