@@ -17,9 +17,9 @@ import { stageGuides } from "./guides/stageGuides";
 import { stakeholderGuides } from "./guides/stakeholderGuides";
 import { roleLandings } from "./solutions/career-paths/roleLandingData";
 import { regimePages } from "./startup-macro-posture/clusterData";
-import { indexableSignalsClusters } from "./signals/clusterRoutes";
 import { indexableDecideClusterRoutes } from "./decide/clusterRoutes";
 import { indexableToolkitClusters } from "./toolkits/clusterRoutes";
+import { signalScenarioRoutes } from "./seoRouteClusters";
 import { loadReportDataSafe } from "../lib/report/reportData";
 import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
 import { isSeoPageIndexEligible } from "../lib/report/seoIndexEligibility";
@@ -255,8 +255,8 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     priority: 0.64,
   }));
 
-  const signalsClusterEntries: SitemapEntryDescriptor[] = indexableSignalsClusters.map((cluster) => ({
-    path: `/signals/${cluster.slug}`,
+  const signalsClusterEntries: SitemapEntryDescriptor[] = signalScenarioRoutes.map((clusterRoute) => ({
+    path: `/signals/${clusterRoute.signalSlug}/${clusterRoute.decisionScenario}`,
     lastModified: reportLastModified,
     changeFrequency: "weekly",
     priority: 0.68,
