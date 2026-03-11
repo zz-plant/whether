@@ -540,6 +540,25 @@ type DecisionCallHeaderProps = {
   executiveOperationalStance?: WeeklyDecisionCardProps["executiveOperationalStance"];
 };
 
+const resolvePostureAndStage = ({
+  statusLabel,
+  postureLabel,
+  stageLabel,
+  postureWithStageLabel,
+}: {
+  statusLabel: string;
+  postureLabel?: string;
+  stageLabel?: string;
+  postureWithStageLabel?: string;
+}) => {
+  const [derivedPostureLabel, derivedStageLabel] = (postureWithStageLabel ?? "").split(" — ");
+
+  return {
+    resolvedPostureLabel: postureLabel ?? derivedPostureLabel ?? statusLabel,
+    resolvedStageLabel: stageLabel ?? derivedStageLabel ?? "Unspecified",
+  };
+};
+
 export function DecisionCallHeader({
   statusLabel,
   postureLabel,
@@ -563,9 +582,12 @@ export function DecisionCallHeader({
   trustWarningCopy,
   regimeDistance,
 }: DecisionCallHeaderProps) {
-  const [derivedPostureLabel, derivedStageLabel] = (postureWithStageLabel ?? "").split(" — ");
-  const resolvedPostureLabel = postureLabel ?? derivedPostureLabel ?? statusLabel;
-  const resolvedStageLabel = stageLabel ?? derivedStageLabel ?? "Unspecified";
+  const { resolvedPostureLabel, resolvedStageLabel } = resolvePostureAndStage({
+    statusLabel,
+    postureLabel,
+    stageLabel,
+    postureWithStageLabel,
+  });
   const liveBandChips = resolveLiveBandChips({
     confidenceLabel,
     confidencePercent,
@@ -583,9 +605,10 @@ export function DecisionCallHeader({
     <header className="space-y-4 border-b border-slate-700/80 pb-6" data-testid="weekly-top-fold">
       <article className={`${tierOnePanel} weather-live-hero weather-live-hero--${heroUrgency} space-y-5 border-sky-400/50 bg-gradient-to-br from-slate-950 via-slate-900/95 to-slate-950`} data-testid="weekly-viral-hero" aria-label="Weekly posture strip">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-sky-200">This week&apos;s regime</p>
-        <h1 id="weekly-posture-brief-title" className="text-3xl font-semibold text-slate-50 sm:text-4xl">
-          {resolvedPostureLabel} — {resolvedStageLabel}
-        </h1>
+        <div id="weekly-posture-brief-title" className="space-y-1">
+          <p className="text-3xl font-semibold text-slate-50 sm:text-4xl">Regime: {resolvedPostureLabel}</p>
+          <p className="text-base font-semibold text-slate-200 sm:text-lg">Cycle phase: {resolvedStageLabel}</p>
+        </div>
         <div className="weather-live-band" data-live-urgency={heroUrgency} aria-label="Live decision telemetry">
           {liveBandChips.map((chip) => (
             <span key={chip.id} className={`weather-live-band-chip weather-live-band-chip--${chip.tone}`}>{chip.label}</span>
@@ -654,6 +677,8 @@ export function DecisionCallHeader({
 
 type RegimeBannerProps = {
   statusLabel: string;
+  postureLabel?: string;
+  stageLabel?: string;
   postureWithStageLabel?: string;
   recordDateLabel: string;
   confidencePercent: number;
@@ -693,6 +718,8 @@ const formatFlipTriggerLine = (regimeDistance?: WeeklyDecisionCardProps["regimeD
 
 function RegimeBanner({
   statusLabel,
+  postureLabel,
+  stageLabel,
   postureWithStageLabel,
   recordDateLabel,
   confidencePercent,
@@ -702,18 +729,26 @@ function RegimeBanner({
   actionNowShort,
   regimeDistance,
 }: RegimeBannerProps) {
-  const resolvedRegimeLabel = postureWithStageLabel?.trim() || statusLabel;
+  const { resolvedPostureLabel, resolvedStageLabel } = resolvePostureAndStage({
+    statusLabel,
+    postureLabel,
+    stageLabel,
+    postureWithStageLabel,
+  });
   const trendValue = trendLabel?.trim() || "Unspecified";
   const flipRiskValue = regimeDistance && Number.isFinite(regimeDistance.pointsToFlip)
     ? `${Math.max(0, Math.round(regimeDistance.pointsToFlip))} pts`
     : "Unknown";
   const operatingLine = operatingStanceLine.trim() || actionNowShort?.trim() || "Hold bounded operating rules until next refresh.";
-  const bannerTone = resolveRegimeTone(resolvedRegimeLabel);
+  const bannerTone = resolveRegimeTone(resolvedPostureLabel);
 
   return (
     <header className={`sticky top-2 z-10 rounded-xl border p-4 shadow-lg backdrop-blur sm:p-5 ${bannerTone}`} data-testid="weekly-regime-banner" aria-label="Weekly regime banner">
       <p className="text-[11px] font-semibold uppercase tracking-[0.13em]">REGIME — WEEK OF {recordDateLabel}</p>
-      <h1 id="weekly-posture-brief-title" className="mt-1 text-2xl font-semibold sm:text-3xl">{resolvedRegimeLabel}</h1>
+      <div id="weekly-posture-brief-title" className="mt-1 space-y-0.5">
+        <p className="text-2xl font-semibold sm:text-3xl">Regime: {resolvedPostureLabel}</p>
+        <p className="text-sm font-semibold sm:text-base">Cycle phase: {resolvedStageLabel}</p>
+      </div>
       <p className="mt-2 overflow-x-auto text-xs font-semibold whitespace-nowrap" aria-label="Regime metrics line">
         <span>Confidence {confidenceLabel} {Math.round(confidencePercent)}%</span>
         <span className="px-1.5" aria-hidden="true">·</span>
@@ -1140,6 +1175,8 @@ export function WeeklyDecisionCard({
     <section className="weather-panel space-y-3 px-4 py-5 sm:space-y-4 sm:px-6 sm:py-6" aria-labelledby="weekly-posture-brief-title">
       <RegimeBanner
         statusLabel={statusLabel}
+        postureLabel={postureLabel}
+        stageLabel={stageLabel}
         postureWithStageLabel={postureWithStageLabel}
         recordDateLabel={recordDateLabel}
         confidencePercent={confidencePercent}
