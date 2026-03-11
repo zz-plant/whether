@@ -1143,6 +1143,7 @@ export function WeeklyDecisionCard({
   startupVariantPolicy,
   actionStripItems: _actionStripItems = [],
   roleAwareTemplates,
+  executiveOperationalStance,
   revisitDecisions,
   weeklyMovement,
   memoryRail,
@@ -1184,6 +1185,9 @@ export function WeeklyDecisionCard({
           .join(" · ")
       : "No active contributors this week.";
   const conciseWeeklyMovement = weeklyMovement.summary.replace(/\.$/, "");
+  const snapshotDoNow = immediateDecision;
+  const snapshotAvoid = executiveOperationalStance.avoid[0] ?? guardrail;
+  const snapshotWatch = flipThreshold ?? reversalTrigger;
 
   const needsTrustWarning = isFallbackSnapshot || confidenceLabel !== "HIGH" || freshnessLabel === "Unavailable";
   const trustWarningCopy = isFallbackSnapshot
@@ -1298,6 +1302,21 @@ export function WeeklyDecisionCard({
         actionNowShort={actionNowShort}
         regimeDistance={regimeDistance}
       />
+
+      <article className="rounded-xl border border-slate-700/75 bg-slate-950/92 p-3" aria-label="Weekly call snapshot">
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="text-sm font-semibold tracking-[0.01em] text-slate-50">Weekly call snapshot</h2>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Quick share summary for this week</p>
+        </div>
+        <ul className="mt-2 grid gap-1.5 text-[11px] text-slate-100 sm:grid-cols-2 lg:grid-cols-3">
+          <li className={compactInset}><span className="font-semibold text-slate-200">Regime:</span> {postureWithStageLabel ?? statusLabel}</li>
+          <li className={compactInset}><span className="font-semibold text-slate-200">Trend:</span> {trendLabel}</li>
+          <li className={compactInset}><span className="font-semibold text-slate-200">Confidence:</span> {Math.round(confidencePercent)}% ({confidenceLabel})</li>
+          <li className={compactInset}><span className="font-semibold uppercase tracking-[0.08em] text-emerald-200">DO NOW:</span> {snapshotDoNow}</li>
+          <li className={compactInset}><span className="font-semibold uppercase tracking-[0.08em] text-rose-200">AVOID:</span> {snapshotAvoid}</li>
+          <li className={compactInset}><span className="font-semibold uppercase tracking-[0.08em] text-sky-200">WATCH:</span> {snapshotWatch}</li>
+        </ul>
+      </article>
 
       <article className={`${tierOnePanel} ${sectionSpacing} rounded-2xl border border-slate-700/75 bg-gradient-to-br from-slate-950/95 via-slate-950/88 to-slate-900/92`} aria-label="Since last review">
         <div className="flex flex-wrap items-center justify-between gap-2">

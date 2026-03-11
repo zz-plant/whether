@@ -25,6 +25,7 @@ import { buildTrustStatus } from "../lib/report/trustStatus";
 import { WeeklyDecisionCard } from "./components/weeklyDecisionCard";
 import { buildBoardBrief, buildCallCitation, buildSlackBrief } from "../lib/export/briefBuilders";
 import {
+  buildWeeklyCallSnapshotPlainText,
   buildWeeklyOperatorBriefPayload,
   buildWeeklyOperatorBriefPlainText,
 } from "../lib/export/weeklyOperatorBrief";
@@ -354,6 +355,14 @@ const HomePageReportContent = async ({
     actionStripItems: homeBriefModel.actionStripItems,
   });
   const weeklyOperatorBriefText = buildWeeklyOperatorBriefPlainText(weeklyOperatorBriefPayload);
+  const weeklyCallSnapshotText = buildWeeklyCallSnapshotPlainText({
+    regime: homeBriefModel.postureWithStageLabel ?? homeBriefModel.postureLabel,
+    trend: homeBriefModel.trendLabel,
+    confidence: `${Math.round(homeBriefModel.confidencePercent)}% (${homeBriefModel.confidenceLabel})`,
+    doNow: homeBriefModel.actionNowShort ?? "Hold last week's bounded operating rules until thresholds move.",
+    avoid: homeBriefModel.executiveOperationalStance.avoid[0] ?? homeBriefModel.guardrail,
+    watch: homeBriefModel.flipThreshold ?? homeBriefModel.reversalTrigger,
+  });
   const callCitation = buildCallCitation(assessment, treasury, {
     interpretationLayer,
     postureWithStageLabel: homeBriefModel.postureWithStageLabel,
@@ -456,7 +465,7 @@ const HomePageReportContent = async ({
         citation={callCitation}
         isFallbackSnapshot={isFallback && !historicalSelection}
         failureModes={homeBriefModel.failureModes}
-        actions={<CopyLeadershipArtifactsButtons weeklyOperatorBrief={weeklyOperatorBriefText} boardSummary={boardSummary} citation={callCitation} />}
+        actions={<CopyLeadershipArtifactsButtons weeklyCallSnapshot={weeklyCallSnapshotText} weeklyOperatorBrief={weeklyOperatorBriefText} boardSummary={boardSummary} citation={callCitation} />}
       />
 
 
