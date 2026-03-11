@@ -1,5 +1,13 @@
 # Monthly refresh loop for high-performing pages
 
+## Crawl + thin-risk audit prerequisite
+Before monthly refresh prioritization, run sitemap audit output to:
+- bucket URLs by family,
+- compare family counts versus prior snapshot,
+- flag templates at thin-page risk when decision-contract blocks are missing where required.
+
+Use: `bun run seo:audit:sitemap`.
+
 ## Trigger criteria
 Refresh any page meeting one of:
 - Top quartile organic entrances in its cluster for 2 consecutive months.

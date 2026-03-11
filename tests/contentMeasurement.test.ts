@@ -12,9 +12,13 @@ describe("buildContentMeasurementReport", () => {
   it("aggregates entrances, CTA conversions, assisted paths, and intent counts", () => {
     const events: ContentMeasurementEvent[] = [
       { pagePath: "/resources/how-vc-firms-can-enforce-capital-discipline-across-portfolios", cluster: "vc", intent: "vc-partner", type: "organic_entrance" },
+      { pagePath: "/resources/how-vc-firms-can-enforce-capital-discipline-across-portfolios", cluster: "vc", intent: "vc-partner", type: "decision_block_view" },
+      { pagePath: "/resources/how-vc-firms-can-enforce-capital-discipline-across-portfolios", cluster: "vc", intent: "vc-partner", type: "weekly_brief_handoff" },
       { pagePath: "/resources/how-vc-firms-can-enforce-capital-discipline-across-portfolios", cluster: "vc", intent: "vc-partner", type: "cta_conversion", ctaId: "request" },
       { pagePath: "/resources/operator-posture-standardization-case-example-product-finance", cluster: "vc", intent: "vp-product", type: "cta_conversion", ctaId: "download" },
       { pagePath: "/resources/capital-posture-template", cluster: "tool", intent: "cfo", type: "organic_entrance" },
+      { pagePath: "/resources/capital-posture-template", cluster: "tool", intent: "cfo", type: "operations_handoff" },
+      { pagePath: "/resources/capital-posture-template", cluster: "tool", intent: "cfo", type: "artifact_interaction", artifactAction: "copy" },
       { pagePath: "/resources/capital-posture-template", cluster: "tool", intent: "cfo", type: "assisted_conversion", internalPath: "/resources/how-vc-firms-can-enforce-capital-discipline-across-portfolios -> /resources/capital-posture-template" },
     ];
 
@@ -30,8 +34,13 @@ describe("buildContentMeasurementReport", () => {
       ],
       1,
     );
-    assert.equal(report.eventsByIntent["vc-partner"], 2);
-    assert.equal(report.eventsByIntent.cfo, 2);
+    assert.equal(report.eventsByIntent["vc-partner"], 4);
+    assert.equal(report.eventsByIntent.cfo, 4);
+    assert.equal(report.decisionBlockViewsByPage["/resources/how-vc-firms-can-enforce-capital-discipline-across-portfolios"], 1);
+    assert.equal(report.weeklyBriefHandoffsByPage["/resources/how-vc-firms-can-enforce-capital-discipline-across-portfolios"], 1);
+    assert.equal(report.operationsHandoffsByPage["/resources/capital-posture-template"], 1);
+    assert.equal(report.artifactInteractionsByAction.copy, 1);
+    assert.equal(report.decisionReadySessionsEstimateByPage["/resources/how-vc-firms-can-enforce-capital-discipline-across-portfolios"], 1);
   });
 
 
@@ -53,6 +62,16 @@ describe("buildContentMeasurementReport", () => {
         cluster: "tool",
         intent: "board",
         type: "cta_conversion",
+      }),
+      false,
+    );
+
+    assert.equal(
+      isContentMeasurementEvent({
+        pagePath: "/operations",
+        cluster: "tool",
+        intent: "board",
+        type: "artifact_interaction",
       }),
       false,
     );

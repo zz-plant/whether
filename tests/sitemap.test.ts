@@ -19,6 +19,9 @@ import {
 import { stageGuides } from "../app/guides/stageGuides";
 import { stakeholderGuides } from "../app/guides/stakeholderGuides";
 import { roleLandings } from "../app/solutions/career-paths/roleLandingData";
+import { indexableSignalsClusters } from "../app/signals/clusterRoutes";
+import { indexableDecideClusterRoutes } from "../app/decide/clusterRoutes";
+import { indexableToolkitClusters } from "../app/toolkits/clusterRoutes";
 
 describe("sitemap", () => {
   it("returns canonical URLs and includes posture, decide, learn, toolkit, and library routes", async () => {
@@ -113,5 +116,17 @@ describe("sitemap", () => {
 
     assert.ok(!urls.has(`${siteUrl}/answers/should-we-hire-engineers-right-now`));
     assert.ok(!urls.has(`${siteUrl}/startup-macro-posture/scarcity`));
+
+    for (const cluster of indexableSignalsClusters) {
+      assert.ok(!urls.has(`${siteUrl}/signals/${cluster.slug}`));
+    }
+
+    for (const clusterRoute of indexableDecideClusterRoutes) {
+      assert.ok(!urls.has(`${siteUrl}/decide/${clusterRoute.slug}/${clusterRoute.cluster}`));
+    }
+
+    for (const clusterRoute of indexableToolkitClusters) {
+      assert.ok(!urls.has(`${siteUrl}/toolkits/${clusterRoute.slug}/${clusterRoute.cluster}`));
+    }
   });
 });

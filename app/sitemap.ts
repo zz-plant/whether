@@ -255,21 +255,21 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     priority: 0.64,
   }));
 
-  const signalsClusterEntries: SitemapEntryDescriptor[] = indexableSignalsClusters.map((cluster) => ({
+  const signalsClusterEntries: SitemapEntryDescriptor[] = (programmaticEligible ? indexableSignalsClusters : []).map((cluster) => ({
     path: `/signals/${cluster.slug}`,
     lastModified: reportLastModified,
     changeFrequency: "weekly",
     priority: 0.68,
   }));
 
-  const decideClusterEntries: SitemapEntryDescriptor[] = indexableDecideClusterRoutes.map((clusterRoute) => ({
+  const decideClusterEntries: SitemapEntryDescriptor[] = (programmaticEligible ? indexableDecideClusterRoutes : []).map((clusterRoute) => ({
     path: `/decide/${clusterRoute.slug}/${clusterRoute.cluster}`,
     lastModified: staticContentLastModified,
     changeFrequency: "monthly",
     priority: 0.62,
   }));
 
-  const toolkitClusterEntries: SitemapEntryDescriptor[] = indexableToolkitClusters.map((clusterRoute) => ({
+  const toolkitClusterEntries: SitemapEntryDescriptor[] = (programmaticEligible ? indexableToolkitClusters : []).map((clusterRoute) => ({
     path: `/toolkits/${clusterRoute.slug}/${clusterRoute.cluster}`,
     lastModified: staticContentLastModified,
     changeFrequency: "monthly",

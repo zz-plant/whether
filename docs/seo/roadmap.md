@@ -1,5 +1,27 @@
 # SEO editorial roadmap (12–18 months)
 
+## Programmatic implementation guardrails (current vs pending)
+- **Gated now:** `/answers/*`, `/startup-macro-posture/*` families use decision payload eligibility in index controls.
+- **Expanded in this phase:** generated cluster routes in `/signals/*`, `/decide/*`, and `/toolkits/*` inherit the same programmatic sitemap gating rule.
+- **Pending follow-through:** per-template, field-level eligibility checks for every generated page model (beyond global weekly eligibility) should be enforced where route-specific payloads exist.
+
+## 90-day execution plan
+
+### Days 1–30: foundation
+- Finalize decision template contract across programmatic families.
+- Enforce noindex defaults for stale/incomplete/degraded decision payloads.
+- Stand up sitemap-family audit output for crawl and thin-risk diagnostics.
+
+### Days 31–60: scale with controls
+- Expand only templates passing decision-completeness and trust gates.
+- Wire SERP→brief handoff and artifact interaction analytics into cluster reporting.
+- Add changelog refresh modules to top organic landing templates.
+
+### Days 61–90: optimize and prune
+- Prune or merge low-value templates with weak handoff and low uniqueness.
+- Tighten internal linking toward `/`, `/operations`, and trust/method surfaces.
+- Publish trust/method companion modules for top-entry programmatic templates.
+
 ## North-star structure
 - **Q1:** Pillar + pain + template
 - **Q2:** Pain + VC pages + case examples
