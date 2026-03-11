@@ -19,7 +19,7 @@ import {
 } from "./reportShellNavigation";
 import { type ReportStageItem } from "./reportRevampElements";
 import { INFORMATIONAL_NOTICE } from "../../lib/exportNotices";
-import { serializeJsonLd } from "../../lib/seo";
+import { canonicalPositioningLine, serializeJsonLd } from "../../lib/seo";
 import { AnchorFeedback } from "./anchorFeedback";
 import { ReportCta } from "./reportCta";
 import { NavigationOrientationBadge } from "./navigationOrientationBadge";
@@ -369,6 +369,7 @@ export const ReportShell = ({
               <div className="hidden items-center sm:flex"><p className="text-xs text-slate-300">Signals updated {fetchedAtLabel}</p></div>
             </div>
             <NavigationOrientationBadge currentPath={currentPath} className="mt-4" />
+            <p className="mt-2 text-xs text-slate-300">{canonicalPositioningLine}</p>
             <p className="mt-2 text-[11px] text-slate-400">Choose view: Now (decision), Operate (execution), Reference (evidence).</p>
             {showPageNavigation ? (
               <ReportPageNavigation
