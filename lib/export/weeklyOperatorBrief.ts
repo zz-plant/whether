@@ -14,11 +14,13 @@ export type WeeklyOperatorBriefPayload = {
 
 export type WeeklyCallSnapshotPayload = {
   regime: string;
+  call: string;
   trend: string;
   confidence: string;
   doNow: string;
   avoid: string;
   watch: string;
+  flipConditions: string[];
 };
 
 export const buildWeeklyOperatorBriefPayload = ({
@@ -106,10 +108,13 @@ export const buildWeeklyOperatorBriefCardText = (payload: WeeklyOperatorBriefPay
 
 export const buildWeeklyCallSnapshotPlainText = (payload: WeeklyCallSnapshotPayload) => [
   "Weekly call snapshot",
-  `Regime: ${payload.regime}`,
-  `Trend: ${payload.trend}`,
-  `Confidence: ${payload.confidence}`,
+  `REGIME: ${payload.regime}`,
+  `CALL: ${payload.call}`,
   `DO NOW: ${payload.doNow}`,
   `AVOID: ${payload.avoid}`,
   `WATCH: ${payload.watch}`,
+  "FLIP CONDITIONS:",
+  ...(payload.flipConditions.length > 0
+    ? payload.flipConditions.map((condition) => `• ${condition}`)
+    : ["• Recheck thresholds on next refresh."]),
 ].join("\n");
