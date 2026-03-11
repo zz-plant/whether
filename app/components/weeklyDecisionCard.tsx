@@ -112,17 +112,17 @@ const sectionSpacing = "space-y-3";
 const tierOneHeading = "text-sm font-semibold tracking-[0.01em] text-slate-50";
 const tierTwoHeading = "text-sm font-semibold tracking-[0.01em] text-slate-200";
 const tierThreeHeading = "text-xs font-medium tracking-normal text-slate-400";
-const tierOnePanel = "rounded-xl border border-slate-500/90 bg-slate-950/90 p-5";
-const tierTwoPanel = "rounded-xl border border-slate-700/65 bg-slate-950/68 p-4";
-const tierThreePanel = "rounded-xl border border-slate-800/40 bg-slate-950/40 p-2.5";
-const tierOneInset = "rounded-lg border border-slate-700/75 bg-slate-950/72 px-3 py-3";
-const tierTwoInset = "rounded-md border border-slate-700/55 bg-slate-950/58 px-3 py-2.5";
-const tierThreeInset = "rounded-md border border-slate-800/35 bg-slate-950/34 px-2.5 py-2.5 text-slate-400";
+const tierOnePanel = "rounded-xl border border-slate-700/55 bg-slate-950/84 p-5";
+const tierTwoPanel = "rounded-xl border border-slate-800/45 bg-slate-950/62 p-4";
+const tierThreePanel = "rounded-xl border border-slate-800/28 bg-slate-950/32 p-2.5";
+const tierOneInset = "rounded-lg border border-slate-800/55 bg-slate-950/62 px-3 py-3";
+const tierTwoInset = "rounded-md border border-slate-800/38 bg-slate-950/50 px-3 py-2.5";
+const tierThreeInset = "rounded-md border border-slate-800/24 bg-slate-950/28 px-2.5 py-2.5 text-slate-400";
 const compactSectionSpacing = "space-y-2";
-const compactInset = "rounded-md border border-slate-800/45 bg-slate-950/48 px-2.5 py-2";
+const compactInset = "rounded-md border border-slate-800/32 bg-slate-950/42 px-2.5 py-2";
 const neutralLabel = "font-semibold tracking-[0.01em] text-slate-300";
 const disclosureSummaryClass =
-  "flex min-h-[44px] w-full items-center justify-between gap-3 rounded-md border border-slate-700/70 bg-slate-950/65 px-3 py-2 text-left text-xs font-semibold tracking-[0.01em] text-slate-100 transition hover:border-slate-500/70 hover:bg-slate-900/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300";
+  "flex min-h-[44px] w-full items-center justify-between gap-3 rounded-md border border-slate-800/52 bg-slate-950/56 px-3 py-2 text-left text-xs font-semibold tracking-[0.01em] text-slate-100 transition hover:border-slate-600/60 hover:bg-slate-900/74 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300";
 
 const SummaryLabel = ({
   label,
