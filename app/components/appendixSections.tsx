@@ -44,7 +44,7 @@ import {
   FIRST_TIME_GUIDE_STEPS,
   GLOSSARY_USAGE_NOTES,
 } from "../../lib/report/reportCopy";
-import { DataProvenanceStrip } from "./dataProvenanceStrip";
+import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
 import { MonthlySummaryCard } from "./monthlySummaryCard";
 import { SummaryDeltaPanel } from "./summaryDeltaPanel";
 import { RegimeBadgeIcon } from "./regimeIcons";
