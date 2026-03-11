@@ -21,12 +21,16 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
   if (!clusterDefinition) return {};
 
-  return buildPageMetadata({
+  const metadata = buildPageMetadata({
     title: `${clusterDefinition.title} | Signals`,
     description: clusterDefinition.summary,
     path: `/signals/${cluster}`,
     imageAlt: clusterDefinition.title,
   });
+
+  metadata.robots = { index: false, follow: true };
+
+  return metadata;
 }
 
 export default async function SignalsClusterPage({ params }: { params: Promise<Params> }) {

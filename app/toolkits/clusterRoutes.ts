@@ -1,15 +1,18 @@
-import { toolkitDefinitions } from "../../lib/informationArchitecture";
+import { findToolkitDefinition } from "../../lib/informationArchitecture";
+import { toolkitCanonicalRoutes } from "../seoRouteClusters";
 
 type ToolkitClusterDefinition = {
   slug: string;
-  cluster: "decision-contract";
+  cluster: string;
   isIndexable: boolean;
+  isCanonical: boolean;
 };
 
-const toolkitClusterDefinitions: ToolkitClusterDefinition[] = toolkitDefinitions.map((toolkit) => ({
-  slug: toolkit.slug,
-  cluster: "decision-contract",
-  isIndexable: toolkit.runSequence.length > 0 && toolkit.prepChecklist.length > 0,
+const toolkitClusterDefinitions: ToolkitClusterDefinition[] = toolkitCanonicalRoutes.map((route) => ({
+  slug: route.toolkitType,
+  cluster: route.macroContext,
+  isIndexable: Boolean(findToolkitDefinition(route.toolkitType)),
+  isCanonical: route.isCanonical,
 }));
 
 export const toolkitClusterStaticParams = toolkitClusterDefinitions
@@ -21,5 +24,4 @@ export const findToolkitCluster = (slug: string, cluster: string) =>
     (entry) => entry.slug === slug && entry.cluster === cluster && entry.isIndexable,
   );
 
-export const indexableToolkitClusters = toolkitClusterDefinitions.filter((cluster) => cluster.isIndexable);
-
+export const indexableToolkitClusters = toolkitClusterDefinitions.filter((cluster) => cluster.isIndexable && cluster.isCanonical);
