@@ -44,3 +44,22 @@ it("derives operating levers from canonical bounded rules with assessment contex
   assert.match(hiringLever?.triggerThreshold ?? "", /tightness > 76/i);
   assert.match(hiringLever?.reversalCondition ?? "", /tightness < 66/i);
 });
+
+
+it("keeps operating levers in canonical operatingLeverOrder", () => {
+  const guidance = getPlaybookGuidance("DEFENSIVE", {
+    thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
+    scores: { tightness: 74, riskAppetite: 46 },
+  });
+
+  assert.deepEqual(
+    guidance.operatingLevers.map((item) => item.lever),
+    [
+      "hiring-stance",
+      "investment-pace",
+      "sales-posture",
+      "product-priorities",
+      "risk-tolerance",
+    ],
+  );
+});
