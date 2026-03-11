@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { toolkitDefinitions } from "../lib/informationArchitecture";
+import { toolkitDefinitions } from "../lib/decisionDomainCatalog";
 
 describe("toolkit definitions", () => {
   it("provides built-out operating guidance for each toolkit", () => {

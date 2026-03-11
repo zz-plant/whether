@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { buildPageMetadata } from "../../../lib/seo";
-import { failureModeDefinitions } from "../../../lib/informationArchitecture";
+import { failureModeDefinitions } from "../../../lib/decisionDomainCatalog";
 
 
 export const runtime = "edge";

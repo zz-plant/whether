@@ -1,4 +1,4 @@
-import { useCaseRoles } from "../../lib/informationArchitecture";
+import { useCaseRoles } from "../../lib/decisionDomainCatalog";
 import { decideCanonicalRoutes } from "../seoRouteClusters";
 
 type DecideClusterRoute = {

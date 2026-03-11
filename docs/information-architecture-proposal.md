@@ -22,7 +22,8 @@ To preserve inbound links and historical references, legacy entrypoints should r
 
 ## Migration notes
 - Keep `/decide/use-cases` and `/decide/[slug]` as entry-point bridge paths because they support intent-based routing.
-- Consolidate concept discovery on `/concepts` (and `/concepts/[slug]`) and failure-mode diagnostics on `/library/failure-modes` (and `/library/failure-modes/[slug]`).
+- Consolidate concept discovery on `/concepts` (and `/concepts/[slug]`) and failure-mode diagnostics on `/library/failure-modes` (and `/library/failure-modes/[slug]`), with `/learn` as the single canonical discovery hub.
+- Keep `/library` as a redirect-only compatibility entrypoint to `/learn`.
 - Preserve `/learn/concepts*` and `/learn/failure-modes*` only as redirect compatibility paths; do not prioritize them as canonical discovery URLs.
 - Keep legacy destination pages available during transition windows for backlink continuity.
 - Update sitemap priorities to favor canonical hubs and detail pages while excluding redirect-only bridge paths.

@@ -1,4 +1,4 @@
-import { findToolkitDefinition } from "../../lib/informationArchitecture";
+import { findToolkitDefinition } from "../../lib/decisionDomainCatalog";
 import { toolkitCanonicalRoutes } from "../seoRouteClusters";
 
 type ToolkitClusterDefinition = {

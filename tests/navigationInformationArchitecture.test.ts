@@ -33,6 +33,6 @@ describe("navigation information architecture", () => {
     assert.equal(labels.size, navigationLayers.length);
 
     assert.equal(navigationLabelByPath["/"], "Weekly Brief");
-    assert.equal(navigationLabelByPath["/method"], "Method");
+    assert.equal(navigationLabelByPath["/method"], "Methodology & Data");
   });
 });

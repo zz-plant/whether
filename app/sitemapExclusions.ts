@@ -8,6 +8,7 @@ export const redirectOnlySitemapPaths = [
   "/toolkit",
   "/operations/briefings",
   "/operations/decisions",
+  "/library",
   "/library/canon",
   "/brief",
   "/brief/stage",

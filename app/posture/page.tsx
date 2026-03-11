@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { buildPageMetadata } from "../../lib/seo";
-import { postureDefinitions } from "../../lib/informationArchitecture";
+import { postureDefinitions } from "../../lib/decisionDomainCatalog";
 import { loadReportDataSafe } from "../../lib/report/reportData";
 import { buildHomeBriefModel } from "../../lib/report/homeBriefModel";
 import { getRegimeDisplayLabel } from "../../lib/regimePresentation";

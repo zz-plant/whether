@@ -69,6 +69,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: '/library',
+        destination: '/learn',
+        permanent: true,
+      },
+      {
         source: '/brief/:stakeholder',
         destination: '/guides/:stakeholder',
         permanent: true,

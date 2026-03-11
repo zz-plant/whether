@@ -2,7 +2,7 @@ import type { Metadata, Route } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../../lib/seo";
-import { failureModeDefinitions } from "../../../../lib/informationArchitecture";
+import { failureModeDefinitions } from "../../../../lib/decisionDomainCatalog";
 
 type Params = { slug: string };
 

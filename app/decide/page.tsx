@@ -7,7 +7,7 @@ import {
   findToolkitDefinition,
   situationUseCaseDefinitions,
   useCaseRoles,
-} from "../../lib/informationArchitecture";
+} from "../../lib/decisionDomainCatalog";
 import { BreadcrumbTrail } from "../components/breadcrumbTrail";
 import { NextStepRail } from "../components/nextStepRail";
 

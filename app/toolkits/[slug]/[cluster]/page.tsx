@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../../lib/seo";
-import { findToolkitDefinition } from "../../../../lib/informationArchitecture";
+import { findToolkitDefinition } from "../../../../lib/decisionDomainCatalog";
 import { readProgrammaticPayload } from "../../../../lib/seo/programmaticPayloadBuilder";
 import type { SeoDecisionPayload } from "../../../../lib/report/seoDecisionPayload";
 import { findSignalsCluster } from "../../../signals/clusterRoutes";
