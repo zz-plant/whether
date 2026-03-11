@@ -37,7 +37,9 @@ import { cache } from "react";
 import type { TreasuryData } from "../types";
 import { emitBoundedAlerts, readAlertLedger } from "./alerting";
 import { buildCurrentStateContract } from "./currentStateContract";
+import type { DecisionTransitionEvent } from "./decisionEventStore";
 import { readDecisionTransitionEvents } from "./decisionEventStore";
+import type { RegimeState } from "./regimeStateMachine";
 
 export type ReportSearchParams = {
   month?: string;
@@ -119,6 +121,21 @@ const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 const resolveConfidencePercent = (assessment: ReturnType<typeof evaluateRegime>) => {
   const gap = resolveDistanceToFlip(assessment);
   return Math.max(35, Math.min(92, Math.round(55 + gap * 3)));
+};
+
+export const derivePreviousStateFromTransition = (
+  transition: DecisionTransitionEvent | null,
+): RegimeState | null => {
+  if (!transition) {
+    return null;
+  }
+
+  return {
+    regime: transition.to,
+    enteredAt: transition.timestamp,
+    lastEvaluatedAt: transition.timestamp,
+    confidence: transition.confidence,
+  };
 };
 
 export const classifyConfidenceTrend = (points: WeeklyConfidencePoint[]): ConfidenceTrendFraming => {
@@ -685,7 +702,9 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
   const treasuryAgeLabel = formatAgeHours(treasury.fetched_at, now);
   const sensors = buildSensorReadings(treasury);
   const assessmentMacroSeries = historicalSelection ? [] : macroSeries;
-  const assessment = evaluateRegime(treasury, thresholds, assessmentMacroSeries);
+  const priorTransition = readDecisionTransitionEvents().at(-1) ?? null;
+  const previousState = derivePreviousStateFromTransition(priorTransition);
+  const assessment = evaluateRegime(treasury, thresholds, assessmentMacroSeries, previousState);
   const operatorAlerts = emitBoundedAlerts(assessment, treasury.record_date);
   const lastTransition = readDecisionTransitionEvents().at(-1) ?? null;
   const currentStateContract = buildCurrentStateContract({
@@ -905,7 +924,9 @@ const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataF
   const cacheMonthsByYear = getTimeMachineMonthsByYear();
   const regimeSeries = getTimeMachineRegimeSeries(DEFAULT_REGIME_SERIES_MONTHS, thresholds, historicalSelection?.asOf);
   const yieldCurveSeries = getTimeMachineYieldCurveSeries(240, historicalSelection?.asOf);
-  const assessment = evaluateRegime(fallbackTreasury, thresholds, []);
+  const priorTransition = readDecisionTransitionEvents().at(-1) ?? null;
+  const previousState = derivePreviousStateFromTransition(priorTransition);
+  const assessment = evaluateRegime(fallbackTreasury, thresholds, [], previousState);
   const currentStateContract = buildCurrentStateContract({
     assessment,
     lastTransition: readDecisionTransitionEvents().at(-1) ?? null,

@@ -10,6 +10,7 @@ import {
   buildReportEvidenceItems,
   buildWeeklyConfidenceSeries,
   classifyConfidenceTrend,
+  derivePreviousStateFromTransition,
 } from "../lib/report/reportData";
 import type { TreasuryData } from "../lib/types";
 import { resolveSectorKey } from "../lib/report/sectorSensitivity";
@@ -29,6 +30,35 @@ const makeTreasury = (
     twoYear,
     tenYear,
   },
+});
+
+describe("derivePreviousStateFromTransition", () => {
+  it("maps a transition event into previous regime state for subsequent evaluation", () => {
+    const state = derivePreviousStateFromTransition({
+      id: "2026-04-01:VOLATILE->EXPANSION:1",
+      timestamp: "2026-04-01",
+      from: "VOLATILE",
+      to: "EXPANSION",
+      triggerValues: {
+        tightness: 62,
+        riskAppetite: 58,
+        thresholdRule: "riskAppetite > riskAppetiteRegime",
+      },
+      confidence: "MEDIUM",
+      reversalConditions: ["Reverse if appetite slips below threshold."],
+    });
+
+    assert.deepEqual(state, {
+      regime: "EXPANSION",
+      enteredAt: "2026-04-01",
+      lastEvaluatedAt: "2026-04-01",
+      confidence: "MEDIUM",
+    });
+  });
+
+  it("returns null when there is no prior transition", () => {
+    assert.equal(derivePreviousStateFromTransition(null), null);
+  });
 });
 
 describe("buildLastYearComparison", () => {
