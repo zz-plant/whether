@@ -4,6 +4,7 @@ import {
   buildUniqueMonthEntries,
   getRegimeSeriesCacheSize,
   getTimeMachineRegimeSeries,
+  getTimeMachineSnapshots,
 } from "../lib/timeMachine/timeMachineCache";
 
 describe("time machine cache month entry helpers", () => {
@@ -30,4 +31,18 @@ describe("time machine cache month entry helpers", () => {
 
     assert.equal(getRegimeSeriesCacheSize() <= 50, true);
   });
+
+  it("anchors regime series window to the requested historical as-of date", () => {
+    const snapshots = getTimeMachineSnapshots();
+    assert.equal(snapshots.length > 30, true);
+
+    const asOf = snapshots[snapshots.length - 25]?.record_date;
+    assert.ok(asOf);
+
+    const series = getTimeMachineRegimeSeries(24, undefined, asOf);
+
+    assert.equal(series.length, 24);
+    assert.equal(series[series.length - 1]?.recordDate, asOf);
+  });
+
 });
