@@ -40,6 +40,7 @@ import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
 import { resolveSectorKey } from "../lib/report/sectorSensitivity";
 import { LiveDataFallbackAlert } from "./components/liveDataFallbackAlert";
 import { getRegimeDisplayLabel } from "../lib/regimePresentation";
+import { recordCommittedPostureDecisionEvent } from "../lib/report/postureStateSource";
 
 export const revalidate = 900;
 export const runtime = "edge";
@@ -301,6 +302,12 @@ const HomePageReportContent = async ({
     stableAction:
       "Safe to use for near-term planning; proceed with normal approval flow.",
   });
+  const postureState = recordCommittedPostureDecisionEvent({
+    recordDate: treasury.record_date,
+    assessment,
+    reportDynamics,
+    previousRegime: regimeAlert?.previousRegime ?? null,
+  });
   const homeBriefModel = buildHomeBriefModel({
     assessment,
     fetchedAtLabel,
@@ -317,6 +324,7 @@ const HomePageReportContent = async ({
     stopItems,
     treasury,
     treasuryProvenance,
+    postureState,
   }, { overlaySector: homepageOverlaySector });
   const displayRegime = getRegimeDisplayLabel({
     regime: assessment.regime,
@@ -344,6 +352,7 @@ const HomePageReportContent = async ({
     actionStripItems: homeBriefModel.actionStripItems,
     confidenceLabel: homeBriefModel.confidenceLabel,
     freshnessLabel: fetchedAtLabel.trim().length > 0 ? fetchedAtLabel : "Unavailable",
+    postureState,
   };
   const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries, exportLayerOptions);
   const boardSummary = buildBoardBrief(assessment, treasury, sensors, macroSeries, exportLayerOptions);
@@ -354,6 +363,7 @@ const HomePageReportContent = async ({
     confidenceLabel: homeBriefModel.confidenceLabel,
     actionStripItems: homeBriefModel.actionStripItems,
     flipConditionLabels: homeBriefModel.compactFlipConditionLabels,
+    postureState,
   });
   const weeklyOperatorBriefText = buildWeeklyOperatorBriefPlainText(weeklyOperatorBriefPayload);
   const weeklyCallSnapshotText = buildWeeklyCallSnapshotPlainText({
@@ -363,9 +373,9 @@ const HomePageReportContent = async ({
     confidence: `${Math.round(homeBriefModel.confidencePercent)}% (${homeBriefModel.confidenceLabel})`,
     doNow: homeBriefModel.actionNowShort ?? "Hold last week's bounded operating rules until thresholds move.",
     avoid: homeBriefModel.executiveOperationalStance.avoid[0] ?? homeBriefModel.guardrail,
-    watch: homeBriefModel.flipThreshold ?? homeBriefModel.reversalTrigger,
-    flipConditions: homeBriefModel.compactFlipConditionLabels.length > 0
-      ? homeBriefModel.compactFlipConditionLabels
+    watch: postureState.whatFlipsNext.flipTrigger,
+    flipConditions: postureState.whatFlipsNext.thresholds.length > 0
+      ? postureState.whatFlipsNext.thresholds
       : homeBriefModel.decisionRules
           .map((rule) => rule.resumeTrigger?.trim())
           .filter((trigger): trigger is string => Boolean(trigger && trigger.length > 0))
@@ -420,7 +430,7 @@ const HomePageReportContent = async ({
           homeBriefModel.actionNowShort ?? "Hold last week's bounded operating rules until thresholds move.",
           homeBriefModel.guardrail,
         ],
-        flipConditions: [homeBriefModel.flipThreshold ?? homeBriefModel.reversalTrigger],
+        flipConditions: [postureState.whatFlipsNext.flipTrigger],
         updatedAt: fetchedAtLabel,
       }}
       historicalBanner={

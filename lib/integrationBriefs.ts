@@ -1,5 +1,6 @@
 import type { RegimeAssessment } from "./regimeEngine";
 import type { TreasuryData } from "./types";
+import type { PostureStateContract } from "./report/postureStateContract";
 
 export type IntegrationTarget = "slack" | "notion" | "linear";
 
@@ -19,14 +20,17 @@ export type WeeklyMandateEnvelope = {
   regime: RegimeAssessment["regime"];
   markdown: string;
   constraints: string[];
+  lastChange: PostureStateContract["lastCommittedChangeEvent"];
+  nextFlip: PostureStateContract["whatFlipsNext"];
 };
 
 export const buildWeeklyMandateEnvelope = (
   assessment: RegimeAssessment,
   treasury: TreasuryData,
+  postureState: PostureStateContract,
 ): WeeklyMandateEnvelope => {
   const title = `Whether weekly mandate — ${treasury.record_date}`;
-  const summary = `${assessment.regime}: Tightness ${assessment.scores.tightness}/100, Risk appetite ${assessment.scores.riskAppetite}/100.`;
+  const summary = `${postureState.currentState.postureLabel}: Tightness ${assessment.scores.tightness}/100, Risk appetite ${assessment.scores.riskAppetite}/100.`;
   const constraints = assessment.constraints.slice(0, 3);
 
   return {
@@ -35,12 +39,18 @@ export const buildWeeklyMandateEnvelope = (
     recordDate: treasury.record_date,
     regime: assessment.regime,
     constraints,
+    lastChange: postureState.lastCommittedChangeEvent,
+    nextFlip: postureState.whatFlipsNext,
     markdown: [
       `## ${title}`,
       summary,
       "",
       "### Constraints",
       ...constraints.map((item) => `- ${item}`),
+      "",
+      `Last committed change: ${postureState.lastCommittedChangeEvent.timestamp ?? "Unavailable"} · ${postureState.lastCommittedChangeEvent.reason}`,
+      `Next flip trigger: ${postureState.whatFlipsNext.flipTrigger}`,
+      ...postureState.whatFlipsNext.reversalConditions.map((condition) => `- Reversal: ${condition}`),
       "",
       `Source: ${treasury.source}`,
     ].join("\n"),
@@ -51,8 +61,9 @@ export const buildWeeklyMandatePayload = (
   target: IntegrationTarget,
   assessment: RegimeAssessment,
   treasury: TreasuryData,
+  postureState: PostureStateContract,
 ) => {
-  const envelope = buildWeeklyMandateEnvelope(assessment, treasury);
+  const envelope = buildWeeklyMandateEnvelope(assessment, treasury, postureState);
 
   if (target === "slack") {
     return {

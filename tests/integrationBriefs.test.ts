@@ -49,6 +49,29 @@ const assessment: RegimeAssessment = {
   },
 };
 
+const postureState = {
+  currentState: {
+    regime: "DEFENSIVE",
+    postureLabel: "Contraction",
+    confidenceLabel: "LOW",
+    confidencePercent: 61,
+    transitionWatch: "ON",
+    recordDate: "2026-03-01",
+  },
+  lastCommittedChangeEvent: {
+    timestamp: "2026-03-01T10:00:00Z",
+    fromState: "VOLATILE",
+    toState: "DEFENSIVE",
+    reason: "Tightness crossed above 70.",
+    source: "event-store",
+  },
+  whatFlipsNext: {
+    flipTrigger: "Tightness ≤ 66 for 2 consecutive refreshes.",
+    thresholds: ["Tightness ≤ 66 for 2 consecutive refreshes."],
+    reversalConditions: ["Risk appetite ≥ 54 for 2 consecutive refreshes."],
+  },
+} as const;
+
 const treasury = {
   source: "https://example.com",
   record_date: "2026-03-01",
@@ -65,24 +88,24 @@ describe("integration briefs", () => {
   });
 
   it("builds reusable envelope", () => {
-    const envelope = buildWeeklyMandateEnvelope(assessment, treasury);
+    const envelope = buildWeeklyMandateEnvelope(assessment, treasury, postureState);
     assert.match(envelope.title, /weekly mandate/i);
     assert.match(envelope.markdown, /## Whether weekly mandate/);
   });
 
   it("builds slack payload", () => {
-    const payload = buildWeeklyMandatePayload("slack", assessment, treasury) as { text: string; metadata: { regime: string } };
+    const payload = buildWeeklyMandatePayload("slack", assessment, treasury, postureState) as { text: string; metadata: { regime: string } };
     assert.match(payload.text, /Whether weekly mandate/);
     assert.equal(payload.metadata.regime, "DEFENSIVE");
   });
 
   it("builds notion payload", () => {
-    const payload = buildWeeklyMandatePayload("notion", assessment, treasury) as { properties: { Regime: { select: { name: string } } } };
+    const payload = buildWeeklyMandatePayload("notion", assessment, treasury, postureState) as { properties: { Regime: { select: { name: string } } } };
     assert.equal(payload.properties.Regime.select.name, "DEFENSIVE");
   });
 
   it("builds linear payload", () => {
-    const payload = buildWeeklyMandatePayload("linear", assessment, treasury) as { labels: string[] };
+    const payload = buildWeeklyMandatePayload("linear", assessment, treasury, postureState) as { labels: string[] };
     assert.ok(payload.labels.includes("defensive"));
   });
 });

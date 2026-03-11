@@ -2,7 +2,7 @@ import { formatRegimeLabel } from "../regimeFormat";
 import type { RegimeAssessment } from "../regimeEngine";
 import type { TreasuryData } from "../types";
 import type { ActionStripItem } from "../report/operatingCalls";
-import { buildWeeklyLockCommitment } from "../report/decisionKnobs";
+import type { PostureStateContract } from "../report/postureStateContract";
 
 export type WeeklyOperatorBriefPayload = {
   date: string;
@@ -31,6 +31,7 @@ export const buildWeeklyOperatorBriefPayload = ({
   confidenceLabel,
   actionStripItems = [],
   flipConditionLabels = [],
+  postureState,
 }: {
   assessment: RegimeAssessment;
   treasury: TreasuryData;
@@ -38,14 +39,8 @@ export const buildWeeklyOperatorBriefPayload = ({
   confidenceLabel?: "HIGH" | "MED" | "LOW";
   actionStripItems?: ActionStripItem[];
   flipConditionLabels?: string[];
+  postureState?: PostureStateContract;
 }): WeeklyOperatorBriefPayload => {
-  const lockCommitment = buildWeeklyLockCommitment({
-    regime: assessment.regime,
-    tightnessRegime: assessment.thresholds.tightnessRegime,
-    riskAppetiteRegime: assessment.thresholds.riskAppetiteRegime,
-    confidenceDegraded: confidenceLabel !== "HIGH",
-    freshnessDegraded: false,
-  });
 
   const doNowBullets = actionStripItems.length > 0
     ? actionStripItems.slice(0, 3).map((item) => item.actionNow)
@@ -63,10 +58,12 @@ export const buildWeeklyOperatorBriefPayload = ({
     confidence: confidenceLabel ? `${confidenceLabel} confidence` : "Score-based posture confidence",
     doNowBullets,
     flipTrigger:
-      normalizedFlipConditionLabels[0]
-      ?? lockCommitment.flipConditions[0]
+      postureState?.whatFlipsNext.flipTrigger
+      ?? normalizedFlipConditionLabels[0]
       ?? "Flip when live indicators cross the weekly guardrail threshold.",
-    flipConditionLabels: normalizedFlipConditionLabels,
+    flipConditionLabels: normalizedFlipConditionLabels.length > 0
+      ? normalizedFlipConditionLabels
+      : (postureState?.whatFlipsNext.thresholds ?? []),
   };
 };
 
