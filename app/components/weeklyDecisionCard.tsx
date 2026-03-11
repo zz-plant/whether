@@ -1225,6 +1225,7 @@ export function WeeklyDecisionCard({
 
           <article id="weekly-call-core" className={`${tierOnePanel} weather-motion-card ${sectionSpacing} bg-gradient-to-br from-slate-950/95 via-slate-900/85 to-slate-950/95`}>
             <h2 className={tierOneHeading}>This week&apos;s call</h2>
+            <p className="text-xs text-slate-300">Whether does not predict markets; it tells founders how to operate inside them this week.</p>
             <div className="grid gap-2.5 sm:grid-cols-2">
               <div className={`${tierOneInset} space-y-1.5 border-emerald-500/35 bg-emerald-500/5`}>
                 <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald-200">DO NOW</p>
