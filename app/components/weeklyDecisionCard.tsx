@@ -1214,38 +1214,39 @@ export function WeeklyDecisionCard({
       },
     },
   } satisfies StartupVariantPolicy;
-  const modeContentByMode = Object.fromEntries(
-    resolvedStartupVariantPolicy.options.map((option) => {
-      const scopedAdjustment = resolvedStartupVariantPolicy.adjustmentsByMode[option.mode];
-      return [
-        option.mode,
-        {
-          description: scopedAdjustment.description,
-          thresholdEmphasis: scopedAdjustment.thresholdEmphasis,
-          doNowBullets: [
-            ...buildRoleTemplateBullets({ roleAwareTemplates, field: "doNow" }),
-            ...scopedAdjustment.doNowAdjustments,
-          ].slice(0, 5),
-          avoidBullets: [
-            ...buildRoleTemplateBullets({ roleAwareTemplates, field: "avoidNow" }),
-            ...scopedAdjustment.avoidAdjustments,
-          ].slice(0, 5),
-          watchBullets: [
-            ...buildWatchBullets({ regimeDistance, regimeVelocity }),
-            ...scopedAdjustment.watchAdjustments,
-          ].slice(0, 5),
-          reversalTriggerDiscipline: scopedAdjustment.reversalTriggerDiscipline,
-        },
-      ];
-    }),
-  ) as Record<StartupVariantMode, {
+  const modeContentByMode = resolvedStartupVariantPolicy.options.reduce<Partial<Record<StartupVariantMode, {
     description: string;
     thresholdEmphasis: string;
     doNowBullets: string[];
     avoidBullets: string[];
     watchBullets: string[];
     reversalTriggerDiscipline: string;
-  }>;
+  }>>>((contentMap, option) => {
+    const scopedAdjustment = resolvedStartupVariantPolicy.adjustmentsByMode[option.mode];
+    if (!scopedAdjustment) {
+      return contentMap;
+    }
+
+    contentMap[option.mode] = {
+      description: scopedAdjustment.description,
+      thresholdEmphasis: scopedAdjustment.thresholdEmphasis,
+      doNowBullets: [
+        ...buildRoleTemplateBullets({ roleAwareTemplates, field: "doNow" }),
+        ...scopedAdjustment.doNowAdjustments,
+      ].slice(0, 5),
+      avoidBullets: [
+        ...buildRoleTemplateBullets({ roleAwareTemplates, field: "avoidNow" }),
+        ...scopedAdjustment.avoidAdjustments,
+      ].slice(0, 5),
+      watchBullets: [
+        ...buildWatchBullets({ regimeDistance, regimeVelocity }),
+        ...scopedAdjustment.watchAdjustments,
+      ].slice(0, 5),
+      reversalTriggerDiscipline: scopedAdjustment.reversalTriggerDiscipline,
+    };
+
+    return contentMap;
+  }, {});
   const decisionDeltaStripItems = buildDecisionDeltaStripItems({
     weeklyMemoLines,
     immediateDecision,
