@@ -24,10 +24,12 @@ const trackFirstActionConversion = (action: PrimaryActionType) => {
 };
 
 export function CopyLeadershipArtifactsButtons({
+  weeklyCallSnapshot,
   weeklyOperatorBrief,
   boardSummary,
   citation,
 }: {
+  weeklyCallSnapshot: string;
   weeklyOperatorBrief: string;
   boardSummary: string;
   citation: string;
@@ -35,7 +37,7 @@ export function CopyLeadershipArtifactsButtons({
   const { status, activeTarget, copyToClipboard } = useClipboardCopy();
   const haptic = useHapticFeedback();
   const isCopying = status === "copying";
-  const copyState = (target: "Meeting pack" | "Weekly operator brief" | "Board" | "Citation") =>
+  const copyState = (target: "Meeting pack" | "Weekly call snapshot" | "Weekly operator brief" | "Board" | "Citation") =>
     status === "copying" && activeTarget === target
       ? "copying"
       : status === "copied"
@@ -45,6 +47,9 @@ export function CopyLeadershipArtifactsButtons({
           : "idle";
 
   const meetingPackContent = [
+    "Weekly call snapshot",
+    weeklyCallSnapshot,
+    "",
     "WEEKLY OPERATOR BRIEF",
     weeklyOperatorBrief,
     "",
@@ -61,7 +66,7 @@ export function CopyLeadershipArtifactsButtons({
   };
 
   const copyLabel = (
-    target: "Meeting pack" | "Weekly operator brief" | "Board" | "Citation",
+    target: "Meeting pack" | "Weekly call snapshot" | "Weekly operator brief" | "Board" | "Citation",
     label: string,
   ) => {
     const state = copyState(target);
@@ -76,6 +81,18 @@ export function CopyLeadershipArtifactsButtons({
   return (
     <div className="space-y-2">
       <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4" aria-label="Primary weekly brief actions">
+        <Button
+          type="button"
+          onClick={() => {
+            trackFirstActionConversion("copy_weekly_brief");
+            copyToClipboard(weeklyCallSnapshot, "Weekly call snapshot");
+          }}
+          disabled={isCopying}
+          aria-busy={isCopying}
+          className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-200 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
+        >
+          {copyLabel("Weekly call snapshot", "Copy weekly call snapshot")}
+        </Button>
         <Button
           type="button"
           onClick={() => {
