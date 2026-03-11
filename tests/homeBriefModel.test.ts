@@ -226,7 +226,7 @@ describe("buildHomeBriefModel", () => {
     assert.match(overlayRow?.label ?? "", /Infrastructure/);
   });
 
-  it("anchors historical timeline to record year for time-machine snapshots", () => {
+  it("builds ordered historical timeline entries from regime series", () => {
     const model = buildHomeBriefModel({
       assessment: {
         regime: "DEFENSIVE",
@@ -235,7 +235,12 @@ describe("buildHomeBriefModel", () => {
       },
       regimeAlert: null,
       stopItems: ["Guardrail"],
-      recordDateLabel: "2022-09-30",
+      historicalSelection: { month: 2, year: 2026, banner: "Historical" },
+      regimeSeries: [
+        { year: 2026, month: 1, recordDate: "2026-01-31", regime: "VOLATILE", summary: "Stabilizing" },
+        { year: 2026, month: 2, recordDate: "2026-02-28", regime: "DEFENSIVE", summary: "Tighten" },
+        { year: 2026, month: 3, recordDate: "2026-03-31", regime: "SCARCITY", summary: "Not selected" },
+      ],
       reportDynamics: {
         directionLabel: "stable",
         changedSignals: [],
@@ -243,9 +248,11 @@ describe("buildHomeBriefModel", () => {
       },
     });
 
-    const timelineLabels = model.historicalTimeline.map((entry) => entry.label);
-    assert.equal(timelineLabels[timelineLabels.length - 1], "2022");
-    assert.ok(timelineLabels.every((label) => Number.parseInt(label, 10) <= 2022));
+    assert.equal(model.historicalTimeline.length, 2);
+    assert.equal(model.historicalTimeline[0]?.month, 1);
+    assert.equal(model.historicalTimeline[1]?.month, 2);
+    assert.equal(model.historicalTimeline[1]?.isCurrent, true);
+    assert.match(model.historicalTimeline[0]?.label ?? "", /2026/);
   });
 
   it("derives stage labels for regime edge cases", () => {
