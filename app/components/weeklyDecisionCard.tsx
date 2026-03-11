@@ -617,7 +617,7 @@ function RegimeBanner({
   const bannerTone = resolveRegimeTone(resolvedRegimeLabel);
 
   return (
-    <header className={`sticky top-2 z-30 rounded-xl border p-4 shadow-lg backdrop-blur sm:p-5 ${bannerTone}`} data-testid="weekly-regime-banner" aria-label="Weekly regime banner">
+    <header className={`sticky top-2 z-10 rounded-xl border p-4 shadow-lg backdrop-blur sm:p-5 ${bannerTone}`} data-testid="weekly-regime-banner" aria-label="Weekly regime banner">
       <p className="text-[11px] font-semibold uppercase tracking-[0.13em]">REGIME — WEEK OF {recordDateLabel}</p>
       <h1 id="weekly-posture-brief-title" className="mt-1 text-2xl font-semibold sm:text-3xl">{resolvedRegimeLabel}</h1>
       <p className="mt-2 overflow-x-auto text-xs font-semibold whitespace-nowrap" aria-label="Regime metrics line">
