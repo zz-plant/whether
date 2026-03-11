@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { buildCanonicalBoundedDecisionRules } from "../lib/report/boundedDecisionRules";
+import { buildCanonicalBoundedDecisionRules, buildScopedVariantDecisionAdjustment } from "../lib/report/boundedDecisionRules";
 import { buildActionStripItems, buildRoleAwareOperatingTemplates } from "../lib/report/operatingCalls";
 
 describe("bounded decision rule formatting", () => {
@@ -46,4 +46,40 @@ it("ensures every operating lever item includes bounded decision fields", () => 
     assert.ok(item.triggerThreshold.trim().length > 0);
     assert.ok(item.reversalCondition.trim().length > 0);
   }
+});
+
+
+it("builds scoped variant adjustments with reversal discipline", () => {
+  const adjustment = buildScopedVariantDecisionAdjustment({
+    mode: "bootstrapped",
+    thresholds: { tightnessRegime: 62, riskAppetiteRegime: 48 },
+    scores: { tightness: 66, riskAppetite: 45 },
+  });
+
+  assert.equal(adjustment.mode, "bootstrapped");
+  assert.ok(adjustment.doNowAdjustments.length > 0);
+  assert.ok(adjustment.avoidAdjustments.length > 0);
+  assert.ok(adjustment.watchAdjustments.length > 0);
+  assert.match(adjustment.reversalTriggerDiscipline, /Reverse/i);
+});
+
+
+it("avoids zero-distance watch copy at regime boundaries", () => {
+  const seedAdjustment = buildScopedVariantDecisionAdjustment({
+    mode: "seed",
+    thresholds: { tightnessRegime: 62, riskAppetiteRegime: 48 },
+    scores: { tightness: 62.01, riskAppetite: 55 },
+  });
+
+  assert.match(seedAdjustment.watchAdjustments[0] ?? "", /already at the regime boundary/i);
+  assert.doesNotMatch(seedAdjustment.watchAdjustments[0] ?? "", /0\.0 points/i);
+
+  const bootstrappedAdjustment = buildScopedVariantDecisionAdjustment({
+    mode: "bootstrapped",
+    thresholds: { tightnessRegime: 62, riskAppetiteRegime: 48 },
+    scores: { tightness: 62.02, riskAppetite: 48.01 },
+  });
+
+  assert.match(bootstrappedAdjustment.watchAdjustments[0] ?? "", /tighten spend now/i);
+  assert.doesNotMatch(bootstrappedAdjustment.watchAdjustments[0] ?? "", /0\.0 points/i);
 });

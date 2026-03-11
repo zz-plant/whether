@@ -4,11 +4,12 @@ import { CircleTargetIcon, ShieldIcon } from "./uiIcons";
 import { CompactDisclosure } from "./compactDisclosure";
 import type { ConfidenceTrendFraming, ReportDynamics, ReportEvidenceItem, WeeklyConfidencePoint } from "../../lib/report/reportData";
 import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
-import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
+import { decisionAreaLabel, type StartupVariantMode } from "../../lib/report/boundedDecisionRules";
+import { StartupModeSelector } from "./startupModeSelector";
 import type { ActionStripItem, RoleAwareOperatingTemplate } from "../../lib/report/operatingCalls";
 import type { ForecastRegimeLabel, TransitionVelocityEstimate } from "../../lib/report/forecastModel";
 import type { RegimeKey } from "../../lib/regimeEngine";
-import type { DecisionMatrixPayload } from "../../lib/report/homeBriefModel";
+import type { DecisionMatrixPayload, StartupVariantPolicy } from "../../lib/report/homeBriefModel";
 import { formatProbabilityPercent } from "../../lib/report/reportFormatting";
 import { getOrderedRegimeLegend, REGIME_BANNER_TOKENS, REGIME_LEGEND_DESCRIPTORS, type RegimeBannerTone } from "../../lib/regimePresentation";
 import {
@@ -80,6 +81,7 @@ export type WeeklyDecisionCardProps = {
   transitionProbabilities: Record<ForecastRegimeLabel, number>;
   decisionRules: BoundedDecisionRule[];
   decisionMatrix?: DecisionMatrixPayload;
+  startupVariantPolicy?: StartupVariantPolicy;
   actionStripItems?: ActionStripItem[];
   roleAwareTemplates: RoleAwareOperatingTemplate[];
   executiveOperationalStance: { expand: string[]; avoid: string[] };
@@ -838,6 +840,7 @@ const ConfidenceMiniChart = ({
 
 type BoundedRulesMatrixProps = {
   decisionMatrix?: DecisionMatrixPayload;
+  startupVariantPolicy?: StartupVariantPolicy;
   decisionRules?: BoundedDecisionRule[];
 };
 
@@ -1137,6 +1140,7 @@ export function WeeklyDecisionCard({
   transitionProbabilities,
   decisionRules,
   decisionMatrix,
+  startupVariantPolicy,
   actionStripItems: _actionStripItems = [],
   roleAwareTemplates,
   revisitDecisions,
@@ -1185,9 +1189,90 @@ export function WeeklyDecisionCard({
   const trustWarningCopy = isFallbackSnapshot
     ? "Using a cached snapshot. Use this call for near-term pacing only and pause irreversible decisions until live refresh returns."
     : "Use this call for near-term pacing only until confidence returns to HIGH with fresh data.";
-  const doNowBullets = buildRoleTemplateBullets({ roleAwareTemplates, field: "doNow" });
-  const avoidBullets = buildRoleTemplateBullets({ roleAwareTemplates, field: "avoidNow" });
-  const watchBullets = buildWatchBullets({ regimeDistance, regimeVelocity });
+  const resolvedStartupVariantPolicy = startupVariantPolicy ?? {
+    selectedMode: "series-a",
+    options: [
+      { mode: "seed", label: "Seed" },
+      { mode: "series-a", label: "Series A" },
+      { mode: "series-b", label: "Series B" },
+      { mode: "bootstrapped", label: "Bootstrapped" },
+    ],
+    adjustmentsByMode: {
+      seed: {
+        mode: "seed",
+        label: "Seed",
+        description: "Protect runway while preserving rapid proof loops.",
+        doNowAdjustments: ["Prioritize experiments that can prove customer pull inside one sprint."],
+        avoidAdjustments: ["Avoid bundling multiple irreversible hires before one milestone clears."],
+        watchAdjustments: ["Runway trigger: tighten immediately when boundary distance compresses."],
+        thresholdEmphasis: "Emphasize runway and evidence cadence over growth breadth.",
+        reversalTriggerDiscipline: "Reverse to faster hiring only after improving reads and shipped traction proof.",
+      },
+      "series-a": {
+        mode: "series-a",
+        label: "Series A",
+        description: "Balance growth tempo with repeatability proof.",
+        doNowAdjustments: ["Scale only where activation and retention targets are tracking."],
+        avoidAdjustments: ["Avoid parallel expansion programs that obscure payback accountability."],
+        watchAdjustments: ["Payback trigger: revisit if boundary distance narrows."],
+        thresholdEmphasis: "Emphasize payback windows and repeatable pipeline conversion.",
+        reversalTriggerDiscipline: "Reverse to aggressive expansion only after trigger clears and conversion quality holds.",
+      },
+      "series-b": {
+        mode: "series-b",
+        label: "Series B",
+        description: "Protect operating leverage while preserving selective scale lanes.",
+        doNowAdjustments: ["Concentrate approvals on lanes with measurable efficiency lift."],
+        avoidAdjustments: ["Avoid fixed-cost expansions that assume forward multiple recovery."],
+        watchAdjustments: ["Leverage trigger: hold expansion when boundary distance compresses."],
+        thresholdEmphasis: "Emphasize efficiency lift and margin durability before headcount scale.",
+        reversalTriggerDiscipline: "Reverse to broader scaling only when both boundaries clear resume bands.",
+      },
+      bootstrapped: {
+        mode: "bootstrapped",
+        label: "Bootstrapped",
+        description: "Maximize cash durability and compounding customer value.",
+        doNowAdjustments: ["Prioritize self-funded growth loops with near-term cash payback."],
+        avoidAdjustments: ["Avoid commitments that require external financing to finish."],
+        watchAdjustments: ["Cash trigger: tighten spend when either boundary narrows."],
+        thresholdEmphasis: "Emphasize cash conversion and reversible commitments over growth optics.",
+        reversalTriggerDiscipline: "Reverse to higher spend only after cash payback proof holds across weekly reads.",
+      },
+    },
+  } satisfies StartupVariantPolicy;
+  const modeContentByMode = resolvedStartupVariantPolicy.options.reduce<Partial<Record<StartupVariantMode, {
+    description: string;
+    thresholdEmphasis: string;
+    doNowBullets: string[];
+    avoidBullets: string[];
+    watchBullets: string[];
+    reversalTriggerDiscipline: string;
+  }>>>((contentMap, option) => {
+    const scopedAdjustment = resolvedStartupVariantPolicy.adjustmentsByMode[option.mode];
+    if (!scopedAdjustment) {
+      return contentMap;
+    }
+
+    contentMap[option.mode] = {
+      description: scopedAdjustment.description,
+      thresholdEmphasis: scopedAdjustment.thresholdEmphasis,
+      doNowBullets: [
+        ...buildRoleTemplateBullets({ roleAwareTemplates, field: "doNow" }),
+        ...scopedAdjustment.doNowAdjustments,
+      ].slice(0, 5),
+      avoidBullets: [
+        ...buildRoleTemplateBullets({ roleAwareTemplates, field: "avoidNow" }),
+        ...scopedAdjustment.avoidAdjustments,
+      ].slice(0, 5),
+      watchBullets: [
+        ...buildWatchBullets({ regimeDistance, regimeVelocity }),
+        ...scopedAdjustment.watchAdjustments,
+      ].slice(0, 5),
+      reversalTriggerDiscipline: scopedAdjustment.reversalTriggerDiscipline,
+    };
+
+    return contentMap;
+  }, {});
   const decisionDeltaStripItems = buildDecisionDeltaStripItems({
     weeklyMemoLines,
     immediateDecision,
@@ -1253,26 +1338,11 @@ export function WeeklyDecisionCard({
           <article id="weekly-call-core" className={`${tierOnePanel} weather-motion-card ${sectionSpacing} bg-gradient-to-br from-slate-950/95 via-slate-900/85 to-slate-950/95`}>
             <h2 className={tierOneHeading}>This week&apos;s call</h2>
             <p className="text-xs text-slate-300">Whether does not predict markets; it tells founders how to operate inside them this week.</p>
-            <div className="grid gap-2.5 sm:grid-cols-2">
-              <div className={`${tierOneInset} space-y-1.5 border-emerald-500/35 bg-emerald-500/5`}>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald-200">DO NOW</p>
-                <ul className="space-y-1 text-xs text-emerald-100">
-                  {doNowBullets.map((bullet) => <li key={`do-${bullet}`}>• {bullet}</li>)}
-                </ul>
-              </div>
-              <div className={`${tierOneInset} space-y-1.5 border-rose-500/35 bg-rose-500/5`}>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-rose-200">AVOID</p>
-                <ul className="space-y-1 text-xs text-rose-100">
-                  {avoidBullets.map((bullet) => <li key={`avoid-${bullet}`}>• {bullet}</li>)}
-                </ul>
-              </div>
-            </div>
-            <div className={`${tierOneInset} space-y-1.5 border-sky-500/35 bg-sky-500/5`}>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">WATCH</p>
-              <ul className="space-y-1 text-xs text-sky-100">
-                {watchBullets.map((bullet) => <li key={`watch-${bullet}`}>• {bullet}</li>)}
-              </ul>
-            </div>
+            <StartupModeSelector
+              options={resolvedStartupVariantPolicy.options}
+              selectedMode={resolvedStartupVariantPolicy.selectedMode}
+              contentByMode={modeContentByMode}
+            />
           </article>
 
           <article className={`${tierOnePanel} ${sectionSpacing}`}>
@@ -1283,21 +1353,27 @@ export function WeeklyDecisionCard({
             <PostureHistoryTimeline historicalTimeline={recentTimeline} />
           </article>
 
-          <details id="decision-snapshot-for-leadership-this-week" className={`${tierOnePanel} ${sectionSpacing} group`}>
-            <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
-              <span>Decision snapshot matrix (expand)</span>
-              <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
-            </summary>
-            <div className="mt-3"><BoundedRulesMatrix decisionMatrix={decisionMatrix} decisionRules={decisionRules} /></div>
-          </details>
+          <article className={`${tierTwoPanel} ${sectionSpacing}`} aria-label="Need deeper analysis">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 className={tierTwoHeading}>Need deeper analysis?</h2>
+              <p className="text-[11px] uppercase tracking-[0.1em] text-slate-400">Optional depth</p>
+            </div>
+            <p className="text-xs text-slate-300">Open diagnostics only when you need proof detail, role-level execution plans, or model input context.</p>
 
-          <details id="execution-guidance" className={`${tierOnePanel} ${sectionSpacing} group`}>
-            <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
-              <span>Execution plan by role (expand)</span>
-              <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
-            </summary>
-            <div className="mt-3">
-              <div className="mt-2 grid gap-3 sm:grid-cols-2">
+            <details id="decision-snapshot-for-leadership-this-week" className="group">
+              <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
+                <span>Open diagnostics: decision snapshot matrix</span>
+                <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
+              </summary>
+              <div className="mt-3"><BoundedRulesMatrix decisionMatrix={decisionMatrix} decisionRules={decisionRules} /></div>
+            </details>
+
+            <details id="execution-guidance" className="group">
+              <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
+                <span>Open diagnostics: role plan</span>
+                <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
+              </summary>
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
                 {roleAwareTemplates.map((template) => (
                   <article key={template.role} className={`${tierOneInset} space-y-2`}>
                     <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-200">{template.roleLabel}</p>
@@ -1307,51 +1383,52 @@ export function WeeklyDecisionCard({
                   </article>
                 ))}
               </div>
-            </div>
-          </details>
+            </details>
+
+            <CompactDisclosure
+              id="evidence-diagnostics"
+              className={`${tierThreePanel} ${compactSectionSpacing} group`}
+              summaryClassName={disclosureSummaryClass}
+              summary="Open diagnostics: evidence, drivers, and model inputs"
+            >
+              <article className={compactInset}>
+                <p className={`text-xs ${neutralLabel}`}>Evidence</p>
+                <ul className="mt-1 space-y-1 text-xs text-slate-200">
+                  {evidenceItems.map((item) => (
+                    <li key={`evidence-${item.key}`}>• {item.title}: {item.immediateImplication}</li>
+                  ))}
+                </ul>
+              </article>
+
+              <article className={`${compactInset} mt-2`}>
+                <p className={`text-xs ${neutralLabel}`}>Drivers</p>
+                <p className="mt-1 text-xs text-slate-300">Top contributors: {topContributorInline}</p>
+                <p className="mt-1 text-xs text-slate-300">Weekly movement: {conciseWeeklyMovement}</p>
+              </article>
+
+              <article className={`${compactInset} mt-2`}>
+                <p className={`text-xs ${neutralLabel}`}>Model inputs</p>
+                <p className="mt-1 text-xs text-slate-300">Decision thresholds are in the matrix above.</p>
+                <p className="mt-1 text-xs text-slate-300">Defensive probability: {formatProbabilityPercent(transitionProbabilities.Defensive)}</p>
+              </article>
+              {failureModes.length > 0 ? (
+                <article className={`${compactInset} mt-2`}>
+                  <p className={`text-xs ${neutralLabel}`}>False-signal warnings</p>
+                  <ul className="mt-1 space-y-1 text-xs text-slate-300">
+                    {failureModes.slice(0, 2).map((mode) => (
+                      <li key={mode.id}>• {mode.warning}</li>
+                    ))}
+                  </ul>
+                </article>
+              ) : null}
+            </CompactDisclosure>
+          </article>
 
         </main>
 
         <aside className="space-y-3 xl:col-span-4">
           <ConfidenceMiniChart confidenceHistory={confidenceHistory} confidenceTrend={confidenceTrend} />
 
-          <CompactDisclosure
-            id="evidence-diagnostics"
-            className={`${tierThreePanel} ${compactSectionSpacing} group`}
-            summaryClassName={disclosureSummaryClass}
-            summary="Why this call (expand)"
-          >
-            <article className={compactInset}>
-              <p className={`text-xs ${neutralLabel}`}>Evidence</p>
-              <ul className="mt-1 space-y-1 text-xs text-slate-200">
-                {evidenceItems.map((item) => (
-                  <li key={`evidence-${item.key}`}>• {item.title}: {item.immediateImplication}</li>
-                ))}
-              </ul>
-            </article>
-
-            <article className={`${compactInset} mt-2`}>
-              <p className={`text-xs ${neutralLabel}`}>Drivers</p>
-              <p className="mt-1 text-xs text-slate-300">Top contributors: {topContributorInline}</p>
-              <p className="mt-1 text-xs text-slate-300">Weekly movement: {conciseWeeklyMovement}</p>
-            </article>
-
-            <article className={`${compactInset} mt-2`}>
-              <p className={`text-xs ${neutralLabel}`}>Model inputs</p>
-              <p className="mt-1 text-xs text-slate-300">Decision thresholds are in the matrix above.</p>
-              <p className="mt-1 text-xs text-slate-300">Defensive probability: {formatProbabilityPercent(transitionProbabilities.Defensive)}</p>
-            </article>
-            {failureModes.length > 0 ? (
-              <article className={`${compactInset} mt-2`}>
-                <p className={`text-xs ${neutralLabel}`}>False-signal warnings</p>
-                <ul className="mt-1 space-y-1 text-xs text-slate-300">
-                  {failureModes.slice(0, 2).map((mode) => (
-                    <li key={mode.id}>• {mode.warning}</li>
-                  ))}
-                </ul>
-              </article>
-            ) : null}
-          </CompactDisclosure>
         </aside>
       </div>
 
