@@ -217,6 +217,24 @@ const buildActionNowShort = ({
   return "Hold last week's operating cadence; avoid irreversible commitments.";
 };
 
+const buildGuidanceBundleFromAssessment = (assessment: ReturnType<typeof evaluateRegime>) => {
+  const { playbook, startItems, stopItems } = getPlaybookGuidance(assessment.regime);
+  const actionStripItems = buildActionStripItems(
+    buildCanonicalBoundedDecisionRules({
+      regime: assessment.regime,
+      thresholds: assessment.thresholds,
+      scores: assessment.scores,
+    })
+  );
+
+  return {
+    playbook,
+    startItems,
+    stopItems,
+    actionStripItems,
+  };
+};
+
 export const buildFlipThreshold = (assessment: ReturnType<typeof evaluateRegime>): string => {
   const tightnessThreshold = assessment.thresholds.tightnessRegime.toFixed(1);
   const riskThreshold = assessment.thresholds.riskAppetiteRegime.toFixed(1);
@@ -663,8 +681,7 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
   const assessmentMacroSeries = historicalSelection ? [] : macroSeries;
   const assessment = evaluateRegime(treasury, thresholds, assessmentMacroSeries);
   const liveAssessment = historicalSelection ? evaluateRegime(liveTreasury, thresholds, macroSeries) : null;
-  const { playbook, startItems, stopItems } = getPlaybookGuidance(assessment.regime);
-  const actionStripItems = buildActionStripItems(buildCanonicalBoundedDecisionRules({ regime: assessment.regime, thresholds: assessment.thresholds, scores: assessment.scores }));
+  const { playbook, startItems, stopItems, actionStripItems } = buildGuidanceBundleFromAssessment(assessment);
   const fenceItems = assessment.constraints;
   const previousSnapshot = historicalSelection
     ? null
@@ -880,8 +897,7 @@ const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataF
   const recordDateLabel = formatDateUTC(fallbackTreasury.record_date);
   const fetchedAtLabel = formatTimestampUTC(fallbackTreasury.fetched_at);
   const ageLabel = formatAgeHours(fallbackTreasury.fetched_at, now);
-  const { playbook, startItems, stopItems } = getPlaybookGuidance(assessment.regime);
-  const actionStripItems = buildActionStripItems(buildCanonicalBoundedDecisionRules({ regime: assessment.regime, thresholds: assessment.thresholds, scores: assessment.scores }));
+  const { playbook, startItems, stopItems, actionStripItems } = buildGuidanceBundleFromAssessment(assessment);
 
   const fallbackReportDynamics: ReportDynamics = {
     changedSignals: [],
