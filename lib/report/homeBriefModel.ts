@@ -20,7 +20,13 @@ import {
   type ForecastModel,
   type TransitionVelocityEstimate,
 } from "./forecastModel";
-import { formatConfidencePlainLabel } from "./reportFormatting";
+import {
+  formatConfidencePlainLabel,
+  formatRegimeSignalValue,
+  formatTrendArrow,
+  regimeSignalLabelByKey,
+  type RegimeSignalKey,
+} from "./reportFormatting";
 import {
   buildFailureModeWarnings,
   type FailureModeWarning,
@@ -107,6 +113,18 @@ type HomeBriefHistoricalAnalog = {
 type MacroOverlayItem = {
   label: string;
   detail: string;
+};
+
+
+type RegimeSignalIndicator = {
+  key: RegimeSignalKey;
+  label: string;
+  valueLabel: string;
+  rawValue: number | null;
+  trendArrow: "↑" | "↓" | "→";
+  trendDeltaLabel: string;
+  sparkline: number[];
+  isFallback: boolean;
 };
 
 type HomeBriefFailureMode = FailureModeWarning;
@@ -360,15 +378,90 @@ const buildHistoricalTimeline = (currentRegime: Regime, anchorYear: number): Mem
 
 const getMacroSeriesDelta = (macroSeries: MacroSeriesReading[] | undefined, id: MacroSeriesReading["id"]) => {
   const series = macroSeries?.find((reading) => reading.id === id);
-  const latest = series?.value;
+  const latest = typeof series?.value === "number" ? series.value : null;
   const history = series?.history ?? [];
-  const previous = history.length >= 2 ? history[history.length - 2]?.value : null;
+  const previousValue = history.length >= 2 ? history[history.length - 2]?.value : null;
+  const previous = typeof previousValue === "number" ? previousValue : null;
   const delta =
     typeof latest === "number" && typeof previous === "number"
       ? latest - previous
       : null;
 
   return { latest, delta };
+};
+
+const signalSeriesByKey: Record<RegimeSignalKey, MacroSeriesReading["id"]> = {
+  tightness: "FINANCIAL_CONDITIONS_INDEX",
+  riskAppetite: "RISK_SENTIMENT_INDEX",
+  baseRate: "FED_FUNDS_RATE",
+  curveSlope: "YIELD_CURVE_10Y2Y",
+};
+
+const fallbackTrendDeltaByKey: Record<RegimeSignalKey, number | null> = {
+  tightness: null,
+  riskAppetite: null,
+  baseRate: null,
+  curveSlope: null,
+};
+
+const buildRegimeSignalIndicators = ({
+  assessment,
+  reportDynamics,
+  macroSeries,
+}: {
+  assessment: HomeReportData["assessment"];
+  reportDynamics: HomeReportData["reportDynamics"];
+  macroSeries: MacroSeriesReading[] | undefined;
+}): RegimeSignalIndicator[] => {
+  const changedSignals = reportDynamics?.changedSignals ?? [];
+
+  const resolveSparkline = (key: RegimeSignalKey): number[] => {
+    if (key === "tightness") {
+      return [assessment.thresholds.tightnessRegime, assessment.scores.tightness];
+    }
+    if (key === "riskAppetite") {
+      return [assessment.thresholds.riskAppetiteRegime, assessment.scores.riskAppetite];
+    }
+
+    const series = macroSeries?.find((entry) => entry.id === signalSeriesByKey[key]);
+    const historyValues = (series?.history ?? []).slice(-3).map((entry) => entry.value).filter((value): value is number => typeof value === "number");
+    const latestValue = typeof series?.value === "number" ? [series.value] : [];
+    const sparkline = [...historyValues, ...latestValue];
+    return sparkline.length ? sparkline.slice(-4) : [];
+  };
+
+  const indicatorForSignal = (key: RegimeSignalKey): RegimeSignalIndicator => {
+    if (key === "tightness" || key === "riskAppetite") {
+      const rawValue = key === "tightness" ? assessment.scores.tightness : assessment.scores.riskAppetite;
+      const changed = changedSignals.find((signal) => signal.key === key);
+      const delta = changed?.delta ?? fallbackTrendDeltaByKey[key];
+      return {
+        key,
+        label: regimeSignalLabelByKey[key],
+        valueLabel: formatRegimeSignalValue(rawValue, key),
+        rawValue,
+        trendArrow: formatTrendArrow(delta),
+        trendDeltaLabel: delta === null ? "No weekly delta" : `${delta > 0 ? "+" : ""}${delta.toFixed(1)} vs last week`,
+        sparkline: resolveSparkline(key),
+        isFallback: delta === null,
+      };
+    }
+
+    const macroDelta = getMacroSeriesDelta(macroSeries, signalSeriesByKey[key]);
+    return {
+      key,
+      label: regimeSignalLabelByKey[key],
+      valueLabel: formatRegimeSignalValue(macroDelta.latest, key),
+      rawValue: macroDelta.latest,
+      trendArrow: formatTrendArrow(macroDelta.delta),
+      trendDeltaLabel:
+        macroDelta.delta === null ? "No weekly delta" : `${macroDelta.delta > 0 ? "+" : ""}${macroDelta.delta.toFixed(1)} vs last week`,
+      sparkline: resolveSparkline(key),
+      isFallback: macroDelta.latest === null || macroDelta.delta === null,
+    };
+  };
+
+  return (["tightness", "riskAppetite", "baseRate", "curveSlope"] as const).map((key) => indicatorForSignal(key));
 };
 
 const formatDelta = (value: number | null, positiveIsImproving: boolean) => {
@@ -465,13 +558,6 @@ const buildMacroOverlay = (
   ];
 };
 
-const signalReasonLabel: Record<"tightness" | "riskAppetite" | "baseRate" | "curveSlope", string> = {
-  tightness: "Capital tightness",
-  riskAppetite: "Risk appetite",
-  baseRate: "Base rate",
-  curveSlope: "Yield curve slope",
-};
-
 const buildWhyThisCall = ({
   tightnessGap,
   riskGap,
@@ -498,7 +584,7 @@ const buildWhyThisCall = ({
       label: "What moved this week",
       detail:
         reportDynamics?.changedSignals.length
-          ? `${signalReasonLabel[changedSignal?.key ?? "tightness"]} ${changedSignal ? describeSignalDirection(changedSignal) : "held"} this week; ${reportDynamics.directionLabel} overall.`
+          ? `${regimeSignalLabelByKey[changedSignal?.key ?? "tightness"]} ${changedSignal ? describeSignalDirection(changedSignal) : "held"} this week; ${reportDynamics.directionLabel} overall.`
           : "No material signal move this week; posture is driven by current levels and threshold distance.",
     },
     {
@@ -741,6 +827,12 @@ export const buildHomeBriefModel = (
     changedSignals: reportDynamics?.changedSignals ?? [],
   });
 
+  const regimeSignalIndicators = buildRegimeSignalIndicators({
+    assessment,
+    reportDynamics,
+    macroSeries,
+  });
+
   const netConstraintSummary =
     severityDelta > 0
       ? `${displayRegime.label}. Changed: constraints tightened. Do now: ${conciseActionNow ?? "slow non-core approvals and keep irreversible spend frozen"}. Flip: ${conciseFlipThreshold}`
@@ -765,6 +857,7 @@ export const buildHomeBriefModel = (
       }),
     },
     trendLabel,
+    regimeSignalIndicators,
     operatingStanceLine,
     weeklyMemoLines: buildWeeklyMemoLines({
       operatingStanceLine,

@@ -47,6 +47,12 @@ describe("WeeklyDecisionCard top-fold composition", () => {
             primaryRisk: "Downside: Capital tightness tightened (1.0).",
           }}
         trendLabel="Improving"
+        regimeSignalIndicators={[
+          { key: "tightness", label: "Capital tightness", valueLabel: "64", rawValue: 64, trendArrow: "↑", trendDeltaLabel: "+1.0 vs last week", sparkline: [61, 62, 63, 64], isFallback: false },
+          { key: "riskAppetite", label: "Risk appetite", valueLabel: "52", rawValue: 52, trendArrow: "↓", trendDeltaLabel: "-1.0 vs last week", sparkline: [56, 54, 53, 52], isFallback: false },
+          { key: "baseRate", label: "Base rate", valueLabel: "5.3", rawValue: 5.3, trendArrow: "→", trendDeltaLabel: "No weekly delta", sparkline: [5.3], isFallback: true },
+          { key: "curveSlope", label: "Yield curve slope", valueLabel: "-0.2", rawValue: -0.2, trendArrow: "↑", trendDeltaLabel: "+0.1 vs last week", sparkline: [-0.4, -0.3, -0.2], isFallback: false },
+        ]}
         transitionWatch="ON"
         operatingStanceLine="Stage decisions. Avoid irreversible spend."
         weeklyMemoLines={["Market conditions tightened this week.", "Stage decisions. Avoid irreversible spend.", "Regime shift watch is on: stage approvals and preserve runway."]}
@@ -115,6 +121,8 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /weekly-viral-hero/);
     assert.match(html, /This week&#x27;s regime/);
     assert.match(html, /Decision delta/);
+    assert.match(html, /Signal micro-read/);
+    assert.match(html, /Capital tightness/);
     assert.match(html, /Regime panel/);
     assert.match(html, /This week&#x27;s call/);
     assert.match(html, /Do now/);
@@ -150,6 +158,12 @@ describe("WeeklyDecisionCard top-fold composition", () => {
           primaryRisk: "Downside: Potential stale snapshot bias: live signal freshness is degraded.",
         }}
         trendLabel="Stable"
+        regimeSignalIndicators={[
+          { key: "tightness", label: "Capital tightness", valueLabel: "64", rawValue: 64, trendArrow: "→", trendDeltaLabel: "No weekly delta", sparkline: [64], isFallback: true },
+          { key: "riskAppetite", label: "Risk appetite", valueLabel: "50", rawValue: 50, trendArrow: "→", trendDeltaLabel: "No weekly delta", sparkline: [50], isFallback: true },
+          { key: "baseRate", label: "Base rate", valueLabel: "—", rawValue: null, trendArrow: "→", trendDeltaLabel: "No weekly delta", sparkline: [], isFallback: true },
+          { key: "curveSlope", label: "Yield curve slope", valueLabel: "—", rawValue: null, trendArrow: "→", trendDeltaLabel: "No weekly delta", sparkline: [], isFallback: true },
+        ]}
         transitionWatch="OFF"
         operatingStanceLine="Hold approvals steady. Keep irreversible spend capped."
         weeklyMemoLines={["Market conditions are stable this week.", "Hold approvals steady. Keep irreversible spend capped.", "Regime shift watch is off: hold current pace with bounded approvals."]}
@@ -215,5 +229,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /Regime history/);
     assert.match(html, /Model pressure is flat this week; hold posture and keep existing guardrails in force\./);
     assert.match(html, /weekly-viral-hero/);
+    assert.match(html, /Signal micro-read/);
+    assert.match(html, /Fallback/);
   });
 });

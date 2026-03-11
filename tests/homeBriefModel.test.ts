@@ -58,6 +58,9 @@ describe("buildHomeBriefModel", () => {
     assert.equal(typeof model.regimeVelocity.displayLabel, "string");
     assert.equal(typeof model.weeklyMovement.score, "number");
     assert.match(model.weeklyMovement.direction, /defensive|expansionary|neutral/);
+    assert.equal(model.regimeSignalIndicators.length, 4);
+    assert.equal(model.regimeSignalIndicators[0]?.label, "Capital tightness");
+    assert.match(model.regimeSignalIndicators[0]?.trendDeltaLabel ?? "", /vs last week/);
   });
 
   it("preserves all normalized evidence items including curve-slope", () => {
@@ -360,5 +363,30 @@ describe("buildHomeBriefModel", () => {
     assert.match(model.operatingStanceLine, /posture|operate|approval/i);
     assert.doesNotMatch(model.netConstraintSummary, /climate stance/i);
   });
+
+  it("marks missing macro series as fallback indicators", () => {
+    const model = buildHomeBriefModel({
+      assessment: {
+        regime: "DEFENSIVE",
+        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
+        scores: { tightness: 58, riskAppetite: 45 },
+      },
+      regimeAlert: null,
+      stopItems: ["Guardrail"],
+      reportDynamics: {
+        directionLabel: "stable",
+        changedSignals: [],
+        anomalySignals: [],
+      },
+      macroSeries: [],
+    });
+
+    const baseRate = model.regimeSignalIndicators.find((item) => item.key === "baseRate");
+    assert.ok(baseRate);
+    assert.equal(baseRate?.valueLabel, "—");
+    assert.equal(baseRate?.trendArrow, "→");
+    assert.equal(baseRate?.isFallback, true);
+  });
+
 
 });

@@ -38,6 +38,16 @@ export type WeeklyDecisionCardProps = {
     primaryRisk: string;
   };
   trendLabel: string;
+  regimeSignalIndicators: Array<{
+    key: "tightness" | "riskAppetite" | "baseRate" | "curveSlope";
+    label: string;
+    valueLabel: string;
+    rawValue: number | null;
+    trendArrow: "↑" | "↓" | "→";
+    trendDeltaLabel: string;
+    sparkline: number[];
+    isFallback: boolean;
+  }>;
   transitionWatch: "ON" | "OFF";
   operatingStanceLine: string;
   weeklyMemoLines: string[];
@@ -291,6 +301,47 @@ const PostureHistoryTimeline = ({ historicalTimeline }: { historicalTimeline: We
   </ol>
 );
 
+
+const MicroSignalIndicators = ({
+  indicators,
+}: {
+  indicators: WeeklyDecisionCardProps["regimeSignalIndicators"];
+}) => (
+  <div className="grid gap-1.5 sm:grid-cols-2" aria-label="Regime micro indicators">
+    {indicators.map((indicator) => {
+      const sparkline = indicator.sparkline.length > 0 ? indicator.sparkline : [0];
+      const max = Math.max(...sparkline.map((value) => Math.abs(value)), 1);
+
+      return (
+        <div key={indicator.key} className="rounded-md border border-slate-700/60 bg-slate-950/55 px-2.5 py-2">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-300">{indicator.label}</p>
+            <p className="text-xs font-semibold text-slate-100">{indicator.valueLabel}</p>
+          </div>
+          <div className="mt-1.5 flex items-center justify-between gap-2">
+            <p className="text-[11px] text-slate-300">
+              <span className="font-semibold text-slate-100" aria-hidden="true">{indicator.trendArrow}</span>{" "}
+              {indicator.isFallback ? "Fallback" : indicator.trendDeltaLabel}
+            </p>
+            <div className="flex h-4 items-end gap-0.5" aria-hidden="true">
+              {sparkline.map((value, index) => {
+                const height = Math.max(3, Math.round((Math.abs(value) / max) * 14));
+                return (
+                  <span
+                    key={`${indicator.key}-${index}-${value}`}
+                    className="w-1 rounded-sm bg-slate-400/80"
+                    style={{ height: `${height}px` }}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      );
+    })}
+  </div>
+);
+
 type DecisionCallHeaderProps = {
   statusLabel: string;
   postureLabel?: string;
@@ -304,6 +355,7 @@ type DecisionCallHeaderProps = {
   confidenceLabel: WeeklyDecisionCardProps["confidenceLabel"];
   regimeHeader: WeeklyDecisionCardProps["regimeHeader"];
   trendLabel: WeeklyDecisionCardProps["trendLabel"];
+  regimeSignalIndicators: WeeklyDecisionCardProps["regimeSignalIndicators"];
   transitionWatch: WeeklyDecisionCardProps["transitionWatch"];
   operatingStanceLine: string;
   weeklyMemoLines?: string[];
@@ -331,6 +383,7 @@ export function DecisionCallHeader({
   confidenceLabel,
   regimeHeader,
   trendLabel,
+  regimeSignalIndicators = [],
   transitionWatch,
   operatingStanceLine,
   weeklyMemoLines,
@@ -396,6 +449,11 @@ export function DecisionCallHeader({
             <p className="mt-1 text-sm font-semibold">{guardrail}</p>
           </div>
         </div>
+
+        <section className="space-y-1" aria-label="Signal micro read">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Signal micro-read (context only)</p>
+          <MicroSignalIndicators indicators={regimeSignalIndicators} />
+        </section>
 
         <div className="flex flex-wrap gap-2" aria-label="Trust and momentum">
           <p className="weather-live-chip rounded-full border border-emerald-400/45 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-emerald-100">
@@ -620,6 +678,7 @@ export function WeeklyDecisionCard({
   confidencePercent,
   regimeHeader,
   trendLabel,
+  regimeSignalIndicators = [],
   transitionWatch,
   operatingStanceLine,
   weeklyMemoLines,
@@ -698,6 +757,7 @@ export function WeeklyDecisionCard({
         confidenceLabel={confidenceLabel}
         regimeHeader={regimeHeader}
         trendLabel={trendLabel}
+        regimeSignalIndicators={regimeSignalIndicators}
         transitionWatch={transitionWatch}
         operatingStanceLine={operatingStanceLine}
         freshnessLabel={freshnessLabel}

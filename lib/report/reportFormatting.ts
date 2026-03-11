@@ -2,6 +2,15 @@ import type { CrossingRiskLabel } from "./forecastModel";
 import type { RegimeAssessment } from "../regimeEngine";
 import { formatScoreValue } from "../formatters";
 
+export type RegimeSignalKey = "tightness" | "riskAppetite" | "baseRate" | "curveSlope";
+
+export const regimeSignalLabelByKey: Record<RegimeSignalKey, string> = {
+  tightness: "Capital tightness",
+  riskAppetite: "Risk appetite",
+  baseRate: "Base rate",
+  curveSlope: "Yield curve slope",
+};
+
 export const buildRegimeAlert = (
   current: RegimeAssessment,
   previous: RegimeAssessment,
@@ -74,3 +83,23 @@ export const formatCrossingRiskLabel = (risk: CrossingRiskLabel): string => cros
 
 export const formatConfidencePlainLabel = (confidence: "LOW" | "MED" | "HIGH"): string =>
   confidencePlainLabels[confidence];
+
+export const formatRegimeSignalValue = (value: number | null, key: RegimeSignalKey): string => {
+  if (value === null || Number.isNaN(value)) {
+    return "—";
+  }
+
+  if (key === "tightness" || key === "riskAppetite") {
+    return formatScoreValue(value);
+  }
+
+  return value.toFixed(1);
+};
+
+export const formatTrendArrow = (delta: number | null): "↑" | "↓" | "→" => {
+  if (delta === null || Number.isNaN(delta) || delta === 0) {
+    return "→";
+  }
+
+  return delta > 0 ? "↑" : "↓";
+};
