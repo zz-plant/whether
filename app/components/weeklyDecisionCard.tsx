@@ -176,6 +176,53 @@ const compactRoleCue = (text: string) =>
     .replace(/;\s*$/, "")
     .trim();
 
+const normalizeCueFragments = (text: string) =>
+  compactRoleCue(text)
+    .split(";")
+    .map((fragment) => fragment.trim().replace(/[.;]+$/, ""))
+    .filter(Boolean);
+
+const buildRoleTemplateBullets = ({
+  roleAwareTemplates,
+  field,
+  maxItems = 5,
+}: {
+  roleAwareTemplates: RoleAwareOperatingTemplate[];
+  field: "doNow" | "avoidNow";
+  maxItems?: number;
+}) => {
+  const uniqueBullets = new Set<string>();
+
+  roleAwareTemplates.forEach((template) => {
+    normalizeCueFragments(template[field]).forEach((fragment) => {
+      const normalized = fragment.toLowerCase();
+      if (!uniqueBullets.has(normalized)) {
+        uniqueBullets.add(normalized);
+      }
+    });
+  });
+
+  return Array.from(uniqueBullets)
+    .slice(0, Math.max(1, maxItems))
+    .map((bullet) => bullet.charAt(0).toUpperCase() + bullet.slice(1));
+};
+
+const buildWatchBullets = ({
+  regimeDistance,
+  regimeVelocity,
+}: {
+  regimeDistance: WeeklyDecisionCardProps["regimeDistance"];
+  regimeVelocity: TransitionVelocityEstimate;
+}) => {
+  const distanceDirection = regimeDistance.thresholdDirection === "riseAbove" ? "rises above" : "falls to or below";
+  const distanceBullet = `${regimeDistance.dimensionLabel} ${distanceDirection} ${regimeDistance.thresholdValue.toFixed(1)} (${Math.max(0, regimeDistance.pointsToFlip).toFixed(1)} pts away)`;
+  const velocityBullet = regimeVelocity.status === "ok"
+    ? `${regimeVelocity.from}→${regimeVelocity.to} can flip in ${regimeVelocity.typicalRangeLabel}`
+    : `${regimeVelocity.from}→${regimeVelocity.to} timing is uncertain (${regimeVelocity.sampleSize} sample${regimeVelocity.sampleSize === 1 ? "" : "s"})`;
+
+  return [distanceBullet, velocityBullet].slice(0, 5);
+};
+
 
 type LiveBandChip = {
   id: string;
@@ -507,6 +554,81 @@ export function DecisionCallHeader({
           <p className="rounded-md border border-amber-500/50 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">{trustWarningCopy}</p>
         ) : null}
       </article>
+    </header>
+  );
+}
+
+type RegimeBannerProps = {
+  statusLabel: string;
+  postureWithStageLabel?: string;
+  recordDateLabel: string;
+  confidencePercent: number;
+  confidenceLabel: WeeklyDecisionCardProps["confidenceLabel"];
+  trendLabel?: string;
+  operatingStanceLine: string;
+  actionNowShort?: string;
+  regimeDistance?: WeeklyDecisionCardProps["regimeDistance"];
+};
+
+const resolveRegimeTone = (label: string) => {
+  const normalized = label.toLowerCase();
+  if (normalized.includes("guarded expansion")) {
+    return "border-amber-400/65 bg-amber-500/10 text-amber-100";
+  }
+  if (normalized.includes("expansion")) {
+    return "border-emerald-400/65 bg-emerald-500/10 text-emerald-100";
+  }
+  if (normalized.includes("defensive")) {
+    return "border-rose-400/65 bg-rose-500/10 text-rose-100";
+  }
+  if (normalized.includes("stabilizing")) {
+    return "border-sky-400/65 bg-sky-500/10 text-sky-100";
+  }
+  return "border-slate-500/75 bg-slate-900/85 text-slate-100";
+};
+
+const formatFlipTriggerLine = (regimeDistance?: WeeklyDecisionCardProps["regimeDistance"]) => {
+  if (!regimeDistance) {
+    return "Next flip trigger: watch weekly threshold movement updates.";
+  }
+  const safePoints = Number.isFinite(regimeDistance.pointsToFlip)
+    ? Math.max(0, Math.round(regimeDistance.pointsToFlip))
+    : null;
+  return `Next flip trigger: ${regimeDistance.dimensionLabel} ${regimeDistance.thresholdDirection === "riseAbove" ? "rises above" : "falls to or below"} ${regimeDistance.thresholdValue.toFixed(1)}${safePoints !== null ? ` (${safePoints} pts away)` : ""}.`;
+};
+
+function RegimeBanner({
+  statusLabel,
+  postureWithStageLabel,
+  recordDateLabel,
+  confidencePercent,
+  confidenceLabel,
+  trendLabel,
+  operatingStanceLine,
+  actionNowShort,
+  regimeDistance,
+}: RegimeBannerProps) {
+  const resolvedRegimeLabel = postureWithStageLabel?.trim() || statusLabel;
+  const trendValue = trendLabel?.trim() || "Unspecified";
+  const flipRiskValue = regimeDistance && Number.isFinite(regimeDistance.pointsToFlip)
+    ? `${Math.max(0, Math.round(regimeDistance.pointsToFlip))} pts`
+    : "Unknown";
+  const operatingLine = operatingStanceLine.trim() || actionNowShort?.trim() || "Hold bounded operating rules until next refresh.";
+  const bannerTone = resolveRegimeTone(resolvedRegimeLabel);
+
+  return (
+    <header className={`sticky top-2 z-30 rounded-xl border p-4 shadow-lg backdrop-blur sm:p-5 ${bannerTone}`} data-testid="weekly-regime-banner" aria-label="Weekly regime banner">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.13em]">REGIME — WEEK OF {recordDateLabel}</p>
+      <h1 id="weekly-posture-brief-title" className="mt-1 text-2xl font-semibold sm:text-3xl">{resolvedRegimeLabel}</h1>
+      <p className="mt-2 overflow-x-auto text-xs font-semibold whitespace-nowrap" aria-label="Regime metrics line">
+        <span>Confidence {confidenceLabel} {Math.round(confidencePercent)}%</span>
+        <span className="px-1.5" aria-hidden="true">·</span>
+        <span>Trend {trendValue}</span>
+        <span className="px-1.5" aria-hidden="true">·</span>
+        <span>Flip Risk {flipRiskValue}</span>
+      </p>
+      <p className="mt-2 text-sm font-semibold leading-5">{operatingLine}</p>
+      <p className="mt-1 text-xs leading-5">{formatFlipTriggerLine(regimeDistance)}</p>
     </header>
   );
 }
@@ -848,28 +970,21 @@ export function WeeklyDecisionCard({
   const trustWarningCopy = isFallbackSnapshot
     ? "Using a cached snapshot. Use this call for near-term pacing only and pause irreversible decisions until live refresh returns."
     : "Use this call for near-term pacing only until confidence returns to HIGH with fresh data.";
+  const doNowBullets = buildRoleTemplateBullets({ roleAwareTemplates, field: "doNow" });
+  const avoidBullets = buildRoleTemplateBullets({ roleAwareTemplates, field: "avoidNow" });
+  const watchBullets = buildWatchBullets({ regimeDistance, regimeVelocity });
 
   return (
-    <section className="weather-panel space-y-4 px-4 py-5 sm:space-y-5 sm:px-6 sm:py-6" aria-labelledby="weekly-posture-brief-title">
-      <DecisionCallHeader
+    <section className="weather-panel space-y-3 px-4 py-5 sm:space-y-4 sm:px-6 sm:py-6" aria-labelledby="weekly-posture-brief-title">
+      <RegimeBanner
         statusLabel={statusLabel}
-        postureLabel={postureLabel}
-        stageLabel={stageLabel}
         postureWithStageLabel={postureWithStageLabel}
-        netConstraintSummary={netConstraintSummary}
-        immediateDecision={immediateDecision}
-        guardrail={effectiveGuardrail}
+        recordDateLabel={recordDateLabel}
         confidencePercent={confidencePercent}
         confidenceLabel={confidenceLabel}
-        regimeHeader={regimeHeader}
         trendLabel={trendLabel}
-        regimeSignalIndicators={regimeSignalIndicators}
-        transitionWatch={transitionWatch}
         operatingStanceLine={operatingStanceLine}
-        freshnessLabel={freshnessLabel}
-        trustCueLine={trustCueLine}
-        needsTrustWarning={needsTrustWarning}
-        trustWarningCopy={trustWarningCopy}
+        actionNowShort={actionNowShort}
         regimeDistance={regimeDistance}
       />
 
@@ -899,23 +1014,22 @@ export function WeeklyDecisionCard({
             <h2 className={tierOneHeading}>This week&apos;s call</h2>
             <div className="grid gap-2.5 sm:grid-cols-2">
               <div className={`${tierOneInset} space-y-1.5 border-emerald-500/35 bg-emerald-500/5`}>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald-200">Do now</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald-200">DO NOW</p>
                 <ul className="space-y-1 text-xs text-emerald-100">
-                  {roleAwareTemplates.slice(0, 4).map((template) => <li key={`do-${template.role}`}>• {compactRoleCue(template.doNow)}</li>)}
+                  {doNowBullets.map((bullet) => <li key={`do-${bullet}`}>• {bullet}</li>)}
                 </ul>
               </div>
               <div className={`${tierOneInset} space-y-1.5 border-rose-500/35 bg-rose-500/5`}>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-rose-200">Avoid</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-rose-200">AVOID</p>
                 <ul className="space-y-1 text-xs text-rose-100">
-                  {roleAwareTemplates.slice(0, 4).map((template) => <li key={`avoid-${template.role}`}>• {compactRoleCue(template.avoidNow)}</li>)}
+                  {avoidBullets.map((bullet) => <li key={`avoid-${bullet}`}>• {bullet}</li>)}
                 </ul>
               </div>
             </div>
             <div className={`${tierOneInset} space-y-1.5 border-sky-500/35 bg-sky-500/5`}>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">Watch</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">WATCH</p>
               <ul className="space-y-1 text-xs text-sky-100">
-                <li>• {regimeDistance.dimensionLabel} approaching {regimeDistance.thresholdValue.toFixed(1)} threshold.</li>
-                <li>• Transition pace: {regimeVelocity.displayLabel}</li>
+                {watchBullets.map((bullet) => <li key={`watch-${bullet}`}>• {bullet}</li>)}
               </ul>
             </div>
           </article>
