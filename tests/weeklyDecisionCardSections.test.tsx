@@ -200,8 +200,9 @@ describe("WeeklyDecisionCard extracted sections", () => {
     );
 
     assert.match(html, /Decision snapshot for leadership this week/);
-    assert.match(html, /What to do/);
-    assert.match(html, /Delay:/);
+    assert.match(html, /Approve/);
+    assert.match(html, /Delay/);
+    assert.match(html, /Flip/);
 
   });
 

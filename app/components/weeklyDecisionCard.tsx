@@ -3,9 +3,10 @@ import Link from "next/link";
 import { CircleTargetIcon, ShieldIcon } from "./uiIcons";
 import type { ReportDynamics, ReportEvidenceItem } from "../../lib/report/reportData";
 import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
-import type { ActionStripItem, RoleAwareOperatingTemplate } from "../../lib/report/operatingCalls";
 import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
+import type { ActionStripItem, RoleAwareOperatingTemplate } from "../../lib/report/operatingCalls";
 import type { ForecastRegimeLabel, TransitionVelocityEstimate } from "../../lib/report/forecastModel";
+import type { DecisionMatrixPayload } from "../../lib/report/homeBriefModel";
 import { formatProbabilityPercent } from "../../lib/report/reportFormatting";
 import {
   buildWeeklyCitationMetaLine,
@@ -64,6 +65,7 @@ export type WeeklyDecisionCardProps = {
   decisionShiftSummary: string;
   transitionProbabilities: Record<ForecastRegimeLabel, number>;
   decisionRules: BoundedDecisionRule[];
+  decisionMatrix?: DecisionMatrixPayload;
   actionStripItems?: ActionStripItem[];
   roleAwareTemplates: RoleAwareOperatingTemplate[];
   executiveOperationalStance: { expand: string[]; avoid: string[] };
@@ -508,54 +510,77 @@ export function DecisionCallHeader({
 }
 
 type BoundedRulesMatrixProps = {
-  decisionRules: BoundedDecisionRule[];
+  decisionMatrix?: DecisionMatrixPayload;
+  decisionRules?: BoundedDecisionRule[];
 };
 
-export function BoundedRulesMatrix({ decisionRules }: BoundedRulesMatrixProps) {
-  const topDecisionRules = decisionRules.slice(0, 4);
-
-  const compactRuleList = (items: string[]) => {
-    if (items.length === 0) {
-      return [];
+export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [] }: BoundedRulesMatrixProps) {
+  const fallbackMatrix = decisionRules.length > 0
+    ? {
+      columns: [
+        { key: "approve" as const, label: "Approve" },
+        { key: "delay" as const, label: "Delay" },
+        { key: "flip" as const, label: "Flip" },
+      ],
+      rows: decisionRules.slice(0, 4).map((rule, index) => ({
+        key: (["hiring", "product", "capital", "burn"][index] ?? "hiring") as "hiring" | "product" | "capital" | "burn",
+        label: decisionAreaLabel(rule.area),
+        cells: {
+          approve: { text: rule.doNow[0] ?? "Stage approvals", detail: rule.rationale },
+          delay: { text: rule.avoidNow[0] ?? "Delay irreversible commitments", detail: rule.pauseTrigger },
+          flip: { text: rule.resumeTrigger, detail: rule.resumeTrigger },
+        },
+      })),
     }
+    : null;
 
-    return items.slice(0, 2).map((item) => compactActionCue(item));
-  };
+  const matrix = decisionMatrix ?? fallbackMatrix;
+
+  if (!matrix || matrix.rows.length === 0) {
+    return (
+      <article className={`${tierOnePanel} ${sectionSpacing}`}>
+        <h2 className={tierOneHeading}>Decision snapshot for leadership this week</h2>
+        <p className="text-xs leading-5 text-slate-300">Decision matrix unavailable; keep current guardrails and recheck after next refresh.</p>
+      </article>
+    );
+  }
 
   return (
     <article className={`${tierOnePanel} ${sectionSpacing}`}>
       <h2 className={tierOneHeading}>Decision snapshot for leadership this week</h2>
-      <p className="text-xs leading-5 text-slate-300">Current posture, action, rationale, and flip trigger by operating area.</p>
-      <ul className="mt-2 grid gap-3 sm:grid-cols-2 sm:auto-rows-fr">
-        {topDecisionRules.map((rule) => {
-          const doCues = compactRuleList(rule.doNow);
-          const avoidCue = compactRuleList(rule.avoidNow)[0] ?? "No avoid-now constraint";
-
-          return (
-            <li key={rule.area} className={`${tierOneInset} flex h-full flex-col gap-2 text-xs text-slate-200`}>
-              <p className="font-semibold text-slate-200">{decisionAreaLabel(rule.area)}</p>
-              <div className="rounded-md border border-slate-700/70 bg-slate-950/70 px-2.5 py-2">
-                <p className="text-[10px] font-semibold text-slate-300">Current posture</p>
-                <p className="mt-1 text-[11px] leading-5 text-slate-100">{compactActionCue(rule.recommendation)}</p>
-              </div>
-              <div className="rounded-md border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-2">
-                <p className="text-[10px] font-semibold text-emerald-100">What to do</p>
-                <p className="mt-1 text-[11px] leading-5 text-emerald-50">{doCues[0] ?? "No immediate action"}</p>
-                <p className="mt-1 text-[11px] leading-5 text-rose-100">Delay: {avoidCue}</p>
-              </div>
-              <p className="rounded-md border border-violet-500/45 bg-violet-500/10 px-2.5 py-2 text-[11px] text-violet-100">
-                <span className="font-semibold">Why:</span> {compactActionCue(rule.rationale)}
-              </p>
-              <p className="rounded-full border border-amber-500/45 bg-amber-500/10 px-2.5 py-1 text-[11px] text-amber-100">
-                <span className="font-semibold">Guardrail:</span> {compactActionCue(rule.pauseTrigger)}
-              </p>
-              <p className="rounded-full border border-sky-500/45 bg-sky-500/10 px-2.5 py-1 text-[11px] text-sky-100">
-                <span className="font-semibold">Flip when:</span> {compactActionCue(rule.resumeTrigger)}
-              </p>
-            </li>
-          );
-        })}
-      </ul>
+      <p className="text-xs leading-5 text-slate-300">Scan Approve/Delay/Flip across core operating decisions, then open a cell for rationale and threshold context.</p>
+      <div className="mt-2 overflow-x-auto">
+        <table className="min-w-full border-separate border-spacing-2 text-xs text-slate-100" aria-label="Bounded decision matrix">
+          <thead>
+            <tr>
+              <th scope="col" className="rounded-md border border-slate-700/70 bg-slate-950/70 px-2.5 py-2 text-left font-semibold text-slate-300">Decision area</th>
+              {matrix.columns.map((column) => (
+                <th key={column.key} scope="col" className="rounded-md border border-slate-700/70 bg-slate-950/70 px-2.5 py-2 text-left font-semibold text-slate-200">{column.label}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {matrix.rows.map((row) => (
+              <tr key={row.key}>
+                <th scope="row" className="rounded-md border border-slate-700/70 bg-slate-950/75 px-2.5 py-2 text-left font-semibold text-slate-100">{row.label}</th>
+                {matrix.columns.map((column) => {
+                  const cell = row.cells[column.key];
+                  return (
+                    <td key={`${row.key}-${column.key}`} className="rounded-md border border-slate-700/55 bg-slate-950/60 px-2.5 py-2 align-top">
+                      <details className="group">
+                        <summary className="cursor-pointer list-none text-[11px] font-medium leading-5 text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+                          {compactActionCue(cell.text)}
+                        </summary>
+                        <p className="mt-1 text-[11px] leading-5 text-slate-300">{cell.detail}</p>
+                      </details>
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </article>
   );
 }
@@ -720,7 +745,8 @@ export function WeeklyDecisionCard({
   reportDynamics,
   decisionShiftSummary: _decisionShiftSummary,
   transitionProbabilities,
-  decisionRules,
+  decisionRules: _decisionRules,
+  decisionMatrix,
   actionStripItems: _actionStripItems = [],
   roleAwareTemplates,
   revisitDecisions,
@@ -844,7 +870,7 @@ export function WeeklyDecisionCard({
               <span>Decision snapshot matrix (expand)</span>
               <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
             </summary>
-            <div className="mt-3"><BoundedRulesMatrix decisionRules={decisionRules} /></div>
+            <div className="mt-3"><BoundedRulesMatrix decisionMatrix={decisionMatrix} /></div>
           </details>
 
           <details id="execution-guidance" className={`${tierOnePanel} ${sectionSpacing} group`}>
