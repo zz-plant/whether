@@ -275,6 +275,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
             scope: "CFO review",
             pauseTrigger: "Tightness above 74",
             resumeTrigger: "Tightness below 65",
+            flipConditions: [{ metric: "tightness", operator: "<", value: 65, label: "Tightness < 65" }],
             rationale: "Discipline",
           },
         ]}

@@ -44,6 +44,7 @@ const decisionRules: BoundedDecisionRule[] = [
     scope: "Only critical replacements.",
     pauseTrigger: "Pause when tightness rises above 74.",
     resumeTrigger: "Resume when tightness falls below 65.",
+    flipConditions: [{ metric: "tightness", operator: "<", value: 65, label: "Tightness < 65" }],
     rationale: "",
   },
 ];
@@ -86,6 +87,7 @@ describe("interpretation view panel", () => {
         scope: "",
         pauseTrigger: "pause-1",
         resumeTrigger: "resume-1",
+        flipConditions: [{ metric: "tightness", operator: "<", value: 61, label: "Tightness < 61" }],
         rationale: "",
       },
       {
@@ -96,6 +98,7 @@ describe("interpretation view panel", () => {
         scope: "",
         pauseTrigger: "pause-2",
         resumeTrigger: "resume-2",
+        flipConditions: [{ metric: "tightness", operator: "<", value: 62, label: "Tightness < 62" }],
         rationale: "",
       },
       {
@@ -106,6 +109,7 @@ describe("interpretation view panel", () => {
         scope: "",
         pauseTrigger: "pause-3",
         resumeTrigger: "resume-3",
+        flipConditions: [{ metric: "tightness", operator: "<", value: 63, label: "Tightness < 63" }],
         rationale: "",
       },
       {
@@ -116,6 +120,7 @@ describe("interpretation view panel", () => {
         scope: "",
         pauseTrigger: "pause-4",
         resumeTrigger: "resume-4",
+        flipConditions: [{ metric: "tightness", operator: "<", value: 64, label: "Tightness < 64" }],
         rationale: "",
       },
     ];

@@ -99,6 +99,8 @@ export default async function OperationsPage({
     startItems,
     statusLabel,
     stopItems,
+    actionNowShort,
+    flipThreshold,
     treasury,
     treasuryProvenance,
   } = reportData;
@@ -176,6 +178,19 @@ export default async function OperationsPage({
         confidence: trustStatusLabel,
         effectiveDate: recordDateLabel,
         evidenceHref: "#ops-monthly-action-summary",
+      }}
+      commandBar={{
+        regime: assessment.regime,
+        call: "Translate the weekly regime into execution moves and keep approvals bounded.",
+        doNow: [
+          actionNowShort,
+          actionStripItems[0]?.actionNow ?? startItems[0] ?? "Apply the highest-priority start move for this regime.",
+        ],
+        flipConditions: [
+          flipThreshold,
+          stopItems[0] ?? "Escalate to leadership if a stop trigger is hit.",
+        ],
+        updatedAt: fetchedAtLabel,
       }}
       actionSequence={{
         title: "Planning sequence",

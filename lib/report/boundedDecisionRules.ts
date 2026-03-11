@@ -10,6 +10,12 @@ export type BoundedDecisionRule = {
   scope: string;
   pauseTrigger: string;
   resumeTrigger: string;
+  flipConditions: Array<{
+    metric: "tightness" | "riskAppetite";
+    operator: ">" | ">=" | "<" | "<=";
+    value: number;
+    label: string;
+  }>;
   rationale: string;
 };
 
@@ -80,6 +86,10 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
       scope: `Applies to all net-new headcount; current tightness ${fmt(scores.tightness)} and risk appetite ${fmt(scores.riskAppetite)}.`,
       pauseTrigger: `Pause net-new hiring if tightness > ${fmt(tightnessPause)} or risk appetite < ${fmt(riskPause)}.`,
       resumeTrigger: `Resume staged approvals when tightness < ${fmt(tightnessResume)} and risk appetite > ${fmt(riskResume)}.`,
+      flipConditions: [
+        { metric: "tightness", operator: "<", value: tightnessResume, label: `Tightness < ${fmt(tightnessResume)}` },
+        { metric: "riskAppetite", operator: ">", value: riskResume, label: `Risk appetite > ${fmt(riskResume)}` },
+      ],
       rationale: "Protect delivery capacity without locking in irreversible fixed-cost growth.",
     },
     "product-tempo": {
@@ -96,6 +106,9 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
       scope: "Roadmap sequencing, release scope, and experimentation cadence.",
       pauseTrigger: `Pause long-payback bets if risk appetite < ${fmt(riskPause)} or two consecutive weaker weekly reads print.`,
       resumeTrigger: `Resume tempo on deferred bets when risk appetite > ${fmt(riskResume)} and weekly direction stabilizes/improves.`,
+      flipConditions: [
+        { metric: "riskAppetite", operator: ">", value: riskResume, label: `Risk appetite > ${fmt(riskResume)}` },
+      ],
       rationale: "Keep cycle-time high where evidence is strong; cap downside from speculative scope.",
     },
     "capital-raising": {
@@ -112,6 +125,10 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
       scope: "Fundraising launch timing, process pacing, and minimum term quality.",
       pauseTrigger: `Pause acceleration if risk appetite falls below ${fmt(riskPause)} or tightness rises above ${fmt(tightnessPause)}.`,
       resumeTrigger: `Resume full process when risk appetite > ${fmt(riskResume)} and tightness < ${fmt(tightnessResume)}.`,
+      flipConditions: [
+        { metric: "riskAppetite", operator: ">", value: riskResume, label: `Risk appetite > ${fmt(riskResume)}` },
+        { metric: "tightness", operator: "<", value: tightnessResume, label: `Tightness < ${fmt(tightnessResume)}` },
+      ],
       rationale: "Timing the process around signal windows improves optionality and reduces forced terms.",
     },
     "burn-discipline": {
@@ -122,6 +139,9 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
       scope: "Hiring, vendor, and GTM program spend with multi-quarter commitments.",
       pauseTrigger: `Pause discretionary burn expansion if tightness > ${fmt(tightnessPause)}.`,
       resumeTrigger: `Resume controlled burn expansion when tightness < ${fmt(tightnessResume)} and budget payback proof is intact.`,
+      flipConditions: [
+        { metric: "tightness", operator: "<", value: tightnessResume, label: `Tightness < ${fmt(tightnessResume)}` },
+      ],
       rationale: "Cash durability preserves strategic options when macro direction changes quickly.",
     },
     "expansion-bets": {
@@ -138,6 +158,10 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
       scope: "New market launches, major platform rewrites, and long-cycle initiatives.",
       pauseTrigger: `Pause expansion bets if risk appetite < ${fmt(riskPause)} or tightness > ${fmt(tightnessPause)}.`,
       resumeTrigger: `Resume in tranches when risk appetite > ${fmt(riskResume)} and tightness < ${fmt(tightnessResume)}.`,
+      flipConditions: [
+        { metric: "riskAppetite", operator: ">", value: riskResume, label: `Risk appetite > ${fmt(riskResume)}` },
+        { metric: "tightness", operator: "<", value: tightnessResume, label: `Tightness < ${fmt(tightnessResume)}` },
+      ],
       rationale: "Expansion should scale with validated window strength, not optimism.",
     },
   };
