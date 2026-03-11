@@ -25,6 +25,10 @@ import { buildTrustStatus } from "../lib/report/trustStatus";
 import { WeeklyDecisionCard } from "./components/weeklyDecisionCard";
 import { buildBoardBrief, buildCallCitation, buildSlackBrief } from "../lib/export/briefBuilders";
 import {
+  buildWeeklyOperatorBriefPayload,
+  buildWeeklyOperatorBriefPlainText,
+} from "../lib/export/weeklyOperatorBrief";
+import {
   buildInterpretationLayer,
   isInterpretationView,
   type InterpretationView,
@@ -342,6 +346,14 @@ const HomePageReportContent = async ({
   };
   const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries, exportLayerOptions);
   const boardSummary = buildBoardBrief(assessment, treasury, sensors, macroSeries, exportLayerOptions);
+  const weeklyOperatorBriefPayload = buildWeeklyOperatorBriefPayload({
+    assessment,
+    treasury,
+    postureWithStageLabel: homeBriefModel.postureWithStageLabel,
+    confidenceLabel: homeBriefModel.confidenceLabel,
+    actionStripItems: homeBriefModel.actionStripItems,
+  });
+  const weeklyOperatorBriefText = buildWeeklyOperatorBriefPlainText(weeklyOperatorBriefPayload);
   const callCitation = buildCallCitation(assessment, treasury, {
     interpretationLayer,
     postureWithStageLabel: homeBriefModel.postureWithStageLabel,
@@ -364,9 +376,9 @@ const HomePageReportContent = async ({
       pageSummary="Action, guardrail, and flip condition for this planning cycle; scores stay contextual."
       primaryCta={{
         href: "#citation-actions",
-        label: "Copy weekly brief",
-        copyText: slackBrief,
-        copyTarget: "Slack",
+        label: "Copy Weekly Operator Brief",
+        copyText: weeklyOperatorBriefText,
+        copyTarget: "Weekly operator brief",
       }}
       secondaryCta={{
         href: "/operations",
@@ -442,7 +454,7 @@ const HomePageReportContent = async ({
         citation={callCitation}
         isFallbackSnapshot={isFallback && !historicalSelection}
         failureModes={homeBriefModel.failureModes}
-        actions={<CopyLeadershipArtifactsButtons slackBrief={slackBrief} boardSummary={boardSummary} citation={callCitation} />}
+        actions={<CopyLeadershipArtifactsButtons weeklyOperatorBrief={weeklyOperatorBriefText} boardSummary={boardSummary} citation={callCitation} />}
       />
 
 

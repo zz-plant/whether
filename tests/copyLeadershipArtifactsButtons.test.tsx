@@ -7,13 +7,13 @@ describe("CopyLeadershipArtifactsButtons", () => {
   it("prioritizes weekly brief, playbook, and evidence actions in order with mobile-safe touch targets", () => {
     const html = renderToStaticMarkup(
       <CopyLeadershipArtifactsButtons
-        slackBrief="brief"
+        weeklyOperatorBrief="brief"
         boardSummary="board"
         citation="citation"
       />,
     );
 
-    const copyIndex = html.indexOf("Copy weekly brief");
+    const copyIndex = html.indexOf("Copy Weekly Operator Brief");
     const playbookIndex = html.indexOf("View action playbook");
     const evidenceIndex = html.indexOf("Inspect evidence");
     const moreActionsIndex = html.indexOf("More artifact actions");

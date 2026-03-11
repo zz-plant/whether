@@ -24,11 +24,11 @@ const trackFirstActionConversion = (action: PrimaryActionType) => {
 };
 
 export function CopyLeadershipArtifactsButtons({
-  slackBrief,
+  weeklyOperatorBrief,
   boardSummary,
   citation,
 }: {
-  slackBrief: string;
+  weeklyOperatorBrief: string;
   boardSummary: string;
   citation: string;
 }) {
@@ -41,7 +41,7 @@ export function CopyLeadershipArtifactsButtons({
     window.print();
   };
 
-  const copyLabel = (target: "Slack" | "Board" | "Citation", label: string) =>
+  const copyLabel = (target: "Weekly operator brief" | "Board" | "Citation", label: string) =>
     isCopying && activeTarget === target ? "Copying" : label;
 
   const secondaryActionClassName = "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-200 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation";
@@ -53,13 +53,13 @@ export function CopyLeadershipArtifactsButtons({
           type="button"
           onClick={() => {
             trackFirstActionConversion("copy_weekly_brief");
-            copyToClipboard(slackBrief, "Slack");
+            copyToClipboard(weeklyOperatorBrief, "Weekly operator brief");
           }}
           disabled={isCopying}
           aria-busy={isCopying}
           className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-200 disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-500 touch-manipulation"
         >
-          {copyLabel("Slack", "Copy weekly brief")}
+          {copyLabel("Weekly operator brief", "Copy Weekly Operator Brief")}
         </Button>
 
         <Link

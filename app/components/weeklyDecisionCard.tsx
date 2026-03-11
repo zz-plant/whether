@@ -176,6 +176,53 @@ const compactRoleCue = (text: string) =>
     .replace(/;\s*$/, "")
     .trim();
 
+const normalizeCueFragments = (text: string) =>
+  compactRoleCue(text)
+    .split(";")
+    .map((fragment) => fragment.trim().replace(/[.;]+$/, ""))
+    .filter(Boolean);
+
+const buildRoleTemplateBullets = ({
+  roleAwareTemplates,
+  field,
+  maxItems = 5,
+}: {
+  roleAwareTemplates: RoleAwareOperatingTemplate[];
+  field: "doNow" | "avoidNow";
+  maxItems?: number;
+}) => {
+  const uniqueBullets = new Set<string>();
+
+  roleAwareTemplates.forEach((template) => {
+    normalizeCueFragments(template[field]).forEach((fragment) => {
+      const normalized = fragment.toLowerCase();
+      if (!uniqueBullets.has(normalized)) {
+        uniqueBullets.add(normalized);
+      }
+    });
+  });
+
+  return Array.from(uniqueBullets)
+    .slice(0, Math.max(1, maxItems))
+    .map((bullet) => bullet.charAt(0).toUpperCase() + bullet.slice(1));
+};
+
+const buildWatchBullets = ({
+  regimeDistance,
+  regimeVelocity,
+}: {
+  regimeDistance: WeeklyDecisionCardProps["regimeDistance"];
+  regimeVelocity: TransitionVelocityEstimate;
+}) => {
+  const distanceDirection = regimeDistance.thresholdDirection === "riseAbove" ? "rises above" : "falls to or below";
+  const distanceBullet = `${regimeDistance.dimensionLabel} ${distanceDirection} ${regimeDistance.thresholdValue.toFixed(1)} (${Math.max(0, regimeDistance.pointsToFlip).toFixed(1)} pts away)`;
+  const velocityBullet = regimeVelocity.status === "ok"
+    ? `${regimeVelocity.from}→${regimeVelocity.to} can flip in ${regimeVelocity.typicalRangeLabel}`
+    : `${regimeVelocity.from}→${regimeVelocity.to} timing is uncertain (${regimeVelocity.sampleSize} sample${regimeVelocity.sampleSize === 1 ? "" : "s"})`;
+
+  return [distanceBullet, velocityBullet].slice(0, 5);
+};
+
 
 type LiveBandChip = {
   id: string;
@@ -923,6 +970,9 @@ export function WeeklyDecisionCard({
   const trustWarningCopy = isFallbackSnapshot
     ? "Using a cached snapshot. Use this call for near-term pacing only and pause irreversible decisions until live refresh returns."
     : "Use this call for near-term pacing only until confidence returns to HIGH with fresh data.";
+  const doNowBullets = buildRoleTemplateBullets({ roleAwareTemplates, field: "doNow" });
+  const avoidBullets = buildRoleTemplateBullets({ roleAwareTemplates, field: "avoidNow" });
+  const watchBullets = buildWatchBullets({ regimeDistance, regimeVelocity });
 
   return (
     <section className="weather-panel space-y-3 px-4 py-5 sm:space-y-4 sm:px-6 sm:py-6" aria-labelledby="weekly-posture-brief-title">
@@ -964,23 +1014,22 @@ export function WeeklyDecisionCard({
             <h2 className={tierOneHeading}>This week&apos;s call</h2>
             <div className="grid gap-2.5 sm:grid-cols-2">
               <div className={`${tierOneInset} space-y-1.5 border-emerald-500/35 bg-emerald-500/5`}>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald-200">Do now</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald-200">DO NOW</p>
                 <ul className="space-y-1 text-xs text-emerald-100">
-                  {roleAwareTemplates.slice(0, 4).map((template) => <li key={`do-${template.role}`}>• {compactRoleCue(template.doNow)}</li>)}
+                  {doNowBullets.map((bullet) => <li key={`do-${bullet}`}>• {bullet}</li>)}
                 </ul>
               </div>
               <div className={`${tierOneInset} space-y-1.5 border-rose-500/35 bg-rose-500/5`}>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-rose-200">Avoid</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-rose-200">AVOID</p>
                 <ul className="space-y-1 text-xs text-rose-100">
-                  {roleAwareTemplates.slice(0, 4).map((template) => <li key={`avoid-${template.role}`}>• {compactRoleCue(template.avoidNow)}</li>)}
+                  {avoidBullets.map((bullet) => <li key={`avoid-${bullet}`}>• {bullet}</li>)}
                 </ul>
               </div>
             </div>
             <div className={`${tierOneInset} space-y-1.5 border-sky-500/35 bg-sky-500/5`}>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">Watch</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">WATCH</p>
               <ul className="space-y-1 text-xs text-sky-100">
-                <li>• {regimeDistance.dimensionLabel} approaching {regimeDistance.thresholdValue.toFixed(1)} threshold.</li>
-                <li>• Transition pace: {regimeVelocity.displayLabel}</li>
+                {watchBullets.map((bullet) => <li key={`watch-${bullet}`}>• {bullet}</li>)}
               </ul>
             </div>
           </article>

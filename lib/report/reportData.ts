@@ -141,17 +141,19 @@ export const classifyConfidenceTrend = (points: WeeklyConfidencePoint[]): Confid
 
 export const buildWeeklyConfidenceSeries = ({
   snapshots,
+  currentSnapshot,
   thresholds,
   asOf,
   window = 8,
 }: {
   snapshots: TreasuryData[];
+  currentSnapshot?: TreasuryData;
   thresholds: ReturnType<typeof parseThresholdsFromSearchParams>;
   asOf: string;
   window?: number;
 }): WeeklyConfidencePoint[] => {
   const asOfTime = new Date(asOf).getTime();
-  const snapshotsBeforeAsOf = snapshots
+  const snapshotsBeforeAsOf = [...snapshots, ...(currentSnapshot ? [currentSnapshot] : [])]
     .filter((snapshot) => {
       const timestamp = new Date(snapshot.record_date).getTime();
       return Number.isFinite(timestamp) && timestamp <= asOfTime;
@@ -762,6 +764,7 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
       : null;
   const confidenceHistory = buildWeeklyConfidenceSeries({
     snapshots: timeMachineSnapshots.map(({ year: _year, month: _month, ...snapshot }) => snapshot),
+    currentSnapshot: treasury,
     thresholds,
     asOf: treasury.record_date,
     window: 8,
