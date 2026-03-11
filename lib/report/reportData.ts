@@ -534,7 +534,7 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
   const selectedMonth = requestedSelection?.month ?? defaultMonth;
   const selectedYear = requestedSelection?.year ?? defaultYear;
   const thresholds = parseThresholdsFromSearchParams(searchParams);
-  const regimeSeries = getTimeMachineRegimeSeries(DEFAULT_REGIME_SERIES_MONTHS, thresholds);
+  const regimeSeries = getTimeMachineRegimeSeries(DEFAULT_REGIME_SERIES_MONTHS, thresholds, historicalSelection?.asOf);
   const yieldCurveSeries = getTimeMachineYieldCurveSeries(240, historicalSelection?.asOf);
   const timeMachineSnapshots = getTimeMachineSnapshots();
   const [treasuryResult, liveTreasuryResult, macroResult] = await Promise.allSettled([
@@ -763,7 +763,7 @@ const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataF
   const thresholds = parseThresholdsFromSearchParams(searchParams);
   const cacheCoverage = getTimeMachineCoverage();
   const cacheMonthsByYear = getTimeMachineMonthsByYear();
-  const regimeSeries = getTimeMachineRegimeSeries(DEFAULT_REGIME_SERIES_MONTHS, thresholds);
+  const regimeSeries = getTimeMachineRegimeSeries(DEFAULT_REGIME_SERIES_MONTHS, thresholds, historicalSelection?.asOf);
   const yieldCurveSeries = getTimeMachineYieldCurveSeries(240, historicalSelection?.asOf);
   const assessment = evaluateRegime(fallbackTreasury, thresholds, []);
   const liveAssessment = evaluateRegime(fallbackTreasury, thresholds, []);
