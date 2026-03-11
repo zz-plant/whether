@@ -5,6 +5,7 @@ import {
   buildWeeklyOperatorBriefPlainText,
   buildWeeklyOperatorBriefSlackBlocks,
   buildWeeklyOperatorBriefCardText,
+  buildWeeklyCallSnapshotPlainText,
 } from "../lib/export/weeklyOperatorBrief";
 import { getClipboardUiState } from "../app/components/useClipboardCopy";
 import type { RegimeAssessment } from "../lib/regimeEngine";
@@ -94,6 +95,32 @@ describe("weekly operator brief export adapters", () => {
     assert.equal(parsed.blocks[0]?.type, "header");
     assert.ok(parsed.blocks.some((block) => block.type === "section"));
     assert.ok(parsed.blocks.some((block) => block.type === "context"));
+  });
+});
+
+
+describe("weekly call snapshot export", () => {
+  it("renders sections in decision-first order with bulleted flip conditions", () => {
+    const text = buildWeeklyCallSnapshotPlainText({
+      regime: "Defensive — Late Cycle",
+      call: "Hold approval velocity and protect runway.",
+      trend: "Deteriorating",
+      confidence: "74% (MED)",
+      doNow: "Ship only reversible roadmap items.",
+      avoid: "Pause net-new fixed burn commitments.",
+      watch: "Track threshold pressure near regime boundary.",
+      flipConditions: [
+        "Resume hiring when risk appetite clears 50 for two weekly reads.",
+        "Release expansion spend after tightness falls below 70 and holds.",
+      ],
+    });
+
+    assert.match(text, /REGIME: Defensive — Late Cycle/);
+    assert.match(text, /CALL: Hold approval velocity and protect runway\./);
+    assert.match(text, /DO NOW: Ship only reversible roadmap items\./);
+    assert.match(text, /AVOID: Pause net-new fixed burn commitments\./);
+    assert.match(text, /WATCH: Track threshold pressure near regime boundary\./);
+    assert.match(text, /FLIP CONDITIONS:\n• Resume hiring when risk appetite clears 50 for two weekly reads\.\n• Release expansion spend after tightness falls below 70 and holds\./);
   });
 });
 
