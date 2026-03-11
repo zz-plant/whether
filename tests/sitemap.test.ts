@@ -19,6 +19,7 @@ import {
 import { stageGuides } from "../app/guides/stageGuides";
 import { stakeholderGuides } from "../app/guides/stakeholderGuides";
 import { roleLandings } from "../app/solutions/career-paths/roleLandingData";
+import { redirectOnlySitemapPaths } from "../app/sitemapExclusions";
 
 describe("sitemap", () => {
   it("returns canonical URLs and includes posture, decide, learn, toolkit, and library routes", async () => {
@@ -36,6 +37,10 @@ describe("sitemap", () => {
     assert.ok(urls.has(`${siteUrl}/decide`));
     assert.ok(urls.has(`${siteUrl}/toolkits`));
     assert.ok(urls.has(`${siteUrl}/library`));
+
+    for (const redirectOnlyPath of redirectOnlySitemapPaths) {
+      assert.ok(!urls.has(`${siteUrl}${redirectOnlyPath}`));
+    }
 
     for (const posture of postureDefinitions) {
       assert.ok(urls.has(`${siteUrl}/posture/${posture.slug}`));

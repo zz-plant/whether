@@ -23,6 +23,7 @@ import { signalScenarioRoutes } from "./seoRouteClusters";
 import { loadReportDataSafe } from "../lib/report/reportData";
 import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
 import { evaluateSeoQualityGates } from "../lib/report/seoQualityGates";
+import { isRedirectOnlySitemapPath } from "./sitemapExclusions";
 
 type ChangeFrequency = NonNullable<MetadataRoute.Sitemap[number]["changeFrequency"]>;
 
@@ -306,5 +307,7 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     ...signalsClusterEntries,
     ...decideClusterEntries,
     ...toolkitClusterEntries,
-  ].map(buildEntry);
+  ]
+    .filter((entry) => !isRedirectOnlySitemapPath(entry.path))
+    .map(buildEntry);
 }
