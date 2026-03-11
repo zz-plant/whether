@@ -50,7 +50,7 @@ const nextConfig = {
       },
       {
         source: '/reference/failure-modes/:slug',
-        destination: '/library/failure-modes/:slug',
+        destination: '/learn/failure-modes/:slug',
         permanent: true,
       },
       {
@@ -64,8 +64,8 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: '/learn/failure-modes/:slug',
-        destination: '/library/failure-modes/:slug',
+        source: '/library/failure-modes/:slug',
+        destination: '/learn/failure-modes/:slug',
         permanent: true,
       },
       {

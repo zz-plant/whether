@@ -347,7 +347,7 @@ export const toolkitDefinitions: ToolkitDefinition[] = [
       },
     ],
     misuseCases: ["Making irreversible bets without contingency paths"],
-    canonLinks: [{ label: "Irreversibility failure mode", href: "/library/failure-modes/irreversibility" }],
+    canonLinks: [{ label: "Irreversibility failure mode", href: "/learn/failure-modes/irreversibility" }],
   },
   {
     slug: "decision-rights",
@@ -463,7 +463,7 @@ export const toolkitDefinitions: ToolkitDefinition[] = [
       },
     ],
     misuseCases: ["Launching on optimism without threshold evidence"],
-    canonLinks: [{ label: "Launch failures", href: "/library/failure-modes/premature-scaling" }],
+    canonLinks: [{ label: "Launch failures", href: "/learn/failure-modes/premature-scaling" }],
   },
   {
     slug: "ops-capacity",
@@ -521,7 +521,7 @@ export const toolkitDefinitions: ToolkitDefinition[] = [
       },
     ],
     misuseCases: ["Assuming normal capacity under stress"],
-    canonLinks: [{ label: "Complexity debt", href: "/library/failure-modes/complexity-debt" }],
+    canonLinks: [{ label: "Complexity debt", href: "/learn/failure-modes/complexity-debt" }],
   },
   {
     slug: "claims",
@@ -579,7 +579,7 @@ export const toolkitDefinitions: ToolkitDefinition[] = [
       },
     ],
     misuseCases: ["Publishing AI claims without operational proof"],
-    canonLinks: [{ label: "Claims and trust", href: "/library/failure-modes/risk-externalization" }],
+    canonLinks: [{ label: "Claims and trust", href: "/learn/failure-modes/risk-externalization" }],
   },
 ];
 
