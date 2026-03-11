@@ -387,7 +387,7 @@ const HomePageReportContent = async ({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Weekly Operating Posture Brief"
       currentPath="/"
-      pageSummary="Action, guardrail, and flip condition for this planning cycle; scores stay contextual."
+      pageSummary="Whether translates macro conditions into operating decisions for companies. Action, guardrail, and flip condition for this planning cycle; scores stay contextual."
       primaryCta={{
         href: "#citation-actions",
         label: "Copy Weekly Operator Brief",
