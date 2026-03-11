@@ -97,6 +97,7 @@ export type ReportDynamics = {
 export type ReportEvidenceItem = {
   key: ReportDynamics["changedSignals"][number]["key"];
   title: string;
+  lastUpdated: string | null;
   supportingBullets: string[];
   confidenceLabel: string;
   directionLabel: "Tightening" | "Easing" | "Unchanged";
@@ -481,9 +482,11 @@ const signalImmediateImplication = (key: ReportDynamics["changedSignals"][number
 export const buildReportEvidenceItems = ({
   reportDynamics,
   assessment,
+  lastUpdated,
 }: {
   reportDynamics: ReportDynamics;
   assessment: ReturnType<typeof evaluateRegime>;
+  lastUpdated: string | null;
 }): ReportEvidenceItem[] =>
   signalOrder.map((key) => {
     const movedSignal = reportDynamics.changedSignals.find((item) => item.key === key);
@@ -510,6 +513,7 @@ export const buildReportEvidenceItems = ({
     return {
       key,
       title: evidenceTitleBySignal[key],
+      lastUpdated,
       supportingBullets,
       confidenceLabel: formatConfidencePlainLabel(toConfidenceLabel(delta)),
       directionLabel,
@@ -803,7 +807,11 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
   const actionNowShort = buildActionNowShort(reportDynamics);
   const guardrailThreshold = stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
   const flipThreshold = buildFlipThreshold(assessment);
-  const reportEvidenceItems = buildReportEvidenceItems({ reportDynamics, assessment });
+  const reportEvidenceItems = buildReportEvidenceItems({
+    reportDynamics,
+    assessment,
+    lastUpdated: treasury.record_date,
+  });
 
   return {
     assessment,
@@ -912,7 +920,11 @@ const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataF
   const actionNowShort = buildActionNowShort(fallbackReportDynamics);
   const guardrailThreshold = stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
   const flipThreshold = buildFlipThreshold(assessment);
-  const reportEvidenceItems = buildReportEvidenceItems({ reportDynamics: fallbackReportDynamics, assessment });
+  const reportEvidenceItems = buildReportEvidenceItems({
+    reportDynamics: fallbackReportDynamics,
+    assessment,
+    lastUpdated: fallbackTreasury.record_date,
+  });
 
   return {
     assessment,

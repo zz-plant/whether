@@ -12,6 +12,7 @@ import type { RegimeKey } from "../../lib/regimeEngine";
 import type { DecisionMatrixPayload, StartupVariantPolicy } from "../../lib/report/homeBriefModel";
 import { formatProbabilityPercent } from "../../lib/report/reportFormatting";
 import { getOrderedRegimeLegend, REGIME_BANNER_TOKENS, REGIME_LEGEND_DESCRIPTORS, type RegimeBannerTone } from "../../lib/regimePresentation";
+import { formatDateUTC } from "../../lib/formatters";
 import {
   buildWeeklyCitationMetaLine,
   buildCompactTrustSummary,
@@ -1028,6 +1029,7 @@ export function MoreContextDisclosureBody({
           {evidenceItems.map((item) => (
             <li key={item.key} className={`${compactInset} space-y-1.5 text-xs text-slate-200`}>
               <p className="font-semibold text-slate-100">{item.title}</p>
+              <p className="text-[11px] text-slate-400">Updated {item.lastUpdated ? formatDateUTC(item.lastUpdated) : "—"}</p>
               <ul className="space-y-1 text-[11px] text-slate-300">
                 {item.supportingBullets.slice(0, 3).map((bullet) => (
                   <li key={`${item.key}-${bullet}`}>• {bullet}</li>
@@ -1414,7 +1416,7 @@ export function WeeklyDecisionCard({
                 <p className={`text-xs ${neutralLabel}`}>Evidence</p>
                 <ul className="mt-1 space-y-1 text-xs text-slate-200">
                   {evidenceItems.map((item) => (
-                    <li key={`evidence-${item.key}`}>• {item.title}: {item.immediateImplication}</li>
+                    <li key={`evidence-${item.key}`}>• {item.title} (Updated {item.lastUpdated ? formatDateUTC(item.lastUpdated) : "—"}): {item.immediateImplication}</li>
                   ))}
                 </ul>
               </article>
