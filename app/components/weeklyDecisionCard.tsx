@@ -1134,7 +1134,7 @@ export function WeeklyDecisionCard({
     guardrail,
     regimeDistance,
   });
-  const recentTimeline = historicalTimeline.slice(-4);
+  const recentTimeline = historicalTimeline.slice(-2);
 
   return (
     <section className="weather-panel space-y-3 px-4 py-5 sm:space-y-4 sm:px-6 sm:py-6" aria-labelledby="weekly-posture-brief-title">
@@ -1165,14 +1165,20 @@ export function WeeklyDecisionCard({
             </li>
           ))}
         </ul>
+        {actions ? (
+          <div className="rounded-lg border border-sky-400/40 bg-sky-500/10 p-2.5" aria-label="Share this week's call">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-sky-100">Share this week&apos;s call</p>
+            <div className="mt-2">{actions}</div>
+          </div>
+        ) : null}
       </article>
 
       <div className="grid gap-3 xl:grid-cols-12">
-        <aside className="space-y-3 xl:col-span-3">
+        <main className="space-y-3 xl:col-span-8">
           <article className={`${tierOnePanel} ${sectionSpacing}`}>
-            <h2 className={tierOneHeading}>Regime panel</h2>
-            <p className="text-xs text-slate-300">Keep the weekly call in view while you approve or pause decisions.</p>
-            <ul className="space-y-2 text-xs text-slate-200">
+            <h2 className={tierOneHeading}>Weekly decision brief</h2>
+            <p className="text-xs text-slate-300">Use this single brief to align the team on this week&apos;s call and flip trigger.</p>
+            <ul className="grid gap-2 text-xs text-slate-200 sm:grid-cols-2">
               <li className={tierOneInset}><span className="font-semibold text-slate-100">Regime:</span> {postureWithStageLabel ?? statusLabel}</li>
               <li className={tierOneInset}><span className="font-semibold text-slate-100">Trend:</span> {trendLabel}</li>
               <li className={tierOneInset}><span className="font-semibold text-slate-100">Confidence:</span> {Math.round(confidencePercent)}%</li>
@@ -1180,10 +1186,6 @@ export function WeeklyDecisionCard({
             </ul>
           </article>
 
-          <ConfidenceMiniChart confidenceHistory={confidenceHistory} confidenceTrend={confidenceTrend} />
-        </aside>
-
-        <main className="space-y-3 xl:col-span-6">
           <article id="weekly-call-core" className={`${tierOnePanel} weather-motion-card ${sectionSpacing} bg-gradient-to-br from-slate-950/95 via-slate-900/85 to-slate-950/95`}>
             <h2 className={tierOneHeading}>This week&apos;s call</h2>
             <div className="grid gap-2.5 sm:grid-cols-2">
@@ -1211,7 +1213,7 @@ export function WeeklyDecisionCard({
           <article className={`${tierOnePanel} ${sectionSpacing}`}>
             <div className="flex flex-wrap items-center justify-between gap-2">
               <h2 className={tierOneHeading}>Regime history (recent)</h2>
-              <p className="text-[11px] uppercase tracking-[0.1em] text-slate-400">Last 4 checkpoints</p>
+              <p className="text-[11px] uppercase tracking-[0.1em] text-slate-400">Last 2 checkpoints</p>
             </div>
             <PostureHistoryTimeline historicalTimeline={recentTimeline} />
           </article>
@@ -1245,38 +1247,33 @@ export function WeeklyDecisionCard({
 
         </main>
 
-        <aside className="space-y-3 xl:col-span-3">
+        <aside className="space-y-3 xl:col-span-4">
+          <ConfidenceMiniChart confidenceHistory={confidenceHistory} confidenceTrend={confidenceTrend} />
+
           <CompactDisclosure
             id="evidence-diagnostics"
             className={`${tierThreePanel} ${compactSectionSpacing} group`}
             summaryClassName={disclosureSummaryClass}
-            summary="Inspect evidence →"
-          >
-            <ul className="mt-2 space-y-1 text-xs text-slate-200">
-              {evidenceItems.map((item) => (
-                <li key={`evidence-${item.key}`}>• {item.title}: {item.immediateImplication}</li>
-              ))}
-            </ul>
-          </CompactDisclosure>
-
-          <CompactDisclosure
-            className={`${tierThreePanel} ${compactSectionSpacing} group`}
-            summaryClassName={disclosureSummaryClass}
-            summary="Inspect drivers →"
+            summary="Why this call (expand)"
           >
             <article className={compactInset}>
-              <p className={`text-xs ${neutralLabel}`}>Top contributors: {topContributorInline}</p>
+              <p className={`text-xs ${neutralLabel}`}>Evidence</p>
+              <ul className="mt-1 space-y-1 text-xs text-slate-200">
+                {evidenceItems.map((item) => (
+                  <li key={`evidence-${item.key}`}>• {item.title}: {item.immediateImplication}</li>
+                ))}
+              </ul>
+            </article>
+
+            <article className={`${compactInset} mt-2`}>
+              <p className={`text-xs ${neutralLabel}`}>Drivers</p>
+              <p className="mt-1 text-xs text-slate-300">Top contributors: {topContributorInline}</p>
               <p className="mt-1 text-xs text-slate-300">Weekly movement: {conciseWeeklyMovement}</p>
             </article>
-          </CompactDisclosure>
 
-          <CompactDisclosure
-            className={`${tierThreePanel} ${compactSectionSpacing} group`}
-            summaryClassName={disclosureSummaryClass}
-            summary="Inspect model inputs →"
-          >
-            <article className={compactInset}>
-              <p className={`text-xs ${neutralLabel}`}>Decision thresholds are in the matrix above.</p>
+            <article className={`${compactInset} mt-2`}>
+              <p className={`text-xs ${neutralLabel}`}>Model inputs</p>
+              <p className="mt-1 text-xs text-slate-300">Decision thresholds are in the matrix above.</p>
               <p className="mt-1 text-xs text-slate-300">Defensive probability: {formatProbabilityPercent(transitionProbabilities.Defensive)}</p>
             </article>
             {failureModes.length > 0 ? (
