@@ -35,7 +35,6 @@ import { buildActionStripItems } from "./operatingCalls";
 import { deltaLabelBySignal, resolveSignalDirection, signalOrder } from "./briefFormatting";
 import { cache } from "react";
 import type { TreasuryData } from "../types";
-import { loadCanonicalReportInputs } from "../ingestion/materialized";
 
 export type ReportSearchParams = {
   month?: string;
@@ -611,6 +610,25 @@ export const buildReportDynamics = ({
   };
 };
 
+
+const isEdgeRuntime = () => typeof (globalThis as { EdgeRuntime?: string }).EdgeRuntime === "string";
+
+const loadCanonicalReportInputsIfAvailable = async (options: { fetcher?: typeof fetch }) => {
+  if (isEdgeRuntime()) {
+    return null;
+  }
+
+  try {
+    const dynamicImport = new Function("modulePath", "return import(modulePath);") as (
+      modulePath: string,
+    ) => Promise<typeof import("../ingestion/materialized")>;
+    const materialized = await dynamicImport("../ingestion/materialized");
+    return materialized.loadCanonicalReportInputs(options);
+  } catch {
+    return null;
+  }
+};
+
 const REPORT_DATA_REVALIDATE_SECONDS = 900;
 const REPORT_FALLBACK_REASON = "Report dependency outage: serving cached treasury snapshot.";
 
@@ -642,7 +660,7 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
   const requestedSelection = parseTimeMachineRequest(searchParams);
   const canonicalInputs = historicalSelection
     ? null
-    : await loadCanonicalReportInputs({ fetcher: liveFetcher });
+    : await loadCanonicalReportInputsIfAvailable({ fetcher: liveFetcher });
   const treasuryPromise = canonicalInputs
     ? Promise.resolve(canonicalInputs.treasury)
     : fetchTreasuryData({
