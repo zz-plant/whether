@@ -22,15 +22,23 @@ export const REGIME_SHORT_LABELS: Record<RegimeKey, string> = {
 };
 
 export const REGIME_LEGEND_LABELS: Record<RegimeKey, string> = {
-  SCARCITY: REGIME_SHORT_LABELS.SCARCITY,
-  DEFENSIVE: REGIME_SHORT_LABELS.DEFENSIVE,
-  VOLATILE: REGIME_SHORT_LABELS.VOLATILE,
-  EXPANSION: REGIME_SHORT_LABELS.EXPANSION,
+  SCARCITY: "Scarcity",
+  DEFENSIVE: "Defensive",
+  VOLATILE: "Transitional",
+  EXPANSION: "Expansion",
+};
+
+export const REGIME_LEGEND_ARIA_LABELS: Record<RegimeKey, string> = {
+  SCARCITY: "Scarcity regime: capital constrained and risk appetite weak",
+  DEFENSIVE: "Defensive regime: capital constrained with moderate risk appetite",
+  VOLATILE: "Transitional regime: mixed read with unstable risk appetite",
+  EXPANSION: "Expansion regime: capital easing with stronger risk appetite",
 };
 
 export const getOrderedRegimeLegend = () => REGIME_ORDER.map((regime) => ({
   regime,
   label: REGIME_LEGEND_LABELS[regime],
+  ariaLabel: REGIME_LEGEND_ARIA_LABELS[regime],
 }));
 
 export const REGIME_SEVERITY_RANK: Record<RegimeKey, number> = {

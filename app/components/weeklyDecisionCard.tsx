@@ -693,21 +693,17 @@ type RegimeBannerProps = {
   regimeDistance?: WeeklyDecisionCardProps["regimeDistance"];
 };
 
-const resolveRegimeTone = (label: string) => {
-  const normalized = label.toLowerCase();
-  if (normalized.includes("guarded expansion")) {
-    return "border-amber-400/65 bg-amber-500/10 text-amber-100";
-  }
-  if (normalized.includes("expansion")) {
-    return "border-emerald-400/65 bg-emerald-500/10 text-emerald-100";
-  }
-  if (normalized.includes("defensive")) {
+const resolveRegimeTone = (regime: RegimeKey) => {
+  if (regime === "SCARCITY") {
     return "border-rose-400/65 bg-rose-500/10 text-rose-100";
   }
-  if (normalized.includes("stabilizing")) {
+  if (regime === "DEFENSIVE") {
+    return "border-amber-400/65 bg-amber-500/10 text-amber-100";
+  }
+  if (regime === "VOLATILE") {
     return "border-sky-400/65 bg-sky-500/10 text-sky-100";
   }
-  return "border-slate-500/75 bg-slate-900/85 text-slate-100";
+  return "border-emerald-400/65 bg-emerald-500/10 text-emerald-100";
 };
 
 function RegimeLegend({ activeRegime }: { activeRegime: RegimeKey }) {
@@ -715,8 +711,8 @@ function RegimeLegend({ activeRegime }: { activeRegime: RegimeKey }) {
 
   return (
     <div className="mt-3 rounded-lg border border-slate-700/70 bg-slate-950/75 px-3 py-2.5" aria-label="Regime legend">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300">Regime spectrum</p>
-      <ol className="mt-2 flex flex-wrap items-center gap-1.5 sm:flex-nowrap" aria-label="Ordered regime states">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300">Ordered regime states (tightest → loosest)</p>
+      <ol className="mt-2 flex flex-wrap items-center gap-1.5 sm:flex-nowrap" aria-label="Ordered regime states from scarcity to expansion">
         {legendItems.map((item, index) => {
           const active = item.regime === activeRegime;
           return (
@@ -726,8 +722,10 @@ function RegimeLegend({ activeRegime }: { activeRegime: RegimeKey }) {
                   ? "border-sky-300/80 bg-sky-400/20 text-sky-100 shadow-[0_0_0_1px_rgba(125,211,252,0.25)]"
                   : "border-slate-600/70 bg-slate-900/85 text-slate-300"}`}
                 aria-current={active ? "step" : undefined}
+                aria-label={active ? `${item.ariaLabel} (current)` : item.ariaLabel}
               >
                 {item.label}
+                <span className="sr-only">{active ? " (current regime)" : ""}</span>
               </span>
               {index < legendItems.length - 1 ? <span className="text-slate-500" aria-hidden="true">→</span> : null}
             </li>
@@ -773,7 +771,7 @@ function RegimeBanner({
     ? `${Math.max(0, Math.round(regimeDistance.pointsToFlip))} pts`
     : "Unknown";
   const operatingLine = operatingStanceLine.trim() || actionNowShort?.trim() || "Hold bounded operating rules until next refresh.";
-  const bannerTone = resolveRegimeTone(resolvedPostureLabel);
+  const bannerTone = resolveRegimeTone(regimeKey);
 
   return (
     <header className={`sticky top-2 z-10 rounded-2xl border px-5 py-5 shadow-[0_24px_54px_rgba(2,6,23,0.5)] backdrop-blur sm:px-6 sm:py-6 ${bannerTone}`} data-testid="weekly-regime-banner" aria-label="Weekly regime banner">
