@@ -202,7 +202,7 @@ export const ExecutiveSnapshotPanel = ({
       : "border-emerald-400/40 bg-emerald-500/10 text-emerald-100";
 
   const weeklyLockCommitment = buildWeeklyLockCommitment({
-    regime: assessment.regime,
+    state: assessment.state,
     tightnessRegime: assessment.thresholds.tightnessRegime,
     riskAppetiteRegime: assessment.thresholds.riskAppetiteRegime,
     confidenceDegraded,

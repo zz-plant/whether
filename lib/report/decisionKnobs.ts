@@ -1,4 +1,5 @@
 import type { RegimeKey } from "../regimeEngine";
+import type { RegimeState } from "./regimeStateMachine";
 
 export const operatingLeverOrder = [
   "hiring-stance",
@@ -28,30 +29,10 @@ export type DecisionKnob = {
 };
 
 export const knobsByRegime: Record<RegimeKey, Record<DecisionKnob["key"], number>> = {
-  SCARCITY: {
-    approvalVelocity: 0,
-    reversibility: 3,
-    payback: 3,
-    experimentTolerance: 0,
-  },
-  DEFENSIVE: {
-    approvalVelocity: 1,
-    reversibility: 2,
-    payback: 2,
-    experimentTolerance: 1,
-  },
-  VOLATILE: {
-    approvalVelocity: 2,
-    reversibility: 2,
-    payback: 1,
-    experimentTolerance: 2,
-  },
-  EXPANSION: {
-    approvalVelocity: 3,
-    reversibility: 1,
-    payback: 0,
-    experimentTolerance: 3,
-  },
+  SCARCITY: { approvalVelocity: 0, reversibility: 3, payback: 3, experimentTolerance: 0 },
+  DEFENSIVE: { approvalVelocity: 1, reversibility: 2, payback: 2, experimentTolerance: 1 },
+  VOLATILE: { approvalVelocity: 2, reversibility: 2, payback: 1, experimentTolerance: 2 },
+  EXPANSION: { approvalVelocity: 3, reversibility: 1, payback: 0, experimentTolerance: 3 },
 };
 
 const knobLabels: Record<DecisionKnob["key"], string> = {
@@ -68,81 +49,43 @@ const knobLevelLabels: Record<DecisionKnob["key"], DecisionKnob["levelLabels"]> 
   experimentTolerance: ["0 · None", "1 · Limited", "2 · Moderate", "3 · High"],
 };
 
+const knobKeyOrder: DecisionKnob["key"][] = ["approvalVelocity", "reversibility", "payback", "experimentTolerance"];
 const clampKnobValue = (value: number) => Math.min(3, Math.max(0, value));
 
-const knobKeyOrder: DecisionKnob["key"][] = [
-  "approvalVelocity",
-  "reversibility",
-  "payback",
-  "experimentTolerance",
-];
-
 type DecisionKnobContext = {
-  regime: RegimeKey;
+  state: RegimeState;
   severityDelta: number;
   nearestThresholdGap: number;
   weakSignalCount: number;
 };
 
-export type WeeklyLockCommitment = {
-  currentCall: string;
-  flipConditions: string[];
-  ownerCadence: string;
-  trustMarkers: string[];
-};
-
-type WeeklyLockCommitmentContext = {
-  regime: RegimeKey;
-  tightnessRegime: number;
-  riskAppetiteRegime: number;
-  confidenceDegraded: boolean;
-  freshnessDegraded: boolean;
-};
-
-const weeklyCallByRegime: Record<RegimeKey, string> = {
-  SCARCITY: "Freeze discretionary spend; protect cash-critical execution.",
-  DEFENSIVE: "Gate net-new commitments to short-payback work only.",
-  VOLATILE: "Approve only reversible bets with explicit checkpoint exits.",
-  EXPANSION: "Scale proven bets, but keep milestone-based approval gates.",
-};
-
 const buildKnobRationale = (key: DecisionKnob["key"], context: DecisionKnobContext) => {
   const thresholdCaution = context.nearestThresholdGap <= 8;
+  const stabilityLabel = context.state.lastEvaluatedAt === context.state.enteredAt ? "new regime entered" : "state held";
   const severityShift =
     context.severityDelta > 0
-      ? "Conditions deteriorated versus prior week"
+      ? "Conditions deteriorated versus prior refresh"
       : context.severityDelta < 0
-        ? "Conditions improved versus prior week"
-        : "Conditions are steady versus prior week";
-  const weakSignalLabel = context.weakSignalCount > 0 ? `${context.weakSignalCount} weak signal${context.weakSignalCount > 1 ? "s" : ""}` : "signals are stable";
+        ? "Conditions improved versus prior refresh"
+        : "Conditions are steady versus prior refresh";
+  const weakSignalLabel =
+    context.weakSignalCount > 0
+      ? `${context.weakSignalCount} weak signal${context.weakSignalCount > 1 ? "s" : ""}`
+      : "signals are stable";
 
-  if (key === "approvalVelocity") {
-    return thresholdCaution
-      ? `${severityShift}; near-threshold risk keeps approvals paced until flip conditions clear while ${weakSignalLabel}.`
-      : `${severityShift}; approval speed follows ${context.regime.toLowerCase()} conditions while ${weakSignalLabel}.`;
-  }
-
-  if (key === "experimentTolerance") {
-    return thresholdCaution
-      ? `${severityShift}; threshold proximity caps experimentation until reversal conditions clear despite ${weakSignalLabel}.`
-      : `${severityShift}; experiment tolerance tracks current risk appetite and ${weakSignalLabel}.`;
-  }
-
-  return thresholdCaution
-    ? `${severityShift}; keep stronger controls until threshold triggers clear and ${weakSignalLabel}.`
-    : `${severityShift}; controls align to current regime with ${weakSignalLabel}.`;
+  return `${severityShift}; ${stabilityLabel}; ${thresholdCaution ? "near-threshold caution active" : "state-machine band stable"}; ${weakSignalLabel}.`;
 };
 
 export const deriveDecisionKnobs = (
-  regime: RegimeKey,
+  state: RegimeState,
   severityDelta: number,
   context?: { nearestThresholdGap?: number; weakSignalCount?: number },
 ): DecisionKnob[] => {
   const severityDirection = severityDelta === 0 ? 0 : severityDelta > 0 ? 1 : -1;
   const shift = Math.min(1, Math.abs(severityDirection));
-  const baseline = knobsByRegime[regime];
+  const baseline = knobsByRegime[state.regime];
   const knobContext: DecisionKnobContext = {
-    regime,
+    state,
     severityDelta,
     nearestThresholdGap: context?.nearestThresholdGap ?? 100,
     weakSignalCount: context?.weakSignalCount ?? 0,
@@ -162,8 +105,30 @@ export const deriveDecisionKnobs = (
   });
 };
 
+export type WeeklyLockCommitment = {
+  currentCall: string;
+  flipConditions: string[];
+  ownerCadence: string;
+  trustMarkers: string[];
+};
+
+type WeeklyLockCommitmentContext = {
+  state: RegimeState;
+  tightnessRegime: number;
+  riskAppetiteRegime: number;
+  confidenceDegraded: boolean;
+  freshnessDegraded: boolean;
+};
+
+const weeklyCallByRegime: Record<RegimeKey, string> = {
+  SCARCITY: "Freeze discretionary spend; protect cash-critical execution.",
+  DEFENSIVE: "Gate net-new commitments to short-payback work only.",
+  VOLATILE: "Approve only reversible bets with explicit checkpoint exits.",
+  EXPANSION: "Scale proven bets, but keep milestone-based approval gates.",
+};
+
 export const buildWeeklyLockCommitment = ({
-  regime,
+  state,
   tightnessRegime,
   riskAppetiteRegime,
   confidenceDegraded,
@@ -171,22 +136,22 @@ export const buildWeeklyLockCommitment = ({
 }: WeeklyLockCommitmentContext): WeeklyLockCommitment => {
   const tightenBy = 6;
   const loosenBy = 4;
-
   const trustMarkers = [
     confidenceDegraded ? "Confidence: Guarded" : "",
     freshnessDegraded ? "Freshness: Stale" : "",
-  ].filter((marker) => marker.length > 0);
+  ].filter(Boolean);
 
   return {
-    currentCall: weeklyCallByRegime[regime],
+    currentCall: weeklyCallByRegime[state.regime],
     flipConditions: [
       `Tightness ≤ ${Math.max(tightnessRegime - loosenBy, 0)} for 2 consecutive refreshes.`,
       `Risk appetite ≥ ${Math.min(riskAppetiteRegime + loosenBy, 100)} for 2 consecutive refreshes.`,
       `Re-tighten if tightness > ${Math.min(tightnessRegime + tightenBy, 100)} or risk appetite < ${Math.max(riskAppetiteRegime - tightenBy, 0)}.`,
     ],
-    ownerCadence: confidenceDegraded || freshnessDegraded
-      ? "Owner: CEO + Finance lead · Checkpoint: daily 10:00 review until trust markers clear."
-      : "Owner: CEO + Finance lead · Checkpoint: Mon/Thu operating review.",
+    ownerCadence:
+      confidenceDegraded || freshnessDegraded
+        ? "Owner: CEO + Finance lead · Checkpoint: daily 10:00 review until trust markers clear."
+        : "Owner: CEO + Finance lead · Checkpoint: Mon/Thu operating review.",
     trustMarkers,
   };
 };

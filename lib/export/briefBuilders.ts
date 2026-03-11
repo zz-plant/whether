@@ -43,7 +43,7 @@ const buildViralArtifactBlock = (assessment: RegimeAssessment, options?: ExportL
   }
 
   const lockCommitment = buildWeeklyLockCommitment({
-    regime: assessment.regime,
+    state: assessment.state,
     tightnessRegime: assessment.thresholds.tightnessRegime,
     riskAppetiteRegime: assessment.thresholds.riskAppetiteRegime,
     confidenceDegraded: options.confidenceLabel !== "HIGH",

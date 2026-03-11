@@ -35,6 +35,9 @@ import { buildActionStripItems } from "./operatingCalls";
 import { deltaLabelBySignal, resolveSignalDirection, signalOrder } from "./briefFormatting";
 import { cache } from "react";
 import type { TreasuryData } from "../types";
+import { emitBoundedAlerts, readAlertLedger } from "./alerting";
+import { buildCurrentStateContract } from "./currentStateContract";
+import { readDecisionTransitionEvents } from "./decisionEventStore";
 
 export type ReportSearchParams = {
   month?: string;
@@ -683,6 +686,13 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
   const sensors = buildSensorReadings(treasury);
   const assessmentMacroSeries = historicalSelection ? [] : macroSeries;
   const assessment = evaluateRegime(treasury, thresholds, assessmentMacroSeries);
+  const operatorAlerts = emitBoundedAlerts(assessment, treasury.record_date);
+  const lastTransition = readDecisionTransitionEvents().at(-1) ?? null;
+  const currentStateContract = buildCurrentStateContract({
+    assessment,
+    lastTransition,
+    alerts: operatorAlerts.length > 0 ? operatorAlerts : readAlertLedger().slice(-2),
+  });
   const liveAssessment = historicalSelection ? evaluateRegime(liveTreasury, thresholds, macroSeries) : null;
   const { playbook, startItems, stopItems, actionStripItems } = buildGuidanceBundleFromAssessment(assessment);
   const fenceItems = assessment.constraints;
@@ -835,6 +845,7 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
     sensors,
     startItems,
     statusLabel,
+    currentStateContract,
     stopItems,
     actionStripItems,
     actionNowShort,
@@ -895,6 +906,11 @@ const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataF
   const regimeSeries = getTimeMachineRegimeSeries(DEFAULT_REGIME_SERIES_MONTHS, thresholds, historicalSelection?.asOf);
   const yieldCurveSeries = getTimeMachineYieldCurveSeries(240, historicalSelection?.asOf);
   const assessment = evaluateRegime(fallbackTreasury, thresholds, []);
+  const currentStateContract = buildCurrentStateContract({
+    assessment,
+    lastTransition: readDecisionTransitionEvents().at(-1) ?? null,
+    alerts: readAlertLedger().slice(-2),
+  });
   const liveAssessment = evaluateRegime(fallbackTreasury, thresholds, []);
   const sensors = buildSensorReadings(fallbackTreasury);
   const recordDateLabel = formatDateUTC(fallbackTreasury.record_date);
@@ -957,6 +973,7 @@ const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataF
     sensors,
     startItems,
     statusLabel: formatRegimeLabel(assessment.regime),
+    currentStateContract,
     stopItems,
     actionStripItems,
     actionNowShort,

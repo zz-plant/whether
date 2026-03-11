@@ -4,7 +4,7 @@ import { buildWeeklyLockCommitment, deriveDecisionKnobs } from "../lib/report/de
 
 describe("deriveDecisionKnobs", () => {
   it("uses per-dial level labels and rationale", () => {
-    const knobs = deriveDecisionKnobs("EXPANSION", 0, {
+    const knobs = deriveDecisionKnobs({ regime: "EXPANSION", enteredAt: "2026-01-01", lastEvaluatedAt: "2026-01-01", confidence: "HIGH" }, 0, {
       nearestThresholdGap: 4,
       weakSignalCount: 2,
     });
@@ -25,7 +25,7 @@ describe("deriveDecisionKnobs", () => {
 describe("buildWeeklyLockCommitment", () => {
   it("returns measurable flip conditions and owner cadence", () => {
     const commitment = buildWeeklyLockCommitment({
-      regime: "DEFENSIVE",
+      state: { regime: "DEFENSIVE", enteredAt: "2026-01-01", lastEvaluatedAt: "2026-01-01", confidence: "HIGH" },
       tightnessRegime: 70,
       riskAppetiteRegime: 45,
       confidenceDegraded: false,
@@ -42,7 +42,7 @@ describe("buildWeeklyLockCommitment", () => {
 
   it("adds compact trust markers and tighter cadence when trust is degraded", () => {
     const commitment = buildWeeklyLockCommitment({
-      regime: "VOLATILE",
+      state: { regime: "VOLATILE", enteredAt: "2026-01-01", lastEvaluatedAt: "2026-01-02", confidence: "LOW" },
       tightnessRegime: 62,
       riskAppetiteRegime: 52,
       confidenceDegraded: true,

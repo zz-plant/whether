@@ -35,7 +35,7 @@ export const buildWeeklyOperatorBriefPayload = ({
   actionStripItems?: ActionStripItem[];
 }): WeeklyOperatorBriefPayload => {
   const lockCommitment = buildWeeklyLockCommitment({
-    regime: assessment.regime,
+    state: assessment.state,
     tightnessRegime: assessment.thresholds.tightnessRegime,
     riskAppetiteRegime: assessment.thresholds.riskAppetiteRegime,
     confidenceDegraded: confidenceLabel !== "HIGH",

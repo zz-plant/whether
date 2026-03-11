@@ -230,7 +230,7 @@ export const buildDecisionMatrixPayload = ({
 }): DecisionMatrixPayload => {
   const rulesByArea = new Map(decisionRules.map((rule) => [rule.area, rule]));
   const lockCommitment = buildWeeklyLockCommitment({
-    regime,
+    state: { regime, enteredAt: "", lastEvaluatedAt: "", confidence: "MEDIUM" },
     tightnessRegime: thresholds.tightnessRegime,
     riskAppetiteRegime: thresholds.riskAppetiteRegime,
     confidenceDegraded,

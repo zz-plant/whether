@@ -6,6 +6,8 @@ import type { MacroSeriesReading, TreasuryData, TreasuryYields } from "./types";
 import { POLICY_BBB_WEIGHT_FOR_RAS, POLICY_SPEC_V1 } from "./policy/config";
 import { getGovernanceParametersForPosture, type GovernanceParameterSet } from "./policy/governance";
 import { clipZScore, computeCompositeScore, computeVolatility, computeZScore, directionalNormalize } from "./policy/transforms";
+import { appendDecisionTransitionEvent } from "./report/decisionEventStore";
+import { evaluateRegimeStateMachine, type RegimeState } from "./report/regimeStateMachine";
 
 export type RegimeKey = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
 
@@ -32,6 +34,7 @@ export type RegimeInput = {
 
 export interface RegimeAssessment {
   regime: RegimeKey;
+  state: RegimeState;
   scores: RegimeScores;
   diagnostics: RegimeDiagnostics;
   description: string;
@@ -786,7 +789,8 @@ export const buildRegimeChangeReasons = (
 export const evaluateRegime = (
   treasury: TreasuryData,
   overrides?: Partial<RegimeThresholds>,
-  macroSeries: MacroSeriesReading[] = []
+  macroSeries: MacroSeriesReading[] = [],
+  previousState?: RegimeState | null,
 ): RegimeAssessment => {
   const dataWarnings: string[] = [];
   const baseRate = getBaseRate(treasury.yields);
@@ -814,7 +818,7 @@ export const evaluateRegime = (
   const macroAdjusted = applyMacroAdjustments(baselineTightness, baselineRiskAppetite, macroSeries);
   const tightness = macroAdjusted.tightness;
   const riskAppetite = macroAdjusted.riskAppetite;
-  const regime = classifyRegime(tightness, riskAppetite, thresholds);
+  const provisionalRegime = classifyRegime(tightness, riskAppetite, thresholds);
   const diagnostics = computeDiagnostics(
     tightness,
     riskAppetite,
@@ -822,7 +826,33 @@ export const evaluateRegime = (
     macroAdjusted.boundaryContributors,
     macroAdjusted.weakReadCount
   );
+  const stateTransition = evaluateRegimeStateMachine({
+    previousState,
+    scores: { tightness, riskAppetite },
+    thresholds,
+    asOf: treasury.record_date,
+    confidence: diagnostics.confidence,
+  });
+  const regime = stateTransition.state.regime ?? provisionalRegime;
   const profile = REGIME_PROFILES[regime];
+
+  if (stateTransition.transition) {
+    appendDecisionTransitionEvent({
+      timestamp: treasury.record_date,
+      from: stateTransition.transition.from,
+      to: stateTransition.transition.to,
+      triggerValues: {
+        tightness,
+        riskAppetite,
+        thresholdRule: stateTransition.transition.threshold,
+      },
+      confidence: diagnostics.confidence,
+      reversalConditions: [
+        `Reverse if tightness <= ${thresholds.tightnessRegime}`,
+        `Reverse if risk appetite > ${thresholds.riskAppetiteRegime}`,
+      ],
+    });
+  }
   const policyAssessment = computePolicyAssessment(
     treasury,
     thresholds,
@@ -833,6 +863,7 @@ export const evaluateRegime = (
 
   return {
     regime,
+    state: stateTransition.state,
     scores: {
       tightness,
       riskAppetite,

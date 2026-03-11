@@ -156,7 +156,7 @@ const getKnobLevel = (
   runwayGap: number,
   key: "approvalVelocity" | "payback",
 ) => {
-  const knobs = deriveDecisionKnobs(input.regime, 0, {
+  const knobs = deriveDecisionKnobs({ regime: input.regime, enteredAt: "", lastEvaluatedAt: "", confidence: "MEDIUM" }, 0, {
     nearestThresholdGap: Math.abs(runwayGap) * 3,
   });
   const knob = knobs.find((item) => item.key === key);
