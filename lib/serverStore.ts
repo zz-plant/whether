@@ -1,16 +1,28 @@
 import type { AlertDeliveryEvent, RegimeAlertEvent } from "./signalOps";
 import type { DecisionMemoryEntry } from "./decisionMemory";
+import type { RegimeKey } from "./regimeEngine";
+
+export type PostureDecisionEvent = {
+  id: string;
+  recordedAt: string;
+  effectiveRecordDate: string;
+  fromState: RegimeKey | null;
+  toState: RegimeKey;
+  reason: string;
+};
 
 type Store = {
   regimeAlerts: RegimeAlertEvent[];
   alertDeliveries: AlertDeliveryEvent[];
   decisionMemory: DecisionMemoryEntry[];
+  postureDecisionEvents: PostureDecisionEvent[];
 };
 
 const createStore = (): Store => ({
   regimeAlerts: [],
   alertDeliveries: [],
   decisionMemory: [],
+  postureDecisionEvents: [],
 });
 
 declare global {

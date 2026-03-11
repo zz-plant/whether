@@ -5,7 +5,7 @@ import { buildComplianceStamp } from "../exportNotices";
 import { formatRegimeLabel } from "../regimeFormat";
 import type { InterpretationLayer } from "../report/interpretationLayer";
 import type { ActionStripItem } from "../report/operatingCalls";
-import { buildWeeklyLockCommitment } from "../report/decisionKnobs";
+import type { PostureStateContract } from "../report/postureStateContract";
 import {
   buildRunwayPlan,
   formatRunwayPlanCompactBlock,
@@ -35,6 +35,7 @@ type ExportLayerOptions = {
   actionStripItems?: ActionStripItem[];
   confidenceLabel?: "HIGH" | "MED" | "LOW";
   freshnessLabel?: string;
+  postureState?: PostureStateContract;
 };
 
 const buildViralArtifactBlock = (assessment: RegimeAssessment, options?: ExportLayerOptions) => {
@@ -42,13 +43,10 @@ const buildViralArtifactBlock = (assessment: RegimeAssessment, options?: ExportL
     return [];
   }
 
-  const lockCommitment = buildWeeklyLockCommitment({
-    regime: assessment.regime,
-    tightnessRegime: assessment.thresholds.tightnessRegime,
-    riskAppetiteRegime: assessment.thresholds.riskAppetiteRegime,
-    confidenceDegraded: options.confidenceLabel !== "HIGH",
-    freshnessDegraded: !options.freshnessLabel || options.freshnessLabel === "Unavailable",
-  });
+  const trustMarkers = [
+    options?.postureState?.currentState.confidenceLabel !== "HIGH" ? "Confidence: Guarded" : "",
+    !options?.freshnessLabel || options.freshnessLabel === "Unavailable" ? "Freshness: Stale" : "",
+  ].filter((marker) => marker.length > 0);
 
   const actionStrip = (options.actionStripItems ?? []).slice(0, 2).flatMap((item) => [
     `• ${item.label}`,
@@ -64,10 +62,10 @@ const buildViralArtifactBlock = (assessment: RegimeAssessment, options?: ExportL
     `• Trend: ${(options.trendLabel ?? "Stable").toUpperCase()}`,
     `• Distance to regime change: ${(options.regimeDistancePoints ?? 0).toFixed(1)} points`,
     `• Regime shift watch: ${options.transitionWatch ?? "OFF"}`,
-    `• Current call: ${lockCommitment.currentCall}`,
-    ...lockCommitment.flipConditions.map((condition) => `• Flip if: ${condition}`),
-    `• Re-check owner/cadence: ${lockCommitment.ownerCadence}`,
-    ...(lockCommitment.trustMarkers.length > 0 ? [`• Trust markers: ${lockCommitment.trustMarkers.join(" · ")}`] : []),
+    `• Current call: ${options?.operatingStanceLine ?? assessment.constraints[0] ?? "Hold bounded operating discipline."}`,
+    ...(options?.postureState?.whatFlipsNext.thresholds ?? []).map((condition) => `• Flip if: ${condition}`),
+    `• Re-check owner/cadence: Owner: CEO + Finance lead · Checkpoint: Mon/Thu operating review.`,
+    ...(trustMarkers.length > 0 ? [`• Trust markers: ${trustMarkers.join(" · ")}`] : []),
     `• Operating posture: ${options.operatingStanceLine}`,
     ...actionStrip,
   ];
