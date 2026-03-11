@@ -363,7 +363,7 @@ export const ReportShell = ({
         <AnchorFeedback />
         <DisplayGuardian />
         <div className="tv-rail-safe mx-auto max-w-[82rem] pb-[calc(env(safe-area-inset-bottom)+10rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)] pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)] sm:pb-10 sm:pt-5 sm:pl-[calc(env(safe-area-inset-left)+1.25rem)] sm:pr-[calc(env(safe-area-inset-right)+1.25rem)]">
-          <header className="weather-appbar sticky top-[calc(env(safe-area-inset-top)+0.75rem)] z-20 px-4 py-4 sm:top-4 sm:px-6 sm:py-4">
+          <header className="weather-appbar relative z-20 px-4 py-4 sm:sticky sm:top-4 sm:px-6 sm:py-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-3"><Image src="/whether-logo.svg" alt="Whether — Weekly Operating Posture (Hiring, Spend, Roadmap)" width={156} height={36} className="h-9 w-auto" priority /><p className="text-xs text-slate-300 sm:hidden">Signals updated {fetchedAtLabel}</p></div>
               <div className="hidden items-center sm:flex"><p className="text-xs text-slate-300">Signals updated {fetchedAtLabel}</p></div>
