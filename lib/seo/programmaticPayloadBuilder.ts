@@ -111,7 +111,15 @@ export const enumerateProgrammaticRoutes = (): ProgrammaticRouteDefinition[] => 
     .sort((a, b) => a.url.localeCompare(b.url));
 };
 
-const buildRecordForRoute = (route: ProgrammaticRouteDefinition, context: PayloadContext): ProgrammaticPayloadRecord => {
+
+
+const clusterKeyForRoute = (route: ProgrammaticRouteDefinition): string => {
+  if (route.kind === "decide") return `decide:${route.cluster}`;
+  if (route.kind === "toolkit") return `toolkit:${route.cluster}`;
+  return `signal:${route.cluster}`;
+};
+
+const buildRecordForRoute = (route: ProgrammaticRouteDefinition, context: PayloadContext, siblingsInCluster: { pageKey: string; interpretationLabel?: string; currentCall?: string; immediateAction?: string; evidenceTitles?: string[]; }[] = []): ProgrammaticPayloadRecord => {
   const { reportData, isFallbackSnapshot } = context;
   const homeBriefModel = buildHomeBriefModel(reportData);
 
@@ -145,6 +153,9 @@ const buildRecordForRoute = (route: ProgrammaticRouteDefinition, context: Payloa
     isFallbackSnapshot,
     provenanceStatusLabel: reportData.treasuryProvenance?.statusLabel,
     fetchedAtIso: reportData.treasury.fetched_at,
+    pageKey: route.url,
+    siblingsInCluster,
+    provenanceLinks: [reportData.treasury.source, reportData.macroSeries[0]?.sourceUrl].filter((link): link is string => Boolean(link)),
   });
 
   const title = (() => {
@@ -204,10 +215,28 @@ export const generateProgrammaticPayloadArtifacts = async (): Promise<{ version:
     urls: {},
   };
 
-  const records = routes.map((route) => {
-    const record = buildRecordForRoute(route, { reportData, isFallbackSnapshot });
-    assertGenerationContracts(record);
-    return record;
+  const preliminaryRecords = routes.map((route) => buildRecordForRoute(route, { reportData, isFallbackSnapshot }));
+
+  const records = preliminaryRecords.map((record) => {
+    const route = routes.find((item) => item.url === record.url);
+    if (!route) return record;
+    const clusterKey = clusterKeyForRoute(route);
+    const siblings = preliminaryRecords
+      .filter((candidate) => {
+        const candidateRoute = routes.find((item) => item.url === candidate.url);
+        return candidateRoute ? clusterKeyForRoute(candidateRoute) === clusterKey : false;
+      })
+      .map((candidate) => ({
+        pageKey: candidate.url,
+        interpretationLabel: `${candidate.payload.currentCall}|${candidate.payload.immediateAction}`,
+        currentCall: candidate.payload.currentCall,
+        immediateAction: candidate.payload.immediateAction,
+        evidenceTitles: candidate.payload.evidence.map((item) => item.title),
+      }));
+
+    const rebuilt = buildRecordForRoute(route, { reportData, isFallbackSnapshot }, siblings);
+    assertGenerationContracts(rebuilt);
+    return rebuilt;
   });
 
   for (const record of records) {

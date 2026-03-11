@@ -3,7 +3,7 @@ import { getRegimeProfile } from "../regimeEngine";
 import type { BoundedDecisionRule, DecisionArea } from "./boundedDecisionRules";
 import type { ReportEvidenceItem } from "./reportData";
 import { buildCompactTrustSummary, buildFailureModeWarnings, buildWeeklyCitationMetaLine } from "./trustStatus";
-import { isSeoPageIndexEligible } from "./seoIndexEligibility";
+import { evaluateSeoQualityGates, type SeoQualitySiblingInput } from "./seoQualityGates";
 
 export type SeoDecisionEvidence = {
   title: string;
@@ -12,6 +12,7 @@ export type SeoDecisionEvidence = {
 };
 
 export type SeoDecisionPayload = {
+  pageKey?: string;
   currentCall: string;
   immediateAction: string;
   triggerThreshold: string;
@@ -21,6 +22,7 @@ export type SeoDecisionPayload = {
   degraded: boolean;
   noindex: boolean;
   noindexReasons?: string[];
+  qualityGates?: ReturnType<typeof evaluateSeoQualityGates>;
   trustSummary: string;
   citationMeta: string;
 };
@@ -39,6 +41,9 @@ export const buildSeoDecisionPayload = ({
   isFallbackSnapshot,
   provenanceStatusLabel,
   fetchedAtIso,
+  pageKey,
+  siblingsInCluster,
+  provenanceLinks,
 }: {
   assessment: Pick<RegimeAssessment, "regime" | "thresholds" | "scores">;
   mappedRules: BoundedDecisionRule[];
@@ -53,6 +58,9 @@ export const buildSeoDecisionPayload = ({
   isFallbackSnapshot: boolean;
   provenanceStatusLabel?: string;
   fetchedAtIso?: string;
+  pageKey?: string;
+  siblingsInCluster?: SeoQualitySiblingInput[];
+  provenanceLinks?: string[];
 }): SeoDecisionPayload => {
   const primaryRule = mappedDecisionAreas
     .map((area) => mappedRules.find((rule) => rule.area === area))
@@ -86,37 +94,54 @@ export const buildSeoDecisionPayload = ({
     primaryRule?.resumeTrigger ??
     "Reverse only after two consecutive supportive reads and improved threshold distance.";
 
-  const eligibility = isSeoPageIndexEligible({
-    currentCall,
-    immediateAction,
-    triggerThreshold,
-    reversalCondition,
-    evidenceCount: evidence.length,
-    fetchedAtIso,
+  const trustSummary = buildCompactTrustSummary({
+    confidenceLabel,
+    freshnessLabel,
     isFallbackSnapshot,
-    provenanceStatusLabel,
   });
 
+  const citationMeta = buildWeeklyCitationMetaLine({
+    statusLabel: assessment.regime,
+    confidenceLabel,
+    recordDateLabel,
+    freshnessLabel,
+  });
+
+  const qualityGates = evaluateSeoQualityGates(
+    {
+      pageKey: pageKey ?? `${mappedDecisionAreas.join("-") || "default"}`,
+      currentCall,
+      immediateAction,
+      triggerThreshold,
+      reversalCondition,
+      evidenceCount: evidence.length,
+      evidenceTitles: evidence.map((item) => item.title),
+      fetchedAtIso,
+      isFallbackSnapshot,
+      trustSummary,
+      citationMeta,
+      provenanceStatusLabel,
+      provenanceLinks,
+      confidenceLabel,
+      fallbackLabel: isFallbackSnapshot ? "fallback" : "live",
+      interpretationLabel: `${currentCall}|${immediateAction}`,
+      siblingsInCluster,
+    },
+  );
+
   return {
+    pageKey,
     currentCall,
     immediateAction,
     triggerThreshold,
     reversalCondition,
     evidence,
     freshness: freshnessLabel,
-    degraded: degraded || !eligibility.eligible,
-    noindex: !eligibility.eligible,
-    noindexReasons: eligibility.reasons,
-    trustSummary: buildCompactTrustSummary({
-      confidenceLabel,
-      freshnessLabel,
-      isFallbackSnapshot,
-    }),
-    citationMeta: buildWeeklyCitationMetaLine({
-      statusLabel: assessment.regime,
-      confidenceLabel,
-      recordDateLabel,
-      freshnessLabel,
-    }),
+    degraded: degraded || qualityGates.noindex,
+    noindex: qualityGates.noindex,
+    noindexReasons: qualityGates.reasons,
+    qualityGates,
+    trustSummary,
+    citationMeta,
   };
 };
