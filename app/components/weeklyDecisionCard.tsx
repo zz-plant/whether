@@ -421,6 +421,37 @@ const MicroSignalIndicators = ({
   </div>
 );
 
+const SignalStrip = ({
+  indicators,
+}: {
+  indicators: WeeklyDecisionCardProps["regimeSignalIndicators"];
+}) => {
+  if (indicators.length === 0) {
+    return null;
+  }
+
+  return (
+    <section
+      className="rounded-md border border-slate-800/70 bg-slate-950/55 px-3 py-2"
+      aria-label="Signals strip"
+    >
+      <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
+        <p className="mr-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-400">Signals</p>
+        {indicators.map((indicator) => (
+          <span
+            key={`signal-strip-${indicator.key}`}
+            className="inline-flex items-center gap-1 rounded-full border border-slate-700/70 bg-slate-900/80 px-2 py-0.5 text-slate-200"
+          >
+            <span className="font-medium text-slate-300">{indicator.label}</span>
+            <span className="font-semibold text-slate-100">{indicator.valueLabel}</span>
+            {!indicator.isFallback ? <span aria-hidden="true">{indicator.trendArrow}</span> : null}
+          </span>
+        ))}
+      </div>
+    </section>
+  );
+};
+
 type DecisionCallHeaderProps = {
   statusLabel: string;
   postureLabel?: string;
@@ -528,6 +559,8 @@ export function DecisionCallHeader({
             <p className="mt-1 text-sm font-semibold">{guardrail}</p>
           </div>
         </div>
+
+        <SignalStrip indicators={regimeSignalIndicators} />
 
         <section className="space-y-1" aria-label="Signal micro read">
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Signal micro-read (context only)</p>
