@@ -152,6 +152,7 @@ describe("buildReportEvidenceItems", () => {
     const items = buildReportEvidenceItems({
       reportDynamics,
       assessment: makeAssessment({ tightness: 45, riskAppetite: 55, baseRate: 4.5, curveSlope: 0.2 }),
+      lastUpdated: "2025-02-01",
     });
 
     const curveSlopeItem = items.find((item) => item.key === "curveSlope");
