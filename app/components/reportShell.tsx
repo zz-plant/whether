@@ -251,7 +251,12 @@ export function CommandCenterNavBlock({
           {exportCta ? <a href={exportCta.href} className="weather-cta weather-cta-export w-full sm:w-auto">{exportCta.label}</a> : null}
         </div>
         {nextStep ? <p className="text-xs font-semibold tracking-[0.1em] text-slate-300">Next step: <a href={nextStep.href} className="text-sky-200 underline decoration-slate-500/80 underline-offset-4">{nextStep.description}</a></p> : null}
-        <p className="weather-surface inline-flex min-h-[44px] flex-wrap items-center gap-x-2 px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100"><span>Posture {statusLabel}</span><span className="text-slate-400">·</span><span>Confidence {trustStatusLabel}</span><span className="text-slate-400">·</span><span>Updated {fetchedAtLabel}</span><span className="text-slate-400">·</span><span>Next refresh {resolvedNextRefreshLabel}</span></p>
+        <dl className="weather-surface weather-meta-list min-h-[44px] px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100" aria-label="Current report status">
+          <div className="weather-meta-list__item"><dt className="text-slate-400">Posture</dt><dd>{statusLabel}</dd></div>
+          <div className="weather-meta-list__item"><dt className="text-slate-400">Confidence</dt><dd>{trustStatusLabel}</dd></div>
+          <div className="weather-meta-list__item"><dt className="text-slate-400">Updated</dt><dd>{fetchedAtLabel}</dd></div>
+          <div className="weather-meta-list__item"><dt className="text-slate-400">Next refresh</dt><dd>{resolvedNextRefreshLabel}</dd></div>
+        </dl>
         <p className="text-sm text-slate-200">{trustStatusAction}</p>
         {showOfflineBadge ? <p className="weather-chip inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.14em] text-amber-100">{offlineBadgeLabel}</p> : null}
       </section>
