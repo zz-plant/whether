@@ -218,7 +218,10 @@ const buildActionNowShort = ({
 };
 
 const buildGuidanceBundleFromAssessment = (assessment: ReturnType<typeof evaluateRegime>) => {
-  const { playbook, startItems, stopItems } = getPlaybookGuidance(assessment.regime);
+  const { playbook, startItems, stopItems } = getPlaybookGuidance(assessment.regime, {
+    thresholds: assessment.thresholds,
+    scores: assessment.scores,
+  });
   const actionStripItems = buildActionStripItems(
     buildCanonicalBoundedDecisionRules({
       regime: assessment.regime,

@@ -3,7 +3,7 @@
  */
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { getPlaybookForRegime } from "../lib/playbook";
+import { getPlaybookForRegime, getPlaybookGuidance } from "../lib/playbook";
 import { buildCanonicalBoundedDecisionRules } from "../lib/report/boundedDecisionRules";
 import { buildRoleAwareOperatingTemplates } from "../lib/report/operatingCalls";
 
@@ -30,4 +30,17 @@ it("builds role-aware templates with bounded do/avoid/flip structure", () => {
   assert.match(templates[0]?.avoidNow ?? "", /tightness|risk appetite/i);
   assert.match(templates[0]?.flipTrigger ?? "", /tightness|risk appetite/i);
   assert.equal(templates[1]?.role, "vc-partner");
+});
+
+
+it("derives operating levers from canonical bounded rules with assessment context", () => {
+  const guidance = getPlaybookGuidance("DEFENSIVE", {
+    thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
+    scores: { tightness: 74, riskAppetite: 46 },
+  });
+
+  const hiringLever = guidance.operatingLevers.find((item) => item.lever === "hiring-stance");
+  assert.match(hiringLever?.actionNow ?? "", /Backfills \+ mission-critical hiring only/i);
+  assert.match(hiringLever?.triggerThreshold ?? "", /tightness > 76/i);
+  assert.match(hiringLever?.reversalCondition ?? "", /tightness < 66/i);
 });
