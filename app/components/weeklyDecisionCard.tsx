@@ -1,4 +1,6 @@
-import type { ReactNode } from "react";
+"use client";
+
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { CircleTargetIcon, ShieldIcon } from "./uiIcons";
 import { CompactDisclosure } from "./compactDisclosure";
@@ -7,7 +9,7 @@ import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules"
 import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
 import type { ActionStripItem, RoleAwareOperatingTemplate } from "../../lib/report/operatingCalls";
 import type { ForecastRegimeLabel, TransitionVelocityEstimate } from "../../lib/report/forecastModel";
-import type { DecisionMatrixPayload } from "../../lib/report/homeBriefModel";
+import type { DecisionMatrixPayload, StartupVariantPolicy } from "../../lib/report/homeBriefModel";
 import { formatProbabilityPercent } from "../../lib/report/reportFormatting";
 import {
   buildWeeklyCitationMetaLine,
@@ -77,6 +79,7 @@ export type WeeklyDecisionCardProps = {
   transitionProbabilities: Record<ForecastRegimeLabel, number>;
   decisionRules: BoundedDecisionRule[];
   decisionMatrix?: DecisionMatrixPayload;
+  startupVariantPolicy?: StartupVariantPolicy;
   actionStripItems?: ActionStripItem[];
   roleAwareTemplates: RoleAwareOperatingTemplate[];
   executiveOperationalStance: { expand: string[]; avoid: string[] };
@@ -813,6 +816,7 @@ const ConfidenceMiniChart = ({
 
 type BoundedRulesMatrixProps = {
   decisionMatrix?: DecisionMatrixPayload;
+  startupVariantPolicy?: StartupVariantPolicy;
   decisionRules?: BoundedDecisionRule[];
 };
 
@@ -1111,6 +1115,7 @@ export function WeeklyDecisionCard({
   transitionProbabilities,
   decisionRules,
   decisionMatrix,
+  startupVariantPolicy,
   actionStripItems: _actionStripItems = [],
   roleAwareTemplates,
   revisitDecisions,
@@ -1159,9 +1164,71 @@ export function WeeklyDecisionCard({
   const trustWarningCopy = isFallbackSnapshot
     ? "Using a cached snapshot. Use this call for near-term pacing only and pause irreversible decisions until live refresh returns."
     : "Use this call for near-term pacing only until confidence returns to HIGH with fresh data.";
-  const doNowBullets = buildRoleTemplateBullets({ roleAwareTemplates, field: "doNow" });
-  const avoidBullets = buildRoleTemplateBullets({ roleAwareTemplates, field: "avoidNow" });
-  const watchBullets = buildWatchBullets({ regimeDistance, regimeVelocity });
+  const resolvedStartupVariantPolicy = startupVariantPolicy ?? {
+    selectedMode: "series-a",
+    options: [
+      { mode: "seed", label: "Seed" },
+      { mode: "series-a", label: "Series A" },
+      { mode: "series-b", label: "Series B" },
+      { mode: "bootstrapped", label: "Bootstrapped" },
+    ],
+    adjustmentsByMode: {
+      seed: {
+        mode: "seed",
+        label: "Seed",
+        description: "Protect runway while preserving rapid proof loops.",
+        doNowAdjustments: ["Prioritize experiments that can prove customer pull inside one sprint."],
+        avoidAdjustments: ["Avoid bundling multiple irreversible hires before one milestone clears."],
+        watchAdjustments: ["Runway trigger: tighten immediately when boundary distance compresses."],
+        thresholdEmphasis: "Emphasize runway and evidence cadence over growth breadth.",
+        reversalTriggerDiscipline: "Reverse to faster hiring only after improving reads and shipped traction proof.",
+      },
+      "series-a": {
+        mode: "series-a",
+        label: "Series A",
+        description: "Balance growth tempo with repeatability proof.",
+        doNowAdjustments: ["Scale only where activation and retention targets are tracking."],
+        avoidAdjustments: ["Avoid parallel expansion programs that obscure payback accountability."],
+        watchAdjustments: ["Payback trigger: revisit if boundary distance narrows."],
+        thresholdEmphasis: "Emphasize payback windows and repeatable pipeline conversion.",
+        reversalTriggerDiscipline: "Reverse to aggressive expansion only after trigger clears and conversion quality holds.",
+      },
+      "series-b": {
+        mode: "series-b",
+        label: "Series B",
+        description: "Protect operating leverage while preserving selective scale lanes.",
+        doNowAdjustments: ["Concentrate approvals on lanes with measurable efficiency lift."],
+        avoidAdjustments: ["Avoid fixed-cost expansions that assume forward multiple recovery."],
+        watchAdjustments: ["Leverage trigger: hold expansion when boundary distance compresses."],
+        thresholdEmphasis: "Emphasize efficiency lift and margin durability before headcount scale.",
+        reversalTriggerDiscipline: "Reverse to broader scaling only when both boundaries clear resume bands.",
+      },
+      bootstrapped: {
+        mode: "bootstrapped",
+        label: "Bootstrapped",
+        description: "Maximize cash durability and compounding customer value.",
+        doNowAdjustments: ["Prioritize self-funded growth loops with near-term cash payback."],
+        avoidAdjustments: ["Avoid commitments that require external financing to finish."],
+        watchAdjustments: ["Cash trigger: tighten spend when either boundary narrows."],
+        thresholdEmphasis: "Emphasize cash conversion and reversible commitments over growth optics.",
+        reversalTriggerDiscipline: "Reverse to higher spend only after cash payback proof holds across weekly reads.",
+      },
+    },
+  } satisfies StartupVariantPolicy;
+  const [selectedVariantMode, setSelectedVariantMode] = useState(resolvedStartupVariantPolicy.selectedMode);
+  const scopedAdjustment = resolvedStartupVariantPolicy.adjustmentsByMode[selectedVariantMode];
+  const doNowBullets = [
+    ...buildRoleTemplateBullets({ roleAwareTemplates, field: "doNow" }),
+    ...scopedAdjustment.doNowAdjustments,
+  ].slice(0, 5);
+  const avoidBullets = [
+    ...buildRoleTemplateBullets({ roleAwareTemplates, field: "avoidNow" }),
+    ...scopedAdjustment.avoidAdjustments,
+  ].slice(0, 5);
+  const watchBullets = [
+    ...buildWatchBullets({ regimeDistance, regimeVelocity }),
+    ...scopedAdjustment.watchAdjustments,
+  ].slice(0, 5);
   const decisionDeltaStripItems = buildDecisionDeltaStripItems({
     weeklyMemoLines,
     immediateDecision,
@@ -1226,6 +1293,23 @@ export function WeeklyDecisionCard({
           <article id="weekly-call-core" className={`${tierOnePanel} weather-motion-card ${sectionSpacing} bg-gradient-to-br from-slate-950/95 via-slate-900/85 to-slate-950/95`}>
             <h2 className={tierOneHeading}>This week&apos;s call</h2>
             <p className="text-xs text-slate-300">Whether does not predict markets; it tells founders how to operate inside them this week.</p>
+            <div className={`${tierOneInset} space-y-2`}>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">Company mode</p>
+              <div className="flex flex-wrap gap-2">
+                {resolvedStartupVariantPolicy.options.map((option) => (
+                  <button
+                    key={option.mode}
+                    type="button"
+                    onClick={() => setSelectedVariantMode(option.mode)}
+                    className={`min-h-[44px] rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.06em] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation ${selectedVariantMode === option.mode ? "border-sky-400/70 bg-sky-500/20 text-sky-100" : "border-slate-700/70 bg-slate-950/70 text-slate-300 hover:border-slate-500/80"}`}
+                    aria-pressed={selectedVariantMode === option.mode}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs text-slate-300">{scopedAdjustment.description} Threshold emphasis: {scopedAdjustment.thresholdEmphasis}</p>
+            </div>
             <div className="grid gap-2.5 sm:grid-cols-2">
               <div className={`${tierOneInset} space-y-1.5 border-emerald-500/35 bg-emerald-500/5`}>
                 <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald-200">DO NOW</p>
@@ -1245,6 +1329,7 @@ export function WeeklyDecisionCard({
               <ul className="space-y-1 text-xs text-sky-100">
                 {watchBullets.map((bullet) => <li key={`watch-${bullet}`}>• {bullet}</li>)}
               </ul>
+              <p className="text-xs text-sky-100/90">Reversal discipline: {scopedAdjustment.reversalTriggerDiscipline}</p>
             </div>
           </article>
 

@@ -263,3 +263,40 @@ Track adoption signals tied to ritualization:
 Homepage weekly brief and answer pages now share one canonical bounded-rule policy model (`lib/report/boundedDecisionRules.ts`). `buildHomeBriefModel` exposes `decisionRules` and `revisitDecisions`; `/` renders the weekly artifact view, and `/answers/[slug]` maps relevant decision areas into direct-answer pages with shared pause/resume triggers and citation continuity.
 
 - Canonical bounded rules now include threshold-aware pause/resume triggers (risk appetite + tightness) and power both homepage cards and /answers page recommendations.
+
+### Startup variant selector contract (homepage weekly call)
+
+To preserve semantic consistency while allowing company-stage tuning, the weekly call card includes a non-routing selector with four modes:
+
+- `Seed`
+- `Series A`
+- `Series B`
+- `Bootstrapped`
+
+Implementation scope:
+
+- Data shaping and mode payload construction live in `lib/report/homeBriefModel.ts`.
+- Bounded mode adjustments and reversal-trigger discipline live in `lib/report/boundedDecisionRules.ts`.
+- Rendering and mode interaction live in `app/components/weeklyDecisionCard.tsx`.
+
+Behavior contract:
+
+- The selector must not create a route change or new page.
+- Mode changes are translation-only and must not alter:
+  - regime classification,
+  - confidence label,
+  - baseline boundary thresholds.
+- Mode changes may adjust only:
+  - `Do now` bullets,
+  - `Avoid` bullets,
+  - `Watch` bullets,
+  - threshold emphasis language,
+  - reversal-trigger discipline text.
+
+Drift guardrails:
+
+- Each mode must provide explicit bounded language for both:
+  - action emphasis (`doNowAdjustments` / `avoidAdjustments` / `watchAdjustments`), and
+  - reversal condition discipline (`reversalTriggerDiscipline`).
+- Reversal language should remain trigger-based (clear condition + resume rule), not narrative advice.
+- If mode copy changes, update both the bounded rules source and this contract in the same PR.

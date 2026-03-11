@@ -32,7 +32,13 @@ import {
   type FailureModeWarning,
 } from "./trustStatus";
 import { buildWeeklyLockCommitment } from "./decisionKnobs";
-import type { BoundedDecisionRule } from "./boundedDecisionRules";
+import {
+  buildScopedVariantDecisionAdjustment,
+  startupVariantModes,
+  type BoundedDecisionRule,
+  type ScopedVariantDecisionAdjustment,
+  type StartupVariantMode,
+} from "./boundedDecisionRules";
 import type { ActionStripItem, RoleAwareOperatingTemplate } from "./operatingCalls";
 import type { TimeMachineRegimeEntry } from "../timeMachine/timeMachineCache";
 
@@ -158,6 +164,14 @@ export type DecisionMatrixRow = {
 export type DecisionMatrixPayload = {
   columns: Array<{ key: DecisionMatrixColumnKey; label: string }>;
   rows: DecisionMatrixRow[];
+};
+
+export type StartupVariantOption = { mode: StartupVariantMode; label: string };
+
+export type StartupVariantPolicy = {
+  selectedMode: StartupVariantMode;
+  options: StartupVariantOption[];
+  adjustmentsByMode: Record<StartupVariantMode, ScopedVariantDecisionAdjustment>;
 };
 
 type ExecutiveOperationalStance = {
@@ -803,7 +817,7 @@ const buildPrimaryRiskLabel = ({
 
 export const buildHomeBriefModel = (
   data: HomeReportData,
-  options?: { overlaySector?: SectorKey },
+  options?: { overlaySector?: SectorKey; startupVariantMode?: StartupVariantMode },
 ) => {
   const {
     assessment,
@@ -824,6 +838,7 @@ export const buildHomeBriefModel = (
     flipThreshold,
   } = data;
   const overlaySector = options?.overlaySector ?? "b2b-saas";
+  const startupVariantMode = options?.startupVariantMode ?? "series-a";
   const previousRegime = regimeAlert?.previousRegime;
   const severityDelta = previousRegime
     ? REGIME_SEVERITY_RANK[assessment.regime] - REGIME_SEVERITY_RANK[previousRegime]
@@ -956,6 +971,16 @@ export const buildHomeBriefModel = (
     thresholds: assessment.thresholds,
     scores: assessment.scores,
   });
+  const startupVariantPolicy: StartupVariantPolicy = {
+    selectedMode: startupVariantMode,
+    options: startupVariantModes,
+    adjustmentsByMode: {
+      seed: buildScopedVariantDecisionAdjustment({ mode: "seed", thresholds: assessment.thresholds, scores: assessment.scores }),
+      "series-a": buildScopedVariantDecisionAdjustment({ mode: "series-a", thresholds: assessment.thresholds, scores: assessment.scores }),
+      "series-b": buildScopedVariantDecisionAdjustment({ mode: "series-b", thresholds: assessment.thresholds, scores: assessment.scores }),
+      bootstrapped: buildScopedVariantDecisionAdjustment({ mode: "bootstrapped", thresholds: assessment.thresholds, scores: assessment.scores }),
+    },
+  };
   const roleAwareTemplates = buildRoleAwareOperatingTemplates(decisionRules);
   const actionStripItems: ActionStripItem[] = buildActionStripItems(decisionRules);
   const executiveOperationalStance = extractExecutiveOperationalStance({ roleAwareTemplates, decisionRules });
@@ -1028,6 +1053,7 @@ export const buildHomeBriefModel = (
       Defensive: 25,
     },
     decisionRules,
+    startupVariantPolicy,
     decisionMatrix,
     actionStripItems,
     roleAwareTemplates,
