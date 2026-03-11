@@ -21,6 +21,18 @@ export const REGIME_SHORT_LABELS: Record<RegimeKey, string> = {
   EXPANSION: "Expansion",
 };
 
+export const REGIME_LEGEND_LABELS: Record<RegimeKey, string> = {
+  SCARCITY: REGIME_SHORT_LABELS.SCARCITY,
+  DEFENSIVE: REGIME_SHORT_LABELS.DEFENSIVE,
+  VOLATILE: REGIME_SHORT_LABELS.VOLATILE,
+  EXPANSION: REGIME_SHORT_LABELS.EXPANSION,
+};
+
+export const getOrderedRegimeLegend = () => REGIME_ORDER.map((regime) => ({
+  regime,
+  label: REGIME_LEGEND_LABELS[regime],
+}));
+
 export const REGIME_SEVERITY_RANK: Record<RegimeKey, number> = {
   EXPANSION: 0,
   VOLATILE: 1,

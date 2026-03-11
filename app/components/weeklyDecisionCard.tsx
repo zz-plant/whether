@@ -7,8 +7,10 @@ import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules"
 import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
 import type { ActionStripItem, RoleAwareOperatingTemplate } from "../../lib/report/operatingCalls";
 import type { ForecastRegimeLabel, TransitionVelocityEstimate } from "../../lib/report/forecastModel";
+import type { RegimeKey } from "../../lib/regimeEngine";
 import type { DecisionMatrixPayload } from "../../lib/report/homeBriefModel";
 import { formatProbabilityPercent } from "../../lib/report/reportFormatting";
+import { getOrderedRegimeLegend } from "../../lib/regimePresentation";
 import {
   buildWeeklyCitationMetaLine,
   buildCompactTrustSummary,
@@ -36,6 +38,7 @@ type DecisionDeltaStripItem = {
 
 export type WeeklyDecisionCardProps = {
   statusLabel: string;
+  regimeKey: RegimeKey;
   postureLabel: string;
   stageLabel: string;
   postureWithStageLabel?: string;
@@ -677,6 +680,7 @@ export function DecisionCallHeader({
 
 type RegimeBannerProps = {
   statusLabel: string;
+  regimeKey: RegimeKey;
   postureLabel?: string;
   stageLabel?: string;
   postureWithStageLabel?: string;
@@ -706,6 +710,34 @@ const resolveRegimeTone = (label: string) => {
   return "border-slate-500/75 bg-slate-900/85 text-slate-100";
 };
 
+function RegimeLegend({ activeRegime }: { activeRegime: RegimeKey }) {
+  const legendItems = getOrderedRegimeLegend();
+
+  return (
+    <div className="mt-3 rounded-lg border border-slate-700/70 bg-slate-950/75 px-3 py-2.5" aria-label="Regime legend">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300">Regime spectrum</p>
+      <ol className="mt-2 flex flex-wrap items-center gap-1.5 sm:flex-nowrap" aria-label="Ordered regime states">
+        {legendItems.map((item, index) => {
+          const active = item.regime === activeRegime;
+          return (
+            <li key={item.regime} className="inline-flex items-center gap-1.5">
+              <span
+                className={`rounded-full border px-2.5 py-0.5 text-[11px] font-semibold whitespace-nowrap ${active
+                  ? "border-sky-300/80 bg-sky-400/20 text-sky-100 shadow-[0_0_0_1px_rgba(125,211,252,0.25)]"
+                  : "border-slate-600/70 bg-slate-900/85 text-slate-300"}`}
+                aria-current={active ? "step" : undefined}
+              >
+                {item.label}
+              </span>
+              {index < legendItems.length - 1 ? <span className="text-slate-500" aria-hidden="true">→</span> : null}
+            </li>
+          );
+        })}
+      </ol>
+    </div>
+  );
+}
+
 const formatFlipTriggerLine = (regimeDistance?: WeeklyDecisionCardProps["regimeDistance"]) => {
   if (!regimeDistance) {
     return "Next flip trigger: watch weekly threshold movement updates.";
@@ -718,6 +750,7 @@ const formatFlipTriggerLine = (regimeDistance?: WeeklyDecisionCardProps["regimeD
 
 function RegimeBanner({
   statusLabel,
+  regimeKey,
   postureLabel,
   stageLabel,
   postureWithStageLabel,
@@ -743,7 +776,7 @@ function RegimeBanner({
   const bannerTone = resolveRegimeTone(resolvedPostureLabel);
 
   return (
-    <header className={`sticky top-2 z-10 rounded-xl border p-4 shadow-lg backdrop-blur sm:p-5 ${bannerTone}`} data-testid="weekly-regime-banner" aria-label="Weekly regime banner">
+    <header className={`sticky top-2 z-10 rounded-2xl border px-5 py-5 shadow-[0_24px_54px_rgba(2,6,23,0.5)] backdrop-blur sm:px-6 sm:py-6 ${bannerTone}`} data-testid="weekly-regime-banner" aria-label="Weekly regime banner">
       <p className="text-[11px] font-semibold uppercase tracking-[0.13em]">REGIME — WEEK OF {recordDateLabel}</p>
       <div id="weekly-posture-brief-title" className="mt-1 space-y-0.5">
         <p className="text-2xl font-semibold sm:text-3xl">Regime: {resolvedPostureLabel}</p>
@@ -756,8 +789,9 @@ function RegimeBanner({
         <span className="px-1.5" aria-hidden="true">·</span>
         <span>Flip Risk {flipRiskValue}</span>
       </p>
-      <p className="mt-2 text-sm font-semibold leading-5">{operatingLine}</p>
-      <p className="mt-1 text-xs leading-5">{formatFlipTriggerLine(regimeDistance)}</p>
+      <RegimeLegend activeRegime={regimeKey} />
+      <p className="mt-2 text-sm leading-tight font-semibold sm:text-base sm:leading-5">{operatingLine}</p>
+      <p className="mt-1 text-xs leading-6 text-slate-100">{formatFlipTriggerLine(regimeDistance)}</p>
     </header>
   );
 }
@@ -1085,6 +1119,7 @@ export function CitationActionFooter({ citationMetaLine, citation, actions }: Ci
 
 export function WeeklyDecisionCard({
   statusLabel,
+  regimeKey,
   postureLabel,
   stageLabel,
   postureWithStageLabel,
@@ -1175,6 +1210,7 @@ export function WeeklyDecisionCard({
     <section className="weather-panel space-y-3 px-4 py-5 sm:space-y-4 sm:px-6 sm:py-6" aria-labelledby="weekly-posture-brief-title">
       <RegimeBanner
         statusLabel={statusLabel}
+        regimeKey={regimeKey}
         postureLabel={postureLabel}
         stageLabel={stageLabel}
         postureWithStageLabel={postureWithStageLabel}
@@ -1187,7 +1223,7 @@ export function WeeklyDecisionCard({
         regimeDistance={regimeDistance}
       />
 
-      <article className={`${tierOnePanel} ${sectionSpacing}`} aria-label="Since last review">
+      <article className={`${tierOnePanel} ${sectionSpacing} rounded-2xl border border-slate-700/75 bg-gradient-to-br from-slate-950/95 via-slate-950/88 to-slate-900/92`} aria-label="Since last review">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className={tierOneHeading}>Since last review</h2>
           <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-300">Decision delta</p>
@@ -1203,7 +1239,7 @@ export function WeeklyDecisionCard({
           ))}
         </ul>
         {actions ? (
-          <div className="rounded-lg border border-sky-400/40 bg-sky-500/10 p-2.5" aria-label="Share this week's call">
+          <div className="rounded-xl border border-sky-400/45 bg-gradient-to-r from-sky-600/18 via-sky-500/12 to-slate-950/35 p-3" aria-label="Share this week's call">
             <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-sky-100">Share this week&apos;s call</p>
             <div className="mt-2">{actions}</div>
           </div>
