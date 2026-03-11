@@ -125,8 +125,9 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /Capital tightness/);
     assert.match(html, /Regime panel/);
     assert.match(html, /This week&#x27;s call/);
-    assert.match(html, /Do now/);
-    assert.match(html, /Avoid/);
+    assert.match(html, /DO NOW/);
+    assert.match(html, /AVOID/);
+    assert.match(html, /WATCH/);
     assert.match(html, /Inspect evidence/);
     assert.match(html, /Regime history/);
     assert.match(html, /id="primary-artifact-actions"/);
@@ -316,6 +317,99 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.equal((html.match(/This week&#x27;s call/g) ?? []).length, 1);
     assert.doesNotMatch(html, /Copy weekly operator brief/);
     assert.match(html, /weather-panel space-y-4 px-4 py-5/);
+  });
+
+  it("dedupes and caps DO NOW/AVOID bullets while keeping WATCH concise", () => {
+    const html = renderToStaticMarkup(
+      <WeeklyDecisionCard
+        statusLabel="DEFENSIVE"
+        postureLabel="Defensive"
+        stageLabel="Watchful"
+        postureWithStageLabel="Defensive — Watchful"
+        postureDelta="Worse than last week"
+        confidenceLabel="MED"
+        confidencePercent={68}
+        signalConfidenceReason="Reason: regime boundary proximity + volatile macro signals"
+        regimeHeader={{
+          regime: "Defensive",
+          confidence: "Medium",
+          primaryRisk: "Downside risk.",
+        }}
+        trendLabel="Improving"
+        regimeSignalIndicators={[]}
+        transitionWatch="ON"
+        operatingStanceLine="Stage decisions."
+        weeklyMemoLines={[]}
+        netConstraintSummary="Pressure remains elevated but stabilizing."
+        guardrail="Hold irreversible hiring unless direct revenue impact is clear."
+        reversalTrigger="If risk appetite rises above 55, reopen selective hiring."
+        recordDateLabel="Mar 5, 2026"
+        fetchedAtLabel="Mar 6, 2026 09:12 UTC"
+        reportDynamics={reportDynamics}
+        decisionShiftSummary="Decision delta"
+        transitionProbabilities={{ Expansion: 10, Mixed: 35, Scarcity: 40, Defensive: 15 }}
+        decisionRules={decisionRules}
+        roleAwareTemplates={[
+          {
+            role: "startup-leadership",
+            roleLabel: "Startup leadership",
+            doNow: "Protect runway; protect runway; keep delivery focused; tighten scope; sequence launches; preserve optionality;",
+            avoidNow: "Pause speculative hiring.; pause speculative hiring.; lock in long-payback spend.;",
+            flipTrigger: "Resume staged expansion when tightness and risk appetite recover.",
+          },
+          {
+            role: "vc-partner",
+            roleLabel: "VC partner",
+            doNow: "Keep delivery focused; preserve optionality; improve proof loops;",
+            avoidNow: "Lock in long-payback spend.; overcommit to expansion.;",
+            flipTrigger: "Reopen growth pacing after two improving reads.",
+          },
+        ]}
+        executiveOperationalStance={{
+          expand: ["Increase product tempo for reversible bets"],
+          avoid: ["net-new hiring if tightness > 74"],
+        }}
+        revisitDecisions={true}
+        weeklyMovement={{ score: 1.2, direction: "defensive", summary: "summary" }}
+        memoryRail={[{ label: "Now", posture: "Defensive" }]}
+        historicalTimeline={[{ label: "2026", posture: "Defensive" }]}
+        historicalAnalogs={[]}
+        macroOverlay={[]}
+        whyThisCall={[]}
+        evidenceItems={[]}
+        startupClimateIndex={{ score: 63, status: "Improving", breakdown: [{ label: "Capital availability", score: 71 }] }}
+        regimeDistance={{
+          dimensionLabel: "Tightness",
+          currentValue: 64,
+          thresholdValue: 70,
+          pointsToFlip: 6,
+          dimensionKey: "tightness",
+          thresholdDirection: "riseAbove",
+        }}
+        regimeVelocity={{
+          status: "ok",
+          from: "Expansion",
+          to: "Mixed",
+          sampleSize: 4,
+          lowerBoundMonths: 3,
+          upperBoundMonths: 6,
+          typicalRangeLabel: "3–6 months",
+          displayLabel: "Expansion→Mixed typically 3–6 months",
+        }}
+        citation="Whether weekly brief citation"
+      />,
+    );
+
+    const callCore = html.slice(html.indexOf('id="weekly-call-core"'), html.indexOf('id="decision-snapshot-for-leadership-this-week"'));
+
+    assert.match(callCore, /DO NOW/);
+    assert.match(callCore, /AVOID/);
+    assert.match(callCore, /WATCH/);
+    assert.ok((callCore.match(/<li/g) ?? []).length <= 12);
+    assert.equal((callCore.match(/Protect runway/g) ?? []).length, 1);
+    assert.equal((callCore.match(/Pause speculative hiring/g) ?? []).length, 1);
+    assert.match(callCore, /Tightness rises above 70\.0 \(6\.0 pts away\)/);
+    assert.match(callCore, /Expansion→Mixed can flip in 3–6 months/);
   });
 
 });
