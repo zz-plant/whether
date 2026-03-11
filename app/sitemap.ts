@@ -119,10 +119,7 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     { path: "/solutions/market-regime-playbook", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.7 },
     { path: "/solutions/product-roadmapping", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.7 },
     { path: "/solutions/engineering-capacity", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.7 },
-    { path: "/learn", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.72 },
-    { path: "/learn/concepts", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.66 },
-    { path: "/learn/failure-modes", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.66 },
-    { path: "/should-we-hire-engineers-right-now", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.8 },
+                { path: "/should-we-hire-engineers-right-now", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.8 },
     { path: "/should-startups-slow-roadmap-expansion", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.78 },
     { path: "/is-it-risk-on-or-risk-off-for-startups", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.8 },
     { path: "/startup-funding-climate-this-week", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.8 },
@@ -132,7 +129,8 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     { path: "/startup-market-outlook", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.78 },
     { path: "/startup-macro-posture", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.84 },
     { path: "/startup-macro-posture/index", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.8 },
-    { path: "/library/failure-modes", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.75 },
+    { path: "/learn", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.75 },
+    { path: "/learn/failure-modes", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.72 },
     { path: "/concepts", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.75 },
     { path: "/about", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.45 },
     { path: "/terms-of-service", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },
@@ -168,7 +166,7 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
   }));
 
   const failureModeEntries: SitemapEntryDescriptor[] = failureModes.map((slug) => ({
-    path: `/library/failure-modes/${slug}`,
+    path: `/learn/failure-modes/${slug}`,
     lastModified: staticContentLastModified,
     changeFrequency: "monthly",
     priority: 0.65,

@@ -75,7 +75,7 @@ export const buildSearchIndex = (): SearchEntity[] => {
     id: `failure-mode-${failureMode.slug}`,
     type: "failure-mode",
     title: failureMode.title,
-    href: `/library/failure-modes/${formatFailureModeSlug(failureMode.slug)}`,
+    href: `/learn/failure-modes/${formatFailureModeSlug(failureMode.slug)}`,
     summary: failureMode.summary,
     intentLabel: "Diagnose risk pattern",
     keywords: [failureMode.trigger, ...failureMode.symptoms, ...failureMode.firstMoves],

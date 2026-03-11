@@ -59,8 +59,10 @@ describe("sitemap", () => {
     }
 
     for (const mode of failureModes) {
-      assert.ok(urls.has(`${siteUrl}/library/failure-modes/${mode}`));
+      assert.ok(urls.has(`${siteUrl}/learn/failure-modes/${mode}`));
     }
+
+    assert.ok(!urls.has(`${siteUrl}/library/failure-modes`));
 
     for (const article of productConceptArticles) {
       assert.ok(urls.has(`${siteUrl}/concepts/${article.slug}`));

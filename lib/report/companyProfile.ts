@@ -168,7 +168,10 @@ export const buildCompanyAdjustedRules = ({
   profile?: Partial<CompanyProfile>;
 }): CompanyAdjustedRule[] => {
   const resolvedProfile = resolveCompanyProfile(profile);
-  const playbook = getPlaybookGuidance(assessment.regime);
+  const playbook = getPlaybookGuidance(assessment.regime, {
+    thresholds: assessment.thresholds,
+    scores: assessment.scores,
+  });
   const runwayPlan = buildRunwayPlanFromRequest(
     {
       runway: runwayMonthsByBand[resolvedProfile.runwayBand],

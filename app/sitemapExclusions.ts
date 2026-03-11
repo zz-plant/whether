@@ -2,7 +2,6 @@ export const redirectOnlySitemapPaths = [
   "/guides",
   "/solutions",
   "/learn/concepts",
-  "/learn/failure-modes",
   "/operate",
   "/templates",
   "/toolkit",
