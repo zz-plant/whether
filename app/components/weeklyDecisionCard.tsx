@@ -1341,21 +1341,27 @@ export function WeeklyDecisionCard({
             <PostureHistoryTimeline historicalTimeline={recentTimeline} />
           </article>
 
-          <details id="decision-snapshot-for-leadership-this-week" className={`${tierOnePanel} ${sectionSpacing} group`}>
-            <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
-              <span>Decision snapshot matrix (expand)</span>
-              <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
-            </summary>
-            <div className="mt-3"><BoundedRulesMatrix decisionMatrix={decisionMatrix} decisionRules={decisionRules} /></div>
-          </details>
+          <article className={`${tierTwoPanel} ${sectionSpacing}`} aria-label="Need deeper analysis">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 className={tierTwoHeading}>Need deeper analysis?</h2>
+              <p className="text-[11px] uppercase tracking-[0.1em] text-slate-400">Optional depth</p>
+            </div>
+            <p className="text-xs text-slate-300">Open diagnostics only when you need proof detail, role-level execution plans, or model input context.</p>
 
-          <details id="execution-guidance" className={`${tierOnePanel} ${sectionSpacing} group`}>
-            <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
-              <span>Execution plan by role (expand)</span>
-              <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
-            </summary>
-            <div className="mt-3">
-              <div className="mt-2 grid gap-3 sm:grid-cols-2">
+            <details id="decision-snapshot-for-leadership-this-week" className="group">
+              <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
+                <span>Open diagnostics: decision snapshot matrix</span>
+                <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
+              </summary>
+              <div className="mt-3"><BoundedRulesMatrix decisionMatrix={decisionMatrix} decisionRules={decisionRules} /></div>
+            </details>
+
+            <details id="execution-guidance" className="group">
+              <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
+                <span>Open diagnostics: role plan</span>
+                <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
+              </summary>
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
                 {roleAwareTemplates.map((template) => (
                   <article key={template.role} className={`${tierOneInset} space-y-2`}>
                     <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-200">{template.roleLabel}</p>
@@ -1365,51 +1371,52 @@ export function WeeklyDecisionCard({
                   </article>
                 ))}
               </div>
-            </div>
-          </details>
+            </details>
+
+            <CompactDisclosure
+              id="evidence-diagnostics"
+              className={`${tierThreePanel} ${compactSectionSpacing} group`}
+              summaryClassName={disclosureSummaryClass}
+              summary="Open diagnostics: evidence, drivers, and model inputs"
+            >
+              <article className={compactInset}>
+                <p className={`text-xs ${neutralLabel}`}>Evidence</p>
+                <ul className="mt-1 space-y-1 text-xs text-slate-200">
+                  {evidenceItems.map((item) => (
+                    <li key={`evidence-${item.key}`}>• {item.title}: {item.immediateImplication}</li>
+                  ))}
+                </ul>
+              </article>
+
+              <article className={`${compactInset} mt-2`}>
+                <p className={`text-xs ${neutralLabel}`}>Drivers</p>
+                <p className="mt-1 text-xs text-slate-300">Top contributors: {topContributorInline}</p>
+                <p className="mt-1 text-xs text-slate-300">Weekly movement: {conciseWeeklyMovement}</p>
+              </article>
+
+              <article className={`${compactInset} mt-2`}>
+                <p className={`text-xs ${neutralLabel}`}>Model inputs</p>
+                <p className="mt-1 text-xs text-slate-300">Decision thresholds are in the matrix above.</p>
+                <p className="mt-1 text-xs text-slate-300">Defensive probability: {formatProbabilityPercent(transitionProbabilities.Defensive)}</p>
+              </article>
+              {failureModes.length > 0 ? (
+                <article className={`${compactInset} mt-2`}>
+                  <p className={`text-xs ${neutralLabel}`}>False-signal warnings</p>
+                  <ul className="mt-1 space-y-1 text-xs text-slate-300">
+                    {failureModes.slice(0, 2).map((mode) => (
+                      <li key={mode.id}>• {mode.warning}</li>
+                    ))}
+                  </ul>
+                </article>
+              ) : null}
+            </CompactDisclosure>
+          </article>
 
         </main>
 
         <aside className="space-y-3 xl:col-span-4">
           <ConfidenceMiniChart confidenceHistory={confidenceHistory} confidenceTrend={confidenceTrend} />
 
-          <CompactDisclosure
-            id="evidence-diagnostics"
-            className={`${tierThreePanel} ${compactSectionSpacing} group`}
-            summaryClassName={disclosureSummaryClass}
-            summary="Why this call (expand)"
-          >
-            <article className={compactInset}>
-              <p className={`text-xs ${neutralLabel}`}>Evidence</p>
-              <ul className="mt-1 space-y-1 text-xs text-slate-200">
-                {evidenceItems.map((item) => (
-                  <li key={`evidence-${item.key}`}>• {item.title}: {item.immediateImplication}</li>
-                ))}
-              </ul>
-            </article>
-
-            <article className={`${compactInset} mt-2`}>
-              <p className={`text-xs ${neutralLabel}`}>Drivers</p>
-              <p className="mt-1 text-xs text-slate-300">Top contributors: {topContributorInline}</p>
-              <p className="mt-1 text-xs text-slate-300">Weekly movement: {conciseWeeklyMovement}</p>
-            </article>
-
-            <article className={`${compactInset} mt-2`}>
-              <p className={`text-xs ${neutralLabel}`}>Model inputs</p>
-              <p className="mt-1 text-xs text-slate-300">Decision thresholds are in the matrix above.</p>
-              <p className="mt-1 text-xs text-slate-300">Defensive probability: {formatProbabilityPercent(transitionProbabilities.Defensive)}</p>
-            </article>
-            {failureModes.length > 0 ? (
-              <article className={`${compactInset} mt-2`}>
-                <p className={`text-xs ${neutralLabel}`}>False-signal warnings</p>
-                <ul className="mt-1 space-y-1 text-xs text-slate-300">
-                  {failureModes.slice(0, 2).map((mode) => (
-                    <li key={mode.id}>• {mode.warning}</li>
-                  ))}
-                </ul>
-              </article>
-            ) : null}
-          </CompactDisclosure>
         </aside>
       </div>
 
