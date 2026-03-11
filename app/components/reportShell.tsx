@@ -27,6 +27,7 @@ import { NavigationOrientationBadge } from "./navigationOrientationBadge";
 import { ClimateBackdrop } from "./climateBackdrop";
 import { RegimeIconType } from "./regimeIcons";
 import { ArrowRightIcon } from "./uiIcons";
+import { RegimeCommandBar, type RegimeCommandBarProps } from "./RegimeCommandBar";
 
 type ReportCtaProps = { href: string; label: string; copyText?: string; copyTarget?: string };
 type SecondaryCtaProps = { href: string; label: string };
@@ -95,6 +96,7 @@ type ReportShellProps = {
   nextRefreshLabel?: string;
   inlineTrustPlacement?: "before-content" | "after-first-section";
   provenance?: DataProvenance;
+  commandBar?: RegimeCommandBarProps;
 };
 
 export const resolveTrustProvenance = ({
@@ -337,6 +339,7 @@ export const ReportShell = ({
   nextRefreshLabel,
   inlineTrustPlacement = "before-content",
   provenance,
+  commandBar,
 }: ReportShellProps) => {
   const resolvedNextRefreshLabel = nextRefreshLabel ?? (trustStatusTone === "historical" ? "Fixed historical snapshot" : "15m cadence");
   const contentSections = Children.toArray(children);
@@ -384,6 +387,7 @@ export const ReportShell = ({
 
           {showPostureRibbon ? <div className="weather-panel-static mb-4 hidden flex-wrap items-center justify-between gap-2 border border-slate-700/70 px-4 py-2 text-xs sm:flex"><p className="text-slate-300">Current Posture: <span className="font-semibold text-slate-100">{statusLabel}</span><span className="ml-2 text-slate-400">Updated {recordDateLabel}</span></p><Link href="/" className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-[11px] font-semibold tracking-[0.14em]">Open weekly brief</Link></div> : null}
           {historicalBanner}
+          {commandBar ? <div className="mt-4"><RegimeCommandBar {...commandBar} /></div> : null}
 
           <div className={`mt-5 grid min-w-0 gap-5 ${hasSidebar ? "lg:grid-cols-[minmax(0,1fr),260px] lg:items-start" : ""}`}>
             {hasSidebar ? <aside className="order-2 space-y-4 lg:order-none lg:col-start-2 lg:row-start-1 lg:sticky lg:top-28 lg:self-start">{sectionLinks.length ? <ReportSectionNavigation sectionLinks={sectionLinks} className="hidden lg:block" /> : null}<HeroTrustProvenanceBlock trustStatusTone={trustStatusTone} trustStatusLabel={trustStatusLabel} trustStatusDetail={trustStatusDetail} trustStatusAction={trustStatusAction} statusLabel={statusLabel} fetchedAtLabel={fetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} provenance={provenance} /></aside> : null}

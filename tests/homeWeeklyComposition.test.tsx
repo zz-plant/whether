@@ -27,6 +27,7 @@ const decisionRules: BoundedDecisionRule[] = [
     scope: "",
     pauseTrigger: "Pause if tightness rises above 72.",
     resumeTrigger: "Resume if tightness falls below 64.",
+    flipConditions: [{ metric: "tightness", operator: "<", value: 64, label: "Tightness < 64" }],
     rationale: "",
   },
 ];

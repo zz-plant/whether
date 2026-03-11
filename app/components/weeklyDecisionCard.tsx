@@ -12,6 +12,7 @@ import type { RegimeKey } from "../../lib/regimeEngine";
 import type { DecisionMatrixPayload, StartupVariantPolicy } from "../../lib/report/homeBriefModel";
 import { formatProbabilityPercent } from "../../lib/report/reportFormatting";
 import { getOrderedRegimeLegend, REGIME_BANNER_TOKENS, REGIME_LEGEND_DESCRIPTORS, type RegimeBannerTone } from "../../lib/regimePresentation";
+import { formatDateUTC } from "../../lib/formatters";
 import {
   buildWeeklyCitationMetaLine,
   buildCompactTrustSummary,
@@ -74,6 +75,14 @@ export type WeeklyDecisionCardProps = {
   actionNowShort?: string;
   guardrailThreshold?: string;
   flipThreshold?: string;
+  compactFlipConditionLabels?: string[];
+  canonicalFlipConditions?: Array<{
+    area: BoundedDecisionRule["area"];
+    metric: "tightness" | "riskAppetite";
+    operator: ">" | ">=" | "<" | "<=";
+    value: number;
+    label: string;
+  }>;
   recordDateLabel: string;
   fetchedAtLabel: string;
   reportDynamics: ReportDynamics;
@@ -1028,6 +1037,7 @@ export function MoreContextDisclosureBody({
           {evidenceItems.map((item) => (
             <li key={item.key} className={`${compactInset} space-y-1.5 text-xs text-slate-200`}>
               <p className="font-semibold text-slate-100">{item.title}</p>
+              <p className="text-[11px] text-slate-400">Updated {item.lastUpdated ? formatDateUTC(item.lastUpdated) : "—"}</p>
               <ul className="space-y-1 text-[11px] text-slate-300">
                 {item.supportingBullets.slice(0, 3).map((bullet) => (
                   <li key={`${item.key}-${bullet}`}>• {bullet}</li>
@@ -1133,6 +1143,8 @@ export function WeeklyDecisionCard({
   actionNowShort,
   guardrailThreshold,
   flipThreshold,
+  compactFlipConditionLabels = [],
+  canonicalFlipConditions = [],
   recordDateLabel,
   fetchedAtLabel,
   reportDynamics,
@@ -1188,6 +1200,14 @@ export function WeeklyDecisionCard({
   const snapshotDoNow = immediateDecision;
   const snapshotAvoid = executiveOperationalStance.avoid[0] ?? guardrail;
   const snapshotWatch = flipThreshold ?? reversalTrigger;
+  const structuredFlipLabels = canonicalFlipConditions
+    .map((condition) => condition.label.trim())
+    .filter((label) => label.length > 0)
+    .filter((label, index, labels) => labels.indexOf(label) === index)
+    .slice(0, 4);
+  const effectiveFlipLabels = structuredFlipLabels.length > 0
+    ? structuredFlipLabels
+    : compactFlipConditionLabels.filter((label, index, labels) => labels.indexOf(label) === index).slice(0, 4);
 
   const needsTrustWarning = isFallbackSnapshot || confidenceLabel !== "HIGH" || freshnessLabel === "Unavailable";
   const trustWarningCopy = isFallbackSnapshot
@@ -1316,6 +1336,14 @@ export function WeeklyDecisionCard({
           <li className={compactInset}><span className="font-semibold uppercase tracking-[0.08em] text-rose-200">AVOID:</span> {snapshotAvoid}</li>
           <li className={compactInset}><span className="font-semibold uppercase tracking-[0.08em] text-sky-200">WATCH:</span> {snapshotWatch}</li>
         </ul>
+        <div className="mt-2 rounded-md border border-sky-500/25 bg-sky-500/5 px-2.5 py-2">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Flip conditions</p>
+          <ul className="mt-1 space-y-1 text-[11px] text-slate-100">
+            {(effectiveFlipLabels.length > 0 ? effectiveFlipLabels : [snapshotWatch]).map((condition) => (
+              <li key={`flip-condition-${condition}`}>• {condition}</li>
+            ))}
+          </ul>
+        </div>
       </article>
 
       <article className={`${tierOnePanel} ${sectionSpacing} rounded-2xl border border-slate-700/75 bg-gradient-to-br from-slate-950/95 via-slate-950/88 to-slate-900/92`} aria-label="Since last review">
@@ -1414,7 +1442,7 @@ export function WeeklyDecisionCard({
                 <p className={`text-xs ${neutralLabel}`}>Evidence</p>
                 <ul className="mt-1 space-y-1 text-xs text-slate-200">
                   {evidenceItems.map((item) => (
-                    <li key={`evidence-${item.key}`}>• {item.title}: {item.immediateImplication}</li>
+                    <li key={`evidence-${item.key}`}>• {item.title} (Updated {item.lastUpdated ? formatDateUTC(item.lastUpdated) : "—"}): {item.immediateImplication}</li>
                   ))}
                 </ul>
               </article>

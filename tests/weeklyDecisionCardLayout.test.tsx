@@ -25,6 +25,7 @@ const decisionRules: BoundedDecisionRule[] = [
     scope: "New headcount requires CFO review.",
     pauseTrigger: "Pause when tightness rises above 74.",
     resumeTrigger: "Resume when tightness falls below 65.",
+    flipConditions: [{ metric: "tightness", operator: "<", value: 65, label: "Tightness < 65" }],
     rationale: "Preserve fixed-cost discipline under pressure.",
   },
 ];

@@ -118,6 +118,8 @@ export default async function SignalsPage({
     startItems,
     statusLabel,
     stopItems,
+    actionNowShort,
+    flipThreshold,
     treasury,
     treasuryProvenance,
   } = reportData;
@@ -351,6 +353,19 @@ export default async function SignalsPage({
         evidenceHref: "#current-scores",
       }}
       decisionDiffs={[{ label: `Regime: ${regimeLabel}`, tone: "neutral" }]}
+      commandBar={{
+        regime: assessment.regime,
+        call: `${regimeLabel} posture remains active while signal thresholds hold.`,
+        doNow: [
+          actionNowShort,
+          startItems[0] ?? "Prioritize the highest-confidence start rule before changing posture.",
+        ],
+        flipConditions: [
+          flipThreshold,
+          stopItems[0] ?? "Pause irreversible commitments if confidence degrades.",
+        ],
+        updatedAt: fetchedAtLabel,
+      }}
       structuredData={structuredData}
       historicalBanner={
         historicalSelection ? (
