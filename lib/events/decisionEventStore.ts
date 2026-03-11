@@ -29,6 +29,21 @@ type ListSinceResult = {
   cursor: Cursor;
 };
 
+type CloudflareKvListResult = {
+  keys: Array<{ name: string }>;
+  list_complete: boolean;
+  cursor?: string;
+};
+
+export type CloudflareKvNamespaceLike = {
+  get(key: string): Promise<string | null>;
+  put(key: string, value: string): Promise<void>;
+  list(options?: { prefix?: string; cursor?: string; limit?: number }): Promise<CloudflareKvListResult>;
+};
+
+const EVENT_PREFIX = "decision-event:";
+const EVENT_INDEX_KEY = "decision-event:index";
+
 const clone = <T>(value: T): T => {
   if (typeof structuredClone === "function") {
     return structuredClone(value);
@@ -51,25 +66,83 @@ const freeze = <T>(value: T): T => {
   return value;
 };
 
+const toEventKey = (index: number) => `${EVENT_PREFIX}${String(index).padStart(12, "0")}`;
+
+const parseEventIndex = (key: string) => {
+  if (!key.startsWith(EVENT_PREFIX)) {
+    return null;
+  }
+  const parsed = Number.parseInt(key.slice(EVENT_PREFIX.length), 10);
+  return Number.isNaN(parsed) ? null : parsed;
+};
+
+const parseCursorIndex = (cursor: Cursor) => {
+  if (!cursor) {
+    return -1;
+  }
+  const parsed = Number.parseInt(cursor, 10);
+  return Number.isNaN(parsed) ? -1 : parsed;
+};
+
+const isRegimeDecisionEvent = (value: unknown): value is RegimeDecisionEvent => {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+  const event = value as Partial<RegimeDecisionEvent>;
+  return event.type === "RegimeDecisionEvent" && typeof event.id === "string";
+};
+
+const sortByOccurredAtThenId = (left: RegimeDecisionEvent, right: RegimeDecisionEvent) => {
+  const occurredCompare = left.occurredAt.localeCompare(right.occurredAt);
+  if (occurredCompare !== 0) {
+    return occurredCompare;
+  }
+  return left.id.localeCompare(right.id);
+};
+
 export class DecisionEventStore {
   private readonly events: RegimeDecisionEvent[] = [];
+  private persistQueue: Promise<void> = Promise.resolve();
+
+  constructor(private readonly cloudflareKv: CloudflareKvNamespaceLike | null = null) {}
 
   append(event: RegimeDecisionEvent): RegimeDecisionEvent {
     const next = freeze(clone(event));
     this.events.push(next);
+
+    if (this.cloudflareKv) {
+      this.persistQueue = this.persistQueue
+        .then(async () => {
+          const currentIndexRaw = await this.cloudflareKv?.get(EVENT_INDEX_KEY);
+          const currentIndex = currentIndexRaw ? Number.parseInt(currentIndexRaw, 10) : -1;
+          const nextIndex = Number.isNaN(currentIndex) ? 0 : currentIndex + 1;
+          await this.cloudflareKv?.put(toEventKey(nextIndex), JSON.stringify(next));
+          await this.cloudflareKv?.put(EVENT_INDEX_KEY, String(nextIndex));
+        })
+        .catch(() => {
+          // Non-fatal persistence fallback: keep in-memory event stream available.
+        });
+    }
+
     return clone(next);
   }
 
-  listSince(cursor: Cursor): ListSinceResult {
-    const startIndex = cursor ? Number.parseInt(cursor, 10) + 1 : 0;
-    const safeStart = Number.isNaN(startIndex) ? 0 : Math.max(0, startIndex);
-    const sliced = this.events.slice(safeStart).map((event) => clone(event));
-    const nextCursor = this.events.length > 0 ? `${this.events.length - 1}` : null;
+  async whenDurableFlushCompletes() {
+    await this.persistQueue;
+  }
 
-    return {
-      events: sliced,
-      cursor: nextCursor,
-    };
+  async listSince(cursor: Cursor): Promise<ListSinceResult> {
+    const inMemory = this.listSinceInMemory(cursor);
+    if (!this.cloudflareKv) {
+      return inMemory;
+    }
+
+    await this.whenDurableFlushCompletes();
+    const durable = await this.listSinceDurable(cursor);
+    if (durable.events.length === 0) {
+      return inMemory;
+    }
+    return durable;
   }
 
   replay(initialState: RegimeKey, events: RegimeDecisionEvent[]): RegimeKey {
@@ -85,6 +158,69 @@ export class DecisionEventStore {
 
   clear() {
     this.events.length = 0;
+  }
+
+  private listSinceInMemory(cursor: Cursor): ListSinceResult {
+    const startIndex = parseCursorIndex(cursor) + 1;
+    const safeStart = Math.max(0, startIndex);
+    const sliced = this.events.slice(safeStart).map((event) => clone(event));
+    const nextCursor = this.events.length > 0 ? `${this.events.length - 1}` : cursor;
+
+    return {
+      events: sliced,
+      cursor: nextCursor,
+    };
+  }
+
+  private async listSinceDurable(cursor: Cursor): Promise<ListSinceResult> {
+    if (!this.cloudflareKv) {
+      return this.listSinceInMemory(cursor);
+    }
+
+    const thresholdIndex = parseCursorIndex(cursor);
+    const collected: Array<{ index: number; event: RegimeDecisionEvent }> = [];
+    let listCursor: string | undefined;
+
+    do {
+      const page = await this.cloudflareKv.list({
+        prefix: EVENT_PREFIX,
+        cursor: listCursor,
+        limit: 1000,
+      });
+
+      for (const key of page.keys) {
+        const index = parseEventIndex(key.name);
+        if (index === null || index <= thresholdIndex) {
+          continue;
+        }
+
+        const raw = await this.cloudflareKv.get(key.name);
+        if (!raw) {
+          continue;
+        }
+
+        const parsed = JSON.parse(raw) as unknown;
+        if (!isRegimeDecisionEvent(parsed)) {
+          continue;
+        }
+
+        collected.push({ index, event: parsed });
+      }
+
+      listCursor = page.cursor;
+      if (page.list_complete) {
+        break;
+      }
+    } while (listCursor);
+
+    collected.sort((left, right) => left.index - right.index);
+    const events = collected.map(({ event }) => clone(event));
+    const nextCursor = collected.length > 0 ? `${collected[collected.length - 1]?.index ?? thresholdIndex}` : cursor;
+
+    return {
+      events,
+      cursor: nextCursor,
+    };
   }
 }
 
@@ -158,16 +294,36 @@ export const buildRegimeDecisionEvent = ({
   transitionReason,
 });
 
+const getCloudflareKvBinding = () => {
+  const maybeBinding = (globalThis as { DECISION_EVENTS_KV?: CloudflareKvNamespaceLike }).DECISION_EVENTS_KV;
+  if (!maybeBinding) {
+    return null;
+  }
+
+  if (
+    typeof maybeBinding.get !== "function" ||
+    typeof maybeBinding.put !== "function" ||
+    typeof maybeBinding.list !== "function"
+  ) {
+    return null;
+  }
+
+  return maybeBinding;
+};
+
 let sharedDecisionEventStore: DecisionEventStore | null = null;
 
 export const getDecisionEventStore = () => {
   if (!sharedDecisionEventStore) {
-    sharedDecisionEventStore = new DecisionEventStore();
+    sharedDecisionEventStore = new DecisionEventStore(getCloudflareKvBinding());
   }
   return sharedDecisionEventStore;
 };
 
 export const resetDecisionEventStore = () => {
-  sharedDecisionEventStore = new DecisionEventStore();
+  sharedDecisionEventStore = new DecisionEventStore(getCloudflareKvBinding());
   return sharedDecisionEventStore;
 };
+
+export const sortRegimeDecisionEvents = (events: RegimeDecisionEvent[]) =>
+  [...events].sort(sortByOccurredAtThenId);

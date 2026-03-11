@@ -1,7 +1,7 @@
 import { getDecisionEventStore, type RegimeDecisionEvent } from "../../../lib/events/decisionEventStore";
 import type { RegimeKey } from "../../../lib/regimeEngine";
 
-export const runtime = "nodejs";
+export const runtime = "edge";
 export const revalidate = 0;
 
 const parseLimit = (value: string | null) => {
@@ -37,7 +37,7 @@ export async function GET(request: { nextUrl?: URL; url?: string }) {
   const initialState = toRegimeKey(params.get("initialState"));
 
   const store = getDecisionEventStore();
-  const listed = store.listSince(cursor);
+  const listed = await store.listSince(cursor);
   const events = listed.events.slice(0, limit);
   const baseIndex = cursor ? Number.parseInt(cursor, 10) + 1 : 0;
   const nextCursor = events.length > 0 ? `${baseIndex + events.length - 1}` : cursor;

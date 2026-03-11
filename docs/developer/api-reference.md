@@ -41,6 +41,7 @@ Whether exposes read-first JSON endpoints for weekly posture transmission, caden
 | --- | --- | --- |
 | `/api/regime-alerts` | GET, POST | Read/create regime alert events. |
 | `/api/weekly-digest` | GET | Build digest summary from stored alert events. |
+| `/api/decision-events` | GET | Retrieve regime transition decision events with cursor pagination and optional replay support (`replay=1&initialState=<REGIME>`). |
 | `/api/integrations/weekly-mandate?target=<slack|email|...>` | GET | Destination-specific weekly mandate payload. |
 
 ### D2) Premium billing readiness
@@ -94,7 +95,8 @@ Dropping these fields weakens traceability and makes cross-run comparisons britt
 
 ## Data durability note
 
-Alert preferences, alerts, and delivery events currently use process-memory store semantics. For production-grade durable history, persist these events in external storage.
+- Decision transition events (`/api/decision-events`) support durable persistence on Cloudflare when the `DECISION_EVENTS_KV` binding is configured; otherwise they fall back to process-memory semantics.
+- Alert preferences, alerts, and delivery events still use process-memory store semantics. For production-grade durable history, persist these events in external storage.
 
 ## Regime and posture taxonomy
 
