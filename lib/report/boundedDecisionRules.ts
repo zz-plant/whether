@@ -13,6 +13,19 @@ export type BoundedDecisionRule = {
   rationale: string;
 };
 
+export type StartupVariantMode = "seed" | "series-a" | "series-b" | "bootstrapped";
+
+export type ScopedVariantDecisionAdjustment = {
+  mode: StartupVariantMode;
+  label: string;
+  description: string;
+  doNowAdjustments: string[];
+  avoidAdjustments: string[];
+  watchAdjustments: string[];
+  thresholdEmphasis: string;
+  reversalTriggerDiscipline: string;
+};
+
 type RuleContext = {
   regime: RegimeKey;
   thresholds: {
@@ -135,3 +148,95 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
 export const formatActionStripThresholdText = (rule: Pick<BoundedDecisionRule, "pauseTrigger">) => rule.pauseTrigger;
 
 export const formatActionStripReversalText = (rule: Pick<BoundedDecisionRule, "resumeTrigger">) => rule.resumeTrigger;
+
+export const startupVariantModes: Array<{ mode: StartupVariantMode; label: string }> = [
+  { mode: "seed", label: "Seed" },
+  { mode: "series-a", label: "Series A" },
+  { mode: "series-b", label: "Series B" },
+  { mode: "bootstrapped", label: "Bootstrapped" },
+];
+
+export const buildScopedVariantDecisionAdjustment = ({
+  mode,
+  thresholds,
+  scores,
+}: Pick<RuleContext, "thresholds" | "scores"> & { mode: StartupVariantMode }): ScopedVariantDecisionAdjustment => {
+  const riskGap = Math.abs(scores.riskAppetite - thresholds.riskAppetiteRegime).toFixed(1);
+  const tightnessGap = Math.abs(scores.tightness - thresholds.tightnessRegime).toFixed(1);
+
+  if (mode === "seed") {
+    return {
+      mode,
+      label: "Seed",
+      description: "Protect runway while preserving rapid proof loops.",
+      doNowAdjustments: [
+        "Prioritize experiments that can prove customer pull inside one sprint.",
+        "Keep hiring decisions tied to milestone unlocks or direct revenue coverage.",
+      ],
+      avoidAdjustments: [
+        "Avoid bundling multiple irreversible hires before one milestone clears.",
+      ],
+      watchAdjustments: [
+        `Runway trigger: tighten immediately if tightness gap compresses below ${tightnessGap} points for 2 reads.`,
+      ],
+      thresholdEmphasis: "Emphasize runway and evidence cadence over growth breadth.",
+      reversalTriggerDiscipline: "Reverse to faster hiring only after two consecutive improving reads and one shipped traction milestone.",
+    };
+  }
+
+  if (mode === "series-a") {
+    return {
+      mode,
+      label: "Series A",
+      description: "Balance growth tempo with repeatability proof.",
+      doNowAdjustments: [
+        "Scale GTM and product bets only where activation and retention targets are tracking.",
+      ],
+      avoidAdjustments: [
+        "Avoid parallel expansion programs that obscure payback accountability.",
+      ],
+      watchAdjustments: [
+        `Payback trigger: revisit plan if risk appetite gap moves inside ${riskGap} points.`,
+      ],
+      thresholdEmphasis: "Emphasize payback windows and repeatable pipeline conversion.",
+      reversalTriggerDiscipline: "Reverse to aggressive expansion only after trigger clears and conversion quality remains stable for two weekly reviews.",
+    };
+  }
+
+  if (mode === "series-b") {
+    return {
+      mode,
+      label: "Series B",
+      description: "Protect operating leverage while preserving selective scale lanes.",
+      doNowAdjustments: [
+        "Concentrate approvals on lanes with measurable margin or efficiency lift this quarter.",
+      ],
+      avoidAdjustments: [
+        "Avoid fixed-cost expansions that assume forward multiple recovery.",
+      ],
+      watchAdjustments: [
+        `Leverage trigger: hold expansion if tightness rises within ${tightnessGap} points of the boundary.`,
+      ],
+      thresholdEmphasis: "Emphasize efficiency lift and margin durability before headcount scale.",
+      reversalTriggerDiscipline: "Reverse to broader scaling only when both risk appetite and tightness clear their resume bands in the same week.",
+    };
+  }
+
+  return {
+    mode,
+    label: "Bootstrapped",
+    description: "Maximize cash durability and compounding customer value.",
+    doNowAdjustments: [
+      "Prioritize self-funded growth loops with near-term cash payback.",
+      "Sequence investments so each tranche can be paused without operational breakage.",
+    ],
+    avoidAdjustments: [
+      "Avoid commitments that require external financing to finish.",
+    ],
+    watchAdjustments: [
+      `Cash trigger: tighten spend if either boundary sits within ${Math.min(Number(riskGap), Number(tightnessGap)).toFixed(1)} points.`,
+    ],
+    thresholdEmphasis: "Emphasize cash conversion and reversible commitments over growth optics.",
+    reversalTriggerDiscipline: "Reverse to higher spend only after cash payback proof holds for two consecutive weekly reads.",
+  };
+};

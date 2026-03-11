@@ -134,6 +134,11 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /DO NOW/);
     assert.match(html, /AVOID/);
     assert.match(html, /WATCH/);
+    assert.match(html, /Company mode/);
+    assert.match(html, /Seed/);
+    assert.match(html, /Series A/);
+    assert.match(html, /Series B/);
+    assert.match(html, /Bootstrapped/);
     assert.match(html, /Inspect evidence/);
     assert.match(html, /Regime history/);
     assert.match(html, /id="primary-artifact-actions"/);
