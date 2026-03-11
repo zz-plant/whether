@@ -27,6 +27,12 @@ describe("WeeklyDecisionCard extracted sections", () => {
           primaryRisk: "Downside: Capital tightness tightened (1.0).",
         }}
         trendLabel="Mixed"
+        regimeSignalIndicators={[
+          { key: "tightness", label: "Capital tightness", valueLabel: "64", rawValue: 64, trendArrow: "↑", trendDeltaLabel: "+1.0 vs last week", sparkline: [62, 63, 64], isFallback: false },
+          { key: "riskAppetite", label: "Risk appetite", valueLabel: "49", rawValue: 49, trendArrow: "↓", trendDeltaLabel: "-1.0 vs last week", sparkline: [51, 50, 49], isFallback: false },
+          { key: "baseRate", label: "Base rate", valueLabel: "5.3", rawValue: 5.3, trendArrow: "→", trendDeltaLabel: "No weekly delta", sparkline: [5.3], isFallback: true },
+          { key: "curveSlope", label: "Yield curve slope", valueLabel: "-0.2", rawValue: -0.2, trendArrow: "↑", trendDeltaLabel: "+0.1 vs last week", sparkline: [-0.3, -0.2], isFallback: false },
+        ]}
         transitionWatch="ON"
         operatingStanceLine="Stage decisions. Avoid irreversible spend."
         weeklyMemoLines={["Market conditions tightened this week.", "Stage decisions. Avoid irreversible spend.", "Regime shift watch is on: stage approvals and preserve runway."]}
@@ -87,6 +93,12 @@ describe("WeeklyDecisionCard extracted sections", () => {
           primaryRisk: "Downside: Capital tightness tightened (1.0).",
         }}
         trendLabel="Mixed"
+        regimeSignalIndicators={[
+          { key: "tightness", label: "Capital tightness", valueLabel: "64", rawValue: 64, trendArrow: "↑", trendDeltaLabel: "+1.0 vs last week", sparkline: [62, 63, 64], isFallback: false },
+          { key: "riskAppetite", label: "Risk appetite", valueLabel: "49", rawValue: 49, trendArrow: "↓", trendDeltaLabel: "-1.0 vs last week", sparkline: [51, 50, 49], isFallback: false },
+          { key: "baseRate", label: "Base rate", valueLabel: "5.3", rawValue: 5.3, trendArrow: "→", trendDeltaLabel: "No weekly delta", sparkline: [5.3], isFallback: true },
+          { key: "curveSlope", label: "Yield curve slope", valueLabel: "-0.2", rawValue: -0.2, trendArrow: "↑", trendDeltaLabel: "+0.1 vs last week", sparkline: [-0.3, -0.2], isFallback: false },
+        ]}
         transitionWatch="ON"
         operatingStanceLine="Stage decisions. Avoid irreversible spend."
         weeklyMemoLines={["Market conditions tightened this week.", "Stage decisions. Avoid irreversible spend.", "Regime shift watch is on: stage approvals and preserve runway."]}
@@ -134,6 +146,12 @@ describe("WeeklyDecisionCard extracted sections", () => {
           primaryRisk: "Downside: Capital tightness tightened (1.0).",
         }}
         trendLabel="Mixed"
+        regimeSignalIndicators={[
+          { key: "tightness", label: "Capital tightness", valueLabel: "64", rawValue: 64, trendArrow: "↑", trendDeltaLabel: "+1.0 vs last week", sparkline: [62, 63, 64], isFallback: false },
+          { key: "riskAppetite", label: "Risk appetite", valueLabel: "49", rawValue: 49, trendArrow: "↓", trendDeltaLabel: "-1.0 vs last week", sparkline: [51, 50, 49], isFallback: false },
+          { key: "baseRate", label: "Base rate", valueLabel: "5.3", rawValue: 5.3, trendArrow: "→", trendDeltaLabel: "No weekly delta", sparkline: [5.3], isFallback: true },
+          { key: "curveSlope", label: "Yield curve slope", valueLabel: "-0.2", rawValue: -0.2, trendArrow: "↑", trendDeltaLabel: "+0.1 vs last week", sparkline: [-0.3, -0.2], isFallback: false },
+        ]}
         transitionWatch="ON"
         operatingStanceLine="Stage decisions. Avoid irreversible spend."
         weeklyMemoLines={["Market conditions tightened this week.", "Stage decisions. Avoid irreversible spend.", "Regime shift watch is on: stage approvals and preserve runway."]}
