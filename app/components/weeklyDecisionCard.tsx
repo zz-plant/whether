@@ -1,12 +1,11 @@
-"use client";
-
-import { useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { CircleTargetIcon, ShieldIcon } from "./uiIcons";
 import { CompactDisclosure } from "./compactDisclosure";
 import type { ConfidenceTrendFraming, ReportDynamics, ReportEvidenceItem, WeeklyConfidencePoint } from "../../lib/report/reportData";
 import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
-import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
+import { decisionAreaLabel, type StartupVariantMode } from "../../lib/report/boundedDecisionRules";
+import { StartupModeSelector } from "./startupModeSelector";
 import type { ActionStripItem, RoleAwareOperatingTemplate } from "../../lib/report/operatingCalls";
 import type { ForecastRegimeLabel, TransitionVelocityEstimate } from "../../lib/report/forecastModel";
 import type { DecisionMatrixPayload, StartupVariantPolicy } from "../../lib/report/homeBriefModel";
@@ -1215,20 +1214,38 @@ export function WeeklyDecisionCard({
       },
     },
   } satisfies StartupVariantPolicy;
-  const [selectedVariantMode, setSelectedVariantMode] = useState(resolvedStartupVariantPolicy.selectedMode);
-  const scopedAdjustment = resolvedStartupVariantPolicy.adjustmentsByMode[selectedVariantMode];
-  const doNowBullets = [
-    ...buildRoleTemplateBullets({ roleAwareTemplates, field: "doNow" }),
-    ...scopedAdjustment.doNowAdjustments,
-  ].slice(0, 5);
-  const avoidBullets = [
-    ...buildRoleTemplateBullets({ roleAwareTemplates, field: "avoidNow" }),
-    ...scopedAdjustment.avoidAdjustments,
-  ].slice(0, 5);
-  const watchBullets = [
-    ...buildWatchBullets({ regimeDistance, regimeVelocity }),
-    ...scopedAdjustment.watchAdjustments,
-  ].slice(0, 5);
+  const modeContentByMode = Object.fromEntries(
+    resolvedStartupVariantPolicy.options.map((option) => {
+      const scopedAdjustment = resolvedStartupVariantPolicy.adjustmentsByMode[option.mode];
+      return [
+        option.mode,
+        {
+          description: scopedAdjustment.description,
+          thresholdEmphasis: scopedAdjustment.thresholdEmphasis,
+          doNowBullets: [
+            ...buildRoleTemplateBullets({ roleAwareTemplates, field: "doNow" }),
+            ...scopedAdjustment.doNowAdjustments,
+          ].slice(0, 5),
+          avoidBullets: [
+            ...buildRoleTemplateBullets({ roleAwareTemplates, field: "avoidNow" }),
+            ...scopedAdjustment.avoidAdjustments,
+          ].slice(0, 5),
+          watchBullets: [
+            ...buildWatchBullets({ regimeDistance, regimeVelocity }),
+            ...scopedAdjustment.watchAdjustments,
+          ].slice(0, 5),
+          reversalTriggerDiscipline: scopedAdjustment.reversalTriggerDiscipline,
+        },
+      ];
+    }),
+  ) as Record<StartupVariantMode, {
+    description: string;
+    thresholdEmphasis: string;
+    doNowBullets: string[];
+    avoidBullets: string[];
+    watchBullets: string[];
+    reversalTriggerDiscipline: string;
+  }>;
   const decisionDeltaStripItems = buildDecisionDeltaStripItems({
     weeklyMemoLines,
     immediateDecision,
@@ -1293,44 +1310,11 @@ export function WeeklyDecisionCard({
           <article id="weekly-call-core" className={`${tierOnePanel} weather-motion-card ${sectionSpacing} bg-gradient-to-br from-slate-950/95 via-slate-900/85 to-slate-950/95`}>
             <h2 className={tierOneHeading}>This week&apos;s call</h2>
             <p className="text-xs text-slate-300">Whether does not predict markets; it tells founders how to operate inside them this week.</p>
-            <div className={`${tierOneInset} space-y-2`}>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">Company mode</p>
-              <div className="flex flex-wrap gap-2">
-                {resolvedStartupVariantPolicy.options.map((option) => (
-                  <button
-                    key={option.mode}
-                    type="button"
-                    onClick={() => setSelectedVariantMode(option.mode)}
-                    className={`min-h-[44px] rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.06em] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation ${selectedVariantMode === option.mode ? "border-sky-400/70 bg-sky-500/20 text-sky-100" : "border-slate-700/70 bg-slate-950/70 text-slate-300 hover:border-slate-500/80"}`}
-                    aria-pressed={selectedVariantMode === option.mode}
-                  >
-                    {option.label}
-                  </button>
-                ))}
-              </div>
-              <p className="text-xs text-slate-300">{scopedAdjustment.description} Threshold emphasis: {scopedAdjustment.thresholdEmphasis}</p>
-            </div>
-            <div className="grid gap-2.5 sm:grid-cols-2">
-              <div className={`${tierOneInset} space-y-1.5 border-emerald-500/35 bg-emerald-500/5`}>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald-200">DO NOW</p>
-                <ul className="space-y-1 text-xs text-emerald-100">
-                  {doNowBullets.map((bullet) => <li key={`do-${bullet}`}>• {bullet}</li>)}
-                </ul>
-              </div>
-              <div className={`${tierOneInset} space-y-1.5 border-rose-500/35 bg-rose-500/5`}>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-rose-200">AVOID</p>
-                <ul className="space-y-1 text-xs text-rose-100">
-                  {avoidBullets.map((bullet) => <li key={`avoid-${bullet}`}>• {bullet}</li>)}
-                </ul>
-              </div>
-            </div>
-            <div className={`${tierOneInset} space-y-1.5 border-sky-500/35 bg-sky-500/5`}>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">WATCH</p>
-              <ul className="space-y-1 text-xs text-sky-100">
-                {watchBullets.map((bullet) => <li key={`watch-${bullet}`}>• {bullet}</li>)}
-              </ul>
-              <p className="text-xs text-sky-100/90">Reversal discipline: {scopedAdjustment.reversalTriggerDiscipline}</p>
-            </div>
+            <StartupModeSelector
+              options={resolvedStartupVariantPolicy.options}
+              selectedMode={resolvedStartupVariantPolicy.selectedMode}
+              contentByMode={modeContentByMode}
+            />
           </article>
 
           <article className={`${tierOnePanel} ${sectionSpacing}`}>

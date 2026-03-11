@@ -277,7 +277,7 @@ Implementation scope:
 
 - Data shaping and mode payload construction live in `lib/report/homeBriefModel.ts`.
 - Bounded mode adjustments and reversal-trigger discipline live in `lib/report/boundedDecisionRules.ts`.
-- Rendering and mode interaction live in `app/components/weeklyDecisionCard.tsx`.
+- Server rendering for the weekly artifact lives in `app/components/weeklyDecisionCard.tsx`; mode-chip interactivity lives in `app/components/startupModeSelector.tsx`.
 
 Behavior contract:
 
