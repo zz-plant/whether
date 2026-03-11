@@ -48,19 +48,19 @@ const connectedPages = [
 
 const boundedCapacityRules = [
   {
-    action: "Freeze net-new headcount unless the role unblocks contracted delivery.",
-    trigger: "Apply when tightness breaches the current regime threshold.",
-    reversal: "Resume planned hiring after two weekly briefs show improving momentum.",
+    action: "Hold new hiring unless a role unblocks committed delivery.",
+    trigger: "Use this when tightness moves above its threshold.",
+    reversal: "Resume planned hiring after two improving weekly briefs.",
   },
   {
-    action: "Reallocate 10-20% of sprint capacity into reliability and churn-defense work.",
-    trigger: "Apply when risk appetite drops below threshold or when revisit decisions is ON.",
-    reversal: "Shift capacity back to expansion once risk appetite clears threshold for a full month.",
+    action: "Shift 10–20% of sprint capacity to reliability and churn defense.",
+    trigger: "Use this when risk appetite drops below threshold or review decisions is ON.",
+    reversal: "Shift capacity back to expansion after one month above the risk threshold.",
   },
   {
-    action: "Publish a weekly delivery risk log with pause/resume ownership by function lead.",
-    trigger: "Apply in mixed momentum weeks to avoid silent scope creep.",
-    reversal: "Move to biweekly governance when momentum returns stable and no key thresholds are near flips.",
+    action: "Publish a weekly delivery risk log with clear owners for pause/resume calls.",
+    trigger: "Use this in mixed weeks to prevent silent scope creep.",
+    reversal: "Return to biweekly governance once momentum is stable and thresholds are not close to flipping.",
   },
 ] as const;
 
@@ -69,25 +69,24 @@ export default async function EngineeringCapacityPage() {
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
       <section className="weather-panel space-y-4 px-6 py-6">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-          Engineering operating posture
+          Engineering planning in this market
         </p>
         <h1 className="max-w-3xl text-2xl font-semibold text-slate-100 sm:text-3xl">
-          Macro signals for engineering capacity planning.
+          How to plan engineering capacity with the latest market signals.
         </h1>
         <p className="max-w-3xl text-sm text-slate-300 sm:text-base">
-          Whether helps engineering leaders convert Treasury-driven market signals into clear
-          staffing, sequencing, and delivery risk decisions.
+          Use this page to make clear staffing and scope calls without losing delivery control.
         </p>
       </section>
 
 
       <SeoPostureSnapshot
         route="/solutions/engineering-capacity"
-        immediateImplication="Set staffing and scope around cash preservation first, then increase delivery aggression only when momentum and confidence hold."
+        immediateImplication="Protect cash and reliability first, then speed up only when momentum and confidence stay strong."
       />
 
       <section className="weather-panel space-y-4 px-6 py-6">
-        <h2 className="text-xl font-semibold text-slate-100">Capacity checklist by market regime</h2>
+        <h2 className="text-xl font-semibold text-slate-100">Capacity checklist for this week</h2>
         <ul className="space-y-2 text-sm text-slate-200">
           {capacityChecks.map((check) => (
             <li key={check} className="weather-surface px-4 py-3">
@@ -98,7 +97,7 @@ export default async function EngineeringCapacityPage() {
       </section>
 
       <section className="weather-panel space-y-4 px-6 py-6">
-        <h2 className="text-xl font-semibold text-slate-100">Bounded engineering decisions</h2>
+        <h2 className="text-xl font-semibold text-slate-100">Engineering rules for this week</h2>
         <div className="grid gap-3 sm:grid-cols-3">
           {boundedCapacityRules.map((rule) => (
             <article key={rule.action} className="weather-surface space-y-2 px-4 py-4 text-sm">
@@ -111,10 +110,9 @@ export default async function EngineeringCapacityPage() {
       </section>
 
       <section className="weather-panel space-y-4 px-6 py-6">
-        <h2 className="text-xl font-semibold text-slate-100">Recommended workflow</h2>
+        <h2 className="text-xl font-semibold text-slate-100">How to use this in your weekly workflow</h2>
         <p className="text-sm text-slate-300">
-          Start in Signals to verify trend direction and thresholds, then move into Operations to
-          assign owners and execution horizons.
+          Start in Signals to confirm direction and thresholds, then move to Operations to assign owners and timing.
         </p>
         <div className="flex flex-wrap gap-3">
           <Link
@@ -133,7 +131,7 @@ export default async function EngineeringCapacityPage() {
       </section>
 
       <section className="weather-panel space-y-4 px-6 py-6">
-        <h2 className="text-xl font-semibold text-slate-100">Connect this page to the rest of Whether</h2>
+        <h2 className="text-xl font-semibold text-slate-100">Related pages</h2>
         <div className="grid gap-3 sm:grid-cols-3">
           {connectedPages.map((page) => (
             <article key={page.href} className="weather-surface flex h-full flex-col gap-3 px-4 py-4">

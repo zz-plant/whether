@@ -23,23 +23,23 @@ const regimeRows = [
   {
     regime: "High stress",
     guidance:
-      "Protect cash and delivery reliability first. Delay discretionary expansion bets until confidence improves.",
-    trigger: "Activate when tightness is above threshold or risk appetite is below threshold.",
-    reversal: "Re-open expansion pilots after two improving weekly reads.",
+      "Protect cash and delivery reliability first. Delay optional expansion bets.",
+    trigger: "Use this when tightness is above threshold or risk appetite is below threshold.",
+    reversal: "Re-open expansion pilots after two improving weekly briefs.",
   },
   {
     regime: "Moderate stress",
     guidance:
-      "Balance efficiency with selective growth. Gate larger initiatives behind tighter milestone review.",
-    trigger: "Activate when momentum is mixed and transition watch remains ON.",
-    reversal: "Resume normal planning cadence after momentum stabilizes for a full month.",
+      "Balance efficiency with selective growth. Gate larger initiatives with tighter milestone checks.",
+    trigger: "Use this when momentum is mixed and transition watch is ON.",
+    reversal: "Return to normal planning cadence after one stable month.",
   },
   {
     regime: "Low stress",
     guidance:
-      "Increase growth cadence while preserving risk controls on hiring and strategic commitments.",
-    trigger: "Activate when risk appetite stays above threshold with stable or improving momentum.",
-    reversal: "Return to moderate-stress playbook immediately if either threshold nears flip range.",
+      "Increase growth pace while keeping hiring and strategic risk controls in place.",
+    trigger: "Use this when risk appetite stays above threshold and momentum is stable or improving.",
+    reversal: "Switch back to the moderate-stress playbook if either threshold nears a flip.",
   },
 ] as const;
 
@@ -69,24 +69,23 @@ export default async function MarketRegimePlaybookPage() {
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
       <section className="weather-panel space-y-4 px-6 py-6">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-          Regime-aware strategy
+          Leadership playbook by market posture
         </p>
         <h1 className="max-w-3xl text-2xl font-semibold text-slate-100 sm:text-3xl">
-          Market regime operations playbook for leadership teams.
+          How leadership teams should operate in the current market posture.
         </h1>
         <p className="max-w-3xl text-sm text-slate-300 sm:text-base">
-          Use this framework to match product, engineering, and finance decisions to current market
-          stress and confidence levels.
+          Use these rules to align product, engineering, and finance decisions to this week’s posture.
         </p>
       </section>
 
       <SeoPostureSnapshot
         route="/solutions/market-regime-playbook"
-        immediateImplication="Run cross-functional plans off the current weekly posture so hiring, spend, and roadmap calls share one reversible operating baseline."
+        immediateImplication="Anchor hiring, spend, and roadmap calls to one shared weekly posture so teams can move together and reverse quickly if needed."
       />
 
       <section className="weather-panel space-y-4 px-6 py-6">
-        <h2 className="text-xl font-semibold text-slate-100">Operating moves by regime</h2>
+        <h2 className="text-xl font-semibold text-slate-100">Operating rules by regime</h2>
         <div className="space-y-3">
           {regimeRows.map((row) => (
             <article key={row.regime} className="weather-surface space-y-2 px-4 py-4">
@@ -100,17 +99,16 @@ export default async function MarketRegimePlaybookPage() {
       </section>
 
       <section className="weather-panel space-y-4 px-6 py-6">
-        <h2 className="text-xl font-semibold text-slate-100">Next steps</h2>
+        <h2 className="text-xl font-semibold text-slate-100">What to do next</h2>
         <p className="text-sm text-slate-300">
-          Confirm the current regime in the weekly briefing and pressure-test assumptions in
-          methodology before finalizing cross-functional plans.
+          Confirm the current regime in the weekly brief, then pressure-test assumptions in Method before finalizing plans.
         </p>
         <div className="flex flex-wrap gap-3">
           <Link
             href="/"
             className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
           >
-            Open weekly briefing
+            Open weekly brief
           </Link>
           <Link
             href="/method"
@@ -122,7 +120,7 @@ export default async function MarketRegimePlaybookPage() {
       </section>
 
       <section className="weather-panel space-y-4 px-6 py-6">
-        <h2 className="text-xl font-semibold text-slate-100">Connect this playbook to functional pages</h2>
+        <h2 className="text-xl font-semibold text-slate-100">Related pages</h2>
         <div className="grid gap-3 sm:grid-cols-3">
           {connectedPages.map((page) => (
             <article key={page.href} className="weather-surface flex h-full flex-col gap-3 px-4 py-4">
