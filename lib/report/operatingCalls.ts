@@ -24,6 +24,28 @@ export type RoleAwareOperatingTemplate = {
   flipTrigger: string;
 };
 
+export const decisionAreaToOperatingLever: Record<DecisionArea, OperatingLeverKey> = {
+  hiring: "hiring-stance",
+  "burn-discipline": "investment-pace",
+  "capital-raising": "sales-posture",
+  "product-tempo": "product-priorities",
+  "expansion-bets": "risk-tolerance",
+};
+
+const orderedOperatingLeverAreas: Array<{ lever: OperatingLeverKey; area: DecisionArea }> = [
+  { lever: "hiring-stance", area: "hiring" },
+  { lever: "investment-pace", area: "burn-discipline" },
+  { lever: "sales-posture", area: "capital-raising" },
+  { lever: "product-priorities", area: "product-tempo" },
+  { lever: "risk-tolerance", area: "expansion-bets" },
+];
+
+const canonicalRuleFallback: Omit<ActionStripItem, "lever" | "label"> = {
+  actionNow: "Keep current operating posture until a canonical rule refresh is available.",
+  triggerThreshold: "Tighten only if confidence and threshold signals worsen.",
+  reversalCondition: "Loosen only when threshold conditions recover and hold.",
+};
+
 export const operatingCallsByRegime: Record<RegimeKey, OperatingCall> = {
   SCARCITY: {
     hiring: "Maintain freeze",
@@ -59,20 +81,14 @@ const sanitizeFlip = (resumeTrigger: string) =>
 const isString = (value: string | undefined): value is string => typeof value === "string";
 
 export const buildActionStripItems = (rules: BoundedDecisionRule[]): ActionStripItem[] =>
-  ([
-    { lever: "hiring-stance", area: "hiring" },
-    { lever: "investment-pace", area: "burn-discipline" },
-    { lever: "sales-posture", area: "capital-raising" },
-    { lever: "product-priorities", area: "product-tempo" },
-    { lever: "risk-tolerance", area: "expansion-bets" },
-  ] as const).map(({ lever, area }) => {
+  orderedOperatingLeverAreas.map(({ lever, area }) => {
     const rule = findRule(rules, area);
     return {
       lever,
       label: operatingLeverLabel[lever],
-      actionNow: rule?.recommendation ?? "Keep current operating posture until a rule refresh is available.",
-      triggerThreshold: rule?.pauseTrigger ?? "Tighten only if confidence and threshold signals worsen.",
-      reversalCondition: rule?.resumeTrigger ?? "Loosen only when threshold conditions recover and hold.",
+      actionNow: rule?.recommendation ?? canonicalRuleFallback.actionNow,
+      triggerThreshold: rule?.pauseTrigger ?? canonicalRuleFallback.triggerThreshold,
+      reversalCondition: rule?.resumeTrigger ?? canonicalRuleFallback.reversalCondition,
     };
   });
 

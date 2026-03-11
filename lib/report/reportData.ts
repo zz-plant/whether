@@ -663,7 +663,10 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
   const assessmentMacroSeries = historicalSelection ? [] : macroSeries;
   const assessment = evaluateRegime(treasury, thresholds, assessmentMacroSeries);
   const liveAssessment = historicalSelection ? evaluateRegime(liveTreasury, thresholds, macroSeries) : null;
-  const { playbook, startItems, stopItems } = getPlaybookGuidance(assessment.regime);
+  const { playbook, startItems, stopItems } = getPlaybookGuidance(assessment.regime, {
+    thresholds: assessment.thresholds,
+    scores: assessment.scores,
+  });
   const actionStripItems = buildActionStripItems(buildCanonicalBoundedDecisionRules({ regime: assessment.regime, thresholds: assessment.thresholds, scores: assessment.scores }));
   const fenceItems = assessment.constraints;
   const previousSnapshot = historicalSelection
@@ -880,7 +883,10 @@ const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataF
   const recordDateLabel = formatDateUTC(fallbackTreasury.record_date);
   const fetchedAtLabel = formatTimestampUTC(fallbackTreasury.fetched_at);
   const ageLabel = formatAgeHours(fallbackTreasury.fetched_at, now);
-  const { playbook, startItems, stopItems } = getPlaybookGuidance(assessment.regime);
+  const { playbook, startItems, stopItems } = getPlaybookGuidance(assessment.regime, {
+    thresholds: assessment.thresholds,
+    scores: assessment.scores,
+  });
   const actionStripItems = buildActionStripItems(buildCanonicalBoundedDecisionRules({ regime: assessment.regime, thresholds: assessment.thresholds, scores: assessment.scores }));
 
   const fallbackReportDynamics: ReportDynamics = {
