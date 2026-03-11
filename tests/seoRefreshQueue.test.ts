@@ -100,5 +100,37 @@ describe("seo refresh queue", () => {
       result.statusByUrl["/toolkits/focus/risk-appetite-watch"]?.lastRefreshRequestedAtIso,
       "2026-03-10T12:00:00.000Z",
     );
+    assert.equal(
+      result.statusByUrl["/toolkits/focus/risk-appetite-watch"]?.slaDueAtIso,
+      "2026-03-17T12:00:00.000Z",
+    );
+  });
+
+  it("marks carried-over queued pages as overdue when prior SLA has already elapsed", () => {
+    const result = evaluateRefreshQueue({
+      payloadRecords: [
+        {
+          ...basePage,
+          url: "/decide/ceo/runway-planning",
+        },
+      ],
+      metricsByUrl: {
+        "/decide/ceo/runway-planning": {
+          trafficTier: "high",
+          ctaConversionRate: 0.01,
+        },
+      },
+      previousStatusByUrl: {
+        "/decide/ceo/runway-planning": {
+          lastRefreshRequestedAtIso: "2026-03-01T00:00:00.000Z",
+          lastRefreshedAtIso: null,
+        },
+      },
+      now: new Date("2026-03-10T12:00:00.000Z"),
+      staleAfterHours: 24 * 14,
+    });
+
+    assert.equal(result.statusByUrl["/decide/ceo/runway-planning"]?.slaDueAtIso, "2026-03-04T00:00:00.000Z");
+    assert.equal(result.statusByUrl["/decide/ceo/runway-planning"]?.slaState, "overdue");
   });
 });

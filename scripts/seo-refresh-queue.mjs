@@ -54,6 +54,15 @@ const priorityToSlaHours = {
   p2: 168,
 };
 
+const computeSlaDueAtIso = ({ queueMeta, previousRequestedAtIso, nowIso }) => {
+  if (!queueMeta.enqueue || !queueMeta.priority) return null;
+
+  const requestedAtMs = Date.parse(previousRequestedAtIso ?? nowIso);
+  const requestedAtBaseMs = Number.isNaN(requestedAtMs) ? Date.parse(nowIso) : requestedAtMs;
+
+  return new Date(requestedAtBaseMs + priorityToSlaHours[queueMeta.priority] * HOURS).toISOString();
+};
+
 const buildQueueRecord = ({ page, metric, stale, conversionRate }) => {
   const trafficTier = toTrafficTier(metric);
   const conversionTarget = conversionTargetByTier[trafficTier];
@@ -114,13 +123,14 @@ export const evaluateRefreshQueue = ({
       const conversionRate = Number(metric.ctaConversionRate ?? Number.NaN);
 
       const queueMeta = buildQueueRecord({ page, metric, stale, conversionRate });
-      const dueAtIso = queueMeta.enqueue && queueMeta.priority
-        ? new Date(now.getTime() + priorityToSlaHours[queueMeta.priority] * HOURS).toISOString()
-        : null;
-
       const lastRefreshRequestedAtIso = queueMeta.enqueue
         ? (previous.lastRefreshRequestedAtIso ?? nowIso)
         : null;
+      const dueAtIso = computeSlaDueAtIso({
+        queueMeta,
+        previousRequestedAtIso: lastRefreshRequestedAtIso,
+        nowIso,
+      });
       const lastRefreshedAtIso = previous.lastRefreshedAtIso ?? null;
 
       const status = {
