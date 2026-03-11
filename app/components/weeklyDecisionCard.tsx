@@ -396,40 +396,44 @@ const ActionStrip = ({ items }: { items: ActionStripItem[] }) => (
 );
 
 const PostureHistoryTimeline = ({ historicalTimeline }: { historicalTimeline: WeeklyDecisionCardProps["historicalTimeline"] }) => (
-  <ol className="mt-2 flex flex-wrap items-center gap-2" aria-label="Posture change timeline">
+  <ol className="mt-2 space-y-2" aria-label="Posture change timeline">
     {historicalTimeline.map((item, index) => {
       const isCurrent = item.isCurrent ?? index === historicalTimeline.length - 1;
       const href = item.month && item.year ? `/?month=${item.month}&year=${item.year}` : null;
+      const previous = historicalTimeline[index - 1];
+      const hasPostureShift = previous ? previous.posture !== item.posture : false;
+      const shiftLabel = previous ? (hasPostureShift ? "Changed" : "Held") : "Start";
       const node = (
         <>
-          <p className="text-slate-400">{item.label}</p>
-          <p className="mt-1 font-semibold text-slate-100">{item.posture}</p>
-          {isCurrent ? <p className="mt-1 text-[10px] font-medium text-sky-200">Current week</p> : null}
-          {item.recordDate ? (
-            <p className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 hidden w-56 -translate-x-1/2 rounded-md border border-slate-600/70 bg-slate-950/95 px-2 py-1.5 text-[10px] leading-4 text-slate-200 shadow-xl group-hover:block group-focus-visible:block">
-              {item.recordDate}{item.summary ? ` • ${item.summary}` : ""}
-            </p>
-          ) : null}
+          <div className="absolute top-0 bottom-0 left-2.5 w-px bg-slate-700/70" aria-hidden="true" />
+          <div className={`relative mt-1 h-3 w-3 rounded-full border ${isCurrent ? "border-sky-200 bg-sky-300" : "border-slate-500 bg-slate-700"}`} aria-hidden="true" />
+          <div className="min-w-0 flex-1 rounded-lg border border-slate-700/60 bg-slate-950/65 px-2.5 py-2">
+            <div className="flex flex-wrap items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">
+              <span>{item.label}</span>
+              <span className={`rounded-full border px-1.5 py-0.5 ${shiftLabel === "Changed" ? "border-amber-300/60 bg-amber-500/15 text-amber-100" : "border-slate-500/70 bg-slate-800/85 text-slate-300"}`}>{shiftLabel}</span>
+              {isCurrent ? <span className="rounded-full border border-sky-300/50 bg-sky-500/20 px-1.5 py-0.5 text-sky-100">Current</span> : null}
+            </div>
+            <p className="mt-1 text-xs font-semibold text-slate-100">{item.posture}</p>
+            {item.summary ? <p className="mt-1 text-[11px] leading-4 text-slate-300">{item.summary}</p> : null}
+            {item.recordDate ? <p className="mt-1 text-[10px] text-slate-400">{item.recordDate}</p> : null}
+          </div>
         </>
       );
 
       return (
-        <li key={`${item.label}-${item.posture}-${index}`} className="contents">
+        <li key={`${item.label}-${item.posture}-${index}`} className="relative">
           {href ? (
             <Link
               href={href}
-              className={`${tierThreeInset} group relative min-w-[140px] text-xs transition hover:border-slate-500/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${isCurrent ? "border-sky-400/70 bg-sky-500/10" : ""}`}
+              className="group relative flex min-h-[44px] items-start gap-2.5 rounded-lg pr-1 text-xs transition hover:bg-slate-900/35 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
               aria-label={`Load weekly call for ${item.label}`}
               prefetch={false}
             >
               {node}
             </Link>
           ) : (
-            <div className={`${tierThreeInset} group relative min-w-[140px] text-xs ${isCurrent ? "border-sky-400/70 bg-sky-500/10" : ""}`}>{node}</div>
+            <div className="relative flex min-h-[44px] items-start gap-2.5 pr-1 text-xs">{node}</div>
           )}
-          {index < historicalTimeline.length - 1 ? (
-            <span aria-hidden="true" className="text-slate-500">→</span>
-          ) : null}
         </li>
       );
     })}
@@ -1130,6 +1134,7 @@ export function WeeklyDecisionCard({
     guardrail,
     regimeDistance,
   });
+  const recentTimeline = historicalTimeline.slice(-4);
 
   return (
     <section className="weather-panel space-y-3 px-4 py-5 sm:space-y-4 sm:px-6 sm:py-6" aria-labelledby="weekly-posture-brief-title">
@@ -1176,11 +1181,6 @@ export function WeeklyDecisionCard({
           </article>
 
           <ConfidenceMiniChart confidenceHistory={confidenceHistory} confidenceTrend={confidenceTrend} />
-
-          <article className={`${tierOnePanel} ${sectionSpacing}`}>
-            <h2 className={tierOneHeading}>Regime history</h2>
-            <PostureHistoryTimeline historicalTimeline={historicalTimeline} />
-          </article>
         </aside>
 
         <main className="space-y-3 xl:col-span-6">
@@ -1206,6 +1206,14 @@ export function WeeklyDecisionCard({
                 {watchBullets.map((bullet) => <li key={`watch-${bullet}`}>• {bullet}</li>)}
               </ul>
             </div>
+          </article>
+
+          <article className={`${tierOnePanel} ${sectionSpacing}`}>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 className={tierOneHeading}>Regime history (recent)</h2>
+              <p className="text-[11px] uppercase tracking-[0.1em] text-slate-400">Last 4 checkpoints</p>
+            </div>
+            <PostureHistoryTimeline historicalTimeline={recentTimeline} />
           </article>
 
           <details id="decision-snapshot-for-leadership-this-week" className={`${tierOnePanel} ${sectionSpacing} group`}>
