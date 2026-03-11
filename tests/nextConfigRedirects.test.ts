@@ -49,7 +49,7 @@ describe("next.config redirects", () => {
 
     assert.deepEqual(findRedirect("/reference/failure-modes/:slug"), {
       source: "/reference/failure-modes/:slug",
-      destination: "/library/failure-modes/:slug",
+      destination: "/learn/failure-modes/:slug",
       permanent: true,
     });
 
@@ -59,9 +59,9 @@ describe("next.config redirects", () => {
       permanent: true,
     });
 
-    assert.deepEqual(findRedirect("/learn/failure-modes/:slug"), {
-      source: "/learn/failure-modes/:slug",
-      destination: "/library/failure-modes/:slug",
+    assert.deepEqual(findRedirect("/library/failure-modes/:slug"), {
+      source: "/library/failure-modes/:slug",
+      destination: "/learn/failure-modes/:slug",
       permanent: true,
     });
 
