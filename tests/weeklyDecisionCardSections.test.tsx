@@ -6,6 +6,7 @@ import {
   CitationActionFooter,
   DecisionCallHeader,
   MoreContextDisclosureBody,
+  WeeklyDecisionCard,
 } from "../app/components/weeklyDecisionCard";
 
 describe("WeeklyDecisionCard extracted sections", () => {
@@ -27,6 +28,13 @@ describe("WeeklyDecisionCard extracted sections", () => {
           primaryRisk: "Downside: Capital tightness tightened (1.0).",
         }}
         trendLabel="Mixed"
+        confidenceHistory={[
+          { recordDate: "2026-02-13", confidencePercent: 64, isMissing: false },
+          { recordDate: "2026-02-20", confidencePercent: 66, isMissing: false },
+          { recordDate: "2026-02-27", confidencePercent: null, isMissing: true },
+          { recordDate: "2026-03-06", confidencePercent: 70, isMissing: false },
+        ]}
+        confidenceTrend="unstable"
         regimeSignalIndicators={[
           { key: "tightness", label: "Capital tightness", valueLabel: "64", rawValue: 64, trendArrow: "↑", trendDeltaLabel: "+1.0 vs last week", sparkline: [62, 63, 64], isFallback: false },
           { key: "riskAppetite", label: "Risk appetite", valueLabel: "49", rawValue: 49, trendArrow: "↓", trendDeltaLabel: "-1.0 vs last week", sparkline: [51, 50, 49], isFallback: false },
@@ -93,6 +101,13 @@ describe("WeeklyDecisionCard extracted sections", () => {
           primaryRisk: "Downside: Capital tightness tightened (1.0).",
         }}
         trendLabel="Mixed"
+        confidenceHistory={[
+          { recordDate: "2026-02-13", confidencePercent: 64, isMissing: false },
+          { recordDate: "2026-02-20", confidencePercent: 66, isMissing: false },
+          { recordDate: "2026-02-27", confidencePercent: null, isMissing: true },
+          { recordDate: "2026-03-06", confidencePercent: 70, isMissing: false },
+        ]}
+        confidenceTrend="unstable"
         regimeSignalIndicators={[
           { key: "tightness", label: "Capital tightness", valueLabel: "64", rawValue: 64, trendArrow: "↑", trendDeltaLabel: "+1.0 vs last week", sparkline: [62, 63, 64], isFallback: false },
           { key: "riskAppetite", label: "Risk appetite", valueLabel: "49", rawValue: 49, trendArrow: "↓", trendDeltaLabel: "-1.0 vs last week", sparkline: [51, 50, 49], isFallback: false },
@@ -146,6 +161,13 @@ describe("WeeklyDecisionCard extracted sections", () => {
           primaryRisk: "Downside: Capital tightness tightened (1.0).",
         }}
         trendLabel="Mixed"
+        confidenceHistory={[
+          { recordDate: "2026-02-13", confidencePercent: 64, isMissing: false },
+          { recordDate: "2026-02-20", confidencePercent: 66, isMissing: false },
+          { recordDate: "2026-02-27", confidencePercent: null, isMissing: true },
+          { recordDate: "2026-03-06", confidencePercent: 70, isMissing: false },
+        ]}
+        confidenceTrend="unstable"
         regimeSignalIndicators={[
           { key: "tightness", label: "Capital tightness", valueLabel: "64", rawValue: 64, trendArrow: "↑", trendDeltaLabel: "+1.0 vs last week", sparkline: [62, 63, 64], isFallback: false },
           { key: "riskAppetite", label: "Risk appetite", valueLabel: "49", rawValue: 49, trendArrow: "↓", trendDeltaLabel: "-1.0 vs last week", sparkline: [51, 50, 49], isFallback: false },
@@ -181,6 +203,66 @@ describe("WeeklyDecisionCard extracted sections", () => {
     assert.match(html, /Constraints eased\./);
   });
 
+
+  it("renders confidence mini-chart fallback markers in regime panel", () => {
+    const html = renderToStaticMarkup(
+      <WeeklyDecisionCard
+        statusLabel="DEFENSIVE"
+        postureLabel="Defensive"
+        stageLabel="Watchful"
+        postureDelta="No worse than last week"
+        confidenceLabel="MED"
+        confidencePercent={69}
+        signalConfidenceReason="Boundary distance is moderate."
+        regimeHeader={{ regime: "Defensive", confidence: "Medium", primaryRisk: "Tightness still elevated." }}
+        trendLabel="Mixed"
+        confidenceHistory={[
+          { recordDate: "2026-01-30", confidencePercent: 62, isMissing: false },
+          { recordDate: "2026-02-06", confidencePercent: null, isMissing: true },
+          { recordDate: "2026-02-13", confidencePercent: 66, isMissing: false },
+        ]}
+        confidenceTrend="unstable"
+        regimeSignalIndicators={[]}
+        transitionWatch="ON"
+        operatingStanceLine="Hold reversible pace."
+        weeklyMemoLines={["Signals are mixed."]}
+        netConstraintSummary="Risk still elevated"
+        guardrail="Do not commit irreversible spend"
+        reversalTrigger="Flip when tightness falls"
+        recordDateLabel="Mar 6, 2026"
+        fetchedAtLabel="Mar 6, 2026"
+        reportDynamics={{ changedSignals: [], anomalySignals: [], totalSignalChanges: 0, regimeChanged: false, directionLabel: "stable" }}
+        decisionShiftSummary="No major shift"
+        transitionProbabilities={{ SCARCITY: 0.2, DEFENSIVE: 0.5, VOLATILE: 0.2, EXPANSION: 0.1 }}
+        decisionRules={[]}
+        roleAwareTemplates={[]}
+        executiveOperationalStance={{ expand: [], avoid: [] }}
+        revisitDecisions={false}
+        weeklyMovement={{ score: 0, direction: "neutral", summary: "steady" }}
+        memoryRail={[]}
+        historicalTimeline={[]}
+        historicalAnalogs={[]}
+        macroOverlay={[]}
+        whyThisCall={[]}
+        evidenceItems={[]}
+        startupClimateIndex={{ score: 50, status: "Stable", breakdown: [] }}
+        regimeDistance={{
+          dimensionLabel: "Tightness",
+          dimensionKey: "tightness",
+          currentValue: 64,
+          thresholdValue: 70,
+          pointsToFlip: 6,
+          thresholdDirection: "riseAbove",
+        }}
+        regimeVelocity={{ weeklyDeltaPoints: 0, displayLabel: "Flat", confidence: "moderate" }}
+        citation="citation"
+      />,
+    );
+
+    assert.match(html, /Confidence trend \(8w\)/);
+    assert.match(html, /Missing weeks are dashed markers/);
+    assert.match(html, /missing confidence data/);
+  });
   it("renders bounded rules matrix hierarchy", () => {
     const html = renderToStaticMarkup(
       <BoundedRulesMatrix

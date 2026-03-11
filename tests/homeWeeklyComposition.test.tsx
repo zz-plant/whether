@@ -83,6 +83,12 @@ describe("weekly card and interpretation panel composition", () => {
             primaryRisk: "Downside: Capital tightness tightened (1.0).",
           }}
           trendLabel="Stable"
+          confidenceHistory={[
+            { recordDate: "2026-02-13", confidencePercent: 64, isMissing: false },
+            { recordDate: "2026-02-20", confidencePercent: null, isMissing: true },
+            { recordDate: "2026-02-27", confidencePercent: 64, isMissing: false },
+          ]}
+          confidenceTrend="unstable"
           regimeSignalIndicators={[
             { key: "tightness", label: "Capital tightness", valueLabel: "64", rawValue: 64, trendArrow: "→", trendDeltaLabel: "No weekly delta", sparkline: [64], isFallback: true },
             { key: "riskAppetite", label: "Risk appetite", valueLabel: "50", rawValue: 50, trendArrow: "→", trendDeltaLabel: "No weekly delta", sparkline: [50], isFallback: true },
@@ -194,6 +200,12 @@ describe("weekly card and interpretation panel composition", () => {
             primaryRisk: "Downside: Capital tightness tightened (1.0).",
           }}
           trendLabel="Stable"
+          confidenceHistory={[
+            { recordDate: "2026-02-13", confidencePercent: 64, isMissing: false },
+            { recordDate: "2026-02-20", confidencePercent: null, isMissing: true },
+            { recordDate: "2026-02-27", confidencePercent: 64, isMissing: false },
+          ]}
+          confidenceTrend="unstable"
           regimeSignalIndicators={[
             { key: "tightness", label: "Capital tightness", valueLabel: "64", rawValue: 64, trendArrow: "→", trendDeltaLabel: "No weekly delta", sparkline: [64], isFallback: true },
             { key: "riskAppetite", label: "Risk appetite", valueLabel: "50", rawValue: 50, trendArrow: "→", trendDeltaLabel: "No weekly delta", sparkline: [50], isFallback: true },
@@ -306,6 +318,12 @@ describe("weekly card and interpretation panel composition", () => {
             primaryRisk: "Downside: Capital tightness tightened (1.0).",
           }}
           trendLabel="Stable"
+          confidenceHistory={[
+            { recordDate: "2026-02-13", confidencePercent: 64, isMissing: false },
+            { recordDate: "2026-02-20", confidencePercent: null, isMissing: true },
+            { recordDate: "2026-02-27", confidencePercent: 64, isMissing: false },
+          ]}
+          confidenceTrend="unstable"
           regimeSignalIndicators={[
             { key: "tightness", label: "Capital tightness", valueLabel: "64", rawValue: 64, trendArrow: "→", trendDeltaLabel: "No weekly delta", sparkline: [64], isFallback: true },
             { key: "riskAppetite", label: "Risk appetite", valueLabel: "50", rawValue: 50, trendArrow: "→", trendDeltaLabel: "No weekly delta", sparkline: [50], isFallback: true },

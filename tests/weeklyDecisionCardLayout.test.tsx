@@ -47,6 +47,12 @@ describe("WeeklyDecisionCard top-fold composition", () => {
             primaryRisk: "Downside: Capital tightness tightened (1.0).",
           }}
         trendLabel="Improving"
+        confidenceHistory={[
+          { recordDate: "2026-02-13", confidencePercent: 60, isMissing: false },
+          { recordDate: "2026-02-20", confidencePercent: 66, isMissing: false },
+          { recordDate: "2026-02-27", confidencePercent: 72, isMissing: false },
+        ]}
+        confidenceTrend="strengthening"
         regimeSignalIndicators={[
           { key: "tightness", label: "Capital tightness", valueLabel: "64", rawValue: 64, trendArrow: "↑", trendDeltaLabel: "+1.0 vs last week", sparkline: [61, 62, 63, 64], isFallback: false },
           { key: "riskAppetite", label: "Risk appetite", valueLabel: "52", rawValue: 52, trendArrow: "↓", trendDeltaLabel: "-1.0 vs last week", sparkline: [56, 54, 53, 52], isFallback: false },

@@ -8,6 +8,8 @@ import {
   buildHistoricalAnalogs,
   buildFlipThreshold,
   buildReportEvidenceItems,
+  buildWeeklyConfidenceSeries,
+  classifyConfidenceTrend,
 } from "../lib/report/reportData";
 import type { TreasuryData } from "../lib/types";
 import { resolveSectorKey } from "../lib/report/sectorSensitivity";
@@ -276,6 +278,80 @@ describe("buildHistoricalAnalogs", () => {
   });
 });
 
+
+
+describe("weekly confidence history", () => {
+  const thresholds = { baseRateTightness: 5, tightnessRegime: 70, riskAppetiteRegime: 50 };
+
+  it("returns the last eight weekly points and injects missing-week markers", () => {
+    const snapshots = [
+      makeTreasury("2025-01-03", 5.2, 4.8, 4.4),
+      makeTreasury("2025-01-10", 5.1, 4.7, 4.4),
+      makeTreasury("2025-01-31", 5.0, 4.6, 4.4),
+      makeTreasury("2025-02-07", 4.9, 4.5, 4.4),
+      makeTreasury("2025-02-14", 4.8, 4.4, 4.4),
+      makeTreasury("2025-02-21", 4.7, 4.3, 4.4),
+      makeTreasury("2025-02-28", 4.6, 4.2, 4.4),
+      makeTreasury("2025-03-07", 4.5, 4.1, 4.4),
+      makeTreasury("2025-03-14", 4.4, 4.0, 4.4),
+    ];
+
+    const series = buildWeeklyConfidenceSeries({
+      snapshots,
+      thresholds,
+      asOf: "2025-03-14",
+      window: 8,
+    });
+
+    assert.equal(series.length, 8);
+    assert.equal(series.at(-1)?.recordDate, "2025-03-14");
+    assert.equal(series.some((point) => point.recordDate === "2025-02-07"), true);
+
+    const withGap = buildWeeklyConfidenceSeries({
+      snapshots: [
+        makeTreasury("2025-01-03", 5.2, 4.8, 4.4),
+        makeTreasury("2025-01-24", 5.1, 4.7, 4.4),
+        makeTreasury("2025-01-31", 5.0, 4.6, 4.4),
+      ],
+      thresholds,
+      asOf: "2025-01-31",
+      window: 8,
+    });
+
+    assert.equal(withGap.some((point) => point.isMissing), true);
+    const missing = withGap.find((point) => point.isMissing);
+    assert.equal(missing?.confidencePercent, null);
+  });
+
+  it("classifies confidence trend from slope and volatility", () => {
+    assert.equal(
+      classifyConfidenceTrend([
+        { recordDate: "2025-01-03", confidencePercent: 55, isMissing: false },
+        { recordDate: "2025-01-10", confidencePercent: 59, isMissing: false },
+        { recordDate: "2025-01-17", confidencePercent: 63, isMissing: false },
+      ]),
+      "strengthening",
+    );
+
+    assert.equal(
+      classifyConfidenceTrend([
+        { recordDate: "2025-01-03", confidencePercent: 68, isMissing: false },
+        { recordDate: "2025-01-10", confidencePercent: 62, isMissing: false },
+        { recordDate: "2025-01-17", confidencePercent: 56, isMissing: false },
+      ]),
+      "weakening",
+    );
+
+    assert.equal(
+      classifyConfidenceTrend([
+        { recordDate: "2025-01-03", confidencePercent: 55, isMissing: false },
+        { recordDate: "2025-01-10", confidencePercent: 72, isMissing: false },
+        { recordDate: "2025-01-17", confidencePercent: 57, isMissing: false },
+      ]),
+      "unstable",
+    );
+  });
+});
 describe("buildFlipThreshold", () => {
   const makeAssessment = (
     regime: "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION",
