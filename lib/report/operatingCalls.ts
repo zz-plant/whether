@@ -1,5 +1,6 @@
 import type { BoundedDecisionRule, DecisionArea } from "./boundedDecisionRules";
-import { operatingLeverLabel, type OperatingLeverKey } from "./decisionKnobs";
+import { operatingLeverLabel, operatingLeverOrder, type OperatingLeverKey } from "./decisionKnobs";
+import { operatingLeverToDecisionArea } from "./operatingLeverMap";
 
 export type ActionStripItem = {
   lever: OperatingLeverKey;
@@ -28,21 +29,23 @@ const sanitizeFlip = (resumeTrigger: string) =>
 
 const isString = (value: string | undefined): value is string => typeof value === "string";
 
+const OPERATING_LEVER_FALLBACK = {
+  actionNow: "Keep current operating posture until a rule refresh is available.",
+  triggerThreshold: "Tighten only if confidence and threshold signals worsen.",
+  reversalCondition: "Loosen only when threshold conditions recover and hold.",
+} satisfies Omit<ActionStripItem, "lever" | "label">;
+
 export const buildActionStripItems = (rules: BoundedDecisionRule[]): ActionStripItem[] =>
-  ([
-    { lever: "hiring-stance", area: "hiring" },
-    { lever: "investment-pace", area: "burn-discipline" },
-    { lever: "sales-posture", area: "capital-raising" },
-    { lever: "product-priorities", area: "product-tempo" },
-    { lever: "risk-tolerance", area: "expansion-bets" },
-  ] as const).map(({ lever, area }) => {
+  operatingLeverOrder.map((lever) => {
+    const area = operatingLeverToDecisionArea[lever];
     const rule = findRule(rules, area);
+
     return {
       lever,
       label: operatingLeverLabel[lever],
-      actionNow: rule?.recommendation ?? "Keep current operating posture until a rule refresh is available.",
-      triggerThreshold: rule?.pauseTrigger ?? "Tighten only if confidence and threshold signals worsen.",
-      reversalCondition: rule?.resumeTrigger ?? "Loosen only when threshold conditions recover and hold.",
+      actionNow: rule?.recommendation ?? OPERATING_LEVER_FALLBACK.actionNow,
+      triggerThreshold: rule?.pauseTrigger ?? OPERATING_LEVER_FALLBACK.triggerThreshold,
+      reversalCondition: rule?.resumeTrigger ?? OPERATING_LEVER_FALLBACK.reversalCondition,
     };
   });
 

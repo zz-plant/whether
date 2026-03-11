@@ -254,7 +254,16 @@ export const buildRunwayPlan = (rawInput: RunwayPlannerInput): RunwayPlannerOutp
   const burnRule = rules.find((rule) => rule.area === "burn-discipline");
   const capitalRule = rules.find((rule) => rule.area === "capital-raising");
 
-  const playbook = getPlaybookGuidance(input.regime);
+  const playbook = getPlaybookGuidance(input.regime, {
+    thresholds: {
+      tightnessRegime: 70,
+      riskAppetiteRegime: 50,
+    },
+    scores: {
+      tightness: 70,
+      riskAppetite: 50,
+    },
+  });
   const approvalVelocity = getKnobLevel(input, runwayGap, "approvalVelocity");
   const paybackStrictness = getKnobLevel(input, runwayGap, "payback");
   const paybackStrictnessLevel = parseKnobLevelLabel(paybackStrictness);
