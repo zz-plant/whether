@@ -511,6 +511,81 @@ export function DecisionCallHeader({
   );
 }
 
+type RegimeBannerProps = {
+  statusLabel: string;
+  postureWithStageLabel?: string;
+  recordDateLabel: string;
+  confidencePercent: number;
+  confidenceLabel: WeeklyDecisionCardProps["confidenceLabel"];
+  trendLabel?: string;
+  operatingStanceLine: string;
+  actionNowShort?: string;
+  regimeDistance?: WeeklyDecisionCardProps["regimeDistance"];
+};
+
+const resolveRegimeTone = (label: string) => {
+  const normalized = label.toLowerCase();
+  if (normalized.includes("guarded expansion")) {
+    return "border-amber-400/65 bg-amber-500/10 text-amber-100";
+  }
+  if (normalized.includes("expansion")) {
+    return "border-emerald-400/65 bg-emerald-500/10 text-emerald-100";
+  }
+  if (normalized.includes("defensive")) {
+    return "border-rose-400/65 bg-rose-500/10 text-rose-100";
+  }
+  if (normalized.includes("stabilizing")) {
+    return "border-sky-400/65 bg-sky-500/10 text-sky-100";
+  }
+  return "border-slate-500/75 bg-slate-900/85 text-slate-100";
+};
+
+const formatFlipTriggerLine = (regimeDistance?: WeeklyDecisionCardProps["regimeDistance"]) => {
+  if (!regimeDistance) {
+    return "Next flip trigger: watch weekly threshold movement updates.";
+  }
+  const safePoints = Number.isFinite(regimeDistance.pointsToFlip)
+    ? Math.max(0, Math.round(regimeDistance.pointsToFlip))
+    : null;
+  return `Next flip trigger: ${regimeDistance.dimensionLabel} ${regimeDistance.thresholdDirection === "riseAbove" ? "rises above" : "falls to or below"} ${regimeDistance.thresholdValue.toFixed(1)}${safePoints !== null ? ` (${safePoints} pts away)` : ""}.`;
+};
+
+function RegimeBanner({
+  statusLabel,
+  postureWithStageLabel,
+  recordDateLabel,
+  confidencePercent,
+  confidenceLabel,
+  trendLabel,
+  operatingStanceLine,
+  actionNowShort,
+  regimeDistance,
+}: RegimeBannerProps) {
+  const resolvedRegimeLabel = postureWithStageLabel?.trim() || statusLabel;
+  const trendValue = trendLabel?.trim() || "Unspecified";
+  const flipRiskValue = regimeDistance && Number.isFinite(regimeDistance.pointsToFlip)
+    ? `${Math.max(0, Math.round(regimeDistance.pointsToFlip))} pts`
+    : "Unknown";
+  const operatingLine = operatingStanceLine.trim() || actionNowShort?.trim() || "Hold bounded operating rules until next refresh.";
+  const bannerTone = resolveRegimeTone(resolvedRegimeLabel);
+
+  return (
+    <header className={`sticky top-2 z-30 rounded-xl border p-4 shadow-lg backdrop-blur sm:p-5 ${bannerTone}`} data-testid="weekly-regime-banner" aria-label="Weekly regime banner">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.13em]">REGIME — WEEK OF {recordDateLabel}</p>
+      <h1 id="weekly-posture-brief-title" className="mt-1 text-2xl font-semibold sm:text-3xl">{resolvedRegimeLabel}</h1>
+      <p className="mt-2 overflow-x-auto text-xs font-semibold whitespace-nowrap" aria-label="Regime metrics line">
+        <span>Confidence {confidenceLabel} {Math.round(confidencePercent)}%</span>
+        <span className="px-1.5" aria-hidden="true">·</span>
+        <span>Trend {trendValue}</span>
+        <span className="px-1.5" aria-hidden="true">·</span>
+        <span>Flip Risk {flipRiskValue}</span>
+      </p>
+      <p className="mt-2 text-sm font-semibold leading-5">{operatingLine}</p>
+      <p className="mt-1 text-xs leading-5">{formatFlipTriggerLine(regimeDistance)}</p>
+    </header>
+  );
+}
+
 
 const confidenceTrendTone: Record<ConfidenceTrendFraming, string> = {
   strengthening: "text-emerald-200",
@@ -850,26 +925,16 @@ export function WeeklyDecisionCard({
     : "Use this call for near-term pacing only until confidence returns to HIGH with fresh data.";
 
   return (
-    <section className="weather-panel space-y-4 px-4 py-5 sm:space-y-5 sm:px-6 sm:py-6" aria-labelledby="weekly-posture-brief-title">
-      <DecisionCallHeader
+    <section className="weather-panel space-y-3 px-4 py-5 sm:space-y-4 sm:px-6 sm:py-6" aria-labelledby="weekly-posture-brief-title">
+      <RegimeBanner
         statusLabel={statusLabel}
-        postureLabel={postureLabel}
-        stageLabel={stageLabel}
         postureWithStageLabel={postureWithStageLabel}
-        netConstraintSummary={netConstraintSummary}
-        immediateDecision={immediateDecision}
-        guardrail={effectiveGuardrail}
+        recordDateLabel={recordDateLabel}
         confidencePercent={confidencePercent}
         confidenceLabel={confidenceLabel}
-        regimeHeader={regimeHeader}
         trendLabel={trendLabel}
-        regimeSignalIndicators={regimeSignalIndicators}
-        transitionWatch={transitionWatch}
         operatingStanceLine={operatingStanceLine}
-        freshnessLabel={freshnessLabel}
-        trustCueLine={trustCueLine}
-        needsTrustWarning={needsTrustWarning}
-        trustWarningCopy={trustWarningCopy}
+        actionNowShort={actionNowShort}
         regimeDistance={regimeDistance}
       />
 
