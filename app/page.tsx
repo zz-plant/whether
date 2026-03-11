@@ -267,6 +267,8 @@ const HomePageReportContent = async ({
     stopItems,
     treasury,
     treasuryProvenance,
+    confidenceHistory,
+    confidenceTrend,
   } = reportData;
   const previousHistoricalSelection = historicalSelection
     ? getAdjacentTimeMachineRequest(historicalSelection, "previous")
@@ -404,6 +406,8 @@ const HomePageReportContent = async ({
         signalConfidenceReason={homeBriefModel.signalConfidenceReason}
         regimeHeader={homeBriefModel.regimeHeader}
         trendLabel={homeBriefModel.trendLabel}
+        confidenceHistory={confidenceHistory}
+        confidenceTrend={confidenceTrend}
         regimeSignalIndicators={homeBriefModel.regimeSignalIndicators}
         transitionWatch={homeBriefModel.transitionWatch}
         operatingStanceLine={homeBriefModel.operatingStanceLine}
