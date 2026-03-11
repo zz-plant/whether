@@ -22,7 +22,7 @@ import { indexableToolkitClusters } from "./toolkits/clusterRoutes";
 import { signalScenarioRoutes } from "./seoRouteClusters";
 import { loadReportDataSafe } from "../lib/report/reportData";
 import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
-import { isSeoPageIndexEligible } from "../lib/report/seoIndexEligibility";
+import { evaluateSeoQualityGates } from "../lib/report/seoQualityGates";
 
 type ChangeFrequency = NonNullable<MetadataRoute.Sitemap[number]["changeFrequency"]>;
 
@@ -71,15 +71,23 @@ export const isProgrammaticSitemapEligible = async (): Promise<boolean> => {
   const homeBriefModel = buildHomeBriefModel(reportData);
   const primaryRule = homeBriefModel.decisionRules[0];
 
-  return isSeoPageIndexEligible({
+  return evaluateSeoQualityGates({
+    pageKey: "sitemap-programmatic",
     currentCall: primaryRule?.recommendation,
     immediateAction: primaryRule?.doNow[0],
     triggerThreshold: primaryRule?.pauseTrigger,
     reversalCondition: primaryRule?.resumeTrigger,
     evidenceCount: reportData.reportEvidenceItems.length,
+    evidenceTitles: reportData.reportEvidenceItems.map((item) => item.title),
     fetchedAtIso: reportData.treasury.fetched_at,
     isFallbackSnapshot: !reportResult.ok,
     provenanceStatusLabel: reportData.treasuryProvenance?.statusLabel,
+    provenanceLinks: [reportData.treasury.source, reportData.macroSeries[0]?.sourceUrl].filter((link): link is string => Boolean(link)),
+    confidenceLabel: homeBriefModel.confidenceLabel,
+    fallbackLabel: reportResult.ok ? "live" : "fallback",
+    trustSummary: reportData.treasuryProvenance?.statusLabel,
+    citationMeta: reportData.recordDateLabel,
+    interpretationLabel: `${primaryRule?.recommendation ?? ""}|${primaryRule?.doNow[0] ?? ""}`,
   }).eligible;
 };
 

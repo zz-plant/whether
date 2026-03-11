@@ -74,6 +74,8 @@ export async function generateMetadata({ params }: DecisionPageProps): Promise<M
     isFallbackSnapshot: !reportResult.ok,
     provenanceStatusLabel: reportData.treasuryProvenance?.statusLabel,
     fetchedAtIso: reportData.treasury.fetched_at,
+    pageKey: `/answers/${page.slug}`,
+    provenanceLinks: [reportData.treasury.source, reportData.macroSeries[0]?.sourceUrl].filter((link): link is string => Boolean(link)),
   });
 
   return buildDecisionAnswerMetadata({ title: page.title, slug: page.slug, payload });
