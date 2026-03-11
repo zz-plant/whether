@@ -14,6 +14,15 @@ type ModeContent = {
   reversalTriggerDiscipline: string;
 };
 
+const emptyModeContent: ModeContent = {
+  description: "Mode details are temporarily unavailable.",
+  thresholdEmphasis: "Use core weekly posture guidance until mode details refresh.",
+  doNowBullets: ["Use the core weekly brief recommendations for this week."],
+  avoidBullets: ["Avoid irreversible commitments until mode details are available."],
+  watchBullets: ["Recheck mode guidance after the next data refresh."],
+  reversalTriggerDiscipline: "Keep decisions reversible until mode guidance is restored.",
+};
+
 export function StartupModeSelector({
   options,
   selectedMode,
@@ -21,10 +30,14 @@ export function StartupModeSelector({
 }: {
   options: ModeOption[];
   selectedMode: StartupVariantMode;
-  contentByMode: Record<StartupVariantMode, ModeContent>;
+  contentByMode: Partial<Record<StartupVariantMode, ModeContent>>;
 }) {
+  const firstAvailableMode = options.find((option) => contentByMode[option.mode])?.mode;
   const [activeMode, setActiveMode] = useState(selectedMode);
-  const activeContent = contentByMode[activeMode];
+  const effectiveMode = contentByMode[activeMode]
+    ? activeMode
+    : (contentByMode[selectedMode] ? selectedMode : firstAvailableMode);
+  const activeContent = (effectiveMode && contentByMode[effectiveMode]) || emptyModeContent;
 
   return (
     <>
@@ -36,8 +49,8 @@ export function StartupModeSelector({
               key={option.mode}
               type="button"
               onClick={() => setActiveMode(option.mode)}
-              className={`min-h-[44px] rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.06em] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation ${activeMode === option.mode ? "border-sky-400/70 bg-sky-500/20 text-sky-100" : "border-slate-700/70 bg-slate-950/70 text-slate-300 hover:border-slate-500/80"}`}
-              aria-pressed={activeMode === option.mode}
+              className={`min-h-[44px] rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.06em] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation ${effectiveMode === option.mode ? "border-sky-400/70 bg-sky-500/20 text-sky-100" : "border-slate-700/70 bg-slate-950/70 text-slate-300 hover:border-slate-500/80"}`}
+              aria-pressed={effectiveMode === option.mode}
             >
               {option.label}
             </button>
