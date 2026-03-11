@@ -18,6 +18,7 @@ const postureRules: BoundedDecisionRule[] = [
     scope: "",
     pauseTrigger: "Pause base capital.",
     resumeTrigger: "Resume base capital.",
+    flipConditions: [{ metric: "riskAppetite", operator: ">", value: 54, label: "Risk appetite > 54" }],
     rationale: "",
   },
   {
@@ -28,6 +29,7 @@ const postureRules: BoundedDecisionRule[] = [
     scope: "",
     pauseTrigger: "Pause base burn.",
     resumeTrigger: "Resume base burn.",
+    flipConditions: [{ metric: "tightness", operator: "<", value: 66, label: "Tightness < 66" }],
     rationale: "",
   },
   {
@@ -38,6 +40,7 @@ const postureRules: BoundedDecisionRule[] = [
     scope: "",
     pauseTrigger: "Pause base hiring.",
     resumeTrigger: "Resume base hiring.",
+    flipConditions: [{ metric: "tightness", operator: "<", value: 66, label: "Tightness < 66" }],
     rationale: "",
   },
 ];

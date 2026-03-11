@@ -10,6 +10,7 @@ export type WeeklyOperatorBriefPayload = {
   confidence: string;
   doNowBullets: string[];
   flipTrigger: string;
+  flipConditionLabels: string[];
 };
 
 export type WeeklyCallSnapshotPayload = {
@@ -29,12 +30,14 @@ export const buildWeeklyOperatorBriefPayload = ({
   postureWithStageLabel,
   confidenceLabel,
   actionStripItems = [],
+  flipConditionLabels = [],
 }: {
   assessment: RegimeAssessment;
   treasury: TreasuryData;
   postureWithStageLabel?: string;
   confidenceLabel?: "HIGH" | "MED" | "LOW";
   actionStripItems?: ActionStripItem[];
+  flipConditionLabels?: string[];
 }): WeeklyOperatorBriefPayload => {
   const lockCommitment = buildWeeklyLockCommitment({
     regime: assessment.regime,
@@ -48,12 +51,22 @@ export const buildWeeklyOperatorBriefPayload = ({
     ? actionStripItems.slice(0, 3).map((item) => item.actionNow)
     : assessment.constraints.slice(0, 3);
 
+  const normalizedFlipConditionLabels = flipConditionLabels
+    .map((label) => label.trim())
+    .filter((label) => label.length > 0)
+    .filter((label, index, labels) => labels.indexOf(label) === index)
+    .slice(0, 4);
+
   return {
     date: treasury.record_date,
     regimeStage: postureWithStageLabel ?? formatRegimeLabel(assessment.regime),
     confidence: confidenceLabel ? `${confidenceLabel} confidence` : "Score-based posture confidence",
     doNowBullets,
-    flipTrigger: lockCommitment.flipConditions[0] ?? "Flip when live indicators cross the weekly guardrail threshold.",
+    flipTrigger:
+      normalizedFlipConditionLabels[0]
+      ?? lockCommitment.flipConditions[0]
+      ?? "Flip when live indicators cross the weekly guardrail threshold.",
+    flipConditionLabels: normalizedFlipConditionLabels,
   };
 };
 
@@ -66,6 +79,9 @@ export const buildWeeklyOperatorBriefPlainText = (payload: WeeklyOperatorBriefPa
   ...payload.doNowBullets.map((bullet) => `• ${bullet}`),
   "",
   `Flip trigger: ${payload.flipTrigger}`,
+  ...(payload.flipConditionLabels.length > 1
+    ? ["", "Flip conditions:", ...payload.flipConditionLabels.map((condition) => `• ${condition}`)]
+    : []),
 ].join("\n");
 
 export const buildWeeklyOperatorBriefSlackBlocks = (payload: WeeklyOperatorBriefPayload) =>
@@ -95,7 +111,14 @@ export const buildWeeklyOperatorBriefSlackBlocks = (payload: WeeklyOperatorBrief
         },
         {
           type: "context",
-          elements: [{ type: "mrkdwn", text: `*Flip trigger:* ${payload.flipTrigger}` }],
+          elements: [
+            {
+              type: "mrkdwn",
+              text: payload.flipConditionLabels.length > 0
+                ? `*Flip trigger:* ${payload.flipTrigger}\n${payload.flipConditionLabels.map((condition) => `• ${condition}`).join("\n")}`
+                : `*Flip trigger:* ${payload.flipTrigger}`,
+            },
+          ],
         },
       ],
     },
