@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
+import Link from "next/link";
 import { Suspense } from "react";
 import {
   buildTimeMachineHref,
@@ -33,36 +33,8 @@ import { CopyLeadershipArtifactsButtons } from "./components/copyLeadershipArtif
 import { createBreadcrumbTrail } from "../lib/navigation/breadcrumbs";
 import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
 import { resolveSectorKey } from "../lib/report/sectorSensitivity";
-import { getFeaturedConceptArticles } from "../lib/productCanon";
 import { LiveDataFallbackAlert } from "./components/liveDataFallbackAlert";
-import { HomeInterpretationPanel } from "./components/homeInterpretationPanel";
-import { DeferredSection } from "./components/deferredSection";
 import { getRegimeDisplayLabel } from "../lib/regimePresentation";
-import { navigationLayers } from "../lib/navigation/informationArchitecture";
-import { HomeFirstRunOrientation } from "./components/homeFirstRunOrientation";
-import { ResponsiveDetailsPanel } from "./components/responsiveDetailsPanel";
-
-const WeeklyActionSummaryPanel = dynamic(
-  () => import("./components/boardBriefSections").then((module) => module.WeeklyActionSummaryPanel),
-  {},
-);
-
-const ExecutiveSnapshotPanel = dynamic(
-  () => import("./components/boardBriefSections").then((module) => module.ExecutiveSnapshotPanel),
-  {},
-);
-
-const WeeklyActionSummaryFallback = () => (
-  <section id="weekly-action-summary" aria-label="Weekly decisions" className="space-y-8">
-    <div className="weather-panel px-5 py-5 text-sm text-slate-200">Putting together this week&apos;s decisions…</div>
-  </section>
-);
-
-const ExecutiveSnapshotFallback = () => (
-  <section id="executive-snapshot" aria-label="Leadership summary" className="space-y-8">
-    <div className="weather-panel px-5 py-5 text-sm text-slate-200">Collecting the latest evidence snapshot…</div>
-  </section>
-);
 
 export const revalidate = 900;
 export const runtime = "edge";
@@ -73,18 +45,6 @@ const homeSectionSequence = [
   { href: "#execution-guidance", label: "Run the plan" },
   { href: "#evidence-diagnostics", label: "Stress-test evidence" },
 ] as const;
-
-const firstRunDestinationKeys = ["signals", "operations", "decide"] as const;
-
-const homeQuickActions = [
-  { label: "Weekly brief", href: "/" },
-  { label: "Learn", href: "/learn" },
-  { label: "Review evidence", href: "/signals" },
-  { label: "Apply operations", href: "/operations" },
-  { label: "Choose decision path", href: "/decide" },
-  { label: "Run toolkit", href: "/toolkits" },
-  { label: "Inspect methodology", href: "/method" },
-];
 
 
 export const generateMetadata = async ({
@@ -288,9 +248,6 @@ const HomePageReportContent = async ({
     label: section.label,
   }));
   const structuredData = buildHomeStructuredData();
-  const firstRunDestinations = firstRunDestinationKeys
-    .map((key) => navigationLayers.find((layer) => layer.key === key))
-    .filter((layer): layer is (typeof navigationLayers)[number] => layer !== undefined);
 
   const reportResult = await loadReportDataSafe(resolvedSearchParams, { route: "/" });
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
@@ -385,7 +342,6 @@ const HomePageReportContent = async ({
     interpretationLayer,
     postureWithStageLabel: homeBriefModel.postureWithStageLabel,
   });
-  const featuredConcepts = getFeaturedConceptArticles().slice(0, 3);
   return (
     <ReportShell
       regime={assessment.regime}
@@ -482,50 +438,24 @@ const HomePageReportContent = async ({
       />
 
 
-      <DeferredSection
-        id="weekly-action-summary"
-        ariaLabel="Decisions"
-        fallback={<WeeklyActionSummaryFallback />}
-      >
-        <WeeklyActionSummaryPanel
-          assessment={assessment}
-          provenance={treasuryProvenance}
-          recordDateLabel={recordDateLabel}
-        />
-      </DeferredSection>
-
-      <ResponsiveDetailsPanel
-        className="weather-panel px-5 py-4"
-        summary="Evidence appendix (tap to expand)"
-        summaryClassName="cursor-pointer list-none text-xs font-semibold uppercase tracking-[0.14em] text-slate-300 sm:hidden"
-      >
-        <DeferredSection
-          id="executive-snapshot"
-          ariaLabel="Leadership summary"
-          fallback={<ExecutiveSnapshotFallback />}
-        >
-          <ExecutiveSnapshotPanel
-            treasury={treasury}
-            assessment={assessment}
-            provenance={treasuryProvenance}
-            sectionId="executive-snapshot-evidence"
-          />
-        </DeferredSection>
-      </ResponsiveDetailsPanel>
-
-      <HomeInterpretationPanel
-        layer={interpretationLayer}
-        searchParams={resolvedSearchParams}
-      />
-
-      <HomeFirstRunOrientation
-        changeSummary={homeBriefModel.decisionShiftSummary}
-        decisionNow={homeBriefModel.operatingStanceLine}
-        destinations={firstRunDestinations}
-        quickActions={[...homeQuickActions]}
-        featuredConcepts={featuredConcepts}
-        currentPath="/"
-      />
+      <section className="weather-panel space-y-4 px-5 py-4" aria-label="Secondary navigation">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">Need deeper analysis?</p>
+        <p className="text-sm text-slate-200">Keep this page as the weekly call surface. Open detailed workflows only when you need diagnostics or role-specific plans.</p>
+        <div className="grid gap-2 sm:grid-cols-3">
+          <Link href="/operations" className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-100 hover:border-slate-500/80">
+            <span className="font-semibold">Execution playbook</span>
+            <span className="mt-1 block text-slate-300">Approve/hold/escalate plans by function.</span>
+          </Link>
+          <Link href="/signals" className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-100 hover:border-slate-500/80">
+            <span className="font-semibold">Evidence + drivers</span>
+            <span className="mt-1 block text-slate-300">Inspect raw indicators, deltas, and provenance.</span>
+          </Link>
+          <Link href="/decide" className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-100 hover:border-slate-500/80">
+            <span className="font-semibold">Decision scenarios</span>
+            <span className="mt-1 block text-slate-300">Stress-test thresholds and reversal conditions.</span>
+          </Link>
+        </div>
+      </section>
 
       {!reportResult.ok ? (
         <LiveDataFallbackAlert

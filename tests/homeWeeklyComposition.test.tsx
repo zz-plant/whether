@@ -148,9 +148,9 @@ describe("weekly card and interpretation panel composition", () => {
       </>,
     );
 
-    assert.match(html, /Macro operating console/);
-    assert.match(html, /Decision guidance/);
-    assert.match(html, /Share the leadership brief/);
+    assert.match(html, /This week&#x27;s regime/);
+    assert.match(html, /This week&#x27;s call/);
+    assert.match(html, /Copy weekly operator brief/);
     assert.match(html, /Confidence:/);
     assert.match(html, /Action/);
     assert.match(html, /Interpretation layer/);
@@ -158,7 +158,7 @@ describe("weekly card and interpretation panel composition", () => {
     assert.match(html, /• Action:/);
     assert.match(html, /Trigger:/);
     assert.match(html, /Reverse:/);
-    assert.match(html, /Approve, hold, or escalate by role/);
+    assert.match(html, /Execution plan/);
     assert.match(html, /Approve now/);
     assert.match(html, /Delay now/);
   });
@@ -253,10 +253,10 @@ describe("weekly card and interpretation panel composition", () => {
       </>,
     );
 
-    const heroIndex = html.indexOf("Macro operating console");
-    const playbookIndex = html.indexOf("Decision guidance");
+    const heroIndex = html.indexOf("This week&#x27;s regime");
+    const playbookIndex = html.indexOf("This week&#x27;s call");
     const confidenceIndex = html.indexOf("Confidence:");
-    const instructionIndex = html.indexOf("Monitoring panel");
+    const instructionIndex = html.indexOf("Inspect evidence");
     const interpretationIndex = html.indexOf("Interpretation layer");
 
     assert.ok(heroIndex > -1);
@@ -344,7 +344,7 @@ describe("weekly card and interpretation panel composition", () => {
     );
 
     const orientationIndex = html.indexOf("Fast orientation for this week");
-    const cardIndex = html.indexOf("Macro operating console");
+    const cardIndex = html.indexOf("This week&#x27;s regime");
 
     assert.ok(orientationIndex > -1);
     assert.ok(cardIndex > orientationIndex);

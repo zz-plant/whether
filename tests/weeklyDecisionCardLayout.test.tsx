@@ -113,22 +113,20 @@ describe("WeeklyDecisionCard top-fold composition", () => {
 
     assert.match(html, /weekly-posture-brief-title/);
     assert.match(html, /weekly-viral-hero/);
-    assert.match(html, /Macro operating console/);
+    assert.match(html, /This week&#x27;s regime/);
     assert.match(html, /Decision delta/);
-    assert.match(html, /Operational meaning/);
-    assert.match(html, /Operator posture/);
-    assert.match(html, /Conservation/);
-    assert.match(html, /Decision guidance/);
-    assert.match(html, /Decisions favored/);
-    assert.match(html, /Decisions discouraged/);
-    assert.match(html, /Monitoring panel/);
-    assert.match(html, /Weekly change indicator/);
+    assert.match(html, /Regime panel/);
+    assert.match(html, /This week&#x27;s call/);
+    assert.match(html, /Do now/);
+    assert.match(html, /Avoid/);
+    assert.match(html, /Inspect evidence/);
+    assert.match(html, /Regime history/);
     assert.match(html, /id="primary-artifact-actions"/);
 
     const heroIndex = html.indexOf("weekly-posture-brief-title");
     const deltaIndex = html.indexOf("Decision delta");
-    const postureIndex = html.indexOf("Operator posture");
-    const guidanceIndex = html.indexOf("Decision guidance");
+    const postureIndex = html.indexOf("Regime panel");
+    const guidanceIndex = html.indexOf("This week&#x27;s call");
 
     assert.ok(deltaIndex > heroIndex);
     assert.ok(postureIndex > deltaIndex);
@@ -214,7 +212,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     );
 
     assert.match(html, /Using a cached snapshot/);
-    assert.match(html, /Weekly change indicator/);
+    assert.match(html, /Regime history/);
     assert.match(html, /Model pressure is flat this week; hold posture and keep existing guardrails in force\./);
     assert.match(html, /weekly-viral-hero/);
   });
