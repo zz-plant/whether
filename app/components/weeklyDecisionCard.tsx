@@ -3,8 +3,8 @@ import { CircleTargetIcon, ShieldIcon } from "./uiIcons";
 import type { ReportDynamics, ReportEvidenceItem } from "../../lib/report/reportData";
 import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
 import type { ActionStripItem, RoleAwareOperatingTemplate } from "../../lib/report/operatingCalls";
-import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
 import type { ForecastRegimeLabel, TransitionVelocityEstimate } from "../../lib/report/forecastModel";
+import type { HomeDecisionMatrix } from "../../lib/report/homeBriefModel";
 import { formatProbabilityPercent } from "../../lib/report/reportFormatting";
 import {
   buildWeeklyCitationMetaLine,
@@ -53,6 +53,7 @@ export type WeeklyDecisionCardProps = {
   decisionShiftSummary: string;
   transitionProbabilities: Record<ForecastRegimeLabel, number>;
   decisionRules: BoundedDecisionRule[];
+  decisionMatrix: HomeDecisionMatrix;
   actionStripItems?: ActionStripItem[];
   roleAwareTemplates: RoleAwareOperatingTemplate[];
   executiveOperationalStance: { expand: string[]; avoid: string[] };
@@ -423,54 +424,53 @@ export function DecisionCallHeader({
 }
 
 type BoundedRulesMatrixProps = {
-  decisionRules: BoundedDecisionRule[];
+  decisionMatrix: HomeDecisionMatrix;
 };
 
-export function BoundedRulesMatrix({ decisionRules }: BoundedRulesMatrixProps) {
-  const topDecisionRules = decisionRules.slice(0, 4);
-
-  const compactRuleList = (items: string[]) => {
-    if (items.length === 0) {
-      return [];
-    }
-
-    return items.slice(0, 2).map((item) => compactActionCue(item));
-  };
+export function BoundedRulesMatrix({ decisionMatrix }: BoundedRulesMatrixProps) {
+  if (decisionMatrix.rows.length === 0) {
+    return (
+      <article className={`${tierOnePanel} ${sectionSpacing}`}>
+        <h2 className={tierOneHeading}>Decision snapshot for leadership this week</h2>
+        <p className="text-xs leading-5 text-slate-300">Matrix unavailable. Keep last week&apos;s bounded rules until fresh rules land.</p>
+      </article>
+    );
+  }
 
   return (
     <article className={`${tierOnePanel} ${sectionSpacing}`}>
       <h2 className={tierOneHeading}>Decision snapshot for leadership this week</h2>
-      <p className="text-xs leading-5 text-slate-300">Current posture, action, rationale, and flip trigger by operating area.</p>
-      <ul className="mt-2 grid gap-3 sm:grid-cols-2 sm:auto-rows-fr">
-        {topDecisionRules.map((rule) => {
-          const doCues = compactRuleList(rule.doNow);
-          const avoidCue = compactRuleList(rule.avoidNow)[0] ?? "No avoid-now constraint";
-
-          return (
-            <li key={rule.area} className={`${tierOneInset} flex h-full flex-col gap-2 text-xs text-slate-200`}>
-              <p className="font-semibold text-slate-200">{decisionAreaLabel(rule.area)}</p>
-              <div className="rounded-md border border-slate-700/70 bg-slate-950/70 px-2.5 py-2">
-                <p className="text-[10px] font-semibold text-slate-300">Current posture</p>
-                <p className="mt-1 text-[11px] leading-5 text-slate-100">{compactActionCue(rule.recommendation)}</p>
-              </div>
-              <div className="rounded-md border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-2">
-                <p className="text-[10px] font-semibold text-emerald-100">What to do</p>
-                <p className="mt-1 text-[11px] leading-5 text-emerald-50">{doCues[0] ?? "No immediate action"}</p>
-                <p className="mt-1 text-[11px] leading-5 text-rose-100">Delay: {avoidCue}</p>
-              </div>
-              <p className="rounded-md border border-violet-500/45 bg-violet-500/10 px-2.5 py-2 text-[11px] text-violet-100">
-                <span className="font-semibold">Why:</span> {compactActionCue(rule.rationale)}
-              </p>
-              <p className="rounded-full border border-amber-500/45 bg-amber-500/10 px-2.5 py-1 text-[11px] text-amber-100">
-                <span className="font-semibold">Guardrail:</span> {compactActionCue(rule.pauseTrigger)}
-              </p>
-              <p className="rounded-full border border-sky-500/45 bg-sky-500/10 px-2.5 py-1 text-[11px] text-sky-100">
-                <span className="font-semibold">Flip when:</span> {compactActionCue(rule.resumeTrigger)}
-              </p>
-            </li>
-          );
-        })}
-      </ul>
+      <p className="text-xs leading-5 text-slate-300">Approve, delay, or flip by operating area. Hover any cell for threshold/reversal detail.</p>
+      <div className="mt-2 overflow-x-auto">
+        <table className="w-full min-w-[640px] border-collapse text-left text-xs text-slate-200">
+          <thead>
+            <tr>
+              <th className="border border-slate-700/70 bg-slate-950/80 px-2.5 py-2 text-[10px] uppercase tracking-[0.12em] text-slate-300">Area</th>
+              {decisionMatrix.columns.map((column) => (
+                <th key={column.key} className="border border-slate-700/70 bg-slate-950/80 px-2.5 py-2 text-[10px] uppercase tracking-[0.12em] text-slate-300">{column.label}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {decisionMatrix.rows.map((row) => (
+              <tr key={row.row}>
+                <th scope="row" className="border border-slate-700/70 bg-slate-950/72 px-2.5 py-2 font-semibold text-slate-100">{row.label}</th>
+                {decisionMatrix.columns.map((column) => {
+                  const cell = row.cells[column.key];
+                  const detail = cell.detail?.trim() || "Threshold and reversal logic unavailable for this cell.";
+                  return (
+                    <td key={`${row.row}-${column.key}`} className="border border-slate-700/70 bg-slate-950/50 px-2.5 py-2 align-top" title={detail}>
+                      <p className="leading-5 text-slate-100">{cell.action}</p>
+                      {cell.rationaleKey ? <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-400">{cell.rationaleKey}</p> : null}
+                      <p className="sr-only">Hover detail: {detail}</p>
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </article>
   );
 }
@@ -635,6 +635,7 @@ export function WeeklyDecisionCard({
   decisionShiftSummary: _decisionShiftSummary,
   transitionProbabilities,
   decisionRules,
+  decisionMatrix,
   actionStripItems: _actionStripItems = [],
   roleAwareTemplates,
   revisitDecisions,
@@ -669,7 +670,7 @@ export function WeeklyDecisionCard({
   const immediateDecision = actionNowShort?.trim()
     || (revisitDecisions
       ? "Revise hiring and roadmap calls now."
-      : "Hold last week's operating rules.");
+      : "Hold last week&apos;s operating rules.");
 
   const topContributors = (reportDynamics.signalContributions ?? []).slice(0, 3);
   const topContributorInline =
@@ -757,7 +758,7 @@ export function WeeklyDecisionCard({
               <span>Decision snapshot matrix (expand)</span>
               <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
             </summary>
-            <div className="mt-3"><BoundedRulesMatrix decisionRules={decisionRules} /></div>
+            <div className="mt-3"><BoundedRulesMatrix decisionMatrix={decisionMatrix} /></div>
           </details>
 
           <details id="execution-guidance" className={`${tierOnePanel} ${sectionSpacing} group`}>

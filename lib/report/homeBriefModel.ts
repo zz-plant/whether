@@ -28,6 +28,29 @@ import {
 import type { BoundedDecisionRule } from "./boundedDecisionRules";
 import type { ActionStripItem, RoleAwareOperatingTemplate } from "./operatingCalls";
 
+export const DECISION_MATRIX_ROWS = ["hiring", "product", "capital", "burn"] as const;
+export const DECISION_MATRIX_COLUMNS = ["approve", "delay", "flip"] as const;
+
+export type DecisionMatrixRowKey = (typeof DECISION_MATRIX_ROWS)[number];
+export type DecisionMatrixColumnKey = (typeof DECISION_MATRIX_COLUMNS)[number];
+
+export type DecisionMatrixCell = {
+  action: string;
+  rationaleKey?: string;
+  detail?: string;
+};
+
+export type DecisionMatrixRow = {
+  row: DecisionMatrixRowKey;
+  label: string;
+  cells: Record<DecisionMatrixColumnKey, DecisionMatrixCell>;
+};
+
+export type HomeDecisionMatrix = {
+  columns: Array<{ key: DecisionMatrixColumnKey; label: string }>;
+  rows: DecisionMatrixRow[];
+};
+
 type Regime = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
 
 type HomeReportData = {
@@ -546,6 +569,13 @@ const buildStartupClimateIndex = ({
   };
 };
 
+const compactActionCue = (text: string) =>
+  text
+    .replace(/^(Pause|Resume)\s+/i, "")
+    .replace(/\.$/, "")
+    .replace(/^when\s+/i, "")
+    .trim();
+
 const buildPrimaryRiskLabel = ({
   failureModes,
   changedSignals,
@@ -573,6 +603,105 @@ const buildPrimaryRiskLabel = ({
   }
 
   return `Upside: ${signalLabel} eased (${Math.abs(dominantSignal.delta).toFixed(1)}).`;
+};
+
+const buildHomeDecisionMatrix = (decisionRules: BoundedDecisionRule[]): HomeDecisionMatrix => {
+  const byArea = new Map(decisionRules.map((rule) => [rule.area, rule]));
+  const fallbackDetail = "Threshold and reversal logic unavailable for this area this week.";
+
+  return {
+    columns: [
+      { key: "approve", label: "Approve" },
+      { key: "delay", label: "Delay" },
+      { key: "flip", label: "Flip" },
+    ],
+    rows: [
+      {
+        row: "hiring",
+        label: "Hiring",
+        cells: {
+          approve: {
+            action: compactActionCue(byArea.get("hiring")?.doNow[0] ?? "No approve call available"),
+            rationaleKey: "H1",
+            detail: compactActionCue(byArea.get("hiring")?.pauseTrigger ?? fallbackDetail),
+          },
+          delay: {
+            action: compactActionCue(byArea.get("hiring")?.avoidNow[0] ?? "No delay call available"),
+            rationaleKey: "H2",
+            detail: compactActionCue(byArea.get("hiring")?.rationale ?? fallbackDetail),
+          },
+          flip: {
+            action: compactActionCue(byArea.get("hiring")?.resumeTrigger ?? "No flip trigger available"),
+            rationaleKey: "H3",
+            detail: compactActionCue(byArea.get("hiring")?.resumeTrigger ?? fallbackDetail),
+          },
+        },
+      },
+      {
+        row: "product",
+        label: "Product",
+        cells: {
+          approve: {
+            action: compactActionCue(byArea.get("product-tempo")?.doNow[0] ?? "No approve call available"),
+            rationaleKey: "P1",
+            detail: compactActionCue(byArea.get("product-tempo")?.pauseTrigger ?? fallbackDetail),
+          },
+          delay: {
+            action: compactActionCue(byArea.get("product-tempo")?.avoidNow[0] ?? "No delay call available"),
+            rationaleKey: "P2",
+            detail: compactActionCue(byArea.get("product-tempo")?.rationale ?? fallbackDetail),
+          },
+          flip: {
+            action: compactActionCue(byArea.get("product-tempo")?.resumeTrigger ?? "No flip trigger available"),
+            rationaleKey: "P3",
+            detail: compactActionCue(byArea.get("product-tempo")?.resumeTrigger ?? fallbackDetail),
+          },
+        },
+      },
+      {
+        row: "capital",
+        label: "Capital",
+        cells: {
+          approve: {
+            action: compactActionCue(byArea.get("capital-raising")?.doNow[0] ?? "No approve call available"),
+            rationaleKey: "C1",
+            detail: compactActionCue(byArea.get("capital-raising")?.pauseTrigger ?? fallbackDetail),
+          },
+          delay: {
+            action: compactActionCue(byArea.get("capital-raising")?.avoidNow[0] ?? "No delay call available"),
+            rationaleKey: "C2",
+            detail: compactActionCue(byArea.get("capital-raising")?.rationale ?? fallbackDetail),
+          },
+          flip: {
+            action: compactActionCue(byArea.get("capital-raising")?.resumeTrigger ?? "No flip trigger available"),
+            rationaleKey: "C3",
+            detail: compactActionCue(byArea.get("capital-raising")?.resumeTrigger ?? fallbackDetail),
+          },
+        },
+      },
+      {
+        row: "burn",
+        label: "Burn",
+        cells: {
+          approve: {
+            action: compactActionCue(byArea.get("burn-discipline")?.doNow[0] ?? "No approve call available"),
+            rationaleKey: "B1",
+            detail: compactActionCue(byArea.get("burn-discipline")?.pauseTrigger ?? fallbackDetail),
+          },
+          delay: {
+            action: compactActionCue(byArea.get("burn-discipline")?.avoidNow[0] ?? "No delay call available"),
+            rationaleKey: "B2",
+            detail: compactActionCue(byArea.get("burn-discipline")?.rationale ?? fallbackDetail),
+          },
+          flip: {
+            action: compactActionCue(byArea.get("burn-discipline")?.resumeTrigger ?? "No flip trigger available"),
+            rationaleKey: "B3",
+            detail: compactActionCue(byArea.get("burn-discipline")?.resumeTrigger ?? fallbackDetail),
+          },
+        },
+      },
+    ],
+  };
 };
 
 export const buildHomeBriefModel = (
@@ -733,6 +862,7 @@ export const buildHomeBriefModel = (
   const roleAwareTemplates = buildRoleAwareOperatingTemplates(decisionRules);
   const actionStripItems: ActionStripItem[] = buildActionStripItems(decisionRules);
   const executiveOperationalStance = extractExecutiveOperationalStance({ roleAwareTemplates, decisionRules });
+  const decisionMatrix = buildHomeDecisionMatrix(decisionRules);
 
   const conciseActionNow = actionNowShort?.trim();
   const conciseFlipThreshold = flipThreshold?.trim() || reversalTrigger;
@@ -788,6 +918,7 @@ export const buildHomeBriefModel = (
       Defensive: 25,
     },
     decisionRules,
+    decisionMatrix,
     actionStripItems,
     roleAwareTemplates,
     executiveOperationalStance,

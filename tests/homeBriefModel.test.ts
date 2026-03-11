@@ -361,4 +361,31 @@ describe("buildHomeBriefModel", () => {
     assert.doesNotMatch(model.netConstraintSummary, /climate stance/i);
   });
 
+  it("builds decision matrix with complete row and column contract", () => {
+    const model = buildHomeBriefModel({
+      assessment: {
+        regime: "DEFENSIVE",
+        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
+        scores: { tightness: 60, riskAppetite: 45 },
+      },
+      regimeAlert: null,
+      stopItems: ["Guardrail"],
+      reportDynamics: {
+        directionLabel: "stable",
+        changedSignals: [],
+        anomalySignals: [],
+      },
+    });
+
+    assert.deepEqual(model.decisionMatrix.columns.map((column) => column.key), ["approve", "delay", "flip"]);
+    assert.deepEqual(model.decisionMatrix.rows.map((row) => row.row), ["hiring", "product", "capital", "burn"]);
+
+    for (const row of model.decisionMatrix.rows) {
+      assert.ok(row.cells.approve.action.length > 0);
+      assert.ok(row.cells.delay.action.length > 0);
+      assert.ok(row.cells.flip.action.length > 0);
+      assert.ok((row.cells.flip.detail ?? "").length > 0);
+    }
+  });
+
 });

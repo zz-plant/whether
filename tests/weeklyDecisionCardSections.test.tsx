@@ -163,28 +163,53 @@ describe("WeeklyDecisionCard extracted sections", () => {
     assert.match(html, /Constraints eased\./);
   });
 
-  it("renders bounded rules matrix hierarchy", () => {
+  it("renders decision matrix columns, rows, and hover detail", () => {
     const html = renderToStaticMarkup(
       <BoundedRulesMatrix
-        decisionRules={[
-          {
-            area: "hiring",
-            recommendation: "Keep backfills only.",
-            doNow: ["Keep backfills only."],
-            avoidNow: ["Avoid speculative hiring."],
-            scope: "CFO review",
-            pauseTrigger: "Tightness above 74",
-            resumeTrigger: "Tightness below 65",
-            rationale: "Discipline",
-          },
-        ]}
+        decisionMatrix={{
+          columns: [
+            { key: "approve", label: "Approve" },
+            { key: "delay", label: "Delay" },
+            { key: "flip", label: "Flip" },
+          ],
+          rows: [
+            {
+              row: "hiring",
+              label: "Hiring",
+              cells: {
+                approve: { action: "Backfills only", rationaleKey: "H1", detail: "Pause if tightness > 74" },
+                delay: { action: "Speculative classes", rationaleKey: "H2", detail: "Long payback risk" },
+                flip: { action: "Resume staged approvals", rationaleKey: "H3", detail: "When tightness < 65" },
+              },
+            },
+          ],
+        }}
       />,
     );
 
     assert.match(html, /Decision snapshot for leadership this week/);
-    assert.match(html, /What to do/);
-    assert.match(html, /Delay:/);
+    assert.match(html, /Approve/);
+    assert.match(html, /Delay/);
+    assert.match(html, /Flip/);
+    assert.match(html, /title="Pause if tightness &gt; 74"/);
+    assert.match(html, /Hover detail: Pause if tightness &gt; 74/);
+  });
 
+  it("renders decision matrix empty state", () => {
+    const html = renderToStaticMarkup(
+      <BoundedRulesMatrix
+        decisionMatrix={{
+          columns: [
+            { key: "approve", label: "Approve" },
+            { key: "delay", label: "Delay" },
+            { key: "flip", label: "Flip" },
+          ],
+          rows: [],
+        }}
+      />,
+    );
+
+    assert.match(html, /Matrix unavailable/);
   });
 
   it("renders collapsed context and citation footer", () => {

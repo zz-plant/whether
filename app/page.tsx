@@ -417,6 +417,7 @@ const HomePageReportContent = async ({
         decisionShiftSummary={homeBriefModel.decisionShiftSummary}
         transitionProbabilities={homeBriefModel.transitionProbabilities}
         decisionRules={homeBriefModel.decisionRules}
+        decisionMatrix={homeBriefModel.decisionMatrix}
         actionStripItems={homeBriefModel.actionStripItems}
         roleAwareTemplates={homeBriefModel.roleAwareTemplates}
         executiveOperationalStance={homeBriefModel.executiveOperationalStance}
