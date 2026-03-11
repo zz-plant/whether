@@ -31,6 +31,7 @@ import {
   buildFailureModeWarnings,
   type FailureModeWarning,
 } from "./trustStatus";
+import { buildWeeklyLockCommitment } from "./decisionKnobs";
 import type { BoundedDecisionRule } from "./boundedDecisionRules";
 import type { ActionStripItem, RoleAwareOperatingTemplate } from "./operatingCalls";
 import type { TimeMachineRegimeEntry } from "../timeMachine/timeMachineCache";
@@ -139,6 +140,26 @@ type RegimeSignalIndicator = {
 
 type HomeBriefFailureMode = FailureModeWarning;
 
+export type DecisionMatrixColumnKey = "approve" | "delay" | "flip";
+
+export type DecisionMatrixRowKey = "hiring" | "product" | "capital" | "burn";
+
+export type DecisionMatrixCell = {
+  text: string;
+  detail: string;
+};
+
+export type DecisionMatrixRow = {
+  key: DecisionMatrixRowKey;
+  label: string;
+  cells: Record<DecisionMatrixColumnKey, DecisionMatrixCell>;
+};
+
+export type DecisionMatrixPayload = {
+  columns: Array<{ key: DecisionMatrixColumnKey; label: string }>;
+  rows: DecisionMatrixRow[];
+};
+
 type ExecutiveOperationalStance = {
   expand: string[];
   avoid: string[];
@@ -161,6 +182,81 @@ const dedupeByStem = (items: string[]): string[] => {
     seen.add(stem);
     return true;
   });
+};
+
+const compactMatrixText = (value: string, fallback: string) => {
+  const normalized = value.trim();
+  if (!normalized) {
+    return fallback;
+  }
+
+  const [firstClause] = normalized.split(/[.;]/);
+  return firstClause?.trim() || fallback;
+};
+
+const matrixRowConfig: Array<{ key: DecisionMatrixRowKey; label: string; area: BoundedDecisionRule["area"]; flipConditionIndex: number }> = [
+  { key: "hiring", label: "Hiring", area: "hiring", flipConditionIndex: 0 },
+  { key: "product", label: "Product", area: "product-tempo", flipConditionIndex: 1 },
+  { key: "capital", label: "Capital", area: "capital-raising", flipConditionIndex: 1 },
+  { key: "burn", label: "Burn", area: "burn-discipline", flipConditionIndex: 2 },
+];
+
+export const buildDecisionMatrixPayload = ({
+  regime,
+  thresholds,
+  decisionRules,
+  confidenceDegraded,
+  freshnessDegraded,
+}: {
+  regime: Regime;
+  thresholds: HomeReportData["assessment"]["thresholds"];
+  decisionRules: BoundedDecisionRule[];
+  confidenceDegraded: boolean;
+  freshnessDegraded: boolean;
+}): DecisionMatrixPayload => {
+  const rulesByArea = new Map(decisionRules.map((rule) => [rule.area, rule]));
+  const lockCommitment = buildWeeklyLockCommitment({
+    regime,
+    tightnessRegime: thresholds.tightnessRegime,
+    riskAppetiteRegime: thresholds.riskAppetiteRegime,
+    confidenceDegraded,
+    freshnessDegraded,
+  });
+
+  const rows: DecisionMatrixRow[] = matrixRowConfig.map(({ key, label, area, flipConditionIndex }) => {
+    const rule = rulesByArea.get(area);
+    const fallbackApprove = "Stage approvals on short-cycle proof";
+    const fallbackDelay = "Delay irreversible commitments";
+    const flipCondition = lockCommitment.flipConditions[flipConditionIndex] ?? lockCommitment.flipConditions[0] ?? "Recheck thresholds on next refresh.";
+
+    return {
+      key,
+      label,
+      cells: {
+        approve: {
+          text: compactMatrixText(rule?.doNow[0] ?? "", fallbackApprove),
+          detail: rule?.rationale ?? "Use current posture until signal quality improves.",
+        },
+        delay: {
+          text: compactMatrixText(rule?.avoidNow[0] ?? "", fallbackDelay),
+          detail: rule?.pauseTrigger ?? "Pause if macro confidence degrades or thresholds weaken.",
+        },
+        flip: {
+          text: compactMatrixText(flipCondition, "Flip only after threshold recovery"),
+          detail: `${rule?.resumeTrigger ?? "Resume only with sustained threshold recovery."} ${flipCondition}`.trim(),
+        },
+      },
+    };
+  });
+
+  return {
+    columns: [
+      { key: "approve", label: "Approve" },
+      { key: "delay", label: "Delay" },
+      { key: "flip", label: "Flip" },
+    ],
+    rows,
+  };
 };
 
 export const extractExecutiveOperationalStance = ({
@@ -861,6 +957,13 @@ export const buildHomeBriefModel = (
 
   const conciseActionNow = actionNowShort?.trim();
   const conciseFlipThreshold = flipThreshold?.trim() || reversalTrigger;
+  const decisionMatrix = buildDecisionMatrixPayload({
+    regime: assessment.regime,
+    thresholds: assessment.thresholds,
+    decisionRules,
+    confidenceDegraded: confidenceLabel === "LOW",
+    freshnessDegraded: Boolean(treasury?.fallback_at || treasury?.fallback_reason),
+  });
   const weeklyMovement = buildWeeklyMovementMetric({
     severityDelta,
     changedSignals: reportDynamics?.changedSignals ?? [],
@@ -920,6 +1023,7 @@ export const buildHomeBriefModel = (
       Defensive: 25,
     },
     decisionRules,
+    decisionMatrix,
     actionStripItems,
     roleAwareTemplates,
     executiveOperationalStance,

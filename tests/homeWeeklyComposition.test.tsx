@@ -162,7 +162,7 @@ describe("weekly card and interpretation panel composition", () => {
 
     assert.match(html, /This week&#x27;s regime/);
     assert.match(html, /This week&#x27;s call/);
-    assert.match(html, /Copy weekly operator brief/);
+    assert.doesNotMatch(html, /Copy weekly operator brief/);
     assert.match(html, /Confidence:/);
     assert.match(html, /Action/);
     assert.match(html, /Interpretation layer/);

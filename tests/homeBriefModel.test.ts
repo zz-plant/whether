@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
+import { buildDecisionMatrixPayload, buildHomeBriefModel } from "../lib/report/homeBriefModel";
 
 describe("buildHomeBriefModel", () => {
   it("derives stable labels and decision rules from brief inputs", () => {
@@ -393,6 +393,53 @@ describe("buildHomeBriefModel", () => {
     assert.equal(baseRate?.valueLabel, "—");
     assert.equal(baseRate?.trendArrow, "→");
     assert.equal(baseRate?.isFallback, true);
+  });
+
+
+  it("builds complete decision matrix across all row and column intersections", () => {
+    const model = buildHomeBriefModel({
+      assessment: {
+        regime: "DEFENSIVE",
+        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
+        scores: { tightness: 58, riskAppetite: 45 },
+      },
+      regimeAlert: null,
+      stopItems: ["Guardrail"],
+      reportDynamics: {
+        directionLabel: "stable",
+        changedSignals: [],
+        anomalySignals: [],
+      },
+    });
+
+    assert.equal(model.decisionMatrix.columns.length, 3);
+    assert.deepEqual(model.decisionMatrix.columns.map((column) => column.label), ["Approve", "Delay", "Flip"]);
+    assert.equal(model.decisionMatrix.rows.length, 4);
+
+    for (const row of model.decisionMatrix.rows) {
+      for (const column of model.decisionMatrix.columns) {
+        const cell = row.cells[column.key];
+        assert.ok(cell);
+        assert.ok(cell.text.length > 0);
+        assert.ok(cell.detail.length > 0);
+      }
+    }
+  });
+
+  it("falls back to default matrix cues when decision inputs are missing", () => {
+    const matrix = buildDecisionMatrixPayload({
+      regime: "DEFENSIVE",
+      thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
+      decisionRules: [],
+      confidenceDegraded: true,
+      freshnessDegraded: true,
+    });
+
+    assert.equal(matrix.rows.length, 4);
+    assert.equal(matrix.rows[0]?.cells.approve.text, "Stage approvals on short-cycle proof");
+    assert.equal(matrix.rows[0]?.cells.delay.text, "Delay irreversible commitments");
+    assert.match(matrix.rows[0]?.cells.flip.text ?? "", /Tightness ≤/);
+    assert.match(matrix.rows[3]?.cells.flip.text ?? "", /Re-tighten if/);
   });
 
 
