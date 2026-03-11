@@ -4,10 +4,9 @@
  */
 import { insightDatabase } from "../data/recommendations";
 import type { RegimeKey } from "./regimeEngine";
-import { operatingLeverLabel, type OperatingLeverKey } from "./report/decisionKnobs";
+import { operatingLeverLabel, operatingLeverOrder, type OperatingLeverKey } from "./report/decisionKnobs";
 import { buildCanonicalBoundedDecisionRules } from "./report/boundedDecisionRules";
 import { buildActionStripItems } from "./report/operatingCalls";
-import { decisionAreaToOperatingLever } from "./report/operatingLeverMap";
 
 type PlaybookOperatingLever = {
   lever: OperatingLeverKey;
@@ -72,8 +71,7 @@ const buildPlaybookOperatingLevers = ({
   const actionStripItems = buildActionStripItems(canonicalRules);
   const actionStripByLever = new Map(actionStripItems.map((item) => [item.lever, item]));
 
-  return canonicalRules.map((rule) => {
-    const lever = decisionAreaToOperatingLever[rule.area];
+  return operatingLeverOrder.map((lever) => {
     const stripItem = actionStripByLever.get(lever);
 
     return {
