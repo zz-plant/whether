@@ -161,14 +161,6 @@ const compactRoleCue = (text: string) =>
     .replace(/;\s*$/, "")
     .trim();
 
-const resolveDecisionShift = (label: "unchanged" | "higher" | "lower") => {
-  if (label === "higher") return "higher";
-  if (label === "lower") return "lower";
-  return "unchanged";
-};
-
-
-
 
 type LiveBandChip = {
   id: string;
@@ -366,9 +358,9 @@ export function DecisionCallHeader({
 
   return (
     <header className="space-y-4 border-b border-slate-700/80 pb-6" data-testid="weekly-top-fold">
-      <article className={`${tierOnePanel} weather-live-hero weather-live-hero--${heroUrgency} space-y-4`} data-testid="weekly-viral-hero" aria-label="Weekly posture strip">
-        <p className="text-xs font-semibold tracking-[0.08em] text-slate-300">Macro operating console</p>
-        <h1 id="weekly-posture-brief-title" className="text-2xl font-semibold text-slate-50 sm:text-3xl">
+      <article className={`${tierOnePanel} weather-live-hero weather-live-hero--${heroUrgency} space-y-5 border-sky-400/50 bg-gradient-to-br from-slate-950 via-slate-900/95 to-slate-950`} data-testid="weekly-viral-hero" aria-label="Weekly posture strip">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-sky-200">This week&apos;s regime</p>
+        <h1 id="weekly-posture-brief-title" className="text-3xl font-semibold text-slate-50 sm:text-4xl">
           {resolvedPostureLabel} — {resolvedStageLabel}
         </h1>
         <div className="weather-live-band" data-live-urgency={heroUrgency} aria-label="Live decision telemetry">
@@ -376,7 +368,7 @@ export function DecisionCallHeader({
             <span key={chip.id} className={`weather-live-band-chip weather-live-band-chip--${chip.tone}`}>{chip.label}</span>
           ))}
         </div>
-        <p className="text-base font-semibold text-sky-100">{operatingStanceLine}</p>
+        <p className="text-lg font-semibold text-sky-100">{operatingStanceLine}</p>
         <p className="text-sm leading-6 text-slate-200">{immediateDecision}</p>
         <p className="rounded-md border border-slate-700/75 bg-slate-950/68 px-3 py-2 text-xs text-slate-200"><span className="font-semibold text-slate-100">Decision delta:</span> {netConstraintSummary}</p>
 
@@ -421,8 +413,7 @@ export function DecisionCallHeader({
           </p>
         </div>
 
-        <p className="text-xs text-slate-300">{netConstraintSummary}</p>
-        <p className="text-xs text-slate-300">Flip watch: {regimeDistance.dimensionLabel} {regimeDistance.thresholdDirection === "riseAbove" ? "rises above" : "falls to or below"} {regimeDistance.thresholdValue.toFixed(1)}.</p>
+        <p className="text-xs text-slate-300">Next flip: {regimeDistance.dimensionLabel} {regimeDistance.thresholdDirection === "riseAbove" ? "rises above" : "falls to or below"} {regimeDistance.thresholdValue.toFixed(1)}.</p>
         {needsTrustWarning ? (
           <p className="rounded-md border border-amber-500/50 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">{trustWarningCopy}</p>
         ) : null}
@@ -641,10 +632,10 @@ export function WeeklyDecisionCard({
   recordDateLabel,
   fetchedAtLabel,
   reportDynamics,
-  decisionShiftSummary,
+  decisionShiftSummary: _decisionShiftSummary,
   transitionProbabilities,
   decisionRules,
-  actionStripItems = [],
+  actionStripItems: _actionStripItems = [],
   roleAwareTemplates,
   revisitDecisions,
   weeklyMovement,
@@ -693,12 +684,6 @@ export function WeeklyDecisionCard({
     ? "Using a cached snapshot. Use this call for near-term pacing only and pause irreversible decisions until live refresh returns."
     : "Use this call for near-term pacing only until confidence returns to HIGH with fresh data.";
 
-  const hiringShift = resolveDecisionShift(revisitDecisions ? "higher" : "unchanged");
-  const experimentShift = resolveDecisionShift(revisitDecisions ? "lower" : "unchanged");
-  const longPaybackShift = resolveDecisionShift(revisitDecisions ? "higher" : "unchanged");
-  const movementMagnitude = Math.min(100, Math.max(8, Math.round(Math.abs(weeklyMovement.score) * 16)));
-  const movementTone = weeklyMovement.direction === "expansionary" ? "positive" : weeklyMovement.direction === "defensive" ? "warning" : "neutral";
-
   return (
     <section className="weather-panel space-y-5 px-5 py-6 sm:space-y-6 sm:px-7 sm:py-8" aria-labelledby="weekly-posture-brief-title">
       <DecisionCallHeader
@@ -722,177 +707,141 @@ export function WeeklyDecisionCard({
         regimeDistance={regimeDistance}
       />
 
-      <div className="grid gap-4 lg:grid-cols-5">
-        <article id="what-changed-this-week" className={`${tierOnePanel} weather-motion-card ${sectionSpacing} lg:col-span-3 bg-gradient-to-b from-slate-950/95 to-slate-950/75`}>
-          <div className="flex items-center justify-between gap-3">
-            <h2 className={tierOneHeading}>Evidence snapshot</h2>
-            <span className="rounded-full border border-sky-400/40 bg-sky-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-100">Live weekly move</span>
-          </div>
-          <p className="text-xs text-slate-300">Scan evidence, reliability, and immediate implication in one pass.</p>
-          <ul className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
-            {evidenceItems.map((item) => {
-              const evidenceTone = resolveEvidenceTone(item.directionLabel);
-              return (
-                <li key={item.key} className={`${tierOneInset} weather-signal-cell weather-signal-cell--${evidenceTone} space-y-1.5 text-xs text-slate-200`}>
-                  <p className="font-semibold text-slate-100">{item.title}</p>
-                  <ul className="space-y-1 text-[11px] text-slate-300">
-                    {item.supportingBullets.slice(0, 3).map((bullet) => (
-                      <li key={`${item.key}-delta-${bullet}`}>• {bullet}</li>
-                    ))}
-                  </ul>
-                  <p className="text-[11px] text-slate-300"><span className="font-semibold text-slate-200">Confidence:</span> {item.confidenceLabel}</p>
-                  <p className="text-[11px] text-slate-300"><span className="font-semibold text-slate-200">Direction:</span> {item.directionLabel}</p>
-                  <p className="text-[11px] text-slate-300"><span className="font-semibold text-slate-200">Immediate implication:</span> {item.immediateImplication}</p>
-                </li>
-              );
-            })}
-          </ul>
-          <p className="rounded-md border border-sky-500/40 bg-sky-500/10 px-3 py-2 text-xs font-semibold text-sky-100">
-            Net effect: {immediateDecision}
-          </p>
-        </article>
-
-        <article className={`${tierOnePanel} weather-motion-card ${sectionSpacing} lg:col-span-2 bg-gradient-to-b from-slate-950/95 to-slate-950/75`}>
-          <h2 className={tierOneHeading}>Operator posture</h2>
-          <p className="text-[11px] text-slate-300">Operational meaning</p>
-          <p className="text-sm font-semibold text-slate-100">{postureWithStageLabel ?? statusLabel}</p>
-          <div className="rounded-lg border border-slate-700/70 bg-slate-950/65 p-3 space-y-2">
-            <div className="flex items-center justify-between text-[10px] uppercase tracking-[0.1em] text-slate-400">
-              <span>Conservation</span>
-              <span>Expansion</span>
-            </div>
-            <div className="relative h-2 rounded-full bg-slate-800">
-              <div className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-violet-500/40 via-sky-500/40 to-emerald-500/40" />
-              <div className="absolute top-1/2 h-4 w-4 -translate-y-1/2 rounded-full border border-sky-200 bg-sky-400 shadow-[0_0_0_4px_rgba(14,165,233,0.2)]" style={{ left: `calc(${resolvePosturePosition(postureWithStageLabel ?? statusLabel)}% - 0.5rem)` }} />
-            </div>
-          </div>
-          <div className="grid gap-2 sm:grid-cols-2">
-            <p className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">Hiring pace: <span className="font-semibold uppercase">{hiringShift}</span></p>
-            <p className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">Experiment tolerance: <span className="font-semibold uppercase">{experimentShift === "higher" ? "up" : experimentShift === "lower" ? "down" : "flat"}</span></p>
-            <p className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">Commitment threshold: <span className="font-semibold uppercase">{longPaybackShift === "higher" ? "elevated" : "normal"}</span></p>
-            <p className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">Payback tolerance: <span className="font-semibold uppercase">{longPaybackShift === "higher" ? "shorter" : "medium"}</span></p>
-          </div>
-        </article>
-      </div>
-
-      <div className="grid gap-4 lg:grid-cols-3">
-        <article className={`${tierOnePanel} weather-motion-card ${sectionSpacing} lg:col-span-2`}>
-          <h2 className={tierOneHeading}>Decision guidance</h2>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div className={`${tierOneInset} space-y-1.5 border-emerald-500/35 bg-emerald-500/5`}>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald-200">Decisions favored</p>
-              <ul className="space-y-1 text-xs text-emerald-100">
-                {roleAwareTemplates.slice(0, 3).map((template) => <li key={`favor-${template.role}`}>• {compactRoleCue(template.doNow)}</li>)}
-              </ul>
-            </div>
-            <div className={`${tierOneInset} space-y-1.5 border-rose-500/35 bg-rose-500/5`}>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-rose-200">Decisions discouraged</p>
-              <ul className="space-y-1 text-xs text-rose-100">
-                {roleAwareTemplates.slice(0, 3).map((template) => <li key={`avoid-${template.role}`}>• {compactRoleCue(template.avoidNow)}</li>)}
-              </ul>
-            </div>
-          </div>
-        </article>
-
-        <details className={`${tierThreePanel} ${compactSectionSpacing} group`}>
-          <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
-            <span>Monitoring panel (secondary)</span>
-            <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
-          </summary>
-          <ul className="mt-1.5 space-y-1 text-xs text-slate-200">
-            {evidenceItems.slice(0, 3).map((item) => (
-              <li key={`watch-${item.key}`}>• {item.title}: {item.immediateImplication}</li>
-            ))}
-            <li>• Flip watch: {regimeDistance.dimensionLabel} {regimeDistance.thresholdDirection === "riseAbove" ? "rises above" : "falls to or below"} {regimeDistance.thresholdValue.toFixed(1)}.</li>
-          </ul>
-        </details>
-      </div>
-
-      <article className={`${tierOnePanel} weather-motion-card ${sectionSpacing} bg-gradient-to-r from-slate-950/92 via-slate-900/85 to-slate-950/92`}>
-        <h2 className={tierOneHeading}>Weekly change indicator</h2>
-        <p className="text-sm font-semibold text-slate-100">Model-backed movement score: {weeklyMovement.score > 0 ? `+${weeklyMovement.score.toFixed(1)}` : weeklyMovement.score.toFixed(1)} ({weeklyMovement.direction})</p>
-        <div className="weather-movement-track" aria-hidden="true">
-          <div className={`weather-movement-fill weather-movement-fill--${movementTone}`} style={{ width: `${movementMagnitude}%` }} />
-        </div>
-        <p className="text-xs text-slate-300">{weeklyMovement.summary}</p>
-      </article>
-
-      <div id="decision-snapshot-for-leadership-this-week"><BoundedRulesMatrix decisionRules={decisionRules} /></div>
-
-      <article id="execution-guidance" className={`${tierOnePanel} ${sectionSpacing}`}>
-        <h2 className={tierOneHeading}>Approve, hold, or escalate by role</h2>
-        <p className="text-xs text-slate-300">Because the stance is {postureWithStageLabel ?? statusLabel}, execute in a gated, reversible way this week.</p>
-        <div className="mt-2 grid gap-3 sm:grid-cols-2">
-          {roleAwareTemplates.map((template) => (
-            <article key={template.role} className={`${tierOneInset} space-y-2`}>
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-200">{template.roleLabel}</p>
-              <p className="rounded-md border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-2 text-xs text-emerald-100"><span className="font-semibold uppercase tracking-[0.1em]">Approve now</span> {compactRoleCue(template.doNow)}</p>
-              <p className="rounded-md border border-rose-500/40 bg-rose-500/10 px-2.5 py-2 text-xs text-rose-100"><span className="font-semibold uppercase tracking-[0.1em]">Delay now</span> {compactRoleCue(template.avoidNow)}</p>
-              <p className="rounded-md border border-sky-500/40 bg-sky-500/10 px-2.5 py-2 text-xs text-sky-100"><span className="font-semibold uppercase tracking-[0.1em]">Flip when</span> {compactActionCue(template.flipTrigger)}</p>
-            </article>
-          ))}
-        </div>
-      </article>
-
-      <article className={`${tierOnePanel} ${sectionSpacing}`}>
-        <h2 className={tierOneHeading}>Share the leadership brief</h2>
-        <div className={`${tierOneInset} space-y-2 text-xs text-slate-200`}>
-          <p><span className="font-semibold uppercase tracking-[0.1em] text-slate-300">Stance:</span> {postureWithStageLabel ?? statusLabel}</p>
-          <p><span className="font-semibold uppercase tracking-[0.1em] text-slate-300">What changed:</span> {decisionShiftSummary}</p>
-          <p><span className="font-semibold uppercase tracking-[0.1em] text-slate-300">Risk of defensive flip:</span> {formatProbabilityPercent(transitionProbabilities.Defensive)}</p>
-          <ul className="space-y-1">
-            {weeklyMemoLines.slice(0, 2).map((line) => (
-              <li key={line}>• {line}</li>
-            ))}
-            {actionStripItems.slice(0, 5).map((item) => (
-              <li key={item.lever}>• {item.label} — Action now: {compactActionCue(item.actionNow)}; Trigger/threshold to tighten or loosen: {compactActionCue(item.triggerThreshold)}; Reversal condition: {compactActionCue(item.reversalCondition)}.</li>
-            ))}
-          </ul>
-          <p className="font-semibold uppercase tracking-[0.1em] text-slate-300">Flip conditions</p>
-          <ul className="space-y-1 text-slate-300">
-            <li>• More expansionary if {compactActionCue(effectiveFlipThreshold)}.</li>
-            <li>• More defensive if {compactActionCue(effectiveGuardrail)}.</li>
-            <li>• Watch {regimeDistance.dimensionLabel} crossing {regimeDistance.thresholdValue.toFixed(1)}.</li>
-          </ul>
-        </div>
-      </article>
-
-      <details id="evidence-diagnostics" className={`${tierThreePanel} ${compactSectionSpacing} group`}>
-        <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
-          <span>Inspect call evidence and failure risks (secondary)</span>
-          <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
-        </summary>
-        <div className="mt-2 space-y-2">
-          <article className={compactInset}>
-            <p className={`text-xs ${neutralLabel}`}>See the deltas that moved this call</p>
-            <p className="mt-1 text-xs text-slate-200">Top contributors: {topContributorInline}</p>
-            <p className="mt-1 text-xs text-slate-300">Transition pace: {regimeVelocity.displayLabel}</p>
-          </article>
-          <article className={compactInset}>
-            <p className={`text-xs ${neutralLabel}`}>See where pressure rose vs cooled</p>
-            <ul className="mt-1 space-y-1 text-xs text-slate-200">
-              {evidenceItems.map((item) => (
-                <li key={`evidence-${item.key}`}>{item.title}: {item.directionLabel} · {item.immediateImplication}</li>
-              ))}
+      <div className="grid gap-4 xl:grid-cols-12">
+        <aside className="space-y-4 xl:col-span-3">
+          <article className={`${tierOnePanel} ${sectionSpacing}`}>
+            <h2 className={tierOneHeading}>Regime panel</h2>
+            <p className="text-xs text-slate-300">Keep the weekly call in view while you approve or pause decisions.</p>
+            <ul className="space-y-2 text-xs text-slate-200">
+              <li className={tierOneInset}><span className="font-semibold text-slate-100">Regime:</span> {postureWithStageLabel ?? statusLabel}</li>
+              <li className={tierOneInset}><span className="font-semibold text-slate-100">Trend:</span> {trendLabel}</li>
+              <li className={tierOneInset}><span className="font-semibold text-slate-100">Confidence:</span> {Math.round(confidencePercent)}%</li>
+              <li className={tierOneInset}><span className="font-semibold text-slate-100">Next flip:</span> {regimeDistance.dimensionLabel} {regimeDistance.thresholdDirection === "riseAbove" ? "rises above" : "falls to or below"} {regimeDistance.thresholdValue.toFixed(1)}</li>
             </ul>
           </article>
-          <article className={compactInset}>
-            <p className={`text-xs ${neutralLabel}`}>Flip when</p>
-            <p className="text-xs text-slate-300">More expansionary: {compactActionCue(effectiveFlipThreshold)}</p>
-            <p className="mt-1 text-xs text-slate-300">More defensive: {compactActionCue(effectiveGuardrail)}</p>
+
+          <article className={`${tierOnePanel} ${sectionSpacing}`}>
+            <h2 className={tierOneHeading}>Regime history</h2>
+            <PostureHistoryTimeline historicalTimeline={historicalTimeline} />
           </article>
-          {failureModes.length > 0 ? (
-            <article className={compactInset}>
-              <p className={`text-xs ${neutralLabel}`}>False-signal warnings</p>
-              <ul className="mt-1 space-y-1 text-xs text-slate-300">
-                {failureModes.slice(0, 2).map((mode) => (
-                  <li key={mode.id}>• {mode.warning}</li>
+        </aside>
+
+        <main className="space-y-4 xl:col-span-6">
+          <article className={`${tierOnePanel} weather-motion-card ${sectionSpacing} bg-gradient-to-br from-slate-950/95 via-slate-900/85 to-slate-950/95`}>
+            <h2 className={tierOneHeading}>This week&apos;s call</h2>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className={`${tierOneInset} space-y-1.5 border-emerald-500/35 bg-emerald-500/5`}>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-emerald-200">Do now</p>
+                <ul className="space-y-1 text-xs text-emerald-100">
+                  {roleAwareTemplates.slice(0, 4).map((template) => <li key={`do-${template.role}`}>• {compactRoleCue(template.doNow)}</li>)}
+                </ul>
+              </div>
+              <div className={`${tierOneInset} space-y-1.5 border-rose-500/35 bg-rose-500/5`}>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-rose-200">Avoid</p>
+                <ul className="space-y-1 text-xs text-rose-100">
+                  {roleAwareTemplates.slice(0, 4).map((template) => <li key={`avoid-${template.role}`}>• {compactRoleCue(template.avoidNow)}</li>)}
+                </ul>
+              </div>
+            </div>
+            <div className={`${tierOneInset} space-y-1.5 border-sky-500/35 bg-sky-500/5`}>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">Watch</p>
+              <ul className="space-y-1 text-xs text-sky-100">
+                <li>• {regimeDistance.dimensionLabel} approaching {regimeDistance.thresholdValue.toFixed(1)} threshold.</li>
+                <li>• Transition pace: {regimeVelocity.displayLabel}</li>
+              </ul>
+            </div>
+          </article>
+
+          <details id="decision-snapshot-for-leadership-this-week" className={`${tierOnePanel} ${sectionSpacing} group`}>
+            <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
+              <span>Decision snapshot matrix (expand)</span>
+              <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
+            </summary>
+            <div className="mt-3"><BoundedRulesMatrix decisionRules={decisionRules} /></div>
+          </details>
+
+          <details id="execution-guidance" className={`${tierOnePanel} ${sectionSpacing} group`}>
+            <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
+              <span>Execution plan by role (expand)</span>
+              <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
+            </summary>
+            <div className="mt-3">
+              <p className="text-xs text-slate-300">Because the stance is {postureWithStageLabel ?? statusLabel}, execute in a gated, reversible way this week.</p>
+              <div className="mt-2 grid gap-3 sm:grid-cols-2">
+                {roleAwareTemplates.map((template) => (
+                  <article key={template.role} className={`${tierOneInset} space-y-2`}>
+                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-200">{template.roleLabel}</p>
+                    <p className="rounded-md border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-2 text-xs text-emerald-100"><span className="font-semibold uppercase tracking-[0.1em]">Approve now</span> {compactRoleCue(template.doNow)}</p>
+                    <p className="rounded-md border border-rose-500/40 bg-rose-500/10 px-2.5 py-2 text-xs text-rose-100"><span className="font-semibold uppercase tracking-[0.1em]">Delay now</span> {compactRoleCue(template.avoidNow)}</p>
+                    <p className="rounded-md border border-sky-500/40 bg-sky-500/10 px-2.5 py-2 text-xs text-sky-100"><span className="font-semibold uppercase tracking-[0.1em]">Flip when</span> {compactActionCue(template.flipTrigger)}</p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </details>
+
+          <article className={`${tierOnePanel} ${sectionSpacing}`}>
+            <h2 className={tierOneHeading}>Copy weekly operator brief</h2>
+            <div className={`${tierOneInset} space-y-2 text-xs text-slate-200`}>
+              <p><span className="font-semibold uppercase tracking-[0.1em] text-slate-300">Regime:</span> {postureWithStageLabel ?? statusLabel}</p>
+              <p><span className="font-semibold uppercase tracking-[0.1em] text-slate-300">Confidence:</span> {Math.round(confidencePercent)}%</p>
+              <ul className="space-y-1">
+                {roleAwareTemplates.slice(0, 3).map((template) => (
+                  <li key={`brief-${template.role}`}>• {compactRoleCue(template.doNow)}</li>
                 ))}
               </ul>
+              <p><span className="font-semibold uppercase tracking-[0.1em] text-slate-300">Flip trigger:</span> {regimeDistance.dimensionLabel} {regimeDistance.thresholdDirection === "riseAbove" ? "rises above" : "falls to or below"} {regimeDistance.thresholdValue.toFixed(1)}</p>
+            </div>
+          </article>
+        </main>
+
+        <aside className="space-y-4 xl:col-span-3">
+          <details id="evidence-diagnostics" className={`${tierThreePanel} ${compactSectionSpacing} group`}>
+            <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
+              <span>Inspect evidence →</span>
+              <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
+            </summary>
+            <ul className="mt-2 space-y-1 text-xs text-slate-200">
+              {evidenceItems.map((item) => (
+                <li key={`evidence-${item.key}`}>• {item.title}: {item.immediateImplication}</li>
+              ))}
+            </ul>
+          </details>
+
+          <details className={`${tierThreePanel} ${compactSectionSpacing} group`}>
+            <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
+              <span>Inspect drivers →</span>
+              <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
+            </summary>
+            <article className={compactInset}>
+              <p className={`text-xs ${neutralLabel}`}>Top contributors: {topContributorInline}</p>
+              <p className="mt-1 text-xs text-slate-300">Weekly movement: {weeklyMovement.summary}</p>
             </article>
-          ) : null}
-        </div>
-      </details>
+          </details>
+
+          <details className={`${tierThreePanel} ${compactSectionSpacing} group`}>
+            <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
+              <span>Inspect model inputs →</span>
+              <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
+            </summary>
+            <article className={compactInset}>
+              <p className={`text-xs ${neutralLabel}`}>Guardrail: {compactActionCue(effectiveGuardrail)}</p>
+              <p className="mt-1 text-xs text-slate-300">Flip when: {compactActionCue(effectiveFlipThreshold)}</p>
+              <p className="mt-1 text-xs text-slate-300">Defensive probability: {formatProbabilityPercent(transitionProbabilities.Defensive)}</p>
+            </article>
+            {failureModes.length > 0 ? (
+              <article className={`${compactInset} mt-2`}>
+                <p className={`text-xs ${neutralLabel}`}>False-signal warnings</p>
+                <ul className="mt-1 space-y-1 text-xs text-slate-300">
+                  {failureModes.slice(0, 2).map((mode) => (
+                    <li key={mode.id}>• {mode.warning}</li>
+                  ))}
+                </ul>
+              </article>
+            ) : null}
+          </details>
+        </aside>
+      </div>
 
       {actions ? (
         <div id="primary-artifact-actions" className="rounded-xl border border-sky-500/40 bg-slate-950/92 p-3 sm:hidden" aria-label="Primary artifact actions">

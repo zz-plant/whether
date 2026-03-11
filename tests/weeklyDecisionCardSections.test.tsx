@@ -55,7 +55,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
     assert.match(html, /weekly-posture-brief-title/);
     assert.match(html, /Do now:/);
     assert.match(html, /Regime/);
-    assert.match(html, /Flip watch:/);
+    assert.match(html, /Next flip:/);
     assert.match(html, /Leadership call/);
     assert.match(html, /Confidence/);
     assert.match(html, /Primary risk/);
@@ -113,7 +113,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
     );
 
     assert.match(html, /Regime/);
-    assert.match(html, /Flip watch: Tightness rises above 70\.0\./);
+    assert.match(html, /Next flip: Tightness rises above 70\.0\./);
   });
 
   it("renders compact flip-condition distance", () => {
@@ -159,7 +159,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
       />,
     );
 
-    assert.match(html, /Flip watch: Risk appetite falls to or below 50\.0\./);
+    assert.match(html, /Next flip: Risk appetite falls to or below 50\.0\./);
     assert.match(html, /Constraints eased\./);
   });
 
