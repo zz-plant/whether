@@ -33,6 +33,7 @@ import {
 } from "./trustStatus";
 import type { BoundedDecisionRule } from "./boundedDecisionRules";
 import type { ActionStripItem, RoleAwareOperatingTemplate } from "./operatingCalls";
+import type { TimeMachineRegimeEntry } from "../timeMachine/timeMachineCache";
 
 type Regime = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
 
@@ -61,6 +62,7 @@ type HomeReportData = {
   macroSeries?: MacroSeriesReading[];
   forecast?: ForecastModel;
   historicalAnalogs?: HistoricalAnalog[];
+  regimeSeries?: TimeMachineRegimeEntry[];
   treasuryProvenance?: { statusLabel?: string };
   treasury?: { fallback_at?: string | null; fallback_reason?: string | null };
   actionNowShort?: string;
@@ -72,6 +74,14 @@ type HomeReportData = {
 type MemoryRailItem = {
   label: string;
   posture: string;
+};
+
+type HistoricalTimelineItem = MemoryRailItem & {
+  month?: number;
+  year?: number;
+  recordDate?: string;
+  summary?: string;
+  isCurrent?: boolean;
 };
 
 
@@ -347,33 +357,62 @@ const buildMemoryRail = (recordDateLabel: string | undefined, currentRegime: Reg
   ].slice(-4);
 };
 
-const resolveTimelineAnchorYear = (recordDateLabel: string | undefined): number => {
-  const matchedYear = recordDateLabel?.match(/^(\d{4})/)?.[1];
-  const parsedYear = matchedYear ? Number.parseInt(matchedYear, 10) : Number.NaN;
+const buildHistoricalTimeline = ({
+  currentRegime,
+  regimeSeries,
+  historicalSelection,
+}: {
+  currentRegime: Regime;
+  regimeSeries?: TimeMachineRegimeEntry[];
+  historicalSelection?: { month: number; year: number } | null;
+}): HistoricalTimelineItem[] => {
+  const selectedYear = historicalSelection?.year;
+  const selectedMonth = historicalSelection?.month;
+  const fallback = [{ label: "Current", posture: REGIME_SHORT_LABELS[currentRegime], isCurrent: true }];
 
-  return Number.isFinite(parsedYear) ? parsedYear : new Date().getUTCFullYear();
-};
+  if (!regimeSeries || regimeSeries.length === 0) {
+    return fallback;
+  }
 
-const buildHistoricalTimeline = (currentRegime: Regime, anchorYear: number): MemoryRailItem[] => {
-  const yearlyEntries = getSummaryArchive()
-    .filter((entry): entry is Extract<typeof entry, { cadence: "yearly" }> => entry.cadence === "yearly")
-    .filter((entry) => entry.year <= anchorYear)
-    .slice(-6)
-    .map((entry) => ({
-      label: String(entry.year),
-      posture: REGIME_SHORT_LABELS[entry.summary.regime],
-    }));
+  const scopedSeries = regimeSeries
+    .filter((entry) => {
+      if (!selectedYear || !selectedMonth) {
+        return true;
+      }
 
-  const latestYear = yearlyEntries[yearlyEntries.length - 1]?.label;
-  const currentEntryLabel = latestYear === String(anchorYear) ? latestYear : String(anchorYear);
+      if (entry.year < selectedYear) {
+        return true;
+      }
 
-  return [
-    ...yearlyEntries,
-    {
-      label: currentEntryLabel,
-      posture: REGIME_SHORT_LABELS[currentRegime],
-    },
-  ].slice(-7);
+      return entry.year === selectedYear && entry.month <= selectedMonth;
+    })
+    .slice(-8);
+
+  if (scopedSeries.length === 0) {
+    return fallback;
+  }
+
+  const currentKey = selectedYear && selectedMonth
+    ? `${selectedYear}-${selectedMonth}`
+    : `${scopedSeries[scopedSeries.length - 1]?.year}-${scopedSeries[scopedSeries.length - 1]?.month}`;
+
+  return scopedSeries.map((entry) => {
+    const labelDate = new Date(entry.recordDate);
+    const isValidDate = !Number.isNaN(labelDate.valueOf());
+    const label = isValidDate
+      ? labelDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })
+      : entry.recordDate;
+
+    return {
+      label,
+      posture: REGIME_SHORT_LABELS[entry.regime],
+      month: entry.month,
+      year: entry.year,
+      recordDate: entry.recordDate,
+      summary: entry.summary,
+      isCurrent: `${entry.year}-${entry.month}` === currentKey,
+    };
+  });
 };
 
 const getMacroSeriesDelta = (macroSeries: MacroSeriesReading[] | undefined, id: MacroSeriesReading["id"]) => {
@@ -676,6 +715,7 @@ export const buildHomeBriefModel = (
     historicalAnalogs,
     fetchedAtLabel,
     historicalSelection,
+    regimeSeries,
     treasuryProvenance,
     treasury,
     actionNowShort,
@@ -683,7 +723,6 @@ export const buildHomeBriefModel = (
     flipThreshold,
   } = data;
   const overlaySector = options?.overlaySector ?? "b2b-saas";
-  const timelineAnchorYear = resolveTimelineAnchorYear(recordDateLabel);
   const previousRegime = regimeAlert?.previousRegime;
   const severityDelta = previousRegime
     ? REGIME_SEVERITY_RANK[assessment.regime] - REGIME_SEVERITY_RANK[previousRegime]
@@ -891,7 +930,7 @@ export const buildHomeBriefModel = (
     flipThreshold: conciseFlipThreshold,
     historicalAnalogs: normalizedHistoricalAnalogs,
     memoryRail: buildMemoryRail(recordDateLabel, assessment.regime),
-    historicalTimeline: buildHistoricalTimeline(assessment.regime, timelineAnchorYear),
+    historicalTimeline: buildHistoricalTimeline({ currentRegime: assessment.regime, regimeSeries, historicalSelection }),
     macroOverlay: buildMacroOverlay(macroSeries, assessment, overlaySector),
     evidenceItems: data.reportEvidenceItems ?? [],
     netConstraintSummary,

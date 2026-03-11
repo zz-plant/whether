@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 import { CircleTargetIcon, ShieldIcon } from "./uiIcons";
 import type { ReportDynamics, ReportEvidenceItem } from "../../lib/report/reportData";
 import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
@@ -69,7 +70,7 @@ export type WeeklyDecisionCardProps = {
   revisitDecisions: boolean;
   weeklyMovement: WeeklyMovement;
   memoryRail: MemoryRailItem[];
-  historicalTimeline: Array<{ label: string; posture: string }>;
+  historicalTimeline: Array<{ label: string; posture: string; month?: number; year?: number; recordDate?: string; summary?: string; isCurrent?: boolean }>;
   historicalAnalogs: HistoricalAnalogItem[];
   macroOverlay: MacroOverlayItem[];
   whyThisCall: WhyThisCallItem[];
@@ -287,14 +288,40 @@ const ActionStrip = ({ items }: { items: ActionStripItem[] }) => (
 );
 
 const PostureHistoryTimeline = ({ historicalTimeline }: { historicalTimeline: WeeklyDecisionCardProps["historicalTimeline"] }) => (
-  <ol className="mt-2 grid gap-2 lg:grid-cols-4" aria-label="Posture change timeline">
+  <ol className="mt-2 flex flex-wrap items-center gap-2" aria-label="Posture change timeline">
     {historicalTimeline.map((item, index) => {
-      const isCurrent = index === historicalTimeline.length - 1;
-      return (
-        <li key={`${item.label}-${item.posture}`} className={`${tierThreeInset} text-xs ${isCurrent ? "border-sky-400/70 bg-sky-500/10" : ""}`}>
+      const isCurrent = item.isCurrent ?? index === historicalTimeline.length - 1;
+      const href = item.month && item.year ? `/?month=${item.month}&year=${item.year}` : null;
+      const node = (
+        <>
           <p className="text-slate-400">{item.label}</p>
           <p className="mt-1 font-semibold text-slate-100">{item.posture}</p>
           {isCurrent ? <p className="mt-1 text-[10px] font-medium text-sky-200">Current week</p> : null}
+          {item.recordDate ? (
+            <p className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 hidden w-56 -translate-x-1/2 rounded-md border border-slate-600/70 bg-slate-950/95 px-2 py-1.5 text-[10px] leading-4 text-slate-200 shadow-xl group-hover:block group-focus-visible:block">
+              {item.recordDate}{item.summary ? ` • ${item.summary}` : ""}
+            </p>
+          ) : null}
+        </>
+      );
+
+      return (
+        <li key={`${item.label}-${item.posture}-${index}`} className="contents">
+          {href ? (
+            <Link
+              href={href}
+              className={`${tierThreeInset} group relative min-w-[140px] text-xs transition hover:border-slate-500/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${isCurrent ? "border-sky-400/70 bg-sky-500/10" : ""}`}
+              aria-label={`Load weekly call for ${item.label}`}
+              prefetch={false}
+            >
+              {node}
+            </Link>
+          ) : (
+            <div className={`${tierThreeInset} group relative min-w-[140px] text-xs ${isCurrent ? "border-sky-400/70 bg-sky-500/10" : ""}`}>{node}</div>
+          )}
+          {index < historicalTimeline.length - 1 ? (
+            <span aria-hidden="true" className="text-slate-500">→</span>
+          ) : null}
         </li>
       );
     })}
