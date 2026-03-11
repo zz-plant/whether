@@ -2,7 +2,7 @@ import type { Metadata, Route } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../lib/seo";
-import { findDecisionPathsForToolkit, findToolkitDefinition, toolkitStaticParams } from "../../../lib/informationArchitecture";
+import { findDecisionPathsForToolkit, findToolkitDefinition, toolkitStaticParams } from "../../../lib/decisionDomainCatalog";
 type Params = { slug: string };
 
 export const dynamicParams = true;

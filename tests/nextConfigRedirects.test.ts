@@ -65,6 +65,12 @@ describe("next.config redirects", () => {
       permanent: true,
     });
 
+    assert.deepEqual(findRedirect("/library"), {
+      source: "/library",
+      destination: "/learn",
+      permanent: true,
+    });
+
     assert.deepEqual(findRedirect("/library/canon/:slug"), {
       source: "/library/canon/:slug",
       destination: "/concepts/:slug",

@@ -9,7 +9,7 @@ import {
   situationUseCases,
   toolkitDefinitions,
   useCaseRoles,
-} from "../lib/informationArchitecture";
+} from "../lib/decisionDomainCatalog";
 import {
   conceptAudiences,
   conceptFocuses,
@@ -22,7 +22,7 @@ import { roleLandings } from "../app/solutions/career-paths/roleLandingData";
 import { redirectOnlySitemapPaths } from "../app/sitemapExclusions";
 
 describe("sitemap", () => {
-  it("returns canonical URLs and includes posture, decide, learn, toolkit, and library routes", async () => {
+  it("returns canonical URLs and includes posture, decide, learn, and toolkit routes", async () => {
     const entries = await sitemap({ programmaticEligible: true });
 
     assert.ok(entries.length > 0);
@@ -36,7 +36,7 @@ describe("sitemap", () => {
     assert.ok(urls.has(`${siteUrl}/posture`));
     assert.ok(urls.has(`${siteUrl}/decide`));
     assert.ok(urls.has(`${siteUrl}/toolkits`));
-    assert.ok(urls.has(`${siteUrl}/library`));
+    assert.ok(urls.has(`${siteUrl}/learn`));
 
     for (const redirectOnlyPath of redirectOnlySitemapPaths) {
       assert.ok(!urls.has(`${siteUrl}${redirectOnlyPath}`));

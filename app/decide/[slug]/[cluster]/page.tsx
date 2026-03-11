@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../../lib/seo";
 import { readProgrammaticPayload } from "../../../../lib/seo/programmaticPayloadBuilder";
-import { findUseCaseRole } from "../../../../lib/informationArchitecture";
+import { findUseCaseRole } from "../../../../lib/decisionDomainCatalog";
 import { decideClusterStaticParams, findDecideClusterRoute } from "../../clusterRoutes";
 import { findDecisionScenario } from "../../../seoRouteClusters";
 import type { SeoDecisionPayload } from "../../../../lib/report/seoDecisionPayload";

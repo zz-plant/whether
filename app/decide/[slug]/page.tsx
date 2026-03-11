@@ -8,7 +8,7 @@ import {
   findToolkitDefinition,
   findUseCaseRole,
   isSituationUseCaseSlug,
-} from "../../../lib/informationArchitecture";
+} from "../../../lib/decisionDomainCatalog";
 
 type Params = { slug: string };
 

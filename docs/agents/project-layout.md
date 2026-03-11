@@ -13,5 +13,6 @@
 
 ## Editing guidance
 - Keep scoring/classification logic in core modules under `lib/`.
+- Treat `lib/decisionDomainCatalog.ts` as the canonical operator-domain catalog (posture, decide, toolkits, failure modes); keep navigation IA concerns in `lib/navigation/informationArchitecture.ts`.
 - Keep user-facing behavior changes paired with nearby tests and docs updates.
 - Prefer local edits in existing modules over introducing new top-level structures.

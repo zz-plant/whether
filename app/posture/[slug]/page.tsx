@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../lib/seo";
-import { postureDefinitions } from "../../../lib/informationArchitecture";
+import { postureDefinitions } from "../../../lib/decisionDomainCatalog";
 type Params = { slug: string };
 
 export const dynamicParams = false;

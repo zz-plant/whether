@@ -4,7 +4,7 @@ import { z } from "zod";
 import { decideClusterStaticParams } from "../../app/decide/clusterRoutes";
 import { decisionScenarioDefinitions, signalScenarioRoutes } from "../../app/seoRouteClusters";
 import { toolkitClusterStaticParams } from "../../app/toolkits/clusterRoutes";
-import { findUseCaseRole, findToolkitDefinition } from "../informationArchitecture";
+import { findUseCaseRole, findToolkitDefinition } from "../decisionDomainCatalog";
 import { buildHomeBriefModel } from "../report/homeBriefModel";
 import { buildSeoDecisionPayload, type SeoDecisionPayload } from "../report/seoDecisionPayload";
 import type { DecisionArea } from "../report/boundedDecisionRules";

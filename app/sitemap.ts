@@ -7,7 +7,7 @@ import {
   situationUseCases,
   toolkitDefinitions,
   useCaseRoles,
-} from "../lib/informationArchitecture";
+} from "../lib/decisionDomainCatalog";
 import { productConceptArticles } from "../lib/productCanon";
 import { conceptAudiences, conceptFocuses, toConceptTaxonomySlug } from "../lib/productCanon";
 import { resourcePillarPages, resourceSupportingPages } from "../lib/resourcesContent";
@@ -132,7 +132,6 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     { path: "/startup-market-outlook", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.78 },
     { path: "/startup-macro-posture", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.84 },
     { path: "/startup-macro-posture/index", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.8 },
-    { path: "/library", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
     { path: "/library/failure-modes", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.75 },
     { path: "/concepts", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.75 },
     { path: "/about", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.45 },

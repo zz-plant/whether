@@ -1,4 +1,4 @@
-import { failureModeDefinitions, toolkitDefinitions } from "../informationArchitecture";
+import { failureModeDefinitions, toolkitDefinitions } from "../decisionDomainCatalog";
 import { productConceptArticles } from "../productCanon";
 
 export type SearchEntityType = "toolkit" | "failure-mode" | "concept" | "doc";
