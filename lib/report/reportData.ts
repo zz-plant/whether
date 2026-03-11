@@ -35,6 +35,7 @@ import { buildActionStripItems } from "./operatingCalls";
 import { deltaLabelBySignal, resolveSignalDirection, signalOrder } from "./briefFormatting";
 import { cache } from "react";
 import type { TreasuryData } from "../types";
+import { loadCanonicalReportInputs } from "../ingestion/materialized";
 
 export type ReportSearchParams = {
   month?: string;
@@ -97,6 +98,7 @@ export type ReportDynamics = {
 export type ReportEvidenceItem = {
   key: ReportDynamics["changedSignals"][number]["key"];
   title: string;
+  lastUpdated: string | null;
   supportingBullets: string[];
   confidenceLabel: string;
   directionLabel: "Tightening" | "Easing" | "Unchanged";
@@ -481,9 +483,11 @@ const signalImmediateImplication = (key: ReportDynamics["changedSignals"][number
 export const buildReportEvidenceItems = ({
   reportDynamics,
   assessment,
+  lastUpdated,
 }: {
   reportDynamics: ReportDynamics;
   assessment: ReturnType<typeof evaluateRegime>;
+  lastUpdated: string | null;
 }): ReportEvidenceItem[] =>
   signalOrder.map((key) => {
     const movedSignal = reportDynamics.changedSignals.find((item) => item.key === key);
@@ -510,6 +514,7 @@ export const buildReportEvidenceItems = ({
     return {
       key,
       title: evidenceTitleBySignal[key],
+      lastUpdated,
       supportingBullets,
       confidenceLabel: formatConfidencePlainLabel(toConfidenceLabel(delta)),
       directionLabel,
@@ -635,14 +640,21 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
     });
   const historicalSelection = resolveTimeMachineSelection(searchParams);
   const requestedSelection = parseTimeMachineRequest(searchParams);
-  const treasuryPromise = fetchTreasuryData({
-    fetcher: liveFetcher,
-    snapshotFallback: snapshotData,
-    asOf: historicalSelection?.asOf,
-  });
-  const liveTreasuryPromise = historicalSelection
-    ? fetchTreasuryData({ snapshotFallback: snapshotData, fetcher: liveFetcher })
-    : null;
+  const canonicalInputs = historicalSelection
+    ? null
+    : await loadCanonicalReportInputs({ fetcher: liveFetcher });
+  const treasuryPromise = canonicalInputs
+    ? Promise.resolve(canonicalInputs.treasury)
+    : fetchTreasuryData({
+        fetcher: liveFetcher,
+        snapshotFallback: snapshotData,
+        asOf: historicalSelection?.asOf,
+      });
+  const liveTreasuryPromise = canonicalInputs
+    ? Promise.resolve(canonicalInputs.treasury)
+    : historicalSelection
+      ? fetchTreasuryData({ snapshotFallback: snapshotData, fetcher: liveFetcher })
+      : null;
   const now = new Date();
   const latestCache = getLatestTimeMachineSnapshot();
   const defaultMonth = latestCache?.month ?? now.getUTCMonth() + 1;
@@ -659,7 +671,7 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
   const [treasuryResult, liveTreasuryResult, macroResult] = await Promise.allSettled([
     treasuryPromise,
     liveTreasuryPromise ?? treasuryPromise,
-    loadMacroSeries(liveFetcher),
+    canonicalInputs ? Promise.resolve(canonicalInputs.macroSeries) : loadMacroSeries(liveFetcher),
   ]);
 
   if (treasuryResult.status === "rejected") {
@@ -699,11 +711,13 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
   const lastYearAssessment = lastYearSnapshot ? evaluateRegime(lastYearSnapshot, thresholds) : null;
   const confidenceLabel = historicalSelection
     ? "Simulated (low)"
-    : treasury.isLive
+    : canonicalInputs
+      ? "Canonical snapshot (high confidence)"
+      : treasury.isLive
       ? "Live (high confidence)"
       : "Cached (medium)";
   const treasuryProvenance = {
-    sourceLabel: "Federal Reserve Economic Data (FRED)",
+    sourceLabel: canonicalInputs ? "Canonical ingestion (FRED/BLS)" : "Federal Reserve Economic Data (FRED)",
     sourceUrl: treasury.source,
     recordDateLabel,
     timestampLabel: fetchedAtLabel,
@@ -721,7 +735,9 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
     ageLabel: macroAgeLabel,
     statusLabel: historicalSelection
       ? "Simulated (low)"
-      : macroSeries.some((signal) => signal.isLive)
+      : canonicalInputs
+        ? "Canonical snapshot (high confidence)"
+        : macroSeries.some((signal) => signal.isLive)
         ? "Live (high confidence)"
         : "Cached (medium)",
   };
@@ -803,7 +819,11 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
   const actionNowShort = buildActionNowShort(reportDynamics);
   const guardrailThreshold = stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
   const flipThreshold = buildFlipThreshold(assessment);
-  const reportEvidenceItems = buildReportEvidenceItems({ reportDynamics, assessment });
+  const reportEvidenceItems = buildReportEvidenceItems({
+    reportDynamics,
+    assessment,
+    lastUpdated: treasury.record_date,
+  });
 
   return {
     assessment,
@@ -846,6 +866,7 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
     thresholds,
     treasury,
     treasuryProvenance,
+    materializedSignals: canonicalInputs?.materializedSignals ?? null,
   };
 };
 
@@ -912,7 +933,11 @@ const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataF
   const actionNowShort = buildActionNowShort(fallbackReportDynamics);
   const guardrailThreshold = stopItems[0] ?? "Do not approve irreversible commitments without trigger confirmation.";
   const flipThreshold = buildFlipThreshold(assessment);
-  const reportEvidenceItems = buildReportEvidenceItems({ reportDynamics: fallbackReportDynamics, assessment });
+  const reportEvidenceItems = buildReportEvidenceItems({
+    reportDynamics: fallbackReportDynamics,
+    assessment,
+    lastUpdated: fallbackTreasury.record_date,
+  });
 
   return {
     assessment,
@@ -963,8 +988,11 @@ const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataF
     reportEvidenceItems,
     guardrailThreshold,
     flipThreshold,
+    confidenceHistory: [],
+    confidenceTrend: "unstable" as const,
     thresholds,
     treasury: fallbackTreasury,
+    materializedSignals: null,
     treasuryProvenance: {
       sourceLabel: "Federal Reserve Economic Data (FRED)",
       sourceUrl: fallbackTreasury.source,
