@@ -24,5 +24,24 @@ describe("programmatic payload builder", () => {
     assert.ok(record.delta.changedSignals.length >= 0);
     assert.ok(record.payload.currentCall.length > 0);
     assert.equal(record.payload.noindex, false);
+
+    const routes = enumerateProgrammaticRoutes();
+    const decideCluster = routes
+      .filter((route): route is Extract<(typeof routes)[number], { kind: "decide" }> => route.kind === "decide")
+      .reduce<Map<string, string[]>>((clusters, route) => {
+        const existing = clusters.get(route.cluster) ?? [];
+        existing.push(route.url);
+        clusters.set(route.cluster, existing);
+        return clusters;
+      }, new Map());
+
+    const multiSlugCluster = [...decideCluster.entries()].find(([, urls]) => urls.length > 1);
+    assert.ok(multiSlugCluster, "expected at least one decide cluster with multiple role variants");
+
+    for (const url of multiSlugCluster[1]) {
+      const clusterRecord = output.records.find((candidate) => candidate.url === url);
+      assert.ok(clusterRecord, `expected generated record for ${url}`);
+      assert.equal(clusterRecord.payload.noindex, false);
+    }
   });
 });

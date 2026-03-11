@@ -114,8 +114,8 @@ export const enumerateProgrammaticRoutes = (): ProgrammaticRouteDefinition[] => 
 
 
 const clusterKeyForRoute = (route: ProgrammaticRouteDefinition): string => {
-  if (route.kind === "decide") return `decide:${route.cluster}`;
-  if (route.kind === "toolkit") return `toolkit:${route.cluster}`;
+  if (route.kind === "decide") return `decide:${route.slug}:${route.cluster}`;
+  if (route.kind === "toolkit") return `toolkit:${route.slug}:${route.cluster}`;
   return `signal:${route.cluster}`;
 };
 
