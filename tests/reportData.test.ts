@@ -283,6 +283,25 @@ describe("buildHistoricalAnalogs", () => {
 describe("weekly confidence history", () => {
   const thresholds = { baseRateTightness: 5, tightnessRegime: 70, riskAppetiteRegime: 50 };
 
+  it("includes the current report snapshot when it is newer than cached history", () => {
+    const snapshots = [
+      makeTreasury("2025-01-03", 5.2, 4.8, 4.4),
+      makeTreasury("2025-01-10", 5.1, 4.7, 4.4),
+      makeTreasury("2025-01-17", 5.0, 4.6, 4.4),
+    ];
+
+    const series = buildWeeklyConfidenceSeries({
+      snapshots,
+      currentSnapshot: makeTreasury("2025-01-24", 4.8, 4.4, 4.4),
+      thresholds,
+      asOf: "2025-01-24",
+      window: 8,
+    });
+
+    assert.equal(series.at(-1)?.recordDate, "2025-01-24");
+    assert.equal(series.at(-1)?.isMissing, false);
+  });
+
   it("returns the last eight weekly points and injects missing-week markers", () => {
     const snapshots = [
       makeTreasury("2025-01-03", 5.2, 4.8, 4.4),

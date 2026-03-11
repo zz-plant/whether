@@ -11,6 +11,12 @@ import type { MacroSeriesReading, SensorReading, TreasuryData } from "../../../l
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import { formatNumberWithUnit } from "../../../lib/formatters";
 import { buildAgentPayloadJson, buildAgentPrompt } from "../../../lib/agentHandoff";
+import {
+  buildWeeklyOperatorBriefCardText,
+  buildWeeklyOperatorBriefPayload,
+  buildWeeklyOperatorBriefPlainText,
+  buildWeeklyOperatorBriefSlackBlocks,
+} from "../../../lib/export/weeklyOperatorBrief";
 import { buildComplianceStamp } from "../../../lib/exportNotices";
 import { formatRegimeLabel } from "../../../lib/regimeFormat";
 import {
@@ -202,6 +208,22 @@ export const ExportBriefPanel = ({
     () => buildSlackBrief(assessment, treasury, sensors, macroSeries),
     [assessment, treasury, sensors, macroSeries]
   );
+  const weeklyOperatorPayload = useMemo(() => buildWeeklyOperatorBriefPayload({
+    assessment,
+    treasury,
+  }), [assessment, treasury]);
+  const weeklyOperatorPlainText = useMemo(
+    () => buildWeeklyOperatorBriefPlainText(weeklyOperatorPayload),
+    [weeklyOperatorPayload],
+  );
+  const weeklyOperatorSlackBlocks = useMemo(
+    () => buildWeeklyOperatorBriefSlackBlocks(weeklyOperatorPayload),
+    [weeklyOperatorPayload],
+  );
+  const weeklyOperatorCardText = useMemo(
+    () => buildWeeklyOperatorBriefCardText(weeklyOperatorPayload),
+    [weeklyOperatorPayload],
+  );
   const jiraMarkdownBrief = useMemo(
     () => buildJiraMarkdownBrief(assessment, treasury, sensors, macroSeries),
     [assessment, treasury, sensors, macroSeries]
@@ -306,6 +328,17 @@ export const ExportBriefPanel = ({
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Send to team</p>
           <div className="mt-3 flex flex-wrap gap-3">
             <ClipboardActionRow
+              label={<span className="inline-flex items-center gap-1.5"><CopyIcon className="h-3.5 w-3.5" aria-hidden="true" />Copy Weekly Operator Brief</span>}
+              state={clipboardState("Weekly operator brief") }
+              disabled={isCopyDisabled("Weekly operator brief")}
+              onClick={() => void handleCopy(weeklyOperatorPlainText, "Weekly operator brief")}
+              className="weather-button-primary"
+              buttonProps={{
+                "data-premium-intent": "export_brief",
+                "data-premium-cta": "copy_weekly_operator_brief",
+              }}
+            />
+            <ClipboardActionRow
               label={<span className="inline-flex items-center gap-1.5"><CopyIcon className="h-3.5 w-3.5" aria-hidden="true" />Copy Slack Brief</span>}
               state={clipboardState("Slack")}
               disabled={isCopyDisabled("Slack")}
@@ -347,6 +380,24 @@ export const ExportBriefPanel = ({
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
               <ClipboardActionRow
+                label="Copy weekly operator brief"
+                state={clipboardState("Weekly operator brief") }
+                disabled={isCopyDisabled("Weekly operator brief")}
+                onClick={() => void handleCopy(weeklyOperatorPlainText, "Weekly operator brief")}
+              />
+              <ClipboardActionRow
+                label="Copy Slack block payload"
+                state={clipboardState("Slack blocks")}
+                disabled={isCopyDisabled("Slack blocks")}
+                onClick={() => void handleCopy(weeklyOperatorSlackBlocks, "Slack blocks")}
+              />
+              <ClipboardActionRow
+                label="Copy image/PDF card text"
+                state={clipboardState("Card text")}
+                disabled={isCopyDisabled("Card text")}
+                onClick={() => void handleCopy(weeklyOperatorCardText, "Card text")}
+              />
+              <ClipboardActionRow
                 label={<><span>Copy</span> <WorkAppLabel app="slack" label="brief" className="inline-flex items-center gap-2" /></>}
                 state={clipboardState("Slack")}
                 disabled={isCopyDisabled("Slack")}
@@ -369,6 +420,18 @@ export const ExportBriefPanel = ({
                 className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
               >
                 Download brief
+              </Button>
+              <Button
+                type="button"
+                onClick={() =>
+                  handleDownload(
+                    weeklyOperatorSlackBlocks,
+                    `whether-weekly-operator-slack-blocks-${treasury.record_date}.json`
+                  )
+                }
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
+              >
+                Download Slack blocks
               </Button>
               <a
                 href={`mailto:?subject=${mailSubject}&body=${mailBody}`}
