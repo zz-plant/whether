@@ -156,13 +156,33 @@ export const startupVariantModes: Array<{ mode: StartupVariantMode; label: strin
   { mode: "bootstrapped", label: "Bootstrapped" },
 ];
 
+const MIN_BOUNDARY_GAP = 0.1;
+
+const describeBoundaryGap = ({
+  dimension,
+  gap,
+  whenNearBoundary,
+  whenAway,
+}: {
+  dimension: string;
+  gap: number;
+  whenNearBoundary: (dimension: string) => string;
+  whenAway: (formattedGap: string) => string;
+}) => {
+  if (!Number.isFinite(gap) || gap <= 0.05) {
+    return whenNearBoundary(dimension);
+  }
+
+  return whenAway(Math.max(MIN_BOUNDARY_GAP, gap).toFixed(1));
+};
+
 export const buildScopedVariantDecisionAdjustment = ({
   mode,
   thresholds,
   scores,
 }: Pick<RuleContext, "thresholds" | "scores"> & { mode: StartupVariantMode }): ScopedVariantDecisionAdjustment => {
-  const riskGap = Math.abs(scores.riskAppetite - thresholds.riskAppetiteRegime).toFixed(1);
-  const tightnessGap = Math.abs(scores.tightness - thresholds.tightnessRegime).toFixed(1);
+  const riskGap = Math.abs(scores.riskAppetite - thresholds.riskAppetiteRegime);
+  const tightnessGap = Math.abs(scores.tightness - thresholds.tightnessRegime);
 
   if (mode === "seed") {
     return {
@@ -177,7 +197,12 @@ export const buildScopedVariantDecisionAdjustment = ({
         "Avoid bundling multiple irreversible hires before one milestone clears.",
       ],
       watchAdjustments: [
-        `Runway trigger: tighten immediately if tightness gap compresses below ${tightnessGap} points for 2 reads.`,
+        describeBoundaryGap({
+          dimension: "tightness",
+          gap: tightnessGap,
+          whenNearBoundary: () => "Runway trigger: tighten immediately because tightness is already at the regime boundary.",
+          whenAway: (formattedGap) => `Runway trigger: tighten immediately if tightness gap compresses below ${formattedGap} points for 2 reads.`,
+        }),
       ],
       thresholdEmphasis: "Emphasize runway and evidence cadence over growth breadth.",
       reversalTriggerDiscipline: "Reverse to faster hiring only after two consecutive improving reads and one shipped traction milestone.",
@@ -196,7 +221,12 @@ export const buildScopedVariantDecisionAdjustment = ({
         "Avoid parallel expansion programs that obscure payback accountability.",
       ],
       watchAdjustments: [
-        `Payback trigger: revisit plan if risk appetite gap moves inside ${riskGap} points.`,
+        describeBoundaryGap({
+          dimension: "risk appetite",
+          gap: riskGap,
+          whenNearBoundary: () => "Payback trigger: revisit plan now because risk appetite is already at the regime boundary.",
+          whenAway: (formattedGap) => `Payback trigger: revisit plan if risk appetite gap moves inside ${formattedGap} points.`,
+        }),
       ],
       thresholdEmphasis: "Emphasize payback windows and repeatable pipeline conversion.",
       reversalTriggerDiscipline: "Reverse to aggressive expansion only after trigger clears and conversion quality remains stable for two weekly reviews.",
@@ -215,7 +245,12 @@ export const buildScopedVariantDecisionAdjustment = ({
         "Avoid fixed-cost expansions that assume forward multiple recovery.",
       ],
       watchAdjustments: [
-        `Leverage trigger: hold expansion if tightness rises within ${tightnessGap} points of the boundary.`,
+        describeBoundaryGap({
+          dimension: "tightness",
+          gap: tightnessGap,
+          whenNearBoundary: () => "Leverage trigger: hold expansion now because tightness is already at the regime boundary.",
+          whenAway: (formattedGap) => `Leverage trigger: hold expansion if tightness rises within ${formattedGap} points of the boundary.`,
+        }),
       ],
       thresholdEmphasis: "Emphasize efficiency lift and margin durability before headcount scale.",
       reversalTriggerDiscipline: "Reverse to broader scaling only when both risk appetite and tightness clear their resume bands in the same week.",
@@ -234,7 +269,12 @@ export const buildScopedVariantDecisionAdjustment = ({
       "Avoid commitments that require external financing to finish.",
     ],
     watchAdjustments: [
-      `Cash trigger: tighten spend if either boundary sits within ${Math.min(Number(riskGap), Number(tightnessGap)).toFixed(1)} points.`,
+      describeBoundaryGap({
+        dimension: "a boundary",
+        gap: Math.min(riskGap, tightnessGap),
+        whenNearBoundary: () => "Cash trigger: tighten spend now because at least one boundary is already at the regime threshold.",
+        whenAway: (formattedGap) => `Cash trigger: tighten spend if either boundary sits within ${formattedGap} points.`,
+      }),
     ],
     thresholdEmphasis: "Emphasize cash conversion and reversible commitments over growth optics.",
     reversalTriggerDiscipline: "Reverse to higher spend only after cash payback proof holds for two consecutive weekly reads.",

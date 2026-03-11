@@ -62,3 +62,24 @@ it("builds scoped variant adjustments with reversal discipline", () => {
   assert.ok(adjustment.watchAdjustments.length > 0);
   assert.match(adjustment.reversalTriggerDiscipline, /Reverse/i);
 });
+
+
+it("avoids zero-distance watch copy at regime boundaries", () => {
+  const seedAdjustment = buildScopedVariantDecisionAdjustment({
+    mode: "seed",
+    thresholds: { tightnessRegime: 62, riskAppetiteRegime: 48 },
+    scores: { tightness: 62.01, riskAppetite: 55 },
+  });
+
+  assert.match(seedAdjustment.watchAdjustments[0] ?? "", /already at the regime boundary/i);
+  assert.doesNotMatch(seedAdjustment.watchAdjustments[0] ?? "", /0\.0 points/i);
+
+  const bootstrappedAdjustment = buildScopedVariantDecisionAdjustment({
+    mode: "bootstrapped",
+    thresholds: { tightnessRegime: 62, riskAppetiteRegime: 48 },
+    scores: { tightness: 62.02, riskAppetite: 48.01 },
+  });
+
+  assert.match(bootstrappedAdjustment.watchAdjustments[0] ?? "", /tighten spend now/i);
+  assert.doesNotMatch(bootstrappedAdjustment.watchAdjustments[0] ?? "", /0\.0 points/i);
+});
