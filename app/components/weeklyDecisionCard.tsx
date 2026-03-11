@@ -722,26 +722,63 @@ type BoundedRulesMatrixProps = {
 };
 
 export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [] }: BoundedRulesMatrixProps) {
-  const fallbackMatrix = decisionRules.length > 0
-    ? {
-      columns: [
-        { key: "approve" as const, label: "Approve" },
-        { key: "delay" as const, label: "Delay" },
-        { key: "flip" as const, label: "Flip" },
-      ],
-      rows: decisionRules.slice(0, 4).map((rule, index) => ({
-        key: (["hiring", "product", "capital", "burn"][index] ?? "hiring") as "hiring" | "product" | "capital" | "burn",
-        label: decisionAreaLabel(rule.area),
+  const matrixAreaByKey: Record<"hiring" | "product" | "capital" | "burn", BoundedDecisionRule["area"]> = {
+    hiring: "hiring",
+    product: "product-tempo",
+    capital: "capital-raising",
+    burn: "burn-discipline",
+  };
+  const rowOrder: Array<"hiring" | "product" | "capital" | "burn"> = ["hiring", "product", "capital", "burn"];
+  const rulesByArea = new Map(decisionRules.map((rule) => [rule.area, rule]));
+  const fallbackMatrix = {
+    columns: [
+      { key: "approve" as const, label: "Approve" },
+      { key: "delay" as const, label: "Delay" },
+      { key: "flip" as const, label: "Flip" },
+    ],
+    rows: rowOrder.map((key) => {
+      const rule = rulesByArea.get(matrixAreaByKey[key]);
+      return {
+        key,
+        label: rule ? decisionAreaLabel(rule.area) : key.charAt(0).toUpperCase() + key.slice(1),
         cells: {
-          approve: { text: rule.doNow[0] ?? "Stage approvals", detail: rule.rationale },
-          delay: { text: rule.avoidNow[0] ?? "Delay irreversible commitments", detail: rule.pauseTrigger },
-          flip: { text: rule.resumeTrigger, detail: rule.resumeTrigger },
+          approve: { text: rule?.doNow[0] ?? "Stage approvals", detail: rule?.rationale ?? "Keep approvals tied to near-term proof." },
+          delay: { text: rule?.avoidNow[0] ?? "Delay irreversible commitments", detail: rule?.pauseTrigger ?? "Pause when thresholds weaken." },
+          flip: { text: rule?.resumeTrigger ?? "Flip after threshold recovery", detail: rule?.resumeTrigger ?? "Resume only after threshold recovery holds." },
         },
-      })),
-    }
-    : null;
+        context: rule?.scope ?? "Apply this rule to related weekly operating decisions.",
+      };
+    }),
+  };
 
-  const matrix = decisionMatrix ?? fallbackMatrix;
+  const matrix = decisionMatrix
+    ? {
+      ...decisionMatrix,
+      rows: rowOrder.map((rowKey) => {
+        const matrixRow = decisionMatrix.rows.find((row) => row.key === rowKey);
+        const rule = rulesByArea.get(matrixAreaByKey[rowKey]);
+        return {
+          key: rowKey,
+          label: matrixRow?.label ?? (rule ? decisionAreaLabel(rule.area) : rowKey.charAt(0).toUpperCase() + rowKey.slice(1)),
+          cells: {
+            approve: {
+              text: matrixRow?.cells.approve.text ?? rule?.doNow[0] ?? "Stage approvals",
+              detail: matrixRow?.cells.approve.detail ?? rule?.rationale ?? "Keep approvals tied to near-term proof.",
+            },
+            delay: {
+              text: matrixRow?.cells.delay.text ?? rule?.avoidNow[0] ?? "Delay irreversible commitments",
+              detail: matrixRow?.cells.delay.detail ?? rule?.pauseTrigger ?? "Pause when thresholds weaken.",
+            },
+            flip: {
+              text: matrixRow?.cells.flip.text ?? rule?.resumeTrigger ?? "Flip after threshold recovery",
+              detail: matrixRow?.cells.flip.detail ?? rule?.resumeTrigger ?? "Resume only after threshold recovery holds.",
+            },
+          },
+          context: rule?.scope ?? "Apply this rule to related weekly operating decisions.",
+        };
+      }),
+    }
+    : fallbackMatrix;
 
   if (!matrix || matrix.rows.length === 0) {
     return (
@@ -756,11 +793,12 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [] }: Bound
     <article className={`${tierOnePanel} ${sectionSpacing}`}>
       <h2 className={tierOneHeading}>Decision snapshot for leadership this week</h2>
       <p className="text-xs leading-5 text-slate-300">Scan Approve/Delay/Flip across core operating decisions, then open a cell for rationale and threshold context.</p>
-      <div className="mt-2 overflow-x-auto">
+      <div className="mt-2 overflow-x-auto hidden sm:block">
         <table className="min-w-full border-separate border-spacing-2 text-xs text-slate-100" aria-label="Bounded decision matrix">
           <thead>
             <tr>
               <th scope="col" className="rounded-md border border-slate-700/70 bg-slate-950/70 px-2.5 py-2 text-left font-semibold text-slate-300">Decision area</th>
+              <th scope="col" className="rounded-md border border-slate-700/70 bg-slate-950/70 px-2.5 py-2 text-left font-semibold text-slate-300">Context</th>
               {matrix.columns.map((column) => (
                 <th key={column.key} scope="col" className="rounded-md border border-slate-700/70 bg-slate-950/70 px-2.5 py-2 text-left font-semibold text-slate-200">{column.label}</th>
               ))}
@@ -770,6 +808,7 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [] }: Bound
             {matrix.rows.map((row) => (
               <tr key={row.key}>
                 <th scope="row" className="rounded-md border border-slate-700/70 bg-slate-950/75 px-2.5 py-2 text-left font-semibold text-slate-100">{row.label}</th>
+                <td className="rounded-md border border-slate-700/55 bg-slate-950/60 px-2.5 py-2 align-top text-[11px] leading-5 text-slate-300">{row.context}</td>
                 {matrix.columns.map((column) => {
                   const cell = row.cells[column.key];
                   return (
@@ -787,6 +826,27 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [] }: Bound
             ))}
           </tbody>
         </table>
+      </div>
+      <div className="mt-2 space-y-2 sm:hidden">
+        {matrix.rows.map((row) => (
+          <article key={`mobile-${row.key}`} className="rounded-md border border-slate-700/55 bg-slate-950/60 p-2.5">
+            <p className="text-xs font-semibold text-slate-100">{row.label}</p>
+            <p className="mt-1 text-[11px] leading-5 text-slate-300">{row.context}</p>
+            <div className="mt-2 space-y-1.5">
+              {matrix.columns.map((column) => {
+                const cell = row.cells[column.key];
+                return (
+                  <details key={`mobile-${row.key}-${column.key}`} className="rounded border border-slate-700/60 bg-slate-950/70 px-2 py-1.5">
+                    <summary className="cursor-pointer list-none text-[11px] leading-5 text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+                      <span className="font-semibold text-slate-300">{column.label}:</span> {compactActionCue(cell.text)}
+                    </summary>
+                    <p className="mt-1 text-[11px] leading-5 text-slate-300">{cell.detail}</p>
+                  </details>
+                );
+              })}
+            </div>
+          </article>
+        ))}
       </div>
     </article>
   );
@@ -954,7 +1014,7 @@ export function WeeklyDecisionCard({
   reportDynamics,
   decisionShiftSummary: _decisionShiftSummary,
   transitionProbabilities,
-  decisionRules: _decisionRules,
+  decisionRules,
   decisionMatrix,
   actionStripItems: _actionStripItems = [],
   roleAwareTemplates,
@@ -985,8 +1045,6 @@ export function WeeklyDecisionCard({
     recordDateLabel,
     freshnessLabel,
   });
-  const effectiveGuardrail = guardrailThreshold?.trim() || guardrail;
-  const effectiveFlipThreshold = flipThreshold?.trim() || reversalTrigger;
   const immediateDecision = actionNowShort?.trim()
     || (revisitDecisions
       ? "Revise hiring and roadmap calls now."
@@ -1001,8 +1059,6 @@ export function WeeklyDecisionCard({
           .join(" · ")
       : "No active contributors this week.";
   const conciseWeeklyMovement = weeklyMovement.summary.replace(/\.$/, "");
-  const conciseGuardrail = compactActionCue(effectiveGuardrail);
-  const conciseFlipThreshold = compactActionCue(effectiveFlipThreshold);
 
   const needsTrustWarning = isFallbackSnapshot || confidenceLabel !== "HIGH" || freshnessLabel === "Unavailable";
   const trustWarningCopy = isFallbackSnapshot
@@ -1077,7 +1133,7 @@ export function WeeklyDecisionCard({
               <span>Decision snapshot matrix (expand)</span>
               <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
             </summary>
-            <div className="mt-3"><BoundedRulesMatrix decisionMatrix={decisionMatrix} /></div>
+            <div className="mt-3"><BoundedRulesMatrix decisionMatrix={decisionMatrix} decisionRules={decisionRules} /></div>
           </details>
 
           <details id="execution-guidance" className={`${tierOnePanel} ${sectionSpacing} group`}>
@@ -1132,8 +1188,7 @@ export function WeeklyDecisionCard({
             summary="Inspect model inputs →"
           >
             <article className={compactInset}>
-              <p className={`text-xs ${neutralLabel}`}>Guardrail: {conciseGuardrail}</p>
-              <p className="mt-1 text-xs text-slate-300">Flip when: {conciseFlipThreshold}</p>
+              <p className={`text-xs ${neutralLabel}`}>Decision thresholds are in the matrix above.</p>
               <p className="mt-1 text-xs text-slate-300">Defensive probability: {formatProbabilityPercent(transitionProbabilities.Defensive)}</p>
             </article>
             {failureModes.length > 0 ? (
