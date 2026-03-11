@@ -5,29 +5,16 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 import { Accordion } from "@base-ui/react/accordion";
 import { Collapsible } from "@base-ui/react/collapsible";
-import { Dialog } from "@base-ui/react/dialog";
-import { Fieldset } from "@base-ui/react/fieldset";
 import { Field } from "@base-ui/react/field";
 import { Input } from "@base-ui/react/input";
-import { Menu } from "@base-ui/react/menu";
-import { Meter } from "@base-ui/react/meter";
-import { NumberField } from "@base-ui/react/number-field";
-import { Popover } from "@base-ui/react/popover";
-import { PreviewCard } from "@base-ui/react/preview-card";
-import { ScrollArea } from "@base-ui/react/scroll-area";
 import { Select } from "@base-ui/react/select";
-import { Separator } from "@base-ui/react/separator";
-import { Tabs } from "@base-ui/react/tabs";
-import { Toast } from "@base-ui/react/toast";
 import { Toggle } from "@base-ui/react/toggle";
 import { ToggleGroup } from "@base-ui/react/toggle-group";
 import { Tooltip } from "@base-ui/react/tooltip";
-import { Toolbar } from "@base-ui/react/toolbar";
-import { Checkbox } from "@base-ui/react/checkbox";
-import { CheckboxGroup } from "@base-ui/react/checkbox-group";
 import type { RegimeAssessment } from "../../lib/regimeEngine";
 import type { PlaybookEntry } from "../../lib/playbook";
 import type { ActionStripItem } from "../../lib/report/operatingCalls";
@@ -35,7 +22,6 @@ import type {
   MacroSeriesReading,
   SensorReading,
   SensorTimeWindow,
-  TreasuryData,
 } from "../../lib/types";
 import {
   getSensorWindowAggregation,
@@ -43,8 +29,11 @@ import {
 } from "../../lib/sensors";
 import { cxoFunctionOutputs } from "../../lib/cxoFunctionOutputs";
 import { operatorRequests } from "../../lib/operatorRequests";
-import { buildMonthlySummary, getMonthlyActionGuidance } from "../../lib/summary/monthlySummary";
-import { buildWeeklySummary, getWeeklyActionGuidance } from "../../lib/summary/weeklySummary";
+import {
+  buildMonthlySummary,
+  getMonthlyActionGuidance,
+} from "../../lib/summary/monthlySummary";
+import { buildWeeklySummary } from "../../lib/summary/weeklySummary";
 import { buildCadenceAlignment } from "../../lib/cadenceAlignment";
 import { formatDateUTC, formatTimestampUTC } from "../../lib/formatters";
 import { buildMacroPriorityScore, rankMacroSignalsByPriority } from "../../lib/macroPrioritization";
@@ -55,30 +44,26 @@ import {
   FIRST_TIME_GUIDE_STEPS,
   GLOSSARY_USAGE_NOTES,
 } from "../../lib/report/reportCopy";
-import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
+import { DataProvenanceStrip } from "./dataProvenanceStrip";
 import { MonthlySummaryCard } from "./monthlySummaryCard";
 import { SummaryDeltaPanel } from "./summaryDeltaPanel";
-import { WeeklySummaryCard } from "./weeklySummaryCard";
 import { RegimeBadgeIcon } from "./regimeIcons";
 import { CollapsibleDeepDive } from "./collapsibleDeepDive";
 import { insightDatabase } from "../../data/recommendations";
 import {
   buildSparkline,
-  CLIMATE_ORDER,
   clampToRange,
   formatDelta,
   formatNumber,
   getRegimeAccent,
   getRegimeBadge,
   getRegimeLabel,
-  mapToPercent,
   regimeBadges,
   SPARKLINE_HEIGHT,
   SPARKLINE_WIDTH,
   sortClimateKeys,
 } from "./reportSectionUtils";
-import { DataGauge } from "./dataGauge";
-import { useClipboardCopy, type ClipboardCopyState } from "./useClipboardCopy";
+import { useClipboardCopy } from "./useClipboardCopy";
 export {
   ExecutiveSnapshotPanel,
   HistoricalBanner,
@@ -1469,12 +1454,12 @@ export const RegimeChangeAlertPanel = ({
                     <span>Document the change in the operations log.</span>
                   </li>
                 </ul>
-                <a
+                <Link
                   href="/signals?advanced=1#time-machine"
                   className="mt-4 inline-flex min-h-[44px] items-center justify-center rounded-xl border border-sky-500/40 bg-slate-950/70 px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
                 >
                   Open Time Machine
-                </a>
+                </Link>
               </div>
               <div className="weather-surface p-4">
                 <p className="type-label text-slate-400">Alert discipline</p>
