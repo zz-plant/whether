@@ -41,6 +41,7 @@ import {
 } from "./boundedDecisionRules";
 import type { ActionStripItem, RoleAwareOperatingTemplate } from "./operatingCalls";
 import type { TimeMachineRegimeEntry } from "../timeMachine/timeMachineCache";
+import type { PostureStateContract } from "./postureStateContract";
 
 type Regime = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
 
@@ -75,6 +76,7 @@ type HomeReportData = {
   actionNowShort?: string;
   guardrailThreshold?: string;
   flipThreshold?: string;
+  postureState?: PostureStateContract;
   [key: string]: unknown;
 };
 
@@ -845,6 +847,7 @@ export const buildHomeBriefModel = (
     actionNowShort,
     guardrailThreshold,
     flipThreshold,
+    postureState,
   } = data;
   const overlaySector = options?.overlaySector ?? "b2b-saas";
   const startupVariantMode = options?.startupVariantMode ?? "series-a";
@@ -1009,7 +1012,7 @@ export const buildHomeBriefModel = (
     .filter((label) => label.length > 0)
     .filter((label, index, labels) => labels.indexOf(label) === index)
     .slice(0, 4);
-  const conciseFlipThreshold = flipThreshold?.trim() || reversalTrigger || compactFlipConditionLabels[0];
+  const conciseFlipThreshold = postureState?.whatFlipsNext.flipTrigger?.trim() || flipThreshold?.trim() || reversalTrigger || compactFlipConditionLabels[0];
   const decisionMatrix = buildDecisionMatrixPayload({
     regime: assessment.regime,
     thresholds: assessment.thresholds,
@@ -1040,8 +1043,8 @@ export const buildHomeBriefModel = (
     stageLabel: stage.label,
     stageFragile: stage.fragile,
     postureWithStageLabel: `${displayRegime.label} — ${stage.displayLabel}`,
-    confidenceLabel,
-    confidencePercent,
+    confidenceLabel: postureState?.currentState.confidenceLabel ?? confidenceLabel,
+    confidencePercent: postureState?.currentState.confidencePercent ?? confidencePercent,
     signalConfidenceReason,
     regimeHeader: {
       regime: displayRegime.label,
@@ -1086,6 +1089,7 @@ export const buildHomeBriefModel = (
     actionNowShort: conciseActionNow,
     guardrailThreshold: guardrail,
     flipThreshold: conciseFlipThreshold,
+    lastCommittedChangeEvent: postureState?.lastCommittedChangeEvent ?? null,
     canonicalFlipConditions,
     compactFlipConditionLabels,
     historicalAnalogs: normalizedHistoricalAnalogs,
