@@ -187,6 +187,31 @@ describe("WeeklyDecisionCard extracted sections", () => {
 
   });
 
+
+
+  it("renders ordered transitions with hover metadata and history links", () => {
+    const detailsHtml = renderToStaticMarkup(
+      <MoreContextDisclosureBody
+        startupClimateIndex={{ score: 62, status: "Stable", breakdown: [{ label: "Capital", score: 60 }] }}
+        evidenceItems={[{ key: "tightness", title: "Capital conditions", supportingBullets: ["Weekly move: +1.0 vs. prior snapshot."], confidenceLabel: "Medium", directionLabel: "Tightening", immediateImplication: "Tighten approvals and protect runway for fixed-cost commitments." }]}
+        whyThisCall={[{ label: "Momentum", detail: "No material change" }]}
+        memoryRail={[{ label: "W-1", posture: "Defensive" }]}
+        historicalTimeline={[
+          { label: "Jan 31, 2026", posture: "Defensive", month: 1, year: 2026, recordDate: "2026-01-31", summary: "Hold approvals" },
+          { label: "Feb 28, 2026", posture: "Scarcity", month: 2, year: 2026, recordDate: "2026-02-28", summary: "Tighten hiring" },
+        ]}
+        historicalAnalogs={[]}
+        macroOverlay={[{ label: "VC", detail: "Muted" }]}
+      />,
+    );
+
+    assert.match(detailsHtml, /Posture change timeline/);
+    assert.match(detailsHtml, /→/);
+    assert.match(detailsHtml, /\/?month=1&amp;year=2026/);
+    assert.match(detailsHtml, /group-hover:block/);
+    assert.match(detailsHtml, /2026-01-31 • Hold approvals/);
+  });
+
   it("renders collapsed context and citation footer", () => {
     const detailsHtml = renderToStaticMarkup(
       <MoreContextDisclosureBody
