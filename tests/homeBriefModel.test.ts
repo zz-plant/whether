@@ -424,6 +424,11 @@ describe("buildHomeBriefModel", () => {
         assert.ok(cell.detail.length > 0);
       }
     }
+
+    const capitalRow = model.decisionMatrix.rows.find((row) => row.key === "capital");
+    assert.ok(capitalRow);
+    assert.match(capitalRow?.cells.flip.text ?? "", /tightness\s*</i);
+    assert.match(capitalRow?.cells.flip.text ?? "", /risk appetite\s*>/i);
   });
 
   it("falls back to default matrix cues when decision inputs are missing", () => {

@@ -228,6 +228,11 @@ export const buildDecisionMatrixPayload = ({
     const fallbackApprove = "Stage approvals on short-cycle proof";
     const fallbackDelay = "Delay irreversible commitments";
     const flipCondition = lockCommitment.flipConditions[flipConditionIndex] ?? lockCommitment.flipConditions[0] ?? "Recheck thresholds on next refresh.";
+    const flipSummary = rule?.resumeTrigger ?? flipCondition;
+    const flipDetail = [rule?.resumeTrigger, !rule ? flipCondition : ""]
+      .filter((entry): entry is string => Boolean(entry && entry.trim().length > 0))
+      .join(" ")
+      .trim();
 
     return {
       key,
@@ -242,8 +247,8 @@ export const buildDecisionMatrixPayload = ({
           detail: rule?.pauseTrigger ?? "Pause if macro confidence degrades or thresholds weaken.",
         },
         flip: {
-          text: compactMatrixText(flipCondition, "Flip only after threshold recovery"),
-          detail: `${rule?.resumeTrigger ?? "Resume only with sustained threshold recovery."} ${flipCondition}`.trim(),
+          text: compactMatrixText(flipSummary, "Flip only after threshold recovery"),
+          detail: flipDetail || "Resume only with sustained threshold recovery.",
         },
       },
     };
