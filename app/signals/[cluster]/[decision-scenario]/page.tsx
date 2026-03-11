@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../../lib/seo";
 import { readProgrammaticPayload } from "../../../../lib/seo/programmaticPayloadBuilder";
+import type { SeoDecisionPayload } from "../../../../lib/report/seoDecisionPayload";
 import { findSignalsCluster } from "../../clusterRoutes";
 import { findDecisionScenario, signalScenarioRoutes } from "../../../seoRouteClusters";
 
@@ -15,6 +16,41 @@ export function generateStaticParams() {
   return signalScenarioRoutes.map((route) => ({ cluster: route.signalSlug, "decision-scenario": route.decisionScenario }));
 }
 
+const shouldNoindexForPayload = (payload?: Pick<SeoDecisionPayload, "degraded" | "noindex" | "noindexReasons">) => {
+  if (!payload) return true;
+  if (payload.noindex || payload.degraded) return true;
+  return (payload.noindexReasons ?? []).some((reason) => reason.startsWith("freshness-") || reason.includes("provenance"));
+};
+
+export const buildSignalDecisionScenarioMetadata = ({
+  cluster,
+  decisionScenario,
+  signalTitle,
+  signalSummary,
+  scenarioTitle,
+  payload,
+}: {
+  cluster: string;
+  decisionScenario: string;
+  signalTitle: string;
+  signalSummary: string;
+  scenarioTitle: string;
+  payload?: Pick<SeoDecisionPayload, "degraded" | "noindex" | "noindexReasons">;
+}) => {
+  const metadata = buildPageMetadata({
+    title: `${signalTitle}: ${scenarioTitle} decisions`,
+    description: signalSummary,
+    path: `/signals/${cluster}/${decisionScenario}`,
+    imageAlt: `${signalTitle} ${scenarioTitle}`,
+  });
+
+  if (shouldNoindexForPayload(payload)) {
+    metadata.robots = { index: false, follow: true };
+  }
+
+  return metadata;
+};
+
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { cluster: cluster, "decision-scenario": decisionScenario } = await params;
   const signal = findSignalsCluster(cluster);
@@ -22,11 +58,15 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
   if (!signal || !scenario) return {};
 
-  return buildPageMetadata({
-    title: `${signal.title}: ${scenario.title} decisions`,
-    description: signal.summary,
-    path: `/signals/${cluster}/${decisionScenario}`,
-    imageAlt: `${signal.title} ${scenario.title}`,
+  const payloadRecord = await readProgrammaticPayload(`/signals/${cluster}/${decisionScenario}`).catch(() => undefined);
+
+  return buildSignalDecisionScenarioMetadata({
+    cluster,
+    decisionScenario,
+    signalTitle: signal.title,
+    signalSummary: signal.summary,
+    scenarioTitle: scenario.title,
+    payload: payloadRecord?.payload,
   });
 }
 
