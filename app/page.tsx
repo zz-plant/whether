@@ -405,6 +405,16 @@ const HomePageReportContent = async ({
       pageLinks={reportPageLinks}
       sectionLinks={sectionLinks}
       structuredData={structuredData}
+      commandBar={{
+        regime: assessment.regime,
+        call: homeBriefModel.postureWithStageLabel,
+        doNow: [
+          homeBriefModel.actionNowShort ?? "Hold last week's bounded operating rules until thresholds move.",
+          homeBriefModel.guardrail,
+        ],
+        flipConditions: [homeBriefModel.flipThreshold ?? homeBriefModel.reversalTrigger],
+        updatedAt: fetchedAtLabel,
+      }}
       historicalBanner={
         historicalSelection ? (
           <HistoricalBanner
