@@ -212,10 +212,13 @@ const setRegimeSeriesCache = (key: string, value: TimeMachineRegimeEntry[]) => {
 
 const buildRegimeSeriesCacheKey = (
   months: number,
-  overrides?: Partial<RegimeThresholds>
+  overrides?: Partial<RegimeThresholds>,
+  asOf?: string
 ) => {
+  const normalizedAsOf = asOf ?? "latest";
+
   if (!overrides) {
-    return `${months}:default`;
+    return `${months}:default:${normalizedAsOf}`;
   }
 
   return [
@@ -223,20 +226,32 @@ const buildRegimeSeriesCacheKey = (
     overrides.baseRateTightness ?? "default",
     overrides.tightnessRegime ?? "default",
     overrides.riskAppetiteRegime ?? "default",
+    normalizedAsOf,
   ].join(":");
 };
 
 export const getTimeMachineRegimeSeries = (
   months = DEFAULT_REGIME_SERIES_MONTHS,
-  overrides?: Partial<RegimeThresholds>
+  overrides?: Partial<RegimeThresholds>,
+  asOf?: string
 ): TimeMachineRegimeEntry[] => {
-  const cacheKey = buildRegimeSeriesCacheKey(months, overrides);
+  const cacheKey = buildRegimeSeriesCacheKey(months, overrides, asOf);
   const cached = timeMachineRegimeSeriesCache.get(cacheKey);
   if (cached) {
     return cached;
   }
-  const sliceStart = Math.max(sortedSnapshots.length - months, 0);
-  const series = sortedSnapshots.slice(sliceStart).map((snapshot) => {
+  const resolvedMonths = Math.max(months, 1);
+  const asOfTime = asOf ? new Date(asOf).getTime() : Number.NaN;
+  const asOfIndex =
+    asOf && Number.isFinite(asOfTime)
+      ? findSnapshotIndexAtOrBefore(asOfTime)
+      : sortedSnapshots.length - 1;
+  const lastIndex =
+    typeof asOfIndex === "number" && asOfIndex >= 0
+      ? asOfIndex
+      : sortedSnapshots.length - 1;
+  const sliceStart = Math.max(lastIndex + 1 - resolvedMonths, 0);
+  const series = sortedSnapshots.slice(sliceStart, lastIndex + 1).map((snapshot) => {
     const assessment = evaluateRegime(snapshot, overrides);
     return {
       year: snapshot.year,
