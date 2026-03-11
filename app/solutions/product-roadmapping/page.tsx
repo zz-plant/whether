@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { buildPageMetadata } from "../../../lib/seo";
+import { SeoPostureSnapshot } from "../components/seoPostureSnapshot";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Treasury yield curve signals for product roadmapping — Whether",
@@ -24,6 +25,24 @@ const roadmapMoves = [
   "Protect core reliability and activation flows before long-horizon initiatives.",
 ] as const;
 
+const boundedRules = [
+  {
+    action: "Ship only roadmap items with value proof in under six weeks.",
+    trigger: "Apply when risk appetite score falls below regime threshold.",
+    reversal: "Re-open exploratory bets after two consecutive improving weekly reads.",
+  },
+  {
+    action: "Gate net-new platform projects behind executive checkpoint review.",
+    trigger: "Apply when tightness score rises above regime threshold.",
+    reversal: "Release gating after tightness normalizes for one full monthly cycle.",
+  },
+  {
+    action: "Shift PM reviews to weekly decision packets with keep/pause/accelerate labels.",
+    trigger: "Apply whenever momentum is mixed or deteriorating.",
+    reversal: "Return to biweekly reviews once momentum is stable and revisit flag is off.",
+  },
+] as const;
+
 const connectedPages = [
   {
     title: "Engineering capacity",
@@ -45,7 +64,7 @@ const connectedPages = [
   },
 ] as const;
 
-export default function ProductRoadmappingPage() {
+export default async function ProductRoadmappingPage() {
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
       <section className="weather-panel space-y-4 px-6 py-6">
@@ -61,6 +80,11 @@ export default function ProductRoadmappingPage() {
         </p>
       </section>
 
+      <SeoPostureSnapshot
+        route="/solutions/product-roadmapping"
+        immediateImplication="Bias toward near-term customer value and de-risk roadmap sequencing before committing to long-horizon expansions."
+      />
+
       <section className="weather-panel space-y-4 px-6 py-6">
         <h2 className="text-xl font-semibold text-slate-100">How to apply macro signals this quarter</h2>
         <ul className="space-y-2 text-sm text-slate-200">
@@ -70,6 +94,19 @@ export default function ProductRoadmappingPage() {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section className="weather-panel space-y-4 px-6 py-6">
+        <h2 className="text-xl font-semibold text-slate-100">Bounded roadmap decisions</h2>
+        <div className="grid gap-3 sm:grid-cols-3">
+          {boundedRules.map((rule) => (
+            <article key={rule.action} className="weather-surface space-y-2 px-4 py-4 text-sm">
+              <p className="font-semibold text-slate-100">Action: {rule.action}</p>
+              <p className="text-rose-200">Trigger: {rule.trigger}</p>
+              <p className="text-emerald-200">Reversal: {rule.reversal}</p>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section className="weather-panel space-y-4 px-6 py-6">

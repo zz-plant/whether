@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { buildPageMetadata } from "../../../lib/seo";
+import { SeoPostureSnapshot } from "../components/seoPostureSnapshot";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Market regime operations playbook — Whether",
@@ -23,16 +24,22 @@ const regimeRows = [
     regime: "High stress",
     guidance:
       "Protect cash and delivery reliability first. Delay discretionary expansion bets until confidence improves.",
+    trigger: "Activate when tightness is above threshold or risk appetite is below threshold.",
+    reversal: "Re-open expansion pilots after two improving weekly reads.",
   },
   {
     regime: "Moderate stress",
     guidance:
       "Balance efficiency with selective growth. Gate larger initiatives behind tighter milestone review.",
+    trigger: "Activate when momentum is mixed and transition watch remains ON.",
+    reversal: "Resume normal planning cadence after momentum stabilizes for a full month.",
   },
   {
     regime: "Low stress",
     guidance:
       "Increase growth cadence while preserving risk controls on hiring and strategic commitments.",
+    trigger: "Activate when risk appetite stays above threshold with stable or improving momentum.",
+    reversal: "Return to moderate-stress playbook immediately if either threshold nears flip range.",
   },
 ] as const;
 
@@ -57,7 +64,7 @@ const connectedPages = [
   },
 ] as const;
 
-export default function MarketRegimePlaybookPage() {
+export default async function MarketRegimePlaybookPage() {
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
       <section className="weather-panel space-y-4 px-6 py-6">
@@ -73,13 +80,20 @@ export default function MarketRegimePlaybookPage() {
         </p>
       </section>
 
+      <SeoPostureSnapshot
+        route="/solutions/market-regime-playbook"
+        immediateImplication="Run cross-functional plans off the current weekly posture so hiring, spend, and roadmap calls share one reversible operating baseline."
+      />
+
       <section className="weather-panel space-y-4 px-6 py-6">
         <h2 className="text-xl font-semibold text-slate-100">Operating moves by regime</h2>
         <div className="space-y-3">
           {regimeRows.map((row) => (
             <article key={row.regime} className="weather-surface space-y-2 px-4 py-4">
               <h3 className="text-base font-semibold text-slate-100">{row.regime}</h3>
-              <p className="text-sm text-slate-200">{row.guidance}</p>
+              <p className="text-sm text-slate-200">Action: {row.guidance}</p>
+              <p className="text-xs text-rose-200">Trigger: {row.trigger}</p>
+              <p className="text-xs text-emerald-200">Reversal: {row.reversal}</p>
             </article>
           ))}
         </div>

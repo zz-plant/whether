@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { buildPageMetadata } from "../../../lib/seo";
+import { SeoPostureSnapshot } from "../components/seoPostureSnapshot";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Macro signals for engineering capacity planning — Whether",
@@ -45,7 +46,25 @@ const connectedPages = [
   },
 ] as const;
 
-export default function EngineeringCapacityPage() {
+const boundedCapacityRules = [
+  {
+    action: "Freeze net-new headcount unless the role unblocks contracted delivery.",
+    trigger: "Apply when tightness breaches the current regime threshold.",
+    reversal: "Resume planned hiring after two weekly briefs show improving momentum.",
+  },
+  {
+    action: "Reallocate 10-20% of sprint capacity into reliability and churn-defense work.",
+    trigger: "Apply when risk appetite drops below threshold or when revisit decisions is ON.",
+    reversal: "Shift capacity back to expansion once risk appetite clears threshold for a full month.",
+  },
+  {
+    action: "Publish a weekly delivery risk log with pause/resume ownership by function lead.",
+    trigger: "Apply in mixed momentum weeks to avoid silent scope creep.",
+    reversal: "Move to biweekly governance when momentum returns stable and no key thresholds are near flips.",
+  },
+] as const;
+
+export default async function EngineeringCapacityPage() {
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
       <section className="weather-panel space-y-4 px-6 py-6">
@@ -61,6 +80,12 @@ export default function EngineeringCapacityPage() {
         </p>
       </section>
 
+
+      <SeoPostureSnapshot
+        route="/solutions/engineering-capacity"
+        immediateImplication="Set staffing and scope around cash preservation first, then increase delivery aggression only when momentum and confidence hold."
+      />
+
       <section className="weather-panel space-y-4 px-6 py-6">
         <h2 className="text-xl font-semibold text-slate-100">Capacity checklist by market regime</h2>
         <ul className="space-y-2 text-sm text-slate-200">
@@ -70,6 +95,19 @@ export default function EngineeringCapacityPage() {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section className="weather-panel space-y-4 px-6 py-6">
+        <h2 className="text-xl font-semibold text-slate-100">Bounded engineering decisions</h2>
+        <div className="grid gap-3 sm:grid-cols-3">
+          {boundedCapacityRules.map((rule) => (
+            <article key={rule.action} className="weather-surface space-y-2 px-4 py-4 text-sm">
+              <p className="font-semibold text-slate-100">Action: {rule.action}</p>
+              <p className="text-rose-200">Trigger: {rule.trigger}</p>
+              <p className="text-emerald-200">Reversal: {rule.reversal}</p>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section className="weather-panel space-y-4 px-6 py-6">
