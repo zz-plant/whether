@@ -1,0 +1,11 @@
+{
+  "version": "seo-refresh-queue.v1",
+  "generatedAtIso": "2026-03-11T03:33:40.473Z",
+  "staleAfterHours": 336,
+  "totals": {
+    "pages": 66,
+    "queued": 0,
+    "noindexNow": 0
+  },
+  "queue": []
+}
