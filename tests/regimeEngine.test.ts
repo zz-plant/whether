@@ -11,6 +11,7 @@ import {
   deriveRegimeTrend,
   evaluateRegime,
 } from "../lib/regimeEngine";
+import { advanceRegimeState } from "../lib/report/regimeStateMachine";
 import type { TreasuryData } from "../lib/types";
 
 describe("regime engine scoring", () => {
@@ -355,5 +356,89 @@ describe("regime macro overlays", () => {
     assert.ok(stressed.scores.riskAppetite < baseline.scores.riskAppetite);
     assert.equal(stressed.diagnostics.twoWeakReadsWarning, true);
     assert.ok(stressed.diagnostics.boundaryContributors.length >= 2);
+  });
+});
+
+
+describe("regime state machine", () => {
+  it("keeps transitions pending under low confidence", () => {
+    const previous = {
+      committedState: "EXPANSION" as const,
+      pendingState: null,
+      pendingCount: 0,
+      lastSignals: { tightness: 60, riskAppetite: 55 },
+    };
+
+    const transition = advanceRegimeState(previous, {
+      tightness: 76,
+      riskAppetite: 40,
+      thresholds: DEFAULT_THRESHOLDS,
+      diagnostics: {
+        confidence: "LOW",
+        nearestThresholdDelta: 2,
+        transitionWatch: true,
+      },
+    });
+
+    assert.equal(transition.nextState, "EXPANSION");
+    assert.equal(transition.pending, true);
+    assert.equal(transition.committed, false);
+  });
+
+  it("commits after consecutive confirmations to avoid whipsaw", () => {
+    const first = advanceRegimeState(
+      {
+        committedState: "EXPANSION",
+        pendingState: null,
+        pendingCount: 0,
+        lastSignals: { tightness: 60, riskAppetite: 58 },
+      },
+      {
+        tightness: 76,
+        riskAppetite: 40,
+        thresholds: DEFAULT_THRESHOLDS,
+        diagnostics: { confidence: "MEDIUM", nearestThresholdDelta: 4, transitionWatch: true },
+      },
+    );
+
+    const second = advanceRegimeState(first.snapshot, {
+      tightness: 77,
+      riskAppetite: 39,
+      thresholds: DEFAULT_THRESHOLDS,
+      diagnostics: { confidence: "MEDIUM", nearestThresholdDelta: 4, transitionWatch: true },
+    });
+
+    assert.equal(first.nextState, "EXPANSION");
+    assert.equal(first.pending, true);
+    assert.equal(second.nextState, "SCARCITY");
+    assert.equal(second.committed, true);
+  });
+
+  it("resets pending reversal when signals snap back", () => {
+    const pending = advanceRegimeState(
+      {
+        committedState: "DEFENSIVE",
+        pendingState: null,
+        pendingCount: 0,
+        lastSignals: { tightness: 75, riskAppetite: 58 },
+      },
+      {
+        tightness: 60,
+        riskAppetite: 62,
+        thresholds: DEFAULT_THRESHOLDS,
+        diagnostics: { confidence: "MEDIUM", nearestThresholdDelta: 6, transitionWatch: true },
+      },
+    );
+
+    const reverted = advanceRegimeState(pending.snapshot, {
+      tightness: 76,
+      riskAppetite: 58,
+      thresholds: DEFAULT_THRESHOLDS,
+      diagnostics: { confidence: "HIGH", nearestThresholdDelta: 12, transitionWatch: false },
+    });
+
+    assert.equal(pending.pending, true);
+    assert.equal(reverted.nextState, "DEFENSIVE");
+    assert.equal(reverted.pending, false);
   });
 });

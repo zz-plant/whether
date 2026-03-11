@@ -1,4 +1,5 @@
 import type { RegimeKey } from "../regimeEngine";
+import type { RegimeStateTransition } from "./regimeStateMachine";
 
 export const operatingLeverOrder = [
   "hiring-stance",
@@ -77,9 +78,16 @@ const knobKeyOrder: DecisionKnob["key"][] = [
   "experimentTolerance",
 ];
 
-type DecisionKnobContext = {
-  regime: RegimeKey;
-  severityDelta: number;
+const regimeRank: Record<RegimeKey, number> = {
+  SCARCITY: 0,
+  DEFENSIVE: 1,
+  VOLATILE: 2,
+  EXPANSION: 3,
+};
+
+export type DecisionKnobContext = {
+  committedState: RegimeKey;
+  transition: Pick<RegimeStateTransition, "pending" | "committed" | "candidateState" | "transitionReason">;
   nearestThresholdGap: number;
   weakSignalCount: number;
 };
@@ -108,56 +116,49 @@ const weeklyCallByRegime: Record<RegimeKey, string> = {
 
 const buildKnobRationale = (key: DecisionKnob["key"], context: DecisionKnobContext) => {
   const thresholdCaution = context.nearestThresholdGap <= 8;
-  const severityShift =
-    context.severityDelta > 0
-      ? "Conditions deteriorated versus prior week"
-      : context.severityDelta < 0
-        ? "Conditions improved versus prior week"
-        : "Conditions are steady versus prior week";
   const weakSignalLabel = context.weakSignalCount > 0 ? `${context.weakSignalCount} weak signal${context.weakSignalCount > 1 ? "s" : ""}` : "signals are stable";
 
-  if (key === "approvalVelocity") {
-    return thresholdCaution
-      ? `${severityShift}; near-threshold risk keeps approvals paced until flip conditions clear while ${weakSignalLabel}.`
-      : `${severityShift}; approval speed follows ${context.regime.toLowerCase()} conditions while ${weakSignalLabel}.`;
+  if (context.transition.pending) {
+    return `${context.transition.transitionReason} Keep ${key} on committed ${context.committedState.toLowerCase()} settings while ${weakSignalLabel}.`;
   }
 
-  if (key === "experimentTolerance") {
-    return thresholdCaution
-      ? `${severityShift}; threshold proximity caps experimentation until reversal conditions clear despite ${weakSignalLabel}.`
-      : `${severityShift}; experiment tolerance tracks current risk appetite and ${weakSignalLabel}.`;
+  if (context.transition.committed) {
+    return `${context.transition.transitionReason} ${key} now follows committed ${context.committedState.toLowerCase()} posture with ${weakSignalLabel}.`;
   }
 
-  return thresholdCaution
-    ? `${severityShift}; keep stronger controls until threshold triggers clear and ${weakSignalLabel}.`
-    : `${severityShift}; controls align to current regime with ${weakSignalLabel}.`;
+  if (thresholdCaution) {
+    return `Near-threshold risk keeps ${key} constrained while ${weakSignalLabel}.`;
+  }
+
+  return `${key} aligns to committed ${context.committedState.toLowerCase()} posture and ${weakSignalLabel}.`;
 };
 
-export const deriveDecisionKnobs = (
-  regime: RegimeKey,
-  severityDelta: number,
-  context?: { nearestThresholdGap?: number; weakSignalCount?: number },
-): DecisionKnob[] => {
-  const severityDirection = severityDelta === 0 ? 0 : severityDelta > 0 ? 1 : -1;
-  const shift = Math.min(1, Math.abs(severityDirection));
-  const baseline = knobsByRegime[regime];
-  const knobContext: DecisionKnobContext = {
-    regime,
-    severityDelta,
-    nearestThresholdGap: context?.nearestThresholdGap ?? 100,
-    weakSignalCount: context?.weakSignalCount ?? 0,
-  };
+const getPendingBias = (key: DecisionKnob["key"], context: DecisionKnobContext) => {
+  if (!context.transition.pending) {
+    return 0;
+  }
+
+  const direction = regimeRank[context.transition.candidateState] - regimeRank[context.committedState];
+  if (direction === 0) {
+    return 0;
+  }
+
+  const conservativeBias = key === "reversibility" || key === "payback" ? 1 : -1;
+  return direction < 0 ? conservativeBias : -conservativeBias;
+};
+
+export const deriveDecisionKnobs = (context: DecisionKnobContext): DecisionKnob[] => {
+  const baseline = knobsByRegime[context.committedState];
 
   return knobKeyOrder.map((key) => {
-    const conservativeBias = key === "reversibility" || key === "payback" ? 1 : -1;
-    const delta = shift * severityDirection * conservativeBias;
+    const delta = getPendingBias(key, context);
     return {
       key,
       label: knobLabels[key],
       value: clampKnobValue(baseline[key] + delta),
       delta,
       levelLabels: knobLevelLabels[key],
-      rationale: buildKnobRationale(key, knobContext),
+      rationale: buildKnobRationale(key, context),
     };
   });
 };

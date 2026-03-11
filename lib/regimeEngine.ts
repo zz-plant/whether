@@ -6,6 +6,7 @@ import type { MacroSeriesReading, TreasuryData, TreasuryYields } from "./types";
 import { POLICY_BBB_WEIGHT_FOR_RAS, POLICY_SPEC_V1 } from "./policy/config";
 import { getGovernanceParametersForPosture, type GovernanceParameterSet } from "./policy/governance";
 import { clipZScore, computeCompositeScore, computeVolatility, computeZScore, directionalNormalize } from "./policy/transforms";
+import { advanceRegimeState, type RegimeMachineSnapshot, type RegimeStateTransition } from "./report/regimeStateMachine";
 
 export type RegimeKey = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
 
@@ -32,6 +33,7 @@ export type RegimeInput = {
 
 export interface RegimeAssessment {
   regime: RegimeKey;
+  regimeTransition: RegimeStateTransition;
   scores: RegimeScores;
   diagnostics: RegimeDiagnostics;
   description: string;
@@ -335,18 +337,17 @@ export const classifyRegime = (
   tightness: number,
   riskAppetite: number,
   thresholds: RegimeThresholds
-): RegimeKey => {
-  if (tightness > thresholds.tightnessRegime && riskAppetite <= thresholds.riskAppetiteRegime) {
-    return "SCARCITY";
-  }
-  if (tightness > thresholds.tightnessRegime && riskAppetite > thresholds.riskAppetiteRegime) {
-    return "DEFENSIVE";
-  }
-  if (tightness <= thresholds.tightnessRegime && riskAppetite <= thresholds.riskAppetiteRegime) {
-    return "VOLATILE";
-  }
-  return "EXPANSION";
-};
+): RegimeKey =>
+  advanceRegimeState(null, {
+    tightness,
+    riskAppetite,
+    thresholds,
+    diagnostics: {
+      confidence: "HIGH",
+      nearestThresholdDelta: Number.POSITIVE_INFINITY,
+      transitionWatch: false,
+    },
+  }).nextState;
 
 
 
@@ -786,7 +787,8 @@ export const buildRegimeChangeReasons = (
 export const evaluateRegime = (
   treasury: TreasuryData,
   overrides?: Partial<RegimeThresholds>,
-  macroSeries: MacroSeriesReading[] = []
+  macroSeries: MacroSeriesReading[] = [],
+  previousMachineState: RegimeMachineSnapshot | null = null,
 ): RegimeAssessment => {
   const dataWarnings: string[] = [];
   const baseRate = getBaseRate(treasury.yields);
@@ -814,7 +816,6 @@ export const evaluateRegime = (
   const macroAdjusted = applyMacroAdjustments(baselineTightness, baselineRiskAppetite, macroSeries);
   const tightness = macroAdjusted.tightness;
   const riskAppetite = macroAdjusted.riskAppetite;
-  const regime = classifyRegime(tightness, riskAppetite, thresholds);
   const diagnostics = computeDiagnostics(
     tightness,
     riskAppetite,
@@ -822,6 +823,13 @@ export const evaluateRegime = (
     macroAdjusted.boundaryContributors,
     macroAdjusted.weakReadCount
   );
+  const regimeTransition = advanceRegimeState(previousMachineState, {
+    tightness,
+    riskAppetite,
+    thresholds,
+    diagnostics,
+  });
+  const regime = regimeTransition.nextState;
   const profile = REGIME_PROFILES[regime];
   const policyAssessment = computePolicyAssessment(
     treasury,
@@ -833,6 +841,7 @@ export const evaluateRegime = (
 
   return {
     regime,
+    regimeTransition,
     scores: {
       tightness,
       riskAppetite,
