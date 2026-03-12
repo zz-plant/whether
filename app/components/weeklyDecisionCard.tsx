@@ -18,6 +18,7 @@ import {
   buildWeeklyCitationMetaLine,
   buildCompactTrustSummary,
 } from "../../lib/report/trustStatus";
+import type { CanonicalDecisionCopy } from "../../lib/report/canonicalDecisionCopy";
 
 type WhyThisCallItem = { label: string; detail: string };
 type MemoryRailItem = { label: string; posture: string };
@@ -41,7 +42,7 @@ type DecisionDeltaStripItem = {
 
 export type WeeklyDecisionCardProps = {
   statusLabel: string;
-  regimeKey: RegimeKey;
+  regimeKey?: RegimeKey;
   postureLabel: string;
   stageLabel: string;
   postureWithStageLabel?: string;
@@ -77,6 +78,7 @@ export type WeeklyDecisionCardProps = {
   guardrailThreshold?: string;
   flipThreshold?: string;
   compactFlipConditionLabels?: string[];
+  canonicalDecisionCopy?: CanonicalDecisionCopy;
   canonicalFlipConditions?: Array<{
     area: BoundedDecisionRule["area"];
     metric: "tightness" | "riskAppetite";
@@ -1113,6 +1115,7 @@ export function WeeklyDecisionCard({
   guardrailThreshold,
   flipThreshold,
   compactFlipConditionLabels = [],
+  canonicalDecisionCopy,
   canonicalFlipConditions = [],
   recordDateLabel,
   fetchedAtLabel,
@@ -1152,8 +1155,9 @@ export function WeeklyDecisionCard({
     recordDateLabel,
     freshnessLabel,
   });
-  const immediateDecision = actionNowShort?.trim()
-    || (revisitDecisions
+  const immediateDecision = canonicalDecisionCopy?.doNowLines[0]
+    ?? actionNowShort?.trim()
+    ?? (revisitDecisions
       ? "Revise hiring and roadmap calls now."
       : "Hold last week's operating rules.");
 
@@ -1168,13 +1172,15 @@ export function WeeklyDecisionCard({
   const conciseWeeklyMovement = weeklyMovement.summary.replace(/\.$/, "");
   const snapshotDoNow = immediateDecision;
   const snapshotAvoid = executiveOperationalStance.avoid[0] ?? guardrail;
-  const snapshotWatch = flipThreshold ?? reversalTrigger;
+  const snapshotWatch = canonicalDecisionCopy?.flipTrigger ?? flipThreshold ?? reversalTrigger;
   const structuredFlipLabels = canonicalFlipConditions
     .map((condition) => condition.label.trim())
     .filter((label) => label.length > 0)
     .filter((label, index, labels) => labels.indexOf(label) === index)
     .slice(0, 4);
-  const effectiveFlipLabels = structuredFlipLabels.length > 0
+  const effectiveFlipLabels = canonicalDecisionCopy?.flipConditions?.length
+    ? canonicalDecisionCopy.flipConditions
+    : structuredFlipLabels.length > 0
     ? structuredFlipLabels
     : compactFlipConditionLabels.filter((label, index, labels) => labels.indexOf(label) === index).slice(0, 4);
 
@@ -1289,12 +1295,13 @@ export function WeeklyDecisionCard({
     regimeDistance,
   });
   const recentTimeline = historicalTimeline.slice(-2);
+  const resolvedRegimeKey = regimeKey ?? "DEFENSIVE";
 
   return (
     <section className="weather-panel space-y-3 px-4 py-5 sm:space-y-4 sm:px-6 sm:py-6" aria-labelledby="weekly-posture-brief-title">
       <RegimeBanner
         statusLabel={statusLabel}
-        regimeKey={regimeKey}
+        regimeKey={resolvedRegimeKey}
         postureLabel={postureLabel}
         stageLabel={stageLabel}
         postureWithStageLabel={postureWithStageLabel}
@@ -1313,6 +1320,7 @@ export function WeeklyDecisionCard({
             startupVariantPolicy={resolvedStartupVariantPolicy}
             modeContentByMode={modeContentByMode}
             postureLabel={postureWithStageLabel ?? statusLabel}
+            operatingCall={canonicalDecisionCopy?.operatingCall ?? operatingStanceLine}
             trendLabel={trendLabel}
             confidencePercent={confidencePercent}
             confidenceLabel={confidenceLabel}

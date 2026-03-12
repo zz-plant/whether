@@ -10,6 +10,7 @@ type WeeklyCallModePanelProps = {
   startupVariantPolicy: StartupVariantPolicy;
   modeContentByMode: Partial<Record<StartupVariantMode, StartupModeContent>>;
   postureLabel: string;
+  operatingCall: string;
   trendLabel: string;
   confidencePercent: number;
   confidenceLabel: "HIGH" | "MED" | "LOW";
@@ -28,6 +29,7 @@ export function WeeklyCallModePanel({
   startupVariantPolicy,
   modeContentByMode,
   postureLabel,
+  operatingCall,
   trendLabel,
   confidencePercent,
   confidenceLabel,
@@ -63,14 +65,21 @@ export function WeeklyCallModePanel({
           <h2 className="text-sm font-semibold tracking-[0.01em] text-slate-50">Weekly call snapshot</h2>
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Quick share summary for this week</p>
         </div>
-        <ul className="mt-2 grid gap-1.5 text-[11px] text-slate-100 sm:grid-cols-2 lg:grid-cols-3">
+        <ol className="mt-2 grid gap-1.5 text-[11px] text-slate-100" aria-label="Weekly decision transmission order">
           <li className={compactInsetClassName}><span className="font-semibold text-slate-200">Regime:</span> {postureLabel}</li>
-          <li className={compactInsetClassName}><span className="font-semibold text-slate-200">Trend:</span> {trendLabel}</li>
-          <li className={compactInsetClassName}><span className="font-semibold text-slate-200">Confidence:</span> {Math.round(confidencePercent)}% ({confidenceLabel})</li>
-          <li className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-emerald-200">DO NOW:</span> {snapshotDoNow}</li>
-          <li className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-rose-200">AVOID:</span> {snapshotAvoid}</li>
-          <li className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-sky-200">WATCH:</span> {snapshotWatch}</li>
-        </ul>
+          <li className={compactInsetClassName}><span className="font-semibold text-slate-200">Call:</span> {operatingCall}</li>
+          <li className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-emerald-200">Do now:</span> {snapshotDoNow}</li>
+          <li className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-sky-200">Flip conditions:</span> {effectiveFlipLabels[0] ?? snapshotWatch}</li>
+        </ol>
+        <details className="mt-2 rounded-md border border-slate-700/60 bg-slate-950/55 px-2.5 py-2">
+          <summary className="cursor-pointer text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Secondary diagnostics</summary>
+          <ul className="mt-2 grid gap-1.5 text-[11px] text-slate-100 sm:grid-cols-2">
+            <li className={compactInsetClassName}><span className="font-semibold text-slate-200">Trend:</span> {trendLabel}</li>
+            <li className={compactInsetClassName}><span className="font-semibold text-slate-200">Confidence:</span> {Math.round(confidencePercent)}% ({confidenceLabel})</li>
+            <li className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-rose-200">Avoid:</span> {snapshotAvoid}</li>
+            <li className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-sky-200">Watch:</span> {snapshotWatch}</li>
+          </ul>
+        </details>
         <div className="mt-2 rounded-md border border-sky-500/25 bg-sky-500/5 px-2.5 py-2">
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Flip conditions</p>
           <ul className="mt-1 space-y-1 text-[11px] text-slate-100">

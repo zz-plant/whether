@@ -41,6 +41,7 @@ import { resolveSectorKey } from "../lib/report/sectorSensitivity";
 import { LiveDataFallbackAlert } from "./components/liveDataFallbackAlert";
 import { getRegimeDisplayLabel } from "../lib/regimePresentation";
 import { buildPostureState } from "../lib/report/postureStateSource";
+import { buildCanonicalDecisionCopy } from "../lib/report/canonicalDecisionCopy";
 
 export const revalidate = 900;
 export const runtime = "edge";
@@ -239,7 +240,7 @@ export default async function HomePage({
   );
 }
 
-const HomePageReportContent = async ({
+export const HomePageReportContent = async ({
   searchParams,
 }: {
   searchParams?: HomePageSearchParams | Promise<HomePageSearchParams>;
@@ -354,6 +355,10 @@ const HomePageReportContent = async ({
     postureState,
   };
   const boardSummary = buildBoardBrief(assessment, treasury, sensors, macroSeries, exportLayerOptions);
+  const canonicalDecisionCopy = buildCanonicalDecisionCopy({
+    homeBriefModel,
+    postureState,
+  });
   const weeklyOperatorBriefPayload = buildWeeklyOperatorBriefPayload({
     assessment,
     treasury,
@@ -362,22 +367,18 @@ const HomePageReportContent = async ({
     actionStripItems: homeBriefModel.actionStripItems,
     flipConditionLabels: homeBriefModel.compactFlipConditionLabels,
     postureState,
+    canonicalDecisionCopy,
   });
   const weeklyOperatorBriefText = buildWeeklyOperatorBriefPlainText(weeklyOperatorBriefPayload);
   const weeklyCallSnapshotText = buildWeeklyCallSnapshotPlainText({
-    regime: homeBriefModel.postureWithStageLabel ?? homeBriefModel.postureLabel,
-    call: homeBriefModel.operatingStanceLine,
+    regime: canonicalDecisionCopy.currentRegimeLabel,
+    call: canonicalDecisionCopy.operatingCall,
     trend: homeBriefModel.trendLabel,
     confidence: `${Math.round(homeBriefModel.confidencePercent)}% (${homeBriefModel.confidenceLabel})`,
-    doNow: homeBriefModel.actionNowShort ?? "Hold last week's bounded operating rules until thresholds move.",
+    doNow: canonicalDecisionCopy.doNowLines[0],
     avoid: homeBriefModel.executiveOperationalStance.avoid[0] ?? homeBriefModel.guardrail,
-    watch: postureState.whatFlipsNext.flipTrigger,
-    flipConditions: postureState.whatFlipsNext.thresholds.length > 0
-      ? postureState.whatFlipsNext.thresholds
-      : homeBriefModel.decisionRules
-          .map((rule) => rule.resumeTrigger?.trim())
-          .filter((trigger): trigger is string => Boolean(trigger && trigger.length > 0))
-          .slice(0, 3),
+    watch: canonicalDecisionCopy.flipTrigger,
+    flipConditions: canonicalDecisionCopy.flipConditions,
   });
   const callCitation = buildCallCitation(assessment, treasury, {
     interpretationLayer,
@@ -423,12 +424,9 @@ const HomePageReportContent = async ({
       structuredData={structuredData}
       commandBar={{
         regime: assessment.regime,
-        call: homeBriefModel.postureWithStageLabel,
-        doNow: [
-          homeBriefModel.actionNowShort ?? "Hold last week's bounded operating rules until thresholds move.",
-          homeBriefModel.guardrail,
-        ],
-        flipConditions: [postureState.whatFlipsNext.flipTrigger],
+        call: canonicalDecisionCopy.operatingCall,
+        doNow: canonicalDecisionCopy.doNowLines,
+        flipConditions: [canonicalDecisionCopy.flipTrigger, ...canonicalDecisionCopy.flipConditions].slice(0, 4),
         updatedAt: fetchedAtLabel,
       }}
       historicalBanner={
@@ -468,6 +466,7 @@ const HomePageReportContent = async ({
         flipThreshold={homeBriefModel.flipThreshold}
         compactFlipConditionLabels={homeBriefModel.compactFlipConditionLabels}
         canonicalFlipConditions={homeBriefModel.canonicalFlipConditions}
+        canonicalDecisionCopy={canonicalDecisionCopy}
         recordDateLabel={recordDateLabel}
         fetchedAtLabel={fetchedAtLabel}
         reportDynamics={reportDynamics}
