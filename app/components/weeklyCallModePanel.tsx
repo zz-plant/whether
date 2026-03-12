@@ -80,14 +80,6 @@ export function WeeklyCallModePanel({
             <li className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-sky-200">Watch:</span> {snapshotWatch}</li>
           </ul>
         </details>
-        <div className="mt-2 rounded-md border border-sky-500/25 bg-sky-500/5 px-2.5 py-2">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Flip conditions</p>
-          <ul className="mt-1 space-y-1 text-[11px] text-slate-100">
-            {(effectiveFlipLabels.length > 0 ? effectiveFlipLabels : [snapshotWatch]).map((condition) => (
-              <li key={`flip-condition-${condition}`}>• {condition}</li>
-            ))}
-          </ul>
-        </div>
         {actions ? (
           <div className="mt-2 rounded-xl border border-sky-400/45 bg-gradient-to-r from-sky-600/18 via-sky-500/12 to-slate-950/35 p-3" aria-label="Share this week's call">
             <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-sky-100">Share this week&apos;s call</p>
