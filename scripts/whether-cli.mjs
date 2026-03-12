@@ -240,14 +240,18 @@ const cmdDiagnostics = async (settings, subcommand, flags) => {
 
 const cmdHistory = async (settings, subcommand, flags) => {
   if (flags.help) return writeOutput(SUB_HELP.history, settings);
-  const body = await getJson(settings, "/api/cli/history");
+  const query = new URLSearchParams();
+  if (flags.weeks !== undefined) query.set("weeks", String(flags.weeks));
+  const endpoint = query.size > 0 ? `/api/cli/history?${query.toString()}` : "/api/cli/history";
+  const body = await getJson(settings, endpoint);
   if (subcommand === "compare") {
-    return writeOutput(`Compare mode (${flags.from ?? "start"} -> ${flags.to ?? "end"})\n${body.history[0]?.recordDate ?? "n/a"} latest snapshot`, settings);
+    return writeOutput(`Compare mode (${flags.from ?? "start"} -> ${flags.to ?? "end"})
+${body.history[0]?.recordDate ?? "n/a"} latest snapshot`, settings);
   }
-  const weeks = Number(flags.weeks ?? 12);
-  const items = body.history.slice(0, weeks);
-  const text = `Recent History\n\n${items.map((item) => `${item.recordDate}  ${item.regime}  ${item.confidenceLabel}  ${item.trend}`).join("\n")}`;
-  writeOutput(settings.output === "text" ? text : { ...body, history: items }, settings);
+  const text = `Recent History
+
+${body.history.map((item) => `${item.recordDate}  ${item.regime}  ${item.confidenceLabel}  ${item.trend}`).join("\n")}`;
+  writeOutput(settings.output === "text" ? text : body, settings);
 };
 
 const cmdBrief = async (settings, subcommand, flags) => {
