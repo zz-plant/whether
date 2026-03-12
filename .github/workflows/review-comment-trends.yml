@@ -45,7 +45,8 @@ jobs:
             HUMAN_FLAG="--humans-only"
           fi
 
-          node scripts/review-comment-trends.mjs \
+          # Migration note: switched from direct node script invocation to bun run package script entry.
+          bun run ci:review-comment-trends -- \
             --repo zz-plant/whether \
             --limit "$LIMIT" \
             $HUMAN_FLAG \

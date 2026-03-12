@@ -22,4 +22,6 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Run prod synthetic smoke
-        run: node scripts/prod-synthetic-smoke.mjs https://whether.work
+        run: |
+          # Migration note: switched from direct node script invocation to bun run package script entry.
+          bun run ci:prod-synthetic-smoke -- https://whether.work
