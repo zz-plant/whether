@@ -24,13 +24,48 @@ export type WeeklyMandateEnvelope = {
   nextFlip: PostureStateContract["whatFlipsNext"];
 };
 
+const buildFallbackPostureState = (
+  assessment: RegimeAssessment,
+  treasury: TreasuryData,
+): PostureStateContract => ({
+  currentState: {
+    regime: assessment.regime,
+    postureLabel: assessment.regime,
+    confidenceLabel: "MED",
+    confidencePercent: 55,
+    transitionWatch: "OFF",
+    recordDate: treasury.record_date,
+  },
+  lastCommittedChangeEvent: {
+    timestamp: null,
+    fromState: null,
+    toState: assessment.regime,
+    reason: "Posture event unavailable; using current regime snapshot.",
+    source: "state-machine",
+  },
+  whatFlipsNext: {
+    flipTrigger: "Recheck thresholds on next refresh.",
+    thresholds: ["Recheck thresholds on next refresh."],
+    reversalConditions: [],
+  },
+});
+
+const resolvePostureState = (
+  postureState: PostureStateContract | null | undefined,
+  assessment: RegimeAssessment,
+  treasury: TreasuryData,
+): PostureStateContract => postureState?.currentState
+  ? postureState
+  : buildFallbackPostureState(assessment, treasury);
+
 export const buildWeeklyMandateEnvelope = (
   assessment: RegimeAssessment,
   treasury: TreasuryData,
-  postureState: PostureStateContract,
+  postureState: PostureStateContract | null | undefined,
 ): WeeklyMandateEnvelope => {
+  const resolvedPostureState = resolvePostureState(postureState, assessment, treasury);
   const title = `Whether weekly mandate — ${treasury.record_date}`;
-  const summary = `${postureState.currentState.postureLabel}: Tightness ${assessment.scores.tightness}/100, Risk appetite ${assessment.scores.riskAppetite}/100.`;
+  const summary = `${resolvedPostureState.currentState.postureLabel}: Tightness ${assessment.scores.tightness}/100, Risk appetite ${assessment.scores.riskAppetite}/100.`;
   const constraints = assessment.constraints.slice(0, 3);
 
   return {
@@ -39,8 +74,8 @@ export const buildWeeklyMandateEnvelope = (
     recordDate: treasury.record_date,
     regime: assessment.regime,
     constraints,
-    lastChange: postureState.lastCommittedChangeEvent,
-    nextFlip: postureState.whatFlipsNext,
+    lastChange: resolvedPostureState.lastCommittedChangeEvent,
+    nextFlip: resolvedPostureState.whatFlipsNext,
     markdown: [
       `## ${title}`,
       summary,
@@ -48,9 +83,9 @@ export const buildWeeklyMandateEnvelope = (
       "### Constraints",
       ...constraints.map((item) => `- ${item}`),
       "",
-      `Last committed change: ${postureState.lastCommittedChangeEvent.timestamp ?? "Unavailable"} · ${postureState.lastCommittedChangeEvent.reason}`,
-      `Next flip trigger: ${postureState.whatFlipsNext.flipTrigger}`,
-      ...postureState.whatFlipsNext.reversalConditions.map((condition) => `- Reversal: ${condition}`),
+      `Last committed change: ${resolvedPostureState.lastCommittedChangeEvent.timestamp ?? "Unavailable"} · ${resolvedPostureState.lastCommittedChangeEvent.reason}`,
+      `Next flip trigger: ${resolvedPostureState.whatFlipsNext.flipTrigger}`,
+      ...resolvedPostureState.whatFlipsNext.reversalConditions.map((condition) => `- Reversal: ${condition}`),
       "",
       `Source: ${treasury.source}`,
     ].join("\n"),
@@ -61,7 +96,7 @@ export const buildWeeklyMandatePayload = (
   target: IntegrationTarget,
   assessment: RegimeAssessment,
   treasury: TreasuryData,
-  postureState: PostureStateContract,
+  postureState: PostureStateContract | null | undefined,
 ) => {
   const envelope = buildWeeklyMandateEnvelope(assessment, treasury, postureState);
 
