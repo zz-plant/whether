@@ -38,6 +38,7 @@ jobs:
           LIMIT: ${{ github.event.inputs.limit || '200' }}
           HUMANS_ONLY: ${{ github.event.inputs.humans_only || 'false' }}
         run: |
+          # Migration note: invoke package script via `bun run` instead of direct `node scripts/...`.
           mkdir -p artifacts
 
           HUMAN_FLAG=""
@@ -45,8 +46,7 @@ jobs:
             HUMAN_FLAG="--humans-only"
           fi
 
-          node scripts/review-comment-trends.mjs \
-            --repo zz-plant/whether \
+          bun run review:comment-trends -- \
             --limit "$LIMIT" \
             $HUMAN_FLAG \
             --out artifacts/review-comment-trends.json \

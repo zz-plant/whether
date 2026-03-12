@@ -40,7 +40,8 @@ jobs:
 
       - name: Audit Cloudflare warning budget
         run: |
-          node scripts/cloudflare-warning-audit.mjs \
+          # Migration note: invoke package script via `bun run` instead of direct `node scripts/...`.
+          bun run audit:cloudflare-warnings -- \
             --log artifacts/cloudflare-build.log \
             --expected .github/cloudflare/warning-baseline.txt \
             --critical .github/cloudflare/warning-critical.txt \
