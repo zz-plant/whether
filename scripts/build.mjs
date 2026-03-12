@@ -91,7 +91,7 @@ const shouldAutoSkipInCi =
 const skipBuildWasRequested =
   skipNextOnPagesBuild ||
   hasReusableBuildOutput ||
-  (reusePrebuiltOutput && hasVercelBuildOutput) ||
+  reusePrebuiltOutput ||
   shouldAutoSkipInCi;
 const canSkipNextOnPagesBuild = hasVercelBuildOutput;
 const shouldSkipNextOnPagesBuild =
