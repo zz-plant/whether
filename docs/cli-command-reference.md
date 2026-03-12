@@ -25,7 +25,7 @@ Whether CLI is an operator decision terminal: **environment → call → changes
 - `whether company [list|select|status|call|brief]`
 - `whether watch --interval 60 --changes-only`
 - `whether config [init|get|set <key> <value>]`
-- `whether auth [login|logout|status]`
+- `whether auth [login|logout|status] [--check] [--json]`
 - `whether raw <endpoint>`
 - `whether doctor`
 - `whether install [--yes|--ci] [--api-base-url <url>] [--token <token>]`
@@ -66,13 +66,13 @@ bun run cli:whether -- install --yes --api-base-url http://localhost:3000
 CI/non-interactive installer command:
 
 ```bash
-bun run cli:whether -- install --ci --api-base-url "$WHETHER_API_URL" --token "$WHETHER_TOKEN"
+bun run cli:whether -- install --ci --api-base-url "$WHETHER_API_URL" --token "$WHETHER_API_KEY"
 ```
 
 Behavior:
 - `install` writes `~/.config/whether/config.yaml` with baseline defaults and any provided flags.
 - In non-interactive shells, `install` requires `--yes` or `--ci`; otherwise it exits with an error explaining the required flag.
-- If config-file writes are blocked (restricted shell/home permissions), use `WHETHER_API_URL` and `WHETHER_TOKEN` environment variables instead of running `install` (see `docs/developer/cli-fallback.md`).
+- If config-file writes are blocked (restricted shell/home permissions), use `WHETHER_API_URL` and `WHETHER_API_KEY` (or `WHETHER_TOKEN`) environment variables instead of running `install`.
 
 Linux/macOS note:
 - Commands above are POSIX shell-safe and work in standard Linux and macOS terminals.
@@ -94,7 +94,8 @@ Order: **flags > env vars > config file**.
 
 - Config file: `~/.config/whether/config.yaml`
 - Env vars:
-  - `WHETHER_TOKEN`
+  - `WHETHER_API_KEY` (preferred)
+  - `WHETHER_TOKEN` (legacy alias)
   - `WHETHER_API_URL`
   - `WHETHER_PROFILE`
 
@@ -115,10 +116,9 @@ All are versioned `v1` payloads for automation-safe command output.
 
 The CLI maps common failures to these exact category-prefixed error strings:
 
-- `auth: Authentication failed. Set WHETHER_TOKEN or pass --token, then run whether auth login --token <token>.`
-  - Fallback path: `docs/developer/cli-fallback.md` for direct `curl` access to `/api/cli/status` when CLI auth/config flow is blocked.
+- `auth: Authentication failed (missing|expired|invalid key). Set/rotate WHETHER_API_KEY (or WHETHER_TOKEN) or pass --token, then run whether auth login --token <token>.`
 - `network: Unable to reach Whether API. Set WHETHER_API_URL or pass --api-base-url, then verify <apiBaseUrl>/api/health.`
-- `forbidden: Access denied by API. Use a token with required access via WHETHER_TOKEN or --token, then retry.`
+- `forbidden: Access denied by API (invalid scope). Use a token with required access via WHETHER_API_KEY (or WHETHER_TOKEN) or --token, then retry.`
 - `rate limit: Request quota exceeded. Retry with --watch --interval 120 or wait for quota reset at /api/cli/status.`
 - `server fault: API returned <status>. Run whether doctor and verify <apiBaseUrl>/api/health is healthy before retrying.`
 
@@ -151,3 +151,24 @@ When release changes touch installer behavior, keep these contract points stable
 - `whether install --yes` and `whether install --ci` both remain supported for non-interactive flows.
 - `whether --version` remains a zero-noise verification check (exit `0`, semantic version on stdout).
 - Restricted-shell fallback via `WHETHER_API_URL`/`WHETHER_TOKEN` remains documented and working.
+
+
+## Auth status (machine-readable)
+
+`whether auth status --json` returns a stable payload for agents/CI:
+
+```json
+{
+  "authenticated": true,
+  "source": "env",
+  "hasToken": true,
+  "apiBaseUrl": "http://localhost:3000"
+}
+```
+
+Exit-code contract:
+- `0` authenticated (token found from flag/env/config)
+- `2` not authenticated (missing key/token)
+
+Optional API validation:
+- `whether auth status --check` performs an authenticated `/api/auth/status` check and preserves existing auth/network/server exit codes.

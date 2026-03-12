@@ -125,7 +125,7 @@ bun run cli:whether -- install --yes --api-base-url http://localhost:3000
 Linux/macOS CI-safe variant:
 
 ```bash
-bun run cli:whether -- install --ci --api-base-url "$WHETHER_API_URL" --token "$WHETHER_TOKEN"
+bun run cli:whether -- install --ci --api-base-url "$WHETHER_API_URL" --token "$WHETHER_API_KEY"
 ```
 
 ### Fallback method (restricted shells)
@@ -133,10 +133,28 @@ If your shell blocks writing `~/.config/whether/config.yaml`, skip install and u
 
 ```bash
 export WHETHER_API_URL="http://localhost:3000"
-export WHETHER_TOKEN="<token-if-required>"
+export WHETHER_API_KEY="<token-if-required>"
+# Legacy alias still supported:
+# export WHETHER_TOKEN="<token-if-required>"
 ```
 
 Then run commands with `bun run cli:whether -- <command>` so config-file writes are not required.
+
+### Agent/CI auth bootstrap
+Use env-based auth (no config write required):
+
+```bash
+export WHETHER_API_URL="https://api.whether.app"
+export WHETHER_API_KEY="<your-api-key>"
+
+# Machine-readable preflight
+bun run cli:whether -- auth status --json
+
+# Optional: validate key against auth-protected API endpoint
+bun run cli:whether -- auth status --check --json
+```
+
+The CLI also accepts `WHETHER_TOKEN` as a legacy alias, but `WHETHER_API_KEY` is preferred for automation.
 
 ### Verification
 Run:
