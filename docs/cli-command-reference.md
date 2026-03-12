@@ -28,6 +28,7 @@ Whether CLI is an operator decision terminal: **environment → call → changes
 - `whether auth [login|logout|status]`
 - `whether raw <endpoint>`
 - `whether doctor`
+- `whether install [--yes|--ci] [--api-base-url <url>] [--token <token>]`
 - `whether completion`
 
 ## Common flags
@@ -40,6 +41,30 @@ Whether CLI is an operator decision terminal: **environment → call → changes
 - `--company <name>`
 - `--stage <name>`
 - `--as-of <YYYY-MM> (example: 2024-07)`
+- `--yes` (install: non-interactive acceptance of defaults)
+- `--ci` (install: alias of `--yes` for CI scripts)
+
+## Install contract (automation-safe)
+
+Canonical installer command:
+
+```bash
+bun run cli:whether -- install --yes --api-base-url http://localhost:3000
+```
+
+CI/non-interactive installer command:
+
+```bash
+bun run cli:whether -- install --ci --api-base-url "$WHETHER_API_URL" --token "$WHETHER_TOKEN"
+```
+
+Behavior:
+- `install` writes `~/.config/whether/config.yaml` with baseline defaults and any provided flags.
+- In non-interactive shells, `install` requires `--yes` or `--ci`; otherwise it exits with an error explaining the required flag.
+- If config-file writes are blocked (restricted shell/home permissions), use `WHETHER_API_URL` and `WHETHER_TOKEN` environment variables instead of running `install`.
+
+Linux/macOS note:
+- Commands above are POSIX shell-safe and work in standard Linux and macOS terminals.
 
 ## Exit codes
 
@@ -107,3 +132,10 @@ Use these three commands as the minimal smoke surface for operators and agents:
   - Stdout (json): object that includes `brief` text payload
 
 JSON mode is intentionally stdout-only machine output; it should not include ANSI color escapes or log prefixes unless an error occurs.
+
+## Docs change note (contract stability)
+
+When release changes touch installer behavior, keep these contract points stable or update this document in the same PR:
+- `whether install --yes` and `whether install --ci` both remain supported for non-interactive flows.
+- `whether --version` remains a zero-noise verification check (exit `0`, semantic version on stdout).
+- Restricted-shell fallback via `WHETHER_API_URL`/`WHETHER_TOKEN` remains documented and working.
