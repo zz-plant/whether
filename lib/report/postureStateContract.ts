@@ -77,7 +77,7 @@ export const buildPostureStateContract = ({
           source: "event-store",
         }
       : {
-          timestamp: committedTransition ? new Date().toISOString() : null,
+          timestamp: committedTransition ? `${recordDate}T00:00:00.000Z` : null,
           fromState: null,
           toState: committedTransition?.candidateState ?? assessment.regime,
           reason: committedTransition?.transitionReason ?? "No committed transition event in store.",

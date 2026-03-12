@@ -43,6 +43,7 @@ export function WeeklyCallModePanel({
 }: WeeklyCallModePanelProps) {
   const firstAvailableMode = startupVariantPolicy.options.find((option) => modeContentByMode[option.mode])?.mode;
   const [activeMode, setActiveMode] = useState<StartupVariantMode>(startupVariantPolicy.selectedMode);
+  const [showModeRefinement, setShowModeRefinement] = useState(false);
   const effectiveMode = modeContentByMode[activeMode]
     ? activeMode
     : (modeContentByMode[startupVariantPolicy.selectedMode] ? startupVariantPolicy.selectedMode : firstAvailableMode);
@@ -66,10 +67,9 @@ export function WeeklyCallModePanel({
           <li className={compactInsetClassName}><span className="font-semibold text-slate-200">Regime:</span> {postureLabel}</li>
           <li className={compactInsetClassName}><span className="font-semibold text-slate-200">Trend:</span> {trendLabel}</li>
           <li className={compactInsetClassName}><span className="font-semibold text-slate-200">Confidence:</span> {Math.round(confidencePercent)}% ({confidenceLabel})</li>
-          <li className={compactInsetClassName}><span className="font-semibold text-slate-200">Company mode:</span> {selectedModeLabel ?? "Default"}</li>
-          <li className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-emerald-200">DO NOW:</span> {modeAdjustedSnapshot.doNow}</li>
-          <li className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-rose-200">AVOID:</span> {modeAdjustedSnapshot.avoid}</li>
-          <li className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-sky-200">WATCH:</span> {modeAdjustedSnapshot.watch}</li>
+          <li className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-emerald-200">DO NOW:</span> {snapshotDoNow}</li>
+          <li className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-rose-200">AVOID:</span> {snapshotAvoid}</li>
+          <li className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-sky-200">WATCH:</span> {snapshotWatch}</li>
         </ul>
         <div className="mt-2 rounded-md border border-sky-500/25 bg-sky-500/5 px-2.5 py-2">
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Flip conditions</p>
@@ -90,12 +90,37 @@ export function WeeklyCallModePanel({
       <article id="weekly-call-core" className={`${tierOnePanelClassName} weather-motion-card ${sectionSpacingClassName} bg-gradient-to-br from-slate-950/95 via-slate-900/85 to-slate-950/95`}>
         <h2 className={tierOneHeadingClassName}>This week&apos;s call</h2>
         <p className="text-xs text-slate-300">Whether does not predict markets; it tells founders how to operate inside them this week.</p>
-        <StartupModeSelector
-          options={startupVariantPolicy.options}
-          selectedMode={effectiveMode ?? startupVariantPolicy.selectedMode}
-          onModeChange={setActiveMode}
-          contentByMode={modeContentByMode}
-        />
+        <div className="grid gap-2 text-xs text-slate-100">
+          <p className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-slate-200">What environment?</span> {postureLabel} with a {trendLabel.toLowerCase()} trend at {Math.round(confidencePercent)}% confidence.</p>
+          <p className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-emerald-200">What should leadership do?</span> {snapshotDoNow}</p>
+          <p className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-rose-200">Avoid this week:</span> {snapshotAvoid}</p>
+          <p className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-sky-200">Watch / flip cues:</span> {snapshotWatch}</p>
+        </div>
+
+        <div className="rounded-lg border border-slate-800/55 bg-slate-950/62 px-3 py-3 space-y-2">
+          <button
+            type="button"
+            onClick={() => setShowModeRefinement((current) => !current)}
+            className="flex min-h-[44px] w-full items-center justify-between gap-2 rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-left text-xs font-semibold tracking-[0.06em] text-slate-200 transition hover:border-slate-500/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+            aria-expanded={showModeRefinement}
+            aria-controls="company-stage-refinement-panel"
+          >
+            <span>Refine by company stage</span>
+            <span aria-hidden="true" className={`text-sm transition ${showModeRefinement ? "rotate-180" : ""}`}>▾</span>
+          </button>
+          {showModeRefinement ? (
+            <div id="company-stage-refinement-panel" className="space-y-2">
+              <p className="text-[10px] uppercase tracking-[0.1em] text-slate-400">Stage variant selected: {selectedModeLabel ?? "Default"}</p>
+              <StartupModeSelector
+                options={startupVariantPolicy.options}
+                selectedMode={effectiveMode ?? startupVariantPolicy.selectedMode}
+                onModeChange={setActiveMode}
+                contentByMode={modeContentByMode}
+              />
+              <p className="text-[11px] text-slate-300">Stage-specific snapshot — DO NOW: {modeAdjustedSnapshot.doNow} · AVOID: {modeAdjustedSnapshot.avoid} · WATCH: {modeAdjustedSnapshot.watch}</p>
+            </div>
+          ) : null}
+        </div>
       </article>
     </>
   );

@@ -618,70 +618,38 @@ export function DecisionCallHeader({
 
   return (
     <header className="space-y-4 border-b border-slate-700/80 pb-6" data-testid="weekly-top-fold">
-      <article className={`${tierOnePanel} weather-live-hero weather-live-hero--${heroUrgency} space-y-5 border-sky-400/50 bg-gradient-to-br from-slate-950 via-slate-900/95 to-slate-950`} data-testid="weekly-viral-hero" aria-label="Weekly posture strip">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-sky-200">This week&apos;s regime</p>
+      <article className={`${tierOnePanel} weather-live-hero weather-live-hero--${heroUrgency} space-y-4 border-sky-400/50 bg-gradient-to-br from-slate-950 via-slate-900/95 to-slate-950`} data-testid="weekly-viral-hero" aria-label="Canonical weekly decision card">
         <div id="weekly-posture-brief-title" className="space-y-1">
-          <p className="text-3xl font-semibold text-slate-50 sm:text-4xl">Regime: {resolvedPostureLabel}</p>
-          <p className="text-base font-semibold text-slate-200 sm:text-lg">Cycle phase: {resolvedStageLabel}</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-sky-200">Weekly operating call</p>
+          <p className="text-base text-slate-300">Scan this card to align this week&apos;s operating posture.</p>
         </div>
-        <div className="weather-live-band" data-live-urgency={heroUrgency} aria-label="Live decision telemetry">
-          {liveBandChips.map((chip) => (
-            <span key={chip.id} className={`weather-live-band-chip weather-live-band-chip--${chip.tone}`}>{chip.label}</span>
-          ))}
-        </div>
-        <p className="text-lg font-semibold text-sky-100">{operatingStanceLine}</p>
-        <p className="text-sm leading-6 text-slate-200">{immediateDecision}</p>
-        <p className="rounded-md border border-slate-700/75 bg-slate-950/68 px-3 py-2 text-xs text-slate-200"><span className="font-semibold text-slate-100">Decision delta:</span> {netConstraintSummary}</p>
 
-        <section className="rounded-md border border-slate-700/75 bg-slate-950/68 px-3 py-3">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">What changed this week</p>
-          <p className="mt-1 text-sm leading-6 text-slate-100">{weeklyMemoLines?.[0] ?? immediateDecision}</p>
-          {meetingShorthand ? <p className="mt-1 text-xs font-semibold text-sky-100">{meetingShorthand}</p> : null}
-        </section>
-
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4" aria-label="Quick weekly scan">
-          <div className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">
+        <ol className="grid gap-2" aria-label="Weekly decision card sequence">
+          <li className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">
             <SummaryLabel label="Regime" icon={<CircleTargetIcon className="h-3.5 w-3.5" aria-hidden="true" />} />
-            <p className="mt-1 text-sm font-semibold text-slate-100">{regimeHeader.regime}</p>
-          </div>
-          <div className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">
-            <p className="text-xs font-semibold text-slate-300">Confidence</p>
-            <p className="mt-1 text-sm font-semibold text-slate-100">{regimeHeader.confidence}</p>
-          </div>
-          <div className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">
-            <p className="text-xs font-semibold text-slate-300">Primary risk</p>
-            <p className="mt-1 text-sm leading-6 font-semibold text-slate-100">{regimeHeader.primaryRisk}</p>
-          </div>
-          <div className="rounded-md border border-violet-500/40 bg-violet-500/10 px-3 py-2 text-xs text-violet-100">
-            <SummaryLabel label="Leadership call" icon={<ShieldIcon className="h-3.5 w-3.5" aria-hidden="true" />} />
-            <p className="mt-1 text-sm font-semibold">{guardrail}</p>
-          </div>
+            <p className="mt-1 text-sm font-semibold text-slate-100">{resolvedPostureLabel} — {resolvedStageLabel}</p>
+          </li>
+          <li className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">
+            <SummaryLabel label="Call" icon={<ShieldIcon className="h-3.5 w-3.5" aria-hidden="true" />} />
+            <p className="mt-1 text-sm font-semibold text-slate-100">{operatingStanceLine}</p>
+          </li>
+          <li className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">
+            <p className="text-xs font-semibold text-slate-300">Do now</p>
+            <p className="mt-1 text-sm leading-6 font-semibold text-slate-100">{immediateDecision}</p>
+          </li>
+          <li className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">
+            <p className="text-xs font-semibold text-slate-300">Flip conditions</p>
+            <p className="mt-1 text-sm font-semibold text-slate-100">{regimeDistance.dimensionLabel} {regimeDistance.thresholdDirection === "riseAbove" ? "rises above" : "falls to or below"} {regimeDistance.thresholdValue.toFixed(1)} ({Math.max(0, Math.round(regimeDistance.pointsToFlip))} pts away).</p>
+          </li>
+        </ol>
+
+        <div className="flex flex-wrap gap-2" aria-label="Compact trust and fallback cues">
+          <p className="weather-live-chip rounded-full border border-emerald-400/45 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-emerald-100">Confidence {confidenceLabel} ({Math.round(confidencePercent)}%)</p>
+          <p className="weather-live-chip rounded-full border border-slate-600/70 bg-slate-900/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-200">Trend {trendLabel} · Watch {transitionWatch}</p>
+          <p className="weather-live-chip rounded-full border border-slate-600/70 bg-slate-900/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-200">Freshness {freshnessLabel}</p>
+          <p className="weather-live-chip rounded-full border border-slate-600/70 bg-slate-900/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-200">Trust {trustCueLine}</p>
         </div>
 
-        <SignalStrip indicators={regimeSignalIndicators} />
-
-        <section className="space-y-1" aria-label="Signal micro read">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Signal micro-read (context only)</p>
-          <MicroSignalIndicators indicators={regimeSignalIndicators} />
-        </section>
-
-        <div className="flex flex-wrap gap-2" aria-label="Trust and momentum">
-          <p className="weather-live-chip rounded-full border border-emerald-400/45 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-emerald-100">
-            <span className="mr-2 inline-flex items-center" aria-hidden="true"><span className="weather-live-dot" /></span>
-            Confidence: {confidenceLabel} ({Math.round(confidencePercent)}%)
-          </p>
-          <p className="weather-live-chip rounded-full border border-slate-600/70 bg-slate-900/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-200">
-            Trend: {trendLabel} · Watch {transitionWatch}
-          </p>
-          <p className="weather-live-chip rounded-full border border-slate-600/70 bg-slate-900/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-200">
-            Freshness: {freshnessLabel}
-          </p>
-          <p className="weather-live-chip rounded-full border border-slate-600/70 bg-slate-900/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-200">
-            Trust cue: {trustCueLine}
-          </p>
-        </div>
-
-        <p className="text-xs text-slate-300">Next flip: {regimeDistance.dimensionLabel} {regimeDistance.thresholdDirection === "riseAbove" ? "rises above" : "falls to or below"} {regimeDistance.thresholdValue.toFixed(1)}.</p>
         {needsTrustWarning ? (
           <p className="rounded-md border border-amber-500/50 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">{trustWarningCopy}</p>
         ) : null}
@@ -1339,36 +1307,8 @@ export function WeeklyDecisionCard({
         regimeDistance={regimeDistance}
       />
 
-      <article className={`${tierOnePanel} ${sectionSpacing} rounded-2xl border border-slate-700/75 bg-gradient-to-br from-slate-950/95 via-slate-950/88 to-slate-900/92`} aria-label="Since last review">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className={tierOneHeading}>Since last review</h2>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-300">Decision delta</p>
-        </div>
-        <ul className="grid gap-2 sm:grid-cols-3">
-          {decisionDeltaStripItems.map((item) => (
-            <li key={item.id}>
-              <Link href={item.href} className={`block min-h-[44px] rounded-lg border px-3 py-2 text-xs transition hover:border-slate-300/45 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${impactToneClass[item.impact]}`}>
-                <p className="font-semibold uppercase tracking-[0.1em]">{item.label}</p>
-                <p className="mt-1 leading-5 text-slate-100">{item.detail}</p>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </article>
-
       <div className="grid gap-3 xl:grid-cols-12">
         <main className="space-y-3 xl:col-span-8">
-          <article className={`${tierOnePanel} ${sectionSpacing}`}>
-            <h2 className={tierOneHeading}>Weekly decision brief</h2>
-            <p className="text-xs text-slate-300">Use this single brief to align the team on this week&apos;s call and flip trigger.</p>
-            <ul className="grid gap-2 text-xs text-slate-200 sm:grid-cols-2">
-              <li className={tierOneInset}><span className="font-semibold text-slate-100">Regime:</span> {postureWithStageLabel ?? statusLabel}</li>
-              <li className={tierOneInset}><span className="font-semibold text-slate-100">Trend:</span> {trendLabel}</li>
-              <li className={tierOneInset}><span className="font-semibold text-slate-100">Confidence:</span> {Math.round(confidencePercent)}%</li>
-              <li className={tierOneInset}><span className="font-semibold text-slate-100">Next flip:</span> {regimeDistance.dimensionLabel} {regimeDistance.thresholdDirection === "riseAbove" ? "rises above" : "falls to or below"} {regimeDistance.thresholdValue.toFixed(1)}</li>
-            </ul>
-          </article>
-
           <WeeklyCallModePanel
             startupVariantPolicy={resolvedStartupVariantPolicy}
             modeContentByMode={modeContentByMode}
@@ -1393,6 +1333,36 @@ export function WeeklyDecisionCard({
               <p className="text-[11px] uppercase tracking-[0.1em] text-slate-400">Optional depth</p>
             </div>
             <p className="text-xs text-slate-300">Open diagnostics only when you need proof detail, role-level execution plans, or model input context.</p>
+
+            <details className="group">
+              <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
+                <span>Since last review</span>
+                <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
+              </summary>
+              <ul className="mt-3 grid gap-2 sm:grid-cols-3">
+                {decisionDeltaStripItems.map((item) => (
+                  <li key={item.id}>
+                    <Link href={item.href} className={`block min-h-[44px] rounded-lg border px-3 py-2 text-xs transition hover:border-slate-300/45 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${impactToneClass[item.impact]}`}>
+                      <p className="font-semibold uppercase tracking-[0.1em]">{item.label}</p>
+                      <p className="mt-1 leading-5 text-slate-100">{item.detail}</p>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </details>
+
+            <details className="group">
+              <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
+                <span>Weekly decision brief</span>
+                <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
+              </summary>
+              <ul className="mt-3 grid gap-2 text-xs text-slate-200 sm:grid-cols-2">
+                <li className={tierOneInset}><span className="font-semibold text-slate-100">Regime:</span> {postureWithStageLabel ?? statusLabel}</li>
+                <li className={tierOneInset}><span className="font-semibold text-slate-100">Trend:</span> {trendLabel}</li>
+                <li className={tierOneInset}><span className="font-semibold text-slate-100">Confidence:</span> {Math.round(confidencePercent)}%</li>
+                <li className={tierOneInset}><span className="font-semibold text-slate-100">Next flip:</span> {regimeDistance.dimensionLabel} {regimeDistance.thresholdDirection === "riseAbove" ? "rises above" : "falls to or below"} {regimeDistance.thresholdValue.toFixed(1)}</li>
+              </ul>
+            </details>
 
             <details id="decision-snapshot-for-leadership-this-week" className="group">
               <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>

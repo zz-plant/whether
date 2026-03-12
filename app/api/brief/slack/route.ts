@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { buildSlackBrief } from "../../../../lib/export/briefBuilders";
 import { loadReportDataSafe } from "../../../../lib/report/reportData";
-import { recordCommittedPostureDecisionEvent } from "../../../../lib/report/postureStateSource";
+import { buildPostureState } from "../../../../lib/report/postureStateSource";
 
 export const runtime = "edge";
 export const revalidate = 0;
@@ -11,11 +11,10 @@ export async function GET() {
   const reportResult = await loadReportDataSafe(undefined, { route: "/api/brief/slack" });
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
   const { assessment, treasury, sensors, macroSeries } = reportData;
-  const postureState = recordCommittedPostureDecisionEvent({
+  const postureState = buildPostureState({
     recordDate: treasury.record_date,
     assessment,
     reportDynamics: reportData.reportDynamics,
-    previousRegime: reportData.regimeAlert?.previousRegime ?? null,
   });
   const brief = buildSlackBrief(assessment, treasury, sensors, macroSeries, { postureState });
 
