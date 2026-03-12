@@ -50,6 +50,9 @@ const run = (command, args, env = process.env) => {
   }
 };
 
+const childBuildEnv = { ...process.env };
+delete childBuildEnv.__WHETHER_NODE_RUNTIME_ACTIVE;
+
 const readBuildMeta = () => {
   if (!existsSync(BUILD_META_PATH)) {
     return null;
@@ -81,9 +84,9 @@ const hasReusableOutput =
   hasMatchingCommit;
 
 if (hasReusableOutput) {
-  run('bun', ['run', 'build:pages:skip-next-build']);
+  run('bun', ['run', 'build:pages:skip-next-build'], childBuildEnv);
 } else {
-  run('bun', ['run', 'build:pages']);
+  run('bun', ['run', 'build:pages'], childBuildEnv);
 }
 
 run('bun', ['run', 'wrangler:upload']);
