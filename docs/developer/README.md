@@ -34,3 +34,7 @@ A robust integration should preserve:
 - **Decision transmission:** capture posture + what changed, not just raw macro data.
 - **Traceability:** keep `generatedAt`, `recordDateLabel`, `version`, and provenance fields.
 - **Operational safety:** block sends when `/api/health` is degraded/down or cadence is misaligned.
+
+## Endpoint discovery location
+
+Canonical in-product endpoint discovery lives at `/operations/data` (Weekly data access). Keep new machine-route links and curl-first discovery copy there to avoid split guidance across operations surfaces.

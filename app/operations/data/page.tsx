@@ -14,7 +14,9 @@ export const metadata: Metadata = buildPageMetadata({
 });
 
 const endpointUrl = `${siteUrl}/api/weekly`;
+const agentEndpointUrl = `${siteUrl}/api/agent?cadence=weekly`;
 const curlExample = `curl -s ${endpointUrl}`;
+const machineCurlExample = `curl -s ${agentEndpointUrl}`;
 const responseExample = `{
   "updatedAt": "2026-02-01T12:00:00.000Z",
   "summary": {
@@ -70,6 +72,46 @@ export default async function OperationsDataPage() {
           <pre className="overflow-x-auto rounded-2xl border border-slate-800/80 bg-slate-950/80 p-4 text-xs text-slate-100">
             {curlExample}
           </pre>
+        </section>
+
+        <section className="weather-panel-static space-y-4 px-6 py-6">
+          <h2 className="text-xl font-semibold text-slate-50">Machine endpoints</h2>
+          <p className="text-sm text-slate-300">
+            Start with curl, then wire the same routes into your agent loop.
+          </p>
+          <pre className="overflow-x-auto rounded-2xl border border-slate-800/80 bg-slate-950/80 p-4 text-xs text-slate-100">
+            {machineCurlExample}
+          </pre>
+          <ul className="space-y-2 text-sm text-slate-300">
+            <li>
+              <Link href="/docs/developer/api-reference" className="text-sky-200 underline-offset-2 hover:underline">
+                /docs/developer/api-reference
+              </Link>{" "}
+              — full endpoint contracts.
+            </li>
+            <li>
+              <Link href="/llms.txt" className="text-sky-200 underline-offset-2 hover:underline">
+                /llms.txt
+              </Link>{" "}
+              — plain-text machine onboarding.
+            </li>
+            <li>
+              <Link href="/.well-known/whether-agent.json" className="text-sky-200 underline-offset-2 hover:underline">
+                /.well-known/whether-agent.json
+              </Link>{" "}
+              — JSON manifest for tools and agents.
+            </li>
+            <li>
+              <code>/api/agent</code> + <code>/api/weekly</code> — core weekly machine routes.
+            </li>
+          </ul>
+          <p className="text-sm text-slate-300">
+            Keep machine pulls anchored to the weekly brief: review the latest call on{" "}
+            <Link href="/" className="text-sky-200 underline-offset-2 hover:underline">
+              the homepage brief
+            </Link>{" "}
+            before sharing automations in meetings or Slack.
+          </p>
         </section>
 
         <section className="weather-panel-static space-y-4 px-6 py-6">
