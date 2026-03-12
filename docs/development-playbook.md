@@ -10,6 +10,8 @@ For baseline project orientation, start with `CONTRIBUTING.md`.
 
 ## 1) Preferred day-to-day workflow
 
+**Runtime policy (Option A — transition):** Bun is the primary runtime/package manager. Node.js remains a supported fallback for selected build/test scripts (`scripts/build.mjs`, `scripts/run-tests.mjs`).
+
 1. **Sync and install**
    - `git pull --rebase`
    - `bun install`
@@ -18,7 +20,7 @@ For baseline project orientation, start with `CONTRIBUTING.md`.
 3. **Ship in vertical slices**
    - Land thin increments that include implementation + tests + docs when behavior changes.
 4. **Validate before push**
-   - Typical: `bun run lint && bun test`
+   - Typical: `bun run lint && bun run test`
    - Broad/high-risk: `bun run check`
 
 ## 2) Scope management and PR sizing
@@ -35,7 +37,7 @@ For baseline project orientation, start with `CONTRIBUTING.md`.
 | Risk profile | Examples | Expected validation |
 | --- | --- | --- |
 | Low | Docs/copy/metadata-only updates | Verify links, references, and command correctness |
-| Medium | UI behavior, orchestration/glue logic | `bun run lint` + `bun test` |
+| Medium | UI behavior, orchestration/glue logic | `bun run lint` + `bun run test` |
 | High | Regime/scoring/decision logic, data plumbing | `bun run check` + targeted regression tests |
 
 ### Regression priorities for high-risk changes
@@ -81,7 +83,7 @@ Suggested PR body scaffold:
 ## Why this matters
 ## Validation
 - `bun run lint`
-- `bun test`
+- `bun run test`
 ## Risks / follow-ups
 ```
 
