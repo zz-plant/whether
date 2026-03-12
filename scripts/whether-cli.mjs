@@ -2,12 +2,14 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const EXIT = { OK: 0, ERROR: 1, AUTH_CONFIG: 2, NO_DATA: 3, WATCH_TRIGGER: 4, INVALID_SCENARIO: 5 };
 EXIT.NETWORK = 6;
 EXIT.SERVER = 7;
 const CONFIG_PATH = path.join(os.homedir(), ".config", "whether", "config.yaml");
-const PACKAGE_JSON_PATH = path.join(process.cwd(), "package.json");
+const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
+const PACKAGE_JSON_PATH = path.join(SCRIPT_DIR, "..", "package.json");
 const ERROR_CATEGORY = {
   AUTH: "auth",
   NETWORK: "network",
