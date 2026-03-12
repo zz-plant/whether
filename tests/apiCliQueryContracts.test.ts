@@ -7,9 +7,11 @@ describe("api cli query contracts", () => {
     assert.deepEqual(parseAsOfSearchParam("2024-07"), { month: "7", year: "2024" });
   });
 
-  it("rejects malformed asOf values", () => {
+  it("rejects full-date, malformed, and out-of-range asOf values", () => {
+    assert.equal(parseAsOfSearchParam("2024-07-15"), null);
     assert.equal(parseAsOfSearchParam("2024/07"), null);
     assert.equal(parseAsOfSearchParam("2024-13"), null);
+    assert.equal(parseAsOfSearchParam("1999-12"), null);
   });
 
   it("rejects unsupported query parameters explicitly", async () => {
