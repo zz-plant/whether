@@ -73,8 +73,18 @@ const rawForKey = (reportData: ReportData, key: "tightness" | "riskAppetite" | "
     : key === "riskAppetite"
       ? reportData.assessment.scores.riskAppetite
       : key === "baseRate"
-        ? reportData.treasury.fed_funds
-        : reportData.treasury.yield_curve_spread;
+        ? reportData.assessment.scores.baseRate
+        : reportData.assessment.scores.curveSlope;
+
+const deriveCyclePhaseLabel = (reportData: ReportData) => {
+  const stage = deriveRegimeStage({
+    regime: reportData.assessment.regime,
+    momentum: reportData.reportDynamics.directionLabel,
+    confidence: reportData.assessment.diagnostics.confidence === "MEDIUM" ? "MED" : reportData.assessment.diagnostics.confidence,
+    distanceToFlip: reportData.assessment.diagnostics.nearestThresholdDelta,
+  });
+  return stage.displayLabel;
+};
 
 const impactFromSignal = (key: "tightness" | "riskAppetite" | "baseRate" | "curveSlope", delta: number) => {
   if (key === "tightness" || key === "baseRate") {
@@ -109,7 +119,7 @@ export const buildCliStatusContract = ({ reportData, postureState, degraded }: {
   generatedAt: new Date().toISOString(),
   updatedAt: reportData.treasury.fetched_at,
   regime: postureState.currentState.postureLabel,
-  cyclePhase: titleCase(deriveRegimeStage(reportData.assessment.regime)),
+  cyclePhase: deriveCyclePhaseLabel(reportData),
   confidence: {
     label: postureState.currentState.confidenceLabel,
     score: postureState.currentState.confidencePercent,
@@ -138,7 +148,8 @@ export const buildCliChangesContract = ({ reportData, postureState, degraded }: 
   version: "v1",
   generatedAt: new Date().toISOString(),
   changed: reportData.reportDynamics.changedSignals.map((signal) => {
-    const to = Number(rawForKey(reportData, signal.key).toFixed(2));
+    const raw = rawForKey(reportData, signal.key);
+    const to = Number((typeof raw === "number" ? raw : signal.delta).toFixed(2));
     const from = Number((to - signal.delta).toFixed(2));
     return {
       metric: metricLabel[signal.key],
@@ -160,10 +171,10 @@ export const buildCliRegimeContract = ({ reportData, postureState, degraded }: {
   version: "v1",
   generatedAt: new Date().toISOString(),
   regime: postureState.currentState.postureLabel,
-  phase: titleCase(deriveRegimeStage(reportData.assessment.regime)),
+  phase: deriveCyclePhaseLabel(reportData),
   confidence: postureState.currentState.confidenceLabel,
   trend: titleCase(reportData.reportDynamics.directionLabel),
-  interpretation: reportData.playbook.why,
+  interpretation: reportData.playbook?.insight ?? reportData.assessment.description,
   degraded,
 });
 
