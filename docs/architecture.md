@@ -84,7 +84,7 @@ Use `bun run summary-archive:migrate-structured` to materialize `structured` blo
    - Implemented in `lib/summary/summaryCopyRenderer.ts` with shared contracts in `lib/summary/summaryTypes.ts`.
    - Goal: remove formatting drift risk between builders and UI/export surfaces.
 2. **P1 — Formalize archive migration step** ✅ Implemented
-   - Added `scripts/migrateSummaryArchiveStructured.ts` and npm scripts to materialize `structured` into historical weekly/monthly archive records.
+   - Added `scripts/migrateSummaryArchiveStructured.ts` and Bun scripts to materialize `structured` into historical weekly/monthly archive records.
    - Added `tests/summaryArchiveMigration.test.ts` to prevent regressions where archive entries lose `summary.structured`.
    - Goal: keep runtime hydration fallback-only and simplify validation paths.
 3. **P1 — Strengthen contract tests at API boundary**

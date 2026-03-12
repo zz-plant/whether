@@ -1,14 +1,20 @@
 # Stack modernization inventory & constraints
 
+## Runtime policy
+- **Policy choice:** Option A (transition).
+- **Primary runtime:** Bun is the default runtime/package manager for local and CI command orchestration (`bun install`, `bun run <script>`).
+- **Supported fallback:** Node.js 20.16.x is intentionally retained for selected scripts that directly execute `.mjs` entrypoints (`scripts/build.mjs`, `scripts/run-tests.mjs`).
+
 ## Runtime & tooling versions
-- **Package manager:** Bun 1.3.9 (`packageManager`).
-- **Node engine:** 20.16.x (`engines.node`).
+- **Package manager / primary runtime:** Bun 1.3.9 (`packageManager`, `engines.bun`).
+- **Node engine (fallback for selected scripts):** 20.16.x (`engines.node`).
 - **Next.js:** 16.1.6.
 - **React / React DOM:** 19.2.4.
 - **TypeScript:** 5.9.3.
 - **Tailwind CSS:** 3.4.17.
 - **Cloudflare adapter:** @cloudflare/next-on-pages 1.13.16.
-- **Testing:** Node test runner via `bun run test` (`scripts/run-tests.mjs`).
+- **Testing:** Bun test runner via `bun run test` (`bun test ./tests`, recursive `.test.ts`/`.test.tsx` discovery).
+- **Test compatibility contract:** Existing tests continue using `node:test` / `node:assert/strict` imports under Bun's Node-compat layer.
 - **Linting:** `eslint` CLI via `bun run lint`.
 
 ## Newer capabilities snapshot (research baseline)
@@ -26,7 +32,7 @@ This section maps the currently pinned stack to newer stable versions and highli
 | ESLint | 9.38.0 | 9.39.2 | Flat config-first ecosystem direction and updated rule/tooling compatibility expectations. |
 
 ### Research sources used for this snapshot
-- `npm view <package> version` for version baselining.
+- `bun outdated` plus registry/version release notes for version baselining.
 - Next.js 16 release post: <https://nextjs.org/blog/next-16>
 - React 19 release post: <https://react.dev/blog/2024/12/05/react-19>
 - Tailwind CSS v4 release post: <https://tailwindcss.com/blog/tailwindcss-v4>

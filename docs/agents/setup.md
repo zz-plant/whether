@@ -1,8 +1,9 @@
 # Setup commands
 
 ## Toolchain
-- Node.js 20+ (`.nvmrc`)
-- Bun 1.3.x (`packageManager` in `package.json`)
+- **Runtime policy (Option A — transition):** Bun is the primary runtime/package manager, and Node.js is a supported fallback for selected build/test scripts.
+- Bun 1.3.x (`packageManager` + `engines.bun` in `package.json`)
+- Node.js 20.16.x (`engines.node` in `package.json`; fallback runtime for `scripts/build.mjs` and `scripts/run-tests.mjs`)
 
 ## Core repo commands
 - Install dependencies: `bun install`
@@ -14,6 +15,7 @@
 - Run type checks: `bun run typecheck`
 - Run tests: `bun run test`
 - Run tests in watch mode: `bun run test:watch`
+- Test runtime contract: `bun run test` delegates to Bun's native test runner over `./tests` with recursive `.test.ts`/`.test.tsx` discovery; `node:test` and `node:assert/strict` imports are supported via Bun Node compatibility.
 - Run Whether MCP server (stdio): `bun run mcp:whether`
 
 ## Default execution profile for agents
