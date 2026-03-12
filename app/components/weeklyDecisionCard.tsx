@@ -1354,12 +1354,6 @@ export function WeeklyDecisionCard({
             </li>
           ))}
         </ul>
-        {actions ? (
-          <div className="rounded-xl border border-sky-400/45 bg-gradient-to-r from-sky-600/18 via-sky-500/12 to-slate-950/35 p-3" aria-label="Share this week's call">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-sky-100">Share this week&apos;s call</p>
-            <div className="mt-2">{actions}</div>
-          </div>
-        ) : null}
       </article>
 
       <div className="grid gap-3 xl:grid-cols-12">
@@ -1390,15 +1384,8 @@ export function WeeklyDecisionCard({
             tierOnePanelClassName={tierOnePanel}
             sectionSpacingClassName={sectionSpacing}
             tierOneHeadingClassName={tierOneHeading}
+            actions={actions}
           />
-
-          <article className={`${tierOnePanel} ${sectionSpacing}`}>
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 className={tierOneHeading}>Regime history (recent)</h2>
-              <p className="text-[11px] uppercase tracking-[0.1em] text-slate-400">Last 2 checkpoints</p>
-            </div>
-            <PostureHistoryTimeline historicalTimeline={recentTimeline} />
-          </article>
 
           <article className={`${tierTwoPanel} ${sectionSpacing}`} aria-label="Need deeper analysis">
             <div className="flex flex-wrap items-center justify-between gap-2">
@@ -1469,6 +1456,14 @@ export function WeeklyDecisionCard({
                 </article>
               ) : null}
             </CompactDisclosure>
+          </article>
+
+          <article className={`${tierOnePanel} ${sectionSpacing}`}>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 className={tierOneHeading}>Regime history (recent)</h2>
+              <p className="text-[11px] uppercase tracking-[0.1em] text-slate-400">Last 2 checkpoints</p>
+            </div>
+            <PostureHistoryTimeline historicalTimeline={recentTimeline} />
           </article>
 
         </main>

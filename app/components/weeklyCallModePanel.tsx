@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 import type { StartupVariantMode } from "../../lib/report/boundedDecisionRules";
 import type { StartupVariantPolicy } from "../../lib/report/homeBriefModel";
@@ -20,6 +21,7 @@ type WeeklyCallModePanelProps = {
   tierOnePanelClassName: string;
   sectionSpacingClassName: string;
   tierOneHeadingClassName: string;
+  actions?: ReactNode;
 };
 
 export function WeeklyCallModePanel({
@@ -37,6 +39,7 @@ export function WeeklyCallModePanel({
   tierOnePanelClassName,
   sectionSpacingClassName,
   tierOneHeadingClassName,
+  actions,
 }: WeeklyCallModePanelProps) {
   const firstAvailableMode = startupVariantPolicy.options.find((option) => modeContentByMode[option.mode])?.mode;
   const [activeMode, setActiveMode] = useState<StartupVariantMode>(startupVariantPolicy.selectedMode);
@@ -76,6 +79,12 @@ export function WeeklyCallModePanel({
             ))}
           </ul>
         </div>
+        {actions ? (
+          <div className="mt-2 rounded-xl border border-sky-400/45 bg-gradient-to-r from-sky-600/18 via-sky-500/12 to-slate-950/35 p-3" aria-label="Share this week's call">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-sky-100">Share this week&apos;s call</p>
+            <div className="mt-2">{actions}</div>
+          </div>
+        ) : null}
       </article>
 
       <article id="weekly-call-core" className={`${tierOnePanelClassName} weather-motion-card ${sectionSpacingClassName} bg-gradient-to-br from-slate-950/95 via-slate-900/85 to-slate-950/95`}>
