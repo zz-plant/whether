@@ -269,6 +269,18 @@ const WeeklyDecisionDiagnosticsLaneDeferred = async ({
 };
 
 type ArtifactActionsProps = {
+  artifactPayloadPromise: Promise<ArtifactPayload | null>;
+  fallbackActive: boolean;
+};
+
+type ArtifactPayload = {
+  boardSummary: string;
+  weeklyOperatorBriefText: string;
+  weeklyCallSnapshotText: string;
+  callCitation: string;
+};
+
+type BuildArtifactPayloadArgs = {
   assessment: ReportData["assessment"];
   treasury: ReportData["treasury"];
   sensors: ReportData["sensors"];
@@ -278,10 +290,9 @@ type ArtifactActionsProps = {
   interpretationView: InterpretationView;
   forecast: ReportData["forecast"];
   freshnessLabel: string;
-  historicalSelectionActive: boolean;
 };
 
-const LeadershipArtifactActions = async ({
+const buildLeadershipArtifactPayload = async ({
   assessment,
   treasury,
   sensors,
@@ -291,16 +302,8 @@ const LeadershipArtifactActions = async ({
   interpretationView,
   forecast,
   freshnessLabel,
-  historicalSelectionActive,
-}: ArtifactActionsProps) => {
+}: BuildArtifactPayloadArgs): Promise<ArtifactPayload | null> => {
   await Promise.resolve();
-
-  type ArtifactPayload = {
-    boardSummary: string;
-    weeklyOperatorBriefText: string;
-    weeklyCallSnapshotText: string;
-    callCitation: string;
-  };
 
   let artifactPayload: ArtifactPayload | null = null;
 
@@ -367,6 +370,15 @@ const LeadershipArtifactActions = async ({
     console.error("[home] leadership artifact export unavailable", error);
   }
 
+  return artifactPayload;
+};
+
+const LeadershipArtifactActions = async ({
+  artifactPayloadPromise,
+  fallbackActive,
+}: ArtifactActionsProps) => {
+  const artifactPayload = await artifactPayloadPromise;
+
   if (!artifactPayload) {
     return (
       <p className="rounded-lg border border-amber-300/30 bg-amber-300/10 px-3 py-2 text-xs text-amber-100">
@@ -381,7 +393,7 @@ const LeadershipArtifactActions = async ({
       weeklyOperatorBrief={artifactPayload.weeklyOperatorBriefText}
       boardSummary={artifactPayload.boardSummary}
       citation={artifactPayload.callCitation}
-      fallbackActive={!historicalSelectionActive && Boolean(treasury.fallback_at || treasury.fallback_reason)}
+      fallbackActive={fallbackActive}
     />
   );
 };
@@ -567,6 +579,18 @@ export const HomePageReportContent = async ({
       ? "Revise hiring and roadmap calls now."
       : "Hold last week's operating rules.");
 
+  const leadershipArtifactPayloadPromise = buildLeadershipArtifactPayload({
+    assessment,
+    treasury,
+    sensors,
+    macroSeries,
+    homeBriefModel,
+    postureState,
+    interpretationView,
+    forecast,
+    freshnessLabel: freshnessMeta.updatedAtLabel,
+  });
+
   return (
     <ReportShell
       regime={assessment.regime}
@@ -687,16 +711,8 @@ export const HomePageReportContent = async ({
         actions={(
           <Suspense fallback={<ArtifactActionsFallback />}>
             <LeadershipArtifactActions
-              assessment={assessment}
-              treasury={treasury}
-              sensors={sensors}
-              macroSeries={macroSeries}
-              homeBriefModel={homeBriefModel}
-              postureState={postureState}
-              interpretationView={interpretationView}
-              forecast={forecast}
-              freshnessLabel={freshnessMeta.updatedAtLabel}
-              historicalSelectionActive={Boolean(historicalSelection)}
+              artifactPayloadPromise={leadershipArtifactPayloadPromise}
+              fallbackActive={!historicalSelection && Boolean(treasury.fallback_at || treasury.fallback_reason)}
             />
           </Suspense>
         )}
