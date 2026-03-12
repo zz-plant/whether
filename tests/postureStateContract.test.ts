@@ -79,6 +79,7 @@ describe("posture state contract consumers", () => {
           id: "evt_1",
           recordedAt: "2026-03-01T10:00:00Z",
           effectiveRecordDate: treasury.record_date,
+          idempotencyKey: `${treasury.record_date}:DEFENSIVE`,
           fromState: "VOLATILE",
           toState: "DEFENSIVE",
           reason: "Tightness crossed above 70.",

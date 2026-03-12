@@ -40,7 +40,7 @@ import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
 import { resolveSectorKey } from "../lib/report/sectorSensitivity";
 import { LiveDataFallbackAlert } from "./components/liveDataFallbackAlert";
 import { getRegimeDisplayLabel } from "../lib/regimePresentation";
-import { recordCommittedPostureDecisionEvent } from "../lib/report/postureStateSource";
+import { buildPostureState } from "../lib/report/postureStateSource";
 
 export const revalidate = 900;
 export const runtime = "edge";
@@ -302,11 +302,10 @@ const HomePageReportContent = async ({
     stableAction:
       "Safe to use for near-term planning; proceed with normal approval flow.",
   });
-  const postureState = recordCommittedPostureDecisionEvent({
+  const postureState = buildPostureState({
     recordDate: treasury.record_date,
     assessment,
     reportDynamics,
-    previousRegime: regimeAlert?.previousRegime ?? null,
   });
   const homeBriefModel = buildHomeBriefModel({
     assessment,
