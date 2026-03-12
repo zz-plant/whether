@@ -23,16 +23,16 @@
     "test": "bun test ./tests",
     "test:watch": "bun test --watch ./tests",
     "time-machine:update-summaries": "bun scripts/updateTimeMachineSummariesSince.mjs",
-    "mcp:whether": "tsx scripts/mcp/whether-mcp-server.ts",
+    "mcp:whether": "bun scripts/mcp/whether-mcp-server.ts",
     "audit:cloudflare-warnings": "bun scripts/cloudflare-warning-audit.mjs",
     "deploy:cloudflare": "bun scripts/cloudflare-build-and-upload.mjs",
     "smoke:prod": "bun scripts/prod-synthetic-smoke.mjs https://whether.work",
     "review:comment-trends": "bun scripts/review-comment-trends.mjs --repo zz-plant/whether --limit 200",
     "review:comment-trends:update": "bun scripts/review-comment-trends.mjs --repo zz-plant/whether --limit 200 --out docs/research/review-comment-trends.latest.json --summary-out docs/research/review-comment-trends.latest.md",
     "review:hotspot-preflight": "bun scripts/review-hotspot-preflight.mjs",
-    "summary-archive:migrate-structured": "bunx tsx scripts/migrateSummaryArchiveStructured.ts --write",
-    "summary-archive:check-structured": "bunx tsx scripts/migrateSummaryArchiveStructured.ts",
-    "brief:weekly:artifact": "bunx tsx scripts/generateWeeklySlackBrief.ts --out artifacts/weekly-slack-brief.txt",
+    "summary-archive:migrate-structured": "bun scripts/migrateSummaryArchiveStructured.ts --write",
+    "summary-archive:check-structured": "bun scripts/migrateSummaryArchiveStructured.ts",
+    "brief:weekly:artifact": "bun scripts/generateWeeklySlackBrief.ts --out artifacts/weekly-slack-brief.txt",
     "seo:refresh-queue": "bun scripts/seo-refresh-queue.mjs"
   },
   "engines": {
@@ -61,7 +61,6 @@
     "eslint-config-next": "16.1.6",
     "postcss": "8.5.6",
     "tailwindcss": "3.4.17",
-    "tsx": "^4.21.0",
     "typescript": "5.9.3",
     "vercel": "^50.28.0",
     "wrangler": "^4.71.0"
