@@ -1,12 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { Button } from "@base-ui/react/button";
 import { useClipboardCopy } from "./useClipboardCopy";
 import { useHapticFeedback } from "./useHapticFeedback";
 import { trackContentCtaConversion } from "../../lib/contentMeasurement";
 
-type PrimaryActionType = "copy_weekly_brief" | "view_action_playbook" | "inspect_evidence";
+type PrimaryActionType = "copy_weekly_brief";
 
 const trackFirstActionConversion = (action: PrimaryActionType) => {
   trackContentCtaConversion({
@@ -14,12 +13,6 @@ const trackFirstActionConversion = (action: PrimaryActionType) => {
     cluster: "tool",
     intent: "board",
     ctaId: `homepage_top_fold_${action}`,
-    internalPath:
-      action === "view_action_playbook"
-        ? "/operations"
-        : action === "inspect_evidence"
-          ? "/signals"
-          : undefined,
   });
 };
 
@@ -119,29 +112,6 @@ export function CopyLeadershipArtifactsButtons({
           {copyLabel("Weekly operator brief", "Copy Weekly Operator Brief")}
         </Button>
 
-        <Link
-          href="/operations"
-          prefetch={false}
-          onClick={() => {
-            haptic.navigate();
-            trackFirstActionConversion("view_action_playbook");
-          }}
-          className={secondaryActionClassName}
-        >
-          View action playbook
-        </Link>
-
-        <Link
-          href="/signals"
-          prefetch={false}
-          onClick={() => {
-            haptic.navigate();
-            trackFirstActionConversion("inspect_evidence");
-          }}
-          className={secondaryActionClassName}
-        >
-          Inspect evidence
-        </Link>
       </div>
 
       <details className="w-full">
