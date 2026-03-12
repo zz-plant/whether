@@ -3,7 +3,7 @@ import { applyConfidenceGate, buildDecisionDeltaRules } from "./alerts/decisionD
 
 export type AlertChannel = "slack" | "email" | "webhook";
 
-export type AlertGate = "pass" | "downgrade";
+export type AlertGate = "pass" | "downgrade" | "suppressed";
 
 export type DecisionDelta = {
   code: string;
@@ -40,12 +40,18 @@ export type SignalAlertInputPayload = Omit<SignalAlertPayload, "decisionDeltas" 
 };
 
 export type RegimeAlertEvent = {
+  eventId: string;
+  sourceVersion: string;
+  canonicalTimestampSource: "request-received-at";
   id: string;
   createdAt: string;
   payload: SignalAlertPayload;
 };
 
 export type AlertDeliveryEvent = {
+  eventId: string;
+  sourceVersion: string;
+  canonicalTimestampSource: "request-received-at";
   id: string;
   alertId: string;
   channel: AlertChannel;

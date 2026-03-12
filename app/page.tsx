@@ -302,7 +302,7 @@ const HomePageReportContent = async ({
     stableAction:
       "Safe to use for near-term planning; proceed with normal approval flow.",
   });
-  const postureState = buildPostureState({
+  const postureState = await buildPostureState({
     recordDate: treasury.record_date,
     assessment,
     reportDynamics,

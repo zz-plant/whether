@@ -1,37 +1,63 @@
 import { NextResponse } from "next/server";
-import { serverStore } from "../../../lib/serverStore";
+import { getRegimeAlertRepository } from "../../../lib/storage/regimeAlertRepository";
 import {
   buildSignalAlertPayload,
   shouldCreateSignalAlert,
   type RegimeAlertEvent,
   type SignalAlertInputPayload,
 } from "../../../lib/signalOps";
+import { buildLineage } from "../../../lib/storage/lineage";
 
 export const runtime = "edge";
 
-export async function GET() {
-  return NextResponse.json({ alerts: serverStore.snapshot.regimeAlerts });
+export async function GET(request: Request) {
+  const url = new URL(request.url);
+  const cursor = url.searchParams.get("cursor");
+  const limitRaw = url.searchParams.get("limit");
+  const limit = limitRaw ? Math.max(1, Math.min(200, Number.parseInt(limitRaw, 10) || 64)) : 64;
+
+  const repository = getRegimeAlertRepository();
+  const listed = await repository.listAlerts({ cursor, limit });
+
+  return NextResponse.json({
+    alerts: listed.alerts,
+    pagination: {
+      cursor,
+      nextCursor: listed.nextCursor,
+      limit,
+      returned: listed.alerts.length,
+    },
+    backend: repository.backendStatus(),
+  });
 }
 
 export async function POST(request: Request) {
   const requestPayload = (await request.json()) as SignalAlertInputPayload;
-  const latest = serverStore.snapshot.regimeAlerts[0];
-  const payload = buildSignalAlertPayload(requestPayload, latest);
+  const repository = getRegimeAlertRepository();
+  const latest = await repository.latestAlert();
+  const payload = buildSignalAlertPayload(requestPayload, latest ?? undefined);
 
-  if (!shouldCreateSignalAlert(payload, latest)) {
-    return NextResponse.json({ created: false, alerts: serverStore.snapshot.regimeAlerts });
+  const listed = await repository.listAlerts({ limit: 64 });
+  if (!shouldCreateSignalAlert(payload, latest ?? undefined)) {
+    return NextResponse.json({ created: false, alerts: listed.alerts, backend: repository.backendStatus() });
   }
 
+  const lineage = buildLineage("request-received-at");
   const entry: RegimeAlertEvent = {
-    id: typeof crypto.randomUUID === "function" ? crypto.randomUUID() : `${Date.now()}`,
+    ...lineage,
+    canonicalTimestampSource: "request-received-at",
+    id: lineage.eventId,
     createdAt: new Date().toISOString(),
     payload,
   };
 
-  serverStore.save({
-    ...serverStore.snapshot,
-    regimeAlerts: [entry, ...serverStore.snapshot.regimeAlerts].slice(0, 64),
-  });
+  await repository.appendAlert(entry);
+  const updated = await repository.listAlerts({ limit: 64 });
 
-  return NextResponse.json({ created: true, alert: entry, alerts: serverStore.snapshot.regimeAlerts });
+  return NextResponse.json({
+    created: true,
+    alert: entry,
+    alerts: updated.alerts,
+    backend: repository.backendStatus(),
+  });
 }
