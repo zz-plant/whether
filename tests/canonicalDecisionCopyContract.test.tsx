@@ -1,0 +1,143 @@
+import assert from "node:assert/strict";
+import { describe, it } from "node:test";
+import { renderToStaticMarkup } from "react-dom/server";
+import { RegimeCommandBar } from "../app/components/RegimeCommandBar";
+import { buildCanonicalDecisionCopy } from "../lib/report/canonicalDecisionCopy";
+import { buildWeeklyOperatorBriefPayload, buildWeeklyCallSnapshotPlainText } from "../lib/export/weeklyOperatorBrief";
+import type { RegimeAssessment } from "../lib/regimeEngine";
+import type { TreasuryData } from "../lib/types";
+import type { PostureStateContract } from "../lib/report/postureStateContract";
+
+const assessment: RegimeAssessment = {
+  regime: "DEFENSIVE",
+  scores: { tightness: 72, riskAppetite: 42, baseRateUsed: "1M", baseRate: 5.2, curveSlope: -0.3 },
+  diagnostics: {
+    tightnessDelta: 1,
+    riskAppetiteDelta: -1,
+    nearestThresholdDelta: 4,
+    confidence: "MED",
+    transitionWatch: true,
+    intensity: "MILD",
+    boundaryContributors: [],
+    weakReadCount: 0,
+    twoWeakReadsWarning: false,
+  },
+  description: "",
+  constraints: ["Preserve runway"],
+  tightnessExplanation: "",
+  riskAppetiteExplanation: "",
+  dataWarnings: [],
+  thresholds: { baseRateTightness: 5, tightnessRegime: 70, riskAppetiteRegime: 50 },
+  inputs: [],
+  policyAssessment: {
+    version: "v1",
+    normalizations: [],
+    composites: { cts: 0, ras: 0 },
+    posture: "SAFETY_MODE",
+    band: "TIGHT",
+    confidenceIndex: { agreement: 0, distanceFromNeutral: 0, volatility30d: 0 },
+    refusal: { refused: false, reasons: [] },
+    governanceParameters: {
+      hiringThreshold: "STRICT",
+      paybackWindowTolerance: "SHORTER",
+      rollbackRequirement: "STRICT",
+      approvalVelocity: "SLOWER",
+      expansionScope: "NARROW",
+      experimentationTolerance: "LOW",
+    },
+  },
+};
+
+const treasury: TreasuryData = {
+  source: "https://fred.stlouisfed.org",
+  record_date: "2026-03-07",
+  fetched_at: "2026-03-08T00:00:00.000Z",
+  isLive: true,
+  yields: { oneMonth: 5.2, threeMonth: 5.1, twoYear: 4.7, tenYear: 4.4 },
+};
+
+const postureState: PostureStateContract = {
+  currentState: {
+    regime: "DEFENSIVE",
+    postureLabel: "Defensive",
+    confidenceLabel: "MED",
+    confidencePercent: 68,
+    transitionWatch: "ON",
+    recordDate: "2026-03-07",
+  },
+  lastCommittedChangeEvent: {
+    timestamp: "2026-03-07T00:00:00.000Z",
+    fromState: "VOLATILE",
+    toState: "DEFENSIVE",
+    reason: "Boundary pressure persisted",
+    source: "state-machine",
+  },
+  whatFlipsNext: {
+    flipTrigger: "Flip when tightness falls below 65 and holds.",
+    thresholds: ["Tightness < 65", "Risk appetite > 50"],
+    reversalConditions: ["Risk appetite > 50"],
+  },
+};
+
+describe("canonical decision copy contract", () => {
+  it("keeps command bar, snapshot, and export payload phrases identical for core decision lines", () => {
+    // Decision transmission contract: all primary surfaces should reuse one canonical phrase set.
+    const canonical = buildCanonicalDecisionCopy({
+      homeBriefModel: {
+        postureWithStageLabel: "Defensive — Watchful",
+        postureLabel: "Defensive",
+        operatingStanceLine: "Stage approvals and protect runway.",
+        actionNowShort: "Pause net-new fixed burn commitments this week.",
+        actionStripItems: [
+          { label: "Hiring", actionNow: "Keep hiring to critical backfills only." },
+        ],
+        guardrail: "Hold discretionary spend above 10k pending review.",
+        canonicalFlipConditions: [
+          { area: "hiring", metric: "tightness", operator: "<", value: 65, label: "Tightness < 65" },
+        ],
+        compactFlipConditionLabels: ["Tightness < 65", "Risk appetite > 50"],
+      } as never,
+      postureState,
+    });
+
+    const commandBarHtml = renderToStaticMarkup(
+      <RegimeCommandBar
+        regime="DEFENSIVE"
+        call={canonical.operatingCall}
+        doNow={canonical.doNowLines}
+        flipConditions={[canonical.flipTrigger]}
+        updatedAt="Mar 8, 2026"
+      />,
+    );
+
+    const payload = buildWeeklyOperatorBriefPayload({
+      assessment,
+      treasury,
+      postureWithStageLabel: "Defensive — Watchful",
+      confidenceLabel: "MED",
+      postureState,
+      canonicalDecisionCopy: canonical,
+    });
+
+    const snapshot = buildWeeklyCallSnapshotPlainText({
+      regime: canonical.currentRegimeLabel,
+      call: canonical.operatingCall,
+      trend: "Deteriorating",
+      confidence: "68% (MED)",
+      doNow: canonical.doNowLines[0],
+      avoid: "Avoid irreversible expansion",
+      watch: canonical.flipTrigger,
+      flipConditions: canonical.flipConditions,
+    });
+
+    assert.equal(payload.regimeStage, canonical.currentRegimeLabel);
+    assert.equal(payload.doNowBullets[0], canonical.doNowLines[0]);
+    assert.equal(payload.flipTrigger, canonical.flipTrigger);
+    assert.equal(payload.flipConditionLabels[0], canonical.flipConditions[0]);
+    assert.match(commandBarHtml, new RegExp(canonical.operatingCall.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+    assert.match(snapshot, /REGIME: Defensive — Watchful/);
+    assert.match(snapshot, /CALL: Stage approvals and protect runway\./);
+    assert.match(snapshot, /DO NOW: Pause net-new fixed burn commitments this week\./);
+    assert.match(snapshot, /WATCH: Flip when tightness falls below 65 and holds\./);
+  });
+});

@@ -3,6 +3,7 @@ import type { RegimeAssessment } from "../regimeEngine";
 import type { TreasuryData } from "../types";
 import type { ActionStripItem } from "../report/operatingCalls";
 import type { PostureStateContract } from "../report/postureStateContract";
+import type { CanonicalDecisionCopy } from "../report/canonicalDecisionCopy";
 
 export type WeeklyOperatorBriefPayload = {
   date: string;
@@ -32,6 +33,7 @@ export const buildWeeklyOperatorBriefPayload = ({
   actionStripItems = [],
   flipConditionLabels = [],
   postureState,
+  canonicalDecisionCopy,
 }: {
   assessment: RegimeAssessment;
   treasury: TreasuryData;
@@ -40,6 +42,7 @@ export const buildWeeklyOperatorBriefPayload = ({
   actionStripItems?: ActionStripItem[];
   flipConditionLabels?: string[];
   postureState?: PostureStateContract;
+  canonicalDecisionCopy?: CanonicalDecisionCopy;
 }): WeeklyOperatorBriefPayload => {
 
   const doNowBullets = actionStripItems.length > 0
@@ -54,14 +57,17 @@ export const buildWeeklyOperatorBriefPayload = ({
 
   return {
     date: treasury.record_date,
-    regimeStage: postureWithStageLabel ?? formatRegimeLabel(assessment.regime),
+    regimeStage: canonicalDecisionCopy?.currentRegimeLabel ?? postureWithStageLabel ?? formatRegimeLabel(assessment.regime),
     confidence: confidenceLabel ? `${confidenceLabel} confidence` : "Score-based posture confidence",
-    doNowBullets,
+    doNowBullets: canonicalDecisionCopy?.doNowLines.length ? canonicalDecisionCopy.doNowLines : doNowBullets,
     flipTrigger:
-      postureState?.whatFlipsNext.flipTrigger
+      canonicalDecisionCopy?.flipTrigger
+      ?? postureState?.whatFlipsNext.flipTrigger
       ?? normalizedFlipConditionLabels[0]
       ?? "Flip when live indicators cross the weekly guardrail threshold.",
-    flipConditionLabels: normalizedFlipConditionLabels.length > 0
+    flipConditionLabels: canonicalDecisionCopy?.flipConditions.length
+      ? canonicalDecisionCopy.flipConditions
+      : normalizedFlipConditionLabels.length > 0
       ? normalizedFlipConditionLabels
       : (postureState?.whatFlipsNext.thresholds ?? []),
   };
