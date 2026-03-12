@@ -4,7 +4,10 @@ import os from "node:os";
 import path from "node:path";
 
 const EXIT = { OK: 0, ERROR: 1, AUTH_CONFIG: 2, NO_DATA: 3, WATCH_TRIGGER: 4, INVALID_SCENARIO: 5 };
+EXIT.NETWORK = 6;
+EXIT.SERVER = 7;
 const CONFIG_PATH = path.join(os.homedir(), ".config", "whether", "config.yaml");
+const PACKAGE_JSON_PATH = path.join(process.cwd(), "package.json");
 const ERROR_CATEGORY = {
   AUTH: "auth",
   NETWORK: "network",
@@ -17,8 +20,10 @@ const HELP = `Whether CLI — decision terminal for operators
 
 Usage:
   whether <command> [flags]
+  whether --version
 
 Core Commands:
+  ping          Verify API reachability and auth readiness
   status        Show current operating environment and call (use --verbose for bounded decision detail)
   call          Show leadership recommendation
   changes       Show what changed since last refresh
@@ -42,6 +47,7 @@ Setup:
 `;
 
 const SUB_HELP = {
+  ping: "Usage: whether ping [--json]",
   call: "Usage: whether call [show|copy|diff] [--json|--yaml|--markdown]",
   status: "Usage: whether status [--verbose|--view expanded] [--json] [--as-of <date>]",
   diagnostics: "Usage: whether diagnostics [summary|drivers|evidence|provenance] [--json] [--as-of <date>]",
@@ -52,6 +58,20 @@ const SUB_HELP = {
   auth: "Usage: whether auth [login|logout|status] [--token <token>]",
   config: "Usage: whether config [init|get|set <key> <value>]",
   company: "Usage: whether company [list|select|status|call|brief] [name]",
+};
+
+let cachedVersion = null;
+
+const readCliVersion = async () => {
+  if (cachedVersion) return cachedVersion;
+  try {
+    const parsed = JSON.parse(await fs.readFile(PACKAGE_JSON_PATH, "utf8"));
+    cachedVersion = String(parsed.version ?? "0.0.0");
+    return cachedVersion;
+  } catch {
+    cachedVersion = "0.0.0";
+    return cachedVersion;
+  }
 };
 
 const parseArgs = (argv) => {
@@ -170,6 +190,58 @@ const buildCliError = ({ category, summary, settings, cause, exitCode = EXIT.ERR
   return error;
 };
 
+const buildHttpStatusError = ({ response, endpoint, settings }) => {
+  if (response.status === 401) {
+    return buildCliError({
+      category: ERROR_CATEGORY.AUTH,
+      summary: "Authentication failed.",
+      settings,
+      cause: new Error(`HTTP ${response.status} for ${endpoint}`),
+      exitCode: EXIT.AUTH_CONFIG,
+    });
+  }
+  if (response.status === 403) {
+    return buildCliError({
+      category: ERROR_CATEGORY.FORBIDDEN,
+      summary: "Access denied by API.",
+      settings,
+      cause: new Error(`HTTP ${response.status} for ${endpoint}`),
+      exitCode: EXIT.AUTH_CONFIG,
+    });
+  }
+  if (response.status === 429) {
+    return buildCliError({
+      category: ERROR_CATEGORY.RATE_LIMIT,
+      summary: "Request quota exceeded.",
+      settings,
+      cause: new Error(`HTTP ${response.status} for ${endpoint}`),
+      exitCode: EXIT.SERVER,
+    });
+  }
+  if (response.status >= 500) {
+    return buildCliError({
+      category: ERROR_CATEGORY.SERVER_FAULT,
+      summary: `API returned ${response.status}.`,
+      settings,
+      cause: new Error(`HTTP ${response.status} for ${endpoint}`),
+      exitCode: EXIT.SERVER,
+    });
+  }
+  if (response.status === 404) {
+    const error = new Error("No data available.");
+    error.exitCode = EXIT.NO_DATA;
+    return error;
+  }
+  if (!response.ok) {
+    const error = new Error(`Request failed (${response.status})`, {
+      cause: new Error(`HTTP ${response.status} for ${endpoint}`),
+    });
+    error.exitCode = EXIT.ERROR;
+    return error;
+  }
+  return null;
+};
+
 const getJson = async (settings, endpoint) => {
   let response;
   try {
@@ -186,56 +258,53 @@ const getJson = async (settings, endpoint) => {
       summary: "Unable to reach Whether API.",
       settings,
       cause,
+      exitCode: EXIT.NETWORK,
     });
   }
 
-  if (response.status === 401) {
-    throw buildCliError({
-      category: ERROR_CATEGORY.AUTH,
-      summary: "Authentication failed.",
-      settings,
-      cause: new Error(`HTTP ${response.status} for ${endpoint}`),
-      exitCode: EXIT.AUTH_CONFIG,
-    });
-  }
-  if (response.status === 403) {
-    throw buildCliError({
-      category: ERROR_CATEGORY.FORBIDDEN,
-      summary: "Access denied by API.",
-      settings,
-      cause: new Error(`HTTP ${response.status} for ${endpoint}`),
-      exitCode: EXIT.AUTH_CONFIG,
-    });
-  }
-  if (response.status === 429) {
-    throw buildCliError({
-      category: ERROR_CATEGORY.RATE_LIMIT,
-      summary: "Request quota exceeded.",
-      settings,
-      cause: new Error(`HTTP ${response.status} for ${endpoint}`),
-    });
-  }
-  if (response.status >= 500) {
-    throw buildCliError({
-      category: ERROR_CATEGORY.SERVER_FAULT,
-      summary: `API returned ${response.status}.`,
-      settings,
-      cause: new Error(`HTTP ${response.status} for ${endpoint}`),
-    });
-  }
-  if (response.status === 404) {
-    const error = new Error("No data available.");
-    error.exitCode = EXIT.NO_DATA;
-    throw error;
-  }
-  if (!response.ok) {
-    const error = new Error(`Request failed (${response.status})`, {
-      cause: new Error(`HTTP ${response.status} for ${endpoint}`),
-    });
-    error.exitCode = EXIT.ERROR;
-    throw error;
-  }
+  const statusError = buildHttpStatusError({ response, endpoint, settings });
+  if (statusError) throw statusError;
   return response.json();
+};
+
+const cmdVersion = async (settings) => {
+  const version = await readCliVersion();
+  const payload = { name: "whether", version };
+  writeOutput(settings.output === "text" ? version : payload, settings);
+};
+
+const cmdPing = async (settings, flags) => {
+  if (flags.help) return writeOutput(SUB_HELP.ping, settings);
+  const endpoint = "/api/health";
+  let response;
+  try {
+    response = await fetch(`${settings.apiBaseUrl}${endpoint}`, {
+      cache: "no-store",
+      headers: {
+        accept: "application/json",
+        ...(settings.token ? { authorization: `Bearer ${settings.token}` } : {}),
+      },
+    });
+  } catch (cause) {
+    throw buildCliError({
+      category: ERROR_CATEGORY.NETWORK,
+      summary: "Unable to reach Whether API.",
+      settings,
+      cause,
+      exitCode: EXIT.NETWORK,
+    });
+  }
+
+  const statusError = buildHttpStatusError({ response, endpoint, settings });
+  if (statusError) throw statusError;
+
+  const health = await response.json();
+  const payload = {
+    ok: true,
+    apiBaseUrl: settings.apiBaseUrl,
+    status: health.status ?? "ok",
+  };
+  writeOutput(settings.output === "text" ? "ok" : payload, settings);
 };
 
 
@@ -518,6 +587,12 @@ const main = async () => {
     return;
   }
 
+  if (parsed.flags.version) {
+    const settings = await normalizeFlags(parsed.flags);
+    await cmdVersion(settings);
+    return;
+  }
+
   if (parsed.flags.help && !SUB_HELP[parsed.command]) {
     console.log(HELP);
     return;
@@ -529,6 +604,9 @@ const main = async () => {
     switch (parsed.command) {
       case "status":
         await cmdStatus(settings, parsed.flags);
+        return;
+      case "ping":
+        await cmdPing(settings, parsed.flags);
         return;
       case "call":
         await cmdCall(settings, parsed.subcommand ?? "show", parsed.flags);
@@ -580,6 +658,10 @@ const main = async () => {
         return;
       case "completion":
         writeOutput("Shell completion is available via `whether completion` (zsh/bash integration planned).", settings);
+        return;
+      case "--version":
+      case "version":
+        await cmdVersion(settings);
         return;
       default:
         writeOutput(HELP, settings);

@@ -16,6 +16,67 @@ describe("whether cli", () => {
     assert.match(result.stdout, /share/);
   });
 
+
+
+  it("prints semantic version with --version", () => {
+    const result = spawnSync("node", [CLI_PATH, "--version"], { encoding: "utf8" });
+    assert.equal(result.status, 0);
+    assert.match(result.stdout.trim(), /^\d+\.\d+\.\d+$/);
+    assert.equal(result.stderr, "");
+  });
+
+  it("ping reports healthy API for smoke checks", async () => {
+    const server = http.createServer((req, res) => {
+      if ((req.url ?? "").startsWith("/api/health")) {
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({ status: "ok" }));
+        return;
+      }
+      res.writeHead(404);
+      res.end();
+    });
+
+    await new Promise<void>((resolve) => server.listen(0, resolve));
+    const { port } = server.address() as { port: number };
+    const result = spawnSync("node", [CLI_PATH, "ping", "--api-base-url", `http://127.0.0.1:${port}`, "--json"], { encoding: "utf8" });
+    server.close();
+
+    assert.equal(result.status, 0);
+    const parsed = JSON.parse(result.stdout);
+    assert.equal(parsed.ok, true);
+    assert.equal(parsed.status, "ok");
+    assert.equal(result.stderr, "");
+  });
+
+  it("smoke brief --json stays machine-readable without stderr noise", async () => {
+    const server = http.createServer((req, res) => {
+      if ((req.url ?? "").startsWith("/api/brief")) {
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(
+          JSON.stringify({
+            brief: "Weekly operator brief\n- Stage fixed-cost approvals.",
+            generatedAt: "2026-03-12T12:00:00.000Z",
+          }),
+        );
+        return;
+      }
+      res.writeHead(404);
+      res.end();
+    });
+
+    await new Promise<void>((resolve) => server.listen(0, resolve));
+    const { port } = server.address() as { port: number };
+    const result = spawnSync("node", [CLI_PATH, "brief", "--api-base-url", `http://127.0.0.1:${port}`, "--json"], { encoding: "utf8" });
+    server.close();
+
+    assert.equal(result.status, 0);
+    const parsed = JSON.parse(result.stdout);
+    assert.match(parsed.brief, /Weekly operator brief/);
+    assert.match(parsed.brief, /Stage fixed-cost approvals/);
+    assert.equal(result.stderr, "");
+    assert.doesNotMatch(result.stdout, /\u001b\[/);
+  });
+
   it("returns exit code 5 for invalid scenario input", () => {
     const result = spawnSync("node", [CLI_PATH, "scenario", "--tightness", "oops"], { encoding: "utf8" });
     assert.equal(result.status, 5);
@@ -142,7 +203,7 @@ describe("whether cli", () => {
     const result = spawnSync("node", [CLI_PATH, "status", "--api-base-url", `http://127.0.0.1:${port}`], { encoding: "utf8" });
     server.close();
 
-    assert.equal(result.status, 1);
+    assert.equal(result.status, 7);
     assert.match(result.stderr, /rate limit: Request quota exceeded\./);
     assert.match(result.stderr, /--watch --interval 120/);
     assert.match(result.stderr, /Cause: HTTP 429 for \/api\/cli\/status/);
@@ -164,7 +225,7 @@ describe("whether cli", () => {
     const result = spawnSync("node", [CLI_PATH, "status", "--api-base-url", `http://127.0.0.1:${port}`], { encoding: "utf8" });
     server.close();
 
-    assert.equal(result.status, 1);
+    assert.equal(result.status, 7);
     assert.match(result.stderr, /server fault: API returned 503\./);
     assert.match(result.stderr, /whether doctor/);
     assert.match(result.stderr, /\/api\/health/);
@@ -178,11 +239,40 @@ describe("whether cli", () => {
       { encoding: "utf8" },
     );
 
-    assert.equal(result.status, 1);
+    assert.equal(result.status, 6);
     assert.match(result.stderr, /network: Unable to reach Whether API\./);
     assert.match(result.stderr, /WHETHER_API_URL/);
     assert.match(result.stderr, /--api-base-url/);
     assert.match(result.stderr, /Cause:/);
+  });
+
+
+
+  it("ping maps auth failures to auth exit semantics", async () => {
+    const server = http.createServer((req, res) => {
+      if ((req.url ?? "").startsWith("/api/health")) {
+        res.writeHead(401, { "content-type": "application/json" });
+        res.end(JSON.stringify({ error: "unauthorized" }));
+        return;
+      }
+      res.writeHead(404);
+      res.end();
+    });
+
+    await new Promise<void>((resolve) => server.listen(0, resolve));
+    const { port } = server.address() as { port: number };
+    const result = spawnSync("node", [CLI_PATH, "ping", "--api-base-url", `http://127.0.0.1:${port}`], { encoding: "utf8" });
+    server.close();
+
+    assert.equal(result.status, 2);
+    assert.match(result.stderr, /auth: Authentication failed\./);
+  });
+
+  it("ping maps network failures to network exit semantics", () => {
+    const result = spawnSync("node", [CLI_PATH, "ping", "--api-base-url", "http://127.0.0.1:1"], { encoding: "utf8" });
+
+    assert.equal(result.status, 6);
+    assert.match(result.stderr, /network: Unable to reach Whether API\./);
   });
 
   it("surfaces unsupported query params from API for status", async () => {

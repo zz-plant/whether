@@ -9,6 +9,8 @@ Whether CLI is an operator decision terminal: **environment → call → changes
 
 ## Top-level commands
 
+- `whether --version`
+- `whether ping`
 - `whether status`
 - `whether call [show|copy|diff]`
 - `whether regime`
@@ -42,11 +44,13 @@ Whether CLI is an operator decision terminal: **environment → call → changes
 ## Exit codes
 
 - `0` success
-- `1` generic error
-- `2` auth/config error
+- `1` generic/request-contract error
+- `2` auth/config/forbidden error
 - `3` no data available
 - `4` watch condition triggered
 - `5` invalid scenario input
+- `6` network reachability failure
+- `7` server/rate-limit failure
 
 ## Config and environment precedence
 
@@ -83,6 +87,23 @@ The CLI maps common failures to these exact category-prefixed error strings:
 
 Notes:
 - `auth` and `forbidden` return exit code `2`.
-- `network`, `rate limit`, and `server fault` return exit code `1`.
+- `network` returns exit code `6`; `rate limit` and `server fault` return exit code `7`.
 - The top-level handler also prints `Cause: ...` so the original failure remains visible for debugging.
 
+
+## Smoke command contract
+
+Use these three commands as the minimal smoke surface for operators and agents:
+
+- `whether --version`
+  - Exit: `0`
+  - Stdout (text): semantic version only (example `0.1.0`)
+- `whether ping --json`
+  - Exit: `0` on healthy API
+  - Stdout (json): `{ "ok": true, "apiBaseUrl": "...", "status": "ok" }`
+  - Exit: `2` for auth/forbidden, `6` for network, `7` for 429/5xx server failures
+- `whether brief --json`
+  - Exit: `0`
+  - Stdout (json): object that includes `brief` text payload
+
+JSON mode is intentionally stdout-only machine output; it should not include ANSI color escapes or log prefixes unless an error occurs.
