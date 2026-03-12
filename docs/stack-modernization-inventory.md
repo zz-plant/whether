@@ -1,14 +1,19 @@
 # Stack modernization inventory & constraints
 
+## Runtime policy
+- **Policy choice:** Option A (transition).
+- **Primary runtime:** Bun is the default runtime/package manager for local and CI command orchestration (`bun install`, `bun run <script>`).
+- **Supported fallback:** Node.js 20.16.x is intentionally retained for selected scripts that directly execute `.mjs` entrypoints (`scripts/build.mjs`, `scripts/run-tests.mjs`).
+
 ## Runtime & tooling versions
-- **Package manager:** Bun 1.3.9 (`packageManager`).
-- **Node engine:** 20.16.x (`engines.node`).
+- **Package manager / primary runtime:** Bun 1.3.9 (`packageManager`, `engines.bun`).
+- **Node engine (fallback for selected scripts):** 20.16.x (`engines.node`).
 - **Next.js:** 16.1.6.
 - **React / React DOM:** 19.2.4.
 - **TypeScript:** 5.9.3.
 - **Tailwind CSS:** 3.4.17.
 - **Cloudflare adapter:** @cloudflare/next-on-pages 1.13.16.
-- **Testing:** Node test runner via `bun run test` (`scripts/run-tests.mjs`).
+- **Testing:** `bun run test` invokes Node fallback runner (`scripts/run-tests.mjs`).
 - **Linting:** `eslint` CLI via `bun run lint`.
 
 ## Newer capabilities snapshot (research baseline)
