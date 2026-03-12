@@ -16,6 +16,13 @@ const ERROR_CATEGORY = {
   SERVER_FAULT: "server fault",
 };
 
+const AUTH_FAILURE = {
+  MISSING: "missing",
+  EXPIRED: "expired",
+  INVALID: "invalid",
+  SCOPE: "scope",
+};
+
 const HELP = `Whether CLI — decision terminal for operators
 
 Usage:
@@ -58,7 +65,7 @@ const SUB_HELP = {
   share: "Usage: whether share [slack|email|clipboard] [--brief <type>]",
   install:
     "Usage: whether install [--yes|--ci] [--api-base-url <url>] [--token <token>]\n\nNon-interactive modes:\n  --yes   Skip prompts and accept defaults\n  --ci    CI alias for --yes",
-  auth: "Usage: whether auth [login|logout|status] [--token <token>]",
+  auth: "Usage: whether auth [login|logout|status] [--token <token>] [--check] [--json]",
   config: "Usage: whether config [init|get|set <key> <value>]",
   company: "Usage: whether company [list|select|status|call|brief] [name]",
 };
@@ -155,26 +162,47 @@ const writeOutput = (payload, settings) => {
 
 const normalizeFlags = async (flags) => {
   const config = await loadConfig();
+  const envToken = process.env.WHETHER_API_KEY ?? process.env.WHETHER_TOKEN ?? null;
   return {
     config,
     output: flags.json ? "json" : flags.yaml ? "yaml" : flags.markdown ? "markdown" : flags.output ?? config.output ?? "text",
     quiet: Boolean(flags.quiet),
     noColor: Boolean(flags["no-color"]),
     apiBaseUrl: flags["api-base-url"] ?? process.env.WHETHER_API_URL ?? config.api_base_url ?? "http://localhost:3000",
-    token: flags.token ?? process.env.WHETHER_TOKEN ?? config.token ?? null,
+    token: flags.token ?? envToken ?? config.token ?? null,
+    tokenSource: typeof flags.token === "string" ? "flag" : envToken ? "env" : config.token ? "config" : "none",
     profile: process.env.WHETHER_PROFILE ?? config.profile ?? "default",
   };
 };
 
-const getCategoryRemediation = (category, settings) => {
+const classifyAuthFailure = (responseBody) => {
+  const rawCode = responseBody?.code ?? responseBody?.errorCode ?? responseBody?.error ?? responseBody?.reason;
+  const code = typeof rawCode === "string" ? rawCode.toLowerCase() : "";
+  if (code.includes("expired")) return AUTH_FAILURE.EXPIRED;
+  if (code.includes("scope") || code.includes("forbidden")) return AUTH_FAILURE.SCOPE;
+  if (code.includes("missing") || code.includes("no_token") || code.includes("unauthorized")) return AUTH_FAILURE.MISSING;
+  if (code.includes("invalid") || code.includes("malformed")) return AUTH_FAILURE.INVALID;
+  return AUTH_FAILURE.INVALID;
+};
+
+const getCategoryRemediation = (category, settings, detail) => {
   const healthUrl = `${settings.apiBaseUrl}/api/health`;
   switch (category) {
     case ERROR_CATEGORY.AUTH:
-      return "Set WHETHER_TOKEN or pass --token, then run `whether auth login --token <token>`.";
+      if (detail === AUTH_FAILURE.MISSING) {
+        return "Set WHETHER_API_KEY (or WHETHER_TOKEN) or pass --token, then run `whether auth login --token <token>`.";
+      }
+      if (detail === AUTH_FAILURE.EXPIRED) {
+        return "Token expired. Rotate WHETHER_API_KEY (or WHETHER_TOKEN), then rerun `whether auth login --token <token>`.";
+      }
+      if (detail === AUTH_FAILURE.SCOPE) {
+        return "Token is valid but lacks required scope. Mint a key with CLI scope, export WHETHER_API_KEY, then retry.";
+      }
+      return "Token is invalid. Replace WHETHER_API_KEY (or WHETHER_TOKEN) and rerun `whether auth login --token <token>`.";
     case ERROR_CATEGORY.NETWORK:
       return `Set WHETHER_API_URL or pass --api-base-url, then verify ${healthUrl}.`;
     case ERROR_CATEGORY.FORBIDDEN:
-      return "Use a token with required access via WHETHER_TOKEN or --token, then retry.";
+      return "Use a token with required access via WHETHER_API_KEY (or WHETHER_TOKEN) or --token, then retry.";
     case ERROR_CATEGORY.RATE_LIMIT:
       return "Retry with --watch --interval 120 or wait for quota reset at /api/cli/status.";
     case ERROR_CATEGORY.SERVER_FAULT:
@@ -184,66 +212,75 @@ const getCategoryRemediation = (category, settings) => {
   }
 };
 
-const buildCliError = ({ category, summary, settings, cause, exitCode = EXIT.ERROR }) => {
-  const remediation = getCategoryRemediation(category, settings);
+const buildCliError = ({ category, summary, settings, cause, exitCode = EXIT.ERROR, detail = null }) => {
+  const remediation = getCategoryRemediation(category, settings, detail);
   const error = new Error(`${category}: ${summary} ${remediation}`, { cause });
   error.exitCode = exitCode;
   error.category = category;
   error.remediation = remediation;
+  error.detail = detail;
   return error;
 };
 
-const buildHttpStatusError = ({ response, endpoint, settings }) => {
-  if (response.status === 401) {
+const buildHttpStatusError = ({ status, ok, endpoint, settings, body = null }) => {
+  const authDetail = classifyAuthFailure(body);
+  if (status === 401) {
     return buildCliError({
       category: ERROR_CATEGORY.AUTH,
-      summary: "Authentication failed.",
+      summary:
+        authDetail === AUTH_FAILURE.EXPIRED
+          ? "Authentication failed (expired key)."
+          : authDetail === AUTH_FAILURE.MISSING
+            ? "Authentication failed (missing key)."
+            : "Authentication failed (invalid key).",
       settings,
-      cause: new Error(`HTTP ${response.status} for ${endpoint}`),
+      cause: new Error(`HTTP ${status} for ${endpoint}`),
       exitCode: EXIT.AUTH_CONFIG,
+      detail: authDetail,
     });
   }
-  if (response.status === 403) {
+  if (status === 403) {
     return buildCliError({
       category: ERROR_CATEGORY.FORBIDDEN,
-      summary: "Access denied by API.",
+      summary: "Access denied by API (invalid scope).",
       settings,
-      cause: new Error(`HTTP ${response.status} for ${endpoint}`),
+      cause: new Error(`HTTP ${status} for ${endpoint}`),
       exitCode: EXIT.AUTH_CONFIG,
     });
   }
-  if (response.status === 429) {
+  if (status === 429) {
     return buildCliError({
       category: ERROR_CATEGORY.RATE_LIMIT,
       summary: "Request quota exceeded.",
       settings,
-      cause: new Error(`HTTP ${response.status} for ${endpoint}`),
+      cause: new Error(`HTTP ${status} for ${endpoint}`),
       exitCode: EXIT.SERVER,
     });
   }
-  if (response.status >= 500) {
+  if (status >= 500) {
     return buildCliError({
       category: ERROR_CATEGORY.SERVER_FAULT,
-      summary: `API returned ${response.status}.`,
+      summary: `API returned ${status}.`,
       settings,
-      cause: new Error(`HTTP ${response.status} for ${endpoint}`),
+      cause: new Error(`HTTP ${status} for ${endpoint}`),
       exitCode: EXIT.SERVER,
     });
   }
-  if (response.status === 404) {
+  if (status === 404) {
     const error = new Error("No data available.");
     error.exitCode = EXIT.NO_DATA;
     return error;
   }
-  if (!response.ok) {
-    const error = new Error(`Request failed (${response.status})`, {
-      cause: new Error(`HTTP ${response.status} for ${endpoint}`),
+  if (!ok) {
+    const error = new Error(`Request failed (${status})`, {
+      cause: new Error(`HTTP ${status} for ${endpoint}`),
     });
     error.exitCode = EXIT.ERROR;
     return error;
   }
   return null;
 };
+
 
 const getJson = async (settings, endpoint) => {
   let response;
@@ -265,8 +302,19 @@ const getJson = async (settings, endpoint) => {
     });
   }
 
-  const statusError = buildHttpStatusError({ response, endpoint, settings });
+  let parsedBody = null;
+  const contentType = response.headers.get("content-type") ?? "";
+  if (contentType.includes("application/json")) {
+    try {
+      parsedBody = await response.json();
+    } catch {
+      parsedBody = null;
+    }
+  }
+
+  const statusError = buildHttpStatusError({ status: response.status, ok: response.ok, body: parsedBody, endpoint, settings });
   if (statusError) throw statusError;
+  if (parsedBody !== null) return parsedBody;
   return response.json();
 };
 
@@ -298,10 +346,18 @@ const cmdPing = async (settings, flags) => {
     });
   }
 
-  const statusError = buildHttpStatusError({ response, endpoint, settings });
+  let parsedBody = null;
+  const contentType = response.headers.get("content-type") ?? "";
+  if (contentType.includes("application/json")) {
+    try {
+      parsedBody = await response.json();
+    } catch {
+      parsedBody = null;
+    }
+  }
+  const statusError = buildHttpStatusError({ status: response.status, ok: response.ok, body: parsedBody, endpoint, settings });
   if (statusError) throw statusError;
-
-  const health = await response.json();
+  const health = parsedBody ?? (await response.json());
   const payload = {
     ok: true,
     apiBaseUrl: settings.apiBaseUrl,
@@ -577,7 +633,7 @@ const cmdAuth = async (settings, subcommand, flags) => {
   if (flags.help) return writeOutput(SUB_HELP.auth, settings);
   const config = await loadConfig();
   if (subcommand === "login") {
-    const token = flags.token;
+    const token = flags.token ?? process.env.WHETHER_API_KEY ?? process.env.WHETHER_TOKEN;
     if (!token || typeof token !== "string") process.exit(EXIT.AUTH_CONFIG);
     await saveConfig({ ...config, token });
     return writeOutput("Token saved.", settings);
@@ -587,7 +643,44 @@ const cmdAuth = async (settings, subcommand, flags) => {
     await saveConfig(rest);
     return writeOutput("Logged out.", settings);
   }
-  writeOutput(config.token ? "Authenticated" : "Not authenticated", settings);
+  const effectiveToken = flags.token ?? process.env.WHETHER_API_KEY ?? process.env.WHETHER_TOKEN ?? config.token ?? null;
+  const payload = {
+    authenticated: Boolean(effectiveToken),
+    source: settings.tokenSource,
+    hasToken: Boolean(effectiveToken),
+    apiBaseUrl: settings.apiBaseUrl,
+  };
+
+  if (!payload.authenticated) {
+    writeOutput(settings.output === "text" ? "Not authenticated" : payload, settings);
+    process.exit(EXIT.AUTH_CONFIG);
+  }
+
+  if (flags.check) {
+    const endpoint = "/api/health";
+    let response;
+    try {
+      response = await fetch(`${settings.apiBaseUrl}${endpoint}`, {
+        cache: "no-store",
+        headers: {
+          accept: "application/json",
+          authorization: `Bearer ${effectiveToken}`,
+        },
+      });
+    } catch (cause) {
+      throw buildCliError({
+        category: ERROR_CATEGORY.NETWORK,
+        summary: "Unable to reach Whether API.",
+        settings,
+        cause,
+        exitCode: EXIT.NETWORK,
+      });
+    }
+    const statusError = buildHttpStatusError({ status: response.status, ok: response.ok, endpoint, settings });
+    if (statusError) throw statusError;
+  }
+
+  writeOutput(settings.output === "text" ? "Authenticated" : payload, settings);
 };
 
 const cmdWatch = async (settings, flags) => {

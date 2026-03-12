@@ -195,8 +195,8 @@ describe("whether cli", () => {
     server.close();
 
     assert.equal(result.status, 2);
-    assert.match(result.stderr, /auth: Authentication failed\./);
-    assert.match(result.stderr, /WHETHER_TOKEN/);
+    assert.match(result.stderr, /auth: Authentication failed \(missing key\)\./);
+    assert.match(result.stderr, /WHETHER_API_KEY/);
     assert.match(result.stderr, /whether auth login --token <token>/);
     assert.match(result.stderr, /Cause: HTTP 401 for \/api\/cli\/status/);
   });
@@ -218,7 +218,8 @@ describe("whether cli", () => {
     server.close();
 
     assert.equal(result.status, 2);
-    assert.match(result.stderr, /forbidden: Access denied by API\./);
+    assert.match(result.stderr, /forbidden: Access denied by API \(invalid scope\)\./);
+    assert.match(result.stderr, /WHETHER_API_KEY/);
     assert.match(result.stderr, /--token/);
     assert.match(result.stderr, /Cause: HTTP 403 for \/api\/cli\/status/);
   });
@@ -301,7 +302,91 @@ describe("whether cli", () => {
     server.close();
 
     assert.equal(result.status, 2);
-    assert.match(result.stderr, /auth: Authentication failed\./);
+    assert.match(result.stderr, /auth: Authentication failed \(missing key\)\./);
+  });
+
+  it("maps expired and invalid API key errors with actionable remediation", async () => {
+    const server = http.createServer((req, res) => {
+      if ((req.url ?? "").startsWith("/api/cli/status")) {
+        const auth = req.headers.authorization ?? "";
+        if (auth.includes("expired-token")) {
+          res.writeHead(401, { "content-type": "application/json" });
+          res.end(JSON.stringify({ error: "token_expired" }));
+          return;
+        }
+        res.writeHead(401, { "content-type": "application/json" });
+        res.end(JSON.stringify({ error: "invalid_token" }));
+        return;
+      }
+      res.writeHead(404);
+      res.end();
+    });
+
+    await new Promise<void>((resolve) => server.listen(0, resolve));
+    const { port } = server.address() as { port: number };
+
+    const expired = spawnSync("node", [CLI_PATH, "status", "--api-base-url", `http://127.0.0.1:${port}`], {
+      encoding: "utf8",
+      env: { ...process.env, WHETHER_API_KEY: "expired-token" },
+    });
+    const invalid = spawnSync("node", [CLI_PATH, "status", "--api-base-url", `http://127.0.0.1:${port}`], {
+      encoding: "utf8",
+      env: { ...process.env, WHETHER_API_KEY: "invalid-token" },
+    });
+    server.close();
+
+    assert.equal(expired.status, 2);
+    assert.match(expired.stderr, /auth: Authentication failed \(expired key\)\./);
+    assert.match(expired.stderr, /Token expired\./);
+    assert.equal(invalid.status, 2);
+    assert.match(invalid.stderr, /auth: Authentication failed \(invalid key\)\./);
+    assert.match(invalid.stderr, /Token is invalid\./);
+  });
+
+  it("auth login accepts WHETHER_API_KEY in env when --token is omitted", () => {
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
+    const login = spawnSync("node", [CLI_PATH, "auth", "login"], {
+      encoding: "utf8",
+      env: { ...process.env, HOME: homeDir, WHETHER_API_KEY: "env-api-key" },
+    });
+
+    const status = spawnSync("node", [CLI_PATH, "auth", "status", "--json"], {
+      encoding: "utf8",
+      env: { ...process.env, HOME: homeDir },
+    });
+
+    fs.rmSync(homeDir, { recursive: true, force: true });
+
+    assert.equal(login.status, 0);
+    assert.equal(status.status, 0);
+    const parsed = JSON.parse(status.stdout);
+    assert.equal(parsed.authenticated, true);
+    assert.equal(parsed.source, "config");
+  });
+
+  it("auth status returns machine-readable output and clear exit codes", () => {
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
+    const missing = spawnSync("node", [CLI_PATH, "auth", "status", "--json"], {
+      encoding: "utf8",
+      env: { ...process.env, HOME: homeDir },
+    });
+
+    const withEnv = spawnSync("node", [CLI_PATH, "auth", "status", "--json"], {
+      encoding: "utf8",
+      env: { ...process.env, HOME: homeDir, WHETHER_API_KEY: "present" },
+    });
+
+    fs.rmSync(homeDir, { recursive: true, force: true });
+
+    assert.equal(missing.status, 2);
+    const missingParsed = JSON.parse(missing.stdout);
+    assert.equal(missingParsed.authenticated, false);
+    assert.equal(missingParsed.source, "none");
+
+    assert.equal(withEnv.status, 0);
+    const envParsed = JSON.parse(withEnv.stdout);
+    assert.equal(envParsed.authenticated, true);
+    assert.equal(envParsed.source, "env");
   });
 
   it("ping maps network failures to network exit semantics", () => {
