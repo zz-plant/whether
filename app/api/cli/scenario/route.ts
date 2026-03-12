@@ -1,7 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { DEFAULT_THRESHOLDS, evaluateRegime } from "../../../../lib/regimeEngine";
 import { buildScenarioContract } from "../../../../lib/cli/contracts";
 import { applyScenarioOverridesToTreasury } from "../../../../lib/cli/scenarioInputs";
+import { CLI_QUERY_ALLOWLISTS, rejectUnsupportedCliQuery } from "../../../../lib/cli/queryContracts";
 import { loadReportDataSafe } from "../../../../lib/report/reportData";
 import { getRegimeDisplayLabel } from "../../../../lib/regimePresentation";
 
@@ -18,8 +19,11 @@ const parseNumber = (value: string | null) => {
 };
 
 
-export async function GET(request: Request) {
-  const url = new URL(request.url);
+export async function GET(request: NextRequest) {
+  const invalidQuery = rejectUnsupportedCliQuery(request, CLI_QUERY_ALLOWLISTS.scenario);
+  if (invalidQuery) return invalidQuery;
+
+  const url = request.nextUrl;
   const tightness = parseNumber(url.searchParams.get("tightness"));
   const riskAppetite = parseNumber(url.searchParams.get("risk-appetite"));
 

@@ -6,6 +6,16 @@ type CliQueryRequest = {
 
 const toUnique = (values: string[]) => Array.from(new Set(values));
 
+export const CLI_QUERY_ALLOWLISTS = {
+  status: ["asOf", "view"],
+  call: ["asOf"],
+  changes: ["asOf"],
+  diagnostics: ["asOf"],
+  regime: ["asOf"],
+  history: ["asOf", "weeks"],
+  scenario: ["tightness", "risk-appetite"],
+} as const;
+
 export const rejectUnsupportedCliQuery = (request: CliQueryRequest, supportedParams: string[]) => {
   const allowed = new Set(supportedParams);
   const provided = toUnique(Array.from(request.nextUrl.searchParams.keys()));

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { loadReportDataSafe } from "../../../../lib/report/reportData";
-import { parseAsOfSearchParam, parseWeeksSearchParam, rejectUnsupportedCliQuery } from "../../../../lib/cli/queryContracts";
+import { CLI_QUERY_ALLOWLISTS, parseAsOfSearchParam, parseWeeksSearchParam, rejectUnsupportedCliQuery } from "../../../../lib/cli/queryContracts";
 
 export const runtime = "edge";
 export const revalidate = 0;
@@ -10,7 +10,7 @@ const DEFAULT_WINDOW_WEEKS = 12;
 const MAX_WINDOW_WEEKS = 52;
 
 export async function GET(request: NextRequest) {
-  const invalidQuery = rejectUnsupportedCliQuery(request, ["asOf", "weeks"]);
+  const invalidQuery = rejectUnsupportedCliQuery(request, CLI_QUERY_ALLOWLISTS.history);
   if (invalidQuery) return invalidQuery;
 
   const searchParams = parseAsOfSearchParam(request.nextUrl.searchParams.get("asOf"));

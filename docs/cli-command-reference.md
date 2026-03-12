@@ -28,16 +28,34 @@ Whether CLI is an operator decision terminal: **environment → call → changes
 - `whether doctor`
 - `whether completion`
 
-## Common flags
+## Global output and transport flags
+
+Available on any command:
 
 - `--json`
 - `--yaml`
 - `--markdown`
 - `--quiet`
 - `--no-color`
-- `--company <name>`
-- `--stage <name>`
-- `--as-of <YYYY-MM-DD>`
+- `--api-base-url <url>`
+- `--token <token>`
+
+## Command-specific query flags
+
+Only these flags are forwarded to CLI API route handlers:
+
+- `status`: `--as-of <YYYY-MM>`, `--verbose` (maps to `view=expanded`), `--view expanded`
+- `call`: `--as-of <YYYY-MM>`
+- `changes`: `--as-of <YYYY-MM>`
+- `diagnostics`: `--as-of <YYYY-MM>`
+- `regime`: `--as-of <YYYY-MM>`
+- `history`: `--as-of <YYYY-MM>`, `--weeks <n>`
+- `scenario`: `--tightness <n>`, `--risk-appetite <n>`
+
+Notes:
+- Unsupported query flags are not forwarded by the CLI for these routes.
+- API route handlers still return deterministic `400` payloads for unsupported query params if called directly.
+- `--company` and `--stage` are not universal query flags for `app/api/cli/*` routes.
 
 ## Exit codes
 
@@ -85,4 +103,3 @@ Notes:
 - `auth` and `forbidden` return exit code `2`.
 - `network`, `rate limit`, and `server fault` return exit code `1`.
 - The top-level handler also prints `Cause: ...` so the original failure remains visible for debugging.
-

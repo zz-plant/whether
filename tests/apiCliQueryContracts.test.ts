@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { parseAsOfSearchParam, parseWeeksSearchParam, rejectUnsupportedCliQuery } from "../lib/cli/queryContracts";
+import { CLI_QUERY_ALLOWLISTS, parseAsOfSearchParam, parseWeeksSearchParam, rejectUnsupportedCliQuery } from "../lib/cli/queryContracts";
 
 describe("api cli query contracts", () => {
   it("parses supported asOf values into report search params", () => {
@@ -45,5 +45,32 @@ describe("api cli query contracts", () => {
       { requestedWeeks: 200, windowWeeks: 52, truncatedToMax: true },
     );
   });
+
+  it("returns deterministic unsupported-parameter payloads for every cli route allowlist", async () => {
+    const cases: Array<{ route: keyof typeof CLI_QUERY_ALLOWLISTS; accepted: string }> = [
+      { route: "status", accepted: "asOf" },
+      { route: "call", accepted: "asOf" },
+      { route: "changes", accepted: "asOf" },
+      { route: "diagnostics", accepted: "asOf" },
+      { route: "regime", accepted: "asOf" },
+      { route: "history", accepted: "weeks" },
+      { route: "scenario", accepted: "tightness" },
+    ];
+
+    for (const testCase of cases) {
+      const request = {
+        nextUrl: new URL(`http://localhost:3000/api/cli/${testCase.route}?${testCase.accepted}=1&company=acme`),
+      };
+      const response = rejectUnsupportedCliQuery(request, [...CLI_QUERY_ALLOWLISTS[testCase.route]]);
+      assert.ok(response, `expected unsupported payload for route ${testCase.route}`);
+      assert.equal(response.status, 400);
+      assert.deepEqual(await response.json(), {
+        error: "Unsupported query parameters.",
+        unsupported: ["company"],
+        supported: [...CLI_QUERY_ALLOWLISTS[testCase.route]],
+      });
+    }
+  });
+
 
 });

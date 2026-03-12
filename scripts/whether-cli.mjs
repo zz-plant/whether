@@ -254,13 +254,14 @@ Freshness: ${freshnessText(body)}\n\nLeadership should:\n${body.leadershipShould
 const changesText = (body) => `What Changed Since Last Refresh
 Freshness: ${freshnessText(body)}\n\nCHANGED\n${body.changed.map((item) => `- ${item.metric} ${item.from} → ${item.to} (${item.direction}, ${item.impact})`).join("\n")}\n\nREVISIT\n${body.revisit.map((item) => `- ${item}`).join("\n")}\n\nFLIP\n${body.flip.map((item) => `- ${item.condition}${typeof item.distance === "number" ? ` (${item.distance} away)` : ""}`).join("\n")}`;
 
-const routeWithCommonParams = (base, flags) => {
+const routeWithParams = (base, flags, allowedParams) => {
   const params = new URLSearchParams();
-  if (flags["as-of"]) params.set("asOf", String(flags["as-of"]));
-  if (flags.weeks) params.set("weeks", String(flags.weeks));
-  if (flags.view) params.set("view", String(flags.view));
-  if (flags.company) params.set("company", String(flags.company));
-  if (flags.stage) params.set("stage", String(flags.stage));
+  for (const [flagName, queryName] of allowedParams) {
+    const value = flags[flagName];
+    if (value !== undefined && value !== null) {
+      params.set(queryName, String(value));
+    }
+  }
   const query = params.toString();
   return query ? `${base}?${query}` : base;
 };
@@ -273,10 +274,10 @@ const writeFileIfRequested = async (flags, payload, settings) => {
 
 const cmdStatus = async (settings, flags) => {
   if (flags.help) return writeOutput(SUB_HELP.status, settings);
-  const route = routeWithCommonParams("/api/cli/status", {
+  const route = routeWithParams("/api/cli/status", {
     ...flags,
     view: flags.verbose || flags.view === "expanded" ? "expanded" : undefined,
-  });
+  }, [["as-of", "asOf"], ["view", "view"]]);
   const body = await getJson(settings, route);
   const expandedTail = body.view === "expanded"
     ? `
@@ -296,7 +297,7 @@ ${body.boundedDecision.topDeltas.map((item) => `- ${item.metric} ${item.directio
 
 const cmdCall = async (settings, subcommand, flags) => {
   if (flags.help) return writeOutput(SUB_HELP.call, settings);
-  const body = await getJson(settings, routeWithCommonParams("/api/cli/call", flags));
+  const body = await getJson(settings, routeWithParams("/api/cli/call", flags, [["as-of", "asOf"]]));
 
   if (subcommand === "diff") {
     const from = flags.from ?? "previous";
@@ -313,7 +314,7 @@ const cmdCall = async (settings, subcommand, flags) => {
 };
 
 const cmdRegime = async (settings, flags) => {
-  const body = await getJson(settings, routeWithCommonParams("/api/cli/regime", flags));
+  const body = await getJson(settings, routeWithParams("/api/cli/regime", flags, [["as-of", "asOf"]]));
   if (flags.plot) {
     const history = await getJson(settings, "/api/cli/history");
     const plot = history.history.map((item) => `${item.recordDate}  ${item.regime}  ${item.trend}`).join("\n");
@@ -324,15 +325,15 @@ const cmdRegime = async (settings, flags) => {
 };
 
 const cmdChanges = async (settings, flags) => {
-  const body = await getJson(settings, routeWithCommonParams("/api/cli/changes", flags));
+  const body = await getJson(settings, routeWithParams("/api/cli/changes", flags, [["as-of", "asOf"]]));
   writeOutput(settings.output === "text" ? changesText(body) : body, settings);
 };
 
 const cmdDiagnostics = async (settings, subcommand, flags) => {
   if (flags.help) return writeOutput(SUB_HELP.diagnostics, settings);
-  const body = await getJson(settings, routeWithCommonParams("/api/cli/diagnostics", flags));
+  const body = await getJson(settings, routeWithParams("/api/cli/diagnostics", flags, [["as-of", "asOf"]]));
   if (subcommand === "provenance") {
-    const status = await getJson(settings, routeWithCommonParams("/api/cli/status", flags));
+    const status = await getJson(settings, routeWithParams("/api/cli/status", flags, [["as-of", "asOf"]]));
     return writeOutput({ updatedAt: status.updatedAt, confidence: status.confidence, degraded: status.degraded }, settings);
   }
   if (subcommand === "evidence") {
@@ -345,7 +346,7 @@ const cmdDiagnostics = async (settings, subcommand, flags) => {
 
 const cmdHistory = async (settings, subcommand, flags) => {
   if (flags.help) return writeOutput(SUB_HELP.history, settings);
-  const body = await getJson(settings, routeWithCommonParams("/api/cli/history", flags));
+  const body = await getJson(settings, routeWithParams("/api/cli/history", flags, [["as-of", "asOf"], ["weeks", "weeks"]]));
   if (subcommand === "compare") {
     return writeOutput(`Compare mode (${flags.from ?? "start"} -> ${flags.to ?? "end"})
 ${body.history[0]?.recordDate ?? "n/a"} latest snapshot`, settings);

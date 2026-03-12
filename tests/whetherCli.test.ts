@@ -185,11 +185,22 @@ describe("whether cli", () => {
     assert.match(result.stderr, /Cause:/);
   });
 
-  it("surfaces unsupported query params from API for status", async () => {
+  it("drops unsupported flags from status while preserving supported query params", async () => {
+    const requests: string[] = [];
     const server = http.createServer((req, res) => {
+      requests.push(req.url ?? "");
       if ((req.url ?? "").startsWith("/api/cli/status")) {
-        res.writeHead(400, { "content-type": "application/json" });
-        res.end(JSON.stringify({ error: "Unsupported query parameters." }));
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({
+          version: "v1",
+          regime: "Guarded",
+          cyclePhase: "Late",
+          confidence: { label: "MED", score: 66 },
+          trend: "Deteriorating",
+          decisionStability: "unstable",
+          updatedAt: "2026-03",
+          call: { summary: "Stage decisions", do: ["Do x"], avoid: ["Avoid y"], flipConditions: ["tightness < 60"] },
+        }));
         return;
       }
       res.writeHead(404);
@@ -200,15 +211,72 @@ describe("whether cli", () => {
     const { port } = server.address() as { port: number };
     const result = spawnSync(
       "node",
-      [CLI_PATH, "status", "--api-base-url", `http://127.0.0.1:${port}`, "--company", "acme"],
+      [CLI_PATH, "status", "--api-base-url", `http://127.0.0.1:${port}`, "--as-of", "2026-03", "--company", "acme", "--stage", "series-a"],
       { encoding: "utf8" },
     );
     server.close();
 
-    assert.equal(result.status, 1);
-    assert.match(result.stderr, /Request failed \(400\)/);
+    assert.equal(result.status, 0);
+    assert.ok(requests.some((url) => url.includes('/api/cli/status?asOf=2026-03')));
+    assert.ok(requests.every((url) => !url.includes('company=') && !url.includes('stage=')));
   });
 
+  it("forwards command-specific query params for status and history", async () => {
+    const requests: string[] = [];
+    const server = http.createServer((req, res) => {
+      requests.push(req.url ?? "");
+      if ((req.url ?? "").startsWith("/api/cli/status")) {
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({
+          version: "v1",
+          view: "expanded",
+          regime: "Guarded",
+          cyclePhase: "Late",
+          confidence: { label: "MED", score: 66 },
+          trend: "Deteriorating",
+          decisionStability: "unstable",
+          updatedAt: "2026-03-12T12:00:00.000Z",
+          freshness: { line: "Updated 2026-03-12T12:00:00.000Z · live · mixed-reliability" },
+          call: { summary: "Stage decisions", do: ["Do x"], avoid: ["Avoid y"], flipConditions: ["tightness < 60"] },
+          boundedDecision: {
+            guardrailThreshold: "Keep fixed-cost approvals staged.",
+            reversalTrigger: "Re-open only after two confirming reads.",
+            flipConditionsCompact: ["tightness < 60"],
+            topDeltas: [{ metric: "tightness", direction: "down", delta: -1.5 }],
+          },
+          degraded: false,
+        }));
+        return;
+      }
+      if ((req.url ?? "").startsWith("/api/cli/history")) {
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({
+          version: "v1",
+          generatedAt: new Date().toISOString(),
+          requestedWeeks: 8,
+          windowWeeks: 8,
+          maxWeeks: 52,
+          truncatedToMax: false,
+          history: [{ recordDate: "2026-03-10", regime: "Guarded", confidenceLabel: "MED", trend: "stable" }],
+          degraded: false,
+        }));
+        return;
+      }
+      res.writeHead(404);
+      res.end();
+    });
+
+    await new Promise<void>((resolve) => server.listen(0, resolve));
+    const { port } = server.address() as { port: number };
+    const statusResult = spawnSync("node", [CLI_PATH, "status", "--verbose", "--as-of", "2026-03", "--api-base-url", `http://127.0.0.1:${port}`], { encoding: "utf8" });
+    const historyResult = spawnSync("node", [CLI_PATH, "history", "--weeks", "8", "--as-of", "2026-03", "--api-base-url", `http://127.0.0.1:${port}`], { encoding: "utf8" });
+    server.close();
+
+    assert.equal(statusResult.status, 0);
+    assert.equal(historyResult.status, 0);
+    assert.ok(requests.some((url) => url.includes('/api/cli/status?asOf=2026-03&view=expanded')));
+    assert.ok(requests.some((url) => url.includes('/api/cli/history?asOf=2026-03&weeks=8')));
+  });
 
   it("history forwards weeks to API and prints server-bounded metadata", async () => {
     const requests: string[] = [];
@@ -244,31 +312,38 @@ describe("whether cli", () => {
     assert.match(result.stdout, /max 52/);
   });
 
-  it("status --verbose requests expanded contract and renders bounded decision section", async () => {
+  it("sends only route-supported query parameters per command", async () => {
     const requests: string[] = [];
     const server = http.createServer((req, res) => {
       requests.push(req.url ?? "");
-      if ((req.url ?? "").startsWith("/api/cli/status")) {
+      if ((req.url ?? "").startsWith("/api/cli/call")) {
         res.writeHead(200, { "content-type": "application/json" });
-        res.end(JSON.stringify({
-          version: "v1",
-          view: "expanded",
-          regime: "Guarded",
-          cyclePhase: "Late",
-          confidence: { label: "MED", score: 66 },
-          trend: "Deteriorating",
-          decisionStability: "unstable",
-          updatedAt: "2026-03-12T12:00:00.000Z",
-          freshness: { line: "Updated 2026-03-12T12:00:00.000Z · live · mixed-reliability" },
-          call: { summary: "Stage decisions", do: ["Do x"], avoid: ["Avoid y"], flipConditions: ["tightness < 60"] },
-          boundedDecision: {
-            guardrailThreshold: "Keep fixed-cost approvals staged.",
-            reversalTrigger: "Re-open only after two confirming reads.",
-            flipConditionsCompact: ["tightness < 60"],
-            topDeltas: [{ metric: "tightness", direction: "down", delta: -1.5 }],
-          },
-          degraded: false,
-        }));
+        res.end(JSON.stringify({ call: "Guarded", leadershipShould: ["Constrain hiring"], watch: ["labor softening"], updatedAt: "2026-03", confidence: { label: "MED" }, degraded: false }));
+        return;
+      }
+      if ((req.url ?? "").startsWith("/api/cli/changes")) {
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({ changed: [], revisit: [], flip: [], updatedAt: "2026-03", confidence: { label: "MED" }, degraded: false }));
+        return;
+      }
+      if ((req.url ?? "").startsWith("/api/cli/diagnostics")) {
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({ topDrivers: [], generatedAt: "2026-03", degraded: false }));
+        return;
+      }
+      if ((req.url ?? "").startsWith("/api/cli/regime")) {
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({ regime: "Guarded", phase: "Late", confidence: "MED", trend: "Stable", interpretation: "Risk-adjusted posture.", degraded: false }));
+        return;
+      }
+      if ((req.url ?? "").startsWith("/api/cli/history")) {
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({ version: "v1", generatedAt: "2026-03", requestedWeeks: 4, windowWeeks: 4, maxWeeks: 52, truncatedToMax: false, history: [], degraded: false }));
+        return;
+      }
+      if ((req.url ?? "").startsWith("/api/cli/scenario")) {
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({ postureBefore: "Before", postureAfter: "After", inputs: { tightness: 10, riskAppetite: 20 } }));
         return;
       }
       res.writeHead(404);
@@ -277,12 +352,34 @@ describe("whether cli", () => {
 
     await new Promise<void>((resolve) => server.listen(0, resolve));
     const { port } = server.address() as { port: number };
-    const result = spawnSync("node", [CLI_PATH, "status", "--verbose", "--api-base-url", `http://127.0.0.1:${port}`], { encoding: "utf8" });
+    const base = ["--api-base-url", `http://127.0.0.1:${port}`];
+
+    const commands = [
+      ["call", "--as-of", "2026-03", "--weeks", "5", "--company", "acme"],
+      ["changes", "--as-of", "2026-03", "--weeks", "5", "--stage", "seed"],
+      ["diagnostics", "--as-of", "2026-03", "--company", "acme"],
+      ["regime", "--as-of", "2026-03", "--weeks", "5"],
+      ["history", "--as-of", "2026-03", "--weeks", "4", "--company", "acme"],
+      ["scenario", "--tightness", "10", "--risk-appetite", "20", "--as-of", "2026-03", "--company", "acme"],
+    ];
+
+    for (const commandArgs of commands) {
+      const result = spawnSync("node", [CLI_PATH, ...commandArgs, ...base], { encoding: "utf8" });
+      assert.equal(result.status, 0, `command failed: ${commandArgs.join(" ")} :: ${result.stderr}`);
+    }
     server.close();
 
-    assert.equal(result.status, 0);
-    assert.ok(requests.some((url) => url.includes("/api/cli/status?view=expanded")));
-    assert.match(result.stdout, /Bounded Decision:/);
+    const findRequest = (prefix: string) => requests.find((url) => url.startsWith(prefix)) ?? "";
+
+    assert.equal(findRequest("/api/cli/call"), "/api/cli/call?asOf=2026-03");
+    assert.equal(findRequest("/api/cli/changes"), "/api/cli/changes?asOf=2026-03");
+    assert.equal(findRequest("/api/cli/diagnostics"), "/api/cli/diagnostics?asOf=2026-03");
+    assert.equal(findRequest("/api/cli/regime"), "/api/cli/regime?asOf=2026-03");
+    assert.equal(findRequest("/api/cli/history"), "/api/cli/history?asOf=2026-03&weeks=4");
+    assert.equal(findRequest("/api/cli/scenario"), "/api/cli/scenario?tightness=10&risk-appetite=20");
   });
+
+
+
 
 });
