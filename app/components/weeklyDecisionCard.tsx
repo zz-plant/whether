@@ -56,8 +56,8 @@ export type WeeklyDecisionCardProps = {
     primaryRisk: string;
   };
   trendLabel: string;
-  confidenceHistory: WeeklyConfidencePoint[];
-  confidenceTrend: ConfidenceTrendFraming;
+  confidenceHistory?: WeeklyConfidencePoint[];
+  confidenceTrend?: ConfidenceTrendFraming;
   regimeSignalIndicators: Array<{
     key: "tightness" | "riskAppetite" | "baseRate" | "curveSlope";
     label: string;
@@ -542,6 +542,8 @@ type DecisionCallHeaderProps = {
   confidenceLabel: WeeklyDecisionCardProps["confidenceLabel"];
   regimeHeader: WeeklyDecisionCardProps["regimeHeader"];
   trendLabel: WeeklyDecisionCardProps["trendLabel"];
+  confidenceHistory?: WeeklyDecisionCardProps["confidenceHistory"];
+  confidenceTrend?: WeeklyDecisionCardProps["confidenceTrend"];
   regimeSignalIndicators: WeeklyDecisionCardProps["regimeSignalIndicators"];
   transitionWatch: WeeklyDecisionCardProps["transitionWatch"];
   operatingStanceLine: string;
@@ -723,7 +725,7 @@ const formatFlipTriggerLine = (regimeDistance?: WeeklyDecisionCardProps["regimeD
 
 function RegimeBanner({
   statusLabel,
-  regimeKey,
+  regimeKey = "VOLATILE",
   postureLabel,
   stageLabel,
   postureWithStageLabel,
@@ -798,16 +800,17 @@ const ConfidenceMiniChart = ({
         {confidenceHistory.length === 0 ? <p className="text-xs text-slate-400">No confidence history available.</p> : null}
         {confidenceHistory.map((point) => {
           const missing = point.isMissing || typeof point.confidencePercent !== "number";
-          const height = missing ? 14 : Math.max(14, Math.round(((point.confidencePercent - min) / range) * 44) + 14);
+          const confidencePercent = typeof point.confidencePercent === "number" ? point.confidencePercent : null;
+          const height = missing || confidencePercent === null ? 14 : Math.max(14, Math.round(((confidencePercent - min) / range) * 44) + 14);
           return (
             <div key={point.recordDate} className="group relative flex-1">
               <span
                 className={missing ? "block rounded-sm border border-amber-400/80 border-dashed bg-amber-500/5" : "block rounded-sm bg-sky-300/80"}
                 style={{ height }}
-                aria-label={missing ? `${point.recordDate} missing confidence data` : `${point.recordDate} confidence ${Math.round(point.confidencePercent)}%`}
+                aria-label={missing || confidencePercent === null ? `${point.recordDate} missing confidence data` : `${point.recordDate} confidence ${Math.round(confidencePercent)}%`}
               />
               <span className="pointer-events-none absolute -top-7 left-1/2 hidden -translate-x-1/2 whitespace-nowrap rounded bg-slate-900 px-1.5 py-0.5 text-[10px] text-slate-100 group-hover:block">
-                {missing ? `${point.recordDate}: missing` : `${point.recordDate}: ${Math.round(point.confidencePercent)}%`}
+                {missing || confidencePercent === null ? `${point.recordDate}: missing` : `${point.recordDate}: ${Math.round(confidencePercent)}%`}
               </span>
             </div>
           );

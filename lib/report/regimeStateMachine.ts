@@ -23,7 +23,7 @@ export type RegimeStateTransition = {
   committed: boolean;
   pending: boolean;
   transitionReason: string;
-  transitionPendingCount: number;
+  transitionPendingCount?: number;
   snapshot: RegimeMachineSnapshot;
 };
 
@@ -174,11 +174,10 @@ export const advanceRegimeState = (
         riskAppetite: currentSignals.riskAppetite,
         thresholds: currentSignals.thresholds,
         diagnostics: currentSignals.diagnostics,
-        pendingCount: transition.transitionPendingCount,
+        pendingCount: transition.transitionPendingCount ?? 0,
         transitionReason: transition.transitionReason,
       }),
     );
   }
   return transition;
 };
-

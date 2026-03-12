@@ -233,7 +233,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
         fetchedAtLabel="Mar 6, 2026"
         reportDynamics={{ changedSignals: [], anomalySignals: [], totalSignalChanges: 0, regimeChanged: false, directionLabel: "stable" }}
         decisionShiftSummary="No major shift"
-        transitionProbabilities={{ SCARCITY: 0.2, DEFENSIVE: 0.5, VOLATILE: 0.2, EXPANSION: 0.1 }}
+        transitionProbabilities={{ Scarcity: 0.2, Defensive: 0.5, Mixed: 0.2, Expansion: 0.1 }}
         decisionRules={[]}
         roleAwareTemplates={[]}
         executiveOperationalStance={{ expand: [], avoid: [] }}
@@ -254,7 +254,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
           pointsToFlip: 6,
           thresholdDirection: "riseAbove",
         }}
-        regimeVelocity={{ weeklyDeltaPoints: 0, displayLabel: "Flat", confidence: "moderate" }}
+        regimeVelocity={{ status: "insufficient_history", from: "Defensive", to: "Defensive", sampleSize: 0, displayLabel: "Flat" }}
         citation="citation"
       />,
     );

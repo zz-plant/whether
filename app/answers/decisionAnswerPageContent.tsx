@@ -122,7 +122,7 @@ export async function DecisionAnswerPageContent({
         <h2 className="text-lg font-semibold text-slate-100">Citation</h2>
         <p className="text-xs text-slate-300">{callCitation}</p>
         <p className="text-xs text-slate-400">Data date: {recordDateLabel} · freshness: {fetchedAtLabel}.</p>
-        {payload.degraded ? <p className="text-xs text-amber-200">Degraded data mode: {payload.noindexReasons.join(", ") || "cached/stale signals"}; this answer is marked noindex.</p> : null}
+        {payload.degraded ? <p className="text-xs text-amber-200">Degraded data mode: {(payload.noindexReasons ?? []).join(", ") || "cached/stale signals"}; this answer is marked noindex.</p> : null}
       </section>
 
       <section className="weather-panel space-y-3 px-6 py-6">

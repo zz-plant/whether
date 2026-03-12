@@ -99,7 +99,7 @@ export type ReportDynamics = {
 export type ReportEvidenceItem = {
   key: ReportDynamics["changedSignals"][number]["key"];
   title: string;
-  lastUpdated: string | null;
+  lastUpdated?: string | null;
   supportingBullets: string[];
   confidenceLabel: string;
   directionLabel: "Tightening" | "Easing" | "Unchanged";

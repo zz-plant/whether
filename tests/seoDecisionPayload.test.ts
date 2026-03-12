@@ -27,7 +27,7 @@ const baseInput = {
       scope: "Fundraising",
       pauseTrigger: "Pause acceleration if risk appetite falls below 44 or tightness rises above 76.",
       resumeTrigger: "Resume full process when risk appetite > 54 and tightness < 66.",
-      flipConditions: [{ metric: "riskAppetite", operator: ">", value: 54, label: "Risk appetite > 54" }],
+      flipConditions: [{ metric: "riskAppetite" as const, operator: ">" as const, value: 54, label: "Risk appetite > 54" }],
       rationale: "Preserve optionality",
     },
   ],
