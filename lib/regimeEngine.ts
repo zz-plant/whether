@@ -33,7 +33,7 @@ export type RegimeInput = {
 
 export interface RegimeAssessment {
   regime: RegimeKey;
-  regimeTransition: RegimeStateTransition;
+  regimeTransition?: RegimeStateTransition;
   scores: RegimeScores;
   diagnostics: RegimeDiagnostics;
   description: string;

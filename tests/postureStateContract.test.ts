@@ -77,7 +77,9 @@ describe("posture state contract consumers", () => {
       postureLabel: "Contraction",
       decisionEventStore: [
         {
-          id: "evt_1",
+          eventId: "evt_1",
+          sourceVersion: "v1",
+          canonicalTimestampSource: "request-received-at",
           recordedAt: "2026-03-01T10:00:00Z",
           effectiveRecordDate: treasury.record_date,
           idempotencyKey: `${treasury.record_date}:DEFENSIVE`,

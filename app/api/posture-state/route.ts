@@ -31,7 +31,7 @@ export async function POST() {
   const { assessment, treasury, regimeAlert } = reportData;
   const repository = getPostureDecisionEventRepository();
 
-  if (!assessment.regimeTransition.committed) {
+  if (!assessment.regimeTransition?.committed) {
     return NextResponse.json({ appended: false, reason: "No committed transition for current snapshot.", backend: repository.backendStatus() });
   }
 
@@ -39,7 +39,7 @@ export async function POST() {
     recordDate: treasury.record_date,
     sourceIngestedAt: treasury.fetched_at,
     assessment,
-    previousRegime: regimeAlert?.previousRegime ?? assessment.regimeTransition.snapshot.committedState,
+    previousRegime: regimeAlert?.previousRegime ?? assessment.regimeTransition?.snapshot.committedState ?? assessment.regime,
     repository,
   });
 

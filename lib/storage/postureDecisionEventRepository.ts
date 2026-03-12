@@ -2,6 +2,7 @@ import type { RegimeKey } from "../regimeEngine";
 import { buildLineage, type DurableLineage } from "./lineage";
 
 export type PostureDecisionEvent = DurableLineage & {
+  id?: string;
   recordedAt: string;
   effectiveRecordDate: string;
   idempotencyKey: string;

@@ -125,9 +125,9 @@ const buildRecordForRoute = (route: ProgrammaticRouteDefinition, context: Payloa
 
   const mappedDecisionAreas: DecisionArea[] =
     route.kind === "signal-scenario"
-      ? [route.scenario]
+      ? [route.scenario as DecisionArea]
       : route.kind === "decide"
-        ? [route.cluster]
+        ? [route.cluster as DecisionArea]
         : homeBriefModel.decisionRules.map((rule) => rule.area);
 
   const mappedRules = homeBriefModel.decisionRules.filter((rule) => mappedDecisionAreas.includes(rule.area));

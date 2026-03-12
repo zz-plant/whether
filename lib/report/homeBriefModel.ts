@@ -471,11 +471,9 @@ const getMacroSeriesDelta = (macroSeries: MacroSeriesReading[] | undefined, id: 
   return { latest, delta };
 };
 
-const signalSeriesByKey: Record<RegimeSignalKey, MacroSeriesReading["id"]> = {
-  tightness: "FINANCIAL_CONDITIONS_INDEX",
-  riskAppetite: "RISK_SENTIMENT_INDEX",
-  baseRate: "FED_FUNDS_RATE",
-  curveSlope: "YIELD_CURVE_10Y2Y",
+const signalSeriesByKey: Partial<Record<RegimeSignalKey, MacroSeriesReading["id"]>> = {
+  tightness: "CHICAGO_FCI",
+  riskAppetite: "VIX_INDEX",
 };
 
 const fallbackTrendDeltaByKey: Record<RegimeSignalKey, number | null> = {
@@ -504,7 +502,8 @@ const buildRegimeSignalIndicators = ({
       return [assessment.thresholds.riskAppetiteRegime, assessment.scores.riskAppetite];
     }
 
-    const series = macroSeries?.find((entry) => entry.id === signalSeriesByKey[key]);
+    const seriesId = signalSeriesByKey[key];
+    const series = seriesId ? macroSeries?.find((entry) => entry.id === seriesId) : undefined;
     const historyValues = (series?.history ?? []).slice(-3).map((entry) => entry.value).filter((value): value is number => typeof value === "number");
     const latestValue = typeof series?.value === "number" ? [series.value] : [];
     const sparkline = [...historyValues, ...latestValue];
@@ -528,7 +527,10 @@ const buildRegimeSignalIndicators = ({
       };
     }
 
-    const macroDelta = getMacroSeriesDelta(macroSeries, signalSeriesByKey[key]);
+    const seriesId = signalSeriesByKey[key];
+    const macroDelta = seriesId
+      ? getMacroSeriesDelta(macroSeries, seriesId)
+      : { latest: null, delta: null };
     return {
       key,
       label: regimeSignalLabelByKey[key],

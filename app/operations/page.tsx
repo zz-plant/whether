@@ -294,7 +294,6 @@ export default async function OperationsPage({
           regime={assessment.regime}
           provenance={treasuryProvenance}
           showProvenance={false}
-          actionStripItems={actionStripItems}
         />
         <RunwayPlannerPanel assessment={assessment} />
       </SectionedReportPanel>
@@ -312,7 +311,6 @@ export default async function OperationsPage({
           macroSeries={macroSeries}
           provenance={treasuryProvenance}
           showProvenance={false}
-          actionStripItems={actionStripItems}
         />
       </SectionedReportPanel>
 

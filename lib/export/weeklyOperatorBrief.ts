@@ -77,7 +77,7 @@ export const buildWeeklyOperatorBriefPayload = ({
       ? normalizedFlipConditionLabels
       : buildFlipConditionsWithoutTriggerDuplication({
         flipTrigger: postureState?.whatFlipsNext.flipTrigger ?? "",
-        flipConditions: postureState?.whatFlipsNext.thresholds ?? [],
+        flipConditions: [...(postureState?.whatFlipsNext.thresholds ?? [])],
       }),
   };
 };

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
+// @ts-expect-error mjs test helper has no TS declarations
 import { evaluateRefreshQueue } from "../scripts/seo-refresh-queue.mjs";
 
 const basePage = {
