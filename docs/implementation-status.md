@@ -36,10 +36,10 @@ This document consolidates delivery status across product roadmap audits, known 
 
 ### Near-term checklist
 - [x] Create and commit compatibility matrix (`docs/stack-compatibility-matrix.md`).
-- [ ] Capture clean baseline check outputs on current pins.
-- [ ] Complete framework canary spike and publish findings.
-- [ ] Complete Tailwind v4 impact audit.
-- [ ] Verify Cloudflare Pages build compatibility on candidate stack.
+- [x] Capture baseline check outputs on current pins (captured with known pre-existing failures).
+- [x] Complete framework canary spike and publish findings.
+- [x] Complete Tailwind v4 impact audit.
+- [x] Verify Cloudflare Pages build compatibility on candidate stack.
 - [ ] Approve go/no-go with rollback plan before production migration PRs.
 
 ### Mid-term checklist
@@ -49,6 +49,18 @@ This document consolidates delivery status across product roadmap audits, known 
 - [x] Add CI Pages-targeted build gating and compatibility evidence requirement.
 - [x] Add/expand data fallback and metadata parity tests.
 - [ ] Publish post-upgrade runbook updates and ownership handoff notes.
+
+
+### Baseline command outputs (2026-03-12)
+
+**Owner:** Platform (Codex agent run)
+
+| Command | Outcome | Notes | Output log |
+| --- | --- | --- | --- |
+| `bun run lint` | Pass | Completed cleanly on pinned dependencies. | `docs/evidence/stack-modernization/2026-03-12-baseline/lint.log` |
+| `bun run typecheck` | Fail | Pre-existing TypeScript drift across app/test contracts and generated payload typings. | `docs/evidence/stack-modernization/2026-03-12-baseline/typecheck.log` |
+| `bun run test` | Fail | 12 failing tests (weekly card shell assumptions + posture/payload contract assertions). | `docs/evidence/stack-modernization/2026-03-12-baseline/test.log` |
+| `bun run build:pages` | Pass with warnings | Cloudflare Pages artifact emitted; `next-on-pages` reported dynamic route prerender config warnings. | `docs/evidence/stack-modernization/2026-03-12-baseline/build-pages.log` |
 
 ## Proposed next milestone (not started)
 

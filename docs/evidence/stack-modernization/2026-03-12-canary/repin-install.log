@@ -1,0 +1,8 @@
+bun install v1.2.14 (6a363a38)
+
++ eslint-config-next@16.1.6
++ next@16.1.6
++ react@19.2.4
++ react-dom@19.2.4
+
+13 packages installed [177.00ms]

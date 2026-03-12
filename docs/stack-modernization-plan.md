@@ -90,9 +90,9 @@ These actions convert the research output into executable work items while minim
 ### Near-term execution checklist
 - [x] Create and commit the compatibility matrix document (`docs/stack-compatibility-matrix.md`).
 - [ ] Capture clean baseline check outputs on current pins.
-- [ ] Complete framework canary spike and publish findings.
-- [ ] Complete Tailwind v4 impact audit.
-- [ ] Verify Cloudflare Pages build compatibility on candidate stack.
+- [x] Complete framework canary spike and publish findings.
+- [x] Complete Tailwind v4 impact audit.
+- [x] Verify Cloudflare Pages build compatibility on candidate stack.
 - [ ] Approve go/no-go with rollback plan before production migration PRs.
 
 ## Recommended mid-term upgrade actions (next 1–2 quarters)
@@ -149,3 +149,78 @@ These actions operationalize migration outcomes after the near-term spike and ga
 - Compatibility matrix and breaking-change notes.
 - Spike branch report (what broke, how to fix).
 - Migration plan with timeline and owners.
+
+
+
+## 2026-03-12 framework canary spike findings
+
+**Owner:** Platform + Frontend (Codex agent run)
+
+### Candidate versions tested
+- `next@16.2.0-canary.93`
+- `react@19.3.0-canary-46103596-20260305`
+- `react-dom@19.3.0-canary-46103596-20260305`
+- `eslint-config-next@16.2.0-canary.93`
+- `@cloudflare/next-on-pages@1.13.16` (unchanged during spike)
+
+### Commands + outcomes
+- Install canary pins: **pass** (`docs/evidence/stack-modernization/2026-03-12-canary/framework-upgrade-install.log`)
+- `bun run lint`: **terminated / blocked** due lint traversal cost after generated build artifacts (terminated after prolonged run) (`docs/evidence/stack-modernization/2026-03-12-canary/lint.log`)
+- `bun run typecheck`: **fail** with new Next canary typed-route breakage in generated `.next/types/**` (`PrefetchForTypeCheckInternal` export mismatch + stricter route handler param checks), plus baseline repo type drift (`docs/evidence/stack-modernization/2026-03-12-canary/typecheck.log`)
+- `bun run test`: **fail** (same 12 failing baseline tests; no additional canary-only failures were isolated in this run) (`docs/evidence/stack-modernization/2026-03-12-canary/test.log`)
+- `bun run build:pages`: **pass with warnings**; Cloudflare worker artifact emitted (`docs/evidence/stack-modernization/2026-03-12-canary/build-pages.log`)
+- Runtime smoke: **pass** module import of generated worker (`docs/evidence/stack-modernization/2026-03-12-canary/runtime-smoke.log`)
+
+### Blockers
+1. **Noisy baseline before migration**: type/test suites already fail on pinned stable stack; this masks canary-attributed regressions.
+2. **Next canary generated-type incompatibility**: `.next/types/**` references internal exports not available in canary package layout used here.
+3. **Lint runtime pressure after builds**: lint scans become impractical when generated `.vercel` output exists in workspace.
+
+### Remediation notes
+- Stabilize baseline first (type/test red items in baseline logs) before any framework upgrade decision.
+- For canary follow-up, clear generated outputs (`bun run clean`) before lint and exclude deployment artifacts from lint scope if needed.
+- Re-run canary on a clean branch with route-handler signature audit focused on Next 16.2 canary typegen changes.
+
+## 2026-03-12 Tailwind v4 impact audit
+
+**Owner:** Frontend (Codex agent run)
+
+### Current state snapshot
+- Tailwind version: `3.4.17` (current pin).
+- Config model: JS/TS config + PostCSS plugin chain (`tailwind.config.ts`, `postcss.config.js`).
+- CSS entrypoint: `app/globals.css` with legacy layer directives (`@tailwind base/components/utilities`) and heavy `@apply` usage in custom utility classes.
+- Tailwind plugin usage: none (`plugins: []`), which lowers migration complexity.
+
+### Risk map
+- **Config migration risk (medium):** v4 prefers CSS-first config and changes default content detection assumptions. Existing typed `tailwind.config.ts` theme extension will need translation/validation.
+- **PostCSS pipeline risk (medium):** plugin entry changes from `tailwindcss` to the v4 package/plugin expectations; requires lock-step update with build tooling.
+- **Global CSS risk (high):** `app/globals.css` contains broad `@apply`-based composition for shell/panel/tile primitives; visual drift risk is concentrated here.
+- **Component risk (medium-high):** components depending on classes composed in `globals.css` (weekly decision card shell, operations/export tiles, layout chrome) likely exhibit perceptible style shifts under v4 token + preflight differences.
+
+### Migration scope (estimated)
+1. Move/translate Tailwind config to v4-compatible CSS-first setup while preserving semantic color tokens.
+2. Update PostCSS integration and remove deprecated directives/config where required.
+3. Validate all `@apply` chains in `app/globals.css` against v4 utility availability.
+4. Run focused visual QA sweep for top-fold homepage, operations export view, and decision-card components.
+
+### Visual QA entry criteria
+- `bun run build` and `bun run build:pages` pass on migration branch.
+- Zero layout breakage in one-screen weekly brief above the fold.
+- No clipping/contrast regressions in export/share surfaces (`/operations`).
+- Screenshot diff spot-check approved for: homepage hero + weekly decision card, operations export panel, answers detail page shell.
+
+## Rollback strategy (required before production migration)
+
+### Trigger conditions
+Rollback immediately if any of the following occur during rollout/canary deploy:
+1. Cloudflare Pages build fails or worker artifact cannot be generated.
+2. Runtime smoke fails (worker import/load or core route health check fails).
+3. Typecheck or test regressions exceed known baseline failure envelope without approved exceptions.
+4. Visual QA detects decision-transmission regressions on weekly brief or export artifacts.
+
+### Re-pin steps
+1. Restore pinned stable versions in `package.json` (`next@16.1.6`, `react@19.2.4`, `react-dom@19.2.4`, `eslint-config-next@16.1.6`, `tailwindcss@3.4.17`).
+2. Reinstall exact lockfile state: `bun install --frozen-lockfile` (or restore committed `bun.lock` and run `bun install`).
+3. Clean generated upgrade artifacts: `bun run clean`.
+4. Re-run baseline verification quartet: `bun run lint`, `bun run typecheck`, `bun run test`, `bun run build:pages`.
+5. Attach rollback evidence logs to implementation-status + compatibility matrix before any re-attempt.

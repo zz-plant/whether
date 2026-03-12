@@ -1,0 +1,3 @@
+$ eslint . --max-warnings=0
+[BABEL] Note: The code generator has deoptimised the styling of /workspace/whether/.vercel/output/functions/api/treasury.func/index.js as it exceeds the max of 500KB.
+error: script "lint" was terminated by signal SIGTERM (Polite quit request)

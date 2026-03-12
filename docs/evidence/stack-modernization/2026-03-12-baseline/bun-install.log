@@ -1,0 +1,26 @@
+bun install v1.2.14 (6a363a38)
+
++ @cloudflare/next-on-pages@1.13.16
++ @modelcontextprotocol/sdk@1.27.1
++ @types/node@24.4.0
++ @types/react@19.2.14
++ @types/react-dom@19.2.3
++ autoprefixer@10.4.24
++ eslint@9.38.0
++ eslint-config-next@16.1.6
++ postcss@8.5.6
++ tailwindcss@3.4.17
++ tsx@4.21.0
++ typescript@5.9.3
++ vercel@50.28.0
++ wrangler@4.71.0
++ @base-ui/react@1.2.0
++ lucide-react@0.577.0
++ next@16.1.6
++ react@19.2.4
++ react-dom@19.2.4
++ simple-icons@16.10.0
++ web-haptics@0.0.6
++ zod@4.3.6
+
+736 packages installed [15.96s]
