@@ -88,6 +88,7 @@ export type WeeklyDecisionCardProps = {
   }>;
   recordDateLabel: string;
   fetchedAtLabel: string;
+  sharedFreshnessLine?: string;
   reportDynamics: ReportDynamics;
   decisionShiftSummary: string;
   transitionProbabilities: Record<ForecastRegimeLabel, number>;
@@ -662,7 +663,7 @@ export function DecisionCallHeader({
           <p className="weather-live-chip rounded-full border border-emerald-400/45 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-emerald-100">Confidence {confidenceLabel} ({Math.round(confidencePercent)}%)</p>
           <p className="weather-live-chip rounded-full border border-slate-600/70 bg-slate-900/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-200">Trend {trendLabel} · Watch {transitionWatch}</p>
           <p className="weather-live-chip rounded-full border border-slate-600/70 bg-slate-900/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-200">Freshness {freshnessLabel}</p>
-          <p className="weather-live-chip rounded-full border border-slate-600/70 bg-slate-900/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-200">Trust {trustCueLine}</p>
+          <p className="weather-live-chip rounded-full border border-slate-600/70 bg-slate-900/80 px-3 py-1 text-[11px] font-semibold tracking-[0.04em] text-slate-200">{trustCueLine}</p>
         </div>
 
         {needsTrustWarning ? (
@@ -1133,6 +1134,7 @@ export function WeeklyDecisionCard({
   canonicalFlipConditions = [],
   recordDateLabel,
   fetchedAtLabel,
+  sharedFreshnessLine,
   reportDynamics,
   decisionShiftSummary: _decisionShiftSummary,
   transitionProbabilities,
@@ -1158,7 +1160,7 @@ export function WeeklyDecisionCard({
   actions,
 }: WeeklyDecisionCardProps) {
   const freshnessLabel = fetchedAtLabel.trim().length > 0 ? fetchedAtLabel : "Unavailable";
-  const trustCueLine = buildCompactTrustSummary({
+  const trustCueLine = sharedFreshnessLine ?? buildCompactTrustSummary({
     confidenceLabel,
     freshnessLabel,
     isFallbackSnapshot,

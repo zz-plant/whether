@@ -1,6 +1,14 @@
 import { deriveRegimeStage } from "../regimePresentation";
 import type { PostureStateContract } from "../report/postureStateContract";
 import type { ReportData } from "../report/reportData";
+import { buildSharedFreshnessMetadata } from "../report/trustStatus";
+
+export type CliFreshnessContract = {
+  updatedLabel: string;
+  marker: "live" | "degraded";
+  confidenceCue: string;
+  line: string;
+};
 
 export type CliStatusContract = {
   version: "v1";
@@ -18,6 +26,7 @@ export type CliStatusContract = {
     flipConditions: string[];
   };
   degraded: boolean;
+  freshness: CliFreshnessContract;
 };
 
 export type CliCallContract = {
@@ -27,6 +36,7 @@ export type CliCallContract = {
   leadershipShould: string[];
   watch: string[];
   degraded: boolean;
+  freshness: CliFreshnessContract;
 };
 
 export type CliChangesContract = {
@@ -45,6 +55,7 @@ export type CliChangesContract = {
     distance: number | null;
   }>;
   degraded: boolean;
+  freshness: CliFreshnessContract;
 };
 
 export type CliRegimeContract = {
@@ -104,7 +115,15 @@ const parseDistance = (condition: string, reportData: ReportData): number | null
   return Number((target - current).toFixed(2));
 };
 
-export const buildCliStatusContract = ({ reportData, postureState, degraded }: { reportData: ReportData; postureState: PostureStateContract; degraded: boolean }): CliStatusContract => ({
+export const buildCliStatusContract = ({ reportData, postureState, degraded }: { reportData: ReportData; postureState: PostureStateContract; degraded: boolean }): CliStatusContract => {
+  const freshness = buildSharedFreshnessMetadata({
+    updatedAtLabel: reportData.treasury.fetched_at,
+    confidenceLabel: postureState.currentState.confidenceLabel,
+    isFallbackSnapshot: Boolean(reportData.treasury.fallback_at || reportData.treasury.fallback_reason),
+    isDegraded: degraded,
+  });
+
+  return {
   version: "v1",
   generatedAt: new Date().toISOString(),
   updatedAt: reportData.treasury.fetched_at,
@@ -123,7 +142,9 @@ export const buildCliStatusContract = ({ reportData, postureState, degraded }: {
     flipConditions: [...postureState.whatFlipsNext.thresholds],
   },
   degraded,
-});
+  freshness,
+};
+};
 
 export const buildCliCallContract = ({ reportData, postureState, degraded }: { reportData: ReportData; postureState: PostureStateContract; degraded: boolean }): CliCallContract => ({
   version: "v1",
@@ -132,6 +153,12 @@ export const buildCliCallContract = ({ reportData, postureState, degraded }: { r
   leadershipShould: reportData.startItems,
   watch: [...postureState.whatFlipsNext.thresholds],
   degraded,
+  freshness: buildSharedFreshnessMetadata({
+    updatedAtLabel: reportData.treasury.fetched_at,
+    confidenceLabel: postureState.currentState.confidenceLabel,
+    isFallbackSnapshot: Boolean(reportData.treasury.fallback_at || reportData.treasury.fallback_reason),
+    isDegraded: degraded,
+  }),
 });
 
 export const buildCliChangesContract = ({ reportData, postureState, degraded }: { reportData: ReportData; postureState: PostureStateContract; degraded: boolean }): CliChangesContract => ({
@@ -154,6 +181,12 @@ export const buildCliChangesContract = ({ reportData, postureState, degraded }: 
     distance: parseDistance(condition, reportData),
   })),
   degraded,
+  freshness: buildSharedFreshnessMetadata({
+    updatedAtLabel: reportData.treasury.fetched_at,
+    confidenceLabel: postureState.currentState.confidenceLabel,
+    isFallbackSnapshot: Boolean(reportData.treasury.fallback_at || reportData.treasury.fallback_reason),
+    isDegraded: degraded,
+  }),
 });
 
 export const buildCliRegimeContract = ({ reportData, postureState, degraded }: { reportData: ReportData; postureState: PostureStateContract; degraded: boolean }): CliRegimeContract => ({

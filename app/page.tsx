@@ -21,7 +21,7 @@ import {
 import { HistoricalBanner } from "./components/boardBriefSections";
 import { ReportShell } from "./components/reportShell";
 import { reportPageLinks } from "../lib/report/reportNavigation";
-import { buildTrustStatus } from "../lib/report/trustStatus";
+import { buildSharedFreshnessMetadata, buildTrustStatus } from "../lib/report/trustStatus";
 import { WeeklyDecisionCard } from "./components/weeklyDecisionCard";
 import { buildBoardBrief, buildCallCitation } from "../lib/export/briefBuilders";
 import {
@@ -327,6 +327,13 @@ export const HomePageReportContent = async ({
     treasuryProvenance,
     postureState,
   }, { overlaySector: homepageOverlaySector });
+  const sharedFreshness = buildSharedFreshnessMetadata({
+    updatedAtLabel: fetchedAtLabel,
+    confidenceLabel: homeBriefModel.confidenceLabel,
+    isFallbackSnapshot: isFallback,
+    isDegraded: !reportResult.ok,
+  });
+
   const displayRegime = getRegimeDisplayLabel({
     regime: assessment.regime,
     momentum: reportDynamics.directionLabel,
@@ -352,7 +359,7 @@ export const HomePageReportContent = async ({
     failureModes: homeBriefModel.failureModes,
     actionStripItems: homeBriefModel.actionStripItems,
     confidenceLabel: homeBriefModel.confidenceLabel,
-    freshnessLabel: fetchedAtLabel.trim().length > 0 ? fetchedAtLabel : "Unavailable",
+    freshnessLabel: sharedFreshness.updatedLabel,
     postureState,
   };
   const boardSummary = buildBoardBrief(assessment, treasury, sensors, macroSeries, exportLayerOptions);
@@ -477,6 +484,7 @@ export const HomePageReportContent = async ({
         canonicalDecisionCopy={canonicalDecisionCopy}
         recordDateLabel={recordDateLabel}
         fetchedAtLabel={fetchedAtLabel}
+        sharedFreshnessLine={sharedFreshness.line}
         reportDynamics={reportDynamics}
         decisionShiftSummary={homeBriefModel.decisionShiftSummary}
         transitionProbabilities={homeBriefModel.transitionProbabilities}

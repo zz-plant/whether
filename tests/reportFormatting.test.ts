@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { formatRegimeSignalValue, formatTrendArrow } from "../lib/report/reportFormatting";
+import { buildSharedFreshnessMetadata } from "../lib/report/trustStatus";
 
 describe("reportFormatting regime signal helpers", () => {
   it("formats regime signal values with score vs decimal precision", () => {
@@ -17,4 +18,22 @@ describe("reportFormatting regime signal helpers", () => {
     assert.equal(formatTrendArrow(0), "→");
     assert.equal(formatTrendArrow(null), "→");
   });
+
+
+  it("builds compact shared freshness wording for cross-channel use", () => {
+    const live = buildSharedFreshnessMetadata({
+      updatedAtLabel: "Mar 12, 2026 12:00 UTC",
+      confidenceLabel: "HIGH",
+      isFallbackSnapshot: false,
+    });
+    assert.equal(live.line, "Updated Mar 12, 2026 12:00 UTC · Live snapshot · Confidence HIGH (fresh cadence)");
+
+    const degraded = buildSharedFreshnessMetadata({
+      updatedAtLabel: "Mar 12, 2026 12:00 UTC",
+      confidenceLabel: "LOW",
+      isFallbackSnapshot: true,
+    });
+    assert.equal(degraded.line, "Updated Mar 12, 2026 12:00 UTC · Degraded snapshot · Confidence LOW (stage decisions)");
+  });
+
 });

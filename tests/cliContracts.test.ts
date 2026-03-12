@@ -46,13 +46,19 @@ describe("cli contracts", () => {
     assert.equal(status.version, "v1");
     assert.equal(status.decisionStability, "unstable");
     assert.equal(status.call.do[0], "Selective hiring for revenue-linked roles");
+    assert.equal(status.freshness.marker, "live");
+    assert.match(status.freshness.line, /Updated 2026-03-12T12:00:00.000Z/);
+
 
     const call = buildCliCallContract({ reportData, postureState, degraded: false });
     assert.match(call.call, /Stage decisions/);
+    assert.equal(call.freshness.marker, "live");
 
     const changes = buildCliChangesContract({ reportData, postureState, degraded: false });
     assert.equal(changes.changed[0].from, 68);
     assert.equal(changes.changed[0].to, 62);
+    assert.equal(changes.freshness.marker, "live");
+    assert.equal(changes.freshness.line, status.freshness.line);
 
     const regime = buildCliRegimeContract({ reportData, postureState, degraded: false });
     assert.equal(regime.regime, "Guarded Expansion");

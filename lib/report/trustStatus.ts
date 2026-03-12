@@ -1,5 +1,12 @@
 type TrustStatusTone = "stable" | "warning" | "historical";
 
+export type SharedFreshnessMetadata = {
+  updatedLabel: string;
+  marker: "live" | "degraded";
+  confidenceCue: string;
+  line: string;
+};
+
 export type FailureModeWarning = {
   id: "boundary-whipsaw" | "stale-cached" | "anomaly-divergence";
   warning: string;
@@ -11,6 +18,38 @@ const FALLBACK_FRESHNESS_LABEL = "Unavailable";
 const normalizeFreshnessLabel = (freshnessLabel: string) => {
   const trimmedLabel = freshnessLabel.trim();
   return trimmedLabel.length > 0 ? trimmedLabel : FALLBACK_FRESHNESS_LABEL;
+};
+
+const freshnessCueByConfidence: Record<"HIGH" | "MED" | "LOW", string> = {
+  HIGH: "fresh cadence",
+  MED: "confirm before scaling",
+  LOW: "stage decisions",
+};
+
+export const buildSharedFreshnessMetadata = ({
+  updatedAtLabel,
+  confidenceLabel,
+  isFallbackSnapshot,
+  isDegraded,
+}: {
+  updatedAtLabel: string;
+  confidenceLabel: "HIGH" | "MED" | "LOW";
+  isFallbackSnapshot: boolean;
+  isDegraded?: boolean;
+}): SharedFreshnessMetadata => {
+  const updatedLabel = normalizeFreshnessLabel(updatedAtLabel);
+  const marker = isFallbackSnapshot || isDegraded ? "degraded" : "live";
+  const confidenceCue = marker === "degraded"
+    ? "stage decisions"
+    : freshnessCueByConfidence[confidenceLabel];
+  const markerLabel = marker === "degraded" ? "Degraded snapshot" : "Live snapshot";
+
+  return {
+    updatedLabel,
+    marker,
+    confidenceCue,
+    line: `Updated ${updatedLabel} · ${markerLabel} · Confidence ${confidenceLabel} (${confidenceCue})`,
+  };
 };
 
 const isUnavailableFreshness = (freshnessLabel: string) =>

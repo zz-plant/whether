@@ -162,10 +162,48 @@ const getJson = async (settings, endpoint) => {
   return response.json();
 };
 
-const statusText = (body) => `Whether — Current Status\n\nRegime:             ${body.regime}\nCycle Phase:        ${body.cyclePhase}\nConfidence:         ${body.confidence.label} (${body.confidence.score})\nTrend:              ${body.trend}\nDecision Stability: ${body.decisionStability}\nUpdated:            ${body.updatedAt}\n\nThis Week's Call:\n${body.call.summary}\n\nDo:\n${body.call.do.map((item) => `- ${item}`).join("\n")}\n\nAvoid:\n${body.call.avoid.map((item) => `- ${item}`).join("\n")}\n\nFlip Conditions:\n${body.call.flipConditions.map((item) => `- ${item}`).join("\n")}`;
+const resolveFreshnessLine = (body) => body?.freshness?.line ?? `Updated ${body.updatedAt ?? "Unavailable"}`;
 
-const callText = (body) => `Call: ${body.call}\n\nLeadership should:\n${body.leadershipShould.map((item) => `- ${item}`).join("\n")}\n\nWatch:\n${body.watch.map((item) => `- ${item}`).join("\n")}`;
-const changesText = (body) => `What Changed Since Last Refresh\n\nCHANGED\n${body.changed.map((item) => `- ${item.metric} ${item.from} → ${item.to} (${item.direction}, ${item.impact})`).join("\n")}\n\nREVISIT\n${body.revisit.map((item) => `- ${item}`).join("\n")}\n\nFLIP\n${body.flip.map((item) => `- ${item.condition}${typeof item.distance === "number" ? ` (${item.distance} away)` : ""}`).join("\n")}`;
+const statusText = (body) => `Whether — Current Status
+
+Regime:             ${body.regime}
+Cycle Phase:        ${body.cyclePhase}
+Confidence:         ${body.confidence.label} (${body.confidence.score})
+Trend:              ${body.trend}
+Decision Stability: ${body.decisionStability}
+Freshness:          ${resolveFreshnessLine(body)}
+
+This Week's Call:
+${body.call.summary}
+
+Do:
+${body.call.do.map((item) => `- ${item}`).join("\n")}
+
+Avoid:
+${body.call.avoid.map((item) => `- ${item}`).join("\n")}
+
+Flip Conditions:
+${body.call.flipConditions.map((item) => `- ${item}`).join("\n")}`;
+
+const callText = (body) => `Call: ${body.call}
+Freshness: ${resolveFreshnessLine(body)}
+
+Leadership should:
+${body.leadershipShould.map((item) => `- ${item}`).join("\n")}
+
+Watch:
+${body.watch.map((item) => `- ${item}`).join("\n")}`;
+const changesText = (body) => `What Changed Since Last Refresh
+Freshness: ${resolveFreshnessLine(body)}
+
+CHANGED
+${body.changed.map((item) => `- ${item.metric} ${item.from} → ${item.to} (${item.direction}, ${item.impact})`).join("\n")}
+
+REVISIT
+${body.revisit.map((item) => `- ${item}`).join("\n")}
+
+FLIP
+${body.flip.map((item) => `- ${item.condition}${typeof item.distance === "number" ? ` (${item.distance} away)` : ""}`).join("\n")}`;
 
 const routeWithCommonParams = (base, flags) => {
   const params = new URLSearchParams();
@@ -228,7 +266,7 @@ const cmdDiagnostics = async (settings, subcommand, flags) => {
   const body = await getJson(settings, "/api/cli/diagnostics");
   if (subcommand === "provenance") {
     const status = await getJson(settings, "/api/cli/status");
-    return writeOutput({ updatedAt: status.updatedAt, confidence: status.confidence, degraded: status.degraded }, settings);
+    return writeOutput({ updatedAt: status.updatedAt, confidence: status.confidence, degraded: status.degraded, freshness: status.freshness }, settings);
   }
   if (subcommand === "evidence") {
     const metric = flags.metric ? String(flags.metric).toLowerCase() : null;
