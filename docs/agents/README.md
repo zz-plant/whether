@@ -2,6 +2,45 @@
 
 Task-focused guidance for AI agents and code assistants working in this repository.
 
+## Agent Quickstart (non-interactive)
+
+Use this first for copy-paste setup in CI/headless shells before reading deeper guides.
+
+### Install
+```bash
+bun install
+bun run cli:whether -- install --ci --api-base-url "${WHETHER_API_URL:-http://localhost:3000}" --token "${WHETHER_TOKEN:-}"
+```
+
+If config-file writes are blocked, skip `install` and set env vars:
+
+```bash
+export WHETHER_API_URL="${WHETHER_API_URL:-http://localhost:3000}"
+export WHETHER_TOKEN="${WHETHER_TOKEN:-}"
+```
+
+### Auth status
+```bash
+bun run cli:whether -- auth status
+```
+
+### Smoke test
+```bash
+bun run cli:whether -- --version
+bun run cli:whether -- ping --json
+bun run cli:whether -- brief --json
+```
+
+### Common blockers
+- **403/WAF**: verify `"$WHETHER_API_URL/api/health"`; if edge policy blocks CLI routes, use fallback API path `GET /api/agent?cadence=weekly` from `agent-interface.md`.
+- **Missing PATH**: run `bun run cli:whether -- <command>` instead of relying on global `whether`.
+- **No package install**: skip CLI bootstrap and pull briefing data directly:
+  - `curl -fsS "${WHETHER_API_URL:-http://localhost:3000}/api/agent?cadence=weekly"`
+
+Cross-links:
+- Fallback API path: `agent-interface.md#option-a-http-interface`
+- Auth command family: `../cli-command-reference.md#whether-cli-v1`
+
 ## How to use this hub
 1. Start with `../../AGENTS.md` for instruction priority and operating constraints.
 2. Read `setup.md` for install/run/check commands.
