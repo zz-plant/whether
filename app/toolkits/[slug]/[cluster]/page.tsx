@@ -6,15 +6,15 @@ import { findToolkitDefinition } from "../../../../lib/decisionDomainCatalog";
 import { readProgrammaticPayload } from "../../../../lib/seo/programmaticPayloadBuilder";
 import type { SeoDecisionPayload } from "../../../../lib/report/seoDecisionPayload";
 import { findSignalsCluster } from "../../../signals/clusterRoutes";
-import { findToolkitCluster, toolkitClusterStaticParams } from "../../clusterRoutes";
+import { findToolkitCluster, toolkitCanonicalClusterStaticParams } from "../../clusterRoutes";
 
 type Params = { slug: string; cluster: string };
 
-export const dynamicParams = false;
+export const dynamicParams = true;
 export const revalidate = 900;
 
 export function generateStaticParams() {
-  return toolkitClusterStaticParams;
+  return toolkitCanonicalClusterStaticParams;
 }
 
 
