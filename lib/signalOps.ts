@@ -1,6 +1,27 @@
 import type { RegimeAssessment, RegimeChangeReason } from "./regimeEngine";
+import { applyConfidenceGate, buildDecisionDeltaRules } from "./alerts/decisionDeltaRules";
 
 export type AlertChannel = "slack" | "email" | "webhook";
+
+export type AlertGate = "pass" | "downgrade";
+
+export type DecisionDelta = {
+  code: string;
+  decisionArea: "posture" | "hiring" | "spend" | "risk";
+  actionText: string;
+  triggerValue: number;
+  thresholdLabel: string;
+  thresholdValue: number;
+  confidence: RegimeAssessment["diagnostics"]["confidence"];
+  reversalText: string;
+  gate: AlertGate;
+  severe: boolean;
+};
+
+export type DecisionTriggerState = {
+  crossed: boolean;
+  sustainedPeriods: number;
+};
 
 export type SignalAlertPayload = {
   previousRecordDate: string;
@@ -8,8 +29,14 @@ export type SignalAlertPayload = {
   previousAssessment: RegimeAssessment;
   currentAssessment: RegimeAssessment;
   reasons: RegimeChangeReason[];
+  decisionDeltas: DecisionDelta[];
+  triggerStates: Record<string, DecisionTriggerState>;
   sourceUrls: string[];
   timeMachineHref: string;
+};
+
+export type SignalAlertInputPayload = Omit<SignalAlertPayload, "decisionDeltas" | "triggerStates" | "reasons"> & {
+  reasons?: RegimeChangeReason[];
 };
 
 export type RegimeAlertEvent = {
@@ -28,20 +55,62 @@ export type AlertDeliveryEvent = {
 };
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+const MIN_SUSTAINED_PERIODS = 2;
+
+export const buildSignalAlertPayload = (
+  payload: SignalAlertInputPayload,
+  latestAlert?: RegimeAlertEvent,
+): SignalAlertPayload => {
+  const candidates = buildDecisionDeltaRules(payload.previousAssessment, payload.currentAssessment);
+  const gated = applyConfidenceGate(candidates, payload.currentAssessment.diagnostics.confidence);
+  const previousStates = latestAlert?.payload.triggerStates ?? {};
+
+  const decisionDeltas: DecisionDelta[] = gated.map((delta) => ({
+    code: delta.code,
+    decisionArea: delta.decisionArea,
+    actionText: delta.action,
+    triggerValue: delta.metricValue,
+    thresholdLabel: delta.thresholdLabel,
+    thresholdValue: delta.thresholdValue,
+    confidence: payload.currentAssessment.diagnostics.confidence,
+    reversalText: delta.reversal,
+    gate: delta.gate,
+    severe: delta.severe,
+  }));
+
+  const triggerStates = decisionDeltas.reduce<Record<string, DecisionTriggerState>>((acc, delta) => {
+    const previous = previousStates[delta.code];
+    acc[delta.code] = {
+      crossed: true,
+      sustainedPeriods: previous?.crossed ? previous.sustainedPeriods + 1 : 1,
+    };
+    return acc;
+  }, {});
+
+  const reasons: RegimeChangeReason[] =
+    decisionDeltas.length > 0
+      ? decisionDeltas.map((delta) => ({
+          code: delta.code,
+          message: `${delta.actionText} Trigger ${delta.triggerValue.toFixed(2)} vs ${delta.thresholdLabel} ${delta.thresholdValue.toFixed(2)}. ${delta.reversalText}`,
+        }))
+      : payload.reasons ?? [{ code: "signals-updated", message: "Signal values updated with no threshold crossing." }];
+
+  return {
+    ...payload,
+    reasons,
+    decisionDeltas,
+    triggerStates,
+  };
+};
 
 export const shouldCreateSignalAlert = (
   payload: SignalAlertPayload,
   latestAlert?: RegimeAlertEvent
 ) => {
-  const hasRequiredTrigger = payload.reasons.some((reason) =>
-    [
-      "regime-change",
-      "tightness-upshift",
-      "tightness-downshift",
-      "risk-appetite-upshift",
-      "risk-appetite-downshift",
-    ].includes(reason.code)
-  );
+  const hasRequiredTrigger = payload.decisionDeltas.some((delta) => {
+    const state = payload.triggerStates[delta.code];
+    return delta.severe || (state?.sustainedPeriods ?? 0) >= MIN_SUSTAINED_PERIODS;
+  });
 
   if (!hasRequiredTrigger) {
     return false;
@@ -60,8 +129,17 @@ export const shouldCreateSignalAlert = (
   const withinCooldown = nowMs - latestMs < ONE_DAY_MS;
   const regimeFlippedAgain =
     payload.currentAssessment.regime !== latestAlert.payload.currentAssessment.regime;
+  const sameDeltaSet =
+    payload.decisionDeltas.length === latestAlert.payload.decisionDeltas.length &&
+    payload.decisionDeltas.every((delta) =>
+      latestAlert.payload.decisionDeltas.some(
+        (prior) =>
+          prior.code === delta.code &&
+          Math.round(prior.triggerValue * 100) === Math.round(delta.triggerValue * 100),
+      ),
+    );
 
-  if (withinCooldown && !regimeFlippedAgain) {
+  if ((withinCooldown && !regimeFlippedAgain) || sameDeltaSet) {
     return false;
   }
 
@@ -69,8 +147,10 @@ export const shouldCreateSignalAlert = (
 };
 
 export const buildDeliverySummary = (alert: RegimeAlertEvent) => {
-  const reasons = alert.payload.reasons.map((reason) => reason.code).join(", ");
-  return `${alert.payload.currentAssessment.regime} (${alert.payload.currentRecordDate}) · ${reasons}`;
+  const deltas = alert.payload.decisionDeltas
+    .map((delta) => `${delta.decisionArea}:${delta.code}`)
+    .join(", ");
+  return `${alert.payload.currentAssessment.regime} (${alert.payload.currentRecordDate}) · ${deltas || "signals-updated"}`;
 };
 
 export const buildWeeklyDigest = (alerts: RegimeAlertEvent[]) => {
@@ -94,7 +174,9 @@ export const buildWeeklyDigest = (alerts: RegimeAlertEvent[]) => {
     bullets: [
       `Tightness delta: ${tightnessDelta >= 0 ? "+" : ""}${tightnessDelta.toFixed(2)}.`,
       `Risk appetite delta: ${riskDelta >= 0 ? "+" : ""}${riskDelta.toFixed(2)}.`,
-      ...latest.payload.reasons.map((reason) => `${reason.code}: ${reason.message}`),
+      ...latest.payload.decisionDeltas.map(
+        (delta) => `${delta.decisionArea}: ${delta.actionText} Reversal: ${delta.reversalText}`,
+      ),
     ],
   };
 };
