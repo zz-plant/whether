@@ -5,6 +5,7 @@ import {
   buildCliChangesContract,
   buildCliRegimeContract,
   buildCliStatusContract,
+  buildCliStatusExpandedContract,
   buildScenarioContract,
 } from "../lib/cli/contracts";
 
@@ -21,11 +22,15 @@ const reportData = {
   reportDynamics: {
     directionLabel: "deteriorating",
     changedSignals: [{ key: "tightness", delta: -6 }],
+    anomalySignals: [{ reason: "spread divergence" }, { reason: "macro drift" }],
   },
   playbook: { why: "Proceed selectively while protecting downside." },
   actionNowShort: "Stage decisions. Avoid irreversible spend.",
   startItems: ["Selective hiring for revenue-linked roles"],
   stopItems: ["Broad headcount expansion"],
+  guardrailThreshold: "Do not approve broad hiring without 2-cycle confirmation.",
+  flipThreshold: "Flip if tightness stays below 60.",
+  treasuryProvenance: { statusLabel: "Cached (fallback)", ageLabel: "26h" },
 } as any;
 
 const postureState = {
@@ -37,6 +42,8 @@ const postureState = {
   },
   whatFlipsNext: {
     thresholds: ["tightness < 60 for 2 consecutive refreshes"],
+    reversalConditions: ["risk appetite > 50 for 2 consecutive refreshes"],
+    flipTrigger: "tightness < 60 for 2 consecutive refreshes",
   },
 } as any;
 
@@ -56,6 +63,17 @@ describe("cli contracts", () => {
 
     const regime = buildCliRegimeContract({ reportData, postureState, degraded: false });
     assert.equal(regime.regime, "Guarded Expansion");
+  });
+
+  it("builds expanded status contract", () => {
+    const status = buildCliStatusExpandedContract({ reportData, postureState, degraded: false });
+    assert.equal(status.version, "v1");
+    assert.equal(status.view, "expanded");
+    assert.equal(status.guardrails.threshold, "Do not approve broad hiring without 2-cycle confirmation.");
+    assert.equal(status.boundedDecisionSummary.topSignalDeltas[0]?.metric, "tightness");
+    assert.equal(status.trust.fallback, false);
+    assert.match(status.trust.cueLine, /Signal reliability HIGH/);
+    assert.ok(status.trust.warnings.length >= 1);
   });
 
   it("builds scenario contract", () => {

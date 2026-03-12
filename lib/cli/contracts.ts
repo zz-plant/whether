@@ -1,4 +1,9 @@
 import { deriveRegimeStage } from "../regimePresentation";
+import {
+  buildCompactTrustSummary,
+  buildFailureModeWarnings,
+  buildWeeklyTrustCueLine,
+} from "../report/trustStatus";
 import type { PostureStateContract } from "../report/postureStateContract";
 import type { ReportData } from "../report/reportData";
 
@@ -16,6 +21,48 @@ export type CliStatusContract = {
     do: string[];
     avoid: string[];
     flipConditions: string[];
+  };
+  degraded: boolean;
+};
+
+export type CliStatusExpandedContract = {
+  version: "v1";
+  view: "expanded";
+  generatedAt: string;
+  updatedAt: string;
+  regime: string;
+  cyclePhase: string;
+  confidence: { label: string; score: number };
+  trend: string;
+  decisionStability: "stable" | "unstable";
+  call: {
+    summary: string;
+    do: string[];
+    avoid: string[];
+  };
+  guardrails: {
+    threshold: string;
+    reversalTrigger: string;
+  };
+  flipConditionsCompact: string[];
+  boundedDecisionSummary: {
+    action: string;
+    threshold: string;
+    reversalCondition: string;
+    topSignalDeltas: Array<{
+      metric: "tightness" | "risk_appetite" | "base_rate" | "curve_slope";
+      delta: number;
+      direction: "up" | "down";
+      impact: "positive" | "negative";
+    }>;
+  };
+  trust: {
+    cueLine: string;
+    compactSummary: string;
+    fallback: boolean;
+    freshness: string;
+    provenanceStatus: string;
+    warnings: ReturnType<typeof buildFailureModeWarnings>;
   };
   degraded: boolean;
 };
@@ -124,6 +171,75 @@ export const buildCliStatusContract = ({ reportData, postureState, degraded }: {
   },
   degraded,
 });
+
+export const buildCliStatusExpandedContract = ({ reportData, postureState, degraded }: { reportData: ReportData; postureState: PostureStateContract; degraded: boolean }): CliStatusExpandedContract => {
+  const freshnessLabel = reportData.treasuryProvenance?.ageLabel ?? "Unavailable";
+  const provenanceStatus = reportData.treasuryProvenance?.statusLabel ?? "Unavailable";
+  const fallbackSnapshot = degraded || Boolean(reportData.treasury?.fallback_reason);
+  const topSignalDeltas = reportData.reportDynamics.changedSignals.slice(0, 3).map((signal) => ({
+    metric: metricLabel[signal.key],
+    delta: Number(signal.delta.toFixed(2)),
+    direction: signal.delta >= 0 ? ("up" as const) : ("down" as const),
+    impact: impactFromSignal(signal.key, signal.delta),
+  }));
+  const compactFlipConditions = postureState.whatFlipsNext.thresholds.slice(0, 2);
+
+  return {
+    version: "v1",
+    view: "expanded",
+    generatedAt: new Date().toISOString(),
+    updatedAt: reportData.treasury.fetched_at,
+    regime: postureState.currentState.postureLabel,
+    cyclePhase: titleCase(deriveRegimeStage(reportData.assessment.regime)),
+    confidence: {
+      label: postureState.currentState.confidenceLabel,
+      score: postureState.currentState.confidencePercent,
+    },
+    trend: titleCase(reportData.reportDynamics.directionLabel),
+    decisionStability: buildDecisionStability(postureState),
+    call: {
+      summary: reportData.actionNowShort,
+      do: reportData.startItems,
+      avoid: reportData.stopItems,
+    },
+    guardrails: {
+      threshold: reportData.guardrailThreshold,
+      reversalTrigger: postureState.whatFlipsNext.flipTrigger,
+    },
+    flipConditionsCompact: compactFlipConditions,
+    boundedDecisionSummary: {
+      action: reportData.startItems[0] ?? reportData.actionNowShort,
+      threshold: reportData.guardrailThreshold,
+      reversalCondition: postureState.whatFlipsNext.reversalConditions[0] ?? reportData.flipThreshold,
+      topSignalDeltas,
+    },
+    trust: {
+      cueLine: buildWeeklyTrustCueLine({
+        confidenceLabel: postureState.currentState.confidenceLabel,
+        freshnessLabel,
+        transitionWatch: postureState.currentState.transitionWatch,
+      }),
+      compactSummary: buildCompactTrustSummary({
+        confidenceLabel: postureState.currentState.confidenceLabel,
+        freshnessLabel,
+        isFallbackSnapshot: fallbackSnapshot,
+      }),
+      fallback: fallbackSnapshot,
+      freshness: freshnessLabel,
+      provenanceStatus,
+      warnings: buildFailureModeWarnings({
+        confidenceLabel: postureState.currentState.confidenceLabel,
+        transitionWatch: postureState.currentState.transitionWatch,
+        freshnessLabel,
+        isFallbackSnapshot: fallbackSnapshot,
+        provenanceStatusLabel: provenanceStatus,
+        changedSignals: reportData.reportDynamics.changedSignals,
+        anomalySignals: reportData.reportDynamics.anomalySignals ?? [],
+      }),
+    },
+    degraded,
+  };
+};
 
 export const buildCliCallContract = ({ reportData, postureState, degraded }: { reportData: ReportData; postureState: PostureStateContract; degraded: boolean }): CliCallContract => ({
   version: "v1",

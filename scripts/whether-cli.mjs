@@ -162,7 +162,61 @@ const getJson = async (settings, endpoint) => {
   return response.json();
 };
 
-const statusText = (body) => `Whether — Current Status\n\nRegime:             ${body.regime}\nCycle Phase:        ${body.cyclePhase}\nConfidence:         ${body.confidence.label} (${body.confidence.score})\nTrend:              ${body.trend}\nDecision Stability: ${body.decisionStability}\nUpdated:            ${body.updatedAt}\n\nThis Week's Call:\n${body.call.summary}\n\nDo:\n${body.call.do.map((item) => `- ${item}`).join("\n")}\n\nAvoid:\n${body.call.avoid.map((item) => `- ${item}`).join("\n")}\n\nFlip Conditions:\n${body.call.flipConditions.map((item) => `- ${item}`).join("\n")}`;
+const statusText = (body) => `Whether — Current Status
+
+Regime:             ${body.regime}
+Cycle Phase:        ${body.cyclePhase}
+Confidence:         ${body.confidence.label} (${body.confidence.score})
+Trend:              ${body.trend}
+Decision Stability: ${body.decisionStability}
+Updated:            ${body.updatedAt}
+
+This Week's Call:
+${body.call.summary}
+
+Do:
+${body.call.do.map((item) => `- ${item}`).join("\n")}
+
+Avoid:
+${body.call.avoid.map((item) => `- ${item}`).join("\n")}
+
+Flip Conditions:
+${body.call.flipConditions.map((item) => `- ${item}`).join("\n")}`;
+
+const statusExpandedText = (body) => `Whether — Current Status (Expanded)
+
+Regime:             ${body.regime}
+Cycle Phase:        ${body.cyclePhase}
+Confidence:         ${body.confidence.label} (${body.confidence.score})
+Trend:              ${body.trend}
+Decision Stability: ${body.decisionStability}
+Updated:            ${body.updatedAt}
+
+This Week's Call:
+${body.call.summary}
+
+Guardrails:
+- Threshold: ${body.guardrails.threshold}
+- Reversal trigger: ${body.guardrails.reversalTrigger}
+
+Bounded decision:
+- Action: ${body.boundedDecisionSummary.action}
+- Threshold: ${body.boundedDecisionSummary.threshold}
+- Reversal: ${body.boundedDecisionSummary.reversalCondition}
+
+Top signal deltas:
+${body.boundedDecisionSummary.topSignalDeltas.map((item) => `- ${item.metric}: ${item.direction} ${Math.abs(item.delta)} (${item.impact})`).join("\n")}
+
+Compact flip conditions:
+${body.flipConditionsCompact.map((item) => `- ${item}`).join("\n")}
+
+Trust:
+- ${body.trust.cueLine}
+- ${body.trust.compactSummary}
+- Freshness: ${body.trust.freshness}
+- Provenance: ${body.trust.provenanceStatus}
+${body.trust.warnings.length ? `- Warnings:
+${body.trust.warnings.map((item) => `  - ${item.warning}`).join("\n")}` : "- Warnings: none"}`;
 
 const callText = (body) => `Call: ${body.call}\n\nLeadership should:\n${body.leadershipShould.map((item) => `- ${item}`).join("\n")}\n\nWatch:\n${body.watch.map((item) => `- ${item}`).join("\n")}`;
 const changesText = (body) => `What Changed Since Last Refresh\n\nCHANGED\n${body.changed.map((item) => `- ${item.metric} ${item.from} → ${item.to} (${item.direction}, ${item.impact})`).join("\n")}\n\nREVISIT\n${body.revisit.map((item) => `- ${item}`).join("\n")}\n\nFLIP\n${body.flip.map((item) => `- ${item.condition}${typeof item.distance === "number" ? ` (${item.distance} away)` : ""}`).join("\n")}`;
@@ -172,6 +226,8 @@ const routeWithCommonParams = (base, flags) => {
   if (flags["as-of"]) params.set("asOf", String(flags["as-of"]));
   if (flags.company) params.set("company", String(flags.company));
   if (flags.stage) params.set("stage", String(flags.stage));
+  if (flags.verbose && !flags.view) params.set("view", "expanded");
+  if (flags.view) params.set("view", String(flags.view));
   const query = params.toString();
   return query ? `${base}?${query}` : base;
 };
@@ -184,7 +240,11 @@ const writeFileIfRequested = async (flags, payload, settings) => {
 
 const cmdStatus = async (settings, flags) => {
   const body = await getJson(settings, routeWithCommonParams("/api/cli/status", flags));
-  const rendered = flags.summary ? body.call.summary : statusText(body);
+  const rendered = flags.summary
+    ? body.call.summary
+    : body.view === "expanded"
+      ? statusExpandedText(body)
+      : statusText(body);
   await writeFileIfRequested(flags, rendered, settings);
   writeOutput(settings.output === "text" ? rendered : body, settings);
 };
