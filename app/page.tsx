@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Suspense } from "react";
+import { cache, Suspense } from "react";
 import {
   buildTimeMachineHref,
   getAdjacentTimeMachineRequest,
@@ -196,6 +196,79 @@ type ArtifactActionsProps = {
   historicalSelectionActive: boolean;
 };
 
+const buildLeadershipArtifactPayload = cache(
+  async (
+    assessment: ReportData["assessment"],
+    treasury: ReportData["treasury"],
+    sensors: ReportData["sensors"],
+    macroSeries: ReportData["macroSeries"],
+    homeBriefModel: ReturnType<typeof buildHomeBriefModel>,
+    postureState: Awaited<ReturnType<typeof buildPostureState>>,
+    interpretationView: InterpretationView,
+    forecast: ReportData["forecast"],
+    freshnessLabel: string,
+  ) => {
+    const interpretationLayer = buildInterpretationLayer({
+      view: interpretationView,
+      homeBriefModel,
+      assessment,
+      forecast,
+      decisionRules: homeBriefModel.decisionRules,
+    });
+    const exportLayerOptions = {
+      interpretationLayer,
+      postureWithStageLabel: homeBriefModel.postureWithStageLabel,
+      operatingStanceLine: homeBriefModel.operatingStanceLine,
+      trendLabel: homeBriefModel.trendLabel,
+      transitionWatch: homeBriefModel.transitionWatch,
+      regimeDistancePoints: homeBriefModel.regimeDistance.pointsToFlip,
+      historicalAnalogs: homeBriefModel.historicalAnalogs,
+      failureModes: homeBriefModel.failureModes,
+      actionStripItems: homeBriefModel.actionStripItems,
+      confidenceLabel: homeBriefModel.confidenceLabel,
+      freshnessLabel,
+      postureState,
+    };
+    const boardSummary = buildBoardBrief(assessment, treasury, sensors, macroSeries, exportLayerOptions);
+    const canonicalDecisionCopy = buildCanonicalDecisionCopy({
+      homeBriefModel,
+      postureState,
+    });
+    const weeklyOperatorBriefPayload = buildWeeklyOperatorBriefPayload({
+      assessment,
+      treasury,
+      postureWithStageLabel: homeBriefModel.postureWithStageLabel,
+      confidenceLabel: homeBriefModel.confidenceLabel,
+      actionStripItems: homeBriefModel.actionStripItems,
+      flipConditionLabels: homeBriefModel.compactFlipConditionLabels,
+      postureState,
+      canonicalDecisionCopy,
+    });
+    const weeklyOperatorBriefText = buildWeeklyOperatorBriefPlainText(weeklyOperatorBriefPayload);
+    const weeklyCallSnapshotText = buildWeeklyCallSnapshotPlainText({
+      regime: canonicalDecisionCopy.currentRegimeLabel,
+      call: canonicalDecisionCopy.operatingCall,
+      trend: homeBriefModel.trendLabel,
+      confidence: `${Math.round(homeBriefModel.confidencePercent)}% (${homeBriefModel.confidenceLabel})`,
+      doNow: canonicalDecisionCopy.doNowLines[0],
+      avoid: homeBriefModel.executiveOperationalStance.avoid[0] ?? homeBriefModel.guardrail,
+      watch: canonicalDecisionCopy.flipTrigger,
+      flipConditions: canonicalDecisionCopy.flipConditions,
+    });
+    const callCitation = buildCallCitation(assessment, treasury, {
+      interpretationLayer,
+      postureWithStageLabel: homeBriefModel.postureWithStageLabel,
+    });
+
+    return {
+      boardSummary,
+      weeklyOperatorBriefText,
+      weeklyCallSnapshotText,
+      callCitation,
+    };
+  },
+);
+
 const LeadershipArtifactActions = async ({
   assessment,
   treasury,
@@ -208,57 +281,22 @@ const LeadershipArtifactActions = async ({
   freshnessLabel,
   historicalSelectionActive,
 }: ArtifactActionsProps) => {
-  const interpretationLayer = buildInterpretationLayer({
-    view: interpretationView,
-    homeBriefModel,
-    assessment,
-    forecast,
-    decisionRules: homeBriefModel.decisionRules,
-  });
-  const exportLayerOptions = {
-    interpretationLayer,
-    postureWithStageLabel: homeBriefModel.postureWithStageLabel,
-    operatingStanceLine: homeBriefModel.operatingStanceLine,
-    trendLabel: homeBriefModel.trendLabel,
-    transitionWatch: homeBriefModel.transitionWatch,
-    regimeDistancePoints: homeBriefModel.regimeDistance.pointsToFlip,
-    historicalAnalogs: homeBriefModel.historicalAnalogs,
-    failureModes: homeBriefModel.failureModes,
-    actionStripItems: homeBriefModel.actionStripItems,
-    confidenceLabel: homeBriefModel.confidenceLabel,
-    freshnessLabel,
-    postureState,
-  };
-  const boardSummary = buildBoardBrief(assessment, treasury, sensors, macroSeries, exportLayerOptions);
-  const canonicalDecisionCopy = buildCanonicalDecisionCopy({
-    homeBriefModel,
-    postureState,
-  });
-  const weeklyOperatorBriefPayload = buildWeeklyOperatorBriefPayload({
+  const {
+    boardSummary,
+    weeklyOperatorBriefText,
+    weeklyCallSnapshotText,
+    callCitation,
+  } = await buildLeadershipArtifactPayload(
     assessment,
     treasury,
-    postureWithStageLabel: homeBriefModel.postureWithStageLabel,
-    confidenceLabel: homeBriefModel.confidenceLabel,
-    actionStripItems: homeBriefModel.actionStripItems,
-    flipConditionLabels: homeBriefModel.compactFlipConditionLabels,
+    sensors,
+    macroSeries,
+    homeBriefModel,
     postureState,
-    canonicalDecisionCopy,
-  });
-  const weeklyOperatorBriefText = buildWeeklyOperatorBriefPlainText(weeklyOperatorBriefPayload);
-  const weeklyCallSnapshotText = buildWeeklyCallSnapshotPlainText({
-    regime: canonicalDecisionCopy.currentRegimeLabel,
-    call: canonicalDecisionCopy.operatingCall,
-    trend: homeBriefModel.trendLabel,
-    confidence: `${Math.round(homeBriefModel.confidencePercent)}% (${homeBriefModel.confidenceLabel})`,
-    doNow: canonicalDecisionCopy.doNowLines[0],
-    avoid: homeBriefModel.executiveOperationalStance.avoid[0] ?? homeBriefModel.guardrail,
-    watch: canonicalDecisionCopy.flipTrigger,
-    flipConditions: canonicalDecisionCopy.flipConditions,
-  });
-  const callCitation = buildCallCitation(assessment, treasury, {
-    interpretationLayer,
-    postureWithStageLabel: homeBriefModel.postureWithStageLabel,
-  });
+    interpretationView,
+    forecast,
+    freshnessLabel,
+  );
 
   return (
     <CopyLeadershipArtifactsButtons
