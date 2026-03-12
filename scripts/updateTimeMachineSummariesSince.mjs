@@ -45,14 +45,14 @@ if (endYear !== undefined) {
 }
 
 for (const script of scripts) {
-  const commandLabel = `bunx tsx ${script}`;
+  const commandLabel = `bun ${script}`;
   if (dryRun) {
     console.log(`[dry-run] HISTORY_START_YEAR=${baseEnv.HISTORY_START_YEAR}${endYear !== undefined ? ` HISTORY_END_YEAR=${baseEnv.HISTORY_END_YEAR}` : ""} ${commandLabel}`);
     continue;
   }
 
   console.log(`\n→ Running ${commandLabel}`);
-  const result = spawnSync("bunx", ["tsx", script], {
+  const result = spawnSync("bun", [script], {
     stdio: "inherit",
     env: baseEnv,
   });
