@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
 import { buildPostureStateContract } from "../lib/report/postureStateContract";
 import { buildWeeklyOperatorBriefPayload } from "../lib/export/weeklyOperatorBrief";
+import { buildFlipConditionsWithoutTriggerDuplication } from "../lib/report/canonicalDecisionCopy";
 import { buildWeeklyMandateEnvelope } from "../lib/integrationBriefs";
 import type { RegimeAssessment } from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
@@ -116,6 +117,12 @@ describe("posture state contract consumers", () => {
     assert.equal(operatorBrief.flipTrigger, postureState.whatFlipsNext.flipTrigger);
     assert.equal(envelope.lastChange.timestamp, postureState.lastCommittedChangeEvent.timestamp);
     assert.equal(envelope.lastChange.reason, postureState.lastCommittedChangeEvent.reason);
-    assert.deepEqual(operatorBrief.flipConditionLabels, postureState.whatFlipsNext.thresholds);
+    assert.deepEqual(
+      operatorBrief.flipConditionLabels,
+      buildFlipConditionsWithoutTriggerDuplication({
+        flipTrigger: postureState.whatFlipsNext.flipTrigger,
+        flipConditions: homeBriefModel.compactFlipConditionLabels,
+      }),
+    );
   });
 });

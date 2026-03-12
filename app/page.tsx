@@ -41,7 +41,7 @@ import { resolveSectorKey } from "../lib/report/sectorSensitivity";
 import { LiveDataFallbackAlert } from "./components/liveDataFallbackAlert";
 import { getRegimeDisplayLabel } from "../lib/regimePresentation";
 import { buildPostureState } from "../lib/report/postureStateSource";
-import { buildCanonicalDecisionCopy } from "../lib/report/canonicalDecisionCopy";
+import { buildCanonicalDecisionCopy, buildFlipConditionsWithoutTriggerDuplication } from "../lib/report/canonicalDecisionCopy";
 
 export const revalidate = 900;
 export const runtime = "edge";
@@ -426,7 +426,14 @@ export const HomePageReportContent = async ({
         regime: assessment.regime,
         call: canonicalDecisionCopy.operatingCall,
         doNow: canonicalDecisionCopy.doNowLines,
-        flipConditions: [canonicalDecisionCopy.flipTrigger, ...canonicalDecisionCopy.flipConditions].slice(0, 4),
+        flipConditions: [
+          canonicalDecisionCopy.flipTrigger,
+          ...buildFlipConditionsWithoutTriggerDuplication({
+            flipTrigger: canonicalDecisionCopy.flipTrigger,
+            flipConditions: canonicalDecisionCopy.flipConditions,
+            maxItems: 3,
+          }),
+        ],
         updatedAt: fetchedAtLabel,
       }}
       historicalBanner={

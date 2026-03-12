@@ -9,6 +9,25 @@ export type CanonicalDecisionCopy = {
   flipConditions: string[];
 };
 
+export const buildFlipConditionsWithoutTriggerDuplication = ({
+  flipTrigger,
+  flipConditions,
+  maxItems = 4,
+}: {
+  flipTrigger: string;
+  flipConditions: string[];
+  maxItems?: number;
+}) => {
+  const normalizedTrigger = flipTrigger.trim();
+
+  return flipConditions
+    .map((condition) => condition.trim())
+    .filter((condition) => condition.length > 0)
+    .filter((condition, index, conditions) => conditions.indexOf(condition) === index)
+    .filter((condition) => condition !== normalizedTrigger)
+    .slice(0, maxItems);
+};
+
 type HomeBriefModel = ReturnType<typeof buildHomeBriefModel>;
 
 const FALLBACK_DO_NOW_LINE = "Hold last week's bounded operating rules until thresholds move.";
