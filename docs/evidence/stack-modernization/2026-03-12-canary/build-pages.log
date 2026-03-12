@@ -1,0 +1,105 @@
+$ bun run build:cloudflare
+$ BUILD_TARGET=cloudflare NEXT_ON_PAGES_REUSE_PREBUILT=1 node scripts/build.mjs
+⚡️ @cloudflare/next-on-pages CLI v.1.13.16
+
+⚡️ Build Summary (@cloudflare/next-on-pages v1.13.16)
+⚡️ 
+⚡️ Edge Function Routes (41)
+⚡️   ┌ /
+⚡️   ├ /.well-known/whether-agent.json
+⚡️   ├ /api/agent
+⚡️   ├ /api/billing/checkout
+⚡️   ├ /api/billing/webhook
+⚡️   ├ /api/brief/slack
+⚡️   ├ /api/cadence
+⚡️   ├ /api/decision-events
+⚡️   ├ /api/health
+⚡️   ├ /api/integrations/weekly-mandate
+⚡️   ├ /api/monthly
+⚡️   ├ /api/og
+⚡️   ├ /api/posture-state
+⚡️   ├ /api/quarterly
+⚡️   ├ /api/regime-alerts
+⚡️   ├ /api/summary-delta
+⚡️   ├ /api/telemetry/content-measurement
+⚡️   ├ /api/telemetry/premium-funnel
+⚡️   ├ /api/treasury
+⚡️   ├ /api/weekly
+⚡️   ├ /api/weekly-digest
+⚡️   ├ /api/yearly
+⚡️   ├ /concepts/[slug]
+⚡️   ├ /concepts/audience/[audience]
+⚡️   ├ /concepts/focus/[focus]
+⚡️   ├ /confidence
+⚡️   ├ /decide/ship-checklist
+⚡️   ├ /decide/team-context
+⚡️   ├ /guides/[stakeholder]
+⚡️   ├ /guides/stage/[stage]
+⚡️   ├ /learn/failure-modes
+⚡️   ├ /learn/failure-modes/[slug]
+⚡️   ├ /library/failure-modes/[slug]
+⚡️   ├ /llms.txt
+⚡️   ├ /method
+⚡️   ├ /operations
+⚡️   ├ /search
+⚡️   ├ /signals
+⚡️   ├ /solutions/career-paths/[role]
+⚡️   ├ /sources
+⚡️   └ /toolkits
+⚡️ 
+⚡️ Prerendered Routes (1661)
+⚡️   ┌ /_global-error
+⚡️   ├ /_global-error.rsc
+⚡️   ├ /_global-error.segments/_full.segment.rsc
+⚡️   ├ /_global-error.segments/_global-error.segment.rsc
+⚡️   ├ /_global-error.segments/_global-error/__PAGE__.segment.rsc
+⚡️   ├ /_global-error.segments/_head.segment.rsc
+⚡️   ├ /_global-error.segments/_index.segment.rsc
+⚡️   ├ /_global-error.segments/_tree.segment.rsc
+⚡️   ├ /_not-found
+⚡️   ├ /_not-found.rsc
+⚡️   ├ /_not-found.segments/_full.segment.rsc
+⚡️   ├ /_not-found.segments/_head.segment.rsc
+⚡️   ├ /_not-found.segments/_index.segment.rsc
+⚡️   ├ /_not-found.segments/_not-found.segment.rsc
+⚡️   ├ /_not-found.segments/_not-found/__PAGE__.segment.rsc
+⚡️   ├ /_not-found.segments/_tree.segment.rsc
+⚡️   ├ /about
+⚡️   ├ /about.rsc
+⚡️   ├ /about.segments/_full.segment.rsc
+⚡️   └ ... 1642 more
+⚡️ 
+⚡️ Other Static Assets (148)
+⚡️   ┌ /.assetsignore
+⚡️   ├ /.gitkeep
+⚡️   ├ /404.html
+⚡️   ├ /404.rsc.json
+⚡️   └ ... 144 more
+
+⚡️ Build log saved to '.vercel/output/static/_worker.js/nop-build-log.json'
+⚡️ Generated '.vercel/output/static/_worker.js/index.js'.
+⚡️ Build completed in 92.81s
+⚡️ Invalid prerender config for /answers/[slug]
+⚡️ Invalid prerender config for /answers/[slug].rsc
+⚡️ Invalid prerender config for /decide/[slug]/[cluster]
+⚡️ Invalid prerender config for /decide/[slug]/[cluster].rsc
+⚡️ Invalid prerender config for /decide/[slug]
+⚡️ Invalid prerender config for /decide/[slug].rsc
+⚡️ Invalid prerender config for /posture/[slug]
+⚡️ Invalid prerender config for /posture/[slug].rsc
+⚡️ Invalid prerender config for /resources/[slug]
+⚡️ Invalid prerender config for /resources/[slug].rsc
+⚡️ Invalid prerender config for /signals/[cluster]/[decision-scenario]
+⚡️ Invalid prerender config for /signals/[cluster]/[decision-scenario].rsc
+⚡️ Invalid prerender config for /signals/[cluster]
+⚡️ Invalid prerender config for /signals/[cluster].rsc
+⚡️ Invalid prerender config for /startup-macro-posture/[regime]
+⚡️ Invalid prerender config for /startup-macro-posture/[regime].rsc
+⚡️ Invalid prerender config for /toolkits/[slug]/[cluster]
+⚡️ Invalid prerender config for /toolkits/[slug]/[cluster].rsc
+⚡️ Invalid prerender config for /toolkits/[slug]
+⚡️ Invalid prerender config for /toolkits/[slug].rsc
+
+
+
+

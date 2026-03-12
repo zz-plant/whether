@@ -115,6 +115,9 @@ describe("signalOps", () => {
     assert.equal(shouldCreateSignalAlert(first), false);
 
     const latest: RegimeAlertEvent = {
+      eventId: "evt-1",
+      sourceVersion: "test",
+      canonicalTimestampSource: "request-received-at",
       id: "1",
       createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
       payload: {
@@ -165,6 +168,9 @@ describe("signalOps", () => {
     );
 
     const latestEvent: RegimeAlertEvent = {
+      eventId: "evt-2",
+      sourceVersion: "test",
+      canonicalTimestampSource: "request-received-at",
       id: "2",
       createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
       payload: {
@@ -203,6 +209,9 @@ describe("signalOps", () => {
     );
 
     const latest: RegimeAlertEvent = {
+      eventId: "evt-3",
+      sourceVersion: "test",
+      canonicalTimestampSource: "request-received-at",
       id: "1",
       createdAt: new Date().toISOString(),
       payload,
