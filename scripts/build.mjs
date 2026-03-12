@@ -123,6 +123,18 @@ const shouldSkipNextOnPagesBuild =
   useNextOnPages &&
   skipBuildWasRequested &&
   canSkipNextOnPagesBuild;
+const shouldBypassNextOnPagesConversion =
+  useNextOnPages &&
+  hasReusableBuildOutput &&
+  !forceCloudflareBuild &&
+  (isCi || isCloudflarePages || isCloudflareDeploy);
+
+if (shouldBypassNextOnPagesConversion) {
+  console.log(
+    "Reusing cached Cloudflare Pages output for this commit; skipping next-on-pages conversion.",
+  );
+  process.exit(0);
+}
 
 const command = useNextOnPages ? "next-on-pages" : "next";
 const disableWorkerMinification =
