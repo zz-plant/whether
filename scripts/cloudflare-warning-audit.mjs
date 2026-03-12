@@ -1,5 +1,40 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
+import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
+
+
+const isTruthyEnv = (value) => {
+  if (typeof value !== "string") {
+    return false;
+  }
+
+  const normalized = value.trim().toLowerCase();
+  return normalized === "1" || normalized === "true" || normalized === "yes";
+};
+
+// Temporary escape hatch for Bun runtime rollout; remove after two stable CI cycles.
+const shouldForceNodeRuntime =
+  isTruthyEnv(process.env.FORCE_NODE_BUILD_RUNTIME) &&
+  !isTruthyEnv(process.env.__WHETHER_NODE_RUNTIME_ACTIVE) &&
+  Boolean(process.versions?.bun);
+
+if (shouldForceNodeRuntime) {
+  const rerun = spawnSync(
+    "node",
+    [fileURLToPath(import.meta.url), ...process.argv.slice(2)],
+    {
+      stdio: "inherit",
+      shell: true,
+      env: {
+        ...process.env,
+        __WHETHER_NODE_RUNTIME_ACTIVE: "1",
+      },
+    },
+  );
+
+  process.exit(rerun.status ?? 1);
+}
 
 const readLines = (filePath) =>
   readFileSync(filePath, "utf8")
