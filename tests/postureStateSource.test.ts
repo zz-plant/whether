@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import { beforeEach, describe, it } from "node:test";
 import { appendCommittedPostureEvent, buildPostureState } from "../lib/report/postureStateSource";
-import { serverStore } from "../lib/serverStore";
+import {
+  resetPostureDecisionEventRepository,
+  type PostureDecisionEventRepository,
+} from "../lib/storage/postureDecisionEventRepository";
 import type { RegimeAssessment } from "../lib/regimeEngine";
 
 const committedAssessment: RegimeAssessment = {
@@ -59,42 +62,48 @@ const committedAssessment: RegimeAssessment = {
 };
 
 describe("posture state source", () => {
+  let repository: PostureDecisionEventRepository;
+
   beforeEach(() => {
-    serverStore.save({ regimeAlerts: [], alertDeliveries: [], decisionMemory: [], postureDecisionEvents: [] });
+    repository = resetPostureDecisionEventRepository();
   });
 
-  it("builds posture state without mutating events", () => {
-    const before = serverStore.snapshot.postureDecisionEvents.length;
-    const posture = buildPostureState({
+  it("builds posture state without mutating events", async () => {
+    const before = (await repository.list({ limit: 64 })).events.length;
+    const posture = await buildPostureState({
       recordDate: "2026-03-08",
       assessment: committedAssessment,
       reportDynamics: { directionLabel: "deteriorating" },
+      repository,
     });
 
-    assert.equal(serverStore.snapshot.postureDecisionEvents.length, before);
+    assert.equal((await repository.list({ limit: 64 })).events.length, before);
     assert.equal(posture.currentState.regime, "DEFENSIVE");
   });
 
-  it("appends committed events with deterministic timestamps and idempotency", () => {
-    const first = appendCommittedPostureEvent({
+  it("appends committed events with deterministic timestamps and idempotency", async () => {
+    const first = await appendCommittedPostureEvent({
       recordDate: "2026-03-08",
       sourceIngestedAt: "2026-03-08T10:30:00Z",
       assessment: committedAssessment,
       previousRegime: "VOLATILE",
+      repository,
     });
 
     assert.equal(first.appended, true);
     assert.equal(first.event?.recordedAt, "2026-03-08T10:30:00.000Z");
     assert.equal(first.event?.idempotencyKey, "2026-03-08:DEFENSIVE");
+    assert.equal(first.event?.eventId.length ? true : false, true);
 
-    const second = appendCommittedPostureEvent({
+    const second = await appendCommittedPostureEvent({
       recordDate: "2026-03-08",
       sourceIngestedAt: "2026-03-08T10:30:00Z",
       assessment: committedAssessment,
       previousRegime: "VOLATILE",
+      repository,
     });
 
     assert.equal(second.appended, false);
-    assert.equal(serverStore.snapshot.postureDecisionEvents.length, 1);
+    assert.equal((await repository.list({ limit: 64 })).events.length, 1);
   });
 });

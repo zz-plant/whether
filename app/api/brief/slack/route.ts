@@ -11,7 +11,7 @@ export async function GET() {
   const reportResult = await loadReportDataSafe(undefined, { route: "/api/brief/slack" });
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
   const { assessment, treasury, sensors, macroSeries } = reportData;
-  const postureState = buildPostureState({
+  const postureState = await buildPostureState({
     recordDate: treasury.record_date,
     assessment,
     reportDynamics: reportData.reportDynamics,

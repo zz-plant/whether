@@ -49,5 +49,6 @@ Before posting to Slack/email/webhooks:
 
 ## 4) Deployment notes
 
-- Current alert store is process memory (`lib/serverStore.ts`), so state resets across cold starts/new isolates.
-- For durable operational history, pair these APIs with persistent storage and idempotent writes.
+- Alert/posture primitives now use repository abstractions with durable KV bindings when available (`lib/storage/regimeAlertRepository.ts`, `lib/storage/postureDecisionEventRepository.ts`).
+- Ingestion snapshots/materialized read models use the same pattern (`lib/ingestion/store.ts`) and automatically fall back to local file-backed storage in `.cache/ingestion` when durable KV is unavailable.
+- If durable KV bindings are unavailable or failing, repositories degrade to local fallback and report backend status (`durable` vs `local-fallback`) in API responses where relevant.
