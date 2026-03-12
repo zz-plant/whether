@@ -6,6 +6,7 @@ export type PostureDecisionEvent = {
   id: string;
   recordedAt: string;
   effectiveRecordDate: string;
+  idempotencyKey: string;
   fromState: RegimeKey | null;
   toState: RegimeKey;
   reason: string;

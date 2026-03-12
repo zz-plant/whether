@@ -5,7 +5,7 @@ import {
   integrationTargets,
   parseIntegrationTarget,
 } from "../../../../lib/integrationBriefs";
-import { recordCommittedPostureDecisionEvent } from "../../../../lib/report/postureStateSource";
+import { buildPostureState } from "../../../../lib/report/postureStateSource";
 
 export const runtime = "edge";
 
@@ -27,11 +27,10 @@ export async function GET(request: Request) {
   const reportResult = await loadReportDataSafe(undefined, { route: "/api/integrations/weekly-mandate" });
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
   const { assessment, treasury } = reportData;
-  const postureState = recordCommittedPostureDecisionEvent({
+  const postureState = buildPostureState({
     recordDate: treasury.record_date,
     assessment,
     reportDynamics: reportData.reportDynamics,
-    previousRegime: reportData.regimeAlert?.previousRegime ?? null,
   });
 
   return NextResponse.json({

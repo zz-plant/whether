@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { loadReportDataSafe } from "../../../lib/report/reportData";
 import { buildWeeklyDigest } from "../../../lib/signalOps";
 import { serverStore } from "../../../lib/serverStore";
-import { recordCommittedPostureDecisionEvent } from "../../../lib/report/postureStateSource";
+import { buildPostureState } from "../../../lib/report/postureStateSource";
 
 export const runtime = "edge";
 
@@ -10,11 +10,10 @@ export async function GET() {
   const digest = buildWeeklyDigest(serverStore.snapshot.regimeAlerts);
   const reportResult = await loadReportDataSafe(undefined, { route: "/api/weekly-digest" });
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
-  const postureState = recordCommittedPostureDecisionEvent({
+  const postureState = buildPostureState({
     recordDate: reportData.treasury.record_date,
     assessment: reportData.assessment,
     reportDynamics: reportData.reportDynamics,
-    previousRegime: reportData.regimeAlert?.previousRegime ?? null,
   });
 
   return NextResponse.json({
