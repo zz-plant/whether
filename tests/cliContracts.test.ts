@@ -16,13 +16,18 @@ const reportData = {
   },
   assessment: {
     regime: "EXPANSION",
-    scores: { tightness: 62, riskAppetite: 45 },
+    scores: { tightness: 62, riskAppetite: 45, baseRate: 5.25, curveSlope: -0.4 },
+    diagnostics: { confidence: "HIGH", nearestThresholdDelta: 9 },
   },
   reportDynamics: {
     directionLabel: "deteriorating",
-    changedSignals: [{ key: "tightness", delta: -6 }],
+    changedSignals: [
+      { key: "tightness", delta: -6 },
+      { key: "baseRate", delta: 0.25 },
+      { key: "curveSlope", delta: -0.15 },
+    ],
   },
-  playbook: { why: "Proceed selectively while protecting downside." },
+  playbook: { insight: "Proceed selectively while protecting downside." },
   actionNowShort: "Stage decisions. Avoid irreversible spend.",
   startItems: ["Selective hiring for revenue-linked roles"],
   stopItems: ["Broad headcount expansion"],
@@ -53,6 +58,12 @@ describe("cli contracts", () => {
     const changes = buildCliChangesContract({ reportData, postureState, degraded: false });
     assert.equal(changes.changed[0].from, 68);
     assert.equal(changes.changed[0].to, 62);
+    assert.equal(changes.changed[1].metric, "base_rate");
+    assert.equal(changes.changed[1].to, 5.25);
+    assert.equal(changes.changed[2].metric, "curve_slope");
+    assert.equal(changes.changed[2].to, -0.4);
+
+    assert.equal(status.cyclePhase, "Late");
 
     const regime = buildCliRegimeContract({ reportData, postureState, degraded: false });
     assert.equal(regime.regime, "Guarded Expansion");
