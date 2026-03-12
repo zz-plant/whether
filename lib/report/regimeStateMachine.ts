@@ -1,4 +1,5 @@
 import type { RegimeDiagnostics, RegimeKey, RegimeThresholds } from "../regimeEngine";
+import { buildRegimeDecisionEvent, getDecisionEventStore } from "../events/decisionEventStore";
 
 export type RegimeState = RegimeKey;
 
@@ -22,6 +23,7 @@ export type RegimeStateTransition = {
   committed: boolean;
   pending: boolean;
   transitionReason: string;
+  transitionPendingCount: number;
   snapshot: RegimeMachineSnapshot;
 };
 
@@ -61,7 +63,7 @@ const crossed = ({
   return null;
 };
 
-export const advanceRegimeState = (
+const advanceRegimeStateBase = (
   previousState: RegimeMachineSnapshot | null,
   currentSignals: RegimeMachineSignals,
 ): RegimeStateTransition => {
@@ -75,6 +77,7 @@ export const advanceRegimeState = (
       committed: false,
       pending: false,
       transitionReason: "No threshold crossing changed the committed state.",
+      transitionPendingCount: 0,
       snapshot: {
         committedState,
         pendingState: null,
@@ -121,6 +124,7 @@ export const advanceRegimeState = (
       committed: false,
       pending: true,
       transitionReason: `${transitionReason} Transition pending confidence gate (${pendingCount}/${confirmationGate}).`,
+      transitionPendingCount: pendingCount,
       snapshot: {
         committedState,
         pendingState: candidateState,
@@ -139,6 +143,7 @@ export const advanceRegimeState = (
     committed: true,
     pending: false,
     transitionReason: `${transitionReason} Transition committed.`,
+    transitionPendingCount: pendingCount,
     snapshot: {
       committedState: candidateState,
       pendingState: null,
@@ -150,3 +155,30 @@ export const advanceRegimeState = (
     },
   };
 };
+
+export const advanceRegimeState = (
+  previousState: RegimeMachineSnapshot | null,
+  currentSignals: RegimeMachineSignals,
+): RegimeStateTransition => {
+  const transition = advanceRegimeStateBase(previousState, currentSignals);
+  if (
+    previousState &&
+    transition.committed &&
+    transition.nextState !== previousState.committedState
+  ) {
+    getDecisionEventStore().append(
+      buildRegimeDecisionEvent({
+        previousState: previousState.committedState,
+        nextState: transition.nextState,
+        tightness: currentSignals.tightness,
+        riskAppetite: currentSignals.riskAppetite,
+        thresholds: currentSignals.thresholds,
+        diagnostics: currentSignals.diagnostics,
+        pendingCount: transition.transitionPendingCount,
+        transitionReason: transition.transitionReason,
+      }),
+    );
+  }
+  return transition;
+};
+
