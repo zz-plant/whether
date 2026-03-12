@@ -4,7 +4,7 @@ import type { Route } from "next";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { CircleTargetIcon, LayoutGridIcon, SectionJumpIcon } from "../../components/uiIcons";
+import { BoltIcon, CircleTargetIcon, LayoutGridIcon, SectionJumpIcon } from "../../components/uiIcons";
 import {
   operationsWorkstreamLinks,
   type OperationsWorkstreamLink,
@@ -17,6 +17,7 @@ const workstreamIconByLabel: Record<OperationsWorkstreamLink["label"], ReactNode
   Plan: <CircleTargetIcon className="h-3.5 w-3.5" />,
   Integrations: <SectionJumpIcon className="h-3.5 w-3.5" />,
   Data: <LayoutGridIcon className="h-3.5 w-3.5" />,
+  CLI: <BoltIcon className="h-3.5 w-3.5" />,
 };
 
 const getItemClasses = (link: OperationsWorkstreamLink, currentPath: Route) =>
