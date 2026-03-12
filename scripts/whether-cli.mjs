@@ -36,8 +36,8 @@ Setup:
 
 const SUB_HELP = {
   call: "Usage: whether call [show|copy|diff] [--json|--yaml|--markdown]",
-  diagnostics: "Usage: whether diagnostics [summary|drivers|evidence|provenance] [--json]",
-  history: "Usage: whether history [compare] [--weeks <n>] [--json]",
+  diagnostics: "Usage: whether diagnostics [summary|drivers|evidence|provenance] [--json] [--as-of <date>]",
+  history: "Usage: whether history [compare] [--weeks <n>] [--json] [--as-of <date>]",
   brief: "Usage: whether brief [exec|board|staff|investor|slack|email] [--copy]",
   export: "Usage: whether export [json|csv|markdown|pdf|briefing] [--output <file>]",
   share: "Usage: whether share [slack|email|clipboard] [--brief <type>]",
@@ -225,9 +225,9 @@ const cmdChanges = async (settings, flags) => {
 
 const cmdDiagnostics = async (settings, subcommand, flags) => {
   if (flags.help) return writeOutput(SUB_HELP.diagnostics, settings);
-  const body = await getJson(settings, "/api/cli/diagnostics");
+  const body = await getJson(settings, routeWithCommonParams("/api/cli/diagnostics", flags));
   if (subcommand === "provenance") {
-    const status = await getJson(settings, "/api/cli/status");
+    const status = await getJson(settings, routeWithCommonParams("/api/cli/status", flags));
     return writeOutput({ updatedAt: status.updatedAt, confidence: status.confidence, degraded: status.degraded }, settings);
   }
   if (subcommand === "evidence") {
@@ -240,7 +240,7 @@ const cmdDiagnostics = async (settings, subcommand, flags) => {
 
 const cmdHistory = async (settings, subcommand, flags) => {
   if (flags.help) return writeOutput(SUB_HELP.history, settings);
-  const body = await getJson(settings, "/api/cli/history");
+  const body = await getJson(settings, routeWithCommonParams("/api/cli/history", flags));
   if (subcommand === "compare") {
     return writeOutput(`Compare mode (${flags.from ?? "start"} -> ${flags.to ?? "end"})\n${body.history[0]?.recordDate ?? "n/a"} latest snapshot`, settings);
   }
