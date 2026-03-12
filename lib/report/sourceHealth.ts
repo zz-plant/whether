@@ -56,6 +56,27 @@ const resolveMacroFallbackReason = ({
   return null;
 };
 
+const getLatestParseableTimestamp = (timestamps: Array<string | null | undefined>): string | null => {
+  let latestTimestamp: string | null = null;
+  let latestEpoch = Number.NEGATIVE_INFINITY;
+
+  for (const timestamp of timestamps) {
+    if (typeof timestamp !== "string") {
+      continue;
+    }
+
+    const parsedTimestamp = Date.parse(timestamp);
+    if (Number.isNaN(parsedTimestamp) || parsedTimestamp <= latestEpoch) {
+      continue;
+    }
+
+    latestEpoch = parsedTimestamp;
+    latestTimestamp = timestamp;
+  }
+
+  return latestTimestamp;
+};
+
 export const buildSourceHealthRows = ({
   treasury,
   macroSeries,
@@ -70,10 +91,9 @@ export const buildSourceHealthRows = ({
   const treasuryFallbackReason = treasury.fallback_reason ?? null;
   const treasuryLastSuccessfulFetchAt = treasury.fetched_at ?? null;
 
-  const macroLastSuccessfulFetchAt =
-    macroSeries
-      .map((series) => series.fetched_at)
-      .find((timestamp) => typeof timestamp === "string" && !Number.isNaN(Date.parse(timestamp))) ?? null;
+  const macroLastSuccessfulFetchAt = getLatestParseableTimestamp(
+    macroSeries.map((series) => series.fetched_at),
+  );
   const macroFallbackReason = resolveMacroFallbackReason({
     macroSeries,
     macroStatusLabel,
