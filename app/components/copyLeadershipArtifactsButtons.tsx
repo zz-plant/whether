@@ -121,6 +121,7 @@ export function CopyLeadershipArtifactsButtons({
 
         <Link
           href="/operations"
+          prefetch={false}
           onClick={() => {
             haptic.navigate();
             trackFirstActionConversion("view_action_playbook");
@@ -132,6 +133,7 @@ export function CopyLeadershipArtifactsButtons({
 
         <Link
           href="/signals"
+          prefetch={false}
           onClick={() => {
             haptic.navigate();
             trackFirstActionConversion("inspect_evidence");
