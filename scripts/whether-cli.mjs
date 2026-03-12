@@ -310,15 +310,19 @@ const getJson = async (settings, endpoint) => {
   const contentType = response.headers.get("content-type") ?? "";
   if (contentType.includes("application/json")) {
     try {
-      parsedBody = await response.json();
+      // By cloning the response, we can safely inspect the body for error
+      // classification without consuming the stream for the final return.
+      parsedBody = await response.clone().json();
     } catch {
+      // Ignore if body is not valid JSON. The final `response.json()` will handle it.
       parsedBody = null;
     }
   }
 
   const statusError = buildHttpStatusError({ status: response.status, ok: response.ok, body: parsedBody, endpoint, settings });
   if (statusError) throw statusError;
-  if (parsedBody !== null) return parsedBody;
+
+  // The original response body is still available due to clone(), so this is safe.
   return response.json();
 };
 
