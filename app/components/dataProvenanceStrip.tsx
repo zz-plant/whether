@@ -4,6 +4,7 @@
  */
 "use client";
 
+import { Popover } from "@base-ui/react/popover";
 import { Tooltip } from "@base-ui/react/tooltip";
 import { StatusLiveIcon, StatusStaticIcon } from "./uiIcons";
 
@@ -120,26 +121,28 @@ export const DataProvenanceStrip = ({
           <span className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/75 bg-slate-900/70 px-3 py-2 text-xs font-medium uppercase tracking-[0.12em] text-slate-100">
             Confidence {confidencePct}%
           </span>
-          <Tooltip.Root>
-            <Tooltip.Trigger
-              type="button"
+          <Popover.Root>
+            <Popover.Trigger
               className={`weather-chip min-h-[44px] rounded-full border px-3 py-2 text-xs font-medium uppercase tracking-[0.12em] transition-colors hover:border-slate-500/80 ${
                 statusStyle ?? "border-slate-700 text-slate-200"
               }`}
             >
               {provenance.statusLabel}
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Positioner side="top" align="center" sideOffset={8}>
-                <Tooltip.Popup className="max-w-[220px] rounded-xl border border-slate-700/80 bg-slate-950/95 px-3 py-2 text-xs text-slate-200 shadow-md">
-                  <p className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-slate-300">
-                    Status meaning
-                  </p>
-                  <p className="mt-2 text-sm text-slate-100">{statusDescription}</p>
-                </Tooltip.Popup>
-              </Tooltip.Positioner>
-            </Tooltip.Portal>
-          </Tooltip.Root>
+            </Popover.Trigger>
+            <Popover.Portal>
+              <Popover.Positioner side="top" align="center" sideOffset={10}>
+                <Popover.Popup className="w-[min(290px,calc(100vw-2rem))] rounded-xl border border-slate-700/80 bg-slate-950/95 px-3 py-3 text-xs text-slate-200 shadow-md">
+                  <p className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-slate-300">Trust snapshot</p>
+                  <p className="mt-1 text-sm text-slate-100">{statusDescription}</p>
+                  <div className="mt-2 space-y-1 text-[11px] text-slate-300">
+                    <p><span className="text-slate-500">Confidence:</span> {confidencePct}%</p>
+                    <p><span className="text-slate-500">Record date:</span> {provenance.recordDateLabel}</p>
+                    <p><span className="text-slate-500">Updated:</span> {provenance.timestampLabel}</p>
+                  </div>
+                </Popover.Popup>
+              </Popover.Positioner>
+            </Popover.Portal>
+          </Popover.Root>
         </div>
         <div className="grid gap-2 rounded-xl border border-slate-800/85 bg-slate-950/45 p-3 text-xs tracking-[0.08em] text-slate-200 sm:grid-cols-2">
           {provenanceRows.map((row) => (
@@ -167,26 +170,27 @@ export const DataProvenanceStrip = ({
         <span className="rounded-full border border-slate-700/70 bg-slate-900/70 px-2 py-1 text-xs uppercase tracking-[0.12em] text-slate-200">
           Confidence {confidencePct}%
         </span>
-        <Tooltip.Root>
-          <Tooltip.Trigger
-            type="button"
+        <Popover.Root>
+          <Popover.Trigger
             className={`weather-chip rounded-full border px-2 py-1 text-xs font-semibold uppercase tracking-[0.12em] transition-colors hover:border-slate-500/80 ${
               statusStyle ?? "border-slate-700 text-slate-200"
             }`}
           >
             {provenance.statusLabel}
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Positioner side="top" align="center" sideOffset={8}>
-              <Tooltip.Popup className="max-w-[220px] rounded-xl border border-slate-700/80 bg-slate-950/95 px-3 py-2 text-xs text-slate-200 shadow-md">
-                <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-400">
-                  Status meaning
-                </p>
-                <p className="mt-2 text-sm text-slate-200">{statusDescription}</p>
-              </Tooltip.Popup>
-            </Tooltip.Positioner>
-          </Tooltip.Portal>
-        </Tooltip.Root>
+          </Popover.Trigger>
+          <Popover.Portal>
+            <Popover.Positioner side="top" align="center" sideOffset={8}>
+              <Popover.Popup className="w-[min(290px,calc(100vw-2rem))] rounded-xl border border-slate-700/80 bg-slate-950/95 px-3 py-3 text-xs text-slate-200 shadow-md">
+                <p className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-slate-400">Trust snapshot</p>
+                <p className="mt-1 text-sm text-slate-200">{statusDescription}</p>
+                <div className="mt-2 space-y-1 text-[11px] text-slate-300">
+                  <p><span className="text-slate-500">Confidence:</span> {confidencePct}%</p>
+                  <p><span className="text-slate-500">Data age:</span> {provenance.ageLabel}</p>
+                </div>
+              </Popover.Popup>
+            </Popover.Positioner>
+          </Popover.Portal>
+        </Popover.Root>
       </div>
       <div className="grid gap-2 text-xs text-slate-200 sm:grid-cols-2 xl:grid-cols-4">
         {provenanceRows.map((row) => (

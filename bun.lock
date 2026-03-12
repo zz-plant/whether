@@ -24,7 +24,6 @@
         "eslint-config-next": "16.1.6",
         "postcss": "8.5.6",
         "tailwindcss": "3.4.17",
-        "tsx": "^4.21.0",
         "typescript": "5.9.3",
         "vercel": "^50.28.0",
         "wrangler": "^4.71.0",

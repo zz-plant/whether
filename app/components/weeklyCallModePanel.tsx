@@ -3,7 +3,7 @@
 import { Dialog } from "@base-ui/react/dialog";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { StartupVariantMode } from "../../lib/report/boundedDecisionRules";
 import type { StartupVariantPolicy } from "../../lib/report/homeBriefModel";
 import { StartupModeSelector, type StartupModeContent } from "./startupModeSelector";
@@ -84,6 +84,22 @@ export function WeeklyCallModePanel({
     `${action.label} ${action.type}`.toLowerCase().includes(commandQuery.trim().toLowerCase())
   );
 
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const isCommandShortcut = (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k";
+      if (!isCommandShortcut) {
+        return;
+      }
+
+      event.preventDefault();
+      setCommandOpen(true);
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
   return (
     <>
       <article className="rounded-xl border border-slate-700/75 bg-slate-950/92 p-3" aria-label="Weekly call snapshot">
@@ -147,7 +163,7 @@ export function WeeklyCallModePanel({
               className="flex min-h-[44px] w-full items-center justify-between gap-2 rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-left text-xs font-semibold tracking-[0.06em] text-slate-200 transition hover:border-slate-500/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
             >
               <span>Open command palette</span>
-              <span aria-hidden="true" className="text-sm">⌘</span>
+              <span aria-hidden="true" className="text-sm">⌘K / Ctrl+K</span>
             </button>
           </div>
           <p className="mt-2 text-[11px] text-slate-300">Stage selected: {selectedModeLabel ?? "Default"}. Use command palette to jump to decision blocks fast.</p>
