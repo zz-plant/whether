@@ -78,4 +78,26 @@ describe("cli contracts", () => {
     assert.equal(scenario.version, "v1");
     assert.equal(scenario.likelyOutcome.changed, true);
   });
+
+  it("uses current-level fallback when a changed signal metric is missing", () => {
+    const degradedReportData = {
+      ...reportData,
+      assessment: {
+        ...reportData.assessment,
+        scores: {
+          ...reportData.assessment.scores,
+          curveSlope: null,
+        },
+      },
+      reportDynamics: {
+        ...reportData.reportDynamics,
+        changedSignals: [{ key: "curveSlope", delta: 0.2 }],
+      },
+    } as any;
+
+    const changes = buildCliChangesContract({ reportData: degradedReportData, postureState, degraded: true });
+    assert.equal(changes.changed[0].metric, "curve_slope");
+    assert.equal(changes.changed[0].to, 0);
+    assert.equal(changes.changed[0].from, -0.2);
+  });
 });

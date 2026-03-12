@@ -76,6 +76,11 @@ const rawForKey = (reportData: ReportData, key: "tightness" | "riskAppetite" | "
         ? reportData.assessment.scores.baseRate
         : reportData.assessment.scores.curveSlope;
 
+const currentLevelForKey = (reportData: ReportData, key: "tightness" | "riskAppetite" | "baseRate" | "curveSlope") => {
+  const raw = rawForKey(reportData, key);
+  return typeof raw === "number" ? raw : 0;
+};
+
 const deriveCyclePhaseLabel = (reportData: ReportData) => {
   const stage = deriveRegimeStage({
     regime: reportData.assessment.regime,
@@ -148,8 +153,7 @@ export const buildCliChangesContract = ({ reportData, postureState, degraded }: 
   version: "v1",
   generatedAt: new Date().toISOString(),
   changed: reportData.reportDynamics.changedSignals.map((signal) => {
-    const raw = rawForKey(reportData, signal.key);
-    const to = Number((typeof raw === "number" ? raw : signal.delta).toFixed(2));
+    const to = Number(currentLevelForKey(reportData, signal.key).toFixed(2));
     const from = Number((to - signal.delta).toFixed(2));
     return {
       metric: metricLabel[signal.key],
