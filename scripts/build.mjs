@@ -81,6 +81,7 @@ const useNextOnPages =
   !isVercelRuntime &&
   (forceCloudflareBuild ||
     (!forceNextBuild && (isCloudflarePages || isCloudflareDeploy)));
+const forceWebpackBuild = isTruthyEnv(process.env.NEXT_BUILD_FORCE_WEBPACK);
 const hasRestoredCloudflareOutput = hasVercelBuildOutput || hasWorkerBuildOutput;
 const shouldAutoSkipInCi =
   useNextOnPages &&
@@ -104,7 +105,11 @@ if (disableWorkerMinification) {
   nextOnPagesArgs.push("--disable-worker-minification");
 }
 
-const args = useNextOnPages ? nextOnPagesArgs : ["build", "--webpack"];
+const args = useNextOnPages
+  ? nextOnPagesArgs
+  : forceWebpackBuild
+    ? ["build", "--webpack"]
+    : ["build"];
 
 const suppressedCloudflareWarningPatterns = [
   /^▲ \[WARNING\] Duplicate key "options" in object literal \[duplicate-object-key\]$/,
@@ -192,6 +197,7 @@ if (useNextOnPages) {
         commitSha: currentCommitSha,
         command,
         args,
+        forceWebpackBuild,
         commandSucceeded,
         workerIndexExists: existsSync(workerIndexPath),
         generatedAt: new Date().toISOString(),
