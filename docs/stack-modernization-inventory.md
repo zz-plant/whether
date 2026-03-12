@@ -13,7 +13,7 @@
 - **TypeScript:** 5.9.3.
 - **Tailwind CSS:** 3.4.17.
 - **Cloudflare adapter:** @cloudflare/next-on-pages 1.13.16.
-- **Testing:** Bun test runner via `bun run test` (`bun test ./tests`, recursive `.test.ts`/`.test.tsx` discovery).
+- **Testing:** Bun test runner via `bun run test` (guarded wrapper `bun scripts/run-tests.mjs` fails if `./tests` discovery is empty before running `bun test ./tests`).
 - **Test compatibility contract:** Existing tests continue using `node:test` / `node:assert/strict` imports under Bun's Node-compat layer.
 - **Linting:** `eslint` CLI via `bun run lint`.
 
