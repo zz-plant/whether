@@ -751,7 +751,7 @@ function RegimeBanner({
   const bannerTone = REGIME_BANNER_TOKENS[regimeKey];
 
   return (
-    <header className={`sticky top-2 z-10 rounded-2xl border px-5 py-5 shadow-[0_24px_54px_rgba(2,6,23,0.5)] backdrop-blur sm:px-6 sm:py-6 ${bannerTone.shell}`} data-testid="weekly-regime-banner" aria-label="Weekly regime banner">
+    <header className={`z-10 rounded-2xl border px-5 py-5 shadow-[0_24px_54px_rgba(2,6,23,0.5)] backdrop-blur md:sticky md:top-2 sm:px-6 sm:py-6 ${bannerTone.shell}`} data-testid="weekly-regime-banner" aria-label="Weekly regime banner">
       <p className="text-[11px] font-semibold uppercase tracking-[0.13em]">REGIME — WEEK OF {recordDateLabel}</p>
       <div id="weekly-posture-brief-title" className="mt-1 space-y-0.5">
         <p className="text-2xl font-semibold sm:text-3xl">Regime: {resolvedPostureLabel}</p>
@@ -1181,8 +1181,13 @@ export function WeeklyDecisionCard({
     .filter((label) => label.length > 0)
     .filter((label, index, labels) => labels.indexOf(label) === index)
     .slice(0, 4);
-  const effectiveFlipLabels = canonicalDecisionCopy?.flipConditions?.length
-    ? canonicalDecisionCopy.flipConditions
+  const canonicalFlipLabels = (canonicalDecisionCopy?.flipConditions ?? [])
+    .map((label) => label.trim())
+    .filter((label) => label.length > 0)
+    .filter((label, index, labels) => labels.indexOf(label) === index)
+    .slice(0, 4);
+  const effectiveFlipLabels = canonicalFlipLabels.length > 0
+    ? canonicalFlipLabels
     : structuredFlipLabels.length > 0
     ? structuredFlipLabels
     : compactFlipConditionLabels.filter((label, index, labels) => labels.indexOf(label) === index).slice(0, 4);
