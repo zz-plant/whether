@@ -39,7 +39,7 @@ stack while preserving product behavior and Cloudflare readiness.
 
 - Create a spike branch for experimental upgrades.
 - Upgrade one layer at a time (Next.js → React → Tailwind) to isolate failures.
-- Run `bun run lint`, `bun run typecheck`, and `bun test` after each layer.
+- Run `bun run lint`, `bun run typecheck`, and `bun run test` after each layer.
 - Capture failure logs and remediation steps.
 
 ## Phase 4: Migration plan & execution (3–5 days)
@@ -67,7 +67,7 @@ These actions convert the research output into executable work items while minim
    - Include explicit Cloudflare compatibility notes and links to release/change logs for every candidate version.
 
 2. **Run a dependency-only baseline validation on the current branch (owner: engineering).**
-   - Keep current versions pinned and run `bun run lint`, `bun run typecheck`, and `bun test` to confirm a clean baseline before any upgrades.
+   - Keep current versions pinned and run `bun run lint`, `bun run typecheck`, and `bun run test` to confirm a clean baseline before any upgrades.
    - Save outputs in a short spike note so future failures can be attributed to upgrades, not pre-existing drift.
 
 3. **Perform a canary spike for framework core (owner: platform + frontend).**

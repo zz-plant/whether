@@ -64,9 +64,9 @@ export const MobileActionSheet = ({
       </Dialog.Trigger>
 
       <Dialog.Portal>
-        <Dialog.Backdrop className="fixed inset-0 z-40 bg-slate-950/70" />
+        <Dialog.Backdrop className="fixed inset-0 z-40 bg-slate-950/70 backdrop-blur-[1px]" />
         <Dialog.Popup
-          className="fixed inset-x-4 bottom-[calc(env(safe-area-inset-bottom)+5.5rem)] z-50 max-h-[calc(100vh-2rem)] overflow-auto pt-6"
+          className="fixed inset-x-2 bottom-[calc(env(safe-area-inset-bottom)+0.5rem)] z-50 max-h-[85vh] overflow-auto pt-2"
           finalFocus={() => {
             if (!suppressCloseAutoFocusRef.current) {
               return true;
@@ -76,7 +76,8 @@ export const MobileActionSheet = ({
             return false;
           }}
         >
-          <div className="weather-mobile-panel weather-mobile-sheet w-full p-4 shadow-2xl">
+          <div className="weather-mobile-panel weather-mobile-sheet w-full rounded-3xl border border-slate-700/80 p-4 shadow-2xl">
+            <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-slate-600/90" aria-hidden="true" />
             <div className="mb-3 flex items-center justify-between gap-3">
               <Dialog.Title className="text-xs font-semibold tracking-[0.2em] text-slate-300">More actions</Dialog.Title>
               <Dialog.Close className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-slate-700/80 text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation">

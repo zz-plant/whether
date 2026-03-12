@@ -41,6 +41,7 @@ export const SummaryCard = ({
       add({
         title: "Summary copied",
         description: "Paste the posture card wherever you need it.",
+        type: "success",
       });
     }
     if (status === "error") {
@@ -50,6 +51,7 @@ export const SummaryCard = ({
         description: isBlocked
           ? "Select the summary block to copy it manually."
           : "Select the summary text and copy it manually.",
+        type: "error",
       });
     }
     lastStatusRef.current = status;
