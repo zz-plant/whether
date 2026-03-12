@@ -14,6 +14,7 @@ import type { DecisionMatrixPayload, StartupVariantPolicy } from "../../lib/repo
 import { formatProbabilityPercent } from "../../lib/report/reportFormatting";
 import { getOrderedRegimeLegend, REGIME_BANNER_TOKENS, REGIME_LEGEND_DESCRIPTORS, type RegimeBannerTone } from "../../lib/regimePresentation";
 import { formatDateUTC } from "../../lib/formatters";
+import type { CanonicalDecisionCopy } from "../../lib/report/canonicalDecisionCopy";
 import {
   buildWeeklyCitationMetaLine,
   buildCompactTrustSummary,
@@ -121,6 +122,7 @@ export type WeeklyDecisionCardProps = {
   isFallbackSnapshot?: boolean;
   failureModes?: FailureModeWarningItem[];
   actions?: ReactNode;
+  canonicalDecisionCopy?: CanonicalDecisionCopy;
 };
 
 const sectionSpacing = "space-y-3";
@@ -1171,6 +1173,7 @@ export function WeeklyDecisionCard({
   isFallbackSnapshot = false,
   failureModes = [],
   actions,
+  canonicalDecisionCopy,
 }: WeeklyDecisionCardProps) {
   const freshnessLabel = fetchedAtLabel.trim().length > 0 ? fetchedAtLabel : "Unavailable";
   const trustCueLine = buildCompactTrustSummary({
@@ -1184,8 +1187,9 @@ export function WeeklyDecisionCard({
     recordDateLabel,
     freshnessLabel,
   });
-  const immediateDecision = actionNowShort?.trim()
-    || (revisitDecisions
+  const immediateDecision = canonicalDecisionCopy?.doNowLines[0]
+    ?? actionNowShort?.trim()
+    ?? (revisitDecisions
       ? "Revise hiring and roadmap calls now."
       : "Hold last week's operating rules.");
 
@@ -1200,15 +1204,17 @@ export function WeeklyDecisionCard({
   const conciseWeeklyMovement = weeklyMovement.summary.replace(/\.$/, "");
   const snapshotDoNow = immediateDecision;
   const snapshotAvoid = executiveOperationalStance.avoid[0] ?? guardrail;
-  const snapshotWatch = flipThreshold ?? reversalTrigger;
+  const snapshotWatch = canonicalDecisionCopy?.flipTrigger ?? flipThreshold ?? reversalTrigger;
   const structuredFlipLabels = canonicalFlipConditions
     .map((condition) => condition.label.trim())
     .filter((label) => label.length > 0)
     .filter((label, index, labels) => labels.indexOf(label) === index)
     .slice(0, 4);
-  const effectiveFlipLabels = structuredFlipLabels.length > 0
-    ? structuredFlipLabels
-    : compactFlipConditionLabels.filter((label, index, labels) => labels.indexOf(label) === index).slice(0, 4);
+  const effectiveFlipLabels = canonicalDecisionCopy?.flipConditions?.length
+    ? canonicalDecisionCopy.flipConditions
+    : structuredFlipLabels.length > 0
+      ? structuredFlipLabels
+      : compactFlipConditionLabels.filter((label, index, labels) => labels.indexOf(label) === index).slice(0, 4);
 
   const needsTrustWarning = isFallbackSnapshot || confidenceLabel !== "HIGH" || freshnessLabel === "Unavailable";
   const trustWarningCopy = isFallbackSnapshot
