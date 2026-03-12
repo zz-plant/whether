@@ -82,18 +82,22 @@ const useNextOnPages =
   (forceCloudflareBuild ||
     (!forceNextBuild && (isCloudflarePages || isCloudflareDeploy)));
 const forceWebpackBuild = isTruthyEnv(process.env.NEXT_BUILD_FORCE_WEBPACK);
-const hasRestoredCloudflareOutput = hasVercelBuildOutput || hasWorkerBuildOutput;
+const hasAnyCloudflareBuildOutput = hasVercelBuildOutput || hasWorkerBuildOutput;
 const shouldAutoSkipInCi =
   useNextOnPages &&
   !forceCloudflareBuild &&
-  hasRestoredCloudflareOutput &&
+  hasVercelBuildOutput &&
   (isCi || isCloudflarePages || isCloudflareDeploy);
+const skipBuildWasRequested =
+  skipNextOnPagesBuild ||
+  hasReusableBuildOutput ||
+  (reusePrebuiltOutput && hasVercelBuildOutput) ||
+  shouldAutoSkipInCi;
+const canSkipNextOnPagesBuild = hasVercelBuildOutput;
 const shouldSkipNextOnPagesBuild =
   useNextOnPages &&
-  (skipNextOnPagesBuild ||
-    hasReusableBuildOutput ||
-    (reusePrebuiltOutput && (hasVercelBuildOutput || hasWorkerBuildOutput)) ||
-    shouldAutoSkipInCi);
+  skipBuildWasRequested &&
+  canSkipNextOnPagesBuild;
 
 const command = useNextOnPages ? "next-on-pages" : "next";
 const disableWorkerMinification =
@@ -138,6 +142,12 @@ const result = spawnSync(command, args, {
     NEXT_TELEMETRY_DISABLED: "1",
   },
 });
+
+if (useNextOnPages && skipBuildWasRequested && !canSkipNextOnPagesBuild) {
+  console.warn(
+    "Skipping next-on-pages prebuild reuse because `.vercel/output/config.json` is missing; running full next-on-pages build instead.",
+  );
+}
 
 if (useNextOnPages) {
   const outputChannels = [
@@ -189,17 +199,22 @@ if (useNextOnPages) {
             ? "NEXT_ON_PAGES_SKIP_BUILD"
             : hasReusableBuildOutput
               ? "cache-hit-same-commit"
-              : reusePrebuiltOutput &&
-                  (hasVercelBuildOutput || hasWorkerBuildOutput)
+              : reusePrebuiltOutput && hasVercelBuildOutput
                 ? "NEXT_ON_PAGES_REUSE_PREBUILT"
               : "ci-prebuilt-vercel-output"
+          : skipBuildWasRequested
+            ? "missing-prebuilt-vercel-output"
           : null,
         commitSha: currentCommitSha,
         command,
         args,
         forceWebpackBuild,
         commandSucceeded,
+        skipBuildWasRequested,
+        canSkipNextOnPagesBuild,
         workerIndexExists: existsSync(workerIndexPath),
+        vercelOutputConfigExists: existsSync(vercelOutputConfigPath),
+        hasAnyCloudflareBuildOutput,
         generatedAt: new Date().toISOString(),
       },
       null,
