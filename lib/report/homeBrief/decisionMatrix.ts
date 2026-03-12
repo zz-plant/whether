@@ -1,0 +1,87 @@
+import { buildWeeklyLockCommitment } from "../decisionKnobs";
+import type { BoundedDecisionRule } from "../boundedDecisionRules";
+import type { DecisionMatrixPayload, DecisionMatrixRow, DecisionMatrixRowKey, Regime } from "../homeBriefModel";
+
+const compactMatrixText = (value: string, fallback: string) => {
+  const normalized = value.trim();
+  if (!normalized) {
+    return fallback;
+  }
+
+  const [firstClause] = normalized.split(/[.;]/);
+  return firstClause?.trim() || fallback;
+};
+
+const matrixRowConfig: Array<{ key: DecisionMatrixRowKey; label: string; area: BoundedDecisionRule["area"]; flipConditionIndex: number }> = [
+  { key: "hiring", label: "Hiring", area: "hiring", flipConditionIndex: 0 },
+  { key: "product", label: "Product", area: "product-tempo", flipConditionIndex: 1 },
+  { key: "capital", label: "Capital", area: "capital-raising", flipConditionIndex: 1 },
+  { key: "burn", label: "Burn", area: "burn-discipline", flipConditionIndex: 2 },
+];
+
+export const buildDecisionMatrixPayload = ({
+  regime,
+  thresholds,
+  decisionRules,
+  confidenceDegraded,
+  freshnessDegraded,
+}: {
+  regime: Regime;
+  thresholds: { tightnessRegime: number; riskAppetiteRegime: number };
+  decisionRules: BoundedDecisionRule[];
+  confidenceDegraded: boolean;
+  freshnessDegraded: boolean;
+}): DecisionMatrixPayload => {
+  const rulesByArea = new Map(decisionRules.map((rule) => [rule.area, rule]));
+  const lockCommitment = buildWeeklyLockCommitment({
+    regime,
+    tightnessRegime: thresholds.tightnessRegime,
+    riskAppetiteRegime: thresholds.riskAppetiteRegime,
+    confidenceDegraded,
+    freshnessDegraded,
+  });
+
+  const rows: DecisionMatrixRow[] = matrixRowConfig.map(({ key, label, area, flipConditionIndex }) => {
+    const rule = rulesByArea.get(area);
+    const fallbackApprove = "Stage approvals on short-cycle proof";
+    const fallbackDelay = "Delay irreversible commitments";
+    const structuredFlipCondition = rule?.flipConditions
+      .map((condition) => condition.label.trim())
+      .filter((condition) => condition.length > 0)
+      .join(" or ") ?? "";
+    const fallbackFlipCondition = lockCommitment.flipConditions[flipConditionIndex] ?? lockCommitment.flipConditions[0] ?? "Recheck thresholds on next refresh.";
+    const flipSummary = structuredFlipCondition || rule?.resumeTrigger || fallbackFlipCondition;
+    const flipDetail = [rule?.resumeTrigger, structuredFlipCondition, !rule ? fallbackFlipCondition : ""]
+      .filter((entry): entry is string => Boolean(entry && entry.trim().length > 0))
+      .join(" ")
+      .trim();
+
+    return {
+      key,
+      label,
+      cells: {
+        approve: {
+          text: compactMatrixText(rule?.doNow[0] ?? "", fallbackApprove),
+          detail: rule?.rationale ?? "Use current posture until signal quality improves.",
+        },
+        delay: {
+          text: compactMatrixText(rule?.avoidNow[0] ?? "", fallbackDelay),
+          detail: rule?.pauseTrigger ?? "Pause if macro confidence degrades or thresholds weaken.",
+        },
+        flip: {
+          text: compactMatrixText(flipSummary, "Flip only after threshold recovery"),
+          detail: flipDetail || "Resume only with sustained threshold recovery.",
+        },
+      },
+    };
+  });
+
+  return {
+    columns: [
+      { key: "approve", label: "Approve" },
+      { key: "delay", label: "Delay" },
+      { key: "flip", label: "Flip" },
+    ],
+    rows,
+  };
+};

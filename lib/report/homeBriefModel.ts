@@ -2,9 +2,8 @@ import { buildCanonicalBoundedDecisionRules } from "./boundedDecisionRules";
 import { buildActionStripItems, buildRoleAwareOperatingTemplates } from "./operatingCalls";
 import { getSummaryArchive } from "../summary/summaryArchive";
 import type { MacroSeriesReading } from "../types";
-import { isImprovingSignalDelta } from "./reportData";
-import { deltaLabelBySignal } from "./briefFormatting";
-import type { HistoricalAnalog, ReportEvidenceItem } from "./reportData";
+import { resolveDistanceToFlip, resolveConfidencePercentFromDistance } from "./confidence";
+import { isImprovingSignalDelta, type HistoricalAnalog, type ReportEvidenceItem } from "./reportData";
 import {
   REGIME_SEVERITY_RANK,
   REGIME_SHORT_LABELS,
@@ -31,7 +30,6 @@ import {
   buildFailureModeWarnings,
   type FailureModeWarning,
 } from "./trustStatus";
-import { buildWeeklyLockCommitment } from "./decisionKnobs";
 import {
   buildScopedVariantDecisionAdjustment,
   startupVariantModes,
@@ -42,8 +40,13 @@ import {
 import type { ActionStripItem, RoleAwareOperatingTemplate } from "./operatingCalls";
 import type { TimeMachineRegimeEntry } from "../timeMachine/timeMachineCache";
 import type { PostureStateContract } from "./postureStateContract";
+import { buildDecisionMatrixPayload } from "./homeBrief/decisionMatrix";
+import { buildStartupClimateIndex, type StartupClimateIndex } from "./homeBrief/scoring";
+import { buildPrimaryRiskLabel } from "./homeBrief/risk";
 
-type Regime = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
+export { buildDecisionMatrixPayload };
+
+export type Regime = "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
 
 type HomeReportData = {
   fetchedAtLabel?: string;
@@ -103,12 +106,6 @@ type WhyThisCallItem = {
 type SignalChange = {
   key: "tightness" | "riskAppetite" | "baseRate" | "curveSlope";
   delta: number;
-};
-
-type StartupClimateIndex = {
-  score: number;
-  status: "Improving" | "Stable" | "Deteriorating";
-  breakdown: Array<{ label: string; score: number }>;
 };
 
 type BoundaryDimension = "tightness" | "riskAppetite";
@@ -206,87 +203,6 @@ const dedupeByStem = (items: string[]): string[] => {
     seen.add(stem);
     return true;
   });
-};
-
-const compactMatrixText = (value: string, fallback: string) => {
-  const normalized = value.trim();
-  if (!normalized) {
-    return fallback;
-  }
-
-  const [firstClause] = normalized.split(/[.;]/);
-  return firstClause?.trim() || fallback;
-};
-
-const matrixRowConfig: Array<{ key: DecisionMatrixRowKey; label: string; area: BoundedDecisionRule["area"]; flipConditionIndex: number }> = [
-  { key: "hiring", label: "Hiring", area: "hiring", flipConditionIndex: 0 },
-  { key: "product", label: "Product", area: "product-tempo", flipConditionIndex: 1 },
-  { key: "capital", label: "Capital", area: "capital-raising", flipConditionIndex: 1 },
-  { key: "burn", label: "Burn", area: "burn-discipline", flipConditionIndex: 2 },
-];
-
-export const buildDecisionMatrixPayload = ({
-  regime,
-  thresholds,
-  decisionRules,
-  confidenceDegraded,
-  freshnessDegraded,
-}: {
-  regime: Regime;
-  thresholds: HomeReportData["assessment"]["thresholds"];
-  decisionRules: BoundedDecisionRule[];
-  confidenceDegraded: boolean;
-  freshnessDegraded: boolean;
-}): DecisionMatrixPayload => {
-  const rulesByArea = new Map(decisionRules.map((rule) => [rule.area, rule]));
-  const lockCommitment = buildWeeklyLockCommitment({
-    regime,
-    tightnessRegime: thresholds.tightnessRegime,
-    riskAppetiteRegime: thresholds.riskAppetiteRegime,
-    confidenceDegraded,
-    freshnessDegraded,
-  });
-
-  const rows: DecisionMatrixRow[] = matrixRowConfig.map(({ key, label, area, flipConditionIndex }) => {
-    const rule = rulesByArea.get(area);
-    const fallbackApprove = "Stage approvals on short-cycle proof";
-    const fallbackDelay = "Delay irreversible commitments";
-    const structuredFlipCondition = rule?.flipConditions[0]?.label ?? "";
-    const fallbackFlipCondition = lockCommitment.flipConditions[flipConditionIndex] ?? lockCommitment.flipConditions[0] ?? "Recheck thresholds on next refresh.";
-    const flipSummary = structuredFlipCondition || rule?.resumeTrigger || fallbackFlipCondition;
-    const flipDetail = [rule?.resumeTrigger, structuredFlipCondition, !rule ? fallbackFlipCondition : ""]
-      .filter((entry): entry is string => Boolean(entry && entry.trim().length > 0))
-      .join(" ")
-      .trim();
-
-    return {
-      key,
-      label,
-      cells: {
-        approve: {
-          text: compactMatrixText(rule?.doNow[0] ?? "", fallbackApprove),
-          detail: rule?.rationale ?? "Use current posture until signal quality improves.",
-        },
-        delay: {
-          text: compactMatrixText(rule?.avoidNow[0] ?? "", fallbackDelay),
-          detail: rule?.pauseTrigger ?? "Pause if macro confidence degrades or thresholds weaken.",
-        },
-        flip: {
-          text: compactMatrixText(flipSummary, "Flip only after threshold recovery"),
-          detail: flipDetail || "Resume only with sustained threshold recovery.",
-        },
-      },
-    };
-  });
-
-  return {
-    columns: [
-      { key: "approve", label: "Approve" },
-      { key: "delay", label: "Delay" },
-      { key: "flip", label: "Flip" },
-    ],
-    rows,
-  };
 };
 
 export const extractExecutiveOperationalStance = ({
@@ -760,72 +676,6 @@ const buildWhyThisCall = ({
   ];
 };
 
-const clampScore = (value: number) => Math.max(0, Math.min(100, Math.round(value)));
-
-const findMacroValue = (macroSeries: MacroSeriesReading[] | undefined, id: MacroSeriesReading["id"]): number | null =>
-  macroSeries?.find((series) => series.id === id)?.value ?? null;
-
-const buildStartupClimateIndex = ({
-  assessment,
-  macroSeries,
-  trendLabel,
-}: {
-  assessment: HomeReportData["assessment"];
-  macroSeries: MacroSeriesReading[] | undefined;
-  trendLabel: "Improving" | "Deteriorating" | "Mixed" | "Stable";
-}): StartupClimateIndex => {
-  const capitalAvailability = clampScore((100 - assessment.scores.tightness) * 0.6 + assessment.scores.riskAppetite * 0.4);
-  const unemployment = findMacroValue(macroSeries, "UNEMPLOYMENT_RATE");
-  const hiringMarket = clampScore(unemployment === null ? 55 : 100 - unemployment * 10);
-  const saasMultiple = findMacroValue(macroSeries, "SAAS_VALUATION_MULTIPLE");
-  const valuations = clampScore(saasMultiple === null ? 55 : Math.min(100, saasMultiple * 8));
-  const vix = findMacroValue(macroSeries, "VIX_INDEX");
-  const ipoWindow = clampScore(vix === null ? 50 : 100 - vix * 2);
-
-  const breakdown = [
-    { label: "Capital availability", score: capitalAvailability },
-    { label: "Hiring market", score: hiringMarket },
-    { label: "SaaS valuations", score: valuations },
-    { label: "IPO window", score: ipoWindow },
-  ];
-
-  const score = clampScore(breakdown.reduce((sum, item) => sum + item.score, 0) / breakdown.length);
-  return {
-    score,
-    status: trendLabel === "Mixed" ? "Stable" : trendLabel,
-    breakdown,
-  };
-};
-
-const buildPrimaryRiskLabel = ({
-  failureModes,
-  changedSignals,
-}: {
-  failureModes: HomeBriefFailureMode[];
-  changedSignals: SignalChange[];
-}) => {
-  const dominantSignal = changedSignals
-    .slice()
-    .sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta))[0];
-
-  if (failureModes[0]) {
-    return `Downside: ${failureModes[0].warning}`;
-  }
-
-  if (!dominantSignal || dominantSignal.delta === 0) {
-    return "Neutral: no dominant directional risk this week.";
-  }
-
-  const signalLabel = deltaLabelBySignal[dominantSignal.key];
-  const isImprovingMove = isImprovingSignalDelta(dominantSignal.key, dominantSignal.delta);
-
-  if (!isImprovingMove) {
-    return `Downside: ${signalLabel} tightened (${dominantSignal.delta.toFixed(1)}).`;
-  }
-
-  return `Upside: ${signalLabel} eased (${Math.abs(dominantSignal.delta).toFixed(1)}).`;
-};
-
 export const buildHomeBriefModel = (
   data: HomeReportData,
   options?: { overlaySector?: SectorKey; startupVariantMode?: StartupVariantMode },
@@ -867,13 +717,16 @@ export const buildHomeBriefModel = (
   const riskThreshold = assessment.thresholds.riskAppetiteRegime;
   const tightnessGap = Math.abs(assessment.scores.tightness - tightnessThreshold);
   const riskGap = Math.abs(assessment.scores.riskAppetite - riskThreshold);
-  const nearestThresholdGap = Math.min(tightnessGap, riskGap);
+  const nearestThresholdGap = resolveDistanceToFlip({
+    scores: assessment.scores,
+    thresholds: assessment.thresholds,
+  });
   const shiftTargets = regimeShiftTargets[assessment.regime];
   const primaryShiftRegimeLabel = REGIME_SHORT_LABELS[shiftTargets.defensive];
 
   const confidenceLabel: RegimeConfidenceLabel = nearestThresholdGap <= 5 ? "LOW" : nearestThresholdGap <= 12 ? "MED" : "HIGH";
   const transitionWatch: "ON" | "OFF" = nearestThresholdGap <= 8 || Boolean(regimeAlert) ? "ON" : "OFF";
-  const confidencePercent = Math.max(35, Math.min(92, Math.round(55 + nearestThresholdGap * 3)));
+  const confidencePercent = resolveConfidencePercentFromDistance(nearestThresholdGap);
   const signalConfidenceReason = buildSignalConfidenceReason({
     confidenceLabel,
     nearestThresholdGap,

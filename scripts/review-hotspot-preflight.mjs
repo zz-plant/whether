@@ -81,7 +81,7 @@ function addedTypeAssertions(diffRange) {
 }
 
 function requiresTestCoverage(file) {
-  return /^src\/.+\.(ts|tsx)$/.test(file) && /(regime|policy|classif|score|indicator)/i.test(file);
+  return /^(src|lib|app)\/.+\.(ts|tsx)$/.test(file) && /(regime|policy|classif|score|indicator)/i.test(file);
 }
 
 function isTestFile(file) {
