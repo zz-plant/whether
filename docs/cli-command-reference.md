@@ -39,7 +39,7 @@ Whether CLI is an operator decision terminal: **environment → call → changes
 - `--no-color`
 - `--company <name>`
 - `--stage <name>`
-- `--as-of <YYYY-MM-DD>`
+- `--as-of <YYYY-MM> (example: 2024-07)`
 
 ## Exit codes
 

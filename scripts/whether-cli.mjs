@@ -49,9 +49,9 @@ Setup:
 const SUB_HELP = {
   ping: "Usage: whether ping [--json]",
   call: "Usage: whether call [show|copy|diff] [--json|--yaml|--markdown]",
-  status: "Usage: whether status [--verbose|--view expanded] [--json] [--as-of <date>]",
-  diagnostics: "Usage: whether diagnostics [summary|drivers|evidence|provenance] [--json] [--as-of <date>]",
-  history: "Usage: whether history [compare] [--weeks <n>] [--json] [--as-of <date>]",
+  status: "Usage: whether status [--verbose|--view expanded] [--json] [--as-of <YYYY-MM>] (example: --as-of 2024-07)",
+  diagnostics: "Usage: whether diagnostics [summary|drivers|evidence|provenance] [--json] [--as-of <YYYY-MM>] (example: --as-of 2024-07)",
+  history: "Usage: whether history [compare] [--weeks <n>] [--json] [--as-of <YYYY-MM>] (example: --as-of 2024-07)",
   brief: "Usage: whether brief [exec|board|staff|investor|slack|email] [--copy]",
   export: "Usage: whether export [json|csv|markdown|pdf|briefing] [--output <file>]",
   share: "Usage: whether share [slack|email|clipboard] [--brief <type>]",
