@@ -1,9 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { DEFAULT_THRESHOLDS, evaluateRegime } from "../../../../lib/regimeEngine";
 import { buildScenarioContract } from "../../../../lib/cli/contracts";
 import { applyScenarioOverridesToTreasury } from "../../../../lib/cli/scenarioInputs";
 import { loadReportDataSafe } from "../../../../lib/report/reportData";
 import { getRegimeDisplayLabel } from "../../../../lib/regimePresentation";
+import { CLI_QUERY_ALLOWLIST_BY_ENDPOINT, rejectUnsupportedCliQuery } from "../../../../lib/cli/queryContracts";
 
 export const runtime = "edge";
 export const revalidate = 0;
@@ -18,15 +19,17 @@ const parseNumber = (value: string | null) => {
 };
 
 
-export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const tightness = parseNumber(url.searchParams.get("tightness"));
-  const riskAppetite = parseNumber(url.searchParams.get("risk-appetite"));
+export async function GET(request: NextRequest) {
+  const invalidQuery = rejectUnsupportedCliQuery(request, CLI_QUERY_ALLOWLIST_BY_ENDPOINT.scenario);
+  if (invalidQuery) return invalidQuery;
 
-  if (url.searchParams.has("tightness") && tightness === null) {
+  const tightness = parseNumber(request.nextUrl.searchParams.get("tightness"));
+  const riskAppetite = parseNumber(request.nextUrl.searchParams.get("risk-appetite"));
+
+  if (request.nextUrl.searchParams.has("tightness") && tightness === null) {
     return NextResponse.json({ error: "Invalid tightness input." }, { status: 400 });
   }
-  if (url.searchParams.has("risk-appetite") && riskAppetite === null) {
+  if (request.nextUrl.searchParams.has("risk-appetite") && riskAppetite === null) {
     return NextResponse.json({ error: "Invalid risk-appetite input." }, { status: 400 });
   }
 

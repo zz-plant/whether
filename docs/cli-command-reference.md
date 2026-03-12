@@ -31,18 +31,29 @@ Whether CLI is an operator decision terminal: **environment → call → changes
 - `whether install [--yes|--ci] [--api-base-url <url>] [--token <token>]`
 - `whether completion`
 
-## Common flags
+## Global output/setup flags
 
 - `--json`
 - `--yaml`
 - `--markdown`
 - `--quiet`
 - `--no-color`
-- `--company <name>`
-- `--stage <name>`
-- `--as-of <YYYY-MM> (example: 2024-07)`
 - `--yes` (install: non-interactive acceptance of defaults)
 - `--ci` (install: alias of `--yes` for CI scripts)
+
+## Command-specific query flags
+
+- `status`: `--as-of <YYYY-MM>`, `--view expanded`, `--verbose`
+- `call`: `--as-of <YYYY-MM>`
+- `changes`: `--as-of <YYYY-MM>`
+- `diagnostics`: `--as-of <YYYY-MM>`
+- `regime`: `--as-of <YYYY-MM>`
+- `history`: `--as-of <YYYY-MM>`, `--weeks <n>`
+- `scenario`: `--tightness <n>`, `--risk-appetite <n>`
+
+Notes:
+- `--as-of` is mapped to `asOf` query shape expected by the API handlers.
+- `--company` / `--stage` are CLI context flags (for commands like `whether company ...`) and are not forwarded as query params to `/api/cli/*` endpoints.
 
 ## Install contract (automation-safe)
 

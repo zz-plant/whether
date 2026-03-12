@@ -4,6 +4,59 @@ Whether translates macro market signals into a weekly operating posture for star
 
 In practical terms, it gives founders a weekly answer for the decisions they obsess over: **hiring pace, fundraising timing, and runway discipline.**
 
+## Agent Quickstart (non-interactive)
+
+Use this when you need a copy-paste setup that works in CI, headless containers, and other non-interactive shells.
+
+### 1) Install
+
+```bash
+bun install
+bun run cli:whether -- install --ci --api-base-url "${WHETHER_API_URL:-http://localhost:3000}" --token "${WHETHER_TOKEN:-}"
+```
+
+If your shell cannot write `~/.config/whether/config.yaml`, skip installer writes and use env vars directly:
+
+```bash
+export WHETHER_API_URL="${WHETHER_API_URL:-http://localhost:3000}"
+export WHETHER_TOKEN="${WHETHER_TOKEN:-}"
+```
+
+### 2) Auth check
+
+```bash
+bun run cli:whether -- auth status
+```
+
+Need command details? See the CLI auth command reference: `docs/cli-command-reference.md#whether-cli-v1`.
+
+### 3) Smoke test
+
+```bash
+bun run cli:whether -- --version
+bun run cli:whether -- ping --json
+bun run cli:whether -- brief --json
+```
+
+### 4) Troubleshooting common blockers
+
+- **403 / WAF / reverse-proxy blocks**
+  - Symptom: `forbidden` errors or HTML challenge pages instead of JSON.
+  - Check API health path through your deployed edge: `"$WHETHER_API_URL/api/health"`.
+  - Fallback to the agent-facing HTTP route for read-only retrieval: `GET /api/agent?cadence=weekly` (see `docs/agents/agent-interface.md#option-a-http-interface`).
+- **`whether` not found (missing PATH)**
+  - Use repo-local invocation to avoid PATH dependency:
+    - `bun run cli:whether -- <command>`
+  - Re-run install after PATH fixes only if you need global `whether` binary behavior.
+- **No package install allowed**
+  - If `bun install` is blocked, use the already-checked-out repo/runtime image and call the fallback API path directly:
+    - `curl -fsS "${WHETHER_API_URL:-http://localhost:3000}/api/agent?cadence=weekly"`
+  - This keeps decision artifact retrieval unblocked even when local CLI bootstrap is restricted.
+
+Cross-links:
+- Fallback API path details: `docs/agents/agent-interface.md#option-a-http-interface`
+- Auth status command family: `docs/cli-command-reference.md#whether-cli-v1`
+
 ## What Whether does
 - Detects the current startup market weather from Treasury yield data and companion macro signals.
 - Converts that weather read into concrete operating constraints (hiring posture, fundraising readiness, runway discipline).

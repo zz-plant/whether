@@ -15,6 +15,7 @@ export const metadata: Metadata = buildPageMetadata({
 
 const endpointUrl = `${siteUrl}/api/weekly`;
 const agentEndpointUrl = `${siteUrl}/api/agent?cadence=weekly`;
+const apiReferenceUrl = "https://github.com/zz-plant/whether/blob/main/docs/developer/api-reference.md";
 const curlExample = `curl -s ${endpointUrl}`;
 const machineCurlExample = `curl -s ${agentEndpointUrl}`;
 const responseExample = `{
@@ -84,9 +85,14 @@ export default async function OperationsDataPage() {
           </pre>
           <ul className="space-y-2 text-sm text-slate-300">
             <li>
-              <Link href="/docs/developer/api-reference" className="text-sky-200 underline-offset-2 hover:underline">
-                /docs/developer/api-reference
-              </Link>{" "}
+              <a
+                href={apiReferenceUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="text-sky-200 underline-offset-2 hover:underline"
+              >
+                Developer API reference (GitHub)
+              </a>{" "}
               — full endpoint contracts.
             </li>
             <li>

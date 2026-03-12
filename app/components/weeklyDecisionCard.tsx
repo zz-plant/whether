@@ -124,6 +124,174 @@ export type WeeklyDecisionCardProps = {
   isFallbackSnapshot?: boolean;
   failureModes?: FailureModeWarningItem[];
   actions?: ReactNode;
+  diagnosticsLane?: ReactNode;
+};
+
+export type WeeklyDecisionDiagnosticsLaneProps = {
+  weeklyMemoLines: string[];
+  immediateDecision: string;
+  revisitDecisions: boolean;
+  guardrail: string;
+  regimeDistance: WeeklyDecisionCardProps["regimeDistance"];
+  postureWithStageLabel: string;
+  statusLabel: string;
+  trendLabel: string;
+  confidencePercent: number;
+  decisionMatrix?: DecisionMatrixPayload;
+  decisionRules: BoundedDecisionRule[];
+  roleAwareTemplates: RoleAwareOperatingTemplate[];
+  evidenceItems: ReportEvidenceItem[];
+  reportDynamics: ReportDynamics;
+  weeklyMovement: WeeklyMovement;
+  transitionProbabilities: Record<ForecastRegimeLabel, number>;
+  failureModes: FailureModeWarningItem[];
+  historicalTimeline: WeeklyDecisionCardProps["historicalTimeline"];
+};
+
+export const WeeklyDecisionDiagnosticsLane = ({
+  weeklyMemoLines,
+  immediateDecision,
+  revisitDecisions,
+  guardrail,
+  regimeDistance,
+  postureWithStageLabel,
+  statusLabel,
+  trendLabel,
+  confidencePercent,
+  decisionMatrix,
+  decisionRules,
+  roleAwareTemplates,
+  evidenceItems,
+  reportDynamics,
+  weeklyMovement,
+  transitionProbabilities,
+  failureModes,
+  historicalTimeline,
+}: WeeklyDecisionDiagnosticsLaneProps) => {
+  const decisionDeltaStripItems = buildDecisionDeltaStripItems({
+    weeklyMemoLines,
+    immediateDecision,
+    revisitDecisions,
+    guardrail,
+    regimeDistance,
+  });
+  const topContributors = (reportDynamics.signalContributions ?? []).slice(0, 3);
+  const topContributorInline =
+    topContributors.length > 0
+      ? topContributors
+          .slice(0, 2)
+          .map((item) => `${item.label} (${item.normalizedPercentLabel})`)
+          .join(" · ")
+      : "No active contributors this week.";
+  const conciseWeeklyMovement = weeklyMovement.summary.replace(/\.$/, "");
+  const recentTimeline = historicalTimeline.slice(-2);
+
+  return (
+    <>
+      <article className={`${tierTwoPanel} ${sectionSpacing}`} aria-label="Need deeper analysis">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className={tierTwoHeading}>Need deeper analysis?</h2>
+          <p className="text-[11px] uppercase tracking-[0.1em] text-slate-400">Optional depth</p>
+        </div>
+        <p className="text-xs text-slate-300">Open diagnostics only when you need proof detail, role-level execution plans, or model input context.</p>
+
+        <Accordion.Root defaultValue={["since-last-review"]} className="space-y-2">
+          <Accordion.Item value="since-last-review" className="group">
+            <DiagnosticsAccordionTrigger label="Since last review" />
+            <Accordion.Panel>
+              <ul className="mt-3 grid gap-2 sm:grid-cols-3">
+                {decisionDeltaStripItems.map((item) => (
+                  <li key={item.id}>
+                    <Link href={item.href} className={`block min-h-[44px] rounded-lg border px-3 py-2 text-xs transition hover:border-slate-300/45 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${impactToneClass[item.impact]}`}>
+                      <p className="font-semibold uppercase tracking-[0.1em]">{item.label}</p>
+                      <p className="mt-1 leading-5 text-slate-100">{item.detail}</p>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </Accordion.Panel>
+          </Accordion.Item>
+
+          <Accordion.Item value="weekly-decision-brief" className="group">
+            <DiagnosticsAccordionTrigger label="Weekly decision brief" />
+            <Accordion.Panel>
+              <ul className="mt-3 grid gap-2 text-xs text-slate-200 sm:grid-cols-2">
+                <li className={tierOneInset}><span className="font-semibold text-slate-100">Regime:</span> {postureWithStageLabel ?? statusLabel}</li>
+                <li className={tierOneInset}><span className="font-semibold text-slate-100">Trend:</span> {trendLabel}</li>
+                <li className={tierOneInset}><span className="font-semibold text-slate-100">Confidence:</span> {Math.round(confidencePercent)}%</li>
+                <li className={tierOneInset}><span className="font-semibold text-slate-100">Next flip:</span> {regimeDistance.dimensionLabel} {regimeDistance.thresholdDirection === "riseAbove" ? "rises above" : "falls to or below"} {regimeDistance.thresholdValue.toFixed(1)}</li>
+              </ul>
+            </Accordion.Panel>
+          </Accordion.Item>
+
+          <Accordion.Item id="decision-snapshot-for-leadership-this-week" value="decision-snapshot" className="group">
+            <DiagnosticsAccordionTrigger label="Open diagnostics: decision snapshot matrix" />
+            <Accordion.Panel className={disclosurePanelClass}>
+              <BoundedRulesMatrix decisionMatrix={decisionMatrix} decisionRules={decisionRules} />
+            </Accordion.Panel>
+          </Accordion.Item>
+
+          <Accordion.Item id="execution-guidance" value="role-plan" className="group">
+            <DiagnosticsAccordionTrigger label="Open diagnostics: role plan" />
+            <Accordion.Panel className={`${disclosurePanelClass} grid gap-3 sm:grid-cols-2`}>
+              {roleAwareTemplates.map((template) => (
+                <article key={template.role} className={`${tierOneInset} space-y-2`}>
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-200">{template.roleLabel}</p>
+                  <p className="rounded-md border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-2 text-xs text-emerald-100"><span className="font-semibold uppercase tracking-[0.1em]">Approve now</span> {compactRoleCue(template.doNow)}</p>
+                  <p className="rounded-md border border-rose-500/40 bg-rose-500/10 px-2.5 py-2 text-xs text-rose-100"><span className="font-semibold uppercase tracking-[0.1em]">Delay now</span> {compactRoleCue(template.avoidNow)}</p>
+                  <p className="rounded-md border border-sky-500/40 bg-sky-500/10 px-2.5 py-2 text-xs text-sky-100"><span className="font-semibold uppercase tracking-[0.1em]">Flip when</span> {compactActionCue(template.flipTrigger)}</p>
+                </article>
+              ))}
+            </Accordion.Panel>
+          </Accordion.Item>
+
+          <Accordion.Item id="evidence-diagnostics" value="evidence-drivers-model-inputs" className={`${tierThreePanel} ${compactSectionSpacing} group`}>
+            <DiagnosticsAccordionTrigger label="Open diagnostics: evidence, drivers, and model inputs" />
+            <Accordion.Panel className={disclosurePanelClass}>
+              <article className={compactInset}>
+                <p className={`text-xs ${neutralLabel}`}>Evidence</p>
+                <ul className="mt-1 space-y-1 text-xs text-slate-200">
+                  {evidenceItems.map((item) => (
+                    <li key={`evidence-${item.key}`}>• {item.title} (Updated {item.lastUpdated ? formatDateUTC(item.lastUpdated) : "—"}): {item.immediateImplication}</li>
+                  ))}
+                </ul>
+              </article>
+
+              <article className={`${compactInset} mt-2`}>
+                <p className={`text-xs ${neutralLabel}`}>Drivers</p>
+                <p className="mt-1 text-xs text-slate-300">Top contributors: {topContributorInline}</p>
+                <p className="mt-1 text-xs text-slate-300">Weekly movement: {conciseWeeklyMovement}</p>
+              </article>
+
+              <article className={`${compactInset} mt-2`}>
+                <p className={`text-xs ${neutralLabel}`}>Model inputs</p>
+                <p className="mt-1 text-xs text-slate-300">Decision thresholds are in the matrix above.</p>
+                <p className="mt-1 text-xs text-slate-300">Defensive probability: {formatProbabilityPercent(transitionProbabilities.Defensive)}</p>
+              </article>
+              {failureModes.length > 0 ? (
+                <article className={`${compactInset} mt-2`}>
+                  <p className={`text-xs ${neutralLabel}`}>False-signal warnings</p>
+                  <ul className="mt-1 space-y-1 text-xs text-slate-300">
+                    {failureModes.slice(0, 2).map((mode) => (
+                      <li key={mode.id}>• {mode.warning}</li>
+                    ))}
+                  </ul>
+                </article>
+              ) : null}
+            </Accordion.Panel>
+          </Accordion.Item>
+        </Accordion.Root>
+      </article>
+
+      <article className={`${tierOnePanel} ${sectionSpacing}`}>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className={tierOneHeading}>Regime history (recent)</h2>
+          <p className="text-[11px] uppercase tracking-[0.1em] text-slate-400">Last 2 checkpoints</p>
+        </div>
+        <PostureHistoryTimeline historicalTimeline={recentTimeline} />
+      </article>
+    </>
+  );
 };
 
 const sectionSpacing = "space-y-3";
@@ -1158,6 +1326,7 @@ export function WeeklyDecisionCard({
   isFallbackSnapshot = false,
   failureModes = [],
   actions,
+  diagnosticsLane,
 }: WeeklyDecisionCardProps) {
   const freshnessMeta = buildCompactFreshnessMeta({
     updatedAtLabel: fetchedAtLabel,
@@ -1182,15 +1351,6 @@ export function WeeklyDecisionCard({
       ? "Revise hiring and roadmap calls now."
       : "Hold last week's operating rules.");
 
-  const topContributors = (reportDynamics.signalContributions ?? []).slice(0, 3);
-  const topContributorInline =
-    topContributors.length > 0
-      ? topContributors
-          .slice(0, 2)
-          .map((item) => `${item.label} (${item.normalizedPercentLabel})`)
-          .join(" · ")
-      : "No active contributors this week.";
-  const conciseWeeklyMovement = weeklyMovement.summary.replace(/\.$/, "");
   const snapshotDoNow = immediateDecision;
   const snapshotAvoid = executiveOperationalStance.avoid[0] ?? guardrail;
   const snapshotWatch = canonicalDecisionCopy?.flipTrigger ?? flipThreshold ?? reversalTrigger;
@@ -1313,14 +1473,6 @@ export function WeeklyDecisionCard({
 
     return contentMap;
   }, {});
-  const decisionDeltaStripItems = buildDecisionDeltaStripItems({
-    weeklyMemoLines,
-    immediateDecision,
-    revisitDecisions,
-    guardrail,
-    regimeDistance,
-  });
-  const recentTimeline = historicalTimeline.slice(-2);
   const resolvedRegimeKey = regimeKey ?? "DEFENSIVE";
 
   return (
@@ -1361,108 +1513,28 @@ export function WeeklyDecisionCard({
             actions={actions}
           />
 
-          <article className={`${tierTwoPanel} ${sectionSpacing}`} aria-label="Need deeper analysis">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 className={tierTwoHeading}>Need deeper analysis?</h2>
-              <p className="text-[11px] uppercase tracking-[0.1em] text-slate-400">Optional depth</p>
-            </div>
-            <p className="text-xs text-slate-300">Open diagnostics only when you need proof detail, role-level execution plans, or model input context.</p>
-
-            <Accordion.Root defaultValue={["since-last-review"]} className="space-y-2">
-              <Accordion.Item value="since-last-review" className="group">
-                <DiagnosticsAccordionTrigger label="Since last review" />
-                <Accordion.Panel>
-                  <ul className="mt-3 grid gap-2 sm:grid-cols-3">
-                    {decisionDeltaStripItems.map((item) => (
-                      <li key={item.id}>
-                        <Link href={item.href} className={`block min-h-[44px] rounded-lg border px-3 py-2 text-xs transition hover:border-slate-300/45 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${impactToneClass[item.impact]}`}>
-                          <p className="font-semibold uppercase tracking-[0.1em]">{item.label}</p>
-                          <p className="mt-1 leading-5 text-slate-100">{item.detail}</p>
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </Accordion.Panel>
-              </Accordion.Item>
-
-              <Accordion.Item value="weekly-decision-brief" className="group">
-                <DiagnosticsAccordionTrigger label="Weekly decision brief" />
-                <Accordion.Panel>
-                  <ul className="mt-3 grid gap-2 text-xs text-slate-200 sm:grid-cols-2">
-                    <li className={tierOneInset}><span className="font-semibold text-slate-100">Regime:</span> {postureWithStageLabel ?? statusLabel}</li>
-                    <li className={tierOneInset}><span className="font-semibold text-slate-100">Trend:</span> {trendLabel}</li>
-                    <li className={tierOneInset}><span className="font-semibold text-slate-100">Confidence:</span> {Math.round(confidencePercent)}%</li>
-                    <li className={tierOneInset}><span className="font-semibold text-slate-100">Next flip:</span> {regimeDistance.dimensionLabel} {regimeDistance.thresholdDirection === "riseAbove" ? "rises above" : "falls to or below"} {regimeDistance.thresholdValue.toFixed(1)}</li>
-                  </ul>
-                </Accordion.Panel>
-              </Accordion.Item>
-
-              <Accordion.Item id="decision-snapshot-for-leadership-this-week" value="decision-snapshot" className="group">
-                <DiagnosticsAccordionTrigger label="Open diagnostics: decision snapshot matrix" />
-                <Accordion.Panel className={disclosurePanelClass}>
-                  <BoundedRulesMatrix decisionMatrix={decisionMatrix} decisionRules={decisionRules} />
-                </Accordion.Panel>
-              </Accordion.Item>
-
-              <Accordion.Item id="execution-guidance" value="role-plan" className="group">
-                <DiagnosticsAccordionTrigger label="Open diagnostics: role plan" />
-                <Accordion.Panel className={`${disclosurePanelClass} grid gap-3 sm:grid-cols-2`}>
-                  {roleAwareTemplates.map((template) => (
-                    <article key={template.role} className={`${tierOneInset} space-y-2`}>
-                      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-200">{template.roleLabel}</p>
-                      <p className="rounded-md border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-2 text-xs text-emerald-100"><span className="font-semibold uppercase tracking-[0.1em]">Approve now</span> {compactRoleCue(template.doNow)}</p>
-                      <p className="rounded-md border border-rose-500/40 bg-rose-500/10 px-2.5 py-2 text-xs text-rose-100"><span className="font-semibold uppercase tracking-[0.1em]">Delay now</span> {compactRoleCue(template.avoidNow)}</p>
-                      <p className="rounded-md border border-sky-500/40 bg-sky-500/10 px-2.5 py-2 text-xs text-sky-100"><span className="font-semibold uppercase tracking-[0.1em]">Flip when</span> {compactActionCue(template.flipTrigger)}</p>
-                    </article>
-                  ))}
-                </Accordion.Panel>
-              </Accordion.Item>
-
-              <Accordion.Item id="evidence-diagnostics" value="evidence-drivers-model-inputs" className={`${tierThreePanel} ${compactSectionSpacing} group`}>
-                <DiagnosticsAccordionTrigger label="Open diagnostics: evidence, drivers, and model inputs" />
-                <Accordion.Panel className={disclosurePanelClass}>
-                  <article className={compactInset}>
-                <p className={`text-xs ${neutralLabel}`}>Evidence</p>
-                <ul className="mt-1 space-y-1 text-xs text-slate-200">
-                  {evidenceItems.map((item) => (
-                    <li key={`evidence-${item.key}`}>• {item.title} (Updated {item.lastUpdated ? formatDateUTC(item.lastUpdated) : "—"}): {item.immediateImplication}</li>
-                  ))}
-                </ul>
-              </article>
-
-              <article className={`${compactInset} mt-2`}>
-                <p className={`text-xs ${neutralLabel}`}>Drivers</p>
-                <p className="mt-1 text-xs text-slate-300">Top contributors: {topContributorInline}</p>
-                <p className="mt-1 text-xs text-slate-300">Weekly movement: {conciseWeeklyMovement}</p>
-              </article>
-
-              <article className={`${compactInset} mt-2`}>
-                <p className={`text-xs ${neutralLabel}`}>Model inputs</p>
-                <p className="mt-1 text-xs text-slate-300">Decision thresholds are in the matrix above.</p>
-                <p className="mt-1 text-xs text-slate-300">Defensive probability: {formatProbabilityPercent(transitionProbabilities.Defensive)}</p>
-              </article>
-              {failureModes.length > 0 ? (
-                <article className={`${compactInset} mt-2`}>
-                  <p className={`text-xs ${neutralLabel}`}>False-signal warnings</p>
-                  <ul className="mt-1 space-y-1 text-xs text-slate-300">
-                    {failureModes.slice(0, 2).map((mode) => (
-                      <li key={mode.id}>• {mode.warning}</li>
-                    ))}
-                  </ul>
-                </article>
-              ) : null}
-                </Accordion.Panel>
-              </Accordion.Item>
-            </Accordion.Root>
-          </article>
-
-          <article className={`${tierOnePanel} ${sectionSpacing}`}>
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 className={tierOneHeading}>Regime history (recent)</h2>
-              <p className="text-[11px] uppercase tracking-[0.1em] text-slate-400">Last 2 checkpoints</p>
-            </div>
-            <PostureHistoryTimeline historicalTimeline={recentTimeline} />
-          </article>
+          {diagnosticsLane ?? (
+            <WeeklyDecisionDiagnosticsLane
+              weeklyMemoLines={weeklyMemoLines}
+              immediateDecision={immediateDecision}
+              revisitDecisions={revisitDecisions}
+              guardrail={guardrail}
+              regimeDistance={regimeDistance}
+              postureWithStageLabel={postureWithStageLabel}
+              statusLabel={statusLabel}
+              trendLabel={trendLabel}
+              confidencePercent={confidencePercent}
+              decisionMatrix={decisionMatrix}
+              decisionRules={decisionRules}
+              roleAwareTemplates={roleAwareTemplates}
+              evidenceItems={evidenceItems}
+              reportDynamics={reportDynamics}
+              weeklyMovement={weeklyMovement}
+              transitionProbabilities={transitionProbabilities}
+              failureModes={failureModes}
+              historicalTimeline={historicalTimeline}
+            />
+          )}
 
         </main>
 
