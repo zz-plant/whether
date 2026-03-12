@@ -3,7 +3,7 @@ import type { RegimeAssessment } from "../regimeEngine";
 import type { TreasuryData } from "../types";
 import type { ActionStripItem } from "../report/operatingCalls";
 import type { PostureStateContract } from "../report/postureStateContract";
-import type { CanonicalDecisionCopy } from "../report/canonicalDecisionCopy";
+import { buildFlipConditionsWithoutTriggerDuplication, type CanonicalDecisionCopy } from "../report/canonicalDecisionCopy";
 
 export type WeeklyOperatorBriefPayload = {
   date: string;
@@ -66,10 +66,19 @@ export const buildWeeklyOperatorBriefPayload = ({
       ?? normalizedFlipConditionLabels[0]
       ?? "Flip when live indicators cross the weekly guardrail threshold.",
     flipConditionLabels: canonicalDecisionCopy?.flipConditions.length
-      ? canonicalDecisionCopy.flipConditions
+      ? buildFlipConditionsWithoutTriggerDuplication({
+        flipTrigger:
+          canonicalDecisionCopy.flipTrigger
+          ?? postureState?.whatFlipsNext.flipTrigger
+          ?? "",
+        flipConditions: canonicalDecisionCopy.flipConditions,
+      })
       : normalizedFlipConditionLabels.length > 0
       ? normalizedFlipConditionLabels
-      : (postureState?.whatFlipsNext.thresholds ?? []),
+      : buildFlipConditionsWithoutTriggerDuplication({
+        flipTrigger: postureState?.whatFlipsNext.flipTrigger ?? "",
+        flipConditions: postureState?.whatFlipsNext.thresholds ?? [],
+      }),
   };
 };
 
@@ -82,7 +91,7 @@ export const buildWeeklyOperatorBriefPlainText = (payload: WeeklyOperatorBriefPa
   ...payload.doNowBullets.map((bullet) => `• ${bullet}`),
   "",
   `Flip trigger: ${payload.flipTrigger}`,
-  ...(payload.flipConditionLabels.length > 1
+  ...(payload.flipConditionLabels.length > 0
     ? ["", "Flip conditions:", ...payload.flipConditionLabels.map((condition) => `• ${condition}`)]
     : []),
 ].join("\n");

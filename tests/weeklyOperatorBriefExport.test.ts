@@ -96,6 +96,26 @@ describe("weekly operator brief export adapters", () => {
     assert.ok(parsed.blocks.some((block) => block.type === "section"));
     assert.ok(parsed.blocks.some((block) => block.type === "context"));
   });
+
+  it("removes flip trigger duplication from canonical flip conditions", () => {
+    const payload = buildWeeklyOperatorBriefPayload({
+      assessment,
+      treasury,
+      confidenceLabel: "MED",
+      canonicalDecisionCopy: {
+        currentRegimeLabel: "Defensive",
+        operatingCall: "Protect runway.",
+        doNowLines: ["Hold fixed burn."],
+        flipTrigger: "Tightness < 65",
+        flipConditions: ["Tightness < 65", "Risk appetite > 50", "Yield curve steepens"],
+      },
+    });
+
+    assert.deepEqual(payload.flipConditionLabels, ["Risk appetite > 50", "Yield curve steepens"]);
+    const text = buildWeeklyOperatorBriefPlainText(payload);
+    assert.doesNotMatch(text, /Flip conditions:\n• Tightness < 65/);
+  });
+
 });
 
 

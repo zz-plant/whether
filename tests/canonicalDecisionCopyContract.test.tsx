@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { RegimeCommandBar } from "../app/components/RegimeCommandBar";
-import { buildCanonicalDecisionCopy } from "../lib/report/canonicalDecisionCopy";
+import { buildCanonicalDecisionCopy, buildFlipConditionsWithoutTriggerDuplication } from "../lib/report/canonicalDecisionCopy";
 import { buildWeeklyOperatorBriefPayload, buildWeeklyCallSnapshotPlainText } from "../lib/export/weeklyOperatorBrief";
 import type { RegimeAssessment } from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
@@ -140,4 +140,63 @@ describe("canonical decision copy contract", () => {
     assert.match(snapshot, /DO NOW: Pause net-new fixed burn commitments this week\./);
     assert.match(snapshot, /WATCH: Flip when tightness falls below 65 and holds\./);
   });
+
+  it("keeps command bar flip list unique when canonical conditions include the trigger", () => {
+    const postureStateWithDuplicatedThreshold: PostureStateContract = {
+      ...postureState,
+      whatFlipsNext: {
+        ...postureState.whatFlipsNext,
+        thresholds: [
+          "Flip when tightness falls below 65 and holds.",
+          "Risk appetite > 50",
+          "Yield curve re-steepens",
+          "Credit spreads normalize",
+        ],
+      },
+    };
+
+    const canonical = buildCanonicalDecisionCopy({
+      homeBriefModel: {
+        postureWithStageLabel: "Defensive — Watchful",
+        postureLabel: "Defensive",
+        operatingStanceLine: "Stage approvals and protect runway.",
+        actionNowShort: "Pause net-new fixed burn commitments this week.",
+        actionStripItems: [{ label: "Hiring", actionNow: "Keep hiring to critical backfills only." }],
+        guardrail: "Hold discretionary spend above 10k pending review.",
+        canonicalFlipConditions: [
+          {
+            area: "hiring",
+            metric: "tightness",
+            operator: "<",
+            value: 65,
+            label: "Flip when tightness falls below 65 and holds.",
+          },
+        ],
+        compactFlipConditionLabels: [
+          "Flip when tightness falls below 65 and holds.",
+          "Risk appetite > 50",
+          "Yield curve re-steepens",
+          "Credit spreads normalize",
+        ],
+      } as never,
+      postureState: postureStateWithDuplicatedThreshold,
+    });
+
+    const commandBarFlipConditions = [
+      canonical.flipTrigger,
+      ...buildFlipConditionsWithoutTriggerDuplication({
+        flipTrigger: canonical.flipTrigger,
+        flipConditions: canonical.flipConditions,
+        maxItems: 3,
+      }),
+    ];
+
+    assert.deepEqual(commandBarFlipConditions, [
+      "Flip when tightness falls below 65 and holds.",
+      "Risk appetite > 50",
+      "Yield curve re-steepens",
+      "Credit spreads normalize",
+    ]);
+  });
+
 });
