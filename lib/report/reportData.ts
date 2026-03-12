@@ -35,6 +35,7 @@ import { buildActionStripItems } from "./operatingCalls";
 import { deltaLabelBySignal, resolveSignalDirection, signalOrder } from "./briefFormatting";
 import { cache } from "react";
 import type { TreasuryData } from "../types";
+import { resolveConfidencePercent as resolveConfidencePercentFromAssessment, resolveDistanceToFlip as resolveDistanceToFlipFromInputs } from "./confidence";
 
 export type ReportSearchParams = {
   month?: string;
@@ -115,8 +116,10 @@ export type ConfidenceTrendFraming = "strengthening" | "weakening" | "unstable";
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
 const resolveConfidencePercent = (assessment: ReturnType<typeof evaluateRegime>) => {
-  const gap = resolveDistanceToFlip(assessment);
-  return Math.max(35, Math.min(92, Math.round(55 + gap * 3)));
+  return resolveConfidencePercentFromAssessment({
+    scores: assessment.scores,
+    thresholds: assessment.thresholds,
+  });
 };
 
 export const classifyConfidenceTrend = (points: WeeklyConfidencePoint[]): ConfidenceTrendFraming => {
@@ -267,9 +270,10 @@ const ANALOG_DIMENSION_WEIGHTS: AnalogScoreDimensions = {
 };
 
 const resolveDistanceToFlip = (assessment: ReturnType<typeof evaluateRegime>) => {
-  const tightnessGap = Math.abs(assessment.scores.tightness - assessment.thresholds.tightnessRegime);
-  const riskGap = Math.abs(assessment.scores.riskAppetite - assessment.thresholds.riskAppetiteRegime);
-  return Math.min(tightnessGap, riskGap);
+  return resolveDistanceToFlipFromInputs({
+    scores: assessment.scores,
+    thresholds: assessment.thresholds,
+  });
 };
 
 const resolveConfidenceBand = (assessment: ReturnType<typeof evaluateRegime>) => {
@@ -904,7 +908,25 @@ const loadReportDataMemoized = cache(async (cacheKey?: string) => {
     return loadReportDataUncached();
   }
 
-  return loadReportDataUncached(JSON.parse(cacheKey) as ReportSearchParams);
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(cacheKey);
+  } catch {
+    return loadReportDataUncached();
+  }
+
+  if (!parsed || typeof parsed !== "object") {
+    return loadReportDataUncached();
+  }
+
+  const normalizedSearchParams: ReportSearchParams = {};
+  for (const [key, value] of Object.entries(parsed)) {
+    if (typeof value === "string" || typeof value === "undefined") {
+      normalizedSearchParams[key] = value;
+    }
+  }
+
+  return loadReportDataUncached(normalizedSearchParams);
 });
 
 export const loadReportData = (searchParams?: ReportSearchParams) => {

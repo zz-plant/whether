@@ -11,8 +11,7 @@ Completed in this patch:
 - Route canonicalization contributor checklist documented in `docs/development-playbook.md`
 
 Remaining backlog from audit:
-- Enforce noun discipline copy pass (regime vs posture vs environment)
-- Bind action strip items to measurable stop/flip conditions
+- None from this patch scope. Open IA/design follow-ups are tracked separately in `docs/design-debt-prioritized.md`.
 
 ## Plan-week execution status
 

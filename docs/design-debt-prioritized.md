@@ -11,6 +11,19 @@ Scope clicked: `/`, `/start`, `/signals`, `/operations`, `/decide`, `/toolkits`,
    - **Code signals:** The top nav is implemented as a horizontal overflow rail (`overflow-x-auto`, `snap-x`) without an affordance pattern (fade edge, explicit chevron, or progress hint).
    - **Recommendation:** Add explicit horizontal-scroll affordance and active-tab visibility cues; ensure first render makes the pattern self-evident.
 
+### Implementation tracker
+
+| ID | Priority | Item | Suggested owner | Status |
+| --- | --- | --- | --- | --- |
+| DD-001 | P0 | Mobile global nav scroll affordance | Design + Frontend | Open |
+| DD-002 | P1 | IA taxonomy/nav alignment with canonical hubs | Product + Frontend | Open |
+| DD-003 | P1 | Theme toggle accessibility semantics | Frontend | Open |
+| DD-004 | P1 | `/start` progressive disclosure on mobile | Product + Frontend | Open |
+| DD-005 | P2 | Consolidate duplicate CTA patterns on primary pages | Product + Frontend | Open |
+| DD-006 | P2 | Improve dark-theme secondary text contrast tokens | Design system + Frontend | Open |
+| DD-007 | P3 | Standardize user-facing Evidence/Signals naming | Product + Content | Open |
+| DD-008 | P3 | Toolkit search feedback affordances | Frontend | Open |
+
 ## Priority 1 — High leverage
 
 2. **Information architecture drift between intended hub model and surfaced navigation labels/routes.**
@@ -55,4 +68,3 @@ Scope clicked: `/`, `/start`, `/signals`, `/operations`, `/decide`, `/toolkits`,
    - **Why it matters:** Users submit a full form request for simple filtering, with minimal assistive affordances like highlighted matches, quick facets, or saved intents.
    - **Code signals:** `/toolkits` uses server-rendered query filtering through a search form and plain results grid.
    - **Recommendation:** Keep server filtering but add lightweight client-side affordances (suggested intents, active-query chips, result counts near input).
-
