@@ -201,4 +201,9 @@ export const getRegimeAlertRepository = () => {
   return sharedRepository;
 };
 
+export const resetRegimeAlertRepository = () => {
+  sharedRepository = new InMemoryRegimeAlertRepository();
+  return sharedRepository;
+};
+
 export const buildRegimeAlertLineage = () => buildLineage("request-received-at");
