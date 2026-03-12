@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { formatPublishedLabel } from "../../../lib/formatters";
 import type { ProductConceptArticle } from "../../../lib/productCanon";
 import { getMacroContextForArticle, regimeToneByKey } from "../../../lib/productCanon";
@@ -113,7 +114,9 @@ export const ConceptTaxonomyPage = <TTaxonomy extends string>({
         <p className="text-sm text-slate-300">{copy.description(resolvedTaxonomy)}</p>
       </section>
 
-      <ThisWeeksOperatingImplication />
+      <Suspense fallback={<ThisWeeksOperatingImplicationFallback />}>
+        <ThisWeeksOperatingImplication />
+      </Suspense>
 
       <section className="weather-panel space-y-3 px-6 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Articles</h2>
@@ -170,6 +173,11 @@ const ThisWeeksOperatingImplication = async () => {
   return (
     <section className="weather-panel space-y-3 px-6 py-5">
       <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">This week’s operating implication</p>
+      {!reportResult.ok ? (
+        <p className="weather-surface border-amber-300/40 bg-amber-400/10 px-3 py-2 text-xs font-semibold text-amber-100">
+          Using fallback snapshot data. Live report feeds are currently degraded, so posture and recommendations may be stale.
+        </p>
+      ) : null}
       <p className="text-sm font-semibold text-slate-100">Posture: {homeBriefModel.postureLabel}</p>
       {topRule ? (
         <article className="weather-surface space-y-2 px-4 py-3 text-sm">
@@ -198,3 +206,10 @@ const ThisWeeksOperatingImplication = async () => {
     </section>
   );
 };
+
+const ThisWeeksOperatingImplicationFallback = () => (
+  <section className="weather-panel space-y-3 px-6 py-5" aria-live="polite" aria-busy="true">
+    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">This week’s operating implication</p>
+    <p className="text-sm text-slate-300">Loading current operating posture…</p>
+  </section>
+);
