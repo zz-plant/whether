@@ -24,6 +24,11 @@ export const operationsWorkstreamLinks: OperationsWorkstreamLink[] = [
     label: "Data",
     description: "Optional handoff: share API guidance and data references with automation owners.",
   },
+  {
+    href: "/operations/cli",
+    label: "CLI",
+    description: "Run status, changes, history, and scenario checks directly from the terminal.",
+  },
 ];
 
 export const operationsSectionLinks: { plan: ReportSectionLink[] } = {
