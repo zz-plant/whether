@@ -69,3 +69,20 @@ Order: **flags > env vars > config file**.
 - `GET /api/cli/scenario`
 
 All are versioned `v1` payloads for automation-safe command output.
+
+
+## Troubleshooting (error categories)
+
+The CLI maps common failures to these exact category-prefixed error strings:
+
+- `auth: Authentication failed. Set WHETHER_TOKEN or pass --token, then run whether auth login --token <token>.`
+- `network: Unable to reach Whether API. Set WHETHER_API_URL or pass --api-base-url, then verify <apiBaseUrl>/api/health.`
+- `forbidden: Access denied by API. Use a token with required access via WHETHER_TOKEN or --token, then retry.`
+- `rate limit: Request quota exceeded. Retry with --watch --interval 120 or wait for quota reset at /api/cli/status.`
+- `server fault: API returned <status>. Run whether doctor and verify <apiBaseUrl>/api/health is healthy before retrying.`
+
+Notes:
+- `auth` and `forbidden` return exit code `2`.
+- `network`, `rate limit`, and `server fault` return exit code `1`.
+- The top-level handler also prints `Cause: ...` so the original failure remains visible for debugging.
+

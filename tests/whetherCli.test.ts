@@ -80,6 +80,111 @@ describe("whether cli", () => {
     assert.ok(requests.some((url) => url.includes("/api/cli/status?asOf=2024-07")));
   });
 
+
+  it("maps auth category with remediation and preserves cause", async () => {
+    const server = http.createServer((req, res) => {
+      if ((req.url ?? "").startsWith("/api/cli/status")) {
+        res.writeHead(401, { "content-type": "application/json" });
+        res.end(JSON.stringify({ error: "unauthorized" }));
+        return;
+      }
+      res.writeHead(404);
+      res.end();
+    });
+
+    await new Promise<void>((resolve) => server.listen(0, resolve));
+    const { port } = server.address() as { port: number };
+    const result = spawnSync("node", [CLI_PATH, "status", "--api-base-url", `http://127.0.0.1:${port}`], { encoding: "utf8" });
+    server.close();
+
+    assert.equal(result.status, 2);
+    assert.match(result.stderr, /auth: Authentication failed\./);
+    assert.match(result.stderr, /WHETHER_TOKEN/);
+    assert.match(result.stderr, /whether auth login --token <token>/);
+    assert.match(result.stderr, /Cause: HTTP 401 for \/api\/cli\/status/);
+  });
+
+  it("maps forbidden category with remediation and preserves cause", async () => {
+    const server = http.createServer((req, res) => {
+      if ((req.url ?? "").startsWith("/api/cli/status")) {
+        res.writeHead(403, { "content-type": "application/json" });
+        res.end(JSON.stringify({ error: "forbidden" }));
+        return;
+      }
+      res.writeHead(404);
+      res.end();
+    });
+
+    await new Promise<void>((resolve) => server.listen(0, resolve));
+    const { port } = server.address() as { port: number };
+    const result = spawnSync("node", [CLI_PATH, "status", "--api-base-url", `http://127.0.0.1:${port}`], { encoding: "utf8" });
+    server.close();
+
+    assert.equal(result.status, 2);
+    assert.match(result.stderr, /forbidden: Access denied by API\./);
+    assert.match(result.stderr, /--token/);
+    assert.match(result.stderr, /Cause: HTTP 403 for \/api\/cli\/status/);
+  });
+
+  it("maps rate limit category with remediation and preserves cause", async () => {
+    const server = http.createServer((req, res) => {
+      if ((req.url ?? "").startsWith("/api/cli/status")) {
+        res.writeHead(429, { "content-type": "application/json" });
+        res.end(JSON.stringify({ error: "too_many_requests" }));
+        return;
+      }
+      res.writeHead(404);
+      res.end();
+    });
+
+    await new Promise<void>((resolve) => server.listen(0, resolve));
+    const { port } = server.address() as { port: number };
+    const result = spawnSync("node", [CLI_PATH, "status", "--api-base-url", `http://127.0.0.1:${port}`], { encoding: "utf8" });
+    server.close();
+
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /rate limit: Request quota exceeded\./);
+    assert.match(result.stderr, /--watch --interval 120/);
+    assert.match(result.stderr, /Cause: HTTP 429 for \/api\/cli\/status/);
+  });
+
+  it("maps server fault category with remediation and preserves cause", async () => {
+    const server = http.createServer((req, res) => {
+      if ((req.url ?? "").startsWith("/api/cli/status")) {
+        res.writeHead(503, { "content-type": "application/json" });
+        res.end(JSON.stringify({ error: "downstream_unavailable" }));
+        return;
+      }
+      res.writeHead(404);
+      res.end();
+    });
+
+    await new Promise<void>((resolve) => server.listen(0, resolve));
+    const { port } = server.address() as { port: number };
+    const result = spawnSync("node", [CLI_PATH, "status", "--api-base-url", `http://127.0.0.1:${port}`], { encoding: "utf8" });
+    server.close();
+
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /server fault: API returned 503\./);
+    assert.match(result.stderr, /whether doctor/);
+    assert.match(result.stderr, /\/api\/health/);
+    assert.match(result.stderr, /Cause: HTTP 503 for \/api\/cli\/status/);
+  });
+
+  it("maps network category with remediation and preserves original fetch cause", () => {
+    const result = spawnSync(
+      "node",
+      [CLI_PATH, "status", "--api-base-url", "http://127.0.0.1:1"],
+      { encoding: "utf8" },
+    );
+
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /network: Unable to reach Whether API\./);
+    assert.match(result.stderr, /WHETHER_API_URL/);
+    assert.match(result.stderr, /--api-base-url/);
+    assert.match(result.stderr, /Cause:/);
+  });
+
   it("surfaces unsupported query params from API for status", async () => {
     const server = http.createServer((req, res) => {
       if ((req.url ?? "").startsWith("/api/cli/status")) {

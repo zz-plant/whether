@@ -5,6 +5,13 @@ import path from "node:path";
 
 const EXIT = { OK: 0, ERROR: 1, AUTH_CONFIG: 2, NO_DATA: 3, WATCH_TRIGGER: 4, INVALID_SCENARIO: 5 };
 const CONFIG_PATH = path.join(os.homedir(), ".config", "whether", "config.yaml");
+const ERROR_CATEGORY = {
+  AUTH: "auth",
+  NETWORK: "network",
+  FORBIDDEN: "forbidden",
+  RATE_LIMIT: "rate limit",
+  SERVER_FAULT: "server fault",
+};
 
 const HELP = `Whether CLI — decision terminal for operators
 
@@ -136,19 +143,85 @@ const normalizeFlags = async (flags) => {
   };
 };
 
-const getJson = async (settings, endpoint) => {
-  const response = await fetch(`${settings.apiBaseUrl}${endpoint}`, {
-    cache: "no-store",
-    headers: {
-      accept: "application/json",
-      ...(settings.token ? { authorization: `Bearer ${settings.token}` } : {}),
-    },
-  });
+const getCategoryRemediation = (category, settings) => {
+  const healthUrl = `${settings.apiBaseUrl}/api/health`;
+  switch (category) {
+    case ERROR_CATEGORY.AUTH:
+      return "Set WHETHER_TOKEN or pass --token, then run `whether auth login --token <token>`.";
+    case ERROR_CATEGORY.NETWORK:
+      return `Set WHETHER_API_URL or pass --api-base-url, then verify ${healthUrl}.`;
+    case ERROR_CATEGORY.FORBIDDEN:
+      return "Use a token with required access via WHETHER_TOKEN or --token, then retry.";
+    case ERROR_CATEGORY.RATE_LIMIT:
+      return "Retry with --watch --interval 120 or wait for quota reset at /api/cli/status.";
+    case ERROR_CATEGORY.SERVER_FAULT:
+      return `Run \`whether doctor\` and verify ${healthUrl} is healthy before retrying.`;
+    default:
+      return "Retry the command or run `whether doctor`.";
+  }
+};
 
-  if (response.status === 401 || response.status === 403) {
-    const error = new Error("Authentication failed. Run `whether auth login --token <token>`.");
-    error.exitCode = EXIT.AUTH_CONFIG;
-    throw error;
+const buildCliError = ({ category, summary, settings, cause, exitCode = EXIT.ERROR }) => {
+  const remediation = getCategoryRemediation(category, settings);
+  const error = new Error(`${category}: ${summary} ${remediation}`, { cause });
+  error.exitCode = exitCode;
+  error.category = category;
+  error.remediation = remediation;
+  return error;
+};
+
+const getJson = async (settings, endpoint) => {
+  let response;
+  try {
+    response = await fetch(`${settings.apiBaseUrl}${endpoint}`, {
+      cache: "no-store",
+      headers: {
+        accept: "application/json",
+        ...(settings.token ? { authorization: `Bearer ${settings.token}` } : {}),
+      },
+    });
+  } catch (cause) {
+    throw buildCliError({
+      category: ERROR_CATEGORY.NETWORK,
+      summary: "Unable to reach Whether API.",
+      settings,
+      cause,
+    });
+  }
+
+  if (response.status === 401) {
+    throw buildCliError({
+      category: ERROR_CATEGORY.AUTH,
+      summary: "Authentication failed.",
+      settings,
+      cause: new Error(`HTTP ${response.status} for ${endpoint}`),
+      exitCode: EXIT.AUTH_CONFIG,
+    });
+  }
+  if (response.status === 403) {
+    throw buildCliError({
+      category: ERROR_CATEGORY.FORBIDDEN,
+      summary: "Access denied by API.",
+      settings,
+      cause: new Error(`HTTP ${response.status} for ${endpoint}`),
+      exitCode: EXIT.AUTH_CONFIG,
+    });
+  }
+  if (response.status === 429) {
+    throw buildCliError({
+      category: ERROR_CATEGORY.RATE_LIMIT,
+      summary: "Request quota exceeded.",
+      settings,
+      cause: new Error(`HTTP ${response.status} for ${endpoint}`),
+    });
+  }
+  if (response.status >= 500) {
+    throw buildCliError({
+      category: ERROR_CATEGORY.SERVER_FAULT,
+      summary: `API returned ${response.status}.`,
+      settings,
+      cause: new Error(`HTTP ${response.status} for ${endpoint}`),
+    });
   }
   if (response.status === 404) {
     const error = new Error("No data available.");
@@ -156,7 +229,9 @@ const getJson = async (settings, endpoint) => {
     throw error;
   }
   if (!response.ok) {
-    const error = new Error(`Request failed (${response.status})`);
+    const error = new Error(`Request failed (${response.status})`, {
+      cause: new Error(`HTTP ${response.status} for ${endpoint}`),
+    });
     error.exitCode = EXIT.ERROR;
     throw error;
   }
@@ -453,48 +528,70 @@ const main = async () => {
   try {
     switch (parsed.command) {
       case "status":
-        return cmdStatus(settings, parsed.flags);
+        await cmdStatus(settings, parsed.flags);
+        return;
       case "call":
-        return cmdCall(settings, parsed.subcommand ?? "show", parsed.flags);
+        await cmdCall(settings, parsed.subcommand ?? "show", parsed.flags);
+        return;
       case "regime":
-        return cmdRegime(settings, parsed.flags);
+        await cmdRegime(settings, parsed.flags);
+        return;
       case "changes":
-        return cmdChanges(settings, parsed.flags);
+        await cmdChanges(settings, parsed.flags);
+        return;
       case "diagnostics":
-        return cmdDiagnostics(settings, parsed.subcommand ?? "summary", parsed.flags);
+        await cmdDiagnostics(settings, parsed.subcommand ?? "summary", parsed.flags);
+        return;
       case "history":
-        return cmdHistory(settings, parsed.subcommand, parsed.flags);
+        await cmdHistory(settings, parsed.subcommand, parsed.flags);
+        return;
       case "brief":
-        return cmdBrief(settings, parsed.subcommand, parsed.flags);
+        await cmdBrief(settings, parsed.subcommand, parsed.flags);
+        return;
       case "export":
-        return cmdExport(settings, parsed.subcommand, parsed.flags);
+        await cmdExport(settings, parsed.subcommand, parsed.flags);
+        return;
       case "share":
-        return cmdShare(settings, parsed.subcommand, parsed.flags);
+        await cmdShare(settings, parsed.subcommand, parsed.flags);
+        return;
       case "explain":
-        return cmdExplain(settings, parsed.subcommand, parsed.flags);
+        await cmdExplain(settings, parsed.subcommand, parsed.flags);
+        return;
       case "scenario":
-        return cmdScenario(settings, parsed.flags);
+        await cmdScenario(settings, parsed.flags);
+        return;
       case "company":
-        return cmdCompany(settings, parsed.subcommand, parsed.args, parsed.flags);
+        await cmdCompany(settings, parsed.subcommand, parsed.args, parsed.flags);
+        return;
       case "watch":
-        return cmdWatch(settings, parsed.flags);
+        await cmdWatch(settings, parsed.flags);
+        return;
       case "config":
-        return cmdConfig(settings, parsed.subcommand ?? "get", parsed.args, parsed.flags);
+        await cmdConfig(settings, parsed.subcommand ?? "get", parsed.args, parsed.flags);
+        return;
       case "auth":
-        return cmdAuth(settings, parsed.subcommand ?? "status", parsed.flags);
+        await cmdAuth(settings, parsed.subcommand ?? "status", parsed.flags);
+        return;
       case "raw":
-        return cmdRaw(settings, parsed.subcommand);
+        await cmdRaw(settings, parsed.subcommand);
+        return;
       case "doctor":
-        return cmdDoctor(settings);
+        await cmdDoctor(settings);
+        return;
       case "completion":
-        return writeOutput("Shell completion is available via `whether completion` (zsh/bash integration planned).", settings);
+        writeOutput("Shell completion is available via `whether completion` (zsh/bash integration planned).", settings);
+        return;
       default:
         writeOutput(HELP, settings);
         process.exit(EXIT.ERROR);
     }
   } catch (error) {
-    console.error(error.message);
-    process.exit(error.exitCode ?? EXIT.ERROR);
+    const knownError = error instanceof Error ? error : new Error(String(error));
+    console.error(knownError.message);
+    if (knownError.cause instanceof Error && knownError.cause.message) {
+      console.error(`Cause: ${knownError.cause.message}`);
+    }
+    process.exit(knownError.exitCode ?? EXIT.ERROR);
   }
 };
 
