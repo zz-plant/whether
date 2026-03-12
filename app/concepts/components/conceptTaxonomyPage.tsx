@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { formatPublishedLabel } from "../../../lib/formatters";
 import type { ProductConceptArticle } from "../../../lib/productCanon";
 import { getMacroContextForArticle, regimeToneByKey } from "../../../lib/productCanon";
+import { buildHomeBriefModel } from "../../../lib/report/homeBriefModel";
+import { loadReportDataSafe } from "../../../lib/report/reportData";
 import { buildCanonicalUrl, buildPageMetadata, serializeJsonLd } from "../../../lib/seo";
 
 export type ConceptTaxonomyKind = "audience" | "focus";
@@ -111,6 +113,8 @@ export const ConceptTaxonomyPage = <TTaxonomy extends string>({
         <p className="text-sm text-slate-300">{copy.description(resolvedTaxonomy)}</p>
       </section>
 
+      <ThisWeeksOperatingImplication />
+
       <section className="weather-panel space-y-3 px-6 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Articles</h2>
         <ol className="space-y-3">
@@ -154,5 +158,43 @@ export const ConceptTaxonomyPage = <TTaxonomy extends string>({
         </Link>
       </section>
     </main>
+  );
+};
+
+const ThisWeeksOperatingImplication = async () => {
+  const reportResult = await loadReportDataSafe(undefined, { route: "/concepts" });
+  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
+  const homeBriefModel = buildHomeBriefModel(reportData);
+  const topRule = homeBriefModel.decisionRules[0];
+
+  return (
+    <section className="weather-panel space-y-3 px-6 py-5">
+      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">This week’s operating implication</p>
+      <p className="text-sm font-semibold text-slate-100">Posture: {homeBriefModel.postureLabel}</p>
+      {topRule ? (
+        <article className="weather-surface space-y-2 px-4 py-3 text-sm">
+          <p className="text-slate-100">
+            <span className="font-semibold">Action:</span> {topRule.recommendation}
+          </p>
+          <p className="text-rose-200">
+            <span className="font-semibold">Trigger:</span> {topRule.pauseTrigger}
+          </p>
+          <p className="text-emerald-200">
+            <span className="font-semibold">Reversal:</span> {topRule.resumeTrigger}
+          </p>
+        </article>
+      ) : null}
+      <div className="flex flex-wrap gap-3">
+        <Link href="/" className="weather-button inline-flex min-h-[44px] items-center justify-center">
+          Open weekly brief
+        </Link>
+        <Link
+          href="/answers"
+          className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]"
+        >
+          Browse answer pages
+        </Link>
+      </div>
+    </section>
   );
 };
