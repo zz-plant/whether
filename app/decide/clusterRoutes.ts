@@ -21,6 +21,10 @@ export const decideClusterStaticParams = decideClusterRoutes
   .filter((route) => route.isIndexable)
   .map((route) => ({ slug: route.slug, cluster: route.cluster }));
 
+export const decideCanonicalClusterStaticParams = decideClusterRoutes
+  .filter((route) => route.isIndexable && route.isCanonical)
+  .map((route) => ({ slug: route.slug, cluster: route.cluster }));
+
 export const findDecideClusterRoute = (slug: string, cluster: string) =>
   decideClusterRoutes.find((route) => route.slug === slug && route.cluster === cluster && route.isIndexable);
 

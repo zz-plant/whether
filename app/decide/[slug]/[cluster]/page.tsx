@@ -4,17 +4,17 @@ import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../../lib/seo";
 import { readProgrammaticPayload } from "../../../../lib/seo/programmaticPayloadBuilder";
 import { findUseCaseRole } from "../../../../lib/decisionDomainCatalog";
-import { decideClusterStaticParams, findDecideClusterRoute } from "../../clusterRoutes";
+import { decideCanonicalClusterStaticParams, findDecideClusterRoute } from "../../clusterRoutes";
 import { findDecisionScenario } from "../../../seoRouteClusters";
 import type { SeoDecisionPayload } from "../../../../lib/report/seoDecisionPayload";
 
 type Params = { slug: string; cluster: string };
 
-export const dynamicParams = false;
+export const dynamicParams = true;
 export const revalidate = 900;
 
 export function generateStaticParams() {
-  return decideClusterStaticParams;
+  return decideCanonicalClusterStaticParams;
 }
 
 

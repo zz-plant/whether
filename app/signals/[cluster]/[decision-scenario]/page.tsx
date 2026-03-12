@@ -9,7 +9,7 @@ import { findDecisionScenario, signalScenarioRoutes } from "../../../seoRouteClu
 
 type Params = { cluster: string; "decision-scenario": string };
 
-export const dynamicParams = false;
+export const dynamicParams = true;
 export const revalidate = 900;
 
 export function generateStaticParams() {
