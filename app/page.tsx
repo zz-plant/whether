@@ -42,6 +42,7 @@ import { LiveDataFallbackAlert } from "./components/liveDataFallbackAlert";
 import { getRegimeDisplayLabel } from "../lib/regimePresentation";
 import { buildPostureState } from "../lib/report/postureStateSource";
 import { buildCanonicalDecisionCopy, buildFlipConditionsWithoutTriggerDuplication } from "../lib/report/canonicalDecisionCopy";
+import { Skeleton } from "./components/skeleton";
 
 export const revalidate = 900;
 export const runtime = "edge";
@@ -149,20 +150,20 @@ const HomePageStreamingFallback = () => (
         <li className="rounded-lg border border-slate-700/90 bg-slate-900/60 px-2.5 py-2">3. Generate a share-ready leadership brief</li>
       </ol>
       <div className="space-y-3 rounded-xl border border-slate-700/80 bg-slate-900/70 p-3">
-        <div className="h-3 w-32 animate-pulse rounded-full bg-slate-600/80" />
-        <div className="h-4 w-full animate-pulse rounded-full bg-slate-500/80" />
-        <div className="h-4 w-11/12 animate-pulse rounded-full bg-slate-500/70" />
-        <div className="h-3 w-40 animate-pulse rounded-full bg-slate-600/80" />
+        <Skeleton className="h-3 w-32 rounded-full bg-slate-600/80" />
+        <Skeleton className="h-4 w-full rounded-full bg-slate-500/80" />
+        <Skeleton className="h-4 w-11/12 rounded-full bg-slate-500/70" />
+        <Skeleton className="h-3 w-40 rounded-full bg-slate-600/80" />
       </div>
       <p className="text-xs text-slate-300">Usually ready in under 10 seconds for weekly standup.</p>
     </section>
     <section className="weather-panel space-y-4 px-5 py-5" aria-label="Loading evidence">
       <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Checking live evidence</p>
       <div className="space-y-2 rounded-xl border border-slate-700/80 bg-slate-900/70 p-3">
-        <div className="h-3 w-full animate-pulse rounded-full bg-slate-600/70" />
-        <div className="h-3 w-full animate-pulse rounded-full bg-slate-600/70" />
-        <div className="h-3 w-11/12 animate-pulse rounded-full bg-slate-600/60" />
-        <div className="h-3 w-7/12 animate-pulse rounded-full bg-slate-600/60" />
+        <Skeleton className="h-3 w-full rounded-full bg-slate-600/70" />
+        <Skeleton className="h-3 w-full rounded-full bg-slate-600/70" />
+        <Skeleton className="h-3 w-11/12 rounded-full bg-slate-600/60" />
+        <Skeleton className="h-3 w-7/12 rounded-full bg-slate-600/60" />
       </div>
     </section>
   </section>
@@ -499,7 +500,7 @@ export const HomePageReportContent = async ({
         citation={callCitation}
         isFallbackSnapshot={isFallback && !historicalSelection}
         failureModes={homeBriefModel.failureModes}
-        actions={<CopyLeadershipArtifactsButtons weeklyCallSnapshot={weeklyCallSnapshotText} weeklyOperatorBrief={weeklyOperatorBriefText} boardSummary={boardSummary} citation={callCitation} />}
+        actions={<CopyLeadershipArtifactsButtons weeklyCallSnapshot={weeklyCallSnapshotText} weeklyOperatorBrief={weeklyOperatorBriefText} boardSummary={boardSummary} citation={callCitation} fallbackActive={isFallback && !historicalSelection} />}
       />
 
 

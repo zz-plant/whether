@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { Accordion } from "@base-ui/react/accordion";
 import { CircleTargetIcon, ShieldIcon } from "./uiIcons";
-import { CompactDisclosure } from "./compactDisclosure";
 import type { ConfidenceTrendFraming, ReportDynamics, ReportEvidenceItem, WeeklyConfidencePoint } from "../../lib/report/reportData";
 import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
 import { decisionAreaLabel, type StartupVariantMode } from "../../lib/report/boundedDecisionRules";
@@ -140,6 +140,17 @@ const compactInset = "rounded-md border border-slate-800/32 bg-slate-950/42 px-2
 const neutralLabel = "font-semibold tracking-[0.01em] text-slate-300";
 const disclosureSummaryClass =
   "flex min-h-[44px] w-full items-center justify-between gap-3 rounded-md border border-slate-800/52 bg-slate-950/56 px-3 py-2 text-left text-xs font-semibold tracking-[0.01em] text-slate-100 transition hover:border-slate-600/60 hover:bg-slate-900/74 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300";
+
+const disclosurePanelClass = "mt-3";
+
+const DiagnosticsAccordionTrigger = ({ label }: { label: string }) => (
+  <Accordion.Header>
+    <Accordion.Trigger className={`${disclosureSummaryClass} group cursor-pointer list-none touch-manipulation`}>
+      <span>{label}</span>
+      <span aria-hidden="true" className="text-sm transition group-data-[panel-open]:rotate-180">▾</span>
+    </Accordion.Trigger>
+  </Accordion.Header>
+);
 
 const SummaryLabel = ({
   label,
@@ -1350,68 +1361,60 @@ export function WeeklyDecisionCard({
             </div>
             <p className="text-xs text-slate-300">Open diagnostics only when you need proof detail, role-level execution plans, or model input context.</p>
 
-            <details className="group">
-              <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
-                <span>Since last review</span>
-                <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
-              </summary>
-              <ul className="mt-3 grid gap-2 sm:grid-cols-3">
-                {decisionDeltaStripItems.map((item) => (
-                  <li key={item.id}>
-                    <Link href={item.href} className={`block min-h-[44px] rounded-lg border px-3 py-2 text-xs transition hover:border-slate-300/45 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${impactToneClass[item.impact]}`}>
-                      <p className="font-semibold uppercase tracking-[0.1em]">{item.label}</p>
-                      <p className="mt-1 leading-5 text-slate-100">{item.detail}</p>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </details>
+            <Accordion.Root defaultValue={["since-last-review"]} className="space-y-2">
+              <Accordion.Item value="since-last-review" className="group">
+                <DiagnosticsAccordionTrigger label="Since last review" />
+                <Accordion.Panel>
+                  <ul className="mt-3 grid gap-2 sm:grid-cols-3">
+                    {decisionDeltaStripItems.map((item) => (
+                      <li key={item.id}>
+                        <Link href={item.href} className={`block min-h-[44px] rounded-lg border px-3 py-2 text-xs transition hover:border-slate-300/45 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${impactToneClass[item.impact]}`}>
+                          <p className="font-semibold uppercase tracking-[0.1em]">{item.label}</p>
+                          <p className="mt-1 leading-5 text-slate-100">{item.detail}</p>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </Accordion.Panel>
+              </Accordion.Item>
 
-            <details className="group">
-              <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
-                <span>Weekly decision brief</span>
-                <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
-              </summary>
-              <ul className="mt-3 grid gap-2 text-xs text-slate-200 sm:grid-cols-2">
-                <li className={tierOneInset}><span className="font-semibold text-slate-100">Regime:</span> {postureWithStageLabel ?? statusLabel}</li>
-                <li className={tierOneInset}><span className="font-semibold text-slate-100">Trend:</span> {trendLabel}</li>
-                <li className={tierOneInset}><span className="font-semibold text-slate-100">Confidence:</span> {Math.round(confidencePercent)}%</li>
-                <li className={tierOneInset}><span className="font-semibold text-slate-100">Next flip:</span> {regimeDistance.dimensionLabel} {regimeDistance.thresholdDirection === "riseAbove" ? "rises above" : "falls to or below"} {regimeDistance.thresholdValue.toFixed(1)}</li>
-              </ul>
-            </details>
+              <Accordion.Item value="weekly-decision-brief" className="group">
+                <DiagnosticsAccordionTrigger label="Weekly decision brief" />
+                <Accordion.Panel>
+                  <ul className="mt-3 grid gap-2 text-xs text-slate-200 sm:grid-cols-2">
+                    <li className={tierOneInset}><span className="font-semibold text-slate-100">Regime:</span> {postureWithStageLabel ?? statusLabel}</li>
+                    <li className={tierOneInset}><span className="font-semibold text-slate-100">Trend:</span> {trendLabel}</li>
+                    <li className={tierOneInset}><span className="font-semibold text-slate-100">Confidence:</span> {Math.round(confidencePercent)}%</li>
+                    <li className={tierOneInset}><span className="font-semibold text-slate-100">Next flip:</span> {regimeDistance.dimensionLabel} {regimeDistance.thresholdDirection === "riseAbove" ? "rises above" : "falls to or below"} {regimeDistance.thresholdValue.toFixed(1)}</li>
+                  </ul>
+                </Accordion.Panel>
+              </Accordion.Item>
 
-            <details id="decision-snapshot-for-leadership-this-week" className="group">
-              <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
-                <span>Open diagnostics: decision snapshot matrix</span>
-                <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
-              </summary>
-              <div className="mt-3"><BoundedRulesMatrix decisionMatrix={decisionMatrix} decisionRules={decisionRules} /></div>
-            </details>
+              <Accordion.Item id="decision-snapshot-for-leadership-this-week" value="decision-snapshot" className="group">
+                <DiagnosticsAccordionTrigger label="Open diagnostics: decision snapshot matrix" />
+                <Accordion.Panel className={disclosurePanelClass}>
+                  <BoundedRulesMatrix decisionMatrix={decisionMatrix} decisionRules={decisionRules} />
+                </Accordion.Panel>
+              </Accordion.Item>
 
-            <details id="execution-guidance" className="group">
-              <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
-                <span>Open diagnostics: role plan</span>
-                <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
-              </summary>
-              <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                {roleAwareTemplates.map((template) => (
-                  <article key={template.role} className={`${tierOneInset} space-y-2`}>
-                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-200">{template.roleLabel}</p>
-                    <p className="rounded-md border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-2 text-xs text-emerald-100"><span className="font-semibold uppercase tracking-[0.1em]">Approve now</span> {compactRoleCue(template.doNow)}</p>
-                    <p className="rounded-md border border-rose-500/40 bg-rose-500/10 px-2.5 py-2 text-xs text-rose-100"><span className="font-semibold uppercase tracking-[0.1em]">Delay now</span> {compactRoleCue(template.avoidNow)}</p>
-                    <p className="rounded-md border border-sky-500/40 bg-sky-500/10 px-2.5 py-2 text-xs text-sky-100"><span className="font-semibold uppercase tracking-[0.1em]">Flip when</span> {compactActionCue(template.flipTrigger)}</p>
-                  </article>
-                ))}
-              </div>
-            </details>
+              <Accordion.Item id="execution-guidance" value="role-plan" className="group">
+                <DiagnosticsAccordionTrigger label="Open diagnostics: role plan" />
+                <Accordion.Panel className={`${disclosurePanelClass} grid gap-3 sm:grid-cols-2`}>
+                  {roleAwareTemplates.map((template) => (
+                    <article key={template.role} className={`${tierOneInset} space-y-2`}>
+                      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-200">{template.roleLabel}</p>
+                      <p className="rounded-md border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-2 text-xs text-emerald-100"><span className="font-semibold uppercase tracking-[0.1em]">Approve now</span> {compactRoleCue(template.doNow)}</p>
+                      <p className="rounded-md border border-rose-500/40 bg-rose-500/10 px-2.5 py-2 text-xs text-rose-100"><span className="font-semibold uppercase tracking-[0.1em]">Delay now</span> {compactRoleCue(template.avoidNow)}</p>
+                      <p className="rounded-md border border-sky-500/40 bg-sky-500/10 px-2.5 py-2 text-xs text-sky-100"><span className="font-semibold uppercase tracking-[0.1em]">Flip when</span> {compactActionCue(template.flipTrigger)}</p>
+                    </article>
+                  ))}
+                </Accordion.Panel>
+              </Accordion.Item>
 
-            <CompactDisclosure
-              id="evidence-diagnostics"
-              className={`${tierThreePanel} ${compactSectionSpacing} group`}
-              summaryClassName={disclosureSummaryClass}
-              summary="Open diagnostics: evidence, drivers, and model inputs"
-            >
-              <article className={compactInset}>
+              <Accordion.Item id="evidence-diagnostics" value="evidence-drivers-model-inputs" className={`${tierThreePanel} ${compactSectionSpacing} group`}>
+                <DiagnosticsAccordionTrigger label="Open diagnostics: evidence, drivers, and model inputs" />
+                <Accordion.Panel className={disclosurePanelClass}>
+                  <article className={compactInset}>
                 <p className={`text-xs ${neutralLabel}`}>Evidence</p>
                 <ul className="mt-1 space-y-1 text-xs text-slate-200">
                   {evidenceItems.map((item) => (
@@ -1441,7 +1444,9 @@ export function WeeklyDecisionCard({
                   </ul>
                 </article>
               ) : null}
-            </CompactDisclosure>
+                </Accordion.Panel>
+              </Accordion.Item>
+            </Accordion.Root>
           </article>
 
           <article className={`${tierOnePanel} ${sectionSpacing}`}>
