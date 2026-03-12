@@ -58,6 +58,42 @@ The progression is: **macro awareness → operating posture → portfolio choice
 
 For internal battlecards, objection handling, and segment talk tracks, see `docs/sales-competitive-messaging.md`.
 
+## CLI install quickstart (canonical)
+Use this when you want the `whether` command available with a stable non-interactive setup contract.
+
+### Canonical method (recommended)
+Install dependencies and run the installer in non-interactive mode:
+
+```bash
+bun install
+bun run cli:whether -- install --yes --api-base-url http://localhost:3000
+```
+
+Linux/macOS CI-safe variant:
+
+```bash
+bun run cli:whether -- install --ci --api-base-url "$WHETHER_API_URL" --token "$WHETHER_TOKEN"
+```
+
+### Fallback method (restricted shells)
+If your shell blocks writing `~/.config/whether/config.yaml`, skip install and use environment variables directly:
+
+```bash
+export WHETHER_API_URL="http://localhost:3000"
+export WHETHER_TOKEN="<token-if-required>"
+```
+
+Then run commands with `bun run cli:whether -- <command>` so config-file writes are not required.
+
+### Verification
+Run:
+
+```bash
+bun run cli:whether -- --version
+```
+
+Expected success behavior: exit code `0` and stdout contains only a semantic version string like `0.1.0`.
+
 ## Local development
 1. Use Node.js 20+ (`.nvmrc`) and Bun 1.3.x.
 2. Install dependencies: `bun install`

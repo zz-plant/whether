@@ -3,6 +3,8 @@ import { describe, it } from "node:test";
 import { spawnSync } from "node:child_process";
 import path from "node:path";
 import http from "node:http";
+import fs from "node:fs";
+import os from "node:os";
 
 const CLI_PATH = path.join(process.cwd(), "scripts", "whether-cli.mjs");
 
@@ -17,6 +19,40 @@ describe("whether cli", () => {
   });
 
 
+
+
+  it("install fails in non-interactive shells without --yes/--ci", () => {
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
+    const result = spawnSync("node", [CLI_PATH, "install"], { encoding: "utf8", env: { ...process.env, HOME: homeDir } });
+    fs.rmSync(homeDir, { recursive: true, force: true });
+
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /Non-interactive shell detected/);
+    assert.match(result.stderr, /--yes/);
+  });
+
+  it("install supports --ci and writes config for automation", () => {
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
+    const install = spawnSync(
+      "node",
+      [CLI_PATH, "install", "--ci", "--api-base-url", "http://127.0.0.1:4321", "--token", "ci-token"],
+      { encoding: "utf8", env: { ...process.env, HOME: homeDir } },
+    );
+
+    assert.equal(install.status, 0);
+
+    const readConfig = spawnSync("node", [CLI_PATH, "config", "--json"], {
+      encoding: "utf8",
+      env: { ...process.env, HOME: homeDir },
+    });
+
+    fs.rmSync(homeDir, { recursive: true, force: true });
+
+    assert.equal(readConfig.status, 0);
+    const parsed = JSON.parse(readConfig.stdout);
+    assert.equal(parsed.api_base_url, "http://127.0.0.1:4321");
+    assert.equal(parsed.token, "ci-token");
+  });
 
   it("prints semantic version with --version", () => {
     const result = spawnSync("node", [CLI_PATH, "--version"], { encoding: "utf8" });
