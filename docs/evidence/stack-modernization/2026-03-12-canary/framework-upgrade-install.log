@@ -1,0 +1,12 @@
+bun add v1.2.14 (6a363a38)
+Resolving dependencies
+Resolved, downloaded and extracted [80]
+Saved lockfile
+
+installed next@16.2.0-canary.93 with binaries:
+ - next
+installed react@19.3.0-canary-46103596-20260305
+installed react-dom@19.3.0-canary-46103596-20260305
+installed eslint-config-next@16.2.0-canary.93
+
+14 packages installed [9.33s]

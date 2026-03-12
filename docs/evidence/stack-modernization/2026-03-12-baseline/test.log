@@ -1,0 +1,2967 @@
+TAP version 13
+# Subtest: pullRecentSiteInfo
+    # Subtest: fetches weekly cadence from the default site URL
+    ok 1 - fetches weekly cadence from the default site URL
+      ---
+      duration_ms: 1.682091
+      ...
+    # Subtest: uses provided site URL and cadence
+    ok 2 - uses provided site URL and cadence
+      ---
+      duration_ms: 0.581164
+      ...
+    # Subtest: throws when site response is not ok
+    ok 3 - throws when site response is not ok
+      ---
+      duration_ms: 1.323929
+      ...
+    1..3
+ok 1 - pullRecentSiteInfo
+  ---
+  duration_ms: 5.297963
+  type: 'suite'
+  ...
+# Subtest: agent-facing routes
+    # Subtest: defines permissive read-only CORS headers for /api/agent
+    ok 1 - defines permissive read-only CORS headers for /api/agent
+      ---
+      duration_ms: 1.247629
+      ...
+    # Subtest: serves llms.txt guidance
+    ok 2 - serves llms.txt guidance
+      ---
+      duration_ms: 6.246339
+      ...
+    # Subtest: serves machine-readable discovery metadata
+    ok 3 - serves machine-readable discovery metadata
+      ---
+      duration_ms: 4.087294
+      ...
+    1..3
+ok 2 - agent-facing routes
+  ---
+  duration_ms: 14.868975
+  type: 'suite'
+  ...
+# [premium-funnel] {
+#   type: 'premium_checkout_start',
+#   source: 'export_brief',
+#   path: '/pricing',
+#   ctaId: 'checkout_pro',
+#   planCandidate: 'team',
+#   seatBand: '6-20',
+#   occurredAt: '2026-03-12T03:20:08.838Z'
+# }
+# Subtest: /api/billing/checkout
+    # Subtest: returns 400 for malformed payload
+    ok 1 - returns 400 for malformed payload
+      ---
+      duration_ms: 38.631219
+      ...
+    # Subtest: requires a valid premium source for attribution
+    ok 2 - requires a valid premium source for attribution
+      ---
+      duration_ms: 2.002758
+      ...
+    # Subtest: returns checkout session when stripe is configured
+    ok 3 - returns checkout session when stripe is configured
+      ---
+      duration_ms: 21.27297
+      ...
+    1..3
+ok 3 - /api/billing/checkout
+  ---
+  duration_ms: 65.699494
+  type: 'suite'
+  ...
+# Subtest: /api/billing/webhook
+    # Subtest: rejects webhook payloads with invalid signatures
+    ok 1 - rejects webhook payloads with invalid signatures
+      ---
+      duration_ms: 9.273682
+      ...
+    # Subtest: rejects signatures with stale timestamps
+    ok 2 - rejects signatures with stale timestamps
+      ---
+      duration_ms: 2.058809
+      ...
+    # Subtest: accepts headers where a later v1 signature matches the active secret
+    ok 3 - accepts headers where a later v1 signature matches the active secret
+      ---
+      duration_ms: 10.956313
+      ...
+    # Subtest: accepts signed checkout completion events and forwards telemetry
+    ok 4 - accepts signed checkout completion events and forwards telemetry
+      ---
+      duration_ms: 5.213376
+      ...
+    # Subtest: ignores events without valid premium source attribution
+    ok 5 - ignores events without valid premium source attribution
+      ---
+      duration_ms: 2.934012
+      ...
+    1..5
+ok 4 - /api/billing/webhook
+  ---
+  duration_ms: 34.301246
+  type: 'suite'
+  ...
+# Subtest: /api/health
+    # Subtest: returns a monitor-friendly payload
+    ok 1 - returns a monitor-friendly payload
+      ---
+      duration_ms: 1236.141606
+      ...
+    1..1
+ok 5 - /api/health
+  ---
+  duration_ms: 1237.705185
+  type: 'suite'
+  ...
+# [premium-funnel] {
+#   type: 'premium_intent',
+#   source: 'export_brief',
+#   path: '/operations',
+#   ctaId: 'copy_slack_brief',
+#   occurredAt: '2026-03-12T03:20:10.046Z'
+# }
+# Subtest: /api/telemetry/premium-funnel
+    # Subtest: rejects invalid payloads
+    ok 1 - rejects invalid payloads
+      ---
+      duration_ms: 8.34298
+      ...
+    # Subtest: accepts valid premium intent events
+    ok 2 - accepts valid premium intent events
+      ---
+      duration_ms: 8.29588
+      ...
+    1..2
+ok 6 - /api/telemetry/premium-funnel
+  ---
+  duration_ms: 17.954873
+  type: 'suite'
+  ...
+# Subtest: /api/brief/slack
+    # Subtest: returns slack-ready brief payload
+    ok 1 - returns slack-ready brief payload
+      ---
+      duration_ms: 611.614111
+      ...
+    1..1
+ok 7 - /api/brief/slack
+  ---
+  duration_ms: 613.15945
+  type: 'suite'
+  ...
+# Subtest: summary route contracts
+    # Subtest: keeps /api/weekly response contract stable
+    ok 1 - keeps /api/weekly response contract stable
+      ---
+      duration_ms: 674.00692
+      ...
+    # Subtest: keeps /api/monthly response contract stable
+    ok 2 - keeps /api/monthly response contract stable
+      ---
+      duration_ms: 322.791735
+      ...
+    # Subtest: keeps /api/quarterly response contract stable
+    ok 3 - keeps /api/quarterly response contract stable
+      ---
+      duration_ms: 330.685051
+      ...
+    # Subtest: keeps /api/yearly response contract stable
+    ok 4 - keeps /api/yearly response contract stable
+      ---
+      duration_ms: 186.810163
+      ...
+    1..4
+ok 8 - summary route contracts
+  ---
+  duration_ms: 1517.452985
+  type: 'suite'
+  ...
+# Subtest: stripe billing helpers
+    # Subtest: reports readiness only when required env vars exist
+    ok 1 - reports readiness only when required env vars exist
+      ---
+      duration_ms: 2.108546
+      ...
+    # Subtest: creates a checkout session for a configured plan
+    ok 2 - creates a checkout session for a configured plan
+      ---
+      duration_ms: 45.973464
+      ...
+    # Subtest: throws a typed error when billing config is missing
+    ok 3 - throws a typed error when billing config is missing
+      ---
+      duration_ms: 1.15699
+      ...
+    # Subtest: maps transport failures to stripe_unreachable
+    ok 4 - maps transport failures to stripe_unreachable
+      ---
+      duration_ms: 0.73636
+      ...
+    1..4
+ok 9 - stripe billing helpers
+  ---
+  duration_ms: 51.70211
+  type: 'suite'
+  ...
+# Subtest: bounded decision rule formatting
+    # Subtest: preserves decimals for low-magnitude score displays
+    ok 1 - preserves decimals for low-magnitude score displays
+      ---
+      duration_ms: 1.637388
+      ...
+    1..1
+ok 10 - bounded decision rule formatting
+  ---
+  duration_ms: 2.978431
+  type: 'suite'
+  ...
+# Subtest: threads bounded decision rules into role templates
+ok 11 - threads bounded decision rules into role templates
+  ---
+  duration_ms: 0.918341
+  ...
+# Subtest: ensures every operating lever item includes bounded decision fields
+ok 12 - ensures every operating lever item includes bounded decision fields
+  ---
+  duration_ms: 0.759002
+  ...
+# Subtest: builds scoped variant adjustments with reversal discipline
+ok 13 - builds scoped variant adjustments with reversal discipline
+  ---
+  duration_ms: 0.600844
+  ...
+# Subtest: avoids zero-distance watch copy at regime boundaries
+ok 14 - avoids zero-distance watch copy at regime boundaries
+  ---
+  duration_ms: 0.616214
+  ...
+# Subtest: builds growth and public stage adjustments
+ok 15 - builds growth and public stage adjustments
+  ---
+  duration_ms: 0.42149
+  ...
+# Subtest: navigation breadcrumbs
+    # Subtest: preserves Home as the root breadcrumb label
+    ok 1 - preserves Home as the root breadcrumb label
+      ---
+      duration_ms: 2.51734
+      ...
+    1..1
+ok 16 - navigation breadcrumbs
+  ---
+  duration_ms: 4.125903
+  type: 'suite'
+  ...
+# Subtest: buildSlackBrief
+    # Subtest: formats index values without the literal unit suffix
+    ok 1 - formats index values without the literal unit suffix
+      ---
+      duration_ms: 4.792514
+      ...
+    # Subtest: includes compact financial implications aligned to posture
+    ok 2 - includes compact financial implications aligned to posture
+      ---
+      duration_ms: 0.568206
+      ...
+    # Subtest: optionally appends interpretation layer content for handoff
+    ok 3 - optionally appends interpretation layer content for handoff
+      ---
+      duration_ms: 0.949341
+      ...
+    # Subtest: formats bps values with readable spacing
+    ok 4 - formats bps values with readable spacing
+      ---
+      duration_ms: 0.561291
+      ...
+    # Subtest: carries interpretation context into board and citation artifacts
+    ok 5 - carries interpretation context into board and citation artifacts
+      ---
+      duration_ms: 1.241647
+      ...
+    # Subtest: includes posture stage label in export surfaces when provided
+    ok 6 - includes posture stage label in export surfaces when provided
+      ---
+      duration_ms: 0.559422
+      ...
+    # Subtest: adds compact weekly call artifact lines when operating stance context is provided
+    not ok 7 - adds compact weekly call artifact lines when operating stance context is provided
+      ---
+      duration_ms: 7.403838
+      location: '/workspace/whether/tests/briefBuilders.test.ts:1:5388'
+      failureType: 'testCodeFailure'
+      error: |-
+        The input did not match the regular expression /• Flip if: Tightness ≤/. Input:
+        
+        'Whether Report Brief — 2026-03-04\n' +
+          'Capital posture: Guarded Expansion — Late\n' +
+          'Tightness: 12 | Risk appetite: 68\n' +
+          'Base rate: 3.75% (1M)\n' +
+          'Curve slope: 0.55%\n' +
+          '\n' +
+          'Macro signals:\n' +
+          '• Chicago Fed National Financial Conditions Index: -0.52 · refreshed 2026-02-27\n' +
+          '• BBB credit spread (OAS): 174.00 bps · refreshed 2026-03-04\n' +
+          '\n' +
+          'Decision Shield highlights (top 3):\n' +
+          '• Constraint one\n' +
+          '• Constraint two\n' +
+          '• Constraint three\n' +
+          '\n' +
+          'Constraints:\n' +
+          '• Constraint one\n' +
+          '• Constraint two\n' +
+          '• Constraint three\n' +
+          '\n' +
+          'Financial implications:\n' +
+          '• Runway risk: LOW (23.8/100), downside flip 35.8/100.\n' +
+          '• Safe runway band: 8-17 months.\n' +
+          '• Raise timing window: 4-8 months (safe target in 0 months).\n' +
+          '• Suggested burn adjustment: 2.5% (range -5% to 10%).\n' +
+          '• Capital-raising guardrail: Raise proactively from leverage while window quality is favorable. Pause acceleration if risk appetite falls below 44 or tightness rises above 76. Resume full process when risk appetite > 54 and tightness < 66. Playbook start: Compounding referral loops and share mechanics\n' +
+          '• Burn-discipline guardrail: Keep discretionary spend gated by measurable short-cycle payback. Pause discretionary burn expansion if tightness > 76. Resume controlled burn expansion when tightness < 66 and budget payback proof is intact. Playbook stop: Over-engineering before demand proves out\n' +
+          '\n' +
+          'Startup environment — weekly call:\n' +
+          '• Posture: Guarded Expansion — Late\n' +
+          '• Trend: DETERIORATING\n' +
+          '• Distance to regime change: 2.0 points\n' +
+          '• Regime shift watch: ON\n' +
+          '• Current call: Stage decisions. Avoid irreversible spend.\n' +
+          '• Re-check owner/cadence: Owner: CEO + Finance lead · Checkpoint: Mon/Thu operating review.\n' +
+          '• Trust markers: Confidence: Guarded · Freshness: Stale\n' +
+          '• Operating posture: Stage decisions. Avoid irreversible spend.\n' +
+          '• Hiring stance\n' +
+          '  Action now: Backfills only\n' +
+          '  Trigger/threshold to tighten or loosen: Pause net-new hiring if tightness > 76\n' +
+          '  Reversal condition: Resume staged approvals when tightness < 66\n' +
+          '\n' +
+          'Citations:\n' +
+          'Treasury source: https://fred.stlouisfed.org (2026-03-04)\n' +
+          'Chicago Fed National Financial Conditions Index: https://fred.stlouisfed.org/series/NFCI (2026-02-27)\n' +
+          'BBB credit spread (OAS): https://fred.stlouisfed.org/series/BAA10Y (2026-03-04)\n' +
+          '\n' +
+          'Compliance stamp:\n' +
+          '- Internal use only\n' +
+          '- Governance artifact; not investment advice.\n' +
+          '- Source: https://fred.stlouisfed.org\n' +
+          '- Timestamp: 2026-03-04\n' +
+          '- Confidence: Score-based posture confidence\n' +
+          '- Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.'
+        
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected:
+      actual: |-
+        Whether Report Brief — 2026-03-04
+        Capital posture: Guarded Expansion — Late
+        Tightness: 12 | Risk appetite: 68
+        Base rate: 3.75% (1M)
+        Curve slope: 0.55%
+        
+        Macro signals:
+        • Chicago Fed National Financial Conditions Index: -0.52 · refreshed 2026-02-27
+        • BBB credit spread (OAS): 174.00 bps · refreshed 2026-03-04
+        
+        Decision Shield highlights (top 3):
+        • Constraint one
+        • Constraint two
+        • Constraint three
+        
+        Constraints:
+        • Constraint one
+        • Constraint two
+        • Constraint three
+        
+        Financial implications:
+        • Runway risk: LOW (23.8/100), downside flip 35.8/100.
+        • Safe runway band: 8-17 months.
+        • Raise timing window: 4-8 months (safe target in 0 months).
+        • Suggested burn adjustment: 2.5% (range -5% to 10%).
+        • Capital-raising guardrail: Raise proactively from leverage while window quality is favorable. Pause acceleration if risk appetite falls below 44 or tightness rises above 76. Resume full process when risk appetite > 54 and tightness < 66. Playbook start: Compounding referral loops and share mechanics
+        • Burn-discipline guardrail: Keep discretionary spend gated by measurable short-cycle payback. Pause discretionary burn expansion if tightness > 76. Resume controlled burn expansion when tightness < 66 and budget payback proof is intact. Playbook stop: Over-engineering before demand proves out
+        
+        Startup environment — weekly call:
+        • Posture: Guarded Expansion — Late
+        • Trend: DETERIORATING
+        • Distance to regime change: 2.0 points
+        • Regime shift watch: ON
+        • Current call: Stage decisions. Avoid irreversible spend.
+        • Re-check owner/cadence: Owner: CEO + Finance lead · Checkpoint: Mon/Thu operating review.
+        • Trust markers: Confidence: Guarded · Freshness: Stale
+        • Operating posture: Stage decisions. Avoid irreversible spend.
+        • Hiring stance
+          Action now: Backfills only
+          Trigger/threshold to tighten or loosen: Pause net-new hiring if tightness > 76
+          Reversal condition: Resume staged approvals when tightness < 66
+        
+        Citations:
+        Treasury source: https://fred.stlouisfed.org (2026-03-04)
+        Chicago Fed National Financial Conditions Index: https://fred.stlouisfed.org/series/NFCI (2026-02-27)
+        BBB credit spread (OAS): https://fred.stlouisfed.org/series/BAA10Y (2026-03-04)
+        
+        Compliance stamp:
+        - Internal use only
+        - Governance artifact; not investment advice.
+        - Source: https://fred.stlouisfed.org
+        - Timestamp: 2026-03-04
+        - Confidence: Score-based posture confidence
+        - Uncertainty: Interpretive and probabilistic guidance; verify assumptions before acting.
+      operator: 'match'
+      stack: |-
+        TestContext.<anonymous> (/workspace/whether/tests/briefBuilders.test.ts:218:12)
+        Test.runInAsyncScope (node:async_hooks:206:9)
+        Test.run (node:internal/test_runner/test:796:25)
+        Suite.processPendingSubtests (node:internal/test_runner/test:526:18)
+        Test.postRun (node:internal/test_runner/test:889:19)
+        Test.run (node:internal/test_runner/test:835:12)
+        async Suite.processPendingSubtests (node:internal/test_runner/test:526:7)
+      ...
+    # Subtest: includes at least one false-signal warning line when active
+    ok 8 - includes at least one false-signal warning line when active
+      ---
+      duration_ms: 0.736403
+      ...
+    # Subtest: adds compact historical analog references when provided
+    ok 9 - adds compact historical analog references when provided
+      ---
+      duration_ms: 1.096591
+      ...
+    # Subtest: omits interpretation context when default layer is selected
+    ok 10 - omits interpretation context when default layer is selected
+      ---
+      duration_ms: 0.393315
+      ...
+    1..10
+not ok 17 - buildSlackBrief
+  ---
+  duration_ms: 22.980038
+  type: 'suite'
+  location: '/workspace/whether/tests/briefBuilders.test.ts:1:2612'
+  failureType: 'subtestsFailed'
+  error: '1 subtest failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: cadence summaries
+    # Subtest: buildQuarterlySummary keeps the quarterly output contract
+    ok 1 - buildQuarterlySummary keeps the quarterly output contract
+      ---
+      duration_ms: 3.019298
+      ...
+    # Subtest: buildYearlySummary keeps the yearly output contract
+    ok 2 - buildYearlySummary keeps the yearly output contract
+      ---
+      duration_ms: 0.496015
+      ...
+    # Subtest: keeps period-label parsing cadence specific
+    ok 3 - keeps period-label parsing cadence specific
+      ---
+      duration_ms: 0.361465
+      ...
+    1..3
+ok 18 - cadence summaries
+  ---
+  duration_ms: 5.992555
+  type: 'suite'
+  ...
+# Subtest: CadenceSummaryCardAdapter
+    # Subtest: keeps weekly structured section order and labels stable
+    ok 1 - keeps weekly structured section order and labels stable
+      ---
+      duration_ms: 40.938215
+      ...
+    # Subtest: keeps monthly structured section order and labels stable
+    ok 2 - keeps monthly structured section order and labels stable
+      ---
+      duration_ms: 5.813447
+      ...
+    # Subtest: renders compact card for quarterly and yearly cadences
+    ok 3 - renders compact card for quarterly and yearly cadences
+      ---
+      duration_ms: 3.732686
+      ...
+    1..3
+ok 19 - CadenceSummaryCardAdapter
+  ---
+  duration_ms: 52.320215
+  type: 'suite'
+  ...
+# Subtest: cloudflare warning audit script
+    # Subtest: summarizes warning classes and tracks unexpected warnings
+    ok 1 - summarizes warning classes and tracks unexpected warnings
+      ---
+      duration_ms: 177.987773
+      ...
+    # Subtest: fails when fail-on-new is set and warnings breach policy
+    ok 2 - fails when fail-on-new is set and warnings breach policy
+      ---
+      duration_ms: 168.538903
+      ...
+    1..2
+ok 20 - cloudflare warning audit script
+  ---
+  duration_ms: 348.265329
+  type: 'suite'
+  ...
+# Subtest: cluster template metadata eligibility
+    # Subtest: forces noindex for degraded freshness/provenance on canonical decide routes
+    ok 1 - forces noindex for degraded freshness/provenance on canonical decide routes
+      ---
+      duration_ms: 1.922245
+      ...
+    # Subtest: keeps non-canonical decide routes as noindex even when payload is eligible
+    ok 2 - keeps non-canonical decide routes as noindex even when payload is eligible
+      ---
+      duration_ms: 0.332839
+      ...
+    # Subtest: forces noindex for degraded signal/scenario pages
+    ok 3 - forces noindex for degraded signal/scenario pages
+      ---
+      duration_ms: 0.337615
+      ...
+    # Subtest: forces noindex for degraded freshness/provenance on canonical toolkit routes
+    ok 4 - forces noindex for degraded freshness/provenance on canonical toolkit routes
+      ---
+      duration_ms: 0.357462
+      ...
+    # Subtest: keeps canonical toolkit pages indexable when payload is eligible
+    ok 5 - keeps canonical toolkit pages indexable when payload is eligible
+      ---
+      duration_ms: 0.196168
+      ...
+    1..5
+ok 21 - cluster template metadata eligibility
+  ---
+  duration_ms: 5.224827
+  type: 'suite'
+  ...
+# Subtest: company-profile adjusted rules
+    # Subtest: differentiates same posture recommendations by company stage
+    ok 1 - differentiates same posture recommendations by company stage
+      ---
+      duration_ms: 43.536008
+      ...
+    # Subtest: falls back to defaults when profile fields are explicitly undefined
+    ok 2 - falls back to defaults when profile fields are explicitly undefined
+      ---
+      duration_ms: 5.172126
+      ...
+    1..2
+ok 22 - company-profile adjusted rules
+  ---
+  duration_ms: 50.547147
+  type: 'suite'
+  ...
+# Subtest: concept conflicts
+    # Subtest: returns resolved conflict entries with canonical articles
+    ok 1 - returns resolved conflict entries with canonical articles
+      ---
+      duration_ms: 1.838136
+      ...
+    1..1
+ok 23 - concept conflicts
+  ---
+  duration_ms: 4.067672
+  type: 'suite'
+  ...
+# Subtest: concept regime mismatch
+    # Subtest: returns mismatch for a concept written in an opposite regime
+    ok 1 - returns mismatch for a concept written in an opposite regime
+      ---
+      duration_ms: 1.441617
+      ...
+    # Subtest: returns unknown when no publication snapshot exists
+    ok 2 - returns unknown when no publication snapshot exists
+      ---
+      duration_ms: 0.375967
+      ...
+    # Subtest: exposes a current regime context from the latest summary
+    ok 3 - exposes a current regime context from the latest summary
+      ---
+      duration_ms: 0.600385
+      ...
+    1..3
+ok 24 - concept regime mismatch
+  ---
+  duration_ms: 4.345407
+  type: 'suite'
+  ...
+# Subtest: canonical content selectors
+    # Subtest: keeps featured answer pages sourced from canonical answer registry
+    ok 1 - keeps featured answer pages sourced from canonical answer registry
+      ---
+      duration_ms: 3.321357
+      ...
+    # Subtest: maps resource article intents to bounded decision areas
+    ok 2 - maps resource article intents to bounded decision areas
+      ---
+      duration_ms: 0.964183
+      ...
+    1..2
+ok 25 - canonical content selectors
+  ---
+  duration_ms: 6.597403
+  type: 'suite'
+  ...
+# Subtest: buildContentMeasurementReport
+    # Subtest: aggregates entrances, CTA conversions, assisted paths, and intent counts
+    ok 1 - aggregates entrances, CTA conversions, assisted paths, and intent counts
+      ---
+      duration_ms: 1.602746
+      ...
+    # Subtest: validates content measurement telemetry payloads
+    ok 2 - validates content measurement telemetry payloads
+      ---
+      duration_ms: 0.39112
+      ...
+    1..2
+ok 26 - buildContentMeasurementReport
+  ---
+  duration_ms: 3.643654
+  type: 'suite'
+  ...
+# Subtest: trackContentCtaConversion
+    # Subtest: falls back to fetch when sendBeacon cannot queue payload
+    ok 1 - falls back to fetch when sendBeacon cannot queue payload
+      ---
+      duration_ms: 83.748351
+      ...
+    1..1
+ok 27 - trackContentCtaConversion
+  ---
+  duration_ms: 84.278229
+  type: 'suite'
+  ...
+# Subtest: CopyLeadershipArtifactsButtons
+    # Subtest: prioritizes weekly call snapshot and brief actions before navigation shortcuts
+    ok 1 - prioritizes weekly call snapshot and brief actions before navigation shortcuts
+      ---
+      duration_ms: 20.201276
+      ...
+    1..1
+ok 28 - CopyLeadershipArtifactsButtons
+  ---
+  duration_ms: 21.334248
+  type: 'suite'
+  ...
+# Subtest: decision event store
+    # Subtest: preserves append-only immutability and insertion order
+    ok 1 - preserves append-only immutability and insertion order
+      ---
+      duration_ms: 6.141528
+      ...
+    # Subtest: replays deterministically from event history
+    ok 2 - replays deterministically from event history
+      ---
+      duration_ms: 1.470222
+      ...
+    # Subtest: automatically appends committed state transitions
+    ok 3 - automatically appends committed state transitions
+      ---
+      duration_ms: 1.028778
+      ...
+    # Subtest: persists and reads events from a cloudflare kv binding
+    ok 4 - persists and reads events from a cloudflare kv binding
+      ---
+      duration_ms: 1.864254
+      ...
+    1..4
+ok 29 - decision event store
+  ---
+  duration_ms: 12.508313
+  type: 'suite'
+  ...
+# Subtest: /api/decision-events
+    # Subtest: returns paginated events with cursor metadata
+    ok 1 - returns paginated events with cursor metadata
+      ---
+      duration_ms: 54.319802
+      ...
+    # Subtest: supports deterministic replay from the requested cursor window
+    ok 2 - supports deterministic replay from the requested cursor window
+      ---
+      duration_ms: 1.749601
+      ...
+    1..2
+ok 30 - /api/decision-events
+  ---
+  duration_ms: 57.569206
+  type: 'suite'
+  ...
+# Subtest: deriveDecisionKnobs
+    # Subtest: uses committed state labels and rationale
+    ok 1 - uses committed state labels and rationale
+      ---
+      duration_ms: 1.975926
+      ...
+    # Subtest: applies conservative pending bias before transition commitment
+    ok 2 - applies conservative pending bias before transition commitment
+      ---
+      duration_ms: 0.851341
+      ...
+    1..2
+ok 31 - deriveDecisionKnobs
+  ---
+  duration_ms: 4.472206
+  type: 'suite'
+  ...
+# Subtest: buildWeeklyLockCommitment
+    # Subtest: returns measurable flip conditions and owner cadence
+    ok 1 - returns measurable flip conditions and owner cadence
+      ---
+      duration_ms: 0.782231
+      ...
+    # Subtest: adds compact trust markers and tighter cadence when trust is degraded
+    ok 2 - adds compact trust markers and tighter cadence when trust is degraded
+      ---
+      duration_ms: 1.862797
+      ...
+    1..2
+ok 32 - buildWeeklyLockCommitment
+  ---
+  duration_ms: 3.088183
+  type: 'suite'
+  ...
+# Subtest: decisionMemory
+    # Subtest: builds entries with deduplicated source URLs
+    ok 1 - builds entries with deduplicated source URLs
+      ---
+      duration_ms: 3.759051
+      ...
+    # Subtest: serializes entries to CSV
+    ok 2 - serializes entries to CSV
+      ---
+      duration_ms: 1.065356
+      ...
+    1..2
+ok 33 - decisionMemory
+  ---
+  duration_ms: 6.496189
+  type: 'suite'
+  ...
+# Subtest: decision shield verdicts
+    # Subtest: flags hiring as dangerous in scarcity
+    ok 1 - flags hiring as dangerous in scarcity
+      ---
+      duration_ms: 1.644164
+      ...
+    # Subtest: marks expansion hiring as safe with a guardrail
+    ok 2 - marks expansion hiring as safe with a guardrail
+      ---
+      duration_ms: 0.370956
+      ...
+    # Subtest: returns reversal triggers tied to thresholds
+    ok 3 - returns reversal triggers tied to thresholds
+      ---
+      duration_ms: 0.46543
+      ...
+    # Subtest: uses one-signal reversal trigger for expansion
+    ok 4 - uses one-signal reversal trigger for expansion
+      ---
+      duration_ms: 0.438245
+      ...
+    # Subtest: applies lifecycle context to tighten discovery-stage verdicts
+    ok 5 - applies lifecycle context to tighten discovery-stage verdicts
+      ---
+      duration_ms: 0.352807
+      ...
+    1..5
+ok 34 - decision shield verdicts
+  ---
+  duration_ms: 5.200705
+  type: 'suite'
+  ...
+# Subtest: getNextDirectionalIndex
+    # Subtest: moves right in a two-column row
+    ok 1 - moves right in a two-column row
+      ---
+      duration_ms: 6.46111
+      ...
+    # Subtest: moves down to nearest candidate
+    ok 2 - moves down to nearest candidate
+      ---
+      duration_ms: 0.593835
+      ...
+    # Subtest: wraps when no candidate exists in direction
+    ok 3 - wraps when no candidate exists in direction
+      ---
+      duration_ms: 0.864941
+      ...
+    # Subtest: wraps away from the current item when it shares the extreme edge
+    ok 4 - wraps away from the current item when it shares the extreme edge
+      ---
+      duration_ms: 0.375597
+      ...
+    # Subtest: returns -1 when direction has no target and wrap is off
+    ok 5 - returns -1 when direction has no target and wrap is off
+      ---
+      duration_ms: 0.374791
+      ...
+    1..5
+ok 35 - getNextDirectionalIndex
+  ---
+  duration_ms: 10.81469
+  type: 'suite'
+  ...
+# Subtest: downloadable resource pages
+    # Subtest: includes all downloadable resource slugs in static params
+    ok 1 - includes all downloadable resource slugs in static params
+      ---
+      duration_ms: 3.109033
+      ...
+    # Subtest: renders all configured downloadable resource slugs
+    ok 2 - renders all configured downloadable resource slugs
+      ---
+      duration_ms: 21.199307
+      ...
+    # Subtest: builds stable metadata for all configured downloadable resources
+    ok 3 - builds stable metadata for all configured downloadable resources
+      ---
+      duration_ms: 1.609615
+      ...
+    1..3
+ok 36 - downloadable resource pages
+  ---
+  duration_ms: 27.945402
+  type: 'suite'
+  ...
+# Subtest: edge runtime contracts
+    # Subtest: keeps critical routes/pages on edge runtime
+    ok 1 - keeps critical routes/pages on edge runtime
+      ---
+      duration_ms: 1.659566
+      ...
+    # Subtest: returns JSON headers and required weekly schema fields
+    ok 2 - returns JSON headers and required weekly schema fields
+      ---
+      duration_ms: 303.746957
+      ...
+    1..2
+ok 37 - edge runtime contracts
+  ---
+  duration_ms: 307.119769
+  type: 'suite'
+  ...
+# Subtest: fetchWithTimeout
+    # Subtest: aborts requests that exceed timeout
+    ok 1 - aborts requests that exceed timeout
+      ---
+      duration_ms: 8.748851
+      ...
+    # Subtest: returns fetch response before timeout
+    ok 2 - returns fetch response before timeout
+      ---
+      duration_ms: 44.469366
+      ...
+    1..2
+ok 38 - fetchWithTimeout
+  ---
+  duration_ms: 55.041894
+  type: 'suite'
+  ...
+# Subtest: forecast model probabilities and risk bounds
+    # Subtest: normalizes regime probabilities to 100 and keeps each probability bounded
+    ok 1 - normalizes regime probabilities to 100 and keeps each probability bounded
+      ---
+      duration_ms: 4.482024
+      ...
+    # Subtest: orders top probability around the current regime under stable conditions
+    ok 2 - orders top probability around the current regime under stable conditions
+      ---
+      duration_ms: 0.843576
+      ...
+    # Subtest: keeps crossing risk low when far from boundaries and motion is away
+    ok 3 - keeps crossing risk low when far from boundaries and motion is away
+      ---
+      duration_ms: 0.754754
+      ...
+    # Subtest: raises crossing risk to high when nearest distance is inside boundary band
+    ok 4 - raises crossing risk to high when nearest distance is inside boundary band
+      ---
+      duration_ms: 0.750684
+      ...
+    1..4
+ok 39 - forecast model probabilities and risk bounds
+  ---
+  duration_ms: 8.474258
+  type: 'suite'
+  ...
+# Subtest: formatNumberWithUnit
+    # Subtest: suppresses literal index suffixes
+    ok 1 - suppresses literal index suffixes
+      ---
+      duration_ms: 1.449658
+      ...
+    # Subtest: adds readable spacing for bps values
+    ok 2 - adds readable spacing for bps values
+      ---
+      duration_ms: 0.53012
+      ...
+    # Subtest: keeps percent values unchanged
+    ok 3 - keeps percent values unchanged
+      ---
+      duration_ms: 0.355989
+      ...
+    1..3
+ok 40 - formatNumberWithUnit
+  ---
+  duration_ms: 4.228634
+  type: 'suite'
+  ...
+# Subtest: summaryFormatting
+    # Subtest: formats source line with and without URL
+    ok 1 - formats source line with and without URL
+      ---
+      duration_ms: 0.393854
+      ...
+    # Subtest: extracts quarter and year labels from record dates
+    ok 2 - extracts quarter and year labels from record dates
+      ---
+      duration_ms: 0.340534
+      ...
+    # Subtest: returns null quarter and year labels for invalid record dates
+    ok 3 - returns null quarter and year labels for invalid record dates
+      ---
+      duration_ms: 0.222937
+      ...
+    1..3
+ok 41 - summaryFormatting
+  ---
+  duration_ms: 1.44837
+  type: 'suite'
+  ...
+# Subtest: buildHomeBriefModel
+    # Subtest: derives stable labels and decision rules from brief inputs
+    ok 1 - derives stable labels and decision rules from brief inputs
+      ---
+      duration_ms: 20.534792
+      ...
+    # Subtest: preserves all normalized evidence items including curve-slope
+    ok 2 - preserves all normalized evidence items including curve-slope
+      ---
+      duration_ms: 1.012397
+      ...
+    # Subtest: returns no-change decision summary when there are no deltas
+    ok 3 - returns no-change decision summary when there are no deltas
+      ---
+      duration_ms: 1.959258
+      ...
+    # Subtest: describes momentum using signal-improvement semantics and strongest move
+    ok 4 - describes momentum using signal-improvement semantics and strongest move
+      ---
+      duration_ms: 0.884541
+      ...
+    # Subtest: uses per-signal semantics when deriving primary risk from dominant move
+    ok 5 - uses per-signal semantics when deriving primary risk from dominant move
+      ---
+      duration_ms: 1.763758
+      ...
+    # Subtest: uses direction-aware reversal trigger language for expansion risk-appetite boundaries
+    ok 6 - uses direction-aware reversal trigger language for expansion risk-appetite boundaries
+      ---
+      duration_ms: 1.55823
+      ...
+    # Subtest: renders selected homepage overlay sector in macro overlay label
+    ok 7 - renders selected homepage overlay sector in macro overlay label
+      ---
+      duration_ms: 0.705657
+      ...
+    # Subtest: builds ordered historical timeline entries from regime series
+    ok 8 - builds ordered historical timeline entries from regime series
+      ---
+      duration_ms: 1.702855
+      ...
+    # Subtest: derives stage labels for regime edge cases
+    ok 9 - derives stage labels for regime edge cases
+      ---
+      duration_ms: 5.23598
+      ...
+    # Subtest: does not emit expansion stance copy when regime improves within contraction states
+    ok 10 - does not emit expansion stance copy when regime improves within contraction states
+      ---
+      duration_ms: 0.73092
+      ...
+    # Subtest: keeps noun discipline in top summary fields
+    ok 11 - keeps noun discipline in top summary fields
+      ---
+      duration_ms: 0.65885
+      ...
+    # Subtest: marks missing macro series as fallback indicators
+    ok 12 - marks missing macro series as fallback indicators
+      ---
+      duration_ms: 0.611248
+      ...
+    # Subtest: builds complete decision matrix across all row and column intersections
+    ok 13 - builds complete decision matrix across all row and column intersections
+      ---
+      duration_ms: 1.644705
+      ...
+    # Subtest: falls back to default matrix cues when decision inputs are missing
+    ok 14 - falls back to default matrix cues when decision inputs are missing
+      ---
+      duration_ms: 0.43248
+      ...
+    1..14
+ok 42 - buildHomeBriefModel
+  ---
+  duration_ms: 41.641294
+  type: 'suite'
+  ...
+# Subtest: weekly card and interpretation panel composition
+    # Subtest: keeps top-fold semantics while layering interpretation bullets below
+    not ok 1 - keeps top-fold semantics while layering interpretation bullets below
+      ---
+      duration_ms: 22.360231
+      location: '/workspace/whether/tests/homeWeeklyComposition.test.tsx:1:1890'
+      failureType: 'testCodeFailure'
+      error: "Cannot read properties of undefined (reading 'shell')"
+      code: 'ERR_TEST_FAILURE'
+      name: 'TypeError'
+      stack: |-
+        RegimeBanner (/workspace/whether/app/components/weeklyDecisionCard.tsx:782:153)
+        Object.react_stack_bottom_frame (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:9808:18)
+        renderWithHooks (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:5062:19)
+        renderElement (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:5497:23)
+        retryNode (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6417:31)
+        renderNodeDestructive (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6367:11)
+        renderNode (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6905:18)
+        renderChildrenArray (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6674:11)
+        retryNode (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6441:13)
+        renderNodeDestructive (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6367:11)
+      ...
+    # Subtest: renders weekly card before interpretation panel and preserves top-fold hierarchy
+    not ok 2 - renders weekly card before interpretation panel and preserves top-fold hierarchy
+      ---
+      duration_ms: 3.502443
+      location: '/workspace/whether/tests/homeWeeklyComposition.test.tsx:1:6647'
+      failureType: 'testCodeFailure'
+      error: "Cannot read properties of undefined (reading 'shell')"
+      code: 'ERR_TEST_FAILURE'
+      name: 'TypeError'
+      stack: |-
+        RegimeBanner (/workspace/whether/app/components/weeklyDecisionCard.tsx:782:153)
+        Object.react_stack_bottom_frame (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:9808:18)
+        renderWithHooks (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:5062:19)
+        renderElement (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:5497:23)
+        retryNode (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6417:31)
+        renderNodeDestructive (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6367:11)
+        renderNode (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6905:18)
+        renderChildrenArray (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6674:11)
+        retryNode (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6441:13)
+        renderNodeDestructive (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6367:11)
+      ...
+    # Subtest: renders orientation strip before the weekly decision card without replacing core card content
+    not ok 3 - renders orientation strip before the weekly decision card without replacing core card content
+      ---
+      duration_ms: 10.203153
+      location: '/workspace/whether/tests/homeWeeklyComposition.test.tsx:1:11400'
+      failureType: 'testCodeFailure'
+      error: "Cannot read properties of undefined (reading 'shell')"
+      code: 'ERR_TEST_FAILURE'
+      name: 'TypeError'
+      stack: |-
+        RegimeBanner (/workspace/whether/app/components/weeklyDecisionCard.tsx:782:153)
+        Object.react_stack_bottom_frame (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:9808:18)
+        renderWithHooks (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:5062:19)
+        renderElement (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:5497:23)
+        retryNode (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6417:31)
+        renderNodeDestructive (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6367:11)
+        renderNode (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6905:18)
+        renderChildrenArray (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6674:11)
+        retryNode (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6441:13)
+        renderNodeDestructive (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6367:11)
+      ...
+    1..3
+not ok 43 - weekly card and interpretation panel composition
+  ---
+  duration_ms: 38.982765
+  type: 'suite'
+  location: '/workspace/whether/tests/homeWeeklyComposition.test.tsx:1:1825'
+  failureType: 'subtestsFailed'
+  error: '3 subtests failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: indicator classification
+    # Subtest: classifies all score drivers as leading or lagging
+    ok 1 - classifies all score drivers as leading or lagging
+      ---
+      duration_ms: 6.494864
+      ...
+    1..1
+ok 44 - indicator classification
+  ---
+  duration_ms: 8.185347
+  type: 'suite'
+  ...
+# Subtest: materialized ingestion model
+    # Subtest: marks stale status from cadence windows
+    ok 1 - marks stale status from cadence windows
+      ---
+      duration_ms: 2.614928
+      ...
+    # Subtest: builds canonical treasury when all required rates are present
+    ok 2 - builds canonical treasury when all required rates are present
+      ---
+      duration_ms: 0.736154
+      ...
+    # Subtest: hydrates matching macro series values from canonical snapshots
+    ok 3 - hydrates matching macro series values from canonical snapshots
+      ---
+      duration_ms: 24.659223
+      ...
+    1..3
+ok 45 - materialized ingestion model
+  ---
+  duration_ms: 29.802275
+  type: 'suite'
+  ...
+# Subtest: integration briefs
+    # Subtest: parses only supported targets
+    ok 1 - parses only supported targets
+      ---
+      duration_ms: 3.318767
+      ...
+    # Subtest: builds reusable envelope
+    ok 2 - builds reusable envelope
+      ---
+      duration_ms: 1.106409
+      ...
+    # Subtest: builds slack payload
+    ok 3 - builds slack payload
+      ---
+      duration_ms: 0.702359
+      ...
+    # Subtest: builds notion payload
+    ok 4 - builds notion payload
+      ---
+      duration_ms: 0.623899
+      ...
+    # Subtest: builds linear payload
+    ok 5 - builds linear payload
+      ---
+      duration_ms: 0.661161
+      ...
+    1..5
+ok 46 - integration briefs
+  ---
+  duration_ms: 9.318043
+  type: 'suite'
+  ...
+# Subtest: weekly mandate integration route
+    # Subtest: returns 400 for invalid target
+    ok 1 - returns 400 for invalid target
+      ---
+      duration_ms: 8.088561
+      ...
+    1..1
+ok 47 - weekly mandate integration route
+  ---
+  duration_ms: 9.336323
+  type: 'suite'
+  ...
+# Subtest: interpretation view panel
+    # Subtest: keeps default view parity with core interpretation copy
+    ok 1 - keeps default view parity with core interpretation copy
+      ---
+      duration_ms: 18.208621
+      ...
+    # Subtest: renders top-priority adjusted company rules with explicit trigger/reverse text
+    ok 2 - renders top-priority adjusted company rules with explicit trigger/reverse text
+      ---
+      duration_ms: 2.792106
+      ...
+    # Subtest: falls back to canonical bullets when company-adjusted rules are unavailable
+    ok 3 - falls back to canonical bullets when company-adjusted rules are unavailable
+      ---
+      duration_ms: 0.723093
+      ...
+    # Subtest: keeps forecast interpretation resilient when 90-day probabilities are missing
+    ok 4 - keeps forecast interpretation resilient when 90-day probabilities are missing
+      ---
+      duration_ms: 0.320088
+      ...
+    # Subtest: keeps interpretation toggle links query-stable and marks active view
+    ok 5 - keeps interpretation toggle links query-stable and marks active view
+      ---
+      duration_ms: 3.183702
+      ...
+    # Subtest: swaps interpretation content without changing toggle shell
+    ok 6 - swaps interpretation content without changing toggle shell
+      ---
+      duration_ms: 5.936094
+      ...
+    # Subtest: keeps interpretation bullets compact for screenshot-safe handoff
+    ok 7 - keeps interpretation bullets compact for screenshot-safe handoff
+      ---
+      duration_ms: 1.464712
+      ...
+    1..7
+ok 48 - interpretation view panel
+  ---
+  duration_ms: 34.597356
+  type: 'suite'
+  ...
+# Subtest: live short answers
+    # Subtest: returns payload current call for short answer
+    ok 1 - returns payload current call for short answer
+      ---
+      duration_ms: 1.386746
+      ...
+    # Subtest: falls back when payload current call is empty
+    ok 2 - falls back when payload current call is empty
+      ---
+      duration_ms: 0.353194
+      ...
+    # Subtest: builds direct answer from payload contract fields
+    ok 3 - builds direct answer from payload contract fields
+      ---
+      duration_ms: 0.608577
+      ...
+    # Subtest: derives expansion state from regime key
+    ok 4 - derives expansion state from regime key
+      ---
+      duration_ms: 0.380683
+      ...
+    1..4
+ok 49 - live short answers
+  ---
+  duration_ms: 5.143153
+  type: 'suite'
+  ...
+# Subtest: buildMacroPriorityScore
+    # Subtest: returns lower recency score for older signals
+    ok 1 - returns lower recency score for older signals
+      ---
+      duration_ms: 1.121566
+      ...
+    1..1
+ok 50 - buildMacroPriorityScore
+  ---
+  duration_ms: 2.64818
+  type: 'suite'
+  ...
+# Subtest: rankMacroSignalsByPriority
+    # Subtest: sorts by impact x recency
+    ok 1 - sorts by impact x recency
+      ---
+      duration_ms: 1.43975
+      ...
+    1..1
+ok 51 - rankMacroSignalsByPriority
+  ---
+  duration_ms: 1.896371
+  type: 'suite'
+  ...
+# Subtest: loadMacroSeries
+    # Subtest: computes CPI as year-over-year percentage and loads Tier 1 live data
+    ok 1 - computes CPI as year-over-year percentage and loads Tier 1 live data
+      ---
+      duration_ms: 82.548455
+      ...
+    # Subtest: returns snapshot data when live fetch fails
+    ok 2 - returns snapshot data when live fetch fails
+      ---
+      duration_ms: 1.338287
+      ...
+    1..2
+ok 52 - loadMacroSeries
+  ---
+  duration_ms: 85.582736
+  type: 'suite'
+  ...
+# Subtest: buildMonthlySummary
+    # Subtest: returns structured sections and keeps copy derived from the structured payload
+    ok 1 - returns structured sections and keeps copy derived from the structured payload
+      ---
+      duration_ms: 5.124319
+      ...
+    1..1
+ok 53 - buildMonthlySummary
+  ---
+  duration_ms: 6.429326
+  type: 'suite'
+  ...
+# Subtest: navigation information architecture
+    # Subtest: keeps primary navigation aligned to architecture layers
+    ok 1 - keeps primary navigation aligned to architecture layers
+      ---
+      duration_ms: 1.441799
+      ...
+    # Subtest: defines passive group labels from IA as single source of truth
+    ok 2 - defines passive group labels from IA as single source of truth
+      ---
+      duration_ms: 0.344809
+      ...
+    # Subtest: keeps one layer for each IA boundary and route
+    ok 3 - keeps one layer for each IA boundary and route
+      ---
+      duration_ms: 0.346392
+      ...
+    1..3
+ok 54 - navigation information architecture
+  ---
+  duration_ms: 9.085816
+  type: 'suite'
+  ...
+# Subtest: NavigationOrientationBadge
+    # Subtest: renders each zone as a link to its canonical landing route
+    ok 1 - renders each zone as a link to its canonical landing route
+      ---
+      duration_ms: 16.583403
+      ...
+    # Subtest: marks the active zone
+    ok 2 - marks the active zone
+      ---
+      duration_ms: 7.774271
+      ...
+    1..2
+ok 55 - NavigationOrientationBadge
+  ---
+  duration_ms: 39.438486
+  type: 'suite'
+  ...
+# Subtest: next.config redirects
+    # Subtest: keeps legacy content aliases routed to canonical destinations
+    ok 1 - keeps legacy content aliases routed to canonical destinations
+      ---
+      duration_ms: 2.551385
+      ...
+    1..1
+ok 56 - next.config redirects
+  ---
+  duration_ms: 3.910223
+  type: 'suite'
+  ...
+# Subtest: pathMatchesLink
+    # Subtest: matches exact routes and subpaths
+    ok 1 - matches exact routes and subpaths
+      ---
+      duration_ms: 1.366268
+      ...
+    # Subtest: does not match unrelated paths
+    ok 2 - does not match unrelated paths
+      ---
+      duration_ms: 0.563233
+      ...
+    1..2
+ok 57 - pathMatchesLink
+  ---
+  duration_ms: 3.587663
+  type: 'suite'
+  ...
+# Subtest: personalized mandates
+    # Subtest: returns tailored actions for the selected profile
+    ok 1 - returns tailored actions for the selected profile
+      ---
+      duration_ms: 3.000213
+      ...
+    # Subtest: keeps base posture output available even with incomplete inputs
+    ok 2 - keeps base posture output available even with incomplete inputs
+      ---
+      duration_ms: 0.776658
+      ...
+    # Subtest: produces materially different advice for same posture with different profiles
+    ok 3 - produces materially different advice for same posture with different profiles
+      ---
+      duration_ms: 0.69563
+      ...
+    # Subtest: normalizes invalid values to safe defaults
+    ok 4 - normalizes invalid values to safe defaults
+      ---
+      duration_ms: 0.389456
+      ...
+    1..4
+ok 58 - personalized mandates
+  ---
+  duration_ms: 7.129551
+  type: 'suite'
+  ...
+# Subtest: playbook selector
+    # Subtest: returns playbook for known regime
+    ok 1 - returns playbook for known regime
+      ---
+      duration_ms: 1.243451
+      ...
+    1..1
+ok 59 - playbook selector
+  ---
+  duration_ms: 2.440946
+  type: 'suite'
+  ...
+# Subtest: builds role-aware templates with bounded do/avoid/flip structure
+ok 60 - builds role-aware templates with bounded do/avoid/flip structure
+  ---
+  duration_ms: 1.42335
+  ...
+# Subtest: derives operating levers from canonical bounded rules with assessment context
+ok 61 - derives operating levers from canonical bounded rules with assessment context
+  ---
+  duration_ms: 0.788559
+  ...
+# Subtest: keeps operating levers in canonical operatingLeverOrder
+ok 62 - keeps operating levers in canonical operatingLeverOrder
+  ---
+  duration_ms: 1.84933
+  ...
+# Subtest: policy governance parameters
+    # Subtest: maps risk-on posture to faster governance defaults
+    ok 1 - maps risk-on posture to faster governance defaults
+      ---
+      duration_ms: 1.41104
+      ...
+    # Subtest: forces reversible controls during refusal
+    ok 2 - forces reversible controls during refusal
+      ---
+      duration_ms: 0.29336
+      ...
+    1..2
+ok 63 - policy governance parameters
+  ---
+  duration_ms: 4.074912
+  type: 'suite'
+  ...
+# Subtest: policy transforms
+    # Subtest: computes z-score and directional normalization
+    ok 1 - computes z-score and directional normalization
+      ---
+      duration_ms: 1.298064
+      ...
+    # Subtest: clips z-scores to bounds
+    ok 2 - clips z-scores to bounds
+      ---
+      duration_ms: 0.33346
+      ...
+    # Subtest: builds composite and volatility
+    ok 3 - builds composite and volatility
+      ---
+      duration_ms: 0.453012
+      ...
+    1..3
+ok 64 - policy transforms
+  ---
+  duration_ms: 3.843868
+  type: 'suite'
+  ...
+# Subtest: posture state contract consumers
+    # Subtest: keeps homepage, exports, and integration envelope aligned
+    not ok 1 - keeps homepage, exports, and integration envelope aligned
+      ---
+      duration_ms: 33.744681
+      location: '/workspace/whether/tests/postureStateContract.test.ts:1:1814'
+      failureType: 'testCodeFailure'
+      error: |-
+        Expected values to be strictly deep-equal:
+        + actual - expected
+        
+          [
+        +   'Tightness < 66',
+        +   'Risk appetite > 54'
+        -   'Tightness ≤ 66 for 2 consecutive refreshes.',
+        -   'Risk appetite ≥ 54 for 2 consecutive refreshes.',
+        -   'Re-tighten if tightness > 76 or risk appetite < 44.'
+          ]
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected:
+        0: 'Tightness ≤ 66 for 2 consecutive refreshes.'
+        1: 'Risk appetite ≥ 54 for 2 consecutive refreshes.'
+        2: 'Re-tighten if tightness > 76 or risk appetite < 44.'
+      actual:
+        0: 'Tightness < 66'
+        1: 'Risk appetite > 54'
+      operator: 'deepStrictEqual'
+      stack: |-
+        TestContext.<anonymous> (/workspace/whether/tests/postureStateContract.test.ts:118:12)
+        Test.runInAsyncScope (node:async_hooks:206:9)
+        Test.run (node:internal/test_runner/test:796:25)
+        Test.start (node:internal/test_runner/test:702:17)
+        node:internal/test_runner/test:1133:71
+        node:internal/per_context/primordials:482:82
+        new Promise (<anonymous>)
+        new SafePromise (node:internal/per_context/primordials:450:29)
+        node:internal/per_context/primordials:482:9
+        Array.map (<anonymous>)
+      ...
+    1..1
+not ok 65 - posture state contract consumers
+  ---
+  duration_ms: 35.304002
+  type: 'suite'
+  location: '/workspace/whether/tests/postureStateContract.test.ts:1:1765'
+  failureType: 'subtestsFailed'
+  error: '1 subtest failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: premium funnel helpers
+    # Subtest: accepts known premium intent sources
+    ok 1 - accepts known premium intent sources
+      ---
+      duration_ms: 1.861832
+      ...
+    # Subtest: rejects unknown premium intent sources
+    ok 2 - rejects unknown premium intent sources
+      ---
+      duration_ms: 0.824972
+      ...
+    # Subtest: validates premium funnel payload shape
+    ok 3 - validates premium funnel payload shape
+      ---
+      duration_ms: 1.906123
+      ...
+    # Subtest: forwards events when webhook is configured
+    ok 4 - forwards events when webhook is configured
+      ---
+      duration_ms: 75.691818
+      ...
+    1..4
+ok 66 - premium funnel helpers
+  ---
+  duration_ms: 82.627792
+  type: 'suite'
+  ...
+# Subtest: productCanon
+    # Subtest: contains unique slugs
+    ok 1 - contains unique slugs
+      ---
+      duration_ms: 1.222019
+      ...
+    # Subtest: returns macro context for entries in the monthly snapshot range
+    ok 2 - returns macro context for entries in the monthly snapshot range
+      ---
+      duration_ms: 0.583472
+      ...
+    # Subtest: maps institutional-friction entries to macro context
+    ok 3 - maps institutional-friction entries to macro context
+      ---
+      duration_ms: 0.413267
+      ...
+    # Subtest: uses normalized outbound source links
+    ok 4 - uses normalized outbound source links
+      ---
+      duration_ms: 0.393262
+      ...
+    # Subtest: returns null when historical month is outside snapshot range
+    ok 5 - returns null when historical month is outside snapshot range
+      ---
+      duration_ms: 0.231941
+      ...
+    1..5
+ok 67 - productCanon
+  ---
+  duration_ms: 4.785344
+  type: 'suite'
+  ...
+# Subtest: programmatic payload builder
+    # Subtest: enumerates all cluster-derived programmatic routes
+    ok 1 - enumerates all cluster-derived programmatic routes
+      ---
+      duration_ms: 6.995495
+      ...
+    # Subtest: generates and reads validated payload artifacts
+    not ok 2 - generates and reads validated payload artifacts
+      ---
+      duration_ms: 1449.482848
+      location: '/workspace/whether/tests/programmaticPayloadBuilder.test.ts:1:562'
+      failureType: 'testCodeFailure'
+      error: 'SEO payload generation failed for /decide/board/burn-discipline: payload is stale or missing contract fields (freshness-stale, provenance-missing-or-degraded).'
+      code: 'ERR_TEST_FAILURE'
+      stack: |-
+        assertGenerationContracts (/workspace/whether/lib/seo/programmaticPayloadBuilder.ts:198:11)
+        <anonymous> (/workspace/whether/lib/seo/programmaticPayloadBuilder.ts:238:5)
+        Array.map (<anonymous>)
+        generateProgrammaticPayloadArtifacts (/workspace/whether/lib/seo/programmaticPayloadBuilder.ts:220:38)
+        async TestContext.<anonymous> (/workspace/whether/tests/programmaticPayloadBuilder.test.ts:19:20)
+        async Test.run (node:internal/test_runner/test:797:9)
+        async Suite.processPendingSubtests (node:internal/test_runner/test:526:7)
+      ...
+    1..2
+not ok 68 - programmatic payload builder
+  ---
+  duration_ms: 1466.538906
+  type: 'suite'
+  location: '/workspace/whether/tests/programmaticPayloadBuilder.test.ts:1:215'
+  failureType: 'subtestsFailed'
+  error: '1 subtest failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: regime engine scoring
+    # Subtest: ramps tightness as rates move above threshold and curve inverts
+    ok 1 - ramps tightness as rates move above threshold and curve inverts
+      ---
+      duration_ms: 21.704529
+      ...
+    # Subtest: maps risk appetite to 0-100
+    ok 2 - maps risk appetite to 0-100
+      ---
+      duration_ms: 0.47516
+      ...
+    # Subtest: clamps risk appetite when curve slope exceeds the range
+    ok 3 - clamps risk appetite when curve slope exceeds the range
+      ---
+      duration_ms: 0.240305
+      ...
+    1..3
+ok 69 - regime engine scoring
+  ---
+  duration_ms: 24.458786
+  type: 'suite'
+  ...
+# Subtest: regime classification
+    # Subtest: classifies scarcity with high tightness and low appetite
+    ok 1 - classifies scarcity with high tightness and low appetite
+      ---
+      duration_ms: 3.179609
+      ...
+    # Subtest: classifies expansion with low tightness and high appetite
+    ok 2 - classifies expansion with low tightness and high appetite
+      ---
+      duration_ms: 0.261566
+      ...
+    # Subtest: treats threshold equality as volatile
+    ok 3 - treats threshold equality as volatile
+      ---
+      duration_ms: 0.150273
+      ...
+    1..3
+ok 70 - regime classification
+  ---
+  duration_ms: 3.90518
+  type: 'suite'
+  ...
+# Subtest: regime assessment
+    # Subtest: returns explainable outputs
+    ok 1 - returns explainable outputs
+      ---
+      duration_ms: 1.846768
+      ...
+    # Subtest: returns policy assessment composites and refusal state
+    ok 2 - returns policy assessment composites and refusal state
+      ---
+      duration_ms: 0.551459
+      ...
+    # Subtest: maps aligned policy signals to risk-on and safety postures
+    ok 3 - maps aligned policy signals to risk-on and safety postures
+      ---
+      duration_ms: 1.268783
+      ...
+    # Subtest: refuses posture change when policy signal gaps are too large
+    ok 4 - refuses posture change when policy signal gaps are too large
+      ---
+      duration_ms: 0.323137
+      ...
+    # Subtest: flags missing inputs with warnings
+    ok 5 - flags missing inputs with warnings
+      ---
+      duration_ms: 0.473149
+      ...
+    1..5
+ok 71 - regime assessment
+  ---
+  duration_ms: 5.513241
+  type: 'suite'
+  ...
+# Subtest: regime trend
+    # Subtest: derives improving trend when tightness eases across the threshold
+    ok 1 - derives improving trend when tightness eases across the threshold
+      ---
+      duration_ms: 0.5024
+      ...
+    1..1
+ok 72 - regime trend
+  ---
+  duration_ms: 0.679081
+  type: 'suite'
+  ...
+# Subtest: regime macro overlays
+    # Subtest: tightens and lowers risk appetite when stress overlays are weak
+    ok 1 - tightens and lowers risk appetite when stress overlays are weak
+      ---
+      duration_ms: 1.009756
+      ...
+    1..1
+ok 73 - regime macro overlays
+  ---
+  duration_ms: 1.18396
+  type: 'suite'
+  ...
+# Subtest: regime state machine
+    # Subtest: keeps transitions pending under low confidence
+    ok 1 - keeps transitions pending under low confidence
+      ---
+      duration_ms: 0.481033
+      ...
+    # Subtest: commits after consecutive confirmations to avoid whipsaw
+    ok 2 - commits after consecutive confirmations to avoid whipsaw
+      ---
+      duration_ms: 2.927611
+      ...
+    # Subtest: resets pending reversal when signals snap back
+    ok 3 - resets pending reversal when signals snap back
+      ---
+      duration_ms: 0.467318
+      ...
+    1..3
+ok 74 - regime state machine
+  ---
+  duration_ms: 4.321107
+  type: 'suite'
+  ...
+# Subtest: regime presentation labels
+    # Subtest: keeps contraction mapping for defensive/scarcity regimes
+    ok 1 - keeps contraction mapping for defensive/scarcity regimes
+      ---
+      duration_ms: 3.832816
+      ...
+    # Subtest: maps volatile to transitional mixed
+    ok 2 - maps volatile to transitional mixed
+      ---
+      duration_ms: 0.5753
+      ...
+    # Subtest: adds guarded modifier to expansion when diagnostics are fragile
+    ok 3 - adds guarded modifier to expansion when diagnostics are fragile
+      ---
+      duration_ms: 0.644302
+      ...
+    1..3
+ok 75 - regime presentation labels
+  ---
+  duration_ms: 7.683543
+  type: 'suite'
+  ...
+# Subtest: reportCopy
+    # Subtest: defines first-time guide content with three ordered steps
+    ok 1 - defines first-time guide content with three ordered steps
+      ---
+      duration_ms: 3.893456
+      ...
+    # Subtest: includes glossary entries with report anchors
+    ok 2 - includes glossary entries with report anchors
+      ---
+      duration_ms: 0.436583
+      ...
+    # Subtest: keeps glossary notes and quick links non-empty
+    ok 3 - keeps glossary notes and quick links non-empty
+      ---
+      duration_ms: 0.366974
+      ...
+    # Subtest: provides related links metadata for onboarding and signals pages
+    ok 4 - provides related links metadata for onboarding and signals pages
+      ---
+      duration_ms: 0.299211
+      ...
+    # Subtest: keeps canonical noun map in glossary usage copy
+    ok 5 - keeps canonical noun map in glossary usage copy
+      ---
+      duration_ms: 0.543914
+      ...
+    1..5
+ok 76 - reportCopy
+  ---
+  duration_ms: 7.670397
+  type: 'suite'
+  ...
+# Subtest: buildLastYearComparison
+    # Subtest: maps prior and current assessments into a comparable shape
+    ok 1 - maps prior and current assessments into a comparable shape
+      ---
+      duration_ms: 3.893411
+      ...
+    1..1
+ok 77 - buildLastYearComparison
+  ---
+  duration_ms: 8.600563
+  type: 'suite'
+  ...
+# Subtest: buildReportDynamics
+    # Subtest: marks improving when favorable signal directions dominate
+    ok 1 - marks improving when favorable signal directions dominate
+      ---
+      duration_ms: 1.872291
+      ...
+    # Subtest: marks deteriorating when unfavorable signal directions dominate
+    ok 2 - marks deteriorating when unfavorable signal directions dominate
+      ---
+      duration_ms: 0.428355
+      ...
+    # Subtest: marks mixed when improvements and deteriorations are both present
+    ok 3 - marks mixed when improvements and deteriorations are both present
+      ---
+      duration_ms: 0.378468
+      ...
+    # Subtest: orders changed signals by largest absolute movement
+    ok 4 - orders changed signals by largest absolute movement
+      ---
+      duration_ms: 20.508877
+      ...
+    # Subtest: flags extreme weekly shifts as anomalies instead of normal deltas
+    ok 5 - flags extreme weekly shifts as anomalies instead of normal deltas
+      ---
+      duration_ms: 0.855629
+      ...
+    1..5
+ok 78 - buildReportDynamics
+  ---
+  duration_ms: 25.028104
+  type: 'suite'
+  ...
+# Subtest: buildReportEvidenceItems
+    # Subtest: uses improving polarity for positive curve-slope deltas
+    ok 1 - uses improving polarity for positive curve-slope deltas
+      ---
+      duration_ms: 2.144738
+      ...
+    1..1
+ok 79 - buildReportEvidenceItems
+  ---
+  duration_ms: 2.698831
+  type: 'suite'
+  ...
+# Subtest: buildSnapshotFallbackTreasury
+    # Subtest: adds fallback markers when snapshot payload has none
+    ok 1 - adds fallback markers when snapshot payload has none
+      ---
+      duration_ms: 1.069103
+      ...
+    # Subtest: preserves existing fallback markers from upstream payload
+    ok 2 - preserves existing fallback markers from upstream payload
+      ---
+      duration_ms: 0.365282
+      ...
+    1..2
+ok 80 - buildSnapshotFallbackTreasury
+  ---
+  duration_ms: 1.904672
+  type: 'suite'
+  ...
+# Subtest: sector overlay key resolution
+    # Subtest: maps supported sector query values
+    ok 1 - maps supported sector query values
+      ---
+      duration_ms: 1.083698
+      ...
+    # Subtest: falls back to b2b-saas for unknown or empty sector values
+    ok 2 - falls back to b2b-saas for unknown or empty sector values
+      ---
+      duration_ms: 0.181826
+      ...
+    1..2
+ok 81 - sector overlay key resolution
+  ---
+  duration_ms: 1.600927
+  type: 'suite'
+  ...
+# Subtest: buildHistoricalAnalogs
+    # Subtest: returns empty list when there is no historical window
+    ok 1 - returns empty list when there is no historical window
+      ---
+      duration_ms: 0.752094
+      ...
+    # Subtest: breaks score ties by most recent record date
+    ok 2 - breaks score ties by most recent record date
+      ---
+      duration_ms: 3.942401
+      ...
+    # Subtest: keeps deterministic ordering across equivalent runs
+    ok 3 - keeps deterministic ordering across equivalent runs
+      ---
+      duration_ms: 2.353223
+      ...
+    1..3
+ok 82 - buildHistoricalAnalogs
+  ---
+  duration_ms: 7.306998
+  type: 'suite'
+  ...
+# Subtest: weekly confidence history
+    # Subtest: includes the current report snapshot when it is newer than cached history
+    ok 1 - includes the current report snapshot when it is newer than cached history
+      ---
+      duration_ms: 1.145992
+      ...
+    # Subtest: returns the last eight weekly points and injects missing-week markers
+    ok 2 - returns the last eight weekly points and injects missing-week markers
+      ---
+      duration_ms: 1.551673
+      ...
+    # Subtest: classifies confidence trend from slope and volatility
+    ok 3 - classifies confidence trend from slope and volatility
+      ---
+      duration_ms: 0.448349
+      ...
+    1..3
+ok 83 - weekly confidence history
+  ---
+  duration_ms: 3.467857
+  type: 'suite'
+  ...
+# Subtest: buildFlipThreshold
+    # Subtest: returns a future crossing for scarcity regimes
+    ok 1 - returns a future crossing for scarcity regimes
+      ---
+      duration_ms: 0.650889
+      ...
+    # Subtest: returns a future crossing for defensive regimes
+    ok 2 - returns a future crossing for defensive regimes
+      ---
+      duration_ms: 0.59824
+      ...
+    # Subtest: returns a future crossing for volatile regimes
+    ok 3 - returns a future crossing for volatile regimes
+      ---
+      duration_ms: 0.267754
+      ...
+    # Subtest: returns a future crossing for expansion regimes
+    ok 4 - returns a future crossing for expansion regimes
+      ---
+      duration_ms: 0.179396
+      ...
+    1..4
+ok 84 - buildFlipThreshold
+  ---
+  duration_ms: 1.936159
+  type: 'suite'
+  ...
+# Subtest: reportFormatting regime signal helpers
+    # Subtest: formats regime signal values with score vs decimal precision
+    ok 1 - formats regime signal values with score vs decimal precision
+      ---
+      duration_ms: 3.309379
+      ...
+    # Subtest: maps delta sign to trend arrows
+    ok 2 - maps delta sign to trend arrows
+      ---
+      duration_ms: 0.575435
+      ...
+    1..2
+ok 85 - reportFormatting regime signal helpers
+  ---
+  duration_ms: 7.580981
+  type: 'suite'
+  ...
+# Subtest: report narrative signs
+    # Subtest: returns fallback guidance when no trigger conditions are met
+    ok 1 - returns fallback guidance when no trigger conditions are met
+      ---
+      duration_ms: 5.49571
+      ...
+    # Subtest: returns inversion, tightness, and risk appetite signs when all triggers apply
+    ok 2 - returns inversion, tightness, and risk appetite signs when all triggers apply
+      ---
+      duration_ms: 0.909136
+      ...
+    1..2
+ok 86 - report narrative signs
+  ---
+  duration_ms: 8.381415
+  type: 'suite'
+  ...
+# Subtest: Report shell page navigation
+    # Subtest: renders grouped labels and route descriptions for core routes
+    ok 1 - renders grouped labels and route descriptions for core routes
+      ---
+      duration_ms: 71.211427
+      ...
+    # Subtest: keeps current path highlighting with aria-current page
+    ok 2 - keeps current path highlighting with aria-current page
+      ---
+      duration_ms: 13.103842
+      ...
+    1..2
+ok 87 - Report shell page navigation
+  ---
+  duration_ms: 86.175471
+  type: 'suite'
+  ...
+# Subtest: ReportShell extracted sections
+    # Subtest: renders hero trust and provenance block
+    ok 1 - renders hero trust and provenance block
+      ---
+      duration_ms: 44.50572
+      ...
+    # Subtest: prefers canonical treasury source attribution when provenance is present
+    ok 2 - prefers canonical treasury source attribution when provenance is present
+      ---
+      duration_ms: 0.488009
+      ...
+    # Subtest: renders command center/nav block
+    ok 3 - renders command center/nav block
+      ---
+      duration_ms: 3.776147
+      ...
+    # Subtest: renders sidebar sequence rail
+    ok 4 - renders sidebar sequence rail
+      ---
+      duration_ms: 1.040006
+      ...
+    1..4
+ok 88 - ReportShell extracted sections
+  ---
+  duration_ms: 52.022275
+  type: 'suite'
+  ...
+# Subtest: resource article page section composition
+    # Subtest: defaults to article-only sections when includeSharedDeepDive is not set
+    ok 1 - defaults to article-only sections when includeSharedDeepDive is not set
+      ---
+      duration_ms: 1.137707
+      ...
+    # Subtest: includes shared deep-dive sections only when includeSharedDeepDive is true
+    ok 2 - includes shared deep-dive sections only when includeSharedDeepDive is true
+      ---
+      duration_ms: 0.54092
+      ...
+    # Subtest: keeps section anchor generation stable in both modes
+    ok 3 - keeps section anchor generation stable in both modes
+      ---
+      duration_ms: 42.029662
+      ...
+    1..3
+ok 89 - resource article page section composition
+  ---
+  duration_ms: 45.503192
+  type: 'suite'
+  ...
+# Subtest: resource article slug route
+    # Subtest: includes article slugs in static params for pre-rendering
+    ok 1 - includes article slugs in static params for pre-rendering
+      ---
+      duration_ms: 2.247719
+      ...
+    # Subtest: builds metadata for known article slugs
+    ok 2 - builds metadata for known article slugs
+      ---
+      duration_ms: 33.684378
+      ...
+    # Subtest: renders known article slugs
+    ok 3 - renders known article slugs
+      ---
+      duration_ms: 459.039244
+      ...
+    # Subtest: throws notFound for unknown slugs
+    ok 4 - throws notFound for unknown slugs
+      ---
+      duration_ms: 1.132277
+      ...
+    1..4
+ok 90 - resource article slug route
+  ---
+  duration_ms: 497.796391
+  type: 'suite'
+  ...
+# Subtest: runway planner
+    # Subtest: computes actionable financial outputs for expansion with short runway
+    ok 1 - computes actionable financial outputs for expansion with short runway
+      ---
+      duration_ms: 6.594011
+      ...
+    # Subtest: handles regime changes from expansion to mixed to scarcity with tighter risk and earlier raise windows
+    ok 2 - handles regime changes from expansion to mixed to scarcity with tighter risk and earlier raise windows
+      ---
+      duration_ms: 2.087374
+      ...
+    # Subtest: reflects stage and sector sensitivity in safe runway bands
+    ok 3 - reflects stage and sector sensitivity in safe runway bands
+      ---
+      duration_ms: 1.17535
+      ...
+    # Subtest: pushes scarcity with aggressive burn toward deeper cuts
+    ok 4 - pushes scarcity with aggressive burn toward deeper cuts
+      ---
+      duration_ms: 5.46078
+      ...
+    1..4
+ok 91 - runway planner
+  ---
+  duration_ms: 18.01411
+  type: 'suite'
+  ...
+# Subtest: search index
+    # Subtest: aggregates toolkit, failure-mode, concept, and doc entities
+    ok 1 - aggregates toolkit, failure-mode, concept, and doc entities
+      ---
+      duration_ms: 3.707377
+      ...
+    # Subtest: returns ranked results for a query
+    ok 2 - returns ranked results for a query
+      ---
+      duration_ms: 31.176533
+      ...
+    # Subtest: groups results by entity type
+    ok 3 - groups results by entity type
+      ---
+      duration_ms: 1.262372
+      ...
+    1..3
+ok 92 - search index
+  ---
+  duration_ms: 39.060703
+  type: 'suite'
+  ...
+# Subtest: deriveSectorAdjustedPosture
+    # Subtest: adds upside tilt for high-sensitivity upside sectors
+    ok 1 - adds upside tilt for high-sensitivity upside sectors
+      ---
+      duration_ms: 8.524603
+      ...
+    # Subtest: adds downside tilt for tighter sectors
+    ok 2 - adds downside tilt for tighter sectors
+      ---
+      duration_ms: 3.517158
+      ...
+    # Subtest: dampens overlays near boundaries
+    ok 3 - dampens overlays near boundaries
+      ---
+      duration_ms: 0.706346
+      ...
+    # Subtest: resolves unknown sectors to canonical fallback
+    ok 4 - resolves unknown sectors to canonical fallback
+      ---
+      duration_ms: 0.657196
+      ...
+    # Subtest: keeps damping stable across tiny near-threshold moves
+    ok 5 - keeps damping stable across tiny near-threshold moves
+      ---
+      duration_ms: 0.525662
+      ...
+    # Subtest: keeps neutral sector in hold mode at thresholds
+    ok 6 - keeps neutral sector in hold mode at thresholds
+      ---
+      duration_ms: 0.662465
+      ...
+    1..6
+ok 93 - deriveSectorAdjustedPosture
+  ---
+  duration_ms: 24.003136
+  type: 'suite'
+  ...
+# Subtest: sensor readings
+    # Subtest: builds base rate and curve slope sensors
+    ok 1 - builds base rate and curve slope sensors
+      ---
+      duration_ms: 4.294021
+      ...
+    1..1
+ok 94 - sensor readings
+  ---
+  duration_ms: 5.864248
+  type: 'suite'
+  ...
+# Subtest: JSON-LD serialization
+    # Subtest: escapes script-breaking and HTML-sensitive characters
+    ok 1 - escapes script-breaking and HTML-sensitive characters
+      ---
+      duration_ms: 2.027195
+      ...
+    1..1
+ok 95 - JSON-LD serialization
+  ---
+  duration_ms: 3.836233
+  type: 'suite'
+  ...
+# Subtest: seo decision payload
+    # Subtest: returns all required decision transmission fields
+    ok 1 - returns all required decision transmission fields
+      ---
+      duration_ms: 3.252033
+      ...
+    # Subtest: marks stale/fallback payloads as degraded and noindex
+    ok 2 - marks stale/fallback payloads as degraded and noindex
+      ---
+      duration_ms: 0.766075
+      ...
+    1..2
+ok 96 - seo decision payload
+  ---
+  duration_ms: 6.141257
+  type: 'suite'
+  ...
+# Subtest: SEO index eligibility
+    # Subtest: treats fresh complete payloads as index-eligible
+    ok 1 - treats fresh complete payloads as index-eligible
+      ---
+      duration_ms: 2.851872
+      ...
+    # Subtest: applies noindex robots metadata when payload is stale
+    ok 2 - applies noindex robots metadata when payload is stale
+      ---
+      duration_ms: 1.818135
+      ...
+    1..2
+ok 97 - SEO index eligibility
+  ---
+  duration_ms: 6.882121
+  type: 'suite'
+  ...
+# Subtest: seo quality gates
+    # Subtest: passes when decision, freshness, uniqueness, thin-page, and trust gates pass
+    ok 1 - passes when decision, freshness, uniqueness, thin-page, and trust gates pass
+      ---
+      duration_ms: 3.726001
+      ...
+    # Subtest: fails uniqueness when sibling pages share the same data points and interpretation
+    ok 2 - fails uniqueness when sibling pages share the same data points and interpretation
+      ---
+      duration_ms: 0.750622
+      ...
+    # Subtest: fails thin-page and trust gates for incomplete sections and missing trust labels
+    ok 3 - fails thin-page and trust gates for incomplete sections and missing trust labels
+      ---
+      duration_ms: 0.491476
+      ...
+    1..3
+ok 98 - seo quality gates
+  ---
+  duration_ms: 7.265535
+  type: 'suite'
+  ...
+# Subtest: seo refresh queue
+    # Subtest: marks stale pages for immediate noindex and P0 refresh queue
+    ok 1 - marks stale pages for immediate noindex and P0 refresh queue
+      ---
+      duration_ms: 4.774709
+      ...
+    # Subtest: queues high-tier low-conversion pages without forcing noindex
+    ok 2 - queues high-tier low-conversion pages without forcing noindex
+      ---
+      duration_ms: 0.495862
+      ...
+    # Subtest: preserves prior refresh request timestamps for still-queued pages
+    ok 3 - preserves prior refresh request timestamps for still-queued pages
+      ---
+      duration_ms: 0.402889
+      ...
+    # Subtest: marks carried-over queued pages as overdue when prior SLA has already elapsed
+    ok 4 - marks carried-over queued pages as overdue when prior SLA has already elapsed
+      ---
+      duration_ms: 0.432516
+      ...
+    1..4
+ok 99 - seo refresh queue
+  ---
+  duration_ms: 8.361505
+  type: 'suite'
+  ...
+# Subtest: normalizeSignalContributions
+    # Subtest: normalizes contribution weights to percentages and sorts descending
+    ok 1 - normalizes contribution weights to percentages and sorts descending
+      ---
+      duration_ms: 11.615984
+      ...
+    # Subtest: keeps unavailable signals stable and pushes them after available values
+    ok 2 - keeps unavailable signals stable and pushes them after available values
+      ---
+      duration_ms: 0.521684
+      ...
+    1..2
+ok 100 - normalizeSignalContributions
+  ---
+  duration_ms: 14.151069
+  type: 'suite'
+  ...
+# Subtest: signalOps
+    # Subtest: emits alert payload on threshold crossing with explicit decision delta
+    ok 1 - emits alert payload on threshold crossing with explicit decision delta
+      ---
+      duration_ms: 7.811188
+      ...
+    # Subtest: suppresses alerts when no threshold crossing happened
+    ok 2 - suppresses alerts when no threshold crossing happened
+      ---
+      duration_ms: 3.912923
+      ...
+    # Subtest: suppresses jittering unsustained non-severe crossings
+    ok 3 - suppresses jittering unsustained non-severe crossings
+      ---
+      duration_ms: 1.650911
+      ...
+    # Subtest: suppresses low-confidence deltas unless severe thresholds are exceeded
+    ok 4 - suppresses low-confidence deltas unless severe thresholds are exceeded
+      ---
+      duration_ms: 0.674371
+      ...
+    # Subtest: emits reversal alerts once state sustains after crossing
+    ok 5 - emits reversal alerts once state sustains after crossing
+      ---
+      duration_ms: 0.468435
+      ...
+    # Subtest: builds delivery summaries with structured delta codes
+    ok 6 - builds delivery summaries with structured delta codes
+      ---
+      duration_ms: 0.539309
+      ...
+    1..6
+ok 101 - signalOps
+  ---
+  duration_ms: 19.421624
+  type: 'suite'
+  ...
+# Subtest: site URL resolution
+    # Subtest: falls back to the default URL when the value is missing
+    ok 1 - falls back to the default URL when the value is missing
+      ---
+      duration_ms: 1.282127
+      ...
+    # Subtest: adds https when the value is missing a protocol
+    ok 2 - adds https when the value is missing a protocol
+      ---
+      duration_ms: 0.592027
+      ...
+    # Subtest: returns the origin for valid absolute URLs
+    ok 3 - returns the origin for valid absolute URLs
+      ---
+      duration_ms: 0.323541
+      ...
+    # Subtest: falls back to the default URL when the value is invalid
+    ok 4 - falls back to the default URL when the value is invalid
+      ---
+      duration_ms: 1.728856
+      ...
+    1..4
+ok 102 - site URL resolution
+  ---
+  duration_ms: 5.723285
+  type: 'suite'
+  ...
+# Subtest: sitemap
+    # Subtest: returns canonical URLs and includes posture, decide, learn, and toolkit routes
+    ok 1 - returns canonical URLs and includes posture, decide, learn, and toolkit routes
+      ---
+      duration_ms: 3.570559
+      ...
+    # Subtest: uses valid last modified dates for root, static pages, and canon article pages
+    ok 2 - uses valid last modified dates for root, static pages, and canon article pages
+      ---
+      duration_ms: 1.329791
+      ...
+    # Subtest: omits programmatic answer/regime URLs when eligibility fails
+    ok 3 - omits programmatic answer/regime URLs when eligibility fails
+      ---
+      duration_ms: 0.854966
+      ...
+    1..3
+ok 103 - sitemap
+  ---
+  duration_ms: 7.59078
+  type: 'suite'
+  ...
+# Subtest: StartupModeSelector
+    # Subtest: falls back to first available mode content when selected mode is missing
+    ok 1 - falls back to first available mode content when selected mode is missing
+      ---
+      duration_ms: 47.287894
+      ...
+    # Subtest: renders safe fallback copy when no mode content is available
+    ok 2 - renders safe fallback copy when no mode content is available
+      ---
+      duration_ms: 2.200748
+      ...
+    1..2
+ok 104 - StartupModeSelector
+  ---
+  duration_ms: 50.772139
+  type: 'suite'
+  ...
+# Subtest: parseSummaryArchive
+    # Subtest: hydrates missing weekly/monthly structured blocks for legacy archive entries
+    ok 1 - hydrates missing weekly/monthly structured blocks for legacy archive entries
+      ---
+      duration_ms: 2.151759
+      ...
+    1..1
+ok 105 - parseSummaryArchive
+  ---
+  duration_ms: 3.523785
+  type: 'suite'
+  ...
+# Subtest: summary archive migration
+    # Subtest: keeps weekly/monthly archive entries fully materialized
+    ok 1 - keeps weekly/monthly archive entries fully materialized
+      ---
+      duration_ms: 2.920602
+      ...
+    1..1
+ok 106 - summary archive migration
+  ---
+  duration_ms: 4.676646
+  type: 'suite'
+  ...
+# Subtest: summaryCopyRenderer
+    # Subtest: renders weekly copy with provenance fallback when sourceUrl is missing
+    ok 1 - renders weekly copy with provenance fallback when sourceUrl is missing
+      ---
+      duration_ms: 2.592502
+      ...
+    # Subtest: renders monthly copy with bulleted constraints and provenance
+    ok 2 - renders monthly copy with bulleted constraints and provenance
+      ---
+      duration_ms: 0.836384
+      ...
+    1..2
+ok 107 - summaryCopyRenderer
+  ---
+  duration_ms: 5.361986
+  type: 'suite'
+  ...
+# Subtest: summary hash
+    # Subtest: is deterministic for identical payloads
+    ok 1 - is deterministic for identical payloads
+      ---
+      duration_ms: 1.661573
+      ...
+    # Subtest: changes when stable summary fields change
+    ok 2 - changes when stable summary fields change
+      ---
+      duration_ms: 0.862931
+      ...
+    1..2
+ok 108 - summary hash
+  ---
+  duration_ms: 4.629127
+  type: 'suite'
+  ...
+# Subtest: time machine helpers
+    # Subtest: builds a historical query filter
+    ok 1 - builds a historical query filter
+      ---
+      duration_ms: 3.889367
+      ...
+    # Subtest: resolves the last day of a given month
+    ok 2 - resolves the last day of a given month
+      ---
+      duration_ms: 1.488729
+      ...
+    # Subtest: formats a historical banner label
+    ok 3 - formats a historical banner label
+      ---
+      duration_ms: 0.47396
+      ...
+    1..3
+ok 109 - time machine helpers
+  ---
+  duration_ms: 8.648053
+  type: 'suite'
+  ...
+# Subtest: time machine cache month entry helpers
+    # Subtest: deduplicates repeated entries in the same month while preserving order
+    ok 1 - deduplicates repeated entries in the same month while preserving order
+      ---
+      duration_ms: 2.225789
+      ...
+    # Subtest: caps regime series memoization to a bounded number of keys
+    ok 2 - caps regime series memoization to a bounded number of keys
+      ---
+      duration_ms: 105.731581
+      ...
+    # Subtest: anchors regime series window to the requested historical as-of date
+    ok 3 - anchors regime series window to the requested historical as-of date
+      ---
+      duration_ms: 0.626832
+      ...
+    1..3
+ok 110 - time machine cache month entry helpers
+  ---
+  duration_ms: 111.384964
+  type: 'suite'
+  ...
+# Subtest: time machine selection helpers
+    # Subtest: parses valid month/year requests
+    ok 1 - parses valid month/year requests
+      ---
+      duration_ms: 2.345149
+      ...
+    # Subtest: returns null for invalid month/year inputs
+    ok 2 - returns null for invalid month/year inputs
+      ---
+      duration_ms: 0.453338
+      ...
+    # Subtest: appends month/year params to handoff links
+    ok 3 - appends month/year params to handoff links
+      ---
+      duration_ms: 0.842621
+      ...
+    # Subtest: preserves existing query/hash while overriding month/year
+    ok 4 - preserves existing query/hash while overriding month/year
+      ---
+      duration_ms: 0.507293
+      ...
+    # Subtest: returns previous snapshot when one exists
+    ok 5 - returns previous snapshot when one exists
+      ---
+      duration_ms: 0.420563
+      ...
+    1..5
+ok 111 - time machine selection helpers
+  ---
+  duration_ms: 6.92542
+  type: 'suite'
+  ...
+# Subtest: time machine panel month parsing
+    # Subtest: parses well-formed YYYY-MM input
+    ok 1 - parses well-formed YYYY-MM input
+      ---
+      duration_ms: 2.80075
+      ...
+    # Subtest: rejects malformed or ambiguous month strings
+    ok 2 - rejects malformed or ambiguous month strings
+      ---
+      duration_ms: 0.52191
+      ...
+    1..2
+ok 112 - time machine panel month parsing
+  ---
+  duration_ms: 5.140544
+  type: 'suite'
+  ...
+# Subtest: toolkit definitions
+    # Subtest: provides built-out operating guidance for each toolkit
+    ok 1 - provides built-out operating guidance for each toolkit
+      ---
+      duration_ms: 1.858929
+      ...
+    1..1
+ok 113 - toolkit definitions
+  ---
+  duration_ms: 3.301427
+  type: 'suite'
+  ...
+# Subtest: treasury client
+    # Subtest: returns live data when fetch succeeds
+    ok 1 - returns live data when fetch succeeds
+      ---
+      duration_ms: 46.033552
+      ...
+    # Subtest: falls back to snapshot on fetch failure
+    ok 2 - falls back to snapshot on fetch failure
+      ---
+      duration_ms: 2.161516
+      ...
+    # Subtest: falls back to snapshot when payload shape is invalid
+    ok 3 - falls back to snapshot when payload shape is invalid
+      ---
+      duration_ms: 3.612568
+      ...
+    # Subtest: returns snapshot fallback with explicit reason for historical cache miss
+    ok 4 - returns snapshot fallback with explicit reason for historical cache miss
+      ---
+      duration_ms: 0.487054
+      ...
+    # Subtest: preserves custom endpoint support for live reads
+    ok 5 - preserves custom endpoint support for live reads
+      ---
+      duration_ms: 3.952095
+      ...
+    # Subtest: preserves existing custom endpoint query params when setting series id
+    ok 6 - preserves existing custom endpoint query params when setting series id
+      ---
+      duration_ms: 2.899463
+      ...
+    # Subtest: retries once when series requests abort
+    ok 7 - retries once when series requests abort
+      ---
+      duration_ms: 2.642267
+      ...
+    # Subtest: uses a clearer fallback reason after repeated timeout aborts
+    ok 8 - uses a clearer fallback reason after repeated timeout aborts
+      ---
+      duration_ms: 1.478149
+      ...
+    # Subtest: uses Treasury daily rates CSV as a live backup when FRED is unavailable
+    ok 9 - uses Treasury daily rates CSV as a live backup when FRED is unavailable
+      ---
+      duration_ms: 2.983575
+      ...
+    # Subtest: uses the next newest Treasury CSV row when the latest row has placeholder tenor values
+    ok 10 - uses the next newest Treasury CSV row when the latest row has placeholder tenor values
+      ---
+      duration_ms: 1.891143
+      ...
+    # Subtest: chooses the latest valid Treasury CSV row regardless of response ordering
+    ok 11 - chooses the latest valid Treasury CSV row regardless of response ordering
+      ---
+      duration_ms: 1.82788
+      ...
+    1..11
+ok 114 - treasury client
+  ---
+  duration_ms: 72.545974
+  type: 'suite'
+  ...
+# Subtest: treasury normalizer
+    # Subtest: maps API payload into normalized row
+    ok 1 - maps API payload into normalized row
+      ---
+      duration_ms: 5.407389
+      ...
+    # Subtest: returns null for invalid payload shape
+    ok 2 - returns null for invalid payload shape
+      ---
+      duration_ms: 1.172959
+      ...
+    1..2
+ok 115 - treasury normalizer
+  ---
+  duration_ms: 8.577471
+  type: 'suite'
+  ...
+# Subtest: buildFailureModeWarnings
+    # Subtest: activates boundary-whipsaw when confidence is low near transition with multiple changes
+    ok 1 - activates boundary-whipsaw when confidence is low near transition with multiple changes
+      ---
+      duration_ms: 2.947608
+      ...
+    # Subtest: deactivates boundary-whipsaw when confidence recovers even with signal movement
+    ok 2 - deactivates boundary-whipsaw when confidence recovers even with signal movement
+      ---
+      duration_ms: 0.320066
+      ...
+    # Subtest: activates and clears stale-cached warning based on fallback and freshness
+    ok 3 - activates and clears stale-cached warning based on fallback and freshness
+      ---
+      duration_ms: 0.362339
+      ...
+    # Subtest: activates anomaly-divergence only when anomaly threshold is met
+    ok 4 - activates anomaly-divergence only when anomaly threshold is met
+      ---
+      duration_ms: 0.437711
+      ...
+    1..4
+ok 116 - buildFailureModeWarnings
+  ---
+  duration_ms: 5.98881
+  type: 'suite'
+  ...
+# Subtest: buildTrustStatus trust tones
+    # Subtest: returns stable trust copy with explicit decision impact and low-confidence action
+    ok 1 - returns stable trust copy with explicit decision impact and low-confidence action
+      ---
+      duration_ms: 1.6215
+      ...
+    # Subtest: returns warning trust copy that keeps decision path but stages irreversible approvals
+    ok 2 - returns warning trust copy that keeps decision path but stages irreversible approvals
+      ---
+      duration_ms: 0.48776
+      ...
+    # Subtest: returns historical trust copy for retrospective use with explicit confidence fallback action
+    ok 3 - returns historical trust copy for retrospective use with explicit confidence fallback action
+      ---
+      duration_ms: 0.383996
+      ...
+    1..3
+ok 117 - buildTrustStatus trust tones
+  ---
+  duration_ms: 4.244508
+  type: 'suite'
+  ...
+# Subtest: validation fallbacks
+    # Subtest: builds a safe snapshot when validation fails
+    ok 1 - builds a safe snapshot when validation fails
+      ---
+      duration_ms: 3.710331
+      ...
+    # Subtest: returns a fallback cache entry instead of throwing
+    ok 2 - returns a fallback cache entry instead of throwing
+      ---
+      duration_ms: 0.615796
+      ...
+    # Subtest: returns an empty archive when validation fails
+    ok 3 - returns an empty archive when validation fails
+      ---
+      duration_ms: 1.216175
+      ...
+    1..3
+ok 118 - validation fallbacks
+  ---
+  duration_ms: 7.419326
+  type: 'suite'
+  ...
+# Subtest: WeeklyDecisionCard top-fold composition
+    # Subtest: renders the operating console hierarchy
+    not ok 1 - renders the operating console hierarchy
+      ---
+      duration_ms: 15.574464
+      location: '/workspace/whether/tests/weeklyDecisionCardLayout.test.tsx:1:954'
+      failureType: 'testCodeFailure'
+      error: "Cannot read properties of undefined (reading 'shell')"
+      code: 'ERR_TEST_FAILURE'
+      name: 'TypeError'
+      stack: |-
+        RegimeBanner (/workspace/whether/app/components/weeklyDecisionCard.tsx:782:153)
+        Object.react_stack_bottom_frame (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:9808:18)
+        renderWithHooks (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:5062:19)
+        renderElement (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:5497:23)
+        retryNode (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6417:31)
+        renderNodeDestructive (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6367:11)
+        renderNode (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6905:18)
+        renderChildrenArray (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6674:11)
+        retryNode (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6441:13)
+        renderNodeDestructive (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6367:11)
+      ...
+    # Subtest: shows fallback warning copy when snapshot mode is active
+    not ok 2 - shows fallback warning copy when snapshot mode is active
+      ---
+      duration_ms: 6.12054
+      location: '/workspace/whether/tests/weeklyDecisionCardLayout.test.tsx:1:6151'
+      failureType: 'testCodeFailure'
+      error: "Cannot read properties of undefined (reading 'shell')"
+      code: 'ERR_TEST_FAILURE'
+      name: 'TypeError'
+      stack: |-
+        RegimeBanner (/workspace/whether/app/components/weeklyDecisionCard.tsx:782:153)
+        Object.react_stack_bottom_frame (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:9808:18)
+        renderWithHooks (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:5062:19)
+        renderElement (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:5497:23)
+        retryNode (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6417:31)
+        renderNodeDestructive (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6367:11)
+        renderNode (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6905:18)
+        renderChildrenArray (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6674:11)
+        retryNode (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6441:13)
+        renderNodeDestructive (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6367:11)
+      ...
+    # Subtest: keeps a single canonical weekly call region and compact shell spacing
+    not ok 3 - keeps a single canonical weekly call region and compact shell spacing
+      ---
+      duration_ms: 4.233184
+      location: '/workspace/whether/tests/weeklyDecisionCardLayout.test.tsx:1:10338'
+      failureType: 'testCodeFailure'
+      error: "Cannot read properties of undefined (reading 'shell')"
+      code: 'ERR_TEST_FAILURE'
+      name: 'TypeError'
+      stack: |-
+        RegimeBanner (/workspace/whether/app/components/weeklyDecisionCard.tsx:782:153)
+        Object.react_stack_bottom_frame (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:9808:18)
+        renderWithHooks (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:5062:19)
+        renderElement (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:5497:23)
+        retryNode (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6417:31)
+        renderNodeDestructive (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6367:11)
+        renderNode (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6905:18)
+        renderChildrenArray (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6674:11)
+        retryNode (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6441:13)
+        renderNodeDestructive (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6367:11)
+      ...
+    # Subtest: dedupes and caps DO NOW/AVOID bullets while keeping WATCH concise
+    not ok 4 - dedupes and caps DO NOW/AVOID bullets while keeping WATCH concise
+      ---
+      duration_ms: 4.327516
+      location: '/workspace/whether/tests/weeklyDecisionCardLayout.test.tsx:1:14153'
+      failureType: 'testCodeFailure'
+      error: "Cannot read properties of undefined (reading 'shell')"
+      code: 'ERR_TEST_FAILURE'
+      name: 'TypeError'
+      stack: |-
+        RegimeBanner (/workspace/whether/app/components/weeklyDecisionCard.tsx:782:153)
+        Object.react_stack_bottom_frame (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:9808:18)
+        renderWithHooks (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:5062:19)
+        renderElement (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:5497:23)
+        retryNode (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6417:31)
+        renderNodeDestructive (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6367:11)
+        renderNode (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6905:18)
+        renderChildrenArray (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6674:11)
+        retryNode (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6441:13)
+        renderNodeDestructive (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6367:11)
+      ...
+    1..4
+not ok 119 - WeeklyDecisionCard top-fold composition
+  ---
+  duration_ms: 32.545922
+  type: 'suite'
+  location: '/workspace/whether/tests/weeklyDecisionCardLayout.test.tsx:1:898'
+  failureType: 'subtestsFailed'
+  error: '4 subtests failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: WeeklyDecisionCard extracted sections
+    # Subtest: renders operating-call header contracts
+    ok 1 - renders operating-call header contracts
+      ---
+      duration_ms: 26.463073
+      ...
+    # Subtest: renders the explicit you-are-here and distance copy
+    ok 2 - renders the explicit you-are-here and distance copy
+      ---
+      duration_ms: 7.915298
+      ...
+    # Subtest: renders compact flip-condition distance
+    ok 3 - renders compact flip-condition distance
+      ---
+      duration_ms: 8.581164
+      ...
+    # Subtest: renders confidence mini-chart fallback markers in regime panel
+    not ok 4 - renders confidence mini-chart fallback markers in regime panel
+      ---
+      duration_ms: 5.360629
+      location: '/workspace/whether/tests/weeklyDecisionCardSections.test.tsx:1:8522'
+      failureType: 'testCodeFailure'
+      error: "Cannot read properties of undefined (reading 'shell')"
+      code: 'ERR_TEST_FAILURE'
+      name: 'TypeError'
+      stack: |-
+        RegimeBanner (/workspace/whether/app/components/weeklyDecisionCard.tsx:782:153)
+        Object.react_stack_bottom_frame (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:9808:18)
+        renderWithHooks (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:5062:19)
+        renderElement (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:5497:23)
+        retryNode (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6417:31)
+        renderNodeDestructive (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6367:11)
+        renderNode (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6905:18)
+        renderChildrenArray (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6674:11)
+        retryNode (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6441:13)
+        renderNodeDestructive (/workspace/whether/node_modules/react-dom/cjs/react-dom-server-legacy.node.development.js:6367:11)
+      ...
+    # Subtest: renders bounded rules matrix hierarchy
+    ok 5 - renders bounded rules matrix hierarchy
+      ---
+      duration_ms: 38.228639
+      ...
+    # Subtest: renders ordered transitions with hover metadata and history links
+    not ok 6 - renders ordered transitions with hover metadata and history links
+      ---
+      duration_ms: 16.399806
+      location: '/workspace/whether/tests/weeklyDecisionCardSections.test.tsx:1:11087'
+      failureType: 'testCodeFailure'
+      error: |-
+        The input did not match the regular expression /→/. Input:
+        
+        '<div class="space-y-2.5"><details class="group rounded-lg border border-slate-800/45 bg-slate-950/38 px-2.5 py-2"><summary class="flex min-h-[44px] w-full items-center justify-between gap-3 rounded-md border border-slate-800/52 bg-slate-950/56 px-3 py-2 text-left text-xs font-semibold tracking-[0.01em] text-slate-100 transition hover:border-slate-600/60 hover:bg-slate-900/74 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 cursor-pointer list-none"><span>Startup Climate Index (context)</span><span aria-hidden="true" class="text-sm transition group-open:rotate-180">▾</span></summary><div class="mt-2 space-y-2"><p class="text-xs text-slate-300">Context metric for continuity: 62 / 100 · Stable</p><ul class="grid gap-1.5 sm:grid-cols-2"><li class="space-y-1 text-xs"><div class="flex items-center justify-between gap-2"><span>Capital</span><span class="font-semibold text-slate-100">60</span></div><div class="h-1.5 rounded-full bg-slate-800"><div class="h-1.5 rounded-full bg-sky-300/70" style="width:60%"></div></div></li></ul></div></details><details class="group rounded-lg border border-slate-800/45 bg-slate-950/38 px-2.5 py-2"><summary class="flex min-h-[44px] w-full items-center justify-between gap-3 rounded-md border border-slate-800/52 bg-slate-950/56 px-3 py-2 text-left text-xs font-semibold tracking-[0.01em] text-slate-100 transition hover:border-slate-600/60 hover:bg-slate-900/74 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 cursor-pointer list-none"><span>Evidence snapshot</span><span aria-hidden="true" class="text-sm transition group-open:rotate-180">▾</span></summary><ul class="mt-2 grid gap-2 lg:grid-cols-3"><li class="rounded-md border border-slate-800/32 bg-slate-950/42 px-2.5 py-2 space-y-1.5 text-xs text-slate-200"><p class="font-semibold text-slate-100">Capital conditions</p><p class="text-[11px] text-slate-400">Updated —</p><ul class="space-y-1 text-[11px] text-slate-300"><li>• Weekly move: +1.0 vs. prior snapshot.</li></ul><p class="text-[11px] text-slate-300"><span class="font-semibold text-slate-200">Confidence:</span> Medium</p><p class="text-[11px] text-slate-300"><span class="font-semibold text-slate-200">Direction:</span> Tightening</p><p class="text-[11px] text-slate-300"><span class="font-semibold text-slate-200">Immediate implication:</span> Tighten approvals and protect runway for fixed-cost commitments.</p></li></ul></details><details class="group rounded-lg border border-slate-800/45 bg-slate-950/38 px-2.5 py-2"><summary class="flex min-h-[44px] w-full items-center justify-between gap-3 rounded-md border border-slate-800/52 bg-slate-950/56 px-3 py-2 text-left text-xs font-semibold tracking-[0.01em] text-slate-100 transition hover:border-slate-600/60 hover:bg-slate-900/74 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 cursor-pointer list-none"><span>Why this posture call</span><span aria-hidden="true" class="text-sm transition group-open:rotate-180">▾</span></summary><ul class="mt-2 grid gap-1.5 sm:grid-cols-3"><li class="rounded-md border border-slate-800/32 bg-slate-950/42 px-2.5 py-2 text-xs text-slate-200"><p class="font-semibold text-slate-300">Momentum</p><p class="mt-1 leading-5 text-slate-300">No material change</p></li></ul></details><details class="group rounded-lg border border-slate-800/45 bg-slate-950/38 px-2.5 py-2"><summary class="flex min-h-[44px] w-full items-center justify-between gap-3 rounded-md border border-slate-800/52 bg-slate-950/56 px-3 py-2 text-left text-xs font-semibold tracking-[0.01em] text-slate-100 transition hover:border-slate-600/60 hover:bg-slate-900/74 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 cursor-pointer list-none"><span>Posture history and overlays</span><span aria-hidden="true" class="text-sm transition group-open:rotate-180">▾</span></summary><div class="mt-2 space-y-2"><ol class="mt-2 space-y-2" aria-label="Posture change timeline"><li class="relative"><a class="group relative flex min-h-[44px] items-start gap-2.5 rounded-lg pr-1 text-xs transition hover:bg-slate-900/35 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300" aria-label="Load weekly call for Jan 31, 2026" href="/?month=1&amp;year=2026"><div class="absolute top-0 bottom-0 left-2.5 w-px bg-slate-700/70" aria-hidden="true"></div><div class="relative mt-1 h-3 w-3 rounded-full border border-slate-500 bg-slate-700" aria-hidden="true"></div><div class="min-w-0 flex-1 rounded-lg border border-slate-700/60 bg-slate-950/65 px-2.5 py-2"><div class="flex flex-wrap items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300"><span>Jan 31, 2026</span><span class="rounded-full border px-1.5 py-0.5 border-slate-500/70 bg-slate-800/85 text-slate-300">Start</span></div><p class="mt-1 text-xs font-semibold text-slate-100">Defensive</p><p class="mt-1 text-[11px] leading-4 text-slate-300">Hold approvals</p><p class="mt-1 text-[10px] text-slate-400">2026-01-31</p></div></a></li><li class="relative"><a class="group relative flex min-h-[44px] items-start gap-2.5 rounded-lg pr-1 text-xs transition hover:bg-slate-900/35 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300" aria-label="Load weekly call for Feb 28, 2026" href="/?month=2&amp;year=2026"><div class="absolute top-0 bottom-0 left-2.5 w-px bg-slate-700/70" aria-hidden="true"></div><div class="relative mt-1 h-3 w-3 rounded-full border border-sky-200 bg-sky-300" aria-hidden="true"></div><div class="min-w-0 flex-1 rounded-lg border border-slate-700/60 bg-slate-950/65 px-2.5 py-2"><div class="flex flex-wrap items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300"><span>Feb 28, 2026</span><span class="rounded-full border px-1.5 py-0.5 border-amber-300/60 bg-amber-500/15 text-amber-100">Changed</span><span class="rounded-full border border-sky-300/50 bg-sky-500/20 px-1.5 py-0.5 text-sky-100">Current</span></div><p class="mt-1 text-xs font-semibold text-slate-100">Scarcity</p><p class="mt-1 text-[11px] leading-4 text-slate-300">Tighten hiring</p><p class="mt-1 text-[10px] text-slate-400">2026-02-28</p></div></a></li></ol><div><p class="text-xs font-medium tracking-normal text-slate-400">Historical memory rail</p><ul class="mt-1.5 grid gap-1.5 sm:grid-cols-2 lg:grid-cols-4"><li class="rounded-md border border-slate-800/32 bg-slate-950/42 px-2.5 py-2 text-xs text-slate-200"><p class="text-slate-400">W-1</p><p class="mt-1 font-semibold text-slate-100">Defensive</p></li></ul></div><ul class="grid gap-1.5 text-xs text-slate-300 sm:grid-cols-2 lg:grid-cols-4"><li class="rounded-md border border-slate-800/32 bg-slate-950/42 px-2.5 py-2"><p class="font-semibold text-slate-200">VC</p><p class="mt-1 leading-5 text-slate-300">Muted</p></li></ul></div></details></div>'
+        
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected:
+      actual: '<div class="space-y-2.5"><details class="group rounded-lg border border-slate-800/45 bg-slate-950/38 px-2.5 py-2"><summary class="flex min-h-[44px] w-full items-center justify-between gap-3 rounded-md border border-slate-800/52 bg-slate-950/56 px-3 py-2 text-left text-xs font-semibold tracking-[0.01em] text-slate-100 transition hover:border-slate-600/60 hover:bg-slate-900/74 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 cursor-pointer list-none"><span>Startup Climate Index (context)</span><span aria-hidden="true" class="text-sm transition group-open:rotate-180">▾</span></summary><div class="mt-2 space-y-2"><p class="text-xs text-slate-300">Context metric for continuity: 62 / 100 · Stable</p><ul class="grid gap-1.5 sm:grid-cols-2"><li class="space-y-1 text-xs"><div class="flex items-center justify-between gap-2"><span>Capital</span><span class="font-semibold text-slate-100">60</span></div><div class="h-1.5 rounded-full bg-slate-800"><div class="h-1.5 rounded-full bg-sky-300/70" style="width:60%"></div></div></li></ul></div></details><details class="group rounded-lg border border-slate-800/45 bg-slate-950/38 px-2.5 py-2"><summary class="flex min-h-[44px] w-full items-center justify-between gap-3 rounded-md border border-slate-800/52 bg-slate-950/56 px-3 py-2 text-left text-xs font-semibold tracking-[0.01em] text-slate-100 transition hover:border-slate-600/60 hover:bg-slate-900/74 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 cursor-pointer list-none"><span>Evidence snapshot</span><span aria-hidden="true" class="text-sm transition group-open:rotate-180">▾</span></summary><ul class="mt-2 grid gap-2 lg:grid-cols-3"><li class="rounded-md border border-slate-800/32 bg-slate-950/42 px-2.5 py-2 space-y-1.5 text-xs text-slate-200"><p class="font-semibold text-slate-100">Capital conditions</p><p class="text-[11px] text-slate-400">Updated —</p><ul class="space-y-1 text-[11px] text-slate-300"><li>• Weekly move: +1.0 vs. prior snapshot.</li></ul><p class="text-[11px] text-slate-300"><span class="font-semibold text-slate-200">Confidence:</span> Medium</p><p class="text-[11px] text-slate-300"><span class="font-semibold text-slate-200">Direction:</span> Tightening</p><p class="text-[11px] text-slate-300"><span class="font-semibold text-slate-200">Immediate implication:</span> Tighten approvals and protect runway for fixed-cost commitments.</p></li></ul></details><details class="group rounded-lg border border-slate-800/45 bg-slate-950/38 px-2.5 py-2"><summary class="flex min-h-[44px] w-full items-center justify-between gap-3 rounded-md border border-slate-800/52 bg-slate-950/56 px-3 py-2 text-left text-xs font-semibold tracking-[0.01em] text-slate-100 transition hover:border-slate-600/60 hover:bg-slate-900/74 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 cursor-pointer list-none"><span>Why this posture call</span><span aria-hidden="true" class="text-sm transition group-open:rotate-180">▾</span></summary><ul class="mt-2 grid gap-1.5 sm:grid-cols-3"><li class="rounded-md border border-slate-800/32 bg-slate-950/42 px-2.5 py-2 text-xs text-slate-200"><p class="font-semibold text-slate-300">Momentum</p><p class="mt-1 leading-5 text-slate-300">No material change</p></li></ul></details><details class="group rounded-lg border border-slate-800/45 bg-slate-950/38 px-2.5 py-2"><summary class="flex min-h-[44px] w-full items-center justify-between gap-3 rounded-md border border-slate-800/52 bg-slate-950/56 px-3 py-2 text-left text-xs font-semibold tracking-[0.01em] text-slate-100 transition hover:border-slate-600/60 hover:bg-slate-900/74 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 cursor-pointer list-none"><span>Posture history and overlays</span><span aria-hidden="true" class="text-sm transition group-open:rotate-180">▾</span></summary><div class="mt-2 space-y-2"><ol class="mt-2 space-y-2" aria-label="Posture change timeline"><li class="relative"><a class="group relative flex min-h-[44px] items-start gap-2.5 rounded-lg pr-1 text-xs transition hover:bg-slate-900/35 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300" aria-label="Load weekly call for Jan 31, 2026" href="/?month=1&amp;year=2026"><div class="absolute top-0 bottom-0 left-2.5 w-px bg-slate-700/70" aria-hidden="true"></div><div class="relative mt-1 h-3 w-3 rounded-full border border-slate-500 bg-slate-700" aria-hidden="true"></div><div class="min-w-0 flex-1 rounded-lg border border-slate-700/60 bg-slate-950/65 px-2.5 py-2"><div class="flex flex-wrap items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300"><span>Jan 31, 2026</span><span class="rounded-full border px-1.5 py-0.5 border-slate-500/70 bg-slate-800/85 text-slate-300">Start</span></div><p class="mt-1 text-xs font-semibold text-slate-100">Defensive</p><p class="mt-1 text-[11px] leading-4 text-slate-300">Hold approvals</p><p class="mt-1 text-[10px] text-slate-400">2026-01-31</p></div></a></li><li class="relative"><a class="group relative flex min-h-[44px] items-start gap-2.5 rounded-lg pr-1 text-xs transition hover:bg-slate-900/35 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300" aria-label="Load weekly call for Feb 28, 2026" href="/?month=2&amp;year=2026"><div class="absolute top-0 bottom-0 left-2.5 w-px bg-slate-700/70" aria-hidden="true"></div><div class="relative mt-1 h-3 w-3 rounded-full border border-sky-200 bg-sky-300" aria-hidden="true"></div><div class="min-w-0 flex-1 rounded-lg border border-slate-700/60 bg-slate-950/65 px-2.5 py-2"><div class="flex flex-wrap items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300"><span>Feb 28, 2026</span><span class="rounded-full border px-1.5 py-0.5 border-amber-300/60 bg-amber-500/15 text-amber-100">Changed</span><span class="rounded-full border border-sky-300/50 bg-sky-500/20 px-1.5 py-0.5 text-sky-100">Current</span></div><p class="mt-1 text-xs font-semibold text-slate-100">Scarcity</p><p class="mt-1 text-[11px] leading-4 text-slate-300">Tighten hiring</p><p class="mt-1 text-[10px] text-slate-400">2026-02-28</p></div></a></li></ol><div><p class="text-xs font-medium tracking-normal text-slate-400">Historical memory rail</p><ul class="mt-1.5 grid gap-1.5 sm:grid-cols-2 lg:grid-cols-4"><li class="rounded-md border border-slate-800/32 bg-slate-950/42 px-2.5 py-2 text-xs text-slate-200"><p class="text-slate-400">W-1</p><p class="mt-1 font-semibold text-slate-100">Defensive</p></li></ul></div><ul class="grid gap-1.5 text-xs text-slate-300 sm:grid-cols-2 lg:grid-cols-4"><li class="rounded-md border border-slate-800/32 bg-slate-950/42 px-2.5 py-2"><p class="font-semibold text-slate-200">VC</p><p class="mt-1 leading-5 text-slate-300">Muted</p></li></ul></div></details></div>'
+      operator: 'match'
+      stack: |-
+        TestContext.<anonymous> (/workspace/whether/tests/weeklyDecisionCardSections.test.tsx:311:12)
+        Test.runInAsyncScope (node:async_hooks:206:9)
+        Test.run (node:internal/test_runner/test:796:25)
+        Suite.processPendingSubtests (node:internal/test_runner/test:526:18)
+        Test.postRun (node:internal/test_runner/test:889:19)
+        Test.run (node:internal/test_runner/test:835:12)
+        async Suite.processPendingSubtests (node:internal/test_runner/test:526:7)
+      ...
+    # Subtest: renders collapsed context and citation footer
+    ok 7 - renders collapsed context and citation footer
+      ---
+      duration_ms: 14.684818
+      ...
+    1..7
+not ok 120 - WeeklyDecisionCard extracted sections
+  ---
+  duration_ms: 119.774205
+  type: 'suite'
+  location: '/workspace/whether/tests/weeklyDecisionCardSections.test.tsx:1:315'
+  failureType: 'subtestsFailed'
+  error: '2 subtests failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+# Subtest: weeklyLeadershipBrief helpers
+    # Subtest: buildBoldnessScore clamps between 0 and 100
+    ok 1 - buildBoldnessScore clamps between 0 and 100
+      ---
+      duration_ms: 1.203465
+      ...
+    # Subtest: trend and window labels are deterministic
+    ok 2 - trend and window labels are deterministic
+      ---
+      duration_ms: 0.456223
+      ...
+    # Subtest: buildWeeklyLeadershipBriefModel returns expected shape
+    ok 3 - buildWeeklyLeadershipBriefModel returns expected shape
+      ---
+      duration_ms: 2.268935
+      ...
+    1..3
+ok 121 - weeklyLeadershipBrief helpers
+  ---
+  duration_ms: 5.586329
+  type: 'suite'
+  ...
+# Subtest: weekly operator brief export adapters
+    # Subtest: standardizes the payload contract fields
+    ok 1 - standardizes the payload contract fields
+      ---
+      duration_ms: 1.365293
+      ...
+    # Subtest: renders plain text and image/PDF card text adapters
+    ok 2 - renders plain text and image/PDF card text adapters
+      ---
+      duration_ms: 0.521835
+      ...
+    # Subtest: renders Slack blocks adapter with required sections
+    ok 3 - renders Slack blocks adapter with required sections
+      ---
+      duration_ms: 0.431377
+      ...
+    1..3
+ok 122 - weekly operator brief export adapters
+  ---
+  duration_ms: 3.945594
+  type: 'suite'
+  ...
+# Subtest: weekly call snapshot export
+    # Subtest: renders sections in decision-first order with bulleted flip conditions
+    ok 1 - renders sections in decision-first order with bulleted flip conditions
+      ---
+      duration_ms: 0.288899
+      ...
+    1..1
+ok 123 - weekly call snapshot export
+  ---
+  duration_ms: 0.421824
+  type: 'suite'
+  ...
+# Subtest: clipboard UX state for export actions
+    # Subtest: returns copied state for successful target
+    ok 1 - returns copied state for successful target
+      ---
+      duration_ms: 0.344325
+      ...
+    # Subtest: returns error state for clipboard failure
+    ok 2 - returns error state for clipboard failure
+      ---
+      duration_ms: 0.190839
+      ...
+    1..2
+ok 124 - clipboard UX state for export actions
+  ---
+  duration_ms: 0.878401
+  type: 'suite'
+  ...
+# Subtest: buildWeeklySummary
+    # Subtest: generates a copy block that starts with summary context and bulleted weekly sections
+    ok 1 - generates a copy block that starts with summary context and bulleted weekly sections
+      ---
+      duration_ms: 4.866756
+      ...
+    1..1
+ok 125 - buildWeeklySummary
+  ---
+  duration_ms: 6.17313
+  type: 'suite'
+  ...
+# Subtest: whether-to-ship checklist
+    # Subtest: returns kill for weak inputs in scarcity
+    ok 1 - returns kill for weak inputs in scarcity
+      ---
+      duration_ms: 1.46541
+      ...
+    # Subtest: returns go for strong inputs despite scarcity penalty
+    ok 2 - returns go for strong inputs despite scarcity penalty
+      ---
+      duration_ms: 0.415039
+      ...
+    1..2
+ok 126 - whether-to-ship checklist
+  ---
+  duration_ms: 3.905266
+  type: 'suite'
+  ...
+1..126
+# tests 354
+# suites 118
+# pass 342
+# fail 12
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 73199.421076
