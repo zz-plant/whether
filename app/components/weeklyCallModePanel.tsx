@@ -1,0 +1,93 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import type { StartupVariantMode } from "../../lib/report/boundedDecisionRules";
+import type { StartupVariantPolicy } from "../../lib/report/homeBriefModel";
+import { StartupModeSelector, type StartupModeContent } from "./startupModeSelector";
+
+type WeeklyCallModePanelProps = {
+  startupVariantPolicy: StartupVariantPolicy;
+  modeContentByMode: Partial<Record<StartupVariantMode, StartupModeContent>>;
+  postureLabel: string;
+  trendLabel: string;
+  confidencePercent: number;
+  confidenceLabel: "HIGH" | "MED" | "LOW";
+  snapshotDoNow: string;
+  snapshotAvoid: string;
+  snapshotWatch: string;
+  effectiveFlipLabels: string[];
+  compactInsetClassName: string;
+  tierOnePanelClassName: string;
+  sectionSpacingClassName: string;
+  tierOneHeadingClassName: string;
+};
+
+export function WeeklyCallModePanel({
+  startupVariantPolicy,
+  modeContentByMode,
+  postureLabel,
+  trendLabel,
+  confidencePercent,
+  confidenceLabel,
+  snapshotDoNow,
+  snapshotAvoid,
+  snapshotWatch,
+  effectiveFlipLabels,
+  compactInsetClassName,
+  tierOnePanelClassName,
+  sectionSpacingClassName,
+  tierOneHeadingClassName,
+}: WeeklyCallModePanelProps) {
+  const firstAvailableMode = startupVariantPolicy.options.find((option) => modeContentByMode[option.mode])?.mode;
+  const [activeMode, setActiveMode] = useState<StartupVariantMode>(startupVariantPolicy.selectedMode);
+  const effectiveMode = modeContentByMode[activeMode]
+    ? activeMode
+    : (modeContentByMode[startupVariantPolicy.selectedMode] ? startupVariantPolicy.selectedMode : firstAvailableMode);
+  const activeContent = effectiveMode ? modeContentByMode[effectiveMode] : undefined;
+  const selectedModeLabel = startupVariantPolicy.options.find((option) => option.mode === effectiveMode)?.label;
+
+  const modeAdjustedSnapshot = useMemo(() => ({
+    doNow: activeContent?.doNowBullets[0] ?? snapshotDoNow,
+    avoid: activeContent?.avoidBullets[0] ?? snapshotAvoid,
+    watch: activeContent?.watchBullets[0] ?? snapshotWatch,
+  }), [activeContent, snapshotAvoid, snapshotDoNow, snapshotWatch]);
+
+  return (
+    <>
+      <article className="rounded-xl border border-slate-700/75 bg-slate-950/92 p-3" aria-label="Weekly call snapshot">
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="text-sm font-semibold tracking-[0.01em] text-slate-50">Weekly call snapshot</h2>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Quick share summary for this week</p>
+        </div>
+        <ul className="mt-2 grid gap-1.5 text-[11px] text-slate-100 sm:grid-cols-2 lg:grid-cols-3">
+          <li className={compactInsetClassName}><span className="font-semibold text-slate-200">Regime:</span> {postureLabel}</li>
+          <li className={compactInsetClassName}><span className="font-semibold text-slate-200">Trend:</span> {trendLabel}</li>
+          <li className={compactInsetClassName}><span className="font-semibold text-slate-200">Confidence:</span> {Math.round(confidencePercent)}% ({confidenceLabel})</li>
+          <li className={compactInsetClassName}><span className="font-semibold text-slate-200">Company mode:</span> {selectedModeLabel ?? "Default"}</li>
+          <li className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-emerald-200">DO NOW:</span> {modeAdjustedSnapshot.doNow}</li>
+          <li className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-rose-200">AVOID:</span> {modeAdjustedSnapshot.avoid}</li>
+          <li className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-sky-200">WATCH:</span> {modeAdjustedSnapshot.watch}</li>
+        </ul>
+        <div className="mt-2 rounded-md border border-sky-500/25 bg-sky-500/5 px-2.5 py-2">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Flip conditions</p>
+          <ul className="mt-1 space-y-1 text-[11px] text-slate-100">
+            {(effectiveFlipLabels.length > 0 ? effectiveFlipLabels : [snapshotWatch]).map((condition) => (
+              <li key={`flip-condition-${condition}`}>• {condition}</li>
+            ))}
+          </ul>
+        </div>
+      </article>
+
+      <article id="weekly-call-core" className={`${tierOnePanelClassName} weather-motion-card ${sectionSpacingClassName} bg-gradient-to-br from-slate-950/95 via-slate-900/85 to-slate-950/95`}>
+        <h2 className={tierOneHeadingClassName}>This week&apos;s call</h2>
+        <p className="text-xs text-slate-300">Whether does not predict markets; it tells founders how to operate inside them this week.</p>
+        <StartupModeSelector
+          options={startupVariantPolicy.options}
+          selectedMode={effectiveMode ?? startupVariantPolicy.selectedMode}
+          onModeChange={setActiveMode}
+          contentByMode={modeContentByMode}
+        />
+      </article>
+    </>
+  );
+}

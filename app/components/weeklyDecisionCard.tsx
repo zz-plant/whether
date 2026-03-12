@@ -5,7 +5,8 @@ import { CompactDisclosure } from "./compactDisclosure";
 import type { ConfidenceTrendFraming, ReportDynamics, ReportEvidenceItem, WeeklyConfidencePoint } from "../../lib/report/reportData";
 import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
 import { decisionAreaLabel, type StartupVariantMode } from "../../lib/report/boundedDecisionRules";
-import { StartupModeSelector } from "./startupModeSelector";
+import type { StartupModeContent } from "./startupModeSelector";
+import { WeeklyCallModePanel } from "./weeklyCallModePanel";
 import type { ActionStripItem, RoleAwareOperatingTemplate } from "../../lib/report/operatingCalls";
 import type { ForecastRegimeLabel, TransitionVelocityEstimate } from "../../lib/report/forecastModel";
 import type { RegimeKey } from "../../lib/regimeEngine";
@@ -1286,14 +1287,7 @@ export function WeeklyDecisionCard({
       },
     },
   } satisfies StartupVariantPolicy;
-  const modeContentByMode = resolvedStartupVariantPolicy.options.reduce<Partial<Record<StartupVariantMode, {
-    description: string;
-    thresholdEmphasis: string;
-    doNowBullets: string[];
-    avoidBullets: string[];
-    watchBullets: string[];
-    reversalTriggerDiscipline: string;
-  }>>>((contentMap, option) => {
+  const modeContentByMode = resolvedStartupVariantPolicy.options.reduce<Partial<Record<StartupVariantMode, StartupModeContent>>>((contentMap, option) => {
     const scopedAdjustment = resolvedStartupVariantPolicy.adjustmentsByMode[option.mode];
     if (!scopedAdjustment) {
       return contentMap;
@@ -1345,29 +1339,6 @@ export function WeeklyDecisionCard({
         regimeDistance={regimeDistance}
       />
 
-      <article className="rounded-xl border border-slate-700/75 bg-slate-950/92 p-3" aria-label="Weekly call snapshot">
-        <div className="flex items-center justify-between gap-2">
-          <h2 className="text-sm font-semibold tracking-[0.01em] text-slate-50">Weekly call snapshot</h2>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Quick share summary for this week</p>
-        </div>
-        <ul className="mt-2 grid gap-1.5 text-[11px] text-slate-100 sm:grid-cols-2 lg:grid-cols-3">
-          <li className={compactInset}><span className="font-semibold text-slate-200">Regime:</span> {postureWithStageLabel ?? statusLabel}</li>
-          <li className={compactInset}><span className="font-semibold text-slate-200">Trend:</span> {trendLabel}</li>
-          <li className={compactInset}><span className="font-semibold text-slate-200">Confidence:</span> {Math.round(confidencePercent)}% ({confidenceLabel})</li>
-          <li className={compactInset}><span className="font-semibold uppercase tracking-[0.08em] text-emerald-200">DO NOW:</span> {snapshotDoNow}</li>
-          <li className={compactInset}><span className="font-semibold uppercase tracking-[0.08em] text-rose-200">AVOID:</span> {snapshotAvoid}</li>
-          <li className={compactInset}><span className="font-semibold uppercase tracking-[0.08em] text-sky-200">WATCH:</span> {snapshotWatch}</li>
-        </ul>
-        <div className="mt-2 rounded-md border border-sky-500/25 bg-sky-500/5 px-2.5 py-2">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Flip conditions</p>
-          <ul className="mt-1 space-y-1 text-[11px] text-slate-100">
-            {(effectiveFlipLabels.length > 0 ? effectiveFlipLabels : [snapshotWatch]).map((condition) => (
-              <li key={`flip-condition-${condition}`}>• {condition}</li>
-            ))}
-          </ul>
-        </div>
-      </article>
-
       <article className={`${tierOnePanel} ${sectionSpacing} rounded-2xl border border-slate-700/75 bg-gradient-to-br from-slate-950/95 via-slate-950/88 to-slate-900/92`} aria-label="Since last review">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className={tierOneHeading}>Since last review</h2>
@@ -1404,15 +1375,22 @@ export function WeeklyDecisionCard({
             </ul>
           </article>
 
-          <article id="weekly-call-core" className={`${tierOnePanel} weather-motion-card ${sectionSpacing} bg-gradient-to-br from-slate-950/95 via-slate-900/85 to-slate-950/95`}>
-            <h2 className={tierOneHeading}>This week&apos;s call</h2>
-            <p className="text-xs text-slate-300">Whether does not predict markets; it tells founders how to operate inside them this week.</p>
-            <StartupModeSelector
-              options={resolvedStartupVariantPolicy.options}
-              selectedMode={resolvedStartupVariantPolicy.selectedMode}
-              contentByMode={modeContentByMode}
-            />
-          </article>
+          <WeeklyCallModePanel
+            startupVariantPolicy={resolvedStartupVariantPolicy}
+            modeContentByMode={modeContentByMode}
+            postureLabel={postureWithStageLabel ?? statusLabel}
+            trendLabel={trendLabel}
+            confidencePercent={confidencePercent}
+            confidenceLabel={confidenceLabel}
+            snapshotDoNow={snapshotDoNow}
+            snapshotAvoid={snapshotAvoid}
+            snapshotWatch={snapshotWatch}
+            effectiveFlipLabels={effectiveFlipLabels}
+            compactInsetClassName={compactInset}
+            tierOnePanelClassName={tierOnePanel}
+            sectionSpacingClassName={sectionSpacing}
+            tierOneHeadingClassName={tierOneHeading}
+          />
 
           <article className={`${tierOnePanel} ${sectionSpacing}`}>
             <div className="flex flex-wrap items-center justify-between gap-2">
