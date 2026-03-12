@@ -40,6 +40,7 @@ Workflow:
   watch         Live refresh mode
 
 Setup:
+  install       Bootstrap local CLI configuration for this machine
   auth          Login and token management
   config        Manage local configuration
   doctor        Diagnose CLI or API setup
@@ -55,6 +56,8 @@ const SUB_HELP = {
   brief: "Usage: whether brief [exec|board|staff|investor|slack|email] [--copy]",
   export: "Usage: whether export [json|csv|markdown|pdf|briefing] [--output <file>]",
   share: "Usage: whether share [slack|email|clipboard] [--brief <type>]",
+  install:
+    "Usage: whether install [--yes|--ci] [--api-base-url <url>] [--token <token>]\n\nNon-interactive modes:\n  --yes   Skip prompts and accept defaults\n  --ci    CI alias for --yes",
   auth: "Usage: whether auth [login|logout|status] [--token <token>]",
   config: "Usage: whether config [init|get|set <key> <value>]",
   company: "Usage: whether company [list|select|status|call|brief] [name]",
@@ -523,6 +526,37 @@ const cmdDoctor = async (settings) => {
   writeOutput(checks, settings);
 };
 
+const cmdInstall = async (settings, flags) => {
+  if (flags.help) return writeOutput(SUB_HELP.install, settings);
+
+  const explicitNonInteractive = Boolean(flags.yes || flags.ci);
+  if (!process.stdin.isTTY && !explicitNonInteractive) {
+    throw new Error("Non-interactive shell detected. Re-run with `whether install --yes` (or `--ci`) to accept defaults.");
+  }
+
+  const config = await loadConfig();
+  const installConfig = {
+    profile: config.profile ?? settings.profile ?? "default",
+    workspace: config.workspace ?? "default",
+    timezone: config.timezone ?? "America/New_York",
+    output: config.output ?? "text",
+    api_base_url: settings.apiBaseUrl,
+    ...(typeof flags.token === "string" ? { token: flags.token } : {}),
+  };
+
+  try {
+    await saveConfig({ ...config, ...installConfig });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(
+      `Install failed while writing ${CONFIG_PATH}. Check shell write permissions, then retry or set WHETHER_API_URL/WHETHER_TOKEN as env vars.`,
+      { cause: new Error(message) },
+    );
+  }
+
+  writeOutput(`Install complete. Configured ${CONFIG_PATH}`, settings);
+};
+
 const cmdConfig = async (settings, subcommand, args, flags) => {
   if (flags.help) return writeOutput(SUB_HELP.config, settings);
   const config = await loadConfig();
@@ -646,6 +680,9 @@ const main = async () => {
         return;
       case "config":
         await cmdConfig(settings, parsed.subcommand ?? "get", parsed.args, parsed.flags);
+        return;
+      case "install":
+        await cmdInstall(settings, parsed.flags);
         return;
       case "auth":
         await cmdAuth(settings, parsed.subcommand ?? "status", parsed.flags);
