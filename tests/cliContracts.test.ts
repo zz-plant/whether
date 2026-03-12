@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
+import fs from "node:fs";
+import path from "node:path";
 import {
   buildCliCallContract,
   buildCliChangesContract,
@@ -78,4 +80,25 @@ describe("cli contracts", () => {
     assert.equal(scenario.version, "v1");
     assert.equal(scenario.likelyOutcome.changed, true);
   });
+
+  it("documents commands that route with common params", () => {
+    const script = fs.readFileSync(path.join(process.cwd(), "scripts", "whether-cli.mjs"), "utf8");
+
+    const expectedRoutes = [
+      "/api/cli/status",
+      "/api/cli/call",
+      "/api/cli/regime",
+      "/api/cli/changes",
+      "/api/cli/diagnostics",
+      "/api/cli/history",
+    ];
+
+    for (const route of expectedRoutes) {
+      assert.ok(script.includes(`routeWithCommonParams("${route}"`));
+    }
+    assert.match(script, /if \(flags\["as-of"\]\) params\.set\("asOf"/);
+    assert.match(script, /if \(flags\.company\) params\.set\("company"/);
+    assert.match(script, /if \(flags\.stage\) params\.set\("stage"/);
+  });
+
 });
