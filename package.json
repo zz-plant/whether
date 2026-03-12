@@ -20,8 +20,8 @@
     "lint:fix": "eslint . --fix",
     "check": "bun run review:hotspot-preflight && bun run lint && bun run typecheck && bun run test",
     "typecheck": "tsc --noEmit",
-    "test": "node scripts/run-tests.mjs",
-    "test:watch": "node scripts/run-tests.mjs --watch",
+    "test": "bun test ./tests",
+    "test:watch": "bun test --watch ./tests",
     "time-machine:update-summaries": "bun scripts/updateTimeMachineSummariesSince.mjs",
     "mcp:whether": "tsx scripts/mcp/whether-mcp-server.ts",
     "audit:cloudflare-warnings": "bun scripts/cloudflare-warning-audit.mjs",
@@ -36,6 +36,7 @@
     "seo:refresh-queue": "bun scripts/seo-refresh-queue.mjs"
   },
   "engines": {
+    "bun": "1.3.x",
     "node": "20.16.x"
   },
   "packageManager": "bun@1.3.9",
