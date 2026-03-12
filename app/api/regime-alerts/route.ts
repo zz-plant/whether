@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { serverStore } from "../../../lib/serverStore";
 import {
+  buildSignalAlertPayload,
   shouldCreateSignalAlert,
   type RegimeAlertEvent,
-  type SignalAlertPayload,
+  type SignalAlertInputPayload,
 } from "../../../lib/signalOps";
 
 export const runtime = "edge";
@@ -13,8 +14,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const payload = (await request.json()) as SignalAlertPayload;
+  const requestPayload = (await request.json()) as SignalAlertInputPayload;
   const latest = serverStore.snapshot.regimeAlerts[0];
+  const payload = buildSignalAlertPayload(requestPayload, latest);
 
   if (!shouldCreateSignalAlert(payload, latest)) {
     return NextResponse.json({ created: false, alerts: serverStore.snapshot.regimeAlerts });
