@@ -23,7 +23,7 @@ import { ReportShell } from "./components/reportShell";
 import { reportPageLinks } from "../lib/report/reportNavigation";
 import { buildTrustStatus } from "../lib/report/trustStatus";
 import { buildCompactFreshnessMeta } from "../lib/report/reportFormatting";
-import { WeeklyDecisionCard } from "./components/weeklyDecisionCard";
+import { WeeklyDecisionCard, WeeklyDecisionDiagnosticsLane } from "./components/weeklyDecisionCard";
 import { buildBoardBrief, buildCallCitation } from "../lib/export/briefBuilders";
 import {
   buildWeeklyCallSnapshotPlainText,
@@ -183,6 +183,91 @@ const ArtifactActionsFallback = () => (
   </div>
 );
 
+const WeeklyDiagnosticsFallback = () => (
+  <section aria-label="Loading diagnostics lane" className="space-y-3" aria-busy="true" aria-live="polite">
+    <article className="rounded-xl border border-slate-800/45 bg-slate-950/62 p-4">
+      <Skeleton className="h-4 w-52 rounded-full bg-slate-600/75" />
+      <Skeleton className="mt-3 h-3 w-full rounded-full bg-slate-600/65" />
+      <Skeleton className="mt-2 h-3 w-11/12 rounded-full bg-slate-600/60" />
+      <div className="mt-3 grid gap-2 sm:grid-cols-2">
+        <Skeleton className="h-16 w-full rounded-lg bg-slate-600/55" />
+        <Skeleton className="h-16 w-full rounded-lg bg-slate-600/55" />
+      </div>
+    </article>
+    <article className="rounded-xl border border-slate-700/55 bg-slate-950/84 p-5">
+      <Skeleton className="h-4 w-40 rounded-full bg-slate-600/75" />
+      <Skeleton className="mt-3 h-24 w-full rounded-lg bg-slate-600/55" />
+    </article>
+  </section>
+);
+
+type WeeklyDecisionDiagnosticsLaneDeferredProps = {
+  weeklyMemoLines: string[];
+  immediateDecision: string;
+  revisitDecisions: boolean;
+  guardrail: string;
+  regimeDistance: ReturnType<typeof buildHomeBriefModel>["regimeDistance"];
+  postureWithStageLabel: string;
+  statusLabel: string;
+  trendLabel: string;
+  confidencePercent: number;
+  decisionMatrix: ReturnType<typeof buildHomeBriefModel>["decisionMatrix"];
+  decisionRules: ReturnType<typeof buildHomeBriefModel>["decisionRules"];
+  roleAwareTemplates: ReturnType<typeof buildHomeBriefModel>["roleAwareTemplates"];
+  evidenceItems: ReturnType<typeof buildHomeBriefModel>["evidenceItems"];
+  reportDynamics: ReportData["reportDynamics"];
+  weeklyMovement: ReturnType<typeof buildHomeBriefModel>["weeklyMovement"];
+  transitionProbabilities: ReturnType<typeof buildHomeBriefModel>["transitionProbabilities"];
+  failureModes: ReturnType<typeof buildHomeBriefModel>["failureModes"];
+  historicalTimeline: ReturnType<typeof buildHomeBriefModel>["historicalTimeline"];
+};
+
+const WeeklyDecisionDiagnosticsLaneDeferred = async ({
+  weeklyMemoLines,
+  immediateDecision,
+  revisitDecisions,
+  guardrail,
+  regimeDistance,
+  postureWithStageLabel,
+  statusLabel,
+  trendLabel,
+  confidencePercent,
+  decisionMatrix,
+  decisionRules,
+  roleAwareTemplates,
+  evidenceItems,
+  reportDynamics,
+  weeklyMovement,
+  transitionProbabilities,
+  failureModes,
+  historicalTimeline,
+}: WeeklyDecisionDiagnosticsLaneDeferredProps) => {
+  await Promise.resolve();
+
+  return (
+    <WeeklyDecisionDiagnosticsLane
+      weeklyMemoLines={weeklyMemoLines}
+      immediateDecision={immediateDecision}
+      revisitDecisions={revisitDecisions}
+      guardrail={guardrail}
+      regimeDistance={regimeDistance}
+      postureWithStageLabel={postureWithStageLabel}
+      statusLabel={statusLabel}
+      trendLabel={trendLabel}
+      confidencePercent={confidencePercent}
+      decisionMatrix={decisionMatrix}
+      decisionRules={decisionRules}
+      roleAwareTemplates={roleAwareTemplates}
+      evidenceItems={evidenceItems}
+      reportDynamics={reportDynamics}
+      weeklyMovement={weeklyMovement}
+      transitionProbabilities={transitionProbabilities}
+      failureModes={failureModes}
+      historicalTimeline={historicalTimeline}
+    />
+  );
+};
+
 type ArtifactActionsProps = {
   assessment: ReportData["assessment"];
   treasury: ReportData["treasury"];
@@ -208,6 +293,8 @@ const LeadershipArtifactActions = async ({
   freshnessLabel,
   historicalSelectionActive,
 }: ArtifactActionsProps) => {
+  await Promise.resolve();
+
   const interpretationLayer = buildInterpretationLayer({
     view: interpretationView,
     homeBriefModel,
@@ -446,6 +533,11 @@ export const HomePageReportContent = async ({
     homeBriefModel,
     postureState,
   });
+  const immediateDecision = canonicalDecisionCopy.doNowLines[0]
+    ?? homeBriefModel.actionNowShort?.trim()
+    ?? (homeBriefModel.revisitDecisions
+      ? "Revise hiring and roadmap calls now."
+      : "Hold last week's operating rules.");
 
   return (
     <ReportShell
@@ -577,6 +669,30 @@ export const HomePageReportContent = async ({
               forecast={forecast}
               freshnessLabel={freshnessMeta.updatedAtLabel}
               historicalSelectionActive={Boolean(historicalSelection)}
+            />
+          </Suspense>
+        )}
+        diagnosticsLane={(
+          <Suspense fallback={<WeeklyDiagnosticsFallback />}>
+            <WeeklyDecisionDiagnosticsLaneDeferred
+              weeklyMemoLines={homeBriefModel.weeklyMemoLines}
+              immediateDecision={immediateDecision}
+              revisitDecisions={homeBriefModel.revisitDecisions}
+              guardrail={homeBriefModel.guardrail}
+              regimeDistance={homeBriefModel.regimeDistance}
+              postureWithStageLabel={homeBriefModel.postureWithStageLabel}
+              statusLabel={statusLabel}
+              trendLabel={homeBriefModel.trendLabel}
+              confidencePercent={homeBriefModel.confidencePercent}
+              decisionMatrix={homeBriefModel.decisionMatrix}
+              decisionRules={homeBriefModel.decisionRules}
+              roleAwareTemplates={homeBriefModel.roleAwareTemplates}
+              evidenceItems={homeBriefModel.evidenceItems}
+              reportDynamics={reportDynamics}
+              weeklyMovement={homeBriefModel.weeklyMovement}
+              transitionProbabilities={homeBriefModel.transitionProbabilities}
+              failureModes={homeBriefModel.failureModes}
+              historicalTimeline={homeBriefModel.historicalTimeline}
             />
           </Suspense>
         )}
