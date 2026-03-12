@@ -36,7 +36,9 @@ describe("buildHomeBriefModel", () => {
     assert.equal(typeof model.guardrail, "string");
     assert.equal(typeof model.reversalTrigger, "string");
     assert.equal(model.decisionRules.length, 5);
-    assert.equal(model.startupVariantPolicy.options.length, 4);
+    assert.equal(model.startupVariantPolicy.options.length, 6);
+    assert.ok(model.startupVariantPolicy.options.some((option) => option.mode === "growth"));
+    assert.ok(model.startupVariantPolicy.options.some((option) => option.mode === "public"));
     assert.equal(model.startupVariantPolicy.selectedMode, "series-a");
     assert.match(model.startupVariantPolicy.adjustmentsByMode.seed.reversalTriggerDiscipline, /Reverse/i);
     assert.equal(model.roleAwareTemplates.length, 2);

@@ -83,3 +83,24 @@ it("avoids zero-distance watch copy at regime boundaries", () => {
   assert.match(bootstrappedAdjustment.watchAdjustments[0] ?? "", /tighten spend now/i);
   assert.doesNotMatch(bootstrappedAdjustment.watchAdjustments[0] ?? "", /0\.0 points/i);
 });
+
+
+it("builds growth and public stage adjustments", () => {
+  const growthAdjustment = buildScopedVariantDecisionAdjustment({
+    mode: "growth",
+    thresholds: { tightnessRegime: 62, riskAppetiteRegime: 48 },
+    scores: { tightness: 60, riskAppetite: 52 },
+  });
+
+  assert.equal(growthAdjustment.mode, "growth");
+  assert.match(growthAdjustment.thresholdEmphasis, /CAC payback/i);
+
+  const publicAdjustment = buildScopedVariantDecisionAdjustment({
+    mode: "public",
+    thresholds: { tightnessRegime: 62, riskAppetiteRegime: 48 },
+    scores: { tightness: 64, riskAppetite: 52 },
+  });
+
+  assert.equal(publicAdjustment.mode, "public");
+  assert.match(publicAdjustment.thresholdEmphasis, /earnings durability/i);
+});
