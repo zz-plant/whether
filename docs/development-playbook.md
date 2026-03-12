@@ -10,7 +10,7 @@ For baseline project orientation, start with `CONTRIBUTING.md`.
 
 ## 1) Preferred day-to-day workflow
 
-**Runtime policy (Option A — transition):** Bun is the primary runtime/package manager. Node.js remains a supported fallback for selected build/test scripts (`scripts/build.mjs`, `scripts/run-tests.mjs`).
+**Runtime policy (Option A — transition):** Bun is the primary runtime/package manager. Node.js remains a supported fallback for selected build scripts (`scripts/build.mjs`).
 
 1. **Sync and install**
    - `git pull --rebase`

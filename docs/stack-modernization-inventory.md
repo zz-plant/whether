@@ -3,7 +3,7 @@
 ## Runtime policy
 - **Policy choice:** Option A (transition).
 - **Primary runtime:** Bun is the default runtime/package manager for local and CI command orchestration (`bun install`, `bun run <script>`).
-- **Supported fallback:** Node.js 20.16.x is intentionally retained for selected scripts that directly execute `.mjs` entrypoints (`scripts/build.mjs`, `scripts/run-tests.mjs`).
+- **Supported fallback:** Node.js 20.16.x is intentionally retained for selected scripts that directly execute `.mjs` entrypoints (`scripts/build.mjs`).
 
 ## Runtime & tooling versions
 - **Package manager / primary runtime:** Bun 1.3.9 (`packageManager`, `engines.bun`).
