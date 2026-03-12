@@ -3,7 +3,7 @@ import { loadReportDataSafe } from "../../../lib/report/reportData";
 import { buildMonthlySummary } from "../../../lib/summary/monthlySummary";
 import { buildSummaryDelta } from "../../../lib/summary/summaryDelta";
 import { buildWeeklySummary } from "../../../lib/summary/weeklySummary";
-import { recordCommittedPostureDecisionEvent } from "../../../lib/report/postureStateSource";
+import { buildPostureState } from "../../../lib/report/postureStateSource";
 
 export const runtime = "edge";
 export const revalidate = 3600;
@@ -23,11 +23,10 @@ export async function GET() {
     recordDateLabel,
   });
   const delta = buildSummaryDelta(weeklySummary, monthlySummary);
-  const postureState = recordCommittedPostureDecisionEvent({
+  const postureState = buildPostureState({
     recordDate: treasury.record_date,
     assessment,
     reportDynamics: reportData.reportDynamics,
-    previousRegime: reportData.regimeAlert?.previousRegime ?? null,
   });
 
   return NextResponse.json({

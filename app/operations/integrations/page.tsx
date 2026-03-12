@@ -4,7 +4,7 @@ import { loadReportDataSafe } from "../../../lib/report/reportData";
 import { buildPageMetadata } from "../../../lib/seo";
 import { buildWeeklyMandatePayload, integrationTargets } from "../../../lib/integrationBriefs";
 import { WorkAppLabel } from "../../components/workAppIcon";
-import { recordCommittedPostureDecisionEvent } from "../../../lib/report/postureStateSource";
+import { buildPostureState } from "../../../lib/report/postureStateSource";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Planning integrations — Whether",
@@ -17,11 +17,10 @@ export default async function OperationsIntegrationsPage() {
   const reportResult = await loadReportDataSafe(undefined, { route: "/operations/integrations" });
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
   const { assessment, treasury } = reportData;
-  const postureState = recordCommittedPostureDecisionEvent({
+  const postureState = buildPostureState({
     recordDate: treasury.record_date,
     assessment,
     reportDynamics: reportData.reportDynamics,
-    previousRegime: reportData.regimeAlert?.previousRegime ?? null,
   });
 
   return (
