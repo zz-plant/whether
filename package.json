@@ -33,7 +33,8 @@
     "summary-archive:migrate-structured": "bun scripts/migrateSummaryArchiveStructured.ts --write",
     "summary-archive:check-structured": "bun scripts/migrateSummaryArchiveStructured.ts",
     "brief:weekly:artifact": "bun scripts/generateWeeklySlackBrief.ts --out artifacts/weekly-slack-brief.txt",
-    "seo:refresh-queue": "bun scripts/seo-refresh-queue.mjs"
+    "seo:refresh-queue": "bun scripts/seo-refresh-queue.mjs",
+    "cli:whether": "node scripts/whether-cli.mjs"
   },
   "engines": {
     "bun": "1.3.x",
@@ -64,5 +65,8 @@
     "typescript": "5.9.3",
     "vercel": "^50.28.0",
     "wrangler": "^4.71.0"
+  },
+  "bin": {
+    "whether": "./scripts/whether-cli.mjs"
   }
 }
