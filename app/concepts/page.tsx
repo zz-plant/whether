@@ -181,20 +181,58 @@ export default async function ProductConceptTimelinePage({
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }}
       />
       <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Concepts" }]} />
-      <section className="weather-panel space-y-4 px-6 py-6">
+      <section className="weather-panel space-y-5 px-6 py-6">
         <p className="type-kicker uppercase tracking-[0.2em]">
           Product canon in context
         </p>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
-          Why famous PM ideas spread when they did
+          Use the canon to translate this week&apos;s delta into operating calls
         </h1>
-        <p className="text-sm text-slate-200">
-          This timeline pairs widely read product-management essays with Whether&apos;s
-          historical macro posture. It now includes foundational essays plus cult-classic
-          career, growth-psychology, and tactical operating frameworks. Each article page
-          explains what was said, why teams adopted it, and which market conditions likely
-          reinforced the idea.
-        </p>
+        <div className="grid gap-3 text-sm sm:grid-cols-3">
+          <div className="weather-surface rounded-md px-4 py-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">1 · What changed</p>
+            <p className="mt-1 text-slate-100">Anchor on this week&apos;s macro shift before applying any framework.</p>
+          </div>
+          <div className="weather-surface rounded-md px-4 py-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">2 · Tighten or loosen</p>
+            <p className="mt-1 text-slate-100">Convert concepts into clear calls on hiring pace, roadmap scope, and spend.</p>
+          </div>
+          <div className="weather-surface rounded-md px-4 py-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">3 · What flips the call</p>
+            <p className="mt-1 text-slate-100">Define the threshold that triggers pause, resume, or reversal.</p>
+          </div>
+        </div>
+        <div className="grid gap-2 text-xs text-slate-200 sm:grid-cols-2 lg:grid-cols-4">
+          <Link href="/" className="weather-surface rounded-md px-3 py-2 transition-colors hover:border-sky-400/70">
+            Open weekly brief
+          </Link>
+          <Link
+            href="/answers/should-startups-hire-engineers-right-now"
+            className="weather-surface rounded-md px-3 py-2 transition-colors hover:border-sky-400/70"
+          >
+            Hiring decision answer
+          </Link>
+          <Link
+            href="/answers/should-startups-slow-roadmap-expansion"
+            className="weather-surface rounded-md px-3 py-2 transition-colors hover:border-sky-400/70"
+          >
+            Product scope decision answer
+          </Link>
+          <Link
+            href="/answers/when-should-startups-cut-burn"
+            className="weather-surface rounded-md px-3 py-2 transition-colors hover:border-sky-400/70"
+          >
+            Burn threshold decision answer
+          </Link>
+        </div>
+        <div className="weather-surface space-y-2 rounded-md px-4 py-3">
+          <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">Use this canon when…</h2>
+          <ul className="space-y-1 text-sm text-slate-200">
+            <li>Hiring: decide if role approvals stay selective or reopen in tranches this week.</li>
+            <li>Product: decide whether to push core delivery or cut speculative roadmap branches.</li>
+            <li>Finance: decide whether to hold spend, raise now, or trigger burn-control thresholds.</li>
+          </ul>
+        </div>
         {currentRegime ? (
           <p className="text-xs text-slate-300">Current regime baseline: {currentRegime.regimeLabel}.</p>
         ) : null}
