@@ -7,6 +7,7 @@ import {
   buildCliChangesContract,
   buildCliRegimeContract,
   buildCliStatusContract,
+  buildCliStatusExpandedContract,
   buildScenarioContract,
 } from "../lib/cli/contracts";
 
@@ -52,10 +53,12 @@ describe("cli contracts", () => {
     const status = buildCliStatusContract({ reportData, postureState, degraded: false });
     assert.equal(status.version, "v1");
     assert.equal(status.decisionStability, "unstable");
+    assert.match(status.freshness.line, /Updated/);
     assert.equal(status.call.do[0], "Selective hiring for revenue-linked roles");
 
     const call = buildCliCallContract({ reportData, postureState, degraded: false });
     assert.match(call.call, /Stage decisions/);
+    assert.match(call.freshness.line, /Updated/);
 
     const changes = buildCliChangesContract({ reportData, postureState, degraded: false });
     assert.equal(changes.changed[0].from, 68);
@@ -69,6 +72,10 @@ describe("cli contracts", () => {
 
     const regime = buildCliRegimeContract({ reportData, postureState, degraded: false });
     assert.equal(regime.regime, "Guarded Expansion");
+
+    const expanded = buildCliStatusExpandedContract({ reportData, postureState, degraded: false });
+    assert.equal(expanded.view, "expanded");
+    assert.ok(expanded.boundedDecision.flipConditionsCompact.length >= 1);
   });
 
   it("builds scenario contract", () => {
@@ -99,6 +106,8 @@ describe("cli contracts", () => {
     assert.match(script, /if \(flags\["as-of"\]\) params\.set\("asOf"/);
     assert.match(script, /if \(flags\.company\) params\.set\("company"/);
     assert.match(script, /if \(flags\.stage\) params\.set\("stage"/);
+    assert.match(script, /if \(flags\.weeks\) params\.set\("weeks"/);
+    assert.match(script, /if \(flags\.view\) params\.set\("view"/);
   });
 
 });

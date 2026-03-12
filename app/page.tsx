@@ -22,6 +22,7 @@ import { HistoricalBanner } from "./components/boardBriefSections";
 import { ReportShell } from "./components/reportShell";
 import { reportPageLinks } from "../lib/report/reportNavigation";
 import { buildTrustStatus } from "../lib/report/trustStatus";
+import { buildCompactFreshnessMeta } from "../lib/report/reportFormatting";
 import { WeeklyDecisionCard } from "./components/weeklyDecisionCard";
 import { buildBoardBrief, buildCallCitation } from "../lib/export/briefBuilders";
 import {
@@ -304,6 +305,11 @@ export const HomePageReportContent = async ({
     stableAction:
       "Safe to use for near-term planning; proceed with normal approval flow.",
   });
+  const freshnessMeta = buildCompactFreshnessMeta({
+    updatedAtLabel: fetchedAtLabel,
+    confidenceLabel: homeBriefModel.confidenceLabel,
+    isFallbackSnapshot: isFallback,
+  });
   const postureState = await buildPostureState({
     recordDate: treasury.record_date,
     assessment,
@@ -352,7 +358,7 @@ export const HomePageReportContent = async ({
     failureModes: homeBriefModel.failureModes,
     actionStripItems: homeBriefModel.actionStripItems,
     confidenceLabel: homeBriefModel.confidenceLabel,
-    freshnessLabel: fetchedAtLabel.trim().length > 0 ? fetchedAtLabel : "Unavailable",
+    freshnessLabel: freshnessMeta.updatedAtLabel,
     postureState,
   };
   const boardSummary = buildBoardBrief(assessment, treasury, sensors, macroSeries, exportLayerOptions);
@@ -391,6 +397,7 @@ export const HomePageReportContent = async ({
       statusLabel={statusLabel}
       recordDateLabel={recordDateLabel}
       fetchedAtLabel={fetchedAtLabel}
+      freshnessLine={freshnessMeta.line}
       treasurySource={treasury.source}
       trustStatusLabel={trustStatusLabel}
       trustStatusDetail={trustStatusDetail}
@@ -435,7 +442,7 @@ export const HomePageReportContent = async ({
             maxItems: 3,
           }),
         ],
-        updatedAt: fetchedAtLabel,
+        updatedAt: freshnessMeta.updatedAtLabel,
       }}
       historicalBanner={
         historicalSelection ? (
@@ -477,6 +484,7 @@ export const HomePageReportContent = async ({
         canonicalDecisionCopy={canonicalDecisionCopy}
         recordDateLabel={recordDateLabel}
         fetchedAtLabel={fetchedAtLabel}
+        freshnessLine={freshnessMeta.line}
         reportDynamics={reportDynamics}
         decisionShiftSummary={homeBriefModel.decisionShiftSummary}
         transitionProbabilities={homeBriefModel.transitionProbabilities}

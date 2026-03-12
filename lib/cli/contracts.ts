@@ -1,11 +1,21 @@
 import { deriveRegimeStage } from "../regimePresentation";
 import type { PostureStateContract } from "../report/postureStateContract";
 import type { ReportData } from "../report/reportData";
+import { buildCompactFreshnessMeta } from "../report/reportFormatting";
+
+export type CliFreshnessContract = {
+  updatedAt: string;
+  line: string;
+  maxAge: "fresh" | "stale";
+  confidenceCue: string;
+  degraded: boolean;
+};
 
 export type CliStatusContract = {
   version: "v1";
   generatedAt: string;
   updatedAt: string;
+  freshness: CliFreshnessContract;
   regime: string;
   cyclePhase: string;
   confidence: { label: string; score: number };
@@ -20,9 +30,20 @@ export type CliStatusContract = {
   degraded: boolean;
 };
 
+export type CliStatusExpandedContract = CliStatusContract & {
+  view: "expanded";
+  boundedDecision: {
+    guardrailThreshold: string;
+    reversalTrigger: string;
+    flipConditionsCompact: string[];
+    topDeltas: Array<{ metric: "tightness" | "risk_appetite" | "base_rate" | "curve_slope"; delta: number; direction: "up" | "down" }>;
+  };
+};
+
 export type CliCallContract = {
   version: "v1";
   generatedAt: string;
+  freshness: CliFreshnessContract;
   call: string;
   leadershipShould: string[];
   watch: string[];
@@ -32,6 +53,7 @@ export type CliCallContract = {
 export type CliChangesContract = {
   version: "v1";
   generatedAt: string;
+  freshness: CliFreshnessContract;
   changed: Array<{
     metric: "tightness" | "risk_appetite" | "base_rate" | "curve_slope";
     from: number;
@@ -114,10 +136,27 @@ const parseDistance = (condition: string, reportData: ReportData): number | null
   return Number((target - current).toFixed(2));
 };
 
+const buildFreshness = ({ reportData, confidenceLabel, degraded }: { reportData: ReportData; confidenceLabel: "HIGH" | "MED" | "LOW"; degraded: boolean }): CliFreshnessContract => {
+  const freshness = buildCompactFreshnessMeta({
+    updatedAtLabel: reportData.treasury.fetched_at,
+    confidenceLabel,
+    isFallbackSnapshot: degraded,
+  });
+
+  return {
+    updatedAt: freshness.updatedAtLabel,
+    line: freshness.line,
+    maxAge: freshness.maxAge,
+    confidenceCue: freshness.confidenceCue,
+    degraded,
+  };
+};
+
 export const buildCliStatusContract = ({ reportData, postureState, degraded }: { reportData: ReportData; postureState: PostureStateContract; degraded: boolean }): CliStatusContract => ({
   version: "v1",
   generatedAt: new Date().toISOString(),
   updatedAt: reportData.treasury.fetched_at,
+  freshness: buildFreshness({ reportData, confidenceLabel: postureState.currentState.confidenceLabel, degraded }),
   regime: postureState.currentState.postureLabel,
   cyclePhase: deriveCyclePhaseLabel(reportData),
   confidence: {
@@ -135,9 +174,25 @@ export const buildCliStatusContract = ({ reportData, postureState, degraded }: {
   degraded,
 });
 
+export const buildCliStatusExpandedContract = ({ reportData, postureState, degraded }: { reportData: ReportData; postureState: PostureStateContract; degraded: boolean }): CliStatusExpandedContract => ({
+  ...buildCliStatusContract({ reportData, postureState, degraded }),
+  view: "expanded",
+  boundedDecision: {
+    guardrailThreshold: reportData.stopItems[0] ?? "Keep current approvals staged.",
+    reversalTrigger: postureState.whatFlipsNext.thresholds[0] ?? "Re-open risk only after threshold pressure eases.",
+    flipConditionsCompact: postureState.whatFlipsNext.thresholds.slice(0, 3),
+    topDeltas: reportData.reportDynamics.changedSignals.slice(0, 3).map((signal) => ({
+      metric: metricLabel[signal.key],
+      delta: Number(signal.delta.toFixed(2)),
+      direction: signal.delta >= 0 ? ("up" as const) : ("down" as const),
+    })),
+  },
+});
+
 export const buildCliCallContract = ({ reportData, postureState, degraded }: { reportData: ReportData; postureState: PostureStateContract; degraded: boolean }): CliCallContract => ({
   version: "v1",
   generatedAt: new Date().toISOString(),
+  freshness: buildFreshness({ reportData, confidenceLabel: postureState.currentState.confidenceLabel, degraded }),
   call: reportData.actionNowShort,
   leadershipShould: reportData.startItems,
   watch: [...postureState.whatFlipsNext.thresholds],
@@ -147,6 +202,7 @@ export const buildCliCallContract = ({ reportData, postureState, degraded }: { r
 export const buildCliChangesContract = ({ reportData, postureState, degraded }: { reportData: ReportData; postureState: PostureStateContract; degraded: boolean }): CliChangesContract => ({
   version: "v1",
   generatedAt: new Date().toISOString(),
+  freshness: buildFreshness({ reportData, confidenceLabel: postureState.currentState.confidenceLabel, degraded }),
   changed: reportData.reportDynamics.changedSignals.map((signal) => {
     const raw = rawForKey(reportData, signal.key);
     const to = Number((typeof raw === "number" ? raw : signal.delta).toFixed(2));

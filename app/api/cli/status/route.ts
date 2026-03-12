@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { buildCliStatusContract } from "../../../../lib/cli/contracts";
+import { buildCliStatusContract, buildCliStatusExpandedContract } from "../../../../lib/cli/contracts";
 import { loadReportDataSafe } from "../../../../lib/report/reportData";
 import { buildPostureState } from "../../../../lib/report/postureStateSource";
 import { parseAsOfSearchParam, rejectUnsupportedCliQuery } from "../../../../lib/cli/queryContracts";
@@ -9,7 +9,7 @@ export const revalidate = 0;
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
-  const invalidQuery = rejectUnsupportedCliQuery(request, ["asOf"]);
+  const invalidQuery = rejectUnsupportedCliQuery(request, ["asOf", "view"]);
   if (invalidQuery) return invalidQuery;
 
   const searchParams = parseAsOfSearchParam(request.nextUrl.searchParams.get("asOf"));
@@ -24,6 +24,17 @@ export async function GET(request: NextRequest) {
     assessment: reportData.assessment,
     reportDynamics: reportData.reportDynamics,
   });
+
+  const view = request.nextUrl.searchParams.get("view");
+  if (view === "expanded") {
+    return NextResponse.json(
+      buildCliStatusExpandedContract({
+        reportData,
+        postureState,
+        degraded: !reportResult.ok,
+      })
+    );
+  }
 
   return NextResponse.json(
     buildCliStatusContract({

@@ -104,4 +104,80 @@ describe("whether cli", () => {
     assert.match(result.stderr, /Request failed \(400\)/);
   });
 
+
+  it("history forwards weeks to API and prints server-bounded metadata", async () => {
+    const requests: string[] = [];
+    const server = http.createServer((req, res) => {
+      requests.push(req.url ?? "");
+      if ((req.url ?? "").startsWith("/api/cli/history")) {
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(
+          JSON.stringify({
+            version: "v1",
+            generatedAt: new Date().toISOString(),
+            requestedWeeks: 99,
+            windowWeeks: 52,
+            maxWeeks: 52,
+            truncatedToMax: true,
+            history: [{ recordDate: "2026-03-10", regime: "Guarded", confidenceLabel: "MED", trend: "stable" }],
+            degraded: false,
+          }),
+        );
+        return;
+      }
+      res.writeHead(404);
+      res.end();
+    });
+
+    await new Promise<void>((resolve) => server.listen(0, resolve));
+    const { port } = server.address() as { port: number };
+    const result = spawnSync("node", [CLI_PATH, "history", "--weeks", "99", "--api-base-url", `http://127.0.0.1:${port}`], { encoding: "utf8" });
+    server.close();
+
+    assert.equal(result.status, 0);
+    assert.ok(requests.some((url) => url.includes("/api/cli/history?weeks=99")));
+    assert.match(result.stdout, /max 52/);
+  });
+
+  it("status --verbose requests expanded contract and renders bounded decision section", async () => {
+    const requests: string[] = [];
+    const server = http.createServer((req, res) => {
+      requests.push(req.url ?? "");
+      if ((req.url ?? "").startsWith("/api/cli/status")) {
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({
+          version: "v1",
+          view: "expanded",
+          regime: "Guarded",
+          cyclePhase: "Late",
+          confidence: { label: "MED", score: 66 },
+          trend: "Deteriorating",
+          decisionStability: "unstable",
+          updatedAt: "2026-03-12T12:00:00.000Z",
+          freshness: { line: "Updated 2026-03-12T12:00:00.000Z · live · mixed-reliability" },
+          call: { summary: "Stage decisions", do: ["Do x"], avoid: ["Avoid y"], flipConditions: ["tightness < 60"] },
+          boundedDecision: {
+            guardrailThreshold: "Keep fixed-cost approvals staged.",
+            reversalTrigger: "Re-open only after two confirming reads.",
+            flipConditionsCompact: ["tightness < 60"],
+            topDeltas: [{ metric: "tightness", direction: "down", delta: -1.5 }],
+          },
+          degraded: false,
+        }));
+        return;
+      }
+      res.writeHead(404);
+      res.end();
+    });
+
+    await new Promise<void>((resolve) => server.listen(0, resolve));
+    const { port } = server.address() as { port: number };
+    const result = spawnSync("node", [CLI_PATH, "status", "--verbose", "--api-base-url", `http://127.0.0.1:${port}`], { encoding: "utf8" });
+    server.close();
+
+    assert.equal(result.status, 0);
+    assert.ok(requests.some((url) => url.includes("/api/cli/status?view=expanded")));
+    assert.match(result.stdout, /Bounded Decision:/);
+  });
+
 });

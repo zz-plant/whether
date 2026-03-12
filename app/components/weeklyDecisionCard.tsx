@@ -11,7 +11,7 @@ import type { ActionStripItem, RoleAwareOperatingTemplate } from "../../lib/repo
 import type { ForecastRegimeLabel, TransitionVelocityEstimate } from "../../lib/report/forecastModel";
 import type { RegimeKey } from "../../lib/regimeEngine";
 import type { DecisionMatrixPayload, StartupVariantPolicy } from "../../lib/report/homeBriefModel";
-import { formatProbabilityPercent } from "../../lib/report/reportFormatting";
+import { buildCompactFreshnessMeta, formatProbabilityPercent } from "../../lib/report/reportFormatting";
 import { getOrderedRegimeLegend, REGIME_BANNER_TOKENS, REGIME_LEGEND_DESCRIPTORS, type RegimeBannerTone } from "../../lib/regimePresentation";
 import { formatDateUTC } from "../../lib/formatters";
 import {
@@ -88,6 +88,7 @@ export type WeeklyDecisionCardProps = {
   }>;
   recordDateLabel: string;
   fetchedAtLabel: string;
+  freshnessLine?: string;
   reportDynamics: ReportDynamics;
   decisionShiftSummary: string;
   transitionProbabilities: Record<ForecastRegimeLabel, number>;
@@ -661,7 +662,7 @@ export function DecisionCallHeader({
         <div className="flex flex-wrap gap-2" aria-label="Compact trust and fallback cues">
           <p className="weather-live-chip rounded-full border border-emerald-400/45 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-emerald-100">Confidence {confidenceLabel} ({Math.round(confidencePercent)}%)</p>
           <p className="weather-live-chip rounded-full border border-slate-600/70 bg-slate-900/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-200">Trend {trendLabel} · Watch {transitionWatch}</p>
-          <p className="weather-live-chip rounded-full border border-slate-600/70 bg-slate-900/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-200">Freshness {freshnessLabel}</p>
+          <p className="weather-live-chip rounded-full border border-slate-600/70 bg-slate-900/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-200">Freshness {freshnessLine ?? freshnessMeta.line}</p>
           <p className="weather-live-chip rounded-full border border-slate-600/70 bg-slate-900/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-200">Trust {trustCueLine}</p>
         </div>
 
@@ -1133,6 +1134,7 @@ export function WeeklyDecisionCard({
   canonicalFlipConditions = [],
   recordDateLabel,
   fetchedAtLabel,
+  freshnessLine,
   reportDynamics,
   decisionShiftSummary: _decisionShiftSummary,
   transitionProbabilities,
@@ -1157,7 +1159,12 @@ export function WeeklyDecisionCard({
   failureModes = [],
   actions,
 }: WeeklyDecisionCardProps) {
-  const freshnessLabel = fetchedAtLabel.trim().length > 0 ? fetchedAtLabel : "Unavailable";
+  const freshnessMeta = buildCompactFreshnessMeta({
+    updatedAtLabel: fetchedAtLabel,
+    confidenceLabel,
+    isFallbackSnapshot,
+  });
+  const freshnessLabel = freshnessMeta.updatedAtLabel;
   const trustCueLine = buildCompactTrustSummary({
     confidenceLabel,
     freshnessLabel,

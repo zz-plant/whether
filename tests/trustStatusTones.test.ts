@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { buildTrustStatus } from "../lib/report/trustStatus";
+import { buildCompactTrustSummary, buildTrustStatus } from "../lib/report/trustStatus";
+import { buildCompactFreshnessMeta } from "../lib/report/reportFormatting";
 
 describe("buildTrustStatus trust tones", () => {
   it("returns stable trust copy with explicit decision impact and low-confidence action", () => {
@@ -49,4 +50,22 @@ describe("buildTrustStatus trust tones", () => {
     assert.match(result.trustStatusDetail, /retrospective only/);
     assert.match(result.trustStatusAction, /If confidence is low, switch to current data/);
   });
+
+  it("keeps compact freshness/trust wording aligned for degraded snapshots", () => {
+    const freshness = buildCompactFreshnessMeta({
+      updatedAtLabel: "",
+      confidenceLabel: "MED",
+      isFallbackSnapshot: true,
+    });
+    const trust = buildCompactTrustSummary({
+      confidenceLabel: "MED",
+      freshnessLabel: freshness.updatedAtLabel,
+      isFallbackSnapshot: true,
+    });
+
+    assert.match(freshness.line, /degraded/);
+    assert.match(trust, /Cached snapshot/);
+    assert.match(trust, /Unavailable/);
+  });
+
 });
