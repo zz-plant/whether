@@ -135,12 +135,15 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /DO NOW/);
     assert.match(html, /AVOID/);
     assert.match(html, /WATCH/);
-    assert.match(html, /Company mode/);
-    assert.match(html, /Company mode:/);
-    assert.match(html, /Seed/);
-    assert.match(html, /Series A/);
-    assert.match(html, /Series B/);
-    assert.match(html, /Bootstrapped/);
+    assert.match(html, /What environment\?/);
+    assert.match(html, /What should leadership do\?/);
+    assert.match(html, /Refine by company stage/);
+    assert.doesNotMatch(html, /Stage variant selected:/);
+    assert.doesNotMatch(html, /Company mode:/);
+    assert.doesNotMatch(html, /Seed/);
+    assert.doesNotMatch(html, /Series A/);
+    assert.doesNotMatch(html, /Series B/);
+    assert.doesNotMatch(html, /Bootstrapped/);
     assert.match(html, /Inspect evidence/);
     assert.match(html, /Regime history/);
     assert.match(html, /id="primary-artifact-actions"/);
@@ -418,11 +421,12 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(callCore, /DO NOW/);
     assert.match(callCore, /AVOID/);
     assert.match(callCore, /WATCH/);
+    assert.match(callCore, /Refine by company stage/);
+    assert.doesNotMatch(callCore, /Stage variant selected:/);
     assert.ok((callCore.match(/<li/g) ?? []).length <= 12);
-    assert.equal((callCore.match(/Protect runway/g) ?? []).length, 1);
-    assert.equal((callCore.match(/Pause speculative hiring/g) ?? []).length, 1);
-    assert.match(callCore, /Tightness rises above 70\.0 \(6\.0 pts away\)/);
-    assert.match(callCore, /Expansion→Mixed can flip in 3–6 months/);
+    assert.match(callCore, /Increase product tempo for reversible bets/);
+    assert.match(callCore, /net-new hiring if tightness &gt; 74/);
+    assert.match(callCore, /If risk appetite rises above 55, reopen selective hiring/);
   });
 
 });
