@@ -1,5 +1,5 @@
 import type { RegimeAssessment, RegimeKey } from "../regimeEngine";
-import type { PostureDecisionEvent } from "../serverStore";
+import type { PostureDecisionEvent } from "../storage/postureDecisionEventRepository";
 import { buildWeeklyLockCommitment } from "./decisionKnobs";
 
 export type PostureStateContract = {

@@ -17,7 +17,7 @@ export default async function OperationsIntegrationsPage() {
   const reportResult = await loadReportDataSafe(undefined, { route: "/operations/integrations" });
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
   const { assessment, treasury } = reportData;
-  const postureState = buildPostureState({
+  const postureState = await buildPostureState({
     recordDate: treasury.record_date,
     assessment,
     reportDynamics: reportData.reportDynamics,

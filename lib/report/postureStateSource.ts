@@ -1,6 +1,11 @@
 import type { RegimeAssessment } from "../regimeEngine";
 import { getRegimeDisplayLabel } from "../regimePresentation";
-import { serverStore, type PostureDecisionEvent } from "../serverStore";
+import {
+  buildPostureDecisionEvent,
+  getPostureDecisionEventRepository,
+  type PostureDecisionEvent,
+  type PostureDecisionEventRepository,
+} from "../storage/postureDecisionEventRepository";
 import { buildPostureStateContract, type PostureStateContract } from "./postureStateContract";
 import type { ReportDynamics } from "./reportData";
 
@@ -27,30 +32,31 @@ const buildIdempotencyKey = ({
   toState: RegimeAssessment["regime"];
 }) => `${effectiveRecordDate}:${toState}`;
 
-export const appendCommittedPostureEvent = ({
+export const appendCommittedPostureEvent = async ({
   recordDate,
   sourceIngestedAt,
   assessment,
   previousRegime,
+  repository = getPostureDecisionEventRepository(),
 }: {
   recordDate: string;
   sourceIngestedAt: string;
   assessment: RegimeAssessment;
   previousRegime: PostureDecisionEvent["fromState"];
+  repository?: PostureDecisionEventRepository;
 }) => {
   const idempotencyKey = buildIdempotencyKey({
     effectiveRecordDate: recordDate,
     toState: assessment.regime,
   });
 
-  const duplicate = serverStore.snapshot.postureDecisionEvents.some((event) => event.idempotencyKey === idempotencyKey);
-  const latest = serverStore.snapshot.postureDecisionEvents[0];
+  const duplicate = await repository.findByIdempotencyKey(idempotencyKey);
+  const latest = await repository.latest();
   if (duplicate || latest?.toState === assessment.regime) {
-    return { appended: false as const };
+    return { appended: false as const, backend: repository.backendStatus() };
   }
 
-  const entry: PostureDecisionEvent = {
-    id: typeof crypto.randomUUID === "function" ? crypto.randomUUID() : idempotencyKey,
+  const entry = buildPostureDecisionEvent({
     recordedAt: resolveDeterministicRecordedAt({
       recordDate,
       sourceIngestedAt,
@@ -60,26 +66,25 @@ export const appendCommittedPostureEvent = ({
     fromState: previousRegime,
     toState: assessment.regime,
     reason: assessment.regimeTransition.transitionReason,
-  };
-
-  serverStore.save({
-    ...serverStore.snapshot,
-    postureDecisionEvents: [entry, ...serverStore.snapshot.postureDecisionEvents].slice(0, 64),
   });
 
-  return { appended: true as const, event: entry };
+  await repository.append(entry);
+
+  return { appended: true as const, event: entry, backend: repository.backendStatus() };
 };
 
-export const buildPostureState = ({
+export const buildPostureState = async ({
   recordDate,
   assessment,
   reportDynamics,
-  decisionEvents = serverStore.snapshot.postureDecisionEvents,
+  decisionEvents,
+  repository = getPostureDecisionEventRepository(),
 }: {
   recordDate: string;
   assessment: RegimeAssessment;
   reportDynamics: Pick<ReportDynamics, "directionLabel">;
   decisionEvents?: PostureDecisionEvent[];
+  repository?: PostureDecisionEventRepository;
 }) => {
   const displayRegime = getRegimeDisplayLabel({
     regime: assessment.regime,
@@ -88,11 +93,15 @@ export const buildPostureState = ({
     transitionWatch: assessment.diagnostics.transitionWatch,
   });
 
+  const listedEvents = decisionEvents
+    ? decisionEvents
+    : (await repository.list({ limit: 64 })).events;
+
   const postureState: PostureStateContract = buildPostureStateContract({
     assessment,
     recordDate,
     postureLabel: displayRegime.label,
-    decisionEventStore: decisionEvents,
+    decisionEventStore: listedEvents,
   });
 
   return postureState;
