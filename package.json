@@ -6,9 +6,9 @@
   "scripts": {
     "dev": "next dev",
     "dev:turbo": "next dev --turbo",
-    "build": "node scripts/build.mjs",
-    "build:cloudflare": "BUILD_TARGET=cloudflare NEXT_ON_PAGES_REUSE_PREBUILT=1 node scripts/build.mjs",
-    "build:cloudflare:skip-next-build": "BUILD_TARGET=cloudflare NEXT_ON_PAGES_SKIP_BUILD=1 NEXT_ON_PAGES_REUSE_PREBUILT=1 node scripts/build.mjs",
+    "build": "bun scripts/build.mjs",
+    "build:cloudflare": "BUILD_TARGET=cloudflare NEXT_ON_PAGES_REUSE_PREBUILT=1 bun scripts/build.mjs",
+    "build:cloudflare:skip-next-build": "BUILD_TARGET=cloudflare NEXT_ON_PAGES_SKIP_BUILD=1 NEXT_ON_PAGES_REUSE_PREBUILT=1 bun scripts/build.mjs",
     "vercel:build": "vercel build --yes",
     "wrangler:upload": "wrangler versions upload",
     "build:pages": "bun run build:cloudflare",
