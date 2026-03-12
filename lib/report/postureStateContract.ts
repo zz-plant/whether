@@ -20,8 +20,8 @@ export type PostureStateContract = {
   };
   whatFlipsNext: {
     flipTrigger: string;
-    thresholds: string[];
-    reversalConditions: string[];
+    thresholds: readonly string[];
+    reversalConditions: readonly string[];
   };
 };
 
@@ -57,7 +57,7 @@ export const buildPostureStateContract = ({
   });
 
   const latestEvent = decisionEventStore[0];
-  const committedTransition = assessment.regimeTransition.committed ? assessment.regimeTransition : null;
+  const committedTransition = assessment.regimeTransition?.committed ? assessment.regimeTransition : null;
 
   return {
     currentState: {

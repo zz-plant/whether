@@ -65,7 +65,7 @@ export const appendCommittedPostureEvent = async ({
     idempotencyKey,
     fromState: previousRegime,
     toState: assessment.regime,
-    reason: assessment.regimeTransition.transitionReason,
+    reason: assessment.regimeTransition?.transitionReason ?? "Transition committed without explicit reason.",
   });
 
   await repository.append(entry);
