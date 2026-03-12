@@ -12,6 +12,14 @@ const compactMatrixText = (value: string, fallback: string) => {
   return firstClause?.trim() || fallback;
 };
 
+const joinFlipConditions = (conditions: string[]) => {
+  if (conditions.length === 0) return "";
+  if (conditions.length === 1) return conditions[0] ?? "";
+  if (conditions.length === 2) return `${conditions[0]} and ${conditions[1]}`;
+
+  return `${conditions.slice(0, -1).join(", ")}, and ${conditions[conditions.length - 1]}`;
+};
+
 const matrixRowConfig: Array<{ key: DecisionMatrixRowKey; label: string; area: BoundedDecisionRule["area"]; flipConditionIndex: number }> = [
   { key: "hiring", label: "Hiring", area: "hiring", flipConditionIndex: 0 },
   { key: "product", label: "Product", area: "product-tempo", flipConditionIndex: 1 },
@@ -45,10 +53,12 @@ export const buildDecisionMatrixPayload = ({
     const rule = rulesByArea.get(area);
     const fallbackApprove = "Stage approvals on short-cycle proof";
     const fallbackDelay = "Delay irreversible commitments";
-    const structuredFlipCondition = rule?.flipConditions
+    const structuredFlipCondition = joinFlipConditions(
+      rule?.flipConditions
       .map((condition) => condition.label.trim())
       .filter((condition) => condition.length > 0)
-      .join(" or ") ?? "";
+      ?? [],
+    );
     const fallbackFlipCondition = lockCommitment.flipConditions[flipConditionIndex] ?? lockCommitment.flipConditions[0] ?? "Recheck thresholds on next refresh.";
     const flipSummary = structuredFlipCondition || rule?.resumeTrigger || fallbackFlipCondition;
     const flipDetail = [rule?.resumeTrigger, structuredFlipCondition, !rule ? fallbackFlipCondition : ""]

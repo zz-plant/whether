@@ -432,6 +432,7 @@ describe("buildHomeBriefModel", () => {
     const capitalRow = model.decisionMatrix.rows.find((row) => row.key === "capital");
     assert.ok(capitalRow);
     assert.match(capitalRow?.cells.flip.text ?? "", /tightness\s*</i);
+    assert.match(capitalRow?.cells.flip.text ?? "", /and/i);
     assert.match(capitalRow?.cells.flip.text ?? "", /risk appetite\s*>/i);
   });
 
