@@ -19,7 +19,7 @@ export type BoundedDecisionRule = {
   rationale: string;
 };
 
-export type StartupVariantMode = "seed" | "series-a" | "series-b" | "bootstrapped";
+export type StartupVariantMode = "seed" | "series-a" | "series-b" | "growth" | "public" | "bootstrapped";
 
 export type ScopedVariantDecisionAdjustment = {
   mode: StartupVariantMode;
@@ -177,6 +177,8 @@ export const startupVariantModes: Array<{ mode: StartupVariantMode; label: strin
   { mode: "seed", label: "Seed" },
   { mode: "series-a", label: "Series A" },
   { mode: "series-b", label: "Series B" },
+  { mode: "growth", label: "Growth" },
+  { mode: "public", label: "Public" },
   { mode: "bootstrapped", label: "Bootstrapped" },
 ];
 
@@ -278,6 +280,54 @@ export const buildScopedVariantDecisionAdjustment = ({
       ],
       thresholdEmphasis: "Emphasize efficiency lift and margin durability before headcount scale.",
       reversalTriggerDiscipline: "Reverse to broader scaling only when both risk appetite and tightness clear their resume bands in the same week.",
+    };
+  }
+
+  if (mode === "growth") {
+    return {
+      mode,
+      label: "Growth",
+      description: "Scale durable GTM and platform leverage without losing unit discipline.",
+      doNowAdjustments: [
+        "Concentrate scale on channels with proven CAC payback inside the planning window.",
+      ],
+      avoidAdjustments: [
+        "Avoid top-line-first expansions that outrun support and margin readiness.",
+      ],
+      watchAdjustments: [
+        describeBoundaryGap({
+          dimension: "risk appetite",
+          gap: riskGap,
+          whenNearBoundary: () => "Growth trigger: rephase expansion now because risk appetite is already at the regime boundary.",
+          whenAway: (formattedGap) => `Growth trigger: rephase expansion if risk appetite moves inside ${formattedGap} points.`,
+        }),
+      ],
+      thresholdEmphasis: "Emphasize CAC payback, retention durability, and support capacity before adding fixed cost.",
+      reversalTriggerDiscipline: "Reverse to faster scaling only after risk appetite and conversion efficiency both improve for two weekly reads.",
+    };
+  }
+
+  if (mode === "public") {
+    return {
+      mode,
+      label: "Public",
+      description: "Prioritize earnings resilience and guided execution consistency.",
+      doNowAdjustments: [
+        "Bias capital allocation toward initiatives with near-term margin and cash-flow reliability.",
+      ],
+      avoidAdjustments: [
+        "Avoid guidance-risk programs that depend on optimistic macro re-rating.",
+      ],
+      watchAdjustments: [
+        describeBoundaryGap({
+          dimension: "tightness",
+          gap: tightnessGap,
+          whenNearBoundary: () => "Guidance trigger: tighten discretionary spend now because tightness is already at the regime boundary.",
+          whenAway: (formattedGap) => `Guidance trigger: tighten discretionary spend if tightness closes inside ${formattedGap} points.`,
+        }),
+      ],
+      thresholdEmphasis: "Emphasize earnings durability, cash conversion, and guidance credibility.",
+      reversalTriggerDiscipline: "Reverse to broader spend only when boundary pressure eases and guidance confidence improves in tandem.",
     };
   }
 
