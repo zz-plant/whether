@@ -20,7 +20,8 @@ Use this index to find the **current** source of truth quickly.
 - `development-playbook.md` — practical engineering workflow and PR readiness checks.
 - `cli-command-reference.md` — Whether CLI command reference, output modes, and exit codes.
 - `cloudflare-deployment-runbook.md` — Cloudflare deployment expectations and CI artifact workflow.
-- `developer/README.md` — external developer-docs entrypoint (quickstart, API reference, integrations).
+- `developer/README.md` — external developer-docs entrypoint (quickstart, API reference, integrations, CLI fallback).
+- `developer/cli-fallback.md` — curl-first fallback for the CLI core read path (`/api/cli/status`) when install/auth flow is blocked.
 - `architecture.md` — modules, runtime flow, and extension points.
 - `stack-compatibility-matrix.md` — platform/runtime support constraints.
 - `stack-modernization-inventory.md` — modernization baseline.

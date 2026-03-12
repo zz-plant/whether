@@ -31,18 +31,29 @@ Whether CLI is an operator decision terminal: **environment → call → changes
 - `whether install [--yes|--ci] [--api-base-url <url>] [--token <token>]`
 - `whether completion`
 
-## Common flags
+## Global output/setup flags
 
 - `--json`
 - `--yaml`
 - `--markdown`
 - `--quiet`
 - `--no-color`
-- `--company <name>`
-- `--stage <name>`
-- `--as-of <YYYY-MM> (example: 2024-07)`
 - `--yes` (install: non-interactive acceptance of defaults)
 - `--ci` (install: alias of `--yes` for CI scripts)
+
+## Command-specific query flags
+
+- `status`: `--as-of <YYYY-MM>`, `--view expanded`, `--verbose`
+- `call`: `--as-of <YYYY-MM>`
+- `changes`: `--as-of <YYYY-MM>`
+- `diagnostics`: `--as-of <YYYY-MM>`
+- `regime`: `--as-of <YYYY-MM>`
+- `history`: `--as-of <YYYY-MM>`, `--weeks <n>`
+- `scenario`: `--tightness <n>`, `--risk-appetite <n>`
+
+Notes:
+- `--as-of` is mapped to `asOf` query shape expected by the API handlers.
+- `--company` / `--stage` are CLI context flags (for commands like `whether company ...`) and are not forwarded as query params to `/api/cli/*` endpoints.
 
 ## Install contract (automation-safe)
 
@@ -61,7 +72,7 @@ bun run cli:whether -- install --ci --api-base-url "$WHETHER_API_URL" --token "$
 Behavior:
 - `install` writes `~/.config/whether/config.yaml` with baseline defaults and any provided flags.
 - In non-interactive shells, `install` requires `--yes` or `--ci`; otherwise it exits with an error explaining the required flag.
-- If config-file writes are blocked (restricted shell/home permissions), use `WHETHER_API_URL` and `WHETHER_TOKEN` environment variables instead of running `install`.
+- If config-file writes are blocked (restricted shell/home permissions), use `WHETHER_API_URL` and `WHETHER_TOKEN` environment variables instead of running `install` (see `docs/developer/cli-fallback.md`).
 
 Linux/macOS note:
 - Commands above are POSIX shell-safe and work in standard Linux and macOS terminals.
@@ -105,6 +116,7 @@ All are versioned `v1` payloads for automation-safe command output.
 The CLI maps common failures to these exact category-prefixed error strings:
 
 - `auth: Authentication failed. Set WHETHER_TOKEN or pass --token, then run whether auth login --token <token>.`
+  - Fallback path: `docs/developer/cli-fallback.md` for direct `curl` access to `/api/cli/status` when CLI auth/config flow is blocked.
 - `network: Unable to reach Whether API. Set WHETHER_API_URL or pass --api-base-url, then verify <apiBaseUrl>/api/health.`
 - `forbidden: Access denied by API. Use a token with required access via WHETHER_TOKEN or --token, then retry.`
 - `rate limit: Request quota exceeded. Retry with --watch --interval 120 or wait for quota reset at /api/cli/status.`
