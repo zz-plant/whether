@@ -326,15 +326,32 @@ Freshness: ${freshnessText(body)}\n\nLeadership should:\n${body.leadershipShould
 const changesText = (body) => `What Changed Since Last Refresh
 Freshness: ${freshnessText(body)}\n\nCHANGED\n${body.changed.map((item) => `- ${item.metric} ${item.from} → ${item.to} (${item.direction}, ${item.impact})`).join("\n")}\n\nREVISIT\n${body.revisit.map((item) => `- ${item}`).join("\n")}\n\nFLIP\n${body.flip.map((item) => `- ${item.condition}${typeof item.distance === "number" ? ` (${item.distance} away)` : ""}`).join("\n")}`;
 
-const routeWithCommonParams = (base, flags) => {
+const routeWithAllowedParams = (base, flags, allowedFlags) => {
+  const keyMap = {
+    "as-of": "asOf",
+    weeks: "weeks",
+    view: "view",
+    tightness: "tightness",
+    "risk-appetite": "risk-appetite",
+  };
   const params = new URLSearchParams();
-  if (flags["as-of"]) params.set("asOf", String(flags["as-of"]));
-  if (flags.weeks) params.set("weeks", String(flags.weeks));
-  if (flags.view) params.set("view", String(flags.view));
-  if (flags.company) params.set("company", String(flags.company));
-  if (flags.stage) params.set("stage", String(flags.stage));
+  for (const flag of allowedFlags) {
+    const value = flags[flag];
+    if (value === undefined) continue;
+    params.set(keyMap[flag] ?? flag, String(value));
+  }
   const query = params.toString();
   return query ? `${base}?${query}` : base;
+};
+
+const cliRoutes = {
+  status: (flags) => routeWithAllowedParams("/api/cli/status", flags, ["as-of", "view"]),
+  call: (flags) => routeWithAllowedParams("/api/cli/call", flags, ["as-of"]),
+  changes: (flags) => routeWithAllowedParams("/api/cli/changes", flags, ["as-of"]),
+  diagnostics: (flags) => routeWithAllowedParams("/api/cli/diagnostics", flags, ["as-of"]),
+  regime: (flags) => routeWithAllowedParams("/api/cli/regime", flags, ["as-of"]),
+  history: (flags) => routeWithAllowedParams("/api/cli/history", flags, ["as-of", "weeks"]),
+  scenario: (flags) => routeWithAllowedParams("/api/cli/scenario", flags, ["tightness", "risk-appetite"]),
 };
 
 const writeFileIfRequested = async (flags, payload, settings) => {
@@ -345,7 +362,7 @@ const writeFileIfRequested = async (flags, payload, settings) => {
 
 const cmdStatus = async (settings, flags) => {
   if (flags.help) return writeOutput(SUB_HELP.status, settings);
-  const route = routeWithCommonParams("/api/cli/status", {
+  const route = cliRoutes.status({
     ...flags,
     view: flags.verbose || flags.view === "expanded" ? "expanded" : undefined,
   });
@@ -368,7 +385,7 @@ ${body.boundedDecision.topDeltas.map((item) => `- ${item.metric} ${item.directio
 
 const cmdCall = async (settings, subcommand, flags) => {
   if (flags.help) return writeOutput(SUB_HELP.call, settings);
-  const body = await getJson(settings, routeWithCommonParams("/api/cli/call", flags));
+  const body = await getJson(settings, cliRoutes.call(flags));
 
   if (subcommand === "diff") {
     const from = flags.from ?? "previous";
@@ -385,7 +402,7 @@ const cmdCall = async (settings, subcommand, flags) => {
 };
 
 const cmdRegime = async (settings, flags) => {
-  const body = await getJson(settings, routeWithCommonParams("/api/cli/regime", flags));
+  const body = await getJson(settings, cliRoutes.regime(flags));
   if (flags.plot) {
     const history = await getJson(settings, "/api/cli/history");
     const plot = history.history.map((item) => `${item.recordDate}  ${item.regime}  ${item.trend}`).join("\n");
@@ -396,15 +413,15 @@ const cmdRegime = async (settings, flags) => {
 };
 
 const cmdChanges = async (settings, flags) => {
-  const body = await getJson(settings, routeWithCommonParams("/api/cli/changes", flags));
+  const body = await getJson(settings, cliRoutes.changes(flags));
   writeOutput(settings.output === "text" ? changesText(body) : body, settings);
 };
 
 const cmdDiagnostics = async (settings, subcommand, flags) => {
   if (flags.help) return writeOutput(SUB_HELP.diagnostics, settings);
-  const body = await getJson(settings, routeWithCommonParams("/api/cli/diagnostics", flags));
+  const body = await getJson(settings, cliRoutes.diagnostics(flags));
   if (subcommand === "provenance") {
-    const status = await getJson(settings, routeWithCommonParams("/api/cli/status", flags));
+    const status = await getJson(settings, cliRoutes.status(flags));
     return writeOutput({ updatedAt: status.updatedAt, confidence: status.confidence, degraded: status.degraded }, settings);
   }
   if (subcommand === "evidence") {
@@ -417,7 +434,7 @@ const cmdDiagnostics = async (settings, subcommand, flags) => {
 
 const cmdHistory = async (settings, subcommand, flags) => {
   if (flags.help) return writeOutput(SUB_HELP.history, settings);
-  const body = await getJson(settings, routeWithCommonParams("/api/cli/history", flags));
+  const body = await getJson(settings, cliRoutes.history(flags));
   if (subcommand === "compare") {
     return writeOutput(`Compare mode (${flags.from ?? "start"} -> ${flags.to ?? "end"})
 ${body.history[0]?.recordDate ?? "n/a"} latest snapshot`, settings);
@@ -483,10 +500,7 @@ const cmdScenario = async (settings, flags) => {
   if ((flags.tightness && Number.isNaN(Number(flags.tightness))) || (flags["risk-appetite"] && Number.isNaN(Number(flags["risk-appetite"])))) {
     process.exit(EXIT.INVALID_SCENARIO);
   }
-  const query = new URLSearchParams();
-  if (flags.tightness !== undefined) query.set("tightness", String(flags.tightness));
-  if (flags["risk-appetite"] !== undefined) query.set("risk-appetite", String(flags["risk-appetite"]));
-  const body = await getJson(settings, `/api/cli/scenario?${query.toString()}`);
+  const body = await getJson(settings, cliRoutes.scenario(flags));
   writeOutput(body, settings);
 };
 
