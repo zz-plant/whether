@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { DEFAULT_THRESHOLDS, evaluateRegime } from "../../../../lib/regimeEngine";
 import { buildScenarioContract } from "../../../../lib/cli/contracts";
+import { applyScenarioOverridesToTreasury } from "../../../../lib/cli/scenarioInputs";
 import { loadReportDataSafe } from "../../../../lib/report/reportData";
 import { getRegimeDisplayLabel } from "../../../../lib/regimePresentation";
 
@@ -15,6 +16,7 @@ const parseNumber = (value: string | null) => {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : null;
 };
+
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -38,14 +40,13 @@ export async function GET(request: Request) {
     transitionWatch: reportData.assessment.diagnostics.transitionWatch,
   }).label;
 
-  const scenarioAssessment = evaluateRegime(
-    {
-      ...reportData.treasury,
-      tightness: tightness ?? reportData.treasury.tightness,
-      risk_appetite: riskAppetite ?? reportData.treasury.risk_appetite,
-    },
-DEFAULT_THRESHOLDS,
-  );
+  const scenarioTreasury = applyScenarioOverridesToTreasury({
+    treasury: reportData.treasury,
+    tightness,
+    riskAppetite,
+  });
+
+  const scenarioAssessment = evaluateRegime(scenarioTreasury, DEFAULT_THRESHOLDS);
 
   const afterLabel = getRegimeDisplayLabel({
     regime: scenarioAssessment.regime,
