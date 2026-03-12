@@ -33,6 +33,7 @@ import { logReportDependencyFailure } from "./reportError";
 import { buildCanonicalBoundedDecisionRules } from "./boundedDecisionRules";
 import { buildActionStripItems } from "./operatingCalls";
 import { deltaLabelBySignal, resolveSignalDirection, signalOrder } from "./briefFormatting";
+import { buildSourceHealthRows } from "./sourceHealth";
 import { cache } from "react";
 import type { TreasuryData } from "../types";
 import { resolveConfidencePercent as resolveConfidencePercentFromAssessment, resolveDistanceToFlip as resolveDistanceToFlipFromInputs } from "./confidence";
@@ -846,6 +847,12 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
     assessment,
     lastUpdated: treasury.record_date,
   });
+  const sourceHealth = buildSourceHealthRows({
+    treasury,
+    macroSeries,
+    macroStatusLabel: macroProvenance.statusLabel,
+    now,
+  });
 
   return {
     assessment,
@@ -888,6 +895,7 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
     thresholds,
     treasury,
     treasuryProvenance,
+    sourceHealth,
     materializedSignals: canonicalInputs?.materializedSignals ?? null,
   };
 };
@@ -978,6 +986,12 @@ const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataF
     assessment,
     lastUpdated: fallbackTreasury.record_date,
   });
+  const sourceHealth = buildSourceHealthRows({
+    treasury: fallbackTreasury,
+    macroSeries: [],
+    macroStatusLabel: "Unavailable (fallback)",
+    now,
+  });
 
   return {
     assessment,
@@ -1033,6 +1047,7 @@ const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataF
     thresholds,
     treasury: fallbackTreasury,
     materializedSignals: null,
+    sourceHealth,
     treasuryProvenance: {
       sourceLabel: "Federal Reserve Economic Data (FRED)",
       sourceUrl: fallbackTreasury.source,

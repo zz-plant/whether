@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { loadReportDataSafe } from "../../../lib/report/reportData";
+import type { SourceHealthRow } from "../../../lib/report/sourceHealth";
 
 export const runtime = "edge";
 export const revalidate = 0;
@@ -25,13 +26,22 @@ const getCommitSha = () =>
 export async function GET() {
   const now = new Date();
   const reportResult = await loadReportDataSafe(undefined, { route: "/api/health" });
-  const { treasury } = reportResult.ok ? reportResult.data : reportResult.fallback;
+  const { treasury, sourceHealth } = reportResult.ok ? reportResult.data : reportResult.fallback;
   const ageHours = toHours(treasury.fetched_at, now);
   const stale = ageHours === null ? true : ageHours > STALE_AFTER_HOURS;
   const treasuryStatus = stale ? "degraded" : "ok";
 
   const status = reportResult.ok && treasuryStatus === "ok" ? "ok" : reportResult.ok ? "degraded" : "down";
   const statusCode = status === "ok" ? 200 : 503;
+  const sources = sourceHealth.map((source): SourceHealthRow & { status: "ok" | "degraded" | "unknown" } => ({
+    ...source,
+    status:
+      source.freshnessStatus === "unknown"
+        ? "unknown"
+        : source.freshnessStatus === "fresh" && source.mode === "live"
+          ? "ok"
+          : "degraded",
+  }));
 
   return NextResponse.json(
     {
@@ -53,6 +63,7 @@ export async function GET() {
           source: treasury.source,
         },
       },
+      sources,
     },
     { status: statusCode },
   );
