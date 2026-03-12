@@ -41,6 +41,9 @@ Whether exposes read-first JSON endpoints for weekly posture transmission, caden
 | --- | --- | --- |
 | `/api/regime-alerts` | GET, POST | Read/create regime alert events. |
 | `/api/weekly-digest` | GET | Build digest summary from stored alert events. |
+| `/api/decision-memory` | GET, POST | List/create Decision Memory entries (`{ entries, count }`), with CSV export via `?format=csv`. |
+| `/api/alert-preferences` | GET, POST | Read/upsert delivery preferences by `clientId` (`{ preferences }`). |
+| `/api/alert-deliveries` | GET, POST | List delivery history and create delivery attempts (`{ deliveries }`). |
 | `/api/decision-events` | GET | Retrieve regime transition decision events with cursor pagination and optional replay support (`replay=1&initialState=<REGIME>`). |
 | `/api/integrations/weekly-mandate?target=<slack|email|...>` | GET | Destination-specific weekly mandate payload. |
 
@@ -96,7 +99,7 @@ Dropping these fields weakens traceability and makes cross-run comparisons britt
 ## Data durability note
 
 - Decision transition events (`/api/decision-events`) support durable persistence on Cloudflare when the `DECISION_EVENTS_KV` binding is configured; otherwise they fall back to process-memory semantics.
-- Alert preferences, alerts, and delivery events still use process-memory store semantics. For production-grade durable history, persist these events in external storage.
+- Alert preferences, decision memory, alerts, and delivery events return stable contracts in all environments and automatically degrade to in-process fallback storage when durable KV bindings are unavailable (`backend: "local-fallback"`, `degraded: true`). Configure `WHETHER_DURABLE_KV` or route-specific bindings (`DECISION_MEMORY_KV`, `ALERT_PREFERENCES_KV`, `REGIME_ALERTS_KV`) for durable history.
 
 ## Regime and posture taxonomy
 
