@@ -37,6 +37,9 @@ describe("sitemap", () => {
     assert.ok(urls.has(`${siteUrl}/decide`));
     assert.ok(urls.has(`${siteUrl}/toolkits`));
     assert.ok(urls.has(`${siteUrl}/learn`));
+    assert.ok(urls.has(`${siteUrl}/operations`));
+    assert.ok(urls.has(`${siteUrl}/operations/data`));
+    assert.ok(urls.has(`${siteUrl}/operations/cli`));
 
     for (const redirectOnlyPath of redirectOnlySitemapPaths) {
       assert.ok(!urls.has(`${siteUrl}${redirectOnlyPath}`));
