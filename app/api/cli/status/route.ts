@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { buildCliStatusContract, buildCliStatusExpandedContract } from "../../../../lib/cli/contracts";
 import { loadReportDataSafe } from "../../../../lib/report/reportData";
 import { buildPostureState } from "../../../../lib/report/postureStateSource";
-import { parseAsOfSearchParam, rejectUnsupportedCliQuery } from "../../../../lib/cli/queryContracts";
+import { CLI_QUERY_ALLOWLIST_BY_ENDPOINT, parseAsOfSearchParam, rejectUnsupportedCliQuery } from "../../../../lib/cli/queryContracts";
 
 export const runtime = "edge";
 export const revalidate = 0;
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
-  const invalidQuery = rejectUnsupportedCliQuery(request, ["asOf", "view"]);
+  const invalidQuery = rejectUnsupportedCliQuery(request, CLI_QUERY_ALLOWLIST_BY_ENDPOINT.status);
   if (invalidQuery) return invalidQuery;
 
   const searchParams = parseAsOfSearchParam(request.nextUrl.searchParams.get("asOf"));

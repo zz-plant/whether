@@ -4,9 +4,19 @@ type CliQueryRequest = {
   };
 };
 
+export const CLI_QUERY_ALLOWLIST_BY_ENDPOINT = {
+  status: ["asOf", "view"],
+  call: ["asOf"],
+  changes: ["asOf"],
+  diagnostics: ["asOf"],
+  regime: ["asOf"],
+  history: ["asOf", "weeks"],
+  scenario: ["tightness", "risk-appetite"],
+} as const;
+
 const toUnique = (values: string[]) => Array.from(new Set(values));
 
-export const rejectUnsupportedCliQuery = (request: CliQueryRequest, supportedParams: string[]) => {
+export const rejectUnsupportedCliQuery = (request: CliQueryRequest, supportedParams: readonly string[]) => {
   const allowed = new Set(supportedParams);
   const provided = toUnique(Array.from(request.nextUrl.searchParams.keys()));
   const unsupported = provided.filter((key) => !allowed.has(key));
