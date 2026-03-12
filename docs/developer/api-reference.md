@@ -8,6 +8,7 @@ Whether exposes read-first JSON endpoints for weekly posture transmission, caden
 - **Format:** JSON.
 - **Runtime:** edge handlers.
 - **Auth:** currently none. Protect public deployments with your own auth/reverse proxy as needed.
+- **Automation headers:** send `Accept: application/json`; include `Authorization: Bearer <token>` when your deployment is access-controlled.
 - **Rate limiting:** platform-default protections apply; explicit per-endpoint quotas are not yet published.
 - **Versioning:** most payloads include `version: "v1"`.
 
@@ -84,6 +85,40 @@ Invalid cadence returns `400` with `allowedCadences`.
 ```bash
 curl -s "http://localhost:3000/api/integrations/weekly-mandate?target=slack" | jq '{target, recordDate, payload}'
 ```
+
+### CLI fallback core read path (`/api/cli/status`)
+
+Use this endpoint when CLI install/auth flows are blocked but you still need the same core read path that powers `whether status` and `whether brief`.
+
+```bash
+curl -sS "http://localhost:3000/api/cli/status" \
+  -H "Accept: application/json" \
+  -H "Authorization: Bearer $WHETHER_TOKEN" \
+  | jq '{version, generatedAt, updatedAt, regime, trend, degraded, call: {summary: .call.summary, flipConditions: .call.flipConditions}}'
+```
+
+Expected JSON response shape (example values):
+
+```json
+{
+  "version": "v1",
+  "generatedAt": "2026-03-12T12:34:56.000Z",
+  "updatedAt": "2026-03-12T12:00:00.000Z",
+  "regime": "Guarded Expansion",
+  "trend": "Deteriorating",
+  "degraded": false,
+  "call": {
+    "summary": "Stage decisions. Avoid irreversible spend.",
+    "flipConditions": [
+      "tightness < 60 for 2 consecutive refreshes"
+    ]
+  }
+}
+```
+
+For bounded-decision parity with `whether status --verbose`, use `GET /api/cli/status?view=expanded`. For historical replay parity with `--as-of`, use `GET /api/cli/status?asOf=YYYY-MM`.
+
+Stability note: this contract is covered by CLI contract/query tests and is the CLI default read route, making it suitable for automation polling and fallback workflows.
 
 ## Contract invariants to preserve downstream
 

@@ -13,6 +13,8 @@ Choose the path that matches your immediate outcome:
    - Endpoint catalog, request/response conventions, and taxonomy rules.
 3. **Run production delivery workflows** → `integrations.md`
    - Agent pull loops, alert delivery patterns, and reliability checks.
+4. **Use API fallback when CLI install/auth is blocked** → `cli-fallback.md`
+   - Minimal `curl` calls, required headers, and stable JSON response shape.
 
 ## Intended audience
 
