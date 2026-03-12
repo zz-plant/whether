@@ -389,6 +389,46 @@ describe("whether cli", () => {
     assert.equal(envParsed.source, "env");
   });
 
+  it("auth status --check validates token against authenticated endpoint", async () => {
+    const requests: string[] = [];
+    const server = http.createServer((req, res) => {
+      requests.push(req.url ?? "");
+      if ((req.url ?? "") === "/api/auth/status") {
+        const authHeader = req.headers.authorization ?? "";
+        if (authHeader === "Bearer valid-token") {
+          res.writeHead(200, { "content-type": "application/json" });
+          res.end(JSON.stringify({ ok: true, authenticated: true }));
+          return;
+        }
+        res.writeHead(401, { "content-type": "application/json" });
+        res.end(JSON.stringify({ error: "invalid_token" }));
+        return;
+      }
+      res.writeHead(404);
+      res.end();
+    });
+
+    await new Promise<void>((resolve) => server.listen(0, resolve));
+    const { port } = server.address() as { port: number };
+
+    const valid = spawnSync("node", [CLI_PATH, "auth", "status", "--check", "--api-base-url", `http://127.0.0.1:${port}`], {
+      encoding: "utf8",
+      env: { ...process.env, WHETHER_API_KEY: "valid-token" },
+    });
+
+    const invalid = spawnSync("node", [CLI_PATH, "auth", "status", "--check", "--api-base-url", `http://127.0.0.1:${port}`], {
+      encoding: "utf8",
+      env: { ...process.env, WHETHER_API_KEY: "invalid-token" },
+    });
+
+    server.close();
+
+    assert.ok(requests.every((url) => url === "/api/auth/status"));
+    assert.equal(valid.status, 0);
+    assert.equal(invalid.status, 2);
+    assert.match(invalid.stderr, /auth: Authentication failed \(invalid key\)\./);
+  });
+
   it("ping maps network failures to network exit semantics", () => {
     const result = spawnSync("node", [CLI_PATH, "ping", "--api-base-url", "http://127.0.0.1:1"], { encoding: "utf8" });
 

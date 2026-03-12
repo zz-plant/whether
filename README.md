@@ -97,7 +97,7 @@ export WHETHER_API_KEY="<your-api-key>"
 # Machine-readable preflight
 bun run cli:whether -- auth status --json
 
-# Optional: validate key against API
+# Optional: validate key against auth-protected API endpoint
 bun run cli:whether -- auth status --check --json
 ```
 

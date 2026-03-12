@@ -160,4 +160,4 @@ Exit-code contract:
 - `2` not authenticated (missing key/token)
 
 Optional API validation:
-- `whether auth status --check` performs an authenticated `/api/health` check and preserves existing auth/network/server exit codes.
+- `whether auth status --check` performs an authenticated `/api/auth/status` check and preserves existing auth/network/server exit codes.

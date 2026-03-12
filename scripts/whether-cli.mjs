@@ -23,6 +23,8 @@ const AUTH_FAILURE = {
   SCOPE: "scope",
 };
 
+const AUTH_CHECK_ENDPOINT = "/api/auth/status";
+
 const HELP = `Whether CLI — decision terminal for operators
 
 Usage:
@@ -657,7 +659,7 @@ const cmdAuth = async (settings, subcommand, flags) => {
   }
 
   if (flags.check) {
-    const endpoint = "/api/health";
+    const endpoint = AUTH_CHECK_ENDPOINT;
     let response;
     try {
       response = await fetch(`${settings.apiBaseUrl}${endpoint}`, {
@@ -676,7 +678,13 @@ const cmdAuth = async (settings, subcommand, flags) => {
         exitCode: EXIT.NETWORK,
       });
     }
-    const statusError = buildHttpStatusError({ status: response.status, ok: response.ok, endpoint, settings });
+    let responseBody = null;
+    try {
+      responseBody = await response.clone().json();
+    } catch {
+      responseBody = null;
+    }
+    const statusError = buildHttpStatusError({ status: response.status, ok: response.ok, endpoint, settings, body: responseBody });
     if (statusError) throw statusError;
   }
 
