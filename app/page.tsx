@@ -23,7 +23,7 @@ import { ReportShell } from "./components/reportShell";
 import { reportPageLinks } from "../lib/report/reportNavigation";
 import { buildTrustStatus } from "../lib/report/trustStatus";
 import { WeeklyDecisionCard } from "./components/weeklyDecisionCard";
-import { buildBoardBrief, buildCallCitation, buildSlackBrief } from "../lib/export/briefBuilders";
+import { buildBoardBrief, buildCallCitation } from "../lib/export/briefBuilders";
 import {
   buildWeeklyCallSnapshotPlainText,
   buildWeeklyOperatorBriefPayload,
@@ -354,7 +354,6 @@ const HomePageReportContent = async ({
     freshnessLabel: fetchedAtLabel.trim().length > 0 ? fetchedAtLabel : "Unavailable",
     postureState,
   };
-  const slackBrief = buildSlackBrief(assessment, treasury, sensors, macroSeries, exportLayerOptions);
   const boardSummary = buildBoardBrief(assessment, treasury, sensors, macroSeries, exportLayerOptions);
   const weeklyOperatorBriefPayload = buildWeeklyOperatorBriefPayload({
     assessment,
@@ -503,15 +502,15 @@ const HomePageReportContent = async ({
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">Need deeper analysis?</p>
         <p className="text-sm text-slate-200">Keep this page as the weekly call surface. Open detailed workflows only when you need diagnostics or role-specific plans.</p>
         <div className="grid gap-2 sm:grid-cols-3">
-          <Link href="/operations" className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-100 hover:border-slate-500/80">
+          <Link prefetch={false} href="/operations" className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-100 hover:border-slate-500/80">
             <span className="font-semibold">Execution playbook</span>
             <span className="mt-1 block text-slate-300">Approve/hold/escalate plans by function.</span>
           </Link>
-          <Link href="/signals" className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-100 hover:border-slate-500/80">
+          <Link prefetch={false} href="/signals" className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-100 hover:border-slate-500/80">
             <span className="font-semibold">Evidence + drivers</span>
             <span className="mt-1 block text-slate-300">Inspect raw indicators, deltas, and provenance.</span>
           </Link>
-          <Link href="/decide" className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-100 hover:border-slate-500/80">
+          <Link prefetch={false} href="/decide" className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-100 hover:border-slate-500/80">
             <span className="font-semibold">Decision scenarios</span>
             <span className="mt-1 block text-slate-300">Stress-test thresholds and reversal conditions.</span>
           </Link>
