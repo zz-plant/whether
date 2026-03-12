@@ -103,3 +103,33 @@ export const formatTrendArrow = (delta: number | null): "↑" | "↓" | "→" =>
 
   return delta > 0 ? "↑" : "↓";
 };
+
+export type CompactFreshnessMeta = {
+  updatedAtLabel: string;
+  confidenceCue: string;
+  maxAge: "fresh" | "stale";
+  line: string;
+};
+
+export const buildCompactFreshnessMeta = ({
+  updatedAtLabel,
+  confidenceLabel,
+  isFallbackSnapshot,
+}: {
+  updatedAtLabel: string;
+  confidenceLabel: "HIGH" | "MED" | "LOW";
+  isFallbackSnapshot: boolean;
+}): CompactFreshnessMeta => {
+  const normalizedUpdatedAt = updatedAtLabel.trim().length > 0 ? updatedAtLabel.trim() : "Unavailable";
+  const staleByDate = normalizedUpdatedAt === "Unavailable";
+  const maxAge: "fresh" | "stale" = isFallbackSnapshot || staleByDate ? "stale" : "fresh";
+  const confidenceCue = confidenceLabel === "HIGH" ? "high-reliability" : confidenceLabel === "MED" ? "mixed-reliability" : "low-reliability";
+  const fallbackCue = maxAge === "stale" ? "degraded" : "live";
+
+  return {
+    updatedAtLabel: normalizedUpdatedAt,
+    confidenceCue,
+    maxAge,
+    line: `Updated ${normalizedUpdatedAt} · ${fallbackCue} · ${confidenceCue}`,
+  };
+};

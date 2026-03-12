@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { loadReportDataSafe } from "../../../../lib/report/reportData";
-import { parseAsOfSearchParam, rejectUnsupportedCliQuery } from "../../../../lib/cli/queryContracts";
+import { parseAsOfSearchParam, parseWeeksSearchParam, rejectUnsupportedCliQuery } from "../../../../lib/cli/queryContracts";
 
 export const runtime = "edge";
 export const revalidate = 0;
 export const dynamic = "force-dynamic";
 
+const DEFAULT_WINDOW_WEEKS = 12;
+const MAX_WINDOW_WEEKS = 52;
+
 export async function GET(request: NextRequest) {
-  const invalidQuery = rejectUnsupportedCliQuery(request, ["asOf"]);
+  const invalidQuery = rejectUnsupportedCliQuery(request, ["asOf", "weeks"]);
   if (invalidQuery) return invalidQuery;
 
   const searchParams = parseAsOfSearchParam(request.nextUrl.searchParams.get("asOf"));
@@ -15,18 +18,33 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Invalid asOf input. Expected YYYY-MM." }, { status: 400 });
   }
 
+  const weeksParam = parseWeeksSearchParam({
+    weeks: request.nextUrl.searchParams.get("weeks"),
+    defaultWeeks: DEFAULT_WINDOW_WEEKS,
+    maxWeeks: MAX_WINDOW_WEEKS,
+  });
+  if (weeksParam === null) {
+    return NextResponse.json({ error: "Invalid weeks input. Expected integer between 1 and 52." }, { status: 400 });
+  }
+
   const reportResult = await loadReportDataSafe(searchParams, { route: "/api/cli/history" });
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
+
+  const history = reportData.regimeSeries.slice(-weeksParam.windowWeeks).reverse().map((entry) => ({
+    recordDate: entry.recordDate,
+    regime: entry.regime,
+    confidenceLabel: entry.confidenceLabel,
+    trend: entry.directionLabel,
+  }));
 
   return NextResponse.json({
     version: "v1",
     generatedAt: new Date().toISOString(),
-    history: reportData.regimeSeries.slice(-12).reverse().map((entry) => ({
-      recordDate: entry.recordDate,
-      regime: entry.regime,
-      confidenceLabel: entry.confidenceLabel,
-      trend: entry.directionLabel,
-    })),
+    windowWeeks: history.length,
+    requestedWeeks: weeksParam.requestedWeeks,
+    maxWeeks: MAX_WINDOW_WEEKS,
+    truncatedToMax: weeksParam.truncatedToMax,
+    history,
     degraded: !reportResult.ok,
   });
 }

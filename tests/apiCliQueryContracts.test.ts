@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { parseAsOfSearchParam, rejectUnsupportedCliQuery } from "../lib/cli/queryContracts";
+import { parseAsOfSearchParam, parseWeeksSearchParam, rejectUnsupportedCliQuery } from "../lib/cli/queryContracts";
 
 describe("api cli query contracts", () => {
   it("parses supported asOf values into report search params", () => {
@@ -25,4 +25,25 @@ describe("api cli query contracts", () => {
       supported: ["asOf"],
     });
   });
+
+  it("parses weeks with defaults, valid custom values, invalid values, and max clamping", () => {
+    assert.deepEqual(
+      parseWeeksSearchParam({ weeks: null, defaultWeeks: 12, maxWeeks: 52 }),
+      { requestedWeeks: 12, windowWeeks: 12, truncatedToMax: false },
+    );
+
+    assert.deepEqual(
+      parseWeeksSearchParam({ weeks: "8", defaultWeeks: 12, maxWeeks: 52 }),
+      { requestedWeeks: 8, windowWeeks: 8, truncatedToMax: false },
+    );
+
+    assert.equal(parseWeeksSearchParam({ weeks: "abc", defaultWeeks: 12, maxWeeks: 52 }), null);
+    assert.equal(parseWeeksSearchParam({ weeks: "0", defaultWeeks: 12, maxWeeks: 52 }), null);
+
+    assert.deepEqual(
+      parseWeeksSearchParam({ weeks: "200", defaultWeeks: 12, maxWeeks: 52 }),
+      { requestedWeeks: 200, windowWeeks: 52, truncatedToMax: true },
+    );
+  });
+
 });

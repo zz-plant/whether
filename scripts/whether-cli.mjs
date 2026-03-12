@@ -12,7 +12,7 @@ Usage:
   whether <command> [flags]
 
 Core Commands:
-  status        Show current operating environment and call
+  status        Show current operating environment and call (use --verbose for bounded decision detail)
   call          Show leadership recommendation
   changes       Show what changed since last refresh
   regime        Show regime and confidence
@@ -36,6 +36,7 @@ Setup:
 
 const SUB_HELP = {
   call: "Usage: whether call [show|copy|diff] [--json|--yaml|--markdown]",
+  status: "Usage: whether status [--verbose|--view expanded] [--json] [--as-of <date>]",
   diagnostics: "Usage: whether diagnostics [summary|drivers|evidence|provenance] [--json] [--as-of <date>]",
   history: "Usage: whether history [compare] [--weeks <n>] [--json] [--as-of <date>]",
   brief: "Usage: whether brief [exec|board|staff|investor|slack|email] [--copy]",
@@ -162,14 +163,27 @@ const getJson = async (settings, endpoint) => {
   return response.json();
 };
 
-const statusText = (body) => `Whether — Current Status\n\nRegime:             ${body.regime}\nCycle Phase:        ${body.cyclePhase}\nConfidence:         ${body.confidence.label} (${body.confidence.score})\nTrend:              ${body.trend}\nDecision Stability: ${body.decisionStability}\nUpdated:            ${body.updatedAt}\n\nThis Week's Call:\n${body.call.summary}\n\nDo:\n${body.call.do.map((item) => `- ${item}`).join("\n")}\n\nAvoid:\n${body.call.avoid.map((item) => `- ${item}`).join("\n")}\n\nFlip Conditions:\n${body.call.flipConditions.map((item) => `- ${item}`).join("\n")}`;
 
-const callText = (body) => `Call: ${body.call}\n\nLeadership should:\n${body.leadershipShould.map((item) => `- ${item}`).join("\n")}\n\nWatch:\n${body.watch.map((item) => `- ${item}`).join("\n")}`;
-const changesText = (body) => `What Changed Since Last Refresh\n\nCHANGED\n${body.changed.map((item) => `- ${item.metric} ${item.from} → ${item.to} (${item.direction}, ${item.impact})`).join("\n")}\n\nREVISIT\n${body.revisit.map((item) => `- ${item}`).join("\n")}\n\nFLIP\n${body.flip.map((item) => `- ${item.condition}${typeof item.distance === "number" ? ` (${item.distance} away)` : ""}`).join("\n")}`;
+const freshnessText = (body) => {
+  if (body.freshness?.line) return body.freshness.line;
+  const updated = body.updatedAt ?? "Unavailable";
+  const confidence = body.confidence?.label ? String(body.confidence.label).toLowerCase() : "unknown";
+  const degraded = body.degraded ? "degraded" : "live";
+  return `Updated ${updated} · ${degraded} · ${confidence}-reliability`;
+};
+
+const statusText = (body) => `Whether — Current Status\n\nRegime:             ${body.regime}\nCycle Phase:        ${body.cyclePhase}\nConfidence:         ${body.confidence.label} (${body.confidence.score})\nTrend:              ${body.trend}\nDecision Stability: ${body.decisionStability}\nFreshness:          ${freshnessText(body)}\n\nThis Week's Call:\n${body.call.summary}\n\nDo:\n${body.call.do.map((item) => `- ${item}`).join("\n")}\n\nAvoid:\n${body.call.avoid.map((item) => `- ${item}`).join("\n")}\n\nFlip Conditions:\n${body.call.flipConditions.map((item) => `- ${item}`).join("\n")}`;
+
+const callText = (body) => `Call: ${body.call}
+Freshness: ${freshnessText(body)}\n\nLeadership should:\n${body.leadershipShould.map((item) => `- ${item}`).join("\n")}\n\nWatch:\n${body.watch.map((item) => `- ${item}`).join("\n")}`;
+const changesText = (body) => `What Changed Since Last Refresh
+Freshness: ${freshnessText(body)}\n\nCHANGED\n${body.changed.map((item) => `- ${item.metric} ${item.from} → ${item.to} (${item.direction}, ${item.impact})`).join("\n")}\n\nREVISIT\n${body.revisit.map((item) => `- ${item}`).join("\n")}\n\nFLIP\n${body.flip.map((item) => `- ${item.condition}${typeof item.distance === "number" ? ` (${item.distance} away)` : ""}`).join("\n")}`;
 
 const routeWithCommonParams = (base, flags) => {
   const params = new URLSearchParams();
   if (flags["as-of"]) params.set("asOf", String(flags["as-of"]));
+  if (flags.weeks) params.set("weeks", String(flags.weeks));
+  if (flags.view) params.set("view", String(flags.view));
   if (flags.company) params.set("company", String(flags.company));
   if (flags.stage) params.set("stage", String(flags.stage));
   const query = params.toString();
@@ -183,8 +197,24 @@ const writeFileIfRequested = async (flags, payload, settings) => {
 };
 
 const cmdStatus = async (settings, flags) => {
-  const body = await getJson(settings, routeWithCommonParams("/api/cli/status", flags));
-  const rendered = flags.summary ? body.call.summary : statusText(body);
+  if (flags.help) return writeOutput(SUB_HELP.status, settings);
+  const route = routeWithCommonParams("/api/cli/status", {
+    ...flags,
+    view: flags.verbose || flags.view === "expanded" ? "expanded" : undefined,
+  });
+  const body = await getJson(settings, route);
+  const expandedTail = body.view === "expanded"
+    ? `
+
+Bounded Decision:
+Guardrail: ${body.boundedDecision.guardrailThreshold}
+Reversal: ${body.boundedDecision.reversalTrigger}
+Flip (compact):
+${body.boundedDecision.flipConditionsCompact.map((item) => `- ${item}`).join("\n")}
+Top deltas:
+${body.boundedDecision.topDeltas.map((item) => `- ${item.metric} ${item.direction} (${item.delta})`).join("\n")}`
+    : "";
+  const rendered = flags.summary ? body.call.summary : `${statusText(body)}${expandedTail}`;
   await writeFileIfRequested(flags, rendered, settings);
   writeOutput(settings.output === "text" ? rendered : body, settings);
 };
@@ -242,13 +272,15 @@ const cmdHistory = async (settings, subcommand, flags) => {
   if (flags.help) return writeOutput(SUB_HELP.history, settings);
   const body = await getJson(settings, routeWithCommonParams("/api/cli/history", flags));
   if (subcommand === "compare") {
-    return writeOutput(`Compare mode (${flags.from ?? "start"} -> ${flags.to ?? "end"})\n${body.history[0]?.recordDate ?? "n/a"} latest snapshot`, settings);
+    return writeOutput(`Compare mode (${flags.from ?? "start"} -> ${flags.to ?? "end"})
+${body.history[0]?.recordDate ?? "n/a"} latest snapshot`, settings);
   }
-  const weeks = Number(flags.weeks ?? 12);
-  const items = body.history.slice(0, weeks);
-  const text = `Recent History\n\n${items.map((item) => `${item.recordDate}  ${item.regime}  ${item.confidenceLabel}  ${item.trend}`).join("\n")}`;
-  writeOutput(settings.output === "text" ? text : { ...body, history: items }, settings);
+  const text = `Recent History (${body.windowWeeks}w, max ${body.maxWeeks})
+
+${body.history.map((item) => `${item.recordDate}  ${item.regime}  ${item.confidenceLabel}  ${item.trend}`).join("\n")}`;
+  writeOutput(settings.output === "text" ? text : body, settings);
 };
+
 
 const cmdBrief = async (settings, subcommand, flags) => {
   if (flags.help) return writeOutput(SUB_HELP.brief, settings);
@@ -402,6 +434,11 @@ const cmdWatch = async (settings, flags) => {
 const main = async () => {
   const parsed = parseArgs(process.argv.slice(2));
   if (parsed.command === "--help" || parsed.command === "help") {
+    console.log(HELP);
+    return;
+  }
+
+  if (parsed.flags.help && process.argv.slice(2).every((token) => token.startsWith("--"))) {
     console.log(HELP);
     return;
   }

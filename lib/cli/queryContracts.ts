@@ -42,3 +42,45 @@ export const parseAsOfSearchParam = (asOf: string | null) => {
     year: String(year),
   };
 };
+
+
+export const parseWeeksSearchParam = ({
+  weeks,
+  defaultWeeks,
+  maxWeeks,
+}: {
+  weeks: string | null;
+  defaultWeeks: number;
+  maxWeeks: number;
+}): { requestedWeeks: number; windowWeeks: number; truncatedToMax: boolean } | null => {
+  if (weeks === null) {
+    return {
+      requestedWeeks: defaultWeeks,
+      windowWeeks: defaultWeeks,
+      truncatedToMax: false,
+    };
+  }
+
+  if (!/^\d+$/.test(weeks)) {
+    return null;
+  }
+
+  const parsed = Number(weeks);
+  if (!Number.isInteger(parsed) || parsed < 1) {
+    return null;
+  }
+
+  if (parsed > maxWeeks) {
+    return {
+      requestedWeeks: parsed,
+      windowWeeks: maxWeeks,
+      truncatedToMax: true,
+    };
+  }
+
+  return {
+    requestedWeeks: parsed,
+    windowWeeks: parsed,
+    truncatedToMax: false,
+  };
+};
