@@ -26,7 +26,7 @@ This section maps the currently pinned stack to newer stable versions and highli
 | ESLint | 9.38.0 | 9.39.2 | Flat config-first ecosystem direction and updated rule/tooling compatibility expectations. |
 
 ### Research sources used for this snapshot
-- `npm view <package> version` for version baselining.
+- `bun outdated` plus registry/version release notes for version baselining.
 - Next.js 16 release post: <https://nextjs.org/blog/next-16>
 - React 19 release post: <https://react.dev/blog/2024/12/05/react-19>
 - Tailwind CSS v4 release post: <https://tailwindcss.com/blog/tailwindcss-v4>
