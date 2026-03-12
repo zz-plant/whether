@@ -45,6 +45,7 @@ const renderItems = (items: string[]) => {
 };
 
 const labelClassName = "text-[11px] font-semibold tracking-[0.18em] text-slate-400";
+const panelClassName = "weather-surface rounded-xl border border-slate-700/70 bg-slate-950/70 p-3";
 
 export const RegimeCommandBar = ({
   regime,
@@ -62,30 +63,35 @@ export const RegimeCommandBar = ({
     >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.14),transparent_45%)]" aria-hidden="true" />
       <div className="relative grid gap-4 text-xs sm:grid-cols-2 lg:grid-cols-[0.85fr,1.15fr,1.4fr,1.4fr,0.85fr]">
-        <article className="weather-surface rounded-xl border border-slate-700/70 bg-slate-950/70 p-3">
+        <article className={panelClassName}>
           <p className={labelClassName}>REGIME</p>
+          <span className="mt-1 block h-px w-10 bg-slate-700/80" aria-hidden="true" />
           <span className={`mt-2 inline-flex min-h-[30px] items-center rounded-full border px-2.5 text-xs font-semibold tracking-[0.08em] ${regimeStyle.toneClass}`}>
             {regimeStyle.label}
           </span>
         </article>
 
-        <article className="weather-surface rounded-xl border border-slate-700/70 bg-slate-950/70 p-3">
+        <article className={panelClassName}>
           <p className={labelClassName}>CALL</p>
+          <span className="mt-1 block h-px w-10 bg-slate-700/80" aria-hidden="true" />
           <p className="mt-2 text-sm font-medium leading-relaxed text-slate-50">{call}</p>
         </article>
 
-        <article className="weather-surface rounded-xl border border-slate-700/70 bg-slate-950/70 p-3">
+        <article className={panelClassName}>
           <p className={labelClassName}>DO NOW</p>
+          <span className="mt-1 block h-px w-10 bg-slate-700/80" aria-hidden="true" />
           <div className="mt-2">{renderItems(doNow)}</div>
         </article>
 
-        <article className="weather-surface rounded-xl border border-slate-700/70 bg-slate-950/70 p-3">
+        <article className={panelClassName}>
           <p className={labelClassName}>FLIP CONDITIONS</p>
+          <span className="mt-1 block h-px w-10 bg-slate-700/80" aria-hidden="true" />
           <div className="mt-2">{renderItems(flipConditions)}</div>
         </article>
 
-        <article className="weather-surface rounded-xl border border-slate-700/70 bg-slate-950/70 p-3">
+        <article className={panelClassName}>
           <p className={labelClassName}>Updated</p>
+          <span className="mt-1 block h-px w-10 bg-slate-700/80" aria-hidden="true" />
           <p className="mt-2 text-sm leading-relaxed text-slate-200">{updatedAt}</p>
         </article>
       </div>
