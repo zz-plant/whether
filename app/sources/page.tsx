@@ -6,6 +6,7 @@ import { buildCompactTrustSummary, buildWeeklyCitationMetaLine } from "../../lib
 import { buildBreadcrumbList, buildPageMetadata, serializeJsonLd } from "../../lib/seo";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { BreadcrumbTrail } from "../components/breadcrumbTrail";
+import { SourceHealthPanel } from "./components/sourceHealthPanel";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -52,6 +53,8 @@ export default async function SourcesPage() {
         <p className="text-sm text-slate-300">What changed this week: verify source status and freshness before escalating irreversible decisions.</p>
         <p className="text-sm text-slate-200">Immediate implication: {reportData.actionNowShort}</p>
       </section>
+
+      <SourceHealthPanel rows={reportData.sourceHealth} />
 
       <section className="weather-panel space-y-3 px-6 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Current source coverage</h2>
