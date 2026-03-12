@@ -4,6 +4,7 @@ import { loadReportDataSafe } from "../../../lib/report/reportData";
 import { buildPageMetadata } from "../../../lib/seo";
 import { buildWeeklyMandatePayload, integrationTargets } from "../../../lib/integrationBriefs";
 import { WorkAppLabel } from "../../components/workAppIcon";
+import { recordCommittedPostureDecisionEvent } from "../../../lib/report/postureStateSource";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Planning integrations — Whether",
@@ -14,7 +15,14 @@ export const metadata: Metadata = buildPageMetadata({
 
 export default async function OperationsIntegrationsPage() {
   const reportResult = await loadReportDataSafe(undefined, { route: "/operations/integrations" });
-  const { assessment, treasury } = reportResult.ok ? reportResult.data : reportResult.fallback;
+  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
+  const { assessment, treasury } = reportData;
+  const postureState = recordCommittedPostureDecisionEvent({
+    recordDate: treasury.record_date,
+    assessment,
+    reportDynamics: reportData.reportDynamics,
+    previousRegime: reportData.regimeAlert?.previousRegime ?? null,
+  });
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
@@ -29,7 +37,7 @@ export default async function OperationsIntegrationsPage() {
             <h2 className="text-lg font-semibold text-slate-100"><WorkAppLabel app={target} label={target} className="inline-flex items-center gap-2 capitalize" /></h2>
             <p className="text-xs text-slate-300">Endpoint: <code>/api/integrations/weekly-mandate?target={target}</code></p>
             <pre className="overflow-x-auto rounded-lg border border-slate-700/70 bg-slate-950/60 p-3 text-xs text-slate-200">
-{JSON.stringify(buildWeeklyMandatePayload(target, assessment, treasury), null, 2)}
+{JSON.stringify(buildWeeklyMandatePayload(target, assessment, treasury, postureState), null, 2)}
             </pre>
           </article>
         ))}
