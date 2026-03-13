@@ -126,7 +126,10 @@ const useNextOnPages =
     (!forceNextBuild &&
       enableAutoNextOnPages &&
       (isCloudflarePages || isCloudflareDeploy)) ||
-    (!forceNextBuild && isCi && projectExpectsNextOnPagesWorker));
+    (!forceNextBuild &&
+      enableAutoNextOnPages &&
+      isCi &&
+      projectExpectsNextOnPagesWorker));
 const forceWebpackBuild = isTruthyEnv(process.env.NEXT_BUILD_FORCE_WEBPACK);
 const hasAnyCloudflareBuildOutput = hasVercelBuildOutput || hasWorkerBuildOutput;
 const shouldAutoSkipInCi =
