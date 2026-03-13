@@ -131,6 +131,15 @@ Whenever a route is renamed or reorganized, complete all of the following in the
 
 Rule of thumb: redirects exist for bookmarked/external traffic only. Product-owned links must always point to canonical routes.
 
+### Legacy answer redirect map workflow
+
+For legacy answer slugs, use the centralized registry in `lib/navigation/legacyRedirects.ts` instead of creating one-off route files under `app/<legacy-slug>/page.tsx`.
+
+- Add one `{ legacyPath, targetPath }` entry to `legacyRedirects`.
+- Keep `legacyPath` as the old slug path (e.g., `/old-slug`) and `targetPath` as the canonical destination (usually `/answers/<slug>`).
+- The dynamic route at `app/[legacySlug]/page.tsx` handles `permanentRedirect` behavior for every mapped slug.
+- Add or update route tests in `tests/legacyAnswerRedirectRoutes.test.ts` to confirm parity.
+
 
 ## 11) Noun discipline glossary (primary surfaces)
 
