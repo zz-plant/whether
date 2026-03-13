@@ -1798,6 +1798,9 @@ export const MacroSignalsPanel = ({
   );
 };
 
+export const getVisibleActionLaneItems = <T,>(items: T[], showAll: boolean) =>
+  (showAll ? items : items.slice(0, 3));
+
 export const PlaybookPanel = ({
   playbook,
   stopItems,
@@ -1806,6 +1809,7 @@ export const PlaybookPanel = ({
   provenance,
   showProvenance = true,
   actionStripItems = [],
+  showAllActionLanes = false,
 }: {
   playbook: PlaybookEntry | null;
   stopItems: string[];
@@ -1814,7 +1818,12 @@ export const PlaybookPanel = ({
   provenance: DataProvenance;
   showProvenance?: boolean;
   actionStripItems?: ActionStripItem[];
+  showAllActionLanes?: boolean;
 }) => {
+  const visibleStopItems = getVisibleActionLaneItems(stopItems, showAllActionLanes);
+  const visibleStartItems = getVisibleActionLaneItems(startItems, showAllActionLanes);
+  const visibleFenceItems = getVisibleActionLaneItems(fenceItems, showAllActionLanes);
+  const visibleActionStripItems = getVisibleActionLaneItems(actionStripItems, showAllActionLanes);
   const playbookQuickLinks = [
     { href: "/operations#ops-decision-shield", label: "Decision shield" },
     { href: "/operations#ops-strategy-brief", label: "Strategy brief" },
@@ -1847,7 +1856,7 @@ export const PlaybookPanel = ({
                 <div className="weather-surface border-l-4 border-rose-500/50 bg-rose-500/10 p-4">
                   <p className="text-xs font-semibold tracking-[0.12em] text-rose-100">Don&apos;t (stop)</p>
                   <ul className="mt-3 space-y-2 text-sm text-slate-300">
-                    {stopItems.map((item) => (
+                    {visibleStopItems.map((item) => (
                       <li key={item} className="break-words">
                         • {item}
                       </li>
@@ -1857,7 +1866,7 @@ export const PlaybookPanel = ({
                 <div className="weather-surface border-l-4 border-emerald-400/50 bg-emerald-500/10 p-4">
                   <p className="text-xs font-semibold tracking-[0.12em] text-emerald-100">Do (start)</p>
                   <ul className="mt-3 space-y-2 text-sm text-slate-300">
-                    {startItems.map((item) => (
+                    {visibleStartItems.map((item) => (
                       <li key={item} className="break-words">
                         • {item}
                       </li>
@@ -1867,7 +1876,7 @@ export const PlaybookPanel = ({
                 <div className="weather-surface border-l-4 border-sky-400/50 p-4">
                   <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Fence</p>
                   <ul className="mt-3 space-y-2 text-sm text-slate-300">
-                    {fenceItems.map((item) => (
+                    {visibleFenceItems.map((item) => (
                       <li key={item} className="break-words">
                         • {item}
                       </li>
@@ -1879,7 +1888,7 @@ export const PlaybookPanel = ({
                 <div className="weather-surface p-4">
                   <p className="text-xs font-semibold tracking-[0.12em] text-slate-400">Action strip contract</p>
                   <ul className="mt-3 space-y-2 text-xs text-slate-300">
-                    {actionStripItems.slice(0, 3).map((item) => (
+                    {visibleActionStripItems.map((item) => (
                       <li key={item.lever} className="rounded-md border border-slate-700/70 bg-slate-900/70 p-2">
                         <p className="font-semibold text-slate-100">{item.label}</p>
                         <p className="mt-1 text-emerald-100">Action now: {item.actionNow}</p>
