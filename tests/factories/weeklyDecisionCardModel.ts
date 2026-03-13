@@ -5,6 +5,7 @@ export type WeeklyDecisionCardModelOverrides = Partial<{
   decision: Partial<WeeklyDecisionCardViewModel["decision"]>;
   diagnostics: Partial<WeeklyDecisionCardViewModel["diagnostics"]>;
   history: Partial<WeeklyDecisionCardViewModel["history"]>;
+  sinceLastReview: Partial<WeeklyDecisionCardViewModel["sinceLastReview"]>;
   artifact: Partial<WeeklyDecisionCardViewModel["artifact"]>;
 }>;
 
@@ -101,6 +102,17 @@ export const buildWeeklyDecisionCardModel = (
     historicalAnalogs: [],
     macroOverlay: [{ label: "VC funding", detail: "-4.5 · ↑ improving" }],
     ...overrides.history,
+  },
+  sinceLastReview: {
+    isReturningUser: true,
+    hasMeaningfulDelta: true,
+    fallbackCopy: "",
+    items: [
+      { id: "posture-shift", label: "Posture shift", detail: "Posture moved from Volatile to Defensive.", href: "/decide" },
+      { id: "top-driver", label: "Top driver change", detail: "Capital tightness tightened.", href: "/signals" },
+      { id: "trigger-risk", label: "Trigger / risk change", detail: "Guardrail now tightened.", href: "/operations" },
+    ],
+    ...overrides.sinceLastReview,
   },
   artifact: {
     citation: "Whether weekly brief citation",
