@@ -46,16 +46,44 @@ const getInitialMode = (): DisplayMode => {
   return "auto";
 };
 
+const getRenderedMode = (): DisplayMode | null => {
+  const currentMode = document.documentElement.dataset.displayMode;
+  if (currentMode === "tv" || currentMode === "auto") {
+    return currentMode;
+  }
+
+  return null;
+};
+
 const applyMode = (mode: DisplayMode) => {
   const nextMode = mode === "auto" && hasCoarsePointer() ? "tv" : mode;
+
+  if (getRenderedMode() === nextMode) {
+    return;
+  }
+
   document.documentElement.dataset.displayMode = nextMode;
 };
 
 const persistMode = (mode: DisplayMode) => {
+  if (window.localStorage.getItem(STORAGE_KEY) === mode) {
+    return;
+  }
+
   window.localStorage.setItem(STORAGE_KEY, mode);
 };
 
 const syncUrl = (mode: DisplayMode) => {
+  const currentMode = getUrlMode();
+
+  if (mode === "auto" && currentMode === null) {
+    return;
+  }
+
+  if (currentMode === mode) {
+    return;
+  }
+
   const nextUrl = new URL(window.location.href);
 
   if (mode === "auto") {
@@ -67,15 +95,21 @@ const syncUrl = (mode: DisplayMode) => {
   window.history.replaceState({}, "", nextUrl);
 };
 
+export const initializeDisplayMode = (): DisplayMode => {
+  const initialMode = getInitialMode();
+  applyMode(initialMode);
+  persistMode(initialMode);
+  syncUrl(initialMode);
+
+  return initialMode;
+};
+
 export const useDisplayMode = () => {
   const [mode, setMode] = useState<DisplayMode>("auto");
 
   useEffect(() => {
-    const initialMode = getInitialMode();
+    const initialMode = initializeDisplayMode();
     setMode(initialMode);
-    applyMode(initialMode);
-    persistMode(initialMode);
-    syncUrl(initialMode);
 
     const onMediaChange = () => {
       if (window.localStorage.getItem(STORAGE_KEY) === "auto") {
