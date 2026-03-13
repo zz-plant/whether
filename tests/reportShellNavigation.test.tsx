@@ -9,7 +9,7 @@ describe("Report shell page navigation", () => {
     const html = renderToStaticMarkup(
       <ReportPageNavigation
         pageLinks={reportPageLinks}
-        pageTitle="Weekly Brief"
+        pageTitle="Start"
         currentPath="/"
       />,
     );
@@ -18,7 +18,7 @@ describe("Report shell page navigation", () => {
     assert.match(html, />Operate</);
     assert.match(html, />Reference</);
 
-    assert.match(html, /Weekly Brief/);
+    assert.match(html, /Start/);
     assert.match(html, /Live posture call, confidence, and immediate operator actions\./);
 
     assert.match(html, /Signals/);

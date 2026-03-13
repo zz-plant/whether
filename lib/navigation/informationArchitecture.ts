@@ -28,7 +28,7 @@ export const navigationLayers: NavigationLayer[] = [
   {
     key: "weekly-brief",
     href: "/",
-    label: "Weekly Brief",
+    label: "Start",
     description: "Live posture call, confidence, and immediate operator actions.",
     boundary: "Outcome snapshot only; detailed evidence and playbooks live in downstream hubs.",
     group: "core",
@@ -68,7 +68,7 @@ export const navigationLayers: NavigationLayer[] = [
   {
     key: "learn",
     href: "/learn",
-    label: "Concepts & Diagnostics",
+    label: "Learn",
     description: "Use failure modes and concept references for operator education.",
     boundary: "Diagnostic and conceptual references only; no new canonical guidance.",
     group: "reference",
@@ -76,7 +76,7 @@ export const navigationLayers: NavigationLayer[] = [
   {
     key: "method",
     href: "/method",
-    label: "Methodology & Data",
+    label: "Method",
     description: "Review formulas, sources, cadence, and confidence limits.",
     boundary: "Transparency surfaces only.",
     group: "reference",
