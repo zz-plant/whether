@@ -4,6 +4,7 @@
  */
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 
 type DisplayGuardianProps = {
@@ -19,6 +20,7 @@ export const DisplayGuardian = ({
   driftPixels = 2,
   driftIntervalSeconds = 45,
 }: DisplayGuardianProps) => {
+  const router = useRouter();
   const lastInteractionAt = useRef(Date.now());
   const lastRefreshAt = useRef(Date.now());
 
@@ -31,48 +33,56 @@ export const DisplayGuardian = ({
 
   useEffect(() => {
     const refreshMs = clamp(refreshMinutes, 2, 60) * 60 * 1000;
-    const heartbeatMs = 30 * 1000;
-
-    const refresh = () => {
-      lastRefreshAt.current = Date.now();
-      window.location.reload();
-    };
+    let heartbeatTimer: number | null = null;
 
     const refreshIfStale = () => {
       const now = Date.now();
       const idleMs = now - lastInteractionAt.current;
       const elapsedSinceRefresh = now - lastRefreshAt.current;
+
       if (idleMs >= refreshMs || elapsedSinceRefresh >= refreshMs) {
-        refresh();
+        lastRefreshAt.current = now;
+        router.refresh();
       }
     };
 
     const updateInteraction = () => {
       lastInteractionAt.current = Date.now();
     };
+
     const handleVisibility = () => {
       if (document.visibilityState === "visible") {
         refreshIfStale();
       }
     };
-    const events = ["pointerdown", "keydown", "scroll", "touchstart"];
+
+    const scheduleHeartbeat = () => {
+      heartbeatTimer = window.setTimeout(() => {
+        refreshIfStale();
+        scheduleHeartbeat();
+      }, 30 * 1000);
+    };
+
+    const events = ["pointerdown", "keydown"];
     events.forEach((eventName) => {
       window.addEventListener(eventName, updateInteraction, { passive: true });
     });
+
     window.addEventListener("online", refreshIfStale);
     document.addEventListener("visibilitychange", handleVisibility);
-
-    const refreshTimer = window.setInterval(refreshIfStale, heartbeatMs);
+    scheduleHeartbeat();
 
     return () => {
-      window.clearInterval(refreshTimer);
+      if (heartbeatTimer) {
+        window.clearTimeout(heartbeatTimer);
+      }
       events.forEach((eventName) => {
         window.removeEventListener(eventName, updateInteraction);
       });
       window.removeEventListener("online", refreshIfStale);
       document.removeEventListener("visibilitychange", handleVisibility);
     };
-  }, [refreshMinutes]);
+  }, [refreshMinutes, router]);
 
   useEffect(() => {
     let wakeLock: WakeLockSentinel | null = null;

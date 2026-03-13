@@ -83,9 +83,14 @@ export const ClimateBackdrop = ({ regime }: { regime: RegimeIconType | "NEUTRAL"
   };
 
   const styles = getRegimeStyles(regime);
-  const animationClassName = allowAnimation && styles.animation !== "none"
-    ? `animate-${styles.animation}`
-    : "";
+  const animationClassByKey = {
+    "aurora-shift": "animate-aurora-shift",
+    "display-drift": "animate-display-drift",
+    "pulse-slow": "animate-pulse-slow",
+    sheen: "animate-sheen",
+    none: "",
+  } as const;
+  const animationClassName = allowAnimation ? animationClassByKey[styles.animation] : "";
 
   return (
     <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
