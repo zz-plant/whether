@@ -45,6 +45,7 @@ import { buildPostureState } from "../lib/report/postureStateSource";
 import { buildCanonicalDecisionCopy, buildFlipConditionsWithoutTriggerDuplication } from "../lib/report/canonicalDecisionCopy";
 import { Skeleton } from "./components/skeleton";
 import { homeSectionSequence } from "../lib/report/homeSections";
+import { StagedReveal } from "./components/stagedReveal";
 
 export const revalidate = 900;
 export const runtime = "edge";
@@ -189,8 +190,8 @@ const HomePageStreamingFallback = () => (
 
 const ArtifactActionsFallback = () => (
   <div
-    aria-live="polite"
     aria-busy="true"
+    aria-label="Loading share artifacts"
     className="space-y-3 rounded-lg border border-slate-700/70 bg-slate-950/65 px-3 py-3"
   >
     <div className="flex items-center justify-between gap-2">
@@ -206,7 +207,7 @@ const ArtifactActionsFallback = () => (
 );
 
 const WeeklyDiagnosticsFallback = () => (
-  <section aria-label="Loading diagnostics lane" className="space-y-3" aria-busy="true" aria-live="polite">
+  <section aria-label="Loading diagnostics lane" className="space-y-3" aria-busy="true">
     <article className="rounded-xl border border-slate-800/45 bg-slate-950/62 p-4">
       <div className="flex items-center justify-between gap-2">
         <Skeleton className="h-4 w-44 rounded-full bg-slate-600/75" />
@@ -734,36 +735,46 @@ export const HomePageReportContent = async ({
         isFallbackSnapshot={isFallback && !historicalSelection}
         failureModes={homeBriefModel.failureModes}
         actions={(
-          <Suspense fallback={<ArtifactActionsFallback />}>
-            <LeadershipArtifactActions
-              artifactPayloadPromise={leadershipArtifactPayloadPromise}
-              fallbackActive={!historicalSelection && Boolean(treasury.fallback_at || treasury.fallback_reason)}
-            />
-          </Suspense>
+          <StagedReveal
+            delayMs={220}
+            placeholder={<div className="h-[98px] rounded-lg border border-slate-800/60 bg-slate-950/35" aria-hidden="true" />}
+          >
+            <Suspense fallback={<ArtifactActionsFallback />}>
+              <LeadershipArtifactActions
+                artifactPayloadPromise={leadershipArtifactPayloadPromise}
+                fallbackActive={!historicalSelection && Boolean(treasury.fallback_at || treasury.fallback_reason)}
+              />
+            </Suspense>
+          </StagedReveal>
         )}
         diagnosticsLane={(
-          <Suspense fallback={<WeeklyDiagnosticsFallback />}>
-            <WeeklyDecisionDiagnosticsLaneDeferred
-              weeklyMemoLines={homeBriefModel.weeklyMemoLines}
-              immediateDecision={immediateDecision}
-              revisitDecisions={homeBriefModel.revisitDecisions}
-              guardrail={homeBriefModel.guardrail}
-              regimeDistance={homeBriefModel.regimeDistance}
-              postureWithStageLabel={homeBriefModel.postureWithStageLabel}
-              statusLabel={statusLabel}
-              trendLabel={homeBriefModel.trendLabel}
-              confidencePercent={homeBriefModel.confidencePercent}
-              decisionMatrix={homeBriefModel.decisionMatrix}
-              decisionRules={homeBriefModel.decisionRules}
-              roleAwareTemplates={homeBriefModel.roleAwareTemplates}
-              evidenceItems={homeBriefModel.evidenceItems}
-              reportDynamics={reportDynamics}
-              weeklyMovement={homeBriefModel.weeklyMovement}
-              transitionProbabilities={homeBriefModel.transitionProbabilities}
-              failureModes={homeBriefModel.failureModes}
-              historicalTimeline={homeBriefModel.historicalTimeline}
-            />
-          </Suspense>
+          <StagedReveal
+            delayMs={520}
+            placeholder={<div className="h-[238px] rounded-xl border border-slate-800/60 bg-slate-950/35" aria-hidden="true" />}
+          >
+            <Suspense fallback={<WeeklyDiagnosticsFallback />}>
+              <WeeklyDecisionDiagnosticsLaneDeferred
+                weeklyMemoLines={homeBriefModel.weeklyMemoLines}
+                immediateDecision={immediateDecision}
+                revisitDecisions={homeBriefModel.revisitDecisions}
+                guardrail={homeBriefModel.guardrail}
+                regimeDistance={homeBriefModel.regimeDistance}
+                postureWithStageLabel={homeBriefModel.postureWithStageLabel}
+                statusLabel={statusLabel}
+                trendLabel={homeBriefModel.trendLabel}
+                confidencePercent={homeBriefModel.confidencePercent}
+                decisionMatrix={homeBriefModel.decisionMatrix}
+                decisionRules={homeBriefModel.decisionRules}
+                roleAwareTemplates={homeBriefModel.roleAwareTemplates}
+                evidenceItems={homeBriefModel.evidenceItems}
+                reportDynamics={reportDynamics}
+                weeklyMovement={homeBriefModel.weeklyMovement}
+                transitionProbabilities={homeBriefModel.transitionProbabilities}
+                failureModes={homeBriefModel.failureModes}
+                historicalTimeline={homeBriefModel.historicalTimeline}
+              />
+            </Suspense>
+          </StagedReveal>
         )}
       />
 
