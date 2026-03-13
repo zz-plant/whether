@@ -18,7 +18,7 @@ import {
   websiteName,
   buildSocialImageUrl,
 } from "../lib/seo";
-import { HistoricalBanner } from "./components/boardBriefSections";
+import { HistoricalBanner } from "./components/historicalBanner";
 import { ReportShell } from "./components/reportShell";
 import { reportPageLinks } from "../lib/report/reportNavigation";
 import { buildTrustStatus } from "../lib/report/trustStatus";
@@ -44,17 +44,10 @@ import { getRegimeDisplayLabel } from "../lib/regimePresentation";
 import { buildPostureState } from "../lib/report/postureStateSource";
 import { buildCanonicalDecisionCopy, buildFlipConditionsWithoutTriggerDuplication } from "../lib/report/canonicalDecisionCopy";
 import { Skeleton } from "./components/skeleton";
+import { homeSectionSequence } from "../lib/report/homeSections";
 
 export const revalidate = 900;
 export const runtime = "edge";
-
-const homeSectionSequence = [
-  { href: "#weekly-posture-brief-title", label: "Call" },
-  { href: "#decision-snapshot-for-leadership-this-week", label: "Decide the call" },
-  { href: "#execution-guidance", label: "Run the plan" },
-  { href: "#evidence-diagnostics", label: "Stress-test evidence" },
-] as const;
-
 
 export const generateMetadata = async ({
   searchParams,

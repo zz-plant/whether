@@ -13,7 +13,7 @@ import {
 } from "../../lib/seo";
 import { ReportShell } from "../components/reportShell";
 import { RelatedReportLinks } from "../components/relatedReportLinks";
-import { HistoricalBanner } from "../components/boardBriefSections";
+import { HistoricalBanner } from "../components/historicalBanner";
 import { reportPageLinks } from "../../lib/report/reportNavigation";
 import { ReturningVisitorDeltaStrip } from "../components/changeSinceLastReadPanel";
 import { buildTrustStatus } from "../../lib/report/trustStatus";

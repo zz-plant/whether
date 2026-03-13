@@ -96,6 +96,9 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
   const [isExpanded, setIsExpanded] = useState(true);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const commandCenterRef = useRef<HTMLElement | null>(null);
+  const queryRef = useRef(query);
+  const isExpandedRef = useRef(isExpanded);
+  const pendingQueryPersistRef = useRef<number | null>(null);
   const haptic = useHapticFeedback();
   const { copyToClipboard } = useClipboardCopy();
   // Haptics should reinforce decision delta and artifact completion, not decorative interaction.
@@ -152,12 +155,40 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
   }, []);
 
   useEffect(() => {
-    sessionStorage.setItem(STORAGE_KEY, query);
+    queryRef.current = query;
+
+    if (pendingQueryPersistRef.current !== null) {
+      window.clearTimeout(pendingQueryPersistRef.current);
+    }
+
+    pendingQueryPersistRef.current = window.setTimeout(() => {
+      sessionStorage.setItem(STORAGE_KEY, queryRef.current);
+      pendingQueryPersistRef.current = null;
+    }, 180);
+
+    return () => {
+      if (pendingQueryPersistRef.current !== null) {
+        window.clearTimeout(pendingQueryPersistRef.current);
+      }
+    };
   }, [query]);
+
+  useEffect(() => () => {
+    if (pendingQueryPersistRef.current !== null) {
+      window.clearTimeout(pendingQueryPersistRef.current);
+      pendingQueryPersistRef.current = null;
+    }
+
+    sessionStorage.setItem(STORAGE_KEY, queryRef.current);
+  }, []);
 
   useEffect(() => {
     sessionStorage.setItem(FILTER_STORAGE_KEY, filter);
   }, [filter]);
+
+  useEffect(() => {
+    isExpandedRef.current = isExpanded;
+  }, [isExpanded]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -167,7 +198,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
         }
 
         event.preventDefault();
-        if (!isExpanded) {
+        if (!isExpandedRef.current) {
           setIsExpanded(true);
         }
         searchInputRef.current?.focus();
@@ -177,14 +208,14 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
         setQuery("");
       }
 
-      if (event.key === "Backspace" && document.activeElement === searchInputRef.current && query.length === 0) {
+      if (event.key === "Backspace" && document.activeElement === searchInputRef.current && queryRef.current.length === 0) {
         setIsExpanded(false);
       }
     };
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [isExpanded, query.length]);
+  }, []);
 
   useEffect(() => {
     if (!isExpanded || !commandCenterRef.current) {

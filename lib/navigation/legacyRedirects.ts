@@ -13,3 +13,7 @@ export const redirectWithParams = async <TParams extends Record<string, string>>
   const params = await paramsPromise;
   permanentRedirect(resolveTargetPath(params) as RedirectTarget);
 };
+
+export const redirectLegacyAnswer = (slug: string): never => {
+  return redirectTo(`/answers/${slug}`);
+};

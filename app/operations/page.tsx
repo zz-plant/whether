@@ -8,7 +8,7 @@ import {
   getAdjacentTimeMachineRequest,
 } from "../../lib/timeMachine/timeMachineSelection";
 import { ReportShell } from "../components/reportShell";
-import { HistoricalBanner } from "../components/boardBriefSections";
+import { HistoricalBanner } from "../components/historicalBanner";
 import {
   FinanceStrategyPanel,
   MonthlyActionSummaryPanel,

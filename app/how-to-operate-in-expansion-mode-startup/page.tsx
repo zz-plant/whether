@@ -1,7 +1,7 @@
-import { redirect } from "next/navigation";
+import { redirectLegacyAnswer } from "../../lib/navigation/legacyRedirects";
 
 export const revalidate = 900;
 
 export default function LegacyAnswerRoute() {
-  redirect("/answers/how-to-operate-in-expansion-mode-startup");
+  redirectLegacyAnswer("how-to-operate-in-expansion-mode-startup");
 }

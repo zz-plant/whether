@@ -66,9 +66,9 @@ import {
 import { useClipboardCopy } from "./useClipboardCopy";
 export {
   ExecutiveSnapshotPanel,
-  HistoricalBanner,
   WeeklyActionSummaryPanel,
 } from "./boardBriefSections";
+export { HistoricalBanner } from "./historicalBanner";
 
 type SeriesFreshnessProps = {
   label?: string;
