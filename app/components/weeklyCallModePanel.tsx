@@ -6,7 +6,13 @@ import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import type { StartupVariantMode } from "../../lib/report/boundedDecisionRules";
 import type { StartupVariantPolicy } from "../../lib/report/homeBriefModel";
+import { homeSectionSequence } from "../../lib/report/homeSections";
 import { StartupModeSelector, type StartupModeContent } from "./startupModeSelector";
+
+const callSectionHref = homeSectionSequence[0]?.href ?? "#weekly-posture-brief-title";
+const decideSectionHref = homeSectionSequence[1]?.href ?? "#decision-snapshot-for-leadership-this-week";
+const executionSectionHref = homeSectionSequence[2]?.href ?? "#execution-guidance";
+const evidenceSectionHref = homeSectionSequence[3]?.href ?? "#evidence-diagnostics";
 
 type WeeklyCallModePanelProps = {
   startupVariantPolicy: StartupVariantPolicy;
@@ -28,10 +34,10 @@ type WeeklyCallModePanelProps = {
 };
 
 const commandActions = [
-  { label: "Jump: This week's call", href: "#weekly-call-core", type: "Section" },
-  { label: "Jump: Decide the call", href: "#decision-snapshot-for-leadership-this-week", type: "Section" },
-  { label: "Jump: Execution guidance", href: "#execution-guidance", type: "Section" },
-  { label: "Jump: Evidence diagnostics", href: "#evidence-diagnostics", type: "Section" },
+  { label: "Jump: This week's call", href: callSectionHref, type: "Section" },
+  { label: "Jump: Decide the call", href: decideSectionHref, type: "Section" },
+  { label: "Jump: Execution guidance", href: executionSectionHref, type: "Section" },
+  { label: "Jump: Evidence diagnostics", href: evidenceSectionHref, type: "Section" },
   { label: "Open Signals", href: "/signals", type: "Page" },
   { label: "Open Operations", href: "/operations", type: "Page" },
   { label: "Open Decide", href: "/decide", type: "Page" },

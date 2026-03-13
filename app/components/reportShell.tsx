@@ -33,6 +33,34 @@ type ReportCtaProps = { href: string; label: string; copyText?: string; copyTarg
 type SecondaryCtaProps = { href: string; label: string };
 type ExportCtaProps = { href: string; label: string };
 
+const isInternalHref = (href: string) => href.startsWith("/") || href.startsWith("#");
+
+const InternalAwareLink = ({
+  href,
+  className,
+  children,
+  ariaCurrent,
+}: {
+  href: string;
+  className: string;
+  children: ReactNode;
+  ariaCurrent?: "page" | "step";
+}) => {
+  if (isInternalHref(href)) {
+    return (
+      <Link href={href} className={className} aria-current={ariaCurrent}>
+        {children}
+      </Link>
+    );
+  }
+
+  return (
+    <a href={href} className={className} aria-current={ariaCurrent}>
+      {children}
+    </a>
+  );
+};
+
 type DecisionBanner = {
   label?: string;
   decision: string;
@@ -236,7 +264,7 @@ export function CommandCenterNavBlock({
               <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
                 {roleSwitcher.options.map((option) => {
                   const isActive = option.key === roleSwitcher.active;
-                  return <a key={option.key} href={option.href} aria-current={isActive ? "page" : undefined} className={`weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-sm font-semibold tracking-[0.08em] ${isActive ? "border-sky-300/80 text-slate-100" : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"}`}>{option.label}</a>;
+                  return <InternalAwareLink key={option.key} href={option.href} ariaCurrent={isActive ? "page" : undefined} className={`weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-sm font-semibold tracking-[0.08em] ${isActive ? "border-sky-300/80 text-slate-100" : "text-slate-300 hover:border-sky-400/70 hover:text-slate-100"}`}>{option.label}</InternalAwareLink>;
                 })}
               </div>
             </div>
@@ -249,10 +277,10 @@ export function CommandCenterNavBlock({
 
         <div id="report-primary-actions" className="flex w-full min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
           <ReportCta href={primaryCta.href} copyText={primaryCta.copyText} copyTarget={primaryCta.copyTarget} label={primaryCta.label} className="weather-cta weather-cta-primary w-full max-w-full text-center sm:w-auto"><span className="max-w-full break-words text-center">{primaryCta.label}</span></ReportCta>
-          {secondaryCta ? <a href={secondaryCta.href} className="weather-cta weather-cta-secondary w-full sm:w-auto">{secondaryCta.label}</a> : null}
-          {exportCta ? <a href={exportCta.href} className="weather-cta weather-cta-export w-full sm:w-auto">{exportCta.label}</a> : null}
+          {secondaryCta ? <InternalAwareLink href={secondaryCta.href} className="weather-cta weather-cta-secondary w-full sm:w-auto">{secondaryCta.label}</InternalAwareLink> : null}
+          {exportCta ? <InternalAwareLink href={exportCta.href} className="weather-cta weather-cta-export w-full sm:w-auto">{exportCta.label}</InternalAwareLink> : null}
         </div>
-        {nextStep ? <p className="text-xs font-semibold tracking-[0.1em] text-slate-300">Next step: <a href={nextStep.href} className="text-sky-200 underline decoration-slate-500/80 underline-offset-4">{nextStep.description}</a></p> : null}
+        {nextStep ? <p className="text-xs font-semibold tracking-[0.1em] text-slate-300">Next step: <InternalAwareLink href={nextStep.href} className="text-sky-200 underline decoration-slate-500/80 underline-offset-4">{nextStep.description}</InternalAwareLink></p> : null}
         <dl className="weather-surface weather-meta-list min-h-[44px] px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100" aria-label="Current report status">
           <div className="weather-meta-list__item"><dt className="text-slate-400">Posture</dt><dd>{statusLabel}</dd></div>
           <div className="weather-meta-list__item"><dt className="text-slate-400">Confidence</dt><dd>{trustStatusLabel}</dd></div>
@@ -270,7 +298,7 @@ export function CommandCenterNavBlock({
             <h2 className="text-lg font-semibold text-slate-100 sm:text-xl">{primaryDecisionText}</h2>
             <p className="text-sm text-slate-300">{missionSupportText}</p>
             {decisionDiffs?.length ? <ul className="mt-2 flex flex-wrap gap-2" aria-label="Decision deltas">{decisionDiffs.map((item) => <li key={item.label} className="inline-flex min-h-[28px] items-center rounded-full border border-slate-700/80 bg-slate-900/60 px-2 py-1 text-[11px] font-semibold tracking-[0.12em] text-slate-200">{item.label}</li>)}</ul> : null}
-            {decisionBanner?.evidenceHref ? <a href={decisionBanner.evidenceHref} className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline">Review evidence trail<ArrowRightIcon className="ml-1 h-3.5 w-3.5" /></a> : null}
+            {decisionBanner?.evidenceHref ? <InternalAwareLink href={decisionBanner.evidenceHref} className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline">Review evidence trail<ArrowRightIcon className="ml-1 h-3.5 w-3.5" /></InternalAwareLink> : null}
           </article>
           <article className="weather-surface space-y-3 p-4">
             <p className="text-sm font-semibold tracking-[0.12em] text-slate-400">{missionSequenceTitle}</p>
@@ -290,10 +318,10 @@ export function SidebarSequenceBlock({ stageRail }: { stageRail?: { title?: stri
       <ol className="grid gap-2 md:grid-cols-5">
         {stageRail.items.map((item, index) => (
           <li key={item.id}>
-            <a href={item.href} className="weather-pill inline-flex min-h-[44px] w-full items-center gap-2 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200" aria-current={item.status === "current" ? "step" : undefined}>
+            <InternalAwareLink href={item.href} className="weather-pill inline-flex min-h-[44px] w-full items-center gap-2 px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200" ariaCurrent={item.status === "current" ? "step" : undefined}>
               <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-current text-[10px]">{index + 1}</span>
               <span>{item.label}</span>
-            </a>
+            </InternalAwareLink>
           </li>
         ))}
       </ol>
@@ -343,7 +371,7 @@ export const ReportShell = ({
 }: ReportShellProps) => {
   const resolvedNextRefreshLabel = nextRefreshLabel ?? (trustStatusTone === "historical" ? "Fixed historical snapshot" : "15m cadence");
   const contentSections = Children.toArray(children);
-  const summaryLink = pageSummaryLink ? <a href={pageSummaryLink.href} className="inline-flex min-h-[44px] items-center text-xs font-semibold text-sky-200 underline decoration-slate-500/80 underline-offset-4">{pageSummaryLink.label}</a> : null;
+  const summaryLink = pageSummaryLink ? <InternalAwareLink href={pageSummaryLink.href} className="inline-flex min-h-[44px] items-center text-xs font-semibold text-sky-200 underline decoration-slate-500/80 underline-offset-4">{pageSummaryLink.label}</InternalAwareLink> : null;
   const hasSidebar = sidebarVariant === "full";
   const missionSequenceLabels = ["Now", "Next", "Later"];
   const missionSequenceTitle = actionSequence?.title ?? "Plan";
@@ -412,7 +440,7 @@ export const ReportShell = ({
 
         {showPageNavigation ? <div className="sm:hidden"><ReportMobileNavigation pageLinks={pageLinks} pageTitle={pageTitle} currentPath={currentPath} className="mt-3 px-4 pb-6" sectionLinks={sectionLinks} /></div> : null}
 
-        <aside className="tv-action-rail" aria-label="TV quick actions"><p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Quick actions</p><div className="mt-2 grid gap-2"><ReportCta href={primaryCta.href} copyText={primaryCta.copyText} copyTarget={primaryCta.copyTarget} label={primaryCta.label} className="weather-button-primary inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-100">{primaryCta.label}</ReportCta>{secondaryCta ? <a href={secondaryCta.href} className="weather-pill inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-200">{secondaryCta.label}</a> : null}<DisplayModeToggle /></div></aside>
+        <aside className="tv-action-rail" aria-label="TV quick actions"><p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Quick actions</p><div className="mt-2 grid gap-2"><ReportCta href={primaryCta.href} copyText={primaryCta.copyText} copyTarget={primaryCta.copyTarget} label={primaryCta.label} className="weather-button-primary inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-100">{primaryCta.label}</ReportCta>{secondaryCta ? <InternalAwareLink href={secondaryCta.href} className="weather-pill inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-200">{secondaryCta.label}</InternalAwareLink> : null}<DisplayModeToggle /></div></aside>
       </main>
     </>
   );

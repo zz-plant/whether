@@ -1,7 +1,7 @@
-import { redirect } from "next/navigation";
+import { redirectLegacyAnswer } from "../../lib/navigation/legacyRedirects";
 
 export const revalidate = 900;
 
 export default function LegacyAnswerRoute() {
-  redirect("/answers/from-hiring-freeze-to-selective-offense");
+  redirectLegacyAnswer("from-hiring-freeze-to-selective-offense");
 }

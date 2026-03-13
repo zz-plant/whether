@@ -96,6 +96,8 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
   const [isExpanded, setIsExpanded] = useState(true);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const commandCenterRef = useRef<HTMLElement | null>(null);
+  const queryRef = useRef(query);
+  const isExpandedRef = useRef(isExpanded);
   const haptic = useHapticFeedback();
   const { copyToClipboard } = useClipboardCopy();
   // Haptics should reinforce decision delta and artifact completion, not decorative interaction.
@@ -152,12 +154,22 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
   }, []);
 
   useEffect(() => {
-    sessionStorage.setItem(STORAGE_KEY, query);
+    queryRef.current = query;
+
+    const timeoutId = window.setTimeout(() => {
+      sessionStorage.setItem(STORAGE_KEY, query);
+    }, 180);
+
+    return () => window.clearTimeout(timeoutId);
   }, [query]);
 
   useEffect(() => {
     sessionStorage.setItem(FILTER_STORAGE_KEY, filter);
   }, [filter]);
+
+  useEffect(() => {
+    isExpandedRef.current = isExpanded;
+  }, [isExpanded]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -167,7 +179,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
         }
 
         event.preventDefault();
-        if (!isExpanded) {
+        if (!isExpandedRef.current) {
           setIsExpanded(true);
         }
         searchInputRef.current?.focus();
@@ -177,14 +189,14 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
         setQuery("");
       }
 
-      if (event.key === "Backspace" && document.activeElement === searchInputRef.current && query.length === 0) {
+      if (event.key === "Backspace" && document.activeElement === searchInputRef.current && queryRef.current.length === 0) {
         setIsExpanded(false);
       }
     };
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [isExpanded, query.length]);
+  }, []);
 
   useEffect(() => {
     if (!isExpanded || !commandCenterRef.current) {

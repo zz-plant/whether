@@ -19,6 +19,17 @@ import {
   buildCompactTrustSummary,
 } from "../../lib/report/trustStatus";
 import type { CanonicalDecisionCopy } from "../../lib/report/canonicalDecisionCopy";
+import { homeSectionSequence } from "../../lib/report/homeSections";
+
+const callSectionHref = homeSectionSequence[0]?.href ?? "#weekly-posture-brief-title";
+const decideSectionHref = homeSectionSequence[1]?.href ?? "#decision-snapshot-for-leadership-this-week";
+const evidenceSectionHref = homeSectionSequence[3]?.href ?? "#evidence-diagnostics";
+
+const sectionHrefByLabel = {
+  call: callSectionHref,
+  decide: decideSectionHref,
+  evidence: evidenceSectionHref,
+} as const;
 
 type WhyThisCallItem = { label: string; detail: string };
 type MemoryRailItem = { label: string; posture: string };
@@ -411,21 +422,21 @@ const buildDecisionDeltaStripItems = ({
       label: "Changed",
       detail: firstDelta,
       impact: "high",
-      href: "#weekly-call-core",
+      href: sectionHrefByLabel.call,
     },
     {
       id: "revisit",
       label: "Revisit",
       detail: revisitDecisions ? `YES — ${guardrail}` : "NO — Hold last week’s operating posture.",
       impact: revisitDecisions ? "high" : "low",
-      href: "#decision-snapshot-for-leadership-this-week",
+      href: sectionHrefByLabel.decide,
     },
     {
       id: "flip",
       label: "Flip",
       detail: `${regimeDistance.dimensionLabel} ${flipDirection} ${regimeDistance.thresholdValue.toFixed(1)} (${flipDistance} pts away).`,
       impact: flipDistance <= 3 ? "high" : "medium",
-      href: "#evidence-diagnostics",
+      href: sectionHrefByLabel.evidence,
     },
   ];
 };
