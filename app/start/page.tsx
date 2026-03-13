@@ -33,5 +33,16 @@ export default async function StartHerePage() {
         trendLabel={weeklyDecisionCardModel.status.trendLabel}
       />
     </main>
+    <LegacyRouteBridge
+      eyebrow="Legacy route bridge"
+      title="Start routing now lives in Weekly Brief"
+      description="Use Weekly Brief for the canonical posture call, then jump to Action playbook guardrails. This route remains only for legacy links."
+      primaryHref="/"
+      primaryLabel="Go to Weekly Brief"
+      secondaryHref="/operations"
+      secondaryLabel="Go to Action playbook"
+      autoForwardSeconds={3}
+      moreActionsLabel="More actions"
+    />
   );
 }

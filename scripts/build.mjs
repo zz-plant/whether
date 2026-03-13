@@ -51,6 +51,22 @@ const workerIndexPath = join(
   "index.js",
 );
 const vercelOutputConfigPath = join(".vercel", "output", "config.json");
+const wranglerConfigPath = "wrangler.toml";
+
+const projectExpectsNextOnPagesWorker = (() => {
+  if (!existsSync(wranglerConfigPath)) {
+    return false;
+  }
+
+  try {
+    const wranglerConfig = readFileSync(wranglerConfigPath, "utf8");
+    return /main\s*=\s*["']\.vercel\/output\/static\/_worker\.js["']/.test(
+      wranglerConfig,
+    );
+  } catch {
+    return false;
+  }
+})();
 
 const readBuildMeta = () => {
   if (!existsSync(buildMetaPath)) {
@@ -102,10 +118,15 @@ const hasReusableBuildOutput =
 const forceCloudflareBuild =
   buildTarget === "cloudflare" || buildTarget === "pages";
 const forceNextBuild = buildTarget === "next";
+// Guard auto-detection because next-on-pages currently requires all dynamic routes to run on Edge.
+const enableAutoNextOnPages = isTruthyEnv(process.env.NEXT_ON_PAGES_AUTO);
 const useNextOnPages =
   !isVercelRuntime &&
   (forceCloudflareBuild ||
-    (!forceNextBuild && (isCloudflarePages || isCloudflareDeploy)));
+    (!forceNextBuild &&
+      enableAutoNextOnPages &&
+      (isCloudflarePages || isCloudflareDeploy)) ||
+    (!forceNextBuild && isCi && projectExpectsNextOnPagesWorker));
 const forceWebpackBuild = isTruthyEnv(process.env.NEXT_BUILD_FORCE_WEBPACK);
 const hasAnyCloudflareBuildOutput = hasVercelBuildOutput || hasWorkerBuildOutput;
 const shouldAutoSkipInCi =

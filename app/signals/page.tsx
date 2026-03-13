@@ -43,6 +43,25 @@ export const metadata: Metadata = buildPageMetadata({
   },
 });
 
+export function buildDiagnosticsExpansionHref(
+  searchParams: Record<string, string | undefined> | undefined,
+  showAll: boolean,
+) {
+  const params = new URLSearchParams();
+  if (searchParams) {
+    Object.entries(searchParams).forEach(([key, value]) => {
+      if (value && key !== "diagnostics") {
+        params.set(key, value);
+      }
+    });
+  }
+  if (showAll) {
+    params.set("diagnostics", "all");
+  }
+  const query = params.toString();
+  return query ? `/signals?${query}#signal-diagnostics` : "/signals#signal-diagnostics";
+}
+
 export default async function SignalsPage({
   searchParams,
 }: {
@@ -207,22 +226,6 @@ export default async function SignalsPage({
     }
     const query = params.toString();
     return query ? `/signals?${query}` : "/signals";
-  };
-
-  const buildDiagnosticsHref = (showAll: boolean) => {
-    const params = new URLSearchParams();
-    if (resolvedSearchParams) {
-      Object.entries(resolvedSearchParams).forEach(([key, value]) => {
-        if (value && key !== "diagnostics") {
-          params.set(key, value);
-        }
-      });
-    }
-    if (showAll) {
-      params.set("diagnostics", "all");
-    }
-    const query = params.toString();
-    return query ? `/signals?${query}#signal-diagnostics` : "/signals#signal-diagnostics";
   };
 
   const buildFocusHref = (focus: FocusTab) => {
@@ -627,7 +630,7 @@ export default async function SignalsPage({
             </p>
           </div>
           <a
-            href={buildDiagnosticsHref(!showFullDiagnostics)}
+            href={buildDiagnosticsExpansionHref(resolvedSearchParams, !showFullDiagnostics)}
             className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
           >
             {showFullDiagnostics ? "Show top 3 only" : "Show full diagnostics"}

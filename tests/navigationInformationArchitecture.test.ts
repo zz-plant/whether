@@ -32,7 +32,22 @@ describe("navigation information architecture", () => {
     assert.equal(hrefs.size, navigationLayers.length);
     assert.equal(labels.size, navigationLayers.length);
 
-    assert.equal(navigationLabelByPath["/"], "Weekly Brief");
-    assert.equal(navigationLabelByPath["/method"], "Methodology & Data");
+    assert.equal(navigationLabelByPath["/"], "Start");
+    assert.equal(navigationLabelByPath["/signals"], "Signals");
+    assert.equal(navigationLabelByPath["/operations"], "Operations");
+    assert.equal(navigationLabelByPath["/decide"], "Decide");
+    assert.equal(navigationLabelByPath["/toolkits"], "Toolkits");
+    assert.equal(navigationLabelByPath["/learn"], "Learn");
+    assert.equal(navigationLabelByPath["/method"], "Method");
+  });
+
+  it("keeps canonical route transitions for Decide and Method", () => {
+    const decideLayer = navigationLayers.find((layer) => layer.key === "decide");
+    const methodLayer = navigationLayers.find((layer) => layer.key === "method");
+
+    assert.equal(decideLayer?.href, "/decide");
+    assert.equal(methodLayer?.href, "/method");
+    assert.equal(decideLayer?.href.startsWith("#"), false);
+    assert.equal(methodLayer?.href.startsWith("#"), false);
   });
 });
