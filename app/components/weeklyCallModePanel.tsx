@@ -111,27 +111,53 @@ export function WeeklyCallModePanel({
       <article className="rounded-xl border border-slate-700/75 bg-slate-950/92 p-3" aria-label="Weekly call snapshot">
         <div className="flex items-center justify-between gap-2">
           <h2 className="text-sm font-semibold tracking-[0.01em] text-slate-50">Weekly call snapshot</h2>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Quick share summary for this week</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Decide, align, and share in under 60 seconds</p>
         </div>
-        <ol className="mt-2 grid gap-1.5 text-[11px] text-slate-100" aria-label="Weekly decision transmission order">
-          <li className={compactInsetClassName}><span className="font-semibold text-slate-200">Regime:</span> {postureLabel}</li>
-          <li className={compactInsetClassName}><span className="font-semibold text-slate-200">Call:</span> {operatingCall}</li>
-          <li className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-emerald-200">Do now:</span> {snapshotDoNow}</li>
-          <li className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-sky-200">Flip conditions:</span> {effectiveFlipLabels[0] ?? snapshotWatch}</li>
+        <ol className="mt-2 grid gap-2 text-[11px] text-slate-100" aria-label="Weekly decision transmission order">
+          <li className="rounded-md border border-slate-700/60 bg-slate-900/65 px-2.5 py-2">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Regime</span>
+            <p className="mt-1 text-xs font-semibold text-slate-100">{postureLabel}</p>
+          </li>
+          <li className="rounded-md border border-slate-700/60 bg-slate-900/65 px-2.5 py-2">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Operating call</span>
+            <p className="mt-1 text-xs font-semibold text-slate-100">{operatingCall}</p>
+          </li>
+          <li className="grid gap-2 sm:grid-cols-3">
+            <div className="rounded-md border border-emerald-400/35 bg-emerald-500/10 px-2.5 py-2">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-200">Do now</p>
+              <p className="mt-1 text-[11px] leading-relaxed text-emerald-50">{snapshotDoNow}</p>
+            </div>
+            <div className="rounded-md border border-rose-400/35 bg-rose-500/10 px-2.5 py-2">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-rose-200">Avoid</p>
+              <p className="mt-1 text-[11px] leading-relaxed text-rose-50">{snapshotAvoid}</p>
+            </div>
+            <div className="rounded-md border border-sky-400/35 bg-sky-500/10 px-2.5 py-2">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Watch</p>
+              <p className="mt-1 text-[11px] leading-relaxed text-sky-50">{snapshotWatch}</p>
+            </div>
+          </li>
+          <li className="rounded-md border border-sky-500/35 bg-sky-500/10 px-2.5 py-2">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Flip conditions</p>
+            <ul className="mt-1 grid gap-1 text-[11px] text-slate-100">
+              {(effectiveFlipLabels.length > 0 ? effectiveFlipLabels.slice(0, 2) : [snapshotWatch]).map((label) => (
+                <li key={label} className={compactInsetClassName}>• {label}</li>
+              ))}
+            </ul>
+          </li>
         </ol>
         <details className="mt-2 rounded-md border border-slate-700/60 bg-slate-950/55 px-2.5 py-2">
           <summary className="cursor-pointer text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Secondary diagnostics</summary>
           <ul className="mt-2 grid gap-1.5 text-[11px] text-slate-100 sm:grid-cols-2">
             <li className={compactInsetClassName}><span className="font-semibold text-slate-200">Trend:</span> {trendLabel}</li>
             <li className={compactInsetClassName}><span className="font-semibold text-slate-200">Confidence:</span> {confidenceValue}% ({confidenceLabel})</li>
-            <li className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-rose-200">Avoid:</span> {snapshotAvoid}</li>
-            <li className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-sky-200">Watch:</span> {snapshotWatch}</li>
+            <li className={compactInsetClassName}><span className="font-semibold text-slate-200">Stage variant:</span> {selectedModeLabel ?? "Default"}</li>
+            <li className={compactInsetClassName}><span className="font-semibold text-slate-200">Refresh action:</span> Recheck flip cues before approving fixed-cost adds.</li>
           </ul>
         </details>
         <div className="mt-2 rounded-md border border-slate-700/60 bg-slate-950/55 px-2.5 py-2" aria-label="Decision confidence gauge">
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Decision confidence</p>
           <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-slate-800/90" role="progressbar" aria-valuenow={confidenceValue} aria-valuemin={0} aria-valuemax={100} aria-label={`Confidence ${confidenceValue} percent`}>
-            <div className={`h-full ${confidenceToneClass} transition-[width] duration-300`} style={{ width: `${confidenceValue}%` }} />
+            <div className={`h-full origin-left ${confidenceToneClass} transition-transform duration-300`} style={{ transform: `scaleX(${confidenceValue / 100})` }} />
           </div>
           <p className="mt-1 text-[10px] text-slate-300">{confidenceValue}% confidence · use flip cues when this drops.</p>
         </div>

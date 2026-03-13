@@ -163,10 +163,10 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
       />,
     );
 
-    const regimeIndex = html.indexOf("Regime:");
-    const callIndex = html.indexOf("Call:");
-    const doNowIndex = html.indexOf("Do now:");
-    const flipIndex = html.indexOf("Flip conditions:");
+    const regimeIndex = html.indexOf("Regime");
+    const callIndex = html.indexOf("Operating call");
+    const doNowIndex = html.indexOf("Do now");
+    const flipIndex = html.indexOf("Flip conditions");
 
     assert.ok(regimeIndex >= 0);
     assert.ok(callIndex > regimeIndex);
