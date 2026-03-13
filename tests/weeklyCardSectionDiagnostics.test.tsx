@@ -25,7 +25,7 @@ describe("DiagnosticsSection", () => {
         reportDynamics={model.decision.reportDynamics}
         weeklyMovement={model.decision.weeklyMovement}
         transitionProbabilities={model.decision.transitionProbabilities}
-        failureModes={model.diagnostics.failureModes}
+        failureModes={model.diagnostics.failureModes ?? []}
         historicalTimeline={model.history.historicalTimeline}
         renderBoundedRulesMatrix={() => <div>matrix</div>}
       />,

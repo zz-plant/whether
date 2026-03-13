@@ -47,7 +47,16 @@ export const ClimateBackdrop = ({ regime }: { regime: RegimeIconType | "NEUTRAL"
     };
   }, []);
 
-  const getRegimeStyles = (r: typeof regime) => {
+  const animationClassByKey = {
+    "aurora-shift": "animate-aurora-shift",
+    "display-drift": "animate-display-drift",
+    "pulse-slow": "animate-pulse-slow",
+    sheen: "animate-sheen",
+    none: "",
+  } as const;
+  type AnimationKey = keyof typeof animationClassByKey;
+
+  const getRegimeStyles = (r: typeof regime): { primary: string; secondary: string; animation: AnimationKey } => {
     switch (r) {
       case "EXPANSION":
         return {
@@ -83,13 +92,6 @@ export const ClimateBackdrop = ({ regime }: { regime: RegimeIconType | "NEUTRAL"
   };
 
   const styles = getRegimeStyles(regime);
-  const animationClassByKey = {
-    "aurora-shift": "animate-aurora-shift",
-    "display-drift": "animate-display-drift",
-    "pulse-slow": "animate-pulse-slow",
-    sheen: "animate-sheen",
-    none: "",
-  } as const;
   const animationClassName = allowAnimation ? animationClassByKey[styles.animation] : "";
 
   return (
