@@ -79,7 +79,6 @@ export const HomePageReportContent = async ({
       statusLabel={homepage.reportShell.statusLabel}
       recordDateLabel={homepage.reportShell.recordDateLabel}
       fetchedAtLabel={homepage.reportShell.fetchedAtLabel}
-      freshnessLine={homepage.reportShell.freshnessLine}
       treasurySource={homepage.reportShell.treasurySource}
       trustStatusLabel={homepage.reportShell.trustStatusLabel}
       trustStatusDetail={homepage.reportShell.trustStatusDetail}
