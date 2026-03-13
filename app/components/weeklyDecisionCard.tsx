@@ -7,6 +7,12 @@ import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules"
 import { decisionAreaLabel, type StartupVariantMode } from "../../lib/report/boundedDecisionRules";
 import type { StartupModeContent } from "./startupModeSelector";
 import { WeeklyCallModePanel } from "./weeklyCallModePanel";
+import { DecisionHeroSection } from "./weekly-card/DecisionHeroSection";
+import { DiagnosticsSection } from "./weekly-card/DiagnosticsSection";
+import { ActionStripSection } from "./weekly-card/ActionStripSection";
+import { PostureHistoryTimeline } from "./weekly-card/HistorySection";
+import type { DiagnosticsSectionProps } from "./weekly-card/types";
+import { compactActionCue, compactInset, compactRoleCue, compactSectionSpacing, disclosurePanelClass, disclosureSummaryClass, neutralLabel, sectionSpacing, tierOneHeading, tierOneInset, tierOnePanel, tierThreeHeading, tierThreePanel, tierTwoHeading, tierTwoInset, tierTwoPanel } from "./weekly-card/shared";
 import type { ActionStripItem, RoleAwareOperatingTemplate } from "../../lib/report/operatingCalls";
 import type { ForecastRegimeLabel, TransitionVelocityEstimate } from "../../lib/report/forecastModel";
 import type { RegimeKey } from "../../lib/regimeEngine";
@@ -68,190 +74,9 @@ export type WeeklyDecisionCardProps =
   | { model: WeeklyDecisionCardViewModel; actions?: ReactNode; diagnosticsLane?: ReactNode }
   | LegacyWeeklyDecisionCardProps;
 
-export type WeeklyDecisionDiagnosticsLaneProps = {
-  weeklyMemoLines: string[];
-  immediateDecision: string;
-  revisitDecisions: boolean;
-  guardrail: string;
-  regimeDistance: WeeklyDecisionCardModel["regimeDistance"];
-  postureWithStageLabel?: string;
-  statusLabel: string;
-  trendLabel: string;
-  confidencePercent: number;
-  decisionMatrix?: DecisionMatrixPayload;
-  decisionRules: BoundedDecisionRule[];
-  roleAwareTemplates: RoleAwareOperatingTemplate[];
-  evidenceItems: ReportEvidenceItem[];
-  reportDynamics: ReportDynamics;
-  weeklyMovement: WeeklyMovement;
-  transitionProbabilities: Record<ForecastRegimeLabel, number>;
-  failureModes: FailureModeWarningItem[];
-  historicalTimeline: WeeklyDecisionCardModel["historicalTimeline"];
-};
-
-export const WeeklyDecisionDiagnosticsLane = ({
-  weeklyMemoLines,
-  immediateDecision,
-  revisitDecisions,
-  guardrail,
-  regimeDistance,
-  postureWithStageLabel,
-  statusLabel,
-  trendLabel,
-  confidencePercent,
-  decisionMatrix,
-  decisionRules,
-  roleAwareTemplates,
-  evidenceItems,
-  reportDynamics,
-  weeklyMovement,
-  transitionProbabilities,
-  failureModes,
-  historicalTimeline,
-}: WeeklyDecisionDiagnosticsLaneProps) => {
-  const decisionDeltaStripItems = buildDecisionDeltaStripItems({
-    weeklyMemoLines,
-    immediateDecision,
-    revisitDecisions,
-    guardrail,
-    regimeDistance,
-  });
-  const topContributors = (reportDynamics.signalContributions ?? []).slice(0, 3);
-  const topContributorInline =
-    topContributors.length > 0
-      ? topContributors
-          .slice(0, 2)
-          .map((item) => `${item.label} (${item.normalizedPercentLabel})`)
-          .join(" · ")
-      : "No active contributors this week.";
-  const conciseWeeklyMovement = weeklyMovement.summary.replace(/\.$/, "");
-  const recentTimeline = historicalTimeline.slice(-2);
-
-  return (
-    <>
-      <article className={`${tierTwoPanel} ${sectionSpacing}`} aria-label="Need deeper analysis">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className={tierTwoHeading}>Need deeper analysis?</h2>
-          <p className="text-[11px] uppercase tracking-[0.1em] text-slate-400">Optional depth</p>
-        </div>
-        <p className="text-xs text-slate-300">Open diagnostics only when you need proof detail, role-level execution plans, or model input context.</p>
-
-        <Accordion.Root defaultValue={["since-last-review"]} className="space-y-2">
-          <Accordion.Item value="since-last-review" className="group">
-            <DiagnosticsAccordionTrigger label="Since last review" />
-            <Accordion.Panel>
-              <ul className="mt-3 grid gap-2 sm:grid-cols-3">
-                {decisionDeltaStripItems.map((item) => (
-                  <li key={item.id}>
-                    <Link href={item.href} className={`block min-h-[44px] rounded-lg border px-3 py-2 text-xs transition hover:border-slate-300/45 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${impactToneClass[item.impact]}`}>
-                      <p className="font-semibold uppercase tracking-[0.1em]">{item.label}</p>
-                      <p className="mt-1 leading-5 text-slate-100">{item.detail}</p>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </Accordion.Panel>
-          </Accordion.Item>
-
-          <Accordion.Item value="weekly-decision-brief" className="group">
-            <DiagnosticsAccordionTrigger label="Weekly decision brief" />
-            <Accordion.Panel>
-              <ul className="mt-3 grid gap-2 text-xs text-slate-200 sm:grid-cols-2">
-                <li className={tierOneInset}><span className="font-semibold text-slate-100">Regime:</span> {postureWithStageLabel ?? statusLabel}</li>
-                <li className={tierOneInset}><span className="font-semibold text-slate-100">Trend:</span> {trendLabel}</li>
-                <li className={tierOneInset}><span className="font-semibold text-slate-100">Confidence:</span> {Math.round(confidencePercent)}%</li>
-                <li className={tierOneInset}><span className="font-semibold text-slate-100">Next flip:</span> {regimeDistance.dimensionLabel} {regimeDistance.thresholdDirection === "riseAbove" ? "rises above" : "falls to or below"} {regimeDistance.thresholdValue.toFixed(1)}</li>
-              </ul>
-            </Accordion.Panel>
-          </Accordion.Item>
-
-          <Accordion.Item id="decision-snapshot-for-leadership-this-week" value="decision-snapshot" className="group">
-            <DiagnosticsAccordionTrigger label="Open diagnostics: decision snapshot matrix" />
-            <Accordion.Panel className={disclosurePanelClass}>
-              <BoundedRulesMatrix decisionMatrix={decisionMatrix} decisionRules={decisionRules} />
-            </Accordion.Panel>
-          </Accordion.Item>
-
-          <Accordion.Item id="execution-guidance" value="role-plan" className="group">
-            <DiagnosticsAccordionTrigger label="Open diagnostics: role plan" />
-            <Accordion.Panel className={`${disclosurePanelClass} grid gap-3 sm:grid-cols-2`}>
-              {roleAwareTemplates.map((template) => (
-                <article key={template.role} className={`${tierOneInset} space-y-2`}>
-                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-200">{template.roleLabel}</p>
-                  <p className="rounded-md border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-2 text-xs text-emerald-100"><span className="font-semibold uppercase tracking-[0.1em]">Approve now</span> {compactRoleCue(template.doNow)}</p>
-                  <p className="rounded-md border border-rose-500/40 bg-rose-500/10 px-2.5 py-2 text-xs text-rose-100"><span className="font-semibold uppercase tracking-[0.1em]">Delay now</span> {compactRoleCue(template.avoidNow)}</p>
-                  <p className="rounded-md border border-sky-500/40 bg-sky-500/10 px-2.5 py-2 text-xs text-sky-100"><span className="font-semibold uppercase tracking-[0.1em]">Flip when</span> {compactActionCue(template.flipTrigger)}</p>
-                </article>
-              ))}
-            </Accordion.Panel>
-          </Accordion.Item>
-
-          <Accordion.Item id="evidence-diagnostics" value="evidence-drivers-model-inputs" className={`${tierThreePanel} ${compactSectionSpacing} group`}>
-            <DiagnosticsAccordionTrigger label="Open diagnostics: evidence, drivers, and model inputs" />
-            <Accordion.Panel className={disclosurePanelClass}>
-              <article className={compactInset}>
-                <p className={`text-xs ${neutralLabel}`}>Evidence</p>
-                <ul className="mt-1 space-y-1 text-xs text-slate-200">
-                  {evidenceItems.map((item) => (
-                    <li key={`evidence-${item.key}`}>• {item.title} (Updated {item.lastUpdated ? formatDateUTC(item.lastUpdated) : "—"}): {item.immediateImplication}</li>
-                  ))}
-                </ul>
-              </article>
-
-              <article className={`${compactInset} mt-2`}>
-                <p className={`text-xs ${neutralLabel}`}>Drivers</p>
-                <p className="mt-1 text-xs text-slate-300">Top contributors: {topContributorInline}</p>
-                <p className="mt-1 text-xs text-slate-300">Weekly movement: {conciseWeeklyMovement}</p>
-              </article>
-
-              <article className={`${compactInset} mt-2`}>
-                <p className={`text-xs ${neutralLabel}`}>Model inputs</p>
-                <p className="mt-1 text-xs text-slate-300">Decision thresholds are in the matrix above.</p>
-                <p className="mt-1 text-xs text-slate-300">Defensive probability: {formatProbabilityPercent(transitionProbabilities.Defensive)}</p>
-              </article>
-              {failureModes.length > 0 ? (
-                <article className={`${compactInset} mt-2`}>
-                  <p className={`text-xs ${neutralLabel}`}>False-signal warnings</p>
-                  <ul className="mt-1 space-y-1 text-xs text-slate-300">
-                    {failureModes.slice(0, 2).map((mode) => (
-                      <li key={mode.id}>• {mode.warning}</li>
-                    ))}
-                  </ul>
-                </article>
-              ) : null}
-            </Accordion.Panel>
-          </Accordion.Item>
-        </Accordion.Root>
-      </article>
-
-      <article className={`${tierOnePanel} ${sectionSpacing}`}>
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className={tierOneHeading}>Regime history (recent)</h2>
-          <p className="text-[11px] uppercase tracking-[0.1em] text-slate-400">Last 2 checkpoints</p>
-        </div>
-        <PostureHistoryTimeline historicalTimeline={recentTimeline} />
-      </article>
-    </>
-  );
-};
-
-const sectionSpacing = "space-y-3";
-const tierOneHeading = "text-sm font-semibold tracking-[0.01em] text-slate-50";
-const tierTwoHeading = "text-sm font-semibold tracking-[0.01em] text-slate-200";
-const tierThreeHeading = "text-xs font-medium tracking-normal text-slate-400";
-const tierOnePanel = "rounded-xl border border-slate-700/55 bg-slate-950/84 p-5";
-const tierTwoPanel = "rounded-xl border border-slate-800/45 bg-slate-950/62 p-4";
-const tierThreePanel = "rounded-xl border border-slate-800/28 bg-slate-950/32 p-2.5";
-const tierOneInset = "rounded-lg border border-slate-800/55 bg-slate-950/62 px-3 py-3";
-const tierTwoInset = "rounded-md border border-slate-800/38 bg-slate-950/50 px-3 py-2.5";
-const tierThreeInset = "rounded-md border border-slate-800/24 bg-slate-950/28 px-2.5 py-2.5 text-slate-400";
-const compactSectionSpacing = "space-y-2";
-const compactInset = "rounded-md border border-slate-800/32 bg-slate-950/42 px-2.5 py-2";
-const neutralLabel = "font-semibold tracking-[0.01em] text-slate-300";
-const disclosureSummaryClass =
-  "flex min-h-[44px] w-full items-center justify-between gap-3 rounded-md border border-slate-800/52 bg-slate-950/56 px-3 py-2 text-left text-xs font-semibold tracking-[0.01em] text-slate-100 transition hover:border-slate-600/60 hover:bg-slate-900/74 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300";
-
-const disclosurePanelClass = "mt-3";
+export type WeeklyDecisionDiagnosticsLaneProps = DiagnosticsSectionProps;
+export const WeeklyDecisionDiagnosticsLane = DiagnosticsSection;
+export const DecisionCallHeader = DecisionHeroSection;
 
 const DiagnosticsAccordionTrigger = ({ label }: { label: string }) => (
   <Accordion.Header>
@@ -468,6 +293,25 @@ const resolveLiveBandChips = ({
   ];
 };
 
+const resolvePostureAndStage = ({
+  statusLabel,
+  postureLabel,
+  stageLabel,
+  postureWithStageLabel,
+}: {
+  statusLabel: string;
+  postureLabel?: string;
+  stageLabel?: string;
+  postureWithStageLabel?: string;
+}) => {
+  const [derivedPostureLabel, derivedStageLabel] = (postureWithStageLabel ?? "").split(" — ");
+
+  return {
+    resolvedPostureLabel: postureLabel ?? derivedPostureLabel ?? statusLabel,
+    resolvedStageLabel: stageLabel ?? derivedStageLabel ?? "Unspecified",
+  };
+};
+
 const resolveHeroUrgency = ({
   confidenceLabel,
   transitionWatch,
@@ -507,76 +351,6 @@ const resolvePosturePosition = (label: string) => {
   return 50;
 };
 
-
-const ActionStrip = ({ items }: { items: ActionStripItem[] }) => (
-  <section className={`${tierTwoPanel} ${sectionSpacing}`} aria-label="Action strip">
-    <div className="flex flex-wrap items-end justify-between gap-2">
-      <h3 className={tierTwoHeading}>Operating levers this week</h3>
-      <p className="text-[11px] text-slate-400">Action now · Trigger/threshold to tighten or loosen · Reversal condition</p>
-    </div>
-    <ul className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-      {items.map((item) => (
-        <li key={item.lever} className={`${tierThreeInset} flex h-full flex-col gap-2`}>
-          <p className="text-[11px] font-semibold text-slate-300">{item.label}</p>
-          <p className="text-sm leading-6 font-semibold text-slate-100"><span className="font-semibold text-emerald-200">Action now:</span> {item.actionNow}</p>
-          <div className="mt-auto space-y-1.5 text-[11px]">
-            <p className="rounded-full border border-amber-500/45 bg-amber-500/10 px-2.5 py-1 text-amber-100">
-              <span className="font-semibold">Trigger/threshold to tighten or loosen:</span> {compactActionCue(item.triggerThreshold)}
-            </p>
-            <p className="rounded-full border border-sky-500/45 bg-sky-500/10 px-2.5 py-1 text-sky-100">
-              <span className="font-semibold">Reversal condition:</span> {compactActionCue(item.reversalCondition)}
-            </p>
-          </div>
-        </li>
-      ))}
-    </ul>
-  </section>
-);
-
-const PostureHistoryTimeline = ({ historicalTimeline }: { historicalTimeline: WeeklyDecisionCardModel["historicalTimeline"] }) => (
-  <ol className="mt-2 space-y-2" aria-label="Posture change timeline">
-    {historicalTimeline.map((item, index) => {
-      const isCurrent = item.isCurrent ?? index === historicalTimeline.length - 1;
-      const href = item.month && item.year ? `/?month=${item.month}&year=${item.year}` : null;
-      const previous = historicalTimeline[index - 1];
-      const hasPostureShift = previous ? previous.posture !== item.posture : false;
-      const shiftLabel = previous ? (hasPostureShift ? "Changed" : "Held") : "Start";
-      const node = (
-        <>
-          <div className="absolute top-0 bottom-0 left-2.5 w-px bg-slate-700/70" aria-hidden="true" />
-          <div className={`relative mt-1 h-3 w-3 rounded-full border ${isCurrent ? "border-sky-200 bg-sky-300" : "border-slate-500 bg-slate-700"}`} aria-hidden="true" />
-          <div className="min-w-0 flex-1 rounded-lg border border-slate-700/60 bg-slate-950/65 px-2.5 py-2">
-            <div className="flex flex-wrap items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-300">
-              <span>{item.label}</span>
-              <span className={`rounded-full border px-1.5 py-0.5 ${shiftLabel === "Changed" ? "border-amber-300/60 bg-amber-500/15 text-amber-100" : "border-slate-500/70 bg-slate-800/85 text-slate-300"}`}>{shiftLabel}</span>
-              {isCurrent ? <span className="rounded-full border border-sky-300/50 bg-sky-500/20 px-1.5 py-0.5 text-sky-100">Current</span> : null}
-            </div>
-            <p className="mt-1 text-xs font-semibold text-slate-100">{item.posture}</p>
-            {item.summary ? <p className="mt-1 text-[11px] leading-4 text-slate-300">{item.summary}</p> : null}
-            {item.recordDate ? <p className="mt-1 text-[10px] text-slate-400">{item.recordDate}</p> : null}
-          </div>
-        </>
-      );
-
-      return (
-        <li key={`${item.label}-${item.posture}-${index}`} className="relative">
-          {href ? (
-            <Link
-              href={href}
-              className="group relative flex min-h-[44px] items-start gap-2.5 rounded-lg pr-1 text-xs transition hover:bg-slate-900/35 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-              aria-label={`Load weekly call for ${item.label}`}
-              prefetch={false}
-            >
-              {node}
-            </Link>
-          ) : (
-            <div className="relative flex min-h-[44px] items-start gap-2.5 pr-1 text-xs">{node}</div>
-          )}
-        </li>
-      );
-    })}
-  </ol>
-);
 
 
 const MicroSignalIndicators = ({
@@ -649,139 +423,6 @@ const SignalStrip = ({
     </section>
   );
 };
-
-type DecisionCallHeaderProps = {
-  statusLabel: string;
-  postureLabel?: string;
-  stageLabel?: string;
-  postureWithStageLabel?: string;
-  netConstraintSummary: string;
-  immediateDecision: string;
-  meetingShorthand?: string;
-  guardrail: string;
-  confidencePercent: number;
-  confidenceLabel: WeeklyDecisionCardModel["confidenceLabel"];
-  regimeHeader: WeeklyDecisionCardModel["regimeHeader"];
-  trendLabel: WeeklyDecisionCardModel["trendLabel"];
-  confidenceHistory?: WeeklyDecisionCardModel["confidenceHistory"];
-  confidenceTrend?: WeeklyDecisionCardModel["confidenceTrend"];
-  regimeSignalIndicators: WeeklyDecisionCardModel["regimeSignalIndicators"];
-  transitionWatch: WeeklyDecisionCardModel["transitionWatch"];
-  operatingStanceLine: string;
-  weeklyMemoLines?: string[];
-  freshnessLabel: string;
-  trustCueLine: string;
-  needsTrustWarning: boolean;
-  trustWarningCopy: string;
-  regimeDistance: WeeklyDecisionCardModel["regimeDistance"];
-  failureModes?: FailureModeWarningItem[];
-  topContributorInline?: string;
-  startupClimateIndex?: Pick<WeeklyDecisionCardModel["startupClimateIndex"], "score" | "status">;
-  executiveOperationalStance?: WeeklyDecisionCardModel["executiveOperationalStance"];
-};
-
-const resolvePostureAndStage = ({
-  statusLabel,
-  postureLabel,
-  stageLabel,
-  postureWithStageLabel,
-}: {
-  statusLabel: string;
-  postureLabel?: string;
-  stageLabel?: string;
-  postureWithStageLabel?: string;
-}) => {
-  const [derivedPostureLabel, derivedStageLabel] = (postureWithStageLabel ?? "").split(" — ");
-
-  return {
-    resolvedPostureLabel: postureLabel ?? derivedPostureLabel ?? statusLabel,
-    resolvedStageLabel: stageLabel ?? derivedStageLabel ?? "Unspecified",
-  };
-};
-
-export function DecisionCallHeader({
-  statusLabel,
-  postureLabel,
-  stageLabel,
-  postureWithStageLabel,
-  netConstraintSummary,
-  immediateDecision,
-  meetingShorthand,
-  guardrail,
-  confidencePercent,
-  confidenceLabel,
-  regimeHeader,
-  trendLabel,
-  regimeSignalIndicators = [],
-  transitionWatch,
-  operatingStanceLine,
-  weeklyMemoLines,
-  freshnessLabel,
-  trustCueLine,
-  needsTrustWarning,
-  trustWarningCopy,
-  regimeDistance,
-}: DecisionCallHeaderProps) {
-  const { resolvedPostureLabel, resolvedStageLabel } = resolvePostureAndStage({
-    statusLabel,
-    postureLabel,
-    stageLabel,
-    postureWithStageLabel,
-  });
-  const liveBandChips = resolveLiveBandChips({
-    confidenceLabel,
-    confidencePercent,
-    trendLabel,
-    transitionWatch,
-    regimeDistance,
-  });
-  const heroUrgency = resolveHeroUrgency({
-    confidenceLabel,
-    transitionWatch,
-    pointsToFlip: regimeDistance.pointsToFlip,
-  });
-
-  return (
-    <header className="space-y-4 border-b border-slate-700/80 pb-6" data-testid="weekly-top-fold">
-      <article className={`${tierOnePanel} weather-live-hero weather-live-hero--${heroUrgency} space-y-4 border-sky-400/50 bg-gradient-to-br from-slate-950 via-slate-900/95 to-slate-950`} data-testid="weekly-viral-hero" aria-label="Canonical weekly decision card">
-        <div id="weekly-posture-brief-title" className="space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-sky-200">Weekly operating call</p>
-          <p className="text-base text-slate-300">Scan this card to align this week&apos;s operating posture.</p>
-        </div>
-
-        <ol className="grid gap-2" aria-label="Weekly decision card sequence">
-          <li className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">
-            <SummaryLabel label="Regime" icon={<CircleTargetIcon className="h-3.5 w-3.5" aria-hidden="true" />} />
-            <p className="mt-1 text-sm font-semibold text-slate-100">{resolvedPostureLabel} — {resolvedStageLabel}</p>
-          </li>
-          <li className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">
-            <SummaryLabel label="Call" icon={<ShieldIcon className="h-3.5 w-3.5" aria-hidden="true" />} />
-            <p className="mt-1 text-sm font-semibold text-slate-100">{operatingStanceLine}</p>
-          </li>
-          <li className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">
-            <p className="text-xs font-semibold text-slate-300">Do now</p>
-            <p className="mt-1 text-sm leading-6 font-semibold text-slate-100">{immediateDecision}</p>
-          </li>
-          <li className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-xs text-slate-200">
-            <p className="text-xs font-semibold text-slate-300">Flip conditions</p>
-            <p className="mt-1 text-sm font-semibold text-slate-100">{regimeDistance.dimensionLabel} {regimeDistance.thresholdDirection === "riseAbove" ? "rises above" : "falls to or below"} {regimeDistance.thresholdValue.toFixed(1)} ({Math.max(0, Math.round(regimeDistance.pointsToFlip))} pts away).</p>
-          </li>
-        </ol>
-
-        <div className="flex flex-wrap gap-2" aria-label="Compact trust and fallback cues">
-          <p className="weather-live-chip rounded-full border border-emerald-400/45 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-emerald-100">Confidence {confidenceLabel} ({Math.round(confidencePercent)}%)</p>
-          <p className="weather-live-chip rounded-full border border-slate-600/70 bg-slate-900/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-200">Trend {trendLabel} · Watch {transitionWatch}</p>
-          <p className="weather-live-chip rounded-full border border-slate-600/70 bg-slate-900/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-200">Freshness {freshnessLabel}</p>
-          <p className="weather-live-chip rounded-full border border-slate-600/70 bg-slate-900/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-200">Trust {trustCueLine}</p>
-        </div>
-
-        {needsTrustWarning ? (
-          <p className="rounded-md border border-amber-500/50 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">{trustWarningCopy}</p>
-        ) : null}
-      </article>
-    </header>
-  );
-}
 
 type RegimeBannerProps = {
   statusLabel: string;
@@ -1520,7 +1161,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
           />
 
           {diagnosticsLane ?? (
-            <WeeklyDecisionDiagnosticsLane
+            <DiagnosticsSection
               weeklyMemoLines={weeklyMemoLines}
               immediateDecision={immediateDecision}
               revisitDecisions={revisitDecisions}
@@ -1539,6 +1180,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
               transitionProbabilities={transitionProbabilities}
               failureModes={failureModes}
               historicalTimeline={historicalTimeline}
+              renderBoundedRulesMatrix={({ decisionMatrix: matrix, decisionRules: rules }) => <BoundedRulesMatrix decisionMatrix={matrix} decisionRules={rules} />}
             />
           )}
 
