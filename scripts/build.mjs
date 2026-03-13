@@ -118,6 +118,13 @@ const hasReusableBuildOutput =
 const forceCloudflareBuild =
   buildTarget === "cloudflare" || buildTarget === "pages";
 const forceNextBuild = buildTarget === "next";
+const shouldReuseCachedCloudflareOutputInCi =
+  !forceCloudflareBuild &&
+  !forceNextBuild &&
+  isCi &&
+  projectExpectsNextOnPagesWorker &&
+  hasVercelBuildOutput &&
+  hasWorkerBuildOutput;
 // Guard auto-detection because next-on-pages currently requires all dynamic routes to run on Edge.
 const enableAutoNextOnPages = isTruthyEnv(process.env.NEXT_ON_PAGES_AUTO);
 const useNextOnPages =
@@ -160,11 +167,22 @@ if (shouldBypassNextOnPagesConversion) {
   process.exit(0);
 }
 
-const command = useNextOnPages ? "next-on-pages" : "next";
+if (shouldReuseCachedCloudflareOutputInCi) {
+  console.log(
+    "Reusing cached Cloudflare Pages build output from cache; skipping Next.js rebuild in CI.",
+  );
+  process.exit(0);
+}
+
+const command = useNextOnPages ? "bunx" : "next";
 const disableWorkerMinification =
   useNextOnPages && !isTruthyEnv(process.env.NEXT_ON_PAGES_ENABLE_WORKER_MINIFICATION);
 
-const nextOnPagesArgs = shouldSkipNextOnPagesBuild ? ["--skip-build"] : [];
+const nextOnPagesArgs = ["@cloudflare/next-on-pages"];
+
+if (shouldSkipNextOnPagesBuild) {
+  nextOnPagesArgs.push("--skip-build");
+}
 
 if (disableWorkerMinification) {
   nextOnPagesArgs.push("--disable-worker-minification");
