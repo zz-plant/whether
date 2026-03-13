@@ -363,6 +363,18 @@ const cmdPing = async (settings, flags) => {
       parsedBody = null;
     }
   }
+
+  if (!response.ok && response.status === 503 && parsedBody?.status === "degraded") {
+    const payload = {
+      ok: true,
+      apiBaseUrl: settings.apiBaseUrl,
+      status: "degraded",
+      degraded: true,
+    };
+    writeOutput(settings.output === "text" ? "degraded" : payload, settings);
+    return;
+  }
+
   const statusError = buildHttpStatusError({ status: response.status, ok: response.ok, body: parsedBody, endpoint, settings });
   if (statusError) throw statusError;
   const health = parsedBody ?? (await response.json());
@@ -370,6 +382,7 @@ const cmdPing = async (settings, flags) => {
     ok: true,
     apiBaseUrl: settings.apiBaseUrl,
     status: health.status ?? "ok",
+    degraded: health.status === "degraded",
   };
   writeOutput(settings.output === "text" ? "ok" : payload, settings);
 };
@@ -593,12 +606,38 @@ const cmdRaw = async (settings, subcommand) => {
 
 const cmdDoctor = async (settings) => {
   const checks = [];
+  const endpoint = "/api/health";
+
   try {
-    await getJson(settings, "/api/health");
-    checks.push({ name: "api/health", status: "ok" });
+    const response = await fetch(`${settings.apiBaseUrl}${endpoint}`, {
+      cache: "no-store",
+      headers: {
+        accept: "application/json",
+        ...(settings.token ? { authorization: `Bearer ${settings.token}` } : {}),
+      },
+    });
+
+    let parsedBody = null;
+    const contentType = response.headers.get("content-type") ?? "";
+    if (contentType.includes("application/json")) {
+      try {
+        parsedBody = await response.json();
+      } catch {
+        parsedBody = null;
+      }
+    }
+
+    if (!response.ok && response.status === 503 && parsedBody?.status === "degraded") {
+      checks.push({ name: "api/health", status: "warning", message: "API is reachable but degraded.", health: parsedBody.status });
+    } else {
+      const statusError = buildHttpStatusError({ status: response.status, ok: response.ok, body: parsedBody, endpoint, settings });
+      if (statusError) throw statusError;
+      checks.push({ name: "api/health", status: "ok", health: parsedBody?.status ?? "ok" });
+    }
   } catch (error) {
     checks.push({ name: "api/health", status: "error", message: error.message });
   }
+
   const config = await loadConfig();
   checks.push({ name: "configPath", status: "ok", path: CONFIG_PATH, profile: config.profile ?? "default" });
   writeOutput(checks, settings);

@@ -84,6 +84,30 @@ describe("whether cli", () => {
     assert.equal(result.stderr, "");
   });
 
+  it("ping treats degraded API health as reachable", async () => {
+    const server = http.createServer((req, res) => {
+      if ((req.url ?? "").startsWith("/api/health")) {
+        res.writeHead(503, { "content-type": "application/json" });
+        res.end(JSON.stringify({ status: "degraded" }));
+        return;
+      }
+      res.writeHead(404);
+      res.end();
+    });
+
+    await new Promise<void>((resolve) => server.listen(0, resolve));
+    const { port } = server.address() as { port: number };
+    const result = spawnSync("node", [CLI_PATH, "ping", "--api-base-url", `http://127.0.0.1:${port}`, "--json"], { encoding: "utf8" });
+    server.close();
+
+    assert.equal(result.status, 0);
+    const parsed = JSON.parse(result.stdout);
+    assert.equal(parsed.ok, true);
+    assert.equal(parsed.status, "degraded");
+    assert.equal(parsed.degraded, true);
+    assert.equal(result.stderr, "");
+  });
+
   it("smoke brief --json stays machine-readable without stderr noise", async () => {
     const server = http.createServer((req, res) => {
       if ((req.url ?? "").startsWith("/api/brief")) {
@@ -303,6 +327,52 @@ describe("whether cli", () => {
 
     assert.equal(result.status, 2);
     assert.match(result.stderr, /auth: Authentication failed \(missing key\)\./);
+  });
+
+  it("doctor classifies degraded health as warning", async () => {
+    const server = http.createServer((req, res) => {
+      if ((req.url ?? "").startsWith("/api/health")) {
+        res.writeHead(503, { "content-type": "application/json" });
+        res.end(JSON.stringify({ status: "degraded" }));
+        return;
+      }
+      res.writeHead(404);
+      res.end();
+    });
+
+    await new Promise<void>((resolve) => server.listen(0, resolve));
+    const { port } = server.address() as { port: number };
+    const result = spawnSync("node", [CLI_PATH, "doctor", "--api-base-url", `http://127.0.0.1:${port}`, "--json"], { encoding: "utf8" });
+    server.close();
+
+    assert.equal(result.status, 0);
+    const parsed = JSON.parse(result.stdout);
+    assert.equal(parsed[0]?.name, "api/health");
+    assert.equal(parsed[0]?.status, "warning");
+    assert.match(parsed[0]?.message, /reachable but degraded/i);
+  });
+
+  it("doctor keeps non-degraded health failures as error", async () => {
+    const server = http.createServer((req, res) => {
+      if ((req.url ?? "").startsWith("/api/health")) {
+        res.writeHead(503, { "content-type": "application/json" });
+        res.end(JSON.stringify({ status: "down" }));
+        return;
+      }
+      res.writeHead(404);
+      res.end();
+    });
+
+    await new Promise<void>((resolve) => server.listen(0, resolve));
+    const { port } = server.address() as { port: number };
+    const result = spawnSync("node", [CLI_PATH, "doctor", "--api-base-url", `http://127.0.0.1:${port}`, "--json"], { encoding: "utf8" });
+    server.close();
+
+    assert.equal(result.status, 0);
+    const parsed = JSON.parse(result.stdout);
+    assert.equal(parsed[0]?.name, "api/health");
+    assert.equal(parsed[0]?.status, "error");
+    assert.match(parsed[0]?.message, /API returned 503/);
   });
 
   it("maps expired and invalid API key errors with actionable remediation", async () => {
