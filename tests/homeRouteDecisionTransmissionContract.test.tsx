@@ -4,6 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { RegimeCommandBar } from "../app/components/RegimeCommandBar";
 import { WeeklyDecisionCard } from "../app/components/weeklyDecisionCard";
 import type { ReportDynamics } from "../lib/report/reportData";
+import { buildWeeklyDecisionCardModel } from "./factories/weeklyDecisionCardModel";
 
 const reportDynamics: ReportDynamics = {
   directionLabel: "deteriorating",
@@ -26,70 +27,43 @@ describe("home route render contract", () => {
           updatedAt="Mar 8, 2026"
         />
         <WeeklyDecisionCard
-          statusLabel="DEFENSIVE"
-          regimeKey="DEFENSIVE"
-          postureLabel="Defensive"
-          stageLabel="Watchful"
-          postureWithStageLabel="Defensive — Watchful"
-          postureDelta="Worse"
-          confidenceLabel="MED"
-          confidencePercent={68}
-          signalConfidenceReason="Reason"
-          regimeHeader={{ regime: "Defensive", confidence: "Medium", primaryRisk: "Boundary pressure" }}
-          trendLabel="Deteriorating"
-          confidenceHistory={[]}
-          confidenceTrend="unstable"
-          regimeSignalIndicators={[]}
-          transitionWatch="ON"
-          operatingStanceLine="Stage approvals and protect runway."
-          weeklyMemoLines={["Signals tightened this week."]}
-          netConstraintSummary="Pressure elevated"
-          guardrail="Guardrail"
-          reversalTrigger="Flip trigger"
-          actionNowShort="Pause net-new fixed burn commitments this week."
-          canonicalDecisionCopy={{
-            currentRegimeLabel: "Defensive — Watchful",
-            operatingCall: "Stage approvals and protect runway.",
-            doNowLines: ["Pause net-new fixed burn commitments this week."],
-            flipTrigger: "Flip when tightness falls below 65 and holds.",
-            flipConditions: ["Tightness < 65"],
-          }}
-          recordDateLabel="Mar 7, 2026"
-          fetchedAtLabel="Mar 8, 2026"
-          reportDynamics={reportDynamics}
-          decisionShiftSummary="delta"
-          transitionProbabilities={{ Expansion: 10, Mixed: 20, Scarcity: 45, Defensive: 25 }}
-          decisionRules={[]}
-          roleAwareTemplates={[]}
-          executiveOperationalStance={{ expand: ["Expand carefully"], avoid: ["Avoid fixed-cost expansion"] }}
-          revisitDecisions={true}
-          weeklyMovement={{ score: 1, direction: "defensive", summary: "Movement" }}
-          memoryRail={[]}
-          historicalTimeline={[]}
-          historicalAnalogs={[]}
-          macroOverlay={[]}
-          whyThisCall={[]}
-          evidenceItems={[]}
-          startupClimateIndex={{ score: 63, status: "Improving", breakdown: [] }}
-          regimeDistance={{
-            dimensionLabel: "Tightness",
-            currentValue: 68,
-            thresholdValue: 70,
-            pointsToFlip: 2,
-            dimensionKey: "tightness",
-            thresholdDirection: "riseAbove",
-          }}
-          regimeVelocity={{
-            status: "ok",
-            from: "Expansion",
-            to: "Mixed",
-            sampleSize: 3,
-            lowerBoundMonths: 2,
-            upperBoundMonths: 5,
-            typicalRangeLabel: "2–5 months",
-            displayLabel: "Expansion→Mixed typically 2–5 months",
-          }}
-          citation="Citation"
+          model={buildWeeklyDecisionCardModel({
+            status: {
+              statusLabel: "DEFENSIVE",
+              trendLabel: "Deteriorating",
+            },
+            decision: {
+              operatingStanceLine: "Stage approvals and protect runway.",
+              weeklyMemoLines: ["Signals tightened this week."],
+              netConstraintSummary: "Pressure elevated",
+              guardrail: "Guardrail",
+              reversalTrigger: "Flip trigger",
+              actionNowShort: "Pause net-new fixed burn commitments this week.",
+              reportDynamics,
+              canonicalDecisionCopy: {
+                currentRegimeLabel: "Defensive — Watchful",
+                operatingCall: "Stage approvals and protect runway.",
+                doNowLines: ["Pause net-new fixed burn commitments this week."],
+                flipTrigger: "Flip when tightness falls below 65 and holds.",
+                flipConditions: ["Tightness < 65"],
+              },
+            },
+            diagnostics: {
+              regimeSignalIndicators: [],
+              evidenceItems: [],
+            },
+            history: {
+              memoryRail: [],
+              historicalTimeline: [],
+              historicalAnalogs: [],
+              macroOverlay: [],
+            },
+            artifact: {
+              citation: "Citation",
+              recordDateLabel: "Mar 7, 2026",
+              fetchedAtLabel: "Mar 8, 2026",
+            },
+          })}
         />
       </>,
     );
