@@ -21,6 +21,7 @@ export default function StartHerePage() {
       secondaryHref="/operations"
       secondaryLabel="Go to Action playbook"
       autoForwardSeconds={3}
+      moreActionsLabel="More actions"
     />
   );
 }

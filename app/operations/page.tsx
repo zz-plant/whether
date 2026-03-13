@@ -45,6 +45,25 @@ export const metadata: Metadata = buildPageMetadata({
   },
 });
 
+export function buildActionsExpansionHref(
+  searchParams: Record<string, string | undefined> | undefined,
+  showAll: boolean,
+) {
+  const params = new URLSearchParams();
+  if (searchParams) {
+    Object.entries(searchParams).forEach(([key, value]) => {
+      if (value && key !== "actions") {
+        params.set(key, value);
+      }
+    });
+  }
+  if (showAll) {
+    params.set("actions", "all");
+  }
+  const query = params.toString();
+  return query ? `/operations?${query}#ops-playbook` : "/operations#ops-playbook";
+}
+
 export default async function OperationsPage({
   searchParams,
 }: {
@@ -136,6 +155,7 @@ export default async function OperationsPage({
       ? "warning"
       : "stable";
 
+  const showAllActionLanes = resolvedSearchParams?.actions === "all";
   const actionStripItems = buildActionStripItems(
     buildCanonicalBoundedDecisionRules({
       regime: assessment.regime,
@@ -273,6 +293,19 @@ export default async function OperationsPage({
         title="Playbook"
         description="Start, stop, and fence actions tuned to the current regime."
       >
+        <div className="flex flex-wrap items-start justify-between gap-3 weather-surface px-4 py-3">
+          <p className="text-xs text-slate-300">
+            {showAllActionLanes
+              ? "Showing full action lanes for deep execution checks."
+              : "Showing top 3 items per lane for the default weekly execution scan."}
+          </p>
+          <a
+            href={buildActionsExpansionHref(resolvedSearchParams, !showAllActionLanes)}
+            className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
+          >
+            {showAllActionLanes ? "Show top 3 only" : "Show full action lanes"}
+          </a>
+        </div>
         <PlaybookPanel
           playbook={playbook}
           stopItems={stopItems}
@@ -281,6 +314,7 @@ export default async function OperationsPage({
           provenance={treasuryProvenance}
           showProvenance={false}
           actionStripItems={actionStripItems}
+          showAllActionLanes={showAllActionLanes}
         />
       </SectionedReportPanel>
 
