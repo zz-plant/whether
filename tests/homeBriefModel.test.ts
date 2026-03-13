@@ -455,4 +455,64 @@ describe("buildHomeBriefModel", () => {
   });
 
 
+
+  it("builds start-route since-last-review delta when regime or drivers moved", () => {
+    const model = buildHomeBriefModel({
+      assessment: {
+        regime: "DEFENSIVE",
+        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
+        scores: { tightness: 56, riskAppetite: 46 },
+      },
+      regimeAlert: { previousRegime: "VOLATILE" },
+      stopItems: ["Pause non-core hiring."],
+      reportDynamics: {
+        directionLabel: "deteriorating",
+        changedSignals: [{ key: "tightness", delta: 2.2 }],
+        anomalySignals: [],
+      },
+      reportEvidenceItems: [{
+        key: "tightness",
+        title: "Capital conditions",
+        supportingBullets: ["Weekly move"],
+        confidenceLabel: "Medium",
+        directionLabel: "Tightening",
+        immediateImplication: "Tighten approvals for fixed-cost plans.",
+      }],
+      regimeSeries: [
+        { year: 2026, month: 1, recordDate: "2026-01-31", regime: "VOLATILE", summary: "Earlier" },
+        { year: 2026, month: 2, recordDate: "2026-02-28", regime: "DEFENSIVE", summary: "Current" },
+      ],
+    });
+
+    assert.equal(model.sinceLastReview.hasMeaningfulDelta, true);
+    assert.equal(model.sinceLastReview.items.length, 3);
+    assert.ok(model.sinceLastReview.items.some((item) => item.href === "/signals"));
+    assert.ok(model.sinceLastReview.items.some((item) => item.href === "/operations"));
+    assert.ok(model.sinceLastReview.items.some((item) => item.href === "/decide"));
+  });
+
+  it("returns compact fallback start-route copy when no meaningful delta exists", () => {
+    const model = buildHomeBriefModel({
+      assessment: {
+        regime: "DEFENSIVE",
+        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
+        scores: { tightness: 50, riskAppetite: 50 },
+      },
+      regimeAlert: null,
+      stopItems: ["Hold guardrails."],
+      reportDynamics: {
+        directionLabel: "stable",
+        changedSignals: [],
+        anomalySignals: [],
+      },
+      regimeSeries: [
+        { year: 2026, month: 1, recordDate: "2026-01-31", regime: "DEFENSIVE", summary: "Earlier" },
+        { year: 2026, month: 2, recordDate: "2026-02-28", regime: "DEFENSIVE", summary: "Current" },
+      ],
+    });
+
+    assert.equal(model.sinceLastReview.hasMeaningfulDelta, false);
+    assert.match(model.sinceLastReview.fallbackCopy, /No significant delta/);
+    assert.equal(model.sinceLastReview.items.length, 0);
+  });
 });

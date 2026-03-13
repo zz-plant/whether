@@ -723,6 +723,12 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
         historicalAnalogs: props.historicalAnalogs,
         macroOverlay: props.macroOverlay,
       },
+      sinceLastReview: {
+        isReturningUser: false,
+        hasMeaningfulDelta: false,
+        fallbackCopy: "",
+        items: [],
+      },
       artifact: {
         citation: props.citation,
         recordDateLabel: props.recordDateLabel,

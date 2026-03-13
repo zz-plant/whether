@@ -185,6 +185,22 @@ export type StartupVariantPolicy = {
   adjustmentsByMode: Record<StartupVariantMode, ScopedVariantDecisionAdjustment>;
 };
 
+export type StartRouteDeltaRoute = "/signals" | "/operations" | "/decide";
+
+export type StartRouteDeltaItem = {
+  id: "posture-shift" | "top-driver" | "trigger-risk";
+  label: string;
+  detail: string;
+  href: StartRouteDeltaRoute;
+};
+
+export type StartRouteDeltaBlock = {
+  isReturningUser: boolean;
+  hasMeaningfulDelta: boolean;
+  fallbackCopy: string;
+  items: StartRouteDeltaItem[];
+};
+
 export type WeeklyDecisionCardViewModel = {
   status: {
     statusLabel: string;
@@ -258,6 +274,7 @@ export type WeeklyDecisionCardViewModel = {
     historicalAnalogs: HomeBriefHistoricalAnalog[];
     macroOverlay: MacroOverlayItem[];
   };
+  sinceLastReview: StartRouteDeltaBlock;
   artifact: {
     citation: string;
     recordDateLabel: string;
@@ -763,6 +780,93 @@ const buildWhyThisCall = ({
   ];
 };
 
+const buildStartRouteDeltaBlock = ({
+  currentRegime,
+  regimeAlert,
+  reportDynamics,
+  evidenceItems,
+  guardrail,
+  reversalTrigger,
+  failureModes,
+  trendLabel,
+  historicalTimeline,
+}: {
+  currentRegime: Regime;
+  regimeAlert: HomeReportData["regimeAlert"];
+  reportDynamics: HomeReportData["reportDynamics"];
+  evidenceItems: ReportEvidenceItem[];
+  guardrail: string;
+  reversalTrigger: string;
+  failureModes: HomeBriefFailureMode[];
+  trendLabel: string;
+  historicalTimeline: HistoricalTimelineItem[];
+}): StartRouteDeltaBlock => {
+  const isReturningUser = historicalTimeline.length >= 2;
+  const changedSignals = reportDynamics?.changedSignals ?? [];
+  const hasMeaningfulDelta = Boolean(regimeAlert) || changedSignals.length > 0;
+
+  if (!isReturningUser) {
+    return {
+      isReturningUser: false,
+      hasMeaningfulDelta: false,
+      fallbackCopy: "First review this cycle. Start with the current posture call, then set your first bounded operating decision.",
+      items: [],
+    };
+  }
+
+  if (!hasMeaningfulDelta) {
+    return {
+      isReturningUser: true,
+      hasMeaningfulDelta: false,
+      fallbackCopy: "No significant delta since your last review. Hold posture, keep current guardrails, and monitor thresholds before changing plans.",
+      items: [],
+    };
+  }
+
+  const topDriver = changedSignals[0];
+  const topDriverEvidence = topDriver
+    ? evidenceItems.find((item) => item.key === topDriver.key)
+    : evidenceItems[0];
+  const topFailureMode = failureModes[0]?.warning;
+  const items: StartRouteDeltaItem[] = [];
+
+  if (regimeAlert) {
+    items.push({
+      id: "posture-shift",
+      label: "Posture shift",
+      detail: `Posture moved from ${REGIME_SHORT_LABELS[regimeAlert.previousRegime]} to ${REGIME_SHORT_LABELS[currentRegime]}. Re-check decision posture before committing irreversible work.`,
+      href: "/decide",
+    });
+  }
+
+  if (topDriver) {
+    items.push({
+      id: "top-driver",
+      label: "Top driver change",
+      detail: topDriverEvidence?.immediateImplication
+        ? `${regimeSignalLabelByKey[topDriver.key]} ${describeSignalDirection(topDriver)}. ${topDriverEvidence.immediateImplication}`
+        : `${regimeSignalLabelByKey[topDriver.key]} ${describeSignalDirection(topDriver)}; trend is ${trendLabel.toLowerCase()}.`,
+      href: "/signals",
+    });
+  }
+
+  items.push({
+    id: "trigger-risk",
+    label: "Trigger / risk change",
+    detail: topFailureMode
+      ? `${topFailureMode} Guardrail now: ${guardrail} Flip when: ${reversalTrigger}`
+      : `Guardrail now: ${guardrail} Flip when: ${reversalTrigger}`,
+    href: "/operations",
+  });
+
+  return {
+    isReturningUser: true,
+    hasMeaningfulDelta: true,
+    fallbackCopy: "",
+    items: items.slice(0, 3),
+  };
+};
+
 export const buildHomeBriefModel = (
   data: HomeReportData,
   options?: { overlaySector?: SectorKey; startupVariantMode?: StartupVariantMode },
@@ -909,6 +1013,8 @@ export const buildHomeBriefModel = (
     to: likelyTransitionTarget,
   });
 
+  const historicalTimeline = buildHistoricalTimeline({ currentRegime: assessment.regime, regimeSeries, historicalSelection });
+
   const normalizedHistoricalAnalogs: HomeBriefHistoricalAnalog[] = (historicalAnalogs ?? [])
     .slice(0, 3)
     .map((analog) => ({
@@ -1036,7 +1142,7 @@ export const buildHomeBriefModel = (
     compactFlipConditionLabels,
     historicalAnalogs: normalizedHistoricalAnalogs,
     memoryRail: buildMemoryRail(recordDateLabel, assessment.regime),
-    historicalTimeline: buildHistoricalTimeline({ currentRegime: assessment.regime, regimeSeries, historicalSelection }),
+    historicalTimeline,
     macroOverlay: buildMacroOverlay(macroSeries, assessment, overlaySector),
     evidenceItems: data.reportEvidenceItems ?? [],
     netConstraintSummary,
@@ -1044,6 +1150,17 @@ export const buildHomeBriefModel = (
     reversalTrigger: conciseFlipThreshold,
     transitionWatch,
     failureModes,
+    sinceLastReview: buildStartRouteDeltaBlock({
+      currentRegime: assessment.regime,
+      regimeAlert,
+      reportDynamics,
+      evidenceItems: data.reportEvidenceItems ?? [],
+      guardrail,
+      reversalTrigger: conciseFlipThreshold,
+      failureModes,
+      trendLabel,
+      historicalTimeline,
+    }),
     whyThisCall: buildWhyThisCall({
       tightnessGap,
       riskGap,
@@ -1144,6 +1261,7 @@ export const buildWeeklyDecisionCardViewModel = ({
       historicalAnalogs: homeBriefModel.historicalAnalogs,
       macroOverlay: homeBriefModel.macroOverlay,
     },
+    sinceLastReview: homeBriefModel.sinceLastReview,
     artifact: {
       citation,
       recordDateLabel,
