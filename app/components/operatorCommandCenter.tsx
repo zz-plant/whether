@@ -98,6 +98,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
   const commandCenterRef = useRef<HTMLElement | null>(null);
   const queryRef = useRef(query);
   const isExpandedRef = useRef(isExpanded);
+  const pendingQueryPersistRef = useRef<number | null>(null);
   const haptic = useHapticFeedback();
   const { copyToClipboard } = useClipboardCopy();
   // Haptics should reinforce decision delta and artifact completion, not decorative interaction.
@@ -156,12 +157,30 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
   useEffect(() => {
     queryRef.current = query;
 
-    const timeoutId = window.setTimeout(() => {
-      sessionStorage.setItem(STORAGE_KEY, query);
+    if (pendingQueryPersistRef.current !== null) {
+      window.clearTimeout(pendingQueryPersistRef.current);
+    }
+
+    pendingQueryPersistRef.current = window.setTimeout(() => {
+      sessionStorage.setItem(STORAGE_KEY, queryRef.current);
+      pendingQueryPersistRef.current = null;
     }, 180);
 
-    return () => window.clearTimeout(timeoutId);
+    return () => {
+      if (pendingQueryPersistRef.current !== null) {
+        window.clearTimeout(pendingQueryPersistRef.current);
+      }
+    };
   }, [query]);
+
+  useEffect(() => () => {
+    if (pendingQueryPersistRef.current !== null) {
+      window.clearTimeout(pendingQueryPersistRef.current);
+      pendingQueryPersistRef.current = null;
+    }
+
+    sessionStorage.setItem(STORAGE_KEY, queryRef.current);
+  }, []);
 
   useEffect(() => {
     sessionStorage.setItem(FILTER_STORAGE_KEY, filter);
