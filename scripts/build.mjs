@@ -102,10 +102,14 @@ const hasReusableBuildOutput =
 const forceCloudflareBuild =
   buildTarget === "cloudflare" || buildTarget === "pages";
 const forceNextBuild = buildTarget === "next";
+// Guard auto-detection because next-on-pages currently requires all dynamic routes to run on Edge.
+const enableAutoNextOnPages = isTruthyEnv(process.env.NEXT_ON_PAGES_AUTO);
 const useNextOnPages =
   !isVercelRuntime &&
   (forceCloudflareBuild ||
-    (!forceNextBuild && (isCloudflarePages || isCloudflareDeploy)));
+    (!forceNextBuild &&
+      enableAutoNextOnPages &&
+      (isCloudflarePages || isCloudflareDeploy)));
 const forceWebpackBuild = isTruthyEnv(process.env.NEXT_BUILD_FORCE_WEBPACK);
 const hasAnyCloudflareBuildOutput = hasVercelBuildOutput || hasWorkerBuildOutput;
 const shouldAutoSkipInCi =
