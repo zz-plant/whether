@@ -37,7 +37,7 @@ import {
 } from "../lib/report/interpretationLayer";
 import { CopyLeadershipArtifactsButtons } from "./components/copyLeadershipArtifactsButtons";
 import { createBreadcrumbTrail } from "../lib/navigation/breadcrumbs";
-import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
+import { buildHomeBriefModel, buildWeeklyDecisionCardViewModel } from "../lib/report/homeBriefModel";
 import { resolveSectorKey } from "../lib/report/sectorSensitivity";
 import { LiveDataFallbackAlert } from "./components/liveDataFallbackAlert";
 import { getRegimeDisplayLabel } from "../lib/regimePresentation";
@@ -598,12 +598,6 @@ export const HomePageReportContent = async ({
     homeBriefModel,
     postureState,
   });
-  const immediateDecision = canonicalDecisionCopy.doNowLines[0]
-    ?? homeBriefModel.actionNowShort?.trim()
-    ?? (homeBriefModel.revisitDecisions
-      ? "Revise hiring and roadmap calls now."
-      : "Hold last week's operating rules.");
-
   const leadershipArtifactPayloadPromise = buildLeadershipArtifactPayload({
     assessment,
     treasury,
@@ -614,6 +608,23 @@ export const HomePageReportContent = async ({
     interpretationView,
     forecast,
     freshnessLabel: freshnessMeta.updatedAtLabel,
+  });
+
+  const weeklyDecisionCardModel = buildWeeklyDecisionCardViewModel({
+    homeBriefModel,
+    statusLabel: displayRegime.label,
+    regimeKey: assessment.regime,
+    reportDynamics,
+    citation: buildCallCitation(assessment, treasury, {
+      postureWithStageLabel: homeBriefModel.postureWithStageLabel,
+    }),
+    recordDateLabel,
+    fetchedAtLabel,
+    freshnessLine: freshnessMeta.line,
+    confidenceHistory,
+    confidenceTrend,
+    canonicalDecisionCopy,
+    isFallbackSnapshot: isFallback && !historicalSelection,
   });
 
   return (
@@ -679,60 +690,7 @@ export const HomePageReportContent = async ({
       }
     >
       <WeeklyDecisionCard
-        statusLabel={displayRegime.label}
-        regimeKey={assessment.regime}
-        postureLabel={homeBriefModel.postureLabel}
-        stageLabel={homeBriefModel.stageLabel}
-        postureWithStageLabel={homeBriefModel.postureWithStageLabel}
-        postureDelta={homeBriefModel.postureDeltaLabel}
-        confidenceLabel={homeBriefModel.confidenceLabel}
-        confidencePercent={homeBriefModel.confidencePercent}
-        signalConfidenceReason={homeBriefModel.signalConfidenceReason}
-        regimeHeader={homeBriefModel.regimeHeader}
-        trendLabel={homeBriefModel.trendLabel}
-        confidenceHistory={confidenceHistory}
-        confidenceTrend={confidenceTrend}
-        regimeSignalIndicators={homeBriefModel.regimeSignalIndicators}
-        transitionWatch={homeBriefModel.transitionWatch}
-        operatingStanceLine={homeBriefModel.operatingStanceLine}
-        weeklyMemoLines={homeBriefModel.weeklyMemoLines}
-        netConstraintSummary={homeBriefModel.netConstraintSummary}
-        guardrail={homeBriefModel.guardrail}
-        reversalTrigger={homeBriefModel.reversalTrigger}
-        actionNowShort={homeBriefModel.actionNowShort}
-        guardrailThreshold={homeBriefModel.guardrailThreshold}
-        flipThreshold={homeBriefModel.flipThreshold}
-        compactFlipConditionLabels={homeBriefModel.compactFlipConditionLabels}
-        canonicalFlipConditions={homeBriefModel.canonicalFlipConditions}
-        canonicalDecisionCopy={canonicalDecisionCopy}
-        recordDateLabel={recordDateLabel}
-        fetchedAtLabel={fetchedAtLabel}
-        freshnessLine={freshnessMeta.line}
-        reportDynamics={reportDynamics}
-        decisionShiftSummary={homeBriefModel.decisionShiftSummary}
-        transitionProbabilities={homeBriefModel.transitionProbabilities}
-        decisionRules={homeBriefModel.decisionRules}
-        decisionMatrix={homeBriefModel.decisionMatrix}
-        startupVariantPolicy={homeBriefModel.startupVariantPolicy}
-        actionStripItems={homeBriefModel.actionStripItems}
-        roleAwareTemplates={homeBriefModel.roleAwareTemplates}
-        executiveOperationalStance={homeBriefModel.executiveOperationalStance}
-        revisitDecisions={homeBriefModel.revisitDecisions}
-        weeklyMovement={homeBriefModel.weeklyMovement}
-        memoryRail={homeBriefModel.memoryRail}
-        historicalTimeline={homeBriefModel.historicalTimeline}
-        historicalAnalogs={homeBriefModel.historicalAnalogs}
-        macroOverlay={homeBriefModel.macroOverlay}
-        whyThisCall={homeBriefModel.whyThisCall}
-        evidenceItems={homeBriefModel.evidenceItems}
-        startupClimateIndex={homeBriefModel.startupClimateIndex}
-        regimeDistance={homeBriefModel.regimeDistance}
-        regimeVelocity={homeBriefModel.regimeVelocity}
-        citation={buildCallCitation(assessment, treasury, {
-          postureWithStageLabel: homeBriefModel.postureWithStageLabel,
-        })}
-        isFallbackSnapshot={isFallback && !historicalSelection}
-        failureModes={homeBriefModel.failureModes}
+        model={weeklyDecisionCardModel}
         actions={(
           <StagedReveal
             delayMs={220}
@@ -754,7 +712,7 @@ export const HomePageReportContent = async ({
             <Suspense fallback={<WeeklyDiagnosticsFallback />}>
               <WeeklyDecisionDiagnosticsLaneDeferred
                 weeklyMemoLines={homeBriefModel.weeklyMemoLines}
-                immediateDecision={immediateDecision}
+                immediateDecision={weeklyDecisionCardModel.decision.immediateDecision}
                 revisitDecisions={homeBriefModel.revisitDecisions}
                 guardrail={homeBriefModel.guardrail}
                 regimeDistance={homeBriefModel.regimeDistance}

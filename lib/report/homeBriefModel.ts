@@ -43,6 +43,10 @@ import type { PostureStateContract } from "./postureStateContract";
 import { buildDecisionMatrixPayload } from "./homeBrief/decisionMatrix";
 import { buildStartupClimateIndex, type StartupClimateIndex } from "./homeBrief/scoring";
 import { buildPrimaryRiskLabel } from "./homeBrief/risk";
+import type { RegimeKey } from "../regimeEngine";
+import type { ConfidenceTrendFraming, ReportDynamics, WeeklyConfidencePoint } from "./reportData";
+import type { CanonicalDecisionCopy } from "./canonicalDecisionCopy";
+import type { ForecastRegimeLabel } from "./forecastModel";
 
 export { buildDecisionMatrixPayload };
 
@@ -179,6 +183,87 @@ export type StartupVariantPolicy = {
   selectedMode: StartupVariantMode;
   options: StartupVariantOption[];
   adjustmentsByMode: Record<StartupVariantMode, ScopedVariantDecisionAdjustment>;
+};
+
+export type WeeklyDecisionCardViewModel = {
+  status: {
+    statusLabel: string;
+    regimeKey?: RegimeKey;
+    postureLabel: string;
+    stageLabel: string;
+    postureWithStageLabel?: string;
+    postureDelta: string;
+    confidenceLabel: "HIGH" | "MED" | "LOW";
+    confidencePercent: number;
+    signalConfidenceReason: string;
+    regimeHeader: {
+      regime: string;
+      confidence: string;
+      primaryRisk: string;
+    };
+    trendLabel: string;
+    confidenceHistory?: WeeklyConfidencePoint[];
+    confidenceTrend?: ConfidenceTrendFraming;
+    transitionWatch: "ON" | "OFF";
+    isFallbackSnapshot?: boolean;
+  };
+  decision: {
+    operatingStanceLine: string;
+    weeklyMemoLines: string[];
+    netConstraintSummary: string;
+    guardrail: string;
+    reversalTrigger: string;
+    actionNowShort?: string;
+    immediateDecision: string;
+    guardrailThreshold?: string;
+    flipThreshold?: string;
+    compactFlipConditionLabels?: string[];
+    canonicalDecisionCopy?: CanonicalDecisionCopy;
+    canonicalFlipConditions?: CanonicalFlipCondition[];
+    reportDynamics: ReportDynamics;
+    decisionShiftSummary: string;
+    transitionProbabilities: Record<ForecastRegimeLabel, number>;
+    decisionRules: BoundedDecisionRule[];
+    decisionMatrix?: DecisionMatrixPayload;
+    startupVariantPolicy?: StartupVariantPolicy;
+    actionStripItems?: ActionStripItem[];
+    roleAwareTemplates: RoleAwareOperatingTemplate[];
+    executiveOperationalStance: { expand: string[]; avoid: string[] };
+    revisitDecisions: boolean;
+    weeklyMovement: {
+      score: number;
+      direction: "defensive" | "expansionary" | "neutral";
+      summary: string;
+    };
+  };
+  diagnostics: {
+    regimeSignalIndicators: RegimeSignalIndicator[];
+    startupClimateIndex: StartupClimateIndex;
+    regimeDistance: {
+      dimensionLabel: string;
+      dimensionKey: "tightness" | "riskAppetite";
+      currentValue: number;
+      thresholdValue: number;
+      pointsToFlip: number;
+      thresholdDirection: BoundaryDirection;
+    };
+    regimeVelocity: TransitionVelocityEstimate;
+    whyThisCall: WhyThisCallItem[];
+    evidenceItems: ReportEvidenceItem[];
+    failureModes?: HomeBriefFailureMode[];
+  };
+  history: {
+    memoryRail: MemoryRailItem[];
+    historicalTimeline: HistoricalTimelineItem[];
+    historicalAnalogs: HomeBriefHistoricalAnalog[];
+    macroOverlay: MacroOverlayItem[];
+  };
+  artifact: {
+    citation: string;
+    recordDateLabel: string;
+    fetchedAtLabel: string;
+    freshnessLine?: string;
+  };
 };
 
 type ExecutiveOperationalStance = {
@@ -965,5 +1050,105 @@ export const buildHomeBriefModel = (
       reportDynamics,
       transitionWatch,
     }),
+  };
+};
+
+export const buildWeeklyDecisionCardViewModel = ({
+  homeBriefModel,
+  statusLabel,
+  regimeKey,
+  reportDynamics,
+  citation,
+  recordDateLabel,
+  fetchedAtLabel,
+  freshnessLine,
+  confidenceHistory,
+  confidenceTrend,
+  canonicalDecisionCopy,
+  isFallbackSnapshot,
+}: {
+  homeBriefModel: ReturnType<typeof buildHomeBriefModel>;
+  statusLabel: string;
+  regimeKey?: RegimeKey;
+  reportDynamics: ReportDynamics;
+  citation: string;
+  recordDateLabel: string;
+  fetchedAtLabel: string;
+  freshnessLine?: string;
+  confidenceHistory?: WeeklyConfidencePoint[];
+  confidenceTrend?: ConfidenceTrendFraming;
+  canonicalDecisionCopy?: CanonicalDecisionCopy;
+  isFallbackSnapshot?: boolean;
+}): WeeklyDecisionCardViewModel => {
+  const immediateDecision = canonicalDecisionCopy?.doNowLines[0]
+    ?? homeBriefModel.actionNowShort?.trim()
+    ?? (homeBriefModel.revisitDecisions
+      ? "Revise hiring and roadmap calls now."
+      : "Hold last week's operating rules.");
+
+  return {
+    status: {
+      statusLabel,
+      regimeKey,
+      postureLabel: homeBriefModel.postureLabel,
+      stageLabel: homeBriefModel.stageLabel,
+      postureWithStageLabel: homeBriefModel.postureWithStageLabel,
+      postureDelta: homeBriefModel.postureDeltaLabel,
+      confidenceLabel: homeBriefModel.confidenceLabel,
+      confidencePercent: homeBriefModel.confidencePercent,
+      signalConfidenceReason: homeBriefModel.signalConfidenceReason,
+      regimeHeader: homeBriefModel.regimeHeader,
+      trendLabel: homeBriefModel.trendLabel,
+      confidenceHistory,
+      confidenceTrend,
+      transitionWatch: homeBriefModel.transitionWatch,
+      isFallbackSnapshot,
+    },
+    decision: {
+      operatingStanceLine: homeBriefModel.operatingStanceLine,
+      weeklyMemoLines: homeBriefModel.weeklyMemoLines,
+      netConstraintSummary: homeBriefModel.netConstraintSummary,
+      guardrail: homeBriefModel.guardrail,
+      reversalTrigger: homeBriefModel.reversalTrigger,
+      actionNowShort: homeBriefModel.actionNowShort,
+      immediateDecision,
+      guardrailThreshold: homeBriefModel.guardrailThreshold,
+      flipThreshold: homeBriefModel.flipThreshold,
+      compactFlipConditionLabels: homeBriefModel.compactFlipConditionLabels,
+      canonicalDecisionCopy,
+      canonicalFlipConditions: homeBriefModel.canonicalFlipConditions,
+      reportDynamics,
+      decisionShiftSummary: homeBriefModel.decisionShiftSummary,
+      transitionProbabilities: homeBriefModel.transitionProbabilities,
+      decisionRules: homeBriefModel.decisionRules,
+      decisionMatrix: homeBriefModel.decisionMatrix,
+      startupVariantPolicy: homeBriefModel.startupVariantPolicy,
+      actionStripItems: homeBriefModel.actionStripItems,
+      roleAwareTemplates: homeBriefModel.roleAwareTemplates,
+      executiveOperationalStance: homeBriefModel.executiveOperationalStance,
+      revisitDecisions: homeBriefModel.revisitDecisions,
+      weeklyMovement: homeBriefModel.weeklyMovement,
+    },
+    diagnostics: {
+      regimeSignalIndicators: homeBriefModel.regimeSignalIndicators,
+      startupClimateIndex: homeBriefModel.startupClimateIndex,
+      regimeDistance: homeBriefModel.regimeDistance,
+      regimeVelocity: homeBriefModel.regimeVelocity,
+      whyThisCall: homeBriefModel.whyThisCall,
+      evidenceItems: homeBriefModel.evidenceItems,
+      failureModes: homeBriefModel.failureModes,
+    },
+    history: {
+      memoryRail: homeBriefModel.memoryRail,
+      historicalTimeline: homeBriefModel.historicalTimeline,
+      historicalAnalogs: homeBriefModel.historicalAnalogs,
+      macroOverlay: homeBriefModel.macroOverlay,
+    },
+    artifact: {
+      citation,
+      recordDateLabel,
+      fetchedAtLabel,
+      freshnessLine,
+    },
   };
 };
