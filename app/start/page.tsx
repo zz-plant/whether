@@ -3,6 +3,8 @@ import { buildPageMetadata } from "../../lib/seo";
 import { assembleHomePage } from "../../lib/report/homePageAssembler";
 import { StartDecisionBlocks } from "./components/startDecisionBlocks";
 
+export const revalidate = 900;
+
 export const metadata: Metadata = buildPageMetadata({
   title: "Start Here — Weekly decision routing",
   description:
