@@ -102,3 +102,10 @@ Use `bun run summary-archive:migrate-structured` to materialize `structured` blo
   wire it into `lib/sensors.ts`.
 - **New guidance**: update `data/recommendations.ts` and extend `lib/playbook.ts` mappings.
 - **New report lanes**: add a route under `app/` plus corresponding builders in `lib/report/*`.
+
+## Client provider placement (global vs scoped)
+- Keep `app/layout.tsx` server-first and limit it to true shell concerns (document metadata, skip link, and shared header).
+- Scope client providers to the smallest route subtree that needs them:
+  - `app/signals/layout.tsx` wraps only the signals experience with `ToastProviderRoot` because summary-copy toasts are rendered from the time machine summary cards.
+  - `app/operations/layout.tsx` wraps operations routes with `ToastProviderRoot` and `PremiumFunnelTracker` because operations panels emit both toast notifications and premium CTA telemetry attributes.
+- Avoid attaching interaction trackers or toast infrastructure to unrelated routes; this reduces client-side work on pages that do not present those interactions.

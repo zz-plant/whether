@@ -1,8 +1,6 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
-import { ToastProviderRoot } from "./components/toastProviderRoot";
 import { GlobalHeader } from "./components/globalHeader";
-import { PremiumFunnelTracker } from "./components/premiumFunnelTracker";
 import { siteUrl } from "../lib/siteUrl";
 import { buildSocialImageUrl } from "../lib/seo";
 
@@ -90,11 +88,8 @@ export default function RootLayout({
         <a className="skip-link" href="#main-content">
           Skip to content
         </a>
-        <ToastProviderRoot>
-          <PremiumFunnelTracker />
-          <GlobalHeader />
-          {children}
-        </ToastProviderRoot>
+        <GlobalHeader />
+        {children}
       </body>
     </html>
   );
