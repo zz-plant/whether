@@ -14,6 +14,7 @@ type LegacyRouteBridgeProps = {
   secondaryHref: Route;
   secondaryLabel: string;
   autoForwardSeconds?: number;
+  moreActionsLabel?: string;
 };
 
 export function LegacyRouteBridge({
@@ -25,6 +26,7 @@ export function LegacyRouteBridge({
   secondaryHref,
   secondaryLabel,
   autoForwardSeconds = 8,
+  moreActionsLabel = "More actions",
 }: LegacyRouteBridgeProps) {
   const preferenceKey = useMemo(
     () => `whether.bridge.auto-forward-seen:${primaryHref}`,
@@ -83,39 +85,50 @@ export function LegacyRouteBridge({
             ? `Taking you to your main destination in ${secondsLeft}s.`
             : "Automatic redirect is off right now. Choose where you'd like to go next."}
         </p>
-        <div className="flex flex-wrap gap-3">
-          <Link
-            href={primaryHref}
-            className="weather-button-primary inline-flex min-h-[44px] items-center gap-1.5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em]"
-          >
-            {primaryLabel}
-            <ArrowRightIcon className="h-3.5 w-3.5" aria-hidden="true" />
-          </Link>
-          <Link
-            href={secondaryHref}
-            className="weather-button inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em]"
-          >
-            {secondaryLabel}
-          </Link>
-          {!isClient ? null : autoForwardEnabled ? (
-            <button
-              type="button"
-              onClick={() => setAutoForwardEnabled(false)}
-              className="inline-flex min-h-[44px] items-center rounded-full border border-slate-600 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-200"
+        <div className="space-y-3">
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href={primaryHref}
+              className="weather-button-primary inline-flex min-h-[44px] items-center gap-1.5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em]"
             >
-              Keep me here
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => {
-                setSecondsLeft(autoForwardSeconds);
-                setAutoForwardEnabled(true);
-              }}
-              className="inline-flex min-h-[44px] items-center rounded-full border border-slate-600 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-200"
+              {primaryLabel}
+              <ArrowRightIcon className="h-3.5 w-3.5" aria-hidden="true" />
+            </Link>
+            <Link
+              href={secondaryHref}
+              className="weather-button inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em]"
             >
-              Turn on automatic redirect
-            </button>
+              {secondaryLabel}
+            </Link>
+          </div>
+          {!isClient ? null : (
+            <details className="weather-surface p-3">
+              <summary className="min-h-[44px] cursor-pointer text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">
+                {moreActionsLabel}
+              </summary>
+              <div className="mt-3 flex flex-wrap gap-3">
+                {autoForwardEnabled ? (
+                  <button
+                    type="button"
+                    onClick={() => setAutoForwardEnabled(false)}
+                    className="inline-flex min-h-[44px] items-center rounded-full border border-slate-600 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-200"
+                  >
+                    Keep me here
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSecondsLeft(autoForwardSeconds);
+                      setAutoForwardEnabled(true);
+                    }}
+                    className="inline-flex min-h-[44px] items-center rounded-full border border-slate-600 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-slate-200"
+                  >
+                    Turn on automatic redirect
+                  </button>
+                )}
+              </div>
+            </details>
           )}
         </div>
       </section>
