@@ -18,7 +18,7 @@ import type { ForecastRegimeLabel, TransitionVelocityEstimate } from "../../lib/
 import type { RegimeKey } from "../../lib/regimeEngine";
 import type { DecisionMatrixPayload, StartupVariantPolicy, WeeklyDecisionCardViewModel } from "../../lib/report/homeBriefModel";
 import { buildCompactFreshnessMeta, formatProbabilityPercent } from "../../lib/report/reportFormatting";
-import { getOrderedRegimeLegend, REGIME_BANNER_TOKENS, REGIME_LEGEND_DESCRIPTORS, type RegimeBannerTone } from "../../lib/regimePresentation";
+import { getOrderedRegimeLegend, getRegimeWeatherIcon, getRegimeWeatherLabel, REGIME_BANNER_TOKENS, REGIME_LEGEND_DESCRIPTORS, type RegimeBannerTone, type RegimeWeatherIcon } from "../../lib/regimePresentation";
 import { formatDateUTC } from "../../lib/formatters";
 import {
   buildWeeklyCitationMetaLine,
@@ -95,6 +95,45 @@ const SummaryLabel = ({
     <span>{label}</span>
   </p>
 );
+
+
+const RegimeWeatherGlyph = ({ icon, title }: { icon: RegimeWeatherIcon; title: string }) => {
+  if (icon === "snowflake") {
+    return (
+      <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 text-sky-100" aria-hidden="true" focusable="false">
+        <title>{title}</title>
+        <path d="M8 1.5v13M2.6 4.2l10.8 7.6M13.4 4.2L2.6 11.8M4.8 2.7l1.7 1.1M11.2 2.7L9.5 3.8M4.8 13.3l1.7-1.1M11.2 13.3l-1.7-1.1" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round"/>
+      </svg>
+    );
+  }
+
+  if (icon === "cloud") {
+    return (
+      <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 text-slate-100" aria-hidden="true" focusable="false">
+        <title>{title}</title>
+        <path d="M5.1 12.4h6.3a2.6 2.6 0 1 0-.3-5.1 3.7 3.7 0 0 0-7.2.9A2.1 2.1 0 1 0 5.1 12.4Z" fill="currentColor" opacity="0.95"/>
+      </svg>
+    );
+  }
+
+  if (icon === "storm") {
+    return (
+      <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 text-sky-100" aria-hidden="true" focusable="false">
+        <title>{title}</title>
+        <path d="M5.1 9.8h6.3a2.6 2.6 0 1 0-.3-5.1 3.7 3.7 0 0 0-7.2.9A2.1 2.1 0 1 0 5.1 9.8Z" fill="currentColor" opacity="0.92"/>
+        <path d="M8.8 9 6.9 12h1.6L7.4 14.5 10 11h-1.5L9.6 9Z" fill="rgb(253 224 71)"/>
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 text-amber-200" aria-hidden="true" focusable="false">
+      <title>{title}</title>
+      <circle cx="8" cy="8" r="3.1" fill="currentColor"/>
+      <path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.2 3.2l1.1 1.1M11.7 11.7l1.1 1.1M12.8 3.2l-1.1 1.1M4.3 11.7l-1.1 1.1" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+    </svg>
+  );
+};
 
 const resolvePostureAndStage = ({
   statusLabel,
@@ -242,16 +281,101 @@ type RegimeBannerProps = {
   regimeDistance?: WeeklyDecisionCardModel["regimeDistance"];
 };
 
-function RegimeLegend({ activeRegime, tone }: { activeRegime: RegimeKey; tone: RegimeBannerTone }) {
+type FlipRiskMeterState = {
+  progressPercent: number;
+  urgencyLabel: "Low" | "Medium" | "High" | "Unknown";
+  detailLabel: string;
+  triggerLabel: string;
+};
+
+const resolveFlipRiskMeterState = (regimeDistance?: WeeklyDecisionCardModel["regimeDistance"]): FlipRiskMeterState => {
+  if (!regimeDistance || !Number.isFinite(regimeDistance.pointsToFlip)) {
+    return {
+      progressPercent: 8,
+      urgencyLabel: "Unknown",
+      detailLabel: "We need one more live update before we can size flip risk with confidence.",
+      triggerLabel: "Flip trigger pending fresh data.",
+    };
+  }
+
+  const pointsToFlip = Math.max(0, Math.round(regimeDistance.pointsToFlip));
+  const clampedDistance = Math.min(pointsToFlip, 12);
+  const progressPercent = Math.max(10, Math.round(((12 - clampedDistance) / 12) * 100));
+  const triggerLabel = `${regimeDistance.dimensionLabel} ${regimeDistance.thresholdDirection === "riseAbove" ? "above" : "to or below"} ${regimeDistance.thresholdValue.toFixed(1)}.`;
+
+  if (pointsToFlip <= 3) {
+    return {
+      progressPercent,
+      urgencyLabel: "High",
+      detailLabel: "We are close to a flip. Recheck major commitments before locking spend.",
+      triggerLabel,
+    };
+  }
+
+  if (pointsToFlip <= 6) {
+    return {
+      progressPercent,
+      urgencyLabel: "Medium",
+      detailLabel: "Flip risk is in play. Keep approvals reversible and review weekly.",
+      triggerLabel,
+    };
+  }
+
+  return {
+    progressPercent,
+    urgencyLabel: "Low",
+    detailLabel: "There is room before a flip. Keep this week’s pace unless signals turn.",
+    triggerLabel,
+  };
+};
+
+const flipRiskFillClass: Record<FlipRiskMeterState["urgencyLabel"], string> = {
+  High: "bg-rose-300",
+  Medium: "bg-amber-200",
+  Low: "bg-emerald-200",
+  Unknown: "bg-slate-300/70",
+};
+
+function RegimeLegend({
+  activeRegime,
+  tone,
+  operatingLine,
+  regimeDistance,
+}: {
+  activeRegime: RegimeKey;
+  tone: RegimeBannerTone;
+  operatingLine: string;
+  regimeDistance?: WeeklyDecisionCardModel["regimeDistance"];
+}) {
   const legendItems = getOrderedRegimeLegend();
   const activeDescriptor = REGIME_LEGEND_DESCRIPTORS[activeRegime];
+  const activeWeather = getRegimeWeatherLabel(activeRegime);
+  const activeWeatherIcon = getRegimeWeatherIcon(activeRegime);
+  const flipRiskState = resolveFlipRiskMeterState(regimeDistance);
 
   return (
     <div className={`mt-3 rounded-lg border px-3 py-2.5 ${tone.legendPanel}`} aria-label="Regime legend">
-      <div className="flex items-center justify-between gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300">
-        <p>Capital tighter</p>
+      <div className={`rounded-md border p-2.5 ${tone.calloutSurface}`}>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.13em] text-slate-200">What to do this week</p>
+        <p className={`mt-1 text-sm font-semibold ${tone.weatherHint}`}>{operatingLine}</p>
+        <p className="mt-1 text-[11px] text-slate-200">
+          <span className="font-semibold text-slate-100">Flip risk:</span> {flipRiskState.urgencyLabel}
+        </p>
+        <div className={`mt-1.5 h-2.5 overflow-hidden rounded-full ${tone.meterTrack}`} aria-hidden="true">
+          <span
+            className={`block h-full rounded-full transition-[width] duration-300 ${flipRiskFillClass[flipRiskState.urgencyLabel]} ${tone.meterFill}`}
+            style={{ width: `${flipRiskState.progressPercent}%` }}
+          />
+        </div>
+        <p className="mt-1 text-[10px] text-slate-300">{flipRiskState.detailLabel}</p>
+        <p className="mt-0.5 text-[10px] text-slate-300/95">
+          <span className="font-semibold text-slate-200">Flip trigger:</span> {flipRiskState.triggerLabel}
+        </p>
+      </div>
+      <div className="mt-2.5 flex items-center justify-between gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300">
+        <p>Tighter conditions</p>
         <p aria-hidden="true">→</p>
-        <p>Capital looser</p>
+        <p>Looser conditions</p>
       </div>
       <ol className="mt-2 flex flex-wrap items-center gap-1.5 sm:flex-nowrap" aria-label="Ordered regime states from scarcity to expansion">
         {legendItems.map((item, index) => {
@@ -265,7 +389,9 @@ function RegimeLegend({ activeRegime, tone }: { activeRegime: RegimeKey; tone: R
                 aria-current={active ? "step" : undefined}
                 aria-label={active ? `${item.ariaLabel} (current)` : item.ariaLabel}
               >
-                {item.label}
+                <RegimeWeatherGlyph icon={item.weatherIcon} title={item.weather} />
+                <span>{item.label}</span>
+                <span className="text-[10px] font-medium text-slate-300/90">· {item.weather}</span>
                 <span className="sr-only">{active ? " (current regime)" : ""}</span>
               </span>
               {index < legendItems.length - 1 ? <span className="text-slate-500" aria-hidden="true">→</span> : null}
@@ -273,20 +399,10 @@ function RegimeLegend({ activeRegime, tone }: { activeRegime: RegimeKey; tone: R
           );
         })}
       </ol>
-      <p className="mt-2 text-xs text-slate-200"><span className="font-semibold text-slate-100">Current implication:</span> {activeDescriptor}</p>
+      <p className={`mt-2 flex flex-wrap items-center gap-1.5 text-xs ${tone.weatherHint}`}><RegimeWeatherGlyph icon={activeWeatherIcon} title={activeWeather} /><span><span className="font-semibold text-slate-100">Weather signal:</span> {activeWeather}. <span className="font-semibold text-slate-100">What this means:</span> {activeDescriptor}</span></p>
     </div>
   );
 }
-
-const formatFlipTriggerLine = (regimeDistance?: WeeklyDecisionCardModel["regimeDistance"]) => {
-  if (!regimeDistance) {
-    return "Next flip trigger: watch weekly threshold movement updates.";
-  }
-  const safePoints = Number.isFinite(regimeDistance.pointsToFlip)
-    ? Math.max(0, Math.round(regimeDistance.pointsToFlip))
-    : null;
-  return `Next flip trigger: ${regimeDistance.dimensionLabel} ${regimeDistance.thresholdDirection === "riseAbove" ? "rises above" : "falls to or below"} ${regimeDistance.thresholdValue.toFixed(1)}${safePoints !== null ? ` (${safePoints} pts away)` : ""}.`;
-};
 
 function RegimeBanner({
   statusLabel,
@@ -329,9 +445,7 @@ function RegimeBanner({
         <span className="px-1.5" aria-hidden="true">·</span>
         <span>Flip Risk {flipRiskValue}</span>
       </p>
-      <RegimeLegend activeRegime={regimeKey} tone={bannerTone} />
-      <p className="mt-2 text-sm leading-tight font-semibold sm:text-base sm:leading-5">{operatingLine}</p>
-      <p className="mt-1 text-xs leading-6 text-slate-100">{formatFlipTriggerLine(regimeDistance)}</p>
+      <RegimeLegend activeRegime={regimeKey} tone={bannerTone} operatingLine={operatingLine} regimeDistance={regimeDistance} />
     </header>
   );
 }
