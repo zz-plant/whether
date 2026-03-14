@@ -14,12 +14,12 @@ bun run wrangler:upload
 This flow keeps dependency installation to a single explicit `bun install --frozen-lockfile` step, then reuses prebuilt `.vercel/output` for the Cloudflare conversion/upload stage.
 
 
-`bun run build:pages` is now branch-aware for Cloudflare Pages builds:
-- production branch -> runs `build:cloudflare` (next-on-pages conversion),
-- non-production branch -> runs `deploy:cloudflare:nonprod` (plain Next build validation),
-- unknown branch metadata in Cloudflare env -> defaults to non-production path for safer preview behavior.
+`bun run build:pages` is now environment-aware:
+- no Cloudflare deploy context -> runs `deploy:cloudflare:nonprod` (plain Next build validation),
+- Cloudflare Pages production branch -> runs `build:cloudflare` (next-on-pages conversion),
+- Cloudflare Pages preview/unknown branch -> runs `deploy:cloudflare:nonprod` (plain Next build validation).
 
-Use `FORCE_CLOUDFLARE_WORKER_BUILD=1 bun run build:pages` to force worker conversion when needed (including unknown-branch environments).
+Use `FORCE_CLOUDFLARE_WORKER_BUILD=1 bun run build:pages` to force worker conversion when needed (including non-production or unknown-branch environments).
 
 ## Branch deploy commands
 

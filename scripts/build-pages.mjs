@@ -27,17 +27,23 @@ const branch =
 const productionBranch = process.env.CF_PAGES_PRODUCTION_BRANCH ?? "main";
 const forceWorkerBuild = isTruthyEnv(process.env.FORCE_CLOUDFLARE_WORKER_BUILD);
 const isCloudflarePages = isTruthyEnv(process.env.CF_PAGES);
+const isCloudflareDeploy = Boolean(process.env.CLOUDFLARE_ACCOUNT_ID);
 const branchIsKnown = Boolean(branch);
 const isProductionBranch = branchIsKnown && branch === productionBranch;
+const hasDeployContext = isCloudflarePages || isCloudflareDeploy;
+const shouldDefaultToNonProdBuild =
+  !hasDeployContext ||
+  (isCloudflarePages && !branchIsKnown) ||
+  (isCloudflarePages && !isProductionBranch);
 
 const shouldUseNonProdBuild =
-  isCloudflarePages && !forceWorkerBuild && !isProductionBranch;
+  !forceWorkerBuild && shouldDefaultToNonProdBuild;
 
 if (shouldUseNonProdBuild) {
   const branchLabel = branchIsKnown ? branch : "unknown branch";
 
   console.log(
-    `Cloudflare preview/unknown branch detected (${branchLabel}); using non-production branch build path. Set FORCE_CLOUDFLARE_WORKER_BUILD=1 to force next-on-pages conversion.`,
+    `Using non-production branch build path (branch: ${branchLabel}; CF_PAGES=${isCloudflarePages ? "1" : "0"}; deploy context=${hasDeployContext ? "1" : "0"}). Set FORCE_CLOUDFLARE_WORKER_BUILD=1 to force next-on-pages conversion.`,
   );
 
   run("bun", ["run", "deploy:cloudflare:nonprod"], {
