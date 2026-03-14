@@ -9,15 +9,13 @@ const isTruthyEnv = (value) => {
   return normalized === "1" || normalized === "true" || normalized === "yes";
 };
 
-const run = (command, args, env = process.env) => {
-  const result = spawnSync(command, args, {
+const run = (command, args, env = process.env) =>
+  spawnSync(command, args, {
     stdio: "inherit",
     shell: true,
     env,
   });
 
-  process.exit(result.status ?? 1);
-};
 
 const branch =
   process.env.CF_PAGES_BRANCH ??
@@ -36,8 +34,14 @@ const shouldDefaultToNonProdBuild =
   (isCloudflarePages && !branchIsKnown) ||
   (isCloudflarePages && !isProductionBranch);
 
-const shouldUseNonProdBuild =
-  !forceWorkerBuild && shouldDefaultToNonProdBuild;
+const shouldUseNonProdBuild = !forceWorkerBuild && shouldDefaultToNonProdBuild;
+
+const runNonProdBuild = () =>
+  run("bun", ["run", "deploy:cloudflare:nonprod"], {
+    ...process.env,
+    ALLOW_NEXT_BUILD_WITH_WORKER_CONFIG:
+      process.env.ALLOW_NEXT_BUILD_WITH_WORKER_CONFIG ?? "1",
+  });
 
 if (shouldUseNonProdBuild) {
   const branchLabel = branchIsKnown ? branch : "unknown branch";
@@ -46,11 +50,19 @@ if (shouldUseNonProdBuild) {
     `Using non-production branch build path (branch: ${branchLabel}; CF_PAGES=${isCloudflarePages ? "1" : "0"}; deploy context=${hasDeployContext ? "1" : "0"}). Set FORCE_CLOUDFLARE_WORKER_BUILD=1 to force next-on-pages conversion.`,
   );
 
-  run("bun", ["run", "deploy:cloudflare:nonprod"], {
-    ...process.env,
-    ALLOW_NEXT_BUILD_WITH_WORKER_CONFIG:
-      process.env.ALLOW_NEXT_BUILD_WITH_WORKER_CONFIG ?? "1",
-  });
+  const result = runNonProdBuild();
+  process.exit(result.status ?? 1);
 }
 
-run("bun", ["run", "build:cloudflare"]);
+const workerBuildResult = run("bun", ["run", "build:cloudflare"]);
+
+if (workerBuildResult.status === 0) {
+  process.exit(0);
+}
+
+console.warn(
+  "Cloudflare worker build failed; falling back to `deploy:cloudflare:nonprod` to keep Pages builds shippable.",
+);
+
+const fallbackResult = runNonProdBuild();
+process.exit(fallbackResult.status ?? workerBuildResult.status ?? 1);
