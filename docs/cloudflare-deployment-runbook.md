@@ -26,6 +26,12 @@ Use `FORCE_CLOUDFLARE_WORKER_BUILD=1 bun run build:pages` to force worker conver
 - **Production branch deploy:** `bun run deploy:cloudflare`
 - **Non-production branch deploy:** `bun run deploy:cloudflare:nonprod`
 
+`deploy:cloudflare` now auto-detects Cloudflare Pages build context (`CF_PAGES`, `CF_PAGES_BRANCH`, or `CF_PAGES_COMMIT_SHA`). In that context it intentionally:
+- allows non-worker fallback when `next-on-pages` cannot convert non-Edge routes, and
+- skips `wrangler versions upload` because Pages deploys the generated output directly.
+
+Outside Cloudflare Pages context (for direct Workers uploads), `deploy:cloudflare` still defaults to strict worker-build success and runs Wrangler upload.
+
 `deploy:cloudflare:nonprod` intentionally runs a plain Next build with `ALLOW_NEXT_BUILD_WITH_WORKER_CONFIG=1` and does **not** run Wrangler upload. This keeps branch validation green while Next-on-Pages remains blocked by non-Edge routes.
 
 ## Build guardrail for Cloudflare environments
