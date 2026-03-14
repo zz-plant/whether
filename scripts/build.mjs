@@ -126,7 +126,10 @@ const shouldReuseCachedCloudflareOutputInCi =
   hasVercelBuildOutput &&
   hasWorkerBuildOutput;
 // Guard auto-detection because next-on-pages currently requires all dynamic routes to run on Edge.
-const enableAutoNextOnPages = isTruthyEnv(process.env.NEXT_ON_PAGES_AUTO);
+const enableAutoNextOnPages =
+  isTruthyEnv(process.env.NEXT_ON_PAGES_AUTO) ||
+  ((isCloudflarePages || isCloudflareDeploy) &&
+    projectExpectsNextOnPagesWorker);
 const useNextOnPages =
   !isVercelRuntime &&
   (forceCloudflareBuild ||
