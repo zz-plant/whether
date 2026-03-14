@@ -25,6 +25,9 @@ const branch =
 const productionBranch = process.env.CF_PAGES_PRODUCTION_BRANCH ?? "main";
 const forceWorkerBuild = isTruthyEnv(process.env.FORCE_CLOUDFLARE_WORKER_BUILD);
 const isCloudflarePages = isTruthyEnv(process.env.CF_PAGES);
+const shouldRequireWorkerBuildSuccess = isTruthyEnv(
+  process.env.REQUIRE_CLOUDFLARE_WORKER_BUILD_SUCCESS,
+);
 const isCloudflareDeploy = Boolean(process.env.CLOUDFLARE_ACCOUNT_ID);
 const branchIsKnown = Boolean(branch);
 const isProductionBranch = branchIsKnown && branch === productionBranch;
@@ -60,9 +63,9 @@ if (workerBuildResult.status === 0) {
   process.exit(0);
 }
 
-if (hasDeployContext) {
+if (shouldRequireWorkerBuildSuccess) {
   console.error(
-    "Cloudflare worker build failed in deploy context; aborting to avoid uploading stale worker artifacts.",
+    "Cloudflare worker build failed while strict worker output is required; aborting to avoid uploading stale worker artifacts.",
   );
 
   process.exit(workerBuildResult.status ?? 1);
