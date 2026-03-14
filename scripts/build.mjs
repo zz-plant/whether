@@ -148,7 +148,7 @@ if (
   !allowNextBuildWithoutWorkerOutput
 ) {
   console.error(
-    "Cloudflare environment detected with worker-based wrangler config, but NEXT_ON_PAGES_AUTO is disabled. Refusing to run `next build` because `wrangler versions upload` requires `.vercel/output/static/_worker.js`. Use `bun run build:cloudflare` (or set NEXT_ON_PAGES_AUTO=1). Set ALLOW_NEXT_BUILD_WITH_WORKER_CONFIG=1 to bypass this safeguard.",
+    "Cloudflare environment detected with worker-based wrangler config, but NEXT_ON_PAGES_AUTO is disabled. Refusing to run `next build` because `wrangler versions upload` requires `.vercel/output/static/_worker.js`. Use `bun run build:cloudflare` (or set NEXT_ON_PAGES_AUTO=1) for production deploys, or `bun run deploy:cloudflare:nonprod` for branch validation. Set ALLOW_NEXT_BUILD_WITH_WORKER_CONFIG=1 to bypass this safeguard.",
   );
   process.exit(1);
 }
