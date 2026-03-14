@@ -19,19 +19,25 @@ const run = (command, args, env = process.env) => {
   process.exit(result.status ?? 1);
 };
 
-const branch = process.env.CF_PAGES_BRANCH ?? "";
+const branch =
+  process.env.CF_PAGES_BRANCH ??
+  process.env.GITHUB_REF_NAME ??
+  process.env.VERCEL_GIT_COMMIT_REF ??
+  "";
 const productionBranch = process.env.CF_PAGES_PRODUCTION_BRANCH ?? "main";
 const forceWorkerBuild = isTruthyEnv(process.env.FORCE_CLOUDFLARE_WORKER_BUILD);
+const isCloudflarePages = isTruthyEnv(process.env.CF_PAGES);
+const branchIsKnown = Boolean(branch);
+const isProductionBranch = branchIsKnown && branch === productionBranch;
 
 const shouldUseNonProdBuild =
-  isTruthyEnv(process.env.CF_PAGES) &&
-  !forceWorkerBuild &&
-  Boolean(branch) &&
-  branch !== productionBranch;
+  isCloudflarePages && !forceWorkerBuild && !isProductionBranch;
 
 if (shouldUseNonProdBuild) {
+  const branchLabel = branchIsKnown ? branch : "unknown branch";
+
   console.log(
-    `Cloudflare preview branch detected (${branch}); using non-production branch build path. Set FORCE_CLOUDFLARE_WORKER_BUILD=1 to force next-on-pages conversion.`,
+    `Cloudflare preview/unknown branch detected (${branchLabel}); using non-production branch build path. Set FORCE_CLOUDFLARE_WORKER_BUILD=1 to force next-on-pages conversion.`,
   );
 
   run("bun", ["run", "deploy:cloudflare:nonprod"], {

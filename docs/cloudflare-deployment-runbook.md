@@ -16,9 +16,10 @@ This flow keeps dependency installation to a single explicit `bun install --froz
 
 `bun run build:pages` is now branch-aware for Cloudflare Pages builds:
 - production branch -> runs `build:cloudflare` (next-on-pages conversion),
-- non-production branch -> runs `deploy:cloudflare:nonprod` (plain Next build validation).
+- non-production branch -> runs `deploy:cloudflare:nonprod` (plain Next build validation),
+- unknown branch metadata in Cloudflare env -> defaults to non-production path for safer preview behavior.
 
-Use `FORCE_CLOUDFLARE_WORKER_BUILD=1 bun run build:pages` to force worker conversion on a preview branch when needed.
+Use `FORCE_CLOUDFLARE_WORKER_BUILD=1 bun run build:pages` to force worker conversion when needed (including unknown-branch environments).
 
 ## Branch deploy commands
 
