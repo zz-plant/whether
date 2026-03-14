@@ -137,14 +137,20 @@ const useNextOnPages =
       enableAutoNextOnPages &&
       isCi &&
       projectExpectsNextOnPagesWorker));
+const allowNextBuildWithoutWorkerOutput = isTruthyEnv(
+  process.env.ALLOW_NEXT_BUILD_WITH_WORKER_CONFIG,
+);
+
 if (
   !useNextOnPages &&
   (isCloudflarePages || isCloudflareDeploy) &&
-  projectExpectsNextOnPagesWorker
+  projectExpectsNextOnPagesWorker &&
+  !allowNextBuildWithoutWorkerOutput
 ) {
-  console.warn(
-    "Cloudflare environment detected with worker-based wrangler config, but NEXT_ON_PAGES_AUTO is disabled. `bun run build` will run `next build`; use `bun run build:cloudflare` (or set NEXT_ON_PAGES_AUTO=1) before `wrangler versions upload`.",
+  console.error(
+    "Cloudflare environment detected with worker-based wrangler config, but NEXT_ON_PAGES_AUTO is disabled. Refusing to run `next build` because `wrangler versions upload` requires `.vercel/output/static/_worker.js`. Use `bun run build:cloudflare` (or set NEXT_ON_PAGES_AUTO=1). Set ALLOW_NEXT_BUILD_WITH_WORKER_CONFIG=1 to bypass this safeguard.",
   );
+  process.exit(1);
 }
 
 const forceWebpackBuild = isTruthyEnv(process.env.NEXT_BUILD_FORCE_WEBPACK);

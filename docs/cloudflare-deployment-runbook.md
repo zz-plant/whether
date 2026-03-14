@@ -13,6 +13,15 @@ bun run wrangler:upload
 
 This flow keeps dependency installation to a single explicit `bun install --frozen-lockfile` step, then reuses prebuilt `.vercel/output` for the Cloudflare conversion/upload stage.
 
+## Build guardrail for Cloudflare environments
+
+`scripts/build.mjs` now fails fast when all of the following are true:
+- Cloudflare environment is detected (`CF_PAGES` or `CLOUDFLARE_ACCOUNT_ID`),
+- `wrangler.toml` expects a Next-on-Pages worker entrypoint (`.vercel/output/static/_worker.js`), and
+- auto conversion is disabled (`NEXT_ON_PAGES_AUTO` is not truthy).
+
+This prevents a green `bun run build` followed by a failing `wrangler versions upload` due to missing worker output. Use `bun run build:cloudflare`/`bun run deploy:cloudflare`, or set `NEXT_ON_PAGES_AUTO=1` in deploy environments. If you intentionally need plain `next build`, set `ALLOW_NEXT_BUILD_WITH_WORKER_CONFIG=1`.
+
 ## Expected warnings (non-blocking)
 
 The warning classes below are currently expected in this project and are tracked by CI baseline:
