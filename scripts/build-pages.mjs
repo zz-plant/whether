@@ -34,8 +34,10 @@ const isProductionBranch = branchIsKnown && branch === productionBranch;
 const hasDeployContext = isCloudflarePages || isCloudflareDeploy;
 const shouldDefaultToNonProdBuild =
   !hasDeployContext ||
-  (isCloudflarePages && !branchIsKnown) ||
-  (isCloudflarePages && !isProductionBranch);
+  // Keep Cloudflare Pages builds on the resilient path by default.
+  // next-on-pages currently fails when dynamic routes are not edge-compatible,
+  // and this repo intentionally has non-edge dynamic routes.
+  isCloudflarePages;
 
 const shouldUseNonProdBuild = !forceWorkerBuild && shouldDefaultToNonProdBuild;
 
@@ -48,9 +50,14 @@ const runNonProdBuild = () =>
 
 if (shouldUseNonProdBuild) {
   const branchLabel = branchIsKnown ? branch : "unknown branch";
+  const branchContext = branchIsKnown
+    ? isProductionBranch
+      ? "production"
+      : "preview"
+    : "unknown";
 
   console.log(
-    `Using non-production branch build path (branch: ${branchLabel}; CF_PAGES=${isCloudflarePages ? "1" : "0"}; deploy context=${hasDeployContext ? "1" : "0"}). Set FORCE_CLOUDFLARE_WORKER_BUILD=1 to force next-on-pages conversion.`,
+    `Using Cloudflare Pages resilient build path (branch: ${branchLabel}, context: ${branchContext}; CF_PAGES=${isCloudflarePages ? "1" : "0"}; deploy context=${hasDeployContext ? "1" : "0"}). Set FORCE_CLOUDFLARE_WORKER_BUILD=1 to force next-on-pages conversion.`,
   );
 
   const result = runNonProdBuild();
