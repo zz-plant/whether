@@ -641,6 +641,19 @@ type ReportDependency = "treasury" | "macro" | "report";
 
 const toError = (value: unknown): Error => (value instanceof Error ? value : new Error(String(value)));
 
+export const REPORT_DATA_CACHE_BUCKET_SECONDS = REPORT_DATA_REVALIDATE_SECONDS;
+
+export const buildReportDataMemoizationKey = (
+  searchParams?: ReportSearchParams,
+  nowMs: number = Date.now(),
+) => {
+  const cacheBucket = Math.floor(nowMs / (REPORT_DATA_CACHE_BUCKET_SECONDS * 1000));
+  return JSON.stringify({
+    cacheBucket,
+    searchParams: searchParams ?? null,
+  });
+};
+
 const withDependencyContext = (dependency: ReportDependency, error: unknown): Error => {
   const resolvedError = toError(error);
   return new Error(`[dependency:${dependency}] ${resolvedError.message}`);
@@ -911,11 +924,7 @@ export type LoadReportDataSafeResult =
   | { ok: true; data: ReportData }
   | { ok: false; error: Error; fallback: ReportDataFallback };
 
-const loadReportDataMemoized = cache(async (cacheKey?: string) => {
-  if (!cacheKey) {
-    return loadReportDataUncached();
-  }
-
+const loadReportDataMemoized = cache(async (cacheKey: string) => {
   let parsed: unknown;
   try {
     parsed = JSON.parse(cacheKey);
@@ -927,8 +936,13 @@ const loadReportDataMemoized = cache(async (cacheKey?: string) => {
     return loadReportDataUncached();
   }
 
+  const parsedWithParams = parsed as { searchParams?: unknown };
+  if (parsedWithParams.searchParams === null || typeof parsedWithParams.searchParams === "undefined") {
+    return loadReportDataUncached();
+  }
+
   const normalizedSearchParams: ReportSearchParams = {};
-  for (const [key, value] of Object.entries(parsed)) {
+  for (const [key, value] of Object.entries(parsedWithParams.searchParams as Record<string, unknown>)) {
     if (typeof value === "string" || typeof value === "undefined") {
       normalizedSearchParams[key] = value;
     }
@@ -938,11 +952,7 @@ const loadReportDataMemoized = cache(async (cacheKey?: string) => {
 });
 
 export const loadReportData = (searchParams?: ReportSearchParams) => {
-  if (!searchParams) {
-    return loadReportDataMemoized();
-  }
-
-  const cacheKey = JSON.stringify(searchParams);
+  const cacheKey = buildReportDataMemoizationKey(searchParams);
   return loadReportDataMemoized(cacheKey);
 };
 
