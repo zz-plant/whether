@@ -39,9 +39,9 @@ const shouldDefaultToNonProdBuild =
   // and this repo intentionally has non-edge dynamic routes.
   isCloudflarePages ||
   // Some Cloudflare Pages deploy-command runs expose account credentials but omit
-  // CF_PAGES context variables. Treat unknown branch context as non-production so
-  // Pages validation remains shippable unless worker conversion is explicitly forced.
-  !branchIsKnown;
+  // CF_PAGES context variables. Only treat unknown branch context as non-production
+  // when strict worker output is not required.
+  (!branchIsKnown && !shouldRequireWorkerBuildSuccess);
 
 const shouldUseNonProdBuild = !forceWorkerBuild && shouldDefaultToNonProdBuild;
 
