@@ -37,7 +37,11 @@ const shouldDefaultToNonProdBuild =
   // Keep Cloudflare Pages builds on the resilient path by default.
   // next-on-pages currently fails when dynamic routes are not edge-compatible,
   // and this repo intentionally has non-edge dynamic routes.
-  isCloudflarePages;
+  isCloudflarePages ||
+  // Some Cloudflare Pages deploy-command runs expose account credentials but omit
+  // CF_PAGES context variables. Treat unknown branch context as non-production so
+  // Pages validation remains shippable unless worker conversion is explicitly forced.
+  !branchIsKnown;
 
 const shouldUseNonProdBuild = !forceWorkerBuild && shouldDefaultToNonProdBuild;
 
