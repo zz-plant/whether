@@ -7,11 +7,18 @@ Use this command sequence in CI to keep Cloudflare Pages/Workers deploys determi
 ```bash
 bun install --frozen-lockfile
 bun run vercel:build
-NEXT_ON_PAGES_SKIP_BUILD=1 NEXT_ON_PAGES_REUSE_PREBUILT=1 bun run build:pages
+NEXT_ON_PAGES_SKIP_BUILD=1 NEXT_ON_PAGES_REUSE_PREBUILT=1 bun run build:cloudflare:skip-next-build
 bun run wrangler:upload
 ```
 
 This flow keeps dependency installation to a single explicit `bun install --frozen-lockfile` step, then reuses prebuilt `.vercel/output` for the Cloudflare conversion/upload stage.
+
+
+`bun run build:pages` is now branch-aware for Cloudflare Pages builds:
+- production branch -> runs `build:cloudflare` (next-on-pages conversion),
+- non-production branch -> runs `deploy:cloudflare:nonprod` (plain Next build validation).
+
+Use `FORCE_CLOUDFLARE_WORKER_BUILD=1 bun run build:pages` to force worker conversion on a preview branch when needed.
 
 ## Branch deploy commands
 

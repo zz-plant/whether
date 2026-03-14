@@ -11,7 +11,7 @@
     "build:cloudflare:skip-next-build": "BUILD_TARGET=cloudflare NEXT_ON_PAGES_SKIP_BUILD=1 NEXT_ON_PAGES_REUSE_PREBUILT=1 bun scripts/build.mjs",
     "vercel:build": "vercel build --yes",
     "wrangler:upload": "wrangler versions upload",
-    "build:pages": "bun run build:cloudflare",
+    "build:pages": "bun scripts/build-pages.mjs",
     "build:pages:skip-next-build": "bun run build:cloudflare:skip-next-build",
     "start": "next start",
     "clean": "bun scripts/clean-build-artifacts.mjs",
