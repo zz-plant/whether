@@ -126,10 +126,7 @@ const shouldReuseCachedCloudflareOutputInCi =
   hasVercelBuildOutput &&
   hasWorkerBuildOutput;
 // Guard auto-detection because next-on-pages currently requires all dynamic routes to run on Edge.
-const enableAutoNextOnPages =
-  isTruthyEnv(process.env.NEXT_ON_PAGES_AUTO) ||
-  ((isCloudflarePages || isCloudflareDeploy) &&
-    projectExpectsNextOnPagesWorker);
+const enableAutoNextOnPages = isTruthyEnv(process.env.NEXT_ON_PAGES_AUTO);
 const useNextOnPages =
   !isVercelRuntime &&
   (forceCloudflareBuild ||
@@ -140,6 +137,16 @@ const useNextOnPages =
       enableAutoNextOnPages &&
       isCi &&
       projectExpectsNextOnPagesWorker));
+if (
+  !useNextOnPages &&
+  (isCloudflarePages || isCloudflareDeploy) &&
+  projectExpectsNextOnPagesWorker
+) {
+  console.warn(
+    "Cloudflare environment detected with worker-based wrangler config, but NEXT_ON_PAGES_AUTO is disabled. `bun run build` will run `next build`; use `bun run build:cloudflare` (or set NEXT_ON_PAGES_AUTO=1) before `wrangler versions upload`.",
+  );
+}
+
 const forceWebpackBuild = isTruthyEnv(process.env.NEXT_BUILD_FORCE_WEBPACK);
 const hasAnyCloudflareBuildOutput = hasVercelBuildOutput || hasWorkerBuildOutput;
 const shouldAutoSkipInCi =
