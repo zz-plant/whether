@@ -60,6 +60,14 @@ if (workerBuildResult.status === 0) {
   process.exit(0);
 }
 
+if (hasDeployContext) {
+  console.error(
+    "Cloudflare worker build failed in deploy context; aborting to avoid uploading stale worker artifacts.",
+  );
+
+  process.exit(workerBuildResult.status ?? 1);
+}
+
 console.warn(
   "Cloudflare worker build failed; falling back to `deploy:cloudflare:nonprod` to keep Pages builds shippable.",
 );
