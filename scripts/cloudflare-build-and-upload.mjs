@@ -50,7 +50,11 @@ const run = (command, args, env = process.env) => {
   }
 };
 
-const childBuildEnv = { ...process.env };
+const childBuildEnv = {
+  ...process.env,
+  REQUIRE_CLOUDFLARE_WORKER_BUILD_SUCCESS:
+    process.env.REQUIRE_CLOUDFLARE_WORKER_BUILD_SUCCESS ?? "1",
+};
 delete childBuildEnv.__WHETHER_NODE_RUNTIME_ACTIVE;
 
 const readBuildMeta = () => {
