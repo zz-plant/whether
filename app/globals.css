@@ -6,19 +6,19 @@
   color-scheme: dark;
   --display-drift-distance: 2px;
   --display-drift-duration: 45s;
-  --shell-glow: rgba(244, 196, 120, 0.14);
-  --shell-glow-secondary: rgba(217, 164, 94, 0.12);
-  --shell-glow-tertiary: rgba(250, 204, 153, 0.08);
-  --surface-edge: rgba(148, 163, 184, 0.12);
-  --surface-sheen: rgba(255, 237, 213, 0.1);
-  --surface-elevated: rgba(245, 158, 11, 0.06);
-  --panel-bg: rgba(5, 13, 28, 0.88);
-  --panel-border: rgba(148, 163, 184, 0.14);
-  --panel-highlight: rgba(56, 189, 248, 0.12);
-  --surface-bg: rgba(2, 8, 22, 0.68);
-  --surface-border: rgba(148, 163, 184, 0.1);
-  --surface-nested-bg: rgba(2, 8, 22, 0.48);
-  --surface-nested-border: rgba(71, 85, 105, 0.16);
+  --shell-glow: rgba(188, 222, 255, 0.42);
+  --shell-glow-secondary: rgba(147, 230, 196, 0.3);
+  --shell-glow-tertiary: rgba(167, 243, 255, 0.24);
+  --surface-edge: rgba(226, 247, 255, 0.34);
+  --surface-sheen: rgba(255, 255, 255, 0.3);
+  --surface-elevated: rgba(76, 200, 255, 0.22);
+  --panel-bg: rgba(19, 67, 114, 0.44);
+  --panel-border: rgba(199, 236, 255, 0.29);
+  --panel-highlight: rgba(118, 209, 255, 0.34);
+  --surface-bg: rgba(14, 74, 124, 0.36);
+  --surface-border: rgba(191, 231, 255, 0.24);
+  --surface-nested-bg: rgba(11, 58, 96, 0.34);
+  --surface-nested-border: rgba(176, 221, 251, 0.2);
 }
 
 html {
@@ -33,57 +33,68 @@ body {
   @apply bg-slate-950 text-slate-100 antialiased;
   font-family: "Inter", system-ui, -apple-system, sans-serif;
   min-height: 100dvh;
+  background-image:
+    radial-gradient(120% 65% at 50% -10%, rgba(224, 242, 255, 0.32), transparent 56%),
+    radial-gradient(110% 70% at 50% 88%, rgba(110, 231, 183, 0.2), transparent 58%),
+    linear-gradient(180deg, rgba(8, 43, 84, 0.98) 0%, rgba(16, 86, 148, 0.9) 48%, rgba(16, 104, 140, 0.82) 100%);
 }
 
 .weather-shell {
-  background-color: #060c1d;
+  background-color: #0a3d78;
   background-image:
-    radial-gradient(900px 460px at 52% -8%, rgba(59, 130, 246, 0.14), transparent 68%),
-    radial-gradient(760px 420px at 90% 92%, rgba(20, 184, 166, 0.1), transparent 76%),
-    linear-gradient(180deg, rgb(3, 8, 20) 0%, rgb(6, 14, 30) 48%, rgb(3, 9, 21) 100%);
+    radial-gradient(1100px 540px at 52% -5%, rgba(227, 242, 255, 0.52), transparent 62%),
+    radial-gradient(760px 420px at 78% 42%, rgba(135, 232, 255, 0.2), transparent 66%),
+    radial-gradient(940px 500px at 50% 98%, rgba(116, 235, 185, 0.22), transparent 74%),
+    linear-gradient(180deg, rgba(16, 86, 158, 0.95) 0%, rgba(13, 75, 140, 0.92) 34%, rgba(10, 57, 114, 0.94) 72%, rgba(10, 44, 102, 0.98) 100%);
 }
 
 .weather-grid {
-  background-image: none;
-  opacity: 0;
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.36) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 88% 22%, rgba(255, 255, 255, 0.28) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 58% 30%, rgba(191, 219, 254, 0.25) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 26% 58%, rgba(226, 232, 240, 0.18) 0 1px, transparent 1.5px);
+  background-size: 100% 100%;
+  opacity: 0.42;
 }
 
 .weather-aurora {
   background-image:
-    radial-gradient(60% 50% at 18% 8%, rgba(56, 189, 248, 0.14), transparent 64%),
-    radial-gradient(54% 44% at 84% 14%, rgba(129, 140, 248, 0.1), transparent 62%),
-    radial-gradient(48% 42% at 56% 28%, rgba(45, 212, 191, 0.1), transparent 72%);
-  filter: blur(36px);
-  opacity: 0.2;
-  animation: none;
+    radial-gradient(64% 56% at 18% 8%, rgba(125, 211, 252, 0.24), transparent 64%),
+    radial-gradient(54% 44% at 84% 14%, rgba(191, 219, 254, 0.2), transparent 62%),
+    radial-gradient(50% 42% at 56% 28%, rgba(110, 231, 183, 0.18), transparent 72%);
+  filter: blur(48px);
+  opacity: 0.36;
+  animation: aurora-shift 22s ease-in-out infinite;
   mix-blend-mode: screen;
 }
 
 .weather-haze {
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.34) 0%, rgba(2, 6, 23, 0.58) 70%);
+  background: linear-gradient(180deg, rgba(224, 242, 254, 0.14) 0%, rgba(61, 182, 183, 0.18) 56%, rgba(16, 108, 125, 0.2) 100%);
 }
 
 .weather-panel {
   @apply rounded-2xl border backdrop-blur-xl;
   border-color: var(--panel-border);
   background-color: var(--panel-bg);
-  background-image: linear-gradient(170deg, rgba(56, 189, 248, 0.03), rgba(15, 23, 42, 0.2) 36%, rgba(2, 6, 23, 0.78) 80%);
+  background-image: linear-gradient(172deg, rgba(221, 244, 255, 0.2) 0%, rgba(82, 184, 225, 0.22) 45%, rgba(8, 49, 92, 0.5) 100%);
   box-shadow:
-    0 24px 38px -34px rgba(2, 6, 23, 0.88),
-    inset 0 1px 0 rgba(226, 232, 240, 0.11),
-    inset 0 0 0 1px rgba(15, 23, 42, 0.32);
+    0 26px 44px -26px rgba(7, 31, 72, 0.52),
+    0 8px 20px -14px rgba(126, 210, 255, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 0 0 1px rgba(11, 62, 105, 0.36);
 }
 
 .weather-appbar {
   @apply rounded-2xl border backdrop-blur-xl;
-  border-color: rgba(148, 163, 184, 0.26);
-  background-color: rgba(2, 10, 25, 0.86);
-  background-image: linear-gradient(165deg, rgba(59, 130, 246, 0.1), rgba(15, 23, 42, 0.2) 35%, rgba(2, 6, 23, 0.78));
+  border-color: rgba(219, 241, 255, 0.28);
+  background-color: rgba(11, 56, 100, 0.5);
+  background-image: linear-gradient(165deg, rgba(224, 242, 255, 0.2), rgba(90, 170, 240, 0.16) 42%, rgba(7, 39, 84, 0.46));
   box-shadow:
-    0 20px 34px -28px rgba(2, 6, 23, 0.9),
-    0 8px 18px -16px rgba(56, 189, 248, 0.3),
-    inset 0 1px 0 rgba(226, 232, 240, 0.12),
-    inset 0 0 0 1px rgba(15, 23, 42, 0.45);
+    0 20px 38px -24px rgba(6, 30, 72, 0.56),
+    0 10px 22px -16px rgba(141, 212, 255, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.36),
+    inset 0 0 0 1px rgba(10, 50, 92, 0.4);
 }
 
 .weather-panel-static {
@@ -98,11 +109,13 @@ body {
 
 .weather-tile {
   @apply rounded-2xl border border-slate-700/70 bg-slate-950/70 backdrop-blur-xl;
-  background-image: linear-gradient(160deg, rgba(56, 189, 248, 0.05), rgba(129, 140, 248, 0.03) 50%, rgba(2, 6, 23, 0.28) 76%);
+  border-color: rgba(205, 235, 255, 0.22);
+  background-color: rgba(10, 62, 104, 0.42);
+  background-image: linear-gradient(162deg, rgba(214, 240, 255, 0.18), rgba(66, 165, 245, 0.14) 48%, rgba(12, 80, 139, 0.24) 100%);
   box-shadow:
-    0 18px 30px -28px rgba(2, 6, 23, 0.78),
-    inset 0 1px 0 rgba(148, 163, 184, 0.13),
-    inset 0 0 0 1px rgba(15, 23, 42, 0.5);
+    0 20px 32px -22px rgba(7, 33, 72, 0.48),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 0 0 1px rgba(8, 54, 96, 0.3);
 }
 
 .weather-bento-grid {
@@ -173,10 +186,10 @@ body {
   @apply rounded-2xl border backdrop-blur;
   border-color: var(--surface-border);
   background-color: var(--surface-bg);
-  background-image: linear-gradient(180deg, rgba(30, 24, 21, 0.44), rgba(2, 6, 23, 0.72));
+  background-image: linear-gradient(180deg, rgba(214, 240, 255, 0.18), rgba(52, 146, 198, 0.2) 50%, rgba(14, 90, 145, 0.24));
   box-shadow:
-    inset 0 1px 0 rgba(186, 230, 253, 0.04),
-    inset 0 0 0 1px rgba(15, 23, 42, 0.34);
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 0 0 1px rgba(11, 58, 105, 0.26);
 }
 
 
@@ -263,8 +276,9 @@ body {
 
 .weather-chip {
   @apply rounded-full border border-slate-700/70 bg-slate-900/70 text-slate-100;
-  background-image: linear-gradient(180deg, rgba(30, 58, 138, 0.4), rgba(2, 6, 23, 0.8));
-  box-shadow: inset 0 1px 0 rgba(186, 230, 253, 0.09);
+  border-color: rgba(216, 240, 255, 0.34);
+  background-image: linear-gradient(180deg, rgba(224, 242, 255, 0.24), rgba(40, 125, 184, 0.34));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.34);
 }
 
 
@@ -597,7 +611,7 @@ body {
   min-height: 44px;
   padding-inline: 1rem;
   font-weight: 500;
-  background: linear-gradient(180deg, rgba(30, 41, 59, 0.62), rgba(2, 6, 23, 0.78));
+  background: linear-gradient(180deg, rgba(15, 75, 122, 0.62), rgba(6, 39, 78, 0.78));
   box-shadow:
     inset 0 0 0 1px rgba(15, 23, 42, 0.5),
     0 10px 18px -16px rgba(2, 6, 23, 0.84);
@@ -614,7 +628,7 @@ body {
   min-height: 44px;
   padding-inline: 1rem;
   font-weight: 600;
-  background: linear-gradient(135deg, rgba(14, 165, 233, 0.72), rgba(56, 189, 248, 0.34));
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.82), rgba(59, 130, 246, 0.58));
   box-shadow:
     0 20px 36px -22px rgba(14, 165, 233, 0.75),
     0 6px 16px -12px rgba(125, 211, 252, 0.4),
@@ -642,7 +656,7 @@ body {
 .weather-cta-primary {
   border-color: rgba(56, 189, 248, 0.72);
   color: rgb(241 245 249);
-  background: linear-gradient(135deg, rgba(14, 165, 233, 0.72), rgba(56, 189, 248, 0.34));
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.82), rgba(59, 130, 246, 0.58));
   box-shadow:
     0 20px 36px -22px rgba(14, 165, 233, 0.75),
     0 6px 16px -12px rgba(125, 211, 252, 0.4),
@@ -650,9 +664,9 @@ body {
 }
 
 .weather-cta-secondary {
-  border-color: rgba(51, 65, 85, 0.82);
+  border-color: rgba(156, 204, 255, 0.42);
   color: rgb(241 245 249);
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.9), rgba(2, 6, 23, 0.75));
+  background: linear-gradient(180deg, rgba(9, 53, 99, 0.76), rgba(8, 34, 72, 0.8));
   box-shadow:
     inset 0 0 0 1px rgba(15, 23, 42, 0.42),
     0 12px 20px -16px rgba(2, 6, 23, 0.82);

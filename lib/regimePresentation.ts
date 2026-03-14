@@ -28,25 +28,46 @@ export const REGIME_LEGEND_LABELS: Record<RegimeKey, string> = {
   EXPANSION: "Expansion",
 };
 
+export const REGIME_WEATHER_LABELS: Record<RegimeKey, string> = {
+  SCARCITY: "Hard Freeze",
+  DEFENSIVE: "Overcast",
+  VOLATILE: "Squall Line",
+  EXPANSION: "Clear Skies",
+};
+
+export type RegimeWeatherIcon = "snowflake" | "cloud" | "storm" | "sun";
+
+export const REGIME_WEATHER_ICONS: Record<RegimeKey, RegimeWeatherIcon> = {
+  SCARCITY: "snowflake",
+  DEFENSIVE: "cloud",
+  VOLATILE: "storm",
+  EXPANSION: "sun",
+};
+
 export const REGIME_LEGEND_ARIA_LABELS: Record<RegimeKey, string> = {
-  SCARCITY: "Scarcity regime: capital constrained and risk appetite weak",
-  DEFENSIVE: "Defensive regime: capital constrained with moderate risk appetite",
-  VOLATILE: "Transitional regime: mixed read with unstable risk appetite",
-  EXPANSION: "Expansion regime: capital easing with stronger risk appetite",
+  SCARCITY: "Scarcity regime: capital constrained and risk appetite weak; weather type hard freeze",
+  DEFENSIVE: "Defensive regime: capital constrained with moderate risk appetite; weather type overcast",
+  VOLATILE: "Transitional regime: mixed read with unstable risk appetite; weather type squall line",
+  EXPANSION: "Expansion regime: capital easing with stronger risk appetite; weather type clear skies",
 };
 
 export const getOrderedRegimeLegend = () => REGIME_ORDER.map((regime) => ({
   regime,
   label: REGIME_LEGEND_LABELS[regime],
+  weather: REGIME_WEATHER_LABELS[regime],
+  weatherIcon: REGIME_WEATHER_ICONS[regime],
   ariaLabel: REGIME_LEGEND_ARIA_LABELS[regime],
 }));
 
 
+export const getRegimeWeatherLabel = (regime: RegimeKey) => REGIME_WEATHER_LABELS[regime];
+export const getRegimeWeatherIcon = (regime: RegimeKey) => REGIME_WEATHER_ICONS[regime];
+
 export const REGIME_LEGEND_DESCRIPTORS: Record<RegimeKey, string> = {
-  SCARCITY: "Cash preservation first; pause irreversible expansion.",
-  DEFENSIVE: "Operate for efficiency; approve only near-term proof bets.",
-  VOLATILE: "Mixed read; prioritize reversible moves and signal confirmation.",
-  EXPANSION: "Press growth with guardrails while leading signals hold.",
+  SCARCITY: "Cash is tight. Protect runway and pause big one-way commitments.",
+  DEFENSIVE: "Stay efficient. Approve only work that pays back soon.",
+  VOLATILE: "Signals are mixed. Keep moves reversible until the trend is clearer.",
+  EXPANSION: "Conditions support growth. Move faster, but keep guardrails in place.",
 };
 
 
@@ -55,6 +76,10 @@ export type RegimeBannerTone = {
   legendPanel: string;
   activePill: string;
   metrics: string;
+  calloutSurface: string;
+  meterTrack: string;
+  meterFill: string;
+  weatherHint: string;
 };
 
 export const REGIME_BANNER_TOKENS: Record<RegimeKey, RegimeBannerTone> = {
@@ -63,24 +88,40 @@ export const REGIME_BANNER_TOKENS: Record<RegimeKey, RegimeBannerTone> = {
     legendPanel: "border-rose-400/30 bg-slate-950/75",
     activePill: "border-rose-300/85 bg-rose-400/20 text-rose-50 shadow-[0_0_0_1px_rgba(251,113,133,0.25)]",
     metrics: "text-rose-100",
+    calloutSurface: "border-rose-300/30 bg-rose-950/22",
+    meterTrack: "bg-rose-950/55",
+    meterFill: "shadow-[0_0_0_1px_rgba(255,255,255,0.2)]",
+    weatherHint: "text-rose-100",
   },
   DEFENSIVE: {
     shell: "border-amber-400/65 bg-gradient-to-br from-amber-900/45 via-slate-950/95 to-slate-950 text-amber-50",
     legendPanel: "border-amber-300/25 bg-slate-950/75",
     activePill: "border-amber-300/85 bg-amber-300/20 text-amber-50 shadow-[0_0_0_1px_rgba(252,211,77,0.22)]",
     metrics: "text-amber-100",
+    calloutSurface: "border-amber-300/28 bg-amber-950/20",
+    meterTrack: "bg-amber-950/45",
+    meterFill: "shadow-[0_0_0_1px_rgba(255,255,255,0.2)]",
+    weatherHint: "text-amber-100",
   },
   VOLATILE: {
     shell: "border-sky-400/65 bg-gradient-to-br from-sky-900/45 via-slate-950/95 to-slate-950 text-sky-50",
     legendPanel: "border-sky-300/25 bg-slate-950/75",
     activePill: "border-sky-300/85 bg-sky-400/20 text-sky-50 shadow-[0_0_0_1px_rgba(125,211,252,0.25)]",
     metrics: "text-sky-100",
+    calloutSurface: "border-sky-300/28 bg-sky-950/22",
+    meterTrack: "bg-sky-950/48",
+    meterFill: "shadow-[0_0_0_1px_rgba(255,255,255,0.22)]",
+    weatherHint: "text-sky-100",
   },
   EXPANSION: {
     shell: "border-emerald-400/65 bg-gradient-to-br from-emerald-900/45 via-slate-950/95 to-slate-950 text-emerald-50",
     legendPanel: "border-emerald-300/25 bg-slate-950/75",
     activePill: "border-emerald-300/85 bg-emerald-300/20 text-emerald-50 shadow-[0_0_0_1px_rgba(110,231,183,0.24)]",
     metrics: "text-emerald-100",
+    calloutSurface: "border-emerald-300/30 bg-emerald-950/20",
+    meterTrack: "bg-emerald-950/45",
+    meterFill: "shadow-[0_0_0_1px_rgba(255,255,255,0.22)]",
+    weatherHint: "text-emerald-100",
   },
 };
 
