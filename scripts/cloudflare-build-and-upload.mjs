@@ -37,6 +37,10 @@ if (shouldForceNodeRuntime) {
 }
 
 const BUILD_META_PATH = join('.vercel', 'output', 'static', '_worker.js', 'build-meta.json');
+const isCloudflarePagesContext =
+  isTruthyEnv(process.env.CF_PAGES) ||
+  Boolean(process.env.CF_PAGES_BRANCH) ||
+  Boolean(process.env.CF_PAGES_COMMIT_SHA);
 
 const run = (command, args, env = process.env) => {
   const result = spawnSync(command, args, {
@@ -53,7 +57,8 @@ const run = (command, args, env = process.env) => {
 const childBuildEnv = {
   ...process.env,
   REQUIRE_CLOUDFLARE_WORKER_BUILD_SUCCESS:
-    process.env.REQUIRE_CLOUDFLARE_WORKER_BUILD_SUCCESS ?? "1",
+    process.env.REQUIRE_CLOUDFLARE_WORKER_BUILD_SUCCESS ??
+    (isCloudflarePagesContext ? "0" : "1"),
 };
 delete childBuildEnv.__WHETHER_NODE_RUNTIME_ACTIVE;
 
@@ -91,6 +96,13 @@ if (hasReusableOutput) {
   run('bun', ['run', 'build:pages:skip-next-build'], childBuildEnv);
 } else {
   run('bun', ['run', 'build:pages'], childBuildEnv);
+}
+
+if (isCloudflarePagesContext) {
+  console.log(
+    'Cloudflare Pages context detected; skipping `wrangler versions upload` because Pages handles deployment of build output.',
+  );
+  process.exit(0);
 }
 
 run('bun', ['run', 'wrangler:upload']);
