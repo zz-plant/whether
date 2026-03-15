@@ -1,5 +1,11 @@
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -133,7 +139,19 @@ const canReusePrebuiltOutputSafely =
 const forceCloudflareBuild =
   buildTarget === "cloudflare" || buildTarget === "pages";
 const forceNextBuild = buildTarget === "next";
+const forceFreshBuild = isTruthyEnv(process.env.FORCE_FRESH_BUILD);
+
+if (forceFreshBuild) {
+  rmSync(".next", { force: true, recursive: true });
+  rmSync(".vercel/output", { force: true, recursive: true });
+
+  console.log(
+    "FORCE_FRESH_BUILD=1 detected; cleared .next and .vercel/output to avoid stale assets.",
+  );
+}
+
 const shouldReuseCachedCloudflareOutputInCi =
+  !forceFreshBuild &&
   !forceCloudflareBuild &&
   !forceNextBuild &&
   isCi &&
@@ -171,15 +189,17 @@ if (
 const forceWebpackBuild = isTruthyEnv(process.env.NEXT_BUILD_FORCE_WEBPACK);
 const hasAnyCloudflareBuildOutput = hasVercelBuildOutput || hasWorkerBuildOutput;
 const shouldAutoSkipInCi =
+  !forceFreshBuild &&
   useNextOnPages &&
   !forceCloudflareBuild &&
   hasVercelBuildOutput &&
   (isCi || isCloudflarePages || isCloudflareDeploy);
 const skipBuildWasRequested =
-  skipNextOnPagesBuild ||
-  hasReusableBuildOutput ||
-  canReusePrebuiltOutputSafely ||
-  shouldAutoSkipInCi;
+  !forceFreshBuild &&
+  (skipNextOnPagesBuild ||
+    hasReusableBuildOutput ||
+    canReusePrebuiltOutputSafely ||
+    shouldAutoSkipInCi);
 const canSkipNextOnPagesBuild = hasVercelBuildOutput;
 const shouldSkipNextOnPagesBuild =
   useNextOnPages &&
