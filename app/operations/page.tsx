@@ -249,8 +249,10 @@ export default async function OperationsPage({
         ) : null
       }
     >
-      {!reportResult.ok ? (
-        <LiveDataFallbackAlert lastCachedTimestamp={reportResult.fallback.lastCachedTimestamp} />
+      {!historicalSelection && isFallback ? (
+        <LiveDataFallbackAlert
+          lastCachedTimestamp={reportResult.ok ? treasury.fetched_at : reportResult.fallback.lastCachedTimestamp}
+        />
       ) : null}
 
       <section className="weather-panel space-y-3 px-5 py-4" aria-label="Three execution moves this week">

@@ -72,6 +72,9 @@ export const HomePageReportContent = async ({
 }) => {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const homepage = await assembleHomePage({ searchParams: resolvedSearchParams });
+  const lastCachedTimestamp = homepage.reportResult.ok
+    ? homepage.reportResult.data.treasury.fetched_at
+    : homepage.reportResult.fallback.lastCachedTimestamp;
 
   return (
     <ReportShell
@@ -162,9 +165,9 @@ export const HomePageReportContent = async ({
         </div>
       </section>
 
-      {!homepage.reportResult.ok ? (
+      {homepage.fallbackActive ? (
         <LiveDataFallbackAlert
-          lastCachedTimestamp={homepage.reportResult.fallback.lastCachedTimestamp}
+          lastCachedTimestamp={lastCachedTimestamp}
           followUpLabel="Review live evidence"
         />
       ) : null}
