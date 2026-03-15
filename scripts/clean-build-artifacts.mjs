@@ -1,6 +1,6 @@
 import { rmSync } from "node:fs";
 
-const targets = [".next", "out", ".vercel", "node_modules"];
+const targets = [".next", "out", ".vercel"];
 
 for (const target of targets) {
   rmSync(target, { force: true, recursive: true });

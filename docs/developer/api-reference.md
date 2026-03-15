@@ -36,6 +36,7 @@ Whether exposes read-first JSON endpoints for summary generation, cadence checks
 
 | Endpoint | Method | Purpose |
 | --- | --- | --- |
+| `/api/brief/slack` | GET | Slack-ready executive brief payload for the current report state. |
 | `/api/integrations/weekly-mandate?target=<slack|email|...>` | GET | Destination-specific weekly mandate payload. |
 | `/api/health` | GET | Monitor-friendly service + treasury freshness status. |
 | `/llms.txt` | GET | Plain-text machine onboarding and endpoint discovery. |

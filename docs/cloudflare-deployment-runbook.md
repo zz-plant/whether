@@ -9,7 +9,7 @@ bun install --frozen-lockfile
 bun run deploy:cloudflare
 ```
 
-`bun run deploy:cloudflare` reuses an existing `.vercel/output` build for the same commit when available and falls back to a full `build:pages` + upload when not.
+`bun run deploy:cloudflare` reuses an existing `.vercel/output` build for the same commit when available and falls back to a full `build:pages` when not, then runs `wrangler deploy --keep-vars` so the latest build is published without deleting dashboard-managed vars.
 
 ## Expected warnings (non-blocking)
 

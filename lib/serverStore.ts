@@ -84,47 +84,23 @@ export const createMemoryServerStoreAdapter = (): ServerStoreAdapter => ({
 const getDefaultStoreFilePath = () =>
   process.env.WHETHER_SERVER_STORE_FILE?.trim() || "/tmp/whether-server-store.json";
 
-const loadNodeModules = async () => {
+const loadFileServerStoreAdapter = async () => {
+  if (process.env.NEXT_RUNTIME === "edge") {
+    return null;
+  }
+
   try {
-    const [fs, path] = await Promise.all([import("node:fs/promises"), import("node:path")]);
-    return { fs, path };
+    const { createFileServerStoreAdapter } = await import(
+      /* webpackIgnore: true */ "./serverStore.node"
+    );
+    return createFileServerStoreAdapter(
+      getDefaultStoreFilePath(),
+      toSnapshot,
+      createEmptySnapshot,
+    );
   } catch {
     return null;
   }
-};
-
-export const createFileServerStoreAdapter = async (
-  storeFilePath = getDefaultStoreFilePath()
-): Promise<ServerStoreAdapter | null> => {
-  const modules = await loadNodeModules();
-  if (!modules) {
-    return null;
-  }
-
-  const { fs, path } = modules;
-
-  const readSnapshot = async (): Promise<ServerStoreSnapshot> => {
-    try {
-      const raw = await fs.readFile(storeFilePath, "utf8");
-      return toSnapshot(JSON.parse(raw));
-    } catch {
-      return createEmptySnapshot();
-    }
-  };
-
-  return {
-    kind: "file",
-    load: readSnapshot,
-    async save(nextSnapshot) {
-      const output = `${JSON.stringify(nextSnapshot, null, 2)}\n`;
-      const directory = path.dirname(storeFilePath);
-      const tempPath = `${storeFilePath}.tmp`;
-
-      await fs.mkdir(directory, { recursive: true });
-      await fs.writeFile(tempPath, output, "utf8");
-      await fs.rename(tempPath, storeFilePath);
-    },
-  };
 };
 
 let adapterOverride: ServerStoreAdapter | null = null;
@@ -142,7 +118,7 @@ const resolveAdapter = async (): Promise<ServerStoreAdapter> => {
     return createMemoryServerStoreAdapter();
   }
 
-  const fileAdapter = await createFileServerStoreAdapter();
+  const fileAdapter = await loadFileServerStoreAdapter();
   if (fileAdapter) {
     return fileAdapter;
   }

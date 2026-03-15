@@ -3,6 +3,8 @@ import Link from "next/link";
 import { buildPageMetadata } from "../../lib/seo";
 import { DecidePresetManager } from "./components/decidePresetManager";
 
+export const runtime = "edge";
+
 export const metadata: Metadata = buildPageMetadata({
   title: "Role Lenses — reference library",
   description: "Role lens library for product, engineering, finance, and leadership decision references.",
