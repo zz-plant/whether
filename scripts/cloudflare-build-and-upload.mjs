@@ -49,14 +49,22 @@ const isCloudflarePagesContext =
   Boolean(process.env.CF_PAGES_BRANCH) ||
   Boolean(process.env.CF_PAGES_COMMIT_SHA);
 const hasCloudflareDeployContext = Boolean(process.env.CLOUDFLARE_ACCOUNT_ID);
+const currentCommitSha =
+  process.env.CF_PAGES_COMMIT_SHA ||
+  process.env.GITHUB_SHA ||
+  process.env.VERCEL_GIT_COMMIT_SHA ||
+  null;
 const branch =
   process.env.CF_PAGES_BRANCH ||
   process.env.GITHUB_REF_NAME ||
   process.env.VERCEL_GIT_COMMIT_REF ||
   "";
 const hasKnownBranchContext = Boolean(branch);
+const hasKnownCommitContext = Boolean(currentCommitSha);
 const shouldUseResilientBuildPathForUnknownDeployContext =
-  hasCloudflareDeployContext && !hasKnownBranchContext;
+  hasCloudflareDeployContext &&
+  !hasKnownBranchContext &&
+  hasKnownCommitContext;
 const shouldUseValidationOnlyDeployPath =
   isTruthyEnv(process.env.CLOUDFLARE_DEPLOY_VALIDATION_ONLY) ||
   isTruthyEnv(process.env.CLOUDFLARE_VALIDATION_ONLY);
@@ -96,12 +104,6 @@ const readBuildMeta = () => {
     return null;
   }
 };
-
-const currentCommitSha =
-  process.env.CF_PAGES_COMMIT_SHA ||
-  process.env.GITHUB_SHA ||
-  process.env.VERCEL_GIT_COMMIT_SHA ||
-  null;
 
 const buildMeta = readBuildMeta();
 const hasMatchingCommit =
