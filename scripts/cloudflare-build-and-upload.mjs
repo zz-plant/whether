@@ -47,7 +47,10 @@ const WORKER_ENTRYPOINT_PATH = join(
 const isCloudflarePagesContext =
   isTruthyEnv(process.env.CF_PAGES) ||
   Boolean(process.env.CF_PAGES_BRANCH) ||
-  Boolean(process.env.CF_PAGES_COMMIT_SHA);
+  Boolean(process.env.CF_PAGES_COMMIT_SHA) ||
+  Boolean(process.env.CF_PAGES_URL) ||
+  Boolean(process.env.CF_PAGES_PROJECT_NAME) ||
+  isTruthyEnv(process.env.CLOUDFLARE_PAGES);
 const hasCloudflareDeployContext = Boolean(process.env.CLOUDFLARE_ACCOUNT_ID);
 const currentCommitSha =
   process.env.CF_PAGES_COMMIT_SHA ||
