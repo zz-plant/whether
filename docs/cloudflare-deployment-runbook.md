@@ -13,6 +13,7 @@ bun run wrangler:upload
 
 This flow keeps dependency installation to a single explicit `bun install --frozen-lockfile` step, then reuses prebuilt `.vercel/output` for the Cloudflare conversion/upload stage.
 
+`bun run build:cloudflare` now performs a full conversion by default to avoid serving stale CSS/assets from reused local output. Prebuilt reuse is still available through the explicit `build:cloudflare:skip-next-build` command, and only when commit metadata confirms the prebuilt output is safe to reuse.
 
 `bun run build:pages` is now environment-aware:
 - no Cloudflare deploy context -> runs `deploy:cloudflare:nonprod` (plain Next build validation),
@@ -110,7 +111,7 @@ When CI already has a fresh `.vercel/output` from `bun run vercel:build`, you ca
 bun run build:cloudflare:skip-next-build
 ```
 
-This uses `NEXT_ON_PAGES_SKIP_BUILD=1` and forwards `--skip-build` to `next-on-pages`, while `NEXT_ON_PAGES_REUSE_PREBUILT=1` allows explicit reuse of restored/prebuilt output.
+This uses `NEXT_ON_PAGES_SKIP_BUILD=1` and forwards `--skip-build` to `next-on-pages`, while `NEXT_ON_PAGES_REUSE_PREBUILT=1` enables explicit reuse only when commit metadata matches the current build context.
 
 `scripts/build.mjs` also auto-enables this skip behavior when all of the following are true:
 - target is Cloudflare Pages (`build:cloudflare` / `build:pages`),
