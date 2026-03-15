@@ -34,14 +34,10 @@ const isProductionBranch = branchIsKnown && branch === productionBranch;
 const hasDeployContext = isCloudflarePages || isCloudflareDeploy;
 const shouldDefaultToNonProdBuild =
   !hasDeployContext ||
-  // Keep Cloudflare Pages builds on the resilient path by default.
+  // Keep Cloudflare Pages preview/unknown-branch builds on the resilient path by default.
   // next-on-pages currently fails when dynamic routes are not edge-compatible,
   // and this repo intentionally has non-edge dynamic routes.
-  isCloudflarePages ||
-  // Some Cloudflare Pages deploy-command runs expose account credentials but omit
-  // CF_PAGES context variables. Only treat unknown branch context as non-production
-  // when strict worker output is not required.
-  (!branchIsKnown && !shouldRequireWorkerBuildSuccess);
+  (isCloudflarePages && !isProductionBranch);
 
 const shouldUseNonProdBuild = !forceWorkerBuild && shouldDefaultToNonProdBuild;
 

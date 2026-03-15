@@ -54,14 +54,6 @@ const currentCommitSha =
   process.env.GITHUB_SHA ||
   process.env.VERCEL_GIT_COMMIT_SHA ||
   null;
-const branch =
-  process.env.CF_PAGES_BRANCH ||
-  process.env.GITHUB_REF_NAME ||
-  process.env.VERCEL_GIT_COMMIT_REF ||
-  "";
-const hasKnownBranchContext = Boolean(branch);
-const shouldUseResilientBuildPathForUnknownDeployContext =
-  hasCloudflareDeployContext && !hasKnownBranchContext;
 const shouldUseValidationOnlyDeployPath =
   isTruthyEnv(process.env.CLOUDFLARE_DEPLOY_VALIDATION_ONLY) ||
   isTruthyEnv(process.env.CLOUDFLARE_VALIDATION_ONLY);
@@ -80,11 +72,13 @@ const run = (command, args, env = process.env) => {
 
 const childBuildEnv = {
   ...process.env,
+  FORCE_CLOUDFLARE_WORKER_BUILD:
+    process.env.FORCE_CLOUDFLARE_WORKER_BUILD ??
+    (hasCloudflareDeployContext && !isCloudflarePagesContext ? "1" : undefined),
   REQUIRE_CLOUDFLARE_WORKER_BUILD_SUCCESS:
     process.env.REQUIRE_CLOUDFLARE_WORKER_BUILD_SUCCESS ??
     (isCloudflarePagesContext ||
-    shouldUseValidationOnlyDeployPath ||
-    shouldUseResilientBuildPathForUnknownDeployContext
+    shouldUseValidationOnlyDeployPath
       ? "0"
       : "1"),
 };
