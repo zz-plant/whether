@@ -24,20 +24,26 @@ const branch =
   "";
 const productionBranch = process.env.CF_PAGES_PRODUCTION_BRANCH ?? "main";
 const forceWorkerBuild = isTruthyEnv(process.env.FORCE_CLOUDFLARE_WORKER_BUILD);
-const isCloudflarePages = isTruthyEnv(process.env.CF_PAGES);
+const isCloudflarePagesContext =
+  isTruthyEnv(process.env.CF_PAGES) ||
+  Boolean(process.env.CF_PAGES_BRANCH) ||
+  Boolean(process.env.CF_PAGES_COMMIT_SHA) ||
+  Boolean(process.env.CF_PAGES_URL) ||
+  Boolean(process.env.CF_PAGES_PROJECT_NAME) ||
+  isTruthyEnv(process.env.CLOUDFLARE_PAGES);
 const shouldRequireWorkerBuildSuccess = isTruthyEnv(
   process.env.REQUIRE_CLOUDFLARE_WORKER_BUILD_SUCCESS,
 );
 const isCloudflareDeploy = Boolean(process.env.CLOUDFLARE_ACCOUNT_ID);
 const branchIsKnown = Boolean(branch);
 const isProductionBranch = branchIsKnown && branch === productionBranch;
-const hasDeployContext = isCloudflarePages || isCloudflareDeploy;
+const hasDeployContext = isCloudflarePagesContext || isCloudflareDeploy;
 const shouldDefaultToNonProdBuild =
   !hasDeployContext ||
   // Keep Cloudflare Pages preview/unknown-branch builds on the resilient path by default.
   // next-on-pages currently fails when dynamic routes are not edge-compatible,
   // and this repo intentionally has non-edge dynamic routes.
-  (isCloudflarePages && !isProductionBranch);
+  (isCloudflarePagesContext && !isProductionBranch);
 
 const shouldUseNonProdBuild = !forceWorkerBuild && shouldDefaultToNonProdBuild;
 
@@ -57,7 +63,7 @@ if (shouldUseNonProdBuild) {
     : "unknown";
 
   console.log(
-    `Using Cloudflare Pages resilient build path (branch: ${branchLabel}, context: ${branchContext}; CF_PAGES=${isCloudflarePages ? "1" : "0"}; deploy context=${hasDeployContext ? "1" : "0"}). Set FORCE_CLOUDFLARE_WORKER_BUILD=1 to force next-on-pages conversion.`,
+    `Using Cloudflare Pages resilient build path (branch: ${branchLabel}, context: ${branchContext}; CF_PAGES_CONTEXT=${isCloudflarePagesContext ? "1" : "0"}; deploy context=${hasDeployContext ? "1" : "0"}). Set FORCE_CLOUDFLARE_WORKER_BUILD=1 to force next-on-pages conversion.`,
   );
 
   const result = runNonProdBuild();
