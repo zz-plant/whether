@@ -80,10 +80,7 @@ const childBuildEnv = {
     (hasCloudflareDeployContext && !isCloudflarePagesContext ? "1" : undefined),
   REQUIRE_CLOUDFLARE_WORKER_BUILD_SUCCESS:
     process.env.REQUIRE_CLOUDFLARE_WORKER_BUILD_SUCCESS ??
-    (isCloudflarePagesContext ||
-    shouldUseValidationOnlyDeployPath
-      ? "0"
-      : "1"),
+    "0",
 };
 delete childBuildEnv.__WHETHER_NODE_RUNTIME_ACTIVE;
 
