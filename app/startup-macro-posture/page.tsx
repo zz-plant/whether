@@ -1,5 +1,6 @@
-import type { Metadata, Route } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
+import type { Route } from "../../lib/navigation/routeType";
 import { loadReportDataSafe } from "../../lib/report/reportData";
 import { buildPageMetadata, serializeJsonLd } from "../../lib/seo";
 import { tierOneDecisionPages, tierThreeKeywords, tierTwoKeywords } from "../answers/decisionPages";

@@ -1,4 +1,4 @@
-import type { Route } from "next";
+import type { Route } from "./routeType";
 import { navigationLayers } from "./informationArchitecture";
 
 export type PrimaryNavigationItem = {

@@ -1,0 +1,61 @@
+{
+  "url": "/decide/ops-risk/expansion-bets",
+  "kind": "decide",
+  "title": "Ops & Risk · Expansion bets",
+  "generatedAtIso": "2026-03-12T00:00:00.000Z",
+  "snapshot": {
+    "recordDate": "2026-03-12",
+    "fetchedAtIso": "2026-03-15T19:13:22.958Z",
+    "previousRecordDate": "2025-02-28"
+  },
+  "delta": {
+    "regimeChanged": true,
+    "directionLabel": "deteriorating",
+    "changedSignals": [
+      {
+        "key": "riskAppetite",
+        "label": "Risk appetite",
+        "delta": -21
+      },
+      {
+        "key": "curveSlope",
+        "label": "Curve slope",
+        "delta": -0.22999999999999998
+      },
+      {
+        "key": "baseRate",
+        "label": "Base rate",
+        "delta": 0.03999999999999959
+      }
+    ]
+  },
+  "payload": {
+    "currentCall": "Hold irreversible expansion bets; keep only reversible experiments active.",
+    "immediateAction": "Keep only reversible expansion experiments active with clear checkpoints.",
+    "triggerThreshold": "Pause expansion bets if risk appetite < 44 or tightness > 76.",
+    "reversalCondition": "Resume in tranches when risk appetite > 54 and tightness < 66.",
+    "evidence": [
+      {
+        "title": "Capital conditions",
+        "summary": "No material operating change this week.",
+        "confidenceLabel": "Low (near threshold, stage decisions)"
+      },
+      {
+        "title": "Risk appetite",
+        "summary": "Bias toward proof-first launches and smaller bet sizes.",
+        "confidenceLabel": "High (safe for near-term operating cadence)"
+      },
+      {
+        "title": "Policy rate pressure",
+        "summary": "Shorten payback windows before approving net-new spend.",
+        "confidenceLabel": "Low (near threshold, stage decisions)"
+      }
+    ],
+    "freshness": "Mar 15, 2026 at 7:13 PM UTC",
+    "degraded": false,
+    "noindex": false,
+    "noindexReasons": [],
+    "trustSummary": "Signal reliability LOW (Mar 15, 2026 at 7:13 PM UTC): keep approvals staged until reliability returns to HIGH.",
+    "citationMeta": "Posture VOLATILE · Signal reliability LOW · Effective Mar 12, 2026 · Freshness Mar 15, 2026 at 7:13 PM UTC"
+  }
+}

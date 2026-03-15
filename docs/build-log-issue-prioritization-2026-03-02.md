@@ -1,5 +1,7 @@
 # Build/Deploy Log Triage — 2026-03-02
 
+Historical note: this triage refers to the retired `next-on-pages` deployment path and is preserved for migration history only.
+
 ## Executive summary
 The deploy completed successfully, but there are **two actionable issues** in the logs and several informational items.
 

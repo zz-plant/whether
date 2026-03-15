@@ -1,4 +1,4 @@
-import type { Route } from "next";
+import type { Route } from "./routeType";
 
 export type NavigationLayerKey =
   | "weekly-brief"

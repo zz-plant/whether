@@ -403,32 +403,36 @@ Freshness: ${freshnessText(body)}\n\nLeadership should:\n${body.leadershipShould
 const changesText = (body) => `What Changed Since Last Refresh
 Freshness: ${freshnessText(body)}\n\nCHANGED\n${body.changed.map((item) => `- ${item.metric} ${item.from} → ${item.to} (${item.direction}, ${item.impact})`).join("\n")}\n\nREVISIT\n${body.revisit.map((item) => `- ${item}`).join("\n")}\n\nFLIP\n${body.flip.map((item) => `- ${item.condition}${typeof item.distance === "number" ? ` (${item.distance} away)` : ""}`).join("\n")}`;
 
-const routeWithAllowedParams = (base, flags, allowedFlags) => {
+const routeWithCommonParams = (base, flags, allowedFlags = ["as-of", "company", "stage", "weeks", "view"]) => {
   const keyMap = {
     "as-of": "asOf",
+    company: "company",
+    stage: "stage",
     weeks: "weeks",
     view: "view",
     tightness: "tightness",
     "risk-appetite": "risk-appetite",
   };
   const params = new URLSearchParams();
-  for (const flag of allowedFlags) {
-    const value = flags[flag];
-    if (value === undefined) continue;
-    params.set(keyMap[flag] ?? flag, String(value));
-  }
+  if (allowedFlags.includes("as-of") && flags["as-of"]) params.set("asOf", String(flags["as-of"]));
+  if (allowedFlags.includes("company") && flags.company) params.set("company", String(flags.company));
+  if (allowedFlags.includes("stage") && flags.stage) params.set("stage", String(flags.stage));
+  if (allowedFlags.includes("weeks") && flags.weeks) params.set("weeks", String(flags.weeks));
+  if (allowedFlags.includes("view") && flags.view) params.set("view", String(flags.view));
+  if (allowedFlags.includes("tightness") && flags.tightness !== undefined) params.set("tightness", String(flags.tightness));
+  if (allowedFlags.includes("risk-appetite") && flags["risk-appetite"] !== undefined) params.set("risk-appetite", String(flags["risk-appetite"]));
   const query = params.toString();
   return query ? `${base}?${query}` : base;
 };
 
 const cliRoutes = {
-  status: (flags) => routeWithAllowedParams("/api/cli/status", flags, ["as-of", "view"]),
-  call: (flags) => routeWithAllowedParams("/api/cli/call", flags, ["as-of"]),
-  changes: (flags) => routeWithAllowedParams("/api/cli/changes", flags, ["as-of"]),
-  diagnostics: (flags) => routeWithAllowedParams("/api/cli/diagnostics", flags, ["as-of"]),
-  regime: (flags) => routeWithAllowedParams("/api/cli/regime", flags, ["as-of"]),
-  history: (flags) => routeWithAllowedParams("/api/cli/history", flags, ["as-of", "weeks"]),
-  scenario: (flags) => routeWithAllowedParams("/api/cli/scenario", flags, ["tightness", "risk-appetite"]),
+  status: (flags) => routeWithCommonParams("/api/cli/status", flags, ["as-of", "view"]),
+  call: (flags) => routeWithCommonParams("/api/cli/call", flags, ["as-of"]),
+  changes: (flags) => routeWithCommonParams("/api/cli/changes", flags, ["as-of"]),
+  diagnostics: (flags) => routeWithCommonParams("/api/cli/diagnostics", flags, ["as-of"]),
+  regime: (flags) => routeWithCommonParams("/api/cli/regime", flags, ["as-of"]),
+  history: (flags) => routeWithCommonParams("/api/cli/history", flags, ["as-of", "weeks"]),
+  scenario: (flags) => routeWithCommonParams("/api/cli/scenario", flags, ["tightness", "risk-appetite"]),
 };
 
 const writeFileIfRequested = async (flags, payload, settings) => {
@@ -874,4 +878,7 @@ const main = async () => {
   }
 };
 
-main();
+main()
+  .then(() => {
+    process.exit(0);
+  });

@@ -99,3 +99,4 @@ Attempted to run `bunx wrangler versions upload` to compare upload size logs.
 
 - Blocked in this environment due missing `CLOUDFLARE_API_TOKEN` in non-interactive mode.
 - Command emitted explicit auth requirement and did not provide upload byte totals.
+Historical note: this bundle-composition audit refers to the retired `.vercel` / `next-on-pages` worker output and is preserved for migration history only.

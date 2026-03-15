@@ -28,8 +28,11 @@ jobs:
       - name: Run full project checks
         run: bun run check
 
-      - name: Build Next.js output
+      - name: Check Vinext compatibility
+        run: bun run check:vinext
+
+      - name: Build app output
         run: bun run build
 
-      - name: Build Cloudflare Pages output (resilient path)
-        run: bun run build:pages
+      - name: Build Cloudflare Worker output
+        run: bun run build:cloudflare

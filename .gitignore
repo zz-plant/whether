@@ -1,5 +1,8 @@
 node_modules
 .next
+.cache
+/.wrangler
+dist
 out
 .vercel
 .env.local

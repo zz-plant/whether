@@ -1,4 +1,4 @@
-import type { Route } from "next";
+import type { Route } from "./navigation/routeType";
 
 export type GovernanceLexiconTerm = {
   slug: "reversibility" | "escalation-thresholds" | "30-day-confirmation-logic" | "capital-regime";

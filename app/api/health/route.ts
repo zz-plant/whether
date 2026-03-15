@@ -19,7 +19,6 @@ const toHours = (isoTimestamp: string, now = new Date()) => {
 };
 
 const getCommitSha = () =>
-  process.env.VERCEL_GIT_COMMIT_SHA ??
   process.env.CF_PAGES_COMMIT_SHA ??
   process.env.GITHUB_SHA ??
   null;

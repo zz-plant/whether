@@ -1,4 +1,4 @@
-import type { Route } from "next";
+import type { Route } from "./navigation/routeType";
 import type { DecisionArea } from "./report/boundedDecisionRules";
 
 export type ResourceArticle = {

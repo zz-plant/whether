@@ -10,7 +10,6 @@ const buildCpus = parsePositiveInt(process.env.NEXT_BUILD_CPUS);
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  typedRoutes: true,
   // Build pipelines run typecheck separately (`bun run check`),
   // so we skip duplicated TypeScript validation during `next build` to reduce deploy time.
   typescript: {

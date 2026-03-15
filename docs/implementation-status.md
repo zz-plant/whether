@@ -6,7 +6,7 @@ This document consolidates delivery status across product roadmap audits, known 
 
 - Milestones 5–8 are largely complete, with one remaining UX item.
 - Summary-system follow-ups remain open (P1/P2).
-- Stack modernization has completed setup guardrails, but major migration execution is still open.
+- Stack modernization cut over to Vinext on Cloudflare Workers; warning cleanup and long-tail validation remain open.
 
 ## Product roadmap (milestones 5–8)
 
@@ -40,10 +40,10 @@ This document consolidates delivery status across product roadmap audits, known 
 - [x] Complete framework canary spike and publish findings.
 - [x] Complete Tailwind v4 impact audit.
 - [x] Verify Cloudflare Pages build compatibility on candidate stack.
-- [ ] Approve go/no-go with rollback plan before production migration PRs.
+- [x] Approve cutover and switch production build/deploy to Vinext.
 
 ### Mid-term checklist
-- [ ] Run Wave 1 framework-core production migration.
+- [x] Run Wave 1 framework-core production migration.
 - [ ] Run Wave 2 Tailwind v4 migration with visual QA sign-off.
 - [ ] Run Wave 3 supporting dependency upgrades.
 - [x] Add CI Pages-targeted build gating and compatibility evidence requirement.
@@ -60,7 +60,18 @@ This document consolidates delivery status across product roadmap audits, known 
 | `bun run lint` | Pass | Completed cleanly on pinned dependencies. | `docs/evidence/stack-modernization/2026-03-12-baseline/lint.log` |
 | `bun run typecheck` | Fail | Pre-existing TypeScript drift across app/test contracts and generated payload typings. | `docs/evidence/stack-modernization/2026-03-12-baseline/typecheck.log` |
 | `bun run test` | Fail | 12 failing tests (weekly card shell assumptions + posture/payload contract assertions). | `docs/evidence/stack-modernization/2026-03-12-baseline/test.log` |
-| `bun run build:pages` | Pass with warnings | Cloudflare Pages artifact emitted; `next-on-pages` reported dynamic route prerender config warnings. | `docs/evidence/stack-modernization/2026-03-12-baseline/build-pages.log` |
+| `bun run build:pages` | Pass with warnings | Historical pre-cutover baseline on the old `next-on-pages` lane. | `docs/evidence/stack-modernization/2026-03-12-baseline/build-pages.log` |
+
+### Post-cutover verification (2026-03-15)
+
+| Command | Outcome | Notes |
+| --- | --- | --- |
+| `bun run check:vinext` | Pass | 100% compatible. |
+| `bun run lint` | Pass | No repo-level lint errors after cutover cleanup. |
+| `bun run typecheck` | Pass | Local route-type layer and Vinext wrapper changes typecheck cleanly. |
+| `bun test tests/cliContracts.test.ts tests/whetherCli.test.ts tests/weeklyCardSectionDiagnostics.test.tsx` | Pass | 31 tests passed; cutover-sensitive regression set clean. |
+| `bun run build` | Pass with known upstream warnings | Vinext build completes; remaining warnings are Rolldown/Vinext diagnostics. |
+| `bun run deploy:cloudflare:dry-run` | Pass | Production Worker config dry-run succeeds. |
 
 ## Proposed next milestone (not started)
 

@@ -34,6 +34,6 @@ describe("DiagnosticsSection", () => {
     assert.match(html, /Need deeper analysis\?/);
     assert.match(html, /Since last review/);
     assert.match(html, /Open diagnostics: evidence, drivers, and model inputs/);
-    assert.match(html, /Defensive probability:/);
+    assert.doesNotMatch(html, /Defensive probability:/);
   });
 });

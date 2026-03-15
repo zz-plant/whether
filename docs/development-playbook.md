@@ -10,7 +10,7 @@ For baseline project orientation, start with `CONTRIBUTING.md`.
 
 ## 1) Preferred day-to-day workflow
 
-**Runtime policy (Option A — transition):** Bun is the primary runtime/package manager. Node.js remains a supported fallback for selected build scripts (`scripts/build.mjs`).
+**Runtime policy:** Bun is the primary runtime/package manager. Node.js `>=22` is required for Vinext build/deploy scripts.
 
 1. **Sync and install**
    - `git pull --rebase`
@@ -152,4 +152,3 @@ Use these canon terms across `/` and `/operations` unless a section is explicitl
 | Macro context and supporting evidence | `environment` | External market conditions that inform confidence and pacing, not the call itself. | backdrop climate (as primary label) |
 
 Rule: write `regime -> posture -> environment` in that order when all three appear together in one artifact.
-

@@ -1,9 +1,9 @@
 # Setup commands
 
 ## Toolchain
-- **Runtime policy (Option A — transition):** Bun is the primary runtime/package manager, and Node.js is a supported fallback for selected build scripts.
+- **Runtime policy:** Bun is the primary runtime/package manager, and Node.js `>=22` is required for Vinext build/deploy commands.
 - Bun 1.3.x (`packageManager` + `engines.bun` in `package.json`)
-- Node.js 20.16.x (`engines.node` in `package.json`; fallback runtime for `scripts/build.mjs`)
+- Node.js `>=22` (`engines.node` in `package.json`; required by `scripts/vinext-run.mjs`)
 
 ## Core repo commands
 - Install dependencies: `bun install`
