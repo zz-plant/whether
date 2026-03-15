@@ -16,7 +16,8 @@ describe("buildTrustStatus trust tones", () => {
     assert.equal(result.trustStatusTone, "stable");
     assert.match(result.trustStatusLabel, /Live • Treasury verified/);
     assert.match(result.trustStatusDetail, /do now \/ hold \/ revisit/);
-    assert.match(result.trustStatusAction, /If confidence drops/);
+    assert.match(result.trustStatusAction, /Trigger: confidence drops/);
+    assert.match(result.trustStatusAction, /Reversal: return to standard cadence/);
   });
 
   it("returns warning trust copy that keeps decision path but stages irreversible approvals", () => {
@@ -32,8 +33,9 @@ describe("buildTrustStatus trust tones", () => {
     assert.equal(result.trustStatusTone, "warning");
     assert.match(result.trustStatusLabel, /Using last verified snapshot/);
     assert.match(result.trustStatusDetail, /keep today’s do now \/ hold \/ revisit path/);
-    assert.match(result.trustStatusDetail, /Treasury API timeout/);
-    assert.match(result.trustStatusAction, /If confidence is low, stage commitments/);
+    assert.match(result.trustStatusDetail, /Source issue: Treasury API timeout/);
+    assert.match(result.trustStatusAction, /Trigger: confidence LOW or feed unavailable/);
+    assert.match(result.trustStatusAction, /Reversal: resume normal approvals/);
   });
 
   it("returns historical trust copy for retrospective use with explicit confidence fallback action", () => {
@@ -48,7 +50,8 @@ describe("buildTrustStatus trust tones", () => {
     assert.equal(result.trustStatusTone, "historical");
     assert.match(result.trustStatusLabel, /Historical snapshot/);
     assert.match(result.trustStatusDetail, /retrospective only/);
-    assert.match(result.trustStatusAction, /If confidence is low, switch to current data/);
+    assert.match(result.trustStatusAction, /Trigger: confidence LOW/);
+    assert.match(result.trustStatusAction, /Reversal: switch to current data/);
   });
 
   it("keeps compact freshness/trust wording aligned for degraded snapshots", () => {
