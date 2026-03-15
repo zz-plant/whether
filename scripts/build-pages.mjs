@@ -34,7 +34,10 @@ const isCloudflarePagesContext =
 const shouldRequireWorkerBuildSuccess = isTruthyEnv(
   process.env.REQUIRE_CLOUDFLARE_WORKER_BUILD_SUCCESS,
 );
-const isCloudflareDeploy = Boolean(process.env.CLOUDFLARE_ACCOUNT_ID);
+const hasWranglerUploadCredentials =
+  Boolean(process.env.CLOUDFLARE_ACCOUNT_ID) &&
+  Boolean(process.env.CLOUDFLARE_API_TOKEN);
+const isCloudflareDeploy = hasWranglerUploadCredentials;
 const branchIsKnown = Boolean(branch);
 const isProductionBranch = branchIsKnown && branch === productionBranch;
 const hasDeployContext = isCloudflarePagesContext || isCloudflareDeploy;

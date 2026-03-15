@@ -52,6 +52,9 @@ const isCloudflarePagesContext =
   Boolean(process.env.CF_PAGES_PROJECT_NAME) ||
   isTruthyEnv(process.env.CLOUDFLARE_PAGES);
 const hasCloudflareDeployContext = Boolean(process.env.CLOUDFLARE_ACCOUNT_ID);
+const hasWranglerUploadCredentials =
+  Boolean(process.env.CLOUDFLARE_ACCOUNT_ID) &&
+  Boolean(process.env.CLOUDFLARE_API_TOKEN);
 const currentCommitSha =
   process.env.CF_PAGES_COMMIT_SHA ||
   process.env.GITHUB_SHA ||
@@ -59,7 +62,10 @@ const currentCommitSha =
   null;
 const shouldUseValidationOnlyDeployPath =
   isTruthyEnv(process.env.CLOUDFLARE_DEPLOY_VALIDATION_ONLY) ||
-  isTruthyEnv(process.env.CLOUDFLARE_VALIDATION_ONLY);
+  isTruthyEnv(process.env.CLOUDFLARE_VALIDATION_ONLY) ||
+  // Cloudflare Pages-managed deploys can expose account context without Wrangler
+  // upload credentials in the deploy phase. Treat those as build-only validation.
+  !hasWranglerUploadCredentials;
 
 const run = (command, args, env = process.env) => {
   const result = spawnSync(command, args, {
@@ -77,12 +83,12 @@ const childBuildEnv = {
   ...process.env,
   FORCE_CLOUDFLARE_WORKER_BUILD:
     process.env.FORCE_CLOUDFLARE_WORKER_BUILD ??
-    (hasCloudflareDeployContext && !isCloudflarePagesContext ? "1" : undefined),
+    (hasWranglerUploadCredentials && !isCloudflarePagesContext ? "1" : undefined),
   REQUIRE_CLOUDFLARE_WORKER_BUILD_SUCCESS:
     process.env.REQUIRE_CLOUDFLARE_WORKER_BUILD_SUCCESS ??
     // Keep worker conversion strict by default whenever this run is expected to
     // produce/upload worker artifacts outside Pages-managed deploys.
-    (hasCloudflareDeployContext && !isCloudflarePagesContext && !shouldUseValidationOnlyDeployPath
+    (hasWranglerUploadCredentials && !isCloudflarePagesContext && !shouldUseValidationOnlyDeployPath
       ? "1"
       : "0"),
 };
