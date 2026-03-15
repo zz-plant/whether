@@ -17,7 +17,7 @@ Detect the package manager from the lockfile:
 | --------------------------- | ------- | ------------- | --------------- |
 | `pnpm-lock.yaml`            | pnpm    | `pnpm add`    | `pnpm remove`   |
 | `yarn.lock`                 | yarn    | `yarn add`    | `yarn remove`   |
-| `bun.lockb` / `bun.lock`    | bun     | `bun add`     | `bun remove`    |
+| `bun.lockb`                 | bun     | `bun add`     | `bun remove`    |
 | `package-lock.json` or none | npm     | `npm install` | `npm uninstall` |
 
 Detect the router: if an `app/` directory exists at root or under `src/`, it's App Router. If only `pages/` exists, it's Pages Router. Both can coexist.

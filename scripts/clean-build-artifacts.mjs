@@ -1,6 +1,6 @@
 import { rmSync } from "node:fs";
 
-const targets = [".next", "dist", ".wrangler", "out", "node_modules"];
+const targets = [".next", "dist", ".wrangler", "out"];
 
 for (const target of targets) {
   rmSync(target, { force: true, recursive: true });

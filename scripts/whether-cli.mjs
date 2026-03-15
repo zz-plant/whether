@@ -414,13 +414,11 @@ const routeWithCommonParams = (base, flags, allowedFlags = ["as-of", "company", 
     "risk-appetite": "risk-appetite",
   };
   const params = new URLSearchParams();
-  if (allowedFlags.includes("as-of") && flags["as-of"]) params.set("asOf", String(flags["as-of"]));
-  if (allowedFlags.includes("company") && flags.company) params.set("company", String(flags.company));
-  if (allowedFlags.includes("stage") && flags.stage) params.set("stage", String(flags.stage));
-  if (allowedFlags.includes("weeks") && flags.weeks) params.set("weeks", String(flags.weeks));
-  if (allowedFlags.includes("view") && flags.view) params.set("view", String(flags.view));
-  if (allowedFlags.includes("tightness") && flags.tightness !== undefined) params.set("tightness", String(flags.tightness));
-  if (allowedFlags.includes("risk-appetite") && flags["risk-appetite"] !== undefined) params.set("risk-appetite", String(flags["risk-appetite"]));
+  for (const flag of allowedFlags) {
+    const value = flags[flag];
+    if (value === undefined || value === null || value === "") continue;
+    params.set(keyMap[flag] ?? flag, String(value));
+  }
   const query = params.toString();
   return query ? `${base}?${query}` : base;
 };

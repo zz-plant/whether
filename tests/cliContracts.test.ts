@@ -103,11 +103,10 @@ describe("cli contracts", () => {
     for (const route of expectedRoutes) {
       assert.ok(script.includes(`routeWithCommonParams("${route}"`));
     }
-    assert.match(script, /flags\["as-of"\][\s\S]*params\.set\("asOf"/);
-    assert.match(script, /flags\.company[\s\S]*params\.set\("company"/);
-    assert.match(script, /flags\.stage[\s\S]*params\.set\("stage"/);
-    assert.match(script, /flags\.weeks[\s\S]*params\.set\("weeks"/);
-    assert.match(script, /flags\.view[\s\S]*params\.set\("view"/);
+    assert.match(script, /const keyMap = \{/);
+    assert.match(script, /"as-of": "asOf"/);
+    assert.match(script, /for \(const flag of allowedFlags\)/);
+    assert.match(script, /params\.set\(keyMap\[flag\] \?\? flag, String\(value\)\)/);
   });
 
 });
