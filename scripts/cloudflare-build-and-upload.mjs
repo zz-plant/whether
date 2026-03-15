@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -48,8 +48,10 @@ const isCloudflarePagesContext =
   isTruthyEnv(process.env.CF_PAGES) ||
   Boolean(process.env.CF_PAGES_BRANCH) ||
   Boolean(process.env.CF_PAGES_COMMIT_SHA);
-const hasCloudflareDeployContext =
-  isCloudflarePagesContext || Boolean(process.env.CLOUDFLARE_ACCOUNT_ID);
+const hasCloudflareDeployContext = Boolean(process.env.CLOUDFLARE_ACCOUNT_ID);
+const shouldUseValidationOnlyDeployPath =
+  isTruthyEnv(process.env.CLOUDFLARE_DEPLOY_VALIDATION_ONLY) ||
+  isTruthyEnv(process.env.CLOUDFLARE_VALIDATION_ONLY);
 
 const run = (command, args, env = process.env) => {
   const result = spawnSync(command, args, {
@@ -67,7 +69,7 @@ const childBuildEnv = {
   ...process.env,
   REQUIRE_CLOUDFLARE_WORKER_BUILD_SUCCESS:
     process.env.REQUIRE_CLOUDFLARE_WORKER_BUILD_SUCCESS ??
-    (hasCloudflareDeployContext ? "0" : "1"),
+    (isCloudflarePagesContext || shouldUseValidationOnlyDeployPath ? "0" : "1"),
 };
 delete childBuildEnv.__WHETHER_NODE_RUNTIME_ACTIVE;
 
@@ -114,9 +116,32 @@ if (isCloudflarePagesContext) {
   process.exit(0);
 }
 
-if (hasCloudflareDeployContext && !existsSync(WORKER_ENTRYPOINT_PATH)) {
+if (shouldUseValidationOnlyDeployPath) {
   console.log(
-    'Cloudflare deploy context detected without worker output; skipping `wrangler versions upload` and keeping this run as build-only validation.',
+    'Validation-only deploy mode enabled; skipping `wrangler versions upload` and keeping this run as build-only validation.',
+  );
+  process.exit(0);
+}
+
+const uploadBuildMeta = readBuildMeta();
+const workerEntrypointExists = existsSync(WORKER_ENTRYPOINT_PATH);
+const workerBuildHasCurrentCommit = currentCommitSha
+  ? uploadBuildMeta?.commitSha === currentCommitSha
+  : true;
+const hasFreshWorkerBuildOutput =
+  Boolean(uploadBuildMeta?.buildTarget === 'cloudflare') &&
+  Boolean(uploadBuildMeta?.useNextOnPages) &&
+  Boolean(uploadBuildMeta?.commandSucceeded) &&
+  Boolean(uploadBuildMeta?.workerIndexExists) &&
+  workerEntrypointExists &&
+  workerBuildHasCurrentCommit;
+
+if (!hasFreshWorkerBuildOutput) {
+  const contextLabel = hasCloudflareDeployContext
+    ? 'Cloudflare deploy context'
+    : 'non-Pages deploy context';
+  console.log(
+    `${contextLabel} has no fresh worker build output for this run; skipping \`wrangler versions upload\` and keeping this run as build-only validation.`,
   );
   process.exit(0);
 }
