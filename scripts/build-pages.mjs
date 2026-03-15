@@ -1,4 +1,5 @@
 import { spawnSync } from "node:child_process";
+import { existsSync, rmSync } from "node:fs";
 
 const isTruthyEnv = (value) => {
   if (typeof value !== "string") {
@@ -57,6 +58,30 @@ const runNonProdBuild = () =>
       process.env.ALLOW_NEXT_BUILD_WITH_WORKER_CONFIG ?? "1",
   });
 
+const STALE_NEXT_BUILD_ARTIFACT_PATHS = [".next/lock", ".next/cache"];
+
+const clearStaleNextBuildArtifacts = () => {
+  for (const artifactPath of STALE_NEXT_BUILD_ARTIFACT_PATHS) {
+    if (!existsSync(artifactPath)) {
+      continue;
+    }
+
+    try {
+      rmSync(artifactPath, { force: true, recursive: true });
+      console.warn(
+        `Removed stale ${artifactPath} before running plain Next build fallback.`,
+      );
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : String(error ?? "unknown error");
+
+      console.warn(
+        `Unable to remove stale ${artifactPath} before fallback build: ${message}`,
+      );
+    }
+  }
+};
+
 if (shouldUseNonProdBuild) {
   const branchLabel = branchIsKnown ? branch : "unknown branch";
   const branchContext = branchIsKnown
@@ -69,6 +94,7 @@ if (shouldUseNonProdBuild) {
     `Using Cloudflare Pages resilient build path (branch: ${branchLabel}, context: ${branchContext}; CF_PAGES_CONTEXT=${isCloudflarePagesContext ? "1" : "0"}; deploy context=${hasDeployContext ? "1" : "0"}). Set FORCE_CLOUDFLARE_WORKER_BUILD=1 to force next-on-pages conversion.`,
   );
 
+  clearStaleNextBuildArtifacts();
   const result = runNonProdBuild();
   process.exit(result.status ?? 1);
 }
@@ -91,5 +117,6 @@ console.warn(
   "Cloudflare worker build failed; falling back to `deploy:cloudflare:nonprod` to keep Pages builds shippable.",
 );
 
+clearStaleNextBuildArtifacts();
 const fallbackResult = runNonProdBuild();
 process.exit(fallbackResult.status ?? workerBuildResult.status ?? 1);

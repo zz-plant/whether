@@ -39,6 +39,8 @@ Before `wrangler versions upload`, the script now verifies fresh worker build st
 
 `deploy:cloudflare:nonprod` intentionally runs a plain Next build with `ALLOW_NEXT_BUILD_WITH_WORKER_CONFIG=1` and does **not** run Wrangler upload. This keeps branch validation green while Next-on-Pages remains blocked by non-Edge routes.
 
+When `build:pages` falls back from a failed worker conversion to `deploy:cloudflare:nonprod`, it now clears stale Next build artifacts first (`.next/lock` and `.next/cache`). This avoids false-negative fallback failures where the first failed `next build` attempt leaves lock/cache state behind and blocks or destabilizes the second build attempt.
+
 ## Build guardrail for Cloudflare environments
 
 `scripts/build.mjs` now fails fast when all of the following are true:
