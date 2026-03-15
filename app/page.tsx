@@ -72,8 +72,11 @@ export const HomePageReportContent = async ({
 }) => {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const homepage = await assembleHomePage({ searchParams: resolvedSearchParams });
+  const fallbackTreasury = homepage.reportResult.ok
+    ? homepage.reportResult.data.treasury
+    : homepage.reportResult.fallback.treasury;
   const lastCachedTimestamp = homepage.reportResult.ok
-    ? homepage.reportResult.data.treasury.fetched_at
+    ? fallbackTreasury.fetched_at
     : homepage.reportResult.fallback.lastCachedTimestamp;
 
   return (
@@ -168,6 +171,9 @@ export const HomePageReportContent = async ({
       {homepage.fallbackActive ? (
         <LiveDataFallbackAlert
           lastCachedTimestamp={lastCachedTimestamp}
+          sourceLabel={fallbackTreasury.source}
+          effectiveRecordDate={fallbackTreasury.record_date}
+          fallbackReason={fallbackTreasury.fallback_reason}
           followUpLabel="Review live evidence"
         />
       ) : null}

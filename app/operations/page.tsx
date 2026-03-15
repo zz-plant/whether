@@ -252,6 +252,9 @@ export default async function OperationsPage({
       {!historicalSelection && isFallback ? (
         <LiveDataFallbackAlert
           lastCachedTimestamp={reportResult.ok ? treasury.fetched_at : reportResult.fallback.lastCachedTimestamp}
+          sourceLabel={treasury.source}
+          effectiveRecordDate={treasury.record_date}
+          fallbackReason={treasury.fallback_reason}
         />
       ) : null}
 
