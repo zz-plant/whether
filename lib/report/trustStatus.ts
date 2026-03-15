@@ -160,14 +160,14 @@ export const buildTrustStatus = ({
   const detail = historicalSelection
     ? "Decision impact: keep today’s do now / hold / revisit path, but treat this view as retrospective only."
     : isFallback
-      ? `Decision impact: keep today’s do now / hold / revisit path, but pause irreversible approvals until live data resumes.${fallbackReason ? ` ${fallbackReason}` : ""}`
+      ? `Decision impact: keep today’s do now / hold / revisit path. Pause irreversible approvals until live data resumes.${fallbackReason ? ` Source issue: ${fallbackReason}` : ""}`
       : "Decision impact: proceed with today’s do now / hold / revisit path under normal approval cadence.";
 
   const action = historicalSelection
-    ? `${historicalAction} If confidence is low, switch to current data before changing pace.`
+    ? `${historicalAction} Trigger: confidence LOW. Reversal: switch to current data before changing pace.`
     : isFallback
-      ? `${fallbackAction} If confidence is low, stage commitments and confirm one live refresh before escalating.`
-      : `${stableAction} If confidence drops, tighten approvals to staged checks until reliability recovers.`;
+      ? `${fallbackAction} Trigger: confidence LOW or feed unavailable. Reversal: resume normal approvals after one verified live refresh.`
+      : `${stableAction} Trigger: confidence drops. Reversal: return to standard cadence once reliability recovers.`;
 
   const tone: TrustStatusTone = historicalSelection
     ? "historical"

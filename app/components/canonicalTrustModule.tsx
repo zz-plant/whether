@@ -120,7 +120,10 @@ export const CanonicalTrustModule = ({
         {detail}
       </p>
       {!compact ? (
-        <p className="text-xs leading-relaxed text-slate-200/80">{action}</p>
+        <div className="space-y-1 rounded-lg border border-slate-700/60 bg-slate-950/35 px-3 py-2">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Decision rule</p>
+          <p className="text-xs leading-relaxed text-slate-100/90 whitespace-pre-line">{action.replace(" Reversal:", "\nReversal:")}</p>
+        </div>
       ) : null}
       {sourceDetails ? (
         <Collapsible.Root className="mt-1 border-t border-slate-700/70 pt-3 text-slate-200">

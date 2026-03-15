@@ -115,6 +115,21 @@ const hasReusableBuildOutput =
   Boolean(priorBuildMeta?.commandSucceeded) &&
   Boolean(currentCommitSha) &&
   priorBuildMeta?.commitSha === currentCommitSha;
+const hasPriorBuildMeta = Boolean(priorBuildMeta?.commandSucceeded);
+const prebuiltOutputCommitMatchesCurrent =
+  Boolean(currentCommitSha) &&
+  Boolean(priorBuildMeta?.commitSha) &&
+  priorBuildMeta.commitSha === currentCommitSha;
+const canReusePrebuiltOutputSafely =
+  !reusePrebuiltOutput
+    ? false
+    : !hasVercelBuildOutput
+      ? false
+      : !currentCommitSha
+        ? false
+        : hasPriorBuildMeta
+          ? prebuiltOutputCommitMatchesCurrent
+          : true;
 const forceCloudflareBuild =
   buildTarget === "cloudflare" || buildTarget === "pages";
 const forceNextBuild = buildTarget === "next";
@@ -163,7 +178,7 @@ const shouldAutoSkipInCi =
 const skipBuildWasRequested =
   skipNextOnPagesBuild ||
   hasReusableBuildOutput ||
-  reusePrebuiltOutput ||
+  canReusePrebuiltOutputSafely ||
   shouldAutoSkipInCi;
 const canSkipNextOnPagesBuild = hasVercelBuildOutput;
 const shouldSkipNextOnPagesBuild =
@@ -244,6 +259,23 @@ if (useNextOnPages && skipBuildWasRequested && !canSkipNextOnPagesBuild) {
   );
 }
 
+if (
+  useNextOnPages &&
+  reusePrebuiltOutput &&
+  !canReusePrebuiltOutputSafely &&
+  hasVercelBuildOutput
+) {
+  if (!currentCommitSha) {
+    console.warn(
+      "NEXT_ON_PAGES_REUSE_PREBUILT requested but commit SHA is unavailable; running a full rebuild to avoid stale static assets.",
+    );
+  } else if (hasPriorBuildMeta && !prebuiltOutputCommitMatchesCurrent) {
+    console.warn(
+      "NEXT_ON_PAGES_REUSE_PREBUILT requested but prebuilt output was generated for a different commit; running a full rebuild to avoid stale static assets.",
+    );
+  }
+}
+
 if (useNextOnPages) {
   const outputChannels = [
     { text: result.stdout ?? "", writer: process.stdout },
@@ -294,9 +326,9 @@ if (useNextOnPages) {
             ? "NEXT_ON_PAGES_SKIP_BUILD"
             : hasReusableBuildOutput
               ? "cache-hit-same-commit"
-              : reusePrebuiltOutput && hasVercelBuildOutput
+              : canReusePrebuiltOutputSafely
                 ? "NEXT_ON_PAGES_REUSE_PREBUILT"
-              : "ci-prebuilt-vercel-output"
+                : "ci-prebuilt-vercel-output"
           : skipBuildWasRequested
             ? "missing-prebuilt-vercel-output"
           : null,
