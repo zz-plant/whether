@@ -31,7 +31,7 @@ Use `FORCE_CLOUDFLARE_WORKER_BUILD=1 bun run build:pages` to force worker conver
 - allows non-worker fallback when `next-on-pages` cannot convert non-Edge routes, and
 - skips `wrangler versions upload` because Pages deploys the generated output directly.
 
-Outside Cloudflare Pages context, `deploy:cloudflare` remains strict by default and expects a successful current worker build before upload. It only relaxes this behavior when you explicitly set `CLOUDFLARE_DEPLOY_VALIDATION_ONLY=1` (or `CLOUDFLARE_VALIDATION_ONLY=1`) for validation-only runs.
+Outside Cloudflare Pages context, `deploy:cloudflare` now defaults to resilient build behavior (`REQUIRE_CLOUDFLARE_WORKER_BUILD_SUCCESS=0`) so a failed worker conversion can still fall back to non-worker build validation. Set `REQUIRE_CLOUDFLARE_WORKER_BUILD_SUCCESS=1` when you need strict worker-build enforcement for a given run.
 
 When `CLOUDFLARE_ACCOUNT_ID` is present outside Pages context (for example Worker Builds), `deploy:cloudflare` now forces worker conversion (`FORCE_CLOUDFLARE_WORKER_BUILD=1`) before evaluating upload freshness. This prevents accidental plain-Next fallback that would skip upload with stale or missing worker artifacts.
 
