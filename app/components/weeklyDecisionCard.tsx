@@ -364,7 +364,7 @@ function RegimeLegend({
         <div className={`mt-1.5 h-2.5 overflow-hidden rounded-full ${tone.meterTrack}`} aria-hidden="true">
           <span
             className={`block h-full rounded-full ${flipRiskFillClass[flipRiskState.urgencyLabel]} ${tone.meterFill}`}
-            style={{ ["--weather-meter-fill" as string]: `${flipRiskState.progressPercent / 100}` }}
+            style={{ width: `${flipRiskState.progressPercent}%` }}
           />
         </div>
         <p className="mt-1 text-[10px] text-slate-300">{flipRiskState.detailLabel}</p>
