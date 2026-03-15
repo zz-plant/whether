@@ -363,8 +363,8 @@ function RegimeLegend({
         </p>
         <div className={`mt-1.5 h-2.5 overflow-hidden rounded-full ${tone.meterTrack}`} aria-hidden="true">
           <span
-            className={`block h-full rounded-full transition-[width] duration-300 ${flipRiskFillClass[flipRiskState.urgencyLabel]} ${tone.meterFill}`}
-            style={{ width: `${flipRiskState.progressPercent}%` }}
+            className={`block h-full rounded-full ${flipRiskFillClass[flipRiskState.urgencyLabel]} ${tone.meterFill}`}
+            style={{ ["--weather-meter-fill" as string]: `${flipRiskState.progressPercent / 100}` }}
           />
         </div>
         <p className="mt-1 text-[10px] text-slate-300">{flipRiskState.detailLabel}</p>
@@ -673,7 +673,10 @@ export function MoreContextDisclosureBody({
                   <span className="font-semibold text-slate-100">{item.score}</span>
                 </div>
                 <div className="h-1.5 rounded-full bg-slate-800">
-                  <div className="h-1.5 rounded-full bg-sky-300/70" style={{ width: `${Math.max(5, Math.min(100, item.score))}%` }} />
+                  <div
+                    className="h-1.5 w-full origin-left rounded-full bg-sky-300/70"
+                    style={{ transform: `scaleX(${Math.max(0.05, Math.min(1, item.score / 100))})` }}
+                  />
                 </div>
               </li>
             ))}
