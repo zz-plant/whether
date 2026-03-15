@@ -7,6 +7,7 @@ export const revalidate = 0;
 export const dynamic = "force-dynamic";
 
 const STALE_AFTER_HOURS = 6;
+const RECORD_DATE_STALE_AFTER_HOURS = 96;
 
 const toHours = (isoTimestamp: string, now = new Date()) => {
   const timestamp = Date.parse(isoTimestamp);
@@ -27,8 +28,11 @@ export async function GET() {
   const now = new Date();
   const reportResult = await loadReportDataSafe(undefined, { route: "/api/health" });
   const { treasury, sourceHealth } = reportResult.ok ? reportResult.data : reportResult.fallback;
-  const ageHours = toHours(treasury.fetched_at, now);
-  const stale = ageHours === null ? true : ageHours > STALE_AFTER_HOURS;
+  const fetchedAgeHours = toHours(treasury.fetched_at, now);
+  const recordDateAgeHours = toHours(`${treasury.record_date}T00:00:00.000Z`, now);
+  const staleByFetchTimestamp = fetchedAgeHours === null ? true : fetchedAgeHours > STALE_AFTER_HOURS;
+  const staleByRecordDate = recordDateAgeHours === null ? true : recordDateAgeHours > RECORD_DATE_STALE_AFTER_HOURS;
+  const stale = staleByFetchTimestamp || staleByRecordDate;
   const treasuryStatus = stale ? "degraded" : "ok";
 
   const status = reportResult.ok && treasuryStatus === "ok" ? "ok" : reportResult.ok ? "degraded" : "down";
@@ -54,9 +58,13 @@ export async function GET() {
         treasuryData: {
           status: reportResult.ok ? treasuryStatus : "down",
           stale,
+          staleByFetchTimestamp,
+          staleByRecordDate,
           fallbackUsed: !reportResult.ok,
           staleAfterHours: STALE_AFTER_HOURS,
-          ageHours,
+          staleRecordDateAfterHours: RECORD_DATE_STALE_AFTER_HOURS,
+          fetchedAgeHours,
+          recordDateAgeHours,
           fetchedAt: treasury.fetched_at,
           recordDate: treasury.record_date,
           isLive: treasury.isLive,
