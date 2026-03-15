@@ -49,6 +49,14 @@ const isCloudflarePagesContext =
   Boolean(process.env.CF_PAGES_BRANCH) ||
   Boolean(process.env.CF_PAGES_COMMIT_SHA);
 const hasCloudflareDeployContext = Boolean(process.env.CLOUDFLARE_ACCOUNT_ID);
+const branch =
+  process.env.CF_PAGES_BRANCH ||
+  process.env.GITHUB_REF_NAME ||
+  process.env.VERCEL_GIT_COMMIT_REF ||
+  "";
+const hasKnownBranchContext = Boolean(branch);
+const shouldUseResilientBuildPathForUnknownDeployContext =
+  hasCloudflareDeployContext && !hasKnownBranchContext;
 const shouldUseValidationOnlyDeployPath =
   isTruthyEnv(process.env.CLOUDFLARE_DEPLOY_VALIDATION_ONLY) ||
   isTruthyEnv(process.env.CLOUDFLARE_VALIDATION_ONLY);
@@ -69,7 +77,11 @@ const childBuildEnv = {
   ...process.env,
   REQUIRE_CLOUDFLARE_WORKER_BUILD_SUCCESS:
     process.env.REQUIRE_CLOUDFLARE_WORKER_BUILD_SUCCESS ??
-    (isCloudflarePagesContext || shouldUseValidationOnlyDeployPath ? "0" : "1"),
+    (isCloudflarePagesContext ||
+    shouldUseValidationOnlyDeployPath ||
+    shouldUseResilientBuildPathForUnknownDeployContext
+      ? "0"
+      : "1"),
 };
 delete childBuildEnv.__WHETHER_NODE_RUNTIME_ACTIVE;
 
