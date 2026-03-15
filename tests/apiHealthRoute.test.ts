@@ -15,6 +15,13 @@ describe("/api/health", () => {
     const checks = body.checks as { treasuryData?: Record<string, unknown> };
     assert.ok(checks && checks.treasuryData, "checks.treasuryData should be present");
     assert.ok(typeof checks.treasuryData?.status === "string");
+    assert.ok(typeof checks.treasuryData?.staleByFetchTimestamp === "boolean");
+    assert.ok(typeof checks.treasuryData?.staleByRecordDate === "boolean");
+    assert.ok(typeof checks.treasuryData?.staleRecordDateAfterHours === "number");
+    assert.ok(
+      checks.treasuryData?.recordDateAgeHours === null ||
+        typeof checks.treasuryData?.recordDateAgeHours === "number",
+    );
 
     const sources = body.sources as Array<Record<string, unknown>>;
     assert.ok(Array.isArray(sources), "sources should be an array");
