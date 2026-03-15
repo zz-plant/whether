@@ -60,8 +60,11 @@ const branch =
   process.env.VERCEL_GIT_COMMIT_REF ||
   "";
 const hasKnownBranchContext = Boolean(branch);
+const hasKnownCommitContext = Boolean(currentCommitSha);
 const shouldUseResilientBuildPathForUnknownDeployContext =
-  hasCloudflareDeployContext && !hasKnownBranchContext;
+  hasCloudflareDeployContext &&
+  !hasKnownBranchContext &&
+  hasKnownCommitContext;
 const shouldUseValidationOnlyDeployPath =
   isTruthyEnv(process.env.CLOUDFLARE_DEPLOY_VALIDATION_ONLY) ||
   isTruthyEnv(process.env.CLOUDFLARE_VALIDATION_ONLY);
