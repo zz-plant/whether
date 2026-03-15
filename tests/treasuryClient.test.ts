@@ -282,6 +282,38 @@ describe("treasury client", () => {
     );
   });
 
+
+  it("uses fiscaldata API as a live backup when FRED and Treasury CSV are unavailable", async () => {
+    const fetcher: typeof fetch = async (input) => {
+      const url = input.toString();
+      if (url.includes("api.fiscaldata.treasury.gov")) {
+        return new Response(
+          JSON.stringify({
+            data: [
+              { record_date: "2026-01-11", security_desc: "Treasury Bills: 4-Week", avg_interest_rate_amt: "4.11" },
+              { record_date: "2026-01-11", security_desc: "Treasury Bills: 13-Week", avg_interest_rate_amt: "4.22" },
+              { record_date: "2026-01-11", security_desc: "Treasury Notes: 2-Year", avg_interest_rate_amt: "4.33" },
+              { record_date: "2026-01-11", security_desc: "Treasury Notes: 10-Year", avg_interest_rate_amt: "4.44" },
+            ],
+          })
+        );
+      }
+
+      return new Response("{}", { status: 500 });
+    };
+
+    const data = await fetchTreasuryData({ fetcher });
+    assert.equal(data.isLive, true);
+    assert.equal(data.record_date, "2026-01-11");
+    assert.equal(data.source, "https://api.fiscaldata.treasury.gov");
+    assert.deepEqual(data.yields, {
+      oneMonth: 4.11,
+      threeMonth: 4.22,
+      twoYear: 4.33,
+      tenYear: 4.44,
+    });
+  });
+
   it("uses Treasury daily rates CSV as a live backup when FRED is unavailable", async () => {
     const fetcher: typeof fetch = async (input) => {
       const url = input.toString();
