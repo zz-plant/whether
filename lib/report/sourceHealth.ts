@@ -12,6 +12,11 @@ export type SourceHealthRow = {
   mode: SourceModeStatus;
 };
 
+export type SourceFreshnessSummary = {
+  oldestSuccessfulFetchAt: string | null;
+  hasDegradedSources: boolean;
+};
+
 const TREASURY_SOURCE_SLA_HOURS = 6;
 const MACRO_SOURCE_SLA_HOURS = 24;
 
@@ -76,6 +81,32 @@ const getLatestParseableTimestamp = (timestamps: Array<string | null | undefined
 
   return latestTimestamp;
 };
+
+const getOldestParseableTimestamp = (timestamps: Array<string | null | undefined>): string | null => {
+  let oldestTimestamp: string | null = null;
+  let oldestEpoch = Number.POSITIVE_INFINITY;
+
+  for (const timestamp of timestamps) {
+    if (typeof timestamp !== "string") {
+      continue;
+    }
+
+    const parsedTimestamp = Date.parse(timestamp);
+    if (Number.isNaN(parsedTimestamp) || parsedTimestamp >= oldestEpoch) {
+      continue;
+    }
+
+    oldestEpoch = parsedTimestamp;
+    oldestTimestamp = timestamp;
+  }
+
+  return oldestTimestamp;
+};
+
+export const summarizeSourceFreshness = (rows: SourceHealthRow[]): SourceFreshnessSummary => ({
+  oldestSuccessfulFetchAt: getOldestParseableTimestamp(rows.map((row) => row.lastSuccessfulFetchAt)),
+  hasDegradedSources: rows.some((row) => row.freshnessStatus !== "fresh" || row.mode === "fallback"),
+});
 
 export const buildSourceHealthRows = ({
   treasury,

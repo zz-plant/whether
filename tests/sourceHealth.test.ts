@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import type { MacroSeriesReading, TreasuryData } from "../lib/types";
-import { buildSourceHealthRows } from "../lib/report/sourceHealth";
+import { buildSourceHealthRows, summarizeSourceFreshness } from "../lib/report/sourceHealth";
 
 const buildTreasury = (overrides: Partial<TreasuryData> = {}): TreasuryData => ({
   yields: {
@@ -49,4 +49,21 @@ describe("buildSourceHealthRows", () => {
     assert.equal(macro.lastSuccessfulFetchAt, "2026-03-10T09:00:00.000Z");
     assert.equal(macro.freshnessStatus, "fresh");
   });
+
+
+  it("summarizes oldest successful fetch and degradation across sources", () => {
+    const rows = buildSourceHealthRows({
+      treasury: buildTreasury({ fetched_at: "2026-03-11T08:00:00.000Z" }),
+      macroSeries: [
+        buildMacroSeriesReading({ id: "CPI_YOY", fetched_at: "2026-03-10T03:00:00.000Z", isLive: false }),
+      ],
+      now: new Date("2026-03-11T10:00:00.000Z"),
+    });
+
+    const summary = summarizeSourceFreshness(rows);
+
+    assert.equal(summary.oldestSuccessfulFetchAt, "2026-03-10T03:00:00.000Z");
+    assert.equal(summary.hasDegradedSources, true);
+  });
+
 });

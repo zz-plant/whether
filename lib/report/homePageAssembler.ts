@@ -5,6 +5,7 @@ import {
 import { loadReportDataSafe, type ReportData } from "./reportData";
 import { buildTrustStatus } from "./trustStatus";
 import { buildCompactFreshnessMeta } from "./reportFormatting";
+import { summarizeSourceFreshness } from "./sourceHealth";
 import {
   buildInterpretationLayer,
   isInterpretationView,
@@ -333,10 +334,15 @@ export const assembleHomePage = async ({
     postureState,
   }, { overlaySector: homepageOverlaySector });
 
+  const sourceFreshness = summarizeSourceFreshness(reportData.sourceHealth);
+  const freshnessAnchorLabel = sourceFreshness.oldestSuccessfulFetchAt
+    ? sourceFreshness.oldestSuccessfulFetchAt
+    : fetchedAtLabel;
+
   const freshnessMeta = buildCompactFreshnessMeta({
-    updatedAtLabel: fetchedAtLabel,
+    updatedAtLabel: freshnessAnchorLabel,
     confidenceLabel: homeBriefModel.confidenceLabel,
-    isFallbackSnapshot: isFallback,
+    isFallbackSnapshot: isFallback || sourceFreshness.hasDegradedSources,
   });
 
   const displayRegime = getRegimeDisplayLabel({
