@@ -116,6 +116,13 @@ if (isCloudflarePagesContext) {
   process.exit(0);
 }
 
+if (shouldUseValidationOnlyDeployPath) {
+  console.log(
+    'Validation-only deploy mode enabled; skipping `wrangler versions upload` and keeping this run as build-only validation.',
+  );
+  process.exit(0);
+}
+
 const uploadBuildMeta = readBuildMeta();
 const workerEntrypointExists = existsSync(WORKER_ENTRYPOINT_PATH);
 const workerBuildHasCurrentCommit = currentCommitSha
