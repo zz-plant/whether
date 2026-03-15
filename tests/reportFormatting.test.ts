@@ -23,18 +23,36 @@ describe("reportFormatting regime signal helpers", () => {
       updatedAtLabel: "2026-03-12T12:00:00.000Z",
       confidenceLabel: "HIGH",
       isFallbackSnapshot: false,
+      now: new Date("2026-03-12T12:20:00.000Z"),
     });
     assert.equal(live.maxAge, "fresh");
     assert.match(live.line, /live/);
+    assert.match(live.line, /<1h old/);
 
     const degraded = buildCompactFreshnessMeta({
       updatedAtLabel: "",
       confidenceLabel: "LOW",
       isFallbackSnapshot: true,
+      now: new Date("2026-03-12T12:20:00.000Z"),
     });
     assert.equal(degraded.updatedAtLabel, "Unavailable");
     assert.equal(degraded.maxAge, "stale");
     assert.match(degraded.line, /degraded/);
+  });
+
+
+  it("marks stale when update age breaches freshness SLA", () => {
+    const stale = buildCompactFreshnessMeta({
+      updatedAtLabel: "2026-03-12T00:00:00.000Z",
+      confidenceLabel: "HIGH",
+      isFallbackSnapshot: false,
+      now: new Date("2026-03-12T12:20:00.000Z"),
+      staleAfterHours: 6,
+    });
+
+    assert.equal(stale.maxAge, "stale");
+    assert.match(stale.line, /12h old/);
+    assert.match(stale.line, /degraded/);
   });
 
 });

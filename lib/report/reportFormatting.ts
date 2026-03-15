@@ -115,21 +115,34 @@ export const buildCompactFreshnessMeta = ({
   updatedAtLabel,
   confidenceLabel,
   isFallbackSnapshot,
+  now = new Date(),
+  staleAfterHours = 6,
 }: {
   updatedAtLabel: string;
   confidenceLabel: "HIGH" | "MED" | "LOW";
   isFallbackSnapshot: boolean;
+  now?: Date;
+  staleAfterHours?: number;
 }): CompactFreshnessMeta => {
   const normalizedUpdatedAt = updatedAtLabel.trim().length > 0 ? updatedAtLabel.trim() : "Unavailable";
-  const staleByDate = normalizedUpdatedAt === "Unavailable";
-  const maxAge: "fresh" | "stale" = isFallbackSnapshot || staleByDate ? "stale" : "fresh";
+  const timestamp = Date.parse(normalizedUpdatedAt);
+  const hasParseableTimestamp = Number.isFinite(timestamp);
+  const ageHours = hasParseableTimestamp ? Math.max(0, (now.getTime() - timestamp) / 3_600_000) : null;
+  const staleByDate = normalizedUpdatedAt === "Unavailable" || ageHours === null;
+  const staleByAge = ageHours !== null && ageHours > staleAfterHours;
+  const maxAge: "fresh" | "stale" = isFallbackSnapshot || staleByDate || staleByAge ? "stale" : "fresh";
   const confidenceCue = confidenceLabel === "HIGH" ? "high-reliability" : confidenceLabel === "MED" ? "mixed-reliability" : "low-reliability";
   const fallbackCue = maxAge === "stale" ? "degraded" : "live";
+  const ageCue = ageHours === null
+    ? ""
+    : ageHours < 1
+      ? " (<1h old)"
+      : ` (${Math.round(ageHours)}h old)`;
 
   return {
     updatedAtLabel: normalizedUpdatedAt,
     confidenceCue,
     maxAge,
-    line: `Updated ${normalizedUpdatedAt} · ${fallbackCue} · ${confidenceCue}`,
+    line: `Updated ${normalizedUpdatedAt}${ageCue} · ${fallbackCue} · ${confidenceCue}`,
   };
 };
