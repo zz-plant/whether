@@ -30,7 +30,7 @@ Use `FORCE_CLOUDFLARE_WORKER_BUILD=1 bun run build:pages` to force worker conver
 - allows non-worker fallback when `next-on-pages` cannot convert non-Edge routes, and
 - skips `wrangler versions upload` because Pages deploys the generated output directly.
 
-Outside Cloudflare Pages context (for direct Workers uploads), `deploy:cloudflare` still defaults to strict worker-build success and runs Wrangler upload.
+Outside Cloudflare Pages context, `deploy:cloudflare` now checks for generated worker output before upload. If `.vercel/output/static/_worker.js/index.js` exists, it proceeds with Wrangler upload; if worker output is missing in Cloudflare deploy context (for example when using `CLOUDFLARE_ACCOUNT_ID` with non-worker fallback), it skips upload and treats the run as build-only validation.
 
 `deploy:cloudflare:nonprod` intentionally runs a plain Next build with `ALLOW_NEXT_BUILD_WITH_WORKER_CONFIG=1` and does **not** run Wrangler upload. This keeps branch validation green while Next-on-Pages remains blocked by non-Edge routes.
 
