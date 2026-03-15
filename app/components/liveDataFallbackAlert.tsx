@@ -29,12 +29,12 @@ export function LiveDataFallbackAlert({
       <p className="mt-1">
         Decision impact: keep today&apos;s do now / hold / revisit path, but pause irreversible approvals until live data returns.
       </p>
-      <p className="mt-1">
+      <p className="mt-1 break-words [overflow-wrap:anywhere]">
         {sourceLine}
         {effectiveLine}
         Last cached update: {lastCachedTimestamp}.
       </p>
-      {fallbackReason ? <p className="mt-1">Fallback reason: {fallbackReason}</p> : null}
+      {fallbackReason ? <p className="mt-1 break-words [overflow-wrap:anywhere]">Fallback reason: {fallbackReason}</p> : null}
       <p className="mt-1">
         Low confidence action: stage commitments and verify the next live refresh. {followUpLabel} in{" "}
         <Link href={signalsHref} className="underline">
