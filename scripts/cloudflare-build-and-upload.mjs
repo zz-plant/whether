@@ -80,7 +80,11 @@ const childBuildEnv = {
     (hasCloudflareDeployContext && !isCloudflarePagesContext ? "1" : undefined),
   REQUIRE_CLOUDFLARE_WORKER_BUILD_SUCCESS:
     process.env.REQUIRE_CLOUDFLARE_WORKER_BUILD_SUCCESS ??
-    "0",
+    // Keep worker conversion strict by default whenever this run is expected to
+    // produce/upload worker artifacts outside Pages-managed deploys.
+    (hasCloudflareDeployContext && !isCloudflarePagesContext && !shouldUseValidationOnlyDeployPath
+      ? "1"
+      : "0"),
 };
 delete childBuildEnv.__WHETHER_NODE_RUNTIME_ACTIVE;
 
