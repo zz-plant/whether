@@ -37,10 +37,19 @@ if (shouldForceNodeRuntime) {
 }
 
 const BUILD_META_PATH = join('.vercel', 'output', 'static', '_worker.js', 'build-meta.json');
+const WORKER_ENTRYPOINT_PATH = join(
+  '.vercel',
+  'output',
+  'static',
+  '_worker.js',
+  'index.js',
+);
 const isCloudflarePagesContext =
   isTruthyEnv(process.env.CF_PAGES) ||
   Boolean(process.env.CF_PAGES_BRANCH) ||
   Boolean(process.env.CF_PAGES_COMMIT_SHA);
+const hasCloudflareDeployContext =
+  isCloudflarePagesContext || Boolean(process.env.CLOUDFLARE_ACCOUNT_ID);
 
 const run = (command, args, env = process.env) => {
   const result = spawnSync(command, args, {
@@ -58,7 +67,7 @@ const childBuildEnv = {
   ...process.env,
   REQUIRE_CLOUDFLARE_WORKER_BUILD_SUCCESS:
     process.env.REQUIRE_CLOUDFLARE_WORKER_BUILD_SUCCESS ??
-    (isCloudflarePagesContext ? "0" : "1"),
+    (hasCloudflareDeployContext ? "0" : "1"),
 };
 delete childBuildEnv.__WHETHER_NODE_RUNTIME_ACTIVE;
 
@@ -101,6 +110,13 @@ if (hasReusableOutput) {
 if (isCloudflarePagesContext) {
   console.log(
     'Cloudflare Pages context detected; skipping `wrangler versions upload` because Pages handles deployment of build output.',
+  );
+  process.exit(0);
+}
+
+if (hasCloudflareDeployContext && !existsSync(WORKER_ENTRYPOINT_PATH)) {
+  console.log(
+    'Cloudflare deploy context detected without worker output; skipping `wrangler versions upload` and keeping this run as build-only validation.',
   );
   process.exit(0);
 }
