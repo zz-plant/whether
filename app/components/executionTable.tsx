@@ -2,8 +2,8 @@
 
 import { ScrollArea } from "@base-ui/react/scroll-area";
 import { Tooltip } from "@base-ui/react/tooltip";
-import type { Route } from "next";
 import Link from "next/link";
+import type { Route } from "../../lib/navigation/routeType";
 import { useMemo, useState } from "react";
 
 export type ExecutionTableRow = {

@@ -1,51 +1,31 @@
 # Stack modernization inventory & constraints
 
 ## Runtime policy
-- **Policy choice:** Option A (transition).
+- **Policy choice:** Vinext cutover complete; Cloudflare build/deploy no longer depend on Vercel output adapters.
 - **Primary runtime:** Bun is the default runtime/package manager for local and CI command orchestration (`bun install`, `bun run <script>`).
-- **Supported fallback:** Node.js 20.16.x is intentionally retained for selected scripts that directly execute `.mjs` entrypoints (`scripts/build.mjs`).
+- **Supported Node runtime:** Node.js `>=22` for Vinext CLI wrappers and deploy flows.
 
 ## Runtime & tooling versions
 - **Package manager / primary runtime:** Bun 1.3.9 (`packageManager`, `engines.bun`).
-- **Node engine (fallback for selected scripts):** 20.16.x (`engines.node`).
+- **Node engine:** `>=22` (`engines.node`).
 - **Next.js:** 16.1.6.
 - **React / React DOM:** 19.2.4.
 - **TypeScript:** 5.9.3.
 - **Tailwind CSS:** 3.4.17.
-- **Cloudflare adapter:** @cloudflare/next-on-pages 1.13.16.
+- **Cloudflare adapter:** Vinext + `@cloudflare/vite-plugin`.
 - **Testing:** Bun test runner via `bun run test` (guarded wrapper `bun scripts/run-tests.mjs` fails if `./tests` discovery is empty before running `bun test ./tests`).
 - **Test compatibility contract:** Existing tests continue using `node:test` / `node:assert/strict` imports under Bun's Node-compat layer.
 - **Linting:** `eslint` CLI via `bun run lint`.
 
-## Newer capabilities snapshot (research baseline)
-
-This section maps the currently pinned stack to newer stable versions and highlights capabilities worth evaluating during modernization.
-
-| Element | Current in repo | Newer stable (observed) | Notable newer capabilities to evaluate |
-| --- | --- | --- | --- |
-| Bun | 1.3.9 | 1.3.9 | Runtime and package manager performance improvements, plus continued Node compatibility expansion for tooling/scripts. |
-| Next.js | 16.1.6 | 16.1.6 | Current production pin includes Cache Components/PPR-oriented caching model and `proxy.ts` naming; keep release-note checks for minor updates. |
-| React / React DOM | 19.2.4 | 19.2.4 | React 19 Actions for async mutations, `useOptimistic`, form-centric hooks (`useFormStatus`, `useActionState`), improved Suspense behavior, and static React DOM APIs. |
-| TypeScript | 5.9.3 | 5.9.3 | Language service and type-checking improvements, faster editor workflows, and newer type-system ergonomics from 5.6–5.9 releases. |
-| Tailwind CSS | 3.4.17 | 4.1.18 | Tailwind v4 CSS-first setup, streamlined content/source detection, and reduced PostCSS plugin surface for common setups. |
-| Zod | 4.3.6 | 4.3.6 | Current pin includes Zod 4 API/performance updates; watch minor upgrades for validator/test compatibility. |
-| ESLint | 9.38.0 | 9.39.2 | Flat config-first ecosystem direction and updated rule/tooling compatibility expectations. |
-
-### Research sources used for this snapshot
-- `bun outdated` plus registry/version release notes for version baselining.
-- Next.js 16 release post: <https://nextjs.org/blog/next-16>
-- React 19 release post: <https://react.dev/blog/2024/12/05/react-19>
-- Tailwind CSS v4 release post: <https://tailwindcss.com/blog/tailwindcss-v4>
-- TypeScript 5.9 release post: <https://devblogs.microsoft.com/typescript/announcing-typescript-5-9/>
-
 ## Build & deployment pipeline
-- **Primary build entry:** `scripts/build.mjs` uses `next build` by default, switches to `next-on-pages` when Cloudflare build target is explicit (`BUILD_TARGET=cloudflare|pages`) or when `NEXT_ON_PAGES_AUTO=1` is set in Cloudflare environments (`CF_PAGES` / `CLOUDFLARE_ACCOUNT_ID`), and rewrites worker output paths for Cloudflare deployment compatibility.
-- **Cloudflare output wiring:** `wrangler.toml` targets the `.vercel/output/static/_worker.js` output with Node.js compatibility enabled.
+- **Primary build entry:** [`scripts/vinext-run.mjs`](/Users/kanav/Documents/GitHub/whether-app/scripts/vinext-run.mjs) wraps the Vinext CLI and enforces Node `>=22` for build/dev/start/deploy commands.
+- **Cloudflare output wiring:** [`wrangler.toml`](/Users/kanav/Documents/GitHub/whether-app/wrangler.toml) targets [`worker/index.ts`](/Users/kanav/Documents/GitHub/whether-app/worker/index.ts) with asset and image bindings enabled.
 
 ## App Router usage & runtimes
 - **App Router layout:** `app/` directory with top-level `layout.tsx`, route segments, and API handlers under `app/api`.
+- **Current route inventory:** 69 `page.tsx` routes, 33 `route.ts` handlers, 3 `layout.tsx` files, and 19 dynamic segments.
 - **Edge runtime:** `app/page.tsx`, onboarding, signals, operations (root/decisions/plan/briefings), and `app/api/og/route.ts` export `runtime = "edge"`.
-- **Typed routes:** enabled via `experimental.typedRoutes` in `next.config.js`.
+- **Typed routes:** shared navigation/content modules now use a local route-type layer instead of depending on Next-generated typed-route output.
 
 ## Data fetching & caching
 - **Treasury API client:** `lib/treasury/treasuryClient.ts` uses `fetch` and normalizes responses with explicit `source`, `fetched_at`, and `isLive` metadata; it also supports snapshot fallbacks and historical cache reads.
@@ -54,18 +34,18 @@ This section maps the currently pinned stack to newer stable versions and highli
 - **Source metadata expectations:** sensor readings include explicit source labels and freshness metadata (see `lib/sensors.ts`).
 
 ## Deployment constraints & assumptions
-- **Cloudflare Pages/Workers:** `wrangler.toml` config includes `compatibility_date = "2026-01-23"` and `nodejs_compat`.
-- **Static asset rules:** ESModule rules for `__next-on-pages-dist__` output.
+- **Cloudflare Workers:** production config includes `compatibility_date = "2026-03-15"` and `nodejs_compat`.
+- **Static asset handling:** Vinext build output is uploaded via `vinext deploy`; runtime assets are bound through `ASSETS`.
 
-## Initial risk register (Phase 1)
+## Initial risk register
 - **Edge runtime drift:** multiple routes rely on `runtime = "edge"`; framework upgrades could shift caching or runtime defaults.
-- **Cloudflare adapter compatibility:** `@cloudflare/next-on-pages` version must remain compatible with target Next.js/React versions.
-- **Typed routes / App Router changes:** `experimental.typedRoutes` and App Router behavior may change in Next.js upgrades.
+- **Cloudflare adapter compatibility:** Vinext/Rolldown warnings still need periodic validation on upgrades.
+- **App Router changes:** App Router behavior may change in Next.js upgrades even when the deploy runtime stays on Vinext.
 - **Data fallback expectations:** treasury fetch fallbacks and snapshot validation need parity during migrations.
 
 ## Sources of truth
 - Tooling and versions: `package.json`.
-- Build pipeline: `scripts/build.mjs`.
+- Build pipeline: `scripts/vinext-run.mjs`.
 - Cloudflare wiring: `wrangler.toml`.
 - App runtime declarations: `app/**/page.tsx`, `app/api/og/route.ts`.
 - Data clients and metadata: `lib/treasury/treasuryClient.ts`, `lib/sensors.ts`, `lib/snapshot.ts`.

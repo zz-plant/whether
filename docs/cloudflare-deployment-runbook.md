@@ -2,122 +2,63 @@
 
 ## Build + deploy commands
 
-Use this command sequence in CI to keep Cloudflare Pages/Workers deploys deterministic and auditable:
+This repo now has two explicit Cloudflare lanes:
+- `current-vinext`: production baseline using Vinext on Cloudflare Workers
+- `vinext-spike`: preview-only Vinext evaluation lane
+
+Use this command sequence in CI to keep Cloudflare Workers deploys deterministic and auditable:
 
 ```bash
 bun install --frozen-lockfile
-bun run vercel:build
-NEXT_ON_PAGES_SKIP_BUILD=1 NEXT_ON_PAGES_REUSE_PREBUILT=1 bun run build:cloudflare:skip-next-build
-bun run wrangler:upload
+bun run check:vinext
+bun run build:cloudflare
+bun run deploy:cloudflare
 ```
 
-This flow keeps dependency installation to a single explicit `bun install --frozen-lockfile` step, then reuses prebuilt `.vercel/output` for the Cloudflare conversion/upload stage.
+This flow keeps dependency installation to a single explicit `bun install --frozen-lockfile` step and uses Vinext as the only build/deploy adapter.
 
-`bun run build:cloudflare` now performs a full conversion by default to avoid serving stale CSS/assets from reused local output. Prebuilt reuse is still available through the explicit `build:cloudflare:skip-next-build` command, and only when commit metadata confirms the prebuilt output is safe to reuse.
-
-`bun run build:pages` is now environment-aware:
-- no Cloudflare deploy context -> runs `deploy:cloudflare:nonprod` (plain Next build validation),
-- Cloudflare Pages production branch -> runs `build:cloudflare` (next-on-pages conversion),
-- Cloudflare Pages preview/unknown branch -> runs `deploy:cloudflare:nonprod` (plain Next build validation).
-
-Use `FORCE_CLOUDFLARE_WORKER_BUILD=1 bun run build:pages` to force worker conversion when needed (including non-production or unknown-branch environments).
+`bun run build`, `bun run build:cloudflare`, and `bun run build:pages` all route through the same Vinext build path so local, CI, and Cloudflare validation stay aligned.
 
 ## Branch deploy commands
 
-- **Production branch deploy:** `bun run deploy:cloudflare`
-- **Non-production branch deploy:** `bun run deploy:cloudflare:nonprod`
+- **Production deploy:** `bun run deploy:cloudflare`
+- **Production deploy dry run:** `bun run deploy:cloudflare:dry-run`
+- **Build-only validation:** `bun run deploy:cloudflare:nonprod`
+- **Preview spike:** `bun run deploy:vinext`
+- **Preview spike dry run:** `bun run deploy:vinext:dry-run`
 
-`deploy:cloudflare` now auto-detects Cloudflare Pages build context (`CF_PAGES`, `CF_PAGES_BRANCH`, `CF_PAGES_COMMIT_SHA`, `CF_PAGES_URL`, `CF_PAGES_PROJECT_NAME`, or `CLOUDFLARE_PAGES`). In that context it intentionally:
-- allows non-worker fallback when `next-on-pages` cannot convert non-Edge routes, and
-- skips `wrangler versions upload` because Pages deploys the generated output directly.
+## Production lane
 
-Outside Cloudflare Pages context, `deploy:cloudflare` defaults to strict worker conversion only when Wrangler upload credentials are present (`CLOUDFLARE_ACCOUNT_ID` + `CLOUDFLARE_API_TOKEN`, which sets `REQUIRE_CLOUDFLARE_WORKER_BUILD_SUCCESS=1`) so true upload contexts fail loudly if conversion fails. In validation-only/non-upload contexts (including envs that expose only `CLOUDFLARE_ACCOUNT_ID`) it remains resilient (`REQUIRE_CLOUDFLARE_WORKER_BUILD_SUCCESS=0`) so branch checks can still complete without upload.
+- Production uses [`wrangler.toml`](/Users/kanav/Documents/GitHub/whether-app/wrangler.toml)
+- Worker entrypoint is [`worker/index.ts`](/Users/kanav/Documents/GitHub/whether-app/worker/index.ts)
+- All default `dev`, `build`, `start`, and Cloudflare deploy scripts route through [`scripts/vinext-run.mjs`](/Users/kanav/Documents/GitHub/whether-app/scripts/vinext-run.mjs)
 
-When Wrangler upload credentials are present outside Pages context, `deploy:cloudflare` now forces worker conversion (`FORCE_CLOUDFLARE_WORKER_BUILD=1`) before evaluating upload freshness. This prevents accidental plain-Next fallback that would skip upload with stale or missing worker artifacts.
+`deploy:cloudflare` maps directly to `vinext deploy` with the production Worker name in [`wrangler.toml`](/Users/kanav/Documents/GitHub/whether-app/wrangler.toml). `deploy:cloudflare:nonprod` is build-only validation without upload.
 
-Before `wrangler versions upload`, the script now verifies fresh worker build state using both `.vercel/output/static/_worker.js/index.js` and `.vercel/output/static/_worker.js/build-meta.json` (target, success, and commit match when commit SHA is available). If that freshness check fails, upload is skipped and the run is treated as build-only validation instead of risking a stale worker upload.
+## Preview lane
 
-`deploy:cloudflare:nonprod` intentionally runs a plain Next build with `ALLOW_NEXT_BUILD_WITH_WORKER_CONFIG=1` and does **not** run Wrangler upload. This keeps branch validation green while Next-on-Pages remains blocked by non-Edge routes.
+The preview lane remains intentionally isolated from the production Cloudflare config:
+- production uses [`wrangler.toml`](/Users/kanav/Documents/GitHub/whether-app/wrangler.toml)
+- preview uses [`wrangler.vinext.jsonc`](/Users/kanav/Documents/GitHub/whether-app/wrangler.vinext.jsonc)
+- `bun run deploy:vinext` runs through [`scripts/vinext-deploy.mjs`](/Users/kanav/Documents/GitHub/whether-app/scripts/vinext-deploy.mjs), which temporarily activates the preview config for the deploy command and then restores the production config immediately after
 
-When `build:pages` falls back from a failed worker conversion to `deploy:cloudflare:nonprod`, it now clears stale Next build artifacts first (`.next/lock` and `.next/cache`). This avoids false-negative fallback failures where the first failed `next build` attempt leaves lock/cache state behind and blocks or destabilizes the second build attempt.
+Validation commands for the preview lane:
 
-## Build guardrail for Cloudflare environments
-
-`scripts/build.mjs` now fails fast when all of the following are true:
-- Cloudflare environment is detected (`CF_PAGES` or `CLOUDFLARE_ACCOUNT_ID`),
-- `wrangler.toml` expects a Next-on-Pages worker entrypoint (`.vercel/output/static/_worker.js`), and
-- auto conversion is disabled (`NEXT_ON_PAGES_AUTO` is not truthy).
-
-This prevents a green `bun run build` followed by a failing `wrangler versions upload` due to missing worker output. Use `bun run build:cloudflare`/`bun run deploy:cloudflare`, or set `NEXT_ON_PAGES_AUTO=1` in deploy environments. For non-production branch deploy validation, use `bun run deploy:cloudflare:nonprod`. If you intentionally need plain `next build` elsewhere, set `ALLOW_NEXT_BUILD_WITH_WORKER_CONFIG=1`.
+```bash
+bun run check:vinext
+bun run build:vinext
+bun run start:vinext
+bun run deploy:vinext:dry-run
+```
 
 ## Expected warnings (non-blocking)
 
-The warning classes below are currently expected in this project and are tracked by CI baseline:
+The warning classes below are currently expected from the Vinext/Rolldown toolchain and should be treated as upstream noise unless behavior changes:
 
-- `Build not running on Vercel. System environment variables will not be available.`
-- `Bun is used as a package manager at build time only, not at runtime with Functions`
-- `Using edge runtime on a page currently disables static generation for that page`
-- `Invalid prerender config for /answers/[slug]` (and `.rsc`)
-- `Invalid prerender config for /concepts/[slug]` (and `.rsc`)
-- `Invalid prerender config for /concepts/audience/[audience]` (and `.rsc`)
-- `Invalid prerender config for /concepts/focus/[focus]` (and `.rsc`)
-- `Invalid prerender config for /decide/[slug]` (and `.rsc`)
-- `Invalid prerender config for /guides/[stakeholder]` (and `.rsc`)
-- `Invalid prerender config for /guides/stage/[stage]` (and `.rsc`)
-- `Invalid prerender config for /library/failure-modes/[slug]` (and `.rsc`)
-- `Invalid prerender config for /posture/[slug]` (and `.rsc`)
-- `Invalid prerender config for /resources/[slug]` (and `.rsc`)
-- `Invalid prerender config for /solutions/career-paths/[role]` (and `.rsc`)
-- `Invalid prerender config for /startup-macro-posture/[regime]` (and `.rsc`)
-- `Invalid prerender config for /toolkits/[slug]` (and `.rsc`)
-
-As of `next@16.1.6`, the latest published `@cloudflare/next-on-pages` is `1.13.16`; no newer adapter release is available yet to remove these adapter warning classes at source.
-
-Known third-party minifier noise (`duplicate-object-key`) is intentionally suppressed at build-log emission time and tracked in `.github/cloudflare/warning-policy.md`.
+- Rolldown/Vinext plugin timing diagnostics during multi-environment builds
+- Rolldown option-validation warnings for `treeshake.preset` and `experimentalMinChunkSize`
+- `INEFFECTIVE_DYNAMIC_IMPORT` for `vinext/dist/shims/navigation.js` during SSR chunking
 
 If CI reports a new warning class, treat it as action-required until triaged and either:
 1. fixed in code/dependencies, or
-2. intentionally accepted and added to `.github/cloudflare/warning-baseline.txt` (or `.github/cloudflare/warning-policy.md` for explicit suppressions).
-
-## Warning budget policy
-
-CI enforces a warning budget after Pages-targeted builds by parsing build logs with:
-
-```bash
-node scripts/cloudflare-warning-audit.mjs \
-  --log artifacts/cloudflare-build.log \
-  --expected .github/cloudflare/warning-baseline.txt \
-  --critical .github/cloudflare/warning-critical.txt \
-  --metrics-out artifacts/cloudflare-warning-metrics.json \
-  --summary-out artifacts/cloudflare-warning-summary.md \
-  --fail-on-new
-```
-
-This produces two deploy artifacts:
-- `artifacts/cloudflare-warning-summary.md` (human-readable warning classes/counts)
-- `artifacts/cloudflare-warning-metrics.json` (machine-readable trend data)
-
-## Triage guide
-
-When warning budget fails:
-1. Open `cloudflare-warning-summary.md` artifact and identify unexpected classes.
-2. Confirm whether warning appears in local Pages build (`bun run build:cloudflare`).
-3. If warning is actionable, fix root cause and keep baseline unchanged.
-4. If warning is known-safe external noise, add exact warning class to baseline with a short PR note explaining why.
-
-## Faster rebuild mode for Cloudflare (optional)
-
-When CI already has a fresh `.vercel/output` from `bun run vercel:build`, you can skip the nested Vercel build that `next-on-pages` normally performs:
-
-```bash
-bun run build:cloudflare:skip-next-build
-```
-
-This uses `NEXT_ON_PAGES_SKIP_BUILD=1` and forwards `--skip-build` to `next-on-pages`, while `NEXT_ON_PAGES_REUSE_PREBUILT=1` enables explicit reuse only when commit metadata matches the current build context.
-
-`scripts/build.mjs` also auto-enables this skip behavior when all of the following are true:
-- target is Cloudflare Pages (`build:cloudflare` / `build:pages`),
-- a restored Vercel/Next-on-Pages output exists (`.vercel/output/config.json` or `_worker.js/index.js`), and
-- the environment indicates CI/deploy context (`CI=1|true|yes`, `CF_PAGES=1|true|yes`, or `CLOUDFLARE_ACCOUNT_ID` is present).
-
-This keeps CI pipelines from rebuilding the same commit twice while still preserving explicit local behavior by default.
+2. intentionally accepted and documented in the build/deploy notes for the current Vinext version.

@@ -33,25 +33,19 @@ jobs:
       - name: Test
         run: bun run test
 
-      - name: Build for Cloudflare Pages target
+      - name: Check Vinext compatibility
         run: |
           mkdir -p artifacts
-          bun run build:pages 2>&1 | tee artifacts/cloudflare-build.log
+          bun run check:vinext 2>&1 | tee artifacts/vinext-check.log
 
-      - name: Audit Cloudflare warning budget
+      - name: Build for Cloudflare Worker target
         run: |
-          # Migration note: invoke package script via `bun run` instead of direct `node scripts/...`.
-          bun run audit:cloudflare-warnings -- \
-            --log artifacts/cloudflare-build.log \
-            --expected .github/cloudflare/warning-baseline.txt \
-            --critical .github/cloudflare/warning-critical.txt \
-            --metrics-out artifacts/cloudflare-warning-metrics.json \
-            --summary-out artifacts/cloudflare-warning-summary.md \
-            --fail-on-new
+          mkdir -p artifacts
+          bun run build:cloudflare 2>&1 | tee artifacts/cloudflare-build.log
 
       - name: Upload Cloudflare warning artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: cloudflare-warning-audit
+          name: cloudflare-build-artifacts
           path: artifacts/

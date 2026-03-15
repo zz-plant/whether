@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import type { Route } from "next";
 import Link from "next/link";
+import type { Route } from "../../lib/navigation/routeType";
 import { buildBreadcrumbList, buildPageMetadata, serializeJsonLd } from "../../lib/pageMetadata";
 import { resourceArticles } from "../../lib/resourceArticles";
 import { resourcePillarPages, resourceSupportingPages } from "../../lib/resourcesContent";

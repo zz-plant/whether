@@ -1,6 +1,6 @@
-import type { Route } from "next";
 import Link from "next/link";
 import { ArrowRightIcon } from "./uiIcons";
+import type { Route } from "../../lib/navigation/routeType";
 
 type RelatedReportLink = {
   href: Route | string;

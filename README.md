@@ -166,7 +166,7 @@ bun run cli:whether -- --version
 Expected success behavior: exit code `0` and stdout contains only a semantic version string like `0.1.0`.
 
 ## Local development
-1. Use Node.js 20+ (`.nvmrc`) and Bun 1.3.x.
+1. Use Node.js 22+ (`.nvmrc`) and Bun 1.3.x.
 2. Install dependencies: `bun install`
 3. Start development server: `bun run dev` (or `bun run dev:turbo`)
 4. Open `http://localhost:3000`
@@ -176,7 +176,7 @@ Expected success behavior: exit code `0` and stdout contains only a semantic ver
 - Lint only: `bun run lint`
 - Typecheck only: `bun run typecheck`
 - Tests only: `bun run test`
-- Clean generated build/dependency artifacts: `bun run clean`
+- Clean generated build artifacts: `bun run clean`
 
 ## Time Machine summary refresh
 - Refresh weekly/monthly/quarterly/yearly Time Machine summary archives from 2024 onward:

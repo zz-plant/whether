@@ -1,9 +1,9 @@
 "use client";
 
-import type { Route } from "next";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import type { Route } from "../../../lib/navigation/routeType";
 import { BoltIcon, CircleTargetIcon, LayoutGridIcon, SectionJumpIcon } from "../../components/uiIcons";
 import {
   operationsWorkstreamLinks,

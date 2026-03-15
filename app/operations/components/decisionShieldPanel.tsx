@@ -9,8 +9,8 @@ import { Field } from "@base-ui/react/field";
 import { Input } from "@base-ui/react/input";
 import { Select } from "@base-ui/react/select";
 import { Toast } from "@base-ui/react/toast";
-import type { Route } from "next";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import type { Route } from "../../../lib/navigation/routeType";
 import {
   evaluateDecision,
   formatDecisionAction,

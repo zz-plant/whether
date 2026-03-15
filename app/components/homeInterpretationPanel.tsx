@@ -1,4 +1,4 @@
-import type { Route } from "next";
+import type { Route } from "../../lib/navigation/routeType";
 import Link from "next/link";
 import type { InterpretationLayer, InterpretationView } from "../../lib/report/interpretationLayer";
 import { interpretationViews } from "../../lib/report/interpretationLayer";

@@ -1,12 +1,34 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import path from "node:path";
 import http from "node:http";
 import fs from "node:fs";
 import os from "node:os";
 
 const CLI_PATH = path.join(process.cwd(), "scripts", "whether-cli.mjs");
+
+const runCli = (args: string[], options: { env?: NodeJS.ProcessEnv } = {}) =>
+  new Promise<{ status: number | null; stdout: string; stderr: string }>((resolve, reject) => {
+    const child = spawn("node", [CLI_PATH, ...args], {
+      env: options.env ?? process.env,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+
+    let stdout = "";
+    let stderr = "";
+
+    child.stdout.on("data", (chunk) => {
+      stdout += String(chunk);
+    });
+    child.stderr.on("data", (chunk) => {
+      stderr += String(chunk);
+    });
+    child.on("error", reject);
+    child.on("close", (status) => {
+      resolve({ status, stdout, stderr });
+    });
+  });
 
 describe("whether cli", () => {
   it("prints expanded help", () => {
@@ -74,8 +96,8 @@ describe("whether cli", () => {
 
     await new Promise<void>((resolve) => server.listen(0, resolve));
     const { port } = server.address() as { port: number };
-    const result = spawnSync("node", [CLI_PATH, "ping", "--api-base-url", `http://127.0.0.1:${port}`, "--json"], { encoding: "utf8" });
-    server.close();
+    const result = await runCli(["ping", "--api-base-url", `http://127.0.0.1:${port}`, "--json"]);
+    await new Promise<void>((resolve) => server.close(() => resolve()));
 
     assert.equal(result.status, 0);
     const parsed = JSON.parse(result.stdout);
@@ -97,8 +119,8 @@ describe("whether cli", () => {
 
     await new Promise<void>((resolve) => server.listen(0, resolve));
     const { port } = server.address() as { port: number };
-    const result = spawnSync("node", [CLI_PATH, "ping", "--api-base-url", `http://127.0.0.1:${port}`, "--json"], { encoding: "utf8" });
-    server.close();
+    const result = await runCli(["ping", "--api-base-url", `http://127.0.0.1:${port}`, "--json"]);
+    await new Promise<void>((resolve) => server.close(() => resolve()));
 
     assert.equal(result.status, 0);
     const parsed = JSON.parse(result.stdout);
@@ -126,8 +148,8 @@ describe("whether cli", () => {
 
     await new Promise<void>((resolve) => server.listen(0, resolve));
     const { port } = server.address() as { port: number };
-    const result = spawnSync("node", [CLI_PATH, "brief", "--api-base-url", `http://127.0.0.1:${port}`, "--json"], { encoding: "utf8" });
-    server.close();
+    const result = await runCli(["brief", "--api-base-url", `http://127.0.0.1:${port}`, "--json"]);
+    await new Promise<void>((resolve) => server.close(() => resolve()));
 
     assert.equal(result.status, 0);
     const parsed = JSON.parse(result.stdout);
@@ -187,11 +209,10 @@ describe("whether cli", () => {
     await new Promise<void>((resolve) => server.listen(0, resolve));
     const { port } = server.address() as { port: number };
 
-    const baseArgs = [CLI_PATH, "status", "--api-base-url", `http://127.0.0.1:${port}`, "--json"];
-    const live = spawnSync("node", baseArgs, { encoding: "utf8" });
-    const historical = spawnSync("node", [...baseArgs, "--as-of", "2024-07"], { encoding: "utf8" });
+    const live = await runCli(["status", "--api-base-url", `http://127.0.0.1:${port}`, "--json"]);
+    const historical = await runCli(["status", "--api-base-url", `http://127.0.0.1:${port}`, "--json", "--as-of", "2024-07"]);
 
-    server.close();
+    await new Promise<void>((resolve) => server.close(() => resolve()));
 
     assert.equal(live.status, 0);
     assert.equal(historical.status, 0);
@@ -215,8 +236,8 @@ describe("whether cli", () => {
 
     await new Promise<void>((resolve) => server.listen(0, resolve));
     const { port } = server.address() as { port: number };
-    const result = spawnSync("node", [CLI_PATH, "status", "--api-base-url", `http://127.0.0.1:${port}`], { encoding: "utf8" });
-    server.close();
+    const result = await runCli(["status", "--api-base-url", `http://127.0.0.1:${port}`]);
+    await new Promise<void>((resolve) => server.close(() => resolve()));
 
     assert.equal(result.status, 2);
     assert.match(result.stderr, /auth: Authentication failed \(missing key\)\./);
@@ -238,8 +259,8 @@ describe("whether cli", () => {
 
     await new Promise<void>((resolve) => server.listen(0, resolve));
     const { port } = server.address() as { port: number };
-    const result = spawnSync("node", [CLI_PATH, "status", "--api-base-url", `http://127.0.0.1:${port}`], { encoding: "utf8" });
-    server.close();
+    const result = await runCli(["status", "--api-base-url", `http://127.0.0.1:${port}`]);
+    await new Promise<void>((resolve) => server.close(() => resolve()));
 
     assert.equal(result.status, 2);
     assert.match(result.stderr, /forbidden: Access denied by API \(invalid scope\)\./);
@@ -261,8 +282,8 @@ describe("whether cli", () => {
 
     await new Promise<void>((resolve) => server.listen(0, resolve));
     const { port } = server.address() as { port: number };
-    const result = spawnSync("node", [CLI_PATH, "status", "--api-base-url", `http://127.0.0.1:${port}`], { encoding: "utf8" });
-    server.close();
+    const result = await runCli(["status", "--api-base-url", `http://127.0.0.1:${port}`]);
+    await new Promise<void>((resolve) => server.close(() => resolve()));
 
     assert.equal(result.status, 7);
     assert.match(result.stderr, /rate limit: Request quota exceeded\./);
@@ -283,8 +304,8 @@ describe("whether cli", () => {
 
     await new Promise<void>((resolve) => server.listen(0, resolve));
     const { port } = server.address() as { port: number };
-    const result = spawnSync("node", [CLI_PATH, "status", "--api-base-url", `http://127.0.0.1:${port}`], { encoding: "utf8" });
-    server.close();
+    const result = await runCli(["status", "--api-base-url", `http://127.0.0.1:${port}`]);
+    await new Promise<void>((resolve) => server.close(() => resolve()));
 
     assert.equal(result.status, 7);
     assert.match(result.stderr, /server fault: API returned 503\./);
@@ -322,8 +343,8 @@ describe("whether cli", () => {
 
     await new Promise<void>((resolve) => server.listen(0, resolve));
     const { port } = server.address() as { port: number };
-    const result = spawnSync("node", [CLI_PATH, "ping", "--api-base-url", `http://127.0.0.1:${port}`], { encoding: "utf8" });
-    server.close();
+    const result = await runCli(["ping", "--api-base-url", `http://127.0.0.1:${port}`]);
+    await new Promise<void>((resolve) => server.close(() => resolve()));
 
     assert.equal(result.status, 2);
     assert.match(result.stderr, /auth: Authentication failed \(missing key\)\./);
@@ -342,8 +363,8 @@ describe("whether cli", () => {
 
     await new Promise<void>((resolve) => server.listen(0, resolve));
     const { port } = server.address() as { port: number };
-    const result = spawnSync("node", [CLI_PATH, "doctor", "--api-base-url", `http://127.0.0.1:${port}`, "--json"], { encoding: "utf8" });
-    server.close();
+    const result = await runCli(["doctor", "--api-base-url", `http://127.0.0.1:${port}`, "--json"]);
+    await new Promise<void>((resolve) => server.close(() => resolve()));
 
     assert.equal(result.status, 0);
     const parsed = JSON.parse(result.stdout);
@@ -365,8 +386,8 @@ describe("whether cli", () => {
 
     await new Promise<void>((resolve) => server.listen(0, resolve));
     const { port } = server.address() as { port: number };
-    const result = spawnSync("node", [CLI_PATH, "doctor", "--api-base-url", `http://127.0.0.1:${port}`, "--json"], { encoding: "utf8" });
-    server.close();
+    const result = await runCli(["doctor", "--api-base-url", `http://127.0.0.1:${port}`, "--json"]);
+    await new Promise<void>((resolve) => server.close(() => resolve()));
 
     assert.equal(result.status, 0);
     const parsed = JSON.parse(result.stdout);
@@ -395,15 +416,13 @@ describe("whether cli", () => {
     await new Promise<void>((resolve) => server.listen(0, resolve));
     const { port } = server.address() as { port: number };
 
-    const expired = spawnSync("node", [CLI_PATH, "status", "--api-base-url", `http://127.0.0.1:${port}`], {
-      encoding: "utf8",
+    const expired = await runCli(["status", "--api-base-url", `http://127.0.0.1:${port}`], {
       env: { ...process.env, WHETHER_API_KEY: "expired-token" },
     });
-    const invalid = spawnSync("node", [CLI_PATH, "status", "--api-base-url", `http://127.0.0.1:${port}`], {
-      encoding: "utf8",
+    const invalid = await runCli(["status", "--api-base-url", `http://127.0.0.1:${port}`], {
       env: { ...process.env, WHETHER_API_KEY: "invalid-token" },
     });
-    server.close();
+    await new Promise<void>((resolve) => server.close(() => resolve()));
 
     assert.equal(expired.status, 2);
     assert.match(expired.stderr, /auth: Authentication failed \(expired key\)\./);
@@ -481,17 +500,15 @@ describe("whether cli", () => {
     await new Promise<void>((resolve) => server.listen(0, resolve));
     const { port } = server.address() as { port: number };
 
-    const valid = spawnSync("node", [CLI_PATH, "auth", "status", "--check", "--api-base-url", `http://127.0.0.1:${port}`], {
-      encoding: "utf8",
+    const valid = await runCli(["auth", "status", "--check", "--api-base-url", `http://127.0.0.1:${port}`], {
       env: { ...process.env, WHETHER_API_KEY: "valid-token" },
     });
 
-    const invalid = spawnSync("node", [CLI_PATH, "auth", "status", "--check", "--api-base-url", `http://127.0.0.1:${port}`], {
-      encoding: "utf8",
+    const invalid = await runCli(["auth", "status", "--check", "--api-base-url", `http://127.0.0.1:${port}`], {
       env: { ...process.env, WHETHER_API_KEY: "invalid-token" },
     });
 
-    server.close();
+    await new Promise<void>((resolve) => server.close(() => resolve()));
 
     assert.ok(requests.every((url) => url === "/api/auth/status"));
     assert.equal(valid.status, 0);
@@ -533,12 +550,8 @@ describe("whether cli", () => {
 
     await new Promise<void>((resolve) => server.listen(0, resolve));
     const { port } = server.address() as { port: number };
-    const result = spawnSync(
-      "node",
-      [CLI_PATH, "status", "--api-base-url", `http://127.0.0.1:${port}`, "--company", "acme", "--stage", "seed"],
-      { encoding: "utf8" },
-    );
-    server.close();
+    const result = await runCli(["status", "--api-base-url", `http://127.0.0.1:${port}`, "--company", "acme", "--stage", "seed"]);
+    await new Promise<void>((resolve) => server.close(() => resolve()));
 
     assert.equal(result.status, 0);
     assert.ok(requests.some((url) => url === "/api/cli/status"));
@@ -572,8 +585,8 @@ describe("whether cli", () => {
 
     await new Promise<void>((resolve) => server.listen(0, resolve));
     const { port } = server.address() as { port: number };
-    const result = spawnSync("node", [CLI_PATH, "history", "--weeks", "99", "--api-base-url", `http://127.0.0.1:${port}`], { encoding: "utf8" });
-    server.close();
+    const result = await runCli(["history", "--weeks", "99", "--api-base-url", `http://127.0.0.1:${port}`]);
+    await new Promise<void>((resolve) => server.close(() => resolve()));
 
     assert.equal(result.status, 0);
     assert.ok(requests.some((url) => url.includes("/api/cli/history?weeks=99")));
@@ -613,8 +626,8 @@ describe("whether cli", () => {
 
     await new Promise<void>((resolve) => server.listen(0, resolve));
     const { port } = server.address() as { port: number };
-    const result = spawnSync("node", [CLI_PATH, "status", "--verbose", "--api-base-url", `http://127.0.0.1:${port}`], { encoding: "utf8" });
-    server.close();
+    const result = await runCli(["status", "--verbose", "--api-base-url", `http://127.0.0.1:${port}`]);
+    await new Promise<void>((resolve) => server.close(() => resolve()));
 
     assert.equal(result.status, 0);
     assert.ok(requests.some((url) => url.includes("/api/cli/status?view=expanded")));
@@ -687,11 +700,10 @@ describe("whether cli", () => {
     ];
 
     for (const args of commands) {
-      const result = spawnSync("node", [CLI_PATH, ...args], { encoding: "utf8" });
+      const result = await runCli(args);
       assert.equal(result.status, 0, `command failed: ${args.join(" ")}\n${result.stderr}`);
     }
-
-    server.close();
+    await new Promise<void>((resolve) => server.close(() => resolve()));
 
     assert.ok(requests.some((url) => url.includes("/api/cli/status?asOf=2024-07&view=expanded")));
     assert.ok(requests.some((url) => url.includes("/api/cli/call?asOf=2024-07")));

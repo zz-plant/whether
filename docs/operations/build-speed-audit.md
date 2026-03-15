@@ -1,5 +1,7 @@
 # Build speed audit (Cloudflare Pages + Next on Pages)
 
+Historical note: this audit describes the retired `next-on-pages` pipeline and is preserved only for baseline comparison against the current Vinext lane.
+
 Based on the 2026-03-12 CI log, the slowest stages are:
 
 ## Timing breakdown (from log)

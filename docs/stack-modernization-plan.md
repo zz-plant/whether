@@ -1,5 +1,7 @@
 # Stack modernization research plan
 
+Historical note: this document captures the pre-cutover research plan from the `next-on-pages` era. Production has since moved to Vinext on Cloudflare Workers; keep this file for migration history, not as the active deployment runbook.
+
 This plan scopes the research, validation, and decision gates needed to modernize the Whether
 stack while preserving product behavior and Cloudflare readiness.
 

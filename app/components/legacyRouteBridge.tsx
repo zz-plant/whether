@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { Route } from "next";
+import type { Route } from "../../lib/navigation/routeType";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRightIcon } from "./uiIcons";
 
