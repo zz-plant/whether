@@ -11,8 +11,8 @@ import { StartupModeSelector, type StartupModeContent } from "./startupModeSelec
 
 const callSectionHref = homeSectionSequence[0]?.href ?? "#weekly-posture-brief-title";
 const auditSectionHref = homeSectionSequence[1]?.href ?? "#audit-this-call";
-const historicalReplaySectionHref = homeSectionSequence[2]?.href ?? "#historical-replay-workspace";
-const executionSectionHref = homeSectionSequence[3]?.href ?? "#approve-this-weeks-plan";
+const executionSectionHref = homeSectionSequence[2]?.href ?? "#approve-this-weeks-plan";
+const historicalReplaySectionHref = homeSectionSequence[3]?.href ?? "#historical-replay-workspace";
 const toolsSectionHref = homeSectionSequence[4]?.href ?? "#translate-or-run-tool";
 
 type WeeklyCallModePanelProps = {
@@ -31,6 +31,15 @@ type WeeklyCallModePanelProps = {
   tierOnePanelClassName: string;
   sectionSpacingClassName: string;
   tierOneHeadingClassName: string;
+  whyItMattersLine?: string;
+  readThisCardItems?: Array<{
+    label: string;
+    detail: string;
+  }>;
+  glossaryHref?: string;
+  trustCueLine?: string;
+  needsTrustWarning?: boolean;
+  trustWarningCopy?: string;
   actions?: ReactNode;
 };
 
@@ -61,6 +70,12 @@ export function WeeklyCallModePanel({
   tierOnePanelClassName,
   sectionSpacingClassName,
   tierOneHeadingClassName,
+  whyItMattersLine,
+  readThisCardItems = [],
+  glossaryHref,
+  trustCueLine,
+  needsTrustWarning = false,
+  trustWarningCopy,
   actions,
 }: WeeklyCallModePanelProps) {
   const firstAvailableMode = startupVariantPolicy.options.find((option) => modeContentByMode[option.mode])?.mode;
@@ -115,9 +130,12 @@ export function WeeklyCallModePanel({
           <h2 className="text-sm font-semibold tracking-[0.01em] text-slate-50">Weekly call snapshot</h2>
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Decide, align, and share in under 60 seconds</p>
         </div>
+        {whyItMattersLine ? (
+          <p className="mt-2 text-xs leading-5 text-slate-300">{whyItMattersLine}</p>
+        ) : null}
         <ol className="mt-3 grid gap-2.5 text-[11px] text-slate-100" aria-label="Weekly decision transmission order">
           <li className="rounded-md border border-slate-700/60 bg-slate-900/65 px-2.5 py-2">
-            <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Regime</span>
+            <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Market posture</span>
             <p className="mt-1 text-xs font-semibold text-slate-100">{postureLabel}</p>
           </li>
           <li className="rounded-md border border-slate-700/60 bg-slate-900/65 px-2.5 py-2">
@@ -130,23 +148,43 @@ export function WeeklyCallModePanel({
               <p className="mt-1 text-[11px] leading-relaxed text-emerald-50">{snapshotDoNow}</p>
             </div>
             <div className="rounded-md border border-rose-400/35 bg-rose-500/10 px-2.5 py-2">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-rose-200">Avoid</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-rose-200">Guardrail</p>
               <p className="mt-1 text-[11px] leading-relaxed text-rose-50">{snapshotAvoid}</p>
             </div>
             <div className="rounded-md border border-sky-400/35 bg-sky-500/10 px-2.5 py-2">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Watch</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Flip when</p>
               <p className="mt-1 text-[11px] leading-relaxed text-sky-50">{snapshotWatch}</p>
             </div>
           </li>
-          <li className="rounded-md border border-sky-500/35 bg-sky-500/10 px-2.5 py-2">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Flip conditions</p>
-            <ul className="mt-1 grid gap-1 text-[11px] text-slate-100">
-              {(effectiveFlipLabels.length > 0 ? effectiveFlipLabels.slice(0, 2) : [snapshotWatch]).map((label) => (
-                <li key={label} className={compactInsetClassName}>• {label}</li>
+        </ol>
+        {readThisCardItems.length > 0 ? (
+          <details className="mt-3 rounded-lg border border-slate-700/60 bg-slate-950/55 px-3 py-3">
+            <summary className="cursor-pointer text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Read this card</summary>
+            <ul className="mt-2 grid gap-1.5 text-[11px] text-slate-100">
+              {readThisCardItems.slice(0, 3).map((item) => (
+                <li key={item.label} className="rounded-md border border-slate-700/55 bg-slate-900/55 px-2.5 py-2">
+                  <span className="font-semibold text-slate-200">{item.label}:</span> {item.detail}
+                </li>
               ))}
             </ul>
-          </li>
-        </ol>
+            <div className="mt-2 flex flex-wrap gap-3 text-[11px] text-slate-300">
+              <span className={compactInsetClassName}>Capital tightness = how hard funding is to access.</span>
+              <span className={compactInsetClassName}>Risk appetite = how much the market will support bold expansion.</span>
+              <span className={compactInsetClassName}>Flip condition = the threshold that changes this week&apos;s call.</span>
+            </div>
+            {glossaryHref ? (
+              <Link href={glossaryHref} className="mt-2 inline-flex min-h-[44px] items-center text-xs font-semibold text-sky-300 underline underline-offset-2">
+                Open glossary help
+              </Link>
+            ) : null}
+          </details>
+        ) : null}
+        {trustCueLine ? (
+          <div className={`mt-3 rounded-lg border px-3 py-3 text-[11px] ${needsTrustWarning ? "border-amber-400/35 bg-amber-500/10 text-amber-50" : "border-slate-700/60 bg-slate-950/55 text-slate-200"}`}>
+            <p className="font-semibold uppercase tracking-[0.12em]">{needsTrustWarning ? "Can I rely on this?" : "Trust check"}</p>
+            <p className="mt-1 leading-5">{needsTrustWarning ? trustWarningCopy ?? trustCueLine : trustCueLine}</p>
+          </div>
+        ) : null}
         <details className="mt-3 rounded-lg border border-slate-700/60 bg-slate-950/55 px-3 py-3">
           <summary className="cursor-pointer text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Secondary diagnostics</summary>
           <ul className="mt-2 grid gap-1.5 text-[11px] text-slate-100 sm:grid-cols-2">
@@ -176,9 +214,9 @@ export function WeeklyCallModePanel({
         <p className="text-xs text-slate-300">Whether does not predict markets; it tells founders how to operate inside them this week.</p>
         <div className="grid gap-2 text-xs text-slate-100">
           <p className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-slate-200">What environment?</span> {postureLabel} with a {trendLabel.toLowerCase()} trend at {confidenceValue}% confidence.</p>
-          <p className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-emerald-200">What should leadership do?</span> {snapshotDoNow}</p>
-          <p className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-rose-200">Avoid this week:</span> {snapshotAvoid}</p>
-          <p className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-sky-200">Watch / flip cues:</span> {snapshotWatch}</p>
+          <p className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-emerald-200">DO NOW</span> {snapshotDoNow}</p>
+          <p className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-rose-200">GUARDRAIL</span> {snapshotAvoid}</p>
+          <p className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-sky-200">FLIP WHEN</span> {snapshotWatch}</p>
         </div>
 
         <div className="rounded-lg border border-slate-800/55 bg-slate-950/62 px-3 py-3">

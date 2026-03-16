@@ -31,6 +31,9 @@ export type DecisionHeroSectionProps = {
   weeklyMovement?: WeeklyDecisionCardViewModel["decision"]["weeklyMovement"];
   regimeSignalIndicators?: WeeklyDecisionCardViewModel["diagnostics"]["regimeSignalIndicators"];
   sinceLastReview?: WeeklyDecisionCardViewModel["sinceLastReview"];
+  whyItMattersLine?: string;
+  readThisCardItems?: WeeklyDecisionCardViewModel["presentation"] extends { readThisCardItems?: infer T } ? T : never;
+  glossaryHref?: string;
 };
 
 export type ActionStripSectionProps = { items: ActionStripItem[] };

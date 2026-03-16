@@ -71,9 +71,11 @@ approved.
 - **Data/API** (`/operations/data`): API usage guidance and handoff references for operators.
 - **Terminal** (`/operations/cli`): command-line status, history, diff, and scenario workflows.
 
-### 1.5 Onboarding (/onboarding)
-Onboarding provides a first-time guide and a plain‑English glossary so new operators can decode
-signals and navigate the report pages.
+### 1.5 Start and glossary support (`/start`, `/onboarding`, `/method#beginner-glossary`)
+The homepage is the canonical first-time and returning weekly workspace. `/start` remains a
+secondary bridge for legacy links, while `/onboarding` redirects there. Plain-English glossary
+support now lives under the Method hub so operators can pull term translation without leaving the
+canonical weekly brief flow.
 
 ### 1.6 Method hub (/method) and formula reference (/methodology)
 `/method` is the canonical trust-audit hub linked from Weekly Brief. It summarizes current

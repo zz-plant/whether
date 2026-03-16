@@ -3,6 +3,7 @@ import type { WeeklyDecisionCardViewModel } from "../../lib/report/homeBriefMode
 export type WeeklyDecisionCardModelOverrides = Partial<{
   status: Partial<WeeklyDecisionCardViewModel["status"]>;
   decision: Partial<WeeklyDecisionCardViewModel["decision"]>;
+  presentation: Partial<NonNullable<WeeklyDecisionCardViewModel["presentation"]>>;
   diagnostics: Partial<WeeklyDecisionCardViewModel["diagnostics"]>;
   history: Partial<WeeklyDecisionCardViewModel["history"]>;
   sinceLastReview: Partial<WeeklyDecisionCardViewModel["sinceLastReview"]>;
@@ -80,6 +81,16 @@ export const buildWeeklyDecisionCardModel = (
     revisitDecisions: true,
     weeklyMovement: { score: 1.2, direction: "defensive", summary: "Model pressure increased by +1.2 this week; tighten approvals until a reversal trigger prints." },
     ...overrides.decision,
+  },
+  presentation: {
+    whyItMattersLine: "External conditions shape how aggressively teams hire, spend, and approve long-payback work this week.",
+    readThisCardItems: [
+      { label: "What changed", detail: "Pressure rose versus last week." },
+      { label: "What action it changes", detail: "Revise hiring and roadmap calls now." },
+      { label: "What would reverse the call", detail: "If risk appetite rises above 55, reopen selective hiring." },
+    ],
+    glossaryHref: "/method#beginner-glossary",
+    ...overrides.presentation,
   },
   diagnostics: {
     regimeSignalIndicators: [

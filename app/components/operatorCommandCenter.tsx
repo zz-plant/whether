@@ -98,6 +98,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
   const commandCenterRef = useRef<HTMLElement | null>(null);
   const queryRef = useRef(query);
   const isExpandedRef = useRef(isExpanded);
+  const hasUserSetFilterRef = useRef(false);
   const pendingQueryPersistRef = useRef<number | null>(null);
   const haptic = useHapticFeedback();
   const { copyToClipboard } = useClipboardCopy();
@@ -121,6 +122,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
 
     const storedFilter = sessionStorage.getItem(FILTER_STORAGE_KEY);
     if (storedFilter && isCommandFilter(storedFilter)) {
+      hasUserSetFilterRef.current = true;
       setFilter(storedFilter);
     }
 
@@ -140,6 +142,9 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
 
     const onChange = () => {
       applyViewport();
+      if (hasUserSetFilterRef.current) {
+        return;
+      }
       setFilter((current) => {
         if (current !== "All" && current !== "Playbook") {
           return current;
@@ -280,6 +285,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
   };
 
   const handleReset = () => {
+    hasUserSetFilterRef.current = false;
     setQuery("");
     setFilter(isMobile ? "Playbook" : "All");
     searchInputRef.current?.focus();
@@ -371,6 +377,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
                       key={item}
                       type="button"
                       onClick={() => {
+                        hasUserSetFilterRef.current = true;
                         setFilter(item);
                       }}
                       className={`${filterClassName} ${

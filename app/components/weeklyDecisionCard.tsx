@@ -32,8 +32,8 @@ import {
 } from "./weekly-card/decisionSupport";
 
 const callSectionHref = homeSectionSequence[0]?.href ?? "#weekly-posture-brief-title";
-const decideSectionHref = homeSectionSequence[1]?.href ?? "#decision-snapshot-for-leadership-this-week";
-const evidenceSectionHref = homeSectionSequence[3]?.href ?? "#evidence-diagnostics";
+const decideSectionHref = "#approve-this-weeks-plan";
+const evidenceSectionHref = "#audit-this-call";
 
 const sectionHrefByLabel = {
   call: callSectionHref,
@@ -56,12 +56,19 @@ type WeeklyMovement = {
 type WeeklyDecisionCardModel =
   & WeeklyDecisionCardViewModel["status"]
   & WeeklyDecisionCardViewModel["decision"]
+  & NonNullable<WeeklyDecisionCardViewModel["presentation"]>
   & WeeklyDecisionCardViewModel["diagnostics"]
   & WeeklyDecisionCardViewModel["history"]
   & WeeklyDecisionCardViewModel["artifact"];
 
-type LegacyWeeklyDecisionCardProps = Omit<WeeklyDecisionCardModel, "immediateDecision"> & {
+type LegacyWeeklyDecisionCardProps = Omit<WeeklyDecisionCardModel, "immediateDecision" | "whyItMattersLine" | "readThisCardItems" | "glossaryHref"> & {
   immediateDecision?: string;
+  whyItMattersLine?: string;
+  readThisCardItems?: Array<{
+    label: string;
+    detail: string;
+  }>;
+  glossaryHref?: string;
   actions?: ReactNode;
   diagnosticsLane?: ReactNode;
 };
@@ -833,6 +840,11 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
         revisitDecisions: props.revisitDecisions,
         weeklyMovement: props.weeklyMovement,
       },
+      presentation: {
+        whyItMattersLine: props.whyItMattersLine,
+        readThisCardItems: props.readThisCardItems ?? [],
+        glossaryHref: props.glossaryHref,
+      },
       diagnostics: {
         regimeSignalIndicators: props.regimeSignalIndicators,
         startupClimateIndex: props.startupClimateIndex,
@@ -864,7 +876,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
 
   const actions = props.actions;
   const diagnosticsLane = props.diagnosticsLane;
-  const { status, decision, diagnostics, history, artifact } = model;
+  const { status, decision, presentation, diagnostics, history, artifact } = model;
   const {
     statusLabel,
     regimeKey,
@@ -904,6 +916,11 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     revisitDecisions,
     weeklyMovement,
   } = decision;
+  const {
+    whyItMattersLine,
+    readThisCardItems = [],
+    glossaryHref,
+  } = presentation ?? {};
   const {
     regimeSignalIndicators = [],
     startupClimateIndex,
@@ -1092,6 +1109,12 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
             tierOnePanelClassName={tierOnePanel}
             sectionSpacingClassName={sectionSpacing}
             tierOneHeadingClassName={tierOneHeading}
+            whyItMattersLine={whyItMattersLine}
+            readThisCardItems={readThisCardItems}
+            glossaryHref={glossaryHref}
+            trustCueLine={trustCueLine}
+            needsTrustWarning={needsTrustWarning}
+            trustWarningCopy={trustWarningCopy}
             actions={actions}
           />
 

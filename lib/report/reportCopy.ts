@@ -124,17 +124,17 @@ export const SIGNALS_RELATED_LINKS: Array<Required<ReportLinkCopy>> = [
     description: "Inspect trust status, source coverage, and formula references for each signal.",
   },
   {
-    href: "/onboarding",
-    label: "Onboarding & glossary",
-    description: "Share plain-English definitions with teams new to macro-driven planning.",
+    href: "/method#beginner-glossary",
+    label: "Method & glossary",
+    description: "Open trust details and plain-English definitions for teams that need term translation.",
   },
 ];
 
 export const ONBOARDING_RELATED_LINKS: Array<Required<ReportLinkCopy>> = [
   {
-    href: "/signals",
-    label: "Signals",
-    description: "Apply the glossary with live source data and threshold diagnostics.",
+    href: "/",
+    label: "Weekly Brief",
+    description: "Use the canonical live weekly call before opening deeper evidence or execution paths.",
   },
   {
     href: "/operations",
@@ -142,8 +142,8 @@ export const ONBOARDING_RELATED_LINKS: Array<Required<ReportLinkCopy>> = [
     description: "Turn the regime readout into concrete posture and execution guidance.",
   },
   {
-    href: "/method",
-    label: "Method",
-    description: "Review trust status, confidence limits, and linked methodology details.",
+    href: "/method#beginner-glossary",
+    label: "Method & glossary",
+    description: "Review trust status, confidence limits, and the plain-English glossary in one place.",
   },
 ];

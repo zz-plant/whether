@@ -27,12 +27,15 @@ html {
   background-color: #0b1120;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  overflow-x: clip;
+  scrollbar-gutter: stable both-edges;
 }
 
 body {
   @apply bg-slate-950 text-slate-100 antialiased;
   font-family: "Inter", system-ui, -apple-system, sans-serif;
   min-height: 100dvh;
+  overflow-x: clip;
   background-image:
     radial-gradient(110% 58% at 50% -8%, rgba(186, 230, 253, 0.22), transparent 55%),
     linear-gradient(180deg, rgba(6, 23, 46, 0.98) 0%, rgba(8, 37, 71, 0.96) 38%, rgba(9, 49, 86, 0.92) 100%);
@@ -105,7 +108,10 @@ body {
 }
 
 .weather-page-shell {
-  @apply mx-auto flex w-full flex-col gap-6 px-4 py-8 sm:gap-7 sm:px-6 sm:py-10 lg:gap-8 lg:px-8 lg:py-12;
+  @apply mx-auto flex w-full flex-col;
+  gap: clamp(1.25rem, 1rem + 1vw, 2rem);
+  padding-inline: clamp(1rem, 0.7rem + 1.5vw, 2rem);
+  padding-block: clamp(2rem, 1.5rem + 2vw, 3rem);
 }
 
 .weather-page-shell-compact {
@@ -128,7 +134,7 @@ body {
 .weather-page-grid-3,
 .weather-page-grid-sidebar {
   display: grid;
-  gap: 1rem;
+  gap: clamp(0.85rem, 0.75rem + 0.6vw, 1.25rem);
   grid-template-columns: minmax(0, 1fr);
 }
 
@@ -183,14 +189,23 @@ body {
 
 .weather-bento-grid {
   display: grid;
-  gap: 1rem;
+  gap: clamp(0.85rem, 0.75rem + 0.6vw, 1.25rem);
   grid-template-columns: minmax(0, 1fr);
 }
 
 .weather-forecast-strip {
   display: grid;
-  gap: 0.75rem;
+  gap: clamp(0.75rem, 0.65rem + 0.4vw, 1rem);
   grid-template-columns: minmax(0, 1fr);
+}
+
+.weather-panel,
+.weather-appbar,
+.weather-panel-static,
+.weather-route-card,
+.weather-stat-card,
+.weather-tile {
+  min-width: 0;
 }
 
 .weather-forecast-card {
@@ -225,6 +240,12 @@ body {
 
   .weather-forecast-strip {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 900px) {
+  .weather-page-grid-sidebar {
+    grid-template-columns: minmax(0, 1.08fr) minmax(17rem, 0.92fr);
   }
 }
 

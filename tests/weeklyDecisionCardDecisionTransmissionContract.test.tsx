@@ -16,7 +16,7 @@ const reportDynamics: ReportDynamics = {
 };
 
 describe("WeeklyDecisionCard decision-transmission contract", () => {
-  it("dedupes canonical flip conditions before rendering snapshot callouts", () => {
+  it("renders a single canonical flip trigger in the snapshot callouts", () => {
     const html = renderToStaticMarkup(
       <WeeklyDecisionCard
         statusLabel="DEFENSIVE"
@@ -87,14 +87,15 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
       />,
     );
 
-    const duplicateCount = html.split("Tightness &lt; 65").length - 1;
+    const snapshotRegion = html.slice(html.indexOf("Weekly call snapshot"), html.indexOf("This week&#x27;s call"));
+    const duplicateCount = snapshotRegion.split("Flip when tightness falls below 65 and holds.").length - 1;
     assert.equal(duplicateCount, 1);
     assert.match(html, /Weather read:/);
     assert.match(html, /Cloudy/);
     assert.match(html, /stay selective and keep efficiency layers on/i);
   });
 
-  it("keeps top-fold sequence canonical: Regime, Call, Do now, Flip conditions", () => {
+  it("keeps top-fold sequence canonical: posture, call, do now, flip when", () => {
     // Contract: top-fold sequence must stay stable for one-screen decision transmission.
     const html = renderToStaticMarkup(
       <WeeklyDecisionCard
@@ -166,10 +167,10 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
       />,
     );
 
-    const regimeIndex = html.indexOf("Regime");
+    const regimeIndex = html.indexOf("Market posture");
     const callIndex = html.indexOf("Operating call");
     const doNowIndex = html.indexOf("Do now");
-    const flipIndex = html.indexOf("Flip conditions");
+    const flipIndex = html.indexOf("Flip when");
 
     assert.ok(regimeIndex >= 0);
     assert.ok(callIndex > regimeIndex);

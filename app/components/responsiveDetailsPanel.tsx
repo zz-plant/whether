@@ -18,6 +18,7 @@ export const ResponsiveDetailsPanel = ({
   summaryClassName,
 }: ResponsiveDetailsPanelProps) => {
   const detailsRef = useRef<HTMLDetailsElement>(null);
+  const hasUserInteractedRef = useRef(false);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -31,6 +32,9 @@ export const ResponsiveDetailsPanel = ({
 
     const desktopQuery = window.matchMedia(`(min-width: ${desktopMinWidth}px)`);
     const syncOpenState = (matches: boolean) => {
+      if (hasUserInteractedRef.current) {
+        return;
+      }
       detailsElement.open = matches;
     };
 
@@ -46,6 +50,23 @@ export const ResponsiveDetailsPanel = ({
       desktopQuery.removeEventListener("change", handleDesktopChange);
     };
   }, [desktopMinWidth]);
+
+  useEffect(() => {
+    const detailsElement = detailsRef.current;
+    if (!detailsElement) {
+      return;
+    }
+
+    const handleToggle = () => {
+      hasUserInteractedRef.current = true;
+    };
+
+    detailsElement.addEventListener("toggle", handleToggle);
+
+    return () => {
+      detailsElement.removeEventListener("toggle", handleToggle);
+    };
+  }, []);
 
   return (
     <details ref={detailsRef} className={className}>

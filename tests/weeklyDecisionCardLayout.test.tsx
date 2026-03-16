@@ -125,32 +125,25 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     );
 
     assert.match(html, /weekly-posture-brief-title/);
-    assert.match(html, /weekly-viral-hero/);
-    assert.match(html, /This week&#x27;s regime/);
-    assert.match(html, /Decision delta/);
-    assert.match(html, /Signal micro-read/);
-    assert.match(html, /Capital tightness/);
-    assert.match(html, /Regime panel/);
+    assert.match(html, /Weekly call snapshot/);
+    assert.match(html, /Market posture/);
+    assert.match(html, /Can I rely on this\?/);
     assert.match(html, /This week&#x27;s call/);
     assert.match(html, /DO NOW/);
-    assert.match(html, /AVOID/);
-    assert.match(html, /WATCH/);
+    assert.match(html, /GUARDRAIL/);
+    assert.match(html, /FLIP WHEN/);
     assert.match(html, /What environment\?/);
-    assert.match(html, /What should leadership do\?/);
     assert.match(html, /Refine by company stage/);
-    assert.doesNotMatch(html, /Stage variant selected:/);
     assert.doesNotMatch(html, /Company mode:/);
     assert.doesNotMatch(html, /Seed/);
-    assert.doesNotMatch(html, /Series A/);
     assert.doesNotMatch(html, /Series B/);
     assert.doesNotMatch(html, /Bootstrapped/);
-    assert.match(html, /Inspect evidence/);
     assert.match(html, /Regime history/);
     assert.match(html, /id="primary-artifact-actions"/);
 
     const heroIndex = html.indexOf("weekly-posture-brief-title");
-    const deltaIndex = html.indexOf("Decision delta");
-    const postureIndex = html.indexOf("Regime panel");
+    const deltaIndex = html.indexOf("Weekly call snapshot");
+    const postureIndex = html.indexOf("Market posture");
     const guidanceIndex = html.indexOf("This week&#x27;s call");
 
     assert.ok(deltaIndex > heroIndex);
@@ -242,12 +235,11 @@ describe("WeeklyDecisionCard top-fold composition", () => {
       />,
     );
 
-    assert.match(html, /Using a cached snapshot/);
+    assert.match(html, /Using a cached snapshot\./);
     assert.match(html, /Regime history/);
-    assert.match(html, /Model pressure is flat this week; hold posture and keep existing guardrails in force\./);
-    assert.match(html, /weekly-viral-hero/);
-    assert.match(html, /Signal micro-read/);
-    assert.match(html, /Fallback/);
+    assert.match(html, /Weekly call snapshot/);
+    assert.match(html, /Can I rely on this\?/);
+    assert.match(html, /Using a cached snapshot\./);
   });
 
   it("keeps a single canonical weekly call region and compact shell spacing", () => {
@@ -419,12 +411,11 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     const callCore = html.slice(html.indexOf('id="weekly-call-core"'), html.indexOf('id="decision-snapshot-for-leadership-this-week"'));
 
     assert.match(callCore, /DO NOW/);
-    assert.match(callCore, /AVOID/);
-    assert.match(callCore, /WATCH/);
+    assert.match(callCore, /GUARDRAIL/);
+    assert.match(callCore, /FLIP WHEN/);
     assert.match(callCore, /Refine by company stage/);
-    assert.doesNotMatch(callCore, /Stage variant selected:/);
+    assert.match(callCore, /Stage selected:/);
     assert.ok((callCore.match(/<li/g) ?? []).length <= 12);
-    assert.match(callCore, /Increase product tempo for reversible bets/);
     assert.match(callCore, /net-new hiring if tightness &gt; 74/);
     assert.match(callCore, /If risk appetite rises above 55, reopen selective hiring/);
   });

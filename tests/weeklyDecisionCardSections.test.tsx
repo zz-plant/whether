@@ -76,20 +76,14 @@ describe("WeeklyDecisionCard extracted sections", () => {
 
     assert.match(html, /weekly-posture-brief-title/);
     assert.match(html, /Do now:/);
-    assert.match(html, /Regime/);
-    assert.match(html, /Next flip:/);
-    assert.match(html, /Data through Mar 6, 2026/);
+    assert.match(html, /Market posture/);
+    assert.match(html, /What would change this call/);
+    assert.doesNotMatch(html, /Data through Mar 6, 2026/);
     assert.match(html, /Top driver change/);
-    assert.match(html, /Leadership call/);
     assert.match(html, /Confidence/);
-    assert.match(html, /Primary risk/);
-
-
     const heroIndex = html.indexOf("weekly-posture-brief-title");
-    const playbookIndex = html.indexOf("Leadership call");
     const memoIndex = html.indexOf("What changed this week");
     assert.ok(memoIndex > heroIndex);
-    assert.ok(playbookIndex > memoIndex);
   });
 
 
@@ -157,9 +151,9 @@ describe("WeeklyDecisionCard extracted sections", () => {
       />,
     );
 
-    assert.match(html, /Regime/);
-    assert.match(html, /Next flip: Tightness rises above 70\.0\./);
-    assert.match(html, /Data through Mar 6, 2026/);
+    assert.match(html, /Market posture/);
+    assert.match(html, /What would change this call/);
+    assert.match(html, /Tightness above 70\.0/);
   });
 
   it("renders compact flip-condition distance", () => {
@@ -226,7 +220,8 @@ describe("WeeklyDecisionCard extracted sections", () => {
       />,
     );
 
-    assert.match(html, /Next flip: Risk appetite falls to or below 50\.0\./);
+    assert.match(html, /What would change this call/);
+    assert.match(html, /Risk appetite at or below 50\.0/);
     assert.match(html, /Constraints eased\./);
   });
 

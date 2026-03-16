@@ -6,6 +6,7 @@ import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { BreadcrumbTrail } from "../components/breadcrumbTrail";
 import { NextStepRail } from "../components/nextStepRail";
 import { StaticHubNav } from "../components/staticHubNav";
+import { BeginnerGlossaryPanel } from "../components/appendixSections";
 import { loadReportDataSafe } from "../../lib/report/reportData";
 import { buildHomeBriefModel } from "../../lib/report/homeBriefModel";
 import { buildCompactTrustSummary } from "../../lib/report/trustStatus";
@@ -127,6 +128,8 @@ export default async function MethodPage() {
           ))}
         </ul>
       </section>
+
+      <BeginnerGlossaryPanel />
 
       <NextStepRail currentPath="/method" />
     </main>

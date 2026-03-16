@@ -252,6 +252,14 @@ export type WeeklyDecisionCardViewModel = {
       summary: string;
     };
   };
+  presentation?: {
+    whyItMattersLine?: string;
+    readThisCardItems?: Array<{
+      label: string;
+      detail: string;
+    }>;
+    glossaryHref?: string;
+  };
   diagnostics: {
     regimeSignalIndicators: RegimeSignalIndicator[];
     startupClimateIndex: StartupClimateIndex;
@@ -867,6 +875,47 @@ const buildStartRouteDeltaBlock = ({
   };
 };
 
+const buildWhyItMattersLine = ({
+  weeklyMovement,
+}: {
+  weeklyMovement: {
+    direction: "defensive" | "expansionary" | "neutral";
+  };
+}) => {
+  if (weeklyMovement.direction === "defensive") {
+    return "External conditions are tightening, so fixed-cost mistakes get harder to reverse and long-payback bets need stronger proof.";
+  }
+
+  if (weeklyMovement.direction === "expansionary") {
+    return "External conditions are easing, so teams can release selective bets faster without dropping payback discipline.";
+  }
+
+  return "External conditions shape how aggressively teams hire, spend, and approve long-payback work even when the weekly call is unchanged.";
+};
+
+const buildReadThisCardItems = ({
+  decisionShiftSummary,
+  immediateDecision,
+  reversalTrigger,
+}: {
+  decisionShiftSummary: string;
+  immediateDecision: string;
+  reversalTrigger: string;
+}) => ([
+  {
+    label: "What changed",
+    detail: decisionShiftSummary.replace(/^Changed:\s*/i, "").trim(),
+  },
+  {
+    label: "What action it changes",
+    detail: immediateDecision.trim(),
+  },
+  {
+    label: "What would reverse the call",
+    detail: reversalTrigger.trim(),
+  },
+]).filter((item) => item.detail.length > 0);
+
 export const buildHomeBriefModel = (
   data: HomeReportData,
   options?: { overlaySector?: SectorKey; startupVariantMode?: StartupVariantMode },
@@ -1202,6 +1251,14 @@ export const buildWeeklyDecisionCardViewModel = ({
     ?? (homeBriefModel.revisitDecisions
       ? "Revise hiring and roadmap calls now."
       : "Hold last week's operating rules.");
+  const whyItMattersLine = buildWhyItMattersLine({
+    weeklyMovement: homeBriefModel.weeklyMovement,
+  });
+  const readThisCardItems = buildReadThisCardItems({
+    decisionShiftSummary: homeBriefModel.decisionShiftSummary,
+    immediateDecision,
+    reversalTrigger: homeBriefModel.reversalTrigger,
+  });
 
   return {
     status: {
@@ -1245,6 +1302,11 @@ export const buildWeeklyDecisionCardViewModel = ({
       executiveOperationalStance: homeBriefModel.executiveOperationalStance,
       revisitDecisions: homeBriefModel.revisitDecisions,
       weeklyMovement: homeBriefModel.weeklyMovement,
+    },
+    presentation: {
+      whyItMattersLine,
+      readThisCardItems,
+      glossaryHref: "/method#beginner-glossary",
     },
     diagnostics: {
       regimeSignalIndicators: homeBriefModel.regimeSignalIndicators,

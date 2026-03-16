@@ -101,11 +101,11 @@ export const HomePageReportContent = async ({
       pageSummary="Whether translates macro conditions into operating decisions for companies. Action, guardrail, and flip condition for this planning cycle; scores stay contextual."
       primaryCta={{
         href: "#approve-this-weeks-plan",
-        label: "Approve this week’s plan",
+        label: "Open execution guardrails",
       }}
       secondaryCta={{
         href: "#audit-this-call",
-        label: "Audit this call",
+        label: "See why this call changed",
       }}
       nextStep={{
         href: "/signals",
