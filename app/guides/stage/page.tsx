@@ -9,14 +9,7 @@ export const metadata: Metadata = buildPageMetadata({
     "See how Whether helps Seed through Series C leadership teams set posture, reduce planning entropy, and improve board-grade communication.",
   path: "/guides/stage",
   imageAlt: "Whether company stage guidance",
-  imageParams: {
-    template: "guides",
-    eyebrow: "Company stage guides",
-    title: "Apply Whether by growth stage",
-    subtitle:
-      "See where macro posture creates leverage from seed through scale-up operating rhythms.",
-    kicker: "Stage-specific decision translation.",
-  },
+  imagePath: "/social/guides.svg",
 });
 
 export default function StageLandingPage() {

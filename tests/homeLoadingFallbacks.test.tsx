@@ -6,13 +6,23 @@ import { WeeklyDiagnosticsFallback } from "../app/components/home/weeklyDiagnost
 import { ArtifactActionsFallback } from "../app/components/home/artifactActionsFallback";
 
 describe("homepage loading fallbacks", () => {
-  it("keeps the primary loading state decision-first", () => {
+  it("keeps the primary loading state decision-first and share-card aligned", () => {
     const html = renderToStaticMarkup(<HomePageStreamingFallback />);
 
     assert.match(html, /Weekly operating call/);
-    assert.match(html, /The top-fold planning call lands first/);
-    assert.match(html, /Top fold first/);
+    assert.match(html, /Opening this week’s brief/);
+    assert.match(html, /Shared-card continuity/);
+    assert.match(html, /What changed/);
+    assert.match(html, /Do now/);
+    assert.match(html, /Flip when/);
     assert.match(html, /Decision support follows automatically/);
+  });
+
+  it("surfaces historical replay context when month and year are present", () => {
+    const html = renderToStaticMarkup(<HomePageStreamingFallback searchParams={{ month: "3", year: "2026" }} />);
+
+    assert.match(html, /Historical replay requested · 2026-03/);
+    assert.match(html, /Opening the selected weekly brief/);
   });
 
   it("frames diagnostics as deferred follow-on work", () => {

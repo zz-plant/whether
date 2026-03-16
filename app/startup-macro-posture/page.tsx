@@ -14,13 +14,7 @@ export const metadata: Metadata = buildPageMetadata({
     "Category anchor for startup macro posture: deterministic operating posture from risk appetite, tightness, and yield curve signals.",
   path: "/startup-macro-posture",
   imageAlt: "Startup macro posture category hub",
-  imageParams: {
-    template: "guides",
-    eyebrow: "Category anchor",
-    title: "Startup Macro Posture",
-    subtitle: "Define posture, not vibes",
-    kicker: startupMacroPostureIndexName,
-  },
+  imagePath: "/social/startup-macro-posture.svg",
 });
 
 export default async function StartupMacroPosturePage() {

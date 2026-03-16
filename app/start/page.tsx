@@ -12,6 +12,7 @@ export const metadata: Metadata = buildPageMetadata({
     "Start with what changed since your last review, then execute this week’s bounded decision call.",
   path: "/start",
   imageAlt: "Whether Start Here decision routing",
+  imagePath: "/social/start-here.svg",
 });
 
 export default async function StartHerePage() {

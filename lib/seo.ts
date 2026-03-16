@@ -50,16 +50,18 @@ export const buildPageMetadata = ({
   description,
   path,
   imageAlt,
+  imagePath,
   imageParams,
 }: {
   title: string;
   description: string;
   path: string;
   imageAlt: string;
+  imagePath?: string;
   imageParams?: Record<string, string>;
 }): Metadata => {
   const canonicalUrl = buildCanonicalUrl(path);
-  const imageUrl = buildOgImageUrl(imageParams);
+  const imageUrl = imagePath ? buildSocialImageUrl(imagePath) : buildOgImageUrl(imageParams);
 
   return {
     title,

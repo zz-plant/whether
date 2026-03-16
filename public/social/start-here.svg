@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" fill="none">
+  <defs>
+    <linearGradient id="bg-start" x1="64" y1="42" x2="1148" y2="610" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#08111F"/>
+      <stop offset="0.58" stop-color="#0C1728"/>
+      <stop offset="1" stop-color="#111F33"/>
+    </linearGradient>
+    <radialGradient id="glow-start" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(960 86) rotate(126.4) scale(430 282)">
+      <stop stop-color="#38BDF8" stop-opacity="0.34"/>
+      <stop offset="1" stop-color="#38BDF8" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" rx="32" fill="url(#bg-start)"/>
+  <circle cx="960" cy="86" r="344" fill="url(#glow-start)"/>
+  <g opacity="0.22" stroke="#3A506C">
+    <path d="M72 84H1128"/>
+    <path d="M72 160H1128"/>
+    <path d="M72 236H1128"/>
+    <path d="M72 312H1128"/>
+    <path d="M72 388H1128"/>
+    <path d="M72 464H1128"/>
+    <path d="M72 540H1128"/>
+  </g>
+  <text x="88" y="108" fill="#7DD3FC" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="18" font-weight="700" letter-spacing="4">START HERE</text>
+  <text x="88" y="184" fill="#F8FAFC" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="58" font-weight="700">Weekly call, simplified</text>
+  <text x="88" y="238" fill="#CBD5E1" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="27">See the delta, lock the call, and route straight to execution.</text>
+  <g transform="translate(706 122)">
+    <rect x="0" y="0" width="390" height="390" rx="32" fill="#0B1525" stroke="#27415F"/>
+    <rect x="32" y="40" width="154" height="94" rx="20" fill="#0E2238" stroke="#3BA5D8"/>
+    <text x="52" y="72" fill="#7DD3FC" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="13" font-weight="700" letter-spacing="1.8">1. WHAT CHANGED</text>
+    <text x="52" y="103" fill="#E2E8F0" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="18" font-weight="600">Delta from</text>
+    <text x="52" y="126" fill="#E2E8F0" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="18" font-weight="600">last review</text>
+    <rect x="206" y="148" width="154" height="94" rx="20" fill="#10253A" stroke="#67E8F9"/>
+    <text x="226" y="180" fill="#A5F3FC" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="13" font-weight="700" letter-spacing="1.8">2. DO NOW</text>
+    <text x="226" y="211" fill="#E2E8F0" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="18" font-weight="600">Bounded action</text>
+    <text x="226" y="234" fill="#E2E8F0" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="18" font-weight="600">with flip trigger</text>
+    <rect x="32" y="258" width="154" height="94" rx="20" fill="#102135" stroke="#38BDF8"/>
+    <text x="52" y="290" fill="#7DD3FC" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="13" font-weight="700" letter-spacing="1.8">3. WHERE TO GO</text>
+    <text x="52" y="321" fill="#E2E8F0" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="18" font-weight="600">Signals, Ops,</text>
+    <text x="52" y="344" fill="#E2E8F0" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="18" font-weight="600">Decide, Toolkits</text>
+    <path d="M186 88C246 88 246 166 206 196" stroke="#38BDF8" stroke-width="10" stroke-linecap="round"/>
+    <path d="M206 196L230 184" stroke="#38BDF8" stroke-width="10" stroke-linecap="round"/>
+    <path d="M206 196L220 220" stroke="#38BDF8" stroke-width="10" stroke-linecap="round"/>
+    <path d="M206 306C248 306 286 286 314 246" stroke="#67E8F9" stroke-width="10" stroke-linecap="round"/>
+    <path d="M314 246L286 246" stroke="#67E8F9" stroke-width="10" stroke-linecap="round"/>
+    <path d="M314 246L300 270" stroke="#67E8F9" stroke-width="10" stroke-linecap="round"/>
+    <rect x="222" y="288" width="128" height="42" rx="21" fill="#082030" stroke="#2C5978"/>
+    <text x="246" y="315" fill="#E0F2FE" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="15" font-weight="700">Faster routing</text>
+  </g>
+  <text x="88" y="544" fill="#94A3B8" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="21">Decision transmission in under 60 seconds.</text>
+  <text x="1088" y="544" text-anchor="end" fill="#E2E8F0" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="21" font-weight="700">Whether</text>
+</svg>

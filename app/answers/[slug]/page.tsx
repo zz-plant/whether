@@ -31,6 +31,7 @@ export const buildDecisionAnswerMetadata = ({
     description: `${payload.currentCall} Action: ${payload.immediateAction}`,
     path: `/answers/${slug}`,
     imageAlt: title,
+    imagePath: "/social/answers.svg",
   });
 
   if (payload.noindex) {
@@ -52,6 +53,7 @@ export async function generateMetadata({ params }: DecisionPageProps): Promise<M
       description: "Macro-backed operator decision answer pages.",
       path: "/answers",
       imageAlt: "Whether operator answer",
+      imagePath: "/social/answers.svg",
     });
   }
 

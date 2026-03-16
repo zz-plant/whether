@@ -11,6 +11,7 @@ export const metadata: Metadata = buildPageMetadata({
   description: "Use Start Here for posture selection in the weekly flow; this page is a reference index for posture guide detail pages.",
   path: "/posture",
   imageAlt: "Whether posture",
+  imagePath: "/social/posture.svg",
 });
 
 export default async function PosturePage() {

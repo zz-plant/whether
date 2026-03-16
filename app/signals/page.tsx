@@ -33,14 +33,7 @@ export const metadata: Metadata = buildPageMetadata({
     "Evidence appendix: macro signals, thresholds, and historical context supporting the weekly posture brief.",
   path: "/signals",
   imageAlt: "Whether Report signals overview",
-  imageParams: {
-    template: "signals",
-    eyebrow: "Signals",
-    title: "Macro signals and threshold context",
-    subtitle:
-      "Inspect drivers, confidence, and historical context before changing operating posture.",
-    kicker: "Built for evidence-first planning.",
-  },
+  imagePath: "/social/signals.svg",
 });
 
 export function buildDiagnosticsExpansionHref(

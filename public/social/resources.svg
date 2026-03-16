@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" fill="none">
+  <defs>
+    <linearGradient id="bg-resources" x1="74" y1="38" x2="1138" y2="612" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#141016"/>
+      <stop offset="0.56" stop-color="#1A1320"/>
+      <stop offset="1" stop-color="#21161F"/>
+    </linearGradient>
+    <radialGradient id="glow-resources" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(950 94) rotate(127.4) scale(446 298)">
+      <stop stop-color="#FB7185" stop-opacity="0.26"/>
+      <stop offset="1" stop-color="#FB7185" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" rx="32" fill="url(#bg-resources)"/>
+  <circle cx="950" cy="94" r="354" fill="url(#glow-resources)"/>
+  <text x="88" y="108" fill="#FDA4AF" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="18" font-weight="700" letter-spacing="4">RESOURCES</text>
+  <text x="88" y="184" fill="#F8FAFC" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="58" font-weight="700">Board-ready resource pack</text>
+  <text x="88" y="238" fill="#CBD5E1" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="27">Templates, authority briefs, and shareable artifacts for leadership reviews.</text>
+  <g transform="translate(686 112)">
+    <rect x="0" y="0" width="420" height="404" rx="30" fill="#18131A" stroke="#74404A"/>
+    <rect x="44" y="70" width="248" height="120" rx="22" fill="#241720" stroke="#E11D48"/>
+    <rect x="86" y="48" width="248" height="120" rx="22" fill="#2A1B23" stroke="#FB7185"/>
+    <rect x="126" y="26" width="248" height="120" rx="22" fill="#311E26" stroke="#FDB4C0"/>
+    <text x="152" y="68" fill="#FFE4E6" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" font-weight="700" letter-spacing="1.6">CAPITAL DISCIPLINE</text>
+    <text x="152" y="98" fill="#F8FAFC" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="18" font-weight="700">Templates + briefs</text>
+    <text x="152" y="124" fill="#CBD5E1" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="16">Citeable artifacts for boards,</text>
+    <text x="152" y="146" fill="#CBD5E1" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="16">ICs, and cross-functional reviews.</text>
+    <rect x="44" y="244" width="328" height="116" rx="24" fill="#21151B" stroke="#8A4F5E"/>
+    <text x="66" y="280" fill="#FECDD3" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" font-weight="700" letter-spacing="1.6">THIS WEEK BEFORE LONG-FORM</text>
+    <text x="66" y="312" fill="#F8FAFC" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="18" font-weight="700">Decision extract</text>
+    <text x="66" y="338" fill="#CBD5E1" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="16">Action, pause trigger, and resume</text>
+    <text x="66" y="360" fill="#CBD5E1" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="16">line before deeper reading.</text>
+  </g>
+  <text x="88" y="544" fill="#94A3B8" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="21">Artifact quality matters. If it cannot be shared, it is not done.</text>
+  <text x="1088" y="544" text-anchor="end" fill="#E2E8F0" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="21" font-weight="700">Whether</text>
+</svg>

@@ -60,9 +60,11 @@ export default async function HomePage({
 }: {
   searchParams?: Promise<HomePageSearchParams>;
 }) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+
   return (
-    <Suspense fallback={<HomePageStreamingFallback />}>
-      <HomePageReportContent searchParams={searchParams} />
+    <Suspense fallback={<HomePageStreamingFallback searchParams={resolvedSearchParams} />}>
+      <HomePageReportContent searchParams={resolvedSearchParams} />
     </Suspense>
   );
 }

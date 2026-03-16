@@ -32,6 +32,13 @@ labels, embedded threshold context, and restrained accent usage for outlier cond
 
 Copy strategy for briefing and onboarding surfaces favors concise, action-first language: one headline plus one support sentence before primary actions, with deeper rationale moved into expandable or secondary sections.
 
+Weekly Brief URLs now emit week-specific Open Graph and Twitter preview cards. Shared links for the
+current brief or a historical Time Machine selection preview the selected week’s posture, immediate
+decision, flip condition, and core rate context instead of falling back to a generic site card.
+
+Cold opens into `/` now use a share-card-aligned loading state before the full report resolves, so
+social clicks land on the same action-first artifact structure rather than a generic skeleton.
+
 ### 1.2 Signals report (/signals)
 The signals report is the deep evidence appendix for the weekly workspace, with sections for:
 - Sensor array (live yield curve readings + derived scores)
@@ -76,6 +83,20 @@ confidence, freshness, source coverage, and revisit conditions, then links out t
 `/methodology` remains the lower-level formula reference documenting the sensor methodology and the
 public data sources used in the report (FRED Treasury series, BLS CPI, BLS labor, FRED credit
 spreads, FRED VIX, and Chicago Fed NFCI).
+
+### 1.7 Share-preview assets for canonical hubs
+High-priority hub routes now ship dedicated static SVG social preview assets for:
+- `/start`
+- `/posture`
+- `/signals`
+- `/operations`
+- `/decide`
+- `/resources`
+- `/startup-macro-posture` and `/startup-macro-posture/index`
+- `/guides` and `/guides/stage`
+- `/answers` and `/answers/[slug]`
+
+The homepage remains on live `/api/og` generation so the weekly brief preview can stay tied to current data.
 
 ## 2) Data sourcing & provenance
 

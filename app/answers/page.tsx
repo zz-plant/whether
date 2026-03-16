@@ -11,6 +11,7 @@ export const metadata: Metadata = buildPageMetadata({
   description: "Direct-answer pages mapped to canonical bounded rules and weekly posture thresholds.",
   path: "/answers",
   imageAlt: "Whether operator answer cluster",
+  imagePath: "/social/answers.svg",
 });
 
 export default function AnswersHubPage() {

@@ -37,14 +37,7 @@ export const metadata: Metadata = buildPageMetadata({
     "Playbook moves, finance posture, and operator requests tuned to the current regime.",
   path: "/operations",
   imageAlt: "Whether operations plan view",
-  imageParams: {
-    template: "operations",
-    eyebrow: "Operations · Plan",
-    title: "Set priorities and resource posture",
-    subtitle:
-      "Translate regime context into playbook moves, finance posture, and operator requests.",
-    kicker: "Plan workstream · Whether",
-  },
+  imagePath: "/social/operations.svg",
 });
 
 export function buildActionsExpansionHref(

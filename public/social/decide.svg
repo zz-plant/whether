@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" fill="none">
+  <defs>
+    <linearGradient id="bg-decide" x1="70" y1="38" x2="1128" y2="608" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#131019"/>
+      <stop offset="0.58" stop-color="#18121D"/>
+      <stop offset="1" stop-color="#1E1720"/>
+    </linearGradient>
+    <radialGradient id="glow-decide" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(952 96) rotate(126.9) scale(446 296)">
+      <stop stop-color="#F59E0B" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#F59E0B" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" rx="32" fill="url(#bg-decide)"/>
+  <circle cx="952" cy="96" r="350" fill="url(#glow-decide)"/>
+  <text x="88" y="108" fill="#FDBA74" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="18" font-weight="700" letter-spacing="4">DECIDE</text>
+  <text x="88" y="184" fill="#F8FAFC" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="58" font-weight="700">Choose the right path</text>
+  <text x="88" y="238" fill="#CBD5E1" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="27">Role route, situation route, then the toolkit that matches this week&apos;s question.</text>
+  <g transform="translate(696 116)">
+    <rect x="0" y="0" width="410" height="398" rx="30" fill="#17131A" stroke="#6D4E18"/>
+    <circle cx="205" cy="72" r="32" fill="#2C1D07" stroke="#F59E0B" stroke-width="3"/>
+    <text x="171" y="79" fill="#FDE68A" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="16" font-weight="700">Route</text>
+    <path d="M205 104V152" stroke="#F59E0B" stroke-width="8" stroke-linecap="round"/>
+    <path d="M205 152H116" stroke="#F59E0B" stroke-width="8" stroke-linecap="round"/>
+    <path d="M205 152H294" stroke="#F59E0B" stroke-width="8" stroke-linecap="round"/>
+    <rect x="42" y="170" width="146" height="84" rx="22" fill="#261B10" stroke="#B45309"/>
+    <rect x="222" y="170" width="146" height="84" rx="22" fill="#1E1A11" stroke="#C08414"/>
+    <text x="64" y="202" fill="#FED7AA" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" font-weight="700" letter-spacing="1.6">ROLE</text>
+    <text x="64" y="230" fill="#F8FAFC" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="18">Full decision map</text>
+    <text x="244" y="202" fill="#FDE68A" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="14" font-weight="700" letter-spacing="1.6">SITUATION</text>
+    <text x="244" y="230" fill="#F8FAFC" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="18">Fastest answer</text>
+    <path d="M116 254V300" stroke="#F59E0B" stroke-width="8" stroke-linecap="round"/>
+    <path d="M294 254V300" stroke="#F59E0B" stroke-width="8" stroke-linecap="round"/>
+    <rect x="108" y="314" width="194" height="52" rx="26" fill="#23180E" stroke="#F59E0B"/>
+    <text x="145" y="347" fill="#F8FAFC" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="17" font-weight="700">Toolkit or checklist</text>
+  </g>
+  <text x="88" y="544" fill="#94A3B8" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="21">Decision flow first. Explanations stay secondary.</text>
+  <text x="1088" y="544" text-anchor="end" fill="#E2E8F0" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="21" font-weight="700">Whether</text>
+</svg>

@@ -16,6 +16,7 @@ export const metadata: Metadata = buildPageMetadata({
   description: "Choose guidance by role or situation, then run supporting decision tools.",
   path: "/decide",
   imageAlt: "Whether decision paths",
+  imagePath: "/social/decide.svg",
 });
 
 export default function DecidePage() {

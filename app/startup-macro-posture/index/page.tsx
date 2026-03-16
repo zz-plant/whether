@@ -11,6 +11,7 @@ export const metadata: Metadata = buildPageMetadata({
     "Named index page for startup macro posture with deterministic inputs, thresholds, and operating interpretation.",
   path: "/startup-macro-posture/index",
   imageAlt: startupMacroPostureIndexName,
+  imagePath: "/social/startup-macro-posture.svg",
 });
 
 export default async function StartupMacroPostureIndexPage() {

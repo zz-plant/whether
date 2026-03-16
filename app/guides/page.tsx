@@ -10,13 +10,7 @@ export const metadata: Metadata = buildPageMetadata({
     "Operator-first overview of Whether stakeholder and company-stage guides: choose the right guide, get role-level outcomes, and return to the weekly brief.",
   path: "/guides",
   imageAlt: "Whether guides overview",
-  imageParams: {
-    template: "guides",
-    eyebrow: "Guides overview",
-    title: "Choose your operating guide",
-    subtitle: "Go straight to role and stage playbooks with clear operator outcomes.",
-    kicker: "Weekly decision support.",
-  },
+  imagePath: "/social/guides.svg",
 });
 
 const featuredStakeholderSlugs = [

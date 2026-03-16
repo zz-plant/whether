@@ -17,9 +17,7 @@ export const metadata: Metadata = buildPageMetadata({
     "Board-facing long-form resources on capital discipline, posture frameworks, pain-driven operating decisions, and practical templates.",
   path: "/resources",
   imageAlt: "Whether resources hub",
-  imageParams: {
-    template: "guides",
-  },
+  imagePath: "/social/resources.svg",
 });
 
 const authorityPages: Array<{
