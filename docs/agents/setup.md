@@ -68,6 +68,7 @@ Available starter skills:
 
 Repository path convention:
 - `.codex/skills/<skill-name>/SKILL.md`
+- skill index: `.codex/skills/README.md`
 
 Usage (tool/runtime dependent):
 - invoke by skill name (for example `research-brief`) when the task matches the skill description

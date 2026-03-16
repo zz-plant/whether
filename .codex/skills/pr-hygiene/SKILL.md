@@ -1,64 +1,83 @@
 ---
 name: pr-hygiene
-description: Enforce Whether validation and PR quality expectations with a repeatable pre-commit/pre-PR checklist and explicit verification logging.
+description: Enforce Whether validation and PR quality expectations with a repeatable pre-commit or pre-PR checklist, explicit verification logging, and doc-drift checks.
 allowed-tools:
   - Read
   - Grep
   - Bash
 ---
 
-# PR hygiene skill (Whether)
+# PR hygiene
+
+Prepare a change for review by matching validation depth to scope and making the review surface explicit.
 
 ## Use this skill when
 
-- Preparing a branch for commit/PR.
-- Reviewing if checks/docs/tests match the scope of a change.
-- Standardizing a PR summary for reviewer efficiency.
+- preparing a branch for commit or PR
+- checking whether tests, docs, and validation match the scope of a change
+- drafting a reviewer-ready summary with risk and follow-up notes
 
 ## Do not use this skill when
 
-- The task is pure research and no code/docs changes are being proposed.
+- the task is pure research with no intended repo change
+- work is still in early exploration and validation would be misleading
+
+## Required inputs
+
+- changed-file scope
+- expected user-facing or contract-facing impact
+- known environment limits that may block checks
+
+## Repo anchors
+
+- `AGENTS.md`
+- `docs/agents/quality-and-pr.md`
+- `docs/agents/documentation.md`
+- `docs/development-playbook.md`
 
 ## Workflow
 
-1. Confirm changed-file scope is intentional.
-2. Run the smallest meaningful verification set.
-3. Confirm docs/tests changed when behavior/contracts changed.
-4. Draft a reviewer-ready PR summary with risks/follow-ups.
+1. Confirm the changed-file scope is intentional.
+2. Choose the smallest meaningful verification set based on risk.
+3. Check whether docs and tests changed where contracts or behavior changed.
+4. Record command outcomes exactly as run.
+5. Draft a concise PR summary with risks and follow-ups.
 
 ## Verification baseline
 
 Start with:
+
 - `bun run lint`
 - `bun run test`
 
-Escalate to `bun run check` for broad or cross-cutting changes.
+Escalate to `bun run check` for broad, high-risk, or cross-cutting changes.
 
-## Output contract (required order)
+## Output contract
+
+Return in this order:
 
 1. **Skill used + why**
 2. **Change scope**
-3. **Validation run log** (command + pass/fail/warn)
-4. **PR summary draft**
-   - What changed
-   - Why it changed
-   - Validation run
-   - Risks / follow-ups
-5. **Release impact line** (`none`, `low`, `medium`, `high`)
-6. **Fallback note** (only if environment limitations block checks)
+3. **Validation run log**
+4. **Docs and test coverage check**
+5. **PR summary draft**
+6. **Release impact line**
+7. **Fallback note** only if environment limits blocked expected checks
 
 ## Quality checks before finalizing
 
-- No check is reported unless actually executed.
-- Command names match repo conventions.
+- No command is reported unless it was actually executed.
 - Validation depth matches change risk.
-- Risks/follow-ups are explicit, not generic.
+- Missing docs or tests are called out explicitly.
+- Risks and follow-ups are concrete.
 
 ## Guardrails
 
-- Flag environment limitations clearly.
-- Keep summary concise and reviewer-actionable.
+- Keep the review surface concise and factual.
+- Do not overstate confidence when checks were partial.
+- Prefer targeted verification over cargo-cult full-suite runs.
 
-## Maintenance
+## Maintenance notes
 
-- Last reviewed: 2026-03-06
+- Last reviewed: 2026-03-16
+- Refresh when repo scripts, PR expectations, or docs-update rules change.

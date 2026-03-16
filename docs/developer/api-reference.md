@@ -131,6 +131,10 @@ When storing or forwarding payloads, retain:
 
 Dropping these fields weakens traceability and makes cross-run comparisons brittle.
 
+Weekly cadence note:
+- for `/api/weekly` and `/api/agent?cadence=weekly`, `recordDateLabel` is the week-ending label used for the briefing artifact
+- the underlying source record date remains available in provenance and input-level fields
+
 ## Data durability note
 
 - Decision transition events (`/api/decision-events`) support durable persistence on Cloudflare when the `DECISION_EVENTS_KV` binding is configured; otherwise they fall back to process-memory semantics.

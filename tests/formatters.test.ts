@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { formatNumberWithUnit } from "../lib/formatters";
+import {
+  formatNumberWithUnit,
+  formatWeekEndingUTC,
+  resolveWeekEndingIsoDateUTC,
+} from "../lib/formatters";
 import {
   formatQuarterLabel,
   formatSourceLine,
@@ -18,6 +22,18 @@ describe("formatNumberWithUnit", () => {
 
   it("keeps percent values unchanged", () => {
     assert.equal(formatNumberWithUnit(3.75, "%"), "3.75%");
+  });
+});
+
+describe("weekly week-ending formatting", () => {
+  it("rolls midweek dates forward to the containing Friday", () => {
+    assert.equal(resolveWeekEndingIsoDateUTC("2026-03-12"), "2026-03-13");
+    assert.equal(formatWeekEndingUTC("2026-03-12"), "Mar 13, 2026");
+  });
+
+  it("keeps Friday dates unchanged", () => {
+    assert.equal(resolveWeekEndingIsoDateUTC("2026-03-13"), "2026-03-13");
+    assert.equal(formatWeekEndingUTC("2026-03-13"), "Mar 13, 2026");
   });
 });
 

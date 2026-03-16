@@ -133,17 +133,19 @@ export const MonthlyActionSummaryPanel = ({
   assessment,
   provenance,
   recordDateLabel,
+  weeklyRecordDateLabel,
 }: {
   assessment: RegimeAssessment;
   provenance: DataProvenance;
   recordDateLabel: string;
+  weeklyRecordDateLabel: string;
 }) => {
   const regimeLabel = getRegimeLabel(assessment.regime);
   const actionGuidance = getMonthlyActionGuidance(assessment.regime);
   const weeklySummary = buildWeeklySummary({
     assessment,
     provenance,
-    recordDateLabel,
+    recordDateLabel: weeklyRecordDateLabel,
   });
   const monthlySummary = buildMonthlySummary({
     assessment,

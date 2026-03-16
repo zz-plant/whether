@@ -1,6 +1,6 @@
 ---
 name: agent-skill-architect
-description: Create or upgrade Whether repo-local skills when users ask to add/update SKILL.md files, codify best practices, tighten triggers, or improve output contracts and guardrails.
+description: Create or upgrade Whether repo-local skills when users ask to add or update SKILL.md files, tighten triggers, reduce overlap, or improve output contracts and maintenance guidance.
 allowed-tools:
   - Read
   - Grep
@@ -8,57 +8,84 @@ allowed-tools:
   - Bash
 ---
 
-# Agent skill architect (Whether)
+# Agent skill architect
+
+Improve first-party Whether skills so they are easier to trigger correctly, easier to review, and less likely to drift from repo policy.
 
 ## Use this skill when
 
-- A task asks to create a new skill in `.codex/skills/*`.
-- A skill is too generic, overlapping, or hard to trigger correctly.
-- A reviewer asks for stronger output contracts, safety limits, or maintenance guidance.
+- a task asks to create a new skill in `.codex/skills/*`
+- a current skill is too broad, too vague, or overlapping another skill
+- a reviewer asks for stronger output contracts, guardrails, or maintenance guidance
+- the repo needs a better skills index or skill discovery aid
 
-## Inputs expected
+## Do not use this skill when
 
-- Task goal and target audience.
-- Existing skills that may overlap.
-- Repo conventions from `AGENTS.md` and `docs/agents/*`.
+- building a product feature
+- rewriting broad contributor docs without changing skills
+- creating a catch-all meta skill instead of tightening current coverage
+
+## Required inputs
+
+- the job to be done in one sentence
+- the target user or operator of the skill
+- overlapping repo-local skills, if any
+- repo constraints from `AGENTS.md` and `docs/agents/*`
+
+## Repo anchors
+
+- `AGENTS.md`
+- `docs/agents/README.md`
+- `docs/agents/documentation.md`
+- `docs/agents/mcp-and-skills-playbook.md`
+- `.codex/skills/README.md`
 
 ## Workflow
 
-1. Define one job-to-be-done in one sentence.
-2. Check overlap with existing skills; extend instead of duplicating when possible.
-3. Write frontmatter that is trigger-specific (`name`, `description`, and repo-used `allowed-tools`).
-4. Draft sections in fixed order (below) with explicit required outputs.
-5. Add guardrails and non-goals to prevent overreach.
-6. Add maintenance notes (`last reviewed`, key references, drift risks).
-7. Run a trigger test with 2 should-use + 2 should-not-use prompts.
+1. Define the skill's single repeatable job.
+2. Check current repo-local skills for overlap before creating new scope.
+3. Write trigger-specific frontmatter with least-privilege tool access.
+4. Draft the skill in a fixed order:
+   - use this skill when
+   - do not use this skill when
+   - required inputs
+   - repo anchors
+   - workflow
+   - output contract
+   - quality checks
+   - guardrails
+   - maintenance notes
+5. Add trigger tests with at least two should-use and two should-not-use prompts.
+6. Update `.codex/skills/README.md` if discovery guidance changed.
 
 ## Output contract
 
 Return in this order:
 
-1. **Skill intent statement**
-2. **Skill spec** (ready to paste in `SKILL.md`)
-3. **Trigger test** (2 positive, 2 negative)
-4. **Risk notes** (overlap, stale guidance, tool permissions)
-5. **Validation checklist**
+1. **Skill used + why**
+2. **Intent statement**
+3. **Overlap check**
+4. **Skill spec**
+5. **Trigger test**
+6. **Risk notes**
+7. **Validation checklist**
+
+## Quality checks before finalizing
+
+- The skill covers one repeatable workflow, not multiple jobs.
+- Trigger language is specific enough to avoid accidental activation.
+- Output sections are fixed and reviewable.
+- Repo anchors point to current canonical docs.
+- Tool permissions are no broader than necessary.
 
 ## Guardrails
 
-- Keep one skill focused on one repeatable workflow.
-- Prefer least-privilege tools; add mutation tools only when required.
-- Make evidence requirements explicit for research-heavy skills (URL + retrieval date + confidence).
+- Prefer extending or tightening an existing skill over creating a near-duplicate.
+- Make evidence requirements explicit for research-heavy workflows.
 - Do not claim checks were run unless they were actually executed.
-
-## Non-goals
-
-- Building product features.
-- Rewriting unrelated docs.
-- Creating broad catch-all “meta skills”.
+- Do not use a skill to hide missing repo documentation; fix the docs too when needed.
 
 ## Maintenance notes
 
-- Last reviewed: 2026-02-23
-- Refresh quarterly against:
-  - MCP docs: https://modelcontextprotocol.io/introduction
-  - Anthropic skills docs: https://docs.anthropic.com/en/docs/claude-code/skills
-  - OpenAI docs: https://platform.openai.com/docs
+- Last reviewed: 2026-03-16
+- Refresh when agent workflow, docs routing, or repo-local skill coverage changes.

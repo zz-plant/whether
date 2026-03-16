@@ -20,13 +20,13 @@ export function PlanningSnippetsPanel({
         id: "directive",
         label: "Weekly engineering directive",
         bestUse: "Best for: engineering standup notes",
-        text: `Weekly directive (${recordDateLabel}): Operate in the ${statusLabel} posture. Prioritize core delivery and reliability commitments, defer speculative scope, and re-validate staffing changes at the next weekly check-in.`,
+        text: `Weekly directive (week ending ${recordDateLabel}): Operate in the ${statusLabel} posture. Prioritize core delivery and reliability commitments, defer speculative scope, and re-validate staffing changes at the next weekly check-in.`,
       },
       {
         id: "staff-update",
         label: "Staff update paragraph",
         bestUse: "Best for: leadership/status updates",
-        text: `This week we are operating in the ${statusLabel} posture based on Treasury regime signals refreshed ${recordDateLabel}. Engineering focus remains on delivery predictability, reliability protection, and disciplined capacity allocation. We will avoid irreversible roadmap or hiring expansion until the next refresh confirms sustained improvement.`,
+        text: `This week we are operating in the ${statusLabel} posture for the week ending ${recordDateLabel}. Engineering focus remains on delivery predictability, reliability protection, and disciplined capacity allocation. We will avoid irreversible roadmap or hiring expansion until the next refresh confirms sustained improvement.`,
       },
       {
         id: "risk-register",

@@ -15,7 +15,15 @@ export const isAgentCadence = (value: string): value is AgentCadence =>
   (supportedAgentCadences as readonly string[]).includes(value);
 
 export const buildAgentInterfaceResponse = async (cadence: AgentCadence) => {
-  const { assessment, macroSeries, sensors, treasury, treasuryProvenance, recordDateLabel } =
+  const {
+    assessment,
+    macroSeries,
+    sensors,
+    treasury,
+    treasuryProvenance,
+    recordDateLabel,
+    weeklyRecordDateLabel,
+  } =
     await loadReportData();
 
   const summary =
@@ -23,7 +31,7 @@ export const buildAgentInterfaceResponse = async (cadence: AgentCadence) => {
       ? buildWeeklySummary({
           assessment,
           provenance: treasuryProvenance,
-          recordDateLabel,
+          recordDateLabel: weeklyRecordDateLabel,
         })
       : cadence === "monthly"
         ? buildMonthlySummary({

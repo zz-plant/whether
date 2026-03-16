@@ -23,6 +23,7 @@ Why this matters:
 - `cadence=weekly` is the default operator rhythm.
 - `summaryHash` helps detect content drift in downstream automations.
 - `generatedAt` and `recordDateLabel` support auditability in Slack/meeting artifacts.
+- for weekly payloads, `recordDateLabel` is the week-ending label for the briefing period; provenance keeps the underlying source date.
 
 ## 2) Pull the human-readable weekly summary
 

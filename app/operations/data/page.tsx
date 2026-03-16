@@ -33,7 +33,7 @@ const responseExample = `{
 
 export default async function OperationsDataPage() {
   const reportResult = await loadReportDataSafe(undefined, { route: "/operations/data" });
-  const { statusLabel, recordDateLabel } = reportResult.ok ? reportResult.data : reportResult.fallback;
+  const { statusLabel, weeklyRecordDateLabel } = reportResult.ok ? reportResult.data : reportResult.fallback;
 
   return (
     <main className="min-h-screen bg-slate-950 px-6 py-12 text-slate-100">
@@ -127,7 +127,7 @@ export default async function OperationsDataPage() {
           </pre>
         </section>
 
-        <PlanningSnippetsPanel statusLabel={statusLabel} recordDateLabel={recordDateLabel} />
+        <PlanningSnippetsPanel statusLabel={statusLabel} recordDateLabel={weeklyRecordDateLabel} />
       </section>
     </main>
   );

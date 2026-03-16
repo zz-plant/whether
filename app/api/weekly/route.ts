@@ -10,11 +10,11 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   return buildCadenceRouteResponse({
     route: "/api/weekly",
-    buildSummary: ({ assessment, treasuryProvenance, recordDateLabel }) =>
+    buildSummary: ({ assessment, treasuryProvenance, weeklyRecordDateLabel }) =>
       buildWeeklySummary({
         assessment,
         provenance: treasuryProvenance,
-        recordDateLabel,
+        recordDateLabel: weeklyRecordDateLabel,
       }),
     buildExtraPayload: ({ reportData, summary }) => {
       const { assessment, treasury, sensors, macroSeries } = reportData;

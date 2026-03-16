@@ -68,7 +68,7 @@ describe("weekly operator brief export adapters", () => {
       confidenceLabel: "HIGH",
     });
 
-    assert.equal(payload.date, "2026-03-04");
+    assert.equal(payload.date, "2026-03-06");
     assert.equal(payload.regimeStage, "Defensive · Late Cycle");
     assert.equal(payload.confidence, "HIGH confidence");
     assert.ok(payload.doNowBullets.length > 0);
@@ -80,7 +80,7 @@ describe("weekly operator brief export adapters", () => {
     const text = buildWeeklyOperatorBriefPlainText(payload);
     const cardText = buildWeeklyOperatorBriefCardText(payload);
 
-    assert.match(text, /Weekly Operator Brief — 2026-03-04/);
+    assert.match(text, /Weekly Operator Brief — 2026-03-06/);
     assert.match(text, /Regime \+ stage:/);
     assert.match(text, /Do now:/);
     assert.match(text, /Flip trigger:/);

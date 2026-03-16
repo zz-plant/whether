@@ -114,6 +114,7 @@ export default async function OperationsPage({
     macroSeries,
     playbook,
     recordDateLabel,
+    weeklyRecordDateLabel,
     sensors,
     startItems,
     statusLabel,
@@ -287,6 +288,7 @@ export default async function OperationsPage({
           assessment={assessment}
           provenance={treasuryProvenance}
           recordDateLabel={recordDateLabel}
+          weeklyRecordDateLabel={weeklyRecordDateLabel}
         />
       </SectionedReportPanel>
 

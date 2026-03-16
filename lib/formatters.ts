@@ -46,12 +46,35 @@ const parseDateValue = (value: string) => {
   return Number.isNaN(date.valueOf()) ? null : date;
 };
 
+const addUtcDays = (date: Date, days: number) => {
+  const next = new Date(date);
+  next.setUTCDate(next.getUTCDate() + days);
+  return next;
+};
+
+const getNextFridayUTC = (date: Date) => {
+  const day = date.getUTCDay();
+  const daysToFriday = (5 - day + 7) % 7;
+  return addUtcDays(date, daysToFriday);
+};
+
 const formatDateValue = (value: string, formatter: Intl.DateTimeFormat) => {
   const date = parseDateValue(value);
   return date ? formatter.format(date) : value;
 };
 
 export const formatDateUTC = (value: string) => formatDateValue(value, dateFormatter);
+
+export const resolveWeekEndingIsoDateUTC = (value: string) => {
+  const date = parseDateValue(value);
+  if (!date) {
+    return value;
+  }
+  return getNextFridayUTC(date).toISOString().slice(0, 10);
+};
+
+export const formatWeekEndingUTC = (value: string) =>
+  formatDateUTC(resolveWeekEndingIsoDateUTC(value));
 
 export const formatTimestampUTC = (value: string) =>
   formatDateValue(value, timestampFormatter);

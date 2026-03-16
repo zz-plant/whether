@@ -11,11 +11,11 @@ export const revalidate = 3600;
 export async function GET() {
   const reportResult = await loadReportDataSafe(undefined, { route: "/api/summary-delta" });
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
-  const { assessment, treasuryProvenance, recordDateLabel, treasury } = reportData;
+  const { assessment, treasuryProvenance, recordDateLabel, weeklyRecordDateLabel, treasury } = reportData;
   const weeklySummary = buildWeeklySummary({
     assessment,
     provenance: treasuryProvenance,
-    recordDateLabel,
+    recordDateLabel: weeklyRecordDateLabel,
   });
   const monthlySummary = buildMonthlySummary({
     assessment,

@@ -1,3 +1,4 @@
+import { resolveWeekEndingIsoDateUTC } from "../formatters";
 import { formatRegimeLabel } from "../regimeFormat";
 import type { RegimeAssessment } from "../regimeEngine";
 import type { TreasuryData } from "../types";
@@ -28,6 +29,7 @@ export type WeeklyCallSnapshotPayload = {
 export const buildWeeklyOperatorBriefPayload = ({
   assessment,
   treasury,
+  date,
   postureWithStageLabel,
   confidenceLabel,
   actionStripItems = [],
@@ -37,6 +39,7 @@ export const buildWeeklyOperatorBriefPayload = ({
 }: {
   assessment: RegimeAssessment;
   treasury: TreasuryData;
+  date?: string;
   postureWithStageLabel?: string;
   confidenceLabel?: "HIGH" | "MED" | "LOW";
   actionStripItems?: ActionStripItem[];
@@ -56,7 +59,7 @@ export const buildWeeklyOperatorBriefPayload = ({
     .slice(0, 4);
 
   return {
-    date: treasury.record_date,
+    date: date ?? resolveWeekEndingIsoDateUTC(treasury.record_date),
     regimeStage: canonicalDecisionCopy?.currentRegimeLabel ?? postureWithStageLabel ?? formatRegimeLabel(assessment.regime),
     confidence: confidenceLabel ? `${confidenceLabel} confidence` : "Score-based posture confidence",
     doNowBullets: canonicalDecisionCopy?.doNowLines.length ? canonicalDecisionCopy.doNowLines : doNowBullets,

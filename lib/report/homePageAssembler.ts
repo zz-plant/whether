@@ -45,6 +45,7 @@ export type ArtifactPayload = {
 type BuildArtifactPayloadArgs = {
   assessment: ReportData["assessment"];
   treasury: ReportData["treasury"];
+  weeklyRecordDate: ReportData["weeklyRecordDate"];
   sensors: ReportData["sensors"];
   macroSeries: ReportData["macroSeries"];
   homeBriefModel: ReturnType<typeof buildHomeBriefModel>;
@@ -115,6 +116,7 @@ const resolveHomepageOverlaySector = (value: string | undefined) => resolveSecto
 const buildLeadershipArtifactPayload = async ({
   assessment,
   treasury,
+  weeklyRecordDate,
   sensors,
   macroSeries,
   homeBriefModel,
@@ -155,6 +157,7 @@ const buildLeadershipArtifactPayload = async ({
     const weeklyOperatorBriefPayload = buildWeeklyOperatorBriefPayload({
       assessment,
       treasury,
+      date: weeklyRecordDate,
       postureWithStageLabel: homeBriefModel.postureWithStageLabel,
       confidenceLabel: homeBriefModel.confidenceLabel,
       actionStripItems: homeBriefModel.actionStripItems,
@@ -266,6 +269,8 @@ export const assembleHomePage = async ({
     historicalSelection,
     historicalAnalogs,
     recordDateLabel,
+    weeklyRecordDate,
+    weeklyRecordDateLabel,
     regimeAlert,
     reportDynamics,
     sensors,
@@ -357,7 +362,7 @@ export const assembleHomePage = async ({
     citation: buildCallCitation(assessment, treasury, {
       postureWithStageLabel: homeBriefModel.postureWithStageLabel,
     }),
-    recordDateLabel,
+    recordDateLabel: weeklyRecordDateLabel,
     fetchedAtLabel,
     freshnessLine: freshnessMeta.line,
     confidenceHistory,
@@ -372,6 +377,7 @@ export const assembleHomePage = async ({
     leadershipArtifactPayloadPromise: buildLeadershipArtifactPayload({
       assessment,
       treasury,
+      weeklyRecordDate,
       sensors,
       macroSeries,
       homeBriefModel,

@@ -344,7 +344,9 @@ const generateWeeklySummaries = async () => {
 
     const treasury = buildTreasurySnapshot(recordDate, fetchedAt, datasets);
     const assessment = evaluateRegime(treasury);
-    const recordDateLabel = formatDateValue(treasury.record_date);
+    // Weekly artifacts should display the week-ending label even when the
+    // underlying Treasury series falls back to the latest common prior day.
+    const recordDateLabel = formatDateValue(asOf);
     const baseRateSourceUrl =
       assessment.scores.baseRateUsed === "3M"
         ? seriesSourceUrls.threeMonth

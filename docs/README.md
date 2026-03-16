@@ -1,69 +1,110 @@
 # Documentation map
 
-Use this index to find the **current** source of truth quickly.
+Use this file to find the current source of truth without reading the whole `docs/` tree.
 
-## Start here
+## Read this first
 
-### Human contributors
-- `../CONTRIBUTING.md` — contribution workflow and review standards.
-- `development-playbook.md` — day-to-day engineering workflow, validation depth, and troubleshooting.
+### If you are changing product behavior
 
-### Agent contributors
-- `../AGENTS.md` — instruction hierarchy and operating constraints.
-- `agents/README.md` — task-oriented agent guidance and policy index.
+- `one-screen-weekly-brief-spec.md` for the primary brief contract
+- `feature-specs-current.md` for shipped product intent
+- `architecture.md` for system boundaries and extension points
 
-### Product and technical stakeholders
-- `architecture.md` — system boundaries, data flow, and extension points.
-- `feature-specs-current.md` — implemented product intent and present-day behavior.
+### If you are changing contributor workflow
 
-## Core engineering docs
-- `development-playbook.md` — practical engineering workflow and PR readiness checks.
-- `cli-command-reference.md` — Whether CLI command reference, output modes, and exit codes.
-- `cloudflare-deployment-runbook.md` — Cloudflare deployment expectations and CI artifact workflow.
-- `developer/README.md` — external developer-docs entrypoint (quickstart, API reference, integrations, CLI fallback).
-- `developer/cli-fallback.md` — curl-first fallback for the CLI core read path (`/api/cli/status`) when install/auth flow is blocked.
-- `architecture.md` — modules, runtime flow, and extension points.
-- `stack-compatibility-matrix.md` — platform/runtime support constraints.
-- `stack-modernization-inventory.md` — modernization baseline.
-- `stack-modernization-plan.md` — modernization implementation plan.
-- `domain-and-deployment.md` — deployment topology and domain model.
-- `vinext-cloudflare-evaluation.md` — Cloudflare-first rollout safeguards.
+- `development-playbook.md` for engineering workflow
+- `cli-command-reference.md` for CLI contracts
+- `cloudflare-deployment-runbook.md` for deploy behavior
 
-## Product direction docs
-- `feature-specs-current.md` — current shipped feature intent.
-- `policy-spec-alignment-plan.md` — scoped implementation plan to align the current engine with the formal policy specification.
-- `frontend-v2-spec.md` — frontend workflow/IA specification for the v2 experience.
-- `prd-next-level.md` / `specs-next-level.md` — next-level product and specification direction.
-- `concepts-enhancements.md` — enhancement opportunities for `/concepts` experiences.
-- `solutions-enhancements.md` — enhancement opportunities for `/solutions` and career-path flows.
-- `design-improvements-priority.md` — prioritized design/UX improvement backlog.
-- `agent-accelerated-prioritization-spec.md` — prioritized implementation spec for the next feature wave under coding-agent execution assumptions.
-- `research/2026-03-01-target-persona-frontend-critique.md` — persona-based constructive critique of the current frontend.
-- `research/2026-03-02-persona-click-route-walkthrough.md` — three-route persona walkthrough focused on streamlining and distraction audit.
-- `research/2026-03-04-review-comment-patterns.md` — recurring PR review-feedback themes and prevention controls.
-- `research/review-comment-trends.latest.md` — latest generated review-comment trend snapshot summary.
-- `one-screen-weekly-brief-spec.md` — decision-first one-screen weekly leadership brief specification.
-- `information-architecture-proposal.md` — proposed navigation model and route-transition plan.
-- `implementation-status.md` — consolidated implementation checklist across roadmap, summary follow-ups, and modernization work.
-- `editorial-guardrails.md` — tone, claim boundaries, and CTA/SEO rules for board-facing long-form resources.
-- `sales-competitive-messaging.md` — internal sales battlecards, objection handling, and differentiation scripts with external-ready copy angles.
-- `seo/roadmap.md` — 12–18 month editorial calendar by quarter and content objective.
-- `seo/quality-gates.md` — mandatory publish checklist for future SEO content.
-- `seo/measurement-model.md` — analytics model for cluster/CTA/assisted conversion reporting with intent tags.
-- `seo/refresh-loop.md` — monthly refresh and changelog loop for high-performing pages.
-- `premium-launch-readiness.md` — pre-reveal telemetry and go/no-go checklist for premium rollout.
+### If you are changing agent workflow or skills
 
-## Agent docs
-- `agents/setup.md` — install/run/check commands and MCP baseline.
-- `agents/project-layout.md` — directory ownership boundaries.
-- `agents/engineering-principles.md` — implementation posture and coding conventions.
-- `agents/documentation.md` — docs source-of-truth and update triggers.
-- `agents/quality-and-pr.md` — validation depth and PR hygiene.
-- `agents/data-and-platform.md` — data provenance and platform-readiness constraints.
-- `agents/ui-ux-standards.md` — UI consistency and accessibility standards.
-- `agents/mcp-and-skills-playbook.md` / `agents/agent-interface.md` — MCP workflows and integration interfaces.
+- `../AGENTS.md` for instruction priority and repo constraints
+- `agents/README.md` for task-based agent routing
+- `agents/mcp-and-skills-playbook.md` for MCP and skill maintenance
+
+### If you are integrating with Whether externally
+
+- `developer/README.md` for the external docs entrypoint
+- `developer/quickstart.md` for first integration
+- `developer/api-reference.md` for endpoint contracts
+
+## Document types
+
+Use these labels mentally when deciding what to read or update:
+
+- `Canonical`: current source of truth for shipped behavior or workflow
+- `Working`: active plan, proposal, or prioritized backlog
+- `Evidence`: generated logs, audits, or research snapshots that support decisions but do not define behavior
+- `Historical`: older context that may explain why something exists but should not override canonical docs
+
+If a document is not obviously canonical, confirm it against the relevant canonical file before implementing from it.
+
+## Canonical docs by outcome
+
+### Product behavior
+
+- `one-screen-weekly-brief-spec.md` — primary weekly brief contract
+- `feature-specs-current.md` — current product surface intent
+- `policy-spec-alignment-plan.md` — current policy/spec reconciliation plan
+- `editorial-guardrails.md` — copy, claims, and long-form guardrails
+
+### Engineering workflow
+
+- `development-playbook.md` — day-to-day engineering workflow and validation depth
+- `architecture.md` — modules, data flow, and extension points
+- `stack-compatibility-matrix.md` — runtime and platform constraints
+- `domain-and-deployment.md` — deployment topology and domain model
+- `cloudflare-deployment-runbook.md` — deploy expectations and evidence capture
+
+### Developer integrations
+
+- `developer/README.md` — outcome-based entrypoint
+- `developer/quickstart.md` — first decision-artifact pull
+- `developer/api-reference.md` — endpoint catalog and contract notes
+- `developer/integrations.md` — operational integration patterns
+- `developer/cli-fallback.md` — curl-first fallback flow
+
+### Agent workflow
+
+- `agents/README.md` — minimal read path by task
+- `agents/setup.md` — install/run/check commands and MCP baseline
+- `agents/project-layout.md` — directory ownership boundaries
+- `agents/documentation.md` — documentation lifecycle and update triggers
+- `agents/quality-and-pr.md` — validation depth and PR hygiene
+- `agents/mcp-and-skills-playbook.md` — skill usage and maintenance rules
+- `../.codex/skills/README.md` — repo-local skill index and overlap guide
+
+## Working and planning docs
+
+Use these when shaping follow-on work, not as sole implementation truth:
+
+- `frontend-v2-spec.md`
+- `prd-next-level.md`
+- `specs-next-level.md`
+- `design-improvements-priority.md`
+- `agent-accelerated-prioritization-spec.md`
+- `information-architecture-proposal.md`
+- `implementation-status.md`
+- `premium-launch-readiness.md`
+- `seo/roadmap.md`
+- `seo/quality-gates.md`
+- `seo/measurement-model.md`
+- `seo/refresh-loop.md`
+
+## Evidence and research docs
+
+Use these to explain why a decision was made or to support a new proposal:
+
+- `research/*.md`
+- `evidence/**`
+- audits such as `frontend-inefficiencies-audit.md`, `outstanding-issues-audit.md`, and similar review notes
+
+If you promote a finding from one of these documents into product or workflow behavior, update the relevant canonical doc in the same change.
 
 ## Maintenance rules
-- Prefer updating an existing active document over creating a near-duplicate.
-- If you add a new active document, link it here and from the relevant audience entrypoint.
-- Delete stale documents instead of keeping unlabeled historical references.
+
+- Prefer updating an existing canonical doc over creating a near-duplicate.
+- Link every new active doc from this file and the most relevant audience entrypoint.
+- Collapse or delete stale proposal docs once their decisions are absorbed elsewhere.
+- Keep evidence logs clearly separate from behavioral guidance.
+- When in doubt, optimize for shorter paths to the right document, not more documentation volume.

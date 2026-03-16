@@ -9,7 +9,7 @@ import { Button } from "@base-ui/react/button";
 import { Toast } from "@base-ui/react/toast";
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../../../lib/types";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
-import { formatNumberWithUnit } from "../../../lib/formatters";
+import { formatNumberWithUnit, resolveWeekEndingIsoDateUTC } from "../../../lib/formatters";
 import { buildAgentPayloadJson, buildAgentPrompt } from "../../../lib/agentHandoff";
 import {
   buildWeeklyOperatorBriefCardText,
@@ -208,10 +208,15 @@ export const ExportBriefPanel = ({
     () => buildSlackBrief(assessment, treasury, sensors, macroSeries),
     [assessment, treasury, sensors, macroSeries]
   );
+  const weeklyOperatorDate = useMemo(
+    () => resolveWeekEndingIsoDateUTC(treasury.record_date),
+    [treasury.record_date],
+  );
   const weeklyOperatorPayload = useMemo(() => buildWeeklyOperatorBriefPayload({
     assessment,
     treasury,
-  }), [assessment, treasury]);
+    date: weeklyOperatorDate,
+  }), [assessment, treasury, weeklyOperatorDate]);
   const weeklyOperatorPlainText = useMemo(
     () => buildWeeklyOperatorBriefPlainText(weeklyOperatorPayload),
     [weeklyOperatorPayload],
@@ -414,7 +419,7 @@ export const ExportBriefPanel = ({
                 onClick={() =>
                   handleDownload(
                     briefing,
-                    `whether-brief-${treasury.record_date}.txt`
+                    `whether-weekly-operator-brief-${weeklyOperatorDate}.txt`
                   )
                 }
                 className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"
@@ -426,7 +431,7 @@ export const ExportBriefPanel = ({
                 onClick={() =>
                   handleDownload(
                     weeklyOperatorSlackBlocks,
-                    `whether-weekly-operator-slack-blocks-${treasury.record_date}.json`
+                    `whether-weekly-operator-slack-blocks-${weeklyOperatorDate}.json`
                   )
                 }
                 className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] transition-colors hover:border-sky-400/70 hover:text-slate-100 touch-manipulation"

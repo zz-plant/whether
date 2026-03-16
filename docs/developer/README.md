@@ -2,41 +2,61 @@
 
 Public integration docs for Whether without requiring Mintlify.
 
-## Start here
+## Pick the shortest path to your outcome
 
-Choose the path that matches your immediate outcome:
+### I need my first machine-readable weekly brief
 
-1. **Ship first decision artifact fast** → `quickstart.md`
-   - Pull a weekly brief payload in minutes.
-   - Verify freshness and cadence alignment before sharing.
-2. **Implement against stable endpoint contracts** → `api-reference.md`
-   - Endpoint catalog, request/response conventions, and taxonomy rules.
-3. **Run production delivery workflows** → `integrations.md`
-   - Agent pull loops, alert delivery patterns, and reliability checks.
-4. **Use API fallback when CLI install/auth is blocked** → `cli-fallback.md`
-   - Minimal `curl` calls, required headers, and stable JSON response shape.
+Read `quickstart.md`.
+
+You will:
+- pull the weekly artifact
+- verify freshness and cadence alignment
+- leave with a minimal publish-safe integration flow
+
+### I need endpoint contracts and payload expectations
+
+Read `api-reference.md`.
+
+You will get:
+- the outcome-based endpoint map
+- request and response conventions
+- contract fields that downstream systems should preserve
+
+### I need production delivery or alert workflows
+
+Read `integrations.md`.
+
+You will get:
+- recommended pull order
+- health and cadence gates
+- alert and delivery flow patterns
+
+### I need a fallback path when CLI install or auth is blocked
+
+Read `cli-fallback.md`.
 
 ## Intended audience
 
-- Platform engineers integrating Whether into internal tools.
-- AI/agent developers needing machine-readable summaries + provenance.
-- Ops teams wiring alerts into Slack/email/webhook workflows.
+- platform engineers integrating Whether into internal systems
+- AI and agent developers consuming machine-readable brief payloads
+- operations teams wiring decision artifacts into Slack, email, or webhook loops
 
-## Source of truth boundaries
+## What a good integration preserves
 
-These docs are for **external integration behavior**.
+- **Decision transmission**: keep posture plus what changed, not just raw macro data
+- **Traceability**: preserve `generatedAt`, `recordDateLabel`, `version`, `summaryHash`, and provenance fields
+- **Operational safety**: block sends when `/api/health` is degraded or cadence alignment is broken
+- **Artifact quality**: keep the output shareable and citeable downstream
 
-For contributor workflow, implementation policy, and repo guardrails, use:
+## Source-of-truth boundaries
+
+These docs cover external integration behavior.
+
+For contributor workflow and repo policy, use:
 - `../development-playbook.md`
 - `../agents/README.md`
 
-## Integration success checklist
+For in-product machine-route discovery, use:
+- `/operations/data`
 
-A robust integration should preserve:
-- **Decision transmission:** capture posture + what changed, not just raw macro data.
-- **Traceability:** keep `generatedAt`, `recordDateLabel`, `version`, and provenance fields.
-- **Operational safety:** block sends when `/api/health` is degraded/down or cadence is misaligned.
-
-## Endpoint discovery location
-
-Canonical in-product endpoint discovery lives at `/operations/data` (Weekly data access). Keep new machine-route links and curl-first discovery copy there to avoid split guidance across operations surfaces.
+Keep new discovery copy aligned with that surface so endpoint guidance does not fragment across the repo.

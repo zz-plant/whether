@@ -24,7 +24,13 @@ import {
 } from "../timeMachine/timeMachineSelection";
 import { loadMacroSeries } from "../macroSnapshot";
 import { parseThresholdsFromSearchParams } from "../thresholds";
-import { formatAgeHours, formatDateUTC, formatTimestampUTC } from "../formatters";
+import {
+  formatAgeHours,
+  formatDateUTC,
+  formatTimestampUTC,
+  formatWeekEndingUTC,
+  resolveWeekEndingIsoDateUTC,
+} from "../formatters";
 import { buildRegimeAlert, formatConfidencePlainLabel } from "./reportFormatting";
 import { normalizeSignalContributions } from "./signalFormatting";
 import { buildFallbackForecastModel, buildForecastModel } from "./forecastModel";
@@ -726,6 +732,8 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
   const liveTreasury = liveTreasuryResult.value;
   const macroSeries = macroResult.value;
   const recordDateLabel = formatDateUTC(treasury.record_date);
+  const weeklyRecordDate = resolveWeekEndingIsoDateUTC(treasury.record_date);
+  const weeklyRecordDateLabel = formatWeekEndingUTC(treasury.record_date);
   const fetchedAtLabel = formatTimestampUTC(treasury.fetched_at);
   const treasuryAgeLabel = formatAgeHours(treasury.fetched_at, now);
   const sensors = buildSensorReadings(treasury);
@@ -886,6 +894,8 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
     macroSeries,
     playbook,
     recordDateLabel,
+    weeklyRecordDate,
+    weeklyRecordDateLabel,
     reportDynamics,
     requestedSelection,
     regimeSeries,
@@ -977,6 +987,8 @@ const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataF
   const liveAssessment = evaluateRegime(fallbackTreasury, thresholds, []);
   const sensors = buildSensorReadings(fallbackTreasury);
   const recordDateLabel = formatDateUTC(fallbackTreasury.record_date);
+  const weeklyRecordDate = resolveWeekEndingIsoDateUTC(fallbackTreasury.record_date);
+  const weeklyRecordDateLabel = formatWeekEndingUTC(fallbackTreasury.record_date);
   const fetchedAtLabel = formatTimestampUTC(fallbackTreasury.fetched_at);
   const ageLabel = formatAgeHours(fallbackTreasury.fetched_at, now);
   const { playbook, startItems, stopItems, actionStripItems } = buildGuidanceBundleFromAssessment(assessment);
@@ -1035,6 +1047,8 @@ const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataF
     macroSeries: [],
     playbook,
     recordDateLabel,
+    weeklyRecordDate,
+    weeklyRecordDateLabel,
     reportDynamics: fallbackReportDynamics,
     requestedSelection,
     regimeSeries,
