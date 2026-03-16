@@ -420,7 +420,7 @@ export const ReportShell = ({
             </div>
             <NavigationOrientationBadge currentPath={currentPath} className="mt-4" />
             <p className="mt-3 max-w-3xl text-xs leading-relaxed text-slate-300">{canonicalPositioningLine}</p>
-            <p className="mt-2 text-[11px] text-slate-400">Choose view: Now for the call, Operate for guardrails, Reference for evidence and method.</p>
+            <p className="mt-2 text-[11px] text-slate-400">Choose view: Now for the weekly call, Workflows for signals and guardrails, Reference for background and method.</p>
             {showPageNavigation ? (
               <ReportPageNavigation
                 pageLinks={pageLinks}

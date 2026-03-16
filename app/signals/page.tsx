@@ -330,7 +330,7 @@ export default async function SignalsPage({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Signals"
       currentPath="/signals"
-      pageSummary="Evidence and raw diagnostics only: drivers, thresholds, and timestamps behind posture."
+      pageSummary="Deep evidence appendix for the Weekly Brief: drivers, thresholds, timestamps, and historical context."
       pageSummaryLink={{
         href: "#thresholds",
         label: "See thresholds",
@@ -340,10 +340,11 @@ export default async function SignalsPage({
       heroVariant="compact"
       pageNavVariant="compact"
       showPageNavigation={true}
-      primaryCta={{ href: "#current-scores", label: "Review evidence" }}
+      primaryCta={{ href: "/", label: "Return to Weekly Brief" }}
+      secondaryCta={{ href: "#current-scores", label: "Open evidence appendix" }}
       nextStep={{
-        href: "/operations",
-        description: "Apply this posture in Operations",
+        href: "/",
+        description: "Return to Weekly Brief once the evidence check is complete",
       }}
       decisionBanner={{
         label: "Decision",
@@ -669,8 +670,8 @@ export default async function SignalsPage({
               </span>
             </div>
             <p className="text-sm leading-relaxed text-slate-300">
-              Use advanced controls when you need threshold tuning, historical snapshots, or regime
-              timeline diagnostics. Keep this closed for the default executive scan.
+              Keep historical replay visible for the default audit loop. Use advanced controls only
+              for threshold tuning and deeper timeline diagnostics.
             </p>
           </div>
           <div className="flex flex-wrap items-center justify-end gap-2">

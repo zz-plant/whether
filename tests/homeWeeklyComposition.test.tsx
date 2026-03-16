@@ -161,19 +161,17 @@ describe("weekly card and interpretation panel composition", () => {
       </>,
     );
 
-    assert.match(html, /This week&#x27;s regime/);
-    assert.match(html, /This week&#x27;s call/);
+    assert.match(html, /REGIME — WEEK OF Mar 5, 2026/);
+    assert.match(html, /Weekly call snapshot/);
     assert.doesNotMatch(html, /Copy weekly operator brief/);
-    assert.match(html, /Confidence:/);
+    assert.match(html, /What to do this week/);
+    assert.match(html, /Decision confidence/);
     assert.match(html, /Action/);
     assert.match(html, /Interpretation layer/);
     assert.match(html, /Company view/);
     assert.match(html, /• Action:/);
     assert.match(html, /Trigger:/);
     assert.match(html, /Reverse:/);
-    assert.match(html, /Execution plan/);
-    assert.match(html, /Approve now/);
-    assert.match(html, /Delay now/);
   });
   it("renders weekly card before interpretation panel and preserves top-fold hierarchy", () => {
     const layer = buildInterpretationLayer({
@@ -278,17 +276,15 @@ describe("weekly card and interpretation panel composition", () => {
       </>,
     );
 
-    const heroIndex = html.indexOf("This week&#x27;s regime");
-    const playbookIndex = html.indexOf("This week&#x27;s call");
-    const confidenceIndex = html.indexOf("Confidence:");
-    const instructionIndex = html.indexOf("Inspect evidence");
+    const heroIndex = html.indexOf("REGIME — WEEK OF Mar 5, 2026");
+    const confidenceIndex = html.indexOf("Confidence MED 68%");
+    const playbookIndex = html.indexOf("Weekly call snapshot");
     const interpretationIndex = html.indexOf("Interpretation layer");
 
     assert.ok(heroIndex > -1);
     assert.ok(confidenceIndex > heroIndex);
     assert.ok(playbookIndex > confidenceIndex);
-    assert.ok(instructionIndex > playbookIndex);
-    assert.ok(interpretationIndex > instructionIndex);
+    assert.ok(interpretationIndex > playbookIndex);
   });
 
 
@@ -299,9 +295,9 @@ describe("weekly card and interpretation panel composition", () => {
           changeSummary="Decision delta: tighten optional spend this week."
           decisionNow="Stage decisions and protect runway while transition watch is on."
           destinations={[
-            { href: "/signals", label: "Signals", description: "Inspect drivers, thresholds, and historical signal context." },
-            { href: "/operations", label: "Operations", description: "Apply hiring, spend, and cadence guardrails to execution." },
-            { href: "/decide", label: "Decide", description: "Translate posture guidance into role-specific choices." },
+            { href: "/signals", label: "Signals", description: "Check what changed in the signals and why the weekly call moved." },
+            { href: "/operations", label: "Operations", description: "Approve or hold hiring, spend, and pacing decisions for this week." },
+            { href: "/decide", label: "Decide", description: "Translate the weekly call into role-specific decisions." },
           ]}
         />
         <WeeklyDecisionCard
@@ -381,7 +377,7 @@ describe("weekly card and interpretation panel composition", () => {
     );
 
     const orientationIndex = html.indexOf("Fast orientation for this week");
-    const cardIndex = html.indexOf("This week&#x27;s regime");
+    const cardIndex = html.indexOf("REGIME — WEEK OF Mar 5, 2026");
 
     assert.ok(orientationIndex > -1);
     assert.ok(cardIndex > orientationIndex);

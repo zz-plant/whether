@@ -6,19 +6,19 @@ type NavigationZone = "core" | "workflow" | "reference";
 
 const zoneLabels: Record<NavigationZone, string> = {
   core: "Now section",
-  workflow: "Operate section",
+  workflow: "Workflow section",
   reference: "Reference section",
 };
 
 const zoneDescriptors: Record<NavigationZone, string> = {
-  core: "Decision call and bounded actions for this week",
-  workflow: "Execution posture and operating rules",
-  reference: "Evidence, provenance, and supporting context",
+  core: "Weekly call and bounded actions for this week",
+  workflow: "Evidence, execution, and decision depth pages that support the Weekly Brief",
+  reference: "Trust, provenance, and optional background reference pages",
 };
 
 const zoneCompactLabels: Record<NavigationZone, string> = {
   core: "Now",
-  workflow: "Operate",
+  workflow: "Workflows",
   reference: "Reference",
 };
 
@@ -30,11 +30,11 @@ const zoneBadgeStyles: Record<NavigationZone, string> = {
 
 const zoneOrder: NavigationZone[] = ["core", "workflow", "reference"];
 
-const zoneDefaultHref: Record<NavigationZone, string> = zoneOrder.reduce((acc, zone) => {
-  const layer = navigationLayers.find((item) => item.group === zone);
-  acc[zone] = layer?.href ?? "/";
-  return acc;
-}, {} as Record<NavigationZone, string>);
+const zoneDefaultHref: Record<NavigationZone, string> = {
+  core: "/",
+  workflow: "/signals",
+  reference: "/method",
+};
 
 const normalizePath = (path: string) =>
   path !== "/" && path.endsWith("/") ? path.slice(0, -1) : path;

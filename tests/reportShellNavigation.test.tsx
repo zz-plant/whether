@@ -15,17 +15,17 @@ describe("Report shell page navigation", () => {
     );
 
     assert.match(html, />Now</);
-    assert.match(html, />Operate</);
+    assert.match(html, />Workflows</);
     assert.match(html, />Reference</);
 
-    assert.match(html, /Start/);
-    assert.match(html, /Live posture call, confidence, and immediate operator actions\./);
+    assert.match(html, /Weekly Brief/);
+    assert.match(html, /Current posture, bounded call, and share-ready artifact\./);
 
     assert.match(html, /Signals/);
-    assert.match(html, /Inspect drivers, thresholds, and historical signal context\./);
+    assert.match(html, /Deep evidence appendix for drivers, thresholds, and freshness behind the weekly brief\./);
 
     assert.match(html, /Operations/);
-    assert.match(html, /Apply hiring, spend, and cadence guardrails to execution\./);
+    assert.match(html, /Detailed execution guardrails once the weekly plan needs deeper review\./);
   });
 
   it("keeps current path highlighting with aria-current page", () => {

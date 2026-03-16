@@ -1,22 +1,21 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Suspense } from "react";
 import { HistoricalBanner } from "./components/historicalBanner";
 import { ReportShell } from "./components/reportShell";
 import { reportPageLinks } from "../lib/report/reportNavigation";
-import { BoundedRulesMatrix, WeeklyDecisionCard, WeeklyDecisionDiagnosticsLane } from "./components/weeklyDecisionCard";
+import { WeeklyDecisionCard } from "./components/weeklyDecisionCard";
 import { CopyLeadershipArtifactsButtons } from "./components/copyLeadershipArtifactsButtons";
 import { LiveDataFallbackAlert } from "./components/liveDataFallbackAlert";
 import { buildHomeMetadata, type HomePageSearchParams } from "../lib/report/homeMetadata";
 import {
   assembleHomePage,
   type ArtifactPayload,
-  type HomePageDiagnosticsLane,
 } from "../lib/report/homePageAssembler";
 import { ArtifactActionsFallback } from "./components/home/artifactActionsFallback";
 import { HomePageStreamingFallback } from "./components/home/homePageStreamingFallback";
 import { WeeklyDiagnosticsFallback } from "./components/home/weeklyDiagnosticsFallback";
 import { StreamedSectionReveal } from "./components/streamedSectionReveal";
+import { HomeWorkspaceBands } from "./components/home/homeWorkspaceBands";
 
 export const revalidate = 900;
 export const runtime = "edge";
@@ -30,10 +29,6 @@ export const generateMetadata = async ({
 type ArtifactActionsProps = {
   artifactPayloadPromise: Promise<ArtifactPayload | null>;
   fallbackActive: boolean;
-};
-
-type DiagnosticsLaneProps = {
-  diagnosticsLanePromise: Promise<HomePageDiagnosticsLane>;
 };
 
 const LeadershipArtifactActions = async ({ artifactPayloadPromise, fallbackActive }: ArtifactActionsProps) => {
@@ -55,23 +50,6 @@ const LeadershipArtifactActions = async ({ artifactPayloadPromise, fallbackActiv
         boardSummary={artifactPayload.boardSummary}
         citation={artifactPayload.callCitation}
         fallbackActive={fallbackActive}
-      />
-    </StreamedSectionReveal>
-  );
-};
-
-const DeferredWeeklyDiagnosticsLane = async ({ diagnosticsLanePromise }: DiagnosticsLaneProps) => {
-  // Yield once so the canonical weekly call can stream before the heavier diagnostics lane.
-  await Promise.resolve();
-  const diagnosticsLane = await diagnosticsLanePromise;
-
-  return (
-    <StreamedSectionReveal delay="short">
-      <WeeklyDecisionDiagnosticsLane
-        {...diagnosticsLane}
-        renderBoundedRulesMatrix={({ decisionMatrix: matrix, decisionRules: rules }) => (
-          <BoundedRulesMatrix decisionMatrix={matrix} decisionRules={rules} />
-        )}
       />
     </StreamedSectionReveal>
   );
@@ -120,16 +98,16 @@ export const HomePageReportContent = async ({
       currentPath="/"
       pageSummary="Whether translates macro conditions into operating decisions for companies. Action, guardrail, and flip condition for this planning cycle; scores stay contextual."
       primaryCta={{
-        href: "#citation-actions",
-        label: "Prepare Weekly Operator Brief",
+        href: "#approve-this-weeks-plan",
+        label: "Approve this week’s plan",
       }}
       secondaryCta={{
-        href: "/operations",
-        label: "Open Operations",
+        href: "#audit-this-call",
+        label: "Audit this call",
       }}
       nextStep={{
         href: "/signals",
-        description: "Inspect evidence in Signals",
+        description: "Open Signals only when the home workspace needs deeper evidence",
       }}
       sidebarVariant="hidden"
       hideHeroChrome={true}
@@ -161,31 +139,14 @@ export const HomePageReportContent = async ({
             />
           </Suspense>
         )}
-        diagnosticsLane={(
-          <Suspense fallback={<WeeklyDiagnosticsFallback />}>
-            <DeferredWeeklyDiagnosticsLane diagnosticsLanePromise={homepage.diagnosticsLanePromise} />
-          </Suspense>
-        )}
+        diagnosticsLane={<></>}
       />
 
-      <section className="weather-panel space-y-4 px-5 py-4" aria-label="Secondary navigation">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">Need deeper analysis?</p>
-        <p className="text-sm text-slate-200">Keep this page your weekly call surface. Open detailed workflows only when you need diagnostics or role-specific plans.</p>
-        <div className="grid gap-2 sm:grid-cols-3">
-          <Link href="/operations" className="weather-panel-static rounded-xl px-3 py-3 text-xs text-slate-100 transition-colors hover:border-sky-400/35">
-            <span className="font-semibold">Operations</span>
-            <span className="mt-1 block text-slate-300">Approve/hold/escalate plans by function.</span>
-          </Link>
-          <Link href="/signals" className="weather-panel-static rounded-xl px-3 py-3 text-xs text-slate-100 transition-colors hover:border-sky-400/35">
-            <span className="font-semibold">Signals</span>
-            <span className="mt-1 block text-slate-300">Inspect raw indicators, deltas, and provenance.</span>
-          </Link>
-          <Link href="/decide" className="weather-panel-static rounded-xl px-3 py-3 text-xs text-slate-100 transition-colors hover:border-sky-400/35">
-            <span className="font-semibold">Decide</span>
-            <span className="mt-1 block text-slate-300">Stress-test thresholds and reversal conditions.</span>
-          </Link>
-        </div>
-      </section>
+      <Suspense fallback={<WeeklyDiagnosticsFallback />}>
+        <HomeWorkspaceBands
+          workspaceModelPromise={homepage.workspaceModelPromise}
+        />
+      </Suspense>
 
       {homepage.fallbackActive ? (
         <LiveDataFallbackAlert

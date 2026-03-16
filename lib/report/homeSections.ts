@@ -1,14 +1,15 @@
 export const homeSectionSequence = [
   { href: "#weekly-posture-brief-title", label: "Call" },
-  { href: "#decision-snapshot-for-leadership-this-week", label: "Decide the call" },
-  { href: "#execution-guidance", label: "Run the plan" },
-  { href: "#evidence-diagnostics", label: "Stress-test evidence" },
+  { href: "#audit-this-call", label: "Audit" },
+  { href: "#historical-replay-workspace", label: "Replay" },
+  { href: "#approve-this-weeks-plan", label: "Plan" },
+  { href: "#translate-or-run-tool", label: "Tools" },
 ] as const;
 
 export const homeSectionCompactLabelByHref: Record<(typeof homeSectionSequence)[number]["href"], string> = {
   "#weekly-posture-brief-title": "Call",
-  "#decision-snapshot-for-leadership-this-week": "Decide",
-  "#execution-guidance": "Run",
-  "#evidence-diagnostics": "Evidence",
+  "#audit-this-call": "Audit",
+  "#historical-replay-workspace": "Replay",
+  "#approve-this-weeks-plan": "Plan",
+  "#translate-or-run-tool": "Tools",
 };
-

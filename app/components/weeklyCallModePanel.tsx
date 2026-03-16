@@ -10,9 +10,10 @@ import { homeSectionSequence } from "../../lib/report/homeSections";
 import { StartupModeSelector, type StartupModeContent } from "./startupModeSelector";
 
 const callSectionHref = homeSectionSequence[0]?.href ?? "#weekly-posture-brief-title";
-const decideSectionHref = homeSectionSequence[1]?.href ?? "#decision-snapshot-for-leadership-this-week";
-const executionSectionHref = homeSectionSequence[2]?.href ?? "#execution-guidance";
-const evidenceSectionHref = homeSectionSequence[3]?.href ?? "#evidence-diagnostics";
+const auditSectionHref = homeSectionSequence[1]?.href ?? "#audit-this-call";
+const historicalReplaySectionHref = homeSectionSequence[2]?.href ?? "#historical-replay-workspace";
+const executionSectionHref = homeSectionSequence[3]?.href ?? "#approve-this-weeks-plan";
+const toolsSectionHref = homeSectionSequence[4]?.href ?? "#translate-or-run-tool";
 
 type WeeklyCallModePanelProps = {
   startupVariantPolicy: StartupVariantPolicy;
@@ -35,9 +36,10 @@ type WeeklyCallModePanelProps = {
 
 const commandActions = [
   { label: "Jump: This week's call", href: callSectionHref, type: "Section" },
-  { label: "Jump: Decide the call", href: decideSectionHref, type: "Section" },
-  { label: "Jump: Execution guidance", href: executionSectionHref, type: "Section" },
-  { label: "Jump: Evidence diagnostics", href: evidenceSectionHref, type: "Section" },
+  { label: "Jump: Audit this call", href: auditSectionHref, type: "Section" },
+  { label: "Jump: Historical replay", href: historicalReplaySectionHref, type: "Section" },
+  { label: "Jump: Approve this week's plan", href: executionSectionHref, type: "Section" },
+  { label: "Jump: Translate or run a tool", href: toolsSectionHref, type: "Section" },
   { label: "Open Signals", href: "/signals", type: "Page" },
   { label: "Open Operations", href: "/operations", type: "Page" },
   { label: "Open Decide", href: "/decide", type: "Page" },

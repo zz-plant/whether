@@ -5,6 +5,9 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 type HistoricalReplayDatePickerProps = {
   initialDate: string;
+  submitHash?: string;
+  forceAdvanced?: boolean;
+  submitLabel?: string;
 };
 
 const toMonthStart = (value: string) => {
@@ -15,7 +18,12 @@ const toMonthStart = (value: string) => {
   return { year, month };
 };
 
-export const HistoricalReplayDatePicker = ({ initialDate }: HistoricalReplayDatePickerProps) => {
+export const HistoricalReplayDatePicker = ({
+  initialDate,
+  submitHash,
+  forceAdvanced = true,
+  submitLabel = "Replay mandate",
+}: HistoricalReplayDatePickerProps) => {
   const [value, setValue] = useState(initialDate);
   const pathname = usePathname();
   const router = useRouter();
@@ -33,8 +41,13 @@ export const HistoricalReplayDatePicker = ({ initialDate }: HistoricalReplayDate
         const params = new URLSearchParams(searchParams.toString());
         params.set("year", parsed.year);
         params.set("month", String(Number(parsed.month)));
-        params.set("advanced", "1");
-        router.push(`${pathname}?${params.toString()}#time-machine` as Parameters<typeof router.push>[0]);
+        if (forceAdvanced) {
+          params.set("advanced", "1");
+        } else {
+          params.delete("advanced");
+        }
+        const hash = submitHash ?? "#time-machine";
+        router.push(`${pathname}?${params.toString()}${hash}` as Parameters<typeof router.push>[0]);
       }}
     >
       <label className="space-y-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">
@@ -50,7 +63,7 @@ export const HistoricalReplayDatePicker = ({ initialDate }: HistoricalReplayDate
         type="submit"
         className="weather-button-primary inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.12em]"
       >
-        Replay mandate
+        {submitLabel}
       </button>
     </form>
   );

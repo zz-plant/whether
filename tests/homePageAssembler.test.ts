@@ -182,11 +182,15 @@ describe("assembleHomePage streaming contract", () => {
 
     let diagnosticsSettled = false;
     let artifactSettled = false;
+    let workspaceSettled = false;
     void homepage.diagnosticsLanePromise.then(() => {
       diagnosticsSettled = true;
     });
     void homepage.leadershipArtifactPayloadPromise.then(() => {
       artifactSettled = true;
+    });
+    void homepage.workspaceModelPromise.then(() => {
+      workspaceSettled = true;
     });
 
     await Promise.resolve();
@@ -194,14 +198,19 @@ describe("assembleHomePage streaming contract", () => {
 
     assert.equal(diagnosticsSettled, false);
     assert.equal(artifactSettled, false);
+    assert.equal(workspaceSettled, false);
 
     releasePostureState?.(postureState);
 
     const diagnosticsLane = await homepage.diagnosticsLanePromise;
     const artifactPayload = await homepage.leadershipArtifactPayloadPromise;
+    const workspaceModel = await homepage.workspaceModelPromise;
 
     assert.ok(diagnosticsLane.immediateDecision.length > 0);
     assert.ok(artifactPayload);
     assert.match(artifactPayload?.weeklyCallSnapshotText ?? "", /avoid|hiring|threshold|flip/i);
+    assert.equal(workspaceModel.workspaceActions.auditHref, "#audit-this-call");
+    assert.equal(workspaceModel.operations.continueHref, "/operations#ops-monthly-action-summary");
+    assert.equal(workspaceModel.translate.decisionUtilities.length, 2);
   });
 });

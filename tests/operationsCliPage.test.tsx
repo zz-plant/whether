@@ -27,7 +27,7 @@ describe("operations cli page", () => {
     const cliLink = operationsWorkstreamLinks.find((link) => link.href === "/operations/cli");
 
     assert.ok(cliLink);
-    assert.equal(cliLink?.label, "CLI");
+    assert.equal(cliLink?.label, "Terminal");
     assert.match(cliLink?.description ?? "", /status, changes, history, and scenario/i);
   });
 });

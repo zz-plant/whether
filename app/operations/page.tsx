@@ -10,15 +10,16 @@ import {
 import { ReportShell } from "../components/reportShell";
 import { HistoricalBanner } from "../components/historicalBanner";
 import {
+  operationsSectionLinks,
+  operationsWorkstreamLinks,
+} from "../../lib/navigation/operationsNavigation";
+import {
   FinanceStrategyPanel,
   MonthlyActionSummaryPanel,
   OperatorRequestsPanel,
   PlaybookPanel,
 } from "../components/appendixSections";
 import { reportPageLinks } from "../../lib/report/reportNavigation";
-import { operationsSectionLinks } from "../../lib/navigation/operationsNavigation";
-import { OperationsWorkstreamNav } from "./components/operationsWorkstreamNav";
-import { OperationsWorkflowProgress } from "./components/operationsWorkflowProgress";
 import { ExportBriefPanel } from "./components/exportBriefPanel";
 import { RunwayPlannerPanel } from "./components/runwayPlannerPanel";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
@@ -26,6 +27,7 @@ import { LiveDataFallbackAlert } from "../components/liveDataFallbackAlert";
 import { NextStepRail } from "../components/nextStepRail";
 import { buildCanonicalBoundedDecisionRules } from "../../lib/report/boundedDecisionRules";
 import { buildActionStripItems } from "../../lib/report/operatingCalls";
+import { OperationsExecutionStepper } from "./components/operationsExecutionStepper";
 
 
 export const runtime = "edge";
@@ -176,23 +178,23 @@ export default async function OperationsPage({
       showOfflineBadge={isFallback && !historicalSelection}
       pageTitle="Operations"
       currentPath="/operations"
-      pageSummary="Run weekly execution decisions and align the monthly playbook for this cycle."
-      pageSummaryLink={{ href: "#ops-playbook", label: "Jump to playbook section ↓" }}
+      pageSummary="Detailed execution depth for the weekly workspace: move through plan, guardrails, finance, and share in one pass."
+      pageSummaryLink={{ href: "#ops-monthly-action-summary", label: "Open execution flow ↓" }}
       primaryCta={{
-        href: "#ops-monthly-action-summary",
-        label: "Review weekly + monthly summary",
+        href: "/",
+        label: "Return to Weekly Brief",
       }}
-      secondaryCta={{ href: "#ops-playbook", label: "Open playbook" }}
-      exportCta={{ href: "#ops-export-briefs", label: "Copy weekly brief" }}
+      secondaryCta={{ href: "#ops-monthly-action-summary", label: "Open execution flow" }}
+      exportCta={{ href: "#ops-export-briefs", label: "Copy aligned brief" }}
       nextStep={{
-        href: "/decide",
-        description: "Translate this into role-specific guidance",
+        href: "/",
+        description: "Return to Weekly Brief when the detailed execution review is complete",
       }}
       pageNavVariant="compact"
       showPageNavigation={true}
       decisionBanner={{
-        label: "Align now",
-        decision: "Translate the regime into weekly execution calls and a monthly plan.",
+        label: "Start here",
+        decision: "Approve or hold the week's hiring, spend, and roadmap moves.",
         horizon: "This week + month",
         confidence: trustStatusLabel,
         effectiveDate: recordDateLabel,
@@ -200,7 +202,7 @@ export default async function OperationsPage({
       }}
       commandBar={{
         regime: assessment.regime,
-        call: "Translate the weekly regime into execution moves and keep approvals bounded.",
+        call: "Turn the weekly posture into a few explicit operating decisions and keep each move reversible.",
         doNow: [
           actionNowShort,
           actionStripItems[0]?.actionNow ?? startItems[0] ?? "Apply the highest-priority start move for this regime.",
@@ -212,25 +214,31 @@ export default async function OperationsPage({
         updatedAt: fetchedAtLabel,
       }}
       actionSequence={{
-        title: "Planning sequence",
+        title: "How to use this page",
         items: [
           {
-            title: "Review weekly + monthly summary",
-            detail: "Confirm this week's execution posture and monthly priorities.",
+            title: "Read the weekly plan",
+            detail: "Start with the approve, hold, and revisit call for this cycle.",
             href: "#ops-monthly-action-summary",
-            cta: "Open summary",
+            cta: "Open plan",
           },
           {
-            title: "Apply playbook moves",
-            detail: "Choose start, stop, and fence actions.",
+            title: "Apply guardrails",
+            detail: "Choose start, stop, and fence actions before committing new work.",
             href: "#ops-playbook",
-            cta: "Open playbook",
+            cta: "Open guardrails",
           },
           {
-            title: "Sync finance strategy",
-            detail: "Check funding signals before commitments.",
+            title: "Verify finance strategy",
+            detail: "Confirm budget posture and runway timing before you publish the brief.",
             href: "#ops-finance-strategy",
-            cta: "Open finance strategy",
+            cta: "Open finance",
+          },
+          {
+            title: "Share the aligned brief",
+            detail: "Copy the artifact once finance strategy and operator asks are aligned.",
+            href: "#ops-export-briefs",
+            cta: "Open share brief",
           },
         ],
       }}
@@ -257,110 +265,158 @@ export default async function OperationsPage({
         />
       ) : null}
 
-      <section className="weather-panel space-y-3 px-5 py-4" aria-label="Three execution moves this week">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">This week&apos;s 3 moves</p>
-        <ol className="grid gap-2 md:grid-cols-3">
-          <li className="weather-surface px-3 py-3 text-xs text-slate-200">
-            <p className="font-semibold uppercase tracking-[0.12em] text-sky-200">1 · Align posture</p>
-            <p className="mt-1">Confirm the monthly action summary before changing team pace.</p>
-          </li>
-          <li className="weather-surface px-3 py-3 text-xs text-slate-200">
-            <p className="font-semibold uppercase tracking-[0.12em] text-sky-200">2 · Apply guardrails</p>
-            <p className="mt-1">Run start/stop/fence moves from the playbook and pause if a stop trigger hits.</p>
-          </li>
-          <li className="weather-surface px-3 py-3 text-xs text-slate-200">
-            <p className="font-semibold uppercase tracking-[0.12em] text-sky-200">3 · Export artifact</p>
-            <p className="mt-1">Copy the stakeholder brief once finance guidance and operator asks are aligned.</p>
-          </li>
-        </ol>
-      </section>
+      <OperationsExecutionStepper
+        steps={[
+          {
+            id: "ops-monthly-action-summary",
+            label: "Plan",
+            title: "Weekly plan",
+            description: "Read this before changing team pace, spend, or priorities.",
+            summary: "Confirm what you should approve, hold, or revisit for this cycle.",
+            hashAliases: ["ops-monthly-action-summary-panel"],
+            children: (
+              <SectionedReportPanel
+                id="ops-monthly-action-summary-panel"
+                label="Start"
+                title="Weekly plan"
+                description="Read this before changing team pace, spend, or priorities."
+                defaultOpen={true}
+              >
+                <MonthlyActionSummaryPanel
+                  assessment={assessment}
+                  provenance={treasuryProvenance}
+                  recordDateLabel={recordDateLabel}
+                  weeklyRecordDateLabel={weeklyRecordDateLabel}
+                />
+              </SectionedReportPanel>
+            ),
+          },
+          {
+            id: "ops-playbook",
+            label: "Guardrails",
+            title: "Guardrails",
+            description: "Use start, stop, and fence rules before you commit new work.",
+            summary: "Apply the top guardrails before approving new commitments.",
+            hashAliases: ["ops-playbook-panel"],
+            children: (
+              <SectionedReportPanel
+                id="ops-playbook-panel"
+                label="Guardrails"
+                title="Approve or hold moves"
+                description="Use start, stop, and fence rules before you commit new work."
+                defaultOpen={true}
+              >
+                <div className="flex flex-wrap items-start justify-between gap-3 weather-surface px-4 py-3">
+                  <p className="text-xs text-slate-300">
+                    {showAllActionLanes
+                      ? "Showing full action lanes for deep execution checks."
+                      : "Showing top 3 items per lane for the default weekly execution scan."}
+                  </p>
+                  <a
+                    href={buildActionsExpansionHref(resolvedSearchParams, !showAllActionLanes)}
+                    className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
+                  >
+                    {showAllActionLanes ? "Show top 3 only" : "Show full action lanes"}
+                  </a>
+                </div>
+                <PlaybookPanel
+                  playbook={playbook}
+                  stopItems={stopItems}
+                  startItems={startItems}
+                  fenceItems={fenceItems}
+                  provenance={treasuryProvenance}
+                  showProvenance={false}
+                  actionStripItems={actionStripItems}
+                  showAllActionLanes={showAllActionLanes}
+                />
+              </SectionedReportPanel>
+            ),
+          },
+          {
+            id: "ops-finance-strategy",
+            label: "Finance",
+            title: "Finance strategy",
+            description: "Budget posture and cash timing guidance for the quarter.",
+            summary: "Validate runway timing and budget posture before sharing the brief.",
+            hashAliases: ["ops-finance-strategy-panel"],
+            children: (
+              <SectionedReportPanel
+                id="ops-finance-strategy-panel"
+                label="Verify"
+                title="Finance strategy"
+                description="Budget posture and cash timing guidance for the quarter."
+                defaultOpen={true}
+              >
+                <FinanceStrategyPanel
+                  regime={assessment.regime}
+                  provenance={treasuryProvenance}
+                  showProvenance={false}
+                />
+                <RunwayPlannerPanel assessment={assessment} />
+              </SectionedReportPanel>
+            ),
+          },
+          {
+            id: "ops-export-briefs",
+            label: "Share",
+            title: "Share brief",
+            description: "Copy-ready narratives for leadership updates and stakeholder syncs.",
+            summary: "Copy or export the aligned brief after plan and finance review are complete.",
+            hashAliases: ["ops-export-briefs-panel", "ops-operator-requests", "ops-operator-requests-panel"],
+            children: (
+              <div className="space-y-6">
+                <SectionedReportPanel
+                  id="ops-export-briefs-panel"
+                  label="Share"
+                  title="Aligned brief"
+                  description="Copy-ready narratives for leadership updates and stakeholder syncs."
+                  defaultOpen={true}
+                >
+                  <ExportBriefPanel
+                    assessment={assessment}
+                    treasury={treasury}
+                    sensors={sensors}
+                    macroSeries={macroSeries}
+                    provenance={treasuryProvenance}
+                    showProvenance={false}
+                  />
+                </SectionedReportPanel>
+                <SectionedReportPanel
+                  id="ops-operator-requests-panel"
+                  label="Coordinate"
+                  title="Operator requests"
+                  description="Current asks for operators driving execution."
+                  defaultOpen={true}
+                >
+                  <OperatorRequestsPanel provenance={internalProvenance} showProvenance={false} />
+                </SectionedReportPanel>
+              </div>
+            ),
+          },
+        ]}
+      />
 
-      <OperationsWorkflowProgress />
-      <OperationsWorkstreamNav currentPath="/operations" />
-
-      <SectionedReportPanel
-        id="ops-monthly-action-summary"
-        label="Decide"
-        title="Monthly action summary"
-        description="The moves the regime recommends this month."
-      >
-        <MonthlyActionSummaryPanel
-          assessment={assessment}
-          provenance={treasuryProvenance}
-          recordDateLabel={recordDateLabel}
-          weeklyRecordDateLabel={weeklyRecordDateLabel}
-        />
-      </SectionedReportPanel>
-
-      <SectionedReportPanel
-        id="ops-playbook"
-        label="Execute"
-        title="Playbook"
-        description="Start, stop, and fence actions tuned to the current regime."
-      >
-        <div className="flex flex-wrap items-start justify-between gap-3 weather-surface px-4 py-3">
-          <p className="text-xs text-slate-300">
-            {showAllActionLanes
-              ? "Showing full action lanes for deep execution checks."
-              : "Showing top 3 items per lane for the default weekly execution scan."}
-          </p>
-          <a
-            href={buildActionsExpansionHref(resolvedSearchParams, !showAllActionLanes)}
-            className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
-          >
-            {showAllActionLanes ? "Show top 3 only" : "Show full action lanes"}
-          </a>
+      <section className="weather-panel space-y-4 px-5 py-5" aria-labelledby="ops-implementation-handoffs-title">
+        <div className="space-y-1">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Implementation handoffs</p>
+          <h2 id="ops-implementation-handoffs-title" className="text-lg font-semibold text-slate-100">Optional depth pages after the weekly plan is approved</h2>
+          <p className="text-sm text-slate-300">Use these only when the approved brief needs delivery, data, or terminal handoff.</p>
         </div>
-        <PlaybookPanel
-          playbook={playbook}
-          stopItems={stopItems}
-          startItems={startItems}
-          fenceItems={fenceItems}
-          provenance={treasuryProvenance}
-          showProvenance={false}
-          actionStripItems={actionStripItems}
-          showAllActionLanes={showAllActionLanes}
-        />
-      </SectionedReportPanel>
-
-      <SectionedReportPanel
-        id="ops-finance-strategy"
-        label="Verify"
-        title="Finance strategy"
-        description="Budget posture and cash timing guidance for the quarter."
-      >
-        <FinanceStrategyPanel
-          regime={assessment.regime}
-          provenance={treasuryProvenance}
-          showProvenance={false}
-        />
-        <RunwayPlannerPanel assessment={assessment} />
-      </SectionedReportPanel>
-
-      <SectionedReportPanel
-        id="ops-export-briefs"
-        label="Export"
-        title="Export briefs"
-        description="Copy-ready narratives for leadership updates and stakeholder syncs."
-      >
-        <ExportBriefPanel
-          assessment={assessment}
-          treasury={treasury}
-          sensors={sensors}
-          macroSeries={macroSeries}
-          provenance={treasuryProvenance}
-          showProvenance={false}
-        />
-      </SectionedReportPanel>
-
-      <SectionedReportPanel
-        id="ops-operator-requests"
-        label="Coordinate"
-        title="Operator requests"
-        description="Current asks for operators driving execution."
-      >
-        <OperatorRequestsPanel provenance={internalProvenance} showProvenance={false} />
-      </SectionedReportPanel>
+        <div className="grid gap-3 md:grid-cols-3">
+          {operationsWorkstreamLinks
+            .filter((link) => link.href !== "/operations")
+            .map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                className="weather-surface rounded-xl border px-4 py-4 text-sm text-slate-100 transition-colors hover:border-sky-400/70"
+              >
+                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">{link.label}</p>
+                <p className="mt-2 text-sm text-slate-300">{link.description}</p>
+              </a>
+            ))}
+        </div>
+      </section>
       <NextStepRail currentPath="/operations" />
     </ReportShell>
   );

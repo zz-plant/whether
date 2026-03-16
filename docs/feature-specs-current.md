@@ -10,53 +10,72 @@ Positioning summary: Whether is an operator briefing system for leadership teams
 ### 1.1 Weekly briefing (/) 
 The home report is a weekly briefing view delivered through the shared `ReportShell` layout. It
 includes status metadata (data freshness, confidence label, offline badges), fixed navigation
-links, and section anchors used across the report experience. 
+links, and section anchors used across the report experience.
 
-Content blocks on the overview page include:
-- URL-controlled view mode toggle:
-  - `?view=narrative` (default): full narrative briefing layout.
-  - `?view=evidence`: dense analytical evidence matrix with one row per core indicator.
-- Executive snapshot (summary + constraints + provenance)
-- Weekly action summary
-- Market climate summary
-- Regime change alert (when thresholds are crossed)
-- Change-since-last-read tracker
-- New alert list
-- Regime assessment card with score explanations
-- Signal matrix with sensor details and history
+The home page is now the canonical weekly workspace. The top fold keeps the `WeeklyDecisionCard`
+hero plus share/copy actions, then the page continues in a fixed operator sequence:
+- weekly call,
+- audit this call,
+- historical replay,
+- approve this week’s plan,
+- translate by role or run a tool.
 
-The evidence matrix is intentionally high-density: direct row labels replace detached legends, long-run
-median/threshold references are embedded in each sparkline, and accent color is reserved for outlier
-conditions so contributors preserve scanability under operational time pressure.
+The audit band keeps trust compact on home by showing freshness, source coverage, revisit/flip
+conditions, and the top evidence movers without forcing a route change. Historical replay uses the
+same time-machine date-picker pattern as `/signals`, but starts directly on home. The operations
+band compresses approve/hold/revisit, top guardrails, finance posture, and export entry points
+before deeper review in `/operations`. The final band surfaces direct role, situation, toolkit,
+ship-checklist, and team-context shortcuts.
+
+The optional `?view=evidence` mode still renders the high-density analytical matrix with direct row
+labels, embedded threshold context, and restrained accent usage for outlier conditions.
 
 Copy strategy for briefing and onboarding surfaces favors concise, action-first language: one headline plus one support sentence before primary actions, with deeper rationale moved into expandable or secondary sections.
 
 ### 1.2 Signals report (/signals)
-The signals report focuses on evidence and methodology, with sections for:
+The signals report is the deep evidence appendix for the weekly workspace, with sections for:
 - Sensor array (live yield curve readings + derived scores)
 - Macro signal snapshot (CPI, unemployment, BBB spreads)
+- Time Machine (historical month selector + cached summaries) visible without advanced-mode gating
 - Threshold tuning (URL-driven overrides + audit log)
-- Time Machine (historical month selector + cached summaries)
 - Regime timeline (24‑month sequence for quick jumps)
 
+Advanced controls remain available for threshold tuning and diagnostics expansion, but historical
+replay is no longer treated as an expert-only action.
+
 ### 1.3 Operations overview (/operations)
-Operations overview organizes execution guidance into workstreams and highlights monthly action
-summary data.
+Operations is the detailed execution depth page for the home workspace. The default surface is a
+four-step progressive flow:
+- weekly plan,
+- guardrails,
+- finance strategy,
+- share brief.
+
+Only one step is expanded at a time, while the other steps collapse into summary cards. Existing
+hash deep links are preserved by mapping section-level hashes into the relevant step. Integrations,
+data/API, and terminal usage remain optional implementation handoffs after the weekly plan is
+approved.
 
 ### 1.4 Operations workstreams
-- **Plan** (`/operations` and `/operations/plan`): playbook moves (start/stop/fence), finance strategy,
-  insight database prompts, and operator requests.
-- **Integrations** (`/operations/integrations`): preview weekly mandate payloads for Slack, Notion,
+- **Weekly plan** (`/operations`; legacy `/operations/plan` redirects here): the default execution
+  path with weekly plan, guardrails, finance strategy, export brief, and operator requests.
+- **Send to tools** (`/operations/integrations`): preview weekly mandate payloads for Slack, Notion,
   and Linear.
-- **Data** (`/operations/data`): API usage guidance and handoff references for operators.
+- **Data/API** (`/operations/data`): API usage guidance and handoff references for operators.
+- **Terminal** (`/operations/cli`): command-line status, history, diff, and scenario workflows.
 
 ### 1.5 Onboarding (/onboarding)
 Onboarding provides a first-time guide and a plain‑English glossary so new operators can decode
 signals and navigate the report pages.
 
-### 1.6 Formula reference (/methodology)
-The formulas page documents the sensor methodology and links directly to public data sources used
-in the report (FRED Treasury series, BLS CPI, BLS labor, FRED credit spreads, FRED VIX, and Chicago Fed NFCI).
+### 1.6 Method hub (/method) and formula reference (/methodology)
+`/method` is the canonical trust-audit hub linked from Weekly Brief. It summarizes current
+confidence, freshness, source coverage, and revisit conditions, then links out to `/sources`,
+`/confidence`, `/methodology`, and `/learn`.
+
+`/methodology` remains the lower-level formula reference documenting the sensor methodology and the
+public data sources used in the report (FRED Treasury series, BLS CPI, BLS labor, FRED credit
+spreads, FRED VIX, and Chicago Fed NFCI).
 
 ## 2) Data sourcing & provenance
 
@@ -149,8 +168,13 @@ This pilot is additive and backward-compatible: existing regime labels and thres
 ## 4) Decision support tooling
 
 ### 4.1 Decisions workstream status
-Decisions is an active first-class workflow surface in shipped navigation (`/decide`) with role and
-situation paths plus supporting tools (for example ship checklist and team-context profiling).
+Decisions is an active first-class workflow surface in shipped navigation (`/decide`) with an
+action-first top fold:
+- direct toolkit shortcuts,
+- ship checklist,
+- team-context profiling,
+- then role and situation browsing below.
+
 Decision Shield logic/components remain integrated through decision and operations surfaces.
 
 ### 4.2 Decision templates

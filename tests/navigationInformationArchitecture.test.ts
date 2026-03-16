@@ -17,7 +17,7 @@ describe("navigation information architecture", () => {
 
   it("defines passive group labels from IA as single source of truth", () => {
     assert.equal(navigationGroupLabels.core, "Now");
-    assert.equal(navigationGroupLabels.workflow, "Operate");
+    assert.equal(navigationGroupLabels.workflow, "Workflows");
     assert.equal(navigationGroupLabels.reference, "Reference");
 
     for (const layer of navigationLayers) {
@@ -32,7 +32,7 @@ describe("navigation information architecture", () => {
     assert.equal(hrefs.size, navigationLayers.length);
     assert.equal(labels.size, navigationLayers.length);
 
-    assert.equal(navigationLabelByPath["/"], "Start");
+    assert.equal(navigationLabelByPath["/"], "Weekly Brief");
     assert.equal(navigationLabelByPath["/signals"], "Signals");
     assert.equal(navigationLabelByPath["/operations"], "Operations");
     assert.equal(navigationLabelByPath["/decide"], "Decide");

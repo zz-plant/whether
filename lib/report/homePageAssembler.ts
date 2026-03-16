@@ -2,7 +2,7 @@ import {
   buildTimeMachineHref,
   getAdjacentTimeMachineRequest,
 } from "../timeMachine/timeMachineSelection";
-import { loadReportDataSafe, type ReportData } from "./reportData";
+import { loadReportDataSafe, type ReportData, type ReportDataFallback } from "./reportData";
 import { buildTrustStatus } from "./trustStatus";
 import { buildCompactFreshnessMeta } from "./reportFormatting";
 import {
@@ -25,6 +25,12 @@ import {
   buildFlipConditionsWithoutTriggerDuplication,
 } from "./canonicalDecisionCopy";
 import { homeSectionSequence } from "./homeSections";
+import {
+  decideHomeRecommendedToolkitSlugs,
+  findToolkitDefinition,
+  situationUseCaseDefinitions,
+  useCaseRoles,
+} from "../decisionDomainCatalog";
 import {
   buildBreadcrumbList,
   defaultSiteDescription,
@@ -76,6 +82,92 @@ export type HomePageDiagnosticsLane = {
   historicalTimeline: ReturnType<typeof buildHomeBriefModel>["historicalTimeline"];
 };
 
+export type HomePageWorkspaceModel = {
+  sectionLinks: { href: string; label: string }[];
+  workspaceActions: {
+    auditHref: string;
+    operationsHref: string;
+  };
+  audit: {
+    trustStatusLabel: string;
+    trustStatusDetail: string;
+    trustStatusAction: string;
+    trustStatusTone: ReturnType<typeof buildTrustStatus>["trustStatusTone"];
+    freshnessSummary: string;
+    sourceCoverageLine: string;
+    sourceRows: Array<{
+      sourceName: string;
+      modeLabel: string;
+      freshnessStatus: string;
+    }>;
+    revisitHeadline: string;
+    revisitDetail: string;
+    flipHeadline: string;
+    flipDetail: string;
+    evidenceMovers: Array<{
+      key: string;
+      title: string;
+      detail: string;
+    }>;
+  };
+  replay: {
+    initialDate: string;
+    summary: string;
+    openFullHref: string;
+    preview: Array<{
+      key: string;
+      label: string;
+      summary: string;
+    }>;
+  };
+  operations: {
+    continueHref: string;
+    approvalHeadline: string;
+    approvalDetail: string;
+    topGuardrails: Array<{
+      key: string;
+      label: string;
+      detail: string;
+    }>;
+    financeSnapshot: Array<{
+      key: string;
+      label: string;
+      actionNow: string;
+      reversalCondition: string;
+    }>;
+    exportActions: Array<{
+      href: string;
+      label: string;
+    }>;
+  };
+  translate: {
+    rolePath: {
+      href: string;
+      title: string;
+      detail: string;
+    };
+    situationPath: {
+      href: string;
+      title: string;
+      detail: string;
+    };
+    toolkitShortcuts: Array<{
+      href: string;
+      title: string;
+      detail: string;
+    }>;
+    decisionUtilities: Array<{
+      href: string;
+      title: string;
+      detail: string;
+    }>;
+    browseActions: Array<{
+      href: string;
+      label: string;
+    }>;
+  };
+};
+
 export type HomePageAssembly = {
   reportShell: {
     regime: ReportData["assessment"]["regime"];
@@ -110,6 +202,7 @@ export type HomePageAssembly = {
   weeklyDecisionCardModel: ReturnType<typeof buildWeeklyDecisionCardViewModel>;
   leadershipArtifactPayloadPromise: Promise<ArtifactPayload | null>;
   diagnosticsLanePromise: Promise<HomePageDiagnosticsLane>;
+  workspaceModelPromise: Promise<HomePageWorkspaceModel>;
   fallbackActive: boolean;
 };
 
@@ -198,6 +291,143 @@ const buildDiagnosticsLanePayload = ({
   failureModes: homeBriefModel.failureModes,
   historicalTimeline: homeBriefModel.historicalTimeline,
 });
+
+const buildHomeWorkspaceModel = ({
+  reportData,
+  diagnosticsLane,
+  weeklyDecisionCardModel,
+  trustStatusLabel,
+  trustStatusDetail,
+  trustStatusAction,
+  trustStatusTone,
+  freshnessLabel,
+  sectionLinks,
+}: {
+  reportData: ReportData | ReportDataFallback;
+  diagnosticsLane: HomePageDiagnosticsLane;
+  weeklyDecisionCardModel: ReturnType<typeof buildWeeklyDecisionCardViewModel>;
+  trustStatusLabel: string;
+  trustStatusDetail: string;
+  trustStatusAction: string;
+  trustStatusTone: ReturnType<typeof buildTrustStatus>["trustStatusTone"];
+  freshnessLabel: string;
+  sectionLinks: { href: string; label: string }[];
+}): HomePageWorkspaceModel => {
+  const actionStripItems = weeklyDecisionCardModel.decision.actionStripItems ?? [];
+  const financeSummaryItems = actionStripItems.filter((item) =>
+    item.lever === "investment-pace" || item.lever === "risk-tolerance"
+  );
+  const currentRolePath = useCaseRoles.find((role) => role.slug === "ceo") ?? useCaseRoles[0];
+  const currentSituationPath = diagnosticsLane.weeklyMovement.direction === "defensive"
+    ? (situationUseCaseDefinitions.find((entry) => entry.slug === "avoid-premature-scaling") ?? situationUseCaseDefinitions[0])
+    : (situationUseCaseDefinitions.find((entry) => entry.slug === "roadmap-focus") ?? situationUseCaseDefinitions[0]);
+  const toolkitShortcuts = decideHomeRecommendedToolkitSlugs
+    .map((slug) => findToolkitDefinition(slug))
+    .filter((toolkit): toolkit is NonNullable<typeof toolkit> => Boolean(toolkit))
+    .slice(0, 3);
+  const replayPreview = diagnosticsLane.historicalTimeline
+    .slice(-4)
+    .map((entry) => ({
+      key: `${entry.label}-${entry.recordDate ?? entry.year ?? "current"}`,
+      label: entry.month && entry.year ? `${entry.label} ${String(entry.month).padStart(2, "0")}/${entry.year}` : entry.label,
+      summary: entry.summary ?? entry.posture,
+    }));
+
+  return {
+    sectionLinks,
+    workspaceActions: {
+      auditHref: homeSectionSequence[1]?.href ?? "#audit-this-call",
+      operationsHref: homeSectionSequence[3]?.href ?? "#approve-this-weeks-plan",
+    },
+    audit: {
+      trustStatusLabel,
+      trustStatusDetail,
+      trustStatusAction,
+      trustStatusTone,
+      freshnessSummary: freshnessLabel,
+      sourceCoverageLine: `${reportData.treasuryProvenance.statusLabel} · ${reportData.macroProvenance.statusLabel}`,
+      sourceRows: reportData.sourceHealth.slice(0, 3).map((row) => ({
+        sourceName: row.sourceName,
+        modeLabel: row.mode === "live" ? "Live" : "Fallback",
+        freshnessStatus: row.freshnessStatus,
+      })),
+      revisitHeadline: diagnosticsLane.revisitDecisions
+        ? "YES — revisit this week's approvals now."
+        : "NO — hold the current weekly baseline.",
+      revisitDetail: diagnosticsLane.guardrail,
+      flipHeadline: reportData.flipThreshold,
+      flipDetail: weeklyDecisionCardModel.decision.reversalTrigger,
+      evidenceMovers: diagnosticsLane.evidenceItems.slice(0, 3).map((item) => ({
+        key: item.key,
+        title: item.title,
+        detail: item.immediateImplication,
+      })),
+    },
+    replay: {
+      initialDate: `${reportData.selectedYear}-${String(reportData.selectedMonth).padStart(2, "0")}-01`,
+      summary: reportData.historicalSelection
+        ? `Viewing ${reportData.historicalSelection.banner}. Use Weekly Brief as the source of truth before approving live commitments.`
+        : "Choose any date to swap the home workspace to the closest cached monthly snapshot.",
+      openFullHref: "/signals?advanced=1#time-machine",
+      preview: replayPreview,
+    },
+    operations: {
+      continueHref: "/operations#ops-monthly-action-summary",
+      approvalHeadline: weeklyDecisionCardModel.decision.immediateDecision,
+      approvalDetail: diagnosticsLane.revisitDecisions
+        ? "Revisit last week's approvals before you add fixed cost or sequence new bets."
+        : "Hold the current weekly baseline unless a flip condition or trust warning fires.",
+      topGuardrails: actionStripItems.slice(0, 3).map((item) => ({
+        key: item.lever,
+        label: item.label,
+        detail: item.triggerThreshold,
+      })),
+      financeSnapshot: financeSummaryItems.map((item) => ({
+        key: item.lever,
+        label: item.label,
+        actionNow: item.actionNow,
+        reversalCondition: item.reversalCondition,
+      })),
+      exportActions: [
+        { href: "/operations#ops-export-briefs", label: "Open share brief" },
+        { href: "/operations#ops-finance-strategy", label: "Open finance detail" },
+      ],
+    },
+    translate: {
+      rolePath: {
+        href: `/decide/${currentRolePath.slug}`,
+        title: currentRolePath.title,
+        detail: currentRolePath.decisions[0],
+      },
+      situationPath: {
+        href: `/decide/${currentSituationPath.slug}`,
+        title: currentSituationPath.title,
+        detail: "Fastest route to this week's next action.",
+      },
+      toolkitShortcuts: toolkitShortcuts.map((toolkit) => ({
+        href: `/toolkits/${toolkit.slug}`,
+        title: toolkit.title,
+        detail: toolkit.decisionThisSession,
+      })),
+      decisionUtilities: [
+        {
+          href: "/decide/ship-checklist",
+          title: "Whether to ship checklist",
+          detail: "Score a go / wait / kill launch decision against the current regime.",
+        },
+        {
+          href: "/decide/team-context",
+          title: "Team context profile",
+          detail: "Tailor the weekly mandate by stage, sector, and operating profile.",
+        },
+      ],
+      browseActions: [
+        { href: "/decide", label: "Browse role and situation hubs" },
+        { href: "/toolkits", label: "Browse all toolkits" },
+      ],
+    },
+  };
+};
 
 const buildLeadershipArtifactPayload = async ({
   assessment,
@@ -543,6 +773,26 @@ export const assembleHomePage = async ({
         reportDynamics,
       })
     ),
+    workspaceModelPromise: enrichedHomePageModelPromise.then(({ homeBriefModel: enrichedHomeBriefModel, weeklyDecisionCardModel: enrichedWeeklyDecisionCardModel }) => {
+      const diagnosticsLane = buildDiagnosticsLanePayload({
+        homeBriefModel: enrichedHomeBriefModel,
+        weeklyDecisionCardModel: enrichedWeeklyDecisionCardModel,
+        statusLabel,
+        reportDynamics,
+      });
+
+      return buildHomeWorkspaceModel({
+        reportData,
+        diagnosticsLane,
+        weeklyDecisionCardModel: enrichedWeeklyDecisionCardModel,
+        trustStatusLabel,
+        trustStatusDetail,
+        trustStatusAction,
+        trustStatusTone,
+        freshnessLabel: freshnessMeta.line,
+        sectionLinks,
+      });
+    }),
     reportShell: {
       regime: assessment.regime,
       statusLabel,

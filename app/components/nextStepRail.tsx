@@ -3,22 +3,22 @@ import { pathMatchesLink } from "../../lib/navigation/pathMatching";
 
 const CANONICAL_ACTIONS = [
   { label: "Weekly brief", href: "/", description: "Reset on the current posture, bounded call, and share-ready artifact." },
-  { label: "Signals", href: "/signals", description: "Inspect the drivers, thresholds, and freshness behind the call." },
-  { label: "Operations", href: "/operations", description: "Turn the posture into hiring, spend, and cadence guardrails." },
-  { label: "Decide", href: "/decide", description: "Translate the weekly call by role or operating question." },
-  { label: "Toolkits", href: "/toolkits", description: "Open a reusable instrument once the decision path is clear." },
-  { label: "Learn", href: "/learn", description: "Use concepts and failure modes only when you need deeper context." },
-  { label: "Method", href: "/method", description: "Check trust status, sources, formulas, and limitations without leaving the decision loop." },
+  { label: "Signals", href: "/signals", description: "Open the deep evidence appendix when the weekly brief needs source-level validation." },
+  { label: "Operations", href: "/operations", description: "Open detailed execution guardrails after the weekly workspace is aligned." },
+  { label: "Decide", href: "/decide", description: "Jump straight to role paths, utilities, and runnable toolkits." },
+  { label: "Toolkits", href: "/toolkits", description: "Run a reusable instrument once the decision path is already clear." },
+  { label: "Learn", href: "/learn", description: "Use concepts and failure modes only for optional background context." },
+  { label: "Method", href: "/method", description: "Audit trust, sources, and formulas without leaving the weekly loop." },
 ] as const;
 
 const recommendedActionByPath = [
   { match: "/", href: "/operations" },
-  { match: "/signals", href: "/operations" },
-  { match: "/operations", href: "/decide" },
-  { match: "/decide", href: "/toolkits" },
+  { match: "/signals", href: "/" },
+  { match: "/operations", href: "/" },
+  { match: "/decide", href: "/" },
   { match: "/toolkits", href: "/" },
-  { match: "/learn", href: "/signals" },
-  { match: "/method", href: "/signals" },
+  { match: "/learn", href: "/" },
+  { match: "/method", href: "/" },
 ] as const;
 
 export function NextStepRail({ currentPath }: { currentPath: string }) {
@@ -31,7 +31,7 @@ export function NextStepRail({ currentPath }: { currentPath: string }) {
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div className="space-y-1">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Next step</p>
-          <p className="text-sm text-slate-300">Keep moving through signals → posture → decision → artifact without losing context.</p>
+          <p className="text-sm text-slate-300">Use Weekly Brief as the canonical workspace. Open depth pages only when the decision needs more detail.</p>
         </div>
         {currentAction ? (
           <div className="weather-stat-card min-w-[14rem]">
@@ -43,7 +43,9 @@ export function NextStepRail({ currentPath }: { currentPath: string }) {
 
       <div className="weather-route-card flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div className="space-y-1">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-200">Best next move</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-200">
+            {recommendedAction.href === "/" ? "Canonical workspace" : "Best next move"}
+          </p>
           <h2 className="text-base font-semibold text-slate-100">{recommendedAction.label}</h2>
           <p className="max-w-2xl text-sm text-slate-300">{recommendedAction.description}</p>
         </div>
@@ -51,7 +53,7 @@ export function NextStepRail({ currentPath }: { currentPath: string }) {
           href={recommendedAction.href}
           className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]"
         >
-          Open {recommendedAction.label}
+          {recommendedAction.href === "/" ? "Return to Weekly Brief" : `Open ${recommendedAction.label}`}
         </Link>
       </div>
 

@@ -10,33 +10,33 @@ export type OperationsWorkstreamLink = {
 export const operationsWorkstreamLinks: OperationsWorkstreamLink[] = [
   {
     href: "/operations",
-    label: "Plan",
-    description: "Translate the regime into quarterly posture, playbook moves, and operator asks.",
+    label: "Weekly plan",
+    description: "Default: review the weekly plan before you change team pace, spend, or priorities.",
   },
   {
     href: "/operations/integrations" as Route,
-    label: "Integrations",
-    description: "Optional handoff: push approved weekly mandate payloads into Slack, Notion, and Linear.",
+    label: "Send to tools",
+    description: "Optional: push the approved brief into Slack, Notion, and Linear.",
   },
 
   {
     href: "/operations/data",
-    label: "Data",
-    description: "Optional handoff: share API guidance and data references with automation owners.",
+    label: "Data/API",
+    description: "Optional: share payloads, endpoints, and references with automation owners.",
   },
   {
     href: "/operations/cli",
-    label: "CLI",
-    description: "Run status, changes, history, and scenario checks directly from the terminal.",
+    label: "Terminal",
+    description: "Optional: inspect status, changes, history, and scenarios from the command line.",
   },
 ];
 
 export const operationsSectionLinks: { plan: ReportSectionLink[] } = {
   plan: [
-    { href: "#ops-monthly-action-summary", label: "Monthly summary" },
-    { href: "#ops-playbook", label: "Playbook" },
+    { href: "#ops-monthly-action-summary", label: "Start here" },
+    { href: "#ops-playbook", label: "Guardrails" },
     { href: "#ops-finance-strategy", label: "Finance strategy" },
-    { href: "#ops-export-briefs", label: "Export briefs" },
+    { href: "#ops-export-briefs", label: "Share brief" },
     { href: "#ops-operator-requests", label: "Operator requests" },
   ],
 };

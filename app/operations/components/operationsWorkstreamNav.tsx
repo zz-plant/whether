@@ -14,10 +14,10 @@ const navItemStyles =
   "weather-pill flex min-h-[56px] flex-col items-start gap-1.5 rounded-2xl border px-4 py-3 text-left text-xs font-semibold tracking-[0.12em] transition-colors";
 
 const workstreamIconByLabel: Record<OperationsWorkstreamLink["label"], ReactNode> = {
-  Plan: <CircleTargetIcon className="h-3.5 w-3.5" />,
-  Integrations: <SectionJumpIcon className="h-3.5 w-3.5" />,
-  Data: <LayoutGridIcon className="h-3.5 w-3.5" />,
-  CLI: <BoltIcon className="h-3.5 w-3.5" />,
+  "Weekly plan": <CircleTargetIcon className="h-3.5 w-3.5" />,
+  "Send to tools": <SectionJumpIcon className="h-3.5 w-3.5" />,
+  "Data/API": <LayoutGridIcon className="h-3.5 w-3.5" />,
+  Terminal: <BoltIcon className="h-3.5 w-3.5" />,
 };
 
 const getItemClasses = (link: OperationsWorkstreamLink, currentPath: Route) =>
@@ -32,9 +32,9 @@ export const OperationsWorkstreamNav = ({ currentPath }: { currentPath: Route })
   return (
     <nav aria-label="Operations workstreams" className="weather-panel px-4 py-4">
       <div className="flex flex-col gap-1">
-        <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Workstreams</p>
+        <p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Other handoffs</p>
         <p className="text-sm text-slate-300">
-          Use Plan as the default weekly workflow; open Integrations/Data when you need implementation handoff.
+          Most teams start with Weekly plan. Open the other cards only when you need delivery, data, or terminal handoff.
         </p>
       </div>
       <ul className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -42,6 +42,7 @@ export const OperationsWorkstreamNav = ({ currentPath }: { currentPath: Route })
           const isActive = link.href === currentPath;
           const labelTone = isActive ? "text-sky-200" : "text-slate-400";
           const descriptionTone = isActive ? "text-sky-100" : "text-slate-100";
+          const statusLabel = isActive ? "Default" : "Optional";
           const href = currentSearch ? `${link.href}?${currentSearch}` : link.href;
           return (
             <li key={link.href}>
@@ -50,10 +51,15 @@ export const OperationsWorkstreamNav = ({ currentPath }: { currentPath: Route })
                 aria-current={isActive ? "page" : undefined}
                 className={getItemClasses(link, currentPath)}
               >
-                <div className="flex w-full flex-wrap items-center gap-2">
-                  <span className="text-slate-300" aria-hidden="true">{workstreamIconByLabel[link.label]}</span>
-                  <span className={`text-[11px] uppercase tracking-[0.22em] ${labelTone}`}>
-                    {link.label}
+                <div className="flex w-full flex-wrap items-center justify-between gap-2">
+                  <span className="inline-flex items-center gap-2">
+                    <span className="text-slate-300" aria-hidden="true">{workstreamIconByLabel[link.label]}</span>
+                    <span className={`text-[11px] uppercase tracking-[0.22em] ${labelTone}`}>
+                      {link.label}
+                    </span>
+                  </span>
+                  <span className="rounded-full border border-slate-700/70 px-2 py-1 text-[10px] uppercase tracking-[0.16em] text-slate-300">
+                    {statusLabel}
                   </span>
                 </div>
                 <span className={`text-sm font-semibold tracking-[0.08em] ${descriptionTone}`}>

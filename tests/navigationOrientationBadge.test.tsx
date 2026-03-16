@@ -10,16 +10,16 @@ describe("NavigationOrientationBadge", () => {
     );
 
     assert.match(html, /href="\/"[^>]*aria-label="Now section"/);
-    assert.match(html, /href="\/signals"[^>]*aria-label="Operate section"/);
-    assert.match(html, /href="\/learn"[^>]*aria-label="Reference section"/);
-    assert.match(html, /title="Decision call and bounded actions for this week"/);
+    assert.match(html, /href="\/signals"[^>]*aria-label="Workflow section"/);
+    assert.match(html, /href="\/method"[^>]*aria-label="Reference section"/);
+    assert.match(html, /title="Weekly call and bounded actions for this week"/);
   });
 
-  it("marks the active zone", () => {
+  it("applies the active zone styling", () => {
     const html = renderToStaticMarkup(
       <NavigationOrientationBadge currentPath="/method" />,
     );
 
-    assert.match(html, /href="\/learn"[^>]*aria-current="true"/);
+    assert.match(html, /href="\/method"[^>]*border-violet-300\/30 bg-violet-400\/10 text-violet-100/);
   });
 });
