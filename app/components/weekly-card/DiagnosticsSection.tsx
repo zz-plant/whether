@@ -27,11 +27,13 @@ export function DiagnosticsSection({
   transitionProbabilities,
   failureModes,
   historicalTimeline,
+  sinceLastReview,
   decisionMatrix,
   decisionRules,
   renderBoundedRulesMatrix,
 }: DiagnosticsSectionProps) {
-  const firstDelta = weeklyMemoLines.find((line) => line.trim().length > 0) ?? immediateDecision;
+  const changedItems = sinceLastReview?.items ?? [];
+  const firstDelta = changedItems[0]?.detail ?? weeklyMemoLines.find((line) => line.trim().length > 0) ?? immediateDecision;
   const flipDirection = regimeDistance.thresholdDirection === "riseAbove" ? "rises above" : "falls to or below";
   const flipDistance = Math.max(0, Math.round(regimeDistance.pointsToFlip));
   const topContributors = (reportDynamics.signalContributions ?? []).slice(0, 2).map((item) => `${item.label} (${item.normalizedPercentLabel})`).join(" · ") || "No active contributors this week.";
@@ -49,6 +51,16 @@ export function DiagnosticsSection({
                 <li className={tierTwoInset}><p className={`text-xs ${neutralLabel}`}>Revisit</p><p className="mt-1 text-xs text-slate-200">{revisitDecisions ? `YES — ${guardrail}` : "NO — Hold last week’s operating posture."}</p></li>
                 <li className={tierTwoInset}><p className={`text-xs ${neutralLabel}`}>Flip</p><p className="mt-1 text-xs text-slate-200">{regimeDistance.dimensionLabel} {flipDirection} {regimeDistance.thresholdValue.toFixed(1)} ({flipDistance} pts away).</p></li>
               </ul>
+              {changedItems.length > 1 ? (
+                <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                  {changedItems.slice(1, 3).map((item) => (
+                    <article key={item.id} className={tierTwoInset}>
+                      <p className={`text-xs ${neutralLabel}`}>{item.label}</p>
+                      <p className="mt-1 text-xs text-slate-200">{item.detail}</p>
+                    </article>
+                  ))}
+                </div>
+              ) : null}
             </Accordion.Panel>
           </Accordion.Item>
           <Accordion.Item value="decision-matrix" className="group">

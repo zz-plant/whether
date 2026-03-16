@@ -26,6 +26,11 @@ export type DecisionHeroSectionProps = {
   trendLabel: WeeklyDecisionCardViewModel["status"]["trendLabel"];
   transitionWatch: WeeklyDecisionCardViewModel["status"]["transitionWatch"];
   regimeDistance: WeeklyDecisionCardViewModel["diagnostics"]["regimeDistance"];
+  fetchedAtLabel?: string;
+  freshnessLine?: string;
+  weeklyMovement?: WeeklyDecisionCardViewModel["decision"]["weeklyMovement"];
+  regimeSignalIndicators?: WeeklyDecisionCardViewModel["diagnostics"]["regimeSignalIndicators"];
+  sinceLastReview?: WeeklyDecisionCardViewModel["sinceLastReview"];
 };
 
 export type ActionStripSectionProps = { items: ActionStripItem[] };
@@ -55,5 +60,6 @@ export type DiagnosticsSectionProps = {
   transitionProbabilities: Record<ForecastRegimeLabel, number>;
   failureModes: FailureModeWarningItem[];
   historicalTimeline: WeeklyDecisionCardViewModel["history"]["historicalTimeline"];
+  sinceLastReview?: WeeklyDecisionCardViewModel["sinceLastReview"];
   renderBoundedRulesMatrix: (props: { decisionMatrix?: DecisionMatrixPayload; decisionRules: BoundedDecisionRule[] }) => ReactNode;
 };

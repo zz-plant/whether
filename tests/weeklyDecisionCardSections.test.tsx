@@ -49,6 +49,14 @@ describe("WeeklyDecisionCard extracted sections", () => {
         needsTrustWarning={true}
         trustWarningCopy="Use this call for near-term pacing only until confidence returns to HIGH with fresh data."
         failureModes={[{ id: "boundary-whipsaw", warning: "Boundary whipsaw risk", mitigationCheck: "Mitigation check" }]}
+        sinceLastReview={{
+          isReturningUser: true,
+          hasMeaningfulDelta: true,
+          fallbackCopy: "",
+          items: [
+            { id: "top-driver", label: "Top driver change", detail: "Capital tightness tightened. Slow approvals and preserve runway.", href: "/signals" },
+          ],
+        }}
         regimeDistance={{
           dimensionLabel: "Tightness",
           currentValue: 64,
@@ -70,6 +78,8 @@ describe("WeeklyDecisionCard extracted sections", () => {
     assert.match(html, /Do now:/);
     assert.match(html, /Regime/);
     assert.match(html, /Next flip:/);
+    assert.match(html, /Data through Mar 6, 2026/);
+    assert.match(html, /Top driver change/);
     assert.match(html, /Leadership call/);
     assert.match(html, /Confidence/);
     assert.match(html, /Primary risk/);
@@ -122,6 +132,14 @@ describe("WeeklyDecisionCard extracted sections", () => {
         needsTrustWarning={false}
         trustWarningCopy=""
         failureModes={[]}
+        sinceLastReview={{
+          isReturningUser: true,
+          hasMeaningfulDelta: true,
+          fallbackCopy: "",
+          items: [
+            { id: "top-driver", label: "Top driver change", detail: "Risk appetite improved. Recheck reversible approvals.", href: "/signals" },
+          ],
+        }}
         regimeDistance={{
           dimensionLabel: "Tightness",
           dimensionKey: "tightness",
@@ -141,6 +159,7 @@ describe("WeeklyDecisionCard extracted sections", () => {
 
     assert.match(html, /Regime/);
     assert.match(html, /Next flip: Tightness rises above 70\.0\./);
+    assert.match(html, /Data through Mar 6, 2026/);
   });
 
   it("renders compact flip-condition distance", () => {
@@ -182,6 +201,14 @@ describe("WeeklyDecisionCard extracted sections", () => {
         needsTrustWarning={false}
         trustWarningCopy=""
         failureModes={[]}
+        sinceLastReview={{
+          isReturningUser: true,
+          hasMeaningfulDelta: true,
+          fallbackCopy: "",
+          items: [
+            { id: "top-driver", label: "Top driver change", detail: "Risk appetite neared the flip band.", href: "/signals" },
+          ],
+        }}
         regimeDistance={{
           dimensionLabel: "Risk appetite",
           dimensionKey: "riskAppetite",
