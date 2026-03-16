@@ -1066,26 +1066,6 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
         regimeDistance={regimeDistance}
       />
 
-      <DecisionCallHeader
-        statusLabel={statusLabel}
-        postureLabel={postureLabel}
-        stageLabel={stageLabel}
-        postureWithStageLabel={postureWithStageLabel}
-        immediateDecision={immediateDecision}
-        operatingStanceLine={operatingStanceLine}
-        confidencePercent={confidencePercent}
-        confidenceLabel={confidenceLabel}
-        trendLabel={trendLabel}
-        transitionWatch={transitionWatch}
-        regimeDistance={regimeDistance}
-        netConstraintSummary={netConstraintSummary}
-        regimeSignalIndicators={regimeSignalIndicators}
-        fetchedAtLabel={fetchedAtLabel}
-        freshnessLine={freshnessLine}
-        weeklyMovement={weeklyMovement}
-        sinceLastReview={sinceLastReview}
-      />
-
       <div className="grid gap-3 xl:grid-cols-12">
         <main className="space-y-3 xl:col-span-8">
           <WeeklyCallModePanel
