@@ -286,9 +286,7 @@ export const assembleHomePage = async ({
   const previousHistoricalHref = previousHistoricalSelection
     ? buildTimeMachineHref("/", previousHistoricalSelection)
     : undefined;
-  const historicalTimeMachineHref = historicalSelection
-    ? buildTimeMachineHref("/signals?advanced=1#time-machine", historicalSelection)
-    : "/signals?advanced=1#time-machine";
+  const historicalTimeMachineHref = "/signals?advanced=1#time-machine";
   const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
 
   const {

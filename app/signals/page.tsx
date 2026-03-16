@@ -148,9 +148,7 @@ export default async function SignalsPage({
   const previousHistoricalHref = previousHistoricalSelection
     ? buildTimeMachineHref("/signals", previousHistoricalSelection)
     : undefined;
-  const historicalTimeMachineHref = historicalSelection
-    ? buildTimeMachineHref("/signals?advanced=1#time-machine", historicalSelection)
-    : "/signals?advanced=1#time-machine";
+  const historicalTimeMachineHref = "/signals?advanced=1#time-machine";
   const showAdvanced = resolvedSearchParams?.advanced === "1";
   const showFullDiagnostics = resolvedSearchParams?.diagnostics === "all";
   const [summaryArchive, signalDiagnostics, advancedPanels] = await Promise.all([
