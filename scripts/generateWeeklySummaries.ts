@@ -71,6 +71,9 @@ type WeekDescriptor = {
   asOf: string;
 };
 
+const MS_PER_DAY = 86400000;
+const MAX_WEEKLY_DATA_LAG_DAYS = 7;
+
 const parseSeries = (csv: string) => {
   const lines = csv.trim().split("\n");
   const points: SeriesPoint[] = [];
@@ -147,9 +150,13 @@ const assertCoverageForAsOf = (
 
   for (const series of requiredCoverage) {
     const latest = getLatestValidDate(datasets[series.key].points);
-    if (!latest || latest.time < asOfTime) {
+    if (
+      !latest ||
+      (latest.time < asOfTime &&
+        asOfTime - latest.time >= MAX_WEEKLY_DATA_LAG_DAYS * MS_PER_DAY)
+    ) {
       throw new Error(
-        `FRED coverage for ${series.label} ends on ${latest?.date ?? "unknown"}, which is before ${asOf}.`
+        `FRED coverage for ${series.label} does not include the week ending ${asOf}; latest value is ${latest?.date ?? "unknown"}.`
       );
     }
   }
@@ -159,9 +166,13 @@ const assertCoverageForAsOf = (
     .filter((point): point is SeriesPoint => Boolean(point))
     .sort((a, b) => b.time - a.time)[0];
 
-  if (!fallbackLatest || fallbackLatest.time < asOfTime) {
+  if (
+    !fallbackLatest ||
+    (fallbackLatest.time < asOfTime &&
+      asOfTime - fallbackLatest.time >= MAX_WEEKLY_DATA_LAG_DAYS * MS_PER_DAY)
+  ) {
     throw new Error(
-      `FRED coverage for DGS1MO/DGS3MO ends on ${fallbackLatest?.date ?? "unknown"}, which is before ${asOf}.`
+      `FRED coverage for DGS1MO/DGS3MO does not include the week ending ${asOf}; latest value is ${fallbackLatest?.date ?? "unknown"}.`
     );
   }
 };
@@ -230,6 +241,17 @@ const getNextFriday = (date: Date) => {
   return addDays(date, daysToFriday);
 };
 
+const getPreviousFriday = (date: Date) => {
+  const day = date.getUTCDay();
+  const daysSinceFriday = (day - 5 + 7) % 7;
+  return addDays(date, -daysSinceFriday);
+};
+
+const getLatestCompletedWeekEnd = (latestDataDate: Date, now: Date) => {
+  const candidate = getNextFriday(latestDataDate);
+  return candidate.getTime() <= now.getTime() ? candidate : getPreviousFriday(latestDataDate);
+};
+
 const buildWeekDescriptors = (
   startYear: number,
   endYear: number,
@@ -292,6 +314,7 @@ const generateWeeklySummaries = async () => {
   const effectiveEndTime = Math.min(latestRequired, latestFallback);
   const effectiveEndDate = new Date(effectiveEndTime);
   const effectiveEndYear = effectiveEndDate.getUTCFullYear();
+  const latestCompletedWeekEnd = getLatestCompletedWeekEnd(effectiveEndDate, now);
 
   const { startYear, endYear, isPartial } = resolveYearRange({
     defaultStartYear: START_YEAR,
@@ -301,7 +324,7 @@ const generateWeeklySummaries = async () => {
   });
   const endDateOverride =
     endYear === effectiveEndYear
-      ? effectiveEndDate
+      ? latestCompletedWeekEnd
       : new Date(Date.UTC(endYear, 11, 31));
   const weeks = buildWeekDescriptors(startYear, endYear, endDateOverride);
 

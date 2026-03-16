@@ -21,12 +21,26 @@ export function DecisionHeroSection(props: DecisionHeroSectionProps) {
     confidencePercent,
     trendLabel,
     transitionWatch,
+    fetchedAtLabel,
+    freshnessLine,
+    weeklyMovement,
+    sinceLastReview,
   } = props as DecisionHeroSectionProps & {
     netConstraintSummary?: string;
-    regimeSignalIndicators?: Array<{ key: string; trendArrow?: string; label?: string; valueLabel?: string; isFallback?: boolean }>;
+    regimeSignalIndicators?: Array<{ key: string; trendArrow?: string; trendDeltaLabel?: string; label?: string; valueLabel?: string; isFallback?: boolean }>;
   };
 
   const keySignals = regimeSignalIndicators.filter((indicator) => indicator.label && indicator.valueLabel).slice(0, 3);
+  const topDeltaItems = sinceLastReview?.items.slice(0, 2) ?? [];
+  const hasMeaningfulDelta = Boolean(sinceLastReview?.hasMeaningfulDelta && topDeltaItems.length > 0);
+  const freshnessLabel = freshnessLine?.trim() || (fetchedAtLabel ? `Updated ${fetchedAtLabel}` : "Update time unavailable");
+  const weeklyMovementLabel = weeklyMovement
+    ? weeklyMovement.direction === "defensive"
+      ? "Pressure up"
+      : weeklyMovement.direction === "expansionary"
+        ? "Pressure eased"
+        : "Pressure flat"
+    : "Pressure unchanged";
 
   return (
     <header className="space-y-4 border-b border-slate-700/80 pb-6" data-testid="weekly-top-fold">
@@ -37,6 +51,15 @@ export function DecisionHeroSection(props: DecisionHeroSectionProps) {
             <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-slate-200">{resolvedPostureLabel} - {resolvedStageLabel}</span>
             <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-slate-200">Confidence {confidenceLabel} / {confidencePercent}%</span>
             <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-slate-200">Trend {trendLabel}</span>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-300">
+            <span className="rounded-full border border-emerald-400/25 bg-emerald-400/10 px-2.5 py-1 text-emerald-100">{freshnessLabel}</span>
+            {fetchedAtLabel ? (
+              <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-slate-200">
+                Data through {fetchedAtLabel}
+              </span>
+            ) : null}
+            <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-slate-200">{weeklyMovementLabel}</span>
           </div>
           <div className="space-y-2">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Operating stance</p>
@@ -77,12 +100,34 @@ export function DecisionHeroSection(props: DecisionHeroSectionProps) {
             </dl>
           </section>
           <section className="rounded-xl border border-slate-800/65 bg-slate-950/62 px-4 py-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">What changed this week</p>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">What changed this week</p>
+              {weeklyMovement ? (
+                <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-200">
+                  {weeklyMovement.summary}
+                </span>
+              ) : null}
+            </div>
+            {hasMeaningfulDelta ? (
+              <div className="mt-3 grid gap-2">
+                {topDeltaItems.map((item) => (
+                  <article key={item.id} className="rounded-lg border border-slate-800/60 bg-slate-950/55 px-3 py-2">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-slate-400">{item.label}</p>
+                    <p className="mt-1 text-sm text-slate-100">{item.detail}</p>
+                  </article>
+                ))}
+              </div>
+            ) : null}
             {keySignals.length > 0 ? (
               <ul className="mt-3 space-y-2 text-sm text-slate-200">
                 {keySignals.map((indicator) => (
                   <li key={indicator.key} className="flex items-start justify-between gap-3 rounded-lg border border-slate-800/60 bg-slate-950/55 px-3 py-2">
-                    <span className="text-slate-300">{indicator.label}</span>
+                    <div>
+                      <p className="text-slate-300">{indicator.label}</p>
+                      <p className="mt-1 text-[11px] text-slate-400">
+                        {indicator.isFallback ? "No fresh weekly delta yet." : indicator.trendDeltaLabel ?? "Weekly delta unavailable."}
+                      </p>
+                    </div>
                     <span className="text-right font-semibold text-slate-100">
                       {indicator.valueLabel} {!indicator.isFallback ? indicator.trendArrow ?? "" : ""}
                     </span>
@@ -90,7 +135,9 @@ export function DecisionHeroSection(props: DecisionHeroSectionProps) {
                 ))}
               </ul>
             ) : (
-              <p className="mt-3 text-sm text-slate-300">No fresh signal delta available yet. Hold the existing planning baseline.</p>
+              <p className="mt-3 text-sm text-slate-300">
+                {hasMeaningfulDelta ? "Signal-level detail is still loading. Use the delta cards above as the source of truth for this week’s changes." : "No fresh signal delta available yet. Hold the existing planning baseline."}
+              </p>
             )}
           </section>
         </div>

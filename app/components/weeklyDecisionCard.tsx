@@ -906,6 +906,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     failureModes = [],
   } = diagnostics;
   const { memoryRail, historicalTimeline, historicalAnalogs, macroOverlay } = history;
+  const sinceLastReview = model.sinceLastReview;
   const { citation, recordDateLabel, fetchedAtLabel, freshnessLine } = artifact;
   const freshnessMeta = buildCompactFreshnessMeta({
     updatedAtLabel: fetchedAtLabel,
@@ -1065,6 +1066,26 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
         regimeDistance={regimeDistance}
       />
 
+      <DecisionCallHeader
+        statusLabel={statusLabel}
+        postureLabel={postureLabel}
+        stageLabel={stageLabel}
+        postureWithStageLabel={postureWithStageLabel}
+        immediateDecision={immediateDecision}
+        operatingStanceLine={operatingStanceLine}
+        confidencePercent={confidencePercent}
+        confidenceLabel={confidenceLabel}
+        trendLabel={trendLabel}
+        transitionWatch={transitionWatch}
+        regimeDistance={regimeDistance}
+        netConstraintSummary={netConstraintSummary}
+        regimeSignalIndicators={regimeSignalIndicators}
+        fetchedAtLabel={fetchedAtLabel}
+        freshnessLine={freshnessLine}
+        weeklyMovement={weeklyMovement}
+        sinceLastReview={sinceLastReview}
+      />
+
       <div className="grid gap-3 xl:grid-cols-12">
         <main className="space-y-3 xl:col-span-8">
           <WeeklyCallModePanel
@@ -1106,6 +1127,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
               transitionProbabilities={transitionProbabilities}
               failureModes={failureModes}
               historicalTimeline={historicalTimeline}
+              sinceLastReview={sinceLastReview}
               renderBoundedRulesMatrix={({ decisionMatrix: matrix, decisionRules: rules }) => <BoundedRulesMatrix decisionMatrix={matrix} decisionRules={rules} />}
             />
           )}
