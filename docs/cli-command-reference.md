@@ -183,7 +183,7 @@ Notes:
 
 ## Smoke command contract
 
-Use these three commands as the minimal smoke surface for operators and agents:
+Use these four commands as the minimal smoke surface for operators and agents:
 
 - `whether --version`
   - Exit: `0`

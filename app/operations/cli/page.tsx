@@ -98,7 +98,7 @@ export default function OperationsCliPage() {
             context in under a minute.
           </p>
 
-          <div className="mt-5 grid gap-2 sm:grid-cols-3">
+          <div className="mt-5 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
             {workflowSteps.map((step) => (
               <div key={step.label} className="rounded-xl border border-sky-500/25 bg-slate-950/60 px-3 py-3">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-sky-200">{step.label}</p>
@@ -132,7 +132,8 @@ export default function OperationsCliPage() {
             <p className="mt-2 text-sm text-slate-300">
               Canonical workflow: <code>status</code> for current operating call, <code>call</code>{" "}
               for recommendation delta, <code>changes</code> for this-week movement, <code>history</code>{" "}
-              for retrospectives, and <code>scenario</code> for bounded what-if checks.
+              for retrospectives, <code>scenario</code> for bounded what-if checks, and <code>agent</code>{" "}
+              when another system needs the canonical handoff payload.
             </p>
           </div>
 
@@ -178,8 +179,8 @@ export default function OperationsCliPage() {
         <section className="weather-panel-static space-y-4 px-6 py-6">
           <h2 className="text-xl font-semibold text-slate-50">API contract references</h2>
           <p className="text-sm text-slate-300">
-            These command surfaces map to versioned v1 CLI endpoints under <code>app/api/cli/*</code>.
-            Keep automation pinned to these routes to avoid semantic drift.
+            These command surfaces map to versioned v1 HTTP endpoints under <code>app/api/cli/*</code> and{" "}
+            <code>app/api/agent</code>. Keep automation pinned to these routes to avoid semantic drift.
           </p>
           <ul className="grid gap-2 text-sm text-slate-200 sm:grid-cols-2">
             {apiEndpoints.map((endpoint) => (
