@@ -8,8 +8,8 @@ import { NextStepRail } from "../components/nextStepRail";
 
 export const runtime = "edge";
 export const metadata: Metadata = buildPageMetadata({
-  title: "Toolkits — runnable instruments",
-  description: "Use practical toolkits with checklists, templates, and misuse warnings.",
+  title: "Toolkits — supporting instruments for Decide",
+  description: "Supporting instrument library for Decide with practical toolkits, checklists, templates, and misuse warnings.",
   path: "/toolkits",
   imageAlt: "Whether toolkits",
 });
@@ -44,10 +44,14 @@ export default async function ToolkitsPage({
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }} />
       <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Toolkits" }]} />
       <section className="weather-panel space-y-4 px-6 py-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Supporting surface under Decide</p>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Toolkits</h1>
         <p className="text-base text-slate-200">
-          Run one toolkit end-to-end for your current decision. Search by toolkit name or intent to find the right instrument faster.
+          Run one toolkit end-to-end once the decision path is clear. Start in Decide when you need role or situation framing, then use this library to execute the instrument itself.
         </p>
+        <div className="flex flex-wrap gap-3">
+          <Link href="/decide" className="weather-button inline-flex items-center justify-center">Open Decide</Link>
+        </div>
         <form action="/toolkits" className="flex flex-col gap-3 sm:flex-row">
           <input
             type="search"

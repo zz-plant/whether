@@ -10,6 +10,8 @@ import {
 } from "../../lib/decisionDomainCatalog";
 import { BreadcrumbTrail } from "../components/breadcrumbTrail";
 import { NextStepRail } from "../components/nextStepRail";
+import { PageFlowNav } from "../components/pageFlowNav";
+import { decideScrollPlan } from "../../lib/navigation/scrollPlans";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Decide — role and situation paths",
@@ -54,7 +56,14 @@ export default function DecidePage() {
         </div>
       </section>
 
-      <section className="weather-panel space-y-4 px-5 py-5 sm:px-6 sm:py-6">
+      <PageFlowNav
+        eyebrow={decideScrollPlan.eyebrow}
+        title={decideScrollPlan.title}
+        description={decideScrollPlan.description}
+        items={decideScrollPlan.items}
+      />
+
+      <section id="run-this-now" className="weather-panel scroll-mt-28 space-y-4 px-5 py-5 sm:px-6 sm:py-6">
         <h2 className="text-lg font-semibold text-slate-100">Run this now</h2>
         <p className="text-sm text-slate-300">Direct toolkit shortcuts for the most common weekly decision jobs.</p>
         <div className="weather-page-grid-3">
@@ -72,7 +81,7 @@ export default function DecidePage() {
         </div>
       </section>
 
-      <section className="weather-panel space-y-4 px-5 py-5 sm:px-6 sm:py-6">
+      <section id="decision-utilities" className="weather-panel scroll-mt-28 space-y-4 px-5 py-5 sm:px-6 sm:py-6">
         <h2 className="text-lg font-semibold text-slate-100">Decision utilities</h2>
         <p className="text-sm text-slate-300">Use these only when the weekly call needs additional validation or personalization.</p>
         <div className="weather-page-grid-2">
@@ -87,7 +96,7 @@ export default function DecidePage() {
         </div>
       </section>
 
-      <section className="weather-panel space-y-4 px-5 py-5 sm:px-6 sm:py-6">
+      <section id="explore-by-role" className="weather-panel scroll-mt-28 space-y-4 px-5 py-5 sm:px-6 sm:py-6">
         <h2 className="text-lg font-semibold text-slate-100">Explore by role</h2>
         <div className="weather-page-grid-3">
           {useCaseRoles.map((role) => (
@@ -96,7 +105,7 @@ export default function DecidePage() {
         </div>
       </section>
 
-      <section className="weather-panel space-y-4 px-5 py-5 sm:px-6 sm:py-6">
+      <section id="explore-by-situation" className="weather-panel scroll-mt-28 space-y-4 px-5 py-5 sm:px-6 sm:py-6">
         <h2 className="text-lg font-semibold text-slate-100">Explore by situation</h2>
         <div className="weather-page-grid-2">
           {situationUseCaseDefinitions.map((situation) => (

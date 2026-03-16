@@ -1,0 +1,113 @@
+- generic [active] [ref=e1]:
+  - link "Skip to content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - link "Whether" [ref=e7] [cursor=pointer]:
+            - /url: /
+          - paragraph [ref=e8]: Operating posture navigation
+        - generic [ref=e9]:
+          - link "Open global search" [ref=e10] [cursor=pointer]:
+            - /url: /search
+            - text: Search
+          - button "Switch to light mode" [ref=e11] [cursor=pointer]: Light
+      - navigation "Global navigation" [ref=e12]:
+        - list [ref=e14]:
+          - listitem [ref=e15]:
+            - link "Now Weekly Brief Current posture, bounded call, and share-ready artifact." [ref=e16] [cursor=pointer]:
+              - /url: /
+              - generic [ref=e17]: Now
+              - generic [ref=e18]: Weekly Brief
+              - generic [ref=e19]: Current posture, bounded call, and share-ready artifact.
+          - listitem [ref=e20]:
+            - link "Workflows Signals Deep evidence appendix for drivers, thresholds, and freshness behind the weekly brief." [ref=e21] [cursor=pointer]:
+              - /url: /signals
+              - generic [ref=e22]: Workflows
+              - generic [ref=e23]: Signals
+              - generic [ref=e24]: Deep evidence appendix for drivers, thresholds, and freshness behind the weekly brief.
+          - listitem [ref=e25]:
+            - link "Workflows Operations Detailed execution guardrails once the weekly plan needs deeper review." [ref=e26] [cursor=pointer]:
+              - /url: /operations
+              - generic [ref=e27]: Workflows
+              - generic [ref=e28]: Operations
+              - generic [ref=e29]: Detailed execution guardrails once the weekly plan needs deeper review.
+          - listitem [ref=e30]:
+            - link "Workflows Decide Direct role, situation, and toolkit shortcuts after the weekly call is set." [ref=e31] [cursor=pointer]:
+              - /url: /decide
+              - generic [ref=e32]: Workflows
+              - generic [ref=e33]: Decide
+              - generic [ref=e34]: Direct role, situation, and toolkit shortcuts after the weekly call is set.
+          - listitem [ref=e35]:
+            - link "Workflows Toolkits Run templates after the weekly call and guardrails are set." [ref=e36] [cursor=pointer]:
+              - /url: /toolkits
+              - generic [ref=e37]: Workflows
+              - generic [ref=e38]: Toolkits
+              - generic [ref=e39]: Run templates after the weekly call and guardrails are set.
+          - listitem [ref=e40]:
+            - link "Reference Learn Background concepts and failure modes for optional operator education." [ref=e41] [cursor=pointer]:
+              - /url: /learn
+              - generic [ref=e42]: Reference
+              - generic [ref=e43]: Learn
+              - generic [ref=e44]: Background concepts and failure modes for optional operator education.
+          - listitem [ref=e45]:
+            - link "Reference Method Audit trust, sources, formulas, and confidence without leaving the weekly loop." [ref=e46] [cursor=pointer]:
+              - /url: /method
+              - generic [ref=e47]: Reference
+              - generic [ref=e48]: Method
+              - generic [ref=e49]: Audit trust, sources, formulas, and confidence without leaving the weekly loop.
+  - region "Loading weekly operating posture" [ref=e50]:
+    - generic [ref=e51]:
+      - generic [ref=e52]:
+        - generic [ref=e53]:
+          - generic [ref=e54]:
+            - generic [ref=e55]: Weekly operating call
+            - generic [ref=e56]: Current weekly brief
+          - paragraph [ref=e57]: Opening this week’s brief
+          - paragraph [ref=e58]: "The shared card opens directly into the same one-screen brief: action, why it matters, and flip condition first."
+        - generic [ref=e59]:
+          - paragraph [ref=e60]: Shared-card continuity
+          - paragraph [ref=e62]: Headline, change summary, and flip cue land before deeper support.
+      - list [ref=e63]:
+        - listitem [ref=e64]:
+          - text: 1. Load action
+          - generic [ref=e65]: Decision headline and posture artifact arrive first.
+        - listitem [ref=e66]:
+          - text: 2. Fill support
+          - generic [ref=e67]: Change summary, trust strip, and share actions stream next.
+        - listitem [ref=e68]:
+          - text: 3. Open full brief
+          - generic [ref=e69]: Diagnostics and operating lanes attach under the same top fold.
+      - article [ref=e70]:
+        - generic [ref=e71]:
+          - generic [ref=e72]:
+            - generic [ref=e73]: Weekly operating call
+            - generic [ref=e74]: Current weekly brief
+          - generic [ref=e87]:
+            - generic [ref=e88]:
+              - article [ref=e89]:
+                - paragraph [ref=e90]: What changed
+              - article [ref=e96]:
+                - paragraph [ref=e97]: Do now
+              - article [ref=e103]:
+                - paragraph [ref=e104]: Flip when
+              - article [ref=e110]:
+                - paragraph [ref=e111]: Operating stance
+            - paragraph [ref=e119]: Snapshot and trust
+    - region "Checking live evidence stream" [ref=e136]:
+      - generic [ref=e137]:
+        - generic [ref=e138]:
+          - paragraph [ref=e139]: Decision support follows automatically
+          - paragraph [ref=e140]: Once the call is locked, we stream the evidence lane, bounded rule matrix, and share packaging.
+        - generic [ref=e141]: Streaming next
+      - generic [ref=e142]:
+        - article [ref=e143]:
+          - paragraph [ref=e144]: Diagnostics lane
+        - article [ref=e152]:
+          - paragraph [ref=e153]: Share artifact
+        - article [ref=e161]:
+          - paragraph [ref=e162]: Trust strip
+  - button "Open Next.js Dev Tools" [ref=e175] [cursor=pointer]:
+    - img [ref=e176]
+  - alert [ref=e179]

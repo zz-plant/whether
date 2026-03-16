@@ -642,7 +642,7 @@ export const FirstTimeGuidePanel = ({
 
 export const BeginnerGlossaryPanel = () => {
   return (
-    <section id="beginner-glossary" aria-labelledby="beginner-glossary-title" className="mt-10">
+    <section id="beginner-glossary" aria-labelledby="beginner-glossary-title" className="mt-10 scroll-mt-28">
       <div className="weather-panel weather-panel-static p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>

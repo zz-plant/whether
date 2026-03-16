@@ -8,7 +8,7 @@ import { getRegimeDisplayLabel } from "../../lib/regimePresentation";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Posture guides — routed from Weekly Brief",
-  description: "Use Start Here for posture selection in the weekly flow; this page is a reference index for posture guide detail pages.",
+  description: "Use the Weekly Brief for the live posture call; this page is a reference index for posture detail pages.",
   path: "/posture",
   imageAlt: "Whether posture",
   imagePath: "/social/posture.svg",
@@ -28,11 +28,10 @@ export default async function PosturePage() {
     <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
       <section className="weather-panel space-y-3 px-6 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Posture guides</h1>
-        <p className="text-sm text-slate-300">For weekly posture selection, start from Weekly Brief and route through Start Here. Use this page when you need direct access to posture detail pages.</p>
+        <p className="text-sm text-slate-300">For weekly posture selection, start from Weekly Brief. Use this page when you need direct access to posture detail pages.</p>
         <p className="text-xs text-sky-200">Current weekly brief posture: {displayRegime.label} <span className="text-slate-400">({displayRegime.canonicalRegime})</span></p>
         <div className="flex flex-wrap items-center gap-3">
           <Link href="/" className="weather-button-primary inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]">Open Weekly Brief</Link>
-          <Link href="/start" className="weather-button inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]">Open Start Here routing</Link>
         </div>
       </section>
       <section className="grid gap-3 sm:grid-cols-3">

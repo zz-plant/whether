@@ -1,22 +1,11 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
-import StartHerePage from "../app/start/page";
 import { buildDiagnosticsExpansionHref } from "../app/signals/page";
 import { buildActionsExpansionHref } from "../app/operations/page";
 import { getVisibleActionLaneItems } from "../app/components/appendixSections";
 
 describe("expansion controls rendering", () => {
-  it("keeps /start top-level actions focused on one primary and one secondary CTA", () => {
-    const html = renderToStaticMarkup(StartHerePage());
-
-    assert.match(html, /Go to Weekly Brief/);
-    assert.match(html, /Go to Action playbook/);
-    assert.doesNotMatch(html, /Keep me here/);
-    assert.doesNotMatch(html, /Turn on automatic redirect/);
-  });
-
-
   it("persists /signals expansion state through query params", () => {
     const href = buildDiagnosticsExpansionHref({ focus: "growth", year: "2025", month: "2" }, true);
 
@@ -28,7 +17,6 @@ describe("expansion controls rendering", () => {
 
     assert.equal(href, "/operations?year=2025&month=2&actions=all#ops-playbook");
   });
-
 
   it("renders PlaybookPanel collapsed by default behind disclosure", () => {
     const html = renderToStaticMarkup(

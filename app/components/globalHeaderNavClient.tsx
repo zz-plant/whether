@@ -17,7 +17,7 @@ export function GlobalHeaderNavClient({ navigationLinks, groupLabels }: GlobalHe
 
   return (
     <div className="relative">
-      <ul className="flex gap-2 overflow-x-auto pb-1 pr-8 [-ms-overflow-style:auto] [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-700/80 sm:grid sm:grid-cols-2 sm:gap-3 sm:overflow-visible sm:pr-0 lg:grid-cols-4 xl:grid-cols-7">
+      <ul className="flex gap-2 overflow-x-auto pb-1 pr-8 [-ms-overflow-style:auto] [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-700/80 sm:grid sm:grid-cols-2 sm:gap-3 sm:overflow-visible sm:pr-0 md:grid-cols-3 lg:grid-cols-5">
         {navigationLinks.map((link) => {
           const isActive = pathMatchesLink(link.href, pathname);
 

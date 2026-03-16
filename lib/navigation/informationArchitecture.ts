@@ -16,6 +16,8 @@ export type NavigationLayer = {
   description: string;
   boundary: string;
   group: "core" | "workflow" | "reference";
+  tier: "primary" | "supporting";
+  parentKey?: NavigationLayerKey;
 };
 
 export const navigationGroupLabels = {
@@ -32,6 +34,7 @@ export const navigationLayers: NavigationLayer[] = [
     description: "Current posture, bounded call, and share-ready artifact.",
     boundary: "Outcome snapshot only; detailed evidence and playbooks live in downstream hubs.",
     group: "core",
+    tier: "primary",
   },
   {
     key: "signals",
@@ -40,6 +43,16 @@ export const navigationLayers: NavigationLayer[] = [
     description: "Deep evidence appendix for drivers, thresholds, and freshness behind the weekly brief.",
     boundary: "Evidence depth only; the canonical weekly workflow lives on Weekly Brief.",
     group: "workflow",
+    tier: "primary",
+  },
+  {
+    key: "decide",
+    href: "/decide",
+    label: "Decide",
+    description: "Role, situation, and utility paths that translate the weekly call into bounded choices.",
+    boundary: "Decision translation depth only; do not duplicate the home workspace.",
+    group: "workflow",
+    tier: "primary",
   },
   {
     key: "operations",
@@ -48,30 +61,7 @@ export const navigationLayers: NavigationLayer[] = [
     description: "Detailed execution guardrails once the weekly plan needs deeper review.",
     boundary: "Execution depth only; Weekly Brief remains the canonical orchestration surface.",
     group: "workflow",
-  },
-  {
-    key: "decide",
-    href: "/decide",
-    label: "Decide",
-    description: "Direct role, situation, and toolkit shortcuts after the weekly call is set.",
-    boundary: "Decision translation depth only; do not duplicate the home workspace.",
-    group: "workflow",
-  },
-  {
-    key: "toolkits",
-    href: "/toolkits",
-    label: "Toolkits",
-    description: "Run templates after the weekly call and guardrails are set.",
-    boundary: "Runnable instruments only; no duplicate posture logic or evidence summaries.",
-    group: "workflow",
-  },
-  {
-    key: "learn",
-    href: "/learn",
-    label: "Learn",
-    description: "Background concepts and failure modes for optional operator education.",
-    boundary: "Reference-only surface; never the canonical workflow or trust path.",
-    group: "reference",
+    tier: "primary",
   },
   {
     key: "method",
@@ -80,8 +70,38 @@ export const navigationLayers: NavigationLayer[] = [
     description: "Audit trust, sources, formulas, and confidence without leaving the weekly loop.",
     boundary: "Transparency surfaces only.",
     group: "reference",
+    tier: "primary",
+  },
+  {
+    key: "toolkits",
+    href: "/toolkits",
+    label: "Toolkits",
+    description: "Supporting instrument library under Decide for runnable templates and checklists.",
+    boundary: "Supporting surface under Decide; no duplicate posture logic or evidence summaries.",
+    group: "workflow",
+    tier: "supporting",
+    parentKey: "decide",
+  },
+  {
+    key: "learn",
+    href: "/learn",
+    label: "Learn",
+    description: "Supporting reference library under Method for concepts, diagnostics, and failure modes.",
+    boundary: "Supporting surface under Method; never the canonical workflow or trust path.",
+    group: "reference",
+    tier: "supporting",
+    parentKey: "method",
   },
 ] as const;
+
+export const primaryNavigationLayers = navigationLayers.filter((layer) => layer.tier === "primary");
+
+export const supportingNavigationLayers = navigationLayers.filter((layer) => layer.tier === "supporting");
+
+export const navigationLayerByKey = navigationLayers.reduce<Record<NavigationLayerKey, NavigationLayer>>((acc, layer) => {
+  acc[layer.key] = layer;
+  return acc;
+}, {} as Record<NavigationLayerKey, NavigationLayer>);
 
 export const navigationLabelByPath = navigationLayers.reduce<Record<string, string>>((acc, layer) => {
   acc[layer.href] = layer.label;

@@ -7,8 +7,8 @@ import { NextStepRail } from "../components/nextStepRail";
 import { StaticHubNav } from "../components/staticHubNav";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Concepts & Diagnostics — operator learning references",
-  description: "Diagnostics and concept references only; use this hub to audit reasoning, not to generate new operating calls.",
+  title: "Learn — supporting references for Method",
+  description: "Supporting reference library under Method for diagnostics and concept references; not a primary operating workflow.",
   path: "/learn",
   imageAlt: "Whether concepts and diagnostics hub",
 });
@@ -30,9 +30,10 @@ export default function LearnPage() {
       <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Learn" }]} />
       <StaticHubNav currentPath="/learn" />
       <section className="weather-panel space-y-3 px-6 py-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Supporting surface under Method</p>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Concepts & Diagnostics</h1>
-        <p className="text-sm text-slate-300">Use Concepts & Diagnostics for operator education only: failure modes, interpretation patterns, and worked examples. For canonical trust surfaces, source definitions, and formulas, use Method.</p>
-        <div>
+        <p className="text-sm text-slate-300">Use Concepts & Diagnostics for operator education only: failure modes, interpretation patterns, and worked examples. Method remains the primary trust hub for sources, formulas, confidence, and revisit conditions.</p>
+        <div className="flex flex-wrap gap-3">
           <Link href="/method" className="weather-button inline-flex items-center justify-center">Open Method</Link>
         </div>
       </section>

@@ -1,13 +1,15 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { navigationLayers } from "../../lib/navigation/informationArchitecture";
+import { navigationLayerByKey, navigationLayers } from "../../lib/navigation/informationArchitecture";
 import { pathMatchesLink } from "../../lib/navigation/pathMatching";
 
 export function GlobalHeaderTaglineClient() {
   const pathname = usePathname();
   const isHome = pathMatchesLink("/", pathname);
   const activeLayer = navigationLayers.find((layer) => pathMatchesLink(layer.href, pathname));
+  const parentLayer =
+    activeLayer?.parentKey ? navigationLayerByKey[activeLayer.parentKey] : null;
 
   if (isHome) {
     return (
@@ -29,7 +31,9 @@ export function GlobalHeaderTaglineClient() {
           {activeLayer.label}
         </p>
         <p className="max-w-2xl text-sm text-slate-300">
-          {activeLayer.description}
+          {activeLayer.tier === "supporting" && parentLayer
+            ? `${activeLayer.description} Primary parent: ${parentLayer.label}.`
+            : activeLayer.description}
         </p>
       </div>
     );

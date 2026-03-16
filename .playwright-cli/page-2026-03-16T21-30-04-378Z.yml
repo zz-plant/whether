@@ -1,0 +1,189 @@
+- generic [active] [ref=e1]:
+  - link "Skip to content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - link "Whether" [ref=e7] [cursor=pointer]:
+            - /url: /
+          - generic [ref=e8]:
+            - paragraph [ref=e9]: Decide
+            - paragraph [ref=e10]: Direct role, situation, and toolkit shortcuts after the weekly call is set.
+        - generic [ref=e11]:
+          - link "Open global search" [ref=e12] [cursor=pointer]:
+            - /url: /search
+            - text: Search
+          - button "Switch to light mode" [ref=e13] [cursor=pointer]: Light
+      - navigation "Global navigation" [ref=e14]:
+        - list [ref=e16]:
+          - listitem [ref=e17]:
+            - link "Now Weekly Brief" [ref=e18] [cursor=pointer]:
+              - /url: /
+              - generic [ref=e19]: Now
+              - generic [ref=e20]: Weekly Brief
+          - listitem [ref=e21]:
+            - link "Workflows Signals" [ref=e22] [cursor=pointer]:
+              - /url: /signals
+              - generic [ref=e23]: Workflows
+              - generic [ref=e24]: Signals
+          - listitem [ref=e25]:
+            - link "Workflows Operations" [ref=e26] [cursor=pointer]:
+              - /url: /operations
+              - generic [ref=e27]: Workflows
+              - generic [ref=e28]: Operations
+          - listitem [ref=e29]:
+            - link "Workflows Decide" [ref=e30] [cursor=pointer]:
+              - /url: /decide
+              - generic [ref=e31]: Workflows
+              - generic [ref=e32]: Decide
+          - listitem [ref=e33]:
+            - link "Workflows Toolkits" [ref=e34] [cursor=pointer]:
+              - /url: /toolkits
+              - generic [ref=e35]: Workflows
+              - generic [ref=e36]: Toolkits
+          - listitem [ref=e37]:
+            - link "Reference Learn" [ref=e38] [cursor=pointer]:
+              - /url: /learn
+              - generic [ref=e39]: Reference
+              - generic [ref=e40]: Learn
+          - listitem [ref=e41]:
+            - link "Reference Method" [ref=e42] [cursor=pointer]:
+              - /url: /method
+              - generic [ref=e43]: Reference
+              - generic [ref=e44]: Method
+  - main [ref=e45]:
+    - navigation "Breadcrumb" [ref=e46]:
+      - list [ref=e47]:
+        - listitem [ref=e48]:
+          - link "Home" [ref=e49] [cursor=pointer]:
+            - /url: /
+        - listitem [ref=e50]:
+          - generic [ref=e51]: /
+          - generic [ref=e52]: Decide
+    - generic [ref=e53]:
+      - generic [ref=e54]:
+        - paragraph [ref=e55]: Decision translation depth
+        - heading "Decision paths" [level=1] [ref=e56]
+        - paragraph [ref=e57]: Start with a runnable path or utility first. Browse roles and situations only when you need wider discovery.
+        - generic [ref=e58]:
+          - link "Return to Weekly Brief" [ref=e59] [cursor=pointer]:
+            - /url: /
+          - link "Run ship checklist" [ref=e60] [cursor=pointer]:
+            - /url: /decide/ship-checklist
+      - generic [ref=e61]:
+        - paragraph [ref=e62]: Action-first
+        - list [ref=e63]:
+          - listitem [ref=e64]: Need to act now? Start with a toolkit.
+          - listitem [ref=e65]: Need a decision utility? Use ship checklist or team context.
+          - listitem [ref=e66]: Need a full map? Browse role or situation paths below.
+    - generic [ref=e67]:
+      - heading "Run this now" [level=2] [ref=e68]
+      - paragraph [ref=e69]: Direct toolkit shortcuts for the most common weekly decision jobs.
+      - generic [ref=e70]:
+        - 'link "PMF Toolkit Run this now: Choose one gate now: invest, hold, or narrow to one segment." [ref=e71] [cursor=pointer]':
+          - /url: /toolkits/pmf
+          - paragraph [ref=e72]: PMF Toolkit
+          - paragraph [ref=e73]: "Run this now: Choose one gate now: invest, hold, or narrow to one segment."
+        - 'link "Roadmap Focus Toolkit Run this now: Commit to keep, pause, and accelerate decisions for this cycle." [ref=e74] [cursor=pointer]':
+          - /url: /toolkits/focus
+          - paragraph [ref=e75]: Roadmap Focus Toolkit
+          - paragraph [ref=e76]: "Run this now: Commit to keep, pause, and accelerate decisions for this cycle."
+        - 'link "Commitment & Rollback Toolkit Run this now: Approve or reject the commitment with rollback ownership assigned now." [ref=e77] [cursor=pointer]':
+          - /url: /toolkits/rollback
+          - paragraph [ref=e78]: Commitment & Rollback Toolkit
+          - paragraph [ref=e79]: "Run this now: Approve or reject the commitment with rollback ownership assigned now."
+        - 'link "Decision Rights Toolkit Run this now: Assign one accountable DRI and escalation boundary for each critical call." [ref=e80] [cursor=pointer]':
+          - /url: /toolkits/decision-rights
+          - paragraph [ref=e81]: Decision Rights Toolkit
+          - paragraph [ref=e82]: "Run this now: Assign one accountable DRI and escalation boundary for each critical call."
+        - 'link "Launch Gates Toolkit Run this now: Make a go/no-go call with owners for deferred risks and rollback." [ref=e83] [cursor=pointer]':
+          - /url: /toolkits/launch-gates
+          - paragraph [ref=e84]: Launch Gates Toolkit
+          - paragraph [ref=e85]: "Run this now: Make a go/no-go call with owners for deferred risks and rollback."
+        - 'link "Claims & Positioning Toolkit Run this now: Approve, revise, or pull claims based on current operational proof." [ref=e86] [cursor=pointer]':
+          - /url: /toolkits/claims
+          - paragraph [ref=e87]: Claims & Positioning Toolkit
+          - paragraph [ref=e88]: "Run this now: Approve, revise, or pull claims based on current operational proof."
+        - 'link "Ops Capacity Toolkit Run this now: Cut, sequence, or re-staff work to keep reliability guardrails intact." [ref=e89] [cursor=pointer]':
+          - /url: /toolkits/ops-capacity
+          - paragraph [ref=e90]: Ops Capacity Toolkit
+          - paragraph [ref=e91]: "Run this now: Cut, sequence, or re-staff work to keep reliability guardrails intact."
+    - generic [ref=e92]:
+      - heading "Decision utilities" [level=2] [ref=e93]
+      - paragraph [ref=e94]: Use these only when the weekly call needs additional validation or personalization.
+      - generic [ref=e95]:
+        - link "Whether to ship checklist Get a go / wait / kill recommendation tied to the current regime." [ref=e96] [cursor=pointer]:
+          - /url: /decide/ship-checklist
+          - heading "Whether to ship checklist" [level=2] [ref=e97]
+          - paragraph [ref=e98]: Get a go / wait / kill recommendation tied to the current regime.
+        - link "Team context profile Tailor the mandate by stage, sector, and team profile." [ref=e99] [cursor=pointer]:
+          - /url: /decide/team-context
+          - heading "Team context profile" [level=2] [ref=e100]
+          - paragraph [ref=e101]: Tailor the mandate by stage, sector, and team profile.
+    - generic [ref=e102]:
+      - heading "Explore by role" [level=2] [ref=e103]
+      - generic [ref=e104]:
+        - link "CEO" [ref=e105] [cursor=pointer]:
+          - /url: /decide/ceo
+        - link "Board" [ref=e106] [cursor=pointer]:
+          - /url: /decide/board
+        - link "Product" [ref=e107] [cursor=pointer]:
+          - /url: /decide/product
+        - link "Engineering" [ref=e108] [cursor=pointer]:
+          - /url: /decide/engineering
+        - link "Growth & GTM" [ref=e109] [cursor=pointer]:
+          - /url: /decide/growth-gtm
+        - link "Ops & Risk" [ref=e110] [cursor=pointer]:
+          - /url: /decide/ops-risk
+    - generic [ref=e111]:
+      - heading "Explore by situation" [level=2] [ref=e112]
+      - generic [ref=e113]:
+        - link "Measure PMF" [ref=e114] [cursor=pointer]:
+          - /url: /decide/measure-pmf
+        - link "Avoid Premature Scaling" [ref=e115] [cursor=pointer]:
+          - /url: /decide/avoid-premature-scaling
+        - link "Roadmap Focus" [ref=e116] [cursor=pointer]:
+          - /url: /decide/roadmap-focus
+        - link "Pricing Change" [ref=e117] [cursor=pointer]:
+          - /url: /decide/pricing-change
+        - link "Launch Gates" [ref=e118] [cursor=pointer]:
+          - /url: /decide/launch-gates
+        - link "Decision Rights" [ref=e119] [cursor=pointer]:
+          - /url: /decide/decision-rights
+        - link "Ops Capacity" [ref=e120] [cursor=pointer]:
+          - /url: /decide/ops-capacity
+        - link "AI Claims" [ref=e121] [cursor=pointer]:
+          - /url: /decide/ai-claims
+    - region "Next step rail" [ref=e122]:
+      - generic [ref=e123]:
+        - generic [ref=e124]:
+          - paragraph [ref=e125]: Next step
+          - paragraph [ref=e126]: Use Weekly Brief as the canonical workspace. Open depth pages only when the decision needs more detail.
+        - generic [ref=e127]:
+          - paragraph [ref=e128]: You are here
+          - paragraph [ref=e129]: Decide
+      - generic [ref=e130]:
+        - generic [ref=e131]:
+          - paragraph [ref=e132]: Canonical workspace
+          - heading "Weekly brief" [level=2] [ref=e133]
+          - paragraph [ref=e134]: Reset on the current posture, bounded call, and share-ready artifact.
+        - link "Return to Weekly Brief" [ref=e135] [cursor=pointer]:
+          - /url: /
+      - generic [ref=e136]:
+        - link "Weekly brief" [ref=e137] [cursor=pointer]:
+          - /url: /
+        - link "Signals" [ref=e138] [cursor=pointer]:
+          - /url: /signals
+        - link "Operations" [ref=e139] [cursor=pointer]:
+          - /url: /operations
+        - generic [ref=e140]: Decide
+        - link "Toolkits" [ref=e141] [cursor=pointer]:
+          - /url: /toolkits
+        - link "Learn" [ref=e142] [cursor=pointer]:
+          - /url: /learn
+        - link "Method" [ref=e143] [cursor=pointer]:
+          - /url: /method
+  - button "Open Next.js Dev Tools" [ref=e149] [cursor=pointer]:
+    - img [ref=e150]
+  - alert [ref=e153]

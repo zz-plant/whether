@@ -1,8 +1,10 @@
 import Link from "next/link";
 import type { Route } from "../../../lib/navigation/routeType";
+import { homeScrollPlan } from "../../../lib/navigation/scrollPlans";
 import type { HomePageWorkspaceModel } from "../../../lib/report/homePageAssembler";
 import { HistoricalReplayDatePicker } from "../../signals/components/historicalReplayDatePicker";
 import { CanonicalTrustModule } from "../canonicalTrustModule";
+import { PageFlowNav } from "../pageFlowNav";
 
 type HomeWorkspaceBandsProps = {
   workspaceModelPromise: Promise<HomePageWorkspaceModel>;
@@ -15,22 +17,24 @@ export async function HomeWorkspaceBands({
 
   return (
     <div className="space-y-6">
-      <section className="weather-panel weather-section-stage flex flex-wrap items-center justify-between gap-3 px-5 py-4" aria-label="Weekly workspace actions">
-        <div className="space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Weekly workspace</p>
-          <p className="text-sm text-slate-200">Confirm what changed, review the evidence, then open execution guardrails only when you need more detail.</p>
-        </div>
-        <div className="flex flex-wrap gap-3">
-          <a href={workspaceModel.workspaceActions.auditHref} className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">
-            See why this call changed
-          </a>
-          <a href={workspaceModel.workspaceActions.operationsHref} className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">
-            Open execution guardrails
-          </a>
-        </div>
-      </section>
+      <PageFlowNav
+        eyebrow={homeScrollPlan.eyebrow}
+        title={homeScrollPlan.title}
+        description={homeScrollPlan.description}
+        items={homeScrollPlan.items}
+        actions={(
+          <>
+            <a href={workspaceModel.workspaceActions.auditHref} className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">
+              See why this call changed
+            </a>
+            <a href={workspaceModel.workspaceActions.operationsHref} className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">
+              Open execution guardrails
+            </a>
+          </>
+        )}
+      />
 
-      <section id="audit-this-call" className="weather-panel weather-section-stage weather-section-stage--short space-y-4 px-5 py-5" aria-labelledby="audit-this-call-title">
+      <section id="audit-this-call" className="weather-panel weather-section-stage weather-section-stage--short scroll-mt-28 space-y-4 px-5 py-5" aria-labelledby="audit-this-call-title">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Why this call</p>
@@ -107,7 +111,7 @@ export async function HomeWorkspaceBands({
         </div>
       </section>
 
-      <section id="approve-this-weeks-plan" className="weather-panel weather-section-stage weather-section-stage--medium space-y-4 px-5 py-5" aria-labelledby="approve-this-weeks-plan-title">
+      <section id="approve-this-weeks-plan" className="weather-panel weather-section-stage weather-section-stage--medium scroll-mt-28 space-y-4 px-5 py-5" aria-labelledby="approve-this-weeks-plan-title">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Execution guardrails</p>
@@ -167,7 +171,7 @@ export async function HomeWorkspaceBands({
         </div>
       </section>
 
-      <section id="historical-replay-workspace" className="weather-panel weather-section-stage weather-section-stage--long space-y-4 px-5 py-5" aria-labelledby="historical-replay-workspace-title">
+      <section id="historical-replay-workspace" className="weather-panel weather-section-stage weather-section-stage--long scroll-mt-28 space-y-4 px-5 py-5" aria-labelledby="historical-replay-workspace-title">
         <div className="space-y-1">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Historical replay</p>
           <h2 id="historical-replay-workspace-title" className="text-xl font-semibold text-slate-100">Replay any prior month after you lock this week&apos;s live call.</h2>
@@ -207,7 +211,7 @@ export async function HomeWorkspaceBands({
         </div>
       </section>
 
-      <section id="translate-or-run-tool" className="weather-panel weather-section-stage weather-section-stage--long space-y-4 px-5 py-5" aria-labelledby="translate-or-run-tool-title">
+      <section id="translate-or-run-tool" className="weather-panel weather-section-stage weather-section-stage--long scroll-mt-28 space-y-4 px-5 py-5" aria-labelledby="translate-or-run-tool-title">
         <div className="space-y-1">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Translate or run a tool</p>
           <h2 id="translate-or-run-tool-title" className="text-xl font-semibold text-slate-100">Go straight to a role path, situation path, or runnable utility.</h2>

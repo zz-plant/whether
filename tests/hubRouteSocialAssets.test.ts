@@ -10,7 +10,6 @@ import { metadata as operationsMetadata } from "../app/operations/page";
 import { metadata as postureMetadata } from "../app/posture/page";
 import { metadata as resourcesMetadata } from "../app/resources/page";
 import { metadata as signalsMetadata } from "../app/signals/page";
-import { metadata as startMetadata } from "../app/start/page";
 import { metadata as startupMacroIndexMetadata } from "../app/startup-macro-posture/index/page";
 import { metadata as startupMacroMetadata } from "../app/startup-macro-posture/page";
 import { buildPageMetadata, buildSocialImageUrl } from "../lib/seo";
@@ -48,7 +47,6 @@ describe("hub route social assets", () => {
 
   it("maps the highest-priority hubs to dedicated SVG assets", () => {
     const expectedAssets: Array<{ metadata: Metadata; imagePath: string }> = [
-      { metadata: startMetadata, imagePath: "/social/start-here.svg" },
       { metadata: postureMetadata, imagePath: "/social/posture.svg" },
       { metadata: signalsMetadata, imagePath: "/social/signals.svg" },
       { metadata: operationsMetadata, imagePath: "/social/operations.svg" },

@@ -23,7 +23,7 @@ import { signalScenarioRoutes } from "./seoRouteClusters";
 import { loadReportDataSafe } from "../lib/report/reportData";
 import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
 import { evaluateSeoQualityGates } from "../lib/report/seoQualityGates";
-import { isRedirectOnlySitemapPath } from "./sitemapExclusions";
+import { isRetiredSitemapPath } from "./sitemapExclusions";
 
 type ChangeFrequency = NonNullable<MetadataRoute.Sitemap[number]["changeFrequency"]>;
 
@@ -98,41 +98,30 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
 
   const coreEntries: SitemapEntryDescriptor[] = [
     { path: "", lastModified: reportLastModified, changeFrequency: "weekly", priority: 1 },
-    { path: "/start", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.9 },
     { path: "/posture", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.8 },
     { path: "/signals", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.9 },
     { path: "/decide", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.82 },
     { path: "/method", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.78 },
     { path: "/resources", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.8 },
     { path: "/methodology", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.56 },
-    { path: "/toolkits", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.52 },
+    { path: "/toolkits", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.56 },
     { path: "/search", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.62 },
     { path: "/answers", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.74 },
     { path: "/operations", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.84 },
-    { path: "/operations/plan", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.72 },
     { path: "/operations/data", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.68 },
     { path: "/operations/cli", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.66 },
     { path: "/operations/integrations", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.62 },
     { path: "/guides", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.78 },
     { path: "/guides/stage", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.74 },
-    { path: "/solutions", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.72 },
     { path: "/solutions/career-paths", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.74 },
     { path: "/solutions/market-regime-playbook", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.7 },
     { path: "/solutions/product-roadmapping", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.7 },
     { path: "/solutions/engineering-capacity", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.7 },
-                { path: "/should-we-hire-engineers-right-now", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.8 },
-    { path: "/should-startups-slow-roadmap-expansion", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.78 },
-    { path: "/is-it-risk-on-or-risk-off-for-startups", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.8 },
-    { path: "/startup-funding-climate-this-week", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.8 },
-    { path: "/should-startups-raise-capital-now", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.8 },
-    { path: "/when-should-startups-cut-burn", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.8 },
-    { path: "/should-startups-slow-product-development", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.78 },
-    { path: "/startup-market-outlook", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.78 },
     { path: "/startup-macro-posture", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.84 },
     { path: "/startup-macro-posture/index", lastModified: staticContentLastModified, changeFrequency: "weekly", priority: 0.8 },
-    { path: "/learn", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.75 },
-    { path: "/learn/failure-modes", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.72 },
-    { path: "/concepts", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.75 },
+    { path: "/learn", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.58 },
+    { path: "/learn/failure-modes", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.54 },
+    { path: "/concepts", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.56 },
     { path: "/about", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.45 },
     { path: "/terms-of-service", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },
     { path: "/acceptable-use-policy", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },
@@ -306,6 +295,6 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     ...decideClusterEntries,
     ...toolkitClusterEntries,
   ]
-    .filter((entry) => !isRedirectOnlySitemapPath(entry.path))
+    .filter((entry) => !isRetiredSitemapPath(entry.path))
     .map(buildEntry);
 }

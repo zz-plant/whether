@@ -1,18 +1,27 @@
-export const redirectOnlySitemapPaths = [
+export const retiredSitemapPaths = [
   "/guides",
   "/solutions",
   "/learn/concepts",
+  "/start",
+  "/onboarding",
+  "/reference",
+  "/formulas",
+  "/evidence",
   "/operate",
   "/templates",
   "/toolkit",
   "/operations/briefings",
+  "/operations/plan",
   "/operations/decisions",
   "/library",
   "/library/canon",
+  "/library/failure-modes",
   "/brief",
+  "/briefing",
+  "/plan",
   "/brief/stage",
 ] as const;
 
-const redirectOnlyPathSet = new Set<string>(redirectOnlySitemapPaths);
+const retiredPathSet = new Set<string>(retiredSitemapPaths);
 
-export const isRedirectOnlySitemapPath = (path: string): boolean => redirectOnlyPathSet.has(path);
+export const isRetiredSitemapPath = (path: string): boolean => retiredPathSet.has(path);

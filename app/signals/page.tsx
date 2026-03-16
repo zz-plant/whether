@@ -22,7 +22,9 @@ import { indicatorTypeByScoreLabel, indicatorTypeLabel } from "../../lib/indicat
 import { HistoricalReplayDatePicker } from "./components/historicalReplayDatePicker";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { REGIME_LABELS } from "../../lib/regimePresentation";
+import { signalsScrollPlan } from "../../lib/navigation/scrollPlans";
 import { NextStepRail } from "../components/nextStepRail";
+import { PageFlowNav } from "../components/pageFlowNav";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -373,6 +375,13 @@ export default async function SignalsPage({
         ) : null
       }
     >
+      <PageFlowNav
+        eyebrow={signalsScrollPlan.eyebrow}
+        title={signalsScrollPlan.title}
+        description={signalsScrollPlan.description}
+        items={signalsScrollPlan.items}
+      />
+
       <ReturningVisitorDeltaStrip
         assessment={assessment}
         recordDate={treasury.record_date}
@@ -388,7 +397,7 @@ export default async function SignalsPage({
         openPanelHref={timeMachineHref}
       />
 
-      <section id="decision-summary" className="weather-panel space-y-6 px-6 py-5" aria-label="Decision summary">
+      <section id="decision-summary" className="weather-panel scroll-mt-28 space-y-6 px-6 py-5" aria-label="Decision summary">
         <p className="weather-surface inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100">
           {decisionDeltaLabel}
         </p>
@@ -495,7 +504,7 @@ export default async function SignalsPage({
         </div>
       </section>
 
-      <section id="historical-replay" className="weather-panel space-y-4 px-6 py-5">
+      <section id="historical-replay" className="weather-panel scroll-mt-28 space-y-4 px-6 py-5">
         <header className="space-y-2">
           <p className="text-sm font-semibold tracking-[0.18em] text-slate-300">Historical regime replay</p>
           <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
@@ -508,7 +517,7 @@ export default async function SignalsPage({
         <HistoricalReplayDatePicker initialDate={`${selectedYear}-${String(selectedMonth).padStart(2, "0")}-01`} />
       </section>
 
-      <section id="current-scores" className="weather-panel space-y-4 px-6 py-5">
+      <section id="current-scores" className="weather-panel scroll-mt-28 space-y-4 px-6 py-5">
         <header className="space-y-2">
           <p className="text-sm font-semibold tracking-[0.18em] text-slate-300">Current scores</p>
           <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
@@ -542,7 +551,7 @@ export default async function SignalsPage({
         </div>
       </section>
 
-      <section id="evidence-priorities" className="weather-panel space-y-4 px-6 py-5" aria-label="Signal diagnostics queue">
+      <section id="evidence-priorities" className="weather-panel scroll-mt-28 space-y-4 px-6 py-5" aria-label="Signal diagnostics queue">
         <header className="space-y-2">
           <p className="text-sm font-semibold tracking-[0.18em] text-slate-300">Evidence priorities</p>
           <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">

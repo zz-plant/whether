@@ -11,6 +11,8 @@ import { loadReportDataSafe } from "../../lib/report/reportData";
 import { buildHomeBriefModel } from "../../lib/report/homeBriefModel";
 import { buildCompactTrustSummary } from "../../lib/report/trustStatus";
 import { formatConfidencePlainLabel } from "../../lib/report/reportFormatting";
+import { PageFlowNav } from "../components/pageFlowNav";
+import { methodScrollPlan } from "../../lib/navigation/scrollPlans";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -84,7 +86,14 @@ export default async function MethodPage() {
         </div>
       </section>
 
-      <section className="grid gap-3 sm:grid-cols-2">
+      <PageFlowNav
+        eyebrow={methodScrollPlan.eyebrow}
+        title={methodScrollPlan.title}
+        description={methodScrollPlan.description}
+        items={methodScrollPlan.items}
+      />
+
+      <section id="trust-hub-links" className="grid scroll-mt-28 gap-3 sm:grid-cols-2">
         <Link href="/sources" className="weather-panel space-y-2 px-4 py-4">
           <h2 className="text-lg font-semibold text-slate-100">Sources and freshness</h2>
           <p className="text-sm text-slate-300">Inspect source coverage, update cadence, and provenance for each signal.</p>
@@ -103,7 +112,7 @@ export default async function MethodPage() {
         </Link>
       </section>
 
-      <section className="weather-panel space-y-4 px-6 py-6" aria-label="Trust snapshot">
+      <section id="trust-snapshot" className="weather-panel scroll-mt-28 space-y-4 px-6 py-6" aria-label="Trust snapshot">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-lg font-semibold text-slate-100">Trust snapshot</h2>
           <p className="text-xs text-slate-400">Last updated: {reportData.fetchedAtLabel}</p>
@@ -116,7 +125,7 @@ export default async function MethodPage() {
         </ul>
       </section>
 
-      <section className="weather-panel space-y-3 px-6 py-6" aria-label="When to distrust or revisit this call">
+      <section id="revisit-call" className="weather-panel scroll-mt-28 space-y-3 px-6 py-6" aria-label="When to distrust or revisit this call">
         <h2 className="text-lg font-semibold text-slate-100">When to distrust or revisit this call</h2>
         <ul className="space-y-3 text-sm text-slate-200">
           {revisitBullets.map((item) => (

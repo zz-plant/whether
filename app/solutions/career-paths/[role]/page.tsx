@@ -75,7 +75,6 @@ export default async function CareerPathRolePage({
     ...buildBreadcrumbList(
       createBreadcrumbTrail([
         { path: "/" },
-        { path: "/solutions" },
         { path: "/solutions/career-paths" },
         { path: `/solutions/career-paths/${roleLanding.slug}`, label: roleLanding.roleTitle },
       ]),
@@ -116,7 +115,6 @@ export default async function CareerPathRolePage({
       <BreadcrumbTrail
         items={[
           { label: "Home", href: "/" },
-          { label: "Solutions", href: "/solutions" },
           { label: "Career paths", href: "/solutions/career-paths" },
           { label: roleLanding.roleTitle },
         ]}

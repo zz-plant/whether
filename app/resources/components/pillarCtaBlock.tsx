@@ -16,13 +16,13 @@ export function PillarCtaBlock({ title, body, keyword, sourceSlug, downloadLabel
       <p className="text-sm text-slate-200">{body}</p>
       <div className="flex flex-wrap gap-3">
         <Link
-          href={`/start?intent=${encodeURIComponent("demo-contact")}&source=${encodeURIComponent(sourceSlug)}`}
+          href="/operations"
           className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-sm font-semibold text-slate-100"
           data-conversion-event="demo/contact"
           data-conversion-surface="pillar-cta"
           data-conversion-keyword={keyword}
         >
-          Book Demo / Contact
+          Open Operations
         </Link>
         <Link
           href={`/resources/capital-posture-template?source=${encodeURIComponent(sourceSlug)}`}
@@ -34,13 +34,13 @@ export function PillarCtaBlock({ title, body, keyword, sourceSlug, downloadLabel
           {downloadLabel}
         </Link>
         <Link
-          href={`/start?intent=${encodeURIComponent("board-pack-request")}&source=${encodeURIComponent(sourceSlug)}`}
+          href="/operations#ops-export-briefs"
           className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-sm font-semibold text-slate-100"
           data-conversion-event="request"
           data-conversion-surface="pillar-cta"
           data-conversion-keyword={keyword}
         >
-          Request Board Pack
+          Open board-pack exports
         </Link>
       </div>
     </section>

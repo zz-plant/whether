@@ -7,6 +7,21 @@ Positioning summary: Whether is an operator briefing system for leadership teams
 
 ## 1) Product surfaces (UI routes)
 
+### 1.0 Rationalized IA (primary vs supporting)
+Primary IA is now the five-surface operator loop:
+- `/` — **Weekly Brief**: the canonical posture, decision delta, and share artifact
+- `/signals` — **Signals**: evidence depth for thresholds, freshness, and replay
+- `/decide` — **Decide**: role, situation, and utility-based decision translation
+- `/operations` — **Operations**: execution guardrails, finance posture, and export actions
+- `/method` — **Method**: trust, source, formula, and confidence audit
+
+Supporting surfaces are intentionally subordinate:
+- `/toolkits` is a supporting instrument library under **Decide**
+- `/learn` is a supporting reference library under **Method**
+- `/guides`, `/resources`, `/answers`, `/solutions/*`, `/concepts`, and `/startup-macro-posture*` remain secondary discovery or distribution surfaces rather than primary workflow hubs
+
+Primary workflow pages now expose a top-of-page scroll path that explains the down-page sequence and highlights the current checkpoint as the operator moves through long surfaces.
+
 ### 1.1 Weekly briefing (/) 
 The home report is a weekly briefing view delivered through the shared `ReportShell` layout. It
 includes status metadata (data freshness, confidence label, offline badges), fixed navigation
@@ -64,18 +79,17 @@ data/API, and terminal usage remain optional implementation handoffs after the w
 approved.
 
 ### 1.4 Operations workstreams
-- **Weekly plan** (`/operations`; legacy `/operations/plan` redirects here): the default execution
+- **Weekly plan** (`/operations`): the default execution
   path with weekly plan, guardrails, finance strategy, export brief, and operator requests.
 - **Send to tools** (`/operations/integrations`): preview weekly mandate payloads for Slack, Notion,
   and Linear.
 - **Data/API** (`/operations/data`): API usage guidance and handoff references for operators.
 - **Terminal** (`/operations/cli`): command-line status, history, diff, and scenario workflows.
 
-### 1.5 Start and glossary support (`/start`, `/onboarding`, `/method#beginner-glossary`)
-The homepage is the canonical first-time and returning weekly workspace. `/start` remains a
-secondary bridge for legacy links, while `/onboarding` redirects there. Plain-English glossary
-support now lives under the Method hub so operators can pull term translation without leaving the
-canonical weekly brief flow.
+### 1.5 Home and glossary support (`/`, `/method#beginner-glossary`)
+The homepage is the only canonical first-time and returning weekly workspace. Plain-English
+glossary support lives under the Method hub so operators can pull term translation without leaving
+the weekly brief flow.
 
 ### 1.6 Method hub (/method) and formula reference (/methodology)
 `/method` is the canonical trust-audit hub linked from Weekly Brief. It summarizes current
@@ -88,7 +102,6 @@ spreads, FRED VIX, and Chicago Fed NFCI).
 
 ### 1.7 Share-preview assets for canonical hubs
 High-priority hub routes now ship dedicated static SVG social preview assets for:
-- `/start`
 - `/posture`
 - `/signals`
 - `/operations`
@@ -197,6 +210,8 @@ action-first top fold:
 - ship checklist,
 - team-context profiling,
 - then role and situation browsing below.
+
+`/toolkits` remains available as the supporting instrument library for Decide, but it is no longer treated as a peer primary hub in navigation.
 
 Decision Shield logic/components remain integrated through decision and operations surfaces.
 

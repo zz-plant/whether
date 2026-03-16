@@ -1,13 +1,19 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { navigationGroupLabels, navigationLayers, navigationLabelByPath } from "../lib/navigation/informationArchitecture";
+import {
+  navigationGroupLabels,
+  navigationLayers,
+  navigationLabelByPath,
+  primaryNavigationLayers,
+  supportingNavigationLayers,
+} from "../lib/navigation/informationArchitecture";
 import { primaryNavigation } from "../lib/navigation/primaryNavigation";
 
 describe("navigation information architecture", () => {
-  it("keeps primary navigation aligned to architecture layers", () => {
-    assert.equal(primaryNavigation.length, navigationLayers.length);
+  it("keeps primary navigation aligned to primary IA layers only", () => {
+    assert.equal(primaryNavigation.length, primaryNavigationLayers.length);
 
-    for (const layer of navigationLayers) {
+    for (const layer of primaryNavigationLayers) {
       const link = primaryNavigation.find((item) => item.href === layer.href);
       assert.ok(link);
       assert.equal(link?.label, layer.label);
@@ -49,5 +55,24 @@ describe("navigation information architecture", () => {
     assert.equal(methodLayer?.href, "/method");
     assert.equal(decideLayer?.href.startsWith("#"), false);
     assert.equal(methodLayer?.href.startsWith("#"), false);
+  });
+
+  it("demotes Toolkits and Learn into supporting surfaces with explicit parents", () => {
+    assert.equal(primaryNavigationLayers.length, 5);
+    assert.deepEqual(
+      primaryNavigationLayers.map((layer) => layer.key),
+      ["weekly-brief", "signals", "decide", "operations", "method"],
+    );
+
+    assert.deepEqual(
+      supportingNavigationLayers.map((layer) => ({
+        key: layer.key,
+        parentKey: layer.parentKey,
+      })),
+      [
+        { key: "toolkits", parentKey: "decide" },
+        { key: "learn", parentKey: "method" },
+      ],
+    );
   });
 });

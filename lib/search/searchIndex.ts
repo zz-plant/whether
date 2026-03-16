@@ -35,8 +35,8 @@ const keyDocs: SearchEntity[] = [
   {
     id: "doc-evidence",
     type: "doc",
-    title: "Evidence checklist",
-    href: "/evidence",
+    title: "Signals — evidence checklist",
+    href: "/signals",
     summary: "Compact source and reliability checks used for weekly operating calls.",
     intentLabel: "Audit provenance",
     keywords: ["evidence", "provenance", "sources", "trust"],
@@ -44,8 +44,8 @@ const keyDocs: SearchEntity[] = [
   {
     id: "doc-formulas",
     type: "doc",
-    title: "Formulas and scoring reference",
-    href: "/formulas",
+    title: "Methodology — formulas and scoring reference",
+    href: "/methodology",
     summary: "Reference formulas behind regime scoring and decision thresholds.",
     intentLabel: "Inspect scoring",
     keywords: ["formulas", "scoring", "thresholds", "regime"],

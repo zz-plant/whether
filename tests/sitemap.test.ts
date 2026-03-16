@@ -19,7 +19,7 @@ import {
 import { stageGuides } from "../app/guides/stageGuides";
 import { stakeholderGuides } from "../app/guides/stakeholderGuides";
 import { roleLandings } from "../app/solutions/career-paths/roleLandingData";
-import { redirectOnlySitemapPaths } from "../app/sitemapExclusions";
+import { retiredSitemapPaths } from "../app/sitemapExclusions";
 
 describe("sitemap", () => {
   it("returns canonical URLs and includes posture, decide, learn, and toolkit routes", async () => {
@@ -32,7 +32,6 @@ describe("sitemap", () => {
 
     assert.equal(urls.size, entries.length);
     assert.ok(urls.has(siteUrl));
-    assert.ok(urls.has(`${siteUrl}/start`));
     assert.ok(urls.has(`${siteUrl}/posture`));
     assert.ok(urls.has(`${siteUrl}/decide`));
     assert.ok(urls.has(`${siteUrl}/toolkits`));
@@ -41,8 +40,8 @@ describe("sitemap", () => {
     assert.ok(urls.has(`${siteUrl}/operations/data`));
     assert.ok(urls.has(`${siteUrl}/operations/cli`));
 
-    for (const redirectOnlyPath of redirectOnlySitemapPaths) {
-      assert.ok(!urls.has(`${siteUrl}${redirectOnlyPath}`));
+    for (const retiredPath of retiredSitemapPaths) {
+      assert.ok(!urls.has(`${siteUrl}${retiredPath}`));
     }
 
     for (const posture of postureDefinitions) {
@@ -100,9 +99,9 @@ describe("sitemap", () => {
     assert.ok(root?.lastModified instanceof Date);
     assert.equal(root?.lastModified?.toISOString(), new Date(snapshotData.record_date).toISOString());
 
-    const start = entries.find((entry) => entry.url === `${siteUrl}/start`);
-    assert.ok(start?.lastModified instanceof Date);
-    assert.equal(start?.lastModified?.toISOString(), new Date("2026-02-01T00:00:00.000Z").toISOString());
+    const posture = entries.find((entry) => entry.url === `${siteUrl}/posture`);
+    assert.ok(posture?.lastModified instanceof Date);
+    assert.equal(posture?.lastModified?.toISOString(), new Date("2026-02-01T00:00:00.000Z").toISOString());
 
     const firstConceptArticle = productConceptArticles[0];
     const firstConceptEntry = entries.find(
@@ -117,11 +116,22 @@ describe("sitemap", () => {
     );
   });
 
+  it("keeps supporting and secondary surfaces below their primary parent priorities", async () => {
+    const entries = await sitemap({ programmaticEligible: true });
+    const priorityByUrl = new Map(entries.map((entry) => [entry.url, entry.priority]));
+
+    assert.ok((priorityByUrl.get(`${siteUrl}/decide`) ?? 0) > (priorityByUrl.get(`${siteUrl}/toolkits`) ?? 1));
+    assert.ok((priorityByUrl.get(`${siteUrl}/method`) ?? 0) > (priorityByUrl.get(`${siteUrl}/learn`) ?? 1));
+    assert.ok((priorityByUrl.get(`${siteUrl}/learn`) ?? 0) > (priorityByUrl.get(`${siteUrl}/learn/failure-modes`) ?? 1));
+    assert.ok((priorityByUrl.get(`${siteUrl}/method`) ?? 0) > (priorityByUrl.get(`${siteUrl}/concepts`) ?? 1));
+  });
+
   it("omits programmatic answer/regime URLs when eligibility fails", async () => {
     const entries = await sitemap({ programmaticEligible: false });
     const urls = new Set(entries.map((entry) => entry.url));
 
     assert.ok(!urls.has(`${siteUrl}/answers/should-we-hire-engineers-right-now`));
+    assert.ok(!urls.has(`${siteUrl}/should-we-hire-engineers-right-now`));
     assert.ok(!urls.has(`${siteUrl}/startup-macro-posture/scarcity`));
   });
 });

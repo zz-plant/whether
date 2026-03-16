@@ -250,7 +250,7 @@ export const ThresholdsPanel = ({
   };
 
   return (
-    <section id="thresholds" aria-labelledby="thresholds-title" className="mt-10">
+    <section id="thresholds" aria-labelledby="thresholds-title" className="mt-10 scroll-mt-28">
       <div className="weather-panel p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>

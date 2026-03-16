@@ -6,9 +6,9 @@ import { groupSearchResultsByType, searchEntityTypeLabels, searchIndex } from ".
 export const runtime = "edge";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Search — find toolkits, failure modes, concepts, and method docs",
+  title: "Search — find workflows, toolkits, concepts, and trust docs",
   description:
-    "Search the full operator corpus across toolkits, failure modes, concepts, and key method/signal docs.",
+    "Search the operator corpus across primary workflows, supporting toolkits, concepts, and key method/signal docs.",
   path: "/search",
   imageAlt: "Whether search",
 });
@@ -31,7 +31,7 @@ export default async function SearchPage({
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-200">Global search</p>
             <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Find decision artifacts fast</h1>
             <p className="max-w-2xl text-sm leading-relaxed text-slate-300">
-              Search across toolkits, failure modes, concepts, and key Signals/Method docs.
+              Search across primary workflow hubs, supporting toolkits, failure modes, concepts, and key Signals/Method docs.
             </p>
           </div>
 
@@ -58,7 +58,8 @@ export default async function SearchPage({
         <aside className="weather-route-card space-y-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-200">Search scope</p>
           <ul className="space-y-2 text-sm text-slate-200">
-            <li>Toolkits and decision flows</li>
+            <li>Primary workflows and decision paths</li>
+            <li>Supporting toolkits and utilities</li>
             <li>Failure modes and concepts</li>
             <li>Signals and method reference docs</li>
           </ul>
@@ -102,7 +103,7 @@ export default async function SearchPage({
         </section>
       ) : (
         <section className="mt-6 weather-panel px-5 py-5 text-sm text-slate-300 sm:px-6">
-          Enter a query to surface decision toolkits, risks, concepts, and trust docs.
+          Enter a query to surface workflow hubs, decision tools, risks, concepts, and trust docs.
         </section>
       )}
     </main>

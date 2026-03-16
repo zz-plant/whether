@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node scripts/vinext-run.mjs dev",
+    "dev": "next dev --turbo",
     "dev:vinext": "node scripts/vinext-run.mjs dev",
     "dev:turbo": "next dev --turbo",
     "build": "node scripts/vinext-run.mjs build",

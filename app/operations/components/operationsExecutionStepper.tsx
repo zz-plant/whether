@@ -119,7 +119,7 @@ export function OperationsExecutionStepper({
 
           if (isActive) {
             return (
-              <section key={step.id} id={step.id} className="weather-step-panel space-y-4">
+              <section key={step.id} id={step.id} className="weather-step-panel scroll-mt-28 space-y-4">
                 <div className="weather-panel flex flex-wrap items-start justify-between gap-3 px-5 py-4">
                   <div className="space-y-1">
                     <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">{step.label}</p>
@@ -136,7 +136,7 @@ export function OperationsExecutionStepper({
           }
 
           return (
-            <section key={step.id} id={step.id} className="weather-panel weather-step-summary flex flex-wrap items-start justify-between gap-3 px-5 py-4">
+            <section key={step.id} id={step.id} className="weather-panel weather-step-summary scroll-mt-28 flex flex-wrap items-start justify-between gap-3 px-5 py-4">
               <div className="space-y-1">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">{step.label}</p>
                 <h3 className="text-base font-semibold text-slate-100">{step.title}</h3>

@@ -122,23 +122,14 @@ When behavior or workflows change, update docs in the same PR:
 
 Whenever a route is renamed or reorganized, complete all of the following in the same PR:
 
-- [ ] Add redirect(s) in `next.config.js` from legacy path(s) to canonical path(s).
+- [ ] Remove the retired route handler or bridge page instead of preserving in-app redirects.
 - [ ] Update first-party navigation and CTA links to canonical routes (no internal link leakage).
 - [ ] Update sitemap entries (`app/sitemap.ts`) to canonical routes only.
 - [ ] Update breadcrumb mappings (`lib/navigation/*`) for the canonical route labels.
 - [ ] Update metadata/canonical URL references for affected route files.
-- [ ] Update route smoke checks (`scripts/prod-synthetic-smoke.mjs`) for both canonical and legacy redirect expectations.
+- [ ] Update route smoke checks (`scripts/prod-synthetic-smoke.mjs`) for canonical routes plus explicit 404 expectations on retired URLs.
 
-Rule of thumb: redirects exist for bookmarked/external traffic only. Product-owned links must always point to canonical routes.
-
-### Legacy answer redirect map workflow
-
-For legacy answer slugs, use the centralized registry in `lib/navigation/legacyRedirects.ts` instead of creating one-off route files under `app/<legacy-slug>/page.tsx`.
-
-- Add one `{ legacyPath, targetPath }` entry to `legacyRedirects`.
-- Keep `legacyPath` as the old slug path (e.g., `/old-slug`) and `targetPath` as the canonical destination (usually `/answers/<slug>`).
-- The dynamic route at `app/[legacySlug]/page.tsx` handles `permanentRedirect` behavior for every mapped slug.
-- Add or update route tests in `tests/legacyAnswerRedirectRoutes.test.ts` to confirm parity.
+Rule of thumb: product-owned links must always point to canonical routes, and retired URLs should fall through unless there is an explicit, current product reason to keep them alive.
 
 
 ## 11) Noun discipline glossary (primary surfaces)

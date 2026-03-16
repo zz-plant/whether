@@ -23,9 +23,9 @@ export const downloadableResources = {
       conversionEvent: "download",
     },
     secondaryCta: {
-      href: "/start?intent=capital-posture-template-gated",
-      label: "Get guided version (Decision Shield)",
-      conversionEvent: "download",
+      href: "/operations",
+      label: "Open guided version in Operations",
+      conversionEvent: "request",
     },
     internalLinks: [
       {

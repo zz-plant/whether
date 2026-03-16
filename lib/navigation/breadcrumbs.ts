@@ -10,9 +10,7 @@ const canonicalBreadcrumbLabels: Record<string, string> = {
   "/": "Home",
   "/resources": "Resources",
   "/concepts": "Concepts",
-  "/solutions": "Solutions",
   "/solutions/career-paths": "Career paths",
-  "/formulas": "Formulas",
 };
 
 const toTitleCase = (value: string) =>

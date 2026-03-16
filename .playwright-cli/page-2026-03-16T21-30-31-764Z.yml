@@ -1,0 +1,185 @@
+- generic [active] [ref=e1]:
+  - link "Skip to content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - link "Whether" [ref=e7] [cursor=pointer]:
+            - /url: /
+          - paragraph [ref=e8]: Operating posture navigation
+        - generic [ref=e9]:
+          - link "Open global search" [ref=e10] [cursor=pointer]:
+            - /url: /search
+            - text: Search
+          - button "Switch to light mode" [ref=e11] [cursor=pointer]: Light
+      - navigation "Global navigation" [ref=e12]:
+        - list [ref=e14]:
+          - listitem [ref=e15]:
+            - link "Now Weekly Brief" [ref=e16] [cursor=pointer]:
+              - /url: /
+              - generic [ref=e17]: Now
+              - generic [ref=e18]: Weekly Brief
+          - listitem [ref=e19]:
+            - link "Workflows Signals" [ref=e20] [cursor=pointer]:
+              - /url: /signals
+              - generic [ref=e21]: Workflows
+              - generic [ref=e22]: Signals
+          - listitem [ref=e23]:
+            - link "Workflows Operations" [ref=e24] [cursor=pointer]:
+              - /url: /operations
+              - generic [ref=e25]: Workflows
+              - generic [ref=e26]: Operations
+          - listitem [ref=e27]:
+            - link "Workflows Decide" [ref=e28] [cursor=pointer]:
+              - /url: /decide
+              - generic [ref=e29]: Workflows
+              - generic [ref=e30]: Decide
+          - listitem [ref=e31]:
+            - link "Workflows Toolkits" [ref=e32] [cursor=pointer]:
+              - /url: /toolkits
+              - generic [ref=e33]: Workflows
+              - generic [ref=e34]: Toolkits
+          - listitem [ref=e35]:
+            - link "Reference Learn" [ref=e36] [cursor=pointer]:
+              - /url: /learn
+              - generic [ref=e37]: Reference
+              - generic [ref=e38]: Learn
+          - listitem [ref=e39]:
+            - link "Reference Method" [ref=e40] [cursor=pointer]:
+              - /url: /method
+              - generic [ref=e41]: Reference
+              - generic [ref=e42]: Method
+  - main [ref=e43]:
+    - generic [ref=e44]:
+      - paragraph [ref=e45]: Operator answer hub
+      - heading "Direct answers mapped to canonical decisions" [level=1] [ref=e46]
+      - paragraph [ref=e47]: "Answer first, then bounded policy + threshold triggers + weekly brief linkback. Total pages: 24."
+    - generic [ref=e48]:
+      - heading "Distribution-ready direct pages" [level=2] [ref=e49]
+      - paragraph [ref=e50]: Answer exact operator queries and route back to the weekly brief artifact.
+      - generic [ref=e51]:
+        - link "Should Startups Hire Engineers Right Now?" [ref=e52] [cursor=pointer]:
+          - /url: /answers/should-startups-hire-engineers-right-now
+        - link "Should Startups Slow Roadmap Expansion?" [ref=e53] [cursor=pointer]:
+          - /url: /answers/should-startups-slow-roadmap-expansion
+        - link "Is It Risk-On or Risk-Off for Startups?" [ref=e54] [cursor=pointer]:
+          - /url: /answers/is-it-risk-on-or-risk-off-for-startups
+        - link "Startup Funding Climate This Week" [ref=e55] [cursor=pointer]:
+          - /url: /answers/startup-funding-climate-this-week
+        - link "Should Startups Raise Capital Now?" [ref=e56] [cursor=pointer]:
+          - /url: /answers/should-startups-raise-capital-now
+        - link "When Should Startups Cut Burn?" [ref=e57] [cursor=pointer]:
+          - /url: /answers/when-should-startups-cut-burn
+        - link "Should Startups Slow Product Development?" [ref=e58] [cursor=pointer]:
+          - /url: /answers/should-startups-slow-product-development
+        - link "Startup Market Outlook" [ref=e59] [cursor=pointer]:
+          - /url: /answers/startup-market-outlook
+    - generic [ref=e60]:
+      - heading "Decision calls" [level=2] [ref=e61]
+      - generic [ref=e62]:
+        - link "should startups hire engineers right now Yes for selective roles with short-cycle ROI proof." [ref=e63] [cursor=pointer]:
+          - /url: /answers/should-startups-hire-engineers-right-now
+          - paragraph [ref=e64]: should startups hire engineers right now
+          - paragraph [ref=e65]: Yes for selective roles with short-cycle ROI proof.
+        - link "should startups slow roadmap expansion Yes—slow expansion scope, not core delivery commitments." [ref=e66] [cursor=pointer]:
+          - /url: /answers/should-startups-slow-roadmap-expansion
+          - paragraph [ref=e67]: should startups slow roadmap expansion
+          - paragraph [ref=e68]: Yes—slow expansion scope, not core delivery commitments.
+        - link "should startups slow product development Slow speculative scope, not core delivery tempo." [ref=e69] [cursor=pointer]:
+          - /url: /answers/should-startups-slow-product-development
+          - paragraph [ref=e70]: should startups slow product development
+          - paragraph [ref=e71]: Slow speculative scope, not core delivery tempo.
+        - link "should startups raise capital now Raise when it extends strategic optionality and preserves terms." [ref=e72] [cursor=pointer]:
+          - /url: /answers/should-startups-raise-capital-now
+          - paragraph [ref=e73]: should startups raise capital now
+          - paragraph [ref=e74]: Raise when it extends strategic optionality and preserves terms.
+        - link "product strategy in a risk off market Protect core roadmap value and cut speculative scope quickly." [ref=e75] [cursor=pointer]:
+          - /url: /answers/product-strategy-in-a-risk-off-market
+          - paragraph [ref=e76]: product strategy in a risk off market
+          - paragraph [ref=e77]: Protect core roadmap value and cut speculative scope quickly.
+        - link "how to operate in expansion mode startup Accelerate reversible bets while preserving explicit rollback triggers." [ref=e78] [cursor=pointer]:
+          - /url: /answers/how-to-operate-in-expansion-mode-startup
+          - paragraph [ref=e79]: how to operate in expansion mode startup
+          - paragraph [ref=e80]: Accelerate reversible bets while preserving explicit rollback triggers.
+        - link "startup strategy during capital scarcity Preserve runway with threshold-gated commitments and narrower execution scope." [ref=e81] [cursor=pointer]:
+          - /url: /answers/startup-strategy-during-capital-scarcity
+          - paragraph [ref=e82]: startup strategy during capital scarcity
+          - paragraph [ref=e83]: Preserve runway with threshold-gated commitments and narrower execution scope.
+        - link "when should startups cut burn Cut burn when tightness worsens and raise-window strength weakens together." [ref=e84] [cursor=pointer]:
+          - /url: /answers/when-should-startups-cut-burn
+          - paragraph [ref=e85]: when should startups cut burn
+          - paragraph [ref=e86]: Cut burn when tightness worsens and raise-window strength weakens together.
+        - link "product strategy during downturn Defend core retention and conversion; defer speculative platform bets." [ref=e87] [cursor=pointer]:
+          - /url: /answers/product-strategy-during-downturn
+          - paragraph [ref=e88]: product strategy during downturn
+          - paragraph [ref=e89]: Defend core retention and conversion; defer speculative platform bets.
+        - link "product strategy during expansion Speed up validated bets while keeping rollback criteria live." [ref=e90] [cursor=pointer]:
+          - /url: /answers/product-strategy-during-expansion
+          - paragraph [ref=e91]: product strategy during expansion
+          - paragraph [ref=e92]: Speed up validated bets while keeping rollback criteria live.
+        - link "when to expand startup hiring Expand only after threshold headroom and role-level payback validation." [ref=e93] [cursor=pointer]:
+          - /url: /answers/when-to-expand-startup-hiring
+          - paragraph [ref=e94]: when to expand startup hiring
+          - paragraph [ref=e95]: Expand only after threshold headroom and role-level payback validation.
+        - link "from freeze posture to selective offense Reopen in tranches only after confirmation-quality signals stabilize." [ref=e96] [cursor=pointer]:
+          - /url: /answers/from-hiring-freeze-to-selective-offense
+          - paragraph [ref=e97]: from freeze posture to selective offense
+          - paragraph [ref=e98]: Reopen in tranches only after confirmation-quality signals stabilize.
+        - link "startup strategy in uncertain markets Prefer reversible decisions and tighter review cadence." [ref=e99] [cursor=pointer]:
+          - /url: /answers/startup-strategy-in-uncertain-markets
+          - paragraph [ref=e100]: startup strategy in uncertain markets
+          - paragraph [ref=e101]: Prefer reversible decisions and tighter review cadence.
+    - generic [ref=e102]:
+      - heading "Climate reads" [level=2] [ref=e103]
+      - generic [ref=e104]:
+        - link "startup funding climate this week Funding is open with guardrails, not universally easy." [ref=e105] [cursor=pointer]:
+          - /url: /answers/startup-funding-climate-this-week
+          - paragraph [ref=e106]: startup funding climate this week
+          - paragraph [ref=e107]: Funding is open with guardrails, not universally easy.
+        - link "is it risk-on or risk-off for startups Current read is expansion with guardrails." [ref=e108] [cursor=pointer]:
+          - /url: /answers/is-it-risk-on-or-risk-off-for-startups
+          - paragraph [ref=e109]: is it risk-on or risk-off for startups
+          - paragraph [ref=e110]: Current read is expansion with guardrails.
+        - link "startup market outlook Near-term outlook supports execution, but reversal risk remains live." [ref=e111] [cursor=pointer]:
+          - /url: /answers/startup-market-outlook
+          - paragraph [ref=e112]: startup market outlook
+          - paragraph [ref=e113]: Near-term outlook supports execution, but reversal risk remains live.
+        - link "is venture funding recovering Recovery is visible, but quality and discipline still separate outcomes." [ref=e114] [cursor=pointer]:
+          - /url: /answers/is-venture-funding-recovering
+          - paragraph [ref=e115]: is venture funding recovering
+          - paragraph [ref=e116]: Recovery is visible, but quality and discipline still separate outcomes.
+        - link "tech funding environment Capital is available for durable stories with clean unit economics." [ref=e117] [cursor=pointer]:
+          - /url: /answers/tech-funding-environment
+          - paragraph [ref=e118]: tech funding environment
+          - paragraph [ref=e119]: Capital is available for durable stories with clean unit economics.
+        - link "startup hiring trends Hiring is selective and role-specific rather than broad-based." [ref=e120] [cursor=pointer]:
+          - /url: /answers/startup-hiring-trends
+          - paragraph [ref=e121]: startup hiring trends
+          - paragraph [ref=e122]: Hiring is selective and role-specific rather than broad-based.
+    - generic [ref=e123]:
+      - heading "Explanation" [level=2] [ref=e124]
+      - generic [ref=e125]:
+        - link "how macro conditions affect startups Macro conditions set approval speed, capital flexibility, and risk tolerance." [ref=e126] [cursor=pointer]:
+          - /url: /answers/how-macro-conditions-affect-startups
+          - paragraph [ref=e127]: how macro conditions affect startups
+          - paragraph [ref=e128]: Macro conditions set approval speed, capital flexibility, and risk tolerance.
+        - link "how interest rates affect startups Rate shifts change capital tightness and investor risk appetite." [ref=e129] [cursor=pointer]:
+          - /url: /answers/how-interest-rates-affect-startups
+          - paragraph [ref=e130]: how interest rates affect startups
+          - paragraph [ref=e131]: Rate shifts change capital tightness and investor risk appetite.
+        - link "venture funding cycle explained Funding cycles are pacing inputs for when to accelerate versus protect runway." [ref=e132] [cursor=pointer]:
+          - /url: /answers/venture-funding-cycle-explained
+          - paragraph [ref=e133]: venture funding cycle explained
+          - paragraph [ref=e134]: Funding cycles are pacing inputs for when to accelerate versus protect runway.
+        - link "how macro affects product strategy Macro primarily changes roadmap tempo and reversibility requirements." [ref=e135] [cursor=pointer]:
+          - /url: /answers/how-macro-affects-product-strategy
+          - paragraph [ref=e136]: how macro affects product strategy
+          - paragraph [ref=e137]: Macro primarily changes roadmap tempo and reversibility requirements.
+        - link "how to brief executives on market conditions Lead with decision delta, bounded rules, and flip triggers." [ref=e138] [cursor=pointer]:
+          - /url: /answers/how-to-brief-executives-on-market-conditions
+          - paragraph [ref=e139]: how to brief executives on market conditions
+          - paragraph [ref=e140]: Lead with decision delta, bounded rules, and flip triggers.
+  - button "Open Next.js Dev Tools" [ref=e146] [cursor=pointer]:
+    - img [ref=e147]
+  - alert [ref=e150]

@@ -5,7 +5,7 @@ import { pathMatchesLink } from "../lib/navigation/pathMatching";
 describe("pathMatchesLink", () => {
   it("matches exact routes and subpaths", () => {
     assert.equal(pathMatchesLink("/learn", "/learn"), true);
-    assert.equal(pathMatchesLink("/learn", "/learn/concepts"), true);
+    assert.equal(pathMatchesLink("/learn", "/learn/failure-modes"), true);
   });
 
   it("does not match unrelated paths", () => {

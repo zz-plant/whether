@@ -1,30 +1,27 @@
 # Information architecture proposal
 
 ## Goal
-Align primary navigation labels with task intent so leaders can move from context to action faster.
+Align navigation to the operator loop so leaders can move from posture to decision to execution without competing top-level choices.
 
-## Proposed top-level language
-- **Command Center** (`/start`) for posture-first orientation and routing.
-- **Signals** (`/signals`) for macro state and confidence context.
-- **Operations** (`/operations`) for execution guardrails by posture.
-- **Decide** (`/decide`) for role/situation decision pathways.
-- **Toolkits** (`/toolkits`) for implementation surfaces and runnable instruments.
-- **Learn** (`/learn`) for diagnostics and conceptual references.
-- **Method** (`/method`) for model transparency and trust context.
+## Rationalized primary IA
+- **Weekly Brief** (`/`) for the canonical weekly call, bounded decision delta, and share artifact.
+- **Signals** (`/signals`) for evidence depth, thresholds, and historical replay.
+- **Decide** (`/decide`) for role, situation, and utility-based decision translation.
+- **Operations** (`/operations`) for execution guardrails, finance posture, and export actions.
+- **Method** (`/method`) for trust, sources, formulas, and confidence limits.
 
-## Legacy route compatibility
-To preserve inbound links and historical references, legacy entrypoints should redirect:
-- `/guides` → `/learn`
-- `/solutions` → `/toolkits`
-- `/brief/stage` → `/toolkits`
-- `/brief` → `/start`
-- `/method` should act as a hub that links to both `/methodology` and `/about` to align trust expectations with user intent.
+## Supporting surfaces
+- **Toolkits** (`/toolkits`) is a supporting instrument library under **Decide**, not a peer workflow hub.
+- **Learn** (`/learn`) is a supporting reference library under **Method**, not a peer workflow hub.
+- **Guides**, **Resources**, **Answers**, **Solutions**, **Concepts**, and **Startup Macro Posture** remain secondary discovery, SEO, or long-form distribution surfaces.
 
-## Migration notes
-- Keep `/decide/use-cases` and `/decide/[slug]` as entry-point bridge paths because they support intent-based routing.
-- Consolidate concept discovery on `/concepts` (and `/concepts/[slug]`) and failure-mode diagnostics on `/library/failure-modes` (and `/library/failure-modes/[slug]`), with `/learn` as the single canonical discovery hub.
-- Keep `/library` as a redirect-only compatibility entrypoint to `/learn`.
-- Preserve `/learn/concepts*` and `/learn/failure-modes*` only as redirect compatibility paths; do not prioritize them as canonical discovery URLs.
-- Keep legacy destination pages available during transition windows for backlink continuity.
-- Update sitemap priorities to favor canonical hubs and detail pages while excluding redirect-only bridge paths.
-- Ensure report shell navigation highlights current labels when users land on compatibility URLs.
+## Rationale
+- The product loop is `signals → posture → decision → artifact`; primary IA should mirror that loop instead of exposing every supporting library as an equal first choice.
+- `Toolkits` and `Learn` are both downstream surfaces by design: one executes a chosen path, the other supplies optional background.
+- Secondary surfaces should stay searchable and indexable when they earn it, but they should not weaken decision transmission on the primary nav.
+
+## Implementation notes
+- Keep the global nav limited to the five primary hubs.
+- Use supporting-surface copy to point back to the parent hub (`Toolkits` → `Decide`, `Learn` → `Method`).
+- Keep first-party CTAs pointed at primary hubs unless the user already needs a supporting surface.
+- Use sitemap and metadata to distinguish canonical workflow hubs from supporting or distribution pages.

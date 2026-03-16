@@ -28,6 +28,8 @@ import { NextStepRail } from "../components/nextStepRail";
 import { buildCanonicalBoundedDecisionRules } from "../../lib/report/boundedDecisionRules";
 import { buildActionStripItems } from "../../lib/report/operatingCalls";
 import { OperationsExecutionStepper } from "./components/operationsExecutionStepper";
+import { operationsScrollPlan } from "../../lib/navigation/scrollPlans";
+import { PageFlowNav } from "../components/pageFlowNav";
 
 
 export const runtime = "edge";
@@ -249,6 +251,13 @@ export default async function OperationsPage({
         ) : null
       }
     >
+      <PageFlowNav
+        eyebrow={operationsScrollPlan.eyebrow}
+        title={operationsScrollPlan.title}
+        description={operationsScrollPlan.description}
+        items={operationsScrollPlan.items}
+      />
+
       {!historicalSelection && isFallback ? (
         <LiveDataFallbackAlert
           lastCachedTimestamp={reportResult.ok ? treasury.fetched_at : reportResult.fallback.lastCachedTimestamp}
@@ -389,7 +398,7 @@ export default async function OperationsPage({
         ]}
       />
 
-      <section className="weather-panel space-y-4 px-5 py-5" aria-labelledby="ops-implementation-handoffs-title">
+      <section id="ops-implementation-handoffs" className="weather-panel scroll-mt-28 space-y-4 px-5 py-5" aria-labelledby="ops-implementation-handoffs-title">
         <div className="space-y-1">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Implementation handoffs</p>
           <h2 id="ops-implementation-handoffs-title" className="text-lg font-semibold text-slate-100">Optional depth pages after the weekly plan is approved</h2>

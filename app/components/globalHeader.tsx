@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { headers } from "next/headers";
-import { navigationGroupLabels, navigationLayers } from "../../lib/navigation/informationArchitecture";
+import { navigationGroupLabels, primaryNavigationLayers } from "../../lib/navigation/informationArchitecture";
 import { reportShellCorePaths } from "../../lib/report/reportNavigation";
 import { GlobalHeaderNavClient } from "./globalHeaderNavClient";
 import { GlobalHeaderTaglineClient } from "./globalHeaderTaglineClient";
@@ -50,7 +50,7 @@ export async function GlobalHeader() {
 
         <nav aria-label="Global navigation" className="mt-5">
           <GlobalHeaderNavClient
-            navigationLinks={navigationLayers}
+            navigationLinks={primaryNavigationLayers}
             groupLabels={navigationGroupLabels}
           />
         </nav>

@@ -1,0 +1,403 @@
+- generic [active] [ref=e1]:
+  - link "Skip to content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - main [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - generic [ref=e7]:
+            - generic [ref=e8]:
+              - img "Whether — Weekly Operating Posture (Hiring, Spend, Roadmap)" [ref=e9]
+              - generic [ref=e10]: Expansion
+            - paragraph [ref=e11]: "Weekly posture artifact for operators: decide now, execute with guardrails, and keep evidence one click away."
+          - generic [ref=e12]:
+            - generic [ref=e13]:
+              - paragraph [ref=e14]: Signals updated
+              - paragraph [ref=e15]: Mar 16, 2026, 9:29 PM UTC
+            - generic [ref=e16]:
+              - paragraph [ref=e17]: Record date
+              - paragraph [ref=e18]: Mar 13, 2026
+        - generic "Navigation zone orientation (not macro posture)" [ref=e19]:
+          - link "Now section" [ref=e20] [cursor=pointer]:
+            - /url: /
+            - generic [ref=e21]: Now section
+          - link "Workflow section" [ref=e22] [cursor=pointer]:
+            - /url: /signals
+            - generic [ref=e23]: Workflow section
+          - link "Reference section" [ref=e24] [cursor=pointer]:
+            - /url: /method
+            - generic [ref=e25]: Reference section
+        - paragraph [ref=e26]: Whether translates macro conditions into weekly operating posture for founders.
+        - paragraph [ref=e27]: "Choose view: Now for the weekly call, Workflows for signals and guardrails, Reference for background and method."
+      - region "Weekly command bar" [ref=e29]:
+        - generic [ref=e30]:
+          - article [ref=e31]:
+            - paragraph [ref=e32]: REGIME
+            - generic [ref=e34]: Expansion
+          - article [ref=e35]:
+            - paragraph [ref=e36]: CALL
+            - paragraph [ref=e38]: Stage decisions. Avoid irreversible spend.
+          - article [ref=e39]:
+            - paragraph [ref=e40]: DO NOW
+            - list [ref=e43]:
+              - listitem [ref=e44]:
+                - generic [ref=e46]: Revise hiring and roadmap calls now.
+              - listitem [ref=e47]:
+                - generic [ref=e49]: Selective hiring for revenue-linked and reliability roles.
+              - listitem [ref=e50]:
+                - generic [ref=e52]: Keep discretionary spend gated by measurable short-cycle payback.
+          - article [ref=e53]:
+            - paragraph [ref=e54]: FLIP CONDITIONS
+            - list [ref=e57]:
+              - listitem [ref=e58]:
+                - generic [ref=e60]: Flip to Defensive if risk appetite falls to or below 50.0 (now 51.0).
+              - listitem [ref=e61]:
+                - generic [ref=e63]: Tightness < 66
+              - listitem [ref=e64]:
+                - generic [ref=e66]: Risk appetite > 54
+          - article [ref=e67]:
+            - paragraph [ref=e68]: Updated
+            - paragraph [ref=e70]: Mar 16, 2026, 9:29 PM UTC
+      - generic [ref=e72]:
+        - generic [ref=e73]:
+          - generic [ref=e74]:
+            - 'region "Regime: Guarded Expansion Cycle phase: Late" [ref=e75]':
+              - generic "Weekly regime banner" [ref=e76]:
+                - paragraph [ref=e77]: REGIME — WEEK OF Mar 13, 2026
+                - generic [ref=e78]:
+                  - paragraph [ref=e79]: "Regime: Guarded Expansion"
+                  - paragraph [ref=e80]: "Cycle phase: Late"
+                - paragraph [ref=e81]:
+                  - generic [ref=e82]: Confidence LOW 58%
+                  - text: ·
+                  - generic [ref=e83]: Trend Deteriorating
+                  - text: ·
+                  - generic [ref=e84]: Flip Risk 1 pts
+                - generic "Regime legend" [ref=e85]:
+                  - generic [ref=e86]:
+                    - paragraph [ref=e87]: What to do this week
+                    - paragraph [ref=e88]: Stage decisions. Avoid irreversible spend.
+                    - paragraph [ref=e89]: "Flip risk: High"
+                    - paragraph [ref=e92]: We are close to a flip. Recheck major commitments before locking spend.
+                    - paragraph [ref=e93]: "Flip trigger: Risk appetite to or below 50.0."
+                  - generic [ref=e94]:
+                    - paragraph [ref=e95]: Tighter conditions
+                    - paragraph [ref=e96]: →
+                    - paragraph [ref=e97]: Looser conditions
+                  - list "Ordered regime states from scarcity to expansion" [ref=e98]:
+                    - listitem [ref=e99]:
+                      - 'generic "Scarcity regime: freezing weather; capital is constrained and each move needs protection." [ref=e100]':
+                        - img [ref=e101]
+                        - text: Scarcity
+                        - generic [ref=e103]: · Freezing
+                      - generic [ref=e105]: →
+                    - listitem [ref=e106]:
+                      - 'generic "Defensive regime: cloudy weather; conditions are workable but visibility is muted." [ref=e107]':
+                        - img [ref=e108]
+                        - text: Defensive
+                        - generic [ref=e110]: · Cloudy
+                      - generic [ref=e112]: →
+                    - listitem [ref=e113]:
+                      - 'generic "Transitional regime: stormy weather; windows open and close quickly." [ref=e114]':
+                        - img [ref=e115]
+                        - text: Transitional
+                        - generic [ref=e118]: · Stormy
+                      - generic [ref=e120]: →
+                    - listitem [ref=e121]:
+                      - 'generic "Expansion regime: sunny weather; visibility is high and conditions support faster movement. (current)" [ref=e122]':
+                        - img [ref=e123]
+                        - text: Expansion
+                        - generic [ref=e126]: · Sunny
+                        - generic [ref=e127]: (current regime)
+                  - paragraph [ref=e128]:
+                    - img [ref=e129]
+                    - generic [ref=e132]: "Weather read: Sunny. Why it fits: Visibility is high and footing is firm, so move faster while keeping guardrails in place. Operator meaning: Conditions support growth. Move faster, but keep guardrails in place."
+              - generic [ref=e133]:
+                - main [ref=e134]:
+                  - article "Weekly call snapshot" [ref=e135]:
+                    - generic [ref=e136]:
+                      - heading "Weekly call snapshot" [level=2] [ref=e137]
+                      - paragraph [ref=e138]: Decide, align, and share in under 60 seconds
+                    - paragraph [ref=e139]: External conditions are tightening, so fixed-cost mistakes get harder to reverse and long-payback bets need stronger proof.
+                    - list "Weekly decision transmission order" [ref=e140]:
+                      - listitem [ref=e141]:
+                        - text: Market posture
+                        - paragraph [ref=e142]: Guarded Expansion — Late (Fragile)
+                      - listitem [ref=e143]:
+                        - text: Operating call
+                        - paragraph [ref=e144]: Stage decisions. Avoid irreversible spend.
+                      - listitem [ref=e145]:
+                        - generic [ref=e146]:
+                          - paragraph [ref=e147]: Do now
+                          - paragraph [ref=e148]: Revise hiring and roadmap calls now.
+                        - generic [ref=e149]:
+                          - paragraph [ref=e150]: Guardrail
+                          - paragraph [ref=e151]: net-new hiring if tightness > 76 or risk appetite < 44 long-payback bets if risk appetite < 44 or two consecutive weaker weekly reads print
+                        - generic [ref=e152]:
+                          - paragraph [ref=e153]: Flip when
+                          - paragraph [ref=e154]: Flip to Defensive if risk appetite falls to or below 50.0 (now 51.0).
+                    - group [ref=e155]:
+                      - generic "Read this card" [ref=e156] [cursor=pointer]
+                    - generic [ref=e157]:
+                      - paragraph [ref=e158]: Can I rely on this?
+                      - paragraph [ref=e159]: Use this call for near-term pacing only until confidence returns to HIGH with fresh data.
+                    - group [ref=e160]:
+                      - generic "Secondary diagnostics" [ref=e161] [cursor=pointer]
+                    - generic "Decision confidence gauge" [ref=e162]:
+                      - paragraph [ref=e163]: Decision confidence
+                      - progressbar "Confidence 58 percent" [ref=e164]
+                      - paragraph [ref=e166]: 58% confidence · use flip cues when this drops.
+                    - generic "Share this week's call" [ref=e167]:
+                      - paragraph [ref=e168]: Share this week's call
+                      - generic "Primary weekly brief actions" [ref=e172]:
+                        - button "Copy weekly call snapshot" [ref=e173] [cursor=pointer]
+                        - button "Copy Meeting Pack" [ref=e174] [cursor=pointer]
+                        - button "Copy Weekly Operator Brief" [ref=e175] [cursor=pointer]
+                        - button "More share actions" [ref=e176] [cursor=pointer]:
+                          - text: More share actions
+                          - generic [ref=e177]: ▾
+                  - article [ref=e178]:
+                    - heading "This week's call" [level=2] [ref=e179]
+                    - paragraph [ref=e180]: Whether does not predict markets; it tells founders how to operate inside them this week.
+                    - generic [ref=e181]:
+                      - paragraph [ref=e182]: What environment? Guarded Expansion — Late (Fragile) with a deteriorating trend at 58% confidence.
+                      - paragraph [ref=e183]: DO NOW Revise hiring and roadmap calls now.
+                      - paragraph [ref=e184]: GUARDRAIL net-new hiring if tightness > 76 or risk appetite < 44 long-payback bets if risk appetite < 44 or two consecutive weaker weekly reads print
+                      - paragraph [ref=e185]: FLIP WHEN Flip to Defensive if risk appetite falls to or below 50.0 (now 51.0).
+                    - generic [ref=e186]:
+                      - generic [ref=e187]:
+                        - button "Refine by company stage" [ref=e188] [cursor=pointer]:
+                          - generic [ref=e189]: Refine by company stage
+                          - generic [ref=e190]: ↗
+                        - button "Open command palette" [ref=e191] [cursor=pointer]:
+                          - generic [ref=e192]: Open command palette
+                          - generic [ref=e193]: ⌘K / Ctrl+K
+                      - paragraph [ref=e194]: "Stage selected: Series A. Use command palette to jump to decision blocks fast."
+                - complementary [ref=e195]:
+                  - article [ref=e196]:
+                    - heading "Confidence trend (8w)" [level=2] [ref=e197]
+                    - paragraph [ref=e198]: unstable
+                    - img "Last 8 weekly confidence values" [ref=e199]:
+                      - generic "2026-01-21 missing confidence data" [ref=e201]
+                      - generic "2026-01-30 confidence 92%" [ref=e203]
+                      - generic "2026-02-06 missing confidence data" [ref=e205]
+                      - generic "2026-02-13 missing confidence data" [ref=e207]
+                      - generic "2026-02-20 missing confidence data" [ref=e209]
+                      - generic "2026-02-27 confidence 92%" [ref=e211]
+                      - generic "2026-03-06 missing confidence data" [ref=e213]
+                      - generic "2026-03-13 confidence 91%" [ref=e215]
+                    - paragraph [ref=e216]: Missing weeks are dashed markers.
+              - article [ref=e217]:
+                - heading "Cite this call" [level=2] [ref=e218]
+                - paragraph [ref=e219]: Posture Guarded Expansion · Signal reliability LOW · Effective Mar 13, 2026 · Freshness Mar 16, 2026, 9:29 PM UTC
+                - generic [ref=e220]: "Whether call — 2026-03-13 Posture: Guarded Expansion — Late (Fragile) (EXPANSION) Confidence: Score-based posture confidence Signal refresh cadence: 15m Source: https://fred.stlouisfed.org"
+                - generic [ref=e221]:
+                  - generic [ref=e222]: Use this citation in meeting notes, board updates, or operating memos.
+                  - generic [ref=e223]: Send to team
+                - generic "Primary weekly brief actions" [ref=e228]:
+                  - button "Copy weekly call snapshot" [ref=e229] [cursor=pointer]
+                  - button "Copy Meeting Pack" [ref=e230] [cursor=pointer]
+                  - button "Copy Weekly Operator Brief" [ref=e231] [cursor=pointer]
+                  - button "More share actions" [ref=e232] [cursor=pointer]:
+                    - text: More share actions
+                    - generic [ref=e233]: ▾
+            - generic [ref=e235]:
+              - generic [ref=e236]:
+                - generic [ref=e237]:
+                  - generic [ref=e238]:
+                    - img [ref=e239]
+                    - text: Data normal
+                  - paragraph [ref=e241]: Data provenance
+                - paragraph [ref=e242]: Live • Treasury verified
+                - paragraph [ref=e243]: "Decision impact: proceed with today’s do now / hold / revisit path under normal approval cadence."
+                - generic [ref=e244]:
+                  - paragraph [ref=e245]: Decision rule
+                  - paragraph [ref=e246]: "Safe to use for near-term planning; proceed with normal approval flow. Trigger: confidence drops. Reversal: return to standard cadence once reliability recovers."
+                - button "Data source details Collapsed ⌄" [ref=e248] [cursor=pointer]:
+                  - generic [ref=e249]: Data source details
+                  - generic [ref=e250]: Collapsed
+                  - generic [ref=e251]: ⌄
+              - paragraph [ref=e252]:
+                - text: Keep the decision path moving; for methodology details, see
+                - link "/method" [ref=e253] [cursor=pointer]:
+                  - /url: /method
+                - text: .
+          - generic [ref=e256]:
+            - region "Weekly workspace actions" [ref=e257]:
+              - generic [ref=e258]:
+                - paragraph [ref=e259]: Weekly workspace
+                - paragraph [ref=e260]: Confirm what changed, review the evidence, then open execution guardrails only when you need more detail.
+              - generic [ref=e261]:
+                - link "See why this call changed" [ref=e262] [cursor=pointer]:
+                  - /url: "#audit-this-call"
+                - link "Open execution guardrails" [ref=e263] [cursor=pointer]:
+                  - /url: "#approve-this-weeks-plan"
+            - region "See what changed, then pressure-test the call with trust and evidence." [ref=e264]:
+              - generic:
+                - generic [ref=e265]:
+                  - paragraph [ref=e266]: Why this call
+                  - heading "See what changed, then pressure-test the call with trust and evidence." [level=2] [ref=e267]
+                  - paragraph [ref=e268]: Start with the weekly delta and reversal cue, then inspect freshness, source coverage, and evidence movers before you change pace.
+                - generic [ref=e269]:
+                  - link "Review full evidence" [ref=e270] [cursor=pointer]:
+                    - /url: /signals
+                  - link "Open trust details" [ref=e271] [cursor=pointer]:
+                    - /url: /method
+                  - link "Open sources" [ref=e272] [cursor=pointer]:
+                    - /url: /sources
+              - generic [ref=e273]:
+                - generic [ref=e274]:
+                  - generic [ref=e275]:
+                    - generic [ref=e276]:
+                      - img [ref=e277]
+                      - text: Data normal
+                    - paragraph [ref=e279]: Data provenance
+                  - paragraph [ref=e280]: Live • Treasury verified
+                  - paragraph [ref=e281]: "Decision impact: proceed with today’s do now / hold / revisit path under normal approval cadence."
+                  - generic [ref=e282]:
+                    - paragraph [ref=e283]: Decision rule
+                    - paragraph [ref=e284]: "Safe to use for near-term planning; proceed with normal approval flow. Trigger: confidence drops. Reversal: return to standard cadence once reliability recovers."
+                  - button "Data source details Collapsed ⌄" [ref=e286] [cursor=pointer]:
+                    - generic [ref=e287]: Data source details
+                    - generic [ref=e288]: Collapsed
+                    - generic [ref=e289]: ⌄
+                - generic [ref=e290]:
+                  - article [ref=e291]:
+                    - paragraph [ref=e292]: What changed in the decision
+                    - paragraph [ref=e293]: YES — revisit this week's approvals now.
+                    - paragraph [ref=e294]: Over-engineering before demand proves out
+                  - article [ref=e295]:
+                    - paragraph [ref=e296]: What would change this call
+                    - paragraph [ref=e297]: "Flip watch: Tightness > 70.0 or Risk appetite <= 50.0."
+                    - paragraph [ref=e298]: Tightness ≤ 66 for 2 consecutive refreshes.
+              - article [ref=e300]:
+                - paragraph [ref=e301]: Evidence movers
+                - paragraph [ref=e302]: No major evidence movers were recorded for this refresh. Hold the current weekly baseline unless a trust warning or flip condition fires.
+            - region "Lock the operating summary here, then open Operations only for execution detail." [ref=e303]:
+              - generic:
+                - generic [ref=e304]:
+                  - paragraph [ref=e305]: Execution guardrails
+                  - heading "Lock the operating summary here, then open Operations only for execution detail." [level=2] [ref=e306]
+                  - paragraph [ref=e307]: This band compresses the weekly do now, top guardrails, finance posture, and share handoff after you review the call.
+                - link "Continue in Operations" [ref=e308] [cursor=pointer]:
+                  - /url: /operations#ops-monthly-action-summary
+              - generic [ref=e309]:
+                - article [ref=e310]:
+                  - paragraph [ref=e311]: Weekly operating action
+                  - paragraph [ref=e312]: Selective hiring for revenue-linked and reliability roles.
+                  - paragraph [ref=e313]: Revisit last week's approvals before you add fixed cost or sequence new bets.
+                - article [ref=e314]:
+                  - paragraph [ref=e315]: Export handoff
+                  - paragraph [ref=e316]: Share the aligned brief only after the plan and finance posture are set.
+                  - generic [ref=e317]:
+                    - link "Open share brief" [ref=e318] [cursor=pointer]:
+                      - /url: /operations#ops-export-briefs
+                    - link "Open finance detail" [ref=e319] [cursor=pointer]:
+                      - /url: /operations#ops-finance-strategy
+              - generic [ref=e320]:
+                - article [ref=e321]:
+                  - paragraph [ref=e322]: Top guardrails
+                  - list [ref=e323]:
+                    - listitem [ref=e324]:
+                      - paragraph [ref=e325]: Hiring stance
+                      - paragraph [ref=e326]: Pause net-new hiring if tightness > 76 or risk appetite < 44.
+                    - listitem [ref=e327]:
+                      - paragraph [ref=e328]: Investment pace
+                      - paragraph [ref=e329]: Pause discretionary burn expansion if tightness > 76.
+                    - listitem [ref=e330]:
+                      - paragraph [ref=e331]: Sales posture
+                      - paragraph [ref=e332]: Pause acceleration if risk appetite falls below 44 or tightness rises above 76.
+                - article [ref=e333]:
+                  - paragraph [ref=e334]: Finance snapshot
+                  - list [ref=e335]:
+                    - listitem [ref=e336]:
+                      - paragraph [ref=e337]: Investment pace
+                      - paragraph [ref=e338]: Keep discretionary spend gated by measurable short-cycle payback.
+                      - paragraph [ref=e339]: "Reverse: Resume controlled burn expansion when tightness < 66 and budget payback proof is intact."
+                    - listitem [ref=e340]:
+                      - paragraph [ref=e341]: Risk tolerance
+                      - paragraph [ref=e342]: Run reversible expansion bets with explicit rollback criteria and stage gates.
+                      - paragraph [ref=e343]: "Reverse: Resume in tranches when risk appetite > 54 and tightness < 66."
+            - region "Replay any prior month after you lock this week's live call." [ref=e344]:
+              - generic [ref=e345]:
+                - paragraph [ref=e346]: Historical replay
+                - heading "Replay any prior month after you lock this week's live call." [level=2] [ref=e347]
+                - paragraph [ref=e348]: Use the same replay pattern as Signals when you want context, retrospectives, or a quick comparison to prior conditions.
+              - generic [ref=e349]:
+                - article [ref=e350]:
+                  - paragraph [ref=e351]: Replay a prior monthly snapshot
+                  - generic [ref=e353]:
+                    - generic [ref=e354]:
+                      - text: Replay date
+                      - textbox "Replay date" [ref=e355]: 2026-02-01
+                    - button "Replay on home" [ref=e356] [cursor=pointer]
+                  - paragraph [ref=e357]: Choose any date to swap the home workspace to the closest cached monthly snapshot.
+                  - link "Open full time machine" [ref=e359] [cursor=pointer]:
+                    - /url: /signals?advanced=1#time-machine
+                - article [ref=e360]:
+                  - paragraph [ref=e361]: What this looked like then
+                  - list [ref=e362]:
+                    - listitem [ref=e363]:
+                      - paragraph [ref=e364]: Nov 28, 2025 11/2025
+                      - paragraph [ref=e365]: Capital is cheap and risk appetite is healthy. Move quickly to capture share.
+                    - listitem [ref=e366]:
+                      - paragraph [ref=e367]: Dec 31, 2025 12/2025
+                      - paragraph [ref=e368]: Capital is cheap and risk appetite is healthy. Move quickly to capture share.
+                    - listitem [ref=e369]:
+                      - paragraph [ref=e370]: Jan 30, 2026 01/2026
+                      - paragraph [ref=e371]: Capital is cheap and risk appetite is healthy. Move quickly to capture share.
+                    - listitem [ref=e372]:
+                      - paragraph [ref=e373]: Feb 27, 2026 02/2026
+                      - paragraph [ref=e374]: Capital is cheap and risk appetite is healthy. Move quickly to capture share.
+            - region "Go straight to a role path, situation path, or runnable utility." [ref=e375]:
+              - generic:
+                - paragraph [ref=e376]: Translate or run a tool
+                - heading "Go straight to a role path, situation path, or runnable utility." [level=2] [ref=e377]
+                - paragraph [ref=e378]: Use fast paths first. Browse role and situation hubs only when you need fuller discovery.
+              - generic [ref=e379]:
+                - link "Recommended role path CEO Where to place the next dollar" [ref=e380] [cursor=pointer]:
+                  - /url: /decide/ceo
+                  - paragraph [ref=e381]: Recommended role path
+                  - heading "CEO" [level=3] [ref=e382]
+                  - paragraph [ref=e383]: Where to place the next dollar
+                - link "Recommended situation path Avoid Premature Scaling Fastest route to this week's next action." [ref=e384] [cursor=pointer]:
+                  - /url: /decide/avoid-premature-scaling
+                  - paragraph [ref=e385]: Recommended situation path
+                  - heading "Avoid Premature Scaling" [level=3] [ref=e386]
+                  - paragraph [ref=e387]: Fastest route to this week's next action.
+              - generic [ref=e388]:
+                - 'link "Toolkit shortcut PMF Toolkit Choose one gate now: invest, hold, or narrow to one segment." [ref=e389] [cursor=pointer]':
+                  - /url: /toolkits/pmf
+                  - paragraph [ref=e390]: Toolkit shortcut
+                  - heading "PMF Toolkit" [level=3] [ref=e391]
+                  - paragraph [ref=e392]: "Choose one gate now: invest, hold, or narrow to one segment."
+                - link "Toolkit shortcut Roadmap Focus Toolkit Commit to keep, pause, and accelerate decisions for this cycle." [ref=e393] [cursor=pointer]:
+                  - /url: /toolkits/focus
+                  - paragraph [ref=e394]: Toolkit shortcut
+                  - heading "Roadmap Focus Toolkit" [level=3] [ref=e395]
+                  - paragraph [ref=e396]: Commit to keep, pause, and accelerate decisions for this cycle.
+                - link "Toolkit shortcut Commitment & Rollback Toolkit Approve or reject the commitment with rollback ownership assigned now." [ref=e397] [cursor=pointer]:
+                  - /url: /toolkits/rollback
+                  - paragraph [ref=e398]: Toolkit shortcut
+                  - heading "Commitment & Rollback Toolkit" [level=3] [ref=e399]
+                  - paragraph [ref=e400]: Approve or reject the commitment with rollback ownership assigned now.
+              - generic [ref=e401]:
+                - link "Decision utility Whether to ship checklist Score a go / wait / kill launch decision against the current regime." [ref=e402] [cursor=pointer]:
+                  - /url: /decide/ship-checklist
+                  - paragraph [ref=e403]: Decision utility
+                  - heading "Whether to ship checklist" [level=3] [ref=e404]
+                  - paragraph [ref=e405]: Score a go / wait / kill launch decision against the current regime.
+                - link "Decision utility Team context profile Tailor the weekly mandate by stage, sector, and operating profile." [ref=e406] [cursor=pointer]:
+                  - /url: /decide/team-context
+                  - paragraph [ref=e407]: Decision utility
+                  - heading "Team context profile" [level=3] [ref=e408]
+                  - paragraph [ref=e409]: Tailor the weekly mandate by stage, sector, and operating profile.
+              - generic [ref=e410]:
+                - link "Browse role and situation hubs" [ref=e411] [cursor=pointer]:
+                  - /url: /decide
+                - link "Browse all toolkits" [ref=e412] [cursor=pointer]:
+                  - /url: /toolkits
+        - paragraph [ref=e414]: Governance artifact; not investment advice.
+  - button "Open Next.js Dev Tools" [ref=e420] [cursor=pointer]:
+    - img [ref=e421]
+  - alert [ref=e424]

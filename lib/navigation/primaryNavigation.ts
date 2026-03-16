@@ -1,5 +1,5 @@
 import type { Route } from "./routeType";
-import { navigationLayers } from "./informationArchitecture";
+import { primaryNavigationLayers } from "./informationArchitecture";
 
 export type PrimaryNavigationItem = {
   id: string;
@@ -9,7 +9,7 @@ export type PrimaryNavigationItem = {
   group: "core" | "workflow" | "reference";
 };
 
-export const primaryNavigation: PrimaryNavigationItem[] = navigationLayers.map((layer) => ({
+export const primaryNavigation: PrimaryNavigationItem[] = primaryNavigationLayers.map((layer) => ({
   id: layer.key,
   href: layer.href,
   label: layer.label,

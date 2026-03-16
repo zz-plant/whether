@@ -1,0 +1,57 @@
+- generic [active] [ref=e1]:
+  - link "Skip to content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - region "Loading weekly operating posture" [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - generic [ref=e6]:
+          - generic [ref=e7]:
+            - generic [ref=e8]: Weekly operating call
+            - generic [ref=e9]: Current weekly brief
+          - paragraph [ref=e10]: Opening this week’s brief
+          - paragraph [ref=e11]: "The shared card opens directly into the same one-screen brief: action, why it matters, and flip condition first."
+        - generic [ref=e12]:
+          - paragraph [ref=e13]: Shared-card continuity
+          - paragraph [ref=e15]: Headline, change summary, and flip cue land before deeper support.
+      - list [ref=e16]:
+        - listitem [ref=e17]:
+          - text: 1. Load action
+          - generic [ref=e18]: Decision headline and posture artifact arrive first.
+        - listitem [ref=e19]:
+          - text: 2. Fill support
+          - generic [ref=e20]: Change summary, trust strip, and share actions stream next.
+        - listitem [ref=e21]:
+          - text: 3. Open full brief
+          - generic [ref=e22]: Diagnostics and operating lanes attach under the same top fold.
+      - article [ref=e23]:
+        - generic [ref=e24]:
+          - generic [ref=e25]:
+            - generic [ref=e26]: Weekly operating call
+            - generic [ref=e27]: Current weekly brief
+          - generic [ref=e40]:
+            - generic [ref=e41]:
+              - article [ref=e42]:
+                - paragraph [ref=e43]: What changed
+              - article [ref=e49]:
+                - paragraph [ref=e50]: Do now
+              - article [ref=e56]:
+                - paragraph [ref=e57]: Flip when
+              - article [ref=e63]:
+                - paragraph [ref=e64]: Operating stance
+            - paragraph [ref=e72]: Snapshot and trust
+    - region "Checking live evidence stream" [ref=e89]:
+      - generic [ref=e90]:
+        - generic [ref=e91]:
+          - paragraph [ref=e92]: Decision support follows automatically
+          - paragraph [ref=e93]: Once the call is locked, we stream the evidence lane, bounded rule matrix, and share packaging.
+        - generic [ref=e94]: Streaming next
+      - generic [ref=e95]:
+        - article [ref=e96]:
+          - paragraph [ref=e97]: Diagnostics lane
+        - article [ref=e105]:
+          - paragraph [ref=e106]: Share artifact
+        - article [ref=e114]:
+          - paragraph [ref=e115]: Trust strip
+  - button "Open Next.js Dev Tools" [ref=e128] [cursor=pointer]:
+    - img [ref=e129]
+  - alert [ref=e132]
