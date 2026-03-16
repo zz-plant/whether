@@ -363,22 +363,38 @@ function RegimeLegend({
 
   return (
     <div className={`mt-3 rounded-lg border px-3 py-2.5 ${tone.legendPanel}`} aria-label="Regime legend">
-      <div className={`rounded-md border p-2.5 ${tone.calloutSurface}`}>
-        <p className="text-[10px] font-semibold uppercase tracking-[0.13em] text-slate-200">What to do this week</p>
-        <p className={`mt-1 text-sm font-semibold ${tone.weatherHint}`}>{operatingLine}</p>
-        <p className="mt-1 text-[11px] text-slate-200">
-          <span className="font-semibold text-slate-100">Flip risk:</span> {flipRiskState.urgencyLabel}
-        </p>
-        <div className={`mt-1.5 h-2.5 overflow-hidden rounded-full ${tone.meterTrack}`} aria-hidden="true">
-          <span
-            className={`block h-full rounded-full ${flipRiskFillClass[flipRiskState.urgencyLabel]} ${tone.meterFill}`}
-            style={{ ["--weather-meter-fill" as string]: `${flipRiskState.progressPercent / 100}` }}
-          />
+      <div className={`rounded-md border p-3 ${tone.calloutSurface}`}>
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,1.2fr)_minmax(15rem,0.8fr)] lg:items-center">
+          <div className="space-y-2">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.13em] text-slate-200">Current read</p>
+            <div className={`flex flex-wrap items-center gap-2 text-sm ${tone.weatherHint}`}>
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-white/10 bg-slate-950/45 text-slate-100">
+                <RegimeWeatherGlyph icon={activeWeatherIcon} title={activeWeather} />
+              </span>
+              <span className="text-base font-semibold text-slate-50">{activeWeather}</span>
+              <span className="rounded-full border border-slate-700/70 bg-slate-950/55 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-200">
+                {flipRiskState.urgencyLabel} flip risk
+              </span>
+            </div>
+            <p className="text-sm font-semibold text-slate-50">{operatingLine}</p>
+            <p className="text-xs leading-5 text-slate-200/90">
+              {activeWeatherRationale} {activeDescriptor}
+            </p>
+          </div>
+          <div className="rounded-xl border border-slate-700/65 bg-slate-950/45 px-3 py-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.13em] text-slate-300">Flip window</p>
+            <div className={`mt-2 h-2.5 overflow-hidden rounded-full ${tone.meterTrack}`} aria-hidden="true">
+              <span
+                className={`block h-full rounded-full ${flipRiskFillClass[flipRiskState.urgencyLabel]} ${tone.meterFill}`}
+                style={{ ["--weather-meter-fill" as string]: `${flipRiskState.progressPercent / 100}` }}
+              />
+            </div>
+            <p className="mt-2 text-[11px] leading-5 text-slate-200">{flipRiskState.detailLabel}</p>
+            <p className="mt-1 text-[10px] leading-5 text-slate-300/95">
+              <span className="font-semibold text-slate-200">Flip trigger:</span> {flipRiskState.triggerLabel}
+            </p>
+          </div>
         </div>
-        <p className="mt-1 text-[10px] text-slate-300">{flipRiskState.detailLabel}</p>
-        <p className="mt-0.5 text-[10px] text-slate-300/95">
-          <span className="font-semibold text-slate-200">Flip trigger:</span> {flipRiskState.triggerLabel}
-        </p>
       </div>
       <div className="mt-2.5 flex items-center justify-between gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300">
         <p>Tighter conditions</p>
@@ -410,9 +426,7 @@ function RegimeLegend({
       <p className={`mt-2 flex flex-wrap items-center gap-1.5 text-xs ${tone.weatherHint}`}>
         <RegimeWeatherGlyph icon={activeWeatherIcon} title={activeWeather} />
         <span>
-          <span className="font-semibold text-slate-100">Weather read:</span> {activeWeather}.{" "}
-          <span className="font-semibold text-slate-100">Why it fits:</span> {activeWeatherRationale}{" "}
-          <span className="font-semibold text-slate-100">Operator meaning:</span> {activeDescriptor}
+          <span className="font-semibold text-slate-100">Why it fits:</span> {activeWeatherRationale}
         </span>
       </p>
     </div>
@@ -445,20 +459,52 @@ function RegimeBanner({
     : "Unknown";
   const operatingLine = operatingStanceLine.trim() || actionNowShort?.trim() || "Hold bounded operating rules until next refresh.";
   const bannerTone = REGIME_BANNER_TOKENS[regimeKey];
+  const activeWeather = getRegimeWeatherLabel(regimeKey);
+  const activeWeatherIcon = getRegimeWeatherIcon(regimeKey);
+  const flipRiskState = resolveFlipRiskMeterState(regimeDistance);
 
   return (
     <header className={`z-10 rounded-2xl border px-5 py-5 shadow-[0_24px_54px_rgba(2,6,23,0.5)] backdrop-blur md:sticky md:top-2 sm:px-6 sm:py-6 ${bannerTone.shell}`} data-testid="weekly-regime-banner" aria-label="Weekly regime banner">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.13em]">REGIME — WEEK OF {recordDateLabel}</p>
-      <div id="weekly-posture-brief-title" className="mt-1 space-y-0.5">
-        <p className="text-2xl font-semibold sm:text-3xl">Regime: {resolvedPostureLabel}</p>
-        <p className="text-sm font-semibold sm:text-base">Cycle phase: {resolvedStageLabel}</p>
+      <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+        <div className="min-w-0 space-y-3">
+          <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-100/85">
+            <span>Current outlook</span>
+            <span className="rounded-full border border-white/10 bg-slate-950/35 px-2.5 py-1">
+              Week of {recordDateLabel}
+            </span>
+          </div>
+          <div id="weekly-posture-brief-title" className="flex items-start gap-3">
+            <span className="weather-icon-chip mt-1 h-12 w-12 flex-shrink-0 text-slate-50">
+              <RegimeWeatherGlyph icon={activeWeatherIcon} title={activeWeather} />
+            </span>
+            <div className="min-w-0">
+              <p className="text-2xl font-semibold leading-tight sm:text-3xl">{resolvedPostureLabel}</p>
+              <p className="mt-1 text-sm font-semibold text-slate-100/90 sm:text-base">{resolvedStageLabel} cycle</p>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-50/90">{operatingLine}</p>
+            </div>
+          </div>
+        </div>
+        <div className="grid gap-2 sm:grid-cols-3 xl:min-w-[24rem]">
+          <div className="rounded-xl border border-white/10 bg-slate-950/28 px-3 py-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-200/80">Weather</p>
+            <p className="mt-1 text-sm font-semibold text-slate-50">{activeWeather}</p>
+          </div>
+          <div className="rounded-xl border border-white/10 bg-slate-950/28 px-3 py-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-200/80">Confidence</p>
+            <p className="mt-1 text-sm font-semibold text-slate-50">{confidenceLabel} {Math.round(confidencePercent)}%</p>
+          </div>
+          <div className="rounded-xl border border-white/10 bg-slate-950/28 px-3 py-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-200/80">Flip watch</p>
+            <p className="mt-1 text-sm font-semibold text-slate-50">{flipRiskState.urgencyLabel} · {flipRiskValue}</p>
+          </div>
+        </div>
       </div>
-      <p className={`mt-2 overflow-x-auto text-xs font-semibold whitespace-nowrap ${bannerTone.metrics}`} aria-label="Regime metrics line">
-        <span>Confidence {confidenceLabel} {Math.round(confidencePercent)}%</span>
-        <span className="px-1.5" aria-hidden="true">·</span>
+      <p className={`mt-3 overflow-x-auto text-xs font-semibold whitespace-nowrap ${bannerTone.metrics}`} aria-label="Regime metrics line">
         <span>Trend {trendValue}</span>
         <span className="px-1.5" aria-hidden="true">·</span>
-        <span>Flip Risk {flipRiskValue}</span>
+        <span>Stage {resolvedStageLabel}</span>
+        <span className="px-1.5" aria-hidden="true">·</span>
+        <span>Flip risk {flipRiskValue}</span>
       </p>
       <RegimeLegend activeRegime={regimeKey} tone={bannerTone} operatingLine={operatingLine} regimeDistance={regimeDistance} />
     </header>

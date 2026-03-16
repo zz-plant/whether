@@ -27,25 +27,41 @@ const regimeStyleByKey: Record<RegimeKey, { label: string; toneClass: string }> 
   },
 };
 
-const renderItems = (items: string[]) => {
+const renderItems = ({
+  items,
+  bulletClassName = "bg-sky-300/80",
+  limit = items.length,
+}: {
+  items: string[];
+  bulletClassName?: string;
+  limit?: number;
+}) => {
   if (!items.length) {
     return <p className="text-sm text-slate-400">No updates available.</p>;
   }
 
+  const visibleItems = items.slice(0, limit);
+  const hiddenCount = Math.max(0, items.length - visibleItems.length);
+
   return (
     <ul className="space-y-1.5 text-sm text-slate-100">
-      {items.map((item) => (
+      {visibleItems.map((item) => (
         <li key={item} className="flex items-start gap-2 leading-relaxed">
-          <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-sky-300/80" aria-hidden="true" />
+          <span className={`mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full ${bulletClassName}`} aria-hidden="true" />
           <span>{item}</span>
         </li>
       ))}
+      {hiddenCount > 0 ? (
+        <li className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
+          +{hiddenCount} more
+        </li>
+      ) : null}
     </ul>
   );
 };
 
-const labelClassName = "text-[11px] font-semibold tracking-[0.18em] text-slate-400";
-const panelClassName = "weather-surface rounded-xl border border-slate-700/70 bg-slate-950/70 p-3";
+const labelClassName = "text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400";
+const panelClassName = "weather-forecast-card min-h-[10rem] flex-col justify-between border-slate-700/75 bg-slate-950/78";
 
 export const RegimeCommandBar = ({
   regime,
@@ -55,6 +71,8 @@ export const RegimeCommandBar = ({
   updatedAt,
 }: RegimeCommandBarProps) => {
   const regimeStyle = regimeStyleByKey[regime];
+  const primaryDoNow = doNow[0] ?? "Keep this week’s plan staged and reversible.";
+  const primaryFlipCondition = flipConditions[0] ?? "No live flip trigger available.";
 
   return (
     <section
@@ -62,38 +80,72 @@ export const RegimeCommandBar = ({
       aria-label="Weekly command bar"
     >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.14),transparent_45%)]" aria-hidden="true" />
-      <div className="relative grid gap-4 text-xs sm:grid-cols-2 lg:grid-cols-[0.85fr,1.15fr,1.4fr,1.4fr,0.85fr]">
+      <div className="relative">
+        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div className="min-w-0 space-y-1.5">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-sky-100/85">
+              Current Conditions
+            </p>
+            <h2 className="max-w-3xl text-lg font-semibold leading-tight text-slate-50 sm:text-xl">
+              {call}
+            </h2>
+            <p className="text-xs leading-relaxed text-slate-300">
+              Scan this strip first, then drop into the weekly brief only when you need the reasoning or share actions.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className={`inline-flex min-h-[36px] items-center rounded-full border px-3 py-1.5 text-xs font-semibold tracking-[0.08em] ${regimeStyle.toneClass}`}>
+              {regimeStyle.label} outlook
+            </span>
+            <span className="inline-flex min-h-[36px] items-center rounded-full border border-slate-700/70 bg-slate-950/72 px-3 py-1.5 text-xs font-medium text-slate-200">
+              Updated {updatedAt}
+            </span>
+          </div>
+        </div>
+
+        <div className="mt-4 grid gap-3 lg:grid-cols-[0.9fr_1.2fr_1.3fr_1.2fr]">
         <article className={panelClassName}>
-          <p className={labelClassName}>REGIME</p>
-          <span className="mt-1 block h-px w-10 bg-slate-700/80" aria-hidden="true" />
-          <span className={`mt-2 inline-flex min-h-[30px] items-center rounded-full border px-2.5 text-xs font-semibold tracking-[0.08em] ${regimeStyle.toneClass}`}>
-            {regimeStyle.label}
-          </span>
+            <div>
+              <p className={labelClassName}>Outlook</p>
+              <span className={`mt-3 inline-flex min-h-[34px] items-center rounded-full border px-3 text-xs font-semibold tracking-[0.08em] ${regimeStyle.toneClass}`}>
+                {regimeStyle.label}
+              </span>
+            </div>
+            <p className="mt-3 text-xs leading-relaxed text-slate-300">
+              Use this as the headline condition before you read the rest of the brief.
+            </p>
         </article>
 
         <article className={panelClassName}>
-          <p className={labelClassName}>CALL</p>
-          <span className="mt-1 block h-px w-10 bg-slate-700/80" aria-hidden="true" />
-          <p className="mt-2 text-sm font-medium leading-relaxed text-slate-50">{call}</p>
+            <div>
+              <p className={labelClassName}>Forecast</p>
+              <p className="mt-3 text-sm font-medium leading-relaxed text-slate-50">{call}</p>
+            </div>
+            <p className="mt-3 text-xs leading-relaxed text-slate-300">
+              The one-line operating read for this cycle.
+            </p>
         </article>
 
         <article className={panelClassName}>
-          <p className={labelClassName}>DO NOW</p>
-          <span className="mt-1 block h-px w-10 bg-slate-700/80" aria-hidden="true" />
-          <div className="mt-2">{renderItems(doNow)}</div>
+            <div>
+              <p className={labelClassName}>Do Now</p>
+              <p className="mt-3 text-sm font-medium leading-relaxed text-emerald-50">{primaryDoNow}</p>
+            </div>
+            <div className="mt-3">
+              {renderItems({ items: doNow, bulletClassName: "bg-emerald-300/80", limit: 2 })}
+            </div>
         </article>
 
         <article className={panelClassName}>
-          <p className={labelClassName}>FLIP CONDITIONS</p>
-          <span className="mt-1 block h-px w-10 bg-slate-700/80" aria-hidden="true" />
-          <div className="mt-2">{renderItems(flipConditions)}</div>
+            <div>
+              <p className={labelClassName}>Flip Watch</p>
+              <p className="mt-3 text-sm font-medium leading-relaxed text-sky-50">{primaryFlipCondition}</p>
+            </div>
+            <div className="mt-3">
+              {renderItems({ items: flipConditions, limit: 2 })}
+            </div>
         </article>
-
-        <article className={panelClassName}>
-          <p className={labelClassName}>Updated</p>
-          <span className="mt-1 block h-px w-10 bg-slate-700/80" aria-hidden="true" />
-          <p className="mt-2 text-sm leading-relaxed text-slate-200">{updatedAt}</p>
-        </article>
+        </div>
       </div>
     </section>
   );

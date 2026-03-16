@@ -379,6 +379,7 @@ export const ReportShell = ({
   const sourceHref = treasurySource.startsWith("http") ? treasurySource : undefined;
   const sourceLabel = sourceHref ? (() => { try { const hostname = new URL(sourceHref).hostname.replace(/^www\./, ""); if (hostname.includes("stlouisfed.org")) return "FRED"; if (hostname.includes("fiscaldata.treasury.gov")) return "Treasury Fiscal Data"; return hostname; } catch { return treasurySource; } })() : treasurySource;
   const showPostureRibbon = currentPath !== "/";
+  const isHomeBrief = currentPath === "/";
   const isPrimaryActionInSectionLinks = sectionLinks.some((section) => section.href === primaryCta.href);
   const showMobileActionCard = !isPrimaryActionInSectionLinks;
   const showInlineTrustBlock = !hasSidebar;
@@ -395,32 +396,73 @@ export const ReportShell = ({
         <DisplayGuardian />
         <div className="tv-rail-safe mx-auto max-w-[88rem] pb-[calc(env(safe-area-inset-bottom)+10rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)] pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)] sm:pb-10 sm:pt-5 sm:pl-[calc(env(safe-area-inset-left)+1.25rem)] sm:pr-[calc(env(safe-area-inset-right)+1.25rem)]">
           <header className="weather-appbar relative z-20 px-4 py-4 sm:px-6 sm:py-5 lg:sticky lg:top-4">
-            <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-              <div className="min-w-0 space-y-2">
-                <div className="flex flex-wrap items-center gap-3">
-                  <Image src="/whether-logo.svg" alt="Whether — Weekly Operating Posture (Hiring, Spend, Roadmap)" width={156} height={36} className="h-9 w-auto" priority />
-                  <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-200">
-                    {statusLabel}
-                  </span>
+            {isHomeBrief ? (
+              <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+                <div className="min-w-0 space-y-3">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Image src="/whether-logo.svg" alt="Whether — Weekly Operating Posture (Hiring, Spend, Roadmap)" width={156} height={36} className="h-9 w-auto" priority />
+                    <span className="rounded-full border border-sky-300/35 bg-sky-400/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-sky-100">
+                      Weekly operating forecast
+                    </span>
+                    <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-200">
+                      {statusLabel}
+                    </span>
+                  </div>
+                  <div className="space-y-1.5">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-100/85">Current conditions</p>
+                    <p className="max-w-3xl text-base font-semibold leading-relaxed text-slate-100 sm:text-lg">
+                      This week&apos;s posture, action, and flip risk in one scan.
+                    </p>
+                    <p className="max-w-3xl text-xs leading-relaxed text-slate-300">
+                      Decide now, keep commitments reversible, and open deeper evidence only when the call needs it.
+                    </p>
+                  </div>
                 </div>
-                <p className="max-w-3xl text-xs leading-relaxed text-slate-300">
-                  Weekly posture artifact for operators: decide now, execute with guardrails, and keep evidence one click away.
-                </p>
+                <div className="grid gap-2 sm:grid-cols-3 xl:min-w-[30rem]">
+                  <div className="weather-stat-card">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Posture</p>
+                    <p className="mt-1 text-sm font-semibold text-slate-100">{statusLabel}</p>
+                  </div>
+                  <div className="weather-stat-card">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Signals updated</p>
+                    <p className="mt-1 text-sm font-semibold text-slate-100">{fetchedAtLabel}</p>
+                  </div>
+                  <div className="weather-stat-card">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Record date</p>
+                    <p className="mt-1 text-sm font-semibold text-slate-100">{recordDateLabel}</p>
+                  </div>
+                </div>
               </div>
-              <div className="grid gap-2 sm:grid-cols-2 xl:min-w-[23rem]">
-                <div className="weather-stat-card">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Signals updated</p>
-                  <p className="mt-1 text-sm font-semibold text-slate-100">{fetchedAtLabel}</p>
+            ) : (
+              <>
+                <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+                  <div className="min-w-0 space-y-2">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <Image src="/whether-logo.svg" alt="Whether — Weekly Operating Posture (Hiring, Spend, Roadmap)" width={156} height={36} className="h-9 w-auto" priority />
+                      <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-200">
+                        {statusLabel}
+                      </span>
+                    </div>
+                    <p className="max-w-3xl text-xs leading-relaxed text-slate-300">
+                      Weekly posture artifact for operators: decide now, execute with guardrails, and keep evidence one click away.
+                    </p>
+                  </div>
+                  <div className="grid gap-2 sm:grid-cols-2 xl:min-w-[23rem]">
+                    <div className="weather-stat-card">
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Signals updated</p>
+                      <p className="mt-1 text-sm font-semibold text-slate-100">{fetchedAtLabel}</p>
+                    </div>
+                    <div className="weather-stat-card">
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Record date</p>
+                      <p className="mt-1 text-sm font-semibold text-slate-100">{recordDateLabel}</p>
+                    </div>
+                  </div>
                 </div>
-                <div className="weather-stat-card">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Record date</p>
-                  <p className="mt-1 text-sm font-semibold text-slate-100">{recordDateLabel}</p>
-                </div>
-              </div>
-            </div>
-            <NavigationOrientationBadge currentPath={currentPath} className="mt-4" />
-            <p className="mt-3 max-w-3xl text-xs leading-relaxed text-slate-300">{canonicalPositioningLine}</p>
-            <p className="mt-2 text-[11px] text-slate-400">Choose view: Now for the weekly call, Workflows for signals and guardrails, Reference for background and method.</p>
+                <NavigationOrientationBadge currentPath={currentPath} className="mt-4" />
+                <p className="mt-3 max-w-3xl text-xs leading-relaxed text-slate-300">{canonicalPositioningLine}</p>
+                <p className="mt-2 text-[11px] text-slate-400">Choose view: Now for the weekly call, Workflows for signals and guardrails, Reference for background and method.</p>
+              </>
+            )}
             {showPageNavigation ? (
               <ReportPageNavigation
                 pageLinks={pageLinks}

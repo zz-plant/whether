@@ -173,6 +173,7 @@ body {
   border-color: rgba(148, 163, 184, 0.24);
   background-color: rgba(2, 6, 23, 0.34);
   box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.26);
+  font-variant-numeric: tabular-nums;
 }
 
 .weather-tile {
@@ -219,6 +220,7 @@ body {
     0 12px 22px -20px rgba(2, 6, 23, 0.68),
     inset 0 1px 0 rgba(148, 163, 184, 0.11),
     inset 0 0 0 1px rgba(15, 23, 42, 0.45);
+  font-variant-numeric: tabular-nums;
 }
 
 .weather-forecast-icon {
@@ -261,6 +263,10 @@ body {
 @media (min-width: 1280px) {
   .weather-page-grid-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .weather-forecast-strip {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
