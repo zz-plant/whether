@@ -18,8 +18,8 @@ Whether CLI is an operator decision terminal: **environment → call → changes
 - `whether diagnostics [summary|drivers|evidence|provenance]`
 - `whether history [compare]`
 - `whether brief [exec|board|staff|investor|slack|email]`
-- `whether export [json|csv|markdown|pdf|briefing]`
-- `whether share [slack|email|clipboard]`
+- `whether export [json|csv|markdown|pdf|briefing] [--output <file>]`
+- `whether share [slack|email|clipboard] [--brief <type>] [--output <file>]`
 - `whether explain [regime|call|flip|metric --metric tightness]`
 - `whether scenario --tightness <n> --risk-appetite <n>`
 - `whether company [list|select|status|call|brief]`
@@ -29,7 +29,7 @@ Whether CLI is an operator decision terminal: **environment → call → changes
 - `whether raw <endpoint>`
 - `whether doctor`
 - `whether install [--yes|--ci] [--api-base-url <url>] [--token <token>]`
-- `whether completion`
+- `whether completion [--shell <bash|zsh>]`
 
 ## Global output/setup flags
 
@@ -38,6 +38,7 @@ Whether CLI is an operator decision terminal: **environment → call → changes
 - `--markdown`
 - `--quiet`
 - `--no-color`
+- `--output <file>` (write command output to a file; it is a path, not a format selector)
 - `--yes` (install: non-interactive acceptance of defaults)
 - `--ci` (install: alias of `--yes` for CI scripts)
 
@@ -53,7 +54,7 @@ Whether CLI is an operator decision terminal: **environment → call → changes
 
 Notes:
 - `--as-of` is mapped to `asOf` query shape expected by the API handlers.
-- `--company` / `--stage` are CLI context flags (for commands like `whether company ...`) and are not forwarded as query params to `/api/cli/*` endpoints.
+- `--company` / `--stage` are local CLI context flags. They annotate output and power `whether company ...`, but they are not forwarded as query params to `/api/cli/*` endpoints.
 
 ## Install contract (automation-safe)
 
@@ -87,6 +88,47 @@ Linux/macOS note:
 - `5` invalid scenario input
 - `6` network reachability failure
 - `7` server/rate-limit failure
+
+## Export behavior
+
+- `json` prints a combined machine payload containing `status`, `changes`, and `brief`.
+- `csv` prints changed metrics as a flat table.
+- `markdown` prints a meeting-ready markdown artifact.
+- `briefing` prints a plain-text operator briefing.
+- `pdf` writes a PDF file. If `--output` is omitted, it defaults to `whether-briefing.pdf` in the current working directory.
+
+Notes:
+- Non-PDF exports print to stdout unless `--output` is provided.
+- `--output` writes the rendered artifact to the requested path while preserving the selected output mode (`--json`, `--yaml`, `--markdown`, or default text).
+
+## Share behavior
+
+`share` generates handoff-ready artifacts; it does not send directly to Slack or email providers.
+
+- `share clipboard` copies the rendered brief when a system clipboard utility is available; otherwise it prints the brief to stdout.
+- `share slack --json` returns Slack-friendly `blocks` plus metadata for automations.
+- `share email` renders a subject/body pair and includes a `mailto` URL in JSON mode.
+- `--brief <type>` accepts the same brief variants as `whether brief` (`exec`, `board`, `staff`, `investor`, `slack`, `email`).
+
+## Company context
+
+- `whether company select <name> --stage <stage>` saves a local company context in `~/.config/whether/config.yaml`.
+- `whether company status|call|brief` reuses that saved context and prefixes the output with a context line.
+- The current weekly call remains the canonical base call; company context is local profile metadata until company-tuned CLI routes exist.
+
+## Shell completion
+
+Bash:
+
+```bash
+eval "$(whether completion --shell bash)"
+```
+
+Zsh:
+
+```bash
+eval "$(whether completion --shell zsh)"
+```
 
 ## Config and environment precedence
 

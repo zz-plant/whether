@@ -11,7 +11,7 @@ export const metadata: Metadata = buildPageMetadata({
   imageAlt: "Whether CLI command reference",
 });
 
-const installCommand = "bun run cli:whether -- --help";
+const installCommand = "bun run cli:whether -- install --ci --api-base-url http://localhost:3000";
 const statusCommand = "whether status";
 const callCommand = "whether call diff --from previous --to current";
 const changesCommand = "whether changes";

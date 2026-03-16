@@ -83,6 +83,16 @@ describe("whether cli", () => {
     assert.equal(result.stderr, "");
   });
 
+  it("prints installable completion scripts for bash and zsh", () => {
+    const bash = spawnSync("node", [CLI_PATH, "completion", "--shell", "bash"], { encoding: "utf8" });
+    const zsh = spawnSync("node", [CLI_PATH, "completion", "--shell", "zsh"], { encoding: "utf8" });
+
+    assert.equal(bash.status, 0);
+    assert.match(bash.stdout, /complete -F _whether_completion whether/);
+    assert.equal(zsh.status, 0);
+    assert.match(zsh.stdout, /compdef _whether_completion whether/);
+  });
+
   it("ping reports healthy API for smoke checks", async () => {
     const server = http.createServer((req, res) => {
       if ((req.url ?? "").startsWith("/api/health")) {
@@ -220,6 +230,43 @@ describe("whether cli", () => {
     assert.match(historical.stdout, /"updatedAt": "2024-07"/);
     assert.ok(requests.some((url) => url === "/api/cli/status"));
     assert.ok(requests.some((url) => url.includes("/api/cli/status?asOf=2024-07")));
+  });
+
+  it("status writes requested output files without treating the path like an output format", async () => {
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
+    const outputPath = path.join(homeDir, "status.json");
+    const server = http.createServer((req, res) => {
+      if ((req.url ?? "").startsWith("/api/cli/status")) {
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({
+          version: "v1",
+          regime: "Current",
+          cyclePhase: "Now",
+          confidence: { label: "HIGH", score: 93 },
+          trend: "stable",
+          decisionStability: "stable",
+          updatedAt: "live",
+          call: { summary: "live summary", do: ["go"], avoid: ["wait"], flipConditions: ["n/a"] },
+          degraded: false,
+        }));
+        return;
+      }
+      res.writeHead(404);
+      res.end();
+    });
+
+    await new Promise<void>((resolve) => server.listen(0, resolve));
+    const { port } = server.address() as { port: number };
+    const result = await runCli(["status", "--json", "--output", outputPath, "--api-base-url", `http://127.0.0.1:${port}`]);
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+
+    assert.equal(result.status, 0);
+    const stdout = JSON.parse(result.stdout);
+    const written = JSON.parse(fs.readFileSync(outputPath, "utf8"));
+    fs.rmSync(homeDir, { recursive: true, force: true });
+
+    assert.equal(stdout.updatedAt, "live");
+    assert.equal(written.updatedAt, "live");
   });
 
 
@@ -396,6 +443,70 @@ describe("whether cli", () => {
     assert.match(parsed[0]?.message, /API returned 503/);
   });
 
+  it("share email renders a ready-to-send subject and body", async () => {
+    const server = http.createServer((req, res) => {
+      if ((req.url ?? "").startsWith("/api/brief/slack")) {
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({
+          brief: "Weekly operator brief\n- Stage fixed-cost approvals.",
+          recordDate: "2026-03-12",
+          generatedAt: "2026-03-12T12:00:00.000Z",
+        }));
+        return;
+      }
+      res.writeHead(404);
+      res.end();
+    });
+
+    await new Promise<void>((resolve) => server.listen(0, resolve));
+    const { port } = server.address() as { port: number };
+    const result = await runCli(["share", "email", "--api-base-url", `http://127.0.0.1:${port}`]);
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /Subject: Whether weekly brief/);
+    assert.match(result.stdout, /Weekly operator brief/);
+    assert.match(result.stdout, /Stage fixed-cost approvals/);
+  });
+
+  it("share slack --json returns blocks and metadata for automation", async () => {
+    const server = http.createServer((req, res) => {
+      if ((req.url ?? "").startsWith("/api/brief/slack")) {
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({
+          brief: "Weekly operator brief\n- Stage fixed-cost approvals.",
+          recordDate: "2026-03-12",
+          generatedAt: "2026-03-12T12:00:00.000Z",
+        }));
+        return;
+      }
+      if ((req.url ?? "").startsWith("/api/integrations/weekly-mandate?target=slack")) {
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({
+          target: "slack",
+          payload: {
+            blocks: [{ type: "header", text: { type: "plain_text", text: "Weekly mandate" } }],
+            metadata: { title: "Weekly mandate", markdown: "## Weekly mandate" },
+          },
+        }));
+        return;
+      }
+      res.writeHead(404);
+      res.end();
+    });
+
+    await new Promise<void>((resolve) => server.listen(0, resolve));
+    const { port } = server.address() as { port: number };
+    const result = await runCli(["share", "slack", "--json", "--api-base-url", `http://127.0.0.1:${port}`]);
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+
+    assert.equal(result.status, 0);
+    const parsed = JSON.parse(result.stdout);
+    assert.equal(parsed.channel, "slack");
+    assert.equal(parsed.blocks[0]?.type, "header");
+    assert.equal(parsed.metadata?.title, "Weekly mandate");
+  });
+
   it("maps expired and invalid API key errors with actionable remediation", async () => {
     const server = http.createServer((req, res) => {
       if ((req.url ?? "").startsWith("/api/cli/status")) {
@@ -476,6 +587,112 @@ describe("whether cli", () => {
     const envParsed = JSON.parse(withEnv.stdout);
     assert.equal(envParsed.authenticated, true);
     assert.equal(envParsed.source, "env");
+  });
+
+  it("company select persists stage and company status reuses that saved context", async () => {
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
+    const server = http.createServer((req, res) => {
+      if ((req.url ?? "").startsWith("/api/cli/status")) {
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({
+          version: "v1",
+          regime: "Current",
+          cyclePhase: "Now",
+          confidence: { label: "HIGH", score: 93 },
+          trend: "stable",
+          decisionStability: "stable",
+          updatedAt: "live",
+          freshness: { line: "Updated live" },
+          call: { summary: "live summary", do: ["go"], avoid: ["wait"], flipConditions: ["n/a"] },
+          degraded: false,
+        }));
+        return;
+      }
+      res.writeHead(404);
+      res.end();
+    });
+
+    await new Promise<void>((resolve) => server.listen(0, resolve));
+    const { port } = server.address() as { port: number };
+
+    const select = await runCli(["company", "select", "acme", "--stage", "seed"], {
+      env: { ...process.env, HOME: homeDir },
+    });
+    const status = await runCli(["company", "status", "--api-base-url", `http://127.0.0.1:${port}`], {
+      env: { ...process.env, HOME: homeDir },
+    });
+
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+    fs.rmSync(homeDir, { recursive: true, force: true });
+
+    assert.equal(select.status, 0);
+    assert.equal(status.status, 0);
+    assert.match(status.stdout, /Company context: acme · stage seed/);
+    assert.match(status.stdout, /Whether — Current Status/);
+  });
+
+  it("export pdf writes a real pdf artifact to the requested path", async () => {
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
+    const outputPath = path.join(homeDir, "briefing.pdf");
+    const server = http.createServer((req, res) => {
+      if ((req.url ?? "").startsWith("/api/cli/status")) {
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({
+          version: "v1",
+          regime: "Guarded Expansion",
+          cyclePhase: "Late",
+          confidence: { label: "MED", score: 66 },
+          trend: "Deteriorating",
+          decisionStability: "unstable",
+          updatedAt: "2026-03-12T12:00:00.000Z",
+          freshness: { line: "Updated 2026-03-12T12:00:00.000Z · live · mixed-reliability" },
+          call: {
+            summary: "Stage decisions",
+            do: ["Do x"],
+            avoid: ["Avoid y"],
+            flipConditions: ["tightness ≤ 60"],
+          },
+          degraded: false,
+        }));
+        return;
+      }
+      if ((req.url ?? "").startsWith("/api/cli/changes")) {
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({
+          version: "v1",
+          generatedAt: "2026-03-12T12:10:00.000Z",
+          freshness: { line: "Updated 2026-03-12T12:00:00.000Z · live · mixed-reliability" },
+          changed: [{ metric: "tightness", from: 62, to: 60, direction: "down", impact: "negative" }],
+          revisit: ["Recheck approvals"],
+          flip: [{ condition: "tightness ≤ 60", distance: 0 }],
+          degraded: false,
+        }));
+        return;
+      }
+      if ((req.url ?? "").startsWith("/api/brief/slack")) {
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({
+          brief: "Weekly operator brief\n- Stage fixed-cost approvals.",
+          recordDate: "2026-03-12",
+          generatedAt: "2026-03-12T12:00:00.000Z",
+        }));
+        return;
+      }
+      res.writeHead(404);
+      res.end();
+    });
+
+    await new Promise<void>((resolve) => server.listen(0, resolve));
+    const { port } = server.address() as { port: number };
+    const result = await runCli(["export", "pdf", "--output", outputPath, "--api-base-url", `http://127.0.0.1:${port}`]);
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+
+    const written = fs.readFileSync(outputPath);
+    fs.rmSync(homeDir, { recursive: true, force: true });
+
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /Wrote PDF briefing to/);
+    assert.equal(written.subarray(0, 4).toString("utf8"), "%PDF");
   });
 
   it("auth status --check validates token against authenticated endpoint", async () => {

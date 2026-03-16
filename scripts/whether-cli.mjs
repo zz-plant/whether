@@ -2,7 +2,9 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { PDFDocument, StandardFonts } from "pdf-lib";
 
 const EXIT = { OK: 0, ERROR: 1, AUTH_CONFIG: 2, NO_DATA: 3, WATCH_TRIGGER: 4, INVALID_SCENARIO: 5 };
 EXIT.NETWORK = 6;
@@ -55,7 +57,7 @@ Setup:
   auth          Login and token management
   config        Manage local configuration
   doctor        Diagnose CLI or API setup
-  completion    Print shell completion hint
+  completion    Print shell completion script
 `;
 
 const SUB_HELP = {
@@ -72,6 +74,7 @@ const SUB_HELP = {
   auth: "Usage: whether auth [login|logout|status] [--token <token>] [--check] [--json]",
   config: "Usage: whether config [init|get|set <key> <value>]",
   company: "Usage: whether company [list|select|status|call|brief] [name]",
+  completion: "Usage: whether completion [--shell <bash|zsh>]",
 };
 
 let cachedVersion = null;
@@ -95,6 +98,12 @@ const parseArgs = (argv) => {
     const token = argv[i];
     if (!token.startsWith("--")) {
       positionals.push(token);
+      continue;
+    }
+    const eqIndex = token.indexOf("=");
+    if (eqIndex !== -1) {
+      const key = token.slice(2, eqIndex);
+      flags[key] = token.slice(eqIndex + 1);
       continue;
     }
     const key = token.slice(2);
@@ -147,21 +156,22 @@ const saveConfig = async (data) => {
   await fs.writeFile(CONFIG_PATH, `${Object.entries(data).map(([k, v]) => `${k}: ${v}`).join("\n")}\n`, "utf8");
 };
 
+const serializePayload = (payload, output) => {
+  if (output === "json") {
+    return JSON.stringify(payload, null, 2);
+  }
+  if (output === "yaml") {
+    return toYaml(payload);
+  }
+  if (output === "markdown") {
+    return typeof payload === "string" ? payload : `\n\`\`\`json\n${JSON.stringify(payload, null, 2)}\n\`\`\``;
+  }
+  return typeof payload === "string" ? payload : JSON.stringify(payload, null, 2);
+};
+
 const writeOutput = (payload, settings) => {
   if (settings.quiet) return;
-  if (settings.output === "json") {
-    console.log(JSON.stringify(payload, null, 2));
-    return;
-  }
-  if (settings.output === "yaml") {
-    console.log(toYaml(payload));
-    return;
-  }
-  if (settings.output === "markdown") {
-    console.log(typeof payload === "string" ? payload : `\n\`\`\`json\n${JSON.stringify(payload, null, 2)}\n\`\`\``);
-    return;
-  }
-  console.log(payload);
+  console.log(serializePayload(payload, settings.output));
 };
 
 const normalizeFlags = async (flags) => {
@@ -169,7 +179,7 @@ const normalizeFlags = async (flags) => {
   const envToken = process.env.WHETHER_API_KEY ?? process.env.WHETHER_TOKEN ?? null;
   return {
     config,
-    output: flags.json ? "json" : flags.yaml ? "yaml" : flags.markdown ? "markdown" : flags.output ?? config.output ?? "text",
+    output: flags.json ? "json" : flags.yaml ? "yaml" : flags.markdown ? "markdown" : flags.format ?? config.output ?? "text",
     quiet: Boolean(flags.quiet),
     noColor: Boolean(flags["no-color"]),
     apiBaseUrl: flags["api-base-url"] ?? process.env.WHETHER_API_URL ?? config.api_base_url ?? "http://localhost:3000",
@@ -178,6 +188,380 @@ const normalizeFlags = async (flags) => {
     profile: process.env.WHETHER_PROFILE ?? config.profile ?? "default",
   };
 };
+
+const ensureParentDirectory = async (filePath) => {
+  const absolutePath = path.resolve(String(filePath));
+  await fs.mkdir(path.dirname(absolutePath), { recursive: true });
+  return absolutePath;
+};
+
+const writeTextFile = async (filePath, content) => {
+  const absolutePath = await ensureParentDirectory(filePath);
+  const normalized = content.endsWith("\n") ? content : `${content}\n`;
+  await fs.writeFile(absolutePath, normalized, "utf8");
+  return absolutePath;
+};
+
+const writeFileIfRequested = async (flags, payload, settings, fallbackFile = null) => {
+  const outputFile = typeof flags.output === "string" ? flags.output : fallbackFile;
+  if (!outputFile) return null;
+  return writeTextFile(outputFile, serializePayload(payload, settings.output));
+};
+
+const resolveCompanyContext = (settings, flags = {}, overrides = {}) => {
+  const company = overrides.company ?? (typeof flags.company === "string" ? flags.company : settings.config.default_company ?? null);
+  const stage = overrides.stage ?? (typeof flags.stage === "string" ? flags.stage : settings.config.default_stage ?? null);
+  if (!company && !stage) return null;
+  return {
+    company: company ?? null,
+    stage: stage ?? null,
+    mode: "local-profile-only",
+    note: "Base weekly call unchanged.",
+  };
+};
+
+const formatCompanyContextLine = (context) => {
+  if (!context) return null;
+  const parts = [];
+  if (context.company) parts.push(context.company);
+  if (context.stage) parts.push(`stage ${context.stage}`);
+  if (parts.length === 0) return null;
+  return `Company context: ${parts.join(" · ")} (local profile only; base weekly call unchanged)`;
+};
+
+const attachCompanyContextText = (text, context) => {
+  const contextLine = formatCompanyContextLine(context);
+  return contextLine ? `${contextLine}\n\n${text}` : text;
+};
+
+const attachCompanyContextPayload = (payload, context) => {
+  if (!context || !payload || typeof payload !== "object") return payload;
+  return { ...payload, context };
+};
+
+const briefTitleByVariant = {
+  exec: "Exec brief",
+  board: "Board brief",
+  staff: "Staff brief",
+  investor: "Investor brief",
+  slack: "Slack brief",
+  email: "Email brief",
+};
+
+const buildBriefArtifact = (variant, body) => {
+  const resolvedVariant = briefTitleByVariant[variant] ? variant : "exec";
+  const title = briefTitleByVariant[resolvedVariant];
+  const recordDate = body.recordDate ?? "unknown";
+  if (resolvedVariant === "email") {
+    const subject = `Whether weekly brief — ${recordDate}`;
+    const rendered = `Subject: ${subject}\n\n${body.brief}`;
+    return {
+      variant: resolvedVariant,
+      title,
+      subject,
+      rendered,
+      payload: {
+        ...body,
+        variant: resolvedVariant,
+        title,
+        subject,
+        rendered,
+      },
+    };
+  }
+
+  const rendered = resolvedVariant === "slack" ? body.brief : `${title}\n\n${body.brief}`;
+  return {
+    variant: resolvedVariant,
+    title,
+    subject: null,
+    rendered,
+    payload: {
+      ...body,
+      variant: resolvedVariant,
+      title,
+      rendered,
+    },
+  };
+};
+
+const buildMarkdownExport = ({ status, changes, brief }) => {
+  const lines = [
+    "# Whether Export",
+    "",
+    "## Current Call",
+    `- Regime: ${status.regime}`,
+    `- Cycle phase: ${status.cyclePhase}`,
+    `- Confidence: ${status.confidence.label} (${status.confidence.score})`,
+    `- Trend: ${status.trend}`,
+    `- Summary: ${status.call.summary}`,
+    "",
+    "## Do Now",
+    ...status.call.do.map((item) => `- ${item}`),
+    "",
+    "## Avoid",
+    ...status.call.avoid.map((item) => `- ${item}`),
+    "",
+    "## Flip Conditions",
+    ...status.call.flipConditions.map((item) => `- ${item}`),
+    "",
+    "## What Changed",
+    ...changes.changed.map((item) => `- ${item.metric}: ${item.from} -> ${item.to} (${item.direction}, ${item.impact})`),
+    "",
+    "## Revisit Now",
+    ...changes.revisit.map((item) => `- ${item}`),
+    "",
+    "## Weekly Brief",
+    brief,
+  ];
+  return lines.join("\n");
+};
+
+const buildTextBriefing = ({ status, changes, brief }) => {
+  const lines = [
+    "Whether briefing",
+    "",
+    `Regime: ${status.regime}`,
+    `Cycle phase: ${status.cyclePhase}`,
+    `Confidence: ${status.confidence.label} (${status.confidence.score})`,
+    `Trend: ${status.trend}`,
+    `Freshness: ${freshnessText(status)}`,
+    "",
+    `Call: ${status.call.summary}`,
+    "",
+    "Do now:",
+    ...status.call.do.map((item) => `- ${item}`),
+    "",
+    "Avoid:",
+    ...status.call.avoid.map((item) => `- ${item}`),
+    "",
+    "Flip conditions:",
+    ...status.call.flipConditions.map((item) => `- ${item}`),
+    "",
+    "What changed:",
+    ...changes.changed.map((item) => `- ${item.metric}: ${item.from} -> ${item.to} (${item.direction}, ${item.impact})`),
+    "",
+    "Revisit:",
+    ...changes.revisit.map((item) => `- ${item}`),
+    "",
+    "Weekly brief:",
+    brief,
+  ];
+  return lines.join("\n");
+};
+
+const wrapText = (text, font, fontSize, maxWidth, prefix = "", continuationPrefix = prefix) => {
+  const words = text.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) {
+    return [prefix.trimEnd()];
+  }
+
+  const lines = [];
+  let current = prefix;
+  for (const word of words) {
+    const candidate = `${current}${current.trim().length === 0 ? "" : " "}${word}`;
+    if (font.widthOfTextAtSize(candidate, fontSize) <= maxWidth) {
+      current = candidate;
+      continue;
+    }
+    lines.push(current.trimEnd());
+    current = `${continuationPrefix}${word}`;
+  }
+  lines.push(current.trimEnd());
+  return lines;
+};
+
+const sanitizePdfText = (value) =>
+  String(value)
+    .replace(/•/g, "-")
+    .replace(/≤/g, "<=")
+    .replace(/≥/g, ">=")
+    .replace(/→/g, "->")
+    .replace(/—/g, "-")
+    .replace(/–/g, "-")
+    .replace(/’/g, "'")
+    .replace(/“|”/g, "\"");
+
+const createPdfFromText = async (title, content, outputFile) => {
+  const pdfDoc = await PDFDocument.create();
+  const regularFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+  const pageSize = [612, 792];
+  const margin = 54;
+  const footerGap = 28;
+  const defaultLineHeight = 15;
+  const smallGap = 8;
+  const mediumGap = 14;
+
+  let page = pdfDoc.addPage(pageSize);
+  let currentPageNumber = 1;
+  let cursorY = pageSize[1] - margin;
+
+  const drawFooter = () => {
+    page.drawText(`Whether CLI export · Page ${currentPageNumber}`, {
+      x: margin,
+      y: 22,
+      size: 9,
+      font: regularFont,
+    });
+  };
+
+  const newPage = () => {
+    drawFooter();
+    currentPageNumber += 1;
+    page = pdfDoc.addPage(pageSize);
+    cursorY = pageSize[1] - margin;
+  };
+
+  const ensureSpace = (requiredHeight) => {
+    if (cursorY - requiredHeight < margin + footerGap) {
+      newPage();
+    }
+  };
+
+  const drawWrappedLine = (text, options = {}) => {
+    const font = options.font ?? regularFont;
+    const fontSize = options.fontSize ?? 11;
+    const lineHeight = options.lineHeight ?? defaultLineHeight;
+    const prefix = options.prefix ?? "";
+    const continuationPrefix = options.continuationPrefix ?? prefix;
+    const lines = wrapText(text, font, fontSize, pageSize[0] - margin * 2, prefix, continuationPrefix);
+    ensureSpace(lines.length * lineHeight);
+    for (const line of lines) {
+      page.drawText(line, {
+        x: margin,
+        y: cursorY,
+        size: fontSize,
+        font,
+      });
+      cursorY -= lineHeight;
+    }
+  };
+
+  drawWrappedLine(sanitizePdfText(title), { font: boldFont, fontSize: 18, lineHeight: 24 });
+  cursorY -= smallGap;
+
+  for (const rawLine of content.split("\n")) {
+    const line = sanitizePdfText(rawLine);
+    if (!line.trim()) {
+      cursorY -= smallGap;
+      continue;
+    }
+    if (line.endsWith(":")) {
+      drawWrappedLine(line, { font: boldFont, fontSize: 11, lineHeight: defaultLineHeight });
+      continue;
+    }
+    if (line.startsWith("- ")) {
+      drawWrappedLine(line.slice(2), {
+        font: regularFont,
+        fontSize: 11,
+        lineHeight: defaultLineHeight,
+        prefix: "- ",
+        continuationPrefix: "  ",
+      });
+      continue;
+    }
+    drawWrappedLine(line, { font: regularFont, fontSize: 11, lineHeight: defaultLineHeight });
+  }
+
+  drawFooter();
+  const absolutePath = await ensureParentDirectory(outputFile);
+  const pdfBytes = await pdfDoc.save();
+  await fs.writeFile(absolutePath, Buffer.from(pdfBytes));
+  return absolutePath;
+};
+
+const copyTextToClipboard = (text) => {
+  const explicitCommand = process.env.WHETHER_CLIPBOARD_COMMAND ? [process.env.WHETHER_CLIPBOARD_COMMAND] : null;
+  const platformCommands =
+    process.platform === "darwin"
+      ? [["pbcopy"]]
+      : process.platform === "win32"
+        ? [["clip"]]
+        : [["wl-copy"], ["xclip", "-selection", "clipboard"]];
+  const candidates = explicitCommand ? [explicitCommand] : platformCommands;
+
+  for (const [command, ...args] of candidates) {
+    const result = spawnSync(command, args, { input: text, encoding: "utf8" });
+    if (!result.error && result.status === 0) {
+      return { copied: true, command };
+    }
+  }
+
+  return { copied: false, command: null };
+};
+
+const inferShell = (requestedShell) => {
+  if (typeof requestedShell === "string" && requestedShell.trim()) {
+    return path.basename(requestedShell.trim());
+  }
+  if (typeof process.env.SHELL === "string" && process.env.SHELL.trim()) {
+    return path.basename(process.env.SHELL.trim());
+  }
+  return "bash";
+};
+
+const renderBashCompletion = () => `# whether bash completion
+_whether_completion() {
+  local cur="\${COMP_WORDS[COMP_CWORD]}"
+  local commands="ping status call changes regime diagnostics history brief export share explain scenario company watch config install auth raw doctor completion version"
+  local global_flags="--help --version --json --yaml --markdown --quiet --no-color --api-base-url --token --output --company --stage"
+  local subcommands=""
+
+  if [[ \${COMP_CWORD} -eq 1 ]]; then
+    COMPREPLY=( $(compgen -W "\${commands} \${global_flags}" -- "\${cur}") )
+    return 0
+  fi
+
+  case "\${COMP_WORDS[1]}" in
+    call) subcommands="show copy diff" ;;
+    diagnostics) subcommands="summary drivers evidence provenance" ;;
+    history) subcommands="compare" ;;
+    brief) subcommands="exec board staff investor slack email" ;;
+    export) subcommands="json csv markdown pdf briefing" ;;
+    share) subcommands="slack email clipboard" ;;
+    explain) subcommands="regime call flip metric" ;;
+    company) subcommands="list select status call brief" ;;
+    config) subcommands="init get set" ;;
+    auth) subcommands="login logout status" ;;
+  esac
+
+  COMPREPLY=( $(compgen -W "\${subcommands} \${global_flags}" -- "\${cur}") )
+}
+
+complete -F _whether_completion whether
+`;
+
+const renderZshCompletion = () => `#compdef whether
+_whether_completion() {
+  local -a commands global_flags subcommands
+  commands=(ping status call changes regime diagnostics history brief export share explain scenario company watch config install auth raw doctor completion version)
+  global_flags=(--help --version --json --yaml --markdown --quiet --no-color --api-base-url --token --output --company --stage)
+
+  if (( CURRENT == 2 )); then
+    compadd -- $commands $global_flags
+    return
+  fi
+
+  case $words[2] in
+    call) subcommands=(show copy diff) ;;
+    diagnostics) subcommands=(summary drivers evidence provenance) ;;
+    history) subcommands=(compare) ;;
+    brief) subcommands=(exec board staff investor slack email) ;;
+    export) subcommands=(json csv markdown pdf briefing) ;;
+    share) subcommands=(slack email clipboard) ;;
+    explain) subcommands=(regime call flip metric) ;;
+    company) subcommands=(list select status call brief) ;;
+    config) subcommands=(init get set) ;;
+    auth) subcommands=(login logout status) ;;
+    *) subcommands=() ;;
+  esac
+
+  compadd -- $subcommands $global_flags
+}
+
+compdef _whether_completion whether
+`;
 
 const classifyAuthFailure = (responseBody) => {
   const rawCode = responseBody?.code ?? responseBody?.errorCode ?? responseBody?.error ?? responseBody?.reason;
@@ -402,6 +786,28 @@ const callText = (body) => `Call: ${body.call}
 Freshness: ${freshnessText(body)}\n\nLeadership should:\n${body.leadershipShould.map((item) => `- ${item}`).join("\n")}\n\nWatch:\n${body.watch.map((item) => `- ${item}`).join("\n")}`;
 const changesText = (body) => `What Changed Since Last Refresh
 Freshness: ${freshnessText(body)}\n\nCHANGED\n${body.changed.map((item) => `- ${item.metric} ${item.from} → ${item.to} (${item.direction}, ${item.impact})`).join("\n")}\n\nREVISIT\n${body.revisit.map((item) => `- ${item}`).join("\n")}\n\nFLIP\n${body.flip.map((item) => `- ${item.condition}${typeof item.distance === "number" ? ` (${item.distance} away)` : ""}`).join("\n")}`;
+const diagnosticsText = (body) => `Diagnostics
+
+Top drivers:
+${body.topDrivers.map((item, idx) => `${idx + 1}. ${item.title} — ${item.directionLabel}\n   ${item.immediateImplication}`).join("\n")}`;
+const scenarioText = (body) => {
+  const from = body.likelyOutcome?.from ?? body.postureBefore ?? "unknown";
+  const to = body.likelyOutcome?.to ?? body.postureAfter ?? "unknown";
+  const changed = typeof body.likelyOutcome?.changed === "boolean" ? body.likelyOutcome.changed : from !== to;
+  return `Scenario
+
+Inputs:
+- Tightness: ${body.inputs.tightness}
+- Risk appetite: ${body.inputs.riskAppetite}
+
+Likely outcome:
+- From: ${from}
+- To: ${to}
+- Changed: ${changed ? "yes" : "no"}
+
+Implication:
+${body.implication ?? "Review the implied posture shift before acting."}`;
+};
 
 const routeWithCommonParams = (base, flags, allowedFlags = ["as-of", "company", "stage", "weeks", "view"]) => {
   const keyMap = {
@@ -433,12 +839,6 @@ const cliRoutes = {
   scenario: (flags) => routeWithCommonParams("/api/cli/scenario", flags, ["tightness", "risk-appetite"]),
 };
 
-const writeFileIfRequested = async (flags, payload, settings) => {
-  if (!flags.output) return;
-  const content = settings.output === "json" ? JSON.stringify(payload, null, 2) : settings.output === "yaml" ? toYaml(payload) : typeof payload === "string" ? payload : JSON.stringify(payload, null, 2);
-  await fs.writeFile(String(flags.output), `${content}\n`, "utf8");
-};
-
 const cmdStatus = async (settings, flags) => {
   if (flags.help) return writeOutput(SUB_HELP.status, settings);
   const route = cliRoutes.status({
@@ -457,9 +857,11 @@ ${body.boundedDecision.flipConditionsCompact.map((item) => `- ${item}`).join("\n
 Top deltas:
 ${body.boundedDecision.topDeltas.map((item) => `- ${item.metric} ${item.direction} (${item.delta})`).join("\n")}`
     : "";
-  const rendered = flags.summary ? body.call.summary : `${statusText(body)}${expandedTail}`;
-  await writeFileIfRequested(flags, rendered, settings);
-  writeOutput(settings.output === "text" ? rendered : body, settings);
+  const context = resolveCompanyContext(settings, flags);
+  const rendered = attachCompanyContextText(flags.summary ? body.call.summary : `${statusText(body)}${expandedTail}`, context);
+  const payload = attachCompanyContextPayload(body, context);
+  await writeFileIfRequested(flags, settings.output === "text" ? rendered : payload, settings);
+  writeOutput(settings.output === "text" ? rendered : payload, settings);
 };
 
 const cmdCall = async (settings, subcommand, flags) => {
@@ -472,56 +874,81 @@ const cmdCall = async (settings, subcommand, flags) => {
     return writeOutput(`Call diff (${from} -> ${to})\n\nCurrent call:\n${body.call}`, settings);
   }
 
-  const rendered = callText(body);
+  const context = resolveCompanyContext(settings, flags);
+  const rendered = attachCompanyContextText(callText(body), context);
+  const payload = attachCompanyContextPayload(body, context);
   if (subcommand === "copy" || flags.copy) {
     return writeOutput(rendered, settings);
   }
 
-  writeOutput(settings.output === "text" ? rendered : body, settings);
+  await writeFileIfRequested(flags, settings.output === "text" ? rendered : payload, settings);
+  writeOutput(settings.output === "text" ? rendered : payload, settings);
 };
 
 const cmdRegime = async (settings, flags) => {
   const body = await getJson(settings, cliRoutes.regime(flags));
+  const context = resolveCompanyContext(settings, flags);
   if (flags.plot) {
     const history = await getJson(settings, "/api/cli/history");
     const plot = history.history.map((item) => `${item.recordDate}  ${item.regime}  ${item.trend}`).join("\n");
-    return writeOutput(`Regime history\n${plot}`, settings);
+    return writeOutput(attachCompanyContextText(`Regime history\n${plot}`, context), settings);
   }
-  const text = `Regime: ${body.regime}\nPhase: ${body.phase}\nConfidence: ${body.confidence}\nTrend: ${body.trend}\n\nInterpretation:\n${body.interpretation}`;
-  writeOutput(settings.output === "text" ? text : body, settings);
+  const text = attachCompanyContextText(`Regime: ${body.regime}\nPhase: ${body.phase}\nConfidence: ${body.confidence}\nTrend: ${body.trend}\n\nInterpretation:\n${body.interpretation}`, context);
+  const payload = attachCompanyContextPayload(body, context);
+  await writeFileIfRequested(flags, settings.output === "text" ? text : payload, settings);
+  writeOutput(settings.output === "text" ? text : payload, settings);
 };
 
 const cmdChanges = async (settings, flags) => {
   const body = await getJson(settings, cliRoutes.changes(flags));
-  writeOutput(settings.output === "text" ? changesText(body) : body, settings);
+  const context = resolveCompanyContext(settings, flags);
+  const text = attachCompanyContextText(changesText(body), context);
+  const payload = attachCompanyContextPayload(body, context);
+  await writeFileIfRequested(flags, settings.output === "text" ? text : payload, settings);
+  writeOutput(settings.output === "text" ? text : payload, settings);
 };
 
 const cmdDiagnostics = async (settings, subcommand, flags) => {
   if (flags.help) return writeOutput(SUB_HELP.diagnostics, settings);
   const body = await getJson(settings, cliRoutes.diagnostics(flags));
+  const context = resolveCompanyContext(settings, flags);
   if (subcommand === "provenance") {
     const status = await getJson(settings, cliRoutes.status(flags));
-    return writeOutput({ updatedAt: status.updatedAt, confidence: status.confidence, degraded: status.degraded }, settings);
+    return writeOutput(attachCompanyContextPayload({ updatedAt: status.updatedAt, confidence: status.confidence, degraded: status.degraded }, context), settings);
   }
   if (subcommand === "evidence") {
     const metric = flags.metric ? String(flags.metric).toLowerCase() : null;
     const filtered = metric ? body.topDrivers.filter((driver) => driver.title.toLowerCase().includes(metric)) : body.topDrivers;
-    return writeOutput(settings.output === "text" ? filtered.map((item, idx) => `${idx + 1}. ${item.title} (${item.directionLabel})`).join("\n") : { ...body, topDrivers: filtered }, settings);
+    const evidencePayload = attachCompanyContextPayload({ ...body, topDrivers: filtered }, context);
+    const evidenceText = attachCompanyContextText(filtered.map((item, idx) => `${idx + 1}. ${item.title} (${item.directionLabel})`).join("\n"), context);
+    return writeOutput(settings.output === "text" ? evidenceText : evidencePayload, settings);
   }
-  writeOutput(body, settings);
+  const payload = attachCompanyContextPayload(body, context);
+  const text = attachCompanyContextText(diagnosticsText(body), context);
+  await writeFileIfRequested(flags, settings.output === "text" ? text : payload, settings);
+  writeOutput(settings.output === "text" ? text : payload, settings);
 };
 
 const cmdHistory = async (settings, subcommand, flags) => {
   if (flags.help) return writeOutput(SUB_HELP.history, settings);
   const body = await getJson(settings, cliRoutes.history(flags));
+  const context = resolveCompanyContext(settings, flags);
   if (subcommand === "compare") {
-    return writeOutput(`Compare mode (${flags.from ?? "start"} -> ${flags.to ?? "end"})
-${body.history[0]?.recordDate ?? "n/a"} latest snapshot`, settings);
+    return writeOutput(
+      attachCompanyContextText(
+        `Compare mode (${flags.from ?? "start"} -> ${flags.to ?? "end"})
+${body.history[0]?.recordDate ?? "n/a"} latest snapshot`,
+        context,
+      ),
+      settings,
+    );
   }
-  const text = `Recent History (${body.windowWeeks}w, max ${body.maxWeeks})
+  const text = attachCompanyContextText(`Recent History (${body.windowWeeks}w, max ${body.maxWeeks})
 
-${body.history.map((item) => `${item.recordDate}  ${item.regime}  ${item.confidenceLabel}  ${item.trend}`).join("\n")}`;
-  writeOutput(settings.output === "text" ? text : body, settings);
+${body.history.map((item) => `${item.recordDate}  ${item.regime}  ${item.confidenceLabel}  ${item.trend}`).join("\n")}`, context);
+  const payload = attachCompanyContextPayload(body, context);
+  await writeFileIfRequested(flags, settings.output === "text" ? text : payload, settings);
+  writeOutput(settings.output === "text" ? text : payload, settings);
 };
 
 
@@ -529,10 +956,12 @@ const cmdBrief = async (settings, subcommand, flags) => {
   if (flags.help) return writeOutput(SUB_HELP.brief, settings);
   const variant = subcommand ?? "exec";
   const body = await getJson(settings, "/api/brief/slack");
-  const prefix = variant === "board" ? "Board brief" : variant === "staff" ? "Staff brief" : variant === "investor" ? "Investor brief" : variant === "email" ? "Email brief" : "Exec brief";
-  const rendered = `${prefix}\n\n${body.brief}`;
-  await writeFileIfRequested(flags, rendered, settings);
-  writeOutput(settings.output === "text" ? rendered : body, settings);
+  const context = resolveCompanyContext(settings, flags);
+  const artifact = buildBriefArtifact(variant, body);
+  const rendered = attachCompanyContextText(artifact.rendered, context);
+  const payload = attachCompanyContextPayload(artifact.payload, context);
+  await writeFileIfRequested(flags, settings.output === "text" ? rendered : payload, settings);
+  writeOutput(settings.output === "text" ? rendered : payload, settings);
 };
 
 const cmdExport = async (settings, subcommand, flags) => {
@@ -540,25 +969,90 @@ const cmdExport = async (settings, subcommand, flags) => {
   const format = subcommand ?? "json";
   const status = await getJson(settings, "/api/cli/status");
   const changes = await getJson(settings, "/api/cli/changes");
-  const payload = { status, changes };
+  const briefBody = await getJson(settings, "/api/brief/slack");
+  const brief = buildBriefArtifact("exec", briefBody);
+  const context = resolveCompanyContext(settings, flags);
+  const payload = attachCompanyContextPayload({ status, changes, brief: brief.payload }, context);
+  const markdown = attachCompanyContextText(buildMarkdownExport({ status, changes, brief: briefBody.brief }), context);
+  const briefing = attachCompanyContextText(buildTextBriefing({ status, changes, brief: briefBody.brief }), context);
 
   if (format === "csv") {
     const csv = ["metric,from,to,direction,impact", ...changes.changed.map((item) => `${item.metric},${item.from},${item.to},${item.direction},${item.impact}`)].join("\n");
-    await writeFileIfRequested({ ...flags, output: flags.output ?? "whether-export.csv" }, csv, { ...settings, output: "text" });
+    await writeFileIfRequested(flags, csv, { ...settings, output: "text" });
     return writeOutput(csv, settings);
   }
 
-  const rendered = format === "markdown" || format === "briefing" ? `# Whether Export\n\n## Call\n${status.call.summary}\n\n## Changes\n${changes.changed.map((item) => `- ${item.metric}: ${item.from} → ${item.to}`).join("\n")}` : payload;
-  await writeFileIfRequested(flags, rendered, settings);
-  writeOutput(rendered, settings);
+  if (format === "markdown") {
+    await writeFileIfRequested(flags, markdown, { ...settings, output: "text" });
+    return writeOutput(markdown, settings);
+  }
+
+  if (format === "briefing") {
+    await writeFileIfRequested(flags, briefing, { ...settings, output: "text" });
+    return writeOutput(briefing, settings);
+  }
+
+  if (format === "pdf") {
+    const outputPath = typeof flags.output === "string" ? flags.output : "whether-briefing.pdf";
+    const absolutePath = await createPdfFromText("Whether briefing", briefing, outputPath);
+    const result = { ok: true, format: "pdf", outputPath: absolutePath };
+    return writeOutput(settings.output === "text" ? `Wrote PDF briefing to ${absolutePath}` : result, settings);
+  }
+
+  await writeFileIfRequested(flags, payload, { ...settings, output: "json" });
+  writeOutput(settings.output === "text" ? JSON.stringify(payload, null, 2) : payload, settings);
 };
 
 const cmdShare = async (settings, subcommand, flags) => {
   if (flags.help) return writeOutput(SUB_HELP.share, settings);
+  const channel = subcommand ?? "clipboard";
   const briefType = flags.brief ?? "exec";
-  const body = await getJson(settings, "/api/brief/slack");
-  const message = `[share:${subcommand ?? "clipboard"}] (${briefType})\n${body.brief}`;
-  writeOutput(message, settings);
+  const briefBody = await getJson(settings, "/api/brief/slack");
+  const brief = buildBriefArtifact(briefType, briefBody);
+  const context = resolveCompanyContext(settings, flags);
+  const briefText = attachCompanyContextText(brief.rendered, context);
+
+  if (channel === "clipboard") {
+    const clipboard = copyTextToClipboard(briefText);
+    const payload = attachCompanyContextPayload({
+      channel,
+      briefType,
+      copied: clipboard.copied,
+      command: clipboard.command,
+      brief: briefText,
+    }, context);
+    if (clipboard.copied) {
+      return writeOutput(settings.output === "text" ? `Copied ${brief.title.toLowerCase()} to clipboard.` : payload, settings);
+    }
+    await writeFileIfRequested(flags, briefText, { ...settings, output: "text" });
+    return writeOutput(settings.output === "text" ? briefText : payload, settings);
+  }
+
+  if (channel === "slack") {
+    const weeklyMandate = await getJson(settings, "/api/integrations/weekly-mandate?target=slack");
+    const payload = attachCompanyContextPayload({
+      channel,
+      briefType,
+      text: briefText,
+      blocks: weeklyMandate.payload?.blocks ?? [],
+      metadata: weeklyMandate.payload?.metadata ?? null,
+      recordDate: briefBody.recordDate,
+    }, context);
+    await writeFileIfRequested(flags, settings.output === "text" ? briefText : payload, settings);
+    return writeOutput(settings.output === "text" ? briefText : payload, settings);
+  }
+
+  const subject = brief.subject ?? `Whether weekly brief — ${briefBody.recordDate}`;
+  const payload = attachCompanyContextPayload({
+    channel: "email",
+    briefType,
+    subject,
+    body: briefText,
+    mailto: `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(briefText)}`,
+  }, context);
+  const rendered = `Subject: ${subject}\n\n${briefText}`;
+  await writeFileIfRequested(flags, settings.output === "text" ? rendered : payload, settings);
+  writeOutput(settings.output === "text" ? rendered : payload, settings);
 };
 
 const cmdExplain = async (settings, subcommand, flags) => {
@@ -580,24 +1074,48 @@ const cmdScenario = async (settings, flags) => {
     process.exit(EXIT.INVALID_SCENARIO);
   }
   const body = await getJson(settings, cliRoutes.scenario(flags));
-  writeOutput(body, settings);
+  const context = resolveCompanyContext(settings, flags);
+  const text = attachCompanyContextText(scenarioText(body), context);
+  const payload = attachCompanyContextPayload(body, context);
+  await writeFileIfRequested(flags, settings.output === "text" ? text : payload, settings);
+  writeOutput(settings.output === "text" ? text : payload, settings);
 };
 
 const cmdCompany = async (settings, subcommand, args, flags) => {
   if (flags.help) return writeOutput(SUB_HELP.company, settings);
-  if (subcommand === "list") return writeOutput("- default", settings);
+  const savedContext = resolveCompanyContext(settings, {}, {});
+  if (subcommand === "list") {
+    if (!savedContext) {
+      return writeOutput(
+        settings.output === "text"
+          ? "No company context saved. Use `whether company select <name> --stage <stage>`."
+          : { saved: [], selected: null },
+        settings,
+      );
+    }
+    return writeOutput(
+      settings.output === "text"
+        ? `${formatCompanyContextLine(savedContext)}`
+        : { saved: [savedContext], selected: savedContext },
+      settings,
+    );
+  }
   if (subcommand === "select") {
     const config = await loadConfig();
-    const company = args[0];
+    const company = args[0] ?? flags.company;
+    const stage = typeof flags.stage === "string" ? flags.stage : config.default_stage ?? null;
     if (!company) process.exit(EXIT.AUTH_CONFIG);
-    await saveConfig({ ...config, default_company: company });
-    return writeOutput(`Selected company: ${company}`, settings);
+    await saveConfig({ ...config, default_company: company, ...(stage ? { default_stage: stage } : {}) });
+    return writeOutput(`Selected company context: ${company}${stage ? ` · stage ${stage}` : ""}`, settings);
   }
-  const company = args[0] ?? flags.company;
-  if (!company) return writeOutput("Provide a company name.", settings);
-  if (subcommand === "call") return cmdCall(settings, "show", { ...flags, company });
-  if (subcommand === "brief") return cmdBrief(settings, "board", { ...flags, company });
-  return cmdStatus(settings, { ...flags, company });
+  const context = resolveCompanyContext(settings, flags, { company: args[0] ?? flags.company });
+  if (!context) {
+    return writeOutput("Provide a company name or select one first with `whether company select <name>`.", settings);
+  }
+  if (subcommand === null || subcommand === "status") return cmdStatus(settings, { ...flags, company: context.company, stage: context.stage });
+  if (subcommand === "call") return cmdCall(settings, "show", { ...flags, company: context.company, stage: context.stage });
+  if (subcommand === "brief") return cmdBrief(settings, "board", { ...flags, company: context.company, stage: context.stage });
+  return writeOutput(formatCompanyContextLine(context), settings);
 };
 
 const cmdRaw = async (settings, subcommand) => {
@@ -643,6 +1161,15 @@ const cmdDoctor = async (settings) => {
   const config = await loadConfig();
   checks.push({ name: "configPath", status: "ok", path: CONFIG_PATH, profile: config.profile ?? "default" });
   writeOutput(checks, settings);
+};
+
+const cmdCompletion = async (settings, flags) => {
+  if (flags.help) return writeOutput(SUB_HELP.completion, settings);
+  const shell = inferShell(flags.shell);
+  if (shell === "zsh") {
+    return writeOutput(renderZshCompletion(), { ...settings, output: "text" });
+  }
+  return writeOutput(renderBashCompletion(), { ...settings, output: "text" });
 };
 
 const cmdInstall = async (settings, flags) => {
@@ -856,7 +1383,7 @@ const main = async () => {
         await cmdDoctor(settings);
         return;
       case "completion":
-        writeOutput("Shell completion is available via `whether completion` (zsh/bash integration planned).", settings);
+        await cmdCompletion(settings, parsed.flags);
         return;
       case "--version":
       case "version":
