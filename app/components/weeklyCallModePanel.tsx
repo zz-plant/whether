@@ -108,12 +108,12 @@ export function WeeklyCallModePanel({
 
   return (
     <>
-      <article className="rounded-xl border border-slate-700/75 bg-slate-950/92 p-3" aria-label="Weekly call snapshot">
+      <article className="rounded-[1.2rem] border border-slate-700/75 bg-slate-950/92 p-4 sm:p-5" aria-label="Weekly call snapshot">
         <div className="flex items-center justify-between gap-2">
           <h2 className="text-sm font-semibold tracking-[0.01em] text-slate-50">Weekly call snapshot</h2>
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Decide, align, and share in under 60 seconds</p>
         </div>
-        <ol className="mt-2 grid gap-2 text-[11px] text-slate-100" aria-label="Weekly decision transmission order">
+        <ol className="mt-3 grid gap-2.5 text-[11px] text-slate-100" aria-label="Weekly decision transmission order">
           <li className="rounded-md border border-slate-700/60 bg-slate-900/65 px-2.5 py-2">
             <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Regime</span>
             <p className="mt-1 text-xs font-semibold text-slate-100">{postureLabel}</p>
@@ -145,7 +145,7 @@ export function WeeklyCallModePanel({
             </ul>
           </li>
         </ol>
-        <details className="mt-2 rounded-md border border-slate-700/60 bg-slate-950/55 px-2.5 py-2">
+        <details className="mt-3 rounded-lg border border-slate-700/60 bg-slate-950/55 px-3 py-3">
           <summary className="cursor-pointer text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Secondary diagnostics</summary>
           <ul className="mt-2 grid gap-1.5 text-[11px] text-slate-100 sm:grid-cols-2">
             <li className={compactInsetClassName}><span className="font-semibold text-slate-200">Trend:</span> {trendLabel}</li>
@@ -154,7 +154,7 @@ export function WeeklyCallModePanel({
             <li className={compactInsetClassName}><span className="font-semibold text-slate-200">Refresh action:</span> Recheck flip cues before approving fixed-cost adds.</li>
           </ul>
         </details>
-        <div className="mt-2 rounded-md border border-slate-700/60 bg-slate-950/55 px-2.5 py-2" aria-label="Decision confidence gauge">
+        <div className="mt-3 rounded-lg border border-slate-700/60 bg-slate-950/55 px-3 py-3" aria-label="Decision confidence gauge">
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Decision confidence</p>
           <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-slate-800/90" role="progressbar" aria-valuenow={confidenceValue} aria-valuemin={0} aria-valuemax={100} aria-label={`Confidence ${confidenceValue} percent`}>
             <div className={`h-full origin-left ${confidenceToneClass} transition-transform duration-300`} style={{ transform: `scaleX(${confidenceValue / 100})` }} />
@@ -162,7 +162,7 @@ export function WeeklyCallModePanel({
           <p className="mt-1 text-[10px] text-slate-300">{confidenceValue}% confidence · use flip cues when this drops.</p>
         </div>
         {actions ? (
-          <div className="mt-2 rounded-xl border border-sky-400/45 bg-gradient-to-r from-sky-600/18 via-sky-500/12 to-slate-950/35 p-3" aria-label="Share this week's call">
+          <div className="mt-3 rounded-xl border border-sky-400/45 bg-gradient-to-r from-sky-600/18 via-sky-500/12 to-slate-950/35 p-3" aria-label="Share this week's call">
             <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-sky-100">Share this week&apos;s call</p>
             <div className="mt-2">{actions}</div>
           </div>

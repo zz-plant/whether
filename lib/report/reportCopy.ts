@@ -52,7 +52,7 @@ export const FIRST_TIME_GUIDE_HIGHLIGHTS: HighlightBullet[] = [
 
 export const FIRST_TIME_GUIDE_NEXT_LINKS: ReportLinkCopy[] = [
   { href: "#executive-snapshot", label: "Leadership summary" },
-  { href: "/operations#ops-playbook", label: "Actions playbook" },
+  { href: "/operations#ops-playbook", label: "Operations" },
   { href: "/signals?advanced=1#time-machine", label: "Time machine" },
 ];
 
@@ -115,13 +115,13 @@ export const GLOSSARY_USAGE_NOTES: GlossaryUsageNote[] = [
 export const SIGNALS_RELATED_LINKS: Array<Required<ReportLinkCopy>> = [
   {
     href: "/operations",
-    label: "Operations playbook",
+    label: "Operations",
     description: "Apply these diagnostics in guardrails, sequencing, and execution trade-offs.",
   },
   {
-    href: "/methodology",
-    label: "Methodology",
-    description: "Inspect formula definitions and source documentation for each signal.",
+    href: "/method",
+    label: "Method",
+    description: "Inspect trust status, source coverage, and formula references for each signal.",
   },
   {
     href: "/onboarding",
@@ -133,17 +133,17 @@ export const SIGNALS_RELATED_LINKS: Array<Required<ReportLinkCopy>> = [
 export const ONBOARDING_RELATED_LINKS: Array<Required<ReportLinkCopy>> = [
   {
     href: "/signals",
-    label: "Signal evidence",
+    label: "Signals",
     description: "Apply the glossary with live source data and threshold diagnostics.",
   },
   {
     href: "/operations",
-    label: "Action playbook",
+    label: "Operations",
     description: "Turn the regime readout into concrete posture and execution guidance.",
   },
   {
-    href: "/methodology",
-    label: "Methodology",
-    description: "Explore the exact formula logic and original data providers.",
+    href: "/method",
+    label: "Method",
+    description: "Review trust status, confidence limits, and linked methodology details.",
   },
 ];

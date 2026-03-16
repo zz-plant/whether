@@ -24,10 +24,10 @@ export async function GlobalHeader() {
   }
 
   return (
-    <header className="mx-auto w-full max-w-6xl px-4 pt-4 sm:px-6">
-      <div className="weather-appbar px-4 py-4 sm:px-5">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
+    <header className="mx-auto w-full max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
+      <div className="weather-appbar px-4 py-4 sm:px-6 sm:py-5">
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-start">
+          <div className="min-w-0 space-y-3">
             <Link
               href="/"
               className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/70 bg-slate-900/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-slate-200 hover:border-sky-400/70 hover:text-sky-100"
@@ -36,7 +36,7 @@ export async function GlobalHeader() {
             </Link>
             <GlobalHeaderTaglineClient />
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 xl:justify-end">
             <Link
               href="/search"
               className="weather-button inline-flex min-h-[44px] items-center justify-center px-3 text-xs font-semibold uppercase tracking-[0.08em]"
@@ -48,7 +48,7 @@ export async function GlobalHeader() {
           </div>
         </div>
 
-        <nav aria-label="Global navigation" className="mt-4">
+        <nav aria-label="Global navigation" className="mt-5">
           <GlobalHeaderNavClient
             navigationLinks={navigationLayers}
             groupLabels={navigationGroupLabels}

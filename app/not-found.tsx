@@ -10,14 +10,14 @@ export default function NotFound() {
         </h1>
         <p className="text-sm leading-7 text-slate-300 sm:text-base">
           Some older routes were replaced during the IA update. Continue with the current command surface,
-          inspect evidence first, or open the action playbook without losing intent.
+          review Signals first, or open Operations without losing intent.
         </p>
         <div className="flex flex-wrap gap-3">
           <Link
-            href="/start"
+            href="/"
             className="weather-button-primary inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em]"
           >
-            Open start guide
+            Open Weekly Brief
           </Link>
           <Link
             href="/signals"
@@ -29,7 +29,7 @@ export default function NotFound() {
             href="/operations"
             className="weather-button inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em]"
           >
-            Continue in operations
+            Open Operations
           </Link>
         </div>
       </section>

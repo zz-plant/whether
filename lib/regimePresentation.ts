@@ -29,10 +29,10 @@ export const REGIME_LEGEND_LABELS: Record<RegimeKey, string> = {
 };
 
 export const REGIME_WEATHER_LABELS: Record<RegimeKey, string> = {
-  SCARCITY: "Hard Freeze",
-  DEFENSIVE: "Overcast",
-  VOLATILE: "Squall Line",
-  EXPANSION: "Clear Skies",
+  SCARCITY: "Freezing",
+  DEFENSIVE: "Cloudy",
+  VOLATILE: "Stormy",
+  EXPANSION: "Sunny",
 };
 
 export type RegimeWeatherIcon = "snowflake" | "cloud" | "storm" | "sun";
@@ -44,17 +44,25 @@ export const REGIME_WEATHER_ICONS: Record<RegimeKey, RegimeWeatherIcon> = {
   EXPANSION: "sun",
 };
 
+export const REGIME_WEATHER_RATIONALES: Record<RegimeKey, string> = {
+  SCARCITY: "Everything costs more to move, so protect heat, conserve cash, and avoid one-way commitments.",
+  DEFENSIVE: "Conditions are workable but muted, so stay selective and keep efficiency layers on.",
+  VOLATILE: "Windows open and close quickly, so move only with shelter, rollback paths, and proof.",
+  EXPANSION: "Visibility is high and footing is firm, so move faster while keeping guardrails in place.",
+};
+
 export const REGIME_LEGEND_ARIA_LABELS: Record<RegimeKey, string> = {
-  SCARCITY: "Scarcity regime: capital constrained and risk appetite weak; weather type hard freeze",
-  DEFENSIVE: "Defensive regime: capital constrained with moderate risk appetite; weather type overcast",
-  VOLATILE: "Transitional regime: mixed read with unstable risk appetite; weather type squall line",
-  EXPANSION: "Expansion regime: capital easing with stronger risk appetite; weather type clear skies",
+  SCARCITY: "Scarcity regime: freezing weather; capital is constrained and each move needs protection.",
+  DEFENSIVE: "Defensive regime: cloudy weather; conditions are workable but visibility is muted.",
+  VOLATILE: "Transitional regime: stormy weather; windows open and close quickly.",
+  EXPANSION: "Expansion regime: sunny weather; visibility is high and conditions support faster movement.",
 };
 
 export const getOrderedRegimeLegend = () => REGIME_ORDER.map((regime) => ({
   regime,
   label: REGIME_LEGEND_LABELS[regime],
   weather: REGIME_WEATHER_LABELS[regime],
+  weatherRationale: REGIME_WEATHER_RATIONALES[regime],
   weatherIcon: REGIME_WEATHER_ICONS[regime],
   ariaLabel: REGIME_LEGEND_ARIA_LABELS[regime],
 }));
@@ -62,6 +70,7 @@ export const getOrderedRegimeLegend = () => REGIME_ORDER.map((regime) => ({
 
 export const getRegimeWeatherLabel = (regime: RegimeKey) => REGIME_WEATHER_LABELS[regime];
 export const getRegimeWeatherIcon = (regime: RegimeKey) => REGIME_WEATHER_ICONS[regime];
+export const getRegimeWeatherRationale = (regime: RegimeKey) => REGIME_WEATHER_RATIONALES[regime];
 
 export const REGIME_LEGEND_DESCRIPTORS: Record<RegimeKey, string> = {
   SCARCITY: "Cash is tight. Protect runway and pause big one-way commitments.",

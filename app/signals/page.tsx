@@ -28,14 +28,14 @@ export const runtime = "edge";
 export const revalidate = 900;
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Whether Report — Signal evidence",
+  title: "Whether Report — Signals",
   description:
     "Evidence appendix: macro signals, thresholds, and historical context supporting the weekly posture brief.",
   path: "/signals",
-  imageAlt: "Whether Report signal evidence overview",
+  imageAlt: "Whether Report signals overview",
   imageParams: {
     template: "signals",
-    eyebrow: "Signal evidence",
+    eyebrow: "Signals",
     title: "Macro signals and threshold context",
     subtitle:
       "Inspect drivers, confidence, and historical context before changing operating posture.",
@@ -78,7 +78,7 @@ export default async function SignalsPage({
       {
         "@type": "WebPage",
         "@id": `${siteUrl}/signals#webpage`,
-        name: "Whether Report — Signal evidence",
+        name: "Whether Report — Signals",
         url: `${siteUrl}/signals`,
         description:
           "Evidence appendix: macro signals, thresholds, and historical context supporting the weekly posture brief.",

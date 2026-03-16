@@ -20,11 +20,21 @@ export default async function StartHerePage() {
 
   return (
     <>
-      <main className="mx-auto w-full max-w-4xl space-y-4 px-4 py-6">
-        <section className="weather-panel space-y-2 px-4 py-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">Start Here</p>
-          <h1 className="text-lg font-semibold text-slate-100">Weekly call, simplified</h1>
-          <p className="text-sm text-slate-300">Answer three questions quickly: what changed, what to do now, and where to execute.</p>
+      <main className="weather-page-shell weather-page-shell-narrow">
+        <section className="weather-panel grid gap-4 px-5 py-5 sm:px-6 sm:py-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(18rem,0.9fr)]">
+          <div className="space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">Start Here</p>
+            <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Weekly call, simplified</h1>
+            <p className="max-w-2xl text-sm leading-relaxed text-slate-300">Answer three questions quickly: what changed, what to do now, and where to execute.</p>
+          </div>
+          <div className="weather-route-card space-y-3">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-200">Fastest route</p>
+            <ul className="space-y-2 text-sm text-slate-200">
+              <li>1. Confirm the delta from last review.</li>
+              <li>2. Lock the do now, guardrail, and flip condition.</li>
+              <li>3. Open the right surface to execute.</li>
+            </ul>
+          </div>
         </section>
 
         <StartDecisionBlocks
@@ -40,11 +50,11 @@ export default async function StartHerePage() {
       <LegacyRouteBridge
         eyebrow="Legacy route bridge"
         title="Start routing now lives in Weekly Brief"
-        description="Use Weekly Brief for the canonical posture call, then jump to Action playbook guardrails. This route remains only for legacy links."
+        description="Use Weekly Brief for the canonical posture call, then jump to Operations for execution guardrails. This route remains only for legacy links."
         primaryHref="/"
         primaryLabel="Go to Weekly Brief"
         secondaryHref="/operations"
-        secondaryLabel="Go to Action playbook"
+        secondaryLabel="Go to Operations"
         autoForwardSeconds={3}
         moreActionsLabel="More actions"
       />

@@ -13,10 +13,10 @@ export default function PlanBridgePage() {
   return (
     <LegacyRouteBridge
       eyebrow="Legacy route bridge"
-      title="Planning is now part of Action playbook"
+      title="Planning is now part of Operations"
       description="The previous /plan route has moved. Continue with the primary planning workflow, or jump to copy-ready brief exports for leadership updates."
       primaryHref="/operations"
-      primaryLabel="Go to action playbook"
+      primaryLabel="Go to Operations"
       secondaryHref="/operations#ops-export-briefs"
       secondaryLabel="Open export briefs"
       autoForwardSeconds={3}

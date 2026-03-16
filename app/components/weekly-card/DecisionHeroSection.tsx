@@ -44,7 +44,7 @@ export function DecisionHeroSection(props: DecisionHeroSectionProps) {
 
   return (
     <header className="space-y-4 border-b border-slate-700/80 pb-6" data-testid="weekly-top-fold">
-      <article className="weather-panel-static rounded-[1.4rem] border-sky-400/25 px-5 py-5 sm:px-6">
+      <article className="weather-panel-static rounded-[1.5rem] border-sky-400/25 px-5 py-5 sm:px-6 sm:py-6 lg:px-7">
         <div id="weekly-posture-brief-title" className="space-y-3">
           <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-300">
             <span className="rounded-full border border-sky-400/35 bg-sky-400/10 px-2.5 py-1 text-sky-100">Weekly operating call</span>
@@ -63,7 +63,7 @@ export function DecisionHeroSection(props: DecisionHeroSectionProps) {
           </div>
           <div className="space-y-2">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Operating stance</p>
-            <h1 className="max-w-4xl text-2xl font-semibold leading-tight text-slate-50 sm:text-[2rem]">
+            <h1 className="max-w-4xl text-2xl font-semibold leading-tight text-slate-50 sm:text-[2.15rem]">
               {operatingStanceLine}
             </h1>
             <p className="max-w-3xl text-sm text-slate-300">
@@ -71,8 +71,8 @@ export function DecisionHeroSection(props: DecisionHeroSectionProps) {
             </p>
           </div>
         </div>
-        <div className="mt-5 grid gap-3 lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,0.85fr)]">
-          <section className="rounded-xl border border-slate-800/65 bg-slate-950/70 px-4 py-4">
+        <div className="mt-5 grid gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(19rem,0.95fr)]">
+          <section className="rounded-xl border border-slate-800/65 bg-slate-950/70 px-4 py-4 sm:px-5">
             <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
               <ShieldIcon className="h-3.5 w-3.5 text-sky-200" />
               <span>Decision summary</span>
@@ -99,7 +99,7 @@ export function DecisionHeroSection(props: DecisionHeroSectionProps) {
               </div>
             </dl>
           </section>
-          <section className="rounded-xl border border-slate-800/65 bg-slate-950/62 px-4 py-4">
+          <section className="rounded-xl border border-slate-800/65 bg-slate-950/62 px-4 py-4 sm:px-5">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">What changed this week</p>
               {weeklyMovement ? (
@@ -119,7 +119,7 @@ export function DecisionHeroSection(props: DecisionHeroSectionProps) {
               </div>
             ) : null}
             {keySignals.length > 0 ? (
-              <ul className="mt-3 space-y-2 text-sm text-slate-200">
+              <ul className="mt-3 grid gap-2 text-sm text-slate-200">
                 {keySignals.map((indicator) => (
                   <li key={indicator.key} className="flex items-start justify-between gap-3 rounded-lg border border-slate-800/60 bg-slate-950/55 px-3 py-2">
                     <div>

@@ -219,7 +219,7 @@ export default async function CareerPathRolePage({
         <h2 className="text-xl font-semibold text-slate-100">How to run this weekly</h2>
         <ol className="space-y-2 text-sm text-slate-200">
           <li className="weather-surface px-4 py-3">
-            Start with the weekly briefing to anchor your planning in the latest climate posture.
+            Start with the Weekly Brief to anchor your planning in the latest climate posture.
           </li>
           <li className="weather-surface px-4 py-3">
             Validate your assumptions in Signals before finalizing trade-offs or escalation asks.

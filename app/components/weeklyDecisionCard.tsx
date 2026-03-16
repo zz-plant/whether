@@ -18,7 +18,7 @@ import type { ForecastRegimeLabel, TransitionVelocityEstimate } from "../../lib/
 import type { RegimeKey } from "../../lib/regimeEngine";
 import type { DecisionMatrixPayload, StartupVariantPolicy, WeeklyDecisionCardViewModel } from "../../lib/report/homeBriefModel";
 import { buildCompactFreshnessMeta, formatProbabilityPercent } from "../../lib/report/reportFormatting";
-import { getOrderedRegimeLegend, getRegimeWeatherIcon, getRegimeWeatherLabel, REGIME_BANNER_TOKENS, REGIME_LEGEND_DESCRIPTORS, type RegimeBannerTone, type RegimeWeatherIcon } from "../../lib/regimePresentation";
+import { getOrderedRegimeLegend, getRegimeWeatherIcon, getRegimeWeatherLabel, getRegimeWeatherRationale, REGIME_BANNER_TOKENS, REGIME_LEGEND_DESCRIPTORS, type RegimeBannerTone, type RegimeWeatherIcon } from "../../lib/regimePresentation";
 import { formatDateUTC } from "../../lib/formatters";
 import {
   buildWeeklyCitationMetaLine,
@@ -351,6 +351,7 @@ function RegimeLegend({
   const activeDescriptor = REGIME_LEGEND_DESCRIPTORS[activeRegime];
   const activeWeather = getRegimeWeatherLabel(activeRegime);
   const activeWeatherIcon = getRegimeWeatherIcon(activeRegime);
+  const activeWeatherRationale = getRegimeWeatherRationale(activeRegime);
   const flipRiskState = resolveFlipRiskMeterState(regimeDistance);
 
   return (
@@ -399,7 +400,14 @@ function RegimeLegend({
           );
         })}
       </ol>
-      <p className={`mt-2 flex flex-wrap items-center gap-1.5 text-xs ${tone.weatherHint}`}><RegimeWeatherGlyph icon={activeWeatherIcon} title={activeWeather} /><span><span className="font-semibold text-slate-100">Weather signal:</span> {activeWeather}. <span className="font-semibold text-slate-100">What this means:</span> {activeDescriptor}</span></p>
+      <p className={`mt-2 flex flex-wrap items-center gap-1.5 text-xs ${tone.weatherHint}`}>
+        <RegimeWeatherGlyph icon={activeWeatherIcon} title={activeWeather} />
+        <span>
+          <span className="font-semibold text-slate-100">Weather read:</span> {activeWeather}.{" "}
+          <span className="font-semibold text-slate-100">Why it fits:</span> {activeWeatherRationale}{" "}
+          <span className="font-semibold text-slate-100">Operator meaning:</span> {activeDescriptor}
+        </span>
+      </p>
     </div>
   );
 }
@@ -1050,7 +1058,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
   const resolvedRegimeKey = regimeKey ?? "DEFENSIVE";
 
   return (
-    <section className="weather-panel space-y-3 px-4 py-5 sm:space-y-4 sm:px-6 sm:py-6" aria-labelledby="weekly-posture-brief-title">
+    <section className="weather-panel space-y-4 px-4 py-5 sm:space-y-5 sm:px-6 sm:py-6 lg:px-7 lg:py-7" aria-labelledby="weekly-posture-brief-title">
       <RegimeBanner
         statusLabel={statusLabel}
         regimeKey={resolvedRegimeKey}
@@ -1066,8 +1074,8 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
         regimeDistance={regimeDistance}
       />
 
-      <div className="grid gap-3 xl:grid-cols-12">
-        <main className="space-y-3 xl:col-span-8">
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.28fr)_minmax(19rem,0.82fr)] xl:items-start">
+        <main className="space-y-4">
           <WeeklyCallModePanel
             startupVariantPolicy={resolvedStartupVariantPolicy}
             modeContentByMode={modeContentByMode}
@@ -1114,7 +1122,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
 
         </main>
 
-        <aside className="space-y-3 xl:col-span-4">
+        <aside className="space-y-4 xl:sticky xl:top-28">
           <ConfidenceMiniChart confidenceHistory={confidenceHistory} confidenceTrend={confidenceTrend} />
 
         </aside>

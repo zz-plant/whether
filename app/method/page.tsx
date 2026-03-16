@@ -14,11 +14,11 @@ export const runtime = "edge";
 export const revalidate = 900;
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Methodology & Data — formulas, sources, and transparency",
+  title: "Method — trust, sources, and limits",
   description:
-    "Canonical trust surfaces for Whether: methodology, formulas, source coverage, and model limitations.",
+    "Canonical trust surfaces for Whether: confidence, freshness, source coverage, and method limits.",
   path: "/method",
-  imageAlt: "Whether methodology and data hub",
+  imageAlt: "Whether method hub",
 });
 
 export default async function MethodPage() {
@@ -65,12 +65,12 @@ export default async function MethodPage() {
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }} />
-      <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Methodology & Data" }]} />
+      <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Method" }]} />
       <StaticHubNav currentPath="/method" />
       <section className="weather-panel space-y-3 px-6 py-6">
-        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Methodology &amp; Data</h1>
+        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Method</h1>
         <p className="text-sm text-slate-300">
-          Use this page as the trust snapshot: current confidence, freshness, and reversal conditions in one screen. Use <span className="font-semibold text-slate-100">Methodology</span> for full formula definitions and model details.
+          Use this page as the trust snapshot: current confidence, freshness, and reversal conditions in one screen. Open <span className="font-semibold text-slate-100">Methodology</span> when you need full formula definitions and model details.
         </p>
         <div className="flex flex-wrap gap-3">
           <Link href="/methodology" className="weather-button inline-flex items-center justify-center">

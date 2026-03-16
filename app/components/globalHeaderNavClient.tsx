@@ -17,17 +17,17 @@ export function GlobalHeaderNavClient({ navigationLinks, groupLabels }: GlobalHe
 
   return (
     <div className="relative">
-      <ul className="flex gap-2 overflow-x-auto pb-1 pr-8 [-ms-overflow-style:auto] [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-700/80">
+      <ul className="flex gap-2 overflow-x-auto pb-1 pr-8 [-ms-overflow-style:auto] [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-700/80 sm:grid sm:grid-cols-2 sm:gap-3 sm:overflow-visible sm:pr-0 lg:grid-cols-4 xl:grid-cols-7">
         {navigationLinks.map((link) => {
           const isActive = pathMatchesLink(link.href, pathname);
 
           return (
-            <li key={link.href} className="flex-shrink-0">
+            <li key={link.href} className="flex-shrink-0 sm:min-w-0">
               <Link
                 href={link.href}
                 aria-current={isActive ? "page" : undefined}
                 title={link.boundary}
-                className={`weather-pill inline-flex min-h-[44px] min-w-[132px] flex-col items-start justify-center rounded-xl px-3 py-2 text-left transition-colors touch-manipulation ${
+                className={`weather-pill group inline-flex min-h-[72px] min-w-[144px] flex-col items-start justify-start rounded-[1.1rem] px-3 py-3 text-left transition-colors touch-manipulation sm:min-w-0 sm:h-full ${
                   isActive
                     ? "border-sky-300/90 bg-sky-500/25 text-sky-50"
                     : "text-slate-100 hover:border-sky-400/70"
@@ -36,8 +36,15 @@ export function GlobalHeaderNavClient({ navigationLinks, groupLabels }: GlobalHe
                 <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-300/90">
                   {groupLabels[link.group]}
                 </span>
-                <span className="mt-1 text-xs font-semibold tracking-[0.08em] sm:text-sm">
+                <span className="mt-1 text-xs font-semibold tracking-[0.06em] sm:text-sm">
                   {link.label}
+                </span>
+                <span
+                  className={`mt-2 hidden text-[11px] leading-relaxed xl:block ${
+                    isActive ? "text-sky-100/90" : "text-slate-400 group-hover:text-slate-300"
+                  }`}
+                >
+                  {link.description}
                 </span>
               </Link>
             </li>

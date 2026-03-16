@@ -393,15 +393,34 @@ export const ReportShell = ({
         <DisplayModeManager />
         <AnchorFeedback />
         <DisplayGuardian />
-        <div className="tv-rail-safe mx-auto max-w-[82rem] pb-[calc(env(safe-area-inset-bottom)+10rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)] pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)] sm:pb-10 sm:pt-5 sm:pl-[calc(env(safe-area-inset-left)+1.25rem)] sm:pr-[calc(env(safe-area-inset-right)+1.25rem)]">
-          <header className="weather-appbar relative z-20 px-4 py-4 sm:sticky sm:top-4 sm:px-6 sm:py-4">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-3"><Image src="/whether-logo.svg" alt="Whether — Weekly Operating Posture (Hiring, Spend, Roadmap)" width={156} height={36} className="h-9 w-auto" priority /><p className="text-xs text-slate-300 sm:hidden">Signals updated {fetchedAtLabel}</p></div>
-              <div className="hidden items-center sm:flex"><p className="text-xs text-slate-300">Signals updated {fetchedAtLabel}</p></div>
+        <div className="tv-rail-safe mx-auto max-w-[88rem] pb-[calc(env(safe-area-inset-bottom)+10rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)] pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)] sm:pb-10 sm:pt-5 sm:pl-[calc(env(safe-area-inset-left)+1.25rem)] sm:pr-[calc(env(safe-area-inset-right)+1.25rem)]">
+          <header className="weather-appbar relative z-20 px-4 py-4 sm:px-6 sm:py-5 lg:sticky lg:top-4">
+            <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+              <div className="min-w-0 space-y-2">
+                <div className="flex flex-wrap items-center gap-3">
+                  <Image src="/whether-logo.svg" alt="Whether — Weekly Operating Posture (Hiring, Spend, Roadmap)" width={156} height={36} className="h-9 w-auto" priority />
+                  <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-200">
+                    {statusLabel}
+                  </span>
+                </div>
+                <p className="max-w-3xl text-xs leading-relaxed text-slate-300">
+                  Weekly posture artifact for operators: decide now, execute with guardrails, and keep evidence one click away.
+                </p>
+              </div>
+              <div className="grid gap-2 sm:grid-cols-2 xl:min-w-[23rem]">
+                <div className="weather-stat-card">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Signals updated</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-100">{fetchedAtLabel}</p>
+                </div>
+                <div className="weather-stat-card">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Record date</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-100">{recordDateLabel}</p>
+                </div>
+              </div>
             </div>
             <NavigationOrientationBadge currentPath={currentPath} className="mt-4" />
-            <p className="mt-2 text-xs text-slate-300">{canonicalPositioningLine}</p>
-            <p className="mt-2 text-[11px] text-slate-400">Choose view: Now (decision), Operate (execution), Reference (evidence).</p>
+            <p className="mt-3 max-w-3xl text-xs leading-relaxed text-slate-300">{canonicalPositioningLine}</p>
+            <p className="mt-2 text-[11px] text-slate-400">Choose view: Now for the call, Operate for guardrails, Reference for evidence and method.</p>
             {showPageNavigation ? (
               <ReportPageNavigation
                 pageLinks={pageLinks}
@@ -417,17 +436,17 @@ export const ReportShell = ({
           {historicalBanner}
           {commandBar ? <div className="mt-4"><RegimeCommandBar {...commandBar} /></div> : null}
 
-          <div className={`mt-5 grid min-w-0 gap-5 ${hasSidebar ? "lg:grid-cols-[minmax(0,1fr),260px] lg:items-start" : ""}`}>
-            {hasSidebar ? <aside className="order-2 space-y-4 lg:order-none lg:col-start-2 lg:row-start-1 lg:sticky lg:top-28 lg:self-start">{sectionLinks.length ? <ReportSectionNavigation sectionLinks={sectionLinks} className="hidden lg:block" /> : null}<HeroTrustProvenanceBlock trustStatusTone={trustStatusTone} trustStatusLabel={trustStatusLabel} trustStatusDetail={trustStatusDetail} trustStatusAction={trustStatusAction} statusLabel={statusLabel} fetchedAtLabel={fetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} provenance={provenance} /></aside> : null}
+          <div className={`mt-5 grid min-w-0 gap-5 xl:gap-6 ${hasSidebar ? "xl:grid-cols-[minmax(0,1fr)_minmax(18rem,20rem)] xl:items-start" : ""}`}>
+            {hasSidebar ? <aside className="order-2 space-y-4 xl:order-none xl:col-start-2 xl:row-start-1 xl:sticky xl:top-28 xl:self-start">{sectionLinks.length ? <ReportSectionNavigation sectionLinks={sectionLinks} className="hidden xl:block" /> : null}<HeroTrustProvenanceBlock trustStatusTone={trustStatusTone} trustStatusLabel={trustStatusLabel} trustStatusDetail={trustStatusDetail} trustStatusAction={trustStatusAction} statusLabel={statusLabel} fetchedAtLabel={fetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} provenance={provenance} /></aside> : null}
 
-            <div className="order-1 min-w-0 space-y-8 lg:order-none lg:col-start-1 lg:row-start-1 lg:space-y-10">
+            <div className={`order-1 min-w-0 space-y-8 lg:space-y-10 xl:order-none xl:col-start-1 xl:row-start-1 ${hasSidebar ? "" : "mx-auto w-full max-w-[78rem]"}`}>
               {!hideHeroChrome ? <CommandCenterNavBlock heroVariant={heroVariant} pageTitle={pageTitle} pageSummary={pageSummary} summaryLink={summaryLink} recordDateLabel={recordDateLabel} roleSwitcher={roleSwitcher} primaryCta={primaryCta} secondaryCta={secondaryCta} exportCta={exportCta} nextStep={nextStep} statusLabel={statusLabel} trustStatusLabel={trustStatusLabel} fetchedAtLabel={fetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={trustStatusAction} showOfflineBadge={showOfflineBadge} offlineBadgeLabel={offlineBadgeLabel} decisionBanner={decisionBanner} missionSupportText={trustStatusDetail} decisionDiffs={decisionDiffs} missionSequenceTitle={missionSequenceTitle} missionSequenceItems={missionSequenceItems} /> : null}
 
               <SidebarSequenceBlock stageRail={stageRail} />
 
-              {renderTrustBeforeContent ? <section className="space-y-4"><div className="grid gap-4 lg:grid-cols-2"><HeroTrustProvenanceBlock trustStatusTone={trustStatusTone} trustStatusLabel={trustStatusLabel} trustStatusDetail={trustStatusDetail} trustStatusAction={trustStatusAction} statusLabel={statusLabel} fetchedAtLabel={fetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} provenance={provenance} /></div></section> : null}
+              {renderTrustBeforeContent ? <section className="space-y-4"><div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]"><HeroTrustProvenanceBlock trustStatusTone={trustStatusTone} trustStatusLabel={trustStatusLabel} trustStatusDetail={trustStatusDetail} trustStatusAction={trustStatusAction} statusLabel={statusLabel} fetchedAtLabel={fetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} provenance={provenance} /></div></section> : null}
 
-              <div className="space-y-10">{contentSections.map((section, index) => { const sectionKey = isValidElement(section) && section.key != null ? section.key : `section-${index}`; return <div key={sectionKey} className={index === 0 ? "" : "border-t border-slate-800/70 pt-10"}>{section}{renderTrustAfterFirstSection && index === 0 ? <section className="mt-4 space-y-4"><div className="grid gap-4 lg:grid-cols-2"><HeroTrustProvenanceBlock trustStatusTone={trustStatusTone} trustStatusLabel={trustStatusLabel} trustStatusDetail={trustStatusDetail} trustStatusAction={trustStatusAction} statusLabel={statusLabel} fetchedAtLabel={fetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} provenance={provenance} /></div></section> : null}</div>; })}</div>
+              <div className="space-y-10 lg:space-y-12">{contentSections.map((section, index) => { const sectionKey = isValidElement(section) && section.key != null ? section.key : `section-${index}`; return <div key={sectionKey} className={index === 0 ? "" : "border-t border-slate-800/70 pt-10 lg:pt-12"}>{section}{renderTrustAfterFirstSection && index === 0 ? <section className="mt-4 space-y-4"><div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]"><HeroTrustProvenanceBlock trustStatusTone={trustStatusTone} trustStatusLabel={trustStatusLabel} trustStatusDetail={trustStatusDetail} trustStatusAction={trustStatusAction} statusLabel={statusLabel} fetchedAtLabel={fetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} provenance={provenance} /></div></section> : null}</div>; })}</div>
 
               <footer className="mt-12 border-t border-slate-800/70 pt-6 text-xs font-semibold tracking-[0.18em] text-slate-300">
                 <p>{INFORMATIONAL_NOTICE}</p>

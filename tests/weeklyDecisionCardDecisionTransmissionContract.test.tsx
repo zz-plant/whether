@@ -89,6 +89,9 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
 
     const duplicateCount = html.split("Tightness &lt; 65").length - 1;
     assert.equal(duplicateCount, 1);
+    assert.match(html, /Weather read:/);
+    assert.match(html, /Cloudy/);
+    assert.match(html, /stay selective and keep efficiency layers on/i);
   });
 
   it("keeps top-fold sequence canonical: Regime, Call, Do now, Flip conditions", () => {

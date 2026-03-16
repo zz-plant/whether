@@ -101,7 +101,7 @@ export const HomePageReportContent = async ({
       }}
       secondaryCta={{
         href: "/operations",
-        label: "View action playbook",
+        label: "Open Operations",
       }}
       nextStep={{
         href: "/signals",
@@ -154,15 +154,15 @@ export const HomePageReportContent = async ({
         <p className="text-sm text-slate-200">Keep this page your weekly call surface. Open detailed workflows only when you need diagnostics or role-specific plans.</p>
         <div className="grid gap-2 sm:grid-cols-3">
           <Link href="/operations" className="weather-panel-static rounded-xl px-3 py-3 text-xs text-slate-100 transition-colors hover:border-sky-400/35">
-            <span className="font-semibold">Execution playbook</span>
+            <span className="font-semibold">Operations</span>
             <span className="mt-1 block text-slate-300">Approve/hold/escalate plans by function.</span>
           </Link>
           <Link href="/signals" className="weather-panel-static rounded-xl px-3 py-3 text-xs text-slate-100 transition-colors hover:border-sky-400/35">
-            <span className="font-semibold">Evidence + drivers</span>
+            <span className="font-semibold">Signals</span>
             <span className="mt-1 block text-slate-300">Inspect raw indicators, deltas, and provenance.</span>
           </Link>
           <Link href="/decide" className="weather-panel-static rounded-xl px-3 py-3 text-xs text-slate-100 transition-colors hover:border-sky-400/35">
-            <span className="font-semibold">Decision scenarios</span>
+            <span className="font-semibold">Decide</span>
             <span className="mt-1 block text-slate-300">Stress-test thresholds and reversal conditions.</span>
           </Link>
         </div>

@@ -59,6 +59,7 @@ export function NavigationOrientationBadge({
   className?: string;
 }) {
   const activeZone = resolveActiveZone(currentPath);
+  const normalizedCurrentPath = normalizePath(currentPath);
 
   return (
     <div
@@ -67,14 +68,15 @@ export function NavigationOrientationBadge({
     >
       {zoneOrder.map((zone) => {
         const isActive = zone === activeZone;
+        const isExactCurrentLink = zoneDefaultHref[zone] === normalizedCurrentPath;
 
         return (
           <a
             key={zone}
             href={zoneDefaultHref[zone]}
             aria-label={zoneLabels[zone]}
-            aria-current={isActive ? "true" : undefined}
-            className={`inline-flex min-h-[32px] items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] transition-colors hover:border-sky-300/60 hover:text-sky-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/70 ${isActive ? zoneBadgeStyles[zone] : "border-slate-700/70 text-slate-400"}`}
+            aria-current={isExactCurrentLink ? "page" : undefined}
+            className={`inline-flex min-h-[44px] items-center rounded-full border px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.08em] transition-colors hover:border-sky-300/60 hover:text-sky-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/70 ${isActive ? zoneBadgeStyles[zone] : "border-slate-700/70 text-slate-400"}`}
             title={zoneDescriptors[zone]}
           >
             <span className="sm:hidden">{zoneCompactLabels[zone]}</span>

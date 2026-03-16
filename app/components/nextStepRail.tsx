@@ -1,22 +1,63 @@
 import Link from "next/link";
+import { pathMatchesLink } from "../../lib/navigation/pathMatching";
 
 const CANONICAL_ACTIONS = [
-  { label: "Weekly brief", href: "/" },
-  { label: "Learn", href: "/learn" },
-  { label: "Review evidence", href: "/signals" },
-  { label: "Apply operations", href: "/operations" },
-  { label: "Choose decision path", href: "/decide" },
-  { label: "Run toolkit", href: "/toolkits" },
-  { label: "Inspect methodology", href: "/method" },
+  { label: "Weekly brief", href: "/", description: "Reset on the current posture, bounded call, and share-ready artifact." },
+  { label: "Signals", href: "/signals", description: "Inspect the drivers, thresholds, and freshness behind the call." },
+  { label: "Operations", href: "/operations", description: "Turn the posture into hiring, spend, and cadence guardrails." },
+  { label: "Decide", href: "/decide", description: "Translate the weekly call by role or operating question." },
+  { label: "Toolkits", href: "/toolkits", description: "Open a reusable instrument once the decision path is clear." },
+  { label: "Learn", href: "/learn", description: "Use concepts and failure modes only when you need deeper context." },
+  { label: "Method", href: "/method", description: "Check trust status, sources, formulas, and limitations without leaving the decision loop." },
+] as const;
+
+const recommendedActionByPath = [
+  { match: "/", href: "/operations" },
+  { match: "/signals", href: "/operations" },
+  { match: "/operations", href: "/decide" },
+  { match: "/decide", href: "/toolkits" },
+  { match: "/toolkits", href: "/" },
+  { match: "/learn", href: "/signals" },
+  { match: "/method", href: "/signals" },
 ] as const;
 
 export function NextStepRail({ currentPath }: { currentPath: string }) {
+  const currentAction = CANONICAL_ACTIONS.find((action) => pathMatchesLink(action.href, currentPath));
+  const recommendedHref = recommendedActionByPath.find((item) => pathMatchesLink(item.match, currentPath))?.href ?? "/";
+  const recommendedAction = CANONICAL_ACTIONS.find((action) => action.href === recommendedHref) ?? CANONICAL_ACTIONS[0];
+
   return (
-    <section className="weather-panel space-y-3 px-6 py-5" aria-label="Next step rail">
-      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Next step</p>
+    <section className="weather-panel space-y-4 px-6 py-5" aria-label="Next step rail">
+      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+        <div className="space-y-1">
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Next step</p>
+          <p className="text-sm text-slate-300">Keep moving through signals → posture → decision → artifact without losing context.</p>
+        </div>
+        {currentAction ? (
+          <div className="weather-stat-card min-w-[14rem]">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">You are here</p>
+            <p className="mt-1 text-sm font-semibold text-slate-100">{currentAction.label}</p>
+          </div>
+        ) : null}
+      </div>
+
+      <div className="weather-route-card flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div className="space-y-1">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-200">Best next move</p>
+          <h2 className="text-base font-semibold text-slate-100">{recommendedAction.label}</h2>
+          <p className="max-w-2xl text-sm text-slate-300">{recommendedAction.description}</p>
+        </div>
+        <Link
+          href={recommendedAction.href}
+          className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]"
+        >
+          Open {recommendedAction.label}
+        </Link>
+      </div>
+
       <div className="flex flex-wrap gap-2">
         {CANONICAL_ACTIONS.map((action) => {
-          const isCurrent = action.href === currentPath;
+          const isCurrent = pathMatchesLink(action.href, currentPath);
 
           if (isCurrent) {
             return (

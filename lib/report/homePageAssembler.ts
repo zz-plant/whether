@@ -212,7 +212,7 @@ const buildHomeStructuredData = () => ({
     {
       "@type": "CollectionPage",
       "@id": `${siteUrl}/#webpage`,
-      name: "Whether Report — Weekly briefing",
+      name: "Whether Report — Weekly Brief",
       url: siteUrl,
       description: defaultSiteDescription,
       inLanguage: "en",

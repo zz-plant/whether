@@ -30,14 +30,14 @@ import { buildActionStripItems } from "../../lib/report/operatingCalls";
 
 export const runtime = "edge";
 export const metadata: Metadata = buildPageMetadata({
-  title: "Whether Report — Action playbook",
+  title: "Whether Report — Operations",
   description:
     "Playbook moves, finance posture, and operator requests tuned to the current regime.",
   path: "/operations",
-  imageAlt: "Whether action playbook plan view",
+  imageAlt: "Whether operations plan view",
   imageParams: {
     template: "operations",
-    eyebrow: "Action playbook · Plan",
+    eyebrow: "Operations · Plan",
     title: "Set priorities and resource posture",
     subtitle:
       "Translate regime context into playbook moves, finance posture, and operator requests.",
@@ -79,7 +79,7 @@ export default async function OperationsPage({
     "@graph": [
       {
         "@type": "WebPage",
-        name: "Whether Report — Action playbook",
+        name: "Whether Report — Operations",
         url: `${siteUrl}/operations`,
         description:
           "Playbook moves, finance posture, and operator requests tuned to the current regime.",
@@ -181,7 +181,7 @@ export default async function OperationsPage({
         href: "#ops-monthly-action-summary",
         label: "Review weekly + monthly summary",
       }}
-      secondaryCta={{ href: "#ops-playbook", label: "Open execution playbook" }}
+      secondaryCta={{ href: "#ops-playbook", label: "Open playbook" }}
       exportCta={{ href: "#ops-export-briefs", label: "Copy weekly brief" }}
       nextStep={{
         href: "/decide",

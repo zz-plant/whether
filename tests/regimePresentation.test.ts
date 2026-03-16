@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { getRegimeDisplayLabel, getRegimeWeatherIcon, getRegimeWeatherLabel, getOrderedRegimeLegend } from "../lib/regimePresentation";
+import { getRegimeDisplayLabel, getRegimeWeatherIcon, getRegimeWeatherLabel, getRegimeWeatherRationale, getOrderedRegimeLegend } from "../lib/regimePresentation";
 
 describe("regime presentation labels", () => {
   it("keeps contraction mapping for defensive/scarcity regimes", () => {
@@ -16,18 +16,25 @@ describe("regime presentation labels", () => {
 
 
   it("associates each regime with a weather type", () => {
-    assert.equal(getRegimeWeatherLabel("SCARCITY"), "Hard Freeze");
-    assert.equal(getRegimeWeatherLabel("DEFENSIVE"), "Overcast");
-    assert.equal(getRegimeWeatherLabel("VOLATILE"), "Squall Line");
-    assert.equal(getRegimeWeatherLabel("EXPANSION"), "Clear Skies");
+    assert.equal(getRegimeWeatherLabel("SCARCITY"), "Freezing");
+    assert.equal(getRegimeWeatherLabel("DEFENSIVE"), "Cloudy");
+    assert.equal(getRegimeWeatherLabel("VOLATILE"), "Stormy");
+    assert.equal(getRegimeWeatherLabel("EXPANSION"), "Sunny");
   });
 
   it("includes weather labels in the ordered legend", () => {
     const legend = getOrderedRegimeLegend();
-    assert.equal(legend[0]?.weather, "Hard Freeze");
-    assert.equal(legend[1]?.weather, "Overcast");
-    assert.equal(legend[2]?.weather, "Squall Line");
-    assert.equal(legend[3]?.weather, "Clear Skies");
+    assert.equal(legend[0]?.weather, "Freezing");
+    assert.equal(legend[1]?.weather, "Cloudy");
+    assert.equal(legend[2]?.weather, "Stormy");
+    assert.equal(legend[3]?.weather, "Sunny");
+  });
+
+  it("gives each weather mapping a rationale that explains the posture", () => {
+    assert.match(getRegimeWeatherRationale("SCARCITY"), /costs more to move/i);
+    assert.match(getRegimeWeatherRationale("DEFENSIVE"), /stay selective/i);
+    assert.match(getRegimeWeatherRationale("VOLATILE"), /windows open and close quickly/i);
+    assert.match(getRegimeWeatherRationale("EXPANSION"), /move faster/i);
   });
 
   it("maps each regime to a weather icon key", () => {
