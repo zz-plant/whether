@@ -389,7 +389,7 @@ export const TimeMachinePanel = ({
   const replayPreviousHref = !isHistorical ? previousSnapshotHref : null;
 
   return (
-    <section id="time-machine" aria-labelledby="time-machine-title" className="mt-10">
+    <section id="time-machine" aria-labelledby="time-machine-title" className="weather-section-stage mt-10">
       <div className="weather-panel p-6">
         <SectionPanelHeader
           label="Time Machine"
@@ -416,8 +416,8 @@ export const TimeMachinePanel = ({
           }
         />
 
-        <div className="mt-6 grid gap-4 lg:grid-cols-[1.2fr,1fr]">
-          <div className="weather-surface p-4">
+        <div className="weather-list-stagger mt-6 grid gap-4 lg:grid-cols-[1.2fr,1fr]">
+          <div className="weather-surface weather-delta-card p-4" data-emphasis="true">
             <p className="type-label text-slate-400">Historical mode</p>
             <p className="mt-3 type-data text-slate-300">
               {isHistorical ? (
@@ -442,7 +442,7 @@ export const TimeMachinePanel = ({
               </div>
             ) : null}
           </div>
-          <div className="weather-surface p-4">
+          <div className="weather-surface weather-delta-card p-4">
             <p className="type-label text-slate-400">Snapshot</p>
             <p className="mt-3 text-lg font-semibold text-slate-100">{selectedLabel}</p>
             <p className="mt-2 text-xs text-slate-500">Highlights the month loaded into the report.</p>
@@ -457,13 +457,13 @@ export const TimeMachinePanel = ({
           </div>
         </div>
 
-        <div className="mt-4 weather-surface p-4" aria-label="Time navigation controls">
+        <div className="mt-4 weather-surface weather-delta-card p-4" aria-label="Time navigation controls">
           <p className="type-label text-slate-400">Time navigation</p>
           <p className="mt-2 text-sm text-slate-300">
             Move backward and forward month-by-month, jump to live data, or open the forward-looking
             forecast view.
           </p>
-          <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="weather-list-stagger mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
             {previousSnapshotHref ? (
               <Link
                 href={previousSnapshotHref as Route}
@@ -504,7 +504,7 @@ export const TimeMachinePanel = ({
         </div>
 
         {showComparison && comparison ? (
-          <div className="weather-surface mt-4 p-4">
+          <div className="weather-surface weather-delta-card mt-4 p-4" data-emphasis="true">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="type-label text-slate-400">Then vs now</p>
               <p className="text-xs text-slate-500">
@@ -512,15 +512,15 @@ export const TimeMachinePanel = ({
                 {formatDateLabel(comparison.now.recordDate)}
               </p>
             </div>
-            <div className="mt-3 grid gap-3 md:grid-cols-2">
-              <div className="weather-surface rounded-lg p-3">
+            <div className="weather-list-stagger mt-3 grid gap-3 md:grid-cols-2">
+              <div className="weather-surface weather-delta-card rounded-lg p-3">
                 <p className="type-kicker">Capital posture</p>
                 <p className="mt-2 text-sm text-slate-100">
                   {comparison.then.regime.toLowerCase()} →{" "}
                   {comparison.now.regime.toLowerCase()}
                 </p>
               </div>
-              <div className="weather-surface rounded-lg p-3">
+              <div className="weather-surface weather-delta-card rounded-lg p-3">
                 <p className="type-kicker">Base rate</p>
                 <p className="mt-2 text-sm text-slate-100">
                   {formatPercent(comparison.then.baseRate)} →{" "}
@@ -533,7 +533,7 @@ export const TimeMachinePanel = ({
                   )
                 </p>
               </div>
-              <div className="weather-surface rounded-lg p-3">
+              <div className="weather-surface weather-delta-card rounded-lg p-3">
                 <p className="type-kicker">Curve slope</p>
                 <p className="mt-2 text-sm text-slate-100">
                   {formatCurve(comparison.then.curveSlope)} →{" "}
@@ -543,7 +543,7 @@ export const TimeMachinePanel = ({
                     : ""}
                 </p>
               </div>
-              <div className="weather-surface rounded-lg p-3">
+              <div className="weather-surface weather-delta-card rounded-lg p-3">
                 <p className="type-kicker">
                   Tightness vs risk
                 </p>

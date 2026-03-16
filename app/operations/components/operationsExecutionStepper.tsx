@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { startTransition, useEffect, useState, type ReactNode } from "react";
 
 type OperationsExecutionStep = {
   id: string;
@@ -60,7 +60,9 @@ export function OperationsExecutionStepper({
   }, [firstStepId, steps]);
 
   const setActiveStep = (stepId: string) => {
-    setActiveStepId(stepId);
+    startTransition(() => {
+      setActiveStepId(stepId);
+    });
     const nextHash = `#${stepId}`;
     const nextUrl = `${window.location.pathname}${window.location.search}${nextHash}`;
     window.history.replaceState(null, "", nextUrl);
@@ -88,7 +90,9 @@ export function OperationsExecutionStepper({
                   type="button"
                   onClick={() => setActiveStep(step.id)}
                   aria-current={isActive ? "step" : undefined}
-                  className={`weather-surface flex min-h-[112px] w-full flex-col gap-2 rounded-xl border p-3 text-left transition-colors ${cardTone}`}
+                  data-active={isActive ? "true" : "false"}
+                  data-reviewed={index < activeIndex ? "true" : "false"}
+                  className={`weather-surface weather-step-card flex min-h-[112px] w-full flex-col gap-2 rounded-xl border p-3 text-left transition-colors ${cardTone}`}
                 >
                   <span className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em]">
                     <span className={`inline-flex h-6 w-6 items-center justify-center rounded-full border text-[10px] ${
@@ -115,7 +119,7 @@ export function OperationsExecutionStepper({
 
           if (isActive) {
             return (
-              <section key={step.id} id={step.id} className="space-y-4">
+              <section key={step.id} id={step.id} className="weather-step-panel space-y-4">
                 <div className="weather-panel flex flex-wrap items-start justify-between gap-3 px-5 py-4">
                   <div className="space-y-1">
                     <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">{step.label}</p>
@@ -132,7 +136,7 @@ export function OperationsExecutionStepper({
           }
 
           return (
-            <section key={step.id} id={step.id} className="weather-panel flex flex-wrap items-start justify-between gap-3 px-5 py-4">
+            <section key={step.id} id={step.id} className="weather-panel weather-step-summary flex flex-wrap items-start justify-between gap-3 px-5 py-4">
               <div className="space-y-1">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">{step.label}</p>
                 <h3 className="text-base font-semibold text-slate-100">{step.title}</h3>

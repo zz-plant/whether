@@ -16,7 +16,7 @@ export const DeferredSection = ({
   children,
   className = "space-y-8",
 }: DeferredSectionProps) => (
-  <RevealOnView placeholder={fallback}>
+  <RevealOnView placeholder={fallback} className="weather-section-stage">
     <Suspense fallback={fallback}>
       <section id={id} aria-label={ariaLabel} className={className}>
         {children}

@@ -14,7 +14,7 @@ export const neutralLabel = "font-semibold tracking-[0.01em] text-slate-300";
 export const disclosureSummaryClass =
   "flex min-h-[48px] w-full items-center justify-between gap-3 rounded-xl border border-slate-800/52 bg-slate-950/56 px-3.5 py-2.5 text-left text-xs font-semibold tracking-[0.01em] text-slate-100 transition hover:border-slate-600/60 hover:bg-slate-900/74 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300";
 
-export const disclosurePanelClass = "mt-3";
+export const disclosurePanelClass = "mt-3 weather-disclosure-panel animate-collapsible-in";
 
 export const compactActionCue = (text: string) =>
   text

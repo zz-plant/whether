@@ -85,7 +85,7 @@ const DiagnosticsAccordionTrigger = ({ label }: { label: string }) => (
   <Accordion.Header>
     <Accordion.Trigger className={`${disclosureSummaryClass} group cursor-pointer list-none touch-manipulation`}>
       <span>{label}</span>
-      <span aria-hidden="true" className="text-sm transition group-data-[panel-open]:rotate-180">▾</span>
+      <span aria-hidden="true" className="weather-disclosure-trigger-indicator text-sm group-data-[panel-open]:rotate-180">▾</span>
     </Accordion.Trigger>
   </Accordion.Header>
 );
@@ -676,9 +676,9 @@ export function MoreContextDisclosureBody({
       <details className="group rounded-lg border border-slate-800/45 bg-slate-950/38 px-2.5 py-2">
         <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
           <span>Startup Climate Index (context)</span>
-          <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
+          <span aria-hidden="true" className="weather-disclosure-trigger-indicator text-sm group-open:rotate-180">▾</span>
         </summary>
-        <div className="mt-2 space-y-2">
+        <div className="weather-disclosure-panel animate-collapsible-in mt-2 space-y-2">
           <p className="text-xs text-slate-300">Context metric for continuity: {startupClimateIndex.score} / 100 · {startupClimateIndex.status}</p>
           <ul className="grid gap-1.5 sm:grid-cols-2">
             {startupClimateIndex.breakdown.map((item) => (
@@ -702,9 +702,9 @@ export function MoreContextDisclosureBody({
       <details className="group rounded-lg border border-slate-800/45 bg-slate-950/38 px-2.5 py-2">
         <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
           <span>Evidence snapshot</span>
-          <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
+          <span aria-hidden="true" className="weather-disclosure-trigger-indicator text-sm group-open:rotate-180">▾</span>
         </summary>
-        <ul className="mt-2 grid gap-2 lg:grid-cols-3">
+        <ul className="weather-disclosure-panel animate-collapsible-in mt-2 grid gap-2 lg:grid-cols-3">
           {evidenceItems.map((item) => (
             <li key={item.key} className={`${compactInset} space-y-1.5 text-xs text-slate-200`}>
               <p className="font-semibold text-slate-100">{item.title}</p>
@@ -725,9 +725,9 @@ export function MoreContextDisclosureBody({
       <details className="group rounded-lg border border-slate-800/45 bg-slate-950/38 px-2.5 py-2">
         <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
           <span>Why this posture call</span>
-          <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
+          <span aria-hidden="true" className="weather-disclosure-trigger-indicator text-sm group-open:rotate-180">▾</span>
         </summary>
-        <ul className="mt-2 grid gap-1.5 sm:grid-cols-3">
+        <ul className="weather-disclosure-panel animate-collapsible-in mt-2 grid gap-1.5 sm:grid-cols-3">
           {whyThisCall.map((reason) => (
             <li key={reason.label} className={`${compactInset} text-xs text-slate-200`}>
               <p className="font-semibold text-slate-300">{reason.label}</p>
@@ -740,9 +740,9 @@ export function MoreContextDisclosureBody({
       <details className="group rounded-lg border border-slate-800/45 bg-slate-950/38 px-2.5 py-2">
         <summary className={`${disclosureSummaryClass} cursor-pointer list-none`}>
           <span>Posture history and overlays</span>
-          <span aria-hidden="true" className="text-sm transition group-open:rotate-180">▾</span>
+          <span aria-hidden="true" className="weather-disclosure-trigger-indicator text-sm group-open:rotate-180">▾</span>
         </summary>
-        <div className="mt-2 space-y-2">
+        <div className="weather-disclosure-panel animate-collapsible-in mt-2 space-y-2">
           <PostureHistoryTimeline historicalTimeline={historicalTimeline} />
           <div>
             <p className={tierThreeHeading}>Historical memory rail</p>

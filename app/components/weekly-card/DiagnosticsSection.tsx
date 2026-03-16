@@ -9,7 +9,7 @@ const DiagnosticsAccordionTrigger = ({ label }: { label: string }) => (
   <Accordion.Header>
     <Accordion.Trigger className={`${disclosureSummaryClass} group cursor-pointer list-none touch-manipulation`}>
       <span>{label}</span>
-      <span aria-hidden="true" className="text-sm transition group-data-[panel-open]:rotate-180">▾</span>
+      <span aria-hidden="true" className="weather-disclosure-trigger-indicator text-sm group-data-[panel-open]:rotate-180">▾</span>
     </Accordion.Trigger>
   </Accordion.Header>
 );

@@ -145,19 +145,23 @@ export const HomePageReportContent = async ({
       />
 
       <Suspense fallback={<WeeklyDiagnosticsFallback />}>
-        <HomeWorkspaceBands
-          workspaceModelPromise={homepage.workspaceModelPromise}
-        />
+        <StreamedSectionReveal delay="short">
+          <HomeWorkspaceBands
+            workspaceModelPromise={homepage.workspaceModelPromise}
+          />
+        </StreamedSectionReveal>
       </Suspense>
 
       {homepage.fallbackActive ? (
-        <LiveDataFallbackAlert
-          lastCachedTimestamp={lastCachedTimestamp}
-          sourceLabel={fallbackTreasury.source}
-          effectiveRecordDate={fallbackTreasury.record_date}
-          fallbackReason={fallbackTreasury.fallback_reason}
-          followUpLabel="Review live evidence"
-        />
+        <StreamedSectionReveal delay="medium">
+          <LiveDataFallbackAlert
+            lastCachedTimestamp={lastCachedTimestamp}
+            sourceLabel={fallbackTreasury.source}
+            effectiveRecordDate={fallbackTreasury.record_date}
+            fallbackReason={fallbackTreasury.fallback_reason}
+            followUpLabel="Review live evidence"
+          />
+        </StreamedSectionReveal>
       ) : null}
     </ReportShell>
   );
