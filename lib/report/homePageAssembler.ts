@@ -55,6 +55,27 @@ type BuildArtifactPayloadArgs = {
   freshnessLabel: string;
 };
 
+export type HomePageDiagnosticsLane = {
+  weeklyMemoLines: ReturnType<typeof buildHomeBriefModel>["weeklyMemoLines"];
+  immediateDecision: string;
+  revisitDecisions: boolean;
+  guardrail: string;
+  regimeDistance: ReturnType<typeof buildHomeBriefModel>["regimeDistance"];
+  postureWithStageLabel: string;
+  statusLabel: string;
+  trendLabel: string;
+  confidencePercent: number;
+  decisionMatrix: ReturnType<typeof buildHomeBriefModel>["decisionMatrix"];
+  decisionRules: ReturnType<typeof buildHomeBriefModel>["decisionRules"];
+  roleAwareTemplates: ReturnType<typeof buildHomeBriefModel>["roleAwareTemplates"];
+  evidenceItems: ReturnType<typeof buildHomeBriefModel>["evidenceItems"];
+  reportDynamics: ReportData["reportDynamics"];
+  weeklyMovement: ReturnType<typeof buildHomeBriefModel>["weeklyMovement"];
+  transitionProbabilities: ReturnType<typeof buildHomeBriefModel>["transitionProbabilities"];
+  failureModes: ReturnType<typeof buildHomeBriefModel>["failureModes"];
+  historicalTimeline: ReturnType<typeof buildHomeBriefModel>["historicalTimeline"];
+};
+
 export type HomePageAssembly = {
   reportShell: {
     regime: ReportData["assessment"]["regime"];
@@ -88,30 +109,95 @@ export type HomePageAssembly = {
   reportResult: Awaited<ReturnType<typeof loadReportDataSafe>>;
   weeklyDecisionCardModel: ReturnType<typeof buildWeeklyDecisionCardViewModel>;
   leadershipArtifactPayloadPromise: Promise<ArtifactPayload | null>;
-  diagnosticsLane: {
-    weeklyMemoLines: ReturnType<typeof buildHomeBriefModel>["weeklyMemoLines"];
-    immediateDecision: string;
-    revisitDecisions: boolean;
-    guardrail: string;
-    regimeDistance: ReturnType<typeof buildHomeBriefModel>["regimeDistance"];
-    postureWithStageLabel: string;
-    statusLabel: string;
-    trendLabel: string;
-    confidencePercent: number;
-    decisionMatrix: ReturnType<typeof buildHomeBriefModel>["decisionMatrix"];
-    decisionRules: ReturnType<typeof buildHomeBriefModel>["decisionRules"];
-    roleAwareTemplates: ReturnType<typeof buildHomeBriefModel>["roleAwareTemplates"];
-    evidenceItems: ReturnType<typeof buildHomeBriefModel>["evidenceItems"];
-    reportDynamics: ReportData["reportDynamics"];
-    weeklyMovement: ReturnType<typeof buildHomeBriefModel>["weeklyMovement"];
-    transitionProbabilities: ReturnType<typeof buildHomeBriefModel>["transitionProbabilities"];
-    failureModes: ReturnType<typeof buildHomeBriefModel>["failureModes"];
-    historicalTimeline: ReturnType<typeof buildHomeBriefModel>["historicalTimeline"];
-  };
+  diagnosticsLanePromise: Promise<HomePageDiagnosticsLane>;
   fallbackActive: boolean;
 };
 
+type HomePageAssemblerDependencies = {
+  loadReportDataSafe: typeof loadReportDataSafe;
+  buildPostureState: typeof buildPostureState;
+};
+
 const resolveHomepageOverlaySector = (value: string | undefined) => resolveSectorKey(value);
+
+const defaultHomePageAssemblerDependencies: HomePageAssemblerDependencies = {
+  loadReportDataSafe,
+  buildPostureState,
+};
+
+const dedupeCompactItems = (items: Array<string | undefined>, maxItems = 4) =>
+  items
+    .map((item) => item?.trim())
+    .filter((item): item is string => Boolean(item && item.length > 0))
+    .filter((item, index, values) => values.indexOf(item) === index)
+    .slice(0, maxItems);
+
+const buildCommandBarPayload = ({
+  assessment,
+  homeBriefModel,
+  weeklyDecisionCardModel,
+  updatedAt,
+  canonicalDecisionCopy,
+}: {
+  assessment: ReportData["assessment"];
+  homeBriefModel: ReturnType<typeof buildHomeBriefModel>;
+  weeklyDecisionCardModel: ReturnType<typeof buildWeeklyDecisionCardViewModel>;
+  updatedAt: string;
+  canonicalDecisionCopy?: ReturnType<typeof buildCanonicalDecisionCopy> | null;
+}) => ({
+  regime: assessment.regime,
+  call: canonicalDecisionCopy?.operatingCall ?? weeklyDecisionCardModel.decision.operatingStanceLine,
+  doNow: canonicalDecisionCopy?.doNowLines ?? dedupeCompactItems([
+    weeklyDecisionCardModel.decision.immediateDecision,
+    ...homeBriefModel.actionStripItems.map((item) => item.actionNow),
+  ], 3),
+  flipConditions: canonicalDecisionCopy
+    ? [
+        canonicalDecisionCopy.flipTrigger,
+        ...buildFlipConditionsWithoutTriggerDuplication({
+          flipTrigger: canonicalDecisionCopy.flipTrigger,
+          flipConditions: canonicalDecisionCopy.flipConditions,
+          maxItems: 3,
+        }),
+      ]
+    : dedupeCompactItems([
+        homeBriefModel.flipThreshold,
+        homeBriefModel.reversalTrigger,
+        ...homeBriefModel.compactFlipConditionLabels,
+      ], 4),
+  updatedAt,
+});
+
+const buildDiagnosticsLanePayload = ({
+  homeBriefModel,
+  weeklyDecisionCardModel,
+  statusLabel,
+  reportDynamics,
+}: {
+  homeBriefModel: ReturnType<typeof buildHomeBriefModel>;
+  weeklyDecisionCardModel: ReturnType<typeof buildWeeklyDecisionCardViewModel>;
+  statusLabel: string;
+  reportDynamics: ReportData["reportDynamics"];
+}): HomePageDiagnosticsLane => ({
+  weeklyMemoLines: homeBriefModel.weeklyMemoLines,
+  immediateDecision: weeklyDecisionCardModel.decision.immediateDecision,
+  revisitDecisions: homeBriefModel.revisitDecisions,
+  guardrail: homeBriefModel.guardrail,
+  regimeDistance: homeBriefModel.regimeDistance,
+  postureWithStageLabel: homeBriefModel.postureWithStageLabel,
+  statusLabel,
+  trendLabel: homeBriefModel.trendLabel,
+  confidencePercent: homeBriefModel.confidencePercent,
+  decisionMatrix: homeBriefModel.decisionMatrix,
+  decisionRules: homeBriefModel.decisionRules,
+  roleAwareTemplates: homeBriefModel.roleAwareTemplates,
+  evidenceItems: homeBriefModel.evidenceItems,
+  reportDynamics,
+  weeklyMovement: homeBriefModel.weeklyMovement,
+  transitionProbabilities: homeBriefModel.transitionProbabilities,
+  failureModes: homeBriefModel.failureModes,
+  historicalTimeline: homeBriefModel.historicalTimeline,
+});
 
 const buildLeadershipArtifactPayload = async ({
   assessment,
@@ -254,14 +340,22 @@ export const assembleHomePage = async ({
   searchParams,
 }: {
   searchParams?: HomePageSearchParams;
-}): Promise<HomePageAssembly> => {
+}, dependencies: Partial<HomePageAssemblerDependencies> = {}): Promise<HomePageAssembly> => {
+  const resolvedDependencies = {
+    ...defaultHomePageAssemblerDependencies,
+    ...dependencies,
+  } satisfies HomePageAssemblerDependencies;
   const homepageOverlaySector = resolveHomepageOverlaySector(searchParams?.sector);
   const interpretationView: InterpretationView = isInterpretationView(searchParams?.view)
     ? searchParams.view
     : "default";
   const sectionLinks = homeSectionSequence.map((section) => ({ href: section.href, label: section.label }));
 
-  const reportResult = await loadReportDataSafe(searchParams, { route: "/" });
+  const reportResult = await resolvedDependencies.loadReportDataSafe(
+    searchParams,
+    { route: "/" },
+    { includeHistoricalLiveComparison: false },
+  );
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
   const {
     assessment,
@@ -311,12 +405,6 @@ export const assembleHomePage = async ({
       "Safe to use for near-term planning; proceed with normal approval flow.",
   });
 
-  const postureState = await buildPostureState({
-    recordDate: treasury.record_date,
-    assessment,
-    reportDynamics,
-  });
-
   const homeBriefModel = buildHomeBriefModel({
     assessment,
     fetchedAtLabel,
@@ -333,7 +421,6 @@ export const assembleHomePage = async ({
     stopItems,
     treasury,
     treasuryProvenance,
-    postureState,
   }, { overlaySector: homepageOverlaySector });
 
   const freshnessMeta = buildCompactFreshnessMeta({
@@ -349,11 +436,6 @@ export const assembleHomePage = async ({
     transitionWatch: homeBriefModel.transitionWatch === "ON",
   });
 
-  const canonicalDecisionCopy = buildCanonicalDecisionCopy({
-    homeBriefModel,
-    postureState,
-  });
-
   const weeklyDecisionCardModel = buildWeeklyDecisionCardViewModel({
     homeBriefModel,
     statusLabel: displayRegime.label,
@@ -367,46 +449,100 @@ export const assembleHomePage = async ({
     freshnessLine: freshnessMeta.line,
     confidenceHistory,
     confidenceTrend,
-    canonicalDecisionCopy,
     isFallbackSnapshot: isFallback && !historicalSelection,
   });
+
+  const enrichedHomePageModelPromise = (async () => {
+    try {
+      const postureState = await resolvedDependencies.buildPostureState({
+        recordDate: treasury.record_date,
+        assessment,
+        reportDynamics,
+      });
+      const enrichedHomeBriefModel = buildHomeBriefModel({
+        assessment,
+        fetchedAtLabel,
+        historicalSelection,
+        historicalAnalogs,
+        recordDateLabel,
+        regimeAlert,
+        reportDynamics,
+        sensors,
+        macroSeries,
+        forecast,
+        regimeSeries,
+        statusLabel,
+        stopItems,
+        treasury,
+        treasuryProvenance,
+        postureState,
+      }, { overlaySector: homepageOverlaySector });
+      const canonicalDecisionCopy = buildCanonicalDecisionCopy({
+        homeBriefModel: enrichedHomeBriefModel,
+        postureState,
+      });
+      const enrichedWeeklyDecisionCardModel = buildWeeklyDecisionCardViewModel({
+        homeBriefModel: enrichedHomeBriefModel,
+        statusLabel: displayRegime.label,
+        regimeKey: assessment.regime,
+        reportDynamics,
+        citation: buildCallCitation(assessment, treasury, {
+          postureWithStageLabel: enrichedHomeBriefModel.postureWithStageLabel,
+        }),
+        recordDateLabel: weeklyRecordDateLabel,
+        fetchedAtLabel,
+        freshnessLine: freshnessMeta.line,
+        confidenceHistory,
+        confidenceTrend,
+        canonicalDecisionCopy,
+        isFallbackSnapshot: isFallback && !historicalSelection,
+      });
+
+      return {
+        postureState,
+        homeBriefModel: enrichedHomeBriefModel,
+        weeklyDecisionCardModel: enrichedWeeklyDecisionCardModel,
+        canonicalDecisionCopy,
+      };
+    } catch (error) {
+      console.error("[home] deferred posture-state enrichment unavailable", error);
+      return {
+        postureState: null,
+        homeBriefModel,
+        weeklyDecisionCardModel,
+        canonicalDecisionCopy: null,
+      };
+    }
+  })();
 
   return {
     reportResult,
     weeklyDecisionCardModel,
-    leadershipArtifactPayloadPromise: buildLeadershipArtifactPayload({
-      assessment,
-      treasury,
-      weeklyRecordDate,
-      sensors,
-      macroSeries,
-      homeBriefModel,
-      postureState,
-      interpretationView,
-      forecast,
-      freshnessLabel: freshnessMeta.updatedAtLabel,
-    }),
+    leadershipArtifactPayloadPromise: enrichedHomePageModelPromise.then(({ postureState, homeBriefModel: enrichedHomeBriefModel }) =>
+      postureState
+        ? buildLeadershipArtifactPayload({
+            assessment,
+            treasury,
+            weeklyRecordDate,
+            sensors,
+            macroSeries,
+            homeBriefModel: enrichedHomeBriefModel,
+            postureState,
+            interpretationView,
+            forecast,
+            freshnessLabel: freshnessMeta.updatedAtLabel,
+          })
+        : null
+    ),
     fallbackActive: !historicalSelection && isFallback,
-    diagnosticsLane: {
-      weeklyMemoLines: homeBriefModel.weeklyMemoLines,
-      immediateDecision: weeklyDecisionCardModel.decision.immediateDecision,
-      revisitDecisions: homeBriefModel.revisitDecisions,
-      guardrail: homeBriefModel.guardrail,
-      regimeDistance: homeBriefModel.regimeDistance,
-      postureWithStageLabel: homeBriefModel.postureWithStageLabel,
-      statusLabel,
-      trendLabel: homeBriefModel.trendLabel,
-      confidencePercent: homeBriefModel.confidencePercent,
-      decisionMatrix: homeBriefModel.decisionMatrix,
-      decisionRules: homeBriefModel.decisionRules,
-      roleAwareTemplates: homeBriefModel.roleAwareTemplates,
-      evidenceItems: homeBriefModel.evidenceItems,
-      reportDynamics,
-      weeklyMovement: homeBriefModel.weeklyMovement,
-      transitionProbabilities: homeBriefModel.transitionProbabilities,
-      failureModes: homeBriefModel.failureModes,
-      historicalTimeline: homeBriefModel.historicalTimeline,
-    },
+    diagnosticsLanePromise: enrichedHomePageModelPromise.then(({ homeBriefModel: enrichedHomeBriefModel, weeklyDecisionCardModel: enrichedWeeklyDecisionCardModel }) =>
+      buildDiagnosticsLanePayload({
+        homeBriefModel: enrichedHomeBriefModel,
+        weeklyDecisionCardModel: enrichedWeeklyDecisionCardModel,
+        statusLabel,
+        reportDynamics,
+      })
+    ),
     reportShell: {
       regime: assessment.regime,
       statusLabel,
@@ -422,20 +558,12 @@ export const assembleHomePage = async ({
       showOfflineBadge: isFallback && !historicalSelection,
       sectionLinks,
       structuredData: buildHomeStructuredData(),
-      commandBar: {
-        regime: assessment.regime,
-        call: canonicalDecisionCopy.operatingCall,
-        doNow: canonicalDecisionCopy.doNowLines,
-        flipConditions: [
-          canonicalDecisionCopy.flipTrigger,
-          ...buildFlipConditionsWithoutTriggerDuplication({
-            flipTrigger: canonicalDecisionCopy.flipTrigger,
-            flipConditions: canonicalDecisionCopy.flipConditions,
-            maxItems: 3,
-          }),
-        ],
+      commandBar: buildCommandBarPayload({
+        assessment,
+        homeBriefModel,
+        weeklyDecisionCardModel,
         updatedAt: freshnessMeta.updatedAtLabel,
-      },
+      }),
       historicalBanner: historicalSelection
         ? {
           banner: historicalSelection.banner,

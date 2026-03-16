@@ -50,6 +50,10 @@ export type ReportSearchParams = {
   [key: string]: string | undefined;
 };
 
+export type ReportDataLoadOptions = {
+  includeHistoricalLiveComparison?: boolean;
+};
+
 export type LastYearComparison = {
   current: {
     recordDate: string;
@@ -651,11 +655,13 @@ export const REPORT_DATA_CACHE_BUCKET_SECONDS = REPORT_DATA_REVALIDATE_SECONDS;
 
 export const buildReportDataMemoizationKey = (
   searchParams?: ReportSearchParams,
+  options?: ReportDataLoadOptions,
   nowMs: number = Date.now(),
 ) => {
   const cacheBucket = Math.floor(nowMs / (REPORT_DATA_CACHE_BUCKET_SECONDS * 1000));
   return JSON.stringify({
     cacheBucket,
+    options: options ?? null,
     searchParams: searchParams ?? null,
   });
 };
@@ -671,7 +677,10 @@ export const buildSnapshotFallbackTreasury = (snapshot: TreasuryData, now = new 
   fallback_reason: snapshot.fallback_reason ?? REPORT_FALLBACK_REASON,
 });
 
-const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
+const loadReportDataUncached = async (
+  searchParams?: ReportSearchParams,
+  options?: ReportDataLoadOptions,
+) => {
   const liveFetcher: typeof fetch = (input, init) =>
     fetch(input, {
       ...init,
@@ -682,6 +691,8 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
     });
   const historicalSelection = resolveTimeMachineSelection(searchParams);
   const requestedSelection = parseTimeMachineRequest(searchParams);
+  const shouldLoadHistoricalLiveComparison =
+    options?.includeHistoricalLiveComparison !== false && Boolean(historicalSelection);
   const canonicalInputs = historicalSelection
     ? null
     : await loadCanonicalReportInputsIfAvailable({ fetcher: liveFetcher });
@@ -694,7 +705,7 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
       });
   const liveTreasuryPromise = canonicalInputs
     ? Promise.resolve(canonicalInputs.treasury)
-    : historicalSelection
+    : shouldLoadHistoricalLiveComparison
       ? fetchTreasuryData({ snapshotFallback: snapshotData, fetcher: liveFetcher })
       : null;
   const now = new Date();
@@ -712,7 +723,7 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
   const timeMachineSnapshots = getTimeMachineSnapshots();
   const [treasuryResult, liveTreasuryResult, macroResult] = await Promise.allSettled([
     treasuryPromise,
-    liveTreasuryPromise ?? treasuryPromise,
+    liveTreasuryPromise ?? Promise.resolve(null),
     canonicalInputs ? Promise.resolve(canonicalInputs.macroSeries) : loadMacroSeries(liveFetcher),
   ]);
 
@@ -720,7 +731,7 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
     throw withDependencyContext("treasury", treasuryResult.reason);
   }
 
-  if (liveTreasuryResult.status === "rejected") {
+  if (shouldLoadHistoricalLiveComparison && liveTreasuryResult.status === "rejected") {
     throw withDependencyContext("treasury", liveTreasuryResult.reason);
   }
 
@@ -729,7 +740,9 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
   }
 
   const treasury = treasuryResult.value;
-  const liveTreasury = liveTreasuryResult.value;
+  const liveTreasury = liveTreasuryResult.status === "fulfilled" && liveTreasuryResult.value
+    ? liveTreasuryResult.value
+    : treasury;
   const macroSeries = macroResult.value;
   const recordDateLabel = formatDateUTC(treasury.record_date);
   const weeklyRecordDate = resolveWeekEndingIsoDateUTC(treasury.record_date);
@@ -739,7 +752,9 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
   const sensors = buildSensorReadings(treasury);
   const assessmentMacroSeries = historicalSelection ? [] : macroSeries;
   const assessment = evaluateRegime(treasury, thresholds, assessmentMacroSeries);
-  const liveAssessment = historicalSelection ? evaluateRegime(liveTreasury, thresholds, macroSeries) : null;
+  const liveAssessment = shouldLoadHistoricalLiveComparison
+    ? evaluateRegime(liveTreasury, thresholds, macroSeries)
+    : null;
   const { playbook, startItems, stopItems, actionStripItems } = buildGuidanceBundleFromAssessment(assessment);
   const fenceItems = assessment.constraints;
   const previousSnapshot = historicalSelection
@@ -794,7 +809,7 @@ const loadReportDataUncached = async (searchParams?: ReportSearchParams) => {
   };
   const statusLabel = formatRegimeLabel(assessment.regime);
   const historicalComparison =
-    historicalSelection && liveAssessment
+    shouldLoadHistoricalLiveComparison && liveAssessment
       ? {
           then: {
             regime: assessment.regime,
@@ -946,9 +961,17 @@ const loadReportDataMemoized = cache(async (cacheKey: string) => {
     return loadReportDataUncached();
   }
 
-  const parsedWithParams = parsed as { searchParams?: unknown };
+  const parsedWithParams = parsed as { options?: unknown; searchParams?: unknown };
+  const normalizedOptions: ReportDataLoadOptions = {};
+  if (parsedWithParams.options && typeof parsedWithParams.options === "object") {
+    const parsedOptions = parsedWithParams.options as Record<string, unknown>;
+    if (typeof parsedOptions.includeHistoricalLiveComparison === "boolean") {
+      normalizedOptions.includeHistoricalLiveComparison = parsedOptions.includeHistoricalLiveComparison;
+    }
+  }
+
   if (parsedWithParams.searchParams === null || typeof parsedWithParams.searchParams === "undefined") {
-    return loadReportDataUncached();
+    return loadReportDataUncached(undefined, normalizedOptions);
   }
 
   const normalizedSearchParams: ReportSearchParams = {};
@@ -958,11 +981,11 @@ const loadReportDataMemoized = cache(async (cacheKey: string) => {
     }
   }
 
-  return loadReportDataUncached(normalizedSearchParams);
+  return loadReportDataUncached(normalizedSearchParams, normalizedOptions);
 });
 
-export const loadReportData = (searchParams?: ReportSearchParams) => {
-  const cacheKey = buildReportDataMemoizationKey(searchParams);
+export const loadReportData = (searchParams?: ReportSearchParams, options?: ReportDataLoadOptions) => {
+  const cacheKey = buildReportDataMemoizationKey(searchParams, options);
   return loadReportDataMemoized(cacheKey);
 };
 
@@ -1088,9 +1111,10 @@ const buildFallbackReportData = (searchParams?: ReportSearchParams): ReportDataF
 export const loadReportDataSafe = async (
   searchParams?: ReportSearchParams,
   context?: { route?: string; requestId?: string },
+  options?: ReportDataLoadOptions,
 ): Promise<LoadReportDataSafeResult> => {
   try {
-    const data = await loadReportData(searchParams);
+    const data = await loadReportData(searchParams, options);
     return { ok: true, data };
   } catch (error) {
     const resolvedError = toError(error);

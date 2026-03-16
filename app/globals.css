@@ -635,7 +635,9 @@ body {
   .weather-live-band-chip,
   .weather-motion-card,
   .weather-signal-cell,
-  .weather-movement-fill::after {
+  .weather-movement-fill::after,
+  .weather-loading-beacon,
+  .weather-skeleton__shimmer {
     animation: none;
   }
 }
@@ -976,6 +978,17 @@ html {
   100% { transform: scale(1); opacity: 0.8; }
 }
 
+@keyframes weather-skeleton-shimmer {
+  0% { transform: translate3d(-120%, 0, 0); }
+  100% { transform: translate3d(120%, 0, 0); }
+}
+
+@keyframes weather-loading-beacon {
+  0% { transform: scale(0.85); opacity: 0.45; }
+  50% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0.85); opacity: 0.45; }
+}
+
 @keyframes shield-ripple {
   0% { stroke-width: 1.8; opacity: 1; }
   50% { stroke-width: 2.2; opacity: 0.7; }
@@ -1001,6 +1014,44 @@ html {
 
 .animate-shield-ripple {
   animation: shield-ripple 3s ease-in-out infinite;
+}
+
+.weather-skeleton {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(71, 85, 105, 0.46), rgba(51, 65, 85, 0.34)),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.12), rgba(71, 85, 105, 0.08));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    inset 0 0 0 1px rgba(15, 23, 42, 0.26);
+}
+
+.weather-skeleton__shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(224, 242, 254, 0.06) 28%,
+    rgba(255, 255, 255, 0.18) 48%,
+    rgba(186, 230, 253, 0.08) 68%,
+    transparent 100%
+  );
+  animation: weather-skeleton-shimmer 1.9s ease-in-out infinite;
+  will-change: transform;
+}
+
+.weather-loading-beacon {
+  display: inline-block;
+  height: 0.55rem;
+  width: 0.55rem;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 30% 30%, rgba(224, 242, 254, 0.98), rgba(34, 211, 238, 0.84) 42%, rgba(8, 145, 178, 0.42) 100%);
+  box-shadow:
+    0 0 0 1px rgba(103, 232, 249, 0.22),
+    0 0 14px rgba(34, 211, 238, 0.4);
+  animation: weather-loading-beacon 1.4s ease-in-out infinite;
 }
 
 @keyframes aurora-shift {

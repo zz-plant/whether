@@ -11,7 +11,7 @@ import { buildHomeMetadata, type HomePageSearchParams } from "../lib/report/home
 import {
   assembleHomePage,
   type ArtifactPayload,
-  type HomePageAssembly,
+  type HomePageDiagnosticsLane,
 } from "../lib/report/homePageAssembler";
 import { ArtifactActionsFallback } from "./components/home/artifactActionsFallback";
 import { HomePageStreamingFallback } from "./components/home/homePageStreamingFallback";
@@ -32,13 +32,7 @@ type ArtifactActionsProps = {
 };
 
 type DiagnosticsLaneProps = {
-  diagnosticsLanePromise: Promise<HomePageAssembly["diagnosticsLane"]>;
-};
-
-// Yield once so the canonical weekly call can stream before the heavier diagnostics lane.
-const deferForStreaming = async <T,>(value: T): Promise<T> => {
-  await Promise.resolve();
-  return value;
+  diagnosticsLanePromise: Promise<HomePageDiagnosticsLane>;
 };
 
 const LeadershipArtifactActions = async ({ artifactPayloadPromise, fallbackActive }: ArtifactActionsProps) => {
@@ -64,6 +58,8 @@ const LeadershipArtifactActions = async ({ artifactPayloadPromise, fallbackActiv
 };
 
 const DeferredWeeklyDiagnosticsLane = async ({ diagnosticsLanePromise }: DiagnosticsLaneProps) => {
+  // Yield once so the canonical weekly call can stream before the heavier diagnostics lane.
+  await Promise.resolve();
   const diagnosticsLane = await diagnosticsLanePromise;
 
   return (
@@ -95,7 +91,6 @@ export const HomePageReportContent = async ({
 }) => {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const homepage = await assembleHomePage({ searchParams: resolvedSearchParams });
-  const diagnosticsLanePromise = deferForStreaming(homepage.diagnosticsLane);
   const fallbackTreasury = homepage.reportResult.ok
     ? homepage.reportResult.data.treasury
     : homepage.reportResult.fallback.treasury;
@@ -163,7 +158,7 @@ export const HomePageReportContent = async ({
         )}
         diagnosticsLane={(
           <Suspense fallback={<WeeklyDiagnosticsFallback />}>
-            <DeferredWeeklyDiagnosticsLane diagnosticsLanePromise={diagnosticsLanePromise} />
+            <DeferredWeeklyDiagnosticsLane diagnosticsLanePromise={homepage.diagnosticsLanePromise} />
           </Suspense>
         )}
       />

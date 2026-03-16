@@ -11,8 +11,8 @@ describe("report data memoization", () => {
     const baselineMs = Date.UTC(2026, 0, 1, 12, 0, 0);
     const withinWindowMs = baselineMs + (REPORT_DATA_CACHE_BUCKET_SECONDS - 1) * 1000;
 
-    const firstKey = buildReportDataMemoizationKey(undefined, baselineMs);
-    const secondKey = buildReportDataMemoizationKey(undefined, withinWindowMs);
+    const firstKey = buildReportDataMemoizationKey(undefined, undefined, baselineMs);
+    const secondKey = buildReportDataMemoizationKey(undefined, undefined, withinWindowMs);
 
     assert.equal(firstKey, secondKey);
   });
@@ -21,8 +21,8 @@ describe("report data memoization", () => {
     const baselineMs = Date.UTC(2026, 0, 1, 12, 0, 0);
     const nextWindowMs = baselineMs + REPORT_DATA_CACHE_BUCKET_SECONDS * 1000;
 
-    const firstKey = buildReportDataMemoizationKey(undefined, baselineMs);
-    const secondKey = buildReportDataMemoizationKey(undefined, nextWindowMs);
+    const firstKey = buildReportDataMemoizationKey(undefined, undefined, baselineMs);
+    const secondKey = buildReportDataMemoizationKey(undefined, undefined, nextWindowMs);
 
     assert.notEqual(firstKey, secondKey);
   });
@@ -30,9 +30,22 @@ describe("report data memoization", () => {
   it("includes search params in the memoization key payload", () => {
     const nowMs = Date.UTC(2026, 0, 1, 12, 0, 0);
 
-    const defaultKey = buildReportDataMemoizationKey(undefined, nowMs);
-    const historicalKey = buildReportDataMemoizationKey({ month: "3", year: "2025" }, nowMs);
+    const defaultKey = buildReportDataMemoizationKey(undefined, undefined, nowMs);
+    const historicalKey = buildReportDataMemoizationKey({ month: "3", year: "2025" }, undefined, nowMs);
 
     assert.notEqual(defaultKey, historicalKey);
+  });
+
+  it("includes load options in the memoization key payload", () => {
+    const nowMs = Date.UTC(2026, 0, 1, 12, 0, 0);
+
+    const defaultKey = buildReportDataMemoizationKey(undefined, undefined, nowMs);
+    const optimizedKey = buildReportDataMemoizationKey(
+      undefined,
+      { includeHistoricalLiveComparison: false },
+      nowMs,
+    );
+
+    assert.notEqual(defaultKey, optimizedKey);
   });
 });
