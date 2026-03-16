@@ -906,6 +906,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     failureModes = [],
   } = diagnostics;
   const { memoryRail, historicalTimeline, historicalAnalogs, macroOverlay } = history;
+  const sinceLastReview = model.sinceLastReview;
   const { citation, recordDateLabel, fetchedAtLabel, freshnessLine } = artifact;
   const freshnessMeta = buildCompactFreshnessMeta({
     updatedAtLabel: fetchedAtLabel,
@@ -1106,6 +1107,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
               transitionProbabilities={transitionProbabilities}
               failureModes={failureModes}
               historicalTimeline={historicalTimeline}
+              sinceLastReview={sinceLastReview}
               renderBoundedRulesMatrix={({ decisionMatrix: matrix, decisionRules: rules }) => <BoundedRulesMatrix decisionMatrix={matrix} decisionRules={rules} />}
             />
           )}
