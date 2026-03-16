@@ -637,7 +637,8 @@ body {
   .weather-signal-cell,
   .weather-movement-fill::after,
   .weather-loading-beacon,
-  .weather-skeleton__shimmer {
+  .weather-skeleton__shimmer,
+  .weather-stream-reveal {
     animation: none;
   }
 }
@@ -989,6 +990,17 @@ html {
   100% { transform: scale(0.85); opacity: 0.45; }
 }
 
+@keyframes weather-stream-reveal {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0) scale(0.992);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
 @keyframes shield-ripple {
   0% { stroke-width: 1.8; opacity: 1; }
   50% { stroke-width: 2.2; opacity: 0.7; }
@@ -1052,6 +1064,19 @@ html {
     0 0 0 1px rgba(103, 232, 249, 0.22),
     0 0 14px rgba(34, 211, 238, 0.4);
   animation: weather-loading-beacon 1.4s ease-in-out infinite;
+}
+
+.weather-stream-reveal {
+  animation: weather-stream-reveal 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: opacity, transform;
+}
+
+.weather-stream-reveal--short {
+  animation-delay: 80ms;
+}
+
+.weather-stream-reveal--medium {
+  animation-delay: 140ms;
 }
 
 @keyframes aurora-shift {

@@ -16,6 +16,7 @@ import {
 import { ArtifactActionsFallback } from "./components/home/artifactActionsFallback";
 import { HomePageStreamingFallback } from "./components/home/homePageStreamingFallback";
 import { WeeklyDiagnosticsFallback } from "./components/home/weeklyDiagnosticsFallback";
+import { StreamedSectionReveal } from "./components/streamedSectionReveal";
 
 export const revalidate = 900;
 export const runtime = "edge";
@@ -47,13 +48,15 @@ const LeadershipArtifactActions = async ({ artifactPayloadPromise, fallbackActiv
   }
 
   return (
-    <CopyLeadershipArtifactsButtons
-      weeklyCallSnapshot={artifactPayload.weeklyCallSnapshotText}
-      weeklyOperatorBrief={artifactPayload.weeklyOperatorBriefText}
-      boardSummary={artifactPayload.boardSummary}
-      citation={artifactPayload.callCitation}
-      fallbackActive={fallbackActive}
-    />
+    <StreamedSectionReveal delay="medium">
+      <CopyLeadershipArtifactsButtons
+        weeklyCallSnapshot={artifactPayload.weeklyCallSnapshotText}
+        weeklyOperatorBrief={artifactPayload.weeklyOperatorBriefText}
+        boardSummary={artifactPayload.boardSummary}
+        citation={artifactPayload.callCitation}
+        fallbackActive={fallbackActive}
+      />
+    </StreamedSectionReveal>
   );
 };
 
@@ -63,12 +66,14 @@ const DeferredWeeklyDiagnosticsLane = async ({ diagnosticsLanePromise }: Diagnos
   const diagnosticsLane = await diagnosticsLanePromise;
 
   return (
-    <WeeklyDecisionDiagnosticsLane
-      {...diagnosticsLane}
-      renderBoundedRulesMatrix={({ decisionMatrix: matrix, decisionRules: rules }) => (
-        <BoundedRulesMatrix decisionMatrix={matrix} decisionRules={rules} />
-      )}
-    />
+    <StreamedSectionReveal delay="short">
+      <WeeklyDecisionDiagnosticsLane
+        {...diagnosticsLane}
+        renderBoundedRulesMatrix={({ decisionMatrix: matrix, decisionRules: rules }) => (
+          <BoundedRulesMatrix decisionMatrix={matrix} decisionRules={rules} />
+        )}
+      />
+    </StreamedSectionReveal>
   );
 };
 
