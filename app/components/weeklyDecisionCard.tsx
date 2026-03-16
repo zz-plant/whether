@@ -1,57 +1,27 @@
 import type { ReactNode } from "react";
-import Link from "next/link";
-import { Accordion } from "@base-ui/react/accordion";
-import { CircleTargetIcon, ShieldIcon } from "./uiIcons";
-import type { ConfidenceTrendFraming, ReportDynamics, ReportEvidenceItem, WeeklyConfidencePoint } from "../../lib/report/reportData";
+import type { ConfidenceTrendFraming, WeeklyConfidencePoint } from "../../lib/report/reportData";
 import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
 import { decisionAreaLabel, type StartupVariantMode } from "../../lib/report/boundedDecisionRules";
 import type { StartupModeContent } from "./startupModeSelector";
 import { WeeklyCallModePanel } from "./weeklyCallModePanel";
 import { DecisionHeroSection } from "./weekly-card/DecisionHeroSection";
 import { DiagnosticsSection } from "./weekly-card/DiagnosticsSection";
-import { ActionStripSection } from "./weekly-card/ActionStripSection";
 import { PostureHistoryTimeline } from "./weekly-card/HistorySection";
 import type { DiagnosticsSectionProps } from "./weekly-card/types";
-import { compactActionCue, compactInset, compactRoleCue, compactSectionSpacing, disclosurePanelClass, disclosureSummaryClass, neutralLabel, sectionSpacing, tierOneHeading, tierOneInset, tierOnePanel, tierThreeHeading, tierThreePanel, tierTwoHeading, tierTwoInset, tierTwoPanel } from "./weekly-card/shared";
-import type { ActionStripItem, RoleAwareOperatingTemplate } from "../../lib/report/operatingCalls";
-import type { ForecastRegimeLabel, TransitionVelocityEstimate } from "../../lib/report/forecastModel";
+import { compactActionCue, compactInset, disclosureSummaryClass, sectionSpacing, tierOneHeading, tierOnePanel, tierThreeHeading, tierThreePanel } from "./weekly-card/shared";
 import type { RegimeKey } from "../../lib/regimeEngine";
 import type { DecisionMatrixPayload, StartupVariantPolicy, WeeklyDecisionCardViewModel } from "../../lib/report/homeBriefModel";
-import { buildCompactFreshnessMeta, formatProbabilityPercent } from "../../lib/report/reportFormatting";
+import { buildCompactFreshnessMeta } from "../../lib/report/reportFormatting";
 import { getOrderedRegimeLegend, getRegimeWeatherIcon, getRegimeWeatherLabel, getRegimeWeatherRationale, REGIME_BANNER_TOKENS, REGIME_LEGEND_DESCRIPTORS, type RegimeBannerTone, type RegimeWeatherIcon } from "../../lib/regimePresentation";
 import { formatDateUTC } from "../../lib/formatters";
 import {
   buildWeeklyCitationMetaLine,
   buildCompactTrustSummary,
 } from "../../lib/report/trustStatus";
-import type { CanonicalDecisionCopy } from "../../lib/report/canonicalDecisionCopy";
-import { homeSectionSequence } from "../../lib/report/homeSections";
 import {
   buildRoleTemplateBullets,
   buildWatchBullets,
 } from "./weekly-card/decisionSupport";
-
-const callSectionHref = homeSectionSequence[0]?.href ?? "#weekly-posture-brief-title";
-const decideSectionHref = "#approve-this-weeks-plan";
-const evidenceSectionHref = "#audit-this-call";
-
-const sectionHrefByLabel = {
-  call: callSectionHref,
-  decide: decideSectionHref,
-  evidence: evidenceSectionHref,
-} as const;
-
-type WhyThisCallItem = { label: string; detail: string };
-type MemoryRailItem = { label: string; posture: string };
-type MacroOverlayItem = { label: string; detail: string };
-type HistoricalAnalogItem = { date: string; similarityScore: number; implication: string };
-type FailureModeWarningItem = { id: string; warning: string; mitigationCheck: string };
-
-type WeeklyMovement = {
-  score: number;
-  direction: "defensive" | "expansionary" | "neutral";
-  summary: string;
-};
 
 type WeeklyDecisionCardModel =
   & WeeklyDecisionCardViewModel["status"]
@@ -61,48 +31,16 @@ type WeeklyDecisionCardModel =
   & WeeklyDecisionCardViewModel["history"]
   & WeeklyDecisionCardViewModel["artifact"];
 
-type LegacyWeeklyDecisionCardProps = Omit<WeeklyDecisionCardModel, "immediateDecision" | "whyItMattersLine" | "readThisCardItems" | "glossaryHref"> & {
-  immediateDecision?: string;
-  whyItMattersLine?: string;
-  readThisCardItems?: Array<{
-    label: string;
-    detail: string;
-  }>;
-  glossaryHref?: string;
+export type WeeklyDecisionCardProps = {
+  model: WeeklyDecisionCardViewModel;
   actions?: ReactNode;
   diagnosticsLane?: ReactNode;
 };
 
-export type WeeklyDecisionCardProps =
-  | { model: WeeklyDecisionCardViewModel; actions?: ReactNode; diagnosticsLane?: ReactNode }
-  | LegacyWeeklyDecisionCardProps;
-
 export type WeeklyDecisionDiagnosticsLaneProps = DiagnosticsSectionProps;
 export const WeeklyDecisionDiagnosticsLane = DiagnosticsSection;
+// Legacy hero export retained for isolated section tests only.
 export const DecisionCallHeader = DecisionHeroSection;
-
-const DiagnosticsAccordionTrigger = ({ label }: { label: string }) => (
-  <Accordion.Header>
-    <Accordion.Trigger className={`${disclosureSummaryClass} group cursor-pointer list-none touch-manipulation`}>
-      <span>{label}</span>
-      <span aria-hidden="true" className="weather-disclosure-trigger-indicator text-sm group-data-[panel-open]:rotate-180">▾</span>
-    </Accordion.Trigger>
-  </Accordion.Header>
-);
-
-const SummaryLabel = ({
-  label,
-  icon,
-}: {
-  label: string;
-  icon: ReactNode;
-}) => (
-  <p className={`inline-flex items-center gap-1.5 text-xs ${neutralLabel}`}>
-    <span className="text-slate-400" aria-hidden="true">{icon}</span>
-    <span>{label}</span>
-  </p>
-);
-
 
 const RegimeWeatherGlyph = ({ icon, title }: { icon: RegimeWeatherIcon; title: string }) => {
   if (icon === "snowflake") {
@@ -159,118 +97,6 @@ const resolvePostureAndStage = ({
     resolvedPostureLabel: postureLabel ?? derivedPostureLabel ?? statusLabel,
     resolvedStageLabel: stageLabel ?? derivedStageLabel ?? "Unspecified",
   };
-};
-
-const resolveHeroUrgency = ({
-  confidenceLabel,
-  transitionWatch,
-  pointsToFlip,
-}: {
-  confidenceLabel: WeeklyDecisionCardModel["confidenceLabel"];
-  transitionWatch: WeeklyDecisionCardModel["transitionWatch"];
-  pointsToFlip: number;
-}) => {
-  if (confidenceLabel === "LOW" || transitionWatch === "ON" || pointsToFlip <= 3) {
-    return "high";
-  }
-  if (confidenceLabel === "MED" || pointsToFlip <= 6) {
-    return "medium";
-  }
-  return "low";
-};
-
-
-
-const resolveEvidenceTone = (directionLabel: string): "positive" | "warning" | "neutral" => {
-  const normalized = directionLabel.toLowerCase();
-  if (normalized.includes("improv") || normalized.includes("ease") || normalized.includes("loos")) {
-    return "positive";
-  }
-  if (normalized.includes("tight") || normalized.includes("deterior") || normalized.includes("stress")) {
-    return "warning";
-  }
-  return "neutral";
-};
-
-const resolvePosturePosition = (label: string) => {
-  const normalized = label.toLowerCase();
-  if (normalized.includes("defensive") || normalized.includes("scarcity")) return 20;
-  if (normalized.includes("mixed") || normalized.includes("watch")) return 45;
-  if (normalized.includes("expansion") || normalized.includes("accelerat")) return 80;
-  return 50;
-};
-
-
-
-const MicroSignalIndicators = ({
-  indicators,
-}: {
-  indicators: WeeklyDecisionCardModel["regimeSignalIndicators"];
-}) => (
-  <div className="grid gap-1.5 sm:grid-cols-2" aria-label="Regime micro indicators">
-    {indicators.map((indicator) => {
-      const sparkline = indicator.sparkline.length > 0 ? indicator.sparkline : [0];
-      const max = Math.max(...sparkline.map((value) => Math.abs(value)), 1);
-
-      return (
-        <div key={indicator.key} className="rounded-md border border-slate-700/60 bg-slate-950/55 px-2.5 py-2">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-300">{indicator.label}</p>
-            <p className="text-xs font-semibold text-slate-100">{indicator.valueLabel}</p>
-          </div>
-          <div className="mt-1.5 flex items-center justify-between gap-2">
-            <p className="text-[11px] text-slate-300">
-              <span className="font-semibold text-slate-100" aria-hidden="true">{indicator.trendArrow}</span>{" "}
-              {indicator.isFallback ? "Fallback" : indicator.trendDeltaLabel}
-            </p>
-            <div className="flex h-4 items-end gap-0.5" aria-hidden="true">
-              {sparkline.map((value, index) => {
-                const height = Math.max(3, Math.round((Math.abs(value) / max) * 14));
-                return (
-                  <span
-                    key={`${indicator.key}-${index}-${value}`}
-                    className="w-1 rounded-sm bg-slate-400/80"
-                    style={{ height: `${height}px` }}
-                  />
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      );
-    })}
-  </div>
-);
-
-const SignalStrip = ({
-  indicators,
-}: {
-  indicators: WeeklyDecisionCardModel["regimeSignalIndicators"];
-}) => {
-  if (indicators.length === 0) {
-    return null;
-  }
-
-  return (
-    <section
-      className="rounded-md border border-slate-800/70 bg-slate-950/55 px-3 py-2"
-      aria-label="Signals strip"
-    >
-      <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
-        <p className="mr-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-400">Signals</p>
-        {indicators.map((indicator) => (
-          <span
-            key={`signal-strip-${indicator.key}`}
-            className="inline-flex items-center gap-1 rounded-full border border-slate-700/70 bg-slate-900/80 px-2 py-0.5 text-slate-200"
-          >
-            <span className="font-medium text-slate-300">{indicator.label}</span>
-            <span className="font-semibold text-slate-100">{indicator.valueLabel}</span>
-            {!indicator.isFallback ? <span aria-hidden="true">{indicator.trendArrow}</span> : null}
-          </span>
-        ))}
-      </div>
-    </section>
-  );
 };
 
 type RegimeBannerProps = {
@@ -839,89 +665,7 @@ export function CitationActionFooter({ citationMetaLine, citation, actions }: Ci
 }
 
 export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
-  const model = "model" in props
-    ? props.model
-    : ({
-      status: {
-        statusLabel: props.statusLabel,
-        regimeKey: props.regimeKey,
-        postureLabel: props.postureLabel,
-        stageLabel: props.stageLabel,
-        postureWithStageLabel: props.postureWithStageLabel,
-        postureDelta: props.postureDelta,
-        confidenceLabel: props.confidenceLabel,
-        confidencePercent: props.confidencePercent,
-        signalConfidenceReason: props.signalConfidenceReason,
-        regimeHeader: props.regimeHeader,
-        trendLabel: props.trendLabel,
-        confidenceHistory: props.confidenceHistory,
-        confidenceTrend: props.confidenceTrend,
-        transitionWatch: props.transitionWatch,
-        isFallbackSnapshot: props.isFallbackSnapshot,
-      },
-      decision: {
-        operatingStanceLine: props.operatingStanceLine,
-        weeklyMemoLines: props.weeklyMemoLines,
-        netConstraintSummary: props.netConstraintSummary,
-        guardrail: props.guardrail,
-        reversalTrigger: props.reversalTrigger,
-        actionNowShort: props.actionNowShort,
-        immediateDecision: props.canonicalDecisionCopy?.doNowLines[0]
-          ?? props.actionNowShort?.trim()
-          ?? (props.revisitDecisions ? "Revise hiring and roadmap calls now." : "Hold last week's operating rules."),
-        guardrailThreshold: props.guardrailThreshold,
-        flipThreshold: props.flipThreshold,
-        compactFlipConditionLabels: props.compactFlipConditionLabels,
-        canonicalDecisionCopy: props.canonicalDecisionCopy,
-        canonicalFlipConditions: props.canonicalFlipConditions,
-        reportDynamics: props.reportDynamics,
-        decisionShiftSummary: props.decisionShiftSummary,
-        transitionProbabilities: props.transitionProbabilities,
-        decisionRules: props.decisionRules,
-        decisionMatrix: props.decisionMatrix,
-        startupVariantPolicy: props.startupVariantPolicy,
-        actionStripItems: props.actionStripItems,
-        roleAwareTemplates: props.roleAwareTemplates,
-        executiveOperationalStance: props.executiveOperationalStance,
-        revisitDecisions: props.revisitDecisions,
-        weeklyMovement: props.weeklyMovement,
-      },
-      presentation: {
-        whyItMattersLine: props.whyItMattersLine,
-        readThisCardItems: props.readThisCardItems ?? [],
-        glossaryHref: props.glossaryHref,
-      },
-      diagnostics: {
-        regimeSignalIndicators: props.regimeSignalIndicators,
-        startupClimateIndex: props.startupClimateIndex,
-        regimeDistance: props.regimeDistance,
-        regimeVelocity: props.regimeVelocity,
-        whyThisCall: props.whyThisCall,
-        evidenceItems: props.evidenceItems,
-        failureModes: props.failureModes,
-      },
-      history: {
-        memoryRail: props.memoryRail,
-        historicalTimeline: props.historicalTimeline,
-        historicalAnalogs: props.historicalAnalogs,
-        macroOverlay: props.macroOverlay,
-      },
-      sinceLastReview: {
-        isReturningUser: false,
-        hasMeaningfulDelta: false,
-        fallbackCopy: "",
-        items: [],
-      },
-      artifact: {
-        citation: props.citation,
-        recordDateLabel: props.recordDateLabel,
-        fetchedAtLabel: props.fetchedAtLabel,
-        freshnessLine: props.freshnessLine,
-      },
-    } satisfies WeeklyDecisionCardViewModel);
-
-  const actions = props.actions;
-  const diagnosticsLane = props.diagnosticsLane;
+  const { model, actions, diagnosticsLane } = props;
   const { status, decision, presentation, diagnostics, history, artifact } = model;
   const {
     statusLabel,
@@ -931,11 +675,9 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     postureWithStageLabel,
     confidenceLabel,
     confidencePercent,
-    regimeHeader,
     trendLabel,
     confidenceHistory = [],
     confidenceTrend = "unstable",
-    transitionWatch,
     isFallbackSnapshot = false,
   } = status;
   const {
@@ -951,12 +693,10 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     canonicalDecisionCopy,
     canonicalFlipConditions = [],
     reportDynamics,
-    decisionShiftSummary: _decisionShiftSummary,
     transitionProbabilities,
     decisionRules,
     decisionMatrix,
     startupVariantPolicy,
-    actionStripItems: _actionStripItems = [],
     roleAwareTemplates,
     executiveOperationalStance,
     revisitDecisions,
@@ -968,17 +708,14 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     glossaryHref,
   } = presentation ?? {};
   const {
-    regimeSignalIndicators = [],
-    startupClimateIndex,
     regimeDistance,
     regimeVelocity,
-    whyThisCall,
     evidenceItems,
     failureModes = [],
   } = diagnostics;
-  const { memoryRail, historicalTimeline, historicalAnalogs, macroOverlay } = history;
+  const { historicalTimeline } = history;
   const sinceLastReview = model.sinceLastReview;
-  const { citation, recordDateLabel, fetchedAtLabel, freshnessLine } = artifact;
+  const { citation, recordDateLabel, fetchedAtLabel } = artifact;
   const freshnessMeta = buildCompactFreshnessMeta({
     updatedAtLabel: fetchedAtLabel,
     confidenceLabel,

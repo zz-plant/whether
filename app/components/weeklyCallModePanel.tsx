@@ -7,6 +7,12 @@ import { useEffect, useMemo, useState } from "react";
 import type { StartupVariantMode } from "../../lib/report/boundedDecisionRules";
 import type { StartupVariantPolicy } from "../../lib/report/homeBriefModel";
 import { homeSectionSequence } from "../../lib/report/homeSections";
+import {
+  ForecastConditionsHeader,
+  ForecastStatsGrid,
+  ForecastStrip,
+  type ForecastStripCardData,
+} from "./forecastStrip";
 import { StartupModeSelector, type StartupModeContent } from "./startupModeSelector";
 
 const callSectionHref = homeSectionSequence[0]?.href ?? "#weekly-posture-brief-title";
@@ -111,6 +117,38 @@ export function WeeklyCallModePanel({
   const followUpFlipLabels = effectiveFlipLabels
     .filter((label) => label.trim().length > 0 && label.trim() !== modeAdjustedSnapshot.watch.trim())
     .slice(0, 2);
+  const forecastCards: ForecastStripCardData[] = [
+    {
+      id: "outlook",
+      label: "Outlook",
+      headline: operatingCall,
+      supportingText: postureLabel,
+    },
+    {
+      id: "do-now",
+      label: "Do now",
+      headline: modeAdjustedSnapshot.doNow,
+      tone: "positive",
+      footerText: "Primary move for the selected stage view.",
+    },
+    {
+      id: "guardrail",
+      label: "Guardrail",
+      headline: modeAdjustedSnapshot.avoid,
+      tone: "warning",
+      footerText: "The mistake to avoid while conditions stay like this.",
+    },
+    {
+      id: "flip-watch",
+      label: "Flip watch",
+      headline: modeAdjustedSnapshot.watch,
+      tone: "info",
+      chips: followUpFlipLabels.map((label) => ({ label, tone: "info" })),
+      footerText: followUpFlipLabels.length > 0
+        ? undefined
+        : "Monitor this trigger before you lock new fixed-cost commitments.",
+    },
+  ];
 
   const filteredCommandActions = commandActions.filter((action) =>
     `${action.label} ${action.type}`.toLowerCase().includes(commandQuery.trim().toLowerCase())
@@ -135,82 +173,30 @@ export function WeeklyCallModePanel({
   return (
     <>
       <article className={`rounded-[1.2rem] border border-slate-700/75 bg-slate-950/92 p-4 sm:p-5 ${heroUrgencyClass}`} aria-label="Weekly call snapshot">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-          <div className="space-y-2">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex min-h-[32px] items-center rounded-full border border-sky-400/35 bg-sky-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-sky-100">
-                Operator forecast
-              </span>
-              <span className="inline-flex min-h-[32px] items-center rounded-full border border-slate-700/70 bg-slate-950/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-200">
-                {postureLabel}
-              </span>
-              <span className="inline-flex min-h-[32px] items-center rounded-full border border-slate-700/70 bg-slate-950/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-200">
-                {trendLabel}
-              </span>
-            </div>
-            <div className="space-y-1">
-              <h2 className="text-lg font-semibold tracking-[0.01em] text-slate-50 sm:text-xl">This week in one screen</h2>
-              <p className="text-xs leading-5 text-slate-300">Decide, align, and share before you open the deeper audit trail.</p>
-            </div>
-          </div>
-          <div className="grid gap-2 sm:grid-cols-3 lg:min-w-[26rem]">
-            <div className="weather-stat-card">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Confidence</p>
-              <p className="mt-1 text-sm font-semibold text-slate-100">{confidenceValue}%</p>
-            </div>
-            <div className="weather-stat-card">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Stage view</p>
-              <p className="mt-1 text-sm font-semibold text-slate-100">{stageSummary}</p>
-            </div>
-            <div className="weather-stat-card">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Signal state</p>
-              <p className="mt-1 text-sm font-semibold text-slate-100">{confidenceLabel}</p>
-            </div>
-          </div>
-        </div>
+        <ForecastConditionsHeader
+          eyebrow="Current conditions"
+          headline="This week in one screen"
+          description="Decide, align, and share before you open the deeper audit trail."
+          chips={[
+            { label: "Operator forecast", tone: "info" },
+            { label: postureLabel },
+            { label: trendLabel },
+          ]}
+          trailing={(
+            <ForecastStatsGrid
+              stats={[
+                { label: "Confidence", value: `${confidenceValue}%` },
+                { label: "Stage view", value: stageSummary },
+                { label: "Signal state", value: confidenceLabel },
+              ]}
+              className="lg:min-w-[26rem]"
+            />
+          )}
+        />
         {whyItMattersLine ? (
           <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-200">{whyItMattersLine}</p>
         ) : null}
-        <div className="weather-forecast-strip mt-4" aria-label="Weekly decision transmission order">
-          <article className="weather-forecast-card">
-            <div className="space-y-2">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Outlook</p>
-              <p className="text-sm font-semibold leading-relaxed text-slate-50">{operatingCall}</p>
-            </div>
-            <p className="text-xs leading-5 text-slate-300">{postureLabel}</p>
-          </article>
-          <article className="weather-forecast-card border-emerald-400/25 bg-emerald-500/8">
-            <div className="space-y-2">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-200">Do now</p>
-              <p className="text-sm font-semibold leading-relaxed text-emerald-50">{modeAdjustedSnapshot.doNow}</p>
-            </div>
-            <p className="text-xs leading-5 text-emerald-100/80">Primary move for the selected stage view.</p>
-          </article>
-          <article className="weather-forecast-card border-rose-400/25 bg-rose-500/8">
-            <div className="space-y-2">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-rose-200">Guardrail</p>
-              <p className="text-sm font-semibold leading-relaxed text-rose-50">{modeAdjustedSnapshot.avoid}</p>
-            </div>
-            <p className="text-xs leading-5 text-rose-100/80">The mistake to avoid while conditions stay like this.</p>
-          </article>
-          <article className="weather-forecast-card border-sky-400/25 bg-sky-500/8">
-            <div className="space-y-2">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Flip watch</p>
-              <p className="text-sm font-semibold leading-relaxed text-sky-50">{modeAdjustedSnapshot.watch}</p>
-            </div>
-            {followUpFlipLabels.length > 0 ? (
-              <div className="flex flex-wrap gap-1.5">
-                {followUpFlipLabels.map((label) => (
-                  <span key={label} className="inline-flex min-h-[28px] items-center rounded-full border border-sky-400/25 bg-slate-950/55 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">
-                    {label}
-                  </span>
-                ))}
-              </div>
-            ) : (
-              <p className="text-xs leading-5 text-sky-100/80">Monitor this trigger before you lock new fixed-cost commitments.</p>
-            )}
-          </article>
-        </div>
+        <ForecastStrip cards={forecastCards} ariaLabel="Weekly decision transmission order" className="mt-4" />
         {readThisCardItems.length > 0 ? (
           <details className="mt-3 rounded-lg border border-slate-700/60 bg-slate-950/55 px-3 py-3">
             <summary className="cursor-pointer text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Decode this forecast</summary>

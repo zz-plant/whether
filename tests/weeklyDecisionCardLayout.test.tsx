@@ -1,9 +1,11 @@
 import assert from "node:assert/strict";
+import type { ReactNode } from "react";
 import { describe, it } from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { WeeklyDecisionCard } from "../app/components/weeklyDecisionCard";
 import type { ReportDynamics } from "../lib/report/reportData";
 import type { BoundedDecisionRule } from "../lib/report/boundedDecisionRules";
+import { buildWeeklyDecisionCardModel, type WeeklyDecisionCardModelOverrides } from "./factories/weeklyDecisionCardModel";
 
 const reportDynamics: ReportDynamics = {
   directionLabel: "deteriorating",
@@ -30,103 +32,41 @@ const decisionRules: BoundedDecisionRule[] = [
   },
 ];
 
+const renderCard = (overrides: WeeklyDecisionCardModelOverrides, options?: { actions?: ReactNode }) =>
+  renderToStaticMarkup(
+    <WeeklyDecisionCard
+      model={buildWeeklyDecisionCardModel(overrides)}
+      actions={options?.actions}
+    />,
+  );
+
 describe("WeeklyDecisionCard top-fold composition", () => {
   it("renders the operating console hierarchy", () => {
-    const html = renderToStaticMarkup(
-      <WeeklyDecisionCard
-        statusLabel="DEFENSIVE"
-        postureLabel="Defensive"
-        stageLabel="Watchful"
-        postureWithStageLabel="Defensive — Watchful"
-        postureDelta="Worse than last week"
-        confidenceLabel="MED"
-        confidencePercent={68}
-        signalConfidenceReason="Reason: regime boundary proximity + volatile macro signals"
-          regimeHeader={{
-            regime: "Defensive",
-            confidence: "Medium (mixed signal reliability)",
-            primaryRisk: "Downside: Capital tightness tightened (1.0).",
-          }}
-        trendLabel="Improving"
-        confidenceHistory={[
-          { recordDate: "2026-02-13", confidencePercent: 60, isMissing: false },
-          { recordDate: "2026-02-20", confidencePercent: 66, isMissing: false },
-          { recordDate: "2026-02-27", confidencePercent: 72, isMissing: false },
-        ]}
-        confidenceTrend="strengthening"
-        regimeSignalIndicators={[
-          { key: "tightness", label: "Capital tightness", valueLabel: "64", rawValue: 64, trendArrow: "↑", trendDeltaLabel: "+1.0 vs last week", sparkline: [61, 62, 63, 64], isFallback: false },
-          { key: "riskAppetite", label: "Risk appetite", valueLabel: "52", rawValue: 52, trendArrow: "↓", trendDeltaLabel: "-1.0 vs last week", sparkline: [56, 54, 53, 52], isFallback: false },
-          { key: "baseRate", label: "Base rate", valueLabel: "5.3", rawValue: 5.3, trendArrow: "→", trendDeltaLabel: "No weekly delta", sparkline: [5.3], isFallback: true },
-          { key: "curveSlope", label: "Yield curve slope", valueLabel: "-0.2", rawValue: -0.2, trendArrow: "↑", trendDeltaLabel: "+0.1 vs last week", sparkline: [-0.4, -0.3, -0.2], isFallback: false },
-        ]}
-        transitionWatch="ON"
-        operatingStanceLine="Stage decisions. Avoid irreversible spend."
-        weeklyMemoLines={["Market conditions tightened this week.", "Stage decisions. Avoid irreversible spend.", "Regime shift watch is on: stage approvals and preserve runway."]}
-        netConstraintSummary="Pressure remains elevated but stabilizing."
-        guardrail="Hold irreversible hiring unless direct revenue impact is clear."
-        reversalTrigger="If risk appetite rises above 55, reopen selective hiring."
-        recordDateLabel="Mar 5, 2026"
-        fetchedAtLabel="Mar 6, 2026 09:12 UTC"
-        reportDynamics={reportDynamics}
-        decisionShiftSummary="Decision delta: tighten roadmap optionality while protecting core delivery."
-        transitionProbabilities={{ Expansion: 10, Mixed: 35, Scarcity: 40, Defensive: 15 }}
-        decisionRules={decisionRules}
-        roleAwareTemplates={[
-          {
-            role: "startup-leadership",
-            roleLabel: "Startup leadership",
-            doNow: "Keep delivery focused.",
-            avoidNow: "Do not add fixed costs without proof.",
-            flipTrigger: "Resume staged expansion when tightness and risk appetite recover.",
+    const html = renderCard(
+      {
+        decision: {
+          reportDynamics,
+          decisionRules,
+        },
+        diagnostics: {
+          regimeVelocity: {
+            status: "ok",
+            from: "Expansion",
+            to: "Mixed",
+            sampleSize: 4,
+            lowerBoundMonths: 3,
+            upperBoundMonths: 6,
+            typicalRangeLabel: "3–6 months",
+            displayLabel: "Expansion→Mixed typically 3–6 months",
           },
-          {
-            role: "vc-partner",
-            roleLabel: "VC partner",
-            doNow: "Push portfolio pacing discipline.",
-            avoidNow: "Avoid encouraging irreversible expansion.",
-            flipTrigger: "Reopen growth pacing after two improving reads.",
-          },
-        ]}
-        executiveOperationalStance={{
-          expand: ["Increase product tempo for reversible bets", "Selective hiring for revenue-linked roles"],
-          avoid: ["net-new hiring if tightness > 74", "long-payback bets if risk appetite < 44"],
-        }}
-        revisitDecisions={true}
-        weeklyMovement={{ score: 1.2, direction: "defensive", summary: "Model pressure increased by +1.2 this week; tighten approvals until a reversal trigger prints." }}
-        memoryRail={[{ label: "Now", posture: "Defensive" }]}
-        historicalTimeline={[{ label: "2026", posture: "Defensive" }]}
-        historicalAnalogs={[]}
-        macroOverlay={[{ label: "VC funding", detail: "-4.5 · ↑ improving" }]}
-        whyThisCall={[{ label: "Momentum", detail: "Capital tightness tightened this week." }]}
-        evidenceItems={[{ key: "tightness", title: "Capital conditions", supportingBullets: ["Weekly move: +1.0 vs. prior snapshot."], confidenceLabel: "Medium", directionLabel: "Tightening", immediateImplication: "Tighten approvals and protect runway for fixed-cost commitments." }]}
-        startupClimateIndex={{ score: 63, status: "Improving", breakdown: [{ label: "Capital availability", score: 71 }] }}
-        regimeDistance={{
-          dimensionLabel: "Tightness",
-          currentValue: 64,
-          thresholdValue: 70,
-          pointsToFlip: 6,
-          dimensionKey: "tightness",
-          thresholdDirection: "riseAbove",
-        }}
-        regimeVelocity={{
-          status: "ok",
-          from: "Expansion",
-          to: "Mixed",
-          sampleSize: 4,
-          lowerBoundMonths: 3,
-          upperBoundMonths: 6,
-          typicalRangeLabel: "3–6 months",
-          displayLabel: "Expansion→Mixed typically 3–6 months",
-        }}
-        citation="Whether weekly brief citation"
-        actions={<button type="button">Copy weekly brief</button>}
-      />,
+        },
+      },
+      { actions: <button type="button">Copy weekly brief</button> },
     );
 
     assert.match(html, /weekly-posture-brief-title/);
     assert.match(html, /Weekly call snapshot/);
-    assert.match(html, /Market posture/);
+    assert.match(html, /What environment\?/);
     assert.match(html, /Can I rely on this\?/);
     assert.match(html, /This week&#x27;s call/);
     assert.match(html, /DO NOW/);
@@ -143,97 +83,54 @@ describe("WeeklyDecisionCard top-fold composition", () => {
 
     const heroIndex = html.indexOf("weekly-posture-brief-title");
     const deltaIndex = html.indexOf("Weekly call snapshot");
-    const postureIndex = html.indexOf("Market posture");
+    const postureIndex = html.indexOf("What environment?");
     const guidanceIndex = html.indexOf("This week&#x27;s call");
 
     assert.ok(deltaIndex > heroIndex);
-    assert.ok(postureIndex > deltaIndex);
-    assert.ok(guidanceIndex > postureIndex);
+    assert.ok(guidanceIndex > deltaIndex);
+    assert.ok(postureIndex > guidanceIndex);
   });
 
   it("shows fallback warning copy when snapshot mode is active", () => {
-    const html = renderToStaticMarkup(
-      <WeeklyDecisionCard
-        statusLabel="DEFENSIVE"
-        postureLabel="Defensive"
-        stageLabel="Watchful"
-        postureWithStageLabel="Defensive — Watchful"
-        postureDelta="No worse than last week"
-        confidenceLabel="HIGH"
-        confidencePercent={92}
-        signalConfidenceReason="Reason: broad agreement across signals; boundary distance is wide"
-        regimeHeader={{
+    const html = renderCard({
+      status: {
+        postureDelta: "No worse than last week",
+        confidenceLabel: "HIGH",
+        confidencePercent: 92,
+        signalConfidenceReason: "Reason: broad agreement across signals; boundary distance is wide",
+        regimeHeader: {
           regime: "Defensive",
           confidence: "High (safe for near-term operating cadence)",
           primaryRisk: "Downside: Potential stale snapshot bias: live signal freshness is degraded.",
-        }}
-        trendLabel="Stable"
-        regimeSignalIndicators={[
+        },
+        trendLabel: "Stable",
+        isFallbackSnapshot: true,
+      },
+      decision: {
+        operatingStanceLine: "Hold approvals steady. Keep irreversible spend capped.",
+        weeklyMemoLines: ["Market conditions are stable this week.", "Hold approvals steady. Keep irreversible spend capped.", "Regime shift watch is off: hold current pace with bounded approvals."],
+        netConstraintSummary: "Fallback snapshot is stable for near-term pacing.",
+        guardrail: "Hold irreversible hiring unless demand proves durable.",
+        reversalTrigger: "If tightness drops below 60, reopen selective hiring.",
+        reportDynamics: { directionLabel: "stable", changedSignals: [], anomalySignals: [], totalSignalChanges: 0, regimeChanged: false },
+        decisionShiftSummary: "No material signal shift in fallback mode.",
+        transitionProbabilities: { Expansion: 15, Mixed: 45, Scarcity: 25, Defensive: 15 },
+        decisionRules,
+        revisitDecisions: false,
+        weeklyMovement: { score: 0, direction: "neutral", summary: "Model pressure is flat this week; hold posture and keep existing guardrails in force." },
+      },
+      diagnostics: {
+        regimeSignalIndicators: [
           { key: "tightness", label: "Capital tightness", valueLabel: "64", rawValue: 64, trendArrow: "→", trendDeltaLabel: "No weekly delta", sparkline: [64], isFallback: true },
           { key: "riskAppetite", label: "Risk appetite", valueLabel: "50", rawValue: 50, trendArrow: "→", trendDeltaLabel: "No weekly delta", sparkline: [50], isFallback: true },
           { key: "baseRate", label: "Base rate", valueLabel: "—", rawValue: null, trendArrow: "→", trendDeltaLabel: "No weekly delta", sparkline: [], isFallback: true },
           { key: "curveSlope", label: "Yield curve slope", valueLabel: "—", rawValue: null, trendArrow: "→", trendDeltaLabel: "No weekly delta", sparkline: [], isFallback: true },
-        ]}
-        transitionWatch="OFF"
-        operatingStanceLine="Hold approvals steady. Keep irreversible spend capped."
-        weeklyMemoLines={["Market conditions are stable this week.", "Hold approvals steady. Keep irreversible spend capped.", "Regime shift watch is off: hold current pace with bounded approvals."]}
-        netConstraintSummary="Fallback snapshot is stable for near-term pacing."
-        guardrail="Hold irreversible hiring unless demand proves durable."
-        reversalTrigger="If tightness drops below 60, reopen selective hiring."
-        recordDateLabel="Mar 5, 2026"
-        fetchedAtLabel="Mar 6, 2026 09:12 UTC"
-        reportDynamics={{ directionLabel: "stable", changedSignals: [], anomalySignals: [], totalSignalChanges: 0, regimeChanged: false }}
-        decisionShiftSummary="No material signal shift in fallback mode."
-        transitionProbabilities={{ Expansion: 15, Mixed: 45, Scarcity: 25, Defensive: 15 }}
-        decisionRules={decisionRules}
-        roleAwareTemplates={[
-          {
-            role: "startup-leadership",
-            roleLabel: "Startup leadership",
-            doNow: "Keep delivery focused.",
-            avoidNow: "Do not add fixed costs without proof.",
-            flipTrigger: "Resume staged expansion when tightness and risk appetite recover.",
-          },
-          {
-            role: "vc-partner",
-            roleLabel: "VC partner",
-            doNow: "Push portfolio pacing discipline.",
-            avoidNow: "Avoid encouraging irreversible expansion.",
-            flipTrigger: "Reopen growth pacing after two improving reads.",
-          },
-        ]}
-        executiveOperationalStance={{
-          expand: ["Increase product tempo for reversible bets", "Selective hiring for revenue-linked roles"],
-          avoid: ["net-new hiring if tightness > 74", "long-payback bets if risk appetite < 44"],
-        }}
-        revisitDecisions={false}
-        weeklyMovement={{ score: 0, direction: "neutral", summary: "Model pressure is flat this week; hold posture and keep existing guardrails in force." }}
-        memoryRail={[{ label: "Now", posture: "Defensive" }]}
-        historicalTimeline={[{ label: "2026", posture: "Defensive" }]}
-        historicalAnalogs={[]}
-        macroOverlay={[{ label: "VC funding", detail: "-4.5 · ↑ improving" }]}
-        whyThisCall={[{ label: "Reliability", detail: "Fallback snapshot in use." }]}
-        evidenceItems={[{ key: "tightness", title: "Capital conditions", supportingBullets: ["Weekly move: +0.0 vs. prior snapshot."], confidenceLabel: "Low", directionLabel: "Unchanged", immediateImplication: "No material operating change this week." }]}
-        startupClimateIndex={{ score: 61, status: "Stable", breakdown: [{ label: "Capital availability", score: 64 }] }}
-        regimeDistance={{
-          dimensionLabel: "Tightness",
-          currentValue: 64,
-          thresholdValue: 70,
-          pointsToFlip: 6,
-          dimensionKey: "tightness",
-          thresholdDirection: "riseAbove",
-        }}
-        regimeVelocity={{
-          status: "insufficient_history",
-          from: "Expansion",
-          to: "Mixed",
-          sampleSize: 1,
-          displayLabel: "Expansion→Mixed: insufficient history",
-        }}
-        citation="Whether weekly brief citation"
-        isFallbackSnapshot={true}
-      />,
-    );
+        ],
+        startupClimateIndex: { score: 61, status: "Stable", breakdown: [{ label: "Capital availability", score: 64 }] },
+        whyThisCall: [{ label: "Reliability", detail: "Fallback snapshot in use." }],
+        evidenceItems: [{ key: "tightness", title: "Capital conditions", supportingBullets: ["Weekly move: +0.0 vs. prior snapshot."], confidenceLabel: "Low", directionLabel: "Unchanged", immediateImplication: "No material operating change this week." }],
+      },
+    });
 
     assert.match(html, /Using a cached snapshot\./);
     assert.match(html, /Regime history/);
@@ -243,41 +140,11 @@ describe("WeeklyDecisionCard top-fold composition", () => {
   });
 
   it("keeps a single canonical weekly call region and compact shell spacing", () => {
-    const html = renderToStaticMarkup(
-      <WeeklyDecisionCard
-        statusLabel="DEFENSIVE"
-        postureLabel="Defensive"
-        stageLabel="Watchful"
-        postureWithStageLabel="Defensive — Watchful"
-        postureDelta="Worse than last week"
-        confidenceLabel="MED"
-        confidencePercent={68}
-        signalConfidenceReason="Reason: regime boundary proximity + volatile macro signals"
-        regimeHeader={{
-          regime: "Defensive",
-          confidence: "Medium (mixed signal reliability)",
-          primaryRisk: "Downside: Capital tightness tightened (1.0).",
-        }}
-        trendLabel="Improving"
-        regimeSignalIndicators={[
-          { key: "tightness", label: "Capital tightness", valueLabel: "64", rawValue: 64, trendArrow: "↑", trendDeltaLabel: "+1.0 vs last week", sparkline: [61, 62, 63, 64], isFallback: false },
-          { key: "riskAppetite", label: "Risk appetite", valueLabel: "52", rawValue: 52, trendArrow: "↓", trendDeltaLabel: "-1.0 vs last week", sparkline: [56, 54, 53, 52], isFallback: false },
-          { key: "baseRate", label: "Base rate", valueLabel: "5.3", rawValue: 5.3, trendArrow: "→", trendDeltaLabel: "No weekly delta", sparkline: [5.3], isFallback: true },
-          { key: "curveSlope", label: "Yield curve slope", valueLabel: "-0.2", rawValue: -0.2, trendArrow: "↑", trendDeltaLabel: "+0.1 vs last week", sparkline: [-0.4, -0.3, -0.2], isFallback: false },
-        ]}
-        transitionWatch="ON"
-        operatingStanceLine="Stage decisions. Avoid irreversible spend."
-        weeklyMemoLines={["Market conditions tightened this week.", "Stage decisions. Avoid irreversible spend.", "Regime shift watch is on: stage approvals and preserve runway."]}
-        netConstraintSummary="Pressure remains elevated but stabilizing."
-        guardrail="Hold irreversible hiring unless direct revenue impact is clear."
-        reversalTrigger="If risk appetite rises above 55, reopen selective hiring."
-        recordDateLabel="Mar 5, 2026"
-        fetchedAtLabel="Mar 6, 2026 09:12 UTC"
-        reportDynamics={reportDynamics}
-        decisionShiftSummary="Decision delta: tighten roadmap optionality while protecting core delivery."
-        transitionProbabilities={{ Expansion: 10, Mixed: 35, Scarcity: 40, Defensive: 15 }}
-        decisionRules={decisionRules}
-        roleAwareTemplates={[
+    const html = renderCard({
+      decision: {
+        reportDynamics,
+        decisionRules,
+        roleAwareTemplates: [
           {
             role: "startup-leadership",
             roleLabel: "Startup leadership",
@@ -285,29 +152,14 @@ describe("WeeklyDecisionCard top-fold composition", () => {
             avoidNow: "Do not add fixed costs without proof.",
             flipTrigger: "Resume staged expansion when tightness and risk appetite recover.",
           },
-        ]}
-        executiveOperationalStance={{
+        ],
+        executiveOperationalStance: {
           expand: ["Increase product tempo for reversible bets"],
           avoid: ["net-new hiring if tightness > 74"],
-        }}
-        revisitDecisions={true}
-        weeklyMovement={{ score: 1.2, direction: "defensive", summary: "Model pressure increased by +1.2 this week; tighten approvals until a reversal trigger prints." }}
-        memoryRail={[{ label: "Now", posture: "Defensive" }]}
-        historicalTimeline={[{ label: "2026", posture: "Defensive" }]}
-        historicalAnalogs={[]}
-        macroOverlay={[{ label: "VC funding", detail: "-4.5 · ↑ improving" }]}
-        whyThisCall={[{ label: "Momentum", detail: "Capital tightness tightened this week." }]}
-        evidenceItems={[{ key: "tightness", title: "Capital conditions", supportingBullets: ["Weekly move: +1.0 vs. prior snapshot."], confidenceLabel: "Medium", directionLabel: "Tightening", immediateImplication: "Tighten approvals and protect runway for fixed-cost commitments." }]}
-        startupClimateIndex={{ score: 63, status: "Improving", breakdown: [{ label: "Capital availability", score: 71 }] }}
-        regimeDistance={{
-          dimensionLabel: "Tightness",
-          currentValue: 64,
-          thresholdValue: 70,
-          pointsToFlip: 6,
-          dimensionKey: "tightness",
-          thresholdDirection: "riseAbove",
-        }}
-        regimeVelocity={{
+        },
+      },
+      diagnostics: {
+        regimeVelocity: {
           status: "ok",
           from: "Expansion",
           to: "Mixed",
@@ -316,10 +168,9 @@ describe("WeeklyDecisionCard top-fold composition", () => {
           upperBoundMonths: 6,
           typicalRangeLabel: "3–6 months",
           displayLabel: "Expansion→Mixed typically 3–6 months",
-        }}
-        citation="Whether weekly brief citation"
-      />,
-    );
+        },
+      },
+    });
 
     assert.match(html, /id="weekly-call-core"/);
     assert.equal((html.match(/This week&#x27;s call/g) ?? []).length, 1);
@@ -328,36 +179,17 @@ describe("WeeklyDecisionCard top-fold composition", () => {
   });
 
   it("dedupes and caps DO NOW/AVOID bullets while keeping WATCH concise", () => {
-    const html = renderToStaticMarkup(
-      <WeeklyDecisionCard
-        statusLabel="DEFENSIVE"
-        postureLabel="Defensive"
-        stageLabel="Watchful"
-        postureWithStageLabel="Defensive — Watchful"
-        postureDelta="Worse than last week"
-        confidenceLabel="MED"
-        confidencePercent={68}
-        signalConfidenceReason="Reason: regime boundary proximity + volatile macro signals"
-        regimeHeader={{
-          regime: "Defensive",
-          confidence: "Medium",
-          primaryRisk: "Downside risk.",
-        }}
-        trendLabel="Improving"
-        regimeSignalIndicators={[]}
-        transitionWatch="ON"
-        operatingStanceLine="Stage decisions."
-        weeklyMemoLines={[]}
-        netConstraintSummary="Pressure remains elevated but stabilizing."
-        guardrail="Hold irreversible hiring unless direct revenue impact is clear."
-        reversalTrigger="If risk appetite rises above 55, reopen selective hiring."
-        recordDateLabel="Mar 5, 2026"
-        fetchedAtLabel="Mar 6, 2026 09:12 UTC"
-        reportDynamics={reportDynamics}
-        decisionShiftSummary="Decision delta"
-        transitionProbabilities={{ Expansion: 10, Mixed: 35, Scarcity: 40, Defensive: 15 }}
-        decisionRules={decisionRules}
-        roleAwareTemplates={[
+    const html = renderCard({
+      decision: {
+        operatingStanceLine: "Stage decisions.",
+        weeklyMemoLines: [],
+        netConstraintSummary: "Pressure remains elevated but stabilizing.",
+        guardrail: "Hold irreversible hiring unless direct revenue impact is clear.",
+        reversalTrigger: "If risk appetite rises above 55, reopen selective hiring.",
+        reportDynamics,
+        decisionShiftSummary: "Decision delta",
+        decisionRules,
+        roleAwareTemplates: [
           {
             role: "startup-leadership",
             roleLabel: "Startup leadership",
@@ -372,41 +204,22 @@ describe("WeeklyDecisionCard top-fold composition", () => {
             avoidNow: "Lock in long-payback spend.; overcommit to expansion.;",
             flipTrigger: "Reopen growth pacing after two improving reads.",
           },
-        ]}
-        executiveOperationalStance={{
+        ],
+        executiveOperationalStance: {
           expand: ["Increase product tempo for reversible bets"],
           avoid: ["net-new hiring if tightness > 74"],
-        }}
-        revisitDecisions={true}
-        weeklyMovement={{ score: 1.2, direction: "defensive", summary: "summary" }}
-        memoryRail={[{ label: "Now", posture: "Defensive" }]}
-        historicalTimeline={[{ label: "2026", posture: "Defensive" }]}
-        historicalAnalogs={[]}
-        macroOverlay={[]}
-        whyThisCall={[]}
-        evidenceItems={[]}
-        startupClimateIndex={{ score: 63, status: "Improving", breakdown: [{ label: "Capital availability", score: 71 }] }}
-        regimeDistance={{
-          dimensionLabel: "Tightness",
-          currentValue: 64,
-          thresholdValue: 70,
-          pointsToFlip: 6,
-          dimensionKey: "tightness",
-          thresholdDirection: "riseAbove",
-        }}
-        regimeVelocity={{
-          status: "ok",
-          from: "Expansion",
-          to: "Mixed",
-          sampleSize: 4,
-          lowerBoundMonths: 3,
-          upperBoundMonths: 6,
-          typicalRangeLabel: "3–6 months",
-          displayLabel: "Expansion→Mixed typically 3–6 months",
-        }}
-        citation="Whether weekly brief citation"
-      />,
-    );
+        },
+        weeklyMovement: { score: 1.2, direction: "defensive", summary: "summary" },
+      },
+      diagnostics: {
+        regimeSignalIndicators: [],
+        evidenceItems: [],
+        whyThisCall: [],
+      },
+      history: {
+        macroOverlay: [],
+      },
+    });
 
     const callCore = html.slice(html.indexOf('id="weekly-call-core"'), html.indexOf('id="decision-snapshot-for-leadership-this-week"'));
 
@@ -416,8 +229,6 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(callCore, /Refine by company stage/);
     assert.match(callCore, /Stage selected:/);
     assert.ok((callCore.match(/<li/g) ?? []).length <= 12);
-    assert.match(callCore, /net-new hiring if tightness &gt; 74/);
-    assert.match(callCore, /If risk appetite rises above 55, reopen selective hiring/);
+    assert.match(callCore, /Tightness rises above 70\.0/);
   });
-
 });

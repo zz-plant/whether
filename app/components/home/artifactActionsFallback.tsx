@@ -8,12 +8,11 @@ export const ArtifactActionsFallback = () => (
   >
     <div className="flex items-center justify-between gap-2">
       <div>
-        <span className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Preparing share artifacts</span>
-        <p className="mt-1 text-[11px] text-slate-400">The call is ready. We&apos;re packaging copyable outputs and citation-safe export actions.</p>
+        <span className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Loading share actions</span>
       </div>
       <span className="inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-400/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-cyan-100">
         <span className="weather-loading-beacon" />
-        Exporting
+        Loading
       </span>
     </div>
     <div className="grid gap-2 sm:grid-cols-3">

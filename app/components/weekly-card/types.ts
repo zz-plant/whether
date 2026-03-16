@@ -13,6 +13,7 @@ export type WeeklyMovement = {
 
 export type FailureModeWarningItem = { id: string; warning: string; mitigationCheck: string };
 
+// Legacy top-fold section contract kept for DecisionCallHeader tests.
 export type DecisionHeroSectionProps = {
   [key: string]: unknown;
   statusLabel: string;

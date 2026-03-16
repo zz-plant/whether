@@ -10,6 +10,7 @@ const resolvePostureAndStage = ({ statusLabel, postureLabel, stageLabel, posture
 };
 
 export function DecisionHeroSection(props: DecisionHeroSectionProps) {
+  // Kept as a compatibility section for isolated tests; live WeeklyDecisionCard renders RegimeBanner + WeeklyCallModePanel.
   const { resolvedPostureLabel, resolvedStageLabel } = resolvePostureAndStage(props);
   const {
     immediateDecision,

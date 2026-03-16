@@ -5,12 +5,11 @@ export const WeeklyDiagnosticsFallback = () => (
     <article className="rounded-[1.2rem] border border-sky-400/20 bg-slate-950/68 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">Decision support is streaming in</p>
-          <p className="mt-1 text-sm text-slate-200">The weekly call is already ready. We&apos;re loading the decision matrix, role-specific guidance, and evidence support next.</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">Loading additional detail</p>
         </div>
         <span className="inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-400/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-cyan-100">
           <span className="weather-loading-beacon" />
-          Streaming
+          Loading
         </span>
       </div>
       <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
@@ -38,7 +37,7 @@ export const WeeklyDiagnosticsFallback = () => (
     <article className="rounded-xl border border-slate-700/55 bg-slate-950/84 p-5">
       <div className="flex items-center justify-between gap-2">
         <Skeleton className="h-4 w-40 rounded-full bg-slate-500/42" />
-        <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Evidence after matrix</span>
+        <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">More detail</span>
       </div>
       <div className="mt-3 grid gap-2 sm:grid-cols-2">
         <Skeleton className="h-16 w-full rounded-xl bg-slate-500/32" />

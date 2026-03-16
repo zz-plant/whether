@@ -8,6 +8,7 @@ import {
   MoreContextDisclosureBody,
   WeeklyDecisionCard,
 } from "../app/components/weeklyDecisionCard";
+import { buildWeeklyDecisionCardModel } from "./factories/weeklyDecisionCardModel";
 
 describe("WeeklyDecisionCard extracted sections", () => {
   it("renders operating-call header contracts", () => {
@@ -229,55 +230,67 @@ describe("WeeklyDecisionCard extracted sections", () => {
   it("renders confidence mini-chart fallback markers in regime panel", () => {
     const html = renderToStaticMarkup(
       <WeeklyDecisionCard
-        statusLabel="DEFENSIVE"
-        postureLabel="Defensive"
-        stageLabel="Watchful"
-        postureDelta="No worse than last week"
-        confidenceLabel="MED"
-        confidencePercent={69}
-        signalConfidenceReason="Boundary distance is moderate."
-        regimeHeader={{ regime: "Defensive", confidence: "Medium", primaryRisk: "Tightness still elevated." }}
-        trendLabel="Mixed"
-        confidenceHistory={[
-          { recordDate: "2026-01-30", confidencePercent: 62, isMissing: false },
-          { recordDate: "2026-02-06", confidencePercent: null, isMissing: true },
-          { recordDate: "2026-02-13", confidencePercent: 66, isMissing: false },
-        ]}
-        confidenceTrend="unstable"
-        regimeSignalIndicators={[]}
-        transitionWatch="ON"
-        operatingStanceLine="Hold reversible pace."
-        weeklyMemoLines={["Signals are mixed."]}
-        netConstraintSummary="Risk still elevated"
-        guardrail="Do not commit irreversible spend"
-        reversalTrigger="Flip when tightness falls"
-        recordDateLabel="Mar 6, 2026"
-        fetchedAtLabel="Mar 6, 2026"
-        reportDynamics={{ changedSignals: [], anomalySignals: [], totalSignalChanges: 0, regimeChanged: false, directionLabel: "stable" }}
-        decisionShiftSummary="No major shift"
-        transitionProbabilities={{ Scarcity: 0.2, Defensive: 0.5, Mixed: 0.2, Expansion: 0.1 }}
-        decisionRules={[]}
-        roleAwareTemplates={[]}
-        executiveOperationalStance={{ expand: [], avoid: [] }}
-        revisitDecisions={false}
-        weeklyMovement={{ score: 0, direction: "neutral", summary: "steady" }}
-        memoryRail={[]}
-        historicalTimeline={[]}
-        historicalAnalogs={[]}
-        macroOverlay={[]}
-        whyThisCall={[]}
-        evidenceItems={[]}
-        startupClimateIndex={{ score: 50, status: "Stable", breakdown: [] }}
-        regimeDistance={{
-          dimensionLabel: "Tightness",
-          dimensionKey: "tightness",
-          currentValue: 64,
-          thresholdValue: 70,
-          pointsToFlip: 6,
-          thresholdDirection: "riseAbove",
-        }}
-        regimeVelocity={{ status: "insufficient_history", from: "Defensive", to: "Defensive", sampleSize: 0, displayLabel: "Flat" }}
-        citation="citation"
+        model={buildWeeklyDecisionCardModel({
+          status: {
+            statusLabel: "DEFENSIVE",
+            postureLabel: "Defensive",
+            stageLabel: "Watchful",
+            postureDelta: "No worse than last week",
+            confidenceLabel: "MED",
+            confidencePercent: 69,
+            signalConfidenceReason: "Boundary distance is moderate.",
+            regimeHeader: { regime: "Defensive", confidence: "Medium", primaryRisk: "Tightness still elevated." },
+            trendLabel: "Mixed",
+            confidenceHistory: [
+              { recordDate: "2026-01-30", confidencePercent: 62, isMissing: false },
+              { recordDate: "2026-02-06", confidencePercent: null, isMissing: true },
+              { recordDate: "2026-02-13", confidencePercent: 66, isMissing: false },
+            ],
+            confidenceTrend: "unstable",
+            transitionWatch: "ON",
+          },
+          decision: {
+            operatingStanceLine: "Hold reversible pace.",
+            weeklyMemoLines: ["Signals are mixed."],
+            netConstraintSummary: "Risk still elevated",
+            guardrail: "Do not commit irreversible spend",
+            reversalTrigger: "Flip when tightness falls",
+            reportDynamics: { changedSignals: [], anomalySignals: [], totalSignalChanges: 0, regimeChanged: false, directionLabel: "stable" },
+            decisionShiftSummary: "No major shift",
+            transitionProbabilities: { Scarcity: 0.2, Defensive: 0.5, Mixed: 0.2, Expansion: 0.1 },
+            decisionRules: [],
+            roleAwareTemplates: [],
+            executiveOperationalStance: { expand: [], avoid: [] },
+            revisitDecisions: false,
+            weeklyMovement: { score: 0, direction: "neutral", summary: "steady" },
+          },
+          diagnostics: {
+            regimeSignalIndicators: [],
+            startupClimateIndex: { score: 50, status: "Stable", breakdown: [] },
+            regimeDistance: {
+              dimensionLabel: "Tightness",
+              dimensionKey: "tightness",
+              currentValue: 64,
+              thresholdValue: 70,
+              pointsToFlip: 6,
+              thresholdDirection: "riseAbove",
+            },
+            regimeVelocity: { status: "insufficient_history", from: "Defensive", to: "Defensive", sampleSize: 0, displayLabel: "Flat" },
+            whyThisCall: [],
+            evidenceItems: [],
+          },
+          history: {
+            memoryRail: [],
+            historicalTimeline: [],
+            historicalAnalogs: [],
+            macroOverlay: [],
+          },
+          artifact: {
+            citation: "citation",
+            recordDateLabel: "Mar 6, 2026",
+            fetchedAtLabel: "Mar 6, 2026",
+          },
+        })}
       />,
     );
 

@@ -1,5 +1,5 @@
-import { HomePageStreamingFallback } from "./components/home/homePageStreamingFallback";
+import { RouteLoadingShell } from "./components/routeLoadingShell";
 
 export default function Loading() {
-  return <HomePageStreamingFallback />;
+  return <RouteLoadingShell />;
 }

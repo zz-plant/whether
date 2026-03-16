@@ -27,52 +27,32 @@ const resolveHistoricalContext = (searchParams?: HomePageStreamingFallbackProps[
 export const HomePageStreamingFallback = ({ searchParams }: HomePageStreamingFallbackProps) => {
   const historicalContext = resolveHistoricalContext(searchParams);
   const contextLabel = historicalContext ?? "Current weekly brief";
-  const introLabel = historicalContext ? "Opening the selected weekly brief" : "Opening this week’s brief";
-  const introCopy = historicalContext
-    ? "The shared card is loading into the full report with the same action, change summary, and flip cue first."
-    : "The shared card opens directly into the same one-screen brief: action, why it matters, and flip condition first.";
+  const introLabel = historicalContext ? "Loading selected weekly brief" : "Loading weekly brief";
 
   return (
     <section aria-label="Loading weekly operating posture" className="space-y-5" aria-live="polite" aria-busy="true">
-      <section className="weather-panel space-y-4 px-4 py-4 sm:px-5 sm:py-5">
+      <section className="weather-panel px-4 py-4 sm:px-5 sm:py-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em]">
-              <span className="rounded-full border border-sky-400/35 bg-sky-400/10 px-2.5 py-1 text-sky-100">Weekly operating call</span>
+              <span className="rounded-full border border-sky-400/35 bg-sky-400/10 px-2.5 py-1 text-sky-100">Weekly brief</span>
               <span className="rounded-full border border-cyan-300/35 bg-cyan-400/10 px-2.5 py-1 text-cyan-100">{contextLabel}</span>
             </div>
             <p className="max-w-2xl text-sm text-slate-100">{introLabel}</p>
-            <p className="max-w-3xl text-[12px] text-slate-300">{introCopy}</p>
           </div>
           <div className="rounded-xl border border-slate-700/75 bg-slate-950/70 px-3 py-2.5 text-right">
             <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-cyan-100">
               <span className="weather-loading-beacon" />
-              Shared-card continuity
+              Loading
             </p>
-            <p className="mt-1 text-[11px] text-slate-300">Headline, change summary, and flip cue land before deeper support.</p>
           </div>
         </div>
-
-        <ol className="grid gap-2 text-xs sm:grid-cols-3">
-          <li className="rounded-xl border border-cyan-300/35 bg-cyan-300/12 px-3 py-3 text-cyan-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]" aria-current="step">
-            <span className="font-semibold">1. Load action</span>
-            <span className="mt-1 block text-cyan-100/85">Decision headline and posture artifact arrive first.</span>
-          </li>
-          <li className="rounded-xl border border-slate-700/90 bg-slate-900/65 px-3 py-3 text-slate-200">
-            <span className="font-semibold">2. Fill support</span>
-            <span className="mt-1 block text-slate-300">Change summary, trust strip, and share actions stream next.</span>
-          </li>
-          <li className="rounded-xl border border-slate-700/90 bg-slate-900/65 px-3 py-3 text-slate-200">
-            <span className="font-semibold">3. Open full brief</span>
-            <span className="mt-1 block text-slate-300">Diagnostics and operating lanes attach under the same top fold.</span>
-          </li>
-        </ol>
 
         <article className="weather-panel-static rounded-[1.5rem] px-5 py-5 sm:px-6 sm:py-6">
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2">
               <span className="rounded-full border border-sky-400/35 bg-sky-400/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-100">
-                Weekly operating call
+                Weekly brief
               </span>
               <span className="rounded-full border border-slate-700/70 bg-slate-950/65 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-200">
                 {contextLabel}
@@ -139,14 +119,13 @@ export const HomePageStreamingFallback = ({ searchParams }: HomePageStreamingFal
         </article>
       </section>
 
-      <section className="weather-panel space-y-4 px-5 py-5" aria-label="Checking live evidence stream">
+      <section className="weather-panel space-y-4 px-5 py-5" aria-label="Loading additional sections">
         <div className="flex items-center justify-between gap-2">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Decision support follows automatically</p>
-            <p className="mt-1 text-sm text-slate-200">Once the call is locked, we stream the evidence lane, bounded rule matrix, and share packaging.</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Loading additional sections</p>
           </div>
           <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-200">
-            Streaming next
+            Loading
           </span>
         </div>
         <div className="grid gap-3 md:grid-cols-3">

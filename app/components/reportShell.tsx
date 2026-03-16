@@ -2,7 +2,6 @@
  * Shared report shell layout for Whether Report pages.
  * Keeps header, navigation, and layout consistent across multi-page views.
  */
-import Image from "next/image";
 import Link from "next/link";
 import { Children, type ReactNode, isValidElement } from "react";
 import { DisplayGuardian } from "./displayGuardian";
@@ -12,22 +11,21 @@ import { CanonicalTrustModule } from "./canonicalTrustModule";
 import { DataProvenanceStrip, type DataProvenance } from "./dataProvenanceStrip";
 import {
   ReportMobileNavigation,
-  ReportPageNavigation,
   ReportSectionNavigation,
   type ReportPageLink,
   type ReportSectionLink,
 } from "./reportShellNavigation";
 import { type ReportStageItem } from "./reportRevampElements";
 import { INFORMATIONAL_NOTICE } from "../../lib/exportNotices";
-import { canonicalPositioningLine, serializeJsonLd } from "../../lib/seo";
+import { serializeJsonLd } from "../../lib/seo";
 import { AnchorFeedback } from "./anchorFeedback";
 import { ReportCta } from "./reportCta";
-import { NavigationOrientationBadge } from "./navigationOrientationBadge";
 
 import { ClimateBackdrop } from "./climateBackdrop";
 import { RegimeIconType } from "./regimeIcons";
 import { ArrowRightIcon } from "./uiIcons";
 import { RegimeCommandBar, type RegimeCommandBarProps } from "./RegimeCommandBar";
+import { ReportShellHeader, type ReportShellHeaderVariant } from "./reportShellHeader";
 
 type ReportCtaProps = { href: string; label: string; copyText?: string; copyTarget?: string };
 type SecondaryCtaProps = { href: string; label: string };
@@ -104,6 +102,7 @@ type ReportShellProps = {
   heroVariant?: "full" | "compact";
   pageNavVariant?: "full" | "compact";
   showPageNavigation?: boolean;
+  headerVariant?: ReportShellHeaderVariant;
   sidebarVariant?: "full" | "hidden";
   hideHeroChrome?: boolean;
   primaryCta?: ReportCtaProps;
@@ -350,6 +349,7 @@ export const ReportShell = ({
   heroVariant = "full",
   pageNavVariant = "full",
   showPageNavigation = false,
+  headerVariant,
   sidebarVariant = "full",
   hideHeroChrome = false,
   primaryCta = { href: "#weekly-action-summary", label: "This week" },
@@ -379,7 +379,7 @@ export const ReportShell = ({
   const sourceHref = treasurySource.startsWith("http") ? treasurySource : undefined;
   const sourceLabel = sourceHref ? (() => { try { const hostname = new URL(sourceHref).hostname.replace(/^www\./, ""); if (hostname.includes("stlouisfed.org")) return "FRED"; if (hostname.includes("fiscaldata.treasury.gov")) return "Treasury Fiscal Data"; return hostname; } catch { return treasurySource; } })() : treasurySource;
   const showPostureRibbon = currentPath !== "/";
-  const isHomeBrief = currentPath === "/";
+  const resolvedHeaderVariant: ReportShellHeaderVariant = headerVariant ?? (hideHeroChrome ? "home-brief" : "standard");
   const isPrimaryActionInSectionLinks = sectionLinks.some((section) => section.href === primaryCta.href);
   const showMobileActionCard = !isPrimaryActionInSectionLinks;
   const showInlineTrustBlock = !hasSidebar;
@@ -395,84 +395,17 @@ export const ReportShell = ({
         <AnchorFeedback />
         <DisplayGuardian />
         <div className="tv-rail-safe mx-auto max-w-[88rem] pb-[calc(env(safe-area-inset-bottom)+10rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)] pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)] sm:pb-10 sm:pt-5 sm:pl-[calc(env(safe-area-inset-left)+1.25rem)] sm:pr-[calc(env(safe-area-inset-right)+1.25rem)]">
-          <header className="weather-appbar relative z-20 px-4 py-4 sm:px-6 sm:py-5 lg:sticky lg:top-4">
-            {isHomeBrief ? (
-              <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-                <div className="min-w-0 space-y-3">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <Image src="/whether-logo.svg" alt="Whether — Weekly Operating Posture (Hiring, Spend, Roadmap)" width={156} height={36} className="h-9 w-auto" priority />
-                    <span className="rounded-full border border-sky-300/35 bg-sky-400/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-sky-100">
-                      Weekly operating forecast
-                    </span>
-                    <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-200">
-                      {statusLabel}
-                    </span>
-                  </div>
-                  <div className="space-y-1.5">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-100/85">Current conditions</p>
-                    <p className="max-w-3xl text-base font-semibold leading-relaxed text-slate-100 sm:text-lg">
-                      This week&apos;s posture, action, and flip risk in one scan.
-                    </p>
-                    <p className="max-w-3xl text-xs leading-relaxed text-slate-300">
-                      Decide now, keep commitments reversible, and open deeper evidence only when the call needs it.
-                    </p>
-                  </div>
-                </div>
-                <div className="grid gap-2 sm:grid-cols-3 xl:min-w-[30rem]">
-                  <div className="weather-stat-card">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Posture</p>
-                    <p className="mt-1 text-sm font-semibold text-slate-100">{statusLabel}</p>
-                  </div>
-                  <div className="weather-stat-card">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Signals updated</p>
-                    <p className="mt-1 text-sm font-semibold text-slate-100">{fetchedAtLabel}</p>
-                  </div>
-                  <div className="weather-stat-card">
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Record date</p>
-                    <p className="mt-1 text-sm font-semibold text-slate-100">{recordDateLabel}</p>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <>
-                <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-                  <div className="min-w-0 space-y-2">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <Image src="/whether-logo.svg" alt="Whether — Weekly Operating Posture (Hiring, Spend, Roadmap)" width={156} height={36} className="h-9 w-auto" priority />
-                      <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-200">
-                        {statusLabel}
-                      </span>
-                    </div>
-                    <p className="max-w-3xl text-xs leading-relaxed text-slate-300">
-                      Weekly posture artifact for operators: decide now, execute with guardrails, and keep evidence one click away.
-                    </p>
-                  </div>
-                  <div className="grid gap-2 sm:grid-cols-2 xl:min-w-[23rem]">
-                    <div className="weather-stat-card">
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Signals updated</p>
-                      <p className="mt-1 text-sm font-semibold text-slate-100">{fetchedAtLabel}</p>
-                    </div>
-                    <div className="weather-stat-card">
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Record date</p>
-                      <p className="mt-1 text-sm font-semibold text-slate-100">{recordDateLabel}</p>
-                    </div>
-                  </div>
-                </div>
-                <NavigationOrientationBadge currentPath={currentPath} className="mt-4" />
-                <p className="mt-3 max-w-3xl text-xs leading-relaxed text-slate-300">{canonicalPositioningLine}</p>
-                <p className="mt-2 text-[11px] text-slate-400">Choose view: Now for the weekly call, Workflows for signals and guardrails, Reference for background and method.</p>
-              </>
-            )}
-            {showPageNavigation ? (
-              <ReportPageNavigation
-                pageLinks={pageLinks}
-                pageTitle={pageTitle}
-                currentPath={currentPath}
-                variant={pageNavVariant}
-                className="mt-4 -mx-4 hidden px-4 sm:mx-0 sm:block sm:px-0"
-              />
-            ) : null}
-          </header>
+          <ReportShellHeader
+            variant={resolvedHeaderVariant}
+            statusLabel={statusLabel}
+            fetchedAtLabel={fetchedAtLabel}
+            recordDateLabel={recordDateLabel}
+            currentPath={currentPath}
+            showPageNavigation={showPageNavigation}
+            pageLinks={pageLinks}
+            pageTitle={pageTitle}
+            pageNavVariant={pageNavVariant}
+          />
 
           {showPostureRibbon ? <div className="weather-panel-static mb-4 hidden flex-wrap items-center justify-between gap-2 border border-slate-700/70 px-4 py-2 text-xs sm:flex"><p className="text-slate-300">Current Posture: <span className="font-semibold text-slate-100">{statusLabel}</span><span className="ml-2 text-slate-400">Updated {recordDateLabel}</span></p><Link href="/" className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-[11px] font-semibold tracking-[0.14em]">Open weekly brief</Link></div> : null}
           {historicalBanner}
