@@ -165,8 +165,110 @@ describe("whether cli", () => {
     const parsed = JSON.parse(result.stdout);
     assert.match(parsed.brief, /Weekly operator brief/);
     assert.match(parsed.brief, /Stage fixed-cost approvals/);
+    assert.equal("variant" in parsed, false);
+    assert.equal("rendered" in parsed, false);
     assert.equal(result.stderr, "");
     assert.doesNotMatch(result.stdout, /\u001b\[/);
+  });
+
+  it("agent --json forwards the canonical backend payload and cadence selection", async () => {
+    const requests: string[] = [];
+    const server = http.createServer((req, res) => {
+      requests.push(req.url ?? "");
+      if ((req.url ?? "").startsWith("/api/agent")) {
+        const url = new URL(req.url ?? "/", "http://localhost");
+        const cadence = url.searchParams.get("cadence") ?? "weekly";
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({
+          cadence,
+          defaultCadence: "weekly",
+          supportedCadences: ["weekly", "monthly", "quarterly", "yearly"],
+          copy: `${cadence} copy`,
+          recordDateLabel: "Week of 2026-03-12",
+          generatedAt: "2026-03-12T12:00:00.000Z",
+          summaryHash: cadence === "monthly" ? "monthly-hash" : "weekly-hash",
+          links: {
+            self: `/api/agent?cadence=${cadence}`,
+            llms: "/llms.txt",
+            discovery: "/.well-known/whether-agent.json",
+          },
+          agentHandoff: {
+            payload: { posture: "guarded" },
+            prompt: `Prompt for ${cadence}`,
+          },
+          version: "v1",
+        }));
+        return;
+      }
+      res.writeHead(404);
+      res.end();
+    });
+
+    await new Promise<void>((resolve) => server.listen(0, resolve));
+    const { port } = server.address() as { port: number };
+    const weekly = await runCli(["agent", "--json", "--api-base-url", `http://127.0.0.1:${port}`]);
+    const monthly = await runCli(["agent", "monthly", "--json", "--api-base-url", `http://127.0.0.1:${port}`]);
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+
+    assert.equal(weekly.status, 0);
+    assert.equal(monthly.status, 0);
+
+    const weeklyParsed = JSON.parse(weekly.stdout);
+    const monthlyParsed = JSON.parse(monthly.stdout);
+    assert.equal(weeklyParsed.cadence, "weekly");
+    assert.equal(weeklyParsed.agentHandoff.prompt, "Prompt for weekly");
+    assert.equal(monthlyParsed.cadence, "monthly");
+    assert.equal(monthlyParsed.summaryHash, "monthly-hash");
+    assert.ok(requests.includes("/api/agent?cadence=weekly"));
+    assert.ok(requests.includes("/api/agent?cadence=monthly"));
+  });
+
+  it("agent renders a readable handoff summary in text mode", async () => {
+    const server = http.createServer((req, res) => {
+      if ((req.url ?? "").startsWith("/api/agent")) {
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({
+          cadence: "weekly",
+          defaultCadence: "weekly",
+          supportedCadences: ["weekly", "monthly", "quarterly", "yearly"],
+          copy: "Weekly operator handoff",
+          recordDateLabel: "Week of 2026-03-12",
+          generatedAt: "2026-03-12T12:00:00.000Z",
+          summaryHash: "weekly-hash",
+          links: {
+            self: "/api/agent?cadence=weekly",
+            llms: "/llms.txt",
+            discovery: "/.well-known/whether-agent.json",
+          },
+          agentHandoff: {
+            payload: { posture: "guarded" },
+            prompt: "Give me the weekly operator summary.",
+          },
+          version: "v1",
+        }));
+        return;
+      }
+      res.writeHead(404);
+      res.end();
+    });
+
+    await new Promise<void>((resolve) => server.listen(0, resolve));
+    const { port } = server.address() as { port: number };
+    const result = await runCli(["agent", "--api-base-url", `http://127.0.0.1:${port}`]);
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+
+    assert.equal(result.status, 0);
+    assert.match(result.stdout, /Cadence: weekly/);
+    assert.match(result.stdout, /Copy:/);
+    assert.match(result.stdout, /Agent prompt:/);
+    assert.match(result.stdout, /Give me the weekly operator summary\./);
+  });
+
+  it("agent rejects unsupported cadence values with a clear error", () => {
+    const result = spawnSync("node", [CLI_PATH, "agent", "daily"], { encoding: "utf8" });
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /Invalid cadence "daily"/);
+    assert.match(result.stderr, /weekly, monthly, quarterly, yearly/);
   });
 
   it("returns exit code 5 for invalid scenario input", () => {
@@ -629,6 +731,49 @@ describe("whether cli", () => {
     assert.equal(status.status, 0);
     assert.match(status.stdout, /Company context: acme · stage seed/);
     assert.match(status.stdout, /Whether — Current Status/);
+  });
+
+  it("company status --json preserves backend payload without local context wrappers", async () => {
+    const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
+    const server = http.createServer((req, res) => {
+      if ((req.url ?? "").startsWith("/api/cli/status")) {
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(JSON.stringify({
+          version: "v1",
+          regime: "Current",
+          cyclePhase: "Now",
+          confidence: { label: "HIGH", score: 93 },
+          trend: "stable",
+          decisionStability: "stable",
+          updatedAt: "live",
+          freshness: { line: "Updated live" },
+          call: { summary: "live summary", do: ["go"], avoid: ["wait"], flipConditions: ["n/a"] },
+          degraded: false,
+        }));
+        return;
+      }
+      res.writeHead(404);
+      res.end();
+    });
+
+    await new Promise<void>((resolve) => server.listen(0, resolve));
+    const { port } = server.address() as { port: number };
+
+    const select = await runCli(["company", "select", "acme", "--stage", "seed"], {
+      env: { ...process.env, HOME: homeDir },
+    });
+    const status = await runCli(["company", "status", "--json", "--api-base-url", `http://127.0.0.1:${port}`], {
+      env: { ...process.env, HOME: homeDir },
+    });
+
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+    fs.rmSync(homeDir, { recursive: true, force: true });
+
+    assert.equal(select.status, 0);
+    assert.equal(status.status, 0);
+    const parsed = JSON.parse(status.stdout);
+    assert.equal(parsed.updatedAt, "live");
+    assert.equal("context" in parsed, false);
   });
 
   it("export pdf writes a real pdf artifact to the requested path", async () => {

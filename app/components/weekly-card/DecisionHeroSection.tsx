@@ -161,7 +161,7 @@ export function DecisionHeroSection(props: DecisionHeroSectionProps) {
               </ul>
             ) : (
               <p className="mt-3 text-sm text-slate-300">
-                {hasMeaningfulDelta ? "Signal-level detail is still loading. Use the delta cards above as the source of truth for this week’s changes." : "No fresh signal delta available yet. Hold the existing planning baseline."}
+                {hasMeaningfulDelta ? "Signal detail not yet available." : "No fresh signal delta available yet. Hold the existing planning baseline."}
               </p>
             )}
           </section>

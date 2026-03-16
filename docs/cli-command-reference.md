@@ -11,6 +11,7 @@ Whether CLI is an operator decision terminal: **environment → call → changes
 
 - `whether --version`
 - `whether ping`
+- `whether agent [weekly|monthly|quarterly|yearly] [--json]`
 - `whether status`
 - `whether call [show|copy|diff]`
 - `whether regime`
@@ -44,6 +45,7 @@ Whether CLI is an operator decision terminal: **environment → call → changes
 
 ## Command-specific query flags
 
+- `agent`: positional cadence (`weekly`, `monthly`, `quarterly`, `yearly`) or `--cadence <value>`
 - `status`: `--as-of <YYYY-MM>`, `--view expanded`, `--verbose`
 - `call`: `--as-of <YYYY-MM>`
 - `changes`: `--as-of <YYYY-MM>`
@@ -55,6 +57,13 @@ Whether CLI is an operator decision terminal: **environment → call → changes
 Notes:
 - `--as-of` is mapped to `asOf` query shape expected by the API handlers.
 - `--company` / `--stage` are local CLI context flags. They annotate output and power `whether company ...`, but they are not forwarded as query params to `/api/cli/*` endpoints.
+
+## Human mode vs agent mode
+
+- Default text output is optimized for terminal reading and meeting handoff. It can add local context lines and rendered brief variants.
+- `--json` on parity commands is optimized for agents, CI, and scripts. It returns the backend payload without local CLI wrappers.
+- Current parity commands are `agent`, `status`, `call`, `changes`, `regime`, `diagnostics`, `history`, `brief`, and `scenario`.
+- Derived commands such as `export`, `share`, and filtered `diagnostics evidence|provenance` intentionally compose or transform backend data.
 
 ## Install contract (automation-safe)
 
@@ -114,6 +123,7 @@ Notes:
 
 - `whether company select <name> --stage <stage>` saves a local company context in `~/.config/whether/config.yaml`.
 - `whether company status|call|brief` reuses that saved context and prefixes the output with a context line.
+- `whether company ... --json` preserves the raw backend payload; saved company context stays a human text-mode annotation only.
 - The current weekly call remains the canonical base call; company context is local profile metadata until company-tuned CLI routes exist.
 
 ## Shell completion
@@ -143,6 +153,7 @@ Order: **flags > env vars > config file**.
 
 ## CLI API routes
 
+- `GET /api/agent?cadence=weekly|monthly|quarterly|yearly`
 - `GET /api/cli/status`
 - `GET /api/cli/call`
 - `GET /api/cli/regime`
@@ -181,9 +192,12 @@ Use these three commands as the minimal smoke surface for operators and agents:
   - Exit: `0` on healthy API
   - Stdout (json): `{ "ok": true, "apiBaseUrl": "...", "status": "ok" }`
   - Exit: `2` for auth/forbidden, `6` for network, `7` for 429/5xx server failures
+- `whether agent weekly --json`
+  - Exit: `0`
+  - Stdout (json): canonical `/api/agent` payload including `cadence`, `copy`, `agentHandoff`, `links`, `generatedAt`, and `version`
 - `whether brief --json`
   - Exit: `0`
-  - Stdout (json): object that includes `brief` text payload
+  - Stdout (json): raw `/api/brief/slack` payload that includes `brief` text
 
 JSON mode is intentionally stdout-only machine output; it should not include ANSI color escapes or log prefixes unless an error occurs.
 

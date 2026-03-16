@@ -298,6 +298,47 @@ describe("WeeklyDecisionCard extracted sections", () => {
     assert.match(html, /Missing weeks are dashed markers/);
     assert.match(html, /missing confidence data/);
   });
+
+  it("keeps missing signal detail copy neutral when delta cards are already present", () => {
+    const model = buildWeeklyDecisionCardModel({
+      diagnostics: {
+        regimeSignalIndicators: [],
+      },
+      sinceLastReview: {
+        hasMeaningfulDelta: true,
+        items: [
+          { id: "top-driver", label: "Top driver change", detail: "Capital tightness tightened.", href: "/signals" },
+        ],
+      },
+    });
+    const html = renderToStaticMarkup(
+      <DecisionCallHeader
+        statusLabel={model.status.statusLabel}
+        postureLabel={model.status.postureLabel}
+        stageLabel={model.status.stageLabel}
+        postureWithStageLabel={model.status.postureWithStageLabel}
+        immediateDecision={model.decision.immediateDecision}
+        operatingStanceLine={model.decision.operatingStanceLine}
+        confidencePercent={model.status.confidencePercent}
+        confidenceLabel={model.status.confidenceLabel}
+        trendLabel={model.status.trendLabel}
+        transitionWatch={model.status.transitionWatch}
+        regimeDistance={model.diagnostics.regimeDistance}
+        fetchedAtLabel={model.artifact.fetchedAtLabel}
+        freshnessLine={model.artifact.freshnessLine}
+        weeklyMovement={model.decision.weeklyMovement}
+        regimeSignalIndicators={model.diagnostics.regimeSignalIndicators}
+        sinceLastReview={model.sinceLastReview}
+        whyItMattersLine={model.presentation?.whyItMattersLine}
+        readThisCardItems={model.presentation?.readThisCardItems}
+        glossaryHref={model.presentation?.glossaryHref}
+      />,
+    );
+
+    assert.match(html, /Signal detail not yet available\./);
+    assert.doesNotMatch(html, /Signal-level detail is still loading/);
+  });
+
   it("renders bounded rules matrix hierarchy", () => {
     const html = renderToStaticMarkup(
       <BoundedRulesMatrix

@@ -17,9 +17,11 @@ const callCommand = "whether call diff --from previous --to current";
 const changesCommand = "whether changes";
 const historyCommand = "whether history compare --weeks 6";
 const scenarioCommand = "whether scenario --tightness 0.65 --risk-appetite 0.45";
+const agentCommand = "whether agent weekly --json";
 const jsonCommand = "whether status --json";
 
 const apiEndpoints = [
+  "GET /api/agent?cadence=weekly|monthly|quarterly|yearly",
   "GET /api/cli/status",
   "GET /api/cli/call",
   "GET /api/cli/regime",
@@ -41,6 +43,10 @@ const workflowSteps = [
   {
     label: "3 · Share",
     detail: "Use human output for meetings, --json for automation.",
+  },
+  {
+    label: "4 · Handoff",
+    detail: "Pull the canonical agent payload when another system needs the same call.",
   },
 ] as const;
 
@@ -68,6 +74,12 @@ const commandCards = [
     title: "history",
     summary: "Review prior calls and compare shifts.",
     command: historyCommand,
+  },
+  {
+    key: "agent",
+    title: "agent",
+    summary: "Pull the canonical agent handoff payload with cadence-aware summaries.",
+    command: agentCommand,
   },
 ] as const;
 
@@ -155,7 +167,9 @@ export default function OperationsCliPage() {
             </div>
             <div className="rounded-xl border border-slate-800/80 bg-slate-950/70 p-3">
               <p className="text-sm font-semibold text-slate-100">--json</p>
-              <p className="mt-1 text-sm text-slate-300">Stable payload for scripts, CI checks, and Slack automation payload builders.</p>
+              <p className="mt-1 text-sm text-slate-300">
+                Backend-equal payload for scripts, CI checks, and agent handoffs. Use text mode when you want rendered terminal guidance instead.
+              </p>
             </div>
           </div>
           <CliCommandRow command={jsonCommand} target="cli-json" label="Copy JSON example" />

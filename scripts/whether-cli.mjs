@@ -37,6 +37,7 @@ Usage:
 
 Core Commands:
   ping          Verify API reachability and auth readiness
+  agent         Pull the canonical agent handoff payload
   status        Show current operating environment and call (use --verbose for bounded decision detail)
   call          Show leadership recommendation
   changes       Show what changed since last refresh
@@ -62,11 +63,12 @@ Setup:
 
 const SUB_HELP = {
   ping: "Usage: whether ping [--json]",
+  agent: "Usage: whether agent [weekly|monthly|quarterly|yearly] [--json]",
   call: "Usage: whether call [show|copy|diff] [--json|--yaml|--markdown]",
   status: "Usage: whether status [--verbose|--view expanded] [--json] [--as-of <YYYY-MM>] (example: --as-of 2024-07)",
   diagnostics: "Usage: whether diagnostics [summary|drivers|evidence|provenance] [--json] [--as-of <YYYY-MM>] (example: --as-of 2024-07)",
   history: "Usage: whether history [compare] [--weeks <n>] [--json] [--as-of <YYYY-MM>] (example: --as-of 2024-07)",
-  brief: "Usage: whether brief [exec|board|staff|investor|slack|email] [--copy]",
+  brief: "Usage: whether brief [exec|board|staff|investor|slack|email] [--copy] [--json]",
   export: "Usage: whether export [json|csv|markdown|pdf|briefing] [--output <file>]",
   share: "Usage: whether share [slack|email|clipboard] [--brief <type>]",
   install:
@@ -76,6 +78,8 @@ const SUB_HELP = {
   company: "Usage: whether company [list|select|status|call|brief] [name]",
   completion: "Usage: whether completion [--shell <bash|zsh>]",
 };
+
+const SUPPORTED_AGENT_CADENCES = ["weekly", "monthly", "quarterly", "yearly"];
 
 let cachedVersion = null;
 
@@ -188,6 +192,8 @@ const normalizeFlags = async (flags) => {
     profile: process.env.WHETHER_PROFILE ?? config.profile ?? "default",
   };
 };
+
+const isTextOutput = (settings) => settings.output === "text";
 
 const ensureParentDirectory = async (filePath) => {
   const absolutePath = path.resolve(String(filePath));
@@ -808,6 +814,33 @@ Likely outcome:
 Implication:
 ${body.implication ?? "Review the implied posture shift before acting."}`;
 };
+const agentText = (body) => `Agent brief
+
+Cadence: ${body.cadence}
+Record date: ${body.recordDateLabel ?? "Unavailable"}
+Generated at: ${body.generatedAt}
+Summary hash: ${body.summaryHash ?? "n/a"}
+Links:
+- Self: ${body.links?.self ?? "n/a"}
+- llms.txt: ${body.links?.llms ?? "n/a"}
+- Discovery: ${body.links?.discovery ?? "n/a"}
+
+Copy:
+${body.copy ?? ""}
+
+Agent prompt:
+${body.agentHandoff?.prompt ?? ""}
+`;
+
+const resolveAgentCadence = (subcommand, flags) => {
+  const candidate = typeof flags.cadence === "string" ? flags.cadence : subcommand ?? "weekly";
+  if (!SUPPORTED_AGENT_CADENCES.includes(candidate)) {
+    const error = new Error(`Invalid cadence "${candidate}". Expected one of: ${SUPPORTED_AGENT_CADENCES.join(", ")}.`);
+    error.exitCode = EXIT.ERROR;
+    throw error;
+  }
+  return candidate;
+};
 
 const routeWithCommonParams = (base, flags, allowedFlags = ["as-of", "company", "stage", "weeks", "view"]) => {
   const keyMap = {
@@ -859,9 +892,8 @@ ${body.boundedDecision.topDeltas.map((item) => `- ${item.metric} ${item.directio
     : "";
   const context = resolveCompanyContext(settings, flags);
   const rendered = attachCompanyContextText(flags.summary ? body.call.summary : `${statusText(body)}${expandedTail}`, context);
-  const payload = attachCompanyContextPayload(body, context);
-  await writeFileIfRequested(flags, settings.output === "text" ? rendered : payload, settings);
-  writeOutput(settings.output === "text" ? rendered : payload, settings);
+  await writeFileIfRequested(flags, isTextOutput(settings) ? rendered : body, settings);
+  writeOutput(isTextOutput(settings) ? rendered : body, settings);
 };
 
 const cmdCall = async (settings, subcommand, flags) => {
@@ -876,13 +908,12 @@ const cmdCall = async (settings, subcommand, flags) => {
 
   const context = resolveCompanyContext(settings, flags);
   const rendered = attachCompanyContextText(callText(body), context);
-  const payload = attachCompanyContextPayload(body, context);
   if (subcommand === "copy" || flags.copy) {
     return writeOutput(rendered, settings);
   }
 
-  await writeFileIfRequested(flags, settings.output === "text" ? rendered : payload, settings);
-  writeOutput(settings.output === "text" ? rendered : payload, settings);
+  await writeFileIfRequested(flags, isTextOutput(settings) ? rendered : body, settings);
+  writeOutput(isTextOutput(settings) ? rendered : body, settings);
 };
 
 const cmdRegime = async (settings, flags) => {
@@ -894,18 +925,16 @@ const cmdRegime = async (settings, flags) => {
     return writeOutput(attachCompanyContextText(`Regime history\n${plot}`, context), settings);
   }
   const text = attachCompanyContextText(`Regime: ${body.regime}\nPhase: ${body.phase}\nConfidence: ${body.confidence}\nTrend: ${body.trend}\n\nInterpretation:\n${body.interpretation}`, context);
-  const payload = attachCompanyContextPayload(body, context);
-  await writeFileIfRequested(flags, settings.output === "text" ? text : payload, settings);
-  writeOutput(settings.output === "text" ? text : payload, settings);
+  await writeFileIfRequested(flags, isTextOutput(settings) ? text : body, settings);
+  writeOutput(isTextOutput(settings) ? text : body, settings);
 };
 
 const cmdChanges = async (settings, flags) => {
   const body = await getJson(settings, cliRoutes.changes(flags));
   const context = resolveCompanyContext(settings, flags);
   const text = attachCompanyContextText(changesText(body), context);
-  const payload = attachCompanyContextPayload(body, context);
-  await writeFileIfRequested(flags, settings.output === "text" ? text : payload, settings);
-  writeOutput(settings.output === "text" ? text : payload, settings);
+  await writeFileIfRequested(flags, isTextOutput(settings) ? text : body, settings);
+  writeOutput(isTextOutput(settings) ? text : body, settings);
 };
 
 const cmdDiagnostics = async (settings, subcommand, flags) => {
@@ -914,19 +943,23 @@ const cmdDiagnostics = async (settings, subcommand, flags) => {
   const context = resolveCompanyContext(settings, flags);
   if (subcommand === "provenance") {
     const status = await getJson(settings, cliRoutes.status(flags));
-    return writeOutput(attachCompanyContextPayload({ updatedAt: status.updatedAt, confidence: status.confidence, degraded: status.degraded }, context), settings);
+    const payload = { updatedAt: status.updatedAt, confidence: status.confidence, degraded: status.degraded };
+    const text = attachCompanyContextText(
+      `Updated at: ${status.updatedAt ?? "n/a"}\nConfidence: ${status.confidence?.label ?? "n/a"}\nDegraded: ${status.degraded ? "yes" : "no"}`,
+      context,
+    );
+    return writeOutput(isTextOutput(settings) ? text : payload, settings);
   }
   if (subcommand === "evidence") {
     const metric = flags.metric ? String(flags.metric).toLowerCase() : null;
     const filtered = metric ? body.topDrivers.filter((driver) => driver.title.toLowerCase().includes(metric)) : body.topDrivers;
-    const evidencePayload = attachCompanyContextPayload({ ...body, topDrivers: filtered }, context);
+    const evidencePayload = { ...body, topDrivers: filtered };
     const evidenceText = attachCompanyContextText(filtered.map((item, idx) => `${idx + 1}. ${item.title} (${item.directionLabel})`).join("\n"), context);
-    return writeOutput(settings.output === "text" ? evidenceText : evidencePayload, settings);
+    return writeOutput(isTextOutput(settings) ? evidenceText : evidencePayload, settings);
   }
-  const payload = attachCompanyContextPayload(body, context);
   const text = attachCompanyContextText(diagnosticsText(body), context);
-  await writeFileIfRequested(flags, settings.output === "text" ? text : payload, settings);
-  writeOutput(settings.output === "text" ? text : payload, settings);
+  await writeFileIfRequested(flags, isTextOutput(settings) ? text : body, settings);
+  writeOutput(isTextOutput(settings) ? text : body, settings);
 };
 
 const cmdHistory = async (settings, subcommand, flags) => {
@@ -946,9 +979,8 @@ ${body.history[0]?.recordDate ?? "n/a"} latest snapshot`,
   const text = attachCompanyContextText(`Recent History (${body.windowWeeks}w, max ${body.maxWeeks})
 
 ${body.history.map((item) => `${item.recordDate}  ${item.regime}  ${item.confidenceLabel}  ${item.trend}`).join("\n")}`, context);
-  const payload = attachCompanyContextPayload(body, context);
-  await writeFileIfRequested(flags, settings.output === "text" ? text : payload, settings);
-  writeOutput(settings.output === "text" ? text : payload, settings);
+  await writeFileIfRequested(flags, isTextOutput(settings) ? text : body, settings);
+  writeOutput(isTextOutput(settings) ? text : body, settings);
 };
 
 
@@ -959,9 +991,8 @@ const cmdBrief = async (settings, subcommand, flags) => {
   const context = resolveCompanyContext(settings, flags);
   const artifact = buildBriefArtifact(variant, body);
   const rendered = attachCompanyContextText(artifact.rendered, context);
-  const payload = attachCompanyContextPayload(artifact.payload, context);
-  await writeFileIfRequested(flags, settings.output === "text" ? rendered : payload, settings);
-  writeOutput(settings.output === "text" ? rendered : payload, settings);
+  await writeFileIfRequested(flags, isTextOutput(settings) ? rendered : body, settings);
+  writeOutput(isTextOutput(settings) ? rendered : body, settings);
 };
 
 const cmdExport = async (settings, subcommand, flags) => {
@@ -1076,9 +1107,17 @@ const cmdScenario = async (settings, flags) => {
   const body = await getJson(settings, cliRoutes.scenario(flags));
   const context = resolveCompanyContext(settings, flags);
   const text = attachCompanyContextText(scenarioText(body), context);
-  const payload = attachCompanyContextPayload(body, context);
-  await writeFileIfRequested(flags, settings.output === "text" ? text : payload, settings);
-  writeOutput(settings.output === "text" ? text : payload, settings);
+  await writeFileIfRequested(flags, isTextOutput(settings) ? text : body, settings);
+  writeOutput(isTextOutput(settings) ? text : body, settings);
+};
+
+const cmdAgent = async (settings, subcommand, flags) => {
+  if (flags.help) return writeOutput(SUB_HELP.agent, settings);
+  const cadence = resolveAgentCadence(subcommand, flags);
+  const body = await getJson(settings, `/api/agent?cadence=${cadence}`);
+  const text = agentText(body);
+  await writeFileIfRequested(flags, isTextOutput(settings) ? text : body, settings);
+  writeOutput(isTextOutput(settings) ? text : body, settings);
 };
 
 const cmdCompany = async (settings, subcommand, args, flags) => {
@@ -1330,6 +1369,9 @@ const main = async () => {
         return;
       case "ping":
         await cmdPing(settings, parsed.flags);
+        return;
+      case "agent":
+        await cmdAgent(settings, parsed.subcommand, parsed.flags);
         return;
       case "call":
         await cmdCall(settings, parsed.subcommand ?? "show", parsed.flags);
