@@ -1,15 +1,14 @@
 import type { ReactNode } from "react";
 import type { ConfidenceTrendFraming, WeeklyConfidencePoint } from "../../lib/report/reportData";
 import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
-import { decisionAreaLabel, type StartupVariantMode } from "../../lib/report/boundedDecisionRules";
+import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
 import type { RoleAwareOperatingTemplate } from "../../lib/report/operatingCalls";
-import type { StartupModeContent } from "./startupModeSelector";
 import { WeeklyCallModePanel } from "./weeklyCallModePanel";
 import { DecisionHeroSection } from "./weekly-card/DecisionHeroSection";
 import { DiagnosticsSection } from "./weekly-card/DiagnosticsSection";
 import { PostureHistoryTimeline } from "./weekly-card/HistorySection";
 import type { DiagnosticsSectionProps } from "./weekly-card/types";
-import { compactActionCue, compactInset, compactRoleCue, disclosureSummaryClass, sectionSpacing, tierOneHeading, tierOnePanel, tierThreeHeading, tierThreePanel } from "./weekly-card/shared";
+import { compactActionCue, compactInset, disclosureSummaryClass, sectionSpacing, tierOneHeading, tierOnePanel, tierThreeHeading, tierThreePanel } from "./weekly-card/shared";
 import type { RegimeKey } from "../../lib/regimeEngine";
 import type { DecisionMatrixPayload, InputInfluenceItem, StartupVariantPolicy, WeeklyDecisionCardViewModel } from "../../lib/report/homeBriefModel";
 import { buildCompactFreshnessMeta } from "../../lib/report/reportFormatting";
@@ -20,10 +19,6 @@ import {
   buildWeeklyCitationMetaLine,
   buildCompactTrustSummary,
 } from "../../lib/report/trustStatus";
-import {
-  buildRoleTemplateBullets,
-  buildWatchBullets,
-} from "./weekly-card/decisionSupport";
 
 type WeeklyDecisionCardModel =
   & WeeklyDecisionCardViewModel["status"]
@@ -996,54 +991,6 @@ type DecisionTransmissionRailProps = {
   actions?: ReactNode;
 };
 
-type ExecutionLanesSectionProps = {
-  decisionMatrix?: DecisionMatrixPayload;
-  decisionRules: BoundedDecisionRule[];
-  roleAwareTemplates: RoleAwareOperatingTemplate[];
-  startupVariantPolicy: StartupVariantPolicy;
-};
-
-function ExecutionLanesSection({
-  decisionMatrix,
-  decisionRules,
-  roleAwareTemplates,
-  startupVariantPolicy,
-}: ExecutionLanesSectionProps) {
-  const selectedModeOption = startupVariantPolicy.options.find((option) => option.mode === startupVariantPolicy.selectedMode);
-  const selectedModeAdjustment = startupVariantPolicy.adjustmentsByMode[startupVariantPolicy.selectedMode];
-
-  return (
-    <section className="grid gap-4 xl:grid-cols-[minmax(0,1.18fr)_minmax(19rem,0.82fr)]" aria-label="Execution lenses">
-      <BoundedRulesMatrix decisionMatrix={decisionMatrix} decisionRules={decisionRules} />
-      <article className={`${tierOnePanel} ${sectionSpacing}`}>
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className={tierOneHeading}>Role and company translation</h2>
-          {selectedModeOption ? (
-            <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-              {selectedModeOption.label}
-            </span>
-          ) : null}
-        </div>
-        {selectedModeAdjustment ? (
-          <p className="mt-1 text-xs leading-5 text-slate-300">
-            <span className="font-semibold text-slate-100">Current company lens:</span> {selectedModeAdjustment.thresholdEmphasis}
-          </p>
-        ) : null}
-        <div className="mt-3 space-y-3">
-          {roleAwareTemplates.map((template) => (
-            <article key={template.role} className="rounded-xl border border-slate-700/60 bg-slate-950/60 px-3 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">{template.roleLabel}</p>
-              <p className="mt-2 text-xs text-emerald-100"><span className="mr-1 rounded-full border border-emerald-400/35 bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-emerald-100">↑ Now</span>{compactRoleCue(template.doNow)}</p>
-              <p className="mt-2 text-xs text-rose-100"><span className="mr-1 rounded-full border border-rose-400/35 bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-rose-100">∥ Hold</span>{compactRoleCue(template.avoidNow)}</p>
-              <p className="mt-2 text-xs text-sky-100"><span className="mr-1 rounded-full border border-sky-400/35 bg-sky-500/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-100">↺ Flip</span>{compactActionCue(template.flipTrigger)}</p>
-            </article>
-          ))}
-        </div>
-      </article>
-    </section>
-  );
-}
-
 function DecisionTransmissionRail({
   actionNow,
   guardrail,
@@ -1222,12 +1169,9 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
   } = decision;
   const {
     whyItMattersLine,
-    readThisCardItems = [],
-    glossaryHref,
   } = presentation ?? {};
   const {
     regimeDistance,
-    regimeVelocity,
     evidenceItems,
     failureModes = [],
     inputInfluence = [],
@@ -1378,32 +1322,6 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
       },
     },
   } satisfies StartupVariantPolicy;
-  const modeContentByMode = resolvedStartupVariantPolicy.options.reduce<Partial<Record<StartupVariantMode, StartupModeContent>>>((contentMap, option) => {
-    const scopedAdjustment = resolvedStartupVariantPolicy.adjustmentsByMode[option.mode];
-    if (!scopedAdjustment) {
-      return contentMap;
-    }
-
-    contentMap[option.mode] = {
-      description: scopedAdjustment.description,
-      thresholdEmphasis: scopedAdjustment.thresholdEmphasis,
-      doNowBullets: [
-        ...buildRoleTemplateBullets({ roleAwareTemplates, field: "doNow" }),
-        ...scopedAdjustment.doNowAdjustments,
-      ].slice(0, 5),
-      avoidBullets: [
-        ...buildRoleTemplateBullets({ roleAwareTemplates, field: "avoidNow" }),
-        ...scopedAdjustment.avoidAdjustments,
-      ].slice(0, 5),
-      watchBullets: [
-        ...buildWatchBullets({ regimeDistance, regimeVelocity }),
-        ...scopedAdjustment.watchAdjustments,
-      ].slice(0, 5),
-      reversalTriggerDiscipline: scopedAdjustment.reversalTriggerDiscipline,
-    };
-
-    return contentMap;
-  }, {});
   const resolvedRegimeKey = regimeKey ?? "DEFENSIVE";
 
   return (
@@ -1427,7 +1345,6 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
         <main className="space-y-4">
           <WeeklyCallModePanel
             startupVariantPolicy={resolvedStartupVariantPolicy}
-            modeContentByMode={modeContentByMode}
             postureLabel={postureWithStageLabel ?? statusLabel}
             operatingCall={canonicalDecisionCopy?.operatingCall ?? operatingStanceLine}
             trendLabel={trendLabel}
@@ -1441,8 +1358,6 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
             sectionSpacingClassName={sectionSpacing}
             tierOneHeadingClassName={tierOneHeading}
             whyItMattersLine={whyItMattersLine}
-            readThisCardItems={readThisCardItems}
-            glossaryHref={glossaryHref}
             needsTrustWarning={needsTrustWarning}
             trustStateLabel={trustStateLabel}
             trustStateDetail={trustStateDetail}
@@ -1456,13 +1371,6 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
           />
 
           <InputInfluenceSection items={inputInfluence} />
-
-          <ExecutionLanesSection
-            decisionMatrix={decisionMatrix}
-            decisionRules={decisionRules}
-            roleAwareTemplates={roleAwareTemplates}
-            startupVariantPolicy={resolvedStartupVariantPolicy}
-          />
 
           {diagnosticsLane ?? (
             <DiagnosticsSection
@@ -1485,7 +1393,6 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
               failureModes={failureModes}
               historicalTimeline={historicalTimeline}
               sinceLastReview={sinceLastReview}
-              renderBoundedRulesMatrix={({ decisionMatrix: matrix, decisionRules: rules }) => <BoundedRulesMatrix decisionMatrix={matrix} decisionRules={rules} />}
             />
           )}
 

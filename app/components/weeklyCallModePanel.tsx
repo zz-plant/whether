@@ -2,10 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import type { Route } from "../../lib/navigation/routeType";
-import type { StartupVariantMode } from "../../lib/report/boundedDecisionRules";
 import type { StartupVariantPolicy } from "../../lib/report/homeBriefModel";
-import type { StartupModeContent } from "./startupModeSelector";
 
 type PolicyDetails = {
   summary: string;
@@ -22,7 +19,6 @@ type RoleTranslation = {
 
 type WeeklyCallModePanelProps = {
   startupVariantPolicy: StartupVariantPolicy;
-  modeContentByMode: Partial<Record<StartupVariantMode, StartupModeContent>>;
   postureLabel: string;
   operatingCall: string;
   trendLabel: string;
@@ -36,11 +32,6 @@ type WeeklyCallModePanelProps = {
   sectionSpacingClassName: string;
   tierOneHeadingClassName: string;
   whyItMattersLine?: string;
-  readThisCardItems?: Array<{
-    label: string;
-    detail: string;
-  }>;
-  glossaryHref?: string;
   needsTrustWarning?: boolean;
   trustStateLabel: string;
   trustStateDetail: string;
@@ -53,30 +44,8 @@ type WeeklyCallModePanelProps = {
   roleTranslations: RoleTranslation[];
 };
 
-const resolveModeContent = ({
-  startupVariantPolicy,
-  modeContentByMode,
-}: Pick<WeeklyCallModePanelProps, "startupVariantPolicy" | "modeContentByMode">) => {
-  const selectedMode = startupVariantPolicy.selectedMode;
-  const selectedContent = modeContentByMode[selectedMode];
-
-  if (selectedContent) {
-    return {
-      activeContent: selectedContent,
-      selectedModeLabel: startupVariantPolicy.options.find((option) => option.mode === selectedMode)?.label ?? "Default",
-    };
-  }
-
-  const fallbackOption = startupVariantPolicy.options.find((option) => modeContentByMode[option.mode]);
-  return {
-    activeContent: fallbackOption ? modeContentByMode[fallbackOption.mode] : undefined,
-    selectedModeLabel: fallbackOption?.label ?? "Default",
-  };
-};
-
 export function WeeklyCallModePanel({
   startupVariantPolicy,
-  modeContentByMode,
   postureLabel,
   operatingCall,
   trendLabel,
@@ -90,8 +59,6 @@ export function WeeklyCallModePanel({
   sectionSpacingClassName,
   tierOneHeadingClassName,
   whyItMattersLine,
-  readThisCardItems = [],
-  glossaryHref,
   needsTrustWarning = false,
   trustStateLabel,
   trustStateDetail,
@@ -103,10 +70,7 @@ export function WeeklyCallModePanel({
   flipPolicyDetails,
   roleTranslations,
 }: WeeklyCallModePanelProps) {
-  const { activeContent, selectedModeLabel } = resolveModeContent({
-    startupVariantPolicy,
-    modeContentByMode,
-  });
+  const selectedModeLabel = startupVariantPolicy.options.find((option) => option.mode === startupVariantPolicy.selectedMode)?.label ?? "Default";
   const [activeRole, setActiveRole] = useState<RoleTranslation["id"]>("finance");
   const activeRoleTranslation = roleTranslations.find((role) => role.id === activeRole) ?? roleTranslations[0];
   const confidenceValue = Math.max(0, Math.min(100, Math.round(confidencePercent)));
@@ -259,39 +223,6 @@ export function WeeklyCallModePanel({
               </p>
             </div>
           </article>
-        ) : null}
-
-        {activeContent ? (
-          <div className="mt-3 rounded-xl border border-slate-700/60 bg-slate-950/60 px-3 py-3">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Company mode lens</p>
-              <span className="rounded-full border border-slate-700/70 bg-slate-900/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-100">
-                {selectedModeLabel}
-              </span>
-            </div>
-            <p className="mt-2 text-xs leading-5 text-slate-200">{activeContent.description}</p>
-            <p className="mt-1 text-[11px] leading-5 text-slate-300">
-              <span className="font-semibold text-slate-100">Threshold emphasis:</span> {activeContent.thresholdEmphasis}
-            </p>
-          </div>
-        ) : null}
-
-        {readThisCardItems.length > 0 ? (
-          <details className="mt-3 rounded-lg border border-slate-700/60 bg-slate-950/55 px-3 py-2.5">
-            <summary className="min-h-[44px] cursor-pointer pt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Decode this forecast</summary>
-            <ul className="mt-2 grid gap-1.5 text-[11px] text-slate-100">
-              {readThisCardItems.slice(0, 3).map((item) => (
-                <li key={item.label} className="rounded-md border border-slate-700/55 bg-slate-900/55 px-2.5 py-2">
-                  <span className="font-semibold text-slate-200">{item.label}:</span> {item.detail}
-                </li>
-              ))}
-            </ul>
-            {glossaryHref ? (
-              <Link href={glossaryHref as Route} className="mt-2 inline-flex min-h-[44px] items-center text-xs font-semibold text-sky-300 underline underline-offset-2">
-                Open glossary help
-              </Link>
-            ) : null}
-          </details>
         ) : null}
 
         <div className="mt-3 grid gap-2 sm:grid-cols-3">
