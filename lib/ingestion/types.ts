@@ -1,4 +1,4 @@
-export type SignalFamily = "rates" | "spreads" | "labor" | "credit" | "volatility";
+export type SignalFamily = "rates" | "spreads" | "labor" | "inflation" | "credit" | "volatility";
 
 export type SignalKey =
   | "TREASURY_1M"
@@ -7,6 +7,7 @@ export type SignalKey =
   | "TREASURY_10Y"
   | "BBB_CREDIT_SPREAD"
   | "HY_CREDIT_SPREAD"
+  | "CPI_YOY"
   | "UNEMPLOYMENT_RATE"
   | "CHICAGO_FCI"
   | "VIX_INDEX";

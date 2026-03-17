@@ -2,6 +2,8 @@ import { fetchWithTimeout } from "../fetchWithTimeout";
 import type { SignalEntitySnapshot, SignalFamily } from "./types";
 
 const MACRO_SERIES_REVALIDATE_SECONDS = 900;
+const BLS_YOY_LOOKBACK_YEARS = 2;
+const YEAR_OVER_YEAR_PERCENT_MULTIPLIER = 100;
 
 type FamilyFetcher = (fetcher: typeof fetch, ingestedAt: string) => Promise<SignalEntitySnapshot[]>;
 
@@ -58,6 +60,57 @@ const readBlsLatestValue = async (seriesId: string, fetcher: typeof fetch) => {
   return {
     observedAt: `${point.year}-${month.padStart(2, "0")}-01T00:00:00.000Z`,
     value: Number(point.value),
+  };
+};
+
+const readBlsLatestYearOverYear = async (seriesId: string, fetcher: typeof fetch) => {
+  const currentYear = new Date().getUTCFullYear();
+  const response = await fetchWithTimeout(fetcher, "https://api.bls.gov/publicAPI/v2/timeseries/data/", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    next: { revalidate: MACRO_SERIES_REVALIDATE_SECONDS },
+    body: JSON.stringify({
+      seriesid: [seriesId],
+      startyear: String(currentYear - BLS_YOY_LOOKBACK_YEARS),
+      endyear: String(currentYear),
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`BLS request failed for ${seriesId}`);
+  }
+
+  const payload = (await response.json()) as {
+    Results?: { series?: Array<{ data?: Array<{ year: string; period: string; value: string }> }> };
+  };
+
+  const points = (payload.Results?.series?.[0]?.data ?? [])
+    .filter((point) => /^M\d{2}$/.test(point.period) && point.period !== "M13")
+    .sort((a, b) => `${b.year}${b.period}`.localeCompare(`${a.year}${a.period}`));
+  const latest = points[0];
+
+  if (!latest) {
+    throw new Error(`No BLS rows for ${seriesId}`);
+  }
+
+  const previousYearPoint = points.find(
+    (point) => point.period === latest.period && point.year === String(Number(latest.year) - 1),
+  );
+
+  if (!previousYearPoint) {
+    throw new Error(`No prior year BLS row for ${seriesId}`);
+  }
+
+  const latestValue = Number(latest.value);
+  const previousYearValue = Number(previousYearPoint.value);
+  if (!Number.isFinite(latestValue) || !Number.isFinite(previousYearValue) || previousYearValue === 0) {
+    throw new Error(`Invalid BLS rows for ${seriesId}`);
+  }
+
+  const month = latest.period.replace("M", "").padStart(2, "0");
+  return {
+    observedAt: `${latest.year}-${month}-01T00:00:00.000Z`,
+    value: ((latestValue - previousYearValue) / previousYearValue) * YEAR_OVER_YEAR_PERCENT_MULTIPLIER,
   };
 };
 
@@ -158,6 +211,23 @@ const fetchLabor: FamilyFetcher = async (fetcher, ingestedAt) => {
   ];
 };
 
+const fetchInflation: FamilyFetcher = async (fetcher, ingestedAt) => {
+  const cpi = await readBlsLatestYearOverYear("CUUR0000SA0", fetcher);
+  return [
+    {
+      signalKey: "CPI_YOY",
+      family: "inflation",
+      value: cpi.value,
+      unit: "%",
+      source: { label: "BLS public API", url: "https://api.bls.gov/publicAPI/v2/timeseries/data/", seriesId: "CUUR0000SA0" },
+      observedAt: cpi.observedAt,
+      ingestedAt,
+      quality: "observed",
+      confidence: "high",
+    },
+  ];
+};
+
 const fetchCredit: FamilyFetcher = async (fetcher, ingestedAt) => {
   const nfci = await readFredLatestValue("NFCI", fetcher);
   return [
@@ -196,6 +266,7 @@ const familyFetchers: Record<SignalFamily, FamilyFetcher> = {
   rates: fetchRates,
   spreads: fetchSpreads,
   labor: fetchLabor,
+  inflation: fetchInflation,
   credit: fetchCredit,
   volatility: fetchVolatility,
 };
@@ -203,4 +274,4 @@ const familyFetchers: Record<SignalFamily, FamilyFetcher> = {
 export const pullSignalFamily = (family: SignalFamily, fetcher: typeof fetch, ingestedAt: string) =>
   familyFetchers[family](fetcher, ingestedAt);
 
-export const SIGNAL_FAMILIES: SignalFamily[] = ["rates", "spreads", "labor", "credit", "volatility"];
+export const SIGNAL_FAMILIES: SignalFamily[] = ["rates", "spreads", "labor", "inflation", "credit", "volatility"];

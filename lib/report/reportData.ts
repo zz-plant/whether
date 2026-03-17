@@ -39,7 +39,7 @@ import { logReportDependencyFailure } from "./reportError";
 import { buildCanonicalBoundedDecisionRules } from "./boundedDecisionRules";
 import { buildActionStripItems } from "./operatingCalls";
 import { deltaLabelBySignal, resolveSignalDirection, signalOrder } from "./briefFormatting";
-import { buildSourceHealthRows } from "./sourceHealth";
+import { buildSourceHealthRows, getLatestParseableTimestamp } from "./sourceHealth";
 import { cache } from "react";
 import type { TreasuryData } from "../types";
 import { resolveConfidencePercent as resolveConfidencePercentFromAssessment, resolveDistanceToFlip as resolveDistanceToFlipFromInputs } from "./confidence";
@@ -251,6 +251,27 @@ const buildGuidanceBundleFromAssessment = (assessment: ReturnType<typeof evaluat
     stopItems,
     actionStripItems,
   };
+};
+
+const getLatestRecordDate = (dates: Array<string | null | undefined>) => {
+  let latestDate: string | null = null;
+  let latestMs = Number.NEGATIVE_INFINITY;
+
+  for (const date of dates) {
+    if (typeof date !== "string") {
+      continue;
+    }
+
+    const parsedDate = Date.parse(`${date}T00:00:00.000Z`);
+    if (Number.isNaN(parsedDate) || parsedDate <= latestMs) {
+      continue;
+    }
+
+    latestDate = date;
+    latestMs = parsedDate;
+  }
+
+  return latestDate;
 };
 
 export const buildFlipThreshold = (assessment: ReturnType<typeof evaluateRegime>): string => {
@@ -783,12 +804,15 @@ const loadReportDataUncached = async (
     ageLabel: treasuryAgeLabel,
     statusLabel: confidenceLabel,
   };
-  const macroTimestamp = macroSeries[0]?.fetched_at ?? treasury.fetched_at;
-  const macroRecordDate = macroSeries[0]?.record_date ?? treasury.record_date;
+  const freshestMacroSeries = [...macroSeries]
+    .filter((series) => typeof series.fetched_at === "string")
+    .sort((left, right) => Date.parse(right.fetched_at) - Date.parse(left.fetched_at))[0];
+  const macroTimestamp = getLatestParseableTimestamp(macroSeries.map((series) => series.fetched_at)) ?? treasury.fetched_at;
+  const macroRecordDate = getLatestRecordDate(macroSeries.map((series) => series.record_date)) ?? treasury.record_date;
   const macroAgeLabel = formatAgeHours(macroTimestamp, now);
   const macroProvenance = {
     sourceLabel: "FRED & US Treasury",
-    sourceUrl: macroSeries[0]?.sourceUrl,
+    sourceUrl: freshestMacroSeries?.sourceUrl ?? macroSeries[0]?.sourceUrl,
     recordDateLabel: formatDateUTC(macroRecordDate),
     timestampLabel: formatTimestampUTC(macroTimestamp),
     ageLabel: macroAgeLabel,

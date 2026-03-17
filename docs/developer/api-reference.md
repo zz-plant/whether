@@ -75,10 +75,18 @@ Whether exposes read-first JSON endpoints for weekly posture transmission, caden
 ### Weekly agent summary
 
 ```bash
-curl -s "http://localhost:3000/api/agent?cadence=weekly" | jq '{cadence, supportedCadences, links, generatedAt}'
+curl -s "http://localhost:3000/api/agent?cadence=weekly" \
+  | jq '{cadence, supportedCadences, generatedAt, decisionDelta: .agentHandoff.payload.decision_delta.summary, flipTrigger: .agentHandoff.payload.flip_watch.flip_trigger}'
 ```
 
 Invalid cadence returns `400` with `allowedCadences`.
+
+The nested `agentHandoff.payload` now exposes:
+
+- `decision_rules` for bounded operating rules by area
+- `decision_delta` for weekly change interpretation
+- `flip_watch` for primary trigger, reversal conditions, and boundary pressure
+- `skills` for deterministic downstream output ordering
 
 ### Weekly mandate payload
 

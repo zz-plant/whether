@@ -2,6 +2,9 @@
  * Agent handoff helpers for autonomous PM assistants.
  * Provides structured payloads and prompts for downstream automation.
  */
+import { buildCanonicalBoundedDecisionRules, decisionAreaLabel } from "./report/boundedDecisionRules";
+import type { PostureStateContract } from "./report/postureStateContract";
+import type { ReportDynamics } from "./report/reportData";
 import type { RegimeAssessment } from "./regimeEngine";
 import { agentSkills } from "./agentSkills";
 import { getRegimeOperatorLabel } from "./regimeLabels";
@@ -36,13 +39,136 @@ const buildSignals = (
   ];
 };
 
+type AgentDecisionSupport = {
+  reportDynamics: Pick<ReportDynamics, "changedSignals" | "directionLabel" | "regimeChanged">;
+  actionNowShort: string;
+  startItems: string[];
+  stopItems: string[];
+  postureState: Pick<PostureStateContract, "currentState" | "lastCommittedChangeEvent" | "whatFlipsNext">;
+};
+
+const titleCase = (value: string) => (value.length ? `${value[0].toUpperCase()}${value.slice(1)}` : value);
+
+const scoreForSignalKey = (
+  assessment: RegimeAssessment,
+  key: "tightness" | "riskAppetite" | "baseRate" | "curveSlope",
+) =>
+  key === "tightness"
+    ? assessment.scores.tightness
+    : key === "riskAppetite"
+      ? assessment.scores.riskAppetite
+      : key === "baseRate"
+        ? assessment.scores.baseRate
+        : assessment.scores.curveSlope ?? 0;
+
+const decisionEffectForSignal = (
+  key: "tightness" | "riskAppetite" | "baseRate" | "curveSlope",
+  delta: number,
+) => {
+  if (delta === 0) return "hold";
+  if (key === "tightness" || key === "baseRate") {
+    return delta > 0 ? "tighten" : "loosen";
+  }
+  return delta > 0 ? "loosen" : "tighten";
+};
+
+const buildDecisionRules = (assessment: RegimeAssessment) =>
+  buildCanonicalBoundedDecisionRules({
+    regime: assessment.regime,
+    thresholds: assessment.thresholds,
+    scores: {
+      tightness: assessment.scores.tightness,
+      riskAppetite: assessment.scores.riskAppetite,
+    },
+  }).map((rule) => ({
+    area: rule.area,
+    area_label: decisionAreaLabel(rule.area),
+    recommendation: rule.recommendation,
+    do_now: rule.doNow,
+    avoid_now: rule.avoidNow,
+    scope: rule.scope,
+    pause_trigger: rule.pauseTrigger,
+    resume_trigger: rule.resumeTrigger,
+    flip_conditions: rule.flipConditions.map((condition) => ({
+      metric: condition.metric,
+      operator: condition.operator,
+      value: condition.value,
+      label: condition.label,
+    })),
+    rationale: rule.rationale,
+  }));
+
+const buildDecisionDelta = (assessment: RegimeAssessment, support: AgentDecisionSupport) => {
+  const changedSignals = support.reportDynamics.changedSignals.map((signal) => {
+    const to = scoreForSignalKey(assessment, signal.key);
+    const normalizedTo = Number(to.toFixed(2));
+    return {
+      metric: signal.key,
+      label: signal.label,
+      from: Number((to - signal.delta).toFixed(2)),
+      to: normalizedTo,
+      delta: Number(signal.delta.toFixed(2)),
+      direction: signal.delta >= 0 ? ("up" as const) : ("down" as const),
+      decision_effect: decisionEffectForSignal(signal.key, signal.delta),
+    };
+  });
+
+  const summary = support.reportDynamics.regimeChanged
+    ? `Regime changed this week. ${support.actionNowShort}`
+    : changedSignals.length === 0
+      ? `No material weekly signal delta. ${support.actionNowShort}`
+      : `${titleCase(support.reportDynamics.directionLabel)} weekly signal move. ${support.actionNowShort}`;
+
+  return {
+    summary,
+    regime_changed: support.reportDynamics.regimeChanged,
+    direction_label: support.reportDynamics.directionLabel,
+    decision_now: support.actionNowShort,
+    do_now: support.startItems,
+    avoid_now: support.stopItems,
+    changed_signals: changedSignals,
+  };
+};
+
+const buildFlipWatch = (assessment: RegimeAssessment, support: AgentDecisionSupport) => ({
+  summary:
+    support.postureState.currentState.transitionWatch === "ON"
+      ? `Transition watch is ON. ${support.postureState.whatFlipsNext.flipTrigger}`
+      : `Transition watch is OFF. Primary trigger: ${support.postureState.whatFlipsNext.flipTrigger}`,
+  transition_watch: support.postureState.currentState.transitionWatch,
+  nearest_threshold_delta: Number(assessment.diagnostics.nearestThresholdDelta.toFixed(2)),
+  boundary_contributors: assessment.diagnostics.boundaryContributors,
+  weak_read_count: assessment.diagnostics.weakReadCount,
+  two_weak_reads_warning: assessment.diagnostics.twoWeakReadsWarning,
+  flip_trigger: support.postureState.whatFlipsNext.flipTrigger,
+  thresholds: [...support.postureState.whatFlipsNext.thresholds],
+  reversal_conditions: [...support.postureState.whatFlipsNext.reversalConditions],
+  last_committed_change: {
+    timestamp: support.postureState.lastCommittedChangeEvent.timestamp,
+    from_state: support.postureState.lastCommittedChangeEvent.fromState,
+    to_state: support.postureState.lastCommittedChangeEvent.toState,
+    reason: support.postureState.lastCommittedChangeEvent.reason,
+    source: support.postureState.lastCommittedChangeEvent.source,
+  },
+});
+
 export const buildAgentPayload = (
   assessment: RegimeAssessment,
   treasury: TreasuryData,
   sensors: SensorReading[],
-  macros: MacroSeriesReading[]
+  macros: MacroSeriesReading[],
+  options?: {
+    decisionSupport?: AgentDecisionSupport;
+  },
 ) => {
   const regimeLabel = getRegimeOperatorLabel(assessment.regime);
+  const decisionRules = buildDecisionRules(assessment);
+  const decisionDelta = options?.decisionSupport
+    ? buildDecisionDelta(assessment, options.decisionSupport)
+    : null;
+  const flipWatch = options?.decisionSupport
+    ? buildFlipWatch(assessment, options.decisionSupport)
+    : null;
 
   return {
     report_date: treasury.record_date,
@@ -67,12 +193,17 @@ export const buildAgentPayload = (
       fetched_at: macro.fetched_at,
       source_url: macro.sourceUrl,
     })),
+    decision_rules: decisionRules,
+    decision_delta: decisionDelta,
+    flip_watch: flipWatch,
     skills: agentSkills,
     pm_handoff: {
       decision_focus: "Use constraints to validate roadmap, hiring, and pricing moves.",
       briefing_actions: [
         "Summarize the regime in plain English.",
+        "State what changed this week and what decisions should change now.",
         "Call out constraints that block or enable new initiatives.",
+        "Track flip triggers before making irreversible commitments.",
         "List open questions for the product manager.",
       ],
     },
@@ -83,8 +214,11 @@ export const buildAgentPayloadJson = (
   assessment: RegimeAssessment,
   treasury: TreasuryData,
   sensors: SensorReading[],
-  macros: MacroSeriesReading[]
-) => JSON.stringify(buildAgentPayload(assessment, treasury, sensors, macros), null, 2);
+  macros: MacroSeriesReading[],
+  options?: {
+    decisionSupport?: AgentDecisionSupport;
+  },
+) => JSON.stringify(buildAgentPayload(assessment, treasury, sensors, macros, options), null, 2);
 
 export const buildAgentPrompt = (
   assessment: RegimeAssessment,
@@ -95,8 +229,10 @@ export const buildAgentPrompt = (
     "Follow the skills list in the JSON payload and deliver outputs in the same order.",
     "Use the JSON payload to draft:",
     "1) A 3-bullet summary of the capital posture.",
-    "2) The top 3 constraints that should shape roadmap decisions.",
-    "3) A short list of questions to confirm with the PM before acting.",
+    "2) A concise decision delta: what changed this week and what changes now.",
+    "3) The top 3 constraints that should shape roadmap decisions.",
+    "4) A flip watchlist with the trigger, reversal conditions, and current boundary pressure.",
+    "5) A short list of questions to confirm with the PM before acting.",
     "",
     `Context: Whether Report for ${treasury.record_date} (${assessment.regime}).`,
   ].join("\n");

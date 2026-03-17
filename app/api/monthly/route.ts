@@ -1,5 +1,6 @@
 import { buildAgentPayload, buildAgentPrompt } from "../../../lib/agentHandoff";
 import { buildCadenceRouteResponse } from "../../../lib/api/cadenceRoute";
+import { buildPostureState } from "../../../lib/report/postureStateSource";
 import { buildMonthlySummary } from "../../../lib/summary/monthlySummary";
 import { buildSummaryHash } from "../../../lib/summary/summaryHash";
 
@@ -15,9 +16,22 @@ export async function GET() {
         provenance: treasuryProvenance,
         recordDateLabel,
       }),
-    buildExtraPayload: ({ reportData, summary }) => {
-      const { assessment, treasury, sensors, macroSeries } = reportData;
-      const agentPayload = buildAgentPayload(assessment, treasury, sensors, macroSeries);
+    buildExtraPayload: async ({ reportData, summary }) => {
+      const { assessment, treasury, sensors, macroSeries, reportDynamics, actionNowShort, startItems, stopItems } = reportData;
+      const postureState = await buildPostureState({
+        recordDate: treasury.record_date,
+        assessment,
+        reportDynamics,
+      });
+      const agentPayload = buildAgentPayload(assessment, treasury, sensors, macroSeries, {
+        decisionSupport: {
+          reportDynamics,
+          actionNowShort,
+          startItems,
+          stopItems,
+          postureState,
+        },
+      });
       const agentPrompt = buildAgentPrompt(assessment, treasury);
 
       return {

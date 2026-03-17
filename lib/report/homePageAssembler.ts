@@ -5,6 +5,7 @@ import {
 import { loadReportDataSafe, type ReportData, type ReportDataFallback } from "./reportData";
 import { buildTrustStatus } from "./trustStatus";
 import { buildCompactFreshnessMeta } from "./reportFormatting";
+import { formatSourceFreshnessLabel, formatSourceModeLabel } from "./sourceHealth";
 import {
   buildInterpretationLayer,
   isInterpretationView,
@@ -292,6 +293,27 @@ const buildDiagnosticsLanePayload = ({
   historicalTimeline: homeBriefModel.historicalTimeline,
 });
 
+const buildSourceCoverageLine = (rows: ReportData["sourceHealth"] | ReportDataFallback["sourceHealth"]) => {
+  const liveRows = rows.filter((row) => row.mode === "live").map((row) => row.sourceName);
+  const snapshotRows = rows.filter((row) => row.mode === "snapshot").map((row) => row.sourceName);
+  const fallbackRows = rows.filter((row) => row.mode === "fallback").map((row) => row.sourceName);
+  const parts: string[] = [];
+
+  if (liveRows.length > 0) {
+    parts.push(`Live: ${liveRows.join(", ")}`);
+  }
+
+  if (snapshotRows.length > 0) {
+    parts.push(`Slower cadence: ${snapshotRows.join(", ")}`);
+  }
+
+  if (fallbackRows.length > 0) {
+    parts.push(`Degraded: ${fallbackRows.join(", ")}`);
+  }
+
+  return parts.join(" · ");
+};
+
 const buildHomeWorkspaceModel = ({
   reportData,
   diagnosticsLane,
@@ -345,11 +367,11 @@ const buildHomeWorkspaceModel = ({
       trustStatusAction,
       trustStatusTone,
       freshnessSummary: freshnessLabel,
-      sourceCoverageLine: `${reportData.treasuryProvenance.statusLabel} · ${reportData.macroProvenance.statusLabel}`,
-      sourceRows: reportData.sourceHealth.slice(0, 3).map((row) => ({
+      sourceCoverageLine: buildSourceCoverageLine(reportData.sourceHealth),
+      sourceRows: reportData.sourceHealth.map((row) => ({
         sourceName: row.sourceName,
-        modeLabel: row.mode === "live" ? "Live" : "Fallback",
-        freshnessStatus: row.freshnessStatus,
+        modeLabel: formatSourceModeLabel(row.mode),
+        freshnessStatus: formatSourceFreshnessLabel(row),
       })),
       revisitHeadline: diagnosticsLane.revisitDecisions
         ? "YES — revisit this week's approvals now."

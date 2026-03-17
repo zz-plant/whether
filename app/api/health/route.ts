@@ -41,7 +41,7 @@ export async function GET() {
     status:
       source.freshnessStatus === "unknown"
         ? "unknown"
-        : source.freshnessStatus === "fresh" && source.mode === "live"
+        : source.freshnessStatus === "fresh" && source.mode !== "fallback"
           ? "ok"
           : "degraded",
   }));

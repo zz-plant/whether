@@ -14,7 +14,7 @@ export async function GET() {
     "## Primary machine endpoint",
     `- GET ${baseUrl}/api/agent?cadence=<weekly|monthly|quarterly|yearly>`,
     "- Default cadence: weekly",
-    "- Response: JSON summary, provenance, agent handoff payload + prompt, generatedAt, version, discovery links",
+    "- Response: JSON summary, provenance, decision delta, flip watch, agent handoff payload + prompt, generatedAt, version, discovery links",
     "- Invalid cadence behavior: HTTP 400 with allowedCadences",
     "",
     "## Guidance",

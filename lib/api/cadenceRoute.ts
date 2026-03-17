@@ -16,11 +16,14 @@ export const buildCadenceRouteResponse = async <TSummary extends CadenceSummary>
 }: {
   route: string;
   buildSummary: (reportData: CadenceRouteData) => TSummary;
-  buildExtraPayload?: (input: { reportData: CadenceRouteData; summary: TSummary }) => Record<string, unknown>;
+  buildExtraPayload?: (
+    input: { reportData: CadenceRouteData; summary: TSummary }
+  ) => Record<string, unknown> | Promise<Record<string, unknown>>;
 }) => {
   const reportResult = await loadReportDataSafe(undefined, { route });
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
   const summary = buildSummary(reportData);
+  const extraPayload = buildExtraPayload ? await buildExtraPayload({ reportData, summary }) : {};
 
   return NextResponse.json({
     summary,
@@ -30,6 +33,6 @@ export const buildCadenceRouteResponse = async <TSummary extends CadenceSummary>
     generatedAt: new Date().toISOString(),
     version: "v1",
     degraded: !reportResult.ok,
-    ...(buildExtraPayload ? buildExtraPayload({ reportData, summary }) : {}),
+    ...extraPayload,
   });
 };

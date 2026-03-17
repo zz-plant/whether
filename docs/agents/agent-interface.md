@@ -22,6 +22,7 @@ Route: `GET /api/agent?cadence=<weekly|monthly|quarterly|yearly>`
 
 - Defaults to `weekly`.
 - Returns summary copy, provenance, and `agentHandoff` (`payload` + `prompt`).
+- The payload now includes `decision_rules`, `decision_delta`, and `flip_watch` so agents can explain what changed, what should change now, and what would flip the call without reconstructing their own regime logic.
 - Returns HTTP 400 for invalid cadence values.
 - Includes read-only CORS headers for browser-based tool clients.
 - Supports `OPTIONS /api/agent` preflight with `204`.
@@ -75,11 +76,19 @@ The returned payload includes `skills` from `lib/agentSkills.ts`, so agent runti
 - preserve output order for deterministic downstream processing,
 - keep prompting concise while maintaining structure.
 
+Current app-level skills in the payload:
+
+- `regime-summary`
+- `decision-delta`
+- `constraint-translation`
+- `flip-watch`
+- `pm-questions`
+
 ## Recommended usage pattern for agent builders
 
 1. Call `list_agent_skills` once per session (or cache by commit hash).
 2. Call `get_agent_brief` per cadence needed.
-3. Generate outputs in the order declared by `skills`.
+3. Generate outputs in the order declared by `skills`, using `decision_delta` for “what changed / what changes now” and `flip_watch` for bounded reversal monitoring.
 4. Keep provenance and source URLs attached in any user-facing response.
 
 ## Production monitoring endpoints

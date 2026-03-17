@@ -10,6 +10,7 @@ describe("SourceHealthPanel", () => {
         rows={[
           {
             sourceName: "Treasury",
+            cadenceLabel: "Intraday rates",
             freshnessStatus: "stale",
             freshnessSlaHours: 6,
             lastSuccessfulFetchAt: "2026-01-01T01:00:00.000Z",
@@ -22,30 +23,32 @@ describe("SourceHealthPanel", () => {
 
     assert.match(html, /Source health/);
     assert.match(html, /Treasury/);
+    assert.match(html, /Intraday rates/);
     assert.match(html, /Fallback/);
-    assert.match(html, /Stale \(SLA 6h\)/);
+    assert.match(html, /Stale · Intraday rates/);
     assert.match(html, /Upstream treasury timeout\./);
   });
 
-  it("distinguishes unknown freshness from stale freshness", () => {
+  it("distinguishes snapshot-backed freshness from degraded fallback rows", () => {
     const html = renderToStaticMarkup(
       <SourceHealthPanel
         rows={[
           {
-            sourceName: "Macro",
-            freshnessStatus: "unknown",
-            freshnessSlaHours: 24,
-            lastSuccessfulFetchAt: null,
-            activeFallbackReason: "Macro series unavailable; running with fallback snapshot.",
-            mode: "fallback",
+            sourceName: "Startup/private markets",
+            cadenceLabel: "Curated snapshot",
+            freshnessStatus: "fresh",
+            freshnessSlaHours: 1080,
+            lastSuccessfulFetchAt: "2026-02-02T00:00:00.000Z",
+            activeFallbackReason: null,
+            mode: "snapshot",
           },
         ]}
       />,
     );
 
-    assert.match(html, /Macro/);
-    assert.match(html, /Unknown \(SLA 24h\)/);
-    assert.doesNotMatch(html, /Stale \(SLA 24h\)/);
-    assert.match(html, />Unknown<|Unknown \(/);
+    assert.match(html, /Startup\/private markets/);
+    assert.match(html, /Snapshot-backed/);
+    assert.match(html, /Current · Curated snapshot/);
+    assert.match(html, /<td class="px-2 py-2 text-slate-300">—<\/td>/);
   });
 });

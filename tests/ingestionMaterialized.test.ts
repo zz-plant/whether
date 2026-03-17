@@ -4,6 +4,7 @@ import {
   buildCanonicalMacroSeriesFromReadModel,
   buildCanonicalTreasuryFromReadModel,
   buildMaterializedReadModel,
+  resolveSignalFamiliesToRefresh,
 } from "../lib/ingestion/materialized";
 import type { SignalEntitySnapshot } from "../lib/ingestion/types";
 
@@ -53,6 +54,17 @@ const baseSnapshots: SignalEntitySnapshot[] = [
     confidence: "high",
   },
   {
+    signalKey: "CPI_YOY",
+    family: "inflation",
+    value: 3.1,
+    unit: "%",
+    source: { label: "BLS public API", url: "https://api.bls.gov/publicAPI/v2/timeseries/data/", seriesId: "CUUR0000SA0" },
+    observedAt: "2026-01-01T00:00:00.000Z",
+    ingestedAt: "2026-01-10T01:00:00.000Z",
+    quality: "observed",
+    confidence: "high",
+  },
+  {
     signalKey: "VIX_INDEX",
     family: "volatility",
     value: 18,
@@ -85,8 +97,25 @@ describe("materialized ingestion model", () => {
     const model = buildMaterializedReadModel(baseSnapshots, new Date("2026-01-10T02:00:00.000Z"));
     const macro = buildCanonicalMacroSeriesFromReadModel(model);
 
+    const cpi = macro.find((series) => series.id === "CPI_YOY");
     const vix = macro.find((series) => series.id === "VIX_INDEX");
+    assert.equal(cpi?.value, 3.1);
+    assert.equal(cpi?.isLive, true);
     assert.equal(vix?.value, 18);
     assert.equal(vix?.isLive, true);
+  });
+
+  it("refreshes missing families before the model goes stale", () => {
+    const model = buildMaterializedReadModel(baseSnapshots, new Date("2026-01-10T02:00:00.000Z"));
+    const dueFamilies = resolveSignalFamiliesToRefresh(model, new Date("2026-01-10T02:30:00.000Z"));
+
+    assert.deepEqual(dueFamilies, ["spreads", "labor", "credit"]);
+  });
+
+  it("refreshes fast families again after their poll windows elapse", () => {
+    const model = buildMaterializedReadModel(baseSnapshots, new Date("2026-01-10T02:00:00.000Z"));
+    const dueFamilies = resolveSignalFamiliesToRefresh(model, new Date("2026-01-10T03:30:01.000Z"));
+
+    assert.deepEqual(dueFamilies, ["rates", "spreads", "labor", "credit", "volatility"]);
   });
 });

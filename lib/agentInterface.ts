@@ -1,5 +1,6 @@
 import { buildAgentPayload, buildAgentPrompt } from "./agentHandoff";
 import { loadReportData } from "./report/reportData";
+import { buildPostureState } from "./report/postureStateSource";
 import { buildSummaryHash } from "./summary/summaryHash";
 import { buildMonthlySummary } from "./summary/monthlySummary";
 import { buildQuarterlySummary, getQuarterLabel } from "./summary/quarterlySummary";
@@ -17,14 +18,23 @@ export const isAgentCadence = (value: string): value is AgentCadence =>
 export const buildAgentInterfaceResponse = async (cadence: AgentCadence) => {
   const {
     assessment,
+    actionNowShort,
     macroSeries,
+    reportDynamics,
     sensors,
+    startItems,
+    stopItems,
     treasury,
     treasuryProvenance,
     recordDateLabel,
     weeklyRecordDateLabel,
   } =
     await loadReportData();
+  const postureState = await buildPostureState({
+    recordDate: treasury.record_date,
+    assessment,
+    reportDynamics,
+  });
 
   const summary =
     cadence === "weekly"
@@ -53,7 +63,15 @@ export const buildAgentInterfaceResponse = async (cadence: AgentCadence) => {
               periodLabel: getYearLabel(treasury.record_date) ?? recordDateLabel,
             });
 
-  const agentPayload = buildAgentPayload(assessment, treasury, sensors, macroSeries);
+  const agentPayload = buildAgentPayload(assessment, treasury, sensors, macroSeries, {
+    decisionSupport: {
+      reportDynamics,
+      actionNowShort,
+      startItems,
+      stopItems,
+      postureState,
+    },
+  });
   const agentPrompt = buildAgentPrompt(assessment, treasury);
 
   return {

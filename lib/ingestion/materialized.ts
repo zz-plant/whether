@@ -3,7 +3,16 @@ import { SIGNAL_FAMILIES, pullSignalFamily } from "./families";
 import { getDefaultIngestionStore, type IngestionStore } from "./store";
 import type { MacroSeriesReading, TreasuryData } from "../types";
 import { macroSeries as snapshotMacroSeries } from "../macroSnapshot";
-import type { MaterializedSignalReadModel, SignalEntitySnapshot, SignalKey } from "./types";
+import type { MaterializedSignalReadModel, SignalEntitySnapshot, SignalFamily, SignalKey } from "./types";
+
+const signalKeysByFamily: Record<SignalFamily, SignalKey[]> = {
+  rates: ["TREASURY_1M", "TREASURY_3M", "TREASURY_2Y", "TREASURY_10Y"],
+  spreads: ["BBB_CREDIT_SPREAD", "HY_CREDIT_SPREAD"],
+  labor: ["UNEMPLOYMENT_RATE"],
+  inflation: ["CPI_YOY"],
+  credit: ["CHICAGO_FCI"],
+  volatility: ["VIX_INDEX"],
+};
 
 const chooseLatest = (existing: SignalEntitySnapshot | undefined, candidate: SignalEntitySnapshot) => {
   if (!existing) {
@@ -61,12 +70,14 @@ export const buildMaterializedReadModel = (
 export const ingestCanonicalSignals = async ({
   fetcher = fetch,
   store = getDefaultIngestionStore(),
+  families = SIGNAL_FAMILIES,
 }: {
   fetcher?: typeof fetch;
   store?: IngestionStore;
+  families?: SignalFamily[];
 } = {}) => {
   const ingestedAt = new Date().toISOString();
-  const settled = await Promise.allSettled(SIGNAL_FAMILIES.map((family) => pullSignalFamily(family, fetcher, ingestedAt)));
+  const settled = await Promise.allSettled(families.map((family) => pullSignalFamily(family, fetcher, ingestedAt)));
   const snapshots = settled.flatMap((result) => (result.status === "fulfilled" ? result.value : []));
 
   if (snapshots.length > 0) {
@@ -81,6 +92,59 @@ export const ingestCanonicalSignals = async ({
 
 export const loadMaterializedSignals = async (store: IngestionStore = getDefaultIngestionStore()) =>
   store.readLatestMaterialized();
+
+const getLatestFamilyIngestedAt = (model: MaterializedSignalReadModel, family: SignalFamily) => {
+  const timestamps = signalKeysByFamily[family]
+    .map((key) => model.signals[key]?.snapshot.ingestedAt)
+    .filter((value): value is string => typeof value === "string");
+
+  let latestTimestamp: string | null = null;
+  let latestMs = Number.NEGATIVE_INFINITY;
+
+  for (const timestamp of timestamps) {
+    const parsed = Date.parse(timestamp);
+    if (Number.isNaN(parsed) || parsed <= latestMs) {
+      continue;
+    }
+
+    latestTimestamp = timestamp;
+    latestMs = parsed;
+  }
+
+  return latestTimestamp;
+};
+
+const isFamilyRefreshDue = (model: MaterializedSignalReadModel, family: SignalFamily, now: Date) => {
+  const keys = signalKeysByFamily[family];
+  const missingKey = keys.some((key) => !model.signals[key]);
+  if (missingKey) {
+    return true;
+  }
+
+  const latestIngestedAt = getLatestFamilyIngestedAt(model, family);
+  if (!latestIngestedAt) {
+    return true;
+  }
+
+  const latestMs = Date.parse(latestIngestedAt);
+  if (Number.isNaN(latestMs)) {
+    return true;
+  }
+
+  const pollWindowMs = Math.min(...keys.map((key) => SIGNAL_CADENCE[key].pollWindowMs));
+  return now.getTime() - latestMs > pollWindowMs;
+};
+
+export const resolveSignalFamiliesToRefresh = (
+  model: MaterializedSignalReadModel | null,
+  now = new Date(),
+) => {
+  if (!model) {
+    return [...SIGNAL_FAMILIES];
+  }
+
+  return SIGNAL_FAMILIES.filter((family) => isFamilyRefreshDue(model, family, now));
+};
 
 const getSignalValue = (model: MaterializedSignalReadModel, key: SignalKey) => model.signals[key]?.snapshot.value ?? null;
 
@@ -112,6 +176,7 @@ export const buildCanonicalTreasuryFromReadModel = (model: MaterializedSignalRea
 
 const macroSignalMap: Partial<Record<MacroSeriesReading["id"], SignalKey>> = {
   BBB_CREDIT_SPREAD: "BBB_CREDIT_SPREAD",
+  CPI_YOY: "CPI_YOY",
   HY_CREDIT_SPREAD: "HY_CREDIT_SPREAD",
   UNEMPLOYMENT_RATE: "UNEMPLOYMENT_RATE",
   CHICAGO_FCI: "CHICAGO_FCI",
@@ -144,9 +209,10 @@ export const buildCanonicalMacroSeriesFromReadModel = (model: MaterializedSignal
 export const loadCanonicalReportInputs = async (options?: { fetcher?: typeof fetch; store?: IngestionStore }) => {
   const store = options?.store ?? getDefaultIngestionStore();
   let model = await loadMaterializedSignals(store);
+  const familiesToRefresh = resolveSignalFamiliesToRefresh(model);
 
-  if (!model) {
-    await ingestCanonicalSignals({ fetcher: options?.fetcher, store });
+  if (familiesToRefresh.length > 0) {
+    await ingestCanonicalSignals({ fetcher: options?.fetcher, store, families: familiesToRefresh });
     model = await loadMaterializedSignals(store);
   }
 

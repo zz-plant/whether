@@ -1,10 +1,11 @@
-import type { MacroSeriesReading, TreasuryData } from "../types";
+import type { MacroSeriesId, MacroSeriesReading, TreasuryData } from "../types";
 
 export type SourceFreshnessStatus = "fresh" | "stale" | "unknown";
-export type SourceModeStatus = "live" | "fallback";
+export type SourceModeStatus = "live" | "snapshot" | "fallback";
 
 export type SourceHealthRow = {
   sourceName: string;
+  cadenceLabel: string;
   freshnessStatus: SourceFreshnessStatus;
   freshnessSlaHours: number;
   lastSuccessfulFetchAt: string | null;
@@ -12,8 +13,56 @@ export type SourceHealthRow = {
   mode: SourceModeStatus;
 };
 
+type SourceGroupDefinition = {
+  sourceName: string;
+  cadenceLabel: string;
+  freshnessSlaHours: number;
+  ids: MacroSeriesId[];
+  supportsLive: boolean;
+};
+
 const TREASURY_SOURCE_SLA_HOURS = 6;
-const MACRO_SOURCE_SLA_HOURS = 24;
+const MARKET_SOURCE_SLA_HOURS = 24;
+const MONTHLY_RELEASE_SLA_HOURS = 45 * 24;
+const CURATED_SNAPSHOT_SLA_HOURS = 45 * 24;
+
+const macroSourceGroups: SourceGroupDefinition[] = [
+  {
+    sourceName: "Market stress",
+    cadenceLabel: "Intraday market",
+    freshnessSlaHours: MARKET_SOURCE_SLA_HOURS,
+    ids: ["BBB_CREDIT_SPREAD", "HY_CREDIT_SPREAD", "CHICAGO_FCI", "VIX_INDEX"],
+    supportsLive: true,
+  },
+  {
+    sourceName: "Inflation",
+    cadenceLabel: "Monthly release",
+    freshnessSlaHours: MONTHLY_RELEASE_SLA_HOURS,
+    ids: ["CPI_YOY"],
+    supportsLive: true,
+  },
+  {
+    sourceName: "Labor",
+    cadenceLabel: "Monthly release",
+    freshnessSlaHours: MONTHLY_RELEASE_SLA_HOURS,
+    ids: ["UNEMPLOYMENT_RATE"],
+    supportsLive: true,
+  },
+  {
+    sourceName: "Startup/private markets",
+    cadenceLabel: "Curated snapshot",
+    freshnessSlaHours: CURATED_SNAPSHOT_SLA_HOURS,
+    ids: [
+      "VC_FUNDING_VELOCITY",
+      "TECH_LAYOFF_TREND",
+      "SAAS_VALUATION_MULTIPLE",
+      "EARNINGS_REVISION_INDEX",
+      "AI_COMPUTE_COST_TREND",
+      "REGULATORY_RISK_TRACKER",
+    ],
+    supportsLive: false,
+  },
+];
 
 const classifyFreshness = (
   lastSuccessfulFetchAt: string | null | undefined,
@@ -32,31 +81,7 @@ const classifyFreshness = (
   return (now.getTime() - timestamp) / 3_600_000 > freshnessSlaHours ? "stale" : "fresh";
 };
 
-const resolveMacroFallbackReason = ({
-  macroSeries,
-  macroStatusLabel,
-  treasuryFallbackReason,
-}: {
-  macroSeries: MacroSeriesReading[];
-  macroStatusLabel?: string;
-  treasuryFallbackReason?: string | null;
-}) => {
-  if (macroSeries.length > 0) {
-    return null;
-  }
-
-  if (treasuryFallbackReason) {
-    return `Macro series unavailable; ${treasuryFallbackReason}`;
-  }
-
-  if (macroStatusLabel && /fallback|unavailable/i.test(macroStatusLabel)) {
-    return "Macro series unavailable; running with fallback snapshot.";
-  }
-
-  return null;
-};
-
-const getLatestParseableTimestamp = (timestamps: Array<string | null | undefined>): string | null => {
+export const getLatestParseableTimestamp = (timestamps: Array<string | null | undefined>): string | null => {
   let latestTimestamp: string | null = null;
   let latestEpoch = Number.NEGATIVE_INFINITY;
 
@@ -77,6 +102,90 @@ const getLatestParseableTimestamp = (timestamps: Array<string | null | undefined
   return latestTimestamp;
 };
 
+const buildLiveGroupFallbackReason = ({
+  group,
+  relevantSeries,
+  macroStatusLabel,
+}: {
+  group: SourceGroupDefinition;
+  relevantSeries: MacroSeriesReading[];
+  macroStatusLabel?: string;
+}) => {
+  if (relevantSeries.length === 0) {
+    return macroStatusLabel && /fallback|unavailable/i.test(macroStatusLabel)
+      ? `${group.sourceName} unavailable; running without live coverage.`
+      : `${group.sourceName} unavailable; no series were loaded for this refresh.`;
+  }
+
+  const liveSeriesCount = relevantSeries.filter((series) => series.isLive).length;
+  if (liveSeriesCount === relevantSeries.length && relevantSeries.length === group.ids.length) {
+    return null;
+  }
+
+  if (liveSeriesCount > 0) {
+    return `${group.sourceName} is mixing live and cached values for this refresh.`;
+  }
+
+  return `${group.sourceName} is running on cached snapshot values.`;
+};
+
+const buildGroupedRow = ({
+  group,
+  macroSeries,
+  macroStatusLabel,
+  now,
+}: {
+  group: SourceGroupDefinition;
+  macroSeries: MacroSeriesReading[];
+  macroStatusLabel?: string;
+  now: Date;
+}): SourceHealthRow => {
+  const relevantSeries = macroSeries.filter((series) => group.ids.includes(series.id));
+  const lastSuccessfulFetchAt = getLatestParseableTimestamp(relevantSeries.map((series) => series.fetched_at));
+  const liveSeriesCount = relevantSeries.filter((series) => series.isLive).length;
+  const hasCompleteLiveCoverage =
+    group.supportsLive &&
+    relevantSeries.length === group.ids.length &&
+    liveSeriesCount === group.ids.length;
+  const mode: SourceModeStatus = group.supportsLive
+    ? hasCompleteLiveCoverage
+      ? "live"
+      : "fallback"
+    : liveSeriesCount > 0
+      ? "live"
+      : "snapshot";
+
+  return {
+    sourceName: group.sourceName,
+    cadenceLabel: group.cadenceLabel,
+    freshnessStatus: classifyFreshness(lastSuccessfulFetchAt, group.freshnessSlaHours, now),
+    freshnessSlaHours: group.freshnessSlaHours,
+    lastSuccessfulFetchAt,
+    activeFallbackReason: group.supportsLive
+      ? buildLiveGroupFallbackReason({ group, relevantSeries, macroStatusLabel })
+      : null,
+    mode,
+  };
+};
+
+export const formatSourceModeLabel = (mode: SourceModeStatus) => {
+  if (mode === "live") return "Live";
+  if (mode === "snapshot") return "Snapshot-backed";
+  return "Fallback";
+};
+
+export const formatSourceFreshnessLabel = (row: SourceHealthRow) => {
+  if (row.freshnessStatus === "unknown") {
+    return `Unknown · ${row.cadenceLabel}`;
+  }
+
+  if (row.freshnessStatus === "fresh" && row.mode === "snapshot") {
+    return `Current · ${row.cadenceLabel}`;
+  }
+
+  return `${row.freshnessStatus === "fresh" ? "Fresh" : "Stale"} · ${row.cadenceLabel}`;
+};
+
 export const buildSourceHealthRows = ({
   treasury,
   macroSeries,
@@ -91,31 +200,16 @@ export const buildSourceHealthRows = ({
   const treasuryFallbackReason = treasury.fallback_reason ?? null;
   const treasuryLastSuccessfulFetchAt = treasury.fetched_at ?? null;
 
-  const macroLastSuccessfulFetchAt = getLatestParseableTimestamp(
-    macroSeries.map((series) => series.fetched_at),
-  );
-  const macroFallbackReason = resolveMacroFallbackReason({
-    macroSeries,
-    macroStatusLabel,
-    treasuryFallbackReason,
-  });
-
   return [
     {
       sourceName: "Treasury",
+      cadenceLabel: "Intraday rates",
       freshnessStatus: classifyFreshness(treasuryLastSuccessfulFetchAt, TREASURY_SOURCE_SLA_HOURS, now),
       freshnessSlaHours: TREASURY_SOURCE_SLA_HOURS,
       lastSuccessfulFetchAt: treasuryLastSuccessfulFetchAt,
       activeFallbackReason: treasuryFallbackReason,
-      mode: treasuryFallbackReason ? "fallback" : treasury.isLive ? "live" : "fallback",
+      mode: treasuryFallbackReason ? "fallback" : treasury.isLive ? "live" : "snapshot",
     },
-    {
-      sourceName: "Macro",
-      freshnessStatus: classifyFreshness(macroLastSuccessfulFetchAt, MACRO_SOURCE_SLA_HOURS, now),
-      freshnessSlaHours: MACRO_SOURCE_SLA_HOURS,
-      lastSuccessfulFetchAt: macroLastSuccessfulFetchAt,
-      activeFallbackReason: macroFallbackReason,
-      mode: macroFallbackReason ? "fallback" : macroSeries.some((series) => series.isLive) ? "live" : "fallback",
-    },
+    ...macroSourceGroups.map((group) => buildGroupedRow({ group, macroSeries, macroStatusLabel, now })),
   ];
 };

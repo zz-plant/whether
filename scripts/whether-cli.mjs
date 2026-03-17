@@ -820,6 +820,8 @@ Cadence: ${body.cadence}
 Record date: ${body.recordDateLabel ?? "Unavailable"}
 Generated at: ${body.generatedAt}
 Summary hash: ${body.summaryHash ?? "n/a"}
+Decision delta: ${body.agentHandoff?.payload?.decision_delta?.summary ?? body.decision_delta?.summary ?? "n/a"}
+Flip watch: ${body.agentHandoff?.payload?.flip_watch?.flip_trigger ?? body.flip_watch?.flip_trigger ?? "n/a"}
 Links:
 - Self: ${body.links?.self ?? "n/a"}
 - llms.txt: ${body.links?.llms ?? "n/a"}

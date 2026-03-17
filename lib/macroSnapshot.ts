@@ -24,6 +24,13 @@ type LiveSeriesValue = {
   sourceUrl: string;
 };
 
+type LiveSeriesDefinition = {
+  id: MacroSeriesId;
+  load: (fetcher: typeof fetch) => Promise<Omit<LiveSeriesValue, "sourceLabel" | "sourceUrl">>;
+  sourceLabel: string;
+  sourceUrl: string;
+};
+
 const payload = macroSnapshot as MacroSnapshotPayload;
 
 const MACRO_SERIES_REVALIDATE_SECONDS = 900;
@@ -145,56 +152,76 @@ const readBlsLatestYearOverYear = async (seriesId: string, fetcher: typeof fetch
   };
 };
 
+const liveSeriesDefinitions: LiveSeriesDefinition[] = [
+  {
+    id: "CPI_YOY",
+    load: (fetcher) => readBlsLatestYearOverYear("CUUR0000SA0", fetcher),
+    sourceLabel: "BLS public API",
+    sourceUrl: "https://api.bls.gov/publicAPI/v2/timeseries/data/",
+  },
+  {
+    id: "UNEMPLOYMENT_RATE",
+    load: (fetcher) => readBlsLatestValue("LNS14000000", fetcher),
+    sourceLabel: "BLS public API",
+    sourceUrl: "https://api.bls.gov/publicAPI/v2/timeseries/data/",
+  },
+  {
+    id: "BBB_CREDIT_SPREAD",
+    load: (fetcher) => readFredLatestValue("BAA10Y", fetcher),
+    sourceLabel: "FRED",
+    sourceUrl: "https://fred.stlouisfed.org/series/BAA10Y",
+  },
+  {
+    id: "HY_CREDIT_SPREAD",
+    load: (fetcher) => readFredLatestValue("BAMLH0A0HYM2", fetcher),
+    sourceLabel: "FRED",
+    sourceUrl: "https://fred.stlouisfed.org/series/BAMLH0A0HYM2",
+  },
+  {
+    id: "CHICAGO_FCI",
+    load: (fetcher) => readFredLatestValue("NFCI", fetcher),
+    sourceLabel: "FRED",
+    sourceUrl: "https://fred.stlouisfed.org/series/NFCI",
+  },
+  {
+    id: "VIX_INDEX",
+    load: (fetcher) => readFredLatestValue("VIXCLS", fetcher),
+    sourceLabel: "FRED",
+    sourceUrl: "https://fred.stlouisfed.org/series/VIXCLS",
+  },
+];
+
 const buildLiveSeries = async (fetcher: typeof fetch): Promise<MacroSeriesReading[]> => {
-  const [cpi, unemployment, bbbSpread, hySpread, chicagoFci, vix] = await Promise.all([
-    readBlsLatestYearOverYear("CUUR0000SA0", fetcher),
-    readBlsLatestValue("LNS14000000", fetcher),
-    readFredLatestValue("BAA10Y", fetcher),
-    readFredLatestValue("BAMLH0A0HYM2", fetcher),
-    readFredLatestValue("NFCI", fetcher),
-    readFredLatestValue("VIXCLS", fetcher),
-  ]);
+  const settled = await Promise.allSettled(
+    liveSeriesDefinitions.map(async (definition) => {
+      const reading = await definition.load(fetcher);
+      return [
+        definition.id,
+        {
+          value: reading.value,
+          recordDate: reading.recordDate,
+          sourceLabel: definition.sourceLabel,
+          sourceUrl: definition.sourceUrl,
+        } satisfies LiveSeriesValue,
+      ] as const;
+    }),
+  );
+
+  const liveById: Partial<Record<MacroSeriesId, LiveSeriesValue>> = {};
+  for (const result of settled) {
+    if (result.status !== "fulfilled") {
+      continue;
+    }
+
+    const [id, reading] = result.value;
+    liveById[id] = reading;
+  }
+
+  if (Object.keys(liveById).length === 0) {
+    throw new Error("No live macro series available.");
+  }
 
   const nowIso = new Date().toISOString();
-  const liveById: Partial<Record<MacroSeriesId, LiveSeriesValue>> = {
-    CPI_YOY: {
-      value: cpi.value,
-      recordDate: cpi.recordDate,
-      sourceLabel: "BLS public API",
-      sourceUrl: "https://api.bls.gov/publicAPI/v2/timeseries/data/",
-    },
-    UNEMPLOYMENT_RATE: {
-      value: unemployment.value,
-      recordDate: unemployment.recordDate,
-      sourceLabel: "BLS public API",
-      sourceUrl: "https://api.bls.gov/publicAPI/v2/timeseries/data/",
-    },
-    BBB_CREDIT_SPREAD: {
-      value: bbbSpread.value,
-      recordDate: bbbSpread.recordDate,
-      sourceLabel: "FRED",
-      sourceUrl: "https://fred.stlouisfed.org/series/BAA10Y",
-    },
-    HY_CREDIT_SPREAD: {
-      value: hySpread.value,
-      recordDate: hySpread.recordDate,
-      sourceLabel: "FRED",
-      sourceUrl: "https://fred.stlouisfed.org/series/BAMLH0A0HYM2",
-    },
-    CHICAGO_FCI: {
-      value: chicagoFci.value,
-      recordDate: chicagoFci.recordDate,
-      sourceLabel: "FRED",
-      sourceUrl: "https://fred.stlouisfed.org/series/NFCI",
-    },
-    VIX_INDEX: {
-      value: vix.value,
-      recordDate: vix.recordDate,
-      sourceLabel: "FRED",
-      sourceUrl: "https://fred.stlouisfed.org/series/VIXCLS",
-    },
-  };
-
   return snapshotSeries.map((series) => {
     const live = liveById[series.id];
     if (!live) {

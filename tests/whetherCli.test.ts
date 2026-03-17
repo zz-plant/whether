@@ -183,6 +183,12 @@ describe("whether cli", () => {
           cadence,
           defaultCadence: "weekly",
           supportedCadences: ["weekly", "monthly", "quarterly", "yearly"],
+          decision_delta: {
+            summary: `${cadence} delta summary`,
+          },
+          flip_watch: {
+            flip_trigger: `${cadence} flip trigger`,
+          },
           copy: `${cadence} copy`,
           recordDateLabel: "Week of 2026-03-12",
           generatedAt: "2026-03-12T12:00:00.000Z",
@@ -193,7 +199,11 @@ describe("whether cli", () => {
             discovery: "/.well-known/whether-agent.json",
           },
           agentHandoff: {
-            payload: { posture: "guarded" },
+            payload: {
+              posture: "guarded",
+              decision_delta: { summary: `${cadence} nested delta summary` },
+              flip_watch: { flip_trigger: `${cadence} nested flip trigger` },
+            },
             prompt: `Prompt for ${cadence}`,
           },
           version: "v1",
@@ -217,7 +227,9 @@ describe("whether cli", () => {
     const monthlyParsed = JSON.parse(monthly.stdout);
     assert.equal(weeklyParsed.cadence, "weekly");
     assert.equal(weeklyParsed.agentHandoff.prompt, "Prompt for weekly");
+    assert.equal(weeklyParsed.agentHandoff.payload.decision_delta.summary, "weekly nested delta summary");
     assert.equal(monthlyParsed.cadence, "monthly");
+    assert.equal(monthlyParsed.agentHandoff.payload.flip_watch.flip_trigger, "monthly nested flip trigger");
     assert.equal(monthlyParsed.summaryHash, "monthly-hash");
     assert.ok(requests.includes("/api/agent?cadence=weekly"));
     assert.ok(requests.includes("/api/agent?cadence=monthly"));
@@ -231,6 +243,12 @@ describe("whether cli", () => {
           cadence: "weekly",
           defaultCadence: "weekly",
           supportedCadences: ["weekly", "monthly", "quarterly", "yearly"],
+          decision_delta: {
+            summary: "Top-level decision delta",
+          },
+          flip_watch: {
+            flip_trigger: "Top-level flip trigger",
+          },
           copy: "Weekly operator handoff",
           recordDateLabel: "Week of 2026-03-12",
           generatedAt: "2026-03-12T12:00:00.000Z",
@@ -241,7 +259,11 @@ describe("whether cli", () => {
             discovery: "/.well-known/whether-agent.json",
           },
           agentHandoff: {
-            payload: { posture: "guarded" },
+            payload: {
+              posture: "guarded",
+              decision_delta: { summary: "Nested decision delta" },
+              flip_watch: { flip_trigger: "Nested flip trigger" },
+            },
             prompt: "Give me the weekly operator summary.",
           },
           version: "v1",
@@ -259,6 +281,8 @@ describe("whether cli", () => {
 
     assert.equal(result.status, 0);
     assert.match(result.stdout, /Cadence: weekly/);
+    assert.match(result.stdout, /Decision delta: Nested decision delta/);
+    assert.match(result.stdout, /Flip watch: Nested flip trigger/);
     assert.match(result.stdout, /Copy:/);
     assert.match(result.stdout, /Agent prompt:/);
     assert.match(result.stdout, /Give me the weekly operator summary\./);

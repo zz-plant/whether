@@ -25,6 +25,8 @@ describe("agent-facing routes", () => {
       /GET https:\/\/whether\.work\/api\/agent\?cadence=<weekly\|monthly\|quarterly\|yearly>/
     );
     assert.match(body, /Default cadence: weekly/);
+    assert.match(body, /decision delta/i);
+    assert.match(body, /flip watch/i);
     assert.match(body, /\.well-known\/whether-agent\.json/);
   });
 
