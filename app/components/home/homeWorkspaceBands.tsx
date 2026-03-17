@@ -128,11 +128,54 @@ export async function HomeWorkspaceBands({
         </div>
       </section>
 
+      <section id="historical-replay-workspace" className="home-band home-band--history home-band-shell weather-panel weather-section-stage weather-section-stage--long scroll-mt-28 space-y-4 px-4 py-4 sm:px-5" aria-labelledby="historical-replay-workspace-title">
+        <div className="home-band-shell__header space-y-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="home-band-step">02</span>
+            <p className="home-band-kicker">Historical replay</p>
+          </div>
+          <h2 id="historical-replay-workspace-title" className="text-xl font-semibold text-slate-100">Compare this week&apos;s live call with a prior baseline before you lock the plan.</h2>
+          <p className="max-w-3xl text-sm text-slate-300">Use replay as continuity for the weekly ritual: check what changed, what held, and whether today&apos;s approvals are tighter or looser than the earlier read.</p>
+        </div>
+
+        <div className="weather-list-stagger grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+          <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Replay a prior monthly snapshot</p>
+            <div className="mt-3">
+              <HomeHistoricalReplayDatePicker
+                initialDate={workspaceModel.replay.initialDate}
+                forceAdvanced={false}
+                submitHash="#historical-replay-workspace"
+                submitLabel="Replay on home"
+              />
+            </div>
+            <p className="mt-3 text-sm text-slate-300">{workspaceModel.replay.summary}</p>
+            <div className="mt-3">
+              <Link href={workspaceModel.replay.openFullHref as Route} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
+                Open full time machine
+              </Link>
+            </div>
+          </article>
+
+          <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">What this looked like then</p>
+            <ul className="mt-3 space-y-2">
+              {workspaceModel.replay.preview.map((entry) => (
+                <li key={entry.key} className="home-band-list-item rounded-lg border border-slate-800/80 bg-slate-950/50 px-3 py-2">
+                  <p className="text-xs font-semibold text-slate-100">{entry.label}</p>
+                  <p className="mt-1 text-xs text-slate-300">{entry.summary}</p>
+                </li>
+              ))}
+            </ul>
+          </article>
+        </div>
+      </section>
+
       <section id="approve-this-weeks-plan" className="home-band home-band--operations home-band-shell weather-panel weather-section-stage weather-section-stage--medium scroll-mt-28 space-y-4 px-4 py-4 sm:px-5" aria-labelledby="approve-this-weeks-plan-title">
         <div className="home-band-shell__header flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="home-band-step">02</span>
+              <span className="home-band-step">03</span>
               <p className="home-band-kicker">Execution guardrails</p>
             </div>
             <h2 id="approve-this-weeks-plan-title" className="text-xl font-semibold text-slate-100">Lock the operating summary here, then open Operations only for execution detail.</h2>
@@ -184,49 +227,6 @@ export async function HomeWorkspaceBands({
                   <p className="text-xs font-semibold text-slate-100">{item.label}</p>
                   <p className="mt-1 text-xs text-slate-300">{item.actionNow}</p>
                   <p className="mt-1 text-xs text-slate-400">Reverse: {item.reversalCondition}</p>
-                </li>
-              ))}
-            </ul>
-          </article>
-        </div>
-      </section>
-
-      <section id="historical-replay-workspace" className="home-band home-band--history home-band-shell weather-panel weather-section-stage weather-section-stage--long scroll-mt-28 space-y-4 px-4 py-4 sm:px-5" aria-labelledby="historical-replay-workspace-title">
-        <div className="home-band-shell__header space-y-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="home-band-step">03</span>
-            <p className="home-band-kicker">Historical replay</p>
-          </div>
-          <h2 id="historical-replay-workspace-title" className="text-xl font-semibold text-slate-100">Replay any prior month after you lock this week&apos;s live call.</h2>
-          <p className="max-w-3xl text-sm text-slate-300">Use the same replay pattern as Signals when you want context, retrospectives, or a quick comparison to prior conditions.</p>
-        </div>
-
-        <div className="weather-list-stagger grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-          <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Replay a prior monthly snapshot</p>
-            <div className="mt-3">
-              <HomeHistoricalReplayDatePicker
-                initialDate={workspaceModel.replay.initialDate}
-                forceAdvanced={false}
-                submitHash="#historical-replay-workspace"
-                submitLabel="Replay on home"
-              />
-            </div>
-            <p className="mt-3 text-sm text-slate-300">{workspaceModel.replay.summary}</p>
-            <div className="mt-3">
-              <Link href={workspaceModel.replay.openFullHref as Route} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
-                Open full time machine
-              </Link>
-            </div>
-          </article>
-
-          <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">What this looked like then</p>
-            <ul className="mt-3 space-y-2">
-              {workspaceModel.replay.preview.map((entry) => (
-                <li key={entry.key} className="home-band-list-item rounded-lg border border-slate-800/80 bg-slate-950/50 px-3 py-2">
-                  <p className="text-xs font-semibold text-slate-100">{entry.label}</p>
-                  <p className="mt-1 text-xs text-slate-300">{entry.summary}</p>
                 </li>
               ))}
             </ul>

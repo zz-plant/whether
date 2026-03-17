@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Route } from "../../lib/navigation/routeType";
 import type { StartupVariantMode } from "../../lib/report/boundedDecisionRules";
 import type { StartupVariantPolicy } from "../../lib/report/homeBriefModel";
 import {
@@ -161,10 +162,36 @@ export function WeeklyCallModePanel({
             />
           )}
         />
+        {trustCueLine ? (
+          <div className={`mt-2.5 rounded-xl border px-3 py-2 text-[11px] ${needsTrustWarning ? "border-amber-400/30 bg-amber-500/10 text-amber-50" : "border-emerald-400/25 bg-emerald-500/10 text-emerald-50"}`}>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className={`h-2.5 w-2.5 rounded-full ${trustDotClass}`} aria-hidden="true" />
+                <span className="text-[10px] font-semibold uppercase tracking-[0.12em]">{trustStatusLabel}</span>
+              </div>
+              <span className="text-[10px] uppercase tracking-[0.12em] text-current/80">Readiness check</span>
+            </div>
+            <p className="mt-1 leading-5">{needsTrustWarning ? trustWarningCopy ?? trustCueLine : trustCueLine}</p>
+          </div>
+        ) : null}
         {whyItMattersLine ? (
           <p className="mt-2.5 max-w-3xl rounded-xl border border-slate-700/60 bg-slate-950/55 px-3 py-2 text-xs leading-5 text-slate-200">{whyItMattersLine}</p>
         ) : null}
         <ForecastStrip cards={forecastCards} ariaLabel="Weekly decision transmission order" className="mt-3" />
+        {activeContent ? (
+          <div className="mt-3 rounded-xl border border-slate-700/60 bg-slate-950/60 px-3 py-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Company mode lens</p>
+              <span className="rounded-full border border-slate-700/70 bg-slate-900/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-100">
+                {selectedModeLabel}
+              </span>
+            </div>
+            <p className="mt-2 text-xs leading-5 text-slate-200">{activeContent.description}</p>
+            <p className="mt-1 text-[11px] leading-5 text-slate-300">
+              <span className="font-semibold text-slate-100">Threshold emphasis:</span> {activeContent.thresholdEmphasis}
+            </p>
+          </div>
+        ) : null}
         {readThisCardItems.length > 0 ? (
           <details className="mt-3 rounded-lg border border-slate-700/60 bg-slate-950/55 px-3 py-2.5">
             <summary className="cursor-pointer text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Decode this forecast</summary>
@@ -181,29 +208,18 @@ export function WeeklyCallModePanel({
               <span className={compactInsetClassName}>Flip condition = the threshold that changes this week&apos;s call.</span>
             </div>
             {glossaryHref ? (
-              <Link href={glossaryHref} className="mt-2 inline-flex min-h-[44px] items-center text-xs font-semibold text-sky-300 underline underline-offset-2">
+              <Link href={glossaryHref as Route} className="mt-2 inline-flex min-h-[44px] items-center text-xs font-semibold text-sky-300 underline underline-offset-2">
                 Open glossary help
               </Link>
             ) : null}
           </details>
         ) : null}
         <div className="mt-3 grid gap-2 lg:grid-cols-[minmax(0,1.15fr)_minmax(13rem,0.85fr)]">
-          {trustCueLine ? (
-            <div className={`rounded-xl border px-3 py-2 text-[11px] ${needsTrustWarning ? "border-amber-400/30 bg-amber-500/10 text-amber-50" : "border-emerald-400/25 bg-emerald-500/10 text-emerald-50"}`}>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-current/80">Can I rely on this?</p>
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <span className={`h-2.5 w-2.5 rounded-full ${trustDotClass}`} aria-hidden="true" />
-                  <span className="font-semibold uppercase tracking-[0.12em]">{trustStatusLabel}</span>
-                </div>
-                <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.12em] text-current/80">
-                  <span aria-hidden="true">◷</span>
-                  Data status
-                </span>
-              </div>
-              <p className="mt-1 leading-5">{needsTrustWarning ? trustWarningCopy ?? trustCueLine : trustCueLine}</p>
-            </div>
-          ) : null}
+          <div className="rounded-xl border border-slate-700/60 bg-slate-950/60 px-3 py-2">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Spoken shorthand</p>
+            <p className="mt-1 text-sm font-semibold text-slate-100">{operatingCall}</p>
+            <p className="mt-1 text-[11px] text-slate-300">Use this as the planning baseline in Slack or the Monday sync.</p>
+          </div>
           <div className="rounded-xl border border-slate-700/60 bg-slate-950/60 px-3 py-2" aria-label="Decision confidence gauge">
             <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Decision confidence</p>
             <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-slate-800/90" role="progressbar" aria-valuenow={confidenceValue} aria-valuemin={0} aria-valuemax={100} aria-label={`Confidence ${confidenceValue} percent`}>

@@ -64,23 +64,6 @@ export function DiagnosticsSection({
               ) : null}
             </Accordion.Panel>
           </Accordion.Item>
-          <Accordion.Item value="decision-matrix" className="group">
-            <DiagnosticsAccordionTrigger label="Decision lanes" />
-            <Accordion.Panel className={disclosurePanelClass}>{renderBoundedRulesMatrix({ decisionMatrix, decisionRules })}</Accordion.Panel>
-          </Accordion.Item>
-          <Accordion.Item value="role-plan" className="group">
-            <DiagnosticsAccordionTrigger label="Role translation" />
-            <Accordion.Panel className={`${disclosurePanelClass} grid gap-3 sm:grid-cols-2`}>
-              {roleAwareTemplates.map((template) => (
-                <article key={template.role} className="border-l border-slate-700/60 pl-3 py-1 space-y-2">
-                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-200">{template.roleLabel}</p>
-                  <p className="text-xs text-emerald-100"><span className="mr-1 rounded-full border border-emerald-400/35 bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-emerald-100">↑ Now</span>{compactRoleCue(template.doNow)}</p>
-                  <p className="text-xs text-rose-100"><span className="mr-1 rounded-full border border-rose-400/35 bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-rose-100">∥ Hold</span>{compactRoleCue(template.avoidNow)}</p>
-                  <p className="text-xs text-sky-100"><span className="mr-1 rounded-full border border-sky-400/35 bg-sky-500/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-100">↺ Flip</span>{compactActionCue(template.flipTrigger)}</p>
-                </article>
-              ))}
-            </Accordion.Panel>
-          </Accordion.Item>
           <Accordion.Item value="evidence-drivers-model-inputs" className={`${tierThreePanel} ${compactSectionSpacing} group`}>
             <DiagnosticsAccordionTrigger label="Evidence pack" />
             <Accordion.Panel className={disclosurePanelClass}>

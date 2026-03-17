@@ -2,13 +2,14 @@ import type { ReactNode } from "react";
 import type { ConfidenceTrendFraming, WeeklyConfidencePoint } from "../../lib/report/reportData";
 import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
 import { decisionAreaLabel, type StartupVariantMode } from "../../lib/report/boundedDecisionRules";
+import type { RoleAwareOperatingTemplate } from "../../lib/report/operatingCalls";
 import type { StartupModeContent } from "./startupModeSelector";
 import { WeeklyCallModePanel } from "./weeklyCallModePanel";
 import { DecisionHeroSection } from "./weekly-card/DecisionHeroSection";
 import { DiagnosticsSection } from "./weekly-card/DiagnosticsSection";
 import { PostureHistoryTimeline } from "./weekly-card/HistorySection";
 import type { DiagnosticsSectionProps } from "./weekly-card/types";
-import { compactActionCue, compactInset, disclosureSummaryClass, sectionSpacing, tierOneHeading, tierOnePanel, tierThreeHeading, tierThreePanel } from "./weekly-card/shared";
+import { compactActionCue, compactInset, compactRoleCue, disclosureSummaryClass, sectionSpacing, tierOneHeading, tierOnePanel, tierThreeHeading, tierThreePanel } from "./weekly-card/shared";
 import type { RegimeKey } from "../../lib/regimeEngine";
 import type { DecisionMatrixPayload, InputInfluenceItem, StartupVariantPolicy, WeeklyDecisionCardViewModel } from "../../lib/report/homeBriefModel";
 import { buildCompactFreshnessMeta } from "../../lib/report/reportFormatting";
@@ -995,6 +996,54 @@ type DecisionTransmissionRailProps = {
   actions?: ReactNode;
 };
 
+type ExecutionLanesSectionProps = {
+  decisionMatrix?: DecisionMatrixPayload;
+  decisionRules: BoundedDecisionRule[];
+  roleAwareTemplates: RoleAwareOperatingTemplate[];
+  startupVariantPolicy: StartupVariantPolicy;
+};
+
+function ExecutionLanesSection({
+  decisionMatrix,
+  decisionRules,
+  roleAwareTemplates,
+  startupVariantPolicy,
+}: ExecutionLanesSectionProps) {
+  const selectedModeOption = startupVariantPolicy.options.find((option) => option.mode === startupVariantPolicy.selectedMode);
+  const selectedModeAdjustment = startupVariantPolicy.adjustmentsByMode[startupVariantPolicy.selectedMode];
+
+  return (
+    <section className="grid gap-4 xl:grid-cols-[minmax(0,1.18fr)_minmax(19rem,0.82fr)]" aria-label="Execution lenses">
+      <BoundedRulesMatrix decisionMatrix={decisionMatrix} decisionRules={decisionRules} />
+      <article className={`${tierOnePanel} ${sectionSpacing}`}>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className={tierOneHeading}>Role and company translation</h2>
+          {selectedModeOption ? (
+            <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+              {selectedModeOption.label}
+            </span>
+          ) : null}
+        </div>
+        {selectedModeAdjustment ? (
+          <p className="mt-1 text-xs leading-5 text-slate-300">
+            <span className="font-semibold text-slate-100">Current company lens:</span> {selectedModeAdjustment.thresholdEmphasis}
+          </p>
+        ) : null}
+        <div className="mt-3 space-y-3">
+          {roleAwareTemplates.map((template) => (
+            <article key={template.role} className="rounded-xl border border-slate-700/60 bg-slate-950/60 px-3 py-3">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">{template.roleLabel}</p>
+              <p className="mt-2 text-xs text-emerald-100"><span className="mr-1 rounded-full border border-emerald-400/35 bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-emerald-100">↑ Now</span>{compactRoleCue(template.doNow)}</p>
+              <p className="mt-2 text-xs text-rose-100"><span className="mr-1 rounded-full border border-rose-400/35 bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-rose-100">∥ Hold</span>{compactRoleCue(template.avoidNow)}</p>
+              <p className="mt-2 text-xs text-sky-100"><span className="mr-1 rounded-full border border-sky-400/35 bg-sky-500/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-100">↺ Flip</span>{compactActionCue(template.flipTrigger)}</p>
+            </article>
+          ))}
+        </div>
+      </article>
+    </section>
+  );
+}
+
 function DecisionTransmissionRail({
   actionNow,
   guardrail,
@@ -1009,11 +1058,11 @@ function DecisionTransmissionRail({
   ];
 
   return (
-    <article className={`${tierOnePanel} ${sectionSpacing} hidden xl:block`} aria-label="Decision transmission rail">
+    <article className={`${tierOnePanel} ${sectionSpacing}`} aria-label="Decision transmission rail">
       <div className="flex items-center justify-between gap-3">
         <h2 className={tierOneHeading}>Transmit this call</h2>
         <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-          Desktop rail
+          Share-ready
         </span>
       </div>
       <p className="text-xs leading-5 text-slate-300">Keep the shareable decision contract visible while you review the evidence stack.</p>
@@ -1292,6 +1341,13 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
 
           <InputInfluenceSection items={inputInfluence} />
 
+          <ExecutionLanesSection
+            decisionMatrix={decisionMatrix}
+            decisionRules={decisionRules}
+            roleAwareTemplates={roleAwareTemplates}
+            startupVariantPolicy={resolvedStartupVariantPolicy}
+          />
+
           {diagnosticsLane ?? (
             <DiagnosticsSection
               weeklyMemoLines={weeklyMemoLines}
@@ -1331,12 +1387,6 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
 
         </aside>
       </div>
-
-      {actions ? (
-        <div id="primary-artifact-actions" className="rounded-xl border border-sky-500/40 bg-slate-950/92 p-3 sm:hidden" aria-label="Primary artifact actions">
-          {actions}
-        </div>
-      ) : null}
 
       <CitationActionFooter citationMetaLine={citationMetaLine} citation={citation} actions={actions} />
     </section>

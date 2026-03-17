@@ -33,7 +33,7 @@ export type DecisionHeroSectionProps = {
   regimeSignalIndicators?: WeeklyDecisionCardViewModel["diagnostics"]["regimeSignalIndicators"];
   sinceLastReview?: WeeklyDecisionCardViewModel["sinceLastReview"];
   whyItMattersLine?: string;
-  readThisCardItems?: WeeklyDecisionCardViewModel["presentation"] extends { readThisCardItems?: infer T } ? T : never;
+  readThisCardItems?: Array<{ label: string; detail: string }>;
   glossaryHref?: string;
 };
 

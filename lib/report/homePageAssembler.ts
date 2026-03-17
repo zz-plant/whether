@@ -358,8 +358,8 @@ const buildHomeWorkspaceModel = ({
   return {
     sectionLinks,
     workspaceActions: {
-      auditHref: homeSectionSequence[1]?.href ?? "#audit-this-call",
-      operationsHref: homeSectionSequence[2]?.href ?? "#approve-this-weeks-plan",
+      auditHref: "#audit-this-call",
+      operationsHref: "#approve-this-weeks-plan",
     },
     audit: {
       trustStatusLabel,
