@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import type { MouseEvent, ReactNode } from "react";
 import { useClipboardCopy } from "./useClipboardCopy";
 
@@ -16,6 +17,7 @@ export function ReportCta({ href, label, className, copyText, copyTarget, childr
   const { status, activeTarget, copyToClipboard } = useClipboardCopy();
   const resolvedCopyTarget = copyTarget ?? label;
   const isCopying = status === "copying" && activeTarget === resolvedCopyTarget;
+  const isInternalHref = href.startsWith("/") || href.startsWith("#");
 
   const handleCopyClick = async (event: MouseEvent<HTMLAnchorElement>) => {
     if (!copyText) {
@@ -32,6 +34,14 @@ export function ReportCta({ href, label, className, copyText, copyTarget, childr
       window.location.assign(href);
     }
   };
+
+  if (!copyText && isInternalHref) {
+    return (
+      <Link href={href} className={className}>
+        {children ?? label}
+      </Link>
+    );
+  }
 
   return (
     <a

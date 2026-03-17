@@ -1,11 +1,6 @@
-"use client";
-
-import { Dialog } from "@base-ui/react/dialog";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
 import type { StartupVariantMode } from "../../lib/report/boundedDecisionRules";
 import type { StartupVariantPolicy } from "../../lib/report/homeBriefModel";
-import { homeSectionSequence } from "../../lib/report/homeSections";
 import {
   ForecastConditionsHeader,
   ForecastStatsGrid,
@@ -13,12 +8,6 @@ import {
   type ForecastStripCardData,
 } from "./forecastStrip";
 import type { StartupModeContent } from "./startupModeSelector";
-
-const callSectionHref = homeSectionSequence[0]?.href ?? "#weekly-posture-brief-title";
-const auditSectionHref = homeSectionSequence[1]?.href ?? "#audit-this-call";
-const executionSectionHref = homeSectionSequence[2]?.href ?? "#approve-this-weeks-plan";
-const historicalReplaySectionHref = homeSectionSequence[3]?.href ?? "#historical-replay-workspace";
-const toolsSectionHref = homeSectionSequence[4]?.href ?? "#translate-or-run-tool";
 
 type WeeklyCallModePanelProps = {
   startupVariantPolicy: StartupVariantPolicy;
@@ -47,16 +36,26 @@ type WeeklyCallModePanelProps = {
   trustWarningCopy?: string;
 };
 
-const commandActions = [
-  { label: "Jump: This week's call", href: callSectionHref, type: "Section" },
-  { label: "Jump: Audit this call", href: auditSectionHref, type: "Section" },
-  { label: "Jump: Historical replay", href: historicalReplaySectionHref, type: "Section" },
-  { label: "Jump: Approve this week's plan", href: executionSectionHref, type: "Section" },
-  { label: "Jump: Translate or run a tool", href: toolsSectionHref, type: "Section" },
-  { label: "Open Signals", href: "/signals", type: "Page" },
-  { label: "Open Operations", href: "/operations", type: "Page" },
-  { label: "Open Decide", href: "/decide", type: "Page" },
-] as const;
+const resolveModeContent = ({
+  startupVariantPolicy,
+  modeContentByMode,
+}: Pick<WeeklyCallModePanelProps, "startupVariantPolicy" | "modeContentByMode">) => {
+  const selectedMode = startupVariantPolicy.selectedMode;
+  const selectedContent = modeContentByMode[selectedMode];
+
+  if (selectedContent) {
+    return {
+      activeContent: selectedContent,
+      selectedModeLabel: startupVariantPolicy.options.find((option) => option.mode === selectedMode)?.label ?? "Default",
+    };
+  }
+
+  const fallbackOption = startupVariantPolicy.options.find((option) => modeContentByMode[option.mode]);
+  return {
+    activeContent: fallbackOption ? modeContentByMode[fallbackOption.mode] : undefined,
+    selectedModeLabel: fallbackOption?.label ?? "Default",
+  };
+};
 
 export function WeeklyCallModePanel({
   startupVariantPolicy,
@@ -81,23 +80,16 @@ export function WeeklyCallModePanel({
   needsTrustWarning = false,
   trustWarningCopy,
 }: WeeklyCallModePanelProps) {
-  const firstAvailableMode = startupVariantPolicy.options.find((option) => modeContentByMode[option.mode])?.mode;
-  const [activeMode, setActiveMode] = useState<StartupVariantMode>(startupVariantPolicy.selectedMode);
-  const [commandOpen, setCommandOpen] = useState(false);
-  const [commandQuery, setCommandQuery] = useState("");
-  const [stageControlsReady, setStageControlsReady] = useState(false);
+  const { activeContent, selectedModeLabel } = resolveModeContent({
+    startupVariantPolicy,
+    modeContentByMode,
+  });
 
-  const effectiveMode = modeContentByMode[activeMode]
-    ? activeMode
-    : (modeContentByMode[startupVariantPolicy.selectedMode] ? startupVariantPolicy.selectedMode : firstAvailableMode);
-  const activeContent = effectiveMode ? modeContentByMode[effectiveMode] : undefined;
-  const selectedModeLabel = startupVariantPolicy.options.find((option) => option.mode === effectiveMode)?.label;
-
-  const modeAdjustedSnapshot = useMemo(() => ({
+  const modeAdjustedSnapshot = {
     doNow: activeContent?.doNowBullets[0] ?? snapshotDoNow,
     avoid: activeContent?.avoidBullets[0] ?? snapshotAvoid,
     watch: activeContent?.watchBullets[0] ?? snapshotWatch,
-  }), [activeContent, snapshotAvoid, snapshotDoNow, snapshotWatch]);
+  };
 
   const confidenceValue = Math.max(0, Math.min(100, Math.round(confidencePercent)));
   const confidenceToneClass = confidenceLabel === "HIGH"
@@ -110,7 +102,6 @@ export function WeeklyCallModePanel({
     : confidenceLabel === "MED"
       ? "weather-live-hero weather-live-hero--medium"
       : "weather-live-hero weather-live-hero--low";
-  const stageSummary = selectedModeLabel ?? "Default";
   const trustDotClass = needsTrustWarning ? "bg-amber-300" : "bg-emerald-300";
   const trustStatusLabel = needsTrustWarning ? "Degraded" : "Live";
   const followUpFlipLabels = effectiveFlipLabels
@@ -147,28 +138,6 @@ export function WeeklyCallModePanel({
     },
   ];
 
-  const filteredCommandActions = commandActions.filter((action) =>
-    `${action.label} ${action.type}`.toLowerCase().includes(commandQuery.trim().toLowerCase())
-  );
-
-
-  useEffect(() => {
-    setStageControlsReady(true);
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      const isCommandShortcut = (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k";
-      if (!isCommandShortcut) {
-        return;
-      }
-
-      event.preventDefault();
-      setCommandOpen(true);
-    };
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
-
   return (
     <>
       <article className={`rounded-[1.2rem] border border-slate-700/75 bg-slate-950/92 p-3 sm:p-3.5 ${heroUrgencyClass}`} aria-label="Weekly call snapshot">
@@ -185,7 +154,7 @@ export function WeeklyCallModePanel({
             <ForecastStatsGrid
               stats={[
                 { label: "Confidence", value: `${confidenceValue}%` },
-                { label: "Stage view", value: stageSummary },
+                { label: "Stage view", value: selectedModeLabel },
                 { label: "Signal state", value: confidenceLabel },
               ]}
               className="lg:min-w-[19rem]"
@@ -254,107 +223,18 @@ export function WeeklyCallModePanel({
           <p className="border-l-2 border-sky-400/45 pl-3 py-1.5"><span className="font-semibold uppercase tracking-[0.08em] text-sky-200">FLIP WHEN</span> {modeAdjustedSnapshot.watch}</p>
         </div>
 
-        <div className="border-t border-slate-800/55 pt-3">
-          <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
-            <div>
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Refine by company stage</p>
-                <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-200">
-                  {stageSummary}
-                </span>
-              </div>
-              <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Stage view</p>
-              <p className="mt-2 text-[11px] leading-5 text-slate-300">
-                <span className="font-semibold text-slate-100">Stage selected:</span> {stageSummary}
-              </p>
-              {stageControlsReady ? (
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {startupVariantPolicy.options.map((option) => {
-                    const selected = option.mode === effectiveMode;
-                    return (
-                      <button
-                        key={option.mode}
-                        type="button"
-                        onClick={() => setActiveMode(option.mode)}
-                        className={`min-h-[44px] rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.06em] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation ${
-                          selected
-                            ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
-                            : "border-slate-700/70 bg-slate-950/70 text-slate-300 hover:border-slate-500/80"
-                        }`}
-                        aria-pressed={selected}
-                      >
-                        {option.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="mt-2">
-                  <span className="inline-flex min-h-[44px] items-center rounded-full border border-sky-400/70 bg-sky-500/20 px-3 py-2 text-xs font-semibold tracking-[0.06em] text-sky-100">
-                    {stageSummary}
-                  </span>
-                </div>
-              )}
-              {activeContent ? (
-                <p className="mt-2 text-[11px] leading-5 text-slate-300">
-                  {activeContent.description} Threshold emphasis: {activeContent.thresholdEmphasis}
-                </p>
-              ) : null}
-            </div>
-            <button
-              type="button"
-              onClick={() => setCommandOpen(true)}
-              className="flex min-h-[44px] w-full items-center justify-between gap-2 rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-left text-xs font-semibold tracking-[0.06em] text-slate-200 transition hover:border-slate-500/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 sm:min-w-[14rem]"
-            >
-              <span>Open command palette</span>
-              <span aria-hidden="true" className="text-sm">⌘K / Ctrl+K</span>
-            </button>
-          </div>
-          <p className="mt-2 text-[11px] text-slate-300">Mode-adjusted call is live above. Use command palette only to jump between sections.</p>
+        <div className="mt-3 grid gap-2 sm:grid-cols-3">
+          <a href="#audit-this-call" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100">
+            Audit this call
+          </a>
+          <a href="#approve-this-weeks-plan" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100">
+            Approve the plan
+          </a>
+          <Link href="/signals" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100">
+            Open Signals
+          </Link>
         </div>
       </article>
-
-      <Dialog.Root open={commandOpen} onOpenChange={setCommandOpen}>
-        <Dialog.Portal>
-          <Dialog.Backdrop className="fixed inset-0 z-40 bg-slate-950/70" />
-          <Dialog.Popup className="fixed inset-x-4 top-1/2 z-50 mx-auto w-full max-w-xl -translate-y-1/2 rounded-2xl border border-slate-700/80 bg-slate-950/98 p-4 shadow-2xl">
-            <Dialog.Title className="text-sm font-semibold tracking-[0.08em] text-slate-100">Command palette</Dialog.Title>
-            <Dialog.Description className="mt-1 text-xs text-slate-300">Jump directly to decision sections or adjacent report pages.</Dialog.Description>
-            <input
-              value={commandQuery}
-              onChange={(event) => setCommandQuery(event.target.value)}
-              placeholder="Search commands..."
-              className="mt-3 min-h-[44px] w-full rounded-md border border-slate-700/80 bg-slate-950/80 px-3 text-sm text-slate-100 placeholder:text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-            />
-            <ul className="mt-3 max-h-64 space-y-2 overflow-auto">
-              {filteredCommandActions.map((action) => (
-                <li key={action.href}>
-                  {action.href.startsWith("/") ? (
-                    <Link
-                      href={action.href}
-                      onClick={() => setCommandOpen(false)}
-                      className="inline-flex min-h-[44px] w-full items-center justify-between rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-left text-xs font-semibold tracking-[0.08em] text-slate-100 hover:border-sky-400/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-                    >
-                      <span>{action.label}</span>
-                      <span className="text-[10px] uppercase text-slate-400">{action.type}</span>
-                    </Link>
-                  ) : (
-                    <a
-                      href={action.href}
-                      onClick={() => setCommandOpen(false)}
-                      className="inline-flex min-h-[44px] w-full items-center justify-between rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-left text-xs font-semibold tracking-[0.08em] text-slate-100 hover:border-sky-400/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-                    >
-                      <span>{action.label}</span>
-                      <span className="text-[10px] uppercase text-slate-400">{action.type}</span>
-                    </a>
-                  )}
-                </li>
-              ))}
-              {filteredCommandActions.length === 0 ? <li className="text-xs text-slate-400">No command matches your search.</li> : null}
-            </ul>
-          </Dialog.Popup>
-        </Dialog.Portal>
-      </Dialog.Root>
     </>
   );
 }

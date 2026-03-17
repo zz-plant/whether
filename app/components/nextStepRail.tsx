@@ -37,14 +37,15 @@ export function NextStepRail({ currentPath }: { currentPath: string }) {
     : "Use Weekly Brief as the canonical workspace. Open depth pages only when the decision needs more detail.";
 
   return (
-    <section className="weather-panel space-y-4 px-6 py-5" aria-label="Next step rail">
+    <section className="weather-hub-section" aria-label="Next step rail">
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div className="space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Next step</p>
-          <p className="text-sm text-slate-300">{introCopy}</p>
+          <p className="weather-hub-section-eyebrow">Next step</p>
+          <h2 className="text-xl font-semibold text-white">Keep the decision thread compact</h2>
+          <p className="max-w-3xl text-sm leading-7 text-slate-300">{introCopy}</p>
         </div>
         {currentAction ? (
-          <div className="weather-stat-card min-w-[14rem]">
+          <div className="weather-hub-card min-w-[14rem] px-4 py-4">
             <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">
               {currentLayer?.tier === "supporting" ? "Supporting surface" : "You are here"}
             </p>
@@ -56,9 +57,9 @@ export function NextStepRail({ currentPath }: { currentPath: string }) {
         ) : null}
       </div>
 
-      <div className="weather-route-card flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+      <div className="weather-hub-card flex flex-col gap-3 px-4 py-4 md:flex-row md:items-end md:justify-between">
         <div className="space-y-1">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-sky-200">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-amber-200">
             {currentLayer?.tier === "supporting" && parentLayer
               ? "Primary parent"
               : recommendedAction.href === "/"
@@ -89,7 +90,7 @@ export function NextStepRail({ currentPath }: { currentPath: string }) {
               <span
                 key={action.href}
                 aria-current="page"
-                className="weather-pill inline-flex min-h-[44px] items-center border-sky-300/80 px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-100"
+                className="weather-hub-chip weather-hub-chip-active"
               >
                 {action.label}
               </span>
@@ -100,7 +101,7 @@ export function NextStepRail({ currentPath }: { currentPath: string }) {
             <Link
               key={action.href}
               href={action.href}
-              className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100"
+              className="weather-hub-chip"
             >
               {action.label}
             </Link>

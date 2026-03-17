@@ -1,11 +1,7 @@
 "use client";
 
-import { Button } from "@base-ui/react/button";
-import { Dialog } from "@base-ui/react/dialog";
-import { Popover } from "@base-ui/react/popover";
-import { useState, type ComponentProps } from "react";
+import { useState, type ButtonHTMLAttributes } from "react";
 import { useClipboardCopy } from "./useClipboardCopy";
-import { useHapticFeedback } from "./useHapticFeedback";
 import { trackContentCtaConversion } from "../../lib/contentMeasurement";
 
 type PrimaryActionType = "copy_weekly_brief";
@@ -41,9 +37,9 @@ function ActionButton({
   variant,
   className,
   ...props
-}: ComponentProps<typeof Button> & { variant: ActionButtonVariant }) {
+}: ButtonHTMLAttributes<HTMLButtonElement> & { variant: ActionButtonVariant }) {
   const variantClassName = actionButtonVariantClassNames[variant];
-  return <Button {...props} className={className ? `${variantClassName} ${className}` : variantClassName} />;
+  return <button {...props} className={className ? `${variantClassName} ${className}` : variantClassName} />;
 }
 
 const trackFirstActionConversion = (action: PrimaryActionType) => {
@@ -69,8 +65,7 @@ export function CopyLeadershipArtifactsButtons({
   fallbackActive?: boolean;
 }) {
   const { status, activeTarget, copyToClipboard } = useClipboardCopy();
-  const haptic = useHapticFeedback();
-  const [confirmPrintOpen, setConfirmPrintOpen] = useState(false);
+  const [moreActionsOpen, setMoreActionsOpen] = useState(false);
   const isCopying = status === "copying";
 
   const copyState = (target: CopyTarget): CopyState =>
@@ -97,13 +92,11 @@ export function CopyLeadershipArtifactsButtons({
   ].join("\n");
 
   const runExportPdf = () => {
-    haptic.confirm();
     window.print();
   };
 
   const handleExportPdf = () => {
-    if (fallbackActive) {
-      setConfirmPrintOpen(true);
+    if (fallbackActive && !window.confirm("Cached snapshot active. Confirm export before sharing this brief.")) {
       return;
     }
     runExportPdf();
@@ -152,78 +145,50 @@ export function CopyLeadershipArtifactsButtons({
           {copyLabel("Weekly operator brief", "Copy Weekly Operator Brief")}
         </ActionButton>
 
-        <Popover.Root>
-          <Popover.Trigger
-            className={`${actionButtonVariantClassNames.secondary} w-auto gap-1.5 px-4 text-slate-200`}
-          >
+        <ActionButton
+          variant="secondary"
+          type="button"
+          className="w-auto gap-1.5 px-4 text-slate-200"
+          aria-expanded={moreActionsOpen}
+          onClick={() => setMoreActionsOpen((open) => !open)}
+        >
             More share actions
             <span aria-hidden="true" className="text-sm">▾</span>
-          </Popover.Trigger>
-          <Popover.Portal>
-            <Popover.Positioner sideOffset={8}>
-              <Popover.Popup className="z-50 w-64 rounded-xl border border-slate-700/80 bg-slate-950/98 p-2 shadow-2xl">
-                <div className="space-y-2">
-                  <ActionButton
-                    variant="secondary"
-                    type="button"
-                    onClick={() => copyToClipboard(boardSummary, "Board")}
-                    disabled={isCopying}
-                    aria-busy={isCopying}
-                  >
-                    {copyLabel("Board", "Copy board summary")}
-                  </ActionButton>
-                  <ActionButton
-                    variant="secondary"
-                    type="button"
-                    onClick={() => copyToClipboard(citation, "Citation")}
-                    disabled={isCopying}
-                    aria-busy={isCopying}
-                  >
-                    {copyLabel("Citation", "Copy citation")}
-                  </ActionButton>
-                  <ActionButton variant="secondary" type="button" onClick={handleExportPdf}>
-                    Export / print PDF
-                  </ActionButton>
-                  {fallbackActive ? (
-                    <p className="px-1 text-[10px] text-amber-200">
-                      Cached snapshot active: confirm irreversible sharing actions before export.
-                    </p>
-                  ) : null}
-                </div>
-              </Popover.Popup>
-            </Popover.Positioner>
-          </Popover.Portal>
-        </Popover.Root>
+        </ActionButton>
       </div>
 
-      <Dialog.Root open={confirmPrintOpen} onOpenChange={setConfirmPrintOpen}>
-        <Dialog.Portal>
-          <Dialog.Backdrop className="fixed inset-0 z-40 bg-slate-950/75" />
-          <Dialog.Popup className="fixed inset-x-4 top-1/2 z-50 mx-auto w-full max-w-lg -translate-y-1/2 rounded-2xl border border-amber-400/50 bg-slate-950/98 p-4 shadow-2xl">
-            <Dialog.Title className="text-sm font-semibold tracking-[0.08em] text-amber-100">
-              Cached snapshot active — confirm export
-            </Dialog.Title>
-            <Dialog.Description className="mt-2 text-xs text-slate-200">
-              You are exporting while live data fallback is active. Keep decisions to hold/revisit path and avoid irreversible approvals until live refresh resumes.
-            </Dialog.Description>
-            <div className="mt-4 flex flex-wrap justify-end gap-2">
-              <Dialog.Close className={`${actionButtonVariantClassNames.secondary} w-auto px-4 text-slate-200`}>
-                Cancel
-              </Dialog.Close>
-              <ActionButton
-                variant="confirm"
-                type="button"
-                onClick={() => {
-                  setConfirmPrintOpen(false);
-                  runExportPdf();
-                }}
-              >
-                Continue export
-              </ActionButton>
-            </div>
-          </Dialog.Popup>
-        </Dialog.Portal>
-      </Dialog.Root>
+      {moreActionsOpen ? (
+        <div className="rounded-xl border border-slate-700/80 bg-slate-950/98 p-2 shadow-2xl">
+          <div className="grid gap-2 sm:grid-cols-3">
+            <ActionButton
+              variant="secondary"
+              type="button"
+              onClick={() => copyToClipboard(boardSummary, "Board")}
+              disabled={isCopying}
+              aria-busy={isCopying}
+            >
+              {copyLabel("Board", "Copy board summary")}
+            </ActionButton>
+            <ActionButton
+              variant="secondary"
+              type="button"
+              onClick={() => copyToClipboard(citation, "Citation")}
+              disabled={isCopying}
+              aria-busy={isCopying}
+            >
+              {copyLabel("Citation", "Copy citation")}
+            </ActionButton>
+            <ActionButton variant="secondary" type="button" onClick={handleExportPdf}>
+              Export / print PDF
+            </ActionButton>
+          </div>
+          {fallbackActive ? (
+            <p className="mt-2 px-1 text-[10px] text-amber-200">
+              Cached snapshot active: confirm irreversible sharing actions before export.
+            </p>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   );
 }

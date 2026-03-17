@@ -1,60 +1,45 @@
 import Link from "next/link";
-import { headers } from "next/headers";
 import { navigationGroupLabels, primaryNavigationLayers } from "../../lib/navigation/informationArchitecture";
-import { reportShellCorePaths } from "../../lib/report/reportNavigation";
 import { GlobalHeaderNavClient } from "./globalHeaderNavClient";
+import { GlobalHeaderRouteGate } from "./globalHeaderRouteGate";
 import { GlobalHeaderTaglineClient } from "./globalHeaderTaglineClient";
 import { ThemeToggleButton } from "./themeToggleButton";
 
-function normalizePathname(pathname: string) {
-  if (pathname !== "/" && pathname.endsWith("/")) {
-    return pathname.slice(0, -1);
-  }
-
-  return pathname;
-}
-
 export async function GlobalHeader() {
-  const requestHeaders = await headers();
-  const pathname = normalizePathname(requestHeaders.get("x-whether-pathname") ?? "/");
-  const isReportShellRoute = reportShellCorePaths.some((route) => route === pathname);
-
-  if (isReportShellRoute) {
-    return null;
-  }
-
   return (
-    <header className="mx-auto w-full max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
-      <div className="weather-appbar px-4 py-4 sm:px-6 sm:py-5">
-        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-start">
-          <div className="min-w-0 space-y-3">
-            <Link
-              href="/"
-              className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/70 bg-slate-900/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-slate-200 hover:border-sky-400/70 hover:text-sky-100"
-            >
-              Whether
-            </Link>
-            <GlobalHeaderTaglineClient />
+    <GlobalHeaderRouteGate>
+      <header className="mx-auto w-full max-w-7xl px-4 pt-4 sm:px-6 lg:px-8">
+        <div className="weather-appbar px-4 py-4 sm:px-6 sm:py-5">
+          <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-start">
+            <div className="min-w-0 space-y-3">
+              <Link
+                href="/"
+                className="inline-flex min-h-[44px] items-center rounded-full border border-slate-700/70 bg-slate-900/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] text-slate-200 hover:border-sky-400/70 hover:text-sky-100"
+              >
+                Whether
+              </Link>
+              <GlobalHeaderTaglineClient />
+            </div>
+            <div className="flex flex-wrap items-center gap-2 xl:justify-end">
+              <Link
+                href="/search"
+                className="weather-button inline-flex min-h-[44px] items-center justify-center px-3 text-xs font-semibold uppercase tracking-[0.08em]"
+                aria-label="Open global search"
+              >
+                Search
+              </Link>
+              <ThemeToggleButton />
+            </div>
           </div>
-          <div className="flex flex-wrap items-center gap-2 xl:justify-end">
-            <Link
-              href="/search"
-              className="weather-button inline-flex min-h-[44px] items-center justify-center px-3 text-xs font-semibold uppercase tracking-[0.08em]"
-              aria-label="Open global search"
-            >
-              Search
-            </Link>
-            <ThemeToggleButton />
-          </div>
-        </div>
 
-        <nav aria-label="Global navigation" className="mt-5">
-          <GlobalHeaderNavClient
-            navigationLinks={primaryNavigationLayers}
-            groupLabels={navigationGroupLabels}
-          />
-        </nav>
-      </div>
-    </header>
+          <nav aria-label="Global navigation" className="mt-5">
+            <GlobalHeaderNavClient
+              navigationLinks={primaryNavigationLayers}
+              groupLabels={navigationGroupLabels}
+            />
+          </nav>
+        </div>
+      </header>
+    </GlobalHeaderRouteGate>
   );
 }

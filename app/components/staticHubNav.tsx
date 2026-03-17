@@ -6,8 +6,14 @@ export function StaticHubNav({ currentPath }: { currentPath: string }) {
   const hubLinks = primaryNavigation.filter((link) => link.href !== "/");
 
   return (
-    <nav className="weather-panel px-4 py-4" aria-label="Primary workflow hubs">
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Primary workflow</p>
+    <nav className="weather-hub-section" aria-label="Primary workflow hubs">
+      <div className="space-y-2">
+        <p className="weather-hub-section-eyebrow">Primary workflow</p>
+        <h2 className="text-xl font-semibold text-white">Move across the operating system without losing the weekly brief thread</h2>
+        <p className="max-w-3xl text-sm leading-7 text-slate-300">
+          Non-report pages should sharpen a decision or trust question, not become a parallel workspace.
+        </p>
+      </div>
       <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
         {hubLinks.map((link) => {
           const isActive = pathMatchesLink(link.href, currentPath);
@@ -16,14 +22,17 @@ export function StaticHubNav({ currentPath }: { currentPath: string }) {
               <Link
                 href={link.href}
                 aria-current={isActive ? "page" : undefined}
-                className={`weather-surface flex min-h-[72px] flex-col justify-between rounded-xl border px-3 py-3 text-xs transition-colors ${
+                className={`weather-hub-link-card flex min-h-[120px] flex-col justify-between gap-4 text-xs ${
                   isActive
-                    ? "border-sky-400/70 bg-sky-500/15 text-sky-100"
-                    : "border-slate-800/80 text-slate-200 hover:border-sky-400/70"
+                    ? "border-amber-300/50 bg-amber-500/10 text-white"
+                    : "text-slate-200"
                 }`}
               >
-                <span className="text-sm font-semibold tracking-[0.06em]">{link.label}</span>
-                <span className="text-[11px] text-slate-300">{link.description}</span>
+                <span className="weather-hub-chip w-fit">{isActive ? "Current hub" : "Workflow hub"}</span>
+                <div className="space-y-1.5">
+                  <span className="text-base font-semibold tracking-[0.02em]">{link.label}</span>
+                  <span className="block text-[12px] leading-5 text-slate-300">{link.description}</span>
+                </div>
               </Link>
             </li>
           );

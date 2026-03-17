@@ -18,6 +18,7 @@ import {
 import { getConceptPublicationRegime, getConceptRegimeStatus, getCurrentRegimeContext } from "../../lib/conceptRegime";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { BreadcrumbTrail } from "../components/breadcrumbTrail";
+import { HubHero, HubPageShell, HubSection } from "../components/hubPageShell";
 import { formatConceptPublishedLabel } from "../../lib/formatters";
 
 export const dynamic = "force-static";
@@ -171,7 +172,7 @@ export default async function ProductConceptTimelinePage({
   };
 
   return (
-    <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+    <HubPageShell>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(conceptCollectionStructuredData) }}
@@ -181,74 +182,71 @@ export default async function ProductConceptTimelinePage({
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }}
       />
       <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Concepts" }]} />
-      <section className="weather-panel space-y-5 px-6 py-6">
-        <p className="type-kicker uppercase tracking-[0.2em]">
-          Product canon in context
-        </p>
-        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
-          Use the canon to translate this week&apos;s delta into operating calls
-        </h1>
+      <HubHero
+        eyebrow="Product canon in context"
+        title="Use the canon to translate this week&apos;s delta into operating calls."
+        description="The canon is useful when a team needs language for a decision already implied by the weekly brief. It should sharpen the call, not replace it."
+        aside={(
+          <div className="weather-hub-card space-y-3 px-5 py-5">
+            <h2 className="text-base font-semibold text-white">Use this canon when…</h2>
+            <ul className="space-y-1 text-sm text-slate-200">
+              <li>Hiring: decide if role approvals stay selective or reopen in tranches this week.</li>
+              <li>Product: decide whether to push core delivery or cut speculative roadmap branches.</li>
+              <li>Finance: decide whether to hold spend, raise now, or trigger burn-control thresholds.</li>
+            </ul>
+            {currentRegime ? (
+              <p className="text-xs text-slate-300">Current regime baseline: {currentRegime.regimeLabel}.</p>
+            ) : null}
+          </div>
+        )}
+      />
+      <HubSection title="Decision translation sequence" description="Anchor on the current regime first, then choose the framework or essay that best tightens the operating call.">
         <div className="grid gap-3 text-sm sm:grid-cols-3">
-          <div className="weather-surface rounded-md px-4 py-3">
+          <div className="weather-hub-card rounded-md px-4 py-3">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">1 · What changed</p>
             <p className="mt-1 text-slate-100">Anchor on this week&apos;s macro shift before applying any framework.</p>
           </div>
-          <div className="weather-surface rounded-md px-4 py-3">
+          <div className="weather-hub-card rounded-md px-4 py-3">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">2 · Tighten or loosen</p>
             <p className="mt-1 text-slate-100">Convert concepts into clear calls on hiring pace, roadmap scope, and spend.</p>
           </div>
-          <div className="weather-surface rounded-md px-4 py-3">
+          <div className="weather-hub-card rounded-md px-4 py-3">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">3 · What flips the call</p>
             <p className="mt-1 text-slate-100">Define the threshold that triggers pause, resume, or reversal.</p>
           </div>
         </div>
         <div className="grid gap-2 text-xs text-slate-200 sm:grid-cols-2 lg:grid-cols-4">
-          <Link href="/" className="weather-surface rounded-md px-3 py-2 transition-colors hover:border-sky-400/70">
+          <Link href="/" className="weather-hub-link-card rounded-md px-3 py-2">
             Open weekly brief
           </Link>
           <Link
             href="/answers/should-startups-hire-engineers-right-now"
-            className="weather-surface rounded-md px-3 py-2 transition-colors hover:border-sky-400/70"
+            className="weather-hub-link-card rounded-md px-3 py-2"
           >
             Hiring decision answer
           </Link>
           <Link
             href="/answers/should-startups-slow-roadmap-expansion"
-            className="weather-surface rounded-md px-3 py-2 transition-colors hover:border-sky-400/70"
+            className="weather-hub-link-card rounded-md px-3 py-2"
           >
             Product scope decision answer
           </Link>
           <Link
             href="/answers/when-should-startups-cut-burn"
-            className="weather-surface rounded-md px-3 py-2 transition-colors hover:border-sky-400/70"
+            className="weather-hub-link-card rounded-md px-3 py-2"
           >
             Burn threshold decision answer
           </Link>
         </div>
-        <div className="weather-surface space-y-2 rounded-md px-4 py-3">
-          <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">Use this canon when…</h2>
-          <ul className="space-y-1 text-sm text-slate-200">
-            <li>Hiring: decide if role approvals stay selective or reopen in tranches this week.</li>
-            <li>Product: decide whether to push core delivery or cut speculative roadmap branches.</li>
-            <li>Finance: decide whether to hold spend, raise now, or trigger burn-control thresholds.</li>
-          </ul>
-        </div>
-        {currentRegime ? (
-          <p className="text-xs text-slate-300">Current regime baseline: {currentRegime.regimeLabel}.</p>
-        ) : null}
-      </section>
+      </HubSection>
 
-      <section className="weather-panel space-y-4 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">High-signal concepts to revisit first</h2>
-        <p className="text-sm text-slate-300">
-          Use these pages for quick decision translation, then expand into the full canon.
-        </p>
+      <HubSection title="High-signal concepts to revisit first" description="Use these pages for quick decision translation, then expand into the full canon.">
         <div className="grid gap-3 md:grid-cols-3">
           {featuredArticles.map((article) => (
             <Link
               key={article.slug}
               href={`/concepts/${article.slug}`}
-              className="weather-surface block space-y-2 px-4 py-4 transition-colors hover:border-sky-400/70"
+              className="weather-hub-link-card space-y-2"
             >
               <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">{article.focus}</p>
               <p className="text-sm font-semibold text-slate-100">{article.title}</p>
@@ -256,10 +254,9 @@ export default async function ProductConceptTimelinePage({
             </Link>
           ))}
         </div>
-      </section>
+      </HubSection>
 
-      <section className="weather-panel space-y-3 px-6 py-5">
-        <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-300">Canon distribution by regime</h2>
+      <HubSection title="Canon distribution by regime">
         <div className="grid gap-2 text-sm text-slate-200 sm:grid-cols-2">
           {(["EXPANSION", "VOLATILE", "DEFENSIVE", "SCARCITY"] as const).map((regimeKey) => {
             const count = canonicalDistribution.byRegime[regimeKey];
@@ -280,10 +277,9 @@ export default async function ProductConceptTimelinePage({
         <p className="text-xs text-slate-300">
           Most PM frameworks in this canon emerged under looser-capital conditions, which can over-index the default playbook toward expansion assumptions.
         </p>
-      </section>
+      </HubSection>
 
-      <section className="weather-panel space-y-4 px-6 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Find relevant concepts faster</h2>
+      <HubSection title="Find relevant concepts faster">
         <form className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5" action="/concepts" method="get">
           <label className="space-y-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">
             Search
@@ -374,11 +370,10 @@ export default async function ProductConceptTimelinePage({
             </p>
           </div>
         </form>
-      </section>
+      </HubSection>
 
 
-      <section className="weather-panel space-y-3 px-6 py-5">
-        <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-300">Explore concept maps</h2>
+      <HubSection title="Explore concept maps">
         <Link
           href="/concepts/conflicts"
           className="weather-button inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.12em]"
@@ -415,21 +410,20 @@ export default async function ProductConceptTimelinePage({
             </div>
           </div>
         </div>
-      </section>
-      <section className="weather-panel space-y-3 px-6 py-5">
-        <h2 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-300">Jump to era</h2>
+      </HubSection>
+      <HubSection title="Jump to era">
         <div className="flex flex-wrap gap-2">
           {productConceptEras.map((eraOption) => (
             <a
               key={eraOption}
               href={`#${toEraId(eraOption)}`}
-              className="weather-pill inline-flex min-h-[38px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100"
+              className="weather-hub-chip"
             >
               {eraOption}
             </a>
           ))}
         </div>
-      </section>
+      </HubSection>
 
       {productConceptEras.map((eraOption) => {
         const articles = filteredArticles
@@ -441,9 +435,12 @@ export default async function ProductConceptTimelinePage({
         }
 
         return (
-          <section id={toEraId(eraOption)} key={eraOption} className="weather-panel space-y-4 px-6 py-6">
-            <h2 className="text-lg font-semibold text-slate-100">{eraOption}</h2>
-            <p className="text-sm text-slate-300">{eraIntro[eraOption]}</p>
+          <HubSection
+            id={toEraId(eraOption)}
+            key={eraOption}
+            title={eraOption}
+            description={eraIntro[eraOption]}
+          >
             <ol className="space-y-3">
               {articles.map((article) => {
                 const macroContext = getMacroContextForArticle(article);
@@ -453,7 +450,7 @@ export default async function ProductConceptTimelinePage({
                 const regimeStatus = getConceptRegimeStatus(article, currentRegime?.regime ?? null);
 
                 return (
-                  <li key={article.slug} className="weather-surface space-y-3 px-4 py-4">
+                  <li key={article.slug} className="weather-hub-card space-y-3 px-4 py-4">
                     <div className="space-y-2">
                       <h3 className="text-base font-semibold text-slate-100">{article.title}</h3>
                       <p className="text-sm text-slate-300">{article.author} · {formatConceptPublishedLabel(article.publishedYear, article.publishedMonth)}</p>
@@ -501,9 +498,9 @@ export default async function ProductConceptTimelinePage({
                 );
               })}
             </ol>
-          </section>
+          </HubSection>
         );
       })}
-    </main>
+    </HubPageShell>
   );
 }

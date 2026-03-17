@@ -1,13 +1,8 @@
-"use client";
-
-import { useEffect, useMemo, useState } from "react";
-import { Collapsible } from "@base-ui/react/collapsible";
-import { NavigationMenu } from "@base-ui/react/navigation-menu";
+import Link from "next/link";
 import { pathMatchesLink } from "../../lib/navigation/pathMatching";
 import { navigationGroupLabels } from "../../lib/navigation/informationArchitecture";
 import { homeSectionCompactLabelByHref } from "../../lib/report/homeSections";
 import { defaultPageLinkIcon, pageLinkIcons } from "./reportShellPageIcons";
-
 
 export type ReportPageLink = {
   id: string;
@@ -50,39 +45,13 @@ const getPageNavigationState = (
   return { currentLink, adjacentLinks };
 };
 
-const isLinkActiveForPath = (linkHref: string, currentPath?: string) => {
-  if (!currentPath) {
-    return false;
-  }
-
-  return pathMatchesLink(linkHref, currentPath);
-};
-
 const basePageLinkClassName =
   "weather-tab inline-flex min-h-[46px] w-full items-center justify-center rounded-xl border px-4 py-2 text-center text-sm font-semibold tracking-[0.08em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:w-auto sm:px-4 sm:text-xs";
 
-const getPageLinkStateClassName = ({
-  isActive,
-}: {
-  isActive: boolean;
-}) => {
-  if (isActive) {
-    return "border-sky-300/90 bg-sky-500/25 text-sky-50 shadow-sm shadow-sky-900/40";
-  }
-
-
-  return "border-slate-700/80 bg-slate-900/45 text-slate-200 hover:border-sky-400/70 hover:text-slate-100";
-};
-
-const isActivePageLink = ({
-  link,
-  currentPath,
-  pageTitle,
-}: {
-  link: ReportPageLink;
-  currentPath?: string;
-  pageTitle: string;
-}) => (currentPath ? isLinkActiveForPath(link.href, currentPath) : link.label === pageTitle);
+const getPageLinkStateClassName = (isActive: boolean) =>
+  isActive
+    ? "border-sky-300/90 bg-sky-500/25 text-sky-50 shadow-sm shadow-sky-900/40"
+    : "border-slate-700/80 bg-slate-900/45 text-slate-200 hover:border-sky-400/70 hover:text-slate-100";
 
 const navigationGroupOrder: Array<keyof typeof navigationGroupLabels> = ["core", "workflow", "reference"];
 
@@ -95,77 +64,11 @@ const groupPageLinks = (pageLinks: ReportPageLink[]) =>
     }))
     .filter((groupSection) => groupSection.links.length > 0);
 
-const useReportActiveSectionHref = (sectionLinks: ReportSectionLink[]) => {
-  const [activeSectionHref, setActiveSectionHref] = useState(sectionLinks[0]?.href);
-
-  const sectionIdByHref = useMemo(
-    () =>
-      sectionLinks.reduce<Record<string, string>>((accumulator, section) => {
-        const id = section.href.startsWith("#") ? section.href.slice(1) : "";
-        if (id) {
-          accumulator[section.href] = id;
-        }
-        return accumulator;
-      }, {}),
-    [sectionLinks],
-  );
-
-  useEffect(() => {
-    if (!sectionLinks.length) {
-      return;
-    }
-
-    const updateFromHash = () => {
-      const hashHref = window.location.hash;
-      if (hashHref && sectionLinks.some((section) => section.href === hashHref)) {
-        setActiveSectionHref(hashHref);
-      }
-    };
-
-    updateFromHash();
-    window.addEventListener("hashchange", updateFromHash);
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visibleEntry = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((left, right) => left.boundingClientRect.top - right.boundingClientRect.top)[0];
-
-        if (!visibleEntry) {
-          return;
-        }
-
-        const matchingHref = Object.entries(sectionIdByHref).find(([, sectionId]) => sectionId === visibleEntry.target.id)?.[0];
-
-        if (matchingHref) {
-          setActiveSectionHref(matchingHref);
-        }
-      },
-      { rootMargin: "-45% 0px -45% 0px", threshold: [0, 0.2, 0.4, 0.6, 0.8, 1] },
-    );
-
-    Object.values(sectionIdByHref).forEach((sectionId) => {
-      const sectionElement = document.getElementById(sectionId);
-      if (sectionElement) {
-        observer.observe(sectionElement);
-      }
-    });
-
-    return () => {
-      window.removeEventListener("hashchange", updateFromHash);
-      observer.disconnect();
-    };
-  }, [sectionIdByHref, sectionLinks]);
-
-  return activeSectionHref;
-};
-
 export const ReportPageNavigation = ({
   pageLinks,
   pageTitle,
   currentPath,
   className,
-  variant: _variant = "full",
 }: {
   pageLinks: ReportPageLink[];
   pageTitle: string;
@@ -176,82 +79,63 @@ export const ReportPageNavigation = ({
   const groupedPageLinks = groupPageLinks(pageLinks);
 
   return (
-    <NavigationMenu.Root aria-label="Report paths" className={className}>
+    <nav aria-label="Report paths" className={className}>
       <div className="space-y-2 rounded-2xl border border-slate-800/80 bg-slate-950/45 p-2">
         {groupedPageLinks.map((groupSection) => (
           <div key={groupSection.group} className="space-y-2">
             <p className="px-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">
               {groupSection.label}
             </p>
-            <NavigationMenu.List className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
               {groupSection.links.map((link) => {
-                const isActive = isActivePageLink({ link, currentPath, pageTitle });
+                const isActive = currentPath ? pathMatchesLink(link.href, currentPath) : link.label === pageTitle;
                 return (
-                  <NavigationMenu.Item key={link.href} className="flex">
-                    <NavigationMenu.Link
-                      href={link.href}
-                      active={isActive}
-                      aria-current={isActive ? "page" : undefined}
-                      className={`${basePageLinkClassName} h-full flex-col items-start justify-start gap-1 text-left sm:w-full sm:text-left ${getPageLinkStateClassName({ isActive })}`}
-                    >
-                      <span className="inline-flex items-center gap-2">
-                        <span className="inline-flex h-5 w-5 items-center justify-center [&_svg]:h-4 [&_svg]:w-4" aria-hidden="true">
-                          {pageLinkIcons[link.id] ?? defaultPageLinkIcon}
-                        </span>
-                        <span>{link.label}</span>
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    aria-current={isActive ? "page" : undefined}
+                    className={`${basePageLinkClassName} h-full flex-col items-start justify-start gap-1 text-left sm:w-full sm:text-left ${getPageLinkStateClassName(isActive)}`}
+                  >
+                    <span className="inline-flex items-center gap-2">
+                      <span className="inline-flex h-5 w-5 items-center justify-center [&_svg]:h-4 [&_svg]:w-4" aria-hidden="true">
+                        {pageLinkIcons[link.id] ?? defaultPageLinkIcon}
                       </span>
-                      <span className="text-[11px] font-medium normal-case tracking-normal text-slate-300">
-                        {link.description}
-                      </span>
-                    </NavigationMenu.Link>
-                  </NavigationMenu.Item>
+                      <span>{link.label}</span>
+                    </span>
+                    <span className="text-[11px] font-medium normal-case tracking-normal text-slate-300">
+                      {link.description}
+                    </span>
+                  </Link>
                 );
               })}
-            </NavigationMenu.List>
+            </div>
           </div>
         ))}
       </div>
-    </NavigationMenu.Root>
+    </nav>
   );
 };
 
 export const ReportInterpretationNotes = () => (
-  <Collapsible.Root>
-    <Collapsible.Trigger
-      type="button"
-      className="group inline-flex min-h-[44px] w-full items-center justify-between gap-2 text-xs font-semibold tracking-[0.12em] text-slate-200 transition-colors hover:text-slate-100 touch-manipulation"
-    >
-      <span>How to interpret this week</span>
-      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-700/70 text-slate-300 transition-transform duration-200 group-data-[panel-open]:rotate-180">
-        <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" aria-hidden="true">
-          <path
-            d="M7 10l5 5 5-5"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </span>
-    </Collapsible.Trigger>
-    <Collapsible.Panel className="mt-3 text-sm text-slate-300">
-      <ul className="space-y-2">
-        <li className="flex gap-2">
-          <span className="text-slate-400">1</span>
-          <span className="break-words">
-            Start with user outcomes and ROI. If the idea still wins, keep it on the table.
-          </span>
-        </li>
-        <li className="flex gap-2">
-          <span className="text-slate-400">2</span>
-          <span className="break-words">
-            Let the climate dictate pacing, staffing, and sequencing—not whether the idea matters.
-          </span>
-        </li>
-      </ul>
-    </Collapsible.Panel>
-  </Collapsible.Root>
+  <details className="rounded-2xl border border-slate-800/80 bg-slate-950/45 p-3">
+    <summary className="cursor-pointer text-xs font-semibold tracking-[0.12em] text-slate-200">
+      How to interpret this week
+    </summary>
+    <ul className="mt-3 space-y-2 text-sm text-slate-300">
+      <li className="flex gap-2">
+        <span className="text-slate-400">1</span>
+        <span className="break-words">
+          Start with user outcomes and ROI. If the idea still wins, keep it on the table.
+        </span>
+      </li>
+      <li className="flex gap-2">
+        <span className="text-slate-400">2</span>
+        <span className="break-words">
+          Let the climate dictate pacing, staffing, and sequencing, not whether the idea matters.
+        </span>
+      </li>
+    </ul>
+  </details>
 );
 
 export const ReportSectionNavigation = ({
@@ -261,8 +145,6 @@ export const ReportSectionNavigation = ({
   sectionLinks: ReportSectionLink[];
   className?: string;
 }) => {
-  const activeSectionHref = useReportActiveSectionHref(sectionLinks);
-
   if (!sectionLinks.length) {
     return null;
   }
@@ -270,25 +152,17 @@ export const ReportSectionNavigation = ({
   return (
     <nav aria-label="Section index" className={className}>
       <ol className="space-y-2 rounded-2xl border border-slate-800/70 bg-slate-950/60 p-3">
-        {sectionLinks.map((section, index) => {
-          const isActive = section.href === activeSectionHref;
-          return (
-            <li key={section.href}>
-              <a
-                href={section.href}
-                aria-current={isActive ? "location" : undefined}
-                className={`inline-flex min-h-[42px] w-full items-center justify-between rounded-xl border px-3 py-2 text-left text-xs font-semibold tracking-[0.12em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${
-                  isActive
-                    ? "border-sky-300/90 bg-sky-500/20 text-sky-50"
-                    : "border-slate-800/80 bg-slate-950/50 text-slate-300 hover:border-sky-400/70 hover:text-slate-100"
-                }`}
-              >
-                <span>{getCompactSectionLabel(section)}</span>
-                <span className="text-[10px] text-slate-400">{index + 1}</span>
-              </a>
-            </li>
-          );
-        })}
+        {sectionLinks.map((section, index) => (
+          <li key={section.href}>
+            <a
+              href={section.href}
+              className="inline-flex min-h-[42px] w-full items-center justify-between rounded-xl border border-slate-800/80 bg-slate-950/50 px-3 py-2 text-left text-xs font-semibold tracking-[0.12em] text-slate-300 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+            >
+              <span>{getCompactSectionLabel(section)}</span>
+              <span className="text-[10px] text-slate-400">{index + 1}</span>
+            </a>
+          </li>
+        ))}
       </ol>
     </nav>
   );
@@ -312,29 +186,22 @@ export const ReportMobileNavigation = ({
     pageTitle,
     currentPath,
   );
-  const activeSectionHref = useReportActiveSectionHref(sectionLinks);
-
-  const activeSectionIndex = sectionLinks.findIndex((section) => section.href === activeSectionHref);
-  const resolvedActiveSectionIndex = activeSectionIndex >= 0 ? activeSectionIndex : 0;
-  const activeSectionLabel = sectionLinks[resolvedActiveSectionIndex]?.label;
-
   const pageCountLabel =
     pageLinks.length === 1 ? "1 page" : `${pageLinks.length} pages`;
 
   return (
-    <NavigationMenu.Root aria-label="Mobile report navigation" className={className}>
-      <div className="relative">
-        <div className="weather-mobile-nav flex flex-col gap-2 px-3 py-3">
-          {sectionLinks.length ? (
-            <div className="rounded-2xl border border-slate-800/80 bg-slate-950/70 px-3 py-2">
-              <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-300">
-                {`${resolvedActiveSectionIndex + 1}/${sectionLinks.length} · ${activeSectionLabel ?? "Overview"}`}
-              </p>
-              <p className="mt-1 truncate text-xs text-slate-400">{`${currentLink.label} / ${activeSectionLabel ?? "Overview"}`}</p>
-            </div>
-          ) : null}
-          <div className="flex min-w-0 items-center justify-between gap-3 rounded-2xl border border-slate-800/80 bg-slate-950/70 px-3 py-2">
-            <div className="flex min-w-0 items-center gap-3">
+    <nav aria-label="Mobile report navigation" className={className}>
+      <div className="weather-mobile-nav flex flex-col gap-2 px-3 py-3">
+        {sectionLinks.length ? (
+          <div className="rounded-2xl border border-slate-800/80 bg-slate-950/70 px-3 py-2">
+            <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-300">
+              {`${sectionLinks.length} sections`}
+            </p>
+            <p className="mt-1 truncate text-xs text-slate-400">{`${currentLink.label} / ${sectionLinks[0]?.label ?? "Overview"}`}</p>
+          </div>
+        ) : null}
+        <div className="flex min-w-0 items-center justify-between gap-3 rounded-2xl border border-slate-800/80 bg-slate-950/70 px-3 py-2">
+          <div className="flex min-w-0 items-center gap-3">
             <span className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl border border-slate-800/80 bg-slate-950/80 text-slate-100">
               {pageLinkIcons[currentLink.id] ?? defaultPageLinkIcon}
             </span>
@@ -346,35 +213,33 @@ export const ReportMobileNavigation = ({
               <p className="mt-1 line-clamp-2 text-xs text-slate-300">{currentLink.description}</p>
               <p className="mt-1 truncate text-[11px] text-slate-400">{pageCountLabel}</p>
             </div>
-            </div>
-            {adjacentLinks[0] ? (
-              <a
-                href={adjacentLinks[0].href}
-                className="weather-pill inline-flex min-h-[44px] max-w-[160px] flex-col items-start justify-center rounded-2xl border border-slate-700/80 px-3 py-2 text-left transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-              >
-                <span className="text-[11px] font-semibold tracking-[0.12em] text-slate-100">{adjacentLinks[0].label}</span>
-                <span className="mt-1 text-[10px] text-slate-300">{adjacentLinks[0].description}</span>
-              </a>
-            ) : null}
           </div>
-
-          {adjacentLinks.slice(1).length > 0 ? (
-            <NavigationMenu.List aria-label="Suggested destinations" className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2">
-              {adjacentLinks.slice(1).map((link) => (
-                <NavigationMenu.Item key={link.href}>
-                  <NavigationMenu.Link
-                    href={link.href}
-                    className="weather-pill inline-flex min-h-[44px] w-full flex-col items-start justify-center rounded-2xl border border-slate-800/80 px-3 py-2 text-left transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
-                  >
-                    <span className="text-xs font-semibold tracking-[0.12em] text-slate-200">{link.label}</span>
-                    <span className="mt-1 text-[11px] text-slate-400">{link.description}</span>
-                  </NavigationMenu.Link>
-                </NavigationMenu.Item>
-              ))}
-            </NavigationMenu.List>
+          {adjacentLinks[0] ? (
+            <Link
+              href={adjacentLinks[0].href}
+              className="weather-pill inline-flex min-h-[44px] max-w-[160px] flex-col items-start justify-center rounded-2xl border border-slate-700/80 px-3 py-2 text-left transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+            >
+              <span className="text-[11px] font-semibold tracking-[0.12em] text-slate-100">{adjacentLinks[0].label}</span>
+              <span className="mt-1 text-[10px] text-slate-300">{adjacentLinks[0].description}</span>
+            </Link>
           ) : null}
         </div>
+
+        {adjacentLinks.slice(1).length > 0 ? (
+          <div aria-label="Suggested destinations" className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2">
+            {adjacentLinks.slice(1).map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="weather-pill inline-flex min-h-[44px] w-full flex-col items-start justify-center rounded-2xl border border-slate-800/80 px-3 py-2 text-left transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+              >
+                <span className="text-xs font-semibold tracking-[0.12em] text-slate-200">{link.label}</span>
+                <span className="mt-1 text-[11px] text-slate-400">{link.description}</span>
+              </Link>
+            ))}
+          </div>
+        ) : null}
       </div>
-    </NavigationMenu.Root>
+    </nav>
   );
 };

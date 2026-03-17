@@ -1,10 +1,22 @@
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import type { Route } from "../../../lib/navigation/routeType";
 import { homeScrollPlan } from "../../../lib/navigation/scrollPlans";
 import type { HomePageWorkspaceModel } from "../../../lib/report/homePageAssembler";
-import { HistoricalReplayDatePicker } from "../../signals/components/historicalReplayDatePicker";
 import { CanonicalTrustModule } from "../canonicalTrustModule";
 import { PageFlowNav } from "../pageFlowNav";
+
+const HomeHistoricalReplayDatePicker = dynamic(
+  () => import("../../signals/components/historicalReplayDatePicker").then((module) => module.HistoricalReplayDatePicker),
+  {
+    ssr: false,
+    loading: () => (
+      <p className="text-xs text-slate-300">
+        Inline replay loads after the page settles. Use the full time machine link if you need it immediately.
+      </p>
+    ),
+  },
+);
 
 type HomeWorkspaceBandsProps = {
   workspaceModelPromise: Promise<HomePageWorkspaceModel>;
@@ -26,12 +38,12 @@ export async function HomeWorkspaceBands({
         compact={true}
         actions={(
           <>
-            <a href={workspaceModel.workspaceActions.auditHref} className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">
+            <Link href={workspaceModel.workspaceActions.auditHref as Route} className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">
               See why this call changed
-            </a>
-            <a href={workspaceModel.workspaceActions.operationsHref} className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">
+            </Link>
+            <Link href={workspaceModel.workspaceActions.operationsHref as Route} className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">
               Open execution guardrails
-            </a>
+            </Link>
           </>
         )}
       />
@@ -193,7 +205,7 @@ export async function HomeWorkspaceBands({
           <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Replay a prior monthly snapshot</p>
             <div className="mt-3">
-              <HistoricalReplayDatePicker
+              <HomeHistoricalReplayDatePicker
                 initialDate={workspaceModel.replay.initialDate}
                 forceAdvanced={false}
                 submitHash="#historical-replay-workspace"

@@ -4,6 +4,7 @@ import { buildBreadcrumbList, buildPageMetadata, serializeJsonLd } from "../../l
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { toolkitDefinitions } from "../../lib/decisionDomainCatalog";
 import { BreadcrumbTrail } from "../components/breadcrumbTrail";
+import { HubHero, HubPageShell, HubSection } from "../components/hubPageShell";
 import { NextStepRail } from "../components/nextStepRail";
 
 export const runtime = "edge";
@@ -40,18 +41,21 @@ export default async function ToolkitsPage({
   };
 
   return (
-    <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
+    <HubPageShell>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }} />
       <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Toolkits" }]} />
-      <section className="weather-panel space-y-4 px-6 py-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Supporting surface under Decide</p>
-        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Toolkits</h1>
-        <p className="text-base text-slate-200">
-          Run one toolkit end-to-end once the decision path is clear. Start in Decide when you need role or situation framing, then use this library to execute the instrument itself.
-        </p>
-        <div className="flex flex-wrap gap-3">
-          <Link href="/decide" className="weather-button inline-flex items-center justify-center">Open Decide</Link>
-        </div>
+      <HubHero
+        eyebrow="Supporting surface under Decide"
+        title="Run one instrument end to end once the weekly call is already clear."
+        description="Start in Decide when you need role or situation framing, then use this library to execute the tool itself."
+        actions={<Link href="/decide" className="weather-button inline-flex items-center justify-center">Open Decide</Link>}
+        stats={[
+          { label: "Results", value: `${filteredToolkits.length} toolkit${filteredToolkits.length === 1 ? "" : "s"}` },
+          { label: "Best use", value: "Action after orientation" },
+          { label: "Search mode", value: query ? `Intent: ${query}` : "Browse all", detail: "Search by decision job, not by abstract framework language." },
+        ]}
+      />
+      <HubSection title="Find the runnable instrument" description="Search by the decision you need to make this week. Each toolkit is designed to help a team move from posture to a bounded action." >
         <form action="/toolkits" className="flex flex-col gap-3 sm:flex-row">
           <input
             type="search"
@@ -71,40 +75,42 @@ export default async function ToolkitsPage({
           </div>
         ) : null}
         <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
-          <span className="rounded-full border border-slate-700/70 px-3 py-1 font-semibold tracking-[0.1em]">
-            {filteredToolkits.length} result{filteredToolkits.length === 1 ? "" : "s"}
-          </span>
-          {suggestedIntents.map((intent) => (
-            <Link
-              key={intent}
-              href={`/toolkits?q=${intent}`}
-              className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 font-semibold uppercase tracking-[0.1em] text-slate-200 hover:border-sky-400/70"
-            >
-              {intent}
-            </Link>
-          ))}
-        </div>
-      </section>
+            <span className="rounded-full border border-slate-700/70 px-3 py-1 font-semibold tracking-[0.1em]">
+              {filteredToolkits.length} result{filteredToolkits.length === 1 ? "" : "s"}
+            </span>
+            {suggestedIntents.map((intent) => (
+              <Link
+                key={intent}
+                href={`/toolkits?q=${intent}`}
+                className="weather-hub-chip"
+              >
+                {intent}
+              </Link>
+            ))}
+          </div>
+      </HubSection>
 
-      <section className="grid gap-3 sm:grid-cols-2">
+      <HubSection title="Toolkit library" description="Start with the decision this session, not the framework label.">
+      <div className="grid gap-3 sm:grid-cols-2">
         {filteredToolkits.map((toolkit) => (
-          <Link key={toolkit.slug} href={`/toolkits/${toolkit.slug}`} className="weather-panel space-y-2 px-4 py-4">
-            <span className="inline-flex w-fit items-center rounded-full border border-emerald-400/45 bg-emerald-500/10 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-200">
+          <Link key={toolkit.slug} href={`/toolkits/${toolkit.slug}`} className="weather-hub-link-card space-y-2">
+            <span className="weather-hub-chip w-fit">
               Toolkit
             </span>
             <h2 className="text-base font-semibold text-slate-100">{toolkit.title}</h2>
             <p className="text-sm text-slate-200">{toolkit.whenToUse}</p>
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-sky-200">Best for: {toolkit.decisionThisSession}</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-200">Best for: {toolkit.decisionThisSession}</p>
           </Link>
         ))}
-      </section>
+      </div>
+      </HubSection>
       {filteredToolkits.length === 0 ? (
-        <section className="weather-panel space-y-3 px-6 py-5 text-sm text-slate-200">
+        <section className="weather-hub-section space-y-3 text-sm text-slate-200">
           <p>No toolkits matched “{query}”. Try broader keywords.</p>
           {closestToolkits.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {closestToolkits.map((toolkit) => (
-                <Link key={toolkit.slug} href={`/toolkits/${toolkit.slug}`} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
+                <Link key={toolkit.slug} href={`/toolkits/${toolkit.slug}`} className="weather-hub-chip">
                   Try {toolkit.title}
                 </Link>
               ))}
@@ -113,6 +119,6 @@ export default async function ToolkitsPage({
         </section>
       ) : null}
       <NextStepRail currentPath="/toolkits" />
-    </main>
+    </HubPageShell>
   );
 }

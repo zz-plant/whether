@@ -124,6 +124,7 @@ type ReportShellProps = {
   inlineTrustPlacement?: "before-content" | "after-first-section";
   provenance?: DataProvenance;
   commandBar?: RegimeCommandBarProps;
+  ambientMode?: "standard" | "tv";
 };
 
 export const resolveTrustProvenance = ({
@@ -368,6 +369,7 @@ export const ReportShell = ({
   inlineTrustPlacement = "before-content",
   provenance,
   commandBar,
+  ambientMode = "standard",
 }: ReportShellProps) => {
   const resolvedNextRefreshLabel = nextRefreshLabel ?? (trustStatusTone === "historical" ? "Fixed historical snapshot" : "15m cadence");
   const contentSections = Children.toArray(children);
@@ -385,15 +387,16 @@ export const ReportShell = ({
   const showInlineTrustBlock = !hasSidebar;
   const renderTrustBeforeContent = showInlineTrustBlock && inlineTrustPlacement === "before-content";
   const renderTrustAfterFirstSection = showInlineTrustBlock && inlineTrustPlacement === "after-first-section";
+  const enableTvAmbientMode = ambientMode === "tv";
 
   return (
     <>
       <main id="main-content" tabIndex={-1} className="weather-shell relative min-h-screen overflow-x-clip text-slate-100">
         <ClimateBackdrop regime={regime || "NEUTRAL"} />
         {structuredData ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }} /> : null}
-        <DisplayModeManager />
-        <AnchorFeedback />
-        <DisplayGuardian />
+        {enableTvAmbientMode ? <DisplayModeManager /> : null}
+        {enableTvAmbientMode ? <AnchorFeedback /> : null}
+        {enableTvAmbientMode ? <DisplayGuardian /> : null}
         <div className="tv-rail-safe mx-auto max-w-[88rem] pb-[calc(env(safe-area-inset-bottom)+10rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)] pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)] sm:pb-10 sm:pt-5 sm:pl-[calc(env(safe-area-inset-left)+1.25rem)] sm:pr-[calc(env(safe-area-inset-right)+1.25rem)]">
           <ReportShellHeader
             variant={resolvedHeaderVariant}
@@ -434,7 +437,7 @@ export const ReportShell = ({
 
         {showPageNavigation ? <div className="sm:hidden"><ReportMobileNavigation pageLinks={pageLinks} pageTitle={pageTitle} currentPath={currentPath} className="mt-3 px-4 pb-6" sectionLinks={sectionLinks} /></div> : null}
 
-        <aside className="tv-action-rail" aria-label="TV quick actions"><p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Quick actions</p><div className="mt-2 grid gap-2"><ReportCta href={primaryCta.href} copyText={primaryCta.copyText} copyTarget={primaryCta.copyTarget} label={primaryCta.label} className="weather-button-primary inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-100">{primaryCta.label}</ReportCta>{secondaryCta ? <InternalAwareLink href={secondaryCta.href} className="weather-pill inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-200">{secondaryCta.label}</InternalAwareLink> : null}<DisplayModeToggle /></div></aside>
+        {enableTvAmbientMode ? <aside className="tv-action-rail" aria-label="TV quick actions"><p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Quick actions</p><div className="mt-2 grid gap-2"><ReportCta href={primaryCta.href} copyText={primaryCta.copyText} copyTarget={primaryCta.copyTarget} label={primaryCta.label} className="weather-button-primary inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-100">{primaryCta.label}</ReportCta>{secondaryCta ? <InternalAwareLink href={secondaryCta.href} className="weather-pill inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-200">{secondaryCta.label}</InternalAwareLink> : null}<DisplayModeToggle /></div></aside> : null}
       </main>
     </>
   );

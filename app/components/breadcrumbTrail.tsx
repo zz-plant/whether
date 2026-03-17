@@ -17,7 +17,7 @@ export function BreadcrumbTrail({
   }
 
   return (
-    <nav aria-label="Breadcrumb" className={className}>
+    <nav aria-label="Breadcrumb" className={`weather-hub-breadcrumbs ${className ?? ""}`.trim()}>
       <ol className="flex min-w-0 flex-wrap items-center gap-1 text-xs text-slate-300 sm:text-sm">
         {items.map((item, index) => {
           const isCurrent = index === items.length - 1;

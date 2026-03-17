@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useHapticFeedback } from "./useHapticFeedback";
 
 export type ClipboardCopyStatus = "idle" | "copying" | "copied" | "error";
 type ClipboardCopyErrorReason = "unavailable" | "write-failed";
@@ -65,7 +64,6 @@ export const useClipboardCopy = (
   const [activeTarget, setActiveTarget] = useState<string | null>(null);
   const [copiedTarget, setCopiedTarget] = useState<string | null>(null);
   const timeoutRef = useRef<number | null>(null);
-  const haptic = useHapticFeedback();
 
   const clearResetTimer = useCallback(() => {
     if (timeoutRef.current !== null) {
@@ -89,7 +87,6 @@ export const useClipboardCopy = (
         setError(true);
         setErrorReason("unavailable");
         setStatus("error");
-        haptic.copyError();
         return false;
       }
       setStatus("copying");
@@ -100,7 +97,6 @@ export const useClipboardCopy = (
         setErrorReason(null);
         setStatus("copied");
         setCopiedTarget(target ?? null);
-        haptic.copySuccess();
         clearResetTimer();
         timeoutRef.current = window.setTimeout(() => {
           setStatus("idle");
@@ -111,13 +107,12 @@ export const useClipboardCopy = (
         setError(true);
         setErrorReason("write-failed");
         setStatus("error");
-        haptic.copyError();
         return false;
       } finally {
         setActiveTarget(null);
       }
     },
-    [clearResetTimer, haptic, resetDelay, status]
+    [clearResetTimer, resetDelay, status]
   );
 
   return {

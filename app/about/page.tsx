@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { buildPageMetadata } from "../../lib/seo";
+import { HubHero, HubPageShell, HubSection } from "../components/hubPageShell";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "About Whether",
@@ -10,18 +11,35 @@ export const metadata: Metadata = buildPageMetadata({
 
 export default function AboutPage() {
   return (
-    <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
-      <section className="weather-panel space-y-3 px-6 py-6">
-        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">About</h1>
-        <p className="text-sm text-slate-300">Whether helps product and engineering leaders make clearer calls in uncertain market conditions.</p>
-      </section>
-      <section className="weather-panel space-y-2 px-6 py-6 text-sm text-slate-300">
-        <p><span className="font-semibold text-slate-100">Method:</span> we use a posture-first workflow so teams can move from signal to decision without guesswork.</p>
-        <p><span className="font-semibold text-slate-100">Sources:</span> public Treasury and macro datasets with transparent timestamps and refresh cadence.</p>
-        <p><span className="font-semibold text-slate-100">FAQ:</span> how to read posture, confidence, and when to use each toolkit.</p>
-        <p id="subscribe"><span className="font-semibold text-slate-100">Subscribe:</span> get updates when posture changes or new toolkit guidance is published.</p>
-        <p><span className="font-semibold text-slate-100">Contact:</span> hello@whether.app</p>
-      </section>
-    </main>
+    <HubPageShell width="standard">
+      <HubHero
+        eyebrow="Why Whether exists"
+        title="A weekly macro brief built for operating decisions, not commentary."
+        description="Whether compresses macro signals into a compact operating posture so product and engineering leaders can decide what to tighten, what to defer, and what they can safely ship forward."
+        stats={[
+          { label: "Core loop", value: "Signals -> posture -> decision -> artifact" },
+          { label: "Use case", value: "Weekly leadership cadence", detail: "Built to scan, decide, and share in under a minute." },
+          { label: "Trust model", value: "Fresh public-source inputs", detail: "Timestamps, confidence, and fallback state stay visible." },
+        ]}
+      />
+      <HubSection
+        title="What the product is trying to solve"
+        description="The product should reduce re-litigation in weekly planning. It gives teams a shared default stance before they reopen hiring, roadmap, spending, or launch assumptions."
+      >
+        <div className="grid gap-3 md:grid-cols-2">
+          <div className="weather-hub-card space-y-2 px-5 py-5 text-sm text-slate-300">
+            <p className="weather-hub-section-eyebrow">Method</p>
+            <p><span className="font-semibold text-slate-100">Posture first:</span> start from the current market stance, then translate into operating constraints.</p>
+            <p><span className="font-semibold text-slate-100">Bounded decisions:</span> guidance should include a concrete action, a trigger, and a reversal condition.</p>
+          </div>
+          <div className="weather-hub-card space-y-2 px-5 py-5 text-sm text-slate-300">
+            <p className="weather-hub-section-eyebrow">Trust</p>
+            <p><span className="font-semibold text-slate-100">Sources:</span> public Treasury and macro datasets with transparent timestamps and refresh cadence.</p>
+            <p id="subscribe"><span className="font-semibold text-slate-100">Updates:</span> posture changes, new toolkit coverage, and confidence shifts should be easy to monitor.</p>
+            <p><span className="font-semibold text-slate-100">Contact:</span> hello@whether.app</p>
+          </div>
+        </div>
+      </HubSection>
+    </HubPageShell>
   );
 }

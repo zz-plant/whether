@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { buildPageMetadata } from "../../lib/seo";
 import { groupSearchResultsByType, searchEntityTypeLabels, searchIndex } from "../../lib/search/searchIndex";
+import { HubHero, HubPageShell, HubSection } from "../components/hubPageShell";
 
 export const runtime = "edge";
 
@@ -24,18 +25,26 @@ export default async function SearchPage({
   const groupedResults = groupSearchResultsByType(results);
 
   return (
-    <main className="weather-page-shell weather-page-shell-wide">
-      <section className="weather-panel grid gap-5 px-5 py-5 sm:px-6 sm:py-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(19rem,0.75fr)]">
-        <div className="space-y-4">
-          <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-200">Global search</p>
-            <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Find decision artifacts fast</h1>
-            <p className="max-w-2xl text-sm leading-relaxed text-slate-300">
-              Search across primary workflow hubs, supporting toolkits, failure modes, concepts, and key Signals/Method docs.
-            </p>
+    <HubPageShell>
+      <HubHero
+        eyebrow="Global search"
+        title="Find the right page before the meeting thread goes cold."
+        description="Search across primary workflow hubs, supporting toolkits, failure modes, concepts, and key Signals/Method docs."
+        aside={(
+          <div className="weather-hub-card space-y-3 px-5 py-5">
+            <p className="weather-hub-section-eyebrow">Search scope</p>
+            <ul className="space-y-2 text-sm text-slate-200">
+              <li>Primary workflows and decision paths</li>
+              <li>Supporting toolkits and utilities</li>
+              <li>Failure modes and concepts</li>
+              <li>Signals and method reference docs</li>
+            </ul>
           </div>
+        )}
+      />
 
-          <form action="/search" className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto_auto]">
+      <HubSection title="Search the operating system" description="Use direct terms for the decision you need to make, the risk you are seeing, or the trust question you need to settle.">
+        <form action="/search" className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto_auto]">
             <input
               type="search"
               name="q"
@@ -53,22 +62,11 @@ export default async function SearchPage({
               </Link>
             ) : null}
           </form>
-        </div>
-
-        <aside className="weather-route-card space-y-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-200">Search scope</p>
-          <ul className="space-y-2 text-sm text-slate-200">
-            <li>Primary workflows and decision paths</li>
-            <li>Supporting toolkits and utilities</li>
-            <li>Failure modes and concepts</li>
-            <li>Signals and method reference docs</li>
-          </ul>
-        </aside>
-      </section>
+      </HubSection>
 
       {query ? (
-        <section className="mt-6 space-y-6">
-          <p className="text-sm text-slate-300">
+        <section className="space-y-6">
+          <p className="px-1 text-sm text-slate-300">
             {results.length} result{results.length === 1 ? "" : "s"} for <span className="font-semibold text-slate-100">“{query}”</span>
           </p>
 
@@ -76,25 +74,28 @@ export default async function SearchPage({
             if (entries.length === 0) return null;
 
             return (
-              <article key={type} className="weather-panel space-y-4 px-5 py-5 sm:px-6 sm:py-6">
-                <h2 className="text-lg font-semibold text-slate-100">{searchEntityTypeLabels[type as keyof typeof groupedResults]}</h2>
+              <HubSection
+                key={type}
+                title={searchEntityTypeLabels[type as keyof typeof groupedResults]}
+                description="Each result is meant to get you back to a single decision surface quickly."
+              >
                 <ul className="grid gap-3">
                   {entries.map((entry) => (
                     <li key={entry.id}>
-                      <Link href={entry.href} className="weather-route-card block space-y-1">
-                        <p className="text-xs font-semibold uppercase tracking-[0.1em] text-sky-200">{entry.intentLabel}</p>
+                      <Link href={entry.href} className="weather-hub-link-card space-y-1">
+                        <p className="text-xs font-semibold uppercase tracking-[0.1em] text-amber-200">{entry.intentLabel}</p>
                         <p className="text-base font-semibold text-slate-100">{entry.title}</p>
                         <p className="text-sm text-slate-300">{entry.summary}</p>
                       </Link>
                     </li>
                   ))}
                 </ul>
-              </article>
+              </HubSection>
             );
           })}
 
           {results.length === 0 ? (
-            <div className="weather-panel px-5 py-5 text-sm text-slate-300 sm:px-6">
+            <div className="weather-hub-section text-sm text-slate-300">
               No results matched. Try terms like <span className="font-semibold text-slate-100">rollback</span>,{" "}
               <span className="font-semibold text-slate-100">PMF</span>, or{" "}
               <span className="font-semibold text-slate-100">method</span>.
@@ -102,10 +103,10 @@ export default async function SearchPage({
           ) : null}
         </section>
       ) : (
-        <section className="mt-6 weather-panel px-5 py-5 text-sm text-slate-300 sm:px-6">
+        <section className="weather-hub-section text-sm text-slate-300">
           Enter a query to surface workflow hubs, decision tools, risks, concepts, and trust docs.
         </section>
       )}
-    </main>
+    </HubPageShell>
   );
 }
