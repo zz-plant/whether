@@ -42,6 +42,7 @@ export function DiagnosticsSection({
     <>
       <article className={`${tierTwoPanel} ${sectionSpacing}`} aria-label="Audit trail">
         <h2 className={tierTwoHeading}>Audit trail</h2>
+        <p className="text-xs leading-5 text-slate-300">Need deeper analysis? Open the supporting lanes below without leaving the weekly call.</p>
         <Accordion.Root defaultValue={["since-last-review"]} className="space-y-2">
           <Accordion.Item value="since-last-review" className="group">
             <DiagnosticsAccordionTrigger label="Delta" />

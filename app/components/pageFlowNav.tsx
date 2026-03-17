@@ -107,8 +107,8 @@ export function PageFlowNav({
 
   if (compact) {
     return (
-      <section className={`weather-panel weather-section-stage space-y-3 px-4 py-4 ${className ?? ""}`} aria-label={title}>
-        <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
+      <section className={`weather-panel weather-section-stage space-y-2.5 px-4 py-3.5 ${className ?? ""}`} aria-label={title}>
+        <div className="flex flex-col gap-2.5 xl:flex-row xl:items-end xl:justify-between">
           <div className="space-y-1">
             <div className="flex flex-wrap items-center gap-2">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">{eyebrow}</p>
@@ -139,12 +139,12 @@ export function PageFlowNav({
                   aria-current={isActive ? "location" : undefined}
                   data-active={isActive ? "true" : "false"}
                   data-reviewed={isReviewed ? "true" : "false"}
-                  className={`weather-surface weather-step-card flex min-h-[92px] touch-manipulation flex-col gap-1.5 rounded-xl border px-3 py-3 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${tone}`}
+                  className={`weather-surface weather-step-card flex min-h-[84px] touch-manipulation flex-col gap-1 rounded-xl border px-3 py-2.5 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${tone}`}
                 >
                   <div className="flex items-center justify-between gap-3">
                     <span className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em]">
                       <span
-                        className={`inline-flex h-6 w-6 items-center justify-center rounded-full border text-[10px] ${
+                        className={`inline-flex h-[1.375rem] w-[1.375rem] items-center justify-center rounded-full border text-[10px] ${
                           isActive
                             ? "border-sky-300/80 bg-sky-500/35 text-sky-50"
                             : isReviewed

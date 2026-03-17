@@ -39,7 +39,10 @@ export async function HomeWorkspaceBands({
       <section id="audit-this-call" className="home-band home-band--audit home-band-shell weather-panel weather-section-stage weather-section-stage--short scroll-mt-28 space-y-4 px-4 py-4 sm:px-5" aria-labelledby="audit-this-call-title">
         <div className="home-band-shell__header flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
-            <p className="home-band-kicker">Why this call</p>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="home-band-step">01</span>
+              <p className="home-band-kicker">Why this call</p>
+            </div>
             <h2 id="audit-this-call-title" className="text-xl font-semibold text-slate-100">See what changed, then pressure-test the call with trust and evidence.</h2>
             <p className="max-w-3xl text-sm text-slate-300">Start with the weekly delta and reversal cue, then inspect freshness, source coverage, and evidence movers before you change pace.</p>
           </div>
@@ -116,7 +119,10 @@ export async function HomeWorkspaceBands({
       <section id="approve-this-weeks-plan" className="home-band home-band--operations home-band-shell weather-panel weather-section-stage weather-section-stage--medium scroll-mt-28 space-y-4 px-4 py-4 sm:px-5" aria-labelledby="approve-this-weeks-plan-title">
         <div className="home-band-shell__header flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
-            <p className="home-band-kicker">Execution guardrails</p>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="home-band-step">02</span>
+              <p className="home-band-kicker">Execution guardrails</p>
+            </div>
             <h2 id="approve-this-weeks-plan-title" className="text-xl font-semibold text-slate-100">Lock the operating summary here, then open Operations only for execution detail.</h2>
             <p className="max-w-3xl text-sm text-slate-300">This band compresses the weekly do now, top guardrails, finance posture, and share handoff after you review the call.</p>
           </div>
@@ -175,7 +181,10 @@ export async function HomeWorkspaceBands({
 
       <section id="historical-replay-workspace" className="home-band home-band--history home-band-shell weather-panel weather-section-stage weather-section-stage--long scroll-mt-28 space-y-4 px-4 py-4 sm:px-5" aria-labelledby="historical-replay-workspace-title">
         <div className="home-band-shell__header space-y-1">
-          <p className="home-band-kicker">Historical replay</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="home-band-step">03</span>
+            <p className="home-band-kicker">Historical replay</p>
+          </div>
           <h2 id="historical-replay-workspace-title" className="text-xl font-semibold text-slate-100">Replay any prior month after you lock this week&apos;s live call.</h2>
           <p className="max-w-3xl text-sm text-slate-300">Use the same replay pattern as Signals when you want context, retrospectives, or a quick comparison to prior conditions.</p>
         </div>
@@ -215,7 +224,10 @@ export async function HomeWorkspaceBands({
 
       <section id="translate-or-run-tool" className="home-band home-band--translate home-band-shell weather-panel weather-section-stage weather-section-stage--long scroll-mt-28 space-y-4 px-4 py-4 sm:px-5" aria-labelledby="translate-or-run-tool-title">
         <div className="home-band-shell__header space-y-1">
-          <p className="home-band-kicker">Translate or run a tool</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="home-band-step">04</span>
+            <p className="home-band-kicker">Translate or run a tool</p>
+          </div>
           <h2 id="translate-or-run-tool-title" className="text-xl font-semibold text-slate-100">Go straight to a role path, situation path, or runnable utility.</h2>
           <p className="max-w-3xl text-sm text-slate-300">Use fast paths first. Browse role and situation hubs only when you need fuller discovery.</p>
         </div>

@@ -69,13 +69,13 @@ export const RegimeCommandBar = ({
 
   return (
     <section
-      className="weather-panel-static relative overflow-hidden border border-slate-700/80 bg-slate-950/95 px-4 py-3.5 sm:sticky sm:top-2 sm:z-40 sm:px-5"
+      className="weather-command-bar weather-panel-static relative overflow-hidden border border-slate-700/80 bg-slate-950/95 px-3.5 py-3 sm:sticky sm:top-2 sm:z-40 sm:px-4"
       aria-label="Weekly command bar"
     >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.14),transparent_45%)]" aria-hidden="true" />
-      <div className="relative space-y-3">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-          <div className="min-w-0 space-y-2">
+      <div className="relative grid gap-2.5 xl:grid-cols-[minmax(0,1.3fr)_repeat(3,minmax(0,0.9fr))] xl:items-stretch">
+        <div className="min-w-0 rounded-2xl border border-slate-700/70 bg-slate-950/72 px-3.5 py-3">
+          <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
               <ForecastChip
                 label={`${regimeStyle.label} outlook`}
@@ -88,28 +88,26 @@ export const RegimeCommandBar = ({
             </div>
             <div className="space-y-1">
               <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-sky-100/85">Current conditions</p>
-              <h2 className="text-base font-semibold tracking-[0.01em] text-slate-50 sm:text-lg">{call}</h2>
-              <p className="max-w-3xl text-xs leading-5 text-slate-300">
-                Scan this strip first, then open the full brief only when you need the rationale or execution detail.
+              <h2 className="max-w-3xl text-sm font-semibold leading-6 tracking-[0.01em] text-slate-50 sm:text-base">{call}</h2>
+              <p className="max-w-3xl text-[11px] leading-5 text-slate-300">
+                Planning baseline for this cycle. Open the deeper brief only when the call needs rationale or execution detail.
               </p>
             </div>
           </div>
         </div>
-
-        <div className="grid gap-2 md:grid-cols-3" aria-label="Weekly command bar current conditions strip">
-          {cards.map((card) => (
-            <article
-              key={card.id}
-              className={`rounded-xl border border-slate-800/70 bg-slate-950/72 px-3 py-3 ${card.toneClass ?? ""}`}
-            >
-              <p className={`text-[10px] font-semibold uppercase tracking-[0.12em] ${card.labelClass ?? "text-slate-400"}`}>
-                {card.label}
-              </p>
-              <p className="mt-1 text-sm font-semibold leading-5 text-inherit">{card.headline}</p>
-              <p className="mt-1 text-[11px] leading-5 text-slate-300">{card.detail}</p>
-            </article>
-          ))}
-        </div>
+        {cards.map((card) => (
+          <article
+            key={card.id}
+            className={`weather-command-bar__card rounded-2xl border border-slate-800/70 bg-slate-950/72 px-3 py-3 ${card.toneClass ?? ""}`}
+            aria-label={card.label}
+          >
+            <p className={`text-[10px] font-semibold uppercase tracking-[0.12em] ${card.labelClass ?? "text-slate-400"}`}>
+              {card.label}
+            </p>
+            <p className="mt-1 text-sm font-semibold leading-5 text-inherit">{card.headline}</p>
+            <p className="mt-1 text-[11px] leading-5 text-slate-300">{card.detail}</p>
+          </article>
+        ))}
       </div>
     </section>
   );

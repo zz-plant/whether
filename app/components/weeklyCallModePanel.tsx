@@ -85,6 +85,7 @@ export function WeeklyCallModePanel({
   const [activeMode, setActiveMode] = useState<StartupVariantMode>(startupVariantPolicy.selectedMode);
   const [commandOpen, setCommandOpen] = useState(false);
   const [commandQuery, setCommandQuery] = useState("");
+  const [stageControlsReady, setStageControlsReady] = useState(false);
 
   const effectiveMode = modeContentByMode[activeMode]
     ? activeMode
@@ -152,6 +153,8 @@ export function WeeklyCallModePanel({
 
 
   useEffect(() => {
+    setStageControlsReady(true);
+
     const onKeyDown = (event: KeyboardEvent) => {
       const isCommandShortcut = (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k";
       if (!isCommandShortcut) {
@@ -168,11 +171,11 @@ export function WeeklyCallModePanel({
 
   return (
     <>
-      <article className={`rounded-[1.2rem] border border-slate-700/75 bg-slate-950/92 p-3.5 sm:p-4 ${heroUrgencyClass}`} aria-label="Weekly call snapshot">
+      <article className={`rounded-[1.2rem] border border-slate-700/75 bg-slate-950/92 p-3 sm:p-3.5 ${heroUrgencyClass}`} aria-label="Weekly call snapshot">
         <ForecastConditionsHeader
           eyebrow="Current conditions"
           headline="This week in one screen"
-          description="Decide here, then open the audit trail only if the call needs evidence."
+          description="Action, guardrail, and flip condition for this week."
           chips={[
             { label: "Operator forecast", tone: "info" },
             { label: postureLabel },
@@ -185,12 +188,12 @@ export function WeeklyCallModePanel({
                 { label: "Stage view", value: stageSummary },
                 { label: "Signal state", value: confidenceLabel },
               ]}
-              className="lg:min-w-[22rem]"
+              className="lg:min-w-[19rem]"
             />
           )}
         />
         {whyItMattersLine ? (
-          <p className="mt-2.5 max-w-3xl text-xs leading-5 text-slate-200">{whyItMattersLine}</p>
+          <p className="mt-2.5 max-w-3xl rounded-xl border border-slate-700/60 bg-slate-950/55 px-3 py-2 text-xs leading-5 text-slate-200">{whyItMattersLine}</p>
         ) : null}
         <ForecastStrip cards={forecastCards} ariaLabel="Weekly decision transmission order" className="mt-3" />
         {readThisCardItems.length > 0 ? (
@@ -217,7 +220,8 @@ export function WeeklyCallModePanel({
         ) : null}
         <div className="mt-3 grid gap-2 lg:grid-cols-[minmax(0,1.15fr)_minmax(13rem,0.85fr)]">
           {trustCueLine ? (
-            <div className={`px-1 py-1 text-[11px] ${needsTrustWarning ? "text-amber-50" : "text-emerald-50"}`}>
+            <div className={`rounded-xl border px-3 py-2 text-[11px] ${needsTrustWarning ? "border-amber-400/30 bg-amber-500/10 text-amber-50" : "border-emerald-400/25 bg-emerald-500/10 text-emerald-50"}`}>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-current/80">Can I rely on this?</p>
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <span className={`h-2.5 w-2.5 rounded-full ${trustDotClass}`} aria-hidden="true" />
@@ -231,12 +235,12 @@ export function WeeklyCallModePanel({
               <p className="mt-1 leading-5">{needsTrustWarning ? trustWarningCopy ?? trustCueLine : trustCueLine}</p>
             </div>
           ) : null}
-          <div className="border-l border-slate-700/60 pl-3 py-1 lg:pl-4" aria-label="Decision confidence gauge">
+          <div className="rounded-xl border border-slate-700/60 bg-slate-950/60 px-3 py-2" aria-label="Decision confidence gauge">
             <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Decision confidence</p>
             <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-slate-800/90" role="progressbar" aria-valuenow={confidenceValue} aria-valuemin={0} aria-valuemax={100} aria-label={`Confidence ${confidenceValue} percent`}>
               <div className={`h-full origin-left ${confidenceToneClass} transition-transform duration-300`} style={{ transform: `scaleX(${confidenceValue / 100})` }} />
             </div>
-            <p className="mt-1 text-[10px] text-slate-300">{confidenceValue}% confidence · watch the flip cues when this compresses.</p>
+            <p className="mt-1 text-[10px] text-slate-300"><span className="font-semibold text-slate-100">{confidenceLabel} {confidenceValue}%</span> confidence · watch the flip cues when this compresses.</p>
           </div>
         </div>
       </article>
@@ -245,40 +249,52 @@ export function WeeklyCallModePanel({
         <h2 className={tierOneHeadingClassName}>This week&apos;s call</h2>
         <div className="grid gap-2 text-xs text-slate-100 md:grid-cols-2">
           <p className="border-l-2 border-slate-700/70 pl-3 py-1.5"><span className="font-semibold uppercase tracking-[0.08em] text-slate-200">What environment?</span> {postureLabel} with a {trendLabel.toLowerCase()} trend at {confidenceValue}% confidence.</p>
-          <p className="border-l-2 border-emerald-400/45 pl-3 py-1.5"><span className="font-semibold uppercase tracking-[0.08em] text-emerald-200">Do now</span> {modeAdjustedSnapshot.doNow}</p>
-          <p className="border-l-2 border-rose-400/45 pl-3 py-1.5"><span className="font-semibold uppercase tracking-[0.08em] text-rose-200">Guardrail</span> {modeAdjustedSnapshot.avoid}</p>
-          <p className="border-l-2 border-sky-400/45 pl-3 py-1.5"><span className="font-semibold uppercase tracking-[0.08em] text-sky-200">Flip when</span> {modeAdjustedSnapshot.watch}</p>
+          <p className="border-l-2 border-emerald-400/45 pl-3 py-1.5"><span className="font-semibold uppercase tracking-[0.08em] text-emerald-200">DO NOW</span> {modeAdjustedSnapshot.doNow}</p>
+          <p className="border-l-2 border-rose-400/45 pl-3 py-1.5"><span className="font-semibold uppercase tracking-[0.08em] text-rose-200">GUARDRAIL</span> {modeAdjustedSnapshot.avoid}</p>
+          <p className="border-l-2 border-sky-400/45 pl-3 py-1.5"><span className="font-semibold uppercase tracking-[0.08em] text-sky-200">FLIP WHEN</span> {modeAdjustedSnapshot.watch}</p>
         </div>
 
         <div className="border-t border-slate-800/55 pt-3">
           <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
             <div>
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Stage view</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Refine by company stage</p>
                 <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-200">
                   {stageSummary}
                 </span>
               </div>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {startupVariantPolicy.options.map((option) => {
-                  const selected = option.mode === effectiveMode;
-                  return (
-                    <button
-                      key={option.mode}
-                      type="button"
-                      onClick={() => setActiveMode(option.mode)}
-                      className={`min-h-[44px] rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.06em] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation ${
-                        selected
-                          ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
-                          : "border-slate-700/70 bg-slate-950/70 text-slate-300 hover:border-slate-500/80"
-                      }`}
-                      aria-pressed={selected}
-                    >
-                      {option.label}
-                    </button>
-                  );
-                })}
-              </div>
+              <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Stage view</p>
+              <p className="mt-2 text-[11px] leading-5 text-slate-300">
+                <span className="font-semibold text-slate-100">Stage selected:</span> {stageSummary}
+              </p>
+              {stageControlsReady ? (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {startupVariantPolicy.options.map((option) => {
+                    const selected = option.mode === effectiveMode;
+                    return (
+                      <button
+                        key={option.mode}
+                        type="button"
+                        onClick={() => setActiveMode(option.mode)}
+                        className={`min-h-[44px] rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.06em] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation ${
+                          selected
+                            ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
+                            : "border-slate-700/70 bg-slate-950/70 text-slate-300 hover:border-slate-500/80"
+                        }`}
+                        aria-pressed={selected}
+                      >
+                        {option.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="mt-2">
+                  <span className="inline-flex min-h-[44px] items-center rounded-full border border-sky-400/70 bg-sky-500/20 px-3 py-2 text-xs font-semibold tracking-[0.06em] text-sky-100">
+                    {stageSummary}
+                  </span>
+                </div>
+              )}
               {activeContent ? (
                 <p className="mt-2 text-[11px] leading-5 text-slate-300">
                   {activeContent.description} Threshold emphasis: {activeContent.thresholdEmphasis}

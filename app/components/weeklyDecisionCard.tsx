@@ -264,7 +264,7 @@ const ConfidenceBandMeter = ({
       <div className="flex items-center justify-between gap-2">
         <p className={`text-sm font-semibold ${tone.textClass}`}>{tone.label}</p>
         <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300" title={`Exact confidence ${Math.round(confidencePercent)} percent`}>
-          {Math.round(confidencePercent)}%
+          {confidenceLabel} {Math.round(confidencePercent)}%
         </span>
       </div>
       <div className="mt-2 grid grid-cols-3 gap-1" role="img" aria-label={`${tone.label}. Exact confidence ${Math.round(confidencePercent)} percent`}>
@@ -987,6 +987,55 @@ type CitationActionFooterProps = {
   actions?: ReactNode;
 };
 
+type DecisionTransmissionRailProps = {
+  actionNow: string;
+  guardrail: string;
+  flipWhen: string;
+  citationMetaLine: string;
+  actions?: ReactNode;
+};
+
+function DecisionTransmissionRail({
+  actionNow,
+  guardrail,
+  flipWhen,
+  citationMetaLine,
+  actions,
+}: DecisionTransmissionRailProps) {
+  const transmissionRows = [
+    { label: "Do now", value: actionNow, tone: "border-emerald-400/30 bg-emerald-500/10 text-emerald-50" },
+    { label: "Guardrail", value: guardrail, tone: "border-rose-400/30 bg-rose-500/10 text-rose-50" },
+    { label: "Flip when", value: flipWhen, tone: "border-sky-400/30 bg-sky-500/10 text-sky-50" },
+  ];
+
+  return (
+    <article className={`${tierOnePanel} ${sectionSpacing} hidden xl:block`} aria-label="Decision transmission rail">
+      <div className="flex items-center justify-between gap-3">
+        <h2 className={tierOneHeading}>Transmit this call</h2>
+        <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+          Desktop rail
+        </span>
+      </div>
+      <p className="text-xs leading-5 text-slate-300">Keep the shareable decision contract visible while you review the evidence stack.</p>
+      <div className="space-y-2">
+        {transmissionRows.map((row) => (
+          <div key={row.label} className={`rounded-xl border px-3 py-3 ${row.tone}`}>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-current/80">{row.label}</p>
+            <p className="mt-1 text-sm font-semibold leading-6 text-current">{row.value}</p>
+          </div>
+        ))}
+      </div>
+      <div className="rounded-xl border border-slate-700/60 bg-slate-950/70 px-3 py-3">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Artifact handoff</p>
+        <p className="mt-1 text-xs leading-5 text-slate-300">{citationMetaLine}</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {actions}
+        </div>
+      </div>
+    </article>
+  );
+}
+
 export function CitationActionFooter({ citationMetaLine, citation, actions }: CitationActionFooterProps) {
   return (
     <article id="citation-actions" className={`${tierThreePanel} ${sectionSpacing}`}>
@@ -998,7 +1047,7 @@ export function CitationActionFooter({ citationMetaLine, citation, actions }: Ci
         <span className="font-semibold uppercase tracking-[0.12em] text-slate-200">Send to team</span>
       </div>
       <div className="mt-3 flex flex-wrap gap-3">
-        <div className="hidden sm:flex sm:flex-wrap sm:gap-3">{actions}</div>
+        <div className="hidden sm:flex sm:flex-wrap sm:gap-3 xl:hidden">{actions}</div>
       </div>
     </article>
   );
@@ -1272,6 +1321,13 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
 
         <aside className="space-y-4 xl:sticky xl:top-28">
           <ConfidenceMiniChart confidenceHistory={confidenceHistory} confidenceTrend={confidenceTrend} />
+          <DecisionTransmissionRail
+            actionNow={snapshotDoNow}
+            guardrail={snapshotAvoid}
+            flipWhen={snapshotWatch}
+            citationMetaLine={citationMetaLine}
+            actions={actions}
+          />
 
         </aside>
       </div>

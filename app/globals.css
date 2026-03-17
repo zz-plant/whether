@@ -213,9 +213,9 @@ body {
   display: flex;
   gap: 0.75rem;
   align-items: flex-start;
-  min-height: 8.5rem;
-  padding: 0.95rem;
-  background-image: linear-gradient(155deg, rgba(56, 189, 248, 0.05), rgba(99, 102, 241, 0.04) 56%, rgba(2, 6, 23, 0.24));
+  min-height: 7.25rem;
+  padding: 0.9rem;
+  background-image: linear-gradient(155deg, rgba(56, 189, 248, 0.06), rgba(99, 102, 241, 0.05) 50%, rgba(2, 6, 23, 0.26));
   box-shadow:
     0 12px 22px -20px rgba(2, 6, 23, 0.68),
     inset 0 1px 0 rgba(148, 163, 184, 0.11),
@@ -501,6 +501,27 @@ body {
   width: 0.45rem;
   border-radius: 9999px;
   background: rgb(45 212 191);
+}
+
+.weather-command-bar {
+  box-shadow:
+    0 18px 34px -28px rgba(2, 6, 23, 0.82),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.weather-command-bar__card {
+  height: 100%;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.weather-command-bar__card:hover,
+.weather-command-bar__card:focus-within {
+  transform: translateY(-1px);
+  border-color: rgba(125, 211, 252, 0.36);
+  box-shadow: 0 14px 26px -22px rgba(56, 189, 248, 0.28);
 }
 
 
@@ -1212,6 +1233,21 @@ html {
   text-transform: uppercase;
 }
 
+.home-band-step {
+  display: inline-flex;
+  min-height: 1.75rem;
+  min-width: 1.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--home-band-border) 82%, rgba(255, 255, 255, 0.12));
+  background: color-mix(in srgb, var(--home-band-panel-bg) 84%, rgba(2, 6, 23, 0.4));
+  color: var(--home-band-kicker);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
 .home-band-shell {
   position: relative;
 }
@@ -1358,6 +1394,8 @@ html {
 }
 
 .weather-step-card {
+  position: relative;
+  overflow: hidden;
   transition:
     transform 220ms ease,
     border-color 220ms ease,
@@ -1375,6 +1413,24 @@ html {
 
 .weather-step-card[data-reviewed="true"] {
   border-color: rgba(94, 234, 212, 0.28);
+}
+
+.weather-step-card[data-active="true"]::before,
+.weather-step-card[data-reviewed="true"]::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.weather-step-card[data-active="true"]::before {
+  background: linear-gradient(180deg, rgba(224, 242, 254, 0.96), rgba(56, 189, 248, 0.52));
+}
+
+.weather-step-card[data-reviewed="true"]::before {
+  background: linear-gradient(180deg, rgba(209, 250, 229, 0.94), rgba(16, 185, 129, 0.5));
 }
 
 .weather-step-panel {
