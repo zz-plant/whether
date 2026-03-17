@@ -446,10 +446,10 @@ function RegimeLegend({
           })}
         </ol>
         {activePlaybook ? (
-          <div className="rounded-lg border border-slate-700/65 bg-slate-950/55 px-3 py-3">
+          <div className="border-t border-slate-700/65 pt-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="text-[10px] font-semibold uppercase tracking-[0.13em] text-slate-300">Playbook for {activePlaybook.title}</p>
-              <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-200">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-200">
                 {activePlaybook.mandate}
               </span>
             </div>
@@ -524,8 +524,8 @@ function RegimeBanner({
             </div>
           </div>
         </div>
-        <div className="grid gap-2 sm:grid-cols-3 xl:min-w-[22rem]">
-          <div className="rounded-xl border border-white/10 bg-slate-950/28 px-3 py-2.5">
+        <div className="grid gap-2 border-t border-white/10 pt-2 sm:grid-cols-3 xl:min-w-[22rem] xl:border-t-0 xl:pt-0 xl:pl-4 xl:[&>div:not(:first-child)]:border-l xl:[&>div:not(:first-child)]:border-white/10">
+          <div className="px-1 py-1 xl:px-3">
             <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-200/80">Weather</p>
             <p className="mt-1 flex items-center gap-2 text-sm font-semibold text-slate-50">
               <RegimeWeatherGlyph icon={activeWeatherIcon} title={activeWeather} />
@@ -536,13 +536,13 @@ function RegimeBanner({
               <span>Directional pressure</span>
             </p>
           </div>
-          <div className="rounded-xl border border-white/10 bg-slate-950/28 px-3 py-2.5">
+          <div className="px-1 py-1 xl:px-3">
             <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-200/80">Confidence</p>
             <div className="mt-1">
               <ConfidenceBandMeter confidencePercent={confidencePercent} confidenceLabel={confidenceLabel} />
             </div>
           </div>
-          <div className="rounded-xl border border-white/10 bg-slate-950/28 px-3 py-2.5">
+          <div className="px-1 py-1 xl:px-3">
             <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-200/80">Flip watch</p>
             <div className="mt-1">
               <FlipRiskDial flipRiskState={flipRiskState} />
@@ -618,6 +618,24 @@ type BoundedRulesMatrixProps = {
   decisionRules?: BoundedDecisionRule[];
 };
 
+const decisionLaneTone: Record<"approve" | "delay" | "flip", {
+  label: string;
+  badgeClassName: string;
+}> = {
+  approve: {
+    label: "↑ Now",
+    badgeClassName: "border-emerald-400/35 bg-emerald-500/10 text-emerald-100",
+  },
+  delay: {
+    label: "∥ Hold",
+    badgeClassName: "border-rose-400/35 bg-rose-500/10 text-rose-100",
+  },
+  flip: {
+    label: "↺ Flip",
+    badgeClassName: "border-sky-400/35 bg-sky-500/10 text-sky-100",
+  },
+};
+
 export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [] }: BoundedRulesMatrixProps) {
   const matrixAreaByKey: Record<"hiring" | "product" | "capital" | "burn", BoundedDecisionRule["area"]> = {
     hiring: "hiring",
@@ -689,7 +707,7 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [] }: Bound
   return (
     <article className={`${tierOnePanel} ${sectionSpacing}`}>
       <h2 className={tierOneHeading}>Decision snapshot for leadership this week</h2>
-      <p className="text-xs leading-5 text-slate-300">Scan Approve/Delay/Flip across core operating decisions, then open a cell for rationale and threshold context.</p>
+      <p className="text-xs leading-5 text-slate-300">Scan the lanes, then open a cell only when you need the threshold rationale.</p>
       <div className="mt-2 overflow-x-auto hidden sm:block">
         <table className="min-w-full border-separate border-spacing-2 text-xs text-slate-100" aria-label="Bounded decision matrix">
           <thead>
@@ -697,7 +715,11 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [] }: Bound
               <th scope="col" className="rounded-md border border-slate-700/70 bg-slate-950/70 px-2.5 py-2 text-left font-semibold text-slate-300">Decision area</th>
               <th scope="col" className="rounded-md border border-slate-700/70 bg-slate-950/70 px-2.5 py-2 text-left font-semibold text-slate-300">Context</th>
               {matrix.columns.map((column) => (
-                <th key={column.key} scope="col" className="rounded-md border border-slate-700/70 bg-slate-950/70 px-2.5 py-2 text-left font-semibold text-slate-200">{column.label}</th>
+                <th key={column.key} scope="col" className="rounded-md border border-slate-700/70 bg-slate-950/70 px-2.5 py-2 text-left font-semibold text-slate-200">
+                  <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] uppercase tracking-[0.08em] ${decisionLaneTone[column.key].badgeClassName}`}>
+                    {decisionLaneTone[column.key].label}
+                  </span>
+                </th>
               ))}
             </tr>
           </thead>
@@ -735,7 +757,10 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [] }: Bound
                 return (
                   <details key={`mobile-${row.key}-${column.key}`} className="rounded border border-slate-700/60 bg-slate-950/70 px-2 py-1.5">
                     <summary className="cursor-pointer list-none text-[11px] leading-5 text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
-                      <span className="font-semibold text-slate-300">{column.label}:</span> {compactActionCue(cell.text)}
+                      <span className={`mr-1 inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] ${decisionLaneTone[column.key].badgeClassName}`}>
+                        {decisionLaneTone[column.key].label}
+                      </span>
+                      {compactActionCue(cell.text)}
                     </summary>
                     <p className="mt-1 text-[11px] leading-5 text-slate-300">{cell.detail}</p>
                   </details>
@@ -784,7 +809,7 @@ function InputInfluenceSection({ items }: { items: InputInfluenceItem[] }) {
           const thresholdMarker = buildThresholdMarkerState(item.valueLabel, item.watchLabel);
 
           return (
-            <li key={item.key} className="rounded-lg border border-slate-800/60 bg-slate-950/55 px-3 py-3">
+            <li key={item.key} className="border-b border-slate-800/60 px-1 py-3 last:border-b-0">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">

@@ -110,6 +110,8 @@ export function WeeklyCallModePanel({
       ? "weather-live-hero weather-live-hero--medium"
       : "weather-live-hero weather-live-hero--low";
   const stageSummary = selectedModeLabel ?? "Default";
+  const trustDotClass = needsTrustWarning ? "bg-amber-300" : "bg-emerald-300";
+  const trustStatusLabel = needsTrustWarning ? "Degraded" : "Live";
   const followUpFlipLabels = effectiveFlipLabels
     .filter((label) => label.trim().length > 0 && label.trim() !== modeAdjustedSnapshot.watch.trim())
     .slice(0, 2);
@@ -215,12 +217,21 @@ export function WeeklyCallModePanel({
         ) : null}
         <div className="mt-3 grid gap-2 lg:grid-cols-[minmax(0,1.15fr)_minmax(13rem,0.85fr)]">
           {trustCueLine ? (
-            <div className={`rounded-lg border px-3 py-2.5 text-[11px] ${needsTrustWarning ? "border-amber-400/35 bg-amber-500/10 text-amber-50" : "border-slate-700/60 bg-slate-950/55 text-slate-200"}`}>
-              <p className="font-semibold uppercase tracking-[0.12em]">{needsTrustWarning ? "Can I rely on this?" : "Trust check"}</p>
+            <div className={`px-1 py-1 text-[11px] ${needsTrustWarning ? "text-amber-50" : "text-emerald-50"}`}>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className={`h-2.5 w-2.5 rounded-full ${trustDotClass}`} aria-hidden="true" />
+                  <span className="font-semibold uppercase tracking-[0.12em]">{trustStatusLabel}</span>
+                </div>
+                <span className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.12em] text-current/80">
+                  <span aria-hidden="true">◷</span>
+                  Data status
+                </span>
+              </div>
               <p className="mt-1 leading-5">{needsTrustWarning ? trustWarningCopy ?? trustCueLine : trustCueLine}</p>
             </div>
           ) : null}
-          <div className="rounded-lg border border-slate-700/60 bg-slate-950/55 px-3 py-2.5" aria-label="Decision confidence gauge">
+          <div className="border-l border-slate-700/60 pl-3 py-1 lg:pl-4" aria-label="Decision confidence gauge">
             <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Decision confidence</p>
             <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-slate-800/90" role="progressbar" aria-valuenow={confidenceValue} aria-valuemin={0} aria-valuemax={100} aria-label={`Confidence ${confidenceValue} percent`}>
               <div className={`h-full origin-left ${confidenceToneClass} transition-transform duration-300`} style={{ transform: `scaleX(${confidenceValue / 100})` }} />
@@ -233,13 +244,13 @@ export function WeeklyCallModePanel({
       <article id="weekly-call-core" className={`${tierOnePanelClassName} weather-motion-card ${sectionSpacingClassName} bg-gradient-to-br from-slate-950/95 via-slate-900/85 to-slate-950/95`}>
         <h2 className={tierOneHeadingClassName}>This week&apos;s call</h2>
         <div className="grid gap-2 text-xs text-slate-100 md:grid-cols-2">
-          <p className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-slate-200">What environment?</span> {postureLabel} with a {trendLabel.toLowerCase()} trend at {confidenceValue}% confidence.</p>
-          <p className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-emerald-200">DO NOW</span> {modeAdjustedSnapshot.doNow}</p>
-          <p className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-rose-200">GUARDRAIL</span> {modeAdjustedSnapshot.avoid}</p>
-          <p className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-sky-200">FLIP WHEN</span> {modeAdjustedSnapshot.watch}</p>
+          <p className="border-l-2 border-slate-700/70 pl-3 py-1.5"><span className="font-semibold uppercase tracking-[0.08em] text-slate-200">What environment?</span> {postureLabel} with a {trendLabel.toLowerCase()} trend at {confidenceValue}% confidence.</p>
+          <p className="border-l-2 border-emerald-400/45 pl-3 py-1.5"><span className="font-semibold uppercase tracking-[0.08em] text-emerald-200">Do now</span> {modeAdjustedSnapshot.doNow}</p>
+          <p className="border-l-2 border-rose-400/45 pl-3 py-1.5"><span className="font-semibold uppercase tracking-[0.08em] text-rose-200">Guardrail</span> {modeAdjustedSnapshot.avoid}</p>
+          <p className="border-l-2 border-sky-400/45 pl-3 py-1.5"><span className="font-semibold uppercase tracking-[0.08em] text-sky-200">Flip when</span> {modeAdjustedSnapshot.watch}</p>
         </div>
 
-        <div className="rounded-lg border border-slate-800/55 bg-slate-950/62 px-3 py-2.5">
+        <div className="border-t border-slate-800/55 pt-3">
           <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
             <div>
               <div className="flex flex-wrap items-center justify-between gap-2">
