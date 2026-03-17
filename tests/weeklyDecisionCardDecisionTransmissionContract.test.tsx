@@ -279,8 +279,8 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
       />,
     );
 
-    assert.match(html, /<summary[^>]*>More context<\/summary>/);
-    assert.match(html, /Trend:/);
-    assert.match(html, /Confidence:/);
+    assert.match(html, /<summary[^>]*>Decode this forecast<\/summary>/);
+    assert.match(html, /Can I rely on this\?/);
+    assert.doesNotMatch(html, /<summary[^>]*>More context<\/summary>/);
   });
 });

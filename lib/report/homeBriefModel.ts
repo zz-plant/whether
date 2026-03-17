@@ -4,6 +4,7 @@ import { getSummaryArchive } from "../summary/summaryArchive";
 import type { MacroSeriesReading } from "../types";
 import { resolveDistanceToFlip, resolveConfidencePercentFromDistance } from "./confidence";
 import { isImprovingSignalDelta, type HistoricalAnalog, type ReportEvidenceItem } from "./reportData";
+import { normalizeSignalContributions } from "./signalFormatting";
 import {
   REGIME_SEVERITY_RANK,
   REGIME_SHORT_LABELS,
@@ -43,7 +44,7 @@ import type { PostureStateContract } from "./postureStateContract";
 import { buildDecisionMatrixPayload } from "./homeBrief/decisionMatrix";
 import { buildStartupClimateIndex, type StartupClimateIndex } from "./homeBrief/scoring";
 import { buildPrimaryRiskLabel } from "./homeBrief/risk";
-import type { RegimeKey } from "../regimeEngine";
+import { buildSignalInfluence, DEFAULT_THRESHOLDS, type RegimeKey } from "../regimeEngine";
 import type { ConfidenceTrendFraming, ReportDynamics, WeeklyConfidencePoint } from "./reportData";
 import type { CanonicalDecisionCopy } from "./canonicalDecisionCopy";
 import type { ForecastRegimeLabel } from "./forecastModel";
@@ -58,7 +59,7 @@ type HomeReportData = {
   assessment: {
     regime: Regime;
     thresholds: { tightnessRegime: number; riskAppetiteRegime: number };
-    scores: { tightness: number; riskAppetite: number };
+    scores: { tightness: number; riskAppetite: number; baseRate?: number; curveSlope?: number | null };
   };
   regimeAlert: { previousRegime: Regime } | null;
   stopItems: string[];
@@ -145,6 +146,22 @@ type RegimeSignalIndicator = {
   trendDeltaLabel: string;
   sparkline: number[];
   isFallback: boolean;
+};
+
+type InputInfluenceTone = "warning" | "positive" | "neutral";
+
+export type InputInfluenceItem = {
+  key: RegimeSignalKey;
+  label: string;
+  valueLabel: string;
+  pressureLabel: string;
+  effectDetail: string;
+  influencePercent: number;
+  influencePercentLabel: string;
+  trendArrow: "↑" | "↓" | "→";
+  trendLabel: string;
+  watchLabel: string;
+  tone: InputInfluenceTone;
 };
 
 type HomeBriefFailureMode = FailureModeWarning;
@@ -262,6 +279,7 @@ export type WeeklyDecisionCardViewModel = {
   };
   diagnostics: {
     regimeSignalIndicators: RegimeSignalIndicator[];
+    inputInfluence: InputInfluenceItem[];
     startupClimateIndex: StartupClimateIndex;
     regimeDistance: {
       dimensionLabel: string;
@@ -460,17 +478,33 @@ const buildOperatingStanceLine = ({
   directionLabel: "improving" | "deteriorating" | "mixed" | "stable" | undefined;
   currentRegime: Regime;
 }) => {
-  const isExpansionRegime = currentRegime === "EXPANSION";
-
   if (severityDelta > 0 || directionLabel === "deteriorating") {
-    return "Stage decisions. Avoid irreversible spend.";
+    if (currentRegime === "SCARCITY") {
+      return "Tighten to survival mode: approve only renewals, core delivery, and revenue-backed roles.";
+    }
+    if (currentRegime === "DEFENSIVE") {
+      return "Tighten approvals around retention, margin, and revenue-linked work.";
+    }
+    if (currentRegime === "VOLATILE") {
+      return "De-risk the call: ship reliability, trust, and short-payback releases.";
+    }
+    return "Keep expansion selective: add capacity only in proven demand lanes and keep rollback criteria explicit.";
   }
 
-  if ((severityDelta < 0 || directionLabel === "improving") && isExpansionRegime) {
-    return "Stage expansion. Keep approvals reversible.";
+  if ((severityDelta < 0 || directionLabel === "improving") && currentRegime === "EXPANSION") {
+    return "Press proven growth lanes and add capacity where demand is already converting.";
   }
 
-  return "Hold approvals steady. Keep irreversible spend capped.";
+  if (currentRegime === "SCARCITY") {
+    return "Operate for cash survival: approve only renewals, core delivery, and revenue-backed roles.";
+  }
+  if (currentRegime === "DEFENSIVE") {
+    return "Hold approvals steady around retention, margin, and revenue-linked work.";
+  }
+  if (currentRegime === "VOLATILE") {
+    return "Operate for proof: ship reliability, trust, and short-payback releases.";
+  }
+  return "Press proven growth lanes and add capacity where demand is already converting.";
 };
 
 const buildWeeklyMemoLines = ({
@@ -482,11 +516,13 @@ const buildWeeklyMemoLines = ({
   trendLabel: string;
   transitionWatch: "ON" | "OFF";
 }) => [
-  `Market conditions are ${trendLabel.toLowerCase()} this week.`,
+  trendLabel === "Stable"
+    ? "Changed: no material signal shift this week."
+    : `Changed: market conditions are ${trendLabel.toLowerCase()} this week.`,
   operatingStanceLine,
   transitionWatch === "ON"
-    ? "Regime shift watch is on: stage approvals and preserve runway."
-    : "Regime shift watch is off: hold current pace with bounded approvals.",
+    ? "Flip watch is on: keep hiring, roadmap, and spend decisions reversible until the next live read."
+    : "Flip watch is off: keep this week's approvals on the current track.",
 ];
 
 const buildMemoryRail = (recordDateLabel: string | undefined, currentRegime: Regime): MemoryRailItem[] => {
@@ -611,6 +647,16 @@ const buildRegimeSignalIndicators = ({
     if (key === "riskAppetite") {
       return [assessment.thresholds.riskAppetiteRegime, assessment.scores.riskAppetite];
     }
+    if (key === "baseRate") {
+      return typeof assessment.scores.baseRate === "number"
+        ? [DEFAULT_THRESHOLDS.baseRateTightness, assessment.scores.baseRate]
+        : [];
+    }
+    if (key === "curveSlope") {
+      return typeof assessment.scores.curveSlope === "number"
+        ? [0, assessment.scores.curveSlope]
+        : [];
+    }
 
     const seriesId = signalSeriesByKey[key];
     const series = seriesId ? macroSeries?.find((entry) => entry.id === seriesId) : undefined;
@@ -634,6 +680,24 @@ const buildRegimeSignalIndicators = ({
         trendDeltaLabel: delta === null ? "No weekly delta" : `${delta > 0 ? "+" : ""}${delta.toFixed(1)} vs last week`,
         sparkline: resolveSparkline(key),
         isFallback: delta === null,
+      };
+    }
+
+    if (key === "baseRate" || key === "curveSlope") {
+      const rawValue = key === "baseRate"
+        ? (typeof assessment.scores.baseRate === "number" ? assessment.scores.baseRate : null)
+        : (typeof assessment.scores.curveSlope === "number" ? assessment.scores.curveSlope : null);
+      const changed = changedSignals.find((signal) => signal.key === key);
+      const delta = changed?.delta ?? fallbackTrendDeltaByKey[key];
+      return {
+        key,
+        label: regimeSignalLabelByKey[key],
+        valueLabel: formatRegimeSignalValue(rawValue, key),
+        rawValue,
+        trendArrow: formatTrendArrow(delta),
+        trendDeltaLabel: delta === null ? "No weekly delta" : `${delta > 0 ? "+" : ""}${delta.toFixed(1)} vs last week`,
+        sparkline: resolveSparkline(key),
+        isFallback: rawValue === null || delta === null,
       };
     }
 
@@ -883,14 +947,14 @@ const buildWhyItMattersLine = ({
   };
 }) => {
   if (weeklyMovement.direction === "defensive") {
-    return "External conditions are tightening, so fixed-cost mistakes get harder to reverse and long-payback bets need stronger proof.";
+    return "Fixed-cost mistakes are getting more expensive, so long-payback bets now need harder proof and tighter approval discipline.";
   }
 
   if (weeklyMovement.direction === "expansionary") {
-    return "External conditions are easing, so teams can release selective bets faster without dropping payback discipline.";
+    return "Speed is getting safer, so teams can press proven demand lanes faster without dropping payback discipline.";
   }
 
-  return "External conditions shape how aggressively teams hire, spend, and approve long-payback work even when the weekly call is unchanged.";
+  return "Even with a stable posture, the model is setting how fast teams hire, spend, and approve long-payback work this week.";
 };
 
 const buildReadThisCardItems = ({
@@ -915,6 +979,169 @@ const buildReadThisCardItems = ({
     detail: reversalTrigger.trim(),
   },
 ]).filter((item) => item.detail.length > 0);
+
+const inputInfluenceKeyOrder: RegimeSignalKey[] = ["tightness", "riskAppetite", "baseRate", "curveSlope"];
+
+const buildInputInfluenceFallback = ({
+  assessment,
+}: {
+  assessment: HomeReportData["assessment"];
+}) =>
+  normalizeSignalContributions(
+    buildSignalInfluence({
+    tightness: assessment.scores.tightness,
+    riskAppetite: assessment.scores.riskAppetite,
+    baseRate: typeof assessment.scores.baseRate === "number" ? assessment.scores.baseRate : null,
+    curveSlope: typeof assessment.scores.curveSlope === "number" ? assessment.scores.curveSlope : null,
+    thresholds: {
+      ...DEFAULT_THRESHOLDS,
+      ...assessment.thresholds,
+    },
+    })
+  );
+
+const buildInputInfluenceDescription = ({
+  key,
+  rawValue,
+  assessment,
+}: {
+  key: RegimeSignalKey;
+  rawValue: number | null;
+  assessment: HomeReportData["assessment"];
+}): Pick<InputInfluenceItem, "pressureLabel" | "effectDetail" | "watchLabel" | "tone"> => {
+  if (typeof rawValue !== "number") {
+    return {
+      pressureLabel: "Waiting on a fresh read",
+      effectDetail: "This input is not carrying a current directional push into the call yet.",
+      watchLabel: "Refresh pending",
+      tone: "neutral",
+    };
+  }
+
+  if (key === "tightness") {
+    const gap = rawValue - assessment.thresholds.tightnessRegime;
+    return gap >= 0
+      ? {
+          pressureLabel: gap >= 8 ? "Strong defensive pull" : "Defensive pull",
+          effectDetail: `${gap.toFixed(1)} pts above the regime line, so approvals and fixed-cost tolerance stay tighter.`,
+          watchLabel: `Regime line ${assessment.thresholds.tightnessRegime.toFixed(1)}`,
+          tone: "warning",
+        }
+      : {
+          pressureLabel: Math.abs(gap) >= 8 ? "Expansion support" : "Room to loosen",
+          effectDetail: `${Math.abs(gap).toFixed(1)} pts below the regime line, so the call has room to loosen if other inputs confirm.`,
+          watchLabel: `Regime line ${assessment.thresholds.tightnessRegime.toFixed(1)}`,
+          tone: "positive",
+        };
+  }
+
+  if (key === "riskAppetite") {
+    const gap = rawValue - assessment.thresholds.riskAppetiteRegime;
+    return gap >= 0
+      ? {
+          pressureLabel: gap >= 8 ? "Strong expansion support" : "Expansion support",
+          effectDetail: `${gap.toFixed(1)} pts above the regime line, so the call can carry larger reversible bets.`,
+          watchLabel: `Regime line ${assessment.thresholds.riskAppetiteRegime.toFixed(1)}`,
+          tone: "positive",
+        }
+      : {
+          pressureLabel: Math.abs(gap) >= 8 ? "Risk-off pressure" : "Capping risk-taking",
+          effectDetail: `${Math.abs(gap).toFixed(1)} pts below the regime line, so bet size and expansion appetite stay capped.`,
+          watchLabel: `Regime line ${assessment.thresholds.riskAppetiteRegime.toFixed(1)}`,
+          tone: "warning",
+        };
+  }
+
+  if (key === "baseRate") {
+    const gap = rawValue - DEFAULT_THRESHOLDS.baseRateTightness;
+    if (gap > 0.25) {
+      return {
+        pressureLabel: "Payback pressure",
+        effectDetail: `${gap.toFixed(1)} pts above the cost-of-money line, so long-payback work needs harder proof.`,
+        watchLabel: `Cost-of-money line ${DEFAULT_THRESHOLDS.baseRateTightness.toFixed(1)}%`,
+        tone: "warning",
+      };
+    }
+    if (gap < -0.25) {
+      return {
+        pressureLabel: "Rate relief",
+        effectDetail: `${Math.abs(gap).toFixed(1)} pts below the cost-of-money line, so rates are not the main drag on approvals.`,
+        watchLabel: `Cost-of-money line ${DEFAULT_THRESHOLDS.baseRateTightness.toFixed(1)}%`,
+        tone: "positive",
+      };
+    }
+    return {
+      pressureLabel: "Neutral rate read",
+      effectDetail: "Rates are near the cost-of-money line, so they are not giving the model a strong directional shove.",
+      watchLabel: `Cost-of-money line ${DEFAULT_THRESHOLDS.baseRateTightness.toFixed(1)}%`,
+      tone: "neutral",
+    };
+  }
+
+  if (rawValue < -0.1) {
+    return {
+      pressureLabel: "Recession caution",
+      effectDetail: "The curve is still inverted, so expansion confidence stays capped even if other inputs improve.",
+      watchLabel: "Below 0.0% = inversion",
+      tone: "warning",
+    };
+  }
+  if (rawValue > 0.1) {
+    return {
+      pressureLabel: "Expansion confidence",
+      effectDetail: "The curve is positive, which supports a looser call if tightness also cooperates.",
+      watchLabel: "Below 0.0% = inversion",
+      tone: "positive",
+    };
+  }
+  return {
+    pressureLabel: "Boundary watch",
+    effectDetail: "The curve is near flat, so it is not giving the model a strong directional push yet.",
+    watchLabel: "Below 0.0% = inversion",
+    tone: "neutral",
+  };
+};
+
+const buildInputInfluenceItems = ({
+  assessment,
+  reportDynamics,
+  regimeSignalIndicators,
+}: {
+  assessment: HomeReportData["assessment"];
+  reportDynamics: HomeReportData["reportDynamics"];
+  regimeSignalIndicators: RegimeSignalIndicator[];
+}): InputInfluenceItem[] => {
+  const signalContributions = reportDynamics?.signalContributions?.length
+    ? reportDynamics.signalContributions
+    : buildInputInfluenceFallback({ assessment });
+  const contributionByKey = new Map(signalContributions.map((item) => [item.key, item]));
+  const indicatorByKey = new Map(regimeSignalIndicators.map((item) => [item.key, item]));
+
+  return inputInfluenceKeyOrder.map((key) => {
+    const indicator = indicatorByKey.get(key);
+    const contribution = contributionByKey.get(key);
+    const influencePercent = contribution ? Math.round(contribution.normalized * 100) : 0;
+    const description = buildInputInfluenceDescription({
+      key,
+      rawValue: indicator?.rawValue ?? null,
+      assessment,
+    });
+
+    return {
+      key,
+      label: indicator?.label ?? regimeSignalLabelByKey[key],
+      valueLabel: indicator?.valueLabel ?? "—",
+      pressureLabel: description.pressureLabel,
+      effectDetail: description.effectDetail,
+      influencePercent,
+      influencePercentLabel: contribution?.normalizedPercentLabel ?? `${influencePercent}%`,
+      trendArrow: indicator?.trendArrow ?? "→",
+      trendLabel: indicator?.isFallback ? "No fresh weekly delta yet." : indicator?.trendDeltaLabel ?? "Weekly delta unavailable.",
+      watchLabel: description.watchLabel,
+      tone: description.tone,
+    };
+  });
+};
 
 export const buildHomeBriefModel = (
   data: HomeReportData,
@@ -1127,6 +1354,11 @@ export const buildHomeBriefModel = (
     reportDynamics,
     macroSeries,
   });
+  const inputInfluence = buildInputInfluenceItems({
+    assessment,
+    reportDynamics,
+    regimeSignalIndicators,
+  });
 
   const netConstraintSummary =
     severityDelta > 0
@@ -1153,6 +1385,7 @@ export const buildHomeBriefModel = (
     },
     trendLabel,
     regimeSignalIndicators,
+    inputInfluence,
     operatingStanceLine,
     weeklyMemoLines: buildWeeklyMemoLines({
       operatingStanceLine,
@@ -1310,6 +1543,7 @@ export const buildWeeklyDecisionCardViewModel = ({
     },
     diagnostics: {
       regimeSignalIndicators: homeBriefModel.regimeSignalIndicators,
+      inputInfluence: homeBriefModel.inputInfluence,
       startupClimateIndex: homeBriefModel.startupClimateIndex,
       regimeDistance: homeBriefModel.regimeDistance,
       regimeVelocity: homeBriefModel.regimeVelocity,

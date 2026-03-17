@@ -64,6 +64,9 @@ describe("buildHomeBriefModel", () => {
     assert.equal(typeof model.weeklyMovement.score, "number");
     assert.match(model.weeklyMovement.direction, /defensive|expansionary|neutral/);
     assert.equal(model.regimeSignalIndicators.length, 4);
+    assert.equal(model.inputInfluence.length, 4);
+    assert.equal(model.inputInfluence[0]?.key, "tightness");
+    assert.match(model.inputInfluence[0]?.effectDetail ?? "", /regime line|approvals/i);
     assert.equal(model.regimeSignalIndicators[0]?.label, "Capital tightness");
     assert.match(model.regimeSignalIndicators[0]?.trendDeltaLabel ?? "", /vs last week/);
   });
@@ -353,6 +356,7 @@ describe("buildHomeBriefModel", () => {
 
     assert.doesNotMatch(model.operatingStanceLine, /Stage expansion/i);
     assert.match(model.operatingStanceLine, /Hold approvals steady/i);
+    assert.match(model.operatingStanceLine, /retention|margin|revenue-linked/i);
   });
 
 
@@ -399,6 +403,38 @@ describe("buildHomeBriefModel", () => {
     assert.equal(baseRate?.valueLabel, "—");
     assert.equal(baseRate?.trendArrow, "→");
     assert.equal(baseRate?.isFallback, true);
+  });
+
+  it("uses assessment base rate and curve slope in indicators and influence copy when available", () => {
+    const model = buildHomeBriefModel({
+      assessment: {
+        regime: "DEFENSIVE",
+        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
+        scores: { tightness: 58, riskAppetite: 45, baseRate: 5.4, curveSlope: -0.3 },
+      },
+      regimeAlert: null,
+      stopItems: ["Guardrail"],
+      reportDynamics: {
+        directionLabel: "deteriorating",
+        changedSignals: [
+          { key: "baseRate", delta: 0.2 },
+          { key: "curveSlope", delta: -0.1 },
+        ],
+        anomalySignals: [],
+      },
+    });
+
+    const baseRate = model.regimeSignalIndicators.find((item) => item.key === "baseRate");
+    const curveSlope = model.regimeSignalIndicators.find((item) => item.key === "curveSlope");
+    const baseRateInfluence = model.inputInfluence.find((item) => item.key === "baseRate");
+    const curveInfluence = model.inputInfluence.find((item) => item.key === "curveSlope");
+
+    assert.equal(baseRate?.valueLabel, "5.4");
+    assert.equal(baseRate?.isFallback, false);
+    assert.equal(curveSlope?.valueLabel, "-0.3");
+    assert.equal(curveSlope?.isFallback, false);
+    assert.match(baseRateInfluence?.pressureLabel ?? "", /Payback pressure|Neutral rate read|Rate relief/);
+    assert.match(curveInfluence?.effectDetail ?? "", /curve|expansion confidence|inverted/i);
   });
 
 

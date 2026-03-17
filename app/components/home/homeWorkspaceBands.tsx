@@ -22,6 +22,8 @@ export async function HomeWorkspaceBands({
         title={homeScrollPlan.title}
         description={homeScrollPlan.description}
         items={homeScrollPlan.items}
+        className="home-band home-band--flow"
+        compact={true}
         actions={(
           <>
             <a href={workspaceModel.workspaceActions.auditHref} className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">
@@ -34,10 +36,10 @@ export async function HomeWorkspaceBands({
         )}
       />
 
-      <section id="audit-this-call" className="weather-panel weather-section-stage weather-section-stage--short scroll-mt-28 space-y-4 px-5 py-5" aria-labelledby="audit-this-call-title">
+      <section id="audit-this-call" className="home-band home-band--audit weather-panel weather-section-stage weather-section-stage--short scroll-mt-28 space-y-4 px-4 py-4 sm:px-5" aria-labelledby="audit-this-call-title">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Why this call</p>
+            <p className="home-band-kicker">Why this call</p>
             <h2 id="audit-this-call-title" className="text-xl font-semibold text-slate-100">See what changed, then pressure-test the call with trust and evidence.</h2>
             <p className="max-w-3xl text-sm text-slate-300">Start with the weekly delta and reversal cue, then inspect freshness, source coverage, and evidence movers before you change pace.</p>
           </div>
@@ -80,12 +82,12 @@ export async function HomeWorkspaceBands({
           />
 
           <div className="weather-list-stagger grid gap-3">
-            <article className="weather-surface weather-delta-card rounded-xl p-4" data-emphasis="true">
+            <article className="home-band-card home-band-card--priority weather-surface weather-delta-card rounded-xl p-3" data-emphasis="true">
               <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">What changed in the decision</p>
               <p className="mt-2 text-sm font-semibold text-slate-100">{workspaceModel.audit.revisitHeadline}</p>
               <p className="mt-2 text-sm text-slate-300">{workspaceModel.audit.revisitDetail}</p>
             </article>
-            <article className="weather-surface weather-delta-card rounded-xl p-4">
+            <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">
               <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">What would change this call</p>
               <p className="mt-2 text-sm font-semibold text-slate-100">{workspaceModel.audit.flipHeadline}</p>
               <p className="mt-2 text-sm text-slate-300">{workspaceModel.audit.flipDetail}</p>
@@ -96,14 +98,14 @@ export async function HomeWorkspaceBands({
         <div className="weather-list-stagger grid gap-3 md:grid-cols-3">
           {workspaceModel.audit.evidenceMovers.length > 0 ? (
             workspaceModel.audit.evidenceMovers.map((item, index) => (
-              <article key={item.key} className="weather-surface weather-delta-card rounded-xl p-4" data-emphasis={index === 0 ? "true" : undefined}>
+              <article key={item.key} className="home-band-card weather-surface weather-delta-card rounded-xl p-3" data-emphasis={index === 0 ? "true" : undefined}>
               <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Mover {index + 1}</p>
                 <h3 className="mt-2 text-sm font-semibold text-slate-100">{item.title}</h3>
                 <p className="mt-2 text-sm text-slate-300">{item.detail}</p>
               </article>
             ))
           ) : (
-            <article className="weather-surface weather-delta-card rounded-xl p-4 md:col-span-3">
+            <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3 md:col-span-3">
               <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Evidence movers</p>
               <p className="mt-2 text-sm text-slate-300">No major evidence movers were recorded for this refresh. Hold the current weekly baseline unless a trust warning or flip condition fires.</p>
             </article>
@@ -111,10 +113,10 @@ export async function HomeWorkspaceBands({
         </div>
       </section>
 
-      <section id="approve-this-weeks-plan" className="weather-panel weather-section-stage weather-section-stage--medium scroll-mt-28 space-y-4 px-5 py-5" aria-labelledby="approve-this-weeks-plan-title">
+      <section id="approve-this-weeks-plan" className="home-band home-band--operations weather-panel weather-section-stage weather-section-stage--medium scroll-mt-28 space-y-4 px-4 py-4 sm:px-5" aria-labelledby="approve-this-weeks-plan-title">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Execution guardrails</p>
+            <p className="home-band-kicker">Execution guardrails</p>
             <h2 id="approve-this-weeks-plan-title" className="text-xl font-semibold text-slate-100">Lock the operating summary here, then open Operations only for execution detail.</h2>
             <p className="max-w-3xl text-sm text-slate-300">This band compresses the weekly do now, top guardrails, finance posture, and share handoff after you review the call.</p>
           </div>
@@ -124,13 +126,13 @@ export async function HomeWorkspaceBands({
         </div>
 
         <div className="weather-list-stagger grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-          <article className="weather-surface weather-delta-card rounded-xl p-4" data-emphasis="true">
+          <article className="home-band-card home-band-card--priority weather-surface weather-delta-card rounded-xl p-3" data-emphasis="true">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Weekly operating action</p>
             <p className="mt-2 text-sm font-semibold text-slate-100">{workspaceModel.operations.approvalHeadline}</p>
             <p className="mt-2 text-sm text-slate-300">{workspaceModel.operations.approvalDetail}</p>
           </article>
 
-          <article className="weather-surface weather-delta-card rounded-xl p-4">
+          <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Export handoff</p>
             <p className="mt-2 text-sm font-semibold text-slate-100">Share the aligned brief only after the plan and finance posture are set.</p>
             <div className="mt-3 flex flex-wrap gap-2">
@@ -144,11 +146,11 @@ export async function HomeWorkspaceBands({
         </div>
 
         <div className="grid gap-3 lg:grid-cols-2">
-          <article className="weather-surface weather-delta-card rounded-xl p-4">
+          <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Top guardrails</p>
             <ul className="mt-3 space-y-2">
               {workspaceModel.operations.topGuardrails.map((item) => (
-                <li key={item.key} className="rounded-lg border border-slate-800/80 bg-slate-950/50 px-3 py-2">
+                <li key={item.key} className="home-band-list-item rounded-lg border border-slate-800/80 bg-slate-950/50 px-3 py-2">
                   <p className="text-xs font-semibold text-slate-100">{item.label}</p>
                   <p className="mt-1 text-xs text-slate-300">{item.detail}</p>
                 </li>
@@ -156,11 +158,11 @@ export async function HomeWorkspaceBands({
             </ul>
           </article>
 
-          <article className="weather-surface weather-delta-card rounded-xl p-4">
+          <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Finance snapshot</p>
             <ul className="mt-3 space-y-2">
               {workspaceModel.operations.financeSnapshot.map((item) => (
-                <li key={item.key} className="rounded-lg border border-slate-800/80 bg-slate-950/50 px-3 py-2">
+                <li key={item.key} className="home-band-list-item rounded-lg border border-slate-800/80 bg-slate-950/50 px-3 py-2">
                   <p className="text-xs font-semibold text-slate-100">{item.label}</p>
                   <p className="mt-1 text-xs text-slate-300">{item.actionNow}</p>
                   <p className="mt-1 text-xs text-slate-400">Reverse: {item.reversalCondition}</p>
@@ -171,15 +173,15 @@ export async function HomeWorkspaceBands({
         </div>
       </section>
 
-      <section id="historical-replay-workspace" className="weather-panel weather-section-stage weather-section-stage--long scroll-mt-28 space-y-4 px-5 py-5" aria-labelledby="historical-replay-workspace-title">
+      <section id="historical-replay-workspace" className="home-band home-band--history weather-panel weather-section-stage weather-section-stage--long scroll-mt-28 space-y-4 px-4 py-4 sm:px-5" aria-labelledby="historical-replay-workspace-title">
         <div className="space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Historical replay</p>
+          <p className="home-band-kicker">Historical replay</p>
           <h2 id="historical-replay-workspace-title" className="text-xl font-semibold text-slate-100">Replay any prior month after you lock this week&apos;s live call.</h2>
           <p className="max-w-3xl text-sm text-slate-300">Use the same replay pattern as Signals when you want context, retrospectives, or a quick comparison to prior conditions.</p>
         </div>
 
         <div className="weather-list-stagger grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-          <article className="weather-surface weather-delta-card rounded-xl p-4">
+          <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Replay a prior monthly snapshot</p>
             <div className="mt-3">
               <HistoricalReplayDatePicker
@@ -197,11 +199,11 @@ export async function HomeWorkspaceBands({
             </div>
           </article>
 
-          <article className="weather-surface weather-delta-card rounded-xl p-4">
+          <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">What this looked like then</p>
             <ul className="mt-3 space-y-2">
               {workspaceModel.replay.preview.map((entry) => (
-                <li key={entry.key} className="rounded-lg border border-slate-800/80 bg-slate-950/50 px-3 py-2">
+                <li key={entry.key} className="home-band-list-item rounded-lg border border-slate-800/80 bg-slate-950/50 px-3 py-2">
                   <p className="text-xs font-semibold text-slate-100">{entry.label}</p>
                   <p className="mt-1 text-xs text-slate-300">{entry.summary}</p>
                 </li>
@@ -211,20 +213,20 @@ export async function HomeWorkspaceBands({
         </div>
       </section>
 
-      <section id="translate-or-run-tool" className="weather-panel weather-section-stage weather-section-stage--long scroll-mt-28 space-y-4 px-5 py-5" aria-labelledby="translate-or-run-tool-title">
+      <section id="translate-or-run-tool" className="home-band home-band--translate weather-panel weather-section-stage weather-section-stage--long scroll-mt-28 space-y-4 px-4 py-4 sm:px-5" aria-labelledby="translate-or-run-tool-title">
         <div className="space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Translate or run a tool</p>
+          <p className="home-band-kicker">Translate or run a tool</p>
           <h2 id="translate-or-run-tool-title" className="text-xl font-semibold text-slate-100">Go straight to a role path, situation path, or runnable utility.</h2>
           <p className="max-w-3xl text-sm text-slate-300">Use fast paths first. Browse role and situation hubs only when you need fuller discovery.</p>
         </div>
 
         <div className="weather-list-stagger grid gap-3 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-          <Link href={workspaceModel.translate.rolePath.href as Route} className="weather-surface weather-delta-card rounded-xl p-4 text-slate-100" data-emphasis="true">
+          <Link href={workspaceModel.translate.rolePath.href as Route} className="home-band-link-card home-band-card home-band-card--priority weather-surface weather-delta-card rounded-xl p-3 text-slate-100" data-emphasis="true">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Recommended role path</p>
             <h3 className="mt-2 text-base font-semibold">{workspaceModel.translate.rolePath.title}</h3>
             <p className="mt-2 text-sm text-slate-300">{workspaceModel.translate.rolePath.detail}</p>
           </Link>
-          <Link href={workspaceModel.translate.situationPath.href as Route} className="weather-surface weather-delta-card rounded-xl p-4 text-slate-100">
+          <Link href={workspaceModel.translate.situationPath.href as Route} className="home-band-link-card home-band-card weather-surface weather-delta-card rounded-xl p-3 text-slate-100">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Recommended situation path</p>
             <h3 className="mt-2 text-base font-semibold">{workspaceModel.translate.situationPath.title}</h3>
             <p className="mt-2 text-sm text-slate-300">{workspaceModel.translate.situationPath.detail}</p>
@@ -233,7 +235,7 @@ export async function HomeWorkspaceBands({
 
         <div className="weather-list-stagger grid gap-3 md:grid-cols-3">
           {workspaceModel.translate.toolkitShortcuts.map((toolkit) => (
-            <Link key={toolkit.href} href={toolkit.href as Route} className="weather-surface weather-delta-card rounded-xl p-4 text-slate-100">
+            <Link key={toolkit.href} href={toolkit.href as Route} className="home-band-link-card home-band-card weather-surface weather-delta-card rounded-xl p-3 text-slate-100">
               <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Toolkit shortcut</p>
               <h3 className="mt-2 text-base font-semibold">{toolkit.title}</h3>
               <p className="mt-2 text-sm text-slate-300">{toolkit.detail}</p>
@@ -243,7 +245,7 @@ export async function HomeWorkspaceBands({
 
         <div className="weather-list-stagger grid gap-3 md:grid-cols-2">
           {workspaceModel.translate.decisionUtilities.map((utility) => (
-            <Link key={utility.href} href={utility.href as Route} className="weather-surface weather-delta-card rounded-xl p-4 text-slate-100">
+            <Link key={utility.href} href={utility.href as Route} className="home-band-link-card home-band-card weather-surface weather-delta-card rounded-xl p-3 text-slate-100">
               <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Decision utility</p>
               <h3 className="mt-2 text-base font-semibold">{utility.title}</h3>
               <p className="mt-2 text-sm text-slate-300">{utility.detail}</p>

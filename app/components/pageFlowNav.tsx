@@ -26,6 +26,7 @@ export function PageFlowNav({
   items,
   actions,
   className,
+  compact = false,
 }: {
   eyebrow: string;
   title: string;
@@ -33,6 +34,7 @@ export function PageFlowNav({
   items: ScrollPlanItem[];
   actions?: ReactNode;
   className?: string;
+  compact?: boolean;
 }) {
   const [activeHref, setActiveHref] = useState<`#${string}` | undefined>(items[0]?.href);
 
@@ -102,6 +104,71 @@ export function PageFlowNav({
   const nextItem = items[activeIndex + 1];
   const gridClassName =
     items.length >= 5 ? "xl:grid-cols-5" : items.length === 4 ? "xl:grid-cols-4" : "xl:grid-cols-3";
+
+  if (compact) {
+    return (
+      <section className={`weather-panel weather-section-stage space-y-3 px-4 py-4 ${className ?? ""}`} aria-label={title}>
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
+          <div className="space-y-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">{eyebrow}</p>
+              <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-200">
+                {activeIndex + 1} of {items.length}
+              </span>
+            </div>
+            <h2 className="text-lg font-semibold text-slate-100 sm:text-xl">{title}</h2>
+            <p className="max-w-3xl text-sm text-slate-300">{description}</p>
+          </div>
+          {actions ? <div className="flex flex-wrap gap-2.5">{actions}</div> : null}
+        </div>
+
+        <ol className={`grid gap-2 md:grid-cols-2 ${gridClassName}`}>
+          {items.map((item, index) => {
+            const isActive = item.href === activeItem.href;
+            const isReviewed = index < activeIndex;
+            const tone = isActive
+              ? "border-sky-400/70 bg-sky-500/15 text-sky-100"
+              : isReviewed
+                ? "border-emerald-300/30 bg-emerald-400/10 text-slate-100"
+                : "border-slate-800/80 text-slate-200 hover:border-sky-400/70 hover:text-slate-100";
+
+            return (
+              <li key={item.href}>
+                <a
+                  href={item.href}
+                  aria-current={isActive ? "location" : undefined}
+                  data-active={isActive ? "true" : "false"}
+                  data-reviewed={isReviewed ? "true" : "false"}
+                  className={`weather-surface weather-step-card flex min-h-[92px] touch-manipulation flex-col gap-1.5 rounded-xl border px-3 py-3 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 ${tone}`}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em]">
+                      <span
+                        className={`inline-flex h-6 w-6 items-center justify-center rounded-full border text-[10px] ${
+                          isActive
+                            ? "border-sky-300/80 bg-sky-500/35 text-sky-50"
+                            : isReviewed
+                              ? "border-emerald-300/60 bg-emerald-400/15 text-emerald-100"
+                              : "border-slate-600/80 text-slate-300"
+                        }`}
+                      >
+                        {index + 1}
+                      </span>
+                      {item.label}
+                    </span>
+                    <span className="text-[10px] uppercase tracking-[0.16em] text-slate-400">
+                      {isActive ? "Current" : isReviewed ? "Reviewed" : "Jump"}
+                    </span>
+                  </div>
+                  <p className="text-xs leading-5 text-slate-300">{item.summary}</p>
+                </a>
+              </li>
+            );
+          })}
+        </ol>
+      </section>
+    );
+  }
 
   return (
     <section className={`weather-panel weather-section-stage space-y-4 px-5 py-5 ${className ?? ""}`} aria-label={title}>

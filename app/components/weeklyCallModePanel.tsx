@@ -2,7 +2,6 @@
 
 import { Dialog } from "@base-ui/react/dialog";
 import Link from "next/link";
-import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import type { StartupVariantMode } from "../../lib/report/boundedDecisionRules";
 import type { StartupVariantPolicy } from "../../lib/report/homeBriefModel";
@@ -13,7 +12,7 @@ import {
   ForecastStrip,
   type ForecastStripCardData,
 } from "./forecastStrip";
-import { StartupModeSelector, type StartupModeContent } from "./startupModeSelector";
+import type { StartupModeContent } from "./startupModeSelector";
 
 const callSectionHref = homeSectionSequence[0]?.href ?? "#weekly-posture-brief-title";
 const auditSectionHref = homeSectionSequence[1]?.href ?? "#audit-this-call";
@@ -46,7 +45,6 @@ type WeeklyCallModePanelProps = {
   trustCueLine?: string;
   needsTrustWarning?: boolean;
   trustWarningCopy?: string;
-  actions?: ReactNode;
 };
 
 const commandActions = [
@@ -82,12 +80,10 @@ export function WeeklyCallModePanel({
   trustCueLine,
   needsTrustWarning = false,
   trustWarningCopy,
-  actions,
 }: WeeklyCallModePanelProps) {
   const firstAvailableMode = startupVariantPolicy.options.find((option) => modeContentByMode[option.mode])?.mode;
   const [activeMode, setActiveMode] = useState<StartupVariantMode>(startupVariantPolicy.selectedMode);
   const [commandOpen, setCommandOpen] = useState(false);
-  const [stageSheetOpen, setStageSheetOpen] = useState(false);
   const [commandQuery, setCommandQuery] = useState("");
 
   const effectiveMode = modeContentByMode[activeMode]
@@ -129,14 +125,12 @@ export function WeeklyCallModePanel({
       label: "Do now",
       headline: modeAdjustedSnapshot.doNow,
       tone: "positive",
-      footerText: "Primary move for the selected stage view.",
     },
     {
       id: "guardrail",
       label: "Guardrail",
       headline: modeAdjustedSnapshot.avoid,
       tone: "warning",
-      footerText: "The mistake to avoid while conditions stay like this.",
     },
     {
       id: "flip-watch",
@@ -146,7 +140,7 @@ export function WeeklyCallModePanel({
       chips: followUpFlipLabels.map((label) => ({ label, tone: "info" })),
       footerText: followUpFlipLabels.length > 0
         ? undefined
-        : "Monitor this trigger before you lock new fixed-cost commitments.",
+        : "Primary trigger before new fixed-cost commitments.",
     },
   ];
 
@@ -172,11 +166,11 @@ export function WeeklyCallModePanel({
 
   return (
     <>
-      <article className={`rounded-[1.2rem] border border-slate-700/75 bg-slate-950/92 p-4 sm:p-5 ${heroUrgencyClass}`} aria-label="Weekly call snapshot">
+      <article className={`rounded-[1.2rem] border border-slate-700/75 bg-slate-950/92 p-3.5 sm:p-4 ${heroUrgencyClass}`} aria-label="Weekly call snapshot">
         <ForecastConditionsHeader
           eyebrow="Current conditions"
           headline="This week in one screen"
-          description="Decide, align, and share before you open the deeper audit trail."
+          description="Decide here, then open the audit trail only if the call needs evidence."
           chips={[
             { label: "Operator forecast", tone: "info" },
             { label: postureLabel },
@@ -189,16 +183,16 @@ export function WeeklyCallModePanel({
                 { label: "Stage view", value: stageSummary },
                 { label: "Signal state", value: confidenceLabel },
               ]}
-              className="lg:min-w-[26rem]"
+              className="lg:min-w-[22rem]"
             />
           )}
         />
         {whyItMattersLine ? (
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-200">{whyItMattersLine}</p>
+          <p className="mt-2.5 max-w-3xl text-xs leading-5 text-slate-200">{whyItMattersLine}</p>
         ) : null}
-        <ForecastStrip cards={forecastCards} ariaLabel="Weekly decision transmission order" className="mt-4" />
+        <ForecastStrip cards={forecastCards} ariaLabel="Weekly decision transmission order" className="mt-3" />
         {readThisCardItems.length > 0 ? (
-          <details className="mt-3 rounded-lg border border-slate-700/60 bg-slate-950/55 px-3 py-3">
+          <details className="mt-3 rounded-lg border border-slate-700/60 bg-slate-950/55 px-3 py-2.5">
             <summary className="cursor-pointer text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Decode this forecast</summary>
             <ul className="mt-2 grid gap-1.5 text-[11px] text-slate-100">
               {readThisCardItems.slice(0, 3).map((item) => (
@@ -219,14 +213,14 @@ export function WeeklyCallModePanel({
             ) : null}
           </details>
         ) : null}
-        <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(15rem,0.8fr)]">
+        <div className="mt-3 grid gap-2 lg:grid-cols-[minmax(0,1.15fr)_minmax(13rem,0.85fr)]">
           {trustCueLine ? (
-            <div className={`rounded-lg border px-3 py-3 text-[11px] ${needsTrustWarning ? "border-amber-400/35 bg-amber-500/10 text-amber-50" : "border-slate-700/60 bg-slate-950/55 text-slate-200"}`}>
+            <div className={`rounded-lg border px-3 py-2.5 text-[11px] ${needsTrustWarning ? "border-amber-400/35 bg-amber-500/10 text-amber-50" : "border-slate-700/60 bg-slate-950/55 text-slate-200"}`}>
               <p className="font-semibold uppercase tracking-[0.12em]">{needsTrustWarning ? "Can I rely on this?" : "Trust check"}</p>
               <p className="mt-1 leading-5">{needsTrustWarning ? trustWarningCopy ?? trustCueLine : trustCueLine}</p>
             </div>
           ) : null}
-          <div className="rounded-lg border border-slate-700/60 bg-slate-950/55 px-3 py-3" aria-label="Decision confidence gauge">
+          <div className="rounded-lg border border-slate-700/60 bg-slate-950/55 px-3 py-2.5" aria-label="Decision confidence gauge">
             <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Decision confidence</p>
             <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-slate-800/90" role="progressbar" aria-valuenow={confidenceValue} aria-valuemin={0} aria-valuemax={100} aria-label={`Confidence ${confidenceValue} percent`}>
               <div className={`h-full origin-left ${confidenceToneClass} transition-transform duration-300`} style={{ transform: `scaleX(${confidenceValue / 100})` }} />
@@ -234,78 +228,64 @@ export function WeeklyCallModePanel({
             <p className="mt-1 text-[10px] text-slate-300">{confidenceValue}% confidence · watch the flip cues when this compresses.</p>
           </div>
         </div>
-        <details className="mt-3 rounded-lg border border-slate-700/60 bg-slate-950/55 px-3 py-3">
-          <summary className="cursor-pointer text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">More context</summary>
-          <ul className="mt-2 grid gap-1.5 text-[11px] text-slate-100 sm:grid-cols-2">
-            <li className={compactInsetClassName}><span className="font-semibold text-slate-200">Trend:</span> {trendLabel}</li>
-            <li className={compactInsetClassName}><span className="font-semibold text-slate-200">Confidence:</span> {confidenceValue}% ({confidenceLabel})</li>
-            <li className={compactInsetClassName}><span className="font-semibold text-slate-200">Stage variant:</span> {stageSummary}</li>
-            <li className={compactInsetClassName}><span className="font-semibold text-slate-200">Refresh action:</span> Recheck flip cues before approving fixed-cost adds.</li>
-          </ul>
-        </details>
-        {actions ? (
-          <div className="mt-3 rounded-xl border border-sky-400/45 bg-gradient-to-r from-sky-600/18 via-sky-500/12 to-slate-950/35 p-3" aria-label="Share this week's call">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-sky-100">Share this week&apos;s call</p>
-            <div className="mt-2">{actions}</div>
-          </div>
-        ) : null}
       </article>
 
       <article id="weekly-call-core" className={`${tierOnePanelClassName} weather-motion-card ${sectionSpacingClassName} bg-gradient-to-br from-slate-950/95 via-slate-900/85 to-slate-950/95`}>
         <h2 className={tierOneHeadingClassName}>This week&apos;s call</h2>
-        <p className="text-xs text-slate-300">Whether does not predict markets; it tells founders how to operate inside them this week.</p>
-        <div className="grid gap-2 text-xs text-slate-100">
+        <div className="grid gap-2 text-xs text-slate-100 md:grid-cols-2">
           <p className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-slate-200">What environment?</span> {postureLabel} with a {trendLabel.toLowerCase()} trend at {confidenceValue}% confidence.</p>
           <p className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-emerald-200">DO NOW</span> {modeAdjustedSnapshot.doNow}</p>
           <p className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-rose-200">GUARDRAIL</span> {modeAdjustedSnapshot.avoid}</p>
           <p className={compactInsetClassName}><span className="font-semibold uppercase tracking-[0.08em] text-sky-200">FLIP WHEN</span> {modeAdjustedSnapshot.watch}</p>
         </div>
 
-        <div className="rounded-lg border border-slate-800/55 bg-slate-950/62 px-3 py-3">
-          <div className="grid gap-2 sm:grid-cols-2">
-            <button
-              type="button"
-              onClick={() => setStageSheetOpen(true)}
-              className="flex min-h-[44px] w-full items-center justify-between gap-2 rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-left text-xs font-semibold tracking-[0.06em] text-slate-200 transition hover:border-slate-500/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-            >
-              <span>Refine by company stage</span>
-              <span aria-hidden="true" className="text-sm">↗</span>
-            </button>
+        <div className="rounded-lg border border-slate-800/55 bg-slate-950/62 px-3 py-2.5">
+          <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
+            <div>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Stage view</p>
+                <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-200">
+                  {stageSummary}
+                </span>
+              </div>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {startupVariantPolicy.options.map((option) => {
+                  const selected = option.mode === effectiveMode;
+                  return (
+                    <button
+                      key={option.mode}
+                      type="button"
+                      onClick={() => setActiveMode(option.mode)}
+                      className={`min-h-[44px] rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.06em] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation ${
+                        selected
+                          ? "border-sky-400/70 bg-sky-500/20 text-sky-100"
+                          : "border-slate-700/70 bg-slate-950/70 text-slate-300 hover:border-slate-500/80"
+                      }`}
+                      aria-pressed={selected}
+                    >
+                      {option.label}
+                    </button>
+                  );
+                })}
+              </div>
+              {activeContent ? (
+                <p className="mt-2 text-[11px] leading-5 text-slate-300">
+                  {activeContent.description} Threshold emphasis: {activeContent.thresholdEmphasis}
+                </p>
+              ) : null}
+            </div>
             <button
               type="button"
               onClick={() => setCommandOpen(true)}
-              className="flex min-h-[44px] w-full items-center justify-between gap-2 rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-left text-xs font-semibold tracking-[0.06em] text-slate-200 transition hover:border-slate-500/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+              className="flex min-h-[44px] w-full items-center justify-between gap-2 rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-left text-xs font-semibold tracking-[0.06em] text-slate-200 transition hover:border-slate-500/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 sm:min-w-[14rem]"
             >
               <span>Open command palette</span>
               <span aria-hidden="true" className="text-sm">⌘K / Ctrl+K</span>
             </button>
           </div>
-          <p className="mt-2 text-[11px] text-slate-300">Stage selected: {stageSummary}. Use command palette to jump to decision blocks fast.</p>
+          <p className="mt-2 text-[11px] text-slate-300">Mode-adjusted call is live above. Use command palette only to jump between sections.</p>
         </div>
       </article>
-
-      <Dialog.Root open={stageSheetOpen} onOpenChange={setStageSheetOpen}>
-        <Dialog.Portal>
-          <Dialog.Backdrop className="fixed inset-0 z-40 bg-slate-950/70" />
-          <Dialog.Popup className="fixed inset-x-4 bottom-[calc(env(safe-area-inset-bottom)+1rem)] z-50 max-h-[70vh] overflow-auto rounded-2xl border border-slate-700/80 bg-slate-950/98 p-4 shadow-2xl">
-            <Dialog.Title className="text-sm font-semibold tracking-[0.08em] text-slate-100">Refine by company stage</Dialog.Title>
-            <Dialog.Description className="mt-1 text-xs text-slate-300">Choose the stage variant, then copy the adjusted do now / avoid / watch call.</Dialog.Description>
-            <div className="mt-3 space-y-2" id="company-stage-refinement-panel">
-              <p className="text-[10px] uppercase tracking-[0.1em] text-slate-400">Stage variant selected: {selectedModeLabel ?? "Default"}</p>
-              <StartupModeSelector
-                options={startupVariantPolicy.options}
-                selectedMode={effectiveMode ?? startupVariantPolicy.selectedMode}
-                onModeChange={setActiveMode}
-                contentByMode={modeContentByMode}
-              />
-              <p className="text-[11px] text-slate-300">Stage-specific snapshot — DO NOW: {modeAdjustedSnapshot.doNow} · AVOID: {modeAdjustedSnapshot.avoid} · WATCH: {modeAdjustedSnapshot.watch}</p>
-            </div>
-            <div className="mt-4 flex justify-end">
-              <Dialog.Close className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200">Done</Dialog.Close>
-            </div>
-          </Dialog.Popup>
-        </Dialog.Portal>
-      </Dialog.Root>
 
       <Dialog.Root open={commandOpen} onOpenChange={setCommandOpen}>
         <Dialog.Portal>

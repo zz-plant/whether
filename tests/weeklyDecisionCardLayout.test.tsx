@@ -69,10 +69,13 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /What environment\?/);
     assert.match(html, /Can I rely on this\?/);
     assert.match(html, /This week&#x27;s call/);
+    assert.match(html, /How inputs move this call/);
     assert.match(html, /DO NOW/);
     assert.match(html, /GUARDRAIL/);
     assert.match(html, /FLIP WHEN/);
     assert.match(html, /What environment\?/);
+    assert.match(html, /Playbook for Defensive/);
+    assert.match(html, /Efficiency first\./);
     assert.match(html, /Refine by company stage/);
     assert.doesNotMatch(html, /Company mode:/);
     assert.doesNotMatch(html, /Seed/);
@@ -84,10 +87,14 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     const heroIndex = html.indexOf("weekly-posture-brief-title");
     const deltaIndex = html.indexOf("Weekly call snapshot");
     const postureIndex = html.indexOf("What environment?");
+    const influenceIndex = html.indexOf("How inputs move this call");
     const guidanceIndex = html.indexOf("This week&#x27;s call");
+    const diagnosticsIndex = html.indexOf("Need deeper analysis?");
 
     assert.ok(deltaIndex > heroIndex);
     assert.ok(guidanceIndex > deltaIndex);
+    assert.ok(influenceIndex > guidanceIndex);
+    assert.ok(diagnosticsIndex > influenceIndex);
     assert.ok(postureIndex > guidanceIndex);
   });
 
@@ -175,7 +182,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /id="weekly-call-core"/);
     assert.equal((html.match(/This week&#x27;s call/g) ?? []).length, 1);
     assert.doesNotMatch(html, /Copy weekly operator brief/);
-    assert.match(html, /weather-panel space-y-4 px-4 py-5/);
+    assert.match(html, /weather-panel space-y-4 px-4 py-4/);
   });
 
   it("dedupes and caps DO NOW/AVOID bullets while keeping WATCH concise", () => {

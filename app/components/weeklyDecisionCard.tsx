@@ -10,10 +10,11 @@ import { PostureHistoryTimeline } from "./weekly-card/HistorySection";
 import type { DiagnosticsSectionProps } from "./weekly-card/types";
 import { compactActionCue, compactInset, disclosureSummaryClass, sectionSpacing, tierOneHeading, tierOnePanel, tierThreeHeading, tierThreePanel } from "./weekly-card/shared";
 import type { RegimeKey } from "../../lib/regimeEngine";
-import type { DecisionMatrixPayload, StartupVariantPolicy, WeeklyDecisionCardViewModel } from "../../lib/report/homeBriefModel";
+import type { DecisionMatrixPayload, InputInfluenceItem, StartupVariantPolicy, WeeklyDecisionCardViewModel } from "../../lib/report/homeBriefModel";
 import { buildCompactFreshnessMeta } from "../../lib/report/reportFormatting";
 import { getOrderedRegimeLegend, getRegimeWeatherIcon, getRegimeWeatherLabel, getRegimeWeatherRationale, REGIME_BANNER_TOKENS, REGIME_LEGEND_DESCRIPTORS, type RegimeBannerTone, type RegimeWeatherIcon } from "../../lib/regimePresentation";
 import { formatDateUTC } from "../../lib/formatters";
+import { getPlaybookForRegime } from "../../lib/playbook";
 import {
   buildWeeklyCitationMetaLine,
   buildCompactTrustSummary,
@@ -169,6 +170,185 @@ const flipRiskFillClass: Record<FlipRiskMeterState["urgencyLabel"], string> = {
   Unknown: "bg-slate-300/70",
 };
 
+const flipRiskStrokeClass: Record<FlipRiskMeterState["urgencyLabel"], string> = {
+  High: "stroke-rose-300",
+  Medium: "stroke-amber-200",
+  Low: "stroke-emerald-200",
+  Unknown: "stroke-slate-300/70",
+};
+
+const confidenceBandTone: Record<RegimeBannerProps["confidenceLabel"], {
+  label: string;
+  activeIndex: number;
+  fillClass: string;
+  textClass: string;
+}> = {
+  HIGH: {
+    label: "High confidence",
+    activeIndex: 2,
+    fillClass: "bg-emerald-300",
+    textClass: "text-emerald-100",
+  },
+  MED: {
+    label: "Medium confidence",
+    activeIndex: 1,
+    fillClass: "bg-amber-200",
+    textClass: "text-amber-100",
+  },
+  LOW: {
+    label: "Low confidence",
+    activeIndex: 0,
+    fillClass: "bg-rose-300",
+    textClass: "text-rose-200",
+  },
+};
+
+const trendIconTone: Record<string, string> = {
+  improving: "text-emerald-200",
+  strengthening: "text-emerald-200",
+  stable: "text-slate-200",
+  mixed: "text-amber-200",
+  unstable: "text-amber-200",
+  deteriorating: "text-rose-200",
+  weakening: "text-rose-200",
+};
+
+const normalizeTrendKey = (trendLabel?: string) => trendLabel?.trim().toLowerCase() ?? "stable";
+
+const TrendGlyph = ({ trendLabel }: { trendLabel?: string }) => {
+  const trendKey = normalizeTrendKey(trendLabel);
+  const toneClass = trendIconTone[trendKey] ?? "text-slate-200";
+
+  if (trendKey === "improving" || trendKey === "strengthening") {
+    return (
+      <svg viewBox="0 0 16 16" className={`h-3.5 w-3.5 ${toneClass}`} aria-hidden="true" focusable="false">
+        <path d="M3.5 11.5 11.5 3.5M7.5 3.5h4v4" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    );
+  }
+
+  if (trendKey === "deteriorating" || trendKey === "weakening") {
+    return (
+      <svg viewBox="0 0 16 16" className={`h-3.5 w-3.5 ${toneClass}`} aria-hidden="true" focusable="false">
+        <path d="M3.5 4.5 11.5 12.5M7.5 12.5h4v-4" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    );
+  }
+
+  if (trendKey === "mixed" || trendKey === "unstable") {
+    return (
+      <svg viewBox="0 0 16 16" className={`h-3.5 w-3.5 ${toneClass}`} aria-hidden="true" focusable="false">
+        <path d="M2.5 10.5 5.3 7.7l2.2 2.2 3.8-3.8 2.2 2.2" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 16 16" className={`h-3.5 w-3.5 ${toneClass}`} aria-hidden="true" focusable="false">
+      <path d="M3 8h10" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+    </svg>
+  );
+};
+
+const ConfidenceBandMeter = ({
+  confidencePercent,
+  confidenceLabel,
+}: {
+  confidencePercent: number;
+  confidenceLabel: RegimeBannerProps["confidenceLabel"];
+}) => {
+  const tone = confidenceBandTone[confidenceLabel];
+
+  return (
+    <div>
+      <div className="flex items-center justify-between gap-2">
+        <p className={`text-sm font-semibold ${tone.textClass}`}>{tone.label}</p>
+        <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300" title={`Exact confidence ${Math.round(confidencePercent)} percent`}>
+          {Math.round(confidencePercent)}%
+        </span>
+      </div>
+      <div className="mt-2 grid grid-cols-3 gap-1" role="img" aria-label={`${tone.label}. Exact confidence ${Math.round(confidencePercent)} percent`}>
+        {[0, 1, 2].map((index) => (
+          <span
+            key={index}
+            className={`h-2.5 rounded-full ${index === tone.activeIndex ? tone.fillClass : "bg-slate-800/85"}`}
+            aria-hidden="true"
+          />
+        ))}
+      </div>
+      <p className="mt-2 text-[11px] leading-5 text-slate-300">Use the band for scan speed. Exact percent stays secondary.</p>
+    </div>
+  );
+};
+
+const FlipRiskDial = ({ flipRiskState }: { flipRiskState: FlipRiskMeterState }) => {
+  const radius = 14;
+  const circumference = 2 * Math.PI * radius;
+  const dashOffset = circumference * (1 - flipRiskState.progressPercent / 100);
+  const strokeClass = flipRiskStrokeClass[flipRiskState.urgencyLabel];
+  const zoneLabel = flipRiskState.urgencyLabel === "High"
+    ? "Near flip"
+    : flipRiskState.urgencyLabel === "Medium"
+      ? "Flip in play"
+      : flipRiskState.urgencyLabel === "Low"
+        ? "Room before flip"
+        : "Flip pending data";
+
+  return (
+    <div className="flex items-center gap-3">
+      <div className="relative flex h-11 w-11 items-center justify-center">
+        <svg viewBox="0 0 36 36" className="h-11 w-11 -rotate-90" aria-hidden="true" focusable="false">
+          <circle cx="18" cy="18" r={radius} className="fill-none stroke-slate-800/80" strokeWidth="4" />
+          <circle
+            cx="18"
+            cy="18"
+            r={radius}
+            className={`fill-none ${strokeClass}`}
+            strokeWidth="4"
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            strokeDashoffset={dashOffset}
+          />
+        </svg>
+        <span className="absolute text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-100">
+          {flipRiskState.urgencyLabel === "Unknown" ? "?" : flipRiskState.urgencyLabel.slice(0, 1)}
+        </span>
+      </div>
+      <div className="min-w-0">
+        <p className="text-sm font-semibold text-slate-50">{zoneLabel}</p>
+        <p className="mt-1 text-[11px] leading-5 text-slate-300">{flipRiskState.triggerLabel}</p>
+      </div>
+    </div>
+  );
+};
+
+const parseMetricNumber = (label: string) => {
+  const match = label.replace(/,/g, "").match(/-?\d+(?:\.\d+)?/);
+  return match ? Number(match[0]) : null;
+};
+
+const buildThresholdMarkerState = (valueLabel: string, watchLabel: string) => {
+  const currentValue = parseMetricNumber(valueLabel);
+  const thresholdValue = parseMetricNumber(watchLabel);
+
+  if (currentValue === null || thresholdValue === null) {
+    return null;
+  }
+
+  const lowerBound = Math.min(currentValue, thresholdValue, 0);
+  const upperBound = Math.max(currentValue, thresholdValue, 0);
+  const padding = Math.max((upperBound - lowerBound) * 0.2, Math.abs(thresholdValue) * 0.15, 0.5);
+  const domainMin = lowerBound - padding;
+  const domainMax = upperBound + padding;
+  const domainRange = Math.max(domainMax - domainMin, 1);
+  const normalize = (value: number) => Math.min(96, Math.max(4, ((value - domainMin) / domainRange) * 100));
+
+  return {
+    currentPercent: normalize(currentValue),
+    thresholdPercent: normalize(thresholdValue),
+  };
+};
+
 function RegimeLegend({
   activeRegime,
   tone,
@@ -186,76 +366,109 @@ function RegimeLegend({
   const activeWeatherIcon = getRegimeWeatherIcon(activeRegime);
   const activeWeatherRationale = getRegimeWeatherRationale(activeRegime);
   const flipRiskState = resolveFlipRiskMeterState(regimeDistance);
+  const activePlaybook = getPlaybookForRegime(activeRegime);
 
   return (
-    <div className={`mt-3 rounded-lg border px-3 py-2.5 ${tone.legendPanel}`} aria-label="Regime legend">
-      <div className={`rounded-md border p-3 ${tone.calloutSurface}`}>
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,1.2fr)_minmax(15rem,0.8fr)] lg:items-center">
-          <div className="space-y-2">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.13em] text-slate-200">Current read</p>
-            <div className={`flex flex-wrap items-center gap-2 text-sm ${tone.weatherHint}`}>
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-white/10 bg-slate-950/45 text-slate-100">
-                <RegimeWeatherGlyph icon={activeWeatherIcon} title={activeWeather} />
-              </span>
-              <span className="text-base font-semibold text-slate-50">{activeWeather}</span>
-              <span className="rounded-full border border-slate-700/70 bg-slate-950/55 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-200">
-                {flipRiskState.urgencyLabel} flip risk
-              </span>
+    <details className={`mt-3 rounded-lg border px-3 py-2.5 ${tone.legendPanel}`} aria-label="Regime legend">
+      <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 rounded-md text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+        <div className="space-y-1">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.13em] text-slate-200">Regime ladder</p>
+          <p className={`flex flex-wrap items-center gap-1.5 text-sm font-semibold ${tone.weatherHint}`}>
+            <RegimeWeatherGlyph icon={activeWeatherIcon} title={activeWeather} />
+            <span className="text-slate-50">{activeWeather}</span>
+            <span className="text-slate-400">·</span>
+            <span>{flipRiskState.urgencyLabel} flip risk</span>
+          </p>
+        </div>
+        <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+          Open detail
+        </span>
+      </summary>
+
+      <div className="mt-2.5 space-y-2.5">
+        <div className={`rounded-md border p-3 ${tone.calloutSurface}`}>
+          <div className="grid gap-3 lg:grid-cols-[minmax(0,1.2fr)_minmax(15rem,0.8fr)] lg:items-center">
+            <div className="space-y-2">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.13em] text-slate-200">Current read</p>
+              <div className={`flex flex-wrap items-center gap-2 text-sm ${tone.weatherHint}`}>
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-2xl border border-white/10 bg-slate-950/45 text-slate-100">
+                  <RegimeWeatherGlyph icon={activeWeatherIcon} title={activeWeather} />
+                </span>
+                <span className="text-base font-semibold text-slate-50">{activeWeather}</span>
+                <span className="rounded-full border border-slate-700/70 bg-slate-950/55 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-200">
+                  {flipRiskState.urgencyLabel} flip risk
+                </span>
+              </div>
+              <p className="text-sm font-semibold text-slate-50">{operatingLine}</p>
+              <p className="text-xs leading-5 text-slate-200/90">
+                {activeWeatherRationale} {activeDescriptor}
+              </p>
             </div>
-            <p className="text-sm font-semibold text-slate-50">{operatingLine}</p>
-            <p className="text-xs leading-5 text-slate-200/90">
-              {activeWeatherRationale} {activeDescriptor}
-            </p>
-          </div>
-          <div className="rounded-xl border border-slate-700/65 bg-slate-950/45 px-3 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.13em] text-slate-300">Flip window</p>
-            <div className={`mt-2 h-2.5 overflow-hidden rounded-full ${tone.meterTrack}`} aria-hidden="true">
-              <span
-                className={`block h-full rounded-full ${flipRiskFillClass[flipRiskState.urgencyLabel]} ${tone.meterFill}`}
-                style={{ ["--weather-meter-fill" as string]: `${flipRiskState.progressPercent / 100}` }}
-              />
+            <div className="rounded-xl border border-slate-700/65 bg-slate-950/45 px-3 py-3">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.13em] text-slate-300">Flip window</p>
+              <div className={`mt-2 h-2.5 overflow-hidden rounded-full ${tone.meterTrack}`} aria-hidden="true">
+                <span
+                  className={`block h-full rounded-full ${flipRiskFillClass[flipRiskState.urgencyLabel]} ${tone.meterFill}`}
+                  style={{ ["--weather-meter-fill" as string]: `${flipRiskState.progressPercent / 100}` }}
+                />
+              </div>
+              <p className="mt-2 text-[11px] leading-5 text-slate-200">{flipRiskState.detailLabel}</p>
+              <p className="mt-1 text-[10px] leading-5 text-slate-300/95">
+                <span className="font-semibold text-slate-200">Flip trigger:</span> {flipRiskState.triggerLabel}
+              </p>
             </div>
-            <p className="mt-2 text-[11px] leading-5 text-slate-200">{flipRiskState.detailLabel}</p>
-            <p className="mt-1 text-[10px] leading-5 text-slate-300/95">
-              <span className="font-semibold text-slate-200">Flip trigger:</span> {flipRiskState.triggerLabel}
-            </p>
           </div>
         </div>
-      </div>
-      <div className="mt-2.5 flex items-center justify-between gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300">
-        <p>Tighter conditions</p>
-        <p aria-hidden="true">→</p>
-        <p>Looser conditions</p>
-      </div>
-      <ol className="mt-2 flex flex-wrap items-center gap-1.5 sm:flex-nowrap" aria-label="Ordered regime states from scarcity to expansion">
-        {legendItems.map((item, index) => {
-          const active = item.regime === activeRegime;
-          return (
-            <li key={item.regime} className="inline-flex items-center gap-1.5">
-              <span
-                className={`rounded-full border px-2.5 py-0.5 text-[11px] font-semibold whitespace-nowrap ${active
-                  ? tone.activePill
-                  : "border-slate-600/70 bg-slate-900/85 text-slate-300"}`}
-                aria-current={active ? "step" : undefined}
-                aria-label={active ? `${item.ariaLabel} (current)` : item.ariaLabel}
-              >
-                <RegimeWeatherGlyph icon={item.weatherIcon} title={item.weather} />
-                <span>{item.label}</span>
-                <span className="text-[10px] font-medium text-slate-300/90">· {item.weather}</span>
-                <span className="sr-only">{active ? " (current regime)" : ""}</span>
+        <div className="flex items-center justify-between gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-300">
+          <p>Tighter conditions</p>
+          <p aria-hidden="true">→</p>
+          <p>Looser conditions</p>
+        </div>
+        <ol className="flex flex-wrap items-center gap-1.5 sm:flex-nowrap" aria-label="Ordered regime states from scarcity to expansion">
+          {legendItems.map((item, index) => {
+            const active = item.regime === activeRegime;
+            return (
+              <li key={item.regime} className="inline-flex items-center gap-1.5">
+                <span
+                  className={`rounded-full border px-2.5 py-0.5 text-[11px] font-semibold whitespace-nowrap ${active
+                    ? tone.activePill
+                    : "border-slate-600/70 bg-slate-900/85 text-slate-300"}`}
+                  aria-current={active ? "step" : undefined}
+                  aria-label={active ? `${item.ariaLabel} (current)` : item.ariaLabel}
+                >
+                  <RegimeWeatherGlyph icon={item.weatherIcon} title={item.weather} />
+                  <span>{item.label}</span>
+                  <span className="sr-only">{active ? " (current regime)" : ""}</span>
+                </span>
+                {index < legendItems.length - 1 ? <span className="text-slate-500" aria-hidden="true">→</span> : null}
+              </li>
+            );
+          })}
+        </ol>
+        {activePlaybook ? (
+          <div className="rounded-lg border border-slate-700/65 bg-slate-950/55 px-3 py-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.13em] text-slate-300">Playbook for {activePlaybook.title}</p>
+              <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-200">
+                {activePlaybook.mandate}
               </span>
-              {index < legendItems.length - 1 ? <span className="text-slate-500" aria-hidden="true">→</span> : null}
-            </li>
-          );
-        })}
-      </ol>
-      <p className={`mt-2 flex flex-wrap items-center gap-1.5 text-xs ${tone.weatherHint}`}>
-        <RegimeWeatherGlyph icon={activeWeatherIcon} title={activeWeather} />
-        <span>
-          <span className="font-semibold text-slate-100">Why it fits:</span> {activeWeatherRationale}
-        </span>
-      </p>
-    </div>
+            </div>
+            <p className="mt-2 text-xs leading-5 text-slate-200">{activePlaybook.insight}</p>
+            <p className="mt-2 text-[11px] leading-5 text-slate-300">
+              <span className="font-semibold text-slate-100">Do now:</span> {activePlaybook.start[0] ?? "Hold the current operating plan."}
+              <span className="px-1.5" aria-hidden="true">·</span>
+              <span className="font-semibold text-slate-100">Stop:</span> {activePlaybook.stop[0] ?? "No stop guidance loaded."}
+            </p>
+          </div>
+        ) : null}
+        <p className={`flex flex-wrap items-center gap-1.5 text-xs ${tone.weatherHint}`}>
+          <RegimeWeatherGlyph icon={activeWeatherIcon} title={activeWeather} />
+          <span>
+            <span className="font-semibold text-slate-100">Why it fits:</span> {activeWeatherRationale}
+          </span>
+        </p>
+      </div>
+    </details>
   );
 }
 
@@ -288,11 +501,12 @@ function RegimeBanner({
   const activeWeather = getRegimeWeatherLabel(regimeKey);
   const activeWeatherIcon = getRegimeWeatherIcon(regimeKey);
   const flipRiskState = resolveFlipRiskMeterState(regimeDistance);
+  const exactConfidenceLabel = `${Math.round(confidencePercent)}%`;
 
   return (
-    <header className={`z-10 rounded-2xl border px-5 py-5 shadow-[0_24px_54px_rgba(2,6,23,0.5)] backdrop-blur md:sticky md:top-2 sm:px-6 sm:py-6 ${bannerTone.shell}`} data-testid="weekly-regime-banner" aria-label="Weekly regime banner">
-      <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-        <div className="min-w-0 space-y-3">
+    <header className={`z-10 rounded-2xl border px-4 py-4 shadow-[0_20px_44px_rgba(2,6,23,0.42)] backdrop-blur md:sticky md:top-2 sm:px-5 sm:py-5 ${bannerTone.shell}`} data-testid="weekly-regime-banner" aria-label="Weekly regime banner">
+      <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
+        <div className="min-w-0 space-y-2.5">
           <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-100/85">
             <span>Current outlook</span>
             <span className="rounded-full border border-white/10 bg-slate-950/35 px-2.5 py-1">
@@ -300,37 +514,48 @@ function RegimeBanner({
             </span>
           </div>
           <div id="weekly-posture-brief-title" className="flex items-start gap-3">
-            <span className="weather-icon-chip mt-1 h-12 w-12 flex-shrink-0 text-slate-50">
+            <span className="weather-icon-chip mt-0.5 h-10 w-10 flex-shrink-0 text-slate-50">
               <RegimeWeatherGlyph icon={activeWeatherIcon} title={activeWeather} />
             </span>
             <div className="min-w-0">
-              <p className="text-2xl font-semibold leading-tight sm:text-3xl">{resolvedPostureLabel}</p>
-              <p className="mt-1 text-sm font-semibold text-slate-100/90 sm:text-base">{resolvedStageLabel} cycle</p>
-              <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-50/90">{operatingLine}</p>
+              <p className="text-xl font-semibold leading-tight sm:text-[1.85rem]">{resolvedPostureLabel}</p>
+              <p className="mt-0.5 text-sm font-semibold text-slate-100/90">{resolvedStageLabel} cycle</p>
+              <p className="mt-1.5 max-w-3xl text-sm leading-6 text-slate-50/90">{operatingLine}</p>
             </div>
           </div>
         </div>
-        <div className="grid gap-2 sm:grid-cols-3 xl:min-w-[24rem]">
-          <div className="rounded-xl border border-white/10 bg-slate-950/28 px-3 py-3">
+        <div className="grid gap-2 sm:grid-cols-3 xl:min-w-[22rem]">
+          <div className="rounded-xl border border-white/10 bg-slate-950/28 px-3 py-2.5">
             <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-200/80">Weather</p>
-            <p className="mt-1 text-sm font-semibold text-slate-50">{activeWeather}</p>
+            <p className="mt-1 flex items-center gap-2 text-sm font-semibold text-slate-50">
+              <RegimeWeatherGlyph icon={activeWeatherIcon} title={activeWeather} />
+              <span>{activeWeather}</span>
+            </p>
+            <p className="mt-2 flex items-center gap-1.5 text-[11px] text-slate-300" aria-label={`Trend ${trendValue}`}>
+              <TrendGlyph trendLabel={trendValue} />
+              <span>Directional pressure</span>
+            </p>
           </div>
-          <div className="rounded-xl border border-white/10 bg-slate-950/28 px-3 py-3">
+          <div className="rounded-xl border border-white/10 bg-slate-950/28 px-3 py-2.5">
             <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-200/80">Confidence</p>
-            <p className="mt-1 text-sm font-semibold text-slate-50">{confidenceLabel} {Math.round(confidencePercent)}%</p>
+            <div className="mt-1">
+              <ConfidenceBandMeter confidencePercent={confidencePercent} confidenceLabel={confidenceLabel} />
+            </div>
           </div>
-          <div className="rounded-xl border border-white/10 bg-slate-950/28 px-3 py-3">
+          <div className="rounded-xl border border-white/10 bg-slate-950/28 px-3 py-2.5">
             <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-200/80">Flip watch</p>
-            <p className="mt-1 text-sm font-semibold text-slate-50">{flipRiskState.urgencyLabel} · {flipRiskValue}</p>
+            <div className="mt-1">
+              <FlipRiskDial flipRiskState={flipRiskState} />
+            </div>
           </div>
         </div>
       </div>
-      <p className={`mt-3 overflow-x-auto text-xs font-semibold whitespace-nowrap ${bannerTone.metrics}`} aria-label="Regime metrics line">
-        <span>Trend {trendValue}</span>
-        <span className="px-1.5" aria-hidden="true">·</span>
+      <p className={`mt-2.5 overflow-x-auto text-xs font-semibold whitespace-nowrap ${bannerTone.metrics}`} aria-label="Regime metrics line">
         <span>Stage {resolvedStageLabel}</span>
         <span className="px-1.5" aria-hidden="true">·</span>
-        <span>Flip risk {flipRiskValue}</span>
+        <span>Exact confidence {exactConfidenceLabel}</span>
+        <span className="px-1.5" aria-hidden="true">·</span>
+        <span>Flip window {flipRiskValue}</span>
       </p>
       <RegimeLegend activeRegime={regimeKey} tone={bannerTone} operatingLine={operatingLine} regimeDistance={regimeDistance} />
     </header>
@@ -524,6 +749,96 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [] }: Bound
   );
 }
 
+const inputInfluenceToneClasses: Record<InputInfluenceItem["tone"], { badge: string; fill: string }> = {
+  warning: {
+    badge: "border-rose-400/35 bg-rose-500/10 text-rose-100",
+    fill: "bg-rose-300",
+  },
+  positive: {
+    badge: "border-emerald-400/35 bg-emerald-500/10 text-emerald-100",
+    fill: "bg-emerald-300",
+  },
+  neutral: {
+    badge: "border-slate-600/75 bg-slate-950/60 text-slate-200",
+    fill: "bg-slate-300",
+  },
+};
+
+function InputInfluenceSection({ items }: { items: InputInfluenceItem[] }) {
+  if (items.length === 0) {
+    return null;
+  }
+
+  return (
+    <article className={`${tierOnePanel} ${sectionSpacing}`} aria-label="How inputs move this call">
+      <div className="flex flex-wrap items-end justify-between gap-2">
+        <div>
+          <h2 className={tierOneHeading}>How inputs move this call</h2>
+          <p className="mt-1 text-xs leading-5 text-slate-300">Bars show contribution share. Marker strips keep the current read anchored to its flip line.</p>
+        </div>
+        <p className="text-[11px] text-slate-400">Longer bars = bigger share of the weekly call.</p>
+      </div>
+      <ul className="mt-3 grid gap-2">
+        {items.map((item, index) => {
+          const tone = inputInfluenceToneClasses[item.tone];
+          const thresholdMarker = buildThresholdMarkerState(item.valueLabel, item.watchLabel);
+
+          return (
+            <li key={item.key} className="rounded-lg border border-slate-800/60 bg-slate-950/55 px-3 py-3">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-sm font-semibold text-slate-100">{item.label}</p>
+                    <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] ${tone.badge}`}>
+                      {item.pressureLabel}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs leading-5 text-slate-300">{item.effectDetail}</p>
+                  <p className="mt-1 text-[11px] text-slate-400">
+                    {item.trendArrow} {item.trendLabel}
+                    <span className="px-1" aria-hidden="true">·</span>
+                    {item.watchLabel}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-semibold text-slate-100">{item.valueLabel}</p>
+                  {index === 0 ? <p className="text-[11px] text-slate-400">{item.influencePercentLabel} share</p> : null}
+                </div>
+              </div>
+              <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-800/90" aria-hidden="true">
+                <div
+                  className={`h-full origin-left rounded-full ${tone.fill}`}
+                  style={{ transform: `scaleX(${Math.max(0.06, item.influencePercent / 100)})` }}
+                />
+              </div>
+              <div className="mt-2">
+                <div className="flex items-center justify-between gap-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">
+                  <span>Current vs trigger</span>
+                  <span>{item.watchLabel}</span>
+                </div>
+                {thresholdMarker ? (
+                  <div className="relative mt-1.5 h-5 rounded-full border border-slate-800/70 bg-slate-950/60" aria-hidden="true">
+                    <span
+                      className="absolute inset-y-0 w-px bg-slate-500/90"
+                      style={{ left: `${thresholdMarker.thresholdPercent}%` }}
+                    />
+                    <span
+                      className={`absolute top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border border-slate-950/90 ${tone.fill}`}
+                      style={{ left: `${thresholdMarker.currentPercent}%` }}
+                    />
+                  </div>
+                ) : (
+                  <p className="mt-1 text-[11px] text-slate-400">{item.watchLabel}</p>
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </article>
+  );
+}
+
 type MoreContextDisclosureProps = {
   startupClimateIndex: WeeklyDecisionCardModel["startupClimateIndex"];
   evidenceItems: WeeklyDecisionCardModel["evidenceItems"];
@@ -712,6 +1027,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     regimeVelocity,
     evidenceItems,
     failureModes = [],
+    inputInfluence = [],
   } = diagnostics;
   const { historicalTimeline } = history;
   const sinceLastReview = model.sinceLastReview;
@@ -858,7 +1174,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
   const resolvedRegimeKey = regimeKey ?? "DEFENSIVE";
 
   return (
-    <section className="weather-panel space-y-4 px-4 py-5 sm:space-y-5 sm:px-6 sm:py-6 lg:px-7 lg:py-7" aria-labelledby="weekly-posture-brief-title">
+    <section className="weather-panel space-y-4 px-4 py-4 sm:space-y-5 sm:px-5 sm:py-5 lg:px-6 lg:py-6" aria-labelledby="weekly-posture-brief-title">
       <RegimeBanner
         statusLabel={statusLabel}
         regimeKey={resolvedRegimeKey}
@@ -898,8 +1214,9 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
             trustCueLine={trustCueLine}
             needsTrustWarning={needsTrustWarning}
             trustWarningCopy={trustWarningCopy}
-            actions={actions}
           />
+
+          <InputInfluenceSection items={inputInfluence} />
 
           {diagnosticsLane ?? (
             <DiagnosticsSection

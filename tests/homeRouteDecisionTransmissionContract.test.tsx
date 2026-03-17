@@ -68,7 +68,7 @@ describe("home route render contract", () => {
       </>,
     );
 
-    const summaryHeadings = html.match(/<h2[^>]*>Weekly call snapshot<\/h2>/g) ?? [];
+    const summaryHeadings = html.match(/aria-label="Weekly call snapshot"/g) ?? [];
     const canonicalOrders = html.match(/Weekly decision transmission order/g) ?? [];
     assert.equal(summaryHeadings.length, 1);
     assert.equal(canonicalOrders.length, 1);
