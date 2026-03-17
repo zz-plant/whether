@@ -11,6 +11,7 @@ describe("CopyLeadershipArtifactsButtons", () => {
   it("keeps primary copy actions ahead of secondary share actions", () => {
     const html = renderToStaticMarkup(
       <CopyLeadershipArtifactsButtons
+        boardSnippet="snippet"
         weeklyCallSnapshot="snapshot"
         weeklyOperatorBrief="brief"
         boardSummary="board"
@@ -18,14 +19,15 @@ describe("CopyLeadershipArtifactsButtons", () => {
       />,
     );
 
+    const boardSnippetIndex = html.indexOf("Copy board snippet");
     const snapshotIndex = html.indexOf("Copy weekly call snapshot");
-    const meetingPackIndex = html.indexOf("Copy Meeting Pack");
     const briefIndex = html.indexOf("Copy Weekly Operator Brief");
     const moreActionsIndex = html.indexOf("More share actions");
 
+    assert.ok(boardSnippetIndex >= 0);
+    assert.ok(snapshotIndex > boardSnippetIndex);
     assert.ok(snapshotIndex >= 0);
-    assert.ok(meetingPackIndex > snapshotIndex);
-    assert.ok(briefIndex > meetingPackIndex);
+    assert.ok(briefIndex > snapshotIndex);
     assert.ok(moreActionsIndex > briefIndex);
   });
 

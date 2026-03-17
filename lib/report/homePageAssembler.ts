@@ -13,6 +13,7 @@ import {
 } from "./interpretationLayer";
 import { buildBoardBrief, buildCallCitation } from "../export/briefBuilders";
 import {
+  buildWeeklyBoardSnippetPlainText,
   buildWeeklyCallSnapshotPlainText,
   buildWeeklyOperatorBriefPayload,
   buildWeeklyOperatorBriefPlainText,
@@ -44,6 +45,7 @@ import type { HomePageSearchParams } from "./homeMetadata";
 
 export type ArtifactPayload = {
   boardSummary: string;
+  boardSnippetText: string;
   weeklyOperatorBriefText: string;
   weeklyCallSnapshotText: string;
   callCitation: string;
@@ -506,6 +508,16 @@ const buildLeadershipArtifactPayload = async ({
 
     return {
       boardSummary,
+      boardSnippetText: buildWeeklyBoardSnippetPlainText({
+        trustLine: treasury.fallback_at || treasury.fallback_reason
+          ? `TRUST: FALLBACK SNAPSHOT · As of ${freshnessLabel}${treasury.fallback_reason ? ` · Reason: ${treasury.fallback_reason}` : ""}`
+          : `TRUST: LIVE · As of ${freshnessLabel}`,
+        postureLine: `POSTURE: ${canonicalDecisionCopy.currentRegimeLabel} · ${homeBriefModel.confidenceLabel} ${Math.round(homeBriefModel.confidencePercent)}% confidence`,
+        changedLine: `CHANGED: ${homeBriefModel.decisionShiftSummary.replace(/^Changed:\s*/i, "").trim()}`,
+        guardrailLine: `GUARDRAIL: ${homeBriefModel.executiveOperationalStance.avoid[0] ?? homeBriefModel.guardrail}`,
+        flipLine: `FLIP: ${canonicalDecisionCopy.flipTrigger}`,
+        stabilityLine: "STABILITY: Act on posture changes after 2 consecutive weekly reads, unless the flip trigger fires at HIGH confidence.",
+      }),
       weeklyOperatorBriefText: buildWeeklyOperatorBriefPlainText(weeklyOperatorBriefPayload),
       weeklyCallSnapshotText: buildWeeklyCallSnapshotPlainText({
         regime: canonicalDecisionCopy.currentRegimeLabel,

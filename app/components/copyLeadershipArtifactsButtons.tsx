@@ -7,6 +7,7 @@ import { trackContentCtaConversion } from "../../lib/contentMeasurement";
 type PrimaryActionType = "copy_weekly_brief";
 
 type CopyTarget =
+  | "Board snippet"
   | "Meeting pack"
   | "Weekly call snapshot"
   | "Weekly operator brief"
@@ -52,12 +53,14 @@ const trackFirstActionConversion = (action: PrimaryActionType) => {
 };
 
 export function CopyLeadershipArtifactsButtons({
+  boardSnippet,
   weeklyCallSnapshot,
   weeklyOperatorBrief,
   boardSummary,
   citation,
   fallbackActive = false,
 }: {
+  boardSnippet: string;
   weeklyCallSnapshot: string;
   weeklyOperatorBrief: string;
   boardSummary: string;
@@ -66,6 +69,11 @@ export function CopyLeadershipArtifactsButtons({
 }) {
   const { status, activeTarget, copyToClipboard } = useClipboardCopy();
   const [moreActionsOpen, setMoreActionsOpen] = useState(false);
+  const [overrideOpen, setOverrideOpen] = useState(false);
+  const [overrideReason, setOverrideReason] = useState("");
+  const [overrideIndicator, setOverrideIndicator] = useState("");
+  const [overrideOwner, setOverrideOwner] = useState("");
+  const [overrideReversal, setOverrideReversal] = useState("");
   const isCopying = status === "copying";
 
   const copyState = (target: CopyTarget): CopyState =>
@@ -77,15 +85,26 @@ export function CopyLeadershipArtifactsButtons({
           ? "error"
           : "idle";
 
+  const hasOverride = [overrideReason, overrideIndicator, overrideOwner, overrideReversal]
+    .every((value) => value.trim().length > 0);
+  const overrideLine = hasOverride
+    ? `OVERRIDE ACTIVE: ${overrideReason.trim()} · Indicator: ${overrideIndicator.trim()} · Owner: ${overrideOwner.trim()} · Reverse when: ${overrideReversal.trim()}`
+    : "";
+
+  const applyOverride = (content: string) => hasOverride ? `${content}\n${overrideLine}` : content;
+
   const meetingPackContent = [
+    "BOARD SNIPPET",
+    applyOverride(boardSnippet),
+    "",
     "Weekly call snapshot",
-    weeklyCallSnapshot,
+    applyOverride(weeklyCallSnapshot),
     "",
     "WEEKLY OPERATOR BRIEF",
-    weeklyOperatorBrief,
+    applyOverride(weeklyOperatorBrief),
     "",
     "BOARD SUMMARY",
-    boardSummary,
+    applyOverride(boardSummary),
     "",
     "CITATION",
     citation,
@@ -112,24 +131,24 @@ export function CopyLeadershipArtifactsButtons({
           type="button"
           onClick={() => {
             trackFirstActionConversion("copy_weekly_brief");
-            copyToClipboard(weeklyCallSnapshot, "Weekly call snapshot");
+            copyToClipboard(applyOverride(boardSnippet), "Board snippet");
           }}
           disabled={isCopying}
           aria-busy={isCopying}
         >
-          {copyLabel("Weekly call snapshot", "Copy weekly call snapshot")}
+          {copyLabel("Board snippet", "Copy board snippet")}
         </ActionButton>
         <ActionButton
           variant="primary"
           type="button"
           onClick={() => {
             trackFirstActionConversion("copy_weekly_brief");
-            copyToClipboard(meetingPackContent, "Meeting pack");
+            copyToClipboard(applyOverride(weeklyCallSnapshot), "Weekly call snapshot");
           }}
           disabled={isCopying}
           aria-busy={isCopying}
         >
-          {copyLabel("Meeting pack", "Copy Meeting Pack")}
+          {copyLabel("Weekly call snapshot", "Copy weekly call snapshot")}
         </ActionButton>
 
         <ActionButton
@@ -137,7 +156,7 @@ export function CopyLeadershipArtifactsButtons({
           type="button"
           onClick={() => {
             trackFirstActionConversion("copy_weekly_brief");
-            copyToClipboard(weeklyOperatorBrief, "Weekly operator brief");
+            copyToClipboard(applyOverride(weeklyOperatorBrief), "Weekly operator brief");
           }}
           disabled={isCopying}
           aria-busy={isCopying}
@@ -159,11 +178,20 @@ export function CopyLeadershipArtifactsButtons({
 
       {moreActionsOpen ? (
         <div className="rounded-xl border border-slate-700/80 bg-slate-950/98 p-2 shadow-2xl">
-          <div className="grid gap-2 sm:grid-cols-3">
+          <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
             <ActionButton
               variant="secondary"
               type="button"
-              onClick={() => copyToClipboard(boardSummary, "Board")}
+              onClick={() => copyToClipboard(meetingPackContent, "Meeting pack")}
+              disabled={isCopying}
+              aria-busy={isCopying}
+            >
+              {copyLabel("Meeting pack", "Copy meeting pack")}
+            </ActionButton>
+            <ActionButton
+              variant="secondary"
+              type="button"
+              onClick={() => copyToClipboard(applyOverride(boardSummary), "Board")}
               disabled={isCopying}
               aria-busy={isCopying}
             >
@@ -181,6 +209,50 @@ export function CopyLeadershipArtifactsButtons({
             <ActionButton variant="secondary" type="button" onClick={handleExportPdf}>
               Export / print PDF
             </ActionButton>
+          </div>
+          <div className="mt-3 rounded-xl border border-slate-700/70 bg-slate-950/70 px-3 py-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Override this week</p>
+              <div className="flex items-center gap-2">
+                {hasOverride ? (
+                  <span className="rounded-full border border-amber-300/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-amber-100">
+                    Override active
+                  </span>
+                ) : null}
+                <button
+                  type="button"
+                  className="text-[11px] font-semibold text-sky-300 underline underline-offset-2"
+                  onClick={() => setOverrideOpen((open) => !open)}
+                >
+                  {overrideOpen ? "Hide override" : "Add override"}
+                </button>
+              </div>
+            </div>
+            {hasOverride ? (
+              <p className="mt-2 text-xs leading-5 text-slate-200">{overrideLine}</p>
+            ) : (
+              <p className="mt-2 text-xs leading-5 text-slate-300">Use only when local company conditions override the macro default for this week.</p>
+            )}
+            {overrideOpen ? (
+              <div className="mt-3 grid gap-2 md:grid-cols-2">
+                <label className="space-y-1">
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Reason</span>
+                  <input className="w-full rounded-lg border border-slate-700/70 bg-slate-950/80 px-3 py-2 text-base text-slate-100" value={overrideReason} onChange={(event) => setOverrideReason(event.target.value)} />
+                </label>
+                <label className="space-y-1">
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Local indicator</span>
+                  <input className="w-full rounded-lg border border-slate-700/70 bg-slate-950/80 px-3 py-2 text-base text-slate-100" value={overrideIndicator} onChange={(event) => setOverrideIndicator(event.target.value)} />
+                </label>
+                <label className="space-y-1">
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Owner</span>
+                  <input className="w-full rounded-lg border border-slate-700/70 bg-slate-950/80 px-3 py-2 text-base text-slate-100" value={overrideOwner} onChange={(event) => setOverrideOwner(event.target.value)} />
+                </label>
+                <label className="space-y-1">
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Reversal condition</span>
+                  <input className="w-full rounded-lg border border-slate-700/70 bg-slate-950/80 px-3 py-2 text-base text-slate-100" value={overrideReversal} onChange={(event) => setOverrideReversal(event.target.value)} />
+                </label>
+              </div>
+            ) : null}
           </div>
           {fallbackActive ? (
             <p className="mt-2 px-1 text-[10px] text-amber-200">

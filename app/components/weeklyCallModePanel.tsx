@@ -1,14 +1,24 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
 import type { Route } from "../../lib/navigation/routeType";
 import type { StartupVariantMode } from "../../lib/report/boundedDecisionRules";
 import type { StartupVariantPolicy } from "../../lib/report/homeBriefModel";
-import {
-  ForecastConditionsHeader,
-  ForecastStatsGrid,
-  ForecastStrip,
-  type ForecastStripCardData,
-} from "./forecastStrip";
 import type { StartupModeContent } from "./startupModeSelector";
+
+type PolicyDetails = {
+  summary: string;
+  chips: string[];
+};
+
+type RoleTranslation = {
+  id: "finance" | "product";
+  label: string;
+  implication: string;
+  doLine: string;
+  holdLine: string;
+};
 
 type WeeklyCallModePanelProps = {
   startupVariantPolicy: StartupVariantPolicy;
@@ -18,7 +28,6 @@ type WeeklyCallModePanelProps = {
   trendLabel: string;
   confidencePercent: number;
   confidenceLabel: "HIGH" | "MED" | "LOW";
-  snapshotDoNow: string;
   snapshotAvoid: string;
   snapshotWatch: string;
   effectiveFlipLabels: string[];
@@ -32,9 +41,16 @@ type WeeklyCallModePanelProps = {
     detail: string;
   }>;
   glossaryHref?: string;
-  trustCueLine?: string;
   needsTrustWarning?: boolean;
-  trustWarningCopy?: string;
+  trustStateLabel: string;
+  trustStateDetail: string;
+  trustTimestamp: string;
+  trustReason?: string;
+  stabilityRule: string;
+  decisionBullets: Array<{ label: string; detail: string }>;
+  guardrailPolicyDetails: PolicyDetails;
+  flipPolicyDetails: PolicyDetails;
+  roleTranslations: RoleTranslation[];
 };
 
 const resolveModeContent = ({
@@ -66,7 +82,6 @@ export function WeeklyCallModePanel({
   trendLabel,
   confidencePercent,
   confidenceLabel,
-  snapshotDoNow,
   snapshotAvoid,
   snapshotWatch,
   effectiveFlipLabels,
@@ -77,107 +92,175 @@ export function WeeklyCallModePanel({
   whyItMattersLine,
   readThisCardItems = [],
   glossaryHref,
-  trustCueLine,
   needsTrustWarning = false,
-  trustWarningCopy,
+  trustStateLabel,
+  trustStateDetail,
+  trustTimestamp,
+  trustReason,
+  stabilityRule,
+  decisionBullets,
+  guardrailPolicyDetails,
+  flipPolicyDetails,
+  roleTranslations,
 }: WeeklyCallModePanelProps) {
   const { activeContent, selectedModeLabel } = resolveModeContent({
     startupVariantPolicy,
     modeContentByMode,
   });
-
-  const modeAdjustedSnapshot = {
-    doNow: activeContent?.doNowBullets[0] ?? snapshotDoNow,
-    avoid: activeContent?.avoidBullets[0] ?? snapshotAvoid,
-    watch: activeContent?.watchBullets[0] ?? snapshotWatch,
-  };
-
+  const [activeRole, setActiveRole] = useState<RoleTranslation["id"]>("finance");
+  const activeRoleTranslation = roleTranslations.find((role) => role.id === activeRole) ?? roleTranslations[0];
   const confidenceValue = Math.max(0, Math.min(100, Math.round(confidencePercent)));
   const confidenceToneClass = confidenceLabel === "HIGH"
     ? "bg-emerald-400/80"
     : confidenceLabel === "MED"
       ? "bg-amber-400/80"
       : "bg-rose-400/80";
-  const heroUrgencyClass = confidenceLabel === "LOW"
-    ? "weather-live-hero weather-live-hero--high"
-    : confidenceLabel === "MED"
-      ? "weather-live-hero weather-live-hero--medium"
-      : "weather-live-hero weather-live-hero--low";
-  const trustDotClass = needsTrustWarning ? "bg-amber-300" : "bg-emerald-300";
-  const trustStatusLabel = needsTrustWarning ? "Degraded" : "Live";
-  const followUpFlipLabels = effectiveFlipLabels
-    .filter((label) => label.trim().length > 0 && label.trim() !== modeAdjustedSnapshot.watch.trim())
+  const trustToneClass = needsTrustWarning
+    ? "border-amber-400/35 bg-amber-500/10 text-amber-50"
+    : "border-emerald-400/30 bg-emerald-500/10 text-emerald-50";
+  const detailDisclosureBase = "mt-2 rounded-lg border border-slate-700/60 bg-slate-950/65 px-3 py-2";
+  const flipSupport = effectiveFlipLabels
+    .filter((label) => label.trim().length > 0 && label.trim() !== snapshotWatch.trim())
     .slice(0, 2);
-  const forecastCards: ForecastStripCardData[] = [
-    {
-      id: "outlook",
-      label: "Outlook",
-      headline: operatingCall,
-      supportingText: postureLabel,
-    },
-    {
-      id: "do-now",
-      label: "Do now",
-      headline: modeAdjustedSnapshot.doNow,
-      tone: "positive",
-    },
-    {
-      id: "guardrail",
-      label: "Guardrail",
-      headline: modeAdjustedSnapshot.avoid,
-      tone: "warning",
-    },
-    {
-      id: "flip-watch",
-      label: "Flip watch",
-      headline: modeAdjustedSnapshot.watch,
-      tone: "info",
-      chips: followUpFlipLabels.map((label) => ({ label, tone: "info" })),
-      footerText: followUpFlipLabels.length > 0
-        ? undefined
-        : "Primary trigger before new fixed-cost commitments.",
-    },
-  ];
 
   return (
     <>
-      <article className={`rounded-[1.2rem] border border-slate-700/75 bg-slate-950/92 p-3 sm:p-3.5 ${heroUrgencyClass}`} aria-label="Weekly call snapshot">
-        <ForecastConditionsHeader
-          eyebrow="Current conditions"
-          headline="This week in one screen"
-          description="Action, guardrail, and flip condition for this week."
-          chips={[
-            { label: "Operator forecast", tone: "info" },
-            { label: postureLabel },
-            { label: trendLabel },
-          ]}
-          trailing={(
-            <ForecastStatsGrid
-              stats={[
-                { label: "Confidence", value: `${confidenceValue}%` },
-                { label: "Stage view", value: selectedModeLabel },
-                { label: "Signal state", value: confidenceLabel },
-              ]}
-              className="lg:min-w-[19rem]"
-            />
-          )}
-        />
-        {trustCueLine ? (
-          <div className={`mt-2.5 rounded-xl border px-3 py-2 text-[11px] ${needsTrustWarning ? "border-amber-400/30 bg-amber-500/10 text-amber-50" : "border-emerald-400/25 bg-emerald-500/10 text-emerald-50"}`}>
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <span className={`h-2.5 w-2.5 rounded-full ${trustDotClass}`} aria-hidden="true" />
-                <span className="text-[10px] font-semibold uppercase tracking-[0.12em]">{trustStatusLabel}</span>
-              </div>
-              <span className="text-[10px] uppercase tracking-[0.12em] text-current/80">Readiness check</span>
+      <article className={`rounded-[1.2rem] border border-slate-700/75 bg-slate-950/92 p-3 sm:p-3.5 ${sectionSpacingClassName}`} aria-label="Weekly call snapshot">
+        <div className={`rounded-xl border px-3 py-2 ${trustToneClass}`}>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.12em]">{trustStateLabel}</span>
+              <span className="rounded-full border border-current/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em]">
+                As of {trustTimestamp}
+              </span>
             </div>
-            <p className="mt-1 leading-5">{needsTrustWarning ? trustWarningCopy ?? trustCueLine : trustCueLine}</p>
+            <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-current/80">{confidenceLabel} confidence</span>
           </div>
+          <p className="mt-1 text-xs leading-5">{trustStateDetail}</p>
+          {trustReason ? <p className="mt-1 text-[11px] leading-5 text-current/85">Reason: {trustReason}</p> : null}
+        </div>
+
+        <div className="mt-3 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-full border border-sky-400/35 bg-sky-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-100">
+                Weekly operating brief
+              </span>
+              <span className="rounded-full border border-slate-700/70 bg-slate-950/75 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-200">
+                {selectedModeLabel}
+              </span>
+              <span className="rounded-full border border-slate-700/70 bg-slate-950/75 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-200">
+                {trendLabel}
+              </span>
+            </div>
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-sky-100/85">Current conditions</p>
+              <h2 className="mt-1 text-xl font-semibold text-slate-50 sm:text-2xl">{operatingCall}</h2>
+              <p className="mt-1 text-sm font-semibold text-slate-200">{postureLabel}</p>
+              {whyItMattersLine ? <p className="mt-2 max-w-3xl text-xs leading-5 text-slate-300">{whyItMattersLine}</p> : null}
+            </div>
+          </div>
+          <div className="rounded-xl border border-slate-700/70 bg-slate-950/70 px-3 py-3 lg:min-w-[18rem]">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Decision confidence</p>
+            <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full bg-slate-800/90" role="progressbar" aria-valuenow={confidenceValue} aria-valuemin={0} aria-valuemax={100} aria-label={`Confidence ${confidenceValue} percent`}>
+              <div className={`h-full origin-left ${confidenceToneClass} transition-transform duration-300`} style={{ transform: `scaleX(${confidenceValue / 100})` }} />
+            </div>
+            <p className="mt-2 text-xs leading-5 text-slate-300">
+              <span className="font-semibold text-slate-100">{confidenceLabel} {confidenceValue}%</span> confidence.
+            </p>
+            <p className="mt-1 text-[11px] leading-5 text-slate-300">{stabilityRule}</p>
+          </div>
+        </div>
+
+        <article id="weekly-call-core" className={`${tierOnePanelClassName} mt-3 bg-gradient-to-br from-slate-950/95 via-slate-900/85 to-slate-950/95`}>
+          <h2 className={tierOneHeadingClassName}>This week&apos;s call</h2>
+          <ul className="mt-3 grid gap-2 md:grid-cols-2">
+            {decisionBullets.map((item) => (
+              <li key={item.label} className="rounded-xl border border-slate-700/60 bg-slate-950/70 px-3 py-3 text-sm text-slate-100">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">{item.label}</p>
+                <p className="mt-1 leading-6">{item.detail}</p>
+              </li>
+            ))}
+          </ul>
+        </article>
+
+        <div className="mt-3 grid gap-3 xl:grid-cols-2">
+          <article className="rounded-xl border border-rose-400/25 bg-rose-500/8 px-3 py-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-rose-200">Guardrail</p>
+            <p className="mt-1 text-sm font-semibold leading-6 text-rose-50">{snapshotAvoid}</p>
+            <details className={detailDisclosureBase}>
+              <summary className="min-h-[44px] cursor-pointer list-none pt-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+                Show policy details
+              </summary>
+              <p className="mt-1 text-xs leading-5 text-slate-200">{guardrailPolicyDetails.summary}</p>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {guardrailPolicyDetails.chips.map((chip) => (
+                  <span key={chip} className={compactInsetClassName}>{chip}</span>
+                ))}
+              </div>
+            </details>
+          </article>
+
+          <article className="rounded-xl border border-sky-400/25 bg-sky-500/8 px-3 py-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Flip condition</p>
+            <p className="mt-1 text-sm font-semibold leading-6 text-sky-50">{snapshotWatch}</p>
+            {flipSupport.length > 0 ? (
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {flipSupport.map((label) => (
+                  <span key={label} className="rounded-full border border-sky-400/25 bg-sky-500/8 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-100">
+                    {label}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+            <details className={detailDisclosureBase}>
+              <summary className="min-h-[44px] cursor-pointer list-none pt-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+                Show numbers
+              </summary>
+              <p className="mt-1 text-xs leading-5 text-slate-200">{flipPolicyDetails.summary}</p>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {flipPolicyDetails.chips.map((chip) => (
+                  <span key={chip} className={compactInsetClassName}>{chip}</span>
+                ))}
+              </div>
+            </details>
+          </article>
+        </div>
+
+        {activeRoleTranslation ? (
+          <article className="mt-3 rounded-xl border border-slate-700/60 bg-slate-950/60 px-3 py-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Role translation</p>
+              <div className="flex flex-wrap gap-2">
+                {roleTranslations.map((role) => {
+                  const active = role.id === activeRole;
+                  return (
+                    <button
+                      key={role.id}
+                      type="button"
+                      className={active
+                        ? "min-h-[44px] rounded-full border border-sky-400/35 bg-sky-500/10 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-100"
+                        : "min-h-[44px] rounded-full border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300"}
+                      onClick={() => setActiveRole(role.id)}
+                    >
+                      {role.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            <p className="mt-2 text-sm font-semibold text-slate-100">{activeRoleTranslation.implication}</p>
+            <div className="mt-2 grid gap-2 md:grid-cols-2">
+              <p className="rounded-lg border border-emerald-400/25 bg-emerald-500/8 px-3 py-2 text-xs leading-5 text-emerald-100">
+                <span className="font-semibold uppercase tracking-[0.08em] text-emerald-200">Do</span> {activeRoleTranslation.doLine}
+              </p>
+              <p className="rounded-lg border border-rose-400/25 bg-rose-500/8 px-3 py-2 text-xs leading-5 text-rose-100">
+                <span className="font-semibold uppercase tracking-[0.08em] text-rose-200">Don&apos;t</span> {activeRoleTranslation.holdLine}
+              </p>
+            </div>
+          </article>
         ) : null}
-        {whyItMattersLine ? (
-          <p className="mt-2.5 max-w-3xl rounded-xl border border-slate-700/60 bg-slate-950/55 px-3 py-2 text-xs leading-5 text-slate-200">{whyItMattersLine}</p>
-        ) : null}
-        <ForecastStrip cards={forecastCards} ariaLabel="Weekly decision transmission order" className="mt-3" />
+
         {activeContent ? (
           <div className="mt-3 rounded-xl border border-slate-700/60 bg-slate-950/60 px-3 py-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
@@ -192,9 +275,10 @@ export function WeeklyCallModePanel({
             </p>
           </div>
         ) : null}
+
         {readThisCardItems.length > 0 ? (
           <details className="mt-3 rounded-lg border border-slate-700/60 bg-slate-950/55 px-3 py-2.5">
-            <summary className="cursor-pointer text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Decode this forecast</summary>
+            <summary className="min-h-[44px] cursor-pointer pt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Decode this forecast</summary>
             <ul className="mt-2 grid gap-1.5 text-[11px] text-slate-100">
               {readThisCardItems.slice(0, 3).map((item) => (
                 <li key={item.label} className="rounded-md border border-slate-700/55 bg-slate-900/55 px-2.5 py-2">
@@ -202,11 +286,6 @@ export function WeeklyCallModePanel({
                 </li>
               ))}
             </ul>
-            <div className="mt-2 flex flex-wrap gap-3 text-[11px] text-slate-300">
-              <span className={compactInsetClassName}>Capital tightness = how hard funding is to access.</span>
-              <span className={compactInsetClassName}>Risk appetite = how much the market will support bold expansion.</span>
-              <span className={compactInsetClassName}>Flip condition = the threshold that changes this week&apos;s call.</span>
-            </div>
             {glossaryHref ? (
               <Link href={glossaryHref as Route} className="mt-2 inline-flex min-h-[44px] items-center text-xs font-semibold text-sky-300 underline underline-offset-2">
                 Open glossary help
@@ -214,30 +293,6 @@ export function WeeklyCallModePanel({
             ) : null}
           </details>
         ) : null}
-        <div className="mt-3 grid gap-2 lg:grid-cols-[minmax(0,1.15fr)_minmax(13rem,0.85fr)]">
-          <div className="rounded-xl border border-slate-700/60 bg-slate-950/60 px-3 py-2">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Spoken shorthand</p>
-            <p className="mt-1 text-sm font-semibold text-slate-100">{operatingCall}</p>
-            <p className="mt-1 text-[11px] text-slate-300">Use this as the planning baseline in Slack or the Monday sync.</p>
-          </div>
-          <div className="rounded-xl border border-slate-700/60 bg-slate-950/60 px-3 py-2" aria-label="Decision confidence gauge">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Decision confidence</p>
-            <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-slate-800/90" role="progressbar" aria-valuenow={confidenceValue} aria-valuemin={0} aria-valuemax={100} aria-label={`Confidence ${confidenceValue} percent`}>
-              <div className={`h-full origin-left ${confidenceToneClass} transition-transform duration-300`} style={{ transform: `scaleX(${confidenceValue / 100})` }} />
-            </div>
-            <p className="mt-1 text-[10px] text-slate-300"><span className="font-semibold text-slate-100">{confidenceLabel} {confidenceValue}%</span> confidence · watch the flip cues when this compresses.</p>
-          </div>
-        </div>
-      </article>
-
-      <article id="weekly-call-core" className={`${tierOnePanelClassName} weather-motion-card ${sectionSpacingClassName} bg-gradient-to-br from-slate-950/95 via-slate-900/85 to-slate-950/95`}>
-        <h2 className={tierOneHeadingClassName}>This week&apos;s call</h2>
-        <div className="grid gap-2 text-xs text-slate-100 md:grid-cols-2">
-          <p className="border-l-2 border-slate-700/70 pl-3 py-1.5"><span className="font-semibold uppercase tracking-[0.08em] text-slate-200">What environment?</span> {postureLabel} with a {trendLabel.toLowerCase()} trend at {confidenceValue}% confidence.</p>
-          <p className="border-l-2 border-emerald-400/45 pl-3 py-1.5"><span className="font-semibold uppercase tracking-[0.08em] text-emerald-200">DO NOW</span> {modeAdjustedSnapshot.doNow}</p>
-          <p className="border-l-2 border-rose-400/45 pl-3 py-1.5"><span className="font-semibold uppercase tracking-[0.08em] text-rose-200">GUARDRAIL</span> {modeAdjustedSnapshot.avoid}</p>
-          <p className="border-l-2 border-sky-400/45 pl-3 py-1.5"><span className="font-semibold uppercase tracking-[0.08em] text-sky-200">FLIP WHEN</span> {modeAdjustedSnapshot.watch}</p>
-        </div>
 
         <div className="mt-3 grid gap-2 sm:grid-cols-3">
           <a href="#audit-this-call" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100">

@@ -1102,6 +1102,86 @@ export function CitationActionFooter({ citationMetaLine, citation, actions }: Ci
   );
 }
 
+const ownerLabelByArea: Record<BoundedDecisionRule["area"], string> = {
+  hiring: "CEO",
+  "product-tempo": "CPO",
+  "capital-raising": "CEO / Finance",
+  "burn-discipline": "CFO",
+  "expansion-bets": "CEO",
+};
+
+const extractThresholdChips = (text: string): string[] => {
+  const match = text.match(/(tightness|risk appetite)\s*(>=|<=|>|<)\s*(-?\d+(?:\.\d+)?)/i);
+
+  if (!match) {
+    return [];
+  }
+
+  const metricLabel = match[1].toLowerCase() === "risk appetite" ? "Risk appetite" : "Tightness";
+  return [`Metric ${metricLabel}`, `Trigger ${match[2]} ${match[3]}`];
+};
+
+const buildPolicyDetails = ({
+  rule,
+  summary,
+  fallbackOwner,
+}: {
+  rule?: BoundedDecisionRule;
+  summary: string;
+  fallbackOwner: string;
+}) => {
+  if (!rule) {
+    return {
+      summary,
+      chips: [`Owner ${fallbackOwner}`],
+    };
+  }
+
+  const pauseChips = extractThresholdChips(rule.pauseTrigger);
+  const firstFlip = rule.flipConditions[0];
+
+  return {
+    summary,
+    chips: [
+      ...(pauseChips.length > 0
+        ? pauseChips
+        : firstFlip
+          ? [
+            `Metric ${firstFlip.metric === "riskAppetite" ? "Risk appetite" : "Tightness"}`,
+            `Trigger ${firstFlip.operator} ${firstFlip.value.toFixed(1)}`,
+          ]
+          : []),
+      `Owner ${ownerLabelByArea[rule.area]}`,
+    ],
+  };
+};
+
+const buildRoleTranslationCards = ({
+  decisionRules,
+}: {
+  decisionRules: BoundedDecisionRule[];
+}) => {
+  const financeRule = decisionRules.find((rule) => rule.area === "burn-discipline");
+  const productRule = decisionRules.find((rule) => rule.area === "product-tempo");
+
+  return [
+    {
+      id: "finance" as const,
+      label: "Finance",
+      implication: financeRule?.recommendation ?? "Translate posture into approval limits and commitment discipline.",
+      doLine: financeRule?.doNow[0] ?? "Keep new fixed-cost commitments reversible and staged.",
+      holdLine: financeRule?.avoidNow[0] ?? "Do not approve multi-quarter spend without clear payback proof.",
+    },
+    {
+      id: "product" as const,
+      label: "Product",
+      implication: productRule?.recommendation ?? "Translate posture into roadmap pacing and scope discipline.",
+      doLine: productRule?.doNow[0] ?? "Prioritize near-term customer value and reversible roadmap bets.",
+      holdLine: productRule?.avoidNow[0] ?? "Do not expand long-payback roadmap scope without stronger proof.",
+    },
+  ];
+};
+
 export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
   const { model, actions, diagnosticsLane } = props;
   const { status, decision, presentation, diagnostics, history, artifact } = model;
@@ -1121,7 +1201,6 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
   const {
     operatingStanceLine,
     weeklyMemoLines,
-    netConstraintSummary,
     guardrail,
     reversalTrigger,
     actionNowShort,
@@ -1131,6 +1210,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     canonicalDecisionCopy,
     canonicalFlipConditions = [],
     reportDynamics,
+    decisionShiftSummary,
     transitionProbabilities,
     decisionRules,
     decisionMatrix,
@@ -1190,11 +1270,41 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     : structuredFlipLabels.length > 0
     ? structuredFlipLabels
     : compactFlipConditionLabels.filter((label, index, labels) => labels.indexOf(label) === index).slice(0, 4);
+  const stabilityRule = "Stability rule: act on posture shifts only after 2 consecutive weekly reads, unless the flip trigger fires at HIGH confidence.";
+  const trustStateLabel = isFallbackSnapshot ? "FALLBACK SNAPSHOT" : "LIVE";
+  const trustStateDetail = isFallbackSnapshot
+    ? "Cached weekly read. Use for pacing and defer irreversible approvals until live data returns."
+    : confidenceLabel === "HIGH"
+      ? "Live weekly read. Safe for near-term operating decisions."
+      : "Live weekly read, but confidence is not HIGH yet. Keep approvals staged.";
+  const decisionBullets = [
+    { label: "What changed", detail: decisionShiftSummary.replace(/^Changed:\s*/i, "").trim() },
+    { label: "What that changes", detail: immediateDecision.trim() },
+    { label: "What to revisit", detail: guardrail.trim() },
+    { label: "What would flip", detail: snapshotWatch.trim() },
+  ];
+  const guardrailPolicyDetails = buildPolicyDetails({
+    rule: decisionRules.find((rule) => rule.area === "burn-discipline") ?? decisionRules[0],
+    summary: "Use this as the enforceable weekly boundary before approving new fixed-cost commitments.",
+    fallbackOwner: "CFO",
+  });
+  const flipPolicyDetails = canonicalFlipConditions[0]
+    ? {
+      summary: "This is the pre-committed trigger that reopens the weekly posture call.",
+      chips: [
+        `Metric ${canonicalFlipConditions[0].metric === "riskAppetite" ? "Risk appetite" : "Tightness"}`,
+        `Trigger ${canonicalFlipConditions[0].operator} ${canonicalFlipConditions[0].value.toFixed(1)}`,
+        `Owner ${ownerLabelByArea[canonicalFlipConditions[0].area]}`,
+      ],
+    }
+    : buildPolicyDetails({
+      rule: decisionRules.find((rule) => rule.area === "product-tempo") ?? decisionRules[0],
+      summary: "Use the primary flip trigger to decide when this week’s posture should be revisited.",
+      fallbackOwner: "CEO",
+    });
+  const roleTranslations = buildRoleTranslationCards({ decisionRules });
 
   const needsTrustWarning = isFallbackSnapshot || confidenceLabel !== "HIGH" || freshnessLabel === "Unavailable";
-  const trustWarningCopy = isFallbackSnapshot
-    ? "Using a cached snapshot. Use this call for near-term pacing only and pause irreversible decisions until live refresh returns."
-    : "Use this call for near-term pacing only until confidence returns to HIGH with fresh data.";
   const resolvedStartupVariantPolicy = startupVariantPolicy ?? {
     selectedMode: "series-a",
     options: [
@@ -1323,7 +1433,6 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
             trendLabel={trendLabel}
             confidencePercent={confidencePercent}
             confidenceLabel={confidenceLabel}
-            snapshotDoNow={snapshotDoNow}
             snapshotAvoid={snapshotAvoid}
             snapshotWatch={snapshotWatch}
             effectiveFlipLabels={effectiveFlipLabels}
@@ -1334,9 +1443,16 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
             whyItMattersLine={whyItMattersLine}
             readThisCardItems={readThisCardItems}
             glossaryHref={glossaryHref}
-            trustCueLine={trustCueLine}
             needsTrustWarning={needsTrustWarning}
-            trustWarningCopy={trustWarningCopy}
+            trustStateLabel={trustStateLabel}
+            trustStateDetail={trustStateDetail}
+            trustTimestamp={freshnessLabel}
+            trustReason={isFallbackSnapshot ? artifact.freshnessLine ?? trustCueLine : undefined}
+            stabilityRule={stabilityRule}
+            decisionBullets={decisionBullets}
+            guardrailPolicyDetails={guardrailPolicyDetails}
+            flipPolicyDetails={flipPolicyDetails}
+            roleTranslations={roleTranslations}
           />
 
           <InputInfluenceSection items={inputInfluence} />

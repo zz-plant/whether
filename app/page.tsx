@@ -45,6 +45,7 @@ const LeadershipArtifactActions = async ({ artifactPayloadPromise, fallbackActiv
   return (
     <StreamedSectionReveal delay="medium">
       <CopyLeadershipArtifactsButtons
+        boardSnippet={artifactPayload.boardSnippetText}
         weeklyCallSnapshot={artifactPayload.weeklyCallSnapshotText}
         weeklyOperatorBrief={artifactPayload.weeklyOperatorBriefText}
         boardSummary={artifactPayload.boardSummary}

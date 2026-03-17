@@ -26,6 +26,15 @@ export type WeeklyCallSnapshotPayload = {
   flipConditions: string[];
 };
 
+export type WeeklyBoardSnippetPayload = {
+  trustLine: string;
+  postureLine: string;
+  changedLine: string;
+  guardrailLine: string;
+  flipLine: string;
+  stabilityLine: string;
+};
+
 export const buildWeeklyOperatorBriefPayload = ({
   assessment,
   treasury,
@@ -155,4 +164,13 @@ export const buildWeeklyCallSnapshotPlainText = (payload: WeeklyCallSnapshotPayl
   ...(payload.flipConditions.length > 0
     ? payload.flipConditions.map((condition) => `• ${condition}`)
     : ["• Recheck thresholds on next refresh."]),
+].join("\n");
+
+export const buildWeeklyBoardSnippetPlainText = (payload: WeeklyBoardSnippetPayload) => [
+  payload.trustLine,
+  payload.postureLine,
+  payload.changedLine,
+  payload.guardrailLine,
+  payload.flipLine,
+  payload.stabilityLine,
 ].join("\n");
