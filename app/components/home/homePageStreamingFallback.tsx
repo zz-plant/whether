@@ -1,4 +1,5 @@
 import { Skeleton } from "../skeleton";
+import { WeeklyDiagnosticsFallback } from "./weeklyDiagnosticsFallback";
 
 type HomePageStreamingFallbackProps = {
   searchParams?: {
@@ -119,41 +120,44 @@ export const HomePageStreamingFallback = ({ searchParams }: HomePageStreamingFal
         </article>
       </section>
 
-      <section className="weather-panel space-y-4 px-5 py-5" aria-label="Loading additional sections">
-        <div className="flex items-center justify-between gap-2">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">Loading additional sections</p>
+      <section className="home-band-stack" aria-label="Loading additional sections">
+        <section className="home-band home-band--flow home-band-shell home-band-shell--nav weather-panel weather-section-stage space-y-3 px-4 py-4">
+          <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
+            <div className="space-y-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Scroll path</p>
+                <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-200">
+                  1 of 4
+                </span>
+              </div>
+              <h2 className="text-lg font-semibold text-slate-100 sm:text-xl">Move through the weekly brief in one pass</h2>
+              <p className="max-w-3xl text-sm text-slate-300">Start with why the call changed, lock the operating plan, then open replay or decision tools only when they help this week.</p>
+            </div>
+            <div className="flex flex-wrap gap-2.5">
+              <Skeleton className="h-11 w-52 rounded-full bg-slate-500/34" />
+              <Skeleton className="h-11 w-56 rounded-full bg-slate-500/30" />
+            </div>
           </div>
-          <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-200">
-            Loading
-          </span>
-        </div>
-        <div className="grid gap-3 md:grid-cols-3">
-          <article className="rounded-xl border border-slate-700/80 bg-slate-900/70 p-3">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Diagnostics lane</p>
-            <div className="mt-2 space-y-2">
-              <Skeleton className="h-3 w-3/4 rounded-full bg-slate-500/45" />
-              <Skeleton className="h-12 w-full rounded-xl bg-slate-500/38" />
-              <Skeleton className="h-12 w-full rounded-xl bg-slate-500/32" />
-            </div>
-          </article>
-          <article className="rounded-xl border border-slate-700/80 bg-slate-900/70 p-3">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Share artifact</p>
-            <div className="mt-2 space-y-2">
-              <Skeleton className="h-3 w-2/3 rounded-full bg-slate-500/45" />
-              <Skeleton className="h-10 w-full rounded-full bg-slate-500/35" />
-              <Skeleton className="h-10 w-full rounded-full bg-slate-500/30" />
-            </div>
-          </article>
-          <article className="rounded-xl border border-slate-700/80 bg-slate-900/70 p-3">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">Trust strip</p>
-            <div className="mt-2 space-y-2">
-              <Skeleton className="h-3 w-1/2 rounded-full bg-slate-500/45" />
-              <Skeleton className="h-3 w-full rounded-full bg-slate-500/35" />
-              <Skeleton className="h-3 w-4/5 rounded-full bg-slate-500/30" />
-            </div>
-          </article>
-        </div>
+          <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-4">
+            {["Audit", "Approve", "Replay", "Translate"].map((label, index) => (
+              <article key={label} className={`weather-surface weather-step-card rounded-xl border px-3 py-3 ${index === 0 ? "border-sky-400/40 bg-sky-500/10" : "border-slate-800/80 bg-slate-950/45"}`}>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-200">
+                    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-600/80 text-[10px] text-slate-300">{index + 1}</span>
+                    {label}
+                  </span>
+                  <span className="text-[10px] uppercase tracking-[0.16em] text-slate-400">{index === 0 ? "Current" : "Queued"}</span>
+                </div>
+                <div className="mt-2 space-y-2">
+                  <Skeleton className="h-3 w-11/12 rounded-full bg-slate-500/34" />
+                  <Skeleton className="h-3 w-8/12 rounded-full bg-slate-500/26" />
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <WeeklyDiagnosticsFallback />
       </section>
     </section>
   );

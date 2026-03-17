@@ -16,7 +16,7 @@ export async function HomeWorkspaceBands({
   const workspaceModel = await workspaceModelPromise;
 
   return (
-    <div className="space-y-6">
+    <div className="home-band-stack">
       <PageFlowNav
         eyebrow={homeScrollPlan.eyebrow}
         title={homeScrollPlan.title}
@@ -36,8 +36,8 @@ export async function HomeWorkspaceBands({
         )}
       />
 
-      <section id="audit-this-call" className="home-band home-band--audit weather-panel weather-section-stage weather-section-stage--short scroll-mt-28 space-y-4 px-4 py-4 sm:px-5" aria-labelledby="audit-this-call-title">
-        <div className="flex flex-wrap items-start justify-between gap-3">
+      <section id="audit-this-call" className="home-band home-band--audit home-band-shell weather-panel weather-section-stage weather-section-stage--short scroll-mt-28 space-y-4 px-4 py-4 sm:px-5" aria-labelledby="audit-this-call-title">
+        <div className="home-band-shell__header flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
             <p className="home-band-kicker">Why this call</p>
             <h2 id="audit-this-call-title" className="text-xl font-semibold text-slate-100">See what changed, then pressure-test the call with trust and evidence.</h2>
@@ -113,8 +113,8 @@ export async function HomeWorkspaceBands({
         </div>
       </section>
 
-      <section id="approve-this-weeks-plan" className="home-band home-band--operations weather-panel weather-section-stage weather-section-stage--medium scroll-mt-28 space-y-4 px-4 py-4 sm:px-5" aria-labelledby="approve-this-weeks-plan-title">
-        <div className="flex flex-wrap items-start justify-between gap-3">
+      <section id="approve-this-weeks-plan" className="home-band home-band--operations home-band-shell weather-panel weather-section-stage weather-section-stage--medium scroll-mt-28 space-y-4 px-4 py-4 sm:px-5" aria-labelledby="approve-this-weeks-plan-title">
+        <div className="home-band-shell__header flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
             <p className="home-band-kicker">Execution guardrails</p>
             <h2 id="approve-this-weeks-plan-title" className="text-xl font-semibold text-slate-100">Lock the operating summary here, then open Operations only for execution detail.</h2>
@@ -173,8 +173,8 @@ export async function HomeWorkspaceBands({
         </div>
       </section>
 
-      <section id="historical-replay-workspace" className="home-band home-band--history weather-panel weather-section-stage weather-section-stage--long scroll-mt-28 space-y-4 px-4 py-4 sm:px-5" aria-labelledby="historical-replay-workspace-title">
-        <div className="space-y-1">
+      <section id="historical-replay-workspace" className="home-band home-band--history home-band-shell weather-panel weather-section-stage weather-section-stage--long scroll-mt-28 space-y-4 px-4 py-4 sm:px-5" aria-labelledby="historical-replay-workspace-title">
+        <div className="home-band-shell__header space-y-1">
           <p className="home-band-kicker">Historical replay</p>
           <h2 id="historical-replay-workspace-title" className="text-xl font-semibold text-slate-100">Replay any prior month after you lock this week&apos;s live call.</h2>
           <p className="max-w-3xl text-sm text-slate-300">Use the same replay pattern as Signals when you want context, retrospectives, or a quick comparison to prior conditions.</p>
@@ -213,8 +213,8 @@ export async function HomeWorkspaceBands({
         </div>
       </section>
 
-      <section id="translate-or-run-tool" className="home-band home-band--translate weather-panel weather-section-stage weather-section-stage--long scroll-mt-28 space-y-4 px-4 py-4 sm:px-5" aria-labelledby="translate-or-run-tool-title">
-        <div className="space-y-1">
+      <section id="translate-or-run-tool" className="home-band home-band--translate home-band-shell weather-panel weather-section-stage weather-section-stage--long scroll-mt-28 space-y-4 px-4 py-4 sm:px-5" aria-labelledby="translate-or-run-tool-title">
+        <div className="home-band-shell__header space-y-1">
           <p className="home-band-kicker">Translate or run a tool</p>
           <h2 id="translate-or-run-tool-title" className="text-xl font-semibold text-slate-100">Go straight to a role path, situation path, or runnable utility.</h2>
           <p className="max-w-3xl text-sm text-slate-300">Use fast paths first. Browse role and situation hubs only when you need fuller discovery.</p>

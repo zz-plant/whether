@@ -1,11 +1,12 @@
 import { Skeleton } from "../skeleton";
 
 export const WeeklyDiagnosticsFallback = () => (
-  <section aria-label="Loading diagnostics lane" className="space-y-3" aria-busy="true">
-    <article className="rounded-[1.2rem] border border-sky-400/20 bg-slate-950/68 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-      <div className="flex flex-wrap items-start justify-between gap-3">
+  <section aria-label="Loading diagnostics lane" className="home-band-stack" aria-busy="true">
+    <article className="home-band home-band--audit home-band-shell weather-panel weather-section-stage weather-section-stage--short space-y-4 px-4 py-4 sm:px-5">
+      <div className="home-band-shell__header flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">Loading additional detail</p>
+          <p className="home-band-kicker">Why this call</p>
+          <h2 className="text-xl font-semibold text-slate-100">Loading trust, decision delta, and evidence movers.</h2>
         </div>
         <span className="inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-400/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-cyan-100">
           <span className="weather-loading-beacon" />
@@ -34,14 +35,21 @@ export const WeeklyDiagnosticsFallback = () => (
       </div>
     </article>
 
-    <article className="rounded-xl border border-slate-700/55 bg-slate-950/84 p-5">
-      <div className="flex items-center justify-between gap-2">
-        <Skeleton className="h-4 w-40 rounded-full bg-slate-500/42" />
-        <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">More detail</span>
+    <article className="home-band home-band--operations home-band-shell weather-panel weather-section-stage weather-section-stage--medium space-y-4 px-4 py-4 sm:px-5">
+      <div className="home-band-shell__header flex items-center justify-between gap-2">
+        <div className="space-y-1">
+          <p className="home-band-kicker">Execution guardrails</p>
+          <h2 className="text-xl font-semibold text-slate-100">Loading the weekly operating summary.</h2>
+        </div>
+        <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Queued</span>
       </div>
-      <div className="mt-3 grid gap-2 sm:grid-cols-2">
-        <Skeleton className="h-16 w-full rounded-xl bg-slate-500/32" />
-        <Skeleton className="h-16 w-full rounded-xl bg-slate-500/28" />
+      <div className="grid gap-3 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+        <Skeleton className="h-28 w-full rounded-xl bg-slate-500/32" />
+        <Skeleton className="h-28 w-full rounded-xl bg-slate-500/28" />
+      </div>
+      <div className="grid gap-3 lg:grid-cols-2">
+        <Skeleton className="h-40 w-full rounded-xl bg-slate-500/26" />
+        <Skeleton className="h-40 w-full rounded-xl bg-slate-500/22" />
       </div>
     </article>
   </section>

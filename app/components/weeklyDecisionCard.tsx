@@ -504,7 +504,7 @@ function RegimeBanner({
   const exactConfidenceLabel = `${Math.round(confidencePercent)}%`;
 
   return (
-    <header className={`z-10 rounded-2xl border px-4 py-4 shadow-[0_20px_44px_rgba(2,6,23,0.42)] backdrop-blur md:sticky md:top-2 sm:px-5 sm:py-5 ${bannerTone.shell}`} data-testid="weekly-regime-banner" aria-label="Weekly regime banner">
+    <header className={`z-10 rounded-2xl border px-4 py-4 shadow-[0_20px_44px_rgba(2,6,23,0.42)] backdrop-blur sm:px-5 sm:py-5 ${bannerTone.shell}`} data-testid="weekly-regime-banner" aria-label="Weekly regime banner">
       <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
         <div className="min-w-0 space-y-2.5">
           <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-100/85">
