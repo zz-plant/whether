@@ -6,6 +6,7 @@ import type { RoleAwareOperatingTemplate } from "../../lib/report/operatingCalls
 import { WeeklyCallModePanel } from "./weeklyCallModePanel";
 import { DecisionHeroSection } from "./weekly-card/DecisionHeroSection";
 import { DiagnosticsSection } from "./weekly-card/DiagnosticsSection";
+import { ActionStripSection } from "./weekly-card/ActionStripSection";
 import { PostureHistoryTimeline } from "./weekly-card/HistorySection";
 import type { DiagnosticsSectionProps } from "./weekly-card/types";
 import { compactActionCue, compactInset, disclosureSummaryClass, sectionSpacing, tierOneHeading, tierOnePanel, tierThreeHeading, tierThreePanel } from "./weekly-card/shared";
@@ -1161,6 +1162,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     transitionProbabilities,
     decisionRules,
     decisionMatrix,
+    actionStripItems = [],
     startupVariantPolicy,
     roleAwareTemplates,
     executiveOperationalStance,
@@ -1391,10 +1393,19 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
               weeklyMovement={weeklyMovement}
               transitionProbabilities={transitionProbabilities}
               failureModes={failureModes}
-              historicalTimeline={historicalTimeline}
               sinceLastReview={sinceLastReview}
             />
           )}
+
+          <BoundedRulesMatrix
+            decisionMatrix={decisionMatrix}
+            decisionRules={decisionRules}
+            startupVariantPolicy={resolvedStartupVariantPolicy}
+          />
+
+          {actionStripItems.length > 0 ? (
+            <ActionStripSection items={actionStripItems} />
+          ) : null}
 
         </main>
 

@@ -9,6 +9,7 @@ import { formatSourceFreshnessLabel, formatSourceModeLabel } from "./sourceHealt
 import {
   buildInterpretationLayer,
   isInterpretationView,
+  type InterpretationLayer,
   type InterpretationView,
 } from "./interpretationLayer";
 import { buildBoardBrief, buildCallCitation } from "../export/briefBuilders";
@@ -206,6 +207,8 @@ export type HomePageAssembly = {
   leadershipArtifactPayloadPromise: Promise<ArtifactPayload | null>;
   diagnosticsLanePromise: Promise<HomePageDiagnosticsLane>;
   workspaceModelPromise: Promise<HomePageWorkspaceModel>;
+  interpretationLayer: InterpretationLayer;
+  interpretationSearchParams?: Record<string, string | undefined>;
   fallbackActive: boolean;
 };
 
@@ -715,6 +718,22 @@ export const assembleHomePage = async ({
     confidenceTrend,
     isFallbackSnapshot: isFallback && !historicalSelection,
   });
+  const interpretationLayer = buildInterpretationLayer({
+    view: interpretationView,
+    homeBriefModel,
+    assessment,
+    forecast,
+    decisionRules: homeBriefModel.decisionRules,
+  });
+  const interpretationSearchParams = searchParams
+    ? Object.entries(searchParams).reduce<Record<string, string | undefined>>((result, [key, value]) => {
+        if (typeof value === "string") {
+          result[key] = value;
+        }
+
+        return result;
+      }, {})
+    : undefined;
 
   const enrichedHomePageModelPromise = (async () => {
     try {
@@ -799,6 +818,8 @@ export const assembleHomePage = async ({
         : null
     ),
     fallbackActive: !historicalSelection && isFallback,
+    interpretationLayer,
+    interpretationSearchParams,
     diagnosticsLanePromise: enrichedHomePageModelPromise.then(({ homeBriefModel: enrichedHomeBriefModel, weeklyDecisionCardModel: enrichedWeeklyDecisionCardModel }) =>
       buildDiagnosticsLanePayload({
         homeBriefModel: enrichedHomeBriefModel,

@@ -213,4 +213,20 @@ describe("assembleHomePage streaming contract", () => {
     assert.equal(workspaceModel.operations.continueHref, "/operations#ops-monthly-action-summary");
     assert.equal(workspaceModel.translate.decisionUtilities.length, 2);
   });
+
+  it("parses interpretation view from search params without changing the canonical weekly call", async () => {
+    const homepage = await assembleHomePage(
+      { searchParams: { view: "forecast", month: "3", year: "2026" } },
+      {
+        loadReportDataSafe: async () => buildReportResult(),
+        buildPostureState: async () => postureState,
+      },
+    );
+
+    assert.equal(homepage.interpretationLayer.view, "forecast");
+    assert.equal(homepage.interpretationSearchParams?.view, "forecast");
+    assert.equal(homepage.interpretationSearchParams?.month, "3");
+    assert.match(homepage.interpretationLayer.summary, /boundary|flip|momentum/i);
+    assert.match(homepage.weeklyDecisionCardModel.decision.immediateDecision, /stage|revise|hold/i);
+  });
 });

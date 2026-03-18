@@ -26,14 +26,13 @@ describe("DiagnosticsSection", () => {
         weeklyMovement={model.decision.weeklyMovement}
         transitionProbabilities={model.decision.transitionProbabilities}
         failureModes={model.diagnostics.failureModes ?? []}
-        historicalTimeline={model.history.historicalTimeline}
-        renderBoundedRulesMatrix={() => <div>matrix</div>}
       />,
     );
 
     assert.match(html, /Need deeper analysis\?/);
-    assert.match(html, /Since last review/);
-    assert.match(html, /Open diagnostics: evidence, drivers, and model inputs/);
-    assert.doesNotMatch(html, /Defensive probability:/);
+    assert.match(html, /Audit trail/);
+    assert.match(html, /Delta/);
+    assert.match(html, /Evidence pack/);
+    assert.doesNotMatch(html, /Regime history \(recent\)/);
   });
 });
