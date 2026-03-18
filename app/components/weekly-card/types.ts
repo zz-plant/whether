@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import type { BoundedDecisionRule } from "../../../lib/report/boundedDecisionRules";
 import type { DecisionMatrixPayload, WeeklyDecisionCardViewModel } from "../../../lib/report/homeBriefModel";
 import type { ActionStripItem, RoleAwareOperatingTemplate } from "../../../lib/report/operatingCalls";
@@ -63,7 +62,5 @@ export type DiagnosticsSectionProps = {
   weeklyMovement: WeeklyMovement;
   transitionProbabilities: Record<ForecastRegimeLabel, number>;
   failureModes: FailureModeWarningItem[];
-  historicalTimeline: WeeklyDecisionCardViewModel["history"]["historicalTimeline"];
   sinceLastReview?: WeeklyDecisionCardViewModel["sinceLastReview"];
-  renderBoundedRulesMatrix: (props: { decisionMatrix?: DecisionMatrixPayload; decisionRules: BoundedDecisionRule[] }) => ReactNode;
 };

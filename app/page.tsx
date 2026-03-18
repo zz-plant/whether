@@ -16,6 +16,7 @@ import { HomePageStreamingFallback } from "./components/home/homePageStreamingFa
 import { WeeklyDiagnosticsFallback } from "./components/home/weeklyDiagnosticsFallback";
 import { StreamedSectionReveal } from "./components/streamedSectionReveal";
 import { HomeWorkspaceBands } from "./components/home/homeWorkspaceBands";
+import { HomeInterpretationPanel } from "./components/homeInterpretationPanel";
 
 export const revalidate = 900;
 export const runtime = "edge";
@@ -142,8 +143,14 @@ export const HomePageReportContent = async ({
             />
           </Suspense>
         )}
-        diagnosticsLane={<></>}
       />
+
+      <StreamedSectionReveal delay="medium">
+        <HomeInterpretationPanel
+          layer={homepage.interpretationLayer}
+          searchParams={homepage.interpretationSearchParams}
+        />
+      </StreamedSectionReveal>
 
       <Suspense fallback={<WeeklyDiagnosticsFallback />}>
         <StreamedSectionReveal delay="short">

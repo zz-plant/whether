@@ -3,12 +3,14 @@ import { describe, it } from "node:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { WeeklyDecisionCard } from "../app/components/weeklyDecisionCard";
 import { HomeInterpretationPanel } from "../app/components/homeInterpretationPanel";
+import { HomeWorkspaceBands } from "../app/components/home/homeWorkspaceBands";
 import { HomeFirstRunOrientation } from "../app/components/homeFirstRunOrientation";
 import { buildInterpretationLayer } from "../lib/report/interpretationLayer";
 import type { ReportDynamics } from "../lib/report/reportData";
 import type { BoundedDecisionRule } from "../lib/report/boundedDecisionRules";
 import type { RegimeAssessment } from "../lib/regimeEngine";
 import type { ForecastModel } from "../lib/report/forecastModel";
+import type { HomePageWorkspaceModel } from "../lib/report/homePageAssembler";
 import { buildWeeklyDecisionCardModel, type WeeklyDecisionCardModelOverrides } from "./factories/weeklyDecisionCardModel";
 
 const reportDynamics: ReportDynamics = {
@@ -99,8 +101,56 @@ const buildHomeCardModel = (overrides: WeeklyDecisionCardModelOverrides = {}) =>
     ...overrides,
   });
 
+const workspaceModel: HomePageWorkspaceModel = {
+  sectionLinks: [
+    { href: "#audit-this-call", label: "Why this call" },
+    { href: "#approve-this-weeks-plan", label: "Execution guardrails" },
+  ],
+  workspaceActions: {
+    auditHref: "#audit-this-call",
+    operationsHref: "#approve-this-weeks-plan",
+  },
+  audit: {
+    trustStatusLabel: "Live",
+    trustStatusDetail: "Fresh data is available for this weekly read.",
+    trustStatusAction: "Use the current call for near-term approvals.",
+    trustStatusTone: "stable",
+    freshnessSummary: "Updated Mar 6, 2026 09:12 UTC",
+    sourceCoverageLine: "Live: FRED",
+    sourceRows: [],
+    revisitHeadline: "YES — revisit this week's approvals now.",
+    revisitDetail: "Pause non-core hiring while the weekly delta is negative.",
+    flipHeadline: "Risk appetite back above 55",
+    flipDetail: "Reopen pace after the flip line clears.",
+    evidenceMovers: [
+      { key: "tightness", title: "Capital tightness", detail: "Higher financing pressure tightened the call." },
+    ],
+  },
+  replay: {
+    initialDate: "2026-03-01",
+    summary: "Replay the prior monthly snapshot before locking the plan.",
+    openFullHref: "/signals?advanced=1#time-machine",
+    preview: [{ key: "week-1", label: "Last month", summary: "More expansionary than today." }],
+  },
+  operations: {
+    continueHref: "/operations#ops-monthly-action-summary",
+    approvalHeadline: "Revisit hiring and roadmap calls now.",
+    approvalDetail: "Recheck fixed-cost approvals before you expand commitments.",
+    topGuardrails: [{ key: "hiring", label: "Hiring", detail: "Backfills only until the trigger clears." }],
+    financeSnapshot: [{ key: "burn", label: "Burn", actionNow: "Stage spend to proof points.", reversalCondition: "Reverse after tighter conditions ease." }],
+    exportActions: [{ href: "/operations#ops-export-briefs", label: "Open share brief" }],
+  },
+  translate: {
+    rolePath: { href: "/decide/ceo", title: "CEO view", detail: "Translate this week into leadership calls." },
+    situationPath: { href: "/decide/avoid-premature-scaling", title: "Avoid premature scaling", detail: "Fastest route to this week's next action." },
+    toolkitShortcuts: [],
+    decisionUtilities: [],
+    browseActions: [],
+  },
+};
+
 describe("weekly card and interpretation panel composition", () => {
-  it("keeps top-fold semantics while layering interpretation bullets below", () => {
+  it("keeps top-fold semantics while layering interpretation bullets below", async () => {
     const layer = buildInterpretationLayer({
       view: "company",
       homeBriefModel,
@@ -108,28 +158,34 @@ describe("weekly card and interpretation panel composition", () => {
       forecast,
       decisionRules,
     });
+    const workspaceBands = await HomeWorkspaceBands({
+      workspaceModelPromise: Promise.resolve(workspaceModel),
+    });
 
     const html = renderToStaticMarkup(
       <>
         <WeeklyDecisionCard model={buildHomeCardModel()} />
         <HomeInterpretationPanel layer={layer} searchParams={{ view: "company", month: "3", year: "2026" }} />
+        {workspaceBands}
       </>,
     );
 
     assert.match(html, /Current outlook/);
     assert.match(html, /Week of Mar 5, 2026/);
-    assert.match(html, /Weekly call snapshot/);
+    assert.match(html, /Audit trail/);
+    assert.match(html, /Decision snapshot for leadership this week/);
+    assert.match(html, /Operating levers this week/);
     assert.doesNotMatch(html, /Copy weekly operator brief/);
-    assert.match(html, /Decision confidence/);
     assert.match(html, /Action/);
     assert.match(html, /Interpretation layer/);
     assert.match(html, /Company view/);
     assert.match(html, /• Action:/);
     assert.match(html, /Trigger:/);
     assert.match(html, /Reverse:/);
+    assert.match(html, /See what changed, then pressure-test the call with trust and evidence\./);
   });
 
-  it("renders weekly card before interpretation panel and preserves top-fold hierarchy", () => {
+  it("renders weekly card before interpretation panel and preserves homepage hierarchy", async () => {
     const layer = buildInterpretationLayer({
       view: "forecast",
       homeBriefModel,
@@ -137,23 +193,31 @@ describe("weekly card and interpretation panel composition", () => {
       forecast,
       decisionRules,
     });
+    const workspaceBands = await HomeWorkspaceBands({
+      workspaceModelPromise: Promise.resolve(workspaceModel),
+    });
 
     const html = renderToStaticMarkup(
       <>
         <WeeklyDecisionCard model={buildHomeCardModel()} />
         <HomeInterpretationPanel layer={layer} searchParams={{ view: "forecast" }} />
+        {workspaceBands}
       </>,
     );
 
     const heroIndex = html.indexOf("Current outlook");
-    const confidenceIndex = html.indexOf("MED 68%");
-    const playbookIndex = html.indexOf("Weekly call snapshot");
+    const diagnosticsIndex = html.indexOf("Audit trail");
+    const rulesIndex = html.indexOf("Decision snapshot for leadership this week");
+    const actionStripIndex = html.indexOf("Operating levers this week");
     const interpretationIndex = html.indexOf("Interpretation layer");
+    const workspaceIndex = html.indexOf("See what changed, then pressure-test the call with trust and evidence.");
 
     assert.ok(heroIndex > -1);
-    assert.ok(confidenceIndex > heroIndex);
-    assert.ok(playbookIndex > confidenceIndex);
-    assert.ok(interpretationIndex > playbookIndex);
+    assert.ok(diagnosticsIndex > heroIndex);
+    assert.ok(rulesIndex > diagnosticsIndex);
+    assert.ok(actionStripIndex > rulesIndex);
+    assert.ok(interpretationIndex > actionStripIndex);
+    assert.ok(workspaceIndex > interpretationIndex);
   });
 
   it("renders orientation strip before the weekly decision card without replacing core card content", () => {

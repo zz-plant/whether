@@ -58,6 +58,67 @@ export const buildWeeklyDecisionCardModel = (
     decisionShiftSummary: "Decision delta: tighten roadmap optionality while protecting core delivery.",
     transitionProbabilities: { Expansion: 10, Mixed: 35, Scarcity: 40, Defensive: 15 },
     decisionRules: [],
+    decisionMatrix: {
+      columns: [
+        { key: "approve", label: "Approve" },
+        { key: "delay", label: "Delay" },
+        { key: "flip", label: "Flip" },
+      ],
+      rows: [
+        {
+          key: "hiring",
+          label: "Hiring",
+          cells: {
+            approve: { text: "Approve revenue-linked backfills.", detail: "Only when proof and manager capacity are in place." },
+            delay: { text: "Delay team expansion.", detail: "Hold broad org adds until tighter conditions ease." },
+            flip: { text: "Reopen selective hiring.", detail: "Flip after risk appetite recovery holds." },
+          },
+        },
+        {
+          key: "product",
+          label: "Product",
+          cells: {
+            approve: { text: "Ship near-term proof work.", detail: "Bias roadmap toward measurable customer pull." },
+            delay: { text: "Delay long-payback roadmap bets.", detail: "Keep optional work staged." },
+            flip: { text: "Re-expand roadmap scope.", detail: "Flip once threshold pressure clears." },
+          },
+        },
+        {
+          key: "capital",
+          label: "Capital",
+          cells: {
+            approve: { text: "Prepare financing narrative.", detail: "Keep financing options warm." },
+            delay: { text: "Delay aggressive raise timing.", detail: "Avoid assuming a better market next week." },
+            flip: { text: "Accelerate raise prep.", detail: "Move once financing conditions improve." },
+          },
+        },
+        {
+          key: "burn",
+          label: "Burn",
+          cells: {
+            approve: { text: "Approve critical fixed cost only.", detail: "Tie spend to near-term proof." },
+            delay: { text: "Delay discretionary expansion.", detail: "Protect runway while confidence is mixed." },
+            flip: { text: "Re-open spend bands.", detail: "Flip after the reversal trigger prints." },
+          },
+        },
+      ],
+    },
+    actionStripItems: [
+      {
+        lever: "hiring-pace",
+        label: "Hiring pace",
+        actionNow: "Keep hiring to critical, revenue-linked backfills only.",
+        triggerThreshold: "Tighten if tightness rises above 70 or confidence slips.",
+        reversalCondition: "Reopen selective hiring after risk appetite clears 55 for two reads.",
+      },
+      {
+        lever: "investment-pace",
+        label: "Investment pace",
+        actionNow: "Stage discretionary spend behind proof milestones.",
+        triggerThreshold: "Loosen only after threshold pressure eases and payback stays inside plan.",
+        reversalCondition: "Reverse to faster pace once the flip condition prints and confidence improves.",
+      },
+    ],
     roleAwareTemplates: [
       {
         role: "startup-leadership",

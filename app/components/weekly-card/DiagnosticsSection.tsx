@@ -1,7 +1,6 @@
 import { Accordion } from "@base-ui/react/accordion";
 import { formatDateUTC } from "../../../lib/formatters";
 import { formatProbabilityPercent } from "../../../lib/report/reportFormatting";
-import { HistorySection } from "./HistorySection";
 import { compactActionCue, compactRoleCue, compactSectionSpacing, disclosurePanelClass, disclosureSummaryClass, neutralLabel, sectionSpacing, tierTwoHeading, tierTwoPanel, tierThreePanel } from "./shared";
 import type { DiagnosticsSectionProps } from "./types";
 
@@ -26,11 +25,7 @@ export function DiagnosticsSection({
   weeklyMovement,
   transitionProbabilities,
   failureModes,
-  historicalTimeline,
   sinceLastReview,
-  decisionMatrix,
-  decisionRules,
-  renderBoundedRulesMatrix,
 }: DiagnosticsSectionProps) {
   const changedItems = sinceLastReview?.items ?? [];
   const firstDelta = changedItems[0]?.detail ?? weeklyMemoLines.find((line) => line.trim().length > 0) ?? immediateDecision;
@@ -75,7 +70,6 @@ export function DiagnosticsSection({
           </Accordion.Item>
         </Accordion.Root>
       </article>
-      <HistorySection historicalTimeline={historicalTimeline.slice(-2)} />
     </>
   );
 }
