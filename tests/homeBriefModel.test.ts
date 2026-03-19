@@ -487,6 +487,33 @@ describe("buildHomeBriefModel", () => {
     assert.match(capitalRow?.cells.flip.text ?? "", /risk appetite\s*>/i);
   });
 
+  it("preserves decimal flip thresholds in matrix scan copy", () => {
+    const matrix = buildDecisionMatrixPayload({
+      regime: "DEFENSIVE",
+      thresholds: { tightnessRegime: 0, riskAppetiteRegime: 50 },
+      decisionRules: [{
+        area: "capital-raising",
+        recommendation: "Prepare raise materials and launch planning early to preserve process control.",
+        doNow: ["Prepare raise materials and launch planning early to preserve process control."],
+        avoidNow: ["Avoid speed-first terms that reduce durability under tighter conditions."],
+        scope: "Fundraising launch timing, process pacing, and minimum term quality.",
+        pauseTrigger: "Pause acceleration if risk appetite falls below 44 or tightness rises above 6.0.",
+        resumeTrigger: "Resume full process when risk appetite > 54 and tightness < 0.0.",
+        flipConditions: [
+          { metric: "tightness", operator: "<", value: 0, label: "Tightness < 0.0" },
+          { metric: "riskAppetite", operator: ">", value: 54, label: "Risk appetite > 54" },
+        ],
+        rationale: "Timing the process around signal windows improves optionality and reduces forced terms.",
+      }],
+      confidenceDegraded: false,
+      freshnessDegraded: false,
+    });
+
+    const capitalRow = matrix.rows.find((row) => row.key === "capital");
+    assert.equal(capitalRow?.cells.flip.text, "Tightness < 0.0 and Risk appetite > 54");
+    assert.equal(capitalRow?.cells.flip.reversal, "Tightness < 0.0 and Risk appetite > 54");
+  });
+
   it("falls back to default matrix cues when decision inputs are missing", () => {
     const matrix = buildDecisionMatrixPayload({
       regime: "DEFENSIVE",

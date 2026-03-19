@@ -56,15 +56,38 @@ const areaLabels: Record<DecisionArea, string> = {
 
 export const decisionAreaLabel = (area: DecisionArea) => areaLabels[area];
 
-const compactSentence = (value: string, fallback: string) => {
+export const extractCompactClause = (value: string, fallback: string) => {
   const normalized = value.trim();
   if (!normalized) {
     return fallback;
   }
 
-  const [firstClause] = normalized.split(/[.;]/);
-  return (firstClause?.trim() || fallback).replace(/\.$/, "");
+  let boundaryIndex = -1;
+  for (let index = 0; index < normalized.length; index += 1) {
+    const character = normalized[index];
+    if (character === ";") {
+      boundaryIndex = index;
+      break;
+    }
+
+    if (character !== ".") {
+      continue;
+    }
+
+    const previousCharacter = normalized[index - 1] ?? "";
+    const nextCharacter = normalized[index + 1] ?? "";
+    const isDecimalPoint = /\d/.test(previousCharacter) && /\d/.test(nextCharacter);
+    if (!isDecimalPoint) {
+      boundaryIndex = index;
+      break;
+    }
+  }
+
+  const firstClause = boundaryIndex >= 0 ? normalized.slice(0, boundaryIndex) : normalized;
+  return (firstClause.trim() || fallback).replace(/\.$/, "");
 };
+
+const compactSentence = (value: string, fallback: string) => extractCompactClause(value, fallback);
 
 export const formatBoundedDecisionAction = (rule: Pick<BoundedDecisionRule, "doNow" | "recommendation">) =>
   compactSentence(rule.doNow[0] ?? rule.recommendation, "Keep current approvals staged");
