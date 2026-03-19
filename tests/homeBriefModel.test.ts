@@ -1,8 +1,18 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { buildDecisionMatrixPayload, buildHomeBriefModel } from "../lib/report/homeBriefModel";
+import { buildDecisionMatrixPayload, buildHomeBriefModel, buildMemoryRail } from "../lib/report/homeBriefModel";
 
 describe("buildHomeBriefModel", () => {
+  it("keeps the memory rail labels and posture sequence aligned with the recent weekly posture artifact", () => {
+    const memoryRail = buildMemoryRail("Mar 19, 2026", "DEFENSIVE");
+
+    assert.deepEqual(memoryRail, [
+      { label: "2026-02-27", posture: "Expansion" },
+      { label: "2026-03-06", posture: "Expansion" },
+      { label: "2026-03-12", posture: "Expansion" },
+      { label: "Mar 19, 2026", posture: "Defensive" },
+    ]);
+  });
   it("derives stable labels and decision rules from brief inputs", () => {
     const model = buildHomeBriefModel({
       assessment: {

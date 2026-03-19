@@ -76,6 +76,8 @@ Summary APIs live under `app/api/*` and mirror the time horizon they serve:
 
 Historical summary playback uses `lib/summary/summaryArchive.ts`, which validates archive entries and only falls back to hydration when legacy records are encountered.
 
+Default brief assembly should stay on the smaller derived history paths: `data/summary_memory_rail_weekly.json` + `lib/summary/weeklyPostureHistory.ts` for the homepage memory rail and `data/summary_monthly_regime_history.json` + `lib/summary/monthlyRegimeHistory.ts` for forecast-history regime points. Keep `lib/summary/summaryArchive.ts` as the canonical full-history loader for advanced `/signals` historical views and Time Machine playback, not the default path for homepage or forecast assembly.
+
 Use `bun run summary-archive:migrate-structured` to materialize `structured` blocks into the checked-in archive and keep runtime hydration as fallback-only behavior.
 
 ## Prioritized refactor backlog (structured summaries)
