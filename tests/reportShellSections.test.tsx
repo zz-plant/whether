@@ -93,7 +93,7 @@ describe("ReportShell extracted sections", () => {
     assert.match(html, /Call/);
   });
 
-  it("hides hero actions that only scroll within the current page", () => {
+  it("keeps in-page hero actions as actual links when they target report sections", () => {
     const html = renderToStaticMarkup(
       <ReportShell
         statusLabel="DEFENSIVE"
@@ -104,7 +104,10 @@ describe("ReportShell extracted sections", () => {
         pageSummary="Deep evidence appendix."
         pageSummaryLink={{ href: "#thresholds", label: "See thresholds" }}
         pageLinks={[]}
-        sectionLinks={[]}
+        sectionLinks={[
+          { href: "#current-scores", label: "Current scores" },
+          { href: "#thresholds", label: "Thresholds" },
+        ]}
         trustStatusLabel="HIGH"
         trustStatusDetail="Stable feed"
         trustStatusAction="Proceed with planning."
@@ -118,9 +121,12 @@ describe("ReportShell extracted sections", () => {
       </ReportShell>,
     );
 
-    assert.doesNotMatch(html, /Open evidence appendix/);
-    assert.doesNotMatch(html, /See thresholds/);
-    assert.doesNotMatch(html, /Copy aligned brief/);
+    assert.match(html, /href="#current-scores"/);
+    assert.match(html, /href="#thresholds"/);
+    assert.match(html, /href="#ops-export-briefs"/);
+    assert.match(html, /Open evidence appendix/);
+    assert.match(html, /See thresholds/);
+    assert.match(html, /Copy aligned brief/);
     assert.match(html, /Deep evidence appendix\./);
   });
 });

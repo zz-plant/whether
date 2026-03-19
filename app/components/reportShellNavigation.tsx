@@ -188,16 +188,41 @@ export const ReportMobileNavigation = ({
   );
   const pageCountLabel =
     pageLinks.length === 1 ? "1 page" : `${pageLinks.length} pages`;
+  const mobileSectionLinks = sectionLinks.slice(0, 4);
+  const hiddenSectionCount = Math.max(sectionLinks.length - mobileSectionLinks.length, 0);
 
   return (
     <nav aria-label="Mobile report navigation" className={className}>
       <div className="weather-mobile-nav flex flex-col gap-2 px-3 py-3">
         {sectionLinks.length ? (
-          <div className="rounded-2xl border border-slate-800/80 bg-slate-950/70 px-3 py-2">
-            <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-300">
-              {`${sectionLinks.length} sections`}
-            </p>
-            <p className="mt-1 truncate text-xs text-slate-400">{`${currentLink.label} / ${sectionLinks[0]?.label ?? "Overview"}`}</p>
+          <div className="rounded-2xl border border-slate-800/80 bg-slate-950/70 px-3 py-3">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-[11px] font-semibold tracking-[0.14em] text-slate-300">
+                  {`${sectionLinks.length} sections`}
+                </p>
+                <p className="mt-1 text-xs text-slate-400">Jump straight to the part of {currentLink.label} you need.</p>
+              </div>
+              <span className="rounded-full border border-slate-700/80 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+                {currentLink.label}
+              </span>
+            </div>
+            <ol className="mt-3 grid grid-cols-1 gap-2 min-[420px]:grid-cols-2">
+              {mobileSectionLinks.map((section, index) => (
+                <li key={section.href}>
+                  <a
+                    href={section.href}
+                    className="weather-pill inline-flex min-h-[44px] w-full items-center justify-between gap-3 rounded-2xl border border-slate-800/80 px-3 py-2 text-left transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                  >
+                    <span className="text-xs font-semibold tracking-[0.12em] text-slate-200">{getCompactSectionLabel(section)}</span>
+                    <span className="text-[10px] text-slate-400">{index + 1}</span>
+                  </a>
+                </li>
+              ))}
+            </ol>
+            {hiddenSectionCount > 0 ? (
+              <p className="mt-2 text-[11px] text-slate-400">+{hiddenSectionCount} more section{hiddenSectionCount === 1 ? "" : "s"} below.</p>
+            ) : null}
           </div>
         ) : null}
         <div className="flex min-w-0 items-center justify-between gap-3 rounded-2xl border border-slate-800/80 bg-slate-950/70 px-3 py-2">
