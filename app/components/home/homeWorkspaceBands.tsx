@@ -1,22 +1,10 @@
-import dynamic from "next/dynamic";
 import Link from "next/link";
 import type { Route } from "../../../lib/navigation/routeType";
 import { homeScrollPlan } from "../../../lib/navigation/scrollPlans";
 import type { HomePageWorkspaceModel } from "../../../lib/report/homePageAssembler";
 import { CanonicalTrustModule } from "../canonicalTrustModule";
 import { PageFlowNav } from "../pageFlowNav";
-
-const HomeHistoricalReplayDatePicker = dynamic(
-  () => import("../../signals/components/historicalReplayDatePicker").then((module) => module.HistoricalReplayDatePicker),
-  {
-    ssr: false,
-    loading: () => (
-      <p className="text-xs text-slate-300">
-        Inline replay loads after the page settles. Use the full time machine link if you need it immediately.
-      </p>
-    ),
-  },
-);
+import { HistoricalReplayDatePicker } from "../../signals/components/historicalReplayDatePicker";
 
 type HomeWorkspaceBandsProps = {
   workspaceModelPromise: Promise<HomePageWorkspaceModel>;
@@ -142,7 +130,7 @@ export async function HomeWorkspaceBands({
           <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Replay a prior monthly snapshot</p>
             <div className="mt-3">
-              <HomeHistoricalReplayDatePicker
+              <HistoricalReplayDatePicker
                 initialDate={workspaceModel.replay.initialDate}
                 forceAdvanced={false}
                 submitHash="#historical-replay-workspace"
