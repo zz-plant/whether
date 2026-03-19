@@ -5,7 +5,6 @@
 "use client";
 
 import { Popover } from "@base-ui/react/popover";
-import { Tooltip } from "@base-ui/react/tooltip";
 import { StatusLiveIcon, StatusStaticIcon } from "./uiIcons";
 
 export type DataProvenance = {
