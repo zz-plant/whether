@@ -38,7 +38,8 @@
     "cli:whether": "node scripts/whether-cli.mjs",
     "deploy:cloudflare:nonprod": "node scripts/vinext-run.mjs build",
     "deploy:vinext": "node scripts/vinext-deploy.mjs --preview",
-    "deploy:vinext:dry-run": "node scripts/vinext-deploy.mjs --preview --dry-run"
+    "deploy:vinext:dry-run": "node scripts/vinext-deploy.mjs --preview --dry-run",
+    "data:refresh-fallbacks": "bun scripts/refreshFallbackSnapshots.ts"
   },
   "engines": {
     "bun": "1.3.x",

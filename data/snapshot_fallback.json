@@ -1,12 +1,12 @@
 {
-  "source": "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v2/accounting/od/daily_treasury_yield_curve",
-  "record_date": "2026-03-06",
-  "fetched_at": "2026-03-09T00:00:00Z",
+  "source": "https://fred.stlouisfed.org",
+  "record_date": "2026-03-17",
+  "fetched_at": "2026-03-19T17:59:33.048Z",
   "isLive": false,
   "yields": {
-    "oneMonth": 3.75,
-    "threeMonth": 3.69,
-    "twoYear": 3.56,
-    "tenYear": 4.15
+    "oneMonth": 3.74,
+    "threeMonth": 3.72,
+    "twoYear": 3.68,
+    "tenYear": 4.2
   }
 }
