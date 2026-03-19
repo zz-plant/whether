@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { buildCanonicalBoundedDecisionRules, buildScopedVariantDecisionAdjustment } from "../lib/report/boundedDecisionRules";
+import {
+  buildCanonicalBoundedDecisionRules,
+  buildScopedVariantDecisionAdjustment,
+  formatBoundedDecisionTriplet,
+} from "../lib/report/boundedDecisionRules";
 import { buildActionStripItems, buildRoleAwareOperatingTemplates } from "../lib/report/operatingCalls";
 
 describe("bounded decision rule formatting", () => {
@@ -28,6 +32,20 @@ it("threads bounded decision rules into role templates", () => {
   assert.match(templates[0]?.doNow ?? "", /Selective hiring|Increase product tempo/i);
   assert.doesNotMatch(templates[0]?.avoidNow ?? "", /^Pause/i);
   assert.doesNotMatch(templates[0]?.flipTrigger ?? "", /^Resume/i);
+});
+
+
+it("formats bounded decision triplets for scan-time surfaces", () => {
+  const rules = buildCanonicalBoundedDecisionRules({
+    regime: "DEFENSIVE",
+    thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
+    scores: { tightness: 72, riskAppetite: 48 },
+  });
+
+  const hiringTriplet = formatBoundedDecisionTriplet(rules[0]!);
+  assert.match(hiringTriplet.action, /backfills|mission-critical/i);
+  assert.doesNotMatch(hiringTriplet.threshold, /^Pause/i);
+  assert.doesNotMatch(hiringTriplet.reverse, /^Resume/i);
 });
 
 

@@ -172,6 +172,8 @@ Implementation guardrails:
 - Top fold uses responsive grid composition at `lg` breakpoints to preserve scan hierarchy around common screenshot widths (~1200px desktop browser).
 - Decision-support details should visually explain how the current core inputs are pulling the call (`tightness`, `risk appetite`, `base rate`, `curve slope`) and keep the explanation compact enough for screenshot use.
 - Regime guidance should stay attached to the regime ladder itself: each regime needs a terse operating cue, and the active regime should expose a stronger `do now / stop` playbook without falling back to methodology copy.
+- Above the fold, trust and rationale copy must stay compressed: keep posture, action now, confidence, flip risk, and the bounded call visible; move longer explanation into disclosure content below the primary scan path.
+- Decision-matrix rows must expose the bounded rule inline at scan time as short `Action` + `Threshold` + `Flip` fragments; disclosures are for supporting rationale only.
 - Citation + provenance belong near the lower fold: `Cite this call` retains actionable copy/export controls via the existing `actions` slot, and compact provenance remains immediately after the weekly card on `/`.
 - Trust copy should be a single compact sentence near the top fold: `state + freshness + operating implication`.
 - Rendering tests should verify hierarchy order and responsive class hooks (`data-testid="weekly-top-fold"`, `lg:grid-cols-12`, `lg:grid-cols-4`) to prevent drift.

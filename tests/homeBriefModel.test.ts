@@ -474,6 +474,9 @@ describe("buildHomeBriefModel", () => {
         assert.ok(cell);
         assert.ok(cell.text.length > 0);
         assert.ok(cell.detail.length > 0);
+        assert.ok(cell.action.length > 0);
+        assert.ok(cell.threshold.length > 0);
+        assert.ok(cell.reversal.length > 0);
       }
     }
 
@@ -498,6 +501,9 @@ describe("buildHomeBriefModel", () => {
     assert.equal(matrix.rows[0]?.cells.delay.text, "Delay irreversible commitments");
     assert.match(matrix.rows[0]?.cells.flip.text ?? "", /Tightness ≤/);
     assert.match(matrix.rows[3]?.cells.flip.text ?? "", /Re-tighten if/);
+    assert.equal(matrix.rows[0]?.cells.approve.action, "Stage approvals on short-cycle proof");
+    assert.match(matrix.rows[0]?.cells.approve.threshold ?? "", /Pause if thresholds weaken/);
+    assert.match(matrix.rows[0]?.cells.flip.reversal ?? "", /Tightness ≤/);
   });
 
 

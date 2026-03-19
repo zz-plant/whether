@@ -173,6 +173,9 @@ export type DecisionMatrixRowKey = "hiring" | "product" | "capital" | "burn";
 export type DecisionMatrixCell = {
   text: string;
   detail: string;
+  action: string;
+  threshold: string;
+  reversal: string;
 };
 
 export type DecisionMatrixRow = {
