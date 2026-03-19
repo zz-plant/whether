@@ -342,8 +342,8 @@ export async function HomeWorkspaceBands({
         <HomeBandHeader
           step="04"
           kicker="Translate or run a tool"
-          title="Go straight to a role path, situation path, or runnable utility."
-          description="Use fast paths first. Browse role and situation hubs only when you need fuller discovery."
+          title="Choose the role view, situation view, or runnable tool that sharpens this week&apos;s decision."
+          description="Start with the route most likely to translate the weekly call into action. Open broader discovery only if the first path does not resolve the decision."
           icon={<LayoutGridIcon className="h-5 w-5 text-amber-100" />}
           toneClass="border-amber-400/40 text-amber-200"
         />

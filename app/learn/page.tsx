@@ -33,7 +33,7 @@ export default function LearnPage() {
       <HubHero
         eyebrow="Supporting surface under Method"
         title="Use Learn for interpretation depth, not for the canonical call."
-        description="Open this library when a team needs context on why a failure pattern appears, how a framework should be read, or what concept best explains the current posture."
+        description="Open Learn when a team needs context on why a failure pattern appears, how a framework should be read, or what concept best explains the current posture."
         actions={<Link href="/method" className="weather-button inline-flex items-center justify-center">Open Method</Link>}
       />
       <HubSection
@@ -42,7 +42,7 @@ export default function LearnPage() {
       >
         <div className="grid gap-3 sm:grid-cols-2">
         <Link href="/learn/failure-modes" className="weather-hub-link-card space-y-2">
-          <h2 className="text-lg font-semibold text-slate-100">Diagnostics library</h2>
+          <h2 className="text-lg font-semibold text-slate-100">Failure-mode diagnostics</h2>
           <p className="text-sm text-slate-300">Diagnose common failure patterns and trace the underlying concepts.</p>
         </Link>
         <Link href="/concepts" className="weather-hub-link-card space-y-2">

@@ -204,8 +204,8 @@ export const loadHomeSharePreview = async (
     130,
   );
   const audienceLabel = reportData.historicalSelection
-    ? `For founders in ${reportData.historicalSelection.banner.replace(/^Historical mode active\s+·\s+/i, "")}`
-    : "For founders this week";
+    ? `For operators in ${reportData.historicalSelection.banner.replace(/^Historical mode active\s+·\s+/i, "")}`
+    : "For operators this week";
   const title = reportData.historicalSelection
     ? `${contextLabel}: ${headline} — Whether`
     : `${statusLabel}: ${headline} — Whether`;

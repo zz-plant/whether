@@ -103,7 +103,7 @@ export default async function DecideDetailPage({
     <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
       <section className="weather-panel space-y-3 px-6 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{situationUseCase?.title || titleCase(slug)}</h1>
-        <p className="text-sm text-slate-300">Use this page as your fast path to the right toolkit, then go deeper in the library when needed.</p>
+        <p className="text-sm text-slate-300">Start with the toolkit most likely to unblock this decision, then open deeper detail only if needed.</p>
       </section>
       <section className="weather-panel space-y-3 px-6 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Start here</h2>

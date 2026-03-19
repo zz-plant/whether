@@ -9,7 +9,7 @@ export function StaticHubNav({ currentPath }: { currentPath: string }) {
     <nav className="weather-hub-section" aria-label="Primary workflow hubs">
       <div className="space-y-2">
         <p className="weather-hub-section-eyebrow">Primary workflow</p>
-        <h2 className="text-xl font-semibold text-white">Move across the operating system without losing the weekly brief thread</h2>
+        <h2 className="text-xl font-semibold text-white">Move across the operating system from the weekly brief anchor</h2>
         <p className="max-w-3xl text-sm leading-7 text-slate-300">
           Non-report pages should sharpen a decision or trust question, not become a parallel workspace.
         </p>
