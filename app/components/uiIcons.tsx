@@ -6,8 +6,11 @@ import {
   Download,
   FileText,
   Grid2x2,
+  History,
+  ScanSearch,
   Shield,
   Target,
+  TrendingUp,
   Waypoints,
   Zap,
   type LucideProps,
@@ -63,6 +66,18 @@ export const DownloadIcon = ({ className = "h-3.5 w-3.5", title: _title, ...prop
 
 export const ShieldIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (
   <Shield className={className} {...baseProps} {...props} />
+);
+
+export const HistoryIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (
+  <History className={className} {...baseProps} {...props} />
+);
+
+export const AuditIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (
+  <ScanSearch className={className} {...baseProps} {...props} />
+);
+
+export const TrendUpIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (
+  <TrendingUp className={className} {...baseProps} {...props} />
 );
 
 export const StatusLiveIcon = ({ className = "h-2.5 w-2.5", title, ...props }: SVGProps<SVGSVGElement> & { title?: string }) => (
