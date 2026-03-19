@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { ConfidenceTrendFraming, WeeklyConfidencePoint } from "../../lib/report/reportData";
 import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
-import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
+import { boundedDecisionFieldLabels, compactBoundedDecisionCopy, decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
 import type { RoleAwareOperatingTemplate } from "../../lib/report/operatingCalls";
 import { WeeklyCallModePanel } from "./weeklyCallModePanel";
 import { DecisionHeroSection } from "./weekly-card/DecisionHeroSection";
@@ -644,9 +644,9 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [] }: Bound
   const rulesByArea = new Map(decisionRules.map((rule) => [rule.area, rule]));
   const fallbackMatrix = {
     columns: [
-      { key: "approve" as const, label: "Approve" },
-      { key: "delay" as const, label: "Delay" },
-      { key: "flip" as const, label: "Flip" },
+      { key: "approve" as const, label: "Action" },
+      { key: "delay" as const, label: "Threshold" },
+      { key: "flip" as const, label: "Reverse" },
     ],
     rows: rowOrder.map((key) => {
       const rule = rulesByArea.get(matrixAreaByKey[key]);
@@ -655,8 +655,8 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [] }: Bound
         label: rule ? decisionAreaLabel(rule.area) : key.charAt(0).toUpperCase() + key.slice(1),
         cells: {
           approve: { text: rule?.doNow[0] ?? "Stage approvals", detail: rule?.rationale ?? "Keep approvals tied to near-term proof." },
-          delay: { text: rule?.avoidNow[0] ?? "Delay irreversible commitments", detail: rule?.pauseTrigger ?? "Pause when thresholds weaken." },
-          flip: { text: rule?.resumeTrigger ?? "Flip after threshold recovery", detail: rule?.resumeTrigger ?? "Resume only after threshold recovery holds." },
+          delay: { text: rule?.pauseTrigger ?? "Pause when thresholds weaken.", detail: rule?.rationale ?? "Keep thresholds tied to measurable signal pressure." },
+          flip: { text: rule?.resumeTrigger ?? "Reverse after threshold recovery", detail: rule?.rationale ?? "Resume only after threshold recovery holds." },
         },
         context: rule?.scope ?? "Apply this rule to related weekly operating decisions.",
       };
@@ -678,12 +678,12 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [] }: Bound
               detail: matrixRow?.cells.approve.detail ?? rule?.rationale ?? "Keep approvals tied to near-term proof.",
             },
             delay: {
-              text: matrixRow?.cells.delay.text ?? rule?.avoidNow[0] ?? "Delay irreversible commitments",
-              detail: matrixRow?.cells.delay.detail ?? rule?.pauseTrigger ?? "Pause when thresholds weaken.",
+              text: matrixRow?.cells.delay.text ?? rule?.pauseTrigger ?? "Pause when thresholds weaken.",
+              detail: matrixRow?.cells.delay.detail ?? rule?.rationale ?? "Keep thresholds tied to measurable signal pressure.",
             },
             flip: {
-              text: matrixRow?.cells.flip.text ?? rule?.resumeTrigger ?? "Flip after threshold recovery",
-              detail: matrixRow?.cells.flip.detail ?? rule?.resumeTrigger ?? "Resume only after threshold recovery holds.",
+              text: matrixRow?.cells.flip.text ?? rule?.resumeTrigger ?? "Reverse after threshold recovery",
+              detail: matrixRow?.cells.flip.detail ?? rule?.rationale ?? "Resume only after threshold recovery holds.",
             },
           },
           context: rule?.scope ?? "Apply this rule to related weekly operating decisions.",
@@ -704,13 +704,12 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [] }: Bound
   return (
     <article className={`${tierOnePanel} ${sectionSpacing}`}>
       <h2 className={tierOneHeading}>Decision snapshot for leadership this week</h2>
-      <p className="text-xs leading-5 text-slate-300">Scan the lanes, then open a cell only when you need the threshold rationale.</p>
+      <p className="text-xs leading-5 text-slate-300">Scan each row for the bounded rule first: action now, threshold to tighten, and reverse condition to reopen pace.</p>
       <div className="mt-2 overflow-x-auto hidden sm:block">
         <table className="min-w-full border-separate border-spacing-2 text-xs text-slate-100" aria-label="Bounded decision matrix">
           <thead>
             <tr>
               <th scope="col" className="rounded-md border border-slate-700/70 bg-slate-950/70 px-2.5 py-2 text-left font-semibold text-slate-300">Decision area</th>
-              <th scope="col" className="rounded-md border border-slate-700/70 bg-slate-950/70 px-2.5 py-2 text-left font-semibold text-slate-300">Context</th>
               {matrix.columns.map((column) => (
                 <th key={column.key} scope="col" className="rounded-md border border-slate-700/70 bg-slate-950/70 px-2.5 py-2 text-left font-semibold text-slate-200">
                   <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] uppercase tracking-[0.08em] ${decisionLaneTone[column.key].badgeClassName}`}>
@@ -723,18 +722,27 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [] }: Bound
           <tbody>
             {matrix.rows.map((row) => (
               <tr key={row.key}>
-                <th scope="row" className="rounded-md border border-slate-700/70 bg-slate-950/75 px-2.5 py-2 text-left font-semibold text-slate-100">{row.label}</th>
-                <td className="rounded-md border border-slate-700/55 bg-slate-950/60 px-2.5 py-2 align-top text-[11px] leading-5 text-slate-300">{row.context}</td>
+                <th scope="row" className="w-44 rounded-md border border-slate-700/70 bg-slate-950/75 px-2.5 py-2 text-left align-top">
+                  <p className="font-semibold text-slate-100">{row.label}</p>
+                  <p className="mt-1 text-[11px] leading-5 text-slate-400">{compactBoundedDecisionCopy(row.context, 88)}</p>
+                  <details className="mt-2">
+                    <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+                      Why this lane
+                    </summary>
+                    <p className="mt-1 text-[11px] leading-5 text-slate-300">{row.cells.approve.detail}</p>
+                  </details>
+                </th>
                 {matrix.columns.map((column) => {
                   const cell = row.cells[column.key];
+                  const fieldLabel = column.key === "approve"
+                    ? boundedDecisionFieldLabels.action
+                    : column.key === "delay"
+                      ? boundedDecisionFieldLabels.threshold
+                      : boundedDecisionFieldLabels.reversal;
                   return (
                     <td key={`${row.key}-${column.key}`} className="rounded-md border border-slate-700/55 bg-slate-950/60 px-2.5 py-2 align-top">
-                      <details className="group">
-                        <summary className="cursor-pointer list-none text-[11px] font-medium leading-5 text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
-                          {compactActionCue(cell.text)}
-                        </summary>
-                        <p className="mt-1 text-[11px] leading-5 text-slate-300">{cell.detail}</p>
-                      </details>
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">{fieldLabel}</p>
+                      <p className="mt-1 text-[11px] font-medium leading-5 text-slate-100">{compactActionCue(cell.text)}</p>
                     </td>
                   );
                 })}
@@ -751,19 +759,30 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [] }: Bound
             <div className="mt-2 space-y-1.5">
               {matrix.columns.map((column) => {
                 const cell = row.cells[column.key];
+                const fieldLabel = column.key === "approve"
+                  ? boundedDecisionFieldLabels.action
+                  : column.key === "delay"
+                    ? boundedDecisionFieldLabels.threshold
+                    : boundedDecisionFieldLabels.reversal;
                 return (
-                  <details key={`mobile-${row.key}-${column.key}`} className="rounded border border-slate-700/60 bg-slate-950/70 px-2 py-1.5">
-                    <summary className="cursor-pointer list-none text-[11px] leading-5 text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
-                      <span className={`mr-1 inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] ${decisionLaneTone[column.key].badgeClassName}`}>
+                  <div key={`mobile-${row.key}-${column.key}`} className="rounded border border-slate-700/60 bg-slate-950/70 px-2 py-1.5">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className={`inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] ${decisionLaneTone[column.key].badgeClassName}`}>
                         {decisionLaneTone[column.key].label}
                       </span>
-                      {compactActionCue(cell.text)}
-                    </summary>
-                    <p className="mt-1 text-[11px] leading-5 text-slate-300">{cell.detail}</p>
-                  </details>
+                      <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">{fieldLabel}</span>
+                    </div>
+                    <p className="mt-1 text-[11px] leading-5 text-slate-100">{compactActionCue(cell.text)}</p>
+                  </div>
                 );
               })}
             </div>
+            <details className="mt-2">
+              <summary className="cursor-pointer list-none text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+                Why this lane
+              </summary>
+              <p className="mt-1 text-[11px] leading-5 text-slate-300">{row.cells.approve.detail}</p>
+            </details>
           </article>
         ))}
       </div>

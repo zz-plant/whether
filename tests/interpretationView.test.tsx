@@ -137,7 +137,7 @@ describe("interpretation view panel", () => {
     assert.match(company.bullets[0], /Rule 1 first\./);
     assert.match(company.bullets[1], /Rule 2 second\./);
     assert.match(company.bullets[2], /Rule 3 third\./);
-    assert.ok(company.bullets.every((bullet) => bullet.includes("Trigger:")));
+    assert.ok(company.bullets.every((bullet) => bullet.includes("Threshold:")));
     assert.ok(company.bullets.every((bullet) => bullet.includes("Reverse:")));
     assert.ok(company.bullets.every((bullet) => !bullet.includes("Rule 4 hidden.")));
   });
@@ -156,7 +156,7 @@ describe("interpretation view panel", () => {
     assert.match(company.summary, /unavailable this week/i);
     assert.equal(company.bullets.length, 3);
     assert.match(company.bullets[0], /Action: Changed: pressure rose versus last week\./);
-    assert.match(company.bullets[1], /Trigger: Hold irreversible hiring\./);
+    assert.match(company.bullets[1], /Threshold: Hold irreversible hiring\./);
     assert.match(company.bullets[2], /Reverse: Reopen if risk appetite rises above 55\./);
   });
 
@@ -206,10 +206,10 @@ describe("interpretation view panel", () => {
     assert.match(sectorHtml, /Action: Sector sensitivity: Consumer teams should stage expansions\./);
     assert.match(financialHtml, /Financial view/);
     assert.match(financialHtml, /Runway risk/);
-    assert.match(financialHtml, /Trigger: Raise window/);
+    assert.match(financialHtml, /Threshold: Raise window/);
     assert.match(financialHtml, /Reverse: Burn delta/);
     assert.match(financialHtml, /Financial action summary/);
-    assert.match(sectorHtml, /Trigger: Tighten one notch if sector demand weakens faster than the base posture\./);
+    assert.match(sectorHtml, /Threshold: Tighten one notch if sector demand weakens faster than the base posture\./);
     assert.match(sectorHtml, /Reverse: Return to base once sector drag normalizes for two updates\./);
     assert.match(sectorHtml, /Default/);
     assert.match(financialHtml, /Default/);
@@ -227,7 +227,7 @@ describe("interpretation view panel", () => {
       });
 
       assert.ok(layer.bullets.length >= 1 && layer.bullets.length <= 3);
-      assert.ok(layer.bullets.every((bullet) => bullet.includes("Action:") || bullet.includes("Trigger:") || bullet.includes("Reverse:")));
+      assert.ok(layer.bullets.every((bullet) => bullet.includes("Action:") || bullet.includes("Threshold:") || bullet.includes("Reverse:")));
       assert.ok(layer.bullets.every((bullet) => bullet.length <= 340));
     }
   });

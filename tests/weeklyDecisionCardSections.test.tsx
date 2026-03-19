@@ -359,9 +359,10 @@ describe("WeeklyDecisionCard extracted sections", () => {
     );
 
     assert.match(html, /Decision snapshot for leadership this week/);
-    assert.match(html, /Approve/);
-    assert.match(html, /Delay/);
-    assert.match(html, /Flip/);
+    assert.match(html, /Action/);
+    assert.match(html, /Threshold/);
+    assert.match(html, /Reverse/);
+    assert.match(html, /Why this lane/);
 
   });
 

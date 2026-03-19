@@ -1,6 +1,6 @@
 import type { RegimeAssessment } from "../regimeEngine";
 import type { ForecastModel } from "./forecastModel";
-import type { BoundedDecisionRule } from "./boundedDecisionRules";
+import { formatBoundedDecisionField, type BoundedDecisionRule } from "./boundedDecisionRules";
 import {
   buildCompanyAdjustedRules,
   type CompanyProfile,
@@ -43,8 +43,10 @@ const compactClause = (value: string, max = 96) => {
   return `${normalized.slice(0, max - 1).trimEnd()}…`;
 };
 
-const boundedLine = (label: "Action" | "Trigger" | "Reverse", value: string) =>
-  `${label}: ${compactClause(value)}`;
+const boundedLine = (
+  field: "action" | "threshold" | "reversal",
+  value: string,
+) => formatBoundedDecisionField(field, compactClause(value));
 
 const boundedTriplet = ({
   action,
@@ -56,9 +58,9 @@ const boundedTriplet = ({
   reverse: string;
 }) =>
   [
-    boundedLine("Action", action),
-    boundedLine("Trigger", trigger),
-    boundedLine("Reverse", reverse),
+    boundedLine("action", action),
+    boundedLine("threshold", trigger),
+    boundedLine("reversal", reverse),
   ].join(" | ");
 
 type FinancialViewInput = {
@@ -130,9 +132,9 @@ export const buildInterpretationLayer = ({
   companyProfile?: Partial<CompanyProfile>;
 }): InterpretationLayer => {
   const canonicalBullets = [
-    boundedLine("Action", homeBriefModel.decisionShiftSummary),
-    boundedLine("Trigger", homeBriefModel.guardrail),
-    boundedLine("Reverse", homeBriefModel.reversalTrigger),
+    boundedLine("action", homeBriefModel.decisionShiftSummary),
+    boundedLine("threshold", homeBriefModel.guardrail),
+    boundedLine("reversal", homeBriefModel.reversalTrigger),
   ];
 
   if (view === "sector") {
@@ -146,9 +148,9 @@ export const buildInterpretationLayer = ({
       summary:
         "Apply the macro call through sector sensitivity before changing pace.",
       bullets: [
-        boundedLine("Action", sectorShift),
-        boundedLine("Trigger", "Tighten one notch if sector demand weakens faster than the base posture."),
-        boundedLine("Reverse", "Return to base once sector drag normalizes for two updates."),
+        boundedLine("action", sectorShift),
+        boundedLine("threshold", "Tighten one notch if sector demand weakens faster than the base posture."),
+        boundedLine("reversal", "Return to base once sector drag normalizes for two updates."),
       ],
     };
   }
@@ -203,15 +205,15 @@ export const buildInterpretationLayer = ({
         "Translate this week into bounded runway decisions: risk now vs downside, raise window, and burn delta.",
       bullets: [
         boundedLine(
-          "Action",
+          "action",
           `Runway risk ${plan.runwayRisk.level.toUpperCase()} at ${plan.runwayRisk.score}/100; protect downside now.`,
         ),
         boundedLine(
-          "Trigger",
+          "threshold",
           `Raise window ${plan.raiseTimingRecommendation.startMonth}-${plan.raiseTimingRecommendation.endMonth} months; safe target in ${plan.raiseTimingRecommendation.timeToSafeRunwayTargetMonths} months.`,
         ),
         boundedLine(
-          "Reverse",
+          "reversal",
           `Burn delta ${plan.burnAdjustment.recommendedDeltaPercent}% (range ${plan.burnAdjustment.floorPercent}% to ${plan.burnAdjustment.ceilingPercent}%).`,
         ),
       ],
@@ -244,12 +246,12 @@ export const buildInterpretationLayer = ({
       summary:
         "Boundary pressure indicates how likely this call is to flip if signal momentum persists.",
       bullets: [
-        boundedLine("Action", `Operate for ${topRegime[0]} (${topRegime[1]}%) while current posture holds.`),
+        boundedLine("action", `Operate for ${topRegime[0]} (${topRegime[1]}%) while current posture holds.`),
         boundedLine(
-          "Trigger",
+          "threshold",
           `${forecast.boundaryPressure.distance} points to boundary; crossing risk ${crossingRiskLabel[forecast.boundaryPressure.crossingRisk]}.`,
         ),
-        boundedLine("Reverse", momentumCopy[forecast.boundaryPressure.momentum]),
+        boundedLine("reversal", momentumCopy[forecast.boundaryPressure.momentum]),
       ],
     };
   }

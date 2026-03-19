@@ -13,7 +13,7 @@ const interpretationLabels: Record<InterpretationView, string> = {
   forecast: "Forecast",
 };
 
-const pickCue = (bullets: string[], prefix: "Action:" | "Trigger:" | "Reverse:") => {
+const pickCue = (bullets: string[], prefix: "Action:" | "Threshold:" | "Reverse:") => {
   const line = bullets.find((bullet) => bullet.includes(prefix));
   return line ? line.slice(line.indexOf(prefix) + prefix.length).trim() : null;
 };
@@ -68,7 +68,7 @@ export const HomeInterpretationPanel = ({
   searchParams?: Record<string, string | undefined>;
 }) => {
   const actionCue = pickCue(layer.bullets, "Action:");
-  const triggerCue = pickCue(layer.bullets, "Trigger:");
+  const triggerCue = pickCue(layer.bullets, "Threshold:");
   const reverseCue = pickCue(layer.bullets, "Reverse:");
 
   return (
@@ -111,7 +111,7 @@ export const HomeInterpretationPanel = ({
           body={actionCue ?? "Review the current decision call above."}
         />
         <CueCard
-          label="Trigger"
+          label="Threshold"
           icon={<TrendUpIcon className="h-3.5 w-3.5" />}
           toneClass="border-amber-500/45 bg-amber-500/10 text-amber-100"
           body={triggerCue ?? "Watch threshold pressure before expanding commitments."}

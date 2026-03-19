@@ -21,6 +21,12 @@ export type BoundedDecisionRule = {
 
 export type StartupVariantMode = "seed" | "series-a" | "series-b" | "growth" | "public" | "bootstrapped";
 
+export const boundedDecisionFieldLabels = {
+  action: "Action",
+  threshold: "Threshold",
+  reversal: "Reverse",
+} as const;
+
 export type ScopedVariantDecisionAdjustment = {
   mode: StartupVariantMode;
   label: string;
@@ -172,6 +178,23 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
 export const formatActionStripThresholdText = (rule: Pick<BoundedDecisionRule, "pauseTrigger">) => rule.pauseTrigger;
 
 export const formatActionStripReversalText = (rule: Pick<BoundedDecisionRule, "resumeTrigger">) => rule.resumeTrigger;
+
+const normalizeCompactDecisionCopy = (value: string) => value.replace(/\s+/g, " ").trim();
+
+export const compactBoundedDecisionCopy = (value: string, maxLength = 96) => {
+  const normalized = normalizeCompactDecisionCopy(value);
+  if (normalized.length <= maxLength) {
+    return normalized;
+  }
+
+  return `${normalized.slice(0, maxLength - 1).trimEnd()}…`;
+};
+
+export const formatBoundedDecisionField = (
+  field: keyof typeof boundedDecisionFieldLabels,
+  value: string,
+  maxLength?: number,
+) => `${boundedDecisionFieldLabels[field]}: ${compactBoundedDecisionCopy(value, maxLength)}`;
 
 export const startupVariantModes: Array<{ mode: StartupVariantMode; label: string }> = [
   { mode: "seed", label: "Seed" },

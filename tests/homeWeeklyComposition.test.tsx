@@ -179,8 +179,8 @@ describe("weekly card and interpretation panel composition", () => {
     assert.match(html, /Action/);
     assert.match(html, /Interpretation layer/);
     assert.match(html, /Company view/);
-    assert.match(html, /• Action:/);
-    assert.match(html, /Trigger:/);
+    assert.match(html, /Action:/);
+    assert.match(html, /Threshold:/);
     assert.match(html, /Reverse:/);
     assert.match(html, /See what changed, then pressure-test the call with trust and evidence\./);
   });

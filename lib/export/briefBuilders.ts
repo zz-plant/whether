@@ -50,9 +50,9 @@ const buildViralArtifactBlock = (assessment: RegimeAssessment, options?: ExportL
 
   const actionStrip = (options.actionStripItems ?? []).slice(0, 2).flatMap((item) => [
     `• ${item.label}`,
-    `  Action now: ${item.actionNow}`,
-    `  Trigger/threshold to tighten or loosen: ${item.triggerThreshold}`,
-    `  Reversal condition: ${item.reversalCondition}`,
+    `  Action: ${item.actionNow}`,
+    `  Threshold: ${item.triggerThreshold}`,
+    `  Reverse: ${item.reversalCondition}`,
   ]);
 
   return [

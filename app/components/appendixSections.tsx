@@ -1893,9 +1893,9 @@ export const PlaybookPanel = ({
                     {visibleActionStripItems.map((item) => (
                       <li key={item.lever} className="rounded-md border border-slate-700/70 bg-slate-900/70 p-2">
                         <p className="font-semibold text-slate-100">{item.label}</p>
-                        <p className="mt-1 text-emerald-100">Action now: {item.actionNow}</p>
-                        <p className="mt-1 text-amber-100">Trigger/threshold to tighten or loosen: {item.triggerThreshold}</p>
-                        <p className="mt-1 text-sky-100">Reversal condition: {item.reversalCondition}</p>
+                        <p className="mt-1 text-emerald-100">Action: {item.actionNow}</p>
+                        <p className="mt-1 text-amber-100">Threshold: {item.triggerThreshold}</p>
+                        <p className="mt-1 text-sky-100">Reverse: {item.reversalCondition}</p>
                       </li>
                     ))}
                   </ul>

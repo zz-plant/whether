@@ -61,7 +61,7 @@ describe("live short answers", () => {
     });
 
     assert.match(directAnswer, /Action:/);
-    assert.match(directAnswer, /Trigger:/);
+    assert.match(directAnswer, /Threshold:/);
     assert.match(directAnswer, /Reverse:/);
   });
 

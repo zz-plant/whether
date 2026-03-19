@@ -144,7 +144,7 @@ describe("buildSlackBrief", () => {
         view: "financial",
         label: "Financial view",
         summary: "Runway translation for near-term operating cadence.",
-        bullets: ["Action: Tighten non-core spend.", "Trigger: Reopen when risk appetite improves.", "Reverse: Restore burn only after two stable updates."],
+        bullets: ["Action: Tighten non-core spend.", "Threshold: Reopen when risk appetite improves.", "Reverse: Restore burn only after two stable updates."],
       },
     });
 
@@ -167,7 +167,7 @@ describe("buildSlackBrief", () => {
       summary: "Boundary pressure translation for planning windows.",
       bullets: [
         "Action: Operate for Defensive (31%) while posture holds.",
-        "Trigger: 3 points to boundary; crossing risk High.",
+        "Threshold: 3 points to boundary; crossing risk High.",
         "Reverse: Momentum mixed across boundary signals.",
       ],
     };
@@ -219,9 +219,9 @@ describe("buildSlackBrief", () => {
     assert.match(brief, /• Trust markers: Confidence: Guarded · Freshness: Stale/);
     assert.match(brief, /• Operating posture: Stage decisions\. Avoid irreversible spend\./);
     assert.match(brief, /• Hiring stance/);
-    assert.match(brief, /Action now: Backfills only/);
-    assert.match(brief, /Trigger\/threshold to tighten or loosen: Pause net-new hiring if tightness > 76/);
-    assert.match(brief, /Reversal condition: Resume staged approvals when tightness < 66/);
+    assert.match(brief, /Action: Backfills only/);
+    assert.match(brief, /Threshold: Pause net-new hiring if tightness > 76/);
+    assert.match(brief, /Reverse: Resume staged approvals when tightness < 66/);
   });
 
 
