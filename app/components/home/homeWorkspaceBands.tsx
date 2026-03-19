@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import type { Route } from "../../../lib/navigation/routeType";
 import { homeScrollPlan } from "../../../lib/navigation/scrollPlans";
 import type { HomePageWorkspaceModel } from "../../../lib/report/homePageAssembler";
@@ -9,6 +10,34 @@ import { HistoricalReplayDatePicker } from "../../signals/components/historicalR
 type HomeWorkspaceBandsProps = {
   workspaceModelPromise: Promise<HomePageWorkspaceModel>;
 };
+
+const HistoricalReplayDatePickerFallback = ({
+  initialDate,
+  submitLabel,
+}: {
+  initialDate: string;
+  submitLabel: string;
+}) => (
+  <form className="flex flex-wrap items-end gap-3" aria-busy="true">
+    <label className="space-y-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-300">
+      Replay date
+      <input
+        type="date"
+        value={initialDate}
+        readOnly={true}
+        disabled={true}
+        className="weather-control rounded-md border-slate-700 bg-slate-900 opacity-80"
+      />
+    </label>
+    <button
+      type="button"
+      disabled={true}
+      className="weather-button-primary inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold tracking-[0.12em] opacity-80"
+    >
+      {submitLabel}
+    </button>
+  </form>
+);
 
 export async function HomeWorkspaceBands({
   workspaceModelPromise,
@@ -130,12 +159,21 @@ export async function HomeWorkspaceBands({
           <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Replay a prior monthly snapshot</p>
             <div className="mt-3">
-              <HistoricalReplayDatePicker
-                initialDate={workspaceModel.replay.initialDate}
-                forceAdvanced={false}
-                submitHash="#historical-replay-workspace"
-                submitLabel="Replay on home"
-              />
+              <Suspense
+                fallback={(
+                  <HistoricalReplayDatePickerFallback
+                    initialDate={workspaceModel.replay.initialDate}
+                    submitLabel="Replay on home"
+                  />
+                )}
+              >
+                <HistoricalReplayDatePicker
+                  initialDate={workspaceModel.replay.initialDate}
+                  forceAdvanced={false}
+                  submitHash="#historical-replay-workspace"
+                  submitLabel="Replay on home"
+                />
+              </Suspense>
             </div>
             <p className="mt-3 text-sm text-slate-300">{workspaceModel.replay.summary}</p>
             <div className="mt-3">
