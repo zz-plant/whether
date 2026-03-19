@@ -7,7 +7,7 @@ import {
   type RegimeAssessment,
   type RegimeKey,
 } from "../regimeEngine";
-import { getSummaryArchive } from "../summary/summaryArchive";
+import { getMonthlyRegimeHistory } from "../summary/monthlyRegimeHistory";
 import { getTimeMachineRegimeSeries } from "../timeMachine/timeMachineCache";
 import type { MacroSeriesId, MacroSeriesReading } from "../types";
 import type { ReportDynamics } from "./reportData";
@@ -84,12 +84,11 @@ const parseDate = (value: string) => {
   return Number.isFinite(timestamp) ? timestamp : null;
 };
 
-const toMonthlyRegimePoints = () => {
-  const archivePoints = getSummaryArchive()
-    .filter((entry): entry is Extract<typeof entry, { cadence: "monthly" }> => entry.cadence === "monthly")
+export const toMonthlyRegimePoints = () => {
+  const archivePoints = getMonthlyRegimeHistory()
     .map((entry) => ({
       timestamp: parseDate(entry.record_date),
-      regime: regimeKeyToForecastLabel[entry.summary.regime],
+      regime: regimeKeyToForecastLabel[entry.regime],
     }))
     .filter((point): point is { timestamp: number; regime: ForecastRegimeLabel } => point.timestamp !== null);
 
