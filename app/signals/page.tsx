@@ -445,20 +445,9 @@ export default async function SignalsPage({
                 <dd className="mt-1 text-xs text-slate-100">Re-check after the next data refresh and threshold confirmation.</dd>
               </div>
             </dl>
-            <div className="flex flex-wrap gap-2 pt-1">
-              <a
-                href="#current-scores"
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] hover:border-sky-400/70 hover:text-slate-100"
-              >
-                Review raw evidence
-              </a>
-              <a
-                href="#thresholds"
-                className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100"
-              >
-                Inspect threshold logic
-              </a>
-            </div>
+            <p className="text-xs text-slate-300">
+              The evidence scorecard and threshold logic appear below in the standard review order.
+            </p>
           </article>
           <article className="weather-surface space-y-3 p-5" aria-label="Founder decision playbook">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-200">Founder operating moves</p>
@@ -491,12 +480,7 @@ export default async function SignalsPage({
                   <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">Mover {index + 1}</p>
                   <p className="mt-1 text-sm font-semibold text-slate-100">{item.label}</p>
                   <p className="mt-1 text-sm text-slate-200">{item.why}</p>
-                  <a
-                    href={item.href}
-                    className="mt-2 inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-                  >
-                    Open {item.label.toLowerCase()} →
-                  </a>
+                  <p className="mt-2 text-xs text-slate-300">Review in the current scores section below.</p>
                 </li>
               ))}
             </ul>
@@ -537,12 +521,7 @@ export default async function SignalsPage({
                     </dl>
                     <p className="text-sm font-semibold text-slate-200">Threshold: {card.threshold}</p>
                     <p className="text-sm text-slate-300">{card.description}</p>
-                    <a
-                      href={card.href}
-                      className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-                    >
-                      Open source signals →
-                    </a>
+                    <p className="text-xs text-slate-300">Source signal details are listed in this scorecard.</p>
                   </article>
                 ))}
               </div>
@@ -583,12 +562,7 @@ export default async function SignalsPage({
               <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">Priority {index + 1}</p>
               <p className="text-sm font-semibold text-slate-100">{item.label}</p>
               <p className="text-sm text-slate-200">{item.why}</p>
-              <a
-                href={item.href}
-                className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-              >
-                Open {item.label.toLowerCase()} →
-              </a>
+              <p className="text-xs text-slate-300">Use the sections below to validate this driver in sequence.</p>
             </li>
           ))}
         </ol>
@@ -604,12 +578,7 @@ export default async function SignalsPage({
                   <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">Priority {index + essentialPriorityQueue.length + 1}</p>
                   <p className="mt-2 text-sm font-semibold text-slate-100">{item.label}</p>
                   <p className="mt-1 text-sm text-slate-200">{item.why}</p>
-                  <a
-                    href={item.href}
-                    className="mt-2 inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-                  >
-                    Open {item.label.toLowerCase()} →
-                  </a>
+                  <p className="mt-2 text-xs text-slate-300">Validate this item in the matching section below.</p>
                 </li>
               ))}
             </ol>
@@ -645,12 +614,7 @@ export default async function SignalsPage({
                 <p className="text-xs font-semibold tracking-[0.18em] text-slate-300">Driver {index + 1}</p>
                 <p className="text-sm font-semibold text-slate-100">{item.label}</p>
                 <p className="text-sm text-slate-200">{item.why}</p>
-                <a
-                  href={item.href}
-                  className="inline-flex min-h-[44px] items-center text-xs font-semibold tracking-[0.14em] text-sky-200 underline decoration-slate-500 underline-offset-4 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
-                >
-                  Open {item.label.toLowerCase()} →
-                </a>
+                <p className="text-xs text-slate-300">Review this driver in the evidence stack below.</p>
               </li>
             ))}
           </ol>

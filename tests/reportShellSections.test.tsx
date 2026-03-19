@@ -4,6 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import {
   CommandCenterNavBlock,
   HeroTrustProvenanceBlock,
+  ReportShell,
   SidebarSequenceBlock,
   resolveTrustProvenance,
 } from "../app/components/reportShell";
@@ -90,5 +91,36 @@ describe("ReportShell extracted sections", () => {
 
     assert.match(html, /Decision flow/);
     assert.match(html, /Call/);
+  });
+
+  it("hides hero actions that only scroll within the current page", () => {
+    const html = renderToStaticMarkup(
+      <ReportShell
+        statusLabel="DEFENSIVE"
+        recordDateLabel="Mar 5, 2026"
+        fetchedAtLabel="Mar 6, 2026"
+        treasurySource="https://fred.stlouisfed.org"
+        pageTitle="Signals"
+        pageSummary="Deep evidence appendix."
+        pageSummaryLink={{ href: "#thresholds", label: "See thresholds" }}
+        pageLinks={[]}
+        sectionLinks={[]}
+        trustStatusLabel="HIGH"
+        trustStatusDetail="Stable feed"
+        trustStatusAction="Proceed with planning."
+        trustStatusTone="stable"
+        currentPath="/signals"
+        primaryCta={{ href: "#current-scores", label: "Open evidence appendix" }}
+        secondaryCta={{ href: "#thresholds", label: "See thresholds" }}
+        exportCta={{ href: "#ops-export-briefs", label: "Copy aligned brief" }}
+      >
+        <section>Body</section>
+      </ReportShell>,
+    );
+
+    assert.doesNotMatch(html, /Open evidence appendix/);
+    assert.doesNotMatch(html, /See thresholds/);
+    assert.doesNotMatch(html, /Copy aligned brief/);
+    assert.match(html, /Deep evidence appendix\./);
   });
 });
