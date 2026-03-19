@@ -225,13 +225,7 @@ export function WeeklyCallModePanel({
           </article>
         ) : null}
 
-        <div className="mt-3 grid gap-2 sm:grid-cols-3">
-          <a href="#audit-this-call" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100">
-            Audit this call
-          </a>
-          <a href="#approve-this-weeks-plan" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100">
-            Approve the plan
-          </a>
+        <div className="mt-3 flex flex-wrap gap-2">
           <Link href="/signals" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100">
             Open Signals
           </Link>

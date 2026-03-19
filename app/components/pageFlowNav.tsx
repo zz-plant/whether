@@ -45,10 +45,7 @@ export function PageFlowNav({
         <ol className={`grid gap-2 md:grid-cols-2 ${gridClassName}`}>
           {items.map((item, index) => (
             <li key={item.href}>
-              <a
-                href={item.href}
-                className="weather-hub-link-card flex min-h-[84px] touch-manipulation flex-col gap-1 px-3 py-2.5 text-left text-slate-200"
-              >
+              <article className="weather-hub-link-card flex min-h-[84px] flex-col gap-1 px-3 py-2.5 text-left text-slate-200">
                 <div className="flex items-center justify-between gap-3">
                   <span className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em]">
                     <span className="inline-flex h-[1.375rem] w-[1.375rem] items-center justify-center rounded-full border border-slate-600/80 text-[10px] text-slate-300">
@@ -56,10 +53,10 @@ export function PageFlowNav({
                     </span>
                     {item.label}
                   </span>
-                  <span className="text-[10px] uppercase tracking-[0.16em] text-slate-400">Jump</span>
+                  <span className="text-[10px] uppercase tracking-[0.16em] text-slate-400">Checkpoint</span>
                 </div>
                 <p className="text-xs leading-5 text-slate-300">{item.summary}</p>
-              </a>
+              </article>
             </li>
           ))}
         </ol>
@@ -98,10 +95,7 @@ export function PageFlowNav({
       <ol className={`grid gap-3 md:grid-cols-2 ${gridClassName}`}>
         {items.map((item, index) => (
           <li key={item.href}>
-            <a
-              href={item.href}
-              className="weather-hub-link-card flex min-h-[124px] touch-manipulation flex-col gap-2 p-4 text-left text-slate-200"
-            >
+            <article className="weather-hub-link-card flex min-h-[124px] flex-col gap-2 p-4 text-left text-slate-200">
               <div className="flex items-center justify-between gap-3">
                 <span className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em]">
                   <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-slate-600/80 text-[10px] text-slate-300">
@@ -109,11 +103,11 @@ export function PageFlowNav({
                   </span>
                   {item.label}
                 </span>
-                <span className="text-[10px] uppercase tracking-[0.16em] text-slate-400">Jump</span>
+                <span className="text-[10px] uppercase tracking-[0.16em] text-slate-400">Checkpoint</span>
               </div>
               <p className="text-sm font-semibold tracking-[0.06em] text-slate-100">{item.summary}</p>
-              <p className="text-xs text-slate-300">Jump to this section.</p>
-            </a>
+              <p className="text-xs text-slate-300">Read this section in sequence.</p>
+            </article>
           </li>
         ))}
       </ol>

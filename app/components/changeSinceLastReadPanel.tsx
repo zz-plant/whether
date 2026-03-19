@@ -231,13 +231,12 @@ export const ChangeSinceLastReadPanel = ({
             {previous ? (
               <div className="mt-3 flex flex-wrap gap-2">
                 {topImpactItems.map((item) => (
-                  <a
+                  <span
                     key={item.label}
-                    href={item.href}
                     className={`inline-flex min-h-[44px] items-center rounded-full border px-3 py-2 text-xs font-semibold tracking-[0.12em] touch-manipulation ${item.tone.className}`}
                   >
                     {item.label}: {item.tone.label}
-                  </a>
+                  </span>
                 ))}
               </div>
             ) : null}
@@ -318,22 +317,6 @@ export const ChangeSinceLastReadPanel = ({
                 ? `Last read logged ${formatDateLabel(previous.readAt)}.`
                 : "No previous read captured yet. Open the report again to view a delta snapshot."}
             </p>
-            {previous ? (
-              <div className="mt-3 flex flex-wrap gap-2">
-                <a
-                  href="#weekly-action-summary"
-                  className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100"
-                >
-                  Jump to action priorities
-                </a>
-                <a
-                  href="#executive-snapshot"
-                  className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.12em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100"
-                >
-                  Jump to leadership readout
-                </a>
-              </div>
-            ) : null}
             {hasChange ? (
               <p className="mt-4 text-xs text-emerald-200">
                 Changes detected since your last read.

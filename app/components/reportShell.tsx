@@ -32,6 +32,7 @@ type SecondaryCtaProps = { href: string; label: string };
 type ExportCtaProps = { href: string; label: string };
 
 const isInternalHref = (href: string) => href.startsWith("/") || href.startsWith("#");
+const isHashHref = (href: string) => href.startsWith("#");
 
 const InternalAwareLink = ({
   href,
@@ -236,7 +237,7 @@ export function CommandCenterNavBlock({
   summaryLink: ReactNode;
   recordDateLabel: string;
   roleSwitcher?: RoleSwitcher;
-  primaryCta: ReportCtaProps;
+  primaryCta?: ReportCtaProps;
   secondaryCta?: SecondaryCtaProps;
   exportCta?: ExportCtaProps | null;
   nextStep?: { description: string; href: string };
@@ -253,7 +254,7 @@ export function CommandCenterNavBlock({
   missionSequenceTitle: string;
   missionSequenceItems: Array<{ title: string; detail: string; href: string; cta: string; phase: string }>;
 }) {
-  const primaryDecisionText = decisionBanner?.decision ?? `${primaryCta.label}.`;
+  const primaryDecisionText = decisionBanner?.decision ?? (primaryCta ? `${primaryCta.label}.` : "Review the current operating posture.");
   return (
     <>
       <section className="weather-panel-static min-w-0 space-y-4 px-4 py-4 sm:space-y-5 sm:px-5">
@@ -275,11 +276,13 @@ export function CommandCenterNavBlock({
           {heroVariant === "full" ? <span className="sr-only">Signals stamped {recordDateLabel}</span> : null}
         </div>
 
-        <div id="report-primary-actions" className="flex w-full min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
-          <ReportCta href={primaryCta.href} copyText={primaryCta.copyText} copyTarget={primaryCta.copyTarget} label={primaryCta.label} className="weather-cta weather-cta-primary w-full max-w-full text-center sm:w-auto"><span className="max-w-full break-words text-center">{primaryCta.label}</span></ReportCta>
-          {secondaryCta ? <InternalAwareLink href={secondaryCta.href} className="weather-cta weather-cta-secondary w-full sm:w-auto">{secondaryCta.label}</InternalAwareLink> : null}
-          {exportCta ? <InternalAwareLink href={exportCta.href} className="weather-cta weather-cta-export w-full sm:w-auto">{exportCta.label}</InternalAwareLink> : null}
-        </div>
+        {primaryCta || secondaryCta || exportCta ? (
+          <div id="report-primary-actions" className="flex w-full min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+            {primaryCta ? <ReportCta href={primaryCta.href} copyText={primaryCta.copyText} copyTarget={primaryCta.copyTarget} label={primaryCta.label} className="weather-cta weather-cta-primary w-full max-w-full text-center sm:w-auto"><span className="max-w-full break-words text-center">{primaryCta.label}</span></ReportCta> : null}
+            {secondaryCta ? <InternalAwareLink href={secondaryCta.href} className="weather-cta weather-cta-secondary w-full sm:w-auto">{secondaryCta.label}</InternalAwareLink> : null}
+            {exportCta ? <InternalAwareLink href={exportCta.href} className="weather-cta weather-cta-export w-full sm:w-auto">{exportCta.label}</InternalAwareLink> : null}
+          </div>
+        ) : null}
         {nextStep ? <p className="text-xs font-semibold tracking-[0.1em] text-slate-300">Next step: <InternalAwareLink href={nextStep.href} className="text-sky-200 underline decoration-slate-500/80 underline-offset-4">{nextStep.description}</InternalAwareLink></p> : null}
         <dl className="weather-surface weather-meta-list min-h-[44px] px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100" aria-label="Current report status">
           <div className="weather-meta-list__item"><dt className="text-slate-400">Posture</dt><dd>{statusLabel}</dd></div>
@@ -371,9 +374,13 @@ export const ReportShell = ({
   commandBar,
   ambientMode = "standard",
 }: ReportShellProps) => {
+  const resolvedPageSummaryLink = pageSummaryLink && !isHashHref(pageSummaryLink.href) ? pageSummaryLink : undefined;
+  const resolvedPrimaryCta = primaryCta && !isHashHref(primaryCta.href) ? primaryCta : undefined;
+  const resolvedSecondaryCta = secondaryCta && !isHashHref(secondaryCta.href) ? secondaryCta : undefined;
+  const resolvedExportCta = exportCta && !isHashHref(exportCta.href) ? exportCta : null;
   const resolvedNextRefreshLabel = nextRefreshLabel ?? (trustStatusTone === "historical" ? "Fixed historical snapshot" : "15m cadence");
   const contentSections = Children.toArray(children);
-  const summaryLink = pageSummaryLink ? <InternalAwareLink href={pageSummaryLink.href} className="inline-flex min-h-[44px] items-center text-xs font-semibold text-sky-200 underline decoration-slate-500/80 underline-offset-4">{pageSummaryLink.label}</InternalAwareLink> : null;
+  const summaryLink = resolvedPageSummaryLink ? <InternalAwareLink href={resolvedPageSummaryLink.href} className="inline-flex min-h-[44px] items-center text-xs font-semibold text-sky-200 underline decoration-slate-500/80 underline-offset-4">{resolvedPageSummaryLink.label}</InternalAwareLink> : null;
   const hasSidebar = sidebarVariant === "full";
   const missionSequenceLabels = ["Now", "Next", "Later"];
   const missionSequenceTitle = actionSequence?.title ?? "Plan";
@@ -382,8 +389,8 @@ export const ReportShell = ({
   const sourceLabel = sourceHref ? (() => { try { const hostname = new URL(sourceHref).hostname.replace(/^www\./, ""); if (hostname.includes("stlouisfed.org")) return "FRED"; if (hostname.includes("fiscaldata.treasury.gov")) return "Treasury Fiscal Data"; return hostname; } catch { return treasurySource; } })() : treasurySource;
   const showPostureRibbon = currentPath !== "/";
   const resolvedHeaderVariant: ReportShellHeaderVariant = headerVariant ?? (hideHeroChrome ? "home-brief" : "standard");
-  const isPrimaryActionInSectionLinks = sectionLinks.some((section) => section.href === primaryCta.href);
-  const showMobileActionCard = !isPrimaryActionInSectionLinks;
+  const isPrimaryActionInSectionLinks = resolvedPrimaryCta ? sectionLinks.some((section) => section.href === resolvedPrimaryCta.href) : false;
+  const showMobileActionCard = Boolean(resolvedPrimaryCta) && !isPrimaryActionInSectionLinks;
   const showInlineTrustBlock = !hasSidebar;
   const renderTrustBeforeContent = showInlineTrustBlock && inlineTrustPlacement === "before-content";
   const renderTrustAfterFirstSection = showInlineTrustBlock && inlineTrustPlacement === "after-first-section";
@@ -418,7 +425,7 @@ export const ReportShell = ({
             {hasSidebar ? <aside className="order-2 space-y-4 xl:order-none xl:col-start-2 xl:row-start-1 xl:sticky xl:top-28 xl:self-start">{sectionLinks.length ? <ReportSectionNavigation sectionLinks={sectionLinks} className="hidden xl:block" /> : null}<HeroTrustProvenanceBlock trustStatusTone={trustStatusTone} trustStatusLabel={trustStatusLabel} trustStatusDetail={trustStatusDetail} trustStatusAction={trustStatusAction} statusLabel={statusLabel} fetchedAtLabel={fetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} provenance={provenance} /></aside> : null}
 
             <div className={`order-1 min-w-0 space-y-8 lg:space-y-10 xl:order-none xl:col-start-1 xl:row-start-1 ${hasSidebar ? "" : "mx-auto w-full max-w-[78rem]"}`}>
-              {!hideHeroChrome ? <CommandCenterNavBlock heroVariant={heroVariant} pageTitle={pageTitle} pageSummary={pageSummary} summaryLink={summaryLink} recordDateLabel={recordDateLabel} roleSwitcher={roleSwitcher} primaryCta={primaryCta} secondaryCta={secondaryCta} exportCta={exportCta} nextStep={nextStep} statusLabel={statusLabel} trustStatusLabel={trustStatusLabel} fetchedAtLabel={fetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={trustStatusAction} showOfflineBadge={showOfflineBadge} offlineBadgeLabel={offlineBadgeLabel} decisionBanner={decisionBanner} missionSupportText={trustStatusDetail} decisionDiffs={decisionDiffs} missionSequenceTitle={missionSequenceTitle} missionSequenceItems={missionSequenceItems} /> : null}
+              {!hideHeroChrome ? <CommandCenterNavBlock heroVariant={heroVariant} pageTitle={pageTitle} pageSummary={pageSummary} summaryLink={summaryLink} recordDateLabel={recordDateLabel} roleSwitcher={roleSwitcher} primaryCta={resolvedPrimaryCta} secondaryCta={resolvedSecondaryCta} exportCta={resolvedExportCta} nextStep={nextStep} statusLabel={statusLabel} trustStatusLabel={trustStatusLabel} fetchedAtLabel={fetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={trustStatusAction} showOfflineBadge={showOfflineBadge} offlineBadgeLabel={offlineBadgeLabel} decisionBanner={decisionBanner} missionSupportText={trustStatusDetail} decisionDiffs={decisionDiffs} missionSequenceTitle={missionSequenceTitle} missionSequenceItems={missionSequenceItems} /> : null}
 
               <SidebarSequenceBlock stageRail={stageRail} />
 
@@ -433,11 +440,11 @@ export const ReportShell = ({
           </div>
         </div>
 
-        {showMobileActionCard ? <div className="sm:hidden mt-6 px-4"><section className="weather-panel border-sky-500/40 bg-slate-950/95 px-3 py-3"><p className="text-[11px] font-semibold tracking-[0.14em] text-slate-300">Current posture</p><div className="mt-2 flex items-center justify-between gap-3"><p className="max-w-[16rem] text-xs font-semibold text-slate-100">{decisionBanner?.decision ?? `${primaryCta.label}.`}</p><ReportCta href={primaryCta.href} copyText={primaryCta.copyText} copyTarget={primaryCta.copyTarget} label={primaryCta.label} className="weather-button-primary inline-flex min-h-[44px] flex-shrink-0 items-center justify-center rounded-full px-3 py-2 text-xs font-semibold tracking-[0.14em]">{primaryCta.label}</ReportCta></div></section></div> : null}
+        {showMobileActionCard && resolvedPrimaryCta ? <div className="sm:hidden mt-6 px-4"><section className="weather-panel border-sky-500/40 bg-slate-950/95 px-3 py-3"><p className="text-[11px] font-semibold tracking-[0.14em] text-slate-300">Current posture</p><div className="mt-2 flex items-center justify-between gap-3"><p className="max-w-[16rem] text-xs font-semibold text-slate-100">{decisionBanner?.decision ?? `${resolvedPrimaryCta.label}.`}</p><ReportCta href={resolvedPrimaryCta.href} copyText={resolvedPrimaryCta.copyText} copyTarget={resolvedPrimaryCta.copyTarget} label={resolvedPrimaryCta.label} className="weather-button-primary inline-flex min-h-[44px] flex-shrink-0 items-center justify-center rounded-full px-3 py-2 text-xs font-semibold tracking-[0.14em]">{resolvedPrimaryCta.label}</ReportCta></div></section></div> : null}
 
         {showPageNavigation ? <div className="sm:hidden"><ReportMobileNavigation pageLinks={pageLinks} pageTitle={pageTitle} currentPath={currentPath} className="mt-3 px-4 pb-6" sectionLinks={sectionLinks} /></div> : null}
 
-        {enableTvAmbientMode ? <aside className="tv-action-rail" aria-label="TV quick actions"><p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Quick actions</p><div className="mt-2 grid gap-2"><ReportCta href={primaryCta.href} copyText={primaryCta.copyText} copyTarget={primaryCta.copyTarget} label={primaryCta.label} className="weather-button-primary inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-100">{primaryCta.label}</ReportCta>{secondaryCta ? <InternalAwareLink href={secondaryCta.href} className="weather-pill inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-200">{secondaryCta.label}</InternalAwareLink> : null}<DisplayModeToggle /></div></aside> : null}
+        {enableTvAmbientMode && resolvedPrimaryCta ? <aside className="tv-action-rail" aria-label="TV quick actions"><p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Quick actions</p><div className="mt-2 grid gap-2"><ReportCta href={resolvedPrimaryCta.href} copyText={resolvedPrimaryCta.copyText} copyTarget={resolvedPrimaryCta.copyTarget} label={resolvedPrimaryCta.label} className="weather-button-primary inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-100">{resolvedPrimaryCta.label}</ReportCta>{resolvedSecondaryCta ? <InternalAwareLink href={resolvedSecondaryCta.href} className="weather-pill inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-200">{resolvedSecondaryCta.label}</InternalAwareLink> : null}<DisplayModeToggle /></div></aside> : null}
       </main>
     </>
   );

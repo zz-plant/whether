@@ -51,17 +51,15 @@ export const OperationsWorkflowProgress = () => {
       </div>
       <ol className="grid gap-3 md:grid-cols-3">
         {executionSteps.map((step, index) => {
-          const href = currentSearch ? `?${currentSearch}${step.href}` : step.href;
           const cardTone =
             index === 0
               ? "border-sky-400/70 bg-sky-500/15 text-sky-100"
               : "border-slate-800/80 text-slate-200 hover:border-sky-400/70";
           return (
             <li key={step.href}>
-              <a
-                href={href}
+              <article
                 aria-current={index === 0 ? "step" : undefined}
-                className={`weather-surface flex min-h-[100px] flex-col gap-2 rounded-xl border p-3 transition-colors ${cardTone}`}
+                className={`weather-surface flex min-h-[100px] flex-col gap-2 rounded-xl border p-3 ${cardTone}`}
               >
                 <span className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em]">
                   <span className="inline-flex items-center gap-2">
@@ -83,7 +81,7 @@ export const OperationsWorkflowProgress = () => {
                 </span>
                 <span className="text-sm font-semibold tracking-[0.08em]">{step.title}</span>
                 <span className="text-xs text-slate-300">{step.description}</span>
-              </a>
+              </article>
             </li>
           );
         })}
