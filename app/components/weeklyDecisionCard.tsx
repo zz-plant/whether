@@ -517,7 +517,7 @@ function RegimeBanner({
             <div className="min-w-0">
               <p className="text-xl font-semibold leading-tight sm:text-[1.85rem]">{resolvedPostureLabel}</p>
               <p className="mt-0.5 text-sm font-semibold text-slate-100/90">{resolvedStageLabel} cycle</p>
-              <p className="mt-1.5 max-w-3xl text-sm leading-6 text-slate-50/90">{operatingLine}</p>
+              <p className="mt-1.5 max-w-3xl text-sm font-semibold leading-6 text-slate-50/95">{operatingLine}</p>
             </div>
           </div>
         </div>
@@ -530,7 +530,7 @@ function RegimeBanner({
             </p>
             <p className="mt-2 flex items-center gap-1.5 text-[11px] text-slate-300" aria-label={`Trend ${trendValue}`}>
               <TrendGlyph trendLabel={trendValue} />
-              <span>Directional pressure</span>
+              <span>{trendValue}</span>
             </p>
           </div>
           <div className="px-1 py-1 xl:px-3">
@@ -554,7 +554,6 @@ function RegimeBanner({
         <span className="px-1.5" aria-hidden="true">·</span>
         <span>Flip window {flipRiskValue}</span>
       </p>
-      <RegimeLegend activeRegime={regimeKey} tone={bannerTone} operatingLine={operatingLine} regimeDistance={regimeDistance} />
     </header>
   );
 }
@@ -1158,7 +1157,6 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     canonicalDecisionCopy,
     canonicalFlipConditions = [],
     reportDynamics,
-    decisionShiftSummary,
     transitionProbabilities,
     decisionRules,
     decisionMatrix,
@@ -1224,10 +1222,9 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
       ? "Live weekly read. Safe for near-term operating decisions."
       : "Live weekly read, but confidence is not HIGH yet. Keep approvals staged.";
   const decisionBullets = [
-    { label: "What changed", detail: decisionShiftSummary.replace(/^Changed:\s*/i, "").trim() },
-    { label: "What that changes", detail: immediateDecision.trim() },
-    { label: "What to revisit", detail: guardrail.trim() },
-    { label: "What would flip", detail: snapshotWatch.trim() },
+    { label: "Action now", detail: immediateDecision.trim() },
+    { label: "Bounded call", detail: guardrail.trim() },
+    { label: "Flip risk", detail: snapshotWatch.trim() },
   ];
   const guardrailPolicyDetails = buildPolicyDetails({
     rule: decisionRules.find((rule) => rule.area === "burn-discipline") ?? decisionRules[0],
@@ -1325,26 +1322,28 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     },
   } satisfies StartupVariantPolicy;
   const resolvedRegimeKey = regimeKey ?? "DEFENSIVE";
+  const bannerTone = REGIME_BANNER_TOKENS[resolvedRegimeKey];
 
   return (
     <section className="weather-panel space-y-4 px-4 py-4 sm:space-y-5 sm:px-5 sm:py-5 lg:px-6 lg:py-6" aria-labelledby="weekly-posture-brief-title">
-      <RegimeBanner
-        statusLabel={statusLabel}
-        regimeKey={resolvedRegimeKey}
-        postureLabel={postureLabel}
-        stageLabel={stageLabel}
-        postureWithStageLabel={postureWithStageLabel}
-        recordDateLabel={recordDateLabel}
-        confidencePercent={confidencePercent}
-        confidenceLabel={confidenceLabel}
-        trendLabel={trendLabel}
-        operatingStanceLine={operatingStanceLine}
-        actionNowShort={actionNowShort}
-        regimeDistance={regimeDistance}
-      />
-
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.28fr)_minmax(19rem,0.82fr)] xl:items-start">
-        <main className="space-y-4">
+      <div data-testid="weekly-top-fold" className="grid gap-4 lg:grid-cols-12 lg:items-start">
+        <div className="lg:col-span-8">
+          <RegimeBanner
+            statusLabel={statusLabel}
+            regimeKey={resolvedRegimeKey}
+            postureLabel={postureLabel}
+            stageLabel={stageLabel}
+            postureWithStageLabel={postureWithStageLabel}
+            recordDateLabel={recordDateLabel}
+            confidencePercent={confidencePercent}
+            confidenceLabel={confidenceLabel}
+            trendLabel={trendLabel}
+            operatingStanceLine={operatingStanceLine}
+            actionNowShort={actionNowShort}
+            regimeDistance={regimeDistance}
+          />
+        </div>
+        <div className="lg:col-span-4">
           <WeeklyCallModePanel
             startupVariantPolicy={resolvedStartupVariantPolicy}
             postureLabel={postureWithStageLabel ?? statusLabel}
@@ -1371,8 +1370,19 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
             flipPolicyDetails={flipPolicyDetails}
             roleTranslations={roleTranslations}
           />
+        </div>
+      </div>
 
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.28fr)_minmax(19rem,0.82fr)] xl:items-start">
+        <main className="space-y-4">
           <InputInfluenceSection items={inputInfluence} />
+
+          <RegimeLegend
+            activeRegime={resolvedRegimeKey}
+            tone={bannerTone}
+            operatingLine={operatingStanceLine.trim() || actionNowShort?.trim() || "Hold bounded operating rules until next refresh."}
+            regimeDistance={regimeDistance}
+          />
 
           {diagnosticsLane ?? (
             <DiagnosticsSection

@@ -162,18 +162,19 @@ The homepage supports optional interpretation layers without changing the canoni
 
 ### Current implementation contract (`/`, `WeeklyDecisionCard`)
 Canonical top-fold order on homepage must remain:
-1. **This week in 15 seconds** (single canonical decision block with `Action`, `Guardrail`, `Flip condition`)
-2. **Decision support details** (delta + evidence helpers that reference the canonical decision)
-3. **Decision matrix + action strip** (bounded rules with measurable `Action`, `Threshold`, `Flip condition`)
-4. **Why this call** disclosure (supporting evidence hidden behind details/summary)
+1. **Regime banner** (`current posture`, `action now`, `confidence`, `flip risk`)
+2. **Compact bounded call** (`Action now`, `Bounded call`, `Flip risk`, plus terse trust status)
+3. **Decision support details** (input pressure + evidence helpers that reference the canonical decision)
+4. **Decision matrix + action strip** (bounded rules with measurable `Action`, `Threshold`, `Flip condition`)
+5. **Why this call** disclosure (supporting evidence, rationale, and longer playbook copy hidden behind details/summary)
 
 Implementation guardrails:
 - Action-strip contract requirement: every surfaced item (homepage, operations, export payload) must include non-empty `action`, `threshold`, and `reversalCondition` fields.
-- Top fold uses responsive grid composition at `lg` breakpoints to preserve scan hierarchy around common screenshot widths (~1200px desktop browser).
-- Decision-support details should visually explain how the current core inputs are pulling the call (`tightness`, `risk appetite`, `base rate`, `curve slope`) and keep the explanation compact enough for screenshot use.
-- Regime guidance should stay attached to the regime ladder itself: each regime needs a terse operating cue, and the active regime should expose a stronger `do now / stop` playbook without falling back to methodology copy.
+- Top fold uses responsive grid composition at `lg` breakpoints (`data-testid="weekly-top-fold"`, `lg:grid-cols-12`, `lg:col-span-8`, `lg:col-span-4`) to preserve scan hierarchy around common screenshot widths (~1200px desktop browser).
+- Decision-support details should visually explain how the current core inputs are pulling the call (`tightness`, `risk appetite`, `base rate`, `curve slope`) and keep the explanation below the initial bounded call so the first viewport stays screenshot-safe.
+- Regime guidance should stay attached to the regime ladder itself, but the ladder opens below the top fold. Each regime needs a terse operating cue, and the active regime should expose a stronger `do now / stop` playbook without falling back to methodology copy.
 - Citation + provenance belong near the lower fold: `Cite this call` retains actionable copy/export controls via the existing `actions` slot, and compact provenance remains immediately after the weekly card on `/`.
-- Trust copy should be a single compact sentence near the top fold: `state + freshness + operating implication`.
+- Trust copy should be a single compact sentence near the top fold: `state + freshness + operating implication`. Longer rationale and fallback explanation belong in disclosure content.
 - Rendering tests should verify hierarchy order and responsive class hooks (`data-testid="weekly-top-fold"`, `lg:grid-cols-12`, `lg:grid-cols-4`) to prevent drift.
 
 ## Slack screenshot card contract

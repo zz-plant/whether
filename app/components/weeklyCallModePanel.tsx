@@ -100,15 +100,14 @@ export function WeeklyCallModePanel({
             </div>
             <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-current/80">{confidenceLabel} confidence</span>
           </div>
-          <p className="mt-1 text-xs leading-5">{trustStateDetail}</p>
-          {trustReason ? <p className="mt-1 text-[11px] leading-5 text-current/85">Reason: {trustReason}</p> : null}
+          <p className="mt-1 text-[11px] font-medium leading-5">{trustStateDetail}</p>
         </div>
 
-        <div className="mt-3 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+        <div className="mt-3 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
               <span className="rounded-full border border-sky-400/35 bg-sky-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-100">
-                Weekly operating brief
+                This week
               </span>
               <span className="rounded-full border border-slate-700/70 bg-slate-950/75 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-200">
                 {selectedModeLabel}
@@ -118,27 +117,27 @@ export function WeeklyCallModePanel({
               </span>
             </div>
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-sky-100/85">Current conditions</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-sky-100/85">Action now</p>
               <h2 className="mt-1 text-xl font-semibold text-slate-50 sm:text-2xl">{operatingCall}</h2>
               <p className="mt-1 text-sm font-semibold text-slate-200">{postureLabel}</p>
-              {whyItMattersLine ? <p className="mt-2 max-w-3xl text-xs leading-5 text-slate-300">{whyItMattersLine}</p> : null}
             </div>
           </div>
-          <div className="rounded-xl border border-slate-700/70 bg-slate-950/70 px-3 py-3 lg:min-w-[18rem]">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Decision confidence</p>
+          <div className="rounded-xl border border-slate-700/70 bg-slate-950/70 px-3 py-3 lg:min-w-[17rem]">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Confidence</p>
             <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full bg-slate-800/90" role="progressbar" aria-valuenow={confidenceValue} aria-valuemin={0} aria-valuemax={100} aria-label={`Confidence ${confidenceValue} percent`}>
               <div className={`h-full origin-left ${confidenceToneClass} transition-transform duration-300`} style={{ transform: `scaleX(${confidenceValue / 100})` }} />
             </div>
             <p className="mt-2 text-xs leading-5 text-slate-300">
-              <span className="font-semibold text-slate-100">{confidenceLabel} {confidenceValue}%</span> confidence.
+              <span className="font-semibold text-slate-100">{confidenceLabel} {confidenceValue}%</span>
+              <span className="px-1" aria-hidden="true">·</span>
+              Hold after 2 reads unless the flip line fires at HIGH confidence.
             </p>
-            <p className="mt-1 text-[11px] leading-5 text-slate-300">{stabilityRule}</p>
           </div>
         </div>
 
         <article id="weekly-call-core" className={`${tierOnePanelClassName} mt-3 bg-gradient-to-br from-slate-950/95 via-slate-900/85 to-slate-950/95`}>
           <h2 className={tierOneHeadingClassName}>This week&apos;s call</h2>
-          <ul className="mt-3 grid gap-2 md:grid-cols-2">
+          <ul className="mt-3 grid gap-2 lg:grid-cols-3">
             {decisionBullets.map((item) => (
               <li key={item.label} className="rounded-xl border border-slate-700/60 bg-slate-950/70 px-3 py-3 text-sm text-slate-100">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">{item.label}</p>
@@ -150,11 +149,11 @@ export function WeeklyCallModePanel({
 
         <div className="mt-3 grid gap-3 xl:grid-cols-2">
           <article className="rounded-xl border border-rose-400/25 bg-rose-500/8 px-3 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-rose-200">Guardrail</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-rose-200">Bound</p>
             <p className="mt-1 text-sm font-semibold leading-6 text-rose-50">{snapshotAvoid}</p>
             <details className={detailDisclosureBase}>
               <summary className="min-h-[44px] cursor-pointer list-none pt-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-                Show policy details
+                Numbers
               </summary>
               <p className="mt-1 text-xs leading-5 text-slate-200">{guardrailPolicyDetails.summary}</p>
               <div className="mt-2 flex flex-wrap gap-1.5">
@@ -166,7 +165,7 @@ export function WeeklyCallModePanel({
           </article>
 
           <article className="rounded-xl border border-sky-400/25 bg-sky-500/8 px-3 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Flip condition</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Flip if</p>
             <p className="mt-1 text-sm font-semibold leading-6 text-sky-50">{snapshotWatch}</p>
             {flipSupport.length > 0 ? (
               <div className="mt-2 flex flex-wrap gap-1.5">
@@ -179,7 +178,7 @@ export function WeeklyCallModePanel({
             ) : null}
             <details className={detailDisclosureBase}>
               <summary className="min-h-[44px] cursor-pointer list-none pt-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-                Show numbers
+                Thresholds
               </summary>
               <p className="mt-1 text-xs leading-5 text-slate-200">{flipPolicyDetails.summary}</p>
               <div className="mt-2 flex flex-wrap gap-1.5">
@@ -191,45 +190,63 @@ export function WeeklyCallModePanel({
           </article>
         </div>
 
-        {activeRoleTranslation ? (
-          <article className="mt-3 rounded-xl border border-slate-700/60 bg-slate-950/60 px-3 py-3">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Role translation</p>
-              <div className="flex flex-wrap gap-2">
-                {roleTranslations.map((role) => {
-                  const active = role.id === activeRole;
-                  return (
-                    <button
-                      key={role.id}
-                      type="button"
-                      className={active
-                        ? "min-h-[44px] rounded-full border border-sky-400/35 bg-sky-500/10 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-100"
-                        : "min-h-[44px] rounded-full border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300"}
-                      onClick={() => setActiveRole(role.id)}
-                    >
-                      {role.label}
-                    </button>
-                  );
-                })}
-              </div>
+        <details className="mt-3 rounded-xl border border-slate-700/60 bg-slate-950/60 px-3 py-3">
+          <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-2 text-left">
+            <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Why this call</span>
+            <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Open detail</span>
+          </summary>
+          <div className="mt-2 space-y-3">
+            <div className="grid gap-2 md:grid-cols-2">
+              <p className="rounded-lg border border-slate-700/60 bg-slate-950/70 px-3 py-2 text-xs leading-5 text-slate-200">{stabilityRule}</p>
+              {whyItMattersLine ? (
+                <p className="rounded-lg border border-slate-700/60 bg-slate-950/70 px-3 py-2 text-xs leading-5 text-slate-200">{whyItMattersLine}</p>
+              ) : null}
+              {trustReason ? (
+                <p className="rounded-lg border border-slate-700/60 bg-slate-950/70 px-3 py-2 text-xs leading-5 text-slate-200 md:col-span-2">Trust note: {trustReason}</p>
+              ) : null}
             </div>
-            <p className="mt-2 text-sm font-semibold text-slate-100">{activeRoleTranslation.implication}</p>
-            <div className="mt-2 grid gap-2 md:grid-cols-2">
-              <p className="rounded-lg border border-emerald-400/25 bg-emerald-500/8 px-3 py-2 text-xs leading-5 text-emerald-100">
-                <span className="font-semibold uppercase tracking-[0.08em] text-emerald-200">Do</span> {activeRoleTranslation.doLine}
-              </p>
-              <p className="rounded-lg border border-rose-400/25 bg-rose-500/8 px-3 py-2 text-xs leading-5 text-rose-100">
-                <span className="font-semibold uppercase tracking-[0.08em] text-rose-200">Don&apos;t</span> {activeRoleTranslation.holdLine}
-              </p>
-            </div>
-          </article>
-        ) : null}
 
-        <div className="mt-3 flex flex-wrap gap-2">
-          <Link href="/signals" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100">
-            Open Signals
-          </Link>
-        </div>
+            {activeRoleTranslation ? (
+              <div className="rounded-xl border border-slate-700/60 bg-slate-950/55 px-3 py-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">Role translation</p>
+                  <div className="flex flex-wrap gap-2">
+                    {roleTranslations.map((role) => {
+                      const active = role.id === activeRole;
+                      return (
+                        <button
+                          key={role.id}
+                          type="button"
+                          className={active
+                            ? "min-h-[44px] rounded-full border border-sky-400/35 bg-sky-500/10 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-100"
+                            : "min-h-[44px] rounded-full border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300"}
+                          onClick={() => setActiveRole(role.id)}
+                        >
+                          {role.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+                <p className="mt-2 text-sm font-semibold text-slate-100">{activeRoleTranslation.implication}</p>
+                <div className="mt-2 grid gap-2 md:grid-cols-2">
+                  <p className="rounded-lg border border-emerald-400/25 bg-emerald-500/8 px-3 py-2 text-xs leading-5 text-emerald-100">
+                    <span className="font-semibold uppercase tracking-[0.08em] text-emerald-200">Do</span> {activeRoleTranslation.doLine}
+                  </p>
+                  <p className="rounded-lg border border-rose-400/25 bg-rose-500/8 px-3 py-2 text-xs leading-5 text-rose-100">
+                    <span className="font-semibold uppercase tracking-[0.08em] text-rose-200">Don&apos;t</span> {activeRoleTranslation.holdLine}
+                  </p>
+                </div>
+              </div>
+            ) : null}
+
+            <div className="flex flex-wrap gap-2">
+              <Link href="/signals" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100">
+                Open Signals
+              </Link>
+            </div>
+          </div>
+        </details>
       </article>
     </>
   );

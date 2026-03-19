@@ -100,12 +100,12 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
       />,
     );
 
-    const snapshotRegion = html.slice(html.indexOf("Weekly call snapshot"), html.indexOf("This week&#x27;s call"));
+    const snapshotRegion = html.slice(html.indexOf("Current outlook"), html.indexOf("This week&#x27;s call"));
     const flipWatchCount = (snapshotRegion.match(/Flip watch/g) ?? []).length;
     assert.equal(flipWatchCount, 1);
-    assert.match(html, /Current read/);
+    assert.match(html, /Action now/);
     assert.match(html, /Cloudy/);
-    assert.match(html, /stay selective and keep efficiency layers on/i);
+    assert.match(html, /Stage approvals and protect runway\./);
   });
 
   it("keeps top-fold sequence canonical: posture, call, do now, flip when", () => {
@@ -194,8 +194,8 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
 
     const regimeIndex = html.indexOf("Current outlook");
     const callIndex = html.indexOf("Weekly call snapshot");
-    const doNowIndex = html.indexOf("DO NOW");
-    const flipIndex = html.indexOf("FLIP WHEN");
+    const doNowIndex = html.indexOf("Action now");
+    const flipIndex = html.indexOf("Flip if");
 
     assert.ok(regimeIndex >= 0);
     assert.ok(callIndex > regimeIndex);
@@ -279,8 +279,8 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
       />,
     );
 
-    assert.match(html, /<summary[^>]*>Decode this forecast<\/summary>/);
-    assert.match(html, /Can I rely on this\?/);
-    assert.doesNotMatch(html, /<summary[^>]*>More context<\/summary>/);
+    assert.match(html, /<summary[^>]*>Why this call<\/summary>/);
+    assert.match(html, /Regime ladder/);
+    assert.doesNotMatch(html, /Decode this forecast/);
   });
 });
