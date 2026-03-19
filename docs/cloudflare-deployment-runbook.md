@@ -62,3 +62,9 @@ The warning classes below are currently expected from the Vinext/Rolldown toolch
 If CI reports a new warning class, treat it as action-required until triaged and either:
 1. fixed in code/dependencies, or
 2. intentionally accepted and documented in the build/deploy notes for the current Vinext version.
+
+## Shared UI import exceptions
+
+- `app/components/uiIcons.tsx` now imports Lucide icons from `lucide-react/dist/esm/icons/*` so the shared client chunk only analyzes the icons the weekly brief and operations surfaces actually render.
+- `simple-icons` does not expose stable per-icon ESM component entrypoints in the current package shape; `app/components/workAppIcon.tsx` therefore inlines the four non-Slack SVG metadata records used across export/integration surfaces instead of importing the full package entry.
+- If we revisit `simple-icons`, treat any return to `import { ... } from "simple-icons"` inside shared UI modules as an explicit bundle-cost tradeoff that must be re-measured in `bun run build`.
