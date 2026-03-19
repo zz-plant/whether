@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 import type { ConfidenceTrendFraming, WeeklyConfidencePoint } from "../../lib/report/reportData";
 import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
 import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
@@ -547,13 +547,17 @@ function RegimeBanner({
           </div>
         </div>
       </div>
-      <p className={`mt-2.5 overflow-x-auto text-xs font-semibold whitespace-nowrap ${bannerTone.metrics}`} aria-label="Regime metrics line">
-        <span>Stage {resolvedStageLabel}</span>
-        <span className="px-1.5" aria-hidden="true">·</span>
-        <span>Exact confidence {exactConfidenceLabel}</span>
-        <span className="px-1.5" aria-hidden="true">·</span>
-        <span>Flip window {flipRiskValue}</span>
-      </p>
+      <div className={`mt-2.5 flex flex-wrap gap-1.5 text-xs font-semibold ${bannerTone.metrics}`} aria-label="Regime metrics line">
+        {[
+          `Stage ${resolvedStageLabel}`,
+          `Exact confidence ${exactConfidenceLabel}`,
+          `Flip window ${flipRiskValue}`,
+        ].map((metric) => (
+          <span key={metric} className="inline-flex min-h-8 items-center rounded-full border border-white/10 bg-slate-950/25 px-2.5 py-1 leading-4">
+            {metric}
+          </span>
+        ))}
+      </div>
       <RegimeLegend activeRegime={regimeKey} tone={bannerTone} operatingLine={operatingLine} regimeDistance={regimeDistance} />
     </header>
   );
@@ -705,45 +709,42 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [] }: Bound
     <article className={`${tierOnePanel} ${sectionSpacing}`}>
       <h2 className={tierOneHeading}>Decision snapshot for leadership this week</h2>
       <p className="text-xs leading-5 text-slate-300">Scan the lanes, then open a cell only when you need the threshold rationale.</p>
-      <div className="mt-2 overflow-x-auto hidden sm:block">
-        <table className="min-w-full border-separate border-spacing-2 text-xs text-slate-100" aria-label="Bounded decision matrix">
-          <thead>
-            <tr>
-              <th scope="col" className="rounded-md border border-slate-700/70 bg-slate-950/70 px-2.5 py-2 text-left font-semibold text-slate-300">Decision area</th>
-              <th scope="col" className="rounded-md border border-slate-700/70 bg-slate-950/70 px-2.5 py-2 text-left font-semibold text-slate-300">Context</th>
-              {matrix.columns.map((column) => (
-                <th key={column.key} scope="col" className="rounded-md border border-slate-700/70 bg-slate-950/70 px-2.5 py-2 text-left font-semibold text-slate-200">
-                  <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] uppercase tracking-[0.08em] ${decisionLaneTone[column.key].badgeClassName}`}>
-                    {decisionLaneTone[column.key].label}
-                  </span>
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {matrix.rows.map((row) => (
-              <tr key={row.key}>
-                <th scope="row" className="rounded-md border border-slate-700/70 bg-slate-950/75 px-2.5 py-2 text-left font-semibold text-slate-100">{row.label}</th>
-                <td className="rounded-md border border-slate-700/55 bg-slate-950/60 px-2.5 py-2 align-top text-[11px] leading-5 text-slate-300">{row.context}</td>
-                {matrix.columns.map((column) => {
-                  const cell = row.cells[column.key];
-                  return (
-                    <td key={`${row.key}-${column.key}`} className="rounded-md border border-slate-700/55 bg-slate-950/60 px-2.5 py-2 align-top">
-                      <details className="group">
-                        <summary className="cursor-pointer list-none text-[11px] font-medium leading-5 text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
-                          {compactActionCue(cell.text)}
-                        </summary>
-                        <p className="mt-1 text-[11px] leading-5 text-slate-300">{cell.detail}</p>
-                      </details>
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="mt-2 hidden md:block">
+        <div className="grid grid-cols-[minmax(0,11rem)_repeat(3,minmax(0,1fr))] gap-2" aria-label="Bounded decision matrix">
+          <div className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-300">
+            Decision area
+          </div>
+          {matrix.columns.map((column) => (
+            <div key={`desktop-column-${column.key}`} className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-left text-slate-200">
+              <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] uppercase tracking-[0.08em] ${decisionLaneTone[column.key].badgeClassName}`}>
+                {decisionLaneTone[column.key].label}
+              </span>
+            </div>
+          ))}
+          {matrix.rows.map((row) => (
+            <Fragment key={`desktop-row-${row.key}`}>
+              <div className="rounded-md border border-slate-700/70 bg-slate-950/75 px-3 py-2.5">
+                <p className="text-sm font-semibold text-slate-100">{row.label}</p>
+                <p className="mt-1 text-[11px] leading-5 text-slate-300">{row.context}</p>
+              </div>
+              {matrix.columns.map((column) => {
+                const cell = row.cells[column.key];
+                return (
+                  <div key={`${row.key}-${column.key}`} className="rounded-md border border-slate-700/55 bg-slate-950/60 px-3 py-2.5 align-top">
+                    <details className="group">
+                      <summary className="cursor-pointer list-none text-[11px] font-medium leading-5 text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+                        {compactActionCue(cell.text)}
+                      </summary>
+                      <p className="mt-1 text-[11px] leading-5 text-slate-300">{cell.detail}</p>
+                    </details>
+                  </div>
+                );
+              })}
+            </Fragment>
+          ))}
+        </div>
       </div>
-      <div className="mt-2 space-y-2 sm:hidden">
+      <div className="mt-2 space-y-2 md:hidden">
         {matrix.rows.map((row) => (
           <article key={`mobile-${row.key}`} className="rounded-md border border-slate-700/55 bg-slate-950/60 p-2.5">
             <p className="text-xs font-semibold text-slate-100">{row.label}</p>

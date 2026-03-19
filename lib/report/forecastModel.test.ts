@@ -2,7 +2,9 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
 import { evaluateRegime } from "../regimeEngine";
+import rawArchive from "../../data/summary_archive.json";
 import type { MacroSeriesReading, TreasuryData } from "../types";
+import { getTimeMachineRegimeSeries } from "../timeMachine/timeMachineCache";
 import { buildReportDynamics } from "./reportData";
 import {
   buildFallbackForecastModel,
@@ -10,6 +12,7 @@ import {
   buildTransitionVelocityEstimateFromDurations,
   classifyBoundaryMomentum,
   classifyCrossingRisk,
+  toMonthlyRegimePoints,
 } from "./forecastModel";
 
 const buildTreasury = ({
@@ -377,6 +380,44 @@ describe("buildFallbackForecastModel", () => {
   });
 });
 
+
+describe("monthly regime history derivation", () => {
+  it("preserves the canonical full-archive monthly points after moving to the smaller history artifact", () => {
+    const regimeLabels = {
+      EXPANSION: "Expansion",
+      VOLATILE: "Mixed",
+      SCARCITY: "Scarcity",
+      DEFENSIVE: "Defensive",
+    } as const;
+
+    const parseDate = (value: string) => new Date(value).getTime();
+
+    const archivePoints = rawArchive
+      .filter((entry) => entry.cadence === "monthly")
+      .map((entry) => ({
+        timestamp: parseDate(entry.record_date),
+        regime: regimeLabels[entry.summary.regime as keyof typeof regimeLabels],
+      }));
+
+    const timeMachinePoints = getTimeMachineRegimeSeries(240).map((entry) => ({
+      timestamp: parseDate(entry.recordDate),
+      regime: regimeLabels[entry.regime as keyof typeof regimeLabels],
+    }));
+
+    const byMonth = new Map<string, { timestamp: number; regime: (typeof archivePoints)[number]["regime"] }>();
+    [...archivePoints, ...timeMachinePoints].forEach((point) => {
+      const monthKey = new Date(point.timestamp).toISOString().slice(0, 7);
+      const existing = byMonth.get(monthKey);
+      if (!existing || point.timestamp > existing.timestamp) {
+        byMonth.set(monthKey, point);
+      }
+    });
+
+    const expected = Array.from(byMonth.values()).sort((left, right) => left.timestamp - right.timestamp);
+
+    assert.deepEqual(toMonthlyRegimePoints(), expected);
+  });
+});
 
 describe("transition velocity estimates", () => {
   it("bins durations into a typical month range", () => {
