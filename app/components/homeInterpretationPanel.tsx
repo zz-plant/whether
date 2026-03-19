@@ -2,6 +2,8 @@ import type { Route } from "../../lib/navigation/routeType";
 import Link from "next/link";
 import type { InterpretationLayer, InterpretationView } from "../../lib/report/interpretationLayer";
 import { interpretationViews } from "../../lib/report/interpretationLayer";
+import { BoltIcon, CircleTargetIcon, TrendUpIcon } from "./uiIcons";
+import type { ReactNode } from "react";
 
 const interpretationLabels: Record<InterpretationView, string> = {
   default: "Default",
@@ -36,6 +38,28 @@ const buildViewHref = (
   return query.length > 0 ? `/?${query}` : "/";
 };
 
+const CueCard = ({
+  label,
+  icon,
+  toneClass,
+  body,
+}: {
+  label: string;
+  icon: ReactNode;
+  toneClass: string;
+  body: string;
+}) => (
+  <article className={`weather-surface rounded-lg border px-3 py-3 text-sm text-slate-200 ${toneClass}`}>
+    <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.1em]">
+      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-current/20 bg-slate-950/55">
+        {icon}
+      </span>
+      <span>{label}</span>
+    </p>
+    <p className="mt-2">{body}</p>
+  </article>
+);
+
 export const HomeInterpretationPanel = ({
   layer,
   searchParams,
@@ -49,11 +73,17 @@ export const HomeInterpretationPanel = ({
 
   return (
     <section id="interpretation-layer" className="weather-panel space-y-4 px-5 py-5" aria-label="Interpretation layer">
-      <div className="space-y-1">
-        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Interpretation layer</p>
-        <h2 className="text-base font-semibold text-slate-100">{layer.label}</h2>
-        <p className="text-xs text-slate-300">{layer.summary}</p>
-        <p className="text-xs text-slate-400">Canonical decision lives above: action, guardrail, and flip condition.</p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="space-y-1">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Interpretation layer</p>
+          <h2 className="text-base font-semibold text-slate-100">{layer.label}</h2>
+          <p className="text-xs text-slate-300">{layer.summary}</p>
+          <p className="text-xs text-slate-400">Canonical decision lives above: action, guardrail, and flip condition.</p>
+        </div>
+        <div className="inline-flex items-center gap-2 rounded-full border border-slate-700/80 bg-slate-950/70 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+          <TrendUpIcon className="h-3.5 w-3.5 text-sky-200" />
+          <span>Role-specific read</span>
+        </div>
       </div>
 
       <nav className="grid gap-2 sm:grid-cols-5" aria-label="Interpretation view">
@@ -74,32 +104,47 @@ export const HomeInterpretationPanel = ({
       </nav>
 
       <div className="grid gap-2 md:grid-cols-3" aria-label="Interpretation cues">
-        <article className="weather-surface rounded-lg border border-violet-500/45 bg-violet-500/10 px-3 py-3 text-sm text-slate-200">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-violet-100">Action</p>
-          <p className="mt-1">{actionCue ?? "Review the current decision call above."}</p>
-        </article>
-        <article className="weather-surface rounded-lg border border-amber-500/45 bg-amber-500/10 px-3 py-3 text-sm text-slate-200">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-amber-100">Trigger</p>
-          <p className="mt-1">{triggerCue ?? "Watch threshold pressure before expanding commitments."}</p>
-        </article>
-        <article className="weather-surface rounded-lg border border-sky-500/45 bg-sky-500/10 px-3 py-3 text-sm text-slate-200">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-sky-100">Reverse</p>
-          <p className="mt-1">{reverseCue ?? "Re-open pace once the flip condition is met."}</p>
-        </article>
+        <CueCard
+          label="Action"
+          icon={<BoltIcon className="h-3.5 w-3.5" />}
+          toneClass="border-violet-500/45 bg-violet-500/10 text-violet-100"
+          body={actionCue ?? "Review the current decision call above."}
+        />
+        <CueCard
+          label="Trigger"
+          icon={<TrendUpIcon className="h-3.5 w-3.5" />}
+          toneClass="border-amber-500/45 bg-amber-500/10 text-amber-100"
+          body={triggerCue ?? "Watch threshold pressure before expanding commitments."}
+        />
+        <CueCard
+          label="Reverse"
+          icon={<CircleTargetIcon className="h-3.5 w-3.5" />}
+          toneClass="border-sky-500/45 bg-sky-500/10 text-sky-100"
+          body={reverseCue ?? "Re-open pace once the flip condition is met."}
+        />
       </div>
 
       {layer.financialAction ? (
         <div className="grid gap-3 md:grid-cols-3" aria-label="Financial action summary">
           <article className="weather-surface px-4 py-3 text-sm text-slate-200">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Runway risk</p>
+            <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
+              <TrendUpIcon className="h-3.5 w-3.5 text-sky-200" />
+              <span>Runway risk</span>
+            </p>
             <p className="mt-2">{layer.financialAction.runwayRisk}</p>
           </article>
           <article className="weather-surface px-4 py-3 text-sm text-slate-200">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Raise timing</p>
+            <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
+              <CircleTargetIcon className="h-3.5 w-3.5 text-amber-200" />
+              <span>Raise timing</span>
+            </p>
             <p className="mt-2">{layer.financialAction.raiseTiming}</p>
           </article>
           <article className="weather-surface px-4 py-3 text-sm text-slate-200">
-            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Burn adjustment</p>
+            <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
+              <BoltIcon className="h-3.5 w-3.5 text-violet-200" />
+              <span>Burn adjustment</span>
+            </p>
             <p className="mt-2">{layer.financialAction.burnAdjustment}</p>
           </article>
         </div>
@@ -107,7 +152,10 @@ export const HomeInterpretationPanel = ({
       <ul className="grid gap-2" aria-label={`${layer.label} details`}>
         {layer.bullets.slice(0, 3).map((bullet) => (
           <li key={bullet} className="weather-surface px-4 py-3 text-xs text-slate-200">
-            <p className="leading-snug">• {bullet}</p>
+            <p className="inline-flex items-start gap-2 leading-snug">
+              <TrendUpIcon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-sky-200" />
+              <span>{bullet}</span>
+            </p>
           </li>
         ))}
       </ul>
