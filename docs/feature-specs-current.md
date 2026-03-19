@@ -21,6 +21,7 @@ Supporting surfaces are intentionally subordinate:
 - `/guides`, `/resources`, `/answers`, `/solutions/*`, `/concepts`, and `/startup-macro-posture*` remain secondary discovery or distribution surfaces rather than primary workflow hubs
 
 Primary workflow pages now expose a top-of-page scroll path that explains the down-page sequence and highlights the current checkpoint as the operator moves through long surfaces.
+Report-shell routes (`/`, `/signals`, `/operations` and nested report paths) also use a reduced global header mode: brand/home anchor, global search entry, and compact route-orientation cues stay available without restoring the full navigation chrome above the brief.
 
 ### 1.1 Weekly briefing (/) 
 The home report is a weekly briefing view delivered through the shared `ReportShell` layout. It
