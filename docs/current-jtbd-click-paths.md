@@ -36,6 +36,7 @@ Validation note: click labels in this document were verified from the current ro
    - `Copy board summary`
    - `Copy citation`
    - `Export / print PDF`
+5. Only if the company needs a temporary exception, open `Advanced override controls` and add the governance note before copying again.
 
 **Current output**
 - Slack-ready weekly call snapshot
