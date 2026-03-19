@@ -28,7 +28,7 @@ export default async function SearchPage({
     <HubPageShell>
       <HubHero
         eyebrow="Global search"
-        title="Find the right page before the meeting thread goes cold."
+        title="Find the decision surface you need for this week."
         description="Search across primary workflow hubs, supporting toolkits, failure modes, concepts, and key Signals/Method docs."
         aside={(
           <div className="weather-hub-card space-y-3 px-5 py-5">
@@ -77,7 +77,7 @@ export default async function SearchPage({
               <HubSection
                 key={type}
                 title={searchEntityTypeLabels[type as keyof typeof groupedResults]}
-                description="Each result is meant to get you back to a single decision surface quickly."
+                description="Each result points to one decision surface, trust reference, or tool you can act on quickly."
               >
                 <ul className="grid gap-3">
                   {entries.map((entry) => (

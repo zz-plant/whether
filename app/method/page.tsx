@@ -100,7 +100,7 @@ export default async function MethodPage() {
         items={methodScrollPlan.items}
       />
 
-      <HubSection id="trust-hub-links" title="Trust hub links" description="Open the exact trust surface you need instead of hunting through long documentation." className="scroll-mt-28">
+      <HubSection id="trust-hub-links" title="Trust hub links" description="Open the exact trust surface you need in one step." className="scroll-mt-28">
         <div className="grid gap-3 sm:grid-cols-2">
         <Link href="/sources" className="weather-hub-link-card space-y-2">
           <h2 className="text-lg font-semibold text-slate-100">Sources and freshness</h2>

@@ -47,7 +47,7 @@ export default async function ToolkitsPage({
       <HubHero
         eyebrow="Supporting surface under Decide"
         title="Run one instrument end to end once the weekly call is already clear."
-        description="Start in Decide when you need role or situation framing, then use this library to execute the tool itself."
+        description="Start in Decide when you need role or situation framing, then use Toolkits to run one instrument end to end."
         actions={<Link href="/decide" className="weather-button inline-flex items-center justify-center">Open Decide</Link>}
         stats={[
           { label: "Results", value: `${filteredToolkits.length} toolkit${filteredToolkits.length === 1 ? "" : "s"}` },
@@ -90,7 +90,7 @@ export default async function ToolkitsPage({
           </div>
       </HubSection>
 
-      <HubSection title="Toolkit library" description="Start with the decision this session, not the framework label.">
+      <HubSection title="Runnable toolkits" description="Start with the decision this session, not the framework label.">
       <div className="grid gap-3 sm:grid-cols-2">
         {filteredToolkits.map((toolkit) => (
           <Link key={toolkit.slug} href={`/toolkits/${toolkit.slug}`} className="weather-hub-link-card space-y-2">
