@@ -1,5 +1,10 @@
 import { buildWeeklyLockCommitment } from "../decisionKnobs";
-import type { BoundedDecisionRule } from "../boundedDecisionRules";
+import {
+  formatBoundedDecisionAction,
+  formatBoundedDecisionReverse,
+  formatBoundedDecisionThreshold,
+  type BoundedDecisionRule,
+} from "../boundedDecisionRules";
 import type { DecisionMatrixPayload, DecisionMatrixRow, DecisionMatrixRowKey, Regime } from "../homeBriefModel";
 
 const compactMatrixText = (value: string, fallback: string) => {
@@ -71,16 +76,25 @@ export const buildDecisionMatrixPayload = ({
       label,
       cells: {
         approve: {
-          text: compactMatrixText(rule?.doNow[0] ?? "", fallbackApprove),
+          text: compactMatrixText(rule ? formatBoundedDecisionAction(rule) : "", fallbackApprove),
           detail: rule?.rationale ?? "Use current posture until signal quality improves.",
+          action: rule ? formatBoundedDecisionAction(rule) : fallbackApprove,
+          threshold: rule ? formatBoundedDecisionThreshold(rule) : "Pause if thresholds weaken",
+          reversal: rule ? formatBoundedDecisionReverse(rule) : "Reverse only after threshold recovery",
         },
         delay: {
           text: compactMatrixText(rule?.avoidNow[0] ?? "", fallbackDelay),
           detail: rule?.pauseTrigger ?? "Pause if macro confidence degrades or thresholds weaken.",
+          action: compactMatrixText(rule?.avoidNow[0] ?? "", fallbackDelay),
+          threshold: rule ? formatBoundedDecisionThreshold(rule) : "Pause if thresholds weaken",
+          reversal: rule ? formatBoundedDecisionReverse(rule) : "Reverse only after threshold recovery",
         },
         flip: {
           text: compactMatrixText(flipSummary, "Flip only after threshold recovery"),
           detail: flipDetail || "Resume only with sustained threshold recovery.",
+          action: rule ? formatBoundedDecisionAction(rule) : fallbackApprove,
+          threshold: rule ? formatBoundedDecisionThreshold(rule) : fallbackFlipCondition,
+          reversal: compactMatrixText(flipSummary, "Flip only after threshold recovery"),
         },
       },
     };

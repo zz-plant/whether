@@ -1,4 +1,10 @@
-import type { BoundedDecisionRule, DecisionArea } from "./boundedDecisionRules";
+import {
+  formatActionStripReversalText,
+  formatActionStripThresholdText,
+  formatBoundedDecisionAction,
+  type BoundedDecisionRule,
+  type DecisionArea,
+} from "./boundedDecisionRules";
 import { operatingLeverLabel, operatingLeverOrder, type OperatingLeverKey } from "./decisionKnobs";
 import { operatingLeverToDecisionArea } from "./operatingLeverMap";
 
@@ -21,12 +27,6 @@ export type RoleAwareOperatingTemplate = {
 const findRule = (rules: BoundedDecisionRule[], area: DecisionArea) =>
   rules.find((rule) => rule.area === area);
 
-const sanitizeGuardrail = (pauseTrigger: string) =>
-  pauseTrigger.replace(/^Pause\s+/i, "").replace(/\.$/, "");
-
-const sanitizeFlip = (resumeTrigger: string) =>
-  resumeTrigger.replace(/^Resume\s+/i, "").replace(/\.$/, "");
-
 const isString = (value: string | undefined): value is string => typeof value === "string";
 
 const OPERATING_LEVER_FALLBACK = {
@@ -43,9 +43,9 @@ export const buildActionStripItems = (rules: BoundedDecisionRule[]): ActionStrip
     return {
       lever,
       label: operatingLeverLabel[lever],
-      actionNow: rule?.recommendation ?? OPERATING_LEVER_FALLBACK.actionNow,
-      triggerThreshold: rule?.pauseTrigger ?? OPERATING_LEVER_FALLBACK.triggerThreshold,
-      reversalCondition: rule?.resumeTrigger ?? OPERATING_LEVER_FALLBACK.reversalCondition,
+      actionNow: rule ? formatBoundedDecisionAction(rule) : OPERATING_LEVER_FALLBACK.actionNow,
+      triggerThreshold: rule ? formatActionStripThresholdText(rule) : OPERATING_LEVER_FALLBACK.triggerThreshold,
+      reversalCondition: rule ? formatActionStripReversalText(rule) : OPERATING_LEVER_FALLBACK.reversalCondition,
     };
   });
 
@@ -63,11 +63,14 @@ export const buildRoleAwareOperatingTemplates = (rules: BoundedDecisionRule[]): 
       doNow: [hiringRule?.recommendation, productRule?.recommendation, burnRule?.recommendation]
         .filter(isString)
         .join(" "),
-      avoidNow: [hiringRule?.pauseTrigger, productRule?.pauseTrigger]
+      avoidNow: [hiringRule && formatActionStripThresholdText(hiringRule), productRule && formatActionStripThresholdText(productRule)]
         .filter(isString)
-        .map(sanitizeGuardrail)
         .join(" "),
-      flipTrigger: sanitizeFlip(expansionRule?.resumeTrigger ?? hiringRule?.resumeTrigger ?? ""),
+      flipTrigger: expansionRule
+        ? formatActionStripReversalText(expansionRule)
+        : hiringRule
+          ? formatActionStripReversalText(hiringRule)
+          : "",
     },
     {
       role: "vc-partner",
@@ -75,11 +78,14 @@ export const buildRoleAwareOperatingTemplates = (rules: BoundedDecisionRule[]): 
       doNow: [capitalRule?.recommendation, burnRule?.recommendation]
         .filter(isString)
         .join(" "),
-      avoidNow: [capitalRule?.pauseTrigger, expansionRule?.pauseTrigger]
+      avoidNow: [capitalRule && formatActionStripThresholdText(capitalRule), expansionRule && formatActionStripThresholdText(expansionRule)]
         .filter(isString)
-        .map(sanitizeGuardrail)
         .join(" "),
-      flipTrigger: sanitizeFlip(capitalRule?.resumeTrigger ?? expansionRule?.resumeTrigger ?? ""),
+      flipTrigger: capitalRule
+        ? formatActionStripReversalText(capitalRule)
+        : expansionRule
+          ? formatActionStripReversalText(expansionRule)
+          : "",
     },
   ];
 };

@@ -66,27 +66,26 @@ describe("WeeklyDecisionCard top-fold composition", () => {
 
     assert.match(html, /weekly-posture-brief-title/);
     assert.match(html, /Weekly call snapshot/);
-    assert.match(html, /What environment\?/);
-    assert.match(html, /Can I rely on this\?/);
+    assert.match(html, /Current outlook/);
+    assert.match(html, /Action now/);
     assert.match(html, /This week&#x27;s call/);
     assert.match(html, /How inputs move this call/);
-    assert.match(html, /DO NOW/);
-    assert.match(html, /GUARDRAIL/);
-    assert.match(html, /FLIP WHEN/);
-    assert.match(html, /What environment\?/);
+    assert.match(html, /Action now/);
+    assert.match(html, /Threshold/);
+    assert.match(html, /Flip condition/);
+    assert.match(html, /Current outlook/);
     assert.match(html, /Playbook for Defensive/);
     assert.match(html, /Efficiency first\./);
-    assert.match(html, /Refine by company stage/);
+    assert.match(html, /Supporting rationale/);
     assert.doesNotMatch(html, /Company mode:/);
     assert.doesNotMatch(html, /Seed/);
     assert.doesNotMatch(html, /Series B/);
     assert.doesNotMatch(html, /Bootstrapped/);
-    assert.match(html, /Regime history/);
-    assert.match(html, /id="primary-artifact-actions"/);
+    assert.match(html, /Artifact handoff/);
 
     const heroIndex = html.indexOf("weekly-posture-brief-title");
     const deltaIndex = html.indexOf("Weekly call snapshot");
-    const postureIndex = html.indexOf("What environment?");
+    const postureIndex = html.indexOf("Current outlook");
     const influenceIndex = html.indexOf("How inputs move this call");
     const guidanceIndex = html.indexOf("This week&#x27;s call");
     const diagnosticsIndex = html.indexOf("Need deeper analysis?");
@@ -95,7 +94,8 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.ok(guidanceIndex > deltaIndex);
     assert.ok(influenceIndex > guidanceIndex);
     assert.ok(diagnosticsIndex > influenceIndex);
-    assert.ok(postureIndex > guidanceIndex);
+    assert.ok(postureIndex >= heroIndex);
+    assert.ok(postureIndex < deltaIndex);
   });
 
   it("shows fallback warning copy when snapshot mode is active", () => {
@@ -139,11 +139,10 @@ describe("WeeklyDecisionCard top-fold composition", () => {
       },
     });
 
-    assert.match(html, /Using a cached snapshot\./);
-    assert.match(html, /Regime history/);
+    assert.match(html, /Cached weekly read\./);
     assert.match(html, /Weekly call snapshot/);
-    assert.match(html, /Can I rely on this\?/);
-    assert.match(html, /Using a cached snapshot\./);
+    assert.match(html, /LIVE|FALLBACK SNAPSHOT/);
+    assert.match(html, /Cached weekly read\./);
   });
 
   it("keeps a single canonical weekly call region and compact shell spacing", () => {
@@ -185,7 +184,7 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /weather-panel space-y-4 px-4 py-4/);
   });
 
-  it("dedupes and caps DO NOW/AVOID bullets while keeping WATCH concise", () => {
+  it("keeps the bounded call compact with action, threshold, and flip visible", () => {
     const html = renderCard({
       decision: {
         operatingStanceLine: "Stage decisions.",
@@ -228,14 +227,16 @@ describe("WeeklyDecisionCard top-fold composition", () => {
       },
     });
 
-    const callCore = html.slice(html.indexOf('id="weekly-call-core"'), html.indexOf('id="decision-snapshot-for-leadership-this-week"'));
+    const callCore = html.slice(
+      html.indexOf('id="weekly-call-core"'),
+      html.indexOf("Supporting rationale") > -1 ? html.indexOf("Supporting rationale") : html.indexOf("Open Signals"),
+    );
 
-    assert.match(callCore, /DO NOW/);
-    assert.match(callCore, /GUARDRAIL/);
-    assert.match(callCore, /FLIP WHEN/);
-    assert.match(callCore, /Refine by company stage/);
-    assert.match(callCore, /Stage selected:/);
-    assert.ok((callCore.match(/<li/g) ?? []).length <= 12);
-    assert.match(callCore, /Tightness rises above 70\.0/);
+    assert.match(callCore, /Action now/);
+    assert.match(callCore, /Threshold/);
+    assert.match(callCore, /Flip condition/);
+    assert.ok((callCore.match(/<li/g) ?? []).length <= 4);
+    assert.match(callCore, /What changed/);
+    assert.match(callCore, /What to revisit/);
   });
 });

@@ -56,6 +56,31 @@ const areaLabels: Record<DecisionArea, string> = {
 
 export const decisionAreaLabel = (area: DecisionArea) => areaLabels[area];
 
+const compactSentence = (value: string, fallback: string) => {
+  const normalized = value.trim();
+  if (!normalized) {
+    return fallback;
+  }
+
+  const [firstClause] = normalized.split(/[.;]/);
+  return (firstClause?.trim() || fallback).replace(/\.$/, "");
+};
+
+export const formatBoundedDecisionAction = (rule: Pick<BoundedDecisionRule, "doNow" | "recommendation">) =>
+  compactSentence(rule.doNow[0] ?? rule.recommendation, "Keep current approvals staged");
+
+export const formatBoundedDecisionThreshold = (rule: Pick<BoundedDecisionRule, "pauseTrigger">) =>
+  compactSentence(rule.pauseTrigger.replace(/^Pause\s+/i, ""), "Pause if thresholds weaken");
+
+export const formatBoundedDecisionReverse = (rule: Pick<BoundedDecisionRule, "resumeTrigger">) =>
+  compactSentence(rule.resumeTrigger.replace(/^Resume\s+/i, ""), "Reverse only after threshold recovery");
+
+export const formatBoundedDecisionTriplet = (rule: Pick<BoundedDecisionRule, "doNow" | "recommendation" | "pauseTrigger" | "resumeTrigger">) => ({
+  action: formatBoundedDecisionAction(rule),
+  threshold: formatBoundedDecisionThreshold(rule),
+  reverse: formatBoundedDecisionReverse(rule),
+});
+
 const fmt = (value: number) => {
   if (Math.abs(value) < 10 || !Number.isInteger(value)) {
     return value.toFixed(1);
@@ -169,9 +194,11 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
   return areaOrder.map((area) => rulesByArea[area]);
 };
 
-export const formatActionStripThresholdText = (rule: Pick<BoundedDecisionRule, "pauseTrigger">) => rule.pauseTrigger;
+export const formatActionStripThresholdText = (rule: Pick<BoundedDecisionRule, "pauseTrigger">) =>
+  formatBoundedDecisionThreshold(rule);
 
-export const formatActionStripReversalText = (rule: Pick<BoundedDecisionRule, "resumeTrigger">) => rule.resumeTrigger;
+export const formatActionStripReversalText = (rule: Pick<BoundedDecisionRule, "resumeTrigger">) =>
+  formatBoundedDecisionReverse(rule);
 
 export const startupVariantModes: Array<{ mode: StartupVariantMode; label: string }> = [
   { mode: "seed", label: "Seed" },

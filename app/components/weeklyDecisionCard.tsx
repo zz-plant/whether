@@ -1,7 +1,7 @@
 import { Fragment, type ReactNode } from "react";
 import type { ConfidenceTrendFraming, WeeklyConfidencePoint } from "../../lib/report/reportData";
 import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
-import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
+import { decisionAreaLabel, formatBoundedDecisionTriplet } from "../../lib/report/boundedDecisionRules";
 import type { RoleAwareOperatingTemplate } from "../../lib/report/operatingCalls";
 import { WeeklyCallModePanel } from "./weeklyCallModePanel";
 import { DecisionHeroSection } from "./weekly-card/DecisionHeroSection";
@@ -273,7 +273,7 @@ const ConfidenceBandMeter = ({
           />
         ))}
       </div>
-      <p className="mt-2 text-[11px] leading-5 text-slate-300">Use the band for scan speed. Exact percent stays secondary.</p>
+      <p className="mt-2 text-[11px] leading-5 text-slate-300">Band first, percent second.</p>
     </div>
   );
 };
@@ -397,9 +397,7 @@ function RegimeLegend({
                 </span>
               </div>
               <p className="text-sm font-semibold text-slate-50">{operatingLine}</p>
-              <p className="text-xs leading-5 text-slate-200/90">
-                {activeWeatherRationale} {activeDescriptor}
-              </p>
+              <p className="text-[11px] leading-5 text-slate-300">{activeWeatherRationale}</p>
             </div>
             <div className="rounded-xl border border-slate-700/65 bg-slate-950/45 px-3 py-3">
               <p className="text-[10px] font-semibold uppercase tracking-[0.13em] text-slate-300">Flip window</p>
@@ -450,15 +448,20 @@ function RegimeLegend({
                 {activePlaybook.mandate}
               </span>
             </div>
-            <p className="mt-2 text-xs leading-5 text-slate-200">{activePlaybook.insight}</p>
             <p className="mt-2 text-[11px] leading-5 text-slate-300">
               <span className="font-semibold text-slate-100">Do now:</span> {activePlaybook.start[0] ?? "Hold the current operating plan."}
               <span className="px-1.5" aria-hidden="true">·</span>
               <span className="font-semibold text-slate-100">Stop:</span> {activePlaybook.stop[0] ?? "No stop guidance loaded."}
             </p>
+            <details className="mt-2 rounded-md border border-slate-700/65 bg-slate-950/45 px-3 py-2.5">
+              <summary className="min-h-[44px] cursor-pointer list-none pt-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+                Why this regime
+              </summary>
+              <p className="mt-1 text-xs leading-5 text-slate-200">{activePlaybook.insight} {activeDescriptor}</p>
+            </details>
           </div>
         ) : null}
-        <p className={`flex flex-wrap items-center gap-1.5 text-xs ${tone.weatherHint}`}>
+        <p className={`flex flex-wrap items-center gap-1.5 text-[11px] ${tone.weatherHint}`}>
           <RegimeWeatherGlyph icon={activeWeatherIcon} title={activeWeather} />
           <span>
             <span className="font-semibold text-slate-100">Why it fits:</span> {activeWeatherRationale}
@@ -499,11 +502,16 @@ function RegimeBanner({
   const activeWeatherIcon = getRegimeWeatherIcon(regimeKey);
   const flipRiskState = resolveFlipRiskMeterState(regimeDistance);
   const exactConfidenceLabel = `${Math.round(confidencePercent)}%`;
+  const topFoldMetricChips = [
+    `Action ${actionNowShort?.trim() || "Hold bounded operating rules."}`,
+    `Confidence ${confidenceLabel} ${exactConfidenceLabel}`,
+    `Flip ${flipRiskState.triggerLabel}`,
+  ];
 
   return (
     <header className={`z-10 rounded-2xl border px-4 py-4 shadow-[0_20px_44px_rgba(2,6,23,0.42)] backdrop-blur sm:px-5 sm:py-5 ${bannerTone.shell}`} data-testid="weekly-regime-banner" aria-label="Weekly regime banner">
       <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
-        <div className="min-w-0 space-y-2.5">
+        <div className="min-w-0 space-y-2">
           <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-100/85">
             <span>Current outlook</span>
             <span className="rounded-full border border-white/10 bg-slate-950/35 px-2.5 py-1">
@@ -517,8 +525,15 @@ function RegimeBanner({
             <div className="min-w-0">
               <p className="text-xl font-semibold leading-tight sm:text-[1.85rem]">{resolvedPostureLabel}</p>
               <p className="mt-0.5 text-sm font-semibold text-slate-100/90">{resolvedStageLabel} cycle</p>
-              <p className="mt-1.5 max-w-3xl text-sm leading-6 text-slate-50/90">{operatingLine}</p>
+              <p className="mt-1.5 max-w-3xl text-sm font-semibold leading-6 text-slate-50/95">{operatingLine}</p>
             </div>
+          </div>
+          <div className={`flex flex-wrap gap-1.5 text-xs font-semibold ${bannerTone.metrics}`} aria-label="Top fold decision chips">
+            {topFoldMetricChips.map((metric) => (
+              <span key={metric} className="inline-flex min-h-8 items-center rounded-full border border-white/10 bg-slate-950/25 px-2.5 py-1 leading-4">
+                {metric}
+              </span>
+            ))}
           </div>
         </div>
         <div className="grid gap-2 border-t border-white/10 pt-2 sm:grid-cols-3 xl:min-w-[22rem] xl:border-t-0 xl:pt-0 xl:pl-4 xl:[&>div:not(:first-child)]:border-l xl:[&>div:not(:first-child)]:border-white/10">
@@ -530,7 +545,7 @@ function RegimeBanner({
             </p>
             <p className="mt-2 flex items-center gap-1.5 text-[11px] text-slate-300" aria-label={`Trend ${trendValue}`}>
               <TrendGlyph trendLabel={trendValue} />
-              <span>Directional pressure</span>
+              <span>Trend {trendValue}</span>
             </p>
           </div>
           <div className="px-1 py-1 xl:px-3">
@@ -637,6 +652,35 @@ const decisionLaneTone: Record<"approve" | "delay" | "flip", {
   },
 };
 
+const matrixLineTone: Record<"action" | "threshold" | "reverse", string> = {
+  action: "text-emerald-100",
+  threshold: "text-amber-100",
+  reverse: "text-sky-100",
+};
+
+const MatrixRuleSummary = ({
+  action,
+  threshold,
+  reversal,
+}: {
+  action: string;
+  threshold: string;
+  reversal: string;
+}) => (
+  <div className="space-y-1.5 text-[11px] leading-5">
+    {[
+      { label: "Act", value: action, tone: matrixLineTone.action },
+      { label: "Trip", value: threshold, tone: matrixLineTone.threshold },
+      { label: "Flip", value: reversal, tone: matrixLineTone.reverse },
+    ].map((item) => (
+      <p key={item.label} className="text-slate-200">
+        <span className={`mr-1 font-semibold uppercase tracking-[0.08em] ${item.tone}`}>{item.label}</span>
+        <span>{item.value}</span>
+      </p>
+    ))}
+  </div>
+);
+
 export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [] }: BoundedRulesMatrixProps) {
   const matrixAreaByKey: Record<"hiring" | "product" | "capital" | "burn", BoundedDecisionRule["area"]> = {
     hiring: "hiring",
@@ -658,9 +702,27 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [] }: Bound
         key,
         label: rule ? decisionAreaLabel(rule.area) : key.charAt(0).toUpperCase() + key.slice(1),
         cells: {
-          approve: { text: rule?.doNow[0] ?? "Stage approvals", detail: rule?.rationale ?? "Keep approvals tied to near-term proof." },
-          delay: { text: rule?.avoidNow[0] ?? "Delay irreversible commitments", detail: rule?.pauseTrigger ?? "Pause when thresholds weaken." },
-          flip: { text: rule?.resumeTrigger ?? "Flip after threshold recovery", detail: rule?.resumeTrigger ?? "Resume only after threshold recovery holds." },
+          approve: {
+            text: rule?.doNow[0] ?? "Stage approvals",
+            detail: rule?.rationale ?? "Keep approvals tied to near-term proof.",
+            action: rule ? formatBoundedDecisionTriplet(rule).action : "Stage approvals",
+            threshold: rule ? formatBoundedDecisionTriplet(rule).threshold : "Pause if thresholds weaken",
+            reversal: rule ? formatBoundedDecisionTriplet(rule).reverse : "Reverse only after threshold recovery",
+          },
+          delay: {
+            text: rule?.avoidNow[0] ?? "Delay irreversible commitments",
+            detail: rule?.pauseTrigger ?? "Pause when thresholds weaken.",
+            action: rule?.avoidNow[0] ?? "Delay irreversible commitments",
+            threshold: rule ? formatBoundedDecisionTriplet(rule).threshold : "Pause if thresholds weaken",
+            reversal: rule ? formatBoundedDecisionTriplet(rule).reverse : "Reverse only after threshold recovery",
+          },
+          flip: {
+            text: rule?.resumeTrigger ?? "Flip after threshold recovery",
+            detail: rule?.resumeTrigger ?? "Resume only after threshold recovery holds.",
+            action: rule ? formatBoundedDecisionTriplet(rule).action : "Stage approvals",
+            threshold: rule ? formatBoundedDecisionTriplet(rule).threshold : "Pause if thresholds weaken",
+            reversal: rule ? formatBoundedDecisionTriplet(rule).reverse : "Reverse only after threshold recovery",
+          },
         },
         context: rule?.scope ?? "Apply this rule to related weekly operating decisions.",
       };
@@ -680,14 +742,23 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [] }: Bound
             approve: {
               text: matrixRow?.cells.approve.text ?? rule?.doNow[0] ?? "Stage approvals",
               detail: matrixRow?.cells.approve.detail ?? rule?.rationale ?? "Keep approvals tied to near-term proof.",
+              action: matrixRow?.cells.approve.action ?? (rule ? formatBoundedDecisionTriplet(rule).action : "Stage approvals"),
+              threshold: matrixRow?.cells.approve.threshold ?? (rule ? formatBoundedDecisionTriplet(rule).threshold : "Pause if thresholds weaken"),
+              reversal: matrixRow?.cells.approve.reversal ?? (rule ? formatBoundedDecisionTriplet(rule).reverse : "Reverse only after threshold recovery"),
             },
             delay: {
               text: matrixRow?.cells.delay.text ?? rule?.avoidNow[0] ?? "Delay irreversible commitments",
               detail: matrixRow?.cells.delay.detail ?? rule?.pauseTrigger ?? "Pause when thresholds weaken.",
+              action: matrixRow?.cells.delay.action ?? rule?.avoidNow[0] ?? "Delay irreversible commitments",
+              threshold: matrixRow?.cells.delay.threshold ?? (rule ? formatBoundedDecisionTriplet(rule).threshold : "Pause if thresholds weaken"),
+              reversal: matrixRow?.cells.delay.reversal ?? (rule ? formatBoundedDecisionTriplet(rule).reverse : "Reverse only after threshold recovery"),
             },
             flip: {
               text: matrixRow?.cells.flip.text ?? rule?.resumeTrigger ?? "Flip after threshold recovery",
               detail: matrixRow?.cells.flip.detail ?? rule?.resumeTrigger ?? "Resume only after threshold recovery holds.",
+              action: matrixRow?.cells.flip.action ?? (rule ? formatBoundedDecisionTriplet(rule).action : "Stage approvals"),
+              threshold: matrixRow?.cells.flip.threshold ?? (rule ? formatBoundedDecisionTriplet(rule).threshold : "Pause if thresholds weaken"),
+              reversal: matrixRow?.cells.flip.reversal ?? (rule ? formatBoundedDecisionTriplet(rule).reverse : "Reverse only after threshold recovery"),
             },
           },
           context: rule?.scope ?? "Apply this rule to related weekly operating decisions.",
@@ -708,7 +779,7 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [] }: Bound
   return (
     <article className={`${tierOnePanel} ${sectionSpacing}`}>
       <h2 className={tierOneHeading}>Decision snapshot for leadership this week</h2>
-      <p className="text-xs leading-5 text-slate-300">Scan the lanes, then open a cell only when you need the threshold rationale.</p>
+      <p className="text-xs leading-5 text-slate-300">Each lane shows the bounded rule: act now, trip line, and flip condition.</p>
       <div className="mt-2 hidden md:block">
         <div className="grid grid-cols-[minmax(0,11rem)_repeat(3,minmax(0,1fr))] gap-2" aria-label="Bounded decision matrix">
           <div className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-300">
@@ -731,12 +802,10 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [] }: Bound
                 const cell = row.cells[column.key];
                 return (
                   <div key={`${row.key}-${column.key}`} className="rounded-md border border-slate-700/55 bg-slate-950/60 px-3 py-2.5 align-top">
-                    <details className="group">
-                      <summary className="cursor-pointer list-none text-[11px] font-medium leading-5 text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
-                        {compactActionCue(cell.text)}
-                      </summary>
-                      <p className="mt-1 text-[11px] leading-5 text-slate-300">{cell.detail}</p>
-                    </details>
+                    <p className="text-[11px] font-semibold leading-5 text-slate-100">{compactActionCue(cell.text)}</p>
+                    <div className="mt-2 border-t border-slate-800/70 pt-2">
+                      <MatrixRuleSummary action={cell.action} threshold={cell.threshold} reversal={cell.reversal} />
+                    </div>
                   </div>
                 );
               })}
@@ -753,15 +822,17 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [] }: Bound
               {matrix.columns.map((column) => {
                 const cell = row.cells[column.key];
                 return (
-                  <details key={`mobile-${row.key}-${column.key}`} className="rounded border border-slate-700/60 bg-slate-950/70 px-2 py-1.5">
-                    <summary className="cursor-pointer list-none text-[11px] leading-5 text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+                  <div key={`mobile-${row.key}-${column.key}`} className="rounded border border-slate-700/60 bg-slate-950/70 px-2 py-2">
+                    <p className="text-[11px] leading-5 text-slate-100">
                       <span className={`mr-1 inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] ${decisionLaneTone[column.key].badgeClassName}`}>
                         {decisionLaneTone[column.key].label}
                       </span>
                       {compactActionCue(cell.text)}
-                    </summary>
-                    <p className="mt-1 text-[11px] leading-5 text-slate-300">{cell.detail}</p>
-                  </details>
+                    </p>
+                    <div className="mt-2 border-t border-slate-800/70 pt-2">
+                      <MatrixRuleSummary action={cell.action} threshold={cell.threshold} reversal={cell.reversal} />
+                    </div>
+                  </div>
                 );
               })}
             </div>
