@@ -40,7 +40,7 @@ export default function DecidePage() {
       <HubHero
         eyebrow="Decision translation depth"
         title="Choose the path that turns posture into an operating call."
-        description="Start with a runnable path or utility first. Browse roles and situations only when you need wider discovery."
+        description="Start with the runnable path most likely to unblock this week&apos;s decision. Use role and situation views only when you need translation depth."
         actions={(
           <>
             <Link href="/" className="weather-button inline-flex items-center justify-center">Return to Weekly Brief</Link>

@@ -41,7 +41,7 @@ export function NextStepRail({ currentPath }: { currentPath: string }) {
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div className="space-y-1">
           <p className="weather-hub-section-eyebrow">Next step</p>
-          <h2 className="text-xl font-semibold text-white">Keep the decision thread compact</h2>
+          <h2 className="text-xl font-semibold text-white">Keep the weekly brief as the decision anchor</h2>
           <p className="max-w-3xl text-sm leading-7 text-slate-300">{introCopy}</p>
         </div>
         {currentAction ? (
