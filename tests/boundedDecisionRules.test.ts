@@ -3,6 +3,8 @@ import { describe, it } from "node:test";
 import {
   buildCanonicalBoundedDecisionRules,
   buildScopedVariantDecisionAdjustment,
+  extractCompactClause,
+  formatBoundedDecisionReverse,
   formatBoundedDecisionTriplet,
 } from "../lib/report/boundedDecisionRules";
 import { buildActionStripItems, buildRoleAwareOperatingTemplates } from "../lib/report/operatingCalls";
@@ -17,6 +19,27 @@ describe("bounded decision rule formatting", () => {
 
     assert.match(rules[0].scope, /current tightness 0\.9 and risk appetite 56\.?0?/i);
     assert.match(rules[0].pauseTrigger, /tightness > 6\.4/i);
+  });
+
+  it("keeps decimal thresholds intact when compacting reversal copy", () => {
+    assert.equal(
+      extractCompactClause(
+        "Tightness < 0.0 and Risk appetite > 54. Resume staged approvals next refresh.",
+        "fallback",
+      ),
+      "Tightness < 0.0 and Risk appetite > 54",
+    );
+
+    const rules = buildCanonicalBoundedDecisionRules({
+      regime: "DEFENSIVE",
+      thresholds: { tightnessRegime: 0.0, riskAppetiteRegime: 50 },
+      scores: { tightness: 8.0, riskAppetite: 44 },
+    });
+
+    assert.equal(
+      formatBoundedDecisionReverse(rules[0]!),
+      "staged approvals when tightness < 0.0 and risk appetite > 54",
+    );
   });
 });
 

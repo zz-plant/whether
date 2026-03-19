@@ -1,5 +1,6 @@
 import { buildWeeklyLockCommitment } from "../decisionKnobs";
 import {
+  extractCompactClause,
   formatBoundedDecisionAction,
   formatBoundedDecisionReverse,
   formatBoundedDecisionThreshold,
@@ -7,15 +8,7 @@ import {
 } from "../boundedDecisionRules";
 import type { DecisionMatrixPayload, DecisionMatrixRow, DecisionMatrixRowKey, Regime } from "../homeBriefModel";
 
-const compactMatrixText = (value: string, fallback: string) => {
-  const normalized = value.trim();
-  if (!normalized) {
-    return fallback;
-  }
-
-  const [firstClause] = normalized.split(/[.;]/);
-  return firstClause?.trim() || fallback;
-};
+const compactMatrixText = (value: string, fallback: string) => extractCompactClause(value, fallback);
 
 const joinFlipConditions = (conditions: string[]) => {
   if (conditions.length === 0) return "";
