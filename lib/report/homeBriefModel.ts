@@ -1,6 +1,6 @@
 import { buildCanonicalBoundedDecisionRules } from "./boundedDecisionRules";
 import { buildActionStripItems, buildRoleAwareOperatingTemplates } from "./operatingCalls";
-import { getSummaryArchive } from "../summary/summaryArchive";
+import { getWeeklyPostureHistory } from "../summary/weeklyPostureHistory";
 import type { MacroSeriesReading } from "../types";
 import { resolveDistanceToFlip, resolveConfidencePercentFromDistance } from "./confidence";
 import { isImprovingSignalDelta, type HistoricalAnalog, type ReportEvidenceItem } from "./reportData";
@@ -525,15 +525,13 @@ const buildWeeklyMemoLines = ({
     : "Flip watch is off: keep this week's approvals on the current track.",
 ];
 
-const buildMemoryRail = (recordDateLabel: string | undefined, currentRegime: Regime): MemoryRailItem[] => {
-  const weeklyEntries = getSummaryArchive().filter((entry) => entry.cadence === "weekly");
-
-  const priorEntries = weeklyEntries
+export const buildMemoryRail = (recordDateLabel: string | undefined, currentRegime: Regime): MemoryRailItem[] => {
+  const priorEntries = getWeeklyPostureHistory()
     .filter((entry) => (recordDateLabel ? entry.record_date !== recordDateLabel : true))
     .slice(-3)
     .map((entry) => ({
       label: entry.record_date,
-      posture: REGIME_SHORT_LABELS[entry.summary.regime],
+      posture: REGIME_SHORT_LABELS[entry.regime],
     }));
 
   return [
