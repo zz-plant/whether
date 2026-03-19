@@ -17,6 +17,7 @@
 - Run tests in watch mode: `bun run test:watch`
 - Test runtime contract: `bun run test` delegates to Bun's native test runner over `./tests` with recursive `.test.ts`/`.test.tsx` discovery; `node:test` and `node:assert/strict` imports are supported via Bun Node compatibility.
 - Run Whether MCP server (stdio): `bun run mcp:whether`
+- Refresh checked-in fallback snapshots: `bun run data:refresh-fallbacks`
 
 ## Default execution profile for agents
 
