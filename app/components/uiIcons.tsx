@@ -1,20 +1,18 @@
-import {
-  ArrowRight,
-  Check,
-  ChevronDown,
-  Copy,
-  Download,
-  FileText,
-  Grid2x2,
-  History,
-  ScanSearch,
-  Shield,
-  Target,
-  TrendingUp,
-  Waypoints,
-  Zap,
-  type LucideProps,
-} from "lucide-react";
+import type { LucideProps } from "lucide-react";
+import ArrowRight from "lucide-react/dist/esm/icons/arrow-right.js";
+import Check from "lucide-react/dist/esm/icons/check.js";
+import ChevronDown from "lucide-react/dist/esm/icons/chevron-down.js";
+import Copy from "lucide-react/dist/esm/icons/copy.js";
+import Download from "lucide-react/dist/esm/icons/download.js";
+import FileText from "lucide-react/dist/esm/icons/file-text.js";
+import Grid2x2 from "lucide-react/dist/esm/icons/grid-2x2.js";
+import History from "lucide-react/dist/esm/icons/history.js";
+import ScanSearch from "lucide-react/dist/esm/icons/scan-search.js";
+import Shield from "lucide-react/dist/esm/icons/shield.js";
+import Target from "lucide-react/dist/esm/icons/target.js";
+import TrendingUp from "lucide-react/dist/esm/icons/trending-up.js";
+import Waypoints from "lucide-react/dist/esm/icons/waypoints.js";
+import Zap from "lucide-react/dist/esm/icons/zap.js";
 import type { SVGProps } from "react";
 
 type IconProps = LucideProps & { title?: string };
