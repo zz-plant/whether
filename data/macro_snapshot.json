@@ -1,5 +1,5 @@
 {
-  "fetched_at": "2026-03-19T17:59:33.843Z",
+  "fetched_at": "2026-03-19T18:15:55.781Z",
   "isLive": false,
   "series": [
     {
@@ -13,10 +13,6 @@
       "formulaUrl": "/formulas#cpi-inflation",
       "record_date": "2026-02-01",
       "history": [
-        {
-          "date": "2024-04-01",
-          "value": 3.4
-        },
         {
           "date": "2024-05-01",
           "value": 3.3
@@ -32,9 +28,13 @@
         {
           "date": "2024-08-01",
           "value": 3.7
+        },
+        {
+          "date": "2026-02-01",
+          "value": 2.4141129866304056
         }
       ],
-      "fetched_at": "2026-03-19T17:59:33.842Z",
+      "fetched_at": "2026-03-19T18:15:53.542Z",
       "isLive": false
     },
     {
@@ -48,10 +48,6 @@
       "formulaUrl": "/formulas#unemployment-rate",
       "record_date": "2026-02-01",
       "history": [
-        {
-          "date": "2024-05-01",
-          "value": 4
-        },
         {
           "date": "2024-06-01",
           "value": 4.1
@@ -67,9 +63,13 @@
         {
           "date": "2024-09-01",
           "value": 4.1
+        },
+        {
+          "date": "2026-02-01",
+          "value": 4.4
         }
       ],
-      "fetched_at": "2026-03-19T17:59:33.842Z",
+      "fetched_at": "2026-03-19T18:15:53.542Z",
       "isLive": false
     },
     {
@@ -83,10 +83,6 @@
       "formulaUrl": "/formulas#credit-spread",
       "record_date": "2026-03-17",
       "history": [
-        {
-          "date": "2024-06-01",
-          "value": 1.55
-        },
         {
           "date": "2024-07-01",
           "value": 1.62
@@ -102,6 +98,10 @@
         {
           "date": "2026-02-01",
           "value": 1.65
+        },
+        {
+          "date": "2026-03-17",
+          "value": 1.85
         }
       ],
       "fetched_at": "2026-03-19T17:59:33.842Z",
@@ -119,10 +119,6 @@
       "record_date": "2026-03-18",
       "history": [
         {
-          "date": "2024-06-01",
-          "value": 3.82
-        },
-        {
           "date": "2024-07-01",
           "value": 3.64
         },
@@ -137,9 +133,13 @@
         {
           "date": "2026-02-01",
           "value": 3.55
+        },
+        {
+          "date": "2026-03-18",
+          "value": 3.2
         }
       ],
-      "fetched_at": "2026-03-19T17:59:33.842Z",
+      "fetched_at": "2026-03-19T18:15:53.542Z",
       "isLive": false
     },
     {
@@ -153,10 +153,6 @@
       "formulaUrl": "/formulas#financial-conditions",
       "record_date": "2026-03-13",
       "history": [
-        {
-          "date": "2024-06-01",
-          "value": -0.21
-        },
         {
           "date": "2024-07-01",
           "value": -0.18
@@ -172,6 +168,10 @@
         {
           "date": "2026-02-01",
           "value": -0.12
+        },
+        {
+          "date": "2026-03-13",
+          "value": -0.48574
         }
       ],
       "fetched_at": "2026-03-19T17:59:33.842Z",
@@ -189,10 +189,6 @@
       "record_date": "2026-03-18",
       "history": [
         {
-          "date": "2024-06-01",
-          "value": 13.2
-        },
-        {
           "date": "2024-07-01",
           "value": 14.8
         },
@@ -207,9 +203,13 @@
         {
           "date": "2026-02-01",
           "value": 17.4
+        },
+        {
+          "date": "2026-03-18",
+          "value": 25.09
         }
       ],
-      "fetched_at": "2026-03-19T17:59:33.842Z",
+      "fetched_at": "2026-03-19T18:15:53.542Z",
       "isLive": false
     },
     {

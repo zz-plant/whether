@@ -8,6 +8,26 @@ import type { TreasuryData } from "../lib/types";
 type MacroSnapshotPayload = typeof currentMacroSnapshot;
 
 const repoRoot = process.cwd();
+
+const mergeLatestHistoryPoint = ({
+  history,
+  recordDate,
+  value,
+}: {
+  history: MacroSnapshotPayload["series"][number]["history"] | undefined;
+  recordDate: string;
+  value: number | null;
+}) => {
+  if (!history?.length || typeof value !== "number") {
+    return history;
+  }
+
+  const nextHistory = history.filter((point) => point.date !== recordDate);
+  nextHistory.push({ date: recordDate, value });
+
+  return nextHistory.slice(-history.length);
+};
+
 const treasuryFallbackPath = path.join(repoRoot, "data", "snapshot_fallback.json");
 const macroSnapshotPath = path.join(repoRoot, "data", "macro_snapshot.json");
 
@@ -28,14 +48,23 @@ const buildMacroFallbackPayload = (
 ): MacroSnapshotPayload => ({
   fetched_at: new Date().toISOString(),
   isLive: false,
-  series: refreshedSeries.map((series) => ({
-    ...series,
-    isLive: false,
-    fetched_at: series.fetched_at ?? previousPayload.fetched_at,
-  })),
+  series: refreshedSeries.map((series) => {
+    const previousSeries = previousPayload.series.find((entry) => entry.id === series.id);
+
+    return {
+      ...series,
+      history: mergeLatestHistoryPoint({
+        history: previousSeries?.history ?? series.history,
+        recordDate: series.record_date,
+        value: series.value,
+      }),
+      isLive: false,
+      fetched_at: series.fetched_at ?? previousPayload.fetched_at,
+    };
+  }),
 });
 
-const main = async () => {
+export const main = async () => {
   const [treasury, macroSeries] = await Promise.all([
     fetchTreasuryData(),
     loadMacroSeries(),
@@ -66,7 +95,11 @@ const main = async () => {
   }, null, 2));
 };
 
-main().catch((error) => {
-  console.error(error instanceof Error ? error.message : error);
-  process.exit(1);
-});
+if (import.meta.main) {
+  main().catch((error) => {
+    console.error(error instanceof Error ? error.message : error);
+    process.exit(1);
+  });
+}
+
+export { buildMacroFallbackPayload, mergeLatestHistoryPoint };
