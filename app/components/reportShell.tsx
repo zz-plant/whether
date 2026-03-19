@@ -32,8 +32,6 @@ type SecondaryCtaProps = { href: string; label: string };
 type ExportCtaProps = { href: string; label: string };
 
 const isInternalHref = (href: string) => href.startsWith("/") || href.startsWith("#");
-const isHashHref = (href: string) => href.startsWith("#");
-
 const InternalAwareLink = ({
   href,
   className,
@@ -374,10 +372,10 @@ export const ReportShell = ({
   commandBar,
   ambientMode = "standard",
 }: ReportShellProps) => {
-  const resolvedPageSummaryLink = pageSummaryLink && !isHashHref(pageSummaryLink.href) ? pageSummaryLink : undefined;
-  const resolvedPrimaryCta = primaryCta && !isHashHref(primaryCta.href) ? primaryCta : undefined;
-  const resolvedSecondaryCta = secondaryCta && !isHashHref(secondaryCta.href) ? secondaryCta : undefined;
-  const resolvedExportCta = exportCta && !isHashHref(exportCta.href) ? exportCta : null;
+  const resolvedPageSummaryLink = pageSummaryLink;
+  const resolvedPrimaryCta = primaryCta;
+  const resolvedSecondaryCta = secondaryCta;
+  const resolvedExportCta = exportCta;
   const resolvedNextRefreshLabel = nextRefreshLabel ?? (trustStatusTone === "historical" ? "Fixed historical snapshot" : "15m cadence");
   const contentSections = Children.toArray(children);
   const summaryLink = resolvedPageSummaryLink ? <InternalAwareLink href={resolvedPageSummaryLink.href} className="inline-flex min-h-[44px] items-center text-xs font-semibold text-sky-200 underline decoration-slate-500/80 underline-offset-4">{resolvedPageSummaryLink.label}</InternalAwareLink> : null;
