@@ -349,8 +349,8 @@ describe("WeeklyDecisionCard extracted sections", () => {
             doNow: ["Keep backfills only."],
             avoidNow: ["Avoid speculative hiring."],
             scope: "CFO review",
-            pauseTrigger: "Tightness above 74",
-            resumeTrigger: "Tightness below 65",
+            pauseTrigger: "Pause net-new hiring if tightness exceeds 74.",
+            resumeTrigger: "Resume staged approvals when tightness falls below 65.",
             flipConditions: [{ metric: "tightness", operator: "<", value: 65, label: "Tightness < 65" }],
             rationale: "Discipline",
           },
@@ -362,7 +362,8 @@ describe("WeeklyDecisionCard extracted sections", () => {
     assert.match(html, /Action/);
     assert.match(html, /Threshold/);
     assert.match(html, /Reverse/);
-    assert.match(html, /Why this lane/);
+    assert.match(html, /Pause net-new hiring if tightness exceeds 74\./);
+    assert.match(html, /Resume staged approvals when tightness falls below 65\./);
 
   });
 

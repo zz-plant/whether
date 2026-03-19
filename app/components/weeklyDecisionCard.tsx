@@ -9,7 +9,7 @@ import { DiagnosticsSection } from "./weekly-card/DiagnosticsSection";
 import { ActionStripSection } from "./weekly-card/ActionStripSection";
 import { PostureHistoryTimeline } from "./weekly-card/HistorySection";
 import type { DiagnosticsSectionProps } from "./weekly-card/types";
-import { compactActionCue, compactInset, disclosureSummaryClass, sectionSpacing, tierOneHeading, tierOnePanel, tierThreeHeading, tierThreePanel } from "./weekly-card/shared";
+import { compactInset, disclosureSummaryClass, sectionSpacing, tierOneHeading, tierOnePanel, tierThreeHeading, tierThreePanel } from "./weekly-card/shared";
 import type { RegimeKey } from "../../lib/regimeEngine";
 import type { DecisionMatrixPayload, InputInfluenceItem, StartupVariantPolicy, WeeklyDecisionCardViewModel } from "../../lib/report/homeBriefModel";
 import { buildCompactFreshnessMeta } from "../../lib/report/reportFormatting";
@@ -742,7 +742,7 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [] }: Bound
                   return (
                     <td key={`${row.key}-${column.key}`} className="rounded-md border border-slate-700/55 bg-slate-950/60 px-2.5 py-2 align-top">
                       <p className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">{fieldLabel}</p>
-                      <p className="mt-1 text-[11px] font-medium leading-5 text-slate-100">{compactActionCue(cell.text)}</p>
+                      <p className="mt-1 text-[11px] font-medium leading-5 text-slate-100">{cell.text}</p>
                     </td>
                   );
                 })}
@@ -772,7 +772,7 @@ export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [] }: Bound
                       </span>
                       <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">{fieldLabel}</span>
                     </div>
-                    <p className="mt-1 text-[11px] leading-5 text-slate-100">{compactActionCue(cell.text)}</p>
+                    <p className="mt-1 text-[11px] leading-5 text-slate-100">{cell.text}</p>
                   </div>
                 );
               })}
