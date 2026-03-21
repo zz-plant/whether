@@ -58,6 +58,8 @@ export const trackContentCtaConversion = (event: Omit<ContentMeasurementEvent, "
     headers: { "content-type": "application/json" },
     body,
     keepalive: true,
+  }).catch(() => {
+    // Ignore telemetry network failures to keep the client console clean.
   });
 };
 

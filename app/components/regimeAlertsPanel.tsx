@@ -179,6 +179,8 @@ export const RegimeAlertsPanel = () => {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ clientId, preferences: next }),
+    }).catch(() => {
+      // Keep the optimistic toggle and avoid noisy fetch errors in the console.
     });
   };
 
