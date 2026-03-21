@@ -20,6 +20,8 @@ Supporting surfaces are intentionally subordinate:
 - `/learn` is a supporting reference library under **Method**
 - `/guides`, `/resources`, `/answers`, `/solutions/*`, `/concepts`, and `/startup-macro-posture*` remain secondary discovery or distribution surfaces rather than primary workflow hubs
 
+The homepage keeps interpretation layers optional and query-driven: the default weekly brief omits interpretation context entirely, and interpretation panels render only when a non-default `?view=` is explicitly selected.
+
 Primary workflow pages now expose a top-of-page scroll path that explains the down-page sequence and highlights the current checkpoint as the operator moves through long surfaces.
 Report-shell routes (`/`, `/signals`, `/operations` and nested report paths) also use a reduced global header mode: brand/home anchor, global search entry, and compact route-orientation cues stay available without restoring the full navigation chrome above the brief.
 
@@ -118,6 +120,8 @@ High-priority hub routes now ship dedicated static SVG social preview assets for
 - `/startup-macro-posture` and `/startup-macro-posture/index`
 - `/guides` and `/guides/stage`
 - `/answers` and `/answers/[slug]`
+
+The `/answers` hub now opens with live weekly posture context (current posture, immediate implication, flip condition, and direct return path to `/`) before the answer directory grid so operators can orient quickly before browsing distribution pages.
 
 The homepage remains on live `/api/og` generation so the weekly brief preview can stay tied to current data.
 
