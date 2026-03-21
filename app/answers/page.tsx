@@ -3,6 +3,9 @@ import type { Metadata } from "next";
 import { buildCanonicalUrl, buildPageMetadata, serializeJsonLd } from "../../lib/seo";
 import { answerCategories, answerPages } from "./decisionPages";
 import { featuredAnswerPages } from "./selectors";
+import { loadReportDataSafe } from "../../lib/report/reportData";
+import { buildHomeBriefModel } from "../../lib/report/homeBriefModel";
+import { getRegimeDisplayLabel } from "../../lib/regimePresentation";
 
 export const revalidate = 900;
 
@@ -14,7 +17,16 @@ export const metadata: Metadata = buildPageMetadata({
   imagePath: "/social/answers.svg",
 });
 
-export default function AnswersHubPage() {
+export default async function AnswersHubPage() {
+  const reportResult = await loadReportDataSafe(undefined, { route: "/answers" });
+  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
+  const homeBriefModel = buildHomeBriefModel(reportData);
+  const displayRegime = getRegimeDisplayLabel({
+    regime: reportData.assessment.regime,
+    momentum: reportData.reportDynamics.directionLabel,
+    confidence: homeBriefModel.confidenceLabel,
+    transitionWatch: homeBriefModel.transitionWatch === "ON",
+  });
   const listData = {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -34,6 +46,36 @@ export default function AnswersHubPage() {
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Operator answer hub</p>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Direct answers mapped to canonical decisions</h1>
         <p className="text-sm text-slate-300">Answer first, then bounded policy + threshold triggers + weekly brief linkback. Total pages: {answerPages.length}.</p>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/" className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em]">
+            Open weekly brief
+          </Link>
+          <Link href="/signals" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.12em] text-slate-100">
+            Review evidence
+          </Link>
+        </div>
+      </section>
+
+      <section className="weather-panel space-y-4 px-6 py-6">
+        <h2 className="text-lg font-semibold text-slate-100">Current weekly posture</h2>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <article className="weather-surface px-4 py-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Posture now</p>
+            <p className="mt-2 text-sm font-semibold text-slate-100">{displayRegime.label}</p>
+            <p className="mt-1 text-xs text-slate-300">{reportData.weeklyRecordDateLabel}</p>
+          </article>
+          <article className="weather-surface px-4 py-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Immediate implication</p>
+            <p className="mt-2 text-sm text-slate-200">{homeBriefModel.immediateDecision}</p>
+          </article>
+          <article className="weather-surface px-4 py-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Flip condition</p>
+            <p className="mt-2 text-sm text-slate-200">{homeBriefModel.reversalTrigger}</p>
+          </article>
+        </div>
+        <p className="text-sm text-slate-300">
+          Use `/answers` when you need a direct, shareable answer to one operating question. Use the weekly brief when you need the full planning baseline for this week.
+        </p>
       </section>
 
       <section className="weather-panel space-y-4 px-6 py-6">

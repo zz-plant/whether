@@ -135,6 +135,7 @@ export const HomePageReportContent = async ({
     >
       <WeeklyDecisionCard
         model={homepage.weeklyDecisionCardModel}
+        searchParams={homepage.interpretationSearchParams}
         actions={(
           <Suspense fallback={<ArtifactActionsFallback />}>
             <LeadershipArtifactActions
@@ -145,13 +146,6 @@ export const HomePageReportContent = async ({
         )}
       />
 
-      <StreamedSectionReveal delay="medium">
-        <HomeInterpretationPanel
-          layer={homepage.interpretationLayer}
-          searchParams={homepage.interpretationSearchParams}
-        />
-      </StreamedSectionReveal>
-
       <Suspense fallback={<WeeklyDiagnosticsFallback />}>
         <StreamedSectionReveal delay="short">
           <HomeWorkspaceBands
@@ -159,6 +153,15 @@ export const HomePageReportContent = async ({
           />
         </StreamedSectionReveal>
       </Suspense>
+
+      {homepage.interpretationLayer.view !== "default" ? (
+        <StreamedSectionReveal delay="medium">
+          <HomeInterpretationPanel
+            layer={homepage.interpretationLayer}
+            searchParams={homepage.interpretationSearchParams}
+          />
+        </StreamedSectionReveal>
+      ) : null}
 
       {homepage.fallbackActive ? (
         <StreamedSectionReveal delay="medium">

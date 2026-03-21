@@ -17,7 +17,7 @@ const reportDynamics: ReportDynamics = {
 };
 
 describe("WeeklyDecisionCard decision-transmission contract", () => {
-  it("renders a single canonical flip trigger in the snapshot callouts", () => {
+  it("keeps the snapshot band compact instead of repeating a second hero", () => {
     const html = renderToStaticMarkup(
       <WeeklyDecisionCard
         model={buildWeeklyDecisionCardModel({
@@ -101,8 +101,8 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
     );
 
     const snapshotRegion = html.slice(html.indexOf("Weekly call snapshot"), html.indexOf("This week&#x27;s call"));
-    const flipWatchCount = (snapshotRegion.match(/Flip watch/g) ?? []).length;
-    assert.equal(flipWatchCount, 1);
+    assert.doesNotMatch(snapshotRegion, /Current conditions/);
+    assert.doesNotMatch(snapshotRegion, /Decision confidence/);
     assert.match(html, /Current read/);
     assert.match(html, /Cloudy/);
     assert.match(html, /stay selective and keep efficiency layers on/i);
@@ -194,8 +194,8 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
 
     const regimeIndex = html.indexOf("Current outlook");
     const callIndex = html.indexOf("Weekly call snapshot");
-    const doNowIndex = html.indexOf("DO NOW");
-    const flipIndex = html.indexOf("FLIP WHEN");
+    const doNowIndex = html.indexOf("Action now");
+    const flipIndex = html.indexOf("Flip condition");
 
     assert.ok(regimeIndex >= 0);
     assert.ok(callIndex > regimeIndex);
@@ -279,8 +279,8 @@ describe("WeeklyDecisionCard decision-transmission contract", () => {
       />,
     );
 
-    assert.match(html, /<summary[^>]*>Decode this forecast<\/summary>/);
-    assert.match(html, /Can I rely on this\?/);
+    assert.match(html, /<summary[^>]*>Policy detail<\/summary>/);
+    assert.match(html, /<summary[^>]*>Supporting rationale<\/summary>/);
     assert.doesNotMatch(html, /<summary[^>]*>More context<\/summary>/);
   });
 });

@@ -33,6 +33,7 @@ export type WeeklyDecisionCardProps = {
   model: WeeklyDecisionCardViewModel;
   actions?: ReactNode;
   diagnosticsLane?: ReactNode;
+  searchParams?: Record<string, string | undefined>;
 };
 
 export type WeeklyDecisionDiagnosticsLaneProps = DiagnosticsSectionProps;
@@ -1202,8 +1203,32 @@ const buildRoleTranslationCards = ({
   ];
 };
 
+const resolveRoleView = (
+  role: string | undefined,
+): "finance" | "product" => (role === "product" ? "product" : "finance");
+
+const buildRoleHref = (
+  role: "finance" | "product",
+  searchParams?: Record<string, string | undefined>,
+) => {
+  const params = new URLSearchParams();
+
+  Object.entries(searchParams ?? {}).forEach(([key, value]) => {
+    if (typeof value === "string" && value.length > 0 && key !== "role") {
+      params.set(key, value);
+    }
+  });
+
+  if (role !== "finance") {
+    params.set("role", role);
+  }
+
+  const query = params.toString();
+  return query.length > 0 ? `/?${query}#weekly-call-core` : "/#weekly-call-core";
+};
+
 export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
-  const { model, actions, diagnosticsLane } = props;
+  const { model, actions, diagnosticsLane, searchParams } = props;
   const { status, decision, presentation, diagnostics, history, artifact } = model;
   const {
     statusLabel,
@@ -1321,6 +1346,11 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
       fallbackOwner: "CEO",
     });
   const roleTranslations = buildRoleTranslationCards({ decisionRules });
+  const activeRole = resolveRoleView(searchParams?.role);
+  const roleHrefs = {
+    finance: buildRoleHref("finance", searchParams),
+    product: buildRoleHref("product", searchParams),
+  };
 
   const needsTrustWarning = isFallbackSnapshot || confidenceLabel !== "HIGH" || freshnessLabel === "Unavailable";
   const resolvedStartupVariantPolicy = startupVariantPolicy ?? {
@@ -1442,6 +1472,8 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
             guardrailPolicyDetails={guardrailPolicyDetails}
             flipPolicyDetails={flipPolicyDetails}
             roleTranslations={roleTranslations}
+            activeRole={activeRole}
+            roleHrefs={roleHrefs}
           />
 
           <InputInfluenceSection items={inputInfluence} />
