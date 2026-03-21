@@ -124,16 +124,10 @@ export async function HomeWorkspaceBands({
         className="home-band home-band--flow"
         compact={true}
         actions={(
-          <>
-            <Link href={workspaceModel.workspaceActions.auditHref as Route} className="weather-button inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em]">
-              <AuditIcon className="h-3.5 w-3.5" />
-              <span>See why this call changed</span>
-            </Link>
-            <Link href={workspaceModel.workspaceActions.operationsHref as Route} className="weather-button-primary inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em]">
-              <CheckIcon className="h-3.5 w-3.5" />
-              <span>Open execution guardrails</span>
-            </Link>
-          </>
+          <Link href={workspaceModel.workspaceActions.operationsHref as Route} className="weather-button-primary inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold tracking-[0.12em]">
+            <CheckIcon className="h-3.5 w-3.5" />
+            <span>Open execution guardrails</span>
+          </Link>
         )}
       />
 
@@ -146,20 +140,10 @@ export async function HomeWorkspaceBands({
           icon={<AuditIcon className="h-5 w-5 text-sky-100" />}
           toneClass="border-sky-400/40 text-sky-200"
           actions={(
-            <>
-              <Link href={"/signals" as Route} className="weather-pill inline-flex min-h-[44px] items-center gap-2 px-3 py-2 text-xs font-semibold text-slate-100">
-                <TrendUpIcon className="h-3.5 w-3.5" />
-                <span>Review full evidence</span>
-              </Link>
-              <Link href={"/method" as Route} className="weather-pill inline-flex min-h-[44px] items-center gap-2 px-3 py-2 text-xs font-semibold text-slate-100">
-                <ShieldIcon className="h-3.5 w-3.5" />
-                <span>Open trust details</span>
-              </Link>
-              <Link href={"/sources" as Route} className="weather-pill inline-flex min-h-[44px] items-center gap-2 px-3 py-2 text-xs font-semibold text-slate-100">
-                <DocumentIcon className="h-3.5 w-3.5" />
-                <span>Open sources</span>
-              </Link>
-            </>
+            <Link href={"/signals" as Route} className="weather-pill inline-flex min-h-[44px] items-center gap-2 px-3 py-2 text-xs font-semibold text-slate-100">
+              <TrendUpIcon className="h-3.5 w-3.5" />
+              <span>Review full evidence</span>
+            </Link>
           )}
         />
 
@@ -220,62 +204,9 @@ export async function HomeWorkspaceBands({
         </div>
       </section>
 
-      <section id="historical-replay-workspace" className="home-band home-band--history home-band-shell weather-panel weather-section-stage weather-section-stage--long scroll-mt-28 space-y-4 px-4 py-4 sm:px-5" aria-labelledby="historical-replay-workspace-title">
-        <HomeBandHeader
-          step="02"
-          kicker="Historical replay"
-          title="Compare this week's live call with a prior baseline before you lock the plan."
-          description="Use replay as continuity for the weekly ritual: check what changed, what held, and whether today's approvals are tighter or looser than the earlier read."
-          icon={<HistoryIcon className="h-5 w-5 text-violet-100" />}
-          toneClass="border-violet-400/40 text-violet-200"
-        />
-
-        <div className="weather-list-stagger grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-          <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">
-            <CardEyebrow icon={<HistoryIcon className="h-3.5 w-3.5" />} label="Replay a prior monthly snapshot" accentClass="text-violet-200" />
-            <div className="mt-3">
-              <Suspense
-                fallback={(
-                  <HistoricalReplayDatePickerFallback
-                    initialDate={workspaceModel.replay.initialDate}
-                    submitLabel="Replay on home"
-                  />
-                )}
-              >
-                <HistoricalReplayDatePicker
-                  initialDate={workspaceModel.replay.initialDate}
-                  forceAdvanced={false}
-                  submitHash="#historical-replay-workspace"
-                  submitLabel="Replay on home"
-                />
-              </Suspense>
-            </div>
-            <p className="mt-3 text-sm text-slate-300">{workspaceModel.replay.summary}</p>
-            <div className="mt-3">
-              <Link href={workspaceModel.replay.openFullHref as Route} className="weather-pill inline-flex min-h-[44px] items-center gap-2 px-3 py-2 text-xs font-semibold text-slate-100">
-                <LayoutGridIcon className="h-3.5 w-3.5" />
-                <span>Open full time machine</span>
-              </Link>
-            </div>
-          </article>
-
-          <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">
-            <CardEyebrow icon={<ArrowRightIcon className="h-3.5 w-3.5" />} label="What this looked like then" accentClass="text-slate-300" />
-            <ul className="mt-3 space-y-2">
-              {workspaceModel.replay.preview.map((entry) => (
-                <li key={entry.key} className="home-band-list-item rounded-lg border border-slate-800/80 bg-slate-950/50 px-3 py-2">
-                  <p className="text-xs font-semibold text-slate-100">{entry.label}</p>
-                  <p className="mt-1 text-xs text-slate-300">{entry.summary}</p>
-                </li>
-              ))}
-            </ul>
-          </article>
-        </div>
-      </section>
-
       <section id="approve-this-weeks-plan" className="home-band home-band--operations home-band-shell weather-panel weather-section-stage weather-section-stage--medium scroll-mt-28 space-y-4 px-4 py-4 sm:px-5" aria-labelledby="approve-this-weeks-plan-title">
         <HomeBandHeader
-          step="03"
+          step="02"
           kicker="Execution guardrails"
           title="Lock the operating summary here, then open Operations only for execution detail."
           description="This band compresses the weekly do now, top guardrails, finance posture, and share handoff after you review the call."
@@ -331,6 +262,59 @@ export async function HomeWorkspaceBands({
                   <p className="text-xs font-semibold text-slate-100">{item.label}</p>
                   <p className="mt-1 text-xs text-slate-300">{item.actionNow}</p>
                   <p className="mt-1 text-xs text-slate-400">Reverse: {item.reversalCondition}</p>
+                </li>
+              ))}
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section id="historical-replay-workspace" className="home-band home-band--history home-band-shell weather-panel weather-section-stage weather-section-stage--long scroll-mt-28 space-y-4 px-4 py-4 sm:px-5" aria-labelledby="historical-replay-workspace-title">
+        <HomeBandHeader
+          step="03"
+          kicker="Historical replay"
+          title="Compare this week's live call with a prior baseline after you lock the plan."
+          description="Use replay as continuity for the weekly ritual: check what changed, what held, and whether today's approvals are tighter or looser than the earlier read."
+          icon={<HistoryIcon className="h-5 w-5 text-violet-100" />}
+          toneClass="border-violet-400/40 text-violet-200"
+        />
+
+        <div className="weather-list-stagger grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+          <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">
+            <CardEyebrow icon={<HistoryIcon className="h-3.5 w-3.5" />} label="Replay a prior monthly snapshot" accentClass="text-violet-200" />
+            <div className="mt-3">
+              <Suspense
+                fallback={(
+                  <HistoricalReplayDatePickerFallback
+                    initialDate={workspaceModel.replay.initialDate}
+                    submitLabel="Replay on home"
+                  />
+                )}
+              >
+                <HistoricalReplayDatePicker
+                  initialDate={workspaceModel.replay.initialDate}
+                  forceAdvanced={false}
+                  submitHash="#historical-replay-workspace"
+                  submitLabel="Replay on home"
+                />
+              </Suspense>
+            </div>
+            <p className="mt-3 text-sm text-slate-300">{workspaceModel.replay.summary}</p>
+            <div className="mt-3">
+              <Link href={workspaceModel.replay.openFullHref as Route} className="weather-pill inline-flex min-h-[44px] items-center gap-2 px-3 py-2 text-xs font-semibold text-slate-100">
+                <LayoutGridIcon className="h-3.5 w-3.5" />
+                <span>Open full time machine</span>
+              </Link>
+            </div>
+          </article>
+
+          <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">
+            <CardEyebrow icon={<ArrowRightIcon className="h-3.5 w-3.5" />} label="What this looked like then" accentClass="text-slate-300" />
+            <ul className="mt-3 space-y-2">
+              {workspaceModel.replay.preview.map((entry) => (
+                <li key={entry.key} className="home-band-list-item rounded-lg border border-slate-800/80 bg-slate-950/50 px-3 py-2">
+                  <p className="text-xs font-semibold text-slate-100">{entry.label}</p>
+                  <p className="mt-1 text-xs text-slate-300">{entry.summary}</p>
                 </li>
               ))}
             </ul>

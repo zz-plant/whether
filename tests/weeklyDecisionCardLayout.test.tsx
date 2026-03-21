@@ -71,7 +71,8 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /This week&#x27;s call/);
     assert.match(html, /How inputs move this call/);
     assert.match(html, /Action now/);
-    assert.match(html, /Threshold/);
+    assert.match(html, /Revisit decisions\?/);
+    assert.match(html, /Guardrail/);
     assert.match(html, /Flip condition/);
     assert.match(html, /Current outlook/);
     assert.match(html, /Playbook for Defensive/);
@@ -181,10 +182,11 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /id="weekly-call-core"/);
     assert.equal((html.match(/This week&#x27;s call/g) ?? []).length, 1);
     assert.doesNotMatch(html, /Copy weekly operator brief/);
+    assert.doesNotMatch(html, /Open Signals/);
     assert.match(html, /weather-panel space-y-4 px-4 py-4/);
   });
 
-  it("keeps the bounded call compact with action, threshold, and flip visible", () => {
+  it("keeps the bounded call compact with action, guardrail, and flip visible", () => {
     const html = renderCard({
       decision: {
         operatingStanceLine: "Stage decisions.",
@@ -229,12 +231,13 @@ describe("WeeklyDecisionCard top-fold composition", () => {
 
     const callCore = html.slice(
       html.indexOf('id="weekly-call-core"'),
-      html.indexOf("Supporting rationale") > -1 ? html.indexOf("Supporting rationale") : html.indexOf("Open Signals"),
+      html.indexOf("Supporting rationale") > -1 ? html.indexOf("Supporting rationale") : html.indexOf('id="citation-actions"'),
     );
 
     assert.match(callCore, /Action now/);
-    assert.match(callCore, /Threshold/);
+    assert.match(callCore, /Guardrail/);
     assert.match(callCore, /Flip condition/);
+    assert.match(callCore, /Revisit decisions\?/);
     assert.ok((callCore.match(/<li/g) ?? []).length <= 4);
     assert.match(callCore, /What changed/);
     assert.match(callCore, /What to revisit/);
