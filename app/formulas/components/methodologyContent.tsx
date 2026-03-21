@@ -69,6 +69,27 @@ export const MethodologyContent = () => {
 
         </header>
 
+        <section className="mt-6 grid gap-4 md:grid-cols-3" aria-label="Methodology scope">
+          <article className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">What this model does</p>
+            <p className="mt-3 text-sm text-slate-200">
+              It turns a bounded macro input set into a weekly operating posture so leaders can tighten, hold, or loosen plans without reopening every assumption from scratch.
+            </p>
+          </article>
+          <article className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">What powers the call</p>
+            <p className="mt-3 text-sm text-slate-200">
+              The canonical pacing inputs are intentionally compact: base rate, curve slope, BBB spread, CPI, and unemployment. They set market tempo; they do not claim to model company-specific demand, product quality, or execution.
+            </p>
+          </article>
+          <article className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">How to read the outputs</p>
+            <p className="mt-3 text-sm text-slate-200">
+              Hiring, spending, fundraising, and product-tempo guidance are translation-layer defaults. They are designed to be bounded and reversible, not presented as bespoke certainty.
+            </p>
+          </article>
+        </section>
+
 
         <section className="mt-6 grid gap-4 md:grid-cols-3" aria-label="Methodology formulas">
           {primaryFormulas.concat(contextFormulas).map((item) => (
@@ -95,6 +116,9 @@ export const MethodologyContent = () => {
               outputs include <code>NO_POSTURE_CHANGE_RECOMMENDED</code> and <code>REVERSIBLE_BETS_ONLY</code>.
             </li>
           </ul>
+          <p className="mt-4 text-xs leading-6 text-slate-400">
+            Practical reading rule: the formulas improve transparency, but they do not expand the underlying data universe. Treat the composites as a compact macro interpretation layer, then pressure-test the output against your own company metrics before acting.
+          </p>
         </section>
       </div>
     </main>

@@ -27,7 +27,7 @@ export function LiveDataFallbackAlert({
     >
       <p className="font-semibold">Data state: cached snapshot active.</p>
       <p className="mt-1">
-        Decision impact: keep today&apos;s do now / hold / revisit path, but pause irreversible approvals until live data returns.
+        Decision impact: use this week&apos;s brief for pacing only, and pause irreversible approvals until live data returns.
       </p>
       <p className="mt-1 break-words [overflow-wrap:anywhere]">
         {sourceLine}
@@ -36,7 +36,7 @@ export function LiveDataFallbackAlert({
       </p>
       {fallbackReason ? <p className="mt-1 break-words [overflow-wrap:anywhere]">Fallback reason: {fallbackReason}</p> : null}
       <p className="mt-1">
-        Low confidence action: stage commitments and verify the next live refresh. {followUpLabel} in{" "}
+        Low confidence action: stage commitments, wait for one verified live refresh, and use the cached call as a translation layer rather than final authority. {followUpLabel} in{" "}
         <Link href={signalsHref} className="underline">
           Signals
         </Link>
