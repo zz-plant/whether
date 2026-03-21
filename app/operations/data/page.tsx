@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { buildPageMetadata } from "../../../lib/seo";
 import { siteUrl } from "../../../lib/siteUrl";
-import { loadReportDataSafe } from "../../../lib/report/reportData";
 import { PlanningSnippetsPanel } from "../components/planningSnippetsPanel";
 
 export const metadata: Metadata = buildPageMetadata({
@@ -32,9 +31,6 @@ const responseExample = `{
 }`;
 
 export default async function OperationsDataPage() {
-  const reportResult = await loadReportDataSafe(undefined, { route: "/operations/data" });
-  const { statusLabel, weeklyRecordDateLabel } = reportResult.ok ? reportResult.data : reportResult.fallback;
-
   return (
     <main className="min-h-screen bg-slate-950 px-6 py-12 text-slate-100">
       <section className="mx-auto max-w-4xl space-y-6">
@@ -48,7 +44,7 @@ export default async function OperationsDataPage() {
           <p className="max-w-3xl text-sm leading-7 text-slate-300 sm:text-base">
             Use this page when you need the weekly summary endpoint in automation, dashboards, or
             internal briefs. The API remains machine-first; this page gives a quick human bridge for
-            implementation.
+            implementation without depending on a live report render.
           </p>
           <div className="flex flex-wrap gap-3">
             <Link href="/operations" className="weather-button-primary px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em]">
@@ -127,7 +123,7 @@ export default async function OperationsDataPage() {
           </pre>
         </section>
 
-        <PlanningSnippetsPanel statusLabel={statusLabel} recordDateLabel={weeklyRecordDateLabel} />
+        <PlanningSnippetsPanel />
       </section>
     </main>
   );

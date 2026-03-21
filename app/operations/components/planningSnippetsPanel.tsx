@@ -6,36 +6,39 @@ import { getClipboardUiState, useClipboardCopy } from "../../components/useClipb
 import { WorkAppLabel } from "../../components/workAppIcon";
 
 type PlanningSnippetsPanelProps = {
-  statusLabel: string;
-  recordDateLabel: string;
+  statusLabel?: string;
+  recordDateLabel?: string;
 };
 
 export function PlanningSnippetsPanel({
   statusLabel,
   recordDateLabel,
 }: PlanningSnippetsPanelProps) {
+  const postureReference = statusLabel ? `the ${statusLabel} posture` : "the current weekly brief posture";
+  const weekReference = recordDateLabel ? `week ending ${recordDateLabel}` : "this week";
+
   const snippets = useMemo(
     () => [
       {
         id: "directive",
         label: "Weekly engineering directive",
         bestUse: "Best for: engineering standup notes",
-        text: `Weekly directive (week ending ${recordDateLabel}): Operate in the ${statusLabel} posture. Prioritize core delivery and reliability commitments, defer speculative scope, and re-validate staffing changes at the next weekly check-in.`,
+        text: `Weekly directive (${weekReference}): Operate in ${postureReference}. Prioritize core delivery and reliability commitments, defer speculative scope, and re-validate staffing changes at the next weekly check-in.`,
       },
       {
         id: "staff-update",
         label: "Staff update paragraph",
         bestUse: "Best for: leadership/status updates",
-        text: `This week we are operating in the ${statusLabel} posture for the week ending ${recordDateLabel}. Engineering focus remains on delivery predictability, reliability protection, and disciplined capacity allocation. We will avoid irreversible roadmap or hiring expansion until the next refresh confirms sustained improvement.`,
+        text: `This week we are operating in ${postureReference} for ${weekReference}. Engineering focus remains on delivery predictability, reliability protection, and disciplined capacity allocation. We will avoid irreversible roadmap or hiring expansion until the next refresh confirms sustained improvement.`,
       },
       {
         id: "risk-register",
         label: "Risk register entry",
         bestUse: "Best for: risk review logs",
-        text: `Risk: Posture mismatch to regime and environment (${statusLabel}).\nImpact: Missed delivery targets or excess spend under changing conditions.\nMitigation: Gate speculative work, enforce reliability guardrails, and re-evaluate posture weekly with latest signals.\nReview cadence: Weekly.`,
+        text: `Risk: Posture mismatch to regime and environment (${postureReference}).\nImpact: Missed delivery targets or excess spend under changing conditions.\nMitigation: Gate speculative work, enforce reliability guardrails, and re-evaluate posture weekly with latest signals.\nReview cadence: Weekly.`,
       },
     ],
-    [recordDateLabel, statusLabel],
+    [postureReference, weekReference],
   );
 
   const { activeTarget, copiedTarget, status, error, copyToClipboard } = useClipboardCopy();

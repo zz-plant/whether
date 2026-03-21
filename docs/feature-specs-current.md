@@ -87,10 +87,15 @@ approved.
 - **Data/API** (`/operations/data`): API usage guidance and handoff references for operators.
 - **Terminal** (`/operations/cli`): command-line status, history, diff, and scenario workflows.
 
+The `/operations/data` companion is intentionally static-first: endpoint docs and copy-ready snippets should load even when the live weekly report is degraded, so trust/reference content does not inherit avoidable report-fetch timeouts.
+
 ### 1.5 Home and glossary support (`/`, `/method#beginner-glossary`)
 The homepage is the only canonical first-time and returning weekly workspace. Plain-English
 glossary support lives under the Method hub so operators can pull term translation without leaving
 the weekly brief flow.
+
+### 1.5.1 About and identity framing (`/about`)
+The About page explicitly frames Whether as a small independent operator tool rather than a large research institution. It now states the intended authority boundary: trust the product for weekly pacing, bounded decisions, provenance, and degradation honesty—not as bespoke company advice or a substitute for internal metrics and judgment.
 
 ### 1.6 Method hub (/method) and formula reference (/methodology)
 `/method` is the canonical trust-audit hub linked from Weekly Brief. It summarizes current
@@ -100,6 +105,8 @@ confidence, freshness, source coverage, and revisit conditions, then links out t
 `/methodology` remains the lower-level formula reference documenting the sensor methodology and the
 public data sources used in the report (FRED Treasury series, BLS CPI, BLS labor, FRED credit
 spreads, FRED VIX, and Chicago Fed NFCI).
+
+The methodology reference also now clarifies scope: the canonical pacing model is intentionally built on a bounded macro input set (base rate, curve slope, BBB spread, CPI, unemployment), and the operating outputs are a translation layer rather than a claim of bespoke precision.
 
 ### 1.7 Share-preview assets for canonical hubs
 High-priority hub routes now ship dedicated static SVG social preview assets for:
