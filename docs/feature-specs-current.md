@@ -34,15 +34,18 @@ The home page is now the canonical weekly workspace. The top fold keeps the `Wee
 hero plus share/copy actions, then the page continues in a fixed operator sequence:
 - weekly call,
 - audit this call,
-- historical replay,
 - approve this week’s plan,
+- historical replay,
 - translate by role or run a tool.
 
 The audit band keeps trust compact on home by showing freshness, source coverage, revisit/flip
-conditions, and the top evidence movers without forcing a route change. Historical replay uses the
-same time-machine date-picker pattern as `/signals`, but starts directly on home. The operations
-band compresses approve/hold/revisit, top guardrails, finance posture, and export entry points
-before deeper review in `/operations`. The final band surfaces direct role, situation, toolkit,
+conditions, and the top evidence movers without forcing a route change. Audit actions now collapse
+to a single deeper-evidence path (`/signals`) so the home scan path stays focused on the weekly
+decision before branching. The operations band now appears before historical replay so operators
+can lock the current-week plan before looking backward. Historical replay still uses the same
+time-machine date-picker pattern as `/signals`, but starts directly on home. The operations band
+compresses approve/hold/revisit, top guardrails, finance posture, and export entry points before
+deeper review in `/operations`. The final band surfaces direct role, situation, toolkit,
 ship-checklist, and team-context shortcuts.
 
 The optional `?view=evidence` mode still renders the high-density analytical matrix with direct row

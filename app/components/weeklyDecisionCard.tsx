@@ -1054,7 +1054,6 @@ export function MoreContextDisclosureBody({
 type CitationActionFooterProps = {
   citationMetaLine: string;
   citation: string;
-  actions?: ReactNode;
 };
 
 type DecisionTransmissionRailProps = {
@@ -1106,7 +1105,7 @@ function DecisionTransmissionRail({
   );
 }
 
-export function CitationActionFooter({ citationMetaLine, citation, actions }: CitationActionFooterProps) {
+export function CitationActionFooter({ citationMetaLine, citation }: CitationActionFooterProps) {
   return (
     <article id="citation-actions" className={`${tierThreePanel} ${sectionSpacing}`}>
       <h2 className={tierThreeHeading}>Cite this call</h2>
@@ -1114,10 +1113,7 @@ export function CitationActionFooter({ citationMetaLine, citation, actions }: Ci
       <pre className="mt-2 overflow-x-auto rounded-md border border-slate-700/70 bg-slate-950/75 px-3 py-2 font-mono whitespace-pre-wrap text-xs text-slate-300">{citation}</pre>
       <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-md border border-slate-700/60 bg-slate-950/60 px-3 py-3 text-xs text-slate-300">
         <span>Use this citation in meeting notes, board updates, or operating memos.</span>
-        <span className="font-semibold uppercase tracking-[0.12em] text-slate-200">Send to team</span>
-      </div>
-      <div className="mt-3 flex flex-wrap gap-3">
-        <div className="hidden sm:flex sm:flex-wrap sm:gap-3 xl:hidden">{actions}</div>
+        <span className="font-semibold uppercase tracking-[0.12em] text-slate-200">Share actions stay in the transmission rail above.</span>
       </div>
     </article>
   );
@@ -1250,6 +1246,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     reversalTrigger,
     actionNowShort,
     immediateDecision,
+    guardrailThreshold,
     flipThreshold,
     compactFlipConditionLabels = [],
     canonicalDecisionCopy,
@@ -1296,7 +1293,9 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
     freshnessLabel,
   });
   const snapshotDoNow = immediateDecision;
-  const snapshotAvoid = executiveOperationalStance.avoid[0] ?? guardrail;
+  const snapshotGuardrail = guardrailThreshold?.trim()
+    || executiveOperationalStance.avoid[0]?.trim()
+    || guardrail;
   const snapshotWatch = canonicalDecisionCopy?.flipTrigger ?? flipThreshold ?? reversalTrigger;
   const structuredFlipLabels = canonicalFlipConditions
     .map((condition) => condition.label.trim())
@@ -1454,8 +1453,9 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
             trendLabel={trendLabel}
             confidencePercent={confidencePercent}
             confidenceLabel={confidenceLabel}
-            snapshotAvoid={snapshotAvoid}
+            snapshotGuardrail={snapshotGuardrail}
             snapshotWatch={snapshotWatch}
+            revisitDecisions={revisitDecisions}
             effectiveFlipLabels={effectiveFlipLabels}
             compactInsetClassName={compactInset}
             tierOnePanelClassName={tierOnePanel}
@@ -1517,7 +1517,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
           <ConfidenceMiniChart confidenceHistory={confidenceHistory} confidenceTrend={confidenceTrend} />
           <DecisionTransmissionRail
             actionNow={snapshotDoNow}
-            guardrail={snapshotAvoid}
+            guardrail={snapshotGuardrail}
             flipWhen={snapshotWatch}
             citationMetaLine={citationMetaLine}
             actions={actions}
@@ -1526,7 +1526,7 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
         </aside>
       </div>
 
-      <CitationActionFooter citationMetaLine={citationMetaLine} citation={citation} actions={actions} />
+      <CitationActionFooter citationMetaLine={citationMetaLine} citation={citation} />
     </section>
   );
 }

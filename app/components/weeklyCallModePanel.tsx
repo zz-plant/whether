@@ -21,8 +21,9 @@ type WeeklyCallModePanelProps = {
   trendLabel: string;
   confidencePercent: number;
   confidenceLabel: "HIGH" | "MED" | "LOW";
-  snapshotAvoid: string;
+  snapshotGuardrail: string;
   snapshotWatch: string;
+  revisitDecisions: boolean;
   effectiveFlipLabels: string[];
   compactInsetClassName: string;
   tierOnePanelClassName: string;
@@ -49,8 +50,9 @@ export function WeeklyCallModePanel({
   operatingCall,
   trendLabel,
   confidenceLabel,
-  snapshotAvoid,
+  snapshotGuardrail,
   snapshotWatch,
+  revisitDecisions,
   effectiveFlipLabels,
   compactInsetClassName,
   tierOnePanelClassName,
@@ -83,6 +85,10 @@ export function WeeklyCallModePanel({
     .filter((item) => item.detail.trim().length > 0)
     .slice(0, 3);
   const actionNowDetail = decisionBullets.find((item) => item.label === "What that changes")?.detail ?? operatingCall;
+  const revisitLabel = revisitDecisions ? "YES — revise this week." : "NO — hold posture.";
+  const revisitDetail = revisitDecisions
+    ? "Recheck last week's approvals before adding fixed cost."
+    : "No regime shift detected; keep last week's approvals in force.";
 
   return (
     <>
@@ -102,14 +108,19 @@ export function WeeklyCallModePanel({
           <h2 className={tierOneHeadingClassName}>This week&apos;s call</h2>
           <p className="mt-2 text-sm leading-6 text-slate-300">{operatingCall}</p>
           <p className="mt-1 text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">{postureLabel}</p>
+          <article className="mt-3 rounded-xl border border-amber-400/25 bg-amber-500/8 px-3 py-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-200">Revisit decisions?</p>
+            <p className="mt-1 text-sm font-semibold leading-6 text-amber-50">{revisitLabel}</p>
+            <p className="mt-1 text-xs leading-5 text-amber-100/85">{revisitDetail}</p>
+          </article>
           <div className="mt-3 grid gap-2 md:grid-cols-[minmax(0,1.15fr)_repeat(2,minmax(0,0.92fr))]">
             <article className="rounded-xl border border-emerald-400/25 bg-emerald-500/8 px-3 py-3">
               <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-emerald-200">Action now</p>
               <p className="mt-1 text-sm font-semibold leading-6 text-emerald-50">{actionNowDetail}</p>
             </article>
             <article className="rounded-xl border border-rose-400/25 bg-rose-500/8 px-3 py-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-rose-200">Threshold</p>
-              <p className="mt-1 text-sm font-semibold leading-6 text-rose-50">{snapshotAvoid}</p>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-rose-200">Guardrail</p>
+              <p className="mt-1 text-sm font-semibold leading-6 text-rose-50">{snapshotGuardrail}</p>
             </article>
             <article className="rounded-xl border border-sky-400/25 bg-sky-500/8 px-3 py-3">
               <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-sky-200">Flip condition</p>
@@ -206,12 +217,6 @@ export function WeeklyCallModePanel({
             ) : null}
           </details>
         ) : null}
-
-        <div className="mt-3 flex flex-wrap gap-2">
-          <Link href="/signals" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100">
-            Open Signals
-          </Link>
-        </div>
       </article>
     </>
   );
