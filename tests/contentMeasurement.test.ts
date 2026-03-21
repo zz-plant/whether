@@ -99,4 +99,40 @@ describe("trackContentCtaConversion", () => {
       globalThis.fetch = originalFetch;
     }
   });
+
+  it("swallows fetch rejections when telemetry delivery fails", async () => {
+    const originalNavigator = globalThis.navigator;
+    const originalFetch = globalThis.fetch;
+
+    Object.defineProperty(globalThis, "navigator", {
+      configurable: true,
+      value: {
+        sendBeacon: () => false,
+      },
+    });
+
+    let fetchCalls = 0;
+    globalThis.fetch = (async () => {
+      fetchCalls += 1;
+      throw new Error("network down");
+    }) as typeof fetch;
+
+    try {
+      trackContentCtaConversion({
+        pagePath: "/",
+        cluster: "tool",
+        intent: "board",
+        ctaId: "hero-copy",
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      assert.equal(fetchCalls, 1);
+    } finally {
+      Object.defineProperty(globalThis, "navigator", {
+        configurable: true,
+        value: originalNavigator,
+      });
+      globalThis.fetch = originalFetch;
+    }
+  });
 });
