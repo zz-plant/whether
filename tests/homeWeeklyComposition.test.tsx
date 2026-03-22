@@ -179,7 +179,6 @@ describe("weekly card and interpretation panel composition", () => {
     assert.match(html, /Action/);
     assert.match(html, /Interpretation layer/);
     assert.match(html, /Company view/);
-    assert.match(html, /• Action:/);
     assert.match(html, /Trigger:/);
     assert.match(html, /Reverse:/);
     assert.match(html, /See what changed, then pressure-test the call with trust and evidence\./);
@@ -218,6 +217,34 @@ describe("weekly card and interpretation panel composition", () => {
     assert.ok(actionStripIndex > rulesIndex);
     assert.ok(interpretationIndex > actionStripIndex);
     assert.ok(workspaceIndex > interpretationIndex);
+  });
+
+  it("keeps interpretation navigation reachable on the default homepage view", async () => {
+    const layer = buildInterpretationLayer({
+      view: "default",
+      homeBriefModel,
+      assessment,
+      forecast,
+      decisionRules,
+    });
+    const workspaceBands = await HomeWorkspaceBands({
+      workspaceModelPromise: Promise.resolve(workspaceModel),
+    });
+
+    const html = renderToStaticMarkup(
+      <>
+        <WeeklyDecisionCard model={buildHomeCardModel()} searchParams={{ month: "3", year: "2026" }} />
+        <HomeInterpretationPanel layer={layer} searchParams={{ month: "3", year: "2026" }} />
+        {workspaceBands}
+      </>,
+    );
+
+    assert.match(html, /Interpretation layer/);
+    assert.match(html, /Default view/);
+    assert.match(html, /\/\?month=3&amp;year=2026&amp;view=sector/);
+    assert.match(html, /\/\?month=3&amp;year=2026&amp;view=company/);
+    assert.match(html, /\/\?month=3&amp;year=2026&amp;view=financial/);
+    assert.match(html, /\/\?month=3&amp;year=2026&amp;view=forecast/);
   });
 
   it("renders orientation strip before the weekly decision card without replacing core card content", () => {

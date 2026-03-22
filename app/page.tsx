@@ -154,14 +154,12 @@ export const HomePageReportContent = async ({
         </StreamedSectionReveal>
       </Suspense>
 
-      {homepage.interpretationLayer.view !== "default" ? (
-        <StreamedSectionReveal delay="medium">
-          <HomeInterpretationPanel
-            layer={homepage.interpretationLayer}
-            searchParams={homepage.interpretationSearchParams}
-          />
-        </StreamedSectionReveal>
-      ) : null}
+      <StreamedSectionReveal delay="medium">
+        <HomeInterpretationPanel
+          layer={homepage.interpretationLayer}
+          searchParams={homepage.interpretationSearchParams}
+        />
+      </StreamedSectionReveal>
 
       {homepage.fallbackActive ? (
         <StreamedSectionReveal delay="medium">

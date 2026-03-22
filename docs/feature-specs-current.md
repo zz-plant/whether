@@ -20,7 +20,7 @@ Supporting surfaces are intentionally subordinate:
 - `/learn` is a supporting reference library under **Method**
 - `/guides`, `/resources`, `/answers`, `/solutions/*`, `/concepts`, and `/startup-macro-posture*` remain secondary discovery or distribution surfaces rather than primary workflow hubs
 
-The homepage keeps interpretation layers optional and query-driven: the default weekly brief omits interpretation context entirely, and interpretation panels render only when a non-default `?view=` is explicitly selected.
+The homepage keeps interpretation layers query-driven: the default weekly brief renders the canonical interpretation panel and its in-product links, while non-default `?view=` selections swap the panel into sector, company, financial, or forecast translations.
 
 Primary workflow pages now expose a top-of-page scroll path that explains the down-page sequence and highlights the current checkpoint as the operator moves through long surfaces.
 Report-shell routes (`/`, `/signals`, `/operations` and nested report paths) also use a reduced global header mode: brand/home anchor, global search entry, and compact route-orientation cues stay available without restoring the full navigation chrome above the brief.
