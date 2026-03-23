@@ -10,6 +10,8 @@ type HomePageDataDependencies = {
   unstableCache: typeof unstable_cache;
 };
 
+type HomePageFallbackState = Extract<HomePageReportResult, { ok: false }>;
+
 const HOMEPAGE_REPORT_REVALIDATE_SECONDS = 900;
 
 const defaultDependencies: HomePageDataDependencies = {
@@ -69,6 +71,8 @@ export const createHomePageReportDataLoader = (
     ...dependencies,
   } satisfies HomePageDataDependencies;
 
+  const fallbackStateByCacheKey = new Map<string, HomePageFallbackState>();
+
   const loadCachedHomePageReportResult = resolvedDependencies.unstableCache(
     async (cacheKey: string): Promise<CachedHomePageReportResult> => {
       const reportResult = await resolvedDependencies.loadReportDataSafe(
@@ -78,9 +82,11 @@ export const createHomePageReportDataLoader = (
       );
 
       if (!reportResult.ok) {
+        fallbackStateByCacheKey.set(cacheKey, reportResult);
         throw new HomePageFallbackResultError(reportResult.fallback, reportResult.error);
       }
 
+      fallbackStateByCacheKey.delete(cacheKey);
       return reportResult;
     },
     ["home-page-report-data"],
@@ -88,8 +94,17 @@ export const createHomePageReportDataLoader = (
   );
 
   return async (searchParams?: HomePageSearchParams): Promise<HomePageReportResult> => {
+    const cacheKey = buildHomePageCacheKey(searchParams);
+
     try {
-      return await loadCachedHomePageReportResult(buildHomePageCacheKey(searchParams));
+      const cachedResult = await loadCachedHomePageReportResult(cacheKey);
+      const fallbackState = fallbackStateByCacheKey.get(cacheKey);
+
+      if (fallbackState) {
+        return fallbackState;
+      }
+
+      return cachedResult;
     } catch (error) {
       if (error instanceof HomePageFallbackResultError) {
         return {
