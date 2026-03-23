@@ -171,7 +171,7 @@ describe("assembleHomePage streaming contract", () => {
     const homepage = await assembleHomePage(
       { searchParams: undefined },
       {
-        loadReportDataSafe: async () => buildReportResult(),
+        loadHomePageReportData: async () => buildReportResult(),
         buildPostureState: async () => postureStatePromise,
       },
     );
@@ -218,7 +218,7 @@ describe("assembleHomePage streaming contract", () => {
     const homepage = await assembleHomePage(
       { searchParams: { view: "forecast", month: "3", year: "2026" } },
       {
-        loadReportDataSafe: async () => buildReportResult(),
+        loadHomePageReportData: async () => buildReportResult(),
         buildPostureState: async () => postureState,
       },
     );

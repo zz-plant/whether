@@ -2,7 +2,7 @@ import {
   buildTimeMachineHref,
   getAdjacentTimeMachineRequest,
 } from "../timeMachine/timeMachineSelection";
-import { loadReportDataSafe, type ReportData, type ReportDataFallback } from "./reportData";
+import { type ReportData, type ReportDataFallback } from "./reportData";
 import { buildTrustStatus } from "./trustStatus";
 import { buildCompactFreshnessMeta } from "./reportFormatting";
 import { formatSourceFreshnessLabel, formatSourceModeLabel } from "./sourceHealth";
@@ -43,6 +43,7 @@ import {
 import { siteUrl } from "../siteUrl";
 import { createBreadcrumbTrail } from "../navigation/breadcrumbs";
 import type { HomePageSearchParams } from "./homeMetadata";
+import { loadHomePageReportData } from "./homePageData";
 
 export type ArtifactPayload = {
   boardSummary: string;
@@ -202,7 +203,7 @@ export type HomePageAssembly = {
       timeMachineHref: string;
     } | null;
   };
-  reportResult: Awaited<ReturnType<typeof loadReportDataSafe>>;
+  reportResult: Awaited<ReturnType<typeof loadHomePageReportData>>;
   weeklyDecisionCardModel: ReturnType<typeof buildWeeklyDecisionCardViewModel>;
   leadershipArtifactPayloadPromise: Promise<ArtifactPayload | null>;
   diagnosticsLanePromise: Promise<HomePageDiagnosticsLane>;
@@ -213,14 +214,14 @@ export type HomePageAssembly = {
 };
 
 type HomePageAssemblerDependencies = {
-  loadReportDataSafe: typeof loadReportDataSafe;
+  loadHomePageReportData: typeof loadHomePageReportData;
   buildPostureState: typeof buildPostureState;
 };
 
 const resolveHomepageOverlaySector = (value: string | undefined) => resolveSectorKey(value);
 
 const defaultHomePageAssemblerDependencies: HomePageAssemblerDependencies = {
-  loadReportDataSafe,
+  loadHomePageReportData,
   buildPostureState,
 };
 
@@ -618,11 +619,7 @@ export const assembleHomePage = async ({
     : "default";
   const sectionLinks = homeSectionSequence.map((section) => ({ href: section.href, label: section.label }));
 
-  const reportResult = await resolvedDependencies.loadReportDataSafe(
-    searchParams,
-    { route: "/" },
-    { includeHistoricalLiveComparison: false },
-  );
+  const reportResult = await resolvedDependencies.loadHomePageReportData(searchParams);
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
   const {
     assessment,

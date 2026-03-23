@@ -2,7 +2,7 @@ import { buildCallCitation } from "../export/briefBuilders";
 import { getRegimeDisplayLabel } from "../regimePresentation";
 import { buildCanonicalUrl, buildOgImageUrl } from "../seo";
 import { buildHomeBriefModel, buildWeeklyDecisionCardViewModel } from "./homeBriefModel";
-import { loadReportDataSafe } from "./reportData";
+import { loadHomePageReportData } from "./homePageData";
 import { buildCompactFreshnessMeta } from "./reportFormatting";
 import { resolveSectorKey } from "./sectorSensitivity";
 
@@ -41,11 +41,11 @@ export type HomeSharePreview = {
 };
 
 type HomeSharePreviewDependencies = {
-  loadReportDataSafe: typeof loadReportDataSafe;
+  loadHomePageReportData: typeof loadHomePageReportData;
 };
 
 const defaultDependencies: HomeSharePreviewDependencies = {
-  loadReportDataSafe,
+  loadHomePageReportData,
 };
 
 const formatRateValue = (value: number | null | undefined) =>
@@ -116,11 +116,7 @@ export const loadHomeSharePreview = async (
     ...defaultDependencies,
     ...dependencies,
   } satisfies HomeSharePreviewDependencies;
-  const reportResult = await resolvedDependencies.loadReportDataSafe(
-    searchParams,
-    { route: "/" },
-    { includeHistoricalLiveComparison: false },
-  );
+  const reportResult = await resolvedDependencies.loadHomePageReportData(searchParams);
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
   const overlaySector = resolveSectorKey(searchParams?.sector);
   const isFallback = Boolean(reportData.treasury.fallback_at || reportData.treasury.fallback_reason);
