@@ -3,11 +3,31 @@ import { loadReportDataSafe } from "./reportData";
 import type { HomePageSearchParams } from "./homeMetadata";
 
 type HomePageReportResult = Awaited<ReturnType<typeof loadReportDataSafe>>;
-type CachedHomePageReportResult =
-  | Extract<HomePageReportResult, { ok: true }>
-  | Omit<Extract<HomePageReportResult, { ok: false }>, "error">;
+type CachedHomePageReportResult = Extract<HomePageReportResult, { ok: true }>;
+
+type HomePageDataDependencies = {
+  loadReportDataSafe: typeof loadReportDataSafe;
+  unstableCache: typeof unstable_cache;
+};
 
 const HOMEPAGE_REPORT_REVALIDATE_SECONDS = 900;
+
+const defaultDependencies: HomePageDataDependencies = {
+  loadReportDataSafe,
+  unstableCache: unstable_cache,
+};
+
+class HomePageFallbackResultError extends Error {
+  fallback: Extract<HomePageReportResult, { ok: false }>['fallback'];
+  originalError: Error;
+
+  constructor(fallback: Extract<HomePageReportResult, { ok: false }>['fallback'], originalError: Error) {
+    super("Home page report data fell back to snapshot data.", { cause: originalError });
+    this.name = "HomePageFallbackResultError";
+    this.fallback = fallback;
+    this.originalError = originalError;
+  }
+}
 
 const normalizeHomePageSearchParams = (searchParams?: HomePageSearchParams) => {
   if (!searchParams) {
@@ -41,38 +61,47 @@ const parseHomePageCacheKey = (cacheKey: string): HomePageSearchParams | undefin
   ) as HomePageSearchParams;
 };
 
-const loadCachedHomePageReportResult = unstable_cache(
-  async (cacheKey: string): Promise<CachedHomePageReportResult> => {
-    const reportResult = await loadReportDataSafe(
-      parseHomePageCacheKey(cacheKey),
-      { route: "/" },
-      { includeHistoricalLiveComparison: false },
-    );
+export const createHomePageReportDataLoader = (
+  dependencies: Partial<HomePageDataDependencies> = {},
+) => {
+  const resolvedDependencies = {
+    ...defaultDependencies,
+    ...dependencies,
+  } satisfies HomePageDataDependencies;
 
-    if (reportResult.ok) {
+  const loadCachedHomePageReportResult = resolvedDependencies.unstableCache(
+    async (cacheKey: string): Promise<CachedHomePageReportResult> => {
+      const reportResult = await resolvedDependencies.loadReportDataSafe(
+        parseHomePageCacheKey(cacheKey),
+        { route: "/" },
+        { includeHistoricalLiveComparison: false },
+      );
+
+      if (!reportResult.ok) {
+        throw new HomePageFallbackResultError(reportResult.fallback, reportResult.error);
+      }
+
       return reportResult;
+    },
+    ["home-page-report-data"],
+    { revalidate: HOMEPAGE_REPORT_REVALIDATE_SECONDS },
+  );
+
+  return async (searchParams?: HomePageSearchParams): Promise<HomePageReportResult> => {
+    try {
+      return await loadCachedHomePageReportResult(buildHomePageCacheKey(searchParams));
+    } catch (error) {
+      if (error instanceof HomePageFallbackResultError) {
+        return {
+          ok: false,
+          fallback: error.fallback,
+          error: error.originalError,
+        };
+      }
+
+      throw error;
     }
-
-    return {
-      ok: false,
-      fallback: reportResult.fallback,
-    };
-  },
-  ["home-page-report-data"],
-  { revalidate: HOMEPAGE_REPORT_REVALIDATE_SECONDS },
-);
-
-export const loadHomePageReportData = async (
-  searchParams?: HomePageSearchParams,
-): Promise<HomePageReportResult> => {
-  const cachedResult = await loadCachedHomePageReportResult(buildHomePageCacheKey(searchParams));
-
-  if (cachedResult.ok) {
-    return cachedResult;
-  }
-
-  return {
-    ...cachedResult,
-    error: new Error("Home page report data fell back to cached data."),
   };
 };
+
+export const loadHomePageReportData = createHomePageReportDataLoader();
