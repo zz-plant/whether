@@ -35,7 +35,11 @@ type HubSectionProps = {
 
 export function HubPageShell({ children, width = "wide" }: HubPageShellProps) {
   return (
-    <main className={`weather-page-shell ${widthClassNames[width]} weather-hub-shell`}>
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className={`weather-page-shell ${widthClassNames[width]} weather-hub-shell`}
+    >
       <div className="weather-hub-backdrop" aria-hidden="true" />
       {children}
     </main>

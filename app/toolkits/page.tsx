@@ -57,17 +57,21 @@ export default async function ToolkitsPage({
       />
       <HubSection title="Find the runnable instrument" description="Search by the decision you need to make this week. Each toolkit is designed to help a team move from posture to a bounded action." >
         <form action="/toolkits" className="flex flex-col gap-3 sm:flex-row">
+          <label htmlFor="toolkits-search-input" className="sr-only">Search toolkits by decision</label>
           <input
+            id="toolkits-search-input"
             type="search"
             name="q"
             defaultValue={resolvedSearchParams?.q ?? ""}
             className="weather-input w-full px-4 py-2"
-            placeholder="Search toolkits (e.g., rollback, roadmap, PMF)"
+            placeholder="Search toolkits (e.g., rollback, roadmap, PMF)…"
+            autoComplete="off"
             aria-label="Search toolkits"
           />
           <button type="submit" className="weather-button">Search</button>
           {query ? (<Link href="/toolkits" className="weather-button inline-flex items-center justify-center">Clear</Link>) : null}
         </form>
+        <p className="text-xs text-slate-300">Use concrete decision jobs first, then refine by workflow context.</p>
         {query ? (
           <div className="flex flex-wrap gap-2 text-xs text-slate-200">
             <span className="weather-pill inline-flex min-h-[36px] items-center px-3 py-1">Active intent: {query}</span>
@@ -107,6 +111,9 @@ export default async function ToolkitsPage({
       {filteredToolkits.length === 0 ? (
         <section className="weather-hub-section space-y-3 text-sm text-slate-200">
           <p>No toolkits matched “{query}”. Try broader keywords.</p>
+          <div className="flex flex-wrap gap-2">
+            <Link href="/decide" className="weather-hub-chip">Open Decide for guided routing</Link>
+          </div>
           {closestToolkits.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {closestToolkits.map((toolkit) => (

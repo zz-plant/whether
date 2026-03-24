@@ -45,12 +45,15 @@ export default async function SearchPage({
 
       <HubSection title="Search the operating system" description="Use direct terms for the decision you need to make, the risk you are seeing, or the trust question you need to settle.">
         <form action="/search" className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto_auto]">
+            <label htmlFor="global-search-input" className="sr-only">Search all Whether content</label>
             <input
+              id="global-search-input"
               type="search"
               name="q"
               defaultValue={q}
               className="weather-input w-full"
-              placeholder="Search: rollback, PMF, regime mismatch, formulas"
+              placeholder="Search: rollback, PMF, regime mismatch, formulas…"
+              autoComplete="off"
               aria-label="Search all Whether content"
             />
             <button type="submit" className="weather-button-primary min-h-[44px] px-4">
@@ -62,11 +65,12 @@ export default async function SearchPage({
               </Link>
             ) : null}
           </form>
+        <p className="text-xs text-slate-300">Try decision-first terms like <span className="font-semibold text-slate-100">runway</span>, <span className="font-semibold text-slate-100">hiring freeze</span>, or <span className="font-semibold text-slate-100">capital posture</span>.</p>
       </HubSection>
 
       {query ? (
         <section className="space-y-6">
-          <p className="px-1 text-sm text-slate-300">
+          <p className="px-1 text-sm text-slate-300" role="status" aria-live="polite">
             {results.length} result{results.length === 1 ? "" : "s"} for <span className="font-semibold text-slate-100">“{query}”</span>
           </p>
 
@@ -95,10 +99,17 @@ export default async function SearchPage({
           })}
 
           {results.length === 0 ? (
-            <div className="weather-hub-section text-sm text-slate-300">
-              No results matched. Try terms like <span className="font-semibold text-slate-100">rollback</span>,{" "}
-              <span className="font-semibold text-slate-100">PMF</span>, or{" "}
-              <span className="font-semibold text-slate-100">method</span>.
+            <div className="weather-hub-section space-y-3 text-sm text-slate-300" role="status" aria-live="polite">
+              <p>
+                No results matched. Try terms like <span className="font-semibold text-slate-100">rollback</span>,{" "}
+                <span className="font-semibold text-slate-100">PMF</span>, or{" "}
+                <span className="font-semibold text-slate-100">method</span>.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Link href="/search?q=rollback" className="weather-hub-chip">Try rollback</Link>
+                <Link href="/search?q=runway" className="weather-hub-chip">Try runway</Link>
+                <Link href="/search?q=trust" className="weather-hub-chip">Try trust docs</Link>
+              </div>
             </div>
           ) : null}
         </section>
