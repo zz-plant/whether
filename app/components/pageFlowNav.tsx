@@ -79,17 +79,17 @@ export function PageFlowNav({
         </div>
         <div className="grid gap-2 sm:grid-cols-2 xl:min-w-[23rem]">
           <div className="weather-hub-card px-4 py-4">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Current section</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">First checkpoint</p>
             <p className="mt-1 text-sm font-semibold text-slate-100">{items[0]?.label}</p>
             <p className="mt-1 text-xs text-slate-300">{items[0]?.summary}</p>
           </div>
           <div className="weather-hub-card px-4 py-4">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Progress</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Total checkpoints</p>
             <p className="mt-1 text-sm font-semibold text-slate-100">
-              1 of {items.length}
+              {items.length}
             </p>
             <p className="mt-1 text-xs text-slate-300">
-              Follow the sections top to bottom for the intended decision flow.
+              Follow sections top to bottom for the intended decision flow.
             </p>
           </div>
         </div>
