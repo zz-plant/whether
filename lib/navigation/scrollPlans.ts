@@ -15,7 +15,7 @@ export const homeScrollPlan: ScrollPlan = {
   eyebrow: "Scroll path",
   title: "Move through the weekly brief in one pass",
   description:
-    "Start with why the call changed, lock the operating plan, then open replay or decision tools only when they help this week.",
+    "Confirm why the call changed, lock the operating plan, then use replay only when continuity helps this week’s decision.",
   items: [
     {
       href: "#audit-this-call",
@@ -31,11 +31,6 @@ export const homeScrollPlan: ScrollPlan = {
       href: "#historical-replay-workspace",
       label: "Replay",
       summary: "Compare against prior months only after the live call is settled.",
-    },
-    {
-      href: "#translate-or-run-tool",
-      label: "Translate",
-      summary: "Jump into a role path, situation path, or runnable utility if needed.",
     },
   ],
 };

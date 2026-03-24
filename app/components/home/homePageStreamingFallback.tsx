@@ -122,24 +122,20 @@ export const HomePageStreamingFallback = ({ searchParams }: HomePageStreamingFal
 
       <section className="home-band-stack" aria-label="Loading additional sections">
         <section className="home-band home-band--flow home-band-shell home-band-shell--nav weather-panel weather-section-stage space-y-3 px-4 py-4">
-          <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
+          <div className="flex flex-col gap-3">
             <div className="space-y-1">
               <div className="flex flex-wrap items-center gap-2">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Scroll path</p>
                 <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-200">
-                  1 of 4
+                  1 of 3
                 </span>
               </div>
               <h2 className="text-lg font-semibold text-slate-100 sm:text-xl">Move through the weekly brief in one pass</h2>
-              <p className="max-w-3xl text-sm text-slate-300">Start with why the call changed, lock the operating plan, then open replay or decision tools only when they help this week.</p>
-            </div>
-            <div className="flex flex-wrap gap-2.5">
-              <Skeleton className="h-11 w-52 rounded-full bg-slate-500/34" />
-              <Skeleton className="h-11 w-56 rounded-full bg-slate-500/30" />
+              <p className="max-w-3xl text-sm text-slate-300">Confirm why the call changed, lock the operating plan, then use replay only when continuity helps this week.</p>
             </div>
           </div>
-          <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-4">
-            {["Audit", "Approve", "Replay", "Translate"].map((label, index) => (
+          <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+            {["Audit", "Approve", "Replay"].map((label, index) => (
               <article key={label} className={`weather-surface weather-step-card rounded-xl border px-3 py-3 ${index === 0 ? "border-sky-400/40 bg-sky-500/10" : "border-slate-800/80 bg-slate-950/45"}`}>
                 <div className="flex items-center justify-between gap-3">
                   <span className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-200">

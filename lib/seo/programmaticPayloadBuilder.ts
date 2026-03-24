@@ -5,10 +5,10 @@ import { decideClusterStaticParams } from "../../app/decide/clusterRoutes";
 import { decisionScenarioDefinitions, signalScenarioRoutes } from "../../app/seoRouteClusters";
 import { toolkitClusterStaticParams } from "../../app/toolkits/clusterRoutes";
 import { findUseCaseRole, findToolkitDefinition } from "../decisionDomainCatalog";
-import { buildHomeBriefModel } from "../report/homeBriefModel";
 import { buildSeoDecisionPayload, type SeoDecisionPayload } from "../report/seoDecisionPayload";
 import type { DecisionArea } from "../report/boundedDecisionRules";
-import { loadReportDataSafe, type ReportData } from "../report/reportData";
+import type { ReportData } from "../report/reportData";
+import { loadWeeklyBriefSnapshot, type WeeklyBriefSnapshot } from "../report/weeklyBriefSnapshot";
 import { findSignalsCluster } from "../../app/signals/clusterRoutes";
 
 const ARTIFACT_ROOT = join(process.cwd(), "data", "seo-payloads");
@@ -72,6 +72,7 @@ export type ProgrammaticRouteDefinition = z.infer<typeof programmaticRouteSchema
 type PayloadContext = {
   reportData: ReportData;
   isFallbackSnapshot: boolean;
+  snapshot: WeeklyBriefSnapshot;
 };
 
 const stableJson = (value: unknown) => `${JSON.stringify(value, null, 2)}\n`;
@@ -120,8 +121,8 @@ const clusterKeyForRoute = (route: ProgrammaticRouteDefinition): string => {
 };
 
 const buildRecordForRoute = (route: ProgrammaticRouteDefinition, context: PayloadContext, siblingsInCluster: { pageKey: string; interpretationLabel?: string; currentCall?: string; immediateAction?: string; evidenceTitles?: string[]; }[] = []): ProgrammaticPayloadRecord => {
-  const { reportData, isFallbackSnapshot } = context;
-  const homeBriefModel = buildHomeBriefModel(reportData);
+  const { reportData, isFallbackSnapshot, snapshot } = context;
+  const { homeBriefModel } = snapshot;
 
   const mappedDecisionAreas: DecisionArea[] =
     route.kind === "signal-scenario"
@@ -200,9 +201,11 @@ const assertGenerationContracts = (record: ProgrammaticPayloadRecord) => {
 };
 
 export const generateProgrammaticPayloadArtifacts = async (): Promise<{ version: string; records: ProgrammaticPayloadRecord[] }> => {
-  const reportResult = await loadReportDataSafe(undefined, { route: "programmatic-seo-build" });
-  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
-  const isFallbackSnapshot = !reportResult.ok;
+  const { reportData, degraded, snapshot } = await loadWeeklyBriefSnapshot(
+    undefined,
+    { route: "programmatic-seo-build" },
+  );
+  const isFallbackSnapshot = degraded;
   const version = versionFromReportData(reportData);
   const routes = enumerateProgrammaticRoutes();
   const outputDir = join(ARTIFACT_ROOT, version);
@@ -215,7 +218,11 @@ export const generateProgrammaticPayloadArtifacts = async (): Promise<{ version:
     urls: {},
   };
 
-  const preliminaryRecords = routes.map((route) => buildRecordForRoute(route, { reportData, isFallbackSnapshot }));
+  const preliminaryRecords = routes.map((route) => buildRecordForRoute(route, {
+    reportData,
+    isFallbackSnapshot,
+    snapshot,
+  }));
 
   const records = preliminaryRecords.map((record) => {
     const route = routes.find((item) => item.url === record.url);
@@ -234,7 +241,7 @@ export const generateProgrammaticPayloadArtifacts = async (): Promise<{ version:
         evidenceTitles: candidate.payload.evidence.map((item) => item.title),
       }));
 
-    const rebuilt = buildRecordForRoute(route, { reportData, isFallbackSnapshot }, siblings);
+    const rebuilt = buildRecordForRoute(route, { reportData, isFallbackSnapshot, snapshot }, siblings);
     assertGenerationContracts(rebuilt);
     return rebuilt;
   });

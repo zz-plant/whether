@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { loadReportDataSafe, type ReportData, type ReportDataFallback } from "../report/reportData";
+import type { ReportData, ReportDataFallback } from "../report/reportData";
+import { loadReportRouteContext } from "./reportRoute";
 
 type CadenceRouteData = ReportData | ReportDataFallback;
 
@@ -20,8 +21,7 @@ export const buildCadenceRouteResponse = async <TSummary extends CadenceSummary>
     input: { reportData: CadenceRouteData; summary: TSummary }
   ) => Record<string, unknown> | Promise<Record<string, unknown>>;
 }) => {
-  const reportResult = await loadReportDataSafe(undefined, { route });
-  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
+  const { reportData, degraded } = await loadReportRouteContext({ route });
   const summary = buildSummary(reportData);
   const extraPayload = buildExtraPayload ? await buildExtraPayload({ reportData, summary }) : {};
 
@@ -32,7 +32,7 @@ export const buildCadenceRouteResponse = async <TSummary extends CadenceSummary>
     recordDateLabel: summary.recordDateLabel,
     generatedAt: new Date().toISOString(),
     version: "v1",
-    degraded: !reportResult.ok,
+    degraded,
     ...extraPayload,
   });
 };

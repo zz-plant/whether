@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { loadReportDataSafe } from "../../lib/report/reportData";
-import { buildHomeBriefModel } from "../../lib/report/homeBriefModel";
+import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { buildBreadcrumbList, buildPageMetadata, serializeJsonLd } from "../../lib/seo";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import {
@@ -34,9 +33,8 @@ export default async function DecidePage() {
       ]),
     ),
   };
-  const reportResult = await loadReportDataSafe(undefined, { route: "/decide" });
-  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
-  const homeBriefModel = buildHomeBriefModel(reportData);
+  const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/decide" });
+  const { homeBriefModel } = snapshot;
   const liveCall = {
     posture: homeBriefModel.postureWithStageLabel,
     action: reportData.actionNowShort ?? homeBriefModel.operatingStanceLine,
@@ -50,8 +48,8 @@ export default async function DecidePage() {
       <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Decide" }]} />
       <HubHero
         eyebrow="Decision translation"
-        title="Translate this week’s live call without leaving the operator loop."
-        description="Start from the current posture, then choose the narrowest path that turns it into a role-specific or situation-specific decision."
+        title="Use Decide only when the weekly call needs role or situation translation."
+        description="If Weekly Brief already resolved the decision, stay there or continue to Operations. Open Decide when the direction is clear but the owner-specific translation still needs work."
         actions={(
           <>
             <Link href="/" className="weather-button inline-flex items-center justify-center">Return to Weekly Brief</Link>
@@ -104,7 +102,7 @@ export default async function DecidePage() {
       <HubSection
         id="run-this-now"
         title="Run this now"
-        description="Use the shortest runnable path when the live call already tells you the direction and you only need execution translation."
+        description="Use the shortest runnable path only after the weekly call already tells you the direction and you just need execution translation."
         className="scroll-mt-28"
       >
         <div className="weather-page-grid-3">
@@ -126,7 +124,7 @@ export default async function DecidePage() {
       <HubSection
         id="decision-utilities"
         title="Decision utilities"
-        description="Use these only when the live call needs bounded validation or company context before you act."
+        description="Use these only when the weekly call needs bounded validation or company context before you act."
         className="scroll-mt-28"
       >
         <div className="weather-page-grid-2">

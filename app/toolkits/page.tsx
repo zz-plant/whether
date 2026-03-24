@@ -46,12 +46,12 @@ export default async function ToolkitsPage({
       <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Toolkits" }]} />
       <HubHero
         eyebrow="Supporting surface under Decide"
-        title="Run one instrument end to end once the weekly call is already clear."
-        description="Start in Decide when you need role or situation framing, then use Toolkits to run one instrument end to end."
+        title="Run one instrument only after Weekly Brief or Decide has already set the direction."
+        description="Toolkits are execution helpers, not the canonical workflow. Use them when the call is clear and you need one runnable instrument end to end."
         actions={<Link href="/decide" className="weather-button inline-flex items-center justify-center">Open Decide</Link>}
         stats={[
           { label: "Results", value: `${filteredToolkits.length} toolkit${filteredToolkits.length === 1 ? "" : "s"}` },
-          { label: "Best use", value: "Action after orientation" },
+          { label: "Best use", value: "Action after direction" },
           { label: "Search mode", value: query ? `Intent: ${query}` : "Browse all", detail: "Search by decision job, not by abstract framework language." },
         ]}
       />

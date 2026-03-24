@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import { buildPageMetadata } from "../../../lib/seo";
 import { findDecisionPage, highValueAnswerStaticParams, highValueStaticAnswerSlugs } from "../decisionPages";
 import { DecisionAnswerPageContent } from "../decisionAnswerPageContent";
-import { loadReportDataSafe } from "../../../lib/report/reportData";
-import { buildHomeBriefModel } from "../../../lib/report/homeBriefModel";
 import { buildSeoDecisionPayload } from "../../../lib/report/seoDecisionPayload";
+import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
 
 type DecisionPageProps = {
   params: Promise<{ slug: string }>;
@@ -58,9 +57,8 @@ export async function generateMetadata({ params }: DecisionPageProps): Promise<M
   }
 
   const route = highValueStaticAnswerSlugs.includes(slug) ? "/answers/[slug]" : "/answers/[slug]:isr";
-  const reportResult = await loadReportDataSafe(undefined, { route });
-  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
-  const homeBriefModel = buildHomeBriefModel(reportData);
+  const { reportData, degraded, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route });
+  const homeBriefModel = snapshot.homeBriefModel;
   const mappedRules = homeBriefModel.decisionRules.filter((rule) => page.mappedDecisionAreas.includes(rule.area));
   const payload = buildSeoDecisionPayload({
     assessment: reportData.assessment,
@@ -73,7 +71,7 @@ export async function generateMetadata({ params }: DecisionPageProps): Promise<M
     recordDateLabel: reportData.recordDateLabel,
     confidenceLabel: homeBriefModel.confidenceLabel,
     transitionWatch: homeBriefModel.transitionWatch,
-    isFallbackSnapshot: !reportResult.ok,
+    isFallbackSnapshot: degraded,
     provenanceStatusLabel: reportData.treasuryProvenance?.statusLabel,
     fetchedAtIso: reportData.treasury.fetched_at,
     pageKey: `/answers/${page.slug}`,

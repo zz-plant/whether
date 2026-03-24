@@ -1,14 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { loadReportDataSafe } from "../../lib/report/reportData";
 import { serializeJsonLd } from "../../lib/seo";
-import { buildHomeBriefModel } from "../../lib/report/homeBriefModel";
 import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
-import { buildCallCitation } from "../../lib/export/briefBuilders";
 import { buildLiveDirectAnswer, buildLiveShortAnswer } from "./liveShortAnswers";
 import { answerPages, findDecisionPage } from "./decisionPages";
-import { getRegimeDisplayLabel } from "../../lib/regimePresentation";
 import { buildSeoDecisionPayload } from "../../lib/report/seoDecisionPayload";
+import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 
 export async function DecisionAnswerPageContent({
   slug,
@@ -20,10 +17,9 @@ export async function DecisionAnswerPageContent({
   const page = findDecisionPage(slug);
   if (!page) notFound();
 
-  const reportResult = await loadReportDataSafe(undefined, { route });
-  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
+  const { reportData, degraded, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route });
   const { assessment, recordDateLabel, reportDynamics, treasury, fetchedAtLabel } = reportData;
-  const homeBriefModel = buildHomeBriefModel(reportData);
+  const { homeBriefModel, displayRegime, callCitation } = snapshot;
   const mappedRules = homeBriefModel.decisionRules.filter((rule) => page.mappedDecisionAreas.includes(rule.area));
   const payload = buildSeoDecisionPayload({
     assessment,
@@ -36,7 +32,7 @@ export async function DecisionAnswerPageContent({
     recordDateLabel,
     confidenceLabel: homeBriefModel.confidenceLabel,
     transitionWatch: homeBriefModel.transitionWatch,
-    isFallbackSnapshot: !reportResult.ok,
+    isFallbackSnapshot: degraded,
     provenanceStatusLabel: reportData.treasuryProvenance?.statusLabel,
     fetchedAtIso: reportData.treasury.fetched_at,
     pageKey: `/answers/${page.slug}`,
@@ -44,7 +40,6 @@ export async function DecisionAnswerPageContent({
   });
   const liveShortAnswer = buildLiveShortAnswer({ payload, fallback: page.shortAnswer });
   const liveDirectAnswer = buildLiveDirectAnswer({ payload, fallback: page.directAnswer });
-  const callCitation = buildCallCitation(assessment, treasury);
   const relatedPages = answerPages.filter((candidate) => candidate.slug !== page.slug && candidate.category !== page.category).slice(0, 3);
 
   const faqData = {
@@ -61,13 +56,6 @@ export async function DecisionAnswerPageContent({
       },
     ],
   };
-
-  const displayRegime = getRegimeDisplayLabel({
-    regime: assessment.regime,
-    momentum: reportDynamics.directionLabel,
-    confidence: homeBriefModel.confidenceLabel,
-    transitionWatch: homeBriefModel.transitionWatch === "ON",
-  });
 
   const thresholdTrigger =
     page.thresholdFocus === "tightness"

@@ -4,9 +4,8 @@ import { notFound } from "next/navigation";
 import { formatPublishedLabel } from "../../../lib/formatters";
 import type { ProductConceptArticle } from "../../../lib/productCanon";
 import { getMacroContextForArticle, regimeToneByKey } from "../../../lib/productCanon";
-import { buildHomeBriefModel } from "../../../lib/report/homeBriefModel";
-import { loadReportDataSafe } from "../../../lib/report/reportData";
 import { buildCanonicalUrl, buildPageMetadata, serializeJsonLd } from "../../../lib/seo";
+import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
 
 export type ConceptTaxonomyKind = "audience" | "focus";
 
@@ -162,9 +161,8 @@ export const ConceptTaxonomyPage = <TTaxonomy extends string>({
 };
 
 const ThisWeeksOperatingImplication = async () => {
-  const reportResult = await loadReportDataSafe(undefined, { route: "/concepts" });
-  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
-  const homeBriefModel = buildHomeBriefModel(reportData);
+  const { snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/concepts" });
+  const homeBriefModel = snapshot.homeBriefModel;
   const topRule = homeBriefModel.decisionRules[0];
 
   return (

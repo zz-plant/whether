@@ -30,10 +30,7 @@ import {
   downloadableResources,
 } from "../../../lib/downloadableResources";
 import { resourceArticles } from "../../../lib/resourceArticles";
-import { loadReportDataSafe } from "../../../lib/report/reportData";
-import { buildHomeBriefModel } from "../../../lib/report/homeBriefModel";
-import { getRegimeDisplayLabel } from "../../../lib/regimePresentation";
-import { buildCallCitation } from "../../../lib/export/briefBuilders";
+import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
 
 type Params = { slug: string };
 
@@ -102,17 +99,10 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
 
   const article = findResourceArticleBySlug(slug);
   if (article) {
-    const reportResult = await loadReportDataSafe(undefined, { route: `/resources/${article.slug}` });
-    const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
-    const homeBriefModel = buildHomeBriefModel(reportData);
+    const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: `/resources/${article.slug}` });
+    const { homeBriefModel, displayRegime, callCitation } = snapshot;
     const decisionAreas = getResourceArticleDecisionAreas(article);
     const mappedRules = homeBriefModel.decisionRules.filter((rule) => decisionAreas.includes(rule.area)).slice(0, 3);
-    const displayRegime = getRegimeDisplayLabel({
-      regime: reportData.assessment.regime,
-      momentum: reportData.reportDynamics.directionLabel,
-      confidence: homeBriefModel.confidenceLabel,
-      transitionWatch: homeBriefModel.transitionWatch === "ON",
-    });
 
     return (
       <ResourceArticlePage
@@ -122,7 +112,7 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
           postureSummary: `Posture: ${displayRegime.label} (${displayRegime.canonicalRegime}) · Weekly momentum: ${reportData.reportDynamics.directionLabel} · Revisit decisions: ${homeBriefModel.revisitDecisions ? "YES" : "NO"}`,
           mappedRules,
           freshnessLabel: reportData.fetchedAtLabel,
-          citation: buildCallCitation(reportData.assessment, reportData.treasury),
+          citation: callCitation,
         }}
       />
     );

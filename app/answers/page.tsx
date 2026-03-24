@@ -3,9 +3,7 @@ import type { Metadata } from "next";
 import { buildCanonicalUrl, buildPageMetadata, serializeJsonLd } from "../../lib/seo";
 import { answerCategories, answerPages } from "./decisionPages";
 import { featuredAnswerPages } from "./selectors";
-import { loadReportDataSafe } from "../../lib/report/reportData";
-import { buildHomeBriefModel } from "../../lib/report/homeBriefModel";
-import { getRegimeDisplayLabel } from "../../lib/regimePresentation";
+import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 
 export const revalidate = 900;
 
@@ -18,15 +16,8 @@ export const metadata: Metadata = buildPageMetadata({
 });
 
 export default async function AnswersHubPage() {
-  const reportResult = await loadReportDataSafe(undefined, { route: "/answers" });
-  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
-  const homeBriefModel = buildHomeBriefModel(reportData);
-  const displayRegime = getRegimeDisplayLabel({
-    regime: reportData.assessment.regime,
-    momentum: reportData.reportDynamics.directionLabel,
-    confidence: homeBriefModel.confidenceLabel,
-    transitionWatch: homeBriefModel.transitionWatch === "ON",
-  });
+  const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/answers" });
+  const { displayRegime, weeklyDecisionCardModel } = snapshot;
   const listData = {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -66,11 +57,11 @@ export default async function AnswersHubPage() {
           </article>
           <article className="weather-surface px-4 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Immediate implication</p>
-            <p className="mt-2 text-sm text-slate-200">{homeBriefModel.immediateDecision}</p>
+            <p className="mt-2 text-sm text-slate-200">{weeklyDecisionCardModel.decision.immediateDecision}</p>
           </article>
           <article className="weather-surface px-4 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Flip condition</p>
-            <p className="mt-2 text-sm text-slate-200">{homeBriefModel.reversalTrigger}</p>
+            <p className="mt-2 text-sm text-slate-200">{weeklyDecisionCardModel.decision.reversalTrigger}</p>
           </article>
         </div>
         <p className="text-sm text-slate-300">

@@ -20,10 +20,9 @@ import { regimePages } from "./startup-macro-posture/clusterData";
 import { indexableDecideClusterRoutes } from "./decide/clusterRoutes";
 import { indexableToolkitClusters } from "./toolkits/clusterRoutes";
 import { signalScenarioRoutes } from "./seoRouteClusters";
-import { loadReportDataSafe } from "../lib/report/reportData";
-import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
 import { evaluateSeoQualityGates } from "../lib/report/seoQualityGates";
 import { isRetiredSitemapPath } from "./sitemapExclusions";
+import { loadWeeklyBriefSnapshot } from "../lib/report/weeklyBriefSnapshot";
 
 type ChangeFrequency = NonNullable<MetadataRoute.Sitemap[number]["changeFrequency"]>;
 
@@ -67,9 +66,8 @@ const buildEntry = ({
 });
 
 export const isProgrammaticSitemapEligible = async (): Promise<boolean> => {
-  const reportResult = await loadReportDataSafe(undefined, { route: "/sitemap" });
-  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
-  const homeBriefModel = buildHomeBriefModel(reportData);
+  const { reportData, degraded, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/sitemap" });
+  const homeBriefModel = snapshot.homeBriefModel;
   const primaryRule = homeBriefModel.decisionRules[0];
 
   return evaluateSeoQualityGates({
@@ -81,11 +79,11 @@ export const isProgrammaticSitemapEligible = async (): Promise<boolean> => {
     evidenceCount: reportData.reportEvidenceItems.length,
     evidenceTitles: reportData.reportEvidenceItems.map((item) => item.title),
     fetchedAtIso: reportData.treasury.fetched_at,
-    isFallbackSnapshot: !reportResult.ok,
+    isFallbackSnapshot: degraded,
     provenanceStatusLabel: reportData.treasuryProvenance?.statusLabel,
     provenanceLinks: [reportData.treasury.source, reportData.macroSeries[0]?.sourceUrl].filter((link): link is string => Boolean(link)),
     confidenceLabel: homeBriefModel.confidenceLabel,
-    fallbackLabel: reportResult.ok ? "live" : "fallback",
+    fallbackLabel: degraded ? "fallback" : "live",
     trustSummary: reportData.treasuryProvenance?.statusLabel,
     citationMeta: reportData.recordDateLabel,
     interpretationLabel: `${primaryRule?.recommendation ?? ""}|${primaryRule?.doNow[0] ?? ""}`,

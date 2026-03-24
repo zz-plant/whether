@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { loadReportDataSafe } from "../../lib/report/reportData";
-import { buildHomeBriefModel } from "../../lib/report/homeBriefModel";
 import { buildCompactTrustSummary, buildFailureModeWarnings } from "../../lib/report/trustStatus";
 import { formatConfidencePlainLabel } from "../../lib/report/reportFormatting";
 import { buildBreadcrumbList, buildPageMetadata, serializeJsonLd } from "../../lib/seo";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { BreadcrumbTrail } from "../components/breadcrumbTrail";
+import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -19,10 +18,9 @@ export const metadata: Metadata = buildPageMetadata({
 });
 
 export default async function ConfidencePage() {
-  const reportResult = await loadReportDataSafe(undefined, { route: "/confidence" });
-  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
-  const homeBriefModel = buildHomeBriefModel(reportData);
-  const isFallback = Boolean(reportData.treasury.fallback_at || reportData.treasury.fallback_reason);
+  const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/confidence" });
+  const homeBriefModel = snapshot.homeBriefModel;
+  const isFallback = snapshot.isFallback;
 
   const trustSummary = buildCompactTrustSummary({
     confidenceLabel: homeBriefModel.confidenceLabel,

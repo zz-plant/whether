@@ -4,7 +4,6 @@ import {
 } from "../timeMachine/timeMachineSelection";
 import { type ReportData, type ReportDataFallback } from "./reportData";
 import { buildTrustStatus } from "./trustStatus";
-import { buildCompactFreshnessMeta } from "./reportFormatting";
 import { formatSourceFreshnessLabel, formatSourceModeLabel } from "./sourceHealth";
 import {
   buildInterpretationLayer,
@@ -21,7 +20,6 @@ import {
 } from "../export/weeklyOperatorBrief";
 import { buildHomeBriefModel, buildWeeklyDecisionCardViewModel } from "./homeBriefModel";
 import { resolveSectorKey } from "./sectorSensitivity";
-import { getRegimeDisplayLabel } from "../regimePresentation";
 import { buildPostureState } from "./postureStateSource";
 import {
   buildCanonicalDecisionCopy,
@@ -44,6 +42,7 @@ import { siteUrl } from "../siteUrl";
 import { createBreadcrumbTrail } from "../navigation/breadcrumbs";
 import type { HomePageSearchParams } from "./homeMetadata";
 import { loadHomePageReportData } from "./homePageData";
+import { buildWeeklyBriefSnapshot } from "./weeklyBriefSnapshot";
 
 export type ArtifactPayload = {
   boardSummary: string;
@@ -418,7 +417,6 @@ const buildHomeWorkspaceModel = ({
       })),
       exportActions: [
         { href: "/operations#ops-export-briefs", label: "Open share brief" },
-        { href: "/operations#ops-finance-strategy", label: "Open finance detail" },
       ],
     },
     translate: {
@@ -650,71 +648,18 @@ export const assembleHomePage = async ({
     ? buildTimeMachineHref("/", previousHistoricalSelection)
     : undefined;
   const historicalTimeMachineHref = "/signals?advanced=1#time-machine";
-  const isFallback = Boolean(treasury.fallback_at || treasury.fallback_reason);
-
+  const baseSnapshot = buildWeeklyBriefSnapshot({
+    reportData,
+    degraded: !reportResult.ok,
+    overlaySector: homepageOverlaySector,
+  });
+  const { isFallback, trustStatus, freshnessMeta, displayRegime, homeBriefModel, weeklyDecisionCardModel } = baseSnapshot;
   const {
     trustStatusLabel,
     trustStatusDetail,
     trustStatusAction,
     trustStatusTone,
-  } = buildTrustStatus({
-    historicalSelection: Boolean(historicalSelection),
-    isFallback,
-    fallbackReason: treasury.fallback_reason ?? undefined,
-    historicalAction:
-      "Use for retrospectives only; avoid live planning calls until you return to current data.",
-    fallbackAction:
-      "Pause irreversible decisions until the live feed returns or you confirm the cache.",
-    stableAction:
-      "Safe to use for near-term planning; proceed with normal approval flow.",
-  });
-
-  const homeBriefModel = buildHomeBriefModel({
-    assessment,
-    fetchedAtLabel,
-    historicalSelection,
-    historicalAnalogs,
-    recordDateLabel,
-    regimeAlert,
-    reportDynamics,
-    sensors,
-    macroSeries,
-    forecast,
-    regimeSeries,
-    statusLabel,
-    stopItems,
-    treasury,
-    treasuryProvenance,
-  }, { overlaySector: homepageOverlaySector });
-
-  const freshnessMeta = buildCompactFreshnessMeta({
-    updatedAtLabel: fetchedAtLabel,
-    confidenceLabel: homeBriefModel.confidenceLabel,
-    isFallbackSnapshot: isFallback,
-  });
-
-  const displayRegime = getRegimeDisplayLabel({
-    regime: assessment.regime,
-    momentum: reportDynamics.directionLabel,
-    confidence: homeBriefModel.confidenceLabel,
-    transitionWatch: homeBriefModel.transitionWatch === "ON",
-  });
-
-  const weeklyDecisionCardModel = buildWeeklyDecisionCardViewModel({
-    homeBriefModel,
-    statusLabel: displayRegime.label,
-    regimeKey: assessment.regime,
-    reportDynamics,
-    citation: buildCallCitation(assessment, treasury, {
-      postureWithStageLabel: homeBriefModel.postureWithStageLabel,
-    }),
-    recordDateLabel: weeklyRecordDateLabel,
-    fetchedAtLabel,
-    freshnessLine: freshnessMeta.line,
-    confidenceHistory,
-    confidenceTrend,
-    isFallbackSnapshot: isFallback && !historicalSelection,
-  });
+  } = trustStatus;
   const interpretationLayer = buildInterpretationLayer({
     view: interpretationView,
     homeBriefModel,
@@ -739,57 +684,25 @@ export const assembleHomePage = async ({
         assessment,
         reportDynamics,
       });
-      const enrichedHomeBriefModel = buildHomeBriefModel({
-        assessment,
-        fetchedAtLabel,
-        historicalSelection,
-        historicalAnalogs,
-        recordDateLabel,
-        regimeAlert,
-        reportDynamics,
-        sensors,
-        macroSeries,
-        forecast,
-        regimeSeries,
-        statusLabel,
-        stopItems,
-        treasury,
-        treasuryProvenance,
+      const enrichedSnapshot = buildWeeklyBriefSnapshot({
+        reportData,
+        degraded: !reportResult.ok,
+        overlaySector: homepageOverlaySector,
         postureState,
-      }, { overlaySector: homepageOverlaySector });
-      const canonicalDecisionCopy = buildCanonicalDecisionCopy({
-        homeBriefModel: enrichedHomeBriefModel,
-        postureState,
-      });
-      const enrichedWeeklyDecisionCardModel = buildWeeklyDecisionCardViewModel({
-        homeBriefModel: enrichedHomeBriefModel,
-        statusLabel: displayRegime.label,
-        regimeKey: assessment.regime,
-        reportDynamics,
-        citation: buildCallCitation(assessment, treasury, {
-          postureWithStageLabel: enrichedHomeBriefModel.postureWithStageLabel,
-        }),
-        recordDateLabel: weeklyRecordDateLabel,
-        fetchedAtLabel,
-        freshnessLine: freshnessMeta.line,
-        confidenceHistory,
-        confidenceTrend,
-        canonicalDecisionCopy,
-        isFallbackSnapshot: isFallback && !historicalSelection,
       });
 
       return {
         postureState,
-        homeBriefModel: enrichedHomeBriefModel,
-        weeklyDecisionCardModel: enrichedWeeklyDecisionCardModel,
-        canonicalDecisionCopy,
+        homeBriefModel: enrichedSnapshot.homeBriefModel,
+        weeklyDecisionCardModel: enrichedSnapshot.weeklyDecisionCardModel,
+        canonicalDecisionCopy: enrichedSnapshot.canonicalDecisionCopy,
       };
     } catch (error) {
       console.error("[home] deferred posture-state enrichment unavailable", error);
       return {
         postureState: null,
-        homeBriefModel,
-        weeklyDecisionCardModel,
+        homeBriefModel: baseSnapshot.homeBriefModel,
+        weeklyDecisionCardModel: baseSnapshot.weeklyDecisionCardModel,
         canonicalDecisionCopy: null,
       };
     }

@@ -7,10 +7,9 @@ import { BreadcrumbTrail } from "../components/breadcrumbTrail";
 import { HubHero, HubPageShell, HubSection } from "../components/hubPageShell";
 import { NextStepRail } from "../components/nextStepRail";
 import { BeginnerGlossaryPanel } from "../components/appendixSections";
-import { loadReportDataSafe } from "../../lib/report/reportData";
-import { buildHomeBriefModel } from "../../lib/report/homeBriefModel";
 import { buildCompactTrustSummary } from "../../lib/report/trustStatus";
 import { formatConfidencePlainLabel } from "../../lib/report/reportFormatting";
+import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -33,10 +32,9 @@ export default async function MethodPage() {
       ]),
     ),
   };
-  const reportResult = await loadReportDataSafe(undefined, { route: "/method" });
-  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
-  const homeBriefModel = buildHomeBriefModel(reportData);
-  const isFallback = Boolean(reportData.treasury.fallback_at || reportData.treasury.fallback_reason);
+  const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/method" });
+  const homeBriefModel = snapshot.homeBriefModel;
+  const isFallback = snapshot.isFallback;
   const trustSummary = buildCompactTrustSummary({
     confidenceLabel: homeBriefModel.confidenceLabel,
     freshnessLabel: reportData.fetchedAtLabel,

@@ -1,10 +1,5 @@
-import { buildCallCitation } from "../export/briefBuilders";
-import { getRegimeDisplayLabel } from "../regimePresentation";
 import { buildCanonicalUrl, buildOgImageUrl } from "../seo";
-import { buildHomeBriefModel, buildWeeklyDecisionCardViewModel } from "./homeBriefModel";
-import { loadHomePageReportData } from "./homePageData";
-import { buildCompactFreshnessMeta } from "./reportFormatting";
-import { resolveSectorKey } from "./sectorSensitivity";
+import { loadWeeklyBriefSnapshot } from "./weeklyBriefSnapshot";
 
 export type HomeShareSearchParams = {
   month?: string;
@@ -41,11 +36,11 @@ export type HomeSharePreview = {
 };
 
 type HomeSharePreviewDependencies = {
-  loadHomePageReportData: typeof loadHomePageReportData;
+  loadWeeklyBriefSnapshot: typeof loadWeeklyBriefSnapshot;
 };
 
 const defaultDependencies: HomeSharePreviewDependencies = {
-  loadHomePageReportData,
+  loadWeeklyBriefSnapshot,
 };
 
 const formatRateValue = (value: number | null | undefined) =>
@@ -116,61 +111,12 @@ export const loadHomeSharePreview = async (
     ...defaultDependencies,
     ...dependencies,
   } satisfies HomeSharePreviewDependencies;
-  const reportResult = await resolvedDependencies.loadHomePageReportData(searchParams);
-  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
-  const overlaySector = resolveSectorKey(searchParams?.sector);
-  const isFallback = Boolean(reportData.treasury.fallback_at || reportData.treasury.fallback_reason);
-
-  const homeBriefModel = buildHomeBriefModel({
-    assessment: reportData.assessment,
-    fetchedAtLabel: reportData.fetchedAtLabel,
-    historicalSelection: reportData.historicalSelection,
-    historicalAnalogs: reportData.historicalAnalogs,
-    recordDateLabel: reportData.recordDateLabel,
-    regimeAlert: reportData.regimeAlert,
-    reportDynamics: reportData.reportDynamics,
-    sensors: reportData.sensors,
-    macroSeries: reportData.macroSeries,
-    forecast: reportData.forecast,
-    regimeSeries: reportData.regimeSeries,
-    statusLabel: reportData.statusLabel,
-    stopItems: reportData.stopItems,
-    treasury: reportData.treasury,
-    treasuryProvenance: reportData.treasuryProvenance,
-    actionNowShort: reportData.actionNowShort,
-    guardrailThreshold: reportData.guardrailThreshold,
-    flipThreshold: reportData.flipThreshold,
-    reportEvidenceItems: reportData.reportEvidenceItems,
-  }, { overlaySector });
-
-  const freshnessMeta = buildCompactFreshnessMeta({
-    updatedAtLabel: reportData.fetchedAtLabel,
-    confidenceLabel: homeBriefModel.confidenceLabel,
-    isFallbackSnapshot: isFallback,
-  });
-
-  const displayRegime = getRegimeDisplayLabel({
-    regime: reportData.assessment.regime,
-    momentum: reportData.reportDynamics.directionLabel,
-    confidence: homeBriefModel.confidenceLabel,
-    transitionWatch: homeBriefModel.transitionWatch === "ON",
-  });
-
-  const weeklyDecisionCardModel = buildWeeklyDecisionCardViewModel({
-    homeBriefModel,
-    statusLabel: displayRegime.label,
-    regimeKey: reportData.assessment.regime,
-    reportDynamics: reportData.reportDynamics,
-    citation: buildCallCitation(reportData.assessment, reportData.treasury, {
-      postureWithStageLabel: homeBriefModel.postureWithStageLabel,
-    }),
-    recordDateLabel: reportData.weeklyRecordDateLabel,
-    fetchedAtLabel: reportData.fetchedAtLabel,
-    freshnessLine: freshnessMeta.line,
-    confidenceHistory: reportData.confidenceHistory,
-    confidenceTrend: reportData.confidenceTrend,
-    isFallbackSnapshot: isFallback && !reportData.historicalSelection,
-  });
+  const { reportResult, reportData, snapshot } = await resolvedDependencies.loadWeeklyBriefSnapshot(
+    searchParams,
+    { route: "/" },
+    { overlaySector: searchParams?.sector },
+  );
+  const { isFallback, freshnessMeta, weeklyDecisionCardModel } = snapshot;
 
   const sharePath = buildHomeSharePath(searchParams);
   const imageUrl = buildOgImageUrl(buildImageParams(searchParams));

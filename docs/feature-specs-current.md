@@ -35,20 +35,20 @@ hero plus share/copy actions, then the page continues in a fixed operator sequen
 - weekly call,
 - audit this call,
 - approve this week’s plan,
-- historical replay,
-- translate by role or run a tool.
+- historical replay.
 
 The home top fold now separates metadata from decision contract: a compact current-outlook strip
 shows posture, trend, confidence, and flip-window context, and the canonical weekly call appears
 once below it with explicit `Action now`, `Guardrail`, and `Flip condition` fields. The share rail
-stays artifact-first, while company-specific override controls are separated from routine sharing.
+stays artifact-first with the weekly operator brief as the default handoff, while company-specific
+override controls remain separated from routine sharing.
 
 The audit band keeps trust compact on home by showing one trust summary, one decision pressure-test
 card, and a single deeper-evidence path (`/signals`) instead of reproducing the full evidence lane.
 The operations band now compresses the weekly action, one hold-the-line summary, and direct export
 entry points before deeper review in `/operations`. Historical replay still uses the same
-time-machine date-picker pattern as `/signals`, but starts directly on home. The final band
-surfaces direct role, situation, toolkit, ship-checklist, and team-context shortcuts.
+time-machine date-picker pattern as `/signals`, but starts directly on home. Deeper role, situation,
+and toolkit paths are now handled as a compact handoff after replay instead of a full extra home band.
 
 The optional `?view=evidence` mode still renders the high-density analytical matrix with direct row
 labels, embedded threshold context, and restrained accent usage for outlier conditions.

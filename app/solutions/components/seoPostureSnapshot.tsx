@@ -1,8 +1,5 @@
 import Link from "next/link";
-import { loadReportDataSafe } from "../../../lib/report/reportData";
-import { buildHomeBriefModel } from "../../../lib/report/homeBriefModel";
-import { getRegimeDisplayLabel } from "../../../lib/regimePresentation";
-import { buildCallCitation } from "../../../lib/export/briefBuilders";
+import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
 
 type SeoPostureSnapshotProps = {
   route: string;
@@ -10,16 +7,9 @@ type SeoPostureSnapshotProps = {
 };
 
 export async function SeoPostureSnapshot({ route, immediateImplication }: SeoPostureSnapshotProps) {
-  const reportResult = await loadReportDataSafe(undefined, { route });
-  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
-  const homeBriefModel = buildHomeBriefModel(reportData);
-  const { assessment, reportDynamics, recordDateLabel, fetchedAtLabel, treasury } = reportData;
-  const displayRegime = getRegimeDisplayLabel({
-    regime: assessment.regime,
-    momentum: reportDynamics.directionLabel,
-    confidence: homeBriefModel.confidenceLabel,
-    transitionWatch: homeBriefModel.transitionWatch === "ON",
-  });
+  const { reportResult, reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route });
+  const { homeBriefModel, displayRegime, callCitation } = snapshot;
+  const { reportDynamics, recordDateLabel, fetchedAtLabel } = reportData;
 
   return (
     <section className="weather-panel space-y-4 px-6 py-6">
@@ -28,7 +18,7 @@ export async function SeoPostureSnapshot({ route, immediateImplication }: SeoPos
         <span className="font-semibold text-sky-200">{displayRegime.label}</span> ({displayRegime.canonicalRegime}) · trend {reportDynamics.directionLabel} · review decisions {homeBriefModel.revisitDecisions ? "YES" : "NO"}
       </p>
       <p className="text-sm text-slate-300">What this means right now: {immediateImplication}</p>
-      <p className="text-xs text-slate-400">{buildCallCitation(assessment, treasury)} Data date: {recordDateLabel}. Updated: {fetchedAtLabel}.</p>
+      <p className="text-xs text-slate-400">{callCitation} Data date: {recordDateLabel}. Updated: {fetchedAtLabel}.</p>
       {!reportResult.ok ? (
         <p className="rounded-md border border-amber-400/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
           We’re showing a fallback snapshot right now. Open the weekly brief for the latest live read.

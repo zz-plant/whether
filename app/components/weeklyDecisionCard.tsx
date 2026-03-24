@@ -913,13 +913,13 @@ function DecisionTransmissionRail({
   return (
     <article className={`${tierOnePanel} ${sectionSpacing}`} aria-label="Decision transmission rail">
       <div className="flex items-center justify-between gap-3">
-        <h2 className={tierOneHeading}>Share this call</h2>
+        <h2 className={tierOneHeading}>Transmit this call</h2>
         <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
           Share-ready
         </span>
       </div>
       <p className="text-xs leading-5 text-slate-300">
-        Default artifacts already carry this week&apos;s action, guardrail, and flip condition. Use sharing here after the call is aligned.
+        Default handoff: copy the weekly operator brief once the call is aligned. Use the snapshot for short chat context; keep board variants and exceptions secondary.
       </p>
       <div className="rounded-xl border border-slate-700/60 bg-slate-950/60 px-3 py-3 text-xs text-slate-300">
         <p><span className="font-semibold text-slate-100">Action:</span> {actionNow}</p>

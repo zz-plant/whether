@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { buildPageMetadata } from "../../lib/seo";
 import { postureDefinitions } from "../../lib/decisionDomainCatalog";
-import { loadReportDataSafe } from "../../lib/report/reportData";
-import { buildHomeBriefModel } from "../../lib/report/homeBriefModel";
-import { getRegimeDisplayLabel } from "../../lib/regimePresentation";
+import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Posture guides — routed from Weekly Brief",
@@ -15,15 +13,8 @@ export const metadata: Metadata = buildPageMetadata({
 });
 
 export default async function PosturePage() {
-  const reportResult = await loadReportDataSafe(undefined, { route: "/posture" });
-  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
-  const homeBriefModel = buildHomeBriefModel(reportData);
-  const displayRegime = getRegimeDisplayLabel({
-    regime: reportData.assessment.regime,
-    momentum: reportData.reportDynamics.directionLabel,
-    confidence: homeBriefModel.confidenceLabel,
-    transitionWatch: homeBriefModel.transitionWatch === "ON",
-  });
+  const { snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/posture" });
+  const { displayRegime } = snapshot;
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
       <section className="weather-panel space-y-3 px-6 py-6">

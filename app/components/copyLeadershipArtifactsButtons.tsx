@@ -126,32 +126,7 @@ export function CopyLeadershipArtifactsButtons({
 
   return (
     <div className="space-y-2">
-      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4" aria-label="Primary weekly brief actions">
-        <ActionButton
-          variant="primary"
-          type="button"
-          onClick={() => {
-            trackFirstActionConversion("copy_weekly_brief");
-            copyToClipboard(applyOverride(boardSnippet), "Board snippet");
-          }}
-          disabled={isCopying}
-          aria-busy={isCopying}
-        >
-          {copyLabel("Board snippet", "Copy board snippet")}
-        </ActionButton>
-        <ActionButton
-          variant="primary"
-          type="button"
-          onClick={() => {
-            trackFirstActionConversion("copy_weekly_brief");
-            copyToClipboard(applyOverride(weeklyCallSnapshot), "Weekly call snapshot");
-          }}
-          disabled={isCopying}
-          aria-busy={isCopying}
-        >
-          {copyLabel("Weekly call snapshot", "Copy weekly call snapshot")}
-        </ActionButton>
-
+      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3" aria-label="Primary weekly brief actions">
         <ActionButton
           variant="primary"
           type="button"
@@ -162,7 +137,19 @@ export function CopyLeadershipArtifactsButtons({
           disabled={isCopying}
           aria-busy={isCopying}
         >
-          {copyLabel("Weekly operator brief", "Copy Weekly Operator Brief")}
+          {copyLabel("Weekly operator brief", "Copy weekly operator brief")}
+        </ActionButton>
+        <ActionButton
+          variant="secondary"
+          type="button"
+          onClick={() => {
+            trackFirstActionConversion("copy_weekly_brief");
+            copyToClipboard(applyOverride(weeklyCallSnapshot), "Weekly call snapshot");
+          }}
+          disabled={isCopying}
+          aria-busy={isCopying}
+        >
+          {copyLabel("Weekly call snapshot", "Copy weekly call snapshot")}
         </ActionButton>
 
         <ActionButton
@@ -179,10 +166,23 @@ export function CopyLeadershipArtifactsButtons({
         </ActionButton>
       </div>
 
+      <p className="px-1 text-[11px] leading-5 text-slate-400">
+        Default share path: copy the weekly operator brief. Use the snapshot for short chat context; keep board variants and exception handling secondary.
+      </p>
+
       {moreActionsOpen ? (
         <div className="space-y-3 rounded-xl border border-slate-700/80 bg-slate-950/98 p-2 shadow-2xl">
           <div>
-            <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
+              <ActionButton
+                variant="secondary"
+                type="button"
+                onClick={() => copyToClipboard(applyOverride(boardSnippet), "Board snippet")}
+                disabled={isCopying}
+                aria-busy={isCopying}
+              >
+                {copyLabel("Board snippet", "Copy board snippet")}
+              </ActionButton>
               <ActionButton
                 variant="secondary"
                 type="button"
@@ -215,7 +215,7 @@ export function CopyLeadershipArtifactsButtons({
               </ActionButton>
             </div>
             <p className="mt-2 px-1 text-[11px] leading-5 text-slate-400">
-              Extended actions stay share-first: meeting pack, board summary, citation, and print export.
+              Extended actions are for board packaging, citation, or print handoff after the default brief is aligned.
             </p>
           </div>
 
