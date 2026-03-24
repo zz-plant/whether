@@ -3,7 +3,7 @@ import path from "node:path";
 import currentMacroSnapshot from "../data/macro_snapshot.json";
 import { loadMacroSeries } from "../lib/macroSnapshot";
 import { fetchTreasuryData } from "../lib/treasury/treasuryClient";
-import type { TreasuryData } from "../lib/types";
+import type { MacroSeriesReading, TreasuryData } from "../lib/types";
 
 type MacroSnapshotPayload = typeof currentMacroSnapshot;
 
@@ -17,9 +17,9 @@ const mergeLatestHistoryPoint = ({
   history: MacroSnapshotPayload["series"][number]["history"] | undefined;
   recordDate: string;
   value: number | null;
-}) => {
+}): Array<{ date: string; value: number }> => {
   if (!history?.length || typeof value !== "number") {
-    return history;
+    return history ?? [];
   }
 
   const nextHistory = history.filter((point) => point.date !== recordDate);
@@ -42,6 +42,36 @@ const toFallbackTreasury = (treasury: TreasuryData): TreasuryData => ({
   fallback_reason: undefined,
 });
 
+const resolveSnapshotValue = ({
+  series,
+  previousSeries,
+}: {
+  series: MacroSeriesReading;
+  previousSeries?: MacroSnapshotPayload["series"][number];
+}): number => {
+  if (typeof series.value === "number") {
+    return series.value;
+  }
+  if (typeof previousSeries?.value === "number") {
+    return previousSeries.value;
+  }
+  throw new Error(`Missing numeric value for macro series ${series.id}`);
+};
+
+const resolveSnapshotHistory = ({
+  series,
+  previousSeries,
+}: {
+  series: MacroSeriesReading;
+  previousSeries?: MacroSnapshotPayload["series"][number];
+}): Array<{ date: string; value: number }> => {
+  const currentHistory = series.history?.filter(
+    (point): point is { date: string; value: number } => typeof point.value === "number",
+  );
+  const previousHistory = previousSeries?.history;
+  return currentHistory?.length ? currentHistory : (previousHistory ?? []);
+};
+
 const buildMacroFallbackPayload = (
   previousPayload: MacroSnapshotPayload,
   refreshedSeries: Awaited<ReturnType<typeof loadMacroSeries>>,
@@ -50,13 +80,15 @@ const buildMacroFallbackPayload = (
   isLive: false,
   series: refreshedSeries.map((series) => {
     const previousSeries = previousPayload.series.find((entry) => entry.id === series.id);
+    const resolvedValue = resolveSnapshotValue({ series, previousSeries });
 
     return {
       ...series,
+      value: resolvedValue,
       history: mergeLatestHistoryPoint({
-        history: previousSeries?.history ?? series.history,
+        history: resolveSnapshotHistory({ series, previousSeries }),
         recordDate: series.record_date,
-        value: series.value,
+        value: resolvedValue,
       }),
       isLive: false,
       fetched_at: series.fetched_at ?? previousPayload.fetched_at,

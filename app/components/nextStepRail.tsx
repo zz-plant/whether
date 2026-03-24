@@ -10,7 +10,7 @@ const PRIMARY_ACTIONS = primaryNavigationLayers.map((layer) => ({
   label: layer.label,
   href: layer.href,
   description: layer.description,
-})) as const;
+}));
 
 const recommendedPrimaryHrefByKey = {
   "weekly-brief": "/operations",

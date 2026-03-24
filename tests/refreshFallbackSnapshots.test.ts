@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import currentMacroSnapshot from "../data/macro_snapshot.json";
+import type { loadMacroSeries } from "../lib/macroSnapshot";
+import type { MacroSeriesId, MacroSeriesReading } from "../lib/types";
 import { buildMacroFallbackPayload, mergeLatestHistoryPoint } from "../scripts/refreshFallbackSnapshots";
 
 describe("refreshFallbackSnapshots", () => {
@@ -52,21 +54,24 @@ describe("refreshFallbackSnapshots", () => {
       throw new Error("Expected VIX snapshot history in fixture");
     }
 
-    const refreshedPayload = buildMacroFallbackPayload(previousPayload, previousPayload.series.map((series) => (
+    const refreshedSeries: Awaited<ReturnType<typeof loadMacroSeries>> = previousPayload.series.map((series): MacroSeriesReading => (
       series.id === "VIX_INDEX"
         ? {
             ...series,
+            id: series.id as MacroSeriesId,
             value: 25.09,
             record_date: "2026-03-18",
             fetched_at: "2026-03-19T00:00:00.000Z",
             isLive: true,
-          }
+          } as MacroSeriesReading
         : {
             ...series,
+            id: series.id as MacroSeriesId,
             fetched_at: "2026-03-19T00:00:00.000Z",
             isLive: false,
-          }
-    )));
+          } as MacroSeriesReading
+    ));
+    const refreshedPayload = buildMacroFallbackPayload(previousPayload, refreshedSeries);
 
     const refreshedVix = refreshedPayload.series.find((series) => series.id === "VIX_INDEX");
     if (!refreshedVix?.history?.length) {
