@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { loadReportDataSafe } from "../../lib/report/reportData";
+import { buildHomeBriefModel } from "../../lib/report/homeBriefModel";
 import { buildBreadcrumbList, buildPageMetadata, serializeJsonLd } from "../../lib/seo";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import {
@@ -16,13 +18,13 @@ import { decideScrollPlan } from "../../lib/navigation/scrollPlans";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Decide — role and situation paths",
-  description: "Choose guidance by role or situation, then run supporting decision tools.",
+  description: "Start from this week’s live call, then translate it by role, situation, or runnable tool.",
   path: "/decide",
   imageAlt: "Whether decision paths",
   imagePath: "/social/decide.svg",
 });
 
-export default function DecidePage() {
+export default async function DecidePage() {
   const breadcrumbStructuredData = {
     "@context": "https://schema.org",
     ...buildBreadcrumbList(
@@ -32,15 +34,24 @@ export default function DecidePage() {
       ]),
     ),
   };
+  const reportResult = await loadReportDataSafe(undefined, { route: "/decide" });
+  const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
+  const homeBriefModel = buildHomeBriefModel(reportData);
+  const liveCall = {
+    posture: homeBriefModel.postureWithStageLabel,
+    action: reportData.actionNowShort ?? homeBriefModel.operatingStanceLine,
+    guardrail: homeBriefModel.guardrail,
+    flip: reportData.flipThreshold ?? homeBriefModel.reversalTrigger,
+  };
 
   return (
     <HubPageShell width="standard">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }} />
       <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Decide" }]} />
       <HubHero
-        eyebrow="Decision translation depth"
-        title="Choose the path that turns posture into an operating call."
-        description="Start with the runnable path most likely to unblock this week&apos;s decision. Use role and situation views only when you need translation depth."
+        eyebrow="Decision translation"
+        title="Translate this week’s live call without leaving the operator loop."
+        description="Start from the current posture, then choose the narrowest path that turns it into a role-specific or situation-specific decision."
         actions={(
           <>
             <Link href="/" className="weather-button inline-flex items-center justify-center">Return to Weekly Brief</Link>
@@ -49,12 +60,13 @@ export default function DecidePage() {
         )}
         aside={(
           <div className="weather-hub-card space-y-3 px-5 py-5">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-200">Action-first</p>
-          <ul className="space-y-2 text-sm text-slate-200">
-            <li><span className="font-semibold text-slate-100">Need to act now?</span> Start with a toolkit.</li>
-            <li><span className="font-semibold text-slate-100">Need a decision utility?</span> Use ship checklist or team context.</li>
-            <li><span className="font-semibold text-slate-100">Need a full map?</span> Browse role or situation paths below.</li>
-          </ul>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-200">Current weekly call</p>
+            <p className="text-sm font-semibold text-slate-100">{liveCall.posture}</p>
+            <ul className="space-y-2 text-sm text-slate-200">
+              <li><span className="font-semibold text-slate-100">Do now:</span> {liveCall.action}</li>
+              <li><span className="font-semibold text-slate-100">Guardrail:</span> {liveCall.guardrail}</li>
+              <li><span className="font-semibold text-slate-100">Flip when:</span> {liveCall.flip}</li>
+            </ul>
           </div>
         )}
       />
@@ -67,9 +79,32 @@ export default function DecidePage() {
       />
 
       <HubSection
+        id="start-from-this-weeks-call"
+        title="Start from this week’s live call"
+        description="Use the same bounded weekly decision everywhere below so translation never drifts from the canonical brief."
+        className="scroll-mt-28"
+      >
+        <div className="weather-page-grid-3">
+          <article className="weather-hub-card space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Posture</p>
+            <p className="text-sm font-semibold text-slate-100">{liveCall.posture}</p>
+          </article>
+          <article className="weather-hub-card space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Action now</p>
+            <p className="text-sm text-slate-200">{liveCall.action}</p>
+          </article>
+          <article className="weather-hub-card space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Guardrail and flip</p>
+            <p className="text-sm text-slate-200">{liveCall.guardrail}</p>
+            <p className="text-xs text-slate-400">Flip: {liveCall.flip}</p>
+          </article>
+        </div>
+      </HubSection>
+
+      <HubSection
         id="run-this-now"
         title="Run this now"
-        description="Direct toolkit shortcuts for the most common weekly decision jobs."
+        description="Use the shortest runnable path when the live call already tells you the direction and you only need execution translation."
         className="scroll-mt-28"
       >
         <div className="weather-page-grid-3">
@@ -91,7 +126,7 @@ export default function DecidePage() {
       <HubSection
         id="decision-utilities"
         title="Decision utilities"
-        description="Use these only when the weekly call needs additional validation or personalization."
+        description="Use these only when the live call needs bounded validation or company context before you act."
         className="scroll-mt-28"
       >
         <div className="weather-page-grid-2">

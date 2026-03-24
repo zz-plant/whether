@@ -403,13 +403,12 @@ describe("WeeklyDecisionCard extracted sections", () => {
       />,
     );
     const footerHtml = renderToStaticMarkup(
-      <CitationActionFooter citationMetaLine="Posture DEFENSIVE" citation="Whether weekly brief citation" actions={<button type="button">Copy</button>} />,
+      <CitationActionFooter citationMetaLine="Posture DEFENSIVE" citation="Whether weekly brief citation" />,
     );
 
     assert.match(detailsHtml, /Why this posture call/);
     assert.match(detailsHtml, /Posture history/);
-    assert.match(footerHtml, /Send to team/);
-    assert.match(footerHtml, /hidden sm:flex sm:flex-wrap sm:gap-3/);
-    assert.match(footerHtml, />Copy<\/button>/);
+    assert.match(footerHtml, /Use this citation in meeting notes, board updates, or operating memos\./);
+    assert.match(footerHtml, /Share actions stay in the transmission rail above\./);
   });
 });

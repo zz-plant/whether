@@ -28,15 +28,16 @@ Validation note: click labels in this document were verified from the current ro
 **Clicks**
 1. Open `/` or click `Weekly Brief`.
 2. Use one of:
+   - `Copy board snippet`
    - `Copy weekly call snapshot`
-   - `Copy Meeting Pack`
    - `Copy Weekly Operator Brief`
 3. If needed, open `More share actions`.
 4. Choose one of:
+   - `Copy meeting pack`
    - `Copy board summary`
    - `Copy citation`
    - `Export / print PDF`
-5. Only if the company needs a temporary exception, open `Advanced override controls` and add the governance note before copying again.
+5. Only if the company needs a temporary exception, open `Company-specific exception` and add the governance note before copying again.
 
 **Current output**
 - Slack-ready weekly call snapshot
@@ -136,7 +137,8 @@ Validation note: click labels in this document were verified from the current ro
 
 **Clicks**
 1. Click `Decide` in global navigation.
-2. Under `Explore by role`, click the relevant role card.
+2. Review the `Start from this week's live call` block.
+3. Under `Explore by role`, click the relevant role card.
 3. Review:
    - `Decisions you're making`
    - `Failure modes to watch`
@@ -154,9 +156,10 @@ Validation note: click labels in this document were verified from the current ro
 
 **Clicks**
 1. Click `Decide`.
-2. Under `Explore by situation`, click the relevant situation card.
-3. Click a toolkit in `Start here` or `Run this now`.
-4. On the toolkit page, use:
+2. Review the `Start from this week's live call` block.
+3. Under `Explore by situation`, click the relevant situation card.
+4. Click a toolkit in `Start here` or `Run this now`.
+5. On the toolkit page, use:
    - `Run sequence`
    - `Included instruments`
    - `Canon references`
@@ -172,7 +175,8 @@ Validation note: click labels in this document were verified from the current ro
 
 **Clicks**
 1. Click `Decide`.
-2. In `Optional supporting tools`, click `Team context profile`.
+2. Review the `Start from this week's live call` block.
+3. In `Decision utilities`, click `Team context profile`.
 3. Set:
    - `Stage`
    - `Sector`
@@ -195,7 +199,8 @@ Validation note: click labels in this document were verified from the current ro
 
 **Clicks**
 1. Click `Decide`.
-2. In `Optional supporting tools`, click `Whether to ship checklist`.
+2. Review the `Start from this week's live call` block.
+3. In `Decision utilities`, click `Whether to ship checklist`.
 3. Set:
    - `Evidence strength`
    - `Reversibility`

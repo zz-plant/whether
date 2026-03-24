@@ -215,79 +215,8 @@ export function CopyLeadershipArtifactsButtons({
               </ActionButton>
             </div>
             <p className="mt-2 px-1 text-[11px] leading-5 text-slate-400">
-              Share-ready outputs stay untouched by default. Only use an override when local company conditions should append a governance note to copied artifacts for this week.
+              Extended actions stay share-first: meeting pack, board summary, citation, and print export.
             </p>
-          </div>
-
-          <div className="rounded-xl border border-slate-700/70 bg-slate-950/70 px-3 py-3">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="space-y-1">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
-                  Advanced override controls
-                </p>
-                <p className="max-w-2xl text-xs leading-5 text-slate-300">
-                  Use this only when leadership agrees the company should temporarily override the macro default. Add the reason, owner, and reversal condition so the shared artifact carries bounded governance context.
-                </p>
-              </div>
-              <ActionButton
-                variant="secondary"
-                type="button"
-                className="w-auto px-4 text-slate-200"
-                aria-expanded={advancedOverrideOpen}
-                onClick={() => setAdvancedOverrideOpen((open) => !open)}
-              >
-                {advancedOverrideOpen ? "Hide advanced override" : "Open advanced override"}
-              </ActionButton>
-            </div>
-
-            {hasOverride ? (
-              <div className="mt-3 rounded-lg border border-amber-300/30 bg-amber-500/10 px-3 py-2 text-xs leading-5 text-amber-100">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-100">Override active</p>
-                <p className="mt-1">{overrideLine}</p>
-              </div>
-            ) : null}
-
-            {advancedOverrideOpen ? (
-              <div className="mt-3 space-y-3 border-t border-slate-800/80 pt-3">
-                <p className="text-xs leading-5 text-slate-400">
-                  Appropriate when a board- or exec-level call needs an explicit local exception, not for routine sharing or formatting tweaks.
-                </p>
-                <div className="grid gap-2 md:grid-cols-2">
-                  <label className="space-y-1">
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Reason</span>
-                    <input
-                      className="w-full rounded-lg border border-slate-700/70 bg-slate-950/80 px-3 py-2 text-base text-slate-100"
-                      value={overrideReason}
-                      onChange={(event) => setOverrideReason(event.target.value)}
-                    />
-                  </label>
-                  <label className="space-y-1">
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Local indicator</span>
-                    <input
-                      className="w-full rounded-lg border border-slate-700/70 bg-slate-950/80 px-3 py-2 text-base text-slate-100"
-                      value={overrideIndicator}
-                      onChange={(event) => setOverrideIndicator(event.target.value)}
-                    />
-                  </label>
-                  <label className="space-y-1">
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Owner</span>
-                    <input
-                      className="w-full rounded-lg border border-slate-700/70 bg-slate-950/80 px-3 py-2 text-base text-slate-100"
-                      value={overrideOwner}
-                      onChange={(event) => setOverrideOwner(event.target.value)}
-                    />
-                  </label>
-                  <label className="space-y-1">
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Reversal condition</span>
-                    <input
-                      className="w-full rounded-lg border border-slate-700/70 bg-slate-950/80 px-3 py-2 text-base text-slate-100"
-                      value={overrideReversal}
-                      onChange={(event) => setOverrideReversal(event.target.value)}
-                    />
-                  </label>
-                </div>
-              </div>
-            ) : null}
           </div>
 
           {fallbackActive ? (
@@ -297,6 +226,77 @@ export function CopyLeadershipArtifactsButtons({
           ) : null}
         </div>
       ) : null}
+
+      <div className="rounded-xl border border-slate-700/70 bg-slate-950/70 px-3 py-3">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="space-y-1">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300">
+              Company-specific exception
+            </p>
+            <p className="max-w-2xl text-xs leading-5 text-slate-300">
+              Keep this separate from routine sharing. Use it only when leadership needs the copied artifact to carry an explicit local override.
+            </p>
+          </div>
+          <ActionButton
+            variant="secondary"
+            type="button"
+            className="w-auto px-4 text-slate-200"
+            aria-expanded={advancedOverrideOpen}
+            onClick={() => setAdvancedOverrideOpen((open) => !open)}
+          >
+            {advancedOverrideOpen ? "Hide exception controls" : "Open exception controls"}
+          </ActionButton>
+        </div>
+
+        {hasOverride ? (
+          <div className="mt-3 rounded-lg border border-amber-300/30 bg-amber-500/10 px-3 py-2 text-xs leading-5 text-amber-100">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-100">Override active</p>
+            <p className="mt-1">{overrideLine}</p>
+          </div>
+        ) : null}
+
+        {advancedOverrideOpen ? (
+          <div className="mt-3 space-y-3 border-t border-slate-800/80 pt-3">
+            <p className="text-xs leading-5 text-slate-400">
+              Appropriate when a board- or exec-level call needs an explicit local exception, not for routine sharing or formatting tweaks.
+            </p>
+            <div className="grid gap-2 md:grid-cols-2">
+              <label className="space-y-1">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Reason</span>
+                <input
+                  className="w-full rounded-lg border border-slate-700/70 bg-slate-950/80 px-3 py-2 text-base text-slate-100"
+                  value={overrideReason}
+                  onChange={(event) => setOverrideReason(event.target.value)}
+                />
+              </label>
+              <label className="space-y-1">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Local indicator</span>
+                <input
+                  className="w-full rounded-lg border border-slate-700/70 bg-slate-950/80 px-3 py-2 text-base text-slate-100"
+                  value={overrideIndicator}
+                  onChange={(event) => setOverrideIndicator(event.target.value)}
+                />
+              </label>
+              <label className="space-y-1">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Owner</span>
+                <input
+                  className="w-full rounded-lg border border-slate-700/70 bg-slate-950/80 px-3 py-2 text-base text-slate-100"
+                  value={overrideOwner}
+                  onChange={(event) => setOverrideOwner(event.target.value)}
+                />
+              </label>
+              <label className="space-y-1">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400">Reversal condition</span>
+                <input
+                  className="w-full rounded-lg border border-slate-700/70 bg-slate-950/80 px-3 py-2 text-base text-slate-100"
+                  value={overrideReversal}
+                  onChange={(event) => setOverrideReversal(event.target.value)}
+                />
+              </label>
+            </div>
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 }

@@ -49,6 +49,7 @@ export function WeeklyCallModePanel({
   postureLabel,
   operatingCall,
   trendLabel,
+  confidencePercent,
   confidenceLabel,
   snapshotGuardrail,
   snapshotWatch,
@@ -98,7 +99,7 @@ export function WeeklyCallModePanel({
             <span>{trustStateLabel}</span>
             <span className="rounded-full border border-current/20 px-2 py-0.5">{selectedModeLabel}</span>
             <span className="rounded-full border border-current/20 px-2 py-0.5">As of {trustTimestamp}</span>
-            <span>{confidenceLabel} confidence</span>
+            <span>{confidenceLabel} confidence · {Math.round(confidencePercent)}%</span>
           </div>
           <p className="mt-1 text-xs leading-5">{trustStateDetail}</p>
           <p className="mt-1 text-[11px] leading-5 text-current/80">Trend: {trendLabel}. {stabilityRule}</p>

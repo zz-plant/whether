@@ -6,14 +6,11 @@ import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { BreadcrumbTrail } from "../components/breadcrumbTrail";
 import { HubHero, HubPageShell, HubSection } from "../components/hubPageShell";
 import { NextStepRail } from "../components/nextStepRail";
-import { StaticHubNav } from "../components/staticHubNav";
 import { BeginnerGlossaryPanel } from "../components/appendixSections";
 import { loadReportDataSafe } from "../../lib/report/reportData";
 import { buildHomeBriefModel } from "../../lib/report/homeBriefModel";
 import { buildCompactTrustSummary } from "../../lib/report/trustStatus";
 import { formatConfidencePlainLabel } from "../../lib/report/reportFormatting";
-import { PageFlowNav } from "../components/pageFlowNav";
-import { methodScrollPlan } from "../../lib/navigation/scrollPlans";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -94,11 +91,10 @@ export default async function MethodPage() {
     <HubPageShell>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }} />
       <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Method" }]} />
-      <StaticHubNav currentPath="/method" />
       <HubHero
         eyebrow="Trust audit hub"
-        title="Trust check in 60 seconds: confidence, freshness, and flip conditions."
-        description="Scan this page, decide whether the current weekly call is dependable, and copy a meeting-ready trust summary."
+        title="Trust the weekly call fast: confidence, freshness, and flip conditions."
+        description="Use Method only to validate the current brief. If the trust check passes, go back to operating decisions instead of staying here."
         actions={(
           <>
             <Link href="/" className="weather-button inline-flex items-center justify-center">
@@ -114,13 +110,6 @@ export default async function MethodPage() {
           { label: "Confidence", value: confidenceLabel },
           { label: "Trust status", value: trustSummary, detail: `Freshness: ${reportData.fetchedAtLabel}` },
         ]}
-      />
-
-      <PageFlowNav
-        eyebrow={methodScrollPlan.eyebrow}
-        title={methodScrollPlan.title}
-        description={methodScrollPlan.description}
-        items={methodScrollPlan.items}
       />
 
       <HubSection id="trust-snapshot" title="60-second trust check" description="Read top-to-bottom before acting on this week's posture." className="scroll-mt-28">

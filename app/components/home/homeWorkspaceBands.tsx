@@ -3,7 +3,6 @@ import { Suspense } from "react";
 import type { Route } from "../../../lib/navigation/routeType";
 import { homeScrollPlan } from "../../../lib/navigation/scrollPlans";
 import type { HomePageWorkspaceModel } from "../../../lib/report/homePageAssembler";
-import { CanonicalTrustModule } from "../canonicalTrustModule";
 import { PageFlowNav } from "../pageFlowNav";
 import { HistoricalReplayDatePicker } from "../../signals/components/historicalReplayDatePicker";
 import {
@@ -147,60 +146,32 @@ export async function HomeWorkspaceBands({
           )}
         />
 
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
-          <CanonicalTrustModule
-            tone={workspaceModel.audit.trustStatusTone}
-            label={workspaceModel.audit.trustStatusLabel}
-            detail={workspaceModel.audit.trustStatusDetail}
-            action={workspaceModel.audit.trustStatusAction}
-            sourceDetails={(
-              <div className="space-y-2 text-xs text-slate-200">
-                <p><span className="font-semibold text-slate-100">Freshness:</span> {workspaceModel.audit.freshnessSummary}</p>
-                <p><span className="font-semibold text-slate-100">Source coverage:</span> {workspaceModel.audit.sourceCoverageLine}</p>
-                {workspaceModel.audit.sourceRows.length > 0 ? (
-                  <div className="space-y-1">
-                    {workspaceModel.audit.sourceRows.map((row) => (
-                      <p key={row.sourceName}>
-                        <span className="font-semibold text-slate-100">{row.sourceName}:</span> {row.modeLabel} · {row.freshnessStatus}
-                      </p>
-                    ))}
-                  </div>
-                ) : (
-                  <p>No per-source freshness rows are available for this refresh.</p>
-                )}
-              </div>
-            )}
-          />
+        <div className="grid gap-3 lg:grid-cols-2">
+          <article className="home-band-card home-band-card--priority weather-surface weather-delta-card rounded-xl p-3" data-emphasis="true">
+            <CardEyebrow icon={<AuditIcon className="h-3.5 w-3.5" />} label="Trust summary" accentClass="text-sky-200" />
+            <p className="mt-2 text-sm font-semibold text-slate-100">
+              {workspaceModel.audit.trustStatusLabel} — {workspaceModel.audit.trustStatusDetail}
+            </p>
+            <p className="mt-2 text-sm text-slate-300">{workspaceModel.audit.trustStatusAction}</p>
+            <div className="mt-3 space-y-1 text-xs text-slate-300">
+              <p><span className="font-semibold text-slate-100">Freshness:</span> {workspaceModel.audit.freshnessSummary}</p>
+              <p><span className="font-semibold text-slate-100">Coverage:</span> {workspaceModel.audit.sourceCoverageLine}</p>
+            </div>
+          </article>
 
-          <div className="weather-list-stagger grid gap-3">
-            <article className="home-band-card home-band-card--priority weather-surface weather-delta-card rounded-xl p-3" data-emphasis="true">
-              <CardEyebrow icon={<BoltIcon className="h-3.5 w-3.5" />} label="What changed in the decision" accentClass="text-sky-200" />
-              <p className="mt-2 text-sm font-semibold text-slate-100">{workspaceModel.audit.revisitHeadline}</p>
-              <p className="mt-2 text-sm text-slate-300">{workspaceModel.audit.revisitDetail}</p>
-            </article>
-            <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">
-              <CardEyebrow icon={<CircleTargetIcon className="h-3.5 w-3.5" />} label="What would change this call" accentClass="text-amber-200" />
-              <p className="mt-2 text-sm font-semibold text-slate-100">{workspaceModel.audit.flipHeadline}</p>
-              <p className="mt-2 text-sm text-slate-300">{workspaceModel.audit.flipDetail}</p>
-            </article>
-          </div>
-        </div>
-
-        <div className="weather-list-stagger grid gap-3 md:grid-cols-3">
-          {workspaceModel.audit.evidenceMovers.length > 0 ? (
-            workspaceModel.audit.evidenceMovers.map((item, index) => (
-              <article key={item.key} className="home-band-card weather-surface weather-delta-card rounded-xl p-3" data-emphasis={index === 0 ? "true" : undefined}>
-                <CardEyebrow icon={<TrendUpIcon className="h-3.5 w-3.5" />} label={`Mover ${index + 1}`} accentClass="text-emerald-200" />
-                <h3 className="mt-2 text-sm font-semibold text-slate-100">{item.title}</h3>
-                <p className="mt-2 text-sm text-slate-300">{item.detail}</p>
-              </article>
-            ))
-          ) : (
-            <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3 md:col-span-3">
-              <CardEyebrow icon={<TrendUpIcon className="h-3.5 w-3.5" />} label="Evidence movers" accentClass="text-emerald-200" />
-              <p className="mt-2 text-sm text-slate-300">No major evidence movers were recorded for this refresh. Hold the current weekly baseline unless a trust warning or flip condition fires.</p>
-            </article>
-          )}
+          <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">
+            <CardEyebrow icon={<BoltIcon className="h-3.5 w-3.5" />} label="Decision pressure test" accentClass="text-amber-200" />
+            <p className="mt-2 text-sm font-semibold text-slate-100">{workspaceModel.audit.revisitHeadline}</p>
+            <p className="mt-2 text-sm text-slate-300">{workspaceModel.audit.revisitDetail}</p>
+            <p className="mt-3 text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">Flip line</p>
+            <p className="mt-1 text-sm font-semibold text-slate-100">{workspaceModel.audit.flipHeadline}</p>
+            <p className="mt-1 text-sm text-slate-300">{workspaceModel.audit.flipDetail}</p>
+            {workspaceModel.audit.evidenceMovers[0] ? (
+              <p className="mt-3 text-xs text-slate-300">
+                <span className="font-semibold text-slate-100">Top mover:</span> {workspaceModel.audit.evidenceMovers[0].title} — {workspaceModel.audit.evidenceMovers[0].detail}
+              </p>
+            ) : null}
+          </article>
         </div>
       </section>
 
@@ -228,44 +199,29 @@ export async function HomeWorkspaceBands({
           </article>
 
           <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">
-            <CardEyebrow icon={<DocumentIcon className="h-3.5 w-3.5" />} label="Export handoff" accentClass="text-sky-200" />
-            <p className="mt-2 text-sm font-semibold text-slate-100">Share the aligned brief only after the plan and finance posture are set.</p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {workspaceModel.operations.exportActions.map((action) => (
-                <Link key={action.href} href={action.href as Route} className="weather-pill inline-flex min-h-[44px] items-center gap-2 px-3 py-2 text-xs font-semibold text-slate-100">
-                  <DocumentIcon className="h-3.5 w-3.5" />
-                  <span>{action.label}</span>
-                </Link>
-              ))}
-            </div>
+            <CardEyebrow icon={<ShieldIcon className="h-3.5 w-3.5" />} label="Hold this line" accentClass="text-amber-200" />
+            {workspaceModel.operations.topGuardrails[0] ? (
+              <>
+                <p className="mt-2 text-sm font-semibold text-slate-100">{workspaceModel.operations.topGuardrails[0].label}</p>
+                <p className="mt-2 text-sm text-slate-300">{workspaceModel.operations.topGuardrails[0].detail}</p>
+              </>
+            ) : (
+              <p className="mt-2 text-sm text-slate-300">Keep this week&apos;s guardrails in force until a flip condition clears.</p>
+            )}
+            {workspaceModel.operations.financeSnapshot[0] ? (
+              <p className="mt-3 text-xs text-slate-300">
+                <span className="font-semibold text-slate-100">Finance:</span> {workspaceModel.operations.financeSnapshot[0].actionNow}
+              </p>
+            ) : null}
           </article>
         </div>
-
-        <div className="grid gap-3 lg:grid-cols-2">
-          <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">
-            <CardEyebrow icon={<ShieldIcon className="h-3.5 w-3.5" />} label="Top guardrails" accentClass="text-amber-200" />
-            <ul className="mt-3 space-y-2">
-              {workspaceModel.operations.topGuardrails.map((item) => (
-                <li key={item.key} className="home-band-list-item rounded-lg border border-slate-800/80 bg-slate-950/50 px-3 py-2">
-                  <p className="text-xs font-semibold text-slate-100">{item.label}</p>
-                  <p className="mt-1 text-xs text-slate-300">{item.detail}</p>
-                </li>
-              ))}
-            </ul>
-          </article>
-
-          <article className="home-band-card weather-surface weather-delta-card rounded-xl p-3">
-            <CardEyebrow icon={<TrendUpIcon className="h-3.5 w-3.5" />} label="Finance snapshot" accentClass="text-sky-200" />
-            <ul className="mt-3 space-y-2">
-              {workspaceModel.operations.financeSnapshot.map((item) => (
-                <li key={item.key} className="home-band-list-item rounded-lg border border-slate-800/80 bg-slate-950/50 px-3 py-2">
-                  <p className="text-xs font-semibold text-slate-100">{item.label}</p>
-                  <p className="mt-1 text-xs text-slate-300">{item.actionNow}</p>
-                  <p className="mt-1 text-xs text-slate-400">Reverse: {item.reversalCondition}</p>
-                </li>
-              ))}
-            </ul>
-          </article>
+        <div className="flex flex-wrap gap-2">
+          {workspaceModel.operations.exportActions.map((action) => (
+            <Link key={action.href} href={action.href as Route} className="weather-pill inline-flex min-h-[44px] items-center gap-2 px-3 py-2 text-xs font-semibold text-slate-100">
+              <DocumentIcon className="h-3.5 w-3.5" />
+              <span>{action.label}</span>
+            </Link>
+          ))}
         </div>
       </section>
 

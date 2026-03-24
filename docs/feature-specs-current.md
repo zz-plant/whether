@@ -38,15 +38,17 @@ hero plus share/copy actions, then the page continues in a fixed operator sequen
 - historical replay,
 - translate by role or run a tool.
 
-The audit band keeps trust compact on home by showing freshness, source coverage, revisit/flip
-conditions, and the top evidence movers without forcing a route change. Audit actions now collapse
-to a single deeper-evidence path (`/signals`) so the home scan path stays focused on the weekly
-decision before branching. The operations band now appears before historical replay so operators
-can lock the current-week plan before looking backward. Historical replay still uses the same
-time-machine date-picker pattern as `/signals`, but starts directly on home. The operations band
-compresses approve/hold/revisit, top guardrails, finance posture, and export entry points before
-deeper review in `/operations`. The final band surfaces direct role, situation, toolkit,
-ship-checklist, and team-context shortcuts.
+The home top fold now separates metadata from decision contract: a compact current-outlook strip
+shows posture, trend, confidence, and flip-window context, and the canonical weekly call appears
+once below it with explicit `Action now`, `Guardrail`, and `Flip condition` fields. The share rail
+stays artifact-first, while company-specific override controls are separated from routine sharing.
+
+The audit band keeps trust compact on home by showing one trust summary, one decision pressure-test
+card, and a single deeper-evidence path (`/signals`) instead of reproducing the full evidence lane.
+The operations band now compresses the weekly action, one hold-the-line summary, and direct export
+entry points before deeper review in `/operations`. Historical replay still uses the same
+time-machine date-picker pattern as `/signals`, but starts directly on home. The final band
+surfaces direct role, situation, toolkit, ship-checklist, and team-context shortcuts.
 
 The optional `?view=evidence` mode still renders the high-density analytical matrix with direct row
 labels, embedded threshold context, and restrained accent usage for outlier conditions.
@@ -220,7 +222,8 @@ This pilot is additive and backward-compatible: existing regime labels and thres
 
 ### 4.1 Decisions workstream status
 Decisions is an active first-class workflow surface in shipped navigation (`/decide`) with an
-action-first top fold:
+action-first top fold anchored to the live weekly call:
+- current posture, action, guardrail, and flip condition,
 - direct toolkit shortcuts,
 - ship checklist,
 - team-context profiling,

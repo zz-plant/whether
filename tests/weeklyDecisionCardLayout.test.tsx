@@ -75,8 +75,8 @@ describe("WeeklyDecisionCard top-fold composition", () => {
     assert.match(html, /Guardrail/);
     assert.match(html, /Flip condition/);
     assert.match(html, /Current outlook/);
-    assert.match(html, /Playbook for Defensive/);
-    assert.match(html, /Efficiency first\./);
+    assert.match(html, /Flip window/);
+    assert.match(html, /Cloudy\./);
     assert.match(html, /Supporting rationale/);
     assert.doesNotMatch(html, /Company mode:/);
     assert.doesNotMatch(html, /Seed/);
