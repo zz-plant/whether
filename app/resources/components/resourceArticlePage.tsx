@@ -8,7 +8,7 @@ import {
   serializeJsonLd,
 } from "../../../lib/pageMetadata";
 import { decisionAreaLabel, type BoundedDecisionRule } from "../../../lib/report/boundedDecisionRules";
-import type { ResourceArticle } from "../../../lib/resourceArticles";
+import type { ResourceArticle, ResourceArticleEmbed } from "../../../lib/resourceArticles";
 import { CopyAnchorButton } from "./copyAnchorButton";
 
 const boardFrameworkPath = "/resources/board-level-capital-posture-framework";
@@ -40,6 +40,61 @@ const buildAnchor = (heading: string) =>
     .replace(/[^a-z0-9\s-]/g, "")
     .trim()
     .replace(/\s+/g, "-");
+
+const iframeSrcPattern = /<iframe[^>]*\ssrc=(["'])(.*?)\1/i;
+const iframeTitlePattern = /<iframe[^>]*\stitle=(["'])(.*?)\1/i;
+
+const normalizeEmbedUrl = (value: string | undefined): string | null => {
+  if (!value) {
+    return null;
+  }
+
+  try {
+    const parsed = new URL(value);
+    if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
+      return null;
+    }
+    return parsed.toString();
+  } catch {
+    return null;
+  }
+};
+
+const resolveImportedEmbed = (embed: ResourceArticleEmbed): { src: string; title: string; caption?: string; provider?: string } | null => {
+  const directSrc = normalizeEmbedUrl(embed.src);
+  const directTitle = embed.title?.trim();
+  if (directSrc) {
+    return {
+      src: directSrc,
+      title: directTitle && directTitle.length > 0 ? directTitle : "Embedded content",
+      caption: embed.caption,
+      provider: embed.provider,
+    };
+  }
+
+  if (!embed.html) {
+    return null;
+  }
+
+  const srcMatch = embed.html.match(iframeSrcPattern);
+  const parsedSrc = normalizeEmbedUrl(srcMatch?.[2]);
+  if (!parsedSrc) {
+    return null;
+  }
+
+  const importedTitle = embed.html.match(iframeTitlePattern)?.[2]?.trim();
+
+  return {
+    src: parsedSrc,
+    title: directTitle && directTitle.length > 0
+      ? directTitle
+      : importedTitle && importedTitle.length > 0
+        ? importedTitle
+        : "Embedded content",
+    caption: embed.caption,
+    provider: embed.provider,
+  };
+};
 
 export const buildResourceArticleMetadata = (article: ResourceArticle): Metadata =>
   buildPageMetadata({
@@ -141,6 +196,36 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
                 <CopyAnchorButton anchor={anchor} />
               </div>
               {section.paragraphs.map((paragraph) => <p key={paragraph} className="text-sm leading-7 text-slate-200 print:text-slate-700">{paragraph}</p>)}
+              {section.embeds?.map((embed, index) => {
+                const importedEmbed = resolveImportedEmbed(embed);
+                if (!importedEmbed) {
+                  return null;
+                }
+
+                return (
+                  <figure key={`${section.heading}-embed-${importedEmbed.src}-${index}`} className="space-y-3">
+                    <div className="overflow-hidden rounded-2xl border border-slate-700/80 bg-slate-950/70 shadow-[0_20px_60px_rgba(15,23,42,0.35)]">
+                      <div className="aspect-video">
+                        <iframe
+                          src={importedEmbed.src}
+                          title={importedEmbed.title}
+                          loading="lazy"
+                          allowFullScreen
+                          referrerPolicy="strict-origin-when-cross-origin"
+                          sandbox="allow-same-origin allow-scripts allow-popups allow-popups-to-escape-sandbox allow-presentation"
+                          className="h-full w-full border-0"
+                        />
+                      </div>
+                    </div>
+                    {importedEmbed.provider || importedEmbed.caption ? (
+                      <figcaption className="text-xs text-slate-400 print:text-slate-600">
+                        {importedEmbed.provider ? `${importedEmbed.provider} embed` : "Imported embed"}
+                        {importedEmbed.caption ? ` · ${importedEmbed.caption}` : ""}
+                      </figcaption>
+                    ) : null}
+                  </figure>
+                );
+              })}
             </section>
           );
         })}
