@@ -70,6 +70,7 @@ type HomeReportData = {
       key: "tightness" | "riskAppetite" | "baseRate" | "curveSlope";
       delta: number;
     }>;
+    signalContributions?: ReportDynamics["signalContributions"];
     anomalySignals?: Array<{
       reason: string;
     }>;
@@ -1115,7 +1116,7 @@ const buildInputInfluenceItems = ({
   const signalContributions = reportDynamics?.signalContributions?.length
     ? reportDynamics.signalContributions
     : buildInputInfluenceFallback({ assessment });
-  const contributionByKey = new Map(signalContributions.map((item) => [item.key, item]));
+  const contributionByKey = new Map(signalContributions.map((item: NonNullable<ReportDynamics["signalContributions"]>[number]) => [item.key, item]));
   const indicatorByKey = new Map(regimeSignalIndicators.map((item) => [item.key, item]));
 
   return inputInfluenceKeyOrder.map((key) => {

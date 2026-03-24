@@ -8,12 +8,12 @@ import {
   serializeJsonLd,
 } from "../../../lib/pageMetadata";
 import { decisionAreaLabel, type BoundedDecisionRule } from "../../../lib/report/boundedDecisionRules";
-import type { ResourceArticle, ResourceArticleEmbed } from "../../../lib/resourceArticles";
+import type { ResourceArticle, ResourceArticleEmbed, ResourceArticleSection } from "../../../lib/resourceArticles";
 import { CopyAnchorButton } from "./copyAnchorButton";
 
 const boardFrameworkPath = "/resources/board-level-capital-posture-framework";
 
-const sharedDeepDiveSections = [
+const sharedDeepDiveSections: ResourceArticleSection[] = [
   {
     heading: "Implementation operating cadence (weeks 1-12)",
     paragraphs: [

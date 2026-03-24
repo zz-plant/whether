@@ -57,6 +57,7 @@ describe("buildHomeMetadata", () => {
       : metadata.openGraph?.images
         ? [metadata.openGraph.images]
         : [];
+    const firstOpenGraphImage = openGraphImages[0];
     const twitterImages = Array.isArray(metadata.twitter?.images)
       ? metadata.twitter.images
       : metadata.twitter?.images
@@ -67,8 +68,16 @@ describe("buildHomeMetadata", () => {
     assert.equal(metadata.description, preview.description);
     assert.equal(metadata.alternates?.canonical, "/");
     assert.equal(metadata.openGraph?.url, preview.url);
-    assert.equal(openGraphImages[0]?.url, preview.imageUrl);
-    assert.equal(openGraphImages[0]?.alt, preview.imageAlt);
+    const firstOpenGraphImageUrl = typeof firstOpenGraphImage === "string"
+      ? firstOpenGraphImage
+      : firstOpenGraphImage instanceof URL
+        ? firstOpenGraphImage.toString()
+        : firstOpenGraphImage?.url;
+    const firstOpenGraphImageAlt = firstOpenGraphImage && typeof firstOpenGraphImage === "object" && !(firstOpenGraphImage instanceof URL) && "alt" in firstOpenGraphImage
+      ? firstOpenGraphImage.alt
+      : undefined;
+    assert.equal(firstOpenGraphImageUrl, preview.imageUrl);
+    assert.equal(firstOpenGraphImageAlt, preview.imageAlt);
     assert.equal(twitterImages[0], preview.imageUrl);
     assert.deepEqual(metadata.robots, { index: false, follow: true });
   });

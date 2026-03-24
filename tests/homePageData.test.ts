@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { createHomePageReportDataLoader } from "../lib/report/homePageData";
-import type { loadReportDataSafe } from "../lib/report/reportData";
+import type { LoadReportDataSafeResult } from "../lib/report/reportData";
 
 const createFakeUnstableCache = () => {
   const cache = new Map<string, unknown>();
@@ -57,16 +57,18 @@ const createFakeRevalidatingUnstableCache = () => {
 
 describe("createHomePageReportDataLoader", () => {
   it("retries fallback results instead of caching degraded payloads", async () => {
+    type FallbackReportResult = Extract<LoadReportDataSafeResult, { ok: false }>;
+    type LiveReportResult = Extract<LoadReportDataSafeResult, { ok: true }>;
     const transientError = new Error("transient treasury timeout");
     const fallbackResult = {
       ok: false,
       error: transientError,
       fallback: { marker: "fallback" },
-    } as Awaited<ReturnType<typeof loadReportDataSafe>>;
+    } as unknown as FallbackReportResult;
     const liveResult = {
       ok: true,
       data: { marker: "live" },
-    } as Awaited<ReturnType<typeof loadReportDataSafe>>;
+    } as unknown as LiveReportResult;
 
     let callCount = 0;
     const loader = createHomePageReportDataLoader({
@@ -94,16 +96,18 @@ describe("createHomePageReportDataLoader", () => {
   });
 
   it("surfaces fallback mode when stale cached live data fails revalidation", async () => {
+    type FallbackReportResult = Extract<LoadReportDataSafeResult, { ok: false }>;
+    type LiveReportResult = Extract<LoadReportDataSafeResult, { ok: true }>;
     const transientError = new Error("macro feed unavailable");
     const liveResult = {
       ok: true,
       data: { marker: "live" },
-    } as Awaited<ReturnType<typeof loadReportDataSafe>>;
+    } as unknown as LiveReportResult;
     const fallbackResult = {
       ok: false,
       error: transientError,
       fallback: { marker: "fallback" },
-    } as Awaited<ReturnType<typeof loadReportDataSafe>>;
+    } as unknown as FallbackReportResult;
     const fakeCache = createFakeRevalidatingUnstableCache();
 
     let callCount = 0;
@@ -142,6 +146,9 @@ describe("createHomePageReportDataLoader", () => {
 
     const thirdResult = await loader(searchParams);
     assert.equal(thirdResult.ok, false);
+    if (!thirdResult.ok) {
+      assert.deepEqual(thirdResult.fallback, fallbackResult.fallback);
+    }
     assert.equal(callCount, 2);
 
     fakeCache.markStale(cacheKey);
