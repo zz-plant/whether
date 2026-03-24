@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { Route } from "../../lib/navigation/routeType";
-import { buildBreadcrumbList, buildPageMetadata, serializeJsonLd } from "../../lib/seo";
+import { buildBreadcrumbList, buildPageMetadata } from "../../lib/seo";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import { BreadcrumbTrail } from "../components/breadcrumbTrail";
-import { HubHero, HubPageShell, HubSection } from "../components/hubPageShell";
+import { HubSection } from "../components/hubPageShell";
 import { NextStepRail } from "../components/nextStepRail";
 import { BeginnerGlossaryPanel } from "../components/appendixSections";
 import { buildCompactTrustSummary } from "../../lib/report/trustStatus";
 import { formatConfidencePlainLabel } from "../../lib/report/reportFormatting";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
+import { ReportShell } from "../components/reportShell";
+import { reportPageLinks } from "../../lib/report/reportNavigation";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -84,31 +86,86 @@ export default async function MethodPage() {
       cta: "Open formula reference",
     },
   ];
+  const sectionLinks = [
+    { href: "#trust-snapshot", label: "60-second trust check" },
+    { href: "#trust-hub-links", label: "Audit workflow" },
+    { href: "#revisit-call", label: "Revisit triggers" },
+    { href: "#meeting-snippet", label: "Meeting snippet" },
+  ];
+  const trustStatusTone = reportData.historicalSelection
+    ? "historical"
+    : isFallback
+      ? "warning"
+      : "stable";
 
   return (
-    <HubPageShell>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbStructuredData) }} />
+    <ReportShell
+      statusLabel={reportData.statusLabel}
+      recordDateLabel={reportData.recordDateLabel}
+      fetchedAtLabel={reportData.fetchedAtLabel}
+      treasurySource={reportData.treasury.source}
+      trustStatusLabel={trustSummary}
+      trustStatusDetail={`Coverage: ${sourceCoverage}`}
+      trustStatusAction="If trust checks pass, return to the weekly brief and execute the operating call."
+      trustStatusTone={trustStatusTone}
+      pageTitle="Method"
+      currentPath="/method"
+      pageSummary="Trust, source, and confidence checks in the same shell used by the weekly operating surfaces."
+      pageSummaryLink={{ href: "#trust-snapshot", label: "Start trust check ↓" }}
+      pageLinks={reportPageLinks}
+      sectionLinks={sectionLinks}
+      heroVariant="compact"
+      pageNavVariant="compact"
+      showPageNavigation={true}
+      primaryCta={{ href: "/", label: "Return to Weekly Brief" }}
+      secondaryCta={{ href: "#trust-snapshot", label: "Open trust check" }}
+      nextStep={{
+        href: "/",
+        description: "Return to Weekly Brief after validating trust and confidence",
+      }}
+      decisionBanner={{
+        label: "Start here",
+        decision: "Validate freshness, confidence, and flip conditions before approving irreversible moves.",
+        horizon: "This week",
+        confidence: trustSummary,
+        effectiveDate: reportData.recordDateLabel,
+        evidenceHref: "#trust-snapshot",
+      }}
+      commandBar={{
+        regime: reportData.assessment.regime,
+        call: "Use Method as a fast trust gate, then move back to execution.",
+        doNow: [
+          `Confirm freshness: ${reportData.fetchedAtLabel}.`,
+          `Confirm confidence: ${confidenceLabel}.`,
+        ],
+        flipConditions: [
+          reportData.flipThreshold,
+          "If trust degrades, hold irreversible approvals until live evidence stabilizes.",
+        ],
+        updatedAt: reportData.fetchedAtLabel,
+      }}
+      structuredData={breadcrumbStructuredData}
+    >
       <BreadcrumbTrail items={[{ label: "Home", href: "/" }, { label: "Method" }]} />
-      <HubHero
-        eyebrow="Trust audit hub"
-        title="Trust the weekly call fast: confidence, freshness, and flip conditions."
-        description="Use Method only to validate the current brief. If the trust check passes, go back to operating decisions instead of staying here."
-        actions={(
-          <>
-            <Link href="/" className="weather-button inline-flex items-center justify-center">
-              Return to Weekly Brief
-            </Link>
-            <Link href="/methodology" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100">
-              Open formula reference
-            </Link>
-          </>
-        )}
-        stats={[
-          { label: "Posture", value: `${reportData.statusLabel} (${reportData.recordDateLabel})` },
-          { label: "Confidence", value: confidenceLabel },
-          { label: "Trust status", value: trustSummary, detail: `Freshness: ${reportData.fetchedAtLabel}` },
-        ]}
-      />
+      <section className="weather-panel scroll-mt-28 space-y-4 px-6 py-5" aria-label="Method quick start">
+        <p className="weather-surface inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.08em] text-slate-100">
+          Trust audit hub
+        </p>
+        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
+          Trust the weekly call fast: confidence, freshness, and flip conditions.
+        </h1>
+        <p className="text-sm leading-relaxed text-slate-200 sm:text-base">
+          Use Method only to validate the current brief. If the trust check passes, go back to operating decisions instead of staying here.
+        </p>
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <Link href="/" className="weather-button inline-flex min-h-[44px] items-center justify-center">
+            Return to Weekly Brief
+          </Link>
+          <Link href="/methodology" className="weather-pill inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold tracking-[0.14em] text-slate-200 hover:border-sky-400/70 hover:text-slate-100">
+            Open formula reference
+          </Link>
+        </div>
+      </section>
 
       <HubSection id="trust-snapshot" title="60-second trust check" description="Read top-to-bottom before acting on this week's posture." className="scroll-mt-28">
         <div className="grid gap-3 sm:grid-cols-3">
@@ -177,6 +234,6 @@ export default async function MethodPage() {
       <BeginnerGlossaryPanel />
 
       <NextStepRail currentPath="/method" />
-    </HubPageShell>
+    </ReportShell>
   );
 }
