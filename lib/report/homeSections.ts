@@ -11,3 +11,15 @@ export const homeSectionCompactLabelByHref: Record<(typeof homeSectionSequence)[
   "#approve-this-weeks-plan": "Plan",
   "#historical-replay-workspace": "Replay",
 };
+
+const extendedSectionCompactLabelByHref: Record<string, string> = {
+  ...homeSectionCompactLabelByHref,
+  "#evidence-priorities": "Top drivers",
+  "#ops-monthly-action-summary": "Monthly",
+  "#ops-playbook": "Playbook",
+  "#ops-finance-strategy": "Finance",
+  "#ops-export-briefs": "Export",
+};
+
+export const getCompactSectionLabel = (href: string, fallbackLabel: string) =>
+  extendedSectionCompactLabelByHref[href] ?? fallbackLabel;

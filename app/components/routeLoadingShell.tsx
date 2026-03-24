@@ -1,6 +1,12 @@
 import { Skeleton } from "./skeleton";
 
-export function RouteLoadingShell() {
+export function RouteLoadingShell({
+  label = "Loading page",
+  description = "Content is loading.",
+}: {
+  label?: string;
+  description?: string;
+}) {
   return (
     <main
       id="main-content"
@@ -14,15 +20,13 @@ export function RouteLoadingShell() {
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em]">
               <span className="rounded-full border border-sky-400/35 bg-sky-400/10 px-2.5 py-1 text-sky-100">
-                Loading page
+                {label}
               </span>
               <span className="rounded-full border border-slate-700/70 bg-slate-950/70 px-2.5 py-1 text-slate-200">
                 In progress
               </span>
             </div>
-            <p className="max-w-2xl text-sm text-slate-100">
-              Content is loading.
-            </p>
+            <p className="max-w-2xl text-sm text-slate-100">{description}</p>
           </div>
           <div className="rounded-xl border border-slate-700/75 bg-slate-950/70 px-3 py-2.5 text-right">
             <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-cyan-100">

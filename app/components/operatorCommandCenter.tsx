@@ -170,13 +170,19 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
     const persistCurrentQuery = () => {
       persistQuery(queryRef.current);
     };
+    const persistOnHidden = () => {
+      if (document.visibilityState !== "hidden") {
+        return;
+      }
+      persistCurrentQuery();
+    };
 
     window.addEventListener("pagehide", persistCurrentQuery);
-    document.addEventListener("visibilitychange", persistCurrentQuery);
+    document.addEventListener("visibilitychange", persistOnHidden);
 
     return () => {
       window.removeEventListener("pagehide", persistCurrentQuery);
-      document.removeEventListener("visibilitychange", persistCurrentQuery);
+      document.removeEventListener("visibilitychange", persistOnHidden);
       persistCurrentQuery();
     };
   }, []);
@@ -275,12 +281,14 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
   };
 
   const handleCollapse = () => {
+    persistQuery(queryRef.current);
     setIsExpanded(false);
   };
 
   const handleReset = () => {
     hasUserSetFilterRef.current = false;
     setQuery("");
+    persistQuery("");
     setFilter(isMobile ? "Playbook" : "All");
     searchInputRef.current?.focus();
   };
