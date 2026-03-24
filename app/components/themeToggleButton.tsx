@@ -24,7 +24,7 @@ export function ThemeToggleButton() {
     <button
       type="button"
       onClick={toggleTheme}
-      className="weather-button inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em]"
+      className="weather-button inline-flex min-h-[44px] w-full items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.02em] sm:w-auto"
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
       aria-pressed={!isDark}
     >

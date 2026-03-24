@@ -20,10 +20,10 @@ export async function GlobalHeader() {
               </Link>
               <GlobalHeaderTaglineClient />
             </div>
-            <div className="flex flex-wrap items-center gap-2 xl:justify-end">
+            <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center xl:justify-end">
               <Link
                 href="/search"
-                className="weather-button inline-flex min-h-[44px] items-center justify-center px-3 text-xs font-semibold uppercase tracking-[0.08em]"
+                className="weather-button inline-flex min-h-[44px] w-full items-center justify-center px-3 text-xs font-semibold tracking-[0.02em] sm:w-auto"
                 aria-label="Open global search"
               >
                 Search

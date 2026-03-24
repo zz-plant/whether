@@ -15,12 +15,14 @@ type HubHeroProps = {
   title: string;
   description: string;
   actions?: ReactNode;
+  actionLayout?: "wrap" | "stacked-mobile";
   aside?: ReactNode;
   stats?: Array<{
     label: string;
     value: string;
     detail?: string;
   }>;
+  statsVariant?: "hub" | "report";
 };
 
 type HubSectionProps = {
@@ -51,8 +53,10 @@ export function HubHero({
   title,
   description,
   actions,
+  actionLayout = "wrap",
   aside,
   stats,
+  statsVariant = "hub",
 }: HubHeroProps) {
   return (
     <section className="weather-hub-hero">
@@ -64,17 +68,41 @@ export function HubHero({
             {description}
           </p>
         </div>
-        {actions ? <div className="flex flex-wrap gap-3">{actions}</div> : null}
-        {stats?.length ? (
-          <div className="weather-hub-stat-grid">
-            {stats.map((item) => (
-              <div key={item.label} className="weather-hub-stat">
-                <p className="weather-hub-stat-label">{item.label}</p>
-                <p className="weather-hub-stat-value">{item.value}</p>
-                {item.detail ? <p className="text-xs leading-5 text-slate-300">{item.detail}</p> : null}
-              </div>
-            ))}
+        {actions ? (
+          <div
+            className={
+              actionLayout === "stacked-mobile"
+                ? "flex flex-col gap-3 sm:flex-row sm:flex-wrap"
+                : "flex flex-wrap gap-3"
+            }
+          >
+            {actions}
           </div>
+        ) : null}
+        {stats?.length ? (
+          statsVariant === "report" ? (
+            <div className="grid gap-2 sm:grid-cols-3">
+              {stats.map((item) => (
+                <div key={item.label} className="weather-stat-card">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+                    {item.label}
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-slate-100">{item.value}</p>
+                  {item.detail ? <p className="mt-1 text-xs leading-5 text-slate-300">{item.detail}</p> : null}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="weather-hub-stat-grid">
+              {stats.map((item) => (
+                <div key={item.label} className="weather-hub-stat">
+                  <p className="weather-hub-stat-label">{item.label}</p>
+                  <p className="weather-hub-stat-value">{item.value}</p>
+                  {item.detail ? <p className="text-xs leading-5 text-slate-300">{item.detail}</p> : null}
+                </div>
+              ))}
+            </div>
+          )
         ) : null}
       </div>
       {aside ? <div className="weather-hub-sidecar">{aside}</div> : null}
