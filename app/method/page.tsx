@@ -46,6 +46,9 @@ export default async function MethodPage() {
     isFallbackSnapshot: isFallback,
     isHistoricalSelection: Boolean(reportData.historicalSelection),
   });
+  const confidenceLabel = formatConfidencePlainLabel(homeBriefModel.confidenceLabel);
+  const sourceCoverage = `${reportData.treasuryProvenance.statusLabel} · ${reportData.macroProvenance.statusLabel}`;
+  const meetingSnippet = `Posture: ${reportData.statusLabel} (${reportData.recordDateLabel})\nConfidence: ${confidenceLabel}\nTrust: ${trustSummary}\nFlip trigger: ${reportData.flipThreshold}\nAction now: ${reportData.actionNowShort}`;
 
   const revisitBullets = [
     {
@@ -66,6 +69,26 @@ export default async function MethodPage() {
       href: "/sources" as Route,
     },
   ];
+  const trustActions = [
+    {
+      title: "Validate freshness",
+      detail: `Latest refresh: ${reportData.fetchedAtLabel}. Confirm this still matches your meeting window.`,
+      href: "/sources" as Route,
+      cta: "Open freshness checks",
+    },
+    {
+      title: "Validate confidence limits",
+      detail: `Current confidence: ${confidenceLabel}. Review uncertainty before approving irreversible spend.`,
+      href: "/confidence" as Route,
+      cta: "Open confidence limits",
+    },
+    {
+      title: "Validate model assumptions",
+      detail: "Audit formulas and fallback behavior if you need to defend this posture externally.",
+      href: "/methodology" as Route,
+      cta: "Open formula reference",
+    },
+  ];
 
   return (
     <HubPageShell>
@@ -74,8 +97,8 @@ export default async function MethodPage() {
       <StaticHubNav currentPath="/method" />
       <HubHero
         eyebrow="Trust audit hub"
-        title="One screen for confidence, freshness, provenance, and reversal conditions."
-        description="Use this page as the trust audit hub linked from Weekly Brief. Open Learn only if you need optional background context."
+        title="Trust check in 60 seconds: confidence, freshness, and flip conditions."
+        description="Scan this page, decide whether the current weekly call is dependable, and copy a meeting-ready trust summary."
         actions={(
           <>
             <Link href="/" className="weather-button inline-flex items-center justify-center">
@@ -88,7 +111,7 @@ export default async function MethodPage() {
         )}
         stats={[
           { label: "Posture", value: `${reportData.statusLabel} (${reportData.recordDateLabel})` },
-          { label: "Confidence", value: formatConfidencePlainLabel(homeBriefModel.confidenceLabel) },
+          { label: "Confidence", value: confidenceLabel },
           { label: "Trust status", value: trustSummary, detail: `Freshness: ${reportData.fetchedAtLabel}` },
         ]}
       />
@@ -100,37 +123,46 @@ export default async function MethodPage() {
         items={methodScrollPlan.items}
       />
 
-      <HubSection id="trust-hub-links" title="Trust hub links" description="Open the exact trust surface you need in one step." className="scroll-mt-28">
-        <div className="grid gap-3 sm:grid-cols-2">
-        <Link href="/sources" className="weather-hub-link-card space-y-2">
-          <h2 className="text-lg font-semibold text-slate-100">Sources and freshness</h2>
-          <p className="text-sm text-slate-300">Inspect source coverage, update cadence, and provenance for each signal.</p>
-        </Link>
-        <Link href="/confidence" className="weather-hub-link-card space-y-2">
-          <h2 className="text-lg font-semibold text-slate-100">Confidence and limits</h2>
-          <p className="text-sm text-slate-300">Understand uncertainty, assumptions, and conditions that can flip the call.</p>
-        </Link>
-        <Link href="/methodology" className="weather-hub-link-card space-y-2">
-          <h2 className="text-lg font-semibold text-slate-100">Formula reference</h2>
-          <p className="text-sm text-slate-300">Review formulas, weighting choices, and fallback logic in full detail.</p>
-        </Link>
-        <Link href="/learn" className="weather-hub-link-card space-y-2">
-          <h2 className="text-lg font-semibold text-slate-100">Optional concepts &amp; diagnostics</h2>
-          <p className="text-sm text-slate-300">Open Learn only when you need deeper conceptual background beyond the trust audit.</p>
-        </Link>
+      <HubSection id="trust-snapshot" title="60-second trust check" description="Read top-to-bottom before acting on this week's posture." className="scroll-mt-28">
+        <div className="grid gap-3 sm:grid-cols-3">
+          <article className="weather-hub-card rounded-2xl px-4 py-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Current call</p>
+            <p className="mt-2 text-sm text-slate-200">Posture: <span className="font-semibold text-slate-100">{reportData.statusLabel}</span> (effective {reportData.recordDateLabel})</p>
+            <p className="mt-2 text-sm text-slate-200">Confidence: <span className="font-semibold text-slate-100">{confidenceLabel}</span></p>
+          </article>
+          <article className="weather-hub-card rounded-2xl px-4 py-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Trust status</p>
+            <p className="mt-2 text-sm text-slate-200">{trustSummary}</p>
+            <p className="mt-2 text-sm text-slate-300">Coverage: {sourceCoverage}</p>
+            <p className="mt-2 text-xs text-slate-400">Latest refresh: {reportData.fetchedAtLabel}</p>
+          </article>
+          <article className="weather-hub-card rounded-2xl px-4 py-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Decision boundary</p>
+            <p className="mt-2 text-sm text-slate-200">{reportData.flipThreshold}</p>
+            <p className="mt-2 text-sm text-slate-300">{reportData.actionNowShort}</p>
+          </article>
         </div>
       </HubSection>
 
-      <HubSection id="trust-snapshot" title="Trust snapshot" className="scroll-mt-28">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="text-xs text-slate-400">Last updated: {reportData.fetchedAtLabel}</p>
+      <HubSection id="trust-hub-links" title="Audit workflow" description="Open each surface only when that exact question appears in review." className="scroll-mt-28">
+        <div className="grid gap-3 sm:grid-cols-2">
+          {trustActions.map((item) => (
+            <article key={item.title} className="weather-hub-link-card space-y-2">
+              <h2 className="text-lg font-semibold text-slate-100">{item.title}</h2>
+              <p className="text-sm text-slate-300">{item.detail}</p>
+              <Link href={item.href} className="inline-flex min-h-[44px] items-center text-xs font-semibold uppercase tracking-[0.12em] text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
+                {item.cta}
+              </Link>
+            </article>
+          ))}
+          <article className="weather-hub-link-card space-y-2">
+            <h2 className="text-lg font-semibold text-slate-100">Optional context only</h2>
+            <p className="text-sm text-slate-300">Use Learn for conceptual diagnostics after you have already made the operating call.</p>
+            <Link href="/learn" className="inline-flex min-h-[44px] items-center text-xs font-semibold uppercase tracking-[0.12em] text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
+              Open Learn context
+            </Link>
+          </article>
         </div>
-        <ul className="space-y-2 text-sm text-slate-200">
-          <li><span className="text-slate-400">Posture:</span> {reportData.statusLabel} (effective {reportData.recordDateLabel})</li>
-          <li><span className="text-slate-400">Confidence:</span> {formatConfidencePlainLabel(homeBriefModel.confidenceLabel)}</li>
-          <li><span className="text-slate-400">Trust status:</span> {trustSummary}</li>
-          <li><span className="text-slate-400">Source coverage:</span> {reportData.treasuryProvenance.statusLabel} · {reportData.macroProvenance.statusLabel}</li>
-        </ul>
       </HubSection>
 
       <HubSection
@@ -147,6 +179,12 @@ export default async function MethodPage() {
             </li>
           ))}
         </ul>
+      </HubSection>
+
+      <HubSection id="meeting-snippet" title="Meeting-ready trust snippet" description="Copy this into Slack, notes, or the meeting agenda." className="scroll-mt-28">
+        <pre className="weather-hub-card overflow-x-auto rounded-2xl px-4 py-4 text-xs leading-6 text-slate-200">
+          <code>{meetingSnippet}</code>
+        </pre>
       </HubSection>
 
       <BeginnerGlossaryPanel />
