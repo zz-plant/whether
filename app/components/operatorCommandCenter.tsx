@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { handleDirectionalFocus } from "./directionalFocus";
 import { useHapticFeedback } from "./useHapticFeedback";
@@ -99,9 +100,11 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
   const queryRef = useRef(query);
   const isExpandedRef = useRef(isExpanded);
   const hasUserSetFilterRef = useRef(false);
-  const pendingQueryPersistRef = useRef<number | null>(null);
   const haptic = useHapticFeedback();
   const { copyToClipboard } = useClipboardCopy();
+  const persistQuery = (value: string) => {
+    sessionStorage.setItem(STORAGE_KEY, value);
+  };
   // Haptics should reinforce decision delta and artifact completion, not decorative interaction.
   const triggerNavigationHaptic = () => haptic.navigate();
   const triggerDecisionCommitHaptic = () => haptic.confirm();
@@ -161,30 +164,27 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
 
   useEffect(() => {
     queryRef.current = query;
-
-    if (pendingQueryPersistRef.current !== null) {
-      window.clearTimeout(pendingQueryPersistRef.current);
-    }
-
-    pendingQueryPersistRef.current = window.setTimeout(() => {
-      sessionStorage.setItem(STORAGE_KEY, queryRef.current);
-      pendingQueryPersistRef.current = null;
-    }, 180);
-
-    return () => {
-      if (pendingQueryPersistRef.current !== null) {
-        window.clearTimeout(pendingQueryPersistRef.current);
-      }
-    };
   }, [query]);
 
-  useEffect(() => () => {
-    if (pendingQueryPersistRef.current !== null) {
-      window.clearTimeout(pendingQueryPersistRef.current);
-      pendingQueryPersistRef.current = null;
-    }
+  useEffect(() => {
+    const persistCurrentQuery = () => {
+      persistQuery(queryRef.current);
+    };
+    const persistOnHidden = () => {
+      if (document.visibilityState !== "hidden") {
+        return;
+      }
+      persistCurrentQuery();
+    };
 
-    sessionStorage.setItem(STORAGE_KEY, queryRef.current);
+    window.addEventListener("pagehide", persistCurrentQuery);
+    document.addEventListener("visibilitychange", persistOnHidden);
+
+    return () => {
+      window.removeEventListener("pagehide", persistCurrentQuery);
+      document.removeEventListener("visibilitychange", persistOnHidden);
+      persistCurrentQuery();
+    };
   }, []);
 
   useEffect(() => {
@@ -281,12 +281,14 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
   };
 
   const handleCollapse = () => {
+    persistQuery(queryRef.current);
     setIsExpanded(false);
   };
 
   const handleReset = () => {
     hasUserSetFilterRef.current = false;
     setQuery("");
+    persistQuery("");
     setFilter(isMobile ? "Playbook" : "All");
     searchInputRef.current?.focus();
   };
@@ -318,13 +320,13 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
             {totalResults} links
           </span>
           {topMatch ? (
-            <a
+            <Link
               href={topMatch.href}
               onClick={triggerNavigationHaptic}
               className="weather-pill hidden min-h-[44px] items-center px-3 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-200 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation sm:inline-flex"
             >
               {isInPageLink(topMatch.href) ? "Top section" : "Top page"}
-            </a>
+            </Link>
           ) : null}
         </div>
       </div>
@@ -364,6 +366,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
+              onBlur={() => persistQuery(query)}
               placeholder="Search"
               className="w-full rounded-2xl border border-slate-700/80 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
             />
@@ -503,7 +506,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
                               </span>
                             </button>
                           ) : (
-                            <a
+                            <Link
                               href={action.href}
                               className="weather-pill inline-flex min-h-[44px] w-full items-center justify-between gap-3 px-3 py-2 text-left transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
                               title={action.description}
@@ -535,7 +538,7 @@ export const OperatorCommandCenter = ({ actions }: { actions: OperatorCommandAct
                                 </span>
                                 <ArrowRightIcon className="h-3.5 w-3.5 text-slate-500" />
                               </span>
-                            </a>
+                            </Link>
                           )}
                         </li>
                         );
