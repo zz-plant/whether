@@ -17,10 +17,25 @@ export type ResourceArticle = {
   intent: "cfo" | "board" | "vp-product" | "vc-partner";
   format: "guide" | "case-example";
   boardSummary: string[];
-  sections: Array<{ heading: string; paragraphs: string[] }>;
+  sections: ResourceArticleSection[];
   includeSharedDeepDive?: boolean;
   faqs: Array<{ question: string; answer: string }>;
   toolLink: { href: Route; label: string };
+};
+
+export type ResourceArticleEmbed = {
+  kind: "iframe";
+  title?: string;
+  src?: string;
+  html?: string;
+  caption?: string;
+  provider?: string;
+};
+
+export type ResourceArticleSection = {
+  heading: string;
+  paragraphs: string[];
+  embeds?: ResourceArticleEmbed[];
 };
 
 export const resourceArticles: ResourceArticle[] = [

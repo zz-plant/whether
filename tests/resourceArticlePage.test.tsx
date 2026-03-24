@@ -48,4 +48,34 @@ describe("resource article page section composition", () => {
     assert.match(withoutSharedHtml, /id="anchor-stable-heading"/);
     assert.match(withSharedHtml, /id="anchor-stable-heading"/);
   });
+
+  it("renders imported iframe embeds from raw snippets with safe defaults", () => {
+    const html = renderToStaticMarkup(
+      <ResourceArticlePage
+        article={{
+          ...baseArticle,
+          sections: [
+            {
+              heading: "Imported embed section",
+              paragraphs: ["Watch the operating review."],
+              embeds: [
+                {
+                  kind: "iframe",
+                  provider: "Loom",
+                  caption: "Shareable walkthrough",
+                  html: '<iframe src="https://www.loom.com/embed/abc123" title="Weekly walkthrough" allow="autoplay"></iframe><script>alert(1)</script>',
+                },
+              ],
+            },
+          ],
+        }}
+      />,
+    );
+
+    assert.match(html, /src="https:\/\/www\.loom\.com\/embed\/abc123"/);
+    assert.match(html, /title="Weekly walkthrough"/);
+    assert.match(html, /sandbox="allow-same-origin allow-scripts allow-popups allow-popups-to-escape-sandbox allow-presentation"/);
+    assert.match(html, /Loom embed · Shareable walkthrough/);
+    assert.doesNotMatch(html, /<script>alert\(1\)<\/script>/);
+  });
 });
