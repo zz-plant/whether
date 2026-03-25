@@ -4,7 +4,8 @@ import { buildScenarioContract } from "../../../../lib/cli/contracts";
 import { applyScenarioOverridesToTreasury } from "../../../../lib/cli/scenarioInputs";
 import { loadReportDataSafe } from "../../../../lib/report/reportData";
 import { getRegimeDisplayLabel } from "../../../../lib/regimePresentation";
-import { CLI_QUERY_ALLOWLIST_BY_ENDPOINT, rejectUnsupportedCliQuery } from "../../../../lib/cli/queryContracts";
+import { CLI_QUERY_ALLOWLIST_BY_ENDPOINT } from "../../../../lib/cli/queryContracts";
+import { parseCliRouteRequest } from "../../../../lib/api/cliRoute";
 
 export const runtime = "edge";
 export const revalidate = 0;
@@ -20,8 +21,8 @@ const parseNumber = (value: string | null) => {
 
 
 export async function GET(request: NextRequest) {
-  const invalidQuery = rejectUnsupportedCliQuery(request, CLI_QUERY_ALLOWLIST_BY_ENDPOINT.scenario);
-  if (invalidQuery) return invalidQuery;
+  const parsedRequest = parseCliRouteRequest(request, CLI_QUERY_ALLOWLIST_BY_ENDPOINT.scenario);
+  if (parsedRequest instanceof NextResponse) return parsedRequest;
 
   const tightness = parseNumber(request.nextUrl.searchParams.get("tightness"));
   const riskAppetite = parseNumber(request.nextUrl.searchParams.get("risk-appetite"));

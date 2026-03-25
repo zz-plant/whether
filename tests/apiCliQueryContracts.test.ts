@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
+import { NextRequest, NextResponse } from "next/server";
 import { CLI_QUERY_ALLOWLIST_BY_ENDPOINT, parseAsOfSearchParam, parseWeeksSearchParam, rejectUnsupportedCliQuery } from "../lib/cli/queryContracts";
+import { INVALID_AS_OF_ERROR, parseCliRouteRequest } from "../lib/api/cliRoute";
 
 describe("api cli query contracts", () => {
   it("parses supported asOf values into report search params", () => {
@@ -80,6 +82,26 @@ describe("api cli query contracts", () => {
       const supportedOnly = rejectUnsupportedCliQuery(supportedRequest, allowlist);
       assert.equal(supportedOnly, null);
     }
+  });
+
+  it("normalizes route asOf query via shared parser", () => {
+    const parsed = parseCliRouteRequest(
+      new NextRequest("http://localhost:3000/api/cli/status?asOf=2024-06"),
+      CLI_QUERY_ALLOWLIST_BY_ENDPOINT.status,
+    );
+
+    assert.deepEqual(parsed, { asOf: { year: 2024, month: 6 } });
+  });
+
+  it("returns shared invalid-asOf response payload", async () => {
+    const parsed = parseCliRouteRequest(
+      new NextRequest("http://localhost:3000/api/cli/status?asOf=2024-13"),
+      CLI_QUERY_ALLOWLIST_BY_ENDPOINT.status,
+    );
+
+    assert.ok(parsed instanceof NextResponse);
+    assert.equal(parsed.status, 400);
+    assert.deepEqual(await parsed.json(), { error: INVALID_AS_OF_ERROR });
   });
 
 });
