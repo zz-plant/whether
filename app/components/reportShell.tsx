@@ -396,13 +396,13 @@ export const ReportShell = ({
 
   return (
     <>
-      <main id="main-content" tabIndex={-1} className="weather-shell relative min-h-screen overflow-x-clip text-slate-100">
+      <main id="main-content" tabIndex={-1} className="weather-shell relative isolate min-h-screen overflow-x-clip text-slate-100">
         <ClimateBackdrop regime={regime || "NEUTRAL"} />
         {structuredData ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }} /> : null}
         {enableTvAmbientMode ? <DisplayModeManager /> : null}
         {enableTvAmbientMode ? <AnchorFeedback /> : null}
         {enableTvAmbientMode ? <DisplayGuardian /> : null}
-        <div className="tv-rail-safe mx-auto max-w-[88rem] pb-[calc(env(safe-area-inset-bottom)+10rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)] pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)] sm:pb-10 sm:pt-5 sm:pl-[calc(env(safe-area-inset-left)+1.25rem)] sm:pr-[calc(env(safe-area-inset-right)+1.25rem)]">
+        <div className="tv-rail-safe relative z-10 mx-auto max-w-[88rem] pb-[calc(env(safe-area-inset-bottom)+10rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)] pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)] sm:pb-10 sm:pt-5 sm:pl-[calc(env(safe-area-inset-left)+1.25rem)] sm:pr-[calc(env(safe-area-inset-right)+1.25rem)]">
           <ReportShellHeader
             variant={resolvedHeaderVariant}
             statusLabel={statusLabel}
