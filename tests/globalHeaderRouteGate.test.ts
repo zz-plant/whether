@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { isReportShellRoute } from "../app/components/globalHeaderRouteGate";
+import { isReportShellRoute } from "../lib/navigation/globalHeader";
 
 describe("isReportShellRoute", () => {
   it("keeps reduced mode on core report paths and nested report routes", () => {
