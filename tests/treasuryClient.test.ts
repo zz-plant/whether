@@ -248,6 +248,58 @@ describe("treasury client", () => {
     }
   });
 
+  it("retries series requests after transient 520 responses", async () => {
+    const attempts = new Map<string, number>();
+    const fetcher: typeof fetch = async (input) => {
+      const url = input.toString();
+      const count = attempts.get(url) ?? 0;
+      attempts.set(url, count + 1);
+
+      if (count === 0) {
+        return new Response("upstream unavailable", { status: 520 });
+      }
+
+      if (url.includes("DGS1MO")) {
+        return new Response(
+          buildCsv("DGS1MO", [
+            { date: "2026-02-01", value: "5.2" },
+            { date: "2026-02-02", value: "5.1" },
+          ])
+        );
+      }
+      if (url.includes("DGS3MO")) {
+        return new Response(
+          buildCsv("DGS3MO", [
+            { date: "2026-02-01", value: "5.0" },
+            { date: "2026-02-02", value: "4.9" },
+          ])
+        );
+      }
+      if (url.includes("DGS2")) {
+        return new Response(
+          buildCsv("DGS2", [
+            { date: "2026-02-01", value: "4.8" },
+            { date: "2026-02-02", value: "4.7" },
+          ])
+        );
+      }
+
+      return new Response(
+        buildCsv("DGS10", [
+          { date: "2026-02-01", value: "4.6" },
+          { date: "2026-02-02", value: "4.5" },
+        ])
+      );
+    };
+
+    const data = await fetchTreasuryData({ fetcher });
+    assert.equal(data.isLive, true);
+    assert.equal(data.record_date, "2026-02-02");
+    for (const count of attempts.values()) {
+      assert.equal(count, 2);
+    }
+  });
+
   it("uses a clearer fallback reason after repeated timeout aborts", async () => {
     const fetcher: typeof fetch = async (input) => {
       if (input.toString().includes("api.fiscaldata.treasury.gov")) {
