@@ -1,47 +1,24 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { navigationLayerByKey, navigationLayers } from "../../lib/navigation/informationArchitecture";
-import { pathMatchesLink } from "../../lib/navigation/pathMatching";
+import { resolveGlobalHeaderTagline } from "../../lib/navigation/globalHeader";
 
-export function GlobalHeaderTaglineClient() {
-  const pathname = usePathname();
-  const isHome = pathMatchesLink("/", pathname);
-  const activeLayer = navigationLayers.find((layer) => pathMatchesLink(layer.href, pathname));
-  const parentLayer =
-    activeLayer?.parentKey ? navigationLayerByKey[activeLayer.parentKey] : null;
+type GlobalHeaderTaglineClientProps = {
+  pathname?: string;
+};
 
-  if (isHome) {
-    return (
-      <div className="mt-1 space-y-1">
-        <p className="text-base font-semibold tracking-tight text-slate-100 sm:text-lg">
-          Startup market weather: weekly posture for hiring, fundraising, and runway.
-        </p>
-        <p className="max-w-2xl text-sm text-slate-300">
-          Scan the call, lock the decision, and open the right execution surface.
-        </p>
-      </div>
-    );
-  }
+export function GlobalHeaderTaglineClient({ pathname }: GlobalHeaderTaglineClientProps) {
+  const currentPathname = usePathname() ?? "/";
+  const tagline = resolveGlobalHeaderTagline(pathname ?? currentPathname);
 
-  if (activeLayer) {
-    return (
-      <div className="mt-1 space-y-1">
-        <p className="text-sm font-semibold text-slate-100 sm:text-base">
-          {activeLayer.label}
-        </p>
-        <p className="max-w-2xl text-sm text-slate-300">
-          {activeLayer.tier === "supporting" && parentLayer
-            ? `${activeLayer.description} Primary parent: ${parentLayer.label}.`
-            : activeLayer.description}
-        </p>
-      </div>
-    );
+  if (!tagline.description) {
+    return <p className="mt-1 text-sm font-medium text-slate-300 sm:text-base">{tagline.title}</p>;
   }
 
   return (
-    <p className="mt-1 text-sm font-medium text-slate-300 sm:text-base">
-      Operating posture navigation
-    </p>
+    <div className="mt-1 space-y-1">
+      <p className="text-base font-semibold tracking-tight text-slate-100 sm:text-lg">{tagline.title}</p>
+      <p className="max-w-2xl text-sm text-slate-300">{tagline.description}</p>
+    </div>
   );
 }

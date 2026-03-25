@@ -1,31 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
-import { navigationLayers } from "../../lib/navigation/informationArchitecture";
-import { pathMatchesLink } from "../../lib/navigation/pathMatching";
-import { reportShellCorePaths } from "../../lib/report/reportNavigation";
+import {
+  isReportShellRoute,
+  normalizePathname,
+  resolveGlobalHeaderRouteLabel,
+} from "../../lib/navigation/globalHeader";
 import { NavigationOrientationBadge } from "./navigationOrientationBadge";
 
-const normalizePathname = (pathname: string) =>
-  pathname !== "/" && pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
+import type { ReactNode } from "react";
 
-export const isReportShellRoute = (pathname: string) => {
-  const normalizedPathname = normalizePathname(pathname);
-  return reportShellCorePaths.some((route) => pathMatchesLink(route, normalizedPathname));
+type GlobalHeaderRouteGateProps = {
+  defaultHeader: ReactNode;
 };
 
-const resolveRouteLabel = (pathname: string) => {
-  const normalizedPathname = normalizePathname(pathname);
-  return navigationLayers.find((layer) => pathMatchesLink(layer.href, normalizedPathname))?.label ?? "Report";
-};
-
-export function GlobalHeaderRouteGate({ children }: { children: ReactNode }) {
+export function GlobalHeaderRouteGate({ defaultHeader }: GlobalHeaderRouteGateProps) {
   const pathname = normalizePathname(usePathname() ?? "/");
 
   if (!isReportShellRoute(pathname)) {
-    return <>{children}</>;
+    return <>{defaultHeader}</>;
   }
 
   return (
@@ -45,7 +39,7 @@ export function GlobalHeaderRouteGate({ children }: { children: ReactNode }) {
                   Report surface
                 </p>
                 <p className="truncate text-xs font-medium text-slate-200">
-                  {resolveRouteLabel(pathname)}
+                  {resolveGlobalHeaderRouteLabel(pathname)}
                 </p>
               </div>
             </div>

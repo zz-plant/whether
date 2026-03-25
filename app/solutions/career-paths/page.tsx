@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { ActionLink } from "../../components/ui/actionLink";
+import { ButtonLink } from "../../components/ui/buttonLink";
 import { buildCanonicalUrl, buildPageMetadata, serializeJsonLd } from "../../../lib/seo";
 import { roleLandings, type ScopeType, type SeniorityBand } from "./roleLandingData";
 
@@ -193,12 +194,9 @@ export default async function CareerPathsPage({ searchParams }: CareerPathsPageP
             >
               Apply filters
             </button>
-            <Link
-              href="/solutions/career-paths"
-              className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100"
-            >
+            <ActionLink href="/solutions/career-paths" className="transition-none hover:border-slate-700">
               Reset
-            </Link>
+            </ActionLink>
             <p className="inline-flex min-h-[44px] items-center text-sm text-slate-300">
               {filteredRoles.length} role{filteredRoles.length === 1 ? "" : "s"} shown.
             </p>
@@ -276,18 +274,18 @@ export default async function CareerPathsPage({ searchParams }: CareerPathsPageP
                 <p className="text-sm text-slate-300">{roleLanding.hero}</p>
                 <p className="text-sm text-slate-300">{roleLanding.summary}</p>
                 <div className="mt-auto flex flex-wrap gap-2">
-                  <Link
+                  <ButtonLink
                     href={`/solutions/career-paths/${roleLanding.slug}`}
-                    className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.1em]"
+                    className="px-3 tracking-[0.1em]"
                   >
                     Open {roleLanding.roleTitle} playbook
-                  </Link>
-                  <Link
+                  </ButtonLink>
+                  <ActionLink
                     href={`/solutions/career-paths?seniority=${encodeURIComponent(seniority)}&scope=${encodeURIComponent(scope)}&compare=${encodeURIComponent(compareParam)}`}
-                    className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100"
+                    className="justify-center"
                   >
                     {compareSet.has(roleLanding.slug) ? "Remove from compare" : "Add to compare"}
-                  </Link>
+                  </ActionLink>
                 </div>
               </article>
             );
@@ -317,12 +315,12 @@ export default async function CareerPathsPage({ searchParams }: CareerPathsPageP
             <article key={solution.href} className="weather-surface flex h-full flex-col gap-3 px-4 py-4">
               <h3 className="text-base font-semibold text-slate-100">{solution.title}</h3>
               <p className="text-sm text-slate-300">{solution.description}</p>
-              <Link
+              <ActionLink
                 href={solution.href}
-                className="weather-pill mt-auto inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
+                className="mt-auto justify-center"
               >
                 {solution.cta}
-              </Link>
+              </ActionLink>
             </article>
           ))}
         </div>

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { ActionLink } from "../../components/ui/actionLink";
 import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
 
 type SeoPostureSnapshotProps = {
@@ -24,12 +24,11 @@ export async function SeoPostureSnapshot({ route, immediateImplication }: SeoPos
           We’re showing a fallback snapshot right now. Open the weekly brief for the latest live read.
         </p>
       ) : null}
-      <Link
+      <ActionLink
         href="/"
-        className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold tracking-[0.1em] text-slate-100 transition-colors hover:border-sky-400/70 hover:text-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300 touch-manipulation"
       >
         Open this week’s brief
-      </Link>
+      </ActionLink>
     </section>
   );
 }
