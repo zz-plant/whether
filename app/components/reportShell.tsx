@@ -82,6 +82,7 @@ type DecisionDiff = { label: string; tone?: "neutral" | "positive" | "warning" }
 
 type ReportShellProps = {
   children: ReactNode;
+  model?: ReportShellModel;
   statusLabel: string;
   regime?: RegimeIconType;
   recordDateLabel: string;
@@ -124,6 +125,15 @@ type ReportShellProps = {
   provenance?: DataProvenance;
   commandBar?: RegimeCommandBarProps;
   ambientMode?: "standard" | "tv";
+};
+
+type ReportShellModel = {
+  status: Pick<ReportShellProps, "statusLabel" | "regime" | "recordDateLabel" | "fetchedAtLabel" | "treasurySource">;
+  page: Pick<ReportShellProps, "pageTitle" | "pageSummary" | "pageSummaryLink" | "pageLinks" | "sectionLinks" | "currentPath">;
+  trust: Pick<ReportShellProps, "trustStatusLabel" | "trustStatusDetail" | "trustStatusAction" | "trustStatusTone" | "showOfflineBadge" | "offlineBadgeLabel" | "inlineTrustPlacement" | "provenance">;
+  chrome?: Pick<ReportShellProps, "heroVariant" | "pageNavVariant" | "showPageNavigation" | "headerVariant" | "sidebarVariant" | "hideHeroChrome" | "ambientMode">;
+  actions?: Pick<ReportShellProps, "primaryCta" | "secondaryCta" | "exportCta" | "nextStep" | "nextRefreshLabel">;
+  payloads?: Pick<ReportShellProps, "structuredData" | "historicalBanner" | "stageRail" | "decisionBanner" | "actionSequence" | "roleSwitcher" | "decisionDiffs" | "commandBar">;
 };
 
 export const resolveTrustProvenance = ({
@@ -332,6 +342,7 @@ export function SidebarSequenceBlock({ stageRail }: { stageRail?: { title?: stri
 
 export const ReportShell = ({
   children,
+  model,
   statusLabel,
   regime,
   recordDateLabel,
@@ -372,64 +383,99 @@ export const ReportShell = ({
   commandBar,
   ambientMode = "standard",
 }: ReportShellProps) => {
-  const resolvedPageSummaryLink = pageSummaryLink;
-  const resolvedPrimaryCta = primaryCta;
-  const resolvedSecondaryCta = secondaryCta;
-  const resolvedExportCta = exportCta;
-  const resolvedNextRefreshLabel = nextRefreshLabel ?? (trustStatusTone === "historical" ? "Fixed historical snapshot" : "15m cadence");
+  const resolvedStatusLabel = model?.status.statusLabel ?? statusLabel;
+  const resolvedRegime = model?.status.regime ?? regime;
+  const resolvedRecordDateLabel = model?.status.recordDateLabel ?? recordDateLabel;
+  const resolvedFetchedAtLabel = model?.status.fetchedAtLabel ?? fetchedAtLabel;
+  const resolvedTreasurySource = model?.status.treasurySource ?? treasurySource;
+  const resolvedPageTitle = model?.page.pageTitle ?? pageTitle;
+  const resolvedPageSummary = model?.page.pageSummary ?? pageSummary;
+  const resolvedPageSummaryLink = model?.page.pageSummaryLink ?? pageSummaryLink;
+  const resolvedPageLinks = model?.page.pageLinks ?? pageLinks;
+  const resolvedSectionLinks = model?.page.sectionLinks ?? sectionLinks;
+  const resolvedCurrentPath = model?.page.currentPath ?? currentPath;
+  const resolvedTrustStatusLabel = model?.trust.trustStatusLabel ?? trustStatusLabel;
+  const resolvedTrustStatusDetail = model?.trust.trustStatusDetail ?? trustStatusDetail;
+  const resolvedTrustStatusAction = model?.trust.trustStatusAction ?? trustStatusAction;
+  const resolvedTrustStatusTone = model?.trust.trustStatusTone ?? trustStatusTone;
+  const resolvedShowOfflineBadge = model?.trust.showOfflineBadge ?? showOfflineBadge;
+  const resolvedOfflineBadgeLabel = model?.trust.offlineBadgeLabel ?? offlineBadgeLabel;
+  const resolvedInlineTrustPlacement = model?.trust.inlineTrustPlacement ?? inlineTrustPlacement;
+  const resolvedProvenance = model?.trust.provenance ?? provenance;
+  const resolvedHeroVariant = model?.chrome?.heroVariant ?? heroVariant;
+  const resolvedPageNavVariant = model?.chrome?.pageNavVariant ?? pageNavVariant;
+  const resolvedShowPageNavigation = model?.chrome?.showPageNavigation ?? showPageNavigation;
+  const resolvedHeaderVariantInput = model?.chrome?.headerVariant ?? headerVariant;
+  const resolvedSidebarVariant = model?.chrome?.sidebarVariant ?? sidebarVariant;
+  const resolvedHideHeroChrome = model?.chrome?.hideHeroChrome ?? hideHeroChrome;
+  const resolvedAmbientMode = model?.chrome?.ambientMode ?? ambientMode;
+  const resolvedPrimaryCta = model?.actions?.primaryCta ?? primaryCta;
+  const resolvedSecondaryCta = model?.actions?.secondaryCta ?? secondaryCta;
+  const resolvedExportCta = model?.actions?.exportCta ?? exportCta;
+  const resolvedNextStep = model?.actions?.nextStep ?? nextStep;
+  const resolvedNextRefreshLabel = (model?.actions?.nextRefreshLabel ?? nextRefreshLabel)
+    ?? (resolvedTrustStatusTone === "historical" ? "Fixed historical snapshot" : "15m cadence");
+  const resolvedStructuredData = model?.payloads?.structuredData ?? structuredData;
+  const resolvedHistoricalBanner = model?.payloads?.historicalBanner ?? historicalBanner;
+  const resolvedStageRail = model?.payloads?.stageRail ?? stageRail;
+  const resolvedDecisionBanner = model?.payloads?.decisionBanner ?? decisionBanner;
+  const resolvedActionSequence = model?.payloads?.actionSequence ?? actionSequence;
+  const resolvedRoleSwitcher = model?.payloads?.roleSwitcher ?? roleSwitcher;
+  const resolvedDecisionDiffs = model?.payloads?.decisionDiffs ?? decisionDiffs;
+  const resolvedCommandBar = model?.payloads?.commandBar ?? commandBar;
   const contentSections = Children.toArray(children);
   const summaryLink = resolvedPageSummaryLink ? <InternalAwareLink href={resolvedPageSummaryLink.href} className="inline-flex min-h-[44px] items-center text-xs font-semibold text-sky-200 underline decoration-slate-500/80 underline-offset-4">{resolvedPageSummaryLink.label}</InternalAwareLink> : null;
-  const hasSidebar = sidebarVariant === "full";
+  const hasSidebar = resolvedSidebarVariant === "full";
   const missionSequenceLabels = ["Now", "Next", "Later"];
-  const missionSequenceTitle = actionSequence?.title ?? "Plan";
-  const missionSequenceItems = (actionSequence?.items ?? []).slice(0, 3).map((item, index) => ({ ...item, phase: missionSequenceLabels[index] ?? `Step ${index + 1}` }));
-  const sourceHref = treasurySource.startsWith("http") ? treasurySource : undefined;
-  const sourceLabel = sourceHref ? (() => { try { const hostname = new URL(sourceHref).hostname.replace(/^www\./, ""); if (hostname.includes("stlouisfed.org")) return "FRED"; if (hostname.includes("fiscaldata.treasury.gov")) return "Treasury Fiscal Data"; return hostname; } catch { return treasurySource; } })() : treasurySource;
-  const showPostureRibbon = currentPath !== "/";
-  const resolvedHeaderVariant: ReportShellHeaderVariant = headerVariant ?? (hideHeroChrome ? "home-brief" : "standard");
-  const isPrimaryActionInSectionLinks = resolvedPrimaryCta ? sectionLinks.some((section) => section.href === resolvedPrimaryCta.href) : false;
+  const missionSequenceTitle = resolvedActionSequence?.title ?? "Plan";
+  const missionSequenceItems = (resolvedActionSequence?.items ?? []).slice(0, 3).map((item, index) => ({ ...item, phase: missionSequenceLabels[index] ?? `Step ${index + 1}` }));
+  const sourceHref = resolvedTreasurySource.startsWith("http") ? resolvedTreasurySource : undefined;
+  const sourceLabel = sourceHref ? (() => { try { const hostname = new URL(sourceHref).hostname.replace(/^www\./, ""); if (hostname.includes("stlouisfed.org")) return "FRED"; if (hostname.includes("fiscaldata.treasury.gov")) return "Treasury Fiscal Data"; return hostname; } catch { return resolvedTreasurySource; } })() : resolvedTreasurySource;
+  const showPostureRibbon = resolvedCurrentPath !== "/";
+  const resolvedHeaderVariant: ReportShellHeaderVariant = resolvedHeaderVariantInput ?? (resolvedHideHeroChrome ? "home-brief" : "standard");
+  const isPrimaryActionInSectionLinks = resolvedPrimaryCta ? resolvedSectionLinks.some((section) => section.href === resolvedPrimaryCta.href) : false;
   const showMobileActionCard = Boolean(resolvedPrimaryCta) && !isPrimaryActionInSectionLinks;
   const showInlineTrustBlock = !hasSidebar;
-  const renderTrustBeforeContent = showInlineTrustBlock && inlineTrustPlacement === "before-content";
-  const renderTrustAfterFirstSection = showInlineTrustBlock && inlineTrustPlacement === "after-first-section";
-  const enableTvAmbientMode = ambientMode === "tv";
+  const renderTrustBeforeContent = showInlineTrustBlock && resolvedInlineTrustPlacement === "before-content";
+  const renderTrustAfterFirstSection = showInlineTrustBlock && resolvedInlineTrustPlacement === "after-first-section";
+  const enableTvAmbientMode = resolvedAmbientMode === "tv";
 
   return (
     <>
       <main id="main-content" tabIndex={-1} className="weather-shell relative isolate min-h-screen overflow-x-clip text-slate-100">
-        <ClimateBackdrop regime={regime || "NEUTRAL"} />
-        {structuredData ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }} /> : null}
+        <ClimateBackdrop regime={resolvedRegime || "NEUTRAL"} />
+        {resolvedStructuredData ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(resolvedStructuredData) }} /> : null}
         {enableTvAmbientMode ? <DisplayModeManager /> : null}
         {enableTvAmbientMode ? <AnchorFeedback /> : null}
         {enableTvAmbientMode ? <DisplayGuardian /> : null}
         <div className="tv-rail-safe relative z-10 mx-auto max-w-[88rem] pb-[calc(env(safe-area-inset-bottom)+10rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)] pl-[calc(env(safe-area-inset-left)+1rem)] pr-[calc(env(safe-area-inset-right)+1rem)] sm:pb-10 sm:pt-5 sm:pl-[calc(env(safe-area-inset-left)+1.25rem)] sm:pr-[calc(env(safe-area-inset-right)+1.25rem)]">
           <ReportShellHeader
             variant={resolvedHeaderVariant}
-            statusLabel={statusLabel}
-            fetchedAtLabel={fetchedAtLabel}
-            recordDateLabel={recordDateLabel}
-            currentPath={currentPath}
-            showPageNavigation={showPageNavigation}
-            pageLinks={pageLinks}
-            pageTitle={pageTitle}
-            pageNavVariant={pageNavVariant}
+            statusLabel={resolvedStatusLabel}
+            fetchedAtLabel={resolvedFetchedAtLabel}
+            recordDateLabel={resolvedRecordDateLabel}
+            currentPath={resolvedCurrentPath}
+            showPageNavigation={resolvedShowPageNavigation}
+            pageLinks={resolvedPageLinks}
+            pageTitle={resolvedPageTitle}
+            pageNavVariant={resolvedPageNavVariant}
           />
 
-          {showPostureRibbon ? <div className="weather-panel-static mb-4 hidden flex-wrap items-center justify-between gap-2 border border-slate-700/70 px-4 py-2 text-xs sm:flex"><p className="text-slate-300">Current Posture: <span className="font-semibold text-slate-100">{statusLabel}</span><span className="ml-2 text-slate-400">Updated {recordDateLabel}</span></p><Link href="/" className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-[11px] font-semibold tracking-[0.14em]">Open weekly brief</Link></div> : null}
-          {historicalBanner}
-          {commandBar ? <div className="mt-4"><RegimeCommandBar {...commandBar} /></div> : null}
+          {showPostureRibbon ? <div className="weather-panel-static mb-4 hidden flex-wrap items-center justify-between gap-2 border border-slate-700/70 px-4 py-2 text-xs sm:flex"><p className="text-slate-300">Current Posture: <span className="font-semibold text-slate-100">{resolvedStatusLabel}</span><span className="ml-2 text-slate-400">Updated {resolvedRecordDateLabel}</span></p><Link href="/" className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-[11px] font-semibold tracking-[0.14em]">Open weekly brief</Link></div> : null}
+          {resolvedHistoricalBanner}
+          {resolvedCommandBar ? <div className="mt-4"><RegimeCommandBar {...resolvedCommandBar} /></div> : null}
 
           <div className={`mt-5 grid min-w-0 gap-5 xl:gap-6 ${hasSidebar ? "xl:grid-cols-[minmax(0,1fr)_minmax(18rem,20rem)] xl:items-start" : ""}`}>
-            {hasSidebar ? <aside className="order-2 space-y-4 xl:order-none xl:col-start-2 xl:row-start-1 xl:sticky xl:top-28 xl:self-start">{sectionLinks.length ? <ReportSectionNavigation sectionLinks={sectionLinks} className="hidden xl:block" /> : null}<HeroTrustProvenanceBlock trustStatusTone={trustStatusTone} trustStatusLabel={trustStatusLabel} trustStatusDetail={trustStatusDetail} trustStatusAction={trustStatusAction} statusLabel={statusLabel} fetchedAtLabel={fetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} provenance={provenance} /></aside> : null}
+            {hasSidebar ? <aside className="order-2 space-y-4 xl:order-none xl:col-start-2 xl:row-start-1 xl:sticky xl:top-28 xl:self-start">{resolvedSectionLinks.length ? <ReportSectionNavigation sectionLinks={resolvedSectionLinks} className="hidden xl:block" /> : null}<HeroTrustProvenanceBlock trustStatusTone={resolvedTrustStatusTone} trustStatusLabel={resolvedTrustStatusLabel} trustStatusDetail={resolvedTrustStatusDetail} trustStatusAction={resolvedTrustStatusAction} statusLabel={resolvedStatusLabel} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} provenance={resolvedProvenance} /></aside> : null}
 
             <div className={`order-1 min-w-0 space-y-8 lg:space-y-10 xl:order-none xl:col-start-1 xl:row-start-1 ${hasSidebar ? "" : "mx-auto w-full max-w-[78rem]"}`}>
-              {!hideHeroChrome ? <CommandCenterNavBlock heroVariant={heroVariant} pageTitle={pageTitle} pageSummary={pageSummary} summaryLink={summaryLink} recordDateLabel={recordDateLabel} roleSwitcher={roleSwitcher} primaryCta={resolvedPrimaryCta} secondaryCta={resolvedSecondaryCta} exportCta={resolvedExportCta} nextStep={nextStep} statusLabel={statusLabel} trustStatusLabel={trustStatusLabel} fetchedAtLabel={fetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={trustStatusAction} showOfflineBadge={showOfflineBadge} offlineBadgeLabel={offlineBadgeLabel} decisionBanner={decisionBanner} missionSupportText={trustStatusDetail} decisionDiffs={decisionDiffs} missionSequenceTitle={missionSequenceTitle} missionSequenceItems={missionSequenceItems} /> : null}
+              {!resolvedHideHeroChrome ? <CommandCenterNavBlock heroVariant={resolvedHeroVariant} pageTitle={resolvedPageTitle} pageSummary={resolvedPageSummary} summaryLink={summaryLink} recordDateLabel={resolvedRecordDateLabel} roleSwitcher={resolvedRoleSwitcher} primaryCta={resolvedPrimaryCta} secondaryCta={resolvedSecondaryCta} exportCta={resolvedExportCta} nextStep={resolvedNextStep} statusLabel={resolvedStatusLabel} trustStatusLabel={resolvedTrustStatusLabel} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} trustStatusAction={resolvedTrustStatusAction} showOfflineBadge={resolvedShowOfflineBadge} offlineBadgeLabel={resolvedOfflineBadgeLabel} decisionBanner={resolvedDecisionBanner} missionSupportText={resolvedTrustStatusDetail} decisionDiffs={resolvedDecisionDiffs} missionSequenceTitle={missionSequenceTitle} missionSequenceItems={missionSequenceItems} /> : null}
 
-              <SidebarSequenceBlock stageRail={stageRail} />
+              <SidebarSequenceBlock stageRail={resolvedStageRail} />
 
-              {renderTrustBeforeContent ? <section className="space-y-4"><div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]"><HeroTrustProvenanceBlock trustStatusTone={trustStatusTone} trustStatusLabel={trustStatusLabel} trustStatusDetail={trustStatusDetail} trustStatusAction={trustStatusAction} statusLabel={statusLabel} fetchedAtLabel={fetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} provenance={provenance} /></div></section> : null}
+              {renderTrustBeforeContent ? <section className="space-y-4"><div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]"><HeroTrustProvenanceBlock trustStatusTone={resolvedTrustStatusTone} trustStatusLabel={resolvedTrustStatusLabel} trustStatusDetail={resolvedTrustStatusDetail} trustStatusAction={resolvedTrustStatusAction} statusLabel={resolvedStatusLabel} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} provenance={resolvedProvenance} /></div></section> : null}
 
-              <div className="space-y-10 lg:space-y-12">{contentSections.map((section, index) => { const sectionKey = isValidElement(section) && section.key != null ? section.key : `section-${index}`; return <div key={sectionKey} className={index === 0 ? "" : "border-t border-slate-800/70 pt-10 lg:pt-12"}>{section}{renderTrustAfterFirstSection && index === 0 ? <section className="mt-4 space-y-4"><div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]"><HeroTrustProvenanceBlock trustStatusTone={trustStatusTone} trustStatusLabel={trustStatusLabel} trustStatusDetail={trustStatusDetail} trustStatusAction={trustStatusAction} statusLabel={statusLabel} fetchedAtLabel={fetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} provenance={provenance} /></div></section> : null}</div>; })}</div>
+              <div className="space-y-10 lg:space-y-12">{contentSections.map((section, index) => { const sectionKey = isValidElement(section) && section.key != null ? section.key : `section-${index}`; return <div key={sectionKey} className={index === 0 ? "" : "border-t border-slate-800/70 pt-10 lg:pt-12"}>{section}{renderTrustAfterFirstSection && index === 0 ? <section className="mt-4 space-y-4"><div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]"><HeroTrustProvenanceBlock trustStatusTone={resolvedTrustStatusTone} trustStatusLabel={resolvedTrustStatusLabel} trustStatusDetail={resolvedTrustStatusDetail} trustStatusAction={resolvedTrustStatusAction} statusLabel={resolvedStatusLabel} fetchedAtLabel={resolvedFetchedAtLabel} resolvedNextRefreshLabel={resolvedNextRefreshLabel} sourceLabel={sourceLabel} sourceHref={sourceHref} provenance={resolvedProvenance} /></div></section> : null}</div>; })}</div>
 
               <footer className="mt-12 border-t border-slate-800/70 pt-6 text-xs font-semibold tracking-[0.18em] text-slate-300">
                 <p>{INFORMATIONAL_NOTICE}</p>
@@ -440,7 +486,7 @@ export const ReportShell = ({
 
         {showMobileActionCard && resolvedPrimaryCta ? <div className="sm:hidden mt-6 px-4"><section className="weather-panel border-sky-500/40 bg-slate-950/95 px-3 py-3"><p className="text-[11px] font-semibold tracking-[0.14em] text-slate-300">Current posture</p><div className="mt-2 flex items-center justify-between gap-3"><p className="max-w-[16rem] text-xs font-semibold text-slate-100">{decisionBanner?.decision ?? `${resolvedPrimaryCta.label}.`}</p><ReportCta href={resolvedPrimaryCta.href} copyText={resolvedPrimaryCta.copyText} copyTarget={resolvedPrimaryCta.copyTarget} label={resolvedPrimaryCta.label} className="weather-button-primary inline-flex min-h-[44px] flex-shrink-0 items-center justify-center rounded-full px-3 py-2 text-xs font-semibold tracking-[0.14em]">{resolvedPrimaryCta.label}</ReportCta></div></section></div> : null}
 
-        {showPageNavigation ? <div className="sm:hidden"><ReportMobileNavigation pageLinks={pageLinks} pageTitle={pageTitle} currentPath={currentPath} className="mt-3 px-4 pb-6" sectionLinks={sectionLinks} /></div> : null}
+        {resolvedShowPageNavigation ? <div className="sm:hidden"><ReportMobileNavigation pageLinks={resolvedPageLinks} pageTitle={resolvedPageTitle} currentPath={resolvedCurrentPath} className="mt-3 px-4 pb-6" sectionLinks={resolvedSectionLinks} /></div> : null}
 
         {enableTvAmbientMode && resolvedPrimaryCta ? <aside className="tv-action-rail" aria-label="TV quick actions"><p className="text-xs font-semibold tracking-[0.18em] text-slate-400">Quick actions</p><div className="mt-2 grid gap-2"><ReportCta href={resolvedPrimaryCta.href} copyText={resolvedPrimaryCta.copyText} copyTarget={resolvedPrimaryCta.copyTarget} label={resolvedPrimaryCta.label} className="weather-button-primary inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-100">{resolvedPrimaryCta.label}</ReportCta>{resolvedSecondaryCta ? <InternalAwareLink href={resolvedSecondaryCta.href} className="weather-pill inline-flex min-h-[56px] items-center justify-center px-4 py-2 text-center text-sm font-semibold tracking-[0.12em] text-slate-200">{resolvedSecondaryCta.label}</InternalAwareLink> : null}<DisplayModeToggle /></div></aside> : null}
       </main>
