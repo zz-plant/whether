@@ -1,26 +1,25 @@
-import { Fragment, type ReactNode } from "react";
-import type { ConfidenceTrendFraming, WeeklyConfidencePoint } from "../../lib/report/reportData";
+import type { ReactNode } from "react";
 import type { BoundedDecisionRule } from "../../lib/report/boundedDecisionRules";
-import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
 import type { RoleAwareOperatingTemplate } from "../../lib/report/operatingCalls";
 import { WeeklyCallModePanel } from "./weeklyCallModePanel";
 import { DecisionHeroSection } from "./weekly-card/DecisionHeroSection";
 import { DiagnosticsSection } from "./weekly-card/DiagnosticsSection";
 import { ActionStripSection } from "./weekly-card/ActionStripSection";
 import { PostureHistoryTimeline } from "./weekly-card/HistorySection";
+import { BoundedRulesMatrix } from "./weekly-card/BoundedRulesMatrix";
+import { ConfidenceMiniChart } from "./weekly-card/ConfidenceMiniChart";
 import type { DiagnosticsSectionProps } from "./weekly-card/types";
 import { compactActionCue, compactInset, disclosureSummaryClass, sectionSpacing, tierOneHeading, tierOnePanel, tierThreeHeading, tierThreePanel } from "./weekly-card/shared";
 import { RegimeBanner } from "./weekly-card/regime-banner/RegimeBanner";
 import { WeeklyDecisionContent } from "./weekly-card/decision-content/WeeklyDecisionContent";
 import type { RegimeKey } from "../../lib/regimeEngine";
 import type {
-  DecisionMatrixPayload,
   FlipRiskMeterState,
   InputInfluenceItem,
   StartupVariantPolicy,
   WeeklyDecisionCardViewModel,
 } from "../../lib/report/homeBriefModel";
-import { boundedDecisionPhraseFallbacks, buildCompactFreshnessMeta, formatDecisionTriplet } from "../../lib/report/reportFormatting";
+import { buildCompactFreshnessMeta } from "../../lib/report/reportFormatting";
 import { buildThresholdMarkerState } from "../../lib/report/homeBriefPresentation";
 import { formatDateUTC } from "../../lib/formatters";
 import {
@@ -55,279 +54,8 @@ export type WeeklyDecisionDiagnosticsLaneProps = DiagnosticsSectionProps;
 export const WeeklyDecisionDiagnosticsLane = DiagnosticsSection;
 // Legacy hero export retained for isolated section tests only.
 export const DecisionCallHeader = DecisionHeroSection;
+export { BoundedRulesMatrix } from "./weekly-card/BoundedRulesMatrix";
 
-const confidenceTrendTone: Record<ConfidenceTrendFraming, string> = {
-  strengthening: "text-emerald-200",
-  weakening: "text-rose-200",
-  unstable: "text-amber-200",
-};
-
-const ConfidenceMiniChart = ({
-  confidenceHistory,
-  confidenceTrend,
-}: {
-  confidenceHistory: WeeklyConfidencePoint[];
-  confidenceTrend: ConfidenceTrendFraming;
-}) => {
-  const knownValues = confidenceHistory
-    .filter((point): point is WeeklyConfidencePoint & { confidencePercent: number } => typeof point.confidencePercent === "number")
-    .map((point) => point.confidencePercent);
-  const min = knownValues.length > 0 ? Math.min(...knownValues) : 0;
-  const max = knownValues.length > 0 ? Math.max(...knownValues) : 100;
-  const range = Math.max(max - min, 1);
-
-  return (
-    <article className={`${tierOnePanel} ${sectionSpacing}`}>
-      <h2 className={tierOneHeading}>Confidence trend (8w)</h2>
-      <p className={`text-xs font-semibold uppercase tracking-[0.1em] ${confidenceTrendTone[confidenceTrend]}`}>{confidenceTrend}</p>
-      <div className="mt-1 flex h-14 items-end gap-1.5" role="img" aria-label="Last 8 weekly confidence values">
-        {confidenceHistory.length === 0 ? <p className="text-xs text-slate-400">No confidence history available.</p> : null}
-        {confidenceHistory.map((point) => {
-          const missing = point.isMissing || typeof point.confidencePercent !== "number";
-          const confidencePercent = typeof point.confidencePercent === "number" ? point.confidencePercent : null;
-          const height = missing || confidencePercent === null ? 14 : Math.max(14, Math.round(((confidencePercent - min) / range) * 44) + 14);
-          return (
-            <div key={point.recordDate} className="group relative flex-1">
-              <span
-                className={missing ? "block rounded-sm border border-amber-400/80 border-dashed bg-amber-500/5" : "block rounded-sm bg-sky-300/80"}
-                style={{ height }}
-                aria-label={missing || confidencePercent === null ? `${point.recordDate} missing confidence data` : `${point.recordDate} confidence ${Math.round(confidencePercent)}%`}
-              />
-              <span className="pointer-events-none absolute -top-7 left-1/2 hidden -translate-x-1/2 whitespace-nowrap rounded bg-slate-900 px-1.5 py-0.5 text-[10px] text-slate-100 group-hover:block">
-                {missing || confidencePercent === null ? `${point.recordDate}: missing` : `${point.recordDate}: ${Math.round(confidencePercent)}%`}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-      <p className="text-[11px] text-slate-400">Missing weeks are dashed markers.</p>
-    </article>
-  );
-};
-
-type BoundedRulesMatrixProps = {
-  decisionMatrix?: DecisionMatrixPayload;
-  startupVariantPolicy?: StartupVariantPolicy;
-  decisionRules?: BoundedDecisionRule[];
-};
-
-const decisionLaneTone: Record<"approve" | "delay" | "flip", {
-  label: string;
-  badgeClassName: string;
-}> = {
-  approve: {
-    label: "↑ Now",
-    badgeClassName: "border-emerald-400/35 bg-emerald-500/10 text-emerald-100",
-  },
-  delay: {
-    label: "∥ Hold",
-    badgeClassName: "border-rose-400/35 bg-rose-500/10 text-rose-100",
-  },
-  flip: {
-    label: "↺ Flip",
-    badgeClassName: "border-sky-400/35 bg-sky-500/10 text-sky-100",
-  },
-};
-
-const matrixLineTone: Record<"action" | "threshold" | "reverse", string> = {
-  action: "text-emerald-100",
-  threshold: "text-amber-100",
-  reverse: "text-sky-100",
-};
-
-const MatrixRuleSummary = ({
-  action,
-  threshold,
-  reversal,
-}: {
-  action: string;
-  threshold: string;
-  reversal: string;
-}) => (
-  <div className="space-y-1.5 text-[11px] leading-5">
-    {[
-      { label: "Act", value: action, tone: matrixLineTone.action },
-      { label: "Trip", value: threshold, tone: matrixLineTone.threshold },
-      { label: "Flip", value: reversal, tone: matrixLineTone.reverse },
-    ].map((item) => (
-      <p key={item.label} className="text-slate-200">
-        <span className={`mr-1 font-semibold uppercase tracking-[0.08em] ${item.tone}`}>{item.label}</span>
-        <span>{item.value}</span>
-      </p>
-    ))}
-  </div>
-);
-
-export function BoundedRulesMatrix({ decisionMatrix, decisionRules = [] }: BoundedRulesMatrixProps) {
-  const matrixAreaByKey: Record<"hiring" | "product" | "capital" | "burn", BoundedDecisionRule["area"]> = {
-    hiring: "hiring",
-    product: "product-tempo",
-    capital: "capital-raising",
-    burn: "burn-discipline",
-  };
-  const rowOrder: Array<"hiring" | "product" | "capital" | "burn"> = ["hiring", "product", "capital", "burn"];
-  const rulesByArea = new Map(decisionRules.map((rule) => [rule.area, rule]));
-  const fallbackDecisionTriplet = boundedDecisionPhraseFallbacks;
-  const getTriplet = (rule?: BoundedDecisionRule) => (rule
-    ? formatDecisionTriplet({
-      action: rule.doNow[0] ?? rule.recommendation,
-      threshold: rule.pauseTrigger,
-      reversal: rule.resumeTrigger,
-      fallbacks: fallbackDecisionTriplet,
-    })
-    : fallbackDecisionTriplet);
-  const fallbackMatrix = {
-    columns: [
-      { key: "approve" as const, label: "Approve" },
-      { key: "delay" as const, label: "Delay" },
-      { key: "flip" as const, label: "Flip" },
-    ],
-    rows: rowOrder.map((key) => {
-      const rule = rulesByArea.get(matrixAreaByKey[key]);
-      return {
-        key,
-        label: rule ? decisionAreaLabel(rule.area) : key.charAt(0).toUpperCase() + key.slice(1),
-        cells: {
-          approve: {
-            text: rule?.doNow[0] ?? fallbackDecisionTriplet.action,
-            detail: rule?.rationale ?? "Keep approvals tied to near-term proof.",
-            action: getTriplet(rule).action,
-            threshold: getTriplet(rule).threshold,
-            reversal: getTriplet(rule).reversal,
-          },
-          delay: {
-            text: rule?.avoidNow[0] ?? "Delay irreversible commitments",
-            detail: rule?.pauseTrigger ?? "Pause when thresholds weaken.",
-            action: rule?.avoidNow[0] ?? "Delay irreversible commitments",
-            threshold: getTriplet(rule).threshold,
-            reversal: getTriplet(rule).reversal,
-          },
-          flip: {
-            text: rule?.resumeTrigger ?? "Flip after threshold recovery",
-            detail: rule?.resumeTrigger ?? "Resume only after threshold recovery holds.",
-            action: getTriplet(rule).action,
-            threshold: getTriplet(rule).threshold,
-            reversal: getTriplet(rule).reversal,
-          },
-        },
-        context: rule?.scope ?? "Apply this rule to related weekly operating decisions.",
-      };
-    }),
-  };
-
-  const matrix = decisionMatrix
-    ? {
-      ...decisionMatrix,
-      rows: rowOrder.map((rowKey) => {
-        const matrixRow = decisionMatrix.rows.find((row) => row.key === rowKey);
-        const rule = rulesByArea.get(matrixAreaByKey[rowKey]);
-        return {
-          key: rowKey,
-          label: matrixRow?.label ?? (rule ? decisionAreaLabel(rule.area) : rowKey.charAt(0).toUpperCase() + rowKey.slice(1)),
-          cells: {
-            approve: {
-              text: matrixRow?.cells.approve.text ?? rule?.doNow[0] ?? fallbackDecisionTriplet.action,
-              detail: matrixRow?.cells.approve.detail ?? rule?.rationale ?? "Keep approvals tied to near-term proof.",
-              action: matrixRow?.cells.approve.action ?? getTriplet(rule).action,
-              threshold: matrixRow?.cells.approve.threshold ?? getTriplet(rule).threshold,
-              reversal: matrixRow?.cells.approve.reversal ?? getTriplet(rule).reversal,
-            },
-            delay: {
-              text: matrixRow?.cells.delay.text ?? rule?.avoidNow[0] ?? "Delay irreversible commitments",
-              detail: matrixRow?.cells.delay.detail ?? rule?.pauseTrigger ?? "Pause when thresholds weaken.",
-              action: matrixRow?.cells.delay.action ?? rule?.avoidNow[0] ?? "Delay irreversible commitments",
-              threshold: matrixRow?.cells.delay.threshold ?? getTriplet(rule).threshold,
-              reversal: matrixRow?.cells.delay.reversal ?? getTriplet(rule).reversal,
-            },
-            flip: {
-              text: matrixRow?.cells.flip.text ?? rule?.resumeTrigger ?? "Flip after threshold recovery",
-              detail: matrixRow?.cells.flip.detail ?? rule?.resumeTrigger ?? "Resume only after threshold recovery holds.",
-              action: matrixRow?.cells.flip.action ?? getTriplet(rule).action,
-              threshold: matrixRow?.cells.flip.threshold ?? getTriplet(rule).threshold,
-              reversal: matrixRow?.cells.flip.reversal ?? getTriplet(rule).reversal,
-            },
-          },
-          context: rule?.scope ?? "Apply this rule to related weekly operating decisions.",
-        };
-      }),
-    }
-    : fallbackMatrix;
-
-  if (!matrix || matrix.rows.length === 0) {
-    return (
-      <article className={`${tierOnePanel} ${sectionSpacing}`}>
-        <h2 className={tierOneHeading}>Decision snapshot for leadership this week</h2>
-        <p className="text-xs leading-5 text-slate-300">Decision matrix unavailable; keep current guardrails and recheck after next refresh.</p>
-      </article>
-    );
-  }
-
-  return (
-    <article className={`${tierOnePanel} ${sectionSpacing}`}>
-      <h2 className={tierOneHeading}>Decision snapshot for leadership this week</h2>
-      <p className="text-xs leading-5 text-slate-300">Each lane shows the bounded rule: act now, trip line, and flip condition.</p>
-      <div className="mt-2 hidden md:block">
-        <div className="grid grid-cols-[minmax(0,11rem)_repeat(3,minmax(0,1fr))] gap-2" aria-label="Bounded decision matrix">
-          <div className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-300">
-            Decision area
-          </div>
-          {matrix.columns.map((column) => (
-            <div key={`desktop-column-${column.key}`} className="rounded-md border border-slate-700/70 bg-slate-950/70 px-3 py-2 text-left text-slate-200">
-              <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] uppercase tracking-[0.08em] ${decisionLaneTone[column.key].badgeClassName}`}>
-                {decisionLaneTone[column.key].label}
-              </span>
-            </div>
-          ))}
-          {matrix.rows.map((row) => (
-            <Fragment key={`desktop-row-${row.key}`}>
-              <div className="rounded-md border border-slate-700/70 bg-slate-950/75 px-3 py-2.5">
-                <p className="text-sm font-semibold text-slate-100">{row.label}</p>
-                <p className="mt-1 text-[11px] leading-5 text-slate-300">{row.context}</p>
-              </div>
-              {matrix.columns.map((column) => {
-                const cell = row.cells[column.key];
-                return (
-                  <div key={`${row.key}-${column.key}`} className="rounded-md border border-slate-700/55 bg-slate-950/60 px-3 py-2.5 align-top">
-                    <p className="text-[11px] font-semibold leading-5 text-slate-100">{compactActionCue(cell.text)}</p>
-                    <div className="mt-2 border-t border-slate-800/70 pt-2">
-                      <MatrixRuleSummary action={cell.action} threshold={cell.threshold} reversal={cell.reversal} />
-                    </div>
-                  </div>
-                );
-              })}
-            </Fragment>
-          ))}
-        </div>
-      </div>
-      <div className="mt-2 space-y-2 md:hidden">
-        {matrix.rows.map((row) => (
-          <article key={`mobile-${row.key}`} className="rounded-md border border-slate-700/55 bg-slate-950/60 p-2.5">
-            <p className="text-xs font-semibold text-slate-100">{row.label}</p>
-            <p className="mt-1 text-[11px] leading-5 text-slate-300">{row.context}</p>
-            <div className="mt-2 space-y-1.5">
-              {matrix.columns.map((column) => {
-                const cell = row.cells[column.key];
-                return (
-                  <div key={`mobile-${row.key}-${column.key}`} className="rounded border border-slate-700/60 bg-slate-950/70 px-2 py-2">
-                    <p className="text-[11px] leading-5 text-slate-100">
-                      <span className={`mr-1 inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] ${decisionLaneTone[column.key].badgeClassName}`}>
-                        {decisionLaneTone[column.key].label}
-                      </span>
-                      {compactActionCue(cell.text)}
-                    </p>
-                    <div className="mt-2 border-t border-slate-800/70 pt-2">
-                      <MatrixRuleSummary action={cell.action} threshold={cell.threshold} reversal={cell.reversal} />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </article>
-        ))}
-      </div>
-    </article>
-  );
-}
 
 const inputInfluenceToneClasses: Record<InputInfluenceItem["tone"], { badge: string; fill: string }> = {
   warning: {

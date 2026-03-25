@@ -16,6 +16,20 @@ const config = [
       reportUnusedDisableDirectives: "off",
     },
   },
+  {
+    files: ["app/components/weeklyDecisionCard.tsx", "lib/report/homePageAssembler.ts"],
+    rules: {
+      "max-lines": ["error", { max: 900, skipBlankLines: true, skipComments: true }],
+    },
+  },
+  {
+    files: ["lib/report/home/**/*.ts"],
+    rules: {
+      "no-restricted-imports": ["error", {
+        patterns: ["../app/*", "../../app/*", "../../../app/*", "app/*"],
+      }],
+    },
+  },
 ];
 
 export default config;

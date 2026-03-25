@@ -45,51 +45,76 @@ export const HomePageReportContent = async ({
 
   return (
     <ReportShell
-      regime={homepage.reportShell.regime}
+      model={{
+        status: {
+          regime: homepage.reportShell.regime,
+          statusLabel: homepage.reportShell.statusLabel,
+          recordDateLabel: homepage.reportShell.recordDateLabel,
+          fetchedAtLabel: homepage.reportShell.fetchedAtLabel,
+          treasurySource: homepage.reportShell.treasurySource,
+        },
+        page: {
+          pageTitle: "Weekly Operating Posture Brief",
+          pageSummary: "Whether translates macro conditions into operating decisions for companies. Action, guardrail, and flip condition for this planning cycle; scores stay contextual.",
+          pageLinks: reportPageLinks,
+          sectionLinks: homepage.reportShell.sectionLinks,
+          currentPath: "/",
+        },
+        trust: {
+          trustStatusLabel: homepage.reportShell.trustStatusLabel,
+          trustStatusDetail: homepage.reportShell.trustStatusDetail,
+          trustStatusAction: homepage.reportShell.trustStatusAction,
+          trustStatusTone: homepage.reportShell.trustStatusTone,
+          showOfflineBadge: homepage.reportShell.showOfflineBadge,
+          inlineTrustPlacement: "after-first-section",
+          provenance: homepage.reportShell.provenance,
+        },
+        chrome: {
+          sidebarVariant: "hidden",
+          hideHeroChrome: true,
+          pageNavVariant: "compact",
+          showPageNavigation: false,
+        },
+        actions: {
+          primaryCta: {
+            href: "#approve-this-weeks-plan",
+            label: "Open execution guardrails",
+          },
+          secondaryCta: {
+            href: "#audit-this-call",
+            label: "See why this call changed",
+          },
+          nextStep: {
+            href: "/signals",
+            description: "Open Signals only when the home workspace needs deeper evidence",
+          },
+        },
+        payloads: {
+          structuredData: homepage.reportShell.structuredData,
+          commandBar: homepage.reportShell.commandBar,
+          historicalBanner: homepage.reportShell.historicalBanner ? (
+            <HistoricalBanner
+              banner={homepage.reportShell.historicalBanner.banner}
+              liveHref={homepage.reportShell.historicalBanner.liveHref}
+              previousHref={homepage.reportShell.historicalBanner.previousHref}
+              timeMachineHref={homepage.reportShell.historicalBanner.timeMachineHref}
+            />
+          ) : null,
+        },
+      }}
       statusLabel={homepage.reportShell.statusLabel}
       recordDateLabel={homepage.reportShell.recordDateLabel}
       fetchedAtLabel={homepage.reportShell.fetchedAtLabel}
       treasurySource={homepage.reportShell.treasurySource}
+      pageTitle="Weekly Operating Posture Brief"
+      pageSummary="Whether translates macro conditions into operating decisions for companies. Action, guardrail, and flip condition for this planning cycle; scores stay contextual."
+      pageLinks={reportPageLinks}
+      sectionLinks={homepage.reportShell.sectionLinks}
       trustStatusLabel={homepage.reportShell.trustStatusLabel}
       trustStatusDetail={homepage.reportShell.trustStatusDetail}
       trustStatusAction={homepage.reportShell.trustStatusAction}
       trustStatusTone={homepage.reportShell.trustStatusTone}
-      provenance={homepage.reportShell.provenance}
-      showOfflineBadge={homepage.reportShell.showOfflineBadge}
-      pageTitle="Weekly Operating Posture Brief"
       currentPath="/"
-      pageSummary="Whether translates macro conditions into operating decisions for companies. Action, guardrail, and flip condition for this planning cycle; scores stay contextual."
-      primaryCta={{
-        href: "#approve-this-weeks-plan",
-        label: "Open execution guardrails",
-      }}
-      secondaryCta={{
-        href: "#audit-this-call",
-        label: "See why this call changed",
-      }}
-      nextStep={{
-        href: "/signals",
-        description: "Open Signals only when the home workspace needs deeper evidence",
-      }}
-      sidebarVariant="hidden"
-      hideHeroChrome={true}
-      pageNavVariant="compact"
-      showPageNavigation={false}
-      inlineTrustPlacement="after-first-section"
-      pageLinks={reportPageLinks}
-      sectionLinks={homepage.reportShell.sectionLinks}
-      structuredData={homepage.reportShell.structuredData}
-      commandBar={homepage.reportShell.commandBar}
-      historicalBanner={
-        homepage.reportShell.historicalBanner ? (
-          <HistoricalBanner
-            banner={homepage.reportShell.historicalBanner.banner}
-            liveHref={homepage.reportShell.historicalBanner.liveHref}
-            previousHref={homepage.reportShell.historicalBanner.previousHref}
-            timeMachineHref={homepage.reportShell.historicalBanner.timeMachineHref}
-          />
-        ) : null
-      }
     >
       <HomeWhatChangedSection
         weeklyDecisionCardModel={homepage.weeklyDecisionCardModel}
