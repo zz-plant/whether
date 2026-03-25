@@ -12,14 +12,14 @@ import { NavigationOrientationBadge } from "./navigationOrientationBadge";
 import type { ReactNode } from "react";
 
 type GlobalHeaderRouteGateProps = {
-  children: (context: { pathname: string; isReportShell: boolean }) => ReactNode;
+  defaultHeader: ReactNode;
 };
 
-export function GlobalHeaderRouteGate({ children }: GlobalHeaderRouteGateProps) {
+export function GlobalHeaderRouteGate({ defaultHeader }: GlobalHeaderRouteGateProps) {
   const pathname = normalizePathname(usePathname() ?? "/");
 
   if (!isReportShellRoute(pathname)) {
-    return <>{children({ pathname, isReportShell: false })}</>;
+    return <>{defaultHeader}</>;
   }
 
   return (
