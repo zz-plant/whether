@@ -34,7 +34,11 @@ export const ClimateBackdrop = ({ regime }: { regime: RegimeIconType | "NEUTRAL"
   const styles = getRegimeStyles(regime);
 
   return (
-    <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+    <div
+      aria-hidden="true"
+      className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
+      style={{ zIndex: -1 }}
+    >
       <div
         className="absolute inset-0"
         style={{
