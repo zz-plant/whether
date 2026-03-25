@@ -190,9 +190,11 @@ export const buildWeeklyLockCommitment = ({
   return {
     currentCall: weeklyCallByRegime[regime],
     flipConditions: [
-      formatDecisionThreshold(`Pause if tightness ≤ ${Math.max(tightnessRegime - loosenBy, 0)} for 2 consecutive refreshes.`),
-      formatDecisionThreshold(`Pause if risk appetite ≥ ${Math.min(riskAppetiteRegime + loosenBy, 100)} for 2 consecutive refreshes.`),
-      formatDecisionReversal(`Resume tighten stance if tightness > ${Math.min(tightnessRegime + tightenBy, 100)} or risk appetite < ${Math.max(riskAppetiteRegime - tightenBy, 0)}.`),
+      formatDecisionThreshold(`Tightness ≤ ${Math.max(tightnessRegime - loosenBy, 0)} for 2 consecutive refreshes.`),
+      formatDecisionThreshold(`Risk appetite ≥ ${Math.min(riskAppetiteRegime + loosenBy, 100)} for 2 consecutive refreshes.`),
+      formatDecisionReversal(
+        `Tightness > ${Math.min(tightnessRegime + tightenBy, 100)} or risk appetite < ${Math.max(riskAppetiteRegime - tightenBy, 0)} resumes tighten stance.`
+      ),
     ],
     ownerCadence: confidenceDegraded || freshnessDegraded
       ? "Owner: CEO + Finance lead · Checkpoint: daily 10:00 review until trust markers clear."
