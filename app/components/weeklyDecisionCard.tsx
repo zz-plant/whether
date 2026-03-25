@@ -10,6 +10,8 @@ import { ActionStripSection } from "./weekly-card/ActionStripSection";
 import { PostureHistoryTimeline } from "./weekly-card/HistorySection";
 import type { DiagnosticsSectionProps } from "./weekly-card/types";
 import { compactActionCue, compactInset, disclosureSummaryClass, sectionSpacing, tierOneHeading, tierOnePanel, tierThreeHeading, tierThreePanel } from "./weekly-card/shared";
+import { RegimeBanner } from "./weekly-card/regime-banner/RegimeBanner";
+import { WeeklyDecisionContent } from "./weekly-card/decision-content/WeeklyDecisionContent";
 import type { RegimeKey } from "../../lib/regimeEngine";
 import type {
   DecisionMatrixPayload,
@@ -19,7 +21,7 @@ import type {
   WeeklyDecisionCardViewModel,
 } from "../../lib/report/homeBriefModel";
 import { boundedDecisionPhraseFallbacks, buildCompactFreshnessMeta, formatDecisionTriplet } from "../../lib/report/reportFormatting";
-import { getRegimeWeatherIcon, getRegimeWeatherLabel, REGIME_BANNER_TOKENS, type RegimeWeatherIcon } from "../../lib/regimePresentation";
+import { buildThresholdMarkerState } from "../../lib/report/homeBriefPresentation";
 import { formatDateUTC } from "../../lib/formatters";
 import {
   buildWeeklyCitationMetaLine,
@@ -53,339 +55,6 @@ export type WeeklyDecisionDiagnosticsLaneProps = DiagnosticsSectionProps;
 export const WeeklyDecisionDiagnosticsLane = DiagnosticsSection;
 // Legacy hero export retained for isolated section tests only.
 export const DecisionCallHeader = DecisionHeroSection;
-
-const RegimeWeatherGlyph = ({ icon, title }: { icon: RegimeWeatherIcon; title: string }) => {
-  if (icon === "snowflake") {
-    return (
-      <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 text-sky-100" aria-hidden="true" focusable="false">
-        <title>{title}</title>
-        <path d="M8 1.5v13M2.6 4.2l10.8 7.6M13.4 4.2L2.6 11.8M4.8 2.7l1.7 1.1M11.2 2.7L9.5 3.8M4.8 13.3l1.7-1.1M11.2 13.3l-1.7-1.1" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round"/>
-      </svg>
-    );
-  }
-
-  if (icon === "cloud") {
-    return (
-      <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 text-slate-100" aria-hidden="true" focusable="false">
-        <title>{title}</title>
-        <path d="M5.1 12.4h6.3a2.6 2.6 0 1 0-.3-5.1 3.7 3.7 0 0 0-7.2.9A2.1 2.1 0 1 0 5.1 12.4Z" fill="currentColor" opacity="0.95"/>
-      </svg>
-    );
-  }
-
-  if (icon === "storm") {
-    return (
-      <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 text-sky-100" aria-hidden="true" focusable="false">
-        <title>{title}</title>
-        <path d="M5.1 9.8h6.3a2.6 2.6 0 1 0-.3-5.1 3.7 3.7 0 0 0-7.2.9A2.1 2.1 0 1 0 5.1 9.8Z" fill="currentColor" opacity="0.92"/>
-        <path d="M8.8 9 6.9 12h1.6L7.4 14.5 10 11h-1.5L9.6 9Z" fill="rgb(253 224 71)"/>
-      </svg>
-    );
-  }
-
-  return (
-    <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 text-amber-200" aria-hidden="true" focusable="false">
-      <title>{title}</title>
-      <circle cx="8" cy="8" r="3.1" fill="currentColor"/>
-      <path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.2 3.2l1.1 1.1M11.7 11.7l1.1 1.1M12.8 3.2l-1.1 1.1M4.3 11.7l-1.1 1.1" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-    </svg>
-  );
-};
-
-const resolvePostureAndStage = ({
-  statusLabel,
-  postureLabel,
-  stageLabel,
-  postureWithStageLabel,
-}: {
-  statusLabel: string;
-  postureLabel?: string;
-  stageLabel?: string;
-  postureWithStageLabel?: string;
-}) => {
-  const [derivedPostureLabel, derivedStageLabel] = (postureWithStageLabel ?? "").split(" — ");
-
-  return {
-    resolvedPostureLabel: postureLabel ?? derivedPostureLabel ?? statusLabel,
-    resolvedStageLabel: stageLabel ?? derivedStageLabel ?? "Unspecified",
-  };
-};
-
-type RegimeBannerProps = {
-  statusLabel: string;
-  regimeKey: RegimeKey;
-  postureLabel?: string;
-  stageLabel?: string;
-  postureWithStageLabel?: string;
-  recordDateLabel: string;
-  confidencePercent: number;
-  confidenceLabel: WeeklyDecisionCardModel["confidenceLabel"];
-  trendLabel?: string;
-  regimeDistance?: WeeklyDecisionCardModel["regimeDistance"];
-  flipRiskMeter: FlipRiskMeterState;
-};
-
-const flipRiskFillClass: Record<FlipRiskMeterState["urgencyLabel"], string> = {
-  High: "bg-rose-300",
-  Medium: "bg-amber-200",
-  Low: "bg-emerald-200",
-  Unknown: "bg-slate-300/70",
-};
-
-const flipRiskStrokeClass: Record<FlipRiskMeterState["urgencyLabel"], string> = {
-  High: "stroke-rose-300",
-  Medium: "stroke-amber-200",
-  Low: "stroke-emerald-200",
-  Unknown: "stroke-slate-300/70",
-};
-
-const confidenceBandTone: Record<RegimeBannerProps["confidenceLabel"], {
-  label: string;
-  activeIndex: number;
-  fillClass: string;
-  textClass: string;
-}> = {
-  HIGH: {
-    label: "High confidence",
-    activeIndex: 2,
-    fillClass: "bg-emerald-300",
-    textClass: "text-emerald-100",
-  },
-  MED: {
-    label: "Medium confidence",
-    activeIndex: 1,
-    fillClass: "bg-amber-200",
-    textClass: "text-amber-100",
-  },
-  LOW: {
-    label: "Low confidence",
-    activeIndex: 0,
-    fillClass: "bg-rose-300",
-    textClass: "text-rose-200",
-  },
-};
-
-const trendIconTone: Record<string, string> = {
-  improving: "text-emerald-200",
-  strengthening: "text-emerald-200",
-  stable: "text-slate-200",
-  mixed: "text-amber-200",
-  unstable: "text-amber-200",
-  deteriorating: "text-rose-200",
-  weakening: "text-rose-200",
-};
-
-const normalizeTrendKey = (trendLabel?: string) => trendLabel?.trim().toLowerCase() ?? "stable";
-
-const TrendGlyph = ({ trendLabel }: { trendLabel?: string }) => {
-  const trendKey = normalizeTrendKey(trendLabel);
-  const toneClass = trendIconTone[trendKey] ?? "text-slate-200";
-
-  if (trendKey === "improving" || trendKey === "strengthening") {
-    return (
-      <svg viewBox="0 0 16 16" className={`h-3.5 w-3.5 ${toneClass}`} aria-hidden="true" focusable="false">
-        <path d="M3.5 11.5 11.5 3.5M7.5 3.5h4v4" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    );
-  }
-
-  if (trendKey === "deteriorating" || trendKey === "weakening") {
-    return (
-      <svg viewBox="0 0 16 16" className={`h-3.5 w-3.5 ${toneClass}`} aria-hidden="true" focusable="false">
-        <path d="M3.5 4.5 11.5 12.5M7.5 12.5h4v-4" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    );
-  }
-
-  if (trendKey === "mixed" || trendKey === "unstable") {
-    return (
-      <svg viewBox="0 0 16 16" className={`h-3.5 w-3.5 ${toneClass}`} aria-hidden="true" focusable="false">
-        <path d="M2.5 10.5 5.3 7.7l2.2 2.2 3.8-3.8 2.2 2.2" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    );
-  }
-
-  return (
-    <svg viewBox="0 0 16 16" className={`h-3.5 w-3.5 ${toneClass}`} aria-hidden="true" focusable="false">
-      <path d="M3 8h10" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-    </svg>
-  );
-};
-
-const ConfidenceBandMeter = ({
-  confidencePercent,
-  confidenceLabel,
-}: {
-  confidencePercent: number;
-  confidenceLabel: RegimeBannerProps["confidenceLabel"];
-}) => {
-  const tone = confidenceBandTone[confidenceLabel];
-
-  return (
-    <div>
-      <div className="flex items-center justify-between gap-2">
-        <p className={`text-sm font-semibold ${tone.textClass}`}>{tone.label}</p>
-        <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-300" title={`Exact confidence ${Math.round(confidencePercent)} percent`}>
-          {confidenceLabel} {Math.round(confidencePercent)}%
-        </span>
-      </div>
-      <div className="mt-2 grid grid-cols-3 gap-1" role="img" aria-label={`${tone.label}. Exact confidence ${Math.round(confidencePercent)} percent`}>
-        {[0, 1, 2].map((index) => (
-          <span
-            key={index}
-            className={`h-2.5 rounded-full ${index === tone.activeIndex ? tone.fillClass : "bg-slate-800/85"}`}
-            aria-hidden="true"
-          />
-        ))}
-      </div>
-      <p className="mt-2 text-[11px] leading-5 text-slate-300">Band first, percent second.</p>
-    </div>
-  );
-};
-
-const FlipRiskDial = ({ flipRiskState }: { flipRiskState: FlipRiskMeterState }) => {
-  const radius = 14;
-  const circumference = 2 * Math.PI * radius;
-  const dashOffset = circumference * (1 - flipRiskState.progressPercent / 100);
-  const strokeClass = flipRiskStrokeClass[flipRiskState.urgencyLabel];
-  const zoneLabel = flipRiskState.urgencyLabel === "High"
-    ? "Near flip"
-    : flipRiskState.urgencyLabel === "Medium"
-      ? "Flip in play"
-      : flipRiskState.urgencyLabel === "Low"
-        ? "Room before flip"
-        : "Flip pending data";
-
-  return (
-    <div className="flex items-center gap-3">
-      <div className="relative flex h-11 w-11 items-center justify-center">
-        <svg viewBox="0 0 36 36" className="h-11 w-11 -rotate-90" aria-hidden="true" focusable="false">
-          <circle cx="18" cy="18" r={radius} className="fill-none stroke-slate-800/80" strokeWidth="4" />
-          <circle
-            cx="18"
-            cy="18"
-            r={radius}
-            className={`fill-none ${strokeClass}`}
-            strokeWidth="4"
-            strokeLinecap="round"
-            strokeDasharray={circumference}
-            strokeDashoffset={dashOffset}
-          />
-        </svg>
-        <span className="absolute text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-100">
-          {flipRiskState.urgencyLabel === "Unknown" ? "?" : flipRiskState.urgencyLabel.slice(0, 1)}
-        </span>
-      </div>
-      <div className="min-w-0">
-        <p className="text-sm font-semibold text-slate-50">{zoneLabel}</p>
-        <p className="mt-1 text-[11px] leading-5 text-slate-300">{flipRiskState.triggerLabel}</p>
-      </div>
-    </div>
-  );
-};
-
-const parseMetricNumber = (label: string) => {
-  const match = label.replace(/,/g, "").match(/-?\d+(?:\.\d+)?/);
-  return match ? Number(match[0]) : null;
-};
-
-const buildThresholdMarkerState = (valueLabel: string, watchLabel: string) => {
-  const currentValue = parseMetricNumber(valueLabel);
-  const thresholdValue = parseMetricNumber(watchLabel);
-
-  if (currentValue === null || thresholdValue === null) {
-    return null;
-  }
-
-  const lowerBound = Math.min(currentValue, thresholdValue, 0);
-  const upperBound = Math.max(currentValue, thresholdValue, 0);
-  const padding = Math.max((upperBound - lowerBound) * 0.2, Math.abs(thresholdValue) * 0.15, 0.5);
-  const domainMin = lowerBound - padding;
-  const domainMax = upperBound + padding;
-  const domainRange = Math.max(domainMax - domainMin, 1);
-  const normalize = (value: number) => Math.min(96, Math.max(4, ((value - domainMin) / domainRange) * 100));
-
-  return {
-    currentPercent: normalize(currentValue),
-    thresholdPercent: normalize(thresholdValue),
-  };
-};
-
-function RegimeBanner({
-  statusLabel,
-  regimeKey = "VOLATILE",
-  postureLabel,
-  stageLabel,
-  postureWithStageLabel,
-  recordDateLabel,
-  confidencePercent,
-  confidenceLabel,
-  trendLabel,
-  regimeDistance,
-  flipRiskMeter,
-}: RegimeBannerProps) {
-  const { resolvedPostureLabel, resolvedStageLabel } = resolvePostureAndStage({
-    statusLabel,
-    postureLabel,
-    stageLabel,
-    postureWithStageLabel,
-  });
-  const trendValue = trendLabel?.trim() || "Unspecified";
-  const flipRiskValue = regimeDistance && Number.isFinite(regimeDistance.pointsToFlip)
-    ? `${Math.max(0, Math.round(regimeDistance.pointsToFlip))} pts`
-    : "Unknown";
-  const bannerTone = REGIME_BANNER_TOKENS[regimeKey];
-  const activeWeather = getRegimeWeatherLabel(regimeKey);
-  const activeWeatherIcon = getRegimeWeatherIcon(regimeKey);
-  const flipRiskState = flipRiskMeter;
-  const exactConfidenceLabel = `${Math.round(confidencePercent)}%`;
-  const compactMetricChips = [
-    `Trend ${trendValue}`,
-    `Confidence ${confidenceLabel} ${exactConfidenceLabel}`,
-    `Flip window ${flipRiskValue}`,
-  ];
-
-  return (
-    <header className={`z-10 rounded-2xl border px-4 py-3 shadow-[0_20px_44px_rgba(2,6,23,0.42)] backdrop-blur sm:px-5 sm:py-4 ${bannerTone.shell}`} data-testid="weekly-regime-banner" aria-label="Weekly regime banner">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div className="min-w-0 space-y-2">
-          <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-100/85">
-            <span>Current outlook</span>
-            <span className="rounded-full border border-white/10 bg-slate-950/35 px-2.5 py-1">
-              Week of {recordDateLabel}
-            </span>
-          </div>
-          <div id="weekly-posture-brief-title" className="flex items-start gap-3">
-            <span className="weather-icon-chip mt-0.5 h-10 w-10 flex-shrink-0 text-slate-50">
-              <RegimeWeatherGlyph icon={activeWeatherIcon} title={activeWeather} />
-            </span>
-            <div className="min-w-0">
-              <p className="text-xl font-semibold leading-tight sm:text-[1.7rem]">{resolvedPostureLabel}</p>
-              <p className="mt-0.5 text-sm font-semibold text-slate-100/90">{resolvedStageLabel} cycle</p>
-              <p className="mt-1 text-xs leading-5 text-slate-300">
-                {activeWeather}. {flipRiskState.detailLabel}
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="space-y-2 lg:max-w-[24rem]">
-          <div className={`flex flex-wrap gap-1.5 text-xs font-semibold ${bannerTone.metrics}`} aria-label="Current outlook metadata">
-            {compactMetricChips.map((metric) => (
-              <span key={metric} className="inline-flex min-h-8 items-center rounded-full border border-white/10 bg-slate-950/25 px-2.5 py-1 leading-4">
-                {metric}
-              </span>
-            ))}
-          </div>
-          <p className="flex items-center gap-1.5 text-[11px] text-slate-300" aria-label={`Trend ${trendValue}`}>
-            <TrendGlyph trendLabel={trendValue} />
-            <span>{flipRiskState.triggerLabel}</span>
-          </p>
-        </div>
-      </div>
-    </header>
-  );
-}
-
 
 const confidenceTrendTone: Record<ConfidenceTrendFraming, string> = {
   strengthening: "text-emerald-200",
@@ -1258,8 +927,8 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
         flipRiskMeter={flipRiskMeter}
       />
 
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.28fr)_minmax(19rem,0.82fr)] xl:items-start">
-        <main className="space-y-4" aria-label="Weekly decision transmission order">
+      <WeeklyDecisionContent
+        modePanel={(
           <WeeklyCallModePanel
             startupVariantPolicy={resolvedStartupVariantPolicy}
             postureLabel={postureWithStageLabel ?? statusLabel}
@@ -1291,56 +960,51 @@ export function WeeklyDecisionCard(props: WeeklyDecisionCardProps) {
             activeRole={activeRole}
             roleHrefs={roleHrefs}
           />
-
-          <InputInfluenceSection items={inputInfluence} />
-
-          {diagnosticsLane ?? (
-            <DiagnosticsSection
-              weeklyMemoLines={weeklyMemoLines}
-              immediateDecision={immediateDecision}
-              revisitDecisions={revisitDecisions}
-              guardrail={guardrail}
-              regimeDistance={regimeDistance}
-              postureWithStageLabel={postureWithStageLabel}
-              statusLabel={statusLabel}
-              trendLabel={trendLabel}
-              confidencePercent={confidencePercent}
-              decisionMatrix={decisionMatrix}
-              decisionRules={decisionRules}
-              roleAwareTemplates={roleAwareTemplates}
-              evidenceItems={evidenceItems}
-              reportDynamics={reportDynamics}
-              weeklyMovement={weeklyMovement}
-              transitionProbabilities={transitionProbabilities}
-              failureModes={failureModes}
-              sinceLastReview={sinceLastReview}
-            />
-          )}
-
+        )}
+        influenceSection={<InputInfluenceSection items={inputInfluence} />}
+        diagnosticsSection={diagnosticsLane ?? (
+          <DiagnosticsSection
+            weeklyMemoLines={weeklyMemoLines}
+            immediateDecision={immediateDecision}
+            revisitDecisions={revisitDecisions}
+            guardrail={guardrail}
+            regimeDistance={regimeDistance}
+            postureWithStageLabel={postureWithStageLabel}
+            statusLabel={statusLabel}
+            trendLabel={trendLabel}
+            confidencePercent={confidencePercent}
+            decisionMatrix={decisionMatrix}
+            decisionRules={decisionRules}
+            roleAwareTemplates={roleAwareTemplates}
+            evidenceItems={evidenceItems}
+            reportDynamics={reportDynamics}
+            weeklyMovement={weeklyMovement}
+            transitionProbabilities={transitionProbabilities}
+            failureModes={failureModes}
+            sinceLastReview={sinceLastReview}
+          />
+        )}
+        matrixSection={(
           <BoundedRulesMatrix
             decisionMatrix={decisionMatrix}
             decisionRules={decisionRules}
             startupVariantPolicy={resolvedStartupVariantPolicy}
           />
-
-          {actionStripItems.length > 0 ? (
-            <ActionStripSection items={actionStripItems} />
-          ) : null}
-
-        </main>
-
-        <aside className="space-y-4 xl:sticky xl:top-28">
-          <ConfidenceMiniChart confidenceHistory={confidenceHistory} confidenceTrend={confidenceTrend} />
-          <DecisionTransmissionRail
-            actionNow={snapshotDoNow}
-            guardrail={snapshotGuardrail}
-            flipWhen={snapshotWatch}
-            citationMetaLine={citationMetaLine}
-            actions={actions}
-          />
-
-        </aside>
-      </div>
+        )}
+        actionStripSection={actionStripItems.length > 0 ? <ActionStripSection items={actionStripItems} /> : null}
+        asideContent={(
+          <>
+            <ConfidenceMiniChart confidenceHistory={confidenceHistory} confidenceTrend={confidenceTrend} />
+            <DecisionTransmissionRail
+              actionNow={snapshotDoNow}
+              guardrail={snapshotGuardrail}
+              flipWhen={snapshotWatch}
+              citationMetaLine={citationMetaLine}
+              actions={actions}
+            />
+          </>
+        )}
+      />
 
       <CitationActionFooter citationMetaLine={citationMetaLine} citation={citation} />
     </section>
