@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import {
-  globalHeaderGroupLabels,
   resolveGlobalHeaderNavigationLinks,
   type GlobalHeaderNavigationLink,
 } from "../../lib/navigation/globalHeader";
@@ -26,12 +25,9 @@ function NavigationLinkCard({ link }: { link: GlobalHeaderNavigationLink }) {
             : "text-slate-100 hover:border-sky-400/70"
         }`}
       >
-        <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-300/90">
-          {globalHeaderGroupLabels[link.group]}
-        </span>
-        <span className="mt-1 text-xs font-semibold tracking-[0.06em] sm:text-sm">{link.label}</span>
+        <span className="text-xs font-semibold tracking-[0.06em] sm:text-sm">{link.label}</span>
         <span
-          className={`mt-2 hidden text-[11px] leading-relaxed xl:block ${
+          className={`mt-2 hidden text-[11px] leading-relaxed lg:block ${
             link.isActive ? "text-sky-100/90" : "text-slate-400 group-hover:text-slate-300"
           }`}
         >
@@ -42,10 +38,34 @@ function NavigationLinkCard({ link }: { link: GlobalHeaderNavigationLink }) {
   );
 }
 
+function WeeklyBriefAnchor({ link }: { link: GlobalHeaderNavigationLink }) {
+  return (
+    <Link
+      href={link.href}
+      aria-current={link.isActive ? "page" : undefined}
+      title={link.boundary}
+      className={`weather-pill group inline-flex w-full min-h-[72px] flex-col items-start justify-start rounded-[1.1rem] px-4 py-3 text-left transition-colors touch-manipulation ${
+        link.isActive
+          ? "border-sky-300/90 bg-sky-500/25 text-sky-50"
+          : "text-slate-100 hover:border-sky-400/70"
+      }`}
+    >
+      <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-sky-200">Decision anchor</span>
+      <span className="mt-1 text-sm font-semibold tracking-[0.06em]">{link.label}</span>
+      <span className={`mt-1 text-xs leading-relaxed ${link.isActive ? "text-sky-100/90" : "text-slate-400 group-hover:text-slate-300"}`}>
+        {link.description}
+      </span>
+    </Link>
+  );
+}
+
 export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) {
   const currentPathname = usePathname() ?? "/";
   const resolvedPathname = pathname ?? currentPathname;
   const navigationLinks = useMemo(() => resolveGlobalHeaderNavigationLinks(resolvedPathname), [resolvedPathname]);
+  const weeklyBriefLink = navigationLinks.find((link) => link.key === "weekly-brief");
+  const investigateLinks = navigationLinks.filter((link) => link.key === "signals" || link.key === "method");
+  const executeLinks = navigationLinks.filter((link) => link.key === "decide" || link.key === "operations");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -67,11 +87,29 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
       </div>
       <ul
         id="global-header-nav-list"
-        className={`${isMenuOpen ? "flex" : "hidden"} gap-2 overflow-x-auto pb-1 pr-8 [-ms-overflow-style:auto] [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-700/80 sm:grid sm:grid-cols-2 sm:gap-3 sm:overflow-visible sm:pr-0 md:grid-cols-3 lg:grid-cols-5`}
+        className={`${isMenuOpen ? "flex" : "hidden"} flex-col gap-3 pb-1 sm:flex`}
       >
-        {navigationLinks.map((link) => (
-          <NavigationLinkCard key={link.href} link={link} />
-        ))}
+        {weeklyBriefLink ? (
+          <li className="list-none">
+            <WeeklyBriefAnchor link={weeklyBriefLink} />
+          </li>
+        ) : null}
+        <li className="list-none">
+          <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">Investigate</p>
+          <ul className="grid gap-2 sm:grid-cols-2">
+            {investigateLinks.map((link) => (
+              <NavigationLinkCard key={link.href} link={link} />
+            ))}
+          </ul>
+        </li>
+        <li className="list-none">
+          <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-400">Execute</p>
+          <ul className="grid gap-2 sm:grid-cols-2">
+            {executeLinks.map((link) => (
+              <NavigationLinkCard key={link.href} link={link} />
+            ))}
+          </ul>
+        </li>
       </ul>
       <div
         aria-hidden="true"

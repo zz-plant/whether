@@ -15,6 +15,7 @@ export type NavigationLayer = {
   label: string;
   description: string;
   boundary: string;
+  recommendedNextKey?: NavigationLayerKey;
   group: "core" | "workflow" | "reference";
   tier: "primary" | "supporting";
   parentKey?: NavigationLayerKey;
@@ -33,6 +34,7 @@ export const navigationLayers: NavigationLayer[] = [
     label: "Weekly Brief",
     description: "Current posture, bounded call, and share-ready artifact.",
     boundary: "Outcome snapshot only; detailed evidence and playbooks live in downstream hubs.",
+    recommendedNextKey: "decide",
     group: "core",
     tier: "primary",
   },
@@ -42,6 +44,7 @@ export const navigationLayers: NavigationLayer[] = [
     label: "Signals",
     description: "Deep evidence appendix for drivers, thresholds, and freshness behind the weekly brief.",
     boundary: "Evidence depth only; the canonical weekly workflow lives on Weekly Brief.",
+    recommendedNextKey: "decide",
     group: "workflow",
     tier: "primary",
   },
@@ -51,6 +54,7 @@ export const navigationLayers: NavigationLayer[] = [
     label: "Decide",
     description: "Role, situation, and utility paths that translate the weekly call into bounded choices.",
     boundary: "Decision translation depth only; do not duplicate the home workspace.",
+    recommendedNextKey: "operations",
     group: "workflow",
     tier: "primary",
   },
@@ -60,6 +64,7 @@ export const navigationLayers: NavigationLayer[] = [
     label: "Operations",
     description: "Detailed execution guardrails once the weekly plan needs deeper review.",
     boundary: "Execution depth only; Weekly Brief remains the canonical orchestration surface.",
+    recommendedNextKey: "weekly-brief",
     group: "workflow",
     tier: "primary",
   },
@@ -69,6 +74,7 @@ export const navigationLayers: NavigationLayer[] = [
     label: "Method",
     description: "Audit trust, sources, formulas, and confidence without leaving the weekly loop.",
     boundary: "Transparency surfaces only.",
+    recommendedNextKey: "signals",
     group: "reference",
     tier: "primary",
   },
@@ -78,6 +84,7 @@ export const navigationLayers: NavigationLayer[] = [
     label: "Toolkits",
     description: "Supporting instrument library under Decide for runnable templates and checklists.",
     boundary: "Supporting surface under Decide; no duplicate posture logic or evidence summaries.",
+    recommendedNextKey: "decide",
     group: "workflow",
     tier: "supporting",
     parentKey: "decide",
@@ -88,6 +95,7 @@ export const navigationLayers: NavigationLayer[] = [
     label: "Learn",
     description: "Supporting reference library under Method for concepts, diagnostics, and failure modes.",
     boundary: "Supporting surface under Method; never the canonical workflow or trust path.",
+    recommendedNextKey: "method",
     group: "reference",
     tier: "supporting",
     parentKey: "method",
@@ -116,4 +124,3 @@ export const trustHubAliases: ReadonlyArray<{ href: Route; canonicalHref: Route;
     note: "Methodology remains a legacy alias that resolves to Method formula reference content.",
   },
 ] as const;
-

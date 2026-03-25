@@ -7,18 +7,11 @@ import {
 import { pathMatchesLink } from "../../lib/navigation/pathMatching";
 
 const PRIMARY_ACTIONS = primaryNavigationLayers.map((layer) => ({
+  key: layer.key,
   label: layer.label,
   href: layer.href,
   description: layer.description,
 }));
-
-const recommendedPrimaryHrefByKey = {
-  "weekly-brief": "/operations",
-  signals: "/operations",
-  operations: "/",
-  decide: "/operations",
-  method: "/",
-} as const;
 
 export function NextStepRail({ currentPath }: { currentPath: string }) {
   const currentLayer = navigationLayers.find((layer) => pathMatchesLink(layer.href, currentPath));
@@ -26,12 +19,8 @@ export function NextStepRail({ currentPath }: { currentPath: string }) {
     ? { label: currentLayer.label, href: currentLayer.href, description: currentLayer.description }
     : null;
   const parentLayer = currentLayer?.parentKey ? navigationLayerByKey[currentLayer.parentKey] : null;
-  const recommendedHref = currentLayer?.tier === "supporting"
-    ? parentLayer?.href
-    : currentLayer
-      ? recommendedPrimaryHrefByKey[currentLayer.key as keyof typeof recommendedPrimaryHrefByKey]
-      : "/";
-  const recommendedAction = PRIMARY_ACTIONS.find((action) => action.href === recommendedHref) ?? PRIMARY_ACTIONS[0];
+  const recommendedKey = currentLayer?.recommendedNextKey ?? "weekly-brief";
+  const recommendedAction = PRIMARY_ACTIONS.find((action) => action.key === recommendedKey) ?? PRIMARY_ACTIONS[0];
   const introCopy = currentLayer?.tier === "supporting" && parentLayer
     ? `${currentLayer.label} is a supporting surface under ${parentLayer.label}. Use the primary workflow for orientation, then come here only when you need this deeper library.`
     : "Use Weekly Brief as the canonical workspace. Open depth pages only when the decision needs more detail.";
