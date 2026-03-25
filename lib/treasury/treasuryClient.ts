@@ -8,6 +8,7 @@ import { fetchWithTimeout } from "../fetchWithTimeout";
 
 const PRIMARY_FETCH_TIMEOUT_MS = 12_000;
 const RETRY_FETCH_TIMEOUT_MS = 20_000;
+const MAX_SERIES_FETCH_ATTEMPTS = 3;
 const TREASURY_RATES_ENDPOINT =
   "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/daily-treasury-rates.csv/current/all?type=daily_treasury_yield_curve&_format=csv";
 const TREASURY_FISCALDATA_ENDPOINT =
@@ -327,6 +328,30 @@ const isAbortLikeError = (error: unknown) => {
   return name.includes("abort") || message.includes("aborted") || message.includes("timeout");
 };
 
+const isTransientFetchError = (error: unknown) => {
+  if (!error) {
+    return false;
+  }
+
+  const message =
+    typeof error === "object" && "message" in error && typeof error.message === "string"
+      ? error.message.toLowerCase()
+      : String(error).toLowerCase();
+  const code =
+    typeof error === "object" && "cause" in error && error.cause && typeof error.cause === "object" && "code" in error.cause
+      ? String(error.cause.code).toLowerCase()
+      : "";
+
+  return (
+    message.includes("fetch failed") ||
+    message.includes("network") ||
+    message.includes("timed out") ||
+    code.includes("enetunreach") ||
+    code.includes("econnreset") ||
+    code.includes("etimedout")
+  );
+};
+
 const formatFetchError = (error: unknown) => {
   if (isAbortLikeError(error)) {
     return `Treasury live fetch timed out after ${PRIMARY_FETCH_TIMEOUT_MS / 1_000}s (retried once).`;
@@ -336,15 +361,45 @@ const formatFetchError = (error: unknown) => {
 };
 
 const fetchSeriesWithRetry = async (fetcher: typeof fetch, endpoint: string) => {
-  try {
-    return await fetchWithTimeout(fetcher, endpoint, undefined, PRIMARY_FETCH_TIMEOUT_MS);
-  } catch (error) {
-    if (!isAbortLikeError(error)) {
-      throw error;
-    }
+  let lastError: unknown;
+  let lastResponse: Response | null = null;
 
-    return fetchWithTimeout(fetcher, endpoint, undefined, RETRY_FETCH_TIMEOUT_MS);
+  for (let attempt = 0; attempt < MAX_SERIES_FETCH_ATTEMPTS; attempt += 1) {
+    try {
+      const response = await fetchWithTimeout(
+        fetcher,
+        endpoint,
+        {
+          headers: {
+            accept: "text/csv,application/csv;q=0.9,*/*;q=0.8",
+          },
+        },
+        attempt === 0 ? PRIMARY_FETCH_TIMEOUT_MS : RETRY_FETCH_TIMEOUT_MS
+      );
+
+      if (response.ok) {
+        return response;
+      }
+
+      lastResponse = response;
+      const shouldRetryStatus = response.status >= 500 || response.status === 429;
+      if (!shouldRetryStatus) {
+        return response;
+      }
+    } catch (error) {
+      lastError = error;
+      const shouldRetryError = isAbortLikeError(error) || isTransientFetchError(error);
+      if (!shouldRetryError || attempt >= MAX_SERIES_FETCH_ATTEMPTS - 1) {
+        throw error;
+      }
+    }
   }
+
+  if (lastResponse) {
+    return lastResponse;
+  }
+
+  throw (lastError ?? new Error("Unknown Treasury fetch error"));
 };
 
 export const fetchTreasuryData = async (
