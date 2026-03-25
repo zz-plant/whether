@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { BreadcrumbTrail } from "../components/breadcrumbTrail";
 import type { Route } from "../../lib/navigation/routeType";
 import { loadReportDataSafe } from "../../lib/report/reportData";
 import { buildPageMetadata, serializeJsonLd } from "../../lib/seo";
@@ -32,11 +33,26 @@ export default async function StartupMacroPosturePage() {
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(pageSchema) }} />
+      <BreadcrumbTrail
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Posture", href: "/posture" },
+          { label: "Startup macro posture" },
+        ]}
+      />
+
       <section className="weather-panel space-y-4 px-6 py-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Category anchor</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">SEO authority (discovery hub)</p>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Startup Macro Posture</h1>
         <p className="text-sm text-slate-200">Startup macro posture is the discipline of mapping capital conditions into operating constraints. Whether does not predict your business; it defines your risk posture with explicit thresholds and trigger reversals.</p>
         <p className="text-sm text-slate-300">Live posture now: <span className="font-semibold text-slate-100">{assessment.regime}</span> (risk appetite {assessment.scores.riskAppetite.toFixed(0)}, tightness {assessment.scores.tightness.toFixed(0)}, yield curve {(assessment.scores.curveSlope ?? 0).toFixed(2)}%).</p>
+        <div className="flex flex-wrap gap-3">
+          <Link href="/posture" className="weather-button-primary inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]">Open canonical posture hub</Link>
+          <Link href="/" className="weather-button inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]">Start core loop: Weekly Brief</Link>
+          <Link href="/signals" className="weather-button inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]">Then Signals</Link>
+          <Link href="/decide" className="weather-button inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]">Then Decide</Link>
+          <Link href="/operations" className="weather-button inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em]">Then Operations</Link>
+        </div>
       </section>
 
       <section className="weather-panel space-y-4 px-6 py-6">
@@ -86,8 +102,8 @@ export default async function StartupMacroPosturePage() {
       <section className="weather-panel space-y-3 px-6 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Internal linking rules</h2>
         <ul className="space-y-2 text-sm text-slate-200">
-          <li>• Every decision page links upward to this category anchor.</li>
-          <li>• Every regime page links sideways to peer regimes and signals.</li>
+          <li>• Every decision page links upward to the canonical posture hub at /posture.</li>
+          <li>• Every regime page links upward to /posture and then into /signals and /decide.</li>
           <li>• Every signal page links to at least two decision pages and one toolkit.</li>
           <li>• Every page includes timestamp + trigger reversal text.</li>
         </ul>
