@@ -9,10 +9,7 @@ import {
 } from "../../lib/timeMachine/timeMachineSelection";
 import { ReportShell } from "../components/reportShell";
 import { HistoricalBanner } from "../components/historicalBanner";
-import {
-  operationsSectionLinks,
-  operationsWorkstreamLinks,
-} from "../../lib/navigation/operationsNavigation";
+import { operationsSectionLinks } from "../../lib/navigation/operationsNavigation";
 import {
   FinanceStrategyPanel,
   MonthlyActionSummaryPanel,
@@ -410,25 +407,40 @@ export default async function OperationsPage({
         ]}
       />
 
-      <section id="ops-implementation-handoffs" className="weather-panel scroll-mt-28 space-y-4 px-5 py-5" aria-labelledby="ops-implementation-handoffs-title">
+      <section id="ops-developer-reference" className="weather-panel scroll-mt-28 space-y-4 px-5 py-5" aria-labelledby="ops-developer-reference-title">
         <div className="space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Implementation handoffs</p>
-          <h2 id="ops-implementation-handoffs-title" className="text-lg font-semibold text-slate-100">Optional depth pages after the weekly plan is approved</h2>
-          <p className="text-sm text-slate-300">Use these only when the approved brief needs delivery, data, or terminal handoff.</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Developer reference</p>
+          <h2 id="ops-developer-reference-title" className="text-lg font-semibold text-slate-100">Implementation handoff docs</h2>
+          <p className="text-sm text-slate-300">After the weekly plan is approved, use these docs for endpoint contracts, CLI commands, and integration payload wiring.</p>
         </div>
         <div className="grid gap-3 md:grid-cols-3">
-          {operationsWorkstreamLinks
-            .filter((link) => link.href !== "/operations")
-            .map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="weather-surface rounded-xl border px-4 py-4 text-sm text-slate-100 transition-colors hover:border-sky-400/70"
-              >
-                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">{link.label}</p>
-                <p className="mt-2 text-sm text-slate-300">{link.description}</p>
-              </a>
-            ))}
+          <a
+            href="https://github.com/zz-plant/whether/blob/main/docs/developer/operations-reference.md#weekly-dataapi-handoff"
+            target="_blank"
+            rel="noreferrer"
+            className="weather-surface rounded-xl border px-4 py-4 text-sm text-slate-100 transition-colors hover:border-sky-400/70"
+          >
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Data/API</p>
+            <p className="mt-2 text-sm text-slate-300">Weekly endpoint quick checks and machine handoff pointers.</p>
+          </a>
+          <a
+            href="https://github.com/zz-plant/whether/blob/main/docs/developer/operations-reference.md#cli-handoff"
+            target="_blank"
+            rel="noreferrer"
+            className="weather-surface rounded-xl border px-4 py-4 text-sm text-slate-100 transition-colors hover:border-sky-400/70"
+          >
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Terminal</p>
+            <p className="mt-2 text-sm text-slate-300">Command reference path and fallback endpoints for CLI workflows.</p>
+          </a>
+          <a
+            href="https://github.com/zz-plant/whether/blob/main/docs/developer/operations-reference.md#integrations-handoff"
+            target="_blank"
+            rel="noreferrer"
+            className="weather-surface rounded-xl border px-4 py-4 text-sm text-slate-100 transition-colors hover:border-sky-400/70"
+          >
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Integrations</p>
+            <p className="mt-2 text-sm text-slate-300">Weekly mandate payload endpoint and delivery docs for tool syncs.</p>
+          </a>
         </div>
       </section>
       <NextStepRail currentPath="/operations" />

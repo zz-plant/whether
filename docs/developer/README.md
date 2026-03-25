@@ -31,6 +31,10 @@ You will get:
 - health and cadence gates
 - alert and delivery flow patterns
 
+### I need operations implementation handoff details
+
+Read `operations-reference.md`.
+
 ### I need a fallback path when CLI install or auth is blocked
 
 Read `cli-fallback.md`.
@@ -56,7 +60,7 @@ For contributor workflow and repo policy, use:
 - `../development-playbook.md`
 - `../agents/README.md`
 
-For in-product machine-route discovery, use:
-- `/operations/data`
+For operations handoff reference, use:
+- `operations-reference.md`
 
-Keep new discovery copy aligned with that surface so endpoint guidance does not fragment across the repo.
+Keep new endpoint and CLI guidance aligned with that page so machine-route discovery stays in one place.

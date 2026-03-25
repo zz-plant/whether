@@ -9,7 +9,6 @@ const pageChecks = [
   { path: "/toolkits", required: ["toolkits"] },
   { path: "/decide", required: ["decide"] },
   { path: "/learn", required: ["learn"] },
-  { path: "/operations/data", required: ["data"] },
   { path: "/acceptable-use-policy", required: ["acceptable use"] },
   { path: "/terms-of-service", required: ["terms of service"] },
 ];

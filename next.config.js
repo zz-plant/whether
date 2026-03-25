@@ -15,6 +15,25 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  async redirects() {
+    return [
+      {
+        source: "/operations/data",
+        destination: "https://github.com/zz-plant/whether/blob/main/docs/developer/operations-reference.md#weekly-dataapi-handoff",
+        permanent: true,
+      },
+      {
+        source: "/operations/cli",
+        destination: "https://github.com/zz-plant/whether/blob/main/docs/developer/operations-reference.md#cli-handoff",
+        permanent: true,
+      },
+      {
+        source: "/operations/integrations",
+        destination: "https://github.com/zz-plant/whether/blob/main/docs/developer/operations-reference.md#integrations-handoff",
+        permanent: true,
+      },
+    ];
+  },
   experimental: {
     ...(staticGenerationWorkers ? { staticGenerationMaxConcurrency: staticGenerationWorkers } : {}),
     ...(staticGenerationMinPagesPerWorker ? { staticGenerationMinPagesPerWorker } : {}),

@@ -63,6 +63,7 @@ If a document is not obviously canonical, confirm it against the relevant canoni
 - `developer/quickstart.md` — first decision-artifact pull
 - `developer/api-reference.md` — endpoint catalog and contract notes
 - `developer/integrations.md` — operational integration patterns
+- `developer/operations-reference.md` — canonical operations handoff for Data/API, CLI, and integrations
 - `developer/cli-fallback.md` — curl-first fallback flow
 
 ### Agent workflow

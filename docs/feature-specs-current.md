@@ -89,12 +89,10 @@ approved.
 ### 1.4 Operations workstreams
 - **Weekly plan** (`/operations`): the default execution
   path with weekly plan, guardrails, finance strategy, export brief, and operator requests.
-- **Send to tools** (`/operations/integrations`): preview weekly mandate payloads for Slack, Notion,
-  and Linear.
-- **Data/API** (`/operations/data`): API usage guidance and handoff references for operators.
-- **Terminal** (`/operations/cli`): command-line status, history, diff, and scenario workflows.
+- **Developer reference** (`docs/developer/operations-reference.md`): canonical handoff for Data/API,
+  terminal workflows, and integration payload checks.
 
-The `/operations/data` companion is intentionally static-first: endpoint docs and copy-ready snippets should load even when the live weekly report is degraded, so trust/reference content does not inherit avoidable report-fetch timeouts.
+Operations handoff docs are intentionally static-first so endpoint contracts and copy-ready snippets stay available even when live report rendering is degraded.
 
 ### 1.5 Home and glossary support (`/`, `/method#beginner-glossary`)
 The homepage is the only canonical first-time and returning weekly workspace. Plain-English
